@@ -210,7 +210,7 @@ cddb_end: ;
 
 
 /*
- Gets and saves CDDA Meta Information about the CD.
+ Gets and saves Meta Information about the CD-DA.
 
  In the Control routine, we handle Meta Information requests and
  basically copy what we've saved here.
@@ -272,10 +272,14 @@ void CDDAMetaInfo( access_t *p_access, int i_track )
               (p_cdda->lsn[i_first_track+i] - p_cdda->lsn[i_first_track])
               / CDIO_CD_FRAMES_PER_SEC;
 
-        dbg_print( INPUT_DBG_META, "Duration %ld", (long int) i_duration );
+        dbg_print( INPUT_DBG_META, "Duration %ld, tracks %d", 
+		   (long int) i_duration, p_cdda->i_tracks );
         input_Control( p_cdda->p_input, INPUT_ADD_INFO,
                        _("Disc"), _("Duration"), "%s",
                        secstotimestr( psz_buffer, i_duration ) );
+
+        input_Control( p_cdda->p_input, INPUT_ADD_INFO,
+                       _("Disc"), _("Tracks"), "%d", p_cdda->i_tracks );
 
 #ifdef HAVE_LIBCDDB
         if (p_cdda->b_cddb_enabled && p_cdda->cddb.disc)
@@ -305,58 +309,56 @@ void CDDAMetaInfo( access_t *p_access, int i_track )
             add_cdtext_disc_info_str("Title (CD-Text)",       CDTEXT_TITLE);
         }
 
-        if( i_track == -1 )
-        {
-            for( i = 0 ; i < p_cdda->i_tracks ; i++ )
-            {
-                char psz_track[TITLE_MAX];
-                const track_t i_track = i_first_track + i;
-                mtime_t i_duration = (p_cdda->lsn[i_track+1] -
-                                      p_cdda->lsn[i_track])
-                                      / CDIO_CD_FRAMES_PER_SEC;
-                snprintf(psz_track, TITLE_MAX, "%s %02d", _("Track"), i_track);
-                input_Control( p_cdda->p_input, INPUT_ADD_INFO, psz_track,
-                               _("Duration"), "%s",
-                               secstotimestr( psz_buffer, i_duration ) );
+	for( i = 0 ; i < p_cdda->i_tracks ; i++ )
+	{
+	  char psz_track[TITLE_MAX];
+	  const track_t i_track = i_first_track + i;
+	  mtime_t i_duration = (p_cdda->lsn[i_track+1] -
+				p_cdda->lsn[i_track])
+	    / CDIO_CD_FRAMES_PER_SEC;
+	  snprintf(psz_track, TITLE_MAX, "%s %02d", _("Track"), i_track);
 
-                p_cdda->p_cdtext[i_track] =
-                                cdio_get_cdtext(p_cdda->p_cdio, i_track);
-
-                if (p_cdda->p_cdtext[i_track])
-                {
-                    add_cdtext_info_str( psz_track, "Arranger (CD-Text)",
-                                         i_track, CDTEXT_ARRANGER);
-                    add_cdtext_info_str( psz_track, "Composer (CD-Text)",
-                                         i_track, CDTEXT_COMPOSER);
-                    add_cdtext_info_str( psz_track, "Disc ID (CD-Text)",
-                                         i_track, CDTEXT_DISCID);
-                    add_cdtext_info_str( psz_track, "Genre (CD-Text)",
-                                         i_track, CDTEXT_GENRE);
-                    add_cdtext_info_str( psz_track, "Message (CD-Text)",
-                                         i_track, CDTEXT_MESSAGE);
-                    add_cdtext_info_str( psz_track, "Performer (CD-Text)",
-                                         i_track, CDTEXT_PERFORMER);
-                    add_cdtext_info_str( psz_track, "Songwriter (CD-Text)",
-                                         i_track, CDTEXT_SONGWRITER);
-                    add_cdtext_info_str( psz_track, "Title (CD-Text)",
-                                         i_track, CDTEXT_TITLE);
-                }
-
+	  input_Control( p_cdda->p_input, INPUT_ADD_INFO, psz_track,
+			 _("Duration"), "%s",
+			 secstotimestr( psz_buffer, i_duration ) );
+	  
+	  p_cdda->p_cdtext[i_track] =
+	    cdio_get_cdtext(p_cdda->p_cdio, i_track);
+	  
+	  if (p_cdda->p_cdtext[i_track])
+	    {
+	      add_cdtext_info_str( psz_track, "Arranger (CD-Text)",
+				   i_track, CDTEXT_ARRANGER);
+	      add_cdtext_info_str( psz_track, "Composer (CD-Text)",
+				   i_track, CDTEXT_COMPOSER);
+	      add_cdtext_info_str( psz_track, "Disc ID (CD-Text)",
+				   i_track, CDTEXT_DISCID);
+	      add_cdtext_info_str( psz_track, "Genre (CD-Text)",
+				   i_track, CDTEXT_GENRE);
+	      add_cdtext_info_str( psz_track, "Message (CD-Text)",
+				   i_track, CDTEXT_MESSAGE);
+	      add_cdtext_info_str( psz_track, "Performer (CD-Text)",
+				   i_track, CDTEXT_PERFORMER);
+	      add_cdtext_info_str( psz_track, "Songwriter (CD-Text)",
+				   i_track, CDTEXT_SONGWRITER);
+	      add_cdtext_info_str( psz_track, "Title (CD-Text)",
+				   i_track, CDTEXT_TITLE);
+	    }
+	  
 #ifdef HAVE_LIBCDDB
-                if (p_cdda->b_cddb_enabled)
-                {
-                    cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, i);
-                    if (t != NULL)
-                    {
-                        add_info_str(psz_track, "Artist (CDDB)", t->artist);
-                        add_info_str(psz_track, "Title (CDDB)",  t->title);
-                        add_info_str(psz_track, "Extended Data (CDDB)",
-                                                t->ext_data);
-                    }
-                }
+	  if (p_cdda->b_cddb_enabled)
+	    {
+	      cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, i);
+	      if (t != NULL)
+		{
+		  add_info_str(psz_track, "Artist (CDDB)", t->artist);
+		  add_info_str(psz_track, "Title (CDDB)",  t->title);
+		  add_info_str(psz_track, "Extended Data (CDDB)",
+			       t->ext_data);
+		}
+	    }
 #endif /*HAVE_LIBCDDB*/
-            }
-        }
+	}
     }
 }
 
@@ -386,6 +388,17 @@ void CDDAMetaInfo( access_t *p_access, int i_track )
     }                                                    \
     saw_control_prefix = false;                          \
   }
+
+static inline bool
+want_cddb_info(
+cdda_data_t *p_cdda, char *psz_cdtext) 
+{
+  /* We either don't have CD-Text info, or we do but we prefer to get CDDB
+     which means CDDB has been enabled and we were able to retrieve the info.*/
+  return !psz_cdtext || 
+    (!p_cdda->b_cdtext_prefer && p_cdda->b_cddb_enabled && p_cdda->cddb.disc);
+}
+
 
 /*!
    Take a format string and expand escape sequences, that is sequences that
@@ -423,6 +436,7 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
 
     for (i=0; i<format_len; i++)
     {
+        char *psz = NULL;
 
         if (!saw_control_prefix && format_str[i] != '%')
         {
@@ -442,15 +456,19 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
               break;
 #ifdef HAVE_LIBCDDB
             case 'a':
-                if (!p_cdda->b_cddb_enabled) goto not_special;
-                if (p_cdda->cddb.disc)
-                    add_format_str_info(p_cdda->cddb.disc->artist);
-                break;
+	        if (p_cdda->p_cdtext[0] 
+		    && p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER])
+		  psz = p_cdda->p_cdtext[0]->field[CDTEXT_PERFORMER];
+		if (want_cddb_info(p_cdda, psz))
+		  psz = p_cdda->cddb.disc->artist;
+                goto format_str;
             case 'A':
-                if (!p_cdda->b_cddb_enabled) goto not_special;
-                if (p_cdda->cddb.disc)
-                    add_format_str_info(p_cdda->cddb.disc->title);
-                    break;
+	        if (p_cdda->p_cdtext[0] 
+		    && p_cdda->p_cdtext[0]->field[CDTEXT_TITLE])
+		  psz = p_cdda->p_cdtext[0]->field[CDTEXT_TITLE];
+		if (want_cddb_info(p_cdda, psz))
+		  psz =  p_cdda->cddb.disc->title;
+                goto format_str;
             case 'C':
                 if (!p_cdda->b_cddb_enabled) goto not_special;
                 if (p_cdda->cddb.disc)
@@ -458,14 +476,20 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                                   CDDB_CATEGORY[p_cdda->cddb.disc->category]);
                 break;
             case 'G':
-                if (!p_cdda->b_cddb_enabled) goto not_special;
-                if (p_cdda->cddb.disc)
-                    add_format_str_info(p_cdda->cddb.disc->genre);
-                break;
+	        if (p_cdda->p_cdtext[0] 
+		    && p_cdda->p_cdtext[0]->field[CDTEXT_GENRE])
+		  psz = p_cdda->p_cdtext[0]->field[CDTEXT_GENRE];
+		if (want_cddb_info(p_cdda, psz))
+		  psz = p_cdda->cddb.disc->genre;
+		goto format_str;
             case 'I':
-                if (!p_cdda->b_cddb_enabled) goto not_special;
-                if (p_cdda->cddb.disc)
+	        if (p_cdda->p_cdtext[0] 
+		    && p_cdda->p_cdtext[0]->field[CDTEXT_DISCID])
+		  psz = p_cdda->p_cdtext[0]->field[CDTEXT_DISCID];
+		if (want_cddb_info(p_cdda, psz)) {
                      add_format_num_info(p_cdda->cddb.disc->discid, "%x");
+		} else if (psz)
+		     add_format_str_info(psz);
                 break;
             case 'Y':
                 if (!p_cdda->b_cddb_enabled) goto not_special;
@@ -482,23 +506,30 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                 }
                 else goto not_special;
                 break;
-            case 'p':
-                if (p_cdda->b_cddb_enabled && p_cdda->cddb.disc)
-                {
-                    cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
-                                                        i_track-1);
-                    if (t != NULL && t->artist != NULL)
-                    add_format_str_info(t->artist);
-                } else goto not_special;
-                break;
+	    case 'p':
+	        if (p_cdda->p_cdtext[i_track] 
+		    && p_cdda->p_cdtext[i_track]->field[CDTEXT_PERFORMER])
+		  psz = p_cdda->p_cdtext[i_track]->field[CDTEXT_PERFORMER];
+		if (want_cddb_info(p_cdda, psz))
+		  {
+		    cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
+							i_track-1);
+		    if (t != NULL && t->artist != NULL)
+		      psz = t->artist;
+		  }
+		goto format_str;
             case 'e':
-                if (p_cdda->b_cddb_enabled && p_cdda->cddb.disc)
+	        if (p_cdda->p_cdtext[i_track] 
+		    && p_cdda->p_cdtext[i_track]->field[CDTEXT_MESSAGE])
+		  psz = p_cdda->p_cdtext[i_track]->field[CDTEXT_MESSAGE];
+		if (want_cddb_info(p_cdda, psz))
                 {
                     cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc,
                                                         i_track-1);
                     if (t != NULL && t->ext_data != NULL)
-                        add_format_str_info(t->ext_data);
-                } else goto not_special;
+                        psz = t->ext_data;
+                } 
+		goto format_str;
                 break;
             case 's':
                 if (p_cdda->b_cddb_enabled)
@@ -510,6 +541,38 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                     add_format_str_info(secstotimestr( psz_buffer,
                                        i_duration ) );
                 } else goto not_special;
+                break;
+#else
+            case 'a':
+	        if (p_cdda->p_cdtext[0] 
+		    && p_cdda->p_cdtext->field[CDTEXT_PERFORMER]
+		    psz = p_cdda->p_cdtext->field[CDTEXT_PERFORMER]);
+                goto format_str;
+            case 'A':
+	        if (p_cdda->p_cdtext[0] 
+		    && p_cdda->p_cdtext->field[CDTEXT_TITLE]
+		    psz = p_cdda->p_cdtext->field[CDTEXT_TITLE]);
+                goto format_str;
+            case 'G':
+	        if (p_cdda->p_cdtext[0] 
+		    && p_cdda->p_cdtext[0]->field[CDTEXT_GENRE])
+		  psz = p_cdda->p_cdtext[0]->field[CDTEXT_GENRE];
+		goto format_str;
+            case 'I':
+	        if (p_cdda->p_cdtext[0] 
+		    && p_cdda->p_cdtext[0]->field[CDTEXT_DISCID])
+		  add_format_str_info(p_cdda->p_cdtext[0]->field[CDTEXT_DISCID]);
+                break;
+	    case 'p':
+	        if (p_cdda->p_cdtext[i_track] 
+		    && p_cdda->p_cdtext[i_track]->field[CDTEXT_PERFORMER])
+		  psz = p_cdda->p_cdtext[i_track]->field[CDTEXT_PERFORMER];
+		goto format_str;
+            case 'e':
+	        if (p_cdda->p_cdtext[i_track] 
+		    && p_cdda->p_cdtext[i_track]->field[CDTEXT_MESSAGE])
+		  psz = p_cdda->p_cdtext[i_track]->field[CDTEXT_MESSAGE];
+		goto format_str;
                 break;
 #endif /*HAVE_LIBCDDB*/
 
@@ -528,6 +591,10 @@ CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
             case 'T':
               add_format_num_info(i_track, "%02d");
               break;
+	    format_str:
+	      if (psz)
+		add_format_str_info(psz);
+	      break;
 #ifdef HAVE_LIBCDDB
             not_special:
 #endif
