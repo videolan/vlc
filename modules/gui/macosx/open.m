@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.8 2003/01/06 22:07:47 massiot Exp $
+ * $Id: open.m,v 1.9 2003/01/18 04:10:58 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -163,9 +163,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         s_point.x = 0;
         s_point.y = OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
         [[o_panel contentView] setBoundsOrigin: s_point];
-
-        free(psz_sout);
     }
+    free(psz_sout);
 
     [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
@@ -674,7 +673,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         NSRect s_rect = [o_panel frame];
         s_rect.size.height = OPEN_PANEL_FULL_HEIGHT + WINDOW_TITLE_HEIGHT;
         s_rect.origin.y -= OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
-        [o_panel setFrame: s_rect display: YES animate: YES];
+        [o_panel setFrame: s_rect display: YES animate: NO];
     }
     else
     {
@@ -687,7 +686,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         NSRect s_rect = [o_panel frame];
         s_rect.size.height = OPEN_PANEL_SHORT_HEIGHT + WINDOW_TITLE_HEIGHT;
         s_rect.origin.y += OPEN_PANEL_FULL_HEIGHT - OPEN_PANEL_SHORT_HEIGHT;
-        [o_panel setFrame: s_rect display: YES animate:YES];
+        [o_panel setFrame: s_rect display: YES animate:NO];
     }
 }
 
