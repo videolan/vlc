@@ -413,6 +413,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     if( p_vout->p_module == NULL )
     {
         msg_Err( p_vout, "no suitable vout module" );
+        vlc_object_detach( p_vout );
         vlc_object_destroy( p_vout );
         return NULL;
     }
@@ -489,6 +490,11 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
         /* Make sure the thread is destroyed */
         p_vout->b_die = VLC_TRUE;
+
+        if( p_vout->p_text_renderer_module )
+        {
+            module_Unneed( p_vout, p_vout->p_text_renderer_module );
+        }
         vlc_thread_join( p_vout );
 
         vlc_object_detach( p_vout );
@@ -1157,7 +1163,10 @@ static void DestroyThread( vout_thread_t *p_vout )
     vlc_mutex_destroy( &p_vout->change_lock );
 
     /* Release the module */
-    module_Unneed( p_vout, p_vout->p_module );
+    if( p_vout->p_module && p_vout->p_module )
+    {
+        module_Unneed( p_vout, p_vout->p_module );
+    }
 }
 
 /* following functions are local */
