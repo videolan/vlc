@@ -372,7 +372,7 @@ package-win32:
 	# Create installation script
 	sed -e 's#@VERSION@#'${VLC_QUICKVERSION}'#' < install-win32 > tmp/nsi
 	# Copy relevant files
-	cp vlc.exe plugins/directx.so plugins/gtk.so plugins/sdl.so tmp/ 
+	cp vlc.exe $(PLUGINS:%=plugins/%.so) tmp/ 
 	cp INSTALL-win32.txt AUTHORS COPYING ChangeLog ChangeLog.libdvdcss \
 		README README.libdvdcss FAQ TODO tmp/
 	for file in gtk-1.3.dll gdk-1.3.dll glib-1.3.dll gmodule-1.3.dll \
