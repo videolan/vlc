@@ -124,68 +124,78 @@ intf_thread_t* intf_Create( void )
         }
     }
 
-        if( i_best_score == 0 )
-        {
+    if( i_best_score == 0 )
+    {
         free( p_intf );
         return( NULL );
-        }
+    }
 
-        /* Get the plugin functions */
-        ( (intf_getplugin_t *)
-          p_main->p_bank->p_info[ i_best_index ]->intf_GetPlugin )( p_intf );
+    /* Get the plugin functions */
+    ( (intf_getplugin_t *)
+      p_main->p_bank->p_info[ i_best_index ]->intf_GetPlugin )( p_intf );
 
-        /* Initialize structure */
-        p_intf->b_die =     0;
-        p_intf->p_vout =    NULL;
-        p_intf->p_input =   NULL;
-        p_intf->p_keys =    NULL;
+    /* Initialize structure */
+    p_intf->b_die =     0;
+    p_intf->p_vout =    NULL;
+    p_intf->p_input =   NULL;
+    p_intf->p_keys =    NULL;
 
-        /* Load channels - the pointer will be set to NULL on failure. The
-         * return value is ignored since the program can work without
-         * channels */
-        LoadChannels( p_intf, main_GetPszVariable( INTF_CHANNELS_VAR, INTF_CHANNELS_DEFAULT ));
+    /* Load channels - the pointer will be set to NULL on failure. The
+     * return value is ignored since the program can work without
+     * channels */
+    LoadChannels( p_intf, main_GetPszVariable( INTF_CHANNELS_VAR, INTF_CHANNELS_DEFAULT ));
 
-        /* Start interfaces */
-        p_intf->p_console = intf_ConsoleCreate();
-        if( p_intf->p_console == NULL )
-        {
+    /* Start interfaces */
+    p_intf->p_console = intf_ConsoleCreate();
+    if( p_intf->p_console == NULL )
+    {
         intf_ErrMsg("error: can't create control console\n");
         free( p_intf );
         return( NULL );
-        }
-        if( p_intf->p_sys_create( p_intf ) )
-        {
+    }
+    if( p_intf->p_sys_create( p_intf ) )
+    {
         intf_ErrMsg("error: can't create interface\n");
         intf_ConsoleDestroy( p_intf->p_console );
         free( p_intf );
         return( NULL );
-        }
-
-        intf_Msg("Interface initialized\n");
-        return( p_intf );
     }
 
-    /*****************************************************************************
-     * intf_Run
-     *****************************************************************************
-     * Initialization script and main interface loop.
-     *****************************************************************************/
-    void intf_Run( intf_thread_t *p_intf )
-    {
-        if( p_main->p_playlist->p_list )
-        {
-        p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_FILE, NULL, 0, 0, p_main->p_intf->p_vout, p_main->p_aout, NULL );
-        }
-        /* Execute the initialization script - if a positive number is returned,
-         * the script could be executed but failed */
-        else if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
-        {
-        intf_ErrMsg("warning: error(s) during startup script\n");
-        }
+    intf_Msg("Interface initialized\n");
+    return( p_intf );
+}
 
-        /* Main loop */
-        while(!p_intf->b_die)
-        {
+/*****************************************************************************
+ * intf_Run
+ *****************************************************************************
+ * Initialization script and main interface loop.
+ *****************************************************************************/
+void intf_Run( intf_thread_t *p_intf )
+{
+    char * psz_server = main_GetPszVariable( INPUT_SERVER_VAR, NULL );
+
+    /* If a server was specified */
+    if( psz_server )
+    {
+        p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_UCAST,
+                              psz_server, 0, 0,
+                              p_intf->p_vout, p_main->p_aout, NULL );
+    }
+    /* Or if a file was specified */
+    else if( p_main->p_playlist->p_list )
+    {
+        p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_FILE, NULL, 0, 0, p_main->p_intf->p_vout, p_main->p_aout, NULL );
+    }
+    /* Execute the initialization script - if a positive number is returned,
+     * the script could be executed but failed */
+    else if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
+    {
+        intf_ErrMsg("warning: error(s) during startup script\n");
+    }
+
+    /* Main loop */
+    while(!p_intf->b_die)
+    {
         /* Flush waiting messages */
         intf_FlushMsg();
 
@@ -208,53 +218,52 @@ intf_thread_t* intf_Create( void )
         /* Sleep to avoid using all CPU - since some interfaces needs to access
          * keyboard events, a 100ms delay is a good compromise */
         msleep( INTF_IDLE_SLEEP );
-        }
     }
+}
 
-    /*****************************************************************************
-     * intf_Destroy: clean interface after main loop
-     *****************************************************************************
-     * This function destroys specific interfaces and close output devices.
-     *****************************************************************************/
-    void intf_Destroy( intf_thread_t *p_intf )
+/*****************************************************************************
+ * intf_Destroy: clean interface after main loop
+ *****************************************************************************
+ * This function destroys specific interfaces and close output devices.
+ *****************************************************************************/
+void intf_Destroy( intf_thread_t *p_intf )
+{
+    p_intf_key  p_cur;
+    p_intf_key  p_next;
+    /* Destroy interfaces */
+    p_intf->p_sys_destroy( p_intf );
+    intf_ConsoleDestroy( p_intf->p_console );
+
+    /* Unload channels */
+    UnloadChannels( p_intf );
+
+    /* Destroy keymap */
+    p_cur = p_intf->p_keys;
+    while( p_cur != NULL)
     {
-        p_intf_key  p_cur;
-        p_intf_key  p_next;
-        /* Destroy interfaces */
-        p_intf->p_sys_destroy( p_intf );
-        intf_ConsoleDestroy( p_intf->p_console );
-
-        /* Unload channels */
-        UnloadChannels( p_intf );
-
-        /* Destroy keymap */
-        
-        p_cur = p_intf->p_keys;
-        while( p_cur != NULL)
-        {
         p_next = p_cur->next;
         free(p_cur);
         p_cur = p_next;
-         }
+    }
          
         
         /* Free structure */
-        free( p_intf );
-    }
+    free( p_intf );
+}
 
-    /*****************************************************************************
-     * intf_SelectChannel: change channel
-     *****************************************************************************
-     * Kill existing input, if any, and try to open a new one, using an input
-     * configuration table.
-     *****************************************************************************/
-    int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
+/*****************************************************************************
+ * intf_SelectChannel: change channel
+ *****************************************************************************
+ * Kill existing input, if any, and try to open a new one, using an input
+ * configuration table.
+ *****************************************************************************/
+int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
+{
+    intf_channel_t *    p_channel;                                /* channel */
+
+    /* Look for channel in array */
+    if( p_intf->p_channel != NULL )
     {
-        intf_channel_t *    p_channel;                                /* channel */
-
-        /* Look for channel in array */
-        if( p_intf->p_channel != NULL )
-        {
         for( p_channel = p_intf->p_channel; p_channel->i_channel != -1; p_channel++ )
         {
             if( p_channel->i_channel == i_channel )
@@ -278,20 +287,19 @@ intf_thread_t* intf_Create( void )
             return( p_intf->p_input == NULL );
             }
         }
-        }
-
-        /* Channel does not exist */
-        intf_Msg("Channel %d does not exist\n", i_channel );
-        return( 1 );
     }
 
-    /*****************************************************************************
-     * intf_AssignKey: assign standartkeys                                       *
-     *****************************************************************************
-     * This function fills in the associative array that links the key pressed   *
-     * and the key we use internally. Support one extra parameter.               *
-     ****************************************************************************/
+    /* Channel does not exist */
+    intf_Msg("Channel %d does not exist\n", i_channel );
+    return( 1 );
+}
 
+/*****************************************************************************
+ * intf_AssignKey: assign standartkeys                                       *
+ *****************************************************************************
+ * This function fills in the associative array that links the key pressed   *
+ * and the key we use internally. Support one extra parameter.               *
+ ****************************************************************************/
 void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key, int param)
 {
     p_intf_key  p_cur =  p_intf->p_keys;
@@ -323,7 +331,7 @@ void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key, int param)
 }
 
 /* Basic getKey function... */
-keyparm intf_getKey( intf_thread_t *p_intf, int r_key)
+keyparm intf_GetKey( intf_thread_t *p_intf, int r_key)
 {   
     keyparm reply;
     
@@ -334,8 +342,8 @@ keyparm intf_getKey( intf_thread_t *p_intf, int r_key)
     }
     if(current == NULL)
     {   /* didn't find any key in the array */ 
-        reply.key=INTF_KEY_UNKNOWN;
-        reply.param=0;
+        reply.key = INTF_KEY_UNKNOWN;
+        reply.param = 0;
     }
     else
     {
@@ -353,7 +361,7 @@ keyparm intf_getKey( intf_thread_t *p_intf, int r_key)
 
 void intf_AssignNormalKeys( intf_thread_t *p_intf)
 {
-    p_intf->p_intf_getKey = intf_getKey;
+    p_intf->p_intf_get_key = intf_GetKey;
 
     intf_AssignKey( p_intf , 'Q', INTF_KEY_QUIT, 0);
     intf_AssignKey( p_intf , 'q', INTF_KEY_QUIT, 0);
@@ -393,7 +401,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
     static int i_volbackup;
     keyparm k_reply;
     
-    k_reply = intf_getKey( p_intf, g_key); 
+    k_reply = intf_GetKey( p_intf, g_key); 
     
     switch( k_reply.key )
     {

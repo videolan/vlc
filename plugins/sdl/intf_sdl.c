@@ -160,7 +160,7 @@ void intf_SDLManage( intf_thread_t *p_intf )
 
 void intf_SDL_Keymap(intf_thread_t * p_intf )
 {
-    p_intf->p_intf_getKey = intf_getKey; 
+    p_intf->p_intf_get_key = intf_GetKey; 
     intf_AssignKey(p_intf, SDLK_q,      INTF_KEY_QUIT, NULL);
     intf_AssignKey(p_intf, SDLK_ESCAPE, INTF_KEY_QUIT, NULL);
     /* intf_AssignKey(p_intf,3,'Q'); */

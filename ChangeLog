@@ -8,6 +8,12 @@ O.1.99i :
   * fixed the aliases install.
   * renamed an inconsistent varaible in src/input/input_file.c.
   * added support for I+ synchro (all Is and the first P).
+  * fixed a motion compensation bug which generated some distortion
+    on B images.
+  * fixed a motion compensation bug for skipped macroblocks.
+  * fixed a synchro bug for field images.
+  * cleaned Octplane's crappy indentation.
+  * fixed the --server option which didn't work if a ~/.vlcrc existed.
 
 Tue, 22 Aug 2000 01:31:58 +0200
 0.1.99h :

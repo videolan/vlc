@@ -89,7 +89,7 @@ typedef struct intf_thread_s
     p_input_thread_t    p_input;
 
     /* Specific functions */
-    keyparm (*p_intf_getKey)(struct intf_thread_s *p_intf, int r_key) ;
+    keyparm (*p_intf_get_key)(struct intf_thread_s *p_intf, int r_key) ;
     
 } intf_thread_t;
 
@@ -104,10 +104,6 @@ int             intf_SelectChannel      ( intf_thread_t * p_intf, int i_channel 
 int             intf_ProcessKey         ( intf_thread_t * p_intf, int i_key );
 
 void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key, int param);
-
-void intf_AssignSKey( intf_thread_t *p_intf, int r_key, int f_key);
-
-keyparm intf_getKey( intf_thread_t *p_intf, int r_key);
-
+keyparm intf_GetKey( intf_thread_t *p_intf, int r_key);
 void intf_AssignNormalKeys( intf_thread_t *p_intf);
 
