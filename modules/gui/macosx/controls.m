@@ -334,7 +334,7 @@
     [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)];
 
     vout_OSDMessage( p_intf, DEFAULT_CHAN, "Vol %d%%", 
-		     i_volume*100/AOUT_VOLUME_MAX );
+		     i_volume*200/AOUT_VOLUME_MAX );
 }
 
 - (IBAction)windowAction:(id)sender
@@ -620,9 +620,7 @@
     {
         if( p_playlist != NULL && p_input != NULL )
         {
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            bEnabled = p_input->stream.b_pace_control;
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            bEnabled = p_input->input.b_can_pace_control;
         }
         else
         {
@@ -646,13 +644,6 @@
         else
         {
             bEnabled = p_playlist->i_size > 1;
-
-            if( p_input != NULL )
-            {
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-                bEnabled |= p_input->stream.i_area_nb > 1;
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
-            }
         }
     }
     else if( [[o_mi title] isEqualToString: _NS("Random")] )
@@ -681,9 +672,7 @@
     {
         if( p_playlist != NULL && p_input != NULL )
         {
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            bEnabled = p_input->stream.b_seekable;
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            bEnabled = TRUE; /* FIXME p_input seekable */
         }
         else
         {

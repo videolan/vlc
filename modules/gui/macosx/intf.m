@@ -84,9 +84,9 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 void E_(CloseIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
-
+    
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-
+    
     [p_intf->p_sys->o_sendport release];
     [p_intf->p_sys->o_pool release];
 
@@ -728,14 +728,10 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
                     vlc_value_t val;
 
                     /* New input or stream map change */
-                    if( p_input->stream.b_changed )
-                    {
                         msg_Dbg( p_intf, "stream has changed, refreshing interface" );
                         p_intf->p_sys->b_playing = TRUE;
                         p_intf->p_sys->b_current_title_update = 1;
-                        p_input->stream.b_changed = 0;
                         p_intf->p_sys->b_intf_update = TRUE;
-                    }
 
                     if( var_Get( (vlc_object_t *)p_input, "intf-change", &val )
                         >= 0 && val.b_bool )
@@ -845,18 +841,14 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
         if( ( b_input = ( p_input != NULL ) ) )
         {
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-
             /* seekable streams */
-            b_seekable = p_input->stream.b_seekable;
+            b_seekable = (BOOL)f_slider_old;
 
             /* check wether slow/fast motion is possible*/
-            b_control = p_input->stream.b_pace_control; 
+            b_control = p_input->input.b_can_pace_control; 
 
             /* chapters & titles */
-            b_chapters = p_input->stream.i_area_nb > 1; 
- 
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            //b_chapters = p_input->stream.i_area_nb > 1; 
         }
 
         [o_btn_stop setEnabled: b_input];
@@ -899,7 +891,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         NSString * o_time;
         mtime_t i_seconds;
 
-        if( p_input->stream.b_seekable )
+        if( (BOOL)f_slider_old )
         {
             vlc_value_t pos;
             float f_updated;
@@ -1177,7 +1169,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         mtime_t i_seconds;
         NSString * o_time;
 
-        if( p_input->stream.b_seekable )
+        if( (BOOL)f_slider_old )
         {
                 vlc_value_t pos;
                 pos.f_float = f_updated / 10000.;
@@ -1216,7 +1208,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
     }
 
     /* FIXME - Wait here until all vouts are terminated because
-       libvlc's VLC_Stop destroys interfaces before vouts, which isn't
+       libvlc's VLC_CleanUp destroys interfaces before vouts, which isn't
        good on OS X. We definitly need a cleaner way to handle this,
        but this may hopefully be good enough for now.
          -- titer 2003/11/22 */
@@ -1265,8 +1257,8 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         o_msg_lock = nil;
     }
 
-    [NSApp terminate: nil];
     [NSApp stop: nil];
+    [NSApp terminate: nil];
 
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
