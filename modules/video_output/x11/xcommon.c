@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.33 2003/10/24 21:27:06 gbazin Exp $
+ * $Id: xcommon.c,v 1.34 2003/10/26 12:46:55 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,6 +34,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+#include <hotkeys.h>
 
 #ifdef HAVE_MACHINE_PARAM_H
     /* BSD */
@@ -517,92 +518,49 @@ static int ManageVideo( vout_thread_t *p_vout )
         /* Keyboard event */
         else if( xevent.type == KeyPress )
         {
+            vlc_value_t val;
+            val.i_int = 0;
             /* We may have keys like F1 trough F12, ESC ... */
             x_key_symbol = XKeycodeToKeysym( p_vout->p_sys->p_display,
                                              xevent.xkey.keycode, 0 );
             switch( (int)x_key_symbol )
             {
-            case XK_Escape:
-                if( p_vout->b_fullscreen )
-                {
-                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                }
-                else
-                {
-                    /* the user wants to close the window */
-                    playlist_t * p_playlist =
-                        (playlist_t *)vlc_object_find( p_vout,
-                                                       VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-                    if( p_playlist != NULL )
-                    {
-                        playlist_Stop( p_playlist );
-                        vlc_object_release( p_playlist );
-                    }
-                }
-                break;
-            case XK_Menu:
-                {
-                    intf_thread_t *p_intf;
-                    playlist_t * p_playlist;
-
-                    p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
-                                                      FIND_ANYWHERE );
-                    if( p_intf )
-                    {
-                        p_intf->b_menu_change = 1;
-                        vlc_object_release( p_intf );
-                    }
-
-                    p_playlist = vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
-                                                           FIND_ANYWHERE );
-                    if( p_playlist != NULL )
-                    {
-                        vlc_value_t val;
-                        var_Set( p_playlist, "intf-popupmenu", val );
-                        vlc_object_release( p_playlist );
-                    }
-                }
-                break;
-            case XK_Left:
-/*                input_Seek( p_vout, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
-                val.psz_string = "LEFT";
-                var_Set( p_vout, "key-pressed", val );
-                break;
-            case XK_Right:
-/*                input_Seek( p_vout, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
-                val.psz_string = "RIGHT";
-                var_Set( p_vout, "key-pressed", val );
-                break;
-            case XK_Up:
-/*                input_Seek( p_vout, 60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
-                val.psz_string = "UP";
-                var_Set( p_vout, "key-pressed", val );
-                break;
-            case XK_Down:
-/*                input_Seek( p_vout, -60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR ); */
-                val.psz_string = "DOWN";
-                var_Set( p_vout, "key-pressed", val );
-                break;
             case XK_Return:
             case XK_KP_Enter:
-                val.psz_string = "ENTER";
-                var_Set( p_vout, "key-pressed", val );
+                val.i_int = KEY_ENTER;
+                break;
+            case XK_Escape:
+                val.i_int = KEY_ESC;
+                break;
+            case XK_Menu:
+                val.i_int = KEY_MENU;
+                break;
+            case XK_Left:
+                val.i_int = KEY_LEFT;
+                break;
+            case XK_Right:
+                val.i_int = KEY_RIGHT;
+                break;
+            case XK_Up:
+                val.i_int = KEY_UP;
+                break;
+            case XK_Down:
+                val.i_int = KEY_DOWN;
                 break;
             case XK_Home:
-                input_Seek( p_vout, 0, INPUT_SEEK_BYTES | INPUT_SEEK_SET );
+                val.i_int = KEY_HOME;
                 break;
             case XK_End:
-                input_Seek( p_vout, 0, INPUT_SEEK_BYTES | INPUT_SEEK_END );
+                val.i_int = KEY_END;
                 break;
             case XK_Page_Up:
-                input_Seek( p_vout, 10, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                val.i_int = KEY_PAGEUP;
                 break;
             case XK_Page_Down:
-                input_Seek( p_vout, -10, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
+                val.i_int = KEY_PAGEDOWN;
                 break;
             case XK_space:
-                input_SetStatus( p_vout, INPUT_STATUS_PAUSE );
+                val.i_int = KEY_SPACE;
                 break;
 
             default:
@@ -614,22 +572,33 @@ static int ManageVideo( vout_thread_t *p_vout )
                 if( XLookupString( &xevent.xkey, &i_key, 1, NULL, NULL ) )
                 {
                     /* FIXME: handle stuff here */
-                    switch( i_key )
-                    {
-                    case 'q':
-                    case 'Q':
-                        p_vout->p_vlc->b_die = 1;
-                        break;
-                    case 'f':
-                    case 'F':
-                        p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                        break;
-
-                    default:
-                        break;
-                    }
+                    val.i_int = i_key;
                 }
                 break;
+            }
+            if ( val.i_int )
+            {
+                if ( xevent.xkey.state & ShiftMask )
+                {
+                    val.i_int |= KEY_MODIFIER_SHIFT;
+                }
+                if ( xevent.xkey.state & ControlMask )
+                {
+                    msg_Dbg( p_vout, "control pressed, key value is %x", val.i_int );
+                    val.i_int |= KEY_MODIFIER_CTRL;
+                }
+                if ( xevent.xkey.state & Mod1Mask )
+                {
+                    val.i_int |= KEY_MODIFIER_ALT;
+                }
+                if ( val.i_int == config_GetInt( p_vout, "fullscreen-key" ) )
+                {
+                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                }
+                else
+                {
+                    var_Set( p_vout->p_vlc, "key-pressed", val );
+                }
             }
         }
         /* Mouse click */

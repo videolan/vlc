@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.98 2003/10/23 16:43:37 sam Exp $
+ * $Id: libvlc.c,v 1.99 2003/10/26 12:46:55 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -565,6 +565,10 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     }
 
     /*
+     * Initialize hotkey handling
+     */
+    var_Create( p_vlc, "key-pressed", VLC_VAR_INTEGER );
+    /*
      * Initialize playlist and get commandline files
      */
     p_playlist = playlist_Create( p_vlc );
@@ -607,6 +611,11 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     {
         free( psz_modules );
     }
+
+    /*
+     * Allways load the hotkeys interface if it exists
+     */
+    VLC_AddIntf( 0, "hotkeys,none", VLC_FALSE );
 
     /*
      * FIXME: kludge to use a p_vlc-local variable for the Mozilla plugin

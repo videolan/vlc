@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.94 2003/10/24 21:27:06 gbazin Exp $
+dnl $Id: configure.ac,v 1.95 2003/10/26 12:46:55 sigmunau Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -844,7 +844,7 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-AX_ADD_PLUGINS([dummy rc logger gestures memcpy])
+AX_ADD_PLUGINS([dummy rc logger gestures memcpy hotkeys])
 AX_ADD_PLUGINS([es mpga m4v mpeg_system ps ts avi asf aac mp4 rawdv])
 AX_ADD_PLUGINS([spudec mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])

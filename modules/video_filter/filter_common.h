@@ -2,7 +2,7 @@
  * filter_common.h: Common filter functions
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: filter_common.h,v 1.4 2003/10/24 21:27:06 gbazin Exp $
+ * $Id: filter_common.h,v 1.5 2003/10/26 12:46:55 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -78,16 +78,14 @@ static int SetParentVal( vlc_object_t *p_this, char const *psz_var,
     var_AddCallback( newvout, "mouse-x", SendEvents, p_vout );                \
     var_AddCallback( newvout, "mouse-y", SendEvents, p_vout );                \
     var_AddCallback( newvout, "mouse-moved", SendEvents, p_vout );            \
-    var_AddCallback( newvout, "mouse-clicked", SendEvents, p_vout );          \
-    var_AddCallback( newvout, "key-pressed", SendEvents, p_vout )
+    var_AddCallback( newvout, "mouse-clicked", SendEvents, p_vout );
 
 #define DEL_CALLBACKS( newvout, handler ) \
     var_DelCallback( newvout, "fullscreen", SetParentVal, p_vout );           \
     var_DelCallback( newvout, "mouse-x", SendEvents, p_vout );                \
     var_DelCallback( newvout, "mouse-y", SendEvents, p_vout );                \
     var_DelCallback( newvout, "mouse-moved", SendEvents, p_vout );            \
-    var_DelCallback( newvout, "mouse-clicked", SendEvents, p_vout );          \
-    var_DelCallback( newvout, "key-pressed", SendEvents, p_vout )
+    var_DelCallback( newvout, "mouse-clicked", SendEvents, p_vout );
 
 #define ADD_PARENT_CALLBACKS( handler ) \
     var_AddCallback( p_vout, "fullscreen", handler, NULL );                   \
