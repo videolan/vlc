@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.123 2003/11/27 10:13:11 hartman Exp $
+dnl $Id: configure.ac,v 1.124 2003/11/30 14:28:07 fenrir Exp $
 
 AC_INIT(vlc,0.7.0-test1)
 
@@ -142,7 +142,7 @@ case "${target_os}" in
         # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"; CPPFLAGS="${CPPFLAGS_save}"
         AX_ADD_LDFLAGS([vlc],[-lws2_32 -lnetapi32 -lwinmm -mwindows])
-        AX_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_ftp access_output_udp sap slp http httpd stream_out_standard],[-lws2_32])
+        AX_ADD_LDFLAGS([ipv4 ipv6 access_http access_mms access_udp access_tcp access_ftp access_output_udp sap slp http httpd stream_out_standard],[-lws2_32])
     fi
     ;;
   *nto*)
@@ -301,7 +301,7 @@ AC_CHECK_FUNCS(connect,,[
 
 AC_CHECK_FUNCS(send,,[
   AC_CHECK_LIB(socket,send,[
-    AX_ADD_LDFLAGS([access_http access_mms access_udp access_ftp sap httpd access_output_udp stream_out_standard],[-lsocket])
+    AX_ADD_LDFLAGS([access_http access_mms access_udp access_tcp access_ftp sap httpd access_output_udp stream_out_standard],[-lsocket])
   ])
 ])
 
@@ -879,7 +879,7 @@ AX_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
 AX_ADD_PLUGINS([id3 m3u])
 AX_ADD_PLUGINS([rawvideo])
 AX_ADD_PLUGINS([wav araw demuxdump demuxsub adpcm a52sys au])
-AX_ADD_PLUGINS([access_file access_udp access_http ipv4 access_mms])
+AX_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
 AX_ADD_PLUGINS([access_ftp access_directory sap httpd http])
 
 dnl
