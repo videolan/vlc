@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.107 2003/11/07 21:44:20 fenrir Exp $
+dnl $Id: configure.ac,v 1.108 2003/11/07 22:56:02 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -1105,6 +1105,11 @@ then
       AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/BasicUsageEnvironment -lBasicUsageEnvironment])
       AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/groupsock -lgroupsock])
       AX_ADD_LDFLAGS([livedotcom],[-L${real_livedotcom_tree}/UsageEnvironment -lUsageEnvironment])
+
+      if test "${SYS}" = "mingw32"; then
+        # add ws2_32 for closesocket, select, recv
+        AX_ADD_LDFLAGS([livedotcom],[-lws2_32])
+      fi
 
       AX_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/BasicUsageEnvironment/include])
       AX_ADD_CXXFLAGS([livedotcom],[-I${real_livedotcom_tree}/groupsock/include])

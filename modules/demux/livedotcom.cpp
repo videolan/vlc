@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.4 2003/11/07 18:08:54 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.5 2003/11/07 22:56:02 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -31,6 +31,10 @@
 
 #include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include <iostream>
+
+#if defined( WIN32 )
+#   include <winsock2.h>
+#endif
 
 #include "BasicUsageEnvironment.hh"
 #include "GroupsockHelper.hh"
