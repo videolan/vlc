@@ -4,7 +4,6 @@
 [
     <!ENTITY glossary SYSTEM "glossary.xml">
     <!ENTITY overview SYSTEM "overview.xml">
-    <!ENTITY hacking SYSTEM "hacking.xml">
     <!ENTITY interface SYSTEM "interface.xml">
     <!ENTITY input SYSTEM "input.xml">
     <!ENTITY decoders SYSTEM "decoders.xml">
@@ -58,7 +57,7 @@
       <orgname> VideoLAN project </orgname>
     </affiliation>
   </collab>
-  <pubdate> $Id: manual.xml,v 1.4 2002/09/30 11:05:33 sam Exp $ </pubdate>
+  <pubdate> $Id: manual.xml,v 1.5 2002/10/12 23:15:45 alexis Exp $ </pubdate>
   <copyright> <year> 2001 </year>
               <holder> Christophe Massiot, for IDEALX S.A.S. </holder>
   </copyright>
@@ -83,11 +82,6 @@
   -->
 
 &overview;
-
-<!-- ============================ HACKING =============================
-  -->
-
-&hacking;
 
 <!-- =========================== INTERFACE ============================
   -->
