@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: input.c,v 1.44 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,6 +99,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     /* Now add user filters */
     if( var_Type( p_aout, "visual" ) == 0 )
     {
+        module_t *p_module;
         var_Create( p_aout, "visual", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         text.psz_string = _("Visualizations");
         var_Change( p_aout, "visual", VLC_VAR_SETTEXT, &text, NULL );
@@ -110,8 +111,15 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         val.psz_string = "spectrum"; text.psz_string = _("Spectrum");
         var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
-        /* val.psz_string = "goom"; text.psz_string = _("Goom");
-        var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );*/
+
+        /* Look for goom plugin */
+        p_module = config_FindModule( VLC_OBJECT(p_aout), "goom" );
+        if( p_module )
+        {
+            val.psz_string = "goom"; text.psz_string = _("Goom");
+            var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        }
+
         if( var_Get( p_aout, "effect-list", &val ) == VLC_SUCCESS )
         {
             var_Set( p_aout, "visual", val );
@@ -158,7 +166,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
                 break;
             }
 
-            msg_Dbg( p_aout, "user filter %s", psz_parser );
+            msg_Dbg( p_aout, "user filter \"%s\"", psz_parser );
 
             /* Create a VLC object */
             p_filter = vlc_object_create( p_aout, sizeof(aout_filter_t) );
@@ -466,7 +474,10 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
     {
         if( !psz_filter || !*psz_filter )
         {
-            val.psz_string = "visual";
+            if( !strcmp( "goom", psz_mode) )
+                val.psz_string = "goom";
+            else
+                val.psz_string = "visual";
             var_Set( p_aout, "audio-filter", val );
         }
         else
