@@ -59,13 +59,17 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-file-"
+#define APPEND_TEXT N_("Append to file")
+#define APPEND_LONGTEXT N_( "Append to file if it exists instead " \
+                            "of replacing it.")
 
 vlc_module_begin();
     set_description( _("File stream ouput") );
     set_capability( "sout access", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );
-    add_bool( SOUT_CFG_PREFIX "append", 0, NULL, "append", "", VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "append", 0, NULL, APPEND_TEXT,APPEND_LONGTEXT,
+              VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 

@@ -65,13 +65,35 @@ static void Close( vlc_object_t * );
     "Allows you to modify the default caching value for udp streams. This " \
     "value should be set in millisecond units." )
 
+#define TTL_TEXT N_("Time To Live")
+#define TTL_LONGTEXT N_("Allows you to define the time to live of the " \
+                        "outgoing stream.")
+
+#define GROUP_TEXT N_("Group packets")
+#define GROUP_LONGTEXT N_("Packets can be sent one by one at the right time " \
+                          "or by groups. This allows you to give the number " \
+                          "of packets that will be sent at a time." )
+#define LATE_TEXT N_("Late delay (ms)" )
+#define LATE_LONGTEXT N_("Late packets are dropped. This allows you to give " \
+                       "the time (in milliseconds) a packet is allowed to be" \
+                       " late.")
+#define RAW_TEXT N_("Raw write")
+#define RAW_LONGTEXT N_("If you enable this option, packets will be sent " \
+                       "directly, without trying to fill the MTU (ie, " \
+                       "without trying to make the biggest possible packets " \
+                       "in order to improve streaming)." )
+
 vlc_module_begin();
     set_description( _("UDP stream ouput") );
     add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, "ttl", "", VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "group", 1, NULL, "group", "", VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "late", 0, NULL, "late (ms)", "", VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "raw",  0, NULL, "raw", "", VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL,TTL_TEXT, TTL_LONGTEXT,
+                                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "group", 1, NULL, GROUP_TEXT, GROUP_LONGTEXT,
+                                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "late", 0, NULL, LATE_TEXT, LATE_LONGTEXT,
+                                 VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "raw",  0, NULL, RAW_TEXT, RAW_LONGTEXT,
+                                 VLC_TRUE );
 
     set_capability( "sout access", 100 );
     add_shortcut( "udp" );

@@ -43,6 +43,14 @@ static void Close( vlc_object_t * );
 
 #define SOUT_CFG_PREFIX "sout-http-"
 
+#define USER_TEXT N_("Username")
+#define USER_LONGTEXT N_("Allows you to give a user name that will be " \
+                         "requested to access the stream." )
+#define PASS_TEXT N_("Password")
+#define PASS_LONGTEXT N_("Allows you to give a password that will be " \
+                         "requested to access the stream." )
+
+
 vlc_module_begin();
     set_description( _("HTTP stream ouput") );
     set_capability( "sout access", 0 );
