@@ -2,7 +2,7 @@
 <GTK-Interface>
 
 <project>
-  <name>VideoLAN Client</name>
+  <name>VLC media player</name>
   <program_name>vlc</program_name>
   <directory></directory>
   <source_directory></source_directory>
@@ -1598,7 +1598,7 @@
       <widget>
 	<class>GtkLabel</class>
 	<name>label17</name>
-	<label>This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source.</label>
+	<label>This is the VLC media player, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source.</label>
 	<justify>GTK_JUSTIFY_LEFT</justify>
 	<wrap>True</wrap>
 	<xalign>0.5</xalign>

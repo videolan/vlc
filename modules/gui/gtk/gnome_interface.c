@@ -1360,7 +1360,7 @@ create_intf_about (void)
   intf_about = gnome_about_new ("VLC media player", VERSION,
                         _("(c) 1996-2004 the VideoLAN team"),
                         authors,
-                        _("This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source."),
+                        _("This is the VLC media player, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source."),
                         NULL);
   gtk_object_set_data (GTK_OBJECT (intf_about), "intf_about", intf_about);
 

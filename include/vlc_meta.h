@@ -34,7 +34,7 @@
 #define VLC_META_RATING             N_("Rating")
 #define VLC_META_DATE               N_("Date")
 #define VLC_META_SETTING            N_("Setting")
-#define VLC_META_URL                N_("Url")
+#define VLC_META_URL                N_("URL")
 #define VLC_META_LANGUAGE           N_("Language")
 #define VLC_META_CODEC_NAME         N_("Codec Name")
 #define VLC_META_CODEC_DESCRIPTION  N_("Codec Description")
