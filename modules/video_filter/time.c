@@ -64,6 +64,7 @@ struct filter_sys_t
  *****************************************************************************/
 vlc_module_begin();
     set_capability( "sub filter", 0 );
+    set_shortname( N_("Time overlay"));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     set_callbacks( CreateFilter, DestroyFilter );

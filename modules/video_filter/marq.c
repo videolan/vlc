@@ -77,6 +77,7 @@ struct filter_sys_t
  *****************************************************************************/
 vlc_module_begin();
     set_capability( "sub filter", 0 );
+    set_shortname( N_("Marquee" ));
     set_callbacks( CreateFilter, DestroyFilter );
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );

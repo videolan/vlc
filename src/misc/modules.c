@@ -1128,7 +1128,8 @@ static void DupModule( module_t *p_module )
      * module is unloaded. */
     p_module->psz_object_name = strdup( p_module->psz_object_name );
     p_module->psz_capability = strdup( p_module->psz_capability );
-    p_module->psz_shortname = strdup( p_module->psz_shortname );
+    p_module->psz_shortname = p_module->psz_shortname ?
+                                 strdup( p_module->psz_shortname ) : NULL;
     p_module->psz_longname = strdup( p_module->psz_longname );
 
     if( p_module->psz_program != NULL )

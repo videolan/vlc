@@ -59,6 +59,7 @@ static int  SendEvents( vlc_object_t *, char const *,
 
 vlc_module_begin();
     set_description( _("Crop video filter") );
+    set_shortname( N_("Crop" ));
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_VFILTER );
     set_capability( "video filter", 0 );

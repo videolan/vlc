@@ -84,7 +84,6 @@ struct module_t
      * Variables set by the module to identify itself
      */
     char *psz_shortname;                                      /* Module name */
-    char *psz_name;                              /* Human-readable shortname */
     char *psz_longname;                           /* Module descriptive name */
 
     /*
