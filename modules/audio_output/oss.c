@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.48 2003/01/28 22:03:21 sam Exp $
+ * $Id: oss.c,v 1.49 2003/02/02 00:57:21 jobi Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,13 +53,6 @@
 #   include <machine/soundcard.h>
 #endif
 
-/* AFMT_AC3 is really IEC61937 / IEC60958, mpeg/ac3/dts over spdif */
-#ifndef AFMT_AC3
-#   define AFMT_AC3        0x00000400                   /* Dolby Digital AC3 */
-#endif
-#ifndef AFMT_S16_NE
-#   define AFMT_S16_NE     0x00000010
-#endif
 /*****************************************************************************
  * aout_sys_t: OSS audio output method descriptor
  *****************************************************************************
@@ -260,13 +253,18 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Open the sound device */
-    p_sys->i_fd = open( psz_device, O_WRONLY );
+    p_sys->i_fd = open( psz_device, O_WRONLY | O_NDELAY );
     if( p_sys->i_fd < 0 )
     {
         msg_Err( p_aout, "cannot open audio device (%s)", psz_device );
         free( p_sys );
         return VLC_EGENERIC;
     }
+
+    /* if the opening was ok, put the device back in blocking mode */
+    fcntl( p_sys->i_fd, F_SETFL,
+            fcntl( p_sys->i_fd, F_GETFL ) &~ FNDELAY );
+
     free( psz_device );
 
     p_aout->output.pf_play = Play;

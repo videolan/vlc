@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.12 2003/02/02 00:05:00 sam Exp $
+$Id: NEWS,v 1.13 2003/02/02 00:57:20 jobi Exp $
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
@@ -8,7 +8,7 @@ Core structure:
   * new audio output architecture based on filter pipelines, providing
     S/PDIF and multi-channel support
   * localization support via gettext on most architectures
-  * new stream output architecture, allowing to use VLC to unicast,
+  * new stream output architecture, allowing, using VLC to unicast,
     multicast or broadcast a stream to another VLC (only MPEG 1, 2 and 4
     and A/52 streams are supported)
   * build system now uses autoconf/automake/autopoint
@@ -18,6 +18,8 @@ Input access:
   * ftp:// support
   * stability fixes in the HTTP access
   * auto-detection of RTP encapsulation
+  * VCD entry points support
+  * VCD image file support
 
 Input demux:
   * support for *.asf format
@@ -26,14 +28,13 @@ Input demux:
   * support for ogg encapsulation
   * support for raw DV format
   * support for *.wav format
+  * support for *.mp3 format
   * new demuxdump demux allowing to save a stream to a file
   * raw AAC support
 
 Stream discovery & playlists:
   * support for the SAP/SDP and SLP protocols
   * support for .m3u file format
-  * support for .asx file format
-  * hack to find the streaming sources in html-pages with embedded wmp
 
 Codecs:
   * support for the microdvd, subrip, ssa1, ssa2-4 subtitles file formats
@@ -60,10 +61,6 @@ Miscellaneous:
   * all interfaces allow to dynamically change the volume, the audio
     device and the channels configuration
   * headphone channel mixer with virtual spatialization effect
-  * Mozilla plugin based on libvlc for embedded playback in webpages of any
-    format that VLC can play
-  * new swedish translation
-  * updated french, german, dutch and italian translations
 
 GNU/Linux, *BSD & misc. UNIX ports:
   * OSS and ALSA audio output modules support A/52 over S/PDIF output
@@ -76,10 +73,10 @@ Mac OS X port:
   * new open panel with full features
   * video output screen can be chosen in the Video menu
   * audio device and channels configuration can be chosen in the Audio menu
-  * new playlist drawer and messages windows
+  * new playlist and messages windows
 
 Win32 port:
-  * preferences dialog box redesigned
+  * preference dialog box redesigned
   * waveout module supports multi-channel audio output
   * support for VCDs
   * new dialog box to select avi subtitles
