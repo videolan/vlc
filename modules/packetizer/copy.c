@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.14 2003/08/10 14:21:16 gbazin Exp $
+ * $Id: copy.c,v 1.15 2003/08/11 20:19:45 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -493,10 +493,10 @@ static void PacketizeStd( packetizer_thread_t *p_pack )
         p_pack->p_fifo->b_error = 1;
         return;
     }
-
+#if 0
     msg_Dbg( p_pack->p_fifo, "pes size:%d dts="I64Fd" pts="I64Fd,
              p_pes->i_pes_size, p_pes->i_dts, p_pes->i_pts );
-
+#endif
 
     if( p_pes->i_pts <= 0 )
     {
@@ -542,9 +542,10 @@ static void PacketizeSPU( packetizer_thread_t *p_pack )
             p_pack->p_fifo->b_error = 1;
             return;
         }
-
+#if 0
         msg_Dbg( p_pack->p_fifo, "pes size:%d dts="I64Fd" pts="I64Fd,
                  p_pes->i_pes_size, p_pes->i_dts, p_pes->i_pts );
+#endif
 
         if( p_out == NULL &&
             ( p_pes->i_pts <= 0 || p_pes->i_pes_size < 4 ) )
