@@ -291,7 +291,7 @@ int __net_Read( vlc_object_t *p_this, int fd, uint8_t *p_data, int i_data,
             {
                 msg_Err( p_this, "recv() failed. "
                          "Increase the mtu size (--mtu option)" );
-                i_recv = i_data;
+                i_total += i_data;
             }
             else
                 msg_Err( p_this, "recv failed (%i)", WSAGetLastError() );
