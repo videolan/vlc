@@ -2,9 +2,9 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.134 2003/10/04 11:17:04 sam Exp $
+ * $Id: modules.c,v 1.135 2003/10/05 15:35:59 sam Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
  *          Hans-Peter Jansen <hpj@urpla.net>
  *
@@ -134,9 +134,14 @@ static int  AllocatePluginFile   ( vlc_object_t *, MYCHAR * );
 static int  AllocateBuiltinModule( vlc_object_t *, int ( * ) ( module_t * ) );
 static int  DeleteModule ( module_t * );
 #ifdef HAVE_DYNAMIC_PLUGINS
-static void DupModule    ( module_t * );
-static void UndupModule  ( module_t * );
-static int  CallEntry    ( module_t * );
+static void   DupModule        ( module_t * );
+static void   UndupModule      ( module_t * );
+static int    CallEntry        ( module_t * );
+static void   CloseModule      ( module_handle_t );
+static void * GetSymbol        ( module_handle_t, const char * );
+#if defined(UNDER_CE) || defined(WIN32)
+static char * GetWindowsError  ( void );
+#endif
 #endif
 
 /*****************************************************************************
@@ -795,24 +800,134 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     module_t * p_module;
     module_handle_t handle;
 
-#ifdef UNDER_CE
+    /*
+     * Try to dynamically load the module. This part is very platform-
+     * specific, and error messages should be as verbose as possible.
+     */
+
+#if defined(HAVE_DL_DYLD)
+    NSObjectFileImage image;
+    NSObjectFileImageReturnCode ret;
+
+    ret = NSCreateObjectFileImageFromFile( psz_file, &image );
+
+    if( ret != NSObjectFileImageSuccess )
+    {
+        msg_Warn( p_this, "cannot create image from `%s'", psz_file );
+        return -1;
+    }
+
+    /* Open the dynamic module */
+    handle = NSLinkModule( image, psz_file,
+                           NSLINKMODULE_OPTION_RETURN_ON_ERROR );
+
+    if( !handle )
+    {
+        NSLinkEditErrors errors;
+        const char *psz_file, *psz_err;
+        int i_errnum;
+        NSLinkEditError( &errors, &i_errnum, &psz_file, &psz_err );
+        msg_Warn( p_this, "cannot link module `%s' (%s)", psz_file, psz_err );
+        NSDestroyObjectFileImage( image );
+        return -1;
+    }
+
+    /* Destroy our image, we won't need it */
+    NSDestroyObjectFileImage( image );
+
+#elif defined(HAVE_IMAGE_H)
+    handle = load_add_on( psz_file );
+    if( handle < 0 )
+    {
+        msg_Warn( p_this, "cannot load module `%s'", psz_file );
+        return -1;
+    }
+
+#elif defined(UNDER_CE)
     char psz_filename[MAX_PATH];
     WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, psz_file, -1,
                          psz_filename, MAX_PATH, NULL, NULL );
-#else
-    char * psz_filename = psz_file;
-#endif
-
-    /* Try to dynamically load the module. */
-    if( module_load( psz_file, &handle ) )
+    handle = LoadLibrary( psz_filename );
+    if( handle == NULL )
     {
-        char psz_buffer[256];
+        char *psz_error = GetWindowsError();
+        msg_Warn( p_this, "cannot load module `%s' (%s)",
+                          psz_filename, psz_error );
+        free( psz_error );
+    }
 
-        /* The plugin module couldn't be opened */
-        msg_Warn( p_this, "cannot open `%s' (%s)",
-                  psz_filename, module_error( psz_buffer ) );
+#elif defined(WIN32)
+    handle = LoadLibrary( psz_file );
+    if( handle == NULL )
+    {
+        char *psz_error = GetWindowsError();
+        msg_Warn( p_this, "cannot load module `%s' (%s)",
+                          psz_filename, psz_error );
+        free( psz_error );
+    }
+
+#elif defined(HAVE_DL_DLOPEN) && defined(RTLD_NOW)
+    /* static is OK, we are called atomically */
+    static vlc_bool_t b_kde = VLC_FALSE;
+
+#   if defined(SYS_LINUX)
+    /* XXX HACK #1 - we should NOT open modules with RTLD_GLOBAL, or we
+     * are going to get namespace collisions when two modules have common
+     * public symbols, but ALSA is being a pest here. */
+    if( strstr( psz_file, "alsa_plugin" ) )
+    {
+        handle = dlopen( psz_file, RTLD_NOW | RTLD_GLOBAL );
+        if( handle == NULL )
+        {
+            msg_Warn( p_this, "cannot load module `%s' (%s)",
+                              psz_file, dlerror() );
+            return -1;
+        }
+    }
+#   endif
+    /* XXX HACK #2 - the ugly KDE workaround. It seems that libkdewhatever
+     * causes dlopen() to segfault if libstdc++ is not loaded in the caller,
+     * so we just load libstdc++. Bwahahaha! ph34r! -- Sam. */
+    /* Update: FYI, this is Debian bug #180505, and seems to be fixed. */
+    if( !b_kde && !strstr( psz_file, "kde" ) )
+    {
+        dlopen( "libstdc++.so.6", RTLD_NOW )
+         || dlopen( "libstdc++.so.5", RTLD_NOW )
+         || dlopen( "libstdc++.so.4", RTLD_NOW )
+         || dlopen( "libstdc++.so.3", RTLD_NOW );
+        b_kde = VLC_TRUE;
+    }
+
+    handle = dlopen( psz_file, RTLD_NOW );
+    if( handle == NULL )
+    {
+        msg_Warn( p_this, "cannot load module `%s' (%s)",
+                          psz_file, dlerror() );
         return -1;
     }
+
+#elif defined(HAVE_DL_DLOPEN) && defined(DL_LAZY)
+    handle = dlopen( psz_file, DL_LAZY );
+    if( handle == NULL )
+    {
+        msg_Warn( p_this, "cannot load module `%s' (%s)",
+                          psz_file, dlerror() );
+        return -1;
+    }
+
+#elif defined(HAVE_DL_SHL_LOAD)
+    handle = shl_load( psz_file, BIND_IMMEDIATE | BIND_NONFATAL, NULL );
+    if( handle == NULL )
+    {
+        msg_Warn( p_this, "cannot load module `%s' (%s)",
+                          psz_file, strerror(errno) );
+        return -1;
+    }
+
+#else
+#   error "Something is wrong in modules.c"
+
+#endif
 
     /* Now that we have successfully loaded the module, we can
      * allocate a structure for it */
@@ -820,12 +935,16 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     if( p_module == NULL )
     {
         msg_Err( p_this, "out of memory" );
-        module_unload( handle );
+        CloseModule( handle );
         return -1;
     }
 
     /* We need to fill these since they may be needed by CallEntry() */
+#ifdef UNDER_CE
     p_module->psz_filename = psz_filename;
+#else
+    p_module->psz_filename = psz_file;
+#endif
     p_module->handle = handle;
     p_module->p_symbols = &p_this->p_libvlc->p_module_bank->symbols;
 
@@ -834,7 +953,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     {
         /* We couldn't call module_init() */
         vlc_object_destroy( p_module );
-        module_unload( handle );
+        CloseModule( handle );
         return -1;
     }
 
@@ -973,7 +1092,7 @@ static int DeleteModule( module_t * p_module )
     {
         if( p_module->b_unloadable )
         {
-            module_unload( p_module->handle );
+            CloseModule( p_module->handle );
         }
         UndupModule( p_module );
         free( p_module->psz_filename );
@@ -1009,18 +1128,27 @@ static int CallEntry( module_t * p_module )
     int (* pf_symbol) ( module_t * p_module );
 
     /* Try to resolve the symbol */
-    pf_symbol = (int (*)(module_t *)) module_getsymbol( p_module->handle,
-                                                        psz_name );
+    pf_symbol = (int (*)(module_t *)) GetSymbol( p_module->handle, psz_name );
 
     if( pf_symbol == NULL )
     {
-        char psz_buffer[256];
-
-        /* We couldn't load the symbol */
+#if defined(HAVE_DL_DYLD) || defined(HAVE_IMAGE_H)
+        msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s'",
+                            psz_name, p_module->psz_filename );
+#elif defined(UNDER_CE) || defined(WIN32)
+        char *psz_error = GetWindowsError();
         msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%s)",
-                            psz_name, p_module->psz_filename,
-                            module_error( psz_buffer ) );
-        return -1;
+                            psz_name, p_module->psz_filename, psz_error );
+        free( psz_error );
+#elif defined(HAVE_DL_DLOPEN)
+        msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%s)",
+                            psz_name, p_module->psz_filename, dlerror() );
+#elif defined(HAVE_DL_SHL_LOAD)
+        msg_Warn( p_module, "cannot find symbol \"%s\" in file `%s' (%s)",
+                            psz_name, p_module->psz_filename, strerror(errno) );
+#else
+#   error "Something is wrong in modules.c"
+#endif
     }
 
     /* We can now try to call the symbol */
@@ -1036,4 +1164,147 @@ static int CallEntry( module_t * p_module )
     /* Everything worked fine, we can return */
     return 0;
 }
+
+/*****************************************************************************
+ * CloseModule: unload a dynamic library
+ *****************************************************************************
+ * This function unloads a previously opened dynamically linked library
+ * using a system dependant method. No return value is taken in consideration,
+ * since some libraries sometimes refuse to close properly.
+ *****************************************************************************/
+static void CloseModule( module_handle_t handle )
+{
+#if defined(HAVE_DL_DYLD)
+    NSUnLinkModule( handle, FALSE );
+
+#elif defined(HAVE_IMAGE_H)
+    unload_add_on( handle );
+
+#elif defined(WIN32) || defined(UNDER_CE)
+    FreeLibrary( handle );
+
+#elif defined(HAVE_DL_DLOPEN)
+    dlclose( handle );
+
+#elif defined(HAVE_DL_SHL_LOAD)
+    shl_unload( handle );
+
+#endif
+    return;
+}
+
+/*****************************************************************************
+ * GetSymbol: get a symbol from a dynamic library
+ *****************************************************************************
+ * This function queries a loaded library for a symbol specified in a
+ * string, and returns a pointer to it. We don't check for dlerror() or
+ * similar functions, since we want a non-NULL symbol anyway.
+ *****************************************************************************/
+static void * _module_getsymbol( module_handle_t, const char * );
+
+static void * GetSymbol( module_handle_t handle, const char * psz_function )
+{
+    void * p_symbol = _module_getsymbol( handle, psz_function );
+
+    /* MacOS X dl library expects symbols to begin with "_". So do
+     * some other operating systems. That's really lame, but hey, what
+     * can we do ? */
+    if( p_symbol == NULL )
+    {
+        char *psz_call = malloc( strlen( psz_function ) + 2 );
+
+        strcpy( psz_call + 1, psz_function );
+        psz_call[ 0 ] = '_';
+        p_symbol = _module_getsymbol( handle, psz_call );
+        free( psz_call );
+    }
+
+    return p_symbol;
+}
+
+static void * _module_getsymbol( module_handle_t handle,
+                                 const char * psz_function )
+{
+#if defined(HAVE_DL_DYLD)
+    NSSymbol sym = NSLookupSymbolInModule( handle, psz_function );
+    return NSAddressOfSymbol( sym );
+
+#elif defined(HAVE_IMAGE_H)
+    void * p_symbol;
+    if( B_OK == get_image_symbol( handle, psz_function,
+                                  B_SYMBOL_TYPE_TEXT, &p_symbol ) )
+    {
+        return p_symbol;
+    }
+    else
+    {
+        return NULL;
+    }
+
+#elif defined( UNDER_CE )
+    wchar_t psz_real[256];
+    MultiByteToWideChar( CP_ACP, 0, psz_function, -1, psz_real, 256 );
+
+    return (void *)GetProcAddress( handle, psz_real );
+
+#elif defined( WIN32 )
+    return (void *)GetProcAddress( handle, (MYCHAR*)psz_function );
+
+#elif defined(HAVE_DL_DLOPEN)
+    return dlsym( handle, psz_function );
+
+#elif defined(HAVE_DL_SHL_LOAD)
+    void *p_sym;
+    shl_findsym( &handle, psz_function, TYPE_UNDEFINED, &p_sym );
+    return p_sym;
+
+#endif
+}
+
+#if defined(UNDER_CE) || defined(WIN32)
+static char * GetWindowsError( void )
+{
+#if defined(UNDER_CE)
+    wchar_t psz_tmp[256];
+    char * psz_buffer = malloc( 256 );
+#else
+    char * psz_tmp = malloc( 256 );
+#endif
+    int i = 0, i_error = GetLastError();
+
+    FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                   NULL, i_error, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
+                   (LPTSTR) psz_tmp, 256, NULL );
+
+    /* Go to the end of the string */
+#if defined(UNDER_CE)
+    while( psz_tmp[i] && psz_tmp[i] != L'\r' && psz_tmp[i] != L'\n' )
+#else
+    while( psz_tmp[i] && psz_tmp[i] != '\r' && psz_tmp[i] != '\n' )
+#endif
+    {
+        i++;
+    }
+
+    if( psz_tmp[i] )
+    {
+#if defined(UNDER_CE)
+        swprintf( psz_tmp + i, L" (error %i)", i_error );
+        psz_tmp[ 255 ] = L'\0';
+#else
+        snprintf( psz_tmp + i, 256 - i, " (error %i)", i_error );
+        psz_tmp[ 255 ] = '\0';
+#endif
+    }
+
+#if defined(UNDER_CE)
+    WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, psz_tmp, -1,
+                         psz_buffer, 256, NULL, NULL );
+    return psz_buffer;
+#else
+    return psz_tmp;
+#endif
+}
+#endif
+
 #endif /* HAVE_DYNAMIC_PLUGINS */
