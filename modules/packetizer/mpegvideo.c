@@ -2,7 +2,7 @@
  * mpegvideo.c: parse and packetize an MPEG1/2 video stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.30 2004/02/25 18:43:24 gbazin Exp $
+ * $Id: mpegvideo.c,v 1.31 2004/03/03 11:09:30 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -414,6 +414,19 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         {
             p_sys->i_interpolated_dts += p_sys->i_old_duration;
             p_sys->i_old_duration = i_duration;
+        }
+
+        switch ( p_sys->i_picture_type )
+        {
+        case 0x01:
+            p_pic->i_flags |= BLOCK_FLAG_TYPE_I;
+            break;
+        case 0x02:
+            p_pic->i_flags |= BLOCK_FLAG_TYPE_P;
+            break;
+        case 0x03:
+            p_pic->i_flags |= BLOCK_FLAG_TYPE_B;
+            break;
         }
 
         p_pic->i_length = p_sys->i_interpolated_dts - p_pic->i_dts;
