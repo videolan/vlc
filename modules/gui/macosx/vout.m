@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout.m,v 1.7 2002/12/08 05:30:47 jlj Exp $
+ * $Id: vout.m,v 1.8 2002/12/24 23:00:51 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -130,6 +130,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     p_vout->p_sys->h_img_descr = 
         (ImageDescriptionHandle)NewHandleClear( sizeof(ImageDescription) );
     p_vout->p_sys->p_matrix = (MatrixRecordPtr)malloc( sizeof(MatrixRecord) );
+    p_vout->p_sys->p_fullscreen_state;
 
     p_vout->p_sys->b_mouse_pointer_visible = 1;
 
@@ -533,11 +534,15 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
 
     if( p_vout->b_fullscreen )
     {
-        HideMenuBar();
+        if ( p_vout->p_sys->p_fullscreen_state == NULL )
+            BeginFullScreen( &p_vout->p_sys->p_fullscreen_state, NULL, 0, 0,
+                             NULL, NULL, fullScreenHideCursor | fullScreenAllowEvents );
     }
     else
     {
-        ShowMenuBar();
+        if ( p_vout->p_sys->p_fullscreen_state != NULL )
+            EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
+        p_vout->p_sys->p_fullscreen_state = NULL;
     }
 
     if( CoCreateWindow( p_vout ) )

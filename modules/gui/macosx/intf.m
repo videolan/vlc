@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.10 2002/12/14 19:34:06 gbazin Exp $
+ * $Id: intf.m,v 1.11 2002/12/24 23:00:51 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -196,7 +196,7 @@ static void Run( intf_thread_t *p_intf )
 
     [o_mu_file setTitle: _NS("File")];
     [o_mi_open_file setTitle: _NS("Open File...")];
-    [o_mi_open_generic setTitle: _NS("Open Generic...")];
+    [o_mi_open_generic setTitle: _NS("Open...")];
     [o_mi_open_disc setTitle: _NS("Open Disc...")];
     [o_mi_open_net setTitle: _NS("Open Network...")];
     [o_mi_open_recent setTitle: _NS("Open Recent")];
@@ -309,6 +309,9 @@ static void Run( intf_thread_t *p_intf )
                                                         FIND_ANYWHERE );
             vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                       FIND_ANYWHERE );
+
+            /* Disable screen saver. */
+            UpdateSystemActivity( UsrActivity );
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
 
