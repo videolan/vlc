@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.149 2004/01/11 00:45:06 zorglub Exp $
+dnl $Id: configure.ac,v 1.150 2004/01/12 21:08:22 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -2583,7 +2583,14 @@ AC_ARG_ENABLE(caca,
   [  --enable-caca           libcaca output (default disabled)])
 if test "${enable_caca}" = "yes"
 then
-  AC_PATH_PROG(CACA_CONFIG, caca-config, no)
+  CACA_PATH="${PATH}"
+  AC_ARG_WITH(caca-config-path,
+    [    --with-caca-config-path=PATH caca-config path (default search in \$PATH)],
+    [ if test "${with_caca_config_path}" != "no"
+      then
+        CACA_PATH="${with_caca_config_path}:${PATH}"
+      fi ])
+  AC_PATH_PROG(CACA_CONFIG, caca-config, no, ${CACA_PATH})
   if test "${CACA_CONFIG}" != "no"
   then
     AX_ADD_PLUGINS([caca])
