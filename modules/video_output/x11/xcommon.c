@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.26 2003/07/29 21:14:10 gbazin Exp $
+ * $Id: xcommon.c,v 1.27 2003/08/02 14:06:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -525,7 +525,16 @@ static int ManageVideo( vout_thread_t *p_vout )
                 }
                 else
                 {
-                    p_vout->p_vlc->b_die = 1;
+                    /* the user wants to close the window */
+                    playlist_t * p_playlist =
+                        (playlist_t *)vlc_object_find( p_vout,
+                                                       VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+                    if( p_playlist != NULL )
+                    {
+                        playlist_Stop( p_playlist );
+                        vlc_object_release( p_playlist );
+                    }
                 }
                 break;
             case XK_Menu:
@@ -820,7 +829,15 @@ static int ManageVideo( vout_thread_t *p_vout )
                && ((Atom)xevent.xclient.data.l[0]
                      == p_vout->p_sys->p_win->wm_delete_window ) )
         {
-            p_vout->p_vlc->b_die = 1;
+            /* the user wants to close the window */
+            playlist_t * p_playlist =
+                (playlist_t *)vlc_object_find( p_vout, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
+            if( p_playlist != NULL )
+            {
+                playlist_Stop( p_playlist );
+                vlc_object_release( p_playlist );
+            }
         }
     }
 
