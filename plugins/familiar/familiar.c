@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.8.2.8 2002/10/13 20:20:46 jpsaman Exp $
+ * $Id: familiar.c,v 1.8.2.9 2002/10/29 20:53:30 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -32,6 +32,10 @@
 #include <videolan/vlc.h>
 
 #include <gtk/gtk.h>
+
+#ifdef HAVE_GPE_INIT_H
+#include <gpe/init.h>
+#endif 
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -178,12 +182,18 @@ static void Run( intf_thread_t *p_intf )
     int    i_args   = 1;
     int    i_dummy  = 0;
 
-    /* Initialize Gtk+ */
-    gtk_set_locale ();
-
-    /* gtk_init will register stuff with g_atexit, so we need to take
-     * the global lock if we want to be able to intercept the calls */
-    gtk_init( &i_args, &pp_args );
+#ifdef HAVE_GPE_INIT_H
+   /* Initialize GPE interface */
+   if (gpe_application_init(&i_args, &pp_args) == FALSE)
+        exit (1);	
+#else
+   /* Initialize Gtk+ */
+   gtk_set_locale ();
+    
+   /* gtk_init will register stuff with g_atexit, so we need to take
+    * the global lock if we want to be able to intercept the calls */
+   gtk_init( &i_args, &pp_args );
+#endif
 
     /* Create some useful widgets that will certainly be used */
 // FIXME: magic path
@@ -215,7 +225,8 @@ static void Run( intf_thread_t *p_intf )
                          "p_intf", p_intf );
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
-    ReadDirectory(p_intf->p_sys->p_clist, ".");
+    ReadDirectory(p_intf->p_sys->p_clist, "/mnt"); 
+//    OpenDirectory(p_intf->p_sys->p_clist, "/mnt");
 
     /* Sleep to avoid using all CPU - since some interfaces needs to access
      * keyboard events, a 100ms delay is a good compromise */

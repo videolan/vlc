@@ -2,7 +2,7 @@
  * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.10 2002/10/13 14:27:49 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.11 2002/10/29 20:53:30 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -24,13 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <sys/types.h>                                              /* off_t */
-#include <stdlib.h>
-
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
 #include <sys/stat.h>
+#include <sys/types.h>                                              /* off_t */
+#include <dirent.h>
 #include <unistd.h>
 
 #include <videolan/vlc.h>
@@ -57,8 +56,8 @@
 
 #include "netutils.h"
 
-static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
-static char* get_file_perm(const char *path);
+void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
+char* get_file_perm(const char *path);
 
 /*****************************************************************************
  * Useful function to retrieve p_intf
@@ -97,7 +96,7 @@ void * __GtkGetIntf( GtkWidget * widget )
 /*****************************************************************************
  * Helper functions for URL changes in Media and Preferences notebook pages.
  ****************************************************************************/
-static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
+void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
     int            i_end = p_main->p_playlist->i_size;
@@ -131,10 +130,11 @@ static void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 void ReadDirectory( GtkCList *clist, char *psz_dir )
 {
     intf_thread_t *p_intf = GtkGetIntf( clist );
-    struct dirent **namelist;
+    struct dirent **namelist=NULL;
     int n=-1;
     int status=-1;
 
+    printf( "Read directory: %s\n", psz_dir );
     if (psz_dir)
     {
        status = chdir(psz_dir);
@@ -142,8 +142,9 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
     if (status<0)
       intf_ErrMsg("File is not a directory.");
     else
-      n = scandir(".", &namelist, 0, NULL);
+      n = scandir(".", &namelist, NULL, NULL);
 
+//    printf( "n=%d\n", n);
     if (n<0)
         perror("scandir");
     else
@@ -158,8 +159,9 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
         for (i=0; i<n; i++)
         {
             /* This is a list of strings. */
-            ppsz_text[0] = namelist[i]->d_name;
-            ppsz_text[1] = get_file_perm(namelist[i]->d_name);
+            ppsz_text[0] =  &(namelist[i])->d_name[0];
+            ppsz_text[1] =  get_file_perm(&(namelist[i])->d_name[0]);
+ //           printf( "Entry: %s, %s\n", &(namelist[i])->d_name[0], ppsz_text[1] );
             if (strcmp(ppsz_text[1],"") == 0)
                 intf_ErrMsg("File system error unknown filetype encountered.");
             gtk_clist_insert( p_intf->p_sys->p_clist, i, ppsz_text );
@@ -170,7 +172,69 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
     }
 }
 
-static char* get_file_perm(const char *path)
+void OpenDirectory( GtkCList *clist, char *psz_dir )
+{
+    intf_thread_t *p_intf = GtkGetIntf( clist );
+    gchar *ppsz_text[2];
+    int row=0;
+
+    char* dir_path;
+    DIR* dir;
+    struct dirent* entry=NULL;
+    char entry_path[PATH_MAX+1];
+    size_t path_len;
+
+    if (psz_dir)
+       dir_path = psz_dir;
+    else
+       dir_path = ".";
+
+    strncpy( &entry_path[0], dir_path, sizeof(entry_path) );
+    /* always force end of string */
+    entry_path[PATH_MAX+1]='\0';
+    path_len = strlen(dir_path);
+    /* Make sure we do not run over our buffer here */
+    if (path_len > PATH_MAX)
+        path_len = PATH_MAX;
+    /* Add backslash to directory path */
+    if (entry_path[path_len-1] != '/')
+    {
+      entry_path[path_len] = '/';
+      entry_path[path_len+1] = '\0';
+      ++path_len;
+    }
+ printf( "path_len=%d\n", path_len );
+ printf( "entry_path=%s\n", entry_path);
+
+    if( p_intf->p_sys->p_clist == NULL )
+       intf_ErrMsg("OpenDirectory - ERROR p_intf->p_sys->p_clist == NULL");
+    gtk_clist_freeze( p_intf->p_sys->p_clist );
+    gtk_clist_clear( p_intf->p_sys->p_clist );
+
+    dir = opendir(dir_path);
+    if (!dir) perror("opendir");
+    while( (entry = readdir(dir))!=NULL )
+    {
+      if (!entry) perror("readdir");
+ printf( "sizeof(entry->d_name)=%d\n",sizeof(&(entry)->d_name[0]) );
+ printf( "entry->d_name=%s\n",&(entry->d_name)[0] );
+
+      strncpy( entry_path + path_len, &(entry)->d_name[0], sizeof(entry_path) - path_len );
+      /* always force end of string */
+      entry_path[PATH_MAX+1]='\0';
+      /* This is a list of strings. */
+      ppsz_text[0] = &(entry)->d_name[0];
+      ppsz_text[1] = get_file_perm(entry_path);
+ printf( "%-18s %s\n", ppsz_text[1], &(entry)->d_name[0] );
+//      gtk_clist_insert( p_intf->p_sys->p_clist, row, ppsz_text );
+      row++;
+    }
+    closedir(dir);
+
+    gtk_clist_thaw( p_intf->p_sys->p_clist );
+}
+
+char* get_file_perm(const char *path)
 {
     struct stat st;
     char *perm;
@@ -274,6 +338,7 @@ on_toolbar_open_clicked                (GtkButton       *button,
     if (p_intf->p_sys->p_clist)
     {
        ReadDirectory(p_intf->p_sys->p_clist, ".");
+//       OpenDirectory(p_intf->p_sys->p_clist, ".");
     }
 }
 
@@ -420,23 +485,24 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
 
     psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
     if( (strncmp("file://",(const char *) psz_url,7)==0) ||
-		    (strncmp("udp://",(const char *) psz_url,6)==0) ||
-		    (strncmp("udp4://",(const char *) psz_url,7)==0) ||		
-			(strncmp("udp6://",(const char *) psz_url,7)==0) ||
-		    (strncmp("udpstream://",(const char *) psz_url,12)==0) ||
-		    (strncmp("rtp://",(const char *) psz_url,6)==0) ||
-		    (strncmp("rtp4://",(const char *) psz_url,7)==0) ||
-		    (strncmp("rtp6://",(const char *) psz_url,7)==0) ||
-		    (strncmp("rtpstream://",(const char *) psz_url,12)==0) ||
-			(strncmp("ftp://",(const char *) psz_url,6)==0) ||
-		    (strncmp("http://",(const char *) psz_url,7)==0) )
-	{
+        (strncmp("udp://",(const char *) psz_url,6)==0) ||
+        (strncmp("udp4://",(const char *) psz_url,7)==0) ||
+        (strncmp("udp6://",(const char *) psz_url,7)==0) ||
+        (strncmp("udpstream://",(const char *) psz_url,12)==0) ||
+        (strncmp("rtp://",(const char *) psz_url,6)==0) ||
+        (strncmp("rtp4://",(const char *) psz_url,7)==0) ||
+        (strncmp("rtp6://",(const char *) psz_url,7)==0) ||
+        (strncmp("rtpstream://",(const char *) psz_url,12)==0) ||
+        (strncmp("ftp://",(const char *) psz_url,6)==0) ||
+        (strncmp("http://",(const char *) psz_url,7)==0) )
+    {
         MediaURLOpenChanged(GTK_WIDGET(editable), psz_url);
     }
     else if (lstat((char*)psz_url, &st)==0)
     {
         if (S_ISDIR(st.st_mode))
            ReadDirectory(p_intf->p_sys->p_clist, psz_url);
+//           OpenDirectory(p_intf->p_sys->p_clist, psz_url);
         else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
                  (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
                  (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
@@ -490,6 +556,7 @@ on_clistmedia_select_row               (GtkCList        *clist,
         {
             if (S_ISDIR(st.st_mode))
                ReadDirectory(p_intf->p_sys->p_clist, text[0]);
+//               OpenDirectory(p_intf->p_sys->p_clist, text[0]);
             else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
                      (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
                      (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
