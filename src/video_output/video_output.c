@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.214 2003/03/24 23:50:46 gbazin Exp $
+ * $Id: video_output.c,v 1.215 2003/03/25 00:43:26 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -361,15 +361,15 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
     /* Calculate delay created by internal caching */
     p_input_thread = (input_thread_t *)vlc_object_find( p_vout,
-                                           VLC_OBJECT_INPUT, FIND_PARENT );
+                                           VLC_OBJECT_INPUT, FIND_ANYWHERE );
     if( p_input_thread )
     {
-        p_vout->i_pts_delay = p_input_thread->i_pts_delay + VOUT_BOGUS_DELAY;
+        p_vout->i_pts_delay = p_input_thread->i_pts_delay;
         vlc_object_release( p_input_thread );
     }
     else
     {
-        p_vout->i_pts_delay = VOUT_BOGUS_DELAY;
+        p_vout->i_pts_delay = DEFAULT_PTS_DELAY;
     }
 
     /* Create thread and set locks */
@@ -714,7 +714,8 @@ static void RunThread( vout_thread_t *p_vout)
                 continue;
             }
 
-            if( display_date > current_date + p_vout->i_pts_delay )
+            if( display_date >
+                current_date + p_vout->i_pts_delay +  VOUT_BOGUS_DELAY )
             {
                 /* Picture is waaay too early: it will be destroyed */
                 vlc_mutex_lock( &p_vout->picture_lock );
@@ -731,7 +732,8 @@ static void RunThread( vout_thread_t *p_vout)
                     p_vout->i_heap_size--;
                 }
                 msg_Warn( p_vout, "vout warning: early picture skipped "
-                          "("I64Fd")", display_date - current_date );
+                          "("I64Fd")", display_date - current_date
+                          - p_vout->i_pts_delay );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
                 continue;
