@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.31 2003/09/29 15:45:19 sigmunau Exp $
+ * $Id: variables.c,v 1.32 2003/10/22 17:12:31 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -271,10 +271,21 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         {
             /* Free data if needed */
             p_var->pf_free( &p_var->val );
-            /* Check boundaries and list */
-            CheckValue( p_var, &val );
             /* Set the variable */
             p_var->val = val;
+
+            if( i_type & VLC_VAR_HASCHOICE )
+            {
+                /* We must add the inherited value to our choice list */
+                p_var->i_default = 0;
+
+                INSERT_ELEM( p_var->choices.p_values, p_var->choices.i_count,
+                             0, val );
+                INSERT_ELEM( p_var->choices_text.p_values,
+                             p_var->choices_text.i_count, 0, val );
+                p_var->pf_dup( &p_var->choices.p_values[0] );
+                p_var->choices_text.p_values[0].psz_string = NULL;
+            }
         }
     }
 
@@ -1173,7 +1184,6 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
     if( i_var >= 0 )
     {
         /* We found it! */
-
         p_var = &p_this->p_parent->p_vars[i_var];
 
         /* Really get the variable */

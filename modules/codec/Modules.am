@@ -8,6 +8,7 @@ SOURCES_vorbis = vorbis.c
 SOURCES_tarkin = tarkin.c
 SOURCES_theora = theora.c
 SOURCES_tremor = vorbis.c
+SOURCES_speex = speex.c
 SOURCES_dv = dv.c
 SOURCES_xvid = xvid.c
 SOURCES_adpcm = adpcm.c

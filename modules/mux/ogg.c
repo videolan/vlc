@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.18 2003/10/10 17:09:42 gbazin Exp $
+ * $Id: ogg.c,v 1.19 2003/10/22 17:12:30 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -422,6 +422,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             msg_Dbg( p_mux, "vorbis stream" );
             break;
 
+        case VLC_FOURCC( 's', 'p', 'x', ' ' ):
+            msg_Dbg( p_mux, "speex stream" );
+            break;
+
         default:
             FREE( p_input->p_sys );
             return( VLC_EGENERIC );
@@ -595,12 +599,13 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
         p_stream->i_packet_no = 0;
 
         if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
+            p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) ||
             p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
         {
             /* Special case, headers are already there in the
              * incoming stream or we backed them up earlier */
 
-            /* first packet in order: vorbis/theora info */
+            /* first packet in order: vorbis/speex/theora info */
             if( !p_stream->i_sout_headers )
             {
                 p_og = sout_FifoGet( p_mux->pp_inputs[i]->p_fifo );
@@ -655,6 +660,7 @@ static sout_buffer_t *OggCreateHeader( sout_mux_t *p_mux, mtime_t i_dts )
         ogg_stream_t *p_stream = (ogg_stream_t*)p_mux->pp_inputs[i]->p_sys;
 
         if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
+            p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) ||
             p_stream->i_fourcc == VLC_FOURCC( 't', 'h', 'e', 'o' ) )
         {
             /* Special case, headers are already there in the incoming stream.
@@ -860,6 +866,7 @@ static int Mux( sout_mux_t *p_mux )
         p_data   = sout_FifoGet( p_input->p_fifo );
 
         if( p_stream->i_fourcc != VLC_FOURCC( 'v', 'o', 'r', 'b' ) &&
+            p_stream->i_fourcc != VLC_FOURCC( 's', 'p', 'x', ' ' ) &&
             p_stream->i_fourcc != VLC_FOURCC( 't', 'h', 'e', 'o' ) )
         {
             sout_BufferReallocFromPreHeader( p_mux->p_sout, p_data, 1 );
@@ -874,7 +881,8 @@ static int Mux( sout_mux_t *p_mux )
 
         if( p_stream->i_cat == AUDIO_ES )
         {
-            if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) )
+            if( p_stream->i_fourcc == VLC_FOURCC( 'v', 'o', 'r', 'b' ) ||
+                p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) )
             {
                 /* number of sample from begining + current packet */
                 op.granulepos =
@@ -908,9 +916,11 @@ static int Mux( sout_mux_t *p_mux )
 
         ogg_stream_packetin( &p_stream->os, &op );
 
-        if( p_stream->i_cat == SPU_ES )
+        if( p_stream->i_cat == SPU_ES ||
+            p_stream->i_fourcc == VLC_FOURCC( 's', 'p', 'x', ' ' ) )
         {
-            /* Subtitles need to be flushed to be sent on time */
+            /* Subtitles or Speex packets are quite small so they 
+             * need to be flushed to be sent on time */
             sout_BufferChain( &p_og, OggStreamFlush( p_mux, &p_stream->os,
                                                      p_data->i_dts ) );
         }

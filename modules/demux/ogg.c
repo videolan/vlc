@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.39 2003/10/19 16:53:59 gbazin Exp $
+ * $Id: ogg.c,v 1.40 2003/10/22 17:12:30 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -356,6 +356,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         switch( p_stream->i_fourcc )
         {
         case VLC_FOURCC( 'v','o','r','b' ):
+        case VLC_FOURCC( 's','p','x',' ' ):
         case VLC_FOURCC( 't','h','e','o' ):
           if( p_stream->i_packets_backup == 3 ) p_stream->b_force_backup = 0;
           break;
@@ -398,7 +399,8 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     vlc_mutex_unlock( &p_input->stream.control.control_lock );
 
     /* Convert the pcr into a pts */
-    if( p_stream->i_fourcc == VLC_FOURCC( 'v','o','r','b' ) )
+    if( p_stream->i_fourcc == VLC_FOURCC( 'v','o','r','b' ) ||
+        p_stream->i_fourcc == VLC_FOURCC( 's','p','x',' ' ) )
     {
         if( p_stream->i_pcr >= 0 )
         {
@@ -484,6 +486,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     if( p_stream->i_cat == SPU_ES ) p_pes->i_dts = 0;
 
     if( p_stream->i_fourcc != VLC_FOURCC( 'v','o','r','b' ) &&
+        p_stream->i_fourcc != VLC_FOURCC( 's','p','x',' ' ) &&
         p_stream->i_fourcc != VLC_FOURCC( 't','a','r','k' ) &&
         p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
     {
@@ -600,6 +603,49 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                                        p_stream->i_channels );
                         input_AddInfo( p_cat, _("Bit Rate"), "%d",
                                        p_stream->i_bitrate );
+                    }
+                }
+                /* Check for Speex header */
+                if( oggpacket.bytes >= 7 &&
+                    ! strncmp( &oggpacket.packet[0], "Speex", 5 ) )
+                {
+                    oggpack_buffer opb;
+
+                    p_stream->i_cat = AUDIO_ES;
+                    p_stream->i_fourcc = VLC_FOURCC( 's','p','x',' ' );
+
+                    /* Signal that we want to keep a backup of the vorbis
+                     * stream headers. They will be used when switching between
+                     * audio streams. */
+                    p_stream->b_force_backup = 1;
+
+                    /* Cheat and get additionnal info ;) */
+                    oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
+                    oggpack_adv( &opb, 224 );
+                    oggpack_adv( &opb, 32 ); /* speex_version_id */
+                    oggpack_adv( &opb, 32 ); /* header_size */
+                    p_stream->f_rate = oggpack_read( &opb, 32 );
+                    oggpack_adv( &opb, 32 ); /* mode */
+                    oggpack_adv( &opb, 32 ); /* mode_bitstream_version */
+                    p_stream->i_channels = oggpack_read( &opb, 32 );
+                    p_stream->i_bitrate = oggpack_read( &opb, 32 );
+                    {
+                        char title[sizeof("Stream") + 10];
+                        input_info_category_t *p_cat;
+                        sprintf( title, "Stream %d", p_ogg->i_streams );
+                        p_cat = input_InfoCategory( p_input, title );
+                        input_AddInfo( p_cat, _("Type"), _("Audio") );
+                        input_AddInfo( p_cat, _("Codec"), _("Speex") );
+                        input_AddInfo( p_cat, _("Sample Rate"), "%f",
+                                       p_stream->f_rate );
+                        input_AddInfo( p_cat, _("Channels"), "%d",
+                                       p_stream->i_channels );
+                        input_AddInfo( p_cat, _("Bit Rate"), "%d",
+                                       p_stream->i_bitrate );
+                        msg_Dbg( p_input, "found speex header, channels: %i, "
+                                 "rate: %i,  bitrate: %i",
+                                 p_stream->i_channels,
+                                 (int)p_stream->f_rate, p_stream->i_bitrate );
                     }
                 }
                 /* Check for Theora header */
@@ -1489,7 +1535,8 @@ static int Demux( input_thread_t * p_input )
                 }
 
                 /* An Ogg/vorbis packet contains an end date granulepos */
-                if( p_stream->i_fourcc == VLC_FOURCC( 'v','o','r','b' ) )
+                if( p_stream->i_fourcc == VLC_FOURCC( 'v','o','r','b' ) ||
+                    p_stream->i_fourcc == VLC_FOURCC( 's','p','x',' ' ) )
                 {
                     if( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
                     {

@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.89 2003/10/21 17:31:36 gbazin Exp $
+dnl $Id: configure.ac,v 1.90 2003/10/22 17:12:30 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2033,6 +2033,18 @@ then
     AX_ADD_PLUGINS([tremor])
     AX_ADD_LDFLAGS([tremor],[-lvorbisidec -logg])
    ],[])
+fi
+
+dnl
+dnl  Speex plugin
+dnl
+AC_ARG_ENABLE(speex,
+  [  --enable-speex         Speex decoder support (default enabled)])
+if test "${enable_speex}" != "no"
+then
+  AC_CHECK_HEADERS(speex.h, [
+    AX_ADD_PLUGINS([speex])
+    AX_ADD_LDFLAGS([speex],[-lspeex]) ],[])
 fi
 
 dnl

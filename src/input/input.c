@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.248 2003/10/20 00:01:06 hartman Exp $
+ * $Id: input.c,v 1.249 2003/10/22 17:12:31 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -627,11 +627,13 @@ static int InitThread( input_thread_t * p_input )
     p_input->p_access = module_Need( p_input, "access",
                                      p_input->psz_access );
 
+#ifndef WIN32      /* Remove this gross hack from the win32 build as colons
+                    * are forbidden in filenames on Win32. */
+
+    /* Maybe we got something like: /Volumes/toto:titi/gabu.mpg */
     if ( p_input->p_access == NULL
           && (*p_input->psz_demux || *p_input->psz_access) )
     {
-        /* Maybe we got something like :
-         * /Volumes/toto:titi/gabu.mpg */
         p_input->psz_access = p_input->psz_demux = "";
         p_input->psz_name = p_input->psz_source;
         free( p_input->psz_dupsource);
@@ -640,6 +642,7 @@ static int InitThread( input_thread_t * p_input )
         p_input->p_access = module_Need( p_input, "access",
                                          p_input->psz_access );
     }
+#endif
 
     if( p_input->p_access == NULL )
     {

@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.22 2003/08/24 16:59:35 hartman Exp $
+ * $Id: udp.c,v 1.23 2003/10/22 17:12:30 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -106,6 +106,7 @@ static int Open( vlc_object_t *p_this )
     char *              psz_bind_port = "";
     int                 i_bind_port = 0, i_server_port = 0;
     network_socket_t    socket_desc;
+    vlc_value_t         val;
 
     if( config_GetInt( p_input, "ipv4" ) )
     {
@@ -272,7 +273,7 @@ static int Open( vlc_object_t *p_this )
         return( -1 );
     }
     module_Unneed( p_input, p_network );
-    
+
     p_access_data = malloc( sizeof(input_socket_t) );
     p_input->p_access_data = (access_sys_t *)p_access_data;
 
@@ -286,7 +287,9 @@ static int Open( vlc_object_t *p_this )
     p_input->i_mtu = socket_desc.i_mtu;
 
     /* Update default_pts to a suitable value for udp access */
-    p_input->i_pts_delay = config_GetInt( p_input, "udp-caching" ) * 1000;
+    var_Create( p_input, "udp-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "udp-caching", &val );
+    p_input->i_pts_delay = val.i_int * 1000;
 
     return( 0 );
 }
