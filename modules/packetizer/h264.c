@@ -6,7 +6,7 @@
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -73,6 +73,15 @@ struct decoder_sys_t
 
     /* avcC data */
     int i_avcC_length_size;
+
+    /* Useful values of the Sequence Parameter Set */
+    int i_log2_max_frame_num;
+    int b_frame_mbs_only;
+
+    /* Useful values of the Slice Header */
+    int i_nal_type;
+    int i_idr_pic_id;
+    int i_frame_num;
 };
 
 enum
@@ -119,7 +128,8 @@ static int Open( vlc_object_t *p_this )
         p_dec->fmt_in.i_codec != VLC_FOURCC( 'H', '2', '6', '4') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC( 'V', 'S', 'S', 'H') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC( 'v', 's', 's', 'h') &&
-        ( p_dec->fmt_in.i_codec != VLC_FOURCC( 'a', 'v', 'c', '1') || p_dec->fmt_in.i_extra < 7 ) )
+        ( p_dec->fmt_in.i_codec != VLC_FOURCC( 'a', 'v', 'c', '1') ||
+          p_dec->fmt_in.i_extra < 7 ) )
     {
         return VLC_EGENERIC;
     }
@@ -143,6 +153,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pts   = 0;
     p_sys->i_flags = 0;
     p_sys->b_sps   = VLC_FALSE;
+
+    p_sys->i_nal_type = -1;
+    p_sys->i_idr_pic_id = -1;
+    p_sys->i_frame_num = -1;
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -311,6 +325,7 @@ static block_t *PacketizeAVC1( decoder_t *p_dec, block_t **pp_block )
 
             p_part->i_dts = p_block->i_dts;
             p_part->i_pts = p_block->i_pts;
+
             /* Parse the NAL */
             if( ( p_pic = ParseNALBlock( p_dec, p_part ) ) )
             {
@@ -334,13 +349,15 @@ static block_t *nal_get_annexeb( decoder_t *p_dec, uint8_t *p, int i_size )
     p_nal->p_buffer[1] = 0x00;
     p_nal->p_buffer[2] = 0x00;
     p_nal->p_buffer[3] = 0x01;
+
     /* Copy nalu */
     memcpy( &p_nal->p_buffer[4], p, i_size );
 
     return p_nal;
 }
 
-static void nal_get_decoded( uint8_t **pp_ret, int *pi_ret, uint8_t *src, int i_src )
+static void nal_get_decoded( uint8_t **pp_ret, int *pi_ret,
+                             uint8_t *src, int i_src )
 {
     uint8_t *end = &src[i_src];
     uint8_t *dst = malloc( i_src );
@@ -349,7 +366,8 @@ static void nal_get_decoded( uint8_t **pp_ret, int *pi_ret, uint8_t *src, int i_
 
     while( src < end )
     {
-        if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00  && src[2] == 0x03 )
+        if( src < end - 3 && src[0] == 0x00 && src[1] == 0x00 &&
+            src[2] == 0x03 )
         {
             *dst++ = 0x00;
             *dst++ = 0x00;
@@ -373,6 +391,7 @@ static inline int bs_read_ue( bs_t *s )
     }
     return( ( 1 << i) - 1 + bs_read( s, i ) );
 }
+
 static inline int bs_read_se( bs_t *s )
 {
     int val = bs_read_ue( s );
@@ -386,68 +405,108 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
 
-    const int i_ref_idc = (p_frag->p_buffer[4] >> 5)&0x03;
-    const int i_nal_type= p_frag->p_buffer[4]&0x1f;
+    const int i_ref_idc  = (p_frag->p_buffer[4] >> 5)&0x03;
+    const int i_nal_type = p_frag->p_buffer[4]&0x1f;
 
-    if( p_sys->b_slice &&
-        ( i_nal_type == NAL_SLICE || i_nal_type == NAL_SLICE_IDR ||
-          i_nal_type == NAL_SLICE_DPC || i_nal_type == NAL_SPS || i_nal_type == NAL_PPS ) )
+    if( p_sys->b_slice && !p_sys->b_sps )
     {
-        if( p_sys->b_sps )
+        block_ChainRelease( p_sys->p_frame );
+        msg_Warn( p_dec, "waiting for SPS" );
+
+        /* Reset context */
+        p_sys->p_frame = NULL;
+        p_sys->b_slice = VLC_FALSE;
+    }
+
+    if( !p_sys->b_sps &&
+        i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
+    {
+        p_sys->b_slice = VLC_TRUE;
+        /* Fragment will be discarded later on */
+    }
+    else if( i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
+    {
+        uint8_t *dec;
+        int i_dec, i_first_mb, i_slice_type, i_frame_num, i_pic_flags = 0;
+        vlc_bool_t b_pic = VLC_FALSE;
+        bs_t s;
+
+        /* do not convert the whole frame */
+        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5],
+                         __MIN( p_frag->i_buffer - 5, 60 ) );
+        bs_init( &s, dec, i_dec );
+
+        /* first_mb_in_slice */
+        i_first_mb = bs_read_ue( &s );
+
+        /* slice_type */
+        switch( (i_slice_type = bs_read_ue( &s )) )
+        {
+            case 0: case 5:
+                i_pic_flags = BLOCK_FLAG_TYPE_P;
+                break;
+            case 1: case 6:
+                i_pic_flags = BLOCK_FLAG_TYPE_B;
+                break;
+            case 2: case 7:
+                i_pic_flags = BLOCK_FLAG_TYPE_I;
+                break;
+            case 3: case 8: /* SP */
+                i_pic_flags = BLOCK_FLAG_TYPE_P;
+                break;
+            case 4: case 9:
+                i_pic_flags = BLOCK_FLAG_TYPE_I;
+                break;
+        }
+
+        /* pic_parameter_set_id */
+        bs_read_ue( &s );
+        /* frame_num */
+        i_frame_num = bs_read( &s, p_sys->i_log2_max_frame_num + 4 );
+
+        if( i_nal_type != NAL_SLICE_IDR && i_frame_num != p_sys->i_frame_num )
+        {
+            b_pic = VLC_TRUE;
+        }
+        p_sys->i_frame_num = i_frame_num;
+
+        if( !p_sys->b_frame_mbs_only )
+        {
+            /* field_pic_flag */
+            if( bs_read( &s, 1 ) )
+            {
+                /* bottom_field_flag */
+                bs_read( &s, 1 );
+            }
+        }
+
+        if( i_nal_type == NAL_SLICE_IDR )
+        {
+            /* id_pic_id */
+            int i_idr_pic_id = bs_read_ue( &s );
+            if( p_sys->i_nal_type != i_nal_type ) b_pic = VLC_TRUE;
+            if( p_sys->i_idr_pic_id != i_idr_pic_id ) b_pic = VLC_TRUE;
+            p_sys->i_idr_pic_id = i_idr_pic_id;
+        }
+        p_sys->i_nal_type = i_nal_type;
+
+        if( b_pic && p_sys->b_slice )
         {
             p_pic = block_ChainGather( p_sys->p_frame );
             p_pic->i_dts = p_sys->i_dts;
             p_pic->i_pts = p_sys->i_pts;
             p_pic->i_length = 0;    /* FIXME */
             p_pic->i_flags = p_sys->i_flags;
-        }
-        else
-        {
-            block_ChainRelease( p_sys->p_frame );
-            msg_Warn( p_dec, "waiting SPS" );
-        }
 
-        /* reset context */
-        p_sys->p_frame = NULL;
-        p_sys->b_slice = VLC_FALSE;
-        //p_sys->i_dts += 40000;
-    }
-
-    if( i_nal_type >= NAL_SLICE && i_nal_type <= NAL_SLICE_IDR )
-    {
-        uint8_t *dec;
-        int     i_dec;
-        bs_t s;
+            /* Reset context */
+            p_sys->p_frame = NULL;
+            p_sys->b_slice = VLC_FALSE;
+        }
 
         p_sys->b_slice = VLC_TRUE;
+        p_sys->i_flags = i_pic_flags;
         p_sys->i_dts   = p_frag->i_dts;
         p_sys->i_pts   = p_frag->i_pts;
-
-        /* do not convert the whole frame */
-        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5], __MIN( p_frag->i_buffer - 5, 60 ) );
-        bs_init( &s, dec, i_dec );
-
-        /* i_first_mb */
-        bs_read_ue( &s );
-        /* picture type */
-        switch( bs_read_ue( &s ) )
-        {
-            case 0: case 5:
-                p_sys->i_flags = BLOCK_FLAG_TYPE_P;
-                break;
-            case 1: case 6:
-                p_sys->i_flags =BLOCK_FLAG_TYPE_B;
-                break;
-            case 2: case 7:
-                p_sys->i_flags = BLOCK_FLAG_TYPE_I;
-                break;
-            case 3: case 8: /* SP */
-                p_sys->i_flags = BLOCK_FLAG_TYPE_P;
-                break;
-            case 4: case 9:
-                p_sys->i_flags = BLOCK_FLAG_TYPE_I;
-                break;
-        }
 
         free( dec );
     }
@@ -458,9 +517,12 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         bs_t s;
         int i_tmp;
 
+        msg_Dbg( p_dec, "found NAL_SPS" );
+
         p_sys->b_sps = VLC_TRUE;
 
-        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
+        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5],
+                         p_frag->i_buffer - 5 );
 
         bs_init( &s, dec, i_dec );
         /* Skip profile(8), constraint_set012, reserver(5), level(8) */
@@ -468,7 +530,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         /* sps id */
         bs_read_ue( &s );
         /* Skip i_log2_max_frame_num */
-        bs_read_ue( &s );
+        p_sys->i_log2_max_frame_num = bs_read_ue( &s );
         /* Read poc_type */
         i_tmp = bs_read_ue( &s );
         if( i_tmp == 0 )
@@ -504,8 +566,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         p_dec->fmt_out.video.i_height = 16 * ( bs_read_ue( &s ) + 1 );
 
         /* b_frame_mbs_only */
-        i_tmp = bs_read( &s, 1 );
-        if( i_tmp == 0 )
+        p_sys->b_frame_mbs_only = bs_read( &s, 1 );
+        if( p_sys->b_frame_mbs_only == 0 )
         {
             bs_skip( &s, 1 );
         }
@@ -555,9 +617,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
                     h = bs_read( &s, 16 );
                 }
                 p_dec->fmt_out.video.i_aspect =
-                    VOUT_ASPECT_FACTOR *
-                    w / h *
-                    p_dec->fmt_out.video.i_width / p_dec->fmt_out.video.i_height;
+                    VOUT_ASPECT_FACTOR * w / h * p_dec->fmt_out.video.i_width /
+                    p_dec->fmt_out.video.i_height;
             }
         }
 
@@ -569,12 +630,11 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         bs_init( &s, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
 
         /* TODO */
+        msg_Dbg( p_dec, "found NAL_PPS" );
     }
-
 
     /* Append the block */
     block_ChainAppend( &p_sys->p_frame, p_frag );
 
     return p_pic;
 }
-
