@@ -1,25 +1,31 @@
 ## corba module declaration
 
-SOURCES_corba = corba.c
+SOURCES_corba = corba.c mediacontrol-core.c mediacontrol-plugin.c
+
+EXTRA_DIST = MediaControl.so
 
 nodist_SOURCES_corba = \
-	mediacontrol-common.c \
-	mediacontrol-skels.c \
-	mediacontrol.h \
+	MediaControl-common.c \
+	MediaControl-skels.c \
+	MediaControl.h \
 	$(NULL)
 
 ORBITIDL = orbit-idl-2
 
-mediacontrol-common.c mediacontrol-skels.c mediacontrol-stubs.c mediacontrol.h:
-	$(ORBITIDL) --skeleton-impl mediacontrol.idl
+GENERATEDFILES=MediaControl-common.c MediaControl-skels.c MediaControl.h  MediaControl-imodule.c
 
-mediacontrol-imodule.c:
-	$(ORBITIDL) --imodule mediacontrol.idl
+corba.c: MediaControl.h MediaControl-common.c
 
-mediacontrol.so: mediacontrol-imodule.c
-	gcc -fPIC -o mediacontrol-imodule.o -c mediacontrol-imodule.c `pkg-config --cflags ORBit-2.0`
-	gcc -shared -o $@ mediacontrol-imodule.o `pkg-config --libs ORBit-2.0`
+$(GENERATEDFILES): MediaControl.idl
+	$(ORBITIDL) --skeleton-impl MediaControl.idl
+
+MediaControl-imodule.c:
+	$(ORBITIDL) --imodule MediaControl.idl
+
+MediaControl.so: MediaControl-imodule.c
+	$(CC) -fPIC -o MediaControl-imodule.o -c MediaControl-imodule.c `pkg-config --cflags ORBit-2.0`
+	$(CC) -shared -o $@ MediaControl-imodule.o `pkg-config --libs ORBit-2.0`
 
 clean:
-	rm -f mediacontrol-stubs.c mediacontrol-imodule.c mediacontrol-skelimpl.c
+	$(RM) -f $(GENERATEDFILES)
 
