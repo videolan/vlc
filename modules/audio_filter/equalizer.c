@@ -61,13 +61,13 @@ static void Close( vlc_object_t * );
 #define PREAMP_LONGTEXT N_("Set the global gain in dB (-20 ... 20)" )
 
 static char *preset_list[] = {
-    "flat", "classical", "club", "dance", "fullbass", "fullbasstreeble",
-    "fulltreeble", "headphones","largehall", "live", "party", "pop", "reggae",
+    "flat", "classical", "club", "dance", "fullbass", "fullbasstreble",
+    "fulltreble", "headphones","largehall", "live", "party", "pop", "reggae",
     "rock", "ska", "soft", "softrock", "techno"
 };
 static char *preset_list_text[] = {
     N_("Flat"), N_("Classical"), N_("Club"), N_("Dance"), N_("Full bass"),
-    N_("Full bass and treeble"), N_("Full treeble"), N_("Headphones"),
+    N_("Full bass and treble"), N_("Full treble"), N_("Headphones"),
     N_("Large Hall"), N_("Live"), N_("Party"), N_("Pop"), N_("Reggae"),
     N_("Rock"), N_("Ska"), N_("Soft"), N_("Soft rock"), N_("Techno"),
 };
@@ -281,15 +281,15 @@ static const eqz_preset_t eqz_preset_fullbass_10b=
     "fullbass", 10, 5.0,
     { -8, 9.6, 9.6, 5.6, 1.6, -4, -8, -10.4, -11.2, -11.2  }
 };
-static const eqz_preset_t eqz_preset_fullbasstreeble_10b=
+static const eqz_preset_t eqz_preset_fullbasstreble_10b=
 {
-    "fullbasstreeble", 10, 4.0,
+    "fullbasstreble", 10, 4.0,
     { 7.2, 5.6, -1.11022e-15, -7.2, -4.8, 1.6, 8, 11.2, 12, 12 }
 };
 
-static const eqz_preset_t eqz_preset_fulltreeble_10b=
+static const eqz_preset_t eqz_preset_fulltreble_10b=
 {
-    "fulltreeble", 10, 3.0,
+    "fulltreble", 10, 3.0,
     { -9.6, -9.6, -9.6, -4, 2.4, 11.2, 16, 16, 16, 16.8 }
 };
 static const eqz_preset_t eqz_preset_headphones_10b=
@@ -355,8 +355,8 @@ static const eqz_preset_t *eqz_preset_10b[] =
     &eqz_preset_club_10b,
     &eqz_preset_dance_10b,
     &eqz_preset_fullbass_10b,
-    &eqz_preset_fullbasstreeble_10b,
-    &eqz_preset_fulltreeble_10b,
+    &eqz_preset_fullbasstreble_10b,
+    &eqz_preset_fulltreble_10b,
     &eqz_preset_headphones_10b,
     &eqz_preset_largehall_10b,
     &eqz_preset_live_10b,
