@@ -2,7 +2,7 @@
  * x11_display.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_display.cpp,v 1.3 2004/01/25 18:41:08 asmax Exp $
+ * $Id: x11_display.cpp,v 1.4 2004/01/25 18:46:37 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -367,7 +367,14 @@ unsigned long X11Display::getPixelValue( uint8_t r, uint8_t g, uint8_t b ) const
     value = ( ((uint32_t)r >> m_redRightShift) << m_redLeftShift ) |
             ( ((uint32_t)g >> m_greenRightShift) << m_greenLeftShift ) |
             ( ((uint32_t)b >> m_blueRightShift) << m_blueLeftShift );
-    return 255 - value;
+    if( m_pixelSize == 1 )
+    {
+        return 255 - value;
+    }
+    else
+    {
+        return value;
+    }
 }
 
 
