@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.9 2003/02/10 23:50:08 massiot Exp $
+ * $Id: sdl.c,v 1.10 2003/03/17 17:11:32 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -197,10 +197,10 @@ static int Open ( vlc_object_t *p_this )
         msg_Err( p_vout, "cannot set up SDL (%s)", SDL_GetError() );
         SDL_QuitSubSystem( SDL_INIT_VIDEO );
         free( p_vout->p_sys );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -265,7 +265,7 @@ static int Init( vout_thread_t *p_vout )
         I_OUTPUTPICTURES++;
     }
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -579,7 +579,7 @@ static int Manage( vout_thread_t *p_vout )
         SDL_ShowCursor( 0 );
     }
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -623,8 +623,11 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int OpenDisplay( vout_thread_t *p_vout )
 {
-    Uint32 i_flags;
-    int    i_bpp;
+    Uint32   i_flags;
+    int      i_bpp;
+
+    /* SDL fucked up fourcc definitions on bigendian machines */
+    uint32_t i_sdl_chroma;
 
     /* Set main window's size */
     p_vout->p_sys->i_width = p_vout->b_fullscreen ? p_vout->output.i_width :
@@ -641,7 +644,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( i_bpp == 0 )
     {
         msg_Err( p_vout, "no video mode available" );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     p_vout->p_sys->p_display = SDL_SetVideoMode( p_vout->p_sys->i_width,
@@ -651,7 +654,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_display == NULL )
     {
         msg_Err( p_vout, "cannot set video mode" );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     SDL_LockSurface( p_vout->p_sys->p_display );
@@ -661,52 +664,55 @@ static int OpenDisplay( vout_thread_t *p_vout )
     {
         case VLC_FOURCC('Y','U','Y','2'):
         case VLC_FOURCC('Y','U','N','V'):
-            p_vout->output.i_chroma = SDL_YUY2_OVERLAY;
+            p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
+            i_sdl_chroma = SDL_YUY2_OVERLAY;
             break;
         case VLC_FOURCC('U','Y','V','Y'):
         case VLC_FOURCC('U','Y','N','V'):
         case VLC_FOURCC('Y','4','2','2'):
-            p_vout->output.i_chroma = SDL_UYVY_OVERLAY;
+            p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
+            i_sdl_chroma = SDL_UYVY_OVERLAY;
             break;
         case VLC_FOURCC('Y','V','Y','U'):
-            p_vout->output.i_chroma = SDL_YVYU_OVERLAY;
+            p_vout->output.i_chroma = VLC_FOURCC('Y','V','Y','U');
+            i_sdl_chroma = SDL_YVYU_OVERLAY;
             break;
         case VLC_FOURCC('Y','V','1','2'):
         case VLC_FOURCC('I','4','2','0'):
         case VLC_FOURCC('I','Y','U','V'):
         default:
-            p_vout->output.i_chroma = SDL_YV12_OVERLAY;
+            p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
+            i_sdl_chroma = SDL_YV12_OVERLAY;
             break;
     }
 
     p_vout->p_sys->p_overlay =
-        SDL_CreateYUVOverlay( 32, 32, p_vout->output.i_chroma,
-                              p_vout->p_sys->p_display );
+        SDL_CreateYUVOverlay( 32, 32, i_sdl_chroma, p_vout->p_sys->p_display );
     /* FIXME: if the first overlay we find is software, don't stop,
      * because we may find a hardware one later ... */
 
     /* If this best choice failed, fall back to other chromas */
     if( p_vout->p_sys->p_overlay == NULL )
     {
-        p_vout->output.i_chroma = SDL_IYUV_OVERLAY;
+        p_vout->output.i_chroma = VLC_FOURCC('I','Y','U','V');
         p_vout->p_sys->p_overlay =
-            SDL_CreateYUVOverlay( 32, 32, p_vout->output.i_chroma,
+            SDL_CreateYUVOverlay( 32, 32, SDL_IYUV_OVERLAY,
                                   p_vout->p_sys->p_display );
     }
 
     if( p_vout->p_sys->p_overlay == NULL )
     {
-        p_vout->output.i_chroma = SDL_YV12_OVERLAY;
+        p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
         p_vout->p_sys->p_overlay =
-            SDL_CreateYUVOverlay( 32, 32, p_vout->output.i_chroma,
+            SDL_CreateYUVOverlay( 32, 32, SDL_YV12_OVERLAY,
                                   p_vout->p_sys->p_display );
     }
 
     if( p_vout->p_sys->p_overlay == NULL )
     {
-        p_vout->output.i_chroma = SDL_YUY2_OVERLAY;
+        p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
         p_vout->p_sys->p_overlay =
-            SDL_CreateYUVOverlay( 32, 32, p_vout->output.i_chroma,
+            SDL_CreateYUVOverlay( 32, 32, SDL_YUY2_OVERLAY,
                                   p_vout->p_sys->p_display );
     }
 
@@ -738,7 +744,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
                          p_vout->p_sys->p_display->format->BitsPerPixel );
                 SDL_UnlockSurface( p_vout->p_sys->p_display );
                 SDL_FreeSurface( p_vout->p_sys->p_display );
-                return( -1 );
+                return VLC_EGENERIC;
         }
 
         p_vout->output.i_rmask = p_vout->p_sys->p_display->format->Rmask;
@@ -764,7 +770,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     SDL_EventState( SDL_KEYUP, SDL_IGNORE );               /* ignore keys up */
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -796,14 +802,14 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         if( p_vout->p_sys->i_surfaces )
         {
             /* We already allocated this surface, return */
-            return -1;
+            return VLC_EGENERIC;
         }
 
         p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
 
         if( p_pic->p_sys == NULL )
         {
-            return -1;
+            return VLC_ENOMEM;
         }
 
         switch( p_vout->p_sys->p_display->format->BitsPerPixel )
@@ -820,7 +826,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                 p_pic->p->i_pixel_pitch = 4;
                 break;
             default:
-                return( -1 );
+                return VLC_EGENERIC;
         }
 
         p_pic->p->p_pixels = p_vout->p_sys->p_display->pixels;
@@ -839,7 +845,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( p_pic->p_sys == NULL )
         {
-            return -1;
+            return VLC_ENOMEM;
         }
 
         p_pic->p_sys->p_overlay =
@@ -850,7 +856,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         if( p_pic->p_sys->p_overlay == NULL )
         {
             free( p_pic->p_sys );
-            return -1;
+            return VLC_EGENERIC;
         }
 
         SDL_LockYUVOverlay( p_pic->p_sys->p_overlay );
@@ -908,7 +914,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         }
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
