@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: vcd.c,v 1.11 2003/12/11 12:56:25 rocky Exp $
+ * $Id: vcd.c,v 1.12 2003/12/13 12:56:14 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -64,6 +64,25 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
     "still    (400) 1024\n" \
     "vcdinfo  (800) 2048\n" )
 
+#define VCD_TITLE_FMT_LONGTEXT N_( \
+"Format used in the GUI Playlist Title. Similar to the Unix date \n" \
+"Format specifiers that start with a percent sign. Specifiers are: \n" \
+"   %A : The album information\n" \
+"   %C : The VCD volume count - the number of CD's in the collection\n" \
+"   %c : The VCD volume num - the number of the CD in the collection.\n" \
+"   %F : The VCD Format, e.g. VCD 1.0, VCD 1.1, VCD 2.0, or SVC\n" \
+"   %I : The current entry/segment/playback type, e.g. ENTRY, TRACK, SEGMENT..\n" \
+"   %L : The playlist ID prefixed with ' LID' if it exists\n" \
+"   %N : The current number of the %I - a decimal number\n" \
+"   %P : The publisher ID\n" \
+"   %p : The preparer I\n" \
+"   %S : If we are in a segment (menu), the kind of segment\n" \
+"   %T : The track numbe\n" \
+"   %V : The volume set I\n" \
+"   %v : The volume I\n" \
+"       A number between 1 and the volume count.\n" \
+"   %% : a % \n")
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -88,6 +107,18 @@ vlc_module_begin();
 	      N_("If VCD is authored with playback control, use it. "
 		 "Otherwise we play by tracks."), 
 	      VLC_TRUE );
+
+    add_string( MODULE_STRING "-author-format", 
+		"%v - %F disc %c of %C",
+		NULL, 
+		N_("Format to use in playlist 'author'"),
+                VCD_TITLE_FMT_LONGTEXT, VLC_TRUE );
+
+    add_string( MODULE_STRING "-title-format", 
+		"%I %N%L%S - %M",
+		NULL, 
+		N_("Format to use in playlist 'title' field"),
+                VCD_TITLE_FMT_LONGTEXT, VLC_TRUE );
 
 #ifdef FIXED
     add_submodule();

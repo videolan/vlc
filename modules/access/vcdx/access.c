@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003 VideoLAN
- * $Id: access.c,v 1.10 2003/12/11 12:56:25 rocky Exp $
+ * $Id: access.c,v 1.11 2003/12/13 12:56:14 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -72,7 +72,8 @@ static int  VCDReadSector   ( vlc_object_t *p_this,
                               const vcdinfo_obj_t *p_vcd, lsn_t cur_lsn, 
                               byte_t * p_buffer );
 static char *VCDParse       ( input_thread_t *, 
-                              /*out*/ vcdinfo_itemid_t * p_itemid );
+                              /*out*/ vcdinfo_itemid_t * p_itemid ,
+			      /*out*/ bool *play_single_item );
 
 static void VCDUpdateVar( input_thread_t *p_input, int i_entry, int i_action,
                           const char *varname, const char *label );
@@ -376,7 +377,7 @@ VCDSeek( input_thread_t * p_input, off_t i_off )
     /* Find entry */
     if( p_vcd->b_valid_ep )
     {
-        for( i_entry = 1 ; i_entry < p_vcd->num_entries ; i_entry ++ )
+        for( i_entry = 0 ; i_entry < p_vcd->num_entries ; i_entry ++ )
         {
             if( p_vcd->cur_lsn < p_vcd->p_entries[i_entry] )
             {
@@ -413,10 +414,13 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
     thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
     input_area_t *          p_area;
     
-    p_vcd->in_still = false;
-
     dbg_print(INPUT_DBG_CALL, "itemid.num: %d, itemid.type: %d\n", 
 	      itemid.num, itemid.type);
+
+    if (!p_input->p_access_data) return VLC_EGENERIC;
+
+    p_vcd->in_still = false;
+    p_vcd->cur_lid  = VCDINFO_INVALID_LID;
 
 #define area p_input->stream.pp_areas
 
@@ -749,7 +753,8 @@ VCDLIDs( input_thread_t * p_input )
  * VCDParse: parse command line
  *****************************************************************************/
 static char * 
-VCDParse( input_thread_t * p_input, /*out*/ vcdinfo_itemid_t * p_itemid )
+VCDParse( input_thread_t * p_input, /*out*/ vcdinfo_itemid_t * p_itemid,
+	  /*out*/ bool *play_single_item )
 {
     thread_vcd_data_t *p_vcd = (thread_vcd_data_t *)p_input->p_access_data;
     char *             psz_parser;
@@ -759,9 +764,10 @@ VCDParse( input_thread_t * p_input, /*out*/ vcdinfo_itemid_t * p_itemid )
     if ( config_GetInt( p_input, MODULE_STRING "-PBC" ) ) {
       p_itemid->type=VCDINFO_ITEM_TYPE_LID;
       p_itemid->num=1;
+      *play_single_item=false;
     } else {
-      p_itemid->type=VCDINFO_ITEM_TYPE_TRACK;
-      p_itemid->num=1;
+      p_itemid->type=VCDINFO_ITEM_TYPE_ENTRY;
+      p_itemid->num=0;
     }
     
 #ifdef WIN32
@@ -798,18 +804,22 @@ VCDParse( input_thread_t * p_input, /*out*/ vcdinfo_itemid_t * p_itemid )
           case 'E': 
             p_itemid->type = VCDINFO_ITEM_TYPE_ENTRY;
             ++psz_parser;
+	    *play_single_item = true;
             break;
           case 'P': 
             p_itemid->type = VCDINFO_ITEM_TYPE_LID;
             ++psz_parser;
+	    *play_single_item = false;
             break;
           case 'S': 
             p_itemid->type = VCDINFO_ITEM_TYPE_SEGMENT;
             ++psz_parser;
+	    *play_single_item = true;
             break;
           case 'T': 
             p_itemid->type = VCDINFO_ITEM_TYPE_TRACK;
             ++psz_parser;
+	    *play_single_item = true;
             break;
           default: ;
           }
@@ -821,7 +831,10 @@ VCDParse( input_thread_t * p_input, /*out*/ vcdinfo_itemid_t * p_itemid )
           p_itemid->num = num;
         }
       
+    } else {
+      *play_single_item = ( VCDINFO_ITEM_TYPE_LID == p_itemid->type );
     }
+    
 
     if( !*psz_source ) {
 
@@ -891,11 +904,6 @@ vcd_Open( vlc_object_t *p_this, const char *psz_dev )
 
     if( !psz_dev ) return NULL;
 
-    /* Set where to log errors messages from libcdio. */
-    p_vcd_input = (input_thread_t *)p_this;
-    cdio_log_set_handler ( cdio_log_handler );
-    vcd_log_set_handler ( vcd_log_handler );
-    
     actual_dev=strdup(psz_dev);
     if ( vcdinfo_open(&p_vcdobj, &actual_dev, DRIVER_UNKNOWN, NULL) != 
          VCDINFO_OPEN_VCD) {
@@ -984,39 +992,252 @@ static void InformationCreate( input_thread_t *p_input  )
 
 }
 
-#if FINISHED_PLAYLIST
+#define add_format_str_info(val)			\
+  {							\
+    const char *str = val;				\
+    unsigned int len;					\
+    if (val != NULL) {					\
+      len=strlen(str);					\
+      if (len != 0) {					\
+	strncat(tp, str, TEMP_STR_LEN-(tp-temp_str));	\
+	tp += len;					\
+      }							\
+      saw_control_prefix = false;			\
+    }							\
+  }
+
+#define add_format_num_info(val, fmt)			\
+  {							\
+    char num_str[10];					\
+    unsigned int len;                                   \
+    sprintf(num_str, fmt, val);				\
+    len=strlen(num_str);                                \
+    if (len != 0) {					\
+      strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));	\
+      tp += len;					\
+    }							\
+    saw_control_prefix = false;				\
+  }
+
+/*!
+   Take a format string and expand escape sequences, that is sequences that
+   begin with %, with information from the current VCD. 
+   The expanded string is returned. Here is a list of escape sequences:
+
+   %A : The album information 
+   %C : The VCD volume count - the number of CD's in the collection.
+   %c : The VCD volume num - the number of the CD in the collection. 
+   %F : The VCD Format, e.g. VCD 1.0, VCD 1.1, VCD 2.0, or SVCD
+   %I : The current entry/segment/playback type, e.g. ENTRY, TRACK, SEGMENT...
+   %L : The playlist ID prefixed with " LID" if it exists
+   %M : MRL
+   %N : The current number of the %I - a decimal number
+   %P : The publisher ID 
+   %p : The preparer ID
+   %S : If we are in a segment (menu), the kind of segment
+   %T : The track number
+   %V : The volume set ID
+   %v : The volume ID
+       A number between 1 and the volume count.
+   %% : a %
+*/
+static char *
+VCDFormatStr(const input_thread_t *p_input, thread_vcd_data_t *p_vcd,
+	     const char format_str[], const char *mrl, 
+	     const vcdinfo_itemid_t *itemid)
+{
+#define TEMP_STR_SIZE 256
+#define TEMP_STR_LEN (TEMP_STR_SIZE-1)
+  static char    temp_str[TEMP_STR_SIZE];
+  size_t i;
+  char * tp = temp_str;
+  bool saw_control_prefix = false;
+  size_t format_len = strlen(format_str);
+
+  bzero(temp_str, TEMP_STR_SIZE);
+
+  for (i=0; i<format_len; i++) {
+
+    if (!saw_control_prefix && format_str[i] != '%') {
+      *tp++ = format_str[i];
+      saw_control_prefix = false;
+      continue;
+    }
+
+    switch(format_str[i]) {
+    case '%':
+      if (saw_control_prefix) {
+	*tp++ = '%';
+      }
+      saw_control_prefix = !saw_control_prefix;
+      break;
+    case 'A':
+      add_format_str_info(vcdinfo_strip_trail(vcdinfo_get_album_id(p_vcd->vcd), 
+                                              MAX_ALBUM_LEN));
+      break;
+
+    case 'c':
+      add_format_num_info(vcdinfo_get_volume_num(p_vcd->vcd), "%d");
+      break;
+
+    case 'C':
+      add_format_num_info(vcdinfo_get_volume_count(p_vcd->vcd), "%d");
+      break;
+
+    case 'F':
+      add_format_str_info(vcdinfo_get_format_version_str(p_vcd->vcd));
+      break;
+
+    case 'I':
+      {
+	switch (itemid->type) {
+	case VCDINFO_ITEM_TYPE_TRACK:
+	  strncat(tp, _("Track"), TEMP_STR_LEN-(tp-temp_str));
+	  tp += strlen(_("Track"));
+	break;
+	case VCDINFO_ITEM_TYPE_ENTRY:  
+	  strncat(tp, _("Entry"), TEMP_STR_LEN-(tp-temp_str));
+	  tp += strlen(_("Entry"));
+	  break;
+	case VCDINFO_ITEM_TYPE_SEGMENT:  
+	  strncat(tp, _("Segment"), TEMP_STR_LEN-(tp-temp_str));
+	  tp += strlen(_("Segment"));
+	  break;
+	case VCDINFO_ITEM_TYPE_LID:  
+	  strncat(tp, _("List ID"), TEMP_STR_LEN-(tp-temp_str));
+	  tp += strlen(_("List ID"));
+	  break;
+	case VCDINFO_ITEM_TYPE_SPAREID2:  
+	  strncat(tp, _("Navigation"), TEMP_STR_LEN-(tp-temp_str));
+	  tp += strlen(_("Navigation"));
+	  break;
+	default:
+	  /* What to do? */
+          ;
+	}
+	saw_control_prefix = false;
+      }
+      break;
+
+    case 'L':
+      if (vcdplayer_pbc_is_on(p_vcd)) {
+        char num_str[10];
+        sprintf(num_str, _(" List ID %d"), p_vcd->cur_lid);
+        strncat(tp, num_str, TEMP_STR_LEN-(tp-temp_str));
+        tp += strlen(num_str);
+      }
+      saw_control_prefix = false;
+      break;
+
+    case 'M':
+      add_format_str_info(mrl);
+      break;
+
+    case 'N':
+      add_format_num_info(itemid->num, "%d");
+      break;
+
+    case 'p':
+      add_format_str_info(vcdinfo_get_preparer_id(p_vcd->vcd));
+      break;
+
+    case 'P':
+      add_format_str_info(vcdinfo_get_publisher_id(p_vcd->vcd));
+      break;
+
+    case 'S':
+      if ( VCDINFO_ITEM_TYPE_SEGMENT==itemid->type ) {
+        char seg_type_str[10];
+
+        sprintf(seg_type_str, " %s", 
+                vcdinfo_video_type2str(p_vcd->vcd, itemid->num));
+        strncat(tp, seg_type_str, TEMP_STR_LEN-(tp-temp_str));
+        tp += strlen(seg_type_str);
+      }
+      saw_control_prefix = false;
+      break;
+
+    case 'T':
+      add_format_num_info(p_vcd->cur_track, "%d");
+      break;
+
+    case 'V':
+      add_format_str_info(vcdinfo_get_volumeset_id(p_vcd->vcd));
+      break;
+
+    case 'v':
+      add_format_str_info(vcdinfo_get_volume_id(p_vcd->vcd));
+      break;
+
+    default:
+      *tp++ = '%'; 
+      *tp++ = format_str[i];
+      saw_control_prefix = false;
+    }
+  }
+  return strdup(temp_str);
+}
+
 static void
 VCDCreatePlayListItem(const input_thread_t *p_input, 
 		      thread_vcd_data_t *p_vcd, 
-		      playlist_t *p_playlist, unsigned int i_track, 
+		      playlist_t *p_playlist, 
+		      const vcdinfo_itemid_t *itemid,
 		      char *psz_mrl, int psz_mrl_max, 
 		      const char *psz_source, int playlist_operation, 
-		      unsigned int i_pos)
+		      int i_pos)
 {
-  mtime_t i_duration = 
-    (vcdinfo_get_track_size(p_vcd->vcd, i_track) * 8 * 10000000)
-    / (400 * p_input->stream.control.i_rate) ;
+  mtime_t i_duration = -1;
+  char *p_author;
   char *p_title;
-  char *config_varname = MODULE_STRING "-title-format";
+  char c_type;
 
-  snprintf(psz_mrl, psz_mrl_max, "%s%s@T%u", 
-	   VCD_MRL_PREFIX, psz_source, i_track);
+  switch(itemid->type) {
+  case VCDINFO_ITEM_TYPE_TRACK: 
+    c_type='T';
+    break;
+  case VCDINFO_ITEM_TYPE_SEGMENT: 
+    c_type='S';
+    break;
+  case VCDINFO_ITEM_TYPE_LID:
+    c_type='P';
+    break;
+  case VCDINFO_ITEM_TYPE_ENTRY:
+    c_type='E';
+    break;
+  default:
+    c_type='?';
+    break;
+  }
+  
+  snprintf(psz_mrl, psz_mrl_max, "%s%s@%c%u", VCD_MRL_PREFIX, psz_source, 
+	   c_type, itemid->num);
 
-#if 0
-  p_title = VCDFormatStr(p_input, p_vcd, 
-			 config_GetPsz( p_input, config_varname ), 
-			 psz_mrl, i_track);
-#else
-  p_title = psz_mrl;
-#endif
-
+  p_title = 
+    VCDFormatStr( p_input, p_vcd, 
+		  config_GetPsz( p_input, MODULE_STRING "-title-format" ), 
+		  psz_mrl, itemid );
+  
   playlist_AddExt( p_playlist, psz_mrl, p_title, i_duration, 
 		   0, 0, playlist_operation, i_pos );
+
+  p_author = 
+    VCDFormatStr( p_input, p_vcd, 
+		  config_GetPsz( p_input, MODULE_STRING "-author-format" ),
+		  psz_mrl, itemid );
+
+  /* FIXME: This is horrible, but until the playlist interface is fixed up
+     something like this has to be done for the "Author" field.
+   */
+  if( i_pos == PLAYLIST_END ) i_pos = p_playlist->i_size - 1;
+  free(p_playlist->pp_items[i_pos]->psz_author);
+  p_playlist->pp_items[i_pos]->psz_author = strdup(p_author);
 }
 
 static int
 VCDFixupPlayList( input_thread_t *p_input, thread_vcd_data_t *p_vcd, 
-		  const char *psz_source )
+		  const char *psz_source, vcdinfo_itemid_t *itemid,
+		  bool play_single_item )
 {
   unsigned int i;
   playlist_t * p_playlist;
@@ -1041,23 +1262,27 @@ VCDFixupPlayList( input_thread_t *p_input, thread_vcd_data_t *p_vcd,
       return -1;
     }
 
-  if ( config_GetInt( p_input, MODULE_STRING "-PBC" ) ) {
+  InformationCreate( p_input );
+
+  if ( play_single_item ) {
     /* May fill out more information when the playlist user interface becomes
        more mature.
      */
-    VCDCreatePlayListItem(p_input, p_vcd, p_playlist, p_vcd->cur_track, 
+    VCDCreatePlayListItem(p_input, p_vcd, p_playlist, itemid,
 			  psz_mrl, psz_mrl_max, psz_source, PLAYLIST_REPLACE, 
 			  p_playlist->i_index);
   } else {
-  
+    vcdinfo_itemid_t list_itemid;
+    list_itemid.type=VCDINFO_ITEM_TYPE_ENTRY;
+    
     playlist_Delete( p_playlist, p_playlist->i_index);
 
-    for( i = 1 ; i < p_vcd->num_tracks ; i++ )
+    for( i = 0 ; i < p_vcd->num_entries ; i++ )
       {
-	VCDCreatePlayListItem(p_input, p_vcd, p_playlist, i, psz_mrl, 
-			      psz_mrl_max, psz_source, PLAYLIST_APPEND, 
-			      PLAYLIST_END);
-
+	list_itemid.num=i;
+	VCDCreatePlayListItem(p_input, p_vcd, p_playlist, &list_itemid, 
+			      psz_mrl, psz_mrl_max, psz_source, 
+			      PLAYLIST_APPEND, PLAYLIST_END);
       }
 
     playlist_Command( p_playlist, PLAYLIST_GOTO, 0 );
@@ -1068,7 +1293,6 @@ VCDFixupPlayList( input_thread_t *p_input, thread_vcd_data_t *p_vcd,
   free(psz_mrl);
   return 0;
 }
-#endif
 
 /*****************************************************************************
  * Public routines.
@@ -1108,6 +1332,7 @@ E_(Open) ( vlc_object_t *p_this )
     char *                  psz_source;
     vcdinfo_itemid_t        itemid;
     bool                    b_play_ok;
+    bool                    play_single_item = false;
     
     p_input->pf_read        = VCDRead;
     p_input->pf_seek        = VCDSeek;
@@ -1124,7 +1349,13 @@ E_(Open) ( vlc_object_t *p_this )
 
     p_input->p_access_data = (void *)p_vcd;
     p_vcd->i_debug         = config_GetInt( p_this, MODULE_STRING "-debug" );
-    psz_source             = VCDParse( p_input, &itemid );
+
+    /* Set where to log errors messages from libcdio. */
+    p_vcd_input = (input_thread_t *)p_this;
+    cdio_log_set_handler ( cdio_log_handler );
+    vcd_log_set_handler ( vcd_log_handler );
+
+    psz_source             = VCDParse( p_input, &itemid, &play_single_item );
 
     if ( NULL == psz_source ) 
     {
@@ -1132,7 +1363,8 @@ E_(Open) ( vlc_object_t *p_this )
       return( VLC_EGENERIC );
     }
 
-    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "%s", psz_source );
+    dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "source: %s: mrl: %s", 
+	       psz_source, p_input->psz_name );
 
     p_vcd->p_segments = NULL;
     p_vcd->p_entries  = NULL;
@@ -1222,11 +1454,7 @@ E_(Open) ( vlc_object_t *p_this )
     p_vcd->p_intf->b_block = VLC_FALSE;
     intf_RunThread( p_vcd->p_intf );
 
-    InformationCreate( p_input );
-
-#if FINISHED_PLAYLIST
-    VCDFixupPlayList( p_input, p_vcd, psz_source );
-#endif
+    VCDFixupPlayList( p_input, p_vcd, psz_source, &itemid, play_single_item );
     
     free( psz_source );
 

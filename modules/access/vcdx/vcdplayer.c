@@ -3,7 +3,7 @@
  *               using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
- * $Id: vcdplayer.c,v 1.8 2003/12/11 05:31:37 rocky Exp $
+ * $Id: vcdplayer.c,v 1.9 2003/12/13 12:56:14 rocky Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,19 +90,7 @@ vcdplayer_non_pbc_nav ( input_thread_t * p_input )
 
     dbg_print( INPUT_DBG_LSN, "new track %d, lsn %d", p_vcd->cur_track, 
                p_vcd->p_sectors[p_vcd->cur_track+1] );
-    
-    if ( p_vcd->cur_track >= p_vcd->num_tracks - 1 )
-      return READ_END; /* EOF */
-        
-    p_vcd->play_item.num = p_vcd->cur_track++;
-    
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_area = p_input->stream.pp_areas[p_vcd->cur_track];
-    
-    p_area->i_part = 1;
-    VCDSetArea( p_input, p_area );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-    return READ_BLOCK;
+    return READ_END;
     break;
   }
   case VCDINFO_ITEM_TYPE_SPAREID2:  
