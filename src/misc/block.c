@@ -73,6 +73,8 @@ static block_t *__BlockDupContent( block_t *p_block )
     p_dup->i_flags         = p_block->i_flags;
     p_dup->i_pts           = p_block->i_pts;
     p_dup->i_dts           = p_block->i_dts;
+    p_dup->i_length        = p_block->i_length;
+    p_dup->i_rate          = p_block->i_rate;
 
     return p_dup;
 }
@@ -150,8 +152,19 @@ static block_t *BlockRealloc( block_t *p_block, int i_prebody, int i_body )
     {
         block_t *p_rea = block_New( p_block->p_manager, i_prebody + i_body );
 
+        fprintf( stderr, "arg i_prebody=%d max is %d\n", i_prebody,
+                 p_block->p_buffer - p_block->p_sys->p_allocated_buffer );
+
+        p_rea->i_dts   = p_block->i_dts;
+        p_rea->i_pts   = p_block->i_pts;
+        p_rea->i_flags = p_block->i_flags;
+        p_rea->i_length= p_block->i_length;
+        p_rea->i_rate  = p_block->i_rate;
+
         memcpy( &p_rea->p_buffer[i_prebody], p_block->p_buffer,
                 p_block->i_buffer );
+
+        block_Release( p_block );
 
         return p_rea;
     }
@@ -194,6 +207,7 @@ block_t *block_NewEmpty( void )
     p_block->i_pts          = 0;
     p_block->i_dts          = 0;
     p_block->i_length       = 0;
+    p_block->i_rate         = 0;
 
     p_block->i_buffer       = 0;
     p_block->p_buffer       = NULL;
