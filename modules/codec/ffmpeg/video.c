@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.11 2002/12/06 16:34:05 sam Exp $
+ * $Id: video.c,v 1.12 2002/12/10 10:22:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -50,7 +50,7 @@
  * Local prototypes
  *****************************************************************************/
 #if LIBAVCODEC_BUILD >= 4641
-static void ffmpeg_CopyPicture( picture_t *, AVVideoFrame *, vdec_thread_t * );
+static void ffmpeg_CopyPicture( picture_t *, AVFrame *, vdec_thread_t * );
 #else
 static void ffmpeg_CopyPicture( picture_t *, AVPicture *, vdec_thread_t * );
 #endif
@@ -58,8 +58,8 @@ static void ffmpeg_CopyPicture( picture_t *, AVPicture *, vdec_thread_t * );
 static void ffmpeg_PostProcPicture( vdec_thread_t *, picture_t * );
 
 #if LIBAVCODEC_BUILD >= 4641
-static int  ffmpeg_GetFrameBuf( struct AVCodecContext *, AVVideoFrame *);
-static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVVideoFrame *);
+static int  ffmpeg_GetFrameBuf( struct AVCodecContext *, AVFrame *);
+static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame *);
 #endif
 
 /*****************************************************************************
@@ -152,7 +152,7 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
 */
 #if LIBAVCODEC_BUILD >= 4641
 static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
-                                             AVVideoFrame *p_ff_pic,
+                                             AVFrame *p_ff_pic,
                                              vdec_thread_t   *p_vdec )
 #else
 static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
@@ -272,7 +272,9 @@ static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
 int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 {
     int i_tmp;
-#if LIBAVCODEC_BUILD >= 4641
+#if LIBAVCODEC_BUILD >= 4645
+    p_vdec->p_ff_pic = avcodec_alloc_frame();
+#elif LIBAVCODEC_BUILD >= 4641
     p_vdec->p_ff_pic = avcodec_alloc_picture();
 #else
     p_vdec->p_ff_pic = &p_vdec->ff_pic;
@@ -738,7 +740,7 @@ void E_( EndThread_Video )( vdec_thread_t *p_vdec )
  *****************************************************************************/
 #if LIBAVCODEC_BUILD >= 4641
 static void ffmpeg_CopyPicture( picture_t    *p_pic,
-                                AVVideoFrame *p_ff_pic,
+                                AVFrame *p_ff_pic,
                                 vdec_thread_t *p_vdec )
 #else
 static void ffmpeg_CopyPicture( picture_t    *p_pic,
@@ -823,7 +825,7 @@ static void ffmpeg_PostProcPicture( vdec_thread_t *p_vdec, picture_t *p_pic )
  *****************************************************************************/
 
 static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
-                               AVVideoFrame *p_ff_pic )
+                               AVFrame *p_ff_pic )
 {
     vdec_thread_t *p_vdec = (vdec_thread_t *)p_context->opaque;
     picture_t *p_pic;
@@ -850,7 +852,9 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_vdec->p_context->draw_horiz_band= NULL;
 
     p_ff_pic->opaque = (void*)p_pic;
-
+#if LIBAVCODEC_BUILD >= 4645
+    p_ff_pic->type = FF_BUFFER_TYPE_USER;
+#endif
     p_ff_pic->data[0] = p_pic->p[0].p_pixels;
     p_ff_pic->data[1] = p_pic->p[1].p_pixels;
     p_ff_pic->data[2] = p_pic->p[2].p_pixels;
@@ -872,7 +876,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 }
 
 static void  ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
-                                     AVVideoFrame *p_ff_pic )
+                                     AVFrame *p_ff_pic )
 {
     vdec_thread_t *p_vdec = (vdec_thread_t *)p_context->opaque;
     picture_t *p_pic;

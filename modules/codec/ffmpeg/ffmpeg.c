@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.20 2002/11/28 16:32:29 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.21 2002/12/10 10:22:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -508,6 +508,14 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name = "Motion JPEG B";
             break;
 #endif
+        case FOURCC_dvsl:
+        case FOURCC_dvsd:
+        case FOURCC_DVSD:
+        case FOURCC_dvhd:
+            i_cat = VIDEO_ES;
+            i_codec = CODEC_ID_DVVIDEO;
+            psz_name = "DV video";
+            break;
 
 #if LIBAVCODEC_BUILD >= 4632
         case FOURCC_WMA1:
@@ -523,7 +531,6 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
             psz_name ="Windows Media Audio 2";
             break;
 #endif
-
         default:
             i_cat = UNKNOWN_ES;
             i_codec = CODEC_ID_NONE;

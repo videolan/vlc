@@ -2,7 +2,7 @@
  * video.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.h,v 1.5 2002/12/06 11:53:45 fenrir Exp $
+ * $Id: video.h,v 1.6 2002/12/10 10:22:04 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -20,12 +20,15 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+#if LIBAVCODEC_BUILD >= 4641 && LIBAVCODEC_BUILD < 4645
+#   define AVFrame AVVideoFrame
+#endif
 
 typedef struct vdec_thread_s
 {
     DECODER_THREAD_COMMON
 #if LIBAVCODEC_BUILD >= 4641
-    AVVideoFrame        *p_ff_pic;
+    AVFrame        *p_ff_pic;
 #else
     AVPicture           ff_pic, *p_ff_pic;
 #endif
