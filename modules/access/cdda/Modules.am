@@ -1,9 +1,9 @@
 SOURCES_cddax = \
         ../vcdx/cdrom.c \
         ../vcdx/cdrom.h \
+	demux.c \
 	cdda.c \
 	cdda.h \
 	access.c \
-	demux.c \
 	intf.c \
 	$(NULL)
