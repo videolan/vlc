@@ -2,7 +2,7 @@
  * win32_loop.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_loop.cpp,v 1.2 2004/02/27 13:24:12 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -123,8 +123,11 @@ void Win32Loop::run()
             {
                 PAINTSTRUCT Infos;
                 BeginPaint( msg.hwnd, &Infos );
-                EvtRefresh evt( getIntf(), 0, 0, Infos.rcPaint.right,
-                                Infos.rcPaint.bottom );
+                EvtRefresh evt( getIntf(),
+                                Infos.rcPaint.left,
+                                Infos.rcPaint.top,
+                                Infos.rcPaint.right - Infos.rcPaint.left + 1,
+                                Infos.rcPaint.bottom - Infos.rcPaint.top + 1 );
                 EndPaint( msg.hwnd, &Infos );
                 win.processEvent( evt );
                 break;
