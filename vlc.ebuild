@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.9 2003/06/23 00:18:50 hartman Exp $
+# $Id: vlc.ebuild,v 1.10 2003/06/28 00:29:13 sam Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -100,6 +100,10 @@ src_unpack() {
 		cp configure.ac configure.ac.orig
 		sed "s:-lkfile::" \
 			configure.ac.orig > configure.ac
+
+		cp configure configure.orig
+		sed "s:-lkfile::" \
+			configure.orig > configure
 
 		cd ${S}/modules/gui/kde
 		cp interface.h interface.h.orig
@@ -217,6 +221,13 @@ src_compile(){
 	export CFLAGS=""
 	export WANT_AUTOCONF_2_5=1
 	export WANT_AUTOMAKE_1_6=1
+
+	# Avoid timestamp skews with autotools
+	touch configure.ac
+	touch aclocal.m4
+	touch configure
+	touch config.h.in
+	touch `find . -name Makefile.in`
 
 	myconf="${myconf} --enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} \
 		--enable-libmpeg2 --with-libmpeg2-tree=${SLIBMPEG2} \
