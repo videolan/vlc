@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.12 2001/11/14 04:55:49 xav Exp $
+ * $Id: vout_directx.c,v 1.13 2001/11/15 21:27:53 xav Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -717,7 +717,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
     /* Set DirectDraw Cooperative level, ie what control we want over Windows
      * display */
     dxresult = IDirectDraw_SetCooperativeLevel( p_ddobject,
-                                           p_vout->p_sys->hwnd, DDSCL_MULTITHREADED );
+                                           p_vout->p_sys->hwnd, DDSCL_NORMAL );
     if( dxresult != DD_OK )
     {
         intf_ErrMsg( "vout error: can't set direct draw cooperative level." );
