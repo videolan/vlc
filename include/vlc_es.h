@@ -197,18 +197,33 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
         dst->i_extra = 0;
         dst->p_extra = NULL;
     }
+
+    if( src->subs.psz_encoding )
+        dst->subs.psz_encoding = strdup( src->subs.psz_encoding );
+
+    if( src->video.p_palette )
+    {
+        dst->video.p_palette = malloc( sizeof( video_palette_t ) );
+        memcpy( dst->video.p_palette, src->video.p_palette, sizeof( video_palette_t ) );
+    }
 }
 
 static inline void es_format_Clean( es_format_t *fmt )
 {
     if( fmt->psz_language ) free( fmt->psz_language );
-    fmt->psz_language = 0;
+    fmt->psz_language = NULL;
+
     if( fmt->psz_description ) free( fmt->psz_description );
-    fmt->psz_description = 0;
+    fmt->psz_description = NULL;
+
     if( fmt->i_extra > 0 ) free( fmt->p_extra );
-    fmt->i_extra = 0; fmt->p_extra = 0;
+    fmt->i_extra = 0; fmt->p_extra = NULL;
+
     if( fmt->video.p_palette ) free( fmt->video.p_palette );
-    fmt->video.p_palette = 0;
+    fmt->video.p_palette = NULL;
+
+    if( fmt->subs.psz_encoding ) free( fmt->subs.psz_encoding );
+    fmt->subs.psz_encoding = NULL;
 }
 
 #endif
