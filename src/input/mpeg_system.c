@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.21 2000/12/28 17:57:39 massiot Exp $
+ * $Id: mpeg_system.c,v 1.22 2000/12/29 10:52:40 massiot Exp $
  *
  * Authors: 
  *
@@ -239,9 +239,9 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         }
                         p_pes->i_dts =
                         ( ((mtime_t)(p_full_header[7] & 0x0E) << 29) |
-                          (((mtime_t)U16_AT(p_full_header + 10) << 14)
+                          (((mtime_t)U16_AT(p_full_header + 8) << 14)
                                 - (1 << 14)) |
-                          ((mtime_t)U16_AT(p_full_header + 12) >> 1) ) * 300;
+                          ((mtime_t)U16_AT(p_full_header + 10) >> 1) ) * 300;
                         p_pes->i_dts /= 27;
                     }
                 }
@@ -362,9 +362,12 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     p_pes->i_pts += p_es->p_pgrm->delta_cr
                                          + p_es->p_pgrm->delta_absolute
                                          + DEFAULT_PTS_DELAY;
-                    p_pes->i_dts += p_es->p_pgrm->delta_cr
-                                         + p_es->p_pgrm->delta_absolute
-                                         + DEFAULT_PTS_DELAY;
+                    if( p_pes->i_dts )
+                    {
+                        p_pes->i_dts += p_es->p_pgrm->delta_cr
+                                             + p_es->p_pgrm->delta_absolute
+                                             + DEFAULT_PTS_DELAY;
+                    }
                     break;
                 }
             }

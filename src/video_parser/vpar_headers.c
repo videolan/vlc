@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.63 2000/12/27 18:09:02 massiot Exp $
+ * $Id: vpar_headers.c,v 1.64 2000/12/29 10:52:40 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -610,19 +610,22 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                     (p_vpar->sequence.p_forward == NULL ||
                      p_vpar->sequence.p_backward == NULL)));
 
-    if( b_parsable )
+    if( p_vpar->picture.i_current_structure )
     {
-        if( p_vpar->picture.i_current_structure )
+        /* Second field of a frame. We will decode it if, and only if we
+         * have decoded the first field. */
+        if( b_parsable )
         {
-            /* Second field of a frame. We will decode it if, and only if we
-             * have decoded the first field. */
             b_parsable = (p_vpar->picture.p_picture != NULL);
         }
-        else
-        {
-            /* Warn synchro we have a new picture (updates pictures index). */
-            vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type );
+    }
+    else
+    {
+        /* Warn synchro we have a new picture (updates pictures index). */
+        vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type );
 
+        if( b_parsable )
+        {
             /* Does synchro say we have enough time to decode it ? */
             b_parsable = vpar_SynchroChoose( p_vpar,
                                p_vpar->picture.i_coding_type, i_structure );
@@ -647,14 +650,12 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                 /* The frame is complete. */
                 p_vpar->picture.i_current_structure = i_structure;
 
-                vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type );
                 vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
             }
         }
         else
         {
             /* Warn Synchro we have trashed a picture. */
-            vpar_SynchroNewPicture( p_vpar, p_vpar->picture.i_coding_type );
             vpar_SynchroTrash( p_vpar, p_vpar->picture.i_coding_type, i_structure );
         }
         p_vpar->picture.p_picture = NULL;
