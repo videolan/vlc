@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.51 2004/01/05 13:07:02 zorglub Exp $
+ * $Id: mkv.cpp,v 1.52 2004/01/05 18:15:12 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -633,7 +633,7 @@ static int Open( vlc_object_t * p_this )
                         else  if( EbmlId( *el3 ) == KaxCodecPrivate::ClassInfos.GlobalId )
                         {
                             KaxCodecPrivate &cpriv = *(KaxCodecPrivate*)el3;
-                            cpriv.ReadData( p_sys->es->I_O() );
+                            cpriv.ReadData( p_sys->es->I_O(), SCOPE_ALL_DATA );
 
                             tk.i_extra_data = cpriv.GetSize();
                             if( tk.i_extra_data > 0 )
@@ -856,7 +856,7 @@ static int Open( vlc_object_t * p_this )
                         {
                             KaxSeekID &sid = *(KaxSeekID*)el;
 
-                            sid.ReadData( p_sys->es->I_O() );
+                            sid.ReadData( p_sys->es->I_O(), SCOPE_ALL_DATA );
 
                             id = EbmlId( sid.GetBuffer(), sid.GetSize() );
                         }
@@ -864,7 +864,7 @@ static int Open( vlc_object_t * p_this )
                         {
                             KaxSeekPosition &spos = *(KaxSeekPosition*)el;
 
-                            spos.ReadData( p_sys->es->I_O() );
+                            spos.ReadData( p_sys->es->I_O(), SCOPE_ALL_DATA );
 
                             i_pos = uint64( spos );
                         }
@@ -1323,7 +1323,7 @@ static int BlockGet( input_thread_t *p_input, KaxBlock **pp_block, int64_t *pi_r
             {
                 KaxClusterTimecode &ctc = *(KaxClusterTimecode*)el;
 
-                ctc.ReadData( p_sys->es->I_O() );
+                ctc.ReadData( p_sys->es->I_O(), SCOPE_ALL_DATA );
                 p_sys->cluster->InitTimecode( uint64( ctc ), p_sys->i_timescale );
             }
             else if( EbmlId( *el ) == KaxBlockGroup::ClassInfos.GlobalId )
