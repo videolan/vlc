@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.7 2002/11/24 16:00:10 sigmunau Exp $
+ * $Id: m3u.c,v 1.8 2002/11/25 15:56:39 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -114,8 +114,9 @@ static int Activate( vlc_object_t * p_this )
     {
         byte_t *p_peek;
         int i_size = input_Peek( p_input, &p_peek, MAX_LINE );
+        i_size -= sizeof("<html>") - 1;
         if ( i_size > 0 ) {
-            while ( i_size && *p_peek
+            while ( i_size
                     && strncasecmp( p_peek, "<html>", sizeof("<html>") - 1 )
                     && strncasecmp( p_peek, "<asx", sizeof("<asx") - 1 ) )
             {
