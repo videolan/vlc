@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.69 2003/07/23 21:45:13 hartman Exp $
+ * $Id: vlc_common.h,v 1.70 2003/08/01 00:00:12 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -46,6 +46,8 @@
 /*****************************************************************************
  * Required system headers
  *****************************************************************************/
+#include <stdarg.h>
+
 #ifdef HAVE_STRING_H
 #   include <string.h>                                         /* strerror() */
 #endif
@@ -223,6 +225,9 @@ typedef struct pgrm_descriptor_t pgrm_descriptor_t;
 typedef struct pgrm_sys_t pgrm_sys_t;
 typedef struct stream_descriptor_t stream_descriptor_t;
 typedef struct stream_sys_t stream_sys_t;
+
+/* NInput */
+typedef struct stream_t stream_t;
 
 /* Audio */
 typedef struct aout_instance_t aout_instance_t;
