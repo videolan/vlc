@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.2 2002/10/27 16:58:14 gbazin Exp $
+ * $Id: vorbis.c,v 1.3 2002/11/02 18:13:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -188,14 +188,6 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
         goto error;
     }
 
-    /* Take care of the first pts we receive. We need to be careful as a pts
-     * in vorbis language does in fact correspond to the presentation time of
-     * the _next_ packet to receive */
-    if( i_pts > 0 && i_pts != aout_DateGet( &p_dec->end_date ) )
-    {
-        aout_DateSet( &p_dec->end_date, i_pts );
-    }
-
     /* vorbis decoder thread's main loop */
     while( (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
     {
@@ -243,10 +235,14 @@ static void DecodePacket( dec_thread_t *p_dec )
         return;
     }
 
+    /* Date management */
+    if( i_pts > 0 && i_pts != aout_DateGet( &p_dec->end_date ) )
+    {
+        aout_DateSet( &p_dec->end_date, i_pts );
+    }
+
     if( vorbis_synthesis( &p_dec->vb, &oggpacket ) == 0 )
         vorbis_synthesis_blockin( &p_dec->vd, &p_dec->vb );
-    else
-        msg_Err( p_dec->p_fifo, "vorbis_synthesis error" );
 
     /* **pp_pcm is a multichannel float vector. In stereo, for
      * example, pp_pcm[0] is left, and pp_pcm[1] is right. i_samples is
@@ -276,16 +272,6 @@ static void DecodePacket( dec_thread_t *p_dec )
         p_aout_buffer->start_date = aout_DateGet( &p_dec->end_date );
         p_aout_buffer->end_date = aout_DateIncrement( &p_dec->end_date,
                                                       i_samples );
-
-        if( i_pts > 0 && i_pts != aout_DateGet( &p_dec->end_date ) )
-        {
-            aout_DateSet( &p_dec->end_date, i_pts );
-            p_aout_buffer->end_date = aout_DateGet( &p_dec->end_date );
-        }
-        else
-        {
-            aout_DateSet( &p_dec->end_date, p_aout_buffer->end_date );
-        }
 
         aout_DecPlay( p_dec->p_aout, p_dec->p_aout_input, p_aout_buffer );
     }

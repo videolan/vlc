@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.2 2002/10/27 16:59:30 gbazin Exp $
+ * $Id: ogg.c,v 1.3 2002/11/02 18:13:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -54,10 +54,14 @@ typedef struct logical_stream_s
     es_descriptor_t  *p_es;   
     int              b_selected;                           /* newly selected */
 
-    /* info for vorbis logical streams */
+    /* program clock reference (in units of 90kHz) derived from the previous
+     * granulepos */
+    mtime_t i_pcr;
+
+    /* info from logical streams */
     int i_rate;
-    int i_channels;
     int i_bitrate;
+    int b_reinit;
 
 } logical_stream_t;
 
@@ -72,9 +76,14 @@ struct demux_sys_t
     logical_stream_t *p_stream_video;
     logical_stream_t *p_stream_audio;
 
-    mtime_t i_time;
+    /* stream we use as a time reference for demux reading speed */
+    logical_stream_t *p_stream_timeref;
+
+    /* program clock reference (in units of 90kHz) derived from the pcr of
+     * one of the sub-streams (p_stream_timeref) */
+    mtime_t i_pcr;
+
     mtime_t i_length;
-    mtime_t i_pcr; 
     int     b_seekable;
 };
 
@@ -231,6 +240,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
 {
     pes_packet_t  *p_pes;
     data_packet_t *p_data;
+    demux_sys_t *p_ogg = p_input->p_demux_data;
 
     if( !( p_pes = input_NewPES( p_input->p_method_data ) ) )
     {
@@ -248,12 +258,28 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     p_pes->i_pes_size = p_oggpacket->bytes;
     p_pes->i_dts = p_oggpacket->granulepos;
 
-    /* Convert the granule into a pts */
-    p_pes->i_pts = (p_oggpacket->granulepos < 0) ? 0 :
-        p_oggpacket->granulepos * 90000 / p_stream->i_rate;
-    p_pes->i_pts = (p_oggpacket->granulepos < 0) ? 0 :
+    /* Convert the pcr into a pts */
+    p_pes->i_pts = ( p_stream->i_pcr < 0 ) ? 0 :
         input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                          p_pes->i_pts );
+                          p_stream->i_pcr );
+
+    /* Convert the next granule into a pcr */
+    p_stream->i_pcr = ( p_oggpacket->granulepos < 0 ) ? -1 :
+                           p_oggpacket->granulepos * 90000 / p_stream->i_rate;
+
+    /* Update the main pcr */
+    if( p_stream == p_ogg->p_stream_timeref )
+    {
+        if( p_ogg->p_stream_timeref->i_pcr >= 0 )
+        {
+            p_ogg->i_pcr = p_ogg->p_stream_timeref->i_pcr;
+        }
+        else
+        {
+            p_ogg->i_pcr += ( p_oggpacket->bytes * 90000
+                              / p_stream->i_bitrate / 8 );
+        }
+    }
 
     memcpy( p_data->p_payload_start, p_oggpacket->packet, p_oggpacket->bytes );
 
@@ -300,6 +326,10 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 p_stream->i_serial_no = ogg_page_serialno( &oggpage );
                 ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
 
+                /* The first stream we find is our timeref (might be changed
+                 * later on) */
+                p_ogg->p_stream_timeref = p_stream;
+
                 /* Extract the initial header from the first page and verify
                  * the codec type of tis Ogg bitstream */
                 if( ogg_stream_pagein( &p_stream->os, &oggpage ) < 0 )
@@ -325,8 +355,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
 
                     /* Cheat and get additionnal info ;) */
                     oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
-                    oggpack_adv( &opb, 88 );
-                    p_stream->i_channels = oggpack_read( &opb, 8 );
+                    oggpack_adv( &opb, 96 );
                     p_stream->i_rate = oggpack_read( &opb, 32 );
                     oggpack_adv( &opb, 32 );
                     p_stream->i_bitrate = oggpack_read( &opb, 32 );
@@ -389,8 +418,8 @@ static int Activate( vlc_object_t * p_this )
     memset( p_ogg, 0, sizeof( demux_sys_t ) );
     p_input->p_demux_data = p_ogg;
 
-    p_ogg->i_time = 0;
     p_ogg->i_pcr  = 0;
+    p_ogg->p_stream_timeref = NULL;
     p_ogg->b_seekable = ( ( p_input->stream.b_seekable )
                         &&( p_input->stream.i_method == INPUT_METHOD_FILE ) );
 
@@ -467,6 +496,7 @@ static int Activate( vlc_object_t * p_this )
                 if( (p_ogg->p_stream_audio == NULL) )
                 {
                     p_ogg->p_stream_audio = p_stream;
+                    p_ogg->p_stream_timeref = p_stream;
                     Ogg_StreamStart( p_input, p_ogg, i_stream );
                 }
                 break;
@@ -489,6 +519,11 @@ static int Activate( vlc_object_t * p_this )
     }
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    /* Call the pace control */
+    input_ClockManageRef( p_input,
+                          p_input->stream.p_selected_program,
+                          p_ogg->i_pcr );
 
     return 0;
 
@@ -530,7 +565,7 @@ static void Deactivate( vlc_object_t *p_this )
  *****************************************************************************/
 static int Demux( input_thread_t * p_input )
 {
-    int i, i_stream, b_eos;
+    int i, i_stream, b_eos = 0;
     ogg_page    oggpage;
     ogg_packet  oggpacket;
     demux_sys_t *p_ogg  = (demux_sys_t *)p_input->p_demux_data;
@@ -555,7 +590,7 @@ static int Demux( input_thread_t * p_input )
         }
     }
 
-    /* search new video and audio stream selected
+    /* search for new video and audio stream to select
      * if current have been unselected */
     if( ( !p_ogg->p_stream_video )
             || ( !p_ogg->p_stream_video->p_es->p_decoder_fifo ) )
@@ -581,33 +616,34 @@ static int Demux( input_thread_t * p_input )
                   &&( p_stream->p_es->p_decoder_fifo ) )
             {
                 p_ogg->p_stream_audio = p_stream;
+                p_ogg->p_stream_timeref = p_stream;
                 break;
             }
         }
     }
 
-    /* Update program clock reference */
-    p_ogg->i_pcr = p_ogg->i_time * 9 / 100;
-
-    if( (p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT)
-         || (input_ClockManageControl( p_input,
-				       p_input->stream.p_selected_program,
-				       (mtime_t)0 ) == PAUSE_S) )
+    if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
         msg_Warn( p_input, "synchro reinit" );
-        p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_OK;
+
+        /* An ogg packet does only contain the starting date of the next
+         * packet, not its own starting date.
+         * As a quick work around, we just skip an oggpage */
+
+        for( i_stream = 0; i_stream < p_ogg->i_streams; i_stream++ )
+        {
+            /* we'll trash all the data until we find the next pcr */
+            p_stream->b_reinit = 1;
+            p_ogg->i_pcr = 0;
+        }
     }
 
-    /* Call the pace control. */
-    input_ClockManageRef( p_input,
-                          p_input->stream.p_selected_program,
-                          p_ogg->i_pcr );
 
     /* Demux ogg pages from the stream */
-    b_eos = 0;
-    for( i = 0; i < PAGES_READ_ONCE; i++ )
+    for( i = 0; (i < PAGES_READ_ONCE) || p_ogg->p_stream_timeref->b_reinit;
+         i++ )
     {
-        if( Ogg_ReadPage(p_input, p_ogg, &oggpage ) != VLC_SUCCESS )
+        if( Ogg_ReadPage( p_input, p_ogg, &oggpage ) != VLC_SUCCESS )
         {
             b_eos = 1;
             break;
@@ -622,26 +658,45 @@ static int Demux( input_thread_t * p_input )
 
             while( ogg_stream_packetout( &p_stream->os, &oggpacket ) > 0 )
             {
-                /* FIXME: handle discontinuity */
-
                 if( !p_stream->p_es ||
                     !p_stream->p_es->p_decoder_fifo )
                 {
                     break;
                 }
 
-                if( oggpacket.granulepos >= 0 )
-                    p_ogg->i_time = oggpacket.granulepos * 1000000
-                        / p_stream->i_rate;
-                else
-                    p_ogg->i_time += (oggpacket.bytes * 1000000
-                        / p_stream->i_bitrate);
+                if( p_stream->b_reinit )
+                {
+                    if( oggpacket.granulepos >= 0 )
+                    {
+                        p_stream->b_reinit = 0;
+                        p_stream->i_pcr = oggpacket.granulepos
+                            * 90000 / p_stream->i_rate;
+
+                        if( !p_ogg->i_pcr ||
+                            (p_stream == p_ogg->p_stream_timeref) )
+                        {
+                            /* Call the pace control to reinitialize
+                             * the system clock */
+                            p_ogg->i_pcr = p_stream->i_pcr;
+                            input_ClockManageRef( p_input,
+                               p_input->stream.p_selected_program,
+                               p_ogg->i_pcr );
+                        }
+                    }
+                    continue;
+                }
 
                 Ogg_DecodePacket( p_input, p_stream, &oggpacket );
+
             }
         }
 #undef p_stream
     }
+
+    /* Call the pace control */
+    if( !b_eos ) input_ClockManageRef( p_input,
+                                       p_input->stream.p_selected_program,
+                                       p_ogg->i_pcr );
 
     /* Did we reach the end of stream ? */
     return( b_eos ? 0 : 1 );
