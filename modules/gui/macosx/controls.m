@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.35 2003/05/05 22:04:11 hartman Exp $
+ * $Id: controls.m,v 1.36 2003/05/06 20:12:28 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -324,79 +324,34 @@
     [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)]; 
 }
 
-- (IBAction)halfWindow:(id)sender
+- (IBAction)windowAction:(id)sender
 {
     id o_window = [NSApp keyWindow];
+    NSString *o_title = [sender title];
     NSArray *o_windows = [NSApp windows];
     NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-    
-    while ((o_window = [o_enumerator nextObject]))
-    {
-        if( [[o_window className] isEqualToString: @"VLCWindow"] )
-        {
-            [o_window scaleWindowWithFactor: 0.5];
-        }
-    }
-}
+    vout_thread_t   *p_vout = vlc_object_find( [NSApp getIntf], VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
 
-- (IBAction)normalWindow:(id)sender
-{
-    id o_window = [NSApp keyWindow];
-    NSArray *o_windows = [NSApp windows];
-    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-    
-    while ((o_window = [o_enumerator nextObject]))
+    if( p_vout != NULL )
     {
-        if( [[o_window className] isEqualToString: @"VLCWindow"] )
+        while ((o_window = [o_enumerator nextObject]))
         {
-            [o_window scaleWindowWithFactor: 1];
+            if( [[o_window className] isEqualToString: @"VLCWindow"] )
+            {
+                if( [o_title isEqualToString: _NS("Fullscreen") ] )
+                    [o_window toggleFullscreen];
+                else if( [o_title isEqualToString: _NS("Half Size") ] )
+                    [o_window scaleWindowWithFactor: 0.5];
+                else if( [o_title isEqualToString: _NS("Normal Size") ] )
+                    [o_window scaleWindowWithFactor: 1.0];
+                else if( [o_title isEqualToString: _NS("Double Size") ] )
+                    [o_window scaleWindowWithFactor: 2.0];
+                else if( [o_title isEqualToString: _NS("Float On Top") ] )
+                    [o_window toggleFloatOnTop];
+            }
         }
-    }
-}
-
-- (IBAction)doubleWindow:(id)sender
-{
-    id o_window = [NSApp keyWindow];
-    NSArray *o_windows = [NSApp windows];
-    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-    
-    while ((o_window = [o_enumerator nextObject]))
-    {
-        if( [[o_window className] isEqualToString: @"VLCWindow"] )
-        {
-            [o_window scaleWindowWithFactor: 2];
-        }
-    }
-}
-
-
-- (IBAction)fullscreen:(id)sender
-{
-    id o_window = [NSApp keyWindow];
-    NSArray *o_windows = [NSApp windows];
-    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-    
-    while ((o_window = [o_enumerator nextObject]))
-    {
-        if( [[o_window className] isEqualToString: @"VLCWindow"] )
-        {
-            [o_window toggleFullscreen];
-        }
-    }
-}
-
-- (IBAction)floatOnTop:(id)sender
-{
-    id o_window = [NSApp keyWindow];
-    NSArray *o_windows = [NSApp windows];
-    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-    
-    while ((o_window = [o_enumerator nextObject]))
-    {
-        if( [[o_window className] isEqualToString: @"VLCWindow"] )
-        {
-            [o_window toggleFloatOnTop];
-        }
+        vlc_object_release( (vlc_object_t *)p_vout );
     }
 }
 
@@ -734,13 +689,19 @@
             [o_mi setState: i_state];
         }
         
-        while ((o_window = [o_enumerator nextObject]))
+        vout_thread_t   *p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+        if( p_vout != NULL )
         {
-            if( [[o_window className] isEqualToString: @"VLCWindow"] )
+            while ((o_window = [o_enumerator nextObject]))
             {
-                bEnabled = TRUE;
-                break;
+                if( [[o_window className] isEqualToString: @"VLCWindow"] )
+                {
+                    bEnabled = TRUE;
+                    break;
+                }
             }
+            vlc_object_release( (vlc_object_t *)p_vout );
         }
     }
     else if( [[o_mi title] isEqualToString: _NS("Float On Top")] )

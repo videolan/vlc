@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.74 2003/05/05 22:23:39 gbazin Exp $
+ * $Id: intf.m,v 1.75 2003/05/06 20:12:28 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -636,18 +636,22 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
     if( p_intf->p_sys->b_current_title_update )
     {
-        id o_vout_wnd;
-
-        NSEnumerator * o_enum = [[NSApp windows] objectEnumerator];
-        
-        while( ( o_vout_wnd = [o_enum nextObject] ) )
+        vout_thread_t   *p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+        if( p_vout != NULL )
         {
-            if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"] )
+            id o_vout_wnd;
+            NSEnumerator * o_enum = [[NSApp windows] objectEnumerator];
+            
+            while( ( o_vout_wnd = [o_enum nextObject] ) )
             {
-                [o_vout_wnd updateTitle];
+                if( [[o_vout_wnd className] isEqualToString: @"VLCWindow"] )
+                {
+                    [o_vout_wnd updateTitle];
+                }
             }
+            vlc_object_release( (vlc_object_t *)p_vout );
         }
-
         [o_playlist updateRowSelection];
         [o_info updateInfo];
 

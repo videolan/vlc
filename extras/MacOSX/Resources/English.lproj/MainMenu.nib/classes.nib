@@ -20,16 +20,11 @@
             ACTIONS = {
                 backward = id; 
                 deinterlace = id; 
-                doubleWindow = id; 
                 faster = id; 
-                floatOnTop = id; 
                 forward = id; 
-                fullscreen = id; 
-                halfWindow = id; 
                 loop = id; 
                 mute = id; 
                 next = id; 
-                normalWindow = id; 
                 pause = id; 
                 play = id; 
                 prev = id; 
@@ -44,6 +39,7 @@
                 volumeDown = id; 
                 volumeSliderUpdated = id; 
                 volumeUp = id; 
+                windowAction = id; 
             }; 
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
