@@ -165,6 +165,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys->i_mode = DEINTERLACE_DISCARD;
     p_vout->p_sys->b_double_rate = 0;
     p_vout->p_sys->last_date = 0;
+    p_vout->p_sys->p_vout = 0;
     vlc_mutex_init( p_vout, &p_vout->p_sys->filter_lock );
 
 #if defined(CAN_COMPILE_C_ALTIVEC)
@@ -383,10 +384,12 @@ static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-
-    vlc_object_detach( p_vout->p_sys->p_vout );
-    vout_Destroy( p_vout->p_sys->p_vout );
+    if( p_vout->p_sys->p_vout )
+    {
+        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+        vlc_object_detach( p_vout->p_sys->p_vout );
+        vout_Destroy( p_vout->p_sys->p_vout );
+    }
 
     DEL_PARENT_CALLBACKS( SendEventsToChild );
 
