@@ -2,7 +2,7 @@
  * vout_aa.c: Aa video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aa.c,v 1.3 2002/04/19 13:56:10 sam Exp $
+ * $Id: aa.c,v 1.4 2002/05/27 18:26:31 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -34,6 +34,7 @@
 
 #include "video.h"
 #include "video_output.h"
+#include "interface.h"
 
 /*****************************************************************************
  * Capabilities defined in the other files.
@@ -129,9 +130,12 @@ static int vout_Create( vout_thread_t *p_vout )
         intf_ErrMsg( "vout error: cannot initialize AA-lib. Sorry" );
         return( 1 );
     }
+
     p_vout->p_sys->i_width = aa_imgwidth(p_vout->p_sys->aa_context);
     p_vout->p_sys->i_height = aa_imgheight(p_vout->p_sys->aa_context);
-
+    aa_autoinitkbd( p_vout->p_sys->aa_context, 0 );
+    aa_autoinitmouse( p_vout->p_sys->aa_context, AA_MOUSEPRESSMASK );
+    aa_hidemouse( p_vout->p_sys->aa_context );
     return( 0 );
 }
 
@@ -199,7 +203,7 @@ static void vout_End( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
-    aa_close(p_vout->p_sys->aa_context);
+    aa_close( p_vout->p_sys->aa_context );
     free( p_vout->p_sys );
 }
 
@@ -211,6 +215,27 @@ static void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {
+    int event, x, y, b;
+    event = aa_getevent( p_vout->p_sys->aa_context, 0 );
+    switch ( event )
+    {
+    case AA_MOUSE:
+        aa_getmouse( p_vout->p_sys->aa_context, &x, &y, &b );
+        if ( b & AA_BUTTON3 ) {
+            vlc_mutex_lock( &p_main->p_intf->change_lock );
+            p_main->p_intf->b_menu_change = 1;    
+            vlc_mutex_unlock( &p_main->p_intf->change_lock );
+        }
+        break;
+    case AA_RESIZE:
+        p_vout->i_changes |= VOUT_SIZE_CHANGE;
+        aa_resize( p_vout->p_sys->aa_context );
+        p_vout->p_sys->i_width = aa_imgwidth( p_vout->p_sys->aa_context );
+        p_vout->p_sys->i_height = aa_imgheight( p_vout->p_sys->aa_context );
+        break;
+    default:
+        break;
+    }
     return( 0 );
 }
 
@@ -219,7 +244,9 @@ static int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    ;
+  aa_fastrender( p_vout->p_sys->aa_context, 0, 0,
+                 aa_imgwidth( p_vout->p_sys->aa_context ),
+                 aa_imgheight( p_vout->p_sys->aa_context ) );
 }
 
 /*****************************************************************************
@@ -232,10 +259,6 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
     vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
                        &i_x, &i_y, &i_width, &i_height );
-    //    p_vout->p_sys->aa_context->imagebuffer = p_pic->p_data;
-    aa_fastrender( p_vout->p_sys->aa_context, 0, 0,
-                   aa_scrwidth(p_vout->p_sys->aa_context),
-                   aa_scrheight(p_vout->p_sys->aa_context) );
 
     aa_flush(p_vout->p_sys->aa_context);
 }
