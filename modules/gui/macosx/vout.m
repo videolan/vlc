@@ -1,8 +1,9 @@
 
-/* vout.m: MacOS X video output plugin
+/*****************************************************************************
+ * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.53 2003/08/20 13:08:10 garf Exp $
+ * $Id: vout.m,v 1.54 2003/08/20 16:22:27 garf Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -488,7 +489,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         SetPort( p_vout->p_sys->p_qdport );
         SetOrigin( p_vout->p_sys->portx , p_vout->p_sys->porty );
         ClipRect( &p_vout->p_sys->rect );
-    
+   	
         if( ( err = DecompressSequenceFrameS( 
                         p_vout->p_sys->i_seq,
                         p_pic->p_sys->p_info,
@@ -499,9 +500,9 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         }
         else
         {
-            QDFlushPortBuffer( p_vout->p_sys->p_qdport, nil );
+            QDFlushPortBuffer( p_vout->p_sys->p_qdport, p_vout->p_sys->mask );
         }
-    
+
 	SetOrigin( oldrect.left , oldrect.top );
         SetClip( oldClip );
         SetPort( p_vout->p_sys->p_qdportold );
@@ -693,7 +694,9 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
         i_width = valw.i_int;
         i_height = valh.i_int;
 
-        SetRectRgn( p_vout->p_sys->mask , vall.i_int - valx.i_int , valt.i_int - valy.i_int , valr.i_int - valx.i_int , valb.i_int - valy.i_int );
+        SetRectRgn( p_vout->p_sys->mask , vall.i_int - valx.i_int ,
+                    valt.i_int - valy.i_int , valr.i_int - valx.i_int ,
+                    valb.i_int - valy.i_int );
         p_vout->p_sys->rect.top = 0;
         p_vout->p_sys->rect.left = 0;
         p_vout->p_sys->rect.bottom = valb.i_int - valt.i_int;
