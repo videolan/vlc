@@ -87,7 +87,7 @@ void FileInfo::UpdateFileInfo()
 {
     input_thread_t *p_input = p_intf->p_sys->p_input;
 
-    if( !p_input || p_input->b_dead || p_input->input.p_item->psz_name )
+    if( !p_input || p_input->b_dead || !p_input->input.p_item->psz_name )
     {
         if( fileinfo_root )
         {
@@ -103,7 +103,8 @@ void FileInfo::UpdateFileInfo()
          * retrieved with the GetItemText() method, but it doesn't work on
          * Windows when the wxTR_HIDE_ROOT style is set. That's why we need to
          * use the fileinfo_root_label variable... */
-        fileinfo_root = fileinfo_tree->AddRoot( wxL2U(p_input->input.p_item->psz_name) );
+        fileinfo_root =
+            fileinfo_tree->AddRoot( wxL2U(p_input->input.p_item->psz_name) );
         fileinfo_root_label = wxL2U(p_input->input.p_item->psz_name);
     }
     else if( fileinfo_root_label == wxL2U(p_input->input.p_item->psz_name) )
