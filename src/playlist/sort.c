@@ -153,6 +153,26 @@ int playlist_ItemArraySort( playlist_t *p_playlist, int i_items,
             {
                 msg_Err( p_playlist,"META SORT not implemented" );
             }
+            else if( i_mode == SORT_TITLE_NODES_FIRST )
+            {
+                /* Alphabetic sort, all nodes first */
+
+                if( pp_items[i]->i_children == -1 &&
+                    pp_items[i_small]->i_children >= 0 )
+                {
+                    i_test = 1;
+                }
+                else if( pp_items[i]->i_children >= 0 &&
+                         pp_items[i_small]->i_children == -1 )
+                {
+                    i_test = -1;
+                }
+                else
+                {
+                    i_test = strcasecmp( pp_items[i]->input.psz_name,
+                                         pp_items[i_small]->input.psz_name );
+                }
+            }
 
             if( ( i_type == ORDER_NORMAL  && i_test < 0 ) ||
                 ( i_type == ORDER_REVERSE && i_test > 0 ) )

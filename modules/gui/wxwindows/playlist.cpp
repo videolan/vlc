@@ -93,6 +93,7 @@ enum
 
     PopupPlay_Event,
     PopupPlayThis_Event,
+    PopupSort_Event,
     PopupDel_Event,
     PopupEna_Event,
     PopupInfo_Event,
@@ -154,6 +155,7 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     /* Popup events */
     EVT_MENU( PopupPlay_Event, Playlist::OnPopupPlay)
     EVT_MENU( PopupPlayThis_Event, Playlist::OnPopupPlay)
+    EVT_MENU( PopupSort_Event, Playlist::OnPopupSort)
     EVT_MENU( PopupDel_Event, Playlist::OnPopupDel)
     EVT_MENU( PopupEna_Event, Playlist::OnPopupEna)
     EVT_MENU( PopupInfo_Event, Playlist::OnPopupInfo)
@@ -276,6 +278,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     popup_menu = new wxMenu;
     popup_menu->Append( PopupPlay_Event, wxU(_("Play")) );
     popup_menu->Append( PopupPlayThis_Event, wxU(_("Play this branch")) );
+    popup_menu->Append( PopupSort_Event, wxU(_("Sort this branch")) );
     popup_menu->Append( PopupDel_Event, wxU(_("Delete")) );
     popup_menu->Append( PopupEna_Event, wxU(_("Enable/Disable")) );
     popup_menu->Append( PopupInfo_Event, wxU(_("Info")) );
@@ -1449,6 +1452,26 @@ void Playlist::OnPopupDel( wxMenuEvent& event )
     else
     {
         //DeleteNode( p_wxitem->p_item );
+    }
+}
+
+void Playlist::OnPopupSort( wxMenuEvent& event )
+{
+    PlaylistItem *p_wxitem;
+
+    p_wxitem = (PlaylistItem *)treectrl->GetItemData( i_popup_item );
+
+    if( p_wxitem->p_item->i_children >= 0 )
+    {
+        playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_intf,
+                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
+        if( p_playlist )
+        {
+            playlist_NodeSort( p_playlist, p_wxitem->p_item,
+                               SORT_TITLE_NODES_FIRST, ORDER_NORMAL );
+            vlc_object_release( p_playlist );
+        }
     }
 }
 

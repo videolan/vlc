@@ -829,6 +829,7 @@ private:
     /* Popup functions */
     void OnPopup( wxContextMenuEvent& event );
     void OnPopupPlay( wxMenuEvent& event );
+    void OnPopupSort( wxMenuEvent& event );
     void OnPopupDel( wxMenuEvent& event );
     void OnPopupEna( wxMenuEvent& event );
     void OnPopupInfo( wxMenuEvent& event );

@@ -208,7 +208,8 @@ struct playlist_add_t
 
 #define SORT_ID 0
 #define SORT_TITLE 1
-#define SORT_AUTHOR 2
+#define SORT_TITLE_NODES_FIRST 2
+#define SORT_AUTHOR 3
 #define SORT_RANDOM 4
 #define SORT_DURATION 5
 
@@ -331,6 +332,7 @@ VLC_EXPORT( int, playlist_ItemAddOption, (playlist_item_t *, const char *) );
 VLC_EXPORT( int,  playlist_Sort, ( playlist_t *, int, int) );
 VLC_EXPORT( int,  playlist_Move, ( playlist_t *, int, int ) );
 VLC_EXPORT( int,  playlist_NodeGroup, ( playlist_t *, int,playlist_item_t *,playlist_item_t **,int, int, int ) );
+VLC_EXPORT( int,  playlist_NodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 
 /* Load/Save */
 VLC_EXPORT( int,  playlist_Import, ( playlist_t *, const char * ) );
