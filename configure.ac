@@ -1,7 +1,7 @@
 dnl Autoconf settings for vlc
 dnl $Id$
  
-AC_INIT(vlc,0.7.2-test3)
+AC_INIT(vlc,0.7.2)
 
 CONFIGURE_LINE="$0 $*"
 CODENAME="Bond"
@@ -13,7 +13,7 @@ AC_CANONICAL_SYSTEM
 
 dnl XXX: we don't put any flags here, because automake 1.5 doesn't support
 dnl them. And we need the comma otherwize automake will choke on it.
-AM_INIT_AUTOMAKE(vlc,0.7.2-test3)
+AM_INIT_AUTOMAKE(vlc,0.7.2)
 AM_CONFIG_HEADER(config.h)
 
 dnl
@@ -2306,8 +2306,19 @@ AC_ARG_ENABLE(speex,
 if test "${enable_speex}" != "no"
 then
   AC_CHECK_HEADERS(speex.h, [
-    AX_ADD_PLUGINS([speex])
-    AX_ADD_LDFLAGS([speex],[-lspeex]) ],[])
+    AC_MSG_CHECKING(for libspeex version > 1.1.0)
+    AC_EGREP_CPP(yes,
+      [#include <speex.h>
+       #ifdef SPEEX_SET_SUBMODE_ENCODING
+       yes
+       #endif],
+      [ AC_MSG_RESULT([yes])
+        AX_ADD_PLUGINS([speex])
+        AX_ADD_LDFLAGS([speex],[-lspeex]) ],
+      [ AC_MSG_RESULT([no])
+        AC_MSG_WARN([Your libspeex is too old, please get the development
+                     version.]) ] )
+    ],[])
 fi
 
 dnl
