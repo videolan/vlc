@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.36 2003/11/27 20:50:48 fenrir Exp $
+ * $Id: libmp4.c,v 1.37 2003/12/02 13:31:23 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -143,7 +143,7 @@ static void MP4_ConvertDate2Str( char *psz, uint64_t i_date )
     int i_sec;
 
     /* date begin at 1 jan 1904 */
-    i_date += ((1904ULL * 365) + 17) * 24 * 60 * 60;
+    i_date += ((1904U * 365) + 17) * 24 * 60 * 60;
 
     i_day = i_date / ( 60*60*24);
     i_hour = ( i_date /( 60*60 ) ) % 60;

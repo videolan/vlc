@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.38 2003/09/07 22:53:09 fenrir Exp $
+ * $Id: rc.c,v 1.39 2003/12/02 13:31:23 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -538,7 +538,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            val.i_time = (int64_t)atoi( newval.psz_string ) * 1000000ULL;
+            val.i_time = ((int64_t)atoi( newval.psz_string )) * 1000000;
             var_Set( p_input, "time", val );
         }
         vlc_object_release( p_input );

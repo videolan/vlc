@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.80 2003/11/30 22:14:39 fenrir Exp $
+ * $Id: avi.c,v 1.81 2003/12/02 13:31:23 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1112,7 +1112,7 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
             i64 = (int64_t)va_arg( args, int64_t );
             if( p_sys->i_length > 0 )
             {
-                i_percent = 100 * i64 / (p_sys->i_length*1000000ULL);
+                i_percent = 100 * i64 / (p_sys->i_length*1000000);
             }
             else if( p_sys->i_time > 0 )
             {

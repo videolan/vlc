@@ -306,18 +306,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_es"=.\plugin_es.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "plugin_i420_rgb"=.\plugin_i420_rgb.dsp - Package Owner=<4>
 
 Package=<5>
@@ -354,30 +342,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_idct"=.\plugin_idct.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_idctclassic"=.\plugin_idctclassic.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "plugin_ipv4"=.\plugin_ipv4.dsp - Package Owner=<4>
 
 Package=<5>
@@ -391,18 +355,6 @@ Package=<4>
 ###############################################################################
 
 Project: "plugin_memcpy"=.\plugin_memcpy.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_motion"=.\plugin_motion.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -439,18 +391,6 @@ Package=<4>
 ###############################################################################
 
 Project: "plugin_mpeg_system"=.\plugin_mpeg_system.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_mpeg_video_old"=.\plugin_mpeg_video_old.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -570,18 +510,6 @@ Package=<4>
 
 ###############################################################################
 
-Project: "plugin_packetizer_a52"=.\plugin_packetizer_a52.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
 Project: "plugin_packetizer_copy"=.\plugin_packetizer_copy.dsp - Package Owner=<4>
 
 Package=<5>
@@ -607,18 +535,6 @@ Package=<4>
 ###############################################################################
 
 Project: "plugin_packetizer_mpeg4video"=.\plugin_packetizer_mpeg4video.dsp - Package Owner=<4>
-
-Package=<5>
-{{{
-}}}
-
-Package=<4>
-{{{
-}}}
-
-###############################################################################
-
-Project: "plugin_packetizer_mpegaudio"=.\plugin_packetizer_mpegaudio.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
