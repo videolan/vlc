@@ -176,6 +176,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
             msg_Dbg( p_input, "Select audio in language[%d] %s",
                      i, p_sys->ppsz_audio_language[i] );
     }
+    if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_input, "sub-language", &val );
     p_sys->ppsz_sub_language = LanguageSplit(val.psz_string);
@@ -185,8 +186,8 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
             msg_Dbg( p_input, "Select subtitle in language[%d] %s",
                      i, p_sys->ppsz_sub_language[i] );
     }
+    if( val.psz_string ) free( val.psz_string );
 
-    /* */
     p_sys->p_es_audio = NULL;
     p_sys->p_es_video = NULL;
     p_sys->p_es_sub   = NULL;
