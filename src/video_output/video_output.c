@@ -144,12 +144,12 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
 #endif
 #ifdef VIDEO_BEOS
         case VOUT_BEOS_METHOD:
-            p_vout->p_sys_create =    vout_BeSysCreate;
-            p_vout->p_sys_init =      vout_BeSysInit;
-            p_vout->p_sys_end =       vout_BeSysEnd;
-            p_vout->p_sys_destroy =   vout_BeSysDestroy;
-            p_vout->p_sys_manage =    vout_BeSysManage;
-            p_vout->p_sys_display =   vout_BeSysDisplay;
+            p_vout->p_sys_create =    vout_BSysCreate;
+            p_vout->p_sys_init =      vout_BSysInit;
+            p_vout->p_sys_end =       vout_BSysEnd;
+            p_vout->p_sys_destroy =   vout_BSysDestroy;
+            p_vout->p_sys_manage =    vout_BSysManage;
+            p_vout->p_sys_display =   vout_BSysDisplay;
             break;
 #endif
         default:

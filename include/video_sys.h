@@ -53,11 +53,11 @@ int     vout_GGISysManage     ( p_vout_thread_t p_vout );
 void    vout_GGISysDisplay    ( p_vout_thread_t p_vout );
 #endif
 #ifdef VIDEO_BEOS
-int     vout_BeSysCreate      ( p_vout_thread_t p_vout, char *psz_display, int i_root_window );
-int     vout_BeSysInit        ( p_vout_thread_t p_vout );
-void    vout_BeSysEnd         ( p_vout_thread_t p_vout );
-void    vout_BeSysDestroy     ( p_vout_thread_t p_vout );
-int     vout_BeSysManage      ( p_vout_thread_t p_vout );
-void    vout_BeSysDisplay     ( p_vout_thread_t p_vout );
+int     vout_BSysCreate       ( p_vout_thread_t p_vout, char *psz_display, int i_root_window );
+int     vout_BSysInit         ( p_vout_thread_t p_vout );
+void    vout_BSysEnd          ( p_vout_thread_t p_vout );
+void    vout_BSysDestroy      ( p_vout_thread_t p_vout );
+int     vout_BSysManage       ( p_vout_thread_t p_vout );
+void    vout_BSysDisplay      ( p_vout_thread_t p_vout );
 #endif
 

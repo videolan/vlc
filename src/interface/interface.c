@@ -130,14 +130,14 @@ intf_thread_t* intf_Create( void )
 #ifdef VIDEO_BEOS
     else if( !strcmp(psz_method, "beos") )
     {
-        p_intf->p_sys_create =    intf_BeSysCreate;
-        p_intf->p_sys_manage =    intf_BeSysManage;
-        p_intf->p_sys_destroy =   intf_BeSysDestroy;
+        p_intf->p_sys_create =    intf_BSysCreate;
+        p_intf->p_sys_manage =    intf_BSysManage;
+        p_intf->p_sys_destroy =   intf_BSysDestroy;
     }
 #endif
     else
     {
-        intf_ErrMsg( "error: video output method not available\n" );
+        intf_ErrMsg( "error: requested video output method not available\n" );
         free( p_intf );
         return( NULL );
     }

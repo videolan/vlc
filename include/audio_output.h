@@ -60,7 +60,7 @@
 #define AOUT_FIFO_ISFULL( fifo )        ( ((((fifo).l_end_frame + 1) - (fifo).l_start_frame) & AOUT_FIFO_SIZE) == 0 )
 
 /*****************************************************************************
- * aout_dsp_t
+ * aout_sys_t
  *****************************************************************************/
 typedef struct
 {
@@ -75,11 +75,11 @@ typedef struct
     /* Rate of the audio output sound (in Hz) */
     long                l_rate;
 
-    /* Buffer information structure, used by aout_dspGetBufInfo() to store the
+    /* Buffer information structure, used by aout_sys_getbufinfo() to store the
      * current state of the internal sound card buffer */
     audio_buf_info      buf_info;
 
-} aout_dsp_t;
+} aout_sys_t;
 
 /*****************************************************************************
  * aout_increment_t
@@ -156,17 +156,37 @@ typedef struct
 #define AOUT_ADEC_STEREO_FIFO   4
 
 /*****************************************************************************
- * aout_thread_t
+ * aout_thread_t : audio output thread descriptor
  *****************************************************************************/
+typedef int  (aout_sys_open_t)           ( aout_sys_t *p_sys );
+typedef int  (aout_sys_reset_t)          ( aout_sys_t *p_sys );
+typedef int  (aout_sys_setformat_t)      ( aout_sys_t *p_sys );
+typedef int  (aout_sys_setchannels_t)    ( aout_sys_t *p_sys );
+typedef int  (aout_sys_setrate_t)        ( aout_sys_t *p_sys );
+typedef long (aout_sys_getbufinfo_t)     ( aout_sys_t *p_sys );
+typedef void (aout_sys_playsamples_t)    ( aout_sys_t *p_sys,
+                                           byte_t *buffer, int i_size );
+typedef void (aout_sys_close_t)          ( aout_sys_t *p_sys );
+
 typedef struct aout_thread_s
 {
     vlc_thread_t        thread_id;
     boolean_t           b_die;
 
-    aout_dsp_t          dsp;
+    aout_sys_t          sys;
 
     vlc_mutex_t         fifos_lock;
     aout_fifo_t         fifo[ AOUT_MAX_FIFOS ];
+
+    /* method-dependant functions */
+    aout_sys_open_t *           p_sys_open;
+    aout_sys_reset_t *          p_sys_reset;
+    aout_sys_setformat_t *      p_sys_setformat;
+    aout_sys_setchannels_t *    p_sys_setchannels;
+    aout_sys_setrate_t *        p_sys_setrate;
+    aout_sys_getbufinfo_t *     p_sys_getbufinfo;
+    aout_sys_playsamples_t *    p_sys_playsamples;
+    aout_sys_close_t *          p_sys_close;
 
     void *              buffer;
     /* The s32 buffer is used to mix all the audio fifos together before
@@ -183,6 +203,15 @@ typedef struct aout_thread_s
     mtime_t             date;
 
 } aout_thread_t;
+
+/* Output methods */
+#define AOUT_DUMMY_METHOD       0x0000                 /* dummy video output */
+#define AOUT_DSP_METHOD         0x0001                     /* linux /dev/dsp */
+
+/* Get the fallback method */
+#ifdef AUDIO_DSP
+#define AOUT_DEFAULT_METHOD "dsp"
+#endif
 
 /*****************************************************************************
  * Prototypes

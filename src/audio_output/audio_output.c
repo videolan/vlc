@@ -32,7 +32,7 @@
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
 #include "audio_output.h"
-#include "audio_dsp.h"
+#include "audio_sys.h"
 #include "main.h"
 
 /*****************************************************************************
@@ -62,6 +62,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
 aout_thread_t *aout_CreateThread( int *pi_status )
 {
     aout_thread_t * p_aout;                             /* thread descriptor */
+    char * psz_method;
 //    int             i_status;                                 /* thread status */
 
     /* Allocate descriptor */
@@ -71,57 +72,91 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         return( NULL );
     }
 
+    /* initialize method-dependent functions */
+    psz_method = main_GetPszVariable( AOUT_METHOD_VAR, AOUT_DEFAULT_METHOD );
+
+    if( !strcmp(psz_method, "dummy") )
+    {
+        p_aout->p_sys_open =           aout_DummySysOpen;
+        p_aout->p_sys_reset =          aout_DummySysReset;
+        p_aout->p_sys_setformat =      aout_DummySysSetFormat;
+        p_aout->p_sys_setchannels =    aout_DummySysSetChannels;
+        p_aout->p_sys_setrate =        aout_DummySysSetRate;
+        p_aout->p_sys_getbufinfo =     aout_DummySysGetBufInfo;
+        p_aout->p_sys_playsamples =    aout_DummySysPlaySamples;
+        p_aout->p_sys_close =          aout_DummySysClose;
+    }
+#ifdef VIDEO_X11
+    else if( !strcmp(psz_method, "dsp") )
+    {
+        p_aout->p_sys_open =           aout_DspSysOpen;
+        p_aout->p_sys_reset =          aout_DspSysReset;
+        p_aout->p_sys_setformat =      aout_DspSysSetFormat;
+        p_aout->p_sys_setchannels =    aout_DspSysSetChannels;
+        p_aout->p_sys_setrate =        aout_DspSysSetRate;
+        p_aout->p_sys_getbufinfo =     aout_DspSysGetBufInfo;
+        p_aout->p_sys_playsamples =    aout_DspSysPlaySamples;
+        p_aout->p_sys_close =          aout_DspSysClose;
+    }
+#endif
+    else
+    {
+        intf_ErrMsg( "error: requested audio output method not available\n" );
+        free( p_aout );
+        return( NULL );
+    }
+		
     //???? kludge to initialize some audio parameters - place this section somewhere
     //???? else
-    p_aout->dsp.i_format = AOUT_DEFAULT_FORMAT;
-    p_aout->dsp.psz_device = main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT );
-    p_aout->dsp.b_stereo   = main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
-    p_aout->dsp.l_rate     = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );
+    p_aout->sys.i_format = AOUT_DEFAULT_FORMAT;
+    p_aout->sys.psz_device = main_GetPszVariable( AOUT_DSP_VAR, AOUT_DSP_DEFAULT );
+    p_aout->sys.b_stereo   = main_GetIntVariable( AOUT_STEREO_VAR, AOUT_STEREO_DEFAULT );
+    p_aout->sys.l_rate     = main_GetIntVariable( AOUT_RATE_VAR, AOUT_RATE_DEFAULT );
     // ???? end of kludge
 
     /*
      * Initialize DSP
      */
-    if ( aout_dspOpen( &p_aout->dsp ) )
+    if ( p_aout->p_sys_open( &p_aout->sys ) )
     {
         free( p_aout );
         return( NULL );
     }
-    if ( aout_dspReset( &p_aout->dsp ) )
+    if ( p_aout->p_sys_reset( &p_aout->sys ) )
     {
-	aout_dspClose( &p_aout->dsp );
+	p_aout->p_sys_close( &p_aout->sys );
 	free( p_aout );
 	return( NULL );
     }
-    if ( aout_dspSetFormat( &p_aout->dsp ) )
+    if ( p_aout->p_sys_setformat( &p_aout->sys ) )
     {
-	aout_dspClose( &p_aout->dsp );
+	p_aout->p_sys_close( &p_aout->sys );
 	free( p_aout );
 	return( NULL );
     }
-    if ( aout_dspSetChannels( &p_aout->dsp ) )
+    if ( p_aout->p_sys_setchannels( &p_aout->sys ) )
     {
-	aout_dspClose( &p_aout->dsp );
+	p_aout->p_sys_close( &p_aout->sys );
 	free( p_aout );
         return( NULL );
     }
-    if ( aout_dspSetRate( &p_aout->dsp ) )
+    if ( p_aout->p_sys_setrate( &p_aout->sys ) )
     {
-	aout_dspClose( &p_aout->dsp );
+	p_aout->p_sys_close( &p_aout->sys );
 	free( p_aout );
 	return( NULL );
     }
     intf_DbgMsg("aout debug: audio device (%s) opened (format=%i, stereo=%i, rate=%li)\n",
-        p_aout->dsp.psz_device,
-        p_aout->dsp.i_format,
-        p_aout->dsp.b_stereo, p_aout->dsp.l_rate);
+        p_aout->sys.psz_device,
+        p_aout->sys.i_format,
+        p_aout->sys.b_stereo, p_aout->sys.l_rate);
 
     //?? maybe it would be cleaner to change SpawnThread prototype
     //?? see vout to handle status correctly - however, it is not critical since
-    //?? this thread is only called in main is all calls are blocking
+    //?? this thread is only called in main and all calls are blocking
     if( aout_SpawnThread( p_aout ) )
     {
-	aout_dspClose( &p_aout->dsp );
+	p_aout->p_sys_close( &p_aout->sys );
 	free( p_aout );
 	return( NULL );
     }
@@ -156,16 +191,16 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
     /* Compute the size (in audio units) of the audio output buffer. Although
      * AOUT_BUFFER_DURATION is given in microseconds, the output rate is given
      * in Hz, that's why we need to divide by 10^6 microseconds (1 second) */
-    p_aout->l_units = (long)( ((s64)p_aout->dsp.l_rate * AOUT_BUFFER_DURATION) / 1000000 );
-    p_aout->l_msleep = (long)( ((s64)p_aout->l_units * 1000000) / (s64)p_aout->dsp.l_rate );
+    p_aout->l_units = (long)( ((s64)p_aout->sys.l_rate * AOUT_BUFFER_DURATION) / 1000000 );
+    p_aout->l_msleep = (long)( ((s64)p_aout->l_units * 1000000) / (s64)p_aout->sys.l_rate );
 
     /* Make aout_thread point to the right thread function, and compute the
      * byte size of the audio output buffer */
-    switch ( p_aout->dsp.b_stereo )
+    switch ( p_aout->sys.b_stereo )
     {
         /* Audio output is mono */
         case 0:
-            switch ( p_aout->dsp.i_format )
+            switch ( p_aout->sys.i_format )
             {
                 case AFMT_U8:
                     l_bytes = 1 * sizeof(u8) * p_aout->l_units;
@@ -191,14 +226,14 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
 
                 default:
                     intf_ErrMsg("aout error: unknown audio output format (%i)\n",
-                        p_aout->dsp.i_format);
+                        p_aout->sys.i_format);
 		    return( -1 );
             }
             break;
 
         /* Audio output is stereo */
         case 1:
-            switch ( p_aout->dsp.i_format )
+            switch ( p_aout->sys.i_format )
             {
                 case AFMT_U8:
                     l_bytes = 2 * sizeof(u8) * p_aout->l_units;
@@ -224,14 +259,14 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
 
                 default:
                     intf_ErrMsg("aout error: unknown audio output format (%i)\n",
-                        p_aout->dsp.i_format);
+                        p_aout->sys.i_format);
                     return( -1 );
             }
             break;
 
         default:
             intf_ErrMsg("aout error: unknown number of audio channels (%i)\n",
-                p_aout->dsp.b_stereo + 1);
+                p_aout->sys.b_stereo + 1);
             return( -1 );
     }
 
@@ -242,7 +277,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
         intf_ErrMsg("aout error: not enough memory to create the output buffer\n");
         return( -1 );
     }
-    if ( (p_aout->s32_buffer = (s32 *)calloc(p_aout->l_units, sizeof(s32) << p_aout->dsp.b_stereo)) == NULL )
+    if ( (p_aout->s32_buffer = (s32 *)calloc(p_aout->l_units, sizeof(s32) << p_aout->sys.b_stereo)) == NULL )
     {
         intf_ErrMsg("aout error: not enough memory to create the s32 output buffer\n");
         free( p_aout->buffer );
@@ -284,8 +319,8 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     free( p_aout->s32_buffer );
 
     /* Free the structure */
-    aout_dspClose( &p_aout->dsp );
-    intf_DbgMsg("aout debug: audio device (%s) closed\n", p_aout->dsp.psz_device);
+    p_aout->p_sys_close( &p_aout->sys );
+    intf_DbgMsg("aout debug: audio device (%s) closed\n", p_aout->sys.psz_device);
     free( p_aout );
 }
 
@@ -327,7 +362,7 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
             p_aout->fifo[i_fifo].buffer = p_fifo->buffer;
 
             p_aout->fifo[i_fifo].l_unit = 0;
-            InitializeIncrement( &p_aout->fifo[i_fifo].unit_increment, p_fifo->l_rate, p_aout->dsp.l_rate );
+            InitializeIncrement( &p_aout->fifo[i_fifo].unit_increment, p_fifo->l_rate, p_aout->sys.l_rate );
             p_aout->fifo[i_fifo].l_units = p_fifo->l_units;
             break;
 
@@ -495,11 +530,11 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
     l_rate = p_fifo->l_rate + ((aout_date - p_fifo->date[p_fifo->l_start_frame]) / 256);
 //    fprintf( stderr, "aout debug: %lli (%li);\n", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
 
-    InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->dsp.l_rate );
+    InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->sys.l_rate );
 
     p_fifo->l_units = (((l_units - (p_fifo->l_unit -
         (p_fifo->l_start_frame * (p_fifo->l_frame_size >> p_fifo->b_stereo))))
-        * p_aout->dsp.l_rate) / l_rate) + 1;
+        * p_aout->sys.l_rate) / l_rate) + 1;
 
     /* We release the lock before leaving */
     vlc_mutex_unlock( &p_fifo->data_lock );
@@ -550,7 +585,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
 		    {
                         l_buffer = 0;
-                        while ( l_buffer < (p_aout->l_units << 1) ) /* p_aout->dsp.b_stereo == 1 */
+                        while ( l_buffer < (p_aout->l_units << 1) ) /* p_aout->sys.b_stereo == 1 */
 			{
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
@@ -563,7 +598,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     else
 		    {
                         l_buffer = 0;
-                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units << 1) ) /* p_aout->dsp.b_stereo == 1 */
+                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units << 1) ) /* p_aout->sys.b_stereo == 1 */
 			{
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
@@ -581,7 +616,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
 		    {
                         l_buffer = 0;
-                        while ( l_buffer < (p_aout->l_units << 1) ) /* p_aout->dsp.b_stereo == 1 */
+                        while ( l_buffer < (p_aout->l_units << 1) ) /* p_aout->sys.b_stereo == 1 */
 			{
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
@@ -594,7 +629,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     else
 		    {
                         l_buffer = 0;
-                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units << 1) ) /* p_aout->dsp.b_stereo */
+                        while ( l_buffer < (p_aout->fifo[i_fifo].l_units << 1) ) /* p_aout->sys.b_stereo */
 			{
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
@@ -624,7 +659,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     {
                         if ( !p_aout->fifo[i_fifo].b_next_frame )
                         {
-                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo], p_aout->date + ((((mtime_t)(l_buffer >> 1)) * 1000000) / ((mtime_t)p_aout->dsp.l_rate))) )
+                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo], p_aout->date + ((((mtime_t)(l_buffer >> 1)) * 1000000) / ((mtime_t)p_aout->sys.l_rate))) )
                             {
                                 break;
                             }
@@ -632,7 +667,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
 
                         if ( p_aout->fifo[i_fifo].l_units > l_units )
                         {
-                            l_buffer_limit = p_aout->l_units << 1; /* p_aout->dsp.b_stereo == 1 */
+                            l_buffer_limit = p_aout->l_units << 1; /* p_aout->sys.b_stereo == 1 */
                             while ( l_buffer < l_buffer_limit )
                             {
                                 p_aout->s32_buffer[l_buffer++] +=
@@ -654,7 +689,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                         else
                         {
                             l_buffer_limit = l_buffer + (p_aout->fifo[i_fifo].l_units << 1);
-                            /* p_aout->dsp.b_stereo == 1 */
+                            /* p_aout->sys.b_stereo == 1 */
                             while ( l_buffer < l_buffer_limit )
                             {
                                 p_aout->s32_buffer[l_buffer++] +=
@@ -701,7 +736,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     {
                         if ( !p_aout->fifo[i_fifo].b_next_frame )
                         {
-                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo], p_aout->date + ((((mtime_t)(l_buffer >> 1)) * 1000000) / ((mtime_t)p_aout->dsp.l_rate))) )
+                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo], p_aout->date + ((((mtime_t)(l_buffer >> 1)) * 1000000) / ((mtime_t)p_aout->sys.l_rate))) )
                             {
                                 break;
                             }
@@ -709,7 +744,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
 
                         if ( p_aout->fifo[i_fifo].l_units > l_units )
                         {
-                            l_buffer_limit = p_aout->l_units << 1; /* p_aout->dsp.b_stereo == 1 */
+                            l_buffer_limit = p_aout->l_units << 1; /* p_aout->sys.b_stereo == 1 */
                             while ( l_buffer < l_buffer_limit )
                             {
                                 p_aout->s32_buffer[l_buffer++] +=
@@ -731,7 +766,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                         else
                         {
                             l_buffer_limit = l_buffer + (p_aout->fifo[i_fifo].l_units << 1);
-                            /* p_aout->dsp.b_stereo == 1 */
+                            /* p_aout->sys.b_stereo == 1 */
                             while ( l_buffer < l_buffer_limit )
                             {
                                 p_aout->s32_buffer[l_buffer++] +=
@@ -769,7 +804,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
         }
         vlc_mutex_unlock( &p_aout->fifos_lock );
 
-        l_buffer_limit = p_aout->l_units << 1; /* p_aout->dsp.b_stereo == 1 */
+        l_buffer_limit = p_aout->l_units << 1; /* p_aout->sys.b_stereo == 1 */
 
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
 	{
@@ -777,10 +812,9 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
             p_aout->s32_buffer[l_buffer] = 0;
         }
 
-        aout_dspGetBufInfo( &p_aout->dsp );
-        l_bytes = (p_aout->dsp.buf_info.fragstotal * p_aout->dsp.buf_info.fragsize) - p_aout->dsp.buf_info.bytes;
-        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 4)) * 1000000) / ((mtime_t)p_aout->dsp.l_rate)); /* sizeof(s16) << p_aout->dsp.b_stereo == 4 */
-        aout_dspPlaySamples( &p_aout->dsp, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(s16) );
+        l_bytes = p_aout->p_sys_getbufinfo( &p_aout->sys );
+        p_aout->date = mdate() + ((((mtime_t)(l_bytes / 4)) * 1000000) / ((mtime_t)p_aout->sys.l_rate)); /* sizeof(s16) << p_aout->sys.b_stereo == 4 */
+        p_aout->p_sys_playsamples( &p_aout->sys, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(s16) );
         if ( l_bytes > (l_buffer_limit * sizeof(s16)) )
         {
             msleep( p_aout->l_msleep );

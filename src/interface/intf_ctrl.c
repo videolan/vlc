@@ -26,47 +26,6 @@
  *****************************************************************************/
 #include "vlc.h"
 #include <sys/stat.h>
-/*??#include <errno.h>
-#include <fcntl.h>
-#include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/soundcard.h>
-#include <sys/uio.h>
-
-#include "config.h"
-#include "common.h"
-#include "mtime.h"
-#include "vlc_thread.h"
-#include "debug.h"
-
-#include "intf_msg.h"
-
-#include "input.h"
-#include "input_ctrl.h"
-#include "input_vlan.h"
-#include "input_psi.h"
-#include "input_netlist.h"
-#include "decoder_fifo.h"
-
-#include "audio_output.h"
-#include "audio_decoder.h"
-
-#include "video.h"
-#include "video_output.h"
-#include "video_graphics.h"
-#include "video_decoder.h"
-
-#include "xconsole.h"
-#include "interface.h"
-#include "intf_cmd.h"
-#include "control.h"
-#include "intf_ctrl.h"
-
-#include "pgm_data.h"
-*/
 
 /*
  * Local prototypes
@@ -382,8 +341,8 @@ static int PlayAudio( int i_argc, intf_arg_t *p_argv )
     }
     close( i_fd );
 
-   /* Now we can work out how many output units we can compute with the fifo */
-    fifo.l_units = (long)(((s64)fifo.l_units*(s64)p_main->p_aout->dsp.l_rate)/(s64)fifo.l_rate);
+    /* Now we can work out how many output units we can compute with the fifo */
+    fifo.l_units = (long)(((s64)fifo.l_units*(s64)p_main->p_aout->sys.l_rate)/(s64)fifo.l_rate);
 
     /* Create the fifo */
     if ( aout_CreateFifo(p_main->p_aout, &fifo) == NULL )

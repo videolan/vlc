@@ -35,8 +35,8 @@ void    intf_GGISysDestroy   ( p_intf_thread_t p_intf );
 void    intf_GGISysManage    ( p_intf_thread_t p_intf );
 #endif
 #ifdef VIDEO_BEOS
-int     intf_BeSysCreate     ( p_intf_thread_t p_intf );
-void    intf_BeSysDestroy    ( p_intf_thread_t p_intf );
-void    intf_BeSysManage     ( p_intf_thread_t p_intf );
+int     intf_BSysCreate      ( p_intf_thread_t p_intf );
+void    intf_BSysDestroy     ( p_intf_thread_t p_intf );
+void    intf_BSysManage      ( p_intf_thread_t p_intf );
 #endif
 
