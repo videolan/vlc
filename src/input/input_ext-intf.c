@@ -56,7 +56,10 @@ void input_Play( input_thread_t * p_input )
  *****************************************************************************/
 void input_Forward( input_thread_t * p_input, int i_rate )
 {
-    intf_Msg( "Forward enabled" );
+    if ( i_rate > 1000 )
+        intf_Msg( "Forward enabled at 1/%d",i_rate/1000 );
+    else
+        intf_Msg( "Forward enabled at %d/1",1000/i_rate );
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.i_new_status = FORWARD_S;
     p_input->stream.i_new_rate = i_rate;

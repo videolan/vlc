@@ -2,7 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_sdl.c,v 1.27 2001/02/07 17:44:52 massiot Exp $
+ * $Id: intf_sdl.c,v 1.28 2001/02/08 00:46:12 reno Exp $
  *
  * Authors:
  *
@@ -110,6 +110,7 @@ void intf_SDLManage( intf_thread_t *p_intf )
 {
     SDL_Event event;                                            /* SDL event */
     Uint8   i_key;
+    int     i_rate;
  
     while ( SDL_PollEvent(&event) )
     {
@@ -148,11 +149,20 @@ void intf_SDLManage( intf_thread_t *p_intf )
                 break;
 
             case SDLK_a:
-                input_Forward( p_intf->p_input, DEFAULT_RATE/2 );
+                i_rate = p_intf->p_input->stream.control.i_rate;
+                if ( i_rate/2 >= MINIMAL_RATE )
+                    input_Forward( p_intf->p_input, i_rate/2 );
                 break;
 
             case SDLK_s:
-                input_Forward( p_intf->p_input, DEFAULT_RATE*2 );
+                i_rate = p_intf->p_input->stream.control.i_rate;
+                if ( i_rate*2 <= MAXIMAL_RATE )
+                {
+                    /* Compensation of int truncature */
+                    if ( i_rate*2 > 500 && i_rate*2 < 1000 )
+                        i_rate = 1000/2;
+                    input_Forward( p_intf->p_input, i_rate*2 );
+                }
                 break;
 
             default:

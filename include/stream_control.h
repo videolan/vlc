@@ -28,3 +28,5 @@ typedef struct stream_ctrl_s
 #define START_S             11
 
 #define DEFAULT_RATE        1000
+#define MINIMAL_RATE        31              /* Up to 32/1 */
+#define MAXIMAL_RATE        8000            /* Up to 1/8 */
