@@ -1,8 +1,8 @@
 /*****************************************************************************
- * a52_system.c : A52 input module for vlc
+ * a52sys.c : A/52 input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: a52sys.c,v 1.1 2002/08/28 22:25:38 massiot Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -50,9 +50,9 @@ static int  Demux ( input_thread_t * );
  *****************************************************************************/
 vlc_module_begin();                                      
     set_description( "A52 demuxer" );                       
-    set_capability( "demux", 150 );
+    set_capability( "demux", 155 );
     set_callbacks( Init, NULL );
-    add_shortcut( "a52sys" );
+    add_shortcut( "a52" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -84,7 +84,7 @@ static int Init( vlc_object_t * p_this )
 
     if( *p_peek != 0x0b || *(p_peek + 1) != 0x77 )
     {
-        if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "a52sys", 3 ) )
+        if( *p_input->psz_demux && !strncmp( p_input->psz_demux, "a52", 3 ) )
         {
             /* User forced */
             msg_Err( p_input, "this doesn't look like an a52 stream, continuing" );
@@ -128,11 +128,16 @@ static int Demux( input_thread_t * p_input )
     pes_packet_t *  p_pes;
     data_packet_t * p_data;
 
+    if( p_fifo == NULL )
+    {
+        return -1;
+    }
+
     i_read = input_SplitBuffer( p_input, &p_data, A52_PACKET_SIZE );
 
     if ( i_read <= 0 )
     {
-        return( i_read );
+        return i_read;
     }
 
     p_pes = input_NewPES( p_input->p_method_data );
@@ -169,6 +174,6 @@ static int Demux( input_thread_t * p_input )
 
     input_DecodePES( p_fifo, p_pes );
 
-    return( 1 );
+    return 1;
 }
 

@@ -2,7 +2,7 @@
  * ugly.c : ugly resampler (changes pitch)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ugly.c,v 1.1 2002/08/24 20:22:34 sam Exp $
+ * $Id: ugly.c,v 1.2 2002/08/28 22:25:38 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -91,8 +91,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         for( i_chan = p_filter->input.i_channels ; i_chan ; )
         {
             i_chan--;
-            *p_out++ = p_in[i_chan];
+            p_out[i_chan] = p_in[i_chan];
         }
+        p_out += p_filter->input.i_channels;
 
         i_remainder += p_filter->input.i_rate;
         while( i_remainder >= p_filter->output.i_rate )

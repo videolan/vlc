@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.6 2002/08/19 21:54:37 massiot Exp $
+ * $Id: filters.c,v 1.7 2002/08/28 22:25:39 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -316,6 +316,7 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
             p_first_alloc->i_bytes_per_sec = __MAX(
                                          p_first_alloc->i_bytes_per_sec,
                                          i_input_size );
+            p_filter->output_alloc.i_alloc_type = AOUT_ALLOC_NONE;
         }
         else
         {
@@ -344,7 +345,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
 
         aout_BufferAlloc( &p_filter->output_alloc,
                           (mtime_t)(*pp_input_buffer)->i_nb_samples * 1000000
-                            / p_filter->output.i_rate, *pp_input_buffer,
+                            / p_filter->input.i_rate, *pp_input_buffer,
                           p_output_buffer );
         if ( p_output_buffer == NULL )
         {

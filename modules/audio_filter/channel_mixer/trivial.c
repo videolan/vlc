@@ -2,7 +2,7 @@
  * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.1 2002/08/21 22:41:59 massiot Exp $
+ * $Id: trivial.c,v 1.2 2002/08/28 22:25:38 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -87,7 +87,7 @@ static void SparseCopy( s32 * p_dest, const s32 * p_src, size_t i_len,
                         int i_output_stride, int i_input_stride )
 {
     int i;
-    for ( i = 0; i < i_len; i++ )
+    for ( i = i_len; i--; )
     {
         int j;
         for ( j = 0; j < i_output_stride; j++ )

@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.9 2002/08/26 23:00:23 massiot Exp $
+ * $Id: input.c,v 1.10 2002/08/28 22:25:39 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -268,7 +268,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          *    synchronization
          * Solution : resample the buffer to avoid a scratch.
          */
-        audio_sample_format_t new_output;
+        audio_sample_format_t new_input;
         int i_ratio, i_nb_filters;
         mtime_t old_duration;
         aout_filter_t * pp_filters[AOUT_MAX_FILTERS];
@@ -279,7 +279,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "buffer is %lld %s, resampling",
                          drift > 0 ? drift : -drift,
                          drift > 0 ? "in advance" : "late" );
-        memcpy( &new_output, &p_aout->mixer.mixer,
+        memcpy( &new_input, &p_input->input,
                 sizeof(audio_sample_format_t) );
         old_duration = p_buffer->end_date - p_buffer->start_date;
         duration = p_buffer->end_date - start_date;
@@ -293,11 +293,12 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         {
             duration = old_duration * 150 / 100;
         }
-        new_output.i_rate = new_output.i_rate * duration / old_duration;
+        new_input.i_rate = new_input.i_rate * old_duration / duration;
+        aout_FormatPrepare( &new_input );
 
         if ( aout_FiltersCreatePipeline( p_aout, pp_filters,
-                                         &i_nb_filters, &p_input->input,
-                                         &new_output ) < 0 )
+                                         &i_nb_filters, &new_input,
+                                         &p_aout->mixer.mixer ) < 0 )
         {
             msg_Err( p_aout, "couldn't set an input pipeline for resampling" );
             vlc_mutex_lock( &p_aout->mixer_lock );
@@ -318,16 +319,17 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                                  &dummy_alloc );
         dummy_alloc.i_bytes_per_sec = __MAX(
                                     dummy_alloc.i_bytes_per_sec,
-                                    p_input->input.i_bytes_per_frame
-                                     * p_input->input.i_rate
-                                     / p_input->input.i_frame_length );
+                                    new_input.i_bytes_per_frame
+                                     * new_input.i_rate
+                                     / new_input.i_frame_length );
         dummy_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
 
-        aout_BufferAlloc( &dummy_alloc, old_duration, NULL, p_new_buffer );
+        aout_BufferAlloc( &dummy_alloc, duration, NULL, p_new_buffer );
         memcpy( p_new_buffer->p_buffer, p_buffer->p_buffer,
                 p_buffer->i_nb_bytes );
         p_new_buffer->i_nb_samples = p_buffer->i_nb_samples;
         p_new_buffer->i_nb_bytes = p_buffer->i_nb_bytes;
+
         aout_BufferFree( p_buffer );
         p_buffer = p_new_buffer;
 
