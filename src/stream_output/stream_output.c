@@ -79,12 +79,14 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
     else if( keep.b_bool )
     {
         msg_Warn( p_parent, "sout-keep true" );
-        if( ( p_sout = vlc_object_find( p_parent, VLC_OBJECT_SOUT, FIND_ANYWHERE ) ) )
+        if( ( p_sout = vlc_object_find( p_parent, VLC_OBJECT_SOUT,
+                                        FIND_ANYWHERE ) ) )
         {
             if( !strcmp( p_sout->psz_sout, psz_dest ) )
             {
                 msg_Warn( p_parent, "sout keep : reusing sout" );
-                msg_Warn( p_parent, "sout keep : you probably want to use gather stream_out" );
+                msg_Warn( p_parent, "sout keep : you probably want to use "
+                          "gather stream_out" );
                 vlc_object_detach( p_sout );
                 vlc_object_attach( p_sout, p_parent );
                 vlc_object_release( p_sout );
@@ -99,7 +101,8 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
     }
     else if( !keep.b_bool )
     {
-        while( ( p_sout = vlc_object_find( p_parent, VLC_OBJECT_SOUT, FIND_PARENT ) ) )
+        while( ( p_sout = vlc_object_find( p_parent, VLC_OBJECT_SOUT,
+                                           FIND_PARENT ) ) )
         {
             msg_Warn( p_parent, "sout keep : destroying old sout" );
             sout_DeleteInstance( p_sout );
@@ -353,9 +356,8 @@ int sout_AccessOutWrite( sout_access_out_t *p_access, block_t *p_buffer )
 /*****************************************************************************
  * sout_MuxNew: create a new mux
  *****************************************************************************/
-sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
-                                   char *psz_mux,
-                                   sout_access_out_t *p_access )
+sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
+                          sout_access_out_t *p_access )
 {
     sout_mux_t *p_mux;
     char       *psz_next;
@@ -564,7 +566,7 @@ void sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 /*****************************************************************************
  *
  *****************************************************************************/
-static int  mrl_Parse( mrl_t *p_mrl, char *psz_mrl )
+static int mrl_Parse( mrl_t *p_mrl, char *psz_mrl )
 {
     char * psz_dup = strdup( psz_mrl );
     char * psz_parser = psz_dup;
@@ -764,7 +766,8 @@ static char *_get_chain_end( char *str )
                 }
             }
         }
-        else if( *p == '\0' || *p == ',' || *p == '}' || *p == ' ' || *p == '\t' )
+        else if( *p == '\0' || *p == ',' || *p == '}' ||
+                 *p == ' ' || *p == '\t' )
         {
             return p;
         }
@@ -818,7 +821,8 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
 
             psz_name = p;
 
-            while( *p && *p != '=' && *p != ',' && *p != '}' && *p != ' ' && *p != '\t' )
+            while( *p && *p != '=' && *p != ',' && *p != '}' &&
+                   *p != ' ' && *p != '\t' )
             {
                 p++;
             }
@@ -924,7 +928,8 @@ static void sout_cfg_free( sout_cfg_t *p_cfg )
     }
 }
 
-void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_options, sout_cfg_t *cfg )
+void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix,
+                      const char **ppsz_options, sout_cfg_t *cfg )
 {
     char *psz_name;
     int  i_type;
@@ -960,8 +965,10 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_
             {
                 break;
             }
-            if( ( !strncmp( cfg->psz_name, "no-", 3 ) && !strcmp( ppsz_options[i], cfg->psz_name + 3 ) ) ||
-                ( !strncmp( cfg->psz_name, "no", 2 ) && !strcmp( ppsz_options[i], cfg->psz_name + 2 ) ) )
+            if( ( !strncmp( cfg->psz_name, "no-", 3 ) &&
+                  !strcmp( ppsz_options[i], cfg->psz_name + 3 ) ) ||
+                ( !strncmp( cfg->psz_name, "no", 2 ) &&
+                  !strcmp( ppsz_options[i], cfg->psz_name + 2 ) ) )
             {
                 b_yes = VLC_FALSE;
                 break;
@@ -980,7 +987,8 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_
         i_type = config_GetType( p_this, psz_name );
         if( !i_type )
         {
-            msg_Warn( p_this, "unknown option %s (value=%s)", cfg->psz_name, cfg->psz_value );
+            msg_Warn( p_this, "unknown option %s (value=%s)",
+                      cfg->psz_name, cfg->psz_value );
             goto next;
         }
         if( i_type != VLC_VAR_BOOL && cfg->psz_value == NULL )
@@ -1021,8 +1029,7 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_
 /*
  * XXX name and p_cfg are used (-> do NOT free them)
  */
-sout_stream_t *sout_stream_new( sout_instance_t *p_sout,
-                                char *psz_chain )
+sout_stream_t *sout_stream_new( sout_instance_t *p_sout, char *psz_chain )
 {
     sout_stream_t *p_stream;
 
@@ -1091,7 +1098,8 @@ static char *_sout_stream_url_to_chain( vlc_object_t *p_this, char *psz_url )
 
     if( config_GetInt( p_this, "sout-display" ) )
     {
-        p += sprintf( p, "duplicate{dst=display,dst=std{mux=\"%s\",access=\"%s\",url=\"%s\"}}",
+        p += sprintf( p, "duplicate{dst=display,dst=std{mux=\"%s\","
+                      "access=\"%s\",url=\"%s\"}}",
                       mrl.psz_way, mrl.psz_access, mrl.psz_name );
     }
     else
