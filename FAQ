@@ -1,0 +1,123 @@
+Frequentely Asked Questions for VideoLAN Client
+$Id: FAQ,v 1.1 2001/10/26 16:23:06 massiot Exp $
+
+1. Using VLC
+
+1.1 How do I read a DVD ?
+-----------------------
+Just launch vlc and use the "open disc" command from the graphical
+interface. In case of trouble, you may want to use the command line
+interface :
+vlc dvd:/dev/dvd
+
+1.2 How do I read an encrypted DVD ?
+----------------------------------
+It's exactly the same as for a normal DVD. You will need write access to
+/dev/dvd, because of the key negociation process.
+
+1.3 How do I switch to full screen display ?
+------------------------------------------
+Press 'f' to toggle fullscreen mode. Note that not all video output
+devices support full screen.
+
+1.4 How do I hide the mouse cursor ?
+----------------------------------
+It should disappear after a few seconds if you stop moving the mouse.
+
+1.5 How do I use vlc if I don't want to install Gnome and all this
+#@!£% *$@&§% !@# bloat ?
+---------------------------------------------------------------------------
+You can run :
+vlc -I dummy myfile.mpg
+Most commands are available from the command line, see vlc --help for
+more information.
+
+
+2. Troubleshooting
+
+2.1 When I start vlc, I don't have any interface coming...
+-------------------------------------------------------
+If you installed a binary package, make sure you also installed an
+interface package such as vlc-gtk or vlc-qt. If you installed from
+source, make sure the development package for gtk or qt is correctly
+installed (often gtk-dev or gtk-devel) and recompile.
+
+2.2 Clicking on "disc" in the interface doesn't do anything
+-----------------------------------------------------------
+Wait a few seconds. Key cracking can take much time on some discs. If it
+still doesn't work, you can have a more verbose output using "vlc -vvvvv".
+Here are a few things to check for :
+* Did you install the libdvdcss package ?
+* Do you have write access to your DVD device ? For instance :
+chmod 666 /dev/hdc
+* Does your kernel log contain line about your DVD device ?
+* Do you have a link from /dev/dvd to your real DVD device ? For instance
+ln -s hdc /dev/dvd
+
+2.3 Running vlc pussycat.mpg doesn't do anything...
+------------------------------------------------
+Probably your MPEG-1 file doesn't have any system layer. This is common
+for MPEG-1 streams without any audio track. Currently VLC doesn't
+automatically detect this format, so you have to manually select it :
+vlc --input es pussycat.mpg
+
+2.4 The video runs but the picture is distorted...
+-----------------------------------------------
+There is probably a problem with the output layer. There are several
+ways of troubleshooting it. First, try with another output plug-in, for
+instance :
+vlc -V sdl
+vlc -V x11
+Second, try with an unoptimized YUV transform :
+vlc --yuv yuv
+Third, change your screen depth and/or definition. It quite often helps.
+Lastly, have a look at your XFree86 video driver (nVidia for instance
+releases optimized drivers for its boards).
+
+2.5 Video is choppy...
+-------------------
+Your system is too slow to decode all pictures. It might be that your
+CPU basically isn't fast enough. It can also be that the subsystem is
+misconfigured/misdriven. Here are some elements to improve speed :
+* Turn on DMA on your DVD device, for instance :
+hdparm -X34 -d1 /dev/dvd
+* Upgrade to the latest XFree86 version and the latest driver for your
+video board ; check that the xvideo plug-in is effectively used with
+vlc -vvvv
+* Kill other applications running...
+
+2.6 Audio is choppy...
+-------------------
+This is not normal ; it is a known problem and is being investigated.
+
+2.7 Audio and video are out of sync
+-----------------------------------
+This is not normal. Try using another output plug-in (for instance -A dsp),
+kill esd or artsd if they are running... This is a known problem and
+is being investigated.
+
+2.8 On some DVDs the subtitles are unreadable
+---------------------------------------------
+This is a known bug and is being investigated.
+
+2.9 When I try to compile VLC, it breaks on unknown instructions in
+idctaltivec.c
+---------------------------------------------------------------------------
+Unset your CFLAGS environment variable. For instance type
+export CFLAGS= ; ./configure
+Don't try to be cleverer than us :-).
+
+2.10 Sound volume is too low
+----------------------------
+This is a known problem.
+
+
+3. Ports and features
+
+3.1 MacOS X port
+
+3.1.1 Does VLC support the ATI DVD hardware acceleration cards ?
+--------------------------------------------------------------
+Currently it doesn't. We'd be glad to support them, but we lack technical
+information on them.
+
