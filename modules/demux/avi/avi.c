@@ -208,7 +208,7 @@ static int Open( vlc_object_t * p_this )
     /* Is it an avi file ? */
     if( stream_Peek( p_demux->s, &p_peek, 200 ) < 200 )
     {
-        msg_Err( p_demux, "cannot peek()" );
+        msg_Dbg( p_demux, "cannot peek()" );
         return VLC_EGENERIC;
     }
     for( i_peeker = 0; i_peeker < 188; i_peeker++ )
