@@ -212,6 +212,50 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_vlc->b_die = VLC_TRUE;
 }
 
+
+/*****************************************************************************
+ * hasDefinedShortcutKey: Check to see if the key press is a defined VLC
+ * shortcut key.  If it is, pass it off to VLC for handling and return YES,
+ * otherwise ignore it and return NO (where it will get handled by Cocoa).
+ *****************************************************************************/
+- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event
+{
+    unichar key = 0;
+    vlc_value_t val;
+    unsigned int i_pressed_modifiers = 0;
+    struct hotkey *p_hotkeys;
+    int i;
+
+    val.i_int = 0;
+    p_hotkeys = p_intf->p_vlc->p_hotkeys;
+
+    i_pressed_modifiers = [o_event modifierFlags];
+
+    if( i_pressed_modifiers & NSShiftKeyMask )
+        val.i_int |= KEY_MODIFIER_SHIFT;
+    if( i_pressed_modifiers & NSControlKeyMask )
+        val.i_int |= KEY_MODIFIER_CTRL;
+    if( i_pressed_modifiers & NSAlternateKeyMask )
+        val.i_int |= KEY_MODIFIER_ALT;
+    if( i_pressed_modifiers & NSCommandKeyMask )
+        val.i_int |= KEY_MODIFIER_COMMAND;
+
+    key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
+
+    val.i_int |= CocoaKeyToVLC( key );
+
+    for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+    {
+        if( p_hotkeys[i].i_key == val.i_int )
+        {
+            var_Set( p_intf->p_vlc, "key-pressed", val );
+            return YES;
+        }
+    }
+
+    return NO;
+}
+
 @end
 
 int ExecuteOnMainThread( id target, SEL sel, void * p_arg )

@@ -973,6 +973,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     return( YES );
 }
 
+- (BOOL)performKeyEquivalent:(NSEvent *)o_event
+{
+    return [(VLCApplication *) [VLCApplication sharedApplication]
+            hasDefinedShortcutKey:o_event];
+}
+
 - (void)keyDown:(NSEvent *)o_event
 {
     unichar key = 0;

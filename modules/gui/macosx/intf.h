@@ -44,6 +44,7 @@
 
 - (void)setIntf:(intf_thread_t *)p_intf;
 - (intf_thread_t *)getIntf;
+- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event;
 
 @end
 

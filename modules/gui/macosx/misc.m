@@ -23,6 +23,7 @@
 
 #include <Cocoa/Cocoa.h>
 
+#include "intf.h"                                          /* VLCApplication */
 #include "misc.h"
 #include "playlist.h"
 
@@ -40,6 +41,13 @@
 
     return( self );
 }
+
+- (BOOL)performKeyEquivalent:(NSEvent *)o_event
+{
+    return [( (VLCApplication *) [VLCApplication sharedApplication] )
+            hasDefinedShortcutKey:o_event];
+}
+
 @end
 
 
