@@ -2,7 +2,7 @@
  * adpcm.c : adpcm variant audio decoder
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: adpcm.c,v 1.9 2003/03/11 06:58:49 fenrir Exp $
+ * $Id: adpcm.c,v 1.10 2003/03/11 23:56:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -737,7 +737,7 @@ static void DecodeAdpcmImaQT( adec_thread_t *p_adec,
     {
         p_sample = ((int16_t*)p_aout_buffer->p_buffer) + i_ch;
         /* load preambule */
-        channel[i_ch].i_predictor  = ( p_buffer[0] << 1 ) ||(  p_buffer[1] >> 7 );
+        channel[i_ch].i_predictor  = (int16_t)((( ( p_buffer[0] << 1 )|(  p_buffer[1] >> 7 ) ))<<7);
         channel[i_ch].i_step_index = p_buffer[1]&0x7f;
 
         CLAMP( channel[i_ch].i_step_index, 0, 88 );
