@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc-cvs\n"
-"POT-Creation-Date: 2002-04-21 20:27+0200\n"
+"POT-Creation-Date: 2002-04-22 09:46+0200\n"
 "PO-Revision-Date: 2002-28-02 23.35+0100\n"
 "Last-Translator: Sigmund Augdal <sigmunau@idi.ntnu.no>.\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr "Standard grensesnitt: "
 #: src/interface/main.c:99
 msgid ""
 "This option allows you to select the interface used by vlc.\n"
-"Note that the default behaviour is to automatically select the best method "
+"Note that the default behavior is to automatically select the best method "
 "available."
 msgstr ""
 
@@ -62,7 +62,7 @@ msgstr ""
 #: src/interface/main.c:120
 msgid ""
 "This option allows you to select the audio audio output method used by vlc.\n"
-"Note that the default behaviour is to automatically select the best method "
+"Note that the default behavior is to automatically select the best method "
 "available."
 msgstr ""
 
@@ -139,7 +139,7 @@ msgstr "Standard grensesnitt: "
 #: src/interface/main.c:163
 msgid ""
 "This option allows you to select the video output method used by vlc.\n"
-"Note that the default behaviour is to automatically select the best method "
+"Note that the default behavior is to automatically select the best method "
 "available."
 msgstr ""
 

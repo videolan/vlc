@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.184 2002/04/21 21:29:20 gbazin Exp $
+ * $Id: main.c,v 1.185 2002/04/22 08:20:26 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -97,7 +97,7 @@
 #define INTF_TEXT N_("interface module")
 #define INTF_LONGTEXT N_( \
     "This option allows you to select the interface used by vlc.\nNote that " \
-    "the default behaviour is to automatically select the best method " \
+    "the default behavior is to automatically select the best method " \
     "available.")
 
 #define WARNING_TEXT N_("warning level (or use -v, -vv, etc...)")
@@ -118,7 +118,7 @@
 #define AOUT_TEXT N_("audio output module")
 #define AOUT_LONGTEXT N_( \
     "This option allows you to select the audio audio output method used by " \
-    "vlc.\nNote that the default behaviour is to automatically select the " \
+    "vlc.\nNote that the default behavior is to automatically select the " \
     "best method available.")
 
 #define NOAUDIO_TEXT N_("disable audio")
@@ -161,7 +161,7 @@
 #define VOUT_TEXT N_("video output module")
 #define VOUT_LONGTEXT N_( \
     "This option allows you to select the video output method used by vlc.\n" \
-    "Note that the default behaviour is to automatically select the best " \
+    "Note that the default behavior is to automatically select the best " \
     "method available.")
 
 #define NOVIDEO_TEXT N_("disable video")
@@ -521,6 +521,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_input_bank  = &input_bank;
     p_aout_bank   = &aout_bank;
     p_vout_bank   = &vout_bank;
+
+    p_main->i_warning_level = 0;
 
     /*
      * Support for gettext

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.73.3\n"
-"POT-Creation-Date: 2002-04-21 20:27+0200\n"
+"POT-Creation-Date: 2002-04-22 09:46+0200\n"
 "PO-Revision-Date: 2002-04-18 23:38+0100\n"
 "Last-Translator: Thomas Graf <tgr@reeler.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr "Oberfläche Modul"
 #: src/interface/main.c:99
 msgid ""
 "This option allows you to select the interface used by vlc.\n"
-"Note that the default behaviour is to automatically select the best method "
+"Note that the default behavior is to automatically select the best method "
 "available."
 msgstr ""
 "Diese Option erlaubt Dir die Standard Oberfläche festzulegen.\n"
@@ -69,7 +69,7 @@ msgstr "Audio Ausgabe Modul"
 #: src/interface/main.c:120
 msgid ""
 "This option allows you to select the audio audio output method used by vlc.\n"
-"Note that the default behaviour is to automatically select the best method "
+"Note that the default behavior is to automatically select the best method "
 "available."
 msgstr ""
 "Diese Option erlaubt Dir den Audio Ausgabemodus festzulegen.\n"
@@ -163,7 +163,7 @@ msgstr "Video Ausgabe Modul"
 #: src/interface/main.c:163
 msgid ""
 "This option allows you to select the video output method used by vlc.\n"
-"Note that the default behaviour is to automatically select the best method "
+"Note that the default behavior is to automatically select the best method "
 "available."
 msgstr ""
 "Diese Option erlaubt Dir den standard Video Ausgabemodus festzulegen.\n"
@@ -559,9 +559,9 @@ msgid "<integer>"
 msgstr "<zahl>"
 
 #: src/misc/configuration.c:687
-#, fuzzy, c-format
+#, c-format
 msgid "# %s <float>\n"
-msgstr "# %s <text>\n"
+msgstr "# %s <gleitpunktzahl>\n"
 
 #: src/misc/configuration.c:694
 #, c-format

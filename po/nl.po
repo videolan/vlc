@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-04-21 20:27+0200\n"
+"POT-Creation-Date: 2002-04-22 09:46+0200\n"
 "PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Jean-Paul Saman <jpsaman@wxs.nl>\n"
 "Language-Team: Nederlands <nl@li.org>\n"
@@ -21,7 +21,7 @@ msgstr "interface module"
 #: src/interface/main.c:99
 msgid ""
 "This option allows you to select the interface used by vlc.\n"
-"Note that the default behaviour is to automatically select the best method "
+"Note that the default behavior is to automatically select the best method "
 "available."
 msgstr ""
 "Via deze optie kan de interface die vlc gebruikt geselecteerd worden.\n"
@@ -69,7 +69,7 @@ msgstr "audio output module"
 #: src/interface/main.c:120
 msgid ""
 "This option allows you to select the audio audio output method used by vlc.\n"
-"Note that the default behaviour is to automatically select the best method "
+"Note that the default behavior is to automatically select the best method "
 "available."
 msgstr ""
 "Deze optie selecteert de audio output methode, die gebruikt wordt door vlc.\n"
@@ -163,7 +163,7 @@ msgstr "video output module"
 #: src/interface/main.c:163
 msgid ""
 "This option allows you to select the video output method used by vlc.\n"
-"Note that the default behaviour is to automatically select the best method "
+"Note that the default behavior is to automatically select the best method "
 "available."
 msgstr ""
 "Selecteer de video output methode die vlc gebruikt.\n"
@@ -512,7 +512,6 @@ msgid " <float>"
 msgstr ""
 
 #: src/interface/main.c:1028
-#, fuzzy
 msgid ""
 "\n"
 "Playlist items:\n"
@@ -934,7 +933,6 @@ msgstr "_Ondertitels"
 
 #: plugins/gtk/gnome_interface.c:126 plugins/gtk/gnome_interface.c:930
 #: plugins/gtk/gtk_interface.c:409
-#, fuzzy
 msgid "Select subtitles channel"
 msgstr "Selecteer ondertitel kanaal"
 
@@ -1090,7 +1088,6 @@ msgid "No server"
 msgstr "Geen server"
 
 #: plugins/gtk/gtk_interface.c:789
-#, fuzzy
 msgid "Channel:"
 msgstr "Kanaal:"
 
@@ -1494,9 +1491,8 @@ msgid "Select"
 msgstr "Selecteer"
 
 #: plugins/gtk/gnome_interface.c:2008
-#, fuzzy
 msgid "Jump to: "
-msgstr "Spring naar:"
+msgstr "Spring naar: "
 
 #: plugins/gtk/gnome_interface.c:2162
 msgid "Open Stream"
