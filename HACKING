@@ -3,10 +3,18 @@ $Id$
 Hacking vlc
 ===========
 
-Requirements
-------------
+First
+-----
 
-You will need the following tools if you plan to use the CVS version of vlc:
+ - Read this file
+
+ - Read the information present on http://developers.videolan.org/vlc/
+
+
+Requirements
+____________
+
+You will need the following tools if you plan to use the SVN version of vlc:
 
  - autoconf version 2.50 or later
 
@@ -14,12 +22,13 @@ You will need the following tools if you plan to use the CVS version of vlc:
 
  - gettext version 0.10.40 (but 0.11.3 or later is recommended)
 
-After retrieving the CVS tree, you need to run the bootstrap script to
+After retrieving the SVN tree, you need to run the bootstrap script to
 generate all the files needed to build vlc. You can then run configure.
+Run ./configure --help for a description of the available options.
 
 If you do not have the correct version of these tools, or if they are
 simply not available for the operating system you plan to develop on,
-you can check out a CVS tree on an OS that provides these tools (such
+you can check out a SVN tree on an OS that provides these tools (such
 as a recent Linux distribution), run bootstrap, and then copy the whole
 tree to your retarded OS.
 
