@@ -119,14 +119,6 @@ Need I say more?
 Status: Todo
 
 Task
-Difficulty: Easy
-Urgency: Normal
-Platform: any
-Description: VobSub support
-Implement VobSub support (.sub and .idx files). Needs SPU scaling support.
-Status: Waiting
-
-Task
 Difficulty: Medium
 Urgency: Wishlist
 Platform: any
@@ -162,6 +154,19 @@ Description: Stream text subtitles
   - Find an existing norm
   - Implement it
 Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Normal
+Platform: any
+Description: Rework spu decoder
+ The spu decoder needs some serious work
+  - Support color
+  - Split/merge for dvd menu highlighting
+  - Downscaling for divx/mkv etc
+  - Chroma independence
+  - .sub/.idx support
+Status: todo
 
 Task
 Difficulty: Hard
