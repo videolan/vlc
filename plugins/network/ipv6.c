@@ -2,10 +2,11 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.10 2002/06/01 16:45:34 sam Exp $
+ * $Id: ipv6.c,v 1.11 2002/06/09 22:57:00 massiot Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ *          Remco Poortinga <poortinga@telin.nl>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -103,6 +104,8 @@ static void getfunctions( function_list_t * p_function_list )
 static int BuildAddr( struct sockaddr_in6 * p_socket,
                       char * psz_address, int i_port )
 {
+    char * psz_multicast_interface = "";
+
 #if defined(WIN32)
     /* Try to get getaddrinfo() and freeaddrinfo() from wship6.dll */
     typedef int (CALLBACK * GETADDRINFO) ( const char *nodename,
@@ -143,6 +146,17 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
               && psz_address[strlen(psz_address) - 1] == ']' )
     {
         psz_address++;
+        /* see if there is an interface name in there... */
+        if( (psz_multicast_interface = strchr(psz_address, '%')) != NULL )
+        {
+            *psz_multicast_interface = '\0';
+            psz_multicast_interface++;
+            intf_WarnMsg( 3, "Interface name specified: \"%s\"",
+                          psz_multicast_interface );
+            /* now convert that interface name to an index */
+            p_socket->sin6_scope_id = if_nametoindex(psz_multicast_interface);
+            intf_WarnMsg( 3, " = #%i\n", p_socket->sin6_scope_id );
+        }
         psz_address[strlen(psz_address) - 1] = '\0' ;
 
 #if !defined( WIN32 )
@@ -307,7 +321,22 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
     }
  
     /* Join the multicast group if the socket is a multicast address */
-    /* FIXME: To be written */
+    if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
+    {
+        struct ipv6_mreq     imr;
+        int                  res;
+
+        imr.ipv6mr_interface = sock.sin6_scope_id;
+        imr.ipv6mr_multiaddr = sock.sin6_addr;
+        res = setsockopt(i_handle, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr,
+                         sizeof(imr));
+
+        if( res == -1 )
+        {
+            intf_ErrMsg( "ipv6 error: setsockopt JOIN_GROUP failed" );
+        }
+    }
+
 
     if( *psz_server_addr )
     {
