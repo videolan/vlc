@@ -1548,7 +1548,9 @@ then
       LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -L${real_ffmpeg_tree}/libavcodec -lavcodec"
       CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${real_ffmpeg_tree}/libavcodec"
 
-      LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -L${real_ffmpeg_tree}/libavcodec -lavcodec"
+      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+      dnl       linker would miserably barf on multiple definitions.
+      LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -L${real_ffmpeg_tree}/libavcodec"
       CPPFLAGS_stream_out_transcode="${CPPFLAGS_stream_out_transcode} -I${real_ffmpeg_tree}/libavcodec"
 
     else
@@ -1562,7 +1564,9 @@ then
     AC_CHECK_LIB(avcodec, avcodec_init, [
       BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
       LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lavcodec" 
-      LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -lavcodec" ],
+      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+      dnl       linker would miserably barf on multiple definitions.
+      LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode}" ],
       [ AC_MSG_ERROR([Cannot find libavcodec library...]) ])
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
