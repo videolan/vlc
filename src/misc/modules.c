@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.126 2003/07/24 22:58:21 gbazin Exp $
+ * $Id: modules.c,v 1.127 2003/08/01 00:00:50 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -77,6 +77,7 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
+#include "ninput.h"
 
 #include "vlc_video.h"
 #include "video_output.h"
