@@ -5,6 +5,7 @@ docdir = $(datadir)/doc/@PACKAGE@
 doc_DATA = \
 	bugreport-howto.txt \
 	fortunes.txt \
+	intf-vcd.txt \
 	web-streaming.html \
 	vlc-howto.sgml \
 	$(NULL)
@@ -18,6 +19,7 @@ EXTRA_DIST = \
 	vlc-config.1 \
 	bugreport-howto.txt \
 	fortunes.txt \
+	intf-vcd.txt \
 	release-howto.txt \
 	web-streaming.html \
 	vlc-howto.sgml \
