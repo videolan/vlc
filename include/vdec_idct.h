@@ -13,16 +13,22 @@
 /*****************************************************************************
  * Common declarations
  *****************************************************************************/ 
-#define elem_t short
+#ifndef VDEC_DFT
+typedef short elem_t;
+#else
+typedef int elem_t;
+#endif
+
+struct vdec_thread_s;
 
 /*****************************************************************************
  * Function pointers
  *****************************************************************************/
-typedef void (*f_idct_t)( elem_t*, int );
+typedef void (*f_idct_t)( struct vdec_thread_s *, elem_t*, int );
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void vdec_DummyIDCT( elem_t*, int );
-void vdec_SparseIDCT( elem_t*, int );
-void vdec_IDCT( elem_t*, int );
+void vdec_DummyIDCT( struct vdec_thread_s *, elem_t*, int );
+void vdec_SparseIDCT( struct vdec_thread_s *, elem_t*, int );
+void vdec_IDCT( struct vdec_thread_s *, elem_t*, int );

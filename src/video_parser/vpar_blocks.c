@@ -43,7 +43,7 @@
  * Local prototypes
  */
 static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
-                                       macroblock_t * p_mb, int i_mb_address );
+                                       macroblock_t * p_mb );
 static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar );
 static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb );
@@ -61,10 +61,20 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
                            int i_mb_previous, int i_mb_base )
 {
     static f_addb_t ppf_addb_intra[2] = {vdec_AddBlock, vdec_CopyBlock};
+    static f_decode_block_t pppf_decode_block[2][2] =
+                { {vpar_DecodeMPEG1Non, vpar_DecodeMPEG1Intra},
+                  {vpar_DecodeMPEG2Non, vpar_DecodeMPEG2Intra} };
+    static int      pi_x[12] = {0,8,0,8,0,0,0,0,8,8,8,8};
+    static int      pi_y[2][12] = { {0,0,8,8,0,0,8,8,0,0,8,8},
+                                    {0,0,1,1,0,0,1,1,0,0,1,1} };
+    static int      pi_chroma_hor[4] = { 0, 1, 1, 0 };
+    static int      pi_chroma_ver[4] = { 0, 1, 0, 0 };
 
-    int             i_mb, i_b, i_mask, i_x, i_y, pi_pos[3], pi_width[3];
+    int             i_mb, i_b, i_mask;
     macroblock_t *  p_mb;
     f_addb_t        pf_addb;
+    elem_t *        p_data1;
+    elem_t *        p_data2;
 
     *pi_mb_address += MacroblockAddressIncrement( p_vpar );
 
@@ -94,7 +104,7 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
             return;
         }
 
-        InitMacroblock( p_vpar, p_mb, i_mb );
+        InitMacroblock( p_vpar, p_mb );
 
         /* No IDCT nor AddBlock. */
         for( i_b = 0; i_b < 12; i_b++ )
@@ -119,7 +129,7 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
         return;
     }
 
-    InitMacroblock( p_vpar, p_mb, *pi_mb_address );
+    InitMacroblock( p_vpar, p_mb );
 
     /* Parse off macroblock_modes structure. */
     MacroblockModes( p_vpar, p_mb );
@@ -158,44 +168,59 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
 
     pf_addb = ppf_addb_intra[p_vpar->mb.i_mb_type & MB_INTRA];
 
-    /* C'est de la merde, il faut recommencer */
+    /*
+     * Effectively decode blocks.
+     */
 
-    i_x = p_mb->i_mb_x << 4;
-    i_y = p_mb->i_mb_y << 4;
+    i_mask = 1 << (3 + 2*p_vpar->sequence.i_chroma_nb_blocks);
 
-    pi_pos[0] = i_y*(p_vpar->sequence.i_width
-                        << (!p_vpar->picture.b_frame_structure))
-                + (p_mb->i_structure == BOTTOM_FIELD)*p_vpar->sequence.i_width
-                + i_x;
-    pi_pos[1] = pi_pos[2] = i_y*(p_vpar->sequence.i_chroma_width
-                        << (!p_vpar->picture.b_frame_structure))
-                + (p_mb->i_structure == BOTTOM_FIELD)*p_vpar->sequence.i_chroma_width
-                + (i_x >> (3-p_vpar->sequence.i_chroma_format));
-    pi_width[0] = p_vpar->sequence.i_width << (!p_vpar->picture.b_frame_structure
-                                               || p_vpar->mb.b_dct_type);
-    pi_width[1] = pi_width[2] = p_vpar->sequence.i_chroma_width
-                << (!p_vpar->picture.b_frame_structure || p_vpar->mb.b_dct_type);
+    /* luminance */
+    p_data1 = p_mb->p_picture->p_y
+              + p_mb->i_l_x + p_mb->i_l_y*(p_vpar->sequence.i_width);
 
-    /* Effectively decode blocks. */
-    for( i_b = 0, i_mask = 1 << (3 + 2*p_vpar->sequence.i_chroma_nb_blocks);
-         i_b < 4 + 2*p_vpar->sequence.i_chroma_nb_blocks; i_b++, i_mask >>= 1 )
+    for( i_b = 0; i_b < 4; i_b++, i_mask >>= 1 )
     {
         if( p_vpar->mb.i_coded_block_pattern & i_mask )
         {
-            static f_decode_block_t pppf_decode_block[2][2] =
-                { {vpar_DecodeMPEG1Non, vpar_DecodeMPEG1Intra},
-                  {vpar_DecodeMPEG2Non, vpar_DecodeMPEG2Intra} };
-            static int              pi_x[12] = {0,8,0,8,0,0,0,0,8,8,8,8};
-            static int              pi_y[12] = {0,0,8,8,0,0,8,8,0,0,8,8};
-            data_t                  pi_data[12] =
-                {p_mb->p_picture->p_y, p_mb->p_picture->p_y,
-                 p_mb->p_picture->p_y, p_mb->p_picture->p_y,
-                 p_mb->p_picture->p_u, p_mb->p_picture->p_v,
-                 p_mb->p_picture->p_u, p_mb->p_picture->p_v,
-                 p_mb->p_picture->p_u, p_mb->p_picture->p_v,
-                 p_mb->p_picture->p_u, p_mb->p_picture->p_v};
+            memset( p_mb->ppi_blocks[i_b], 0, 64*sizeof(elem_t) );
+            (*pppf_decode_block[p_vpar->sequence.b_mpeg2]
+                               [p_vpar->mb.i_mb_type & MB_INTRA])
+                ( p_vpar, p_mb, i_b );
+        
+            /* decode_block has already set pf_idct and pi_sparse_pos. */
+            p_mb->pf_addb[i_b] = pf_addb;
+     
+            /* Calculate block coordinates. */
+            p_mb->p_data[i_b] = p_data1
+                                 + pi_y[p_vpar->mb.b_dct_type][i_b]
+                                   * p_vpar->sequence.i_chroma_width;
+        }
+        else
+        {
+            /* Block not coded, so no IDCT, nor AddBlock */
+            p_mb->pf_addb[i_b] = vdec_DummyBlock;
+            p_mb->pf_idct[i_b] = vdec_DummyIDCT;
+        }
+    }
 
-            bzero( p_mb->ppi_blocks[i_b], 64*sizeof(elem_t) );
+    /* chrominance U */
+    p_data1 = p_mb->p_picture->p_u
+              + p_mb->i_c_x >> pi_chroma_hor[p_vpar->sequence.i_chroma_format]
+              + (p_mb->i_c_y >> pi_chroma_ver[p_vpar->sequence.i_chroma_format])
+                * (p_vpar->sequence.i_chroma_width);
+    p_data2 = p_mb->p_picture->p_v
+              + p_mb->i_c_x >> pi_chroma_hor[p_vpar->sequence.i_chroma_format]
+              + (p_mb->i_c_y >> pi_chroma_ver[p_vpar->sequence.i_chroma_format])
+                * (p_vpar->sequence.i_chroma_width);
+
+    for( i_b = 4; i_b < 4 + 2*p_vpar->sequence.i_chroma_nb_blocks;
+         i_b++, i_mask >>= 1 )
+    {
+        elem_t *    pp_data[2] = {p_data1, p_data2};
+
+        if( p_vpar->mb.i_coded_block_pattern & i_mask )
+        {
+            memset( p_mb->ppi_blocks[i_b], 0, 64*sizeof(elem_t) );
             (*pppf_decode_block[p_vpar->sequence.b_mpeg2]
                                [p_vpar->mb.i_mb_type & MB_INTRA])
                 ( p_vpar, p_mb, i_b );
@@ -204,10 +229,9 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
             p_mb->pf_addb[i_b] = pf_addb;
 
             /* Calculate block coordinates. */
-            p_mb->p_data[i_b] = pi_data[i_b] + pi_pos[i_b >> 2]
-                    + pi_y[i_b]*pi_width[i_b >> 2]
-                    + (p_vpar->mb.b_dct_type & ((i_b & 2) >> 1));
-                    /* INACHEVÉ parce que trop pourri ! */
+            p_mb->p_data[i_b] = pp_data[i_b & 1]
+                                 + pi_y[p_vpar->mb.b_dct_type][i_b]
+                                   * p_vpar->sequence.i_chroma_width;
         }
         else
         {
@@ -248,16 +272,30 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
  * InitMacroblock : Initialize macroblock values
  *****************************************************************************/
 static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
-                                       macroblock_t * p_mb, int i_mb_address )
+                                       macroblock_t * p_mb )
 {
     p_mb->p_picture = p_vpar->picture.p_picture;
     p_mb->i_structure = p_vpar->picture.i_structure;
-    p_mb->i_mb_x = i_mb_address % p_vpar->sequence.i_mb_width;
-    p_mb->i_mb_y = i_mb_address / p_vpar->sequence.i_mb_width;
+    p_mb->i_l_x = p_vpar->mb.i_l_x;
+    p_mb->i_l_y = p_vpar->mb.i_l_y;
+    p_mb->i_c_x = p_vpar->mb.i_c_x;
+    p_mb->i_c_y = p_vpar->mb.i_c_y;
     p_mb->i_chroma_nb_blocks = p_vpar->sequence.i_chroma_nb_blocks;
 
-    p_mb->i_lum_incr = p_vpar->picture.i_lum_incr;
-    p_mb->i_chroma_incr = p_vpar->picture.i_chroma_incr;
+    p_mb->i_l_stride = p_vpar->picture.i_l_stride;
+    p_mb->i_c_stride = p_vpar->picture.i_c_stride;
+
+    /* Update macroblock real position. */
+    p_vpar->mb.i_l_x += 16;
+    p_vpar->mb.i_l_y += (p_vpar->mb.i_l_x / p_vpar->sequence.i_width)
+                        * (2 - p_vpar->picture.b_frame_structure) * 16;
+    p_vpar->mb.i_l_x %= p_vpar->sequence.i_width;
+
+    p_vpar->mb.i_c_x += p_vpar->sequence.i_chroma_mb_width;
+    p_vpar->mb.i_c_y += (p_vpar->mb.i_c_x / p_vpar->sequence.i_chroma_width)
+                        * (2 - p_vpar->picture.b_frame_structure)
+                        * p_vpar->sequence.i_chroma_mb_height;
+    p_vpar->mb.i_c_x %= p_vpar->sequence.i_chroma_width;
 }
 
 /*****************************************************************************
@@ -288,7 +326,7 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
      * has to be dropped, take care if you use scalable streams. */
     /* DumpBits( &p_vpar->bit_stream, 2 ); */
     
-    if( !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD || MB_MOTION_BACKWARD))
+    if( !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD | MB_MOTION_BACKWARD))
         || p_vpar->picture.b_frame_pred_frame_dct )
     {
         /* If mb_type has neither MOTION_FORWARD nor MOTION_BACKWARD, this
@@ -307,15 +345,18 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
     p_vpar->mb.i_mv_format = ppi_mv_format[p_vpar->picture.b_frame_structure]
                                           [p_vpar->mb.i_motion_type];
 
+    p_vpar->mb.b_dct_type = 0;
     if( (p_vpar->picture.i_structure == FRAME_STRUCTURE) &&
         (!p_vpar->picture.b_frame_pred_frame_dct) &&
         (p_vpar->mb.i_mb_type & (MB_PATTERN|MB_INTRA)) )
     {
-        p_vpar->mb.b_dct_type = GetBits( &p_vpar->bit_stream, 1 );
-    }
-    else
-    {
-        p_vpar->mb.b_dct_type = 0;
+        if( p_vpar->mb.b_dct_type = GetBits( &p_vpar->bit_stream, 1 ) )
+        {
+            p_mb->i_l_stride <<= 1;
+	    p_mb->i_l_stride += 8;
+	    p_mb->i_c_stride <<= 1;
+	    p_mb->i_c_stride += 8;
+        }
     }
 }
 

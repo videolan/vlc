@@ -219,7 +219,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     if( ShowBits( &p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
     {
         int                         i_dummy;
-        static int                  pi_chroma_nb_blocks[4] = {0, 1, 2, 4};
         static f_chroma_pattern_t   ppf_chroma_pattern[4] =
                             {NULL, vpar_CodedPattern420,
                              vpar_CodedPattern422, vpar_CodedPattern444};
@@ -230,10 +229,6 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         DumpBits( &p_vpar->bit_stream, 12 );
         p_vpar->sequence.b_progressive = GetBits( &p_vpar->bit_stream, 1 );
         p_vpar->sequence.i_chroma_format = GetBits( &p_vpar->bit_stream, 2 );
-        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width
-                    >> (3-p_vpar->sequence.i_chroma_format);
-        p_vpar->sequence.i_chroma_nb_blocks = pi_chroma_nb_blocks
-                                    [p_vpar->sequence.i_chroma_format];
         p_vpar->sequence.pf_decode_pattern = ppf_chroma_pattern
                                     [p_vpar->sequence.i_chroma_format];
         p_vpar->sequence.i_width |= GetBits( &p_vpar->bit_stream, 2 ) << 12;
@@ -253,13 +248,12 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         /* It's an MPEG-1 stream. Put adequate parameters. */
         p_vpar->sequence.b_progressive = 1;
         p_vpar->sequence.i_chroma_format = CHROMA_420;
-        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 2;
-        p_vpar->sequence.i_chroma_nb_blocks = 2;
         p_vpar->sequence.pf_decode_pattern = vpar_CodedPattern420;
 
         p_vpar->sequence.pf_decode_mv = vpar_MPEG1MotionVector;
     }
 
+    /* Update sizes */
     p_vpar->sequence.i_mb_width = (p_vpar->sequence.i_width + 15) / 16;
     p_vpar->sequence.i_mb_height = (p_vpar->sequence.b_progressive) ?
                                    (p_vpar->sequence.i_height + 15) / 16 :
@@ -270,6 +264,30 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     p_vpar->sequence.i_height = (p_vpar->sequence.i_mb_height * 16);
     p_vpar->sequence.i_size = p_vpar->sequence.i_width
                                         * p_vpar->sequence.i_height;
+
+    /* Update chromatic information */
+    switch( p_vpar->sequence.i_chroma_format )
+    {
+    case CHROMA_420:
+        p_vpar->sequence.i_chroma_nb_blocks = 2;
+        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 2;
+        p_vpar->i_chroma_mb_width = 8;
+        p_vpar->i_chroma_mb_height = 8;
+        break;
+
+    case CHROMA_422:
+        p_vpar->sequence.i_chroma_nb_blocks = 4;
+        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width >> 1;
+        p_vpar->i_chroma_mb_width = 8;
+        p_vpar->i_chroma_mb_height = 16;
+        break;
+
+    case CHROMA_444:
+        p_vpar->sequence.i_chroma_nb_blocks = 8;
+        p_vpar->sequence.i_chroma_width = p_vpar->sequence.i_width;
+        p_vpar->i_chroma_mb_width = 16;
+        p_vpar->i_chroma_mb_height = 16;
+    }
 
     /* Slice Header functions */
     if( p_vpar->sequence.i_height <= 2800 )
@@ -481,10 +499,10 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         P_picture->date = vpar_SynchroDecode( p_vpar,
                                               p_vpar->picture.i_coding_type,
                                               i_structure );
-        p_vpar->picture.i_lum_incr = - 8 + ( p_vpar->sequence.i_width
-                    << ( i_structure != FRAME_STRUCTURE ) );
-        p_vpar->picture.i_chroma_incr = -8 + ( p_vpar->sequence.i_width
-                    << (( i_structure != FRAME_STRUCTURE ) +
+        p_vpar->picture.i_l_stride = - 8 + ( p_vpar->sequence.i_width
+                    << ( 1 - p_vpar->picture.b_frame_structure ) );
+        p_vpar->picture.i_c_stride = -8 + ( p_vpar->sequence.i_width
+                    << (( 1 - p_vpar->picture.b_frame_structure ) +
                         ( 3 - p_vpar->sequence.i_chroma_format )) );
 
         /* Update the reference pointers. */
@@ -498,12 +516,16 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     if( i_structure == BOTTOM_FIELD )
     {
         i_mb_base = p_vpar->sequence.i_mb_size >> 1;
+        p_vpar->mb.i_l_y = 16;
+        p_vpar->mb.i_c_y = p_vpar->sequence.i_chroma_mb_height;
     }
     else
     {
         i_mb_base = 0;
+        p_vpar->mb.i_l_y = p_vpar->mb.i_c_y = 0;
     }
     i_mb_address = 0;
+    p_vpar->mb.i_l_x = p_vpar->mb.i_c_x = 0;
 
     /* Extension and User data. */
     ExtensionAndUserData( p_vpar );
@@ -924,7 +946,7 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_ma
              = GetBits( &p_vpar->bit_stream, 8 );
     }
 
-#ifdef FOURIER_IDCT
+#ifdef VDEC_DFT
     /* Discrete Fourier Transform requires the quantization matrices to
      * be normalized before using them. */
     vdec_NormQuantMatrix( p_matrix->pi_matrix );

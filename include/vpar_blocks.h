@@ -21,11 +21,13 @@
 typedef struct macroblock_s
 {
     picture_t *             p_picture;
-    int                     i_mb_x, i_mb_y;
     int                     i_structure;
     int                     i_l_x, i_l_y;    /* position of macroblock (lum) */
     int                     i_c_x, i_c_y; /* position of macroblock (chroma) */
     int                     i_chroma_nb_blocks;  /* nb of bks for a chr comp */
+    int                     i_l_stride;           /* number of data_t to ignore
+					           * when changing lines     */
+    int                     i_c_stride;                  /* idem, for chroma */
 
     /* IDCT information */
     elem_t                  ppi_blocks[12][64];                    /* blocks */
@@ -47,9 +49,9 @@ typedef struct macroblock_s
     int                     pi_motion_vectors_forw_bot[2];
 
     /* AddBlock information */
-    f_addb_t                pf_addb[12];
-    data_t *                p_data[12];    /* positions of blocks in picture */
-    int                     i_lum_incr, i_chroma_incr;
+    f_addb_t                pf_addb[12];      /* pointer to the Add function */
+    data_t *                p_data[12];              /* pointer to the position
+					              * in the final picture */
 } macroblock_t;
 
 /*****************************************************************************
@@ -60,6 +62,8 @@ typedef struct
     int                     i_mb_type, i_motion_type, i_mv_count, i_mv_format;
     int                     i_coded_block_pattern;
     boolean_t               b_dct_type;
+
+    int                     i_l_x, i_l_y, i_c_x, i_c_y;
 } macroblock_parsing_t;
 
 /*****************************************************************************

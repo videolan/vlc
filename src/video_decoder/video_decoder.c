@@ -242,13 +242,14 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
         /*
          * Inverse DCT (ISO/IEC 13818-2 section Annex A)
          */
-        (p_mb->pf_idct[i_b])( p_mb->ppi_blocks[i_b], p_mb->pi_sparse_pos[i_b] );
+        (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
+                              p_mb->pi_sparse_pos[i_b] );
 
         /*
          * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
          */
         (p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
-                               p_mb->p_data[i_b], p_mb->i_lum_incr );
+                               p_mb->p_data[i_b], p_mb->i_l_stride );
     }
 
     /* chrominance */
@@ -257,13 +258,14 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
         /*
          * Inverse DCT (ISO/IEC 13818-2 section Annex A)
          */
-        (p_mb->pf_idct[i_b])( p_mb->ppi_blocks[i_b], p_mb->pi_sparse_pos[i_b] );
+        (p_mb->pf_idct[i_b])( p_vdec, p_mb->ppi_blocks[i_b],
+                              p_mb->pi_sparse_pos[i_b] );
 
         /*
          * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
          */
         (p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
-                               p_mb->p_data[i_b], p_mb->i_chroma_incr );
+                               p_mb->p_data[i_b], p_mb->i_c_stride );
     }
 
     /*

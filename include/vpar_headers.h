@@ -42,12 +42,10 @@ extern int *    pi_default_nonintra_quant;
  *****************************************************************************/
 typedef struct sequence_s
 {
-    u32                 i_height, i_width, i_chroma_width, i_size;
+    u32                 i_height, i_width, i_size;
     u32                 i_mb_height, i_mb_width, i_mb_size;
     unsigned int        i_aspect_ratio;
     double              d_frame_rate;
-    unsigned int        i_chroma_format;
-    int                 i_chroma_nb_blocks;
     boolean_t           b_mpeg2;
     boolean_t           b_progressive;
     unsigned int        i_scalable_mode;
@@ -56,6 +54,12 @@ typedef struct sequence_s
     quant_matrix_t      chroma_intra_quant, chroma_nonintra_quant;
     void                (*pf_decode_mv)( struct vpar_thread_s *, int );
     f_chroma_pattern_t  pf_decode_pattern;
+
+    /* Chromatic information */
+    unsigned int        i_chroma_format;
+    int                 i_chroma_nb_blocks;
+    u32                 i_chroma_width;
+    u32                 i_chroma_mb_width, i_chroma_mb_height;
 
     /* Parser context */
     picture_t *         p_forward;
@@ -85,7 +89,7 @@ typedef struct picture_parsing_s
     boolean_t           b_alternate_scan, b_progressive_frame;
     boolean_t           b_top_field_first, b_concealment_mv;
     boolean_t           b_repeat_first_field;
-    int                 i_lum_incr, i_chroma_incr;
+    int                 i_l_stride, i_c_stride;
 
     /* Used for second field management */
     int                 i_current_structure;
