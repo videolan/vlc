@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.4 2002/10/20 12:23:47 massiot Exp $
+ * $Id: directx.c,v 1.5 2002/10/28 22:31:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -49,6 +49,13 @@
 DEFINE_GUID(IID_IDirectSoundNotify, 0xb0210783, 0x89cd, 0x11d0, 0xaf, 0x8, 0x0, 0xa0, 0xc9, 0x25, 0xcd, 0x16);
 
 /*****************************************************************************
+ * Useful macros
+ *****************************************************************************/
+#ifndef WAVE_FORMAT_IEEE_FLOAT
+#   define WAVE_FORMAT_IEEE_FLOAT 0x0003
+#endif
+
+/*****************************************************************************
  * notification_thread_t: DirectX event thread
  *****************************************************************************/
 typedef struct notification_thread_t
@@ -81,8 +88,6 @@ struct aout_sys_t
     LPDIRECTSOUNDNOTIFY p_dsnotify;         /* the position notify interface */
 
     HINSTANCE           hdsound_dll;      /* handle of the opened dsound dll */
-
-    vlc_mutex_t buffer_lock;                            /* audio buffer lock */
 
     notification_thread_t * p_notif;                 /* DirectSoundThread id */
 
@@ -139,7 +144,6 @@ static int OpenAudio( vlc_object_t *p_this )
     p_aout->output.p_sys->p_dsbuffer = NULL;
     p_aout->output.p_sys->p_dsnotify = NULL;
     p_aout->output.p_sys->p_notif = NULL;
-    vlc_mutex_init( p_aout, &p_aout->output.p_sys->buffer_lock );
 
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
@@ -177,17 +181,19 @@ static int OpenAudio( vlc_object_t *p_this )
     p_aout->output.p_sys->p_notif->p_events[1].hEventNotify =
         CreateEvent( NULL, FALSE, FALSE, NULL );
 
-    vlc_mutex_lock( &p_aout->output.p_sys->buffer_lock );
-
     /* then create a new secondary buffer */
+    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
     if( DirectxCreateSecondaryBuffer( p_aout ) )
     {
-        msg_Err( p_aout, "cannot create buffer" );
-        vlc_mutex_unlock( &p_aout->output.p_sys->buffer_lock );
-        return 1;
-    }
+        msg_Err( p_aout, "cannot create WAVE_FORMAT_IEEE_FLOAT buffer" );
 
-    vlc_mutex_unlock( &p_aout->output.p_sys->buffer_lock );
+        p_aout->output.output.i_format = VLC_FOURCC('s','1','6','l');
+        if( DirectxCreateSecondaryBuffer( p_aout ) )
+        {
+            msg_Err( p_aout, "cannot create WAVE_FORMAT_PCM buffer" );
+            return 1;
+        }
+    }
 
     /* start playing the buffer */
     dsresult = IDirectSoundBuffer_Play( p_aout->output.p_sys->p_dsbuffer,
@@ -211,7 +217,8 @@ static int OpenAudio( vlc_object_t *p_this )
     msg_Dbg( p_aout, "creating DirectSoundThread" );
     if( vlc_thread_create( p_aout->output.p_sys->p_notif,
                            "DirectSound Notification Thread",
-                           DirectSoundThread, VLC_THREAD_PRIORITY_OUTPUT, 1 ) )
+                           DirectSoundThread,
+                           THREAD_PRIORITY_TIME_CRITICAL, 1 ) )
     {
         msg_Err( p_aout, "cannot create DirectSoundThread" );
         goto error;
@@ -361,14 +368,25 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
 
     /* First set the buffer format */
     memset(&waveformat, 0, sizeof(WAVEFORMATEX));
-    waveformat.wFormatTag      = WAVE_FORMAT_PCM;
+    switch( p_aout->output.output.i_format )
+    {
+    case VLC_FOURCC('s','1','6','l'):
+        waveformat.wFormatTag     = WAVE_FORMAT_PCM;
+        waveformat.wBitsPerSample = 16;
+        break;
+    case VLC_FOURCC('f','l','3','2'):
+        waveformat.wFormatTag     = WAVE_FORMAT_IEEE_FLOAT;
+        waveformat.wBitsPerSample = sizeof(float) * 8;
+        break;
+    }
     waveformat.nChannels       = i_nb_channels;
     waveformat.nSamplesPerSec  = p_aout->output.output.i_rate;
-    waveformat.wBitsPerSample  = 16;
     waveformat.nBlockAlign     = waveformat.wBitsPerSample / 8 *
                                  waveformat.nChannels;
     waveformat.nAvgBytesPerSec = waveformat.nSamplesPerSec *
                                      waveformat.nBlockAlign;
+
+    aout_FormatPrepare( &p_aout->output.output );
 
     /* Then fill in the descriptor */
     memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
@@ -376,8 +394,8 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
     dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2/* Better position accuracy */
                     | DSBCAPS_CTRLPOSITIONNOTIFY     /* We need notification */
                     | DSBCAPS_GLOBALFOCUS;      /* Allows background playing */
-    dsbdesc.dwBufferBytes = FRAME_SIZE * 2 /* frames*/ *      /* buffer size */
-                            sizeof(s16) * i_nb_channels;
+    dsbdesc.dwBufferBytes = FRAME_SIZE * 2 /* frames*/        /* buffer size */
+                            * p_aout->output.output.i_bytes_per_frame;
     dsbdesc.lpwfxFormat = &waveformat;
  
     if( IDirectSound_CreateSoundBuffer( p_aout->output.p_sys->p_dsobject,
@@ -390,8 +408,8 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
     }
 
     /* backup the size of a frame */
-    p_aout->output.p_sys->p_notif->i_buffer_size = FRAME_SIZE * sizeof(s16)
-                                            * i_nb_channels;
+    p_aout->output.p_sys->p_notif->i_buffer_size = FRAME_SIZE *
+        p_aout->output.output.i_bytes_per_frame;
 
     memset(&dsbcaps, 0, sizeof(DSBCAPS));
     dsbcaps.dwSize = sizeof(DSBCAPS);
@@ -423,7 +441,7 @@ static int DirectxCreateSecondaryBuffer( aout_instance_t *p_aout )
         msg_Err( p_aout, "cannot set position Notification" );
         goto error;
     }
-    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+
     p_aout->output.i_nb_samples = FRAME_SIZE;
 
     return 0;
@@ -492,18 +510,14 @@ static void DirectSoundThread( notification_thread_t *p_notif )
         void *p_write_position, *p_wrap_around;
         long l_bytes1, l_bytes2;
         aout_buffer_t * p_buffer;
+        long l_play_position;
 
         /* wait for the position notification */
         i_which_event = WaitForMultipleObjects( 2, notification_events, 0,
                                                 INFINITE ) - WAIT_OBJECT_0;
 
-        vlc_mutex_lock( &p_aout->output.p_sys->buffer_lock );
-
         if( p_notif->b_die )
-        {
-            vlc_mutex_unlock( &p_aout->output.p_sys->buffer_lock );
             break;
-        }
 
         /* Before copying anything, we have to lock the buffer */
         dsresult = IDirectSoundBuffer_Lock(
@@ -533,13 +547,35 @@ static void DirectSoundThread( notification_thread_t *p_notif )
         if( dsresult != DS_OK )
         {
             msg_Warn( p_notif, "cannot lock buffer" );
-            vlc_mutex_unlock( &p_aout->output.p_sys->buffer_lock );
             continue;
         }
 
-        /* We also take into account the latency instead of just mdate() */
+        /* We take into account the current latency */
+        if( IDirectSoundBuffer_GetCurrentPosition(
+                p_aout->output.p_sys->p_dsbuffer,
+                &l_play_position, NULL ) == DS_OK )
+        {
+            if( l_play_position > (i_which_event * FRAME_SIZE)
+                  && l_play_position < ((i_which_event+1) * FRAME_SIZE) )
+            {
+                l_play_position = FRAME_SIZE - ( l_play_position /
+                                      p_aout->output.output.i_bytes_per_frame %
+                                      FRAME_SIZE );
+            }
+            else
+            {
+                l_play_position = 2 * FRAME_SIZE - ( l_play_position /
+                                      p_aout->output.output.i_bytes_per_frame %
+                                      FRAME_SIZE );
+            }
+        }
+        else
+        {
+            l_play_position = FRAME_SIZE;
+        }
+
         p_buffer = aout_OutputNextBuffer( p_aout,
-            mdate() + 1000000 / p_aout->output.output.i_rate * FRAME_SIZE,
+            mdate() + 1000000 / p_aout->output.output.i_rate * l_play_position,
             VLC_FALSE );
 
         /* Now do the actual memcpy into the circular buffer */
@@ -562,8 +598,6 @@ static void DirectSoundThread( notification_thread_t *p_notif )
         IDirectSoundBuffer_Unlock( p_aout->output.p_sys->p_dsbuffer,
                         p_write_position, l_bytes1, p_wrap_around, l_bytes2 );
 
-        vlc_mutex_unlock( &p_aout->output.p_sys->buffer_lock );
-
     }
 
     /* free the events */
@@ -571,5 +605,4 @@ static void DirectSoundThread( notification_thread_t *p_notif )
     CloseHandle( notification_events[1] );
 
     msg_Dbg( p_notif, "DirectSoundThread exiting" );
-
 }

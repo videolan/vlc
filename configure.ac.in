@@ -1393,7 +1393,7 @@ if test "x${enable_vorbis}" != "xno"
 then
   AC_CHECK_HEADERS(vorbis/codec.h, [
     PLUGINS="${PLUGINS} vorbis"
-    LDFLAGS_vorbis="${LDFLAGS_vorbis} -lvorbis"
+    LDFLAGS_vorbis="${LDFLAGS_vorbis} -lvorbis -logg"
    ],[])
 fi
 

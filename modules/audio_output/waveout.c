@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.9 2002/10/20 12:23:47 massiot Exp $
+ * $Id: waveout.c,v 1.10 2002/10/28 22:31:49 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -37,7 +37,15 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-#define FRAME_SIZE 2048              /* The size is in samples, not in bytes */
+#define FRAME_SIZE 1024              /* The size is in samples, not in bytes */
+#define FRAMES_NUM 4
+
+/*****************************************************************************
+ * Useful macros
+ *****************************************************************************/
+#ifndef WAVE_FORMAT_IEEE_FLOAT
+#   define WAVE_FORMAT_IEEE_FLOAT 0x0003
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -76,7 +84,7 @@ struct aout_sys_t
 
     WAVEFORMATEX waveformat;                                 /* audio format */
 
-    WAVEHDR waveheader[2];
+    WAVEHDR waveheader[FRAMES_NUM];
 
     int i_buffer_size;
 
@@ -91,8 +99,7 @@ struct aout_sys_t
 static int Open( vlc_object_t *p_this )
 {   
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    aout_buffer_t *p_buffer;
-    int i_nb_channels;
+    int i_nb_channels, i;
 
     /* Allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
@@ -116,29 +123,28 @@ static int Open( vlc_object_t *p_this )
 
     /* We need to open the device with default values to be sure it is
      * available */
-    if ( OpenWaveOut( p_aout, WAVE_FORMAT_PCM, i_nb_channels,
+    p_aout->output.output.i_format = VLC_FOURCC('f','l','3','2');
+    if ( OpenWaveOut( p_aout, WAVE_FORMAT_IEEE_FLOAT, i_nb_channels,
                       p_aout->output.output.i_rate ) )
     {
-        msg_Err( p_aout, "cannot open waveout audio device with output "
-                         "rate (%i)",
-                          p_aout->output.output.i_rate );
-        return VLC_EGENERIC;
+        msg_Err( p_aout, "Audio device doesn't allow WAVE_FORMAT_IEEE_FLOAT" );
 
+        p_aout->output.output.i_format = VLC_FOURCC('s','1','6','l');
         if ( OpenWaveOut( p_aout, WAVE_FORMAT_PCM, i_nb_channels,
-                          44100 ) )
+                          p_aout->output.output.i_rate ) )
         {
-            msg_Err( p_aout, "cannot open waveout audio device with output "
-                             "rate (44100)" );
+            msg_Err( p_aout, "cannot open waveout audio device" );
             return VLC_EGENERIC;
         }
-        p_aout->output.output.i_rate = 44100;
     }
 
     waveOutReset( p_aout->output.p_sys->h_waveout );
 
     /* Calculate the frame size in bytes */
-    p_aout->output.p_sys->i_buffer_size = FRAME_SIZE * sizeof(s16)
-                                  * p_aout->output.p_sys->waveformat.nChannels;
+    p_aout->output.i_nb_samples = FRAME_SIZE;
+    aout_FormatPrepare( &p_aout->output.output );
+    p_aout->output.p_sys->i_buffer_size = FRAME_SIZE *
+                                      p_aout->output.output.i_bytes_per_frame;
     /* Allocate silence buffer */
     p_aout->output.p_sys->p_silence_buffer =
         calloc( p_aout->output.p_sys->i_buffer_size, 1 );
@@ -148,20 +154,13 @@ static int Open( vlc_object_t *p_this )
         return 1;
     }
 
-    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-    p_aout->output.i_nb_samples = FRAME_SIZE;
-
     /* We need to kick off the playback in order to have the callback properly
      * working */
-    PlayWaveOut( p_aout, p_aout->output.p_sys->h_waveout,
-                 &p_aout->output.p_sys->waveheader[0], NULL );
-
-    p_buffer = aout_OutputNextBuffer( p_aout,
-        mdate() + 1000000 / p_aout->output.output.i_rate * FRAME_SIZE,
-        VLC_FALSE );
-    PlayWaveOut( p_aout, p_aout->output.p_sys->h_waveout,
-                 &p_aout->output.p_sys->waveheader[1], p_buffer );
-
+    for( i = 0; i < FRAMES_NUM; i++ )
+    {
+        PlayWaveOut( p_aout, p_aout->output.p_sys->h_waveout,
+                     &p_aout->output.p_sys->waveheader[i], NULL );
+    }
     return 0;
 }
 
@@ -183,7 +182,16 @@ static void Close( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
 
     /* Before calling waveOutClose we must reset the device */
-    waveOutReset( p_aout->output.p_sys->h_waveout );
+    p_aout->b_die = VLC_TRUE;
+    //Hmmm, waveOutReset never seems to return... why ???
+    //waveOutReset( p_aout->output.p_sys->h_waveout );
+
+    /* Wait for the waveout buffers to be freed */
+    while( !(p_aout->output.p_sys->waveheader[0].dwFlags & WHDR_DONE) || 
+           !(p_aout->output.p_sys->waveheader[1].dwFlags & WHDR_DONE) )
+    {
+        msleep( 1000 );
+    }
 
     /* Close the device */
     if( waveOutClose( p_aout->output.p_sys->h_waveout ) != MMSYSERR_NOERROR )
@@ -209,7 +217,17 @@ static int OpenWaveOut( aout_instance_t *p_aout, int i_format,
     p_aout->output.p_sys->waveformat.wFormatTag = i_format;
     p_aout->output.p_sys->waveformat.nChannels = i_channels;
     p_aout->output.p_sys->waveformat.nSamplesPerSec = i_rate;
-    p_aout->output.p_sys->waveformat.wBitsPerSample = 16;
+
+    switch( i_format )
+    {
+    case WAVE_FORMAT_PCM:
+        p_aout->output.p_sys->waveformat.wBitsPerSample = 16;
+        break;
+    case WAVE_FORMAT_IEEE_FLOAT:
+        p_aout->output.p_sys->waveformat.wBitsPerSample = sizeof(float) * 8;
+        break;
+    }
+
     p_aout->output.p_sys->waveformat.nBlockAlign =
         p_aout->output.p_sys->waveformat.wBitsPerSample / 8 * i_channels;
     p_aout->output.p_sys->waveformat.nAvgBytesPerSec  =
@@ -290,7 +308,9 @@ static void CALLBACK WaveOutCallback( HWAVEOUT h_waveout, UINT uMsg,
     if( p_waveheader->dwUser )
         aout_BufferFree( (aout_buffer_t *)p_waveheader->dwUser );
 
-    /* Take into account WaveOut latency instead of just mdate() */
+    if( p_aout->b_die ) return;
+
+    /* Take into account WaveOut latency ( 1 FRAME ) */
     p_buffer = aout_OutputNextBuffer( p_aout,
         mdate() + 1000000 / p_aout->output.output.i_rate * FRAME_SIZE,
         VLC_FALSE );
