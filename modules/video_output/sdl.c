@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.14 2003/10/25 00:49:14 sam Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -405,11 +405,9 @@ static int Manage( vout_thread_t *p_vout )
                 break;
 
             case 4:
-                input_Seek( p_vout, 15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
             case 5:
-                input_Seek( p_vout, -15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
             }
             break;
@@ -475,19 +473,15 @@ static int Manage( vout_thread_t *p_vout )
                 break;
 
             case SDLK_LEFT:
-                input_Seek( p_vout, -5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
             case SDLK_RIGHT:
-                input_Seek( p_vout, 5, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
             case SDLK_UP:
-                input_Seek( p_vout, 60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
             case SDLK_DOWN:
-                input_Seek( p_vout, -60, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                 break;
 
             case SDLK_b:

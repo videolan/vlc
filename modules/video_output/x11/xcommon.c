@@ -632,14 +632,12 @@ static int ManageVideo( vout_thread_t *p_vout )
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int |= 8;
                     var_Set( p_vout, "mouse-button-down", val );
-                    input_Seek( p_vout, 15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                     break;
 
                 case Button5:
                     var_Get( p_vout, "mouse-button-down", &val );
                     val.i_int |= 16;
                     var_Set( p_vout, "mouse-button-down", val );
-                    input_Seek( p_vout, -15, INPUT_SEEK_SECONDS | INPUT_SEEK_CUR );
                     break;
             }
         }
