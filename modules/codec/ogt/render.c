@@ -1,8 +1,8 @@
 /*****************************************************************************
- * render.c : Philips OGT (SVCD Subtitle) renderer
+ * render.c : Philips OGT and CVD (VCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.15 2004/01/16 13:32:37 rocky Exp $
+ * $Id: render.c,v 1.16 2004/01/20 13:31:15 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -58,6 +58,8 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
 static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop );
+static void RenderRGB2( vout_thread_t *p_vout, picture_t *p_pic,
+                        const subpicture_t *p_spu, vlc_bool_t b_crop );
 
 /*****************************************************************************
  * RenderSPU: draw an SPU on a picture
@@ -108,7 +110,9 @@ void VCDSubRender( vout_thread_t *p_vout, picture_t *p_pic,
            Used in ASCII Art. 
         */
         case VLC_FOURCC('R','G','B','2'):
-            msg_Err( p_vout, "RGB2 not implemented yet" );
+            RenderRGB2( p_vout, p_pic, p_spu, p_spu->p_sys->b_crop );
+          
+          /*msg_Err( p_vout, "RGB2 not implemented yet" );*/
 	    break;
 
         default:
@@ -307,18 +311,31 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
   spans the two pixels.
 */
 
+/* 
+   Should be same as p_pic->p_format.i_bits_per_pixel / 8. But since
+   we know it here, why try to compute it?
+*/
+#define BYTES_PER_PIXEL 4
+
 static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
   /* Common variables */
   uint8_t *p_pixel_base;
-  ogt_yuvt_t *p_source;
+  ogt_yuvt_t *p_source = (ogt_yuvt_t *) p_spu->p_sys->p_data;;
 
-  int i_x, i_y;
+#ifdef EXTRA_CHECKING
+  ogt_yuvt_t *p_source_end = (ogt_yuvt_t *)p_spu->p_sys->p_data + 
+    (p_spu->i_width * p_spu->i_height);
+#endif
+
+  uint16_t i_x, i_y;
+
+  /* Make sure we start on a word (4-byte) boundary. */
+  uint16_t i_spu_x = (p_spu->i_x & 0xFFFE) * 2;
 
   /* Crop-specific */
   int i_x_start, i_y_start, i_x_end, i_y_end;
-  /* int i=0; */
 
   const struct subpicture_sys_t *p_sys = p_spu->p_sys;
   
@@ -329,16 +346,14 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 
   
   p_pixel_base = p_pic->p->p_pixels + 
-               + ( p_spu->i_y * p_pic->p->i_pitch ) + p_spu->i_x * 2;
-  
+    + ( p_spu->i_y * p_pic->p->i_pitch ) + i_spu_x;
+
   i_x_start = p_sys->i_x_start;
   i_y_start = p_sys->i_y_start * p_pic->p->i_pitch;
   
   i_x_end   = p_sys->i_x_end;
   i_y_end   = p_sys->i_y_end   * p_pic->p->i_pitch;
 
-  p_source = (ogt_yuvt_t *)p_sys->p_data;
-  
   /* Draw until we reach the bottom of the subtitle */
   for( i_y = 0; 
        i_y < p_spu->i_height * p_pic->p[Y_PLANE].i_pitch ;
@@ -352,14 +367,25 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
         if ( i_y > i_y_end ) break;
         if (i_x_start) {
           i_x = i_x_start;
-          p_source += i_x_start;
+          p_source += (i_x_start*2);
         }
       }
   
 
-      /* Draw until we reach the end of the line */
-      for( ;  i_x < p_spu->i_width; i_x++, p_source++ )
+      /* Draw until we reach the end of the line. Each output pixel
+         is a combination of two source pixels. 
+       */
+      for( i_x = 0;  i_x < p_spu->i_width / 2; i_x++, p_source +=2 )
 	{
+          uint16_t i_avg_tr; /* transparancy sort of averaged over 2 pixels*/
+
+#if EXTRA_CHECKING
+          if (p_source > p_source_end-1) {
+            msg_Err( p_vout, "Trying to access beyond subtitle x: %d y: %d",
+                     i_x, i_y);
+            return;
+          }
+#endif
 
 	  if( b_crop ) {
 
@@ -368,13 +394,22 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 
             if ( i_x > i_x_end )
 	    {
-	      p_source += p_spu->i_width - i_x;
+	      p_source += p_spu->i_width - (i_x*2);
               break;
 	    }
           }
   
 	  
-	  switch( p_source->s.t )
+          /* Favor opaque subtitle pixels. */
+	  if ( (p_source->s.t == 0) && (p_source+1)->s.t == MAX_ALPHA )
+            i_avg_tr = (p_source+1)->s.t;
+          else if ( (p_source->s.t == MAX_ALPHA) && (p_source+1)->s.t == 0 )
+            i_avg_tr = p_source->s.t;
+          else 
+            i_avg_tr = ( p_source->s.t + (p_source+1)->s.t ) / 2;
+          
+
+	  switch( i_avg_tr )
 	    {
 	    case 0x00: 
 	      /* Completely transparent. Don't change pixel. */
@@ -386,13 +421,29 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		   pixel with subtitle pixel. */
 		
 		/* This is the location that's going to get changed.*/
-		uint8_t *p_pixel = p_pixel_base_y + i_x * 2;
-		
+		uint8_t *p_pixel = p_pixel_base_y + i_x * BYTES_PER_PIXEL;
+		uint8_t i_avg_u;
+		uint8_t i_avg_v;
+
+                /* Favor opaque subtitle pixel. */
+                if (p_source->s.t == MAX_ALPHA ) {
+                  i_avg_u = p_source->plane[U_PLANE] ;
+                  i_avg_v = p_source->plane[V_PLANE] ;
+                } else if ( (p_source+1)->s.t == MAX_ALPHA ) {
+                  i_avg_u = (p_source+1)->plane[U_PLANE] ;
+                  i_avg_v = (p_source+1)->plane[V_PLANE] ;
+                } else {
+                  i_avg_u = ( p_source->plane[U_PLANE] 
+                              + (p_source+1)->plane[U_PLANE] ) / 2;
+                  i_avg_v = ( p_source->plane[V_PLANE] 
+                              + (p_source+1)->plane[V_PLANE] ) / 2;
+                }
+
 		/* draw a two contiguous pixels: 2 Y values, 1 U, and 1 V. */
 		*p_pixel++ = p_source->plane[Y_PLANE] ;
-                *p_pixel++ = p_source->plane[V_PLANE] ;
-		*p_pixel++ = p_source->plane[Y_PLANE] ;
-                *p_pixel++ = p_source->plane[U_PLANE] ;
+                *p_pixel++ = i_avg_u;
+		*p_pixel++ = (p_source+1)->plane[Y_PLANE] ;
+                *p_pixel++ = i_avg_v;
                 
 		break;
 	      }
@@ -402,8 +453,11 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		/* Blend in underlying subtitle pixels. */
 		
 		/* This is the location that's going to get changed.*/
-		uint8_t *p_pixel = p_pixel_base_y + i_x * 2;
-
+		uint8_t *p_pixel = p_pixel_base_y + i_x * BYTES_PER_PIXEL;
+		uint8_t i_avg_u = ( p_source->plane[U_PLANE] 
+                                    + (p_source+1)->plane[U_PLANE] ) / 2;
+		uint8_t i_avg_v = ( p_source->plane[V_PLANE] 
+                                    + (p_source+1)->plane[V_PLANE] ) / 2;
 
 		/* This is the weighted part of the two subtitle
 		   pixels. The color plane is 8 bits and transparancy
@@ -413,6 +467,10 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		  (uint16_t) ( p_source->plane[Y_PLANE] *
 			       (uint16_t) (p_source->s.t) );
 
+		uint16_t i_sub_color_Y2 = 
+		  (uint16_t) ( (p_source+1)->plane[Y_PLANE] *
+			       (uint16_t) ((p_source+1)->s.t) );
+
 		/* This is the weighted part of the underlying pixels.
 		   For the same reasons above, the result is up to 12
 		   bits.  However since the transparancies are
@@ -420,22 +478,23 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 		   will not exceed 12 bits.
 		*/
 		uint16_t i_sub_color_U = 
-		  (uint16_t) ( p_source->plane[U_PLANE] *
-			       (uint16_t) (p_source->s.t) );
+		  (uint16_t) ( i_avg_u * (uint16_t) i_avg_tr );
 		
 		uint16_t i_sub_color_V = 
-		  (uint16_t) ( p_source->plane[V_PLANE] *
-			       (uint16_t) (p_source->s.t) );
+		  (uint16_t) ( i_avg_v * (uint16_t) i_avg_tr );
 
 		uint16_t i_pixel_color_Y1 = 
 		  (uint16_t) ( *(p_pixel) * 
 			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+		uint16_t i_pixel_color_Y2 = 
+		  (uint16_t) ( *(p_pixel) * 
+			       (uint16_t) (MAX_ALPHA - (p_source+1)->s.t) ) ;
 		uint16_t i_pixel_color_U = 
 		  (uint16_t) ( *(p_pixel+1) * 
-			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+			       (uint16_t) (MAX_ALPHA - i_avg_tr) ) ;
 		uint16_t i_pixel_color_V = 
 		  (uint16_t) ( *(p_pixel+3) * 
-			       (uint16_t) (MAX_ALPHA - p_source->s.t) ) ;
+			       (uint16_t) (MAX_ALPHA - i_avg_tr) ) ;
 
 		/* draw a two contiguous pixels: 2 Y values, 1 U, and 1 V. */
 
@@ -449,12 +508,15 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 
 		*p_pixel++ = ( i_sub_color_Y1 + i_pixel_color_Y1 ) >> 4;
 		*p_pixel++ = ( i_sub_color_V + i_pixel_color_V ) >> 4;
-		*p_pixel++ = ( i_sub_color_Y1 + i_pixel_color_Y1 ) >> 4;
+		*p_pixel++ = ( i_sub_color_Y2 + i_pixel_color_Y2 ) >> 4;
 		*p_pixel++ = ( i_sub_color_U + i_pixel_color_U ) >> 4;
 		break;
 	      }
 	    }
 	}
+
+      /* For an odd width source, we'll just have to drop off a pixel. */
+      if (p_spu->i_width % 2) p_source++;
     }
 }
 
@@ -502,9 +564,10 @@ yuv2rgb555(ogt_yuvt_t *p_yuv, uint8_t *p_rgb1, uint8_t *p_rgb2 )
 }
 
 /* 
-   Should be Same as p_pic->p_format.i_bits_per_pixel / 8. But since
+   Should be same as p_pic->p_format.i_bits_per_pixel / 8. But since
    we know it here, why try to compute it?
 */
+#undef BYTES_PER_PIXEL
 #define BYTES_PER_PIXEL 2
 
 static void 
@@ -967,6 +1030,156 @@ RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
 		}
 	    }
 	}
+    }
+}
+
+/* 
+   Should be same as p_pic->p_format.i_bits_per_pixel / 8. But since
+   we know it here, why try to compute it?
+*/
+#undef  BYTES_PER_PIXEL
+#define BYTES_PER_PIXEL 1
+
+static void 
+RenderRGB2( vout_thread_t *p_vout, picture_t *p_pic,
+            const subpicture_t *p_spu, vlc_bool_t b_crop )
+{
+    /* Common variables */
+    uint8_t *p_pixel_base;
+    ogt_yuvt_t *p_src_start = (ogt_yuvt_t *)p_spu->p_sys->p_data;
+    ogt_yuvt_t *p_src_end   = &p_src_start[p_spu->i_height * p_spu->i_width];
+    ogt_yuvt_t *p_source;
+
+    int i_x, i_y;
+    int i_y_src;
+
+    /* RGB-specific */
+    int i_xscale, i_yscale, i_width, i_height, i_ytmp;
+
+    /* Crop-specific */
+    int i_x_start, i_y_start, i_x_end, i_y_end;
+
+    struct subpicture_sys_t *p_sys = p_spu->p_sys;
+
+    i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
+    i_yscale = ( p_vout->output.i_height << 6 ) / p_vout->render.i_height;
+
+    dbg_print( (DECODE_DBG_CALL|DECODE_DBG_RENDER), 
+	       "spu: %dx%d, scaled: %dx%d, vout render: %dx%d, scale %dx%d", 
+	       p_spu->i_width,  p_spu->i_height, 
+	       p_vout->output.i_width, p_vout->output.i_height,
+	       p_vout->render.i_width, p_vout->render.i_height,
+	       i_xscale, i_yscale
+	       );
+
+    i_width  = p_spu->i_width  * i_xscale;
+    i_height = p_spu->i_height * i_yscale;
+
+    /* Set where we will start blending subtitle from using
+       the picture coordinates subtitle offsets
+    */
+    p_pixel_base = p_pic->p->p_pixels 
+              + ( (p_spu->i_x * i_xscale) >> 6 ) * BYTES_PER_PIXEL
+              + ( (p_spu->i_y * i_yscale) >> 6 ) * p_pic->p->i_pitch;
+
+    i_x_start = p_sys->i_x_start;
+    i_y_start = i_yscale * p_sys->i_y_start;
+    i_x_end   = p_sys->i_x_end;
+    i_y_end   = i_yscale * p_sys->i_y_end;
+
+    p_source = (ogt_yuvt_t *)p_sys->p_data;
+  
+    /* Draw until we reach the bottom of the subtitle */
+    i_y = 0;
+    for( i_y_src = 0 ; i_y_src < p_spu->i_height * p_spu->i_width; 
+         i_y_src += p_spu->i_width )
+      {
+	uint8_t *p_pixel_base_y;
+        i_ytmp = i_y >> 6;
+        i_y += i_yscale;
+	p_pixel_base_y = p_pixel_base + (i_ytmp * p_pic->p->i_pitch);
+	i_x = 0;
+        
+        if ( b_crop ) {
+          if ( i_y > i_y_end ) break;
+          if (i_x_start) {
+            i_x = i_x_start;
+            p_source += i_x_start;
+          }
+        }
+        
+        /* Draw until we reach the end of the line */
+        for( ; i_x < p_spu->i_width; i_x ++, p_source++ )
+          {
+            
+#if 0              
+            uint8_t *p=(uint8_t *) p_source;
+            printf("+++ %02x %02x %02x %02x\n", 
+                   p[0], p[1], p[2], p[3]);
+#endif
+            
+            if( b_crop ) {
+              
+              /* FIXME: y cropping should be dealt with outside of this 
+                 loop.*/
+              if ( i_y < i_y_start) continue;
+              
+              if ( i_x > i_x_end )
+                {
+                  p_source += p_spu->i_width - i_x;
+                  break;
+                }
+            }
+            
+            if (p_source >= p_src_end) {
+              msg_Err( p_vout, "Trying to access beyond subtitle %dx%d %d",
+                       i_x, i_y / i_yscale, i_height);
+              return;
+            }
+            
+            switch( p_source->s.t )
+              {
+              case 0x00:
+                /* Completely transparent. Don't change pixel. */
+                break;
+		
+              default:
+              case MAX_ALPHA:
+                {
+                  /* Completely opaque. Completely overwrite underlying
+                     pixel with subtitle pixel. */
+                  
+                  /* This is the location that's going to get changed.
+                   */
+                  uint8_t *p_dest = p_pixel_base_y + i_x;
+                  uint8_t rgb[4];
+                  
+                  yuv2rgb(p_source, rgb);
+                  *p_dest++ = 0xff;
+                  break;
+                }
+                
+#ifdef TRANSPARENCY_FINISHED
+              default:
+                {
+                  /* Blend in underlying pixel subtitle pixel. */
+		  
+                  /* To be able to scale correctly for full opaqueness, we
+                     add 1 to the alpha.  This means alpha value 0 won't
+                     be completely transparent and is not correct, but
+                     that's handled in a special case above anyway. */
+                  
+                  uint8_t *p_dest = p_pixel_base_y + i_x * BYTES_PER_PIXEL;
+                  uint8_t i_destalpha = MAX_ALPHA - p_source->s.t;
+                  uint8_t rgb[3];
+                  
+                  yuv2rgb(p_source, rgb);
+                  rv32_pack_blend(p_dest, rgb, dest_alpha, ALPHA_SCALEDOWN);
+                  break;
+                }
+#endif /*TRANSPARENCY_FINISHED*/
+              }
+          }
     }
 }
 
