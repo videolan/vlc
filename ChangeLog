@@ -4,6 +4,35 @@
 
 HEAD
 
+  * ./plugins/chroma/i420_yuy2.h: optimized the 420 planar-to-packed chroma
+    transformations. They're now PIC-friendly as well.
+  * ./plugins/macosx/intf_open.c: added Open disc and network panels.
+  * ./plugins/macosx/intf_controller.c: some changes to the control layout.
+  * ./src/interface/main.c: i_warning_level is set to 0 to avoid unwanted
+    verbose messages.
+  * ./po/en_GB.po: British translation.
+  * ./src/interface/main.c, ./src/misc/configuration.c: fixed the warning_level
+    handling: "-v" and "--warning" are now working as they should and they also
+    are cumulative (using -vv --warning=3 you end up with i_warning_level=5).
+  * ./src/misc/configuration.c: support for short options. -V, -A, -I
+    are back, and we also have -4 and -6 for IPv4/IPv6.
+  * ./src/misc/configuration.c: added config_GetFloatVariable() and
+    config_PutFloatVariable() to the config module.
+  * ./src/video_output/video_output.c: added a --zoom <float> config option.
+  * ./plugins/idct/idct_sparse.c: added a call to RestoreCPUState() in
+    InitIDCT() so that the FPU is still available after a call to InitIDCT().
+  * ./plugins/text/logger.c: deactivated stream buffering when logging to a
+    file.
+  * ./po/*: re-ran make update-po, fixed a few translations.
+  * ./po/fr.po: completed the french translation.
+  * ./plugins/gtk/gtk.glade, ./plugins/gtk/gnome.glade: synchronized a few
+    strings between the Gtk+ and GNOME modules to avoid duplicate translations.
+  * ./po/de.po: updated german translation. Many thanks to Thomas Graf.
+  * ./doc/vlc-howto.sgml: URL & mailing-lists corrections.
+  * ./plugins/gtk/gtk_preferences.c: the last category from the config options
+    wasn't displayed.
+  * po/nl.po: updated Netherlands translation of interface.
+  * po/fr.po: completed french translations.
   * ALL: internationalized all configuration strings.
   * ./src/interface/main.c: we now set LC_CTYPE to get the right charset.
   * ./src/misc/configuration.c: lots of simplifications in the code.

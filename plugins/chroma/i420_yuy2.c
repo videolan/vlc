@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.5 2002/04/19 13:56:10 sam Exp $
+ * $Id: i420_yuy2.c,v 1.6 2002/04/23 13:47:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -150,8 +150,8 @@ static int chroma_Init( vout_thread_t *p_vout )
         default:
             return -1;
     }
-    
-    return 0; 
+
+    return 0;
 }
 
 /*****************************************************************************
@@ -190,24 +190,12 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_chroma_i420_yuy2)
-            C_YUV420_YUYV( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_YUYV( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_YUYV( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_YUYV( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
+            C_YUV420_YUYV( );
+            C_YUV420_YUYV( );
+            C_YUV420_YUYV( );
+            C_YUV420_YUYV( );
 #else
-            __asm__( ".align 8" MMX_YUV420_YUYV
-                     : : "r" (p_line1), "r" (p_line2),
-                         "r" (p_y1), "r" (p_y2), "r" (p_u), "r" (p_v) ); 
-
-            p_line1 += 8; p_line2 += 8;
-            p_y1 += 4; p_y2 += 4; p_u += 2; p_v += 2;
-
-            __asm__( ".align 8" MMX_YUV420_YUYV
-                     : : "r" (p_line1), "r" (p_line2),
-                         "r" (p_y1), "r" (p_y2), "r" (p_u), "r" (p_v) ); 
-
-            p_line1 += 8; p_line2 += 8;
-            p_y1 += 4; p_y2 += 4; p_u += 2; p_v += 2;
+            MMX_CALL( MMX_YUV420_YUYV );
 #endif
         }
     }
@@ -237,24 +225,12 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_chroma_i420_yuy2)
-            C_YUV420_YVYU( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_YVYU( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_YVYU( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_YVYU( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
+            C_YUV420_YVYU( );
+            C_YUV420_YVYU( );
+            C_YUV420_YVYU( );
+            C_YUV420_YVYU( );
 #else
-            __asm__( ".align 8" MMX_YUV420_YVYU
-                     : : "r" (p_line1), "r" (p_line2),
-                         "r" (p_y1), "r" (p_y2), "r" (p_u), "r" (p_v) ); 
-
-            p_line1 += 8; p_line2 += 8;
-            p_y1 += 4; p_y2 += 4; p_u += 2; p_v += 2;
-
-            __asm__( ".align 8" MMX_YUV420_YVYU
-                     : : "r" (p_line1), "r" (p_line2),
-                         "r" (p_y1), "r" (p_y2), "r" (p_u), "r" (p_v) ); 
-
-            p_line1 += 8; p_line2 += 8;
-            p_y1 += 4; p_y2 += 4; p_u += 2; p_v += 2;
+            MMX_CALL( MMX_YUV420_YVYU );
 #endif
         }
     }
@@ -284,24 +260,12 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_chroma_i420_yuy2)
-            C_YUV420_UYVY( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_UYVY( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_UYVY( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_UYVY( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
+            C_YUV420_UYVY( );
+            C_YUV420_UYVY( );
+            C_YUV420_UYVY( );
+            C_YUV420_UYVY( );
 #else
-            __asm__( ".align 8" MMX_YUV420_UYVY
-                     : : "r" (p_line1), "r" (p_line2),
-                         "r" (p_y1), "r" (p_y2), "r" (p_u), "r" (p_v) ); 
-
-            p_line1 += 8; p_line2 += 8;
-            p_y1 += 4; p_y2 += 4; p_u += 2; p_v += 2;
-
-            __asm__( ".align 8" MMX_YUV420_UYVY
-                     : : "r" (p_line1), "r" (p_line2),
-                         "r" (p_y1), "r" (p_y2), "r" (p_u), "r" (p_v) ); 
-
-            p_line1 += 8; p_line2 += 8;
-            p_y1 += 4; p_y2 += 4; p_u += 2; p_v += 2;
+            MMX_CALL( MMX_YUV420_UYVY );
 #endif
         }
     }
@@ -344,24 +308,12 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
 #if defined (MODULE_NAME_IS_chroma_i420_yuy2)
-            C_YUV420_UYVY( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_UYVY( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_UYVY( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_UYVY( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
+            C_YUV420_UYVY( );
+            C_YUV420_UYVY( );
+            C_YUV420_UYVY( );
+            C_YUV420_UYVY( );
 #else
-            __asm__( ".align 8" MMX_YUV420_UYVY
-                     : : "r" (p_line1), "r" (p_line2),
-                         "r" (p_y1), "r" (p_y2), "r" (p_u), "r" (p_v) ); 
-
-            p_line1 += 8; p_line2 += 8;
-            p_y1 += 4; p_y2 += 4; p_u += 2; p_v += 2;
-
-            __asm__( ".align 8" MMX_YUV420_UYVY
-                     : : "r" (p_line1), "r" (p_line2),
-                         "r" (p_y1), "r" (p_y2), "r" (p_u), "r" (p_v) ); 
-
-            p_line1 += 8; p_line2 += 8;
-            p_y1 += 4; p_y2 += 4; p_u += 2; p_v += 2;
+            MMX_CALL( MMX_YUV420_UYVY );
 #endif
         }
     }
@@ -391,8 +343,8 @@ static void I420_Y211( vout_thread_t *p_vout, picture_t *p_source,
 
         for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
         {
-            C_YUV420_Y211( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
-            C_YUV420_Y211( p_line1, p_line2, p_y1, p_y2, p_u, p_v );
+            C_YUV420_Y211( );
+            C_YUV420_Y211( );
         }
     }
 }
