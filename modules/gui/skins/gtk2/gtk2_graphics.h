@@ -2,7 +2,7 @@
  * gtk2_graphics.h: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.h,v 1.3 2003/04/14 20:07:49 asmax Exp $
+ * $Id: gtk2_graphics.h,v 1.4 2003/04/19 02:34:47 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -37,11 +37,10 @@ class Window;
 //---------------------------------------------------------------------------
 class GTK2Graphics : public Graphics
 {
-    private:
-        int Width;
-        int Height;
+    protected:
         GdkDrawable *Image;
         GdkGC *Gc;
+
     public:
         // Constructor
         GTK2Graphics( int w, int h, Window *from = NULL );
@@ -56,6 +55,7 @@ class GTK2Graphics : public Graphics
 
         // Clipping methods
         virtual void SetClipRegion( Region *rgn );
+        virtual void ResetClipRegion();
 
         // Specific GTK2 methods
         GdkDrawable *GetImage() { return Image; };

@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.12 2003/04/17 17:45:38 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.13 2003/04/19 02:34:47 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -42,21 +42,6 @@
 //---------------------------------------------------------------------------
 GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
 {
-/*    HBITMAP HImage ;
-    Image          = CreateCompatibleDC( NULL );
-    if( from != NULL )
-    {
-        HDC DC = GetWindowDC( ( (GTK2Window *)from )->GetHandle() );
-        HImage = CreateCompatibleBitmap( DC, w, h );
-        ReleaseDC( ( (GTK2Window *)from )->GetHandle(), DC );
-    }
-    else
-    {
-        HImage = CreateCompatibleBitmap( Image, w, h );
-    }
-    SelectObject( Image, HImage );
-    DeleteObject( HImage );*/
-    
     if( from != NULL )
     {
         GdkWindow *fromWnd = ( (GTK2Window *)from )->GetHandle();
@@ -69,32 +54,23 @@ GTK2Graphics::GTK2Graphics( int w, int h, Window *from ) : Graphics( w, h )
         gdk_drawable_set_colormap( Image, gdk_colormap_get_system() );
         Gc = gdk_gc_new( Image );
     }
-    
+
     // Set the background color to black
     gdk_draw_rectangle( Image, Gc, TRUE, 0, 0, w, h );
 }
 //---------------------------------------------------------------------------
 GTK2Graphics::~GTK2Graphics()
 {
-/*    DeleteDC( Image );*/
+    g_object_unref( Gc );
+    g_object_unref( Image );
 }
 //---------------------------------------------------------------------------
 void GTK2Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
                               int sx, int sy, int Flag )
 {
-/*    BitBlt( Image, dx, dy, dw, dh, ( (GTK2Graphics *)Src )->GetImageHandle(),
-        sx, sy, Flag );*/
     gdk_draw_drawable( Image, Gc, (( GTK2Graphics* )Src )->GetImage(),
             sx, sy, dx, dy, dw, dh );
 }
-
-//---------------------------------------------------------------------------
-/*void GTK2Graphics::CopyTo( Graphics *Dest, int dx, int dy, int dw, int dh,
-                            int sx, int sy, int Flag )
-{
-    BitBlt( ( (GTK2Graphics *)Dest )->GetImageHandle(), dx, dy, dw, dh, Image,
-        sx, sy, Flag );
-}*/
 //---------------------------------------------------------------------------
 void GTK2Graphics::DrawRect( int x, int y, int w, int h, int color )
 {
@@ -106,7 +82,18 @@ void GTK2Graphics::SetClipRegion( Region *rgn )
     gdk_gc_set_clip_region( Gc, ( (GTK2Region *)rgn )->GetHandle() );
 }
 //---------------------------------------------------------------------------
-
+void GTK2Graphics::ResetClipRegion()
+{
+    GdkRectangle rect;
+    rect.x = 0;
+    rect.y = 0;
+    rect.width = Width;
+    rect.height = Height;
+    GdkRegion *rgn = gdk_region_rectangle( &rect );
+    gdk_gc_set_clip_region( Gc, rgn );
+    gdk_region_destroy( rgn );
+}
+//---------------------------------------------------------------------------
 
 
 

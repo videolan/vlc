@@ -2,7 +2,7 @@
  * win32_graphics.h: Win32 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: win32_graphics.h,v 1.3 2003/04/19 02:34:47 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -35,10 +35,9 @@ class Window;
 //---------------------------------------------------------------------------
 class Win32Graphics : public Graphics
 {
-    private:
-        int Width;
-        int Height;
+    protected:
         HDC Image;
+
     public:
         // Constructor
         Win32Graphics( int w, int h, Window *from = NULL );
@@ -53,6 +52,7 @@ class Win32Graphics : public Graphics
 
         // Clipping methods
         virtual void SetClipRegion( Region *rgn );
+        virtual void ResetClipRegion();
 
         // Specific win32 methods
         HDC GetImageHandle()    { return Image; };

@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.9 2003/04/17 17:45:38 asmax Exp $
+ * $Id: gtk2_font.cpp,v 1.10 2003/04/19 02:34:47 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -92,7 +92,30 @@ void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
 
     // Set text
     pango_layout_set_text( Layout, text.c_str(), text.length() );
-    pango_layout_set_width( Layout, w * PANGO_SCALE );
+
+    // Set size
+    int real_w, real_h;
+    GetSize( text, real_w, real_h );
+    if( real_w > w )
+    {
+        // Change clipping region
+        Region *TextClipRgn = (Region *)new OSRegion( x, y, w, h );
+        dest->SetClipRegion( TextClipRgn );
+        delete TextClipRgn;
+
+        w = real_w;
+        if( align == VLC_FONT_ALIGN_RIGHT )
+            x += w - real_w;
+        else if( align == VLC_FONT_ALIGN_CENTER )
+            x += ( w - real_w ) / 2;
+
+        // Put old clip region
+        dest->ResetClipRegion();
+    }
+    else
+    {
+        pango_layout_set_width( Layout, w * PANGO_SCALE );
+    }
 
     // Set attributes
     pango_layout_set_alignment( Layout, (PangoAlignment)align );

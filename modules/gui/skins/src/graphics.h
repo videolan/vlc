@@ -2,7 +2,7 @@
  * graphics.h: Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: graphics.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: graphics.h,v 1.2 2003/04/19 02:34:47 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -33,9 +33,10 @@ class Region;
 //---------------------------------------------------------------------------
 class Graphics
 {
-    private:
+    protected:
         int Width;
         int Height;
+
     public:
         // Constructor
         Graphics( int w, int h );
@@ -50,6 +51,8 @@ class Graphics
 
         // Clipping methods
         virtual void SetClipRegion( Region *rgn ) = 0;
+        virtual void ResetClipRegion() = 0;
+
 };
 //---------------------------------------------------------------------------
 class Region
