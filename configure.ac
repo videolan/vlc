@@ -450,7 +450,7 @@ AC_CHECK_LIB(m,pow,[
   VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad toolame equalizer vlc],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
-  VLC_ADD_LDFLAGS([headphone_channel_mixer normvol],[-lm])
+  VLC_ADD_LDFLAGS([headphone_channel_mixer normvol speex],[-lm])
 ])
 fi # end "${SYS}" != "mingw32"
 
@@ -2442,19 +2442,15 @@ AC_ARG_ENABLE(speex,
   [  --enable-speex          Speex decoder support (default enabled)])
 if test "${enable_speex}" != "no"
 then
-  AC_CHECK_HEADERS(speex.h, [
-    AC_MSG_CHECKING(for libspeex version > 1.1.0)
-    AC_EGREP_CPP(yes,
-      [#include <speex.h>
-       #ifdef SPEEX_SET_SUBMODE_ENCODING
-       yes
-       #endif],
-      [ AC_MSG_RESULT([yes])
-        VLC_ADD_PLUGINS([speex])
-        VLC_ADD_LDFLAGS([speex],[-lspeex]) ],
+  AC_CHECK_HEADERS(speex/speex.h, [
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_toolame}"
+    AC_CHECK_LIB(speex, speex_decode_int, [
+      VLC_ADD_PLUGINS([speex])
+      VLC_ADD_LDFLAGS([speex],[-lspeex]) ],
       [ AC_MSG_RESULT([no])
         AC_MSG_WARN([Your libspeex is too old, please get the development
-                     version.]) ] )
+                     version.]) ],[])
+    LDFLAGS="${LDFLAGS_save}"
     ],[])
 fi
 
@@ -2875,14 +2871,22 @@ then
     VLC_ADD_CPPFLAGS([xml],[`${XML2_CONFIG} --cflags`])
     VLC_ADD_LDFLAGS([xml],[`${XML2_CONFIG} --libs`])
     dnl depends on the xmlTextReader extension
+    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_xml}"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_xml}"
     AC_CHECK_LIB(xml2,xmlTextReaderConstName,[
-      VLC_ADD_PLUGINS([xml]) ],[
+      AC_EGREP_HEADER(xmlTextReaderConstName,libxml/xmlreader.h,[
+        VLC_ADD_PLUGINS([xml]) ],[
+          AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version])
+          if test "${enable_xml2}" = "yes"; then
+            AC_MSG_ERROR([libxml2 missing the xmlTextReader extension])
+          fi])
+       ],[
       AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version])
       if test "${enable_xml2}" = "yes"; then
         AC_MSG_ERROR([libxml2 missing the xmlTextReader extension])
       fi])
     LDFLAGS="${LDFLAGS_save}"
+    CPPFLAGS="${CPPFLAGS_save}"
   else
     if test "${enable_xml2}" = "yes"; then
       AC_MSG_ERROR([Could not find libxml2])

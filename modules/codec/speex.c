@@ -29,10 +29,10 @@
 #include <vlc/input.h>
 
 #include <ogg/ogg.h>
-#include <speex.h>
-#include "speex_header.h"
-#include "speex_stereo.h"
-#include "speex_callbacks.h"
+#include <speex/speex.h>
+#include <speex/speex_header.h>
+#include <speex/speex_stereo.h>
+#include <speex/speex_callbacks.h>
 
 /*****************************************************************************
  * decoder_sys_t : speex decoder descriptor
