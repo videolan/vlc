@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.73 2003/11/22 20:26:39 fenrir Exp $
+ * $Id: input_dec.c,v 1.74 2003/11/23 03:17:39 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -175,8 +175,12 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     vlc_thread_join( p_dec );
     /* vlc_mutex_lock( &p_input->stream.stream_lock ); */
 
+#if 0
+    /* XXX We don't do it here because of dll loader that want close in the
+     * same thread than open/decode */
     /* Unneed module */
     module_Unneed( p_dec, p_dec->p_module );
+#endif
 
     /* Delete decoder configuration */
     DeleteDecoder( p_dec );
@@ -449,7 +453,8 @@ static int DecoderThread( decoder_t * p_dec )
     }
 
     /* The decoder's main loop */
-    while( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
+    while( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error &&
+           !p_dec->b_die && !p_dec->b_error )
     {
         int i_size;
 
@@ -568,6 +573,11 @@ static int DecoderThread( decoder_t * p_dec )
         /* Trash all received PES packets */
         input_ExtractPES( p_dec->p_fifo, NULL );
     }
+
+    /* XXX We do it here because of dll loader that want close in the
+     * same thread than open/decode */
+    /* Unneed module */
+    module_Unneed( p_dec, p_dec->p_module );
 
     return 0;
 }
