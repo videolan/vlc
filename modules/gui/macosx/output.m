@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.6 2003/05/25 17:27:13 massiot Exp $
+ * $Id: output.m,v 1.7 2003/05/26 01:25:12 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -112,6 +112,10 @@
 
 - (void)initStrings
 {
+    NSArray *o_a_bitrates = [NSArray arrayWithObjects:@"96", @"128", @"192", @"256", @"512", nil];
+    NSArray *o_v_bitrates = [NSArray arrayWithObjects:
+        @"100", @"150", @"200", @"400", @"500", @"500", @"750", @"1000", @"2000", @"3000", nil];
+    
     [o_output_ckbox setTitle: _NS("Advanced output:")];
     [o_output_settings setTitle: _NS("Settings...")];
     [o_btn_ok setTitle: _NS("OK")];
@@ -146,11 +150,13 @@
     [[o_transcode_video_selector itemAtIndex: 5] setTitle: @"H263"];
     [[o_transcode_video_selector itemAtIndex: 6] setTitle: @"I263"];
     [[o_transcode_video_selector itemAtIndex: 7] setTitle: @"WMV1"];
-    [o_transcode_video_bitrate_lbl setStringValue: _NS("Bitrate (bps)")];
+    [o_transcode_video_bitrate_lbl setStringValue: _NS("Bitrate (kb/s)")];
+    [o_transcode_video_bitrate addItemsWithObjectValues: o_v_bitrates];
     [o_transcode_audio_chkbox setTitle: _NS("Audio")];
-    [[o_transcode_audio_selector itemAtIndex: 0] setTitle: _NS("mpga")];
-    [[o_transcode_audio_selector itemAtIndex: 1] setTitle: _NS("a52 ")];
-    [o_transcode_audio_bitrate_lbl setStringValue: _NS("Bitrate (bps)")];
+    [[o_transcode_audio_selector itemAtIndex: 0] setTitle: @"mpga"];
+    [[o_transcode_audio_selector itemAtIndex: 1] setTitle: @"a52 "];
+    [o_transcode_audio_bitrate_lbl setStringValue: _NS("Bitrate (kb/s)")];
+    [o_transcode_audio_bitrate addItemsWithObjectValues: o_a_bitrates];
 }
 
 - (IBAction)outputChanged:(id)sender;

@@ -2,7 +2,7 @@
  * motion_blur.c : motion blur filter for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: motionblur.c,v 1.11 2003/05/15 22:27:37 massiot Exp $
+ * $Id: motionblur.c,v 1.12 2003/05/26 01:25:12 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -56,7 +56,7 @@ static int  SendEvents( vlc_object_t *, char const *,
 
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL, VLC_FALSE );
-    add_integer( "blur-factor", 80, NULL, MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( "blur-factor", 80, 1, 127, NULL, MODE_TEXT, MODE_LONGTEXT, VLC_FALSE );
     set_description( _("motion blur filter") );
     set_capability( "video filter", 0 );
     set_callbacks( Create, Destroy );

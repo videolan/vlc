@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.27 2003/05/25 17:27:13 massiot Exp $
+ * $Id: prefs.m,v 1.28 2003/05/26 01:25:12 hartman Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -105,7 +105,8 @@
 {
     b_advanced = !b_advanced;
     [o_advanced_ckb setState: b_advanced];
-    [o_tree selectRow: [o_tree selectedRow] byExtendingSelection:NO];
+    [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
+        andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
 }
 
 - (void)loadConfigTree
@@ -119,7 +120,8 @@
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)o_notification
 {
-    [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID] andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
+    [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
+        andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
 }
 
 - (void)configChanged:(id)o_unknown
@@ -137,12 +139,17 @@
     case CONFIG_ITEM_MODULE:
         {
             char *psz_value;
-            NSString *o_value;
-
-            o_value = [o_vlc_config titleOfSelectedItem];
-            psz_value = [o_value isEqualToString: _NS("Auto") ] ? "" :
-                (char *)[o_value UTF8String];
-            config_PutPsz( p_intf, psz_name, psz_value );
+            module_t *p_a_module;
+            int i_id = [[o_vlc_config selectedItem] tag];
+            
+            p_a_module = (module_t *)vlc_object_get( p_intf, i_id );
+            if( p_a_module == NULL || p_a_module->i_object_type != VLC_OBJECT_MODULE )
+            {
+                i_id = -1;
+            }
+            
+            psz_value = ( i_id == -1 ) ? "" :  p_a_module->psz_object_name ;
+            config_PutPsz( p_intf, psz_name, strdup(psz_value) );
         }
         break;
 
@@ -246,8 +253,8 @@
 #define INPUT_FIELD( ctype, cname, label, w, msg, param, tip ) \
     { \
         char * psz_duptip = NULL; \
-        if ( p_item->psz_longtext != NULL && [NSApp getEncoding] == NSISOLatin1StringEncoding ) \
-            psz_duptip = strdup(p_item->psz_longtext); \
+        if ( p_item->psz_longtext != NULL ) \
+            psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP ); \
         s_rc.size.height = 25; \
         s_rc.size.width = w; \
         s_rc.origin.y += 10; \
@@ -259,7 +266,7 @@
         if ( psz_duptip != NULL ) \
         { \
             [o_text_field setToolTip: [NSApp localizedString: \
-                                       vlc_wraptext(psz_duptip, PREFS_WRAP)]]; \
+                                       psz_duptip]]; \
             free(psz_duptip);\
         } \
         [o_view addSubview: [o_text_field autorelease]]; \
@@ -314,9 +321,10 @@
                 VLCPopUpButton *o_modules;
                 module_t *p_a_module;
                 char * psz_duptip = NULL;
-                if ( p_item->psz_longtext != NULL && [NSApp getEncoding] == NSISOLatin1StringEncoding )
-                    psz_duptip = strdup(p_item->psz_longtext);
-        
+
+                if ( p_item->psz_longtext != NULL )
+                    psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
+
                 s_rc.size.height = 30;
                 s_rc.size.width = 200;
                 s_rc.origin.y += 10;
@@ -332,13 +340,14 @@
                 
                 if ( psz_duptip != NULL )
                 {
-                    [o_modules setToolTip: [NSApp localizedString:
-                                            vlc_wraptext(psz_duptip, PREFS_WRAP)]];
+                    [o_modules setToolTip: [NSApp localizedString: psz_duptip]];
                     free( psz_duptip );
                 }
                 [o_view addSubview: [o_modules autorelease]];
 
-                [o_modules addItemWithTitle: _NS("Auto")];
+                [o_modules addItemWithTitle: _NS("None")];
+                [[o_modules lastItem] setTag: -1];
+                [o_modules selectItem: [o_modules lastItem]];
 
                 /* build a list of available modules */
                 {
@@ -349,9 +358,16 @@
                         if( !strcmp( p_a_module->psz_capability,
                                     p_item->psz_type ) )
                         {
-                            NSString *o_object_name = [NSApp
-                                localizedString: p_a_module->psz_object_name];
-                            [o_modules addItemWithTitle: o_object_name];
+                            NSString *o_description = [NSApp
+                                localizedString: p_a_module->psz_longname];
+                            [o_modules addItemWithTitle: o_description];
+                            [[o_modules lastItem] setTag: p_a_module->i_object_id];
+NSLog(@"%@", [[o_modules lastItem] title]);
+                            if( p_item->psz_value &&
+                                !strcmp( p_item->psz_value, p_a_module->psz_object_name ) )
+                            {
+                                [o_modules selectItem:[o_modules lastItem]];
+                            }
                         }
                     }
                 }
@@ -365,7 +381,7 @@
                 }
                 else
                 {
-                    [o_modules selectItemWithTitle: _NS("Auto")];
+                    [o_modules selectItemWithTitle: _NS("None")];
                 }
 
                 CONTROL_LABEL( p_item->psz_text );
@@ -393,8 +409,8 @@
                     int i;
                     VLCComboBox *o_combo_box;
                     char * psz_duptip = NULL;
-                    if ( p_item->psz_longtext != NULL && [NSApp getEncoding] == NSISOLatin1StringEncoding )
-                        psz_duptip = strdup(p_item->psz_longtext);
+                    if ( p_item->psz_longtext != NULL )
+                        psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
     
                     s_rc.size.height = 27;
                     s_rc.size.width = 200;
@@ -411,8 +427,7 @@
 
                     if ( psz_duptip != NULL )
                     {
-                        [o_combo_box setToolTip: [NSApp localizedString:
-                                            vlc_wraptext(psz_duptip, PREFS_WRAP)]];
+                        [o_combo_box setToolTip: [NSApp localizedString: psz_duptip]];
                         free( psz_duptip );
                     }
                     [o_view addSubview: [o_combo_box autorelease]];
@@ -436,15 +451,91 @@
     
             case CONFIG_ITEM_INTEGER:
             {
-                INPUT_FIELD_INTEGER( p_item->psz_name, p_item->psz_text, 70,
-                                    p_item->i_value, p_item->psz_longtext );
+                if( p_item->i_min == p_item->i_max )
+                {
+                    INPUT_FIELD_INTEGER( p_item->psz_name, p_item->psz_text, 70,
+                        p_item->i_value, p_item->psz_longtext );
+                }
+                else
+                {
+                    /*create a slider */
+                    VLCSlider *o_slider;
+                    char * psz_duptip = NULL;
+                    if ( p_item->psz_longtext != NULL )
+                        psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
+        
+                    s_rc.size.height = 27;
+                    s_rc.size.width = 200;
+                    s_rc.origin.y += 10;
+        
+                    CHECK_VIEW_HEIGHT;
+        
+                    o_slider = [[VLCSlider alloc] initWithFrame: s_rc];
+                    [o_slider setMinValue: p_item->i_min];
+                    [o_slider setMaxValue: p_item->i_max];
+                    [o_slider setIntValue: p_item->i_value];
+
+                    if ( psz_duptip != NULL )
+                    {
+                        [o_slider setToolTip: [NSApp localizedString: psz_duptip]];
+                        free( psz_duptip );
+                    }
+                    [o_slider setTarget: self];
+                    [o_slider setAction: @selector(configChanged:)];
+                    [o_slider sendActionOn:NSLeftMouseUpMask];
+                    CONTROL_CONFIG( o_slider, o_module_name,
+                                    CONFIG_ITEM_INTEGER, p_item->psz_name );
+                    [o_view addSubview: [o_slider autorelease]];
+                    CONTROL_LABEL( p_item->psz_text );
+        
+                    s_rc.origin.y += s_rc.size.height;
+                    s_rc.origin.x = X_ORIGIN;
+                }
             }
             break;
     
             case CONFIG_ITEM_FLOAT:
             {
-                INPUT_FIELD_FLOAT( p_item->psz_name, p_item->psz_text, 70,
-                                p_item->f_value, p_item->psz_longtext );
+                if( p_item->f_min == p_item->f_max )
+                {
+                    INPUT_FIELD_FLOAT( p_item->psz_name, p_item->psz_text, 70,
+                        p_item->f_value, p_item->psz_longtext );
+                }
+                else
+                {
+                    /* create a slider */
+                    VLCSlider *o_slider;
+                    char * psz_duptip = NULL;
+                    if ( p_item->psz_longtext != NULL )
+                        psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
+        
+                    s_rc.size.height = 27;
+                    s_rc.size.width = 200;
+                    s_rc.origin.y += 10;
+        
+                    CHECK_VIEW_HEIGHT;
+        
+                    o_slider = [[VLCSlider alloc] initWithFrame: s_rc];
+                    [o_slider setMinValue: p_item->f_min];
+                    [o_slider setMaxValue: p_item->f_max];
+                    [o_slider setFloatValue: p_item->f_value];
+
+                    if ( psz_duptip != NULL )
+                    {
+                        [o_slider setToolTip: [NSApp localizedString: psz_duptip]];
+                        free( psz_duptip );
+                    }
+                    [o_slider setTarget: self];
+                    [o_slider setAction: @selector(configChanged:)];
+                    [o_slider sendActionOn:NSLeftMouseUpMask];
+                    CONTROL_CONFIG( o_slider, o_module_name,
+                                    CONFIG_ITEM_FLOAT, p_item->psz_name );
+                    [o_view addSubview: [o_slider autorelease]];
+                    CONTROL_LABEL( p_item->psz_text );
+        
+                    s_rc.origin.y += s_rc.size.height;
+                    s_rc.origin.x = X_ORIGIN;
+                }
             }
             break;
     
@@ -452,8 +543,9 @@
             {
                 VLCButton *o_btn_bool;
                 char * psz_duptip = NULL;
-                if ( p_item->psz_longtext != NULL && [NSApp getEncoding] == NSISOLatin1StringEncoding )
-                    psz_duptip = strdup(p_item->psz_longtext);
+
+                if ( p_item->psz_longtext != NULL )
+                    psz_duptip = vlc_wraptext( strdup( p_item->psz_longtext ), PREFS_WRAP );
     
                 s_rc.size.height = 27;
                 s_rc.size.width = s_vrc.size.width - X_ORIGIN * 2 - 20;
@@ -464,12 +556,10 @@
                 o_btn_bool = [[VLCButton alloc] initWithFrame: s_rc];
                 [o_btn_bool setButtonType: NSSwitchButton];
                 [o_btn_bool setIntValue: p_item->i_value];
-                [o_btn_bool setTitle:
-                    [NSApp localizedString: p_item->psz_text]];
+                [o_btn_bool setTitle: [NSApp localizedString: p_item->psz_text]];
                 if ( psz_duptip != NULL )
                 {
-                    [o_btn_bool setToolTip: [NSApp localizedString:
-                                            vlc_wraptext(psz_duptip, PREFS_WRAP)]];
+                    [o_btn_bool setToolTip: [NSApp localizedString: psz_duptip]];
                     free( psz_duptip );
                 }
                 [o_btn_bool setTarget: self];
@@ -560,7 +650,7 @@ static VLCTreeItem *o_root_item = nil;
     if (o_children == NULL) {
         intf_thread_t *p_intf = [NSApp getIntf];
         vlc_list_t      *p_list;
-        module_t        *p_module;
+        module_t        *p_module = NULL;
         module_config_t *p_item;
         int i_index,j;
 
@@ -578,6 +668,11 @@ static VLCTreeItem *o_root_item = nil;
                 p_module = (module_t *)p_list->p_values[i_index].p_object;
                 if( !strcmp( p_module->psz_object_name, "main" ) )
                     break;
+            }
+            if( p_module == NULL )
+            {
+                msg_Err( p_intf, "Could not find the main module in our prefs" );
+                return nil;
             }
             if( i_index < p_list->i_count )
             {
@@ -809,3 +904,4 @@ IMPL_CONTROL_CONFIG(Button);
 IMPL_CONTROL_CONFIG(PopUpButton);
 IMPL_CONTROL_CONFIG(ComboBox);
 IMPL_CONTROL_CONFIG(TextField);
+IMPL_CONTROL_CONFIG(Slider);
