@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.157 2004/01/26 04:51:09 rocky Exp $
+dnl $Id: configure.ac,v 1.158 2004/01/26 10:32:33 sam Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -1820,29 +1820,32 @@ then
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
     fi
-    if test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
-      dnl  Use a custom libffmpeg
-      AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-      AX_ADD_BUILTINS([ffmpeg stream_out_transcode])
-      AX_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec -lavcodec])
-      AX_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec])
-
-      if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
-        AC_DEFINE(HAVE_LIBAVFORMAT, 1,
-        [Define if you have ffmpeg's libavformat.])
-        AX_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat -lavformat -lz])
-        AX_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
-      fi
-
-      dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
-      dnl       linker would miserably barf on multiple definitions.
-      AX_ADD_LDFLAGS([stream_out_transcode],[-L${real_ffmpeg_tree}/libavcodec])
-      AX_ADD_CPPFLAGS([stream_out_transcode],[-I${real_ffmpeg_tree}/libavcodec])
-    else
+    if ! test -f "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
       dnl  The given libavcodec wasn't built
       AC_MSG_RESULT(no)
       AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodec.a, make sure you compiled libavcodec in ${with_ffmpeg_tree}])
     fi
+    if ! grep -q "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodec.a"; then
+      dnl  The given libavcodec wasn't built with --enable-pp
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])
+    fi
+    dnl  Use a custom libffmpeg
+    AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
+    AX_ADD_BUILTINS([ffmpeg stream_out_transcode])
+    AX_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec -lavcodec])
+    AX_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec])
+
+    if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
+      AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
+      AX_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat -lavformat -lz])
+      AX_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
+    fi
+
+    dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+    dnl       linker would miserably barf on multiple definitions.
+    AX_ADD_LDFLAGS([stream_out_transcode],[-L${real_ffmpeg_tree}/libavcodec])
+    AX_ADD_CPPFLAGS([stream_out_transcode],[-I${real_ffmpeg_tree}/libavcodec])
   fi
 fi
 
