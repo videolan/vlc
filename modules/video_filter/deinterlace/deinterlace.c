@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.16 2003/11/05 00:39:17 gbazin Exp $
+ * $Id: deinterlace.c,v 1.17 2003/11/06 16:54:40 nitrox Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -518,36 +518,101 @@ static void RenderBob( vout_thread_t *p_vout,
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
                              * p_outpic->p[i_plane].i_lines;
 
-        /* For BOTTOM field we need to add the first line */
-        if( i_field == 1 )
+        switch( p_vout->render.i_chroma )
         {
-            p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
-            p_in += p_pic->p[i_plane].i_pitch;
-            p_out += p_pic->p[i_plane].i_pitch;
-        }
+            case VLC_FOURCC('I','4','2','0'):
+            case VLC_FOURCC('I','Y','U','V'):
+            case VLC_FOURCC('Y','V','1','2'):
+                /* For BOTTOM field we need to add the first line */
+                if( i_field == 1 )
+                {
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                              p_pic->p[i_plane].i_pitch );
+                    p_in += p_pic->p[i_plane].i_pitch;
+                    p_out += p_pic->p[i_plane].i_pitch;
+                }
 
-        p_out_end -= 2 * p_outpic->p[i_plane].i_pitch;
+                p_out_end -= 2 * p_outpic->p[i_plane].i_pitch;
 
-        for( ; p_out < p_out_end ; )
-        {
-            p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                for( ; p_out < p_out_end ; )
+                {
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                              p_pic->p[i_plane].i_pitch );
 
-            p_out += p_pic->p[i_plane].i_pitch;
+                    p_out += p_pic->p[i_plane].i_pitch;
 
-            p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                              p_pic->p[i_plane].i_pitch );
 
-            p_in += 2 * p_pic->p[i_plane].i_pitch;
-            p_out += p_pic->p[i_plane].i_pitch;
-        }
+                    p_in += 2 * p_pic->p[i_plane].i_pitch;
+                    p_out += p_pic->p[i_plane].i_pitch;
+                }
 
-        p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                          p_pic->p[i_plane].i_pitch );
 
-        /* For TOP field we need to add the last line */
-        if( i_field == 0 )
-        {
-            p_in += p_pic->p[i_plane].i_pitch;
-            p_out += p_pic->p[i_plane].i_pitch;
-            p_vout->p_vlc->pf_memcpy( p_out, p_in, p_pic->p[i_plane].i_pitch );
+                /* For TOP field we need to add the last line */
+                if( i_field == 0 )
+                {
+                    p_in += p_pic->p[i_plane].i_pitch;
+                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                              p_pic->p[i_plane].i_pitch );
+                }
+                break;
+
+            case VLC_FOURCC('I','4','2','2'):
+                /* For BOTTOM field we need to add the first line */
+                if( i_field == 1 )
+                {
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                              p_pic->p[i_plane].i_pitch );
+                    p_in += p_pic->p[i_plane].i_pitch;
+                    p_out += p_pic->p[i_plane].i_pitch;
+                }
+
+                p_out_end -= 2 * p_outpic->p[i_plane].i_pitch;
+
+                if( i_plane == Y_PLANE )
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
+
+                        p_out += p_pic->p[i_plane].i_pitch;
+
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
+
+                        p_in += 2 * p_pic->p[i_plane].i_pitch;
+                        p_out += p_pic->p[i_plane].i_pitch;
+                    }
+                }
+                else
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                                  p_pic->p[i_plane].i_pitch );
+
+                        p_out += p_pic->p[i_plane].i_pitch;
+                        p_in += 2 * p_pic->p[i_plane].i_pitch;
+                    }
+                }
+
+                p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                          p_pic->p[i_plane].i_pitch );
+
+                /* For TOP field we need to add the last line */
+                if( i_field == 0 )
+                {
+                    p_in += p_pic->p[i_plane].i_pitch;
+                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                              p_pic->p[i_plane].i_pitch );
+                }
+                break;
         }
     }
 }
@@ -641,7 +706,7 @@ static void RenderBlend( vout_thread_t *p_vout,
                          picture_t *p_outpic, picture_t *p_pic )
 {
     int i_plane;
-
+    
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
     {
@@ -653,19 +718,58 @@ static void RenderBlend( vout_thread_t *p_vout,
         p_out_end = p_out + p_outpic->p[i_plane].i_pitch
                              * p_outpic->p[i_plane].i_lines;
 
-        /* First line: simple copy */
-        p_vout->p_vlc->pf_memcpy( p_out, p_in,
-                                  p_pic->p[i_plane].i_pitch );
-        p_out += p_pic->p[i_plane].i_pitch;
-
-        /* Remaining lines: mean value */
-        for( ; p_out < p_out_end ; )
+        switch( p_vout->render.i_chroma )
         {
-            Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
-                   p_pic->p[i_plane].i_pitch );
+            case VLC_FOURCC('I','4','2','0'):
+            case VLC_FOURCC('I','Y','U','V'):
+            case VLC_FOURCC('Y','V','1','2'):
+                /* First line: simple copy */
+                p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                          p_pic->p[i_plane].i_pitch );
+                p_out += p_pic->p[i_plane].i_pitch;
 
-            p_out += p_pic->p[i_plane].i_pitch;
-            p_in += p_pic->p[i_plane].i_pitch;
+                /* Remaining lines: mean value */
+                for( ; p_out < p_out_end ; )
+                {
+                   Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
+                          p_pic->p[i_plane].i_pitch );
+
+                    p_out += p_pic->p[i_plane].i_pitch;
+                    p_in += p_pic->p[i_plane].i_pitch;
+                }
+                break;
+
+            case VLC_FOURCC('I','4','2','2'):
+                /* First line: simple copy */
+                p_vout->p_vlc->pf_memcpy( p_out, p_in,
+                                          p_pic->p[i_plane].i_pitch );
+                p_out += p_pic->p[i_plane].i_pitch;
+
+                /* Remaining lines: mean value */
+                if( i_plane == Y_PLANE )
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
+                               p_pic->p[i_plane].i_pitch );
+
+                        p_out += p_pic->p[i_plane].i_pitch;
+                        p_in += p_pic->p[i_plane].i_pitch;
+                    }
+                }
+
+                else
+                {
+                    for( ; p_out < p_out_end ; )
+                    {
+                        Merge( p_out, p_in, p_in + p_pic->p[i_plane].i_pitch,
+                               p_pic->p[i_plane].i_pitch );
+
+                        p_out += p_pic->p[i_plane].i_pitch;
+                        p_in += 2*p_pic->p[i_plane].i_pitch;
+                    }
+                }
+                break;
         }
     }
 }
