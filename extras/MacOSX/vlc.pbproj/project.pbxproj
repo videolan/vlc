@@ -378,7 +378,7 @@
 			<key>CFBundleTypeIconFile</key>
 			<string>mpeg.icns</string>
 			<key>CFBundleTypeName</key>
-			<string>mulitplexed MPEG-1/2</string>
+			<string>multiplexed MPEG-1/2</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>
