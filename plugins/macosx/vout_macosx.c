@@ -388,7 +388,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                     p_vout->p_sys->i_seq,
                     p_pic->p_sys->p_info,
                     p_pic->p_sys->i_size,                    
-                    codecFlagUseScreenBuffer, &flags, nil ) != noErr ) )
+                    codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
     {
         intf_ErrMsg( "DecompressSequenceFrameS failed: %d", err );
     }
@@ -569,7 +569,7 @@ static int QTCreateSequence( vout_thread_t *p_vout )
                               NULL, NULL,
                               p_vout->p_sys->p_matrix,
                               0, NULL,
-                              codecFlagUseScreenBuffer,
+                              codecFlagUseImageBuffer,
                               codecLosslessQuality,
                               p_vout->p_sys->img_dc ) ) )
     {

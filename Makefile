@@ -115,6 +115,7 @@ PLUGINS_TARGETS := a52/a52 \
 		memcpy/memcpymmx \
 		memcpy/memcpymmxext \
 		memcpy/memcpy3dn \
+		memcpy/memcpyaltivec \
 		mga/mga \
 		mga/xmga \
 		motion/motion \

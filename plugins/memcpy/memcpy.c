@@ -2,7 +2,7 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.5 2002/02/15 13:32:53 sam Exp $
+ * $Id: memcpy.c,v 1.6 2002/04/02 22:16:07 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,6 +34,7 @@
 #undef HAVE_SSE
 #undef HAVE_SSE2
 #undef HAVE_3DNOW
+#undef HAVE_ALTIVEC
 
 #if defined( MODULE_NAME_IS_memcpy3dn )
 #   define HAVE_3DNOW
@@ -43,6 +44,9 @@
 #   include "fastmemcpy.h"
 #elif defined( MODULE_NAME_IS_memcpymmxext )
 #   define HAVE_MMX2
+#   include "fastmemcpy.h"
+#elif defined( MODULE_NAME_IS_memcpyaltivec )
+#   define HAVE_ALTIVEC
 #   include "fastmemcpy.h"
 #endif
 
@@ -87,6 +91,12 @@ MODULE_INIT_START
     ADD_REQUIREMENT( MMXEXT )
     ADD_SHORTCUT( "mmxext" )
     ADD_SHORTCUT( "memcpymmxext" )
+#elif defined( MODULE_NAME_IS_memcpyaltivec )
+    SET_DESCRIPTION( "Altivec memcpy module" )
+    ADD_CAPABILITY( MEMCPY, 100 )
+    ADD_REQUIREMENT( ALTIVEC )
+    ADD_SHORTCUT( "altivec" )
+    ADD_SHORTCUT( "memcpyaltivec" )
 #endif
 MODULE_INIT_STOP
 
