@@ -1668,8 +1668,8 @@ then
       LDFLAGS_test="-L${with_a52}/lib"
       CPPFLAGS_test="-I${with_a52}/include"
     fi
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test}"
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_test}"
+    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_test} ${CPPFLAGS_a52tofloat32}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_test} ${LDFLAGS_a52tofloat32}"
     AC_CHECK_HEADERS(a52dec/a52.h, [
       AC_CHECK_LIB(a52, a52_free, [
         PLUGINS="${PLUGINS} a52tofloat32"
