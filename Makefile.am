@@ -612,8 +612,9 @@ SOURCES_mozilla = \
 	mozilla/vlcplugin.h \
 	mozilla/vlcpeer.cpp \
 	mozilla/vlcpeer.h \
-	mozilla/classinfo.h \
+	mozilla/support/classinfo.h \
 	$(SOURCES_mozilla_win32) \
+	$(SOURCES_mozilla_macosx) \
 	$(SOURCES_mozilla_unix) \
 	$(NULL)
 
@@ -622,11 +623,16 @@ SOURCES_mozilla = \
 # under Win32 and npunix.c under Unix.
 if HAVE_WIN32
 LIBRARIES_mozilla = mozilla/npvlc$(LIBEXT)
-SOURCES_mozilla_win32 = mozilla/npwin.cpp
+SOURCES_mozilla_win32 = mozilla/support/npwin.cpp
 CPPFLAGS_mozilla_EXTRA = -DXP_WIN -DXP_WIN32
 else
+if HAVE_DARWIN
+# We don't define LIBRARIES_mozilla because we'll be using project builder
+SOURCES_mozilla_macosx = mozilla/support/npmac.cpp
+else
 LIBRARIES_mozilla = mozilla/libvlcplugin$(LIBEXT)
-SOURCES_mozilla_unix = mozilla/npunix.c
+SOURCES_mozilla_unix = mozilla/support/npunix.c
+endif
 endif
 
 if BUILD_MOZILLA
