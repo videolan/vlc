@@ -1,25 +1,66 @@
-$Id: NEWS,v 1.33 2003/03/19 15:44:44 hartman Exp $
+$Id: NEWS,v 1.34 2003/04/06 15:43:02 massiot Exp $
 
 Changes between 0.5.2 and 0.5.3:
 ---------------------------------
 
 Core Support:
+ * fixed DTS S/PDIF output on little-endian machines
+ * support for skins at the interface level
+ * new OSD module using Freetype2
+
+Input access:
+ * fixed HTTP redirects
+ * support for opening an entire directory
+ * EOF should be detected more reliably
+ * new video4linux access plug-in
+ * new kfir access plug-in designed to work around a bug in the kfir driver
+
+Input demux:
+ * added stream type for some Motorola MPEG-2 video encoders
+ * fix for some ogg web radio streams
+ * fixed reading TS streams over HTTP
 
 Codecs:
  * support for 3ivx D4 (not previous versions)
- * support for '3ivd' files.
+ * support for '3ivd' and '3vid' files
+ * support for SAMI subtitles (untested and incomplete)
+ * better SSA4 subtitles recognition
+ * new codec for raw I420 video
+
+Stream output:
+ * new HTTP output support
+ * fixed a segfault in the AVI muxer
+ * fixed AV synchronization issues
+
+Miscellaneous:
+ * support for oldstyle id3 genres
+
+UNIX ports:
+ * the SDL vout plug-in will now work on big-endian machines
+ * skeleton for a GTK2 plug-in
 
 Mac OS X port:
  * reorderable playlist
  * fixed the hiding of the mouse on multiple monitors
- * fixed a big issue with USB speakers
+ * fixed a big issue with some USB speakers
+ * support for mono audio output devices
+ * reset the device to its default mode before quitting VLC
  * fixed several cosmetic issues
  * you can drag the controller window by its background (as it should be)
  * the messages window remembers more lines
+ * delay and fps can now be overriden with subtitles files
+ * Apple menu and friends will now be translated as well
 
-Miscellaneous:
- * support for oldstyle id3 genres
- * improved subtitle files support (SAMI, ssa4, vplayer)
+Win32 port:
+ * new skinnable interface
+
+iPAQ familiar Linux port:
+ * support for FLAC audio format
+ * the interface adapts to the screen size/rotation
+ * playlist
+ * network tab in the interface
+ * "apply" handling in preferences
+
 
 Changes between 0.5.1a and 0.5.2:
 ---------------------------------
@@ -78,6 +119,7 @@ Miscellaneous:
  * mouse gestures work on windows and osx, but there still isn't any useful
    gestures
  * some support for .pls playlists used by shoutcast
+
 
 Changes between 0.5.1 and 0.5.1a:
 ---------------------------------

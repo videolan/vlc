@@ -244,6 +244,7 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/MainMenu.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/MainMenu.nib/objects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
+	extras/MacOSX/Resources/English.lproj/vlc.scriptTerminology \
 	extras/MacOSX/Resources/divx.icns \
 	extras/MacOSX/Resources/generic.icns \
 	extras/MacOSX/Resources/mpeg.icns \
@@ -263,7 +264,7 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/stop.png \
 	extras/MacOSX/Resources/vlc_hg.png \
 	extras/MacOSX/Resources/vlc.scriptSuite \
-	extras/MacOSX/Resources/English.lproj/vlc.scriptTerminology \
+	extras/MacOSX/Resources/README \
 	extras/MacOSX/vlc.pbproj/project.pbxproj \
 	extras/MacOSX/macosx-dmg \
 	$(NULL)

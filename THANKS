@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.5 2003/04/01 11:12:15 massiot Exp $
+$Id: THANKS,v 1.6 2003/04/06 15:43:02 massiot Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -31,6 +31,7 @@ Fumio Nakayama <endymion@ca2.so-net.ne.jp> - Japanese translation
 Haakon Meland Eriksen - Norwegian translation
 Hans-Peter Jansen <hpj@urpla.net> - patch for module options handling
 Jean-Philippe Grimaldi <jeanphi@via.ecp.fr> - bug fixes
+Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be> - French translation
 Jeffrey Baker <jwbaker@acm.org> - port of the ALSA plugin to the ALSA 1.0 API
 Joel Arvidsson <dogai@privat.utfors.se> - Swedish translation
 Joeri van Dooren <joeri@van.dooren.be> - OS X icon
