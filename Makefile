@@ -64,7 +64,8 @@ PLUGINS_DIR :=	a52 \
 		text \
 		vcd \
 		win32 \
-		x11
+		x11 \
+		xosd
 
 PLUGINS_TARGETS := a52/a52 \
 		aa/aa \
@@ -158,7 +159,8 @@ PLUGINS_TARGETS := a52/a52 \
 		win32/waveout \
 		win32/intfwin \
 		x11/x11 \
-		x11/xvideo
+		x11/xvideo \
+		xosd/xosd
 
 #
 # C Objects

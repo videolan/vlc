@@ -125,6 +125,7 @@ vcd_LDFLAGS = @vcd_LDFLAGS@
 vorbis_LDFLAGS = @vorbis_LDFLAGS@
 waveout_LDFLAGS = @waveout_LDFLAGS@
 x11_LDFLAGS = @x11_LDFLAGS@
+xosd_LDFLAGS = @xosd_LDFLAGS@
 xvideo_LDFLAGS = @xvideo_LDFLAGS@
 
 #
