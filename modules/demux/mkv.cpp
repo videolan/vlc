@@ -1087,7 +1087,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_POSITION:
             pf = (double*)va_arg( args, double * );
-            *pf = (double)p_sys->in->getFilePointer() / (double)stream_Size( p_demux->s );
+			if (p_sys->i_pts < p_sys->i_start_pts)
+				*pf = (double)p_sys->i_start_pts / (1000.0 * p_sys->f_duration);
+			else
+				*pf = (double)p_sys->i_pts / (1000.0 * p_sys->f_duration);
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
@@ -1097,18 +1100,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            if( p_sys->f_duration > 0.0 )
-            {
-                mtime_t i_duration = (mtime_t)( p_sys->f_duration / 1000 );
-
-                /* FIXME */
-                *pi64 = (mtime_t)1000000 *
-                        (mtime_t)i_duration*
-                        (mtime_t)p_sys->in->getFilePointer() /
-                        (mtime_t)stream_Size( p_demux->s );
-                return VLC_SUCCESS;
-            }
-            return VLC_EGENERIC;
+			if (p_sys->i_pts < p_sys->i_start_pts)
+				*pi64 = p_sys->i_start_pts;
+			else
+				*pi64 = p_sys->i_pts;
+            return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:
             if( p_sys->title && p_sys->title->i_seekpoint > 0 )
@@ -1355,6 +1351,11 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
 #endif
 
+/*		if (p_sys->i_start_pts > i_pts)
+		{
+            p_block->i_dts = p_block->i_pts = -1;
+		}
+		else*/
         if( tk.fmt.i_cat != VIDEO_ES )
         {
             p_block->i_dts = p_block->i_pts = i_pts;
