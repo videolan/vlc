@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.9 2002/01/21 07:00:21 gbazin Exp $
+ * $Id: vout_events.c,v 1.10 2002/01/27 22:14:52 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -102,16 +102,6 @@ void DirectXEventThread( vout_thread_t *p_vout )
         switch( msg.message )
         {
 
-#if 0
-        case WM_PAINT:
-            intf_WarnMsg( 4, "vout: vout_Manage WM_PAINT" );
-            break;
-
-        case WM_ERASEBKGND:
-            intf_WarnMsg( 4, "vout: vout_Manage WM_ERASEBKGND" );
-            break;
-#endif
-
         case WM_MOUSEMOVE:
             if( p_vout->p_sys->b_cursor )
             {
@@ -126,6 +116,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
                     p_vout->p_sys->i_lastmoved = mdate();
                 }
             }
+            DispatchMessage(&msg);
             break;
 
         case WM_RBUTTONUP:
@@ -221,11 +212,9 @@ void DirectXEventThread( vout_thread_t *p_vout )
 
     if( msg.message == WM_QUIT )
     {
-        intf_WarnMsg( 3, "vout: DirectXEventThread WM_QUIT" );
+        intf_WarnMsg( 3, "vout: DirectXEventThread WM_QUIT... "
+                      "shouldn't happen!!" );
         p_vout->p_sys->hwnd = NULL; /* Window already destroyed */
-
-        /* exit application */
-        p_main->p_intf->b_die = 1;
     }
 
     intf_WarnMsg( 3, "vout: DirectXEventThread Terminating" );
@@ -322,8 +311,13 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     /* register the window class */
     if (!RegisterClassEx(&wc))
     {
-        intf_WarnMsg( 3, "vout: DirectXCreateWindow register window FAILED" );
-        return (1);
+        /* Check why it failed. If it's because one already exists then fine */
+        WNDCLASS wndclass;
+        if( !GetClassInfo( hInstance, "VLC DirectX", &wndclass ) )
+        {
+            intf_ErrMsg( "vout: DirectXCreateWindow RegisterClass FAILED" );
+            return (1);
+        }
     }
 
     /* when you create a window you give the dimensions you wish it to have.
@@ -341,8 +335,8 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                     "VLC DirectX",                  /* window title bar text */
                     WS_OVERLAPPEDWINDOW
                     | WS_SIZEBOX,               /* window style */
-                    10,                              /* default X coordinate */
-                    10,                              /* default Y coordinate */
+                    CW_USEDEFAULT,                   /* default X coordinate */
+                    0,                               /* default Y coordinate */
                     rect_window.right - rect_window.left,    /* window width */
                     rect_window.bottom - rect_window.top,   /* window height */
                     NULL,                                /* no parent window */
@@ -373,8 +367,6 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
  *****************************************************************************/
 static void DirectXCloseWindow( vout_thread_t *p_vout )
 {
-    HINSTANCE hInstance;
-
     intf_WarnMsg( 3, "vout: DirectXCloseWindow" );
     if( p_vout->p_sys->hwnd != NULL )
     {
@@ -382,9 +374,9 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
         p_vout->p_sys->hwnd = NULL;
     }
 
-    hInstance = GetModuleHandle(NULL);
-    UnregisterClass( "VLC DirectX",                            /* class name */
-                     hInstance );          /* handle to application instance */
+    /* We don't unregister the Window Class because it could lead to race
+     * conditions and it will be done anyway by the system when the app will
+     * exit */
 
     /* free window background brush */
     if( p_vout->p_sys->hbrush != NULL )
@@ -514,7 +506,8 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
                       p_vout->p_sys->i_window_height );
 
         DirectXUpdateRects( p_vout );
-        if( p_vout->p_sys->b_using_overlay )
+        if( p_vout->p_sys->b_using_overlay &&
+            !p_vout->p_sys->b_event_thread_die )
             DirectXUpdateOverlay( p_vout );
 
         /* signal the size change */
@@ -535,13 +528,15 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     /* the user wants to close the window */
     case WM_CLOSE:
         intf_WarnMsg( 4, "vout: WinProc WM_CLOSE" );
+        /* exit application */
+        p_main->p_intf->b_die = 1;
+        return 0;
         break;
 
     /* the window has been closed so shut down everything now */
     case WM_DESTROY:
         intf_WarnMsg( 4, "vout: WinProc WM_DESTROY" );
-        /* exit application */
-        p_main->p_intf->b_die = 1;
+        /* just destroy the window */
         PostQuitMessage( 0 );
         return 0;
         break;
@@ -553,6 +548,34 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
             case SC_MONITORPOWER:              /* catch the monitor turn-off */
             intf_WarnMsg( 3, "vout: WinProc WM_SYSCOMMAND" );
             return 0;                      /* this stops them from happening */
+        }
+        break;
+
+#if 0
+    case WM_PAINT:
+        intf_WarnMsg( 4, "vout: WinProc WM_PAINT" );
+        break;
+#endif
+
+    case WM_ERASEBKGND:
+        p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
+        if( !p_vout->p_sys->b_using_overlay )
+        {
+            /* We want to eliminate unnecessary background redraws which create
+             * an annoying flickering */
+            int i_width, i_height, i_x, i_y;
+            RECT rect_temp;
+            GetClipBox( (HDC)wParam, &rect_temp );
+#if 0
+            intf_WarnMsg( 4, "vout: WinProc WM_ERASEBKGND %i,%i,%i,%i",
+                          rect_temp.left, rect_temp.top,
+                          rect_temp.right, rect_temp.bottom );
+#endif
+            vout_PlacePicture( p_vout, p_vout->p_sys->i_window_width,
+                               p_vout->p_sys->i_window_height,
+                               &i_x, &i_y, &i_width, &i_height );
+            ExcludeClipRect( (HDC)wParam, i_x, i_y,
+                             i_x + i_width, i_y + i_height );
         }
         break;
 

@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.19 2002/01/17 23:02:45 gbazin Exp $
+ * $Id: vout_directx.c,v 1.20 2002/01/27 22:14:52 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -285,6 +285,11 @@ static int vout_Init( vout_thread_t *p_vout )
 
     NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
 
+    /* Change the window title bar text */
+    if( p_vout->p_sys->b_using_overlay )
+        SetWindowText( p_vout->p_sys->hwnd,
+                       "VLC DirectX (using hardware overlay)" );
+
     return( 0 );
 }
 
@@ -315,7 +320,8 @@ static void vout_Destroy( vout_thread_t *p_vout )
     p_vout->p_sys->b_event_thread_die = 1;
     /* we need to be sure DirectXEventThread won't stay stuck in GetMessage,
      * so we send a fake message */
-    if( p_vout->p_sys->i_event_thread_status == THREAD_READY )
+    if( p_vout->p_sys->i_event_thread_status == THREAD_READY &&
+        p_vout->p_sys->hwnd )
     {
         PostMessage( p_vout->p_sys->hwnd, WM_CHAR, (WPARAM)'q', 0);
         vlc_thread_join( p_vout->p_sys->event_thread_id );
@@ -353,7 +359,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         if( !p_vout->p_sys->b_using_overlay )
             InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
         else
-          DirectXUpdateOverlay( p_vout );
+            DirectXUpdateOverlay( p_vout );
         p_vout->i_changes &= ~VOUT_SCALE_CHANGE;
         p_vout->p_sys->i_changes &= ~VOUT_SCALE_CHANGE;
     }
@@ -368,7 +374,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         if( !p_vout->p_sys->b_using_overlay )
             InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
         else
-          DirectXUpdateOverlay( p_vout );
+            DirectXUpdateOverlay( p_vout );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
         p_vout->p_sys->i_changes &= ~VOUT_SIZE_CHANGE;
     }
@@ -457,8 +463,6 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     HRESULT dxresult;
 
-    intf_WarnMsg( 8, "vout: vout_Display" );
-
     if( (p_vout->p_sys->p_display == NULL) )
     {
         intf_WarnMsg( 3, "vout error: vout_Display no display!!" );
@@ -476,10 +480,24 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         /* Blit video surface to display */
         dxresult = IDirectDrawSurface3_Blt(p_vout->p_sys->p_display,
-                                           &p_vout->p_sys->rect_dest,
+                                           &p_vout->p_sys->rect_dest_clipped,
                                            p_pic->p_sys->p_surface,
-                                           NULL,
+                                           &p_vout->p_sys->rect_src_clipped,
                                            0, &ddbltfx );
+        if ( dxresult == DDERR_SURFACELOST )
+        {
+            /* Our surface can be lost so be sure
+             * to check this and restore it if needed */
+            IDirectDrawSurface3_Restore( p_vout->p_sys->p_display );
+
+            /* Now that the surface has been restored try to display again */
+            dxresult = IDirectDrawSurface3_Blt(p_vout->p_sys->p_display,
+                                           &p_vout->p_sys->rect_dest_clipped,
+                                           p_pic->p_sys->p_surface,
+                                           &p_vout->p_sys->rect_src_clipped,
+                                           0, &ddbltfx );
+        }
+
         if( dxresult != DD_OK )
         {
             intf_WarnMsg( 3, "vout: could not Blit the surface" );
@@ -491,7 +509,23 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     {
 
         /* Flip the overlay buffers */
-        //dxresult = IDirectDrawSurface3_Flip(p_pic->p_sys->p_surface, NULL, 0 );
+        dxresult = IDirectDrawSurface3_Flip( p_pic->p_sys->p_front_surface,
+                                             NULL, DDFLIP_WAIT );
+        if ( dxresult == DDERR_SURFACELOST )
+        {
+            /* Our surface can be lost so be sure
+             * to check this and restore it if needed */
+            IDirectDrawSurface3_Restore( p_vout->p_sys->p_display );
+            IDirectDrawSurface3_Restore( p_pic->p_sys->p_front_surface );
+
+            /* Now that the surface has been restored try to display again */
+            dxresult = IDirectDrawSurface3_Flip( p_pic->p_sys->p_front_surface,
+                                                 NULL, DDFLIP_WAIT );
+            DirectXUpdateOverlay( p_vout );
+        }
+
+        if( dxresult != DD_OK )
+            intf_WarnMsg( 8, "vout: couldn't flip overlay surface" );
 
         if( !DirectXGetSurfaceDesc( p_pic ) )
         {
@@ -507,11 +541,10 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
             return;
         }
 
-        /* set currently displayed pic !!! faux*/
-        p_vout->p_sys->p_current_surface = p_pic->p_sys->p_surface;
+        /* set currently displayed pic */
+        p_vout->p_sys->p_current_surface = p_pic->p_sys->p_front_surface;
     }
 
-    intf_WarnMsg( 8, "vout: vout_Display End" );
 }
 
 
@@ -758,15 +791,15 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
         ddsd.dwFlags = DDSD_CAPS |
                        DDSD_HEIGHT |
                        DDSD_WIDTH |
-          //DDSD_BACKBUFFERCOUNT |
+                       DDSD_BACKBUFFERCOUNT |
                        DDSD_PIXELFORMAT;
         ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY |
-          //                  DDSCAPS_COMPLEX |
-          //DDSCAPS_FLIP |
+                              DDSCAPS_COMPLEX |
+                              DDSCAPS_FLIP |
                               DDSCAPS_VIDEOMEMORY;
         ddsd.dwHeight = p_vout->render.i_height;
         ddsd.dwWidth = p_vout->render.i_width;
-        ddsd.dwBackBufferCount = 0;                       /* One back buffer */
+        ddsd.dwBackBufferCount = 1;                       /* One back buffer */
 
         dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
                                                &ddsd,
@@ -975,8 +1008,10 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     p_vout->output.i_chroma = p_vout->render.i_chroma;
 
     /* hack */
+#if 1
     if( p_vout->render.i_chroma == FOURCC_I420 )
         p_vout->output.i_chroma = FOURCC_YV12;
+#endif
 
     /* First we try to create an overlay surface.
      * It looks like with most hardware it's not possible to create several
@@ -991,6 +1026,8 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         if( DirectXCreateSurface( p_vout, &p_surface, p_vout->output.i_chroma,
                                   p_vout->p_sys->b_using_overlay ) )
         {
+            DDSCAPS dds_caps;
+
             /* Allocate internal structure */
             p_pic[0].p_sys = malloc( sizeof( picture_sys_t ) );
             if( p_pic[0].p_sys == NULL )
@@ -998,8 +1035,25 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 DirectXCloseSurface( p_vout, p_surface );
                 return -1;
             }
-            p_pic[0].p_sys->p_surface = p_surface;
-            p_vout->p_sys->p_current_surface = p_surface;
+
+            /* set front buffer */
+            p_pic[0].p_sys->p_front_surface = p_surface;
+
+            /* Get the back buffer */
+            memset( &dds_caps, 0, sizeof( DDSCAPS ));
+            dds_caps.dwCaps = DDSCAPS_BACKBUFFER;
+            if( DD_OK != IDirectDrawSurface3_GetAttachedSurface(
+                                                p_surface, &dds_caps,
+                                                &p_pic[0].p_sys->p_surface ) )
+            {
+                intf_WarnMsg( 3, "vout: NewPictureVec couldn't get "
+                              "back buffer" );
+                /* front buffer is the same as back buffer */
+                p_pic[0].p_sys->p_surface = p_surface;
+            }
+
+
+            p_vout->p_sys->p_current_surface= p_pic[0].p_sys->p_front_surface;
             DirectXUpdateOverlay( p_vout );
             I_OUTPUTPICTURES = 1;
         }
@@ -1030,6 +1084,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                     return -1;
                 }
                 p_pic[i].p_sys->p_surface = p_surface;
+                p_pic[i].p_sys->p_front_surface = NULL;
                 I_OUTPUTPICTURES++;
 
             }
@@ -1083,6 +1138,12 @@ static void FreePictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 
     for( i = 0; i < i_num_pics; i++ )
     {
+#if 0
+        if( p_pic->p_sys->p_front_surface && 
+            ( p_pic->p_sys->p_surface != p_pic->p_sys->p_front_surface ) )
+            DirectXCloseSurface( p_vout, p_pic[i].p_sys->p_front_surface );
+#endif
+
         DirectXCloseSurface( p_vout, p_pic[i].p_sys->p_surface );
 
         for( i = 0; i < i_num_pics; i++ )
@@ -1158,7 +1219,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
 
             p_pic->i_planes = 1;
             break;
-#if 0
+
         case FOURCC_I420:
 
             p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
@@ -1184,6 +1245,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             p_pic->i_planes = 3;
             break;
 
+#if 0
         case FOURCC_Y211:
 
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
