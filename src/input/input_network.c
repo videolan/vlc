@@ -32,17 +32,17 @@
 #include <errno.h>                                                  /* errno */
 #include <sys/time.h>                                   /* "input_network.h" */
 
-#ifdef SYS_BSD
+#if defined(SYS_BSD) || defined(SYS_BEOS)
 #include <sys/socket.h>                                   /* struct sockaddr */
 #endif
 
 #include <netdb.h>     /* servent, getservbyname(), hostent, gethostbyname() */
 #include <netinet/in.h>                     /* sockaddr_in, htons(), htonl() */
 
+#include "threads.h"
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "threads.h"
 #include "netutils.h"
 
 #include "input.h"
@@ -96,6 +96,7 @@ int input_NetworkOpen( input_thread_t *p_input )
         return( 1 );
     }
 
+#ifndef SYS_BEOS
     /* Increase the receive buffer size to 1/2MB (8Mb/s during 1/2s) to avoid
      * packet loss caused by scheduling problems */
     i_socket_option = 524288;
@@ -109,6 +110,7 @@ int input_NetworkOpen( input_thread_t *p_input )
         close( p_input->i_handle );
         return( 1 );
     }
+#endif /* SYS_BEOS */
 
     /*
      * Bind the socket

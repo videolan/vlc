@@ -21,7 +21,13 @@
  * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
-void * RequestPlugin     ( char * psz_mask, char * psz_name );
-void   TrashPlugin       ( void * p_plugin );
-void * GetPluginFunction ( void *plugin, char *name );
+#ifdef SYS_BEOS
+typedef int plugin_id_t;
+#else
+typedef void* plugin_id_t;
+#endif
+
+int    RequestPlugin     ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name );
+void   TrashPlugin       ( plugin_id_t p_plugin );
+void * GetPluginFunction ( plugin_id_t plugin, char *name );
 

@@ -32,10 +32,11 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
+#include "threads.h"
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "threads.h"
+#include "plugins.h"
 #include "video.h"
 #include "video_output.h"
 #include "video_yuv.h"

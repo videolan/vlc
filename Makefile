@@ -10,7 +10,7 @@
 ################################################################################
 
 # Environment
-CC=egcc
+CC=gcc
 #CC=gcc295
 SHELL=/bin/sh
 INSTALL=install
@@ -30,7 +30,7 @@ VIDEO = x11
 #VIDEO += ggi
 #VIDEO += glide
 # Not yet supported
-#VIDEO += beos
+#VIDEO = beos
 #VIDEO += dga
 # Fallback method that should always work
 VIDEO += dummy
@@ -82,7 +82,9 @@ endif
 # PROGRAM_BUILD is a complete identification of the build
 # ( we can't use fancy options with date since OSes like Solaris
 # or FreeBSD have strange date implementations )
-PROGRAM_BUILD = `date` $(USER)@`hostname`
+PROGRAM_BUILD = `date` $(USER)
+# XXX: beos does not support hostname
+#PROGRAM_BUILD = `date` $(USER)@`hostname`
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including ARCH_xx and SYS_xx. It will be passed to C compiler.
@@ -122,6 +124,10 @@ endif
 
 ifeq ($(SYS),LINUX)
 LIB += -lpthread -ldl
+endif
+
+ifeq ($SYS),BEOS)
+LIB += -llibroot -llibgame -llibbe
 endif
 
 LIB += -lm

@@ -27,10 +27,10 @@
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
 
+#include "threads.h"
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "threads.h"
 
 #include "input.h"
 #include "input_file.h"

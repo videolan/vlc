@@ -152,7 +152,7 @@ typedef struct vout_thread_s
     u32                 i_blue_pixel;                                /* blue */
 
     /* Plugins */
-    void *                  p_vout_plugin;            /* video output plugin */
+    plugin_id_t             vout_plugin;              /* video output plugin */
     vout_sys_create_t *     p_sys_create;          /* allocate output method */
     vout_sys_init_t *       p_sys_init;          /* initialize output method */
     vout_sys_end_t *        p_sys_end;            /* terminate output method */

@@ -32,10 +32,10 @@
 #include <string.h>                                               /* bzero() */
 #include <netinet/in.h>                                           /* ntohs() */
 
+#include "threads.h"
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "threads.h"
 #include "intf_msg.h"
 #include "debug.h"
 
@@ -1109,19 +1109,19 @@ static stream_descriptor_t* AddStreamDescr(input_thread_t* p_input,
 
   p_input->p_stream->i_PAT_version = PSI_UNINITIALISED;
   p_input->p_stream->i_known_PAT_sections = 0;
-  bzero( p_input->p_stream->a_known_PAT_sections,
-         sizeof(*p_input->p_stream->a_known_PAT_sections) );
+  memset( p_input->p_stream->a_known_PAT_sections, 0,
+          sizeof(*p_input->p_stream->a_known_PAT_sections) );
   p_input->p_stream->b_is_PAT_complete = 0;
 
   p_input->p_stream->i_known_PMT_sections = 0;
-  bzero( p_input->p_stream->a_known_PMT_sections,
-         sizeof(*p_input->p_stream->a_known_PMT_sections) );
+  memset( p_input->p_stream->a_known_PMT_sections, 0,
+          sizeof(*p_input->p_stream->a_known_PMT_sections) );
   p_input->p_stream->b_is_PMT_complete = 0;
 
 #ifdef DVB_EXTENSIONS
   p_input->p_stream->i_SDT_version = PSI_UNINITIALISED;
   p_input->p_stream->i_known_SDT_sections = 0;
-  bzero( p_input->p_stream->a_known_SDT_sections,
+  memset( p_input->p_stream->a_known_SDT_sections, 0,
          sizeof(*p_input->p_stream->a_known_SDT_sections) );
   p_input->p_stream->b_is_SDT_complete = 0;
 #endif

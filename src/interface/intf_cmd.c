@@ -32,10 +32,11 @@
 #include <stdlib.h>                                    /* strtod(), strtol() */
 #include <string.h>                                            /* strerror() */
 
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "threads.h"
+#include "plugins.h"
 
 #include "interface.h"
 #include "intf_msg.h"

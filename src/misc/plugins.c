@@ -23,14 +23,22 @@
 
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
+
+#if defined(SYS_LINUX) || defined(SYS_BSD) || defined(SYS_GNU)
 #include <dlfcn.h>                           /* dlopen(), dlsym(), dlclose() */
+#endif
+
+#ifdef SYS_BEOS
+#include <image.h>
+#endif
+
+#include "plugins.h"
 
 #define PLUGIN_PATH_COUNT 5
 
-void * RequestPlugin ( char * psz_mask, char * psz_name )
+int RequestPlugin ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name )
 {
     int i_count, i_length;
-    void * fd;
     char * psz_plugin;
     char * psz_plugin_path[ PLUGIN_PATH_COUNT ] =
     {
@@ -48,23 +56,45 @@ void * RequestPlugin ( char * psz_mask, char * psz_name )
     {
         psz_plugin = malloc( strlen(psz_plugin_path[i_count]) + i_length + 6 );
         sprintf( psz_plugin, "%s/%s_%s.so", psz_plugin_path[i_count], psz_mask, psz_name );
-        fd = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
+#ifdef SYS_BEOS
+        *p_plugin = load_addon_image( psz_plugin );
+#else  /* SYS_BEOS */
+        *p_plugin = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
+#endif /* SYS_BEOS */
         free( psz_plugin );
 
-        if( fd != NULL )
-            return( fd );
+#ifdef SYS_BEOS
+        if( *p_plugin >= 0 )
+            return( 0 );
+#else
+        if( *p_plugin != NULL )
+            return( 0 );
+#endif
     }
 
-    return( 0 );
+    return( -1 );
 }
 
-void TrashPlugin ( void * p_plugin )
+void TrashPlugin ( plugin_id_t plugin )
 {
-    dlclose( p_plugin );
+#ifdef SYS_BEOS
+    unload_add_on( plugin );
+#else
+    dlclose( plugin );
+#endif
 }
 
-void *GetPluginFunction ( void *p_plugin, char *psz_name )
+void * GetPluginFunction ( plugin_id_t plugin, char *psz_name )
 {
-    return( dlsym(p_plugin, psz_name) );
+#ifdef SYS_BEOS
+    void * p_func;
+    
+    if( get_image_symbol( plugin, psz_name, B_SYMBOL_TYPE_TEXT, &p_func ) )
+        return( NULL );
+    else
+        return( p_func );    
+#else
+    return( dlsym(plugin, psz_name) );
+#endif
 }
 

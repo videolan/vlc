@@ -30,10 +30,10 @@
 #include <stdlib.h>                              /* atoi(), malloc(), free() */
 #include <netinet/in.h>                                           /* ntohl() */
 
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "threads.h"
 #include "debug.h"
 #include "input.h"
 #include "intf_msg.h"

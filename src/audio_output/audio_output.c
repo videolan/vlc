@@ -41,10 +41,10 @@
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
+#include "threads.h"
 #include "common.h"
 #include "config.h"
 #include "mtime.h"                             /* mtime_t, mdate(), msleep() */
-#include "threads.h"
 #include "plugins.h"
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
@@ -93,9 +93,8 @@ aout_thread_t *aout_CreateThread( int *pi_status )
 
     /* Request an interface plugin */
     psz_method = main_GetPszVariable( AOUT_METHOD_VAR, AOUT_DEFAULT_METHOD );
-    p_aout->p_aout_plugin = RequestPlugin( "aout", psz_method );
 
-    if( !p_aout->p_aout_plugin )
+    if( RequestPlugin( &p_aout->aout_plugin, "aout", psz_method ) )
     {
         intf_ErrMsg( "error: could not open audio plugin aout_%s.so\n", psz_method );
         free( p_aout );
@@ -103,21 +102,21 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     }
 
     /* Get plugins */
-    p_aout->p_sys_open =         GetPluginFunction( p_aout->p_aout_plugin, "aout_SysOpen" );
-    p_aout->p_sys_reset =        GetPluginFunction( p_aout->p_aout_plugin, "aout_SysReset" );
-    p_aout->p_sys_setformat =    GetPluginFunction( p_aout->p_aout_plugin, "aout_SysSetFormat" );
-    p_aout->p_sys_setchannels =  GetPluginFunction( p_aout->p_aout_plugin, "aout_SysSetChannels" );
-    p_aout->p_sys_setrate =      GetPluginFunction( p_aout->p_aout_plugin, "aout_SysSetRate" );
-    p_aout->p_sys_getbufinfo =   GetPluginFunction( p_aout->p_aout_plugin, "aout_SysGetBufInfo" );
-    p_aout->p_sys_playsamples =  GetPluginFunction( p_aout->p_aout_plugin, "aout_SysPlaySamples" );
-    p_aout->p_sys_close =        GetPluginFunction( p_aout->p_aout_plugin, "aout_SysClose" );
+    p_aout->p_sys_open =         GetPluginFunction( p_aout->aout_plugin, "aout_SysOpen" );
+    p_aout->p_sys_reset =        GetPluginFunction( p_aout->aout_plugin, "aout_SysReset" );
+    p_aout->p_sys_setformat =    GetPluginFunction( p_aout->aout_plugin, "aout_SysSetFormat" );
+    p_aout->p_sys_setchannels =  GetPluginFunction( p_aout->aout_plugin, "aout_SysSetChannels" );
+    p_aout->p_sys_setrate =      GetPluginFunction( p_aout->aout_plugin, "aout_SysSetRate" );
+    p_aout->p_sys_getbufinfo =   GetPluginFunction( p_aout->aout_plugin, "aout_SysGetBufInfo" );
+    p_aout->p_sys_playsamples =  GetPluginFunction( p_aout->aout_plugin, "aout_SysPlaySamples" );
+    p_aout->p_sys_close =        GetPluginFunction( p_aout->aout_plugin, "aout_SysClose" );
 
     /*
      * Initialize audio device
      */
     if ( p_aout->p_sys_open( p_aout ) )
     {
-        TrashPlugin( p_aout->p_aout_plugin );
+        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
@@ -128,28 +127,28 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     if ( p_aout->p_sys_reset( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->p_aout_plugin );
+        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
     if ( p_aout->p_sys_setformat( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->p_aout_plugin );
+        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
     if ( p_aout->p_sys_setchannels( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->p_aout_plugin );
+        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
     if ( p_aout->p_sys_setrate( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->p_aout_plugin );
+        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
@@ -160,7 +159,7 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     if( aout_SpawnThread( p_aout ) )
     {
         p_aout->p_sys_close( p_aout );
-        TrashPlugin( p_aout->p_aout_plugin );
+        TrashPlugin( p_aout->aout_plugin );
         free( p_aout );
         return( NULL );
     }
@@ -327,7 +326,7 @@ void aout_DestroyThread( aout_thread_t * p_aout, int *pi_status )
     intf_DbgMsg("aout debug: audio device (%s) closed\n", p_aout->psz_device);
 
     /* Close plugin */
-    TrashPlugin( p_aout->p_aout_plugin );
+    TrashPlugin( p_aout->aout_plugin );
 
     /* Free structure */
     free( p_aout );

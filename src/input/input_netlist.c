@@ -32,10 +32,10 @@
 #include <string.h>                                            /* strerror() */
 #include <errno.h>                                                  /* errno */
 
+#include "threads.h"
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "threads.h"
 #include "intf_msg.h"
 #include "debug.h"
 #include "input.h"

@@ -184,7 +184,7 @@ typedef struct aout_thread_s
     aout_fifo_t         fifo[ AOUT_MAX_FIFOS ];
 
     /* Plugins */
-    void *                      p_aout_plugin;        /* video output plugin */
+    plugin_id_t                 aout_plugin;          /* video output plugin */
     aout_sys_open_t *           p_sys_open;
     aout_sys_reset_t *          p_sys_reset;
     aout_sys_setformat_t *      p_sys_setformat;

@@ -103,8 +103,12 @@ typedef struct video_parser_s *         p_video_parser_t;
 #define PAD(n, d)   ( ((n) % (d)) ? ((((n) / (d)) + 1) * (d)) : (n) )
 
 /* MAX and MIN: self explanatory */
+#ifndef MAX
 #define MAX(a, b)   ( ((a) > (b)) ? (a) : (b) )
+#endif
+#ifndef MIN
 #define MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
+#endif
 
 /* MSB (big endian)/LSB (little endian) convertions - network order is always
  * MSB, and should be used for both network communications and files. Note that

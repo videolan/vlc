@@ -32,10 +32,10 @@
 #include <sys/uio.h>                                          /* for input.h */
 #include <unistd.h>                                              /* getpid() */
 
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "threads.h"
 
 #include "intf_msg.h"
 #include "debug.h"                                                 /* ASSERT */

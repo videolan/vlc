@@ -50,11 +50,12 @@
 #include <fcntl.h>                                                 /* open() */
 
 /* Common headers */
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "threads.h"
 #include "debug.h"
+#include "plugins.h"
 #include "intf_msg.h"
 
 #include "input.h"

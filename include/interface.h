@@ -58,7 +58,7 @@ typedef struct intf_thread_s
     p_intf_sys_t        p_sys;                           /* system interface */
 
     /* Plugin */
-    void *                  p_intf_plugin;               /* interface plugin */
+    plugin_id_t             intf_plugin;                 /* interface plugin */
     intf_sys_create_t *     p_sys_create;         /* create interface thread */
     intf_sys_manage_t *     p_sys_manage;                       /* main loop */
     intf_sys_destroy_t *    p_sys_destroy;              /* destroy interface */

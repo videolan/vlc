@@ -32,10 +32,10 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
+#include "threads.h"
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "threads.h"
 #include "plugins.h"
 #include "video.h"
 #include "video_output.h"
@@ -103,9 +103,8 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
 
     /* Request an interface plugin */
     psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
-    p_vout->p_vout_plugin = RequestPlugin( "vout", psz_method );
 
-    if( !p_vout->p_vout_plugin )
+    if( RequestPlugin( &p_vout->vout_plugin, "vout", psz_method ) < 0 )
     {
         intf_ErrMsg( "error: could not open video plugin vout_%s.so\n", psz_method );
         free( p_vout );
@@ -113,12 +112,12 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     }
 
     /* Get plugins */
-    p_vout->p_sys_create =  GetPluginFunction( p_vout->p_vout_plugin, "vout_SysCreate" );
-    p_vout->p_sys_init =    GetPluginFunction( p_vout->p_vout_plugin, "vout_SysInit" );
-    p_vout->p_sys_end =     GetPluginFunction( p_vout->p_vout_plugin, "vout_SysEnd" );
-    p_vout->p_sys_destroy = GetPluginFunction( p_vout->p_vout_plugin, "vout_SysDestroy" );
-    p_vout->p_sys_manage =  GetPluginFunction( p_vout->p_vout_plugin, "vout_SysManage" );
-    p_vout->p_sys_display = GetPluginFunction( p_vout->p_vout_plugin, "vout_SysDisplay" );
+    p_vout->p_sys_create =  GetPluginFunction( p_vout->vout_plugin, "vout_SysCreate" );
+    p_vout->p_sys_init =    GetPluginFunction( p_vout->vout_plugin, "vout_SysInit" );
+    p_vout->p_sys_end =     GetPluginFunction( p_vout->vout_plugin, "vout_SysEnd" );
+    p_vout->p_sys_destroy = GetPluginFunction( p_vout->vout_plugin, "vout_SysDestroy" );
+    p_vout->p_sys_manage =  GetPluginFunction( p_vout->vout_plugin, "vout_SysManage" );
+    p_vout->p_sys_display = GetPluginFunction( p_vout->vout_plugin, "vout_SysDisplay" );
 
     /* Initialize thread properties - thread id and locks will be initialized
      * later */
@@ -181,7 +180,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
      * own error messages */
     if( p_vout->p_sys_create( p_vout, psz_display, i_root_window ) )
     {
-        TrashPlugin( p_vout->p_vout_plugin );
+        TrashPlugin( p_vout->vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -207,7 +206,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     if( p_vout->p_default_font == NULL )
     {
         p_vout->p_sys_destroy( p_vout );
-        TrashPlugin( p_vout->p_vout_plugin );
+        TrashPlugin( p_vout->vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -216,7 +215,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     {
         vout_UnloadFont( p_vout->p_default_font );
         p_vout->p_sys_destroy( p_vout );
-        TrashPlugin( p_vout->p_vout_plugin );
+        TrashPlugin( p_vout->vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -232,7 +231,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
         vout_UnloadFont( p_vout->p_default_font );
         vout_UnloadFont( p_vout->p_large_font );
         p_vout->p_sys_destroy( p_vout );
-        TrashPlugin( p_vout->p_vout_plugin );
+        TrashPlugin( p_vout->vout_plugin );
         free( p_vout );
         return( NULL );
     }
@@ -1254,7 +1253,7 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     p_vout->p_sys_destroy( p_vout );
 
     /* Close plugin */
-    TrashPlugin( p_vout->p_vout_plugin );
+    TrashPlugin( p_vout->vout_plugin );
 
     /* Free structure */
     free( p_vout );

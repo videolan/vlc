@@ -31,11 +31,12 @@
 
 #include <netinet/in.h>                                             /* ntohs */
 
+#include "threads.h"
 #include "common.h"
 #include "config.h"
 #include "mtime.h"
-#include "threads.h"
 #include "intf_msg.h"
+#include "plugins.h"
 #include "debug.h"
 
 #include "input.h"

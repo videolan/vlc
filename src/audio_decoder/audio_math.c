@@ -29,10 +29,11 @@
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
 
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"                                                /* mtime_t */
-#include "threads.h"
+#include "plugins.h"
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 

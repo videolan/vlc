@@ -33,10 +33,10 @@
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                          /* for input.h */
 
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "threads.h"
 #include "plugins.h"
 #include "input.h"
 
@@ -99,9 +99,8 @@ intf_thread_t* intf_Create( void )
 
     /* Request an interface plugin */
     psz_method = main_GetPszVariable( VOUT_METHOD_VAR, VOUT_DEFAULT_METHOD );
-    p_intf->p_intf_plugin = RequestPlugin( "intf", psz_method );
 
-    if( !p_intf->p_intf_plugin )
+    if( RequestPlugin( &p_intf->intf_plugin, "intf", psz_method ) < 0 )
     {
         intf_ErrMsg( "error: could not open interface plugin intf_%s.so\n", psz_method );
         free( p_intf );
@@ -109,9 +108,9 @@ intf_thread_t* intf_Create( void )
     }
 
     /* Get plugins */
-    p_intf->p_sys_create =  GetPluginFunction( p_intf->p_intf_plugin, "intf_SysCreate" );
-    p_intf->p_sys_manage =  GetPluginFunction( p_intf->p_intf_plugin, "intf_SysManage" );
-    p_intf->p_sys_destroy = GetPluginFunction( p_intf->p_intf_plugin, "intf_SysDestroy" );
+    p_intf->p_sys_create =  GetPluginFunction( p_intf->intf_plugin, "intf_SysCreate" );
+    p_intf->p_sys_manage =  GetPluginFunction( p_intf->intf_plugin, "intf_SysManage" );
+    p_intf->p_sys_destroy = GetPluginFunction( p_intf->intf_plugin, "intf_SysDestroy" );
 
     /* Initialize structure */
     p_intf->b_die =     0;
@@ -128,7 +127,7 @@ intf_thread_t* intf_Create( void )
     if( p_intf->p_console == NULL )
     {
         intf_ErrMsg("error: can't create control console\n");
-        TrashPlugin( p_intf->p_intf_plugin );
+        TrashPlugin( p_intf->intf_plugin );
         free( p_intf );
         return( NULL );
     }
@@ -136,7 +135,7 @@ intf_thread_t* intf_Create( void )
     {
         intf_ErrMsg("error: can't create interface\n");
         intf_ConsoleDestroy( p_intf->p_console );
-        TrashPlugin( p_intf->p_intf_plugin );
+        TrashPlugin( p_intf->intf_plugin );
         free( p_intf );
         return( NULL );
     }
@@ -202,7 +201,7 @@ void intf_Destroy( intf_thread_t *p_intf )
     UnloadChannels( p_intf );
 
     /* Close plugin */
-    TrashPlugin( p_intf->p_intf_plugin );
+    TrashPlugin( p_intf->intf_plugin );
 
     /* Free structure */
     free( p_intf );

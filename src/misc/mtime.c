@@ -34,6 +34,10 @@
 #include <unistd.h>                                              /* select() */
 #include <sys/time.h>
 
+#ifdef SYS_BEOS
+#include <kernel/OS.h>
+#endif
+
 #include "common.h"
 #include "mtime.h"
 
@@ -63,6 +67,9 @@ char *mstrtime( char *psz_buffer, mtime_t date )
  *****************************************************************************/
 mtime_t mdate( void )
 {
+#ifdef SYS_BEOS
+    return( real_time_clock_usecs() );
+#else
     struct timeval tv_date;
 
     /* gettimeofday() could return an error, and should be tested. However, the
@@ -70,6 +77,7 @@ mtime_t mdate( void )
      * here, since tv is a local variable. */
     gettimeofday( &tv_date, NULL );
     return( (mtime_t) tv_date.tv_sec * 1000000 + (mtime_t) tv_date.tv_usec );
+#endif
 }
 
 /*****************************************************************************
@@ -81,6 +89,17 @@ mtime_t mdate( void )
  *****************************************************************************/
 void mwait( mtime_t date )
 {
+#ifdef SYS_BEOS
+    mtime_t delay;
+    
+    delay = date - real_time_clock_usecs();
+    if( delay <= 0 )
+    {
+        return;
+    }
+    snooze( delay );
+#else /* SYS_BEOS */
+
     struct timeval tv_date, tv_delay;
     mtime_t        delay;          /* delay in msec, signed to detect errors */
 
@@ -102,6 +121,8 @@ void mwait( mtime_t date )
 #else
     usleep( delay );
 #endif
+
+#endif /* SYS_BEOS */
 }
 
 /*****************************************************************************
@@ -111,6 +132,10 @@ void mwait( mtime_t date )
  *****************************************************************************/
 void msleep( mtime_t delay )
 {
+#ifdef SYS_BEOS
+    snooze( delay );
+#else /* SYS_BEOS */
+
 #ifndef usleep
     struct timeval tv_delay;
 
@@ -124,4 +149,6 @@ void msleep( mtime_t delay )
 #else
     usleep( delay );
 #endif
+
+#endif /* SYS_BEOS */
 }

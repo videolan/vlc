@@ -30,22 +30,24 @@
 #include <string.h>                                   /* strerror(), bzero() */
 #include <stdlib.h>                                                /* free() */
 
-#ifdef SYS_BSD
+#if defined(SYS_BSD) || defined(SYS_BEOS)
 #include <netinet/in.h>                                    /* struct in_addr */
 #include <sys/socket.h>                                   /* struct sockaddr */
 #endif
 
+#if defined(SYS_LINUX) || defined(SYS_BSD) || defined(SYS_GNU)
 #include <arpa/inet.h>                           /* inet_ntoa(), inet_aton() */
+#endif
 
 #ifdef SYS_LINUX
 #include <sys/ioctl.h>                                            /* ioctl() */
 #include <net/if.h>                            /* interface (arch-dependent) */
 #endif
 
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "threads.h"
 #include "netutils.h"
 #include "input_vlan.h"
 #include "intf_msg.h"
@@ -76,6 +78,10 @@ static int ZeTrucMucheFunction( int Channel );
  *****************************************************************************/
 int input_VlanCreate( void )
 {
+#ifdef SYS_BEOS
+    intf_ErrMsg( "error: vlans are not supported under beos\n" );
+    return( 1 );
+#else
     /* Allocate structure */
     p_main->p_vlan = malloc( sizeof( input_vlan_t ) );
     if( p_main->p_vlan == NULL )
@@ -90,6 +96,7 @@ int input_VlanCreate( void )
 
     intf_Msg("VLANs initialized\n");
     return( 0 );
+#endif /* SYS_BEOS */
 }
 
 /*****************************************************************************
@@ -123,6 +130,9 @@ void input_VlanDestroy( void )
  *****************************************************************************/
 int input_VlanJoin( int i_vlan_id )
 {
+#ifdef SYS_BEOS
+    return( -1 );
+#else
     /* If last change is too recent, wait a while */
     if( mdate() - p_main->p_vlan->last_change < INPUT_VLAN_CHANGE_DELAY )
     {
@@ -134,6 +144,7 @@ int input_VlanJoin( int i_vlan_id )
 
     intf_Msg("Joining VLAN %d (channel %d)\n", i_vlan_id + 2, i_vlan_id );
     return( ZeTrucMucheFunction( i_vlan_id ) ); /* FIXME: join vlan ?? */
+#endif /* SYS_BEOS */
 }
 
 /*****************************************************************************

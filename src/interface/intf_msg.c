@@ -34,10 +34,11 @@
 #include <string.h>                                            /* strerror() */
 #include <unistd.h>                                      /* close(), write() */
 
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "threads.h"
+#include "plugins.h"
 #include "intf_msg.h"
 #include "interface.h"
 #include "intf_console.h"
@@ -345,7 +346,12 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
     /*
      * Convert message to string
      */
+#ifdef SYS_BEOS
+    psz_str = (char*) malloc( INTF_MAX_MSG_SIZE );
+    vsprintf( psz_str, psz_format, ap );
+#else
     vasprintf( &psz_str, psz_format, ap );
+#endif
     if( psz_str == NULL )
     {
         fprintf(stderr, "warning: can't store following message (%s): ",
@@ -401,7 +407,12 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
     /*
      * Convert message to string
      */
+#ifdef SYS_BEOS
+    psz_str = (char*) malloc( INTF_MAX_MSG_SIZE );
+    vsprintf( psz_str, psz_format, ap );
+#else
     vasprintf( &psz_str, psz_format, ap );
+#endif
     if( psz_str == NULL )
     {
         fprintf(stderr, "warning: can't store following message (%s): ",

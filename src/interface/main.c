@@ -26,18 +26,19 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <getopt.h>                                              /* getopt() */
 #include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
+#include <getopt.h>                                              /* getopt() */
 #include <stdio.h>                                              /* sprintf() */
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                  /* getenv(), strtol(),  */
 #include <string.h>                                            /* strerror() */
 
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "threads.h"
+#include "plugins.h"
 #include "input_vlan.h"
 
 #include "intf_msg.h"
@@ -574,6 +575,9 @@ static void SignalHandler( int i_signal )
  *****************************************************************************/
 static int TestMMX( void )
 {
+/* FIXME: under beos, gcc does not support the foolowing inline assembly */ 
+#ifndef SYS_BEOS
+
     int i_reg, i_dummy = 0;
 
     /* test for a 386 cpu */
@@ -635,5 +639,9 @@ static int TestMMX( void )
         return( 0 );
 
     return( 1 );
+
+#else /* SYS_BEOS */
+    return( 1 );
+#endif /* SYS_BEOS */
 }
 #endif

@@ -24,10 +24,10 @@
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                          /* for input.h */
 
+#include "threads.h"
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
-#include "threads.h"
 
 #include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 

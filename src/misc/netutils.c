@@ -34,7 +34,10 @@
 #include <sys/socket.h>                                   /* struct sockaddr */
 #endif
 
-#include <arpa/inet.h>                                   /* htons(), htonl() */
+#if defined(SYS_LINUX) || defined(SYS_BSD) || defined(SYS_GNU)
+#include <arpa/inet.h>                           /* inet_ntoa(), inet_aton() */
+#endif
+
 
 #ifdef SYS_LINUX
 #include <sys/ioctl.h>                                            /* ioctl() */
@@ -62,7 +65,7 @@ int BuildInetAddr( struct sockaddr_in *p_sa_in, char *psz_in_addr, int i_port )
 {
     struct hostent *p_hostent;                            /* host descriptor */
 
-    bzero( p_sa_in, sizeof( struct sockaddr_in ) );
+    memset( p_sa_in, 0, sizeof( struct sockaddr_in ) );
     p_sa_in->sin_family = AF_INET;                                 /* family */
     p_sa_in->sin_port = htons( i_port );                             /* port */
 
@@ -73,7 +76,11 @@ int BuildInetAddr( struct sockaddr_in *p_sa_in, char *psz_in_addr, int i_port )
     }
     /* Try to convert address directly from in_addr - this will work if
      * psz_in_addr is dotted decimal. */
+#ifdef SYS_BEOS
+    else if( (p_sa_in->sin_addr.s_addr = inet_addr( psz_in_addr )) == -1 )
+#else
     else if( !inet_aton( psz_in_addr, &p_sa_in->sin_addr) )
+#endif
     {
         /* The convertion failed: the address is an host name, which needs
          * to be resolved */
@@ -85,7 +92,7 @@ int BuildInetAddr( struct sockaddr_in *p_sa_in, char *psz_in_addr, int i_port )
         }
 
         /* Copy the first address of the host in the socket address */
-        bcopy( p_hostent->h_addr_list[0], &p_sa_in->sin_addr, p_hostent->h_length);
+        memmove( &p_sa_in->sin_addr, p_hostent->h_addr_list[0], p_hostent->h_length );
     }
     return( 0 );
 }
