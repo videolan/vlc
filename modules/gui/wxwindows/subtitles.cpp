@@ -2,7 +2,7 @@
  * subtitles.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subtitles.cpp,v 1.2 2003/05/20 23:17:59 gbazin Exp $
+ * $Id: subtitles.cpp,v 1.3 2003/08/10 09:22:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -91,6 +91,8 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     /* Create a panel to put everything in */
     wxPanel *panel = new wxPanel( this, -1 );
     panel->SetAutoLayout( TRUE );
+    wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
 
     /* Create the subtitles file textctrl */
     wxBoxSizer *file_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -108,6 +110,44 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     file_sizer->Add( file_combo, 1, wxALL, 5 );
     file_sizer->Add( browse_button, 0, wxALL, 5 );
     file_sizer_sizer->Add( file_sizer, 1, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( file_sizer, 0, wxEXPAND | wxALL, 5 );
+
+    /* Subtitles encoding */
+    encoding_combo = NULL;
+    module_config_t *p_item =
+        config_FindConfig( VLC_OBJECT(p_intf), "subsdec-encoding" );
+    if( p_item )
+    {
+        wxBoxSizer *enc_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
+        wxStaticBox *enc_box = new wxStaticBox( panel, -1,
+                                                wxU(_("Subtitles encoding")) );
+        wxStaticBoxSizer *enc_sizer = new wxStaticBoxSizer( enc_box,
+                                                            wxHORIZONTAL );
+        wxStaticText *label =
+            new wxStaticText(panel, -1, wxU(_("Text encoding")));
+        encoding_combo = new wxComboBox( panel, -1, wxU(p_item->psz_value),
+                                         wxDefaultPosition, wxDefaultSize,
+                                         0, NULL, wxCB_READONLY | wxCB_SORT );
+
+        /* build a list of available options */
+        for( int i_index = 0; p_item->ppsz_list && p_item->ppsz_list[i_index];
+             i_index++ )
+        {
+            encoding_combo->Append( wxU(p_item->ppsz_list[i_index]) );
+            if( p_item->psz_value && !strcmp( p_item->psz_value,
+                                              p_item->ppsz_list[i_index] ) )
+                encoding_combo->SetSelection( i_index );
+        }
+
+        if( p_item->psz_value )
+        encoding_combo->SetValue( wxU(p_item->psz_value) );
+        encoding_combo->SetToolTip( wxU(p_item->psz_longtext) );
+
+        enc_sizer->Add( label, 0, wxALL, 5 );
+        enc_sizer->Add( encoding_combo, 0, wxALL, 5 );
+        enc_sizer_sizer->Add( enc_sizer, 1, wxEXPAND | wxALL, 5 );
+        panel_sizer->Add( enc_sizer, 0, wxEXPAND | wxALL, 5 );
+    }
 
     /* Misc Subtitles options */
     wxBoxSizer *misc_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -141,6 +181,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     misc_sizer->Add( fps_spinctrl, 0, wxALL, 5 );
 
     misc_sizer_sizer->Add( misc_sizer, 1, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( misc_sizer, 0, wxEXPAND | wxALL, 5 );
 
     /* Separation */
     wxStaticLine *static_line = new wxStaticLine( panel, wxID_OK );
@@ -156,10 +197,7 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     button_sizer->Add( ok_button, 0, wxALL, 5 );
     button_sizer->Add( cancel_button, 0, wxALL, 5 );
     button_sizer->Layout();
-    wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
-    wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
-    panel_sizer->Add( file_sizer, 0, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( misc_sizer, 0, wxEXPAND | wxALL, 5 );
+
     panel_sizer->Add( static_line, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( button_sizer, 0, wxALIGN_LEFT | wxALIGN_BOTTOM |
                       wxALL, 5 );

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.50 2003/07/26 12:41:52 gbazin Exp $
+ * $Id: wxwindows.h,v 1.51 2003/08/10 09:22:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -430,6 +430,7 @@ public:
     virtual ~SubsFileDialog();
 
     wxComboBox *file_combo;
+    wxComboBox *encoding_combo;
     wxSpinCtrl *delay_spinctrl;
     wxSpinCtrl *fps_spinctrl;
 

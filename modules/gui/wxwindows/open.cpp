@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.35 2003/07/26 14:19:04 gbazin Exp $
+ * $Id: open.cpp,v 1.36 2003/08/10 09:22:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -839,6 +839,9 @@ void OpenDialog::OnSubsFileSettings( wxCommandEvent& WXUNUSED(event) )
         subsfile_mrl.Empty();
         subsfile_mrl.Add( wxString(wxT("sub-file=")) +
                           subsfile_dialog->file_combo->GetValue() );
+        if( subsfile_dialog->encoding_combo )
+            subsfile_mrl.Add( wxString(wxT("subsdec-encoding=")) +
+                              subsfile_dialog->encoding_combo->GetValue() );
         subsfile_mrl.Add( wxString::Format( wxT("sub-delay=%i"),
                           subsfile_dialog->delay_spinctrl->GetValue() ) );
         subsfile_mrl.Add( wxString::Format( wxT("sub-fps=%i"),

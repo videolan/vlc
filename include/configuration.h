@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.29 2003/08/03 23:11:21 gbazin Exp $
+ * $Id: configuration.h,v 1.30 2003/08/10 09:22:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -144,7 +144,7 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
     { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value }; tmp.b_advanced = advc; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; } i_config++
 #define add_string_from_list( name, psz_value, ppsz_list, p_callback, text, \
       longtext, advc ) \
-    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, 0, 0, 0, 0, NULL, ppsz_list }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
+    { static module_config_t tmp = { CONFIG_ITEM_STRING, NULL, name, '\0', text, longtext, psz_value, 0, 0, 0, 0, 0, 0, NULL, NULL, ppsz_list }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
 #define add_file( name, psz_value, p_callback, text, longtext, advc ) \
     { static module_config_t tmp = { CONFIG_ITEM_FILE, NULL, name, '\0', text, longtext, psz_value, 0, 0 }; p_config[ i_config ] = tmp; p_config[ i_config ].pf_callback = p_callback; p_config[i_config].b_advanced = advc; } i_config++
 #define add_directory( name, psz_value, p_callback, text, longtext, advc ) \
