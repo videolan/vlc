@@ -171,8 +171,8 @@
 /* Maximum size of a data packet (128 kB) */
 #define INPUT_MAX_PACKET_SIZE			131072
 
-/* Maximum length of a pre-parsed chunk (32 MB) */
-#define INPUT_PREPARSE_LENGTH			33554432
+/* Maximum length of a pre-parsed chunk (4 MB) */
+#define INPUT_PREPARSE_LENGTH			4194304
 
 /* Maximum length of a hostname or source name */
 #define INPUT_MAX_SOURCE_LENGTH         100

@@ -69,8 +69,7 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo )
 void NextDataPacket( bit_stream_t * p_bit_stream )
 {
     WORD_TYPE           buffer_left;
-    /* FIXME : not portable in a 64bit environment */
-    int                 i_bytes_left;
+    ptrdiff_t           i_bytes_left;
     decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
 
     /* Buffer used at the end of a decoder thread, to give it zero

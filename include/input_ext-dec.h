@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.5 2000/12/22 17:53:30 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.6 2000/12/26 19:14:46 massiot Exp $
  *
  * Authors:
  *
@@ -400,7 +400,7 @@ static __inline__ void RealignBits( bit_stream_t * p_bit_stream )
 static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
                                  byte_t * p_buffer, size_t i_buf_len )
 {
-    int     i_available;
+    ptrdiff_t           i_available;
 
     if( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
             >= i_buf_len )

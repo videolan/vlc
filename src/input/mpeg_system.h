@@ -3,7 +3,7 @@
  * and TS system layers
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: mpeg_system.h,v 1.3 2000/12/22 10:58:27 massiot Exp $
+ * $Id: mpeg_system.h,v 1.4 2000/12/26 19:14:47 massiot Exp $
  *
  * Authors:
  *
@@ -103,9 +103,13 @@ typedef struct stream_ts_data_s
  *****************************************************************************/
 typedef struct stream_ps_data_s
 {
+    boolean_t               b_has_PSM;                 /* very rare, in fact */
+
     u8                      i_PSM_version;
-    boolean_t               b_is_PSM_complete;
 } stream_ps_data_t;
+
+/* PSM version is 5 bits, so -1 is not a valid value */
+#define EMPTY_PSM_VERSION   -1
 
 
 /*****************************************************************************

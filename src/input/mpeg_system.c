@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.18 2000/12/22 17:53:30 massiot Exp $
+ * $Id: mpeg_system.c,v 1.19 2000/12/26 19:14:47 massiot Exp $
  *
  * Authors: 
  *
@@ -56,16 +56,70 @@
  */
 
 /*****************************************************************************
+ * MoveChunk
+ *****************************************************************************
+ * Small utility function used to parse discontinuous headers safely. Copies
+ * i_buf_len bytes of data to a buffer and returns the size copied.
+ * This is a variation on the theme of input_ext-dec.h:GetChunk().
+ *****************************************************************************/
+static __inline__ size_t MoveChunk( byte_t * p_dest,
+                                    data_packet_t ** pp_data_src,
+                                    byte_t ** pp_src,
+                                    size_t i_buf_len )
+{
+    ptrdiff_t           i_available;
+
+    if( (i_available = (*pp_data_src)->p_payload_end - *pp_src)
+            >= i_buf_len )
+    {
+        if( p_dest != NULL )
+            memcpy( p_dest, *pp_src, i_buf_len );
+        *pp_src += i_buf_len;
+        return( i_buf_len );
+    }
+    else
+    {
+        size_t          i_init_len = i_buf_len;
+
+        do
+        {
+            if( p_dest != NULL )
+                memcpy( p_dest, *pp_src, i_available );
+            *pp_data_src = (*pp_data_src)->p_next;
+            i_buf_len -= i_available;
+            p_dest += i_available;
+            if( *pp_data_src == NULL )
+            {
+                *pp_src = NULL;
+                return( i_init_len - i_buf_len );
+            }
+            *pp_src = (*pp_data_src)->p_payload_start;
+        }
+        while( (i_available = (*pp_data_src)->p_payload_end - *pp_src)
+                <= i_buf_len );
+
+        if( i_buf_len )
+        {
+            if( p_dest != NULL )
+                memcpy( p_dest, *pp_src, i_buf_len );
+            *pp_src += i_buf_len;
+        }
+        return( i_init_len );
+    }
+}
+
+/*****************************************************************************
  * input_ParsePES
  *****************************************************************************
  * Parse a finished PES packet and analyze its header.
  *****************************************************************************/
-#define PES_HEADER_SIZE     14
+#define PES_HEADER_SIZE     7
 void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
-    data_packet_t * p_header_data;
+    data_packet_t * p_data;
+    byte_t *        p_byte;
     byte_t          p_header[PES_HEADER_SIZE];
-    int             i_done, i_todo;
+    int             i_done;
 
 #define p_pes (p_es->p_pes)
 
@@ -74,31 +128,12 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     /* Parse the header. The header has a variable length, but in order
      * to improve the algorithm, we will read the 14 bytes we may be
      * interested in */
-    p_header_data = p_pes->p_first;
+    p_data = p_pes->p_first;
+    p_byte = p_data->p_payload_start;
     i_done = 0;
 
-    for( ; ; )
-    {
-        i_todo = p_header_data->p_payload_end
-                     - p_header_data->p_payload_start;
-        if( i_todo > PES_HEADER_SIZE - i_done )
-            i_todo = PES_HEADER_SIZE - i_done;
-
-        memcpy( p_header + i_done, p_header_data->p_payload_start,
-                i_todo );
-        i_done += i_todo;
-
-        if( i_done < PES_HEADER_SIZE && p_header_data->p_next != NULL )
-        {
-            p_header_data = p_header_data->p_next;
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    if( i_done != PES_HEADER_SIZE )
+    if( MoveChunk( p_header, &p_data, &p_byte, PES_HEADER_SIZE )
+            != PES_HEADER_SIZE )
     {
         intf_WarnMsg( 3, "PES packet too short to have a header" );
         p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
@@ -150,45 +185,64 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             if( (p_header[6] & 0xC0) == 0x80 )
             {
                 /* MPEG-2 : the PES header contains at least 3 more bytes. */
-                p_pes->b_data_alignment = p_header[6] & 0x04;
-                p_pes->b_has_pts = p_header[7] & 0x80;
-                i_pes_header_size = p_header[8] + 9;
+                size_t      i_max_len;
 
-                /* Now parse the optional header extensions (in the limit of
-                 * the 14 bytes). */
+                p_pes->b_data_alignment = p_header[6] & 0x04;
+
+                /* Re-use p_header buffer now that we don't need it. */
+                i_max_len = MoveChunk( p_header, &p_data, &p_byte, 7 );
+                if( i_max_len < 2 )
+                {
+                    intf_WarnMsg( 3,
+                            "PES packet too short to have a MPEG-2 header" );
+                    p_input->p_plugin->pf_delete_pes( p_input->p_method_data,
+                                                      p_pes );
+                    p_pes = NULL;
+                    return;
+                }
+
+                p_pes->b_has_pts = p_header[0] & 0x80;
+                i_pes_header_size = p_header[1] + 9;
+
+                /* Now parse the optional header extensions */
                 if( p_pes->b_has_pts )
                 {
+                    if( i_max_len < 7 )
+                    {
+                        intf_WarnMsg( 3,
+                            "PES packet too short to have a MPEG-2 header" );
+                        p_input->p_plugin->pf_delete_pes(
+                                                      p_input->p_method_data,
+                                                      p_pes );
+                        p_pes = NULL;
+                        return;
+                    }
                     p_pes->i_pts =
-                      ( ((mtime_t)(p_header[9] & 0x0E) << 29) |
-                        (((mtime_t)U16_AT(p_header + 10) << 14) - (1 << 14)) |
-                        ((mtime_t)U16_AT(p_header + 12) >> 1) ) * 300;
+                      ( ((mtime_t)(p_header[2] & 0x0E) << 29) |
+                        (((mtime_t)U16_AT(p_header + 3) << 14) - (1 << 14)) |
+                        ((mtime_t)U16_AT(p_header + 5) >> 1) ) * 300;
                     p_pes->i_pts /= 27;
                 }
             }
             else
             {
                 /* Probably MPEG-1 */
-                byte_t *        p_byte;
-                data_packet_t * p_data;
-
                 i_pes_header_size = 6;
                 p_data = p_pes->p_first;
-                p_byte = p_data->p_buffer + 6;
+                p_byte = p_data->p_payload_start;
+                /* Cannot fail because the previous one succeeded. */
+                MoveChunk( NULL, &p_data, &p_byte, 6 );
+
                 while( *p_byte == 0xFF && i_pes_header_size < 22 )
                 {
                     i_pes_header_size++;
-                    p_byte++;
-                    if( p_byte >= p_data->p_payload_end )
+                    if( MoveChunk( NULL, &p_data, &p_byte, 1 ) != 1 )
                     {
-                        p_data = p_data->p_next;
-                        if( p_data == NULL )
-                        {
-                            intf_ErrMsg( "MPEG-1 packet too short for header" );
-                            p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
-                            p_pes = NULL;
-                            return;
-                        }
-                        p_byte = p_data->p_payload_start;
+                        intf_WarnMsg( 3,
+                            "PES packet too short to have a MPEG-1 header" );
+                        p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+                        p_pes = NULL;
+                        return;
                     }
                 }
                 if( i_pes_header_size == 22 )
@@ -203,57 +257,42 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 {
                     /* Don't ask why... --Meuuh */
                     /* Erm... why ? --Sam */
-                    p_byte += 2;
+                    /* Well... According to the recommendation, it is for
+                     * STD_buffer_scale and STD_buffer_size. --Meuuh */
                     i_pes_header_size += 2;
-                    if( p_byte >= p_data->p_payload_end )
+                    if( MoveChunk( NULL, &p_data, &p_byte, 2 ) != 2 )
                     {
-                        int i_plus = p_byte - p_data->p_payload_end;
-                        p_data = p_data->p_next;
-                        if( p_data == NULL )
-                        {
-                            intf_ErrMsg( "MPEG-1 packet too short for header" );
-                            p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
-                            p_pes = NULL;
-                            return;
-                        }
-                        p_byte = p_data->p_payload_start + i_plus;
+                        intf_WarnMsg( 3,
+                            "PES packet too short to have a MPEG-1 header" );
+                        p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
+                        p_pes = NULL;
+                        return;
                     }
                 }
 
                 i_pes_header_size++;
-                p_pes->b_has_pts = *p_byte & 0x20;
 
                 if( *p_byte & 0x10 )
                 {
                     /* DTS */
                     i_pes_header_size += 5;
                 }
-                if( *p_byte & 0x20 )
+                if( (p_pes->b_has_pts = (*p_byte & 0x20)) )
                 {
                     /* PTS */
                     byte_t      p_pts[5];
-                    int         i;
 
                     i_pes_header_size += 4;
-                    p_pts[0] = *p_byte;
-                    for( i = 1; i < 5; i++ )
+                    if( MoveChunk( p_pts, &p_data, &p_byte, 5 ) != 5 )
                     {
-                        p_byte++;
-                        if( p_byte >= p_data->p_payload_end )
-                        {
-                            p_data = p_data->p_next;
-                            if( p_data == NULL )
-                            {
-                                intf_ErrMsg( "MPEG-1 packet too short for header" );
-                                p_input->p_plugin->pf_delete_pes( p_input->p_method_data, p_pes );
-                                p_pes = NULL;
-                                return;
-                            }
-                            p_byte = p_data->p_payload_start;
-                        }
-
-                        p_pts[i] = *p_byte;
+                        intf_WarnMsg( 3,
+                            "PES packet too short to have a MPEG-1 header" );
+                        p_input->p_plugin->pf_delete_pes(
+                                            p_input->p_method_data, p_pes );
+                        p_pes = NULL;
+                        return;
                     }
+
                     p_pes->i_pts =
                       ( ((mtime_t)(p_pts[0] & 0x0E) << 29) |
                         (((mtime_t)U16_AT(p_pts + 1) << 14) - (1 << 14)) |
@@ -299,16 +338,16 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
          * specific data packets where the PES payload begins (renumber
          * p_payload_start), so that the decoders can find the beginning
          * of their data right out of the box. */
-        p_header_data = p_pes->p_first;
-        i_payload_size = p_header_data->p_payload_end
-                                 - p_header_data->p_payload_start;
+        p_data = p_pes->p_first;
+        i_payload_size = p_data->p_payload_end
+                                 - p_data->p_payload_start;
         while( i_pes_header_size > i_payload_size )
         {
             /* These packets are entirely filled by the PES header. */
             i_pes_header_size -= i_payload_size;
-            p_header_data->p_payload_start = p_header_data->p_payload_end;
+            p_data->p_payload_start = p_data->p_payload_end;
             /* Go to the next data packet. */
-            if( (p_header_data = p_header_data->p_next) == NULL )
+            if( (p_data = p_data->p_next) == NULL )
             {
                 intf_ErrMsg( "PES header bigger than payload" );
                 p_input->p_plugin->pf_delete_pes( p_input->p_method_data,
@@ -316,8 +355,8 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 p_pes = NULL;
                 return;
             }
-            i_payload_size = p_header_data->p_payload_end
-                                 - p_header_data->p_payload_start;
+            i_payload_size = p_data->p_payload_end
+                                 - p_data->p_payload_start;
         }
         /* This last packet is partly header, partly payload. */
         if( i_payload_size < i_pes_header_size )
@@ -327,7 +366,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             p_pes = NULL;
             return;
         }
-        p_header_data->p_payload_start += i_pes_header_size;
+        p_data->p_payload_start += i_pes_header_size;
 
         /* Now we can eventually put the PES packet in the decoder's
          * PES fifo */
@@ -623,71 +662,121 @@ static u16 GetID( data_packet_t * p_data )
 /*****************************************************************************
  * DecodePSM: Decode the Program Stream Map information
  *****************************************************************************/
-/* FIXME : deprecated code ! */
 static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
 {
     stream_ps_data_t *  p_demux =
                  (stream_ps_data_t *)p_input->stream.p_demux_data;
+    byte_t *            p_byte;
+    byte_t *            p_end;
+    int                 i;
+    int                 i_new_es_number = 0;
 
     intf_Msg("input info: Your stream contains Program Stream Map information");
     intf_Msg("input info: Please send a mail to <massiot@via.ecp.fr>");
 
-#if 0
-    if( !p_demux->b_is_PSM_complete )
+    p_demux->b_has_PSM = 1;
+
+    if( p_data->p_payload_start + 10 > p_data->p_payload_end )
     {
-        byte_t *    p_byte;
-        byte_t *    p_end;
+        intf_ErrMsg( "PSM too short : packet corrupt" );
+        return;
+    }
 
-        intf_DbgMsg( "Building PSM" );
-        if( p_data->p_payload_start + 10 > p_data->p_payload_end )
+    if( p_demux->i_PSM_version == (p_data->p_buffer[6] & 0x1F) )
+    {
+        /* Already got that one. */
+        return;
+    }
+
+    intf_DbgMsg( "Building PSM" );
+    p_demux->i_PSM_version = p_data->p_buffer[6] & 0x1F;
+
+    /* Go to elementary_stream_map_length, jumping over
+     * program_stream_info. */
+    p_byte = p_data->p_payload_start + 10
+              + U16_AT(&p_data->p_payload_start[8]);
+    if( p_byte > p_data->p_payload_end )
+    {
+        intf_ErrMsg( "PSM too short : packet corrupt" );
+        return;
+    }
+    /* This is the full size of the elementary_stream_map.
+     * 2 == elementary_stream_map_length
+     * 4 == CRC_32 */
+    p_end = p_byte + 2 + U16_AT(p_byte) - 4;
+    p_byte += 2;
+    if( p_end > p_data->p_payload_end )
+    {
+        intf_ErrMsg( "PSM too short : packet corrupt" );
+        return;
+    }
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    /* 4 == minimum useful size of a section */
+    while( p_byte + 4 <= p_end )
+    {
+        es_descriptor_t *   p_es = NULL;
+        u8                  i_stream_id = p_byte[1];
+        /* FIXME: there will be a problem with private streams... (same
+         * stream_id) */
+
+        /* Look for the ES in the ES table */
+        for( i = i_new_es_number;
+             i < p_input->stream.pp_programs[0]->i_es_number;
+             i++ )
         {
-            intf_ErrMsg( "PSM too short : packet corrupt" );
-            return;
+            if( p_input->stream.pp_programs[0]->pp_es[i]->i_stream_id
+                    == i_stream_id )
+            {
+                p_es = p_input->stream.pp_programs[0]->pp_es[i];
+                if( p_es->i_type != p_byte[0] )
+                {
+                    input_DelES( p_input, p_es );
+                    p_es = NULL;
+                }
+                else
+                {
+                    /* Move the ES to the beginning. */
+                    i_new_es_number++;
+                    p_input->stream.pp_programs[0]->pp_es[i]
+                        = p_input->stream.pp_programs[0]->pp_es[ i_new_es_number ];
+                    p_input->stream.pp_programs[0]->pp_es[ i_new_es_number ]
+                        = p_es;
+                }
+                break;
+            }
         }
-        /* Go to elementary_stream_map_length, jumping over
-         * program_stream_info. */
-        p_byte = p_data->p_payload_start + 10
-                  + U16_AT(&p_data->p_payload_start[8]);
-        if( p_byte > p_data->p_payload_end )
-        {
-            intf_ErrMsg( "PSM too short : packet corrupt" );
-            return;
-        }
-        /* This is the full size of the elementary_stream_map.
-         * 2 == elementary_stream_map_length
-         * 4 == CRC_32 */
-        p_end = p_byte + 2 + U16_AT(p_byte) - 4;
-        p_byte += 2;
-        if( p_end > p_data->p_payload_end )
-        {
-            intf_ErrMsg( "PSM too short : packet corrupt" );
-            return;
-        }
 
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        /* 4 == minimum useful size of a section */
-        while( p_byte + 4 <= p_end )
+        /* The goal is to have all the ES we have just read in the
+         * beginning of the pp_es table, and all the others at the end,
+         * so that we can close them more easily at the end. */
+        if( p_es == NULL )
         {
-            es_descriptor_t *   p_es;
-
             p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
-                                p_byte[1], 0 );
+                                i_stream_id, 0 );
             p_es->i_type = p_byte[0];
-            p_byte += 4 + U16_AT(&p_byte[2]);
-        }
+            i_new_es_number++;
 
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        p_demux->i_PSM_version = p_data->p_buffer[6] & 0x1F;
-        p_demux->b_is_PSM_complete = 1;
+            /* input_AddES has inserted the new element at the end. */
+            p_input->stream.pp_programs[0]->pp_es[
+                p_input->stream.pp_programs[0]->i_es_number ]
+                = p_input->stream.pp_programs[0]->pp_es[ i_new_es_number ];
+            p_input->stream.pp_programs[0]->pp_es[ i_new_es_number ] = p_es;
+        }
+        p_byte += 4 + U16_AT(&p_byte[2]);
     }
-    else if( p_demux->i_PSM_version != (p_data->p_buffer[6] & 0x1F) )
+
+    /* Un-select the streams that are no longer parts of the program. */
+    for( i = i_new_es_number;
+         i < p_input->stream.pp_programs[0]->i_es_number;
+         i++ )
     {
-        /* FIXME */
-        intf_ErrMsg( "PSM changed, this is not supported yet !" );
-        p_demux->i_PSM_version = p_data->p_buffer[6] & 0x1F;
+        input_DelES( p_input,
+                     p_input->stream.pp_programs[0]->pp_es[i_new_es_number] );
+        /* Yes, I wrote *i_new_es_number* */
     }
-#endif
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
 /*****************************************************************************
@@ -725,10 +814,13 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
         }
         else
         {
+            stream_ps_data_t * p_demux =
+              (stream_ps_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
+
             /* Search all ES ; if not found -> AddES */
             p_es = input_FindES( p_input, i_id );
 
-            if( p_es == NULL )
+            if( p_es == NULL && !p_demux->b_has_PSM )
             {
                 p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
                                     i_id, 0 );
@@ -742,7 +834,8 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         /* MPEG video */
                         p_es->i_type = MPEG2_VIDEO_ES;
 #ifdef AUTO_SPAWN
-                        input_SelectES( p_input, p_es );
+                        if( !p_input->stream.b_seekable )
+                            input_SelectES( p_input, p_es );
 #endif
                     }
                     else if( (i_id & 0xE0) == 0xC0 )
@@ -755,7 +848,8 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                           && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == (p_es->i_id & 0x1F) )
                         {
-                            input_SelectES( p_input, p_es );
+                            if( !p_input->stream.b_seekable )
+                                input_SelectES( p_input, p_es );
                         }
 #endif
                     }
@@ -769,7 +863,8 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                          && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == ((p_es->i_id & 0xF00) >> 8) )
                         {
-                            input_SelectES( p_input, p_es );
+                            if( !p_input->stream.b_seekable )
+                                input_SelectES( p_input, p_es );
                         }
 #endif
                     }
@@ -781,7 +876,8 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         if( main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, 0 )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
-                            input_SelectES( p_input, p_es );
+                            if( !p_input->stream.b_seekable )
+                                input_SelectES( p_input, p_es );
                         }
 #endif
                     }

@@ -2,7 +2,7 @@
  * vpar_synchro.h : video parser blocks management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.h,v 1.1 2000/12/21 17:19:52 massiot Exp $
+ * $Id: vpar_synchro.h,v 1.2 2000/12/26 19:14:47 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -66,7 +66,7 @@ typedef struct video_synchro_s
     mtime_t         backward_pts, current_pts;
 
 #ifdef STATS
-    unsigned int    i_trashed_pic;
+    unsigned int    i_trashed_pic, i_pic;
 #endif
 } video_synchro_t;
 

@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.12 2000/12/22 13:04:45 sam Exp $
+ * $Id: input_ps.c,v 1.13 2000/12/26 19:14:47 massiot Exp $
  *
  * Authors: 
  *
@@ -30,6 +30,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <errno.h>
+#include <malloc.h>
 
 #include "config.h"
 #include "common.h"
@@ -37,6 +38,8 @@
 #include "mtime.h"
 
 #include "intf_msg.h"
+
+#include "main.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -106,16 +109,28 @@ static void PSInit( input_thread_t * p_input )
 
     if( p_input->stream.b_seekable )
     {
+        stream_ps_data_t * p_demux_data =
+             (stream_ps_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
+
         /* Pre-parse the stream to gather stream_descriptor_t. */
         p_input->stream.pp_programs[0]->b_is_ok = 0;
-        /* FIXME: don't read all stream (it can be long !) */
-        while( !p_input->b_die && !p_input->b_error )
+        p_demux_data->i_PSM_version = EMPTY_PSM_VERSION;
+
+        while( !p_input->b_die && !p_input->b_error
+                && !p_demux_data->b_has_PSM )
         {
             int                 i_result, i;
             data_packet_t *     pp_packets[INPUT_READ_ONCE];
 
             i_result = PSRead( p_input, pp_packets );
-            if( i_result == 1 ) break;
+            if( i_result == 1 )
+            {
+                /* EOF */
+                vlc_mutex_lock( &p_input->stream.stream_lock );
+                p_input->stream.pp_programs[0]->b_is_ok = 1;
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
+                break;
+            }
             if( i_result == -1 )
             {
                 p_input->b_error = 1;
@@ -137,8 +152,66 @@ static void PSInit( input_thread_t * p_input )
         }
         fseek( p_method->stream, 0, SEEK_SET );
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_input->stream.pp_programs[0]->b_is_ok = 1;
         p_input->stream.i_tell = 0;
+        if( p_demux_data->b_has_PSM )
+        {
+            /* (The PSM decoder will care about spawning the decoders) */
+            p_input->stream.pp_programs[0]->b_is_ok = 1;
+        }
+#ifdef AUTO_SPAWN
+        else
+        {
+            /* (We have to do it ourselves) */
+            int                 i_es;
+
+            /* FIXME: we should do multiple passes in case an audio type
+             * is not present */
+            for( i_es = 0;
+                 i_es < p_input->stream.pp_programs[0]->i_es_number;
+                 i_es++ )
+            {
+#define p_es p_input->stream.pp_programs[0]->pp_es[i_es]
+                switch( p_es->i_type )
+                {
+                    case MPEG1_VIDEO_ES:
+                    case MPEG2_VIDEO_ES:
+                        input_SelectES( p_input, p_es );
+                        break;
+
+                    case MPEG1_AUDIO_ES:
+                    case MPEG2_AUDIO_ES:
+                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
+                                == REQUESTED_MPEG 
+                            && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                                == (p_es->i_id & 0x1F) )
+                        {
+                            input_SelectES( p_input, p_es );
+                        }
+                        break;
+
+                    case AC3_AUDIO_ES:
+                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
+                                == REQUESTED_AC3
+                            && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                                == ((p_es->i_id & 0xF00) >> 8) )
+                        {
+                            input_SelectES( p_input, p_es );
+                        }
+
+                    case DVD_SPU_ES:
+                        if( main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, 0 )
+                                == ((p_es->i_id & 0x1F00) >> 8) )
+                        {
+                            input_SelectES( p_input, p_es );
+                        }
+
+                    case LPCM_AUDIO_ES:
+                        /* FIXME ! */
+                }
+            }
+                    
+        }
+#endif
 #ifdef STATS
         input_DumpStream( p_input );
 #endif

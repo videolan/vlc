@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.63 2000/12/22 13:04:45 sam Exp $
+ * $Id: vpar_synchro.c,v 1.64 2000/12/26 19:14:47 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -271,7 +271,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             if( S.i_eta_b )
                 S.i_n_b = S.i_eta_b;
             if( S.i_eta_p + 1 > S.i_n_p )
-                S.i_n_p++;
+                S.i_n_p = S.i_eta_p + 1;
 
             if( S.backward_pts )
             {
@@ -310,7 +310,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
         case B_CODING_TYPE:
             /* Stream structure changes */
             if( S.i_eta_b + 1 > S.i_n_b )
-                S.i_n_b++;
+                S.i_n_b = S.i_eta_b + 1;
 
             pts = S.current_pts + period;
 
@@ -495,6 +495,8 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
     {
     case I_CODING_TYPE:
         p_vpar->synchro.i_eta_p = p_vpar->synchro.i_eta_b = 0;
+        if( p_vpar->synchro.i_eta_p )
+            p_vpar->synchro.i_n_p = p_vpar->synchro.i_eta_p;
 #ifdef STATS
         if( p_vpar->synchro.i_type == VPAR_SYNCHRO_DEFAULT )
         {
@@ -505,16 +507,19 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
                   p_vpar->synchro.p_tau[B_CODING_TYPE],
                   p_vpar->synchro.i_n_b,
                   p_vpar->p_vout->render_time,
-                  1 + p_vpar->synchro.i_n_p * (1 + p_vpar->synchro.i_n_b) -
+                  p_vpar->synchro.i_pic -
                   p_vpar->synchro.i_trashed_pic,
-                  1 + p_vpar->synchro.i_n_p * (1 + p_vpar->synchro.i_n_b) );
+                  p_vpar->synchro.i_pic );
             p_vpar->synchro.i_trashed_pic = 0;
+            p_vpar->synchro.i_pic = 0;
         }
 #endif
         break;
     case P_CODING_TYPE:
-        p_vpar->synchro.i_eta_b = 0;
         p_vpar->synchro.i_eta_p++;
+        if( p_vpar->synchro.i_eta_b )
+            p_vpar->synchro.i_n_b = p_vpar->synchro.i_eta_b;
+        p_vpar->synchro.i_eta_b = 0;
         break;
     case B_CODING_TYPE:
         p_vpar->synchro.i_eta_b++;
@@ -537,14 +542,16 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
         }
         else
         {
-            p_vpar->synchro.current_pts += 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
+            p_vpar->synchro.current_pts += 1000000
+                    / (p_vpar->sequence.i_frame_rate) * 1001;
         }
     }
     else
     {
         if( p_vpar->synchro.backward_pts == 0 )
         {
-            p_vpar->synchro.current_pts += 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
+            p_vpar->synchro.current_pts += 1000000
+                    / (p_vpar->sequence.i_frame_rate) * 1001;
         }
         else
         {
@@ -564,4 +571,8 @@ static void SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type )
             p_pes->b_has_pts = 0;
         }
     }
+
+#ifdef STATS
+    p_vpar->synchro.i_pic++;
+#endif
 }

@@ -3,6 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
+ * $Id: common.h,v 1.19 2000/12/26 19:14:46 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -39,10 +40,23 @@ typedef u8                  byte_t;
 #ifndef SYS_SOLARIS
 typedef int                 boolean_t;
 #else
-#include <sys/types.h>
+#   include <sys/types.h>
 #endif
 #ifdef SYS_GNU
-#define _MACH_I386_BOOLEAN_H_
+#   define _MACH_I386_BOOLEAN_H_
+#endif
+
+/* ptrdiff_t definition */
+#ifdef _HAVE_STDDEF_H
+#   include <stddef.h>
+#else
+#   include <malloc.h>
+#endif
+
+#ifndef _PTRDIFF_T
+#   define _PTRDIFF_T
+/* Not portable in a 64-bit environment. */
+typedef int                 ptrdiff_t;
 #endif
 
 /* Counter for statistics and profiling */
@@ -126,7 +140,7 @@ typedef struct video_parser_s *         p_video_parser_t;
 #define MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
-/* MSB (big endian)/LSB (little endian) convertions - network order is always
+/* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. Note that
  * byte orders other than little and big endians are not supported, but only
  * the VAX seems to have such exotic properties - note that these 'functions'
@@ -151,6 +165,6 @@ typedef struct video_parser_s *         p_video_parser_t;
 /* XXX??: cause a compilation error */
 #endif
 
-/* Macros used by input to access the TS buffer */
+/* Macros with automatic casts */
 #define U32_AT(p)   ( ntohl ( *( (u32 *)(p) ) ) )
 #define U16_AT(p)   ( ntohs ( *( (u16 *)(p) ) ) )
