@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.2 2002/08/26 01:01:13 sam Exp $
+##  $Id: bootstrap,v 1.3 2002/08/26 09:38:20 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -29,13 +29,18 @@ done
 ###
 ###  classic stuff
 ###
-rm -f aclocal.m4 configure config.guess config.log config.sub ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh configure.in~ Makefile.am~
+rm -f aclocal.m4 configure config.guess config.log config.sub ltmain.sh libtool ltconfig missing mkinstalldirs depcomp install-sh configure.in~ Makefile.am~ ChangeLog~ po/ChangeLog~
 
 aclocal
 autoheader
-gettextize --force --intl --copy --no-changelog
+
+# run gettextize and then fix its cruft
+gettextize --force --intl --copy --no-changelog || gettextize --force --copy
 test -f configure.in~ && mv configure.in~ configure.in
 test -f Makefile.am~ && mv Makefile.am~ Makefile.am
+test -f ChangeLog~ && mv ChangeLog~ ChangeLog
+test -f po/ChangeLog~ && mv po/ChangeLog~ po/ChangeLog
+
 automake --foreign --add-missing --copy
 autoconf
 aclocal -I m4

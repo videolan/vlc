@@ -3,4 +3,4 @@ SUBDIRS = src include modules mozilla extras \
 
 ACLOCAL_AMFLAGS = -I m4
 
-EXTRA_DIST = config.rpath mkinstalldirs  config.rpath
+EXTRA_DIST = config.rpath mkinstalldirs
