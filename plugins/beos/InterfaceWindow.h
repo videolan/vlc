@@ -32,6 +32,7 @@ public:
     virtual bool    QuitRequested();
     virtual void    MessageReceived(BMessage *message);
     
+	
     intf_thread_t  *p_intf;
 	BSlider * p_vol;
 	BSlider * p_seek;
@@ -39,6 +40,9 @@ public:
 	sem_id	fScrubSem;
 	bool	fSeeking;
 	BFilePanel *file_panel;
+
+private:
+	int GetCD(const char *directory, BMenu *cd_menu);
 };
 
 class InterfaceView : public BView

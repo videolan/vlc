@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.17 2001/03/06 01:26:06 richards Exp $
+ * $Id: intf_beos.cpp,v 1.18 2001/03/06 19:52:03 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -56,6 +56,12 @@
 #include <Screen.h>
 #include <malloc.h>
 #include <string.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <Path.h>
+#include <StorageDefs.h>
+#include <scsi.h>
+#include <scsiprobe_driver.h>
 
 extern "C"
 {
@@ -114,13 +120,16 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
     menu_bar = new BMenuBar(rect, "main menu");
     AddChild( menu_bar );
 
-	BMenu *m;
+	BMenu *m, *cd_menu;
 
 	menu_bar->AddItem( m = new BMenu("File") );
 	menu_bar->ResizeToPreferred();
-	m->AddItem( new BMenuItem("Open file...", new BMessage(OPEN_FILE), 'O'));
-	m->AddItem( new BMenuItem("Open DVD...", new BMessage(OPEN_DVD), 'D'));
+	m->AddItem( new BMenuItem("Open File...", new BMessage(OPEN_FILE), 'O'));
+	cd_menu = new BMenu("Open DVD");
+	GetCD("/dev/disk", cd_menu);
+	m->AddItem(cd_menu);
 	m->AddSeparatorItem();
+	m->AddItem( new BMenuItem("About...", new BMessage(B_ABOUT_REQUESTED), 'A'));
 	m->AddItem( new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
 	
 
@@ -231,6 +240,11 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 	Activate();
     switch( p_message->what )
     {
+    case B_ABOUT_REQUESTED:
+		alert = new BAlert(VOUT_TITLE, "BeOS " VOUT_TITLE "\n\n<www.videolan.org>", "Ok");
+	    alert->Go();
+	    break;    	
+    
     case OPEN_FILE:
     	if(file_panel)
     		{
@@ -243,9 +257,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
     	break;
 
     case OPEN_DVD:
-	    alert = new BAlert(VOUT_TITLE, "Play DVD from menu not yet supported", "Bummer");
-	    alert->Go();
-	    //intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, "dvd:/dev/disk/ide/atapi/1/master/0/raw" );
+	    const char **device;
+	    char device_method_and_name[B_FILE_NAME_LENGTH + 4];
+	    if(p_message->FindString("device", device) != B_ERROR)
+	    	{
+	    	sprintf(device_method_and_name, "dvd:%s", *device); 
+	    	intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, device_method_and_name );
+    		}
     	break;
 
     case STOP_PLAYBACK:
@@ -390,6 +408,74 @@ bool InterfaceWindow::QuitRequested()
 
     return( false );
 }
+
+
+int InterfaceWindow::GetCD(const char *directory, BMenu *cd_menu)
+{ 
+	BDirectory dir; 
+	dir.SetTo(directory); 
+	if(dir.InitCheck() != B_NO_ERROR) { 
+		return B_ERROR; 
+	} 
+	dir.Rewind(); 
+	BEntry entry; 
+	while(dir.GetNextEntry(&entry) >= 0) { 
+		BPath path; 
+		const char *name; 
+		entry_ref e; 
+		
+		if(entry.GetPath(&path) != B_NO_ERROR) 
+			continue; 
+		name = path.Path(); 
+		
+		
+		if(entry.GetRef(&e) != B_NO_ERROR) 
+			continue; 
+
+		if(entry.IsDirectory()) { 
+			if(strcmp(e.name, "floppy") == 0) 
+				continue; // ignore floppy (it is not silent) 
+			int devfd = GetCD(name, cd_menu);
+			if(devfd >= 0)
+				{
+				return devfd;
+				}
+		} 
+		else { 
+			int devfd; 
+			device_geometry g; 
+			status_t m;
+
+			if(strcmp(e.name, "raw") != 0) 
+				continue; // ignore partitions 
+
+			devfd = open(name, O_RDONLY); 
+			if(devfd < 0) 
+				continue; 
+
+			if(ioctl(devfd, B_GET_GEOMETRY, &g, sizeof(g)) >= 0) {
+				if(g.device_type == B_CD) //ensure the drive is a CD-ROM
+				{ 
+					if(ioctl(devfd, B_GET_MEDIA_STATUS, &m, sizeof(m)) >= 0 )
+						if(m == B_NO_ERROR) //ensure media is present
+							{
+							BMessage *msg;
+							msg = new BMessage(OPEN_DVD);
+							msg->AddString("device", name);
+							BMenuItem *menu_item;
+							menu_item = new BMenuItem(name, msg);
+							cd_menu->AddItem(menu_item);
+							continue;
+							}
+				}
+			}
+			close(devfd);
+		} 
+	}
+	return B_ERROR;
+}
+
+
 /*****************************************************************************
  * MediaSlider
  *****************************************************************************/

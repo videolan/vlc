@@ -142,7 +142,7 @@ int32 DrawingThread(void *data)
  *****************************************************************************/
 
 VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_output )
-        : BWindow(frame, name, B_DOCUMENT_WINDOW, NULL)
+        : BWindow(frame, name, B_TITLED_WINDOW, NULL)
 {
 	float minWidth, minHeight, maxWidth, maxHeight; 
 
@@ -247,7 +247,6 @@ void VideoWindow::Zoom(BPoint origin, float width, float height )
 {
 if(is_zoomed)
 	{
-	SetLook(B_DOCUMENT_WINDOW_LOOK);
 	MoveTo(rect.left, rect.top);
 	ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
 	be_app->ShowCursor();
@@ -259,7 +258,6 @@ else
 	screen = new BScreen(this);
 	BRect rect = screen->Frame();
 	delete screen;
-	SetLook(B_NO_BORDER_WINDOW_LOOK);
 	MoveTo(0,0);
 	ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
 	be_app->HideCursor();
