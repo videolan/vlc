@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.16 2003/01/23 23:51:13 massiot Exp $
+ * $Id: vout.m,v 1.17 2003/01/24 00:17:20 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -602,6 +602,11 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
 
         i_offset_y = (i_height - i_adj_height) / 2;
     }
+    /* the following is for the resize bar. Dirty hack (hartman) */
+    if ( !p_vout->b_fullscreen)
+    {
+        i_offset_y = i_offset_y - 12;
+    }
 
     SetIdentityMatrix( p_vout->p_sys->p_matrix );
 
@@ -864,9 +869,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     vout_thread_t * p_vout;
     id o_window = [self window];
     p_vout = (vout_thread_t *)[o_window getVout];
-
-    [[NSColor blackColor] set];
-    NSRectFill( rect );
+    
+    if ( p_vout->b_fullscreen )
+    {
+        [[NSColor blackColor] set];
+        NSRectFill( rect );
+    }
     [super drawRect: rect];
 
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
@@ -1028,6 +1036,9 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
                                    NSClosableWindowMask |
                                    NSResizableWindowMask |
                                    NSTexturedBackgroundWindowMask;
+        
+        /* the following is for the resize bar. Dirty hack (hartman) */
+        p_vout->p_sys->s_rect.size.height = p_vout->p_sys->s_rect.size.height + 24;
 
         if ( p_vout->p_sys->p_fullscreen_state != NULL )
             EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
@@ -1097,6 +1108,10 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_vout->p_sys->s_rect.origin = s_rect.origin;
 
         p_vout->p_sys->b_pos_saved = 1;
+    }
+    else /* the following is for the resize bar. Dirty hack (hartman) */
+    {
+        p_vout->p_sys->s_rect.size.height = p_vout->p_sys->s_rect.size.height - 24;
     }
 
     p_vout->p_sys->p_qdport = nil;
