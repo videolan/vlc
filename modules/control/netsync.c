@@ -2,7 +2,7 @@
  * netsync.c: synchronisation between several network clients.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ntservice.c 6963 2004-03-05 19:24:14Z murray $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -113,6 +113,13 @@ static int Activate( vlc_object_t *p_this )
     msg_Info( p_intf, "Using the netsync interface module..." );
 
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( !p_intf->p_sys )
+    {
+        msg_Err( p_intf, "no memory" );
+        return VLC_ENOMEM;
+    }
+
+    p_intf->p_sys->p_input = NULL;
 
     p_intf->pf_run = Run;
     return VLC_SUCCESS;
@@ -141,7 +148,7 @@ static void Run( intf_thread_t *p_intf )
     char p_data[MAX_MSG_LENGTH];
     int i_socket;
 
-    if( !psz_master || inet_addr( psz_master ) == INADDR_NONE )
+    if( !b_master && (!psz_master || inet_addr( psz_master ) == INADDR_NONE) )
     {
         if( psz_master ) free( psz_master );
         msg_Err( p_intf, "invalid master address." );
