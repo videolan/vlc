@@ -10,6 +10,7 @@ SOURCES_wxwindows = \
         iteminfo.cpp \
 	menus.cpp \
 	preferences.cpp \
+	preferences_widgets.cpp \
 	timer.cpp \
 	fileinfo.cpp \
 	subtitles.cpp \
