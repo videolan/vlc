@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.11 2003/09/10 11:51:00 fenrir Exp $
+ * $Id: ps.c,v 1.12 2003/10/27 18:57:12 rocky Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -146,7 +146,10 @@ static int Activate( vlc_object_t * p_this )
         stream_ps_data_t * p_demux_data =
              (stream_ps_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
 
+	off_t i_tell = p_input->stream.p_selected_area->i_tell;
+
         /* Pre-parse the stream to gather stream_descriptor_t. */
+        p_input->pf_seek( p_input, (off_t) 0 );
         p_input->stream.pp_programs[0]->b_is_ok = 0;
         p_demux_data->i_PSM_version = EMPTY_PSM_VERSION;
 
@@ -183,7 +186,7 @@ static int Activate( vlc_object_t * p_this )
             }
         }
         input_AccessReinit( p_input );
-        p_input->pf_seek( p_input, (off_t)0 );
+        p_input->pf_seek( p_input, i_tell );
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
         if( p_demux_data->b_has_PSM )
