@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.45 2004/01/05 14:42:14 zorglub Exp $
+ * $Id: sap.c,v 1.46 2004/01/15 19:21:03 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -655,16 +655,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
     psz_uri_default = NULL;
     if( p_sd->i_media > 1 )
     {
-        psz_uri = malloc( strlen( p_sd->psz_sdp ) + 7 );
-        if( psz_uri == NULL )
-        {
-            msg_Warn( p_intf, "out of memory" );
-            return;
-        }
-        memcpy( psz_uri, "sdp://", 6 );
-        psz_uri += 6;
-        memcpy( psz_uri, p_sd->psz_sdp, strlen( p_sd->psz_sdp ) + 1 );
-
+        asprintf( &psz_uri, "sdp://%s", p_sd->psz_sdp );
         /* Check if we have already added the item */
         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
         {
@@ -679,9 +670,12 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                                       FIND_ANYWHERE );
         i_id = playlist_Add( p_playlist, psz_uri, p_sd->psz_sessionname ,
                       PLAYLIST_CHECK_INSERT, PLAYLIST_END );
-
-        i_pos = playlist_GetPositionById( p_playlist, i_id );
-        playlist_SetGroup( p_playlist, i_pos, p_intf->p_sys->i_group );
+        if( i_id != -1 )
+        {
+            i_pos = playlist_GetPositionById( p_playlist, i_id );
+            playlist_SetGroup( p_playlist, i_pos, p_intf->p_sys->i_group );
+        }
+        free( psz_uri );
 
         /* Remember it */
         p_announce = (struct sap_announce_t *)malloc(
