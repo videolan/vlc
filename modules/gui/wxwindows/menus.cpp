@@ -58,7 +58,7 @@ class Menu: public wxMenu
 {
 public:
     /* Constructor */
-    Menu( intf_thread_t *p_intf, wxWindow *p_parent, int i_start_id );
+    Menu( intf_thread_t *p_intf, int i_start_id );
     virtual ~Menu();
 
     void Populate( int i_count, char **ppsz_names, int *pi_objects );
@@ -242,7 +242,7 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
     }
 
     /* Build menu */
-    Menu popupmenu( p_intf, p_parent, PopupMenu_Events );
+    Menu popupmenu( p_intf, PopupMenu_Events );
     popupmenu.Populate( i, ppsz_varnames, pi_objects );
 
 #if 1
@@ -294,7 +294,7 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
     /* Build menu */
     Menu *p_vlc_menu = (Menu *)p_menu;
     if( !p_vlc_menu )
-        p_vlc_menu = new Menu( _p_intf, p_parent, AudioMenu_Events );
+        p_vlc_menu = new Menu( _p_intf, AudioMenu_Events );
     else
         p_vlc_menu->Clear();
 
@@ -365,7 +365,7 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
     /* Build menu */
     Menu *p_vlc_menu = (Menu *)p_menu;
     if( !p_vlc_menu )
-        p_vlc_menu = new Menu( _p_intf, p_parent, VideoMenu_Events );
+        p_vlc_menu = new Menu( _p_intf, VideoMenu_Events );
     else
         p_vlc_menu->Clear();
 
@@ -418,7 +418,7 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
     /* Build menu */
     Menu *p_vlc_menu = (Menu *)p_menu;
     if( !p_vlc_menu )
-        p_vlc_menu = new Menu( _p_intf, p_parent, NavigMenu_Events );
+        p_vlc_menu = new Menu( _p_intf, NavigMenu_Events );
     else
         p_vlc_menu->Clear();
 
@@ -454,7 +454,7 @@ wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
     /* Build menu */
     Menu *p_vlc_menu = (Menu *)p_menu;
     if( !p_vlc_menu )
-        p_vlc_menu = new Menu( _p_intf, p_parent, SettingsMenu_Events );
+        p_vlc_menu = new Menu( _p_intf, SettingsMenu_Events );
     else
         p_vlc_menu->Clear();
 
@@ -466,8 +466,7 @@ wxMenu *SettingsMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-Menu::Menu( intf_thread_t *_p_intf, wxWindow *p_parent, int _i_start_id )
-  : wxMenu( )
+Menu::Menu( intf_thread_t *_p_intf, int _i_start_id ) : wxMenu( )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -542,7 +541,7 @@ static void RecursiveDestroy( wxMenu *menu )
         {
             RecursiveDestroy( submenu );
         }
-        menu->Delete( item );
+        menu->Destroy( item );
     }
 }
 

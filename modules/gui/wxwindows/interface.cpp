@@ -744,9 +744,11 @@ void Interface::UpdateAcceleratorTable()
 
 void Interface::OnMenuOpen(wxMenuEvent& event)
 {
-#if !defined( __WXMSW__ )
-    if( event.GetEventObject() == p_settings_menu )
+#if defined( __WXMSW__ )
+#   define GetEventObject GetMenu
 #endif
+
+    if( event.GetEventObject() == p_settings_menu )
     {
         p_settings_menu = SettingsMenu( p_intf, this, p_settings_menu );
 
@@ -759,26 +761,24 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
             wxU(_(HELP_PREFS)) );
     }
 
-#if !defined( __WXMSW__ )
     else if( event.GetEventObject() == p_audio_menu )
-#endif
     {
         p_audio_menu = AudioMenu( p_intf, this, p_audio_menu );
     }
 
-#if !defined( __WXMSW__ )
     else if( event.GetEventObject() == p_video_menu )
-#endif
     {
         p_video_menu = VideoMenu( p_intf, this, p_video_menu );
     }
 
-#if !defined( __WXMSW__ )
     else if( event.GetEventObject() == p_navig_menu )
-#endif
     {
         p_navig_menu = NavigMenu( p_intf, this, p_navig_menu );
     }
+
+#if defined( __WXMSW__ )
+#   undef GetEventObject
+#endif
 }
 
 #if defined( __WXMSW__ ) || defined( __WXMAC__ )

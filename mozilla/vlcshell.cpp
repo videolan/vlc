@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.29 2004/01/25 17:52:17 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -393,6 +393,14 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
             {
                 value.b_bool = VLC_TRUE;
                 VLC_Set( p_plugin->i_vlc, "conf::loop", value );
+            }
+        }
+        else if( !strcmp( argn[i], "fullscreen" ) )
+        {
+            if( !strcmp( argv[i], "yes" ) )
+            {
+                value.b_bool = VLC_TRUE;
+                VLC_Set( p_plugin->i_vlc, "conf::fullscreen", value );
             }
         }
 #endif
