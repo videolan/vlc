@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.37 2001/11/13 12:09:17 henri Exp $
+ * $Id: input_ext-dec.h,v 1.38 2001/11/15 16:15:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -538,26 +538,3 @@ typedef struct decoder_config_s
 
 } decoder_config_t;
 
-/*
- * Communication interface between decoders and input
- */
-
-/*****************************************************************************
- * decoder_capabilities_t
- *****************************************************************************
- * Structure returned by a call to GetCapabilities() of the decoder.
- *****************************************************************************/
-typedef struct decoder_capabilities_s
-{
-    int                     i_dec_type;
-    u8                      i_stream_type;   /* == i_type in es_descriptor_t */
-    int                     i_weight; /* for a given stream type, the decoder
-                                       * with higher weight will be spawned  */
-
-    vlc_thread_t         (* pf_create_thread)( void * );
-} decoder_capabilities_t;
-
-/* Decoder types */
-#define NONE_D              0
-#define VIDEO_D             1
-#define AUDIO_D             2
