@@ -2531,7 +2531,7 @@ dnl
 dnl  SVG module
 dnl
 AC_ARG_ENABLE(svg,
-  [  --enable-svg       SVG support (default disabled)])
+  [  --enable-svg            SVG support (default disabled)])
 if test "${enable_svg}" == "yes"
 then
   PKG_CHECK_MODULES(SVG, 
