@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.3 2002/11/13 20:28:13 fenrir Exp $
+ * $Id: mms.c,v 1.4 2002/11/13 21:18:40 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -120,6 +120,9 @@ vlc_module_begin();
         add_bool( "mms-all", 0, NULL, 
                   "force selection of all streams",
                   "force selection of all streams" );
+
+//        add_bool( "mms-modem", 0, NULL, "Set maxbitrate to 56Kb/s","" );
+
         add_string( "mms-stream", NULL, NULL,
                     "streams selection",
                     "force this stream selection" );
@@ -603,14 +606,43 @@ static void mms_StreamSelect( input_thread_t * p_input,
     }
     FREE( psz_stream );
 
+    /* big test:
+     * select a stream if 
+     *    - no audio nor video stream    
+     *    - or: 
+     *         - if i_bitrate_max not set keep the highest bitrate
+     *         - if i_bitrate_max is set, keep stream that make we used best
+     *           quality regarding i_bitrate_max
+     *
+     * XXX: little buggy:
+     *        - it doesn't use mutual exclusion info..
+     *        - when selecting a better stream we could select 
+     *        something that make i_bitrate_total> i_bitrate_max
+     */ 
     for( i = 1; i < 128; i++ )
     {
         if( stream[i].i_cat == MMS_STREAM_UNKNOWN )
         {
             continue;
         }
-        else if( stream[i].i_cat == MMS_STREAM_AUDIO && i_audio <= 0 )
+        else if( stream[i].i_cat == MMS_STREAM_AUDIO && 
+                 ( i_audio <= 0 || 
+                    ( ( ( stream[i].i_bitrate > stream[i_audio].i_bitrate && 
+                          ( i_bitrate_total < i_bitrate_max || !i_bitrate_max) ) ||
+                        ( stream[i].i_bitrate < stream[i_audio].i_bitrate && 
+                              i_bitrate_max != 0 && i_bitrate_total > i_bitrate_max )
+                      ) )  ) )
         {
+            /* unselect old stream */
+            if( i_audio > 0 )
+            {
+                stream[i_audio].i_selected = 0;
+                if( stream[i_audio].i_bitrate> 0 )
+                {
+                    i_bitrate_total -= stream[i_audio].i_bitrate;
+                }
+            }
+
             stream[i].i_selected = 1;
             if( stream[i].i_bitrate> 0 )
             {
@@ -618,8 +650,23 @@ static void mms_StreamSelect( input_thread_t * p_input,
             }
             i_audio = i;
         }
-        else if( stream[i].i_cat == MMS_STREAM_VIDEO && i_video <= 0 )
+        else if( stream[i].i_cat == MMS_STREAM_VIDEO && 
+                 ( i_video <= 0 || 
+                    (
+                        ( ( stream[i].i_bitrate > stream[i_video].i_bitrate && 
+                            ( i_bitrate_total < i_bitrate_max || !i_bitrate_max) ) ||
+                          ( stream[i].i_bitrate < stream[i_video].i_bitrate && 
+                            i_bitrate_max != 0 && i_bitrate_total > i_bitrate_max )
+                        ) ) )  )
         {
+            /* unselect old stream */
+
+            stream[i_video].i_selected = 0;
+            if( stream[i_video].i_bitrate> 0 )
+            {
+                i_bitrate_total -= stream[i_video].i_bitrate;
+            }
+
             stream[i].i_selected = 1;
             if( stream[i].i_bitrate> 0 )
             {
@@ -627,47 +674,7 @@ static void mms_StreamSelect( input_thread_t * p_input,
             }
             i_video = i;
         }
-        else if( i_bitrate_max > 0  )
-        {   
-            int i_index;
-            // select this stream if it's bitrate is lower or upper
-            if( stream[i].i_cat == MMS_STREAM_AUDIO )
-            {
-                i_index = i_audio;
-            }
-            else 
-            {
-                i_index = i_video;
-            }
-#define MMS_SELECT_XCHG( i1, i2 ) \
-    stream[i1].i_selected = 0; \
-    i_bitrate_total -= stream[i1].i_bitrate; \
-    stream[i2].i_selected = 1; \
-    i_bitrate_total += stream[i2].i_bitrate
-                                                    
-            if( stream[i].i_bitrate > 0 )
-            {
-                if( stream[i].i_bitrate < stream[i_index].i_bitrate &&
-                    i_bitrate_total >= i_bitrate_max )
-                {
-                    MMS_SELECT_XCHG( i_index, i );
-                }
-                else if( stream[i].i_bitrate > stream[i_index].i_bitrate &&
-                         i_bitrate_total < i_bitrate_max )
-                {
-                    MMS_SELECT_XCHG( i, i_index );
-                }
-            }
-            if( stream[i].i_cat == MMS_STREAM_AUDIO )
-            {
-                i_audio = i;
-            }
-            else
-            {
-                i_video = i;
-            }
-           
-        }
+
     }
 }
 
