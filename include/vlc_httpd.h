@@ -2,7 +2,7 @@
  * vlc_httpd.h: builtin HTTP/RTSP server.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: vlc_httpd.h,v 1.1 2004/03/03 13:23:47 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -127,6 +127,7 @@ VLC_EXPORT( void,           httpd_UrlDelete, ( httpd_url_t * ) );
 /* Default client mode is FILE, use these to change it */
 VLC_EXPORT( void,           httpd_ClientModeStream, ( httpd_client_t *cl ) );
 VLC_EXPORT( void,           httpd_ClientModeBidir, ( httpd_client_t *cl ) );
+VLC_EXPORT( char*,          httpd_ClientIP, ( httpd_client_t *cl ) );
 
 /* High level */
 

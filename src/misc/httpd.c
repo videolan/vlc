@@ -1267,7 +1267,7 @@ static void httpd_ClientInit( httpd_client_t *cl )
 {
     cl->i_state = HTTPD_CLIENT_RECEIVING;
     cl->i_activity_date = mdate();
-    cl->i_activity_timeout = 10000000LL;
+    cl->i_activity_timeout = 50000000LL;
     cl->i_buffer_size = 10000;
     cl->i_buffer = 0;
     cl->p_buffer = malloc( cl->i_buffer_size );
@@ -1286,6 +1286,12 @@ void httpd_ClientModeStream( httpd_client_t *cl )
 void httpd_ClientModeBidir( httpd_client_t *cl )
 {
     cl->i_mode   = HTTPD_CLIENT_BIDIR;
+}
+
+char* httpd_ClientIP( httpd_client_t *cl )
+{
+    /* FIXME not thread safe */
+    return strdup( inet_ntoa( cl->sock.sin_addr ) );
 }
 
 static void httpd_ClientClean( httpd_client_t *cl )
