@@ -53,6 +53,7 @@
 #include "vlc_httpd.h"
 #include "vlc_vlm.h"
 #include "vlc_vod.h"
+#include "vlc_tls.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -184,6 +185,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_VOD:
             i_size = sizeof( vod_t );
             psz_type = "vod server";
+            break;
+        case VLC_OBJECT_TLS:
+            i_size = sizeof( tls_t );
+            psz_type = "tls";
             break;
         case VLC_OBJECT_OPENGL:
             i_size = sizeof( vout_thread_t );
