@@ -11990,11 +11990,11 @@ msgid ""
 "or SSL-based server-side encryption)."
 msgstr ""
 "Cette option permet de modifier le nombre premier de bits utilisé pour "
-"l'algorithme Diffie-Hellman  (utilisé pour l'encryption par le serveur)."
+"l'algorithme Diffie-Hellman  (utilisé pour le chiffrement par le serveur)."
 
 #: modules/misc/gnutls.c:59
 msgid "GnuTLS TLS encryption layer"
-msgstr "Couche d'encryption TLS utilisant GnuTLS"
+msgstr "Couche de chiffrement TLS utilisant GnuTLS"
 
 #: modules/misc/gtk_main.c:60
 msgid "Gtk+ GUI helper"
@@ -12368,7 +12368,7 @@ msgid ""
 "Defines the CSA encryption key. This must be a 16 char string (8 hexadecimal "
 "bytes)."
 msgstr ""
-"Définit la clé d’encryptage CSA. Celle-ci doit être une chaîne de 16 "
+"Définit la clé de chiffrement CSA. Celle-ci doit être une chaîne de 16 "
 "caractères (8 octets hexadécimaux)."
 
 #: modules/mux/mpeg/ts.c:129
