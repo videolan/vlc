@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.6 2003/05/02 03:41:03 fenrir Exp $
+ * $Id: transcode.c,v 1.7 2003/05/02 14:51:57 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -487,34 +487,49 @@ static int transcode_audio_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
 {
     int i_ff_codec;
 
-    /* find decoder */
-
-    i_ff_codec = get_ff_codec( id->f_src.i_fourcc );
-    if( i_ff_codec == 0 )
+    if( id->f_src.i_fourcc == VLC_FOURCC('s','1','6','l') ||
+        id->f_src.i_fourcc == VLC_FOURCC('s','1','6','b') ||
+        id->f_src.i_fourcc == VLC_FOURCC('s','8',' ',' ') ||
+        id->f_src.i_fourcc == VLC_FOURCC('u','8',' ',' ') )
     {
-        msg_Err( p_stream, "cannot find decoder" );
-        return VLC_EGENERIC;
+        id->ff_dec = NULL;
+
+        id->ff_dec_c = avcodec_alloc_context();
+        id->ff_dec_c->sample_rate = id->f_src.i_sample_rate;
+        id->ff_dec_c->channels    = id->f_src.i_channels;
+        id->ff_dec_c->block_align = id->f_src.i_block_align;
+        id->ff_dec_c->bit_rate    = id->f_src.i_bitrate;
     }
-
-    id->ff_dec = avcodec_find_decoder( i_ff_codec );
-    if( !id->ff_dec )
+    else
     {
-        msg_Err( p_stream, "cannot find decoder" );
-        return VLC_EGENERIC;
-    }
+        /* find decoder */
+        i_ff_codec = get_ff_codec( id->f_src.i_fourcc );
+        if( i_ff_codec == 0 )
+        {
+            msg_Err( p_stream, "cannot find decoder" );
+            return VLC_EGENERIC;
+        }
 
-    id->ff_dec_c = avcodec_alloc_context();
-    id->ff_dec_c->sample_rate = id->f_src.i_sample_rate;
-    id->ff_dec_c->channels    = id->f_src.i_channels;
-    id->ff_dec_c->block_align = id->f_src.i_block_align;
-    id->ff_dec_c->bit_rate    = id->f_src.i_bitrate;
+        id->ff_dec = avcodec_find_decoder( i_ff_codec );
+        if( !id->ff_dec )
+        {
+            msg_Err( p_stream, "cannot find decoder" );
+            return VLC_EGENERIC;
+        }
 
-    id->ff_dec_c->extradata_size = id->f_src.i_extra_data;
-    id->ff_dec_c->extradata      = id->f_src.p_extra_data;
-    if( avcodec_open( id->ff_dec_c, id->ff_dec ) )
-    {
-        msg_Err( p_stream, "cannot open decoder" );
-        return VLC_EGENERIC;
+        id->ff_dec_c = avcodec_alloc_context();
+        id->ff_dec_c->sample_rate = id->f_src.i_sample_rate;
+        id->ff_dec_c->channels    = id->f_src.i_channels;
+        id->ff_dec_c->block_align = id->f_src.i_block_align;
+        id->ff_dec_c->bit_rate    = id->f_src.i_bitrate;
+
+        id->ff_dec_c->extradata_size = id->f_src.i_extra_data;
+        id->ff_dec_c->extradata      = id->f_src.p_extra_data;
+        if( avcodec_open( id->ff_dec_c, id->ff_dec ) )
+        {
+            msg_Err( p_stream, "cannot open decoder" );
+            return VLC_EGENERIC;
+        }
     }
 
     /* find encoder */
@@ -561,7 +576,10 @@ static int transcode_audio_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
 
 static void transcode_audio_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
-    avcodec_close( id->ff_dec_c );
+    if( id->ff_dec )
+    {
+        avcodec_close( id->ff_dec_c );
+    }
     avcodec_close( id->ff_enc_c );
 
     free( id->ff_dec_c );
@@ -581,44 +599,131 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
                 (mtime_t)(id->i_buffer_pos / 2 / id->ff_enc_c->channels )/
                 (mtime_t)id->ff_enc_c->sample_rate;
 
+    if( id->i_buffer_in_pos + in->i_size > id->i_buffer_in )
+    {
+        /* extend buffer_in */
+        id->i_buffer_in = id->i_buffer_in_pos + in->i_size + 1024;
+        id->p_buffer_in = realloc( id->p_buffer_in, id->i_buffer_in );
+    }
     memcpy( &id->p_buffer_in[id->i_buffer_in_pos],
             in->p_buffer,
             in->i_size );
     id->i_buffer_in_pos += in->i_size;
 
     /* decode as many data as possible */
-    for( ;; )
+    if( id->ff_dec )
     {
-        int i_buffer_size;
-        int i_used;
-
-        i_buffer_size = id->i_buffer - id->i_buffer_pos;
-
-        i_used = avcodec_decode_audio( id->ff_dec_c,
-                                       (int16_t*)&id->p_buffer[id->i_buffer_pos], &i_buffer_size,
-                                       id->p_buffer_in, id->i_buffer_in_pos );
-
-        /* msg_Warn( p_stream, "avcodec_decode_audio: %d used", i_used ); */
-        id->i_buffer_pos += i_buffer_size;
-
-        if( i_used < 0 )
+        for( ;; )
         {
-            msg_Warn( p_stream, "error");
-            id->i_buffer_in_pos = 0;
-            break;
+            int i_buffer_size;
+            int i_used;
+
+            i_buffer_size = id->i_buffer - id->i_buffer_pos;
+
+            i_used = avcodec_decode_audio( id->ff_dec_c,
+                                           (int16_t*)&id->p_buffer[id->i_buffer_pos], &i_buffer_size,
+                                           id->p_buffer_in, id->i_buffer_in_pos );
+
+            /* msg_Warn( p_stream, "avcodec_decode_audio: %d used", i_used ); */
+            id->i_buffer_pos += i_buffer_size;
+
+            if( i_used < 0 )
+            {
+                msg_Warn( p_stream, "error");
+                id->i_buffer_in_pos = 0;
+                break;
+            }
+            else if( i_used < id->i_buffer_in_pos )
+            {
+                memmove( id->p_buffer_in,
+                         &id->p_buffer_in[i_used],
+                         id->i_buffer_in - i_used );
+                id->i_buffer_in_pos -= i_used;
+            }
+            else
+            {
+                id->i_buffer_in_pos = 0;
+                break;
+            }
         }
-        else if( i_used < id->i_buffer_in_pos )
+    }
+    else
+    {
+        int16_t *sout = (int16_t*)&id->p_buffer[id->i_buffer_pos];
+        int     i_used;
+
+        if( id->f_src.i_fourcc == VLC_FOURCC( 's', '8', ' ', ' ' ) )
+        {
+            int8_t *sin = (int8_t*)id->p_buffer_in;
+            int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos );
+            i_used = i_samples;
+            while( i_samples > 0 )
+            {
+                *sout++ = ( *sin++ ) << 8;
+                i_samples--;
+            }
+        }
+        else if( id->f_src.i_fourcc == VLC_FOURCC( 'u', '8', ' ', ' ' ) )
+        {
+            int8_t *sin = (int8_t*)id->p_buffer_in;
+            int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos );
+            i_used = i_samples;
+            while( i_samples > 0 )
+            {
+                *sout++ = ( *sin++ - 128 ) << 8;
+                i_samples--;
+            }
+        }
+        else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'l' ) )
+        {
+            int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
+            i_used = i_samples * 2;
+#ifdef WORDS_BIGENDIAN
+            uint8_t *sin = (uint8_t*)id->p_buffer_in;
+            while( i_samples > 0 )
+            {
+                uint8_t tmp[2];
+
+                tmp[1] = *sin++;
+                tmp[0] = *sin++;
+                *sout++ = *(int16_t*)tmp;
+                i_samples--;
+            }
+
+#else
+            memcpy( sout, id->p_buffer_in, i_samples * 2 );
+            sout += i_samples;
+#endif
+        }
+        else if( id->f_src.i_fourcc == VLC_FOURCC( 's', '1', '6', 'b' ) )
+        {
+            int     i_samples = __MIN( ( id->i_buffer - id->i_buffer_pos ) / 2, id->i_buffer_in_pos / 2);
+            i_used = i_samples * 2;
+#ifdef WORDS_BIGENDIAN
+            memcpy( sout, id->p_buffer_in, i_samples * 2 );
+            sout += i_samples;
+#else
+            uint8_t *sin = (uint8_t*)id->p_buffer_in;
+            while( i_samples > 0 )
+            {
+                uint8_t tmp[2];
+
+                tmp[1] = *sin++;
+                tmp[0] = *sin++;
+                *sout++ = *(int16_t*)tmp;
+                i_samples--;
+            }
+#endif
+        }
+
+        id->i_buffer_pos = (uint8_t*)sout - id->p_buffer;
+        if( i_used < id->i_buffer_in_pos )
         {
             memmove( id->p_buffer_in,
                      &id->p_buffer_in[i_used],
                      id->i_buffer_in - i_used );
-            id->i_buffer_in_pos -= i_used;
         }
-        else
-        {
-            id->i_buffer_in_pos = 0;
-            break;
-        }
+        id->i_buffer_in_pos -= i_used;
     }
 
     /* encode as many data as possible */
