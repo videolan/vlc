@@ -3,8 +3,10 @@
 ###############################################################################
 
 ifeq ($(shell [ ! -r Makefile.opts ] && echo 1),)
-    include Makefile.config
     include Makefile.opts
+endif
+ifeq ($(shell [ ! -r Makefile.config ] && echo 1),)
+    include Makefile.config
 endif
 
 ###############################################################################
