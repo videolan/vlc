@@ -34,6 +34,41 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ACCESS_TEXT N_("Output access method")
+#define ACCESS_LONGTEXT N_( \
+    "Allows you to specify the output access method used for the streaming " \
+    "output." )
+#define ACCESSA_TEXT N_("Audio output access method")
+#define ACCESSA_LONGTEXT N_( \
+    "Allows you to specify the output access method used for the audio " \
+    "streaming output." )
+#define ACCESSV_TEXT N_("Video output access method")
+#define ACCESSV_LONGTEXT N_( \
+    "Allows you to specify the output access method used for the video " \
+    "streaming output." )
+
+#define MUX_TEXT N_("Output muxer")
+#define MUX_LONGTEXT N_( \
+    "Allows you to specify the muxer used for the streaming output." )
+#define MUXA_TEXT N_("Audio output muxer")
+#define MUXA_LONGTEXT N_( \
+    "Allows you to specify the muxer used for the audio streaming output." )
+#define MUXV_TEXT N_("Video output muxer")
+#define MUXV_LONGTEXT N_( \
+    "Allows you to specify the muxer used for the video streaming output." )
+
+#define DEST_TEXT N_("Output URL")
+#define DEST_LONGTEXT N_( \
+    "Allows you to specify the output URL used for the streaming output." )
+#define DESTA_TEXT N_("Audio output URL")
+#define DESTA_LONGTEXT N_( \
+    "Allows you to specify the output URL used for the audio streaming " \
+    "output." )
+#define DESTV_TEXT N_("Video output URL")
+#define DESTV_LONGTEXT N_( \
+    "Allows you to specify the output URL used for the video streaming " \
+    "output." )
+
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
@@ -44,17 +79,26 @@ vlc_module_begin();
     set_capability( "sout stream", 50 );
     add_shortcut( "es" );
 
-    add_string( SOUT_CFG_PREFIX "access", "", NULL, "access", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "access-audio", "", NULL, "access audio", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "access-video", "", NULL, "access video", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "access", "", NULL, ACCESS_TEXT,
+                ACCESS_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "access-audio", "", NULL, ACCESSA_TEXT,
+                ACCESSA_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "access-video", "", NULL, ACCESSV_TEXT,
+                ACCESSV_LONGTEXT, VLC_TRUE );
 
-    add_string( SOUT_CFG_PREFIX "mux", "", NULL, "mux", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "mux-audio", "", NULL, "mux audio", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "mux-video", "", NULL, "mux video", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
+                MUX_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "mux-audio", "", NULL, MUXA_TEXT,
+                MUXA_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "mux-video", "", NULL, MUXV_TEXT,
+                MUXV_LONGTEXT, VLC_TRUE );
 
-    add_string( SOUT_CFG_PREFIX "dst", "", NULL, "dst", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "dst-audio", "", NULL, "dst audio", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "dst-video", "", NULL, "dst video", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "dst", "", NULL, DEST_TEXT,
+                DEST_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "dst-audio", "", NULL, DESTA_TEXT,
+                DESTA_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "dst-video", "", NULL, DESTV_TEXT,
+                DESTV_LONGTEXT, VLC_TRUE );
 
     set_callbacks( Open, Close );
 vlc_module_end();

@@ -37,6 +37,18 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ACCESS_TEXT N_("Output access method")
+#define ACCESS_LONGTEXT N_( \
+    "Allows you to pecify the output access method used for the streaming " \
+    "output." )
+#define MUX_TEXT N_("Output muxer")
+#define MUX_LONGTEXT N_( \
+    "Allows you to pecify the output muxer method used for the streaming " \
+    "output." )
+#define URL_TEXT N_("Output URL")
+#define URL_LONGTEXT N_( \
+    "Allows you to pecify the output URL used for the streaming output." )
+
 static int      Open    ( vlc_object_t * );
 static void     Close   ( vlc_object_t * );
 
@@ -48,9 +60,12 @@ vlc_module_begin();
     add_shortcut( "standard" );
     add_shortcut( "std" );
 
-    add_string( SOUT_CFG_PREFIX "access", "", NULL, "access", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "mux", "", NULL, "mux", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "url", "", NULL, "url", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "access", "", NULL, ACCESS_TEXT,
+                ACCESS_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
+                MUX_LONGTEXT, VLC_FALSE );
+    add_string( SOUT_CFG_PREFIX "url", "", NULL, URL_TEXT,
+                URL_LONGTEXT, VLC_FALSE );
 
     add_bool( SOUT_CFG_PREFIX "sap", 0, NULL, "sap", "", VLC_TRUE );
     add_string( SOUT_CFG_PREFIX "sap-name", "", NULL, "sap name", "", VLC_TRUE );

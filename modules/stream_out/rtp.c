@@ -36,6 +36,25 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define DST_TEXT N_("Destination")
+#define DST_LONGTEXT N_( \
+    "Allows you to specify the output URL used for the streaming output." )
+#define NAME_TEXT N_("Session name")
+#define NAME_LONGTEXT N_( \
+    "Allows you to specify the session name used for the streaming output." )
+#define SDP_TEXT N_("SDP")
+#define SDP_LONGTEXT N_( \
+    "Allows you to specify the SDP used for the streaming output." )
+#define MUX_TEXT N_("Muxer")
+#define MUX_LONGTEXT N_( \
+    "Allows you to specify the muxer used for the streaming output." )
+#define PORT_TEXT N_("Port")
+#define PORT_LONGTEXT N_( \
+    "Allows you to specify the port used for the streaming output." )
+#define TTL_TEXT N_("Time to live")
+#define TTL_LONGTEXT N_( \
+    "Allows you to specify the time to live for the output stream." )
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -45,13 +64,20 @@ vlc_module_begin();
     set_description( _("RTP stream output") );
     set_capability( "sout stream", 0 );
     add_shortcut( "rtp" );
-    add_string( SOUT_CFG_PREFIX "dst", "", NULL, "destination", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "name", "", NULL, "name", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "sdp", "", NULL, "sdp", "", VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "mux", "", NULL, "mux", "", VLC_TRUE );
 
-    add_integer( SOUT_CFG_PREFIX "port", 1234, NULL, "port", "", VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, "port", "", VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "dst", "", NULL, DST_TEXT,
+                DST_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "name", "", NULL, NAME_TEXT,
+                NAME_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "sdp", "", NULL, SDP_TEXT,
+                SDP_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
+                MUX_LONGTEXT, VLC_TRUE );
+
+    add_integer( SOUT_CFG_PREFIX "port", 1234, NULL, PORT_TEXT,
+                 PORT_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
+                 TTL_LONGTEXT, VLC_TRUE );
 
     set_callbacks( Open, Close );
 vlc_module_end();

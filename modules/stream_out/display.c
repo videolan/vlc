@@ -34,6 +34,13 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define AUDIO_TEXT N_("Enable audio")
+#define AUDIO_LONGTEXT N_( "Enable/disable audio rendering." )
+#define VIDEO_TEXT N_("Enable video")
+#define VIDEO_LONGTEXT N_( "Enable/disable video rendering." )
+#define DELAY_TEXT N_("Delay")
+#define DELAY_LONGTEXT N_( "Introduces a delay in the display of the stream." )
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
@@ -43,9 +50,12 @@ vlc_module_begin();
     set_description( _("Display stream output") );
     set_capability( "sout stream", 50 );
     add_shortcut( "display" );
-    add_bool( SOUT_CFG_PREFIX "audio", 1, NULL, "audio", "", VLC_TRUE );
-    add_bool( SOUT_CFG_PREFIX "video", 1, NULL, "video", "", VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "delay", 100, NULL, "delay", "", VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "audio", 1, NULL, AUDIO_TEXT,
+              AUDIO_LONGTEXT, VLC_TRUE );
+    add_bool( SOUT_CFG_PREFIX "video", 1, NULL, VIDEO_TEXT,
+              VIDEO_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "delay", 100, NULL, DELAY_TEXT,
+                 DELAY_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -80,10 +90,12 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t *p_sys;
     vlc_value_t val;
 
-    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options, p_stream->p_cfg );
+    sout_ParseCfg( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+                   p_stream->p_cfg );
 
-    p_sys           = malloc( sizeof( sout_stream_sys_t ) );
-    p_sys->p_input  = vlc_object_find( p_stream, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    p_sys          = malloc( sizeof( sout_stream_sys_t ) );
+    p_sys->p_input = vlc_object_find( p_stream, VLC_OBJECT_INPUT,
+                                      FIND_ANYWHERE );
     if( !p_sys->p_input )
     {
         msg_Err( p_stream, "cannot find p_input" );
