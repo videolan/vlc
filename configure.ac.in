@@ -1274,6 +1274,61 @@ then
 fi
 
 
+dnl
+dnl  xvid decoder plugin
+dnl
+AC_ARG_ENABLE(xvid,
+[  --enable-xvid           xvid codec (default disabled)])
+if test "x${enable_xvid}" = "xyes"
+then
+  AC_ARG_WITH(xvid,
+    [    --with-xvid=PATH      path to xvid installation],[],[])
+  if test "x${with_xvid}" != "xno" -a "x${with_xvid}" != "x"
+  then
+    CPPFLAGS_xvid="${CPPFLAGS_xvid} -I${with_xvid}/include"
+    LDFLAGS_xvid="${LDFLAGS_xvid} -L${with_xvid}/lib"
+  fi
+  LDFLAGS_xvid="${LDFLAGS_xvid}"
+
+  AC_ARG_WITH(xvid-tree,
+  [    --with-xvid-tree=PATH xvid tree for static linking])
+  if test "x${with_xvid_tree}" != "x"
+  then
+    AC_MSG_CHECKING(for libxvidcore.a in ${with_xvid_tree})
+    real_xvid_tree="`cd ${with_xvid_tree} 2>/dev/null && pwd`"
+    if test "x${real_xvid_tree}" = x
+    then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_xvid_tree}])
+    fi
+    if test -f "${real_xvid_tree}/build/generic/libxvidcore.a"
+    then
+      dnl  Use a custom xvid
+      AC_MSG_RESULT(${real_xvid_tree}/build/generic/libxvidcore.a)
+      BUILTINS="${BUILTINS} xvid"
+      LDFLAGS_xvid="${LDFLAGS_xvid} ${real_xvid_tree}/build/generic/libxvidcore.a"
+      CPPFLAGS_xvid="${CPPFLAGS_xvid} -I${real_xvid_tree}/src"
+    else
+      dnl  The given libxvidcore wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_xvid_tree}/build/generic/libxvidcore.a, make sure you compiled libxvidcore in ${with_xvid_tree}])
+    fi
+  else
+    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_xvid}"
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_xvid}"
+    AC_CHECK_HEADERS(xvid.h, ,
+      [ AC_MSG_ERROR([Cannot find development headers for libxvidcore...]) ])
+    AC_CHECK_LIB(xvid, xvid_init, [
+      PLUGINS="${PLUGINS} xvid"
+      LDFLAGS_xvid="${LDFLAGS_xvid} -lxvid" ],
+      [ AC_MSG_ERROR([Cannot find libxvidcore library...]) ])
+    LDFLAGS="${LDFLAGS_save}"
+    CPPFLAGS="${CPPFLAGS_save}"
+  fi
+fi
+
+
 
 dnl
 dnl MP4 module
