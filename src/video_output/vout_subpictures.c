@@ -438,7 +438,7 @@ void spu_DestroySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                             picture_t *p_pic_dst, picture_t *p_pic_src,
                             subpicture_t *p_subpic,
-                            int i_scale_width, int i_scale_height )
+                            int i_scale_width_orig, int i_scale_height_orig )
 {
     /* Get lock */
     vlc_mutex_lock( &p_spu->subpicture_lock );
@@ -447,6 +447,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
     while( p_subpic != NULL && p_subpic->i_status != FREE_SUBPICTURE )
     {
         subpicture_region_t *p_region = p_subpic->p_region;
+        int i_scale_width, i_scale_height;
 
         /* Load the blending module */
         if( !p_spu->p_blend && p_region )
@@ -482,6 +483,18 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
 
             p_spu->p_text->p_module =
                 module_Need( p_spu->p_text, "text renderer", 0, 0 );
+        }
+
+        i_scale_width = i_scale_width_orig;
+        i_scale_height = i_scale_height_orig;
+
+        if( p_subpic->i_original_picture_width ||
+            p_subpic->i_original_picture_height )
+        {
+            i_scale_width = i_scale_width * p_fmt->i_width /
+                p_subpic->i_original_picture_width;
+            i_scale_height = i_scale_height * p_fmt->i_height /
+                p_subpic->i_original_picture_height;
         }
 
         /* Load the scaling module */
