@@ -171,7 +171,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
-    [o_mi_info setTitle: _NS("Proprieties")];
+    [o_mi_info setTitle: _NS("Properties")];
 
     [[o_tc_name headerCell] setStringValue:_NS("Name")];
     [[o_tc_author headerCell] setStringValue:_NS("Author")];

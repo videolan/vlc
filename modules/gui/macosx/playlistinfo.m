@@ -42,7 +42,7 @@
     [o_tbv_info setOutlineTableColumn:0];
     [o_tbv_info setDataSource: self];
 
-    [o_info_window setTitle: _NS("Proprieties")];
+    [o_info_window setTitle: _NS("Properties")];
     [o_uri_lbl setStringValue: _NS("URI")];
     [o_title_lbl setStringValue: _NS("Title")];
     [o_author_lbl setStringValue: _NS("Author")];
