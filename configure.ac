@@ -883,7 +883,7 @@ dnl
 dnl  default modules
 dnl
 AX_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys])
-AX_ADD_PLUGINS([mpgv mpga m4v mpeg_system ps ps2 pva ts avi asf aac mp4 rawdv demux2 nsv real aiff])
+AX_ADD_PLUGINS([mpgv mpga m4v h264 mpeg_system ps ps2 pva ts avi asf aac mp4 rawdv demux2 nsv real aiff])
 AX_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
 AX_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 AX_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32])
@@ -1111,7 +1111,7 @@ if test "${enable_sout}" != "no"
 then
   AX_ADD_PLUGINS([access_output_dummy access_output_udp access_output_file access_output_http])
   AX_ADD_PLUGINS([mux_ts mux_ps mux_avi mux_mp4 mux_asf mux_dummy])
-  AX_ADD_PLUGINS([packetizer_mpegvideo])
+  AX_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
   AX_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
   AX_ADD_PLUGINS([packetizer_copy])
 
