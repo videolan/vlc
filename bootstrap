@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.6 2002/08/26 23:36:20 sam Exp $
+##  $Id: bootstrap,v 1.7 2002/08/27 14:15:24 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -50,14 +50,15 @@ else
   #  do cp ${aclocaldir}/${file} m4/
   #done
   # Yuck!
-  touch m4/Makefile.am
+  echo > m4/Makefile.am
   # Yuck!
   echo 'AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])' > m4/gettext.m4
 fi
 
-aclocal -I m4
+aclocal-1.6 -I m4 || aclocal-1.5 -I m4
 autoheader
-automake --foreign --add-missing --copy
+automake-1.6 --foreign --add-missing --copy \
+  || automake-1.5 --foreign --add-missing --copy
 autoconf
 
 # nuahahahahaha !! overwriting Makefile.in with what *I* want!

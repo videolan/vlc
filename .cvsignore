@@ -1,6 +1,7 @@
 .*
 m4
 intl
+ABOUT-NLS
 core
 core.*
 gmon.out
@@ -13,6 +14,7 @@ config.rpath
 config.status
 config.guess
 config.sub
+autom4te.cache
 Makefile
 Makefile.in
 Makefile.opts
