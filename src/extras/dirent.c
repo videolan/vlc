@@ -9,9 +9,9 @@
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
  *	
- * $Revision: 1.5 $
+ * $Revision: 1.6 $
  * $Author: sam $
- * $Date: 2002/11/11 14:39:12 $
+ * $Date: 2002/11/13 20:51:04 $
  *
  */
 
@@ -181,7 +181,7 @@ readdir (DIR * dirp)
     {
       /* We haven't started the search yet. */
       /* Start the search */
-      dirp->dd_handle = FindFirstFile (dirp->dd_name, &(dirp->dd_dta));
+      dirp->dd_handle = (long)FindFirstFile (dirp->dd_name, &(dirp->dd_dta));
 
   	  if (dirp->dd_handle == -1)
 	{
@@ -197,10 +197,10 @@ readdir (DIR * dirp)
   else
     {
       /* Get the next search entry. */
-      if (FindNextFile (dirp->dd_handle, &(dirp->dd_dta)))
+      if (FindNextFile ((HANDLE)dirp->dd_handle, &(dirp->dd_dta)))
 	{
 	  /* We are off the end or otherwise error. */
-	  FindClose (dirp->dd_handle);
+	  FindClose ((HANDLE)dirp->dd_handle);
 	  dirp->dd_handle = -1;
 	  dirp->dd_stat = -1;
 	}
@@ -246,7 +246,7 @@ closedir (DIR * dirp)
 
   if (dirp->dd_handle != -1)
     {
-      rc = FindClose (dirp->dd_handle);
+      rc = FindClose ((HANDLE)dirp->dd_handle);
     }
 
   /* Delete the dir structure. */
@@ -274,7 +274,7 @@ rewinddir (DIR * dirp)
 
   if (dirp->dd_handle != -1)
     {
-      FindClose (dirp->dd_handle);
+      FindClose ((HANDLE)dirp->dd_handle);
     }
 
   dirp->dd_handle = -1;
@@ -331,7 +331,7 @@ seekdir (DIR * dirp, long lPos)
       /* Seek past end. */
       if (dirp->dd_handle != -1)
 	{
-	  FindClose (dirp->dd_handle);
+	  FindClose ((HANDLE)dirp->dd_handle);
 	}
       dirp->dd_handle = -1;
       dirp->dd_stat = -1;

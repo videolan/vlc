@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.76 2002/11/11 14:39:12 sam Exp $
+ * $Id: netutils.c,v 1.77 2002/11/13 20:51:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -214,6 +214,7 @@ int __network_ChannelJoin( vlc_object_t *p_this, int i_channel )
     socket_desc.i_server_port = i_port;
 
     /* Find an appropriate network module */
+    p_this->p_private = (void*) &socket_desc;
     p_network = module_Need( p_this, "network", psz_network/*, &socket_desc*/ );
     if( p_network == NULL )
     {

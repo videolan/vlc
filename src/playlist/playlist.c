@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.20 2002/11/13 12:58:19 gbazin Exp $
+ * $Id: playlist.c,v 1.21 2002/11/13 20:51:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -416,7 +416,7 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     /* Increment */
     if( b_random )
     {
-        srand( mdate() );
+        srand( (unsigned int)mdate() );
 
         /* Simple random stuff - we cheat a bit to minimize the chances to
          * get the same index again. */

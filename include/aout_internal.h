@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.32 2002/11/11 22:27:00 gbazin Exp $
+ * $Id: aout_internal.h,v 1.33 2002/11/13 20:51:04 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -54,8 +54,8 @@ typedef struct aout_alloc_t
     else                                                                    \
     {                                                                       \
         int i_alloc_size;                                                   \
-        i_alloc_size = (uint64_t)(p_alloc)->i_bytes_per_sec                 \
-                                            * (i_nb_usec) / 1000000 + 1;    \
+        i_alloc_size = (int)( (uint64_t)(p_alloc)->i_bytes_per_sec          \
+                                            * (i_nb_usec) / 1000000 + 1 );  \
         ALLOCA_TEST( p_alloc, p_new_buffer )                                \
         {                                                                   \
             (p_new_buffer) = malloc( i_alloc_size + sizeof(aout_buffer_t) );\

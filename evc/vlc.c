@@ -2,7 +2,7 @@
  * vlc.c: the vlc player, WinCE version
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc.c,v 1.1 2002/11/13 15:28:24 sam Exp $
+ * $Id: vlc.c,v 1.2 2002/11/13 20:51:04 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -88,7 +88,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     window = CreateWindow( L"VLC", pwz_title,
                            WS_VISIBLE | WS_SIZEBOX | WS_CAPTION,
                            CW_USEDEFAULT, CW_USEDEFAULT,
-                           CW_USEDEFAULT, CW_USEDEFAULT, 
+                           //CW_USEDEFAULT, CW_USEDEFAULT, 
+                           200,100,
                            NULL, NULL, hInst, NULL );
 
     ShowWindow( window, nCmdShow );
@@ -218,7 +219,7 @@ static long FAR PASCAL WndProc ( HWND hWnd, UINT message,
         case WM_CREATE:
             hwndCB = CommandBar_Create(hInst, hWnd, 1);
             CommandBar_InsertMenubar(hwndCB, hInst, IDM_MENU, 0);
-            CommandBar_AddAdornments(hwndCB, 0, 0);
+            //CommandBar_AddAdornments(hwndCB, 0, 0);
             break;
         case WM_PAINT:
         {

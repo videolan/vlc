@@ -506,3 +506,5 @@
 
 #define HAVE_GETENV 1
 
+#define HAVE_ATOF 1
+

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.45 2002/11/11 14:39:12 sam Exp $
+ * $Id: configuration.c,v 1.46 2002/11/13 20:51:05 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -43,7 +43,7 @@
 #endif
 
 #if defined(HAVE_GETPWUID)
-#include <pwd.h>                                               /* getpwuid() */
+#   include <pwd.h>                                            /* getpwuid() */
 #endif
 
 #if defined( HAVE_SYS_STAT_H )
@@ -51,6 +51,9 @@
 #endif
 #if defined( HAVE_SYS_TYPES_H )
 #   include <sys/types.h>
+#endif
+#if defined( WIN32 ) && !defined( UNDER_CE )
+#   include <direct.h>
 #endif
 
 /*****************************************************************************
@@ -525,7 +528,8 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
         {
             if( (line[0] == '[')
                && (p_index = strchr(line,']'))
-               && (p_index - &line[1] == strlen((*pp_parser)->psz_object_name))
+               && (p_index - &line[1]
+                    == (int)strlen((*pp_parser)->psz_object_name))
                && !memcmp( &line[1], (*pp_parser)->psz_object_name,
                            strlen((*pp_parser)->psz_object_name) ) )
             {
@@ -762,9 +766,9 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                  pp_parser++ )
             {
                 if( ((p_index2 - &p_line[1])
-                       == strlen((*pp_parser)->psz_object_name) ) &&
-                    !memcmp( &p_line[1], (*pp_parser)->psz_object_name,
-                             strlen((*pp_parser)->psz_object_name) ) )
+                       == (int)strlen((*pp_parser)->psz_object_name) )
+                    && !memcmp( &p_line[1], (*pp_parser)->psz_object_name,
+                                strlen((*pp_parser)->psz_object_name) ) )
                 {
                     if( !psz_module_name )
                         break;

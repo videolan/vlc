@@ -272,22 +272,27 @@ EXTRA_DIST += \
 ###############################################################################
 
 EXTRA_DIST += \
-	msvc/vlc.dsp \
 	msvc/vlc.dsw \
+	msvc/libvlc.dsp \
+	msvc/libvlc.dsp.in \
+	msvc/vlc.dsp \
 	msvc/vlc.dsp.in \
 	msvc/vlc.dsp.out \
+	msvc/plugins.dsp \
+	msvc/plugins.dsp.in \
 	msvc/config.h \
 	msvc/modules_builtin_msvc.h \
-	evc/vlc.vcp \
 	evc/vlc.vcw \
+	evc/libvlc.vcp \
+	evc/libvlc.vcp.in \
+	evc/vlc.vcp \
 	evc/vlc.vcp.in \
 	evc/vlc.vcp.out \
+	evc/plugins.vcp \
+	evc/plugins.vcp.in \
 	evc/config.h \
-	evc/modules_builtin_msvc.h \
+	evc/modules_builtin_evc.h \
 	$(NULL)
-
-show-vlc-sources: FORCE
-	@echo X: $(vlc_SOURCES)
 
 show-libvlc-sources: FORCE
 	@echo X: $(SOURCES_libvlc_common) $(SOURCES_libvlc_win32) $(SOURCES_libvlc_dirent) $(SOURCES_libvlc_getopt) $(SOURCES_libvlc_libc)

@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.23 2002/11/12 13:57:13 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.24 2002/11/13 20:51:05 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -395,8 +395,8 @@ static inline pes_packet_t * NewPES( input_buffers_t * p_buffers )
     }
 
     p_pes->p_next = NULL;
-    p_pes->b_data_alignment = p_pes->b_discontinuity =
-        p_pes->i_pts = p_pes->i_dts = 0;
+    p_pes->b_data_alignment = p_pes->b_discontinuity = VLC_FALSE;
+    p_pes->i_pts = p_pes->i_dts = 0;
     p_pes->p_first = p_pes->p_last = NULL;
     p_pes->i_pes_size = 0;
     p_pes->i_nb_data = 0;
@@ -518,10 +518,10 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
  *****************************************************************************/
 ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte, size_t i_size )
 {
-    if( p_input->p_last_data - p_input->p_current_data < i_size )
+    if( p_input->p_last_data - p_input->p_current_data < (ptrdiff_t)i_size )
     {
         /* Go to the next buffer */
-        ssize_t i_ret = input_FillBuffer( p_input );
+        size_t i_ret = input_FillBuffer( p_input );
 
         if( i_size == -1 )
         {
@@ -543,10 +543,10 @@ ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte, size_t i_size )
 ssize_t input_SplitBuffer( input_thread_t * p_input,
                            data_packet_t ** pp_data, size_t i_size )
 {
-    if( p_input->p_last_data - p_input->p_current_data < i_size )
+    if( p_input->p_last_data - p_input->p_current_data < (ptrdiff_t)i_size )
     {
         /* Go to the next buffer */
-        ssize_t i_ret = input_FillBuffer( p_input );
+        size_t i_ret = input_FillBuffer( p_input );
 
         if( i_ret == -1 )
         {

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.196 2002/11/10 18:04:24 sam Exp $
+ * $Id: video_output.c,v 1.197 2002/11/13 20:51:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -52,8 +52,8 @@ static void     EndThread         ( vout_thread_t * );
 static void     DestroyThread     ( vout_thread_t * );
 
 static int      ReduceHeight      ( int );
-static int      BinaryLog         ( u32 );
-static void     MaskToShift       ( int *, int *, u32 );
+static int      BinaryLog         ( uint32_t );
+static void     MaskToShift       ( int *, int *, uint32_t );
 static void     InitWindowSize    ( vout_thread_t *, int *, int * );
 
 /*****************************************************************************
@@ -803,7 +803,7 @@ static int ReduceHeight( int i_ratio )
  * This functions is used by MaskToShift, to get a bit index from a binary
  * value.
  *****************************************************************************/
-static int BinaryLog(u32 i)
+static int BinaryLog( uint32_t i )
 {
     int i_log = 0;
 
@@ -823,9 +823,9 @@ static int BinaryLog(u32 i)
  *****************************************************************************
  * This function is used for obtaining color shifts from masks.
  *****************************************************************************/
-static void MaskToShift( int *pi_left, int *pi_right, u32 i_mask )
+static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
 {
-    u32 i_low, i_high;                 /* lower hand higher bits of the mask */
+    uint32_t i_low, i_high;            /* lower hand higher bits of the mask */
 
     if( !i_mask )
     {
@@ -834,7 +834,7 @@ static void MaskToShift( int *pi_left, int *pi_right, u32 i_mask )
     }
 
     /* Get bits */
-    i_low =  i_mask & (- i_mask);                   /* lower bit of the mask */
+    i_low =  i_mask & (- (int32_t)i_mask);          /* lower bit of the mask */
     i_high = i_mask + i_low;                       /* higher bit of the mask */
 
     /* Transform bits into an index */
@@ -862,41 +862,41 @@ static void InitWindowSize( vout_thread_t *p_vout, int *pi_width,
 
     i_width = config_GetInt( p_vout, "width" );
     i_height = config_GetInt( p_vout, "height" );
-    ll_zoom = FP_FACTOR * config_GetFloat( p_vout, "zoom" );
+    ll_zoom = (uint64_t)( FP_FACTOR * config_GetFloat( p_vout, "zoom" ) );
 
     if( (i_width >= 0) && (i_height >= 0))
     {
-        *pi_width = i_width * ll_zoom / FP_FACTOR;
-        *pi_height = i_height * ll_zoom / FP_FACTOR;
+        *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
+        *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
         return;
     }
     else if( i_width >= 0 )
     {
-        *pi_width = i_width * ll_zoom / FP_FACTOR;
-        *pi_height = i_width * ll_zoom * VOUT_ASPECT_FACTOR /
-                        p_vout->render.i_aspect / FP_FACTOR;
+        *pi_width = (int)( i_width * ll_zoom / FP_FACTOR );
+        *pi_height = (int)( i_width * ll_zoom * VOUT_ASPECT_FACTOR /
+                            p_vout->render.i_aspect / FP_FACTOR );
         return;
     }
     else if( i_height >= 0 )
     {
-        *pi_height = i_height * ll_zoom / FP_FACTOR;
-        *pi_width = i_height * ll_zoom * p_vout->render.i_aspect /
-                       VOUT_ASPECT_FACTOR / FP_FACTOR;
+        *pi_height = (int)( i_height * ll_zoom / FP_FACTOR );
+        *pi_width = (int)( i_height * ll_zoom * p_vout->render.i_aspect /
+                           VOUT_ASPECT_FACTOR / FP_FACTOR );
         return;
     }
 
     if( p_vout->render.i_height * p_vout->render.i_aspect
         >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
     {
-        *pi_width = p_vout->render.i_height * ll_zoom
-          * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR / FP_FACTOR;
-        *pi_height = p_vout->render.i_height * ll_zoom / FP_FACTOR;
+        *pi_width = (int)( p_vout->render.i_height * ll_zoom
+          * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR / FP_FACTOR );
+        *pi_height = (int)( p_vout->render.i_height * ll_zoom / FP_FACTOR );
     }
     else
     {
-        *pi_width = p_vout->render.i_width * ll_zoom / FP_FACTOR;
-        *pi_height = p_vout->render.i_width * ll_zoom
-          * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect / FP_FACTOR;
+        *pi_width = (int)( p_vout->render.i_width * ll_zoom / FP_FACTOR );
+        *pi_height = (int)( p_vout->render.i_width * ll_zoom
+          * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect / FP_FACTOR );
     }
 
 #undef FP_FACTOR

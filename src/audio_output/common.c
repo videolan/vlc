@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.7 2002/11/12 13:57:13 sam Exp $
+ * $Id: common.c,v 1.8 2002/11/13 20:51:04 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -404,7 +404,7 @@ mtime_t aout_DateIncrement( audio_date_t * p_date, u32 i_nb_samples )
 {
     mtime_t i_dividend = (mtime_t)i_nb_samples * 1000000;
     p_date->date += i_dividend / p_date->i_divider;
-    p_date->i_remainder += i_dividend % p_date->i_divider;
+    p_date->i_remainder += (int)(i_dividend % p_date->i_divider);
     if ( p_date->i_remainder >= p_date->i_divider )
     {
         /* This is Bresenham algorithm. */

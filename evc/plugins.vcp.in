@@ -1,4 +1,4 @@
-# Microsoft eMbedded Visual Tools Project File - Name="vlc" - Package Owner=<4>
+# Microsoft eMbedded Visual Tools Project File - Name="plugins" - Package Owner=<4>
 # Microsoft eMbedded Visual Tools Generated Build File, Format Version 6.02
 # ** DO NOT EDIT **
 
@@ -8,29 +8,29 @@
 # TARGTYPE "Win32 (WCE SH4) Application" 0x8601
 # TARGTYPE "Win32 (WCE MIPS) Application" 0x8201
 
-CFG=vlc - Win32 (WCE MIPS) Debug
+CFG=plugins - Win32 (WCE MIPS) Debug
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
-!MESSAGE NMAKE /f "vlc.vcn".
+!MESSAGE NMAKE /f "plugins.vcn".
 !MESSAGE 
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "vlc.vcn" CFG="vlc - Win32 (WCE MIPS) Debug"
+!MESSAGE NMAKE /f "plugins.vcn" CFG="plugins - Win32 (WCE MIPS) Debug"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
-!MESSAGE "vlc - Win32 (WCE MIPS) Release" (based on "Win32 (WCE MIPS) Application")
-!MESSAGE "vlc - Win32 (WCE MIPS) Debug" (based on "Win32 (WCE MIPS) Application")
-!MESSAGE "vlc - Win32 (WCE SH4) Release" (based on "Win32 (WCE SH4) Application")
-!MESSAGE "vlc - Win32 (WCE SH4) Debug" (based on "Win32 (WCE SH4) Application")
-!MESSAGE "vlc - Win32 (WCE SH3) Release" (based on "Win32 (WCE SH3) Application")
-!MESSAGE "vlc - Win32 (WCE SH3) Debug" (based on "Win32 (WCE SH3) Application")
-!MESSAGE "vlc - Win32 (WCE ARM) Release" (based on "Win32 (WCE ARM) Application")
-!MESSAGE "vlc - Win32 (WCE ARM) Debug" (based on "Win32 (WCE ARM) Application")
-!MESSAGE "vlc - Win32 (WCE x86em) Release" (based on "Win32 (WCE x86em) Application")
-!MESSAGE "vlc - Win32 (WCE x86em) Debug" (based on "Win32 (WCE x86em) Application")
+!MESSAGE "plugins - Win32 (WCE MIPS) Release" (based on "Win32 (WCE MIPS) Application")
+!MESSAGE "plugins - Win32 (WCE MIPS) Debug" (based on "Win32 (WCE MIPS) Application")
+!MESSAGE "plugins - Win32 (WCE SH4) Release" (based on "Win32 (WCE SH4) Application")
+!MESSAGE "plugins - Win32 (WCE SH4) Debug" (based on "Win32 (WCE SH4) Application")
+!MESSAGE "plugins - Win32 (WCE SH3) Release" (based on "Win32 (WCE SH3) Application")
+!MESSAGE "plugins - Win32 (WCE SH3) Debug" (based on "Win32 (WCE SH3) Application")
+!MESSAGE "plugins - Win32 (WCE ARM) Release" (based on "Win32 (WCE ARM) Application")
+!MESSAGE "plugins - Win32 (WCE ARM) Debug" (based on "Win32 (WCE ARM) Application")
+!MESSAGE "plugins - Win32 (WCE x86em) Release" (based on "Win32 (WCE x86em) Application")
+!MESSAGE "plugins - Win32 (WCE x86em) Debug" (based on "Win32 (WCE x86em) Application")
 !MESSAGE 
 
 # Begin Project
@@ -39,7 +39,7 @@ CFG=vlc - Win32 (WCE MIPS) Debug
 # PROP Scc_LocalPath ""
 # PROP ATL_Project 2
 
-!IF  "$(CFG)" == "vlc - Win32 (WCE MIPS) Release"
+!IF  "$(CFG)" == "plugins - Win32 (WCE MIPS) Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -72,7 +72,7 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:MIPS
 # ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:MIPS
 
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE MIPS) Debug"
+!ELSEIF  "$(CFG)" == "plugins - Win32 (WCE MIPS) Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -105,7 +105,7 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:MIPS
 # ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:MIPS
 
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH4) Release"
+!ELSEIF  "$(CFG)" == "plugins - Win32 (WCE SH4) Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -138,7 +138,7 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:SH4
 # ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:SH4
 
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH4) Debug"
+!ELSEIF  "$(CFG)" == "plugins - Win32 (WCE SH4) Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -171,7 +171,7 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:SH4
 # ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:SH4
 
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH3) Release"
+!ELSEIF  "$(CFG)" == "plugins - Win32 (WCE SH3) Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -204,7 +204,7 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:SH3
 # ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:SH3
 
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH3) Debug"
+!ELSEIF  "$(CFG)" == "plugins - Win32 (WCE SH3) Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -237,7 +237,7 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:SH3
 # ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /MACHINE:SH3
 
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE ARM) Release"
+!ELSEIF  "$(CFG)" == "plugins - Win32 (WCE ARM) Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -270,7 +270,7 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /align:"4096" /MACHINE:ARM
 # ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /align:"4096" /MACHINE:ARM
 
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE ARM) Debug"
+!ELSEIF  "$(CFG)" == "plugins - Win32 (WCE ARM) Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -303,7 +303,7 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /align:"4096" /MACHINE:ARM
 # ADD LINK32 commctrl.lib coredll.lib /nologo /base:"0x00010000" /stack:0x10000,0x1000 /entry:"WinMainCRTStartup" /debug /nodefaultlib:"$(CENoDefaultLib)" /subsystem:$(CESubsystem) /align:"4096" /MACHINE:ARM
 
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE x86em) Release"
+!ELSEIF  "$(CFG)" == "plugins - Win32 (WCE x86em) Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -336,7 +336,7 @@ LINK32=link.exe
 # ADD BASE LINK32 commctrl.lib coredll.lib $(CEx86Corelibc) /nologo /stack:0x10000,0x1000 /subsystem:windows /nodefaultlib:"OLDNAMES.lib" /nodefaultlib:$(CENoDefaultLib) /windowsce:emulation /MACHINE:IX86
 # ADD LINK32 commctrl.lib coredll.lib $(CEx86Corelibc) /nologo /stack:0x10000,0x1000 /subsystem:windows /nodefaultlib:"OLDNAMES.lib" /nodefaultlib:$(CENoDefaultLib) /windowsce:emulation /MACHINE:IX86
 
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE x86em) Debug"
+!ELSEIF  "$(CFG)" == "plugins - Win32 (WCE x86em) Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -373,54 +373,14 @@ LINK32=link.exe
 
 # Begin Target
 
-# Name "vlc - Win32 (WCE MIPS) Release"
-# Name "vlc - Win32 (WCE MIPS) Debug"
-# Name "vlc - Win32 (WCE SH4) Release"
-# Name "vlc - Win32 (WCE SH4) Debug"
-# Name "vlc - Win32 (WCE SH3) Release"
-# Name "vlc - Win32 (WCE SH3) Debug"
-# Name "vlc - Win32 (WCE ARM) Release"
-# Name "vlc - Win32 (WCE ARM) Debug"
-# Name "vlc - Win32 (WCE x86em) Release"
-# Name "vlc - Win32 (WCE x86em) Debug"
+# Name "plugins - Win32 (WCE MIPS) Release"
+# Name "plugins - Win32 (WCE MIPS) Debug"
+# Name "plugins - Win32 (WCE SH4) Release"
+# Name "plugins - Win32 (WCE SH4) Debug"
+# Name "plugins - Win32 (WCE SH3) Release"
+# Name "plugins - Win32 (WCE SH3) Debug"
+# Name "plugins - Win32 (WCE ARM) Release"
+# Name "plugins - Win32 (WCE ARM) Debug"
+# Name "plugins - Win32 (WCE x86em) Release"
+# Name "plugins - Win32 (WCE x86em) Debug"
 
-# Begin Group "Source Files"
-# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
-# Begin Source File
-SOURCE="..\evc\vlc.c"
-# End Source File
-# End Group
-
-# Begin Group "Resource Files"
-
-# PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
-# Begin Source File
-
-SOURCE=..\share\vlc_wince_rc.rc
-
-!IF  "$(CFG)" == "vlc - Win32 (WCE MIPS) Release"
-
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE MIPS) Debug"
-
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH4) Release"
-
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH4) Debug"
-
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH3) Release"
-
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE SH3) Debug"
-
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE ARM) Release"
-
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE ARM) Debug"
-
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE x86em) Release"
-
-!ELSEIF  "$(CFG)" == "vlc - Win32 (WCE x86em) Debug"
-
-!ENDIF 
-
-# End Source File
-# End Group
-# End Target
-# End Project

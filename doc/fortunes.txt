@@ -367,3 +367,9 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<sam> dudes, you'll hate me again: bootstrap will now need an argument :)
+<Dnumgis> sam: hate you already
+<gibalou> sam: don't worry sam, we already hated you ;)
+
+  -- #videolan
+%

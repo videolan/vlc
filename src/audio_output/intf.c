@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.5 2002/10/20 12:23:48 massiot Exp $
+ * $Id: intf.c,v 1.6 2002/11/13 20:51:04 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -213,7 +213,7 @@ int aout_VolumeDown( aout_instance_t * p_aout, int i_nb_steps,
 /* Meant to be called by the output plug-in's Open(). */
 void aout_VolumeSoftInit( aout_instance_t * p_aout )
 {
-    int i_volume;
+    audio_volume_t i_volume;
 
     p_aout->output.pf_volume_infos = aout_VolumeSoftInfos;
     p_aout->output.pf_volume_get = aout_VolumeSoftGet;

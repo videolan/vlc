@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.19 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: mixer.c,v 1.20 2002/11/13 20:51:04 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -208,7 +208,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         {
             /* Additionally check that p_first_byte_to_mix is well
              * located. */
-            unsigned long i_nb_bytes = (start_date - p_buffer->start_date)
+            mtime_t i_nb_bytes = (start_date - p_buffer->start_date)
                             * p_aout->mixer.mixer.i_bytes_per_frame
                             * p_aout->mixer.mixer.i_rate
                             / p_aout->mixer.mixer.i_frame_length

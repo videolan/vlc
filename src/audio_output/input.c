@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.20 2002/11/11 22:27:00 gbazin Exp $
+ * $Id: input.c,v 1.21 2002/11/13 20:51:04 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -214,7 +214,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         mtime_t drift = p_buffer->start_date - start_date;
 
         p_input->i_resamp_start_date = mdate();
-        p_input->i_resamp_start_drift = drift;
+        p_input->i_resamp_start_drift = (int)drift;
 
         if ( drift > 0 )
             p_input->i_resampling_type = AOUT_RESAMPLING_DOWN;
@@ -251,7 +251,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             msg_Warn( p_aout, "resampling stopped after "I64Fi" usec",
                       mdate() - p_input->i_resamp_start_date );
         }
-        else if( abs( p_buffer->start_date - start_date ) <
+        else if( abs( (int)(p_buffer->start_date - start_date) ) <
                  abs( p_input->i_resamp_start_drift ) / 2 )
         {
             /* if we reduced the drift from half, then it is time to switch
@@ -263,7 +263,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             p_input->i_resamp_start_drift = 0;
         }
         else if( p_input->i_resamp_start_drift &&
-                 ( abs( p_buffer->start_date - start_date ) >
+                 ( abs( (int)(p_buffer->start_date - start_date) ) >
                    abs( p_input->i_resamp_start_drift ) * 3 / 2 ) )
         {
             /* If the drift is increasing and not decreasing, than something

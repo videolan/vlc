@@ -2,7 +2,7 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.17 2002/11/11 14:39:12 sam Exp $
+ * $Id: intf_eject.c,v 1.18 2002/11/13 20:51:05 sam Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
@@ -109,7 +109,7 @@ static int EjectSCSI ( int i_fd );
  *****************************************************************************/
 int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
-    int i_ret;
+    int i_ret = VLC_SUCCESS;
 
 #ifdef SYS_DARWIN
     FILE *p_eject;
@@ -152,11 +152,11 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
         }
     }
 
-    return 1;
+    return VLC_EGENERIC;
 
 #elif defined(UNDER_CE)
     msg_Warn( p_this, "CD-Rom ejection unsupported on this platform" );
-    return 1;
+    return i_ret;
 
 #elif defined(WIN32)
     HANDLE h_drive ;

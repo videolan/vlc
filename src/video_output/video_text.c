@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.39 2002/11/10 23:41:54 sam Exp $
+ * $Id: video_text.c,v 1.40 2002/11/13 20:51:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -440,13 +440,13 @@ void vout_TextSize( vout_font_t *p_font, int i_style, const char *psz_text, int 
 void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int i_bytes_per_line,
                  u32 i_char_color, u32 i_border_color, u32 i_bg_color, int i_style, const char *psz_text, int i_percent)
 {
-    byte_t      *p_char, *p_border;        /* character and border mask data */
-    int         i_char_mask, i_border_mask, i_bg_mask;              /* masks */
-    int         i_line;                         /* current line in character */
-    int         i_byte;                         /* current byte in character */
-    int         i_interspacing;                  /* offset between two chars */
-    int         i_font_bytes_per_line, i_font_height;     /* font properties */
-    int         i_position, i_end;                      /* current position  */
+    byte_t       *p_char, *p_border;       /* character and border mask data */
+    int          i_char_mask, i_border_mask, i_bg_mask;             /* masks */
+    int          i_line;                        /* current line in character */
+    int          i_byte;                        /* current byte in character */
+    int          i_interspacing;                 /* offset between two chars */
+    int          i_font_bytes_per_line, i_font_height;    /* font properties */
+    unsigned int i_position, i_end;                     /* current position  */
     vout_put_byte_t *p_PutByte;                          /* PutByte function */
 
     /* If no font was loaded, do nothing */

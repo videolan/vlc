@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.2 2002/11/12 10:44:04 gbazin Exp $
+ * $Id: libc.c,v 1.3 2002/11/13 20:51:04 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -150,7 +150,7 @@ double atof( const char *nptr )
 #if !defined( HAVE_LSEEK )
 off_t lseek( int fildes, off_t offset, int whence )
 {
-    return SetFilePointer( (HANDLE)fildes, offset, NULL, whence );
+    return SetFilePointer( (HANDLE)fildes, (long)offset, NULL, whence );
 }
 #endif
 

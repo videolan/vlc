@@ -3,6 +3,45 @@ Microsoft eMbedded Visual Tools Workspace File, Format Version 3.00
 
 ###############################################################################
 
+Project: "libvlc"=.\libvlc.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugin_foo"=.\plugin_foo\plugin_foo.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "plugins"=.\plugins.vcp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name libvlc
+    End Project Dependency
+}}}
+
+###############################################################################
+
 Project: "vlc"=.\vlc.vcp - Package Owner=<4>
 
 Package=<5>
@@ -11,6 +50,9 @@ Package=<5>
 
 Package=<4>
 {{{
+    Begin Project Dependency
+    Project_Dep_Name libvlc
+    End Project Dependency
 }}}
 
 ###############################################################################

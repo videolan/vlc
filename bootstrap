@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.26 2002/11/13 15:28:23 sam Exp $
+##  $Id: bootstrap,v 1.27 2002/11/13 20:51:03 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -11,35 +11,61 @@
 LANG=C
 export LANG
 
+##
+##  Give help
+##
+help()
+{
+  if test "$do_help" = "yes"
+  then
+    cat << EOF
+recognized flags are:
+  --config        create Makefile and configure scripts (read HACKING)
+  --update-vc     update Microsoft Visual Studio files
+  --update-po     update translation files
+EOF
+    exit 1
+  fi
+}
+
 ###
 ###  argument check
 ###
+do_help=yes
 do_po=no
 do_vc=no
 while test $# -gt 0; do
   case "$1" in
+    --config)
+      do_help=no
+      ;;
     --update-vc)
+      do_help=no
       do_vc=yes
       ;;
     --update-po)
+      do_help=no
       do_po=yes
       ;;
     *)
       echo "$0: unknown option $1"
-      echo "recognized flags are --update-vc and --update-po"
-      exit 1
+      do_help=yes
+      help
       ;;
   esac
   shift
 done
 
 ##
+##  Give help if needed
+##
+help
+
+##
 ##  Update the MSVC project files
 ##
-if test "$do_vc" = "no"
+if test "$do_vc" = "yes"
 then
-  echo "not updating MSVC or eVC project file. use --update-vc to force doing it."
-else
   if test ! -f Makefile
   then
     echo "no Makefile found, did you run ./configure?"
@@ -54,7 +80,8 @@ else
   LIBVLC_HEADERS=`make show-libvlc-headers | grep '^X: ' | cut -b3-`
   LIBVLC_PKG_HEADERS=`make show-libvlc-pkg-headers | grep '^X: ' | cut -b3-`
 
-  for target in evc/vlc.vcp msvc/vlc.dsp
+  # libvlc files
+  for target in evc/libvlc.vcp msvc/libvlc.dsp
   do
     rm -f ${target}
     #  Top of the project file
@@ -63,23 +90,6 @@ else
     cat >> ${target} << EOF
 # Begin Group "Source Files"${M}
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"${M}
-# Begin Group "vlc"${M}
-# Begin Source File${M}
-EOF
-    if test "${target}" = "evc/vlc.vcp"
-    then
-      cat >> ${target} << EOF
-SOURCE="..\\evc\\vlc.c"${M}
-EOF
-    else
-      cat >> ${target} << EOF
-SOURCE="..\\src\\vlc.c"${M}
-EOF
-    fi
-    cat >> ${target} << EOF
-# End Source File${M}
-# End Group${M}
-# Begin Group "libvlc"${M}
 EOF
     for file in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep -v "/.*/"`
     do
@@ -97,42 +107,42 @@ EOF
 EOF
       for file in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep "/${subdir}/"`
       do
-      if test "${target}" = "evc/vlc.vcp"
+      if test "${target}" = "evc/libvlc.vcp"
       then
         cat >> ${target} << EOF
 # Begin Source File${M}
 SOURCE="..\\`echo $file | sed -e 's%/%\\\\%g'`"${M}
 # ADD CPP /D "__VLC__" /D PLUGIN_PATH=\\"plugins\\" /D DATA_PATH=\\"share\\"${M}
 !IF "\$(CFG)" == "vlc - Win32 (WCE MIPS) Release"${M}
-# PROP Intermediate_Dir "Release\\${subdir}"${M}
-# PROP Output_Dir "Release\\${subdir}"${M}
+# PROP Intermediate_Dir "MIPSRel\\${subdir}"${M}
+# PROP Output_Dir "MIPSRel\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "vlc - Win32 (WCE MIPS) Debug"${M}
-# PROP Intermediate_Dir "Debug\\${subdir}"${M}
-# PROP Output_Dir "Debug\\${subdir}"${M}
+# PROP Intermediate_Dir "MIPSDbg\\${subdir}"${M}
+# PROP Output_Dir "MIPSDbg\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "vlc - Win32 (WCE SH4) Release"${M}
-# PROP Intermediate_Dir "Release\\${subdir}"${M}
-# PROP Output_Dir "Release\\${subdir}"${M}
+# PROP Intermediate_Dir "SH4Rel\\${subdir}"${M}
+# PROP Output_Dir "SH4Rel\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "vlc - Win32 (WCE SH4) Debug"${M}
-# PROP Intermediate_Dir "Debug\\${subdir}"${M}
-# PROP Output_Dir "Debug\\${subdir}"${M}
+# PROP Intermediate_Dir "SH4Dbg\\${subdir}"${M}
+# PROP Output_Dir "SH4Dbg\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "vlc - Win32 (WCE SH3) Release"${M}
-# PROP Intermediate_Dir "Release\\${subdir}"${M}
-# PROP Output_Dir "Release\\${subdir}"${M}
+# PROP Intermediate_Dir "SH3Rel\\${subdir}"${M}
+# PROP Output_Dir "SH3Rel\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "vlc - Win32 (WCE SH3) Debug"${M}
-# PROP Intermediate_Dir "Debug\\${subdir}"${M}
-# PROP Output_Dir "Debug\\${subdir}"${M}
+# PROP Intermediate_Dir "SH3Dbg\\${subdir}"${M}
+# PROP Output_Dir "SH3Dbg\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "vlc - Win32 (WCE ARM) Release"${M}
-# PROP Intermediate_Dir "Release\\${subdir}"${M}
-# PROP Output_Dir "Release\\${subdir}"${M}
+# PROP Intermediate_Dir "ARMRel\\${subdir}"${M}
+# PROP Output_Dir "ARMRel\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "vlc - Win32 (WCE ARM) Debug"${M}
-# PROP Intermediate_Dir "Debug\\${subdir}"${M}
-# PROP Output_Dir "Debug\\${subdir}"${M}
+# PROP Intermediate_Dir "ARMDbg\\${subdir}"${M}
+# PROP Output_Dir "ARMDbg\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "vlc - Win32 (WCE x86em) Release"${M}
-# PROP Intermediate_Dir "Release\\${subdir}"${M}
-# PROP Output_Dir "Release\\${subdir}"${M}
+# PROP Intermediate_Dir "X86EMRel\\${subdir}"${M}
+# PROP Output_Dir "X86EMRel\\${subdir}"${M}
 !ELSEIF "\$(CFG)" == "vlc - Win32 (WCE x86em) Debug"${M}
-# PROP Intermediate_Dir "Debug\\${subdir}"${M}
-# PROP Output_Dir "Debug\\${subdir}"${M}
+# PROP Intermediate_Dir "X86EMDbg\\${subdir}"${M}
+# PROP Output_Dir "X86EMDbg\\${subdir}"${M}
 !ENDIF${M}
 # End Source File${M}
 EOF
@@ -158,10 +168,7 @@ EOF
     done
     cat >> ${target} << EOF
 # End Group${M}
-# End Group${M}
 EOF
-    #  The modules
-    echo 'no modules yet'
     #  The headers
     cat >> ${target} << EOF
 # Begin Group "Header Files"${M}
@@ -189,6 +196,58 @@ EOF
     cat >> ${target} << EOF
 # End Group${M}
 # End Group${M}
+# End Target${M}
+# End Project${M}
+EOF
+  done
+
+  # plugins files
+  for target in evc/plugins.vcp msvc/plugins.dsp
+  do
+    rm -f ${target}
+    #  Top of the project file
+    cat ${target}.in > ${target}
+    #  The source files
+    cat >> ${target} << EOF
+# Begin Group "Source Files"${M}
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"${M}
+# End Group${M}
+EOF
+    #  The headers
+    cat >> ${target} << EOF
+# Begin Group "Header Files"${M}
+# PROP Default_Filter "h;hpp;hxx;hm;inl"${M}
+# End Group${M}
+# End Target${M}
+# End Project${M}
+EOF
+  done
+
+  # vlc files
+  for target in evc/vlc.vcp msvc/vlc.dsp
+  do
+    rm -f ${target}
+    #  Top of the project file
+    cat ${target}.in > ${target}
+    #  The source files
+    cat >> ${target} << EOF
+# Begin Group "Source Files"${M}
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"${M}
+# Begin Source File${M}
+EOF
+    if test "${target}" = "evc/vlc.vcp"
+    then
+      cat >> ${target} << EOF
+SOURCE="..\\evc\\vlc.c"${M}
+EOF
+    else
+      cat >> ${target} << EOF
+SOURCE="..\\src\\vlc.c"${M}
+EOF
+    fi
+    cat >> ${target} << EOF
+# End Source File${M}
+# End Group${M}
 EOF
     #  Bottom of the project file - handles resource files too
     cat ${target}.out >> ${target}
@@ -200,10 +259,8 @@ fi
 ##
 ##  Update the potfiles because no one ever does it
 ##
-if test "$do_po" = "no"
+if test "$do_po" = "yes"
 then
-  echo "not updating potfiles. use --update-po to force doing it."
-else
   cd po
   make update-po 2>&1 | grep '^[^:]*:$' | cut -f1 -d: | tr '\n' ' ' | sed 's/ $//'
   cd ..
