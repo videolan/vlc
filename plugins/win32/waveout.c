@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.5 2002/03/19 12:48:01 gbazin Exp $
+ * $Id: waveout.c,v 1.6 2002/03/20 23:00:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -155,6 +155,9 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( (p_aout->p_sys->waveformat.nChannels != p_aout->i_channels) ||
         (p_aout->p_sys->waveformat.nSamplesPerSec != p_aout->i_rate) )
     {
+        /* Before calling waveOutClose we must reset the device */
+        waveOutReset( p_aout->p_sys->h_waveout );
+
         if( waveOutClose( p_aout->p_sys->h_waveout ) != MMSYSERR_NOERROR )
         {
             intf_ErrMsg( "aout error: waveOutClose failed" );
@@ -250,6 +253,9 @@ static void aout_Close( aout_thread_t *p_aout )
     int i;
 
     intf_WarnMsg( 3, "aout: waveOut aout_Close ");
+
+    /* Before calling waveOutClose we must reset the device */
+    waveOutReset( p_aout->p_sys->h_waveout );
 
     /* Close the device */
     if( waveOutClose( p_aout->p_sys->h_waveout ) != MMSYSERR_NOERROR )

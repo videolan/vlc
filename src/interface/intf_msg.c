@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.46 2002/02/23 21:31:44 gbazin Exp $
+ * $Id: intf_msg.c,v 1.47 2002/03/20 23:00:15 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -325,6 +325,11 @@ static void QueueMsg( int i_type, int i_level, char *psz_format, va_list ap )
 #ifndef HAVE_VASPRINTF
 #   ifdef WIN32
     psz_temp = ConvertPrintfFormatString(psz_format);
+    if( !psz_temp )
+    {
+        fprintf(stderr, "intf warning: couldn't print message");
+        return;
+    }
     vsprintf( psz_str, psz_temp, ap );
     free( psz_temp );
 #   else
@@ -409,7 +414,7 @@ static void FlushMsg ( void )
  * ConvertPrintfFormatString: replace all occurrences of %ll with %I64 in the
  *                            printf format string.
  *****************************************************************************
- * Win32 doesn't recognize the "%lld" format in a printf string, so we have
+ * Win32 doesn't recognize the "%ll" format in a printf string, so we have
  * to convert this string to something that win32 can handle.
  * This is a REALLY UGLY HACK which won't even work in every situation,
  * but hey I don't want to put an ifdef WIN32 each time I use printf with
@@ -426,7 +431,10 @@ static char *ConvertPrintfFormatString( char *psz_format )
    * psz_format string. Once we'll know that we'll be able to malloc the
    * destination string */
 
-  for( i=0; i <= (strlen(psz_format) - 4); i++ )
+  if( strlen( psz_format ) <= 3 )
+      return strdup( psz_format );
+
+  for( i=0; i <= (strlen(psz_format) - 3); i++ )
   {
       if( !strncmp( (char *)(psz_format + i), "%ll", 3 ) )
       {
@@ -439,12 +447,12 @@ static char *ConvertPrintfFormatString( char *psz_format )
   if( psz_dest == NULL )
   {
       fprintf( stderr, "intf warning: ConvertPrintfFormatString failed\n");
-      exit (errno);
+      return NULL;
   }
 
   /* Now build the modified string */
   i_counter = 0;
-  for( i=0; i <= (strlen(psz_format) - 4); i++ )
+  for( i=0; i <= (strlen(psz_format) - 3); i++ )
   {
       if( !strncmp( (char *)(psz_format + i), "%ll", 3 ) )
       {

@@ -1,4 +1,4 @@
-List of known vlc bugs $Id: BUGS,v 1.8 2002/03/20 03:12:20 ipkiss Exp $
+List of known vlc bugs $Id: BUGS,v 1.9 2002/03/20 23:00:16 gbazin Exp $
 
    Please try to keep this file up to date. Also, grep for FIXME in the
 source files for more and more bugs to fix.
@@ -29,8 +29,6 @@ Audio output:
 
   * Audio output stutters on some audio cards. For instance kwyxz's SB
   128 with an es1371 chip.
-
-  * WaveOut doesn't close correctly under Windows 98.
 
 
 Video output:
