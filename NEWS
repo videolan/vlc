@@ -1,13 +1,33 @@
-$Id: NEWS,v 1.62 2003/08/05 11:54:11 jpsaman Exp $
+$Id: NEWS,v 1.63 2003/08/10 21:26:07 gbazin Exp $
 
 Changes between 0.6.1 and 0.6.2:
 ---------------------------------
 
+Core support:
+ * Fixed a nasty regression in 0.6.1 which made some streams unplayable.
+
+Stream output:
+ * Transcoder now generates proper pts/dts thus should work a lot better.
+ * Improved MPEG TS muxer.
+
 Access input:
  * Support for DVB-S/C/T cards using v4l2 API for Linux 2.6.x kernels.
+ * Few fixes to the VCD navigation.
+
+UNIX ports:
+ * ALSA multi-channel support fixed and tested.
+ * Fixed fullscreen with gnome metacity.
+
+Win32 port:
+ * Fixed VCD support which was broken on some machines.
 
 iPaq port:
- * Familiar interface with Gtk+-1.2 and GPE support removed (deprecreated)
+ * Familiar interface with Gtk+-1.2 and GPE support removed (deprecreated).
+
+Miscellaneous:
+ * Text subtitles now centered on the picture.
+ * Ffmpeg decoder now generates proper pts and can be used to play
+   mpeg1/2 videos.
 
 Changes between 0.6.0 and 0.6.1:
 ---------------------------------
