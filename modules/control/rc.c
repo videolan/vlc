@@ -792,7 +792,6 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t *p_playlist;
-    vlc_value_t     val;
 
     p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,
                                            FIND_ANYWHERE );
@@ -851,7 +850,7 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static Other( vlc_object_t *p_this, char const *psz_cmd,
+static int Other( vlc_object_t *p_this, char const *psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
