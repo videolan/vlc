@@ -407,7 +407,8 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             for( j = 0; j < i_sub_count; j++ )
             {
                 if( result[j].psz_fname && result[i].psz_fname &&
-                    !strncasecmp( result[i].psz_fname, result[j].psz_fname, sizeof( result[i].psz_fname) - 4 ) )
+                    !strncasecmp( result[i].psz_fname, result[j].psz_fname, sizeof( result[i].psz_fname) - 4 ) && 
+                    !strcasecmp( result[j].psz_ext, "idx" ) )
                     break;
                 
             }
