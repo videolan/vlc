@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.43 2003/12/12 15:37:23 zorglub Exp $
+ * $Id: sap.c,v 1.44 2004/01/05 12:59:54 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -166,6 +166,8 @@ struct attr_descr_t
 
 struct sap_announce_t
 {
+    mtime_t i_last;
+    int i_id;
     char *psz_name;
     char *psz_uri;
 };
@@ -279,7 +281,8 @@ static int Open( vlc_object_t *p_this )
         {
             psz_scope = strdup( "8" );
         }
-        snprintf( psz_address, 100, "[%s%c%s]",IPV6_ADDR_1, psz_scope[0], IPV6_ADDR_2 );
+        snprintf( psz_address, 100, "[%s%c%s]",IPV6_ADDR_1,
+                  psz_scope[0], IPV6_ADDR_2 );
         free( psz_scope );
 
         sock.i_type            = NETWORK_UDP;
@@ -373,6 +376,8 @@ static void Run( intf_thread_t *p_intf )
     /* read SAP packets */
     while( !p_intf->b_die )
     {
+        playlist_t *p_playlist= NULL;
+        int i;
         int i_read = NetRead( p_intf, p_sys->fd, buffer, MAX_SAP_BUFFER );
         uint8_t *p_sdp;
         int i_version;
@@ -383,7 +388,46 @@ static void Run( intf_thread_t *p_intf )
         int b_compressed;
         unsigned char *p_decompressed_buffer;
         int i_decompressed_size;
-        
+
+        /* Check for items that need deletion */
+        for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
+        {
+           struct sap_announce_t *p_announce;
+           if( mdate() - p_intf->p_sys->pp_announces[i]->i_last > 10000000 )
+           {
+              msg_Dbg(p_intf,"Time out for %s, deleting (%i/%i)",
+                             p_intf->p_sys->pp_announces[i]->psz_name,
+                             i , p_intf->p_sys->i_announces );
+
+              /* Remove the playlist item */
+               p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                              FIND_ANYWHERE );
+               if( p_playlist )
+               {
+                   int i_pos = playlist_GetPositionById( p_playlist,
+                              p_intf->p_sys->pp_announces[i]->i_id );
+                   playlist_Delete( p_playlist, i_pos );
+               }
+
+               vlc_object_release( p_playlist );
+
+               /* Free the p_announce */
+               p_announce =  p_intf->p_sys->pp_announces[i];
+               if( p_announce->psz_name )
+                  free(  p_announce->psz_name );
+               if( p_announce->psz_uri )
+                  free(  p_announce->psz_uri );
+
+              /* Remove the sap_announce from the array */
+              REMOVE_ELEM( p_intf->p_sys->pp_announces,
+                           p_intf->p_sys->i_announces,
+                           i );
+
+              free( p_announce );
+
+           }
+        }
+
         /* Minimum length is > 6 */
         if( i_read <= 6 )
         {
@@ -467,6 +511,7 @@ static void Run( intf_thread_t *p_intf )
         {
             msg_Warn( p_intf, "ditching sap packet" );
         }
+
     }
 }
 
@@ -587,12 +632,11 @@ static void mfield_parse( char *psz_mfield, char **ppsz_proto,
 
 static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 {
-    playlist_item_t * p_item;
     struct sap_announce_t *p_announce;
-    char *psz_uri, *psz_proto;
+    char *psz_uri, *psz_proto, *psz_item_uri;
     char *psz_port;
     char *psz_uri_default;
-    int i_count , i;
+    int i_count , i , i_pos , i_id = 0;
     vlc_bool_t b_http = VLC_FALSE;
     char *psz_http_path = NULL;
     playlist_t *p_playlist = NULL;
@@ -600,73 +644,61 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
     psz_uri_default = NULL;
     if( p_sd->i_media > 1 )
     {
-        p_item = malloc( sizeof( playlist_item_t ) );
-        if( p_item == NULL )
-        {
-            msg_Warn( p_intf, "out of memory" );
-            return;
-        }
-        p_item->psz_name    = strdup( p_sd->psz_sessionname );
-        p_item->psz_uri     = NULL;
-        p_item->i_duration  = -1;
-        p_item->ppsz_options= NULL;
-        p_item->i_options   = 0;
-
-        p_item->i_type      = 0;
-        p_item->i_status    = 0;
-        p_item->b_autodeletion = VLC_FALSE;
-        p_item->b_enabled   = VLC_TRUE;
-        p_item->i_group     = p_intf->p_sys->i_group;
-        p_item->psz_author  = strdup( "" );
         psz_uri = malloc( strlen( p_sd->psz_sdp ) + 7 );
         if( psz_uri == NULL )
         {
             msg_Warn( p_intf, "out of memory" );
-            free( p_item->psz_name );
-            free( p_item->psz_author );
-            free( p_item );
             return;
         }
-        p_item->psz_uri = psz_uri;
         memcpy( psz_uri, "sdp://", 6 );
         psz_uri += 6;
         memcpy( psz_uri, p_sd->psz_sdp, strlen( p_sd->psz_sdp ) + 1 );
-        /* Enqueueing p_item in the playlist */
 
+        /* Check if we have already added the item */
         for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
         {
             if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
-                        p_item->psz_uri ) )
+                        psz_uri ) )
             {
-                return;
+                    return;
             }
         }
-        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        playlist_AddItem ( p_playlist, p_item, PLAYLIST_CHECK_INSERT, PLAYLIST_END );
-        vlc_object_release( p_playlist );
+        /* Add it to the playlist */
+        p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                      FIND_ANYWHERE );
+        i_id = playlist_Add( p_playlist, psz_uri, p_sd->psz_sessionname ,
+                      PLAYLIST_CHECK_INSERT, PLAYLIST_END );
+
+        i_pos = playlist_GetPositionById( p_playlist, i_id );
+        playlist_SetGroup( p_playlist, i_pos, p_intf->p_sys->i_group );
+
+        /* Remember it */
         p_announce = (struct sap_announce_t *)malloc(
                       sizeof(struct sap_announce_t) );
-        if( p_item->psz_name )
+        if( p_sd->psz_sessionname )
         {
-            p_announce->psz_name = strdup( p_item->psz_name );
+            p_announce->psz_name = strdup(  p_sd->psz_sessionname );
         }
         else
         {
             p_announce->psz_name = strdup( "" );
         }
-        if( p_item->psz_uri )
+        if( psz_uri )
         {
-            p_announce->psz_uri  = strdup( p_item->psz_uri );
+            p_announce->psz_uri  = strdup( psz_uri );
         }
         else
         {
             p_announce->psz_uri = strdup( "" );
         }
+        p_announce->i_id = i_id;
 
         INSERT_ELEM( p_intf->p_sys->pp_announces,
                      p_intf->p_sys->i_announces,
                      p_intf->p_sys->i_announces,
                      p_announce );
+
+        vlc_object_release( p_playlist );
         return;
     }
 
@@ -674,24 +706,10 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
     for( i_count = 0 ; i_count < p_sd->i_media ; i_count++ )
     {
-        p_item = malloc( sizeof( playlist_item_t ) );
-        p_item->psz_name    = strdup( p_sd->psz_sessionname );
-        p_item->psz_uri     = NULL;
-        p_item->i_duration  = -1;
-        p_item->ppsz_options= NULL;
-        p_item->i_options   = 0;
+        int i_group = p_intf->p_sys->i_group;
 
-        p_item->i_type      = 0;
-        p_item->i_status    = 0;
-        p_item->b_autodeletion = VLC_FALSE;
-        p_item->b_enabled   = VLC_TRUE;
-        p_item->i_group     = p_intf->p_sys->i_group;
-        p_item->psz_author  = strdup( "" );
-
-        psz_uri = NULL;
-
-        /* Build what we have to put in p_item->psz_uri, with the m and
-         *  c fields  */
+        /* Build what we have to put in psz_item_uri, with the m and
+         * c fields  */
 
         if( !p_sd->pp_media[i_count] )
         {
@@ -734,7 +752,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             }
             if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup"))
             {
-                int i_id;
+                int i_group_id;
                 p_playlist =
                 (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                         FIND_ANYWHERE );
@@ -743,36 +761,36 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                     return;
                 }
 
-                i_id = playlist_GroupToId( p_playlist,
-                                           p_sd->pp_attributes[i]->psz_value);
-                if( i_id != 0 )
+                i_group_id = playlist_GroupToId( p_playlist,
+                                 p_sd->pp_attributes[i]->psz_value);
+                if( i_group_id != 0 )
                 {
-                    p_item->i_group = i_id;
+                    i_group = i_group_id;
                 }
                 else
                 {
                     playlist_group_t *p_group =
                             playlist_CreateGroup( p_playlist,
                                        p_sd->pp_attributes[i]->psz_value);
-                    p_item->i_group = p_group->i_id;
+                    i_group = p_group->i_id;
                 }
                 vlc_object_release( p_playlist );
             }
         }
 
-        /* Filling p_item->psz_uri */
+        /* Filling psz_uri */
         if( b_http == VLC_FALSE )
         {
-            p_item->psz_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
-                                      strlen( psz_port ) + 7 );
+            psz_item_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
+                                 strlen( psz_port ) + 7 );
             if( ismult( psz_uri ) )
             {
-                sprintf( p_item->psz_uri, "%s://@%s:%s",
+                sprintf( psz_item_uri, "%s://@%s:%s",
                          psz_proto, psz_uri, psz_port );
             }
             else
             {
-                sprintf( p_item->psz_uri, "%s://%s:%s",
+                sprintf( psz_item_uri, "%s://%s:%s",
                          psz_proto, psz_uri, psz_port );
             }
         }
@@ -783,9 +801,10 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                 psz_http_path = strdup( "/" );
             }
 
-            p_item->psz_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
-                                      strlen( psz_port ) + strlen(psz_http_path) + 5 );
-            sprintf( p_item->psz_uri, "%s://%s:%s%s", psz_proto,
+            psz_item_uri = malloc( strlen( psz_proto ) + strlen( psz_uri ) +
+                                   strlen( psz_port ) + strlen(psz_http_path) +
+                                    5 );
+            sprintf( psz_item_uri, "%s://%s:%s%s", psz_proto,
                             psz_uri, psz_port,psz_http_path );
 
             if( psz_http_path )
@@ -794,46 +813,85 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             }
         }
 
+        /* Check if we already know this item */
          for( i = 0 ; i< p_intf->p_sys->i_announces ; i++ )
          {
-            if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
-                        p_item->psz_uri ) )
+            if( !strcmp( p_intf->p_sys->pp_announces[i]->psz_uri,
+                         psz_item_uri ) )
             {
+                p_intf->p_sys->pp_announces[i]->i_last = mdate();
+
+                /* Check if the name changed */
+                if( strcmp( p_intf->p_sys->pp_announces[i]->psz_name,
+                             p_sd->psz_sessionname ) )
+                {
+                    playlist_item_t *p_item;
+                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                  FIND_ANYWHERE );
+
+                    msg_Dbg(p_intf, "Name changed (%s -> %s) for %s",
+                            p_intf->p_sys->pp_announces[i]->psz_name,
+                            p_sd->psz_sessionname,
+                            psz_item_uri );
+
+                    p_item = playlist_GetItemById( p_playlist,
+                                    p_intf->p_sys->pp_announces[i]->i_id );
+
+                    /* Change the name in the item */
+                    if( p_item->psz_name )
+                        free( p_item->psz_name );
+                    p_item->psz_name = strdup( p_sd->psz_sessionname);
+
+                    /* Update the stored name */
+                    if( p_intf->p_sys->pp_announces[i]->psz_name )
+                        free( p_intf->p_sys->pp_announces[i]->psz_name );
+                    p_intf->p_sys->pp_announces[i]->psz_name =
+                                   strdup( p_sd->psz_sessionname );
+
+                    vlc_object_release( p_playlist );
+                }
                 return;
             }
         }
 
-        /* Enqueueing p_item in the playlist */
+        /* Add the item in the playlist */
         p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                       FIND_ANYWHERE );
-        playlist_AddItem ( p_playlist, p_item,
-                           PLAYLIST_CHECK_INSERT, PLAYLIST_END );
+        i_id = playlist_Add ( p_playlist, psz_item_uri ,
+                               p_sd->psz_sessionname,
+                               PLAYLIST_CHECK_INSERT, PLAYLIST_END );
+        i_pos = playlist_GetPositionById( p_playlist, i_id );
+        playlist_SetGroup( p_playlist, i_pos, i_group );
 
-        /* Store it in the list */
+        /* Then remember it */
         p_announce = (struct sap_announce_t *)malloc(
                       sizeof(struct sap_announce_t) );
-        if( p_item->psz_name )
+        if(  p_sd->psz_sessionname )
         {
-            p_announce->psz_name = strdup( p_item->psz_name );
+            p_announce->psz_name = strdup(  p_sd->psz_sessionname );
         }
         else
         {
             p_announce->psz_name = strdup( "" );
         }
-        if( p_item->psz_uri )
+        if( psz_item_uri )
         {
-            p_announce->psz_uri  = strdup( p_item->psz_uri );
+            p_announce->psz_uri  = strdup( psz_item_uri );
         }
         else
         {
             p_announce->psz_uri = strdup( "" );
         }
+        p_announce->i_id = i_id;
+
+        p_announce->i_last = mdate();
+
+        vlc_object_release( p_playlist );
 
         INSERT_ELEM( p_intf->p_sys->pp_announces,
                      p_intf->p_sys->i_announces,
                      p_intf->p_sys->i_announces,
                      p_announce );
-        vlc_object_release( p_playlist );
     }
 }
 
