@@ -70,7 +70,7 @@ int main (void)
 
 #if 1
 	for (i = 0; i < (2*1152); i++)
-	    intf_DbgMsg ( "%04X\n",(u16)buffer[i] );
+	    fprintf ( stderr, "%04X\n",(u16)buffer[i] );
 #endif
     }
 

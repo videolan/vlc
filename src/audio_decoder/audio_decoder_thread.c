@@ -205,14 +205,15 @@ static void RunThread (adec_thread_t * p_adec)
             
             p_byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
             /* FIXME: the check will be done later, am I right ? */
-            adec_byte_stream_next ( p_byte_stream );
+
+            /* FIXME: is this really needed ?
+            adec_byte_stream_next ( p_byte_stream ); */
 
             if( p_adec->b_die || p_adec->b_error )
             {
                 goto bad_frame;
             }
 
-            sync = 1;
         }
 
         if( DECODER_FIFO_START( *p_adec->p_fifo)->b_has_pts )
@@ -229,9 +230,10 @@ static void RunThread (adec_thread_t * p_adec)
 
         if( adec_sync_frame (&p_adec->audio_decoder, &sync_info) )
         {
-            sync = 0;
             goto bad_frame;
         }
+        
+        sync = 1;
 
         p_adec->p_aout_fifo->l_rate = sync_info.sample_rate;
 
