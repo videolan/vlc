@@ -19,6 +19,7 @@ Arwed v. Merkatz <v.merkatz at gmx dot net> - Gamma correction for adjust filter
 Benjamin Mironer <bmironer@noos.fr> - Mac OS X fixes
 Benoit Steiner <benny@via.ecp.fr> - MPEG system input, network input
 Bill Eldridge <bill@rfa.org> - documentation
+Bob Maguire <maguirer at rjmaguire dot com> - addition of some controls to the OSX interface
 Brieuc Jeunhomme <bbp@via.ecp.fr> - bug fixes
 Bruno Vella <allevb@tin.it> - Italian localization
 Carlo Calabrò <murray@via.ecp.fr> - Italian localization
@@ -35,7 +36,7 @@ DirektX <direktx at freemail.hu> - Hungarian translation
 Emmanuel Blindauer <manu@agat.net> - aRts audio output
 Espen Skoglund <esk@ira.uka.de> - FreeBSD autoconf and Makefile patches
 Ethan C. Baldridge <BaldridgeE@cadmus.com> - directory browsing code
-Felix Kühne <fk@aenneburghardt.de> - German translation
+Felix Kühne <fkuehne@users.sf.net> - German translation
 Fumio Nakayama <endymion@ca2.so-net.ne.jp> - Japanese translation
 Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
@@ -94,4 +95,3 @@ Watanabe Go <go@dsl.gr.jp> - fix for non-ASCII filenames
 Xavier Maillard <zedek@fxgsproject.org> - audio converters
 Xavier Marchesini <xav@alarue.net> - Win32 fixes
 Yves Duret <yves@zarb.org> - RPM packages
-Bob Maguire <maguirer at rjmaguire dot com> - addition of some controls to the OSX interface

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-01 13:00+0200\n"
+"POT-Creation-Date: 2004-09-05 20:10+0200\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
 "Last-Translator: Antonio Javier Varela <tonxabar@hotmail.com>\n"
 "Language-Team: \n"
@@ -226,20 +226,20 @@ msgstr ""
 "\n"
 "Para más información, echa un vistazo al sitio web."
 
-#: include/vlc_meta.h:28 src/input/var.c:135 modules/access/cdda/access.c:364
-#: modules/access/cdda/access.c:429 modules/gui/beos/MediaControlView.cpp:1234
+#: include/vlc_meta.h:28 src/input/var.c:135 modules/access/cdda/access.c:439
+#: modules/gui/beos/MediaControlView.cpp:1234
 #: modules/gui/gtk/gnome_interface.c:1659 modules/gui/gtk/gtk_interface.c:1965
 #: modules/gui/gtk/menu.c:1369 modules/gui/gtk/menu.c:1390
 #: modules/gui/gtk/open.c:236 modules/gui/kde/interface.cpp:144
 #: modules/gui/macosx/intf.m:434 modules/gui/macosx/intf.m:435
 #: modules/gui/macosx/open.m:150 modules/gui/macosx/playlistinfo.m:62
 #: modules/gui/wxwindows/open.cpp:635 modules/gui/wxwindows/open.cpp:1124
-#: modules/mux/asf.c:46
+#: modules/mux/asf.c:47
 msgid "Title"
 msgstr "Título"
 
 #: include/vlc_meta.h:29 src/input/input.c:809 src/playlist/sort.c:119
-#: src/playlist/sort.c:121 modules/access/cdda/access.c:758
+#: src/playlist/sort.c:121 modules/access/cdda/access.c:672
 #: modules/access/vcdx/access.c:1326 modules/gui/macosx/playlist.m:181
 #: modules/gui/macosx/playlist.m:505 modules/gui/macosx/playlistinfo.m:63
 #: modules/gui/macosx/playlistinfo.m:140 modules/gui/macosx/playlistinfo.m:179
@@ -247,21 +247,20 @@ msgstr "Título"
 #: modules/gui/wxwindows/iteminfo.cpp:171
 #: modules/gui/wxwindows/playlist.cpp:426
 #: modules/gui/wxwindows/playlist.cpp:442 modules/misc/playlist/m3u.c:62
-#: modules/mux/asf.c:49
+#: modules/mux/asf.c:50
 msgid "Author"
 msgstr "Autor"
 
-#: include/vlc_meta.h:30 modules/access/cdda/access.c:369
-#: modules/access/cdda/access.c:425 modules/gui/macosx/playlist.m:883
+#: include/vlc_meta.h:30 modules/access/cdda/access.c:435
+#: modules/gui/macosx/playlist.m:883
 msgid "Artist"
 msgstr "Artista"
 
-#: include/vlc_meta.h:31 modules/access/cdda/access.c:374
-#: modules/access/cdda/access.c:771
+#: include/vlc_meta.h:31 modules/access/cdda/access.c:685
 msgid "Genre"
 msgstr "Género"
 
-#: include/vlc_meta.h:32 modules/mux/asf.c:52
+#: include/vlc_meta.h:32 modules/mux/asf.c:53
 msgid "Copyright"
 msgstr ""
 
@@ -270,7 +269,7 @@ msgstr ""
 msgid "Description"
 msgstr "Descripción"
 
-#: include/vlc_meta.h:34 modules/mux/asf.c:58
+#: include/vlc_meta.h:34 modules/mux/asf.c:59
 msgid "Rating"
 msgstr "Puntuación"
 
@@ -295,11 +294,104 @@ msgstr ""
 msgid "Language"
 msgstr "Lenguaje"
 
-#: include/vlc_meta.h:39
+#: include/vlc_meta.h:40
+#, fuzzy
+msgid "CDDB Artist"
+msgstr "Artista"
+
+#: include/vlc_meta.h:41
+#, fuzzy
+msgid "CDDB Category"
+msgstr "Categoría de Disco en CDDB"
+
+#: include/vlc_meta.h:42 modules/access/cdda/access.c:688
+msgid "CDDB Disc ID"
+msgstr "ID de Disco en CDDB"
+
+#: include/vlc_meta.h:43
+#, fuzzy
+msgid "CDDB Extended Data"
+msgstr "Datos Extendidos"
+
+#: include/vlc_meta.h:44
+#, fuzzy
+msgid "CDDB Genre"
+msgstr "servidor CDDB"
+
+#: include/vlc_meta.h:45
+#, fuzzy
+msgid "CDDB Year"
+msgstr "servidor CDDB"
+
+#: include/vlc_meta.h:46
+#, fuzzy
+msgid "CDDB Title"
+msgstr "Título"
+
+#: include/vlc_meta.h:48
+msgid "CD-Text Arranger"
+msgstr ""
+
+#: include/vlc_meta.h:49
+msgid "CD-Text Composer"
+msgstr ""
+
+#: include/vlc_meta.h:50
+#, fuzzy
+msgid "CD-Text Disc ID"
+msgstr "ID de Disco en CDDB"
+
+#: include/vlc_meta.h:51
+msgid "CD-Text Genre"
+msgstr ""
+
+#: include/vlc_meta.h:52
+#, fuzzy
+msgid "CD-Text Message"
+msgstr "Mensajes"
+
+#: include/vlc_meta.h:53
+msgid "CD-Text Songwriter"
+msgstr ""
+
+#: include/vlc_meta.h:54
+msgid "CD-Text Performer"
+msgstr ""
+
+#: include/vlc_meta.h:55
+#, fuzzy
+msgid "CD-Text Title"
+msgstr "Título Siguiente"
+
+#: include/vlc_meta.h:57
+#, fuzzy
+msgid "ISO-9660 Application ID"
+msgstr "Aplicación"
+
+#: include/vlc_meta.h:58
+#, fuzzy
+msgid "ISO-9660 Preparer"
+msgstr "Preparador"
+
+#: include/vlc_meta.h:59
+#, fuzzy
+msgid "ISO-9660 Publisher"
+msgstr "Editor"
+
+#: include/vlc_meta.h:60
+msgid "ISO-9660 Volume"
+msgstr ""
+
+#: include/vlc_meta.h:61
+#, fuzzy
+msgid "ISO-9660 Volume Set"
+msgstr "Conjunto de Volumen"
+
+#: include/vlc_meta.h:63
 msgid "Codec Name"
 msgstr "Nombre del Códec"
 
-#: include/vlc_meta.h:40
+#: include/vlc_meta.h:64
 msgid "Codec Description"
 msgstr "Descripción del Códec"
 
@@ -326,14 +418,6 @@ msgstr "Osciloscopio"
 #: src/audio_output/input.c:114
 msgid "Spectrum"
 msgstr "Espectrómetro"
-
-#: src/audio_output/input.c:121
-msgid "Goom"
-msgstr ""
-
-#: src/audio_output/input.c:129
-msgid "GaLaktos"
-msgstr ""
 
 #: src/audio_output/input.c:151 modules/gui/macosx/equalizer.m:140
 #: modules/gui/macosx/equalizer.m:154 modules/gui/macosx/intf.m:474
@@ -440,6 +524,7 @@ msgid "Bookmark %i"
 msgstr "Favorito %i"
 
 #: src/input/es_out.c:309 src/input/es_out.c:310 modules/access/cdda.c:161
+#: modules/access/cdda/access.c:736
 #, c-format
 msgid "Track %i"
 msgstr "Pista %i"
@@ -515,16 +600,12 @@ msgstr "Resolución de pantalla"
 msgid "Subtitle"
 msgstr "Subtítulo"
 
-#: src/input/input.c:808 src/input/input.c:1499 src/playlist/item-ext.c:302
+#: src/input/input.c:808 src/input/input.c:1500 src/playlist/item-ext.c:302
 #: src/playlist/item.c:67 src/playlist/sort.c:119 src/playlist/sort.c:121
-#: modules/access/cdda/access.c:364 modules/access/cdda/access.c:369
-#: modules/access/cdda/access.c:374 modules/access/cdda/access.c:379
-#: modules/access/cdda/access.c:383 modules/access/cdda/access.c:386
-#: modules/access/cdda/access.c:390 modules/access/cdda/access.c:406
-#: modules/access/cdda/access.c:758 modules/access/cdda/access.c:762
-#: modules/access/vcdx/access.c:1051 modules/access/vcdx/access.c:1326
-#: modules/gui/macosx/playlist.m:505 modules/gui/macosx/playlistinfo.m:140
-#: modules/gui/macosx/playlistinfo.m:179
+#: modules/access/cdda/access.c:416 modules/access/cdda/access.c:672
+#: modules/access/cdda/access.c:676 modules/access/vcdx/access.c:1051
+#: modules/access/vcdx/access.c:1326 modules/gui/macosx/playlist.m:505
+#: modules/gui/macosx/playlistinfo.m:140 modules/gui/macosx/playlistinfo.m:179
 #: modules/gui/wxwindows/iteminfo.cpp:171
 #: modules/gui/wxwindows/playlist.cpp:426
 #: modules/gui/wxwindows/playlist.cpp:442 modules/misc/playlist/m3u.c:62
@@ -541,8 +622,8 @@ msgstr "Informaciones de objeto"
 msgid "Stream"
 msgstr "Volcado"
 
-#: src/input/input.c:1499 src/playlist/item-ext.c:302
-#: modules/access/cdda/access.c:406 modules/access/cdda/access.c:415
+#: src/input/input.c:1500 src/playlist/item-ext.c:302
+#: modules/access/cdda/access.c:416 modules/access/cdda/access.c:425
 #: modules/gui/gtk/gnome_interface.c:2448 modules/gui/gtk/gtk_interface.c:2869
 #: modules/gui/macosx/playlist.m:182 modules/gui/wxwindows/playlist.cpp:321
 msgid "Duration"
@@ -3230,55 +3311,47 @@ msgstr "Entrada de CD de Audio"
 msgid "[cdda:][device][@[track]]"
 msgstr "cddax://[aparato-o-archivo][@[T]num]"
 
-#: modules/access/cdda/access.c:106 modules/access/vcdx/access.c:139
-msgid "The above message had unknown vcdimager log level"
-msgstr "El anterior mensaje tuvo nivel de registro vcdimager desconocido"
-
-#: modules/access/cdda/access.c:158
+#: modules/access/cdda/access.c:96 modules/access/cdda/access.c:148
 msgid "The above message had unknown cdio log level"
 msgstr "El anterior mensaje tuvo nivel de registro cdio desconocido"
 
-#: modules/access/cdda/access.c:276 modules/access/cdda/access.c:414
-#: modules/access/vcdx/access.c:340 modules/access/vcdx/access.c:693
-#: modules/access/vcdx/access.c:1193 modules/access/vcdx/access.c:1194
-#: modules/gui/gtk/open.c:287 modules/gui/gtk/open.c:301
-#: modules/gui/wxwindows/open.cpp:1149 modules/gui/wxwindows/open.cpp:1157
+#: modules/access/cdda/access.c:424 modules/access/vcdx/access.c:340
+#: modules/access/vcdx/access.c:693 modules/access/vcdx/access.c:1193
+#: modules/access/vcdx/access.c:1194 modules/gui/gtk/open.c:287
+#: modules/gui/gtk/open.c:301 modules/gui/wxwindows/open.cpp:1149
+#: modules/gui/wxwindows/open.cpp:1157
 msgid "Track"
 msgstr "Pista"
 
-#: modules/access/cdda/access.c:379 modules/access/cdda/access.c:433
+#: modules/access/cdda/access.c:443
 msgid "Extended Data"
 msgstr "Datos Extendidos"
 
-#: modules/access/cdda/access.c:384 modules/access/cdda/access.c:779
-msgid "Year"
-msgstr "Año"
-
-#: modules/access/cdda/access.c:387 modules/access/cdda/access.c:774
-msgid "CDDB Disc ID"
-msgstr "ID de Disco en CDDB"
-
-#: modules/access/cdda/access.c:391 modules/access/cdda/access.c:769
-msgid "CDDB Disc Category"
-msgstr "Categoría de Disco en CDDB"
-
-#: modules/access/cdda/access.c:764 modules/access/vcdx/access.c:1054
+#: modules/access/cdda/access.c:678 modules/access/vcdx/access.c:1054
 msgid "Album"
 msgstr "Álbum"
 
-#: modules/access/cdda/access.c:766
+#: modules/access/cdda/access.c:680
 msgid "Disc Artist(s)"
 msgstr "Artista(s) de Disco"
 
-#: modules/access/cdda/access.c:787
+#: modules/access/cdda/access.c:683
+msgid "CDDB Disc Category"
+msgstr "Categoría de Disco en CDDB"
+
+#: modules/access/cdda/access.c:693
+msgid "Year"
+msgstr "Año"
+
+#: modules/access/cdda/access.c:701
 msgid "Track Artist"
 msgstr "Artista de Pista"
 
-#: modules/access/cdda/access.c:789
+#: modules/access/cdda/access.c:703
 msgid "Track Title"
 msgstr "Título de Pista"
 
-#: modules/access/cdda/cdda.c:58
+#: modules/access/cdda/cdda.c:55
 msgid ""
 "This integer when viewed in binary is a debugging mask\n"
 "meta info        1\n"
@@ -3302,7 +3375,7 @@ msgstr ""
 "libcdio      (80) 128\n"
 "libcdib     (100) 256\n"
 
-#: modules/access/cdda/cdda.c:70
+#: modules/access/cdda/cdda.c:67
 msgid ""
 "Allows you to modify the default caching value for CDDA streams. This value "
 "should be set in millisecond units."
@@ -3310,7 +3383,7 @@ msgstr ""
 "Te permite modificar el valor de caché por defecto para volcados CDDA. Este "
 "valor debería ponerse en unidades de milisegundos."
 
-#: modules/access/cdda/cdda.c:74
+#: modules/access/cdda/cdda.c:71
 msgid ""
 "Format used in the GUI Playlist Title. Similar to the Unix date \n"
 "Format specifiers that start with a percent sign. Specifiers are: \n"
@@ -3349,7 +3422,7 @@ msgstr ""
 "   %Y : El año 19xx ó 20xx\n"
 "   %% : un % \n"
 
-#: modules/access/cdda/cdda.c:93
+#: modules/access/cdda/cdda.c:90
 msgid ""
 "Format used in the GUI Playlist Title. Similar to the Unix date \n"
 "Format specifiers that start with a percent sign. Specifiers are: \n"
@@ -3370,90 +3443,91 @@ msgstr ""
 "   %s : Número de segundos en esta pista \n"
 "   %% : un % \n"
 
-#: modules/access/cdda/cdda.c:107
-msgid "cddax://[device-or-file][@[T]num]"
+#: modules/access/cdda/cdda.c:104
+#, fuzzy
+msgid "cddax://[device-or-file][@[T]track]"
 msgstr "cddax://[aparato-o-archivo][@[T]num]"
 
-#: modules/access/cdda/cdda.c:108
+#: modules/access/cdda/cdda.c:105
 msgid "Compact Disc Digital Audio (CD-DA) input"
 msgstr "Entrada de Audio Digital de Disco Compacto (CD-DA)"
 
-#: modules/access/cdda/cdda.c:116 modules/access/vcdx/vcd.c:100
+#: modules/access/cdda/cdda.c:113 modules/access/vcdx/vcd.c:100
 #: modules/codec/ogt/subtitle.h:39
 msgid "If nonzero, this gives additional debug information."
 msgstr "Si no es cero, esto da información de depuración adicional"
 
-#: modules/access/cdda/cdda.c:121
+#: modules/access/cdda/cdda.c:118
 msgid "Caching value in microseconds"
 msgstr "Valor de caché en microsegundos"
 
-#: modules/access/cdda/cdda.c:126
+#: modules/access/cdda/cdda.c:123
 msgid "Format to use in playlist \"author\" field"
 msgstr "Formato a usar en campo \"autor\" de lista de reproducción"
 
-#: modules/access/cdda/cdda.c:131
+#: modules/access/cdda/cdda.c:128
 msgid "Format to use in playlist \"title\" field when no CDDB"
 msgstr "Formato a usar en campo \"título\" de lista de reproducción sin CDDB"
 
-#: modules/access/cdda/cdda.c:137
+#: modules/access/cdda/cdda.c:134
 msgid "Format to use in playlist \"title\" field when using CDDB"
 msgstr ""
 "Formato a usar en campo \"título\" de lista de reproducción usando CDDB"
 
-#: modules/access/cdda/cdda.c:141
+#: modules/access/cdda/cdda.c:138
 msgid "Do CDDB lookups?"
 msgstr "¿Búsquedas CDDB?"
 
-#: modules/access/cdda/cdda.c:142
+#: modules/access/cdda/cdda.c:139
 msgid "If set, lookup CD-DA track information using the CDDB protocol"
 msgstr "Si puesto, busca información de pista CD-DA usando protocolo CDDB"
 
-#: modules/access/cdda/cdda.c:147
+#: modules/access/cdda/cdda.c:144
 msgid "CDDB server"
 msgstr "servidor CDDB"
 
-#: modules/access/cdda/cdda.c:148
+#: modules/access/cdda/cdda.c:145
 msgid "Contact this CDDB server look up CD-DA information"
 msgstr "Contacta este servidor CDDB, busca información CD-DA"
 
-#: modules/access/cdda/cdda.c:152
+#: modules/access/cdda/cdda.c:149
 msgid "CDDB server port"
 msgstr "Puerto del servidor CDDB"
 
-#: modules/access/cdda/cdda.c:153
+#: modules/access/cdda/cdda.c:150
 msgid "CDDB server uses this port number to communicate on"
 msgstr "El servidor CDDB usa este número de puerto para comunicarse"
 
-#: modules/access/cdda/cdda.c:157 modules/access/cdda/cdda.c:158
+#: modules/access/cdda/cdda.c:154 modules/access/cdda/cdda.c:155
 msgid "email address reported to CDDB server"
 msgstr "dirección de correo notificada a servidor CDDB"
 
-#: modules/access/cdda/cdda.c:162
+#: modules/access/cdda/cdda.c:159
 msgid "Cache CDDB lookups?"
 msgstr "¿Hacer caché de búsquedas CDDB?"
 
-#: modules/access/cdda/cdda.c:163
+#: modules/access/cdda/cdda.c:160
 msgid "If set cache CDDB information about this CD"
 msgstr "Si puesto se hará caché de la info de CDDB sobre este CD"
 
-#: modules/access/cdda/cdda.c:167
+#: modules/access/cdda/cdda.c:164
 msgid "Contact CDDB via the HTTP protocol?"
 msgstr "¿Contactar CDDB por protocolo HTTP"
 
-#: modules/access/cdda/cdda.c:168
+#: modules/access/cdda/cdda.c:165
 msgid "If set, the CDDB server gets information via the CDDB HTTP protocol"
 msgstr ""
 "Si puesto, el servidor CDDB toma información por el protocolo HTTP de CDDB"
 
-#: modules/access/cdda/cdda.c:173
+#: modules/access/cdda/cdda.c:170
 msgid "CDDB server timeout"
 msgstr "Tiempo de espera agotado por servidor CDDB"
 
-#: modules/access/cdda/cdda.c:174
+#: modules/access/cdda/cdda.c:171
 msgid "Time (in seconds) to wait for a response from the CDDB server"
 msgstr "Tiempo (en segundos) a esperar una respuesta del servidor CDDB"
 
-#: modules/access/cdda/cdda.c:179 modules/access/cdda/cdda.c:180
+#: modules/access/cdda/cdda.c:176 modules/access/cdda/cdda.c:177
 msgid "Directory to cache CDDB requests"
 msgstr "Directorio para hacer caché de solicitudes CDDB"
 
@@ -3632,128 +3706,132 @@ msgid "Device number to use on adapter"
 msgstr "Nº de aparato a usar en adaptador"
 
 #: modules/access/dvb/access.c:64
-msgid "Transponder/multiplex frequency"
-msgstr ""
-
-#: modules/access/dvb/access.c:65
-msgid "In kHz for DVB-S or Hz for DVB-C/T"
+msgid "Use CAM"
 msgstr ""
 
 #: modules/access/dvb/access.c:67
-msgid "Inversion mode"
-msgstr "Conversiones desde "
+msgid "Transponder/multiplex frequency"
+msgstr ""
 
 #: modules/access/dvb/access.c:68
-msgid "Inversion mode [0=off, 1=on, 2=auto]"
+msgid "In kHz for DVB-S or Hz for DVB-C/T"
 msgstr ""
 
 #: modules/access/dvb/access.c:70
+msgid "Inversion mode"
+msgstr "Conversiones desde "
+
+#: modules/access/dvb/access.c:71
+msgid "Inversion mode [0=off, 1=on, 2=auto]"
+msgstr ""
+
+#: modules/access/dvb/access.c:73
 msgid "Probe DVB card for capabilities"
 msgstr "Sondear las capacidades de tarjeta DVB"
 
-#: modules/access/dvb/access.c:71
+#: modules/access/dvb/access.c:74
 msgid "Some DVB cards do not like to be probed for their capabilities."
 msgstr "A algunas tarjetas DVB no les gusta que sondeen sus capacidades."
 
-#: modules/access/dvb/access.c:73 modules/access/satellite/satellite.c:62
+#: modules/access/dvb/access.c:76 modules/access/satellite/satellite.c:62
 msgid "Antenna lnb_lof1 (kHz)"
 msgstr "Antena lnb_lof1 (kHz)"
 
-#: modules/access/dvb/access.c:76 modules/access/satellite/satellite.c:65
+#: modules/access/dvb/access.c:79 modules/access/satellite/satellite.c:65
 msgid "Antenna lnb_lof2 (kHz)"
 msgstr "Antena lnb_lof2 (kHz)"
 
-#: modules/access/dvb/access.c:79 modules/access/satellite/satellite.c:68
+#: modules/access/dvb/access.c:82 modules/access/satellite/satellite.c:68
 msgid "Antenna lnb_slof (kHz)"
 msgstr "Antena lnb_slof (kHz)"
 
-#: modules/access/dvb/access.c:83
+#: modules/access/dvb/access.c:86
 msgid "Budget mode"
 msgstr ""
 
-#: modules/access/dvb/access.c:84
+#: modules/access/dvb/access.c:87
 #, fuzzy
 msgid "This allows you to stream an entire transponder with a budget card."
 msgstr "Esto te permite reproducir el volcado mientras lo vuelcas."
 
-#: modules/access/dvb/access.c:86
+#: modules/access/dvb/access.c:89
 msgid "Satellite number in the Diseqc system"
 msgstr ""
 
-#: modules/access/dvb/access.c:87
+#: modules/access/dvb/access.c:90
 msgid "[0=no diseqc, 1-4=normal diseqc, -1=A, -2=B simple diseqc]"
 msgstr ""
 
-#: modules/access/dvb/access.c:89
+#: modules/access/dvb/access.c:92
 msgid "LNB voltage"
 msgstr ""
 
-#: modules/access/dvb/access.c:90
+#: modules/access/dvb/access.c:93
 msgid "In Volts [0, 13=vertical, 18=horizontal]"
 msgstr ""
 
-#: modules/access/dvb/access.c:92
+#: modules/access/dvb/access.c:95
 msgid "22 kHz tone"
 msgstr ""
 
-#: modules/access/dvb/access.c:93
+#: modules/access/dvb/access.c:96
 msgid "[0=off, 1=on, -1=auto]"
 msgstr ""
 
-#: modules/access/dvb/access.c:95
+#: modules/access/dvb/access.c:98
 msgid "Transponder FEC"
 msgstr "FEC de transpondedor satélite"
 
-#: modules/access/dvb/access.c:96
+#: modules/access/dvb/access.c:99
 msgid "FEC=Forward Error Correction mode [9=auto]"
 msgstr ""
 "FEC=Forward Error Correction, modo de Correción de Error por Adelantado"
 
-#: modules/access/dvb/access.c:98
+#: modules/access/dvb/access.c:101
 msgid "Transponder symbol rate in kHz"
 msgstr "Tasa símbolo del transpondedor satélite en kHz"
 
-#: modules/access/dvb/access.c:102
+#: modules/access/dvb/access.c:105
 msgid "Modulation type"
 msgstr "Tipo de modulación"
 
-#: modules/access/dvb/access.c:103
+#: modules/access/dvb/access.c:106
 msgid "Modulation type for front-end device."
 msgstr "Tipo de modulación para aparato destinatario."
 
-#: modules/access/dvb/access.c:106
+#: modules/access/dvb/access.c:109
 msgid "Terrestrial high priority stream code rate (FEC)"
 msgstr "Tasa de código de volcado terrestre de alta prioridad (FEC)"
 
-#: modules/access/dvb/access.c:109
+#: modules/access/dvb/access.c:112
 msgid "Terrestrial low priority stream code rate (FEC)"
 msgstr "Tasa de código de volcado terrestre de baja prioridad (FEC)"
 
-#: modules/access/dvb/access.c:112
+#: modules/access/dvb/access.c:115
 msgid "Terrestrial bandwidth"
 msgstr "Ancho de banda terrestre"
 
-#: modules/access/dvb/access.c:113
+#: modules/access/dvb/access.c:116
 msgid "Terrestrial bandwidth [0=auto,6,7,8 in MHz]"
 msgstr "Ancho de banda terrestre [0=auto,6,7,8 en MHz]"
 
-#: modules/access/dvb/access.c:115
+#: modules/access/dvb/access.c:118
 msgid "Terrestrial guard interval"
 msgstr "Intervalo de protección terrestre"
 
-#: modules/access/dvb/access.c:118
+#: modules/access/dvb/access.c:121
 msgid "Terrestrial transmission mode"
 msgstr "Modo de transmisión terrestre"
 
-#: modules/access/dvb/access.c:121
+#: modules/access/dvb/access.c:124
 msgid "Terrestrial hierarchy mode"
 msgstr "Modo de jerarquía terrestre"
 
-#: modules/access/dvb/access.c:125
+#: modules/access/dvb/access.c:128
 msgid "DVB"
 msgstr ""
 
-#: modules/access/dvb/access.c:126
+#: modules/access/dvb/access.c:129
 msgid "DVB input with v4l2 support"
 msgstr "Entrada DVB con soporte v412"
 
@@ -4034,7 +4112,7 @@ msgid "PAL"
 msgstr ""
 
 #: modules/access/pvr/pvr.c:54
-msgid "NSTC"
+msgid "NTSC"
 msgstr ""
 
 #: modules/access/pvr/pvr.c:56
@@ -4087,7 +4165,7 @@ msgstr "Birmano"
 
 #: modules/access/pvr/pvr.c:71
 msgid ""
-"If this option is set, B-Frames will be used.Use this option to set the "
+"If this option is set, B-Frames will be used. Use this option to set the "
 "number of B-Frames."
 msgstr ""
 
@@ -4131,7 +4209,7 @@ msgstr "Canal"
 #: modules/access/pvr/pvr.c:82
 #, fuzzy
 msgid ""
-"Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo )"
+"Channel of the card to use (Usually, 0 = tuner, 1 = composite, 2 = svideo)"
 msgstr "Usualmente 0 es para sintonizador, 1 para compuesto y 2 para svídeo"
 
 #: modules/access/pvr/pvr.c:86
@@ -4369,6 +4447,10 @@ msgstr "[dvdplay:][aparato][@[título][,[capítulo][,ángulo]]]"
 #: modules/access/vcdx/access.c:113
 msgid "The above message had unknown log level"
 msgstr "El anterior mensaje tuvo nivel de registro desconocido"
+
+#: modules/access/vcdx/access.c:139
+msgid "The above message had unknown vcdimager log level"
+msgstr "El anterior mensaje tuvo nivel de registro vcdimager desconocido"
 
 #: modules/access/vcdx/access.c:262 modules/access/vcdx/access.c:348
 #: modules/access/vcdx/access.c:411 modules/access/vcdx/access.c:940
@@ -4917,7 +4999,7 @@ msgstr "Número de bandas"
 msgid ""
 "This is the number of audio buffers on which the power measurement is made. "
 "A higher number of buffers will increase the response time of the filter to "
-"a high power but will make it less sensitive to short variations "
+"a high power but will make it less sensitive to short variations."
 msgstr ""
 
 #: modules/audio_filter/normvol.c:74
@@ -6176,223 +6258,224 @@ msgid ""
 msgstr ""
 "Muestra la posición actual en segundos dentro del volcado de vez en cuando."
 
-#: modules/control/rc.c:120
+#: modules/control/rc.c:121
 msgid "Fake TTY"
 msgstr "Falso TTY"
 
-#: modules/control/rc.c:121
+#: modules/control/rc.c:122
 msgid "Force the rc module to use stdin as if it was a TTY."
 msgstr "Forzar la entrada rc a usar stdin como si fuera TTY."
 
-#: modules/control/rc.c:123
+#: modules/control/rc.c:124
 msgid "UNIX socket command input"
 msgstr ""
 
-#: modules/control/rc.c:124
-msgid "Accept commands over a Unix socket rather than stdin. "
+#: modules/control/rc.c:125
+msgid "Accept commands over a Unix socket rather than stdin."
 msgstr ""
 
-#: modules/control/rc.c:126
-msgid "IP command input"
-msgstr ""
+#: modules/control/rc.c:128
+#, fuzzy
+msgid "TCP command input"
+msgstr "Entrada TCP"
 
-#: modules/control/rc.c:127
+#: modules/control/rc.c:129
 #, fuzzy
 msgid ""
 "Accept commands over a socket rather than stdin. You can set the address and "
 "port the interface will bind to."
 msgstr "Puedes poner la dirección y puerto al que se unirá la interfaz http."
 
-#: modules/control/rc.c:131
+#: modules/control/rc.c:133
 msgid "Remote control interface"
 msgstr "Interfaz de control remoto"
 
-#: modules/control/rc.c:246
+#: modules/control/rc.c:248
 #, c-format
 msgid "Remote control interface initialized, `h' for help\n"
 msgstr "Interfaz inicializada de control remoto, `h' para ayuda\n"
 
-#: modules/control/rc.c:434 modules/control/rc.c:447
+#: modules/control/rc.c:436 modules/control/rc.c:451
 #, c-format
 msgid "%s: returned %i (%s)\n"
 msgstr "%s: devolvió %i (%s)\n"
 
-#: modules/control/rc.c:471
+#: modules/control/rc.c:476
 #, c-format
 msgid "+----[ end of stream info ]\n"
 msgstr "+----[ fin de info de volcado ]\n"
 
-#: modules/control/rc.c:476
+#: modules/control/rc.c:481
 #, c-format
 msgid "no input\n"
 msgstr "sin entrada\n"
 
-#: modules/control/rc.c:505
+#: modules/control/rc.c:558
 #, c-format
 msgid "+----[ Remote control commands ]\n"
 msgstr "+----[ Comandos de control remoto ]\n"
 
-#: modules/control/rc.c:507
+#: modules/control/rc.c:560
 #, c-format
 msgid "| add XYZ  . . . . . . . . . . add XYZ to playlist\n"
 msgstr "| add XYZ . . . . . . .  añade XYZ a lista de repr.\n"
 
-#: modules/control/rc.c:508
+#: modules/control/rc.c:561
 #, c-format
 msgid "| playlist . . .  show items currently in playlist\n"
 msgstr "| playlist  . . mostrar objetos actualmente en ella\n"
 
-#: modules/control/rc.c:509
+#: modules/control/rc.c:562
 #, c-format
 msgid "| play . . . . . . . . . . . . . . . . play stream\n"
 msgstr "| play  . . . . . . . . . . . .  reproducir volcado\n"
 
-#: modules/control/rc.c:510
+#: modules/control/rc.c:563
 #, c-format
 msgid "| stop . . . . . . . . . . . . . . . . stop stream\n"
 msgstr "| stop  . . . . . . . . . . . . . . . parar volcado\n"
 
-#: modules/control/rc.c:511
+#: modules/control/rc.c:564
 #, c-format
 msgid "| next . . . . . . . . . . . .  next playlist item\n"
 msgstr "| next  . . . .  siguiente objeto de lista de repr.\n"
 
-#: modules/control/rc.c:512
+#: modules/control/rc.c:565
 #, c-format
 msgid "| prev . . . . . . . . . .  previous playlist item\n"
 msgstr "| prev  . . . . . . objeto previo de lista de repr.\n"
 
-#: modules/control/rc.c:513
+#: modules/control/rc.c:566
 #, fuzzy, c-format
 msgid "| title [X]  . . . . set/get title in current item\n"
 msgstr "| title [X] . . . pon/obtén titulo en objeto actual\n"
 
-#: modules/control/rc.c:514
+#: modules/control/rc.c:567
 #, c-format
 msgid "| title_n  . . . . . .  next title in current item\n"
 msgstr "| title_n . . . . título siguiente en objeto actual\n"
 
-#: modules/control/rc.c:515
+#: modules/control/rc.c:568
 #, c-format
 msgid "| title_p  . . . .  previous title in current item\n"
 msgstr "| title_p . . . . .  título previo en objeto actual\n"
 
-#: modules/control/rc.c:516
+#: modules/control/rc.c:569
 #, fuzzy, c-format
 msgid "| chapter [X]  . . set/get chapter in current item\n"
 msgstr "| chapter [X] . pon/obtén capítulo en objeto actual\n"
 
-#: modules/control/rc.c:517
+#: modules/control/rc.c:570
 #, c-format
 msgid "| chapter_n  . . . .  next chapter in current item\n"
 msgstr "| chapter_n . .  capítulo siguente en objeto actual\n"
 
-#: modules/control/rc.c:518
+#: modules/control/rc.c:571
 #, c-format
 msgid "| chapter_p  . .  previous chapter in current item\n"
 msgstr "| chapter_p . . .  capítulo previo en objeto actual\n"
 
-#: modules/control/rc.c:520
+#: modules/control/rc.c:573
 #, c-format
 msgid "| seek X . seek in seconds, for instance `seek 12'\n"
 msgstr "| seek X  . . . buscar en segundos, p.ej. `seek 12'\n"
 
-#: modules/control/rc.c:521
+#: modules/control/rc.c:574
 #, c-format
 msgid "| pause  . . . . . . . . . . . . . .  toggle pause\n"
 msgstr "| pause . . . . . . . . . . . .  intercambiar pausa\n"
 
-#: modules/control/rc.c:522
+#: modules/control/rc.c:575
 #, c-format
 msgid "| f  . . . . . . . . . . . . . . toggle fullscreen\n"
 msgstr "| f . . . . . . . .  intercambiar pantalla completa\n"
 
-#: modules/control/rc.c:523
+#: modules/control/rc.c:576
 #, c-format
 msgid "| info . . .  information about the current stream\n"
 msgstr "| info  . . . . información sobre el volcado actual\n"
 
-#: modules/control/rc.c:525
+#: modules/control/rc.c:578
 #, c-format
 msgid "| volume [X] . . . . . . . .  set/get audio volume\n"
 msgstr "| volume [X]. . . . . .  pon/obtén volumen de audio\n"
 
-#: modules/control/rc.c:526
+#: modules/control/rc.c:579
 #, c-format
 msgid "| volup [X]  . . . . .  raise audio volume X steps\n"
 msgstr "| volup [X] . . . . subir volumen de audio X puntos\n"
 
-#: modules/control/rc.c:527
+#: modules/control/rc.c:580
 #, c-format
 msgid "| voldown [X]  . . . .  lower audio volume X steps\n"
 msgstr "| voldown [X] . . . bajar volumen de audio X puntos\n"
 
-#: modules/control/rc.c:528
+#: modules/control/rc.c:581
 #, c-format
 msgid "| adev [X] . . . . . . . . .  set/get audio device\n"
 msgstr "| adev [X]. . . . . . . . pon/obtén aparato de audio\n"
 
-#: modules/control/rc.c:529
+#: modules/control/rc.c:582
 #, c-format
 msgid "| achan [X]. . . . . . . .  set/get audio channels\n"
 msgstr "| achan [X] . . . . . .  pon/obtén canales de audio\n"
 
-#: modules/control/rc.c:531
+#: modules/control/rc.c:584
 #, c-format
 msgid "| help . . . . . . . . . . . . . this help message\n"
 msgstr "| help  . . . . . . . . . . . este mensaje de ayuda\n"
 
-#: modules/control/rc.c:532
+#: modules/control/rc.c:585
 #, c-format
 msgid "| quit . . . . . . . . . . . . . . . . .  quit vlc\n"
 msgstr "| quit  . . . . . . . . . . . . . . . .  quitar vlc\n"
 
-#: modules/control/rc.c:534
+#: modules/control/rc.c:587
 #, c-format
 msgid "+----[ end of help ]\n"
 msgstr "+----[ fin de ayuda ]\n"
 
-#: modules/control/rc.c:542
+#: modules/control/rc.c:595
 #, c-format
 msgid "unknown command `%s', type `help' for help\n"
 msgstr "comando desconocido `%s', escribe `help' para ayuda\n"
 
-#: modules/control/rc.c:618
+#: modules/control/rc.c:671
 #, c-format
 msgid "Currently playing chapter %d/%d\n"
 msgstr "Reproduciendo ahora capítulo %d/%d\n"
 
-#: modules/control/rc.c:658
+#: modules/control/rc.c:711
 #, c-format
 msgid "Currently playing title %d/%d\n"
 msgstr "Reproduciendo ahora título %d/%d\n"
 
-#: modules/control/rc.c:715
+#: modules/control/rc.c:768
 #, c-format
 msgid "trying to add %s to playlist\n"
 msgstr "intentando añadir %s a lista de repr.\n"
 
-#: modules/control/rc.c:730
+#: modules/control/rc.c:783
 #, c-format
 msgid "| no entries\n"
 msgstr "| sin entradas\n"
 
-#: modules/control/rc.c:738
+#: modules/control/rc.c:791
 #, c-format
 msgid "unknown command!\n"
 msgstr "¡comando desconocido!\n"
 
-#: modules/control/rc.c:784
+#: modules/control/rc.c:837
 #, c-format
 msgid "Volume must be in the range %d-%d\n"
 msgstr "Volumen deber estar en el rango %d-%d\n"
 
-#: modules/control/rc.c:800 modules/control/rc.c:832
+#: modules/control/rc.c:853 modules/control/rc.c:885
 #, c-format
 msgid "Volume is %d\n"
 msgstr "Volumen es %d\n"
 
-#: modules/control/rc.c:894
+#: modules/control/rc.c:947
 #, c-format
 msgid "+----[ end of %s ]\n"
 msgstr "+----[ fin de %s ]\n"
@@ -6473,7 +6556,17 @@ msgstr "Nombre de archivo de volcado"
 msgid "Specify a file name to which the raw stream will be dumped."
 msgstr "Especifica un nombre de archivo al que el flujo raw se volcará."
 
-#: modules/demux/demuxdump.c:45
+#: modules/demux/demuxdump.c:40
+msgid "Append"
+msgstr ""
+
+#: modules/demux/demuxdump.c:42
+msgid ""
+"If the file exists and this option is selected, the existing file will not "
+"be overwritten."
+msgstr ""
+
+#: modules/demux/demuxdump.c:49
 msgid "Filedump demuxer"
 msgstr "Demuxer de archivo de volcado"
 
@@ -8361,7 +8454,7 @@ msgstr ""
 #: modules/gui/macosx/equalizer.m:142 modules/gui/wxwindows/extrapanel.cpp:467
 msgid ""
 "If you enable this settting, the equalizer filter will be applied twice. The "
-"effect will be sharper"
+"effect will be sharper."
 msgstr ""
 
 #: modules/gui/macosx/equalizer.m:144 modules/gui/wxwindows/extrapanel.cpp:212
@@ -8844,7 +8937,7 @@ msgstr ""
 #: modules/gui/ncurses.c:88
 #, fuzzy
 msgid ""
-"This option allows you to specify directory the ncurses filebrowser will "
+"This option allows you to specify the directory the ncurses filebrowser will "
 "show you initially."
 msgstr ""
 "La opción permite especificar una ruta adicional para VLC para buscar sus "
@@ -9403,7 +9496,7 @@ msgstr "%@s no encontrados"
 
 #: modules/gui/wxwindows/bookmarks.cpp:501
 msgid ""
-"No input found. The stream must be playing or paused for bookmarks to work"
+"No input found. The stream must be playing or paused for bookmarks to work."
 msgstr ""
 
 #: modules/gui/wxwindows/bookmarks.cpp:503
@@ -9491,7 +9584,7 @@ msgstr "Visualizaciones"
 
 #: modules/gui/wxwindows/extrapanel.cpp:396
 msgid ""
-"This filter prevents the audio output power from going over a defined value"
+"This filter prevents the audio output power from going over a defined value."
 msgstr ""
 
 #: modules/gui/wxwindows/extrapanel.cpp:400
@@ -9505,7 +9598,7 @@ msgid ""
 "preset (Audio Menu->Equalizer)."
 msgstr ""
 
-#: modules/gui/wxwindows/extrapanel.cpp:909
+#: modules/gui/wxwindows/extrapanel.cpp:911
 msgid ""
 "Select the video effects filters to apply. You must restart the stream for "
 "these settings to take effect.\n"
@@ -9513,15 +9606,15 @@ msgid ""
 "Filters. You can then configure each filter.\n"
 "If you want fine control over the filters ( to choose the order in which "
 "they are applied ), you need to enter manually a filters string "
-"(Preferences / General / Video."
+"(Preferences / General / Video)."
 msgstr ""
 
-#: modules/gui/wxwindows/extrapanel.cpp:919
+#: modules/gui/wxwindows/extrapanel.cpp:921
 #, fuzzy
 msgid "More information"
 msgstr "Informaciones de objeto"
 
-#: modules/gui/wxwindows/extrapanel.cpp:1111
+#: modules/gui/wxwindows/extrapanel.cpp:1124
 #, fuzzy
 msgid "Extended controls"
 msgstr "Datos Extendidos"
@@ -10340,37 +10433,37 @@ msgstr "Módulo C que no hace nada"
 msgid "Miscellaneous stress tests"
 msgstr "Pruebas varias de tensión"
 
-#: modules/mux/asf.c:47
+#: modules/mux/asf.c:48
 msgid "Allows you to define the title that will be put in ASF comments."
 msgstr "Te permite definir el título que se pondrá en comentarios ASF."
 
-#: modules/mux/asf.c:50
+#: modules/mux/asf.c:51
 msgid "Allows you to define the author that will be put in ASF comments."
 msgstr "Te permite definir el autor que se pondrá en comentarios ASF."
 
-#: modules/mux/asf.c:53
+#: modules/mux/asf.c:54
 msgid ""
 "Allows you to define the copyright string that will be put in ASF comments."
 msgstr ""
 "Te permite definir la cadena copyright que se pondrá en comentarios ASF."
 
-#: modules/mux/asf.c:55
+#: modules/mux/asf.c:56
 msgid "Comment"
 msgstr "Comentario"
 
-#: modules/mux/asf.c:56
+#: modules/mux/asf.c:57
 msgid "Allows you to define the comment that will be put in ASF comments."
 msgstr "Te permite definir el comentario que se pondrá en comentarios ASF."
 
-#: modules/mux/asf.c:59
+#: modules/mux/asf.c:60
 msgid "Allows you to define the \"rating\" that will be put in ASF comments."
 msgstr "Te permite definir la \"puntuación\" que se pondrá en comentarios ASF."
 
-#: modules/mux/asf.c:63
+#: modules/mux/asf.c:64
 msgid "ASF muxer"
 msgstr "Muxer ASF"
 
-#: modules/mux/asf.c:505
+#: modules/mux/asf.c:506
 msgid "Unknown Video"
 msgstr "Vídeo Desconocido"
 
@@ -11451,7 +11544,7 @@ msgstr ""
 
 #: modules/video_output/snapshot.c:47
 #, fuzzy
-msgid "Set the width of the snapshot image"
+msgid "Set the width of the snapshot image."
 msgstr "Elige ruta a última piel usada."
 
 #: modules/video_output/snapshot.c:49
@@ -11459,16 +11552,18 @@ msgid "snapshot height"
 msgstr ""
 
 #: modules/video_output/snapshot.c:50
-msgid "Set the height of the snapshot image"
-msgstr ""
+#, fuzzy
+msgid "Set the height of the snapshot image."
+msgstr "Elige ruta a última piel usada."
 
 #: modules/video_output/snapshot.c:52
 msgid "chroma"
 msgstr ""
 
 #: modules/video_output/snapshot.c:53
-msgid "Set the desired chroma for the snapshot image (a 4 character string)"
-msgstr ""
+#, fuzzy
+msgid "Set the desired chroma for the snapshot image (a 4 character string)."
+msgstr "Elige ruta a última piel usada."
 
 #: modules/video_output/snapshot.c:55
 msgid "cache size (number of images)"
@@ -11476,7 +11571,7 @@ msgstr ""
 
 #: modules/video_output/snapshot.c:56
 #, fuzzy
-msgid "Set the cache size (number of images to keep)"
+msgid "Set the cache size (number of images to keep)."
 msgstr "Pon el número de Fotogramas Por Segundo"
 
 #: modules/video_output/snapshot.c:60
