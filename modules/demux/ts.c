@@ -1807,26 +1807,58 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
              p_pat->i_ts_id, p_pat->i_version, p_pat->b_current_next );
 
     /* Clean old */
-    for( i = 2; i < 8192; i++ )
+    if( p_sys->i_pmt > 0 )
     {
-        ts_pid_t *pid = &p_sys->pid[i];
+        int      i_pmt_rm = 0;
+        ts_pid_t **pmt_rm = NULL;
 
-        if( pid->b_valid )
+        /* Search pmt to be deleted */
+        for( i = 0; i < p_sys->i_pmt; i++ )
         {
-            if( pid->psi )
+            ts_pid_t *pmt = p_sys->pmt[i];
+            vlc_bool_t b_keep = VLC_FALSE;
+
+            for( p_program = p_pat->p_first_program; p_program != NULL; p_program = p_program->p_next )
             {
-                if( pid->p_owner == pat->psi )
+                if( p_program->i_pid == pmt->i_pid && p_program->i_number == pmt->psi->i_number )
                 {
-                    PIDClean( p_demux->out, pid );
-                    TAB_REMOVE( p_sys->i_pmt, p_sys->pmt, pid );
+                    b_keep = VLC_TRUE;
+                    break;
                 }
             }
-            else if( pid->p_owner && pid->p_owner->i_number != 0 &&
-                     pid->es->id )
+            if( !b_keep )
             {
-                /* We only remove es that aren't defined by extra pmt */
-                PIDClean( p_demux->out, pid );
+                TAB_APPEND( i_pmt_rm, pmt_rm, pmt );
             }
+        }
+
+        /* Delete all ES attached to thoses PMT */
+        for( i = 2; i < 8192; i++ )
+        {
+            ts_pid_t *pid = &p_sys->pid[i];
+            if( pid->b_valid && !pid->psi )
+            {
+                for( i = 0; i < i_pmt_rm; i++ )
+                {
+                    if( pid->p_owner->i_pid_pcr == pmt_rm[i]->i_pid && pid->es->id )
+                    {
+                        /* We only remove es that aren't defined by extra pmt */
+                        PIDClean( p_demux->out, pid );
+                        break;
+                    }
+                }
+            }
+        }
+
+        /* Delete PMT pid */
+        for( i = 0; i < i_pmt_rm; i++ )
+        {
+            PIDClean( p_demux->out, &p_sys->pid[pmt_rm[i]->i_pid] );
+            TAB_REMOVE( p_sys->i_pmt, p_sys->pmt, pmt_rm[i] );
+        }
+        if( pmt_rm )
+        {
+            free( pmt_rm );
         }
     }
 
@@ -1840,13 +1872,16 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         {
             ts_pid_t *pmt = &p_sys->pid[p_program->i_pid];
 
-            PIDInit( pmt, VLC_TRUE, pat->psi );
-            pmt->psi->handle =
-                dvbpsi_AttachPMT( p_program->i_number,
-                                  (dvbpsi_pmt_callback)PMTCallBack, p_demux );
-            pmt->psi->i_number = p_program->i_number;
+            if( !pmt->b_valid )
+            {
+                PIDInit( pmt, VLC_TRUE, pat->psi );
+                pmt->psi->handle =
+                    dvbpsi_AttachPMT( p_program->i_number,
+                                      (dvbpsi_pmt_callback)PMTCallBack, p_demux );
+                pmt->psi->i_number = p_program->i_number;
 
-            TAB_APPEND( p_sys->i_pmt, p_sys->pmt, pmt );
+                TAB_APPEND( p_sys->i_pmt, p_sys->pmt, pmt );
+            }
         }
     }
     pat->psi->i_version = p_pat->i_version;
