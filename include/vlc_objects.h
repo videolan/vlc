@@ -56,6 +56,7 @@
 #define VLC_OBJECT_FILTER     (-22)
 #define VLC_OBJECT_VOD        (-23)
 #define VLC_OBJECT_SPU        (-24)
+#define VLC_OBJECT_TLS        (-25)
 
 #define VLC_OBJECT_GENERIC  (-666)
 
