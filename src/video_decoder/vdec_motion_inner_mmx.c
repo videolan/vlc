@@ -3,7 +3,7 @@
  *                           MMX
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_inner_mmx.c,v 1.7 2001/01/05 18:46:44 massiot Exp $
+ * $Id: vdec_motion_inner_mmx.c,v 1.8 2001/01/16 17:59:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>, largerly inspired by the
  *          work done by the livid project <http://www.linuxvideo.org/>
@@ -52,6 +52,7 @@
 #include "video_parser.h"
 #include "video_fifo.h"
 
+#include "attributes.h"
 #include "mmx.h"
 
 /* OK, I know, this code has been taken from livid's mpeg2dec --Meuuh */
@@ -75,8 +76,6 @@ static __inline__ void MMXAverage2( u8 *dst, u8 *src1, u8 *src2 )
    //
    // *dst = clip_to_u8((*src1 + *src2 + 1)/2);
    //
-
-   //mmx_zero_reg();
 
    movq_m2r(*src1,mm1);        // load 8 src1 bytes
    movq_r2r(mm1,mm2);          // copy 8 src1 bytes
@@ -107,8 +106,6 @@ static __inline__ void MMXInterpAverage2( u8 *dst, u8 *src1, u8 *src2 )
    //
    // *dst = clip_to_u8((*dst + (*src1 + *src2 + 1)/2 + 1)/2);
    //
-
-   //mmx_zero_reg();
 
    movq_m2r(*dst,mm1);            // load 8 dst bytes
    movq_r2r(mm1,mm2);             // copy 8 dst bytes
@@ -152,10 +149,8 @@ static __inline__ void MMXAverage4( u8 *dst, u8 *src1, u8 *src2, u8 *src3,
                                     u8 *src4 )
 {
    //
-   // *dst = clip_to_u8((*src1 + *src2 + *src3 + *src4 + 2)/4);
+   // *dst = (*src1 + *src2 + *src3 + *src4 + 2) / 4;
    //
-
-   //mmx_zero_reg();
 
    movq_m2r(*src1,mm1);                // load 8 src1 bytes
    movq_r2r(mm1,mm2);                  // copy 8 src1 bytes
@@ -209,8 +204,6 @@ static __inline__ void MMXInterpAverage4( u8 *dst, u8 *src1, u8 *src2,
    //
    // *dst = clip_to_u8((*dst + (*src1 + *src2 + *src3 + *src4 + 2)/4 + 1)/2);
    //
-
-   //mmx_zero_reg();
 
    movq_m2r(*src1,mm1);                // load 8 src1 bytes
    movq_r2r(mm1,mm2);                  // copy 8 src1 bytes
@@ -279,6 +272,9 @@ static __inline__ void MMXInterpAverage4( u8 *dst, u8 *src1, u8 *src2,
  * Actual Motion compensation
  */
 
+#define pavg_r2r(src,dest)      pavgusb_r2r (src, dest);
+#define pavg_m2r(src,dest)      pavgusb_m2r (src, dest);
+
 #define __MotionComponent_x_y_copy(width,height)                            \
 void MotionComponent_x_y_copy_##width##_##height(yuv_data_t * p_src,        \
                                                  yuv_data_t * p_dest,       \
@@ -290,17 +286,15 @@ void MotionComponent_x_y_copy_##width##_##height(yuv_data_t * p_src,        \
                                                                             \
     for( i_y = 0; i_y < height; i_y ++ )                                    \
     {                                                                       \
-        movq_m2r( *p_src, mm1 );     /* load 8 ref bytes */                 \
-        movq_r2m( mm1, *p_dest );    /* store 8 bytes at curr */            \
-                                                                            \
+        movq_m2r( *p_src, mm0 );     /* load 8 ref bytes */                 \
         if( width == 16 )                                                   \
-        {                                                                   \
-            movq_m2r( *(p_src + 8), mm1 );      /* load 8 ref bytes */      \
-            movq_r2m( mm1, *(p_dest + 8) );     /* store 8 bytes at curr */ \
-        }                                                                   \
-                                                                            \
-        p_dest += i_stride;                                                 \
+            movq_m2r( *(p_src + 8), mm1 );                                  \
         p_src += i_stride;                                                  \
+                                                                            \
+        movq_r2m( mm0, *p_dest );    /* store 8 bytes at curr */            \
+        if( width == 16 )                                                   \
+            movq_r2m( mm1, *(p_dest + 8) );                                 \
+        p_dest += i_stride;                                                 \
     }                                                                       \
 }
 
@@ -416,7 +410,7 @@ void MotionComponent_X_y_avg_##width##_##height(yuv_data_t * p_src,         \
                                                                             \
         if( width == 16 )                                                   \
         {                                                                   \
-            MMXInterpAverage2( p_dest + 8, p_dest + 8, p_src + 9 );         \
+            MMXInterpAverage2( p_dest + 8, p_src + 8, p_src + 9 );          \
         }                                                                   \
                                                                             \
         p_dest += i_stride;                                                 \
@@ -429,21 +423,22 @@ void MotionComponent_x_Y_avg_##width##_##height(yuv_data_t * p_src,         \
                                                 yuv_data_t * p_dest,        \
                                                 int i_stride)               \
 {                                                                           \
-    int i_x, i_y;                                                           \
-    unsigned int i_dummy;                                                   \
+    int i_y;                                                                \
+    yuv_data_t * p_next_src = p_src + i_stride;                             \
+                                                                            \
+    MMXZeroReg();                                                           \
                                                                             \
     for( i_y = 0; i_y < height; i_y ++ )                                    \
     {                                                                       \
-        for( i_x = 0; i_x < width; i_x++ )                                  \
+        MMXInterpAverage2( p_dest, p_src, p_next_src );                     \
+                                                                            \
+        if( width == 16 )                                                   \
         {                                                                   \
-            i_dummy =                                                       \
-                p_dest[i_x] + ((unsigned int)(p_src[i_x]                    \
-                                              + p_src[i_x + i_stride]       \
-                                              + 1) >> 1);                   \
-            p_dest[i_x] = (i_dummy + 1) >> 1;                               \
+            MMXInterpAverage2( p_dest + 8, p_src + 8, p_next_src + 8 );     \
         }                                                                   \
         p_dest += i_stride;                                                 \
         p_src += i_stride;                                                  \
+        p_next_src += i_stride;                                             \
     }                                                                       \
 }
 

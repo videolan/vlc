@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.70 2001/01/15 19:54:34 massiot Exp $
+ * $Id: vpar_headers.c,v 1.71 2001/01/16 17:59:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -723,7 +723,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         memset( p_vpar->picture.pp_mb, 0, MAX_MB*sizeof(macroblock_t *) );
 #endif
 /* FIXME ! remove asap ?? */
-//memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
+memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
 
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
