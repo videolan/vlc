@@ -2,7 +2,7 @@
  * pda.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: pda.h,v 1.2 2003/10/01 20:58:45 jpsaman Exp $
+ * $Id: pda.h,v 1.3 2003/10/03 18:04:58 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -39,6 +39,8 @@ struct intf_sys_t
     GtkHScale          *p_slider;
     GtkTreeView        *p_tvfile;
     GtkTreeView        *p_tvplaylist;
+    GtkListStore       *p_filelist;                      /* File list widget */
+    GtkListStore       *p_playlist;                      /* Playlist widget  */
 
     /* slider */
     GtkLabel *          p_slider_label;
