@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.17 2003/08/11 17:31:15 gbazin Exp $
+ * $Id: mpegvideo.c,v 1.18 2003/08/11 18:52:41 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -517,7 +517,7 @@ static void PacketizeThread( packetizer_t *p_pack )
         p_pack->i_old_duration = i_duration;
     }
 
-    p_sout_buffer->i_length = p_pack->p_pack->i_interpolated_dts -
+    p_sout_buffer->i_length = p_pack->i_interpolated_dts -
                                 p_sout_buffer->i_dts;
 
     p_sout_buffer->i_bitrate = (int)( 8 * i_pos * p_pack->d_frame_rate );
