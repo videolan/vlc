@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.42 2003/01/07 14:58:33 massiot Exp $
+ * $Id: oss.c,v 1.43 2003/01/07 15:12:15 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -290,16 +290,24 @@ static int Open( vlc_object_t *p_this )
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT;
     }
-    else if ( !strcmp( val.psz_string, "Stereo" ) )
+    else if ( !strcmp( val.psz_string, N_("Stereo") ) )
     {
         p_aout->output.output.i_format = AOUT_FMT_S16_NE;
         p_aout->output.output.i_physical_channels
             = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
-    else if ( !strcmp( val.psz_string, "Mono" ) )
+    else if ( !strcmp( val.psz_string, N_("Mono") ) )
     {
         p_aout->output.output.i_format = AOUT_FMT_S16_NE;
         p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+    }
+    else
+    {
+        /* This should not happen ! */
+        msg_Err( p_aout, "internal: can't find audio-device (%s)",
+                 val.psz_string );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
     free( val.psz_string );
 
