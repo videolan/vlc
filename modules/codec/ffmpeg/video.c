@@ -91,6 +91,12 @@ static void ffmpeg_CopyPicture    ( decoder_t *, picture_t *, AVFrame * );
 static int  ffmpeg_GetFrameBuf    ( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
 
+static uint32_t ffmpeg_CodecTag( vlc_fourcc_t fcc )
+{
+    uint8_t *p = (uint8_t*)&fcc;
+    return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}
+
 /*****************************************************************************
  * Local Functions
  *****************************************************************************/
@@ -215,6 +221,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_ff_pic = avcodec_alloc_frame();
 
     /* ***** Fill p_context with init values ***** */
+    p_sys->p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_codec );
     p_sys->p_context->width  = p_dec->fmt_in.video.i_width;
     p_sys->p_context->height = p_dec->fmt_in.video.i_height;
     p_sys->p_context->bits_per_sample = p_dec->fmt_in.video.i_bits_per_pixel;
