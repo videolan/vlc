@@ -2,7 +2,7 @@
  * http.c :  http remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.3 2003/05/06 12:57:48 fenrir Exp $
+ * $Id: http.c,v 1.4 2003/05/06 14:19:29 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -258,7 +258,7 @@ static void Run( intf_thread_t *p_intf )
  *****************************************************************************/
 static int httpd_page_interface_update( intf_thread_t *p_intf,
                                         playlist_t *p_playlist,
-                                        uint8_t **pp_data, int *pi_data );
+                                        uint8_t **pp_data, int *pi_data, vlc_bool_t b_redirect );
 
 static void uri_extract_value( char *psz_uri, char *psz_name,
                                char *psz_value, int i_value_max )
@@ -394,7 +394,7 @@ static int httpd_page_interface_get( httpd_file_callback_args_t *p_args,
         }
     }
 
-    i_ret = httpd_page_interface_update( p_intf, p_playlist, pp_data, pi_data);
+    i_ret = httpd_page_interface_update( p_intf, p_playlist, pp_data, pi_data, i_request ? VLC_TRUE : VLC_FALSE );
 
     vlc_object_release( p_playlist );
 
@@ -403,7 +403,7 @@ static int httpd_page_interface_get( httpd_file_callback_args_t *p_args,
 
 static int httpd_page_interface_update( intf_thread_t *p_intf,
                                         playlist_t *p_playlist,
-                                        uint8_t **pp_data, int *pi_data )
+                                        uint8_t **pp_data, int *pi_data, vlc_bool_t b_redirect )
 {
     int i, i_size = 0;
     char *p;
@@ -426,6 +426,11 @@ static int httpd_page_interface_update( intf_thread_t *p_intf,
     p += sprintf( p, "<html>\n" );
     p += sprintf( p, "<head>\n" );
     p += sprintf( p, "<title>VLC Media Player</title>\n" );
+    if( b_redirect )
+    {
+        p += sprintf( p, "<meta http-equiv=\"refresh\" content=\"0;URL=/\"\n" );
+    }
+    /* p += sprintf( p, "<link rel=\"shortcut icon\" href=\"http://www.videolan.org/favicon.ico\">\n" ); */
     p += sprintf( p, "</head>\n" );
     p += sprintf( p, "<body>\n" );
     p += sprintf( p, "<h2><center><a href=\"http://www.videolan.org\">"
