@@ -401,6 +401,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 
     vlc_object_release( p_playlist );
 
+
     /* Update the playlist */
     Rebuild();
 }
@@ -542,7 +543,7 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
     return dummy;
 }
 
-/*wxTreeItemId Playlist::FindItemByName( wxTreeItemId root, wxString search_string, wxTreeItemId current )
+wxTreeItemId Playlist::FindItemByName( wxTreeItemId root, wxString search_string, wxTreeItemId current, vlc_bool_t *pb_current_found )
 {
     long cookie;
     PlaylistItem *p_wxcurrent;
@@ -555,10 +556,19 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
         if( treectrl->GetItemText( item).Lower().Contains(
                                                  search_string.Lower() ) )
         {
-            return item;
+            if( !current.IsOk() || *pb_current_found == VLC_TRUE )
+            {
+                return item;
+            }
+            else if( current.IsOk() && item == current )
+            {
+                *pb_current_found = VLC_TRUE;
+            }
+        }
         if( treectrl->ItemHasChildren( item ) )
         {
-            wxTreeItemId search = FindItem( item, p_item );
+            wxTreeItemId search = FindItemByName( item, search_string, current,
+                                                  pb_current_found );
             if( search.IsOk() )
             {
                 return search;
@@ -566,12 +576,10 @@ wxTreeItemId Playlist::FindItem( wxTreeItemId root, playlist_item_t *p_item )
         }
         item = treectrl->GetNextChild( root, cookie);
     }
-  */  /* Not found */
-    /*wxTreeItemId dummy;
+    /* Not found */
+    wxTreeItemId dummy;
     return dummy;
 }
-*/
-
 
 
 void Playlist::SetCurrentItem( wxTreeItemId item )
@@ -990,10 +998,29 @@ void Playlist::OnSearch( wxCommandEvent& WXUNUSED(event) )
 {
     wxString search_string = search_text->GetValue();
 
-    bool b_ok = false;
-    int i_current;
-    int i_first = 0 ;
-    int i_item = -1;
+    vlc_bool_t pb_found = VLC_FALSE;
+
+    wxTreeItemId found =
+     FindItemByName( treectrl->GetRootItem(), search_string,
+                     search_current, &pb_found );
+
+    if( found.IsOk() )
+    {
+        search_current = found;
+        treectrl->SelectItem( found, true );
+    }
+    else
+    {
+        wxTreeItemId dummy;
+        search_current = dummy;
+        found =  FindItemByName( treectrl->GetRootItem(), search_string,
+                                 search_current, &pb_found );
+        if( found.IsOk() )
+        {
+            search_current = found;
+            treectrl->SelectItem( found, true );
+        }
+    }
 }
 
 #if 0

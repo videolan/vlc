@@ -842,6 +842,7 @@ private:
     void CreateNode( playlist_t *, playlist_item_t*, wxTreeItemId );
 
     wxTreeItemId FindItem( wxTreeItemId, playlist_item_t * );
+    wxTreeItemId FindItemByName( wxTreeItemId, wxString, wxTreeItemId, vlc_bool_t *);
     void SetCurrentItem( wxTreeItemId );
     void UpdateTreeItem( playlist_t *, wxTreeItemId );
 
@@ -869,6 +870,7 @@ private:
     int i_current_view;
 
     wxTreeItemId i_popup_item;
+    wxTreeItemId search_current;
     playlist_item_t *p_popup_item;
     playlist_item_t *p_popup_parent;
 
