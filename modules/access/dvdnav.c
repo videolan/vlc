@@ -313,7 +313,7 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_sys->p_input, "x-end", VLC_VAR_INTEGER );
     var_Create( p_sys->p_input, "y-end", VLC_VAR_INTEGER );
     var_Create( p_sys->p_input, "color", VLC_VAR_ADDRESS );
-    var_Create( p_sys->p_input, "contrast", VLC_VAR_ADDRESS );
+    var_Create( p_sys->p_input, "menu-contrast", VLC_VAR_ADDRESS );
     var_Create( p_sys->p_input, "highlight", VLC_VAR_BOOL );
     var_Create( p_sys->p_input, "highlight-mutex", VLC_VAR_MUTEX );
 
@@ -347,7 +347,7 @@ static void Close( vlc_object_t *p_this )
     var_Destroy( p_sys->p_input, "y-start" );
     var_Destroy( p_sys->p_input, "y-end" );
     var_Destroy( p_sys->p_input, "color" );
-    var_Destroy( p_sys->p_input, "contrast" );
+    var_Destroy( p_sys->p_input, "menu-contrast" );
 
     vlc_object_release( p_sys->p_input );
 
@@ -911,7 +911,7 @@ static void ButtonUpdate( demux_t *p_demux )
             val.i_int = hl.ey; var_Set( p_sys->p_input, "y-end", val );
 
             val.p_address = (void *)p_sys->alpha;
-            var_Set( p_sys->p_input, "contrast", val );
+            var_Set( p_sys->p_input, "menu-contrast", val );
 
             val.b_bool = VLC_TRUE; var_Set( p_sys->p_input, "highlight", val );
             vlc_mutex_unlock( p_mutex );

@@ -987,7 +987,7 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
     }
 #endif
 
-    if( var_Get( p_object, "contrast", &val ) == VLC_SUCCESS )
+    if( var_Get( p_object, "menu-contrast", &val ) == VLC_SUCCESS )
     {
         int i;
         for( i = 0; i < 4; i++ )
