@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.22 2002/05/19 01:07:13 stef Exp $
+ * $Id: spu_decoder.c,v 1.23 2002/05/19 15:50:02 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -122,6 +122,8 @@ static int decoder_Run( decoder_config_t * p_config )
     /*
      * Initialize the thread properties
      */
+    p_spudec->p_vout = NULL;
+
     p_spudec->p_config = p_config;
 
     p_spudec->p_fifo = p_config->p_decoder_fifo;
