@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: aout.m,v 1.21 2003/01/15 00:49:49 jlj Exp $
+ * $Id: aout.m,v 1.22 2003/01/21 00:47:43 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -40,6 +40,13 @@
 #include <CoreAudio/AudioHardware.h>
 
 #define A52_FRAME_NB 1536
+
+#define STREAM_FORMAT_MSG( pre, sfm ) \
+    pre ": [%ld][%4.4s][%ld][%ld][%ld][%ld][%ld][%ld]", \
+    (UInt32)sfm.mSampleRate, (char *)&sfm.mFormatID, \
+    sfm.mFormatFlags, sfm.mBytesPerPacket, \
+    sfm.mFramesPerPacket, sfm.mBytesPerFrame, \
+    sfm.mChannelsPerFrame, sfm.mBitsPerChannel
 
 /*****************************************************************************
  * aout_class_t 
@@ -251,15 +258,8 @@ int E_(OpenAudio)( vlc_object_t * p_this )
     p_aout->output.output.i_rate = 
         (unsigned int)p_sys->stream_format.mSampleRate;
 
-    msg_Dbg( p_aout, "format: [%ld][%4.4s][%ld][%ld][%ld][%ld][%ld][%ld]",
-             (UInt32)p_sys->stream_format.mSampleRate,
-             (char *)&p_sys->stream_format.mFormatID,
-             p_sys->stream_format.mFormatFlags,
-             p_sys->stream_format.mBytesPerPacket,
-             p_sys->stream_format.mFramesPerPacket,
-             p_sys->stream_format.mBytesPerFrame,
-             p_sys->stream_format.mChannelsPerFrame,
-             p_sys->stream_format.mBitsPerChannel );                  
+    msg_Dbg( p_aout, STREAM_FORMAT_MSG( "using format",
+                                        p_sys->stream_format ) );
 
     /* Get the buffer size */
     i_param_size = sizeof( p_sys->i_buffer_size );
@@ -814,6 +814,12 @@ static int InitStream( UInt32 i_dev, aout_instance_t *p_aout,
 
         for( i = 0; i < i_streams; i++ )
         {
+            if( j == 0 )
+            {
+                msg_Dbg( p_aout, STREAM_FORMAT_MSG( "supported format",
+                                                    P_STREAMS[i] ) );
+            }
+
             if( ( P_STREAMS[i].mFormatID != aout_classes[j].mFormatID ) ||
                 ( P_STREAMS[i].mChannelsPerFrame < 
                   aout_classes[j].mChannelsPerFrame ) )
