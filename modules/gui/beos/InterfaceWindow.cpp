@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.11 2002/12/04 02:16:23 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.12 2002/12/09 07:57:04 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -264,7 +264,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			// this currently stops playback not nicely
 			if (playback_status > UNDEF_S)
 			{
-				p_wrapper->volume_mute();
 				snooze( 400000 );
 				p_wrapper->PlaylistStop();
 				p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
@@ -281,13 +280,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				/* pause if currently playing */
 				if ( playback_status == PLAYING_S )
 				{
-					p_wrapper->volume_mute();
-					snooze( 400000 );
 					p_wrapper->PlaylistPause();
 				}
 				else
 				{
-					p_wrapper->volume_restore();
 					p_wrapper->PlaylistPlay();
 				}
 			}
@@ -302,8 +298,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			/* cycle the fast playback modes */
 			if (playback_status > UNDEF_S)
 			{
-				p_wrapper->volume_mute();
-				snooze( 400000 );
 				p_wrapper->InputFaster();
 			}
 			break;
@@ -312,8 +306,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			/*  cycle the slow playback modes */
 			if (playback_status > UNDEF_S)
 			{
-				p_wrapper->volume_mute();
-				snooze( 400000 );
 				p_wrapper->InputSlower();
 			}
 			break;
@@ -322,7 +314,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			/*  restore speed to normal if already playing */
 			if (playback_status > UNDEF_S)
 			{
-				p_wrapper->volume_restore();
 				p_wrapper->PlaylistPlay();
 			}
 			break;
@@ -335,15 +326,18 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			/* adjust the volume */
 			if (playback_status > UNDEF_S)
 			{
-				p_wrapper->set_volume( p_mediaControl->GetVolume() );
-				p_mediaControl->SetMuted( p_wrapper->is_muted() );
+				p_wrapper->SetVolume( p_mediaControl->GetVolume() );
+				p_mediaControl->SetMuted( p_wrapper->IsMuted() );
 			}
 			break;
 	
 		case VOLUME_MUTE:
 			// toggle muting
-			p_wrapper->toggle_mute();
-			p_mediaControl->SetMuted( p_wrapper->is_muted() );
+			if( p_wrapper->IsMuted() )
+			    p_wrapper->VolumeRestore();
+			else
+			    p_wrapper->VolumeMute();
+			p_mediaControl->SetMuted( p_wrapper->IsMuted() );
 			break;
 	
 		case SELECT_CHANNEL:
@@ -353,13 +347,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				if ( p_message->FindInt32( "channel", &channel ) == B_OK )
 				{
 					p_wrapper->toggleLanguage( channel );
-					// vlc seems to remember the volume for every channel,
-					// but I would assume that to be somewhat annoying to the user
-					// the next call will also unmute the volume, which is probably
-					// desired as well, because if the user selects another language,
-					// he probably wants to hear the change as well
-					snooze( 400000 );	// we have to wait a bit, or the change will be reverted
-					p_wrapper->set_volume( p_mediaControl->GetVolume() );
 				}
 			}
 			break;
@@ -510,10 +497,10 @@ void InterfaceWindow::updateInterface()
 			p_wrapper->getNavCapabilities( &canSkipPrev, &canSkipNext );
 			p_mediaControl->SetSkippable( canSkipPrev, canSkipNext );
 
-			if ( p_wrapper->has_audio() )
+			if ( p_wrapper->HasAudio() )
 			{
 				p_mediaControl->SetAudioEnabled( true );
-				p_mediaControl->SetMuted( p_wrapper->is_muted() );
+				p_mediaControl->SetMuted( p_wrapper->IsMuted() );
 			} else
 				p_mediaControl->SetAudioEnabled( false );
 
@@ -633,7 +620,7 @@ InterfaceWindow::_InputStreamChanged()
 //printf("InterfaceWindow::_InputStreamChanged()\n");
 	// TODO: move more stuff from updateInterface() here!
 	snooze( 400000 );
-	p_wrapper->set_volume( p_mediaControl->GetVolume() );
+	p_wrapper->SetVolume( p_mediaControl->GetVolume() );
 }
 
 /*****************************************************************************

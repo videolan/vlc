@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.8 2002/11/27 05:36:41 titer Exp $
+ * $Id: VlcWrapper.h,v 1.9 2002/12/09 07:57:04 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -41,7 +41,7 @@ struct intf_sys_t
     vlc_bool_t        b_loop;
     vlc_bool_t        b_mute;
     int	              i_part;
-    int               i_saved_volume;
+    audio_volume_t    i_saved_volume;
     int               i_channel;
     
     VlcWrapper * p_wrapper;
@@ -77,7 +77,7 @@ public:
     const char* getTimeAsString();
     float getTimeAsFloat();
     void setTimeAsFloat( float i_offset );
-
+    bool IsPlaying();
         
     /* Playlist */
     int PlaylistSize();
@@ -103,14 +103,11 @@ public:
 	void navigateNext();
 
     /* audio */
-    void volume_mute();
-    void volume_restore();
-    void set_volume(int value);
-    void toggle_mute( );
-    bool is_muted();
-    bool is_playing();
-    void maxvolume();
-    bool has_audio();
+    void SetVolume( int value );
+    void VolumeMute();
+    void VolumeRestore();
+    bool IsMuted();
+    bool HasAudio();
 
     /* DVD */
     bool HasTitles();

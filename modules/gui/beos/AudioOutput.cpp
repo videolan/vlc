@@ -2,7 +2,7 @@
  * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.18 2002/11/27 06:27:52 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.19 2002/12/09 07:57:04 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -135,10 +135,19 @@ static void Play( void *aout, void *p_buffer, size_t i_size,
 
     if( p_aout_buffer != NULL )
     {
-       memcpy( (float*)p_buffer,
-               p_aout_buffer->p_buffer,
-               MIN( BUFFER_SIZE, p_aout_buffer->i_nb_bytes ) );
-       aout_BufferFree( p_aout_buffer );
+        memcpy( (float*)p_buffer,
+                p_aout_buffer->p_buffer,
+                MIN( BUFFER_SIZE, p_aout_buffer->i_nb_bytes ) );
+        if( p_aout_buffer->i_nb_bytes < BUFFER_SIZE )
+        {
+            memset( (float*)p_buffer + p_aout_buffer->i_nb_bytes,
+                    0, BUFFER_SIZE - p_aout_buffer->i_nb_bytes );
+        }
+        aout_BufferFree( p_aout_buffer );
+    }
+    else
+    {
+        memset( (float*)p_buffer, 0, BUFFER_SIZE );
     }
 }
 

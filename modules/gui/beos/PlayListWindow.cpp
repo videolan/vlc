@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.4 2002/11/26 01:06:08 titer Exp $
+ * $Id: PlayListWindow.cpp,v 1.5 2002/12/09 07:57:04 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -246,5 +246,5 @@ PlayListWindow::UpdatePlaylist( bool rebuild )
 			fListView->AddItem( new PlaylistItem( p_wrapper->PlaylistItemName( i ) ) );
 	}
 	fListView->SetCurrent( p_wrapper->PlaylistCurrent() );
-	fListView->SetPlaying( p_wrapper->is_playing() );
+	fListView->SetPlaying( p_wrapper->IsPlaying() );
 }

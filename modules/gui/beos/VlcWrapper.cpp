@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.12 2002/11/27 05:36:41 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.13 2002/12/09 07:57:04 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -144,14 +144,7 @@ void VlcWrapper::InputSlower()
     {
         input_SetStatus( p_input, INPUT_STATUS_SLOWER );
     }
-    if( p_input->stream.control.i_rate == DEFAULT_RATE)
-    {
-        toggle_mute();
-    }
-    else
-    {
-        toggle_mute();
-    }
+    //VolumeMute();
 }
 
 void VlcWrapper::InputFaster()
@@ -160,14 +153,7 @@ void VlcWrapper::InputFaster()
     {
         input_SetStatus( p_input, INPUT_STATUS_FASTER );
     }
-    if( p_input->stream.control.i_rate == DEFAULT_RATE)
-    {
-        toggle_mute();
-    }
-    else
-    {
-        toggle_mute();
-    }
+    //VolumeMute();
 }
 
 void VlcWrapper::openFiles( BList* o_files, bool replace )
@@ -201,7 +187,7 @@ void VlcWrapper::toggleLanguage(int i_language)
     int i_cat = AUDIO_ES;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    for( int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
+    for( unsigned int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
     {
         if( p_input->stream.pp_selected_es[i]->i_cat == i_cat )
         {
@@ -233,7 +219,7 @@ void VlcWrapper::toggleSubtitle(int i_subtitle)
     int i_cat = SPU_ES;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    for( int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
+    for( unsigned int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
     {
         if( p_input->stream.pp_selected_es[i]->i_cat == i_cat )
         {
@@ -302,6 +288,30 @@ void VlcWrapper::setTimeAsFloat(float f_position)
     }
 }
 
+bool VlcWrapper::IsPlaying()
+{
+
+	bool playing = false;
+	if ( p_input )
+	{
+		switch ( p_input->stream.control.i_status )
+		{
+			case PLAYING_S:
+			case FORWARD_S:
+			case BACKWARD_S:
+			case START_S:
+				playing = true;
+	            break;
+			case PAUSE_S:
+			case UNDEF_S:
+			case NOT_STARTED_S:
+			default:
+				break;
+		}
+	}
+	return playing;
+
+}
 
 /******************************
  * playlist infos and control *
@@ -334,13 +344,13 @@ bool VlcWrapper::PlaylistPlay()
     if( PlaylistSize() )
     {
         playlist_Play( p_playlist );
+        //VolumeRestore();
     }
     return( true );
 }
 
 void VlcWrapper::PlaylistPause()
 {
-    toggle_mute();
     if( p_input )
     {
         input_SetStatus( p_input, INPUT_STATUS_PAUSE );
@@ -349,7 +359,6 @@ void VlcWrapper::PlaylistPause()
 
 void VlcWrapper::PlaylistStop()
 {
-    volume_mute();
     playlist_Stop( p_playlist );
 }
 
@@ -590,125 +599,43 @@ void VlcWrapper::navigateNext()
  * audio infos and control *
  ***************************/
 
-void VlcWrapper::volume_mute()
+void VlcWrapper::SetVolume(int value)
 {
     if( p_aout != NULL )
     {
-	    if( !p_intf->p_sys->b_mute )
-		{
-		    p_intf->p_sys->i_saved_volume = p_aout->output.i_volume;
-		    p_aout->output.i_volume = 0;
-		    p_intf->p_sys->b_mute = 1;
-		}
-    }
-
-}
-
-void VlcWrapper::volume_restore()
-{
-    if( p_aout != NULL )
-    {
-	    p_aout->output.i_volume = p_intf->p_sys->i_saved_volume;
-		p_intf->p_sys->i_saved_volume = 0;
-	    p_intf->p_sys->b_mute = 0;
-    }
-
-}
-
-void VlcWrapper::set_volume(int value)
-{
-    if( p_aout != NULL )
-    {
-		// make sure value is within bounds
-		if (value < 0)
-			value = 0;
-		if (value > AOUT_VOLUME_MAX)
-			value = AOUT_VOLUME_MAX;
-		vlc_mutex_lock( &p_aout->mixer_lock );
-		// unmute volume if muted
 		if ( p_intf->p_sys->b_mute )
 		{
 			p_intf->p_sys->b_mute = 0;
-            p_aout->output.i_volume = value;
 		}
-		vlc_mutex_unlock( &p_aout->mixer_lock );
+        aout_VolumeSet( p_aout, value );
     }
 }
 
-void VlcWrapper::toggle_mute()
+void VlcWrapper::VolumeMute()
 {
     if( p_aout != NULL )
    	{
-	    if ( p_intf->p_sys->b_mute )
-	    {
-	        volume_restore();
-	    }
-	    else
-	    {
-	        volume_mute();
-	    }
-	}
+   	    aout_VolumeGet( p_aout, &p_intf->p_sys->i_saved_volume );
+	    aout_VolumeMute( p_aout, NULL );
+	    p_intf->p_sys->b_mute = 1;
+   	}
 }
 
-bool VlcWrapper::is_muted()
-{
-	bool muted = true;
-	
-    if( p_aout != NULL )
-	{
-		vlc_mutex_lock( &p_aout->mixer_lock );
-		if( p_aout->output.i_volume > 0 )
-		{
-			muted = false;
-		}
-		vlc_mutex_unlock( &p_aout->mixer_lock );
-// unfortunately, this is not reliable!
-//		return p_main->p_intf->p_sys->b_mute;
-	}
-	return muted;
-}
-
-bool VlcWrapper::is_playing()
-{
-
-	bool playing = false;
-	if ( p_input )
-	{
-		switch ( p_input->stream.control.i_status )
-		{
-			case PLAYING_S:
-			case FORWARD_S:
-			case BACKWARD_S:
-			case START_S:
-				playing = true;
-	            break;
-			case PAUSE_S:
-			case UNDEF_S:
-			case NOT_STARTED_S:
-			default:
-				break;
-		}
-	}
-	return playing;
-
-}
-
-void VlcWrapper::maxvolume()
+void VlcWrapper::VolumeRestore()
 {
     if( p_aout != NULL )
-    {
-	    if( p_intf->p_sys->b_mute )
-	    {
-	        p_intf->p_sys->i_saved_volume = AOUT_VOLUME_MAX;
-	    }
-	    else
-	    {
-	        p_aout->output.i_volume = AOUT_VOLUME_MAX;
-	    }
-    }
+   	{
+        aout_VolumeSet( p_aout, p_intf->p_sys->i_saved_volume );
+        p_intf->p_sys->b_mute = 0;
+	}
 }
 
-bool VlcWrapper::has_audio()
+bool VlcWrapper::IsMuted()
+{
+    return p_intf->p_sys->b_mute;
+}
+
+bool VlcWrapper::HasAudio()
 {
     return( p_aout != NULL );
 }
@@ -737,7 +664,7 @@ void VlcWrapper::PrevTitle()
 
 void VlcWrapper::NextTitle()
 {
-    int i_id;
+    unsigned int i_id;
     i_id = p_input->stream.p_selected_area->i_id + 1;
     if( i_id < p_input->stream.i_area_nb )
     {
