@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.179 2002/05/28 18:34:42 stef Exp $
+ * $Id: video_output.c,v 1.180 2002/05/29 18:39:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -484,10 +484,12 @@ static int InitThread( vout_thread_t *p_vout )
 static void RunThread( vout_thread_t *p_vout)
 {
     int             i_index;                                /* index in heap */
+    int             i_idle_loops = 0;  /* loops without displaying a picture */
     mtime_t         current_date;                            /* current date */
     mtime_t         display_date;                            /* display date */
 
     picture_t *     p_picture;                            /* picture pointer */
+    picture_t *     p_last_picture = NULL;                   /* last picture */
     picture_t *     p_directbuffer;              /* direct buffer to display */
 
     subpicture_t *  p_subpic;                          /* subpicture pointer */
@@ -530,9 +532,7 @@ static void RunThread( vout_thread_t *p_vout)
          */
         p_picture = NULL;
 
-        for( i_index = 0;
-             i_index < I_RENDERPICTURES;
-             i_index++ )
+        for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
         {
             if( (PP_RENDERPICTURE[i_index]->i_status == READY_PICTURE)
                 && ( (p_picture == NULL) ||
@@ -545,11 +545,45 @@ static void RunThread( vout_thread_t *p_vout)
 
         if( p_picture != NULL )
         {
+            /* If we met the last picture, parse again to see whether there is
+             * a more appropriate one. */
+            if( p_picture == p_last_picture )
+            {
+                for( i_index = 0; i_index < I_RENDERPICTURES; i_index++ )
+                {
+                    if( (PP_RENDERPICTURE[i_index]->i_status == READY_PICTURE)
+                        && (PP_RENDERPICTURE[i_index] != p_last_picture)
+                        && ((p_picture == p_last_picture) ||
+                            (PP_RENDERPICTURE[i_index]->date < display_date)) )
+                    {
+                        p_picture = PP_RENDERPICTURE[i_index];
+                        display_date = p_picture->date;
+                    }
+                }
+            }
+    
+            /* If we found better than the last picture, destroy it */
+            if( p_last_picture && p_picture != p_last_picture )
+            {
+                vlc_mutex_lock( &p_vout->picture_lock );
+                if( p_last_picture->i_refcount )
+                {
+                    p_last_picture->i_status = DISPLAYED_PICTURE;
+                }
+                else
+                {
+                    p_last_picture->i_status = DESTROYED_PICTURE;
+                    p_vout->i_heap_size--;
+                }
+                vlc_mutex_unlock( &p_vout->picture_lock );
+            }
+
             /* Compute FPS rate */
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ]
                 = display_date;
 
             if( !p_picture->b_force &&
+                p_picture != p_last_picture &&
                 display_date < current_date + p_vout->render_time )
             {
                 /* Picture is late: it will be destroyed and the thread
@@ -575,7 +609,7 @@ static void RunThread( vout_thread_t *p_vout)
             }
 #if 0
             /* Removed because it causes problems for some people --Meuuh */
-            else if( display_date > current_date + VOUT_BOGUS_DELAY )
+            if( display_date > current_date + VOUT_BOGUS_DELAY )
             {
                 /* Picture is waaay too early: it will be destroyed */
                 vlc_mutex_lock( &p_vout->picture_lock );
@@ -598,7 +632,7 @@ static void RunThread( vout_thread_t *p_vout)
                 continue;
             }
 #endif
-            else if( display_date > current_date + VOUT_DISPLAY_DELAY )
+            if( display_date > current_date + VOUT_DISPLAY_DELAY )
             {
                 /* A picture is ready to be rendered, but its rendering date
                  * is far from the current one so the thread will perform an
@@ -607,6 +641,25 @@ static void RunThread( vout_thread_t *p_vout)
                 p_picture    = NULL;
                 display_date = 0;
             }
+            else if( p_picture == p_last_picture )
+            {
+                if( i_idle_loops < 4 )
+                {
+                    /* We are asked to repeat the previous picture, but we first
+                     * wait for a couple of idle loops */
+                    p_picture    = NULL;
+                    display_date = 0;
+                }
+                else
+                {
+                    //intf_WarnMsg( 6, "vout info: duplicating picture" );
+                }
+            }
+        }
+
+        if( p_picture == NULL )
+        {
+            i_idle_loops++;
         }
 
         /*
@@ -663,18 +716,13 @@ static void RunThread( vout_thread_t *p_vout)
             /* Display the direct buffer returned by vout_RenderPicture */
             p_vout->pf_display( p_vout, p_directbuffer );
 
-            /* Remove picture from heap */
-            vlc_mutex_lock( &p_vout->picture_lock );
-            if( p_picture->i_refcount )
-            {
-                p_picture->i_status = DISPLAYED_PICTURE;
-            }
-            else
-            {
-                p_picture->i_status = DESTROYED_PICTURE;
-                p_vout->i_heap_size--;
-            }
-            vlc_mutex_unlock( &p_vout->picture_lock );
+            /* Reinitialize idle loop count */
+            i_idle_loops = 0;
+
+            /* Tell the vout this was the last picture and that it does not
+             * need to be forced anymore. */
+            p_last_picture = p_picture;
+            p_last_picture->b_force = 0;
         }
 
         /*
