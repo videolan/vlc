@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.9 2002/11/18 19:31:20 fenrir Exp $
+ * $Id: ogg.c,v 1.10 2002/11/20 14:09:57 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -52,7 +52,7 @@ typedef struct logical_stream_s
     vlc_fourcc_t     i_fourcc;
     vlc_fourcc_t     i_codec;
 
-    es_descriptor_t  *p_es;   
+    es_descriptor_t  *p_es;
     int              b_selected;                           /* newly selected */
 
     /* the header of some logical streams (eg vorbis) contain essential
@@ -64,16 +64,18 @@ typedef struct logical_stream_s
 
     /* program clock reference (in units of 90kHz) derived from the previous
      * granulepos */
-    mtime_t i_pcr;
-    long    l_previous_granulepos;
+    mtime_t          i_pcr;
+    mtime_t          i_last_received_pcr;
 
     /* info from logical streams */
-    double i_rate;
+    double f_rate;
     int i_bitrate;
     int b_reinit;
 
+    /* codec specific stuff */
     BITMAPINFOHEADER *p_bih;
     WAVEFORMATEX *p_wf;
+    int i_theora_keyframe_granule_shift;
 
 } logical_stream_t;
 
@@ -315,7 +317,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
 
     if( p_stream->b_force_backup )
     {
-        /* Backup the ogg packet (likely an header) */
+        /* Backup the ogg packet (likely an header packet) */
         ogg_packet *p_packet_backup;
         p_stream->i_packets_backup++;
         p_stream->p_packets_backup =
@@ -349,11 +351,45 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         /* This stream isn't currently selected so we don't need to decode it,
          * but we do need to store its pcr as it might be selected later on. */
 
-        /* Convert the next granule into a pcr */
-        p_stream->i_pcr = ( p_oggpacket->granulepos < 0 ) ?
-            p_stream->i_pcr + ( p_oggpacket->bytes * 90000
-                / p_stream->i_bitrate / 8 ):
-            p_oggpacket->granulepos * 90000 / p_stream->i_rate;
+        /* Convert the next granulepos into a pcr */
+        if( p_oggpacket->granulepos >= 0 )
+        {
+            if( p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
+            {
+                p_stream->i_pcr = p_oggpacket->granulepos * 90000
+                                  / p_stream->f_rate;
+            }
+            else
+            {
+                ogg_int64_t iframe = p_oggpacket->granulepos >>
+                    p_stream->i_theora_keyframe_granule_shift;
+                ogg_int64_t pframe = p_oggpacket->granulepos -
+                    ( iframe << p_stream->i_theora_keyframe_granule_shift );
+
+                p_stream->i_pcr = ( iframe + pframe ) * 90000
+                                  / p_stream->f_rate;
+            }
+
+            p_stream->i_last_received_pcr = p_stream->i_pcr;
+        }
+        else
+        {
+            /* no granulepos available, try to interpolate */
+            if( p_stream->i_bitrate )
+                p_stream->i_pcr += ( p_oggpacket->bytes * 90000
+                                     / p_stream->i_bitrate / 8 );
+            else
+                p_stream->i_pcr = -1;
+        }
+
+        /* Update the main pcr */
+        if( p_stream == p_ogg->p_stream_timeref )
+        {
+            if( p_ogg->p_stream_timeref->i_pcr >= 0 )
+            {
+                p_ogg->i_pcr = p_ogg->p_stream_timeref->i_pcr;
+            }
+        }
 
         return;
     }
@@ -368,8 +404,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         input_DeletePES( p_input->p_method_data, p_pes );
         return;
     }
-    
-    p_pes->i_dts = p_oggpacket->granulepos;
+
     /* Convert the pcr into a pts */
     if( p_stream->i_cat != SPU_ES )
     {
@@ -383,22 +418,37 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         p_pes->i_pts = ( p_oggpacket->granulepos < 0 ) ? 0 :
             input_ClockGetTS( p_input, p_input->stream.p_selected_program,
                               p_oggpacket->granulepos * 90000 /
-                              p_stream->i_rate );
-        p_pes->i_dts = 0;
+                              p_stream->f_rate );
     }
 
-    /* Convert the next granule into a pcr */
-    if( p_oggpacket->granulepos < 0 )
+    /* Convert the next granulepos into a pcr */
+    if( p_oggpacket->granulepos >= 0 )
     {
-        /* FIXME: ffmpeg doesn't like null pts */
-        if( p_stream->i_cat == VIDEO_ES )
-            p_stream->i_pcr += (90000 / p_stream->i_rate);
+        if( p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
+        {
+            p_stream->i_pcr = p_oggpacket->granulepos * 90000
+                              / p_stream->f_rate;
+        }
         else
-            p_stream->i_pcr = -1;
+        {
+            ogg_int64_t iframe = p_oggpacket->granulepos >>
+                p_stream->i_theora_keyframe_granule_shift;
+            ogg_int64_t pframe = p_oggpacket->granulepos -
+                ( iframe << p_stream->i_theora_keyframe_granule_shift );
+
+            p_stream->i_pcr = ( iframe + pframe ) * 90000 / p_stream->f_rate;
+        }
+
+        p_stream->i_last_received_pcr = p_stream->i_pcr;
     }
     else
     {
-        p_stream->i_pcr = p_oggpacket->granulepos * 90000 / p_stream->i_rate;
+        /* FIXME: ffmpeg doesn't like null pts */
+        if( p_stream->i_cat == VIDEO_ES )
+            /* 1 frame per packet */
+            p_stream->i_pcr += (90000 / p_stream->f_rate);
+        else
+            p_stream->i_pcr = -1;
     }
 
     /* Update the main pcr */
@@ -410,16 +460,21 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         }
         else
         {
-            p_ogg->i_pcr += ( p_oggpacket->bytes * 90000
-                              / p_stream->i_bitrate / 8 );
+            /* no granulepos available, try to interpolate */
+            if( p_stream->i_bitrate )
+                p_ogg->i_pcr += ( p_oggpacket->bytes * 90000
+                                     / p_stream->i_bitrate / 8 );
         }
     }
 
     p_pes->i_nb_data = 1;
+    p_pes->i_dts = p_oggpacket->granulepos;
     p_pes->p_first = p_pes->p_last = p_data;
     p_pes->i_pes_size = p_oggpacket->bytes;
 
-    if( p_stream->i_fourcc != VLC_FOURCC( 'v','o','r','b' ) )
+    if( p_stream->i_fourcc != VLC_FOURCC( 'v','o','r','b' ) &&
+        p_stream->i_fourcc != VLC_FOURCC( 't','a','r','k' ) &&
+        p_stream->i_fourcc != VLC_FOURCC( 't','h','e','o' ) )
     {
         /* Remove the header from the packet */
         i_header_len = (*p_oggpacket->packet & PACKET_LEN_BITS01) >> 6;
@@ -427,6 +482,15 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         i_header_len++;
 
         p_pes->i_pes_size -= i_header_len;
+        p_pes->i_dts = 0;
+    }
+
+    if( p_stream->i_fourcc == VLC_FOURCC( 't','a','r','k' ) )
+    {
+        /* FIXME: the biggest hack I've ever done */
+        msg_Warn( p_input, "tark pts: %lli, granule: %i",
+                  p_pes->i_pts, p_pes->i_dts );
+        msleep(10000);
     }
 
     memcpy( p_data->p_payload_start,
@@ -513,9 +577,84 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     /* Cheat and get additionnal info ;) */
                     oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
                     oggpack_adv( &opb, 96 );
-                    p_stream->i_rate = oggpack_read( &opb, 32 );
+                    p_stream->f_rate = oggpack_read( &opb, 32 );
                     oggpack_adv( &opb, 32 );
                     p_stream->i_bitrate = oggpack_read( &opb, 32 );
+                }
+                /* Check for Theora header */
+                else if( oggpacket.bytes >= 7 &&
+                         ! strncmp( &oggpacket.packet[1], "theora", 6 ) )
+                {
+#ifdef HAVE_OGGPACKB
+                    oggpack_buffer opb;
+                    int i_fps_numerator;
+                    int i_fps_denominator;
+                    int i_keyframe_frequency_force;
+#endif
+
+                    msg_Dbg( p_input, "found theora header" );
+#ifdef HAVE_OGGPACKB
+                    p_stream->i_cat = VIDEO_ES;
+                    p_stream->i_fourcc = VLC_FOURCC( 't','h','e','o' );
+
+                    /* Cheat and get additionnal info ;) */
+                    oggpackB_readinit(&opb, oggpacket.packet, oggpacket.bytes);
+                    oggpackB_adv( &opb, 56 );
+                    oggpackB_read( &opb, 8 ); /* major version num */
+                    oggpackB_read( &opb, 8 ); /* minor version num */
+                    oggpackB_read( &opb, 8 ); /* subminor version num */
+                    oggpackB_read( &opb, 16 ) /*<< 4*/; /* width */
+                    oggpackB_read( &opb, 16 ) /*<< 4*/; /* height */
+                    i_fps_numerator = oggpackB_read( &opb, 32 );
+                    i_fps_denominator = oggpackB_read( &opb, 32 );
+                    oggpackB_read( &opb, 24 ); /* aspect_numerator */
+                    oggpackB_read( &opb, 24 ); /* aspect_denominator */
+                    i_keyframe_frequency_force = 1 << oggpackB_read( &opb, 5 );
+                    p_stream->i_bitrate = oggpackB_read( &opb, 24 );
+                    oggpackB_read(&opb,6); /* quality */
+
+                    /* granule_shift = i_log( frequency_force -1 ) */
+                    p_stream->i_theora_keyframe_granule_shift = 0;
+                    i_keyframe_frequency_force--;
+                    while( i_keyframe_frequency_force )
+                    {
+                        p_stream->i_theora_keyframe_granule_shift++;
+                        i_keyframe_frequency_force >>= 1;
+                    }
+
+                    p_stream->f_rate = (float)i_fps_numerator /
+                                                i_fps_denominator;
+                    msg_Dbg( p_input,
+                             "found theora header, bitrate: %i, rate: %f",
+                             p_stream->i_bitrate, p_stream->f_rate );
+#else /* HAVE_OGGPACKB */
+                    msg_Dbg( p_input, "the ogg demuxer has been compiled "
+                             "without support for the oggpackB extension."
+                             "The theora stream won't be decoded." );
+                    free( p_stream );
+                    p_ogg->i_streams--;
+                    continue;
+#endif /* HAVE_OGGPACKB */
+                }
+                /* Check for Tarkin header */
+                else if( oggpacket.bytes >= 7 &&
+                         ! strncmp( &oggpacket.packet[1], "tarkin", 6 ) )
+                {
+                    oggpack_buffer opb;
+
+                    msg_Dbg( p_input, "found tarkin header" );
+                    p_stream->i_cat = VIDEO_ES;
+                    p_stream->i_fourcc = VLC_FOURCC( 't','a','r','k' );
+
+                    /* Cheat and get additionnal info ;) */
+                    oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
+                    oggpack_adv( &opb, 88 );
+                    oggpack_adv( &opb, 104 );
+                    p_stream->i_bitrate = oggpack_read( &opb, 32 );
+                    p_stream->f_rate = 2; /* FIXME */
+                    msg_Dbg( p_input,
+                             "found tarkin header, bitrate: %i, rate: %f",
+                             p_stream->i_bitrate, p_stream->f_rate );
                 }
                 else if( (*oggpacket.packet & PACKET_TYPE_BITS )
                          == PACKET_TYPE_HEADER && 
@@ -549,7 +688,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         msg_Dbg( p_input, "found video header of type: %.4s",
                                  (char *)&p_stream->i_fourcc );
 
-                        p_stream->i_rate = 10000000.0 /
+                        p_stream->f_rate = 10000000.0 /
                             GetQWLE((uint8_t *)&st->time_unit);
                         p_stream->p_bih->biBitCount =
                             GetWLE((uint8_t *)&st->bits_per_sample);
@@ -565,11 +704,11 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
 
                         msg_Dbg( p_input,
                              "fps: %f, width:%i; height:%i, bitcount:%i",
-                            p_stream->i_rate, p_stream->p_bih->biWidth,
+                            p_stream->f_rate, p_stream->p_bih->biWidth,
                             p_stream->p_bih->biHeight,
                             p_stream->p_bih->biBitCount);
 
-                        p_stream->i_bitrate = 1; /* FIXME */
+                        p_stream->i_bitrate = 0;
                     }
                     /* Check for audio header (new format) */
                     else if( !strncmp( st->streamtype, "audio", 5 ) )
@@ -596,7 +735,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         p_stream->p_wf->wFormatTag = strtol(p_buffer,NULL,16);
                         p_stream->p_wf->nChannels =
                             GetWLE((uint8_t *)&st->sh.audio.channels);
-                        p_stream->i_rate = p_stream->p_wf->nSamplesPerSec =
+                        p_stream->f_rate = p_stream->p_wf->nSamplesPerSec =
                             GetQWLE((uint8_t *)&st->samples_per_unit);
                         p_stream->i_bitrate = p_stream->p_wf->nAvgBytesPerSec =
                             GetDWLE((uint8_t *)&st->sh.audio.avgbytespersec);
@@ -656,7 +795,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                         p_stream->i_cat = SPU_ES;
                         p_stream->i_fourcc =
                             VLC_FOURCC( 's', 'u', 'b', 't' );
-                        p_stream->i_rate = 1000; /* granulepos is in milisec */
+                        p_stream->f_rate = 1000; /* granulepos is in milisec */
                     }
                     else
                     {
@@ -981,7 +1120,9 @@ static int Demux( input_thread_t * p_input )
     }
 
 
-    /* Demux ogg pages from the stream */
+    /*
+     * Demux ogg pages from the stream
+     */
     for( i = 0; (i < PAGES_READ_ONCE) || p_ogg->p_stream_timeref->b_reinit;
          i++ )
     {
@@ -1009,7 +1150,7 @@ static int Demux( input_thread_t * p_input )
                     {
                         p_stream->b_reinit = 0;
                         p_stream->i_pcr = oggpacket.granulepos
-                            * 90000 / p_stream->i_rate;
+                            * 90000 / p_stream->f_rate;
 
                         if( !p_ogg->i_pcr ||
                             (p_stream == p_ogg->p_stream_timeref) )

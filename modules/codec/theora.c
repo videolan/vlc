@@ -1,8 +1,8 @@
 /*****************************************************************************
- * tarkin.c: tarkin decoder module making use of libtarkin.
+ * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: tarkin.c,v 1.2 2002/11/20 14:09:57 gbazin Exp $
+ * $Id: theora.c,v 1.1 2002/11/20 14:09:57 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -34,18 +34,10 @@
 
 #include <ogg/ogg.h>
 
-/* FIXME */
-// use 16 bit signed integers as wavelet coefficients
-#define TYPE int16_t
-// we'll actually use TYPE_BITS bits of type (e.g. 9 magnitude + 1 sign)
-#define TYPE_BITS 10
-// use the rle entropy coder
-#define RLECODER 1
-
-#include <tarkin.h>
+#include <theora/theora.h>
 
 /*****************************************************************************
- * dec_thread_t : tarkin decoder thread descriptor
+ * dec_thread_t : theora decoder thread descriptor
  *****************************************************************************/
 typedef struct dec_thread_t
 {
@@ -55,13 +47,10 @@ typedef struct dec_thread_t
     vlc_thread_t        thread_id;                /* id for thread functions */
 
     /*
-     * Tarkin properties
+     * Theora properties
      */
-    TarkinStream *tarkin_stream;
-
-    TarkinInfo       ti;                        /* tarkin bitstream settings */
-    TarkinComment    tc;                   /* tarkin bitstream user comments */
-    TarkinTime           tarkdate;
+    theora_info      ti;                        /* theora bitstream settings */
+    theora_state     td;                   /* theora bitstream user comments */
 
     /*
      * Input properties
@@ -86,16 +75,16 @@ static void CloseDecoder ( dec_thread_t * );
 static void DecodePacket ( dec_thread_t * );
 static int  GetOggPacket ( dec_thread_t *, ogg_packet *, mtime_t * );
 
-static void tarkin_CopyPicture( dec_thread_t *, picture_t *, uint8_t * );
-static vout_thread_t *tarkin_SpawnVout( dec_thread_t *, int, int, int, int );
+static void theora_CopyPicture( dec_thread_t *, picture_t *, yuv_buffer * );
+static vout_thread_t *theora_SpawnVout( dec_thread_t *, int, int, int, int );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("Tarkin decoder module") );
+    set_description( _("Theora decoder module") );
     set_capability( "decoder", 100 );
     set_callbacks( OpenDecoder, NULL );
-    add_shortcut( "tarkin" );
+    add_shortcut( "theora" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -105,7 +94,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC('t','a','r','k') )
+    if( p_fifo->i_fourcc != VLC_FOURCC('t','h','e','o') )
     {
         return VLC_EGENERIC;
     }
@@ -113,14 +102,14 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_fifo->pf_run = RunDecoder;
     return VLC_SUCCESS;
 }
-
 /*****************************************************************************
- * RunDecoder: the tarkin decoder
+ * RunDecoder: the theora decoder
  *****************************************************************************/
 static int RunDecoder( decoder_fifo_t *p_fifo )
 {
     dec_thread_t *p_dec;
     ogg_packet oggpacket;
+    int i_chroma, i_aspect;
     mtime_t i_pts;
 
     /* Allocate the memory needed to store the thread's structure */
@@ -136,59 +125,49 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     p_dec->p_fifo = p_fifo;
     p_dec->p_pes  = NULL;
 
-    /* Take care of the initial Tarkin header */
-    p_dec->tarkin_stream = tarkin_stream_new();
-    tarkin_info_init(&p_dec->ti);
-    tarkin_comment_init(&p_dec->tc);
-
+    /* Take care of the initial Theora header */
     if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
         goto error;
 
     oggpacket.b_o_s = 1; /* yes this actually is a b_o_s packet :) */
-    if( tarkin_synthesis_headerin( &p_dec->ti, &p_dec->tc, &oggpacket ) < 0 )
+    if( theora_decode_header( &p_dec->ti, &oggpacket ) < 0 )
     {
-        msg_Err( p_dec->p_fifo, "This bitstream does not contain Tarkin "
+        msg_Err( p_dec->p_fifo, "This bitstream does not contain Theora "
                  "video data");
         goto error;
     }
 
-    /* The next two packets in order are the comment and codebook headers.
-       We need to watch out that these packets are not missing as a
-       missing or corrupted header is fatal. */
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-        goto error;
+    /* Initialize decoder */
+    theora_decode_init( &p_dec->td, &p_dec->ti );
+    msg_Dbg( p_dec->p_fifo, "%dx%d %.02f fps video",
+             p_dec->ti.width, p_dec->ti.height,
+             (double)p_dec->ti.fps_numerator/p_dec->ti.fps_denominator);
 
-    if( tarkin_synthesis_headerin( &p_dec->ti, &p_dec->tc, &oggpacket ) < 0 )
-    {
-        msg_Err( p_dec->p_fifo, "2nd Tarkin header is corrupted" );
-        goto error;
-    }
+    /* Initialize video output */
+    if( p_dec->ti.aspect_denominator )
+        i_aspect = VOUT_ASPECT_FACTOR * p_dec->ti.aspect_numerator /
+                    p_dec->ti.aspect_denominator;
+    else
+        i_aspect = VOUT_ASPECT_FACTOR * p_dec->ti.width / p_dec->ti.height;
 
-    if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
-        goto error;
+    i_chroma = VLC_FOURCC('Y','V','1','2');
 
-    if( tarkin_synthesis_headerin( &p_dec->ti, &p_dec->tc, &oggpacket ) < 0 )
-    {
-        msg_Err( p_dec->p_fifo, "3rd Tarkin header is corrupted" );
-        goto error;
-    }
+    p_dec->p_vout = theora_SpawnVout( p_dec, p_dec->ti.width, p_dec->ti.height,
+                                      i_aspect, i_chroma );
 
-    /* Initialize the tarkin decoder */
-    tarkin_synthesis_init( p_dec->tarkin_stream, &p_dec->ti );
-
-    /* tarkin decoder thread's main loop */
+    /* theora decoder thread's main loop */
     while( (!p_dec->p_fifo->b_die) && (!p_dec->p_fifo->b_error) )
     {
         DecodePacket( p_dec );
     }
 
-    /* If b_error is set, the tarkin decoder thread enters the error loop */
+    /* If b_error is set, the theora decoder thread enters the error loop */
     if( p_dec->p_fifo->b_error )
     {
         DecoderError( p_dec->p_fifo );
     }
 
-    /* End of the tarkin decoder thread */
+    /* End of the theora decoder thread */
     CloseDecoder( p_dec );
 
     return 0;
@@ -200,7 +179,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         if( p_dec->p_fifo )
             p_dec->p_fifo->b_error = 1;
 
-        /* End of the tarkin decoder thread */
+        /* End of the theora decoder thread */
         CloseDecoder( p_dec );
     }
 
@@ -208,16 +187,14 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 }
 
 /*****************************************************************************
- * DecodePacket: decodes a Tarkin packet.
+ * DecodePacket: decodes a Theora packet.
  *****************************************************************************/
 static void DecodePacket( dec_thread_t *p_dec )
 {
     ogg_packet oggpacket;
     picture_t *p_pic;
     mtime_t i_pts;
-    int i_width, i_height, i_chroma, i_aspect;
-    uint32_t frame = 0;
-    uint8_t *rgb;
+    yuv_buffer yuv;
 
     if( GetOggPacket( p_dec, &oggpacket, &i_pts ) != VLC_SUCCESS )
     {
@@ -225,58 +202,32 @@ static void DecodePacket( dec_thread_t *p_dec )
         return;
     }
 
-    tarkin_synthesis_packetin( p_dec->tarkin_stream, &oggpacket );
+    theora_decode_packetin( &p_dec->td, &oggpacket );
 
-    while( tarkin_synthesis_frameout( p_dec->tarkin_stream,
-                                      &rgb, 0, &p_dec->tarkdate ) == 0 )
+    /* Decode */
+    theora_decode_YUVout( &p_dec->td, &yuv );
+
+    /* Get a new picture */
+    while( !(p_pic = vout_CreatePicture( p_dec->p_vout, 0, 0, 0 ) ) )
     {
-
-        i_width = p_dec->tarkin_stream->layer->desc.width;
-        i_height = p_dec->tarkin_stream->layer->desc.height;
-        switch( p_dec->tarkin_stream->layer->desc.format )
+        if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
         {
-        case TARKIN_RGB24:
-            i_chroma = VLC_FOURCC('R','V','2','4');
-            break;
-        case TARKIN_RGB32:
-            i_chroma = VLC_FOURCC('R','V','3','2');
-            break;
-        case TARKIN_RGBA:
-            i_chroma = VLC_FOURCC('R','G','B','A');
-            break;
-        default:
-            i_chroma = VLC_FOURCC('Y','V','1','2');
-            break;
+            return;
         }
-        i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
-        p_dec->p_vout = tarkin_SpawnVout( p_dec, i_width, i_height,
-                                          i_aspect, i_chroma );
-
-        /* Get a new picture */
-        while( !(p_pic = vout_CreatePicture( p_dec->p_vout, 0, 0, 0 ) ) )
-        {
-            if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
-            {
-                return;
-            }
-            msleep( VOUT_OUTMEM_SLEEP );
-        }
-        if( !p_pic )
-            break;
-
-        tarkin_CopyPicture( p_dec, p_pic, rgb );
-
-        tarkin_synthesis_freeframe( p_dec->tarkin_stream, rgb );
-
-        vout_DatePicture( p_dec->p_vout, p_pic, mdate()+DEFAULT_PTS_DELAY/*i_pts*/ );
-        vout_DisplayPicture( p_dec->p_vout, p_pic );
-
+        msleep( VOUT_OUTMEM_SLEEP );
     }
+    if( !p_pic )
+        return;
+
+    theora_CopyPicture( p_dec, p_pic, &yuv );
+
+    vout_DatePicture( p_dec->p_vout, p_pic, i_pts );
+    vout_DisplayPicture( p_dec->p_vout, p_pic );
 }
 
 /*****************************************************************************
- * GetOggPacket: get the following tarkin packet from the stream and send back
- *               the result in an ogg packet (for easy decoding by libtarkin).
+ * GetOggPacket: get the following theora packet from the stream and send back
+ *               the result in an ogg packet (for easy decoding by libtheora).
  *****************************************************************************
  * Returns VLC_EGENERIC in case of eof.
  *****************************************************************************/
@@ -302,7 +253,7 @@ static int GetOggPacket( dec_thread_t *p_dec, ogg_packet *p_oggpacket,
 }
 
 /*****************************************************************************
- * CloseDecoder: tarkin decoder destruction
+ * CloseDecoder: theora decoder destruction
  *****************************************************************************/
 static void CloseDecoder( dec_thread_t * p_dec )
 {
@@ -318,17 +269,14 @@ static void CloseDecoder( dec_thread_t * p_dec )
             vout_DestroyThread( p_dec->p_vout );
         }
 
-        if( p_dec->tarkin_stream )
-            tarkin_stream_destroy( p_dec->tarkin_stream );
-
         free( p_dec );
     }
 }
 
 /*****************************************************************************
- * tarkin_SpawnVout: creates a new video output
+ * theora_SpawnVout: creates a new video output
  *****************************************************************************/
-static vout_thread_t *tarkin_SpawnVout( dec_thread_t *p_dec,
+static vout_thread_t *theora_SpawnVout( dec_thread_t *p_dec,
                                         int i_width,
                                         int i_height,
                                         int i_aspect,
@@ -387,25 +335,27 @@ static vout_thread_t *tarkin_SpawnVout( dec_thread_t *p_dec,
 }
 
 /*****************************************************************************
- * tarkin_CopyPicture: copy a picture from tarkin internal buffers to a
+ * theora_CopyPicture: copy a picture from theora internal buffers to a
  *                     picture_t structure.
  *****************************************************************************/
-static void tarkin_CopyPicture( dec_thread_t *p_dec, picture_t *p_pic,
-                                uint8_t *p_src )
+static void theora_CopyPicture( dec_thread_t *p_dec, picture_t *p_pic,
+                                yuv_buffer *yuv )
 {
-    int i_plane, i_line, i_width, i_dst_stride;
-    u8  *p_dst;
+    int i_plane, i_line, i_width, i_dst_stride, i_src_stride;
+    u8  *p_dst, *p_src;
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
         p_dst = p_pic->p[i_plane].p_pixels;
+        p_src = i_plane ? (i_plane - 1 ? yuv->v : yuv->u ) : yuv->y;
         i_width = p_pic->p[i_plane].i_visible_pitch;
         i_dst_stride = p_pic->p[i_plane].i_pitch;
+        i_src_stride = i_plane ? yuv->uv_stride : yuv->y_stride;
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
         {
             p_dec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, i_width );
-            p_src += i_width;
+            p_src += i_src_stride;
             p_dst += i_dst_stride;
         }
     }
