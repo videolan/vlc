@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.38 2003/09/12 16:26:40 fenrir Exp $
+ * $Id: asf.c,v 1.39 2003/11/11 00:37:59 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -54,7 +54,9 @@ static int  Demux   ( input_thread_t * );
 typedef struct asf_stream_s
 {
     int i_cat;
-    es_descriptor_t *p_es;
+
+    es_out_id_t     *p_es;
+
     asf_object_stream_properties_t *p_sp;
 
     mtime_t i_time;
@@ -93,7 +95,6 @@ static int Open( vlc_object_t * p_this )
 
     demux_sys_t     *p_sys;
     unsigned int    i_stream;
-    unsigned int    i;
     asf_object_content_description_t *p_cd;
 
     vlc_bool_t      b_seekable;
@@ -148,7 +149,6 @@ static int Open( vlc_object_t * p_this )
 
     msg_Dbg( p_input, "found %d streams", p_sys->i_streams );
 
-    /*  create one program */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
     {
@@ -156,13 +156,6 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "cannot init stream" );
         goto error;
     }
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot add program" );
-        goto error;
-    }
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     p_input->stream.i_mux_rate = 0 ; /* updated later */
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -184,109 +177,61 @@ static int Open( vlc_object_t * p_this )
         p_stream->p_sp = p_sp;
         p_stream->p_es = NULL;
 
-        if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) )
+        if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
+            p_sp->i_type_specific_data_length >= sizeof( WAVEFORMATEX ) - 2 )
         {
-            int i_codec;
-            if( p_sp->p_type_specific_data )
+            es_format_t  fmt;
+            uint8_t      *p_data = p_sp->p_type_specific_data;
+
+            es_format_Init( &fmt, AUDIO_ES, 0 );
+            wf_tag_to_fourcc( GetWLE( &p_data[0] ), &fmt.i_codec, NULL );
+            fmt.audio.i_channels        = GetWLE(  &p_data[2] );
+            fmt.audio.i_samplerate      = GetDWLE( &p_data[4] );
+            fmt.audio.i_bitrate         = GetDWLE( &p_data[8] ) * 8;
+            fmt.audio.i_blockalign      = GetWLE(  &p_data[12] );
+            fmt.audio.i_bitspersample   = GetWLE(  &p_data[14] );
+
+            if( p_sp->i_type_specific_data_length > sizeof( WAVEFORMATEX ) )
             {
-                i_codec = GetWLE( p_sp->p_type_specific_data );
-            }
-            else
-            {
-                i_codec = -1;
+                fmt.i_extra_type = ES_EXTRA_TYPE_WAVEFORMATEX;
+                fmt.i_extra = __MIN( GetWLE( &p_data[16] ),
+                                     p_sp->i_type_specific_data_length - sizeof( WAVEFORMATEX ) );
+                fmt.p_extra = malloc( fmt.i_extra );
+                memcpy( fmt.p_extra, &p_data[sizeof( WAVEFORMATEX )], fmt.i_extra );
             }
 
             p_stream->i_cat = AUDIO_ES;
-            p_stream->p_es = input_AddES( p_input,
-                         p_input->stream.p_selected_program,
-                         p_sp->i_stream_number, AUDIO_ES, NULL, 0 );
+            p_stream->p_es = es_out_Add( p_input->p_es_out, &fmt );
 
             msg_Dbg( p_input,
-                    "adding new audio stream(codec:0x%x,ID:%d)",
-                    i_codec,
-                    p_sp->i_stream_number );
-            wf_tag_to_fourcc( i_codec, &p_stream->p_es->i_fourcc, NULL );
-
-            if( p_sp->i_type_specific_data_length > 0 )
-            {
-                WAVEFORMATEX    *p_wf;
-                size_t          i_size;
-                uint8_t         *p_data;
-
-                i_size = p_sp->i_type_specific_data_length;
-
-                p_wf = malloc( i_size );
-                p_stream->p_es->p_waveformatex = (void*)p_wf;
-                p_data = p_sp->p_type_specific_data;
-
-                p_wf->wFormatTag        = GetWLE( p_data );
-                p_wf->nChannels         = GetWLE( p_data + 2 );
-                p_wf->nSamplesPerSec    = GetDWLE( p_data + 4 );
-                p_wf->nAvgBytesPerSec   = GetDWLE( p_data + 8 );
-                p_wf->nBlockAlign       = GetWLE( p_data + 12 );
-                p_wf->wBitsPerSample    = GetWLE( p_data + 14 );
-                p_wf->cbSize            = __MIN( GetWLE( p_data + 16 ), i_size - sizeof( WAVEFORMATEX ));
-                if( p_wf->cbSize > 0 )
-                {
-                    memcpy( &p_wf[1], p_data + sizeof( WAVEFORMATEX ), p_wf->cbSize );
-                }
-            }
+                    "added new audio stream(codec:0x%x,ID:%d)",
+                    GetWLE( p_data ), p_sp->i_stream_number );
         }
-        else
-        if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) )
+        else if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) &&
+                 p_sp->i_type_specific_data_length >= 11 + sizeof( BITMAPINFOHEADER ) )
         {
+            es_format_t  fmt;
+            uint8_t      *p_data = &p_sp->p_type_specific_data[11];
+
+            es_format_Init( &fmt, VIDEO_ES,
+                            VLC_FOURCC( p_data[16], p_data[17], p_data[18], p_data[19] ) );
+            fmt.video.i_width = GetDWLE( p_data + 4 );
+            fmt.video.i_height= GetDWLE( p_data + 8 );
+
+            if( p_sp->i_type_specific_data_length > 11 + sizeof( BITMAPINFOHEADER ) )
+            {
+                fmt.i_extra_type = ES_EXTRA_TYPE_BITMAPINFOHEADER;
+                fmt.i_extra = __MIN( GetDWLE( p_data ),
+                                     p_sp->i_type_specific_data_length - 11 - sizeof( BITMAPINFOHEADER ) );
+                fmt.p_extra = malloc( fmt.i_extra );
+                memcpy( fmt.p_extra, &p_data[sizeof( BITMAPINFOHEADER )], fmt.i_extra );
+            }
+
             p_stream->i_cat = VIDEO_ES;
-            p_stream->p_es = input_AddES( p_input,
-                         p_input->stream.p_selected_program,
-                         p_sp->i_stream_number, VIDEO_ES, NULL, 0 );
+            p_stream->p_es = es_out_Add( p_input->p_es_out, &fmt );
 
-            msg_Dbg( p_input, "adding new video stream(ID:%d)",
+            msg_Dbg( p_input, "added new video stream(ID:%d)",
                      p_sp->i_stream_number );
-            if( p_sp->p_type_specific_data )
-            {
-                p_stream->p_es->i_fourcc =
-                    VLC_FOURCC( p_sp->p_type_specific_data[27],
-                                p_sp->p_type_specific_data[28],
-                                p_sp->p_type_specific_data[29],
-                                p_sp->p_type_specific_data[30] );
-            }
-            else
-            {
-                p_stream->p_es->i_fourcc =
-                    VLC_FOURCC( 'u','n','d','f' );
-            }
-            if( p_sp->i_type_specific_data_length > 11 )
-            {
-                BITMAPINFOHEADER *p_bih;
-                size_t      i_size;
-                uint8_t     *p_data;
-
-                i_size = p_sp->i_type_specific_data_length - 11;
-
-                p_bih = malloc( i_size );
-                p_stream->p_es->p_bitmapinfoheader = (void*)p_bih;
-                p_data = p_sp->p_type_specific_data + 11;
-
-                p_bih->biSize       = GetDWLE( p_data );
-                p_bih->biWidth      = GetDWLE( p_data + 4 );
-                p_bih->biHeight     = GetDWLE( p_data + 8 );
-                p_bih->biPlanes     = GetDWLE( p_data + 12 );
-                p_bih->biBitCount   = GetDWLE( p_data + 14 );
-                p_bih->biCompression= GetDWLE( p_data + 16 );
-                p_bih->biSizeImage  = GetDWLE( p_data + 20 );
-                p_bih->biXPelsPerMeter = GetDWLE( p_data + 24 );
-                p_bih->biYPelsPerMeter = GetDWLE( p_data + 28 );
-                p_bih->biClrUsed       = GetDWLE( p_data + 32 );
-                p_bih->biClrImportant  = GetDWLE( p_data + 36 );
-
-                if( i_size > sizeof( BITMAPINFOHEADER ) )
-                {
-                    memcpy( &p_bih[1],
-                            p_data + sizeof( BITMAPINFOHEADER ),
-                            i_size - sizeof( BITMAPINFOHEADER ) );
-                }
-            }
-
         }
         else
         {
@@ -294,15 +239,7 @@ static int Open( vlc_object_t * p_this )
             msg_Dbg( p_input, "ignoring unknown stream(ID:%d)",
                      p_sp->i_stream_number );
         }
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        if( p_stream->p_es )
-        {
-            input_SelectES( p_input, p_stream->p_es );
-        }
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
-
 
     p_sys->i_data_begin = p_sys->p_root->p_data->i_object_pos + 50;
     if( p_sys->p_root->p_data->i_object_size != 0 )
@@ -346,11 +283,6 @@ static int Open( vlc_object_t * p_this )
         }
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_input->stream.p_selected_program->b_is_ok = 1;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-
     /* We add all info about this stream */
     p_cat = input_InfoCategory( p_input, "Asf" );
     if( p_sys->i_length > 0 )
@@ -379,6 +311,8 @@ static int Open( vlc_object_t * p_this )
             input_AddInfo( p_cat, _("Rating"), p_cd->psz_rating );
     }
 
+#if 0
+    /* FIXME to port to new way */
     for( i_stream = 0, i = 0; i < 128; i++ )
     {
         asf_stream_t *tk =  p_sys->stream[i];
@@ -420,17 +354,11 @@ static int Open( vlc_object_t * p_this )
 
             input_AddInfo( p_cat, _("Resolution"), "%dx%d",
                            p_bih->biWidth, p_bih->biHeight );
-            input_AddInfo( p_cat, _("Planes"), "%d", p_bih->biPlanes );
-            input_AddInfo( p_cat, _("Bits Per Pixel"), "%d", p_bih->biBitCount );
-            input_AddInfo( p_cat, _("Image Size"), "%d", p_bih->biSizeImage );
-            input_AddInfo( p_cat, _("X pixels per meter"), "%d",
-                           p_bih->biXPelsPerMeter );
-            input_AddInfo( p_cat, _("Y pixels per meter"), "%d",
-                           p_bih->biYPelsPerMeter );
         }
 
         i_stream++;
     }
+#endif
 
     return VLC_SUCCESS;
 
@@ -449,23 +377,6 @@ static int Demux( input_thread_t *p_input )
     demux_sys_t *p_sys = p_input->p_demux_data;
     vlc_bool_t b_play_audio;
     int i;
-    vlc_bool_t b_stream;
-
-    b_stream = VLC_FALSE;
-    for( i = 0; i < 128; i++ )
-    {
-        if( p_sys->stream[i] &&
-            p_sys->stream[i]->p_es &&
-            p_sys->stream[i]->p_es->p_decoder_fifo )
-        {
-            b_stream = VLC_TRUE;
-        }
-    }
-    if( !b_stream )
-    {
-        msg_Warn( p_input, "no stream selected, exiting..." );
-        return( 0 );
-    }
 
     /* catch seek from user */
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
@@ -586,7 +497,7 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
     for( i_stream = 0; i_stream < 128 ; i_stream++ )
     {
 #define p_stream p_sys->stream[i_stream]
-        if( p_stream && p_stream->p_es && p_stream->p_es->p_decoder_fifo && p_stream->i_time > 0)
+        if( p_stream && p_stream->p_es && p_stream->i_time > 0)
         {
             if( i_time < 0 )
             {
@@ -801,7 +712,7 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
             continue;   // over payload
         }
 
-        if( !p_stream->p_es || !p_stream->p_es->p_decoder_fifo )
+        if( !p_stream->p_es )
         {
             i_skip += i_payload_data_length;
             continue;
@@ -832,19 +743,7 @@ static int DemuxPacket( input_thread_t *p_input, vlc_bool_t b_play_audio )
                 /* send complete packet to decoder */
                 if( p_stream->p_pes->i_pes_size > 0 )
                 {
-                    if( p_stream->p_es->p_decoder_fifo &&
-                        ( b_play_audio || p_stream->i_cat != AUDIO_ES ) )
-                    {
-                        p_stream->p_pes->i_rate =
-                            p_input->stream.control.i_rate;
-                        input_DecodePES( p_stream->p_es->p_decoder_fifo,
-                                         p_stream->p_pes );
-                    }
-                    else
-                    {
-                        input_DeletePES( p_input->p_method_data,
-                                         p_stream->p_pes );
-                    }
+                    es_out_Send( p_input->p_es_out, p_stream->p_es, p_stream->p_pes );
                     p_stream->p_pes = NULL;
                 }
             }

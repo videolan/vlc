@@ -2,7 +2,7 @@
  * a52.c : Raw a52 Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52sys.c,v 1.6 2003/09/12 16:26:40 fenrir Exp $
+ * $Id: a52sys.c,v 1.7 2003/11/11 00:37:59 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -55,7 +55,7 @@ struct demux_sys_t
 {
     mtime_t         i_time;
 
-    es_descriptor_t *p_es;
+    es_out_id_t     *p_es;
 };
 
 static inline int HeaderCheck( const uint8_t * p )
@@ -76,7 +76,7 @@ static int HeaderInfo( const uint8_t * p,
                        int *pi_frame_size );
 
 /*****************************************************************************
- * Open: initializes AAC demux structures
+ * Open: initializes A52 demux structures
  *****************************************************************************/
 static int Open( vlc_object_t * p_this )
 {
@@ -87,6 +87,8 @@ static int Open( vlc_object_t * p_this )
     uint8_t        *p_peek;
 
     module_t       *p_id3;
+
+    es_format_t    fmt;
 
 
     if( p_input->psz_demux && !strncmp( p_input->psz_demux, "a52", 3 ) )
@@ -166,28 +168,11 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "cannot init stream" );
         goto error;
     }
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot add program" );
-        goto error;
-    }
-    p_input->stream.pp_programs[0]->b_is_ok = 0;
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-
     p_input->stream.i_mux_rate = 0 / 50;
-
-    p_sys->p_es = input_AddES( p_input,
-                               p_input->stream.p_selected_program,
-                               1 , AUDIO_ES, NULL, 0 );
-
-    p_sys->p_es->i_stream_id = 1;
-    p_sys->p_es->i_fourcc = VLC_FOURCC( 'a', '5', '2', ' ' );
-    input_SelectES( p_input, p_sys->p_es );
-
-    p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
+    es_format_Init( &fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', ' ' ) );
+    p_sys->p_es = es_out_Add( p_input->p_es_out, &fmt );
     return VLC_SUCCESS;
 
 error:
@@ -265,14 +250,8 @@ static int Demux( input_thread_t * p_input )
                                      p_input->stream.p_selected_program,
                                      p_sys->i_time * 9 / 100 );
 
-    if( !p_sys->p_es->p_decoder_fifo )
-    {
-        msg_Err( p_input, "no audio decoder" );
-        input_DeletePES( p_input->p_method_data, p_pes );
-        return( -1 );
-    }
+    es_out_Send( p_input->p_es_out, p_sys->p_es, p_pes );
 
-    input_DecodePES( p_sys->p_es->p_decoder_fifo, p_pes );
     p_sys->i_time += (mtime_t)1000000 *
                      (mtime_t)1536 /
                      (mtime_t)i_sample_rate;
