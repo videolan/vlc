@@ -1201,7 +1201,7 @@ static __inline__ int input_ReadPacket( input_thread_t *p_input )
     i_base_index = p_input->netlist.i_ts_start;
     if( p_input->netlist.i_ts_start + INPUT_TS_READ_ONCE -1 > INPUT_MAX_TS )
     {
-        /* The netlist is splitted in 2 parts. We must gather them to consolidate
+        /* The netlist is split in 2 parts. We must gather them to consolidate
            the FIFO (we make the loop easily in having the same iovec at the far
            end and in the beginning of netlist_free).
            That's why the netlist is (INPUT_MAX_TS +1) + (INPUT_TS_READ_ONCE -1)

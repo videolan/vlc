@@ -158,7 +158,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                 }
             }
 
-#if 1
+#if 0
             if( p_vpar->synchro.b_all_I )
                 intf_ErrMsg( "  I: 1024/1024  " );
 

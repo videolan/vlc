@@ -5,7 +5,12 @@ Thu Aug 18 00:21:33 BST 2000
     fullscreen when possible. Disabled by default.
   * added sdlvlc (which probably should start in fullscreen, no ?)
   * removed sdlvlc :)
-  * updated debian directory to build vlc-sdl
+  * updated debian directory to build vlc-sdl.
+  * removed CCFLAGS flags which were improperly used.
+  * added hints for powerpc build.
+  * fixed the input_file exit bug.
+  * fixed a Makefile bug which removed the CVS directory.
+  * removed the frame statistics output.
  
 Wed Aug 16 01:07:14 CEST 2000
 0.1.99g :

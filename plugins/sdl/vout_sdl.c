@@ -48,8 +48,6 @@
  * This structure is part of the video output thread descriptor.
  * It describes the SDL specific properties of an output thread.
  *****************************************************************************/
-
-
 typedef struct vout_sys_s
 {
     SDL_Surface *   p_display;                             /* display device */
@@ -61,9 +59,8 @@ typedef struct vout_sys_s
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int     SDLOpenDisplay   (   vout_thread_t *p_vout, 
-                                    char *psz_display, 
-                                    void *p_data );
+static int     SDLOpenDisplay   ( vout_thread_t *p_vout, 
+                                  char *psz_display, void *p_data );
 static void    SDLCloseDisplay  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
@@ -73,13 +70,14 @@ static void    SDLCloseDisplay  ( vout_thread_t *p_vout );
  * vout properties to choose the correct mode, and change them according to the
  * mode actually used.
  *****************************************************************************/
-int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window, void *p_data )
+int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
+                    int i_root_window, void *p_data )
 {
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s\n", strerror(ENOMEM) );
+        intf_ErrMsg( "error: %s\n", strerror(ENOMEM) );
         return( 1 );
     }
 
@@ -87,7 +85,7 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display, int i_root_window,
     
     if( SDLOpenDisplay( p_vout, psz_display, p_data ) )
     {
-        intf_ErrMsg("error: can't initialize SDL display\n");
+        intf_ErrMsg( "error: can't initialize SDL display\n" );
         free( p_vout->p_sys );
         return( 1 );
     }
@@ -181,27 +179,29 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
     /* Initialize library */
     if( SDL_Init(SDL_INIT_VIDEO) < 0 )
     {
-        intf_ErrMsg("error: can't initialize SDL library: %s\n", SDL_GetError());
+        intf_ErrMsg( "error: can't initialize SDL library: %s\n",
+                     SDL_GetError() );
         return( 1 );
     }
 
     /* Open display */
-    if(psz_display != NULL && strcmp(psz_display,"fullscreen")==0)
+    if( psz_display != NULL && strcmp(psz_display,"fullscreen") == 0 )
     {
-        p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
-            p_vout->i_height, 
-            15, 
-            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN );
-    } else {
-        p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
-            p_vout->i_height, 
-            15, 
-            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF );
+        p_vout->p_sys->p_display =
+            SDL_SetVideoMode( p_vout->i_width, p_vout->i_height, 15, 
+                              SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF |
+                              SDL_FULLSCREEN );
+    }
+    else
+    {
+        p_vout->p_sys->p_display =
+            SDL_SetVideoMode( p_vout->i_width, p_vout->i_height, 15, 
+                              SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF );
     }
 	
     if( p_vout->p_sys->p_display == NULL )
     {
-        intf_ErrMsg("error: can't open DISPLAY default display\n");
+        intf_ErrMsg( "error: can't open DISPLAY default display\n" );
         return( 1 );
     }
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);	/* ignore keys up */
@@ -220,8 +220,6 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
 	
 	SDL_Flip(p_vout->p_sys->p_display);
 
-	
-	
     /* Set graphic context colors */
 
 /*
@@ -263,7 +261,8 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
 
     
     /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ], p_vout->p_sys->p_buffer[ 1 ]);
+    vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ],
+                             p_vout->p_sys->p_buffer[ 1 ] );
 
     return( 0 );
 }

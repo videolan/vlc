@@ -79,32 +79,32 @@ endif
 #
 # C compiler flags: compilation
 #
-CCFLAGS += $(DEFINE) $(INCLUDE)
-CCFLAGS += -Wall -Winline
-CCFLAGS += -D_REENTRANT
-CCFLAGS += -D_GNU_SOURCE
+CFLAGS += $(DEFINE) $(INCLUDE)
+CFLAGS += -Wall -Winline
+CFLAGS += -D_REENTRANT
+CFLAGS += -D_GNU_SOURCE
 
 # flags needed for clean beos compilation
 ifeq ($(SYS),beos)
-CCFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
+CFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
 endif
 
 # Optimizations : don't compile debug versions with them
 ifeq ($(DEBUG),0)
-CCFLAGS += -O6
-CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
-CCFLAGS += -fomit-frame-pointer
+CFLAGS += -O6
+CFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
+CFLAGS += -fomit-frame-pointer
 
 # Optimizations for x86 familiy
 ifneq (,$(findstring 86,$(ARCH)))
-CCFLAGS += -malign-double
+CFLAGS += -malign-double
 # Eventual Pentium Pro optimizations
 ifneq (,$(findstring ppro,$(ARCH)))
 ifneq ($(SYS), BSD)
-CCFLAGS += -march=pentiumpro
+CFLAGS += -march=pentiumpro
 endif
 else
-CCFLAGS += -march=pentium
+CFLAGS += -march=pentium
 endif
 # Eventual MMX optimizations for x86
 ifneq (,$(findstring mmx,$(ARCH)))
@@ -113,13 +113,18 @@ endif
 endif
 
 # Optimizations for PowerPC
-ifneq (,$(findstring ppc,$(ARCH)))
-CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
+ifneq (,$(findstring powerpc,$(ARCH)))
+# 604e
+CFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
+# G3
+#CFLAGS += -mcpu=750 -mmultiple -mhard-float -mstring
+# G4
+#CFLAGS += -mcpu=7400 -mmultiple -mhard-float -mstring
 endif
 
 # Optimizations for Sparc
 ifneq (,$(findstring sparc,$(ARCH)))
-CCFLAGS += -mhard-float
+CFLAGS += -mhard-float
 endif
 
 # End of optimizations
@@ -359,7 +364,9 @@ distclean: clean
 	rm -f Makefile include/defs.h include/config.h
 	rm -f config.status config.cache config.log
 	rm -f gmon.out core build-stamp
-	rm -rf .dep debian/tmp
+	rm -rf .dep
+	rm -rf debian/tmp debian/*.debhelper debian/*.substvars
+	find debian/* -type d -maxdepth 0 -name 'vlc-*' | xargs rm -rf
 
 install:
 	mkdir -p $(prefix)/bin
@@ -373,9 +380,9 @@ install:
 
 show:
 	@echo CC: $(CC)
-	@echo CCFLAGS: $(CCFLAGS)
+	@echo CFLAGS: $(CFLAGS)
 	@echo DCFLAGS: $(DCFLAGS)
-	@echo LCFLAGS: $(CCFLAGS)
+	@echo LCFLAGS: $(LCFLAGS)
 
 # ugliest of all, but I have no time to do it -- sam
 snapshot:
@@ -402,11 +409,11 @@ FORCE:
 #
 vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
 ifeq ($(SYS),beos)
-	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) -Xlinker -soname=_APP_ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
+	$(CC) $(CFLAGS) $(LCFLAGS) -Xlinker -soname=_APP_ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
 	rm -f ./plugins/_APP_
 	ln -s ../vlc ./plugins/_APP_
 else
-	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
+	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
 
 #
@@ -427,10 +434,10 @@ $(dependancies): %.d: FORCE
 $(C_OBJ): %.o: Makefile.dep
 $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(CPP_OBJ): %.o: %.cpp
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(ASM_OBJ): %.o: Makefile.dep
 $(ASM_OBJ): %.o: %.S
@@ -440,9 +447,9 @@ $(ASM_OBJ): %.o: %.S
 #$(PLUGIN_OBJ): %.so: .dep/%.d
 
 lib/beos.so: $(PLUGIN_BEOS)
-	$(CC) $(CCFLAGS) $(CFLAGS) $(LCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) $(CFLAGS) $(LCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 $(PLUGIN_BEOS): %.o: %.cpp
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/esd.so: $(PLUGIN_ESD)
 ifneq (,$(findstring bsd,$(SYS)))
@@ -451,70 +458,70 @@ else
 	ld -shared -laudiofile -lesd -o $@ $^
 endif
 $(PLUGIN_ESD): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/dsp.so: $(PLUGIN_DSP)
 	ld -shared -o $@ $^
 $(PLUGIN_DSP): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/dummy.so: $(PLUGIN_DUMMY)
 	ld -shared -o $@ $^
 $(PLUGIN_DUMMY): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/fb.so: $(PLUGIN_FB)
 	ld -shared -o $@ $^
 $(PLUGIN_FB): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/x11.so: $(PLUGIN_X11)
 	ld -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
 $(PLUGIN_X11): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/mga.so: $(PLUGIN_MGA)
 	ld -shared -L/usr/X11R6/lib -lX11 -lXext -o $@ $^
 $(PLUGIN_MGA): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/gnome.so: $(PLUGIN_GNOME)
 	ld -shared `gnome-config --libs gnomeui | sed 's,-rdynamic,,'` -o $@ $^
 $(PLUGIN_GNOME): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) `gnome-config --cflags gnomeui` -c -o $@ $<
+	$(CC) $(CFLAGS) `gnome-config --cflags gnomeui` -c -o $@ $<
 
 lib/glide.so: $(PLUGIN_GLIDE)
 	ld -shared -lglide2x -o $@ $^
 $(PLUGIN_GLIDE): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -I/usr/include/glide -c -o $@ $<
+	$(CC) $(CFLAGS) -I/usr/include/glide -c -o $@ $<
 
 lib/ggi.so: $(PLUGIN_GGI)
 	ld -shared -lggi -o $@ $^
 $(PLUGIN_GGI): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/sdl.so: $(PLUGIN_SDL)
 	ld -shared -lSDL -o $@ $^
 $(PLUGIN_SDL): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/yuv.so: $(PLUGIN_YUV)
 ifeq ($(SYS),beos)
-	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
 	ld -shared -o $@ $^
 endif
 $(PLUGIN_YUV): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
 ifeq ($(SYS),beos)
-	$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
 else
 	ld -shared -o $@ $^
 endif
 $(PLUGIN_YUVMMX): %.o: %.c
-	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 ################################################################################
 # Note on generic rules and dependancies

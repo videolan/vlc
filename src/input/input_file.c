@@ -285,11 +285,13 @@ int file_next( options_t *options )
     /* the check for index == 0 has to be done _before_ */
     p_playlist->i_index--;
 
+    /* close the file we just finished */
     if( options->in != -1 )
     {
         close( options->in );
     }
 
+    /* open the next file */
     if( !strcmp( p_playlist->p_list[ p_playlist->i_index ], "-" ) )
     {
         /* read stdin */
@@ -737,7 +739,9 @@ ssize_t ps_read( options_t *p_options, ps_t * p_ps, void *ts )
 
             if(readbytes == 0)
             {
-                intf_ErrMsg ( "input: ps read error\n");
+                input_file.b_die = 1;
+                vlc_cond_signal( &input_file.in_data.notfull );
+                vlc_thread_join( input_file.disk_thread );
                 return -1;
             }
             p_ps->ps_data = p_ps->ps_buffer;
@@ -753,17 +757,17 @@ ssize_t ps_read( options_t *p_options, ps_t * p_ps, void *ts )
                 return -1;
             }
 
-    p_ps->pes_type = NO_PES;
-    p_ps->offset = 0;
+            p_ps->pes_type = NO_PES;
+            p_ps->offset = 0;
             p_ps->pes_size = (p_ps->ps_data[4] << 8) + p_ps->ps_data[5] + 6;
-    p_ps->has_pts = p_ps->ps_data[7] & 0xc0;
+            p_ps->has_pts = p_ps->ps_data[7] & 0xc0;
         }
 
         /* if the actual data we have in pes_data is not a PES, then
          * we read the next one. */
         if( (p_ps->pes_type == NO_PES) && !p_ps->to_skip )
         {
-    p_ps->pes_id = p_ps->ps_data[3];
+            p_ps->pes_id = p_ps->ps_data[3];
 
             if (p_ps->pes_id == 0xbd)
             {
@@ -860,7 +864,7 @@ ssize_t ps_read( options_t *p_options, ps_t * p_ps, void *ts )
             {
                 case VIDEO_PES:
                 case AUDIO_PES:
-case SUBTITLE_PES:
+                case SUBTITLE_PES:
                 case AC3_PES:
                     pid = get_pid (p_ps);
                     write_media_ts(p_ps, ts, pid);
@@ -927,7 +931,6 @@ void ps_fill( input_file_t * p_if, boolean_t wait )
         if( ps_read( &p_if->options, p_ps, ts = (file_ts_packet *)(p_in_data->buf + p_in_data->end) ) != how_many )
         {
             msleep( 50000 ); /* XXX we need an INPUT_IDLE */
-            intf_ErrMsg( "input error: read() error\n" );
             return;
         }
         
@@ -1019,7 +1022,8 @@ int input_FileOpen( input_thread_t *p_input )
 
     if( file_next( p_options ) < 0 )
     {
-        intf_ErrMsg( "input error: cannot open the file %s", p_input->p_source );
+        intf_ErrMsg( "input error: cannot open the file %s",
+                     p_input->p_source );
     }
 
     input_file.b_die = 0;
@@ -1039,8 +1043,7 @@ int input_FileOpen( input_thread_t *p_input )
         return( 1 );
     }
 
-    
-return( 0 );
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -1063,8 +1066,15 @@ int input_FileRead( input_thread_t *p_input, const struct iovec *p_vector,
     vlc_mutex_lock( &p_in_data->lock );
     while( p_in_data->end == p_in_data->start )
     {
-        if( !input_file.b_die )
-            vlc_cond_wait( &p_in_data->notempty, &p_in_data->lock );
+        if( input_file.b_die )
+        {
+            vlc_mutex_unlock( &p_in_data->lock );
+            /* wait 1 second, like the network input */
+            msleep( 1000000 );
+            return( 0 );
+        }
+
+        vlc_cond_wait( &p_in_data->notempty, &p_in_data->lock );
     }
     vlc_mutex_unlock( &p_in_data->lock );
 
@@ -1093,7 +1103,7 @@ int input_FileRead( input_thread_t *p_input, const struct iovec *p_vector,
     vlc_cond_signal(&p_in_data->notfull);
     vlc_mutex_unlock(&p_in_data->lock);
     
-    return( 188*howmany );
+    return( 188 * howmany );
 }
 
 /*****************************************************************************
@@ -1107,3 +1117,4 @@ void input_FileClose( input_thread_t *p_input )
 
     close( input_file.options.in );
 }
+

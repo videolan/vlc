@@ -66,7 +66,7 @@ int intf_SDLCreate( intf_thread_t *p_intf )
     /* Check that b_video is set */
     if( !p_main->b_video )
     {
-        intf_ErrMsg("error: SDL interface require a video output thread\n");
+        intf_ErrMsg( "error: SDL interface requires a video output thread\n" );
         return( 1 );
     }
 
@@ -90,7 +90,7 @@ int intf_SDLCreate( intf_thread_t *p_intf )
 
     if( p_intf->p_vout == NULL )                                  /* error */
     {
-        intf_ErrMsg("error: can't create video output thread\n" );
+        intf_ErrMsg( "error: can't create video output thread\n" );
         free( p_intf->p_sys );
         return( 1 );
     }
@@ -138,8 +138,8 @@ void intf_SDLManage( intf_thread_t *p_intf )
                 
                 if( intf_ProcessKey( p_intf, (char ) i_key ) )
                 {
-                    intf_DbgMsg("unhandled key '%c' (%i)\n", 
-                                (char) i_key, i_key );
+                    intf_DbgMsg( "unhandled key '%c' (%i)\n", 
+                                 (char) i_key, i_key );
                 }
                 break;
             case SDL_QUIT:
@@ -150,3 +150,4 @@ void intf_SDLManage( intf_thread_t *p_intf )
         }
     }
 }
+

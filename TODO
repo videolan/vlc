@@ -250,7 +250,7 @@ Urgency: Critical
 Description: Fix input_file exit
  input_file does not exit cleanly when the file is finished,
  which makes it impossible to quit the vlc. Fix it.
-Status: Todo
+Status: Done 21 Aug 2000 (sam)
 
 Task: 0x14
 Difficulty: Guru
