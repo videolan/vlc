@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.22 2003/04/30 21:16:24 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.23 2003/05/01 13:51:03 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -48,12 +48,12 @@
 #include "../os_theme.h"
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
+
 #ifndef BASIC_SKINS
 #include "../src/wxdialogs.h"
+#include "share/vlc32x32.xpm"           // include the icon graphic
 #endif
 
-// include the icon graphic
-#include "share/vlc32x32.xpm"
 
 //---------------------------------------------------------------------------
 class CallBackObjects
@@ -156,7 +156,9 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     {
         if( !proc->EventProc( evt ) )
         {
+#ifndef BASIC_SKINS
             wxExit();
+#endif
             return;      // Exit VLC !
         }
     }

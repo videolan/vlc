@@ -1,6 +1,6 @@
-/* XML application for skin.dtd (Id: skin.dtd,v 1.3 2003/03/19 17:14:50 karibu Exp).
+/* XML application for skin.dtd (Id: skin.dtd,v 1.4 2003/04/20 20:28:39 ipkiss Exp).
  * Includes actions from skin.act.
- * Generated 2003/04/20 20:23:13.
+ * Generated 2003/05/01 15:30:24.
  *
  * This program was generated with the FleXML XML processor generator,
  * (Id: flexml.pl,v 1.24 1999/12/13 16:18:30 krisrose Exp).
@@ -28,7 +28,7 @@
 #line 31 "skin.act"
 
         
-            #include "wrappers.h"
+            #include "parser/wrappers.h"
         
     
 void STag_Bitmap(void)
