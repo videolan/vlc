@@ -299,7 +299,8 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
     if( p_pic->i_type == DIRECT_PICTURE )
     {
-        if( !p_vout->render.b_allow_modify_pics || p_pic->i_refcount )
+        if( !p_vout->render.b_allow_modify_pics || p_pic->i_refcount ||
+            p_pic->b_force )
         {
             /* Picture is in a direct buffer and is still in use,
              * we need to copy it to another direct buffer before
@@ -311,7 +312,8 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                  * subtitles. */
                 CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
 
-                vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
+                vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0],
+                                        p_pic , p_subpic );
 
                 return PP_OUTPUTPICTURE[0];
             }
@@ -325,7 +327,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         /* Picture is in a direct buffer but isn't used by the
          * decoder. We can safely render subtitles on it and
          * display it. */
-        vout_RenderSubPictures( p_vout, p_pic, p_subpic );
+        vout_RenderSubPictures( p_vout, p_pic, p_pic, p_subpic );
 
         return p_pic;
     }
@@ -347,41 +349,8 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                 return NULL;
             }
 
-        if( p_subpic == NULL ||
-            ( p_vout->render.b_allow_modify_pics && !p_pic->i_refcount ) )
-        {
-            vout_RenderSubPictures( p_vout, p_pic, p_subpic );
-            CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
-	}
-        else if( PP_OUTPUTPICTURE[0]->b_slow )
-        {
-            /* The picture buffer is in slow memory. We'll use
-             * the "2 * VOUT_MAX_PICTURES + 1" picture as a temporary
-             * one for subpictures rendering. */
-            picture_t *p_tmp_pic = &p_vout->p_picture[2 * VOUT_MAX_PICTURES];
-            if( p_tmp_pic->i_status == FREE_PICTURE )
-            {
-                vout_AllocatePicture( VLC_OBJECT(p_vout),
-                                      p_tmp_pic, p_vout->render.i_chroma,
-                                      p_vout->render.i_width,
-                                      p_vout->render.i_height,
-                                      p_vout->render.i_aspect );
-                p_tmp_pic->i_type = MEMORY_PICTURE;
-                p_tmp_pic->i_status = RESERVED_PICTURE;
-            }
-
-            CopyPicture( p_vout, p_pic, p_tmp_pic );
-
-            vout_RenderSubPictures( p_vout, p_tmp_pic, p_subpic );
-
-            CopyPicture( p_vout, p_tmp_pic, PP_OUTPUTPICTURE[0] );
-        }
-        else
-        {
-            CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
-
-            vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
-        }
+        CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
+        vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_pic, p_subpic );
 
         if( PP_OUTPUTPICTURE[0]->pf_unlock )
             PP_OUTPUTPICTURE[0]->pf_unlock( p_vout, PP_OUTPUTPICTURE[0] );
@@ -415,7 +384,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         p_vout->chroma.pf_convert( p_vout, p_pic, p_tmp_pic );
 
         /* Render subpictures on the first direct buffer */
-        vout_RenderSubPictures( p_vout, p_tmp_pic, p_subpic );
+        vout_RenderSubPictures( p_vout, p_tmp_pic, p_tmp_pic, p_subpic );
 
         if( p_vout->p_picture[0].pf_lock )
             if( p_vout->p_picture[0].pf_lock( p_vout, &p_vout->p_picture[0] ) )
@@ -433,7 +402,8 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         p_vout->chroma.pf_convert( p_vout, p_pic, &p_vout->p_picture[0] );
 
         /* Render subpictures on the first direct buffer */
-        vout_RenderSubPictures( p_vout, &p_vout->p_picture[0], p_subpic );
+        vout_RenderSubPictures( p_vout, &p_vout->p_picture[0],
+                                &p_vout->p_picture[0], p_subpic );
     }
 
     if( p_vout->p_picture[0].pf_unlock )

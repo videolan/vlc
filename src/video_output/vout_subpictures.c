@@ -355,8 +355,8 @@ void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
  *****************************************************************************
  * This function renders all sub picture units in the list.
  *****************************************************************************/
-void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic,
-                             subpicture_t *p_subpic )
+void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic_dst,
+                             picture_t *p_pic_src, subpicture_t *p_subpic )
 {
     /* Load the blending module */
     if( !p_vout->p_blend && p_subpic && p_subpic->p_region )
@@ -392,7 +392,7 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic,
 
         if( p_subpic->pf_render )
         {
-            p_subpic->pf_render( p_vout, p_pic, p_subpic );
+            p_subpic->pf_render( p_vout, p_pic_dst, p_subpic );
         }
         else while( p_region && p_vout->p_blend &&
                     p_vout->p_blend->pf_video_blend )
@@ -457,8 +457,8 @@ void vout_RenderSubPictures( vout_thread_t *p_vout, picture_t *p_pic,
                     p_vout->pi_alpha[3];
             }
 
-            p_vout->p_blend->pf_video_blend( p_vout->p_blend,
-                p_pic, p_pic, &p_region->picture, i_x_offset, i_y_offset );
+            p_vout->p_blend->pf_video_blend( p_vout->p_blend, p_pic_dst,
+                p_pic_src, &p_region->picture, i_x_offset, i_y_offset );
 
             p_region = p_region->p_next;
         }
