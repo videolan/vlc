@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.266 2003/11/27 05:46:01 fenrir Exp $
+ * $Id: input.c,v 1.267 2003/11/28 17:04:31 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -309,8 +309,12 @@ static int RunThread( input_thread_t *p_input )
     {
         /* If we failed, wait before we are killed, and exit */
         p_input->b_error = 1;
+
         ErrorThread( p_input );
-        EndThread( p_input );
+
+        /* Tell we're dead */
+        p_input->b_dead = 1;
+
         return 0;
     }
 
@@ -605,6 +609,12 @@ static int InitThread( input_thread_t * p_input )
 
     if( input_AccessInit( p_input ) == -1 )
     {
+        free( p_input->psz_source );
+        if( p_input->psz_dupsource != NULL )
+        {
+            free( p_input->psz_dupsource );
+        }
+
         return VLC_EGENERIC;
     }
 
@@ -617,6 +627,13 @@ static int InitThread( input_thread_t * p_input )
         {
             msg_Err( p_input, "cannot start stream output instance, aborting" );
             free( val.psz_string );
+
+            input_AccessEnd( p_input );
+            free( p_input->psz_source );
+            if( p_input->psz_dupsource != NULL )
+            {
+                free( p_input->psz_dupsource );
+            }
             return VLC_EGENERIC;
         }
         free( val.psz_string );
@@ -655,6 +672,13 @@ static int InitThread( input_thread_t * p_input )
         {
             sout_DeleteInstance( p_input->stream.p_sout );
         }
+
+        input_AccessEnd( p_input );
+        free( p_input->psz_source );
+        if( p_input->psz_dupsource != NULL )
+        {
+            free( p_input->psz_dupsource );
+        }
         return VLC_EGENERIC;
     }
 
@@ -686,6 +710,12 @@ static int InitThread( input_thread_t * p_input )
                 {
                     sout_DeleteInstance( p_input->stream.p_sout );
                 }
+                input_AccessEnd( p_input );
+                free( p_input->psz_source );
+                if( p_input->psz_dupsource != NULL )
+                {
+                    free( p_input->psz_dupsource );
+                }
                 return VLC_EGENERIC;
             }
         }
@@ -698,10 +728,17 @@ static int InitThread( input_thread_t * p_input )
         /* should nver occur yet */
 
         msg_Err( p_input, "cannot create stream_t !" );
+
         module_Unneed( p_input, p_input->p_access );
         if ( p_input->stream.p_sout != NULL )
         {
             sout_DeleteInstance( p_input->stream.p_sout );
+        }
+        input_AccessEnd( p_input );
+        free( p_input->psz_source );
+        if( p_input->psz_dupsource != NULL )
+        {
+            free( p_input->psz_dupsource );
         }
         return VLC_EGENERIC;
     }
@@ -716,11 +753,18 @@ static int InitThread( input_thread_t * p_input )
     {
         msg_Err( p_input, "no suitable demux module for `%s/%s://%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
+
         stream_Release( p_input->s );
         module_Unneed( p_input, p_input->p_access );
         if ( p_input->stream.p_sout != NULL )
         {
             sout_DeleteInstance( p_input->stream.p_sout );
+        }
+        input_AccessEnd( p_input );
+        free( p_input->psz_source );
+        if( p_input->psz_dupsource != NULL )
+        {
+            free( p_input->psz_dupsource );
         }
         return VLC_EGENERIC;
     }
