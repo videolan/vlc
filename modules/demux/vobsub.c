@@ -122,14 +122,14 @@ static int Open ( vlc_object_t *p_this )
         {
             msg_Dbg( p_demux, "this doesn't seem to be a vobsub file" );
             free( s );
+            if( stream_Seek( p_demux->s, 0 ) )
+            {
+                msg_Warn( p_demux, "failed to rewind" );
+            }
             return VLC_EGENERIC;
         }
         free( s );
 
-        if( stream_Seek( p_demux->s, 0 ) )
-        {
-            msg_Warn( p_demux, "failed to rewind" );
-        }
     }
     else
     {
