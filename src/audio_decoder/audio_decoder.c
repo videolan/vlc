@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audio_decoder.c: MPEG1 Layer I-II audio decoder thread
+ * audio_decoder.c: MPEG1 Layer I-II audio decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -25,176 +25,16 @@
  * TODO :
  *
  * - optimiser les NeedBits() et les GetBits() du code là où c'est possible ;
- * - vlc_cond_signal() / vlc_cond_wait() ;
  *
  */
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-#include "defs.h"
-
-#include <unistd.h>                                              /* getpid() */
-
-#include <stdio.h>                                           /* "intf_msg.h" */
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                            /* "input.h" */
-
-#include "config.h"
-#include "common.h"
-#include "threads.h"
-#include "mtime.h"
-#include "plugins.h"
-#include "debug.h"                                      /* "input_netlist.h" */
-
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-
-#include "input.h"                                           /* pes_packet_t */
-#include "input_netlist.h"                         /* input_NetlistFreePES() */
-#include "decoder_fifo.h"         /* DECODER_FIFO_(ISEMPTY|START|INCSTART)() */
-
-#include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
-
+#include "int_types.h"
 #include "audio_constants.h"
 #include "audio_decoder.h"
 #include "audio_math.h"                                    /* DCT32(), PCM() */
+#include "audio_bit_stream.h"
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int      InitThread              ( adec_thread_t * p_adec );
-static void     RunThread               ( adec_thread_t * p_adec );
-static void     ErrorThread             ( adec_thread_t * p_adec );
-static void     EndThread               ( adec_thread_t * p_adec );
-
-/*
-static int      adec_Layer1_Mono        ( adec_thread_t * p_adec );
-static int      adec_Layer1_Stereo      ( adec_thread_t * p_adec );
-static int      adec_Layer2_Mono        ( adec_thread_t * p_adec );
-static int      adec_Layer2_Stereo      ( adec_thread_t * p_adec );
-
-static byte_t   GetByte                 ( bit_stream_t * p_bit_stream );
-static void     NeedBits                ( bit_stream_t * p_bit_stream, int i_bits );
-static void     DumpBits                ( bit_stream_t * p_bit_stream, int i_bits );
-static int      FindHeader              ( adec_thread_t * p_adec );
-*/
-
-/*****************************************************************************
- * adec_CreateThread: creates an audio decoder thread
- *****************************************************************************
- * This function creates a new audio decoder thread, and returns a pointer to
- * its description. On error, it returns NULL.
- *****************************************************************************/
-adec_thread_t * adec_CreateThread( input_thread_t * p_input )
-{
-    adec_thread_t *     p_adec;
-
-    intf_DbgMsg("adec debug: creating audio decoder thread\n");
-
-    /* Allocate the memory needed to store the thread's structure */
-    if ( (p_adec = (adec_thread_t *)malloc( sizeof(adec_thread_t) )) == NULL )
-    {
-        intf_ErrMsg("adec error: not enough memory for adec_CreateThread() to create the new thread\n");
-        return( NULL );
-    }
-
-    /*
-     * Initialize the thread properties
-     */
-    p_adec->b_die = 0;
-    p_adec->b_error = 0;
-
-    /*
-     * Initialize the input properties
-     */
-    /* Initialize the decoder fifo's data lock and conditional variable and set
-     * its buffer as empty */
-    vlc_mutex_init( &p_adec->fifo.data_lock );
-    vlc_cond_init( &p_adec->fifo.data_wait );
-    p_adec->fifo.i_start = 0;
-    p_adec->fifo.i_end = 0;
-    /* Initialize the bit stream structure */
-    p_adec->bit_stream.p_input = p_input;
-    p_adec->bit_stream.p_decoder_fifo = &p_adec->fifo;
-    p_adec->bit_stream.fifo.buffer = 0;
-    p_adec->bit_stream.fifo.i_available = 0;
-
-    /*
-     * Initialize the decoder properties
-     */
-    p_adec->bank_0.actual = p_adec->bank_0.v1;
-    p_adec->bank_0.pos = 0;
-    p_adec->bank_1.actual = p_adec->bank_1.v1;
-    p_adec->bank_1.pos = 0;
-
-    /*
-     * Initialize the output properties
-     */
-    p_adec->p_aout = p_input->p_aout;
-    p_adec->p_aout_fifo = NULL;
-
-    /* Spawn the audio decoder thread */
-    if ( vlc_thread_create(&p_adec->thread_id, "audio decoder", (vlc_thread_func_t)RunThread, (void *)p_adec) )
-    {
-        intf_ErrMsg("adec error: can't spawn audio decoder thread\n");
-        free( p_adec );
-        return( NULL );
-    }
-
-    intf_DbgMsg("adec debug: audio decoder thread (%p) created\n", p_adec);
-    return( p_adec );
-}
-
-/*****************************************************************************
- * adec_DestroyThread: destroys an audio decoder thread
- *****************************************************************************
- * This function asks an audio decoder thread to terminate. This function has
- * not to wait until the decoder thread has really died, because the killer (ie
- * this function's caller) is the input thread, that's why we are sure that no
- * other thread will try to access to this thread's descriptor after its
- * destruction.
- *****************************************************************************/
-void adec_DestroyThread( adec_thread_t * p_adec )
-{
-    intf_DbgMsg("adec debug: requesting termination of audio decoder thread %p\n", p_adec);
-
-    /* Ask thread to kill itself */
-    p_adec->b_die = 1;
-
-    /* Make sure the decoder thread leaves the GetByte() function */
-    vlc_mutex_lock( &(p_adec->fifo.data_lock) );
-    vlc_cond_signal( &(p_adec->fifo.data_wait) );
-    vlc_mutex_unlock( &(p_adec->fifo.data_lock) );
-
-    /* Waiting for the decoder thread to exit */
-    /* Remove this as soon as the "status" flag is implemented */
-    vlc_thread_join( p_adec->thread_id );
-}
-
-/* Following functions are local */
-
-/*****************************************************************************
- * FindHeader : parses an input stream until an audio frame header could be
- *              found
- *****************************************************************************
- * When this function returns successfully, the header can be found in the
- * buffer of the bit stream fifo.
- *****************************************************************************/
-static int FindHeader( adec_thread_t * p_adec )
-{
-    while ( (!p_adec->b_die) && (!p_adec->b_error) )
-    {
-        NeedBits( &p_adec->bit_stream, 32 );
-        if ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_SYNCWORD_MASK) == ADEC_HEADER_SYNCWORD_MASK )
-        {
-            return( 0 );
-        }
-        DumpBits( &p_adec->bit_stream, 8 );
-    }
-
-    return( -1 );
-}
+#define NULL ((void *)0)
 
 /*****************************************************************************
  * adec_Layer`L'_`M': decodes an mpeg 1, layer `L', mode `M', audio frame
@@ -208,41 +48,41 @@ static int FindHeader( adec_thread_t * p_adec )
 /*****************************************************************************
  * adec_Layer1_Mono
  *****************************************************************************/
-static __inline__ int adec_Layer1_Mono( adec_thread_t * p_adec )
+static __inline__ int adec_Layer1_Mono (audiodec_t * p_adec)
 {
-    p_adec->bit_stream.fifo.buffer = 0;
-    p_adec->bit_stream.fifo.i_available = 0;
-    return( 0 );
+    p_adec->bit_stream.buffer = 0;
+    p_adec->bit_stream.i_available = 0;
+    return (0);
 }
 
 /*****************************************************************************
  * adec_Layer1_Stereo
  *****************************************************************************/
-static __inline__ int adec_Layer1_Stereo( adec_thread_t * p_adec )
+static __inline__ int adec_Layer1_Stereo (audiodec_t * p_adec)
 {
-    p_adec->bit_stream.fifo.buffer = 0;
-    p_adec->bit_stream.fifo.i_available = 0;
-    return( 0 );
+    p_adec->bit_stream.buffer = 0;
+    p_adec->bit_stream.i_available = 0;
+    return (0);
 }
 
 /*****************************************************************************
  * adec_Layer2_Mono
  *****************************************************************************/
-static __inline__ int adec_Layer2_Mono( adec_thread_t * p_adec )
+static __inline__ int adec_Layer2_Mono (audiodec_t * p_adec)
 {
-    p_adec->bit_stream.fifo.buffer = 0;
-    p_adec->bit_stream.fifo.i_available = 0;
-    return( 0 );
+    p_adec->bit_stream.buffer = 0;
+    p_adec->bit_stream.i_available = 0;
+    return (0);
 }
 
 /*****************************************************************************
  * adec_Layer2_Stereo
  *****************************************************************************/
-static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
+static __inline__ int adec_Layer2_Stereo (audiodec_t * p_adec, s16 * buffer)
 {
     typedef struct requantization_s
     {
-        byte_t                          i_bits_per_codeword;
+        u8                              i_bits_per_codeword;
         const float *                   pf_ungroup;
         float                           f_slope;
         float                           f_offset;
@@ -256,9 +96,9 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
     int                                 i_sb, i_nbal;
     float                               f_scalefactor_0, f_scalefactor_1;
 
-    static const byte_t                 ppi_bitrate_per_channel_index[4][15] = ADEC_LAYER2_BITRATE_PER_CHANNEL_INDEX;
-    static const byte_t                 ppi_sblimit[3][11] = ADEC_LAYER2_SBLIMIT;
-    static const byte_t                 ppi_nbal[2][32] = ADEC_LAYER2_NBAL;
+    static const u8                     ppi_bitrate_per_channel_index[4][15] = ADEC_LAYER2_BITRATE_PER_CHANNEL_INDEX;
+    static const u8                     ppi_sblimit[3][11] = ADEC_LAYER2_SBLIMIT;
+    static const u8                     ppi_nbal[2][32] = ADEC_LAYER2_NBAL;
 
     static const float                  pf_ungroup3[3*3*3 * 3] = ADEC_LAYER2_UNGROUP3;
     static const float                  pf_ungroup5[5*5*5 * 3] = ADEC_LAYER2_UNGROUP5;
@@ -273,7 +113,7 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
 
     static int                          i_sblimit, i_bitrate_per_channel_index;
     static int                          pi_scfsi_0[30], pi_scfsi_1[30];
-    static const byte_t *               pi_nbal;
+    static const u8 *                   pi_nbal;
     static float                        ppf_sample_0[3][32], ppf_sample_1[3][32];
     static const requantization_t *     pp_requantization_0[30];
     static const requantization_t *     pp_requantization_1[30];
@@ -286,7 +126,6 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
     int                                 i_2nbal, i_gr;
     float                               f_dummy;
 
-    long                                l_end_frame;
     s16 *                               p_s16;
 
     int                                 i_need = 0, i_dump = 0;
@@ -295,19 +134,17 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
 #endif
 
     /* Read the audio frame header and flush the bit buffer */
-    i_header = p_adec->bit_stream.fifo.buffer;
-    p_adec->bit_stream.fifo.buffer = 0;
-    p_adec->bit_stream.fifo.i_available = 0;
+    i_header = p_adec->header;
     /* Read the sampling frequency (see ISO/IEC 11172-3 2.4.2.3) */
     i_sampling_frequency = (int)((i_header & ADEC_HEADER_SAMPLING_FREQUENCY_MASK)
         >> ADEC_HEADER_SAMPLING_FREQUENCY_SHIFT);
     /* Read the mode (see ISO/IEC 11172-3 2.4.2.3) */
     i_mode = (int)((i_header & ADEC_HEADER_MODE_MASK) >> ADEC_HEADER_MODE_SHIFT);
     /* If a CRC can be found in the frame, get rid of it */
-    if ( (i_header & ADEC_HEADER_PROTECTION_BIT_MASK) == 0 )
+    if ((i_header & ADEC_HEADER_PROTECTION_BIT_MASK) == 0)
     {
-        GetByte( &p_adec->bit_stream );
-        GetByte( &p_adec->bit_stream );
+        NeedBits (&p_adec->bit_stream, 16);
+        DumpBits (&p_adec->bit_stream, 16);
     }
 
     /* Find out the bitrate per channel index */
@@ -316,18 +153,18 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
     /* Find out the number of subbands */
     i_sblimit = (int)ppi_sblimit[i_sampling_frequency][i_bitrate_per_channel_index];
     /* Check if the frame is valid or not */
-    if ( i_sblimit == 0 )
+    if (i_sblimit == 0)
     {
-        return( 0 );                                 /* the frame is invalid */
+        return (0);                                 /* the frame is invalid */
     }
     /* Find out the number of bits allocated */
     pi_nbal = ppi_nbal[ (i_bitrate_per_channel_index <= 2) ? 0 : 1 ];
 
     /* Find out the `bound' subband (see ISO/IEC 11172-3 2.4.2.3) */
-    if ( i_mode == 1 )
+    if (i_mode == 1)
     {
         i_bound = (int)(((i_header & ADEC_HEADER_MODE_EXTENSION_MASK) >> (ADEC_HEADER_MODE_EXTENSION_SHIFT - 2)) + 4);
-        if ( i_bound > i_sblimit )
+        if (i_bound > i_sblimit)
         {
             i_bound = i_sblimit;
         }
@@ -338,38 +175,38 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
     }
 
     /* Read the allocation information (see ISO/IEC 11172-3 2.4.1.6) */
-    for ( i_sb = 0; i_sb < i_bound; i_sb++ )
+    for (i_sb = 0; i_sb < i_bound; i_sb++)
     {
         i_2nbal = 2 * (i_nbal = (int)pi_nbal[ i_sb ]);
-        NeedBits( &p_adec->bit_stream, i_2nbal );
+        NeedBits (&p_adec->bit_stream, i_2nbal);
         i_need += i_2nbal;
-        pi_allocation_0[ i_sb ] = (int)(p_adec->bit_stream.fifo.buffer >> (32 - i_nbal));
-        p_adec->bit_stream.fifo.buffer <<= i_nbal;
-        pi_allocation_1[ i_sb ] = (int)(p_adec->bit_stream.fifo.buffer >> (32 - i_nbal));
-        p_adec->bit_stream.fifo.buffer <<= i_nbal;
-        p_adec->bit_stream.fifo.i_available -= i_2nbal;
+        pi_allocation_0[ i_sb ] = (int)(p_adec->bit_stream.buffer >> (32 - i_nbal));
+        p_adec->bit_stream.buffer <<= i_nbal;
+        pi_allocation_1[ i_sb ] = (int)(p_adec->bit_stream.buffer >> (32 - i_nbal));
+        p_adec->bit_stream.buffer <<= i_nbal;
+        p_adec->bit_stream.i_available -= i_2nbal;
         i_dump += i_2nbal;
     }
-    for ( ; i_sb < i_sblimit; i_sb++ )
+    for (; i_sb < i_sblimit; i_sb++)
     {
         i_nbal = (int)pi_nbal[ i_sb ];
-        NeedBits( &p_adec->bit_stream, i_nbal );
+        NeedBits (&p_adec->bit_stream, i_nbal);
         i_need += i_nbal;
-        pi_allocation_0[ i_sb ] = (int)(p_adec->bit_stream.fifo.buffer >> (32 - i_nbal));
-        DumpBits( &p_adec->bit_stream, i_nbal );
+        pi_allocation_0[ i_sb ] = (int)(p_adec->bit_stream.buffer >> (32 - i_nbal));
+        DumpBits (&p_adec->bit_stream, i_nbal);
         i_dump += i_nbal;
     }
 
-#define MACRO( p_requantization ) \
-    for ( i_sb = 0; i_sb < i_bound; i_sb++ ) \
+#define MACRO(p_requantization) \
+    for (i_sb = 0; i_sb < i_bound; i_sb++) \
     { \
-        if ( pi_allocation_0[i_sb] ) \
+        if (pi_allocation_0[i_sb]) \
         { \
             pp_requantization_0[i_sb] = &((p_requantization)[pi_allocation_0[i_sb]]); \
-            NeedBits( &p_adec->bit_stream, 2 ); \
+            NeedBits (&p_adec->bit_stream, 2); \
             i_need += 2; \
-            pi_scfsi_0[i_sb] = (int)(p_adec->bit_stream.fifo.buffer >> (32 - 2)); \
-            DumpBits( &p_adec->bit_stream, 2 ); \
+            pi_scfsi_0[i_sb] = (int)(p_adec->bit_stream.buffer >> (32 - 2)); \
+            DumpBits (&p_adec->bit_stream, 2); \
             i_dump += 2; \
         } \
         else \
@@ -379,13 +216,13 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
             ppf_sample_0[2][i_sb] = .0; \
         } \
 \
-        if ( pi_allocation_1[i_sb] ) \
+        if (pi_allocation_1[i_sb]) \
         { \
             pp_requantization_1[i_sb] = &((p_requantization)[pi_allocation_1[i_sb]]); \
-            NeedBits( &p_adec->bit_stream, 2 ); \
+            NeedBits (&p_adec->bit_stream, 2); \
             i_need += 2; \
-            pi_scfsi_1[i_sb] = (int)(p_adec->bit_stream.fifo.buffer >> (32 - 2)); \
-            DumpBits( &p_adec->bit_stream, 2 ); \
+            pi_scfsi_1[i_sb] = (int)(p_adec->bit_stream.buffer >> (32 - 2)); \
+            DumpBits (&p_adec->bit_stream, 2); \
             i_dump += 2; \
         } \
         else \
@@ -396,18 +233,18 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
         } \
     } \
 \
-    for ( ; i_sb < i_sblimit; i_sb++ ) \
+    for (; i_sb < i_sblimit; i_sb++) \
     { \
-        if ( pi_allocation_0[i_sb] ) \
+        if (pi_allocation_0[i_sb]) \
         { \
             pp_requantization_0[i_sb] = &((p_requantization)[pi_allocation_0[i_sb]]); \
-            NeedBits( &p_adec->bit_stream, 4 ); \
+            NeedBits (&p_adec->bit_stream, 4); \
             i_need += 4; \
-            pi_scfsi_0[i_sb] = (int)(p_adec->bit_stream.fifo.buffer >> (32 - 2)); \
-            p_adec->bit_stream.fifo.buffer <<= 2; \
-            pi_scfsi_1[i_sb] = (int)(p_adec->bit_stream.fifo.buffer >> (32 - 2)); \
-            p_adec->bit_stream.fifo.buffer <<= 2; \
-            p_adec->bit_stream.fifo.i_available -= 4; \
+            pi_scfsi_0[i_sb] = (int)(p_adec->bit_stream.buffer >> (32 - 2)); \
+            p_adec->bit_stream.buffer <<= 2; \
+            pi_scfsi_1[i_sb] = (int)(p_adec->bit_stream.buffer >> (32 - 2)); \
+            p_adec->bit_stream.buffer <<= 2; \
+            p_adec->bit_stream.i_available -= 4; \
             i_dump += 4; \
         } \
         else \
@@ -422,87 +259,87 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
     }
 /* #define MACRO */
 
-    if ( i_bitrate_per_channel_index <= 2 )
+    if (i_bitrate_per_channel_index <= 2)
     {
-        MACRO( p_requantization_cd )
+        MACRO (p_requantization_cd)
     }
     else
     {
-        MACRO( pp_requantization_ab[i_sb] )
+        MACRO (pp_requantization_ab[i_sb])
     }
 
-#define SWITCH( pi_scfsi, pf_scalefactor_0, pf_scalefactor_1, pf_scalefactor_2 )\
-    switch ( (pi_scfsi)[i_sb] ) \
+#define SWITCH(pi_scfsi,pf_scalefactor_0,pf_scalefactor_1,pf_scalefactor_2) \
+    switch ((pi_scfsi)[i_sb]) \
     { \
         case 0: \
-            NeedBits( &p_adec->bit_stream, (3*6) ); \
+            NeedBits (&p_adec->bit_stream, (3*6)); \
             i_need += 18; \
-            (pf_scalefactor_0)[i_sb] = pf_scalefactor[p_adec->bit_stream.fifo.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.fifo.buffer <<= 6; \
-            (pf_scalefactor_1)[i_sb] = pf_scalefactor[p_adec->bit_stream.fifo.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.fifo.buffer <<= 6; \
-            (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.fifo.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.fifo.buffer <<= 6; \
-            p_adec->bit_stream.fifo.i_available -= (3*6); \
+           (pf_scalefactor_0)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
+            p_adec->bit_stream.buffer <<= 6; \
+           (pf_scalefactor_1)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
+            p_adec->bit_stream.buffer <<= 6; \
+           (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
+            p_adec->bit_stream.buffer <<= 6; \
+            p_adec->bit_stream.i_available -= (3*6); \
             i_dump += 18; \
             break; \
 \
         case 1: \
-            NeedBits( &p_adec->bit_stream, (2*6) ); \
+            NeedBits (&p_adec->bit_stream, (2*6)); \
             i_need += 12; \
-            (pf_scalefactor_0)[i_sb] = \
-                (pf_scalefactor_1)[i_sb] = pf_scalefactor[p_adec->bit_stream.fifo.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.fifo.buffer <<= 6; \
-            (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.fifo.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.fifo.buffer <<= 6; \
-            p_adec->bit_stream.fifo.i_available -= (2*6); \
+           (pf_scalefactor_0)[i_sb] = \
+               (pf_scalefactor_1)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
+            p_adec->bit_stream.buffer <<= 6; \
+           (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
+            p_adec->bit_stream.buffer <<= 6; \
+            p_adec->bit_stream.i_available -= (2*6); \
             i_dump += 12; \
             break; \
 \
         case 2: \
-            NeedBits( &p_adec->bit_stream, (1*6) ); \
+            NeedBits (&p_adec->bit_stream, (1*6)); \
             i_need += 6; \
-            (pf_scalefactor_0)[i_sb] = \
-                (pf_scalefactor_1)[i_sb] = \
-                (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.fifo.buffer >> (32 - 6)]; \
-            DumpBits( &p_adec->bit_stream, (1*6) ); \
+           (pf_scalefactor_0)[i_sb] = \
+               (pf_scalefactor_1)[i_sb] = \
+               (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
+            DumpBits (&p_adec->bit_stream, (1*6)); \
             i_dump += 6; \
             break; \
 \
         case 3: \
-            NeedBits( &p_adec->bit_stream, (2*6) ); \
+            NeedBits (&p_adec->bit_stream, (2*6)); \
             i_need += 12; \
-            (pf_scalefactor_0)[i_sb] = pf_scalefactor[p_adec->bit_stream.fifo.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.fifo.buffer <<= 6; \
-            (pf_scalefactor_1)[i_sb] = \
-                (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.fifo.buffer >> (32 - 6)]; \
-            p_adec->bit_stream.fifo.buffer <<= 6; \
-            p_adec->bit_stream.fifo.i_available -= (2*6); \
+           (pf_scalefactor_0)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
+            p_adec->bit_stream.buffer <<= 6; \
+           (pf_scalefactor_1)[i_sb] = \
+               (pf_scalefactor_2)[i_sb] = pf_scalefactor[p_adec->bit_stream.buffer >> (32 - 6)]; \
+            p_adec->bit_stream.buffer <<= 6; \
+            p_adec->bit_stream.i_available -= (2*6); \
             i_dump += 12; \
             break; \
     }
 /* #define SWITCH */
 
-    for ( i_sb = 0; i_sb < i_bound; i_sb++ )
+    for (i_sb = 0; i_sb < i_bound; i_sb++)
     {
-        if ( pi_allocation_0[i_sb] )
+        if (pi_allocation_0[i_sb])
         {
-            SWITCH( pi_scfsi_0, pf_scalefactor_0_0, pf_scalefactor_0_1, pf_scalefactor_0_2 )
+            SWITCH (pi_scfsi_0, pf_scalefactor_0_0, pf_scalefactor_0_1, pf_scalefactor_0_2)
         }
-        if ( pi_allocation_1[i_sb] )
+        if (pi_allocation_1[i_sb])
         {
-            SWITCH( pi_scfsi_1, pf_scalefactor_1_0, pf_scalefactor_1_1, pf_scalefactor_1_2 )
+            SWITCH (pi_scfsi_1, pf_scalefactor_1_0, pf_scalefactor_1_1, pf_scalefactor_1_2)
         }
     }
-    for ( ; i_sb < i_sblimit; i_sb++ )
+    for (; i_sb < i_sblimit; i_sb++)
     {
-        if ( pi_allocation_0[i_sb] )
+        if (pi_allocation_0[i_sb])
         {
-            SWITCH( pi_scfsi_0, pf_scalefactor_0_0, pf_scalefactor_0_1, pf_scalefactor_0_2 )
-            SWITCH( pi_scfsi_1, pf_scalefactor_1_0, pf_scalefactor_1_1, pf_scalefactor_1_2 )
+            SWITCH (pi_scfsi_0, pf_scalefactor_0_0, pf_scalefactor_0_1, pf_scalefactor_0_2)
+            SWITCH (pi_scfsi_1, pf_scalefactor_1_0, pf_scalefactor_1_1, pf_scalefactor_1_2)
         }
     }
-    for ( ; i_sb < 32; i_sb++ )
+    for (; i_sb < 32; i_sb++)
     {
         ppf_sample_0[0][i_sb] = .0;
         ppf_sample_0[1][i_sb] = .0;
@@ -512,115 +349,106 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
         ppf_sample_1[2][i_sb] = .0;
     }
 
-#define NEXT_BUF \
-/* fprintf(stderr, "%p\n", p_adec->p_aout_fifo->buffer); */ \
-/* fprintf(stderr, "l_end_frame == %li, %p\n", l_end_frame, (aout_frame_t *)p_adec->p_aout_fifo->buffer + l_end_frame); */ \
-    p_s16 = ((adec_frame_t *)p_adec->p_aout_fifo->buffer)[ l_end_frame ]; \
-/* fprintf(stderr, "p_s16 == %p\n", p_s16); */ \
-    l_end_frame += 1; \
-    l_end_frame &= AOUT_FIFO_SIZE;
-/* #define NEXT_BUF */
-
-#define GROUPTEST( pp_requantization, ppf_sample, pf_sf ) \
+#define GROUPTEST(pp_requantization,ppf_sample,pf_sf) \
     requantization = *((pp_requantization)[i_sb]); \
-    if ( requantization.pf_ungroup == NULL ) \
+    if (requantization.pf_ungroup == NULL) \
     { \
-        NeedBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+        NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
         i_need += requantization.i_bits_per_codeword; \
-        (ppf_sample)[0][i_sb] = (f_scalefactor_0 = (pf_sf)[i_sb]) * (requantization.f_slope * \
-            (p_adec->bit_stream.fifo.buffer >> (32 - requantization.i_bits_per_codeword)) + requantization.f_offset); \
-        DumpBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+       (ppf_sample)[0][i_sb] = (f_scalefactor_0 = (pf_sf)[i_sb]) * (requantization.f_slope * \
+           (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)) + requantization.f_offset); \
+        DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
         i_dump += requantization.i_bits_per_codeword; \
 \
-        NeedBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+        NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
         i_need += requantization.i_bits_per_codeword; \
-        (ppf_sample)[1][i_sb] = f_scalefactor_0 * (requantization.f_slope * \
-            (p_adec->bit_stream.fifo.buffer >> (32 - requantization.i_bits_per_codeword)) + requantization.f_offset); \
-        DumpBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+       (ppf_sample)[1][i_sb] = f_scalefactor_0 * (requantization.f_slope * \
+           (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)) + requantization.f_offset); \
+        DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
         i_dump += requantization.i_bits_per_codeword; \
 \
-        NeedBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+        NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
         i_need += requantization.i_bits_per_codeword; \
-        (ppf_sample)[2][i_sb] = f_scalefactor_0 * (requantization.f_slope * \
-            (p_adec->bit_stream.fifo.buffer >> (32 - requantization.i_bits_per_codeword)) + requantization.f_offset); \
-        DumpBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+       (ppf_sample)[2][i_sb] = f_scalefactor_0 * (requantization.f_slope * \
+           (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)) + requantization.f_offset); \
+        DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
         i_dump += requantization.i_bits_per_codeword; \
     } \
     else \
     { \
-        NeedBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+        NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
         i_need += requantization.i_bits_per_codeword; \
         pf_ungroup = requantization.pf_ungroup + 3 * \
-            (p_adec->bit_stream.fifo.buffer >> (32 - requantization.i_bits_per_codeword)); \
-        DumpBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+           (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)); \
+        DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
         i_dump += requantization.i_bits_per_codeword; \
-        (ppf_sample)[0][i_sb] = (f_scalefactor_0 = (pf_sf)[i_sb]) * pf_ungroup[0]; \
-        (ppf_sample)[1][i_sb] = f_scalefactor_0 * pf_ungroup[1]; \
-        (ppf_sample)[2][i_sb] = f_scalefactor_0 * pf_ungroup[2]; \
+       (ppf_sample)[0][i_sb] = (f_scalefactor_0 = (pf_sf)[i_sb]) * pf_ungroup[0]; \
+       (ppf_sample)[1][i_sb] = f_scalefactor_0 * pf_ungroup[1]; \
+       (ppf_sample)[2][i_sb] = f_scalefactor_0 * pf_ungroup[2]; \
     }
 /* #define GROUPTEST */
 
-#define READ_SAMPLE_L2S( pf_scalefactor_0, pf_scalefactor_1, i_grlimit ) \
-    for ( ; i_gr < (i_grlimit); i_gr++ ) \
+#define READ_SAMPLE_L2S(pf_scalefactor_0,pf_scalefactor_1,i_grlimit) \
+    for (; i_gr < (i_grlimit); i_gr++) \
     { \
-        for ( i_sb = 0; i_sb < i_bound; i_sb++ ) \
+        for (i_sb = 0; i_sb < i_bound; i_sb++) \
         { \
-            if ( pi_allocation_0[i_sb] ) \
+            if (pi_allocation_0[i_sb]) \
             { \
-                GROUPTEST( pp_requantization_0, ppf_sample_0, (pf_scalefactor_0) ) \
+                GROUPTEST (pp_requantization_0, ppf_sample_0, (pf_scalefactor_0)) \
             } \
-            if ( pi_allocation_1[i_sb] ) \
+            if (pi_allocation_1[i_sb]) \
             { \
-                GROUPTEST( pp_requantization_1, ppf_sample_1, (pf_scalefactor_1) ) \
+                GROUPTEST (pp_requantization_1, ppf_sample_1, (pf_scalefactor_1)) \
             } \
         } \
-        for ( ; i_sb < i_sblimit; i_sb++ ) \
+        for (; i_sb < i_sblimit; i_sb++) \
         { \
-            if ( pi_allocation_0[i_sb] ) \
+            if (pi_allocation_0[i_sb]) \
             { \
                 requantization = *(pp_requantization_0[i_sb]); \
-                if ( requantization.pf_ungroup == NULL ) \
+                if (requantization.pf_ungroup == NULL) \
                 { \
-                    NeedBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+                    NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
                     i_need += requantization.i_bits_per_codeword; \
                     ppf_sample_0[0][i_sb] = (f_scalefactor_0 = (pf_scalefactor_0)[i_sb]) * \
-                        (requantization.f_slope * (f_dummy = \
-                        (float)(p_adec->bit_stream.fifo.buffer >> (32 - requantization.i_bits_per_codeword))) + \
+                       (requantization.f_slope * (f_dummy = \
+                       (float)(p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword))) + \
                         requantization.f_offset); \
-                    DumpBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+                    DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
                     i_dump += requantization.i_bits_per_codeword; \
                     ppf_sample_1[0][i_sb] = (f_scalefactor_1 = (pf_scalefactor_1)[i_sb]) * \
-                        (requantization.f_slope * f_dummy + requantization.f_offset); \
+                       (requantization.f_slope * f_dummy + requantization.f_offset); \
 \
-                    NeedBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+                    NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
                     i_need += requantization.i_bits_per_codeword; \
                     ppf_sample_0[1][i_sb] = f_scalefactor_0 * \
-                        (requantization.f_slope * (f_dummy = \
-                        (float)(p_adec->bit_stream.fifo.buffer >> (32 - requantization.i_bits_per_codeword))) + \
+                       (requantization.f_slope * (f_dummy = \
+                       (float)(p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword))) + \
                         requantization.f_offset); \
-                    DumpBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+                    DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
                     i_dump += requantization.i_bits_per_codeword; \
                     ppf_sample_1[1][i_sb] = f_scalefactor_1 * \
-                        (requantization.f_slope * f_dummy + requantization.f_offset); \
+                       (requantization.f_slope * f_dummy + requantization.f_offset); \
 \
-                    NeedBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+                    NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
                     i_need += requantization.i_bits_per_codeword; \
                     ppf_sample_0[2][i_sb] = f_scalefactor_0 * \
-                        (requantization.f_slope * (f_dummy = \
-                        (float)(p_adec->bit_stream.fifo.buffer >> (32 - requantization.i_bits_per_codeword))) + \
+                       (requantization.f_slope * (f_dummy = \
+                       (float)(p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword))) + \
                         requantization.f_offset); \
-                    DumpBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+                    DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
                     i_dump += requantization.i_bits_per_codeword; \
                     ppf_sample_1[2][i_sb] = f_scalefactor_1 * \
-                        (requantization.f_slope * f_dummy + requantization.f_offset); \
+                       (requantization.f_slope * f_dummy + requantization.f_offset); \
                 } \
                 else \
                 { \
-                    NeedBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+                    NeedBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
                     i_need += requantization.i_bits_per_codeword; \
                     pf_ungroup = requantization.pf_ungroup + 3 * \
-                        (p_adec->bit_stream.fifo.buffer >> (32 - requantization.i_bits_per_codeword)); \
-                    DumpBits( &p_adec->bit_stream, requantization.i_bits_per_codeword ); \
+                       (p_adec->bit_stream.buffer >> (32 - requantization.i_bits_per_codeword)); \
+                    DumpBits (&p_adec->bit_stream, requantization.i_bits_per_codeword); \
                     i_dump += requantization.i_bits_per_codeword; \
 \
                     ppf_sample_0[0][i_sb] = (f_scalefactor_0 = (pf_scalefactor_0)[i_sb]) * pf_ungroup[0]; \
@@ -634,376 +462,148 @@ static __inline__ int adec_Layer2_Stereo( adec_thread_t * p_adec )
             } \
         } \
 \
-/* fprintf(stderr, "%p", p_s16); */ \
-        DCT32( ppf_sample_0[0], &p_adec->bank_0 ); \
-        PCM( &p_adec->bank_0, &p_s16, 2 ); \
-/* fprintf(stderr, " %p", p_s16); */ \
+        DCT32 (ppf_sample_0[0], &p_adec->bank_0); \
+        PCM (&p_adec->bank_0, &p_s16, 2); \
         p_s16 -= 63; \
-/* fprintf(stderr, " %p\n", p_s16); */ \
 \
-/* fprintf(stderr, "%p", p_s16); */ \
-        DCT32( ppf_sample_1[0], &p_adec->bank_1 ); \
-        PCM( &p_adec->bank_1, &p_s16, 2 ); \
-/* fprintf(stderr, " %p", p_s16); */ \
+        DCT32 (ppf_sample_1[0], &p_adec->bank_1); \
+        PCM (&p_adec->bank_1, &p_s16, 2); \
         p_s16 -= 1; \
-/* fprintf(stderr, " %p\n", p_s16); */ \
 \
-/* fprintf(stderr, "%p", p_s16); */ \
-        DCT32( ppf_sample_0[1], &p_adec->bank_0 ); \
-        PCM( &p_adec->bank_0, &p_s16, 2 ); \
-/* fprintf(stderr, " %p", p_s16); */ \
+        DCT32 (ppf_sample_0[1], &p_adec->bank_0); \
+        PCM (&p_adec->bank_0, &p_s16, 2); \
         p_s16 -= 63; \
-/* fprintf(stderr, " %p\n", p_s16); */ \
 \
-/* fprintf(stderr, "%p", p_s16); */ \
-        DCT32( ppf_sample_1[1], &p_adec->bank_1 ); \
-        PCM( &p_adec->bank_1, &p_s16, 2 ); \
-/* fprintf(stderr, " %p", p_s16); */ \
+        DCT32 (ppf_sample_1[1], &p_adec->bank_1); \
+        PCM (&p_adec->bank_1, &p_s16, 2); \
         p_s16 -= 1; \
-/* fprintf(stderr, " %p\n", p_s16); */ \
 \
-/* fprintf(stderr, "%p", p_s16); */ \
-        DCT32( ppf_sample_0[2], &p_adec->bank_0 ); \
-        PCM( &p_adec->bank_0, &p_s16, 2 ); \
-/* fprintf(stderr, " %p", p_s16); */ \
+        DCT32 (ppf_sample_0[2], &p_adec->bank_0); \
+        PCM (&p_adec->bank_0, &p_s16, 2); \
         p_s16 -= 63; \
-/* fprintf(stderr, " %p\n", p_s16); */ \
 \
-/* fprintf(stderr, "%p", p_s16); */ \
-        DCT32( ppf_sample_1[2], &p_adec->bank_1 ); \
-        PCM( &p_adec->bank_1, &p_s16, 2 ); \
-/* fprintf(stderr, " %p", p_s16); */ \
+        DCT32 (ppf_sample_1[2], &p_adec->bank_1); \
+        PCM (&p_adec->bank_1, &p_s16, 2); \
         p_s16 -= 1; \
-/* fprintf(stderr, " %p\n", p_s16); */ \
     }
 /* #define READ_SAMPLE_L2S */
 
-    l_end_frame = p_adec->p_aout_fifo->l_end_frame;
     i_gr = 0;
+    p_s16 = buffer;
 
-    NEXT_BUF
-    READ_SAMPLE_L2S( pf_scalefactor_0_0, pf_scalefactor_1_0, 2 )
+    READ_SAMPLE_L2S (pf_scalefactor_0_0, pf_scalefactor_1_0, 4)
+    READ_SAMPLE_L2S (pf_scalefactor_0_1, pf_scalefactor_1_1, 8)
+    READ_SAMPLE_L2S (pf_scalefactor_0_2, pf_scalefactor_1_2, 12)
 
-    NEXT_BUF
-    READ_SAMPLE_L2S( pf_scalefactor_0_0, pf_scalefactor_1_0, 4 )
-
-    NEXT_BUF
-    READ_SAMPLE_L2S( pf_scalefactor_0_1, pf_scalefactor_1_1, 6 )
-
-    NEXT_BUF
-    READ_SAMPLE_L2S( pf_scalefactor_0_1, pf_scalefactor_1_1, 8 )
-
-    NEXT_BUF
-    READ_SAMPLE_L2S( pf_scalefactor_0_2, pf_scalefactor_1_2, 10 )
-
-    NEXT_BUF
-    READ_SAMPLE_L2S( pf_scalefactor_0_2, pf_scalefactor_1_2, 12 )
-
-#if 0
-    fprintf(stderr, "adec debug: layer == %i, padding_bit == %i, sampling_frequency == %i, bitrate_index == %i\n",
-        (i_header & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT,
-        (i_header & ADEC_HEADER_PADDING_BIT_MASK) >> ADEC_HEADER_PADDING_BIT_SHIFT,
-        (i_header & ADEC_HEADER_SAMPLING_FREQUENCY_MASK) >> ADEC_HEADER_SAMPLING_FREQUENCY_SHIFT,
-        (i_header & ADEC_HEADER_BITRATE_INDEX_MASK) >> ADEC_HEADER_BITRATE_INDEX_SHIFT);
-    fprintf(stderr, "adec debug: framesize == %i, i_need == %i, i_dump == %i\n",
-        pi_framesize[ 128 * ((i_header & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT) +
-            64 * ((i_header & ADEC_HEADER_PADDING_BIT_MASK) >> ADEC_HEADER_PADDING_BIT_SHIFT) +
-            16 * ((i_header & ADEC_HEADER_SAMPLING_FREQUENCY_MASK) >> ADEC_HEADER_SAMPLING_FREQUENCY_SHIFT) +
-            1 * ((i_header & ADEC_HEADER_BITRATE_INDEX_MASK) >> ADEC_HEADER_BITRATE_INDEX_SHIFT) ],
-        i_need,
-        i_dump);
-#endif
-    p_adec->bit_stream.fifo.buffer = 0;
-    p_adec->bit_stream.fifo.i_available = 0;
-    return( 6 );
+    p_adec->bit_stream.buffer = 0;
+    p_adec->bit_stream.i_available = 0;
+    return (6);
 }
 
-/*****************************************************************************
- * InitThread : initialize an audio decoder thread
- *****************************************************************************
- * This function is called from RunThread and performs the second step of the
- * initialization. It returns 0 on success.
- *****************************************************************************/
-static int InitThread( adec_thread_t * p_adec )
+/**** wkn ****/
+
+int adec_init (audiodec_t * p_adec)
 {
-    aout_fifo_t         aout_fifo;
-
-    intf_DbgMsg("adec debug: initializing audio decoder thread %p\n", p_adec);
-
-    /* Our first job is to initialize the bit stream structure with the
-     * beginning of the input stream */
-    vlc_mutex_lock( &p_adec->fifo.data_lock );
-    while ( DECODER_FIFO_ISEMPTY(p_adec->fifo) )
-    {
-        if ( p_adec->b_die )
-        {
-            vlc_mutex_unlock( &p_adec->fifo.data_lock );
-            return( -1 );
-        }
-        vlc_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
-    }
-    p_adec->bit_stream.p_ts = DECODER_FIFO_START( p_adec->fifo )->p_first_ts;
-    p_adec->bit_stream.p_byte = p_adec->bit_stream.p_ts->buffer + p_adec->bit_stream.p_ts->i_payload_start;
-    p_adec->bit_stream.p_end = p_adec->bit_stream.p_ts->buffer + p_adec->bit_stream.p_ts->i_payload_end;
-    vlc_mutex_unlock( &p_adec->fifo.data_lock );
-
-    /* Now we look for an audio frame header in the input stream */
-    if ( FindHeader(p_adec) )
-    {
-        return( -1 );                             /* b_die or b_error is set */
-    }
-
-    /*
-     * We have the header and all its informations : we must be able to create
-     * the audio output fifo.
-     */
-
-    /* Is the sound in mono mode or stereo mode ? */
-    if ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_MODE_MASK) == ADEC_HEADER_MODE_MASK )
-    {
-        intf_DbgMsg("adec debug: mode == mono\n");
-        aout_fifo.i_type = AOUT_ADEC_MONO_FIFO;
-        aout_fifo.i_channels = 1;
-        aout_fifo.b_stereo = 0;
-    }
-    else
-    {
-        intf_DbgMsg("adec debug: mode == stereo\n");
-        aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
-        aout_fifo.i_channels = 2;
-        aout_fifo.b_stereo = 1;
-    }
-
-    /* Checking the sampling frequency */
-    switch ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_SAMPLING_FREQUENCY_MASK) \
-             >> ADEC_HEADER_SAMPLING_FREQUENCY_SHIFT )
-    {
-        case 0:
-            intf_DbgMsg("adec debug: sampling_frequency == 44100 Hz\n");
-            aout_fifo.l_rate = 44100;
-            break;
-
-        case 1:
-            intf_DbgMsg("adec debug: sampling_frequency == 48000 Hz\n");
-            aout_fifo.l_rate = 48000;
-            break;
-
-        case 2:
-            intf_DbgMsg("adec debug: sampling_frequency == 32000 Hz\n");
-            aout_fifo.l_rate = 32000;
-            break;
-
-        case 3:
-            intf_ErrMsg("adec error: can't create audio output fifo (sampling_frequency == `reserved')\n");
-            return( -1 );
-    }
-
-    aout_fifo.l_frame_size = ADEC_FRAME_SIZE;
-
-    /* Creating the audio output fifo */
-    if ( (p_adec->p_aout_fifo = aout_CreateFifo(p_adec->p_aout, &aout_fifo)) == NULL )
-    {
-        return( -1 );
-    }
-
-    intf_DbgMsg("adec debug: audio decoder thread %p initialized\n", p_adec);
-    return( 0 );
+    p_adec->bank_0.actual = p_adec->bank_0.v1;
+    p_adec->bank_0.pos = 0;
+    p_adec->bank_1.actual = p_adec->bank_1.v1;
+    p_adec->bank_1.pos = 0;
+    return 0;
 }
 
-/*****************************************************************************
- * RunThread : audio decoder thread
- *****************************************************************************
- * Audio decoder thread. This function does only returns when the thread is
- * terminated.
- *****************************************************************************/
-static void RunThread( adec_thread_t * p_adec )
+int adec_sync_frame (audiodec_t * p_adec, adec_sync_info_t * p_sync_info)
 {
-#if 0
-    static const int    pi_framesize[512] = ADEC_FRAME_SIZE;
-    int                 i_header;
-    int                 i_framesize;
-    int                 i_dummy;
-#endif
+    static int mpeg1_sample_rate[3] = {44100, 48000, 32000};
+    static int mpeg1_layer1_bit_rate[15] = {
+	0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448
+    };
+    static int mpeg1_layer2_bit_rate[15] = {
+	0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384
+    };
+    static int mpeg2_layer1_bit_rate[15] = {
+	0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256
+    };
+    static int mpeg2_layer2_bit_rate[15] = {
+	0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160
+    };
+    u32 header;
+    int index;
+    int * bit_rate_table;
+    int sample_rate;
+    int bit_rate;
+    int frame_size;
 
-    intf_DbgMsg("adec debug: running audio decoder thread (%p) (pid == %i)\n", p_adec, getpid());
+    p_adec->bit_stream.total_bytes_read = 0;
+    header = GetByte (&p_adec->bit_stream) << 24;
+    header |= GetByte (&p_adec->bit_stream) << 16;
+    header |= GetByte (&p_adec->bit_stream) << 8;
+    header |= GetByte (&p_adec->bit_stream);
 
-    msleep( INPUT_PTS_DELAY );
+    p_adec->header = header;
 
-    /* Initializing the audio decoder thread */
-    if ( InitThread(p_adec) )
-    {
-        p_adec->b_error = 1;
+    /* basic header check : sync word, no emphasis */
+    if ((header & 0xfff00003) != 0xfff00000)
+	return 1;
+
+    index = (header >> 10) & 3;		/* sample rate index */
+    if (index > 2)
+	return 1;
+    sample_rate = mpeg1_sample_rate[index];
+
+    switch ((header >> 17) & 7) {
+    case 2:	/* mpeg 2, layer 2 */
+	sample_rate >>= 1;		/* half sample rate for mpeg2 */
+	bit_rate_table = mpeg2_layer2_bit_rate;
+	break;
+    case 3:	/* mpeg 2, layer 1 */
+	sample_rate >>= 1;		/* half sample rate for mpeg2 */
+	bit_rate_table = mpeg2_layer1_bit_rate;
+	break;
+    case 6:	/* mpeg1, layer 2 */
+	bit_rate_table = mpeg1_layer2_bit_rate;
+	break;
+    case 7:	/* mpeg1, layer 1 */
+	bit_rate_table = mpeg1_layer1_bit_rate;
+	break;
+    default:	/* invalid layer */
+	return 1;
     }
 
-    /* Audio decoder thread's main loop */
-    while ( (!p_adec->b_die) && (!p_adec->b_error) )
-    {
-        switch ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT )
-        {
-            /* Reserved */
-            case 0:
-                intf_DbgMsg("adec debug: layer == 0 (reserved)\n");
-                p_adec->bit_stream.fifo.buffer = 0;
-                p_adec->bit_stream.fifo.i_available = 0;
-                break;
+    index = (header >> 12) & 15;	/* bit rate index */
+    if (index > 14)
+	return 1;
+    bit_rate = bit_rate_table[index];
 
-            /* Layer III */
-            case 1:
-                p_adec->bit_stream.fifo.buffer = 0;
-                p_adec->bit_stream.fifo.i_available = 0;
-                break;
+    p_sync_info->sample_rate = sample_rate;
+    p_sync_info->bit_rate = bit_rate;
 
-            /* Layer II */
-            case 2:
-                if ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_MODE_MASK) == ADEC_HEADER_MODE_MASK )
-                {
-                    adec_Layer2_Mono( p_adec );
-                }
-                else
-                {
-                    /* Waiting until there is enough free space in the audio output fifo
-                     * in order to store the new decoded frames */
-                    vlc_mutex_lock( &p_adec->p_aout_fifo->data_lock );
-                    /* adec_Layer2_Stereo() produces 6 output frames (2*1152/384)...
-                     * If these 6 frames were recorded in the audio output fifo, the
-                     * l_end_frame index would be incremented 6 times. But, if after
-                     * this operation the audio output fifo contains less than 6 frames,
-                     * it would mean that we had not enough room to store the 6 frames :-P */
-                    while ( (((p_adec->p_aout_fifo->l_end_frame + 6) - p_adec->p_aout_fifo->l_start_frame) & AOUT_FIFO_SIZE) < 6 ) /* XXX?? */
-                    {
-                        vlc_cond_wait( &p_adec->p_aout_fifo->data_wait, &p_adec->p_aout_fifo->data_lock );
-                    }
-                    if ( DECODER_FIFO_START(p_adec->fifo)->b_has_pts )
-                    {
-                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_adec->fifo)->i_pts;
-                        DECODER_FIFO_START(p_adec->fifo)->b_has_pts = 0;
-                    }
-                    else
-                    {
-                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                    }
-                    vlc_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
-
-                    /* Decoding the frames */
-                    if ( adec_Layer2_Stereo(p_adec) )
-                    {
-                        vlc_mutex_lock( &p_adec->p_aout_fifo->data_lock );
-
-                        /* Frame 1 */
-                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-
-                        /* Frame 2 */
-                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-
-                        /* Frame 3 */
-                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-
-                        /* Frame 4 */
-                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-
-                        /* Frame 5 */
-                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-
-                        /* Frame 6 */
-                        p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-                        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
-
-                        vlc_cond_signal( &p_adec->p_aout_fifo->data_wait );
-
-                        vlc_mutex_unlock( &p_adec->p_aout_fifo->data_lock );
-                    }
-                }
-                break;
-
-            /* Layer I */
-            case 3:
-                if ( (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_MODE_MASK) == ADEC_HEADER_MODE_MASK )
-                {
-                    adec_Layer1_Mono( p_adec );
-                }
-                else
-                {
-                    adec_Layer1_Stereo( p_adec );
-                }
-                break;
-
-            default:
-                intf_DbgMsg("adec debug: layer == %i (unknown)\n",
-                    (p_adec->bit_stream.fifo.buffer & ADEC_HEADER_LAYER_MASK) >> ADEC_HEADER_LAYER_SHIFT);
-                p_adec->bit_stream.fifo.buffer = 0;
-                p_adec->bit_stream.fifo.i_available = 0;
-                break;
-        }
-        FindHeader( p_adec );
+    if ((header & 0x60000) == 0x60000) {	/* layer 1 */
+	frame_size = 48000 * bit_rate / sample_rate;
+	if (header & 0x200)	/* padding */
+	    frame_size += 4;
+    } else {	/* layer >1 */
+	frame_size = 144000 * bit_rate / sample_rate;
+	if (header & 0x200)	/* padding */
+	    frame_size ++;
     }
 
-    /* If b_error is set, the audio decoder thread enters the error loop */
-    if ( p_adec->b_error )
-    {
-        ErrorThread( p_adec );
-    }
+    p_sync_info->frame_size = frame_size;
+    p_adec->frame_size = frame_size;
 
-    /* End of the audio decoder thread */
-    EndThread( p_adec );
+    return 0;
 }
 
-/*****************************************************************************
- * ErrorThread : audio decoder's RunThread() error loop
- *****************************************************************************
- * This function is called when an error occured during thread main's loop. The
- * thread can still receive feed, but must be ready to terminate as soon as
- * possible.
- *****************************************************************************/
-static void ErrorThread( adec_thread_t *p_adec )
+int adec_decode_frame (audiodec_t * p_adec, s16 * buffer)
 {
-    /* We take the lock, because we are going to read/write the start/end
-     * indexes of the decoder fifo */
-    vlc_mutex_lock( &p_adec->fifo.data_lock );
+    p_adec->bit_stream.i_available = 0;
 
-    /* Wait until a `die' order is sent */
-    while( !p_adec->b_die )
-    {
-        /* Trash all received PES packets */
-        while( !DECODER_FIFO_ISEMPTY(p_adec->fifo) )
-        {
-            input_NetlistFreePES( p_adec->bit_stream.p_input, DECODER_FIFO_START(p_adec->fifo) );
-            DECODER_FIFO_INCSTART( p_adec->fifo );
-        }
+    adec_Layer2_Stereo (p_adec, buffer);
 
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
-    }
+    if (p_adec->bit_stream.total_bytes_read > p_adec->frame_size)
+	return 1;
 
-    /* We can release the lock before leaving */
-    vlc_mutex_unlock( &p_adec->fifo.data_lock );
-}
+    while (p_adec->bit_stream.total_bytes_read < p_adec->frame_size)
+	GetByte (&p_adec->bit_stream);
 
-/*****************************************************************************
- * EndThread : audio decoder thread destruction
- *****************************************************************************
- * This function is called when the thread ends after a sucessfull
- * initialization.
- *****************************************************************************/
-static void EndThread( adec_thread_t *p_adec )
-{
-    intf_DbgMsg("adec debug: destroying audio decoder thread %p\n", p_adec);
-
-    /* If the audio output fifo was created, we destroy it */
-    if ( p_adec->p_aout_fifo != NULL )
-    {
-        aout_DestroyFifo( p_adec->p_aout_fifo );
-
-        /* Make sure the output thread leaves the NextFrame() function */
-        vlc_mutex_lock( &(p_adec->p_aout_fifo->data_lock) );
-        vlc_cond_signal( &(p_adec->p_aout_fifo->data_wait) );
-        vlc_mutex_unlock( &(p_adec->p_aout_fifo->data_lock) );
-    }
-    /* Destroy descriptor */
-    free( p_adec );
-
-    intf_DbgMsg("adec debug: audio decoder thread %p destroyed\n", p_adec);
+    return 0;
 }

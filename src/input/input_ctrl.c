@@ -47,7 +47,8 @@
 
 #include "audio_output.h"                                   /* aout_thread_t */
 
-#include "audio_decoder.h"                                  /* adec_thread_t */
+#include "audio_decoder.h"        /* audiodec_t (for audio_decoder_thread.h) */
+#include "audio_decoder_thread.h"                           /* adec_thread_t */
 
 #include "ac3_decoder.h"              /* ac3dec_t (for ac3_decoder_thread.h) */
 #include "ac3_decoder_thread.h"                           /* ac3dec_thread_t */

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audio_decoder.h : audio decoder thread interface
+ * audio_decoder.h : audio decoder interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -21,87 +21,71 @@
  * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * = Prototyped functions are implemented in audio_decoder/audio_decoder.c
- *
- * = Required headers :
- *   - "common.h"                                    ( u32, byte_t, boolean_t )
- *   - "threads.h"                                             ( vlc_thread_t )
- *   - "input.h"                                ( ts_packet_t, input_thread_t )
- *   - "decoder_fifo.h"                                      ( decoder_fifo_t )
- *   - "audio_output.h"                          ( aout_fifo_t, aout_thread_t )
- *
- * = - LSb = Least Significant bit
- *   - LSB = Least Significant Byte
- *
- * = - MSb = Most Significant bit
- *   - MSB = Most Significant Byte
- *****************************************************************************/
+/**** audio decoder API - public audio decoder structures */
 
-/*
- * TODO :
- * - Etudier /usr/include/asm/bitops.h d'un peu plus près, bien qu'il ne me
- *   semble pas être possible d'utiliser ces fonctions ici
- * - N'y aurait-t-il pas moyen de se passer d'un buffer de bits, en travaillant
- *   directement sur le flux PES ?
- */
+typedef struct audiodec_s audiodec_t;
 
-#define ADEC_FRAME_SIZE 384
+typedef struct adec_sync_info_s {
+    int sample_rate;	/* sample rate in Hz */
+    int frame_size;	/* frame size in bytes */
+    int bit_rate;	/* nominal bit rate in kbps */
+} adec_sync_info_t;
 
-/*****************************************************************************
- * adec_frame_t
- *****************************************************************************/
-typedef s16 adec_frame_t[ ADEC_FRAME_SIZE ];
+typedef struct adec_byte_stream_s {
+    u8 * p_byte;
+    u8 * p_end;
+    void * info;
+} adec_byte_stream_t;
 
-/*****************************************************************************
- * adec_bank_t
- *****************************************************************************/
-typedef struct adec_bank_s
-{
+/**** audio decoder API - functions publically provided by the audio dec. ****/
+
+int adec_init (audiodec_t * p_adec);
+int adec_sync_frame (audiodec_t * p_adec, adec_sync_info_t * p_sync_info);
+int adec_decode_frame (audiodec_t * p_adec, s16 * buffer);
+static adec_byte_stream_t * adec_byte_stream (audiodec_t * p_adec);
+
+/**** audio decoder API - user functions to be provided to the audio dec. ****/
+
+void adec_byte_stream_next (adec_byte_stream_t * p_byte_stream);
+
+/**** EVERYTHING AFTER THIS POINT IS PRIVATE ! DO NOT USE DIRECTLY ****/
+
+/**** audio decoder internal structures ****/
+
+typedef struct adec_bank_s {
     float               v1[512];
     float               v2[512];
     float *             actual;
     int                 pos;
-
 } adec_bank_t;
 
-/*****************************************************************************
- * adec_thread_t : audio decoder thread descriptor
- *****************************************************************************
- * This type describes an audio decoder thread
- *****************************************************************************/
-typedef struct adec_thread_s
-{
-    /*
-     * Thread properties
-     */
-    vlc_thread_t        thread_id;                /* id for thread functions */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_error;                             /* `error' flag */
+typedef struct adec_bit_stream_s {
+    u32 buffer;
+    int i_available;
+    adec_byte_stream_t byte_stream;
+    int total_bytes_read;
+} adec_bit_stream_t;
 
+struct audiodec_s {
     /*
      * Input properties
      */
-    decoder_fifo_t      fifo;                  /* stores the PES stream data */
+
     /* The bit stream structure handles the PES stream at the bit level */
-    bit_stream_t        bit_stream;
+    adec_bit_stream_t	bit_stream;
 
     /*
      * Decoder properties
      */
+    u32			header;
+    int			frame_size;
     adec_bank_t         bank_0;
     adec_bank_t         bank_1;
+};
 
-    /*
-     * Output properties
-     */
-    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
-    aout_thread_t *     p_aout;           /* needed to create the audio fifo */
+/**** audio decoder inline functions ****/
 
-} adec_thread_t;
-
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-adec_thread_t * adec_CreateThread       ( input_thread_t * p_input /* !! , aout_thread_t * p_aout !! */ );
-void            adec_DestroyThread      ( adec_thread_t * p_adec );
+static adec_byte_stream_t * adec_byte_stream (audiodec_t * p_adec)
+{
+    return &(p_adec->bit_stream.byte_stream);
+}

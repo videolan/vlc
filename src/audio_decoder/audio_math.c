@@ -21,29 +21,7 @@
  * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-#include "defs.h"
-
-#include <stdio.h>                                           /* "intf_msg.h" */
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                            /* "input.h" */
-
-#include "config.h"
-#include "common.h"
-#include "threads.h"
-#include "mtime.h"                                                /* mtime_t */
-#include "plugins.h"
-
-#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
-
-#include "input.h"                      /* pes_packet_t (for decoder_fifo.h) */
-#include "decoder_fifo.h"            /* decoder_fifo_t (for audio_decoder.h) */
-
-#include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
-
+#include "int_types.h"
 #include "audio_decoder.h"                                    /* adec_bank_t */
 
 /*****************************************************************************
@@ -135,7 +113,7 @@ void DCT32(float *x, adec_bank_t *b)
     t32 = c32 * (x[30] - x[1]);
     t16 = x[30] + x[1];
     /* 2nd stage */
-    tt9  = c9  * (t1  - t9 );
+    tt9  = c9  * (t1  - t9);
     tt1  = t1  + t9;
     tt10 = c10 * (t2  - t10);
     tt2  = t2  + t10;
@@ -168,13 +146,13 @@ void DCT32(float *x, adec_bank_t *b)
     tt32 = c16 * (t24 - t32);
     tt24 = t24 + t32;
     /* 3rd stage */
-    t5  = c5 * (tt1  - tt5 );
+    t5  = c5 * (tt1  - tt5);
     t1  = tt1  + tt5;
-    t6  = c6 * (tt2  - tt6 );
+    t6  = c6 * (tt2  - tt6);
     t2  = tt2  + tt6;
-    t7  = c7 * (tt3  - tt7 );
+    t7  = c7 * (tt3  - tt7);
     t3  = tt3  + tt7;
-    t8  = c8 * (tt4  - tt8 );
+    t8  = c8 * (tt4  - tt8);
     t4  = tt4  + tt8;
     t13 = c5 * (tt9  - tt13);
     t9  = tt9  + tt13;
@@ -201,13 +179,13 @@ void DCT32(float *x, adec_bank_t *b)
     t32 = c8 * (tt28 - tt32);
     t28 = tt28 + tt32;
     /* 4th stage */
-    tt3  = c3 * (t1  - t3 );
+    tt3  = c3 * (t1  - t3);
     tt1  = t1  + t3;
-    tt4  = c4 * (t2  - t4 );
+    tt4  = c4 * (t2  - t4);
     tt2  = t2  + t4;
-    tt7  = c3 * (t5  - t7 );
+    tt7  = c3 * (t5  - t7);
     tt5  = t5  + t7;
-    tt8  = c4 * (t6  - t8 );
+    tt8  = c4 * (t6  - t8);
     tt6  = t6  + t8;
     tt11 = c3 * (t9  - t11);
     tt9  = t9  + t11;
@@ -237,13 +215,13 @@ void DCT32(float *x, adec_bank_t *b)
     /* Begin to split the result of the DCT (t1 to t32) in the filter bank */
     x = b->actual + b->pos;
     y = (b->actual == b->v1 ? b->v2 : b->v1) + b->pos;
-    x[0] = -(y[0] = c2 * (tt1  - tt2 )); /* t17 */
+    x[0] = -(y[0] = c2 * (tt1  - tt2)); /* t17 */
     x[256] = 0; y[256] = tt1  + tt2; /* t1  */
-    t25 = c2 * (tt3  - tt4 );
+    t25 = c2 * (tt3  - tt4);
     t9  = tt3  + tt4;
-    t21 = c2 * (tt5  - tt6 );
+    t21 = c2 * (tt5  - tt6);
     t5  = tt5  + tt6;
-    t29 = c2 * (tt7  - tt8 );
+    t29 = c2 * (tt7  - tt8);
     t13 = tt7  + tt8;
     t19 = c2 * (tt9  - tt10);
     t3  = tt9  + tt10;
@@ -478,7 +456,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
     switch(b->pos) {
         case 0:
             v = b->actual;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v;
                 v += 15;
                 tmp += *f++ * *v--;
@@ -495,11 +473,11 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     /* ceiling saturation */
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         /* floor saturation */
                         **pcm = 0x8000;
                     else
@@ -510,7 +488,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 1:
             v = b->actual + 1;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v;
                 v += 15;
@@ -527,10 +505,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -540,7 +518,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 2:
             v = b->actual + 2;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v;
@@ -557,10 +535,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -570,7 +548,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 3:
             v = b->actual + 3;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -587,10 +565,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -600,7 +578,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 4:
             v = b->actual + 4;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -617,10 +595,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -630,7 +608,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 5:
             v = b->actual + 5;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -647,10 +625,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -660,7 +638,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 6:
             v = b->actual + 6;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -677,10 +655,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -690,7 +668,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 7:
             v = b->actual + 7;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -707,10 +685,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -720,7 +698,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 8:
             v = b->actual + 8;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -737,10 +715,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -750,7 +728,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 9:
             v = b->actual + 9;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -767,10 +745,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -780,7 +758,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 10:
             v = b->actual + 10;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -797,10 +775,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -810,7 +788,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 11:
             v = b->actual + 11;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -827,10 +805,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -840,7 +818,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 12:
             v = b->actual + 12;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -857,10 +835,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 v += 15;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -870,7 +848,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 13:
             v = b->actual + 13;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -887,10 +865,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v;
                 v += 15;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -900,7 +878,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 14:
             v = b->actual + 14;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -917,10 +895,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v;
                 v += 15;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;
@@ -930,7 +908,7 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
             break;
         case 15:
             v = b->actual + 15;
-            for(i=0; i<32; i++) {
+            for (i=0; i<32; i++) {
                 tmp = *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
@@ -946,10 +924,10 @@ void PCM(adec_bank_t *b, s16 **pcm, int jump)
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
                 tmp += *f++ * *v--;
-                if((tmp += *f++ * *v) > 32767)
+                if ((tmp += *f++ * *v) > 32767)
                     **pcm = 0x7FFF;
                 else
-                    if(tmp < -32768)
+                    if (tmp < -32768)
                         **pcm = 0x8000;
                     else
                         **pcm = (s16)tmp;

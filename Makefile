@@ -1,10 +1,13 @@
 # Generated automatically from Makefile.in by configure.
+# Generated automatically from Makefile.in by configure.
 ################################################################################
 # vlc (VideoLAN Client) main makefile
 # (c)1998 VideoLAN
 ################################################################################
 # This makefile is the main makefile for the VideoLAN client.
 ################################################################################
+
+CC = egcc
 
 ################################################################################
 # Configuration
