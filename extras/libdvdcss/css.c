@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.15 2001/11/12 20:16:32 sam Exp $
+ * $Id: css.c,v 1.16 2001/11/13 02:03:46 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Håkan Hjort <d95hjort@dtek.chalmers.se>
@@ -386,8 +386,8 @@ int CSSGetTitleKey( dvdcss_handle dvdcss, int i_pos )
 
         do
         {
-            i_pos = dvdcss_seek( dvdcss, i_pos, DVDCSS_NOFLAGS );
-            if( dvdcss_read( dvdcss, p_buf, 1, DVDCSS_NOFLAGS ) != 1 ) break;
+            i_pos = _dvdcss_seek( dvdcss, i_pos );
+            if( _dvdcss_read( dvdcss, p_buf, 1 ) != 1 ) break;
 
             /* Stop when we find a non MPEG stream block */
             if( memcmp( p_buf, p_packstart, 4 ) )

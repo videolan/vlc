@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.20 2001/11/13 01:25:05 sam Exp $
+ * $Id: libdvdcss.c,v 1.21 2001/11/13 02:03:46 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -61,8 +61,6 @@
  *****************************************************************************/
 static int _dvdcss_open  ( dvdcss_handle, char *psz_target );
 static int _dvdcss_close ( dvdcss_handle );
-static int _dvdcss_seek  ( dvdcss_handle, int i_blocks );
-static int _dvdcss_read  ( dvdcss_handle, void *p_buffer, int i_blocks );
 static int _dvdcss_readv ( dvdcss_handle, struct iovec *p_iovec, int i_blocks );
 
 /*****************************************************************************
@@ -499,7 +497,7 @@ static int _dvdcss_close ( dvdcss_handle dvdcss )
     return 0;
 }
 
-static int _dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
+int _dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
 {
 #if defined( WIN32 )
     dvdcss->i_seekpos = i_blocks;
@@ -543,7 +541,7 @@ static int _dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
 
 }
 
-static int _dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer, int i_blocks )
+int _dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer, int i_blocks )
 {
 #if defined( WIN32 ) 
     if( WIN2K )
