@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.15 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: video.c,v 1.16 2003/01/08 10:41:57 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -360,7 +360,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         switch( p_vdec->i_codec_id )
         {
             case( CODEC_ID_MPEG4 ):
-#if 0
+#if 1
                 avcodec_decode_video( p_vdec->p_context, p_vdec->p_ff_pic,
                                       &b_gotpicture,
                                       (void *)&p_vdec->p_format[1],
