@@ -153,6 +153,7 @@ struct demux_sys_t
     mtime_t          i_start;
 
     /* */
+    vlc_bool_t       b_multicast;   /* true if one of the tracks is multicasted */
     vlc_bool_t       b_no_data;     /* true if we never receive any data */
     int              i_no_data_ti;  /* consecutive number of TaskInterrupt */
 
@@ -224,6 +225,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->p_out_asf = NULL;
     p_sys->b_no_data = VLC_TRUE;
     p_sys->i_no_data_ti = 0;
+    p_sys->b_multicast = VLC_FALSE;
 
 
     if( ( p_sys->scheduler = BasicTaskScheduler::createNew() ) == NULL )
@@ -360,6 +362,11 @@ static int  Open ( vlc_object_t *p_this )
             {
                 p_sys->rtsp->setupMediaSubsession( *sub, False,
                                                    b_rtsp_tcp ? True : False );
+            }
+            if( !p_sys->b_multicast )
+            {
+                /* Check, because we need diff. rollover behaviour for multicast */
+                p_sys->b_multicast = IsMulticastAddress( sub->connectionEndpointAddress() );
             }
         }
     }
@@ -743,7 +750,12 @@ static int Demux( demux_t *p_demux )
         }
     }
 
-    if( p_sys->b_no_data && p_sys->i_no_data_ti > 3 )
+    if( p_sys->b_multicast && p_sys->b_no_data && p_sys->i_no_data_ti > 120 )
+    {
+        msg_Err( p_demux, "no multicast data received in 36s, aborting" );
+        return 0;
+    }
+    else if( !p_sys->b_multicast && p_sys->b_no_data && p_sys->i_no_data_ti > 3 )
     {
         vlc_bool_t b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" );
 
