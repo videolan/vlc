@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.10 2003/06/06 11:09:24 gbazin Exp $
+ * $Id: ipv6.c,v 1.11 2003/06/12 23:03:09 gbazin Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -64,6 +64,12 @@ static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #endif
 #ifndef IPV6_JOIN_GROUP
 #   define IPV6_JOIN_GROUP 20
+#endif
+#ifndef IPV6_MULTICAST_HOPS
+#   define IPV6_MULTICAST_HOPS 18
+#endif
+#ifndef IPV6_UNICAST_HOPS
+#   define IPV6_UNICAST_HOPS 16
 #endif
 #   define close closesocket
 #endif
@@ -340,6 +346,9 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 
     if( *psz_server_addr )
     {
+        int ttl = config_GetInt( p_this, "ttl" );
+        if( ttl < 1 ) ttl = 1;
+
         /* Build socket for remote connection */
         if ( BuildAddr( p_this, &sock, psz_server_addr, i_server_port ) == -1 )
         {
@@ -355,6 +364,39 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
             msg_Err( p_this, "cannot connect socket (%s)", strerror(errno) );
             close( i_handle );
             return( -1 );
+        }
+
+        /* Set the time-to-live */
+        if( ttl > 1 )
+        {
+#if defined(WIN32) || __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2)
+            if( IN6_IS_ADDR_MULTICAST(&sock.sin6_addr) )
+            {
+                if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_MULTICAST_HOPS,
+                                (void *)&ttl, sizeof( ttl ) ) < 0 )
+                {
+#ifdef HAVE_ERRNO_H
+                    msg_Warn( p_this, "failed to set multicast ttl (%s)",
+                              strerror(errno) );
+#else
+                    msg_Warn( p_this, "failed to set multicast ttl" );
+#endif
+                }
+            }
+            else
+            {
+                if( setsockopt( i_handle, IPPROTO_IPV6, IPV6_UNICAST_HOPS,
+                                (void *)&ttl, sizeof( ttl ) ) < 0 )
+                {
+#ifdef HAVE_ERRNO_H
+                    msg_Warn( p_this, "failed to set unicast ttl (%s)",
+                              strerror(errno) );
+#else
+                    msg_Warn( p_this, "failed to set unicast ttl" );
+#endif
+                }
+            }
+#endif
         }
     }
 
