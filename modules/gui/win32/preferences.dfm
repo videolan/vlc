@@ -3,7 +3,7 @@ object PreferencesDlg: TPreferencesDlg
   Left = 310
   Top = 125
   Width = 458
-  Height = 594
+  Height = 588
   Anchors = [akTop, akRight]
   Caption = 'Preferences'
   Color = clBtnFace
@@ -252,17 +252,17 @@ object PreferencesDlg: TPreferencesDlg
     Left = 8
     Top = 8
     Width = 433
-    Height = 511
+    Height = 512
     Anchors = [akLeft, akTop, akRight, akBottom]
     MultiLine = True
     TabOrder = 0
   end
   object ButtonApply: TButton
     Tag = 3
-    Left = 266
-    Top = 530
-    Width = 82
-    Height = 25
+    Left = 284
+    Top = 528
+    Width = 75
+    Height = 23
     Anchors = [akRight, akBottom]
     Caption = 'Apply'
     TabOrder = 3
@@ -270,10 +270,10 @@ object PreferencesDlg: TPreferencesDlg
   end
   object ButtonSave: TButton
     Tag = 3
-    Left = 359
-    Top = 530
-    Width = 82
-    Height = 25
+    Left = 367
+    Top = 528
+    Width = 75
+    Height = 23
     Anchors = [akRight, akBottom]
     Caption = 'Save'
     TabOrder = 4
@@ -281,10 +281,10 @@ object PreferencesDlg: TPreferencesDlg
   end
   object ButtonOK: TButton
     Tag = 3
-    Left = 81
-    Top = 530
-    Width = 82
-    Height = 25
+    Left = 118
+    Top = 528
+    Width = 75
+    Height = 23
     Anchors = [akRight, akBottom]
     Caption = 'OK'
     Default = True
@@ -294,10 +294,10 @@ object PreferencesDlg: TPreferencesDlg
   end
   object ButtonCancel: TButton
     Tag = 3
-    Left = 174
-    Top = 530
-    Width = 82
-    Height = 25
+    Left = 201
+    Top = 528
+    Width = 75
+    Height = 23
     Anchors = [akRight, akBottom]
     Cancel = True
     Caption = 'Cancel'

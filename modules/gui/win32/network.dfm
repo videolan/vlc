@@ -1,11 +1,11 @@
 object NetworkDlg: TNetworkDlg
   Tag = 3
-  Left = 507
-  Top = 259
+  Left = 358
+  Top = 414
   BorderStyle = bsDialog
   Caption = 'Open network'
-  ClientHeight = 198
-  ClientWidth = 497
+  ClientHeight = 191
+  ClientWidth = 496
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -252,8 +252,8 @@ object NetworkDlg: TNetworkDlg
     Tag = 3
     Left = 8
     Top = 8
-    Width = 481
-    Height = 145
+    Width = 479
+    Height = 144
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Network mode'
     TabOrder = 0
@@ -267,7 +267,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelMulticastPort: TLabel
       Tag = 3
-      Left = 388
+      Left = 386
       Top = 54
       Width = 22
       Height = 13
@@ -277,7 +277,7 @@ object NetworkDlg: TNetworkDlg
     end
     object LabelCSPort: TLabel
       Tag = 3
-      Left = 388
+      Left = 386
       Top = 82
       Width = 22
       Height = 13
@@ -358,7 +358,7 @@ object NetworkDlg: TNetworkDlg
       Tag = 5
       Left = 208
       Top = 50
-      Width = 161
+      Width = 159
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       Enabled = False
@@ -369,7 +369,7 @@ object NetworkDlg: TNetworkDlg
       Tag = 5
       Left = 208
       Top = 78
-      Width = 161
+      Width = 159
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       Enabled = False
@@ -383,7 +383,7 @@ object NetworkDlg: TNetworkDlg
       Tag = 5
       Left = 208
       Top = 106
-      Width = 265
+      Width = 263
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       Enabled = False
@@ -401,7 +401,7 @@ object NetworkDlg: TNetworkDlg
       Value = 1234
     end
     object SpinEditMulticastPort: TCSpinEdit
-      Left = 416
+      Left = 414
       Top = 49
       Width = 57
       Height = 22
@@ -414,7 +414,7 @@ object NetworkDlg: TNetworkDlg
       Value = 1234
     end
     object SpinEditCSPort: TCSpinEdit
-      Left = 416
+      Left = 414
       Top = 77
       Width = 57
       Height = 22
@@ -429,10 +429,10 @@ object NetworkDlg: TNetworkDlg
   end
   object ButtonOK: TButton
     Tag = 3
-    Left = 48
-    Top = 163
-    Width = 177
-    Height = 25
+    Left = 330
+    Top = 160
+    Width = 75
+    Height = 23
     Caption = 'OK'
     Default = True
     ModalResult = 1
@@ -441,10 +441,10 @@ object NetworkDlg: TNetworkDlg
   end
   object ButtonCancel: TButton
     Tag = 3
-    Left = 272
-    Top = 163
-    Width = 177
-    Height = 25
+    Left = 413
+    Top = 160
+    Width = 75
+    Height = 23
     Anchors = [akTop, akRight]
     Cancel = True
     Caption = 'Cancel'

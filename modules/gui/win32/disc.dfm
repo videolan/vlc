@@ -5,8 +5,8 @@ object DiscDlg: TDiscDlg
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsDialog
   Caption = 'Open Disc'
-  ClientHeight = 178
-  ClientWidth = 242
+  ClientHeight = 173
+  ClientWidth = 248
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,23 +21,16 @@ object DiscDlg: TDiscDlg
   object LabelDevice: TLabel
     Tag = 3
     Left = 8
-    Top = 113
+    Top = 117
     Width = 66
     Height = 13
     Caption = 'Device &name:'
-  end
-  object Bevel1: TBevel
-    Left = 8
-    Top = 136
-    Width = 225
-    Height = 2
-    Anchors = [akLeft, akTop, akRight]
   end
   object GroupBoxPosition: TGroupBox
     Tag = 3
     Left = 96
     Top = 8
-    Width = 137
+    Width = 144
     Height = 97
     Caption = 'Starting position'
     TabOrder = 1
@@ -60,7 +53,7 @@ object DiscDlg: TDiscDlg
     object SpinEditTitle: TCSpinEdit
       Left = 56
       Top = 39
-      Width = 73
+      Width = 80
       Height = 22
       TabStop = True
       Font.Charset = DEFAULT_CHARSET
@@ -78,7 +71,7 @@ object DiscDlg: TDiscDlg
     object SpinEditChapter: TCSpinEdit
       Left = 56
       Top = 67
-      Width = 73
+      Width = 80
       Height = 22
       TabStop = True
       MaxValue = 65535
@@ -101,7 +94,7 @@ object DiscDlg: TDiscDlg
     Tag = 3
     Left = 8
     Top = 8
-    Width = 81
+    Width = 80
     Height = 97
     Caption = 'Disc type'
     ItemIndex = 0
@@ -113,10 +106,10 @@ object DiscDlg: TDiscDlg
   end
   object ButtonOk: TButton
     Tag = 3
-    Left = 24
-    Top = 144
-    Width = 81
-    Height = 25
+    Left = 82
+    Top = 142
+    Width = 75
+    Height = 23
     Caption = 'OK'
     Default = True
     ModalResult = 1
@@ -125,10 +118,10 @@ object DiscDlg: TDiscDlg
   end
   object ButtonCancel: TButton
     Tag = 3
-    Left = 136
-    Top = 144
-    Width = 81
-    Height = 25
+    Left = 165
+    Top = 142
+    Width = 75
+    Height = 23
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
@@ -138,8 +131,8 @@ object DiscDlg: TDiscDlg
   object EditDevice: TEdit
     Tag = 5
     Left = 96
-    Top = 109
-    Width = 137
+    Top = 113
+    Width = 144
     Height = 21
     TabOrder = 2
     Text = 'F:\'

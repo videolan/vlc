@@ -46,7 +46,6 @@ __published:	// IDE-managed Components
     TCSpinEdit *SpinEditTitle;
     TCSpinEdit *SpinEditChapter;
     TCheckBox *CheckBoxMenus;
-    TBevel *Bevel1;
     void __fastcall FormShow( TObject *Sender );
     void __fastcall FormHide( TObject *Sender );
     void __fastcall ButtonCancelClick( TObject *Sender );

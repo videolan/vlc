@@ -3,7 +3,7 @@ object SubtitlesDlg: TSubtitlesDlg
   Left = 520
   Top = 185
   Width = 338
-  Height = 173
+  Height = 172
   Caption = 'Add subtitles'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -85,10 +85,10 @@ object SubtitlesDlg: TSubtitlesDlg
   end
   object ButtonOK: TButton
     Tag = 3
-    Left = 39
+    Left = 164
     Top = 112
-    Width = 98
-    Height = 25
+    Width = 75
+    Height = 23
     Caption = 'OK'
     Default = True
     ModalResult = 1
@@ -97,10 +97,10 @@ object SubtitlesDlg: TSubtitlesDlg
   end
   object ButtonCancel: TButton
     Tag = 3
-    Left = 192
+    Left = 247
     Top = 112
-    Width = 98
-    Height = 25
+    Width = 75
+    Height = 23
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2

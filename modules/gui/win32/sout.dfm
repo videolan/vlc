@@ -2,8 +2,8 @@ object SoutDlg: TSoutDlg
   Tag = 3
   Left = 454
   Top = 369
-  Width = 394
-  Height = 238
+  Width = 392
+  Height = 244
   Caption = 'Stream output'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,14 +18,14 @@ object SoutDlg: TSoutDlg
     Tag = 3
     Left = 8
     Top = 8
-    Width = 369
-    Height = 161
+    Width = 368
+    Height = 168
     Anchors = [akLeft, akTop, akRight]
     Caption = 'Stream output MRL (Media Resource Locator)'
     TabOrder = 0
     object LabelPort: TLabel
       Tag = 3
-      Left = 264
+      Left = 263
       Top = 98
       Width = 22
       Height = 13
@@ -45,7 +45,7 @@ object SoutDlg: TSoutDlg
     object EditMrl: TEdit
       Left = 16
       Top = 24
-      Width = 337
+      Width = 336
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 0
@@ -92,7 +92,7 @@ object SoutDlg: TSoutDlg
     end
     object ButtonBrowse: TButton
       Tag = 3
-      Left = 278
+      Left = 277
       Top = 60
       Width = 75
       Height = 25
@@ -104,14 +104,14 @@ object SoutDlg: TSoutDlg
     object EditFile: TEdit
       Left = 96
       Top = 62
-      Width = 177
+      Width = 176
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 2
       OnChange = CustomEditChange
     end
     object SpinEditPort: TCSpinEdit
-      Left = 296
+      Left = 295
       Top = 93
       Width = 57
       Height = 22
@@ -128,7 +128,7 @@ object SoutDlg: TSoutDlg
     object EditAddress: TEdit
       Left = 144
       Top = 94
-      Width = 113
+      Width = 112
       Height = 21
       Anchors = [akLeft, akTop, akRight]
       Enabled = False
@@ -139,7 +139,7 @@ object SoutDlg: TSoutDlg
     object PanelMux: TPanel
       Left = 184
       Top = 124
-      Width = 89
+      Width = 88
       Height = 25
       Anchors = [akLeft, akTop, akRight]
       TabOrder = 6
@@ -156,7 +156,7 @@ object SoutDlg: TSoutDlg
       end
       object RadioButtonTS: TRadioButton
         Tag = 3
-        Left = 40
+        Left = 39
         Top = 4
         Width = 41
         Height = 17
@@ -171,10 +171,10 @@ object SoutDlg: TSoutDlg
   end
   object ButtonOK: TButton
     Tag = 3
-    Left = 56
-    Top = 176
-    Width = 97
-    Height = 25
+    Left = 218
+    Top = 184
+    Width = 75
+    Height = 23
     Caption = 'OK'
     Default = True
     ModalResult = 1
@@ -183,10 +183,10 @@ object SoutDlg: TSoutDlg
   end
   object ButtonCancel: TButton
     Tag = 3
-    Left = 232
-    Top = 176
-    Width = 97
-    Height = 25
+    Left = 301
+    Top = 184
+    Width = 75
+    Height = 23
     Cancel = True
     Caption = 'Cancel'
     ModalResult = 2
