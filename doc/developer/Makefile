@@ -9,6 +9,7 @@ JADE=jade
 XML_DECL := /usr/share/sgml/declaration/xml.decl
 XSL_CHUNK = videolan-doc-chunk.xsl
 XSL = videolan-doc.xsl
+XSL_TXT = /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/xhtml/html.xsl
 
 all: manual
 
@@ -32,9 +33,7 @@ manual.pdf: *.xml
 	
 # TXT
 manual.txt:  *.xml
-	$(JADE) -t sgml -d stylesheet-txt.dsl $(XML_DECL) manual.xml > text.html
-	$(LYNX) -force_html -dump text.html > manual.txt
-#	rm -f text.html
+	xsltproc $(XSL_TXT) manual.xml > manual.txt
 
 clean:
 	rm -f manual.txt manual.pdf
