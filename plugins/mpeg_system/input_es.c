@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.4 2001/12/12 17:41:15 massiot Exp $
+ * $Id: input_es.c,v 1.5 2001/12/13 17:58:16 jobi Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -165,14 +165,15 @@ static void ESInit( input_thread_t * p_input )
     /* FIXME : detect if InitStream failed */
     input_InitStream( p_input, 0 );
     input_AddProgram( p_input, 0, 0 );
+    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xE0, 0 );
+    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xE0, 0 );
     p_es->i_stream_id = 0xE0;
     p_es->i_type = MPEG1_VIDEO_ES;
     p_es->i_cat = VIDEO_ES;
     input_SelectES( p_input, p_es );
     p_input->stream.p_selected_area->i_tell = 0;
-    p_input->stream.pp_programs[0]->b_is_ok = 1;
+    p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
@@ -266,7 +267,7 @@ static void ESDemux( input_thread_t * p_input, data_packet_t * p_data )
 {
     pes_packet_t *  p_pes = p_input->pf_new_pes( p_input->p_method_data );
     decoder_fifo_t * p_fifo =
-        p_input->stream.pp_programs[0]->pp_es[0]->p_decoder_fifo;
+        p_input->stream.p_selected_program->pp_es[0]->p_decoder_fifo;
 
     if( p_pes == NULL )
     {
@@ -279,13 +280,14 @@ static void ESDemux( input_thread_t * p_input, data_packet_t * p_data )
     p_pes->p_first = p_pes->p_last = p_data;
     p_pes->i_nb_data = 1;
 
-    if( (p_input->stream.pp_programs[0]->i_synchro_state == SYNCHRO_REINIT)
-         | (input_ClockManageControl( p_input, p_input->stream.pp_programs[0],
-                                  (mtime_t)0 ) == PAUSE_S) )
+    if( (p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT)
+         | (input_ClockManageControl( p_input, 
+                          p_input->stream.p_selected_program,
+                         (mtime_t)0 ) == PAUSE_S) )
     {
         intf_WarnMsg( 2, "synchro reinit" );
         p_pes->i_pts = mdate() + DEFAULT_PTS_DELAY;
-        p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_OK;
+        p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_OK;
     }
 
     input_DecodePES( p_fifo, p_pes );
