@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.127 2002/03/04 01:53:56 stef Exp $
+ * $Id: input_dvd.c,v 1.128 2002/03/04 02:26:23 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -372,7 +372,12 @@ static int DVDOpen( struct input_thread_s *p_input )
     {
         if( *psz_raw )
         {
-            setenv( "DVDCSS_RAW_DEVICE", psz_raw, 1 );
+            char * psz_env;
+            psz_env = malloc( strlen("DVDCSS_RAW_DEVICE=")
+                            + strlen( psz_raw ) + 1 );
+            sprintf( psz_env, "DVDCSS_RAW_DEVICE=%s", psz_raw );
+            fprintf(stderr, "%s\n", psz_env );
+            putenv( psz_env );
         }
         else
         {

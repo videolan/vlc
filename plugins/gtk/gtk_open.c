@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.17 2002/03/04 01:53:56 stef Exp $
+ * $Id: gtk_open.c,v 1.18 2002/03/04 02:26:23 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -201,7 +201,6 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     else
     {
         intf_ErrMsg( "intf error: unknown disc type toggle button position" );
-        free( psz_source );
         return;
     }
     
