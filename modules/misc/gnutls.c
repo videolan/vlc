@@ -2,7 +2,7 @@
  * tls.c
  *****************************************************************************
  * Copyright (C) 2004-2005 VideoLAN
- * $Id: httpd.c 8263 2004-07-24 09:06:58Z courmisch $
+ * $Id$
  *
  * Authors: Remi Denis-Courmont <courmisch@via.ecp.fr>
  *
@@ -75,6 +75,7 @@ static void Close( vlc_object_t * );
     "Ensures that server hostname in certificate match requested host name." )
 
 vlc_module_begin();
+    set_shortname( "GnuTLS" );
     set_description( _("GnuTLS TLS encryption layer") );
     set_capability( "tls", 1 );
     set_callbacks( Open, Close );
