@@ -9612,43 +9612,43 @@ msgstr "Stream- und Medieninfo"
 
 #: modules/gui/wxwindows/interface.cpp:314
 msgid "Quick &Open File...\tCtrl-O"
-msgstr "Einfaches Datei &Öffnen...\tStrg-O"
+msgstr "Einfaches Datei &Öffnen...\tCtrl-O"
 
 #: modules/gui/wxwindows/interface.cpp:317
 msgid "Open &File...\tCtrl-F"
-msgstr "Datei ö&ffnen..\tStrg-F"
+msgstr "Datei ö&ffnen..\tCtrl-F"
 
 #: modules/gui/wxwindows/interface.cpp:318
 msgid "Open &Disc...\tCtrl-D"
-msgstr "Medium öffnen...\tStrg-D"
+msgstr "Medium öffnen...\tCtrl-D"
 
 #: modules/gui/wxwindows/interface.cpp:320
 msgid "Open &Network Stream...\tCtrl-N"
-msgstr "&Netzwerkstream öffnen...\tStrg-N"
+msgstr "&Netzwerkstream öffnen...\tCtrl-N"
 
 #: modules/gui/wxwindows/interface.cpp:322
 msgid "Open &Capture Device...\tCtrl-C"
-msgstr "&Aufname-Device öffnen...\tStrg-C"
+msgstr "&Aufname-Device öffnen...\tCtrl-C"
 
 #: modules/gui/wxwindows/interface.cpp:325
 msgid "&Wizard...\tCtrl-W"
-msgstr "Streaming-&Assistent...\tStrg-W"
+msgstr "Streaming-&Assistent...\tCtrl-W"
 
 #: modules/gui/wxwindows/interface.cpp:327
 msgid "E&xit\tCtrl-X"
-msgstr "Beenden\tStrg-Q"
+msgstr "Beenden\tCtrl-Q"
 
 #: modules/gui/wxwindows/interface.cpp:331
 msgid "&Playlist...\tCtrl-P"
-msgstr "&Wiedergabeliste...\tStrg-P"
+msgstr "&Wiedergabeliste...\tCtrl-P"
 
 #: modules/gui/wxwindows/interface.cpp:332
 msgid "&Messages...\tCtrl-M"
-msgstr "&Meldungen...\tStrg-M"
+msgstr "&Meldungen...\tCtrl-M"
 
 #: modules/gui/wxwindows/interface.cpp:334
 msgid "Stream and Media &info...\tCtrl-I"
-msgstr "Stream- und Medien&info...\tStrg-I"
+msgstr "Stream- und Medien&info...\tCtrl-I"
 
 #: modules/gui/wxwindows/interface.cpp:348
 msgid "&File"
