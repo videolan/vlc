@@ -2,7 +2,7 @@
  * transforms_common.h: YUV transformation macros for truecolor
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: transforms_common.h,v 1.3 2001/10/11 13:19:27 massiot Exp $
+ * $Id: transforms_common.h,v 1.3.2.1 2001/12/17 01:36:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -121,7 +121,12 @@
                     p_v += i_chroma_width;                                    \
                 }                                                             \
             }                                                                 \
-            else if( (CHROMA == 422) || (CHROMA == 444) )                     \
+            else if( CHROMA == 422 )                                          \
+            {                                                                 \
+                p_u += i_chroma_width;                                        \
+                p_v += i_chroma_width;                                        \
+            }                                                                 \
+            else if( CHROMA == 444 )                                          \
             {                                                                 \
                 p_u += i_width;                                               \
                 p_v += i_width;                                               \
