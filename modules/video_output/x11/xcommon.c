@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.30 2003/08/28 21:11:55 gbazin Exp $
+ * $Id: xcommon.c,v 1.31 2003/09/01 18:30:01 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1268,8 +1268,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
                                   + p_pic->p_sys->p_image->offsets[0];
             p_pic->p->i_lines = p_vout->output.i_height;
             p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0];
-            p_pic->p->i_pixel_pitch = 4;
-            p_pic->p->i_visible_pitch = p_vout->output.i_width * 4;
+            p_pic->p->i_pixel_pitch = 2;
+            p_pic->p->i_visible_pitch = p_vout->output.i_width * 2;
 
             p_pic->i_planes = 1;
             break;
