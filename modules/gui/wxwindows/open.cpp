@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.32 2003/07/24 21:50:28 gbazin Exp $
+ * $Id: open.cpp,v 1.33 2003/07/25 11:33:24 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -294,7 +294,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
     OnNetTypeChange( dummy_event );
 
     /* Update MRL */
-    wxNotebookEvent event = wxNotebookEvent( wxEVT_NULL, 0, i_access_method );
+    wxNotebookEvent event( wxEVT_NULL, 0, i_access_method );
     OnPageChange( event );
 
     /* Place everything in sizers */

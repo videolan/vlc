@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.41 2003/07/23 22:02:56 jpsaman Exp $
+dnl $Id: configure.ac,v 1.42 2003/07/25 11:33:24 gbazin Exp $
 
 AC_INIT(vlc,0.6.1-test1)
 
@@ -1966,7 +1966,7 @@ dnl
 dnl   png
 dnl
 AC_CHECK_HEADERS(png.h, [
-    AX_ADD_LDFLAGS([logo],[-lpng])
+    AX_ADD_LDFLAGS([logo],[-lpng -lz])
     AX_ADD_PLUGINS([logo])])
 
 dnl
