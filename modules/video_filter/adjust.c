@@ -2,7 +2,7 @@
  * adjust.c : Contrast/Hue/Saturation/Brightness video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: adjust.c,v 1.3 2002/11/28 21:49:04 garf Exp $
+ * $Id: adjust.c,v 1.4 2002/12/12 10:56:24 garf Exp $
  *
  * Authors: Simon Latapie <garf@via.ecp.fr>, Samuel Hocevar <sam@zoy.org>
  *
@@ -83,8 +83,6 @@ struct vout_sys_t
 {
         vout_thread_t *p_vout;
 };
-
-static int p_lum_func[256];
 
 inline static int32_t maxmin( int32_t a )
 {
@@ -210,6 +208,7 @@ cleaner :) */
     int i_sat;
     int i_Sin;
     int i_Cos;
+    int p_lum_func[256];
     int i;
     
     /* This is a new frame. Get a structure from the video_output. */
@@ -289,8 +288,8 @@ cleaner :) */
         p_out_u = p_outpic->p[i_index].p_pixels;
         p_out_v = p_outpic->p[i_index + 1].p_pixels;
 
-        cospsin = 128 * ( i_Cos + i_Sin );
-        cosmsin = 128 * ( i_Cos - i_Sin );
+        cospsin = 32768 * ( cos(hue) + sin(hue) );
+        cosmsin = 32768 * ( cos(hue) - sin(hue) );
 
         if ( i_sat > 256 )
         {
