@@ -86,11 +86,10 @@
     </div>
 
     <div class="sectitle">Move Item</div>
-     <div class="section">
-      <form method="get" action="">
-       Move the item number <input type="text" name="psz_pos" size="5" /> to <input type="text" name="psz_newpos" size="5" /> <input type="submit" name="control" value="move" />
-      </form>
-     </div>
+    <div class="section">
+     <form method="get" action="">
+      Move the item number <input type="text" name="psz_pos" size="5" /> to <input type="text" name="psz_newpos" size="5" /> <input type="submit" name="control" value="move" />
+     </form>
     </div>
 
     <div class="sectitle">VLC Playlist</div>
@@ -115,6 +114,7 @@
         <tr>
           <td>
             <table>
+              <vlc id="rpn" param1="0"/>
               <vlc id="foreach" param1="pl" param2="playlist" />
               <tr class="<vlc id="if" param1="pl.index 2 % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
                 <td>
@@ -129,7 +129,15 @@
                   <vlc id="end" />
                 </td>
               </tr>
+              <vlc id="rpn" param1="1 +"/>
               <vlc id="end" />
+              <vlc id="if" param1="0 ="/>
+               <tr class="ligne1">
+                <td>
+                 empty playlist
+                </td>
+               </tr>
+              <vlc id="end"/>
             </table>
           </td>
         </tr>
