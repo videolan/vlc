@@ -68,6 +68,8 @@ static void ParseID3Tag( demux_t *p_demux, uint8_t *p_data, int i_size )
     p_id3_tag = id3_tag_parse( p_data, i_size );
     if( !p_id3_tag ) return;
 
+    if( !p_demux->p_private ) p_demux->p_private = (void *)vlc_meta_New();
+
     while( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
         int i_strings = id3_field_getnstrings( &p_frame->fields[1] );
@@ -130,7 +132,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
     int i_size2;
     vlc_bool_t b_seekable;
 
-    p_demux->p_private = (void *)vlc_meta_New();
+    p_demux->p_private = NULL;
 
     msg_Dbg( p_demux, "checking for ID3 tag" );
 
