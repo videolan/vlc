@@ -26,7 +26,7 @@ build-stamp:
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
 		ARCH_FLAGS="--enable-alsa --with-glide" ;; \
-	alpha|ia64|m68k|powerpc) \
+	alpha|arm|hppa|ia64|m68k|mips|mipsel|powerpc|s390|sparc) \
 		ARCH_FLAGS="--enable-alsa" ;; \
 	*) \
 		ARCH_FLAGS="" ;; \
@@ -74,13 +74,13 @@ install: build
 	mv debian/vlc/usr/bin/gnome-vlc debian/vlc-gnome/usr/bin/
 	mv debian/vlc/usr/bin/qvlc debian/vlc-qt/usr/bin/
 
-	mv debian/vlc/$(VIDDIR)/vlc.png debian/vlc/$(PIXDIR)
-	mv debian/vlc/$(VIDDIR)/gvlc.xpm debian/vlc-gtk/$(VIDDIR)
-	mv debian/vlc/$(VIDDIR)/gvlc.png debian/vlc-gtk/$(PIXDIR)
-	mv debian/vlc/$(VIDDIR)/gnome-vlc.xpm debian/vlc-gnome/$(VIDDIR)
-	mv debian/vlc/$(VIDDIR)/gnome-vlc.png debian/vlc-gnome/$(PIXDIR)
-	mv debian/vlc/$(VIDDIR)/qvlc.xpm debian/vlc-qt/$(VIDDIR)
-	mv debian/vlc/$(VIDDIR)/qvlc.png debian/vlc-qt/$(PIXDIR)
+	mv debian/vlc/$(VIDDIR)/vlc48x48.png debian/vlc/$(PIXDIR)/vlc.png
+	mv debian/vlc/$(VIDDIR)/gvlc32x32.xpm debian/vlc-gtk/$(VIDDIR)/gvlc.xpm
+	mv debian/vlc/$(VIDDIR)/gvlc48x48.png debian/vlc-gtk/$(PIXDIR)/gvlc.png
+	mv debian/vlc/$(VIDDIR)/gnome-vlc32x32.xpm debian/vlc-gnome/$(VIDDIR)/gnome-vlc.xpm
+	mv debian/vlc/$(VIDDIR)/gnome-vlc48x48.png debian/vlc-gnome/$(PIXDIR)/gnome-vlc.png
+	mv debian/vlc/$(VIDDIR)/qvlc32x32.xpm debian/vlc-qt/$(VIDDIR)/qvlc.xpm
+	mv debian/vlc/$(VIDDIR)/qvlc48x48.png debian/vlc-qt/$(PIXDIR)/qvlc.png
 
 	cp debian/vlc.desktop debian/vlc/$(GNOMEDIR)
 	cp debian/gvlc.desktop debian/vlc-gtk/$(GNOMEDIR)
@@ -136,7 +136,7 @@ binary-arch: build install
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
 		ARCH_EXCLUDE="" ;; \
-	alpha|ia64|m68k|powerpc) \
+	alpha|arm|hppa|ia64|m68k|mips|mipsel|powerpc|s390|sparc) \
 		ARCH_EXCLUDE="-Nvlc-glide" ;; \
 	*) \
 		ARCH_EXCLUDE="-Nvlc-glide -Nvlc-alsa" ;; \

@@ -2,8 +2,16 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Samuel Hocevar <sam@zoy.org>
-Build-Depends: debhelper (>=2.2.0), xlibs-dev, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libsdl1.2-dev, libqt-dev, libasound2-dev [alpha i386 ia64 m68k powerpc] (>=0.9.0beta7), libmad0-dev
-Standards-Version: 3.0.1
+Build-Depends: debhelper (>=2.2.0),
+               xlibs-dev,
+               libgnome-dev,
+               libggi2-dev,
+               libglide2-dev [i386],
+               libesd0-dev,
+               libsdl1.2-dev (>=1.2.2-3.1),
+               libqt-dev,
+               libasound2-dev [alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc] (>=0.9.0beta7)
+Standards-Version: 3.5.6
 
 Package: vlc
 Architecture: any
@@ -23,7 +31,7 @@ Description: a portable abstraction library for DVD decryption
  libdvdcss is a portable abstraction library for DVD decryption, it
  provides a simple API to access a DVD device as a block device.
  .
- This package contains the libdvdcss0 runtime library.
+ This package contains the libdvdcss1 runtime library.
 
 Package: libdvdcss1-dev
 Architecture: any
@@ -34,7 +42,7 @@ Description: development files for libdvdcss1
  provides a simple API to access a DVD device as a block device.
  .
  This package contains the header files and static library needed to
- compile applications that use libdvdcss0.
+ compile applications that use libdvdcss1.
 
 Package: vlc-gnome
 Architecture: any
@@ -66,7 +74,7 @@ Description: Esound plugin for vlc
  vlc, the VideoLAN Client.
 
 Package: vlc-alsa
-Architecture: alpha i386 ia64 m68k powerpc
+Architecture: alpha arm hppa i386 ia64 m68k mips mipsel powerpc s390 sparc
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
 Description: ALSA plugin for vlc
  VideoLAN is a free MPEG, MPEG2 and DVD software solution.

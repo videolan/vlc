@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.8 2002/01/07 02:12:29 sam Exp $
+ * $Id: wall.c,v 1.9 2002/01/07 17:02:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -134,8 +134,8 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    p_vout->p_sys->i_col = 6;
-    p_vout->p_sys->i_row = 6;
+    p_vout->p_sys->i_col = 3;
+    p_vout->p_sys->i_row = 3;
 
     p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_row *
                                      p_vout->p_sys->i_col *
