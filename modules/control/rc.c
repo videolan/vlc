@@ -479,6 +479,15 @@ static void Run( intf_thread_t *p_intf )
                          psz_cmd, i_ret, vlc_error( i_ret ) );
             }
         }
+        else if( !strcmp( psz_cmd, "logout" ) )
+        {
+            /* Close connection */
+            if( p_intf->p_sys->i_socket != -1 )
+            {
+                net_Close( p_intf->p_sys->i_socket );
+            }
+            p_intf->p_sys->i_socket = -1;
+        }
         else if( !strcmp( psz_cmd, "info" ) )
         {
             if( p_input )
@@ -614,6 +623,7 @@ static void Run( intf_thread_t *p_intf )
             printf(_("| achan [X]. . . . . . . .  set/get audio channels\n"));
             printf("| \n");
             printf(_("| help . . . . . . . . . . . . . this help message\n"));
+            printf(_("| logout . . . . . .exit (if in socket connection)\n"));
             printf(_("| quit . . . . . . . . . . . . . . . . .  quit vlc\n"));
             printf("| \n");
             printf(_("+----[ end of help ]\n"));
