@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.18 2003/01/02 22:49:19 jlj Exp $
+ * $Id: aout.m,v 1.19 2003/01/13 14:51:25 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -176,6 +176,7 @@ int E_(OpenAudio)( vlc_object_t * p_this )
     UInt32 i, i_param_size;
     struct aout_sys_t * p_sys;
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    vlc_value_t val;
 
     /* Allocate structure */
     p_sys = (struct aout_sys_t *)malloc( sizeof( struct aout_sys_t ) );
@@ -197,8 +198,6 @@ int E_(OpenAudio)( vlc_object_t * p_this )
 
     if( var_Type( p_aout, "audio-device" ) == 0 )
     {
-        vlc_value_t val;
-
         var_Create( p_aout, "audio-device", VLC_VAR_STRING | 
                                             VLC_VAR_HASCHOICE );
 
@@ -208,9 +207,11 @@ int E_(OpenAudio)( vlc_object_t * p_this )
             var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
         }
 
-        val.b_bool = VLC_TRUE;
-        var_Set( p_aout, "intf-change", val );
+        var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
+                         NULL );
     }
+    val.b_bool = VLC_TRUE;
+    var_Set( p_aout, "intf-change", val );
 
     /* Get selected device */
     if( GetDevice( p_aout, &p_sys->devid ) )

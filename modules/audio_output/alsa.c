@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.18 2003/01/08 10:50:58 massiot Exp $
+ * $Id: alsa.c,v 1.19 2003/01/13 14:51:25 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -207,6 +207,8 @@ static void Probe( aout_instance_t * p_aout,
 
     /* Add final settings to the variable */
     var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart, NULL );
+    val.b_bool = VLC_TRUE;
+    var_Set( p_aout, "intf-change", val );
 }
 
 /*****************************************************************************
