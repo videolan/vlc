@@ -18,6 +18,8 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-qt \
 	--disable-kde \
 	--disable-qte \
+	--disable-xosd \
+	--enable-dummy \
 	--enable-fb \
 	--enable-sdl \
 	--enable-oss \
@@ -46,7 +48,7 @@ export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/gpe-vlc-0.5.2
+export PKGDIR=/home/jpsaman/iPaq/packages/gpe-vlc-0.5.3
 
 config:
 	./configure --mandir=$${prefix}/share/man \

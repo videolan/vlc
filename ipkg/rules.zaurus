@@ -16,8 +16,10 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--disable-gnome \
 	--disable-qt \
 	--disable-kde \
+	--disable-xosd \
 	--enable-qte \
 	--disable-x11 \
+	--enable-dummy \
 	--enable-fb \
 	--enable-sdl \
 	--disable-alsa \
@@ -40,7 +42,7 @@ export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/zaurus-vlc-0.5.2
+export PKGDIR=/home/jpsaman/iPaq/packages/zaurus-vlc-0.5.3
 export QTDIR=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop
 
 build: build-stamp
