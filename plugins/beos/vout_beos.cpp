@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.57 2002/05/22 12:23:41 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.58 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -279,7 +279,7 @@ int VideoWindow::SelectDrawingMode(int width, int height)
 {
     int drawingMode = BITMAP;
 
-    int noOverlay = config_GetIntVariable( "nooverlay" );
+    int noOverlay = !config_GetIntVariable( "overlay" );
     for (int i = 0; i < COLOR_COUNT; i++)
     {
         if (noOverlay) break;

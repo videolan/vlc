@@ -172,8 +172,8 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->b_fullscreen =
         config_GetIntVariable( "fullscreen" );
     p_vout->p_sys->i_mode =
-        config_GetIntVariable( "nooverlay" ) ?
-        MODE_NORMAL_MEM : MODE_VIDEO_OVERLAY;
+        config_GetIntVariable( "overlay" ) ?
+        MODE_NORMAL_OVERLAY : MODE_VIDEO_MEM;
     p_vout->p_sys->dim.w = p_vout->i_window_width;
     p_vout->p_sys->dim.h = p_vout->i_window_height;
 

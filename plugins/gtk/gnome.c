@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.21 2002/05/22 14:20:41 gbazin Exp $
+ * $Id: gnome.c,v 1.22 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,10 +61,11 @@ static gint GnomeManage      ( gpointer p_data );
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
-#define TOOLTIPS_TEXT N_("hide tooltips")
-#define TOOLTIPS_LONGTEXT N_("Do not show tooltips for configuration options.")
-#define TOOLBAR_TEXT N_("hide text on toolbar buttons")
-#define TOOLBAR_LONGTEXT N_("Do not show the text below icons on the toolbar.")
+#define TOOLTIPS_TEXT N_("show tooltips")
+#define TOOLTIPS_LONGTEXT N_("Show tooltips for configuration options.")
+
+#define TOOLBAR_TEXT N_("show text on toolbar buttons")
+#define TOOLBAR_LONGTEXT N_("Show the text below icons on the toolbar.")
 
 #define PREFS_MAXH_TEXT N_("maximum height for the configuration windows")
 #define PREFS_MAXH_LONGTEXT N_( \
@@ -72,13 +73,13 @@ static gint GnomeManage      ( gpointer p_data );
     "preferences menu will occupy.")
 
 MODULE_CONFIG_START
-    ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-    ADD_BOOL    ( "gnome-notooltips", GtkHideTooltips, TOOLTIPS_TEXT,
-                  TOOLTIPS_LONGTEXT )
-    ADD_BOOL    ( "gnome-notoolbartext", GtkHideToolbarText, TOOLBAR_TEXT,
-                  TOOLBAR_LONGTEXT )
-    ADD_INTEGER ( "gnome-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT,
-                  PREFS_MAXH_LONGTEXT )
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_BOOL   ( "gnome-tooltips", 1, GtkHideTooltips, TOOLTIPS_TEXT,
+             TOOLTIPS_LONGTEXT )
+ADD_BOOL   ( "gnome-toolbartext", GtkHideToolbarText, TOOLBAR_TEXT,
+             TOOLBAR_LONGTEXT )
+ADD_INTEGER( "gnome-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT,
+             PREFS_MAXH_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -272,11 +273,11 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_tooltips = gtk_tooltips_new();
 
     /* Hide tooltips if the option is set */
-    if( config_GetIntVariable( "gnome-notooltips" ) )
+    if( !config_GetIntVariable( "gnome-tooltips" ) )
         gtk_tooltips_disable( p_intf->p_sys->p_tooltips );
 
     /* Hide toolbar text of the option is set */
-    if ( config_GetIntVariable( "gnome-notoolbartext" ) )
+    if( !config_GetIntVariable( "gnome-toolbartext" ) )
         gtk_toolbar_set_style(
             GTK_TOOLBAR(lookup_widget( p_intf->p_sys->p_window, "toolbar" )),
             GTK_TOOLBAR_ICONS );

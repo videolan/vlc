@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.21 2002/05/22 17:17:45 sam Exp $
+ * $Id: modules_inner.h,v 1.22 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -93,13 +93,15 @@
 #define MODULE_INIT_STOP                                                      \
         } while( 0 );                                                         \
         p_module->pp_shortcuts[ i_shortcut ] = NULL;                          \
-        p_module->i_config_items = 0;                                         \
+        p_module->i_config_items = p_module->i_bool_items = 0;                \
         for( p_item = p_config;                                               \
              p_item->i_type != MODULE_CONFIG_HINT_END;                        \
              p_item++ )                                                       \
         {                                                                     \
             if( p_item->i_type & MODULE_CONFIG_ITEM )                         \
                 p_module->i_config_items++;                                   \
+            if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL )                   \
+                p_module->i_bool_items++;                                     \
         }                                                                     \
         vlc_mutex_init( &p_module->config_lock );                             \
         p_module->p_config = config_Duplicate( p_config );                    \

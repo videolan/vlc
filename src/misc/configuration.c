@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.25 2002/05/18 17:53:11 massiot Exp $
+ * $Id: configuration.c,v 1.26 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -775,7 +775,7 @@ int config_SaveConfigFile( const char *psz_module_name )
 int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
                         boolean_t b_ignore_errors )
 {
-    int i_cmd, i_index, i_opts, i_shortopts;
+    int i_cmd, i_index, i_opts, i_shortopts, flag;
     module_t *p_module;
     module_config_t *p_item;
     struct option *p_longopts;
@@ -823,8 +823,9 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
          p_module = p_module->next )
     {
         /* count the number of exported configuration options (to allocate
-         * longopts). */
-        i_opts += p_module->i_config_items;
+         * longopts). We also need to allocate space for too options when
+         * dealing with boolean to allow for --foo and --no-foo */
+        i_opts += (p_module->i_config_items + p_module->i_bool_items);
     }
 
     p_longopts = malloc( sizeof(struct option) * (i_opts + 1) );
@@ -880,13 +881,30 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
                 continue;
 
             /* Add item to long options */
-            p_longopts[i_index].name = p_item->psz_name;
+            p_longopts[i_index].name = strdup( p_item->psz_name );
+            if( p_longopts[i_index].name == NULL ) continue;
             p_longopts[i_index].has_arg =
                 (p_item->i_type == MODULE_CONFIG_ITEM_BOOL)?
                                                no_argument : required_argument;
-            p_longopts[i_index].flag = 0;
+            p_longopts[i_index].flag = &flag;
             p_longopts[i_index].val = 0;
             i_index++;
+
+            /* When dealing with bools we also need to add the --no-foo
+             * option */
+            if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL )
+            {
+                char *psz_name = malloc( strlen(p_item->psz_name) + 4 );
+                if( psz_name == NULL ) continue;
+                strcpy( psz_name, "no-" );
+                strcat( psz_name, p_item->psz_name );
+
+                p_longopts[i_index].name = psz_name;
+                p_longopts[i_index].has_arg = no_argument;
+                p_longopts[i_index].flag = &flag;
+                p_longopts[i_index].val = 1;
+                i_index++;
+            }
 
             /* If item also has a short option, add it */
             if( p_item->i_short )
@@ -919,26 +937,29 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
         if( i_cmd == 0 )
         {
             module_config_t *p_conf;
+            char *psz_name = (char *)p_longopts[i_index].name;
+
+            /* Check if we deal with a --no-foo long option */
+            if( flag ) psz_name += 3;
 
             /* Store the configuration option */
-            p_conf = config_FindConfig( p_longopts[i_index].name );
+            p_conf = config_FindConfig( psz_name );
 
-            switch( p_conf->i_type )
+            if( p_conf ) switch( p_conf->i_type )
             {
             case MODULE_CONFIG_ITEM_STRING:
             case MODULE_CONFIG_ITEM_FILE:
             case MODULE_CONFIG_ITEM_MODULE:
-                config_PutPszVariable( p_longopts[i_index].name, optarg );
+                config_PutPszVariable( psz_name, optarg );
                 break;
             case MODULE_CONFIG_ITEM_INTEGER:
-                config_PutIntVariable( p_longopts[i_index].name, atoi(optarg));
+                config_PutIntVariable( psz_name, atoi(optarg));
                 break;
             case MODULE_CONFIG_ITEM_FLOAT:
-                config_PutFloatVariable( p_longopts[i_index].name,
-                                         (float)atof(optarg) );
+                config_PutFloatVariable( psz_name, (float)atof(optarg) );
                 break;
             case MODULE_CONFIG_ITEM_BOOL:
-                config_PutIntVariable( p_longopts[i_index].name, 1 );
+                config_PutIntVariable( psz_name, !flag );
                 break;
             }
 
@@ -989,6 +1010,9 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
         }
     }
 
+    /* Free allocated resources */
+    for( i_index = 0; p_longopts[i_index].name; i_index++ )
+        free( (char *)p_longopts[i_index].name );
     free( p_longopts );
     free( psz_shortopts );
     if( b_ignore_errors ) free( ppsz_argv );

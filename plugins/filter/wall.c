@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.19 2002/05/28 22:49:25 sam Exp $
+ * $Id: wall.c,v 1.20 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -153,7 +153,6 @@ static int vout_Create( vout_thread_t *p_vout )
     if( p_vout->p_sys->pp_vout == NULL )
     {
         intf_ErrMsg("error: %s", strerror(ENOMEM) );
-        free( psz_method_tmp );
         free( p_vout->p_sys );
         return( 1 );
     }

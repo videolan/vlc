@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.10 2002/05/03 20:49:30 sam Exp $
+ * $Id: configuration.h,v 1.11 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -141,27 +141,25 @@ void             config_UnsetCallbacks( module_config_t * );
 #define ADD_FLOAT( name, f_value, p_callback, text, longtext ) \
     { MODULE_CONFIG_ITEM_FLOAT, name, '\0', text, longtext, NULL, 0, f_value, \
       p_callback, NULL, 0 },
-#define ADD_BOOL( name, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_BOOL, name, '\0', text, longtext, NULL, 0, 0, \
+#define ADD_BOOL( name, b_value, p_callback, text, longtext ) \
+    { MODULE_CONFIG_ITEM_BOOL, name, '\0', text, longtext, NULL, b_value, 0, \
       p_callback, NULL, 0 },
-#define ADD_STRING_WITH_SHORT( name, ch, value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_STRING, name, ch, text, longtext, value, 0, 0, \
+#define ADD_STRING_WITH_SHORT( name, ch, psz_value, p_callback, text, ltext ) \
+    { MODULE_CONFIG_ITEM_STRING, name, ch, text, ltext, psz_value, 0, 0, \
       p_callback, NULL, 0 },
-#define ADD_FILE_WITH_SHORT( name, ch, psz_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_FILE, name, ch, text, longtext, psz_value, 0, 0, \
+#define ADD_FILE_WITH_SHORT( name, ch, psz_value, p_callback, text, ltext ) \
+    { MODULE_CONFIG_ITEM_FILE, name, ch, text, ltext, psz_value, 0, 0, \
       p_callback, NULL, 0 },
 #define ADD_MODULE_WITH_SHORT( name, ch, i_capability, psz_value, p_callback, \
-  text, longtext) \
-    { MODULE_CONFIG_ITEM_MODULE, name, ch, text, longtext, psz_value, \
+    text, ltext) \
+    { MODULE_CONFIG_ITEM_MODULE, name, ch, text, ltext, psz_value, \
       i_capability, 0, p_callback, NULL, 0 },
-#define ADD_INTEGER_WITH_SHORT( name, ch, i_value, p_callback, text, \
-  longtext ) \
-    { MODULE_CONFIG_ITEM_INTEGER, name, ch, text, longtext, NULL, i_value, 0, \
+#define ADD_INTEGER_WITH_SHORT( name, ch, i_value, p_callback, text, ltext ) \
+    { MODULE_CONFIG_ITEM_INTEGER, name, ch, text, ltext, NULL, i_value, 0, \
       p_callback, NULL, 0 },
-#define ADD_FLOAT_WITH_SHORT( name, f_value, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_FLOAT, name, ch, text, longtext, NULL, 0, f_value, \
+#define ADD_FLOAT_WITH_SHORT( name, ch, f_value, p_callback, text, ltext ) \
+    { MODULE_CONFIG_ITEM_FLOAT, name, ch, text, ltext, NULL, 0, f_value, \
       p_callback, NULL, 0 },
-#define ADD_BOOL_WITH_SHORT( name, ch, p_callback, text, longtext ) \
-    { MODULE_CONFIG_ITEM_BOOL, name, ch, text, longtext, NULL, 0, 0, \
+#define ADD_BOOL_WITH_SHORT( name, ch, b_value, p_callback, text, ltext ) \
+    { MODULE_CONFIG_ITEM_BOOL, name, ch, text, ltext, NULL, b_value, 0, \
       p_callback, NULL, 0 },
-

@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.35 2002/05/18 22:41:43 gbazin Exp $
+ * $Id: vout_directx.c,v 1.36 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -128,9 +128,9 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_event_thread_die = 0;
     p_vout->p_sys->b_caps_overlay_clipping = 0;
     SetRectEmpty( &p_vout->p_sys->rect_display );
-    p_vout->p_sys->b_using_overlay = !config_GetIntVariable( "nooverlay" );
+    p_vout->p_sys->b_using_overlay = config_GetIntVariable( "overlay" );
     p_vout->p_sys->b_use_sysmem = config_GetIntVariable( "directx-use-sysmem");
-    p_vout->p_sys->b_hw_yuv = !config_GetIntVariable( "no-directx-hw-yuv" );
+    p_vout->p_sys->b_hw_yuv = config_GetIntVariable( "directx-hw-yuv" );
 
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();

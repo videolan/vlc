@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.194 2002/05/20 22:39:36 sam Exp $
+ * $Id: main.c,v 1.195 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -119,13 +119,13 @@
     "vlc.\nNote that the default behavior is to automatically select the " \
     "best method available.")
 
-#define NOAUDIO_TEXT N_("disable audio")
-#define NOAUDIO_LONGTEXT N_( \
-    "This will completely disable the audio output. The audio decoding " \
-    "stage shouldn't even be done, so it can allow you to save some " \
+#define AUDIO_TEXT N_("enable audio")
+#define AUDIO_LONGTEXT N_( \
+    "You can completely disable the audio output. In this case the audio " \
+    "decoding stage won't be done, and it will also save some " \
     "processing power.")
 
-#define MONO_TEXT N_("mono audio")
+#define MONO_TEXT N_("force mono audio")
 #define MONO_LONGTEXT N_("This will force a mono audio output")
 
 #define VOLUME_TEXT N_("audio output volume")
@@ -162,10 +162,10 @@
     "Note that the default behavior is to automatically select the best " \
     "method available.")
 
-#define NOVIDEO_TEXT N_("disable video")
-#define NOVIDEO_LONGTEXT N_( \
-    "This will completely disable the video output. The video decoding " \
-    "stage shouldn't even be done, so it can allow you to save some " \
+#define VIDEO_TEXT N_("enable video")
+#define VIDEO_LONGTEXT N_( \
+    "You can completely disable the video output. In this case the video " \
+    "decoding stage won't be done, and it will also save some " \
     "processing power.")
 
 #define DISPLAY_TEXT N_("display identifier")
@@ -189,17 +189,17 @@
 
 #define GRAYSCALE_TEXT N_("grayscale video output")
 #define GRAYSCALE_LONGTEXT N_( \
-    "Using this option, vlc will not decode the color information from the " \
-    "video (this can also allow you to save some processing power).")
+    "When enabled, the color information from the video won't be decoded " \
+    "(this can also allow you to save some processing power).")
 
 #define FULLSCREEN_TEXT N_("fullscreen video output")
 #define FULLSCREEN_LONGTEXT N_( \
     "If this option is enabled, vlc will always start a video in fullscreen " \
     "mode.")
 
-#define NOOVERLAY_TEXT N_("disable hardware acceleration for the video output")
-#define NOOVERLAY_LONGTEXT N_( \
-    "By default vlc will try to take advantage of the overlay capabilities " \
+#define OVERLAY_TEXT N_("overlay video output")
+#define OVERLAY_LONGTEXT N_( \
+    "If enabled, vlc will try to take advantage of the overlay capabilities " \
     "of you graphics card.")
 
 #define SPUMARGIN_TEXT N_("force SPU position")
@@ -249,7 +249,7 @@
 
 #define INPUT_SUBT_TEXT N_("choose subtitles")
 #define INPUT_SUBT_LONGTEXT N_( \
-    "Give the stream number of the subtitle channel you want to use in a DVD " \
+    "Give the stream number of the subtitle channel you want to use in a DVD "\
     "(from 1 to n).")
 
 #define DVD_DEV_TEXT N_("DVD device")
@@ -280,42 +280,42 @@
     "This allows you to select the AC3/A52 audio decoder you want to use. " \
     "Common choices are builtin and a52.")
 
-#define NOMMX_TEXT N_("disable CPU's MMX support")
-#define NOMMX_LONGTEXT N_( \
-    "If your processor supports the MMX instructions set but you don't want " \
-    "vlc to use them, you can use this option.")
+#define MMX_TEXT N_("enable CPU MMX support")
+#define MMX_LONGTEXT N_( \
+    "If your processor supports the MMX instructions set, vlc can take " \
+    "advantage of them.")
 
-#define NO3DN_TEXT N_("disable CPU's 3D Now! support")
-#define NO3DN_LONGTEXT N_( \
-    "If your processor supports the 3D Now! instructions set but you don't " \
-    "want vlc to use them, you can use this option.")
+#define THREE_DN_TEXT N_("enable CPU 3D Now! support")
+#define THREE_DN_LONGTEXT N_( \
+    "If your processor supports the 3D Now! instructions set, vlc can take "\
+    "advantage of them.")
 
-#define NOMMXEXT_TEXT N_("disable CPU's MMX EXT support")
-#define NOMMXEXT_LONGTEXT N_( \
-    "If your processor supports the MMX EXT instructions set but you don't " \
-    "want vlc to use them, you can use this option.")
+#define MMXEXT_TEXT N_("enable CPU MMX EXT support")
+#define MMXEXT_LONGTEXT N_( \
+    "If your processor supports the MMX EXT instructions set, vlc can take "\
+    "advantage of them.")
 
-#define NOSSE_TEXT N_("disable CPU's SSE support")
-#define NOSSE_LONGTEXT N_( \
-    "If your processor supports the SSE instructions set but you don't want " \
-    "vlc to use them, you can use this option.")
+#define SSE_TEXT N_("enable CPU SSE support")
+#define SSE_LONGTEXT N_( \
+    "If your processor supports the SSE instructions set, vlc can take " \
+    "can take advantage of them.")
 
-#define NOALTIVEC_TEXT N_("disable CPU's AltiVec support")
-#define NOALTIVEC_LONGTEXT N_( \
-    "If your processor supports the AltiVec instructions set but you don't " \
-    "want vlc to use them, you can use this option.")
+#define ALTIVEC_TEXT N_("enable CPU AltiVec support")
+#define ALTIVEC_LONGTEXT N_( \
+    "If your processor supports the AltiVec instructions set, vlc can take "\
+    "advantage of them.")
 
-#define PLAYLIST_LAUNCH_TEXT N_("launch playlist on startup")
-#define PLAYLIST_LAUNCH_LONGTEXT N_( \
+#define PL_LAUNCH_TEXT N_("launch playlist on startup")
+#define PL_LAUNCH_LONGTEXT N_( \
     "If you want vlc to start playing on startup, then enable this option.")
 
-#define PLAYLIST_ENQUEUE_TEXT N_("enqueue playlist as default")
-#define PLAYLIST_ENQUEUE_LONGTEXT N_( \
+#define PL_ENQUEUE_TEXT N_("enqueue items in playlist")
+#define PL_ENQUEUE_LONGTEXT N_( \
     "If you want vlc to add items to the playlist as you open them, then " \
     "enable this option.")
 
-#define PLAYLIST_LOOP_TEXT N_("loop playlist on end")
-#define PLAYLIST_LOOP_LONGTEXT N_( \
+#define PL_LOOP_TEXT N_("loop playlist on end")
+#define PL_LOOP_LONGTEXT N_( \
     "If you want vlc to keep playing the playlist indefinitely then enable " \
     "this option.")
 
@@ -323,6 +323,14 @@
 #define MEMCPY_LONGTEXT N_( \
     "You can select wich memory copy module you want to use. By default vlc " \
     "will select the fastest one supported by your hardware.")
+
+#define ACCESS_TEXT N_("access module")
+#define ACCESS_LONGTEXT N_( \
+    "This is a legacy entry to let you configure access modules")
+
+#define DEMUX_TEXT N_("demux module")
+#define DEMUX_LONGTEXT N_( \
+    "This is a legacy entry to let you configure demux modules")
 
 #define FAST_PTHREAD_TEXT N_("fast pthread on NT/2K/XP (developpers only)")
 #define FAST_PTHREAD_LONGTEXT N_( \
@@ -342,7 +350,7 @@
  * ADD_MODULE( option_name, psz_value, i_capability, p_callback,
  *             N_(text), N_(longtext) )
  * ADD_INTEGER( option_name, i_value, p_callback, N_(text), N_(longtext) )
- * ADD_BOOL( option_name, p_callback, N_(text), N_(longtext) )
+ * ADD_BOOL( option_name, b_value, p_callback, N_(text), N_(longtext) )
  */
 
 MODULE_CONFIG_START
@@ -351,37 +359,36 @@ MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Interface"), NULL)
 ADD_MODULE_WITH_SHORT  ( "intf", 'I', MODULE_CAPABILITY_INTF, NULL, NULL, INTF_TEXT, INTF_LONGTEXT )
 ADD_INTEGER ( "warning", 0, NULL, WARNING_TEXT, WARNING_LONGTEXT )
-ADD_BOOL    ( "stats", NULL, STATS_TEXT, STATS_LONGTEXT )
+ADD_BOOL    ( "stats", 0, NULL, STATS_TEXT, STATS_LONGTEXT )
 ADD_STRING  ( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT )
 
 /* Audio options */
 ADD_CATEGORY_HINT( N_("Audio"), NULL)
 ADD_MODULE_WITH_SHORT  ( "aout", 'A', MODULE_CAPABILITY_AOUT, NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT )
-ADD_BOOL    ( "noaudio", NULL, NOAUDIO_TEXT, NOAUDIO_LONGTEXT )
-ADD_BOOL    ( "mono", NULL, MONO_TEXT, MONO_LONGTEXT )
+ADD_BOOL    ( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT )
+ADD_BOOL    ( "mono", 0, NULL, MONO_TEXT, MONO_LONGTEXT )
 ADD_INTEGER ( "volume", VOLUME_DEFAULT, NULL, VOLUME_TEXT, VOLUME_LONGTEXT )
 ADD_INTEGER ( "rate", 44100, NULL, RATE_TEXT, RATE_LONGTEXT )
 ADD_INTEGER ( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT )
-ADD_INTEGER ( "audio-format", 0, NULL, FORMAT_TEXT,
-              FORMAT_LONGTEXT )
+ADD_INTEGER ( "audio-format", 0, NULL, FORMAT_TEXT, FORMAT_LONGTEXT )
 
 /* Video options */
 ADD_CATEGORY_HINT( N_("Video"), NULL )
 ADD_MODULE_WITH_SHORT  ( "vout", 'V', MODULE_CAPABILITY_VOUT, NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT )
-ADD_BOOL    ( "novideo", NULL, NOVIDEO_TEXT, NOVIDEO_LONGTEXT )
+ADD_BOOL    ( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT )
 ADD_INTEGER ( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT )
 ADD_INTEGER ( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT )
 ADD_FLOAT   ( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT )
-ADD_BOOL    ( "grayscale", NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT )
-ADD_BOOL    ( "fullscreen", NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT )
-ADD_BOOL    ( "nooverlay", NULL, NOOVERLAY_TEXT, NOOVERLAY_LONGTEXT )
+ADD_BOOL    ( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT )
+ADD_BOOL    ( "fullscreen", 0, NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT )
+ADD_BOOL    ( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT )
 ADD_INTEGER ( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT )
 ADD_MODULE  ( "filter", MODULE_CAPABILITY_VOUT, NULL, NULL, FILTER_TEXT, FILTER_LONGTEXT )
 
 /* Input options */
 ADD_CATEGORY_HINT( N_("Input"), NULL )
 ADD_INTEGER ( "server-port", 1234, NULL, SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT )
-ADD_BOOL    ( "network-channel", NULL, NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT )
+ADD_BOOL    ( "network-channel", 0, NULL, NETCHANNEL_TEXT, NETCHANNEL_LONGTEXT )
 ADD_STRING  ( "channel-server", "localhost", NULL, CHAN_SERV_TEXT, CHAN_SERV_LONGTEXT )
 ADD_INTEGER ( "channel-port", 6010, NULL, CHAN_PORT_TEXT, CHAN_PORT_LONGTEXT )
 ADD_STRING  ( "iface", "eth0", NULL, IFACE_TEXT, IFACE_LONGTEXT )
@@ -394,8 +401,8 @@ ADD_INTEGER ( "spu-channel", -1, NULL, INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT )
 ADD_STRING  ( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT )
 ADD_STRING  ( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT )
 
-ADD_BOOL_WITH_SHORT    ( "ipv6", '6', NULL, IPV6_TEXT, IPV6_LONGTEXT )
-ADD_BOOL_WITH_SHORT    ( "ipv4", '4', NULL, IPV4_TEXT, IPV4_LONGTEXT )
+ADD_BOOL_WITH_SHORT ( "ipv6", '6', 0, NULL, IPV6_TEXT, IPV6_LONGTEXT )
+ADD_BOOL_WITH_SHORT ( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT )
 
 /* Decoder options */
 ADD_CATEGORY_HINT( N_("Decoders"), NULL )
@@ -404,26 +411,26 @@ ADD_MODULE  ( "ac3-adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_AC3_TEXT, 
 
 /* CPU options */
 ADD_CATEGORY_HINT( N_("CPU"), NULL )
-ADD_BOOL    ( "nommx", NULL, NOMMX_TEXT, NOMMX_LONGTEXT )
-ADD_BOOL    ( "no3dn", NULL, NO3DN_TEXT, NO3DN_LONGTEXT )
-ADD_BOOL    ( "nommxext", NULL, NOMMXEXT_TEXT, NOMMXEXT_LONGTEXT )
-ADD_BOOL    ( "nosse", NULL, NOSSE_TEXT, NOSSE_LONGTEXT )
-ADD_BOOL    ( "noaltivec", NULL, NOALTIVEC_TEXT, NOALTIVEC_LONGTEXT )
+ADD_BOOL ( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT )
+ADD_BOOL ( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT )
+ADD_BOOL ( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT )
+ADD_BOOL ( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT )
+ADD_BOOL ( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT )
 
 /* Playlist options */
 ADD_CATEGORY_HINT( N_("Playlist"), NULL )
-ADD_BOOL    ( "launch-playlist", NULL, PLAYLIST_LAUNCH_TEXT, PLAYLIST_LAUNCH_LONGTEXT )
-ADD_BOOL    ( "enqueue-playlist", NULL, PLAYLIST_ENQUEUE_TEXT, PLAYLIST_ENQUEUE_LONGTEXT )
-ADD_BOOL    ( "loop-playlist", NULL, PLAYLIST_LOOP_TEXT, PLAYLIST_LOOP_LONGTEXT )
+ADD_BOOL ( "launch-playlist", 0, NULL, PL_LAUNCH_TEXT, PL_LAUNCH_LONGTEXT )
+ADD_BOOL ( "enqueue-playlist", 0, NULL, PL_ENQUEUE_TEXT, PL_ENQUEUE_LONGTEXT )
+ADD_BOOL ( "loop-playlist", 0, NULL, PL_LOOP_TEXT, PL_LOOP_LONGTEXT )
 
 /* Misc options */
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
 ADD_MODULE  ( "memcpy", MODULE_CAPABILITY_MEMCPY, NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT )
-ADD_MODULE  ( "access", MODULE_CAPABILITY_ACCESS, NULL, NULL, "access module", "This is a legacy entry to let you configure access modules" )
-ADD_MODULE  ( "demux", MODULE_CAPABILITY_DEMUX, NULL, NULL, "demux module", "This is a legacy entry to let you configure demux modules" )
+ADD_MODULE  ( "access", MODULE_CAPABILITY_ACCESS, NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT )
+ADD_MODULE  ( "demux", MODULE_CAPABILITY_DEMUX, NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT )
 
 #if defined(WIN32)
-ADD_BOOL    ( "fast_pthread", NULL, FAST_PTHREAD_TEXT, FAST_PTHREAD_LONGTEXT )
+ADD_BOOL ( "fast_pthread", 0, NULL, FAST_PTHREAD_TEXT, FAST_PTHREAD_LONGTEXT )
 #endif
 
 MODULE_CONFIG_STOP
@@ -449,13 +456,19 @@ static module_config_t p_help_config[] =
       NULL, NULL, 0, 0, NULL, NULL, 0 },
     { MODULE_CONFIG_ITEM_BOOL, "list", 'l', N_("print a list of available "
       "modules"), NULL, NULL, 0, 0, NULL, NULL, 0 },
-    { MODULE_CONFIG_ITEM_STRING, "module", 'p', N_("print help on module "
-      "<string>"), NULL, NULL, 0, 0, NULL, &help_module.config_lock, 0 },
+    { MODULE_CONFIG_ITEM_STRING, "module", 'p', N_("print help on module"),
+      NULL, NULL, 0, 0, NULL, &help_module.config_lock, 0 },
     { MODULE_CONFIG_ITEM_BOOL, "version", '\0',
       N_("print version information"), NULL, NULL, 0, 0, NULL, NULL, 0 },
     { MODULE_CONFIG_HINT_END, NULL, '\0', NULL, NULL, NULL, 0, 0,
       NULL, NULL, 0 }
 };
+static module_t help_module = { "help", "help module", NULL, {NULL}, 0, {0}, 0,
+                                NULL, p_help_config, {0},
+                                sizeof(p_help_config)/sizeof(module_config_t),
+                                sizeof(p_help_config)/sizeof(module_config_t)
+};
+
 
 /*****************************************************************************
  * End configuration.
@@ -511,7 +524,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     vout_bank_t   vout_bank;
     char *psz_module;
     char *p_tmp;
-    struct module_config_s *p_item;
 
     p_main        = &main_data;               /* set up the global variables */
     p_module_bank = &module_bank;
@@ -599,18 +611,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     module_LoadMain();
 
     /* Hack: insert the help module here */
-    help_module.psz_name = "help";
-    help_module.psz_longname = _( "help module" );
-    help_module.i_config_items =
-                    sizeof(p_help_config) / sizeof(module_config_t) - 1;
     vlc_mutex_init( &help_module.config_lock );
-    help_module.p_config = config_Duplicate( p_help_config );
-    for( p_item = help_module.p_config;
-         p_item->i_type != MODULE_CONFIG_HINT_END;
-         p_item++ )
-    {
-        p_item->p_lock = &help_module.config_lock;
-    }
     help_module.next = p_module_bank->first;
     p_module_bank->first = &help_module;
     /* end hack */
@@ -719,18 +720,18 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->i_warning_level = config_GetIntVariable( "warning" );
     p_main->i_desync = config_GetIntVariable( "desync" ) * (mtime_t)1000;
     p_main->b_stats = config_GetIntVariable( "stats" );
-    p_main->b_audio = !config_GetIntVariable( "noaudio" );
+    p_main->b_audio = config_GetIntVariable( "audio" );
     p_main->b_stereo= !config_GetIntVariable( "mono" );
-    p_main->b_video = !config_GetIntVariable( "novideo" );
-    if( config_GetIntVariable( "nommx" ) )
+    p_main->b_video = config_GetIntVariable( "video" );
+    if( !config_GetIntVariable( "mmx" ) )
         p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_MMX;
-    if( config_GetIntVariable( "no3dn" ) )
+    if( !config_GetIntVariable( "3dn" ) )
         p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_3DNOW;
-    if( config_GetIntVariable( "nommxext" ) )
+    if( !config_GetIntVariable( "mmxext" ) )
         p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_MMXEXT;
-    if( config_GetIntVariable( "nosse" ) )
+    if( !config_GetIntVariable( "sse" ) )
         p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_SSE;
-    if( config_GetIntVariable( "noaltivec" ) )
+    if( !config_GetIntVariable( "altivec" ) )
         p_main->i_cpu_capabilities &= ~CPU_CAPABILITY_ALTIVEC;
 
 
@@ -923,13 +924,15 @@ static int GetFilenames( int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 static void Usage( const char *psz_module_name )
 {
-#define FORMAT_STRING "      --%s%s%s%s%s %s"
-    /* option name ---------------' | | | |  |
-     * <bra ------------------------' | | |  |
-     * option type or "" -------------' | |  |
-     * ket> ----------------------------' |  |
-     * padding spaces --------------------'  |
-     * comment ------------------------------'
+#define FORMAT_STRING "      --%s%s%s%s%s%s %s%s"
+    /* option name prefix ------' | | | | |  | |
+     * option name ---------------' | | | |  | |
+     * <bra ------------------------' | | |  | |
+     * option type or "" -------------' | |  | |
+     * ket> ----------------------------' |  | |
+     * padding spaces --------------------'  | |
+     * comment ------------------------------' |
+     * comment suffix -------------------------'
      *
      * The purpose of having bra and ket is that we might i18n them as well.
      */
@@ -949,11 +952,13 @@ static void Usage( const char *psz_module_name )
     ShowConsole();
 #endif
 
-    /* Enumerate the config of each module */
+    /* Enumerate the config for each module */
     for( p_module = p_module_bank->first ;
          p_module != NULL ;
          p_module = p_module->next )
     {
+        boolean_t b_help_module = !strcmp( "help", p_module->psz_name );
+
         if( psz_module_name && strcmp( psz_module_name, p_module->psz_name ) )
             continue;
 
@@ -968,20 +973,8 @@ static void Usage( const char *psz_module_name )
              p_item++ )
         {
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
+            char *psz_suf = "";
             int i;
-
-            if( p_item->i_short )
-            {
-                psz_format[2] = '-';
-                psz_format[3] = p_item->i_short;
-                psz_format[4] = ',';
-            }
-            else
-            {
-                psz_format[2] = ' ';
-                psz_format[3] = ' ';
-                psz_format[4] = ' ';
-            }
 
             switch( p_item->i_type )
             {
@@ -1002,7 +995,24 @@ static void Usage( const char *psz_module_name )
                 break;
             case MODULE_CONFIG_ITEM_BOOL:
                 psz_bra = ""; psz_type = ""; psz_ket = "";
+                if( !b_help_module )
+                    psz_suf = p_item->i_value ? _(" (default: enabled)") :
+                                                _(" (default: disabled)");
                 break;
+            }
+
+            /* Add short option */
+            if( p_item->i_short )
+            {
+                psz_format[2] = '-';
+                psz_format[3] = p_item->i_short;
+                psz_format[4] = ',';
+            }
+            else
+            {
+                psz_format[2] = ' ';
+                psz_format[3] = ' ';
+                psz_format[4] = ' ';
             }
 
             if( psz_type )
@@ -1010,6 +1020,9 @@ static void Usage( const char *psz_module_name )
                 i = PADDING_SPACES - strlen( p_item->psz_name )
                      - strlen( psz_bra ) - strlen( psz_type )
                      - strlen( psz_ket ) - 1;
+                if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL &&
+                    !b_help_module ) i -= 5;
+
                 if( i < 0 )
                 {
                     i = 0;
@@ -1020,8 +1033,11 @@ static void Usage( const char *psz_module_name )
                     psz_spaces[i] = '\0';
                 }
 
-                intf_Msg( psz_format, p_item->psz_name, psz_bra, psz_type,
-                          psz_ket, psz_spaces, p_item->psz_text );
+                intf_Msg( psz_format,
+                          ( p_item->i_type == MODULE_CONFIG_ITEM_BOOL &&
+                            !b_help_module ) ? "(no-)" : "",
+                          p_item->psz_name, psz_bra, psz_type, psz_ket,
+                          psz_spaces, p_item->psz_text, psz_suf );
                 psz_spaces[i] = ' ';
             }
         }

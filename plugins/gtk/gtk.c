@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.22 2002/05/20 22:39:36 sam Exp $
+ * $Id: gtk.c,v 1.23 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -62,8 +62,8 @@ static gint GtkManage         ( gpointer p_data );
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
-#define TOOLTIPS_TEXT N_("hide tooltips")
-#define TOOLTIPS_LONGTEXT N_("Do not show tooltips for configuration options.")
+#define TOOLTIPS_TEXT N_("show tooltips")
+#define TOOLTIPS_LONGTEXT N_("Show tooltips for configuration options.")
 
 #define PREFS_MAXH_TEXT N_("maximum height for the configuration windows")
 #define PREFS_MAXH_LONGTEXT N_( \
@@ -71,11 +71,9 @@ static gint GtkManage         ( gpointer p_data );
     "preferences menu will occupy.")
 
 MODULE_CONFIG_START
-    ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-    ADD_BOOL    ( "gtk-notooltips", GtkHideTooltips, TOOLTIPS_TEXT,
-                  TOOLTIPS_LONGTEXT )
-    ADD_INTEGER ( "gtk-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT,
-                  PREFS_MAXH_LONGTEXT )
+ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
+ADD_BOOL( "gtk-tooltips", 1, GtkHideTooltips, TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT)
+ADD_INTEGER( "gtk-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT, PREFS_MAXH_LONGTEXT)
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -271,7 +269,7 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_jump = NULL;
 
     /* Hide tooltips if the option is set */
-    if( config_GetIntVariable( "gtk-notooltips" ) )
+    if( !config_GetIntVariable( "gtk-tooltips" ) )
         gtk_tooltips_disable( p_intf->p_sys->p_tooltips );
 
     /* Store p_intf to keep an eye on it */

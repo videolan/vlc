@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.21 2002/05/04 02:05:03 lool Exp $
+ * $Id: gtk_display.c,v 1.22 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -244,13 +244,13 @@ gint GtkModeManage( intf_thread_t * p_intf )
 
 /*****************************************************************************
  * GtkHideTooltips: show or hide the tooltips depending on the configuration
- *                  option gnome-notooltips
+ *                  option gnome-tooltips
  *****************************************************************************
  * FIXME: we should get the intf as parameter
  *****************************************************************************/
 void GtkHideTooltips( void )
 {
-    if( config_GetIntVariable( "gnome-notooltips" ) )
+    if( !config_GetIntVariable( "gnome-tooltips" ) )
         gtk_tooltips_disable( p_main->p_intf->p_sys->p_tooltips );
     else gtk_tooltips_enable( p_main->p_intf->p_sys->p_tooltips );
 }
@@ -258,7 +258,7 @@ void GtkHideTooltips( void )
 #ifdef MODULE_NAME_IS_gnome
 /*****************************************************************************
  * GtkHideToolbartext: show or hide the tooltips depending on the
- *                     configuration option gnome-notoolbartext
+ *                     configuration option gnome-toolbartext
  *****************************************************************************
  * FIXME: we should get the intf as parameter
  * FIXME: GNOME only because of missing icons in gtk interface
@@ -268,9 +268,9 @@ void GtkHideToolbarText( void )
     GtkToolbarStyle style;
     GtkToolbar * p_toolbar;
 
-    style = config_GetIntVariable( "gnome-notoolbartext" )
-            ? GTK_TOOLBAR_ICONS
-            : GTK_TOOLBAR_BOTH;
+    style = config_GetIntVariable( "gnome-toolbartext" )
+            ? GTK_TOOLBAR_BOTH
+            : GTK_TOOLBAR_ICONS;
 
     p_toolbar = GTK_TOOLBAR(lookup_widget( p_main->p_intf->p_sys->p_window,
                             "toolbar" ));

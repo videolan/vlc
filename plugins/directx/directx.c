@@ -2,7 +2,7 @@
  * directx.c : Windows DirectX plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.9 2002/05/22 19:31:33 gbazin Exp $
+ * $Id: directx.c,v 1.10 2002/05/30 08:17:04 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -43,11 +43,11 @@ void _M( vout_getfunctions )( function_list_t * p_function_list );
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
-#define HW_YUV_TEXT N_("Disable hardware YUV->RGB conversions")
+#define HW_YUV_TEXT N_("use hardware YUV->RGB conversions")
 #define HW_YUV_LONGTEXT N_( \
-    "Don't try to use hardware acceleration for YUV->RGB conversions. This " \
-    "option doesn't have any effect when using overlays." )
-#define SYSMEM_TEXT N_("Use video buffers in system memory")
+    "Try to use hardware acceleration for YUV->RGB conversions. " \
+    "This option doesn't have any effect when using overlays." )
+#define SYSMEM_TEXT N_("use video buffers in system memory")
 #define SYSMEM_LONGTEXT N_( \
     "Create video buffers in system memory instead of video memory. This " \
     "isn't recommended as usually using video memory allows to benefit from " \
@@ -56,9 +56,8 @@ void _M( vout_getfunctions )( function_list_t * p_function_list );
 
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Video"), NULL )
-ADD_BOOL ( "no-directx-hw-yuv", NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT )
-ADD_BOOL ( "directx-use-sysmem", NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT )
-ADD_CATEGORY_HINT( N_("Audio"), NULL )
+ADD_BOOL ( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT )
+ADD_BOOL ( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
