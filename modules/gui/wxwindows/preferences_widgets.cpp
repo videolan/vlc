@@ -390,7 +390,8 @@ void  ModuleListCatConfigControl::OnUpdate( wxCommandEvent &event )
             }
             else
             {
-                newtext += wxU( "," ) + wxU(pp_checkboxes[i]->psz_module);
+                newtext += wxU( "," );
+                newtext += wxU(pp_checkboxes[i]->psz_module);
             }
         }
     }
