@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.21 2002/07/23 12:42:17 tcastley Exp $
+ * $Id: InterfaceWindow.cpp,v 1.22 2002/07/23 13:16:51 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -275,8 +275,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
     case VOLUME_MUTE:
         /* toggle muting */
-        b_mute != b_mute;
-        p_vlc_wrapper->volumeMute( b_mute );
+        p_vlc_wrapper->toggleMute( );
         break;
 
     case SELECT_AUDIO:
@@ -567,14 +566,10 @@ int LanguageMenu::GetChannels()
         if( kind == p_intf->p_sys->p_input->stream.pp_es[i]->i_cat )
         {
             psz_name = p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc;
-            if ( strlen(psz_name) == 0 )
-            {
-                // change to default etc
-            }
             if( kind == AUDIO_ES ) //audio
             {
                 msg = new BMessage(SELECT_AUDIO);
-                msg->AddInt32("channel", i);
+                msg->AddInt32("audio", i);
             }
             else
             {

@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.cpp,v 1.2 2002/07/23 12:42:17 tcastley Exp $
+ * $Id: intf_vlc_wrapper.cpp,v 1.3 2002/07/23 13:16:51 tcastley Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -140,7 +140,7 @@ bool Intf_VLCWrapper::playlistPlay()
 
 void Intf_VLCWrapper::playlistPause()
 {
-    volumeMute( true );
+    toggleMute(  );
     playlist_t *p_playlist = 
                 (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -208,11 +208,11 @@ void Intf_VLCWrapper::playSlower()
     }
     if (p_intf->p_sys->p_input->stream.control.i_rate == DEFAULT_RATE)
     {
-        volumeMute( false );
+        toggleMute(  );
     }
     else
     {
-        volumeMute (true );
+        toggleMute ( );
     }
 }
 
@@ -224,11 +224,11 @@ void Intf_VLCWrapper::playFaster()
     }
     if (p_intf->p_sys->p_input->stream.control.i_rate == DEFAULT_RATE)
     {
-        volumeMute( false );
+        toggleMute(  );
     }
     else
     {
-        volumeMute (true );
+        toggleMute ( );
     }
 }
 
@@ -279,6 +279,7 @@ void Intf_VLCWrapper::toggleLanguage(int i_language)
     }
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
+    msg_Info( p_intf, "Old: %d,  New: %d", i_old, i_language);
     if( i_language != -1 )
     {
         input_ToggleES( p_intf->p_sys->p_input, 
@@ -286,7 +287,7 @@ void Intf_VLCWrapper::toggleLanguage(int i_language)
                         VLC_TRUE );
     }
 
-    if( i_old != -1 )
+    if( (i_old != -1) && (i_old != i_language) )
     {
         input_ToggleES( p_intf->p_sys->p_input, 
                         p_intf->p_sys->p_input->stream.pp_selected_es[i_old],
@@ -309,7 +310,8 @@ void Intf_VLCWrapper::toggleSubtitle(int i_subtitle)
         }
     }
     vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
+    
+    msg_Info( p_intf, "Old: %d,  New: %d", i_old, i_subtitle);
     if( i_subtitle != -1 )
     {
         input_ToggleES( p_intf->p_sys->p_input, 
@@ -317,7 +319,7 @@ void Intf_VLCWrapper::toggleSubtitle(int i_subtitle)
                         VLC_TRUE );
     }
 
-    if( i_old != -1 )
+    if( (i_old != -1) && (i_old != i_subtitle) )
     {
         input_ToggleES( p_intf->p_sys->p_input, 
                         p_intf->p_sys->p_input->stream.pp_selected_es[i_old],
@@ -448,14 +450,9 @@ void Intf_VLCWrapper::openNetHTTP(BString o_addr)
 {
 }
 
-void Intf_VLCWrapper::volumeMute( bool mute )
+void Intf_VLCWrapper::toggleMute( )
 {
-    if ( mute )
-    {
-    }
-    else
-    {
-    }
+    input_ToggleMute( p_intf->p_sys->p_input );
 }
 
 /* menus management */
