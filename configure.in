@@ -157,6 +157,9 @@ if test x$have_nanosleep = x1; then
   AC_DEFINE(HAVE_NANOSLEEP, 1,
             Define if nanosleep is available.)
 fi
+# HP/UX port
+AC_CHECK_LIB(rt,sem_init, [vlc_LDFLAGS="${vlc_LDFLAGS} -lrt"])
+
 AC_CHECK_FUNC(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lresolv")
 ])
