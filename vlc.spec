@@ -1,25 +1,28 @@
 %define name 		vlc
-%define vlc_ver 	0.4.5
+%define vlc_ver 	0.5.0
 %define version		%vlc_ver
+%define	libmajor	0
+%define libname		lib%name%libmajor
 
 %define cvs     	0
 %if %{cvs}
-%define cvsdate 	20010619
+%define cvsdate 	20021213
 %define release		0.%{cvsdate}
-%define cvs_name 	%{name}-snapshot-%{cvsdate}-00
+%define cvs_name 	%{name}-%version-cvs
 %else
-%define release 	1
+%define release 	0.1mdk
 %endif
 
 # The QT interface is not functional yet
 %define	plugin_qt	0
 %define	plugin_lirc	1
+%define	plugin_svgalib	0
 
-Summary:	VideoLAN is a free multimedia software solution.
+Summary:	VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-Packager:	Yves Duret <yduret@mandrakesoft.com>
+Packager:	Yves Duret <yves@zarb.org>
 
 %if %{cvs} 
 Source0:	http://www.videolan.org/pub/videolan/vlc/snapshots/%{cvs_name}.tar.bz2
@@ -34,20 +37,26 @@ Requires:	vlc-gui
 Requires:	vlc-mad
 
 BuildRoot:	%_tmppath/%name-%version-%release-root
-Buildrequires:	libncurses5-devel
+#Buildrequires:	libncurses5-devel
 #Buildrequires:	libqt2-devel
-Buildrequires:	libgtk+1.2-devel
-Buildrequires:	gnome-libs-devel
-Buildrequires:	db1-devel
-Buildrequires:	alsa-lib-devel
-Buildrequires:	libarts-devel
-Buildrequires:	libggi-devel
-Buildrequires:	aalib-devel
-Buildrequires:	SDL-devel
-Buildrequires:	liba52dec-devel
-Buildrequires:	libmad-devel
-Buildrequires:	liblirc-devel
-Buildrequires:	libffmpeg-devel
+#Buildrequires:	libgtk+1.2-devel
+#Buildrequires:	gnome-libs-devel
+#Buildrequires:	db1-devel
+Buildrequires:	libalsa2-devel
+Buildrequires:	libesound0-devel
+#Buildrequires:	libarts-devel
+#Buildrequires:	libggi-devel
+#Buildrequires:	aalib-devel
+#Buildrequires:	SDL-devel
+#Buildrequires:	liba52dec-devel
+#Buildrequires:	libmad-devel
+#Buildrequires:	liblirc-devel
+#Buildrequires:	libffmpeg-devel
+#Buildrequires:	libvorbis-devel
+#Buildrequires:	libogg-devel
+#Buildrequires:	mozilla-devel
+#Buildrequires:	libdev2-devel
+#Buildrequires:	libxosd2-devel
 
 %description
 VideoLAN is an OpenSource streaming solution for every OS developed by
@@ -62,139 +71,262 @@ This package contains no CSS unscrambling functionality for DVDs ;
 you need the libdvdcss library available from 
 http://www.videolan.org/libdvdcss/ or http://plf.zarb.org/
 
+#general packages
+%package -n %libname-devel
+Summary: Development files for the VideoLAN Client
+Group: Development/C
+Requires: %name = %version-%release
+Provides: %{name}-devel = %version-%release
+%description -n %libname-devel
+Development files for the VideoLAN Client
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+This package contains headers and a static library required to build plugins
+for the VideoLAN Client, or standalone applications using VideoLAN Client.
+
+%package -n mozilla-plugin-vlc
+Summary: A multimedia plugin for Mozilla, based on vlc
+group: Video
+Requires: %name = %version-%release
+%description -n mozilla-plugin-vlc
+This plugin adds support for MPEG, MPEG2, DVD and DivX to your Mozilla
+browser. The decoding process is done by vlc and the output window is
+embedded in a webpage or directly in the browser window. There is also
+support for fullscreen display.
+
+
 # intf plugins
-%package gtk
+%package -n gvlc
 Summary: Gtk plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
 Provides: vlc-gui
-%description gtk
-VideoLAN is a free multimedia software solution.
+%description -n gvlc
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin adds a Gtk+ interface to vlc, the VideoLAN Client. To
 activate it, use the `--intf gtk' flag or run the `gvlc' program.
 
-%package gnome
+%package -n gnome-vlc
 Summary: Gnome plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-Provides: vlc-gui
-%description gnome
-VideoLAN is a free multimedia software solution.
+Provides: vlc-gui, vlc-gnome
+Obsoletes: vlc-gnome
+%description -n gnome-vlc
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin adds a Gnome interface to vlc, the VideoLAN Client. To
 activate it, use the `--intf gnome' flag or run the `gnome-vlc' program.
 
-%package qt
+%package -n qvlc
 Summary: Qt2 plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-Provides: vlc-gui
-%description qt
-VideoLAN is a free multimedia software solution.
+Provides: vlc-gui, vlc-qt
+Obsoletes: vlc-qt
+%description -n qvlc
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin adds a Qt interface to vlc, the VideoLAN Client. To
 activate it, use the `--intf qt' flag or run the `qvlc' program.
 
-%package ncurses
+%package -n kvlc
+Summary: KDE frontend for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+Provides: vlc-gui
+%description -n kvlc
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+This plugin adds a KDE interface to vlc, the VideoLAN Client. To
+activate it, use the `--intf kde' flag or run the `kvlc' program.
+
+
+%package plugin-ncurses
 Summary: Ncurses console-based plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-%description ncurses
-VideoLAN is a free multimedia software solution.
+%description plugin-ncurses
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin adds a ncurses interface to vlc, the VideoLAN Client. To
 activate it, use the `--intf ncurses' flag.
 
-%package lirc
+%package plugin-lirc
 Summary: Lirc plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-%description lirc
-VideoLAN is a free multimedia software solution.
+Obsoletes: vlc-lirc
+Provides: vlc-lirc
+%description plugin-lirc
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin is an infrared lirc interface for vlc, the
 VideoLAN Client. To activate it, use the `--intf lirc' flag.
 
-
+#
 # video plugins
-%package aa
+%package plugin-aa
 Summary: ASCII art video plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-%description aa
-VideoLAN is a free multimedia software solution.
+Obsoletes: vlc-aa
+Provides: vlc-aa
+%description plugin-aa
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This is an ASCII art video output plugin for vlc, the VideoLAN
 Client. To activate it, use the `--vout aa' flag or select the `aa'
 vout plugin from the preferences menu.
 
 
-%package sdl
+%package plugin-sdl
 Summary: Simple DirectMedia Layer video plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-%description sdl
-VideoLAN is a free multimedia software solution.
+Obsoletes: vlc-sdl
+Provides: vlc-sdl
+%description plugin-sdl
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin adds support for the Simple DirectMedia Layer library to
 vlc, the VideoLAN Client. To activate it, use the `--vout sdl' or
 `--aout sdl' flags or select the `sdl' vout or aout plugin from the
 preferences menu.
 
-%package ggi
+%package plugin-ggi
 Summary: GGI video plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-%description ggi
-VideoLAN is a free multimedia software solution.
+Obsoletes: vlc-ggi
+Provides: vlc-ggi
+%description plugin-ggi
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This is a GGI plugin for vlc, the VideoLAN Client.  To activate it, use
 the `--vout ggi' flag or select the `ggi' vout plugin from the preferences
 menu.
-     
+
+%package plugin-svgalib
+Summary: SVGAlib video plugin for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+%description plugin-svgalib
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+This plugin adds support for SVGAlib to vlc, the VideoLAN Client. To
+activate it, use the `--vout svgalib' flag or select the `svgalib' video
+output plugin from the preferences menu. Note that you will need root
+permissions to use SVGAlib.
+
+
+#
+# visualization plugins
+%package plugin-xosd
+Summary: X On-Screen Display plugin for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+%description plugin-xosd
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+This is an On-Screen Display plugin for vlc, the VideoLAN Client. To
+activate it, use the `--intf xosd' flag or select the `xosd' interface
+plugin from the preferences menu.
+
 # codec plugins
-%package mad
+%package plugin-mad
 Summary: MAD audio codec plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-%description mad
-VideoLAN is a free multimedia software solution.
+Obsoletes: vlc-mad
+Provides: vlc-mad
+%description plugin-mad
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin adds support for libmad, the MPEG audio decoder library,
 to the VideoLAN Client. MAD is 100% fixed-point based. To activate
 this plugin, use the `--mpeg_adec mad' flag or select the `mad' MPEG
 decoder from the preferences menu.
 
+%package plugin-ogg
+Summary: Ogg demuxer and Vorbis codec plugin for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+%description plugin-ogg
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+These plugins add support for the Ogg bitstream format and the Ogg Vorbis
+compressed audio format to vlc, the VideoLAN Client. They are autodetected.
+
+%package plugin-a52
+Summary: A-52 (AC-3) codec plugin for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+%description plugin-a52
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+This plugin adds support for the ATSC A-52 (aka. AC-3) audio format to
+vlc, the VideoLAN Client. The plugin is autodetected.
+
+%package plugin-dv
+Summary: DV codec plugin for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+%description plugin-dv
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+This plugin adds support for the DV video format to vlc, the VideoLAN
+Client. The plugin is autodetected.
+
+#
+# input plugins
+%package plugin-dvb
+Summary: DVB input plugin for the VideoLAN client
+Group: Video
+Requires: %{name} = %{version}
+%description plugin-dvb
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
+
+This plugin adds support for DVB cards to vlc, the VideoLAN Client. Note
+that your card needs to be supported by your kernel before vlc can use it.
+
+#
 # audio plugins
-%package esd
+%package plugin-esd
 Summary: Enlightened Sound Daemon audio plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-%description esd
-VideoLAN is a free multimedia software solution.
+Obsoletes: vlc-esd
+Provides: vlc-esd
+%description plugin-esd
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin adds support for the Enlightened Sound Daemon to vlc, the
 VideoLAN Client. To activate it, use the `--aout esd' flag or select
 the `esd' aout plugin from the preferences menu.
 
-%package arts
+%package plugin-arts
 Summary: aRts audio plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-%description arts
-VideoLAN is a free multimedia software solution.
+Obsoletes: vlc-arts
+Provides: vlc-arts
+%description plugin-arts
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin adds support for the aRts Sound System to vlc, the
 VideoLAN Client. To activate it, use the `--aout arts' flag or
 select the `arts' aout plugin from the preferences menu.
 
-%package alsa
+%package plugin-alsa
 Summary: Advanced Linux Sound Architecture audio plugin for the VideoLAN client
 Group: Video
 Requires: %{name} = %{version}
-%description alsa
-VideoLAN is a free multimedia software solution.
+Obsoletes: vlc-alsa
+Provides: vlc-alsa
+%description plugin-alsa
+VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution.
 
 This plugin adds support for the Advanced Linux Sound Architecture to
 vlc, the VideoLAN Client. To activate it, use the `--aout alsa' flag or
@@ -204,7 +336,8 @@ select the `alsa' aout plugin from the preferences menu.
 %if %{cvs}
 %setup -q -n %{cvs_name}
 %else
-%setup -q
+%setup -q 
+#-n %name-%version-cvs
 %endif
 
 %build
@@ -212,51 +345,61 @@ select the `alsa' aout plugin from the preferences menu.
 # ffmpeg: static linking cause no official ffmpeg release aith a stable ABI
 # ffmpeg: no plugin posible on ia64 due to the static linking (can not put .a in a .so)
 %configure  --enable-release \
-            --enable-dvd --without-dvdcss \
-            --enable-gtk --enable-gnome --disable-qt --disable-kde --enable-ncurses --enable-lirc \
-            --enable-x11 --enable-xvideo --enable-ggi --enable-sdl --enable-fb --enable-mga --enable-aa \
-            --enable-esd --enable-alsa --enable-arts \
-	    --enable-mad --enable-ffmpeg --with-ffmpeg=/usr
-export QTDIR=%{_libdir}/qt2 
+            --enable-dvd --without-dvdcss --enable-dvdplay \
+#            --enable-gtk --enable-gnome --disable-qt --disable-kde --enable-ncurses --enable-lirc \
+            --enable-x11 --enable-xvideo \
+	    #--enable-ggi --enable-sdl --enable-fb --enable-mga --enable-aa \
+            --enable-esd --enable-alsa \
+#--enable-arts \
+#	    --enable-mad --enable-ffmpeg --with-ffmpeg=/usr
+	    
+# --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-mp4 --enable-dvb --enable-dv --enable-svgalib --enable-satellite --enable-ogg --enable-vorbis
+
+export QTDIR=%{_libdir}/qt3 
 %make
 
 %install
 %makeinstall_std
-install -d %buildroot/%_mandir/man1
-install doc/vlc.1 %buildroot/%_mandir/man1
+%find_lang %name
+#install -d %buildroot/%_mandir/man1
+#install doc/vlc.1 %buildroot/%_mandir/man1
 
 # menu
 mkdir -p %buildroot/%{_menudir}
 cat > %buildroot/%{_menudir}/vlc << EOF
-?package(vlc): command="%{_bindir}/vlc" hotkey="V" needs="X11" longtitle="VideoLAN is a free multimedia software solution" section="Multimedia/Video" title="VideoLAN Client" icon="vlc.png" hints="Video"
+?package(vlc): command="%{_bindir}/vlc" hotkey="V" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="VideoLAN Client" icon="vlc.png" hints="Video"
 EOF
-cat > %buildroot/%{_menudir}/vlc-gtk << EOF
-?package(vlc-gtk): command="%{_bindir}/gvlc" needs="X11" longtitle="VideoLAN is a free multimedia software solution" section="Multimedia/Video" title="Gtk VideoLAN Client" icon="gvlc.png" hints="Video"
+cat > %buildroot/%{_menudir}/gvlc << EOF
+?package(gvlc): command="%{_bindir}/gvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gtk VideoLAN Client" icon="gvlc.png" hints="Video"
 EOF
-cat > %buildroot/%{_menudir}/vlc-gnome << EOF
-?package(vlc-gnome): command="%{_bindir}/gnome-vlc" needs="X11" longtitle="VideoLAN is a free multimedia software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="gnome-vlc.png" hints="Video"
+cat > %buildroot/%{_menudir}/gnome-vlc << EOF
+?package(gnome-vlc): command="%{_bindir}/gnome-vlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Gnome VideoLAN Client" icon="gnome-vlc.png" hints="Video"
 EOF
-cat > %buildroot/%{_menudir}/vlc-qt << EOF
-?package(vlc-gnome): command="%{_bindir}/qvlc" needs="X11" longtitle="VideoLAN is a free multimedia software solution" section="Multimedia/Video" title="Qt VideoLAN Client" icon="qvlc.png" hints="Video"
+%if %{plugin_qt}
+cat > %buildroot/%{_menudir}/qvlc << EOF
+?package(qvlc): command="%{_bindir}/qvlc" needs="X11" longtitle="VideoLAN is a free MPEG, MPEG2, DVD and DivX software solution" section="Multimedia/Video" title="Qt VideoLAN Client" icon="qvlc.png" hints="Video"
 EOF
+%endif
 
 # icons
 mkdir -p %{buildroot}/{%{_miconsdir},%{_liconsdir}}
-install -m 644 %buildroot/%_datadir/videolan/vlc16x16.png %buildroot/%{_miconsdir}/vlc.png
-install -m 644 %buildroot/%_datadir/videolan/vlc32x32.png %buildroot/%{_iconsdir}/vlc.png
-install -m 644 %buildroot/%_datadir/videolan/vlc48x48.png %buildroot/%{_liconsdir}/vlc.png
-install -m 644 %buildroot/%_datadir/videolan/gnome-vlc16x16.png %buildroot/%{_miconsdir}/gnome-vlc.png
-install -m 644 %buildroot/%_datadir/videolan/gnome-vlc32x32.png %buildroot/%{_iconsdir}/gnome-vlc.png
-install -m 644 %buildroot/%_datadir/videolan/gnome-vlc48x48.png %buildroot/%{_liconsdir}/gnome-vlc.png
-install -m 644 %buildroot/%_datadir/videolan/gvlc16x16.png %buildroot/%{_miconsdir}/gvlc.png
-install -m 644 %buildroot/%_datadir/videolan/gvlc32x32.png %buildroot/%{_iconsdir}/gvlc.png
-install -m 644 %buildroot/%_datadir/videolan/gvlc48x48.png %buildroot/%{_liconsdir}/gvlc.png
-install -m 644 %buildroot/%_datadir/videolan/kvlc16x16.png %buildroot/%{_miconsdir}/kvlc.png
-install -m 644 %buildroot/%_datadir/videolan/kvlc32x32.png %buildroot/%{_iconsdir}/kvlc.png
-install -m 644 %buildroot/%_datadir/videolan/kvlc48x48.png %buildroot/%{_liconsdir}/kvlc.png
-install -m 644 %buildroot/%_datadir/videolan/qvlc16x16.png %buildroot/%{_miconsdir}/qvlc.png
-install -m 644 %buildroot/%_datadir/videolan/qvlc32x32.png %buildroot/%{_iconsdir}/qvlc.png
-install -m 644 %buildroot/%_datadir/videolan/qvlc48x48.png %buildroot/%{_liconsdir}/qvlc.png
+install -m 644 %buildroot/%_datadir/vlc/vlc16x16.png %buildroot/%_miconsdir/vlc.png
+install -m 644 %buildroot/%_datadir/vlc/vlc32x32.png %buildroot/%_iconsdir/vlc.png
+install -m 644 %buildroot/%_datadir/vlc/vlc48x48.png %buildroot/%_liconsdir/vlc.png
+install -m 644 %buildroot/%_datadir/vlc/gnome-vlc16x16.png %buildroot/%_miconsdir/gnome-vlc.png
+install -m 644 %buildroot/%_datadir/vlc/gnome-vlc32x32.png %buildroot/%_iconsdir/gnome-vlc.png
+install -m 644 %buildroot/%_datadir/vlc/gnome-vlc48x48.png %buildroot/%_liconsdir/gnome-vlc.png
+install -m 644 %buildroot/%_datadir/vlc/gvlc16x16.png %buildroot/%_miconsdir/gvlc.png
+install -m 644 %buildroot/%_datadir/vlc/gvlc32x32.png %buildroot/%_iconsdir/gvlc.png
+install -m 644 %buildroot/%_datadir/vlc/gvlc48x48.png %buildroot/%_liconsdir/gvlc.png
+install -m 644 %buildroot/%_datadir/vlc/kvlc16x16.png %buildroot/%_miconsdir/kvlc.png
+install -m 644 %buildroot/%_datadir/vlc/kvlc32x32.png %buildroot/%_iconsdir/kvlc.png
+install -m 644 %buildroot/%_datadir/vlc/kvlc48x48.png %buildroot/%_liconsdir/kvlc.png
+%if %{plugin_qt}
+install -m 644 %buildroot/%_datadir/vlc/qvlc16x16.png %buildroot/%_miconsdir/qvlc.png
+install -m 644 %buildroot/%_datadir/vlc/qvlc32x32.png %buildroot/%_iconsdir/qvlc.png
+install -m 644 %buildroot/%_datadir/vlc/qvlc48x48.png %buildroot/%_liconsdir/qvlc.png
+%endif
 
 %post
 %update_menus
@@ -266,146 +409,299 @@ install -m 644 %buildroot/%_datadir/videolan/qvlc48x48.png %buildroot/%{_liconsd
 %clean
 rm -fr %buildroot
 
-%files
+%files -f %name.lang
 %defattr(-,root,root)
 %doc README COPYING
-%{_bindir}/vlc
+%_bindir/vlc
 
-%dir %{_libdir}/videolan/vlc
-%{_libdir}/videolan/vlc/ac3_spdif.so
-%{_libdir}/videolan/vlc/avi.so
-%{_libdir}/videolan/vlc/dummy.so
-%{_libdir}/videolan/vlc/dvd.so
-%{_libdir}/videolan/vlc/fb.so
-%{_libdir}/videolan/vlc/file.so
-%{_libdir}/videolan/vlc/filter_deinterlace.so
-%{_libdir}/videolan/vlc/filter_distort.so
-%{_libdir}/videolan/vlc/filter_invert.so
-%{_libdir}/videolan/vlc/filter_transform.so
-%{_libdir}/videolan/vlc/filter_wall.so
-%{_libdir}/videolan/vlc/filter_clone.so
-%{_libdir}/videolan/vlc/filter_crop.so
-%{_libdir}/videolan/vlc/fx_scope.so
-%{_libdir}/videolan/vlc/http.so
-%{_libdir}/videolan/vlc/ipv4.so
-%{_libdir}/videolan/vlc/ipv6.so
-%{_libdir}/videolan/vlc/logger.so
-%{_libdir}/videolan/vlc/lpcm_adec.so
-%{_libdir}/videolan/vlc/memcpy.so
-%{_libdir}/videolan/vlc/mga.so
-%{_libdir}/videolan/vlc/mpeg_es.so
-%{_libdir}/videolan/vlc/mpeg_ps.so
-%{_libdir}/videolan/vlc/mpeg_ts.so
-%{_libdir}/videolan/vlc/null.so
-%{_libdir}/videolan/vlc/oss.so
-%{_libdir}/videolan/vlc/rc.so
-%{_libdir}/videolan/vlc/spudec.so
-%{_libdir}/videolan/vlc/udp.so
-%{_libdir}/videolan/vlc/vcd.so
-%{_libdir}/videolan/vlc/x11.so
-#%{_libdir}/videolan/vlc/xmga.so
+%dir %_libdir/vlc
 
-%{_mandir}/man1/*
-%{_menudir}/vlc
-%{_miconsdir}/vlc.png
-%{_iconsdir}/vlc.png
-%{_liconsdir}/vlc.png
+%dir %_libdir/vlc/access
+%_libdir/vlc/access/libaccess_file_plugin.so
+%_libdir/vlc/access/libaccess_http_plugin.so
+%_libdir/vlc/access/libaccess_mms_plugin.so
+%_libdir/vlc/access/libaccess_rtp_plugin.so
+%_libdir/vlc/access/libaccess_udp_plugin.so
+%_libdir/vlc/access/libdvdplay_plugin.so
+%_libdir/vlc/access/libdvd_plugin.so
+%_libdir/vlc/access/libdvdread_plugin.so
+%_libdir/vlc/access/libvcd_plugin.so
 
+%dir %_libdir/vlc/audio_filter
+%_libdir/vlc/audio_filter/liba52tospdif_plugin.so
+%_libdir/vlc/audio_filter/libfixed32tofloat32_plugin.so
+%_libdir/vlc/audio_filter/libfixed32tos16_plugin.so
+%_libdir/vlc/audio_filter/libfloat32tos16_plugin.so
+%_libdir/vlc/audio_filter/libfloat32tos8_plugin.so
+%_libdir/vlc/audio_filter/libfloat32tou16_plugin.so
+%_libdir/vlc/audio_filter/libfloat32tou8_plugin.so
+%_libdir/vlc/audio_filter/libheadphone_channel_mixer_plugin.so
+%_libdir/vlc/audio_filter/liblinear_resampler_plugin.so
+%_libdir/vlc/audio_filter/libs16tofloat32_plugin.so
+%_libdir/vlc/audio_filter/libs16tofloat32swab_plugin.so
+%_libdir/vlc/audio_filter/libs8tofloat32_plugin.so
+%_libdir/vlc/audio_filter/libtrivial_channel_mixer_plugin.so
+%_libdir/vlc/audio_filter/libtrivial_resampler_plugin.so
+%_libdir/vlc/audio_filter/libu8tofixed32_plugin.so
+%_libdir/vlc/audio_filter/libu8tofloat32_plugin.so
+%_libdir/vlc/audio_filter/libugly_resampler_plugin.so
+
+%dir %_libdir/vlc/audio_mixer
+%_libdir/vlc/audio_mixer/libfloat32_mixer_plugin.so
+%_libdir/vlc/audio_mixer/libspdif_mixer_plugin.so
+%_libdir/vlc/audio_mixer/libtrivial_mixer_plugin.so
+
+%dir %_libdir/vlc/audio_output
+%_libdir/vlc/audio_output/libaout_file_plugin.so
+%_libdir/vlc/audio_output/liboss_plugin.so
+
+
+%dir %_libdir/vlc/codec
+%_libdir/vlc/codec/liba52_plugin.so
+%_libdir/vlc/codec/libadpcm_plugin.so
+%_libdir/vlc/codec/libaraw_plugin.so
+%_libdir/vlc/codec/libcinepak_plugin.so
+%_libdir/vlc/codec/libdownmix3dn_plugin.so
+%_libdir/vlc/codec/libdownmixsse_plugin.so
+%_libdir/vlc/codec/libidctclassic_plugin.so
+%_libdir/vlc/codec/libidctmmxext_plugin.so
+%_libdir/vlc/codec/libidctmmx_plugin.so
+%_libdir/vlc/codec/libidct_plugin.so
+%_libdir/vlc/codec/libimdct3dn_plugin.so
+%_libdir/vlc/codec/libimdctsse_plugin.so
+%_libdir/vlc/codec/liblpcm_plugin.so
+%_libdir/vlc/codec/libmotionmmxext_plugin.so
+%_libdir/vlc/codec/libmotionmmx_plugin.so
+%_libdir/vlc/codec/libmotion_plugin.so
+%_libdir/vlc/codec/libmpeg_audio_plugin.so
+%_libdir/vlc/codec/libmpeg_video_plugin.so
+%_libdir/vlc/codec/libspudec_plugin.so
+
+%dir %_libdir/vlc/control
+
+%dir %_libdir/vlc/demux
+%_libdir/vlc/demux/libaac_plugin.so
+%_libdir/vlc/demux/libasf_plugin.so
+%_libdir/vlc/demux/libaudio_plugin.so
+%_libdir/vlc/demux/libavi_plugin.so
+%_libdir/vlc/demux/libdemuxdump_plugin.so
+%_libdir/vlc/demux/libdemuxsub_plugin.so
+%_libdir/vlc/demux/libes_plugin.so
+%_libdir/vlc/demux/libid3_plugin.so
+%_libdir/vlc/demux/libm3u_plugin.so
+%_libdir/vlc/demux/libmp4_plugin.so
+%_libdir/vlc/demux/libmpeg_system_plugin.so
+%_libdir/vlc/demux/libps_plugin.so
+%_libdir/vlc/demux/libts_plugin.so
+%_libdir/vlc/demux/libwav_plugin.so
+
+%dir %_libdir/vlc/misc
+%_libdir/vlc/misc/libdummy_plugin.so
+%_libdir/vlc/misc/libipv4_plugin.so
+%_libdir/vlc/misc/libipv6_plugin.so
+%_libdir/vlc/misc/liblogger_plugin.so
+%_libdir/vlc/misc/libmemcpy3dn_plugin.so
+%_libdir/vlc/misc/libmemcpymmxext_plugin.so
+%_libdir/vlc/misc/libmemcpymmx_plugin.so
+%_libdir/vlc/misc/libmemcpy_plugin.so
+%_libdir/vlc/misc/libsap_plugin.so
+
+%dir %_libdir/vlc/video_chroma
+%_libdir/vlc/video_chroma/libi420_rgb_mmx_plugin.so
+%_libdir/vlc/video_chroma/libi420_rgb_plugin.so
+%_libdir/vlc/video_chroma/libi420_ymga_mmx_plugin.so
+%_libdir/vlc/video_chroma/libi420_ymga_plugin.so
+%_libdir/vlc/video_chroma/libi420_yuy2_mmx_plugin.so
+%_libdir/vlc/video_chroma/libi420_yuy2_plugin.so
+%_libdir/vlc/video_chroma/libi422_yuy2_mmx_plugin.so
+%_libdir/vlc/video_chroma/libi422_yuy2_plugin.so
+
+%dir %_libdir/vlc/video_filter
+%_libdir/vlc/video_filter/libadjust_plugin.so
+%_libdir/vlc/video_filter/libclone_plugin.so
+%_libdir/vlc/video_filter/libcrop_plugin.so
+%_libdir/vlc/video_filter/libdeinterlace_plugin.so
+%_libdir/vlc/video_filter/libdistort_plugin.so
+%_libdir/vlc/video_filter/libinvert_plugin.so
+%_libdir/vlc/video_filter/libmotionblur_plugin.so
+%_libdir/vlc/video_filter/libtransform_plugin.so
+%_libdir/vlc/video_filter/libwall_plugin.so
+
+%dir %_libdir/vlc/video_output
+%_libdir/vlc/video_output/libfb_plugin.so
+%_libdir/vlc/video_output/libx11_plugin.so
+%_libdir/vlc/video_output/libxvideo_plugin.so
+
+%dir %_libdir/vlc/visualization
+
+%_mandir/man1/*
+%_menudir/vlc
+%_miconsdir/vlc.png
+%_iconsdir/vlc.png
+%_liconsdir/vlc.png
+
+%files -n %libname-devel
+%defattr(-,root,root)
+%doc README
+%dir %_includedir/vlc
+%_includedir/vlc/*
+%_libdir/*a
+%_libdir/vlc/*a
+%_bindir/vlc-config
+
+%files -n mozilla-plugin-vlc
+%defattr(-,root,root)
+%doc README
+# FIXME: seems to be mozilla-version/plugin on Mandrake
+#%dir %_libdir/mozilla
+%_libdir/mozilla/*
 
 # intf plugins
-%files gtk
+%files -n gvlc
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/gtk.so
-%{_bindir}/gvlc
-%{_menudir}/vlc-gtk
-%{_miconsdir}/gvlc.png
-%{_iconsdir}/gvlc.png
-%{_liconsdir}/gvlc.png
-%post gtk
+%_libdir/vlc/misc/libgtk_main_plugin.so
+%_libdir/vlc/gui/libgtk_plugin.so
+%_bindir/gvlc
+%_menudir/gvlc
+%_miconsdir/gvlc.png
+%_iconsdir/gvlc.png
+%_liconsdir/gvlc.png
+%post -n gvlc
 %update_menus
-%postun gtk
+%postun -n gvlc
 %update_menus
 
-%files gnome
+%files -n gnome-vlc
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/gnome.so
-%{_bindir}/gnome-vlc
-%{_menudir}/vlc-gnome
-%{_miconsdir}/gnome-vlc.png
-%{_iconsdir}/gnome-vlc.png
-%{_liconsdir}/gnome-vlc.png
-%post   gnome
+%_libdir/vlc/misc/libgnome_main_plugin.so
+%_libdir/vlc/gui/libgnome_plugin.so
+%_bindir/gnome-vlc
+%_menudir/gnome-vlc
+%_miconsdir/gnome-vlc.png
+%_iconsdir/gnome-vlc.png
+%_liconsdir/gnome-vlc.png
+%post   -n gnome-vlc
 %update_menus
-%postun gnome
+%postun -n gnome-vlc
 %update_menus
 
 %if %{plugin_qt}
-%files qt
+%files -n qvlc
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/qt.so
-%{_bindir}/qvlc
-%{_menudir}/vlc-qt
-%{_miconsdir}/qvlc.png
-%{_iconsdir}/qvlc.png
-%{_liconsdir}/qvlc.png
-%post   qt
+%_libdir/vlc/gui/libqt_plugin.so
+%_bindir/qvlc
+%_menudir/qvlc
+%_miconsdir/qvlc.png
+%_iconsdir/qvlc.png
+%_liconsdir/qvlc.png
+%post   -n qvlc
 %update_menus
-%postun qt
+%postun -n qvlc
 %update_menus
 %endif
 
-%files ncurses
+%files -n kvlc
+%doc README
+%_libdir/vlc/gui/libkde_plugin.so
+%_bindir/kvlc
+%_menudir/kvlc
+%_miconsdir/kvlc.png
+%_iconsdir/kvlc.png
+%_liconsdir/kvlc.png
+%post   -n kvlc
+%update_menus
+%postun -n kvlc
+%update_menus
+
+
+%files plugin-ncurses
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/ncurses.so
+%_libdir/vlc/gui/libncurses_plugin.so
 
 %if %plugin_lirc
-%files lirc
+%files plugin-lirc
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/lirc.so
+%_libdir/vlc/control/liblirc_plugin.so
 %endif
 
 # video plugins
-%files sdl
+%files plugin-sdl
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/sdl.so
+%_libdir/vlc/audio_output/libaout_sdl_plugin.so
+%_libdir/vlc/video_output/libvout_sdl_plugin.so
 
-%files ggi
+%files plugin-ggi
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/ggi.so
+%{_libdir}/vlc/video_output/libggi_plugin.so
 
-%files aa
+%files plugin-aa
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/aa.so
+%{_libdir}/vlc/video_output/libaa_plugin.so
+
+%if %plugin_svgalib
+%files plugin-svgalib
+%defattr(-,root,root)
+%doc README
+%_libdir/vlc/video_output/libsvgalib_plugin.so
+%endif
+
+# visualization plugin
+%files plugin-xosd
+%defattr(-,root,root)
+%doc README
+%_libdir/vlc/visualization/libxosd_plugin.so
 
 # codec plugin
-%files mad
+%files plugin-mad
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/mad.so
+%{_libdir}/vlc/codec/libmad_plugin.so
+
+%files plugin-ogg
+%defattr(-,root,root)
+%doc README
+%{_libdir}/vlc/demux/libogg_plugin.so
+%{_libdir}/vlc/vlc/codec/libvorbis_plugin.so
+
+%files plugin-dv
+%defattr(-,root,root)
+%doc README
+%_libdir/vlc/codec/libdv_plugin.so
+
+%files plugin-a52
+%defattr(-,root,root)
+%doc README
+%_libdir/vlc/codec/liba52_plugin.so
+
+# input plugin
+%files plugin-dvb
+%defattr(-,root,root)
+%doc README
+%_libdir/vlc/access/libsatellite_plugin.so
 
 #audio plugins
-%files esd
+%files plugin-esd
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/esd.so
+%_libdir/vlc/audio_output/libesd_plugin.so
 
-%files arts
+%files plugin-arts
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/arts.so
+%_libdir/vlc/audio_output/libarts_plugin.so
 
-%files alsa
+%files plugin-alsa
 %defattr(-,root,root)
 %doc README
-%{_libdir}/videolan/vlc/alsa.so
+%_libdir/vlc/audio_output/libalsa_plugin.so
 
 %changelog
 * Mon Jun 20 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.2-1mdk
