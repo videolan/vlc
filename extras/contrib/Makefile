@@ -2,7 +2,7 @@
 # Makefile : Build vlc-contrib files
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.2 2003/11/15 13:09:02 massiot Exp $
+# $Id: Makefile,v 1.3 2003/11/23 13:06:43 massiot Exp $
 # 
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 # 
@@ -23,7 +23,7 @@
 
 include ./config.mak
 
-BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib
+BUILDDIRS = bin doc etc include info lib man sbin share vlc-lib tmp
 
 all: FORCE
 	@echo "Do you mean to make src or make bin ?"
@@ -35,7 +35,15 @@ contrib-macosx.tar.bz2: FORCE
 	$(WGET) $(CONTRIB_URL)
 
 bin: contrib-macosx.tar.bz2
-	bunzip2 -c $< | tar xf -
+	@if test -d tmp; then \
+		echo "Move away ./tmp, it's in the way" ; \
+		exit 1 ; \
+	fi
+	mkdir tmp
+	bunzip2 -c $< | (cd tmp; tar xf -)
+	./change_prefix.sh tmp @@CONTRIB_PREFIX@@ $(PREFIX)
+	(cd tmp; tar cf -) | tar xf -
+	rm -rf tmp
 
 clean-src: FORCE
 	$(MAKE) -C src clean-src
@@ -48,8 +56,16 @@ clean: FORCE
 	@echo "Do you mean to clean-src or clean-bin ?"
 
 package: FORCE
+	@if test -d tmp; then \
+		echo "Move away ./tmp, it's in the way" ; \
+		exit 1 ; \
+	fi
+	mkdir tmp
 	tar cf - bin include lib vlc-lib share/aclocal* share/autoconf* \
 		share/automake* share/gettext* \
-		| bzip2 -c > contrib.tar.bz2
+		| (cd tmp; tar xf -)
+	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
+	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
+	rm -rf tmp
 
 FORCE:

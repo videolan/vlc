@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.5 2003/11/17 15:11:05 hartman Exp $
+# $Id: Makefile,v 1.6 2003/11/23 13:06:43 massiot Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -76,7 +76,7 @@ endef
 define INSTALL_NAME_LIB
 	install_name_tool \
 		-change $(PREFIX)/lib/$(shell cd $(PREFIX)/lib; ls | grep "lib$(INSTALL_LIB).[0-9]*.dylib") \
-		@executable_path/lib/lib$(INSTALL_LIB).dylib \
+		@executable_path/lib/vlc_lib$(INSTALL_LIB).dylib \
 		$(PREFIX)/vlc-lib/lib$(patsubst .%,%,$@).dylib ;
 endef
 
@@ -86,7 +86,7 @@ define INSTALL_NAME
 		cp $(PREFIX)/lib/lib$(patsubst .%,%,$@).dylib \
 			$(PREFIX)/vlc-lib/lib$(patsubst .%,%,$@).dylib ; \
 		install_name_tool \
-			-id @executable_path/lib/lib$(patsubst .%,%,$@).dylib \
+			-id @executable_path/lib/vlc_lib$(patsubst .%,%,$@).dylib \
 			$(PREFIX)/vlc-lib/lib$(patsubst .%,%,$@).dylib ; \
 		$(foreach INSTALL_LIB,$(patsubst .%,%,$(filter .%,$^)), \
 			$(INSTALL_NAME_LIB)) \

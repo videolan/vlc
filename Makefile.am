@@ -484,8 +484,10 @@ VLC.app: vlc
 			   "$(top_builddir)/VLC.app/Contents/MacOS/modules" ; \
 	  fi ; done
 	if test -d $(top_builddir)/extras/contrib/vlc-lib; then \
-	  cp -R $(top_builddir)/extras/contrib/vlc-lib \
-	    $(top_builddir)/VLC.app/Contents/MacOS/lib ; \
+	  mkdir -p $(top_builddir)/VLC.app/Contents/MacOS/lib ; \
+	  for i in $(top_builddir)/extras/contrib/vlc-lib/*.dylib ; do \
+	    install -c $${i} $(top_builddir)/VLC.app/Contents/MacOS/lib/vlc_`basename $${i}` ; \
+	  done ; \
 	fi
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/share/http
