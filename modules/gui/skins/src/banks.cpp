@@ -1,8 +1,8 @@
 /*****************************************************************************
- * banks.cpp: Bitmap bank, Event, bank, Font bank and OffSet bank
+ * banks.cpp: Bitmap bank, Event bank, Font bank and OffSet bank
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: banks.cpp,v 1.5 2003/04/21 22:12:37 asmax Exp $
+ * $Id: banks.cpp,v 1.6 2003/04/28 20:46:41 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -78,6 +78,7 @@ Bitmap * BitmapBank::Get( string Id )
     {
         msg_Warn( p_intf, "Unknown bitmap name '%s', using default one",
                   Id.c_str() );
+        Bank.erase( Id );
         return Bank[DEFAULT_BITMAP_NAME];
     }
 
@@ -127,6 +128,7 @@ SkinFont * FontBank::Get( string Id )
     {
         msg_Warn( p_intf, "Unknown font name '%s', using default one",
                   Id.c_str() );
+        Bank.erase( Id );
         return Bank[DEFAULT_FONT_NAME];
     }
 
@@ -218,11 +220,12 @@ void EventBank::TestShortcut( int key, int mod )
 //---------------------------------------------------------------------------
 Event * EventBank::Get( string Id )
 {
-    // If the specified font doesn't exist, use the default one
+    // If the specified event doesn't exist, use the default one
     if( Bank[Id] == NULL )
     {
         msg_Warn( p_intf, "Unknown event name '%s', using default one",
                   Id.c_str() );
+        Bank.erase( Id );
         return Bank[DEFAULT_EVENT_NAME];
     }
 
