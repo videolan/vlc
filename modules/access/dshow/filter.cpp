@@ -314,6 +314,7 @@ CapturePin::CapturePin( vlc_object_t *_p_input, access_sys_t *_p_sys,
     cx_media_type.majortype = mt[0].majortype;
     cx_media_type.subtype   = GUID_NULL;
     cx_media_type.pbFormat  = NULL;
+    cx_media_type.cbFormat  = 0;
     cx_media_type.pUnk      = NULL;
 }
 
