@@ -632,9 +632,9 @@ $(PLUGIN_BEOS): %.o: .dep/%.dpp
 $(PLUGIN_BEOS): %.o: %.cpp
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
-$(PLUGIN_IDCTALTIVEC): %.o: Makefile.dep
-$(PLUGIN_IDCTALTIVEC): %.o: .dep/%.d
-$(PLUGIN_IDCTALTIVEC): %.o: %.c
+plugins/idct/idctaltivec.o: %.o: Makefile.dep
+plugins/idct/idctaltivec.o: %.o: .dep/%.d
+plugins/idct/idctaltivec.o: %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $< -faltivec
 
 #
