@@ -151,6 +151,8 @@ modules/access_output/dummy.c
 modules/access_output/file.c
 modules/access_output/http.c
 modules/access_output/udp.c
+modules/access/pvr/pvr.c
+modules/access/pvr/videodev2.h
 modules/access/satellite/access.c
 modules/access/satellite/dvb.c
 modules/access/satellite/dvb.h
@@ -158,6 +160,7 @@ modules/access/satellite/satellite.c
 modules/access/slp.c
 modules/access/udp.c
 modules/access/v4l/v4l.c
+modules/access/v4l/videodev_mjpeg.h
 modules/access/vcd/cdrom.c
 modules/access/vcd/cdrom.h
 modules/access/vcd/cdrom_internals.h
@@ -534,6 +537,8 @@ modules/gui/skins/src/bezier.cpp
 modules/gui/skins/src/bezier.h
 modules/gui/skins/src/bitmap.cpp
 modules/gui/skins/src/bitmap.h
+modules/gui/skins/src/dialogs.cpp
+modules/gui/skins/src/dialogs.h
 modules/gui/skins/src/event.cpp
 modules/gui/skins/src/event.h
 modules/gui/skins/src/font.cpp
@@ -580,6 +585,8 @@ modules/gui/skins/x11/x11_graphics.h
 modules/gui/skins/x11/x11_run.cpp
 modules/gui/skins/x11/x11_theme.cpp
 modules/gui/skins/x11/x11_theme.h
+modules/gui/skins/x11/x11_timer.cpp
+modules/gui/skins/x11/x11_timer.h
 modules/gui/skins/x11/x11_window.cpp
 modules/gui/skins/x11/x11_window.h
 modules/gui/wxwindows/fileinfo.cpp

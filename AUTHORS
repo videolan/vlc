@@ -1,4 +1,4 @@
-# $Id: AUTHORS,v 1.93 2003/04/09 20:53:28 hartman Exp $
+# $Id: AUTHORS,v 1.94 2003/06/11 22:46:42 gbazin Exp $
 # 
 # The format of this file was inspired by the Linux kernel CREDITS file.
 # Authors are listed alphabetically.
@@ -49,11 +49,13 @@ S: France
 N: Gildas Bazin
 E: gbazin@netcourrier.com
 C: gbazin
-D: mingw32 port, various win32 fixes
-D: DirectX audio and video output, win32 WaveOut audio output
-D: a52 decoder using liba52 and vorbis decoder using libvorbis
-D: ogg demultiplexer
+D: Win32 port, win32 VCD/CDDA input and win32 ipv6 code
+D: DirectX audio/video output, win32 WaveOut audio output
+D: a52 (liba52), vorbis (libvorbis) and theora (libtheora) decoders
+D: mpeg1/2 video decoder (libmpeg2), bandlimited resampling
+D: Ogg and Raw DV demultiplexers
 D: Configuration file infrastructure
+D: wxWindows and http interfaces
 S: France
 
 N: Johan Bilien
