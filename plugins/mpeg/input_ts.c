@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.10 2001/03/18 18:48:27 henri Exp $
+ * $Id: input_ts.c,v 1.11 2001/03/18 20:46:16 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -257,7 +257,7 @@ static int TSRead( input_thread_t * p_input,
                 (int)(i_read/TS_PACKET_SIZE) , pp_packets );
     
         /* check correct TS header */
-        for( i_loop=0; i_loop < (int)(i_read/TS_PACKET_SIZE); i_loop++ )
+        for( i_loop=0; i_loop * TS_PACKET_SIZE < i_read; i_loop++ )
         {
             if( pp_packets[i_loop]->p_buffer[0] != 0x47 )
                 intf_ErrMsg( "TS input : Bad TS Packet (starcode != 0x47)." );
