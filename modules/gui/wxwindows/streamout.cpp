@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: streamout.cpp,v 1.43 2004/02/28 19:30:04 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -357,17 +357,26 @@ void SoutDialog::UpdateMRL()
         /* SAP only if UDP */
         if( sap_checkbox->IsChecked() )
         {
-            dup_opts += wxT(",sap=\"");
-            dup_opts += announce_addr->GetLineText(0);
-            dup_opts += wxT("\"");
+            dup_opts += wxT(",sap");
+            if( ! announce_addr->GetLineText(0).IsEmpty() )
+            {
+                dup_opts += wxT(",name=\"");
+                dup_opts += announce_addr->GetLineText(0);
+                dup_opts += wxT("\"");
+            }
         }
 
         /* SLP only if UDP */
         if( slp_checkbox->IsChecked() )
         {
-            dup_opts += wxT(",slp=\"");
-            dup_opts += announce_addr->GetLineText(0);
-            dup_opts += wxT("\"");
+            dup_opts += wxT(",slp");
+            if( ! sap_checkbox->IsChecked() &&
+                ! announce_addr->GetLineText(0).IsEmpty() )
+            {
+                dup_opts += wxT(",name=\"");
+                dup_opts += announce_addr->GetLineText(0);
+                dup_opts += wxT("\"");
+            }
         }
 
         dup_opts += wxT("}");
