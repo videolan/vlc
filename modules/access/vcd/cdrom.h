@@ -2,7 +2,7 @@
  * cdrom.h: cdrom tools header
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.h,v 1.3 2002/10/15 19:56:59 gbazin Exp $
+ * $Id: cdrom.h,v 1.4 2002/10/16 23:12:46 massiot Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -203,7 +203,7 @@ static int    OpenVCDImage( vlc_object_t *, const char *, vcddev_t * );
 static void   CloseVCDImage( vlc_object_t *, vcddev_t * );
 
 #if defined( SYS_DARWIN )
-static CDTOC *darwin_getTOC( vlc_object_t *, const char * );
+static CDTOC *darwin_getTOC( vlc_object_t *, const vcddev_t * );
 static int    darwin_getNumberOfDescriptors( CDTOC * );
 static int    darwin_getNumberOfTracks( CDTOC *, int );
 

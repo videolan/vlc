@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.4 2002/10/15 19:56:59 gbazin Exp $
+ * $Id: cdrom.c,v 1.5 2002/10/16 23:12:46 massiot Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -37,6 +37,7 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 
@@ -222,7 +223,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         CDTOC *pTOC;
         int i_descriptors;
 
-        if( ( pTOC = darwin_getTOC( p_this, p_vcddev->psz_dev ) ) == NULL )
+        if( ( pTOC = darwin_getTOC( p_this, p_vcddev ) ) == NULL )
         {
             msg_Err( p_this, "failed to get the TOC" );
             return 0;
@@ -868,7 +869,7 @@ static void CloseVCDImage( vlc_object_t * p_this, vcddev_t *p_vcddev )
 /****************************************************************************
  * darwin_getTOC: get the TOC
  ****************************************************************************/
-static CDTOC *darwin_getTOC( vlc_object_t * p_this, vcddev_t *p_vcddev )
+static CDTOC *darwin_getTOC( vlc_object_t * p_this, const vcddev_t *p_vcddev )
 {
     mach_port_t port;
     char *psz_devname;
@@ -876,7 +877,7 @@ static CDTOC *darwin_getTOC( vlc_object_t * p_this, vcddev_t *p_vcddev )
     CDTOC *pTOC = NULL;
     io_iterator_t iterator;
     io_registry_entry_t service;
-    CFDictionaryRef properties;
+    CFMutableDictionaryRef properties;
     CFDataRef data;
 
     /* get the device name */

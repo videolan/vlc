@@ -2,11 +2,12 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.13 2002/09/30 11:05:35 sam Exp $
+ * $Id: sdl.c,v 1.14 2002/10/16 23:12:45 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,20 +77,18 @@ vlc_module_end();
 static int Open ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
-    SDL_AudioSpec desired;
+    SDL_AudioSpec desired, obtained;
+    int i_nb_channels;
 
+    /* Check that no one uses the DSP. */
     Uint32 i_flags = SDL_INIT_AUDIO;
-
     if( SDL_WasInit( i_flags ) )
     {
         return VLC_EGENERIC;
     }
 
-    p_aout->output.pf_play = Play;
-
-    aout_VolumeSoftInit( p_aout );
 #ifndef WIN32
-    /* Win32 SDL implementation doesn't support SDL_INIT_EVENTTHREAD yet*/
+    /* Win32 SDL implementation doesn't support SDL_INIT_EVENTTHREAD yet */
     i_flags |= SDL_INIT_EVENTTHREAD;
 #endif
 #ifdef DEBUG
@@ -105,27 +104,56 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if ( p_aout->output.output.i_channels > 2 )
-        p_aout->output.output.i_channels = 2;
-    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-    p_aout->output.i_nb_samples = FRAME_SIZE;
-
-    /* TODO: finish and clean this */
-
+    i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
+    if ( i_nb_channels > 2 )
+    {
+        /* SDL doesn't support more than two channels. */
+        i_nb_channels = 2;
+        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+    }
     desired.freq       = p_aout->output.output.i_rate;
     desired.format     = AUDIO_S16SYS;
-    desired.channels   = p_aout->output.output.i_channels;
+    desired.channels   = i_nb_channels;
     desired.callback   = SDLCallback;
     desired.userdata   = p_aout;
     desired.samples    = FRAME_SIZE;
 
-    /* Open the sound device - FIXME : get the "natural" parameters */
-    if( SDL_OpenAudio( &desired, NULL ) < 0 )
+    /* Open the sound device. */
+    if( SDL_OpenAudio( &desired, &obtained ) < 0 )
     {
         return VLC_EGENERIC;
     }
 
     SDL_PauseAudio( 0 );
+
+    /* Now have a look at what we got. */
+    switch ( obtained.format )
+    {
+    case AUDIO_S16LSB:
+        p_aout->output.output.i_format = VLC_FOURCC('s','1','6','l'); break;
+    case AUDIO_S16MSB:
+        p_aout->output.output.i_format = VLC_FOURCC('s','1','6','b'); break;
+    case AUDIO_U16LSB:
+        p_aout->output.output.i_format = VLC_FOURCC('u','1','6','l'); break;
+    case AUDIO_U16MSB:
+        p_aout->output.output.i_format = VLC_FOURCC('u','1','6','b'); break;
+    case AUDIO_S8:
+        p_aout->output.output.i_format = VLC_FOURCC('s','8',' ',' '); break;
+    case AUDIO_U8:
+        p_aout->output.output.i_format = VLC_FOURCC('u','8',' ',' '); break;
+    }
+    /* Volume is entirely done in software. */
+    aout_VolumeSoftInit( p_aout );
+
+    if ( obtained.channels != i_nb_channels )
+    {
+        p_aout->output.output.i_channels = (obtained.channels == 2 ?
+                                            AOUT_CHAN_STEREO :
+                                            AOUT_CHAN_MONO);
+    }
+    p_aout->output.output.i_rate = obtained.freq;
+    p_aout->output.i_nb_samples = obtained.samples;
+    p_aout->output.pf_play = Play;
 
     return VLC_SUCCESS;
 }
