@@ -373,6 +373,7 @@ static void Usage( void )
 
     /* Video parameters */
     intf_Msg("Video parameters:\n" \
+             "  " VOUT_FB_DEV_VAR "=<filename>           framebuffer device path\n" \
 	     ); 
 
     /* Vlan parameters */

@@ -24,9 +24,16 @@
  * Program information
  *******************************************************************************/
 
+/* Program options */
+#if defined(VIDEO_X11)
+#define PROGRAM_OPTIONS         "X11"
+#elif defined(VIDEO_FB)
+#define PROGRAM_OPTIONS         "Framebuffer"
+#endif
+
 /* Program version and copyright message */
 #define PROGRAM_VERSION		"DR 2.1"
-#define COPYRIGHT_MESSAGE	"VideoLAN Client v" PROGRAM_VERSION " (" __DATE__ ") - (c)1999 VideoLAN\n"
+#define COPYRIGHT_MESSAGE	"VideoLAN Client v" PROGRAM_VERSION " (" __DATE__ ") - " PROGRAM_OPTIONS " - (c)1999 VideoLAN\n"
 
 /*******************************************************************************
  * General compilation options
@@ -233,7 +240,15 @@
 #define VOUT_DISPLAY_DELAY              150000
 
 /*
- * Environment settings 
+ * Framebuffer settings
+ */
+
+/* Environment variable for framebuffer device, and default value */
+#define VOUT_FB_DEV_VAR                 "vlc_fb_dev"
+#define VOUT_FB_DEV_DEFAULT             "/dev/fb0"
+
+/*
+ * X11 settings 
  */
 
 /* Allow use of X11 XShm (shared memory) extension if possible */

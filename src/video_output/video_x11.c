@@ -88,8 +88,8 @@ int vout_SysCreate( vout_thread_t *p_vout, char *psz_display, Window root_window
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );    
     if( p_vout->p_sys == NULL )
     {   
-        return( 1 );
-        
+        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM) );        
+        return( 1 );        
     }    
 
     /* Since XLib is usually not thread-safe, we can't use the same display
@@ -127,8 +127,8 @@ int vout_SysInit( vout_thread_t *p_vout )
         X11DestroyWindow( p_vout );
         return( 1 );        
     }
-    intf_DbgMsg("%p -> success, depth=%d bpp, Shm=%d\n", 
-                p_vout, p_vout->i_screen_depth, p_vout->p_sys->b_shm );
+    intf_Msg("vout: X11 display initialized, depth=%d bpp, Shm=%d\n", 
+             p_vout->i_screen_depth, p_vout->p_sys->b_shm );
     return( 0 );
 }
 
@@ -293,7 +293,7 @@ static int X11GetProperties( vout_thread_t *p_vout )
         break;
 
     default:                                       /* unsupported screen depth */
-        intf_ErrMsg("vout error 106-2: screen depth %i is not supported\n", 
+        intf_ErrMsg("vout error: screen depth %i is not supported\n", 
                      p_vout->i_screen_depth);
         return( 1  );
         break;
@@ -372,8 +372,6 @@ static int X11CreateWindow( vout_thread_t *p_vout )
  * Create two XImages which will be used as rendering buffers. On error, non 0
  * will be returned and the images pointer will be set to NULL (see 
  * vout_X11ManageOutputMethod()).
- *******************************************************************************
- * Messages type: vout, major code: 108
  *******************************************************************************/
 static int X11CreateImages( vout_thread_t *p_vout )
 {
@@ -409,14 +407,14 @@ static int X11CreateImages( vout_thread_t *p_vout )
     {
         if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[0] ) )
         {
-            intf_Msg("vout error 108-1: can't create images\n");
+            intf_Msg("vout error: can't create images\n");
             p_vout->p_sys->p_ximage[0] = NULL;
             p_vout->p_sys->p_ximage[1] = NULL;
             return( -1 );
         }
         if( X11CreateImage( p_vout, &p_vout->p_sys->p_ximage[1] ) )
         {
-            intf_Msg("vout error 108-2: can't create images\n");
+            intf_Msg("vout error: can't create images\n");
             X11DestroyImage( p_vout->p_sys->p_ximage[0] );
             p_vout->p_sys->p_ximage[0] = NULL;
             p_vout->p_sys->p_ximage[1] = NULL;
@@ -434,8 +432,6 @@ static int X11CreateImages( vout_thread_t *p_vout )
  * X11DestroyImages: destroy X11 rendering buffers
  *******************************************************************************
  * Destroy buffers created by vout_X11CreateImages().
- *******************************************************************************
- * Messages type: vout, major code: 109
  *******************************************************************************/
 static void X11DestroyImages( vout_thread_t *p_vout )
 {
@@ -457,8 +453,6 @@ static void X11DestroyImages( vout_thread_t *p_vout )
  * X11DestroyWindow: destroy X11 window
  *******************************************************************************
  * Destroy an X11 window created by vout_X11CreateWindow
- *******************************************************************************
- * Messages type: vout, major code: 110
  *******************************************************************************/
 static void X11DestroyWindow( vout_thread_t *p_vout )
 {
@@ -470,8 +464,6 @@ static void X11DestroyWindow( vout_thread_t *p_vout )
 
 /*******************************************************************************
  * X11CreateImage: create an XImage                                      
- *******************************************************************************
- * Messages type: vout, major code 112
  *******************************************************************************/
 static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
 {
@@ -484,7 +476,7 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
                                  * p_vout->i_height );
     if( !pb_data )                                                    /* error */
     {
-        intf_ErrMsg("vout error 112-1: %s\n", strerror(ENOMEM));
+        intf_ErrMsg("vout error: %s\n", strerror(ENOMEM));
         return( -1 );   
     }
 
@@ -513,7 +505,7 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
                                p_vout->i_width, p_vout->i_height, i_quantum, 0);
     if(! *pp_ximage )                                                 /* error */
     {
-        intf_ErrMsg( "vout error 112-2: XCreateImage() failed\n" );
+        intf_ErrMsg( "vout error: can't create XImages\n" );
         free( pb_data );
         return( -1 );
     }
@@ -534,8 +526,6 @@ static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
  *  Minor opcode of failed request:  1 (X_ShmAttach)
  *  Serial number of failed request:  17
  *  Current serial number in output stream:  18         
- *******************************************************************************
- * Messages type: vout, major code 113
  *******************************************************************************/
 static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage, 
                               XShmSegmentInfo *p_shm_info)
@@ -547,7 +537,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
                                   p_shm_info, p_vout->i_width, p_vout->i_height );
     if(! *pp_ximage )                                                 /* error */
     {
-        intf_ErrMsg("vout error 113-1: XShmCreateImage() failed\n");
+        intf_ErrMsg("vout error: can't create XImages with shared memory\n");
         return( -1 );
     }
 
@@ -558,7 +548,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
                                 IPC_CREAT | 0777);
     if( p_shm_info->shmid < 0)                                        /* error */
     {
-        intf_ErrMsg("vout error 113-2: can't allocate shared image data (%s)\n",
+        intf_ErrMsg("vout error: can't allocate shared image data (%s)\n",
                     strerror(errno));
         XDestroyImage( *pp_ximage );
         return( -1 );
@@ -568,7 +558,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
     p_shm_info->shmaddr = (*pp_ximage)->data = shmat(p_shm_info->shmid, 0, 0);
     if(! p_shm_info->shmaddr )
     {                                                                 /* error */
-        intf_ErrMsg("vout error 113-3: can't attach shared memory (%s)\n",
+        intf_ErrMsg("vout error: can't attach shared memory (%s)\n",
                     strerror(errno));
         shmctl( p_shm_info->shmid, IPC_RMID, 0 );        /* free shared memory */
         XDestroyImage( *pp_ximage );
@@ -583,7 +573,7 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
     p_shm_info->readOnly = True;
     if( XShmAttach( p_vout->p_sys->p_display, p_shm_info ) == False )    /* error */
     {
-        intf_ErrMsg("vout error 113-4: can't attach shared memory to server\n");
+        intf_ErrMsg("vout error: can't attach shared memory to X11 server\n");
         shmdt( p_shm_info->shmaddr );     /* detach shared memory from process
                                            * and automatic free                */
         XDestroyImage( *pp_ximage );
@@ -635,7 +625,7 @@ static void X11DestroyShmImage( vout_thread_t *p_vout, XImage *p_ximage,
     XDestroyImage( p_ximage );
     if( shmdt( p_shm_info->shmaddr ) )    /* detach shared memory from process */
     {                                     /* also automatic freeing...         */
-        intf_ErrMsg("vout error 115-1: can't detach shared memory (%s)\n", 
+        intf_ErrMsg("vout error: can't detach shared memory (%s)\n", 
                     strerror(errno));
     }
 }

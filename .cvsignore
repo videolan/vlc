@@ -4,3 +4,4 @@ dep
 gmon.out
 vlc
 vlc.init
+vlc-debug.log

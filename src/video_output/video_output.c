@@ -252,9 +252,9 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         case YUV_422_PICTURE:
         case YUV_444_PICTURE:
             p_free_picture->p_data = malloc( 3 * i_height * i_bytes_per_line );                
-            p_free_picture->p_y = p_free_picture->p_data;
-            p_free_picture->p_u = p_free_picture->p_data + i_height * i_bytes_per_line;
-            p_free_picture->p_v = p_free_picture->p_data + i_height * i_bytes_per_line * 2;
+            p_free_picture->p_y = (yuv_data_t *) p_free_picture->p_data;
+            p_free_picture->p_u = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line);
+            p_free_picture->p_v = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line * 2);
             break;                
 #ifdef DEBUG
         default:
@@ -603,6 +603,9 @@ static void EndThread( vout_thread_t *p_vout )
  *******************************************************************************/
 static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    intf_DbgMsg("0x%x Picture 0x%x type=%d, %dx%d\n", 
+                p_vout, p_pic, p_pic->i_type, p_pic->i_width, p_pic->i_height );
+    
     /*???*/
 }
 
