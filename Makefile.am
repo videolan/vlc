@@ -62,7 +62,7 @@ CPPFLAGS_default = -I$(top_srcdir)/include
 CFLAGS_default = 
 CXXFLAGS_default = 
 OBJCFLAGS_default = 
-LDFLAGS_default =
+LDFLAGS_default = $(LDFLAGS_gprof)
 
 CPPFLAGS_pic = $(CPPFLAGS_default)
 CFLAGS_pic = $(CFLAGS_default) @CFLAGS_pics@
@@ -112,11 +112,12 @@ CFLAGS_debug = -g
 endif
 if GPROF
 CPPFLAGS_gprof = -DGPROF
-CFLAGS_gprof = -finstrument-functions
+CFLAGS_gprof = -pg
+LDFLAGS_gprof = -pg
 endif
 if CPROF
 CPPFLAGS_cprof = -DCPROF
-CFLAGS_cprof = -pg
+CFLAGS_cprof = -finstrument-functions
 endif
 if OPTIM
 CFLAGS_optim = @CFLAGS_OPTIM@ @CFLAGS_TUNING@
