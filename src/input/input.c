@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.113 2001/05/30 17:03:12 sam Exp $
+ * $Id: input.c,v 1.114 2001/05/30 22:16:07 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -351,6 +351,10 @@ static int InitThread( input_thread_t * p_input )
     p_input->c_packets_trashed          = 0;
 #endif
 
+    /* Default, might get overwritten */
+    p_input->pf_open = p_input->pf_file_open;
+    p_input->pf_close = p_input->pf_file_close;
+
     p_input->p_input_module = module_Need( MODULE_CAPABILITY_INPUT,
                                            (probedata_t *)p_input );
 
@@ -363,8 +367,14 @@ static int InitThread( input_thread_t * p_input )
 
 #define f p_input->p_input_module->p_functions->input.functions.input
     p_input->pf_init          = f.pf_init;
-    p_input->pf_open          = f.pf_open;
-    p_input->pf_close         = f.pf_close;
+    if( f.pf_open != NULL )
+    {
+        p_input->pf_open          = f.pf_open;
+    }
+    if( f.pf_close != NULL )
+    {
+        p_input->pf_close         = f.pf_close;
+    }
     p_input->pf_end           = f.pf_end;
     p_input->pf_read          = f.pf_read;
     p_input->pf_set_area      = f.pf_set_area;
