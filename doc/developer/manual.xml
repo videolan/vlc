@@ -27,7 +27,7 @@
     <affiliation>
       <jobtitle> <ulink url="mailto:christophe.massiot@idealx.com">
       Developer </ulink> </jobtitle>
-      <orgname> <ulink url="http://www.idealx.com"> IDEALX
+      <orgname> <ulink url="http://www.idealx.com/"> IDEALX
       S.A.S. </ulink> </orgname>
       <orgdiv> Industrial Computing </orgdiv>
     </affiliation>
@@ -45,7 +45,7 @@
     <affiliation>
       <jobtitle> <ulink url="mailto:jean-francois.lecomte@idealx.com">
       Developer </ulink> </jobtitle>
-      <orgname> <ulink url="http://www.idealx.com"> IDEALX
+      <orgname> <ulink url="http://www.idealx.com/"> IDEALX
       S.A.S. </ulink> </orgname>
     </affiliation>
   </collab>
@@ -57,7 +57,7 @@
       <orgname> VideoLAN project </orgname>
     </affiliation>
   </collab>
-  <pubdate> $Id: manual.xml,v 1.5 2002/10/12 23:15:45 alexis Exp $ </pubdate>
+  <pubdate> $Id: manual.xml,v 1.6 2003/12/21 23:32:58 sam Exp $ </pubdate>
   <copyright> <year> 2001 </year>
               <holder> Christophe Massiot, for IDEALX S.A.S. </holder>
   </copyright>

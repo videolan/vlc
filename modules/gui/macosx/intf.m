@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.107 2003/12/15 19:25:56 bigben Exp $
+ * $Id: intf.m,v 1.108 2003/12/21 23:32:58 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -1230,7 +1230,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 - (IBAction)openWebsite:(id)sender
 {
-    NSURL * o_url = [NSURL URLWithString: @"http://www.videolan.org"];
+    NSURL * o_url = [NSURL URLWithString: @"http://www.videolan.org/"];
 
     [[NSWorkspace sharedWorkspace] openURL: o_url];
 }

@@ -6,7 +6,7 @@
 		name="VideoLAN.VLC"
 		type="win32"
 	/>
-	<description>see http://www.videolan.org</description>
+	<description>see http://www.videolan.org/</description>
 	<dependency>
 		<dependentAssembly>
 			<assemblyIdentity

@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.40 2003/11/23 18:16:45 gbazin Exp $
+ * $Id: http.c,v 1.41 2003/12/21 23:32:58 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -2270,7 +2270,7 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         p += sprintf( p, "<body>\n" );
         p += sprintf( p, "<h1><center>Error loading %s for %s</center></h1>\n", p_args->file, p_args->name );
         p += sprintf( p, "<hr />\n" );
-        p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
+        p += sprintf( p, "<a href=\"http://www.videolan.org/\">VideoLAN</a>\n" );
         p += sprintf( p, "</body>\n" );
         p += sprintf( p, "</html>\n" );
 

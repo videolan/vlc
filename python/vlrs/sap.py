@@ -17,7 +17,7 @@ def ntpTime():
 class SdpMessage:
     "Build a SDP message"
  
-    uri = "http://www.videolan.org"
+    uri = "http://www.videolan.org/"
 
     def __init__(self, sessionName, address, uri):
         "Build the message"

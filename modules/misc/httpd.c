@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.29 2003/10/08 11:24:59 zorglub Exp $
+ * $Id: httpd.c,v 1.30 2003/12/21 23:32:58 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1207,7 +1207,7 @@ static int  httpd_page_400_get( httpd_file_callback_args_t *p_args,
     p += sprintf( p, "<body>\n" );
     p += sprintf( p, "<h1><center> 400  Bad Request</center></h1>\n" );
     p += sprintf( p, "<hr />\n" );
-    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
+    p += sprintf( p, "<a href=\"http://www.videolan.org/\">VideoLAN</a>\n" );
     p += sprintf( p, "</body>\n" );
     p += sprintf( p, "</html>\n" );
 
@@ -1235,7 +1235,7 @@ static int  httpd_page_401_get( httpd_file_callback_args_t *p_args,
     p += sprintf( p, "<body>\n" );
     p += sprintf( p, "<h1><center> 401 authentification needed</center></h1>\n" );
     p += sprintf( p, "<hr />\n" );
-    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
+    p += sprintf( p, "<a href=\"http://www.videolan.org/\">VideoLAN</a>\n" );
     p += sprintf( p, "</body>\n" );
     p += sprintf( p, "</html>\n" );
 
@@ -1262,7 +1262,7 @@ static int  httpd_page_404_get( httpd_file_callback_args_t *p_args,
     p += sprintf( p, "<body>\n" );
     p += sprintf( p, "<h1><center> 404 Ressource not found</center></h1>\n" );
     p += sprintf( p, "<hr />\n" );
-    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
+    p += sprintf( p, "<a href=\"http://www.videolan.org/\">VideoLAN</a>\n" );
     p += sprintf( p, "</body>\n" );
     p += sprintf( p, "</html>\n" );
 

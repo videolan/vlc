@@ -27,7 +27,7 @@
   </p>
   <p>
     You may want to look at the port section on our website : 
-    <htmlurl url="http://www.videolan.org" name="http://www.videolan.org/">.
+    <htmlurl url="http://www.videolan.org/" name="http://www.videolan.org/">.
   </p>
  </sect1>
  
@@ -36,7 +36,7 @@
   <p>
 
    VideoLAN is a complete software solution for video streaming, developed
-   by students at the <htmlurl url="http://www.ecp.fr" name="Ecole Centrale
+   by students at the <htmlurl url="http://www.ecp.fr/" name="Ecole Centrale
    Paris"> and contributors from all over the world, under the <htmlurl
    url="http://www.gnu.org/copyleft/gpl.html" name="General Public License
    (GPL)">. It has been designed for streaming MPEG 1 and MPEG 2 videos on
@@ -69,7 +69,7 @@
    </verb>
 
    More details about the project can be found on the
-   <htmlurl url="http://www.videolan.org" name="VideoLAN Web site">.
+   <htmlurl url="http://www.videolan.org/" name="VideoLAN Web site">.
 
   </p>
  </sect1>
@@ -89,7 +89,7 @@ name="VideoLAN Server user guide">,
 </itemize>
 
 The up-to-date version of these documents can be found on the <htmlurl
-url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
+url="http://www.videolan.org/doc/" name="VideoLAN Web Site">.
 
  <sect1>
   <heading>Translated versions of this document</heading>
@@ -167,7 +167,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
 
    In this HOWTO, we consider you already have a little knowledge
    about Linux, and you know how to use a DVD. If not, good howtos
-   can be found on the <htmlurl url="http://www.tldp.org" name="Linux
+   can be found on the <htmlurl url="http://www.tldp.org/" name="Linux
    Documentation Projet">.
 
   </p>
@@ -1293,7 +1293,7 @@ url="http://www.videolan.org/doc" name="VideoLAN Web Site">.
   </p>
   <p>
    There is a FAQ page on our website :
-   <htmlurl url="http://www.videolan.org/doc/index.html" name="http://www.videolan.org/doc/index.html">.
+   <htmlurl url="http://www.videolan.org/doc/" name="http://www.videolan.org/doc/">.
    If you think one question should be in the FAQ, please contact
    <htmlurl url="mailto:videolan@videolan.org" name="videolan@videolan.org">
   </p>

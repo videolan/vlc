@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.46 2003/09/10 21:03:56 fenrir Exp $
+ * $Id: http.c,v 1.47 2003/12/21 23:32:58 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -73,7 +73,7 @@ static ssize_t Read    ( input_thread_t *, byte_t *, size_t );
 #define PROXY_TEXT N_("Specify an HTTP proxy")
 #define PROXY_LONGTEXT N_( \
     "Specify an HTTP proxy to use. It must be in the form " \
-    "http://myproxy.mydomain:myport. If none is specified, the HTTP_PROXY " \
+    "http://myproxy.mydomain:myport/. If none is specified, the HTTP_PROXY " \
     "environment variable will be tried." )
 
 #define CACHING_TEXT N_("Caching value in ms")

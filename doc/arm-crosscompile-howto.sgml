@@ -354,7 +354,7 @@ make
     <heading>tremor</heading>
     <p>
     Tremor is an integer decoder for the vorbis audio codec. Download the
-    source through CVS at the <htmlurl url="http://www.xiph.org" name="xiph.org"> website.
+    source through CVS at the <htmlurl url="http://www.xiph.org/" name="xiph.org"> website.
     </p>
     <p>
     Log into CVS using the password : <tt>anoncvs</tt>.
