@@ -158,10 +158,11 @@ typedef struct module_symbols_s
     void  ( * vout_DatePicture )    ( struct vout_thread_s *p_vout, 
                                       struct picture_s *p_pic, mtime_t );
     
-    
     u32  ( * UnalignedShowBits )    ( struct bit_stream_s *, unsigned int );
     void ( * UnalignedRemoveBits )  ( struct bit_stream_s * );
     u32  ( * UnalignedGetBits )     ( struct bit_stream_s *, unsigned int );
+
+    char * ( * DecodeLanguage ) ( u16 );
 
     struct module_s * ( * module_Need )    ( int, void * );
     void ( * module_Unneed )        ( struct module_s * );
@@ -247,6 +248,7 @@ typedef struct module_symbols_s
     (p_symbols)->UnalignedGetBits = UnalignedGetBits; \
     (p_symbols)->UnalignedRemoveBits = UnalignedRemoveBits; \
     (p_symbols)->UnalignedShowBits = UnalignedShowBits; \
+    (p_symbols)->DecodeLanguage = DecodeLanguage; \
     (p_symbols)->module_Need = module_Need; \
     (p_symbols)->module_Unneed = module_Unneed;
     
@@ -338,6 +340,7 @@ extern module_symbols_t* p_symbols;
 #   define input_NetlistGetiovec p_symbols->input_NetlistGetiovec
 #   define input_NetlistMviovec p_symbols->input_NetlistMviovec
 #   define input_NetlistNewPacket p_symbols->input_NetlistNewPacket
+#   define input_NetlistNewPtr p_symbols->input_NetlistNewPtr
 #   define input_NetlistNewPES p_symbols->input_NetlistNewPES
 #   define input_NetlistDeletePacket p_symbols->input_NetlistDeletePacket
 #   define input_NetlistDeletePES p_symbols->input_NetlistDeletePES
@@ -359,7 +362,10 @@ extern module_symbols_t* p_symbols;
     
 #   define UnalignedShowBits p_symbols->UnalignedShowBits
 #   define UnalignedRemoveBits p_symbols->UnalignedRemoveBits
-#   define UnalignedGetBits p_symbols->UnalignedGetBits   
+#   define UnalignedGetBits p_symbols->UnalignedGetBits
+
+#   define DecodeLanguage p_symbols->DecodeLanguage
+
 #   define module_Need p_symbols->module_Need
 #   define module_Unneed p_symbols->module_Unneed
     

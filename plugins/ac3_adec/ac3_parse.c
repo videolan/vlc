@@ -2,7 +2,7 @@
  * ac3_parse.c: ac3 parsing procedures
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_parse.c,v 1.1 2001/11/13 12:09:17 henri Exp $
+ * $Id: ac3_parse.c,v 1.2 2001/11/25 22:52:21 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -39,6 +39,7 @@
 
 #include "audio_output.h"
 
+#include "modules.h"
 #include "modules_export.h"
 
 #include "stream_control.h"

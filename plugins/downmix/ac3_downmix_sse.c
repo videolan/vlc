@@ -2,7 +2,7 @@
  * ac3_downmix_sse.c: accelerated SSE ac3 downmix functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ac3_downmix_sse.c,v 1.4 2001/07/08 23:15:11 reno Exp $
+ * $Id: ac3_downmix_sse.c,v 1.5 2001/11/25 22:52:21 gbazin Exp $
  *
  * Authors: Renaud Dartus <reno@videolan.org>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -38,12 +38,7 @@
 
 #include "ac3_downmix.h"
 
-void sqrt2_sse (void) __asm__ ("sqrt2_sse");
-void sqrt2_sse (void)
-{
-    __asm__ (".align 16\n"
-             ".float 0f0.7071068");
-}
+static const float sqrt2_sse __asm__ ("sqrt2_sse") __attribute__ ((aligned (16))) = 0.7071068;
 
 void _M( downmix_3f_2r_to_2ch ) (float * samples, dm_par_t * dm_par)
 {

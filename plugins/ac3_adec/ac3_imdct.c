@@ -2,7 +2,7 @@
  * ac3_imdct.c: ac3 DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_imdct.c,v 1.2 2001/11/13 18:10:38 sam Exp $
+ * $Id: ac3_imdct.c,v 1.3 2001/11/25 22:52:21 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Aaron Holtzman <aholtzma@engr.uvic.ca>
@@ -37,6 +37,9 @@
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
+
+#include "modules.h"
+#include "modules_export.h"
 
 #include "stream_control.h"
 #include "input_ext-dec.h"

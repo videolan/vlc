@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.26 2001/11/14 00:01:36 jlj Exp $
+ * $Id: threads.h,v 1.27 2001/11/25 22:52:21 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -48,6 +48,7 @@ int pthread_mutexattr_setkind_np( pthread_mutexattr_t *attr, int kind );
 #   include <byteorder.h>
 
 #elif defined( WIN32 )
+#define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
 #   include <process.h>
 

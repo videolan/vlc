@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.37 2001/10/03 14:41:08 massiot Exp $
+ * $Id: input_ps.c,v 1.38 2001/11/25 22:52:21 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -60,6 +60,9 @@
 
 #include "main.h"
 
+#include "modules.h"
+#include "modules_export.h"
+
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
@@ -68,9 +71,6 @@
 #include "input_ps.h"
 
 #include "debug.h"
-
-#include "modules.h"
-#include "modules_export.h"
 
 /*****************************************************************************
  * fseeko: fseeko replacement for BSDI.

@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.48 2001/11/15 17:39:12 sam Exp $
+ * $Id: input_ext-intf.h,v 1.49 2001/11/25 22:52:21 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -321,6 +321,7 @@ typedef struct input_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+#ifndef PLUGIN
 struct input_thread_s * input_CreateThread ( struct playlist_item_s *,
                                              int *pi_status );
 void input_DestroyThread( struct input_thread_s *, int *pi_status );
@@ -337,4 +338,4 @@ int  input_ChangeArea( struct input_thread_s *, struct input_area_s * );
 int  input_ToggleGrayscale( struct input_thread_s * );
 int  input_ToggleMute( struct input_thread_s * );
 int  input_SetSMP( struct input_thread_s *, int );
-
+#endif

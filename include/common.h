@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.49 2001/11/21 10:47:20 massiot Exp $
+ * $Id: common.h,v 1.50 2001/11/25 22:52:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -153,7 +153,7 @@ struct decoder_fifo_s;
 #ifdef NTOHL_IN_SYS_PARAM_H
 #   include <sys/param.h>
 #elif defined(WIN32)
-#   include <winsock.h>
+#   include "bytes_swap.h"
 #else
 #   include <netinet/in.h>
 #endif
@@ -219,45 +219,14 @@ struct decoder_fifo_s;
 #   else
         /* Assume malloc alignment is sufficient */
 #       define memalign(align,size) malloc(size)
-#   endif
-
-    
+#   endif    
 #endif
 
-/* win32, cl and icl support */
-#if defined( _MSC_VER )
-#   define __attribute__(x)
-#   define __inline__      __inline
-#   define strncasecmp     strnicmp
-#   define strcasecmp      stricmp
-#   define S_ISBLK(m)      (0)
-#   define S_ISCHR(m)      (0)
-#   define S_ISFIFO(m)     (((m)&_S_IFMT) == _S_IFIFO)
-#   define S_ISREG(m)      (((m)&_S_IFMT) == _S_IFREG)
-#   define I64C(x)         x##i64
-#else
-#   define I64C(x)         x##LL
-#endif
 
+#define I64C(x)         x##LL
+
+
+/* The win32 specific stuff was getting really big so it has been moved */
 #if defined( WIN32 )
-#   if defined( __MINGW32__ )
-#       if !defined( _OFF_T_ )
-typedef long long _off_t;
-typedef _off_t off_t;
-#           define _OFF_T_
-#       else
-#           define off_t long long
-#       endif
-#   elif defined( _MSC_VER )
-#       if !defined( _OFF_T_DEFINED )
-typedef __int64 off_t;
-#           define _OFF_T_DEFINED
-#       else
-#           define off_t __int64
-#       endif
-#   endif
-#   define stat _stati64
-#   ifndef snprintf
-#       define snprintf _snprintf  /* snprintf not defined in mingw32 (bug?) */
-#   endif
+#   include "common_win32.h"
 #endif

@@ -411,6 +411,8 @@ dnl Windoze specific section
 dnl
 if test $SYS = mingw32; then
 AC_CHECK_TOOL(WINDRES, windres, :)
+LIB_TS="-lws2_32"
+LIB_RC="-lws2_32"
 fi
 
 dnl
@@ -940,23 +942,16 @@ AC_ARG_ENABLE(directx,
   [  --disable-directx       Windows DirectX support (default enabled on WIN32)],
   [ if test "x$enableval" != "xno"
     then
-      PLUGINS="${PLUGINS} directx"
       if test "x$enableval" = "xyes"
       then
-	AC_ARG_WITH(directx, 
-	[--with-directx=[name] Windows DirectX support (default enabled)])
-	if test "x$withval" = "x"
-	then
-          AC_CHECK_HEADERS(directx.h, [LIB_DIRECTX="-lgdi32 -ldxguid"], 
-          AC_MSG_ERROR([Cannot find DirectX headers !]))
-	else
-        LIB_DIRECTX="${LIB_DIRECTX} -L"$withval"/lib -lgdi32 -ldxguid"
-        INCLUDE="${INCLUDE} -I"$withval"/include"
-	fi
+        AC_CHECK_HEADERS(directx.h,
+        [ PLUGINS="${PLUGINS} directx"
+          LIB_DIRECTX="-lgdi32 -ldxguid" ] )
       else
         AC_MSG_CHECKING(for directX headers in ${enableval})
         if test -f ${enableval}/include/directx.h
         then
+          PLUGINS="${PLUGINS} directx"
           LIB_DIRECTX="-L${enableval}/lib -lgdi32 -ldxguid"
           INCLUDE="${INCLUDE} -I${enableval}/include"
           AC_MSG_RESULT(yes)
@@ -968,10 +963,26 @@ AC_ARG_ENABLE(directx,
     fi ],
   [ if test $SYS = mingw32
     then
-      AC_CHECK_HEADERS(directx.h,
-      [ PLUGINS="${PLUGINS} directx"
-        LIB_DIRECTX="-lgdi32 -ldxguid" ],
-      [ echo "Cannot find DirectX headers !" ])
+      AC_ARG_WITH(directx-path, 
+      [  --with-directx-path=path Windows DirectX headers and libraries])
+      if test "x$with_directx_path" = "x"
+      then
+        AC_CHECK_HEADERS(directx.h,
+        [ PLUGINS="${PLUGINS} directx"
+          LIB_DIRECTX="-lgdi32 -ldxguid" ])
+      else
+        AC_MSG_CHECKING(for directX headers in ${withval})
+        if test -f ${with_directx_path}/include/directx.h
+        then
+          PLUGINS="${PLUGINS} directx"
+          LIB_DIRECTX="-L${with_directx_path}/lib -lgdi32 -ldxguid"
+          INCLUDE="${INCLUDE} -I${with_directx_path}/include"
+          AC_MSG_RESULT(yes)
+        else
+          AC_MSG_RESULT(no)
+          AC_MSG_ERROR([Cannot find ${with_directx_path}/include/directx.h!])
+        fi
+      fi
     fi ])
 
 dnl
@@ -1203,6 +1214,7 @@ AC_SUBST(LIB_ALTIVEC)
 AC_SUBST(LIB_ARTS)
 AC_SUBST(LIB_BEOS)
 AC_SUBST(LIB_DARWIN)
+AC_SUBST(LIB_DIRECTX)
 AC_SUBST(LIB_DVD)
 AC_SUBST(LIB_DVD_PLUGIN)
 AC_SUBST(LIB_DVDREAD)
@@ -1212,15 +1224,15 @@ AC_SUBST(LIB_GGI)
 AC_SUBST(LIB_GLIDE)
 AC_SUBST(LIB_GNOME)
 AC_SUBST(LIB_GTK)
-AC_SUBST(LIB_LIBDVDCSS)
 AC_SUBST(LIB_KDE)
+AC_SUBST(LIB_LIBDVDCSS)
 AC_SUBST(LIB_MACOSX)
-AC_SUBST(LIB_QNX)
 AC_SUBST(LIB_NCURSES)
+AC_SUBST(LIB_QNX)
 AC_SUBST(LIB_QT)
-AC_SUBST(LIB_TS)
+AC_SUBST(LIB_RC)
 AC_SUBST(LIB_SDL)
-AC_SUBST(LIB_DIRECTX)
+AC_SUBST(LIB_TS)
 AC_SUBST(LIB_X11)
 AC_SUBST(LIB_XVIDEO)
 AC_SUBST(LIB_YUV)

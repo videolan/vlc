@@ -38,6 +38,10 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+#if defined( WIN32 )
+#include <winsock2.h>                                            /* select() */
+#endif
+
 #include "config.h"
 #include "common.h"
 #include "threads.h"

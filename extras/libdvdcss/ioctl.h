@@ -2,7 +2,7 @@
  * ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.8 2001/11/02 13:30:38 massiot Exp $
+ * $Id: ioctl.h,v 1.9 2001/11/25 22:52:21 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -125,7 +125,11 @@ typedef u_int8_t dvd_key[5];
 typedef u_int8_t dvd_challenge[10];
 #endif
 
+
 #if defined( WIN32 )
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 /*****************************************************************************
  * win32 ioctl specific
