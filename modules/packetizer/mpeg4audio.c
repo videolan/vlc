@@ -2,7 +2,7 @@
  * mpeg4audio.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4audio.c,v 1.4 2003/03/31 03:46:11 fenrir Exp $
+ * $Id: mpeg4audio.c,v 1.5 2003/04/13 20:00:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -60,7 +60,7 @@ typedef struct packetizer_thread_s
 
     /* Output properties */
     sout_packetizer_input_t *p_sout_input;
-    sout_packet_format_t    output_format;
+    sout_format_t           output_format;
 
 //    mtime_t                 i_pts_start;
     mtime_t                 i_last_pts;
@@ -187,17 +187,8 @@ static int InitThread( packetizer_thread_t *p_pack )
     if( p_wf && p_wf->cbSize > 0)
     {
         uint8_t *p_config = (uint8_t*)&p_wf[1];
-        int i_wf = sizeof( WAVEFORMATEX ) + p_wf->cbSize;
-        int i_index;
+        int     i_index;
 
-
-        p_pack->p_wf = malloc( i_wf );
-        memcpy( p_pack->p_wf,
-                p_wf,
-                i_wf );
-        p_pack->output_format.i_cat = AUDIO_ES;
-        p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'a' );
-        p_pack->output_format.p_format = p_pack->p_wf;
         p_pack->b_adts = 0;
 
         i_index = ( ( p_config[0] << 1 ) | ( p_config[1] >> 7 ) )&0x0f;
@@ -216,6 +207,19 @@ static int InitThread( packetizer_thread_t *p_pack )
                  "aac %dHz %d samples/frame",
                  p_pack->i_sample_rate,
                  p_pack->i_frame_size );
+
+        p_pack->output_format.i_cat = AUDIO_ES;
+        p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'a' );
+        p_pack->output_format.i_sample_rate = p_pack->i_sample_rate;
+        p_pack->output_format.i_channels    = p_wf->nChannels;
+        p_pack->output_format.i_block_align = 0;
+        p_pack->output_format.i_bitrate     = 0;
+
+        p_pack->output_format.i_extra_data = p_wf->cbSize;
+        p_pack->output_format.p_extra_data = malloc( p_wf->cbSize );
+        memcpy( p_pack->output_format.p_extra_data,
+                &p_wf[1],
+                p_wf->cbSize );
     }
     else
     {

@@ -62,6 +62,7 @@ EXTRA_DIST = \
 	mux/Modules.am \
 	mux/mpeg/Modules.am \
 	packetizer/Modules.am \
+	stream_out/Modules.am \
 	video_chroma/Modules.am \
 	video_filter/Modules.am \
 	video_filter/deinterlace/Modules.am \

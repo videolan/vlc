@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.9 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: stream_output.h,v 1.10 2003/04/13 20:00:20 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -57,12 +57,24 @@ struct sout_buffer_t
     struct sout_buffer_t    *p_next;
 };
 
-struct sout_packet_format_t
+struct sout_format_t
 {
-    int             i_cat;      // AUDIO_ES, VIDEO_ES, SPU_ES
+    int             i_cat;
     vlc_fourcc_t    i_fourcc;
 
-    void            *p_format;  // WAVEFORMATEX or BITMAPINFOHEADER
+    /* audio */
+    int             i_sample_rate;
+    int             i_channels;
+    int             i_block_align;
+
+    /* video */
+    int             i_width;
+    int             i_height;
+
+    int             i_bitrate;
+    int             i_extra_data;
+    uint8_t         *p_extra_data;
+
 };
 
 struct sout_fifo_t
@@ -75,39 +87,36 @@ struct sout_fifo_t
     sout_buffer_t       **pp_last;
 };
 
+typedef struct sout_stream_id_t  sout_stream_id_t;
+
 /* for mux */
 struct sout_input_t
 {
-//    vlc_mutex_t             lock;
+    sout_instance_t *p_sout;
 
-    sout_instance_t         *p_sout;
+    sout_format_t   *p_fmt;
+    sout_fifo_t     *p_fifo;
 
-    sout_packet_format_t    input_format;
-    sout_fifo_t             *p_fifo;
-
-    void                    *p_sys;
+    void            *p_sys;
 };
 
-/* for packetizr */
+/* for packetizer */
 struct sout_packetizer_input_t
 {
 
-    sout_instance_t         *p_sout;
-    sout_packet_format_t    input_format;
+    sout_instance_t     *p_sout;
 
-//    vlc_mutex_t             lock;
-    int                     i_nb_inputs;
-    sout_input_t            **pp_inputs;
+    sout_format_t       *p_fmt;
 
-    int                     i_nb_mux;   // not really used, just usefull with TAB_*
-    sout_mux_t              **pp_mux;
-
+    sout_stream_id_t    *id;
 };
+
 
 #define SOUT_METHOD_NONE        0x00
 #define SOUT_METHOD_FILE        0x10
 #define SOUT_METHOD_NETWORK     0x20
 
+typedef struct sout_access_out_sys_t   sout_access_out_sys_t;
 struct sout_access_out_t
 {
     VLC_COMMON_MEMBERS
@@ -180,36 +189,129 @@ struct  sout_mux_t
     mtime_t     i_add_stream_start;
 };
 
+
+
+struct sout_cfg_t
+{
+    sout_cfg_t  *p_next;
+
+    char        *psz_name;
+    char        *psz_value;
+};
+
+typedef struct sout_stream_sys_t sout_stream_sys_t;
+struct sout_stream_t
+{
+    VLC_COMMON_MEMBERS
+
+    module_t                *p_module;
+    sout_instance_t         *p_sout;
+
+    char                    *psz_name;
+    sout_cfg_t              *p_cfg;
+    char                    *psz_next;
+
+    /* add, remove a stream */
+    sout_stream_id_t *      (*pf_add) ( sout_stream_t *, sout_format_t * );
+    int                     (*pf_del) ( sout_stream_t *, sout_stream_id_t * );
+
+    /* manage a packet */
+    int                     (*pf_send)( sout_stream_t *, sout_stream_id_t *, sout_buffer_t* );
+
+    /* private */
+    sout_stream_sys_t       *p_sys;
+};
+
 typedef struct sout_instance_sys_t sout_instance_sys_t;
 struct sout_instance_t
 {
     VLC_COMMON_MEMBERS
 
-    /* complete sout string like udp/ts:239.255.12.42#file/ps://essai.ps */
     char * psz_sout;
-
-    /* here are stored the parsed psz_sout */
-    int                     i_nb_dest;
-    char                    **ppsz_dest;
+    char * psz_chain;
 
     /* muxer data */
     int                     i_preheader;    /* max over all muxer */
 
-    int                     i_nb_mux;
-    sout_mux_t              **pp_mux;
-
-    /* here are all packetizer inputs accepted by at least one muxer */
     vlc_mutex_t             lock;
-    int                     i_nb_inputs;
-    sout_packetizer_input_t **pp_inputs;
+    sout_stream_t           *p_stream;
 
     /* sout private */
     sout_instance_sys_t     *p_sys;
 };
 
+/* some macro */
+#define TAB_APPEND( count, tab, p )             \
+    if( (count) > 0 )                           \
+    {                                           \
+        (tab) = realloc( (tab), sizeof( void ** ) * ( (count) + 1 ) ); \
+    }                                           \
+    else                                        \
+    {                                           \
+        (tab) = malloc( sizeof( void ** ) );    \
+    }                                           \
+    (void**)(tab)[(count)] = (void*)(p);        \
+    (count)++
 
+#define TAB_FIND( count, tab, p, index )        \
+    {                                           \
+        int _i_;                                \
+        (index) = -1;                           \
+        for( _i_ = 0; _i_ < (count); _i_++ )    \
+        {                                       \
+            if((void**)(tab)[_i_]==(void*)(p))  \
+            {                                   \
+                (index) = _i_;                  \
+                break;                          \
+            }                                   \
+        }                                       \
+    }
 
+#define TAB_REMOVE( count, tab, p )             \
+    {                                           \
+        int i_index;                            \
+        TAB_FIND( count, tab, p, i_index );     \
+        if( i_index >= 0 )                      \
+        {                                       \
+            if( count > 1 )                     \
+            {                                   \
+                memmove( ((void**)tab + i_index),    \
+                         ((void**)tab + i_index+1),  \
+                         ( (count) - i_index - 1 ) * sizeof( void* ) );\
+            }                                   \
+            else                                \
+            {                                   \
+                free( tab );                    \
+                (tab) = NULL;                   \
+            }                                   \
+            (count)--;                          \
+        }                                       \
+    }
 
+static inline sout_cfg_t *sout_cfg_find( sout_cfg_t *p_cfg, char *psz_name )
+{
+    while( p_cfg && strcmp( p_cfg->psz_name, psz_name ) )
+    {
+        p_cfg = p_cfg->p_next;
+    }
+
+    return p_cfg;
+}
+
+static inline char *sout_cfg_find_value( sout_cfg_t *p_cfg, char *psz_name )
+{
+    while( p_cfg && strcmp( p_cfg->psz_name, psz_name ) )
+    {
+        p_cfg = p_cfg->p_next;
+    }
+
+    if( p_cfg && p_cfg->psz_value )
+    {
+        return( p_cfg->psz_value );
+    }
+
+    return NULL;
+}
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
@@ -227,7 +329,7 @@ VLC_EXPORT( sout_buffer_t *, sout_FifoShow,       ( sout_fifo_t * ) );
 
 
 #define sout_InputNew( a, b ) __sout_InputNew( VLC_OBJECT(a), b )
-VLC_EXPORT( sout_packetizer_input_t *, __sout_InputNew,       ( vlc_object_t *, sout_packet_format_t * ) );
+VLC_EXPORT( sout_packetizer_input_t *, __sout_InputNew,       ( vlc_object_t *, sout_format_t * ) );
 VLC_EXPORT( int,            sout_InputDelete,      ( sout_packetizer_input_t * ) );
 VLC_EXPORT( int,            sout_InputSendBuffer,  ( sout_packetizer_input_t *, sout_buffer_t* ) );
 
@@ -242,4 +344,14 @@ VLC_EXPORT( sout_access_out_t *, sout_AccessOutNew, ( sout_instance_t *, char *p
 VLC_EXPORT( void,                sout_AccessOutDelete, ( sout_access_out_t * ) );
 VLC_EXPORT( int,                 sout_AccessOutSeek,   ( sout_access_out_t *, off_t ) );
 VLC_EXPORT( int,                 sout_AccessOutWrite,  ( sout_access_out_t *, sout_buffer_t * ) );
+
+VLC_EXPORT( sout_mux_t *,       sout_MuxNew,          ( sout_instance_t*, char *, sout_access_out_t * ) );
+VLC_EXPORT( sout_input_t *,     sout_MuxAddStream,    ( sout_mux_t *, sout_format_t * ) );
+VLC_EXPORT( void,               sout_MuxDeleteStream, ( sout_mux_t *, sout_input_t * ) );
+VLC_EXPORT( void,               sout_MuxDelete,       ( sout_mux_t * ) );
+VLC_EXPORT( void,               sout_MuxSendBuffer, ( sout_mux_t *, sout_input_t  *, sout_buffer_t * ) );
+
+VLC_EXPORT( char *,             sout_cfg_parser, ( char **, sout_cfg_t **, char * ) );
+VLC_EXPORT( sout_stream_t *,    sout_stream_new, ( sout_instance_t *, char *psz_chain ) );
+VLC_EXPORT( void,               sout_stream_delete, ( sout_stream_t *p_stream ) );
 

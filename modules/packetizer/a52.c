@@ -2,7 +2,7 @@
  * a52.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.3 2003/03/31 03:46:11 fenrir Exp $
+ * $Id: a52.c,v 1.4 2003/04/13 20:00:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -45,7 +45,7 @@ typedef struct packetizer_s
 
     /* Output properties */
     sout_packetizer_input_t *p_sout_input;
-    sout_packet_format_t    output_format;
+    sout_format_t           output_format;
 
     uint64_t                i_samplescount;
 
@@ -155,8 +155,6 @@ static int InitThread( packetizer_t *p_pack )
     p_pack->output_format.i_cat = AUDIO_ES;
     p_pack->output_format.i_fourcc = VLC_FOURCC( 'a', '5', '2', ' ' );
 
-    p_pack->output_format.p_format = NULL;
-
     p_pack->p_sout_input   = NULL;
 
     p_pack->i_samplescount = 0;
@@ -230,19 +228,12 @@ static void PacketizeThread( packetizer_t *p_pack )
 
     if( !p_pack->p_sout_input )
     {
-        /* add a input for the stream ouput */
-        WAVEFORMATEX    *p_wf;
-
-        p_wf = malloc( sizeof( WAVEFORMATEX ) );
-        p_pack->output_format.p_format = (void*)p_wf;
-
-        p_wf->wFormatTag        = WAVE_FORMAT_A52;
-        p_wf->nChannels         = i_channels;
-        p_wf->nSamplesPerSec    = i_samplerate;
-        p_wf->nAvgBytesPerSec   = 0;
-        p_wf->nBlockAlign       = 1;
-        p_wf->wBitsPerSample    = 0;
-        p_wf->cbSize            = 0;
+        p_pack->output_format.i_sample_rate = i_samplerate;
+        p_pack->output_format.i_channels    = i_channels;
+        p_pack->output_format.i_block_align = 0;
+        p_pack->output_format.i_bitrate     = 0;
+        p_pack->output_format.i_extra_data  = 0;
+        p_pack->output_format.p_extra_data  = NULL;
 
         p_pack->p_sout_input =
             sout_InputNew( p_pack->p_fifo,

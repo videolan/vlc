@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.9 2003/03/31 03:46:11 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.10 2003/04/13 20:00:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -46,7 +46,7 @@ typedef struct packetizer_thread_s
 
     /* Output properties */
     sout_packetizer_input_t *p_sout_input;
-    sout_packet_format_t    output_format;
+    sout_format_t           output_format;
 
     mtime_t                 i_last_pts;
 
@@ -198,8 +198,15 @@ static int InitThread( packetizer_thread_t *p_pack )
         /* create stream input output */
         p_pack->output_format.i_cat = VIDEO_ES;
         p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'v' );
-        p_pack->output_format.p_format = malloc( p_bih->biSize );
-        memcpy( p_pack->output_format.p_format, p_bih, p_bih->biSize );
+        p_pack->output_format.i_width  = p_bih->biWidth;
+        p_pack->output_format.i_height = p_bih->biHeight;
+        p_pack->output_format.i_bitrate= 0;
+
+        p_pack->output_format.i_extra_data = p_pack->i_vol;
+        p_pack->output_format.p_extra_data = malloc( p_pack->i_vol );
+        memcpy( p_pack->output_format.p_extra_data,
+                p_pack->p_vol,
+                p_pack->i_vol );
 
         msg_Warn( p_pack->p_fifo, "opening with vol size:%d", p_pack->i_vol );
         p_pack->p_sout_input =
@@ -212,7 +219,11 @@ static int InitThread( packetizer_thread_t *p_pack )
         p_pack->p_vol = 0;
         p_pack->output_format.i_cat = UNKNOWN_ES;
         p_pack->output_format.i_fourcc = VLC_FOURCC( 'n', 'u', 'l', 'l' );
-        p_pack->output_format.p_format = NULL;
+        p_pack->output_format.i_width  = 0;
+        p_pack->output_format.i_height = 0;
+        p_pack->output_format.i_bitrate= 0;
+        p_pack->output_format.i_extra_data = 0;
+        p_pack->output_format.p_extra_data = NULL;
 
         p_pack->p_sout_input =
             sout_InputNew( p_pack->p_fifo,
@@ -260,12 +271,14 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
     }
 
     i_pts = p_pes->i_pts;
+#if 0
     if( i_pts <= 0 && p_pack->i_last_pts <= 0 )
     {
-        msg_Err( p_pack->p_fifo, "need a starting pts" );
+        msg_Dbg( p_pack->p_fifo, "need a starting pts" );
         input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
         return;
     }
+#endif
 
     i_size = p_pes->i_pes_size;
     if( i_size > 0 )
@@ -364,8 +377,6 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
 
                 if( p_vol_end != NULL && p_vol_begin < p_vol_end )
                 {
-                    BITMAPINFOHEADER *p_bih;
-
                     p_pack->i_vol = p_vol_end - p_vol_begin;
                     msg_Dbg( p_pack->p_fifo, "Reopening output" );
 
@@ -376,21 +387,16 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
 
                     p_pack->output_format.i_cat = VIDEO_ES;
                     p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'v' );
-                    p_pack->output_format.p_format =
-                        (void*)p_bih = malloc( sizeof( BITMAPINFOHEADER ) + p_pack->i_vol);
 
-                    p_bih->biSize = sizeof( BITMAPINFOHEADER ) + p_pack->i_vol;
-                    p_bih->biWidth  = 0;
-                    p_bih->biHeight = 0;
-                    p_bih->biPlanes = 1;
-                    p_bih->biBitCount = 24;
-                    p_bih->biCompression = VLC_FOURCC( 'd', 'i', 'v', 'x' );
-                    p_bih->biSizeImage = 0;
-                    p_bih->biXPelsPerMeter = 0;
-                    p_bih->biYPelsPerMeter = 0;
-                    p_bih->biClrUsed = 0;
-                    p_bih->biClrImportant = 0;
-                    memcpy( &p_bih[1], p_pack->p_vol, p_pack->i_vol );
+                    p_pack->output_format.i_width  = 0;
+                    p_pack->output_format.i_height = 0;
+                    p_pack->output_format.i_bitrate= 0;
+
+                    p_pack->output_format.i_extra_data = p_pack->i_vol;
+                    p_pack->output_format.p_extra_data = malloc( p_pack->i_vol );
+                    memcpy( p_pack->output_format.p_extra_data,
+                            p_pack->p_vol,
+                            p_pack->i_vol );
 
                     p_pack->p_sout_input =
                         sout_InputNew( p_pack->p_fifo,
@@ -410,8 +416,16 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
             }
         }
 
-        sout_InputSendBuffer( p_pack->p_sout_input,
+        if( i_pts > 0 )
+        {
+            sout_InputSendBuffer( p_pack->p_sout_input,
+                                  p_sout_buffer );
+        }
+        else
+        {
+            sout_BufferDelete( p_pack->p_sout_input->p_sout,
                                p_sout_buffer );
+        }
     }
 
     input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );

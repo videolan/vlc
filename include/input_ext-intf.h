@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.87 2003/03/24 17:15:29 gbazin Exp $
+ * $Id: input_ext-intf.h,v 1.88 2003/04/13 20:00:20 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -71,6 +71,9 @@ struct es_descriptor_t
 
     count_t                 c_packets;                 /* total packets read */
     count_t                 c_invalid_packets;       /* invalid packets read */
+
+    /* XXX hack: to force a decoder instead of mode based on sout */
+    vlc_bool_t              b_force_decoder;
 };
 
 /* Special PID values - note that the PID is only on 13 bits, and that values

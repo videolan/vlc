@@ -2,7 +2,7 @@
  * copy.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: copy.c,v 1.6 2003/03/31 03:46:11 fenrir Exp $
+ * $Id: copy.c,v 1.7 2003/04/13 20:00:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -45,7 +45,7 @@ typedef struct packetizer_thread_s
 
     /* Output properties */
     sout_packetizer_input_t *p_sout_input;
-    sout_packet_format_t    output_format;
+    sout_format_t           output_format;
 
 //    mtime_t i_last_pts;
 
@@ -243,11 +243,26 @@ static int InitThread( packetizer_thread_t *p_pack )
             p_pack->output_format.i_fourcc = VLC_FOURCC( 'd', 'v', 's', 'l' );
             p_pack->output_format.i_cat = VIDEO_ES;
             break;
+        case VLC_FOURCC( 'S', 'V', 'Q', '1' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'S', 'V', 'Q', '1' );
+            p_pack->output_format.i_cat = VIDEO_ES;
+            break;
+
+        case VLC_FOURCC( 'w', 'm', 'a', '1' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'w', 'm', 'a', '1' );
+            p_pack->output_format.i_cat = AUDIO_ES;
+            break;
+        case VLC_FOURCC( 'w', 'm', 'a', '2' ):
+            p_pack->output_format.i_fourcc = VLC_FOURCC( 'w', 'm', 'a', '2' );
+            p_pack->output_format.i_cat = AUDIO_ES;
+            break;
 
         default:
-            p_pack->output_format.i_fourcc = p_pack->p_fifo->i_fourcc;
-            p_pack->output_format.i_cat = UNKNOWN_ES;
-            break;
+            msg_Err( p_pack->p_fifo, "unknown es type !!" );
+            return VLC_EGENERIC;
+            //p_pack->output_format.i_fourcc = p_pack->p_fifo->i_fourcc;
+            //p_pack->output_format.i_cat = UNKNOWN_ES;
+            //break;
     }
 
     switch( p_pack->output_format.i_cat )
@@ -257,12 +272,32 @@ static int InitThread( packetizer_thread_t *p_pack )
                 WAVEFORMATEX *p_wf = (WAVEFORMATEX*)p_pack->p_fifo->p_waveformatex;
                 if( p_wf )
                 {
-                    p_pack->output_format.p_format = malloc( sizeof( WAVEFORMATEX ) + p_wf->cbSize );
-                    memcpy( p_pack->output_format.p_format, p_wf, sizeof( WAVEFORMATEX ) + p_wf->cbSize );
+                    p_pack->output_format.i_sample_rate = p_wf->nSamplesPerSec;
+                    p_pack->output_format.i_channels    = p_wf->nChannels;
+                    p_pack->output_format.i_block_align = p_wf->nBlockAlign;
+                    p_pack->output_format.i_bitrate     = p_wf->nAvgBytesPerSec * 8;
+                    p_pack->output_format.i_extra_data  = p_wf->cbSize;
+                    if( p_wf->cbSize  > 0 )
+                    {
+                        p_pack->output_format.p_extra_data =
+                            malloc( p_pack->output_format.i_extra_data );
+                        memcpy( p_pack->output_format.p_extra_data,
+                                &p_wf[1],
+                                p_pack->output_format.i_extra_data );
+                    }
+                    else
+                    {
+                        p_pack->output_format.p_extra_data = NULL;
+                    }
                 }
                 else
                 {
-                    p_pack->output_format.p_format = NULL;
+                    p_pack->output_format.i_sample_rate = 0;
+                    p_pack->output_format.i_channels    = 0;
+                    p_pack->output_format.i_block_align = 0;
+                    p_pack->output_format.i_bitrate     = 0;
+                    p_pack->output_format.i_extra_data  = 0;
+                    p_pack->output_format.p_extra_data  = NULL;
                 }
             }
             break;
@@ -270,29 +305,34 @@ static int InitThread( packetizer_thread_t *p_pack )
         case VIDEO_ES:
             {
                 BITMAPINFOHEADER *p_bih = (BITMAPINFOHEADER*)p_pack->p_fifo->p_bitmapinfoheader;
+
+                p_pack->output_format.i_bitrate = 0;
                 if( p_bih )
                 {
-                    p_pack->output_format.p_format = malloc( p_bih->biSize );
-                    memcpy( p_pack->output_format.p_format, p_bih, p_bih->biSize );
-                    if( p_pack->output_format.i_fourcc == VLC_FOURCC( 'm', 'p', '4', 'v' ) )
+                    p_pack->output_format.i_width  = p_bih->biWidth;
+                    p_pack->output_format.i_height = p_bih->biHeight;
+                    p_pack->output_format.i_extra_data  = p_bih->biSize - sizeof( BITMAPINFOHEADER );
+                    if( p_pack->output_format.i_extra_data > 0 )
                     {
-                        p_bih->biCompression = VLC_FOURCC( 'd', 'i', 'v', 'x' );
+                        p_pack->output_format.p_extra_data =
+                            malloc( p_pack->output_format.i_extra_data );
+                        memcpy( p_pack->output_format.p_extra_data,
+                                &p_bih[1],
+                                p_pack->output_format.i_extra_data );
                     }
-                    else
-                    {
-                        p_bih->biCompression = p_pack->output_format.i_fourcc;
-                    }
-
                 }
                 else
                 {
-                    p_pack->output_format.p_format = NULL;
+                    p_pack->output_format.i_width  = 0;
+                    p_pack->output_format.i_height = 0;
+                    p_pack->output_format.i_extra_data  = 0;
+                    p_pack->output_format.p_extra_data  = NULL;
                 }
             }
             break;
+
         default:
-            p_pack->output_format.p_format = NULL;
-            break;
+            return VLC_EGENERIC;
     }
 
     p_pack->p_sout_input =
@@ -302,10 +342,10 @@ static int InitThread( packetizer_thread_t *p_pack )
     if( !p_pack->p_sout_input )
     {
         msg_Err( p_pack->p_fifo, "cannot add a new stream" );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 //    p_pack->i_last_pts = 0;
-    return( 0 );
+    return( VLC_SUCCESS );
 }
 
 /*****************************************************************************
@@ -329,7 +369,7 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
 
     if( i_pts <= 0 ) //&& p_pack->i_last_pts <= 0 )
     {
-        msg_Err( p_pack->p_fifo, "need pts != 0" );
+        msg_Dbg( p_pack->p_fifo, "need pts != 0" );
         input_DeletePES( p_pack->p_fifo->p_packets_mgt, p_pes );
         return;
     }

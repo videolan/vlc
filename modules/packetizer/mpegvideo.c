@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.11 2003/03/31 03:46:11 fenrir Exp $
+ * $Id: mpegvideo.c,v 1.12 2003/04/13 20:00:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -45,7 +45,7 @@ typedef struct packetizer_s
 
     /* Output properties */
     sout_packetizer_input_t *p_sout_input;
-    sout_packet_format_t    output_format;
+    sout_format_t           output_format;
 
     mtime_t                 i_last_dts;
     mtime_t                 i_last_ref_pts;
@@ -157,6 +157,11 @@ static int InitThread( packetizer_t *p_pack )
 
     p_pack->output_format.i_cat = VIDEO_ES;
     p_pack->output_format.i_fourcc = VLC_FOURCC( 'm', 'p', 'g', 'v');
+    p_pack->output_format.i_width  = 0;
+    p_pack->output_format.i_height = 0;
+    p_pack->output_format.i_bitrate= 0;
+    p_pack->output_format.i_extra_data = 0;
+    p_pack->output_format.p_extra_data = NULL;
 
     p_pack->p_sout_input = NULL;
 
@@ -228,10 +233,7 @@ static void PacketizeThread( packetizer_t *p_pack )
         byte_t p_temp[512];/* 150 bytes is the maximal size
                                of a sequence_header + sequence_extension */
         int i_frame_rate_code;
-        BITMAPINFOHEADER *p_bih;
 
-        p_bih = malloc( sizeof( BITMAPINFOHEADER ) );
-        p_pack->output_format.p_format = (void*)p_bih;
 
         /* skip data until we find a sequence_header_code */
         /* TODO: store skipped somewhere so can send it to the mux
@@ -250,21 +252,12 @@ static void PacketizeThread( packetizer_t *p_pack )
         i_pos = 0;
         GetChunk( &p_pack->bit_stream, p_temp, 4 ); i_pos += 4;
 
-        p_bih->biSize = sizeof( BITMAPINFOHEADER );
         /* horizontal_size_value */
-        p_bih->biWidth = ShowBits( &p_pack->bit_stream, 12 );
+        p_pack->output_format.i_width = ShowBits( &p_pack->bit_stream, 12 );
         /* vertical_size_value */
-        p_bih->biHeight = ShowBits( &p_pack->bit_stream, 24 ) & 0xFFF;
+        p_pack->output_format.i_height= ShowBits( &p_pack->bit_stream, 24 ) & 0xFFF;
         /* frame_rate_code */
         i_frame_rate_code = ShowBits( &p_pack->bit_stream, 32 ) & 0xF;
-        p_bih->biPlanes = 1;
-        p_bih->biBitCount = 0;
-        p_bih->biCompression = VLC_FOURCC( 'm', 'p', 'g', '2' );
-        p_bih->biSizeImage = 0;
-        p_bih->biXPelsPerMeter = 0;
-        p_bih->biYPelsPerMeter = 0;
-        p_bih->biClrUsed = 0;
-        p_bih->biClrImportant = 0;
 
         /* copy headers */
         GetChunk( &p_pack->bit_stream, p_temp + i_pos, 7 ); i_pos += 7;
@@ -313,7 +306,9 @@ static void PacketizeThread( packetizer_t *p_pack )
 
         msg_Warn( p_pack->p_fifo,
                   "creating input (image size %dx%d, frame rate %.2f)",
-                  p_bih->biWidth, p_bih->biHeight, p_pack->d_frame_rate );
+                  p_pack->output_format.i_width,
+                  p_pack->output_format.i_height,
+                  p_pack->d_frame_rate );
 
         /* now we have informations to create the input */
         p_pack->p_sout_input = sout_InputNew( p_pack->p_fifo,
@@ -365,7 +360,8 @@ static void PacketizeThread( packetizer_t *p_pack )
             }
 
             p_pack->i_last_ref_pts =
-                   p_pack->i_last_dts + 40000; /* FIXME */
+                   p_pack->i_last_dts +
+                        (mtime_t)( 1000000 / p_pack->d_frame_rate); /* FIXME */
             CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
         }
         else if( i_code == 0x100 ) /* Picture */
@@ -437,16 +433,21 @@ static void PacketizeThread( packetizer_t *p_pack )
         return;
     }
 
+#if 1
     if( i_dts > 0 )
     {
-        p_pack->i_last_dts = i_dts;
+        //if( i_dts - p_pack->i_last_dts > 200000 ||
+        //    i_dts - p_pack->i_last_dts < 200000 )
+        {
+            p_pack->i_last_dts = i_dts;
+            if( i_pts > 0 )
+            {
+                p_pack->i_last_ref_pts = i_pts -
+                    i_temporal_ref * (mtime_t)( 1000000 / p_pack->d_frame_rate );
+            }
+        }
     }
-    if( i_pts > 0 )
-    {
-        p_pack->i_last_ref_pts =
-            i_pts - i_temporal_ref *
-                    (mtime_t)( 1000000 / p_pack->d_frame_rate );
-    }
+#endif
 
     p_sout_buffer->i_dts = p_pack->i_last_dts;
     p_sout_buffer->i_pts = p_pack->i_last_ref_pts + 

@@ -1,0 +1,6 @@
+SOURCES_stream_out_dummy = modules/stream_out/dummy.c
+SOURCES_stream_out_standard = modules/stream_out/standard.c
+SOURCES_stream_out_transcode = modules/stream_out/transcode.c
+SOURCES_stream_out_duplicate = modules/stream_out/duplicate.c
+SOURCES_stream_out_es = modules/stream_out/es.c
+SOURCES_stream_out_display = modules/stream_out/display.c

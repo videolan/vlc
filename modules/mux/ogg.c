@@ -2,7 +2,7 @@
  * ogg.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.4 2003/03/31 03:46:11 fenrir Exp $
+ * $Id: ogg.c,v 1.5 2003/04/13 20:00:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -209,33 +209,29 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     ogg_stream_t        *p_stream;
 
-    BITMAPINFOHEADER    *p_bih;
-    WAVEFORMATEX        *p_wf;
-
     msg_Dbg( p_mux, "adding input" );
     p_input->p_sys = (void*)p_stream = malloc( sizeof( ogg_stream_t ) );
 
-    p_stream->i_cat       = p_input->input_format.i_cat;
-    p_stream->i_fourcc    = p_input->input_format.i_fourcc;
+    p_stream->i_cat       = p_input->p_fmt->i_cat;
+    p_stream->i_fourcc    = p_input->p_fmt->i_fourcc;
     p_stream->i_packet_no = 0;
 
     p_stream->header.i_packet_type = PACKET_TYPE_HEADER;
-    switch( p_input->input_format.i_cat )
+    switch( p_input->p_fmt->i_cat )
     {
         case VIDEO_ES:
-            p_bih = (BITMAPINFOHEADER*)p_input->input_format.p_format;
-            switch( p_input->input_format.i_fourcc )
+            switch( p_input->p_fmt->i_fourcc )
             {
                 case VLC_FOURCC( 'm', 'p','4', 'v' ):
                 case VLC_FOURCC( 'D', 'I','V', '3' ):
                     memcpy( p_stream->header.stream_type,
                             "video    ",
                             8 );
-                    if( p_input->input_format.i_fourcc == VLC_FOURCC( 'm', 'p','4', 'v' ) )
+                    if( p_input->p_fmt->i_fourcc == VLC_FOURCC( 'm', 'p','4', 'v' ) )
                     {
                         memcpy( p_stream->header.sub_type, "XVID", 4 );
                     }
-                    else if( p_input->input_format.i_fourcc == VLC_FOURCC( 'D', 'I','V', '3' ) )
+                    else if( p_input->p_fmt->i_fourcc == VLC_FOURCC( 'D', 'I','V', '3' ) )
                     {
                         memcpy( p_stream->header.sub_type, "DIV3", 4 );
                     }
@@ -246,16 +242,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     SetDWLE( &p_stream->header.i_default_len, 0 );      /* ??? */
                     SetDWLE( &p_stream->header.i_buffer_size, 1024*1024 );
                     SetWLE( &p_stream->header.i_bits_per_sample, 0 );
-                    if( p_bih )
-                    {
-                        SetDWLE( &p_stream->header.header.video.i_width, p_bih->biWidth );
-                        SetDWLE( &p_stream->header.header.video.i_height, p_bih->biHeight );
-                    }
-                    else
-                    {
-                        SetDWLE( &p_stream->header.header.video.i_width,  0 );
-                        SetDWLE( &p_stream->header.header.video.i_height, 0 );
-                    }
+                    SetDWLE( &p_stream->header.header.video.i_width,  p_input->p_fmt->i_width );
+                    SetDWLE( &p_stream->header.header.video.i_height, p_input->p_fmt->i_height );
                     break;
                 default:
                     FREE( p_input->p_sys );
@@ -263,19 +251,18 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             }
             break;
         case AUDIO_ES:
-            p_wf = (WAVEFORMATEX*)p_input->input_format.p_format;
-            switch( p_input->input_format.i_fourcc )
+            switch( p_input->p_fmt->i_fourcc )
             {
                 case VLC_FOURCC( 'm', 'p','g', 'a' ):
                 case VLC_FOURCC( 'a', '5','2', ' ' ):
                     memcpy( p_stream->header.stream_type,
                             "audio    ",
                             8 );
-                    if( p_input->input_format.i_fourcc == VLC_FOURCC( 'm', 'p','g', 'a' ) )
+                    if( p_input->p_fmt->i_fourcc == VLC_FOURCC( 'm', 'p','g', 'a' ) )
                     {
                         memcpy( p_stream->header.sub_type, "55  ", 4 );
                     }
-                    else if( p_input->input_format.i_fourcc == VLC_FOURCC( 'a', '5','2', ' ' ) )
+                    else if( p_input->p_fmt->i_fourcc == VLC_FOURCC( 'a', '5','2', ' ' ) )
                     {
                         memcpy( p_stream->header.sub_type, "2000", 4 );
                     }
@@ -283,23 +270,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     SetQWLE( &p_stream->header.i_time_unit, 1000000 );  /* is it used ? */
                     SetDWLE( &p_stream->header.i_default_len, 0 );      /* ??? */
                     SetDWLE( &p_stream->header.i_buffer_size, 30*1024 );
-                    if( p_wf )
-                    {
-                        SetQWLE( &p_stream->header.i_samples_per_unit, p_wf->nSamplesPerSec );
-                        SetWLE( &p_stream->header.i_bits_per_sample, p_wf->wBitsPerSample );
-                        SetDWLE( &p_stream->header.header.audio.i_channels, p_wf->nChannels );
-                        SetDWLE( &p_stream->header.header.audio.i_block_align, p_wf->nBlockAlign );
-                        SetDWLE( &p_stream->header.header.audio.i_avgbytespersec, p_wf->nAvgBytesPerSec );
-                    }
-                    else
-                    {
-                        /* perhaps it's better to fail */
-                        SetQWLE( &p_stream->header.i_samples_per_unit, 44100 );
-                        SetWLE( &p_stream->header.i_bits_per_sample, 0 );
-                        SetDWLE( &p_stream->header.header.audio.i_channels, 2 );
-                        SetDWLE( &p_stream->header.header.audio.i_block_align, 0 );
-                        SetDWLE( &p_stream->header.header.audio.i_avgbytespersec, 0 );
-                    }
+                    SetQWLE( &p_stream->header.i_samples_per_unit, p_input->p_fmt->i_sample_rate );
+                    SetWLE( &p_stream->header.i_bits_per_sample, 0 );
+                    SetDWLE( &p_stream->header.header.audio.i_channels, p_input->p_fmt->i_channels );
+                    SetDWLE( &p_stream->header.header.audio.i_block_align, p_input->p_fmt->i_block_align );
+                    SetDWLE( &p_stream->header.header.audio.i_avgbytespersec, 0 );
                     break;
                 case VLC_FOURCC( 'v', 'o', 'r', 'b' ):
                 default:

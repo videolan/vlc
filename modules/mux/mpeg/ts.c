@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.15 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: ts.c,v 1.16 2003/04/13 20:00:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -223,8 +223,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     ts_stream_t         *p_stream;
-    BITMAPINFOHEADER    *p_bih;
-    WAVEFORMATEX        *p_wf;
 
     msg_Dbg( p_mux, "adding input" );
     p_input->p_sys = (void*)p_stream = malloc( sizeof( ts_stream_t ) );
@@ -236,10 +234,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
     p_stream->i_continuity_counter = 0;
 
-    switch( p_input->input_format.i_cat )
+    switch( p_input->p_fmt->i_cat )
     {
         case VIDEO_ES:
-            switch( p_input->input_format.i_fourcc )
+            switch( p_input->p_fmt->i_fourcc )
             {
                 case VLC_FOURCC( 'm', 'p','g', 'v' ):
                     p_stream->i_stream_type = 0x02;
@@ -269,38 +267,28 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     return( -1 );
             }
             p_sys->i_video_bound++;
-            p_bih = (BITMAPINFOHEADER*)p_input->input_format.p_format;
-            if( p_bih )
-            {
-                p_stream->i_bih_codec = p_input->input_format.i_fourcc;
-                p_stream->i_bih_width = p_bih->biWidth;
-                p_stream->i_bih_height = p_bih->biHeight;
-            }
-            else
-            {
-                p_stream->i_bih_codec = 0x0;
-                p_stream->i_bih_width = 0;
-                p_stream->i_bih_height = 0;
-            }
 
-            if( p_bih && p_bih->biSize > sizeof( BITMAPINFOHEADER ) )
+            p_stream->i_bih_codec  = p_input->p_fmt->i_fourcc;
+            p_stream->i_bih_width  = p_input->p_fmt->i_width;
+            p_stream->i_bih_height = p_input->p_fmt->i_height;
+
+            p_stream->i_decoder_specific_info_len = p_input->p_fmt->i_extra_data;
+            if( p_stream->i_decoder_specific_info_len > 0 )
             {
-                p_stream->i_decoder_specific_info_len =
-                    p_bih->biSize - sizeof( BITMAPINFOHEADER );
                 p_stream->p_decoder_specific_info =
                     malloc( p_stream->i_decoder_specific_info_len );
                 memcpy( p_stream->p_decoder_specific_info,
-                        &p_bih[1],
-                        p_stream->i_decoder_specific_info_len );
+                        p_input->p_fmt->p_extra_data,
+                        p_input->p_fmt->i_extra_data );
             }
             else
             {
                 p_stream->p_decoder_specific_info = NULL;
-                p_stream->i_decoder_specific_info_len = 0;
             }
             break;
+
         case AUDIO_ES:
-            switch( p_input->input_format.i_fourcc )
+            switch( p_input->p_fmt->i_fourcc )
             {
                 case VLC_FOURCC( 'a', '5','2', ' ' ):
                 case VLC_FOURCC( 'a', '5','2', 'b' ):
@@ -324,20 +312,19 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     return( -1 );
             }
             p_sys->i_audio_bound++;
-            p_wf = (WAVEFORMATEX*)p_input->input_format.p_format;
-            if( p_wf && p_wf->cbSize > 0 )
+
+            p_stream->i_decoder_specific_info_len = p_input->p_fmt->i_extra_data;
+            if( p_stream->i_decoder_specific_info_len > 0 )
             {
-                p_stream->i_decoder_specific_info_len = p_wf->cbSize;
                 p_stream->p_decoder_specific_info =
                     malloc( p_stream->i_decoder_specific_info_len );
                 memcpy( p_stream->p_decoder_specific_info,
-                        &p_wf[1],
-                        p_stream->i_decoder_specific_info_len );
+                        p_input->p_fmt->p_extra_data,
+                        p_input->p_fmt->i_extra_data );
             }
             else
             {
                 p_stream->p_decoder_specific_info = NULL;
-                p_stream->i_decoder_specific_info_len = 0;
             }
             break;
         default:

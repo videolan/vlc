@@ -2,7 +2,7 @@
  * ps.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.11 2003/03/11 19:02:30 fenrir Exp $
+ * $Id: ps.c,v 1.12 2003/04/13 20:00:21 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -174,11 +174,11 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     msg_Dbg( p_mux, "adding input" );
     p_input->p_sys = (void*)p_stream = malloc( sizeof( ps_stream_t ) );
     p_stream->i_ok = 0;
-    switch( p_input->input_format.i_cat )
+    switch( p_input->p_fmt->i_cat )
     {
         case VIDEO_ES:
 
-            switch( p_input->input_format.i_fourcc )
+            switch( p_input->p_fmt->i_fourcc )
             {
                 case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
                     p_stream->i_stream_id = p_sys->i_stream_id_mpgv;
@@ -190,7 +190,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             }
             break;
         case AUDIO_ES:
-            switch( p_input->input_format.i_fourcc )
+            switch( p_input->p_fmt->i_fourcc )
             {
                 case VLC_FOURCC( 'a', '5', '2', ' ' ):
                 case VLC_FOURCC( 'a', '5', '2', 'b' ):

@@ -334,6 +334,7 @@ AC_CHECK_LIB(m,cos,
   LDFLAGS_a52tofloat32="${LDFLAGS_a52tofloat32} -lm")
 AC_CHECK_LIB(m,pow,
   LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lm"
+  LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -lm"
   LDFLAGS_imdct="${LDFLAGS_imdct} -lm"
   LDFLAGS_imdct3dn="${LDFLAGS_imdct3dn} -lm"
   LDFLAGS_imdctsse="${LDFLAGS_imdctsse} -lm"
@@ -1017,7 +1018,8 @@ then
   PLUGINS="${PLUGINS} packetizer_mpeg4video packetizer_mpeg4audio"
   PLUGINS="${PLUGINS} packetizer_copy"
 
-  PLUGINS="${PLUGINS} vout_encoder"
+  PLUGINS="${PLUGINS} stream_out_dummy stream_out_standard stream_out_es"
+  PLUGINS="${PLUGINS} stream_out_duplicate stream_out_display"
 
     dnl Ogg/ogm
     AC_CHECK_HEADERS(ogg/ogg.h, [
@@ -1510,6 +1512,10 @@ then
   then
     CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${with_ffmpeg}/include/ffmpeg"
     LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -L${with_ffmpeg}/lib"
+
+    CPPFLAGS_stream_out_transcode="${CPPFLAGS_stream_out_transcode} -I${with_ffmpeg}/include/ffmpeg"
+    LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -L${with_ffmpeg}/lib"
+
   fi
 
   dnl Add postprocessing modules
@@ -1538,9 +1544,13 @@ then
     then
       dnl  Use a custom libffmpeg
       AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodec.a)
-      BUILTINS="${BUILTINS} ffmpeg"
+      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
       LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -L${real_ffmpeg_tree}/libavcodec -lavcodec"
       CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${real_ffmpeg_tree}/libavcodec"
+
+      LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -L${real_ffmpeg_tree}/libavcodec -lavcodec"
+      CPPFLAGS_stream_out_transcode="${CPPFLAGS_stream_out_transcode} -I${real_ffmpeg_tree}/libavcodec"
+
     else
       dnl  The given libavcodec wasn't built
       AC_MSG_RESULT(no)
@@ -1550,8 +1560,9 @@ then
     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_ffmpeg}"
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_ffmpeg}"
     AC_CHECK_LIB(avcodec, avcodec_init, [
-      BUILTINS="${BUILTINS} ffmpeg"
-      LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lavcodec" ],
+      BUILTINS="${BUILTINS} ffmpeg stream_out_transcode"
+      LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -lavcodec" 
+      LDFLAGS_stream_out_transcode="${LDFLAGS_stream_out_transcode} -lavcodec" ],
       [ AC_MSG_ERROR([Cannot find libavcodec library...]) ])
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
