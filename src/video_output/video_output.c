@@ -1387,10 +1387,10 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Get( p_input, "video-es", &val );
     if( val.i_int >= 0 )
     {
-        p_vout->b_filter_change = VLC_TRUE;
         suxor_thread_t *p_suxor =
             vlc_object_create( p_vout, sizeof(suxor_thread_t) );
         p_suxor->p_input = p_input;
+        p_vout->b_filter_change = VLC_TRUE;
         vlc_object_yield( p_input );
         vlc_thread_create( p_suxor, "suxor", SuxorRestartVideoES,
                            VLC_THREAD_PRIORITY_LOW, VLC_FALSE );
