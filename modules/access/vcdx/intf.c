@@ -2,7 +2,7 @@
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
  * Copyright (C) 2002,2003 VideoLAN
- * $Id: intf.c,v 1.10 2003/12/05 04:24:47 rocky Exp $
+ * $Id: intf.c,v 1.11 2003/12/05 05:01:17 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
@@ -119,13 +119,13 @@ static void RunIntf( intf_thread_t *p_intf )
       vlc_mutex_lock( &p_intf->change_lock );
 
         /*
-         * still images
+         * Have we timed-out in showing a still frame? 
          */
         if( p_intf->p_sys->b_still && !p_intf->p_sys->b_inf_still )
         {
             if( p_intf->p_sys->m_still_time > 0 )
             {
-                /* update remaining still time */
+                /* Update remaining still time */
 	        dbg_print(INPUT_DBG_STILL, "updating still time");
                 mtime = mdate();
                 if( mlast )
@@ -137,7 +137,7 @@ static void RunIntf( intf_thread_t *p_intf )
             }
             else
             {
-                /* still time elasped */
+                /* Still time has elasped; set to continue playing. */
 	        dbg_print(INPUT_DBG_STILL, "wait time done - setting play");
                 input_SetStatus( p_intf->p_sys->p_input,
                                  INPUT_STATUS_PLAY );
@@ -148,7 +148,7 @@ static void RunIntf( intf_thread_t *p_intf )
         }
 
       /*
-       * keyboard event
+       * Do we have a keyboard event? 
        */
       if( p_vout && p_intf->p_sys->b_key_pressed )
         {
@@ -227,8 +227,9 @@ static void RunIntf( intf_thread_t *p_intf )
 	    }
 	    number_addend = 0;
 
-	    /* we can safely interact with the VCD player
-	     * with the stream lock */
+	    /* Any keypress gets rid of still frame waiting.
+	       FIXME - should handle just the ones that cause an action.
+	    */
 	    if( p_intf->p_sys->b_still )
 	      {
 		dbg_print(INPUT_DBG_STILL, "Playing still after activate");
@@ -360,9 +361,9 @@ int vcdIntfStillTime( intf_thread_t *p_intf, int i_sec )
 {
     vlc_mutex_lock( &p_intf->change_lock );
 
-    if( i_sec == 0xff )
+    if( i_sec == -1 )
     {
-        p_intf->p_sys->b_still = 1;
+        p_intf->p_sys->b_still     = 1;
         p_intf->p_sys->b_inf_still = 1;
     }
     else if( i_sec > 0 )

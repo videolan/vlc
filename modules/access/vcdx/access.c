@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.8 2003/12/05 04:24:47 rocky Exp $
+ * $Id: access.c,v 1.9 2003/12/05 05:01:17 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -410,7 +410,7 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
     thread_vcd_data_t *     p_vcd= (thread_vcd_data_t *)p_input->p_access_data;
     input_area_t *          p_area;
     
-    p_vcd->in_still = 0;
+    p_vcd->in_still = false;
 
     dbg_print(INPUT_DBG_CALL, "itemid.num: %d, itemid.type: %d\n", 
 	      itemid.num, itemid.type);
@@ -454,11 +454,11 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
           case VCDINFO_FILES_VIDEO_PAL_STILL:
           case VCDINFO_FILES_VIDEO_PAL_STILL2:
             p_input->stream.b_seekable = 0;
-            p_vcd->in_still = -5;
+            p_vcd->in_still = true;
             break;
           default:
             p_input->stream.b_seekable = 1;
-            p_vcd->in_still = 0;
+            p_vcd->in_still = false;
           }
       }
       break;

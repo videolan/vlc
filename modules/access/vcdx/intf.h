@@ -2,7 +2,7 @@
  * intf.h: send info to intf.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf.h,v 1.2 2003/12/05 04:24:47 rocky Exp $
+ * $Id: intf.h,v 1.3 2003/12/05 05:01:17 rocky Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -26,19 +26,20 @@
  *****************************************************************************/
 struct intf_sys_t
 {
-    input_thread_t    * p_input;
-    thread_vcd_data_t * p_vcd;
-
-    vlc_bool_t          b_still;
-    vlc_bool_t          b_inf_still;
-    mtime_t             m_still_time;
-
+  input_thread_t    * p_input;
+  thread_vcd_data_t * p_vcd;
+  
+  vlc_bool_t          b_still;        /* True if we are in a still frame */
+  vlc_bool_t          b_inf_still;    /* True if still wait time is infinite */
+  mtime_t             m_still_time;   /* Time in microseconds remaining 
+					 to wait in still frame.
+				       */
 #if FINISHED
-    vcdplay_ctrl_t      control;
+  vcdplay_ctrl_t      control;
 #else 
-    int                 control;
+  int                 control;
 #endif
-    vlc_bool_t          b_click, b_move, b_key_pressed;
+  vlc_bool_t          b_click, b_move, b_key_pressed;
 };
 
 int vcdIntfStillTime( struct intf_thread_t *, int );

@@ -3,7 +3,7 @@
  *               using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
- * $Id: vcdplayer.c,v 1.6 2003/12/05 04:24:47 rocky Exp $
+ * $Id: vcdplayer.c,v 1.7 2003/12/05 05:01:17 rocky Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -136,9 +136,6 @@ vcdplayer_non_pbc_nav ( input_thread_t * p_input )
   return READ_BLOCK;
 }
 
-/* FIXME: Will do whatever the right thing is later. */
-#define SLEEP_1_SEC_AND_HANDLE_EVENTS sleep(1)
-
 /* Handles PBC navigation when reaching the end of a play item. */
 vcdplayer_read_status_t
 vcdplayer_pbc_nav ( input_thread_t * p_input )
@@ -147,12 +144,6 @@ vcdplayer_pbc_nav ( input_thread_t * p_input )
 
   /* We are in playback control. */
   vcdinfo_itemid_t itemid;
-
-  if (0 != p_vcd->in_still && p_vcd->in_still != -5) {
-      SLEEP_1_SEC_AND_HANDLE_EVENTS;
-      if (p_vcd->in_still > 0) p_vcd->in_still--;
-      return READ_STILL_FRAME;
-  }
 
   /* The end of an entry is really the end of the associated 
      sequence (or track). */
@@ -181,18 +172,11 @@ vcdplayer_pbc_nav ( input_thread_t * p_input )
       return READ_BLOCK;
 
     /* Handle any wait time given. */
-    if (-5 == p_vcd->in_still) {
-      if (wait_time != 0) {
-        /* FIXME */
-        p_vcd->in_still = wait_time - 1;
-	p_vcd->p_intf->p_sys->m_still_time = (wait_time - 1) * 1000000;
-        return READ_STILL_FRAME;
-      } else {
-	p_vcd->p_intf->p_sys->m_still_time = 0;
-	p_vcd->p_intf->p_sys->b_inf_still  = 1;
-      }
-
+    if (p_vcd->in_still) {
+      vcdIntfStillTime( p_vcd->p_intf, wait_time );
+      return READ_STILL_FRAME;
     }
+
     vcdplayer_update_entry( p_input, 
                             vcdinf_pld_get_next_offset(p_vcd->pxd.pld),
                             &itemid.num, "next" );
@@ -213,18 +197,10 @@ vcdplayer_pbc_nav ( input_thread_t * p_input )
                 wait_time, p_vcd->loop_count, max_loop);
       
       /* Handle any wait time given */
-      if (-5 == p_vcd->in_still) {
-	if (wait_time != 0) {
-	  /* FIXME */
-	  p_vcd->in_still = wait_time - 1;
-	  p_vcd->p_intf->p_sys->m_still_time = (wait_time - 1) * 1000000;
-	  return READ_STILL_FRAME;
-	} else {
-	  p_vcd->p_intf->p_sys->m_still_time = 0;
-	  p_vcd->p_intf->p_sys->b_inf_still  = 1;
-	}
+      if (p_vcd->in_still) {
+	vcdIntfStillTime( p_vcd->p_intf, wait_time );
 	return READ_STILL_FRAME;
-      }
+      } 
       
       /* Handle any looping given. */
       if ( max_loop == 0 || p_vcd->loop_count < max_loop ) {
@@ -263,7 +239,7 @@ vcdplayer_pbc_nav ( input_thread_t * p_input )
           return READ_BLOCK;
         } else if (p_vcd->in_still) {
           /* Hack: Just go back and do still again */
-          SLEEP_1_SEC_AND_HANDLE_EVENTS ;
+          sleep(1);
           return READ_STILL_FRAME;
         }
       }
