@@ -1123,7 +1123,7 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
     vlm_message_t *msg;
     int    i;
 
-    fprintf( stderr," mvar_VlmSetNew: name=`%s'\n", name );
+    /* fprintf( stderr," mvar_VlmSetNew: name=`%s'\n", name ); */
     if( vlm == NULL )
         return s;
     if( vlm_ExecuteCommand( vlm, "show", &msg ) )
@@ -1155,7 +1155,7 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
             set = mvar_New( name, "set" );
             mvar_AppendNewVar( set, "name", el->psz_name );
 
-            fprintf( stderr, "#### name=%s\n", el->psz_name );
+            /* fprintf( stderr, "#### name=%s\n", el->psz_name ); */
 
             for( k = 0; k < desc->i_child; k++ )
             {
@@ -1165,19 +1165,19 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
                     int c;
                     mvar_t *n = mvar_New( ch->psz_name, "set" );
 
-                    fprintf( stderr, "        child=%s [%d]\n", ch->psz_name, ch->i_child );
+                    /* fprintf( stderr, "        child=%s [%d]\n", ch->psz_name, ch->i_child ); */
                     for( c = 0; c < ch->i_child; c++ )
                     {
                         mvar_t *in = mvar_New( ch->psz_name, ch->child[c]->psz_name );
                         mvar_AppendVar( n, in );
 
-                        fprintf( stderr, "            sub=%s\n", ch->child[c]->psz_name );
+                        /* fprintf( stderr, "            sub=%s\n", ch->child[c]->psz_name );*/
                     }
                     mvar_AppendVar( set, n );
                 }
                 else
                 {
-                    fprintf( stderr, "        child=%s->%s\n", ch->psz_name, ch->psz_value );
+                    /* fprintf( stderr, "        child=%s->%s\n", ch->psz_name, ch->psz_value ); */
                     mvar_AppendNewVar( set, ch->psz_name, ch->psz_value );
                 }
             }
@@ -1350,6 +1350,8 @@ enum macroType
         MVLC_VLM_PAUSE,
         MVLC_VLM_STOP,
         MVLC_VLM_SEEK,
+        MVLC_VLM_LOAD,
+        MVLC_VLM_SAVE,
 
     MVLC_FOREACH,
     MVLC_IF,
@@ -1403,6 +1405,8 @@ StrToMacroTypeTab [] =
         { "vlm_pause",      MVLC_VLM_PAUSE },
         { "vlm_stop",       MVLC_VLM_STOP },
         { "vlm_seek",       MVLC_VLM_SEEK },
+        { "vlm_load",       MVLC_VLM_LOAD },
+        { "vlm_save",       MVLC_VLM_SAVE },
 
     { "rpn",        MVLC_RPN },
 
@@ -1990,6 +1994,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                             p += sprintf( p, " %s", vlm_properties[i] );
                         }
                     }
+                    fprintf( stderr, "vlm_ExecuteCommand: %s\n", psz );
                     vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz, &vlm_answer );
                     if( vlm_answer->psz_value == NULL ) /* there is no error */
                     {
@@ -2059,9 +2064,35 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     vlm_MessageDelete( vlm_answer );
                     break;
                 }
+                case MVLC_VLM_LOAD:
+                case MVLC_VLM_SAVE:
+                {
+                    vlm_message_t *vlm_answer;
+                    char file[512];
+                    char psz[512];
+
+                    if( p_intf->p_sys->p_vlm == NULL )
+                        p_intf->p_sys->p_vlm = vlm_New( p_intf );
+
+                    uri_extract_value( p_request, "file", file, 512 );
+                    uri_decode_url_encoded( file );
+
+                    if( StrToMacroType( control ) == MVLC_VLM_LOAD )
+                        sprintf( psz, "load %s", file );
+                    else
+                        sprintf( psz, "save %s", file );
+
+                    vlm_ExecuteCommand( p_intf->p_sys->p_vlm, psz, &vlm_answer );
+                    /* FIXME do a vlm_answer -> var stack conversion */
+                    vlm_MessageDelete( vlm_answer );
+                    break;
+                }
 
                 default:
-                    PRINTS( "<!-- control param(%s) unsuported -->", control );
+                    if( *control )
+                    {
+                        PRINTS( "<!-- control param(%s) unsuported -->", control );
+                    }
                     break;
             }
             break;
