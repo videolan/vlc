@@ -1,4 +1,168 @@
 ------------------------------------------------------------------------
+r9111 | gbazin | 2004-11-02 20:23:40 +0100 (Tue, 02 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/gui/wxwindows/interface.cpp
+
+* modules/gui/wxwindows/interface.cpp: slightly bigger interface on win32.
+------------------------------------------------------------------------
+r9110 | fenrir | 2004-11-02 16:23:18 +0100 (Tue, 02 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/httpd.c
+
+* httpd: Do not close the connection on timeout for rtsp.
+(Make quicktime happy)
+------------------------------------------------------------------------
+r9109 | sam | 2004-11-02 15:11:19 +0100 (Tue, 02 Nov 2004) | 4 lines
+Changed paths:
+   M /trunk/po/fr.po
+
+  * po/fr.po:
+    + Minor spelling fixes.
+    + Correct UTF8 apostrophes.
+
+------------------------------------------------------------------------
+r9108 | gbazin | 2004-11-02 14:47:19 +0100 (Tue, 02 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/po/POTFILES.in
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+
+* po/*: update in preparation for 0.8.0.
+------------------------------------------------------------------------
+r9107 | gbazin | 2004-11-02 14:38:04 +0100 (Tue, 02 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/control/rc.c
+
+* modules/control/rc.c: reverted last commit and only print an additional '\r' in net mode.
+------------------------------------------------------------------------
+r9106 | gbazin | 2004-11-02 13:52:49 +0100 (Tue, 02 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/src/misc/win32_specific.c
+
+* src/misc/win32_specific.c: mozilla plugin fix.
+------------------------------------------------------------------------
+r9105 | hartman | 2004-11-02 13:50:17 +0100 (Tue, 02 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/m3u.c
+
+* detect rtsptext reference files as used by QuickTime and Real
+
+------------------------------------------------------------------------
+r9104 | gbazin | 2004-11-02 10:19:19 +0100 (Tue, 02 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/audio_output/portaudio.c
+
+* modules/audio_output/portaudio.c: make stereo the default.
+------------------------------------------------------------------------
+r9103 | fkuehne | 2004-11-01 23:41:54 +0100 (Mon, 01 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/po/it.po
+
+* changed the used-charset-property to UTF-8
+------------------------------------------------------------------------
+r9102 | gbazin | 2004-11-01 17:37:32 +0100 (Mon, 01 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dshow/filter.cpp
+
+* modules/access/dshow/filter.cpp: fixed uninitialized variable.
+------------------------------------------------------------------------
+r9101 | gbazin | 2004-11-01 17:21:29 +0100 (Mon, 01 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/dmo/dmo.c
+
+* modules/codec/dmo/dmo.c: fixed a couple of memleaks.
+------------------------------------------------------------------------
+r9100 | gbazin | 2004-11-01 16:35:11 +0100 (Mon, 01 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/src/video_output/video_output.c
+
+* src/video_output/video_output.c: portability fix.
+------------------------------------------------------------------------
+r9099 | hartman | 2004-11-01 14:43:43 +0100 (Mon, 01 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/sgimb.c
+
+* Shame shame shame shame shame, Shame on me 
+
+------------------------------------------------------------------------
+r9098 | hartman | 2004-11-01 14:42:05 +0100 (Mon, 01 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/sgimb.c
+
+* Set a higher RTSP caching if we use Kasenna VoD
+
+------------------------------------------------------------------------
+r9097 | gbazin | 2004-11-01 14:10:14 +0100 (Mon, 01 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+
+* modules/access/dshow/dshow.cpp: don't add a prefered media type when dealing with pins which handle MEDIATYPE_Stream (for some reason the WinTV PVR doesn't really like this).
+------------------------------------------------------------------------
+r9096 | gbazin | 2004-11-01 13:58:39 +0100 (Mon, 01 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dshow/filter.cpp
+
+* modules/access/dshow/filter.cpp: fixed crash.
+------------------------------------------------------------------------
+r9095 | dionoea | 2004-11-01 12:06:13 +0100 (Mon, 01 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http.c
+   M /trunk/share/http/index.html
+
+Possibility to set volume using %
+
+------------------------------------------------------------------------
+r9094 | dionoea | 2004-11-01 11:35:39 +0100 (Mon, 01 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/share/http/index.html
+
+Fixed the volume control
+
+
+------------------------------------------------------------------------
+r9093 | jpsaman | 2004-10-31 18:24:18 +0100 (Sun, 31 Oct 2004) | 1 line
+Changed paths:
+   M /trunk/ipkg/control.gpe
+   M /trunk/ipkg/control.h3600
+   M /trunk/ipkg/control.opie
+   M /trunk/ipkg/control.zaurus
+   M /trunk/ipkg/rules.gpe
+   M /trunk/ipkg/rules.h3600
+   M /trunk/ipkg/rules.opie
+   M /trunk/ipkg/rules.zaurus
+
+Update version information in iPAQ build files.wq
+------------------------------------------------------------------------
+r9092 | markfm | 2004-10-31 17:50:14 +0100 (Sun, 31 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/extrapanel.cpp
+
+Initialize i_smooth
+
+------------------------------------------------------------------------
+r9091 | gbazin | 2004-10-31 17:44:01 +0100 (Sun, 31 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/NEWS
+   M /trunk/configure.ac
+   M /trunk/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* ALL: update in preparation for 0.8.0.
+
+------------------------------------------------------------------------
 r9090 | gbazin | 2004-10-31 17:21:28 +0100 (Sun, 31 Oct 2004) | 3 lines
 Changed paths:
    M /trunk/TODO
