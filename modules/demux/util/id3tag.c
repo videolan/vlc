@@ -2,7 +2,7 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.4 2003/02/22 14:11:38 sigmunau Exp $
+ * $Id: id3tag.c,v 1.5 2003/03/13 22:35:51 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
@@ -33,6 +33,7 @@
 #include <sys/types.h>
 
 #include <id3tag.h>
+#include "id3genres.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -72,8 +73,25 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
         i_strings = id3_field_getnstrings( &p_frame->fields[1] );
         while ( i_strings > 0 )
         {
-            psz_temp = id3_ucs4_latin1duplicate( id3_field_getstrings ( &p_frame->fields[1], --i_strings ) );
-            input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
+            psz_temp = id3_ucs4_latin1duplicate( id3_field_getstrings( &p_frame->fields[1], --i_strings ) );
+            if ( !strcmp(p_frame->id, ID3_FRAME_GENRE ) )
+            {
+                int i_genre;
+                char *psz_endptr;
+                i_genre = strtol( psz_temp, &psz_endptr, 10 );
+                if( psz_temp != psz_endptr && i_genre >= 0 && i_genre < NUM_GENRES )
+                {
+                    input_AddInfo( p_category, (char *)p_frame->description, ppsz_genres[atoi(psz_temp)]);
+                }
+                else
+                {
+                    input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
+                }
+            }
+            else
+            {
+                input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
+            }
             free( psz_temp ); 
         }
         i++;
