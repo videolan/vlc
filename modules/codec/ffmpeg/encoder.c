@@ -752,12 +752,12 @@ void E_(CloseEncoder)( vlc_object_t *p_this )
             vlc_object_destroy( pp_contexts[i] );
         }
 
-        free(pp_contexts);
+        free( pp_contexts );
     }
 #endif
 
     avcodec_close( p_sys->p_context );
-    free( p_sys->p_context );
+    av_free( p_sys->p_context );
 
     if( p_sys->p_buffer ) free( p_sys->p_buffer );
     if( p_sys->p_buffer_out ) free( p_sys->p_buffer_out );

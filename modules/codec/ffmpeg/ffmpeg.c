@@ -214,7 +214,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 
         avcodec_close( p_sys->p_context );
         msg_Dbg( p_dec, "ffmpeg codec (%s) stopped", p_sys->psz_namecodec );
-        free( p_sys->p_context );
+        av_free( p_sys->p_context );
     }
 
     switch( p_sys->i_cat )

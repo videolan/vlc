@@ -826,11 +826,8 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
 static void transcode_audio_ffmpeg_close( sout_stream_t *p_stream,
                                           sout_stream_id_t *id )
 {
-    if( id->ff_dec )
-    {
-        avcodec_close( id->ff_dec_c );
-        free( id->ff_dec_c );
-    }
+    if( id->ff_dec ) avcodec_close( id->ff_dec_c );
+    av_free( id->ff_dec_c );
 
     module_Unneed( id->p_encoder, id->p_encoder->p_module );
     vlc_object_destroy( id->p_encoder );
@@ -1334,11 +1331,8 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream,
     }
 
     /* Close decoder */
-    if( id->ff_dec )
-    {
-        avcodec_close( id->ff_dec_c );
-        free( id->ff_dec_c );
-    }
+    if( id->ff_dec ) avcodec_close( id->ff_dec_c );
+    av_free( id->ff_dec_c );
 
     /* Close encoder */
     if( id->p_encoder->p_module )
