@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.2 2001/12/31 04:53:33 sam Exp $
+ * $Id: xcommon.c,v 1.3 2002/01/02 06:46:02 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -48,11 +48,11 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/extensions/XShm.h>
+#include <X11/extensions/dpms.h>
 
 #ifdef MODULE_NAME_IS_xvideo
 #   include <X11/extensions/Xv.h>
 #   include <X11/extensions/Xvlib.h>
-#   include <X11/extensions/dpms.h>
 #endif
 
 #include "video.h"
@@ -102,6 +102,8 @@ static void FreePicture    ( vout_thread_t *, picture_t * );
 static IMAGE_TYPE *CreateImage    ( Display *, EXTRA_ARGS, int, int );
 static IMAGE_TYPE *CreateShmImage ( Display *, EXTRA_ARGS_SHM, int, int );
 
+static void ToggleFullScreen      ( vout_thread_t * );
+
 static void EnableXScreenSaver    ( vout_thread_t * );
 static void DisableXScreenSaver   ( vout_thread_t * );
 
@@ -135,7 +137,6 @@ typedef struct vout_sys_s
 #ifdef MODULE_NAME_IS_xvideo
     Window              yuv_window;   /* sub-window for displaying yuv video
                                                                         data */
-    GC                  yuv_gc;
     int                 i_xvport;
 #else
     Colormap            colormap;               /* colormap used (8bpp only) */
@@ -155,11 +156,18 @@ typedef struct vout_sys_s
     int                 i_width;                     /* width of main window */
     int                 i_height;                   /* height of main window */
 
+    /* Backup of window position and size before fullscreen switch */
+    int                 i_width_backup;
+    int                 i_height_backup;
+    int                 i_xpos_backup;
+    int                 i_ypos_backup;
+
     /* Screen saver properties */
     int                 i_ss_timeout;                             /* timeout */
     int                 i_ss_interval;           /* interval between changes */
     int                 i_ss_blanking;                      /* blanking mode */
     int                 i_ss_exposure;                      /* exposure mode */
+    BOOL                b_ss_dpms;                              /* DPMS mode */
 
     /* Mouse pointer properties */
     boolean_t           b_mouse_pointer_visible;
@@ -353,6 +361,7 @@ static int vout_Create( vout_thread_t *p_vout )
     {
         intf_ErrMsg( "vout error: cannot initialize X11 display" );
         DestroyCursor( p_vout );
+        DestroyWindow( p_vout );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
         return( 1 );
@@ -521,15 +530,8 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
     }
 
-#ifdef MODULE_NAME_IS_xvideo
-    XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
-                   i_width, i_height );
-    XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
-                 i_x, i_y );
-#endif
-
-    /* Force synchronization */
-    XSync( p_vout->p_sys->p_display, False );
+    /* Make sure the command is sent now */
+    XFlush( p_vout->p_sys->p_display );
 }
 
 /*****************************************************************************
@@ -565,6 +567,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         {
             /* Update dimensions */
             b_resized = 1;
+            p_vout->i_changes |= VOUT_SIZE_CHANGE;
             p_vout->p_sys->i_width = xevent.xconfigure.width;
             p_vout->p_sys->i_height = xevent.xconfigure.height;
         }
@@ -762,26 +765,16 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
     }
 
+    /*
+     * Fullscreen Change
+     */
     if ( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
+        ToggleFullScreen( p_vout );
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
 
-        p_vout->b_fullscreen = !p_vout->b_fullscreen;
-
-        /* Get rid of the old window */
-        DestroyWindow( p_vout );
-
-        /* And create a new one */
-        if( CreateWindow( p_vout ) )
-        {
-            intf_ErrMsg( "vout error: cannot create X11 window" );
-            XCloseDisplay( p_vout->p_sys->p_display );
-
-            free( p_vout->p_sys );
-            return( 1 );
-        }
-
     }
+
 
 #ifdef MODULE_NAME_IS_x11
     /*
@@ -851,11 +844,24 @@ static int vout_Manage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
+        int i_width, i_height, i_x, i_y;
+
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         intf_WarnMsg( 3, "vout: video display resized (%dx%d)",
                       p_vout->p_sys->i_width,
                       p_vout->p_sys->i_height );
+ 
+        vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
+                           p_vout->p_sys->i_height,
+                           &i_x, &i_y, &i_width, &i_height );
+
+        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
+                       i_width, i_height );
+        
+        XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
+                     i_x, i_y );
+
     }
 #endif
 
@@ -901,52 +907,39 @@ static int CreateWindow( vout_thread_t *p_vout )
     XSetWindowAttributes    xwindow_attributes;
     XGCValues               xgcvalues;
     XEvent                  xevent;
-    Atom                    prop;
-    mwmhints_t              mwmhints;
 
     boolean_t               b_expose;
     boolean_t               b_configure_notify;
     boolean_t               b_map_notify;
 
-    /* If we're full screen, we're full screen! */
-    if( p_vout->b_fullscreen ) 
+    /* Set main window's size */
+    if( p_vout->render.i_height * p_vout->render.i_aspect
+        >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
     {
-        p_vout->p_sys->i_width =
-           DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
-        p_vout->p_sys->i_height =
-           DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen ); 
+        p_vout->p_sys->i_width = p_vout->render.i_height
+          * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
+        p_vout->p_sys->i_height = p_vout->render.i_height;
     }
     else
     {
-        /* Set main window's size */
-        if( p_vout->render.i_height * p_vout->render.i_aspect
-             >= p_vout->render.i_width * VOUT_ASPECT_FACTOR )
-        {
-            p_vout->p_sys->i_width = p_vout->render.i_height
-                * p_vout->render.i_aspect / VOUT_ASPECT_FACTOR;
-            p_vout->p_sys->i_height = p_vout->render.i_height;
-        }
-        else
-        {
-            p_vout->p_sys->i_width = p_vout->render.i_width;
-            p_vout->p_sys->i_height = p_vout->render.i_width
-                * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
-        }
+        p_vout->p_sys->i_width = p_vout->render.i_width;
+        p_vout->p_sys->i_height = p_vout->render.i_width
+          * VOUT_ASPECT_FACTOR / p_vout->render.i_aspect;
+    }
 
 #if 0
-        if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 300 )
-        {
-            p_vout->p_sys->i_width <<= 1;
-            p_vout->p_sys->i_height <<= 1;
-        }
-        else if( p_vout->p_sys->i_width <= 400
-                  && p_vout->p_sys->i_height <= 400 )
-        {
-            p_vout->p_sys->i_width += p_vout->p_sys->i_width >> 1;
-            p_vout->p_sys->i_height += p_vout->p_sys->i_height >> 1;
-        }
-#endif
+    if( p_vout->p_sys->i_width <= 300 && p_vout->p_sys->i_height <= 300 )
+    {
+        p_vout->p_sys->i_width <<= 1;
+        p_vout->p_sys->i_height <<= 1;
     }
+    else if( p_vout->p_sys->i_width <= 400
+             && p_vout->p_sys->i_height <= 400 )
+    {
+        p_vout->p_sys->i_width += p_vout->p_sys->i_width >> 1;
+        p_vout->p_sys->i_height += p_vout->p_sys->i_height >> 1;
+    }
+#endif
 
     /* Prepare window manager hints and properties */
     xsize_hints.base_width          = p_vout->p_sys->i_width;
@@ -959,13 +952,14 @@ static int CreateWindow( vout_thread_t *p_vout )
 
     /* Prepare window attributes */
     xwindow_attributes.backing_store = Always;       /* save the hidden part */
-    xwindow_attributes.background_pixel = BlackPixel( p_vout->p_sys->p_display,
-                                                      p_vout->p_sys->i_screen );
+    xwindow_attributes.background_pixel = BlackPixel(p_vout->p_sys->p_display,
+                                                     p_vout->p_sys->i_screen);
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
     
 
-    /* Create the window and set hints - the window must receive ConfigureNotify
-     * events, and, until it is displayed, Expose and MapNotify events. */
+    /* Create the window and set hints - the window must receive
+     * ConfigureNotify events, and until it is displayed, Expose and
+     * MapNotify events. */
 
     p_vout->p_sys->window =
         XCreateWindow( p_vout->p_sys->p_display,
@@ -973,29 +967,10 @@ static int CreateWindow( vout_thread_t *p_vout )
                        0, 0,
                        p_vout->p_sys->i_width,
                        p_vout->p_sys->i_height,
-#ifdef MODULE_NAME_IS_x11
-                       /* XXX - what's this ? */
                        0,
-#else
-                       1,
-#endif
                        0, InputOutput, 0,
                        CWBackingStore | CWBackPixel | CWEventMask,
                        &xwindow_attributes );
-
-    if ( p_vout->b_fullscreen )
-    {
-        prop = XInternAtom(p_vout->p_sys->p_display, "_MOTIF_WM_HINTS", False);
-        mwmhints.flags = MWM_HINTS_DECORATIONS;
-        mwmhints.decorations = 0;
-        XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                         prop, prop, 32, PropModeReplace,
-                         (unsigned char *)&mwmhints, PROP_MWM_HINTS_ELEMENTS );
-
-        XSetTransientForHint( p_vout->p_sys->p_display,
-                              p_vout->p_sys->window, None );
-        XRaiseWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
-    }
 
     /* Set window manager hints and properties: size hints, command,
      * window's name, and accepted protocols */
@@ -1018,7 +993,7 @@ static int CreateWindow( vout_thread_t *p_vout )
     {
         /* WM_DELETE_WINDOW is not supported by window manager */
         intf_Msg( "vout error: missing or bad window manager" );
-    }
+    } 
 
     /* Creation of a graphic context that doesn't generate a GraphicsExpose
      * event when using functions like XCopyArea */
@@ -1063,13 +1038,6 @@ static int CreateWindow( vout_thread_t *p_vout )
                   ButtonPressMask | ButtonReleaseMask | 
                   PointerMotionMask );
 
-    if( p_vout->b_fullscreen )
-    {
-        XSetInputFocus( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                        RevertToNone, CurrentTime );
-        XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->window, 0, 0 );
-    }
-
 #ifdef MODULE_NAME_IS_x11
     if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
     {
@@ -1090,15 +1058,14 @@ static int CreateWindow( vout_thread_t *p_vout )
 #else
     /* Create YUV output sub-window. */
     p_vout->p_sys->yuv_window = XCreateSimpleWindow( p_vout->p_sys->p_display,
-                         p_vout->p_sys->window, 0, 0, 1, 1, 0,
+                         p_vout->p_sys->window, 0, 0,
+                         p_vout->p_sys->i_width,
+                         p_vout->p_sys->i_height,
+                         0,
                          BlackPixel( p_vout->p_sys->p_display,
                                          p_vout->p_sys->i_screen ),
                          WhitePixel( p_vout->p_sys->p_display,
                                          p_vout->p_sys->i_screen ) );
-
-    p_vout->p_sys->yuv_gc = XCreateGC( p_vout->p_sys->p_display,
-                                       p_vout->p_sys->yuv_window,
-                                       GCGraphicsExposures, &xgcvalues );
     
     XSetWindowBackground( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window,
              BlackPixel(p_vout->p_sys->p_display, p_vout->p_sys->i_screen ) );
@@ -1123,12 +1090,16 @@ static int CreateWindow( vout_thread_t *p_vout )
     return( 0 );
 }
 
+/*****************************************************************************
+ * DestroyWindow: destroy the window
+ *****************************************************************************
+ *
+ *****************************************************************************/
 static void DestroyWindow( vout_thread_t *p_vout )
 {
     XSync( p_vout->p_sys->p_display, False );
 
 #ifdef MODULE_NAME_IS_xvideo
-    XFreeGC( p_vout->p_sys->p_display, p_vout->p_sys->yuv_gc );
     XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->yuv_window );
 #endif
 
@@ -1291,21 +1262,151 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
+ * ToggleFullScreen: Enable or disable full screen mode
+ *****************************************************************************
+ * This function will switch between fullscreen and window mode.
+ *
+ *****************************************************************************/
+static void ToggleFullScreen ( vout_thread_t *p_vout )
+{
+  Atom prop;
+  mwmhints_t mwmhints;
+  int i_xpos, i_ypos, i_width, i_height;
+
+  p_vout->b_fullscreen = !p_vout->b_fullscreen;
+
+  if( p_vout->b_fullscreen )
+  {
+      Window next_parent, parent, *p_dummy, dummy1;
+      unsigned int dummy2, dummy3;
+     
+      intf_WarnMsg( 3, "vout: entering fullscreen mode" );
+
+      /* Save current window coordinates so they can be restored when
+       * we exit from fullscreen mode */
+
+      /* find the real parent, which means the which is a direct child of
+       * the root window */
+      next_parent = parent = p_vout->p_sys->window;
+      while( next_parent != DefaultRootWindow( p_vout->p_sys->p_display ) )
+      {
+          parent = next_parent;
+          XQueryTree( p_vout->p_sys->p_display,
+                      parent,
+                      &dummy1,
+                      &next_parent,
+                      &p_dummy,
+                      &dummy2 );
+          XFree((void *)p_dummy);
+      }
+
+      XGetGeometry( p_vout->p_sys->p_display,
+                    p_vout->p_sys->window,
+                    &dummy1,
+                    &dummy2,
+                    &dummy3,
+                    &p_vout->p_sys->i_width_backup,
+                    &p_vout->p_sys->i_height_backup,
+                    &dummy2, &dummy3 );
+
+      XTranslateCoordinates( p_vout->p_sys->p_display,
+                             parent,
+                             DefaultRootWindow( p_vout->p_sys->p_display ),
+                             0,
+                             0,
+                             &p_vout->p_sys->i_xpos_backup,
+                             &p_vout->p_sys->i_ypos_backup,
+                             &dummy1 );
+
+      mwmhints.flags = MWM_HINTS_DECORATIONS;
+      mwmhints.decorations = 0;
+
+      i_xpos = 0;
+      i_ypos = 0;
+      i_width = DisplayWidth( p_vout->p_sys->p_display,
+                              p_vout->p_sys->i_screen );
+      i_height = DisplayHeight( p_vout->p_sys->p_display,
+                                p_vout->p_sys->i_screen );
+
+#if 0
+      /* Being a transient window allows us to really be fullscreen (display
+       * over the taskbar for instance) but then we end-up with the same
+       * result as with the brute force method */
+      XSetTransientForHint( p_vout->p_sys->p_display,
+                            p_vout->p_sys->window, None );
+#endif
+  }
+  else
+  {
+      intf_WarnMsg( 3, "vout: leaving fullscreen mode" );
+      
+      mwmhints.flags = MWM_HINTS_DECORATIONS;
+      mwmhints.decorations = 1;
+
+      i_xpos = p_vout->p_sys->i_xpos_backup;
+      i_ypos = p_vout->p_sys->i_ypos_backup;
+      i_width = p_vout->p_sys->i_width_backup;
+      i_height = p_vout->p_sys->i_height_backup;
+  }
+
+  /* To my knowledge there are two ways to create a borderless window.
+   * There's the generic way which is to tell x to bypass the window manager,
+   * but this creates problems with the focus of other applications.
+   * The other way is to use the motif property "_MOTIF_WM_HINTS" which
+   * luckily seems to be supported by most window managers.
+   */
+  prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
+                      False );
+  XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
+                   prop, prop, 32, PropModeReplace,
+                   (unsigned char *)&mwmhints,
+                   PROP_MWM_HINTS_ELEMENTS );
+#if 0 /* brute force way to remove decorations */
+  XSetWindowAttributes attributes;
+  attributes.override_redirect = True;
+  XChangeWindowAttributes( p_vout->p_sys->p_display,
+                           p_vout->p_sys->window,
+                           CWOverrideRedirect,
+                           &attributes);
+#endif
+
+  /* We need to unmap and remap the window if we want the window 
+   * manager to take our changes into effect */
+  XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window);
+  XMapRaised( p_vout->p_sys->p_display, p_vout->p_sys->window);
+  XMoveResizeWindow( p_vout->p_sys->p_display,
+                     p_vout->p_sys->window,
+                     i_xpos,
+                     i_ypos,
+                     i_width,
+                     i_height );
+  XFlush( p_vout->p_sys->p_display );
+}
+
+/*****************************************************************************
  * EnableXScreenSaver: enable screen saver
  *****************************************************************************
- * This function enable the screen saver on a display after it had been
- * disabled by XDisableXScreenSaver. Both functions use a counter mechanism to
- * know wether the screen saver can be activated or not: if n successive calls
- * are made to XDisableXScreenSaver, n successive calls to XEnableXScreenSaver
- * will be required before the screen saver could effectively be activated.
+ * This function enables the screen saver on a display after it has been
+ * disabled by XDisableScreenSaver.
+ * FIXME: what happens if multiple vlc sessions are running at the same
+ *        time ???
  *****************************************************************************/
 static void EnableXScreenSaver( vout_thread_t *p_vout )
 {
+    int dummy;
+
     intf_DbgMsg( "vout: enabling screen saver" );
     XSetScreenSaver( p_vout->p_sys->p_display, p_vout->p_sys->i_ss_timeout,
                      p_vout->p_sys->i_ss_interval,
                      p_vout->p_sys->i_ss_blanking,
                      p_vout->p_sys->i_ss_exposure );
+
+    /* Restore DPMS settings */
+    if( DPMSQueryExtension( p_vout->p_sys->p_display, &dummy, &dummy ) )
+    {
+        if( p_vout->p_sys->b_ss_dpms )
+            DPMSEnable( p_vout->p_sys->p_display );
+    }
 }
 
 /*****************************************************************************
@@ -1315,6 +1416,8 @@ static void EnableXScreenSaver( vout_thread_t *p_vout )
  *****************************************************************************/
 static void DisableXScreenSaver( vout_thread_t *p_vout )
 {
+    int dummy;
+
     /* Save screen saver informations */
     XGetScreenSaver( p_vout->p_sys->p_display, &p_vout->p_sys->i_ss_timeout,
                      &p_vout->p_sys->i_ss_interval,
@@ -1328,9 +1431,16 @@ static void DisableXScreenSaver( vout_thread_t *p_vout )
                      p_vout->p_sys->i_ss_blanking,
                      p_vout->p_sys->i_ss_exposure );
 
-#ifdef MODULE_NAME_IS_xvideo
-    DPMSDisable( p_vout->p_sys->p_display );
-#endif
+    /* Disable DPMS */
+    if( DPMSQueryExtension( p_vout->p_sys->p_display, &dummy, &dummy ) )
+    {
+        CARD16 dummy;
+        /* Save DPMS current state */
+        DPMSInfo( p_vout->p_sys->p_display, &dummy,
+                  &p_vout->p_sys->b_ss_dpms );
+        intf_DbgMsg( "vout: disabling DPMS" );
+        DPMSDisable( p_vout->p_sys->p_display );
+   }
 }
 
 /*****************************************************************************
@@ -1347,9 +1457,11 @@ static void CreateCursor( vout_thread_t *p_vout )
 
     XParseColor( p_vout->p_sys->p_display,
                  XCreateColormap( p_vout->p_sys->p_display,
-                                  DefaultRootWindow( p_vout->p_sys->p_display ),
-                                  DefaultVisual( p_vout->p_sys->p_display,
-                                                 p_vout->p_sys->i_screen ),
+                                  DefaultRootWindow(
+                                                    p_vout->p_sys->p_display ),
+                                  DefaultVisual(
+                                                p_vout->p_sys->p_display,
+                                                p_vout->p_sys->i_screen ),
                                   AllocNone ),
                  "black", &cursor_color );
 
@@ -1371,9 +1483,8 @@ static void DestroyCursor( vout_thread_t *p_vout )
 /*****************************************************************************
  * ToggleCursor: hide or show the mouse pointer
  *****************************************************************************
- * This function hides the X pointer if it is visible by putting it at
- * coordinates (32,32) and setting the pointer sprite to a blank one. To
- * show it again, we disable the sprite and restore the original coordinates.
+ * This function hides the X pointer if it is visible by setting the pointer
+ * sprite to a blank one. To show it again, we disable the sprite.
  *****************************************************************************/
 static void ToggleCursor( vout_thread_t *p_vout )
 {
@@ -1452,16 +1563,16 @@ static int XVideoGetPort( Display *dpy, int i_id )
         /* If we requested an adaptor and it's not this one, we aren't
          * interested */
         if( i_requested_adaptor != -1 && i_adaptor != i_requested_adaptor )
-	{
+        {
             continue;
-	}
+        }
 
-	/* If the adaptor doesn't have the required properties, skip it */
+        /* If the adaptor doesn't have the required properties, skip it */
         if( !( p_adaptor[ i_adaptor ].type & XvInputMask ) ||
             !( p_adaptor[ i_adaptor ].type & XvImageMask ) )
         {
             continue;
-	}
+        }
 
         /* Check that port supports YUV12 planar format... */
         p_formats = XvListImageFormats( dpy, p_adaptor[i_adaptor].base_id,
@@ -1585,7 +1696,7 @@ static int XVideoGetPort( Display *dpy, int i_id )
  *****************************************************************************/
 static void XVideoReleasePort( Display *dpy, int i_port )
 {
-    XvGrabPort( dpy, i_port, CurrentTime );
+    XvUngrabPort( dpy, i_port, CurrentTime );
 }
 #endif
 
@@ -1750,11 +1861,7 @@ static IMAGE_TYPE * CreateShmImage( Display* p_display, EXTRA_ARGS_SHM,
     }
 
     /* Attach shared memory segment to X server */
-#ifdef MODULE_NAME_IS_xvideo
-    p_shm->readOnly = False; /* XXX: What's this ? */
-#else
-    p_shm->readOnly = True;
-#endif
+    p_shm->readOnly = True; /* the X server doesn't need to write to our shm */
     if( XShmAttach( p_display, p_shm ) == False )
     {
         intf_ErrMsg( "vout error: cannot attach shared memory to X server" );
