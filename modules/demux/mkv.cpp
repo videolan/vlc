@@ -1680,8 +1680,25 @@ static int Demux( demux_t *p_demux)
         if( p_sys->i_pts >= p_sys->i_start_pts  )
             UpdateCurrentToChapter( *p_demux );
         
+        if ( p_sys->editions.size() && p_sys->editions[p_sys->i_current_edition].b_ordered && p_sys->psz_current_chapter == NULL )
+        {
+            /* nothing left to read in this ordered edition */
+            return 0;
+        }
+
         if( BlockGet( p_demux, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
+            if ( p_sys->editions.size() && p_sys->editions[p_sys->i_current_edition].b_ordered )
+            {
+                // check if there are more chapters to read
+                if ( p_sys->psz_current_chapter != NULL )
+                {
+                    p_sys->i_pts = p_sys->psz_current_chapter->i_user_end_time;
+                    return 1;
+                }
+
+                return 0;
+            }
             msg_Warn( p_demux, "cannot get block EOF?" );
 
             return 0;
