@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.4 2001/03/21 13:42:33 sam Exp $
+ * $Id: VideoWindow.h,v 1.5 2001/08/14 12:09:03 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -53,6 +53,8 @@ public:
     // this is the hook controling direct screen connection
     int32                   i_bytes_per_pixel;
     int32                   i_screen_depth;
+    int32					i_width;
+    int32					i_height;
     struct vout_thread_s   *p_vout;
      
     int32           fRowBytes;
