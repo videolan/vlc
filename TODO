@@ -23,7 +23,7 @@ Description: Fix motion compensation bug
  The motion compensation still has a small bug which can be well
  noticed when there is a sudden color change, a few blocks remain
  visible on the screen.
-Status: Todo
+Status: Done 27 Aug 2000 (Meuuh)
 
 Task: 0x36
 Difficulty: Medium
