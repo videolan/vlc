@@ -999,6 +999,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         default:
             msg_Err( p_stream, "cannot add this stream (unsupported "
                      "codec:%4.4s)", (char*)&p_fmt->i_codec );
+            if( p_access )
+            {
+                sout_AccessOutDelete( p_access );
+            }
             free( id );
             return NULL;
     }
