@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.8 2002/07/09 23:40:34 lool Exp $
+$Id: FAQ,v 1.9 2002/07/10 07:32:43 lool Exp $
 
 1. Using VLC
 
@@ -197,3 +197,7 @@ Systems and completing the functionalities.
 3.3.2 Does VLC have dxr2 / dxr3 cards support ?
 ---------------------------------------------
 This support is currently being developed.
+
+3.3.3 Does VLC support RTP ?
+--------------------------
+No, but this is planned.
