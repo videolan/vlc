@@ -274,8 +274,13 @@ static int MixBuffer( aout_instance_t * p_aout )
                 /* Round to the nearest multiple */
                 i_nb_bytes /= p_aout->mixer.mixer.i_bytes_per_frame;
                 i_nb_bytes *= p_aout->mixer.mixer.i_bytes_per_frame;
-
-                if( i_nb_bytes < 0 ) break; /* FIXME: reset state properly */
+                if( i_nb_bytes < 0 )
+                {
+                    /* Is it really the best way to do it ? */
+                    aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
+                    aout_DateSet( &exact_start_date, 0 );
+                    break;
+                }
 
                 p_input->p_first_byte_to_mix = p_buffer->p_buffer + i_nb_bytes;
             }

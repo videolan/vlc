@@ -409,6 +409,36 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         return 0;
     }
 
+    /* If the audio drift is too big then it's not worth trying to resample
+     * the audio. */
+    if ( start_date != 0 &&
+         ( start_date < p_buffer->start_date - 3 * AOUT_PTS_TOLERANCE ) )
+    {
+        msg_Warn( p_aout, "audio drift is too big ("I64Fd"), clearing out",
+                  start_date - p_buffer->start_date );
+        vlc_mutex_lock( &p_aout->input_fifos_lock );
+        aout_FifoSet( p_aout, &p_input->fifo, 0 );
+        p_input->p_first_byte_to_mix = NULL;
+        vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
+            msg_Warn( p_aout, "timing screwed, stopping resampling" );
+        p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
+        if ( p_input->i_nb_resamplers != 0 )
+        {
+            p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
+            p_input->pp_resamplers[0]->b_continuity = VLC_FALSE;
+        }
+        start_date = 0;
+    }
+    else if ( start_date != 0 &&
+              ( start_date > p_buffer->start_date + 3 * AOUT_PTS_TOLERANCE ) )
+    {
+        msg_Warn( p_aout, "audio drift is too big ("I64Fd"), dropping buffer",
+                  start_date - p_buffer->start_date );
+        aout_BufferFree( p_buffer );
+        return 0;
+    }
+
     if ( start_date == 0 ) start_date = p_buffer->start_date;
 
     /* Run pre-filters. */
