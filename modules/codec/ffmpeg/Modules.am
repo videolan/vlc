@@ -6,5 +6,6 @@ SOURCES_ffmpeg = \
 	chroma.c \
 	encoder.c \
 	postprocess.c \
+	demux.c \
 	$(NULL)
 

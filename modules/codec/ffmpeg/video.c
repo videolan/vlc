@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.57 2003/12/02 10:55:21 gbazin Exp $
+ * $Id: video.c,v 1.58 2004/01/08 00:12:50 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -615,8 +615,9 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         /* we need to convert to I420 */
         switch( p_sys->p_context->pix_fmt )
         {
-        case( PIX_FMT_YUV410P ):
-        case( PIX_FMT_YUV411P ):
+        case PIX_FMT_YUV410P:
+        case PIX_FMT_YUV411P:
+        case PIX_FMT_PAL8:
             for( i = 0; i < p_pic->i_planes; i++ )
             {
                 dest_pic.data[i] = p_pic->p[i].p_pixels;

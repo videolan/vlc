@@ -2,7 +2,7 @@
  * ffmpeg.h: decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.30 2003/11/26 22:12:48 gbazin Exp $
+ * $Id: ffmpeg.h,v 1.31 2004/01/08 00:12:50 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -35,7 +35,8 @@ struct AVCodecContext;
 struct AVCodec;
 
 void E_(InitLibavcodec)( vlc_object_t * );
-int E_(GetFfmpegCodec)( vlc_fourcc_t, int *, int *, char ** );
+int E_(GetFfmpegCodec) ( vlc_fourcc_t, int *, int *, char ** );
+int E_(GetVlcFourcc)   ( int, int *, vlc_fourcc_t *, char ** );
 int E_(GetFfmpegChroma)( vlc_fourcc_t );
 
 /* Video decoder module */
@@ -61,6 +62,10 @@ void E_(CloseEncoder)( vlc_object_t * );
 /* Audio encoder module */
 int  E_(OpenAudioEncoder) ( vlc_object_t * );
 void E_(CloseAudioEncoder)( vlc_object_t * );
+
+/* Demux module */
+int  E_(OpenDemux) ( vlc_object_t * );
+void E_(CloseDemux)( vlc_object_t * );
 
 /* Postprocessing module */
 void *E_(OpenPostproc)( decoder_t *, vlc_bool_t * );

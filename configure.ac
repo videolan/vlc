@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.145 2004/01/05 17:42:36 gbazin Exp $
+dnl $Id: configure.ac,v 1.146 2004/01/08 00:12:50 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -1746,7 +1746,7 @@ AC_CHECK_HEADERS(id3tag.h, [
     AX_ADD_PLUGINS([id3tag])]) ])
 
 dnl
-dnl  ffmpeg decoder plugin
+dnl  ffmpeg decoder/demuxer plugin
 dnl
 AC_ARG_ENABLE(ffmpeg,
 [  --enable-ffmpeg         ffmpeg codec (default enabled)])
@@ -1785,6 +1785,10 @@ then
       dnl       linker would miserably barf on multiple definitions.
       AX_ADD_LDFLAGS([stream_out_transcode],[]) ],
        [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ])
+    AC_CHECK_LIB(avformat, av_open_input_stream, [
+      AC_DEFINE(HAVE_LIBAVFORMAT, 1,
+      [Define if you have ffmpeg's libavformat.])
+      AX_ADD_LDFLAGS([ffmpeg],[-lavformat -lz]) ])
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
   fi
@@ -1806,6 +1810,13 @@ then
       AX_ADD_BUILTINS([ffmpeg stream_out_transcode])
       AX_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec -lavcodec])
       AX_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavcodec])
+
+      if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
+        AC_DEFINE(HAVE_LIBAVFORMAT, 1,
+        [Define if you have ffmpeg's libavformat.])
+        AX_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavformat -lavformat -lz])
+        AX_ADD_CPPFLAGS([ffmpeg],[-I${real_ffmpeg_tree}/libavformat])
+      fi
 
       dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
       dnl       linker would miserably barf on multiple definitions.

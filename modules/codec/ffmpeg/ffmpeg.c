@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.68 2003/12/16 12:38:18 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.69 2004/01/08 00:12:50 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -108,6 +108,11 @@ vlc_module_begin();
     set_description( _("ffmpeg audio/video encoder") );
     set_capability( "encoder", 100 );
     set_callbacks( E_(OpenEncoder), E_(CloseEncoder) );
+
+    /* demux submodule */
+    set_description( _("ffmpeg demuxer" ) );
+    set_capability( "demux2", 1 );
+    set_callbacks( E_(OpenDemux), E_(CloseDemux) );
 
     var_Create( p_module->p_libvlc, "avcodec", VLC_VAR_MUTEX );
 vlc_module_end();
@@ -219,429 +224,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * local Functions
  *****************************************************************************/
-int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
-                        int *pi_ffmpeg_codec, char **ppsz_name )
-{
-    int i_cat;
-    int i_codec;
-    char *psz_name;
-
-    switch( i_fourcc )
-    {
-
-    /*
-     *  Video Codecs
-     */
-
-    /* MPEG-1 Video */
-    case VLC_FOURCC('m','p','1','v'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_MPEG1VIDEO;
-        psz_name = "MPEG-1 Video";
-        break;
-
-    /* MPEG-2 Video */
-    case VLC_FOURCC('m','p','2','v'):
-    case VLC_FOURCC('m','p','g','v'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_MPEG2VIDEO;
-        psz_name = "MPEG-2 Video";
-        break;
-
-    /* MPEG-4 Video */
-    case VLC_FOURCC('D','I','V','X'):
-    case VLC_FOURCC('d','i','v','x'):
-    case VLC_FOURCC('M','P','4','S'):
-    case VLC_FOURCC('m','p','4','s'):
-    case VLC_FOURCC('M','4','S','2'):
-    case VLC_FOURCC('m','4','s','2'):
-    case VLC_FOURCC('x','v','i','d'):
-    case VLC_FOURCC('X','V','I','D'):
-    case VLC_FOURCC('X','v','i','D'):
-    case VLC_FOURCC('D','X','5','0'):
-    case VLC_FOURCC('d','x','5','0'):
-    case VLC_FOURCC('m','p','4','v'):
-    case VLC_FOURCC( 4,  0,  0,  0 ):
-    case VLC_FOURCC('m','4','c','c'):
-    case VLC_FOURCC('M','4','C','C'):
-    /* 3ivx delta 3.5 Unsupported
-     * putting it here gives extreme distorted images
-    case VLC_FOURCC('3','I','V','1'):
-    case VLC_FOURCC('3','i','v','1'): */
-    /* 3ivx delta 4 */
-    case VLC_FOURCC('3','I','V','2'):
-    case VLC_FOURCC('3','i','v','2'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_MPEG4;
-        psz_name = "MPEG-4";
-        break;
-
-    /* MSMPEG4 v1 */
-    case VLC_FOURCC('D','I','V','1'):
-    case VLC_FOURCC('d','i','v','1'):
-    case VLC_FOURCC('M','P','G','4'):
-    case VLC_FOURCC('m','p','g','4'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_MSMPEG4V1;
-        psz_name = "MS MPEG-4 v1";
-        break;
-
-    /* MSMPEG4 v2 */
-    case VLC_FOURCC('D','I','V','2'):
-    case VLC_FOURCC('d','i','v','2'):
-    case VLC_FOURCC('M','P','4','2'):
-    case VLC_FOURCC('m','p','4','2'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_MSMPEG4V2;
-        psz_name = "MS MPEG-4 v2";
-        break;
-
-    /* MSMPEG4 v3 / M$ mpeg4 v3 */
-    case VLC_FOURCC('M','P','G','3'):
-    case VLC_FOURCC('m','p','g','3'):
-    case VLC_FOURCC('d','i','v','3'):
-    case VLC_FOURCC('M','P','4','3'):
-    case VLC_FOURCC('m','p','4','3'):
-    /* DivX 3.20 */
-    case VLC_FOURCC('D','I','V','3'):
-    case VLC_FOURCC('D','I','V','4'):
-    case VLC_FOURCC('d','i','v','4'):
-    case VLC_FOURCC('D','I','V','5'):
-    case VLC_FOURCC('d','i','v','5'):
-    case VLC_FOURCC('D','I','V','6'):
-    case VLC_FOURCC('d','i','v','6'):
-    /* AngelPotion stuff */
-    case VLC_FOURCC('A','P','4','1'):
-    /* 3ivx doctered divx files */
-    case VLC_FOURCC('3','I','V','D'):
-    case VLC_FOURCC('3','i','v','d'):
-    /* who knows? */
-    case VLC_FOURCC('3','V','I','D'):
-    case VLC_FOURCC('3','v','i','d'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_MSMPEG4V3;
-        psz_name = "MS MPEG-4 v3";
-        break;
-
-    /* Sorenson v1 */
-    case VLC_FOURCC('S','V','Q','1'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_SVQ1;
-        psz_name = "SVQ-1 (Sorenson Video v1)";
-        break;
-
-    /* Sorenson v3 */
-    case VLC_FOURCC('S','V','Q','3'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_SVQ3;
-        psz_name = "SVQ-3 (Sorenson Video v3)";
-        break;
-
-    /* h264 */
-    case VLC_FOURCC('h','2','6','4'):
-    case VLC_FOURCC('H','2','6','4'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_H264;
-        psz_name = "h264";
-        break;
-
-/* H263 and H263i */
-/* H263(+) is also known as Real Video 1.0 */
-
-/* FIXME FOURCC_H263P exist but what fourcc ? */
-
-    /* H263 */
-    case VLC_FOURCC('H','2','6','3'):
-    case VLC_FOURCC('h','2','6','3'):
-    case VLC_FOURCC('U','2','6','3'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_H263;
-        psz_name = "H263";
-        break;
-
-    /* H263i */
-    case VLC_FOURCC('I','2','6','3'):
-    case VLC_FOURCC('i','2','6','3'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_H263I;
-        psz_name = "I263.I";
-        break;
-
-    /* Flash (H263) variant */
-    case VLC_FOURCC('F','L','V','1'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_FLV1;
-        psz_name = "Flash Video";
-        break;
-
-    /* MJPEG */
-    case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
-    case VLC_FOURCC( 'm', 'j', 'p', 'g' ):
-    case VLC_FOURCC( 'm', 'j', 'p', 'a' ): /* for mov file */
-    case VLC_FOURCC( 'j', 'p', 'e', 'g' ):
-    case VLC_FOURCC( 'J', 'P', 'E', 'G' ):
-    case VLC_FOURCC( 'J', 'F', 'I', 'F' ):
-    case VLC_FOURCC( 'J', 'P', 'G', 'L' ):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_MJPEG;
-        psz_name = "Motion JPEG";
-        break;
-    case VLC_FOURCC( 'm', 'j', 'p', 'b' ): /* for mov file */
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_MJPEGB;
-        psz_name = "Motion JPEG B";
-        break;
-
-    /* DV */
-    case VLC_FOURCC('d','v','s','l'):
-    case VLC_FOURCC('d','v','s','d'):
-    case VLC_FOURCC('D','V','S','D'):
-    case VLC_FOURCC('d','v','h','d'):
-    case VLC_FOURCC('d','v','c',' '):
-    case VLC_FOURCC('d','v','p',' '):
-    case VLC_FOURCC('C','D','V','C'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_DVVIDEO;
-        psz_name = "DV video";
-        break;
-
-    /* Windows Media Video */
-    case VLC_FOURCC('W','M','V','1'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_WMV1;
-        psz_name ="Windows Media Video 1";
-        break;
-    case VLC_FOURCC('W','M','V','2'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_WMV2;
-        psz_name ="Windows Media Video 2";
-        break;
-
-#if LIBAVCODEC_BUILD >= 4683
-    /* Microsoft Video 1 */
-    case VLC_FOURCC('M','S','V','C'):
-    case VLC_FOURCC('m','s','v','c'):
-    case VLC_FOURCC('C','R','A','M'):
-    case VLC_FOURCC('c','r','a','m'):
-    case VLC_FOURCC('W','H','A','M'):
-    case VLC_FOURCC('w','h','a','m'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_MSVIDEO1;
-        psz_name = "Microsoft Video 1";
-        break;
-
-    /* Microsoft RLE */
-    case VLC_FOURCC('m','r','l','e'):
-    case VLC_FOURCC(0x1,0x0,0x0,0x0):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_MSRLE;
-        psz_name = "Microsoft RLE";
-        break;
-#endif
-
-#if( !defined( WORDS_BIGENDIAN ) )
-    /* Indeo Video Codecs (Quality of this decoder on ppc is not good) */
-    case VLC_FOURCC('I','V','3','1'):
-    case VLC_FOURCC('i','v','3','1'):
-    case VLC_FOURCC('I','V','3','2'):
-    case VLC_FOURCC('i','v','3','2'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_INDEO3;
-        psz_name = "Indeo v3";
-        break;
-#endif
-
-    /* Huff YUV */
-    case VLC_FOURCC('H','F','Y','U'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_HUFFYUV;
-        psz_name ="Huff YUV";
-        break;
-
-    /* Creative YUV */
-    case VLC_FOURCC('C','Y','U','V'):
-        i_cat = VIDEO_ES;
-        i_codec = CODEC_ID_CYUV;
-        psz_name ="Creative YUV";
-        break;
-
-    /* On2 VP3 Video Codecs */
-    case VLC_FOURCC('V','P','3','1'):
-    case VLC_FOURCC('v','p','3','1'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_VP3;
-        psz_name = "On2's VP3 Video";
-        break;
-
-#if LIBAVCODEC_BUILD >= 4685
-    /* Xiph.org theora */
-    case VLC_FOURCC('t','h','e','o'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_THEORA;
-        psz_name = "Xiph.org's Theora Video";
-        break;
-#endif
-
-#if ( !defined( WORDS_BIGENDIAN ) )
-    /* Asus Video (Another thing that doesn't work on PPC) */
-    case VLC_FOURCC('A','S','V','1'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_ASV1;
-        psz_name = "Asus V1";
-        break;
-    case VLC_FOURCC('A','S','V','2'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_ASV2;
-        psz_name = "Asus V2";
-        break;
-#endif
-
-    /* FFMPEG Video 1 (lossless codec) */
-    case VLC_FOURCC('F','F','V','1'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_FFV1;
-        psz_name = "FFMpeg Video 1";
-        break;
-
-    /* ATI VCR1 */
-    case VLC_FOURCC('V','C','R','1'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_VCR1;
-        psz_name = "ATI VCR1";
-        break;
-
-    /* Cirrus Logic AccuPak */
-    case VLC_FOURCC('C','L','J','R'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_CLJR;
-        psz_name = "Creative Logic AccuPak";
-        break;
-
-    case VLC_FOURCC('R','V','1','0'):
-    case VLC_FOURCC('R','V','1','3'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_RV10;
-        psz_name = "Real video";
-        break;
-
-#if LIBAVCODEC_BUILD >= 4683
-    /* Apple Video */
-    case VLC_FOURCC('r','p','z','a'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_RPZA;
-        psz_name = "Apple Video";
-        break;
-#endif
-
-#if LIBAVCODEC_BUILD >= 4683
-    /* Cinepak */
-    case VLC_FOURCC('c','v','i','d'):
-        i_cat    = VIDEO_ES;
-        i_codec  = CODEC_ID_CINEPAK;
-        psz_name = "Cinepak";
-        break;
-#endif
-
-    /*
-     *  Audio Codecs
-     */
-
-    /* Windows Media Audio 1 */
-    case VLC_FOURCC('W','M','A','1'):
-    case VLC_FOURCC('w','m','a','1'):
-        i_cat = AUDIO_ES;
-        i_codec = CODEC_ID_WMAV1;
-        psz_name ="Windows Media Audio 1";
-        break;
-
-    /* Windows Media Audio 2 */
-    case VLC_FOURCC('W','M','A','2'):
-    case VLC_FOURCC('w','m','a','2'):
-        i_cat = AUDIO_ES;
-        i_codec = CODEC_ID_WMAV2;
-        psz_name ="Windows Media Audio 2";
-        break;
-
-    /* DV Audio */
-    case VLC_FOURCC('d','v','a','u'):
-        i_cat = AUDIO_ES;
-        i_codec = CODEC_ID_DVAUDIO;
-        psz_name = "DV audio";
-        break;
-
-    /* MACE-3 Audio */
-    case VLC_FOURCC('M','A','C','3'):
-        i_cat = AUDIO_ES;
-        i_codec = CODEC_ID_MACE3;
-        psz_name = "MACE-3 audio";
-        break;
-
-    /* MACE-6 Audio */
-    case VLC_FOURCC('M','A','C','6'):
-        i_cat = AUDIO_ES;
-        i_codec = CODEC_ID_MACE6;
-        psz_name = "MACE-6 audio";
-        break;
-
-    /* RealAudio 1.0 */
-    case VLC_FOURCC('1','4','_','4'):
-        i_cat    = AUDIO_ES;
-        i_codec  = CODEC_ID_RA_144;
-        psz_name = "RealAudio 1.0";
-        break;
-
-    /* RealAudio 2.0 */
-    case VLC_FOURCC('2','8','_','8'):
-        i_cat    = AUDIO_ES;
-        i_codec  = CODEC_ID_RA_288;
-        psz_name = "RealAudio 2.0";
-        break;
-
-    /* MPEG Audio layer 1/2/3 */
-    case VLC_FOURCC('m','p','g','a'):
-        i_cat    = AUDIO_ES;
-        i_codec  = CODEC_ID_MP2;
-        psz_name = "MPEG Audio layer 1/2";
-        break;
-    case VLC_FOURCC('m','p','3',' '):
-        i_cat    = AUDIO_ES;
-        i_codec  = CODEC_ID_MP3;
-        psz_name = "MPEG Audio layer 1/2/3";
-        break;
-
-    /* A52 Audio (aka AC3) */
-    case VLC_FOURCC('a','5','2',' '):
-    case VLC_FOURCC('a','5','2','b'): /* VLC specific hack */
-        i_cat    = AUDIO_ES;
-        i_codec  = CODEC_ID_AC3;
-        psz_name = "A52 Audio (aka AC3)";
-        break;
-
-    /* AAC audio */
-    case VLC_FOURCC('m','p','4','a'):
-        i_cat    = AUDIO_ES;
-        i_codec  = CODEC_ID_AAC;
-        psz_name = "MPEG AAC Audio";
-        break;
-
-    default:
-        i_cat = UNKNOWN_ES;
-        i_codec = CODEC_ID_NONE;
-        psz_name = NULL;
-        break;
-    }
-
-    if( i_codec != CODEC_ID_NONE )
-    {
-        if( pi_cat ) *pi_cat = i_cat;
-        if( pi_ffmpeg_codec ) *pi_ffmpeg_codec = i_codec;
-        if( ppsz_name ) *ppsz_name = psz_name;
-        return VLC_TRUE;
-    }
-
-    return VLC_FALSE;
-}
-
 int E_(GetFfmpegChroma)( vlc_fourcc_t i_chroma )
 {
     switch( i_chroma )
@@ -693,4 +275,414 @@ void E_(InitLibavcodec)( vlc_object_t *p_object )
     }
 
     vlc_mutex_unlock( lockval.p_address );
+}
+
+
+static struct
+{
+    vlc_fourcc_t  i_fourcc;
+    int  i_codec;
+    int  i_cat;
+    char *psz_name;
+
+} codecs_table[] =
+{
+    /* MPEG-1 Video */
+    { VLC_FOURCC('m','p','1','v'), CODEC_ID_MPEG1VIDEO,
+      VIDEO_ES, "MPEG-1 Video" },
+
+    /* MPEG-2 Video */
+    { VLC_FOURCC('m','p','2','v'), CODEC_ID_MPEG2VIDEO,
+      VIDEO_ES, "MPEG-2 Video" },
+    { VLC_FOURCC('m','p','g','v'), CODEC_ID_MPEG2VIDEO,
+      VIDEO_ES, "MPEG-2 Video" },
+
+    /* MPEG-4 Video */
+    { VLC_FOURCC('D','I','V','X'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('d','i','v','x'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('M','P','4','S'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('m','p','4','s'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('M','4','S','2'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('m','4','s','2'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('x','v','i','d'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('X','V','I','D'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('X','v','i','D'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('D','X','5','0'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('d','x','5','0'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('m','p','4','v'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC( 4,  0,  0,  0 ), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('m','4','c','c'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('M','4','C','C'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    /* 3ivx delta 3.5 Unsupported
+     * putting it here gives extreme distorted images
+    { VLC_FOURCC('3','I','V','1'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('3','i','v','1'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" }, */
+    /* 3ivx delta 4 */
+    { VLC_FOURCC('3','I','V','2'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+    { VLC_FOURCC('3','i','v','2'), CODEC_ID_MPEG4,
+      VIDEO_ES, "MPEG-4 Video" },
+
+    /* MSMPEG4 v1 */
+    { VLC_FOURCC('D','I','V','1'), CODEC_ID_MSMPEG4V1,
+      VIDEO_ES, "MS MPEG-4 Video v1" },
+    { VLC_FOURCC('d','i','v','1'), CODEC_ID_MSMPEG4V1,
+      VIDEO_ES, "MS MPEG-4 Video v1" },
+    { VLC_FOURCC('M','P','G','4'), CODEC_ID_MSMPEG4V1,
+      VIDEO_ES, "MS MPEG-4 Video v1" },
+    { VLC_FOURCC('m','p','g','4'), CODEC_ID_MSMPEG4V1,
+      VIDEO_ES, "MS MPEG-4 Video v1" },
+
+    /* MSMPEG4 v2 */
+    { VLC_FOURCC('D','I','V','2'), CODEC_ID_MSMPEG4V2,
+      VIDEO_ES, "MS MPEG-4 Video v2" },
+    { VLC_FOURCC('d','i','v','2'), CODEC_ID_MSMPEG4V2,
+      VIDEO_ES, "MS MPEG-4 Video v2" },
+    { VLC_FOURCC('M','P','4','2'), CODEC_ID_MSMPEG4V2,
+      VIDEO_ES, "MS MPEG-4 Video v2" },
+    { VLC_FOURCC('m','p','4','2'), CODEC_ID_MSMPEG4V2,
+      VIDEO_ES, "MS MPEG-4 Video v2" },
+
+    /* MSMPEG4 v3 / M$ mpeg4 v3 */
+    { VLC_FOURCC('M','P','G','3'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('m','p','g','3'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('d','i','v','3'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('M','P','4','3'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('m','p','4','3'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    /* DivX 3.20 */
+    { VLC_FOURCC('D','I','V','3'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('D','I','V','4'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('d','i','v','4'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('D','I','V','5'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('d','i','v','5'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('D','I','V','6'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('d','i','v','6'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    /* AngelPotion stuff */
+    { VLC_FOURCC('A','P','4','1'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    /* 3ivx doctered divx files */
+    { VLC_FOURCC('3','I','V','D'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('3','i','v','d'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    /* who knows? */
+    { VLC_FOURCC('3','V','I','D'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+    { VLC_FOURCC('3','v','i','d'), CODEC_ID_MSMPEG4V3,
+      VIDEO_ES, "MS MPEG-4 Video v3" },
+
+    /* Sorenson v1 */
+    { VLC_FOURCC('S','V','Q','1'), CODEC_ID_SVQ1,
+      VIDEO_ES, "SVQ-1 (Sorenson Video v1)" },
+
+    /* Sorenson v3 */
+    { VLC_FOURCC('S','V','Q','3'), CODEC_ID_SVQ3,
+      VIDEO_ES, "SVQ-3 (Sorenson Video v3)" },
+
+    /* h264 */
+    { VLC_FOURCC('h','2','6','4'), CODEC_ID_H264,
+      VIDEO_ES, "h264" },
+    { VLC_FOURCC('H','2','6','4'), CODEC_ID_H264,
+      VIDEO_ES, "h264" },
+
+/* H263 and H263i */
+/* H263(+) is also known as Real Video 1.0 */
+
+/* FIXME FOURCC_H263P exist but what fourcc ? */
+
+    /* H263 */
+    { VLC_FOURCC('H','2','6','3'), CODEC_ID_H263,
+      VIDEO_ES, "H263" },
+    { VLC_FOURCC('h','2','6','3'), CODEC_ID_H263,
+      VIDEO_ES, "H263" },
+    { VLC_FOURCC('U','2','6','3'), CODEC_ID_H263,
+      VIDEO_ES, "H263" },
+
+    /* H263i */
+    { VLC_FOURCC('I','2','6','3'), CODEC_ID_H263I,
+      VIDEO_ES, "I263.I" },
+    { VLC_FOURCC('i','2','6','3'), CODEC_ID_H263I,
+      VIDEO_ES, "I263.I" },
+
+    /* Flash (H263) variant */
+    { VLC_FOURCC('F','L','V','1'), CODEC_ID_FLV1,
+      VIDEO_ES, "Flash Video" },
+
+    /* Flash (H263) variant */
+    { VLC_FOURCC('F','L','I','C'), CODEC_ID_FLIC,
+      VIDEO_ES, "Flic Video" },
+
+    /* MJPEG */
+    { VLC_FOURCC( 'M', 'J', 'P', 'G' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Motion JPEG Video" },
+    { VLC_FOURCC( 'm', 'j', 'p', 'g' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Motion JPEG Video" },
+    { VLC_FOURCC( 'm', 'j', 'p', 'a' ), CODEC_ID_MJPEG, /* for mov file */
+      VIDEO_ES, "Motion JPEG Video" },
+    { VLC_FOURCC( 'j', 'p', 'e', 'g' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Motion JPEG Video" },
+    { VLC_FOURCC( 'J', 'P', 'E', 'G' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Motion JPEG Video" },
+    { VLC_FOURCC( 'J', 'F', 'I', 'F' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Motion JPEG Video" },
+    { VLC_FOURCC( 'J', 'P', 'G', 'L' ), CODEC_ID_MJPEG,
+      VIDEO_ES, "Motion JPEG Video" },
+
+    { VLC_FOURCC( 'm', 'j', 'p', 'b' ), CODEC_ID_MJPEGB, /* for mov file */
+      VIDEO_ES, "Motion JPEG B Video" },
+
+    /* DV */
+    { VLC_FOURCC('d','v','s','l'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','s','d'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('D','V','S','D'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','h','d'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','c',' '), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('d','v','p',' '), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+    { VLC_FOURCC('C','D','V','C'), CODEC_ID_DVVIDEO,
+      VIDEO_ES, "DV Video" },
+
+    /* Windows Media Video */
+    { VLC_FOURCC('W','M','V','1'), CODEC_ID_WMV1,
+      VIDEO_ES, "Windows Media Video 1" },
+    { VLC_FOURCC('W','M','V','2'), CODEC_ID_WMV2,
+      VIDEO_ES, "Windows Media Video 2" },
+
+#if LIBAVCODEC_BUILD >= 4683
+    /* Microsoft Video 1 */
+    { VLC_FOURCC('M','S','V','C'), CODEC_ID_MSVIDEO1,
+      VIDEO_ES, "Microsoft Video 1" },
+    { VLC_FOURCC('m','s','v','c'), CODEC_ID_MSVIDEO1,
+      VIDEO_ES, "Microsoft Video 1" },
+    { VLC_FOURCC('C','R','A','M'), CODEC_ID_MSVIDEO1,
+      VIDEO_ES, "Microsoft Video 1" },
+    { VLC_FOURCC('c','r','a','m'), CODEC_ID_MSVIDEO1,
+      VIDEO_ES, "Microsoft Video 1" },
+    { VLC_FOURCC('W','H','A','M'), CODEC_ID_MSVIDEO1,
+      VIDEO_ES, "Microsoft Video 1" },
+    { VLC_FOURCC('w','h','a','m'), CODEC_ID_MSVIDEO1,
+      VIDEO_ES, "Microsoft Video 1" },
+
+    /* Microsoft RLE */
+    { VLC_FOURCC('m','r','l','e'), CODEC_ID_MSRLE,
+      VIDEO_ES, "Microsoft RLE Video" },
+    { VLC_FOURCC(0x1,0x0,0x0,0x0), CODEC_ID_MSRLE,
+      VIDEO_ES, "Microsoft RLE Video" },
+#endif
+
+#if( !defined( WORDS_BIGENDIAN ) )
+    /* Indeo Video Codecs (Quality of this decoder on ppc is not good) */
+    { VLC_FOURCC('I','V','3','1'), CODEC_ID_INDEO3,
+      VIDEO_ES, "Indeo Video v3" },
+    { VLC_FOURCC('i','v','3','1'), CODEC_ID_INDEO3,
+      VIDEO_ES, "Indeo Video v3" },
+    { VLC_FOURCC('I','V','3','2'), CODEC_ID_INDEO3,
+      VIDEO_ES, "Indeo Video v3" },
+    { VLC_FOURCC('i','v','3','2'), CODEC_ID_INDEO3,
+      VIDEO_ES, "Indeo Video v3" },
+#endif
+
+    /* Huff YUV */
+    { VLC_FOURCC('H','F','Y','U'), CODEC_ID_HUFFYUV,
+      VIDEO_ES, "Huff YUV Video" },
+
+    /* Creative YUV */
+    { VLC_FOURCC('C','Y','U','V'), CODEC_ID_CYUV,
+      VIDEO_ES, "Creative YUV Video" },
+
+    /* On2 VP3 Video Codecs */
+    { VLC_FOURCC('V','P','3','1'), CODEC_ID_VP3,
+      VIDEO_ES, "On2's VP3 Video" },
+    { VLC_FOURCC('v','p','3','1'), CODEC_ID_VP3,
+      VIDEO_ES, "On2's VP3 Video" },
+
+#if LIBAVCODEC_BUILD >= 4685
+    /* Xiph.org theora */
+    { VLC_FOURCC('t','h','e','o'), CODEC_ID_THEORA,
+      VIDEO_ES, "Xiph.org's Theora Video" },
+#endif
+
+#if ( !defined( WORDS_BIGENDIAN ) )
+    /* Asus Video (Another thing that doesn't work on PPC) */
+    { VLC_FOURCC('A','S','V','1'), CODEC_ID_ASV1,
+      VIDEO_ES, "Asus V1 Video" },
+    { VLC_FOURCC('A','S','V','2'), CODEC_ID_ASV2,
+      VIDEO_ES, "Asus V2 Video" },
+#endif
+
+    /* FFMPEG Video 1 (lossless codec) */
+    { VLC_FOURCC('F','F','V','1'), CODEC_ID_FFV1,
+      VIDEO_ES, "FFMpeg Video 1" },
+
+    /* ATI VCR1 */
+    { VLC_FOURCC('V','C','R','1'), CODEC_ID_VCR1,
+      VIDEO_ES, "ATI VCR1 Video" },
+
+    /* Cirrus Logic AccuPak */
+    { VLC_FOURCC('C','L','J','R'), CODEC_ID_CLJR,
+      VIDEO_ES, "Creative Logic AccuPak" },
+
+    /* Real Video */
+    { VLC_FOURCC('R','V','1','0'), CODEC_ID_RV10,
+      VIDEO_ES, "Real Video 10" },
+    { VLC_FOURCC('R','V','1','3'), CODEC_ID_RV10,
+      VIDEO_ES, "Real Video 13" },
+
+#if LIBAVCODEC_BUILD >= 4683
+    /* Apple Video */
+    { VLC_FOURCC('r','p','z','a'), CODEC_ID_RPZA,
+      VIDEO_ES, "Apple Video" },
+#endif
+
+#if LIBAVCODEC_BUILD >= 4683
+    /* Cinepak */
+    { VLC_FOURCC('c','v','i','d'), CODEC_ID_CINEPAK,
+      VIDEO_ES, "Cinepak Video" },
+#endif
+
+    /*
+     *  Audio Codecs
+     */
+
+    /* Windows Media Audio 1 */
+    { VLC_FOURCC('W','M','A','1'), CODEC_ID_WMAV1,
+      AUDIO_ES, "Windows Media Audio 1" },
+    { VLC_FOURCC('w','m','a','1'), CODEC_ID_WMAV1,
+      AUDIO_ES, "Windows Media Audio 1" },
+
+    /* Windows Media Audio 2 */
+    { VLC_FOURCC('W','M','A','2'), CODEC_ID_WMAV2,
+      AUDIO_ES, "Windows Media Audio 2" },
+    { VLC_FOURCC('w','m','a','2'), CODEC_ID_WMAV2,
+      AUDIO_ES, "Windows Media Audio 2" },
+
+    /* DV Audio */
+    { VLC_FOURCC('d','v','a','u'), CODEC_ID_DVAUDIO,
+      AUDIO_ES, "DV Audio" },
+
+    /* MACE-3 Audio */
+    { VLC_FOURCC('M','A','C','3'), CODEC_ID_MACE3,
+      AUDIO_ES, "MACE-3 Audio" },
+
+    /* MACE-6 Audio */
+    { VLC_FOURCC('M','A','C','6'), CODEC_ID_MACE6,
+      AUDIO_ES, "MACE-6 Audio" },
+
+    /* RealAudio 1.0 */
+    { VLC_FOURCC('1','4','_','4'), CODEC_ID_RA_144,
+      AUDIO_ES, "RealAudio 1.0" },
+
+    /* RealAudio 2.0 */
+    { VLC_FOURCC('2','8','_','8'), CODEC_ID_RA_288,
+      AUDIO_ES, "RealAudio 2.0" },
+
+    /* MPEG Audio layer 1/2/3 */
+    { VLC_FOURCC('m','p','g','a'), CODEC_ID_MP2,
+      AUDIO_ES, "MPEG Audio layer 1/2" },
+    { VLC_FOURCC('m','p','3',' '), CODEC_ID_MP3,
+      AUDIO_ES, "MPEG Audio layer 1/2/3" },
+
+    /* A52 Audio (aka AC3) */
+    { VLC_FOURCC('a','5','2',' '), CODEC_ID_AC3,
+      AUDIO_ES, "A52 Audio (aka AC3)" },
+    { VLC_FOURCC('a','5','2','b'), CODEC_ID_AC3, /* VLC specific hack */
+      AUDIO_ES, "A52 Audio (aka AC3)" },
+
+    /* AAC audio */
+    { VLC_FOURCC('m','p','4','a'), CODEC_ID_AAC,
+      AUDIO_ES, "MPEG AAC Audio" },
+
+#if 0
+    /* PCM */
+    { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
+      AUDIO_ES, "PCM S8" },
+    { VLC_FOURCC('u','8',' ',' '), CODEC_ID_PCM_U8,
+      AUDIO_ES, "PCM U8" },
+    { VLC_FOURCC('s','1','6','l'), CODEC_ID_PCM_S16LE,
+      AUDIO_ES, "PCM S16 LE" },
+    { VLC_FOURCC('s','1','6','b'), CODEC_ID_PCM_S16BE,
+      AUDIO_ES, "PCM S16 BE" },
+    { VLC_FOURCC('u','1','6','l'), CODEC_ID_PCM_U16LE,
+      AUDIO_ES, "PCM U16 LE" },
+    { VLC_FOURCC('u','1','6','b'), CODEC_ID_PCM_U16BE,
+      AUDIO_ES, "PCM U16 BE" },
+    { VLC_FOURCC('a','l','a','w'), CODEC_ID_PCM_ALAW,
+      AUDIO_ES, "PCM ALAW" },
+    { VLC_FOURCC('u','l','a','w'), CODEC_ID_PCM_MULAW,
+      AUDIO_ES, "PCM ULAW" },
+#endif
+
+    {0}
+};
+
+int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
+                        int *pi_ffmpeg_codec, char **ppsz_name )
+{
+    int i;
+
+    for( i = 0; codecs_table[i].i_fourcc != 0; i++ )
+    {
+        if( codecs_table[i].i_fourcc == i_fourcc )
+        {
+            if( pi_cat ) *pi_cat = codecs_table[i].i_cat;
+            if( pi_ffmpeg_codec ) *pi_ffmpeg_codec = codecs_table[i].i_codec;
+            if( ppsz_name ) *ppsz_name = codecs_table[i].psz_name;
+
+            return VLC_TRUE;
+        }
+    }
+    return VLC_FALSE;
+}
+
+int E_(GetVlcFourcc)( int i_ffmpeg_codec, int *pi_cat,
+                      vlc_fourcc_t *pi_fourcc, char **ppsz_name )
+{
+    int i;
+
+    for( i = 0; codecs_table[i].i_codec != 0; i++ )
+    {
+        if( codecs_table[i].i_codec == i_ffmpeg_codec )
+        {
+            if( pi_cat ) *pi_cat = codecs_table[i].i_cat;
+            if( pi_fourcc ) *pi_fourcc = codecs_table[i].i_fourcc;
+            if( ppsz_name ) *ppsz_name = codecs_table[i].psz_name;
+
+            return VLC_TRUE;
+        }
+    }
+    return VLC_FALSE;
 }
