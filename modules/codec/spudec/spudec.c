@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.7 2002/11/06 18:07:57 sam Exp $
+ * $Id: spudec.c,v 1.8 2002/11/06 21:48:24 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,14 +31,6 @@
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>                                           /* getpid() */
-#endif
-
-#ifdef WIN32                   /* getpid() for win32 is located in process.h */
-#   include <process.h>
-#endif
-
 #include "spudec.h"
 
 /*****************************************************************************
@@ -52,8 +44,16 @@ static void EndThread     ( spudec_thread_t * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
+#define FONT_TEXT N_("Font used by the text subtitler")
+#define FONT_LONGTEXT N_(\
+    "When the subtitles are coded in text form then, you can choose " \
+    "which font will be used to display them.")
+
 vlc_module_begin();
-    set_description( _("DVD subtitles decoder module") );
+    add_category_hint( N_("subtitles"), NULL );
+    add_file( "spudec-font", "./share/font-eutopiabold36.rle", NULL,
+              FONT_TEXT, FONT_LONGTEXT );
+    set_description( _("subtitles decoder module") );
     set_capability( "decoder", 50 );
     set_callbacks( OpenDecoder, NULL );
 vlc_module_end();
@@ -69,11 +69,12 @@ static int OpenDecoder( vlc_object_t *p_this )
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
 
     if( p_fifo->i_fourcc != VLC_FOURCC('s','p','u',' ')
-         && p_fifo->i_fourcc != VLC_FOURCC('s','p','u','b') )
-    {   
+         && p_fifo->i_fourcc != VLC_FOURCC('s','p','u','b')
+         && p_fifo->i_fourcc != VLC_FOURCC('s','u','b','t') )
+    {
         return VLC_EGENERIC;
     }
-    
+
     p_fifo->pf_run = RunDecoder;
 
     return VLC_SUCCESS;
@@ -85,6 +86,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int RunDecoder( decoder_fifo_t * p_fifo )
 {
     spudec_thread_t *     p_spudec;
+    subtitler_font_t *    p_font;
+    char *                psz_font;
 
     /* Allocate the memory needed to store the thread's structure */
     p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) );
@@ -101,7 +104,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
      */
     p_spudec->p_vout = NULL;
     p_spudec->p_fifo = p_fifo;
-        
+
     /*
      * Initialize thread and free configuration
      */
@@ -111,14 +114,48 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
      * Main loop - it is not executed if an error occured during
      * initialization
      */
-    while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
+    if( p_fifo->i_fourcc == VLC_FOURCC('s','u','b','t') )
     {
-        if( E_(SyncPacket)( p_spudec ) )
+        /* Here we are dealing with text subtitles */
+
+        if( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
         {
-            continue;
+            msg_Err( p_fifo, "no default font selected" );
+            p_font = NULL;
+            p_spudec->p_fifo->b_error;
+        }
+        else
+        {
+            p_font = subtitler_LoadFont( p_spudec->p_vout, psz_font );
+            if ( p_font == NULL )
+            {
+                msg_Err( p_fifo, "unable to load font: %s", psz_font );
+                p_spudec->p_fifo->b_error;
+            }
+        }
+        if( psz_font ) free( psz_font );
+
+        while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
+        {
+            E_(ParseText)( p_spudec, p_font );
         }
 
-        E_(ParsePacket)( p_spudec );
+        if( p_font ) subtitler_UnloadFont( p_spudec->p_vout, p_font );
+
+    }
+    else
+    {
+        /* Here we are dealing with sub-pictures subtitles*/
+
+        while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
+        {
+            if( E_(SyncPacket)( p_spudec ) )
+            {
+                continue;
+            }
+
+            E_(ParsePacket)( p_spudec );
+        }
     }
 
     /*
@@ -154,8 +191,8 @@ static int InitThread( spudec_thread_t *p_spudec )
     {
         if( p_spudec->p_fifo->b_die || p_spudec->p_fifo->b_error )
         {
-            /* Call InitBitstream anyway so p_spudec is in a known state
-             * before calling CloseBitstream */
+            /* Call InitBitstream anyway so p_spudec->bit_stream is in a known
+             * state before calling CloseBitstream */
             InitBitstream( &p_spudec->bit_stream, p_spudec->p_fifo,
                            NULL, NULL );
             return -1;
@@ -209,4 +246,3 @@ static void EndThread( spudec_thread_t *p_spudec )
     CloseBitstream( &p_spudec->bit_stream );
     free( p_spudec );
 }
-

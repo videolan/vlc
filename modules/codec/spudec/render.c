@@ -2,7 +2,7 @@
  * render.c : SPU renderer
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: render.c,v 1.3 2002/11/06 18:07:57 sam Exp $
+ * $Id: render.c,v 1.4 2002/11/06 21:48:24 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -32,14 +32,6 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>                                           /* getpid() */
-#endif
-
-#ifdef WIN32                   /* getpid() for win32 is located in process.h */
-#   include <process.h>
-#endif
 
 #include "spudec.h"
 

@@ -2,7 +2,7 @@
  * spudec.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spudec.h,v 1.3 2002/11/06 18:07:57 sam Exp $
+ * $Id: spudec.h,v 1.4 2002/11/06 21:48:24 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -43,6 +43,18 @@ struct subpicture_sys_t
     vlc_bool_t   b_crop;
     int          i_x_start, i_y_start, i_x_end, i_y_end;
 };
+
+/*****************************************************************************
+ * subtitler_font_t : proportional font
+ *****************************************************************************/
+typedef struct subtitler_font_s
+{
+    int                 i_height;              /* character height in pixels */
+    int                 i_width[256];          /* character widths in pixels */
+    int                 i_memory[256]; /* amount of memory used by character */
+    int *               p_length[256];                   /* line byte widths */
+    u16 **              p_offset[256];                /* pointer to RLE data */
+} subtitler_font_t;
 
 /*****************************************************************************
  * spudec_thread_t : sub picture unit decoder thread descriptor
@@ -99,3 +111,9 @@ void E_(ParsePacket)          ( spudec_thread_t * );
 void E_(RenderSPU)            ( vout_thread_t *, picture_t *,
                                 const subpicture_t * );
 
+void E_(ParseText)            ( spudec_thread_t *, subtitler_font_t * );
+
+subtitler_font_t *E_(subtitler_LoadFont) ( vout_thread_t *, const char * );
+void E_(subtitler_UnloadFont)   ( vout_thread_t *, subtitler_font_t * );
+void E_(subtitler_PlotSubtitle) ( vout_thread_t *, char *, subtitler_font_t *,
+                                  mtime_t, mtime_t );

@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.2 2002/11/05 10:07:56 gbazin Exp $
+ * $Id: video.c,v 1.3 2002/11/06 21:48:24 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -349,6 +349,8 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 
     p_vdec->b_hurry_up = config_GetInt(p_vdec->p_fifo, "ffmpeg-hurry-up");
 
+    p_vdec->p_lastpic = NULL;
+    p_vdec->p_secondlastpic = NULL;
     p_vdec->b_direct_rendering = 0;
 #if LIBAVCODEC_BUILD > 4615
     if( (p_vdec->p_codec->capabilities & CODEC_CAP_DR1)
@@ -668,6 +670,11 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
  *****************************************************************************/
 void E_( EndThread_Video )( vdec_thread_t *p_vdec )
 {
+    if( p_vdec->p_secondlastpic )
+        vout_UnlinkPicture( p_vdec->p_vout, p_vdec->p_secondlastpic );
+    if( p_vdec->p_lastpic )
+        vout_UnlinkPicture( p_vdec->p_vout, p_vdec->p_lastpic );
+
     if( p_vdec->p_pp )
     {
         /* release postprocessing module */
@@ -797,8 +804,13 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *avctx, int width,
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
-    /* FIXME: we may have to use link/unlinkPicture to fully support streams
-     * with B FRAMES */
+    /* FIXME: We keep the last picture linked until the current one is decoded,
+     * this trick won't work with streams with B frames though. */
+    vout_LinkPicture( p_vdec->p_vout, p_pic );
+    if( p_vdec->p_secondlastpic )
+        vout_UnlinkPicture( p_vdec->p_vout, p_vdec->p_secondlastpic );
+    p_vdec->p_secondlastpic = p_vdec->p_lastpic;
+    p_vdec->p_lastpic = p_pic;
 
     avctx->draw_horiz_band= NULL;
     avctx->dr_buffer[0]= p_pic->p[0].p_pixels;

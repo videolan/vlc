@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.7 2002/11/05 21:57:41 gbazin Exp $
+ * $Id: ogg.c,v 1.8 2002/11/06 21:48:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -87,6 +87,7 @@ struct demux_sys_t
     /* current audio and video es */
     logical_stream_t *p_stream_video;
     logical_stream_t *p_stream_audio;
+    logical_stream_t *p_stream_spu;
 
     /* stream we use as a time reference for demux reading speed */
     logical_stream_t *p_stream_timeref;
@@ -168,7 +169,6 @@ static int  Demux     ( input_thread_t * );
 
 /* Stream managment */
 static int  Ogg_StreamStart  ( input_thread_t *, demux_sys_t *, int );
-static int  Ogg_StreamSeek   ( input_thread_t *, demux_sys_t *, int, mtime_t );
 static void Ogg_StreamStop   ( input_thread_t *, demux_sys_t *, int );
 
 /* Bitstream manipulation */
@@ -227,8 +227,6 @@ static int Ogg_StreamStart( input_thread_t *p_input,
         }
     }
 
-    //Ogg_StreamSeek( p_input, p_ogg, i_stream, p_ogg->i_time );
-
     return( p_stream->i_activated );
 #undef  p_stream
 }
@@ -254,17 +252,6 @@ static void Ogg_StreamStop( input_thread_t *p_input,
     p_stream->i_activated = 0;
 
 #undef  p_stream
-}
-
-static int Ogg_StreamSeek( input_thread_t *p_input, demux_sys_t  *p_ogg,
-                           int i_stream, mtime_t i_date )
-{
-#define p_stream    p_ogg->pp_stream[i_stream]
-
-    /* FIXME: todo */
-
-    return 1;
-#undef p_stream
 }
 
 /****************************************************************************
@@ -383,9 +370,20 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     }
 
     /* Convert the pcr into a pts */
-    p_pes->i_pts = ( p_stream->i_pcr < 0 ) ? 0 :
-        input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                          p_stream->i_pcr );
+    if( p_stream->i_cat != SPU_ES )
+    {
+        p_pes->i_pts = ( p_stream->i_pcr < 0 ) ? 0 :
+            input_ClockGetTS( p_input, p_input->stream.p_selected_program,
+                              p_stream->i_pcr );
+    }
+    else
+    {
+        /* Of course subtitles had to be different! */
+        p_pes->i_pts = ( p_oggpacket->granulepos < 0 ) ? 0 :
+            input_ClockGetTS( p_input, p_input->stream.p_selected_program,
+                              p_oggpacket->granulepos * 90000 /
+                              p_stream->i_rate );
+    }
 
     /* Convert the next granule into a pcr */
     if( p_oggpacket->granulepos < 0 )
@@ -435,6 +433,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
             p_oggpacket->bytes - i_header_len );
 
     p_data->p_payload_end = p_data->p_payload_start + p_pes->i_pes_size;
+    p_data->b_discard_payload = 0;
 
     input_DecodePES( p_stream->p_es->p_decoder_fifo, p_pes );
 }
@@ -649,10 +648,14 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     /* Check for text (subtitles) header */
                     else if( !strncmp(st->streamtype, "text", 4) )
                     {
+                        /* We need to get rid of the header packet */
+                        ogg_stream_packetout( &p_stream->os, &oggpacket );
+
                         msg_Dbg( p_input, "found text subtitles header" );
                         p_stream->i_cat = SPU_ES;
                         p_stream->i_fourcc =
                             VLC_FOURCC( 's', 'u', 'b', 't' );
+                        p_stream->i_rate = 1000; /* granulepos is in milisec */
                     }
                     else
                     {
@@ -772,7 +775,7 @@ static int Activate( vlc_object_t * p_this )
                                       p_ogg->i_streams + 1, 0 );
         p_input->stream.i_mux_rate += (p_stream->i_bitrate / ( 8 * 50 ));
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        p_stream->p_es->i_stream_id = i_stream;
+        p_stream->p_es->i_stream_id = p_stream->p_es->i_id = i_stream;
         p_stream->p_es->i_fourcc = p_stream->i_fourcc;
         p_stream->p_es->i_cat = p_stream->i_cat;
         p_stream->p_es->p_demux_data = p_stream->p_bih ?
@@ -786,7 +789,6 @@ static int Activate( vlc_object_t * p_this )
         switch( p_stream->p_es->i_cat )
         {
             case( VIDEO_ES ):
-
                 if( (p_ogg->p_stream_video == NULL) )
                 {
                     p_ogg->p_stream_video = p_stream;
@@ -798,9 +800,33 @@ static int Activate( vlc_object_t * p_this )
             case( AUDIO_ES ):
                 if( (p_ogg->p_stream_audio == NULL) )
                 {
-                    p_ogg->p_stream_audio = p_stream;
-                    p_ogg->p_stream_timeref = p_stream;
-                    Ogg_StreamStart( p_input, p_ogg, i_stream );
+                    int i_audio = config_GetInt( p_input, "audio-channel" );
+                    if( i_audio == i_stream || i_audio <= 0 ||
+                        i_audio >= p_ogg->i_streams ||
+                        p_ogg->pp_stream[i_audio]->p_es->i_cat != AUDIO_ES )
+                    {
+                        p_ogg->p_stream_audio = p_stream;
+                        p_ogg->p_stream_timeref = p_stream;
+                        Ogg_StreamStart( p_input, p_ogg, i_stream );
+                    }
+                }
+                break;
+
+            case( SPU_ES ):
+                if( (p_ogg->p_stream_spu == NULL) )
+                {
+                    /* for spu, default is none */
+                    int i_spu = config_GetInt( p_input, "spu-channel" );
+                    if( i_spu < 0 || i_spu >= p_ogg->i_streams ||
+                        p_ogg->pp_stream[i_spu]->p_es->i_cat != SPU_ES )
+                    {
+                        break;
+                    }
+                    else if( i_spu == i_stream )
+                    {
+                        p_ogg->p_stream_spu = p_stream;
+                        Ogg_StreamStart( p_input, p_ogg, i_stream );
+                    }
                 }
                 break;
 

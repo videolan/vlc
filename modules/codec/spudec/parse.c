@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.4 2002/11/06 18:07:57 sam Exp $
+ * $Id: parse.c,v 1.5 2002/11/06 21:48:24 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,14 +30,6 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/decoder.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>                                           /* getpid() */
-#endif
-
-#ifdef WIN32                   /* getpid() for win32 is located in process.h */
-#   include <process.h>
-#endif
 
 #include "spudec.h"
 

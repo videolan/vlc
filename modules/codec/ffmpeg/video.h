@@ -2,7 +2,7 @@
  * video.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.h,v 1.2 2002/11/05 10:07:56 gbazin Exp $
+ * $Id: video.h,v 1.3 2002/11/06 21:48:24 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -41,7 +41,8 @@ typedef struct vdec_thread_s
 
     /* for direct rendering */
     int b_direct_rendering;
-
+    picture_t *p_lastpic;
+    picture_t *p_secondlastpic;
 } vdec_thread_t;
 
 
