@@ -2,7 +2,7 @@
  * vlcplugin.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.c,v 1.1 2002/07/04 18:11:57 sam Exp $
+ * $Id: vlcplugin.c,v 1.2 2002/07/12 17:08:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -99,7 +99,7 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         //"--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins",
         "--vout", "xvideo,x11,dummy",
         "--intf", "dummy",
-        "--noaudio",
+        //"--noaudio",
         //"-v"
     };
 
