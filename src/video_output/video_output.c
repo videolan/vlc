@@ -1,15 +1,15 @@
-/*******************************************************************************
+/******************************************************************************
  * video_output.c : video output thread
  * (c)2000 VideoLAN
- *******************************************************************************
+ ******************************************************************************
  * This module describes the programming interface for video output threads.
  * It includes functions allowing to open a new thread, send pictures to a
  * thread, and destroy a previously oppenned video output thread.
- *******************************************************************************/
+ ******************************************************************************/
 
-/*******************************************************************************
+/******************************************************************************
  * Preamble
- *******************************************************************************/
+ ******************************************************************************/
 #include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,9 +26,9 @@
 #include "intf_msg.h"
 #include "main.h"
 
-/*******************************************************************************
+/******************************************************************************
  * Local prototypes
- *******************************************************************************/
+ ******************************************************************************/
 static int      InitThread              ( vout_thread_t *p_vout );
 static void     RunThread               ( vout_thread_t *p_vout );
 static void     ErrorThread             ( vout_thread_t *p_vout );
@@ -40,19 +40,19 @@ static int      RenderIdle              ( vout_thread_t *p_vout, boolean_t b_bla
 static int      RenderInfo              ( vout_thread_t *p_vout, boolean_t b_balnk );
 static int      Manage                  ( vout_thread_t *p_vout );
 
-/*******************************************************************************
+/******************************************************************************
  * vout_CreateThread: creates a new video output thread
- *******************************************************************************
+ ******************************************************************************
  * This function creates a new video output thread, and returns a pointer
  * to its description. On error, it returns NULL.
  * If pi_status is NULL, then the function will block until the thread is ready.
  * If not, it will be updated using one of the THREAD_* constants.
- *******************************************************************************/
+ ******************************************************************************/
 vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_window, 
                                                   int i_width, int i_height, int *pi_status )
 {
-    vout_thread_t * p_vout;                               /* thread descriptor */
-    int             i_status;                                 /* thread status */
+    vout_thread_t * p_vout;                              /* thread descriptor */
+    int             i_status;                                /* thread status */
 
     /* Allocate descriptor */
     intf_DbgMsg("\n");    
@@ -143,17 +143,17 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     return( p_vout );
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_DestroyThread: destroys a previously created thread
- *******************************************************************************
+ ******************************************************************************
  * Destroy a terminated thread. 
  * The function will request a destruction of the specified thread. If pi_error
  * is NULL, it will return once the thread is destroyed. Else, it will be 
  * update using one of the THREAD_* constants.
- *******************************************************************************/
+ ******************************************************************************/
 void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
 {  
-    int     i_status;                                         /* thread status */
+    int     i_status;                                        /* thread status */
 
     /* Set status */
     intf_DbgMsg("\n");
@@ -174,18 +174,18 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
     }
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_DisplaySubtitle: display a subtitle
- *******************************************************************************
+ ******************************************************************************
  * Remove the reservation flag of a subtitle, which will cause it to be ready for
  * display. The picture does not need to be locked, since it is ignored by
  * the output thread if is reserved.
- *******************************************************************************/
+ ******************************************************************************/
 void  vout_DisplaySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
 {
 #ifdef DEBUG_VIDEO
-    char        psz_begin_date[MSTRTIME_MAX_SIZE];   /* buffer for date string */
-    char        psz_end_date[MSTRTIME_MAX_SIZE];     /* buffer for date string */
+    char        psz_begin_date[MSTRTIME_MAX_SIZE];  /* buffer for date string */
+    char        psz_end_date[MSTRTIME_MAX_SIZE];    /* buffer for date string */
 #endif
 
 #ifdef DEBUG
@@ -207,28 +207,28 @@ void  vout_DisplaySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
 #endif
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_CreateSubtitle: allocate a subtitle in the video output heap.
- *******************************************************************************
+ ******************************************************************************
  * This function create a reserved subtitle in the video output heap. 
  * A null pointer is returned if the function fails. This method provides an
  * already allocated zone of memory in the subtitle data fields. It needs locking
  * since several pictures can be created by several producers threads. 
- *******************************************************************************/
+ ******************************************************************************/
 subtitle_t *vout_CreateSubtitle( vout_thread_t *p_vout, int i_type, 
                                  int i_size )
 {
     //???
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_DestroySubtitle: remove a permanent or reserved subtitle from the heap
- *******************************************************************************
+ ******************************************************************************
  * This function frees a previously reserved subtitle.
  * It is meant to be used when the construction of a picture aborted.
  * This function does not need locking since reserved subtitles are ignored by
  * the output thread.
- *******************************************************************************/
+ ******************************************************************************/
 void vout_DestroySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
 {
 #ifdef DEBUG
@@ -246,13 +246,13 @@ void vout_DestroySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
 #endif
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_DisplayPicture: display a picture
- *******************************************************************************
+ ******************************************************************************
  * Remove the reservation flag of a picture, which will cause it to be ready for
  * display. The picture won't be displayed until vout_DatePicture has been 
  * called.
- *******************************************************************************/
+ ******************************************************************************/
 void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -278,13 +278,13 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_DatePicture: date a picture
- *******************************************************************************
+ ******************************************************************************
  * Remove the reservation flag of a picture, which will cause it to be ready for
  * display. The picture won't be displayed until vout_DisplayPicture has been 
  * called.
- *******************************************************************************/
+ ******************************************************************************/
 void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -311,21 +311,21 @@ void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_CreatePicture: allocate a picture in the video output heap.
- *******************************************************************************
+ ******************************************************************************
  * This function create a reserved image in the video output heap. 
  * A null pointer is returned if the function fails. This method provides an
  * already allocated zone of memory in the picture data fields. It needs locking
  * since several pictures can be created by several producers threads. 
- *******************************************************************************/
+ ******************************************************************************/
 picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type, 
 			       int i_width, int i_height )
 {
-    int         i_picture;                                    /* picture index */
-    int         i_chroma_width = 0;                            /* chroma width */    
-    picture_t * p_free_picture = NULL;                   /* first free picture */    
-    picture_t * p_destroyed_picture = NULL;         /* first destroyed picture */    
+    int         i_picture;                                   /* picture index */
+    int         i_chroma_width = 0;                           /* chroma width */    
+    picture_t * p_free_picture = NULL;                  /* first free picture */    
+    picture_t * p_destroyed_picture = NULL;        /* first destroyed picture */    
 
     /* Get lock */
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -456,15 +456,15 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
     return( NULL );
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_DestroyPicture: remove a permanent or reserved picture from the heap
- *******************************************************************************
+ ******************************************************************************
  * This function frees a previously reserved picture or a permanent
  * picture. It is meant to be used when the construction of a picture aborted.
  * Note that the picture will be destroyed even if it is linked !
  * This function does not need locking since reserved pictures are ignored by
  * the output thread.
- *******************************************************************************/
+ ******************************************************************************/
 void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
 #ifdef DEBUG
@@ -484,12 +484,12 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_LinkPicture: increment reference counter of a picture
- *******************************************************************************
+ ******************************************************************************
  * This function increment the reference counter of a picture in the video
  * heap. It needs a lock since several producer threads can access the picture.
- *******************************************************************************/
+ ******************************************************************************/
 void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -502,11 +502,11 @@ void vout_LinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
     vlc_mutex_unlock( &p_vout->picture_lock );
 }
 
-/*******************************************************************************
+/******************************************************************************
  * vout_UnlinkPicture: decrement reference counter of a picture
- *******************************************************************************
+ ******************************************************************************
  * This function decrement the reference counter of a picture in the video heap.
- *******************************************************************************/
+ ******************************************************************************/
 void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vlc_mutex_lock( &p_vout->picture_lock );
@@ -534,16 +534,16 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 /* following functions are local */
 
-/*******************************************************************************
+/******************************************************************************
  * InitThread: initialize video output thread
- *******************************************************************************
+ ******************************************************************************
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success. Note that the thread's flag are not
  * modified inside this function.
- *******************************************************************************/
+ ******************************************************************************/
 static int InitThread( vout_thread_t *p_vout )
 {
-    int     i_index;                                          /* generic index */    
+    int     i_index;                                         /* generic index */    
 
     /* Update status */
     intf_DbgMsg("\n");
@@ -579,20 +579,20 @@ static int InitThread( vout_thread_t *p_vout )
     return( 0 );    
 }
 
-/*******************************************************************************
+/******************************************************************************
  * RunThread: video output thread
- *******************************************************************************
+ ******************************************************************************
  * Video output thread. This function does only returns when the thread is
  * terminated. It handles the pictures arriving in the video heap and the
  * display device events.
- *******************************************************************************/
+ ******************************************************************************/
 static void RunThread( vout_thread_t *p_vout)
 {
-    int             i_picture;                                /* picture index */
-    mtime_t         current_date;                              /* current date */
-    mtime_t         pic_date = 0;                              /* picture date */    
-    boolean_t       b_display;                                 /* display flag */    
-    picture_t *     p_pic;                                  /* picture pointer */
+    int             i_picture;                               /* picture index */
+    mtime_t         current_date;                             /* current date */
+    mtime_t         pic_date = 0;                             /* picture date */    
+    boolean_t       b_display;                                /* display flag */    
+    picture_t *     p_pic;                                 /* picture pointer */
      
     /* 
      * Initialize thread and free configuration 
@@ -600,7 +600,7 @@ static void RunThread( vout_thread_t *p_vout)
     p_vout->b_error = InitThread( p_vout );
     if( p_vout->b_error )
     {
-        free( p_vout );                                  /* destroy descriptor */
+        free( p_vout );                                 /* destroy descriptor */
         return;        
     }    
     intf_DbgMsg("\n");
@@ -746,13 +746,13 @@ static void RunThread( vout_thread_t *p_vout)
     intf_DbgMsg( "thread end\n" );
 }
 
-/*******************************************************************************
+/******************************************************************************
  * ErrorThread: RunThread() error loop
- *******************************************************************************
+ ******************************************************************************
  * This function is called when an error occured during thread main's loop. The
  * thread can still receive feed, but must be ready to terminate as soon as
  * possible.
- *******************************************************************************/
+ ******************************************************************************/
 static void ErrorThread( vout_thread_t *p_vout )
 {
     /* Wait until a `die' order */
@@ -764,15 +764,15 @@ static void ErrorThread( vout_thread_t *p_vout )
     }
 }
 
-/*******************************************************************************
+/******************************************************************************
  * EndThread: thread destruction
- *******************************************************************************
+ ******************************************************************************
  * This function is called when the thread ends after a sucessfull 
  * initialization.
- *******************************************************************************/
+ ******************************************************************************/
 static void EndThread( vout_thread_t *p_vout )
 {
-    int *   pi_status;                                        /* thread status */
+    int *   pi_status;                                       /* thread status */
     int     i_picture;
         
     /* Store status */
@@ -801,18 +801,18 @@ static void EndThread( vout_thread_t *p_vout )
     *pi_status = THREAD_OVER;    
 }
 
-/*******************************************************************************
+/******************************************************************************
  * RenderBlank: render a blank screen
- *******************************************************************************
+ ******************************************************************************
  * This function is called by all other rendering functions when they arrive on
  * a non blanked screen.
- *******************************************************************************/
+ ******************************************************************************/
 static void RenderBlank( vout_thread_t *p_vout )
 {
     //?? toooooo slow
-    int  i_index;                                    /* current 64 bits sample */    
-    int  i_width;                                 /* number of 64 bits samples */    
-    u64 *p_pic;                                  /* pointer to 64 bits samples */
+    int  i_index;                                   /* current 64 bits sample */    
+    int  i_width;                                /* number of 64 bits samples */    
+    u64 *p_pic;                                 /* pointer to 64 bits samples */
     
     /* Initialize variables */
     p_pic =     vout_SysGetPicture( p_vout );
@@ -844,22 +844,22 @@ static void RenderBlank( vout_thread_t *p_vout )
 }
 
 
-/*******************************************************************************
+/******************************************************************************
  * RenderPicture: render a picture
- *******************************************************************************
+ ******************************************************************************
  * This function convert a picture from a video heap to a pixel-encoded image
  * and copy it to the current rendering buffer. No lock is required, since the
  * rendered picture has been determined as existant, and will only be destroyed
  * by the vout thread later.
- *******************************************************************************/
+ ******************************************************************************/
 static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank )
 {
-    int         i_display_height, i_display_width;       /* display dimensions */
-    int         i_height, i_width;                /* source picture dimensions */
-    int         i_scaled_height;               /* scaled height of the picture */   
-    int         i_aspect_scale;                 /* aspect ratio vertical scale */
-    int         i_eol;                        /* end of line offset for source */    
-    byte_t *    p_convert_dst;                       /* convertion destination */        
+    int         i_display_height, i_display_width;      /* display dimensions */
+    int         i_height, i_width;               /* source picture dimensions */
+    int         i_scaled_height;              /* scaled height of the picture */   
+    int         i_aspect_scale;                /* aspect ratio vertical scale */
+    int         i_eol;                       /* end of line offset for source */    
+    byte_t *    p_convert_dst;                      /* convertion destination */        
     
 #ifdef STATS
     /* Start recording render time */
@@ -953,15 +953,15 @@ static int RenderPicture( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_b
     return( 1 );    
 }
 
-/*******************************************************************************
+/******************************************************************************
  * RenderPictureInfo: print additionnal informations on a picture
- *******************************************************************************
+ ******************************************************************************
  * This function will print informations such as fps and other picture
  * dependant informations.
- *******************************************************************************/
+ ******************************************************************************/
 static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank )
 {
-    char        psz_buffer[256];                              /* string buffer */
+    char        psz_buffer[256];                             /* string buffer */
 
 #ifdef STATS
     /* 
@@ -1004,11 +1004,11 @@ static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t
     return( 0 );    
 }
 
-/*******************************************************************************
+/******************************************************************************
  * RenderIdle: render idle picture
- *******************************************************************************
+ ******************************************************************************
  * This function will clear the display or print a logo.
- *******************************************************************************/
+ ******************************************************************************/
 static int RenderIdle( vout_thread_t *p_vout, boolean_t b_blank )
 {
     /* Blank screen if required */
@@ -1026,19 +1026,19 @@ static int RenderIdle( vout_thread_t *p_vout, boolean_t b_blank )
     return( 0 );    
 }
 
-/*******************************************************************************
+/******************************************************************************
  * RenderInfo: render additionnal informations
- *******************************************************************************
+ ******************************************************************************
  * This function render informations which do not depend of the current picture
  * rendered.
- *******************************************************************************/
+ ******************************************************************************/
 static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
 {
-    char        psz_buffer[256];                              /* string buffer */
+    char        psz_buffer[256];                             /* string buffer */
 #ifdef DEBUG
-    int         i_ready_pic = 0;                             /* ready pictures */
-    int         i_reserved_pic = 0;                       /* reserved pictures */
-    int         i_picture;                                    /* picture index */
+    int         i_ready_pic = 0;                            /* ready pictures */
+    int         i_reserved_pic = 0;                      /* reserved pictures */
+    int         i_picture;                                   /* picture index */
 #endif
 
 #ifdef DEBUG
@@ -1068,11 +1068,11 @@ static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
     return( 0 );    
 }
 
-/*******************************************************************************
+/******************************************************************************
  * Manage: manage thread
- *******************************************************************************
+ ******************************************************************************
  * This function will handle changes in thread configuration.
- *******************************************************************************/
+ ******************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
     /* On gamma or grayscale change, rebuild tables */
