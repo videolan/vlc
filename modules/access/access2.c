@@ -37,9 +37,10 @@ static void Access2Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Access2 adaptation layer" ) );
-    set_capability( "access", 2 );
+    set_capability( "access", 0 );
     set_callbacks( Access2Open, Access2Close );
     add_shortcut( "access2" );
+    add_shortcut( "http" );
 
     /* Hack */
     //add_shortcut( "file" );
@@ -109,6 +110,12 @@ static int Access2Open( vlc_object_t * p_this )
     /* pts delay */
     access2_Control( p_access, ACCESS_GET_PTS_DELAY, &i_64 );
     p_input->i_pts_delay = i_64;
+
+    if( p_access->psz_demux && *p_access->psz_demux )
+    {
+        if( !p_input->psz_demux || *p_input->psz_demux == '\0' )
+            p_input->psz_demux = strdup( p_access->psz_demux );
+    }
 
     /* Init p_input->stream.* */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -219,7 +226,14 @@ static void Access2Seek( input_thread_t *p_input, off_t i_pos )
     access_t      *p_access = p_sys->p_access;
 
     if( p_access->pf_seek != NULL && p_input->stream.b_seekable )
-        p_access->pf_seek( p_access, i_pos );
+    {
+        if( p_access->pf_seek( p_access, i_pos ) )
+        {
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            p_input->stream.p_selected_area->i_tell = i_pos;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+        }
+    }
 }
 
 /*****************************************************************************
