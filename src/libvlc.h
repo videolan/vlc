@@ -670,10 +670,12 @@ static char *ppsz_align_descriptions[] =
 
 #define PLAYLIST_USAGE N_("\nPlaylist items:" \
     "\n  *.mpg, *.vob                   plain MPEG-1/2 files" \
-    "\n  [dvd:][device][@raw_device][@[title][,[chapter][,angle]]]" \
+    "\n  [dvd://][device][@raw_device][@[title][,[chapter][,angle]]]" \
     "\n                                 DVD device" \
-    "\n  [vcd:][device][@[title][,[chapter]]" \
+    "\n  [vcd://][device][@{S|T|E|P}[number]]" \
     "\n                                 VCD device" \
+    "\n  [cdda://][device][@[T][track-number]]" \
+    "\n                                 Audio CD device" \
     "\n  udpstream:[[<source address>]@[<bind address>][:<bind port>]]" \
     "\n                                 UDP stream sent by a streaming server" \
     "\n  vlc:pause                      pause execution of " \
