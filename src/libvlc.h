@@ -1181,6 +1181,34 @@ vlc_module_begin();
     add_category_hint( N_("Hot keys"), HOTKEY_CAT_LONGTEXT , VLC_FALSE );
 
 #if defined(SYS_DARWIN)
+/* Don't use the following combo's */
+
+/*  copy                          KEY_MODIFIER_COMMAND|'c'
+ *  cut                           KEY_MODIFIER_COMMAND|'x'
+ *  paste                         KEY_MODIFIER_COMMAND|'v'
+ *  select all                    KEY_MODIFIER_COMMAND|'a'
+ *  preferences                   KEY_MODIFIER_COMMAND|','
+ *  hide vlc                      KEY_MODIFIER_COMMAND|'h'
+ *  hide other                    KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|'h'
+ *  open file                     KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'o'
+ *  open                          KEY_MODIFIER_COMMAND|'o'
+ *  open disk                     KEY_MODIFIER_COMMAND|'d'
+ *  open network                  KEY_MODIFIER_COMMAND|'n'
+ *  save playlist                 KEY_MODIFIER_COMMAND|'s'
+ *  playlist random               KEY_MODIFIER_COMMAND|'z'
+ *  playlist repeat all           KEY_MODIFIER_COMMAND|'l'
+ *  playlist repeat               KEY_MODIFIER_COMMAND|'r'
+ *  video half size               KEY_MODIFIER_COMMAND|'0'
+ *  video normal size             KEY_MODIFIER_COMMAND|'1'
+ *  video double size             KEY_MODIFIER_COMMAND|'2'
+ *  video fit to screen           KEY_MODIFIER_COMMAND|'3'
+ *  minimize window               KEY_MODIFIER_COMMAND|'m'
+ *  close window                  KEY_MODIFIER_COMMAND|'w'
+ *  show controller               KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'c'
+ *  show playlist                 KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'p'
+ *  show info                     KEY_MODIFIER_COMMAND|'i'
+ *  help                          KEY_MODIFIER_COMMAND|'?'
+ */
 #   define KEY_FULLSCREEN         KEY_MODIFIER_COMMAND|'f'
 #   define KEY_PLAY_PAUSE         KEY_MODIFIER_COMMAND|'p'
 #   define KEY_PAUSE              KEY_UNSET
@@ -1206,10 +1234,10 @@ vlc_module_begin();
 #   define KEY_VOL_UP             KEY_MODIFIER_COMMAND|KEY_UP
 #   define KEY_VOL_DOWN           KEY_MODIFIER_COMMAND|KEY_DOWN
 #   define KEY_VOL_MUTE           KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m'
-#   define KEY_SUBDELAY_UP        KEY_MODIFIER_COMMAND|'j'
-#   define KEY_SUBDELAY_DOWN      KEY_MODIFIER_COMMAND|'h'
-#   define KEY_AUDIODELAY_UP      KEY_MODIFIER_COMMAND|'l'
-#   define KEY_AUDIODELAY_DOWN    KEY_MODIFIER_COMMAND|'k'
+#   define KEY_SUBDELAY_UP        'j'
+#   define KEY_SUBDELAY_DOWN      'h'
+#   define KEY_AUDIODELAY_UP      'g'
+#   define KEY_AUDIODELAY_DOWN    'f'
 #   define KEY_AUDIO_TRACK        'l'
 #   define KEY_SUBTITLE_TRACK     's'
 #   define KEY_INTF_SHOW          'i'
