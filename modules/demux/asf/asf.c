@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.7 2002/11/19 17:23:21 fenrir Exp $
+ * $Id: asf.c,v 1.8 2002/11/25 15:08:34 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -77,7 +77,7 @@ static int Activate( vlc_object_t * p_this )
     if( p_input->i_mtu == 0 )
     {
         /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE ;
+        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
     }
 
     p_input->pf_demux = Demux;
@@ -403,7 +403,8 @@ static int Demux( input_thread_t *p_input )
             i_offset = 0;
         }
         /* XXX work only when i_min_data_packet_size == i_max_data_packet_size */
-        i_offset -= i_offset % p_demux->p_fp->i_min_data_packet_size;
+        i_offset += p_demux->p_fp->i_min_data_packet_size - 
+                        i_offset % p_demux->p_fp->i_min_data_packet_size;
         ASF_SeekAbsolute( p_input, p_demux->i_data_begin + i_offset );
 
         p_demux->i_time = 0;
@@ -416,6 +417,7 @@ static int Demux( input_thread_t *p_input )
             }
 #undef p_stream
         }
+        p_demux->i_first_pts = -1;
     }
 
 

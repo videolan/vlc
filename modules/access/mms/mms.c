@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.7 2002/11/25 00:22:04 fenrir Exp $
+ * $Id: mms.c,v 1.8 2002/11/25 15:08:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -56,6 +56,8 @@
 #   endif
 #else
 #   include <sys/socket.h>
+#   include <netinet/in.h>
+#   include <arpa/inet.h>
 #endif
 
 #include "network.h"
@@ -231,8 +233,14 @@ static int Open( vlc_object_t *p_this )
 
     /* *** finished to set some variable *** */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    /* those data could be different for UDP/TCP */
-    p_input->stream.b_pace_control = 1;
+    if( p_access->i_proto == MMS_PROTO_UDP )
+    {
+        p_input->stream.b_pace_control = 0;
+    }
+    else
+    {
+        p_input->stream.b_pace_control = 1;
+    }
     p_input->stream.p_selected_area->i_tell = 0;
     if( p_access->i_packet_count <= 0 )
     {
@@ -241,7 +249,7 @@ static int Open( vlc_object_t *p_this )
     }
     else
     {
-        p_input->stream.b_seekable = 0;
+        p_input->stream.b_seekable = 1;
         p_input->stream.p_selected_area->i_size = 
             p_access->i_header + 
             p_access->i_packet_count * p_access->i_packet_length;
@@ -298,17 +306,20 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
      *
      * 
      */
-#if 0
+#if 1
 
     access_t    *p_access = (access_t*)p_input->p_access_data;
     uint32_t    i_packet;
     uint32_t    i_offset;
+    var_buffer_t    buffer;
     
     if( i_pos < 0 )
     {
         return;
     }    
-    msg_Dbg( p_input, "seeking to %lld, header size:%d", i_pos, p_access->i_header );
+    
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    
     if( i_pos < p_access->i_header)
     {
 
@@ -330,11 +341,57 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
         i_packet = ( i_pos - p_access->i_header ) / p_access->i_packet_length;
         i_offset = ( i_pos - p_access->i_header ) % p_access->i_packet_length;
     }
+    msg_Dbg( p_input, "seeking to "I64Fd " (packet:%d)", i_pos, i_packet );
 
     MMSStop( p_input );
-    MMSStart( p_input, i_packet );
+    msg_Dbg( p_input, "stream stopped (seek)" );
+
+    /* *** restart stream *** */
+    var_buffer_initwrite( &buffer, 0 );
+    var_buffer_add64( &buffer, 0 ); /* seek point in second */
+    var_buffer_add32( &buffer, 0xffffffff ); 
+    var_buffer_add32( &buffer, i_packet ); // begin from start
+    var_buffer_add8( &buffer, 0xff ); // stream time limit
+    var_buffer_add8( &buffer, 0xff ); //  on 3bytes ...
+    var_buffer_add8( &buffer, 0xff ); //
+    var_buffer_add8( &buffer, 0x00 ); // don't use limit
+    var_buffer_add32( &buffer, p_access->i_media_packet_id_type ); 
+    
+    mms_CommandSend( p_input, 0x07, p_access->i_command_level, 0x0001ffff, 
+                     buffer.p_data, buffer.i_data );
+    
+    var_buffer_free( &buffer );
+    
+
+    for( ;; )
+    {
+        mms_HeaderMediaRead( p_input, MMS_PACKET_CMD );
+        if( p_access->i_command == 0x1e )
+        {
+            msg_Dbg( p_input, "received 0x1e (seek)" );
+            break;
+        }
+    }
+    
+    for( ;; )
+    {
+        mms_HeaderMediaRead( p_input, MMS_PACKET_CMD );
+        if( p_access->i_command == 0x05 )
+        {
+            msg_Dbg( p_input, "received 0x05 (seek)" );
+            break;
+        }
+    }
+   
+    /* get a packet */
+    mms_HeaderMediaRead( p_input, MMS_PACKET_MEDIA );
+    msg_Dbg( p_input, "Streaming restarted" );
+   
     p_access->i_media_used += i_offset;
     p_access->i_pos = i_pos;
+    p_input->stream.p_selected_area->i_tell = i_pos;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
 #endif
 }
 
@@ -385,7 +442,7 @@ static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
         }
         else
         {
-            if( mms_HeaderMediaRead( p_input, MMS_PACKET_MEDIA ) < 0 );
+            if( p_access->i_eos || mms_HeaderMediaRead( p_input, MMS_PACKET_MEDIA ) < 0 );
             {
                 p_access->i_pos += i_data;
                 return( i_data );
@@ -691,24 +748,35 @@ static int MMSOpen( input_thread_t  *p_input,
     /* *** Bind port if UDP protocol is selected *** */
     if( b_udp )
     {
-        msg_Err( p_input,
-                 "MMS/UDP not yet functionnal, anyway trying..." );
         if( !p_url->psz_bind_addr || !*p_url->psz_bind_addr )
         {
-            msg_Err( p_input, "for udp you have to provide bind address (mms://<server_addr>@<bind_addr/<path> (FIXME)" );
+            struct sockaddr_in name;
+            socklen_t i_namelen = sizeof( struct sockaddr_in );
+
+            if( getsockname( p_access->socket_tcp.i_handle, 
+                             (struct sockaddr_in*)&name, &i_namelen ) < 0 )
+            {
+
+                msg_Err( p_input, "for udp you have to provide bind address (mms://<server_addr>@<bind_addr/<path> (FIXME)" );
 #if defined( UNDER_CE )
-            CloseHandle( (HANDLE)p_access->socket_tcp.i_handle );
+                CloseHandle( (HANDLE)p_access->socket_tcp.i_handle );
 #elif defined( WIN32 )
-            closesocket( p_access->socket_tcp.i_handle );
+                closesocket( p_access->socket_tcp.i_handle );
 #else
-            close( p_access->socket_tcp.i_handle );
+                close( p_access->socket_tcp.i_handle );
 #endif
-            return( -1 );
+                return( -1 );
+            }
+            p_access->psz_bind_addr = inet_ntoa( name.sin_addr );
+        }
+        else
+        {
+            p_access->psz_bind_addr = strdup( p_url->psz_bind_addr );
         }
         socket_desc.i_type = NETWORK_UDP;
         socket_desc.psz_server_addr = "";
         socket_desc.i_server_port   = 0;
-        socket_desc.psz_bind_addr   = p_url->psz_bind_addr;
+        socket_desc.psz_bind_addr   = p_access->psz_bind_addr;
         socket_desc.i_bind_port     = p_url->i_bind_port;
         p_input->p_private = (void*)&socket_desc;
         if( !( p_network = module_Need( p_input, "network", psz_network ) ) )
@@ -727,6 +795,10 @@ static int MMSOpen( input_thread_t  *p_input,
         p_access->socket_udp.i_handle = socket_desc.i_handle;
         p_input->i_mtu    = 0;/*socket_desc.i_mtu;  FIXME */
 
+    }
+    else
+    {
+        p_access->psz_bind_addr = NULL;
     }
 
     /* *** Init context for mms prototcol *** */
@@ -751,6 +823,7 @@ static int MMSOpen( input_thread_t  *p_input,
     p_access->i_buffer_udp = 0;
     p_access->p_cmd = NULL;
     p_access->i_cmd = 0;
+    p_access->i_eos = 0;
 
     /* *** send command 1 : connection request *** */
     var_buffer_initwrite( &buffer, 0 );
@@ -809,7 +882,7 @@ static int MMSOpen( input_thread_t  *p_input,
     {
         sprintf( tmp, 
                  "\\\\%s\\UDP\\%d",
-                 p_url->psz_bind_addr,
+                 p_access->psz_bind_addr,
                  p_url->i_bind_port );
     }
     else
@@ -1344,7 +1417,7 @@ static int  NetFillBuffer( input_thread_t *p_input )
     }
     else
     {
-        msg_Warn( p_input, "ask for tcp:%d udp:%d", i_tcp, i_udp );
+//        msg_Warn( p_input, "ask for tcp:%d udp:%d", i_tcp, i_udp );
     }
 
     /* We'll wait 0.5 second if nothing happens */
@@ -1385,21 +1458,26 @@ static int  NetFillBuffer( input_thread_t *p_input )
         i_udp_read = 0;
     }
 
-    
-    p_access->i_buffer_tcp += i_tcp_read;
-    p_access->i_buffer_udp += i_udp_read;
-    
-    msg_Dbg( p_input, 
-             "filling TCP buffer with %d bytes (buffer:%d)", 
-             i_tcp_read,
-             p_access->i_buffer_tcp );
+#if 0
     if( p_access->i_proto == MMS_PROTO_UDP )
     {
         msg_Dbg( p_input, 
-                 "filling UDP buffer with %d bytes (buffer:%d)", 
-                 i_udp_read,
-                 p_access->i_buffer_udp );
+                 "filling buffer TCP:%d+%d UDP:%d+%d", 
+                 p_access->i_buffer_tcp,
+                 i_tcp_read,
+                 p_access->i_buffer_udp,
+                 i_udp_read );
     }
+    else
+    {
+        msg_Dbg( p_input, 
+                 "filling buffer TCP:%d+%d", 
+                 p_access->i_buffer_tcp,
+                 i_tcp_read );
+    }
+#endif
+    p_access->i_buffer_tcp += i_tcp_read;
+    p_access->i_buffer_udp += i_udp_read;
 
     return( i_tcp_read + i_udp_read);
 #endif
@@ -1546,9 +1624,9 @@ static int  mms_ParsePacket( input_thread_t *p_input,
         FREE( p_access->p_header );
         p_access->p_header = p_packet;
         p_access->i_header = i_packet_length - 8;
-        msg_Dbg( p_input, 
+/*        msg_Dbg( p_input, 
                  "receive header packet (%d bytes)", 
-                 i_packet_length - 8 );
+                 i_packet_length - 8 ); */
 
         return( MMS_PACKET_HEADER );
     }
@@ -1558,9 +1636,9 @@ static int  mms_ParsePacket( input_thread_t *p_input,
         p_access->p_media = p_packet;
         p_access->i_media = i_packet_length - 8;
         p_access->i_media_used = 0;
-        msg_Dbg( p_input, 
+/*        msg_Dbg( p_input, 
                  "receive media packet (%d bytes)",
-                 i_packet_length - 8 );
+                 i_packet_length - 8 ); */
         
         return( MMS_PACKET_MEDIA );
     }
@@ -1739,9 +1817,11 @@ static int mms_CommandRead( input_thread_t *p_input, int i_command1, int i_comma
             {
                 case 0x03:
                     msg_Warn( p_input, "socket closed by server" );
+                    p_access->i_eos = 1;
                     return( -1 );
                 case 0x1e:
                     msg_Warn( p_input, "end of media stream" );
+                    p_access->i_eos = 1;
                     return( -1 );
                 default:
                     break;
@@ -1773,7 +1853,7 @@ static int mms_HeaderMediaRead( input_thread_t *p_input, int i_type )
         }
         else if( i_status == i_type || i_type == MMS_PACKET_ANY )
         {
-            return( 0 );
+            return( i_type );
         }
         else if( i_status == MMS_PACKET_CMD )
         {
@@ -1781,9 +1861,11 @@ static int mms_HeaderMediaRead( input_thread_t *p_input, int i_type )
             {
                 case 0x03:
                     msg_Warn( p_input, "socket closed by server" );
+                    p_access->i_eos = 1;
                     return( -1 );
                 case 0x1e:
                     msg_Warn( p_input, "end of media stream" );
+                    p_access->i_eos = 1;
                     return( -1 );
                 case 0x20:
                     /* XXX not too dificult to be done EXCEPT that we 
@@ -1791,6 +1873,7 @@ static int mms_HeaderMediaRead( input_thread_t *p_input, int i_type )
                      * could do that :p */ 
                     msg_Err( p_input, 
                              "reinitialization needed --> unsupported" );
+                    p_access->i_eos = 1;
                     return( -1 );
                 default:
                     break;

@@ -2,7 +2,7 @@
  * mms.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.h,v 1.4 2002/11/25 00:22:04 fenrir Exp $
+ * $Id: mms.h,v 1.5 2002/11/25 15:08:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -73,6 +73,7 @@ typedef struct access_s
     input_socket_t      socket_tcp;     /* TCP socket for communication with server */
     input_socket_t      socket_udp;     /* Optional UDP socket for data(media/header packet) */
                                         /* send by server */
+    char                *psz_bind_addr; /* used by udp */
 
     url_t   url;                        /* connect to this server */
     
@@ -108,6 +109,7 @@ typedef struct access_s
     
     /* extracted informations */
     int         i_command;
+    int         i_eos;
 
     /* from 0x01 answer (not yet set) */
     char        *psz_server_version;

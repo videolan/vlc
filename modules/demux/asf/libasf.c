@@ -2,7 +2,7 @@
  * libasf.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.6 2002/11/14 16:17:47 fenrir Exp $
+ * $Id: libasf.c,v 1.7 2002/11/25 15:08:34 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -117,8 +117,16 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
         return( 1 );
     }
 
+    if( !p_input->stream.b_seekable && i_pos < i_filepos )
+    {
+        msg_Err( p_input, "cannot seek" );
+        return( 0 );
+    }
+
     if( p_input->stream.b_seekable &&
-        p_input->stream.i_method != INPUT_METHOD_NETWORK )
+        ( p_input->stream.i_method == INPUT_METHOD_FILE || 
+          i_pos < i_filepos || 
+          i_pos - i_filepos > 10000 ) )
     {
         p_input->pf_seek( p_input, i_pos );
         input_AccessReinit( p_input );
@@ -142,14 +150,8 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
             i_size -= i_read;
                     
         } while( i_size > 0 );
-
-        return( 1 );
     }
-    else
-    {
-        msg_Err( p_input, "cannot seek" );
-        return( 0 );
-    }   
+    return( 1 );
 }
 
 /* return 1 if success, 0 if fail */
