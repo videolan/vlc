@@ -192,6 +192,7 @@ INPUT =		src/input/input_ps.o \
 		src/input/input_dec.o \
 		src/input/input_programs.o \
 		src/input/input_netlist.o \
+		src/input/input_clock.o \
 		src/input/input.o
 
 AUDIO_OUTPUT = 	src/audio_output/audio_output.o

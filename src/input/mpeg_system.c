@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.26 2001/01/10 19:22:11 massiot Exp $
+ * $Id: mpeg_system.c,v 1.27 2001/01/24 19:05:55 massiot Exp $
  *
  * Authors: 
  *
@@ -217,11 +217,11 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         p_pes = NULL;
                         return;
                     }
-                    p_pes->i_pts =
+                    p_pes->i_pts = input_ClockToSysdate( p_input, p_es->p_pgrm,
                     ( ((mtime_t)(p_full_header[2] & 0x0E) << 29) |
                       (((mtime_t)U16_AT(p_full_header + 3) << 14) - (1 << 14)) |
-                      ((mtime_t)U16_AT(p_full_header + 5) >> 1) ) * 300;
-                    p_pes->i_pts /= 27;
+                      ((mtime_t)U16_AT(p_full_header + 5) >> 1) ) )
+                        + DEFAULT_PTS_DELAY;
 
                     if( b_has_dts )
                     {
@@ -235,12 +235,13 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                             p_pes = NULL;
                             return;
                         }
-                        p_pes->i_dts =
+                        p_pes->i_dts = input_ClockToSysdate( p_input,
+                                                             p_es->p_pgrm,
                         ( ((mtime_t)(p_full_header[7] & 0x0E) << 29) |
                           (((mtime_t)U16_AT(p_full_header + 8) << 14)
                                 - (1 << 14)) |
-                          ((mtime_t)U16_AT(p_full_header + 10) >> 1) ) * 300;
-                        p_pes->i_dts /= 27;
+                          ((mtime_t)U16_AT(p_full_header + 10) >> 1) ) )
+                            + DEFAULT_PTS_DELAY;
                     }
                 }
             }
@@ -312,11 +313,11 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         return;
                     }
 
-                    p_pes->i_pts =
+                    p_pes->i_pts = input_ClockToSysdate( p_input, p_es->p_pgrm,
                       ( ((mtime_t)(p_ts[0] & 0x0E) << 29) |
                         (((mtime_t)U16_AT(p_ts + 1) << 14) - (1 << 14)) |
-                        ((mtime_t)U16_AT(p_ts + 3) >> 1) ) * 300;
-                    p_pes->i_pts /= 27;
+                        ((mtime_t)U16_AT(p_ts + 3) >> 1) ) )
+                      + DEFAULT_PTS_DELAY;
 
                     if( b_has_dts )
                     {
@@ -331,44 +332,16 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                             return;
                         }
 
-                        p_pes->i_dts =
+                        p_pes->i_dts = input_ClockToSysdate( p_input,
+                                                             p_es->p_pgrm,
                             ( ((mtime_t)(p_ts[0] & 0x0E) << 29) |
                               (((mtime_t)U16_AT(p_ts + 1) << 14) - (1 << 14)) |
-                              ((mtime_t)U16_AT(p_ts + 3) >> 1) ) * 300;
-                        p_pes->i_dts /= 27;
+                              ((mtime_t)U16_AT(p_ts + 3) >> 1) ) )
+                            + DEFAULT_PTS_DELAY;
                     }
                 }
             }
 
-            /* PTS management */
-            if( p_pes->i_pts )
-            {
-                //intf_Msg("%lld", p_pes->i_pts);
-                switch( p_es->p_pgrm->i_synchro_state )
-                {
-                case SYNCHRO_NOT_STARTED:
-                case SYNCHRO_START:
-                    p_pes->i_pts = p_pes->i_dts = 0;
-                    break;
-
-                case SYNCHRO_REINIT: /* We skip a PES | Why ?? --Meuuh */
-                    p_pes->i_pts = p_pes->i_dts = 0;
-                    p_es->p_pgrm->i_synchro_state = SYNCHRO_START;
-                    break;
-
-                case SYNCHRO_OK:
-                    p_pes->i_pts += p_es->p_pgrm->delta_cr
-                                         + p_es->p_pgrm->delta_absolute
-                                         + DEFAULT_PTS_DELAY;
-                    if( p_pes->i_dts )
-                    {
-                        p_pes->i_dts += p_es->p_pgrm->delta_cr
-                                             + p_es->p_pgrm->delta_absolute
-                                             + DEFAULT_PTS_DELAY;
-                    }
-                    break;
-                }
-            }
             break;
         }
 
@@ -479,7 +452,7 @@ void input_GatherPES( input_thread_t * p_input, data_packet_t * p_data,
                 p_input->b_error = 1;
                 return;
             }
-            //intf_DbgMsg("New PES packet %p (first data: %p)", p_pes, p_data);
+            p_pes->i_rate = p_input->stream.control.i_rate;
             p_pes->p_first = p_data;
 
             /* If the PES header fits in the first data packet, we can
@@ -582,20 +555,8 @@ static void CRDecode( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
 {
     if( p_pgrm->i_synchro_state != SYNCHRO_OK )
     {
-        switch( p_pgrm->i_synchro_state )
-        {
-        case SYNCHRO_START:
-            p_pgrm->delta_absolute = mdate() - cr_time;
-            p_pgrm->i_synchro_state = SYNCHRO_OK;
-            break;
-
-        case SYNCHRO_NOT_STARTED:
-            p_pgrm->i_synchro_state = SYNCHRO_START;
-            break;
-
-        default:
-            break;
-        }
+        input_ClockNewRef( p_input, p_pgrm, cr_time );
+        p_pgrm->i_synchro_state = SYNCHRO_OK;
     }
     else
     {
@@ -604,6 +565,8 @@ static void CRDecode( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
                   (    (p_pgrm->last_cr - cr_time) > CR_MAX_GAP
                     || (p_pgrm->last_cr - cr_time) < - CR_MAX_GAP ) ) )
         {
+#if 0
+            /* This code is deprecated */
             int i_es;
 
             /* Stream discontinuity. */
@@ -617,16 +580,19 @@ static void CRDecode( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
             {
                 p_pgrm->pp_es[i_es]->b_discontinuity = 1;
             }
+#endif
         }
         p_pgrm->last_cr = cr_time;
 
         if( p_input->stream.b_pace_control )
         {
             /* Wait a while before delivering the packets to the decoder. */
-            mwait( cr_time + p_pgrm->delta_absolute );
+            mwait( input_ClockToSysdate( p_input, p_pgrm, cr_time ) );
         }
         else
         {
+#if 0
+            /* This code is deprecated, too */
             mtime_t                 sys_time, delta_cr;
 
             sys_time = mdate();
@@ -645,6 +611,7 @@ static void CRDecode( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
                                      / ( p_pgrm->c_average_count + 1 );
                 p_pgrm->c_average_count++;
             }
+#endif
         }
     }
 }
@@ -767,6 +734,11 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
             p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
                                 i_stream_id, 0 );
             p_es->i_type = p_byte[0];
+            p_es->b_audio = ( p_es->i_type == MPEG1_AUDIO_ES
+                              || p_es->i_type == MPEG2_AUDIO_ES
+                              || p_es->i_type == AC3_AUDIO_ES
+                              || p_es->i_type == LPCM_AUDIO_ES
+                            );
 
             /* input_AddES has inserted the new element at the end. */
             p_input->stream.pp_programs[0]->pp_es[
@@ -860,6 +832,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     {
                         /* MPEG audio */
                         p_es->i_type = MPEG2_AUDIO_ES;
+                        p_es->b_audio = 1;
 #ifdef AUTO_SPAWN
                         if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
                                 == REQUESTED_MPEG
@@ -875,6 +848,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     {
                         /* AC3 audio (0x80->0x8F) */
                         p_es->i_type = AC3_AUDIO_ES;
+                        p_es->b_audio = 1;
 #ifdef AUTO_SPAWN
                         if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
                                 == REQUESTED_AC3
@@ -903,6 +877,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     {
                         /* LPCM audio (0xA0->0xAF) */
                         p_es->i_type = LPCM_AUDIO_ES;
+                        p_es->b_audio = 1;
                         /* FIXME : write the decoder */
                     }
                     else
@@ -934,29 +909,27 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         {
         case 0x1BA: /* PACK_START_CODE */
             {
-                /* Convert the SCR in microseconds. */
+                /* Read the SCR. */
                 mtime_t         scr_time;
 
                 if( (p_data->p_buffer[4] & 0xC0) == 0x40 )
                 {
                     /* MPEG-2 */
                     scr_time =
-                      (( ((mtime_t)(p_data->p_buffer[4] & 0x38) << 27) |
+                         ((mtime_t)(p_data->p_buffer[4] & 0x38) << 27) |
                          ((mtime_t)(U32_AT(p_data->p_buffer + 4) & 0x03FFF800)
                                         << 4) |
                          ((mtime_t)(U32_AT(p_data->p_buffer + 6) & 0x03FFF800)
-                                        >> 11)
-                      ) * 300) / 27;
+                                        >> 11);
                 }
                 else
                 {
-                    /* MPEG-1 SCR is like PTS */
+                    /* MPEG-1 SCR is like PTS. */
                     scr_time =
-                      (( ((mtime_t)(p_data->p_buffer[4] & 0x0E) << 29) |
+                         ((mtime_t)(p_data->p_buffer[4] & 0x0E) << 29) |
                          (((mtime_t)U16_AT(p_data->p_buffer + 5) << 14)
                            - (1 << 14)) |
-                         ((mtime_t)U16_AT(p_data->p_buffer + 7) >> 1)
-                      ) * 300) / 27;
+                         ((mtime_t)U16_AT(p_data->p_buffer + 7) >> 1);
                 }
                 /* Call the pace control. */
                 //intf_Msg("+%lld", scr_time);
@@ -1126,13 +1099,11 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                          * it. */
                         if( p[4] >= 7 )
                         {
-                            /* Convert the PCR in microseconds.
-                             * WARNING: do not remove the casts in the
-                             * following calculation ! */
+                            /* Read the PCR. */
                             mtime_t     pcr_time;
                             pcr_time =
-                                    ( (( (mtime_t)U32_AT((u32*)&p[6]) << 1 )
-                                      | ( p[10] >> 7 )) * 300 ) / 27;
+                                    ( (mtime_t)U32_AT((u32*)&p[6]) << 1 )
+                                      | ( p[10] >> 7 );
                             /* Call the pace control. */
                             CRDecode( p_input, p_es->p_pgrm, pcr_time );
                         }

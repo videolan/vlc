@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.7 2001/01/21 01:36:25 massiot Exp $
+ * $Id: video_parser.h,v 1.8 2001/01/24 19:05:55 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -114,10 +114,6 @@ typedef struct vpar_thread_s
     video_synchro_t         synchro;
 
     /* Lookup tables */
-#ifdef MPEG2_COMPLIANT
-    s16                     pi_crop_buf[8192];
-    s16 *                   pi_crop;
-#endif
     lookup_t                pl_mb_addr_inc[2048];    /* for macroblock
                                                         address increment */
     /* tables for macroblock types 0=P 1=B */

@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.9 2001/01/14 07:08:00 stef Exp $
+ * $Id: input_ext-intf.h,v 1.10 2001/01/24 19:05:55 massiot Exp $
  *
  * Authors:
  *
@@ -47,6 +47,9 @@ typedef struct es_descriptor_s
     u16                     i_id;            /* stream ID for PS, PID for TS */
     u8                      i_stream_id;     /* stream ID defined in the PES */
     u8                      i_type;                           /* stream type */
+    boolean_t               b_audio;      /* is the stream an audio stream that
+                                           * will need to be discarded with
+                                           * fast forward and slow motion ?  */
 
     /* Demultiplexer information */
     void *                  p_demux_data;
@@ -85,7 +88,7 @@ typedef struct es_descriptor_s
 /* These ones might violate the norm : */
 #define DVD_SPU_ES          0x82
 #define LPCM_AUDIO_ES       0x83
-#define UNKNOWN_ES         0xFF
+#define UNKNOWN_ES          0xFF
 
 /*****************************************************************************
  * pgrm_descriptor_t
@@ -105,9 +108,8 @@ typedef struct pgrm_descriptor_s
     char *                  psz_srv_name;
 
     /* Synchronization information */
-    /* system_date = PTS_date + delta_cr + delta_absolute */
     mtime_t                 delta_cr;
-    mtime_t                 delta_absolute;
+    mtime_t                 cr_ref, sysdate_ref;
     mtime_t                 last_cr;
     count_t                 c_average_count;
                            /* counter used to compute dynamic average values */
@@ -127,9 +129,8 @@ typedef struct pgrm_descriptor_s
 
 /* Synchro states */
 #define SYNCHRO_OK          0
-#define SYNCHRO_NOT_STARTED 1
-#define SYNCHRO_START       2
-#define SYNCHRO_REINIT      3
+#define SYNCHRO_START       1
+#define SYNCHRO_REINIT      2
 
 /*****************************************************************************
  * stream_descriptor_t
@@ -147,8 +148,15 @@ typedef struct stream_descriptor_s
     boolean_t               b_pace_control;    /* can we read when we want ? */
     boolean_t               b_seekable;               /* can we do lseek() ? */
     /* if (b_seekable) : */
-    off_t                   i_size;     /* total size of the file (in bytes) */
-    off_t                   i_tell;/* actual location in the file (in bytes) */
+    off_t                   i_size;                  /* total size of the file
+                                                      * (in arbitrary units) */
+    off_t                   i_tell;             /* actual location in the file
+                                                 * (in arbitrary units) */
+    off_t                   i_seek;         /* next requested location (changed
+                                             * by the interface thread */
+
+    /* New status and rate requested by the interface */
+    int                     i_new_status, i_new_rate;
 
     /* Demultiplexer data */
     void *                  p_demux_data;

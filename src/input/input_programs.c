@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.26 2001/01/18 05:13:22 sam Exp $
+ * $Id: input_programs.c,v 1.27 2001/01/24 19:05:55 massiot Exp $
  *
  * Authors:
  *
@@ -148,11 +148,12 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
     p_input->stream.pp_programs[i_pgrm_index]->pp_es = NULL;
 
     p_input->stream.pp_programs[i_pgrm_index]->delta_cr = 0;
-    p_input->stream.pp_programs[i_pgrm_index]->delta_absolute = 0;
+    p_input->stream.pp_programs[i_pgrm_index]->cr_ref = 0;
+    p_input->stream.pp_programs[i_pgrm_index]->sysdate_ref = 0;
     p_input->stream.pp_programs[i_pgrm_index]->last_cr = 0;
     p_input->stream.pp_programs[i_pgrm_index]->c_average_count = 0;
     p_input->stream.pp_programs[i_pgrm_index]->i_synchro_state
-                                                = SYNCHRO_NOT_STARTED;
+                                                = SYNCHRO_START;
     p_input->stream.pp_programs[i_pgrm_index]->b_discontinuity = 0;
 
     p_input->stream.pp_programs[i_pgrm_index]->p_vout
@@ -277,12 +278,13 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
         return( NULL );
     }
     p_input->stream.pp_es[p_input->stream.i_es_number - 1] = p_es;
-    p_es->i_id = i_es_id;
 
     /* Init its values */
+    p_es->i_id = i_es_id;
     p_es->b_discontinuity = 0;
     p_es->p_pes = NULL;
     p_es->p_decoder_fifo = NULL;
+    p_es->b_audio = 0;
 
     if( i_data_len )
     {
@@ -412,9 +414,6 @@ void input_DumpStream( input_thread_t * p_input )
         intf_Msg( "input info: Dumping program 0x%x, version %d (%s)",
                   P->i_number, P->i_version,
                   P->b_is_ok ? "complete" : "partial" );
-        if( P->i_synchro_state == SYNCHRO_OK )
-            intf_Msg( "input info: synchro absolute delta : %lld (jitter : %lld)",
-                      P->delta_absolute, P->delta_cr );
 #undef P
         for( j = 0; j < p_input->stream.pp_programs[i]->i_es_number; j++ )
         {

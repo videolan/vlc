@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.11 2001/01/18 17:40:06 massiot Exp $
+ * $Id: input.h,v 1.12 2001/01/24 19:05:55 massiot Exp $
  *
  * Authors:
  *
@@ -101,6 +101,14 @@ void input_EndDecoder( struct input_thread_s *, struct es_descriptor_s * );
 void input_DecodePES( struct decoder_fifo_s *, struct pes_packet_s * );
 
 /*****************************************************************************
+ * Prototypes from input_clock.c
+ *****************************************************************************/
+mtime_t input_ClockToSysdate( struct input_thread_s *,
+                           struct pgrm_descriptor_s *, mtime_t );
+void input_ClockNewRef( struct input_thread_s *,
+                        struct pgrm_descriptor_s *, mtime_t );
+
+/*****************************************************************************
  * Create a NULL packet for padding in case of a data loss
  *****************************************************************************/
 static __inline__ void input_NullPacket( input_thread_t * p_input,
@@ -138,6 +146,7 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
             return;
         }
 
+        p_pes->i_rate = p_input->stream.control.i_rate;
         p_pes->p_first = p_pad_data;
         p_pes->b_messed_up = p_pes->b_discontinuity = 1;
         input_DecodePES( p_es->p_decoder_fifo, p_pes );

@@ -12,8 +12,6 @@ typedef struct stream_ctrl_s
     int                     i_status;
     /* if i_status == FORWARD_S or BACKWARD_S */
     int                     i_rate;
-    s64                     i_ref_sysdate;
-    s64                     i_ref_clock;
 
     boolean_t               b_mute;
     boolean_t               b_bw;                           /* black & white */
@@ -24,5 +22,8 @@ typedef struct stream_ctrl_s
 #define PAUSE_S             1
 #define FORWARD_S           2
 #define BACKWARD_S          3
+#define REWIND_S            4                /* Not supported for the moment */
+#define NOT_STARTED_S       10
+#define START_S             11
 
 #define DEFAULT_RATE        1000

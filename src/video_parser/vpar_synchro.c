@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.79 2001/01/18 17:40:06 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.80 2001/01/24 19:05:55 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -40,8 +40,6 @@
  *    t0  t1  t2  t3  t4  t5  t6  t7  t8  t9  t10 t11 t12
  * Please bear in mind that B's and IP's will be inverted when displaying
  * (decoding order != presentation order). Thus, t1 < t0.
- *
- * FIXME: write a few words about stream structure changes.
  *
  * 2. Definitions
  *    ===========
@@ -230,7 +228,8 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
 #endif
 
         now = mdate();
-        period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate;
+        period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate
+                    * p_vpar->sequence.i_current_rate / DEFAULT_RATE;
 
         vlc_mutex_lock( &p_vpar->p_vout->change_lock );
         tau_yuv = p_vpar->p_vout->render_time;
@@ -265,7 +264,8 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                 b_decode = (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA);
             }
             if( !b_decode )
-                intf_WarnMsg( 3, "vpar synchro warning: trashing I" );
+                intf_WarnMsg( 3, "vpar synchro warning: trashing I (%lld)",
+                             pts - now);
             break;
 
         case P_CODING_TYPE:
@@ -422,7 +422,8 @@ mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                              int i_repeat_field )
 {
-    mtime_t         period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate;
+    mtime_t         period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate
+                              * p_vpar->sequence.i_current_rate / DEFAULT_RATE;
 
     switch( i_coding_type )
     {

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.69 2001/01/18 05:13:23 sam Exp $
+ * $Id: video_parser.c,v 1.70 2001/01/24 19:05:55 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -528,5 +528,7 @@ static void BitstreamCallback ( bit_stream_t * p_bit_stream,
             DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_pts;
         p_vpar->sequence.next_dts =
             DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_dts;
+        p_vpar->sequence.i_current_rate =
+            DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_rate;
     }
 }

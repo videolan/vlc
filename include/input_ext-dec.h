@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.19 2001/01/22 18:04:10 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.20 2001/01/24 19:05:55 massiot Exp $
  *
  * Authors:
  *
@@ -59,8 +59,10 @@ typedef struct pes_packet_s
     boolean_t               b_discontinuity; /* This packet doesn't follow the
                                               * previous one                 */
 
-    mtime_t                 i_pts;/* the PTS for this packet (zero if unset) */
-    mtime_t                 i_dts;/* the DTS for this packet (zero if unset) */
+    mtime_t                 i_pts;    /* PTS for this packet (zero if unset) */
+    mtime_t                 i_dts;    /* DTS for this packet (zero if unset) */
+    int                     i_rate;                /* current pace of reading
+                                                    * (see stream_control.h) */
 
     int                     i_pes_size;    /* size of the current PES packet */
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.72 2001/01/20 20:59:44 stef Exp $
+ * $Id: input.c,v 1.73 2001/01/24 19:05:55 massiot Exp $
  *
  * Authors: 
  *
@@ -103,8 +103,6 @@ input_thread_t *input_CreateThread ( input_config_t * p_config, int *pi_status )
     /* Initialize stream control properties. */
     p_input->stream.control.i_status = PLAYING_S;
     p_input->stream.control.i_rate = DEFAULT_RATE;
-    p_input->stream.control.i_ref_sysdate = 0;
-    p_input->stream.control.i_ref_clock = 0;
     p_input->stream.control.b_mute = 0;
     p_input->stream.control.b_bw = 0;
 
