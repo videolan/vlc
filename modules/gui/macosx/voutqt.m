@@ -174,7 +174,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
     /* Can we find the right chroma ? */
     if( p_vout->p_sys->b_altivec )
     {
-        err = FindCodec( kComponentVideoUnsigned, bestSpeedCodec,
+        err = FindCodec( kYUVSPixelFormat, bestSpeedCodec,
                         nil, &p_vout->p_sys->img_dc );
     }
     else
@@ -189,7 +189,7 @@ int E_(OpenVideoQT) ( vlc_object_t *p_this )
         if( p_vout->p_sys->b_altivec )
         {
             p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
-            p_vout->p_sys->i_codec = kComponentVideoUnsigned;
+            p_vout->p_sys->i_codec = kYUVSPixelFormat;
         }
         else
         {
