@@ -2,14 +2,14 @@
  * charset.c: Determine a canonical name for the current locale's character encoding.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: charset.c,v 1.1 2003/08/23 12:59:31 hartman Exp $
+ * $Id: charset.c,v 1.2 2003/08/23 22:19:07 fenrir Exp $
  *
  * Authors: Derk-Jan Hartman <thedj at users.sf.net>
  *
  * vlc_current_charset() an adaption of mp_locale_charset():
- *  
- *	Copyright (C) 2001-2003 The Mape Project
- *	Written by Karel Zak  <zakkr@zf.jcu.cz>.  
+ *
+ *  Copyright (C) 2001-2003 The Mape Project
+ *  Written by Karel Zak  <zakkr@zf.jcu.cz>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <vlc/vlc.h>
 
 #if !defined WIN32
 # if HAVE_LANGINFO_CODESET
@@ -42,7 +42,6 @@
 # include <windows.h>
 #endif
 
-#include <vlc/vlc.h>
 #include "charset.h"
 
 typedef struct VLCCharsetAlias
@@ -325,8 +324,8 @@ vlc_bool_t vlc_current_charset( char **psz_charset )
         *psz_charset = (char *)psz_codeset;
 
     if (strcasecmp(psz_codeset, "UTF8")==0 || strcasecmp(psz_codeset, "UTF-8")==0)
-        return TRUE;
+        return VLC_TRUE;
     
-    return FALSE;
+    return VLC_FALSE;
 }
 
