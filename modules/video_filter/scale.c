@@ -112,6 +112,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( !p_pic_dst )
     {
         msg_Warn( p_filter, "can't get output picture" );
+        p_pic->pf_release( p_pic );
         return NULL;
     }
 

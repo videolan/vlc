@@ -1438,6 +1438,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
                 msg_Dbg( p_stream, "dropping frame (%i)",
                          (int)(i_video_drift - i_master_drift) );
 #endif
+                p_pic->pf_release( p_pic );
                 return VLC_EGENERIC;
             }
             else if( i_video_drift > i_master_drift + 50000 )
@@ -1456,6 +1457,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 transcode_video_close( p_stream, id );
                 id->b_transcode = VLC_FALSE;
+                p_pic->pf_release( p_pic );
                 return VLC_EGENERIC;
             }
 
@@ -1534,6 +1536,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
                     transcode_video_close( p_stream, id );
                     id->b_transcode = VLC_FALSE;
+                    p_pic->pf_release( p_pic );
                     return VLC_EGENERIC;
                 }
             }
