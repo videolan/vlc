@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.5 2003/01/11 20:42:47 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.6 2003/01/14 16:00:49 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -82,6 +82,7 @@ PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
     fPpSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
     fPpSlider->SetHashMarkCount( 7 );
     fPpSlider->SetLimitLabels( "None", "Maximum" );
+    fPpSlider->SetValue( config_GetInt( p_intf, "ffmpeg-pp-q" ) );
     fFfmpegView->AddChild( fPpSlider );
     
     
@@ -138,6 +139,10 @@ PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
     rect.left = rect.right - 80;
     button = new BButton( rect, NULL, "OK", new BMessage( PREFS_OK ) );
     fPrefsView->AddChild( button );
+
+    rect.OffsetBy( -90, 0 );
+    button = new BButton( rect, NULL, "Save", new BMessage( PREFS_SAVE ) );
+    fPrefsView->AddChild( button );
     
     rect.OffsetBy( -90, 0 );
     button = new BButton( rect, NULL, "Defaults", new BMessage( PREFS_DEFAULTS ) );
@@ -171,6 +176,13 @@ void PreferencesWindow::MessageReceived( BMessage * p_message )
 	    {
 	        SetDefaults();
             ApplyChanges();
+	        break;
+	    }
+	    case PREFS_SAVE:
+	    {
+	        config_SaveConfigFile( p_intf, "main" );
+	        config_SaveConfigFile( p_intf, "adjust" );
+	        config_SaveConfigFile( p_intf, "ffmpeg" );
 	        break;
 	    }
 	    case PREFS_OK:

@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.3 2002/11/26 01:06:08 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.4 2003/01/14 16:00:49 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -30,7 +30,7 @@
 #define PREFS_WINDOW_HEIGHT  280
 
 #define PREFS_OK       'prok'
-#define PREFS_CANCEL   'prca'
+#define PREFS_SAVE     'prsa'
 #define PREFS_DEFAULTS 'prde'
 #define SLIDER_UPDATE  'slup'
 
