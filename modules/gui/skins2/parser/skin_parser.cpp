@@ -35,7 +35,7 @@ SkinParser::SkinParser( intf_thread_t *pIntf, const string &rFileName,
 void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
 {
 #define CheckDefault( a, b ) \
-    if( attr.find(a) == attr.end() ) attr[a] = strdup(b);
+    if( attr.find(a) == attr.end() ) attr[strdup(a)] = strdup(b);
 #define RequireDefault( a ) \
     if( attr.find(a) == attr.end() ) \
     { \
