@@ -5,13 +5,13 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-01-13 15:48+0100\n"
-"PO-Revision-Date: 2002-12-26 00:35+0100\n"
-"Last-Translator: Bruno Vella <allevb@tin.it>\n"
-"Language-Team: \n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2003-01-15 01:01+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #. Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
@@ -29,15 +29,15 @@ msgstr "Utilizzo: %s [opzioni] [elementi]...\n"
 
 #: src/libvlc.c:1115 src/misc/configuration.c:916
 msgid "string"
-msgstr ""
+msgstr "stringa"
 
 #: src/libvlc.c:1133 src/misc/configuration.c:901
 msgid "integer"
-msgstr ""
+msgstr "intero"
 
 #: src/libvlc.c:1136 src/misc/configuration.c:908
 msgid "float"
-msgstr ""
+msgstr "virgola mobile"
 
 #: src/libvlc.c:1142
 msgid " (default enabled)"
@@ -101,7 +101,7 @@ msgstr ""
 
 #: src/libvlc.h:49
 msgid "color messages"
-msgstr ""
+msgstr "messaggi colorati"
 
 #: src/libvlc.h:51
 msgid ""
@@ -141,7 +141,7 @@ msgstr ""
 
 #: src/libvlc.h:70
 msgid "enable audio"
-msgstr ""
+msgstr "abilita audio"
 
 #: src/libvlc.h:72
 msgid ""
@@ -151,7 +151,7 @@ msgstr ""
 
 #: src/libvlc.h:75
 msgid "force mono audio"
-msgstr ""
+msgstr "forza audio mono"
 
 #: src/libvlc.h:76
 msgid "This will force a mono audio output"
@@ -159,7 +159,7 @@ msgstr ""
 
 #: src/libvlc.h:78
 msgid "audio output volume"
-msgstr ""
+msgstr "volume uscita audio"
 
 #: src/libvlc.h:80
 msgid ""
@@ -168,7 +168,7 @@ msgstr ""
 
 #: src/libvlc.h:83
 msgid "audio output frequency (Hz)"
-msgstr ""
+msgstr "frequenza uscita audio (Hz)"
 
 #: src/libvlc.h:85
 msgid ""
@@ -221,7 +221,7 @@ msgstr ""
 
 #: src/libvlc.h:113
 msgid "enable video"
-msgstr ""
+msgstr "abilita video"
 
 #: src/libvlc.h:115
 msgid ""
@@ -241,7 +241,7 @@ msgstr ""
 
 #: src/libvlc.h:123
 msgid "video width"
-msgstr ""
+msgstr "ampiezza video"
 
 #: src/libvlc.h:125
 msgid ""
@@ -251,7 +251,7 @@ msgstr ""
 
 #: src/libvlc.h:128
 msgid "video height"
-msgstr ""
+msgstr "altezza video"
 
 #: src/libvlc.h:130
 msgid ""
@@ -344,7 +344,7 @@ msgstr ""
 
 #: src/libvlc.h:182
 msgid "server port"
-msgstr ""
+msgstr "porta server"
 
 #: src/libvlc.h:184
 msgid "This is the port used for UDP streams. By default, we chose 1234."
@@ -370,7 +370,7 @@ msgstr ""
 
 #: src/libvlc.h:195
 msgid "channel server address"
-msgstr ""
+msgstr "indirizzo canale server"
 
 #: src/libvlc.h:197
 msgid "Indicate here the address of the VideoLAN Channel Server."
@@ -378,7 +378,7 @@ msgstr ""
 
 #: src/libvlc.h:199
 msgid "channel server port"
-msgstr ""
+msgstr "porta canale server"
 
 #: src/libvlc.h:201
 msgid "Indicate here the port on which the VideoLAN Channel Server runs."
@@ -386,7 +386,7 @@ msgstr ""
 
 #: src/libvlc.h:203
 msgid "network interface"
-msgstr ""
+msgstr "interfaccia di rete"
 
 #: src/libvlc.h:205
 msgid ""
@@ -396,7 +396,7 @@ msgstr ""
 
 #: src/libvlc.h:208
 msgid "network interface address"
-msgstr ""
+msgstr "indirizzo interfaccia rete"
 
 #: src/libvlc.h:210
 msgid ""
@@ -415,7 +415,7 @@ msgstr ""
 
 #: src/libvlc.h:218
 msgid "choose audio"
-msgstr ""
+msgstr "scegli audio"
 
 #: src/libvlc.h:220
 msgid "Give the default type of audio you want to use in a DVD."
@@ -423,7 +423,7 @@ msgstr ""
 
 #: src/libvlc.h:222
 msgid "choose channel"
-msgstr ""
+msgstr "scegli canale"
 
 #: src/libvlc.h:224
 msgid ""
@@ -433,7 +433,7 @@ msgstr ""
 
 #: src/libvlc.h:227
 msgid "choose subtitles"
-msgstr ""
+msgstr "scegli sottotitoli"
 
 #: src/libvlc.h:229
 msgid ""
@@ -443,7 +443,7 @@ msgstr ""
 
 #: src/libvlc.h:232
 msgid "DVD device"
-msgstr ""
+msgstr "periferica DVD"
 
 #: src/libvlc.h:235
 msgid ""
@@ -457,7 +457,7 @@ msgstr ""
 
 #: src/libvlc.h:242
 msgid "VCD device"
-msgstr ""
+msgstr "periferica VCD"
 
 #: src/libvlc.h:244
 msgid "This is the default VCD device to use."
@@ -465,7 +465,7 @@ msgstr ""
 
 #: src/libvlc.h:246
 msgid "force IPv6"
-msgstr ""
+msgstr "forza IPv6"
 
 #: src/libvlc.h:248
 msgid ""
@@ -475,7 +475,7 @@ msgstr ""
 
 #: src/libvlc.h:251
 msgid "force IPv4"
-msgstr ""
+msgstr "forza IPv4"
 
 #: src/libvlc.h:253
 msgid ""
@@ -719,7 +719,7 @@ msgstr ""
 #. Input options
 #: src/libvlc.h:445 modules/access/satellite/satellite.c:66
 msgid "Input"
-msgstr ""
+msgstr "Ingresso"
 
 #. Decoder options
 #: src/libvlc.h:478
@@ -750,7 +750,7 @@ msgstr ""
 #: src/libvlc.h:512 modules/audio_filter/converter/a52tofloat32.c:84
 #: modules/codec/a52old/a52old.c:59 modules/codec/mpeg_video/parser.c:84
 #: modules/demux/mpeg/ts.c:113 modules/gui/familiar/familiar.c:69
-#: modules/gui/win32/win32.cpp:298 modules/misc/logger/logger.c:85
+#: modules/gui/win32/win32.cpp:290 modules/misc/logger/logger.c:85
 #: modules/video_filter/clone.c:55 modules/video_filter/crop.c:58
 #: modules/video_filter/deinterlace/deinterlace.c:69
 #: modules/video_filter/distort.c:62 modules/video_filter/motionblur.c:55
@@ -758,7 +758,7 @@ msgstr ""
 #: modules/video_output/fb.c:68 modules/video_output/ggi.c:62
 #: modules/video_output/mga/xmga.c:104
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Varie"
 
 #: src/libvlc.h:526
 msgid "main program"
@@ -860,7 +860,7 @@ msgstr ""
 #. ****************************************************************************
 #: modules/access/http.c:73
 msgid "specify an HTTP proxy"
-msgstr ""
+msgstr "specifica un proxy HTTP"
 
 #: modules/access/http.c:75
 msgid ""
@@ -1026,11 +1026,11 @@ msgstr ""
 #. ****************************************************************************
 #. * Module descriptor
 #. ****************************************************************************
-#: modules/audio_output/alsa.c:90 modules/audio_output/oss.c:94
+#: modules/audio_output/alsa.c:90 modules/audio_output/oss.c:99
 msgid "Try to use S/PDIF output"
 msgstr ""
 
-#: modules/audio_output/alsa.c:92 modules/audio_output/oss.c:96
+#: modules/audio_output/alsa.c:92 modules/audio_output/oss.c:101
 msgid ""
 "Sometimes we attempt to use the S/PDIF output, even if nothing is connected "
 "to it. Un-checking this option disables this behaviour, and permanently "
@@ -1049,32 +1049,32 @@ msgstr ""
 msgid "ALSA audio module"
 msgstr ""
 
-#: modules/audio_output/alsa.c:126 modules/audio_output/alsa.c:312
-#: modules/audio_output/oss.c:138 modules/audio_output/oss.c:274
+#: modules/audio_output/alsa.c:126 modules/audio_output/alsa.c:314
+#: modules/audio_output/oss.c:143 modules/audio_output/oss.c:280
 msgid "A/52 over S/PDIF"
 msgstr ""
 
-#: modules/audio_output/alsa.c:177 modules/audio_output/alsa.c:337
-#: modules/audio_output/oss.c:213 modules/audio_output/oss.c:299
-#: modules/audio_output/sdl.c:118 modules/audio_output/sdl.c:178
-#: modules/audio_output/sdl.c:191 modules/audio_output/sdl.c:199
+#: modules/audio_output/alsa.c:177 modules/audio_output/alsa.c:339
+#: modules/audio_output/oss.c:218 modules/audio_output/oss.c:305
+#: modules/audio_output/sdl.c:119 modules/audio_output/sdl.c:178
+#: modules/audio_output/sdl.c:190 modules/audio_output/sdl.c:198
 msgid "Mono"
 msgstr ""
 
-#: modules/audio_output/alsa.c:182 modules/audio_output/alsa.c:331
-#: modules/audio_output/oss.c:194 modules/audio_output/oss.c:293
-#: modules/audio_output/sdl.c:113 modules/audio_output/sdl.c:177
-#: modules/audio_output/sdl.c:189 modules/audio_output/sdl.c:195
+#: modules/audio_output/alsa.c:182 modules/audio_output/alsa.c:333
+#: modules/audio_output/oss.c:199 modules/audio_output/oss.c:299
+#: modules/audio_output/sdl.c:114 modules/audio_output/sdl.c:177
+#: modules/audio_output/sdl.c:188 modules/audio_output/sdl.c:194
 msgid "Stereo"
 msgstr ""
 
-#: modules/audio_output/alsa.c:316 modules/audio_output/oss.c:173
-#: modules/audio_output/oss.c:278
+#: modules/audio_output/alsa.c:318 modules/audio_output/oss.c:178
+#: modules/audio_output/oss.c:284
 msgid "5.1"
 msgstr ""
 
-#: modules/audio_output/alsa.c:324 modules/audio_output/oss.c:182
-#: modules/audio_output/oss.c:286
+#: modules/audio_output/alsa.c:326 modules/audio_output/oss.c:187
+#: modules/audio_output/oss.c:292
 msgid "2 Front 2 Rear"
 msgstr ""
 
@@ -1126,26 +1126,26 @@ msgstr ""
 #. ****************************************************************************
 #. * Module descriptor
 #. ****************************************************************************
-#: modules/audio_output/oss.c:88
+#: modules/audio_output/oss.c:93
 msgid "Try to work around buggy OSS drivers"
 msgstr ""
 
-#: modules/audio_output/oss.c:90
+#: modules/audio_output/oss.c:95
 msgid ""
 "Some buggy OSS drivers just don't like when their internal buffers are "
 "completely filled (the sound gets heavily hashed). If you have one of these "
 "drivers, then you need to enable this option."
 msgstr ""
 
-#: modules/audio_output/oss.c:101
+#: modules/audio_output/oss.c:106
 msgid "OSS"
 msgstr ""
 
-#: modules/audio_output/oss.c:103
+#: modules/audio_output/oss.c:108
 msgid "OSS dsp device"
 msgstr ""
 
-#: modules/audio_output/oss.c:106
+#: modules/audio_output/oss.c:111
 msgid "Linux OSS /dev/dsp module"
 msgstr ""
 
@@ -1233,16 +1233,8 @@ msgstr ""
 msgid "linear PCM audio parser"
 msgstr ""
 
-#: modules/codec/mad/decoder.c:52
-msgid "Libmad"
-msgstr ""
-
-#: modules/codec/mad/decoder.c:53
-msgid "libmad MPEG 1/2/3 audio decoder"
-msgstr ""
-
-#: modules/codec/mpeg_audio/decoder.c:55
-msgid "MPEG I/II layer 1/2 audio decoder"
+#: modules/codec/mpeg_audio.c:77
+msgid "MPEG audio layer I/II/III parser"
 msgstr ""
 
 #. ****************************************************************************
@@ -1344,7 +1336,7 @@ msgstr ""
 
 #: modules/codec/spudec/spudec.c:53
 msgid "subtitles"
-msgstr ""
+msgstr "sottotitoli"
 
 #: modules/codec/spudec/spudec.c:56
 msgid "subtitles decoder module"
@@ -1357,28 +1349,28 @@ msgstr ""
 #. ****************************************************************************
 #. * Module descriptor
 #. ****************************************************************************
-#: modules/control/rc/rc.c:79
+#: modules/control/rc/rc.c:81
 msgid "show stream position"
 msgstr ""
 
-#: modules/control/rc/rc.c:80
+#: modules/control/rc/rc.c:82
 msgid ""
 "Show the current position in seconds within the stream from time to time."
 msgstr ""
 
-#: modules/control/rc/rc.c:82
+#: modules/control/rc/rc.c:84
 msgid "fake TTY"
 msgstr ""
 
-#: modules/control/rc/rc.c:83
+#: modules/control/rc/rc.c:85
 msgid "Force the rc plugin to use stdin as if it was a TTY."
 msgstr ""
 
-#: modules/control/rc/rc.c:86
+#: modules/control/rc/rc.c:88
 msgid "Remote control"
 msgstr ""
 
-#: modules/control/rc/rc.c:91
+#: modules/control/rc/rc.c:93
 msgid "remote control interface module"
 msgstr ""
 
@@ -1518,11 +1510,11 @@ msgstr "Interrompi sorgente"
 
 #: modules/gui/familiar/interface.c:174
 msgid "Forward"
-msgstr ""
+msgstr "Avanza"
 
 #: modules/gui/familiar/interface.c:175
 msgid "Forward stream"
-msgstr ""
+msgstr "Avanza sorgente"
 
 #. Automatically generated with 'toolbox --update-po'
 #. from modules/gui/win32/about.dfm:
@@ -1530,7 +1522,7 @@ msgstr ""
 #: modules/gui/familiar/interface.c:463 modules/gui/gtk/gtk_interface.c:1341
 #: modules/gui/win32/strings.cpp:5
 msgid "About"
-msgstr ""
+msgstr "Info su"
 
 #: modules/gui/familiar/interface.c:198 modules/gui/win32/strings.cpp:41
 msgid "0:00:00"
@@ -1551,7 +1543,7 @@ msgstr "Tipo"
 
 #: modules/gui/familiar/interface.c:285
 msgid "Size"
-msgstr ""
+msgstr "Dimensione"
 
 #: modules/gui/familiar/interface.c:293
 msgid "User"
@@ -1591,7 +1583,7 @@ msgstr ""
 
 #: modules/gui/familiar/interface.c:336
 msgid "Media"
-msgstr ""
+msgstr "Supporto"
 
 #: modules/gui/familiar/interface.c:352 modules/gui/gtk/preferences.c:592
 #: modules/gui/gtk/preferences.c:609 modules/gui/macosx/open.m:707
@@ -1628,11 +1620,11 @@ msgstr ""
 
 #: modules/gui/familiar/interface.c:430
 msgid "(c) 2002, the VideoLAN Team"
-msgstr ""
+msgstr "(c) 2002, il Team VideoLAN"
 
 #: modules/gui/familiar/interface.c:440
 msgid "Authors: The VideoLAN Team, http://www.videolan.org"
-msgstr ""
+msgstr "Autori: Il Team VideoLAN, http://www.videolan.org"
 
 #: modules/gui/familiar/interface.c:451
 msgid ""
@@ -1848,7 +1840,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:409 modules/gui/gtk/gtk_interface.c:532
 msgid "Open a Satellite Card"
-msgstr ""
+msgstr "Apri una Scheda Satellite"
 
 #: modules/gui/gtk/gnome_interface.c:422 modules/gui/gtk/gnome_interface.c:859
 #: modules/gui/gtk/gtk_interface.c:544 modules/gui/gtk/gtk_interface.c:1023
@@ -1885,7 +1877,7 @@ msgstr "Lento"
 
 #: modules/gui/gtk/gnome_interface.c:487 modules/gui/gtk/gtk_interface.c:604
 msgid "Play Slower"
-msgstr ""
+msgstr "Riproduci Lento"
 
 #: modules/gui/gtk/gnome_interface.c:499 modules/gui/gtk/gnome_interface.c:873
 #: modules/gui/gtk/gtk_interface.c:615 modules/gui/gtk/gtk_interface.c:1039
@@ -1895,7 +1887,7 @@ msgstr "Veloce"
 
 #: modules/gui/gtk/gnome_interface.c:500 modules/gui/gtk/gtk_interface.c:616
 msgid "Play Faster"
-msgstr ""
+msgstr "Riproduci Veloce"
 
 #: modules/gui/gtk/gnome_interface.c:513 modules/gui/gtk/gtk_interface.c:628
 msgid "Open Playlist"
@@ -1933,7 +1925,7 @@ msgstr "Titolo:"
 
 #: modules/gui/gtk/gnome_interface.c:621
 msgid "Select previous title"
-msgstr ""
+msgstr "Seleziona titolo precedente"
 
 #: modules/gui/gtk/gnome_interface.c:646 modules/gui/gtk/gtk_interface.c:754
 #: modules/gui/win32/strings.cpp:38
@@ -1942,15 +1934,15 @@ msgstr "Capitolo:"
 
 #: modules/gui/gtk/gnome_interface.c:666
 msgid "Select previous chapter"
-msgstr ""
+msgstr "Seleziona capitolo precedente"
 
 #: modules/gui/gtk/gnome_interface.c:675
 msgid "Select next chapter"
-msgstr ""
+msgstr "Seleziona prossimo capitolo"
 
 #: modules/gui/gtk/gnome_interface.c:684 modules/gui/gtk/gtk_interface.c:791
 msgid "No server"
-msgstr ""
+msgstr "Nessun server"
 
 #: modules/gui/gtk/gnome_interface.c:698
 msgid "Network Channel:"
@@ -1985,7 +1977,7 @@ msgstr "Programma"
 
 #: modules/gui/gtk/gnome_interface.c:918
 msgid "Switch program"
-msgstr ""
+msgstr "Cambia programma"
 
 #: modules/gui/gtk/gnome_interface.c:924 modules/gui/gtk/gtk_interface.c:1120
 msgid "_Navigation"
@@ -1993,7 +1985,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:925
 msgid "Navigate through titles and chapters"
-msgstr ""
+msgstr "Naviga attraverso titoli e capitoli"
 
 #: modules/gui/gtk/gnome_interface.c:947 modules/gui/gtk/gtk_interface.c:1227
 #: modules/gui/win32/strings.cpp:89
@@ -2003,7 +1995,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1128 modules/gui/gtk/gtk_interface.c:1364
 #: modules/gui/kde/kde.cpp:116
 msgid "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"
-msgstr ""
+msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - il Team VideoLAN"
 
 #: modules/gui/gtk/gnome_interface.c:1130 modules/gui/gtk/gtk_interface.c:1390
 #: modules/gui/kde/kde.cpp:113
@@ -2070,7 +2062,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1409 modules/gui/gtk/gtk_interface.c:1697
 #: modules/gui/macosx/open.m:183
 msgid "Device name"
-msgstr ""
+msgstr "Nome Periferica"
 
 #: modules/gui/gtk/gnome_interface.c:1455 modules/gui/gtk/gtk_interface.c:1743
 #: modules/gui/macosx/open.m:213 modules/gui/macosx/open.m:728
@@ -2084,7 +2076,7 @@ msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1475 modules/gui/gtk/gtk_interface.c:1763
 msgid "Channel server "
-msgstr ""
+msgstr "Canale server "
 
 #: modules/gui/gtk/gnome_interface.c:1485 modules/gui/gtk/gtk_interface.c:1773
 msgid "HTTP"
@@ -2149,7 +2141,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1878 modules/gui/macosx/open.m:365
 #: modules/gui/macosx/open.m:793
 msgid "Open File"
-msgstr ""
+msgstr "Apri File"
 
 #: modules/gui/gtk/gnome_interface.c:1915
 msgid "Modules"
@@ -2252,7 +2244,7 @@ msgstr "_Chiudi"
 
 #: modules/gui/gtk/gtk_interface.c:235
 msgid "Close the window"
-msgstr "Chiude la finestra"
+msgstr "Chiudi la finestra"
 
 #: modules/gui/gtk/gtk_interface.c:242 modules/gui/gtk/gtk_interface.c:1255
 msgid "E_xit"
@@ -2260,7 +2252,7 @@ msgstr "Esci"
 
 #: modules/gui/gtk/gtk_interface.c:250 modules/gui/win32/strings.cpp:121
 msgid "Exit the program"
-msgstr "Esce dal programma"
+msgstr "Esci dal programma"
 
 #: modules/gui/gtk/gtk_interface.c:257
 msgid "_View"
@@ -2268,15 +2260,15 @@ msgstr "_Vista"
 
 #: modules/gui/gtk/gtk_interface.c:283 modules/gui/win32/strings.cpp:49
 msgid "Hide the main interface window"
-msgstr ""
+msgstr "Nascondi la finestra dell'interfaccia principale"
 
 #: modules/gui/gtk/gtk_interface.c:328
 msgid "Navigate through the stream"
-msgstr ""
+msgstr "Naviga attraverso la sorgente"
 
 #: modules/gui/gtk/gtk_interface.c:385
 msgid "_Settings"
-msgstr ""
+msgstr "Impostazioni"
 
 #: modules/gui/gtk/gtk_interface.c:403
 msgid "A_udio"
@@ -2288,19 +2280,19 @@ msgstr "_Preferenze..."
 
 #: modules/gui/gtk/gtk_interface.c:445 modules/gui/win32/strings.cpp:125
 msgid "Configure the application"
-msgstr ""
+msgstr "Configura l'applicazione"
 
 #: modules/gui/gtk/gtk_interface.c:449
 msgid "_Help"
-msgstr ""
+msgstr "Aiuto"
 
 #: modules/gui/gtk/gtk_interface.c:467 modules/gui/gtk/gtk_interface.c:1218
 msgid "_About..."
-msgstr ""
+msgstr "Info su..."
 
 #: modules/gui/gtk/gtk_interface.c:475 modules/gui/win32/strings.cpp:129
 msgid "About this application"
-msgstr ""
+msgstr "Info su questa applicazione"
 
 #: modules/gui/gtk/gtk_interface.c:805 modules/gui/win32/strings.cpp:33
 msgid "Channel:"
@@ -2308,7 +2300,7 @@ msgstr "Canale:"
 
 #: modules/gui/gtk/gtk_interface.c:999
 msgid "_Play"
-msgstr ""
+msgstr "Riproduci"
 
 #: modules/gui/gtk/gtk_interface.c:1373
 msgid "Authors"
@@ -2336,7 +2328,7 @@ msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:2185
 msgid "Select File"
-msgstr ""
+msgstr "Seleziona File"
 
 #: modules/gui/gtk/gtk_interface.c:2232
 msgid "Jump"
@@ -2348,19 +2340,19 @@ msgstr "Vai a:"
 
 #: modules/gui/gtk/gtk_interface.c:2442
 msgid "Selected"
-msgstr ""
+msgstr "Selezionato"
 
 #: modules/gui/gtk/gtk_interface.c:2465
 msgid "_Crop"
-msgstr ""
+msgstr "Ritaglia"
 
 #: modules/gui/gtk/gtk_interface.c:2476
 msgid "_Invert"
-msgstr ""
+msgstr "_Inverti"
 
 #: modules/gui/gtk/gtk_interface.c:2487
 msgid "_Select"
-msgstr ""
+msgstr "_Seleziona"
 
 #. special case for "off" item
 #: modules/gui/gtk/menu.c:518 modules/gui/macosx/prefs.m:384
@@ -2391,7 +2383,7 @@ msgstr "Configura"
 #. add new label
 #: modules/gui/gtk/preferences.c:390 modules/gui/kde/pluginsbox.cpp:53
 msgid "Selected:"
-msgstr ""
+msgstr "Selezionato:"
 
 #: modules/gui/kde/interface.cpp:89
 msgid "Languages"
@@ -2543,8 +2535,9 @@ msgid "Channels"
 msgstr "Canali"
 
 #: modules/gui/macosx/intf.m:242 modules/gui/win32/strings.cpp:80
+#, fuzzy
 msgid "Device"
-msgstr ""
+msgstr "periferica DVD"
 
 #: modules/gui/macosx/intf.m:243 modules/gui/macosx/controls.m:464
 msgid "Fullscreen"
@@ -2574,7 +2567,7 @@ msgstr "Contrai"
 #: modules/gui/macosx/intf.m:254
 #, fuzzy
 msgid "Close Window"
-msgstr "Chiude la finestra"
+msgstr "Chiudi la finestra"
 
 #: modules/gui/macosx/intf.m:255
 msgid "Bring All to Front"
@@ -2635,7 +2628,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:601 modules/gui/macosx/open.m:629
 #, fuzzy
 msgid "Channel server"
-msgstr "Canali"
+msgstr "Canale server "
 
 #: modules/gui/macosx/open.m:203 modules/gui/macosx/open.m:557
 #: modules/gui/macosx/open.m:648 modules/gui/win32/strings.cpp:161
@@ -2671,7 +2664,7 @@ msgstr ""
 #: modules/gui/macosx/open.m:706
 #, fuzzy
 msgid "Save File"
-msgstr "Prossimo File"
+msgstr "Seleziona File"
 
 #: modules/gui/ncurses/ncurses.c:66
 msgid "ncurses interface module"
@@ -2688,23 +2681,24 @@ msgstr ""
 #. ****************************************************************************
 #. * Module descriptor
 #. ****************************************************************************
-#: modules/gui/win32/win32.cpp:292
+#: modules/gui/win32/win32.cpp:284
 msgid "maximum number of lines in the log window"
 msgstr ""
 
-#: modules/gui/win32/win32.cpp:294
+#: modules/gui/win32/win32.cpp:286
 msgid ""
 "You can set the maximum number of lines that the log window will display. "
 "Enter -1 if you want to keep all messages."
 msgstr ""
 
-#: modules/gui/win32/win32.cpp:300
+#: modules/gui/win32/win32.cpp:292
 msgid "Native Windows interface module"
 msgstr ""
 
 #: modules/gui/win32/strings.cpp:7
+#, fuzzy
 msgid "(C) Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002"
-msgstr ""
+msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - il Team VideoLAN"
 
 #: modules/gui/win32/strings.cpp:8
 msgid ""
@@ -2713,12 +2707,14 @@ msgid ""
 msgstr ""
 
 #: modules/gui/win32/strings.cpp:9
+#, fuzzy
 msgid "The VideoLAN Team  <videolan@videolan.org>"
-msgstr ""
+msgstr "Autori: Il Team VideoLAN, http://www.videolan.org"
 
 #: modules/gui/win32/strings.cpp:10
+#, fuzzy
 msgid "http://www.videolan.org/"
-msgstr ""
+msgstr "Autori: Il Team VideoLAN, http://www.videolan.org"
 
 #: modules/gui/win32/strings.cpp:11
 msgid "Version x.y.z"
@@ -2731,8 +2727,9 @@ msgid "Open disc"
 msgstr "Apri Disco..."
 
 #: modules/gui/win32/strings.cpp:16
+#, fuzzy
 msgid "Device &name:"
-msgstr ""
+msgstr "Nome Periferica"
 
 #: modules/gui/win32/strings.cpp:17
 msgid "Starting position"
@@ -2782,8 +2779,9 @@ msgid "File read"
 msgstr ""
 
 #: modules/gui/win32/strings.cpp:34
+#, fuzzy
 msgid "No server!"
-msgstr ""
+msgstr "Nessun server"
 
 #: modules/gui/win32/strings.cpp:39 modules/gui/win32/strings.cpp:40
 msgid "---"
@@ -2838,8 +2836,9 @@ msgid "&Controls"
 msgstr "Controlli"
 
 #: modules/gui/win32/strings.cpp:53
+#, fuzzy
 msgid "Audio device"
-msgstr ""
+msgstr "periferica DVD"
 
 #: modules/gui/win32/strings.cpp:54
 #, fuzzy
@@ -2859,7 +2858,7 @@ msgstr "Programma"
 #: modules/gui/win32/strings.cpp:60
 #, fuzzy
 msgid "Select program"
-msgstr "Scegli il programma"
+msgstr "Cambia programma"
 
 #: modules/gui/win32/strings.cpp:61
 #, fuzzy
@@ -2869,7 +2868,7 @@ msgstr "Titolo"
 #: modules/gui/win32/strings.cpp:62
 #, fuzzy
 msgid "Select title"
-msgstr "Seleziona Tutto"
+msgstr "Seleziona File"
 
 #: modules/gui/win32/strings.cpp:63
 #, fuzzy
@@ -2879,7 +2878,7 @@ msgstr "Capitolo"
 #: modules/gui/win32/strings.cpp:64
 #, fuzzy
 msgid "Select chapter"
-msgstr "Seleziona canale audio"
+msgstr "Seleziona prossimo capitolo"
 
 #: modules/gui/win32/strings.cpp:65
 msgid "&Angle"
@@ -2888,7 +2887,7 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:66
 #, fuzzy
 msgid "Select angle"
-msgstr "Seleziona Tutto"
+msgstr "Seleziona File"
 
 #: modules/gui/win32/strings.cpp:67
 #, fuzzy
@@ -2911,18 +2910,19 @@ msgid "Select subtitles language"
 msgstr "Seleziona canale sottotitoli"
 
 #: modules/gui/win32/strings.cpp:71
+#, fuzzy
 msgid "&Help"
-msgstr ""
+msgstr "Aiuto"
 
 #: modules/gui/win32/strings.cpp:72
 #, fuzzy
 msgid "Close this popup"
-msgstr "Chiude la finestra"
+msgstr "Chiudi la finestra"
 
 #: modules/gui/win32/strings.cpp:73
 #, fuzzy
 msgid "Show interface"
-msgstr "Nascondi interfaccia"
+msgstr "interfaccia di rete"
 
 #: modules/gui/win32/strings.cpp:75
 #, fuzzy
@@ -2935,8 +2935,9 @@ msgid "&Jump..."
 msgstr "Salta..."
 
 #: modules/gui/win32/strings.cpp:79
+#, fuzzy
 msgid "Audio settings"
-msgstr ""
+msgstr "Impostazioni"
 
 #: modules/gui/win32/strings.cpp:84
 #, fuzzy
@@ -2976,12 +2977,12 @@ msgstr "Seleziona una Sorgente di Rete"
 #: modules/gui/win32/strings.cpp:111
 #, fuzzy
 msgid "Play slower"
-msgstr "Riproduci sorgente"
+msgstr "Riproduci Lento"
 
 #: modules/gui/win32/strings.cpp:113
 #, fuzzy
 msgid "Play faster"
-msgstr "Riproduci sorgente"
+msgstr "Riproduci Veloce"
 
 #: modules/gui/win32/strings.cpp:115
 #, fuzzy
@@ -3014,25 +3015,28 @@ msgid "Preferences..."
 msgstr "_Preferenze..."
 
 #: modules/gui/win32/strings.cpp:128
+#, fuzzy
 msgid "About..."
-msgstr ""
+msgstr "Info su..."
 
 #: modules/gui/win32/strings.cpp:131
 #, fuzzy
 msgid "Jump to previous title"
-msgstr "File Precedente"
+msgstr "Seleziona titolo precedente"
 
 #: modules/gui/win32/strings.cpp:133
 msgid "Jump to next title"
 msgstr ""
 
 #: modules/gui/win32/strings.cpp:135
+#, fuzzy
 msgid "Jump to previous chapter"
-msgstr ""
+msgstr "Seleziona capitolo precedente"
 
 #: modules/gui/win32/strings.cpp:137
+#, fuzzy
 msgid "Jump to next chapter"
-msgstr ""
+msgstr "Seleziona prossimo capitolo"
 
 #: modules/gui/win32/strings.cpp:138
 #, fuzzy
@@ -3086,7 +3090,7 @@ msgstr "Indirizzo"
 #: modules/gui/win32/strings.cpp:160
 #, fuzzy
 msgid "Channel Server"
-msgstr "Canali"
+msgstr "Canale server "
 
 #: modules/gui/win32/strings.cpp:162
 msgid "vlcs"
@@ -3095,7 +3099,7 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:167
 #, fuzzy
 msgid "Filename"
-msgstr "Archivio"
+msgstr "Nome Periferica"
 
 #: modules/gui/win32/strings.cpp:169
 #, fuzzy
@@ -3401,7 +3405,7 @@ msgstr ""
 
 #: modules/video_filter/wall.c:54
 msgid "number of rows"
-msgstr ""
+msgstr "numero di righe"
 
 #: modules/video_filter/wall.c:55
 msgid "Select the number of vertical videowindows in which to split the video"
@@ -3409,7 +3413,7 @@ msgstr ""
 
 #: modules/video_filter/wall.c:58
 msgid "active windows"
-msgstr ""
+msgstr "finestre attive"
 
 #: modules/video_filter/wall.c:59
 msgid "comma separated list of active windows, defaults to all"
@@ -3450,7 +3454,7 @@ msgstr ""
 
 #: modules/video_output/directx/directx.c:101
 msgid "specify an existing window"
-msgstr ""
+msgstr "specifica una finestra esistente"
 
 #: modules/video_output/directx/directx.c:103
 msgid ""
@@ -3662,5 +3666,17 @@ msgstr ""
 msgid "xosd interface module"
 msgstr ""
 
+#~ msgid "audio output format"
+#~ msgstr "formato uscita audio"
+
+#~ msgid "number of channels of audio output"
+#~ msgstr "numero di canali di uscita audio"
+
 #~ msgid "About vlc"
 #~ msgstr "Info su vlc"
+
+#~ msgid "Louder"
+#~ msgstr "Più Alto"
+
+#~ msgid "Softer"
+#~ msgstr "Più Basso"
