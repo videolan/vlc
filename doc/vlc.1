@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH VLC 1 "May 19, 2002"
+.TH VLC 1 "Feb 02, 2003"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -16,23 +16,34 @@
 .\" .sp <n>    insert n+1 empty lines
 .\" for manpage-specific macros, see man(7)
 .SH NAME
-vlc, gvlc, gnome-vlc, kvlc, qvlc \- The VideoLAN Client
+vlc, gnome-vlc, gvlc, kvlc, qvlc, wxvlc \- the VLC media player
 .SH SYNOPSIS
 .B vlc
 .RI [ OPTIONS ]
 .RI [ ITEMS ]...
 .SH DESCRIPTION
 This manual page documents briefly the
-.B vlc
-, a free MPEG, MPEG2 and DVD player.
+.B VLC
+multimedia player.
+
+.SH OPTIONS
+.B VLC
+follows the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+For a precise description of options, please use "vlc --help".
+
+The complete list of
+.B VLC
+options depends on what plugins are installed because they automatically
+add their own options. Please use "vlc --longhelp" for a complete list of
+available options.
+
 .SH ITEMS
-.B vlc
+.B VLC
 recognizes several URL-style items:
 .TP
-.B *.mpg, *.vob
-Plain MPEG-1/2 files
-.B *.avi
-AVI files, such as DivX movies
+.B *.mpg, *.vob, *.avi, *.mp3, *.ogg
+Various multimedia file formats
 .TP
 .B dvd:[<device>][@<raw device>][@[<title>][,[<chapter>][,<angle>]]]
 DVD device (for instance dvd:/dev/dvd). The raw device is optional and
@@ -42,22 +53,15 @@ must have been prepared beforehands.
 VCD device (for instance dvd:/dev/cdrom).
 .TP
 .B udpstream:[@[<multicast address>][:<local port>]]
-UDP stream, such as one sent by VideoLAN Server or VideoLAN miniserver.
+UDP stream, such as one sent by VLS or another VLC.
 Usually "udpstream:" is enough.
 .TP
 .B vlc:<command>
-Execute a play-list command. Commands are :
-.B loop
-(loop the playlist),
+Execute a playlist command. Commands are :
 .B pause
 (pause execution of other items), and
 .B quit
 (close VLC).
-.SH OPTIONS
-.B vlc
-follows the usual GNU command line syntax, with long
-options starting with two dashes (`-').
-For a precise description of options, please use "vlc --help".
 
 .SH SEE ALSO
 .BR vls (1), vlms (1)
