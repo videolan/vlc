@@ -901,6 +901,8 @@ Video plugins:
                                e.g use as:
                                --with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr)
     --with-qte=PATH       Qt Embedded headers and libraries
+    --with-qte-system=PATH Additional headers and libraries for Qt Embedded.
+                          (The usr/lib, usr/include directories)
     --with-directx=PATH   Win32 DirectX headers and libraries
     --with-ggi=PATH       path to libggi
     --with-glide=PATH     path to libglide
@@ -12457,13 +12459,13 @@ if test "${with_qte+set}" = set; then
   withval="$with_qte"
 
 fi;
-  if test "x${with_qte}" = "xyes" -a "x${with_qte}" != "x"
+  if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
   then
-    test_LDFLAGS="-L${QTDIR}/lib"
-    test_CFLAGS="-I${QTDIR}/include"
-  else
     test_LDFLAGS="-L${with_qte}/lib"
     test_CFLAGS="-I${with_qte}/include"
+  else
+    test_LDFLAGS="-L${QTDIR}/lib"
+    test_CFLAGS="-I${QTDIR}/include"
   fi
   CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
 
@@ -12577,13 +12579,146 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 _ACEOF
 
     qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -ljpeg -lqte"
+    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqte"
     PLUGINS="${PLUGINS} qte"
-#    BUILTINS="${BUILTINS} qte"
 
 else
    { { echo "$as_me:$LINENO: error: echo \"Cannot find QT Embedded development headers.\"" >&5
 echo "$as_me: error: echo \"Cannot find QT Embedded development headers.\"" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+done
+
+  CPPFLAGS="${save_CPPFLAGS}"
+
+
+# Check whether --with-qte_system or --without-qte_system was given.
+if test "${with_qte_system+set}" = set; then
+  withval="$with_qte_system"
+
+fi;
+  if test "x${with_qte_system}" != "xno" -a "x${with_qte_system}" != "x"
+  then
+    test_CFLAGS="-I${with_qte_system}/include"
+    test_LDFLAGS="-L${with_qte_system}/lib"
+  fi
+  CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
+
+for ac_header in jpeglib.h
+do
+as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
+if eval "test \"\${$as_ac_Header+set}\" = set"; then
+  echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Header+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Header'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Header'}'`" >&6
+else
+  # Is the header compilable?
+echo "$as_me:$LINENO: checking $ac_header usability" >&5
+echo $ECHO_N "checking $ac_header usability... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+$ac_includes_default
+#include <$ac_header>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+cat conftest.$ac_ext >&5
+ac_header_compiler=no
+fi
+rm -f conftest.$ac_objext conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6
+
+# Is the header present?
+echo "$as_me:$LINENO: checking $ac_header presence" >&5
+echo $ECHO_N "checking $ac_header presence... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+#include "confdefs.h"
+#include <$ac_header>
+_ACEOF
+if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+  ac_status=$?
+  egrep -v '^ *\+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+  cat conftest.$ac_ext >&5
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc in
+  yes:no )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: $ac_header: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;};;
+  no:yes )
+    { echo "$as_me:$LINENO: WARNING: $ac_header: present but cannot be compiled" >&5
+echo "$as_me: WARNING: $ac_header: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: $ac_header: check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: $ac_header: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: $ac_header: proceeding with the preprocessor's result" >&2;};;
+esac
+echo "$as_me:$LINENO: checking for $ac_header" >&5
+echo $ECHO_N "checking for $ac_header... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Header+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  eval "$as_ac_Header=$ac_header_preproc"
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Header'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Header'}'`" >&6
+
+fi
+if test `eval echo '${'$as_ac_Header'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+    qte_LDFLAGS="${test_LDFLAGS} -ljpeg ${qte_LDFLAGS}"
+
+else
+   { { echo "$as_me:$LINENO: error: echo \"Cannot find additional QT Embedded system development headers.\"" >&5
+echo "$as_me: error: echo \"Cannot find additional QT Embedded system development headers.\"" >&2;}
    { (exit 1); exit 1; }; }
 fi
 
@@ -14412,13 +14547,13 @@ if test "${with_qte+set}" = set; then
   withval="$with_qte"
 
 fi;
-     if test "x${with_qte}" = "x"
+     if test "x${with_qte}" != "xno"
      then
-       test_LDFLAGS="-L${QTDIR}/lib"
-       test_CFLAGS="-I${QTDIR}/include"
-     else
        test_LDFLAGS="-L${with_qte}/lib"
        test_CFLAGS="-I${with_qte}/include"
+     else
+       test_LDFLAGS="-L${QTDIR}/lib"
+       test_CFLAGS="-I${QTDIR}/include"
      fi
      ac_cv_qte_headers=yes
      CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"

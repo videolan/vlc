@@ -1230,22 +1230,36 @@ if test "x${enable_qte}" = "xyes"
 then
   AC_ARG_WITH(qte,
   [    --with-qte=PATH       Qt Embedded headers and libraries])
-  if test "x${with_qte}" = "xyes" -a "x${with_qte}" != "x"
+  if test "x${with_qte}" != "xno" -a "x${with_qte}" != "x"
   then
-    test_LDFLAGS="-L${QTDIR}/lib"
-    test_CFLAGS="-I${QTDIR}/include"
-  else
     test_LDFLAGS="-L${with_qte}/lib"
     test_CFLAGS="-I${with_qte}/include"
+  else
+    test_LDFLAGS="-L${QTDIR}/lib"
+    test_CFLAGS="-I${QTDIR}/include"
   fi
   CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
   AC_CHECK_HEADERS(qt.h, [
     qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
-    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -ljpeg -lqte"
+    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqte"
     PLUGINS="${PLUGINS} qte"
-#    BUILTINS="${BUILTINS} qte"
   ],
   [ AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."]) ] )
+  CPPFLAGS="${save_CPPFLAGS}"
+
+  AC_ARG_WITH(qte_system,
+  [    --with-qte-system=PATH Additional headers and libraries for Qt Embedded.
+                          (The usr/lib, usr/include directories)])
+  if test "x${with_qte_system}" != "xno" -a "x${with_qte_system}" != "x"
+  then
+    test_CFLAGS="-I${with_qte_system}/include"
+    test_LDFLAGS="-L${with_qte_system}/lib"
+  fi
+  CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
+  AC_CHECK_HEADERS(jpeglib.h, [
+    qte_LDFLAGS="${test_LDFLAGS} -ljpeg ${qte_LDFLAGS}"
+  ],
+  [ AC_MSG_ERROR([echo "Cannot find additional QT Embedded system development headers."]) ] )
   CPPFLAGS="${save_CPPFLAGS}"
 fi
 
@@ -1638,13 +1652,13 @@ AC_ARG_ENABLE(opie,
   [if test "x${enable_opie}" = "xyes"; then
      AC_ARG_WITH(qte,
   [    --with-qte=PATH       Qt Embedded headers and libraries])
-     if test "x${with_qte}" = "x"
+     if test "x${with_qte}" != "xno"
      then
-       test_LDFLAGS="-L${QTDIR}/lib"
-       test_CFLAGS="-I${QTDIR}/include"
-     else
        test_LDFLAGS="-L${with_qte}/lib"
        test_CFLAGS="-I${with_qte}/include"
+     else
+       test_LDFLAGS="-L${QTDIR}/lib"
+       test_CFLAGS="-I${QTDIR}/include"
      fi
      ac_cv_qte_headers=yes
      CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
