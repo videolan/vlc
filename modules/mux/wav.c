@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
+#include <vlc/aout.h>
 #include <vlc/sout.h>
 
 #include "codecs.h"
@@ -56,10 +57,38 @@ struct sout_mux_sys_t
 {
     vlc_bool_t b_used;
     vlc_bool_t b_header;
+    vlc_bool_t b_ext;
+
+    uint32_t i_data;
 
     /* Wave header for the output data */
-    WAVEHEADER waveheader;
+    uint32_t waveheader[5];
+    WAVEFORMATEXTENSIBLE waveformat;
+    uint32_t waveheader2[2];
+
+    uint32_t i_channel_mask;
+    vlc_bool_t b_chan_reorder;              /* do we need channel reordering */
+    int *pi_chan_table;
 };
+
+static const uint32_t pi_channels_in[] =
+    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+      AOUT_CHAN_CENTER, AOUT_CHAN_LFE };
+static const uint32_t pi_channels_out[] =
+    { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,
+      WAVE_SPEAKER_BACK_LEFT, WAVE_SPEAKER_BACK_RIGHT,
+      WAVE_SPEAKER_FRONT_CENTER, WAVE_SPEAKER_LOW_FREQUENCY };
+static const uint32_t pi_channels_ordered[] =
+    { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,
+      WAVE_SPEAKER_FRONT_CENTER, WAVE_SPEAKER_LOW_FREQUENCY,
+      WAVE_SPEAKER_BACK_LEFT, WAVE_SPEAKER_BACK_RIGHT };
+
+static void CheckReordering( sout_mux_t *p_mux, int i_nb_channels );
+static void InterleaveS16( int16_t *p_buf, int i_buf, int *pi_chan_table,
+                           int i_nb_channels );
+static void InterleaveFloat32( float *p_buf, int i_buf, int *pi_chan_table,
+                               int i_nb_channels );
 
 /*****************************************************************************
  * Open:
@@ -75,8 +104,12 @@ static int Open( vlc_object_t *p_this )
     p_mux->pf_mux       = Mux;
 
     p_mux->p_sys = p_sys = malloc( sizeof( sout_mux_sys_t ) );
-    p_sys->b_used       = VLC_FALSE;
-    p_sys->b_header     = VLC_TRUE;
+    p_sys->b_used   = VLC_FALSE;
+    p_sys->b_header = VLC_TRUE;
+    p_sys->i_data   = 0;
+
+    p_sys->pi_chan_table  = NULL;
+    p_sys->b_chan_reorder = 0;
 
     return VLC_SUCCESS;
 }
@@ -89,6 +122,7 @@ static void Close( vlc_object_t * p_this )
     sout_mux_t *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
+    if( p_sys->pi_chan_table ) free( p_sys->pi_chan_table );
     free( p_sys );
 }
 
@@ -120,11 +154,17 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
 }
 static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
+    GUID subformat_guid = {0, 0, 0x10,{0x80, 0, 0, 0xaa, 0, 0x38, 0x9b, 0x71}};
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    int i_bytes_per_sample;
+    WAVEFORMATEX *p_waveformat = &p_sys->waveformat.Format;
+    int i_bytes_per_sample, i_format, i;
+    vlc_bool_t b_ext;
 
     if( p_input->p_fmt->i_cat != AUDIO_ES )
+    {
         msg_Dbg( p_mux, "not an audio stream" );
+        return VLC_EGENERIC;
+    }
 
     if( p_sys->b_used )
     {
@@ -136,60 +176,209 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
              p_input->p_fmt->audio.i_channels,
              p_input->p_fmt->audio.i_rate );
 
-    //p_input->p_fmt->i_codec;
+    p_sys->i_channel_mask = 0;
+    if( p_input->p_fmt->audio.i_physical_channels )
+    {
+        for( i = 0; i < sizeof(pi_channels_in)/sizeof(uint32_t); i++ )
+        {
+            if( p_input->p_fmt->audio.i_physical_channels & pi_channels_in[i] )
+                p_sys->i_channel_mask |= pi_channels_out[i];
+        }
+        msg_Dbg( p_mux, "channel mask: %x", p_sys->i_channel_mask );
+        CheckReordering( p_mux, p_input->p_fmt->audio.i_channels );
+    }
+
+    i_format = p_input->p_fmt->i_codec == VLC_FOURCC('f', 'l', '3', '2') ?
+        WAVE_FORMAT_IEEE_FLOAT : WAVE_FORMAT_PCM;
+    b_ext = p_sys->b_ext = p_input->p_fmt->audio.i_channels > 2;
 
     /* Build a WAV header for the output data */
-    memset( &p_sys->waveheader, 0, sizeof(WAVEHEADER) );
-    SetWLE( &p_sys->waveheader.Format, 1 ); /*WAVE_FORMAT_PCM*/
-    SetWLE( &p_sys->waveheader.BitsPerSample, 16);
-    p_sys->waveheader.MainChunkID = VLC_FOURCC('R', 'I', 'F', 'F');
-    p_sys->waveheader.Length = 0;                     /* we just don't know */
-    p_sys->waveheader.ChunkTypeID = VLC_FOURCC('W', 'A', 'V', 'E');
-    p_sys->waveheader.SubChunkID = VLC_FOURCC('f', 'm', 't', ' ');
-    SetDWLE( &p_sys->waveheader.SubChunkLength, 16 );
-    SetWLE( &p_sys->waveheader.Modus, p_input->p_fmt->audio.i_channels );
-    SetDWLE( &p_sys->waveheader.SampleFreq, p_input->p_fmt->audio.i_rate );
+    p_sys->waveheader[0] = VLC_FOURCC('R', 'I', 'F', 'F'); /* MainChunkID */
+    SetDWLE( &p_sys->waveheader[1], 0 ); /* Length */
+    p_sys->waveheader[2] = VLC_FOURCC('W', 'A', 'V', 'E'); /* ChunkTypeID */
+    p_sys->waveheader[3] = VLC_FOURCC('f', 'm', 't', ' '); /* SubChunkID */
+    SetDWLE( &p_sys->waveheader[4], b_ext ? 40 : 16 ); /* SubChunkLength */
+
+    p_sys->waveheader2[0] = VLC_FOURCC('d', 'a', 't', 'a'); /* DataChunkID */
+    SetDWLE( &p_sys->waveheader2[1], 0 ); /* DataLength */
+
+    /* Build a WAVEVFORMAT header for the output data */
+    memset( &p_sys->waveformat, 0, sizeof(WAVEFORMATEXTENSIBLE) );
+    SetWLE( &p_waveformat->wFormatTag,
+            b_ext ? WAVE_FORMAT_EXTENSIBLE : i_format );
+    SetWLE( &p_waveformat->nChannels,
+            p_input->p_fmt->audio.i_channels );
+    SetDWLE( &p_waveformat->nSamplesPerSec, p_input->p_fmt->audio.i_rate );
     i_bytes_per_sample = p_input->p_fmt->audio.i_channels *
-        16 /*BitsPerSample*/ / 8;
-    SetWLE( &p_sys->waveheader.BytesPerSample, i_bytes_per_sample );
-    SetDWLE( &p_sys->waveheader.BytesPerSec,
+        p_input->p_fmt->audio.i_bitspersample / 8;
+    SetDWLE( &p_waveformat->nAvgBytesPerSec,
              i_bytes_per_sample * p_input->p_fmt->audio.i_rate );
-    p_sys->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
-    p_sys->waveheader.DataLength = 0;                 /* we just don't know */
+    SetWLE( &p_waveformat->nBlockAlign, i_bytes_per_sample );
+    SetWLE( &p_waveformat->wBitsPerSample,
+            p_input->p_fmt->audio.i_bitspersample );
+    SetWLE( &p_waveformat->cbSize, 22 );
+    SetWLE( &p_sys->waveformat.Samples.wValidBitsPerSample,
+            p_input->p_fmt->audio.i_bitspersample );
+    SetDWLE( &p_sys->waveformat.dwChannelMask,
+             p_sys->i_channel_mask );
+    p_sys->waveformat.SubFormat = subformat_guid;
+    p_sys->waveformat.SubFormat.Data1 = i_format;
+
 
     p_sys->b_used = VLC_TRUE;
 
     return VLC_SUCCESS;
 }
 
+static block_t *GetHeader( sout_mux_t *p_mux )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    block_t *p_block =
+        block_New( p_mux, sizeof( WAVEFORMATEXTENSIBLE ) + 7 * 4 );
+
+    SetDWLE( &p_sys->waveheader[1],
+             20 + (p_sys->b_ext ? 40 : 16) + p_sys->i_data ); /* Length */
+    SetDWLE( &p_sys->waveheader2[1], p_sys->i_data ); /* DataLength */
+
+    memcpy( p_block->p_buffer, &p_sys->waveheader, 5 * 4 );
+    memcpy( p_block->p_buffer + 5 * 4, &p_sys->waveformat,
+            sizeof( WAVEFORMATEXTENSIBLE ) );
+    memcpy( p_block->p_buffer + 5 * 4 +
+            (p_sys->b_ext ? sizeof( WAVEFORMATEXTENSIBLE ) : 16),
+            &p_sys->waveheader2, 2 * 4 );
+    if( !p_sys->b_ext ) p_block->i_buffer -= 24;
+    return p_block;
+}
+
 static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     msg_Dbg( p_mux, "removing input" );
+
+    msg_Dbg( p_mux, "writing header data" );
+    if( !sout_AccessOutSeek( p_mux->p_access, 0 ) )
+    {
+        sout_AccessOutWrite( p_mux->p_access, GetHeader( p_mux ) );
+    }
+
     return VLC_SUCCESS;
 }
 
 static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
+    sout_input_t *p_input;
 
     if( !p_mux->i_nb_inputs ) return VLC_SUCCESS;
 
     if( p_sys->b_header )
     {
-        /* Return only the header */
-        block_t *p_block = block_New( p_mux, sizeof( WAVEHEADER ) );
-        memcpy( p_block->p_buffer, &p_sys->waveheader, sizeof(WAVEHEADER) );
-
         msg_Dbg( p_mux, "writing header data" );
-        sout_AccessOutWrite( p_mux->p_access, p_block );
+        sout_AccessOutWrite( p_mux->p_access, GetHeader( p_mux ) );
     }
     p_sys->b_header = VLC_FALSE;
 
-    while( p_mux->pp_inputs[0]->p_fifo->i_depth > 0 )
+    p_input = p_mux->pp_inputs[0];
+    while( p_input->p_fifo->i_depth > 0 )
     {
-        block_t *p_block = block_FifoGet( p_mux->pp_inputs[0]->p_fifo );
+        block_t *p_block = block_FifoGet( p_input->p_fifo );
+        p_sys->i_data += p_block->i_buffer;
+
+        /* Do the channel reordering */
+        if( p_sys->b_chan_reorder )
+        {
+            if( p_input->p_fmt->i_codec == VLC_FOURCC('s','1','6','l') )
+                InterleaveS16( (int16_t *)p_block->p_buffer,
+                               p_block->i_buffer, p_sys->pi_chan_table,
+                               p_input->p_fmt->audio.i_channels );
+            else if( p_input->p_fmt->i_codec == VLC_FOURCC('f','l','3','2') )
+                InterleaveFloat32( (float *)p_block->p_buffer,
+                                   p_block->i_buffer, p_sys->pi_chan_table,
+                                   p_input->p_fmt->audio.i_channels );
+        }
+
         sout_AccessOutWrite( p_mux->p_access, p_block );
     }
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * CheckReordering: Check if we need to do some channel re-ordering
+ *  (our channel order is different from the one chosen by Microsoft).
+ *****************************************************************************/
+static void CheckReordering( sout_mux_t *p_mux, int i_nb_channels )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    int i, j, k, l;
+
+    p_sys->b_chan_reorder = VLC_FALSE;
+
+    p_sys->pi_chan_table = malloc( i_nb_channels * sizeof(int) );
+    if( !p_sys->pi_chan_table ) return;
+
+    for( i = 0, j = 0;
+         i < (int)(sizeof(pi_channels_out)/sizeof(uint32_t)); i++ )
+    {
+        if( p_sys->i_channel_mask & pi_channels_out[i] )
+        {
+            for( k = 0, l = 0;
+                 pi_channels_out[i] != pi_channels_ordered[k]; k++ )
+            {
+                if( p_sys->i_channel_mask & pi_channels_ordered[k] )
+                {
+                    l++;
+                }
+            }
+
+            p_sys->pi_chan_table[j] = l;
+
+            j++;
+        }
+    }
+
+    for( i = 0; i < i_nb_channels; i++ )
+    {
+        if( p_sys->pi_chan_table[i] != i ) p_sys->b_chan_reorder = VLC_TRUE;
+    }
+
+    if( p_sys->b_chan_reorder ) msg_Dbg( p_mux, "channel reordering needed" );
+}
+
+/*****************************************************************************
+ * InterleaveFloat32/S16: change the channel order to the Microsoft one.
+ *****************************************************************************/
+static void InterleaveFloat32( float *p_buf, int i_buf, int *pi_chan_table,
+                               int i_nb_channels )
+{
+    int i, j;
+    float p_tmp[10];
+
+    for( i = 0; i < i_buf / i_nb_channels / sizeof(float); i++ )
+    {
+        for( j = 0; j < i_nb_channels; j++ )
+        {
+            p_tmp[pi_chan_table[j]] = p_buf[i*i_nb_channels + j];
+        }
+
+        memcpy( &p_buf[i*i_nb_channels], p_tmp,
+                i_nb_channels * sizeof(float) );
+    }
+}
+
+static void InterleaveS16( int16_t *p_buf, int i_buf, int *pi_chan_table,
+                           int i_nb_channels )
+{
+    int i, j;
+    int16_t p_tmp[10];
+
+    for( i = 0; i < i_buf / i_nb_channels / sizeof(int16_t); i++ )
+    {
+        for( j = 0; j < i_nb_channels; j++ )
+        {
+            p_tmp[pi_chan_table[j]] = p_buf[i*i_nb_channels + j];
+        }
+
+        memcpy( &p_buf[i*i_nb_channels], p_tmp,
+                i_nb_channels * sizeof(int16_t) );
+    }
 }
