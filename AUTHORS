@@ -176,6 +176,10 @@ E: alexis.guillard@bt.com
 D: IPv6
 S: United Kingdom
 
+N: Roine Gustafsson
+E: roine@popstar.com
+D: spudec bug fixes
+
 N: Shane Harper
 E: shanegh@optusnet.com.au
 D: SDL plugin fixes and enhancements
@@ -299,6 +303,10 @@ D: Many ports (Mac OS X, iPAQ, *BSD, Solaris...)
 D: documentation
 S: France
 
+N: Benjamin Mironer
+E: bmironer@noos.fr
+D: Mac OS X fixes
+
 N: Arkadiusz Miskiewicz
 E: misiek@pld.ORG.PL
 D: autoconf and Makefile patches
@@ -319,6 +327,11 @@ N: Olivier Pomel
 E: pomel@via.ecp.fr
 C: pomel
 S: France
+
+N: Remco Poortinga
+E: poortinga@telin.nl
+D: IPv6 multicast patch
+S: Netherlands
 
 N: Jean-Paul Saman
 E: jpsaman@wxs.nl

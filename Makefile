@@ -102,6 +102,7 @@ PLUGINS_TARGETS := a52/a52 \
 		filter/filter_distort \
 		filter/filter_wall \
 		filter/filter_clone \
+		filter/filter_crop \
 		fx/fx_scope \
 		ggi/ggi \
 		glide/glide \
@@ -368,7 +369,7 @@ dist:
 	for i in Makefile.in.in POTFILES.in ; do cp po/$$i tmp/vlc/po ; done
 	# Copy misc files
 	cp FAQ AUTHORS COPYING TODO todo.pl ChangeLog* README* INSTALL* \
-		ABOUT-NLS BUGS MODULES vlc.spec \
+		ABOUT-NLS BUGS plugins/LIST vlc.spec \
 		Makefile Makefile.*.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh install-win32 macosx-dmg \
 		config.sub config.guess aclocal.m4 mkinstalldirs \
