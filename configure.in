@@ -106,6 +106,14 @@ if test x"${SYS}" != xmingw32; then
   plugins_CFLAGS="${plugins_CFLAGS} -fPIC"
 fi
 
+dnl Check for the need to include the mingwex lib for mingw32
+if test x$SYS = xmingw32
+then
+    AC_CHECK_LIB(mingwex,opendir,
+        AC_CHECK_LIB(kernel32,opendir,,vlc_LDFLAGS="${vlc_LDFLAGS} -lmingwex")
+    )
+fi
+
 dnl The -DSYS_FOO flag
 save_CFLAGS="${save_CFLAGS} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"
 
