@@ -2,9 +2,9 @@
  * tls.c
  *****************************************************************************
  * Copyright (C) 2004-2005 VideoLAN
- * $Id: httpd.c 8263 2004-07-24 09:06:58Z courmisch $
+ * $Id$
  *
- * Authors: Remi Denis-Courmont <courmisch@via.ecp.fr>
+ * Authors: Remi Denis-Courmont <rem # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
