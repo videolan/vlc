@@ -411,7 +411,7 @@ static void SetTables( vout_thread_t *p_vout )
     switch( p_vout->i_screen_depth )
     {
     case 15:
-        MaskToShift( &i_red_right,   &i_red_left,   0xf800 );
+        MaskToShift( &i_red_right,   &i_red_left,   0x7c00 );
         MaskToShift( &i_green_right, &i_green_left, 0x03e0 );
         MaskToShift( &i_blue_right,  &i_blue_left,  0x001f );        
         break;        
