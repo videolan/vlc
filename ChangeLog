@@ -1,3 +1,58 @@
+2003-04-07 Monday 17:35  gbazin
+
+ * po/fr.po: small update.
+ * modules/codec/libmpeg2.c: we now bypass libmpeg2 buffer management. As a nice side effect, still pictures in dvd menus are working now :)
+
+2003-04-07 Monday 16:02  gbazin
+
+ * modules/audio_output/directx.c, modules/audio_output/waveout.c:
+    cosmetic changes.
+
+2003-04-07 Monday 13:46  gbazin
+
+ * src/libvlc.c: fixed the translation config option to also take into
+   account the value in the config file.
+
+2003-04-07 Monday 13:01  gbazin
+
+ * src/libvlc.c: reload the main module in case the user asks for the
+    translation to be disabled. That way, the translation will even be
+    disabled in the preferences panel.
+
+2003-04-07 Monday 12:41  hartman
+
+ * new dutch translation
+ * readded Mac OS X readme file to Mac OS X distribution
+ * fixed some errors in the readme
+
+2003-04-07 Monday 11:48  gbazin
+
+ * src/misc/configuration.c: what the f??k, configuration variable names
+    and subtypes were being translated.
+
+2003-04-07 Monday 09:25  gbazin
+
+ * modules/gui/wxwindows/interface.cpp: removed debug message.
+
+2003-04-06 Sunday 23:44  massiot
+
+ * Renamed the "headphone" option to "headphone-opt" to avoid error
+ messages "option headphone does not exist". I'm not clever enough to find
+ out why it doesn't work when it's named "headphone".
+
+2003-04-06 Sunday 23:21  massiot
+
+ * Bumped up revision number to 0.5.3
+ * po/* : run --update-po before the release
+ * ChangeLog : run --update-changelog
+ * toolbox : ChangeLog is UTC
+ * OS X : fixed a bug with the deinterlace menu and localizations (thanks
+   Felix)
+
+2003-04-06 Sunday 23:00  hartman
+
+ * some small changes/fixes
+
 2003-04-06 Sunday 21:48  gbazin
 
  * po/fr.po: another bunch of updates to the french translation.
