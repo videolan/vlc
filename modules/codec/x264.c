@@ -249,8 +249,10 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_frame_reference = val.i_int;
 
     var_Get( p_enc, SOUT_CFG_PREFIX "scenecut", &val );
+#if X264_BUILD >= 0x000b
     if( val.i_int >= -1 && val.i_int <= 100 )
         p_sys->param.i_scenecut_threshold = val.i_int;
+#endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "analyse", &val );
     if( !strcmp( val.psz_string, "none" ) )
