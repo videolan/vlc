@@ -1232,29 +1232,31 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_LIST:
         {
-            char * psz_var = config_GetPsz( p_this, psz_name );
+            char *psz_orig, *psz_var;
             vlc_list_t *p_list = malloc(sizeof(vlc_list_t));
             p_val->p_list = p_list;
             p_list->i_count = 0;
-            while ( *psz_var )
+
+            psz_var = psz_orig = config_GetPsz( p_this, psz_name );
+            while( psz_var && *psz_var )
             {
-                char * psz_item = psz_var;
+                char *psz_item = psz_var;
                 vlc_value_t val;
-                while ( *psz_var && *psz_var != ',' )
-                    psz_var++;
-                if ( *psz_var == ',' )
+                while( *psz_var && *psz_var != ',' ) psz_var++;
+                if( *psz_var == ',' )
                 {
                     *psz_var = '\0';
                     psz_var++;
                 }
                 val.i_int = strtol( psz_item, NULL, 0 );
-                INSERT_ELEM( p_list->p_values, p_list->i_count, p_list->i_count,
-                             val );
+                INSERT_ELEM( p_list->p_values, p_list->i_count,
+                             p_list->i_count, val );
                 /* p_list->i_count is incremented twice by INSERT_ELEM */
                 p_list->i_count--;
-                INSERT_ELEM( p_list->pi_types, p_list->i_count, p_list->i_count,
-                             VLC_VAR_INTEGER );
+                INSERT_ELEM( p_list->pi_types, p_list->i_count,
+                             p_list->i_count, VLC_VAR_INTEGER );
             }
+            if( psz_orig ) free( psz_orig );
             break;
         }
         default:

@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-02 14:40+0100\n"
+"POT-Creation-Date: 2004-11-03 00:50+0100\n"
 "PO-Revision-Date: 2002-04-22 09:56+0200\n"
 "Last-Translator: Sam Hocevar <sam@zoy.org>\n"
 "Language-Team: \n"
@@ -246,11 +246,11 @@ msgstr ""
 #, fuzzy
 msgid ""
 "VLC is an open-source and cross-platform multimedia player for various audio "
-"and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, ...) as well as "
+"and video formats (MPEG-1, MPEG-2, MPEG-4, DivX, mp3, Ogg, etc.) as well as "
 "DVDs, VCDs, CD audio, and various streaming protocols.\n"
 "\n"
 "VLC is also a streaming server with transcoding capabilities (UDP unicast "
-"and multicast, HTTP, ...) mainly designed for high-bandwidth networks.\n"
+"and multicast, HTTP, etc.) mainly designed for high-bandwidth networks.\n"
 "\n"
 "For more information, have a look at the web site."
 msgstr ""
@@ -738,8 +738,8 @@ msgstr "Switch interface"
 msgid "Add Interface"
 msgstr "Add Interface"
 
-#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1628
-#: src/misc/modules.c:1918
+#: src/libvlc.c:285 src/libvlc.c:419 src/misc/modules.c:1629
+#: src/misc/modules.c:1919
 msgid "C"
 msgstr "en_GB"
 
@@ -964,7 +964,7 @@ msgstr ""
 msgid ""
 "These options allow you to modify the behavior of the audio subsystem, and "
 "to add audio filters which can be used for post processing or visual effects "
-"(spectrum analyzer, ...).\n"
+"(spectrum analyzer, etc.).\n"
 "Enable these filters here, and configure them in the \"audio filters\" "
 "modules section."
 msgstr ""
@@ -1093,7 +1093,7 @@ msgstr ""
 #: src/libvlc.h:151
 msgid ""
 "This allows you to add audio post processing filters, to modify the sound, "
-"or audio visualization modules (spectrum analyzer, ...)."
+"or audio visualization modules (spectrum analyzer, etc.)."
 msgstr ""
 "This allows you to add audio post processing filters, to modify the sound, "
 "or audio visualisation modules (spectrum analyser, …)."
@@ -1114,7 +1114,7 @@ msgstr ""
 msgid ""
 "These options allow you to modify the behavior of the video output "
 "subsystem. You can for example enable video filters (deinterlacing, image "
-"adjusting, ...). Enable these filters here and configure them in the \"video "
+"adjusting, etc.). Enable these filters here and configure them in the \"video "
 "filters\" modules section. You can also set many miscellaneous video options."
 msgstr ""
 "These options allow you to modify the behaviour of the video output "
@@ -1470,16 +1470,16 @@ msgstr ""
 msgid ""
 "You can specify a list of bookmarks for a stream in the form "
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
-"{etc...}\""
+"{...}\""
 msgstr ""
 "You can specify a list of bookmarks for a stream in the form "
 "\"{name=bookmark-name,time=optional-time-offset,bytes=optional-byte-offset},"
-"{etc.}\""
+"{...}\""
 
 #: src/libvlc.h:322
 msgid ""
 "These options allow you to modify the behavior of the subpictures subsystem. "
-"You can for example enable subpictures filters (logo, ...). Enable these "
+"You can for example enable subpictures filters (logo, etc.). Enable these "
 "filters here and configure them in the \"subpictures filters\" modules "
 "section. You can also set many miscellaneous subpictures options."
 msgstr ""
@@ -3417,7 +3417,7 @@ msgstr ""
 #: modules/access/cdda/cdda.c:56
 msgid ""
 "Allows you to specify how many CD blocks to get on a single CD read. "
-"Generally on newer/faster CD's, this increases throughput at the expense of "
+"Generally on newer/faster CDs, this increases throughput at the expense of "
 "a little more memory usage and initial delay. SCSI-MMC limitations generally "
 "don't allow for more than 25 blocks per access."
 msgstr ""
@@ -5063,30 +5063,30 @@ msgstr ""
 msgid "audio filter for PCM format conversion"
 msgstr ""
 
-#: modules/audio_filter/normvol.c:68
+#: modules/audio_filter/normvol.c:69
 #, fuzzy
 msgid "Number of audio buffers"
 msgstr "Number of threads"
 
-#: modules/audio_filter/normvol.c:69
+#: modules/audio_filter/normvol.c:70
 msgid ""
 "This is the number of audio buffers on which the power measurement is made. "
 "A higher number of buffers will increase the response time of the filter to "
 "a high power but will make it less sensitive to short variations."
 msgstr ""
 
-#: modules/audio_filter/normvol.c:74
+#: modules/audio_filter/normvol.c:75
 msgid "Max level"
 msgstr ""
 
-#: modules/audio_filter/normvol.c:75
+#: modules/audio_filter/normvol.c:76
 msgid ""
 "If the average power over the last N buffers is higher than this value, the "
 "volume will be normalized. This value is a positive floating point number. A "
 "value between 0.5 and 10 seems sensible."
 msgstr ""
 
-#: modules/audio_filter/normvol.c:81
+#: modules/audio_filter/normvol.c:82
 #, fuzzy
 msgid "Volume normalizer"
 msgstr "Visualisations"

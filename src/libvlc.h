@@ -89,7 +89,7 @@ static char *ppsz_language_text[] =
 #define AOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the audio " \
     "subsystem, and to add audio filters which can be used for " \
-    "post processing or visual effects (spectrum analyzer, ...).\n" \
+    "post processing or visual effects (spectrum analyzer, etc.).\n" \
     "Enable these filters here, and configure them in the \"audio filters\" " \
     "modules section.")
 
@@ -149,7 +149,7 @@ static char *ppsz_language_text[] =
 #define AUDIO_FILTER_TEXT N_("Audio filters")
 #define AUDIO_FILTER_LONGTEXT N_( \
     "This allows you to add audio post processing filters, to modify " \
-    "the sound, or audio visualization modules (spectrum analyzer, ...).")
+    "the sound, or audio visualization modules (spectrum analyzer, etc.).")
 
 #define AUDIO_CHANNEL_MIXER N_("Channel mixer")
 #define AUDIO_CHANNEL_MIXER_LONGTEXT N_( \
@@ -160,7 +160,7 @@ static char *ppsz_language_text[] =
 #define VOUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the video output " \
     "subsystem. You can for example enable video filters (deinterlacing, " \
-    "image adjusting, ...). Enable these filters here and configure " \
+    "image adjusting, etc.). Enable these filters here and configure " \
     "them in the \"video filters\" modules section. You can also set many " \
     "miscellaneous video options." )
 
@@ -316,11 +316,11 @@ static char *ppsz_align_descriptions[] =
 #define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
 #define BOOKMARKS_LONGTEXT N_("You can specify a list of bookmarks for a stream in " \
     "the form \"{name=bookmark-name,time=optional-time-offset," \
-    "bytes=optional-byte-offset},{etc...}\"")
+    "bytes=optional-byte-offset},{...}\"")
 
 #define SUB_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the subpictures " \
-    "subsystem. You can for example enable subpictures filters (logo, ...). " \
+    "subsystem. You can for example enable subpictures filters (logo, etc.). " \
     "Enable these filters here and configure them in the " \
     "\"subpictures filters\" modules section. You can also set many " \
     "miscellaneous subpictures options." )

@@ -55,7 +55,7 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
-	.cddb .cdio .vcdimager .png
+	.png
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
@@ -759,6 +759,7 @@ live.$(LIVEDOTCOM_VERSION).tar.gz:
 live: live.$(LIVEDOTCOM_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/live.patch
+	patch -p 0 < Patches/kasenna.patch
 
 .live: live
 	(cd $<; ./genmakefiles macosx && make )
@@ -986,6 +987,24 @@ libpng: libpng-$(PNG_VERSION).tar.bz2
 CLEAN_FILE += .png
 CLEAN_PKG += libpng
 DISCLEAN_PKG += libpng-$(PNG_VERSION).tar.bz2
+
+# ***************************************************************************
+# libzvbi
+# ***************************************************************************
+
+zvbi-$(ZVBI_VERSION).tar.bz2:
+	$(WGET) $(ZVBI_URL)
+
+zvbi: zvbi-$(ZVBI_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.zvbi: zvbi
+	(cd $<; ./configure --prefix=$(PREFIX) && make )
+	touch $@
+
+CLEAN_FILE += .zvbi
+CLEAN_PKG += zvbi
+DISCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
 
 # ***************************************************************************
 # Some cleansing

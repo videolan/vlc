@@ -190,11 +190,14 @@ static int Open ( vlc_object_t *p_this )
 
 
     /* Get the FPS */
-    p_sys->i_microsecperframe = 40000; /* default to 25 fps */
     f_fps = var_CreateGetFloat( p_demux, "sub-fps" );
     if( f_fps >= 1.0 )
     {
         p_sys->i_microsecperframe = (int64_t)( (float)1000000 / f_fps );
+    }
+    else
+    {
+        p_sys->i_microsecperframe = 0;
     }
 
     f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" );
@@ -680,6 +683,10 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
     int    i_stop;
     unsigned int i;
 
+    int i_microsecperframe = 40000; /* default to 25 fps */
+    if( p_sys->i_microsecperframe > 0 ) 
+        i_microsecperframe = p_sys->i_microsecperframe;
+    
     p_subtitle->i_start = 0;
     p_subtitle->i_stop  = 0;
     p_subtitle->psz_text = NULL;
@@ -709,8 +716,8 @@ static int ParseMicroDvd( demux_t *p_demux, subtitle_t *p_subtitle )
         }
     }
 
-    p_subtitle->i_start = (int64_t)i_start * p_sys->i_microsecperframe;
-    p_subtitle->i_stop  = (int64_t)i_stop  * p_sys->i_microsecperframe;
+    p_subtitle->i_start = (int64_t)i_start * i_microsecperframe;
+    p_subtitle->i_stop  = (int64_t)i_stop  * i_microsecperframe;
     p_subtitle->psz_text = strndup( buffer_text, MAX_LINE );
     return( 0 );
 }

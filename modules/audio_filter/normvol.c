@@ -2,7 +2,7 @@
  * normvol.c :  volume normalizer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: equalizer.c,v 1.21 2003/07/31 23:44:49 zorglub Exp $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -56,11 +56,12 @@ static void Close    ( vlc_object_t * );
 static void DoWork   ( aout_instance_t * , aout_filter_t *,
                 aout_buffer_t * , aout_buffer_t *);
 
-struct aout_filter_sys_t {
+typedef struct aout_filter_sys_t
+{
     int i_nb;
     float *p_last;
     float f_max;
-};
+} aout_filter_sys_t;
 
 /*****************************************************************************
  * Module descriptor
@@ -79,10 +80,11 @@ struct aout_filter_sys_t {
 
 vlc_module_begin();
     set_description( _("Volume normalizer") );
-    add_shortcut("volnorm");
-    add_integer("norm-buff-size" , 20 , NULL , BUFF_TEXT, BUFF_LONGTEXT,
-                VLC_TRUE);
-    add_float("norm-max-level",2.0,NULL,LEVEL_TEXT,LEVEL_LONGTEXT,VLC_TRUE);
+    add_shortcut( "volnorm" );
+    add_integer( "norm-buff-size", 20 ,NULL ,BUFF_TEXT, BUFF_LONGTEXT,
+                 VLC_TRUE);
+    add_float( "norm-max-level", 2.0, NULL, LEVEL_TEXT,
+               LEVEL_LONGTEXT, VLC_TRUE );
     set_capability( "audio filter", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -93,9 +95,9 @@ vlc_module_end();
 static int Open( vlc_object_t *p_this )
 {
     aout_filter_t *p_filter = (aout_filter_t*)p_this;
-
-    struct aout_filter_sys_t *p_sys = p_filter->p_sys =
-            malloc( sizeof( struct aout_filter_sys_t ) );
+    int i_channels;
+    aout_filter_sys_t *p_sys = p_filter->p_sys =
+        malloc( sizeof( aout_filter_sys_t ) );
 
     if( p_filter->input.i_format != VLC_FOURCC('f','l','3','2' ) ||
         p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
@@ -113,21 +115,18 @@ static int Open( vlc_object_t *p_this )
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = VLC_TRUE;
 
-    int i_channels = aout_FormatNbChannels( &p_filter->input );
+    i_channels = aout_FormatNbChannels( &p_filter->input );
 
-    p_sys->i_nb =  var_CreateGetInteger( p_filter->p_parent, "norm-buff-size" );
+    p_sys->i_nb = var_CreateGetInteger( p_filter->p_parent, "norm-buff-size" );
     p_sys->f_max = var_CreateGetFloat( p_filter->p_parent, "norm-max-level" );
 
-    if( p_sys->f_max <= 0 )
-    {
-        p_sys->f_max = 0.01;
-    }
+    if( p_sys->f_max <= 0 ) p_sys->f_max = 0.01;
 
     /* We need to store (nb_buffers+1)*nb_channels floats */
     p_sys->p_last = malloc( sizeof( float ) * (i_channels) *
                             (p_filter->p_sys->i_nb + 2) );
-    memset( p_sys->p_last, 0 , sizeof( float ) * (i_channels) *
-                           (p_filter->p_sys->i_nb + 2) );
+    memset( p_sys->p_last, 0 ,sizeof( float ) * (i_channels) *
+            (p_filter->p_sys->i_nb + 2) );
     return VLC_SUCCESS;
 }
 
@@ -157,9 +156,9 @@ static int Open( vlc_object_t *p_this )
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
 
-   /* Calculate the average power level on this buffer */
-   for( i = 0 ; i < i_samples; i++ )
-   {
+    /* Calculate the average power level on this buffer */
+    for( i = 0 ; i < i_samples; i++ )
+    {
         for( i_chan = 0; i_chan < i_channels; i_chan++ )
         {
             float f_sample = p_in[i_chan];
@@ -167,11 +166,11 @@ static int Open( vlc_object_t *p_this )
             pf_sum[i_chan] += f_square;
         }
         p_in += i_channels;
-   }
+    }
 
-   /* sum now contains for each channel the sigma(value²) */
-   for( i_chan = 0; i_chan < i_channels; i_chan++ )
-   {
+    /* sum now contains for each channel the sigma(value²) */
+    for( i_chan = 0; i_chan < i_channels; i_chan++ )
+    {
         /* Shift our lastbuff */
         memmove( &p_sys->p_last[ i_chan * p_sys->i_nb],
                         &p_sys->p_last[i_chan * p_sys->i_nb + 1],
@@ -194,7 +193,7 @@ static int Open( vlc_object_t *p_this )
         /* Seuil arbitraire */
         p_sys->f_max = var_GetFloat( p_aout, "norm-max-level" );
 
-//        fprintf(stderr,"Average %f, max %f\n", f_average, p_sys->f_max );
+        //fprintf(stderr,"Average %f, max %f\n", f_average, p_sys->f_max );
         if( f_average > p_sys->f_max )
         {
              pf_gain[i_chan] = f_average / p_sys->f_max;
@@ -206,7 +205,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Apply gain */
-    for( i = 0 ; i < i_samples ; i++)
+    for( i = 0; i < i_samples; i++)
     {
         for( i_chan = 0; i_chan < i_channels; i_chan++ )
         {
@@ -227,14 +226,11 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     aout_filter_t *p_filter = (aout_filter_t*)p_this;
-    struct aout_filter_sys_t *p_sys = p_filter->p_sys;
+    aout_filter_sys_t *p_sys = p_filter->p_sys;
 
     if( p_sys )
     {
-        if( p_sys->p_last)
-        {
-            free( p_sys->p_last );
-        }
+        if( p_sys->p_last) free( p_sys->p_last );
         free( p_sys );
     }
 }
