@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.59 2003/08/14 20:02:55 zorglub Exp $
+dnl $Id: configure.ac,v 1.60 2003/08/16 16:56:40 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -157,7 +157,7 @@ AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 dnl
 dnl Gettext stuff
 dnl
-ALL_LINGUAS="de en_GB fr it ja no ru nl pl sv"
+ALL_LINGUAS="de en_GB fr it ja nl no pl pt_BR ru sv"
 AM_GNU_GETTEXT_VERSION(0.11.5)
 AM_GNU_GETTEXT
 if test "${nls_cv_force_use_gnu_gettext}" = "yes"; then

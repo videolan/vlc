@@ -1,7 +1,6 @@
 # automatically created by toolbox --update-po
 
 # main sources
-include/announce.h
 include/aout_internal.h
 include/audio_output.h
 include/beos_specific.h
@@ -40,6 +39,7 @@ include/vlc_config.h
 include/vlc_cpu.h
 include/vlc_error.h
 include/vlc_interface.h
+include/vlc_keys.h
 include/vlc_messages.h
 include/vlc_objects.h
 include/vlc_playlist.h
@@ -90,7 +90,6 @@ src/misc/threads.c
 src/misc/variables.c
 src/misc/win32_specific.c
 src/playlist/playlist.c
-src/stream_output/announce.c
 src/stream_output/stream_output.c
 src/video_output/video_output.c
 src/video_output/video_text.c
@@ -317,6 +316,7 @@ modules/control/gestures.c
 modules/control/http.c
 modules/control/joystick.c
 modules/control/lirc/lirc.c
+modules/control/ntservice.c
 modules/control/rc/rc.c
 modules/demux/a52sys.c
 modules/demux/aac.c
@@ -635,6 +635,8 @@ modules/packetizer/mpeg4video.c
 modules/packetizer/mpegaudio.c
 modules/packetizer/mpegvideo.c
 modules/packetizer/vorbis.c
+modules/stream_out/announce.c
+modules/stream_out/announce.h
 modules/stream_out/display.c
 modules/stream_out/dummy.c
 modules/stream_out/duplicate.c

@@ -1,4 +1,4 @@
-$Id: THANKS,v 1.9 2003/06/21 20:45:53 sam Exp $
+$Id: THANKS,v 1.10 2003/08/16 16:56:40 gbazin Exp $
 
 VLC makes extensive use of the following persons' code:
 
@@ -8,6 +8,7 @@ Michel Lespinasse <walken@zoy.org> - AC3 decoder, MPEG audio and video decoders
 
 The VideoLAN team would like to thank the following contributors:
 
+André de Barros Martins Ribeiro <andrerib@ajato.com.br> - Brazilian portuguese localization
 Andres Krapf <dae@via.ecp.fr> - FreeBSD port and tests, KDE interface
 Andy Lindsay <andy_vl@ananam.com> - Fixes in the TS demux
 Arkadiusz Lipiec <A.Lipiec@elka.pw.edu.pl> - Polish translation
@@ -67,4 +68,3 @@ Watanabe Go <go@dsl.gr.jp> - fix for non-ASCII filenames
 Xavier Maillard <zedek@fxgsproject.org> - audio converters
 Xavier Marchesini <xav@alarue.net> - Win32 fixes
 Yves Duret <yves@zarb.org> - RPM packages
-
