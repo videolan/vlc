@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.63 2003/11/02 23:13:30 zorglub Exp $
+ * $Id: playlist.c,v 1.64 2003/11/14 03:51:39 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -161,11 +161,27 @@ void playlist_Destroy( playlist_t * p_playlist )
         break;
 
     case PLAYLIST_PAUSE:
-        p_playlist->i_status = PLAYLIST_PAUSED;
+        val.i_int = 0;
         if( p_playlist->p_input )
+            var_Get( p_playlist->p_input, "state", &val );
+
+        if( val.i_int == PAUSE_S )
         {
-            val.i_int = PAUSE_S;
-            var_Set( p_playlist->p_input, "state", val );
+            p_playlist->i_status = PLAYLIST_RUNNING;
+            if( p_playlist->p_input )
+            {
+                val.i_int = PLAYING_S;
+                var_Set( p_playlist->p_input, "state", val );
+            }
+        }
+        else
+        {
+            p_playlist->i_status = PLAYLIST_PAUSED;
+            if( p_playlist->p_input )
+            {
+                val.i_int = PAUSE_S;
+                var_Set( p_playlist->p_input, "state", val );
+            }
         }
         break;
 
