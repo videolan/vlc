@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: v4l.c,v 1.39 2004/01/25 17:31:22 gbazin Exp $
+ * $Id: v4l.c,v 1.40 2004/02/04 20:13:55 fenrir Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -186,6 +186,11 @@ struct access_sys_t
     int i_width;
     int i_height;
 
+    int i_brightness;
+    int i_hue;
+    int i_colour;
+    int i_contrast;
+
     float f_fps;            /* <= 0.0 mean to grab at full rate */
     mtime_t i_video_pts;    /* only used when f_fps > 0 */
 
@@ -288,6 +293,11 @@ static int AccessOpen( vlc_object_t *p_this )
 
     p_sys->f_fps            = -1.0;
     p_sys->i_video_pts      = -1;
+
+    p_sys->i_brightness     = -1;
+    p_sys->i_hue            = -1;
+    p_sys->i_colour         = -1;
+    p_sys->i_contrast       = -1;
 
     p_sys->b_mjpeg     = VLC_FALSE;
     p_sys->i_decimation = 1;
@@ -576,6 +586,26 @@ static void ParseMRL( input_thread_t *p_input )
                     msg_Dbg( p_input, "WxH %dx%d", p_sys->i_width,
                              p_sys->i_height );
                 }
+            }
+            else if( !strncmp( psz_parser, "brightness=", strlen( "brightness=" ) ) )
+            {
+                p_sys->i_brightness = strtol( psz_parser + strlen( "brightness=" ),
+                                              &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "colour=", strlen( "colour=" ) ) )
+            {
+                p_sys->i_colour = strtol( psz_parser + strlen( "colour=" ),
+                                          &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "hue=", strlen( "hue=" ) ) )
+            {
+                p_sys->i_hue = strtol( psz_parser + strlen( "hue=" ), 
+                                       &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "contrast=", strlen( "contrast=" ) ) )
+            {
+                p_sys->i_contrast = strtol( psz_parser + strlen( "contrast=" ),
+                                            &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "tuner=", strlen( "tuner=" ) ) )
             {
@@ -927,6 +957,37 @@ int OpenVideoDev( input_thread_t *p_input, char *psz_device )
 
     if( !p_sys->b_mjpeg )
     {
+        /* set hue/color/.. */
+        if( ioctl( i_fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
+        {
+            struct video_picture vid_picture = p_sys->vid_picture;
+
+            if( p_sys->i_brightness >= 0 && p_sys->i_brightness < 65536 )
+            {
+                vid_picture.brightness = p_sys->i_brightness;
+            }
+            if( p_sys->i_colour >= 0 && p_sys->i_colour < 65536 )
+            {
+                vid_picture.colour = p_sys->i_colour;
+            }
+            if( p_sys->i_hue >= 0 && p_sys->i_hue < 65536 )
+            {
+                vid_picture.hue = p_sys->i_hue;
+            }
+            if( p_sys->i_contrast  >= 0 && p_sys->i_contrast < 65536 )
+            {
+                vid_picture.contrast = p_sys->i_contrast;
+            }
+            if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
+            {
+                msg_Dbg( p_input, "v4l device uses brightness: %d", vid_picture.brightness );
+                msg_Dbg( p_input, "v4l device uses colour: %d", vid_picture.colour );
+                msg_Dbg( p_input, "v4l device uses hue: %d", vid_picture.hue );
+                msg_Dbg( p_input, "v4l device uses contrast: %d", vid_picture.contrast );
+                p_sys->vid_picture = vid_picture;
+            }
+        }
+
         /* Find out video format used by device */
         if( ioctl( i_fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
         {
