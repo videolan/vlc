@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: stream.c,v 1.14 2004/01/26 20:48:10 fenrir Exp $
+ * $Id: stream.c,v 1.15 2004/02/02 13:00:53 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -163,8 +163,8 @@ static int IStreamControl( stream_t *s, int i_query, va_list args )
 
         case STREAM_SET_POSITION:
         {
-            i64 = (int64_t) va_arg( args, int64_t );
             int64_t i_skip;
+            i64 = (int64_t) va_arg( args, int64_t );
 
             vlc_mutex_lock( &p_input->stream.stream_lock );
             if( i64 < 0 ||
