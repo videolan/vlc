@@ -6,6 +6,7 @@
                 eject = id; 
                 faster = id; 
                 fullscreen = id; 
+                loop = id; 
                 maxvolume = id; 
                 mute = id; 
                 next = id; 

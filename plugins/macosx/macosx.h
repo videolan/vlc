@@ -2,7 +2,7 @@
  * macosx.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.h,v 1.9.2.1 2002/06/02 01:22:04 massiot Exp $
+ * $Id: macosx.h,v 1.9.2.2 2002/06/02 12:17:23 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -43,6 +43,7 @@ typedef struct intf_sys_s
     
     int i_part;
     boolean_t b_disabled_menus;
+    boolean_t b_loop;
     int i_channel;
 } intf_sys_t;
 
