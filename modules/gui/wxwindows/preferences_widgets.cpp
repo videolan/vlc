@@ -512,6 +512,7 @@ wxString FileConfigControl::GetPszValue()
  * IntegerConfigControl implementation
  *****************************************************************************/
 BEGIN_EVENT_TABLE(IntegerConfigControl, wxPanel)
+    EVT_TEXT(-1, IntegerConfigControl::OnUpdate)
     EVT_COMMAND_SCROLL(-1, IntegerConfigControl::OnUpdate)
 END_EVENT_TABLE()
 
