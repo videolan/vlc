@@ -44,8 +44,7 @@
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
-    return [( (VLCApplication *) [VLCApplication sharedApplication] )
-            hasDefinedShortcutKey:o_event];
+    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event];
 }
 
 @end
@@ -110,7 +109,7 @@
                 o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];
                 o_array = [o_array arrayByAddingObject: o_dic];
             }
-            [(VLCPlaylist *)[[NSApp delegate] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
+            [(VLCPlaylist *)[[VLCMain sharedInstance] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
             return YES;
         }
     }
@@ -188,7 +187,7 @@
                 o_dic = [NSDictionary dictionaryWithObject:[o_values objectAtIndex:i] forKey:@"ITEM_URL"];
                 o_array = [o_array arrayByAddingObject: o_dic];
             }
-            [(VLCPlaylist *)[[NSApp delegate] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
+            [[[VLCMain sharedInstance] getPlaylist] appendArray: o_array atPos: -1 enqueue:NO];
             return YES;
         }
     }

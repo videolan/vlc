@@ -42,9 +42,12 @@
 #include "audio_output.h"
 
 #include "vlc_interface.h"
-
 #include "vlc_video.h"
 #include "video_output.h"
+
+#ifdef SYS_DARWIN
+#    include "Cocoa/Cocoa.h"
+#endif /* SYS_DARWIN */
 
 /*****************************************************************************
  * Local prototypes
@@ -127,6 +130,42 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
  */
 int intf_RunThread( intf_thread_t *p_intf )
 {
+#ifdef SYS_DARWIN
+    if( p_intf->b_block )
+    {
+        /* This is the primary intf */
+        /* Run a manager thread, launch the interface, kill the manager */
+        if( vlc_thread_create( p_intf, "manager", Manager,
+                               VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
+        {
+            msg_Err( p_intf, "cannot spawn manager thread" );
+            return VLC_EGENERIC;
+        }
+    }
+
+    if( p_intf->b_block && !strncmp( p_intf->p_module->psz_shortname, "macosx" , 6 ) )
+    {
+	/* this is OSX, we are cheating :)
+           This is NOT I REPEAT NOT blocking since [NSApp run] is */
+	p_intf->b_block = VLC_FALSE;
+
+        RunInterface( p_intf );
+    	p_intf->b_block = VLC_TRUE;
+    }
+    else if( p_intf->b_block && !strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) )
+    {
+        /* VLC OS X in cli mode ( no blocking [NSApp run] )
+           this is equal to running in normal non-OSX primary intf mode */
+        RunInterface( p_intf );
+        p_intf->b_die = VLC_TRUE;
+    }
+    else
+    {
+        /* If anything else is the primary intf and we are not in cli mode,
+           then don't make it blocking ([NSApp run] will be blocking) 
+           but run it in a seperate thread. */
+        p_intf->b_block = VLC_FALSE;
+#else
     if( p_intf->b_block )
     {
         /* Run a manager thread, launch the interface, kill the manager */
@@ -140,11 +179,11 @@ int intf_RunThread( intf_thread_t *p_intf )
         RunInterface( p_intf );
 
         p_intf->b_die = VLC_TRUE;
-
         /* Do not join the thread... intf_StopThread will do it for us */
     }
     else
     {
+#endif
         /* Run the interface in a separate thread */
         if( vlc_thread_create( p_intf, "interface", RunInterface,
                                VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
@@ -228,6 +267,12 @@ static void Manager( intf_thread_t *p_intf )
         if( p_intf->p_vlc->b_die )
         {
             p_intf->b_die = VLC_TRUE;
+#ifdef SYS_DARWIN
+    if( strncmp( p_intf->p_vlc->psz_object_name, "clivlc", 6 ) )
+    {
+        [NSApp stop: NULL];
+    }
+#endif
             return;
         }
     }

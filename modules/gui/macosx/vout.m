@@ -119,26 +119,6 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         return( 1 );
     }
 
-    if( [NSApp respondsToSelector: @selector(getIntf)] )
-    {
-        intf_thread_t * p_intf;
-
-        for( i_timeout = 10 ; i_timeout-- ; )
-        {
-            if( ( p_intf = [NSApp getIntf] ) == NULL )
-            {
-                msleep( INTF_IDLE_SLEEP );
-            }
-        }
-
-        if( p_intf == NULL )
-        {
-            msg_Err( p_vout, "MacOS X intf has getIntf, but is NULL" );
-            free( p_vout->p_sys );
-            return( 1 );
-        }
-    }
-
     p_vout->p_sys->b_mouse_moved = VLC_TRUE;
     p_vout->p_sys->i_time_mouse_last_moved = mdate();
 
@@ -613,12 +593,12 @@ static int CoSendRequest( vout_thread_t *p_vout, SEL sel )
     interface. We do not check if this interface exists, since it has 
     already been done before.*/
 
-    p_intf = [NSApp getIntf];
+    /*p_intf = VLCIntf;
 
     val.b_bool = VLC_TRUE;
     var_Create(p_intf,"intf-change",VLC_VAR_BOOL);
     var_Set(p_intf, "intf-change",val);
-
+*/
     return( i_ret );
 }
 
@@ -1036,8 +1016,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
 - (BOOL)performKeyEquivalent:(NSEvent *)o_event
 {
-    return [(VLCApplication *) [VLCApplication sharedApplication]
-            hasDefinedShortcutKey:o_event];
+    return [[VLCMain sharedInstance] hasDefinedShortcutKey:o_event];
 }
 
 - (void)keyDown:(NSEvent *)o_event

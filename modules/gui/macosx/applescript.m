@@ -41,7 +41,7 @@
 
     if ( [o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"] )
     {
-        intf_thread_t * p_intf = [NSApp getIntf];
+        intf_thread_t * p_intf = VLCIntf;
         playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                         FIND_ANYWHERE );
         if( p_playlist == NULL )
@@ -84,7 +84,7 @@
 - (id)performDefaultImplementation {
     NSString *o_command = [[self commandDescription] commandName];
 
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                     FIND_ANYWHERE );
     if( p_playlist == NULL )

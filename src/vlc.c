@@ -7,6 +7,7 @@
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Lots of other people, see the libvlc AUTHORS file
  *
  * This program is free software; you can redistribute it and/or modify
@@ -34,8 +35,15 @@
 #ifdef HAVE_TIME_H
 #   include <time.h>                                               /* time() */
 #endif
+#ifdef HAVE_STRINGS_H
+#   include <strings.h>                                         /* strncmp() */
+#endif
 
 #include <vlc/vlc.h>
+
+#ifdef SYS_DARWIN
+#include <Cocoa/Cocoa.h>
+#endif
 
 /*****************************************************************************
  * Local prototypes.
@@ -44,14 +52,58 @@
 static void SigHandler  ( int i_signal );
 #endif
 
+#ifdef SYS_DARWIN
 /*****************************************************************************
- * main: parse command line, start interface and spawn threads
+ * VLCApplication interface
+ *****************************************************************************/
+@interface VLCApplication : NSApplication
+{
+}
+
+@end
+
+/*****************************************************************************
+ * VLCApplication implementation 
+ *****************************************************************************/
+@implementation VLCApplication 
+
+- (void)stop: (id)sender
+{
+    NSEvent *o_event;
+    [super stop:sender];
+
+    /* send a dummy event to break out of the event loop */
+    o_event = [NSEvent mouseEventWithType: NSLeftMouseDown
+                location: NSMakePoint( 1, 1 ) modifierFlags: 0
+                timestamp: 1 windowNumber: [[NSApp mainWindow] windowNumber]
+                context: [NSGraphicsContext currentContext] eventNumber: 1
+                clickCount: 1 pressure: 0.0];
+    [NSApp postEvent: o_event atStart: YES];
+}
+
+- (void)terminate: (id)sender
+{
+    if( [NSApp isRunning] )
+        [NSApp stop:sender];
+    [super terminate: sender];
+}
+
+@end
+
+#endif /* SYS_DARWIN */
+
+/*****************************************************************************
+ * main: parse command line, start interface and spawn threads.
  *****************************************************************************/
 int main( int i_argc, char *ppsz_argv[] )
 {
     int i_ret;
+    int b_cli = VLC_FALSE ;
 
+#ifndef SYS_DARWIN
+    /* This clutters OSX GUI error logs */
     fprintf( stderr, "VLC media player %s\n", VLC_Version() );
+#endif
 
 #ifdef HAVE_PUTENV
 #   ifdef DEBUG
@@ -98,14 +150,52 @@ int main( int i_argc, char *ppsz_argv[] )
         return i_ret;
     }
 
-    /* Add a blocking interface, start playing, and keep the return value */
+#ifdef HAVE_STRINGS_H
+    /* if first 3 chars of argv[0] are cli, then this is clivlc
+     * We detect this specifically for Mac OS X, so you can launch vlc
+     * from the commandline even if you are not logged in on the GUI */
+    if( i_argc > 0 )
+    {
+        char *psz_temp;
+        char *psz_program = psz_temp = ppsz_argv[0];
+        while( *psz_temp )
+        {
+            if( *psz_temp == '/' ) psz_program = ++psz_temp;
+            else ++psz_temp;
+        }
+        b_cli = !strncmp( psz_program, "cli", 3 );
+    }
+#endif
+
+#ifdef SYS_DARWIN
+    if( !b_cli )
+    {
+        [VLCApplication sharedApplication];
+    }
+
     i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE, VLC_TRUE );
+    
+    if( !b_cli )
+    {
+        /* This is a blocking call */
+        [NSApp run];
+    }
+#else
+    i_ret = VLC_AddIntf( 0, NULL, VLC_TRUE, VLC_TRUE );
+#endif /* SYS_DARWIN */
 
     /* Finish the threads */
     VLC_CleanUp( 0 );
 
     /* Destroy the libvlc structure */
     VLC_Destroy( 0 );
+
+#ifdef SYS_DARWIN
+    if( !b_cli )
+    {
+        [NSApp terminate:NULL];
+    }
+#endif /* SYS_DARWIN */
 
     return i_ret;
 }

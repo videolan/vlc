@@ -31,33 +31,18 @@
 #include <Cocoa/Cocoa.h>
 
 /*****************************************************************************
- * VLCApplication interface
+ * Local prototypes.
  *****************************************************************************/
-@interface VLCApplication : NSApplication
-{
-    intf_thread_t *p_intf;
-}
+int ExecuteOnMainThread( id target, SEL sel, void * p_arg );
+unsigned int CocoaKeyToVLC( unichar i_key );
 
-- (NSString *)localizedString:(char *)psz;
-- (char *)delocalizeString:(NSString *)psz;
-- (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;
+#define VLCIntf [[VLCMain sharedInstance] getIntf]
 
-- (void)setIntf:(intf_thread_t *)p_intf;
-- (intf_thread_t *)getIntf;
-- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event;
-
-@end
-
-#define _NS(s) [NSApp localizedString: _(s)]
+#define _NS(s) [[VLCMain sharedInstance] localizedString: _(s)]
 /* Get an alternate version of the string.
  * This string is stored as '1:string' but when displayed it only displays
  * the translated string. the translation should be '1:translatedstring' though */
-#define _ANS(s) [[NSApp localizedString: _(s)] substringFromIndex:2]
-
-int ExecuteOnMainThread( id target, SEL sel, void * p_arg );
-int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
-                     vlc_value_t old_val, vlc_value_t new_val, void *param );
-unsigned int CocoaKeyToVLC( unichar i_key );
+#define _ANS(s) [[[VLCMain sharedInstance] localizedString: _(s)] substringFromIndex:2]
 
 /*****************************************************************************
  * intf_sys_t: description and status of the interface
@@ -92,6 +77,7 @@ struct intf_sys_t
  *****************************************************************************/
 @interface VLCMain : NSObject
 {
+    intf_thread_t *p_intf;      /* The main intf object */
     id o_prefs;                 /* VLCPrefs       */
 
     IBOutlet id o_window;       /* main window    */
@@ -238,10 +224,19 @@ struct intf_sys_t
     IBOutlet id o_dmi_mute;
 }
 
++ (VLCMain *)sharedInstance;
+
+- (intf_thread_t *)getIntf;
+- (void)setIntf:(intf_thread_t *)p_mainintf;
+
 - (id)getControls;
 - (id)getPlaylist;
 - (id)getInfo;
 - (void)terminate;
+- (NSString *)localizedString:(char *)psz;
+- (char *)delocalizeString:(NSString *)psz;
+- (NSString *)wrapString: (NSString *)o_in_string toWidth: (int)i_width;
+- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event;
 
 - (void)initStrings;
 

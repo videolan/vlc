@@ -397,7 +397,7 @@
 
 - (void)TTLChanged:(NSNotification *)o_notification
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     config_PutInt( p_intf, "ttl", [o_stream_ttl intValue] );
 }
 

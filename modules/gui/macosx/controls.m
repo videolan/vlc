@@ -45,7 +45,7 @@
 {
     vlc_value_t val;
     playlist_t * p_playlist;
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
 
@@ -87,7 +87,7 @@
 
 - (IBAction)stop:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist != NULL )
@@ -100,7 +100,7 @@
 
 - (IBAction)faster:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
     if( p_input != NULL )
@@ -115,7 +115,7 @@
 
 - (IBAction)slower:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
     if( p_input != NULL )
@@ -130,7 +130,7 @@
 
 - (IBAction)prev:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist )
@@ -143,7 +143,7 @@
 
 - (IBAction)next:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist )
@@ -156,7 +156,7 @@
 
 - (IBAction)random:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     vlc_value_t val;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -184,7 +184,7 @@
 
 - (IBAction)repeat:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     vlc_value_t val;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -216,7 +216,7 @@
 
 - (IBAction)loop:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     vlc_value_t val;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
@@ -248,7 +248,7 @@
 
 - (IBAction)forward:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
     if( p_input != NULL )
@@ -263,7 +263,7 @@
 
 - (IBAction)backward:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
     if( p_input != NULL )
@@ -279,7 +279,7 @@
 
 - (IBAction)volumeUp:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
 
     if( p_intf->p_sys->b_mute )
     {
@@ -293,7 +293,7 @@
 
 - (IBAction)volumeDown:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
 
     if( p_intf->p_sys->b_mute )
     {
@@ -307,7 +307,7 @@
 
 - (IBAction)mute:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     audio_volume_t i_volume;
 
     aout_VolumeMute( p_intf, &i_volume );
@@ -318,7 +318,7 @@
 
 - (IBAction)volumeSliderUpdated:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     audio_volume_t i_volume = (audio_volume_t)[sender intValue];
 
     aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_STEP );
@@ -326,7 +326,7 @@
 
 - (void)updateVolumeSlider
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     audio_volume_t i_volume;
 
     aout_VolumeGet( p_intf, &i_volume );
@@ -343,7 +343,7 @@
     NSString *o_title = [sender title];
     NSArray *o_windows = [NSApp orderedWindows];
     NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-    vout_thread_t   *p_vout = vlc_object_find( [NSApp getIntf], VLC_OBJECT_VOUT,
+    vout_thread_t   *p_vout = vlc_object_find( VLCIntf, VLC_OBJECT_VOUT,
                                               FIND_ANYWHERE );
 
     if( p_vout != NULL )
@@ -408,7 +408,7 @@
     
     /* Get the descriptive name of the variable */
     var_Change( p_object, psz_variable, VLC_VAR_GETTEXT, &text, NULL );
-    [o_mi setTitle: [NSApp localizedString: text.psz_string ?
+    [o_mi setTitle: [[VLCMain sharedInstance] localizedString: text.psz_string ?
                                         text.psz_string : strdup( psz_variable ) ]];
 
     var_Get( p_object, psz_variable, &val );
@@ -523,7 +523,7 @@
             another_val.psz_string =
                 strdup(val_list.p_list->p_values[i].psz_string);
 
-            o_title = [NSApp localizedString: text_list.p_list->p_values[i].psz_string ?
+            o_title = [[VLCMain sharedInstance] localizedString: text_list.p_list->p_values[i].psz_string ?
                 text_list.p_list->p_values[i].psz_string : val_list.p_list->p_values[i].psz_string ];
 
             o_lmi = [o_menu addItemWithTitle: o_title action: pf_callback keyEquivalent: @""];
@@ -540,7 +540,7 @@
         case VLC_VAR_INTEGER:
 
              o_title = text_list.p_list->p_values[i].psz_string ?
-                                 [NSApp localizedString: strdup( text_list.p_list->p_values[i].psz_string )] :
+                                 [[VLCMain sharedInstance] localizedString: strdup( text_list.p_list->p_values[i].psz_string )] :
                                  [NSString stringWithFormat: @"%d",
                                  val_list.p_list->p_values[i].i_int];
 
@@ -580,9 +580,9 @@
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
     VLCMenuExt *o_data = (VLCMenuExt *)_o_data;
 
-    vlc_thread_set_priority( [NSApp getIntf] , VLC_THREAD_PRIORITY_LOW );
+    vlc_thread_set_priority( VLCIntf , VLC_THREAD_PRIORITY_LOW );
 
-    p_object = (vlc_object_t *)vlc_object_get( [NSApp getIntf],
+    p_object = (vlc_object_t *)vlc_object_get( VLCIntf,
                                     [o_data objectID] );
 
     if( p_object != NULL )
@@ -604,7 +604,7 @@
 {
     BOOL bEnabled = TRUE;
     vlc_value_t val;
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
 

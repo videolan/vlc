@@ -70,10 +70,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     p_intf->b_play = VLC_TRUE;
     p_intf->pf_run = Run;
     
-    [VLCApplication sharedApplication];
-    [NSApp setIntf: p_intf];
-
-    [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
+    [[VLCMain sharedInstance] setIntf: p_intf];
 
     return( 0 );
 }
@@ -102,161 +99,8 @@ static void Run( intf_thread_t *p_intf )
      * fails to go to real-time priority with the first launched thread
      * (???) --Meuuh */
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
-
-    [NSApp run];
+    [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 }
-
-/*****************************************************************************
- * VLCApplication implementation 
- *****************************************************************************/
-@implementation VLCApplication
-
-- (NSString *)localizedString:(char *)psz
-{
-    NSString * o_str = nil;
-
-    if( psz != NULL )
-    {
-        o_str = [[[NSString alloc] initWithUTF8String: psz] autorelease];
-    }
-    if ( o_str == NULL )
-    {
-        msg_Err( p_intf, "could not translate: %s", psz );
-    }
-
-    return( o_str );
-}
-
-- (char *)delocalizeString:(NSString *)id
-{
-    NSData * o_data = [id dataUsingEncoding: NSUTF8StringEncoding
-                          allowLossyConversion: NO];
-    char * psz_string;
-
-    if ( o_data == nil )
-    {
-        o_data = [id dataUsingEncoding: NSUTF8StringEncoding
-                     allowLossyConversion: YES];
-        psz_string = malloc( [o_data length] + 1 ); 
-        [o_data getBytes: psz_string];
-        psz_string[ [o_data length] ] = '\0';
-        msg_Err( p_intf, "cannot convert to wanted encoding: %s",
-                 psz_string );
-    }
-    else
-    {
-        psz_string = malloc( [o_data length] + 1 ); 
-        [o_data getBytes: psz_string];
-        psz_string[ [o_data length] ] = '\0';
-    }
-
-    return psz_string;
-}
-
-/* i_width is in pixels */
-- (NSString *)wrapString: (NSString *)o_in_string toWidth: (int) i_width
-{
-    NSMutableString *o_wrapped;
-    NSString *o_out_string;
-    NSRange glyphRange, effectiveRange, charRange;
-    NSRect lineFragmentRect;
-    unsigned glyphIndex, breaksInserted = 0;
-
-    NSTextStorage *o_storage = [[NSTextStorage alloc] initWithString: o_in_string
-        attributes: [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSFont labelFontOfSize: 0.0], NSFontAttributeName, nil]];
-    NSLayoutManager *o_layout_manager = [[NSLayoutManager alloc] init];
-    NSTextContainer *o_container = [[NSTextContainer alloc]
-        initWithContainerSize: NSMakeSize(i_width, 2000)];
-    
-    [o_layout_manager addTextContainer: o_container];
-    [o_container release];
-    [o_storage addLayoutManager: o_layout_manager];
-    [o_layout_manager release];
-        
-    o_wrapped = [o_in_string mutableCopy];
-    glyphRange = [o_layout_manager glyphRangeForTextContainer: o_container];
-    
-    for( glyphIndex = glyphRange.location ; glyphIndex < NSMaxRange(glyphRange) ;
-            glyphIndex += effectiveRange.length) {
-        lineFragmentRect = [o_layout_manager lineFragmentRectForGlyphAtIndex: glyphIndex
-                                            effectiveRange: &effectiveRange];
-        charRange = [o_layout_manager characterRangeForGlyphRange: effectiveRange
-                                    actualGlyphRange: &effectiveRange];
-        if ([o_wrapped lineRangeForRange:
-                NSMakeRange(charRange.location + breaksInserted, charRange.length)].length > charRange.length) {
-            [o_wrapped insertString: @"\n" atIndex: NSMaxRange(charRange) + breaksInserted];
-            breaksInserted++;
-        }
-    }
-    o_out_string = [NSString stringWithString: o_wrapped];
-    [o_wrapped release];
-    [o_storage release];
-    
-    return o_out_string;
-}
-
-- (void)setIntf:(intf_thread_t *)_p_intf
-{
-    p_intf = _p_intf;
-}
-
-- (intf_thread_t *)getIntf
-{
-    return( p_intf );
-}
-
-- (void)terminate:(id)sender
-{
-    p_intf->p_vlc->b_die = VLC_TRUE;
-    [super terminate:sender];
-}
-
-
-/*****************************************************************************
- * hasDefinedShortcutKey: Check to see if the key press is a defined VLC
- * shortcut key.  If it is, pass it off to VLC for handling and return YES,
- * otherwise ignore it and return NO (where it will get handled by Cocoa).
- *****************************************************************************/
-- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event
-{
-    unichar key = 0;
-    vlc_value_t val;
-    unsigned int i_pressed_modifiers = 0;
-    struct hotkey *p_hotkeys;
-    int i;
-
-    val.i_int = 0;
-    p_hotkeys = p_intf->p_vlc->p_hotkeys;
-
-    i_pressed_modifiers = [o_event modifierFlags];
-
-    if( i_pressed_modifiers & NSShiftKeyMask )
-        val.i_int |= KEY_MODIFIER_SHIFT;
-    if( i_pressed_modifiers & NSControlKeyMask )
-        val.i_int |= KEY_MODIFIER_CTRL;
-    if( i_pressed_modifiers & NSAlternateKeyMask )
-        val.i_int |= KEY_MODIFIER_ALT;
-    if( i_pressed_modifiers & NSCommandKeyMask )
-        val.i_int |= KEY_MODIFIER_COMMAND;
-
-    key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
-
-    val.i_int |= CocoaKeyToVLC( key );
-
-    for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
-    {
-        if( p_hotkeys[i].i_key == val.i_int )
-        {
-            var_Set( p_intf->p_vlc, "key-pressed", val );
-            return YES;
-        }
-    }
-
-    return NO;
-}
-
-@end
 
 int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 {
@@ -271,7 +115,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                 withObject: [NSValue valueWithPointer: p_arg]
                 waitUntilDone: YES];
     }
-    else if( NSApp != nil && [NSApp respondsToSelector: @selector(getIntf)] ) 
+    else if( NSApp != nil && [[VLCMain sharedInstance] respondsToSelector: @selector(getIntf)] ) 
     {
         NSValue * o_v1;
         NSValue * o_v2;
@@ -285,7 +129,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 
         id * val[] = { &o_lock, &o_v2 };
 
-        p_intf = (intf_thread_t *)[NSApp getIntf];
+        p_intf = (intf_thread_t *)VLCIntf;
 
         o_recv_port = [[NSPort port] retain];
         o_v1 = [NSValue valueWithPointer: val]; 
@@ -329,7 +173,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
 int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     p_intf->p_sys->b_playlist_update = TRUE;
     p_intf->p_sys->b_intf_update = TRUE;
     return VLC_SUCCESS;
@@ -417,10 +261,36 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
  *****************************************************************************/
 @implementation VLCMain
 
+static VLCMain *_o_sharedMainInstance = nil;
+
++ (VLCMain *)sharedInstance
+{
+    return _o_sharedMainInstance ? _o_sharedMainInstance : [[self alloc] init];
+}
+
+- (id)init 
+{
+    if (_o_sharedMainInstance) {
+        [self dealloc];
+    } else {
+        _o_sharedMainInstance = [super init];
+    }
+    
+    return _o_sharedMainInstance;
+}
+
+- (void)setIntf: (intf_thread_t *)p_mainintf {
+    p_intf = p_mainintf;
+}
+
+- (intf_thread_t *)getIntf {
+    return p_intf;
+}
+
 - (void)awakeFromNib
 {
     unsigned int i_key = 0;
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t *p_playlist;
     vlc_value_t val;
 
@@ -632,8 +502,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 - (void)applicationWillFinishLaunching:(NSNotification *)o_notification
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
-
     o_msg_lock = [[NSLock alloc] init];
     o_msg_arr = [[NSMutableArray arrayWithCapacity: 200] retain];
 
@@ -659,7 +527,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 }
-
+/*
 - (BOOL)application:(NSApplication *)o_app openFile:(NSString *)o_filename
 {
     NSDictionary *o_dic = [NSDictionary dictionaryWithObjectsAndKeys: o_filename, @"ITEM_URL", nil];
@@ -667,6 +535,135 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         [NSArray arrayWithObject: o_dic] atPos: -1 enqueue: NO];
             
     return( TRUE );
+}
+*/
+- (NSString *)localizedString:(char *)psz
+{
+    NSString * o_str = nil;
+
+    if( psz != NULL )
+    {
+        o_str = [[[NSString alloc] initWithUTF8String: psz] autorelease];
+    }
+    if ( o_str == NULL )
+    {
+        msg_Err( VLCIntf, "could not translate: %s", psz );
+    }
+
+    return( o_str );
+}
+
+- (char *)delocalizeString:(NSString *)id
+{
+    NSData * o_data = [id dataUsingEncoding: NSUTF8StringEncoding
+                          allowLossyConversion: NO];
+    char * psz_string;
+
+    if ( o_data == nil )
+    {
+        o_data = [id dataUsingEncoding: NSUTF8StringEncoding
+                     allowLossyConversion: YES];
+        psz_string = malloc( [o_data length] + 1 ); 
+        [o_data getBytes: psz_string];
+        psz_string[ [o_data length] ] = '\0';
+        msg_Err( VLCIntf, "cannot convert to wanted encoding: %s",
+                 psz_string );
+    }
+    else
+    {
+        psz_string = malloc( [o_data length] + 1 ); 
+        [o_data getBytes: psz_string];
+        psz_string[ [o_data length] ] = '\0';
+    }
+
+    return psz_string;
+}
+
+/* i_width is in pixels */
+- (NSString *)wrapString: (NSString *)o_in_string toWidth: (int) i_width
+{
+    NSMutableString *o_wrapped;
+    NSString *o_out_string;
+    NSRange glyphRange, effectiveRange, charRange;
+    NSRect lineFragmentRect;
+    unsigned glyphIndex, breaksInserted = 0;
+
+    NSTextStorage *o_storage = [[NSTextStorage alloc] initWithString: o_in_string
+        attributes: [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSFont labelFontOfSize: 0.0], NSFontAttributeName, nil]];
+    NSLayoutManager *o_layout_manager = [[NSLayoutManager alloc] init];
+    NSTextContainer *o_container = [[NSTextContainer alloc]
+        initWithContainerSize: NSMakeSize(i_width, 2000)];
+    
+    [o_layout_manager addTextContainer: o_container];
+    [o_container release];
+    [o_storage addLayoutManager: o_layout_manager];
+    [o_layout_manager release];
+        
+    o_wrapped = [o_in_string mutableCopy];
+    glyphRange = [o_layout_manager glyphRangeForTextContainer: o_container];
+    
+    for( glyphIndex = glyphRange.location ; glyphIndex < NSMaxRange(glyphRange) ;
+            glyphIndex += effectiveRange.length) {
+        lineFragmentRect = [o_layout_manager lineFragmentRectForGlyphAtIndex: glyphIndex
+                                            effectiveRange: &effectiveRange];
+        charRange = [o_layout_manager characterRangeForGlyphRange: effectiveRange
+                                    actualGlyphRange: &effectiveRange];
+        if ([o_wrapped lineRangeForRange:
+                NSMakeRange(charRange.location + breaksInserted, charRange.length)].length > charRange.length) {
+            [o_wrapped insertString: @"\n" atIndex: NSMaxRange(charRange) + breaksInserted];
+            breaksInserted++;
+        }
+    }
+    o_out_string = [NSString stringWithString: o_wrapped];
+    [o_wrapped release];
+    [o_storage release];
+    
+    return o_out_string;
+}
+
+
+/*****************************************************************************
+ * hasDefinedShortcutKey: Check to see if the key press is a defined VLC
+ * shortcut key.  If it is, pass it off to VLC for handling and return YES,
+ * otherwise ignore it and return NO (where it will get handled by Cocoa).
+ *****************************************************************************/
+- (BOOL)hasDefinedShortcutKey:(NSEvent *)o_event
+{
+    unichar key = 0;
+    vlc_value_t val;
+    unsigned int i_pressed_modifiers = 0;
+    struct hotkey *p_hotkeys;
+    int i;
+
+    val.i_int = 0;
+    p_hotkeys = VLCIntf->p_vlc->p_hotkeys;
+
+    i_pressed_modifiers = [o_event modifierFlags];
+
+    if( i_pressed_modifiers & NSShiftKeyMask )
+        val.i_int |= KEY_MODIFIER_SHIFT;
+    if( i_pressed_modifiers & NSControlKeyMask )
+        val.i_int |= KEY_MODIFIER_CTRL;
+    if( i_pressed_modifiers & NSAlternateKeyMask )
+        val.i_int |= KEY_MODIFIER_ALT;
+    if( i_pressed_modifiers & NSCommandKeyMask )
+        val.i_int |= KEY_MODIFIER_COMMAND;
+
+    key = [[o_event charactersIgnoringModifiers] characterAtIndex: 0];
+
+    val.i_int |= CocoaKeyToVLC( key );
+
+    for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+    {
+        if( p_hotkeys[i].i_key == val.i_int )
+        {
+            var_Set( VLCIntf->p_vlc, "key-pressed", val );
+            return YES;
+        }
+    }
+
+    return NO;
 }
 
 - (id)getControls
@@ -699,7 +696,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 - (void)manage
 {
     NSDate * o_sleep_date;
-    intf_thread_t * p_intf = [NSApp getIntf];
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
@@ -769,8 +765,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 - (void)manageIntf:(NSTimer *)o_timer
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
-
     if( p_intf->p_vlc->b_die == VLC_TRUE )
     {
         [o_timer invalidate];
@@ -950,7 +944,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 - (void)setupMenus
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t *p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, 
                                                 FIND_ANYWHERE );
     
@@ -1013,7 +1006,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 - (void)updateMessageArray
 {
     int i_start, i_stop;
-    intf_thread_t * p_intf = [NSApp getIntf];
     vlc_value_t quiet;
 
     vlc_mutex_lock( p_intf->p_sys->p_sub->p_lock );
@@ -1131,7 +1123,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 - (void)manageVolumeSlider
 {
     audio_volume_t i_volume;
-    intf_thread_t * p_intf = [NSApp getIntf];
 
     aout_VolumeGet( p_intf, &i_volume );
 
@@ -1159,7 +1150,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
             return;
     }
 
-    p_intf = [NSApp getIntf];
     p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                             FIND_ANYWHERE );
 
@@ -1194,10 +1184,8 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
 - (void)terminate
 {
-    NSEvent * o_event;
     playlist_t * p_playlist;
     vout_thread_t * p_vout;
-    intf_thread_t * p_intf = [NSApp getIntf];
 
     /* Stop playback */
     if( ( p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -1257,19 +1245,11 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
         o_msg_lock = nil;
     }
 
-    [NSApp stop: nil];
-    [NSApp terminate: nil];
-
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];
-
-    /* send a dummy event to break out of the event loop */
-    o_event = [NSEvent mouseEventWithType: NSLeftMouseDown
-                location: NSMakePoint( 1, 1 ) modifierFlags: 0
-                timestamp: 1 windowNumber: [[NSApp mainWindow] windowNumber]
-                context: [NSGraphicsContext currentContext] eventNumber: 1
-                clickCount: 1 pressure: 0.0];
-    [NSApp postEvent: o_event atStart: YES];
+    
+    p_intf->b_die = VLC_TRUE;
+    [NSApp stop:NULL];
 }
 
 - (IBAction)clearRecentItems:(id)sender
@@ -1291,8 +1271,7 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 - (IBAction)closeError:(id)sender
 {
     vlc_value_t val;
-    intf_thread_t * p_intf = [NSApp getIntf];
-    
+
     if( [o_err_ckbk_surpress state] == NSOnState )
     {
         val.i_int = -1;

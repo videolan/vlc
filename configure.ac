@@ -120,6 +120,7 @@ case "${target_os}" in
     OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
     VLC_ADD_LDFLAGS([vlc ffmpeg],[-all_load])
     VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
+    VLC_ADD_CFLAGS([vlc],[-x objective-c])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-multiply_defined,suppress])
     ;;
   *mingw32* | *cygwin*)
@@ -1237,7 +1238,6 @@ then
         ],[
           if test -n "${enable_dvdread}"
           then
-            AC_MSG_WARN([Please get libdvdread from http://www.dtek.chalmers.se/groups/dvd/downloads.shtml])
             AC_MSG_ERROR([cannot find libdvdread headers])
           fi
         ])

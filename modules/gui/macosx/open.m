@@ -130,7 +130,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
 - (void)awakeFromNib
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
 
     [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
@@ -573,7 +573,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 {
     NSString *o_mode;
     NSString *o_mrl_string = [NSString string];
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
 
     o_mode = [[o_net_mode selectedCell] title];
 

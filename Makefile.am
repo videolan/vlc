@@ -492,6 +492,7 @@ VLC.app: vlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
 	$(INSTALL) $(top_builddir)/vlc \
 		   $(top_builddir)/VLC.app/Contents/MacOS/VLC
+	ln -sf ./VLC $(top_builddir)/VLC.app/Contents/MacOS/clivlc
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS/modules
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; \

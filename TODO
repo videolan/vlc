@@ -183,6 +183,13 @@ Description: DVB info in NIT
 We need to get the information of a DVB stream that are in the NIT (current program, next program, ...)
 Status: Todo
 
+Task
+Difficulty: Medium
+Urgency: Wishlist
+Platform: any
+Description: IceCast/ShoutCast serving
+This would be a nice thing for the sake of completeness of VLC's streaming capabilities.
+Status: Todo
 
 Task
 Difficulty: Hard

@@ -76,8 +76,8 @@
     }
     else
     {
-        i_item = [[[NSApp delegate] getPlaylist] selectedPlaylistItem];
-        o_selected = [[[NSApp delegate] getPlaylist] selectedPlaylistItemsList];
+        i_item = [[[VLCMain sharedInstance] getPlaylist] selectedPlaylistItem];
+        o_selected = [[[VLCMain sharedInstance] getPlaylist] selectedPlaylistItemsList];
         [o_selected retain];
         [self initPanel:sender];
     }
@@ -91,7 +91,7 @@
     }
     else
     {
-        intf_thread_t * p_intf = [NSApp getIntf];
+        intf_thread_t * p_intf = VLCIntf;
         playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
 
@@ -109,7 +109,7 @@
 
 - (void)initPanel:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist;
 
     p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -161,7 +161,7 @@
 - (IBAction)infoOk:(id)sender
 {
     int i,i_row,c;
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
     vlc_value_t val;
@@ -219,7 +219,7 @@
 
 - (IBAction)handleGroup:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
 
@@ -228,13 +228,13 @@
         if ([[o_group_cbx stringValue] isEqual:
                     [o_group_cbx objectValueOfSelectedItem]])
         {
-            [o_group_color setBackgroundColor:[[[NSApp delegate] getPlaylist]
+            [o_group_color setBackgroundColor:[[[VLCMain sharedInstance] getPlaylist]
                 getColor: p_playlist->pp_groups[
                 [o_group_cbx indexOfSelectedItem]]->i_id]];
         }
         else
         {
-            [o_group_color setBackgroundColor:[[[NSApp delegate] getPlaylist]
+            [o_group_color setBackgroundColor:[[[VLCMain sharedInstance] getPlaylist]
                 getColor:p_playlist->pp_groups[
                 [o_group_cbx numberOfItems] - 1]->i_id + 1]];
         }
@@ -244,7 +244,7 @@
 
 - (IBAction)deleteOutlineGroup:(id)sender
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
 
@@ -253,7 +253,7 @@
         if ([[o_group_cbx stringValue] isEqual:
                     [o_group_cbx objectValueOfSelectedItem]])
         {
-            [[[NSApp delegate] getPlaylist] deleteGroup:p_playlist->pp_groups[
+            [[[VLCMain sharedInstance] getPlaylist] deleteGroup:p_playlist->pp_groups[
                     [o_group_cbx indexOfSelectedItem]]->i_id];
             [self createComboBox];
             [self handleGroup:self];
@@ -269,7 +269,7 @@
 
 - (IBAction)createOutlineGroup:(id)sender;
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
     if(p_playlist)
@@ -278,14 +278,14 @@
                     strdup([[o_group_cbx stringValue] cString]));
         [self createComboBox];
         [o_group_cbx reloadData];
-        [[[NSApp delegate] getPlaylist] playlistUpdated];
+        [[[VLCMain sharedInstance] getPlaylist] playlistUpdated];
         vlc_object_release(p_playlist);
     }
 }
 
 -(void)createComboBox
 {
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
     int i;
@@ -322,7 +322,7 @@
 {
     BOOL bEnabled = TRUE;
 
-    intf_thread_t * p_intf = [NSApp getIntf];
+    intf_thread_t * p_intf = VLCIntf;
     input_thread_t * p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
 
@@ -387,7 +387,7 @@ static VLCInfoTreeItem *o_root_item = nil;
         o_value = [o_item_value copy];
         i_object_id = i_id;
         o_parent = o_parent_item;
-        i_item = [[[NSApp delegate] getInfo] getItem];
+        i_item = [[[VLCMain sharedInstance] getInfo] getItem];
     }
     return( self );
 }
@@ -410,7 +410,7 @@ static VLCInfoTreeItem *o_root_item = nil;
 {
     if (o_children == NULL)
     {
-        intf_thread_t * p_intf = [NSApp getIntf];
+        intf_thread_t * p_intf = VLCIntf;
         playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
         int i;
@@ -491,7 +491,7 @@ static VLCInfoTreeItem *o_root_item = nil;
 */
 - (void)refresh
 {
-    i_item = [[[NSApp delegate] getInfo] getItem];
+    i_item = [[[VLCMain sharedInstance] getInfo] getItem];
     if (o_children != NULL)
     {
         [o_children release];
