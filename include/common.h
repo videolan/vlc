@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.86 2002/03/16 01:40:58 gbazin Exp $
+ * $Id: common.h,v 1.87 2002/03/19 03:42:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -421,6 +421,11 @@ typedef __int64 off_t;
 #           define off_t __int64
 #       endif
 #       define stat _stati64
+#   endif
+
+#   if defined( __BORLAND__ )
+#       undef off_t
+#       define off_t __int64
 #   endif
 
 #   ifndef O_NONBLOCK
