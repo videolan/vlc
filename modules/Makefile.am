@@ -46,6 +46,7 @@ EXTRA_DIST = \
 	gui/qnx/Modules.am \
 	gui/qt/Modules.am \
 	gui/win32/Modules.am \
+	gui/wxwindows/Modules.am \
 	misc/Modules.am \
 	misc/dummy/Modules.am \
 	misc/logger/Modules.am \

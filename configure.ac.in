@@ -125,6 +125,8 @@ case "x${target_os}" in
         # add ws2_32 for closesocket, select, recv
         CPPFLAGS_save="${CPPFLAGS_save} -D_OFF_T_ -D_off_t=long"
         CPPFLAGS="${CPPFLAGS_save}"
+        CXXFLAGS_save="${CXXFLAGS_save} -fvtable-thunks";
+        CXXFLAGS="${CXXFLAGS_save}"
         LDFLAGS_vlc="${LDFLAGS_vlc} -lws2_32 -lnetapi32 -mwindows"
         LDFLAGS_ipv4="${LDFLAGS_ipv4} -lws2_32"
         LDFLAGS_ipv6="${LDFLAGS_ipv6} -lws2_32"
@@ -413,7 +415,7 @@ AC_CACHE_CHECK([if \$CC accepts -Wall -Winline],
      AC_TRY_COMPILE([],,ac_cv_c_Wall_Winline=yes, ac_cv_c_Wall_Winline=no)])
 if test "x${ac_cv_c_Wall_Winline}" != "xno"; then
     CFLAGS_save="-Wall -Winline ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="-Wall -Winline ${CXXFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
+    CXXFLAGS_save="-Wall ${CXXFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wall -Winline ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 else
     AC_CACHE_CHECK([if \$CC accepts -wall -winline],
@@ -1955,6 +1957,46 @@ developement tools or remove the --enable-gnome option])
      ])
     CPPFLAGS="${CPPFLAGS_save}"
   fi])
+
+dnl
+dnl  wxWindows module
+dnl
+AC_ARG_ENABLE(wxwindows,
+  [  --enable-wxwindows      wxWindows support (default enabled)])
+if test "x${enable_wxwindows}" != "xno"
+then
+  WXWINDOWS_PATH="${PATH}"
+  AC_ARG_WITH(wx-config-path,
+    [    --with-wx-config-path=PATH wx-config path (default search in \$PATH)],
+    [ if test "x${with_wx_config_path}" != "xno"
+      then
+        WXWINDOWS_PATH="${with_wx_config_path}:${PATH}"
+      fi ])
+  # look for wx-config
+  AC_PATH_PROG(WX_CONFIG, wx-config, no, ${WXWINDOWS_PATH})
+  if test "x${WX_CONFIG}" != "xno"
+  then
+    if expr 2.3.0 \> `${WX_CONFIG} --version` >/dev/null
+    then
+      AC_MSG_ERROR([Your development package for wxWindows is too old, you need at least version 2.3.0. Please upgrade and try again. Alternatively you can also configure with --disable-wxwindows.])
+    fi
+    CXXFLAGS_wxwindows="${CXXFLAGS_wxwindows} `${WX_CONFIG} --cflags`"
+    LDFLAGS_wxwindows="${LDFLAGS_wxwindows} `${WX_CONFIG} --libs`"
+    # now look for the wx.h header
+    CPPFLAGS="${save_CPPFLAGS} ${CXXFLAGS_wxwindows}"
+    ac_cv_wx_headers=yes
+    AC_CHECK_HEADERS(wx/wx.h, , [
+      ac_cv_wx_headers=no
+      echo "Cannot find wxWindows development headers."
+    ])
+    if test "x${ac_cv_wx_headers}" = "xyes"
+    then
+      PLUGINS="${PLUGINS} wxwindows"
+      ALIASES="${ALIASES} wxvlc"
+    fi
+    CPPFLAGS="${save_CPPFLAGS}"
+  fi
+fi
 
 dnl
 dnl  Qt module

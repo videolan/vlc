@@ -1,5 +1,5 @@
 List of vlc plugins
-$Id: LIST,v 1.3 2002/10/23 23:17:45 gbazin Exp $
+$Id: LIST,v 1.4 2002/11/18 13:02:16 gbazin Exp $
 
  * a52_system: input module for A52 decapsulation.
 
@@ -142,6 +142,8 @@ $Id: LIST,v 1.3 2002/10/23 23:17:45 gbazin Exp $
  * vorbis: a vorbis audio decoder using the libvorbis library.
 
  * waveout: simple audio output module for Windows.
+
+ * wxwindows: interface module using the cross-platform wxWindows library.
 
  * x11: video output module using the X11 API.
 

@@ -1,0 +1,18 @@
+SOURCES_wxwindows = \
+	modules/gui/wxwindows/wxwindows.cpp \
+	modules/gui/wxwindows/interface.cpp \
+	modules/gui/wxwindows/timer.cpp
+
+noinst_HEADERS += \
+	modules/gui/wxwindows/wxwindows.h
+
+EXTRA_DIST += \
+	modules/gui/wxwindows/bitmaps/file.xpm \
+	modules/gui/wxwindows/bitmaps/disc.xpm \
+	modules/gui/wxwindows/bitmaps/net.xpm \
+	modules/gui/wxwindows/bitmaps/stop.xpm \
+	modules/gui/wxwindows/bitmaps/play.xpm \
+	modules/gui/wxwindows/bitmaps/pause.xpm \
+	modules/gui/wxwindows/bitmaps/playlist.xpm \
+	modules/gui/wxwindows/bitmaps/previous.xpm \
+	modules/gui/wxwindows/bitmaps/next.xpm
