@@ -527,7 +527,7 @@ FORCE:
 #
 # Generic rules (see below)
 #
-src/misc/modules_builtin.h: Makefile.opts Makefile
+src/misc/modules_builtin.h: Makefile.opts Makefile Makefile.config
 	@echo "make[$(MAKELEVEL)]: Creating \`$@'"
 	@rm -f $@ && cp $@.in $@
 ifneq (,$(BUILTINS))
