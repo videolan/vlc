@@ -289,7 +289,7 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
 	  cddb_track_t *t=cddb_disc_get_track(p_cdda->cddb.disc, i_track-1);
 	  if (t != NULL )
 	  {
-	      if( t->title != NULL )
+	      if( t->title != NULL && ! p_cdda->b_nav_mode )
 	      {
 		  add_meta_val( VLC_META_TITLE, t->title );
 	      }
@@ -428,21 +428,31 @@ CDDAMetaInfo( access_t *p_access, track_t i_track )
 
 	/* Above we should have set psz_meta_title and psz_meta_artist
 	   to CDDB or CD-Text values or the default value depending on
-	   availablity and user preferences. 
+	   availablity and user preferences.
 
-	   So now add the title and artist to VLC's meta, and the 
-	   name as shown in the status bar and playlist entry.
+	   So now add the title and artist to VLC's meta, and the name
+	   as shown in the status bar and playlist entry.
+
+	   For playlist mode, the meta title is what's seen at the
+	   bottom and in the playlist. For nav-mode playing, it is
+	   done by input_control. I don't understand why they do
+	   different things. In either case, we may have customized to
+	   put in the track name.
 	 */
-	add_meta_val( VLC_META_TITLE, psz_meta_title );
-	if (psz_meta_artist) 
-	  add_meta_val( VLC_META_ARTIST, psz_meta_artist );
-
-	if ( CDIO_INVALID_TRACK != i_track )
-	{ 
+	if ( CDIO_INVALID_TRACK != i_track ) 
+	{
 	    char *psz_name = CDDAFormatTitle( p_access, i_track ) ;
-	    input_Control( p_cdda->p_input, INPUT_SET_NAME, psz_name );
-	    free(psz_name);
+	    if ( !p_cdda->b_nav_mode ) {
+	        add_meta_val( VLC_META_TITLE, psz_name );
+	    } else 
+	    { 
+	        input_Control( p_cdda->p_input, INPUT_SET_NAME, psz_name );
+	        free(psz_name);
+	    }
+	    if (psz_meta_artist) 
+	      add_meta_val( VLC_META_ARTIST, psz_meta_artist );
 	}
+	
     }
 }
 
@@ -964,16 +974,18 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
         t->i_length = I64C(1000000) * t->i_size / CDDA_FREQUENCY_SAMPLE / 4;
 
 
-	if (p_item)
-	  CDDAAddMetaToItem( p_access, p_cdda, p_item, i_track, VLC_FALSE );
-
+	if (p_item) 
+	{
+	    CDDAAddMetaToItem( p_access, p_cdda, p_item, i_track, VLC_FALSE );
+	    p_item->input.i_duration = i_track_frames 
+	      * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC);
+	    p_item->input.psz_uri    = CDDAFormatMRL(p_access, i_track);
+	}
+	
         p_cdda->i_titles = 1;
         p_access->info.i_size =
 	  i_track_frames * (int64_t) CDIO_CD_FRAMESIZE_RAW;
 	p_access->info.i_update |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE;
-	p_item->input.psz_uri    = CDDAFormatMRL(p_access, i_track);
-	p_item->input.i_duration = i_track_frames 
-	  * (CLOCK_FREQ / CDIO_CD_FRAMES_PER_SEC);
     }
     else
     {

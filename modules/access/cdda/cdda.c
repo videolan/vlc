@@ -120,11 +120,6 @@ vlc_module_begin();
                  N_("Number of blocks per CD read"),
                  BLOCKS_PER_READ_LONGTEXT, VLC_TRUE );
 
-    add_string( MODULE_STRING "-author-format",
-                "%A - %a %C %I", NULL,
-                N_("Format to use in playlist \"author\" field"),
-                TITLE_FMT_LONGTEXT, VLC_TRUE );
-
     add_string( MODULE_STRING "-title-format",
                 "Track %T. %t", NULL,
                 N_("Format to use in playlist \"title\" field when no CDDB"),
