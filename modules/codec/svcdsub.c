@@ -43,6 +43,9 @@ static void DecoderClose  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Philips OGT (SVCD subtitle) decoder") );
+    set_shortname( N_("SVCD subtitles"));
+    set_category( CAT_INPUT );
+    set_subcategory( SUBCAT_INPUT_SCODEC );
     set_capability( "decoder", 50 );
     set_callbacks( DecoderOpen, DecoderClose );
 
@@ -236,6 +239,33 @@ static block_t *Reassemble( decoder_t *p_dec, block_t *p_block )
     }
 
     p_buffer = p_block->p_buffer;
+
+    /* Attach to our input thread and see if subtitle is selected. */
+    {
+        vlc_object_t * p_input;
+        vlc_value_t val;
+
+        p_input = vlc_object_find( p_dec, VLC_OBJECT_INPUT, FIND_PARENT );
+
+        if( !p_input ) return NULL;
+
+        if( var_Get( p_input, "spu-channel", &val ) )
+        {
+            vlc_object_release( p_input );
+            return NULL;
+        }
+
+        vlc_object_release( p_input );
+        msg_Dbg( p_dec, "val.i_int %x p_buffer[i] %x", val.i_int, p_buffer[1]);
+
+        /* The dummy ES that the menu selection uses has an 0x70 at
+           the head which we need to strip off. */
+        if( val.i_int == -1 || (val.i_int & 0x03) != p_buffer[1] )
+        {
+	    msg_Dbg( p_dec, "subtitle not for us." );
+            return NULL;
+        }
+    }
 
     if( p_sys->i_state == SUBTITLE_BLOCK_EMPTY )
     {
