@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.19 2003/01/13 14:51:25 massiot Exp $
+ * $Id: sdl.c,v 1.20 2003/01/13 16:58:58 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -79,6 +79,7 @@ static int Open ( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     SDL_AudioSpec desired, obtained;
     int i_nb_channels;
+    vlc_value_t val;
 
     /* Check that no one uses the DSP. */
     Uint32 i_flags = SDL_INIT_AUDIO;
@@ -172,7 +173,6 @@ static int Open ( vlc_object_t *p_this )
 
         if ( var_Type( p_aout, "audio-device" ) == 0 )
         {
-            vlc_value_t val;
             var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
             val.psz_string = (obtained.channels == 2) ? N_("Stereo") :
                               N_("Mono");
@@ -184,7 +184,6 @@ static int Open ( vlc_object_t *p_this )
     else if ( var_Type( p_aout, "audio-device" ) == 0 )
     {
         /* First launch. */
-        vlc_value_t val;
         var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         val.psz_string = N_("Stereo");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
