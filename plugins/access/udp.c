@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.7 2002/03/29 00:14:19 massiot Exp $
+ * $Id: udp.c,v 1.8 2002/04/17 17:00:58 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -51,7 +51,6 @@
  *****************************************************************************/
 static void input_getfunctions( function_list_t * );
 static int  UDPOpen       ( struct input_thread_s * );
-static int  UDPSetProgram ( struct input_thread_s * , pgrm_descriptor_t * );  
 
 /*****************************************************************************
  * Build configuration tree.
@@ -85,7 +84,7 @@ static void input_getfunctions( function_list_t * p_function_list )
     input.pf_open             = UDPOpen;
     input.pf_read             = input_FDNetworkRead;
     input.pf_close            = input_FDClose;
-    input.pf_set_program      = UDPSetProgram;
+    input.pf_set_program      = input_SetProgram;
     input.pf_set_area         = NULL;
     input.pf_seek             = NULL;
 #undef input
@@ -274,62 +273,6 @@ static int UDPOpen( input_thread_t * p_input )
 
     p_access_data->i_handle = socket_desc.i_handle;
     p_input->i_mtu = socket_desc.i_mtu;
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * UDPSetProgram: Selects another program
- *****************************************************************************/
-int UDPSetProgram( input_thread_t    * p_input,
-                   pgrm_descriptor_t * p_new_prg )
-{
-    int                 i_es_index;
-
-    if ( p_input->stream.p_selected_program )
-    {
-        for ( i_es_index = 1 ; /* 0 should be the PMT */
-                i_es_index < p_input->stream.p_selected_program->
-                    i_es_number ;
-                i_es_index ++ )
-        {
-#define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
-            if ( p_es->p_decoder_fifo )
-            {
-                input_UnselectES( p_input , p_es );
-                p_es->p_pes = NULL; /* FIXME */
-            }
-#undef p_es
-        }
-    }
-
-    for (i_es_index = 1 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
-    {
-#define p_es p_new_prg->pp_es[i_es_index]
-        switch( p_es->i_cat )
-        {
-            case MPEG1_VIDEO_ES:
-            case MPEG2_VIDEO_ES:
-                if ( p_main->b_video )
-                {
-                    input_SelectES( p_input , p_es );
-                }
-                break;
-            case MPEG1_AUDIO_ES:
-            case MPEG2_AUDIO_ES:
-                if ( p_main->b_audio )
-                {
-                    input_SelectES( p_input , p_es );
-                }
-                break;
-            default:
-                input_SelectES( p_input , p_es );
-                break;
-#undef p_es
-        }
-    }
-
-    p_input->stream.p_selected_program = p_new_prg;
 
     return( 0 );
 }

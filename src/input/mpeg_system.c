@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.89 2002/04/08 14:53:05 jobi Exp $
+ * $Id: mpeg_system.c,v 1.90 2002/04/17 17:00:58 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1588,18 +1588,6 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
     }
 #undef p_psi
 
-    if( !p_input->stream.p_selected_program )
-    {
-        pgrm_descriptor_t *     p_pgrm_to_select;
-        u16 i_id = config_GetIntVariable( "input_program" );
-
-        p_pgrm_to_select = input_FindProgram( p_input, i_id );
-
-        if ( p_pgrm_to_select )
-            input_SetProgram( p_input, p_pgrm_to_select );
-        else /* take the first one */
-            input_SetProgram( p_input, p_input->stream.pp_programs[0] );
-    }
 }
 
 /*****************************************************************************
@@ -1628,8 +1616,6 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         int                 i_section_length,i_current_section;
         int                 i_prog_info_length, i_loop;
         int                 i_es_info_length, i_pid, i_stream_type;
-        int                 i_audio_es, i_spu_es;
-        int                 i_required_audio_es, i_required_spu_es;
         
         p_current_section = p_psi->buffer;
         p_current_data = p_psi->buffer;
@@ -1637,42 +1623,10 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
         p_pgrm_data->i_pcr_pid = ( ((u32)*(p_current_section + 8) & 0x1F) << 8 ) |
                                     *(p_current_section + 9);
 
-        i_audio_es = 0;
-        i_spu_es = 0;
 
         /* Lock stream information */
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
-        /* Get the number of the required audio stream */
-        if( p_main->b_audio )
-        {
-            /* Default is the first one */
-            i_required_audio_es = config_GetIntVariable( "input_channel" );
-            if( i_required_audio_es < 0 )
-            {
-                i_required_audio_es = 1;
-            }
-        }
-        else
-        {
-            i_required_audio_es = 0;
-        }
-
-        /* Same thing for subtitles */
-        if( p_main->b_video )
-        {
-            /* for spu, default is none */
-            i_required_spu_es = config_GetIntVariable( "input_subtitle" );
-            if( i_required_spu_es < 0 )
-            {
-                i_required_spu_es = 0;
-            }
-        }
-        else
-        {
-            i_required_spu_es = 0;
-        }
-        
         /* Delete all ES in this program  except the PSI. We start from the
          * end because i_es_number gets decremented after each deletion. */
         for( i_loop = p_es->p_pgrm->i_es_number ; i_loop ; )
@@ -1717,37 +1671,26 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 
                 /* Tell the interface what kind of stream it is and select 
                  * the required ones */
-                if ( p_input->stream.p_selected_program == p_new_es->p_pgrm )
                 {
                     switch( i_stream_type )
                     {
                         case MPEG1_VIDEO_ES:
                         case MPEG2_VIDEO_ES:
                             p_new_es->i_cat = VIDEO_ES;
-                            input_SelectES( p_input, p_new_es );
                             break;
                         case MPEG1_AUDIO_ES:
                         case MPEG2_AUDIO_ES:
                             p_new_es->i_cat = AUDIO_ES;
-                            i_audio_es += 1;
-                            if( i_audio_es == i_required_audio_es )
-                                input_SelectES( p_input, p_new_es );
                             break;
                         case LPCM_AUDIO_ES :
                         case AC3_AUDIO_ES :
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = AUDIO_ES;
-                            i_audio_es += 1;
-                            if( i_audio_es == i_required_audio_es )
-                                input_SelectES( p_input, p_new_es );
                             break;
                         /* Not sure this one is fully specification-compliant */
                         case DVD_SPU_ES :
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = SPU_ES;
-                            i_spu_es += 1;
-                            if( i_spu_es == i_required_spu_es )
-                                input_SelectES( p_input, p_new_es );
                             break;
                         default :
                             p_new_es->i_cat = UNKNOWN_ES;
@@ -1765,18 +1708,25 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
             
         } while( i_current_section < p_psi->i_last_section_number );
 
-        if( i_required_audio_es > i_audio_es )
-        {
-            intf_WarnMsg( 2, "input: non-existing audio ES required" );
-        }
-        
-        if( i_required_spu_es > i_spu_es )
-        {
-            intf_WarnMsg( 2, "input: non-existing subtitles ES required" );
-        }
-        
         p_pgrm_data->i_pmt_version = p_psi->i_version_number;
 
+        /* if no program is selected :*/
+        if( !p_input->stream.p_selected_program )
+        {
+            pgrm_descriptor_t *     p_pgrm_to_select;
+            u16 i_id = (u16)config_GetIntVariable( "input_program" );
+
+            if( i_id != 0 ) /* if user specified a program */
+            {
+                p_pgrm_to_select = input_FindProgram( p_input, i_id );
+
+                if( p_pgrm_to_select || p_pgrm_to_select == p_es->p_pgrm )
+                    p_input->pf_set_program( p_input, p_pgrm_to_select );
+            }
+            else
+                    p_input->pf_set_program( p_input, p_es->p_pgrm );
+        }
+        
         /* inform interface that stream has changed */
         p_input->stream.b_changed = 1;
         /*  Remove lock */

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.79 2002/04/10 16:26:21 jobi Exp $
+ * $Id: input_programs.c,v 1.80 2002/04/17 17:00:58 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -306,7 +306,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
                 i_es_index ++ )
         {
 #define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
-            if ( p_es->p_decoder_fifo )
+            if ( p_es->p_decoder_fifo ) /* if the ES was selected */
             {
                 input_UnselectES( p_input , p_es );
             }
@@ -346,37 +346,36 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
     for (i_es_index = 0 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
     {
         switch( p_new_prg->pp_es[i_es_index]->i_cat )
-                    {
-                       case VIDEO_ES:
-                           intf_WarnMsg( 4, "Selecting ES %x",
-                                    p_new_prg->pp_es[i_es_index]->i_id );
-                            input_SelectES( p_input,
-                                   p_new_prg->pp_es[i_es_index] );
-                            break;
-                        case AUDIO_ES:
-                            i_audio_es += 1;
-                            if( i_audio_es <= i_required_audio_es )
-                            {
-                                intf_WarnMsg( 4, "Selecting ES %x",
-                                    p_new_prg->pp_es[i_es_index]->i_id );
-                                input_SelectES( p_input,
-                                    p_new_prg->pp_es[i_es_index]);
-                            }
-                            break;
-                        /* Not sure this one is fully specification-compliant */
-                        case SPU_ES :
-                            i_spu_es += 1;
-                            if( i_spu_es <= i_required_spu_es )
-                            {
-                                intf_WarnMsg( 4, "Selecting ES %x",
-                                    p_new_prg->pp_es[i_es_index]->i_id );
-                                input_SelectES( p_input,
-                                    p_new_prg->pp_es[i_es_index] );
-                            }
-                            break;
-                        default :
-                            break;
-                    }
+        {
+            case VIDEO_ES:
+                intf_WarnMsg( 4, "Selecting ES %x",
+                            p_new_prg->pp_es[i_es_index]->i_id );
+                input_SelectES( p_input, p_new_prg->pp_es[i_es_index] );
+                break;
+            case AUDIO_ES:
+                i_audio_es += 1;
+                if( i_audio_es <= i_required_audio_es )
+                {
+                    intf_WarnMsg( 4, "Selecting ES %x",
+                                p_new_prg->pp_es[i_es_index]->i_id );
+                    input_SelectES( p_input, p_new_prg->pp_es[i_es_index]);
+                }
+                break;
+            /* Not sure this one is fully specification-compliant */
+            case SPU_ES :
+                i_spu_es += 1;
+                if( i_spu_es <= i_required_spu_es )
+                {
+                    intf_WarnMsg( 4, "Selecting ES %x",
+                                p_new_prg->pp_es[i_es_index]->i_id );
+                    input_SelectES( p_input, p_new_prg->pp_es[i_es_index] );
+                }
+            break;
+            default :
+                intf_WarnMsg( 2, "ES %x has unknown type",
+                            p_new_prg->pp_es[i_es_index]->i_id );
+                break;
+        }
 
     }
 
