@@ -31,6 +31,9 @@
 #include "intf_msg.h"
 #include "main.h"
 
+#define RGB_MIN -24
+#define RGB_MAX 283
+
 /******************************************************************************
  * vout_sys_t: video output framebuffer method descriptor
  ******************************************************************************
@@ -46,6 +49,10 @@ typedef struct vout_sys_s
     /* Video memory */
     byte_t *                    p_video;                       /* base adress */    
     size_t                      i_page_size;                     /* page size */
+
+    struct fb_cmap              fb_cmap;                 /* original colormap */
+    unsigned short              *fb_palette;              /* original palette */
+
 } vout_sys_t;
 
 /******************************************************************************
@@ -53,6 +60,8 @@ typedef struct vout_sys_s
  ******************************************************************************/
 static int     FBOpenDisplay   ( vout_thread_t *p_vout );
 static void    FBCloseDisplay  ( vout_thread_t *p_vout );
+static void    FBInitBWPalette ( vout_thread_t *p_vout );
+static void    FBInitRGBPalette( vout_thread_t *p_vout );
 
 /******************************************************************************
  * vout_SysCreate: allocates FB video thread output method
@@ -149,7 +158,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
 {
     char *psz_device;                               /* framebuffer device path */
     struct fb_fix_screeninfo    fix_info;       /* framebuffer fix information */
-
+                                            /* framebuffer palette information */
     /* Open framebuffer device */
     psz_device = main_GetPszVariable( VOUT_FB_DEV_VAR, VOUT_FB_DEV_DEFAULT );
     p_vout->p_sys->i_fb_dev = open( psz_device, O_RDWR);
@@ -203,6 +212,20 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     switch( p_vout->i_screen_depth )
     {
     case 8:                                                          /* 8 bpp */
+        p_vout->p_sys->fb_palette = malloc( 8 * 256 * sizeof(unsigned short) );
+        p_vout->p_sys->fb_cmap.start = 0;
+        p_vout->p_sys->fb_cmap.len = 256;
+        p_vout->p_sys->fb_cmap.red = p_vout->p_sys->fb_palette;
+        p_vout->p_sys->fb_cmap.green = p_vout->p_sys->fb_palette + 256 * sizeof(unsigned short);
+        p_vout->p_sys->fb_cmap.blue = p_vout->p_sys->fb_palette + 2 * 256 * sizeof(unsigned short);
+        p_vout->p_sys->fb_cmap.transp = p_vout->p_sys->fb_palette + 3 * 256 * sizeof(unsigned short);
+
+        ioctl( p_vout->p_sys->i_fb_dev, FBIOGETCMAP, &p_vout->p_sys->fb_cmap );
+
+        /* initializes black & white palette */
+	//FBInitBWPalette( p_vout );
+	FBInitRGBPalette( p_vout );
+
         p_vout->i_bytes_per_pixel = 1;
         p_vout->i_bytes_per_line = p_vout->i_width;
         break;
@@ -260,7 +283,89 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
  ******************************************************************************/
 static void FBCloseDisplay( vout_thread_t *p_vout )
 {
+    /* Restore palette */
+    if( p_vout->i_screen_depth == 8 );
+    {
+        ioctl( p_vout->p_sys->i_fb_dev, FBIOPUTCMAP, &p_vout->p_sys->fb_cmap );
+        free( p_vout->p_sys->fb_palette );
+    }
+
     // Destroy window and close display
     close( p_vout->p_sys->i_fb_dev );    
 }
 
+/*****************************************************************************
+ * FBInitRGBPalette: initialize color palette for 8 bpp
+ *****************************************************************************/
+static void FBInitRGBPalette( vout_thread_t *p_vout )
+{
+    int y,u,v;
+    float r,g,b;
+    unsigned int counter = 0;
+    unsigned int allocated = 0;
+    unsigned int lastallocated = 0;
+    unsigned short red[256], green[256], blue[256], transp[256];
+    struct fb_cmap cmap = { 0, 256, red, green, blue, transp };
+
+    for ( y = 0; y <= 256; y += 16 )
+    for ( u = -256; u <= 256; u += 64 )
+    for ( v = -256; v <= 256; v += 64 )
+    {
+        r = (0.99     * y + 1.0      * u - 0.01     * v);
+        g = (1.005085 * y - 0.508475 * u - 0.181356 * v);
+        b = (1.0      * y                + 1.0      * v);
+
+        if( r > RGB_MIN && g > RGB_MIN && b > RGB_MIN
+            && r < RGB_MAX && g < RGB_MAX && b < RGB_MAX )
+        {
+            if(allocated == 256) { fprintf(stderr, "sorry, no colors left\n"); exit(1); }
+            if(r<0) r=0;
+            if(g<0) g=0;
+            if(b<0) b=0;
+            if(r>255) r=255;
+            if(g>255) g=255;
+            if(b>255) b=255;
+
+            red[allocated] = (int)r << 8;
+            green[allocated] = (int)g << 8;
+            blue[allocated] = (int)b << 8;
+            transp[allocated] = 0;
+
+            u += 256;
+            v += 256;
+            //printf("%x (%i:%i:%i) %i %i %i\n", (y>>4)*81 + (u>>6)*9 + (v>>6), y>>4, u>>6, v>>6, (int)r, (int)g, (int)b);
+            //printf("%i %i\n", counter, (y>>4)*81 + (u>>6)*9 + (v>>6) );
+
+            u -= 256;
+            v -= 256;
+            /* allocate color */
+            p_vout->lookup[counter] = allocated;
+            allocated++;
+            /* set last allocated index */
+            lastallocated = allocated - 1;
+        }
+        else p_vout->lookup[counter] = lastallocated;
+
+        counter++;
+    }
+
+    ioctl( p_vout->p_sys->i_fb_dev, FBIOPUTCMAP, &cmap );
+}
+
+/*****************************************************************************
+ * FBInitBWPalette: initialize grayscale palette for 8 bpp
+ *****************************************************************************/
+static void FBInitBWPalette( vout_thread_t *p_vout )
+{
+    unsigned int i;
+    unsigned short gamma[256], transp[256];
+    struct fb_cmap cmap = { 0, 256, gamma, gamma, gamma, transp };
+
+    for( i=0; i<256; i++ )
+    {
+        gamma[i] = i << 8;
+        transp[i] = 0;
+    }
+
+    ioctl( p_vout->p_sys->i_fb_dev, FBIOPUTCMAP, &cmap );
+}

@@ -117,12 +117,15 @@ typedef struct vout_thread_s
     int                 i_green_lshift, i_green_rshift;       /* green shifts */
     int                 i_blue_lshift, i_blue_rshift;          /* blue shifts */
 
-    /* Usefull pre-calculated pixel values - these are not supposed to be 
+    /* Useful pre-calculated pixel values - these are not supposed to be 
      * accurate values, but rather values looking nice, given their usage. */
     u32                 i_white_pixel;                               /* white */
     u32                 i_black_pixel;                               /* black */
     u32                 i_gray_pixel;                                 /* gray */
     u32                 i_blue_pixel;                                 /* blue */
+    
+    /* Palette */
+    u8                  lookup[1377];       /* lookup table for 8 bpp palette */
 
     /* Pictures and rendering properties */
     boolean_t           b_grayscale;            /* color or grayscale display */

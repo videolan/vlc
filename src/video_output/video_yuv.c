@@ -61,9 +61,9 @@ const int MATRIX_COEFFICIENTS_TABLE[8][4] =
   {117579, 136230, 16907, 35559}        /* SMPTE 240M (1987) */
 };
 
-/* Margins and offsets in convertion tables - Margins are used in case a RGB
- * RGB convertion would give a value outside the 0-255 range. Offsets have been
- * calculated to avoid using the same cache line for 2 tables. Convertion tables
+/* Margins and offsets in conversion tables - Margins are used in case a RGB
+ * RGB conversion would give a value outside the 0-255 range. Offsets have been
+ * calculated to avoid using the same cache line for 2 tables. conversion tables
  * are 2*MARGIN + 256 long and stores pixels.*/
 #define RED_MARGIN      178
 #define GREEN_MARGIN    135
@@ -141,10 +141,10 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
                                     int i_matrix_coefficients );
 
 /*****************************************************************************
- * CONVERT_YUV_PIXEL, CONVERT_Y_PIXEL: pixel convertion blocks
+ * CONVERT_YUV_PIXEL, CONVERT_Y_PIXEL: pixel conversion blocks
  *****************************************************************************
- * These convertion routines are used by YUV convertion functions.
- * Convertion are made from p_y, p_u, p_v, which are modified, to p_buffer,
+ * These conversion routines are used by YUV conversion functions.
+ * conversion are made from p_y, p_u, p_v, which are modified, to p_buffer,
  * which is also modified.
  *****************************************************************************/
 #define CONVERT_Y_PIXEL( BPP )                                                \
@@ -172,7 +172,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
 #define SCALE_WIDTH                                                           \
     if( b_horizontal_scaling )                                                \
     {                                                                         \
-        /* Horizontal scaling, convertion has been done to buffer.            \
+        /* Horizontal scaling, conversion has been done to buffer.            \
          * Rewind buffer and offset, then copy and scale line */              \
         p_buffer = p_buffer_start;                                            \
         p_offset = p_offset_start;                                            \
@@ -199,7 +199,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
     }                                                                         \
     else                                                                      \
     {                                                                         \
-        /* No scaling, convertion has been done directly in picture memory.   \
+        /* No scaling, conversion has been done directly in picture memory.   \
          * Increment of picture pointer to end of line is still needed */     \
         p_pic += i_pic_width + i_pic_line_width;                              \
     }                                                                         \
@@ -208,7 +208,7 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
  * SCALE_HEIGHT: handle vertical scaling
  *****************************************************************************
  * This macro handle vertical scaling for a picture. CHROMA may be 420, 422 or
- * 444 for RGB convertion, or 400 for gray convertion. It works for 1, 2, 3
+ * 444 for RGB conversion, or 400 for gray convertion. It works for 1, 2, 3
  * and 4 Bpp.
  *****************************************************************************/
 #define SCALE_HEIGHT( CHROMA, BPP )                                           \
@@ -312,7 +312,7 @@ int vout_InitYUV( vout_thread_t *p_vout )
         return( 1 );                
     }
 
-    /* Allocate memory for convertion buffer and offset array */
+    /* Allocate memory for conversion buffer and offset array */
     p_vout->yuv.p_buffer = malloc( VOUT_MAX_WIDTH * p_vout->i_bytes_per_pixel );
     if( p_vout->yuv.p_buffer == NULL )
     {
@@ -578,9 +578,9 @@ static void SetYUV( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * SetOffset: build offset array for convertion functions
+ * SetOffset: build offset array for conversion functions
  *****************************************************************************
- * This function will build an offset array used in later convertion functions.
+ * This function will build an offset array used in later conversion functions.
  * It will also set horizontal and vertical scaling indicators.
  *****************************************************************************/
 static void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height, 
@@ -625,7 +625,7 @@ static void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_hei
     }
     else
     {
-        /* No horizontal scaling: YUV convertion is done directly to picture */          
+        /* No horizontal scaling: YUV conversion is done directly to picture */          
         *pb_h_scaling = 0;        
     }
 
@@ -659,10 +659,10 @@ static void ConvertY4Gray8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_y,
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width;                    /* chroma width, not used */
-    u8 *        p_gray;                             /* base convertion table */
+    u8 *        p_gray;                             /* base conversion table */
     u8 *        p_pic_start;       /* beginning of the current line for copy */
-    u8 *        p_buffer_start;                   /* convertion buffer start */
-    u8 *        p_buffer;                       /* convertion buffer pointer */
+    u8 *        p_buffer_start;                   /* conversion buffer start */
+    u8 *        p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -677,7 +677,7 @@ static void ConvertY4Gray8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_y,
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -685,28 +685,28 @@ static void ConvertY4Gray8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_y,
         /* Mark beginnning of line for possible later line copy, and initialize
          * buffer */
         p_pic_start =   p_pic;
-        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
+        p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
-            *p_buffer++ = p_gray[ *p_y++ ];
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
+            *p_buffer++ = *p_y++;
         }             
 
         /* Do horizontal and vertical scaling */
@@ -727,10 +727,10 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width;                    /* chroma width, not used */
-    u16 *       p_gray;                             /* base convertion table */
+    u16 *       p_gray;                             /* base conversion table */
     u16 *       p_pic_start;       /* beginning of the current line for copy */
-    u16 *       p_buffer_start;                   /* convertion buffer start */
-    u16 *       p_buffer;                       /* convertion buffer pointer */
+    u16 *       p_buffer_start;                   /* conversion buffer start */
+    u16 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -745,7 +745,7 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -755,7 +755,7 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
@@ -805,10 +805,10 @@ static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width;                    /* chroma width, not used */
-    u32 *       p_gray;                             /* base convertion table */
+    u32 *       p_gray;                             /* base conversion table */
     u32 *       p_pic_start;       /* beginning of the current line for copy */
-    u32 *       p_buffer_start;                   /* convertion buffer start */
-    u32 *       p_buffer;                       /* convertion buffer pointer */
+    u32 *       p_buffer_start;                   /* conversion buffer start */
+    u32 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -823,7 +823,7 @@ static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -833,7 +833,7 @@ static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
@@ -875,11 +875,12 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     int         i_chroma_width;                              /* chroma width */
-    u8 *        p_yuv;                              /* base convertion table */
-    u8 *        p_ybase;                     /* Y dependant convertion table */
+    u8 *        p_yuv;                              /* base conversion table */
+    u8 *        p_ybase;                     /* Y dependant conversion table */
     u8 *        p_pic_start;       /* beginning of the current line for copy */
-    u8 *        p_buffer_start;                   /* convertion buffer start */
-    u8 *        p_buffer;                       /* convertion buffer pointer */
+    u8 *        p_buffer_start;                   /* conversion buffer start */
+    u8 *        p_buffer;                       /* conversion buffer pointer */
+    u8 *        p_foo;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -895,7 +896,7 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -905,18 +906,26 @@ static void ConvertYUV420RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
-            CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
-            CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
-            CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
-            CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
-            CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
-            CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
-            CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
-            CONVERT_YUV_PIXEL(1);  CONVERT_Y_PIXEL(1);
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u)   >> 5) * 9 + ((*p_v)   >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u++) >> 5) * 9 + ((*p_v++) >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u)   >> 5) * 9 + ((*p_v)   >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u++) >> 5) * 9 + ((*p_v++) >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u)   >> 5) * 9 + ((*p_v)   >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u++) >> 5) * 9 + ((*p_v++) >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u)   >> 5) * 9 + ((*p_v)   >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u++) >> 5) * 9 + ((*p_v++) >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u)   >> 5) * 9 + ((*p_v)   >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u++) >> 5) * 9 + ((*p_v++) >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u)   >> 5) * 9 + ((*p_v)   >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u++) >> 5) * 9 + ((*p_v++) >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u)   >> 5) * 9 + ((*p_v)   >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u++) >> 5) * 9 + ((*p_v++) >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u)   >> 5) * 9 + ((*p_v)   >> 5) ];
+            *p_buffer++ = p_vout->lookup[ ((*p_y++ - 8) >> 4) * 81 + ((*p_u++) >> 5) * 9 + ((*p_v++) >> 5) ];
         }             
 
         /* Do horizontal and vertical scaling */
@@ -939,11 +948,11 @@ static void ConvertYUV422RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     int         i_chroma_width;                              /* chroma width */
-    u8 *        p_yuv;                              /* base convertion table */
-    u8 *        p_ybase;                     /* Y dependant convertion table */
+    u8 *        p_yuv;                              /* base conversion table */
+    u8 *        p_ybase;                     /* Y dependant conversion table */
     u8 *        p_pic_start;       /* beginning of the current line for copy */
-    u8 *        p_buffer_start;                   /* convertion buffer start */
-    u8 *        p_buffer;                       /* convertion buffer pointer */
+    u8 *        p_buffer_start;                   /* conversion buffer start */
+    u8 *        p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -959,7 +968,7 @@ static void ConvertYUV422RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -969,7 +978,7 @@ static void ConvertYUV422RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
@@ -1003,11 +1012,11 @@ static void ConvertYUV444RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     int         i_chroma_width;                    /* chroma width, not used */
-    u8 *        p_yuv;                              /* base convertion table */
-    u8 *        p_ybase;                     /* Y dependant convertion table */
+    u8 *        p_yuv;                              /* base conversion table */
+    u8 *        p_ybase;                     /* Y dependant conversion table */
     u8 *        p_pic_start;       /* beginning of the current line for copy */
-    u8 *        p_buffer_start;                   /* convertion buffer start */
-    u8 *        p_buffer;                       /* convertion buffer pointer */
+    u8 *        p_buffer_start;                   /* conversion buffer start */
+    u8 *        p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -1022,7 +1031,7 @@ static void ConvertYUV444RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -1032,7 +1041,7 @@ static void ConvertYUV444RGB8( p_vout_thread_t p_vout, u8 *p_pic, yuv_data_t *p_
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
@@ -1077,11 +1086,11 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     int         i_chroma_width;                              /* chroma width */
-    u16 *       p_yuv;                              /* base convertion table */
-    u16 *       p_ybase;                     /* Y dependant convertion table */
+    u16 *       p_yuv;                              /* base conversion table */
+    u16 *       p_ybase;                     /* Y dependant conversion table */
     u16 *       p_pic_start;       /* beginning of the current line for copy */
-    u16 *       p_buffer_start;                   /* convertion buffer start */
-    u16 *       p_buffer;                       /* convertion buffer pointer */
+    u16 *       p_buffer_start;                   /* conversion buffer start */
+    u16 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -1097,7 +1106,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -1107,7 +1116,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
@@ -1141,11 +1150,11 @@ static void ConvertYUV422RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     int         i_chroma_width;                              /* chroma width */
-    u16 *       p_yuv;                              /* base convertion table */
-    u16 *       p_ybase;                     /* Y dependant convertion table */
+    u16 *       p_yuv;                              /* base conversion table */
+    u16 *       p_ybase;                     /* Y dependant conversion table */
     u16 *       p_pic_start;       /* beginning of the current line for copy */
-    u16 *       p_buffer_start;                   /* convertion buffer start */
-    u16 *       p_buffer;                       /* convertion buffer pointer */
+    u16 *       p_buffer_start;                   /* conversion buffer start */
+    u16 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -1161,7 +1170,7 @@ static void ConvertYUV422RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -1171,7 +1180,7 @@ static void ConvertYUV422RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
@@ -1205,11 +1214,11 @@ static void ConvertYUV444RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     int         i_chroma_width;                    /* chroma width, not used */
-    u16 *       p_yuv;                              /* base convertion table */
-    u16 *       p_ybase;                     /* Y dependant convertion table */
+    u16 *       p_yuv;                              /* base conversion table */
+    u16 *       p_ybase;                     /* Y dependant conversion table */
     u16 *       p_pic_start;       /* beginning of the current line for copy */
-    u16 *       p_buffer_start;                   /* convertion buffer start */
-    u16 *       p_buffer;                       /* convertion buffer pointer */
+    u16 *       p_buffer_start;                   /* conversion buffer start */
+    u16 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -1224,7 +1233,7 @@ static void ConvertYUV444RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -1234,7 +1243,7 @@ static void ConvertYUV444RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
@@ -1298,11 +1307,11 @@ static void ConvertYUV420RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     int         i_chroma_width;                              /* chroma width */
-    u32 *       p_yuv;                              /* base convertion table */
-    u32 *       p_ybase;                     /* Y dependant convertion table */
+    u32 *       p_yuv;                              /* base conversion table */
+    u32 *       p_ybase;                     /* Y dependant conversion table */
     u32 *       p_pic_start;       /* beginning of the current line for copy */
-    u32 *       p_buffer_start;                   /* convertion buffer start */
-    u32 *       p_buffer;                       /* convertion buffer pointer */
+    u32 *       p_buffer_start;                   /* conversion buffer start */
+    u32 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -1318,7 +1327,7 @@ static void ConvertYUV420RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -1328,7 +1337,7 @@ static void ConvertYUV420RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
@@ -1362,11 +1371,11 @@ static void ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     int         i_chroma_width;                              /* chroma width */
-    u32 *       p_yuv;                              /* base convertion table */
-    u32 *       p_ybase;                     /* Y dependant convertion table */
+    u32 *       p_yuv;                              /* base conversion table */
+    u32 *       p_ybase;                     /* Y dependant conversion table */
     u32 *       p_pic_start;       /* beginning of the current line for copy */
-    u32 *       p_buffer_start;                   /* convertion buffer start */
-    u32 *       p_buffer;                       /* convertion buffer pointer */
+    u32 *       p_buffer_start;                   /* conversion buffer start */
+    u32 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -1382,7 +1391,7 @@ static void ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -1392,7 +1401,7 @@ static void ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
@@ -1426,11 +1435,11 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
     int         i_chroma_width;                    /* chroma width, not used */
-    u32 *       p_yuv;                              /* base convertion table */
-    u32 *       p_ybase;                     /* Y dependant convertion table */
+    u32 *       p_yuv;                              /* base conversion table */
+    u32 *       p_ybase;                     /* Y dependant conversion table */
     u32 *       p_pic_start;       /* beginning of the current line for copy */
-    u32 *       p_buffer_start;                   /* convertion buffer start */
-    u32 *       p_buffer;                       /* convertion buffer pointer */
+    u32 *       p_buffer_start;                   /* conversion buffer start */
+    u32 *       p_buffer;                       /* conversion buffer pointer */
     int *       p_offset_start;                        /* offset array start */
     int *       p_offset;                            /* offset array pointer */
     
@@ -1445,7 +1454,7 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
                &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
 
     /*
-     * Perform convertion
+     * Perform conversion
      */
     i_scale_count = i_pic_height;
     for( i_y = 0; i_y < i_height; i_y++ )
@@ -1455,7 +1464,7 @@ static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *
         p_pic_start =   p_pic;
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;        
 
-        /* Do YUV convertion to buffer - YUV picture is always formed of 16
+        /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */
         for( i_x = i_width / 16; i_x--;  )
         {
