@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.27 2002/03/04 23:34:16 stef Exp $
+ * $Id: input_dvdread.c,v 1.28 2002/03/05 00:50:37 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -284,6 +284,11 @@ static int DvdReadOpen( struct input_thread_s *p_input )
 
     if( !*psz_source )
     {
+        if( !p_input->psz_access )
+        {
+            free( psz_orig );
+            return -1;
+        }
         psz_source = config_GetPszVariable( INPUT_DVD_DEVICE_VAR );
     }
 

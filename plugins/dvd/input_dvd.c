@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.130 2002/03/04 22:18:25 gbazin Exp $
+ * $Id: input_dvd.c,v 1.131 2002/03/05 00:50:37 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -286,7 +286,7 @@ static int DVDOpen( struct input_thread_s *p_input )
 
     if( *psz_parser == '@' )
     {
-        /* Found raw device */
+        /* Maybe found raw device or option list */
         *psz_parser = '\0';
         psz_raw = ++psz_parser;
     }
@@ -297,6 +297,8 @@ static int DVDOpen( struct input_thread_s *p_input )
 
     if( *psz_parser && !strtol( psz_parser, NULL, 10 ) )
     {
+        /* what we've found is either a raw device or a partial option
+         * list e.g. @,29 or both a device and a list ; search end of string */
         while( *psz_parser && *psz_parser != '@' )
         {
             psz_parser++;
@@ -304,6 +306,7 @@ static int DVDOpen( struct input_thread_s *p_input )
         
         if( *psz_parser == '@' )
         {
+            /* found end of raw device, and beginning of options */
             *psz_parser = '\0';
             ++psz_parser;
             b_options = 1;
@@ -315,10 +318,12 @@ static int DVDOpen( struct input_thread_s *p_input )
             {
                 if( !*psz_parser )
                 {
+                    /* we have only a raw device */
                     break;
                 }
                 if( strtol( psz_parser, NULL, 10 ) )
                 {
+                    /* we have only a partial list of options, no device */
                     psz_parser = psz_raw;
                     psz_raw = NULL;
                     b_options = 1;
@@ -330,6 +335,7 @@ static int DVDOpen( struct input_thread_s *p_input )
     }
     else
     {
+        /* found beginning of options ; no raw device specified */
         psz_raw = NULL;
         b_options = 1;
     }
@@ -353,11 +359,61 @@ static int DVDOpen( struct input_thread_s *p_input )
         i_angle = i_angle ? i_angle : 1;
     }
 
+    if( psz_raw )
+    {
+        if( *psz_raw )
+        {
+            /* check the raw device */
+            if( stat( psz_raw, &stat_info ) == -1 )
+            {
+                intf_WarnMsg( 3, "dvd warning: cannot stat() raw"
+                                " device `%s' (%s)",
+                             psz_raw, strerror(errno));
+                /* put back '@' */
+                *(psz_raw - 1) = '@';
+                psz_raw = NULL;
+            }
+            else
+            {
+                char * psz_env;
+                
+#ifndef WIN32    
+                if( !S_ISCHR(stat_info.st_mode) )
+                {
+                    intf_WarnMsg( 3, "dvd warning: raw device %s is"
+                                     " not a valid char device", psz_raw );
+                    /* put back '@' */
+                    *(psz_raw - 1) = '@';
+                    psz_raw = NULL;
+                }
+                else
+#endif
+                {
+                    psz_env = malloc( strlen("DVDCSS_RAW_DEVICE=")
+                                    + strlen( psz_raw ) + 1 );
+                    sprintf( psz_env, "DVDCSS_RAW_DEVICE=%s", psz_raw );
+                    putenv( psz_env );
+                }
+            }
+        }
+        else
+        {
+            psz_raw = NULL;
+        }
+    }
+    
     if( !*psz_device )
     {
+        if( !p_input->psz_access )
+        {
+            /* no device and no access specified: we probably don't want DVD */
+            free( psz_orig );
+            return -1;
+        }
         psz_device = config_GetPszVariable( INPUT_DVD_DEVICE_VAR );
     }
 
+    /* check block device */
     if( stat( psz_device, &stat_info ) == -1 )
     {
         intf_ErrMsg( "input error: cannot stat() device `%s' (%s)",
@@ -376,19 +432,6 @@ static int DVDOpen( struct input_thread_s *p_input )
     
     if( psz_raw )
     {
-        if( *psz_raw )
-        {
-            char * psz_env;
-            psz_env = malloc( strlen("DVDCSS_RAW_DEVICE=")
-                            + strlen( psz_raw ) + 1 );
-            sprintf( psz_env, "DVDCSS_RAW_DEVICE=%s", psz_raw );
-            fprintf(stderr, "%s\n", psz_env );
-            putenv( psz_env );
-        }
-        else
-        {
-            psz_raw = NULL;
-        }
     }
 
     intf_WarnMsg( 2, "input: dvd=%s raw=%s title=%d chapter=%d angle=%d",
