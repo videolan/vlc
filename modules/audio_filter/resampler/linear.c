@@ -1,10 +1,11 @@
 /*****************************************************************************
- * ugly.c : linear interpolation resampler
+ * linear.c : linear interpolation resampler
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: linear.c,v 1.3 2002/11/11 19:16:21 gbazin Exp $
+ * $Id: linear.c,v 1.4 2002/11/11 22:27:01 gbazin Exp $
  *
- * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
+ * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ *          Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,21 +37,33 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-
+static void Close     ( vlc_object_t * );
 static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
+
+/*****************************************************************************
+ * Local structures
+ *****************************************************************************/
+struct aout_filter_sys_t
+{
+    int32_t *p_prev_sample;       /* this filter introduces a 1 sample delay */
+
+    int     i_remainder;                     /* remainder of previous sample */
+
+    audio_date_t end_date;
+};
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("audio filter for linear interpolation resampling") );
-    set_capability( "audio filter", 0 );
-    set_callbacks( Create, NULL );
+    set_capability( "audio filter", 10 );
+    set_callbacks( Create, Close );
 vlc_module_end();
 
 /*****************************************************************************
- * Create: allocate ugly resampler
+ * Create: allocate linear resampler
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
@@ -63,10 +76,35 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    /* Allocate the memory needed to store the module's structure */
+    p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
+    if( p_filter->p_sys == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        return VLC_ENOMEM;
+    }
+    p_filter->p_sys->p_prev_sample = malloc( p_filter->input.i_channels
+			 	 	     * sizeof(int32_t) );
+    if( p_filter->p_sys->p_prev_sample == NULL )
+    {
+        msg_Err( p_filter, "out of memory" );
+        return VLC_ENOMEM;
+    }
+
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = VLC_FALSE;
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close: free our resources
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    free( p_filter->p_sys->p_prev_sample );
+    free( p_filter->p_sys );
 }
 
 /*****************************************************************************
@@ -77,41 +115,82 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     float* p_in = (float*)p_in_buf->p_buffer;
     float* p_out = (float*)p_out_buf->p_buffer;
+    float* p_prev_sample = (float*)p_filter->p_sys->p_prev_sample;
 
     int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
     int i_in_nb = p_in_buf->i_nb_samples;
-    int i_out_nb = i_in_nb * p_filter->output.i_rate
-                    / p_filter->input.i_rate;
-    int i_frame_bytes = i_nb_channels * sizeof(s32);
-    int i_in, i_chan, i_out = 0;
-    double f_step = (float)p_filter->input.i_rate / p_filter->output.i_rate;
-    float f_pos = 1;
-    
-    for( i_in = 0 ; i_in < i_in_nb - 1; i_in++ )
+    int i_chan, i_in, i_out = 0;
+
+    /* Take care of the previous input sample (if any) */
+    if( p_filter->b_reinit )
     {
-        f_pos--;
-        while( f_pos <= 1 )
+        p_filter->b_reinit = VLC_FALSE;
+	p_filter->p_sys->i_remainder = 0;
+        aout_DateInit( &p_filter->p_sys->end_date, p_filter->output.i_rate );
+    }
+    else
+    {
+        while( p_filter->p_sys->i_remainder < p_filter->output.i_rate )
         {
             for( i_chan = i_nb_channels ; i_chan ; )
             {
                 i_chan--;
-                p_out[i_chan] = p_in[i_chan] +
-                    ( p_in[i_chan + i_nb_channels] - p_in[i_chan] ) * f_pos;
-                i_out++;
+                p_out[i_chan] = p_prev_sample[i_chan];
+	        p_out[i_chan] += ( (p_prev_sample[i_chan] - p_in[i_chan])
+				   * p_filter->p_sys->i_remainder
+				   / p_filter->output.i_rate );
             }
-            f_pos += f_step;
             p_out += i_nb_channels;
-        }
-        p_in += i_nb_channels;
-    }
-    
-    if ( i_out != i_out_nb * i_nb_channels )
-    {
-        msg_Warn( p_aout, "mismatch in sample numbers: %d requested, "
-                  "%d generated", i_out_nb* i_nb_channels, i_out);
-    }
-                                              
-    p_out_buf->i_nb_samples = i_out_nb;
-    p_out_buf->i_nb_bytes = i_out_nb * i_frame_bytes;
-}
+  	    i_out++;
 
+            p_filter->p_sys->i_remainder += p_filter->input.i_rate;
+        }
+        p_filter->p_sys->i_remainder -= p_filter->output.i_rate;
+    }
+
+    /* Take care of the current input samples (minus last one) */
+    for( i_in = 0; i_in < i_in_nb - 1; i_in++ )
+    {
+        while( p_filter->p_sys->i_remainder < p_filter->output.i_rate )
+        {
+            for( i_chan = i_nb_channels ; i_chan ; )
+            {
+                i_chan--;
+                p_out[i_chan] = p_in[i_chan];
+	        p_out[i_chan] += ( (p_in[i_chan] -
+	            p_in[i_chan + i_nb_channels])
+		    * p_filter->p_sys->i_remainder / p_filter->output.i_rate );
+            }
+            p_out += i_nb_channels;
+  	    i_out++;
+
+            p_filter->p_sys->i_remainder += p_filter->input.i_rate;
+        }
+
+        p_in += i_nb_channels;
+        p_filter->p_sys->i_remainder -= p_filter->output.i_rate;
+    }
+
+    /* Backup the last input sample for next time */
+    for( i_chan = i_nb_channels ; i_chan ; )
+    {
+        i_chan--;
+        p_prev_sample[i_chan] = p_in[i_chan];
+    }
+
+    p_out_buf->i_nb_samples = i_out;
+    p_out_buf->start_date = p_in_buf->start_date;
+
+    if( p_in_buf->start_date !=
+	aout_DateGet( &p_filter->p_sys->end_date ) )
+    {
+        aout_DateSet( &p_filter->p_sys->end_date, p_in_buf->start_date );
+    }
+
+    p_out_buf->end_date = aout_DateIncrement( &p_filter->p_sys->end_date,
+                                              p_out_buf->i_nb_samples );
+
+    p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
+        i_nb_channels * sizeof(int32_t);
+
+}

@@ -2,7 +2,7 @@
  * ugly.c : ugly resampler (changes pitch)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ugly.c,v 1.4 2002/10/15 23:10:54 massiot Exp $
+ * $Id: ugly.c,v 1.5 2002/11/11 22:27:01 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -77,14 +77,14 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    s32* p_in = (s32*)p_in_buf->p_buffer;
-    s32* p_out = (s32*)p_out_buf->p_buffer;
+    int32_t* p_in = (int32_t*)p_in_buf->p_buffer;
+    int32_t* p_out = (int32_t*)p_out_buf->p_buffer;
 
     int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
     int i_in_nb = p_in_buf->i_nb_samples;
     int i_out_nb = i_in_nb * p_filter->output.i_rate
                     / p_filter->input.i_rate;
-    int i_frame_bytes = i_nb_channels * sizeof(s32);
+    int i_sample_bytes = i_nb_channels * sizeof(int32_t);
     int i_out, i_chan, i_remainder = 0;
 
     for( i_out = i_out_nb ; i_out-- ; )
@@ -105,6 +105,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = i_out_nb;
-    p_out_buf->i_nb_bytes = i_out_nb * i_frame_bytes;
+    p_out_buf->i_nb_bytes = i_out_nb * i_sample_bytes;
+    p_out_buf->start_date = p_in_buf->start_date;
+    p_out_buf->end_date = p_out_buf->start_date + p_out_buf->i_nb_samples *
+        1000000 / p_filter->output.i_rate;
 }
-

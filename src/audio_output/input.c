@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.19 2002/11/10 14:31:46 gbazin Exp $
+ * $Id: input.c,v 1.20 2002/11/11 22:27:00 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -98,13 +98,14 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             return -1;
         }
 
+        aout_FiltersHintBuffers( p_aout, p_input->pp_resamplers,
+                                 p_input->i_nb_resamplers,
+                                 &p_input->input_alloc );
+
         /* Setup the initial rate of the resampler */
         p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
         p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
 
-        aout_FiltersHintBuffers( p_aout, p_input->pp_resamplers,
-                                 p_input->i_nb_resamplers,
-                                 &p_input->input_alloc );
     }
 
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
@@ -153,7 +154,7 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                     aout_buffer_t * p_buffer )
 {
-    mtime_t start_date, duration;
+    mtime_t start_date;
 
     /* We don't care if someone changes the start date behind our back after
      * this. We'll deal with that when pushing the buffer, and compensate
@@ -172,9 +173,11 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         vlc_mutex_lock( &p_aout->input_fifos_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
         vlc_mutex_unlock( &p_aout->input_fifos_lock );
+        if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
+            msg_Warn( p_aout, "timing screwed, stopping resampling" );
         p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
         p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
-        msg_Warn( p_aout, "timing screwed, stopping resampling" );
+        p_input->pp_resamplers[0]->b_reinit = VLC_TRUE;
         start_date = 0;
     }
 
@@ -261,7 +264,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         }
         else if( p_input->i_resamp_start_drift &&
                  ( abs( p_buffer->start_date - start_date ) >
-                   abs( p_input->i_resamp_start_drift ) ) )
+                   abs( p_input->i_resamp_start_drift ) * 3 / 2 ) )
         {
             /* If the drift is increasing and not decreasing, than something
              * is bad. We'd better stop the resampling right now. */
@@ -269,7 +272,13 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
             p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
         }
+
     }
+
+    /* Adding the start date will be managed by aout_FifoPush(). */
+    p_buffer->start_date = start_date;
+    p_buffer->end_date = start_date +
+        (p_buffer->end_date - p_buffer->start_date);
 
     /* Actually run the resampler now. */
     if ( p_aout->mixer.mixer.i_rate !=
@@ -279,13 +288,6 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                           p_input->i_nb_resamplers,
                           &p_buffer );
     }
-
-    /* Adding the start date will be managed by aout_FifoPush(). */
-    duration = ( p_buffer->end_date - p_buffer->start_date ) *
-               p_input->pp_resamplers[0]->input.i_rate / p_input->input.i_rate;
-
-    p_buffer->start_date = start_date;
-    p_buffer->end_date = start_date + duration;
 
     vlc_mutex_lock( &p_aout->input_fifos_lock );
     aout_FifoPush( p_aout, &p_input->fifo, p_buffer );

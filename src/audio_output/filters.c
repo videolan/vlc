@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.12 2002/10/20 12:23:48 massiot Exp $
+ * $Id: filters.c,v 1.13 2002/11/11 22:27:00 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,6 +59,8 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
         vlc_object_destroy( p_filter );
         return NULL;
     }
+
+    p_filter->b_reinit = VLC_TRUE;
 
     return p_filter;
 }
@@ -292,10 +294,15 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
         aout_filter_t * p_filter = pp_filters[i];
         aout_buffer_t * p_output_buffer;
 
+        /* We need this because resamplers can produce more samples than
+           (i_in_nb * p_filter->output.i_rate / p_filter->input.i_rate) */
+        int i_compensate_rounding = 2 * p_filter->input.i_rate
+            / p_filter->output.i_rate;
+
         aout_BufferAlloc( &p_filter->output_alloc,
-                          (mtime_t)(*pp_input_buffer)->i_nb_samples * 1000000
-                            / p_filter->input.i_rate, *pp_input_buffer,
-                          p_output_buffer );
+            ((mtime_t)(*pp_input_buffer)->i_nb_samples + i_compensate_rounding)
+            * 1000000 / p_filter->input.i_rate,
+            *pp_input_buffer, p_output_buffer );
         if ( p_output_buffer == NULL )
         {
             msg_Err( p_aout, "out of memory" );
