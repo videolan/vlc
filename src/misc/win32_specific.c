@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.20 2003/01/19 03:16:24 sam Exp $
+ * $Id: win32_specific.c,v 1.21 2003/02/17 05:50:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -39,6 +39,29 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
 #if !defined( UNDER_CE )
     WSADATA Data;
     int i_err;
+
+    /* Get our full path */
+    if( ppsz_argv[0] )
+    {
+        char psz_path[MAX_PATH];
+        char *psz_vlc;
+
+        GetFullPathName( ppsz_argv[0], MAX_PATH, psz_path, &psz_vlc );
+
+        if( psz_vlc > psz_path && psz_vlc[-1] == '\\' )
+        {
+            psz_vlc[-1] = '\0';
+            p_this->p_libvlc->psz_vlcpath = strdup( psz_path );
+        }
+        else
+        {
+            p_this->p_libvlc->psz_vlcpath = strdup( "" );
+        }
+    }
+    else
+    {
+        p_this->p_libvlc->psz_vlcpath = strdup( "" );
+    }
 
     /* WinSock Library Init. */
     i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );

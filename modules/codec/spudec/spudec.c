@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.14 2003/01/30 16:36:04 gbazin Exp $
+ * $Id: spudec.c,v 1.15 2003/02/17 05:50:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -54,11 +54,12 @@ static vout_thread_t *FindVout( spudec_thread_t * );
 
 vlc_module_begin();
     add_category_hint( N_("subtitles"), NULL );
-#if defined(SYS_DARWIN) || defined(SYS_BEOS)
+#if defined(SYS_DARWIN) || defined(SYS_BEOS) \
+     || (defined(WIN32) && !defined(UNDER_CE))
     add_file( "spudec-font", NULL, NULL,
               FONT_TEXT, FONT_LONGTEXT );
 #else
-    add_file( "spudec-font", "./share/" DEFAULT_FONT, NULL,
+    add_file( "spudec-font", "share/" DEFAULT_FONT, NULL,
               FONT_TEXT, FONT_LONGTEXT );
 #endif
     set_description( _("subtitles decoder module") );
@@ -134,6 +135,14 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
             psz_font = malloc( strlen(psz_vlcpath) + strlen("/share/")
                                 + strlen(DEFAULT_FONT) + 1 );
             sprintf(psz_font, "%s/share/" DEFAULT_FONT, psz_vlcpath);
+        }
+#elif defined(WIN32) && !defined(UNDER_CE)
+        if ( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )
+        {
+            char * psz_vlcpath = p_fifo->p_libvlc->psz_vlcpath;
+            psz_font = malloc( strlen(psz_vlcpath) + strlen("\\share\\")
+                                + strlen(DEFAULT_FONT) + 1 );
+            sprintf(psz_font, "%s\\share\\" DEFAULT_FONT, psz_vlcpath);
         }
 #else
         if( (psz_font = config_GetPsz( p_fifo, "spudec-font" )) == NULL )

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.111 2003/01/27 17:41:01 ipkiss Exp $
+ * $Id: modules.c,v 1.112 2003/02/17 05:50:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -551,7 +551,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 
     char **         ppsz_path = path;
     char *          psz_fullpath;
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN ) \
+     || ( defined( WIN32 ) && !defined( UNDER_CE ) )
     int             i_vlclen = strlen( p_this->p_libvlc->psz_vlcpath );
     vlc_bool_t      b_notinroot;
 #endif
@@ -566,14 +567,19 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN ) \
+     || ( defined( WIN32 ) && !defined( UNDER_CE ) )
         /* Store strlen(*ppsz_path) for later use. */
         int i_dirlen = strlen( *ppsz_path );
 
         b_notinroot = VLC_FALSE;
         /* Under BeOS, we need to add beos_GetProgramPath() to access
          * files under the current directory */
-        if( ( i_dirlen > 1 ) && strncmp( *ppsz_path, "/", 1 ) )
+#ifdef WIN32
+        if( i_dirlen < 3 || ppsz_path[3] != '\\' )
+#else
+        if( ppsz_path[0] != '/' )
+#endif
         {
             i_dirlen += i_vlclen + 2;
             b_notinroot = VLC_TRUE;
