@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.14 2002/09/20 23:27:04 massiot Exp $
+ * $Id: mixer.c,v 1.15 2002/09/23 23:05:58 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -304,12 +304,6 @@ int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
 {
     float f_old = p_aout->mixer.f_multiplier;
 
-    if ( p_aout->mixer.mixer.i_format != AOUT_FMT_FLOAT32 )
-    {
-        msg_Warn( p_aout, "MixerMultiplierSet called for non-float32 mixer" );
-        return -1;
-    }
-
     aout_MixerDelete( p_aout );
 
     p_aout->mixer.f_multiplier = f_multiplier;
@@ -332,12 +326,6 @@ int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
  *****************************************************************************/
 int aout_MixerMultiplierGet( aout_instance_t * p_aout, float * pf_multiplier )
 {
-    if ( p_aout->mixer.mixer.i_format != AOUT_FMT_FLOAT32 )
-    {
-        msg_Warn( p_aout, "MixerMultiplierGet called for non-float32 mixer" );
-        return -1;
-    }
-
     *pf_multiplier = p_aout->mixer.f_multiplier;
     return 0;
 }

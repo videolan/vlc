@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.4 2002/08/30 22:22:24 massiot Exp $
+ * $Id: ts.c,v 1.5 2002/09/23 23:05:58 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -90,6 +90,12 @@ static void TS_DVBPSI_HandlePMT ( input_thread_t *, dvbpsi_pmt_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define VLS_BACKWARDS_COMPAT_TEXT N_("compatibility with pre-0.4 VLS")
+#define VLS_BACKWARDS_COMPAT_LONGTEXT N_( \
+    "The protocol for transmitting A/52 audio streams changed between VLC " \
+    "0.3.x and 0.4. By default VLC assumes you have the latest VLS. In case " \
+    "you're using an old version, select this option.")
+
 vlc_module_begin();
 #if defined MODULE_NAME_IS_ts
     set_description( _("ISO 13818-1 MPEG Transport Stream input") );
@@ -100,6 +106,8 @@ vlc_module_begin();
     set_capability( "demux", 170 );
     add_shortcut( "ts_dvbpsi" );
 #endif
+    add_bool( "vls-backwards-compat", 0, NULL,
+              VLS_BACKWARDS_COMPAT_TEXT, VLS_BACKWARDS_COMPAT_LONGTEXT );
     set_callbacks( Activate, Deactivate );
 vlc_module_end();
 
@@ -545,6 +553,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 
     pgrm_ts_data_t            * p_pgrm_data;
     es_ts_data_t              * p_demux_data;
+    vlc_bool_t b_vls_compat = config_GetInt( p_input, "vls-backwards-compat" );
 
     p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
     p_pgrm_data = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data;
@@ -625,7 +634,10 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                             p_new_es->i_cat = AUDIO_ES;
                             break;
                         case A52_AUDIO_ES:
-                            p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                            if ( !b_vls_compat )
+                                p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                            else
+                                p_new_es->i_fourcc = VLC_FOURCC('a','5','2','b');
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = AUDIO_ES;
                             break;
@@ -635,7 +647,10 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                             p_new_es->i_cat = AUDIO_ES;
                             break;
                         case DVD_SPU_ES:
-                            p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                            if ( !b_vls_compat )
+                                p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                            else
+                                p_new_es->i_fourcc = VLC_FOURCC('s','p','u','b');
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = SPU_ES;
                             break;
@@ -840,6 +855,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
     pgrm_descriptor_t *     p_pgrm;
     es_descriptor_t *       p_new_es;
     pgrm_ts_data_t *        p_pgrm_demux;
+    vlc_bool_t b_vls_compat = config_GetInt( p_input, "vls-backwards-compat" );
    
     vlc_mutex_lock( &p_input->stream.stream_lock );
     
@@ -883,12 +899,19 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                     p_new_es->i_cat = AUDIO_ES;
                     break;
                 case A52_AUDIO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                    if ( !b_vls_compat )
+                        p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                    else
+                        p_new_es->i_fourcc = VLC_FOURCC('a','5','2','b');
                     p_new_es->i_cat = AUDIO_ES;
                     p_new_es->i_stream_id = 0xBD;
                     break;
                 case DVD_SPU_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                case A52_AUDIO_ES:
+                    if ( !b_vls_compat )
+                        p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                    else
+                        p_new_es->i_fourcc = VLC_FOURCC('s','p','u','b');
                     p_new_es->i_cat = SPU_ES;
                     p_new_es->i_stream_id = 0xBD;
                     break;

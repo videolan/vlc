@@ -37,6 +37,7 @@ struct module_symbols_t
     int (* __vlc_thread_create_inner) ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), int, vlc_bool_t ) ;
     int (* __vlc_threads_end_inner) ( vlc_object_t * ) ;
     int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
+    int (* aout_BufferPlay_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
     int (* aout_FormatNbChannels_inner) ( audio_sample_format_t * p_format ) ;
     int (* aout_VolumeDown_inner) ( aout_instance_t *, int, audio_volume_t * ) ;
     int (* aout_VolumeGet_inner) ( aout_instance_t *, audio_volume_t * ) ;
@@ -111,7 +112,6 @@ struct module_symbols_t
     void (* __vlc_thread_join_inner) ( vlc_object_t *, char *, int ) ;
     void (* __vlc_thread_ready_inner) ( vlc_object_t * ) ;
     void (* aout_BufferDelete_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
-    void (* aout_BufferPlay_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
     void (* aout_DateInit_inner) ( audio_date_t *, u32 ) ;
     void (* aout_DateMove_inner) ( audio_date_t *, mtime_t ) ;
     void (* aout_DateSet_inner) ( audio_date_t *, mtime_t ) ;
