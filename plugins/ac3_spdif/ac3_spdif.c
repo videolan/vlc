@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.1 2001/11/13 12:09:17 henri Exp $
+ * $Id: ac3_spdif.c,v 1.2 2001/11/14 03:38:11 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -158,11 +158,12 @@ static int ac3_spdif_Run( decoder_config_t * p_config )
         /* Handle the dates */
         if( p_spdif->i_real_pts )
         {
-            if(i_current_pts + i_frame_time != p_spdif->i_real_pts)
+            mtime_t     i_delta = p_spdif->i_real_pts - i_current_pts -
+                                  i_frame_time;
+            if( i_delta > i_frame_time || i_delta < -i_frame_time )
             {
-                intf_WarnMsg( 2, "spdif warning: date discontinuity (%d)",
-                              p_spdif->i_real_pts - i_current_pts -
-                              i_frame_time );
+                intf_WarnMsg( 3, "spdif warning: date discontinuity (%d)",
+                              i_delta );
             }
             i_current_pts = p_spdif->i_real_pts;
             p_spdif->i_real_pts = 0;

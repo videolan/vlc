@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.17 2001/10/13 15:34:21 stef Exp $
+ * $Id: aout_spdif.c,v 1.18 2001/11/14 03:38:11 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -41,8 +41,6 @@
 #include "audio_output.h"
 #include "aout_common.h"
 
-#define FRAME_TIME      32000
-
 /*****************************************************************************
  * aout_SpdifThread: audio output thread that sends raw spdif data
  *                   to an external decoder
@@ -61,7 +59,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
   mtime_t     m_old = 0;
 
 
-  intf_WarnMsg( 3, "aout info: starting spdif output loop" );
+  intf_DbgMsg( "aout debug: starting spdif output loop" );
 
   while( !p_aout->b_die )
   {
@@ -112,13 +110,13 @@ void aout_SpdifThread( aout_thread_t * p_aout )
             /* check continuity */
             if( (m_play - m_old) != m_frame_time )
             {
-              intf_WarnMsg( 6, "aout warning: long frame ? (%lld)",
+              intf_DbgMsg( "aout debug: malformed frame ? (%lld)",
                                m_play - m_old );
-              mwait( m_play );
+              mwait( m_play - m_frame_time );
             }
             else
             {
-              mwait( m_play - 3* m_frame_time );
+              mwait( m_play - 2 * m_frame_time );
             }
             m_old = m_play;
 
@@ -128,20 +126,20 @@ void aout_SpdifThread( aout_thread_t * p_aout )
           }
           else
           {
-            intf_WarnMsg( 6, "aout info: late spdif frame" );
+            intf_DbgMsg( "aout debug: late spdif frame" );
           }
         }
         else
         {
           vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
           msleep( m_frame_time );
-          intf_WarnMsg( 6, "aout info: empty spdif fifo" );
+          intf_WarnMsg( 3, "aout warning: empty spdif fifo" );
         }
       }
     }
   }
 
-  intf_WarnMsg( 3, "aout info: exiting spdif loop" );
+  intf_DbgMsg( "aout debug: exiting spdif loop" );
   vlc_mutex_lock( &p_aout->fifos_lock );
 
   for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
