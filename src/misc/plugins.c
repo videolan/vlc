@@ -27,6 +27,10 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <errno.h>                                                 /* ENOMEM */
+#include <sys/types.h>                                               /* open */
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>                                                 /* close */
 
 #if defined(HAVE_DLFCN_H)                                /* Linux, BSD, Hurd */
 #include <dlfcn.h>                           /* dlopen(), dlsym(), dlclose() */
@@ -135,7 +139,7 @@ void bank_Destroy( plugin_bank_t * p_bank )
 
 char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
 {
-    int i_count, i_length;
+    int i_count, i_length, i_fd;
     char * psz_plugin;
     char * psz_plugin_path[ ] =
     {
@@ -163,6 +167,15 @@ char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
         psz_plugin = malloc( strlen(psz_plugin_path[i_count]) + i_length + 5 );
         sprintf( psz_plugin, "%s/%s.so", psz_plugin_path[i_count], psz_name );
 
+        /* Try to open the plugin before dlopen()ing it. */
+        i_fd = open( psz_plugin, O_RDONLY );
+        if( i_fd == -1 )
+        {
+            free( psz_plugin );
+            continue;
+        }
+        close( i_fd );
+        
         *p_plugin_id = dlopen( psz_plugin, RTLD_NOW | RTLD_GLOBAL );
 #endif
 
@@ -175,11 +188,9 @@ char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
             /* plugin successfuly dlopened */
             return( psz_plugin );
         }
+
 #ifndef SYS_BEOS
-        else
-        {
-            intf_WarnMsg( 1, "dlerror: %s\n", dlerror() );
-        }
+        intf_WarnMsg( 1, "Plugin %s failed: %s\n", psz_plugin, dlerror() );
 #endif
 
         free( psz_plugin );
