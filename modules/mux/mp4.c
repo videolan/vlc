@@ -510,7 +510,8 @@ static int Mux( sout_mux_t *p_mux )
         /* add index entry */
         p_stream->entry[p_stream->i_entry_count].i_pos    = p_sys->i_pos;
         p_stream->entry[p_stream->i_entry_count].i_size   = p_data->i_size;
-        p_stream->entry[p_stream->i_entry_count].i_pts_dts= __MAX( p_data->i_pts - p_data->i_dts, 0 );
+        p_stream->entry[p_stream->i_entry_count].i_pts_dts=
+            __MAX( p_data->i_pts - p_data->i_dts, 0 );
         p_stream->entry[p_stream->i_entry_count].i_length = p_data->i_length;
         p_stream->entry[p_stream->i_entry_count].i_flags  = p_data->i_flags;
 
@@ -739,6 +740,8 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
         box_fix( box );
         box_gather( udta, box );
     }
+
+    /* Misc atoms */
     if( p_meta )
     {
         int i;
@@ -747,27 +750,28 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
             bo_t *box = NULL;
 
             if( !strcmp( p_meta->name[i], VLC_META_TITLE ) )
-            {
                 box = box_new( "\251nam" );
-            }
             else if( !strcmp( p_meta->name[i], VLC_META_AUTHOR ) )
-            {
                 box = box_new( "\251aut" );
-            }
             else if( !strcmp( p_meta->name[i], VLC_META_ARTIST ) )
-            {
                 box = box_new( "\251ART" );
-            }
+            else if( !strcmp( p_meta->name[i], VLC_META_GENRE ) )
+                box = box_new( "\251gen" );
             else if( !strcmp( p_meta->name[i], VLC_META_COPYRIGHT ) )
-            {
                 box = box_new( "\251cpy" );
-            }
+            else if( !strcmp( p_meta->name[i], VLC_META_DESCRIPTION ) )
+                box = box_new( "\251des" );
+            else if( !strcmp( p_meta->name[i], VLC_META_DATE ) )
+                box = box_new( "\251day" );
+            else if( !strcmp( p_meta->name[i], VLC_META_URL ) )
+                box = box_new( "\251url" );
 
             if( box )
             {
                 bo_add_16be( box, strlen( p_meta->value[i] ) );
                 bo_add_16be( box, 0 );
-                bo_add_mem( box, strlen( p_meta->value[i] ), p_meta->value[i] );
+                bo_add_mem( box, strlen( p_meta->value[i] ),
+                            p_meta->value[i] );
                 box_fix( box );
                 box_gather( udta, box );
             }
@@ -1070,7 +1074,8 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
 
         i_dts += p_stream->entry[i].i_length;
 
-        p_stream->entry[i].i_length = i_delta * (int64_t)i_timescale / I64C(1000000);;
+        p_stream->entry[i].i_length =
+            i_delta * (int64_t)i_timescale / I64C(1000000);
 
         i_dts_q += p_stream->entry[i].i_length;
     }
@@ -1111,7 +1116,8 @@ static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
     stss = NULL;
     for( i = 0, i_index = 0; i < p_stream->i_entry_count; i++ )
     {
-        if( p_stream->entry[i].i_flags & (BLOCK_FLAG_TYPE_I<<SOUT_BUFFER_FLAGS_BLOCK_SHIFT) )
+        if( p_stream->entry[i].i_flags &
+            (BLOCK_FLAG_TYPE_I << SOUT_BUFFER_FLAGS_BLOCK_SHIFT) )
         {
             if( stss == NULL )
             {
@@ -1309,12 +1315,14 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
 
             if( p_sys->b_64_ext )
             {
-                bo_add_64be( elst, (p_stream->i_dts_start-p_sys->i_dts_start) * i_movie_timescale / I64C(1000000) );
+                bo_add_64be( elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
+                             i_movie_timescale / I64C(1000000) );
                 bo_add_64be( elst, -1 );
             }
             else
             {
-                bo_add_32be( elst, (p_stream->i_dts_start-p_sys->i_dts_start) * i_movie_timescale / I64C(1000000) );
+                bo_add_32be( elst, (p_stream->i_dts_start-p_sys->i_dts_start) *
+                             i_movie_timescale / I64C(1000000) );
                 bo_add_32be( elst, -1 );
             }
             bo_add_16be( elst, 1 );
@@ -1326,12 +1334,14 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         }
         if( p_sys->b_64_ext )
         {
-            bo_add_64be( elst, p_stream->i_duration * i_movie_timescale / I64C(1000000) );
+            bo_add_64be( elst, p_stream->i_duration *
+                         i_movie_timescale / I64C(1000000) );
             bo_add_64be( elst, 0 );
         }
         else
         {
-            bo_add_32be( elst, p_stream->i_duration * i_movie_timescale / I64C(1000000) );
+            bo_add_32be( elst, p_stream->i_duration *
+                         i_movie_timescale / I64C(1000000) );
             bo_add_32be( elst, 0 );
         }
         bo_add_16be( elst, 1 );
@@ -1498,8 +1508,6 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
     box_fix( moov );
     return moov;
 }
-
-
 
 /****************************************************************************/
 
