@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.15 2003/02/03 17:18:48 stippi Exp $
+ * $Id: MediaControlView.cpp,v 1.16 2003/04/22 16:36:16 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -61,7 +61,7 @@ const rgb_color kSeekRed = (rgb_color){ 255, 0, 0, 255 };
 const rgb_color kSeekRedLight = (rgb_color){ 255, 152, 152, 255 };
 const rgb_color kSeekRedShadow = (rgb_color){ 178, 0, 0, 255 };
 
-const char* kDisabledSeekMessage = "Drop files to play";
+const char* kDisabledSeekMessage = _("Drop files to play");
 
 enum
 {
@@ -1254,9 +1254,9 @@ PositionInfoView::Draw( BRect updateRect )
 			float height = ( r.Height() - timeHeight ) / 3.0;
 			SetFont( &tinyFont );
 			SetHighColor( 0, 180, 0, 255 );
-			DrawString( "File", BPoint( r.left + 3.0, r.top + height ) );
-			DrawString( "Title", BPoint( r.left + 3.0, r.top + 2.0 * height ) );
-			DrawString( "Chapter", BPoint( r.left + 3.0, r.top + 3.0 * height ) );
+			DrawString( _("File"), BPoint( r.left + 3.0, r.top + height ) );
+			DrawString( _("Title"), BPoint( r.left + 3.0, r.top + 2.0 * height ) );
+			DrawString( _("Chapter"), BPoint( r.left + 3.0, r.top + 3.0 * height ) );
 			SetFont( &smallFont );
 			BString helper;
 			SetHighColor( 0, 255, 0, 255 );

@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.8 2003/02/03 17:18:48 stippi Exp $
+ * $Id: PlayListWindow.cpp,v 1.9 2003/04/22 16:36:16 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -79,69 +79,69 @@ PlayListWindow::PlayListWindow( BRect frame, const char* name,
     AddChild( fMenuBar );
 
 	// Add the File menu
-	BMenu *fileMenu = new BMenu( "File" );
+	BMenu *fileMenu = new BMenu( _("File") );
 	fMenuBar->AddItem( fileMenu );
-	BMenuItem* item = new BMenuItem( "Open File" B_UTF8_ELLIPSIS,
+	BMenuItem* item = new BMenuItem( _AddEllipsis(_("Open File")),
 									 new BMessage( OPEN_FILE ), 'O' );
 	item->SetTarget( fMainWindow );
 	fileMenu->AddItem( item );
 
-	CDMenu* cd_menu = new CDMenu( "Open Disc" );
+	CDMenu* cd_menu = new CDMenu( _("Open Disc") );
 	fileMenu->AddItem( cd_menu );
 
 	fileMenu->AddSeparatorItem();
-	item = new BMenuItem( "Close",
+	item = new BMenuItem( _("Close"),
 						  new BMessage( B_QUIT_REQUESTED ), 'W' );
 	fileMenu->AddItem( item );
 
 	// Add the Edit menu
-	BMenu *editMenu = new BMenu( "Edit" );
+	BMenu *editMenu = new BMenu( _("Edit") );
 	fMenuBar->AddItem( editMenu );
-	fSelectAllMI = new BMenuItem( "Select All",
+	fSelectAllMI = new BMenuItem( _("Select All"),
 								  new BMessage( MSG_SELECT_ALL ), 'A' );
 	editMenu->AddItem( fSelectAllMI );
-	fSelectNoneMI = new BMenuItem( "Select None",
+	fSelectNoneMI = new BMenuItem( _("Select None"),
 								   new BMessage( MSG_SELECT_NONE ), 'A', B_SHIFT_KEY );
 	editMenu->AddItem( fSelectNoneMI );
 
 	editMenu->AddSeparatorItem();
-	fSortReverseMI = new BMenuItem( "Sort Reverse",
+	fSortReverseMI = new BMenuItem( _("Sort Reverse"),
 								 new BMessage( MSG_SORT_REVERSE ), 'F' );
 	editMenu->AddItem( fSortReverseMI );
-	fSortNameMI = new BMenuItem( "Sort by Name",
+	fSortNameMI = new BMenuItem( _("Sort by Name"),
 								 new BMessage( MSG_SORT_NAME ), 'N' );
 fSortNameMI->SetEnabled( false );
 	editMenu->AddItem( fSortNameMI );
-	fSortPathMI = new BMenuItem( "Sort by Path",
+	fSortPathMI = new BMenuItem( _("Sort by Path"),
 								 new BMessage( MSG_SORT_PATH ), 'P' );
 fSortPathMI->SetEnabled( false );
 	editMenu->AddItem( fSortPathMI );
-	fRandomizeMI = new BMenuItem( "Randomize",
+	fRandomizeMI = new BMenuItem( _("Randomize"),
 								  new BMessage( MSG_RANDOMIZE ), 'R' );
 fRandomizeMI->SetEnabled( false );
 	editMenu->AddItem( fRandomizeMI );
 	editMenu->AddSeparatorItem();
-	fRemoveMI = new BMenuItem( "Remove",
+	fRemoveMI = new BMenuItem( _("Remove"),
 						  new BMessage( MSG_REMOVE ) );
 	editMenu->AddItem( fRemoveMI );
-	fRemoveAllMI = new BMenuItem( "Remove All",
+	fRemoveAllMI = new BMenuItem( _("Remove All"),
 								  new BMessage( MSG_REMOVE_ALL ) );
 	editMenu->AddItem( fRemoveAllMI );
 
 	// Add View menu
-	fViewMenu = new BMenu( "View" );
+	fViewMenu = new BMenu( _("View") );
 	fMenuBar->AddItem( fViewMenu );
 
 	fViewMenu->SetRadioMode( true );
 	BMessage* message = new BMessage( MSG_SET_DISPLAY );
 	message->AddInt32( "mode", DISPLAY_PATH );
-	item = new BMenuItem( "Path", message );
+	item = new BMenuItem( _("Path"), message );
 	item->SetMarked( true );
 	fViewMenu->AddItem( item );
 
 	message = new BMessage( MSG_SET_DISPLAY );
 	message->AddInt32( "mode", DISPLAY_NAME );
-	item = new BMenuItem( "Name", message );
+	item = new BMenuItem( _("Name"), message );
 	fViewMenu->AddItem( item );
 
 	// make menu bar resize to correct height

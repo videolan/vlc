@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.26 2003/02/09 17:10:52 stippi Exp $
+ * $Id: VlcWrapper.cpp,v 1.27 2003/04/22 16:36:16 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -40,6 +40,13 @@ extern "C"
 
 #include "VlcWrapper.h"
 #include "MsgVals.h"
+
+const char * _AddEllipsis( char * string )
+{
+    BString newString( string );
+    newString << B_UTF8_ELLIPSIS;
+    return newString.String();
+}
 
 /* constructor */
 VlcWrapper::VlcWrapper( intf_thread_t *p_interface )
@@ -174,7 +181,7 @@ BList * VlcWrapper::GetChannels( int i_cat )
         /* "None" */
         message = new BMessage( what );
         message->AddInt32( fieldName, -1 );
-        menuItem = new BMenuItem( "None", message );
+        menuItem = new BMenuItem( _("None"), message );
         if( !p_es )
             menuItem->SetMarked( true );
         list->AddItem( menuItem );
@@ -188,7 +195,7 @@ BList * VlcWrapper::GetChannels( int i_cat )
                 if( strlen( p_input->stream.pp_es[i]->psz_desc ) )
                     trackName = strdup( p_input->stream.pp_es[i]->psz_desc );
                 else
-                    trackName = "<unknown>";
+                    trackName = _("<unknown>");
                 menuItem = new BMenuItem( trackName, message );
                 if( p_input->stream.pp_es[i] == p_es )
                     menuItem->SetMarked( true );

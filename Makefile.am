@@ -447,7 +447,7 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 if HAVE_BEOS
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@
-	$(INSTALL) -d locale
+	rm -Rf locale ; mkdir locale
 	for i in $(ALL_LINGUAS); do \
 		mkdir -p locale/$${i}/LC_MESSAGES ; \
 		cp po/$${i}.gmo locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
@@ -562,26 +562,35 @@ package-beos:
 	else \
 		echo "OK."; mkdir tmp; \
 	fi
-	
-# Create dir
-	mkdir -p tmp/vlc/share
+
 # Copy relevant files
-	cp vlc tmp/vlc/
-	$(STRIP) tmp/vlc/vlc
-	xres -o tmp/vlc/vlc ./share/vlc_beos.rsrc
-	cp AUTHORS COPYING ChangeLog README THANKS NEWS tmp/vlc/
-	for file in default8x16.psf default8x9.psf ; \
-		do cp share/$$file tmp/vlc/share/ ; done
-	mkdir tmp/vlc/plugins
-	for i in dummy $(PLUGIN_FILES) ; do if test "x$$i" != "xdummy" ; then \
-		$(INSTALL) $$i tmp/vlc/plugins/ ; \
-	fi ; done
-	for i in dummy tmp/vlc/plugins/*$(LIBEXT) ; do if test $$i != dummy ; then $(STRIP) $$i ; fi ; done
-# Create package 
+	mkdir -p tmp/vlc
+	cp vlc AUTHORS COPYING ChangeLog README THANKS NEWS tmp/vlc/
+# We cannot use ${PLUGIN_FILES}, it looks like it is too long for the BeOS shell...
+	if [ `find modules -name "lib*_plugin.so" | wc -l` -gt 0 ]; then \
+		mkdir -p tmp/vlc/plugins; \
+		find modules -name "lib*_plugin.so" | xargs -i{} cp {} tmp/vlc/plugins/; \
+	fi
+	for i in $(ALL_LINGUAS); do \
+		mkdir -p tmp/vlc/locale/$${i}/LC_MESSAGES ; \
+		cp po/$${i}.gmo tmp/vlc/locale/$${i}/LC_MESSAGES/vlc.mo || true ; \
+	done
+	mkdir -p tmp/vlc/share
+	cp share/*.rle tmp/vlc/share/
+
+# Create package with debug symbols
+	mimeset -f tmp/vlc/* tmp/vlc/*/*
 	mv tmp/vlc tmp/vlc-${VERSION}
-	(cd tmp ; find vlc-${VERSION} | \
-	zip -9 -@ vlc-${VERSION}-BeOS-x86.zip )
-	mv tmp/vlc-${VERSION}-BeOS-x86.zip .
+	(cd tmp ; zip -9 -r vlc-${VERSION}-BeOS.zip vlc-${VERSION} )
+	mv tmp/vlc-${VERSION}-BeOS.zip .
+
+# Create package without debug symbols
+	strip tmp/vlc-${VERSION}/vlc tmp/vlc-${VERSION}/plugins/lib*_plugin.so
+	xres -o tmp/vlc-${VERSION}/vlc share/vlc_beos.rsrc
+	mimeset -f tmp/vlc-${VERSION}/* tmp/vlc-${VERSION}/*/*
+	(cd tmp ; zip -9 -r vlc-${VERSION}-BeOS-stripped.zip vlc-${VERSION} )
+	mv tmp/vlc-${VERSION}-BeOS-stripped.zip .
+
 # Clean up
 	rm -Rf tmp
 

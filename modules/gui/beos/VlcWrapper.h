@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.20 2003/02/09 11:51:36 titer Exp $
+ * $Id: VlcWrapper.h,v 1.21 2003/04/22 16:36:16 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -24,6 +24,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#include <String.h>
 
 #define SEEKSLIDER_RANGE 2048
 
@@ -48,6 +50,9 @@ struct intf_sys_t
     
     VlcWrapper *         p_wrapper;
 };
+
+/* Necessary because of i18n */
+const char * _AddEllipsis( char * string );
 
 /*****************************************************************************
  * VlcWrapper

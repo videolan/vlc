@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.16 2003/04/18 19:26:38 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.17 2003/04/22 16:36:16 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1126,27 +1126,27 @@ VLCView::MouseDown(BPoint where)
 				BPopUpMenu *menu = new BPopUpMenu("context menu");
 				menu->SetRadioMode(false);
 				// Resize to 50%
-				BMenuItem *halfItem = new BMenuItem("50%", new BMessage(RESIZE_50));
+				BMenuItem *halfItem = new BMenuItem(_("50%"), new BMessage(RESIZE_50));
 				menu->AddItem(halfItem);
 				// Resize to 100%
-				BMenuItem *origItem = new BMenuItem("100%", new BMessage(RESIZE_100));
+				BMenuItem *origItem = new BMenuItem(_("100%"), new BMessage(RESIZE_100));
 				menu->AddItem(origItem);
 				// Resize to 200%
-				BMenuItem *doubleItem = new BMenuItem("200%", new BMessage(RESIZE_200));
+				BMenuItem *doubleItem = new BMenuItem(_("200%"), new BMessage(RESIZE_200));
 				menu->AddItem(doubleItem);
 				// Toggle FullScreen
-				BMenuItem *zoomItem = new BMenuItem("Fullscreen", new BMessage(TOGGLE_FULL_SCREEN));
+				BMenuItem *zoomItem = new BMenuItem(_("Fullscreen"), new BMessage(TOGGLE_FULL_SCREEN));
 				zoomItem->SetMarked(videoWindow->IsFullScreen());
 				menu->AddItem(zoomItem);
 	
 				menu->AddSeparatorItem();
 	
 				// Toggle vSync
-				BMenuItem *vsyncItem = new BMenuItem("Vertical Sync", new BMessage(VERT_SYNC));
+				BMenuItem *vsyncItem = new BMenuItem(_("Vertical Sync"), new BMessage(VERT_SYNC));
 				vsyncItem->SetMarked(videoWindow->IsSyncedToRetrace());
 				menu->AddItem(vsyncItem);
 				// Correct Aspect Ratio
-				BMenuItem *aspectItem = new BMenuItem("Correct Aspect Ratio", new BMessage(ASPECT_CORRECT));
+				BMenuItem *aspectItem = new BMenuItem(_("Correct Aspect Ratio"), new BMessage(ASPECT_CORRECT));
 				aspectItem->SetMarked(videoWindow->CorrectAspectRatio());
 				menu->AddItem(aspectItem);
 	
@@ -1175,13 +1175,13 @@ VLCView::MouseDown(BPoint where)
 				bool onTop = videoWindow->Feel() == B_FLOATING_ALL_WINDOW_FEEL;
 				window_feel feel = onTop ? B_NORMAL_WINDOW_FEEL : B_FLOATING_ALL_WINDOW_FEEL;
 				windowFeelMsg->AddInt32( "WinFeel", (int32)feel );
-				BMenuItem *windowFeelItem = new BMenuItem( "Stay On Top", windowFeelMsg );
+				BMenuItem *windowFeelItem = new BMenuItem( _("Stay On Top"), windowFeelMsg );
 				windowFeelItem->SetMarked( onTop );
 				menu->AddItem( windowFeelItem );
 
 				menu->AddSeparatorItem();
 
-				BMenuItem* screenShotItem = new BMenuItem( "Take Screen Shot",
+				BMenuItem* screenShotItem = new BMenuItem( _("Take Screen Shot"),
 														   new BMessage( SCREEN_SHOT ) );
 				menu->AddItem( screenShotItem );
 

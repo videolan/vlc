@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.79 2003/04/18 15:25:51 titer Exp $
+ * $Id: libvlc.c,v 1.80 2003/04/22 16:36:16 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1058,6 +1058,12 @@ static void SetLanguage ( char const *psz_lang )
 
     /* Set the default domain */
     textdomain( PACKAGE );
+
+#ifdef SYS_BEOS
+    /* BeOS only support UTF8 strings */
+    bind_textdomain_codeset( PACKAGE, "UTF-8" );
+#endif
+
 #endif
 }
 

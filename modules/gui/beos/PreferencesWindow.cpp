@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.13 2003/02/09 17:10:52 stippi Exp $
+ * $Id: PreferencesWindow.cpp,v 1.14 2003/04/22 16:36:16 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -235,37 +235,37 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     
     fGeneralTab = new BTab();
     fTabView->AddTab( fGeneralView, fGeneralTab );
-    fGeneralTab->SetLabel( "General" );
+    fGeneralTab->SetLabel( _("General") );
     
     fAdjustTab = new BTab();
     fTabView->AddTab( fAdjustView, fAdjustTab );
-    fAdjustTab->SetLabel( "Picture" );
+    fAdjustTab->SetLabel( _("Picture") );
     
     /* fills the tabs */
     /* general tab */
     rect = fGeneralView->Bounds();
     rect.InsetBy( 10, 10 );
     rect.bottom = rect.top + 10;
-    fDvdMenusCheck = new BCheckBox( rect, "dvdmenus", "Use DVD menus",
+    fDvdMenusCheck = new BCheckBox( rect, "dvdmenus", _("Use DVD menus"),
                                   new BMessage( DVDMENUS_CHECK ) );
     fGeneralView->AddChild( fDvdMenusCheck );
     
     rect.top = rect.bottom + 20;
     rect.bottom = rect.top + 30;
-    fPpSlider = new BSlider( rect, "post-processing", "MPEG4 post-processing level",
+    fPpSlider = new BSlider( rect, "post-processing", _("MPEG4 post-processing level"),
                                new BMessage( FFMPEG_UPDATE ),
                                0, 6, B_TRIANGLE_THUMB,
                                B_FOLLOW_LEFT, B_WILL_DRAW ); 
     fPpSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
     fPpSlider->SetHashMarkCount( 7 );
-    fPpSlider->SetLimitLabels( "None", "Maximum" );
+    fPpSlider->SetLimitLabels( _("None"), _("Maximum") );
     fGeneralView->AddChild( fPpSlider );
 
 
 	rect.top = fPpSlider->Frame().bottom + 5.0;
 	rect.bottom = rect.top + 15.0;
 	fScreenShotPathTC = new DirectoryTextControl( rect, "screenshot path",
-												  "Screenshot Path:",
+												  _("Screenshot Path:"),
 												  fScreenShotPathBackup.String(),
 												  new BMessage( SET_FOLDER ) );
 //	fScreenShotPathTC->ResizeToPreferred();
@@ -275,7 +275,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
 	BMenu* translatorMenu = new BMenu( "translators" );
 	add_translator_items( translatorMenu, B_TRANSLATOR_BITMAP, SET_TRANSLATOR );
 	fScreenShotFormatMF = new BMenuField( rect, "translators field",
-										  "Screenshot Format:", translatorMenu );
+										  _("Screenshot Format:"), translatorMenu );
 	fScreenShotFormatMF->Menu()->SetRadioMode( true );
 	fScreenShotFormatMF->Menu()->SetLabelFromMarked( true );
 	// this will most likely not work for BMenuFields
@@ -305,7 +305,7 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     be_plain_font->GetHeight( &fh );
     rect.top = rect.bottom - ceilf( fh.ascent + fh.descent ) - 2.0;
     fRestartString = new BStringView( rect, NULL,
-        "DVD-menu and MPEG4 settings take effect after playback is restarted." );
+        _("DVD-menu and MPEG4 settings take effect after playback is restarted.") );
     fRestartString->SetAlignment( B_ALIGN_CENTER );
     fGeneralView->AddChild( fRestartString );
 
@@ -314,22 +314,22 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     rect = fAdjustView->Bounds();
     rect.InsetBy( 10, 10 );
     rect.bottom = rect.top + 30;
-    fBrightnessSlider = new BSlider( rect, "brightness", "Brightness",
+    fBrightnessSlider = new BSlider( rect, "brightness", _("Brightness"),
                                        new BMessage( ADJUST_UPDATE ),
                                        0, 200, B_TRIANGLE_THUMB,
                                        B_FOLLOW_LEFT, B_WILL_DRAW );
     rect.OffsetBy( 0, 40 );
-    fContrastSlider = new BSlider( rect, "contrast", "Contrast",
+    fContrastSlider = new BSlider( rect, "contrast", _("Contrast"),
                                      new BMessage( ADJUST_UPDATE ),
                                      0, 200, B_TRIANGLE_THUMB,
                                      B_FOLLOW_LEFT, B_WILL_DRAW );
     rect.OffsetBy( 0, 40 );
-    fHueSlider = new BSlider( rect, "hue", "Hue",
+    fHueSlider = new BSlider( rect, "hue", _("Hue"),
                                 new BMessage( ADJUST_UPDATE ),
                                 0, 360, B_TRIANGLE_THUMB,
                                 B_FOLLOW_LEFT, B_WILL_DRAW );
     rect.OffsetBy( 0, 40 );
-    fSaturationSlider = new BSlider( rect, "saturation", "Saturation",
+    fSaturationSlider = new BSlider( rect, "saturation", _("Saturation"),
                                        new BMessage( ADJUST_UPDATE ),
                                        0, 200, B_TRIANGLE_THUMB,
                                        B_FOLLOW_LEFT, B_WILL_DRAW );
@@ -346,22 +346,22 @@ PreferencesWindow::PreferencesWindow( intf_thread_t * p_interface,
     rect.InsetBy( 10, 10 );
     rect.top = rect.bottom - 25;
     rect.left = rect.right - 80;
-    button = new BButton( rect, NULL, "OK", new BMessage( PREFS_OK ) );
+    button = new BButton( rect, NULL, _("OK"), new BMessage( PREFS_OK ) );
     fPrefsView->AddChild( button );
 
 	SetDefaultButton( button );
 
     rect.OffsetBy( -90, 0 );
-    button = new BButton( rect, NULL, "Cancel", new BMessage( PREFS_CANCEL ) );
+    button = new BButton( rect, NULL, _("Cancel"), new BMessage( PREFS_CANCEL ) );
     fPrefsView->AddChild( button );
 
     rect.OffsetBy( -90, 0 );
-    button = new BButton( rect, NULL, "Revert", new BMessage( PREFS_REVERT ) );
+    button = new BButton( rect, NULL, _("Revert"), new BMessage( PREFS_REVERT ) );
     fPrefsView->AddChild( button );
 
 	rect.left = Bounds().left + 10.0;
 	rect.right = rect.left + 80.0;
-    button = new BButton( rect, NULL, "Defaults", new BMessage( PREFS_DEFAULTS ) );
+    button = new BButton( rect, NULL, _("Defaults"), new BMessage( PREFS_DEFAULTS ) );
     fPrefsView->AddChild( button );
 
 

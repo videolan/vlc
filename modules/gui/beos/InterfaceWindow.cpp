@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.33 2003/04/18 16:10:28 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.34 2003/04/22 16:36:16 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -156,8 +156,8 @@ collect_folder_contents( BDirectory& dir, BList& list, bool& deep, bool& asked, 
 			{
 				// ask user if we should parse sub-folders as well
 				BAlert* alert = new BAlert( "sub-folders?",
-											"Open files from all sub-folders as well?",
-											"No", "Yes", NULL, B_WIDTH_AS_USUAL,
+											_("Open files from all sub-folders as well?"),
+											_("No"), _("Yes"), NULL, B_WIDTH_AS_USUAL,
 											B_IDEA_ALERT );
 				int32 buttonIndex = alert->Go();
 				deep = buttonIndex == 1;
@@ -202,17 +202,17 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
                      ( screen_rect.bottom - PREFS_WINDOW_HEIGHT ) / 2,
                      ( screen_rect.right + PREFS_WINDOW_WIDTH ) / 2,
                      ( screen_rect.bottom + PREFS_WINDOW_HEIGHT ) / 2 );
-    fPreferencesWindow = new PreferencesWindow( p_intf, window_rect, "Settings" );
+    fPreferencesWindow = new PreferencesWindow( p_intf, window_rect, _("Settings") );
     window_rect.Set( screen_rect.right - 500,
                      screen_rect.top + 50,
                      screen_rect.right - 150,
                      screen_rect.top + 250 );
-    fPlaylistWindow = new PlayListWindow( window_rect, "Playlist", this, p_intf );
+    fPlaylistWindow = new PlayListWindow( window_rect, _("Playlist"), this, p_intf );
     window_rect.Set( screen_rect.right - 500,
                      screen_rect.top + 300,
                      screen_rect.right - 150,
                      screen_rect.top + 600 );
-    fMessagesWindow = new MessagesWindow( p_intf, window_rect, "Messages" );
+    fMessagesWindow = new MessagesWindow( p_intf, window_rect, _("Messages") );
 
     // the media control view
     p_mediaControl = new MediaControlView( BRect( 0.0, 0.0, 250.0, 50.0 ),
@@ -241,23 +241,23 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     // Add the file Menu
     BMenu* fileMenu = new BMenu( _("File") );
     fMenuBar->AddItem( fileMenu );
-    fileMenu->AddItem( new BMenuItem( "Open File" B_UTF8_ELLIPSIS,
+    fileMenu->AddItem( new BMenuItem( _AddEllipsis(_("Open Subtitles")),
                                       new BMessage( OPEN_FILE ), 'O') );
     
-    fileMenu->AddItem( new CDMenu( "Open Disc" ) );
+    fileMenu->AddItem( new CDMenu( _("Open Disc") ) );
 
-    fileMenu->AddItem( new BMenuItem( "Open Subtitles" B_UTF8_ELLIPSIS,
+    fileMenu->AddItem( new BMenuItem( _AddEllipsis(_("Open Subtitles")),
                                       new BMessage( LOAD_SUBFILE ) ) );
     
     fileMenu->AddSeparatorItem();
-    BMenuItem* item = new BMenuItem( "About" B_UTF8_ELLIPSIS,
+    BMenuItem* item = new BMenuItem( _AddEllipsis(_("About")),
                                      new BMessage( B_ABOUT_REQUESTED ), 'A');
     item->SetTarget( be_app );
     fileMenu->AddItem( item );
-    fileMenu->AddItem( new BMenuItem( "Quit", new BMessage( B_QUIT_REQUESTED ), 'Q') );
+    fileMenu->AddItem( new BMenuItem( _("Quit"), new BMessage( B_QUIT_REQUESTED ), 'Q') );
 
-    fLanguageMenu = new LanguageMenu("Language", AUDIO_ES, p_wrapper);
-    fSubtitlesMenu = new LanguageMenu("Subtitles", SPU_ES, p_wrapper);
+    fLanguageMenu = new LanguageMenu( _("Language"), AUDIO_ES, p_wrapper);
+    fSubtitlesMenu = new LanguageMenu( _("Subtitles"), SPU_ES, p_wrapper);
 
     /* Add the Audio menu */
     fAudioMenu = new BMenu( _("Audio") );
@@ -265,11 +265,11 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     fAudioMenu->AddItem( fLanguageMenu );
     fAudioMenu->AddItem( fSubtitlesMenu );
 
-    fPrevTitleMI = new BMenuItem( "Prev Title", new BMessage( PREV_TITLE ) );
-    fNextTitleMI = new BMenuItem( "Next Title", new BMessage( NEXT_TITLE ) );
-    fPrevChapterMI = new BMenuItem( "Prev Chapter", new BMessage( PREV_CHAPTER ) );
-    fNextChapterMI = new BMenuItem( "Next Chapter", new BMessage( NEXT_CHAPTER ) );
-    fGotoMenuMI = new BMenuItem( "Goto Menu", new BMessage( NAVIGATE_MENU ) );
+    fPrevTitleMI = new BMenuItem( _("Prev Title"), new BMessage( PREV_TITLE ) );
+    fNextTitleMI = new BMenuItem( _("Next Title"), new BMessage( NEXT_TITLE ) );
+    fPrevChapterMI = new BMenuItem( _("Prev Chapter"), new BMessage( PREV_CHAPTER ) );
+    fNextChapterMI = new BMenuItem( _("Next Chapter"), new BMessage( NEXT_CHAPTER ) );
+    fGotoMenuMI = new BMenuItem( _("Goto Menu"), new BMessage( NAVIGATE_MENU ) );
 
     /* Add the Navigation menu */
     fNavigationMenu = new BMenu( _("Navigation") );
@@ -278,30 +278,30 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
     fNavigationMenu->AddSeparatorItem();
     fNavigationMenu->AddItem( fPrevTitleMI );
     fNavigationMenu->AddItem( fNextTitleMI );
-    fNavigationMenu->AddItem( fTitleMenu = new TitleMenu( "Go to Title", p_intf ) );
+    fNavigationMenu->AddItem( fTitleMenu = new TitleMenu( _("Go to Title"), p_intf ) );
     fNavigationMenu->AddSeparatorItem();
     fNavigationMenu->AddItem( fPrevChapterMI );
     fNavigationMenu->AddItem( fNextChapterMI );
-    fNavigationMenu->AddItem( fChapterMenu = new ChapterMenu( "Go to Chapter", p_intf ) );
+    fNavigationMenu->AddItem( fChapterMenu = new ChapterMenu( _("Go to Chapter"), p_intf ) );
 
     /* Add the Speed menu */
     fSpeedMenu = new BMenu( _("Speed") );
     fSpeedMenu->SetRadioMode( true );
-    fSpeedMenu->AddItem( fSlowerMI = new BMenuItem( "Slower", new BMessage( SLOWER_PLAY ) ) );
-    fNormalMI = new BMenuItem( "Normal", new BMessage( NORMAL_PLAY ) );
+    fSpeedMenu->AddItem( fSlowerMI = new BMenuItem( _("Slower"), new BMessage( SLOWER_PLAY ) ) );
+    fNormalMI = new BMenuItem( _("Normal"), new BMessage( NORMAL_PLAY ) );
     fNormalMI->SetMarked(true); // default to normal speed
     fSpeedMenu->AddItem( fNormalMI );
-    fSpeedMenu->AddItem( fFasterMI = new BMenuItem( "Faster", new BMessage( FASTER_PLAY) ) );
+    fSpeedMenu->AddItem( fFasterMI = new BMenuItem( _("Faster"), new BMessage( FASTER_PLAY) ) );
     fSpeedMenu->SetTargetForItems( this );
     fMenuBar->AddItem( fSpeedMenu );
 
     /* Add the Show menu */
     fShowMenu = new BMenu( _("Window") );
-    fShowMenu->AddItem( new BMenuItem( "Play List" B_UTF8_ELLIPSIS,
+    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Play List")),
                                        new BMessage( OPEN_PLAYLIST ), 'P') );
-    fShowMenu->AddItem( new BMenuItem( "Messages" B_UTF8_ELLIPSIS,
+    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Messages")),
                                        new BMessage( OPEN_MESSAGES ), 'M' ) );
-    fShowMenu->AddItem( new BMenuItem( "Settings" B_UTF8_ELLIPSIS,
+    fShowMenu->AddItem( new BMenuItem( _AddEllipsis(_("Settings")),
                                        new BMessage( OPEN_PREFERENCES ), 'S' ) );
     fMenuBar->AddItem( fShowMenu );                            
 
@@ -356,8 +356,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         case B_ABOUT_REQUESTED:
         {
             BAlert* alert = new BAlert( "VLC " PACKAGE_VERSION,
-                                        "VLC " PACKAGE_VERSION " for BeOS\n\n"
-                                        "<www.videolan.org>", "OK");
+                                        "VLC " PACKAGE_VERSION " for BeOS"
+                                        "\n\n<www.videolan.org>", _("OK"));
             alert->Go();
             break;
         }
@@ -365,11 +365,11 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
             
         case OPEN_FILE:
-        	_ShowFilePanel( B_REFS_RECEIVED, "VideoLAN Client: Open Media Files" );
+        	_ShowFilePanel( B_REFS_RECEIVED, _("VideoLAN Client: Open Media Files") );
             break;
 
         case LOAD_SUBFILE:
-        	_ShowFilePanel( SUBFILE_RECEIVED, "VideoLAN Client: Open Subtitle File" );
+        	_ShowFilePanel( SUBFILE_RECEIVED, _("VideoLAN Client: Open Subtitle File") );
             break;
 
         case OPEN_PLAYLIST:
@@ -1180,6 +1180,7 @@ int CDMenu::GetCD( const char *directory )
  		vol.Unset();
 		status = volRoster.GetNextVolume( &vol );
 	}
+	return 0;
 }
 
 /*****************************************************************************
