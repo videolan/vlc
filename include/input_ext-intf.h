@@ -344,6 +344,10 @@ struct input_thread_t
 
     count_t c_loops;
 
+    /* User bookmarks */
+    int         i_bookmarks;
+    seekpoint_t **pp_bookmarks;
+
     /* private, do not touch it */
     input_thread_sys_t  *p_sys;
 };

@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.29 2004/03/03 12:01:17 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -283,7 +283,36 @@ enum demux_query_e
     DEMUX_GET_META              /* arg1= vlc_meta_t **  res=can fail    */
 };
 
+struct seekpoint_t
+{
+    int64_t i_byte_offset;
+    int64_t i_time_offset;
+    char    *psz_name;
+};
 
+static inline seekpoint_t *vlc_seekpoint_New( void )
+{
+    seekpoint_t *point = (seekpoint_t*)malloc( sizeof( seekpoint_t ) );
+    point->i_byte_offset = point->i_time_offset;
+    point->psz_name = NULL;
+    return point;
+}
+
+static inline void vlc_seekpoint_Delete( seekpoint_t *point )
+{
+    if( !point ) return;
+    if( point->psz_name ) free( point->psz_name );
+    free( point );
+}
+
+static inline seekpoint_t *vlc_seekpoint_Duplicate( seekpoint_t *src )
+{
+    seekpoint_t *point = vlc_seekpoint_New();
+    if( src->psz_name ) point->psz_name = strdup( src->psz_name );
+    point->i_time_offset = src->i_time_offset;
+    point->i_byte_offset = src->i_byte_offset;
+    return point;
+}
 
 /* Demux */
 VLC_EXPORT( int, demux_vaControl,        ( input_thread_t *, int i_query, va_list  ) );
@@ -318,9 +347,42 @@ static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
     return i_result;
 }
 
-
 /* Subtitles */
 VLC_EXPORT( char **, subtitles_Detect, ( input_thread_t *, char* path, char *fname ) );
+
+/**
+ * @}
+ */
+
+
+/**
+ * \defgroup input Input
+ * @{
+ */
+enum input_query_e
+{
+    INPUT_GET_POSITION,         /* arg1= double *       res=    */
+    INPUT_SET_POSITION,         /* arg1= double         res=can fail    */
+
+    INPUT_GET_TIME,             /* arg1= int64_t *      res=    */
+    INPUT_SET_TIME,             /* arg1= int64_t        res=can fail    */
+
+    INPUT_GET_LENGTH,           /* arg1= int64_t *      res=can fail    */
+
+    INPUT_GET_FPS,              /* arg1= float *        res=can fail    */
+    INPUT_GET_META,             /* arg1= vlc_meta_t **  res=can fail    */
+
+    INPUT_GET_BOOKMARKS,   /* arg1= seekpoint_t *** arg2= int * res=can fail */
+    INPUT_CLEAR_BOOKMARKS, /* res=can fail */
+    INPUT_ADD_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
+    INPUT_DEL_BOOKMARK,    /* arg1= seekpoint_t *  res=can fail   */
+    INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
+
+    INPUT_GET_DIVISIONS
+};
+
+VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
+VLC_EXPORT( int, input_Control,  ( input_thread_t *, int i_query, ...  ) );
 
 /**
  * @}

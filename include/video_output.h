@@ -2,7 +2,7 @@
  * video_output.h : video output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.108 2004/02/22 00:15:33 gbazin Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -215,6 +215,9 @@ VLC_EXPORT( void,            vout_UnlinkPicture,  ( vout_thread_t *, picture_t *
 VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, unsigned int, unsigned int, unsigned int *, unsigned int *, unsigned int *, unsigned int * ) );
 picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
                                                        subpicture_t * );
+VLC_EXPORT( void *, vout_RequestWindow, ( vout_thread_t *, int *, int *, unsigned int *, unsigned int * ) );
+VLC_EXPORT( void,   vout_ReleaseWindow, ( vout_thread_t *, void * ) );
+
 /**
  * \addtogroup subpicture
  * @{

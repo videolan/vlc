@@ -224,6 +224,7 @@ typedef struct es_sys_t es_sys_t;
 typedef struct pgrm_descriptor_t pgrm_descriptor_t;
 typedef struct pgrm_sys_t pgrm_sys_t;
 typedef struct stream_descriptor_t stream_descriptor_t;
+typedef struct seekpoint_t seekpoint_t;
 
 /* Format */
 typedef struct audio_format_t audio_format_t;

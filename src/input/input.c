@@ -77,6 +77,8 @@ static int StateCallback   ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void *p_data );
 static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
                              vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
@@ -130,7 +132,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
     var_Create( p_input, "stop-time", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
 
     /* decoders */
-    var_Create( p_input, "minimize-threads", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "minimize-threads", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
 
     /* play status */
 
@@ -194,7 +196,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
     p_input->p_demux   = NULL;
     p_input->pf_demux  = NULL;
     p_input->pf_rewind = NULL;
-    p_input->pf_demux_control = NULL;
+    p_input->pf_demux_control = demux_vaControlDefault;
     p_input->i_cr_average = config_GetInt( p_input, "cr-average" );
 
     /* Access */
@@ -248,6 +250,64 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
     p_input->stream.control.b_grayscale = config_GetInt( p_input, "grayscale");
 
     msg_Info( p_input, "playlist item `%s'", p_input->psz_source );
+
+    /* Bookmarks */
+    var_Create( p_input, "bookmarks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "bookmark", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE |
+                VLC_VAR_ISCOMMAND );
+    val.psz_string = _("Bookmark");
+    var_Change( p_input, "bookmark", VLC_VAR_SETTEXT, &val, NULL );
+    var_AddCallback( p_input, "bookmark", BookmarkCallback, NULL );
+
+    p_input->i_bookmarks = 0;
+    p_input->pp_bookmarks = NULL;
+
+    var_Get( p_input, "bookmarks", &val );
+    if( val.psz_string )
+    {
+        /* FIXME: have a common cfg parsing routine used by sout and others */
+        char *psz_parser, *psz_start, *psz_end;
+        psz_parser = val.psz_string;
+        while( (psz_start = strchr( psz_parser, '{' ) ) )
+        {
+            seekpoint_t seekpoint;
+            char backup;
+            psz_start++;
+            psz_end = strchr( psz_start, '}' );
+            if( !psz_end ) break;
+            psz_parser = psz_end + 1;
+            backup = *psz_parser;
+            *psz_parser = 0;
+            *psz_end = ',';
+
+            seekpoint.psz_name = 0;
+            seekpoint.i_byte_offset = 0;
+            seekpoint.i_time_offset = 0;
+            while( (psz_end = strchr( psz_start, ',' ) ) )
+            {
+                *psz_end = 0;
+                if( !strncmp( psz_start, "name=", 5 ) )
+                {
+                    seekpoint.psz_name = psz_start + 5;
+                }
+                else if( !strncmp( psz_start, "bytes=", 6 ) )
+                {
+                    seekpoint.i_byte_offset = atol(psz_start + 6);
+                }
+                else if( !strncmp( psz_start, "time=", 5 ) )
+                {
+                    seekpoint.i_time_offset = atol(psz_start + 5) * 1000000;
+                }
+                psz_start = psz_end + 1;
+            }
+            msg_Dbg( p_input, "adding bookmark: %s, bytes="I64Fd", time="I64Fd,
+                     seekpoint.psz_name, seekpoint.i_byte_offset,
+                     seekpoint.i_time_offset );
+            input_Control( p_input, INPUT_ADD_BOOKMARK, &seekpoint );
+            *psz_parser = backup;
+        }
+        free( val.psz_string );
+    }
 
     /* Initialize input info */
     p_input->stream.p_info = NULL;
@@ -1419,4 +1479,11 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
         input_SetRate( p_input, newval.i_int );
     }
     return VLC_SUCCESS;
+}
+
+static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    return input_Control( p_input, INPUT_SET_BOOKMARK, newval );
 }

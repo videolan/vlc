@@ -323,6 +323,7 @@ SOURCES_libvlc_common = \
 	src/playlist/item-ext.c \
 	src/playlist/info.c \
 	src/input/input.c \
+	src/input/control.c \
 	src/input/es_out.c \
 	src/input/stream.c \
 	src/input/demux.c \
@@ -339,6 +340,7 @@ SOURCES_libvlc_common = \
 	src/video_output/video_text.c \
 	src/video_output/vout_subpictures.c \
 	src/video_output/vout_synchro.c \
+	src/video_output/vout_intf.c \
 	src/audio_output/common.c \
 	src/audio_output/dec.c \
 	src/audio_output/filters.c \

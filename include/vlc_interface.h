@@ -63,6 +63,11 @@ struct intf_thread_t
     void ( *pf_show_dialog ) ( intf_thread_t *, int, int,
                                intf_dialog_args_t * );
 
+    /** Video window callbacks */
+    void * ( *pf_request_window ) ( intf_thread_t *, int *, int *,
+                                    unsigned int *, unsigned int * );
+    void   ( *pf_release_window ) ( intf_thread_t *, void * );
+
     /* XXX: new message passing stuff will go here */
     vlc_mutex_t  change_lock;
     vlc_bool_t   b_menu_change;
@@ -142,6 +147,7 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 #define INTF_DIALOG_MESSAGES   11
 #define INTF_DIALOG_FILEINFO   12
 #define INTF_DIALOG_PREFS      13
+#define INTF_DIALOG_BOOKMARKS  14
 
 #define INTF_DIALOG_POPUPMENU  20
 

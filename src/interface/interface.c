@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: interface.c,v 1.114 2004/03/03 20:39:53 gbazin Exp $
+ * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -84,18 +84,8 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this, const char *psz_module )
         msg_Err( p_this, "out of memory" );
         return NULL;
     }
-
-    /* XXX: workaround for a bug in VLC 0.5.0 where the dvdplay plugin was
-     * registering itself in $interface, which we do not want to happen. */
-    psz_intf = config_GetPsz( p_intf, "intf" );
-    if( psz_intf )
-    {
-        if( !strcasecmp( psz_intf, "dvdplay" ) )
-        {
-            config_PutPsz( p_intf, "intf", "" );
-        }
-        free( psz_intf );
-    }
+    p_intf->pf_request_window = NULL;
+    p_intf->pf_release_window = NULL;
 
     /* Choose the best module */
     p_intf->p_module = module_Need( p_intf, "interface", psz_module, 0 );

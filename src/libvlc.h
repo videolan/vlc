@@ -195,6 +195,16 @@ static char *ppsz_language_text[] =
     "You can enforce the video height here. By default (-1) VLC will " \
     "adapt to the video characteristics.")
 
+#define VIDEOX_TEXT N_("Video x coordinate")
+#define VIDEOX_LONGTEXT N_( \
+    "You can enforce the position of the top left corner of the video window "\
+    "here (x coordinate).")
+
+#define VIDEOY_TEXT N_("Video y coordinate")
+#define VIDEOY_LONGTEXT N_( \
+    "You can enforce the position of the top left corner of the video window "\
+    "here (y coordinate).")
+
 #define ALIGN_TEXT N_("Video alignment")
 #define ALIGN_LONGTEXT N_( \
     "You can enforce the video alignement in its window. By default (0) it " \
@@ -310,6 +320,11 @@ static char *ppsz_align_descriptions[] =
 
 #define STOP_TIME_TEXT N_("Input stop time (second)")
 #define STOP_TIME_LONGTEXT N_("Input stop time (second)")
+
+#define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
+#define BOOKMARKS_LONGTEXT N_("You can specify a list of bookmarks for a stream in " \
+    "the form \"{name=bookmark-name,time=optional-time-offset," \
+    "bytes=optional-byte-offset},{etc...}\"")
 
 #define SUB_AUTO_TEXT N_("Autodetect subtitle files")
 #define SUB_AUTO_LONGTEXT \
@@ -757,6 +772,8 @@ vlc_module_begin();
     add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, VLC_TRUE );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
+    add_integer( "video-x", -1, NULL, VIDEOX_TEXT, VIDEOX_LONGTEXT, VLC_TRUE );
+    add_integer( "video-y", -1, NULL, VIDEOY_TEXT, VIDEOY_LONGTEXT, VLC_TRUE );
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
         change_integer_list( pi_align_values, ppsz_align_descriptions, 0 );
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );
@@ -808,6 +825,8 @@ vlc_module_begin();
                  START_TIME_TEXT, START_TIME_LONGTEXT, VLC_TRUE );
     add_integer( "stop-time", 0, NULL,
                  STOP_TIME_TEXT, STOP_TIME_LONGTEXT, VLC_TRUE );
+    add_string( "bookmarks", NULL, NULL,
+                 BOOKMARKS_TEXT, BOOKMARKS_LONGTEXT, VLC_TRUE );
 
     add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT,
               VLC_FALSE );
