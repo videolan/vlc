@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.4 2002/08/18 20:36:04 jpsaman Exp $
+ * $Id: familiar.c,v 1.5 2002/08/20 12:32:01 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -94,6 +94,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );             
 
 static void Run          ( intf_thread_t * );                  
+static gint Manage       ( gpointer );
 
 /*****************************************************************************
  * Module descriptor
@@ -160,7 +161,7 @@ static void Run( intf_thread_t *p_intf )
     char  *p_args[] = { "" };
     char **pp_args  = p_args;
     int    i_args   = 1;
-    int    i_dummy  = 0;
+    int    i_dummy;
 
     /* Initialize Gtk+ */
     gtk_set_locale ();
@@ -202,10 +203,30 @@ static void Run( intf_thread_t *p_intf )
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );
 
+    /* Add a check for termination */
+    i_dummy = gtk_timeout_add( INTF_IDLE_SLEEP / 1000, Manage, p_intf );
+
     /* Enter Gtk mode */
     gtk_main();
 
     /* Remove the timeout */
     gtk_timeout_remove( i_dummy );
+}
+
+/*****************************************************************************
+ * Manage: check for termination
+ *****************************************************************************
+ * In this function, called approx. 10 times a second, we check whether the
+ * main program asked us to die by setting b_die to VLC_TRUE.
+ *****************************************************************************/
+static gint Manage( gpointer p_data )
+{
+    if( ((intf_thread_t *)p_data)->b_die )
+    {
+        gtk_main_quit();
+        return FALSE;
+    }
+
+    return TRUE;
 }
 
