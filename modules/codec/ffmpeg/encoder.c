@@ -362,6 +362,7 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
         p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
         p_context->pix_fmt = E_(GetFfmpegChroma)( p_enc->fmt_in.i_codec );
+#if LIBAVCODEC_BUILD >= 4714
         if( p_codec->pix_fmts )
         {
             const enum PixelFormat *p = p_codec->pix_fmts;
@@ -372,6 +373,9 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
             if( *p == -1 ) p_context->pix_fmt = p_codec->pix_fmts[0];
             p_enc->fmt_in.i_codec = E_(GetVlcChroma)( p_context->pix_fmt );
         }
+#else
+        p_enc->fmt_in.i_codec = E_(GetVlcChroma)( p_context->pix_fmt );
+#endif
 
         if ( p_sys->b_strict_rc )
         {
