@@ -775,6 +775,12 @@ void Playlist::Rebuild()
     {
         item = root;
     }
+    
+    if( p_playlist->i_size )
+    {
+        SetCurrentItem( item );
+    }
+
 
     i_count = CountItems( treectrl->GetRootItem() );
     if( i_count != p_playlist->i_size )
@@ -790,8 +796,6 @@ void Playlist::Rebuild()
                                   "%i items in playlist")),
                                   p_playlist->i_size ), 0 );
     }
-
-    SetCurrentItem( item );
 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
