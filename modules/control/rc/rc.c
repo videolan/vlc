@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.20 2003/01/16 20:08:00 lool Exp $
+ * $Id: rc.c,v 1.21 2003/01/17 19:22:21 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -476,8 +476,9 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             {
                 /* Get. */
                 vlc_mutex_lock( &p_input->stream.stream_lock );
-                printf( "Currently playing chapter %d\n",
-                        p_input->stream.p_selected_area->i_part );
+                printf( "Currently playing chapter %d/%d\n",
+                        p_input->stream.p_selected_area->i_part,
+                        p_input->stream.p_selected_area->i_part_nb - 1 );
                 vlc_mutex_unlock( &p_input->stream.stream_lock );
 
                 vlc_object_release( p_input );
@@ -498,15 +499,15 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        if( ( i_chapter > 0 ) && ( i_chapter <=
+        if( ( i_chapter > 0 ) && ( i_chapter <
             p_input->stream.p_selected_area->i_part_nb ) )
         {
-          p_input->stream.p_selected_area->i_part = i_chapter;
-          vlc_mutex_unlock( &p_input->stream.stream_lock );
-          input_ChangeArea( p_input,
-                            (input_area_t*)p_input->stream.p_selected_area );
-          input_SetStatus( p_input, INPUT_STATUS_PLAY );
-          vlc_mutex_lock( &p_input->stream.stream_lock );
+            input_area_t *p_area = p_input->stream.p_selected_area;
+            p_input->stream.p_selected_area->i_part = i_chapter;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            input_ChangeArea( p_input, p_area );
+            input_SetStatus( p_input, INPUT_STATUS_PLAY );
+            vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -530,8 +531,9 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             {
                 /* Get. */
                 vlc_mutex_lock( &p_input->stream.stream_lock );
-                printf( "Currently playing title %d\n",
-                        p_input->stream.p_selected_area->i_id );
+                printf( "Currently playing title %d/%d\n",
+                        p_input->stream.p_selected_area->i_id,
+                        p_input->stream.i_area_nb - 1 );
                 vlc_mutex_unlock( &p_input->stream.stream_lock );
 
                 vlc_object_release( p_input );
@@ -552,13 +554,11 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        if( ( i_title > 0 ) && ( i_title <=
-            p_input->stream.p_selected_area->i_part_nb ) )
+        if( ( i_title > 0 ) && ( i_title < p_input->stream.i_area_nb ) )
         {
-            p_input->stream.p_selected_area->i_part = i_title;
+            input_area_t *p_area = p_input->stream.pp_areas[i_title];
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            input_ChangeArea( p_input,
-                     (input_area_t*)p_input->stream.pp_areas[i_title] );
+            input_ChangeArea( p_input, p_area );
             input_SetStatus( p_input, INPUT_STATUS_PLAY );
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
