@@ -110,7 +110,7 @@
                                         FIND_ANYWHERE );
 
     int i_index;
-    i_current_view = VIEW_CATEGORY;
+    i_current_view = VIEW_SIMPLE;
     playlist_ViewUpdate( p_playlist, i_current_view );
 
     [o_outline_view setTarget: self];
@@ -362,7 +362,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
                     p_item = NULL;
                 }
             }
-
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY, i_current_view, p_node, p_item );
         }
         vlc_object_release( p_playlist );
@@ -382,6 +381,9 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     [o_mi setState: playlist_IsServicesDiscoveryLoaded( p_playlist,
                                           [o_string cString] ) ? YES : NO];
+
+    i_current_view = VIEW_CATEGORY;
+    playlist_ViewUpdate( p_playlist, i_current_view );
     [self playlistUpdated];
     return;
 }
