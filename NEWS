@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.44 2003/05/20 18:53:03 hartman Exp $
+$Id: NEWS,v 1.45 2003/05/20 21:35:52 hartman Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -20,7 +20,7 @@ Input demux:
 Codecs:
  * VLC's own MPEG1/2 decoder has been replaced with libmpeg2
  * Support for Sorenson 3 (SVQ3 or Quicktime content) via ffmpeg
-   NOTE: QDM2 sound, often used in QT content, is not yet supported
+ * OSX support for QDM2 and QDMC sound, often used in QT content.
  * Fixed a bug which was causing artefacts in DivX video (ffmpeg)
  * If ffmpeg cannot keep up, skip and try to recover instead of stopping altogether
 

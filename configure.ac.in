@@ -1703,7 +1703,19 @@ then
   CPPFLAGS_encoder_xvid=${CPPFLAGS_xvid}
 fi
 
-
+dnl
+dnl  QuickTime plugin
+dnl
+AC_ARG_ENABLE(quicktime,
+  [  --enable-quicktime      QuickTime module (default enabled on MacOS X)])
+if test "x${enable_quicktime}" != "xno" &&
+  (test "x${SYS}" = "xdarwin" || test "x${enable_quicktime}" = "xyes")
+then
+  AC_CHECK_HEADERS(QuickTime/QuickTime.h,
+    [ BUILTINS="${BUILTINS} quicktime"
+      LDFLAGS_quicktime="${LDFLAGS_quicktime} -framework QuickTime -framework Carbon"
+    ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
+fi
 
 dnl
 dnl MP4 module

@@ -13,3 +13,4 @@ SOURCES_adpcm = modules/codec/adpcm.c
 SOURCES_mpeg_audio = modules/codec/mpeg_audio.c
 SOURCES_libmpeg2 = modules/codec/libmpeg2.c
 SOURCES_rawvideo = modules/codec/rawvideo.c
+SOURCES_quicktime = modules/codec/quicktime.c
