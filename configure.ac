@@ -1387,7 +1387,12 @@ AC_LANG_PUSH(C++)
   AC_CHECK_HEADERS(EbmlVersion.h matroska/KaxVersion.h, [
     AX_ADD_PLUGINS([mkv])
     AX_ADD_CXXFLAGS([mkv],[-I/usr/local/include/ebml -I/usr/include/ebml])
-    AX_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
+    AC_CHECK_LIB(ebml_pic,main,[
+      # We have ebml_pic, that's good, we can build an mkv.so plugin !
+      AX_ADD_LDFLAGS([mkv],[-lmatroska_pic -lebml_pic])
+    ],[
+      AX_ADD_LDFLAGS([mkv],[-lmatroska -lebml])
+    ])
   ],[
     AC_MSG_ERROR([libebml or libmatroska include files not found])
   ])
