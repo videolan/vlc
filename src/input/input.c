@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.170 2002/01/10 04:11:25 sam Exp $
+ * $Id: input.c,v 1.171 2002/01/15 17:55:12 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -158,6 +158,17 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
 
     /* Set status */
     p_input->i_status   = THREAD_CREATE;
+    
+    /* Initialize statistics */
+    p_input->c_loops                    = 0;
+    p_input->stream.c_packets_read      = 0;
+    p_input->stream.c_packets_trashed   = 0;
+    p_input->p_stream                   = NULL;
+
+    /* Set locks. */
+    vlc_mutex_init( &p_input->stream.stream_lock );
+    vlc_cond_init( &p_input->stream.stream_wait );
+    vlc_mutex_init( &p_input->stream.control.control_lock );
 
     /* Initialize stream description */
     p_input->stream.i_es_number = 0;
@@ -438,17 +449,6 @@ static void RunThread( input_thread_t *p_input )
  *****************************************************************************/
 static int InitThread( input_thread_t * p_input )
 {
-    /* Initialize statistics */
-    p_input->c_loops                    = 0;
-    p_input->stream.c_packets_read      = 0;
-    p_input->stream.c_packets_trashed   = 0;
-    p_input->p_stream                   = NULL;
-
-    /* Set locks. */
-    vlc_mutex_init( &p_input->stream.stream_lock );
-    vlc_cond_init( &p_input->stream.stream_wait );
-    vlc_mutex_init( &p_input->stream.control.control_lock );
-
     /* Find appropriate module. */
     p_input->p_input_module = module_Need( MODULE_CAPABILITY_INPUT,
                                  main_GetPszVariable( INPUT_METHOD_VAR, NULL ),
