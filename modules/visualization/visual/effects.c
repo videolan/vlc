@@ -2,7 +2,7 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: effects.c,v 1.2 2003/08/29 16:56:43 zorglub Exp $
+ * $Id: effects.c,v 1.3 2003/08/31 16:01:14 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -134,7 +134,7 @@ int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
      19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,
      35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,
      52,53,54,55,56,57,58,59,61,63,67,72,77,82,87,93,99,105,
-     110,115,121,130,141,152,163,174,185,255};
+     110,115,121,130,141,152,163,174,185,200,255};
     const int *xscale;
     const double y_scale =  3.60673760222;  /* (log 256) */
     
