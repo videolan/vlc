@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.7 2002/11/22 15:24:10 sam Exp $
+ * $Id: events.c,v 1.8 2002/11/25 03:12:42 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -592,11 +592,11 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
         /* Store p_vout for future use */
         p_vout = (vout_thread_t *)((CREATESTRUCT *)lParam)->lpCreateParams;
-        SetWindowLong( hWnd, GWL_USERDATA, (LONG)p_vout );
+        SetWindowLong( hwnd, GWL_USERDATA, (LONG)p_vout );
     }
     else
     {
-        p_vout = (vout_thread_t *)GetWindowLong( hWnd, GWL_USERDATA );
+        p_vout = (vout_thread_t *)GetWindowLong( hwnd, GWL_USERDATA );
     }
 
     switch( message )
