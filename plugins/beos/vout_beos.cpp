@@ -224,6 +224,7 @@ VideoWindow::~VideoWindow()
     Sync();
     if(!fUsingOverlay)
     	{
+	    teardownwindow = true;
 	    wait_for_thread(fDrawThreadID, &result);
     	delete bitmap[0];
     	delete bitmap[1];
@@ -499,7 +500,7 @@ void vout_Display( vout_thread_t *p_vout )
 static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
     p_vout->p_sys->p_window =
-        new VideoWindow(  BRect( 50, 150, 50+p_vout->i_width-1, 150+p_vout->i_height-1 ), NULL, p_vout );
+        new VideoWindow(  BRect( 50, 180, 50+p_vout->i_width-1, 180+p_vout->i_height-1 ), NULL, p_vout );
     if( p_vout->p_sys->p_window == 0 )
     {
         free( p_vout->p_sys );
