@@ -5,6 +5,7 @@
         {
             ACTIONS = {
                 deinterlace = id; 
+                fastForward = id; 
                 faster = id; 
                 fullscreen = id; 
                 loop = id; 
@@ -22,11 +23,12 @@
                 toggleTitle = id; 
                 toggleVar = id; 
                 volumeDown = id; 
+                volumeSliderUpdate = id; 
                 volumeUp = id; 
             }; 
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
-            OUTLETS = {"o_open" = id; }; 
+            OUTLETS = {"o_mi_mute" = id; "o_open" = id; "o_volumeslider" = id; }; 
             SUPERCLASS = NSObject; 
         }, 
         {
@@ -40,9 +42,8 @@
             CLASS = VLCMain; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                "o_btn_faster" = id; 
+                "o_btn_fastforward" = id; 
                 "o_btn_next" = id; 
-                "o_btn_pause" = id; 
                 "o_btn_play" = id; 
                 "o_btn_playlist" = id; 
                 "o_btn_prefs" = id; 
@@ -50,7 +51,6 @@
                 "o_btn_slower" = id; 
                 "o_btn_stop" = id; 
                 "o_controls" = id; 
-                "o_dmi_pause" = id; 
                 "o_dmi_play" = id; 
                 "o_dmi_stop" = id; 
                 "o_err_btn_dismiss" = id; 
@@ -66,6 +66,7 @@
                 "o_mi_chapter" = id; 
                 "o_mi_clear" = id; 
                 "o_mi_close_window" = id; 
+                "o_mi_controller" = id; 
                 "o_mi_copy" = id; 
                 "o_mi_cut" = id; 
                 "o_mi_deinterlace" = id; 
@@ -87,7 +88,6 @@
                 "o_mi_open_recent" = id; 
                 "o_mi_open_recent_cm" = id; 
                 "o_mi_paste" = id; 
-                "o_mi_pause" = id; 
                 "o_mi_play" = id; 
                 "o_mi_playlist" = id; 
                 "o_mi_prefs" = id; 
@@ -105,14 +105,16 @@
                 "o_mi_vol_up" = id; 
                 "o_msgs_btn_ok" = id; 
                 "o_msgs_panel" = id; 
+                "o_mu_audio" = id; 
                 "o_mu_controls" = id; 
                 "o_mu_edit" = id; 
                 "o_mu_file" = id; 
-                "o_mu_view" = id; 
+                "o_mu_video" = id; 
                 "o_mu_window" = id; 
                 "o_playlist" = id; 
                 "o_timefield" = id; 
                 "o_timeslider" = id; 
+                "o_volumeslider" = id; 
                 "o_window" = id; 
             }; 
             SUPERCLASS = NSObject; 
@@ -199,6 +201,8 @@
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                "o_btn_add" = id; 
+                "o_btn_remove" = id; 
                 "o_ctx_menu" = id; 
                 "o_mi_delete" = id; 
                 "o_mi_play" = id; 
