@@ -960,6 +960,12 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_
             {
                 break;
             }
+            if( ( !strncmp( cfg->psz_name, "no-", 3 ) && !strcmp( ppsz_options[i], cfg->psz_name + 3 ) ) ||
+                ( !strncmp( cfg->psz_name, "no", 2 ) && !strcmp( ppsz_options[i], cfg->psz_name + 2 ) ) )
+            {
+                b_yes = VLC_FALSE;
+                break;
+            }
         }
         if( ppsz_options[i] == NULL )
         {
@@ -968,26 +974,10 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_
         }
 
         /* create name */
-        asprintf( &psz_name, "%s%s", psz_prefix, cfg->psz_name );
+        asprintf( &psz_name, "%s%s", psz_prefix, ppsz_options[i] );
 
         /* get the type of the variable */
         i_type = config_GetType( p_this, psz_name );
-        if( !i_type && !strncmp( cfg->psz_name, "no", 2 ) )
-        {
-            free( psz_name );
-            b_yes = VLC_FALSE;
-
-            if( !strncmp( cfg->psz_name, "no-", 3 ) )
-            {
-                asprintf( &psz_name, "%s%s", psz_prefix, cfg->psz_name + 3 );
-            }
-            else
-            {
-                asprintf( &psz_name, "%s%s", psz_prefix, cfg->psz_name + 2 );
-            }
-            i_type = config_GetType( p_this, psz_name );
-        }
-
         if( !i_type )
         {
             msg_Warn( p_this, "unknown option %s (value=%s)", cfg->psz_name, cfg->psz_value );
