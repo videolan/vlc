@@ -590,7 +590,6 @@ libebml-$(LIBEBML_VERSION).tar.bz2:
 
 libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/ebml.patch
 	-rm -rf $@/CVS
 
 .ebml: libebml
@@ -611,7 +610,6 @@ libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
 
 libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	patch -p 0 < Patches/matroska.patch
 	-rm -rf $@/CVS
 
 .matroska: libmatroska
