@@ -456,7 +456,7 @@ int             VLC_PlaylistClear( int );
  * \param i_volume something in a range from 0-200
  * \return the new volume (range 0-200 %)
  */
-int             VLC_VolumeSet( int );
+int             VLC_VolumeSet( int, int );
 
 /**
  * Get the current volume
