@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.11 2003/01/14 04:34:13 fenrir Exp $
+ * $Id: stream_output.c,v 1.12 2003/01/17 15:26:24 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -590,7 +590,7 @@ sout_buffer_t *sout_BufferDuplicate( sout_instance_t *p_sout,
     p_dup->i_dts    = p_buffer->i_dts;
     p_dup->i_pts    = p_buffer->i_pts;
     p_dup->i_length = p_buffer->i_length;
-    memcpy( p_dup->p_buffer, p_buffer->p_buffer, p_buffer->i_size );
+    p_sout->p_vlc->pf_memcpy( p_dup->p_buffer, p_buffer->p_buffer, p_buffer->i_size );
 
     return( p_dup );
 }

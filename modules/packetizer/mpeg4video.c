@@ -2,7 +2,7 @@
  * mpeg4video.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.4 2003/01/12 04:11:35 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.5 2003/01/17 15:26:24 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -391,12 +391,13 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
             mtime_t i_gap;
 
             i_gap = p_pes_next->i_pts - p_pes->i_pts;
-
-            if( i_gap > 1000000 / 80 )  // too big fps > 80 is no sense
+#if 0
+            if( i_gap > 1000000 / 4 )  // too littl fps < 4 is no sense
             {
                 i_gap = 1000000 / 25;
                 p_pack->i_pts_start =
-                    ( p_pes->i_pts - p_pack->i_pts_start ) + p_pes_next->i_pts - i_gap;
+                    - ( p_pes->i_pts - p_pack->i_pts_start ) + p_pes_next->i_pts - i_gap;
+
             }
             else if( i_gap < 0 )
             {
@@ -404,6 +405,15 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
                     ( p_pes->i_pts - p_pack->i_pts_start ) + p_pes_next->i_pts;
                 i_gap = 0;
             }
+            if( i_gap < 0 )
+            {
+                msg_Dbg( p_pack->p_fifo, "pts:%lld next_pts:%lld", p_pes->i_pts, p_pes_next->i_pts );
+                /* work around for seek */
+                p_pack->i_pts_start -= i_gap;
+            }
+
+//            msg_Dbg( p_pack->p_fifo, "gap %lld date %lld next diff %lld", i_gap, p_pes->i_pts,  p_pes_next->i_pts-p_pack->i_pts_start );
+#endif
             p_sout_buffer->i_length = i_gap;
         }
         sout_InputSendBuffer( p_pack->p_sout_input,
