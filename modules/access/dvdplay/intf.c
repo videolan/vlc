@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.7 2003/08/13 01:45:13 gbazin Exp $
+ * $Id: intf.c,v 1.8 2003/10/26 13:10:05 sigmunau Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -80,7 +80,8 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     };
 
     p_intf->pf_run = RunIntf;
-
+    
+    var_AddCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
     p_intf->p_sys->m_still_time = 0;
     p_intf->p_sys->b_inf_still = 0;
     p_intf->p_sys->b_still = 0;
@@ -94,7 +95,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
 void E_(CloseIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-
+    var_DelCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
     /* Destroy structure */
     free( p_intf->p_sys );
 }
@@ -108,6 +109,11 @@ static void RunIntf( intf_thread_t *p_intf )
     vlc_object_t *      p_vout = NULL;
     mtime_t             mtime = 0;
     mtime_t             mlast = 0;
+    int i_nav_up = config_GetInt( p_intf, "nav-up-key" );
+    int i_nav_down = config_GetInt( p_intf, "nav-down-key" );
+    int i_nav_left = config_GetInt( p_intf, "nav-left-key" );
+    int i_nav_right = config_GetInt( p_intf, "nav-right-key" );
+    int i_nav_activate = config_GetInt( p_intf, "nav-activate-key" );
 
     if( InitThread( p_intf ) < 0 )
     {
@@ -214,33 +220,33 @@ static void RunIntf( intf_thread_t *p_intf )
         /*
          * keyboard event
          */
-        if( p_vout && p_intf->p_sys->b_key_pressed )
+        if( p_intf->p_sys->b_key_pressed )
         {
             vlc_value_t val;
             int i_activate;
 
             p_intf->p_sys->b_key_pressed = VLC_FALSE;
             
-            var_Get( p_vout, "key-pressed", &val );
-            if ( val.psz_string )
+            var_Get( p_intf->p_vlc, "key-pressed", &val );
+            if ( val.i_int )
             {
-                if( !strcmp( val.psz_string, "LEFT" ) )
+                if( val.i_int == i_nav_left )
                 {
                     p_intf->p_sys->control.type = DVDCtrlLeftButtonSelect;
                 }
-                else if( !strcmp( val.psz_string, "RIGHT" ) )
+                else if( val.i_int == i_nav_right )
                 {
                     p_intf->p_sys->control.type = DVDCtrlRightButtonSelect;
                 }
-                else if( !strcmp( val.psz_string, "UP" ) )
+                else if( val.i_int == i_nav_up )
                 {
                     p_intf->p_sys->control.type = DVDCtrlUpperButtonSelect;
                 }
-                else if( !strcmp( val.psz_string, "DOWN" ) )
+                else if( val.i_int == i_nav_down )
                 {
                     p_intf->p_sys->control.type = DVDCtrlLowerButtonSelect;
                 }
-                else if( !strcmp( val.psz_string, "ENTER" ) )
+                else if( val.i_int == i_nav_activate )
                 {
                     p_intf->p_sys->control.type = DVDCtrlButtonActivate;
                 }
@@ -273,7 +279,6 @@ static void RunIntf( intf_thread_t *p_intf )
         {
             var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
             var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
-            var_DelCallback( p_vout, "key-pressed", KeyEvent, p_intf );
             vlc_object_release( p_vout );
             p_vout = NULL;
         }
@@ -286,7 +291,6 @@ static void RunIntf( intf_thread_t *p_intf )
             {
                 var_AddCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
                 var_AddCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
-                var_AddCallback( p_vout, "key-pressed", KeyEvent, p_intf );
             }
         }
 
@@ -298,7 +302,6 @@ static void RunIntf( intf_thread_t *p_intf )
     {
         var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
         var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
-        var_DelCallback( p_vout, "key-pressed", KeyEvent, p_intf );
         vlc_object_release( p_vout );
     }
 
