@@ -2,7 +2,7 @@
  * http.c :  http remote control plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.7 2003/05/22 15:34:02 hartman Exp $
+ * $Id: http.c,v 1.8 2003/05/23 13:02:53 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -163,7 +163,7 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_httpd_host =
         p_intf->p_sys->p_httpd->pf_register_host( p_intf->p_sys->p_httpd,
                                                   psz_bind_addr, i_bind_port );
-
+    
     if( !p_intf->p_sys->p_httpd_host )
     {
         msg_Err( p_intf, "cannot listen on %s:%d", psz_bind_addr, i_bind_port);
@@ -172,7 +172,8 @@ static void Run( intf_thread_t *p_intf )
         return;
     }
 
-    msg_Info( p_intf, "http interface started" );
+    msg_Info( p_intf, "http interface started on %s:%d", 
+        *psz_bind_addr ? psz_bind_addr : "localhost" , i_bind_port );
 
     /*
      * Register our interface page with the httpd daemon
