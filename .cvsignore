@@ -13,6 +13,7 @@ config.status
 confdefs.h
 Makefile.opts
 Makefile.modules
+Makefile.config
 build-stamp
 vlc
 gvlc
