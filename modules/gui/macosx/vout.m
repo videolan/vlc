@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.47 2003/05/05 22:04:11 hartman Exp $
+ * $Id: vout.m,v 1.48 2003/05/21 15:40:03 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -150,8 +150,13 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 
     if( vout_ChromaCmp( p_vout->render.i_chroma, VLC_FOURCC('I','4','2','0') ) )
     {
+        /* Damn QT isn't thread safe. so keep a lock in the p_vlc object */
+        vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
+
         err = FindCodec( kYUV420CodecType, bestSpeedCodec,
                          nil, &p_vout->p_sys->img_dc );
+        
+        vlc_mutex_unlock( &p_vout->p_vlc->quicktime_lock );
         if( err == noErr && p_vout->p_sys->img_dc != 0 )
         {
             p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');

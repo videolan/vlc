@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.53 2003/02/17 05:50:31 sam Exp $
+ * $Id: main.h,v 1.54 2003/05/21 15:40:03 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -101,5 +101,8 @@ struct vlc_t
 
     /* Locks */
     vlc_mutex_t            config_lock;          /* lock for the config file */
+#ifdef SYS_DARWIN
+    vlc_mutex_t            quicktime_lock;          /* QT is not thread safe on OSX */
+#endif
 };
 

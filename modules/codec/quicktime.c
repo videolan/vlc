@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.1 2003/05/20 21:35:52 hartman Exp $
+ * $Id: quicktime.c,v 1.2 2003/05/21 15:40:03 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -352,9 +352,18 @@ static int  InitThreadAudio     ( adec_thread_t *p_dec )
     p_dec->OutputFormatInfo.sampleRate  = p_wf->nSamplesPerSec;
     p_dec->OutputFormatInfo.format      = FCC( 'N', 'O', 'N', 'E' );
 
+#ifdef SYS_DARWIN
+/* on OS X QT is not threadsafe */
+    vlc_mutex_lock( &p_dec->p_fifo->p_vlc->quicktime_lock );
+#endif
+
     i_error = p_dec->SoundConverterOpen( &p_dec->InputFormatInfo,
                                          &p_dec->OutputFormatInfo,
                                          &p_dec->myConverter );
+#ifdef SYS_DARWIN
+    vlc_mutex_unlock( &p_dec->p_fifo->p_vlc->quicktime_lock );
+#endif
+
     if( i_error )
     {
         msg_Dbg( p_dec->p_fifo, "error while SoundConverterOpen = %d", i_error );

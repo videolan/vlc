@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.86 2003/05/11 13:14:04 sigmunau Exp $
+ * $Id: libvlc.c,v 1.87 2003/05/21 15:40:03 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -187,6 +187,9 @@ int VLC_Create( void )
 
     /* Initialize mutexes */
     vlc_mutex_init( p_vlc, &p_vlc->config_lock );
+#ifdef SYS_DARWIN
+    vlc_mutex_init( p_vlc, &p_vlc->quicktime_lock );
+#endif
 
     /* Store our newly allocated structure in the global list */
     vlc_object_attach( p_vlc, &libvlc );
@@ -650,6 +653,9 @@ int VLC_Destroy( int i_object )
 
     /* Destroy mutexes */
     vlc_mutex_destroy( &p_vlc->config_lock );
+#ifdef SYS_DARWIN
+    vlc_mutex_destroy( &p_vlc->quicktime_lock );
+#endif
 
     vlc_object_detach( p_vlc );
 
