@@ -2,7 +2,7 @@
  * ps.h: Program Stream demuxer helper
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ps.h,v 1.4 2004/01/29 18:37:05 fenrir Exp $
+ * $Id: ps.h,v 1.5 2004/01/30 01:09:24 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -239,15 +239,15 @@ static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
                                     (mtime_t)(header[10] << 22)|
                                    ((mtime_t)(header[11]&0xfe) << 14)|
                                     (mtime_t)(header[12] << 7)|
-                                    (mtime_t)(header[12] >> 1);
+                                    (mtime_t)(header[13] >> 1);
 
                     if( header[7]&0x40 )    /* has dts */
                     {
-                         p_pes->i_dts = ((mtime_t)(header[13]&0x0e ) << 29)|
-                                         (mtime_t)(header[14] << 22)|
-                                        ((mtime_t)(header[15]&0xfe) << 14)|
-                                         (mtime_t)(header[16] << 7)|
-                                         (mtime_t)(header[17] >> 1);
+                         p_pes->i_dts = ((mtime_t)(header[14]&0x0e ) << 29)|
+                                         (mtime_t)(header[15] << 22)|
+                                        ((mtime_t)(header[16]&0xfe) << 14)|
+                                         (mtime_t)(header[17] << 7)|
+                                         (mtime_t)(header[18] >> 1);
                     }
                 }
             }
