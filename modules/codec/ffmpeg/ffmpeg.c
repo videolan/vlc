@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.67 2003/12/01 09:39:04 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.68 2003/12/16 12:38:18 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -472,6 +472,15 @@ int E_(GetFfmpegCodec)( vlc_fourcc_t i_fourcc, int *pi_cat,
         i_codec  = CODEC_ID_VP3;
         psz_name = "On2's VP3 Video";
         break;
+
+#if LIBAVCODEC_BUILD >= 4685
+    /* Xiph.org theora */
+    case VLC_FOURCC('t','h','e','o'):
+        i_cat    = VIDEO_ES;
+        i_codec  = CODEC_ID_THEORA;
+        psz_name = "Xiph.org's Theora Video";
+        break;
+#endif
 
 #if ( !defined( WORDS_BIGENDIAN ) )
     /* Asus Video (Another thing that doesn't work on PPC) */

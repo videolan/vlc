@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.50 2003/12/15 23:31:11 gbazin Exp $
+ * $Id: ogg.c,v 1.51 2003/12/16 12:38:18 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -683,6 +683,12 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     msg_Dbg( p_input,
                              "found theora header, bitrate: %i, rate: %f",
                              p_stream->fmt.i_bitrate, p_stream->f_rate );
+
+                    /* Save this data in p_extra for ffmpeg */
+                    p_stream->fmt.i_extra = oggpacket.bytes;
+                    p_stream->fmt.p_extra = malloc( oggpacket.bytes );
+                    memcpy( p_stream->fmt.p_extra,
+                            oggpacket.packet, oggpacket.bytes );
                 }
                 /* Check for Tarkin header */
                 else if( oggpacket.bytes >= 7 &&
