@@ -3,7 +3,9 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Jean-Marc Dressler <polux@via.ecp.fr>
+ *          Stéphane Borel <stef@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

@@ -1,9 +1,11 @@
 /*****************************************************************************
- * vpar_motion.c : motion vectors parsing
+ * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@via.ecp.fr>
+ *          Jean-Marc Dressler <polu@via.ecp.fr>
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

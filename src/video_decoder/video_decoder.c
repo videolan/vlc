@@ -3,7 +3,8 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
+ *          Gaël Hendryckx <jimmy@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-/* FIXME: passer en terminate/destroy avec les signaux supplémentaires ?? */
 
 /*****************************************************************************
  * Preamble

@@ -4,7 +4,8 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>, largerly inspired by the
+ *          work done by the livid project <http://www.linuxvideo.org/>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
