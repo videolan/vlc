@@ -4,7 +4,7 @@
  * skin.act: FleXML actions file
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin.act,v 1.7 2003/07/18 20:06:00 gbazin Exp $
+ * $Id: skin.act,v 1.8 2003/07/23 09:14:24 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -30,7 +30,7 @@
 <actions>
     <top>
         <![CDATA[
-            #include "wrappers.h"
+            #include "parser/wrappers.h"
         ]]>
     </top>
     <start tag="Bitmap">
