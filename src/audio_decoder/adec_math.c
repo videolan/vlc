@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audio_math.c: Inverse Discrete Cosine Transform and Pulse Code Modulation
+ * adec_math.c: Inverse Discrete Cosine Transform and Pulse Code Modulation
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #include "int_types.h"
-#include "audio_decoder.h"                                    /* adec_bank_t */
+#include "adec_generic.h"                                     /* adec_bank_t */
 
 /*****************************************************************************
  * DCT32: Fast 32 points Discrete Cosine Transform

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audio_test.c: MPEG1 Layer I-II audio decoder test program
+ * adec_test.c: MPEG Layer I-II audio decoder test program
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -36,7 +36,7 @@
 #include <string.h>
 
 #include "int_types.h"
-#include "audio_decoder.h"
+#include "adec_generic.h"
 
 #define ADEC_FRAME_SIZE (2*1152)
 

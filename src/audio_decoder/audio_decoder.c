@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audio_decoder.c: MPEG1 Layer I-II audio decoder
+ * audio_decoder.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,1473 +24,364 @@
  * TODO :
  *
  * - optimiser les NeedBits() et les GetBits() du code là où c'est possible ;
+ * - vlc_cond_signal() / vlc_cond_wait() ;
  *
  */
 
-#include "int_types.h"
-//#include "audio_constants.h"
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#include "defs.h"
+
+#include <unistd.h>                                              /* getpid() */
+
+#include <stdio.h>                                           /* "intf_msg.h" */
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
+#include <sys/uio.h>                                            /* "input.h" */
+#include <netinet/in.h>                                             /* ntohl */
+
+#include "threads.h"
+#include "common.h"
+#include "config.h"
+#include "mtime.h"
+#include "plugins.h"
+#include "debug.h"                                      /* "input_netlist.h" */
+
+#include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
+ 
+#include "stream_control.h"
+#include "input_ext-dec.h"
+
+#include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
+
+#include "adec_generic.h"
 #include "audio_decoder.h"
-#include "audio_math.h"                                    /* DCT32(), PCM() */
-#include "audio_bit_stream.h"
+#include "adec_math.h"                                     /* DCT32(), PCM() */
 
-#include <stdio.h>
+#define ADEC_FRAME_SIZE (2*1152)
 
-#define NULL ((void *)0)
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int      InitThread             (adec_thread_t * p_adec);
+static void     RunThread              (adec_thread_t * p_adec);
+static void     ErrorThread            (adec_thread_t * p_adec);
+static void     EndThread              (adec_thread_t * p_adec);
 
-/**** wkn ****/
-
-static float adec_scalefactor_table[64] =
-{   /* 2 ^ (1 - i/3) */
-    2.0000000000000000, 1.5874010519681994, 1.2599210498948732,
-    1.0000000000000000, 0.7937005259840998, 0.6299605249474366,
-    0.5000000000000000, 0.3968502629920499, 0.3149802624737183,
-    0.2500000000000000, 0.1984251314960249, 0.1574901312368591,
-    0.1250000000000000, 0.0992125657480125, 0.0787450656184296,
-    0.0625000000000000, 0.0496062828740062, 0.0393725328092148,
-    0.0312500000000000, 0.0248031414370031, 0.0196862664046074,
-    0.0156250000000000, 0.0124015707185016, 0.0098431332023037,
-    0.0078125000000000, 0.0062007853592508, 0.0049215666011518,
-    0.0039062500000000, 0.0031003926796254, 0.0024607833005759,
-    0.0019531250000000, 0.0015501963398127, 0.0012303916502880,
-    0.0009765625000000, 0.0007750981699063, 0.0006151958251440,
-    0.0004882812500000, 0.0003875490849532, 0.0003075979125720,
-    0.0002441406250000, 0.0001937745424766, 0.0001537989562860,
-    0.0001220703125000, 0.0000968872712383, 0.0000768994781430,
-    0.0000610351562500, 0.0000484436356191, 0.0000384497390715,
-    0.0000305175781250, 0.0000242218178096, 0.0000192248695357,
-    0.0000152587890625, 0.0000121109089048, 0.0000096124347679,
-    0.0000076293945312, 0.0000060554544524, 0.0000048062173839,
-    0.0000038146972656, 0.0000030277272262, 0.0000024031086920,
-    0.0000019073486328, 0.0000015138636131, 0.0000012015543460,
-    0.0000009536743164 /* last element is not in the standard... invalid ??? */
-};
-
-static float adec_slope_table[15] =
+/*****************************************************************************
+ * adec_CreateThread: creates an audio decoder thread
+ *****************************************************************************
+ * This function creates a new audio decoder thread, and returns a pointer to
+ * its description. On error, it returns NULL.
+ *****************************************************************************/
+vlc_thread_t adec_CreateThread ( adec_config_t * p_config )
 {
-    0.6666666666666666, 0.2857142857142857, 0.1333333333333333,
-    0.0645161290322581, 0.0317460317460317, 0.0157480314960630,
-    0.0078431372549020, 0.0039138943248532, 0.0019550342130987,
-    0.0009770395701026, 0.0004884004884005, 0.0002441704309608,
-    0.0001220777635354, 0.0000610370189520, 0.0000305180437934
-};
+    adec_thread_t *     p_adec;
 
-static float adec_offset_table[15] =
-{
-    -0.6666666666666666, -0.8571428571428571, -0.9333333333333333,
-    -0.9677419354838710, -0.9841269841269841, -0.9921259842519685,
-    -0.9960784313725490, -0.9980430528375733, -0.9990224828934506,
-    -0.9995114802149487, -0.9997557997557998, -0.9998779147845196,
-    -0.9999389611182323, -0.9999694814905240, -0.9999847409781033
-};
+    intf_DbgMsg ( "adec debug: creating audio decoder thread\n" );
 
-static u8 adec_layer1_allocation_table[15] =
-{
-    0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-};
-
-static int adec_bound_table[4] = { 4, 8, 12, 16 };
-
-static int adec_layer1_mono( audiodec_t * p_adec, s16 * buffer )
-{
-    u8 allocation[32];
-    float slope[32];
-    float offset[32];
-    float sample[32];
-
-    int sb;
-    int s;
-
-    /* parse allocation */
-
-    for (sb = 0; sb < 32; sb += 2)
+    /* Allocate the memory needed to store the thread's structure */
+    if ( (p_adec = (adec_thread_t *)malloc (sizeof(adec_thread_t))) == NULL ) 
     {
-        u8 tmp;
-        tmp = GetByte ( &p_adec->bit_stream );
-
-        if ( (tmp >> 4) > 14 )
-        {
-            return 1;
-        }
-
-        allocation[sb] = adec_layer1_allocation_table [tmp >> 4];
-
-        if ((tmp & 15) > 14)
-        {
-            return 1;
-        }
-
-        allocation[sb+1] = adec_layer1_allocation_table [tmp & 15];
-    }
-
-    /* parse scalefactors */
-
-    for ( sb = 0; sb < 32; sb++ )
-    {
-        if ( allocation[sb] )
-        {
-            int index;
-            float scalefactor;
-
-            NeedBits ( &p_adec->bit_stream, 6 );
-            index = p_adec->bit_stream.buffer >> (32 - 6);
-            DumpBits ( &p_adec->bit_stream, 6 );
-
-            scalefactor = adec_scalefactor_table[index];
-
-            slope[sb] = adec_slope_table[allocation[sb]-2] * scalefactor;
-            offset[sb] = adec_offset_table[allocation[sb]-2] * scalefactor;
-        }
-    }
-
-    /* parse samples */
-
-    for (s = 0; s < 12; s++)
-    {
-        s16 * XXX_buf;
-
-        for (sb = 0; sb < 32; sb++)
-        {
-            if (!allocation[sb])
-            {
-                sample[sb] = 0;
-            }
-            else
-            {
-                int code;
-
-                NeedBits (&p_adec->bit_stream, allocation[sb]);
-                code = p_adec->bit_stream.buffer >> (32 - allocation[sb]);
-                DumpBits (&p_adec->bit_stream, allocation[sb]);
-
-                sample[sb] = slope[sb] * code + offset[sb];
-            }
-        }
-
-        DCT32 (sample, &p_adec->bank_0);
-        XXX_buf = buffer;
-        PCM (&p_adec->bank_0, &XXX_buf, 1);
-        buffer += 32;
-    }
-
-    return 0;
-}
-
-static int adec_layer1_stereo (audiodec_t * p_adec, s16 * buffer)
-{
-    u8 allocation_0[32], allocation_1[32];
-    float slope_0[32], slope_1[32];
-    float offset_0[32], offset_1[32];
-    float sample_0[32], sample_1[32];
-
-    int bound;
-    int sb;
-    int s;
-
-    /* calculate bound */
-
-    bound = 32;
-    if ( (p_adec->header & 0xc0) == 0x40)
-    {   /* intensity stereo */
-        int index;
-        index = (p_adec->header >> 4) & 3;
-        bound = adec_bound_table[index];
-    }
-
-    /* parse allocation */
-
-    for (sb = 0; sb < bound; sb++)
-    {
-        u8 tmp;
-        tmp = GetByte (&p_adec->bit_stream);
-        if ((tmp >> 4) > 14)
-        {
-            return 1;
-        }
-        allocation_0[sb] = adec_layer1_allocation_table [tmp >> 4];
-        if ((tmp & 15) > 14)
-        {
-            return 1;
-        }
-        allocation_1[sb] = adec_layer1_allocation_table [tmp & 15];
-    }
-
-    for (; sb < 32; sb += 2)
-    {
-        u8 tmp;
-        tmp = GetByte (&p_adec->bit_stream);
-        if ((tmp >> 4) > 14)
-        {
-            return 1;
-        }
-        allocation_0[sb] = allocation_1[sb] = adec_layer1_allocation_table [tmp >> 4];
-        if ((tmp & 15) > 14)
-        {
-            return 1;
-        }
-        allocation_0[sb+1] = allocation_1[sb+1] = adec_layer1_allocation_table [tmp & 15];
-    }
-
-    /* parse scalefactors */
-
-    for ( sb = 0; sb < 32; sb++ )
-    {
-        if ( allocation_0[sb] )
-        {
-            int index;
-            float scalefactor;
-
-            NeedBits (&p_adec->bit_stream, 6);
-            index = p_adec->bit_stream.buffer >> (32 - 6);
-            DumpBits (&p_adec->bit_stream, 6);
-
-            scalefactor = adec_scalefactor_table[index];
-
-            slope_0[sb] = adec_slope_table[allocation_0[sb]-2] * scalefactor;
-            offset_0[sb] = adec_offset_table[allocation_0[sb]-2] * scalefactor;
-        }
-
-        if (allocation_1[sb])
-        {
-            int index;
-            float scalefactor;
-
-            NeedBits (&p_adec->bit_stream, 6);
-            index = p_adec->bit_stream.buffer >> (32 - 6);
-            DumpBits (&p_adec->bit_stream, 6);
-
-            scalefactor = adec_scalefactor_table[index];
-
-            slope_1[sb] = adec_slope_table[allocation_1[sb]-2] * scalefactor;
-            offset_1[sb] = adec_offset_table[allocation_1[sb]-2] * scalefactor;
-        }
-    }
-
-    /* parse samples */
-
-    for (s = 0; s < 12; s++)
-    {
-        s16 * XXX_buf;
-
-        for (sb = 0; sb < bound; sb++)
-        {
-            if (!allocation_0[sb])
-            {
-                sample_0[sb] = 0;
-            }
-            else
-            {
-                int code;
-
-                NeedBits (&p_adec->bit_stream, allocation_0[sb]);
-                code = p_adec->bit_stream.buffer >> (32 - allocation_0[sb]);
-                DumpBits (&p_adec->bit_stream, allocation_0[sb]);
-
-                sample_0[sb] = slope_0[sb] * code + offset_0[sb];
-            }
-
-            if ( !allocation_1[sb] )
-            {
-                sample_1[sb] = 0;
-            }
-            else
-            {
-                int code;
-
-                NeedBits (&p_adec->bit_stream, allocation_1[sb]);
-                code = p_adec->bit_stream.buffer >> (32 - allocation_1[sb]);
-                DumpBits (&p_adec->bit_stream, allocation_1[sb]);
-
-                sample_1[sb] = slope_1[sb] * code + offset_1[sb];
-            }
-        }
-
-        for (; sb < 32; sb++)
-        {
-            if (!allocation_0[sb])
-            {
-                sample_0[sb] = 0;
-                sample_1[sb] = 0;
-            }
-            else
-            {
-                int code;
-
-                NeedBits (&p_adec->bit_stream, allocation_0[sb]);
-                code = p_adec->bit_stream.buffer >> (32 - allocation_0[sb]);
-                DumpBits (&p_adec->bit_stream, allocation_0[sb]);
-
-                sample_0[sb] = slope_0[sb] * code + offset_0[sb];
-                sample_1[sb] = slope_1[sb] * code + offset_1[sb];
-            }
-        }
-
-        DCT32 (sample_0, &p_adec->bank_0);
-        XXX_buf = buffer;
-        PCM (&p_adec->bank_0, &XXX_buf, 2);
-        DCT32 (sample_1, &p_adec->bank_1);
-        XXX_buf = buffer+1;
-        PCM (&p_adec->bank_1, &XXX_buf, 2);
-        buffer += 64;
-    }
-
-    return 0;
-}
-
-typedef struct
-{
-    s8 nbal[32];
-    u8 * alloc[32];
-} alloc_table_t;
-
-#define L3 -1
-#define L5 -2
-#define L9 -3
-
-static void adec_layer2_get_table( u32 header, u8 freq_table[15],
-                                   alloc_table_t ** alloc, int * sblimit )
-{
-    static s8 table_ab0[16] =
-    {
-        0, L3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
-    };
-    static s8 table_ab3[16] =
-    {
-        0, L3, L5, 3, L9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16
-    };
-    static s8 table_ab11[8] =
-    {
-        0, L3, L5, 3, L9, 4, 5, 16
-    };
-    static s8 table_ab23[8] =
-    {
-        0, L3, L5, 16
-    };
-    static alloc_table_t mpeg1_ab =
-    {
-        {4,4,4,4,4,4,4,4,4,4,4,3,3,3,3,3,3,3,3,3,3,3,3,2,2,2,2,2,2,2,0,0},
-        {table_ab0,  table_ab0,  table_ab0,  table_ab3,
-         table_ab3,  table_ab3,  table_ab3,  table_ab3,
-         table_ab3,  table_ab3,  table_ab3,  table_ab11,
-         table_ab11, table_ab11, table_ab11, table_ab11,
-         table_ab11, table_ab11, table_ab11, table_ab11,
-         table_ab11, table_ab11, table_ab11, table_ab23,
-         table_ab23, table_ab23, table_ab23, table_ab23,
-         table_ab23, table_ab23, NULL, NULL}
-    };
-
-    static s8 table_cd[16] =
-    {
-        0, L3, L5, L9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-    };
-    static alloc_table_t mpeg1_cd =
-    {
-        {4,4,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {table_cd, table_cd, table_cd, table_cd,
-         table_cd, table_cd, table_cd, table_cd,
-         table_cd, table_cd, table_cd, table_cd,
-         NULL, NULL, NULL, NULL,
-         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
-    };
-
-    static s8 table_0[16] =
-    {
-        0, L3, L5, 3, L9, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
-    };
-    static s8 table_4[8] =
-    {
-        0, L3, L5, L9, 4, 5, 6, 7
-    };
-    static alloc_table_t mpeg2 =
-    {
-        {4,4,4,4,3,3,3,3,3,3,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,0,0},
-        {table_0, table_0, table_0, table_0,
-         table_4, table_4, table_4, table_4,
-         table_4, table_4, table_4, table_4,
-         table_4, table_4, table_4, table_4,
-         table_4, table_4, table_4, table_4,
-         table_4, table_4, table_4, table_4,
-         table_4, table_4, table_4, table_4,
-         table_4, table_4, NULL, NULL}
-    };
-
-    static alloc_table_t * alloc_table [4] =
-    {
-        &mpeg2, &mpeg1_cd, &mpeg1_ab, &mpeg1_ab
-    };
-    static int sblimit_table[12] =
-    {
-        30, 8, 27, 30, 30, 8, 27, 27, 30, 12, 27, 30
-    };
-
-    int index;
-
-    if (!(header & 0x80000))
-    {
-        index = 0; /* mpeg2 */
-    }
-    else
-    {
-        index = (header >> 12) & 15; /* mpeg1, bitrate */
-        index = freq_table [index];
-    }
-
-    *alloc = alloc_table[index];
-    index |= (header >> 8) & 12;
-    *sblimit = sblimit_table[index];
-}
-
-static int adec_layer2_mono (audiodec_t * p_adec, s16 * buffer)
-{
-    static u8 freq_table[15] = {2, 1, 1, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2};
-    static float L3_table[3] = {-2/3.0, 0, 2/3.0};
-    static float L5_table[5] = {-4/5.0, -2/5.0, 0, 2/5.0, 4/5.0};
-    static float L9_table[9] = {-8/9.0, -6/9.0, -4/9.0, -2/9.0, 0,
-                                2/9.0, 4/9.0, 6/9.0, 8/9.0};
-
-    s8 allocation[32];
-    u8 scfsi[32];
-    float slope[3][32];
-    float offset[3][32];
-    float sample[3][32];
-    alloc_table_t * alloc_table;
-
-    int sblimit;
-    int sb;
-    int gr0, gr1;
-    int s;
-
-    /* get the right allocation table */
-    adec_layer2_get_table (p_adec->header, freq_table, &alloc_table, &sblimit);
-
-    /* parse allocation */
-    //sblimit=27;
-
-    for (sb = 0; sb < sblimit; sb++)
-    {
-        int index;
-
-        NeedBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
-        index = p_adec->bit_stream.buffer >> (32 - alloc_table->nbal[sb]);
-        DumpBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
-
-        allocation[sb] = alloc_table->alloc[sb][index];
-    }
-
-    /* parse scfsi */
-
-    for (sb = 0; sb < sblimit; sb++)
-    {
-        if (allocation[sb])
-        {
-            NeedBits (&p_adec->bit_stream, 2);
-            scfsi[sb] = p_adec->bit_stream.buffer >> (32 - 2);
-            DumpBits (&p_adec->bit_stream, 2);
-        }
-    }
-
-    /* parse scalefactors */
-
-    for (sb = 0; sb < sblimit; sb++)
-    {
-        if (allocation[sb])
-        {
-            int index_0, index_1, index_2;
-
-            switch (scfsi[sb])
-            {
-                case 0:
-                    NeedBits (&p_adec->bit_stream, 18);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
-                    index_2 = (p_adec->bit_stream.buffer >> (32 - 18)) & 63;
-                    DumpBits (&p_adec->bit_stream, 18);
-
-                    if (allocation[sb] < 0)
-                    {
-                        slope[0][sb] = adec_scalefactor_table[index_0];
-                        slope[1][sb] = adec_scalefactor_table[index_1];
-                        slope[2][sb] = adec_scalefactor_table[index_2];
-                    }
-                    else
-                    {
-                        float r_scalefactor;
-                        float r_slope, r_offset;
-
-                        r_slope = adec_slope_table[allocation[sb]-2];
-                        r_offset = adec_offset_table[allocation[sb]-2];
-
-                        r_scalefactor = adec_scalefactor_table[index_0];
-                        slope[0][sb] = r_slope * r_scalefactor;
-                        offset[0][sb] = r_offset * r_scalefactor;
-
-                        r_scalefactor = adec_scalefactor_table[index_1];
-                        slope[1][sb] = r_slope * r_scalefactor;
-                        offset[1][sb] = r_offset * r_scalefactor;
-
-                        r_scalefactor = adec_scalefactor_table[index_2];
-                        slope[2][sb] = r_slope * r_scalefactor;
-                        offset[2][sb] = r_offset * r_scalefactor;
-                    }
-                break;
-
-                case 1:
-                    NeedBits (&p_adec->bit_stream, 12);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
-                    DumpBits (&p_adec->bit_stream, 12);
-
-                    if (allocation[sb] < 0)
-                    {
-                        slope[0][sb] = slope[1][sb] =
-                            adec_scalefactor_table[index_0];
-                        slope[2][sb] = adec_scalefactor_table[index_1];
-                    }
-                    else
-                    {
-                        float r_scalefactor;
-                        float r_slope, r_offset;
-
-                        r_slope = adec_slope_table[allocation[sb]-2];
-                        r_offset = adec_offset_table[allocation[sb]-2];
-
-                        r_scalefactor = adec_scalefactor_table[index_0];
-                        slope[0][sb] = slope[1][sb] = r_slope * r_scalefactor;
-                        offset[0][sb] = offset[1][sb] =
-                            r_offset * r_scalefactor;
-
-                        r_scalefactor = adec_scalefactor_table[index_1];
-                        slope[2][sb] = r_slope * r_scalefactor;
-                        offset[2][sb] = r_offset * r_scalefactor;
-                    }
-                break;
-
-                case 2:
-                    NeedBits (&p_adec->bit_stream, 6);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    DumpBits (&p_adec->bit_stream, 6);
-
-                    if (allocation[sb] < 0)
-                    {
-                        slope[0][sb] = slope[1][sb] = slope[2][sb] =
-                            adec_scalefactor_table[index_0];
-                    }
-                    else
-                    {
-                        float r_scalefactor;
-                        float r_slope, r_offset;
-
-                        r_slope = adec_slope_table[allocation[sb]-2];
-                        r_offset = adec_offset_table[allocation[sb]-2];
-
-                        r_scalefactor = adec_scalefactor_table[index_0];
-                        slope[0][sb] = slope[1][sb] = slope[2][sb] =
-                            r_slope * r_scalefactor;
-                        offset[0][sb] = offset[1][sb] = offset[2][sb] =
-                            r_offset * r_scalefactor;
-                    }
-                break;
-
-                case 3:
-                    NeedBits (&p_adec->bit_stream, 12);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
-                    DumpBits (&p_adec->bit_stream, 12);
-
-                    if (allocation[sb] < 0)
-                    {
-                        slope[0][sb] = adec_scalefactor_table[index_0];
-                        slope[1][sb] = slope[2][sb] =
-                            adec_scalefactor_table[index_1];
-                    }
-                    else
-                    {
-                        float r_scalefactor;
-                        float r_slope, r_offset;
-
-                        r_slope = adec_slope_table[allocation[sb]-2];
-                        r_offset = adec_offset_table[allocation[sb]-2];
-
-                        r_scalefactor = adec_scalefactor_table[index_0];
-                        slope[0][sb] = r_slope * r_scalefactor;
-                        offset[0][sb] = r_offset * r_scalefactor;
-
-                        r_scalefactor = adec_scalefactor_table[index_1];
-                        slope[1][sb] = slope[2][sb] = r_slope * r_scalefactor;
-                        offset[1][sb] = offset[2][sb] =
-                            r_offset * r_scalefactor;
-                    }
-                break;
-            }
-        }
-    }
-
-    /* parse samples */
-
-    for (gr0 = 0; gr0 < 3; gr0++)
-    {
-        for (gr1 = 0; gr1 < 4; gr1++)
-        {
-            s16 * XXX_buf;
-
-            for (sb = 0; sb < sblimit; sb++)
-            {
-                int code;
-
-                switch (allocation[sb])
-                {
-                    case 0:
-                        sample[0][sb] = sample[1][sb] = sample[2][sb] = 0;
-                        break;
-
-                    case L3:
-                        NeedBits (&p_adec->bit_stream, 5);
-                        code = p_adec->bit_stream.buffer >> (32 - 5);
-                        DumpBits (&p_adec->bit_stream, 5);
-
-                        sample[0][sb] = slope[gr0][sb] * L3_table[code % 3];
-                        code /= 3;
-                        sample[1][sb] = slope[gr0][sb] * L3_table[code % 3];
-                        code /= 3;
-                        sample[2][sb] = slope[gr0][sb] * L3_table[code];
-                    break;
-
-                    case L5:
-                        NeedBits (&p_adec->bit_stream, 7);
-                        code = p_adec->bit_stream.buffer >> (32 - 7);
-                        DumpBits (&p_adec->bit_stream, 7);
-
-                        sample[0][sb] = slope[gr0][sb] * L5_table[code % 5];
-                        code /= 5;
-                        sample[1][sb] = slope[gr0][sb] * L5_table[code % 5];
-                        code /= 5;
-                        sample[2][sb] = slope[gr0][sb] * L5_table[code];
-                    break;
-
-                    case L9:
-                        NeedBits (&p_adec->bit_stream, 10);
-                        code = p_adec->bit_stream.buffer >> (32 - 10);
-                        DumpBits (&p_adec->bit_stream, 10);
-
-                        sample[0][sb] = slope[gr0][sb] * L9_table[code % 9];
-                        code /= 9;
-                        sample[1][sb] = slope[gr0][sb] * L9_table[code % 9];
-                        code /= 9;
-                        sample[2][sb] = slope[gr0][sb] * L9_table[code];
-                    break;
-
-                    default:
-                        for (s = 0; s < 3; s++)
-                        {
-                            NeedBits (&p_adec->bit_stream, allocation[sb]);
-                            code = ( p_adec->bit_stream.buffer >>
-                                     (32 - allocation[sb]) );
-                            DumpBits (&p_adec->bit_stream, allocation[sb]);
-
-                            sample[s][sb] =
-                                slope[gr0][sb] * code + offset[gr0][sb];
-                        }
-                }
-            }
-
-            for (; sb < 32; sb++)
-            {
-                sample[0][sb] = sample[1][sb] = sample[2][sb] = 0;
-            }
-
-            for (s = 0; s < 3; s++)
-            {
-                DCT32 (sample[s], &p_adec->bank_0);
-                XXX_buf = buffer;
-                PCM (&p_adec->bank_0, &XXX_buf, 2);
-
-                /* FIXME: one shouldn't have to do it twice ! */
-                DCT32 (sample[s], &p_adec->bank_1);
-                XXX_buf = buffer+1;
-                PCM (&p_adec->bank_1, &XXX_buf, 2);
-
-                buffer += 64;
-            }
-        }
-    }
-
-    return 0;
-}
-
-static int adec_layer2_stereo (audiodec_t * p_adec, s16 * buffer)
-{
-    static u8 freq_table[15] = {3, 0, 0, 0, 1, 0, 1, 2, 2, 2, 3, 3, 3, 3, 3};
-    static float L3_table[3] = {-2/3.0, 0, 2/3.0};
-    static float L5_table[5] = {-4/5.0, -2/5.0, 0, 2/5.0, 4/5.0};
-    static float L9_table[9] = {-8/9.0, -6/9.0, -4/9.0, -2/9.0, 0,
-                                2/9.0, 4/9.0, 6/9.0, 8/9.0};
-
-    s8 allocation_0[32], allocation_1[32];
-    u8 scfsi_0[32], scfsi_1[32];
-    float slope_0[3][32], slope_1[3][32];
-    float offset_0[3][32], offset_1[3][32];
-    float sample_0[3][32], sample_1[3][32];
-    alloc_table_t * alloc_table;
-
-    int sblimit;
-    int bound;
-    int sb;
-    int gr0, gr1;
-    int s;
-
-    /* get the right allocation table */
-    adec_layer2_get_table (p_adec->header, freq_table, &alloc_table, &sblimit);
-
-    /* calculate bound */
-    bound = sblimit;
-    if ((p_adec->header & 0xc0) == 0x40) { /* intensity stereo */
-        int index;
-        index = (p_adec->header >> 4) & 3;
-        if (adec_bound_table[index] < sblimit)
-        {
-            bound = adec_bound_table[index];
-        }
-    }
-
-    /* parse allocation */
-
-    for (sb = 0; sb < bound; sb++)
-    {
-        int index;
-
-        NeedBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
-        index = p_adec->bit_stream.buffer >> (32 - alloc_table->nbal[sb]);
-        DumpBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
-
-        allocation_0[sb] = alloc_table->alloc[sb][index];
-
-        NeedBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
-        index = p_adec->bit_stream.buffer >> (32 - alloc_table->nbal[sb]);
-        DumpBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
-
-        allocation_1[sb] = alloc_table->alloc[sb][index];
-    }
-
-    for (; sb < sblimit; sb++)
-    {
-        int index;
-
-        NeedBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
-        index = p_adec->bit_stream.buffer >> (32 - alloc_table->nbal[sb]);
-        DumpBits (&p_adec->bit_stream, alloc_table->nbal[sb]);
-
-        allocation_0[sb] = allocation_1[sb] = alloc_table->alloc[sb][index];
-    }
-
-    /* parse scfsi */
-
-    for (sb = 0; sb < sblimit; sb++)
-    {
-        if (allocation_0[sb])
-        {
-            NeedBits (&p_adec->bit_stream, 2);
-            scfsi_0[sb] = p_adec->bit_stream.buffer >> (32 - 2);
-            DumpBits (&p_adec->bit_stream, 2);
-        }
-
-        if (allocation_1[sb])
-        {
-            NeedBits (&p_adec->bit_stream, 2);
-            scfsi_1[sb] = p_adec->bit_stream.buffer >> (32 - 2);
-            DumpBits (&p_adec->bit_stream, 2);
-        }
-    }
-
-    /* parse scalefactors */
-
-    for (sb = 0; sb < sblimit; sb++)
-    {
-        if (allocation_0[sb])
-        {
-            int index_0, index_1, index_2;
-
-            switch (scfsi_0[sb])
-            {
-                case 0:
-                    NeedBits (&p_adec->bit_stream, 18);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
-                    index_2 = (p_adec->bit_stream.buffer >> (32 - 18)) & 63;
-                    DumpBits (&p_adec->bit_stream, 18);
-
-                    if (allocation_0[sb] < 0)
-                    {
-                        slope_0[0][sb] = adec_scalefactor_table[index_0];
-                        slope_0[1][sb] = adec_scalefactor_table[index_1];
-                        slope_0[2][sb] = adec_scalefactor_table[index_2];
-                    }
-                    else
-                    {
-                        float scalefactor;
-                        float slope, offset;
-
-                        slope = adec_slope_table[allocation_0[sb]-2];
-                        offset = adec_offset_table[allocation_0[sb]-2];
-
-                        scalefactor = adec_scalefactor_table[index_0];
-                        slope_0[0][sb] = slope * scalefactor;
-                        offset_0[0][sb] = offset * scalefactor;
-
-                        scalefactor = adec_scalefactor_table[index_1];
-                        slope_0[1][sb] = slope * scalefactor;
-                        offset_0[1][sb] = offset * scalefactor;
-
-                        scalefactor = adec_scalefactor_table[index_2];
-                        slope_0[2][sb] = slope * scalefactor;
-                        offset_0[2][sb] = offset * scalefactor;
-                    }
-                break;
-
-                case 1:
-                    NeedBits (&p_adec->bit_stream, 12);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
-                    DumpBits (&p_adec->bit_stream, 12);
-
-                    if (allocation_0[sb] < 0)
-                    {
-                        slope_0[0][sb] = slope_0[1][sb] =
-                            adec_scalefactor_table[index_0];
-                        slope_0[2][sb] = adec_scalefactor_table[index_1];
-                    }
-                    else
-                    {
-                        float scalefactor;
-                        float slope, offset;
-
-                        slope = adec_slope_table[allocation_0[sb]-2];
-                        offset = adec_offset_table[allocation_0[sb]-2];
-
-                        scalefactor = adec_scalefactor_table[index_0];
-                        slope_0[0][sb] = slope_0[1][sb] = slope * scalefactor;
-                        offset_0[0][sb] = offset_0[1][sb] =
-                            offset * scalefactor;
-
-                        scalefactor = adec_scalefactor_table[index_1];
-                        slope_0[2][sb] = slope * scalefactor;
-                        offset_0[2][sb] = offset * scalefactor;
-                    }
-                break;
-
-                case 2:
-                    NeedBits (&p_adec->bit_stream, 6);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    DumpBits (&p_adec->bit_stream, 6);
-
-                    if (allocation_0[sb] < 0)
-                    {
-                        slope_0[0][sb] = slope_0[1][sb] = slope_0[2][sb] =
-                            adec_scalefactor_table[index_0];
-                    }
-                    else
-                    {
-                        float scalefactor;
-                        float slope, offset;
-
-                        slope = adec_slope_table[allocation_0[sb]-2];
-                        offset = adec_offset_table[allocation_0[sb]-2];
-
-                        scalefactor = adec_scalefactor_table[index_0];
-                        slope_0[0][sb] = slope_0[1][sb] = slope_0[2][sb] =
-                            slope * scalefactor;
-                        offset_0[0][sb] = offset_0[1][sb] = offset_0[2][sb] =
-                            offset * scalefactor;
-                    }
-                break;
-
-                case 3:
-                    NeedBits (&p_adec->bit_stream, 12);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
-                    DumpBits (&p_adec->bit_stream, 12);
-
-                    if (allocation_0[sb] < 0)
-                    {
-                        slope_0[0][sb] = adec_scalefactor_table[index_0];
-                        slope_0[1][sb] = slope_0[2][sb] =
-                            adec_scalefactor_table[index_1];
-                    }
-                    else
-                    {
-                        float scalefactor;
-                        float slope, offset;
-
-                        slope = adec_slope_table[allocation_0[sb]-2];
-                        offset = adec_offset_table[allocation_0[sb]-2];
-
-                        scalefactor = adec_scalefactor_table[index_0];
-                        slope_0[0][sb] = slope * scalefactor;
-                        offset_0[0][sb] = offset * scalefactor;
-
-                        scalefactor = adec_scalefactor_table[index_1];
-                        slope_0[1][sb] = slope_0[2][sb] = slope * scalefactor;
-                        offset_0[1][sb] = offset_0[2][sb] =
-                            offset * scalefactor;
-                    }
-                break;
-            }
-        }
-
-        if (allocation_1[sb])
-        {
-            int index_0, index_1, index_2;
-
-            switch (scfsi_1[sb])
-            {
-                case 0:
-                    NeedBits (&p_adec->bit_stream, 18);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
-                    index_2 = (p_adec->bit_stream.buffer >> (32 - 18)) & 63;
-                    DumpBits (&p_adec->bit_stream, 18);
-
-                    if (allocation_1[sb] < 0)
-                    {
-                        slope_1[0][sb] = adec_scalefactor_table[index_0];
-                        slope_1[1][sb] = adec_scalefactor_table[index_1];
-                        slope_1[2][sb] = adec_scalefactor_table[index_2];
-                    }
-                    else
-                    {
-                        float scalefactor;
-                        float slope, offset;
-
-                        slope = adec_slope_table[allocation_1[sb]-2];
-                        offset = adec_offset_table[allocation_1[sb]-2];
-
-                        scalefactor = adec_scalefactor_table[index_0];
-                        slope_1[0][sb] = slope * scalefactor;
-                        offset_1[0][sb] = offset * scalefactor;
-
-                        scalefactor = adec_scalefactor_table[index_1];
-                        slope_1[1][sb] = slope * scalefactor;
-                        offset_1[1][sb] = offset * scalefactor;
-
-                        scalefactor = adec_scalefactor_table[index_2];
-                        slope_1[2][sb] = slope * scalefactor;
-                        offset_1[2][sb] = offset * scalefactor;
-                    }
-                break;
-
-                case 1:
-                    NeedBits (&p_adec->bit_stream, 12);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
-                    DumpBits (&p_adec->bit_stream, 12);
-
-                    if (allocation_1[sb] < 0)
-                    {
-                        slope_1[0][sb] = slope_1[1][sb] =
-                            adec_scalefactor_table[index_0];
-                        slope_1[2][sb] = adec_scalefactor_table[index_1];
-                    }
-                    else
-                    {
-                        float scalefactor;
-                        float slope, offset;
-
-                        slope = adec_slope_table[allocation_1[sb]-2];
-                        offset = adec_offset_table[allocation_1[sb]-2];
-
-                        scalefactor = adec_scalefactor_table[index_0];
-                        slope_1[0][sb] = slope_1[1][sb] = slope * scalefactor;
-                        offset_1[0][sb] = offset_1[1][sb] =
-                            offset * scalefactor;
-
-                        scalefactor = adec_scalefactor_table[index_1];
-                        slope_1[2][sb] = slope * scalefactor;
-                        offset_1[2][sb] = offset * scalefactor;
-                    }
-                break;
-
-                case 2:
-                    NeedBits (&p_adec->bit_stream, 6);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    DumpBits (&p_adec->bit_stream, 6);
-
-                    if (allocation_1[sb] < 0)
-                    {
-                        slope_1[0][sb] = slope_1[1][sb] = slope_1[2][sb] =
-                            adec_scalefactor_table[index_0];
-                    }
-                    else
-                    {
-                        float scalefactor;
-                        float slope, offset;
-
-                        slope = adec_slope_table[allocation_1[sb]-2];
-                        offset = adec_offset_table[allocation_1[sb]-2];
-
-                        scalefactor = adec_scalefactor_table[index_0];
-                        slope_1[0][sb] = slope_1[1][sb] = slope_1[2][sb] =
-                            slope * scalefactor;
-                        offset_1[0][sb] = offset_1[1][sb] = offset_1[2][sb] =
-                            offset * scalefactor;
-                    }
-                break;
-
-                case 3:
-                    NeedBits (&p_adec->bit_stream, 12);
-                    index_0 = p_adec->bit_stream.buffer >> (32 - 6);
-                    index_1 = (p_adec->bit_stream.buffer >> (32 - 12)) & 63;
-                    DumpBits (&p_adec->bit_stream, 12);
-
-                    if (allocation_1[sb] < 0)
-                    {
-                        slope_1[0][sb] = adec_scalefactor_table[index_0];
-                        slope_1[1][sb] = slope_1[2][sb] =
-                            adec_scalefactor_table[index_1];
-                    }
-                    else
-                    {
-                        float scalefactor;
-                        float slope, offset;
-
-                        slope = adec_slope_table[allocation_1[sb]-2];
-                        offset = adec_offset_table[allocation_1[sb]-2];
-
-                        scalefactor = adec_scalefactor_table[index_0];
-                        slope_1[0][sb] = slope * scalefactor;
-                        offset_1[0][sb] = offset * scalefactor;
-
-                        scalefactor = adec_scalefactor_table[index_1];
-                        slope_1[1][sb] = slope_1[2][sb] = slope * scalefactor;
-                        offset_1[1][sb] = offset_1[2][sb] =
-                            offset * scalefactor;
-                    }
-                break;
-            }
-        }
-    }
-
-    /* parse samples */
-
-    for (gr0 = 0; gr0 < 3; gr0++)
-    {
-        for (gr1 = 0; gr1 < 4; gr1++)
-        {
-            s16 * XXX_buf;
-
-            for (sb = 0; sb < bound; sb++)
-            {
-                int code;
-
-                switch (allocation_0[sb])
-                {
-                    case 0:
-                        sample_0[0][sb] = sample_0[1][sb] = sample_0[2][sb] = 0;
-                        break;
-
-                    case L3:
-                        NeedBits (&p_adec->bit_stream, 5);
-                        code = p_adec->bit_stream.buffer >> (32 - 5);
-                        DumpBits (&p_adec->bit_stream, 5);
-
-                        sample_0[0][sb] = slope_0[gr0][sb] * L3_table[code % 3];
-                        code /= 3;
-                        sample_0[1][sb] = slope_0[gr0][sb] * L3_table[code % 3];
-                        code /= 3;
-                        sample_0[2][sb] = slope_0[gr0][sb] * L3_table[code];
-                    break;
-
-                    case L5:
-                        NeedBits (&p_adec->bit_stream, 7);
-                        code = p_adec->bit_stream.buffer >> (32 - 7);
-                        DumpBits (&p_adec->bit_stream, 7);
-
-                        sample_0[0][sb] = slope_0[gr0][sb] * L5_table[code % 5];
-                        code /= 5;
-                        sample_0[1][sb] = slope_0[gr0][sb] * L5_table[code % 5];
-                        code /= 5;
-                        sample_0[2][sb] = slope_0[gr0][sb] * L5_table[code];
-                    break;
-
-                    case L9:
-                        NeedBits (&p_adec->bit_stream, 10);
-                        code = p_adec->bit_stream.buffer >> (32 - 10);
-                        DumpBits (&p_adec->bit_stream, 10);
-
-                        sample_0[0][sb] = slope_0[gr0][sb] * L9_table[code % 9];
-                        code /= 9;
-                        sample_0[1][sb] = slope_0[gr0][sb] * L9_table[code % 9];
-                        code /= 9;
-                        sample_0[2][sb] = slope_0[gr0][sb] * L9_table[code];
-                    break;
-
-                    default:
-                        for (s = 0; s < 3; s++)
-                        {
-                            NeedBits (&p_adec->bit_stream, allocation_0[sb]);
-                            code = ( p_adec->bit_stream.buffer >>
-                                     (32 - allocation_0[sb]) );
-                            DumpBits (&p_adec->bit_stream, allocation_0[sb]);
-
-                            sample_0[s][sb] =
-                                slope_0[gr0][sb] * code + offset_0[gr0][sb];
-                        }
-                }
-
-                switch (allocation_1[sb])
-                {
-                    case 0:
-                        sample_1[0][sb] = sample_1[1][sb] = sample_1[2][sb] = 0;
-                    break;
-
-                    case L3:
-                        NeedBits (&p_adec->bit_stream, 5);
-                        code = p_adec->bit_stream.buffer >> (32 - 5);
-                        DumpBits (&p_adec->bit_stream, 5);
-
-                        sample_1[0][sb] = slope_1[gr0][sb] * L3_table[code % 3];
-                        code /= 3;
-                        sample_1[1][sb] = slope_1[gr0][sb] * L3_table[code % 3];
-                        code /= 3;
-                        sample_1[2][sb] = slope_1[gr0][sb] * L3_table[code];
-                    break;
-
-                    case L5:
-                        NeedBits (&p_adec->bit_stream, 7);
-                        code = p_adec->bit_stream.buffer >> (32 - 7);
-                        DumpBits (&p_adec->bit_stream, 7);
-
-                        sample_1[0][sb] = slope_1[gr0][sb] * L5_table[code % 5];
-                        code /= 5;
-                        sample_1[1][sb] = slope_1[gr0][sb] * L5_table[code % 5];
-                        code /= 5;
-                        sample_1[2][sb] = slope_1[gr0][sb] * L5_table[code];
-                    break;
-
-                    case L9:
-                        NeedBits (&p_adec->bit_stream, 10);
-                        code = p_adec->bit_stream.buffer >> (32 - 10);
-                        DumpBits (&p_adec->bit_stream, 10);
-
-                        sample_1[0][sb] = slope_1[gr0][sb] * L9_table[code % 9];
-                        code /= 9;
-                        sample_1[1][sb] = slope_1[gr0][sb] * L9_table[code % 9];
-                        code /= 9;
-                        sample_1[2][sb] = slope_1[gr0][sb] * L9_table[code];
-                    break;
-
-                    default:
-                        for (s = 0; s < 3; s++)
-                        {
-                            NeedBits (&p_adec->bit_stream, allocation_1[sb]);
-                            code = ( p_adec->bit_stream.buffer >>
-                                     (32 - allocation_1[sb]) );
-                            DumpBits (&p_adec->bit_stream, allocation_1[sb]);
-
-                            sample_1[s][sb] =
-                                slope_1[gr0][sb] * code + offset_1[gr0][sb];
-                        }
-                }
-            }
-
-            for (; sb < sblimit; sb++)
-            {
-                int code;
-
-                switch (allocation_0[sb])
-                {
-                    case 0:
-                        sample_0[0][sb] = sample_0[1][sb] = sample_0[2][sb] = 0;
-                        sample_1[0][sb] = sample_1[1][sb] = sample_1[2][sb] = 0;
-                    break;
-
-                    case L3:
-                        NeedBits (&p_adec->bit_stream, 5);
-                        code = p_adec->bit_stream.buffer >> (32 - 5);
-                        DumpBits (&p_adec->bit_stream, 5);
-
-                        sample_0[0][sb] = slope_0[gr0][sb] * L3_table[code % 3];
-                        sample_1[0][sb] = slope_1[gr0][sb] * L3_table[code % 3];
-                        code /= 3;
-                        sample_0[1][sb] = slope_0[gr0][sb] * L3_table[code % 3];
-                        sample_1[1][sb] = slope_1[gr0][sb] * L3_table[code % 3];
-                        code /= 3;
-                        sample_0[2][sb] = slope_0[gr0][sb] * L3_table[code];
-                        sample_1[2][sb] = slope_1[gr0][sb] * L3_table[code];
-                    break;
-
-                    case L5:
-                        NeedBits (&p_adec->bit_stream, 7);
-                        code = p_adec->bit_stream.buffer >> (32 - 7);
-                        DumpBits (&p_adec->bit_stream, 7);
-
-                        sample_0[0][sb] = slope_0[gr0][sb] * L5_table[code % 5];
-                        sample_1[0][sb] = slope_1[gr0][sb] * L5_table[code % 5];
-                        code /= 5;
-                        sample_0[1][sb] = slope_0[gr0][sb] * L5_table[code % 5];
-                        sample_1[1][sb] = slope_1[gr0][sb] * L5_table[code % 5];
-                        code /= 5;
-                        sample_0[2][sb] = slope_0[gr0][sb] * L5_table[code];
-                        sample_1[2][sb] = slope_1[gr0][sb] * L5_table[code];
-                    break;
-
-                    case L9:
-                        NeedBits (&p_adec->bit_stream, 10);
-                        code = p_adec->bit_stream.buffer >> (32 - 10);
-                        DumpBits (&p_adec->bit_stream, 10);
-
-                        sample_0[0][sb] = slope_0[gr0][sb] * L9_table[code % 9];
-                        sample_1[0][sb] = slope_1[gr0][sb] * L9_table[code % 9];
-                        code /= 9;
-                        sample_0[1][sb] = slope_0[gr0][sb] * L9_table[code % 9];
-                        sample_1[1][sb] = slope_1[gr0][sb] * L9_table[code % 9];
-                        code /= 9;
-                        sample_0[2][sb] = slope_0[gr0][sb] * L9_table[code];
-                        sample_1[2][sb] = slope_1[gr0][sb] * L9_table[code];
-                    break;
-
-                    default:
-                        for (s = 0; s < 3; s++)
-                        {
-                            NeedBits (&p_adec->bit_stream, allocation_0[sb]);
-                            code = ( p_adec->bit_stream.buffer >>
-                                     (32 - allocation_0[sb]) );
-                            DumpBits (&p_adec->bit_stream, allocation_0[sb]);
-
-                            sample_0[s][sb] =
-                                slope_0[gr0][sb] * code + offset_0[gr0][sb];
-                            sample_1[s][sb] =
-                                slope_1[gr0][sb] * code + offset_1[gr0][sb];
-                        }
-                }
-            }
-
-            for (; sb < 32; sb++)
-            {
-                sample_0[0][sb] = sample_0[1][sb] = sample_0[2][sb] = 0;
-                sample_1[0][sb] = sample_1[1][sb] = sample_1[2][sb] = 0;
-            }
-
-            for (s = 0; s < 3; s++)
-            {
-                DCT32 (sample_0[s], &p_adec->bank_0);
-                XXX_buf = buffer;
-                PCM (&p_adec->bank_0, &XXX_buf, 2);
-
-                DCT32 (sample_1[s], &p_adec->bank_1);
-                XXX_buf = buffer+1;
-                PCM (&p_adec->bank_1, &XXX_buf, 2);
-
-                buffer += 64;
-            }
-        }
-    }
-
-    return 0;
-}
-
-int adec_init (audiodec_t * p_adec)
-{
-    p_adec->bank_0.actual = p_adec->bank_0.v1;
-    p_adec->bank_0.pos = 0;
-    p_adec->bank_1.actual = p_adec->bank_1.v1;
-    p_adec->bank_1.pos = 0;
-    return 0;
-}
-
-int adec_sync_frame (audiodec_t * p_adec, adec_sync_info_t * p_sync_info)
-{
-    static int mpeg1_sample_rate[3] = {44100, 48000, 32000};
-    static int mpeg1_layer1_bit_rate[15] =
-    {
-        0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448
-    };
-    static int mpeg1_layer2_bit_rate[15] =
-    {
-        0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384
-    };
-    static int mpeg2_layer1_bit_rate[15] =
-    {
-        0, 32, 48, 56,  64,  80,  96, 112, 128, 144, 160, 176, 192, 224, 256
-    };
-    static int mpeg2_layer2_bit_rate[15] =
-    {
-        0,  8, 16, 24,  32,  40,  48,  56,  64,  80,  96, 112, 128, 144, 160
-    };
-    static int * bit_rate_table[8] =
-    {
-        NULL, NULL, mpeg2_layer2_bit_rate, mpeg2_layer1_bit_rate,
-        NULL, NULL, mpeg1_layer2_bit_rate, mpeg1_layer1_bit_rate
-    };
-
-    u32 header;
-    int index;
-    int * bit_rates;
-    int sample_rate;
-    int bit_rate;
-    int frame_size;
-
-    p_adec->bit_stream.total_bytes_read = 0;
-
-    header = GetByte (&p_adec->bit_stream) << 24;
-    header |= GetByte (&p_adec->bit_stream) << 16;
-    header |= GetByte (&p_adec->bit_stream) << 8;
-    header |= GetByte (&p_adec->bit_stream);
-    p_adec->header = header;
-
-    /* basic header check : sync word, no emphasis */
-    if ((header & 0xfff00003) != 0xfff00000)
-    {
-        return 1;
-    }
-
-    /* calculate bit rate */
-    index = (header >> 17) & 7; /* mpeg ID + layer */
-    bit_rates = bit_rate_table[index];
-    if (bit_rate_table == NULL)
-    {
-        return 1; /* invalid layer */
-    }
-
-    index = (header >> 12) & 15; /* bit rate index */
-    if (index > 14)
-    {
-        return 1;
-    }
-    bit_rate = bit_rates[index];
-
-    /* mpeg 1 layer 2 : check that bitrate per channel is valid */
-
-    if (bit_rates == mpeg1_layer2_bit_rate)
-    {
-        if ((header & 0xc0) == 0xc0)
-        {   /* mono */
-            if (index > 10)
-            {
-                return 1; /* invalid bitrate per channel */
-            }
-        }
-        else
-        {   /* stereo */
-            if ((1 << index) & 0x2e)
-            {
-                return 1; /* invalid bitrate per channel */
-            }
-        }
-    }
-
-    /* calculate sample rate */
-
-    index = (header >> 10) & 3; /* sample rate index */
-    if (index > 2)
-    {
-        return 1;
-    }
-
-    sample_rate = mpeg1_sample_rate[index];
-    if (!(header & 0x80000))
-    {
-        sample_rate >>= 1; /* half sample rate for mpeg2 */
-    }
-
-    /* calculate frame length */
-
-    if ((header & 0x60000) == 0x60000)
-    {   /* layer 1 */
-        frame_size = 48000 * bit_rate / sample_rate;
-        if (header & 0x200) /* padding */
-        {
-            frame_size += 4;
-        }
-    }
-    else
-    {   /* layer >1 */
-        frame_size = 144000 * bit_rate / sample_rate;
-        if (header & 0x200) /* padding */
-        {
-            frame_size ++;
-        }
-    }
-
-    p_sync_info->sample_rate = sample_rate;
-    p_sync_info->bit_rate = bit_rate;
-    p_sync_info->frame_size = frame_size;
-    p_adec->frame_size = frame_size;
-
-    return 0;
-}
-
-int adec_decode_frame (audiodec_t * p_adec, s16 * buffer)
-{
-    if (!(p_adec->header & 0x10000))
-    {   /* error check, skip it */
-        GetByte (&p_adec->bit_stream);
-        GetByte (&p_adec->bit_stream);
-    }
-
-    /* parse audio data */
-
-    p_adec->bit_stream.i_available = 0;
-
-    switch ((p_adec->header >> 17) & 3)
-    {
-        case 2: /* layer 2 */
-            if ((p_adec->header & 0xc0) == 0xc0)
-            {
-                if (adec_layer2_mono (p_adec, buffer))
-                {
-                    return 1;
-                }
-            }
-            else
-            {
-                if (adec_layer2_stereo (p_adec, buffer))
-                {
-                    return 1;
-                }
-            }
-        break;
-
-        case 3: /* layer 1 */
-            if ((p_adec->header & 0xc0) == 0xc0)
-            {
-                if (adec_layer1_mono (p_adec, buffer))
-                {
-                    return 1;
-                }
-            }
-            else
-            {
-                if (adec_layer1_stereo (p_adec, buffer))
-                {
-                    return 1;
-                }
-            }
-        break;
-    }
-
-    /* skip ancillary data */
-
-    if ((p_adec->header & 0xf000) == 0) /* free bitrate format */
-    {
+        intf_ErrMsg ( "adec error: not enough memory for adec_CreateThread() to create the new thread\n" );
         return 0;
     }
 
-    /* XXX rewrite the byte counting system to reduce overhead */
+    /*
+     * Initialize the thread properties
+     */
+    p_adec->b_die = 0;
+    p_adec->b_error = 0;
+    p_adec->p_config = p_config;
+    p_adec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
-#if 0
-    intf_DbgMsg ( "skip %d\n",
-            p_adec->frame_size - p_adec->bit_stream.total_bytes_read );
-#endif
 
-    if (p_adec->bit_stream.total_bytes_read > p_adec->frame_size)
+    /*
+     * Initialize the decoder properties
+     */
+    adec_init ( &p_adec->audio_decoder );
+
+    /*
+     * Initialize the output properties
+     */
+    p_adec->p_aout = p_config->p_aout;
+    p_adec->p_aout_fifo = NULL;
+
+    /* Spawn the audio decoder thread */
+    if ( vlc_thread_create(&p_adec->thread_id, "audio decoder", (vlc_thread_func_t)RunThread, (void *)p_adec) ) 
     {
-        return 1; /* overrun */
+        intf_ErrMsg ("adec error: can't spawn audio decoder thread\n");
+        free (p_adec);
+        return 0;
     }
 
-    while (p_adec->bit_stream.total_bytes_read < p_adec->frame_size)
+    intf_DbgMsg ("adec debug: audio decoder thread (%p) created\n", p_adec);
+    return p_adec->thread_id;
+}
+
+/*****************************************************************************
+ * InitThread : initialize an audio decoder thread
+ *****************************************************************************
+ * This function is called from RunThread and performs the second step of the
+ * initialization. It returns 0 on success.
+ *****************************************************************************/
+static int InitThread (adec_thread_t * p_adec)
+{
+    aout_fifo_t          aout_fifo;
+    adec_byte_stream_t * byte_stream;
+
+    intf_DbgMsg ("adec debug: initializing audio decoder thread %p\n", p_adec);
+
+    /* Our first job is to initialize the bit stream structure with the
+     * beginning of the input stream */
+    vlc_mutex_lock ( &p_adec->p_fifo->data_lock );
+    while ( DECODER_FIFO_ISEMPTY(*p_adec->p_fifo) ) 
     {
-        GetByte (&p_adec->bit_stream); /* skip ancillary data */
+        if (p_adec->b_die) 
+        {
+            vlc_mutex_unlock ( &p_adec->p_fifo->data_lock );
+            return -1;
+        }
+        vlc_cond_wait ( &p_adec->p_fifo->data_wait, &p_adec->p_fifo->data_lock );
+    }
+    p_adec->p_data = DECODER_FIFO_START ( *p_adec->p_fifo )->p_first;
+    byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
+    byte_stream->p_byte = p_adec->p_data->p_payload_start;
+    byte_stream->p_end = p_adec->p_data->p_payload_end;
+    byte_stream->info = p_adec;
+    vlc_mutex_unlock ( &p_adec->p_fifo->data_lock );
+
+    aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
+    aout_fifo.i_channels = 2;
+    aout_fifo.b_stereo = 1;
+    aout_fifo.l_frame_size = ADEC_FRAME_SIZE;
+
+    /* Creating the audio output fifo */
+    if ( (p_adec->p_aout_fifo = aout_CreateFifo(p_adec->p_aout, &aout_fifo)) == NULL ) 
+    {
+        return -1;
     }
 
+    intf_DbgMsg ( "adec debug: audio decoder thread %p initialized\n", p_adec );
     return 0;
 }
 
+/*****************************************************************************
+ * RunThread : audio decoder thread
+ *****************************************************************************
+ * Audio decoder thread. This function does only returns when the thread is
+ * terminated.
+ *****************************************************************************/
+static void RunThread (adec_thread_t * p_adec)
+{
+    int sync;
+
+    intf_DbgMsg ( "adec debug: running audio decoder thread (%p) (pid == %i)\n", p_adec, getpid() );
+
+    /* You really suck */
+    //msleep ( INPUT_PTS_DELAY );
+
+    /* Initializing the audio decoder thread */
+    if( InitThread (p_adec) )
+    {
+        p_adec->b_error = 1;
+    }
+
+    sync = 0;
+
+    /* Audio decoder thread's main loop */
+    while( (!p_adec->b_die) && (!p_adec->b_error) )
+    {
+        s16 * buffer;
+        adec_sync_info_t sync_info;
+
+        if ( !sync )
+        {
+            /* have to find a synchro point */
+            adec_byte_stream_t * p_byte_stream;
+            
+            intf_DbgMsg ( "adec: sync\n" );
+            
+            p_byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
+            /* FIXME: the check will be done later, am I right ? */
+
+            /* FIXME: is this really needed ?
+            adec_byte_stream_next ( p_byte_stream ); */
+
+            if( p_adec->b_die || p_adec->b_error )
+            {
+                goto bad_frame;
+            }
+
+        }
+
+        if( DECODER_FIFO_START( *p_adec->p_fifo)->b_has_pts )
+        {
+            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
+                DECODER_FIFO_START( *p_adec->p_fifo )->i_pts;
+            DECODER_FIFO_START(*p_adec->p_fifo)->b_has_pts = 0;
+        }
+        else
+        {
+            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
+                LAST_MDATE;
+        }
+
+        if( adec_sync_frame (&p_adec->audio_decoder, &sync_info) )
+        {
+            goto bad_frame;
+        }
+        
+        sync = 1;
+
+        p_adec->p_aout_fifo->l_rate = sync_info.sample_rate;
+
+        buffer = ((s16 *)p_adec->p_aout_fifo->buffer)
+                    + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
+
+        if( adec_decode_frame (&p_adec->audio_decoder, buffer) )
+        {
+            sync = 0;
+            goto bad_frame;
+        }
+
+        vlc_mutex_lock (&p_adec->p_aout_fifo->data_lock);
+
+        p_adec->p_aout_fifo->l_end_frame =
+            (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+        vlc_cond_signal (&p_adec->p_aout_fifo->data_wait);
+        vlc_mutex_unlock (&p_adec->p_aout_fifo->data_lock);
+
+        bad_frame:
+    }
+
+    /* If b_error is set, the audio decoder thread enters the error loop */
+    if( p_adec->b_error ) 
+    {
+        ErrorThread( p_adec );
+    }
+
+    /* End of the audio decoder thread */
+    EndThread( p_adec );
+}
+
+/*****************************************************************************
+ * ErrorThread : audio decoder's RunThread() error loop
+ *****************************************************************************
+ * This function is called when an error occured during thread main's loop. The
+ * thread can still receive feed, but must be ready to terminate as soon as
+ * possible.
+ *****************************************************************************/
+static void ErrorThread ( adec_thread_t *p_adec )
+{
+    /* We take the lock, because we are going to read/write the start/end
+     * indexes of the decoder fifo */
+    vlc_mutex_lock ( &p_adec->p_fifo->data_lock );
+
+    /* Wait until a `die' order is sent */
+    while ( !p_adec->b_die ) 
+    {
+        /* Trash all received PES packets */
+        while ( !DECODER_FIFO_ISEMPTY(*p_adec->p_fifo) ) 
+        {
+            p_adec->p_fifo->pf_delete_pes ( p_adec->p_fifo->p_packets_mgt,
+                                   DECODER_FIFO_START(*p_adec->p_fifo) );
+            DECODER_FIFO_INCSTART ( *p_adec->p_fifo );
+        }
+
+        /* Waiting for the input thread to put new PES packets in the fifo */
+        vlc_cond_wait ( &p_adec->p_fifo->data_wait, &p_adec->p_fifo->data_lock );
+    }
+
+    /* We can release the lock before leaving */
+    vlc_mutex_unlock ( &p_adec->p_fifo->data_lock );
+}
+
+/*****************************************************************************
+ * EndThread : audio decoder thread destruction
+ *****************************************************************************
+ * This function is called when the thread ends after a sucessful
+ * initialization.
+ *****************************************************************************/
+static void EndThread ( adec_thread_t *p_adec )
+{
+    intf_DbgMsg ( "adec debug: destroying audio decoder thread %p\n", p_adec );
+
+    /* If the audio output fifo was created, we destroy it */
+    if ( p_adec->p_aout_fifo != NULL ) 
+    {
+        aout_DestroyFifo ( p_adec->p_aout_fifo );
+
+        /* Make sure the output thread leaves the NextFrame() function */
+        vlc_mutex_lock (&(p_adec->p_aout_fifo->data_lock));
+        vlc_cond_signal (&(p_adec->p_aout_fifo->data_wait));
+        vlc_mutex_unlock (&(p_adec->p_aout_fifo->data_lock));
+    }
+    /* Destroy descriptor */
+    free (p_adec);
+
+    intf_DbgMsg ("adec debug: audio decoder thread %p destroyed\n", p_adec);
+}
+
+void adec_byte_stream_next ( adec_byte_stream_t * p_byte_stream )
+{
+    adec_thread_t * p_adec = p_byte_stream->info;
+
+    /* We are looking for the next TS packet that contains real data,
+     * and not just a PES header */
+    do 
+    {
+        /* We were reading the last TS packet of this PES packet... It's
+         * time to jump to the next PES packet */
+        if (p_adec->p_data->p_next == NULL) 
+        {
+            /* We are going to read/write the start and end indexes of the
+             * decoder fifo and to use the fifo's conditional variable,
+             * that's why we need to take the lock before */
+            vlc_mutex_lock (&p_adec->p_fifo->data_lock);
+
+            /* Is the input thread dying ? */
+            if (p_adec->p_fifo->b_die) 
+            {
+                vlc_mutex_unlock (&(p_adec->p_fifo->data_lock));
+                return;
+            }
+
+            /* We should increase the start index of the decoder fifo, but
+             * if we do this now, the input thread could overwrite the
+             * pointer to the current PES packet, and we weren't able to
+             * give it back to the netlist. That's why we free the PES
+             * packet first. */
+            p_adec->p_fifo->pf_delete_pes (p_adec->p_fifo->p_packets_mgt,
+                    DECODER_FIFO_START(*p_adec->p_fifo));
+            DECODER_FIFO_INCSTART (*p_adec->p_fifo);
+
+            while (DECODER_FIFO_ISEMPTY(*p_adec->p_fifo)) 
+            {
+                vlc_cond_wait (&p_adec->p_fifo->data_wait, &p_adec->p_fifo->data_lock);
+                if (p_adec->p_fifo->b_die) 
+                {
+                    vlc_mutex_unlock (&(p_adec->p_fifo->data_lock));
+                    return;
+                }
+            }
+
+            /* The next byte could be found in the next PES packet */
+            p_adec->p_data = DECODER_FIFO_START (*p_adec->p_fifo)->p_first;
+
+            /* We can release the fifo's data lock */
+            vlc_mutex_unlock (&p_adec->p_fifo->data_lock);
+        }
+        /* Perhaps the next TS packet of the current PES packet contains
+         * real data (ie its payload's size is greater than 0) */
+        else 
+        {
+            p_adec->p_data = p_adec->p_data->p_next;
+        }
+    } while (p_adec->p_data->p_payload_start == p_adec->p_data->p_payload_end);
+
+    /* We've found a TS packet which contains interesting data... */
+    p_byte_stream->p_byte = p_adec->p_data->p_payload_start;
+    p_byte_stream->p_end = p_adec->p_data->p_payload_end;
+}

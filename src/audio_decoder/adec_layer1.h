@@ -1,5 +1,5 @@
 /*****************************************************************************
- * audio_math.h : PCM and DCT
+ * adec_layer1.h: MPEG Layer I audio decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
@@ -9,7 +9,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -20,9 +20,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Prototypes
- *****************************************************************************/
-void     DCT32(float *x, adec_bank_t *b);
-void     PCM(adec_bank_t *b, s16 **pcm, int jump);
+int adec_layer1_mono( audiodec_t * p_adec, s16 * buffer );
+int adec_layer1_stereo (audiodec_t * p_adec, s16 * buffer);
 

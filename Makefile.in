@@ -211,9 +211,11 @@ AC3_DECODER =	src/ac3_decoder/ac3_decoder_thread.o \
 LPCM_DECODER =	src/lpcm_decoder/lpcm_decoder_thread.o \
 		src/lpcm_decoder/lpcm_decoder.o
 
-AUDIO_DECODER =	src/audio_decoder/audio_decoder_thread.o \
-		src/audio_decoder/audio_decoder.o \
-		src/audio_decoder/audio_math.o
+AUDIO_DECODER =	src/audio_decoder/audio_decoder.o \
+		src/audio_decoder/adec_generic.o \
+		src/audio_decoder/adec_layer1.o \
+		src/audio_decoder/adec_layer2.o \
+		src/audio_decoder/adec_math.o
 
 SPU_DECODER =	src/spu_decoder/spu_decoder.o
 

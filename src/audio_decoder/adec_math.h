@@ -1,10 +1,9 @@
 /*****************************************************************************
- * audio_decoder_thread.h : audio decoder thread interface
+ * adec_math.h : PCM and DCT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
  * Authors:
- * Michel Kaempf <maxx@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,39 +21,8 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * adec_thread_t : audio decoder thread descriptor
- *****************************************************************************/
-typedef struct adec_thread_s
-{
-    /*
-     * Thread properties
-     */
-    vlc_thread_t        thread_id;                /* id for thread functions */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_error;                             /* `error' flag */
-
-    /*
-     * Input properties
-     */
-    decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
-    data_packet_t *     p_data;
-    adec_config_t *     p_config;
-
-
-    /*
-     * Decoder properties
-     */
-    audiodec_t		audio_decoder;
-
-    /*
-     * Output properties
-     */
-    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
-    aout_thread_t *     p_aout;           /* needed to create the audio fifo */
-
-} adec_thread_t;
-
-/*****************************************************************************
  * Prototypes
  *****************************************************************************/
-vlc_thread_t adec_CreateThread       ( adec_config_t * p_config );
+void     DCT32(float *x, adec_bank_t *b);
+void     PCM(adec_bank_t *b, s16 **pcm, int jump);
+
