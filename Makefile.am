@@ -859,7 +859,7 @@ package-macosx:
 	fi
 
 # Copy relevant files 
-	cp -R "$(top_builddir)/VLC.app" "$(top_builddir)/tmp/"
+	cp -R "$(top_builddir)/VLC-release.app" "$(top_builddir)/tmp/VLC.app"
 	cd "$(srcdir)" && cp AUTHORS COPYING ChangeLog README README.MacOSX.rtf THANKS NEWS $(top_builddir)/tmp/
 
 # Create disk image 
