@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-02-22 01:37+0100\n"
+"POT-Creation-Date: 2004-03-01 20:59+0100\n"
 "PO-Revision-Date: 2003-01-09 02:37+0900\n"
 "Last-Translator: Fumio Nakayama <endymion@ca2.so-net.ne.jp>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -203,8 +203,8 @@ msgid ""
 "For more information, have a look at the web site."
 msgstr ""
 
-#: include/vlc_meta.h:28 src/input/input_programs.c:101
-#: modules/access/cdda/access.c:402 modules/access/dvdplay/access.c:207
+#: include/vlc_meta.h:28 src/input/input_programs.c:99
+#: modules/access/cdda/access.c:430 modules/access/dvdplay/access.c:207
 #: modules/demux/dvdnav.c:404 modules/demux/mkv.cpp:2189
 #: modules/gui/beos/MediaControlView.cpp:1264
 #: modules/gui/gtk/gnome_interface.c:1659 modules/gui/gtk/gtk_interface.c:1965
@@ -217,22 +217,22 @@ msgid "Title"
 msgstr "タイトル"
 
 #: include/vlc_meta.h:29 src/input/input.c:842 src/playlist/sort.c:107
-#: src/playlist/sort.c:109 modules/access/cdda/access.c:721
+#: src/playlist/sort.c:109 modules/access/cdda/access.c:748
 #: modules/access/vcdx/access.c:1338 modules/demux/util/id3tag.c:148
 #: modules/gui/macosx/playlist.m:170 modules/gui/macosx/playlist.m:400
 #: modules/gui/macosx/playlist.m:606 modules/gui/wxwindows/iteminfo.cpp:177
 #: modules/gui/wxwindows/iteminfo.cpp:182
-#: modules/gui/wxwindows/playlist.cpp:286
-#: modules/gui/wxwindows/playlist.cpp:425 modules/misc/playlist/m3u.c:60
+#: modules/gui/wxwindows/playlist.cpp:293
+#: modules/gui/wxwindows/playlist.cpp:436 modules/misc/playlist/m3u.c:60
 #, fuzzy
 msgid "Author"
 msgstr "作成者"
 
-#: include/vlc_meta.h:30 modules/access/cdda/access.c:401
+#: include/vlc_meta.h:30 modules/access/cdda/access.c:429
 msgid "Artist"
 msgstr ""
 
-#: include/vlc_meta.h:31 modules/access/cdda/access.c:734
+#: include/vlc_meta.h:31 modules/access/cdda/access.c:761
 msgid "Genre"
 msgstr ""
 
@@ -287,14 +287,14 @@ msgstr "説明"
 msgid "Visualizations"
 msgstr "極性"
 
-#: src/audio_output/input.c:105 src/input/input_programs.c:684
+#: src/audio_output/input.c:105 src/input/input_programs.c:682
 #: src/video_output/video_output.c:442 modules/codec/ffmpeg/postprocess.c:90
 msgid "Disable"
 msgstr ""
 
 #: src/audio_output/input.c:107 modules/gui/macosx/controls.m:663
 #: modules/gui/macosx/intf.m:488 modules/gui/macosx/playlist.m:172
-#: modules/gui/wxwindows/playlist.cpp:247
+#: modules/gui/wxwindows/playlist.cpp:254
 msgid "Random"
 msgstr ""
 
@@ -443,7 +443,7 @@ msgstr "閉じる"
 #: src/input/es_out.c:453 src/input/es_out.c:455
 #: modules/gui/gtk/gnome_interface.c:148 modules/gui/gtk/gnome_interface.c:931
 #: modules/gui/gtk/gtk_interface.c:481 modules/gui/gtk/gtk_interface.c:1282
-#: modules/gui/macosx/output.m:162 modules/gui/wxwindows/streamout.cpp:743
+#: modules/gui/macosx/output.m:162 modules/gui/wxwindows/streamout.cpp:744
 msgid "Channels"
 msgstr "チャンネル"
 
@@ -484,11 +484,11 @@ msgstr "選択"
 
 #: src/input/input.c:247 src/input/input.c:842 src/playlist/item-ext.c:133
 #: src/playlist/item-ext.c:391 src/playlist/sort.c:107 src/playlist/sort.c:109
-#: modules/access/cdda/access.c:721 modules/access/cdda/access.c:725
+#: modules/access/cdda/access.c:748 modules/access/cdda/access.c:752
 #: modules/access/vcdx/access.c:1338 modules/demux/util/id3tag.c:148
 #: modules/gui/macosx/playlist.m:400 modules/gui/macosx/playlist.m:606
 #: modules/gui/wxwindows/iteminfo.cpp:182
-#: modules/gui/wxwindows/playlist.cpp:425 modules/misc/playlist/m3u.c:59
+#: modules/gui/wxwindows/playlist.cpp:436 modules/misc/playlist/m3u.c:59
 msgid "General"
 msgstr ""
 
@@ -509,25 +509,25 @@ msgstr "リスト"
 #: modules/gui/gtk/gtk_interface.c:2862 modules/gui/gtk/gtk_interface.c:3114
 #: modules/gui/macosx/open.m:141 modules/gui/macosx/open.m:259
 #: modules/gui/macosx/output.m:132 modules/gui/macosx/output.m:209
-#: modules/gui/macosx/output.m:328 modules/gui/pda/pda_interface.c:360
+#: modules/gui/macosx/output.m:328 modules/gui/pda/pda_interface.c:366
 #: modules/gui/wxwindows/open.cpp:308 modules/gui/wxwindows/streamout.cpp:414
 msgid "File"
 msgstr "ファイル"
 
 #: src/input/input.c:861 src/input/input.c:862 modules/gui/macosx/output.m:133
 #: modules/gui/macosx/output.m:229 modules/gui/macosx/output.m:345
-#: modules/gui/wxwindows/streamwizard.cpp:76
+#: modules/gui/wxwindows/streamwizard.cpp:74
 #, fuzzy
 msgid "Stream"
 msgstr "ストリームの停止"
 
-#: src/input/input_programs.c:97 modules/gui/gtk/gnome_interface.c:1078
+#: src/input/input_programs.c:95 modules/gui/gtk/gnome_interface.c:1078
 #: modules/gui/gtk/gtk_interface.c:1199 modules/gui/kde/interface.cpp:142
 #: modules/gui/macosx/intf.m:493 modules/gui/macosx/intf.m:494
 msgid "Program"
 msgstr "プログラム"
 
-#: src/input/input_programs.c:105 modules/access/dvdplay/access.c:209
+#: src/input/input_programs.c:103 modules/access/dvdplay/access.c:209
 #: modules/demux/dvdnav.c:406 modules/gui/beos/MediaControlView.cpp:1265
 #: modules/gui/gtk/gnome_interface.c:1649 modules/gui/gtk/gtk_interface.c:1955
 #: modules/gui/gtk/menu.c:1020 modules/gui/gtk/menu.c:1433
@@ -537,61 +537,61 @@ msgstr "プログラム"
 msgid "Chapter"
 msgstr "チャプター"
 
-#: src/input/input_programs.c:109 modules/access/vcdx/access.c:1221
+#: src/input/input_programs.c:107 modules/access/vcdx/access.c:1221
 #: modules/access/vcdx/access.c:1222 modules/gui/beos/InterfaceWindow.cpp:271
 #, fuzzy
 msgid "Navigation"
 msgstr "ナビゲーション(_N)"
 
-#: src/input/input_programs.c:113 modules/gui/macosx/intf.m:520
+#: src/input/input_programs.c:111 modules/gui/macosx/intf.m:520
 #: modules/gui/macosx/intf.m:521
 #, fuzzy
 msgid "Video Track"
 msgstr "ビデオ"
 
-#: src/input/input_programs.c:116 modules/gui/macosx/intf.m:504
+#: src/input/input_programs.c:114 modules/gui/macosx/intf.m:504
 #: modules/gui/macosx/intf.m:505
 #, fuzzy
 msgid "Audio Track"
 msgstr "オーディオ"
 
-#: src/input/input_programs.c:119 modules/gui/macosx/intf.m:524
+#: src/input/input_programs.c:117 modules/gui/macosx/intf.m:524
 #: modules/gui/macosx/intf.m:525
 #, fuzzy
 msgid "Subtitles Track"
 msgstr "字幕(_S)"
 
-#: src/input/input_programs.c:358 src/input/input_programs.c:360
+#: src/input/input_programs.c:356 src/input/input_programs.c:358
 #, fuzzy, c-format
 msgid "Title %i"
 msgstr "タイトル"
 
-#: src/input/input_programs.c:366 src/input/input_programs.c:373
+#: src/input/input_programs.c:364 src/input/input_programs.c:371
 #, fuzzy, c-format
 msgid "Chapter %i"
 msgstr "チャプター %d"
 
-#: src/input/input_programs.c:389
+#: src/input/input_programs.c:387
 #, fuzzy
 msgid "Next title"
 msgstr "次のファイル"
 
-#: src/input/input_programs.c:392
+#: src/input/input_programs.c:390
 #, fuzzy
 msgid "Previous title"
 msgstr "前のファイル"
 
-#: src/input/input_programs.c:398 modules/gui/beos/InterfaceWindow.cpp:267
+#: src/input/input_programs.c:396 modules/gui/beos/InterfaceWindow.cpp:267
 #, fuzzy
 msgid "Next chapter"
 msgstr "チャプター"
 
-#: src/input/input_programs.c:401 modules/gui/beos/InterfaceWindow.cpp:266
+#: src/input/input_programs.c:399 modules/gui/beos/InterfaceWindow.cpp:266
 #, fuzzy
 msgid "Previous chapter"
 msgstr "チャプター"
 
-#: src/input/input_programs.c:696 src/input/input_programs.c:698
+#: src/input/input_programs.c:694 src/input/input_programs.c:696
 #, c-format
 msgid "Track %i"
 msgstr ""
@@ -606,41 +606,41 @@ msgstr "ネットワーク・インタフェース"
 msgid "Add interface"
 msgstr "インタフェースを隠す(_H)"
 
-#: src/libvlc.c:279 src/libvlc.c:370
+#: src/libvlc.c:280 src/libvlc.c:371
 msgid "C"
 msgstr "ja"
 
-#: src/libvlc.c:305
+#: src/libvlc.c:306
 #, fuzzy
 msgid "Help options"
 msgstr "ストリームの一時停止"
 
-#: src/libvlc.c:323
+#: src/libvlc.c:324
 #, c-format
 msgid "Usage: %s [options] [items]...\n"
 msgstr ""
 
-#: src/libvlc.c:1369 src/misc/configuration.c:1181
+#: src/libvlc.c:1364 src/misc/configuration.c:1181
 msgid "string"
 msgstr "文字列"
 
-#: src/libvlc.c:1387 src/misc/configuration.c:1151
+#: src/libvlc.c:1382 src/misc/configuration.c:1151
 msgid "integer"
 msgstr "整数"
 
-#: src/libvlc.c:1390 src/misc/configuration.c:1171
+#: src/libvlc.c:1385 src/misc/configuration.c:1171
 msgid "float"
 msgstr "浮動小数点"
 
-#: src/libvlc.c:1396
+#: src/libvlc.c:1391
 msgid " (default enabled)"
 msgstr " (デフォルト：有効)"
 
-#: src/libvlc.c:1397
+#: src/libvlc.c:1392
 msgid " (default disabled)"
 msgstr " (デフォルト：無効)"
 
-#: src/libvlc.c:1513 src/libvlc.c:1568 src/libvlc.c:1592
+#: src/libvlc.c:1508 src/libvlc.c:1563 src/libvlc.c:1587
 #, c-format
 msgid ""
 "\n"
@@ -649,19 +649,19 @@ msgstr ""
 "\n"
 "続けるにはEnterキーを押してください。\n"
 
-#: src/libvlc.c:1538
+#: src/libvlc.c:1533
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr ""
 
-#: src/libvlc.c:1541
+#: src/libvlc.c:1536
 #, c-format
 msgid "[module]              [description]\n"
 msgstr "[モジュール]          [説明]\n"
 
-#: src/libvlc.c:1586
+#: src/libvlc.c:1581
 #, fuzzy, c-format
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -1169,7 +1169,7 @@ msgid ""
 "your graphics card (hardware acceleration)."
 msgstr "VLCはデフォルトでグラフィックカードのオーバレイ機能の使用を試みます。"
 
-#: src/libvlc.h:236 modules/video_output/directx/directx.c:263
+#: src/libvlc.h:236 modules/video_output/directx/directx.c:264
 #: modules/video_output/x11/xcommon.c:286
 msgid "Always on top"
 msgstr ""
@@ -1915,7 +1915,7 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1127 modules/gui/macosx/controls.m:95
 #: modules/gui/macosx/controls.m:637 modules/gui/macosx/intf.m:447
 #: modules/gui/macosx/intf.m:483 modules/gui/macosx/intf.m:548
-#: modules/gui/pda/pda_interface.c:267 modules/gui/pda/pda_interface.c:268
+#: modules/gui/pda/pda_interface.c:274 modules/gui/pda/pda_interface.c:275
 #: modules/gui/wxwindows/interface.cpp:385
 msgid "Stop"
 msgstr "停止"
@@ -2221,9 +2221,9 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:2421 modules/gui/gtk/gtk_interface.c:747
 #: modules/gui/gtk/gtk_interface.c:2709 modules/gui/macosx/intf.m:533
 #: modules/gui/macosx/playlist.m:164 modules/gui/macosx/playlist.m:176
-#: modules/gui/pda/pda_interface.c:1210
+#: modules/gui/pda/pda_interface.c:1265
 #: modules/gui/wxwindows/interface.cpp:389
-#: modules/gui/wxwindows/playlist.cpp:163
+#: modules/gui/wxwindows/playlist.cpp:171
 msgid "Playlist"
 msgstr "リスト"
 
@@ -2280,14 +2280,14 @@ msgstr "真偽値"
 msgid "key"
 msgstr ""
 
-#: src/playlist/item-ext.c:391 modules/access/cdda/access.c:383
-#: modules/access/cdda/access.c:393 modules/demux/mkv.cpp:2183
+#: src/playlist/item-ext.c:391 modules/access/cdda/access.c:411
+#: modules/access/cdda/access.c:421 modules/demux/mkv.cpp:2183
 #: modules/gui/gtk/gnome_interface.c:2448 modules/gui/gtk/gtk_interface.c:2869
-#: modules/gui/macosx/playlist.m:171 modules/gui/wxwindows/playlist.cpp:287
+#: modules/gui/macosx/playlist.m:171 modules/gui/wxwindows/playlist.cpp:294
 msgid "Duration"
 msgstr "持続期間"
 
-#: src/playlist/playlist.c:106 modules/gui/wxwindows/playlist.cpp:429
+#: src/playlist/playlist.c:106 modules/gui/wxwindows/playlist.cpp:440
 #: modules/misc/freetype.c:104
 #, fuzzy
 msgid "Normal"
@@ -2355,50 +2355,51 @@ msgstr ""
 msgid "Audio CD input"
 msgstr "VCD入力モジュール"
 
-#: modules/access/cdda/access.c:99 modules/access/vcdx/access.c:139
+#: modules/access/cdda/access.c:104 modules/access/vcdx/access.c:139
 msgid "The above message had unknown vcdimager log level"
 msgstr ""
 
-#: modules/access/cdda/access.c:151
+#: modules/access/cdda/access.c:156
 msgid "The above message had unknown cdio log level"
 msgstr ""
 
-#: modules/access/cdda/access.c:360 modules/access/cdda/access.c:737
-msgid "CDDB Disc ID"
-msgstr ""
-
-#: modules/access/cdda/access.c:365 modules/access/cdda/access.c:732
-msgid "CDDB Disc Category"
-msgstr ""
-
-#: modules/access/cdda/access.c:391 modules/access/vcdx/access.c:336
-#: modules/access/vcdx/access.c:688 modules/access/vcdx/access.c:1089
-#: modules/access/vcdx/access.c:1205 modules/access/vcdx/access.c:1206
-#: modules/gui/gtk/open.c:287 modules/gui/gtk/open.c:301
-#: modules/gui/wxwindows/open.cpp:1078 modules/gui/wxwindows/open.cpp:1093
+#: modules/access/cdda/access.c:272 modules/access/cdda/access.c:419
+#: modules/access/vcdx/access.c:336 modules/access/vcdx/access.c:688
+#: modules/access/vcdx/access.c:1089 modules/access/vcdx/access.c:1205
+#: modules/access/vcdx/access.c:1206 modules/gui/gtk/open.c:287
+#: modules/gui/gtk/open.c:301 modules/gui/wxwindows/open.cpp:1078
+#: modules/gui/wxwindows/open.cpp:1093
 #, fuzzy
 msgid "Track"
 msgstr "キャンセル"
 
-#: modules/access/cdda/access.c:727 modules/access/vcdx/access.c:1067
+#: modules/access/cdda/access.c:388 modules/access/cdda/access.c:764
+msgid "CDDB Disc ID"
+msgstr ""
+
+#: modules/access/cdda/access.c:393 modules/access/cdda/access.c:759
+msgid "CDDB Disc Category"
+msgstr ""
+
+#: modules/access/cdda/access.c:754 modules/access/vcdx/access.c:1067
 #, fuzzy
 msgid "Album"
 msgstr "VideoLANについて"
 
-#: modules/access/cdda/access.c:729
+#: modules/access/cdda/access.c:756
 msgid "Disc Artist(s)"
 msgstr ""
 
-#: modules/access/cdda/access.c:742
+#: modules/access/cdda/access.c:769
 #, fuzzy
 msgid "Year"
 msgstr "クリア"
 
-#: modules/access/cdda/access.c:750
+#: modules/access/cdda/access.c:777
 msgid "Track Artist"
 msgstr ""
 
-#: modules/access/cdda/access.c:752
+#: modules/access/cdda/access.c:779
 #, fuzzy
 msgid "Track Title"
 msgstr "前のファイル"
@@ -2588,7 +2589,7 @@ msgstr "削除"
 
 #: modules/access/dshow/dshow.cpp:104 modules/access/dshow/dshow.cpp:106
 #: modules/gui/beos/VlcWrapper.cpp:173 modules/gui/gtk/menu.c:734
-#: modules/gui/macosx/macosx.m:68
+#: modules/gui/macosx/macosx.m:73
 #, c-format
 msgid "None"
 msgstr "なし"
@@ -3205,7 +3206,7 @@ msgid "Volume Set"
 msgstr "ボリュームを上げる"
 
 #: modules/access/vcdx/access.c:1073 modules/gui/macosx/intf.m:451
-#: modules/gui/wxwindows/interface.cpp:1371
+#: modules/gui/wxwindows/interface.cpp:1365
 #: modules/gui/wxwindows/timer.cpp:128
 #, fuzzy
 msgid "Volume"
@@ -3389,7 +3390,7 @@ msgid "A/52 dynamic range compression"
 msgstr "A/52 ダイナミック・レンジ圧縮"
 
 #: modules/audio_filter/converter/a52tofloat32.c:78
-#: modules/audio_filter/converter/dtstofloat32.c:68
+#: modules/audio_filter/converter/dtstofloat32.c:64
 msgid ""
 "Dynamic range compression makes the loud sounds softer, and the soft sounds "
 "louder, so you can more easily listen to the stream in a noisy environment "
@@ -3411,12 +3412,12 @@ msgstr "a52 ATSC A/52(AC-3)オーディオ・デコーダ・モジュール"
 msgid "audio filter for A/52->S/PDIF encapsulation"
 msgstr "A/52->S/PDIFのカプセル化のためのオーディオ・フィルター"
 
-#: modules/audio_filter/converter/dtstofloat32.c:66
+#: modules/audio_filter/converter/dtstofloat32.c:62
 #, fuzzy
 msgid "DTS dynamic range compression"
 msgstr "A/52 ダイナミック・レンジ圧縮"
 
-#: modules/audio_filter/converter/dtstofloat32.c:75
+#: modules/audio_filter/converter/dtstofloat32.c:71
 #, fuzzy
 msgid "DTS Coherent Acoustics audio decoder"
 msgstr "字幕・デコーダ・モジュール"
@@ -3987,38 +3988,38 @@ msgstr "エラー"
 msgid "QuickTime library decoder"
 msgstr ""
 
-#: modules/codec/rawvideo.c:66
+#: modules/codec/rawvideo.c:67
 #, fuzzy
 msgid "Pseudo raw video decoder"
 msgstr "疑似AC3オーディオ・デコーダ"
 
-#: modules/codec/rawvideo.c:71
+#: modules/codec/rawvideo.c:72
 #, fuzzy
 msgid "Pseudo raw video packetizer"
 msgstr "疑似AC3オーディオ・デコーダ"
 
-#: modules/codec/speex.c:102
+#: modules/codec/speex.c:103
 #, fuzzy
 msgid "Speex audio decoder"
 msgstr "疑似AC3オーディオ・デコーダ"
 
-#: modules/codec/speex.c:107
+#: modules/codec/speex.c:108
 #, fuzzy
 msgid "Speex audio packetizer"
 msgstr "字幕・デコーダ・モジュール"
 
-#: modules/codec/speex.c:112
+#: modules/codec/speex.c:113
 #, fuzzy
 msgid "Speex audio encoder"
 msgstr "疑似AC3オーディオ・デコーダ"
 
-#: modules/codec/speex.c:464 modules/codec/speex.c:487
-#: modules/codec/speex.c:504
+#: modules/codec/speex.c:465 modules/codec/speex.c:488
+#: modules/codec/speex.c:505
 #, fuzzy
 msgid "Speex comment"
 msgstr "スクリーン"
 
-#: modules/codec/speex.c:474 modules/codec/speex.c:487
+#: modules/codec/speex.c:475 modules/codec/speex.c:488
 #, fuzzy
 msgid "Mode"
 msgstr "モジュール"
@@ -4082,22 +4083,22 @@ msgstr "DVビデオ・デコーダ"
 msgid "Theora comment"
 msgstr ""
 
-#: modules/codec/vorbis.c:128
+#: modules/codec/vorbis.c:129
 #, fuzzy
 msgid "Vorbis audio decoder"
 msgstr "字幕・デコーダ・モジュール"
 
-#: modules/codec/vorbis.c:137
+#: modules/codec/vorbis.c:138
 #, fuzzy
 msgid "Vorbis audio packetizer"
 msgstr "字幕・デコーダ・モジュール"
 
-#: modules/codec/vorbis.c:143
+#: modules/codec/vorbis.c:144
 #, fuzzy
 msgid "Vorbis audio encoder"
 msgstr "字幕・デコーダ・モジュール"
 
-#: modules/codec/vorbis.c:456 modules/codec/vorbis.c:486
+#: modules/codec/vorbis.c:457 modules/codec/vorbis.c:487
 msgid "Vorbis comment"
 msgstr ""
 
@@ -4202,9 +4203,9 @@ msgstr "Gtk+インタフェース・モジュール"
 #: modules/gui/gtk/gnome_interface.c:1020 modules/gui/gtk/gtk_interface.c:709
 #: modules/gui/gtk/gtk_interface.c:1119 modules/gui/macosx/controls.m:59
 #: modules/gui/macosx/intf.m:1030 modules/gui/macosx/intf.m:1031
-#: modules/gui/macosx/intf.m:1032 modules/gui/pda/pda_interface.c:243
-#: modules/gui/pda/pda_interface.c:244 modules/gui/wxwindows/interface.cpp:388
-#: modules/gui/wxwindows/interface.cpp:1297
+#: modules/gui/macosx/intf.m:1032 modules/gui/pda/pda_interface.c:250
+#: modules/gui/pda/pda_interface.c:251 modules/gui/wxwindows/interface.cpp:388
+#: modules/gui/wxwindows/interface.cpp:1291
 msgid "Pause"
 msgstr "一時停止"
 
@@ -4215,10 +4216,10 @@ msgstr "一時停止"
 #: modules/gui/macosx/intf.m:482 modules/gui/macosx/intf.m:547
 #: modules/gui/macosx/intf.m:1038 modules/gui/macosx/intf.m:1039
 #: modules/gui/macosx/intf.m:1040 modules/gui/macosx/playlist.m:166
-#: modules/gui/pda/pda_interface.c:255 modules/gui/pda/pda_interface.c:256
+#: modules/gui/pda/pda_interface.c:262 modules/gui/pda/pda_interface.c:263
 #: modules/gui/wxwindows/interface.cpp:387
-#: modules/gui/wxwindows/interface.cpp:1303
-#: modules/gui/wxwindows/playlist.cpp:236
+#: modules/gui/wxwindows/interface.cpp:1297
+#: modules/gui/wxwindows/playlist.cpp:243
 msgid "Play"
 msgstr "再生"
 
@@ -4518,7 +4519,7 @@ msgstr "ISO 13818-1 MPEG転送ストリーム入力"
 msgid "ISO 13818-1 MPEG Transport Stream demuxstream (libdvbpsi)"
 msgstr "ISO 13818-1 MPEG転送ストリーム入力(libdvdpsi)"
 
-#: modules/demux/dts.c:58
+#: modules/demux/dts.c:59
 #, fuzzy
 msgid "Raw DTS demuxer"
 msgstr "MPEG 1/2レイヤ1/2オーディオ・デコーダ"
@@ -4617,7 +4618,7 @@ msgstr "行数"
 #: modules/demux/mkv.cpp:2218 modules/gui/beos/PlayListWindow.cpp:144
 #: modules/gui/gtk/preferences.c:327 modules/gui/kde/pluginsbox.cpp:45
 #: modules/gui/macosx/playlist.m:169 modules/gui/wxwindows/iteminfo.cpp:160
-#: modules/gui/wxwindows/playlist.cpp:285
+#: modules/gui/wxwindows/playlist.cpp:292
 msgid "Name"
 msgstr "名前"
 
@@ -4783,7 +4784,7 @@ msgstr "MPEG 1/2レイヤ1/2オーディオ・デコーダ"
 msgid "PVA demuxer"
 msgstr "MPEG 1/2レイヤ1/2オーディオ・デコーダ"
 
-#: modules/demux/rawdv.c:39
+#: modules/demux/rawdv.c:42
 msgid "raw dv demuxer"
 msgstr ""
 
@@ -5235,8 +5236,8 @@ msgid "Open Subtitles"
 msgstr "字幕"
 
 #: modules/gui/beos/InterfaceWindow.cpp:249
-#: modules/gui/gtk/gtk_interface.c:1580 modules/gui/pda/pda_interface.c:293
-#: modules/gui/pda/pda_interface.c:294 modules/gui/pda/pda_interface.c:1310
+#: modules/gui/gtk/gtk_interface.c:1580 modules/gui/pda/pda_interface.c:300
+#: modules/gui/pda/pda_interface.c:301 modules/gui/pda/pda_interface.c:1363
 msgid "About"
 msgstr "VideoLANについて"
 
@@ -5284,7 +5285,7 @@ msgstr "ウィンドウ"
 #: modules/gui/gtk/preferences.c:608 modules/gui/macosx/open.m:138
 #: modules/gui/macosx/open.m:179 modules/gui/macosx/output.m:128
 #: modules/gui/wxwindows/iteminfo.cpp:97 modules/gui/wxwindows/open.cpp:299
-#: modules/gui/wxwindows/playlist.cpp:1224
+#: modules/gui/wxwindows/playlist.cpp:1286
 #: modules/gui/wxwindows/preferences.cpp:194
 #: modules/gui/wxwindows/streamout.cpp:194
 #: modules/gui/wxwindows/subtitles.cpp:174 modules/gui/wxwindows/v4l.cpp:142
@@ -5620,7 +5621,7 @@ msgstr "ビデオ"
 
 #: modules/gui/gtk/gnome_interface.c:274 modules/gui/gtk/gtk_interface.c:121
 #: modules/gui/gtk/gtk_interface.c:1595 modules/gui/macosx/intf.m:441
-#: modules/gui/pda/pda_interface.c:205 modules/gui/pda/pda_interface.c:1302
+#: modules/gui/pda/pda_interface.c:212 modules/gui/pda/pda_interface.c:1356
 msgid "VLC media player"
 msgstr ""
 
@@ -5694,7 +5695,7 @@ msgid "Play faster"
 msgstr "早送り再生"
 
 #: modules/gui/gtk/gnome_interface.c:644
-#: modules/gui/wxwindows/playlist.cpp:636
+#: modules/gui/wxwindows/playlist.cpp:638
 #, fuzzy
 msgid "Open playlist"
 msgstr "プレイリストを開く"
@@ -5779,7 +5780,7 @@ msgid "Playlist..."
 msgstr "プレイリスト..."
 
 #: modules/gui/gtk/gnome_interface.c:1361 modules/gui/gtk/gtk_interface.c:1603
-#: modules/gui/kde/kde.cpp:110
+#: modules/gui/kde/kde.cpp:110 modules/gui/pda/pda_interface.c:1350
 msgid "(c) 1996-2004 the VideoLAN team"
 msgstr ""
 
@@ -5888,7 +5889,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1839
 #: modules/gui/gtk/gnome_interface.c:2293 modules/gui/gtk/gtk_interface.c:2154
 #: modules/gui/gtk/gtk_interface.c:2752 modules/gui/macosx/open.m:143
-#: modules/gui/macosx/open.m:267 modules/gui/pda/pda_interface.c:524
+#: modules/gui/macosx/open.m:267 modules/gui/pda/pda_interface.c:548
 #: modules/gui/wxwindows/open.cpp:312
 msgid "Network"
 msgstr "ネットワーク"
@@ -5979,8 +5980,8 @@ msgid "Add"
 msgstr "追加"
 
 #: modules/gui/gtk/gnome_interface.c:2364 modules/gui/gtk/gtk_interface.c:2766
-#: modules/gui/macosx/playlist.m:167 modules/gui/pda/pda_interface.c:1200
-#: modules/gui/wxwindows/playlist.cpp:237
+#: modules/gui/macosx/playlist.m:167 modules/gui/pda/pda_interface.c:1255
+#: modules/gui/wxwindows/playlist.cpp:244
 msgid "Delete"
 msgstr "削除"
 
@@ -6018,7 +6019,7 @@ msgid "Path:"
 msgstr "ポート番号"
 
 #: modules/gui/gtk/gnome_interface.c:2899 modules/gui/gtk/gtk_interface.c:3169
-#: modules/gui/pda/pda_interface.c:427
+#: modules/gui/pda/pda_interface.c:432
 #, fuzzy
 msgid "Address:"
 msgstr "ホスト名/アドレス"
@@ -6219,7 +6220,7 @@ msgstr "ストリーム出力"
 #: modules/gui/gtk/preferences.c:620 modules/gui/macosx/open.m:139
 #: modules/gui/macosx/prefs.m:80 modules/gui/macosx/prefs.m:205
 #: modules/gui/wxwindows/iteminfo.cpp:100 modules/gui/wxwindows/open.cpp:302
-#: modules/gui/wxwindows/playlist.cpp:1227
+#: modules/gui/wxwindows/playlist.cpp:1289
 #: modules/gui/wxwindows/preferences.cpp:197
 #: modules/gui/wxwindows/streamout.cpp:197
 #: modules/gui/wxwindows/subtitles.cpp:177 modules/gui/wxwindows/v4l.cpp:145
@@ -6515,7 +6516,7 @@ msgstr "ファイルの選択"
 
 #: modules/gui/macosx/controls.m:201 modules/gui/macosx/controls.m:677
 #: modules/gui/macosx/intf.m:490 modules/gui/macosx/playlist.m:173
-#: modules/gui/wxwindows/playlist.cpp:254
+#: modules/gui/wxwindows/playlist.cpp:261
 #, fuzzy
 msgid "Repeat All"
 msgstr "すべてを選択"
@@ -6527,7 +6528,7 @@ msgstr "ファイルの選択"
 
 #: modules/gui/macosx/controls.m:229 modules/gui/macosx/controls.m:670
 #: modules/gui/macosx/intf.m:489 modules/gui/macosx/playlist.m:174
-#: modules/gui/wxwindows/playlist.cpp:261
+#: modules/gui/wxwindows/playlist.cpp:268
 #, fuzzy
 msgid "Repeat One"
 msgstr "ファイルの選択"
@@ -6570,7 +6571,7 @@ msgid "Step Backward"
 msgstr "逆転再生"
 
 #: modules/gui/macosx/info.m:157 modules/gui/macosx/intf.m:534
-#: modules/gui/macosx/intf.m:561 modules/gui/wxwindows/playlist.cpp:239
+#: modules/gui/macosx/intf.m:561 modules/gui/wxwindows/playlist.cpp:246
 msgid "Info"
 msgstr ""
 
@@ -6579,8 +6580,8 @@ msgstr ""
 msgid "VLC - Controller"
 msgstr "コントロール"
 
-#: modules/gui/macosx/intf.m:445 modules/gui/pda/pda_interface.c:231
-#: modules/gui/pda/pda_interface.c:232
+#: modules/gui/macosx/intf.m:445 modules/gui/pda/pda_interface.c:238
+#: modules/gui/pda/pda_interface.c:239
 msgid "Rewind"
 msgstr "巻き戻す"
 
@@ -6770,34 +6771,45 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:57
+#, fuzzy
+msgid "Stretch Aspect Ratio"
+msgstr "ソースのアスペクト・レシオ"
+
+#: modules/gui/macosx/macosx.m:58
+msgid ""
+"Instead of keeping the aspect ratio of the movie when resizing the video, "
+"stretch the video to fill the entire window."
+msgstr ""
+
+#: modules/gui/macosx/macosx.m:62
 msgid "Use OpenGL"
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:58
+#: modules/gui/macosx/macosx.m:63
 msgid "Use OpenGL instead of QuickTime to render the video on the screen."
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:61
+#: modules/gui/macosx/macosx.m:66
 #, fuzzy
 msgid "OpenGL effect"
 msgstr "スコープ効果"
 
-#: modules/gui/macosx/macosx.m:62
+#: modules/gui/macosx/macosx.m:67
 msgid ""
 "Use 'None' to display the video without any fantasy, 'Cube' to let the video "
 "play on the faces of a rotating cube, 'Transparent cube' do make this cube "
 "transparent"
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:68
+#: modules/gui/macosx/macosx.m:73
 msgid "Cube"
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:69
+#: modules/gui/macosx/macosx.m:74
 msgid "Transparent cube"
 msgstr ""
 
-#: modules/gui/macosx/macosx.m:72
+#: modules/gui/macosx/macosx.m:77
 msgid "MacOS X interface, sound and video"
 msgstr ""
 
@@ -6866,7 +6878,7 @@ msgstr "ストリームの一時停止"
 
 #: modules/gui/macosx/output.m:153 modules/gui/macosx/output.m:159
 #: modules/gui/wxwindows/streamout.cpp:670
-#: modules/gui/wxwindows/streamout.cpp:737
+#: modules/gui/wxwindows/streamout.cpp:738
 msgid "Bitrate (kb/s)"
 msgstr ""
 
@@ -6897,7 +6909,7 @@ msgstr "ファイルの保存"
 msgid "Save Playlist..."
 msgstr "プレイリスト..."
 
-#: modules/gui/macosx/playlist.m:175 modules/gui/wxwindows/playlist.cpp:274
+#: modules/gui/macosx/playlist.m:175 modules/gui/wxwindows/playlist.cpp:281
 msgid "Search"
 msgstr ""
 
@@ -7017,7 +7029,7 @@ msgid "Owner"
 msgstr "インタフェースを隠す"
 
 #: modules/gui/pda/pda.c:241 modules/gui/wxwindows/iteminfo.cpp:227
-#: modules/gui/wxwindows/playlist.cpp:288
+#: modules/gui/wxwindows/playlist.cpp:295
 msgid "Group"
 msgstr "グループ"
 
@@ -7030,440 +7042,489 @@ msgstr "タイトル"
 msgid "Index"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:279 modules/gui/pda/pda_interface.c:280
+#: modules/gui/pda/pda_interface.c:286 modules/gui/pda/pda_interface.c:287
 msgid "Forward"
 msgstr "転送"
 
-#: modules/gui/pda/pda_interface.c:301
+#: modules/gui/pda/pda_interface.c:308
 msgid "00:00:00"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:355 modules/gui/pda/pda_interface.c:519
-#: modules/gui/pda/pda_interface.c:818 modules/gui/pda/pda_interface.c:1161
+#: modules/gui/pda/pda_interface.c:361 modules/gui/pda/pda_interface.c:543
+#: modules/gui/pda/pda_interface.c:869 modules/gui/pda/pda_interface.c:1217
 #, fuzzy
 msgid "Add to Playlist"
 msgstr "リスト"
 
-#: modules/gui/pda/pda_interface.c:379
-msgid "MRL :"
+#: modules/gui/pda/pda_interface.c:384
+msgid "MRL:"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:419
+#: modules/gui/pda/pda_interface.c:396
+msgid "udp://@:1234"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:397
+msgid "udp6://@:1234"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:398
+msgid "rtp://"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:399
+msgid "rtp6://"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:400
+#, fuzzy
+msgid "ftp://"
+msgstr "ファイル"
+
+#: modules/gui/pda/pda_interface.c:401
+msgid "http://"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:402
+msgid "mms://"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:423
 #, fuzzy
 msgid "Port:"
 msgstr "ポート番号"
 
-#: modules/gui/pda/pda_interface.c:465
+#: modules/gui/pda/pda_interface.c:471
 #, fuzzy
 msgid "unicast"
 msgstr "UDPマルチキャスト"
 
-#: modules/gui/pda/pda_interface.c:466
+#: modules/gui/pda/pda_interface.c:472
 #, fuzzy
 msgid "multicast"
 msgstr "UDPマルチキャスト"
 
-#: modules/gui/pda/pda_interface.c:475
+#: modules/gui/pda/pda_interface.c:481
 #, fuzzy
 msgid "Network: "
 msgstr "ネットワーク"
 
-#: modules/gui/pda/pda_interface.c:491 modules/gui/pda/pda_interface.c:1089
+#: modules/gui/pda/pda_interface.c:498
 msgid "udp"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:492
+#: modules/gui/pda/pda_interface.c:499
 msgid "udp6"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:493 modules/gui/pda/pda_interface.c:1094
+#: modules/gui/pda/pda_interface.c:500
 msgid "rtp"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:494
+#: modules/gui/pda/pda_interface.c:501
 msgid "rtp4"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:495 modules/gui/pda/pda_interface.c:1096
+#: modules/gui/pda/pda_interface.c:502
 msgid "ftp"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:496 modules/gui/pda/pda_interface.c:1092
-#: modules/gui/pda/pda_interface.c:1095
+#: modules/gui/pda/pda_interface.c:503
 msgid "http"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:497
+#: modules/gui/pda/pda_interface.c:504
 #, fuzzy
 msgid "sout"
 msgstr "VideoLANについて"
 
-#: modules/gui/pda/pda_interface.c:498
+#: modules/gui/pda/pda_interface.c:505
 msgid "mms"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:506
+#: modules/gui/pda/pda_interface.c:513
 msgid "Protocol:"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:552
+#: modules/gui/pda/pda_interface.c:522 modules/gui/pda/pda_interface.c:848
 #, fuzzy
-msgid "Video:"
-msgstr "ビデオ"
+msgid "Transcode:"
+msgstr "キャンセル"
 
-#: modules/gui/pda/pda_interface.c:560
-#, fuzzy
-msgid "Audio:"
-msgstr "オーディオ"
-
-#: modules/gui/pda/pda_interface.c:568
-msgid "Channel:"
-msgstr "チャンネル:"
-
-#: modules/gui/pda/pda_interface.c:576
-#, fuzzy
-msgid "Norm:"
-msgstr "なし"
-
-#: modules/gui/pda/pda_interface.c:584
-#, fuzzy
-msgid "Size:"
-msgstr "サイズ"
-
-#: modules/gui/pda/pda_interface.c:592
-#, fuzzy
-msgid "Frequency:"
-msgstr "周波数"
-
-#: modules/gui/pda/pda_interface.c:600
-#, fuzzy
-msgid "Samplerate:"
-msgstr "シンボル・レート"
-
-#: modules/gui/pda/pda_interface.c:608
-#, fuzzy
-msgid "Quality:"
-msgstr "VLCを終了"
-
-#: modules/gui/pda/pda_interface.c:616
-msgid "Tuner:"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:624
-#, fuzzy
-msgid "Sound:"
-msgstr "オーディオ"
-
-#: modules/gui/pda/pda_interface.c:632
-msgid "MJPEG:"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:640
-#, fuzzy
-msgid "Decimation:"
-msgstr "説明"
-
-#: modules/gui/pda/pda_interface.c:705
-msgid "pal"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:706
-#, fuzzy
-msgid "ntsc"
-msgstr "フォント"
-
-#: modules/gui/pda/pda_interface.c:707
-msgid "secam"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:708
-#, fuzzy
-msgid "auto"
-msgstr "作成者"
-
-#: modules/gui/pda/pda_interface.c:725
-msgid "240x192"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:726
-msgid "320x240"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:727
-msgid "qsif"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:728
-msgid "qcif"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:729
-msgid "sif"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:730
-msgid "cif"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:731
-msgid "vga"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:747
-msgid "kHz"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:757
-msgid "Hz/s"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:779
-#, fuzzy
-msgid "mono"
-msgstr "モノラル"
-
-#: modules/gui/pda/pda_interface.c:780
-#, fuzzy
-msgid "stereo"
-msgstr "ステレオ"
-
-#: modules/gui/pda/pda_interface.c:798 modules/gui/pda/pda_interface.c:1037
-#: modules/gui/pda/pda_interface.c:1113 modules/gui/pda/pda_interface.c:1120
+#: modules/gui/pda/pda_interface.c:531 modules/gui/pda/pda_interface.c:833
+#: modules/gui/pda/pda_interface.c:857 modules/gui/pda/pda_interface.c:1099
+#: modules/gui/pda/pda_interface.c:1167 modules/gui/pda/pda_interface.c:1174
 #, fuzzy
 msgid "enable"
 msgstr "ビデオを有効にする"
 
-#: modules/gui/pda/pda_interface.c:823
+#: modules/gui/pda/pda_interface.c:575
+#, fuzzy
+msgid "Video:"
+msgstr "ビデオ"
+
+#: modules/gui/pda/pda_interface.c:584
+#, fuzzy
+msgid "Audio:"
+msgstr "オーディオ"
+
+#: modules/gui/pda/pda_interface.c:593
+msgid "Channel:"
+msgstr "チャンネル:"
+
+#: modules/gui/pda/pda_interface.c:602
+#, fuzzy
+msgid "Norm:"
+msgstr "なし"
+
+#: modules/gui/pda/pda_interface.c:611
+#, fuzzy
+msgid "Size:"
+msgstr "サイズ"
+
+#: modules/gui/pda/pda_interface.c:620
+#, fuzzy
+msgid "Frequency:"
+msgstr "周波数"
+
+#: modules/gui/pda/pda_interface.c:629
+#, fuzzy
+msgid "Samplerate:"
+msgstr "シンボル・レート"
+
+#: modules/gui/pda/pda_interface.c:638
+#, fuzzy
+msgid "Quality:"
+msgstr "VLCを終了"
+
+#: modules/gui/pda/pda_interface.c:647
+msgid "Tuner:"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:656
+#, fuzzy
+msgid "Sound:"
+msgstr "オーディオ"
+
+#: modules/gui/pda/pda_interface.c:665
+msgid "MJPEG:"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:674
+#, fuzzy
+msgid "Decimation:"
+msgstr "説明"
+
+#: modules/gui/pda/pda_interface.c:692
+msgid "/dev/video"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:693
+msgid "/dev/video0"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:694
+msgid "/dev/video1"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:711
+msgid "/dev/dsp"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:712
+msgid "/dev/audio"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:713
+msgid "/dev/audio0"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:714
+msgid "/dev/audio1"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:740
+msgid "pal"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:741
+#, fuzzy
+msgid "ntsc"
+msgstr "フォント"
+
+#: modules/gui/pda/pda_interface.c:742
+msgid "secam"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:743
+#, fuzzy
+msgid "auto"
+msgstr "作成者"
+
+#: modules/gui/pda/pda_interface.c:760
+msgid "240x192"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:761
+msgid "320x240"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:762
+msgid "qsif"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:763
+msgid "qcif"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:764
+msgid "sif"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:765
+msgid "cif"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:766
+msgid "vga"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:782
+msgid "kHz"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:792
+msgid "Hz/s"
+msgstr ""
+
+#: modules/gui/pda/pda_interface.c:814
+#, fuzzy
+msgid "mono"
+msgstr "モノラル"
+
+#: modules/gui/pda/pda_interface.c:815
+#, fuzzy
+msgid "stereo"
+msgstr "ステレオ"
+
+#: modules/gui/pda/pda_interface.c:874
 #, fuzzy
 msgid "Camera"
 msgstr "チャプター"
 
-#: modules/gui/pda/pda_interface.c:849
+#: modules/gui/pda/pda_interface.c:901
 #, fuzzy
 msgid "Video Codec:"
 msgstr "DVDデバイス"
 
-#: modules/gui/pda/pda_interface.c:865
+#: modules/gui/pda/pda_interface.c:918
 msgid "huffyuv"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:866
+#: modules/gui/pda/pda_interface.c:919
 msgid "mp1v"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:867
+#: modules/gui/pda/pda_interface.c:920
 msgid "mp2v"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:868
+#: modules/gui/pda/pda_interface.c:921
 msgid "mp4v"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:869
+#: modules/gui/pda/pda_interface.c:922
 msgid "H263"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:870
+#: modules/gui/pda/pda_interface.c:923
 msgid "I263"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:871
+#: modules/gui/pda/pda_interface.c:924
 msgid "WMV1"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:872
+#: modules/gui/pda/pda_interface.c:925
 msgid "WMV2"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:881
+#: modules/gui/pda/pda_interface.c:934
 #, fuzzy
 msgid "Video Bitrate:"
 msgstr "オーディオ"
 
-#: modules/gui/pda/pda_interface.c:889
+#: modules/gui/pda/pda_interface.c:943
 #, fuzzy
 msgid "Bitrate Tolerance:"
 msgstr "オーディオ"
 
-#: modules/gui/pda/pda_interface.c:897
+#: modules/gui/pda/pda_interface.c:952
 msgid "Keyframe Interval:"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:905
+#: modules/gui/pda/pda_interface.c:961
 #, fuzzy
 msgid "Audio Codec:"
 msgstr "DVDデバイス"
 
-#: modules/gui/pda/pda_interface.c:913
+#: modules/gui/pda/pda_interface.c:970
 #, fuzzy
 msgid "Deinterlace:"
 msgstr "ノンインタレース化"
 
-#: modules/gui/pda/pda_interface.c:921
+#: modules/gui/pda/pda_interface.c:979
 #, fuzzy
 msgid "Access:"
 msgstr "ホスト名/アドレス"
 
-#: modules/gui/pda/pda_interface.c:929
+#: modules/gui/pda/pda_interface.c:988
 #, fuzzy
 msgid "Muxer:"
 msgstr "ミュートする"
 
-#: modules/gui/pda/pda_interface.c:937
+#: modules/gui/pda/pda_interface.c:997
 msgid "URL:"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:945
+#: modules/gui/pda/pda_interface.c:1006
 msgid "Time To Live (TTL):"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:969
+#: modules/gui/pda/pda_interface.c:1031
 msgid "127.0.0.1"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:970
+#: modules/gui/pda/pda_interface.c:1032
 msgid "localhost"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:971
+#: modules/gui/pda/pda_interface.c:1033
 msgid "localhost.localdomain"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:972
+#: modules/gui/pda/pda_interface.c:1034
 msgid "239.0.0.42"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:989
+#: modules/gui/pda/pda_interface.c:1051
 msgid "ps"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:990
+#: modules/gui/pda/pda_interface.c:1052
 msgid "ts"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:991
+#: modules/gui/pda/pda_interface.c:1053
 msgid "mpeg1"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:992
+#: modules/gui/pda/pda_interface.c:1054
 msgid "avi"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:993
+#: modules/gui/pda/pda_interface.c:1055
 msgid "ogg"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:994
+#: modules/gui/pda/pda_interface.c:1056
 msgid "mp4"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:995
+#: modules/gui/pda/pda_interface.c:1057
 msgid "mov"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:996
+#: modules/gui/pda/pda_interface.c:1058
 msgid "asf"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1012 modules/gui/pda/pda_interface.c:1070
+#: modules/gui/pda/pda_interface.c:1074 modules/gui/pda/pda_interface.c:1132
 msgid "kbits/s"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1023
+#: modules/gui/pda/pda_interface.c:1085
 msgid "alaw"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1024
+#: modules/gui/pda/pda_interface.c:1086
 msgid "ulaw"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1025
+#: modules/gui/pda/pda_interface.c:1087
 msgid "mpga"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1026
+#: modules/gui/pda/pda_interface.c:1088
 msgid "mp3"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1027
+#: modules/gui/pda/pda_interface.c:1089
 msgid "a52"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1028
+#: modules/gui/pda/pda_interface.c:1090
 msgid "vorb"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1060
+#: modules/gui/pda/pda_interface.c:1122
 msgid "bits/s"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1073
+#: modules/gui/pda/pda_interface.c:1135
 #, fuzzy
 msgid "Audio Bitrate :"
 msgstr "オーディオ"
 
-#: modules/gui/pda/pda_interface.c:1090
-#, fuzzy
-msgid "display"
-msgstr "再生"
-
-#: modules/gui/pda/pda_interface.c:1091
-msgid "file"
-msgstr "ファイル"
-
-#: modules/gui/pda/pda_interface.c:1093
-msgid "mmsh"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:1105
+#: modules/gui/pda/pda_interface.c:1158
 #, fuzzy
 msgid "SAP Announce:"
 msgstr "ストリーム出力"
 
-#: modules/gui/pda/pda_interface.c:1127
+#: modules/gui/pda/pda_interface.c:1181
 #, fuzzy
 msgid "SLP Announce:"
 msgstr "ストリーム出力"
 
-#: modules/gui/pda/pda_interface.c:1135
+#: modules/gui/pda/pda_interface.c:1190
 #, fuzzy
 msgid "Announce Channel:"
 msgstr "チャンネル:"
 
-#: modules/gui/pda/pda_interface.c:1166
+#: modules/gui/pda/pda_interface.c:1222
 #, fuzzy
 msgid "Transcode"
 msgstr "キャンセル"
 
-#: modules/gui/pda/pda_interface.c:1195
+#: modules/gui/pda/pda_interface.c:1250
 msgid "Update"
 msgstr ""
 
-#: modules/gui/pda/pda_interface.c:1205
+#: modules/gui/pda/pda_interface.c:1260
 #, fuzzy
 msgid " Clear "
 msgstr "クリア"
 
-#: modules/gui/pda/pda_interface.c:1237
+#: modules/gui/pda/pda_interface.c:1291
 #, fuzzy
 msgid " Save "
 msgstr "保存"
 
-#: modules/gui/pda/pda_interface.c:1242
+#: modules/gui/pda/pda_interface.c:1296
 #, fuzzy
 msgid " Apply "
 msgstr "適用"
 
-#: modules/gui/pda/pda_interface.c:1247
+#: modules/gui/pda/pda_interface.c:1301
 #, fuzzy
 msgid " Cancel "
 msgstr "キャンセル"
 
-#: modules/gui/pda/pda_interface.c:1252
+#: modules/gui/pda/pda_interface.c:1306
 msgid "Preference"
 msgstr "設定(_P)..."
 
-#: modules/gui/pda/pda_interface.c:1281
+#: modules/gui/pda/pda_interface.c:1334
 #, fuzzy
 msgid ""
 "VLC Media Player is an MPEG, MPEG 2, MP3 and DivX player that accepts input "
@@ -7473,12 +7534,8 @@ msgstr ""
 "VideoLAN Clientは、MPEG, MPEG 2, MP3 DivXをローカルおよび、ネットワーク上の"
 "ソースから再生できるプレイヤーです。"
 
-#: modules/gui/pda/pda_interface.c:1288
+#: modules/gui/pda/pda_interface.c:1342
 msgid "Authors: the VideoLAN Team, http://www.videolan.org/team/"
-msgstr ""
-
-#: modules/gui/pda/pda_interface.c:1295
-msgid "(c) 1996-2003 the VideoLAN team"
 msgstr ""
 
 #: modules/gui/qnx/qnx.c:44
@@ -7503,7 +7560,7 @@ msgstr ""
 
 #: modules/gui/skins/src/skin_main.cpp:309
 #: modules/gui/skins/src/skin_main.cpp:310
-#: modules/gui/skins2/src/skin_main.cpp:228
+#: modules/gui/skins2/src/skin_main.cpp:223
 msgid "Config of last used skin"
 msgstr ""
 
@@ -7531,19 +7588,19 @@ msgstr "ファイルを開く"
 msgid "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
 msgstr ""
 
-#: modules/gui/skins2/src/skin_main.cpp:226
+#: modules/gui/skins2/src/skin_main.cpp:221
 msgid "Last skin used"
 msgstr ""
 
-#: modules/gui/skins2/src/skin_main.cpp:227
+#: modules/gui/skins2/src/skin_main.cpp:222
 msgid "Select the path to the last skin used."
 msgstr ""
 
-#: modules/gui/skins2/src/skin_main.cpp:229
+#: modules/gui/skins2/src/skin_main.cpp:224
 msgid "Config of last used skin."
 msgstr ""
 
-#: modules/gui/skins2/src/skin_main.cpp:236
+#: modules/gui/skins2/src/skin_main.cpp:231
 #, fuzzy
 msgid "Skinnable Interface"
 msgstr "メインウィンドウの表示/非表示(_I)"
@@ -7835,7 +7892,7 @@ msgid "Item Enabled"
 msgstr " (デフォルト：有効)"
 
 #: modules/gui/wxwindows/iteminfo.cpp:243
-#: modules/gui/wxwindows/playlist.cpp:1205
+#: modules/gui/wxwindows/playlist.cpp:1267
 #, fuzzy
 msgid "New Group"
 msgstr "グループ"
@@ -7880,7 +7937,7 @@ msgid "Save Messages As..."
 msgstr "メッセージ..."
 
 #: modules/gui/wxwindows/open.cpp:208 modules/gui/wxwindows/open.cpp:216
-#: modules/gui/wxwindows/streamwizard.cpp:105
+#: modules/gui/wxwindows/streamwizard.cpp:103
 msgid "Open..."
 msgstr "開く..."
 
@@ -7961,152 +8018,152 @@ msgstr ""
 msgid "Advanced settings..."
 msgstr "ALSAオーディオ・モジュール"
 
-#: modules/gui/wxwindows/playlist.cpp:188
+#: modules/gui/wxwindows/playlist.cpp:195
 #, fuzzy
 msgid "&Simple Add..."
 msgstr "ファイルを開く(_O)..."
 
-#: modules/gui/wxwindows/playlist.cpp:189
+#: modules/gui/wxwindows/playlist.cpp:196
 msgid "&Add MRL..."
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:191
+#: modules/gui/wxwindows/playlist.cpp:198
 #, fuzzy
 msgid "&Open Playlist..."
 msgstr "プレイリストを開く"
 
-#: modules/gui/wxwindows/playlist.cpp:192
+#: modules/gui/wxwindows/playlist.cpp:199
 #, fuzzy
 msgid "&Save Playlist..."
 msgstr "プレイリスト..."
 
-#: modules/gui/wxwindows/playlist.cpp:194
+#: modules/gui/wxwindows/playlist.cpp:201
 #, fuzzy
 msgid "&Close"
 msgstr "閉じる"
 
-#: modules/gui/wxwindows/playlist.cpp:198
+#: modules/gui/wxwindows/playlist.cpp:205
 #, fuzzy
 msgid "Sort by &title"
 msgstr "字幕(_S)"
 
-#: modules/gui/wxwindows/playlist.cpp:199
+#: modules/gui/wxwindows/playlist.cpp:206
 #, fuzzy
 msgid "&Reverse sort by title"
 msgstr "サーバー・ポート"
 
-#: modules/gui/wxwindows/playlist.cpp:201
+#: modules/gui/wxwindows/playlist.cpp:208
 #, fuzzy
 msgid "Sort by &author"
 msgstr "サーバー・ポート"
 
-#: modules/gui/wxwindows/playlist.cpp:202
+#: modules/gui/wxwindows/playlist.cpp:209
 #, fuzzy
 msgid "Reverse sort by author"
 msgstr "サーバー・ポート"
 
-#: modules/gui/wxwindows/playlist.cpp:204
+#: modules/gui/wxwindows/playlist.cpp:211
 #, fuzzy
 msgid "Sort by &group"
 msgstr "サーバー・ポート"
 
-#: modules/gui/wxwindows/playlist.cpp:205
+#: modules/gui/wxwindows/playlist.cpp:212
 #, fuzzy
 msgid "Reverse sort by group"
 msgstr "サーバー・ポート"
 
-#: modules/gui/wxwindows/playlist.cpp:207
+#: modules/gui/wxwindows/playlist.cpp:214
 #, fuzzy
 msgid "&Shuffle Playlist"
 msgstr "プレイリストを開く"
 
-#: modules/gui/wxwindows/playlist.cpp:211
+#: modules/gui/wxwindows/playlist.cpp:218
 #, fuzzy
 msgid "&Enable"
 msgstr "ビデオを有効にする"
 
-#: modules/gui/wxwindows/playlist.cpp:212
+#: modules/gui/wxwindows/playlist.cpp:219
 #, fuzzy
 msgid "&Disable"
 msgstr "ファイル"
 
-#: modules/gui/wxwindows/playlist.cpp:214
+#: modules/gui/wxwindows/playlist.cpp:221
 #, fuzzy
 msgid "&Invert"
 msgstr "逆転"
 
-#: modules/gui/wxwindows/playlist.cpp:215
+#: modules/gui/wxwindows/playlist.cpp:222
 #, fuzzy
 msgid "D&elete"
 msgstr "削除"
 
-#: modules/gui/wxwindows/playlist.cpp:216
+#: modules/gui/wxwindows/playlist.cpp:223
 #, fuzzy
 msgid "&Select All"
 msgstr "すべてを選択"
 
-#: modules/gui/wxwindows/playlist.cpp:220
+#: modules/gui/wxwindows/playlist.cpp:227
 msgid "&Enable all group items"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:222
+#: modules/gui/wxwindows/playlist.cpp:229
 msgid "&Disable all group items"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:226
+#: modules/gui/wxwindows/playlist.cpp:233
 #, fuzzy
 msgid "&Manage"
 msgstr "言語"
 
-#: modules/gui/wxwindows/playlist.cpp:227
+#: modules/gui/wxwindows/playlist.cpp:234
 #, fuzzy
 msgid "S&ort"
 msgstr "ポート番号"
 
-#: modules/gui/wxwindows/playlist.cpp:228
+#: modules/gui/wxwindows/playlist.cpp:235
 #, fuzzy
 msgid "&Selection"
 msgstr "選択"
 
-#: modules/gui/wxwindows/playlist.cpp:229
+#: modules/gui/wxwindows/playlist.cpp:236
 #, fuzzy
 msgid "&Groups"
 msgstr "グループ"
 
-#: modules/gui/wxwindows/playlist.cpp:238
+#: modules/gui/wxwindows/playlist.cpp:245
 #, fuzzy
 msgid "Toggle enabled"
 msgstr " (デフォルト：有効)"
 
-#: modules/gui/wxwindows/playlist.cpp:295
+#: modules/gui/wxwindows/playlist.cpp:302
 msgid "Up"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:298
+#: modules/gui/wxwindows/playlist.cpp:305
 msgid "Down"
 msgstr ""
 
-#: modules/gui/wxwindows/playlist.cpp:302
+#: modules/gui/wxwindows/playlist.cpp:309
 #, fuzzy
 msgid "Item info"
 msgstr "デバイス名"
 
-#: modules/gui/wxwindows/playlist.cpp:592
+#: modules/gui/wxwindows/playlist.cpp:594
 #, fuzzy
 msgid "M3U file"
 msgstr "ファイル"
 
-#: modules/gui/wxwindows/playlist.cpp:593
+#: modules/gui/wxwindows/playlist.cpp:595
 #, fuzzy
 msgid "PLS file"
 msgstr "ファイルの保存"
 
-#: modules/gui/wxwindows/playlist.cpp:602
+#: modules/gui/wxwindows/playlist.cpp:604
 #, fuzzy
 msgid "Save playlist"
 msgstr "プレイリストを開く"
 
-#: modules/gui/wxwindows/playlist.cpp:1219
+#: modules/gui/wxwindows/playlist.cpp:1281
 #, fuzzy
 msgid "Enter a name for the new group:"
 msgstr "区画から縁取りまでのジオメトリを指定"
@@ -8200,41 +8257,41 @@ msgstr "DVDデバイス"
 msgid "Scale"
 msgstr "衛星"
 
-#: modules/gui/wxwindows/streamout.cpp:725
+#: modules/gui/wxwindows/streamout.cpp:726
 #, fuzzy
 msgid "Audio codec"
 msgstr "DVDデバイス"
 
-#: modules/gui/wxwindows/streamout.cpp:871
+#: modules/gui/wxwindows/streamout.cpp:872
 #, fuzzy
 msgid "Save file"
 msgstr "ファイルの保存"
 
-#: modules/gui/wxwindows/streamwizard.cpp:40
+#: modules/gui/wxwindows/streamwizard.cpp:39
 msgid "Stream with VLC in three steps."
 msgstr ""
 
-#: modules/gui/wxwindows/streamwizard.cpp:41
+#: modules/gui/wxwindows/streamwizard.cpp:40
 #, fuzzy
 msgid "Step 1: Select what to stream."
 msgstr "ネットワークストリームを選択する"
 
-#: modules/gui/wxwindows/streamwizard.cpp:42
+#: modules/gui/wxwindows/streamwizard.cpp:41
 #, fuzzy
 msgid "Step 2: Define streaming method."
 msgstr "ネットワークストリームを選択する"
 
-#: modules/gui/wxwindows/streamwizard.cpp:43
+#: modules/gui/wxwindows/streamwizard.cpp:42
 #, fuzzy
 msgid "Step 3: Start streaming."
 msgstr "ネットワークストリームを選択する"
 
-#: modules/gui/wxwindows/streamwizard.cpp:108
+#: modules/gui/wxwindows/streamwizard.cpp:106
 #, fuzzy
 msgid "Choose..."
 msgstr "ブラウズ..."
 
-#: modules/gui/wxwindows/streamwizard.cpp:111
+#: modules/gui/wxwindows/streamwizard.cpp:109
 #, fuzzy
 msgid "Start!"
 msgstr "衛星"
@@ -9383,6 +9440,13 @@ msgid "XOSD interface"
 msgstr "ネットワーク・インタフェース"
 
 #, fuzzy
+#~ msgid "display"
+#~ msgstr "再生"
+
+#~ msgid "file"
+#~ msgstr "ファイル"
+
+#, fuzzy
 #~ msgid "VLC plugins preferences"
 #~ msgstr "設定..."
 
@@ -9786,10 +9850,6 @@ msgstr "ネットワーク・インタフェース"
 #, fuzzy
 #~ msgid "Only enqueue in playlist, do not play"
 #~ msgstr "デフォルトでプレイリストに追加"
-
-#, fuzzy
-#~ msgid "file://"
-#~ msgstr "ファイル"
 
 #, fuzzy
 #~ msgid "Stream:"
