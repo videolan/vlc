@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.19 2003/02/20 16:07:38 gbazin Exp $
+ * $Id: waveout.c,v 1.20 2003/03/28 17:02:25 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -93,14 +93,14 @@ typedef struct {
 #endif
 
 #include <initguid.h>
-#ifndef KSDATAFORMAT_SUBTYPE_IEEE_FLOAT
-DEFINE_GUID( KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+#ifndef KKSDATAFORMAT_SUBTYPE_IEEE_FLOAT
+DEFINE_GUID( KKSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
 #endif
-#ifndef KSDATAFORMAT_SUBTYPE_PCM
-DEFINE_GUID( KSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+#ifndef KKSDATAFORMAT_SUBTYPE_PCM
+DEFINE_GUID( KKSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
 #endif
-#ifndef KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF
-DEFINE_GUID( KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+#ifndef KKSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF
+DEFINE_GUID( KKSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
 #endif
 
 /*****************************************************************************
@@ -480,7 +480,7 @@ static int OpenWaveOut( aout_instance_t *p_aout, int i_format,
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
         waveformat.Format.wFormatTag = WAVE_FORMAT_DOLBY_AC3_SPDIF;
-        waveformat.SubFormat = KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF;
+        waveformat.SubFormat = KKSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF;
         break;
 
     case VLC_FOURCC('f','l','3','2'):
@@ -488,7 +488,7 @@ static int OpenWaveOut( aout_instance_t *p_aout, int i_format,
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
         waveformat.Format.wFormatTag = WAVE_FORMAT_IEEE_FLOAT;
-        waveformat.SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
+        waveformat.SubFormat = KKSDATAFORMAT_SUBTYPE_IEEE_FLOAT;
         break;
 
     case VLC_FOURCC('s','1','6','l'):
@@ -496,7 +496,7 @@ static int OpenWaveOut( aout_instance_t *p_aout, int i_format,
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
         waveformat.Format.wFormatTag = WAVE_FORMAT_PCM;
-        waveformat.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
+        waveformat.SubFormat = KKSDATAFORMAT_SUBTYPE_PCM;
         break;
     }
 

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.216 2003/03/25 17:07:45 gbazin Exp $
+ * $Id: video_output.c,v 1.217 2003/03/28 17:02:25 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -288,6 +288,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
      * will be initialized later in InitThread */
     for( i_index = 0; i_index < 2 * VOUT_MAX_PICTURES; i_index++)
     {
+        p_vout->p_picture[i_index].pf_lock = NULL;
+        p_vout->p_picture[i_index].pf_unlock = NULL;
         p_vout->p_picture[i_index].i_status = FREE_PICTURE;
         p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
     }
@@ -796,7 +798,7 @@ static void RunThread( vout_thread_t *p_vout)
         /*
          * Call the plugin-specific rendering method if there is one
          */
-        if( p_picture != NULL && p_vout->pf_render )
+        if( p_picture != NULL && p_directbuffer != NULL && p_vout->pf_render )
         {
             /* Render the direct buffer returned by vout_RenderPicture */
             p_vout->pf_render( p_vout, p_directbuffer );
@@ -805,7 +807,7 @@ static void RunThread( vout_thread_t *p_vout)
         /*
          * Sleep, wake up
          */
-        if( display_date != 0 )
+        if( display_date != 0 && p_directbuffer != NULL )
         {
             /* Store render time using a sliding mean */
             p_vout->render_time += mdate() - current_date;
@@ -832,7 +834,7 @@ static void RunThread( vout_thread_t *p_vout)
         /*
          * Display the previously rendered picture
          */
-        if( p_picture != NULL )
+        if( p_picture != NULL && p_directbuffer != NULL )
         {
             /* Display the direct buffer returned by vout_RenderPicture */
             if( p_vout->pf_display )

@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.14 2003/03/04 22:48:55 gbazin Exp $
+ * $Id: directx.c,v 1.15 2003/03/28 17:02:25 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -83,7 +83,8 @@ static void DirectXCloseSurface   ( vout_thread_t *p_vout,
                                     LPDIRECTDRAWSURFACE2 );
 static int  DirectXCreateClipper  ( vout_thread_t *p_vout );
 static void DirectXGetDDrawCaps   ( vout_thread_t *p_vout );
-static int  DirectXGetSurfaceDesc ( vout_thread_t *p_vout, picture_t *p_pic );
+static int  DirectXLockSurface    ( vout_thread_t *p_vout, picture_t *p_pic );
+static int  DirectXUnlockSurface  ( vout_thread_t *p_vout, picture_t *p_pic );
 
 /*****************************************************************************
  * Module descriptor
@@ -100,12 +101,17 @@ static int  DirectXGetSurfaceDesc ( vout_thread_t *p_vout, picture_t *p_pic );
     "isn't recommended as usually using video memory allows to benefit from " \
     "more hardware acceleration (like rescaling or YUV->RGB conversions). " \
     "This option doesn't have any effect when using overlays." )
+#define TRIPLEBUF_TEXT N_("use triple buffering for overlays")
+#define TRIPLEBUF_LONGTEXT N_( \
+    "Try to use triple bufferring when using YUV overlays. That results in " \
+    "much better video quality (no flickering)." )
 
 vlc_module_begin();
     add_category_hint( N_("Video"), NULL, VLC_FALSE );
     add_bool( "directx-on-top", 0, NULL, ON_TOP_TEXT, ON_TOP_LONGTEXT, VLC_FALSE );
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT, VLC_TRUE );
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT, VLC_TRUE );
+    add_bool( "directx-3buffering", 1, NULL, TRIPLEBUF_TEXT, TRIPLEBUF_LONGTEXT, VLC_TRUE );
     set_description( _("DirectX video module") );
     set_capability( "video output", 100 );
     add_shortcut( "directx" );
@@ -158,6 +164,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->b_using_overlay = config_GetInt( p_vout, "overlay" );
     p_vout->p_sys->b_use_sysmem = config_GetInt( p_vout, "directx-use-sysmem");
     p_vout->p_sys->b_hw_yuv = config_GetInt( p_vout, "directx-hw-yuv" );
+    p_vout->p_sys->b_3buf_overlay = config_GetInt( p_vout, "directx-3buffering" );
 
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
@@ -518,6 +525,16 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         return;
     }
 
+    /* Our surface can be lost so be sure to check this
+     * and restore it if need be */
+    if( IDirectDrawSurface2_IsLost( p_vout->p_sys->p_display )
+        == DDERR_SURFACELOST )
+    {
+        if( IDirectDrawSurface2_Restore( p_vout->p_sys->p_display ) == DD_OK &&
+            p_vout->p_sys->b_using_overlay )
+            DirectXUpdateOverlay( p_vout );
+    }
+
     if( !p_vout->p_sys->b_using_overlay )
     {
         DDBLTFX  ddbltfx;
@@ -533,20 +550,6 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
                                             p_pic->p_sys->p_surface,
                                             &p_vout->p_sys->rect_src_clipped,
                                             DDBLT_ASYNC, &ddbltfx );
-        if ( dxresult == DDERR_SURFACELOST )
-        {
-            /* Our surface can be lost so be sure
-             * to check this and restore it if needed */
-            IDirectDrawSurface2_Restore( p_vout->p_sys->p_display );
-
-            /* Now that the surface has been restored try to display again */
-            dxresult = IDirectDrawSurface2_Blt( p_vout->p_sys->p_display,
-                                           &p_vout->p_sys->rect_dest_clipped,
-                                           p_pic->p_sys->p_surface,
-                                           &p_vout->p_sys->rect_src_clipped,
-                                           DDBLT_ASYNC, &ddbltfx );
-        }
-
         if( dxresult != DD_OK )
         {
             msg_Warn( p_vout, "could not blit surface (error %i)", dxresult );
@@ -564,40 +567,22 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 
         dxresult = IDirectDrawSurface2_Flip( p_pic->p_sys->p_front_surface,
                                              NULL, DDFLIP_WAIT );
-        if ( dxresult == DDERR_SURFACELOST )
-        {
-            /* Our surface can be lost so be sure
-             * to check this and restore it if needed */
-            IDirectDrawSurface2_Restore( p_vout->p_sys->p_display );
-            IDirectDrawSurface2_Restore( p_pic->p_sys->p_front_surface );
-
-            /* Now that the surface has been restored try to display again */
-            dxresult = IDirectDrawSurface2_Flip( p_pic->p_sys->p_front_surface,
-                                                 NULL, DDFLIP_WAIT );
-            DirectXUpdateOverlay( p_vout );
-        }
-
         if( dxresult != DD_OK )
         {
             msg_Warn( p_vout, "could not flip overlay (error %i)", dxresult );
         }
 
-        if( DirectXGetSurfaceDesc( p_vout, p_pic ) )
-        {
-            /* AAARRGG */
-            msg_Err( p_vout, "cannot get surface desc" );
-            return;
-        }
-
-        if( UpdatePictureStruct( p_vout, p_pic, p_vout->output.i_chroma ) )
-        {
-            /* AAARRGG */
-            msg_Err( p_vout, "invalid pic chroma" );
-            return;
-        }
-
         /* set currently displayed pic */
         p_vout->p_sys->p_current_surface = p_pic->p_sys->p_front_surface;
+
+        /* Lock surface to get all the required info */
+        if( DirectXLockSurface( p_vout, p_pic ) )
+        {
+            /* AAARRGG */
+            msg_Warn( p_vout, "cannot lock surface" );
+            return;
+        }
+        DirectXUnlockSurface( p_vout, p_pic );
     }
 }
 
@@ -949,14 +934,12 @@ void DirectXUpdateOverlay( vout_thread_t *p_vout )
                                          &p_vout->p_sys->rect_src_clipped,
                                          p_vout->p_sys->p_display,
                                          &p_vout->p_sys->rect_dest_clipped,
-                                         dwFlags,
-                                         &ddofx );
+                                         dwFlags, &ddofx );
     if(dxresult != DD_OK)
     {
         msg_Warn( p_vout,
                   "DirectXUpdateOverlay cannot move or resize overlay" );
     }
-
 }
 
 /*****************************************************************************
@@ -1048,13 +1031,13 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
         /* Triple buffering rocks! it doesn't have any processing overhead
          * (you don't have to wait for the vsync) and provides for a very nice
          * video quality (no tearing). */
+        if( p_vout->p_sys->b_3buf_overlay )
+            i_ret = DirectXCreateSurface( p_vout, &p_surface,
+                                          p_vout->output.i_chroma,
+                                          p_vout->p_sys->b_using_overlay,
+                                          2 /* number of backbuffers */ );
 
-        i_ret = DirectXCreateSurface( p_vout, &p_surface,
-                                      p_vout->output.i_chroma,
-                                      p_vout->p_sys->b_using_overlay,
-                                      2 /* number of backbuffers */ );
-
-        if( i_ret != VLC_SUCCESS )
+        if( !p_vout->p_sys->b_3buf_overlay || i_ret != VLC_SUCCESS )
         {
             /* Try to reduce the number of backbuffers */
             i_ret = DirectXCreateSurface( p_vout, &p_surface,
@@ -1098,9 +1081,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 p_pic[0].p_sys->p_front_surface;
 
             /* Reset the front buffer memory */
-            if( !DirectXGetSurfaceDesc( p_vout, &front_pic ) &&
-                !UpdatePictureStruct( p_vout, &front_pic,
-                                      p_vout->output.i_chroma ) )
+            if( DirectXLockSurface( p_vout, &front_pic ) == VLC_SUCCESS )
             {
                 int i,j;
                 for( i = 0; i < front_pic.i_planes; i++ )
@@ -1108,6 +1089,8 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                         memset( front_pic.p[i].p_pixels + j *
                                 front_pic.p[i].i_pitch, 127,
                                 front_pic.p[i].i_visible_pitch );
+
+                DirectXUnlockSurface( p_vout, &front_pic );
             }
 
             DirectXUpdateOverlay( p_vout );
@@ -1197,6 +1180,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 DirectXCloseSurface( p_vout, p_surface );
                 return VLC_ENOMEM;
             }
+
             p_pic[0].p_sys->p_surface = p_pic[0].p_sys->p_front_surface
                 = p_surface;
 
@@ -1214,25 +1198,19 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     {
         p_pic[i].i_status = DESTROYED_PICTURE;
         p_pic[i].i_type   = DIRECT_PICTURE;
+        p_pic[i].pf_lock  = DirectXLockSurface;
+        p_pic[i].pf_unlock = DirectXUnlockSurface;
         PP_OUTPUTPICTURE[i] = &p_pic[i];
 
-        if( DirectXGetSurfaceDesc( p_vout, &p_pic[i] ) )
+        if( DirectXLockSurface( p_vout, &p_pic[i] ) != VLC_SUCCESS )
         {
             /* AAARRGG */
             FreePictureVec( p_vout, p_pic, I_OUTPUTPICTURES );
             I_OUTPUTPICTURES = 0;
+            msg_Err( p_vout, "cannot lock surface" );
             return VLC_EGENERIC;
         }
-
-        if( UpdatePictureStruct(p_vout, &p_pic[i], p_vout->output.i_chroma) )
-        {
-            /* Unknown chroma, tell the guy to get lost */
-            msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
-                     p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma );
-            FreePictureVec( p_vout, p_pic, I_OUTPUTPICTURES );
-            I_OUTPUTPICTURES = 0;
-            return VLC_EGENERIC;
-        }
+        DirectXUnlockSurface( p_vout, &p_pic[i] );
     }
 
     msg_Dbg( p_vout, "End NewPictureVec (%s)",
@@ -1370,7 +1348,10 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             break;
 
         default:
-            /* Not supported */
+            /* Unknown chroma, tell the guy to get lost */
+            msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
+                     p_vout->output.i_chroma,
+                     (char*)&p_vout->output.i_chroma );
             return VLC_EGENERIC;
     }
 
@@ -1431,12 +1412,12 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * DirectXGetSurfaceDesc: Get some more information about the surface
+ * DirectXLockSurface: Lock surface and get picture data pointer
  *****************************************************************************
- * This function get and stores the surface descriptor which among things
- * has the pointer to the picture data.
+ * This function locks a surface and get the surface descriptor which amongst
+ * other things has the pointer to the picture data.
  *****************************************************************************/
-static int DirectXGetSurfaceDesc( vout_thread_t *p_vout, picture_t *p_pic )
+static int DirectXLockSurface( vout_thread_t *p_vout, picture_t *p_pic )
 {
     HRESULT dxresult;
 
@@ -1461,20 +1442,46 @@ static int DirectXGetSurfaceDesc( vout_thread_t *p_vout, picture_t *p_pic )
         {
             /* Your surface can be lost so be sure
              * to check this and restore it if needed */
-            dxresult = IDirectDrawSurface2_Restore( p_pic->p_sys->p_surface );
+
+            /* When using overlays with back-buffers, we need to restore
+             * the front buffer so the back-buffers get restored as well. */
+            if( p_vout->p_sys->b_using_overlay  )
+                IDirectDrawSurface2_Restore( p_pic->p_sys->p_front_surface );
+            else
+                IDirectDrawSurface2_Restore( p_pic->p_sys->p_surface );
+
             dxresult = IDirectDrawSurface2_Lock( p_pic->p_sys->p_surface, NULL,
-                                             &p_pic->p_sys->ddsd,
-                                             DDLOCK_WAIT, NULL);
+                                                 &p_pic->p_sys->ddsd,
+                                                 DDLOCK_WAIT, NULL);
+            if( dxresult == DDERR_SURFACELOST )
+                msg_Dbg( p_vout, "DirectXLockSurface: DDERR_SURFACELOST" );
         }
         if( dxresult != DD_OK )
         {
-            msg_Err( p_vout, "DirectXGetSurfaceDesc cannot lock surface" );
             return VLC_EGENERIC;
         }
     }
 
-    /* Unlock the Surface */
-    dxresult = IDirectDrawSurface2_Unlock( p_pic->p_sys->p_surface, NULL );
+    /* Now we have a pointer to the surface memory, we can update our picture
+     * structure. */
+    if( UpdatePictureStruct( p_vout, p_pic, p_vout->output.i_chroma )
+        != VLC_SUCCESS )
+    {
+        DirectXUnlockSurface( p_vout, p_pic );
+        return VLC_EGENERIC;
+    }
+    else
+        return VLC_SUCCESS;      
+}
 
-    return VLC_SUCCESS;
+/*****************************************************************************
+ * DirectXUnlockSurface: Unlock a surface locked by DirectXLockSurface().
+ *****************************************************************************/
+static int DirectXUnlockSurface( vout_thread_t *p_vout, picture_t *p_pic )
+{
+    /* Unlock the Surface */
+    if( IDirectDrawSurface2_Unlock( p_pic->p_sys->p_surface, NULL ) == DD_OK )
+        return VLC_SUCCESS;
+    else
+        return VLC_EGENERIC;
 }

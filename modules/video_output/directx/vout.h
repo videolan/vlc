@@ -2,7 +2,7 @@
  * vout.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout.h,v 1.3 2002/10/25 18:17:59 sam Exp $
+ * $Id: vout.h,v 1.4 2003/03/28 17:02:25 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -54,6 +54,7 @@ struct vout_sys_t
     vlc_bool_t   b_using_overlay;         /* Are we using an overlay surface */
     vlc_bool_t   b_use_sysmem;   /* Should we use system memory for surfaces */
     vlc_bool_t   b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
+    vlc_bool_t   b_3buf_overlay;   /* Should we use triple buffered overlays */
 
     /* size of the display */
     RECT         rect_display;

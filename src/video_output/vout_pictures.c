@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.35 2003/03/10 18:26:33 gbazin Exp $
+ * $Id: vout_pictures.c,v 1.36 2003/03/28 17:02:25 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -330,9 +330,22 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         /* Picture is not in a direct buffer, but is exactly the
          * same size as the direct buffers. A memcpy() is enough,
          * then render the subtitles. */
+
+        if( PP_OUTPUTPICTURE[0]->pf_lock )
+            if( PP_OUTPUTPICTURE[0]->pf_lock( p_vout, PP_OUTPUTPICTURE[0] ) )
+            {
+                if( PP_OUTPUTPICTURE[0]->pf_unlock )
+                PP_OUTPUTPICTURE[0]->pf_unlock( p_vout, PP_OUTPUTPICTURE[0] );
+
+                return NULL;
+            }
+
         CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
 
         vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
+
+        if( PP_OUTPUTPICTURE[0]->pf_unlock )
+            PP_OUTPUTPICTURE[0]->pf_unlock( p_vout, PP_OUTPUTPICTURE[0] );
 
         return PP_OUTPUTPICTURE[0];
     }
@@ -342,11 +355,18 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
      * well. This usually means software YUV, or hardware YUV with a
      * different chroma. */
 
+    if( p_vout->p_picture[0].pf_lock )
+        if( p_vout->p_picture[0].pf_lock( p_vout, &p_vout->p_picture[0] ) )
+            return NULL;
+
     /* Convert image to the first direct buffer */
     p_vout->chroma.pf_convert( p_vout, p_pic, &p_vout->p_picture[0] );
 
     /* Render subpictures on the first direct buffer */
     vout_RenderSubPictures( p_vout, &p_vout->p_picture[0], p_subpic );
+
+    if( p_vout->p_picture[0].pf_unlock )
+        p_vout->p_picture[0].pf_unlock( p_vout, &p_vout->p_picture[0] );
 
     return &p_vout->p_picture[0];
 }

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.61 2002/11/25 19:29:10 sam Exp $
+ * $Id: video.h,v 1.62 2003/03/28 17:02:25 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -79,6 +79,10 @@ struct picture_t
 
     /* The picture heap we are attached to */
     picture_heap_t* p_heap;
+
+    /* Some vouts require the picture to be locked before it can be modified */
+    int (* pf_lock) ( vout_thread_t *, picture_t * );
+    int (* pf_unlock) ( vout_thread_t *, picture_t * );
 
     /* Private data - the video output plugin might want to put stuff here to
      * keep track of the picture */
