@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout.m: MacOS X video output module
  *****************************************************************************
- * Copyright (C) 2001-2003 VideoLAN
+ * Copyright (C) 2001-2005 VideoLAN
  * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
@@ -326,16 +326,16 @@
 - (void)toggleFloatOnTop
 {
     vlc_value_t val;
+
     if( var_Get( p_vout, "video-on-top", &val )>=0 && val.b_bool)
     {
         val.b_bool = VLC_FALSE;
-        var_Set( p_vout, "video-on-top", val );
     }
     else
     {
         val.b_bool = VLC_TRUE;
-        var_Set( p_vout, "video-on-top", val );
     }
+    var_Set( p_vout, "video-on-top", val );
 }
 
 - (void)toggleFullscreen
