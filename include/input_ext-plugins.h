@@ -3,7 +3,7 @@
  *                      but exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: input_ext-plugins.h,v 1.10 2001/12/12 13:48:09 massiot Exp $
+ * $Id: input_ext-plugins.h,v 1.11 2001/12/19 10:00:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -107,7 +107,7 @@ static __inline__ void input_NullPacket( input_thread_t * p_input,
         return;
     }
 
-    memset( p_pad_data->p_buffer, 0, PADDING_PACKET_SIZE );
+    memset( p_pad_data->p_payload_start, 0, PADDING_PACKET_SIZE );
     p_pad_data->b_discard_payload = 1;
     p_pes = p_es->p_pes;
 
@@ -244,22 +244,22 @@ typedef struct input_buffers_s                                              \
 } input_buffers_t;
 
 #define DECLARE_BUFFERS_SHARED( FLAGS, NB_LIFO )                            \
-typedef struct data_buffer_s                                                \
-{                                                                           \
-    int i_refcount;                                                         \
-    int i_size;                                                             \
-    struct data_buffers_s * p_next;                                         \
-    byte_t payload_start;                                                   \
-} data_buffer_t;                                                            \
-                                                                            \
 typedef struct input_buffers_s                                              \
 {                                                                           \
     vlc_mutex_t lock;                                                       \
     PACKETS_LIFO( pes_packet_t, pes )                                       \
     PACKETS_LIFO( data_packet_t, data )                                     \
-    BUFFERS_LIFO( data_buffers_t, buffers[NB_LIFO] )                        \
+    BUFFERS_LIFO( data_buffer_t, buffers[NB_LIFO] )                         \
     size_t i_allocated;                                                     \
 } input_buffers_t;
+
+typedef struct data_buffer_s
+{
+    int i_refcount;
+    unsigned int i_size;
+    struct data_buffer_s * p_next;
+    byte_t payload_start;
+} data_buffer_t;
 
 
 /*****************************************************************************
@@ -284,14 +284,80 @@ static void * input_BuffersInit( void )                                     \
 /*****************************************************************************
  * input_BuffersEnd: free all cached structures
  *****************************************************************************/
-#define DECLARE_BUFFERS_END( FLAGS, NB_LIFO )                               \
+#define BUFFERS_END_STAT_BUFFERS_LOOP( STRUCT )                             \
+    for( i = 0; i < NB_LIFO; i++ )                                          \
+    {                                                                       \
+        if( FLAGS & BUFFERS_UNIQUE_SIZE )                                   \
+        {                                                                   \
+            intf_StatMsg(                                                   \
+              "input buffers stats: " #STRUCT "[%d]: %d packets",           \
+              i, p_buffers->STRUCT[i].i_depth );                            \
+        }                                                                   \
+        else                                                                \
+        {                                                                   \
+            intf_StatMsg(                                                   \
+              "input buffers stats: " #STRUCT "[%d]: %d bytes, %d packets", \
+              i, p_buffers->STRUCT[i].i_average_size,                       \
+              p_buffers->STRUCT[i].i_depth );                               \
+        }                                                                   \
+    }
+
+#define BUFFERS_END_STAT( FLAGS, NB_LIFO )                                  \
+    BUFFERS_END_STAT_BUFFERS_LOOP( data );
+
+#define BUFFERS_END_STAT_SHARED( FLAGS, NB_LIFO )                           \
+    intf_StatMsg( "input buffers stats: data: %d packets",                  \
+                  p_buffers->data.i_depth );                                \
+    BUFFERS_END_STAT_BUFFERS_LOOP( buffers );
+
+
+#define BUFFERS_END_BUFFERS_LOOP                                            \
+    while( p_buf != NULL )                                                  \
+    {                                                                       \
+        p_next = p_buf->p_next;                                             \
+        p_buffers->i_allocated -= p_buf->i_size;                            \
+        free( p_buf );                                                      \
+        p_buf = p_next;                                                     \
+    }
+
+#define BUFFERS_END_PACKETS_LOOP                                            \
+    while( p_packet != NULL )                                               \
+    {                                                                       \
+        p_next = p_packet->p_next;                                          \
+        free( p_packet );                                                   \
+        p_packet = p_next;                                                  \
+    }
+
+#define BUFFERS_END_LOOP( FLAGS, NB_LIFO )                                  \
+    for( i = 0; i < NB_LIFO; i++ )                                          \
+    {                                                                       \
+        data_packet_t * p_next;                                             \
+        data_packet_t * p_buf = p_buffers->data[i].p_stack;                 \
+        BUFFERS_END_BUFFERS_LOOP;                                           \
+    }                                                                       \
+
+#define BUFFERS_END_LOOP_SHARED( FLAGS, NB_LIFO )                           \
+    {                                                                       \
+        /* Free data packets */                                             \
+        data_packet_t * p_next;                                             \
+        data_packet_t * p_packet = p_buffers->data.p_stack;                 \
+        BUFFERS_END_PACKETS_LOOP;                                           \
+    }                                                                       \
+                                                                            \
+    for( i = 0; i < NB_LIFO; i++ )                                          \
+    {                                                                       \
+        data_buffer_t * p_next;                                             \
+        data_buffer_t * p_buf = p_buffers->buffers[i].p_stack;              \
+        BUFFERS_END_BUFFERS_LOOP;                                           \
+    }                                                                       \
+
+#define BUFFERS_END( FLAGS, NB_LIFO, STAT_LOOP, LOOP )                      \
 static void input_BuffersEnd( void * _p_buffers )                           \
 {                                                                           \
     input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
                                                                             \
     if( _p_buffers != NULL )                                                \
     {                                                                       \
-        pes_packet_t * p_pes = p_buffers->pes.p_stack;                      \
         int i;                                                              \
                                                                             \
         if( p_main->b_stats )                                               \
@@ -299,37 +365,16 @@ static void input_BuffersEnd( void * _p_buffers )                           \
             int i;                                                          \
             intf_StatMsg( "input buffers stats: pes: %d packets",           \
                           p_buffers->pes.i_depth );                         \
-            for( i = 0; i < NB_LIFO; i++ )                                  \
-            {                                                               \
-                intf_StatMsg(                                               \
-                     "input buffers stats: data[%d]: %d bytes, %d packets", \
-                              i, p_buffers->data[i].i_average_size,         \
-                              p_buffers->data[i].i_depth );                 \
-            }                                                               \
+            STAT_LOOP( FLAGS, NB_LIFO );                                    \
         }                                                                   \
                                                                             \
-        /* Free PES */                                                      \
-        while( p_pes != NULL )                                              \
         {                                                                   \
-            pes_packet_t * p_next = p_pes->p_next;                          \
-            free( p_pes );                                                  \
-            p_pes = p_next;                                                 \
+            /* Free PES */                                                  \
+            pes_packet_t * p_next, * p_packet = p_buffers->pes.p_stack;     \
+            BUFFERS_END_PACKETS_LOOP;                                       \
         }                                                                   \
                                                                             \
-        for( i = 0; i < NB_LIFO; i++ )                                      \
-        {                                                                   \
-            data_packet_t * p_data = p_buffers->data[i].p_stack;            \
-                                                                            \
-            /* Free data packets */                                         \
-            while( p_data != NULL )                                         \
-            {                                                               \
-                data_packet_t * p_next = p_data->p_next;                    \
-                p_buffers->i_allocated -= p_data->p_buffer_end              \
-                                            - p_data->p_buffer;             \
-                free( p_data );                                             \
-                p_data = p_next;                                            \
-            }                                                               \
-        }                                                                   \
+        LOOP( FLAGS, NB_LIFO );                                             \
                                                                             \
         if( p_buffers->i_allocated )                                        \
         {                                                                   \
@@ -343,83 +388,135 @@ static void input_BuffersEnd( void * _p_buffers )                           \
     }                                                                       \
 }
 
+#define DECLARE_BUFFERS_END( FLAGS, NB_LIFO )                               \
+    BUFFERS_END( FLAGS, NB_LIFO, BUFFERS_END_STAT, BUFFERS_END_LOOP );
+
+#define DECLARE_BUFFERS_END_SHARED( FLAGS, NB_LIFO )                        \
+    BUFFERS_END( FLAGS, NB_LIFO, BUFFERS_END_STAT_SHARED,                   \
+                 BUFFERS_END_LOOP_SHARED );
+
 /*****************************************************************************
  * input_NewPacket: return a pointer to a data packet of the appropriate size
  *****************************************************************************/
-#define DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO )                         \
+#define BUFFERS_NEWPACKET_EXTRA_DECLARATION( FLAGS, NB_LIFO )               \
+    data_packet_t **    pp_data = &p_buf;
+
+#define BUFFERS_NEWPACKET_EXTRA_DECLARATION_SHARED( FLAGS, NB_LIFO )        \
+    data_packet_t *     p_data;                                             \
+    data_packet_t **    pp_data = &p_data;
+
+#define BUFFERS_NEWPACKET_EXTRA( FLAGS, NB_LIFO )
+
+#define BUFFERS_NEWPACKET_EXTRA_SHARED( FLAGS, NB_LIFO )                    \
+    /* Find a data packet */                                                \
+    if( p_buffers->data.p_stack != NULL )                                   \
+    {                                                                       \
+        p_data = p_buffers->data.p_stack;                                   \
+        p_buffers->data.p_stack = p_data->p_next;                           \
+        p_buffers->data.i_depth--;                                          \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        p_data = malloc( sizeof( data_packet_t ) );                         \
+        if( p_data == NULL )                                                \
+        {                                                                   \
+            intf_ErrMsg( "Out of memory" );                                 \
+            vlc_mutex_unlock( &p_buffers->lock );                           \
+            return( NULL );                                                 \
+        }                                                                   \
+    }                                                                       \
+                                                                            \
+    if( i_size == 0 )                                                       \
+    {                                                                       \
+        /* Warning : in that case, the data packet is left partly           \
+         * uninitialized ; theorically only input_ShareBuffer may call      \
+         * this. */                                                         \
+        p_data->p_next = NULL;                                              \
+        p_data->b_discard_payload = 0;                                      \
+        return p_data;                                                      \
+    }
+
+#define BUFFERS_NEWPACKET_END( FLAGS, NB_LIFO )
+
+#define BUFFERS_NEWPACKET_END_SHARED( FLAGS, NB_LIFO )                      \
+    /* Initialize refcount */                                               \
+    p_buf->i_refcount = 1;
+
+#define BUFFERS_NEWPACKET( FLAGS, NB_LIFO, TYPE, NAME, EXTRA_DECLARATION,   \
+                           EXTRA, END )                                     \
 static __inline__ data_packet_t * _input_NewPacket( void * _p_buffers,      \
                                                     size_t i_size )         \
 {                                                                           \
     input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
     int                 i_select;                                           \
-    data_packet_t *     p_data;                                             \
+    TYPE *              p_buf;                                              \
+    EXTRA_DECLARATION( FLAGS, NB_LIFO );                                    \
                                                                             \
     /* Safety check */                                                      \
     if( p_buffers->i_allocated > INPUT_MAX_ALLOCATION )                     \
     {                                                                       \
-        vlc_mutex_unlock( &p_buffers->lock );                               \
         intf_ErrMsg( "INPUT_MAX_ALLOCATION reached (%d)",                   \
                      p_buffers->i_allocated );                              \
         return NULL;                                                        \
     }                                                                       \
                                                                             \
+    EXTRA( FLAGS, NB_LIFO );                                                \
+                                                                            \
     for( i_select = 0; i_select < NB_LIFO - 1; i_select++ )                 \
     {                                                                       \
-        if( i_size <= (2 * p_buffers->data[i_select].i_average_size         \
-                      + p_buffers->data[i_select + 1].i_average_size) / 3 ) \
+        if( i_size <= (2 * p_buffers->NAME[i_select].i_average_size         \
+                  + p_buffers->NAME[i_select + 1].i_average_size) / 3 )     \
         {                                                                   \
             break;                                                          \
         }                                                                   \
     }                                                                       \
                                                                             \
-    if( p_buffers->data[i_select].p_stack != NULL )                         \
+    if( p_buffers->NAME[i_select].p_stack != NULL )                         \
     {                                                                       \
         /* Take the packet from the cache */                                \
-        p_data = p_buffers->data[i_select].p_stack;                         \
-        p_buffers->data[i_select].p_stack = p_data->p_next;                 \
-        p_buffers->data[i_select].i_depth--;                                \
+        p_buf = p_buffers->NAME[i_select].p_stack;                          \
+        p_buffers->NAME[i_select].p_stack = p_buf->p_next;                  \
+        p_buffers->NAME[i_select].i_depth--;                                \
                                                                             \
         /* Reallocate the packet if it is too small or too large */         \
         if( !(FLAGS & BUFFERS_UNIQUE_SIZE) &&                               \
-            (p_data->p_buffer_end - p_data->p_buffer < i_size ||            \
-             p_data->p_buffer_end - p_data->p_buffer > 3 * i_size) )        \
+            (p_buf->i_size < i_size || p_buf->i_size > 3 * i_size) )        \
         {                                                                   \
-            p_buffers->i_allocated -= p_data->p_buffer_end                  \
-                                        - p_data->p_buffer;                 \
-            p_data = realloc( p_data, sizeof( data_packet_t ) + i_size );   \
-            if( p_data == NULL )                                            \
+            p_buffers->i_allocated -= p_buf->i_size;                        \
+            p_buf = realloc( p_buf, sizeof( TYPE ) + i_size );              \
+            if( p_buf == NULL )                                             \
             {                                                               \
-                vlc_mutex_unlock( &p_buffers->lock );                       \
                 intf_ErrMsg( "Out of memory" );                             \
                 return NULL;                                                \
             }                                                               \
-            p_data->p_buffer = (byte_t *)p_data + sizeof( data_packet_t );  \
-            p_data->p_buffer_end = p_data->p_buffer + i_size;               \
+            p_buf->i_size = i_size;                                         \
             p_buffers->i_allocated += i_size;                               \
         }                                                                   \
     }                                                                       \
     else                                                                    \
     {                                                                       \
         /* Allocate a new packet */                                         \
-        p_data = malloc( sizeof( data_packet_t ) + i_size );                \
-        if( p_data == NULL )                                                \
+        p_buf = malloc( sizeof( TYPE ) + i_size );                          \
+        if( p_buf == NULL )                                                 \
         {                                                                   \
-            vlc_mutex_unlock( &p_buffers->lock );                           \
             intf_ErrMsg( "Out of memory" );                                 \
             return NULL;                                                    \
         }                                                                   \
-        p_data->p_buffer = (byte_t *)p_data + sizeof( data_packet_t );      \
-        p_data->p_buffer_end = p_data->p_buffer + i_size;                   \
+        p_buf->i_size = i_size;                                             \
         p_buffers->i_allocated += i_size;                                   \
     }                                                                       \
                                                                             \
     /* Initialize data */                                                   \
-    p_data->p_next = NULL;                                                  \
-    p_data->b_discard_payload = 0;                                          \
-    p_data->p_payload_start = p_data->p_buffer;                             \
-    p_data->p_payload_end = p_data->p_buffer + i_size;                      \
+    (*pp_data)->p_next = NULL;                                              \
+    (*pp_data)->b_discard_payload = 0;                                      \
+    (*pp_data)->p_buffer = (byte_t *)p_buf;                                 \
+    (*pp_data)->p_demux_start = (*pp_data)->p_buffer + sizeof( TYPE );      \
+    (*pp_data)->p_payload_start = (*pp_data)->p_demux_start;                \
+    (*pp_data)->p_payload_end = (*pp_data)->p_payload_start + i_size;       \
                                                                             \
-    return( p_data );                                                       \
+    END( FLAGS, NB_LIFO );                                                  \
+                                                                            \
+    return( *pp_data );                                                     \
 }                                                                           \
                                                                             \
 static data_packet_t * input_NewPacket( void * _p_buffers, size_t i_size )  \
@@ -440,46 +537,84 @@ static data_packet_t * input_NewPacket( void * _p_buffers, size_t i_size )  \
     return( p_data );                                                       \
 }
 
+#define DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO )                         \
+    BUFFERS_NEWPACKET( FLAGS, NB_LIFO, data_packet_t, data,                 \
+            BUFFERS_NEWPACKET_EXTRA_DECLARATION, BUFFERS_NEWPACKET_EXTRA,   \
+            BUFFERS_NEWPACKET_END )
+
+#define DECLARE_BUFFERS_NEWPACKET_SHARED( FLAGS, NB_LIFO )                  \
+    BUFFERS_NEWPACKET( FLAGS, NB_LIFO, data_buffer_t, buffers,              \
+            BUFFERS_NEWPACKET_EXTRA_DECLARATION_SHARED,                     \
+            BUFFERS_NEWPACKET_EXTRA_SHARED, BUFFERS_NEWPACKET_END_SHARED )
+
 /*****************************************************************************
  * input_DeletePacket: put a packet back into the cache
  *****************************************************************************/
-#define DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, DATA_CACHE_SIZE )     \
+#define BUFFERS_DELETEPACKET_EXTRA( FLAGS, NB_LIFO, DATA_CACHE_SIZE )       \
+    data_packet_t * p_buf = p_data;
+
+#define BUFFERS_DELETEPACKET_EXTRA_SHARED( FLAGS, NB_LIFO, DATA_CACHE_SIZE )\
+    data_buffer_t * p_buf = (data_buffer_t *)p_data->p_buffer;              \
+                                                                            \
+    /* Get rid of the data packet */                                        \
+    if( p_buffers->data.i_depth < DATA_CACHE_SIZE )                         \
+    {                                                                       \
+        /* Cache not full : store the packet in it */                       \
+        p_data->p_next = p_buffers->data.p_stack;                           \
+        p_buffers->data.p_stack = p_data;                                   \
+        p_buffers->data.i_depth++;                                          \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        free( p_data );                                                     \
+    }                                                                       \
+                                                                            \
+    /* Decrement refcount */                                                \
+    p_buf->i_refcount--;                                                    \
+    if( p_buf->i_refcount > 0 )                                             \
+    {                                                                       \
+        return;                                                             \
+    }
+
+#define BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, DATA_CACHE_SIZE, TYPE,        \
+                              NAME, EXTRA )                                 \
 static __inline__ void _input_DeletePacket( void * _p_buffers,              \
                                             data_packet_t * p_data )        \
 {                                                                           \
     input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
-    int                 i_select, i_size;                                   \
+    int                 i_select;                                           \
                                                                             \
-    i_size = p_data->p_buffer_end - p_data->p_buffer;                       \
+    EXTRA( FLAGS, NB_LIFO, DATA_CACHE_SIZE );                               \
+                                                                            \
     for( i_select = 0; i_select < NB_LIFO - 1; i_select++ )                 \
     {                                                                       \
-        if( i_size <= (2 * p_buffers->data[i_select].i_average_size         \
-                      + p_buffers->data[i_select + 1].i_average_size) / 3 ) \
+        if( p_buf->i_size <= (2 * p_buffers->NAME[i_select].i_average_size  \
+                      + p_buffers->NAME[i_select + 1].i_average_size) / 3 ) \
         {                                                                   \
             break;                                                          \
         }                                                                   \
     }                                                                       \
                                                                             \
-    if( p_buffers->data[i_select].i_depth < DATA_CACHE_SIZE )               \
+    if( p_buffers->NAME[i_select].i_depth < DATA_CACHE_SIZE )               \
     {                                                                       \
         /* Cache not full : store the packet in it */                       \
-        p_data->p_next = p_buffers->data[i_select].p_stack;                 \
-        p_buffers->data[i_select].p_stack = p_data;                         \
-        p_buffers->data[i_select].i_depth++;                                \
+        p_buf->p_next = p_buffers->NAME[i_select].p_stack;                  \
+        p_buffers->NAME[i_select].p_stack = p_buf;                          \
+        p_buffers->NAME[i_select].i_depth++;                                \
                                                                             \
         if( !(FLAGS & BUFFERS_UNIQUE_SIZE) )                                \
         {                                                                   \
             /* Update Bresenham mean (very approximative) */                \
-            p_buffers->data[i_select].i_average_size = ( i_size             \
-                 + p_buffers->data[i_select].i_average_size                 \
+            p_buffers->NAME[i_select].i_average_size = ( p_buf->i_size      \
+                 + p_buffers->NAME[i_select].i_average_size                 \
                    * (INPUT_BRESENHAM_NB - 1) )                             \
                  / INPUT_BRESENHAM_NB;                                      \
         }                                                                   \
     }                                                                       \
     else                                                                    \
     {                                                                       \
-        p_buffers->i_allocated -= p_data->p_buffer_end - p_data->p_buffer;  \
-        free( p_data );                                                     \
+        p_buffers->i_allocated -= p_buf->i_size;                            \
+        free( p_buf );                                                      \
     }                                                                       \
 }                                                                           \
                                                                             \
@@ -491,6 +626,15 @@ static void input_DeletePacket( void * _p_buffers, data_packet_t * p_data ) \
     _input_DeletePacket( _p_buffers, p_data );                              \
     vlc_mutex_unlock( &p_buffers->lock );                                   \
 }
+
+#define DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, DATA_CACHE_SIZE )     \
+    BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, DATA_CACHE_SIZE, data_packet_t,   \
+                          data, BUFFERS_DELETEPACKET_EXTRA )
+
+#define DECLARE_BUFFERS_DELETEPACKET_SHARED( FLAGS, NB_LIFO,                \
+                                             DATA_CACHE_SIZE )              \
+    BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, DATA_CACHE_SIZE, data_buffer_t,   \
+                          buffers, BUFFERS_DELETEPACKET_EXTRA_SHARED )
 
 /*****************************************************************************
  * input_NewPES: return a pointer to a new PES packet
@@ -536,18 +680,13 @@ static pes_packet_t * input_NewPES( void * _p_buffers )                     \
 /*****************************************************************************
  * input_DeletePES: put a pes and all data packets back into the cache
  *****************************************************************************/
-#define DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, DATA_CACHE_SIZE,         \
-                                   PES_CACHE_SIZE )                         \
+#define DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, PES_CACHE_SIZE )         \
 static void input_DeletePES( void * _p_buffers, pes_packet_t * p_pes )      \
 {                                                                           \
     input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
                                                                             \
     vlc_mutex_lock( &p_buffers->lock );                                     \
                                                                             \
-    if( !(FLAGS & BUFFERS_UNIQUE_SIZE)                                      \
-            || p_buffers->data[0].i_depth > DATA_CACHE_SIZE )               \
-          /* This is a little inaccurate but who cares if we have too many  \
-           * packets in the cache ? */                                      \
     {                                                                       \
         data_packet_t *     p_data = p_pes->p_first;                        \
         while( p_data != NULL )                                             \
@@ -556,13 +695,6 @@ static void input_DeletePES( void * _p_buffers, pes_packet_t * p_pes )      \
             _input_DeletePacket( _p_buffers, p_data );                      \
             p_data = p_next;                                                \
         }                                                                   \
-    }                                                                       \
-    else                                                                    \
-    {                                                                       \
-        /* NB_LIFO == 1 and we can keep all data packets */                 \
-        p_pes->p_last->p_next = p_buffers->data[0].p_stack;                 \
-        p_buffers->data[0].p_stack = p_pes->p_first;                        \
-        p_buffers->data[0].i_depth += p_pes->i_nb_data;                     \
     }                                                                       \
                                                                             \
     if( p_buffers->pes.i_depth < PES_CACHE_SIZE )                           \
@@ -608,13 +740,43 @@ static data_packet_t * input_BuffersToIO( void * _p_buffers,                \
             return( NULL );                                                 \
         }                                                                   \
                                                                             \
-        p_iovec[i].iov_base = p_next->p_payload_start;                      \
+        p_iovec[i].iov_base = p_next->p_demux_start;                        \
         p_iovec[i].iov_len = BUFFER_SIZE;                                   \
         p_next->p_next = p_data;                                            \
         p_data = p_next;                                                    \
     }                                                                       \
                                                                             \
-    vlc_mutex_unlock( &p_buffers->lock );                                     \
+    vlc_mutex_unlock( &p_buffers->lock );                                   \
+                                                                            \
+    return( p_data );                                                       \
+}
+
+/*****************************************************************************
+ * input_ShareBuffer: return a new data_packet to the same buffer
+ *****************************************************************************/
+#define DECLARE_BUFFERS_SHAREBUFFER( FLAGS )                                \
+static data_packet_t * input_ShareBuffer( void * _p_buffers,                \
+                                           data_packet_t * p_shared_data )  \
+{                                                                           \
+    input_buffers_t *   p_buffers = (input_buffers_t *)_p_buffers;          \
+    data_packet_t *     p_data;                                             \
+    data_buffer_t *     p_buf = (data_buffer_t *)p_shared_data->p_buffer;   \
+                                                                            \
+    vlc_mutex_lock( &p_buffers->lock );                                     \
+                                                                            \
+    /* Get new data_packet_t */                                             \
+    p_data = _input_NewPacket( _p_buffers, 0 );                             \
+                                                                            \
+    /* Finish initialization of p_data */                                   \
+    p_data->p_buffer = p_shared_data->p_buffer;                             \
+    p_data->p_demux_start = p_data->p_payload_start                         \
+                = p_shared_data->p_buffer + sizeof( data_buffer_t );        \
+    p_data->p_payload_end = p_shared_data->p_buffer + p_buf->i_size;        \
+                                                                            \
+    /* Update refcount */                                                   \
+    p_buf->i_refcount++;                                                    \
+                                                                            \
+    vlc_mutex_unlock( &p_buffers->lock );                                   \
                                                                             \
     return( p_data );                                                       \
 }

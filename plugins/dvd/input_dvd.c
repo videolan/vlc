@@ -4,13 +4,12 @@
  * This plugins should handle all the known specificities of the DVD format,
  * especially the 2048 bytes logical block size.
  * It depends on:
- *  -input_netlist used to read packets
  *  -libdvdcss for access and unscrambling
  *  -dvd_ifo for ifo parsing and analyse
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.106 2001/12/10 04:53:10 sam Exp $
+ * $Id: input_dvd.c,v 1.107 2001/12/19 10:00:00 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -95,9 +94,6 @@
 #define DVD_BLOCK_READ_ONCE 64
 #define DVD_DATA_READ_ONCE  (4 * DVD_BLOCK_READ_ONCE)
 
-/* Size of netlist */
-#define DVD_NETLIST_SIZE    256
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -120,6 +116,21 @@ static int  DVDFindSector( thread_dvd_data_t * );
 static int  DVDChapterSelect( thread_dvd_data_t *, int );
 
 /*****************************************************************************
+ * Declare a buffer manager
+ *****************************************************************************/
+#define FLAGS           BUFFERS_UNIQUE_SIZE
+#define NB_LIFO         1
+DECLARE_BUFFERS_SHARED( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_INIT( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_END_SHARED( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_NEWPACKET_SHARED( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPACKET_SHARED( FLAGS, NB_LIFO, 150 );
+DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
+DECLARE_BUFFERS_TOIO( FLAGS, DVD_LB_SIZE );
+DECLARE_BUFFERS_SHAREBUFFER( FLAGS );
+
+/*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
@@ -136,10 +147,10 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_set_area         = DVDSetArea;
     input.pf_set_program      = DVDSetProgram;
     input.pf_demux            = input_DemuxPS;
-    input.pf_new_packet       = input_NetlistNewPacket;
-    input.pf_new_pes          = input_NetlistNewPES;
-    input.pf_delete_packet    = input_NetlistDeletePacket;
-    input.pf_delete_pes       = input_NetlistDeletePES;
+    input.pf_new_packet       = input_NewPacket;
+    input.pf_new_pes          = input_NewPES;
+    input.pf_delete_packet    = input_DeletePacket;
+    input.pf_delete_pes       = input_DeletePES;
     input.pf_rewind           = DVDRewind;
     input.pf_seek             = DVDSeek;
 #undef input
@@ -194,7 +205,12 @@ static void DVDInit( input_thread_t * p_input )
     }
 
     p_input->p_plugin_data = (void *)p_dvd;
-    p_input->p_method_data = NULL;
+
+    if( (p_input->p_method_data = input_BuffersInit()) == NULL )
+    {
+        p_input->b_error = 1;
+        return;
+    }
 
     p_dvd->dvdhandle = (dvdcss_handle) p_input->p_handle;
 
@@ -210,11 +226,6 @@ static void DVDInit( input_thread_t * p_input )
     p_dvd->i_block_once = DVD_BLOCK_READ_ONCE;
     /* this value mustn't be modifed */
     p_input->i_read_once = DVD_DATA_READ_ONCE;
-
-    /* Reading structures initialisation */
-    input_NetlistInit( p_input, DVD_NETLIST_SIZE, 2 * DVD_NETLIST_SIZE,
-                       DVD_NETLIST_SIZE, DVD_LB_SIZE, p_dvd->i_block_once );
-    intf_WarnMsg( 2, "dvd info: netlist initialized" );
 
     /* Ifo allocation & initialisation */
     if( IfoCreate( p_dvd ) < 0 )
@@ -385,7 +396,7 @@ static void DVDEnd( input_thread_t * p_input )
 
     free( p_dvd );
 
-    input_NetlistEnd( p_input );
+    input_BuffersEnd( p_input->p_method_data );
 }
 
 /*****************************************************************************
@@ -829,9 +840,7 @@ static int DVDRead( input_thread_t * p_input,
                     data_packet_t ** pp_packets )
 {
     thread_dvd_data_t *     p_dvd;
-    netlist_t *             p_netlist;
-    struct iovec *          p_vec;
-    struct data_packet_s *  pp_data[DVD_DATA_READ_ONCE];
+    struct iovec            p_vec[DVD_DATA_READ_ONCE];
     u8 *                    pi_cur;
     int                     i_block_once;
     int                     i_packet_size;
@@ -843,9 +852,9 @@ static int DVDRead( input_thread_t * p_input,
     boolean_t               b_eof;
     boolean_t               b_eot;
     boolean_t               b_eoc;
+    data_packet_t *         p_data;
 
     p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
-    p_netlist = (netlist_t *)p_input->p_method_data;
 
     b_eoc = 0;
     i_sector = p_dvd->i_title_start + p_dvd->i_sector;
@@ -909,22 +918,19 @@ static int DVDRead( input_thread_t * p_input,
 /*
 intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_once, p_dvd->i_chapter );
 */
-    p_netlist->i_read_once = i_block_once;
 
-    /* Get an iovec pointer */
-    if( ( p_vec = input_NetlistGetiovec( p_netlist ) ) == NULL )
+    /* Get iovecs */
+    p_data = input_BuffersToIO( p_input->p_method_data, p_vec,
+                                DVD_DATA_READ_ONCE );
+
+    if ( p_data == NULL )
     {
-        intf_ErrMsg( "dvd error: can't get iovec" );
-        return -1;
+        return( -1 );
     }
 
     /* Reads from DVD */
     i_read_blocks = dvdcss_readv( p_dvd->dvdhandle, p_vec,
                                   i_block_once, DVDCSS_READ_DECRYPT );
-
-    /* Update netlist indexes: we don't do it in DVDGetiovec since we
-     * need know the real number of blocks read */
-    input_NetlistMviovec( p_netlist, i_read_blocks, pp_data );
 
     /* Update global position */
     p_dvd->i_sector += i_read_blocks;
@@ -934,9 +940,10 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
     /* Read headers to compute payload length */
     for( i_iovec = 0 ; i_iovec < i_read_blocks ; i_iovec++ )
     {
+        data_packet_t * p_current = p_data;
         i_pos = 0;
 
-        while( i_pos < p_netlist->i_buffer_size )
+        while( i_pos < DVD_LB_SIZE )
         {
             pi_cur = (u8*)p_vec[i_iovec].iov_base + i_pos;
 
@@ -945,21 +952,26 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
             {
                 /* That's the case for all packets, except pack header. */
                 i_packet_size = U16_AT( pi_cur + 4 );
-                pp_packets[i_packet] = input_NetlistNewPtr( p_netlist );
-                (*pp_data[i_iovec]->pi_refcount)++;
-                pp_packets[i_packet]->pi_refcount =
-                    pp_data[i_iovec]->pi_refcount;
-                pp_packets[i_packet]->p_buffer = pp_data[i_iovec]->p_buffer;
             }
             else
             {
                 /* MPEG-2 Pack header. */
                 i_packet_size = 8;
-                pp_packets[i_packet] = pp_data[i_iovec];
+            }
+            if( i_pos != 0 )
+            {
+                pp_packets[i_packet] = input_ShareBuffer( 
+                        p_input->p_method_data, p_current );
+            }
+            else
+            {
+                pp_packets[i_packet] = p_data;
+                p_data = p_data->p_next;
             }
 
             pp_packets[i_packet]->p_payload_start =
-                    pp_packets[i_packet]->p_buffer + i_pos;
+                    pp_packets[i_packet]->p_demux_start =
+                    pp_packets[i_packet]->p_demux_start + i_pos;
 
             pp_packets[i_packet]->p_payload_end =
                     pp_packets[i_packet]->p_payload_start + i_packet_size + 6;
@@ -970,6 +982,13 @@ intf_WarnMsg( 2, "Sector: 0x%x Read: %d Chapter: %d", p_dvd->i_sector, i_block_o
     }
 
     pp_packets[i_packet] = NULL;
+
+    while( p_data != NULL )
+    {
+        data_packet_t * p_next = p_data->p_next;
+        p_input->pf_delete_packet( p_input->p_method_data, p_data );
+        p_data = p_next;
+    }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 

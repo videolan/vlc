@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.5 2001/12/13 17:58:16 jobi Exp $
+ * $Id: input_es.c,v 1.6 2001/12/19 10:00:00 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,7 +99,7 @@ DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 150 );
 DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150, 150 );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
 DECLARE_BUFFERS_TOIO( FLAGS, ES_PACKET_SIZE );
 
 /*****************************************************************************
@@ -204,7 +204,7 @@ static int ESRead( input_thread_t * p_input,
 
     if ( p_data == NULL )
     {
-        return( -1 ); /* empty netlist */
+        return( -1 );
     }
 
     memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
@@ -216,7 +216,7 @@ static int ESRead( input_thread_t * p_input,
         return( -1 );
     }
 
-    for( i_loop=0; i_loop * ES_PACKET_SIZE < i_read; i_loop++ )
+    for( i_loop = 0; i_loop * ES_PACKET_SIZE < i_read; i_loop++ )
     {
         pp_packets[i_loop] = p_data;
         p_data = p_data->p_next;

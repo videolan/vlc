@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.75 2001/12/17 16:42:27 sam Exp $
+ * $Id: mpeg_system.c,v 1.76 2001/12/19 10:00:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -508,13 +508,13 @@ static u16 GetID( data_packet_t * p_data )
 {
     u16         i_id;
 
-    i_id = p_data->p_payload_start[3];                                 /* stream_id */
+    i_id = p_data->p_demux_start[3];                            /* stream_id */
     if( i_id == 0xBD )
     {
         /* FIXME : this is not valid if the header is split in multiple
          * packets */
         /* stream_private_id */
-        i_id |= p_data->p_payload_start[ 9 + p_data->p_payload_start[8] ] << 8;
+        i_id |= p_data->p_demux_start[ 9 + p_data->p_demux_start[8] ] << 8;
     }
     return( i_id );
 }
@@ -533,14 +533,14 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     int                 i;
     int                 i_new_es_number = 0;
 
-    if( p_data->p_payload_start + 10 > p_data->p_payload_end )
+    if( p_data->p_demux_start + 10 > p_data->p_payload_end )
     {
         intf_ErrMsg( "input error: PSM too short : packet corrupt" );
         return;
     }
 
     if( p_demux->b_has_PSM
-        && p_demux->i_PSM_version == (p_data->p_payload_start[6] & 0x1F) )
+        && p_demux->i_PSM_version == (p_data->p_demux_start[6] & 0x1F) )
     {
         /* Already got that one. */
         return;
@@ -548,12 +548,12 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
 
     intf_DbgMsg( "input: building PSM" );
     p_demux->b_has_PSM = 1;
-    p_demux->i_PSM_version = p_data->p_payload_start[6] & 0x1F;
+    p_demux->i_PSM_version = p_data->p_demux_start[6] & 0x1F;
 
     /* Go to elementary_stream_map_length, jumping over
      * program_stream_info. */
-    p_byte = p_data->p_payload_start + 10
-              + U16_AT(&p_data->p_payload_start[8]);
+    p_byte = p_data->p_demux_start + 10
+              + U16_AT(&p_data->p_demux_start[8]);
     if( p_byte > p_data->p_payload_end )
     {
         intf_ErrMsg( "input error: PSM too short, packet corrupt" );
@@ -658,7 +658,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
     u32                 i_code;
     es_descriptor_t *   p_es = NULL;
 
-    i_code = p_data->p_payload_start[3];
+    i_code = p_data->p_demux_start[3];
 
     if( i_code > 0xBC ) /* ES start code */
     {
@@ -697,7 +697,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                                     i_id, 0 );
                 if( p_es != NULL )
                 {
-                    p_es->i_stream_id = p_data->p_payload_start[3];
+                    p_es->i_stream_id = p_data->p_demux_start[3];
 
                     /* Set stream type and auto-spawn. */
                     if( (i_id & 0xF0) == 0xE0 )
@@ -797,10 +797,10 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
     boolean_t           b_trash = 0;
     es_descriptor_t *   p_es = NULL;
 
-    i_code = ((u32)p_data->p_payload_start[0] << 24)
-                | ((u32)p_data->p_payload_start[1] << 16)
-                | ((u32)p_data->p_payload_start[2] << 8)
-                | p_data->p_payload_start[3];
+    i_code = ((u32)p_data->p_demux_start[0] << 24)
+                | ((u32)p_data->p_demux_start[1] << 16)
+                | ((u32)p_data->p_demux_start[2] << 8)
+                | p_data->p_demux_start[3];
     if( i_code <= 0x1BC )
     {
         switch( i_code )
@@ -811,12 +811,12 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                 mtime_t         scr_time;
                 u32             i_mux_rate;
 
-                if( (p_data->p_payload_start[4] & 0xC0) == 0x40 )
+                if( (p_data->p_demux_start[4] & 0xC0) == 0x40 )
                 {
                     /* MPEG-2 */
                     byte_t      p_header[14];
                     byte_t *    p_byte;
-                    p_byte = p_data->p_payload_start;
+                    p_byte = p_data->p_demux_start;
 
                     if( MoveChunk( p_header, &p_data, &p_byte, 14 ) != 14 )
                     {
@@ -848,7 +848,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     /* MPEG-1 SCR is like PTS. */
                     byte_t      p_header[12];
                     byte_t *    p_byte;
-                    p_byte = p_data->p_payload_start;
+                    p_byte = p_data->p_demux_start;
 
                     if( MoveChunk( p_header, &p_data, &p_byte, 12 ) != 12 )
                     {
@@ -951,7 +951,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
     es_ts_data_t *      p_es_demux = NULL;
     pgrm_ts_data_t *    p_pgrm_demux = NULL;
 
-#define p (p_data->p_buffer)
+#define p (p_data->p_demux_start)
     /* Extract flags values from TS common header. */
     i_pid = ((p[1] & 0x1F) << 8) | p[2];
     b_unit_start = (p[1] & 0x40);

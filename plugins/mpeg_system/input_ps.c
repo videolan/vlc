@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.5 2001/12/19 03:50:22 sam Exp $
+ * $Id: input_ps.c,v 1.6 2001/12/19 10:00:00 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -103,7 +103,7 @@ DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 150 );
 DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150, 150 );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
 
 
 /*****************************************************************************
@@ -482,11 +482,11 @@ static int PSRead( input_thread_t * p_input,
         if( U32_AT(p_header) != 0x1B9 )
         {
             /* Copy the header we already read. */
-            memcpy( p_data->p_buffer, p_header, 6 );
+            memcpy( p_data->p_demux_start, p_header, 6 );
 
             /* Read the remaining of the packet. */
             if( i_packet_size && (i_error =
-                    SafeRead( p_input, p_data->p_buffer + 6, i_packet_size )) )
+                    SafeRead( p_input, p_data->p_demux_start + 6, i_packet_size )) )
             {
                 return( i_error );
             }
@@ -494,12 +494,12 @@ static int PSRead( input_thread_t * p_input,
             /* In MPEG-2 pack headers we still have to read stuffing bytes. */
             if( U32_AT(p_header) == 0x1BA )
             {
-                if( i_packet_size == 8 && (p_data->p_buffer[13] & 0x7) != 0 )
+                if( i_packet_size == 8 && (p_data->p_demux_start[13] & 0x7) != 0 )
                 {
                     /* MPEG-2 stuffing bytes */
                     byte_t      p_garbage[8];
                     if( (i_error = SafeRead( p_input, p_garbage,
-                                             p_data->p_buffer[13] & 0x7)) )
+                                             p_data->p_demux_start[13] & 0x7)) )
                     {
                         return( i_error );
                     }
@@ -509,7 +509,7 @@ static int PSRead( input_thread_t * p_input,
         else
         {
             /* Copy the small header. */
-            memcpy( p_data->p_buffer, p_header, 4 );
+            memcpy( p_data->p_demux_start, p_header, 4 );
         }
 
         /* Give the packet to the other input stages. */

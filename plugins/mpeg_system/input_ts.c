@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ts.c,v 1.4 2001/12/12 17:41:15 massiot Exp $
+ * $Id: input_ts.c,v 1.5 2001/12/19 10:00:00 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -102,7 +102,7 @@ DECLARE_BUFFERS_END( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_NEWPACKET( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_DELETEPACKET( FLAGS, NB_LIFO, 1000 );
 DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
-DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 1000, 150 );
+DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 150 );
 DECLARE_BUFFERS_TOIO( FLAGS, TS_PACKET_SIZE );
 
 /*****************************************************************************
@@ -326,10 +326,10 @@ static int TSRead( input_thread_t * p_input,
             p_data = p_data->p_next;
             pp_packets[i_loop]->p_next = NULL;
 
-            if( pp_packets[i_loop]->p_buffer[0] != 0x47 )
+            if( pp_packets[i_loop]->p_demux_start[0] != 0x47 )
                 intf_ErrMsg( "input error: bad TS packet (starts with "
                              "0x%.2x, should be 0x47)",
-                             pp_packets[i_loop]->p_buffer[0] );
+                             pp_packets[i_loop]->p_demux_start[0] );
         }
         for( ; i_loop < INPUT_READ_ONCE ; i_loop++ )
         {
