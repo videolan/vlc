@@ -2,7 +2,7 @@
  * filter.c : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filter.cpp,v 1.12 2004/01/28 16:46:52 gbazin Exp $
+ * $Id: filter.cpp,v 1.13 2004/02/16 13:33:10 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -31,6 +31,11 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 #include <vlc/vout.h>
+
+#ifndef _MSC_VER
+    /* Work-around a bug in w32api-2.5 */
+#   define QACONTAINERFLAGS QACONTAINERFLAGS_SOMETHINGELSE
+#endif
 
 #include "filter.h"
 
@@ -294,10 +299,10 @@ STDMETHODIMP CapturePin::Disconnect()
     msg_Dbg( p_input, "CapturePin::Disconnect" );
 #endif
 
+#if 0 // FIXME: This does seem to create crashes sometimes
     VLCMediaSample vlc_sample;
     access_sys_t *p_sys = p_input->p_access_data;
 
-#if 0 // FIXME: This does seem to create crashes sometimes
     vlc_mutex_lock( &p_sys->lock );
     while( samples_queue.size() )
     {
