@@ -3,10 +3,10 @@
  * (c)1999 VideoLAN
  ******************************************************************************
  * Required headers:
- * - <pthread.h>                                                  ( pthread_t )
  * - <sys/soundcard.h>                                       ( audio_buf_info )
  * - "common.h"                                                   ( boolean_t )
  * - "mtime.h"                                                      ( mtime_t )
+ * - "vlc_thread.h"                                            ( vlc_thread_t )
  ******************************************************************************/
 
 /* TODO :
@@ -131,8 +131,8 @@ typedef struct
     boolean_t           b_stereo;
     long                l_rate;
 
-    pthread_mutex_t     data_lock;
-    pthread_cond_t      data_wait;
+    vlc_mutex_t         data_lock;
+    vlc_cond_t          data_wait;
 
     void *              buffer;
     mtime_t *           date;
@@ -169,12 +169,12 @@ typedef struct
  ******************************************************************************/
 typedef struct aout_thread_s
 {
-    pthread_t           thread_id;
+    vlc_thread_t        thread_id;
     boolean_t           b_die;
 
     aout_dsp_t          dsp;
 
-    pthread_mutex_t     fifos_lock;
+    vlc_mutex_t         fifos_lock;
     aout_fifo_t         fifo[ AOUT_MAX_FIFOS ];
 
     void *              buffer;

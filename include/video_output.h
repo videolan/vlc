@@ -7,10 +7,10 @@
  * thread, and destroy a previously oppenned video output thread.
  *******************************************************************************
  * Requires:
- *  <pthread.h>
  *  "config.h"
  *  "common.h"
  *  "mtime.h"
+ *  "vlc_thread.h"
  *  "video.h"
  *******************************************************************************/
 
@@ -65,9 +65,9 @@ typedef struct vout_thread_s
     boolean_t           b_die;                                   /* `die' flag */
     boolean_t           b_error;                               /* `error' flag */
     boolean_t           b_active;                             /* `active' flag */
-    pthread_t           thread_id;                 /* id for pthread functions */
-    pthread_mutex_t     streams_lock;             /* streams modification lock */
-    pthread_mutex_t     pictures_lock;           /* pictures modification lock */
+    vlc_thread_t        thread_id;                  /* id for thread functions */
+    vlc_mutex_t         streams_lock;             /* streams modification lock */
+    vlc_mutex_t         pictures_lock;           /* pictures modification lock */
     int *               pi_status;                    /* temporary status flag */
 
     /* Common display properties */

@@ -6,13 +6,13 @@
  * interface, such as message output.
  ******************************************************************************
  * Required headers:
- *  <pthread.h>
  *  <sys/uio.h>
  *  <X11/Xlib.h>
  *  <X11/extensions/XShm.h>
  *  "config.h"
  *  "common.h"
  *  "mtime.h"
+ *  "vlc_thread.h"
  *  "input.h"
  *  "video.h"
  *  "video_output.h"

@@ -36,7 +36,7 @@ static __inline__ void input_NetlistFreePES( input_thread_t *p_input,
     ASSERT(p_pes_packet);
 
     /* We will be playing with indexes, so we take a lock. */
-    pthread_mutex_lock( &p_input->netlist.lock );
+    vlc_mutex_lock( &p_input->netlist.lock );
 
     /* Free all TS packets in this PES structure. */
     p_ts_packet = p_pes_packet->p_first_ts;
@@ -67,7 +67,7 @@ static __inline__ void input_NetlistFreePES( input_thread_t *p_input,
     p_input->netlist.i_pes_end &= INPUT_MAX_PES; /* loop */
 #endif
 
-    pthread_mutex_unlock( &p_input->netlist.lock );
+    vlc_mutex_unlock( &p_input->netlist.lock );
 }
 
 /*******************************************************************************
@@ -83,7 +83,7 @@ static __inline__ void input_NetlistFreeTS( input_thread_t *p_input,
     ASSERT(p_ts_packet);
 
     /* We will be playing with indexes, so we take a lock. */
-    pthread_mutex_lock( &p_input->netlist.lock );
+    vlc_mutex_lock( &p_input->netlist.lock );
 
     /* Free the TS structure. */
 #ifdef INPUT_LIFO_TS_NETLIST
@@ -95,7 +95,7 @@ static __inline__ void input_NetlistFreeTS( input_thread_t *p_input,
     p_input->netlist.i_ts_end &= INPUT_MAX_TS; /* loop */
 #endif
 
-    pthread_mutex_unlock( &p_input->netlist.lock );
+    vlc_mutex_unlock( &p_input->netlist.lock );
 }
 
 /*******************************************************************************
@@ -112,7 +112,7 @@ static __inline__ pes_packet_t* input_NetlistGetPES( input_thread_t *p_input )
 #ifdef INPUT_LIFO_PES_NETLIST
     /* i_pes_index might be accessed by a decoder thread to give back a 
      * packet. */
-    pthread_mutex_lock( &p_input->netlist.lock );
+    vlc_mutex_lock( &p_input->netlist.lock );
 
     /* Verify that we still have PES packet in the netlist */
     if( (INPUT_MAX_PES - p_input->netlist.i_pes_index ) <= 1 )
@@ -124,7 +124,7 @@ static __inline__ pes_packet_t* input_NetlistGetPES( input_thread_t *p_input )
     /* Fetch a new PES packet */
     p_pes_packet = p_input->netlist.p_pes_free[p_input->netlist.i_pes_index];
     p_input->netlist.i_pes_index++;
-    pthread_mutex_unlock( &p_input->netlist.lock );
+    vlc_mutex_unlock( &p_input->netlist.lock );
 
 #else /* FIFO */
     /* No need to lock, since we are the only ones accessing i_pes_start. */

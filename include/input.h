@@ -207,7 +207,7 @@ typedef struct
 
 typedef struct pcr_descriptor_struct
 {
-    pthread_mutex_t         lock;                     /* pcr modification lock */
+    vlc_mutex_t             lock;                     /* pcr modification lock */
 
     mtime_t                 delta_clock;
     mtime_t                 delta_decode;
@@ -268,7 +268,7 @@ typedef struct
  *******************************************************************************/
 typedef struct
 {
-    pthread_mutex_t         lock;                  /* netlist modification lock */
+    vlc_mutex_t             lock;                  /* netlist modification lock */
     struct iovec            p_ts_free[INPUT_MAX_TS + INPUT_TS_READ_ONCE];
                                              /* FIFO or LIFO of free TS packets */
     ts_packet_t *           p_ts_packets;
@@ -317,9 +317,9 @@ typedef struct input_thread_struct
     /* Thread properties and locks */
     boolean_t               b_die;                               /* 'die' flag */
     boolean_t               b_error;                               /* deadlock */
-    pthread_t               thread_id;             /* id for pthread functions */
-    pthread_mutex_t         programs_lock;       /* programs modification lock */
-    pthread_mutex_t         es_lock;                   /* es modification lock */
+    vlc_thread_t            thread_id;              /* id for thread functions */
+    vlc_mutex_t             programs_lock;       /* programs modification lock */
+    vlc_mutex_t             es_lock;                   /* es modification lock */
 
     /* Input method description */
     int                     i_method;                          /* input method */

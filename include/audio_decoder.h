@@ -5,8 +5,8 @@
  * = Prototyped functions are implemented in audio_decoder/audio_decoder.c
  *
  * = Required headers :
- *   - <pthread.h>                                                ( pthread_t )
  *   - "common.h"                                    ( u32, byte_t, boolean_t )
+ *   - "vlc_thread.h"                                          ( vlc_thread_t )
  *   - "input.h"                                ( ts_packet_t, input_thread_t )
  *   - "decoder_fifo.h"                                      ( decoder_fifo_t )
  *   - "audio_output.h"                          ( aout_fifo_t, aout_thread_t )
@@ -48,7 +48,7 @@ typedef struct adec_thread_s
     /*
      * Thread properties
      */
-    pthread_t           thread_id;                /* id for pthread functions */
+    vlc_thread_t        thread_id;                 /* id for thread functions */
     boolean_t           b_die;                                  /* `die' flag */
     boolean_t           b_error;                              /* `error' flag */
 

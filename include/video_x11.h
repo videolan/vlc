@@ -6,7 +6,6 @@
  * not be needed by any other module than video_output.c.
  *******************************************************************************
  * Required headers:
- * <pthread.h>
  * <X11/Xlib.h>
  * <X11/Xutil.h>
  * <X11/extensions/XShm.h>

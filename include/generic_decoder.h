@@ -3,10 +3,10 @@
  * (c)1999 VideoLAN
  *******************************************************************************
  * Requires:
- *  <pthread.h>
  *  "config.h"
  *  "common.h"
  *  "mtime.h"
+ *  "vlc_thread.h"
  *  "input.h"
  *  "decoder_fifo.h"
  * ??
@@ -41,7 +41,7 @@ typedef struct gdec_thread_s
     boolean_t           b_die;                                   /* `die' flag */
     boolean_t           b_error;                               /* `error' flag */
     boolean_t           b_active;                             /* `active' flag */
-    pthread_t           thread_id;                 /* id for pthread functions */
+    vlc_thread_t        thread_id;                  /* id for thread functions */
 
     /* Thread configuration */
     int                 i_actions;                          /* decoder actions */

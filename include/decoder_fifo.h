@@ -3,9 +3,9 @@
  * (c)1999 VideoLAN
  ******************************************************************************
  * Required headers:
- * - <pthread.h>
  * - "config.h"
  * - "common.h"
+ * - "vlc_thread.h"
  * - "input.h"
  ******************************************************************************/
 
@@ -31,8 +31,8 @@
  ******************************************************************************/
 typedef struct
 {
-    pthread_mutex_t     data_lock;                          /* fifo data lock */
-    pthread_cond_t      data_wait;          /* fifo data conditional variable */
+    vlc_mutex_t         data_lock;                          /* fifo data lock */
+    vlc_cond_t          data_wait;          /* fifo data conditional variable */
 
     /* buffer is an array of PES packets pointers */
     pes_packet_t *      buffer[FIFO_SIZE + 1];
@@ -120,7 +120,7 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
                 /* We are going to read/write the start and end indexes of the
                  * decoder fifo and to use the fifo's conditional variable,
                  * that's why we need to take the lock before */
-                pthread_mutex_lock( &p_bit_stream->p_decoder_fifo->data_lock );
+                vlc_mutex_lock( &p_bit_stream->p_decoder_fifo->data_lock );
                 /* We should increase the start index of the decoder fifo, but
                  * if we do this now, the input thread could overwrite the
                  * pointer to the current PES packet, and we weren't able to
@@ -131,11 +131,11 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
 
                 while ( DECODER_FIFO_ISEMPTY(*p_bit_stream->p_decoder_fifo) )
                 {
-                    pthread_cond_wait( &p_bit_stream->p_decoder_fifo->data_wait,
+                    vlc_cond_wait( &p_bit_stream->p_decoder_fifo->data_wait,
                                        &p_bit_stream->p_decoder_fifo->data_lock );
                     if ( p_bit_stream->p_input->b_die )
                     {
-                        pthread_mutex_unlock( &(p_bit_stream->p_decoder_fifo->data_lock) );
+                        vlc_mutex_unlock( &(p_bit_stream->p_decoder_fifo->data_lock) );
                         return( 0 );
                     }
                 }
@@ -144,7 +144,7 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
                 p_bit_stream->p_ts = DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->p_first_ts;
 
                 /* We can release the fifo's data lock */
-                pthread_mutex_unlock( &p_bit_stream->p_decoder_fifo->data_lock );
+                vlc_mutex_unlock( &p_bit_stream->p_decoder_fifo->data_lock );
             }
             /* Perhaps the next TS packet of the current PES packet contains
              * real data (ie its payload's size is greater than 0) */

@@ -12,7 +12,6 @@
  *******************************************************************************/
 
 /* System headers */
-#include <pthread.h>
 #include <netinet/in.h>
 #include <sys/soundcard.h>
 #include <sys/uio.h>
@@ -23,6 +22,7 @@
 #include "config.h"
 #include "common.h"
 #include "mtime.h"
+#include "vlc_thread.h"
 
 /* Input */
 #include "input.h"

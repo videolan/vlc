@@ -10,9 +10,9 @@
  * If INTF_MSG_QUEUE is not defined, output is directly performed on stderr.
  *******************************************************************************
  * required headers:
- *  <pthread.h>
- *  config.h
- *  mtime.h
+ * "config.h"
+ * "mtime.h"
+ * "vlc_thread.h"
  *******************************************************************************/
 
 /*******************************************************************************
@@ -53,7 +53,7 @@ typedef struct
 {
 #ifdef INTF_MSG_QUEUE
     /* Message queue */
-    pthread_mutex_t         lock;                        /* message queue lock */
+    vlc_mutex_t             lock;                        /* message queue lock */
     int                     i_count;              /* number of messages stored */
     interface_msg_message_t msg[INTF_MSG_QSIZE];              /* message queue */
 #endif

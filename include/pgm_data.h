@@ -6,7 +6,6 @@
  * only be used by interface.
  *******************************************************************************
  * Required headers:
- *  <pthread.h>
  *  <netinet/in.h>
  *  <sys/soundcard.h>
  *  <sys/uio.h>
@@ -15,6 +14,7 @@
  *  "config.h"
  *  "common.h"
  *  "mtime.h"
+ *  "vlc_thread.h"
  *  "input.h"
  *  "input_vlan.h"
  *  "audio_output.h"

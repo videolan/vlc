@@ -4,10 +4,10 @@
  *******************************************************************************
  *******************************************************************************
  * Requires:
- *  <pthread.h>
  *  "config.h"
  *  "common.h"
  *  "mtime.h"
+ *  "vlc_thread.h"
  *  "input.h"
  *  "video.h"
  *  "video_output.h"
@@ -26,7 +26,7 @@ typedef struct vdec_thread_s
     boolean_t           b_run;                                   /* `run' flag */
     boolean_t           b_error;                               /* `error' flag */
     boolean_t           b_active;                             /* `active' flag */
-    pthread_t           thread_id;                 /* id for pthread functions */
+    vlc_thread_t        thread_id;                  /* id for thread functions */
 
     /* Thread configuration */
     /* ?? */
