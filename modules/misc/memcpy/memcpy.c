@@ -2,7 +2,7 @@
  * memcpy.c : classic memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpy.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: memcpy.c,v 1.2 2002/08/09 16:39:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -64,8 +64,10 @@ static int Activate ( vlc_object_t *p_this )
 {
 #ifdef MODULE_NAME_IS_memcpy
     p_this->p_vlc->pf_memcpy = memcpy;
+    p_this->p_vlc->pf_memset = memset;
 #else
     p_this->p_vlc->pf_memcpy = fast_memcpy;
+    p_this->p_vlc->pf_memset = NULL;
 #endif
 
     return VLC_SUCCESS;

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.23 2002/08/08 22:28:23 sam Exp $
+ * $Id: libvlc.c,v 1.24 2002/08/09 16:39:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -455,10 +455,14 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
      */
     p_vlc->p_memcpy_module = module_Need( p_vlc, "memcpy", "$memcpy" );
 
-    if( p_vlc->p_memcpy_module == NULL )
+    if( p_vlc->pf_memcpy == NULL )
     {
-        msg_Warn( p_vlc, "no suitable memcpy module, using libc default" );
         p_vlc->pf_memcpy = memcpy;
+    }
+
+    if( p_vlc->pf_memset == NULL )
+    {
+        p_vlc->pf_memset = memset;
     }
 
     /*
