@@ -2,7 +2,7 @@
  * duplicate.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: duplicate.c,v 1.3 2003/09/20 23:46:01 gbazin Exp $
+ * $Id: duplicate.c,v 1.4 2003/09/21 11:48:58 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -138,7 +138,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t  *id;
-    int               i_stream;
+    int i_stream, i_valid_streams = 0;
 
     id = malloc( sizeof( sout_stream_id_t ) );
     id->i_nb_ids = 0;
@@ -151,15 +151,16 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, sout_format_t *p_fmt )
         /* XXX not the same sout_stream_id_t definition ... */
         id_new = (void*)p_sys->pp_streams[i_stream]->pf_add(
                             p_sys->pp_streams[i_stream], p_fmt );
-        if( id_new )
-        {
-            TAB_APPEND( id->i_nb_ids, id->pp_ids, id_new );
-        }
+
+        /* Append failed attempts as well to keep track of which pp_id
+	 * belong to which duplicated stream */
+        TAB_APPEND( id->i_nb_ids, id->pp_ids, id_new );
+        if( id_new ) i_valid_streams++;
     }
 
-    if( id->i_nb_ids <= 0 )
+    if( i_valid_streams <= 0 )
     {
-        free( id );
+        Del( p_stream, id );
         return NULL;
     }
 
@@ -173,7 +174,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     for( i_stream = 0; i_stream < p_sys->i_nb_streams; i_stream++ )
     {
-        if( id->i_nb_ids > i_stream && id->pp_ids[i_stream] )
+        if( id->pp_ids[i_stream] )
         {
             p_sys->pp_streams[i_stream]->pf_del( p_sys->pp_streams[i_stream],
                                                  id->pp_ids[i_stream] );
@@ -195,7 +196,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     {
         sout_buffer_t *p_dup;
 
-        if( id->i_nb_ids > i_stream && id->pp_ids[i_stream] )
+        if( id->pp_ids[i_stream] )
         {
             p_dup = sout_BufferDuplicate( p_stream->p_sout, p_buffer );
 
@@ -206,11 +207,15 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
 
     i_stream = p_sys->i_nb_streams - 1;
-    if( id->i_nb_ids > i_stream && id->pp_ids[i_stream] )
+    if( id->pp_ids[i_stream] )
     {
         p_sys->pp_streams[i_stream]->pf_send( p_sys->pp_streams[i_stream],
                                               id->pp_ids[i_stream],
                                               p_buffer);
+    }
+    else
+    {
+        sout_BufferDelete( p_stream->p_sout, p_buffer );
     }
 
     return VLC_SUCCESS;
