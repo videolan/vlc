@@ -10,6 +10,7 @@ EXTRA_DIST = \
 	vlc.dirs \
 	vlc.docs \
 	vlc.menu \
+	vlc.mime \
 	gnome-vlc.desktop \
 	gnome-vlc.dirs \
 	gvlc.desktop \
@@ -28,6 +29,5 @@ EXTRA_DIST = \
 	wxvlc.dirs \
 	wxvlc.menu \
 	patches/00list \
-	patches/20_ffmpeg.dpatch \
 	patches/20_interfaces.dpatch \
 	$(NULL)
