@@ -56,6 +56,7 @@
 #include "ebml/EbmlStream.h"
 #include "ebml/EbmlContexts.h"
 #include "ebml/EbmlVoid.h"
+#include "ebml/EbmlVersion.h"
 #include "ebml/StdIOCallback.h"
 
 #include "matroska/KaxAttachments.h"
@@ -1937,7 +1938,12 @@ void EbmlParser::Reset( void )
 {
     delete m_el[mi_level];
     m_el[mi_level] = NULL;
+#if LIBEBML_VERSION >= 0x000704
+    // a little faster and cleaner
+    m_es->I_O().setFilePointer( static_cast<EbmlMaster*>(m_el[0])->GetDataStart() );
+#else
     m_es->I_O().setFilePointer( m_el[0]->GetElementPosition() + m_el[0]->ElementSize(true) - m_el[0]->GetSize() );
+#endif
 }
 
 EbmlElement *EbmlParser::Get( void )
