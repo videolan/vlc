@@ -2,7 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_sdl.c,v 1.22 2001/01/15 06:18:23 sam Exp $
+ * $Id: intf_sdl.c,v 1.23 2001/01/15 12:42:57 reno Exp $
  *
  * Authors:
  *
@@ -156,7 +156,7 @@ void intf_SDLManage( intf_thread_t *p_intf )
                 }
                 break;
             case SDL_QUIT:
-                intf_ProcessKey( p_intf, INTF_KEY_QUIT ); 
+                intf_ProcessKey( p_intf, SDLK_q );
                 break;
            default:
                 break;
@@ -189,9 +189,6 @@ void intf_SDL_Fullscreen(intf_thread_t * p_intf)
     p_intf->p_vout->p_sys->b_toggle_fullscreen = 1;
     vlc_mutex_unlock( &p_intf->p_vout->change_lock );
 } 
-    
-
-
 
 void intf_SDL_Keymap(intf_thread_t * p_intf )
 {

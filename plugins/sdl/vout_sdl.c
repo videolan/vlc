@@ -41,6 +41,7 @@
 #include "video_output.h"
 
 #include "intf_msg.h"
+#include "main.h"
 
 /*****************************************************************************
  * vout_sys_t: video output SDL method descriptor
@@ -112,8 +113,10 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
         p_vout->p_sys->b_fullscreen = 0;
     }
 
-    p_vout->p_sys->i_width = VOUT_WIDTH_DEFAULT;
-    p_vout->p_sys->i_height = VOUT_HEIGHT_DEFAULT;
+    p_vout->p_sys->i_width = main_GetIntVariable( VOUT_WIDTH_VAR, 
+                                VOUT_WIDTH_DEFAULT );
+    p_vout->p_sys->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
+                                VOUT_HEIGHT_DEFAULT );
 
     if( SDLOpenDisplay(p_vout) )
     {
