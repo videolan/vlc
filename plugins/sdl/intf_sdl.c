@@ -2,7 +2,7 @@
  * intf_sdl.c: SDL interface plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_sdl.c,v 1.19 2001/01/05 18:46:43 massiot Exp $
+ * $Id: intf_sdl.c,v 1.20 2001/01/08 01:07:21 bozo Exp $
  *
  * Authors:
  *
@@ -70,7 +70,6 @@ typedef struct vout_sys_s
     boolean_t   b_reopen_display;
     Uint8   *   p_buffer[2];
                                                      /* Buffers informations */
-    boolean_t   b_must_acquire;           /* must be acquired before writing */
 }   vout_sys_t;
 
 
@@ -161,6 +160,7 @@ void intf_SDLManage( intf_thread_t *p_intf )
         switch (event.type) {
             case SDL_VIDEORESIZE:                      /* Resizing of window */
                 intf_SDL_Resize( p_intf, event.resize.w, event.resize.h );
+                break;
             case SDL_KEYDOWN:                         /* if a key is pressed */
                 switch(i_key) {
                                                     /* switch to fullscreen  */
@@ -179,7 +179,6 @@ void intf_SDLManage( intf_thread_t *p_intf )
                         break;
                 }
                 break;
-                
             case SDL_QUIT:
                 intf_ProcessKey( p_intf, INTF_KEY_QUIT ); 
                 break;
@@ -202,7 +201,7 @@ void intf_SDL_Resize( intf_thread_t * p_intf, int width, int height )
 void intf_SDL_YUVSwitch(intf_thread_t * p_intf)
 {
     vlc_mutex_lock( &p_intf->p_vout->change_lock );
-    p_intf->p_vout->p_sys->b_must_acquire = 0;
+//    p_intf->p_vout->p_sys->b_must_acquire = 0;
     p_intf->p_vout->b_need_render = 1 - p_intf->p_vout->b_need_render;
     intf_DbgMsg( "need render now : '%d'",p_intf->p_vout->b_need_render); 
     p_intf->p_vout->p_sys->b_reopen_display = 1;

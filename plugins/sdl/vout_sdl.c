@@ -58,7 +58,6 @@ typedef struct vout_sys_s
     boolean_t   b_reopen_display;
     Uint8   *   p_buffer[2];
                                                      /* Buffers informations */
-    boolean_t   b_must_acquire;           /* must be acquired before writing */
 }   vout_sys_t;
 
 /*****************************************************************************
@@ -87,7 +86,6 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
 
     p_vout->p_sys->p_display = NULL;
     p_vout->p_sys->p_overlay = NULL;
-    p_vout->p_sys->b_must_acquire = 0;
 
     /* Initialize library */
     if( SDL_Init(SDL_INIT_VIDEO) < 0 )
@@ -115,15 +113,7 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys->i_width = VOUT_WIDTH_DEFAULT;
     p_vout->p_sys->i_height = VOUT_HEIGHT_DEFAULT;
 
-    p_vout->p_sys->b_reopen_display = 0;
-
-    if( SDLOpenDisplay(p_vout) )
-    {
-        intf_ErrMsg( "error: can't initialize SDL library: %s",
-                     SDL_GetError() );
-        free( p_vout->p_sys );
-        return( 1 );
-    }
+    p_vout->p_sys->b_reopen_display = 1;
 
     return( 0 );
 }
@@ -135,10 +125,11 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
  *****************************************************************************/
 int vout_SDLInit( vout_thread_t *p_vout )
 {
-    /* Acquire first buffer */
-    if( p_vout->p_sys->b_must_acquire )
+    if( SDLOpenDisplay(p_vout) )
     {
-        SDL_LockSurface(p_vout->p_sys->p_display);
+      intf_ErrMsg( "error: can't initialize SDL library: %s",
+                   SDL_GetError() );
+      return( 1 );
     }
 
     return( 0 );
@@ -151,12 +142,8 @@ int vout_SDLInit( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_SDLEnd( vout_thread_t *p_vout )
 {
-    /* Release buffer */
-    if( p_vout->p_sys->b_must_acquire )
-    {
-        SDL_UnlockSurface ( p_vout->p_sys->p_display );
-    }
-    free( p_vout->p_sys );
+    SDLCloseDisplay( p_vout );
+    SDL_Quit();
 }
 
 /*****************************************************************************
@@ -166,7 +153,6 @@ void vout_SDLEnd( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_SDLDestroy( vout_thread_t *p_vout )
 {
-    SDLCloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
@@ -181,24 +167,13 @@ int vout_SDLManage( vout_thread_t *p_vout )
     /* If the display has to be reopened we do so */
     if( p_vout->p_sys->b_reopen_display )
     {
-        p_vout->p_sys->b_must_acquire = 0;
-        if( p_vout->p_sys->p_display )
-        {
-            if( p_vout->p_sys->p_overlay )
-            {
-                SDL_FreeYUVOverlay(p_vout->p_sys->p_overlay);
-                p_vout->p_sys->p_overlay = NULL;
-            }
-            SDL_FreeSurface( p_vout->p_sys->p_display );
-            p_vout->p_sys->p_display = NULL;
-        }
+        SDLCloseDisplay(p_vout);
 
         if( SDLOpenDisplay(p_vout) )
         {
             intf_ErrMsg( "error: can't open DISPLAY default display" );
             return( 1 );
         }
-        p_vout->p_sys->b_reopen_display = 0;
     }
     return( 0 );
 }
@@ -212,26 +187,20 @@ int vout_SDLManage( vout_thread_t *p_vout )
 void vout_SDLDisplay( vout_thread_t *p_vout )
 {
     SDL_Rect    disp;
-    if(p_vout->b_need_render)
-    {  
-        /* Change display frame */
-        if( p_vout->p_sys->b_must_acquire )
-        {
-            
+    if(p_vout->p_sys->p_display && !p_vout->p_sys->b_reopen_display)
+    {
+        if(p_vout->b_need_render)
+        {  
+            /* Change display frame */
             SDL_Flip( p_vout->p_sys->p_display );
-            
-            /* Swap buffers and change write frame */
-            //SDL_LockSurface ( p_vout->p_sys->p_display );
         }
-     }
-     else
-     {
-        
-        /*
-         * p_vout->p_rendered_pic->p_y/u/v contains the YUV buffers to render 
-         */
-        if( p_vout->p_sys->b_must_acquire )
+        else
         {
+        
+            /*
+             * p_vout->p_rendered_pic->p_y/u/v contains the YUV buffers to
+             * render 
+             */
             /* TODO: support for streams other than 4:2:0 */
             /* create the overlay if necessary */
             if( p_vout->p_sys->p_overlay == NULL )
@@ -325,6 +294,8 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    SDL_LockSurface(p_vout->p_sys->p_display);
+
     if( p_vout->p_sys->b_fullscreen )
         SDL_ShowCursor( 0 );
     else
@@ -382,8 +353,7 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
 
     p_vout->i_changes |= VOUT_YUV_CHANGE;
 
-    /* Check buffers properties */
-    p_vout->p_sys->b_must_acquire = 1; /* always acquire */
+    p_vout->p_sys->b_reopen_display = 0;
 
     return( 0 );
 }
@@ -396,10 +366,9 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
  *****************************************************************************/
 static void SDLCloseDisplay( vout_thread_t *p_vout )
 {
-    /*
     if( p_vout->p_sys->p_display != NULL )
     {
-        p_vout->p_sys->b_must_acquire = 0;
+        SDL_UnlockSurface ( p_vout->p_sys->p_display );
         if( p_vout->p_sys->p_overlay != NULL )
         {            
             SDL_FreeYUVOverlay(p_vout->p_sys->p_overlay);
@@ -408,9 +377,5 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
         SDL_FreeSurface( p_vout->p_sys->p_display );
         p_vout->p_sys->p_display = NULL;
     }
-    */
-    SDL_Quit();
-    
-    /* Prevents from cleaning, but prevents from SEGfaulting */
 }
 
