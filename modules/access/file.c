@@ -49,14 +49,24 @@
 #   include <io.h>
 #endif
 
-/* stat() support for large files on win32 */
 #if defined( WIN32 ) && !defined( UNDER_CE )
-#define stat _stati64
-#define fstat(a,b) _fstati64(a,b)
-#endif
-
-#ifdef UNDER_CE
-#   define close(a) CloseHandle((HANDLE)a)
+/* stat() support for large files on win32 */
+#   define stat _stati64
+#   define fstat(a,b) _fstati64(a,b)
+#   ifdef lseek
+#      undef lseek
+#   endif
+#   define lseek _lseeki64
+#elif defined( UNDER_CE )
+#   ifdef read
+#      undef read
+#   endif
+#   define read(a,b,c) fread(b,1,c,a)
+#   define close(a) fclose(a)
+#   ifdef lseek
+#      undef lseek
+#   endif
+#   define lseek fseek
 #endif
 
 /*****************************************************************************
@@ -113,9 +123,12 @@ struct access_sys_t
 
     /* Current file */
     int  i_index;
+#ifndef UNDER_CE
     int  fd;
-#ifdef UNDER_CE
-    HANDLE fd_handle;
+    int  fd_backup;
+#else
+    FILE *fd;
+    FILE *fd_backup;
 #endif
 
     /* */
@@ -365,7 +378,8 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
         else
         {
             /* b_kfir ; work around a buggy poll() driver implementation */
-            while ( (i_ret = read( p_sys->fd, p_buffer, i_len )) == 0 && !p_access->b_die )
+            while ( (i_ret = read( p_sys->fd, p_buffer, i_len )) == 0 &&
+                    !p_access->b_die )
             {
                 msleep( INPUT_ERROR_SLEEP );
             }
@@ -373,17 +387,10 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     }
     else
 #endif /* WIN32 || UNDER_CE */
-#ifdef UNDER_CE
-    if( !ReadFile( p_sys->fd_handle, p_buffer, i_len, (LPDWORD)&i_ret, 0 ) )
-    {
-        i_ret = -1;
-    }
-#else
     {
         /* b_pace_control || WIN32 */
         i_ret = read( p_sys->fd, p_buffer, i_len );
     }
-#endif
 
     if( i_ret < 0 )
     {
@@ -418,18 +425,18 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len )
     /* If we reached an EOF then switch to the next file in the list */
     if ( i_ret == 0 && p_sys->i_index + 1 < p_sys->i_file )
     {
-        int fd = p_sys->fd;
         char *psz_name = p_sys->file[++p_sys->i_index]->psz_name;
+        p_sys->fd_backup = p_sys->fd;
 
         msg_Dbg( p_access, "opening file `%s'", psz_name );
 
         if ( _OpenFile( p_access, psz_name ) )
         {
-            p_sys->fd = fd;
+            p_sys->fd = p_sys->fd_backup;
             return 0;
         }
 
-        close( fd );
+        close( p_sys->fd_backup );
 
         /* We have to read some data */
         return Read( p_access, p_buffer, i_len );
@@ -454,9 +461,9 @@ static int Seek( access_t *p_access, int64_t i_pos )
     /* Check which file we need to access */
     if( p_sys->i_file > 1 )
     {
-        int fd = p_sys->fd;
         int i;
         char *psz_name;
+        p_sys->fd_backup = p_sys->fd;
 
         for( i = 0; i < p_sys->i_file - 1; i++ )
         {
@@ -471,20 +478,16 @@ static int Seek( access_t *p_access, int64_t i_pos )
         if ( i != p_sys->i_index && !_OpenFile( p_access, psz_name ) )
         {
             /* Close old file */
-            close( fd );
+            close( p_sys->fd_backup );
             p_sys->i_index = i;
         }
         else
         {
-            p_sys->fd = fd;
+            p_sys->fd = p_sys->fd_backup;
         }
     }
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
-    _lseeki64( p_sys->fd, i_pos - i_size, SEEK_SET );
-#else
     lseek( p_sys->fd, i_pos - i_size, SEEK_SET );
-#endif
 
     p_access->info.i_pos = i_pos;
     if( p_access->info.i_size < p_access->info.i_pos )
@@ -537,8 +540,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = (int64_t)var_GetInteger( p_access, "file-caching" ) * I64C(1000);
+            *pi_64 = var_GetInteger( p_access, "file-caching" ) * I64C(1000);
             break;
+
         /* */
         case ACCESS_SET_PAUSE_STATE:
             /* Nothing to do */
@@ -567,22 +571,17 @@ static int _OpenFile( access_t * p_access, char * psz_name )
     access_sys_t *p_sys = p_access->p_sys;
 
 #ifdef UNDER_CE
-    wchar_t psz_filename[MAX_PATH];
-    MultiByteToWideChar( CP_ACP, 0, psz_name, -1, psz_filename, MAX_PATH );
-
-    p_sys->fd_handle =
-       CreateFile( psz_filename, GENERIC_READ, FILE_SHARE_READ,
-                   NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL );
-    p_sys->fd = (int)p_sys->fd_handle;
-
-    if ( p_sys->fd_handle == INVALID_HANDLE_VALUE )
+    p_sys->fd = fopen( psz_name, "rb" );
+    if ( !p_sys->fd )
     {
-        msg_Err( p_access, "cannot open file %s", psz_name );
+        msg_Err( p_access, "cannot open file %s" );
         return VLC_EGENERIC;
     }
-    p_access->info.i_size =
-        GetFileSize( p_sys->fd_handle, NULL );
+
+    fseek( p_sys->fd, 0, SEEK_END );
+    p_access->info.i_size = ftell( p_sys->fd );
     p_access->info.i_update |= INPUT_UPDATE_SIZE;
+    fseek( p_sys->fd, 0, SEEK_SET );
 #else
 
     p_sys->fd = open( psz_name, O_NONBLOCK /*| O_LARGEFILE*/ );
