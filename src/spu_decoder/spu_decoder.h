@@ -65,6 +65,21 @@ typedef struct spudec_thread_s
 #define SPU_CMD_END                 0xff
 
 /*****************************************************************************
+ * GetNibble: read a nibble from a source packet.
+ *****************************************************************************/
+static __inline__ u8 GetNibble( u8 *p_source, int *pi_index )
+{
+    if( *pi_index & 0x1 )
+    {
+        return( p_source[(*pi_index)++ >> 1] & 0xf );
+    }
+    else
+    {
+        return( p_source[(*pi_index)++ >> 1] >> 4 );
+    }
+}
+
+/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 vlc_thread_t       spudec_CreateThread( vdec_config_t * p_config );

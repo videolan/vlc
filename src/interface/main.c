@@ -331,14 +331,14 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /*
-     * Open video device and start aout thread
+     * Open video device and start vout thread
      */
     if( p_main->b_video )
     {
         p_main->p_vout = vout_CreateThread( NULL );
         if( p_main->p_vout == NULL )
         {
-            /* On error during video initialization, switch off audio */
+            /* On error during video initialization, switch off video */
             intf_ErrMsg( "vout error: video initialization failed,"
                          " video is deactivated" );
             p_main->b_video = 0;

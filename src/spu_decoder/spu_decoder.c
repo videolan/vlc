@@ -53,8 +53,8 @@ static void EndThread   ( spudec_thread_t * );
 
 static int  SyncPacket           ( spudec_thread_t * );
 static void ParsePacket          ( spudec_thread_t * );
-static int  ParseRLE             ( spudec_thread_t *, subpicture_t * );
 static int  ParseControlSequences( spudec_thread_t *, subpicture_t * );
+static int  ParseRLE             ( u8 *,              subpicture_t * );
 
 /*****************************************************************************
  * spudec_CreateThread: create a spu decoder thread
@@ -212,8 +212,8 @@ static int SyncPacket( spudec_thread_t *p_spudec )
     /* The total SPU packet size, often bigger than a PS packet */
     p_spudec->i_spu_size = GetBits( &p_spudec->bit_stream, 16 );
 
-    /* The RLE stuff size */
-    p_spudec->i_rle_size = GetBits( &p_spudec->bit_stream, 16 );
+    /* The RLE stuff size (remove 4 because we just read 32 bits) */
+    p_spudec->i_rle_size = GetBits( &p_spudec->bit_stream, 16 ) - 4;
 
     /* If the values we got are a bit strange, skip packet */
     if( p_spudec->i_rle_size >= p_spudec->i_spu_size )
@@ -233,34 +233,54 @@ static int SyncPacket( spudec_thread_t *p_spudec )
 static void ParsePacket( spudec_thread_t *p_spudec )
 {
     subpicture_t * p_spu;
+    u8           * p_source;
+
+    /* We cannot display a subpicture with no date */
+    if( DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts == 0 )
+    {
+        return;
+    }
 
     /* Allocate the subpicture internal data. */
     p_spu = vout_CreateSubPicture( p_spudec->p_vout, DVD_SUBPICTURE,
-                                   p_spudec->i_rle_size );
+                                   p_spudec->i_rle_size * 4 );
+    /* Rationale for the "p_spudec->i_rle_size * 4": we are going to
+     * expand the RLE stuff so that we won't need to read nibbles later
+     * on. This will speed things up a lot. Plus, we won't need to do
+     * this stupid interlacing stuff. */
 
     if( p_spu == NULL )
     {
         return;
     }
 
-    /* Get display time */
+    /* Get display time now. If we do it later, we may miss a PTS. */
     p_spu->begin_date = p_spu->end_date
                     = DECODER_FIFO_START(*p_spudec->p_fifo)->i_pts;
 
-    if( ParseRLE( p_spudec, p_spu ) )
+    /* Allocate the temporary buffer we will parse */
+    p_source = malloc( p_spudec->i_rle_size );
+
+    if( p_source == NULL )
     {
-        /* There was a parse error, delete the subpicture */
+        intf_ErrMsg( "spudec error: could not allocate p_source" );
         vout_DestroySubPicture( p_spudec->p_vout, p_spu );
         return;
     }
 
+    /* Get RLE data */
+    GetChunk( &p_spudec->bit_stream, p_source, p_spudec->i_rle_size );
+
+#if 0
     /* Dump the subtitle info */
-    intf_WarnHexDump( 0, p_spu->p_data, p_spudec->i_rle_size - 4 );
+    intf_WarnHexDump( 0, p_spu->p_data, p_spudec->i_rle_size );
+#endif
 
     /* Getting the control part */
     if( ParseControlSequences( p_spudec, p_spu ) )
     {
         /* There was a parse error, delete the subpicture */
+        free( p_source );
         vout_DestroySubPicture( p_spudec->p_vout, p_spu );
         return;
     }
@@ -270,32 +290,22 @@ static void ParsePacket( spudec_thread_t *p_spudec )
                   p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y,
                   p_spu->type.spu.i_offset[0], p_spu->type.spu.i_offset[1] );
 
+    if( ParseRLE( p_source, p_spu ) )
+    {
+        /* There was a parse error, delete the subpicture */
+        free( p_source );
+        vout_DestroySubPicture( p_spudec->p_vout, p_spu );
+        return;
+    }
+
     /* SPU is finished - we can tell the video output to display it */
     vout_DisplaySubPicture( p_spudec->p_vout, p_spu );
+
+    /* Clean up */
+    free( p_source );
 }
 
 /*****************************************************************************
- * ParseRLE: parse the RLE part of the subtitle
- *****************************************************************************
- * This part parses the subtitle graphical data and stores it in a more
- * convenient structure for later decoding. For more information on the
- * subtitles format, see http://sam.zoy.org/doc/dvd/subtitles/index.html
- * TODO: pre-parse the RLE stuff here.
- *****************************************************************************/
-static int ParseRLE( spudec_thread_t *p_spudec, subpicture_t * p_spu )
-{
-    /* Get RLE data, skip 4 bytes for the first two read offsets */
-    GetChunk( &p_spudec->bit_stream, p_spu->p_data, p_spudec->i_rle_size - 4 );
-
-    if( p_spudec->p_fifo->b_die )
-    {
-        return( 1 );
-    }
-
-    return( 0 );
-}
-
- /*****************************************************************************
  * ParseControlSequences: parse all SPU control sequences
  *****************************************************************************
  * This is the most important part in SPU decoding. We get dates, palette
@@ -305,11 +315,15 @@ static int ParseRLE( spudec_thread_t *p_spudec, subpicture_t * p_spu )
 static int ParseControlSequences( spudec_thread_t *p_spudec,
                                   subpicture_t * p_spu )
 {
-    int i_index = p_spudec->i_rle_size;
+    /* Our current index in the SPU packet */
+    int i_index = p_spudec->i_rle_size + 4;
+
+    /* The next start-of-control-sequence index and the previous one */
     int i_next_index = 0, i_prev_index;
 
-    int i_date;
+    /* Command time and date */
     u8  i_command;
+    int i_date;
 
     do
     {
@@ -320,7 +334,7 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
         i_prev_index = i_next_index;
         i_next_index = GetBits( &p_spudec->bit_stream, 16 );
  
-        /* Current offset */
+        /* Skip what we just read */
         i_index += 4;
  
         do
@@ -460,6 +474,130 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
     }
 
     /* Successfully parsed ! */
+    return( 0 );
+}
+
+/*****************************************************************************
+ * ParseRLE: parse the RLE part of the subtitle
+ *****************************************************************************
+ * This part parses the subtitle graphical data and stores it in a more
+ * convenient structure for later decoding. For more information on the
+ * subtitles format, see http://sam.zoy.org/doc/dvd/subtitles/index.html
+ *****************************************************************************/
+static int ParseRLE( u8 *p_source, subpicture_t * p_spu )
+{
+    int i_code;
+    int i_id = 0;
+
+    int i_width = p_spu->i_width;
+    int i_height = p_spu->i_height;
+    int i_x = 0, i_y = 0;
+
+    u16 *p_dest = (u16 *)p_spu->p_data;
+    int pi_index[2];
+
+    pi_index[0] = p_spu->type.spu.i_offset[0] << 1;
+    pi_index[1] = p_spu->type.spu.i_offset[1] << 1;
+
+    while( i_y < i_height )
+    {
+        i_code = GetNibble( p_source, pi_index + i_id );
+
+        if( i_code >= 0x04 )
+        {
+            found_code:
+
+            if( ((i_code >> 2) + i_x + i_y * i_width) > i_height * i_width )
+            {
+                intf_ErrMsg( "spudec error: out of bounds, %i at (%i,%i) is "
+                             "out of %ix%i",
+                             i_code >> 2, i_x, i_y, i_width, i_height);
+                return( 1 );
+            }
+            else
+            {
+                /* Store the code */
+                *p_dest++ = i_code;
+
+                i_x += i_code >> 2;
+            }
+
+            if( i_x > i_width )
+            {
+                intf_ErrMsg( "spudec error: i_x overflowed, %i > %i",
+                             i_x, i_width );
+                return( 1 );
+            }
+
+            if( i_x == i_width )
+            {
+                /* byte-align the stream */
+                if( pi_index[i_id] & 0x1 )
+                {
+                    pi_index[i_id]++;
+                }
+
+                i_id = ~i_id & 0x1;
+
+                i_y++;
+                i_x = 0;
+
+                if( i_y > i_height )
+                {
+                    intf_ErrMsg( "spudec error: i_y overflowed at EOL, "
+                                 "%i > %i", i_y, i_height );
+                    return( 1 );
+                }
+            }
+
+            continue;
+        }
+
+        i_code = ( i_code << 4 ) + GetNibble( p_source, pi_index + i_id );
+
+        /* 00 11 xx cc */
+        if( i_code >= 0x10 )
+        {
+            /* 00 01 xx cc */
+            goto found_code;
+        }
+
+        i_code = ( i_code << 4 ) + GetNibble( p_source, pi_index + i_id );
+
+        /* 00 00 11 xx xx cc */
+        if( i_code >= 0x040 )
+        {
+            goto found_code;   /* 00 00 01 xx xx cc */
+        }
+
+        i_code = ( i_code << 4 ) + GetNibble( p_source, pi_index + i_id );
+
+        if( i_code >= 0x0100 ) /* 00 00 00 11 xx xx xx cc */
+        {
+            goto found_code;   /* 00 00 00 01 xx xx xx cc */
+        }
+
+        if( i_code & ~0x0003 )
+        {
+            /* We have a boo boo ! */
+            intf_ErrMsg( "spudec error: unknown code 0x%.4x", i_code );
+            return( 1 );
+        }
+        else
+        {
+            /* If the 14 first bits are 0, then it's a new line */
+            i_code |= ( i_width - i_x ) << 2;
+            goto found_code;
+        }
+    }
+
+    /* FIXME: we shouldn't need these padding bytes */
+    while( i_y < i_height )
+    {
+        *p_dest++ = i_width << 2;
+        i_y++;
+    }
+
     return( 0 );
 }
 
