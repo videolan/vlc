@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for vlc, the VideoLAN Client
-##  $Id: toolbox,v 1.4 2003/01/16 09:00:32 sam Exp $
+##  $Id: toolbox,v 1.5 2003/01/16 12:49:28 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -75,6 +75,11 @@ then
   #  The evil ^M
   M=''
 
+  #  Variables we get from configure.ac.in
+  LIBVLC_VERSION=`sed -ne '/AC_INIT/s/.*,\(.*\))/\1/p' < configure.ac.in`
+  LIBVLC_CODENAME=`sed -ne '/CODENAME=/s/.*"\(.*\)"/\1/p' < configure.ac.in`
+  LIBVLC_SYMBOL=`echo $LIBVLC_VERSION | sed -e 'y/.-/__/'`
+
   #  Sources that get built under Win32 - FIXME: anyone wanna deuglify this? :)
   LIBVLC_SOURCES=`awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_common'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p';  awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_win32'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_dirent'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_getopt'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_libc'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
 
@@ -84,6 +89,16 @@ then
 
   # Clean up
   rm -f evc/*.vcp msvc/*.dsp
+
+  # config files
+  for target in evc/config.h msvc/config.h
+  do
+    echo "${target}"
+    rm -f ${target}
+    sed -e "s/@CODENAME@/${LIBVLC_CODENAME}/" \
+        -e "s/@VERSION@/${LIBVLC_VERSION}/" \
+        -e "s/@SYMBOL@/${LIBVLC_SYMBOL}/" < ${target}.in > ${target}
+  done
 
   # libvlc files
   for target in evc/libvlc.vcp msvc/libvlc.dsp

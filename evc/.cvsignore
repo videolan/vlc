@@ -8,6 +8,7 @@ SH4Dbg
 SH4Rel
 X86EMDbg
 X86EMRel
+config.h
 *.vcp
 *.vcl
 *.vcb
