@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.108 2003/11/22 00:41:07 titer Exp $
+ * $Id: libvlc.h,v 1.109 2003/11/27 05:46:01 fenrir Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -364,6 +364,10 @@ static char *ppsz_language_text[] =
 #define SOUT_LONGTEXT N_( \
     "Empty if no stream output.")
 
+#define SOUT_ALL_TEXT N_("Enable streaming of all ES")
+#define SOUT_ALL_LONGTEXT N_( \
+    "This allows you to stream all ES (video, audio and subtitles)")
+
 #define SOUT_DISPLAY_TEXT N_("Display while streaming")
 #define SOUT_DISPLAY_LONGTEXT N_( \
     "This allows you to play the stream while streaming it.")
@@ -707,7 +711,8 @@ vlc_module_begin();
                                 SOUT_DISPLAY_LONGTEXT, VLC_TRUE );
     add_bool( "sout-keep", VLC_FALSE, NULL, SOUT_KEEP_TEXT,
                                 SOUT_KEEP_LONGTEXT, VLC_TRUE );
-
+    add_bool( "sout-all", 0, NULL, SOUT_ALL_TEXT,
+                                SOUT_ALL_LONGTEXT, VLC_TRUE );
     add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT,
                                 SOUT_AUDIO_LONGTEXT, VLC_TRUE );
     add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT,

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.265 2003/11/27 04:11:40 fenrir Exp $
+ * $Id: input.c,v 1.266 2003/11/27 05:46:01 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -113,6 +113,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     var_Create( p_input, "sub-autodetect-fuzzy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "sout-all",   VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "sout-keep",  VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -770,7 +771,13 @@ static int InitThread( input_thread_t * p_input )
     }
 
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
-    es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_AUTO );
+    val.b_bool =  VLC_FALSE;
+    if( p_input->stream.p_sout )
+    {
+        var_Get( p_input, "sout-all", &val );
+    }
+    es_out_Control( p_input->p_es_out, ES_OUT_SET_MODE,
+                    val.b_bool ? ES_OUT_MODE_ALL : ES_OUT_MODE_AUTO );
 
     return VLC_SUCCESS;
 }

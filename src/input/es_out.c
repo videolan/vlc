@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.2 2003/11/27 04:11:40 fenrir Exp $
+ * $Id: es_out.c,v 1.3 2003/11/27 05:46:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -518,9 +518,18 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case ES_OUT_SET_ACTIVE:
+        {
             b = (vlc_bool_t) va_arg( args, vlc_bool_t );
             p_sys->b_active = b;
+
+            if( b )
+            {
+                vlc_value_t val;
+                val.b_bool = VLC_TRUE;
+                var_Set( p_sys->p_input, "intf-change", val );
+            }
             return VLC_SUCCESS;
+        }
 
         case ES_OUT_GET_ACTIVE:
             pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );
@@ -531,6 +540,8 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             i = (int) va_arg( args, int );
             if( i == ES_OUT_MODE_NONE || i == ES_OUT_MODE_ALL || i == ES_OUT_MODE_AUTO )
             {
+                vlc_value_t val;
+
                 p_sys->i_mode = i;
 
                 /* Reapply policy mode */
@@ -547,6 +558,10 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                     EsOutSelect( out, p_sys->es[i], VLC_FALSE );
                 }
                 vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
+
+                val.b_bool = VLC_TRUE;
+                var_Set( p_sys->p_input, "intf-change", val );
+
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
