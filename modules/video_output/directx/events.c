@@ -711,6 +711,14 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         p_vout = (vout_thread_t *)GetWindowLongPtr( hwnd, GWLP_USERDATA );
     }
 
+    /* Catch the screensaver and the monitor turn-off */
+    if( message == WM_SYSCOMMAND &&
+        ( wParam == SC_SCREENSAVE || wParam == SC_MONITORPOWER ) )
+    {
+        //if( p_vout ) msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND screensaver" );
+        return 0; /* this stops them from happening */
+    }
+
     if( !p_vout )
     {
         /* Hmmm mozilla does manage somehow to save the pointer to our
@@ -754,23 +762,16 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_SYSCOMMAND:
         switch (wParam)
         {
-            case SC_SCREENSAVE:                     /* catch the screensaver */
-            case SC_MONITORPOWER:              /* catch the monitor turn-off */
-                msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND" );
-                return 0;                  /* this stops them from happening */
             case IDM_TOGGLE_ON_TOP:            /* toggle the "on top" status */
             {
                 vlc_value_t val;
                 msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
 
-                /* Get the current value... */
-                if( var_Get( p_vout, "video-on-top", &val ) < 0 )
-                    return 0;
-                /* ...and change it */
+                /* Change the current value */
+                var_Get( p_vout, "video-on-top", &val );
                 val.b_bool = !val.b_bool;
                 var_Set( p_vout, "video-on-top", val );
                 return 0;
-                break;
             }
         }
         break;
