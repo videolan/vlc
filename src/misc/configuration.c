@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.21 2002/05/01 21:31:53 gbazin Exp $
+ * $Id: configuration.c,v 1.22 2002/05/03 20:49:30 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -184,6 +184,10 @@ void config_PutPszVariable( const char *psz_name, char *psz_value )
 
     vlc_mutex_unlock( p_config->p_lock );
 
+    if( p_config->p_callback )
+    {
+        ((void(*)(void))p_config->p_callback)();
+    }
 }
 
 /*****************************************************************************
@@ -214,6 +218,11 @@ void config_PutIntVariable( const char *psz_name, int i_value )
     }
 
     p_config->i_value = i_value;
+
+    if( p_config->p_callback )
+    {
+        ((void(*)(void))p_config->p_callback)();
+    }
 }
 
 /*****************************************************************************
@@ -242,6 +251,11 @@ void config_PutFloatVariable( const char *psz_name, float f_value )
     }
 
     p_config->f_value = f_value;
+
+    if( p_config->p_callback )
+    {
+        ((void(*)(void))p_config->p_callback)();
+    }
 }
 
 /*****************************************************************************
@@ -324,6 +338,37 @@ module_config_t *config_Duplicate( module_config_t *p_orig )
     }
 
     return p_config;
+}
+
+/*****************************************************************************
+ * config_SetCallbacks: sets callback functions in the duplicate p_config.
+ *****************************************************************************
+ * Unfortunatly we cannot work directly with the module's config data as
+ * this module might be unloaded from memory at any time (remember HideModule).
+ * This is why we need to duplicate callbacks each time we reload the module.
+ *****************************************************************************/
+void config_SetCallbacks( module_config_t *p_new, module_config_t *p_orig )
+{
+    while( p_new->i_type != MODULE_CONFIG_HINT_END )
+    {
+        p_new->p_callback = p_orig->p_callback;
+        p_new++;
+        p_orig++;
+    }
+}
+
+/*****************************************************************************
+ * config_UnsetCallbacks: unsets callback functions in the duplicate p_config.
+ *****************************************************************************
+ * We simply undo what we did in config_SetCallbacks.
+ *****************************************************************************/
+void config_UnsetCallbacks( module_config_t *p_new )
+{
+    while( p_new->i_type != MODULE_CONFIG_HINT_END )
+    {
+        p_new->p_callback = NULL;
+        p_new++;
+    }
 }
 
 /*****************************************************************************

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.102 2002/04/27 22:11:22 gbazin Exp $
+ * $Id: common.h,v 1.103 2002/05/03 20:49:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -534,6 +534,9 @@ typedef struct module_symbols_s
     int    ( * config_SaveConfigFile )   ( const char * );
     struct module_config_s * ( * config_FindConfig ) ( const char * );
     struct module_config_s * ( * config_Duplicate ) ( struct module_config_s* );
+    void   ( * config_SetCallbacks )     ( struct module_config_s *,
+                                           struct module_config_s * );
+    void   ( * config_UnsetCallbacks )   ( struct module_config_s * );
 
     struct intf_subscription_s * ( * intf_MsgSub ) ( void );
     void ( * intf_MsgUnsub )   ( struct intf_subscription_s * );

@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h,v 1.23 2002/04/30 12:56:11 gbazin Exp $
+ * $Id: modules_plugin.h,v 1.24 2002/05/03 20:49:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -197,6 +197,8 @@ module_error( char *psz_buffer )
     (p_symbols)->config_SaveConfigFile = config_SaveConfigFile; \
     (p_symbols)->config_Duplicate = config_Duplicate; \
     (p_symbols)->config_FindConfig = config_FindConfig; \
+    (p_symbols)->config_SetCallbacks = config_SetCallbacks; \
+    (p_symbols)->config_UnsetCallbacks = config_UnsetCallbacks; \
     (p_symbols)->intf_MsgSub = intf_MsgSub; \
     (p_symbols)->intf_MsgUnsub = intf_MsgUnsub; \
     (p_symbols)->intf_Msg = intf_Msg; \

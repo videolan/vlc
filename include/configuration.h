@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.9 2002/04/24 00:36:24 sam Exp $
+ * $Id: configuration.h,v 1.10 2002/05/03 20:49:30 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -73,13 +73,16 @@ void   config_PutIntVariable( const char *psz_name, int i_value );
 void   config_PutFloatVariable( const char *psz_name, float f_value );
 void   config_PutPszVariable( const char *psz_name, char *psz_value );
 
-int config_LoadConfigFile( const char *psz_module_name );
-int config_SaveConfigFile( const char *psz_module_name );
-module_config_t *config_FindConfig( const char *psz_name );
-module_config_t *config_Duplicate ( module_config_t * );
-char *config_GetHomeDir( void );
-int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
-                        boolean_t b_ignore_errors );
+int    config_LoadConfigFile( const char *psz_module_name );
+int    config_SaveConfigFile( const char *psz_module_name );
+char * config_GetHomeDir( void );
+int    config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
+                           boolean_t b_ignore_errors );
+
+module_config_t *config_Duplicate     ( module_config_t * );
+module_config_t *config_FindConfig    ( const char * );
+void             config_SetCallbacks  ( module_config_t *, module_config_t * );
+void             config_UnsetCallbacks( module_config_t * );
 
 #else
 #   define config_GetIntVariable p_symbols->config_GetIntVariable
@@ -88,10 +91,12 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
 #   define config_PutFloatVariable p_symbols->config_PutFloatVariable
 #   define config_GetPszVariable p_symbols->config_GetPszVariable
 #   define config_PutPszVariable p_symbols->config_PutPszVariable
-#   define config_Duplicate      p_symbols->config_Duplicate
-#   define config_FindConfig     p_symbols->config_FindConfig
 #   define config_LoadConfigFile p_symbols->config_LoadConfigFile
 #   define config_SaveConfigFile p_symbols->config_SaveConfigFile
+#   define config_Duplicate      p_symbols->config_Duplicate
+#   define config_FindConfig     p_symbols->config_FindConfig
+#   define config_SetCallbacks   p_symbols->config_SetCallbacks
+#   define config_UnsetCallbacks p_symbols->config_UnsetCallbacks
 #endif
 
 /*****************************************************************************

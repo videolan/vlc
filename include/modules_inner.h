@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.17 2002/04/28 17:52:37 sam Exp $
+ * $Id: modules_inner.h,v 1.18 2002/05/03 20:49:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -86,9 +86,11 @@
         p_module->psz_program = NULL;                                         \
         p_module->pp_shortcuts[ 0 ] = MODULE_STRING;                          \
         p_module->i_capabilities = 0;                                         \
-        p_module->i_cpu_capabilities = 0;
+        p_module->i_cpu_capabilities = 0;                                     \
+        do {
 
 #define MODULE_INIT_STOP                                                      \
+        } while( 0 );                                                         \
         STORE_SYMBOLS;                                                        \
         p_module->pp_shortcuts[ i_shortcut ] = NULL;                          \
         p_module->i_config_items = 0;                                         \
@@ -142,15 +144,18 @@
 #define MODULE_ACTIVATE_START                                                 \
     int __VLC_SYMBOL( ActivateModule ) ( module_t *p_module )                 \
     {                                                                         \
+        config_SetCallbacks( p_module->p_config, p_config );                  \
         p_module->p_functions =                                               \
           ( module_functions_t * )malloc( sizeof( module_functions_t ) );     \
         if( p_module->p_functions == NULL )                                   \
         {                                                                     \
             return( -1 );                                                     \
         }                                                                     \
-        STORE_SYMBOLS;
+        STORE_SYMBOLS;                                                        \
+        do {
 
 #define MODULE_ACTIVATE_STOP                                                  \
+        } while( 0 );                                                         \
         return( 0 );                                                          \
     }
 
@@ -162,8 +167,11 @@
 #define MODULE_DEACTIVATE_START                                               \
     int __VLC_SYMBOL( DeactivateModule )( module_t *p_module )                \
     {                                                                         \
-        free( p_module->p_functions );
+        free( p_module->p_functions );                                        \
+        do {
 
 #define MODULE_DEACTIVATE_STOP                                                \
+        } while( 0 );                                                         \
+        config_UnsetCallbacks( p_module->p_config );                          \
         return( 0 );                                                          \
     }
