@@ -432,11 +432,14 @@ void main_PutIntVariable( char *psz_name, int i_value )
 static void SetDefaultConfiguration( void )
 {
     /*
-     * All features are activated by default execpted vlans
+     * All features are activated by default except vlans
      */
     p_main->b_audio  = 1;
     p_main->b_video  = 1;
     p_main->b_vlans  = 0;
+
+    /* This is |_|lt1m4t3 |<l|_|d63 */
+    main_PutIntVariable( INPUT_DVD_SUBTITLE_VAR, -1 );
 }
 
 /*****************************************************************************
@@ -537,20 +540,17 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( YUV_METHOD_VAR, optarg );
             break;
 
-            /* FIXME */
-#if 0
         /* DVD options */
         case 'a':
-            if ( ! strcmp(optarg, "mpeg") )
-                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_MPEG );
+            if ( ! strcmp(optarg, "ac3") )
+                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_AC3 );
             else if ( ! strcmp(optarg, "lpcm") )
                 main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_LPCM );
             else if ( ! strcmp(optarg, "off") )
                 main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_NOAUDIO );
             else
-                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_AC3 );
+                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_MPEG );
             break;
-#endif
         case 'c':
             main_PutIntVariable( INPUT_DVD_CHANNEL_VAR, atoi(optarg) );
             break;

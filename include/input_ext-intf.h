@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.4 2000/12/20 16:04:31 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.5 2000/12/20 17:49:40 massiot Exp $
  *
  * Authors:
  *
@@ -27,6 +27,11 @@
  * Communication input -> interface
  */
 #define INPUT_MAX_PLUGINS   1
+/* FIXME ! */
+#define REQUESTED_MPEG         0
+#define REQUESTED_AC3          1
+#define REQUESTED_LPCM         2
+#define REQUESTED_NOAUDIO    255
 
 /*****************************************************************************
  * es_descriptor_t: elementary stream descriptor

@@ -31,8 +31,6 @@
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                                   /* FILE */
 #include <string.h>                                            /* strerror() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                          /* for input.h */
 
 #include "config.h"
 #include "common.h"
@@ -40,6 +38,7 @@
 #include "mtime.h"
 #include "plugins.h"
 #include "playlist.h"
+
 #include "stream_control.h"
 #include "input_ext-intf.h"
 

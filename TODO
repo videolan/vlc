@@ -70,7 +70,7 @@ Urgency: Important
 Description: Write input_programs.c
  We need a centralized manner of creating new programs, es, and
  spawning new decoders.
-Status: Todo
+Status: Done 20 Dec 2000 (Meuuh)
 
 Task: 0x40
 Difficulty: Medium
@@ -79,7 +79,7 @@ Description: Fix the PS plugin
  The PS plugin should be able to recover from packet loss, to
  read MPEG-1 .mpg files, and to pre-parse the stream (if possible)
  to build the ES table. Check what's wrong and fix it. Now.
-Status: Todo
+Status: Done
 
 Task: 0x3f
 Difficulty: Easy
@@ -89,7 +89,7 @@ Description: Enhance intf_*Msg
  warning/error:" and \n automatically. The new input already
  uses such a behaviour, so we must hurry. It might be necessary
  to modify all messages in all modules...
-Status: Todo
+Status: Todo 20 Dec 2000 (Meuuh)
 
 # end of input-II tasks, thanks for being with us
 

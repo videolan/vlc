@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.5 2000/12/20 16:04:31 massiot Exp $
+ * $Id: input_programs.c,v 1.6 2000/12/20 17:49:40 massiot Exp $
  *
  * Authors:
  *
@@ -40,6 +40,8 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input.h"
+
+#include "main.h"                                     /* --noaudio --novideo */
 
 /*
  * NOTICE : all of these functions expect you to have taken the lock on
@@ -88,6 +90,7 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
     /* Init this entry */
     p_input->stream.pp_programs[i_pgrm_index]->i_number = i_pgrm_id;
     p_input->stream.pp_programs[i_pgrm_index]->b_is_ok = 0;
+    p_input->stream.pp_programs[i_pgrm_index]->i_version = 0;
 
     p_input->stream.pp_programs[i_pgrm_index]->i_es_number = 0;
     p_input->stream.pp_programs[i_pgrm_index]->pp_es = NULL;
@@ -431,20 +434,36 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     {
     case MPEG1_AUDIO_ES:
     case MPEG2_AUDIO_ES:
-        p_es->thread_id = adec_CreateThread( GetAdecConfig( p_input, p_es ) );
+        if( p_main->b_audio )
+        {
+            p_es->thread_id = adec_CreateThread( GetAdecConfig( p_input,
+                                                                p_es ) );
+        }
         break;
 
     case MPEG1_VIDEO_ES:
     case MPEG2_VIDEO_ES:
-        p_es->thread_id = vpar_CreateThread( GetVdecConfig( p_input, p_es ) );
+        if( p_main->b_video )
+        {
+            p_es->thread_id = vpar_CreateThread( GetVdecConfig( p_input,
+                                                                p_es ) );
+        }
         break;
 
     case AC3_AUDIO_ES:
-        p_es->thread_id = ac3dec_CreateThread( GetAdecConfig( p_input, p_es ) );
+        if( p_main->b_audio )
+        {
+            p_es->thread_id = ac3dec_CreateThread( GetAdecConfig( p_input,
+                                                                  p_es ) );
+        }
         break;
 
     case DVD_SPU_ES:
-        p_es->thread_id = spudec_CreateThread( GetVdecConfig( p_input, p_es ) );
+        if( p_main->b_video )
+        {
+            p_es->thread_id = spudec_CreateThread( GetVdecConfig( p_input,
+                                                                  p_es ) );
+        }
         break;
 
     default:

@@ -171,41 +171,14 @@
  * interface, and is in fact an interface limitation */
 #define INPUT_MAX_THREADS               10
 
-/* Maximum number of programs definitions in a TS stream */
-#define INPUT_MAX_PGRM                  10
-
 /* Maximum number of ES definitions in a TS stream */
-#define INPUT_MAX_ES                    10
-
-/* Maximum number of ES in a single program */
-#define INPUT_MAX_PROGRAM_ES            10
+#define INPUT_MAX_ES                    42
 
 /* Maximum number of selected ES in an input thread */
-#define INPUT_MAX_SELECTED_ES           10
+#define INPUT_MAX_SELECTED_ES           42
 
 /* Maximum size of a data packet (128 kB) */
 #define INPUT_MAX_PACKET_SIZE			131072
-
-/* Maximum number of TS packets in the client at any time
- * INPUT_MAX_TS + 1 must be a power of 2, to optimize the %(INPUT_MAX_TS+1)
- * operation with a &INPUT_MAX_TS in the case of a fifo netlist.
- * It should be > number of fifos * FIFO_SIZE to avoid input deadlock. */
-#define INPUT_MAX_TS                    32767     /* INPUT_MAX_TS + 1 = 2^15 */
-
-/* Same thing with PES packets */
-#define INPUT_MAX_PES                   16383
-
-/* Maximum number of TS packets we read from the socket in one readv().
- * Since you can't put more than 7 TS packets in an Ethernet frame,
- * the maximum value is 7. This number should also limit the stream server,
- * otherwise any supplementary packet is lost. */
-#define INPUT_TS_READ_ONCE              7
-
-/* Use a LIFO or FIFO for TS netlist ? */
-#undef INPUT_LIFO_TS_NETLIST
-
-/* Use a LIFO or FIFO for PES netlist ? */
-#undef INPUT_LIFO_PES_NETLIST
 
 /* Maximum length of a hostname or source name */
 #define INPUT_MAX_SOURCE_LENGTH         100
