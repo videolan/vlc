@@ -7,16 +7,61 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
-Task: 
+Task: 0x4e
+Difficulty: Hard
+Urgency: High
+Description: Write stream zones support
+ For random access we need to know where stream descriptors are valid
+ and reside (essentially DVD plugin). -> Meuuh
+Status: Todo
+
+Task: 0x4d
+Difficulty: Hard
+Urgency: Normal
+Description: Write subtitles and stream information in YUV coordinates
+ ... so that they can be displayed even in "overlay" mode.
+Status: Todo
+
+Task: 0x4c
+Difficulty: Medium
+Urgency: Normal
+Description: Update documentation
+ The input structures have undergone a major restructuration with
+ input-II. It might be a good idea to reflect thoses changes in the
+ documentation.
+Status: Todo
+
+Task: 0x4b
+Difficulty: Guru
+Urgency: Low
+Description: Write AVI input plugin
+ .avi files can use MPEG codec, if this is the case it shouldn't be
+ hard to read those files -> Meuuh
+Status: Todo
+
+Task: 0x4a
+Difficulty: Medium
+Urgency: Normal
+Description: Write ES input plugin
+ We need to be able to read .mpg video streams, or .mp* audio streams.
+ More information -> Meuuh
+Status: Todo
+
+Task: 0x49
+Difficulty: Easy
+Urgency: Important
+Description: Write a new buffer allocator
+ Avoid malloc()s by reusing the recently released packets. More
+ information -> Meuuh
+Status: Todo
+
+Task: 0x48
 Difficulty: Medium
 Urgency: Critical
 Description: Fix audio synchro
  With some audio plugins, the audio stream is late because of buffer
  sizes. See what's wrong and fix it.
 Status: Todo
-
-# input-II tasks, from the least important to the most important
-# (backwards order) :
 
 Task: 0x47
 Difficulty: Hard
@@ -62,7 +107,7 @@ Urgency: Important
 Description: Write input_netlist.c
  We need an interface to create fixed-size packets (for instance
  188 bytes or 2 kB) and avoid using the system malloc().
-Status: Todo
+Status: Done 23 Jan 2001 (henri)
 
 Task: 0x41
 Difficulty: Easy
@@ -79,7 +124,7 @@ Description: Fix the PS plugin
  The PS plugin should be able to recover from packet loss, to
  read MPEG-1 .mpg files, and to pre-parse the stream (if possible)
  to build the ES table. Check what's wrong and fix it. Now.
-Status: Done
+Status: Done 20 Dec 2000 (Meuuh)
 
 Task: 0x3f
 Difficulty: Easy
@@ -89,9 +134,7 @@ Description: Enhance intf_*Msg
  warning/error:" and \n automatically. The new input already
  uses such a behaviour, so we must hurry. It might be necessary
  to modify all messages in all modules...
-Status: Todo 20 Dec 2000 (Meuuh)
-
-# end of input-II tasks, thanks for being with us
+Status: Done 20 Dec 2000 (sam)
 
 Task: 0x3e
 Difficulty: Guru

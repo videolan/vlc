@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.8 2001/01/15 06:18:23 sam Exp $
+ * $Id: vout_x11.c,v 1.9 2001/01/23 13:22:58 massiot Exp $
  *
  * Authors:
  *
@@ -289,7 +289,7 @@ void vout_X11Display( vout_thread_t *p_vout )
                      p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->height, True);
 
         /* Send the order to the X server */
-        XFlush(p_vout->p_sys->p_display);
+        XSync(p_vout->p_sys->p_display, False);
     }
     else                                /* regular X11 capabilities are used */
     {
@@ -300,7 +300,7 @@ void vout_X11Display( vout_thread_t *p_vout )
                   p_vout->p_sys->p_ximage[ p_vout->i_buffer_index ]->height);
 
         /* Send the order to the X server */
-        XFlush(p_vout->p_sys->p_display);
+        XSync(p_vout->p_sys->p_display, False);
     }
 }
 
