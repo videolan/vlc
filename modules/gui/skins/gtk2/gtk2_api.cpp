@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.4 2003/04/13 19:09:59 asmax Exp $
+ * $Id: gtk2_api.cpp,v 1.5 2003/04/14 21:38:31 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -25,6 +25,7 @@
 #if !defined WIN32
 
 //--- GTK2 ------------------------------------------------------------------
+#include <glib.h>
 #include <gdk/gdk.h>
 
 //--- SKIN ------------------------------------------------------------------
@@ -90,7 +91,9 @@ int OSAPI_GetNonTransparentColor( int c )
 //---------------------------------------------------------------------------
 int OSAPI_GetTime()
 {
-/*    return GetTickCount();*/
+    GTimeVal time;
+    g_get_current_time( &time );
+    return ( time.tv_sec * 1000 + time.tv_usec / 1000 );
 }
 //---------------------------------------------------------------------------
 void OSAPI_GetScreenSize( int &w, int &h )
