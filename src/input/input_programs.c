@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.60 2001/07/17 09:48:08 massiot Exp $
+ * $Id: input_programs.c,v 1.61 2001/08/09 20:16:17 jlj Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -104,6 +104,12 @@ void input_EndStream( input_thread_t * p_input )
         input_DelArea( p_input, p_input->stream.pp_areas[0] );
     }
 
+    /* Free selected ES */
+    if( p_input->stream.pp_selected_es != NULL )
+    {
+        free( p_input->stream.pp_selected_es );
+    }
+    
     if( p_input->stream.p_demux_data != NULL )
     {
         free( p_input->stream.p_demux_data );

@@ -7,7 +7,7 @@
  * will only be given back to netlist when refcount is zero.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: dvd_netlist.c,v 1.13 2001/07/30 00:53:05 sam Exp $
+ * $Id: dvd_netlist.c,v 1.14 2001/08/09 20:16:17 jlj Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *          Stéphane Borel <stef@videolan.org>
@@ -585,9 +585,10 @@ void DVDNetlistEnd( dvd_netlist_t * p_netlist )
     vlc_mutex_destroy( &p_netlist->lock );
     
     /* free the FIFO, the buffer, and the netlist structure */
-    free( p_netlist->pp_free_data );
-    free( p_netlist->pp_free_pes );
     free( p_netlist->pi_refcount );
+    free( p_netlist->p_free_iovec );
+    free( p_netlist->pp_free_pes );
+    free( p_netlist->pp_free_data );
     free( p_netlist->p_pes );
     free( p_netlist->p_data );
     free( p_netlist->p_buffers );

@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.36 2001/08/06 13:28:00 sam Exp $
+ * $Id: dvd_ifo.c,v 1.37 2001/08/09 20:16:17 jlj Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -1145,21 +1145,21 @@ static int FreeTitle( title_t * p_title )
         {
             free( p_title->command.p_cell_command );
         }
+    }
 
-        if( p_title->i_chapter_map_start_byte )
-        {
-            free( p_title->chapter_map.pi_start_cell );
-        }
+    if( p_title->i_chapter_map_start_byte )
+    {
+        free( p_title->chapter_map.pi_start_cell );
+    }
 
-        if( p_title->i_cell_play_start_byte )
-        {
-            free( p_title->p_cell_play );
-        }
+    if( p_title->i_cell_play_start_byte )
+    {
+        free( p_title->p_cell_play );
+    }
 
-        if( p_title->i_cell_pos_start_byte )
-        {
-            free( p_title->p_cell_pos );
-        }
+    if( p_title->i_cell_pos_start_byte )
+    {
+        free( p_title->p_cell_pos );
     }
 
     return 0;
@@ -1221,8 +1221,15 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf,
  *****************************************************************************/ 
 static int FreeUnitInf( unit_inf_t * p_unit_inf )
 {
+    int i;
+    
     if( p_unit_inf->p_title != NULL )
     {
+        for( i = 0 ; i < p_unit_inf->i_title_nb ; i++ )
+        {
+            FreeTitle( &p_unit_inf->p_title[i].title );
+        }
+            
         free( p_unit_inf->p_title );
     }
 

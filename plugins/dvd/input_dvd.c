@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.84 2001/08/06 13:28:00 sam Exp $
+ * $Id: input_dvd.c,v 1.85 2001/08/09 20:16:17 jlj Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -514,6 +514,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 input_UnselectES( p_input, p_input->stream.pp_selected_es[i] );
             }
 
+            free( p_input->stream.pp_selected_es );
             input_DelProgram( p_input, p_input->stream.pp_programs[0] );
 
             p_input->stream.pp_selected_es = NULL;
