@@ -327,6 +327,30 @@ Not released yet
     belongs to plugins/mpeg_vdec.
   * ALL: the first libvlc commit.
 
+0.4.4
+Sun, 11 Aug 2002 01:18:13 +0200
+
+  * ./src/misc/messages.c: fixed an extremely old buffer overflow.
+  * ./plugins/spudec/spu_decoder.c: fixed a moronic endianness bug.
+  * ./plugins/dvd/dvd.c: added a --dvd-css-method config option to the dvd
+    plugin.
+  * ./include/threads_funcs.h: fixed the --fast-mutex option.
+  * ./plugins/directx/vout_directx.*: the directx vout plugin now uses the
+    IID_IDirectDrawSurface2 interface, this shouldn't break anything and we
+    should now support WinNT4+DirectX3. Added support for YUY2 overlays because
+    a few graphics cards only support this. Some code cleanup too.
+  * ./plugins/directx/vout_events.c: small bugfix.
+  * ./plugins/network/ipv6.c: attempt to fix the win32 IPv6 implementation.
+    Multicast should even work (untested) although we'll need to find a way to
+    replace if_nametoindex() to have a fully functionnal win32 port.
+  * ./include/threads.h, ./include/threads_funcs.h: reverted Win32 pthread
+    implementation to the old code. Fixed vlc_cond_broadcast() for WinNT/2K/XP.
+    Additional vlc_cond_* implementations for Win9x.
+  * ./src/interface/main.c: renamed --fast_pthread option into --fast-mutex.
+    Added a--win9x-cv-method option to choose which vlc_cond_* implementation
+    we want on Win9x.
+  * ./plugins/avi/avi.c: kludge to play AVI files created by ffmpeg.
+
 0.4.3
 Fri, 26 Jul 2002 00:03:13 +0200
 
