@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.16 2002/01/04 14:01:34 sam Exp $
+ * $Id: input_dvdread.c,v 1.17 2002/01/08 23:34:06 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -147,17 +147,14 @@ static int DvdReadProbe( probedata_t *p_data )
     input_thread_t * p_input = (input_thread_t *)p_data;
 
     char * psz_name = p_input->p_source;
-    int i_score = 5;
 
-    if( ( strlen(psz_name) > 8 ) && !strncasecmp( psz_name, "dvdread:", 8 ) )
+    if((( strlen(psz_name) > 8 ) && !strncasecmp( psz_name, "dvdread:", 8 ))
+     ||(( strlen(psz_name) > 4 ) && !strncasecmp( psz_name, "dvd:", 4 )))
     {
-        /* If the user specified "dvdread:" then he probably wants
-         * to use libdvdread */
-        i_score = 100;
-        psz_name += 8;
+        return 1;
     }
 
-    return( i_score );
+    return 0;
 }
 
 /*****************************************************************************
@@ -299,6 +296,11 @@ static void DvdReadOpen( struct input_thread_s *p_input )
          && !strncasecmp( p_input->p_source, "dvdread:", 8 ) )
     {
         p_dvdread = DVDOpen( p_input->p_source + 8 );
+    }
+    else if( strlen( p_input->p_source ) > 4
+         && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    {
+        p_dvdread = DVDOpen( p_input->p_source + 4 );
     }
     else
     {
@@ -928,13 +930,6 @@ static int DvdReadRead( input_thread_t * p_input,
     p_input->pf_delete_packet( p_input->p_method_data, p_data_p );
     *pp_data = NULL;
 
-    while( p_data_p != NULL )
-    {
-        data_packet_t * p_next = p_data_p->p_next;
-        p_input->pf_delete_packet( p_input->p_method_data, p_data_p );
-        p_data_p = p_next;
-    }
-
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     p_input->stream.p_selected_area->i_tell =
@@ -970,7 +965,7 @@ static int DvdReadRead( input_thread_t * p_input,
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return 0;
+    return i_read;
 }
 #undef p_pgc
 
