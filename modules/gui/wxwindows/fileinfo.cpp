@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.10 2003/04/21 16:55:53 anil Exp $
+ * $Id: fileinfo.cpp,v 1.11 2003/04/22 18:21:15 ipkiss Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -123,40 +123,40 @@ void FileInfo::UpdateFileInfo()
     {
         if( fileinfo_root )
         {
-            fileinfo_tree->SetItemText ( fileinfo_root , "");
             fileinfo_root_label = "";
-            fileinfo_tree->DeleteChildren ( fileinfo_root );
+            fileinfo_tree->DeleteChildren( fileinfo_root );
         }
         return;
     }
 
-    wxString inputinfo = p_input->psz_name;
-
     if( !fileinfo_root )
     {
+        /* On linux, the first argument of wxTreeCtrl::AddRoot() can be
+         * retrieved with the GetItemText() method, but it doesn't work on
+         * Windows when the wxTR_HIDE_ROOT style is set. That's why we need to
+         * use the fileinfo_root_label variable... */
         fileinfo_root = fileinfo_tree->AddRoot( p_input->psz_name );
         fileinfo_root_label = p_input->psz_name;
     }
-    else if( fileinfo_root_label == inputinfo )
+    else if( fileinfo_root_label == (wxString)p_input->psz_name )
     {
         return;
     }
 
+    /* We rebuild the tree from scratch */
     fileinfo_tree->DeleteChildren( fileinfo_root );
+    fileinfo_root_label = p_input->psz_name;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    fileinfo_tree->SetItemText( fileinfo_root , p_input->psz_name );
-    fileinfo_root_label = p_input->psz_name;
-
     input_info_category_t *p_cat = p_input->stream.p_info;
 
-    while ( p_cat )
+    while( p_cat )
     {
         wxTreeItemId cat = fileinfo_tree->AppendItem( fileinfo_root,
                                                       p_cat->psz_name );
         input_info_t *p_info = p_cat->p_info;
-        while ( p_info )
+        while( p_info )
         {
             fileinfo_tree->AppendItem( cat, wxString(p_info->psz_name) + ": "
                                             + p_info->psz_value );
