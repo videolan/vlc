@@ -197,7 +197,7 @@ static int Open( vlc_object_t *p_this )
     p_access->info.i_size = p_sys->title[i_title]->i_size;
     p_access->info.i_pos = ( p_sys->i_sector - p_sys->p_sectors[1+i_title] ) * VCD_DATA_SIZE;
 
-    p_access->psz_demux = strdup( "ps2" );
+    p_access->psz_demux = strdup( "ps" );
 
     return VLC_SUCCESS;
 

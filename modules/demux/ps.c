@@ -44,7 +44,7 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("PS demuxer") );
-    set_capability( "demux2", 0 );
+    set_capability( "demux2", 1 );
     set_callbacks( Open, Close );
     add_shortcut( "ps" );
 vlc_module_end();
