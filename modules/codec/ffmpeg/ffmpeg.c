@@ -345,10 +345,13 @@ static struct
     /* Planar YUV formats */
     { VLC_FOURCC('Y','U','V','A'), PIX_FMT_YUV444P }, /* Hack */
     { VLC_FOURCC('I','4','4','4'), PIX_FMT_YUV444P },
+    { VLC_FOURCC('J','4','4','4'), PIX_FMT_YUVJ444P },
     { VLC_FOURCC('I','4','2','2'), PIX_FMT_YUV422P },
+    { VLC_FOURCC('J','4','2','2'), PIX_FMT_YUVJ422P },
     { VLC_FOURCC('I','4','2','0'), PIX_FMT_YUV420P },
     { VLC_FOURCC('Y','V','1','2'), PIX_FMT_YUV420P },
     { VLC_FOURCC('I','Y','U','V'), PIX_FMT_YUV420P },
+    { VLC_FOURCC('J','4','2','0'), PIX_FMT_YUVJ420P },
     { VLC_FOURCC('I','4','1','1'), PIX_FMT_YUV411P },
     { VLC_FOURCC('I','4','1','0'), PIX_FMT_YUV410P },
     { VLC_FOURCC('Y','V','U','9'), PIX_FMT_YUV410P },

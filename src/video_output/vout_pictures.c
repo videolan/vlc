@@ -572,17 +572,20 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
             p_format->i_bits_per_pixel = 32;
             break;
         case FOURCC_I444:
+        case FOURCC_J444:
             p_format->i_bits_per_pixel = 24;
             break;
         case FOURCC_I422:
         case FOURCC_YUY2:
         case FOURCC_UYVY:
+        case FOURCC_J422:
             p_format->i_bits_per_pixel = 16;
             p_format->i_bits_per_pixel = 16;
             break;
         case FOURCC_I411:
         case FOURCC_YV12:
         case FOURCC_I420:
+        case FOURCC_J420:
         case FOURCC_IYUV:
             p_format->i_bits_per_pixel = 12;
             break;
@@ -691,6 +694,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
         case FOURCC_YV12:
         case FOURCC_I420:
         case FOURCC_IYUV:
+        case FOURCC_J420:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
@@ -707,6 +711,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_I422:
+        case FOURCC_J422:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
@@ -723,6 +728,7 @@ int __vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
             break;
 
         case FOURCC_I444:
+        case FOURCC_J444:
             p_pic->p[ Y_PLANE ].i_lines = i_height_aligned;
             p_pic->p[ Y_PLANE ].i_visible_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width_aligned;
