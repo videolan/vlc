@@ -2444,7 +2444,7 @@ AC_ARG_ENABLE(qt,
      PLUGINS="${PLUGINS} qt"
      ALIASES="${ALIASES} qvlc"
      LDFLAGS_qt="${LDFLAGS_qt} -lqt -L${QTDIR}/lib"
-     CPPFLAGS_qt="${CPPFLAGS_qt} -I/usr/include/qt -I${QTDIR}/include"
+     CPPFLAGS_qt="${CPPFLAGS_qt} -I/usr/include/qt3 -I/usr/include/qt -I${QTDIR}/include"
      if test -x ${QTDIR}/bin/moc
      then
        MOC=${QTDIR}/bin/moc
@@ -2476,7 +2476,7 @@ AC_ARG_ENABLE(kde,
        LDFLAGS_kde="${LDFLAGS_kde} -lkio"
      ])
      LDFLAGS="${LDFLAGS_save}"
-     CPPFLAGS_kde="${CPPFLAGS_kde} -I/usr/include/kde -I/usr/include/qt"
+     CPPFLAGS_kde="${CPPFLAGS_kde} -I/usr/include/kde -I/usr/include/qt3 -I/usr/include/qt"
      CPPFLAGS_kde="${CPPFLAGS_kde} -I${KDEDIR}/include -I${QTDIR}/include"
      if test -x ${QTDIR}/bin/moc
      then
