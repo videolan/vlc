@@ -322,7 +322,7 @@ static void ErrorThread( input_thread_t *p_input )
 /*******************************************************************************
  * EndThread: end the input thread
  *******************************************************************************/
-static void EndThread( input_thread_t *p_input )
+static void EndThread( input_thread_t * p_input )
 {
     int i_es_loop;
 
@@ -889,30 +889,27 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
 
             default:
                 /* The PES header contains at least 3 more bytes: parse them */
-                p_pes->b_data_alignment = p_pes->p_pes_header[6] & 0x10;
-                p_pes->b_has_pts = p_pes->p_pes_header[7] & 0x4;
+                p_pes->b_data_alignment = p_pes->p_pes_header[6] & 0x04;
+                p_pes->b_has_pts = p_pes->p_pes_header[7] & 0x80;
                 i_pes_header_size = 9 + p_pes->p_pes_header[8];
-                
+
                 /* Now parse the optional header extensions (in the limit of
                    the 14 bytes */
                 if( p_pes->b_has_pts )
                 {
-                    pcr_descriptor_t *p_pcr;
-                    /* The PTS field is split in 3 bit records. We have to add
-                       them, and thereafter we substract the 2 marker_bits */
+                    pcr_descriptor_t * p_pcr;
 
                     p_pcr = p_input->p_pcr;
                     pthread_mutex_lock( &p_pcr->lock );
                     if( p_pcr->delta_clock == 0 )
                     {
-                        p_pes->i_pts = 0;
+                        p_pes->b_has_pts = 0;
                     }
                     else
                     {
-                        p_pes->i_pts = ( ((mtime_t)p_pes->p_pes_header[9] << 29) +
-                                         ((mtime_t)U16_AT(p_pes->p_pes_header + 10) << 14) +
-                                         ((mtime_t)U16_AT(p_pes->p_pes_header + 12) >> 1) -
-                                         (1 << 14) - (1 << 29) );
+                        p_pes->i_pts = ( ((mtime_t)(p_pes->p_pes_header[9] & 0x0E) << 29) |
+                                         (((mtime_t)U16_AT(p_pes->p_pes_header + 10) << 14) - (1 << 14)) |
+                                         ((mtime_t)U16_AT(p_pes->p_pes_header + 12) >> 1) );
                         p_pes->i_pts *= 300;
                         p_pes->i_pts /= 27;
                         p_pes->i_pts += p_pcr->delta_clock;
@@ -921,8 +918,8 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                             p_pcr->delta_decode = mdate() - p_pes->i_pts + 500000;
                         }
                         p_pes->i_pts += p_pcr->delta_decode;
+                        p_pcr->c_pts += 1;
                     }
-                    p_pcr->c_pts += 1;
                     pthread_mutex_unlock( &p_pcr->lock );
                 }
                 break;

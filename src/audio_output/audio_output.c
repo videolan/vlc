@@ -52,7 +52,7 @@ void aout_Thread_S16_Stereo     ( aout_thread_t * p_aout );
 void aout_Thread_U16_Stereo     ( aout_thread_t * p_aout );
 
 static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long l_numerator, long l_denominator );
-static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo );
+static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, mtime_t aout_date );
 
 /******************************************************************************
  * aout_Open
@@ -426,7 +426,7 @@ static __inline__ void InitializeIncrement( aout_increment_t * p_increment, long
 /******************************************************************************
  * NextFrame
  ******************************************************************************/
-static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
+static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, mtime_t aout_date )
 {
     long l_units, l_rate;
 
@@ -453,15 +453,30 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
         }
     }
 
+    if ( aout_date < p_fifo->date[p_fifo->l_start_frame] )
+    {
+        fprintf(stderr, "+");
+        pthread_mutex_unlock( &p_fifo->data_lock );
+        return( -1 );
+    }
+
     /* We are looking for the next dated frame */
     while ( p_fifo->l_next_frame != p_fifo->l_end_frame )
     {
         if ( p_fifo->date[p_fifo->l_next_frame] != LAST_MDATE )
         {
-            p_fifo->b_next_frame = 1;
-            break;
+            if ( aout_date < p_fifo->date[p_fifo->l_next_frame] )
+            {
+                p_fifo->b_next_frame = 1;
+                break;
+            }
+            else
+            {
+                fprintf(stderr, "-");
+                p_fifo->l_start_frame = p_fifo->l_next_frame;
+            }
         }
-        p_fifo->l_next_frame = (p_fifo->l_next_frame + 1) & AOUT_FIFO_SIZE;        
+        p_fifo->l_next_frame = (p_fifo->l_next_frame + 1) & AOUT_FIFO_SIZE;
     }
     if ( p_fifo->l_next_frame == p_fifo->l_end_frame )
     {
@@ -603,7 +618,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     {
                         if ( !p_aout->fifo[i_fifo].b_next_frame )
                         {
-                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo]) )
+                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo], p_aout->date + (mtime_t)((l_buffer >> p_aout->dsp.b_stereo) / p_aout->dsp.l_rate)) )
                             {
                                 break;
                             }
@@ -671,7 +686,7 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
                     {
                         if ( !p_aout->fifo[i_fifo].b_next_frame )
                         {
-                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo]) )
+                            if ( NextFrame(p_aout, &p_aout->fifo[i_fifo], p_aout->date + (mtime_t)((l_buffer >> p_aout->dsp.b_stereo) / p_aout->dsp.l_rate)) )
                             {
                                 break;
                             }

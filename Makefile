@@ -45,7 +45,6 @@ CCFLAGS += -D_GNU_SOURCE
 #CCFLAGS += -s -fargument-noalias-global -fexpensive-optimizations -ffast-math -funroll-loops -fomit-frame-pointer #-march=pentiumpro
 #(Uncomment -march=pentiumpro if it applies)
 
-
 #
 # C compiler flags: dependancies
 #
