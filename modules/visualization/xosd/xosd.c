@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.3 2002/08/26 09:12:46 sam Exp $
+ * $Id: xosd.c,v 1.4 2003/01/22 16:41:15 lool Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -51,9 +51,9 @@ struct intf_sys_t
  * Local prototypes.
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
-static void Close        ( vlc_object_t * );             
+static void Close        ( vlc_object_t * );
 
-static void Run          ( intf_thread_t * );                  
+static void Run          ( intf_thread_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -96,16 +96,30 @@ static int Open( vlc_object_t *p_this )
     if( p_intf->p_sys == NULL )
     {
         msg_Err( p_intf, "out of memory" );
-        return( 1 );
+        return VLC_ENOMEM;
+    }
+
+    if( getenv( "DISPLAY" ) == NULL )
+    {
+        msg_Err( p_intf, "no display, please set the DISPLAY variable" );
+        return VLC_EGENERIC;
     }
 
     /* Initialize library */
     p_intf->p_sys->p_osd =
 #ifdef HAVE_OLD_XOSD_H
-        xosd_init( "fixed", "LawnGreen", 3, XOSD_top, 0, 1 );
+        xosd_init( config_GetPsz( p_intf, "xosd-font" ),
+                   "LawnGreen", 3, XOSD_top, 0, 1 );
 #else
-        xosd_init( "fixed", "LawnGreen", 3, XOSD_top, 0, 0, 1 );
+        xosd_init( config_GetPsz( p_intf, "xosd-font" ),
+                   "LawnGreen", 3, XOSD_top, 0, 0, 1 );
 #endif
+
+    if( p_intf->p_sys->p_osd == NULL )
+    {
+        msg_Err( p_intf, "couldn't initialize libxosd" );
+        return VLC_EGENERIC;
+    }
 
     /* Initialize to NULL */
     p_intf->p_sys->psz_source = NULL;
@@ -117,14 +131,14 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * Close: destroy interface stuff
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
-{   
+{
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     if( p_intf->p_sys->psz_source ) free( p_intf->p_sys->psz_source );
