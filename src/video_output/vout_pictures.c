@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.39 2003/04/27 23:16:35 gbazin Exp $
+ * $Id: vout_pictures.c,v 1.40 2003/06/09 00:33:34 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -108,7 +108,7 @@ void vout_DatePicture( vout_thread_t *p_vout,
 picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                                vlc_bool_t b_progressive,
                                vlc_bool_t b_top_field_first,
-                               vlc_bool_t b_repeat_first_field )
+                               unsigned int i_nb_fields )
 {
     int         i_pic;                                      /* picture index */
     picture_t * p_pic;
@@ -136,7 +136,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
                 p_pic->b_force    = 0;
 
                 p_pic->b_progressive        = b_progressive;
-                p_pic->b_repeat_first_field = b_repeat_first_field;
+                p_pic->i_nb_fields          = i_nb_fields;
                 p_pic->b_top_field_first    = b_top_field_first;
 
                 p_vout->i_heap_size++;
@@ -178,7 +178,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
             p_freepic->b_force = 0;
 
             p_freepic->b_progressive        = b_progressive;
-            p_freepic->b_repeat_first_field = b_repeat_first_field;
+            p_freepic->i_nb_fields          = i_nb_fields;
             p_freepic->b_top_field_first    = b_top_field_first;
 
             p_freepic->i_matrix_coefficients = 1;

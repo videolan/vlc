@@ -2,7 +2,7 @@
  * vout_synchro.h: frame-dropping structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vout_synchro.h,v 1.1 2003/04/14 22:22:32 massiot Exp $
+ * $Id: vout_synchro.h,v 1.2 2003/06/09 00:33:34 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -49,7 +49,11 @@ struct vout_synchro_t
     /* and p_vout->render_time (read with p_vout->change_lock) */
 
     /* stream context */
-    vlc_bool_t      i_nb_ref;                /* Number of reference pictures */
+    int             i_nb_ref;                /* Number of reference pictures */
+    int             i_dec_nb_ref;      /* Number of reference pictures we'll *
+                                        * have if we decode the current pic  */
+    int             i_trash_nb_ref;    /* Number of reference pictures we'll *
+                                        * have if we trash the current pic   */
     unsigned int    i_eta_p, i_eta_b;
     mtime_t         backward_pts, current_pts;
     int             i_current_period;   /* period to add to the next picture */

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.62 2003/03/28 17:02:25 gbazin Exp $
+ * $Id: video.h,v 1.63 2003/06/09 00:33:34 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -74,7 +74,7 @@ struct picture_t
     /* Picture dynamic properties - those properties can be changed by the
      * decoder */
     vlc_bool_t      b_progressive;            /* is it a progressive frame ? */
-    vlc_bool_t      b_repeat_first_field;                         /* RFF bit */
+    unsigned int    i_nb_fields;                    /* # of displayed fields */
     vlc_bool_t      b_top_field_first;               /* which field is first */
 
     /* The picture heap we are attached to */

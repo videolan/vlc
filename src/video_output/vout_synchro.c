@@ -2,7 +2,7 @@
  * vout_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vout_synchro.c,v 1.2 2003/05/04 22:33:35 massiot Exp $
+ * $Id: vout_synchro.c,v 1.3 2003/06/09 00:33:34 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -134,6 +134,7 @@ vout_synchro_t * __vout_SynchroInit( vlc_object_t * p_object,
     memset( p_synchro->p_tau, 0, 4 * sizeof(mtime_t) );
     memset( p_synchro->pi_meaningful, 0, 4 * sizeof(unsigned int) );
     p_synchro->i_nb_ref = 0;
+    p_synchro->i_trash_nb_ref = p_synchro->i_dec_nb_ref = 0;
     p_synchro->current_pts = mdate() + DEFAULT_PTS_DELAY;
     p_synchro->backward_pts = 0;
     p_synchro->i_current_period = p_synchro->i_backward_period = 0;
@@ -161,6 +162,7 @@ void vout_SynchroRelease( vout_synchro_t * p_synchro )
 void vout_SynchroReset( vout_synchro_t * p_synchro )
 {
     p_synchro->i_nb_ref = 0;
+    p_synchro->i_trash_nb_ref = p_synchro->i_dec_nb_ref = 0;
 }
 
 /*****************************************************************************
@@ -215,10 +217,7 @@ vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type )
         {
             msg_Warn( p_synchro,
                       "synchro trashing I ("I64Fd")", pts - now );
-            p_synchro->i_nb_ref = 0;
         }
-        else if( p_synchro->i_nb_ref < 2 )
-            p_synchro->i_nb_ref++;
         break;
 
     case P_CODING_TYPE:
@@ -258,10 +257,6 @@ vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type )
         {
             b_decode = 0;
         }
-        if( b_decode )
-            p_synchro->i_nb_ref = 2;
-        else
-            p_synchro->i_nb_ref = 0;
         break;
 
     case B_CODING_TYPE:
@@ -296,6 +291,7 @@ vlc_bool_t vout_SynchroChoose( vout_synchro_t * p_synchro, int i_coding_type )
 void vout_SynchroTrash( vout_synchro_t * p_synchro )
 {
     p_synchro->i_trashed_pic++;
+    p_synchro->i_nb_ref = p_synchro->i_trash_nb_ref;
 }
 
 /*****************************************************************************
@@ -304,6 +300,7 @@ void vout_SynchroTrash( vout_synchro_t * p_synchro )
 void vout_SynchroDecode( vout_synchro_t * p_synchro )
 {
     p_synchro->decoding_start = mdate();
+    p_synchro->i_nb_ref = p_synchro->i_dec_nb_ref;
 }
 
 /*****************************************************************************
@@ -365,14 +362,17 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
         if( p_synchro->i_eta_p
              && p_synchro->i_eta_p != p_synchro->i_n_p )
         {
-#if 0
             msg_Dbg( p_synchro,
                      "stream periodicity changed from P[%d] to P[%d]",
                      p_synchro->i_n_p, p_synchro->i_eta_p );
-#endif
             p_synchro->i_n_p = p_synchro->i_eta_p;
         }
         p_synchro->i_eta_p = p_synchro->i_eta_b = 0;
+        p_synchro->i_trash_nb_ref = 0;
+        if( p_synchro->i_nb_ref < 2 )
+            p_synchro->i_dec_nb_ref = p_synchro->i_nb_ref + 1;
+        else
+            p_synchro->i_dec_nb_ref = p_synchro->i_nb_ref;
 
 #if 0
         msg_Dbg( p_synchro, "I("I64Fd") P("I64Fd")[%d] B("I64Fd")"
@@ -407,15 +407,20 @@ void vout_SynchroNewPicture( vout_synchro_t * p_synchro, int i_coding_type,
         if( p_synchro->i_eta_b
              && p_synchro->i_eta_b != p_synchro->i_n_b )
         {
-            msg_Warn( p_synchro,
-                      "stream periodicity changed from B[%d] to B[%d]",
-                      p_synchro->i_n_b, p_synchro->i_eta_b );
+            msg_Dbg( p_synchro,
+                     "stream periodicity changed from B[%d] to B[%d]",
+                     p_synchro->i_n_b, p_synchro->i_eta_b );
             p_synchro->i_n_b = p_synchro->i_eta_b;
         }
         p_synchro->i_eta_b = 0;
+        p_synchro->i_dec_nb_ref = 2;
+        p_synchro->i_trash_nb_ref = 0;
         break;
+
     case B_CODING_TYPE:
         p_synchro->i_eta_b++;
+        p_synchro->i_dec_nb_ref = p_synchro->i_trash_nb_ref
+            = p_synchro->i_nb_ref;
         break;
     }
 

@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.88 2003/06/01 23:48:17 hartman Exp $
+ * $Id: intf.m,v 1.89 2003/06/09 00:33:34 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -35,6 +35,7 @@
 #include "prefs.h"
 #include "playlist.h"
 #include "info.h"
+#include "controls.h"
 
 /*****************************************************************************
  * Local prototypes.

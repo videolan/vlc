@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.19 2003/06/02 12:42:15 hartman Exp $
+ * $Id: libmpeg2.c,v 1.20 2003/06/09 00:33:34 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -65,6 +65,10 @@ typedef struct dec_thread_t
     mtime_t          i_period_remainder;
     int              i_current_rate;
     picture_t *      p_picture_to_destroy;
+    vlc_bool_t       b_garbage_pic;
+    vlc_bool_t       b_after_sequence_header; /* is it the next frame after
+                                               * the sequence header ?    */
+    vlc_bool_t       b_slice_i;             /* intra-slice refresh stream */
 
     /*
      * Output properties
@@ -141,6 +145,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     p_dec->i_previous_pts = 0;
     p_dec->i_period_remainder = 0;
     p_dec->p_picture_to_destroy = NULL;
+    p_dec->b_garbage_pic = 0;
+    p_dec->b_slice_i  = 0;
     p_dec->b_skip     = 0;
 
     /* Initialize decoder */
@@ -177,8 +183,37 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 {
                     vout_SynchroReset( p_dec->p_synchro );
                     if ( p_dec->p_info->current_fbuf != NULL )
-                        p_dec->p_picture_to_destroy
-                            = p_dec->p_info->current_fbuf->id;
+                    {
+                        p_dec->b_garbage_pic = 1;
+                        p_pic = p_dec->p_info->current_fbuf->id;
+                    }
+                    else
+                    {
+                        uint8_t *buf[3];
+                        buf[0] = buf[1] = buf[2] = NULL;
+                        if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
+                            break;
+                        mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
+                    }
+                    p_dec->p_picture_to_destroy = p_pic;
+
+                    memset( p_pic->p[0].p_pixels, 0,
+                            p_dec->p_info->sequence->width
+                             * p_dec->p_info->sequence->height );
+                    memset( p_pic->p[1].p_pixels, 0x80,
+                            p_dec->p_info->sequence->width
+                             * p_dec->p_info->sequence->height / 4 );
+                    memset( p_pic->p[2].p_pixels, 0x80,
+                            p_dec->p_info->sequence->width
+                             * p_dec->p_info->sequence->height / 4 );
+
+                    if ( p_dec->b_slice_i )
+                    {
+                        vout_SynchroNewPicture( p_dec->p_synchro,
+                            I_CODING_TYPE, 2, 0, 0, p_dec->i_current_rate );
+                        vout_SynchroDecode( p_dec->p_synchro );
+                        vout_SynchroEnd( p_dec->p_synchro, I_CODING_TYPE, 0 );
+                    }
                 }
 
                 if( p_dec->p_pes->i_pts )
@@ -259,7 +294,24 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
             /* Set the first 2 reference frames */
             mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
-            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
+
+            if( (p_pic = GetNewPicture( p_dec, buf )) == NULL ) break;
+            memset( p_pic->p[0].p_pixels, 0,
+                    p_dec->p_info->sequence->width
+                     * p_dec->p_info->sequence->height );
+            memset( p_pic->p[1].p_pixels, 0x80,
+                    p_dec->p_info->sequence->width
+                     * p_dec->p_info->sequence->height / 4 );
+            memset( p_pic->p[2].p_pixels, 0x80,
+                    p_dec->p_info->sequence->width
+                     * p_dec->p_info->sequence->height / 4 );
+            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
+            /* This picture will never go through display_picture. */
+            vout_DatePicture( p_dec->p_vout, p_pic, 0 );
+            vout_DisplayPicture( p_dec->p_vout, p_pic );
+            /* For some reason, libmpeg2 will put this pic twice in
+             * discard_picture. This can be considered a bug in libmpeg2. */
+            vout_LinkPicture( p_dec->p_vout, p_pic );
 
             if ( p_dec->p_synchro )
             {
@@ -267,6 +319,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             }
             p_dec->p_synchro = vout_SynchroInit( p_dec->p_fifo, p_dec->p_vout,
                 (u32)((u64)1001000000 * 27 / p_dec->p_info->sequence->frame_period) );
+            p_dec->b_after_sequence_header = 1;
         }
         break;
 
@@ -292,6 +345,21 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             uint8_t *buf[3];
             buf[0] = buf[1] = buf[2] = NULL;
 
+            if ( p_dec->b_after_sequence_header
+                  && ((p_dec->p_info->current_picture->flags
+                        & PIC_MASK_CODING_TYPE)
+                       == PIC_FLAG_CODING_TYPE_P) )
+            {
+                /* Intra-slice refresh. Simulate a blank I picture. */
+                msg_Dbg( p_dec->p_fifo, "intra-slice refresh stream" );
+                vout_SynchroNewPicture( p_dec->p_synchro,
+                    I_CODING_TYPE, 2, 0, 0, p_dec->i_current_rate );
+                vout_SynchroDecode( p_dec->p_synchro );
+                vout_SynchroEnd( p_dec->p_synchro, I_CODING_TYPE, 0 );
+                p_dec->b_slice_i = 1;
+            }
+            p_dec->b_after_sequence_header = 0;
+
             vout_SynchroNewPicture( p_dec->p_synchro,
                 p_dec->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
                 p_dec->p_info->current_picture->nb_fields,
@@ -302,8 +370,12 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                 0,
                 p_dec->i_current_rate );
 
-            if ( !vout_SynchroChoose( p_dec->p_synchro,
-                p_dec->p_info->current_picture->flags & PIC_MASK_CODING_TYPE ) )
+            if ( !(p_dec->b_slice_i
+                   && ((p_dec->p_info->current_picture->flags
+                         & PIC_MASK_CODING_TYPE) == P_CODING_TYPE))
+                   && !vout_SynchroChoose( p_dec->p_synchro,
+                              p_dec->p_info->current_picture->flags
+                                & PIC_MASK_CODING_TYPE ) )
             {
                 mpeg2_skip( p_dec->p_mpeg2dec, 1 );
                 p_dec->b_skip = 1;
@@ -328,28 +400,22 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             {
                 p_pic = (picture_t *)p_dec->p_info->display_fbuf->id;
 
-                if ( p_pic != NULL )
+                vout_SynchroEnd( p_dec->p_synchro,
+                            p_dec->p_info->display_picture->flags
+                             & PIC_MASK_CODING_TYPE,
+                            p_dec->b_garbage_pic );
+                p_dec->b_garbage_pic = 0;
+                vout_DisplayPicture( p_dec->p_vout, p_pic );
+
+                if ( p_dec->p_picture_to_destroy != p_pic )
                 {
-                    if ( p_dec->p_picture_to_destroy != p_pic )
-                    {
-                        vout_SynchroEnd( p_dec->p_synchro,
-                            p_dec->p_info->display_picture->flags
-                             & PIC_MASK_CODING_TYPE,
-                            0 );
-                        vout_DatePicture( p_dec->p_vout, p_pic,
-                            vout_SynchroDate( p_dec->p_synchro ) );
-                        vout_DisplayPicture( p_dec->p_vout, p_pic );
-                    }
-                    else
-                    {
-                        p_dec->p_picture_to_destroy = NULL;
-                        vout_SynchroEnd( p_dec->p_synchro,
-                            p_dec->p_info->display_picture->flags
-                             & PIC_MASK_CODING_TYPE,
-                            1 );
-                        vout_DatePicture( p_dec->p_vout, p_pic, 0 );
-                        vout_DisplayPicture( p_dec->p_vout, p_pic );
-                    }
+                    vout_DatePicture( p_dec->p_vout, p_pic,
+                        vout_SynchroDate( p_dec->p_synchro ) );
+                }
+                else
+                {
+                    p_dec->p_picture_to_destroy = NULL;
+                    vout_DatePicture( p_dec->p_vout, p_pic, 0 );
                 }
             }
 
@@ -379,11 +445,34 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             if( p_dec->p_info->current_fbuf &&
                 p_dec->p_info->current_fbuf->id )
             {
-                p_pic = (picture_t *)p_dec->p_info->current_fbuf->id;
-                vout_UnlinkPicture( p_dec->p_vout, p_pic );
-                vout_DestroyPicture( p_dec->p_vout, p_pic );
+                p_dec->b_garbage_pic = 1;
+                p_pic = p_dec->p_info->current_fbuf->id;
             }
-            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
+            else
+            {
+                if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
+                    break;
+                mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
+            }
+            p_dec->p_picture_to_destroy = p_pic;
+
+            memset( p_pic->p[0].p_pixels, 0,
+                    p_dec->p_info->sequence->width
+                     * p_dec->p_info->sequence->height );
+            memset( p_pic->p[1].p_pixels, 0x80,
+                    p_dec->p_info->sequence->width
+                     * p_dec->p_info->sequence->height / 4 );
+            memset( p_pic->p[2].p_pixels, 0x80,
+                    p_dec->p_info->sequence->width
+                     * p_dec->p_info->sequence->height / 4 );
+
+            if ( p_dec->b_slice_i )
+            {
+                vout_SynchroNewPicture( p_dec->p_synchro,
+                            I_CODING_TYPE, 2, 0, 0, p_dec->i_current_rate );
+                vout_SynchroDecode( p_dec->p_synchro );
+                vout_SynchroEnd( p_dec->p_synchro, I_CODING_TYPE, 0 );
+            }
             break;
         }
 
@@ -461,9 +550,18 @@ static void CloseDecoder( dec_thread_t * p_dec )
 static picture_t *GetNewPicture( dec_thread_t *p_dec, uint8_t **pp_buf )
 {
     picture_t *p_pic;
+    vlc_bool_t b_progressive = p_dec->p_info->current_picture != NULL ?
+        p_dec->p_info->current_picture->flags & PIC_FLAG_PROGRESSIVE_FRAME :
+        1;
+    vlc_bool_t b_top_field_first = p_dec->p_info->current_picture != NULL ?
+        p_dec->p_info->current_picture->flags & PIC_FLAG_TOP_FIELD_FIRST :
+        1;
+    unsigned int i_nb_fields = p_dec->p_info->current_picture != NULL ?
+        p_dec->p_info->current_picture->nb_fields : 2;
 
     /* Get a new picture */
-    while( !(p_pic = vout_CreatePicture( p_dec->p_vout, 0, 0, 0 ) ) )
+    while( !(p_pic = vout_CreatePicture( p_dec->p_vout,
+        b_progressive, b_top_field_first, i_nb_fields )) )
     {
         if( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
             break;
