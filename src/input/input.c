@@ -566,6 +566,11 @@ static int Init( input_thread_t * p_input )
     var_Get( p_input, "audio-desync", &val );
     if( val.i_int < 0 ) p_input->i_pts_delay -= (val.i_int * 1000);
 
+    /* Update cr_average depending on the caching */
+    p_input->input.i_cr_average *= (10 * p_input->i_pts_delay / 200000);
+    p_input->input.i_cr_average /= 10;
+    if( p_input->input.i_cr_average <= 0 ) p_input->input.i_cr_average = 1;
+
     /* Load master infos */
     /* Init length */
     if( !demux2_Control( p_input->input.p_demux, DEMUX_GET_LENGTH,

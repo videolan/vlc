@@ -311,24 +311,12 @@ void input_ClockSetPCR( input_thread_t *p_input,
         else
         {
             /* Smooth clock reference variations. */
-            mtime_t     i_extrapoled_clock = ClockCurrent( p_input, cl );
+            mtime_t i_extrapoled_clock = ClockCurrent( p_input, cl );
 
             /* Bresenham algorithm to smooth variations. */
-            if( cl->c_average_count == cl->i_cr_average )
-            {
-                cl->delta_cr = ( cl->delta_cr
-                                        * (cl->i_cr_average - 1)
-                                      + ( i_extrapoled_clock - i_clock ) )
-                                    / cl->i_cr_average;
-            }
-            else
-            {
-                cl->delta_cr = ( cl->delta_cr
-                                        * cl->c_average_count
-                                      + ( i_extrapoled_clock - i_clock ) )
-                                    / (cl->c_average_count + 1);
-                cl->c_average_count++;
-            }
+            cl->delta_cr = ( cl->delta_cr * (cl->i_cr_average - 1)
+                               + ( i_extrapoled_clock - i_clock ) )
+                           / cl->i_cr_average;
         }
     }
 }
