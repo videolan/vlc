@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.49 2003/12/10 21:54:16 courmisch Exp $
+ * $Id: open.cpp,v 1.50 2003/12/11 05:27:23 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -677,15 +677,50 @@ void OpenDialog::UpdateMRL( int i_access_method )
         mrltemp = file_combo->GetValue();
         break;
     case DISC_ACCESS:
-        mrltemp = ( disc_type->GetSelection() == 0 ? wxT("dvd") :
-                disc_type->GetSelection() == 1 ? wxT("dvdsimple") :
-                disc_type->GetSelection() == 2 ? wxT("vcd") : wxT("cdda") )
-                  + demux + wxT(":")
-//                  + disc_device->GetLineText(0)
+      switch ( disc_type->GetSelection() ) 
+	{
+	case 0:
+	  mrltemp = wxT("dvd://") 
                   + disc_device->GetValue()
                   + wxString::Format( wxT("@%d:%d"),
                                       disc_title->GetValue(),
                                       disc_chapter->GetValue() );
+	  break;
+	case 1:
+	  mrltemp = wxT("dvdsimple://") 
+                  + disc_device->GetValue()
+                  + wxString::Format( wxT("@%d:%d"),
+                                      disc_title->GetValue(),
+                                      disc_chapter->GetValue() );
+	  break;
+	case 2:
+	  mrltemp = 
+#ifdef HAVE_VCDX
+	    wxT("vcdx://");
+#else
+	    wxT("vcd://") 
+                  + disc_device->GetValue()
+                  + wxString::Format( wxT("@%d:%d"),
+                                      disc_title->GetValue(),
+                                      disc_chapter->GetValue() );
+#endif
+	  break;
+	case 3:
+	  mrltemp = 
+#ifdef HAVE_CDDAX
+	    wxT("cddax://");
+#else
+	    wxT("cdda://") 
+                  + disc_device->GetValue()
+                  + wxString::Format( wxT("@%d"),
+                                      disc_title->GetValue() );
+#endif
+	  break;
+	default: ;
+	  msg_Err( p_intf, "invalid selection (%d)", 
+		   disc_type->GetSelection() );
+	}
+      
         break;
     case NET_ACCESS:
         switch( i_net_type )
