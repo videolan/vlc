@@ -48,44 +48,28 @@ void KMessagesWindow::update()
 
     if( p_msg->i_start != i_stop )
     {
-//         static GdkColor white  = { 0, 0xffff, 0xffff, 0xffff };
-//         static GdkColor gray   = { 0, 0xaaaa, 0xaaaa, 0xaaaa };
-//         static GdkColor yellow = { 0, 0xffff, 0xffff, 0x6666 };
-//         static GdkColor red    = { 0, 0xffff, 0x6666, 0x6666 };
-        
         static const char * ppsz_type[4] = { ": ", " error: ", " warning: ",
                                              " debug: " };
-//        static GdkColor *   pp_color[4] = { &white, &red, &yellow, &gray };
-
+        static const char * ppsz_color[4] = {
+            "<font color=#FFFFFF>",
+            "<font color=#FF0000>",
+            "<font color=#CCCC00>",
+            "<font>"
+        };
         for( i_start = p_msg->i_start;
              i_start != i_stop;
              i_start = (i_start+1) % VLC_MSG_QSIZE )
         {
             text->append( QString(p_msg->p_msg[i_start].psz_module) +
                           ppsz_type[p_msg->p_msg[i_start].i_type] +
-                          p_msg->p_msg[i_start].psz_msg + "<br>");
+                          ppsz_color[p_msg->p_msg[i_start].i_type] +
+                          p_msg->p_msg[i_start].psz_msg + "</font>" );
             
-//             /* Append all messages to log window */
-//             gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, &gray,
-//              NULL, p_msg->p_msg[i_start].psz_module, -1 );
-
-//             gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, &gray,
-//                 NULL, ppsz_type[p_msg->p_msg[i_start].i_type],
-//                 -1 );
-
-//             gtk_text_insert( p_intf->p_sys->p_messages_text, NULL,
-//                 pp_color[p_msg->p_msg[i_start].i_type], NULL,
-//                 p_msg->p_msg[i_start].psz_msg, -1 );
-
-//             gtk_text_insert( p_intf->p_sys->p_messages_text, NULL, &gray,
-//                 NULL, "\n", -1 );
         }
 
         vlc_mutex_lock( p_msg->p_lock );
         p_msg->i_start = i_start;
         vlc_mutex_unlock( p_msg->p_lock );
-//        gtk_text_set_point( p_intf->p_sys->p_messages_text,
-//                    gtk_text_get_length( p_intf->p_sys->p_messages_text ) );
 
     }
 }
