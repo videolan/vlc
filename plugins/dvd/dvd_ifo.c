@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.38 2001/10/13 15:34:21 stef Exp $
+ * $Id: dvd_ifo.c,v 1.39 2001/11/07 03:37:27 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -2145,7 +2145,7 @@ static void DumpBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp, int i_nb )
     {
         /* If we went too far, load the next buffer */
         *pp_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_pos + 1 )
-                   + (int)( (*pp_tmp) - (p_buf - DVD_LB_SIZE) );
+                   + (int)( (*pp_tmp) - (p_buf + DVD_LB_SIZE) );
     }
 
     return;
