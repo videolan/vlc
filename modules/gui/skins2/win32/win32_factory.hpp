@@ -2,7 +2,7 @@
  * win32_factory.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_factory.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: win32_factory.hpp,v 1.2 2004/01/27 17:01:51 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -80,10 +80,13 @@ class Win32Factory: public OSFactory
 
 
         /// Functions dynamically loaded from the dll, because they don't exist
-        /// on win9x
+        /// on Win9x/NT4
         // We dynamically load msimg32.dll to get a pointer to TransparentBlt()
         BOOL (WINAPI *TransparentBlt)( HDC, int, int, int, int,
                                        HDC, int, int, int, int, UINT );
+        BOOL (WINAPI *AlphaBlend)( HDC, int, int, int, int, HDC, int, int,
+                                   int, int, BLENDFUNCTION );
+
         // Idem for user32.dll and SetLayeredWindowAttributes()
         BOOL (WINAPI *SetLayeredWindowAttributes)( HWND, COLORREF,
                                                    BYTE, DWORD );

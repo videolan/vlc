@@ -2,7 +2,7 @@
  * win32_factory.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_factory.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: win32_factory.cpp,v 1.2 2004/01/27 17:01:51 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -79,7 +79,7 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 
 
 Win32Factory::Win32Factory( intf_thread_t *pIntf ):
-    OSFactory( pIntf ), TransparentBlt( NULL ),
+    OSFactory( pIntf ), TransparentBlt( NULL ), AlphaBlend( NULL ),
     SetLayeredWindowAttributes( NULL )
 {
     // see init()
@@ -124,8 +124,7 @@ bool Win32Factory::init()
 
     // Create Window
     m_hParentWindow = CreateWindowEx( WS_EX_APPWINDOW, "SkinWindowClass",
-        "VLC Media Player", WS_SYSMENU, 0, 0, 0, 0, 0, 0,
-        m_hInst, NULL );
+        "VLC media player", WS_SYSMENU, -200, -200, 0, 0, 0, 0, m_hInst, 0 );
     if( m_hParentWindow == NULL )
     {
         msg_Err( getIntf(), "Cannot create parent window" );
@@ -156,6 +155,15 @@ bool Win32Factory::init()
         TransparentBlt = NULL;
         msg_Dbg( getIntf(), "Couldn't find TransparentBlt(), "
                  "falling back to BitBlt()" );
+    }
+    if( !m_hMsimg32 ||
+        !( AlphaBlend =
+            (BOOL (WINAPI*)( HDC, int, int, int, int, HDC, int, int,
+                              int, int, BLENDFUNCTION ))
+            GetProcAddress( m_hMsimg32, "AlphaBlend" ) ) )
+    {
+        AlphaBlend = NULL;
+        msg_Dbg( getIntf(), "Couldn't find AlphaBlend()" );
     }
 
     // Idem for user32.dll and SetLayeredWindowAttributes()

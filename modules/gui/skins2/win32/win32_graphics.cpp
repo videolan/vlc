@@ -2,7 +2,7 @@
  * win32_graphics.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_graphics.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: win32_graphics.cpp,v 1.2 2004/01/27 17:01:51 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -179,14 +179,17 @@ void Win32Graphics::drawBitmap( const GenericBitmap &rBitmap,
     bf.AlphaFormat = AC_SRC_ALPHA;
 
     // Blend the image onto the internal DC
-    if( !AlphaBlend( m_hDC, xDest, yDest, width, height, hDC, 0, 0,
+    if( 1/*AlphaBlend*/ &&
+        !AlphaBlend( m_hDC, xDest, yDest, width, height, hDC, 0, 0,
                      width, height, bf ) )
     {
         msg_Err( getIntf(), "AlphaBlend() failed" );
     }
-
-    // Copy the image onto the internal DC
- //   BitBlt( m_hDC, xDest, yDest, width, height, hDC, 0, 0, SRCCOPY );
+    else if( 1/*!AlphaBlend*/ )
+    {
+        // Copy the image onto the internal DC
+        BitBlt( m_hDC, xDest, yDest, width, height, hDC, 0, 0, SRCCOPY );
+    }
 
     // Add the bitmap mask to the global graphics mask
     CombineRgn( m_mask, m_mask, mask, RGN_OR );
