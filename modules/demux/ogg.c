@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.35 2003/09/27 14:32:54 gbazin Exp $
+ * $Id: ogg.c,v 1.36 2003/09/27 15:33:02 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -151,6 +151,7 @@ typedef struct stream_header
 static int  Activate  ( vlc_object_t * );
 static void Deactivate( vlc_object_t * );
 static int  Demux     ( input_thread_t * );
+static int  Control   ( input_thread_t *, int, va_list );
 
 /* Stream managment */
 static int  Ogg_ElemStreamStart  ( input_thread_t *, demux_sys_t *, int );
@@ -1125,8 +1126,9 @@ static int Activate( vlc_object_t * p_this )
     /* Initialize the Ogg physical bitstream parser */
     ogg_sync_init( &p_ogg->oy );
 
-    /* Set exported function */
+    /*Set exported functions */
     p_input->pf_demux = Demux;
+    p_input->pf_demux_control = Control;
 
     /* Initialize access plug-in structures. */
     if( p_input->i_mtu == 0 )
@@ -1349,7 +1351,7 @@ static void Deactivate( vlc_object_t *p_this )
  *****************************************************************************/
 static int Demux( input_thread_t * p_input )
 {
-    demux_sys_t *p_ogg  = (demux_sys_t *)p_input->p_demux_data;
+    demux_sys_t *p_ogg = (demux_sys_t *)p_input->p_demux_data;
     ogg_page    oggpage;
     ogg_packet  oggpacket;
     int         i_stream;
@@ -1362,8 +1364,7 @@ static int Demux( input_thread_t * p_input )
         msg_Dbg( p_input, "beginning of a group of logical streams" );
 
         p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_REINIT;
-        input_ClockManageRef( p_input, p_input->stream.p_selected_program,
-                              0 );
+        input_ClockManageRef( p_input, p_input->stream.p_selected_program, 0 );
     }
 
 #define p_stream p_ogg->pp_stream[i_stream]
@@ -1515,4 +1516,24 @@ static int Demux( input_thread_t * p_input )
 #undef p_stream
 
     return 1;
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( input_thread_t *p_input, int i_query, va_list args )
+{
+    demux_sys_t *p_ogg  = (demux_sys_t *)p_input->p_demux_data;
+    int64_t i64, *pi64;
+
+    switch( i_query )
+    {
+        case DEMUX_GET_TIME:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = p_ogg->i_pcr * 100 / 9;
+            return VLC_SUCCESS;
+
+        default:
+            return demux_vaControlDefault( p_input, i_query, args );
+    }
 }
