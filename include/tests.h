@@ -43,6 +43,12 @@ int TestCPU( int i_capabilities );
  *****************************************************************************/
 static __inline__ int CPUCapabilities( void )
 {
+#ifdef SYS_BEOS
+    return( CPU_CAPABILITY_NONE
+            | CPU_CAPABILITY_486
+            | CPU_CAPABILITY_586
+            | CPU_CAPABILITY_MMX );
+#else
     int         i_capabilities = CPU_CAPABILITY_NONE;
 #ifdef __i386__
     int         i_eax, i_ebx, i_ecx, i_edx;
@@ -131,5 +137,6 @@ static __inline__ int CPUCapabilities( void )
 #endif /* __i386__ */
 
     return( i_capabilities );
+#endif /* SYS_BEOS */
 }
 

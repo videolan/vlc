@@ -374,7 +374,6 @@ PLUGIN_YUVMMX =	plugins/yuv/yuvmmx.o \
 
 STD_PLUGIN_OBJ = \
 		$(PLUGIN_ALSA) \
-		$(PLUGIN_BEOS) \
 		$(PLUGIN_DSP) \
 		$(PLUGIN_DUMMY) \
 		$(PLUGIN_DVD) \
@@ -398,10 +397,6 @@ STD_PLUGIN_OBJ = \
 		$(PLUGIN_YUV) \
 		$(PLUGIN_YUVMMX)
 
-NONSTD_PLUGIN_OBJ = \
-		$(PLUGIN_GLIDE) \
-		$(PLUGIN_GNOME)
-
 # list duplicates
 STD_PLUGIN_COMMON =	plugins/idct/idct_common.o \
 			plugins/motion/vdec_motion_common.o
@@ -410,11 +405,20 @@ STD_PLUGIN_COMMON =	plugins/idct/idct_common.o \
 STD_PLUGIN_OBJ :=	$(filter-out $(STD_PLUGIN_COMMON), \
 				 $(STD_PLUGIN_OBJ)) $(STD_PLUGIN_COMMON)
 
+NONSTD_PLUGIN_OBJ = \
+		$(PLUGIN_GLIDE) \
+		$(PLUGIN_GNOME)
+
+NONSTD_CPP_PLUGIN_OBJ = \
+		$(PLUGIN_BEOS)
+
 #
 # Other lists of files
 #
-objects := $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ) $(NONSTD_PLUGIN_OBJ)
-dependancies := $(objects:%.o=.dep/%.d)
+objects := $(C_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ) $(NONSTD_PLUGIN_OBJ)
+cdependancies := $(objects:%.o=.dep/%.d)
+cppobjects := $(CPP_OBJ) $(NONSTD_CPP_PLUGIN_OBJ)
+cppdependancies := $(cppobjects:%.o=.dep/%.dpp)
 
 # All symbols must be exported
 export
@@ -456,7 +460,13 @@ show:
 	@echo CFLAGS: $(CFLAGS)
 	@echo DCFLAGS: $(DCFLAGS)
 	@echo LCFLAGS: $(LCFLAGS)
+	@echo C_OBJ: $(C_OBJ)
+	@echo CPP_OBJ: $(CPP_OBJ)
 	@echo STD_PLUGIN_OBJ: $(STD_PLUGIN_OBJ)
+	@echo NONSTD_PLUGIN_OBJ: $(NONSTD_PLUGIN_OBJ)
+	@echo NONSTD_CPP_PLUGIN_OBJ: $(NONSTD_CPP_PLUGIN_OBJ)
+	@echo objects: $(objects)
+	@echo cppobjects: $(cppobjects)
 
 # ugliest of all, but I have no time to do it -- sam
 snapshot:
@@ -533,7 +543,10 @@ gvlc fbvlc: vlc
 #
 # Generic rules (see below)
 #
-$(dependancies): %.d: FORCE
+$(cdependancies): %.d: FORCE
+	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
+
+$(cppdependancies): %.dpp: FORCE
 	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
 
 $(C_OBJ): %.o: Makefile.dep
@@ -541,6 +554,8 @@ $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+$(CPP_OBJ): %.o: Makefile.dep
+$(CPP_OBJ): %.o: .dep/%.dpp
 $(CPP_OBJ): %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
 
@@ -563,6 +578,11 @@ $(PLUGIN_GLIDE): %.o: .dep/%.d
 $(PLUGIN_GLIDE): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -I/usr/include/glide -c -o $@ $<
 
+$(PLUGIN_BEOS): %.o: Makefile.dep
+$(PLUGIN_BEOS): %.o: .dep/%.dpp
+$(PLUGIN_BEOS): %.o: %.cpp
+	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
+
 #
 # Main application target
 #
@@ -581,7 +601,7 @@ endif
 #
 
 lib/beos.so: $(PLUGIN_BEOS)
-	$(CC) $(PCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_
+	$(CC) $(PCFLAGS) -nostart -Xlinker -soname=$@ -o $@ $^ plugins/_APP_ -lbe -lgame -lroot
 
 lib/esd.so: $(PLUGIN_ESD)
 ifneq (,$(findstring bsd,$(SYS)))

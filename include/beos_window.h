@@ -25,7 +25,8 @@ class VideoWindow : public BDirectWindow
 {
 public:
     // standard constructor and destructor
-    VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_output); 
+    VideoWindow( BRect frame, const char *name,
+                 struct vout_thread_s *p_video_output); 
     ~VideoWindow();
 
     // standard window member
@@ -35,9 +36,9 @@ public:
     // this is the hook controling direct screen connection
     virtual void    DirectConnected(direct_buffer_info *info);
 
-    int32           i_bytes_per_pixel;
-    int32           i_screen_depth;
-    vout_thread_t   *p_vout;
+    int32                   i_bytes_per_pixel;
+    int32                   i_screen_depth;
+    struct vout_thread_s   *p_vout;
      
     uint8           *fBits;
     int32           fRowBytes;

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.82 2001/02/16 09:25:04 sam Exp $
+ * $Id: input.c,v 1.83 2001/02/18 03:32:02 polux Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -445,7 +445,11 @@ void input_FileOpen( input_thread_t * p_input )
         p_input->stream.b_seekable = 1;
         p_input->stream.i_size = stat_info.st_size;
     }
-    else if( S_ISFIFO(stat_info.st_mode) || S_ISSOCK(stat_info.st_mode) )
+    else if( S_ISFIFO(stat_info.st_mode)
+#ifndef SYS_BEOS
+             || S_ISSOCK(stat_info.st_mode)
+#endif
+             )
     {
         p_input->stream.b_seekable = 0;
         p_input->stream.i_size = 0;

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.74 2001/02/13 13:01:14 massiot Exp $
+ * $Id: video_parser.c,v 1.75 2001/02/18 03:32:02 polux Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -287,13 +287,15 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->pp_vdec[0]->b_error = 0;
     p_vpar->pp_vdec[0]->p_vpar = p_vpar;
 
-#   if VDEC_NICE
+#   ifndef SYS_BEOS
+#       if VDEC_NICE
     /* Re-nice ourself */
     if( nice(VDEC_NICE) == -1 )
     {
         intf_WarnMsg( 2, "vpar warning : couldn't nice() (%s)",
                       strerror(errno) );
     }
+#       endif
 #   endif
 #endif
 

@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.7 2001/02/17 08:48:56 sam Exp $
+ * $Id: intf_beos.cpp,v 1.8 2001/02/18 03:32:02 polux Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -153,13 +153,13 @@ static int intf_Probe( probedata_t *p_data )
         return( 999 );
     }
 
-    return( 1 );
+    return( 100 );
 }
 
 /*****************************************************************************
- * intf_Create: initialize dummy interface
+ * intf_Open: initialize dummy interface
  *****************************************************************************/
-static int intf_Create( intf_thread_t *p_intf )
+static int intf_Open( intf_thread_t *p_intf )
 {
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t*) malloc( sizeof( intf_sys_t ) );
@@ -172,8 +172,8 @@ static int intf_Create( intf_thread_t *p_intf )
     
     /* Create the interface window */
     p_intf->p_sys->p_window =
-        new InterfaceWindow( BRect( 100, 100, 200, 200 ),
-                             "Interface :)", p_intf );
+        new InterfaceWindow( BRect( 50, 50, 400, 100 ),
+                             VOUT_TITLE " (BeOS interface)", p_intf );
     if( p_intf->p_sys->p_window == 0 )
     {
         free( p_intf->p_sys );
@@ -188,9 +188,9 @@ static int intf_Create( intf_thread_t *p_intf )
 }
 
 /*****************************************************************************
- * intf_Destroy: destroy dummy interface
+ * intf_Close: destroy dummy interface
  *****************************************************************************/
-static void intf_Destroy( intf_thread_t *p_intf )
+static void intf_Close( intf_thread_t *p_intf )
 {
     /* Destroy the interface window */
     p_intf->p_sys->p_window->Lock();

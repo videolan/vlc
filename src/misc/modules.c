@@ -92,8 +92,8 @@ void module_InitBank( module_bank_t * p_bank )
     char **         ppsz_path = path;
     char *          psz_file;
 #ifdef SYS_BEOS
-    char *          psz_program_path = beos_GetProgramPath();
-    int             i_programlen = strlen( psz_program_path );
+    char *          psz_vlcpath = beos_GetProgramPath();
+    int             i_vlclen = strlen( psz_vlcpath );
 #endif
     DIR *           dir;
     struct dirent * file;
@@ -124,13 +124,13 @@ void module_InitBank( module_bank_t * p_bank )
                      * access files under the current directory */
                     if( strncmp( file->d_name, "/", 1 ) )
                     {
-                        psz_file = malloc( i_programlen + i_dirlen
+                        psz_file = malloc( i_vlclen + i_dirlen
                                                + i_filelen + 3 );
                         if( psz_file == NULL )
                         {
                             continue;
                         }
-                        sprintf( psz_file, "%s/%s/%s", psz_programlen,
+                        sprintf( psz_file, "%s/%s/%s", psz_vlcpath,
                                  *ppsz_path, file->d_name );
                     }
                     else

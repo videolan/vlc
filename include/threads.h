@@ -287,6 +287,9 @@ static __inline__ int vlc_mutex_destroy( vlc_mutex_t *p_mutex )
 {
 #if defined(HAVE_PTHREAD_H)    
     return pthread_mutex_destroy( p_mutex );
+
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+    return 0;
 #endif    
 }
 
@@ -409,5 +412,9 @@ static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
 {
 #if defined(HAVE_PTHREAD_H)
     return pthread_cond_destroy( p_condvar );
+
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+    return 0;
 #endif    
 }
+

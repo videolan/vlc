@@ -543,7 +543,7 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
     /* Create the DirectDraw video window */
     p_vout->p_sys->p_window =
-        new VideoWindow(  BRect( 100, 100, 100+p_vout->i_width-1, 100+p_vout->i_height-1 ), "VideoLAN", p_vout );
+        new VideoWindow(  BRect( 50, 150, 50+p_vout->i_width-1, 150+p_vout->i_height-1 ), VOUT_TITLE " (BeOS output)", p_vout );
     if( p_vout->p_sys->p_window == 0 )
     {
         free( p_vout->p_sys );

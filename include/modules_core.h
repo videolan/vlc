@@ -76,8 +76,15 @@ module_getsymbol( module_handle_t handle, char * psz_function )
 {
 #ifdef SYS_BEOS
     void * p_symbol;
-    get_image_symbol( handle, psz_function, B_SYMBOL_TYPE_TEXT, &p_symbol );
-    return( p_symbol );
+    if( B_OK == get_image_symbol( handle, psz_function,
+                                  B_SYMBOL_TYPE_TEXT, &p_symbol ) )
+    {
+        return( p_symbol );
+    }
+    else
+    {
+        return( NULL );
+    }
 #else
     return( dlsym( handle, psz_function ) );
 #endif

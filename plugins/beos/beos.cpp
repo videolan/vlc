@@ -87,7 +87,8 @@ int InitModule( module_t * p_module )
  *****************************************************************************/
 int ActivateModule( module_t * p_module )
 {
-    p_module->p_functions = malloc( sizeof( module_functions_t ) );
+    p_module->p_functions =
+                ( module_functions_t * )malloc( sizeof( module_functions_t ) );
     if( p_module->p_functions == NULL )
     {
         return( -1 );
