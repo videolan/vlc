@@ -314,7 +314,7 @@ on_intf_playlist_drag_data_received    (GtkWidget       *widget,
                 &row, 
                 &col )== 1)
     {
-        on_generic_drop_data_received( p_intf, data, info, row);
+        on_generic_drop_data_received( p_intf, data, info, row -1 /*TRICK ! */);
     } else {
         on_generic_drop_data_received( p_intf, data, info, PLAYLIST_END);
     }

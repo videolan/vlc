@@ -1277,10 +1277,12 @@ create_intf_playlist (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (playlist_clist);
   gtk_container_add (GTK_CONTAINER (scrolledwindow1), playlist_clist);
+  gtk_container_set_border_width (GTK_CONTAINER (playlist_clist), 1);
   gtk_clist_set_column_width (GTK_CLIST (playlist_clist), 0, 257);
   gtk_clist_set_column_width (GTK_CLIST (playlist_clist), 1, 80);
   gtk_clist_set_selection_mode (GTK_CLIST (playlist_clist), GTK_SELECTION_EXTENDED);
-  gtk_clist_column_titles_hide (GTK_CLIST (playlist_clist));
+  gtk_clist_column_titles_show (GTK_CLIST (playlist_clist));
+  gtk_clist_set_shadow_type (GTK_CLIST (playlist_clist), GTK_SHADOW_OUT);
 
   label22 = gtk_label_new (_("File"));
   gtk_widget_ref (label22);

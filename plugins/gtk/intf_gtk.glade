@@ -1387,6 +1387,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
       <widget>
 	<class>GtkCList</class>
 	<name>playlist_clist</name>
+	<border_width>1</border_width>
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>event</name>
@@ -1401,8 +1402,8 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 	<columns>2</columns>
 	<column_widths>257,80</column_widths>
 	<selection_mode>GTK_SELECTION_EXTENDED</selection_mode>
-	<show_titles>False</show_titles>
-	<shadow_type>GTK_SHADOW_IN</shadow_type>
+	<show_titles>True</show_titles>
+	<shadow_type>GTK_SHADOW_OUT</shadow_type>
 
 	<widget>
 	  <class>GtkLabel</class>
