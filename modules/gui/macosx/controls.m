@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.17 2003/01/29 11:34:11 jlj Exp $
+ * $Id: controls.m,v 1.18 2003/01/29 11:41:48 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -100,17 +100,14 @@
     }
     else
     {
-        vlc_bool_t b_empty;
-
-        b_empty = playlist_IsEmpty( p_playlist );
-        vlc_object_release( p_playlist );
-
-        if( !b_empty )
+        if( !playlist_IsEmpty( p_playlist ) )
         {
             playlist_Play( p_playlist );
+            vlc_object_release( p_playlist );
         }
         else
         {
+            vlc_object_release( p_playlist );
             [o_open openFile: nil];
         }
     }
