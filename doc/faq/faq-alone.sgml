@@ -1,0 +1,26 @@
+<!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook V4.1//EN'
+[
+
+  <!ENTITY faq SYSTEM "faq.sgml">
+
+]>
+
+<book>
+
+<bookinfo>
+
+<title>Frequently Asked Questions</title>
+
+<copyright>
+    <year>2002, 2003</year>
+    <holder>the VideoLAN project</holder>
+</copyright>
+
+</bookinfo>
+
+
+<toc></toc>
+
+&faq;
+
+</book>
