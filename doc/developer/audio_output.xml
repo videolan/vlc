@@ -294,11 +294,15 @@ When the decoder dies, or the sample format changes, the input stream must be de
 
   </sect1>
   
-  <!--
   <sect1> <title> API for the output module </title>
+
+    <para>
+An output module must implement a constructor, an optional destructor, and a p_aout->output.pf_play function. The constructor is the function which will be called when the module is loaded.
+    </para>
   
   </sect1>
   
+  <!--
   <sect1> <title> Writing an audio filter </title>
   
   </sect1>
