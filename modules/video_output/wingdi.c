@@ -31,16 +31,14 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 
-#include <windows.h>
-#define WIN32_LEAN_AND_MEAN
+#include <commctrl.h>
 
 #ifdef UNDER_CE
-#   include <aygshell.h>
+#   define SHFS_HIDESIPBUTTON   0x0008
 #   define MENU_HEIGHT 26
 #else
 #   define SHFS_HIDESIPBUTTON 0
 #   define MENU_HEIGHT 0
-#   define NM_CUSTOMDRAW 0
 #endif
 
 #undef MODULE_NAME_IS_gapi

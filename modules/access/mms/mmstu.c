@@ -47,7 +47,9 @@
 #   include <sys/stat.h>
 #endif
 
-#ifdef WIN32
+#if defined( UNDER_CE )
+#   include <winsock.h>
+#elif WIN32
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   ifndef IN_MULTICAST

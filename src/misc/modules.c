@@ -115,7 +115,7 @@
 #   include "modules_plugin.h"
 #endif
 
-#if defined( UNDER_CE )
+#if defined( _MSC_VER ) && defined( UNDER_CE )
 #    include "modules_builtin_evc.h"
 #elif defined( _MSC_VER )
 #    include "modules_builtin_msvc.h"

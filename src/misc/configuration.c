@@ -1616,6 +1616,10 @@ char *config_GetHomeDir( void )
 
 #elif defined(UNDER_CE)
 
+#ifndef CSIDL_APPDATA
+#   define CSIDL_APPDATA 0x1A
+#endif
+
     wchar_t p_whomedir[MAX_PATH];
 
     /* get the "Application Data" folder for the current user */

@@ -90,13 +90,8 @@ struct vlc_t
 
     /* Fast memcpy plugin used */
     module_t *             p_memcpy_module;
-#if defined( UNDER_CE )
-    void* ( __cdecl *pf_memcpy ) ( void *, const void *, size_t );
-    void* ( __cdecl *pf_memset ) ( void *, int, size_t );
-#else
     void* ( *pf_memcpy ) ( void *, const void *, size_t );
     void* ( *pf_memset ) ( void *, int, size_t );
-#endif
 
     /* Shared data - these structures are accessed directly from p_vlc by
      * several modules */

@@ -37,7 +37,7 @@
 #   include <fcntl.h>
 #endif
 
-#include <winsock2.h>
+#include <winsock.h>
 
 /*****************************************************************************
  * system_Init: initialize winsock and misc other things.
@@ -77,8 +77,8 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
     /* Set the default file-translation mode */
 #if !defined( UNDER_CE )
     _fmode = _O_BINARY;
-#endif
     _setmode( _fileno( stdin ), _O_BINARY ); /* Needed for pipes */
+#endif
 
     /* Call mdate() once to make sure it is initialized properly */
     mdate();
