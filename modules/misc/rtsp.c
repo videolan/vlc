@@ -140,6 +140,7 @@ struct vod_media_t
     char *psz_session_description;
     char *psz_session_url;
     char *psz_session_email;
+    mtime_t i_length;
 };
 
 struct vod_sys_t
@@ -314,6 +315,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
 
     p_media->i_sdp_id = mdate();
     p_media->i_sdp_version = 1;
+    p_media->i_length = p_item->i_duration;
 
     vlc_mutex_lock( &p_item->lock );
     msg_Dbg( p_vod, "media has %i declared ES", p_item->i_es );
@@ -738,8 +740,10 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
     media_es_t *p_es = (media_es_t*)p_args;
     vod_media_t *p_media = p_es->p_media;
     vod_t *p_vod = p_media->p_vod;
+    rtsp_client_t *p_rtsp = NULL;
     char *psz_session = NULL;
     char *psz_transport = NULL;
+    char *psz_position = NULL;
     int i;
 
     if( answer == NULL || query == NULL ) return VLC_SUCCESS;
@@ -841,9 +845,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
         break;
 
         case HTTPD_MSG_TEARDOWN:
-        {
-            rtsp_client_t *p_rtsp;
-
             answer->i_status = 200;
             answer->psz_status = strdup( "OK" );
             answer->i_body = 0;
@@ -872,10 +873,40 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 RtspClientDel( p_media, p_rtsp );
             }
             break;
-        }
 
         case HTTPD_MSG_PLAY:
+            psz_session = httpd_MsgGet( query, "Session" );
+            msg_Dbg( p_vod, "HTTPD_MSG_PLAY for session: %s", psz_session );
+
+            p_rtsp = RtspClientGet( p_media, psz_session );
+
+            psz_position = httpd_MsgGet( query, "Range" );
+            if( psz_position ) psz_position = strstr( psz_position, "npt=" );
+            if( psz_position )
+            {
+                float f_pos;
+
+                msg_Dbg( p_vod, "seeking request: %s", psz_position );
+
+                psz_position += 4;
+                if( sscanf( psz_position, "%f", &f_pos ) == 1 )
+                {
+                    f_pos /= ((float)(p_media->i_length/1000))/1000 / 100;
+                    vod_MediaControl( p_vod, p_media, psz_session,
+                                      VOD_MEDIA_SEEK, (double)f_pos );
+                }
+            }
+
+            answer->i_status = 460;
+            answer->psz_status = strdup( "Only Aggregate Operation Allowed" );
+            answer->i_body = 0;
+            answer->p_body = NULL;
+            break;
+
         case HTTPD_MSG_PAUSE:
+            psz_session = httpd_MsgGet( query, "Session" );
+            msg_Dbg( p_vod, "HTTPD_MSG_PAUSE for session: %s", psz_session );
+
             answer->i_status = 460;
             answer->psz_status = strdup( "Only Aggregate Operation Allowed" );
             answer->i_body = 0;
@@ -920,7 +951,8 @@ static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
         strlen( "t=0 0\r\n" ) + /* FIXME */
         strlen( "a=tool:"PACKAGE_STRING"\r\n" ) +
         strlen( "c=IN IP4 */*\r\n" ) + 20 + 10 +
-        strlen( psz_destination ? psz_destination : "0.0.0.0" ) ;
+        strlen( psz_destination ? psz_destination : "0.0.0.0" ) +
+        strlen( "a=range:npt=0-1000000000.000\r\n" );
 
     for( i = 0; i < p_media->i_es; i++ )
     {
@@ -960,6 +992,10 @@ static char *SDPGenerate( vod_media_t *p_media, char *psz_destination )
 
     p += sprintf( p, "c=IN IP4 %s/%d\r\n", psz_destination ?
                   psz_destination : "0.0.0.0", p_media->i_ttl );
+
+    if( p_media->i_length > 0 )
+    p += sprintf( p, "a=range:npt=0-%.3f\r\n",
+                  ((float)(p_media->i_length/1000))/1000 );
 
     for( i = 0; i < p_media->i_es; i++ )
     {

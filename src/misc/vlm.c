@@ -2165,6 +2165,16 @@ static int vlm_MediaVodControl( void *p_private, vod_media_t *p_vod_media,
         i_ret = vlm_MediaControl( vlm, vlm->media[i], psz_id, "stop", 0 );
         break;
 
+    case VOD_MEDIA_SEEK:
+    {
+        double f_pos = (double)va_arg( args, double );
+        char psz_pos[50];
+
+        sprintf( psz_pos, "%f", f_pos );
+        i_ret = vlm_MediaControl( vlm, vlm->media[i], psz_id, "seek", psz_pos);
+        break;
+    }
+
     default:
         break;
     }
