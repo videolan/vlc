@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.30 2002/05/14 21:23:44 massiot Exp $
+ * $Id: input_clock.c,v 1.31 2002/05/17 18:06:34 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -155,10 +155,12 @@ int input_ClockManageControl( input_thread_t * p_input,
     if( p_input->stream.i_new_status == PAUSE_S )
     {
         int i_old_status;
+
         vlc_mutex_lock( &p_input->stream.control.control_lock );
         i_old_status = p_input->stream.control.i_status;
-
         p_input->stream.control.i_status = PAUSE_S;
+        vlc_mutex_unlock( &p_input->stream.control.control_lock );
+        
         vlc_cond_wait( &p_input->stream.stream_wait,
                        &p_input->stream.stream_lock );
         p_pgrm->last_syscr = 0;
@@ -167,13 +169,15 @@ int input_ClockManageControl( input_thread_t * p_input,
         if( p_input->stream.i_new_status == PAUSE_S )
         { 
             /* PAUSE_S undoes the pause state: Return to old state. */
+            vlc_mutex_lock( &p_input->stream.control.control_lock );
             p_input->stream.control.i_status = i_old_status;
+            vlc_mutex_unlock( &p_input->stream.control.control_lock );
+            
             p_input->stream.i_new_status = UNDEF_S;
             p_input->stream.i_new_rate = UNDEF_S;
         }
 
         /* We handle i_new_status != PAUSE_S below... */
-        vlc_mutex_unlock( &p_input->stream.control.control_lock );
 
         i_return_value = PAUSE_S;
     }
