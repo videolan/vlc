@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.12 2003/02/05 22:11:52 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.13 2003/02/09 01:56:21 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -614,22 +614,10 @@ void GtkVolumeUp                      ( GtkMenuItem     *menuitem,
                                         gpointer         user_data )
 {
     intf_thread_t   *p_intf = GtkGetIntf( menuitem );
-    aout_instance_t *p_aout;
+    audio_volume_t  i_volume;
 
-    p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    if( p_aout != NULL )
-    {
-        if( p_intf->p_sys->b_mute )
-        {
-            audio_volume_t i_volume;
-
-            aout_VolumeMute( p_aout, &i_volume );
-            p_intf->p_sys->b_mute = ( i_volume == 0 ) ? 1 : 0;
-
-        }
-        aout_VolumeUp( p_aout, 1, NULL );
-        vlc_object_release( (vlc_object_t *)p_aout );
-    }
+    aout_VolumeUp( p_intf, 1, &i_volume );
+    p_intf->p_sys->b_mute = ( i_volume == 0 ) ? 1 : 0;
 }
 
 
@@ -637,21 +625,10 @@ void GtkVolumeDown                    ( GtkMenuItem     *menuitem,
                                         gpointer         user_data )
 {
     intf_thread_t   *p_intf = GtkGetIntf( menuitem );
-    aout_instance_t *p_aout;
+    audio_volume_t  i_volume;
 
-    p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    if( p_aout != NULL )
-    {
-        if( p_intf->p_sys->b_mute )
-        {
-            audio_volume_t i_volume;
-
-            aout_VolumeMute( p_aout, &i_volume );
-            p_intf->p_sys->b_mute = ( i_volume == 0 ) ? 1 : 0;
-        }
-        aout_VolumeDown( p_aout, 1, NULL );
-        vlc_object_release( (vlc_object_t *)p_aout );
-    }
+    aout_VolumeDown( p_intf, 1, &i_volume );
+    p_intf->p_sys->b_mute = ( i_volume == 0 ) ? 1 : 0;
 }
 
 
@@ -659,19 +636,10 @@ void GtkVolumeMute                    ( GtkMenuItem     *menuitem,
                                         gpointer         user_data )
 {
     intf_thread_t   *p_intf = GtkGetIntf( menuitem );
-    aout_instance_t *p_aout;
     audio_volume_t i_volume;
 
-    p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT, FIND_ANYWHERE );
-
-    if( p_aout != NULL )
-    {
-        aout_VolumeMute( p_aout, &i_volume );
-
-        p_intf->p_sys->b_mute = ( i_volume == 0 ) ? 1 : 0;
-
-        vlc_object_release( (vlc_object_t *)p_aout );
-    }
+    aout_VolumeMute( p_intf, &i_volume );
+    p_intf->p_sys->b_mute = ( i_volume == 0 ) ? 1 : 0;
 }
 
 void
