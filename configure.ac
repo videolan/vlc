@@ -2170,7 +2170,7 @@ AC_CHECK_HEADERS(zlib.h, [
 ] )
 
 AC_CHECK_HEADERS(sysfs/libsysfs.h, [
-  VLC_ADD_LDFLAGS([mp4],[-lsysfs])
+  VLC_ADD_LDFLAGS([mp4 mkv],[-lsysfs])
 ] )
 
 dnl
