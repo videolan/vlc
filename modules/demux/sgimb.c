@@ -107,34 +107,36 @@ static int Activate( vlc_object_t * p_this )
     byte_t *p_peek;
     int i_size;
 
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    p_sys->psz_uri = NULL;
-    p_sys->psz_server = NULL;
-    p_sys->psz_location = NULL;
-    p_sys->psz_name = NULL;
-    p_sys->psz_user = NULL;
-    p_sys->psz_password = NULL;
-    p_sys->psz_mcast_ip = NULL;
-    p_sys->i_mcast_port = 0;
-    p_sys->i_packet_size = 0;
-    p_sys->i_duration = (mtime_t)0;
-    p_sys->i_port = 0;
-
-
     /* Lets check the content to see if this is a sgi mediabase file */
     i_size = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
     i_size -= sizeof("sgiNameServerHost=") - 1;
-    if ( i_size > 0 ) {
-        while ( i_size
-            && strncasecmp( p_peek, "sgiNameServerHost=", sizeof("sgiNameServerHost=") - 1 ) )
+    if ( i_size > 0 )
+    {
+        while ( i_size && strncasecmp( p_peek, "sgiNameServerHost=",
+                                       sizeof("sgiNameServerHost=") - 1 ) )
         {
             p_peek++;
             i_size--;
         }
-        if ( !strncasecmp( p_peek, "sgiNameServerHost=", sizeof("sgiNameServerHost=") -1 ) )
+        if ( !strncasecmp( p_peek, "sgiNameServerHost=",
+                           sizeof("sgiNameServerHost=") -1 ) )
         {
+            p_demux->pf_demux = Demux;
+            p_demux->pf_control = Control;
+
+            p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
+            p_sys->psz_uri = NULL;
+            p_sys->psz_server = NULL;
+            p_sys->psz_location = NULL;
+            p_sys->psz_name = NULL;
+            p_sys->psz_user = NULL;
+            p_sys->psz_password = NULL;
+            p_sys->psz_mcast_ip = NULL;
+            p_sys->i_mcast_port = 0;
+            p_sys->i_packet_size = 0;
+            p_sys->i_duration = 0;
+            p_sys->i_port = 0;
+
             return VLC_SUCCESS;
         }
     }
