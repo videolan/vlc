@@ -66,8 +66,20 @@
         {
             /*fill uri / title / author info */
             int i_item = [o_vlc_playlist selectedPlaylistItem];
-            [o_uri_txt setStringValue:[NSString stringWithUTF8String: p_playlist->pp_items[i_item]->psz_uri]];
-            [o_title_txt setStringValue:[NSString stringWithUTF8String: p_playlist->pp_items[i_item]->psz_name]];
+            [o_uri_txt setStringValue:
+                ([NSString stringWithUTF8String:p_playlist->
+                    pp_items[i_item]->psz_uri] == nil ) ?
+                @"" :
+                [NSString stringWithUTF8String:p_playlist->
+                    pp_items[i_item]->psz_uri]];
+
+            [o_title_txt setStringValue:
+                ([NSString stringWithUTF8String:p_playlist->
+                    pp_items[i_item]->psz_name] == nil ) ?
+                @"" :
+                [NSString stringWithUTF8String:p_playlist->
+                    pp_items[i_item]->psz_name]];
+
             [o_author_txt setStringValue:[NSString stringWithUTF8String: playlist_GetInfo(p_playlist, i_item ,_("General"),_("Author") )]];
 
             [[VLCInfoTreeItem rootItem] refresh];
