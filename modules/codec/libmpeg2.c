@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.27 2003/09/03 10:23:17 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.28 2003/09/30 20:23:03 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -187,52 +187,50 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
         switch( state )
         {
         case STATE_BUFFER:
-                if( !p_block->i_buffer || b_need_more_data )
+            if( !p_block->i_buffer || b_need_more_data )
+            {
+                block_Release( p_block );
+                return VLC_SUCCESS;
+            }
+
+            if( p_block->b_discontinuity && p_sys->p_synchro 
+                && p_sys->p_info->sequence->width != (unsigned)-1 )
+            {
+                vout_SynchroReset( p_sys->p_synchro );
+                if( p_sys->p_info->current_fbuf != NULL
+                    && p_sys->p_info->current_fbuf->id != NULL )
                 {
-                    block_Release( p_block );
-                    return VLC_SUCCESS;
+                    p_sys->b_garbage_pic = 1;
+                    p_pic = p_sys->p_info->current_fbuf->id;
                 }
-
-#if 0
-                if( p_pes->b_discontinuity && p_sys->p_synchro 
-                     && p_sys->p_info->sequence->width != (unsigned)-1 )
+                else
                 {
-                    vout_SynchroReset( p_sys->p_synchro );
-                    if ( p_sys->p_info->current_fbuf != NULL
-                          && p_sys->p_info->current_fbuf->id != NULL )
-                    {
-                        p_sys->b_garbage_pic = 1;
-                        p_pic = p_sys->p_info->current_fbuf->id;
-                    }
-                    else
-                    {
-                        uint8_t *buf[3];
-                        buf[0] = buf[1] = buf[2] = NULL;
-                        if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
-                            break;
-                        mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
-                    }
-                    p_sys->p_picture_to_destroy = p_pic;
-
-                    memset( p_pic->p[0].p_pixels, 0,
-                            p_sys->p_info->sequence->width
-                             * p_sys->p_info->sequence->height );
-                    memset( p_pic->p[1].p_pixels, 0x80,
-                            p_sys->p_info->sequence->width
-                             * p_sys->p_info->sequence->height / 4 );
-                    memset( p_pic->p[2].p_pixels, 0x80,
-                            p_sys->p_info->sequence->width
-                             * p_sys->p_info->sequence->height / 4 );
-
-                    if ( p_sys->b_slice_i )
-                    {
-                        vout_SynchroNewPicture( p_sys->p_synchro,
-                            I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate );
-                        vout_SynchroDecode( p_sys->p_synchro );
-                        vout_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
-                    }
+                    uint8_t *buf[3];
+                    buf[0] = buf[1] = buf[2] = NULL;
+                    if( (p_pic = GetNewPicture( p_dec, buf )) == NULL )
+                        break;
+                    mpeg2_set_buf( p_sys->p_mpeg2dec, buf, p_pic );
                 }
-#endif
+                p_sys->p_picture_to_destroy = p_pic;
+
+                memset( p_pic->p[0].p_pixels, 0,
+                        p_sys->p_info->sequence->width
+                         * p_sys->p_info->sequence->height );
+                memset( p_pic->p[1].p_pixels, 0x80,
+                        p_sys->p_info->sequence->width
+                         * p_sys->p_info->sequence->height / 4 );
+                memset( p_pic->p[2].p_pixels, 0x80,
+                        p_sys->p_info->sequence->width
+                         * p_sys->p_info->sequence->height / 4 );
+
+                if ( p_sys->b_slice_i )
+                {
+                    vout_SynchroNewPicture( p_sys->p_synchro,
+                        I_CODING_TYPE, 2, 0, 0, p_sys->i_current_rate );
+                    vout_SynchroDecode( p_sys->p_synchro );
+                    vout_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
+                }
+            }
 
             if( p_block->i_pts )
             {

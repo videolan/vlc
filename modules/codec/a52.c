@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.23 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: a52.c,v 1.24 2003/09/30 20:23:03 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -41,6 +41,8 @@
 #   include <unistd.h>
 #endif
 
+#include "vlc_block_helper.h"
+
 #define A52_HEADER_SIZE 7
 
 /*****************************************************************************
@@ -54,14 +56,11 @@ struct decoder_sys_t
     /*
      * Input properties
      */
-    int     i_state;
+    int        i_state;
+    vlc_bool_t b_synchro;
 
-    uint8_t p_header[A52_HEADER_SIZE];
-    int     i_header;
-
-    mtime_t pts;
-
-    int     i_frame_size;
+    block_t *p_chain;
+    block_bytestream_t bytestream;
 
     /*
      * Decoder output properties
@@ -69,7 +68,6 @@ struct decoder_sys_t
     aout_instance_t *     p_aout;                                  /* opaque */
     aout_input_t *        p_aout_input;                            /* opaque */
     audio_sample_format_t aout_format;
-
     aout_buffer_t *       p_aout_buffer; /* current aout buffer being filled */
 
     /*
@@ -85,12 +83,16 @@ struct decoder_sys_t
     uint8_t               *p_out_buffer;                    /* output buffer */
     int                   i_out_buffer;         /* position in output buffer */
     audio_date_t          end_date;
+
+    mtime_t pts;
+    int i_frame_size, i_bit_rate;
+    unsigned int i_rate, i_channels, i_channels_conf;
+
 };
 
 enum {
 
     STATE_NOSYNC,
-    STATE_PARTIAL_SYNC,
     STATE_SYNC,
     STATE_HEADER,
     STATE_DATA
@@ -173,6 +175,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 static int InitDecoder( decoder_t *p_dec )
 {
     p_dec->p_sys->i_state = STATE_NOSYNC;
+    p_dec->p_sys->b_synchro = VLC_FALSE;
 
     p_dec->p_sys->p_out_buffer = NULL;
     p_dec->p_sys->i_out_buffer = 0;
@@ -188,6 +191,8 @@ static int InitDecoder( decoder_t *p_dec )
     p_dec->p_sys->sout_format.i_cat = AUDIO_ES;
     p_dec->p_sys->sout_format.i_fourcc = VLC_FOURCC( 'a', '5', '2', ' ' );
 
+    p_dec->p_sys->p_chain = NULL;
+
     return VLC_SUCCESS;
 }
 
@@ -199,47 +204,47 @@ static int InitDecoder( decoder_t *p_dec )
 static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_block_pos = 0;
-    mtime_t i_pts = p_block->i_pts;
+    uint8_t p_header[A52_HEADER_SIZE];
 
-    while( i_block_pos < p_block->i_buffer )
+    if( p_sys->p_chain )
+    {
+        block_ChainAppend( &p_sys->p_chain, p_block );
+    }
+    else
+    {
+        block_ChainAppend( &p_sys->p_chain, p_block );
+        p_sys->bytestream = block_BytestreamInit( p_dec, p_sys->p_chain, 0 );
+    }
+
+    while( 1 )
     {
         switch( p_sys->i_state )
         {
+
         case STATE_NOSYNC:
-            /* Look for sync word - should be 0x0b77 */
-            while( i_block_pos < p_block->i_buffer &&
-                   p_block->p_buffer[i_block_pos] != 0x0b )
+            while( block_PeekBytes( &p_sys->bytestream, p_header, 2 )
+                   == VLC_SUCCESS )
             {
-                i_block_pos++;
+                if( p_header[0] == 0x0b && p_header[1] == 0x77 )
+                {
+                    p_sys->i_state = STATE_SYNC;
+                    break;
+                }
+                block_SkipByte( &p_sys->bytestream );
+                p_dec->p_sys->b_synchro = VLC_FALSE;
             }
+            if( p_sys->i_state != STATE_SYNC )
+            {
+                block_ChainRelease( p_sys->p_chain );
+                p_sys->p_chain = NULL;
 
-            if( i_block_pos < p_block->i_buffer )
-            {
-                p_sys->i_state = STATE_PARTIAL_SYNC;
-                i_block_pos++;
-                p_sys->p_header[0] = 0x0b;
-                break;
+                /* Need more data */
+                return VLC_SUCCESS;
             }
-            break;
-
-        case STATE_PARTIAL_SYNC:
-            if( p_block->p_buffer[i_block_pos] == 0x77 )
-            {
-                p_sys->i_state = STATE_SYNC;
-                i_block_pos++;
-                p_sys->p_header[1] = 0x77;
-                p_sys->i_header = 2;
-            }
-            else
-            {
-                p_sys->i_state = STATE_NOSYNC;
-            }
-            break;
 
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
-            p_sys->pts = i_pts; i_pts = 0;
+            p_sys->pts = p_sys->bytestream.p_block->i_pts;
             if( p_sys->pts != 0 &&
                 p_sys->pts != aout_DateGet( &p_sys->end_date ) )
             {
@@ -250,62 +255,81 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
         case STATE_HEADER:
             /* Get A/52 frame header (A52_HEADER_SIZE bytes) */
-            if( p_sys->i_header < A52_HEADER_SIZE )
+            if( block_PeekBytes( &p_sys->bytestream, p_header,
+                                 A52_HEADER_SIZE ) != VLC_SUCCESS )
             {
-                int i_size = __MIN( A52_HEADER_SIZE - p_sys->i_header,
-                                    p_block->i_buffer - i_block_pos );
-
-                memcpy( p_sys->p_header + p_sys->i_header,
-                        p_block->p_buffer + i_block_pos, i_size );
-                i_block_pos += i_size;
-                p_sys->i_header += i_size;
+                /* Need more data */
+                return VLC_SUCCESS;
             }
 
-            if( p_sys->i_header < A52_HEADER_SIZE )
-                break;
-
-            if( GetOutBuffer( p_dec, &p_sys->p_out_buffer )
-                != VLC_SUCCESS )
+            /* Check if frame is valid and get frame info */
+            p_sys->i_frame_size = SyncInfo( p_header,
+                                            &p_sys->i_channels,
+                                            &p_sys->i_channels_conf,
+                                            &p_sys->i_rate,
+                                            &p_sys->i_bit_rate );
+            if( !p_sys->i_frame_size )
             {
-                block_Release( p_block );
+                msg_Dbg( p_dec, "emulated sync word" );
+                block_SkipByte( &p_sys->bytestream );
+                p_sys->i_state = STATE_NOSYNC;
+                p_dec->p_sys->b_synchro = VLC_FALSE;
+                break;
+            }
+            p_sys->i_state = STATE_DATA;
+
+        case STATE_DATA:
+            /* TODO: If p_block == NULL, flush the buffer without checking the
+             * next sync word */
+
+            if( !p_dec->p_sys->b_synchro )
+            {
+                /* Check if next expected frame contains the sync word */
+                if( block_PeekOffsetBytes( &p_sys->bytestream,
+                                           p_sys->i_frame_size, p_header, 2 )
+                    != VLC_SUCCESS )
+                {
+                    /* Need more data */
+                    return VLC_SUCCESS;
+                }
+
+                if( p_header[0] != 0x0b || p_header[1] != 0x77 )
+                {
+                    msg_Dbg( p_dec, "emulated sync word "
+                             "(no sync on following frame)" );
+                    p_sys->i_state = STATE_NOSYNC;
+                    block_SkipByte( &p_sys->bytestream );
+                    p_dec->p_sys->b_synchro = VLC_FALSE;
+                    break;
+                }
+            }
+
+            if( !p_dec->p_sys->p_out_buffer )
+            if( GetOutBuffer( p_dec, &p_sys->p_out_buffer ) != VLC_SUCCESS )
+            {
                 return VLC_EGENERIC;
             }
 
-            if( !p_sys->p_out_buffer )
+            /* Copy the whole frame into the buffer */
+            if( block_GetBytes( &p_sys->bytestream, p_sys->p_out_buffer,
+                                p_sys->i_frame_size ) != VLC_SUCCESS )
             {
-                p_sys->i_state = STATE_NOSYNC;
-                break;
+                /* Need more data */
+                return VLC_SUCCESS;
             }
 
-            memcpy( p_sys->p_out_buffer, p_sys->p_header, A52_HEADER_SIZE );
-            p_sys->i_out_buffer = A52_HEADER_SIZE;
-            p_sys->i_state = STATE_DATA;
-            break;
-
-        case STATE_DATA:
-            /* Copy the whole A52 frame into the aout buffer */
-            if( p_sys->i_out_buffer < p_sys->i_frame_size )
-            {
-                int i_size = __MIN( p_sys->i_frame_size - p_sys->i_out_buffer,
-                                    p_block->i_buffer - i_block_pos );
-
-                memcpy( p_sys->p_out_buffer + p_sys->i_out_buffer,
-                        p_block->p_buffer + i_block_pos, i_size );
-                i_block_pos += i_size;
-                p_sys->i_out_buffer += i_size;
-            }
-
-            if( p_sys->i_out_buffer < p_sys->i_frame_size )
-                break; /* Need more data */
+            p_sys->p_chain = block_BytestreamFlush( &p_sys->bytestream );
 
             SendOutBuffer( p_dec );
-
             p_sys->i_state = STATE_NOSYNC;
-            break;
+            p_dec->p_sys->b_synchro = VLC_TRUE;
+
+            /* Make sure we don't reuse the same pts twice */
+            if( p_sys->pts == p_sys->bytestream.p_block->i_pts )
+                p_sys->pts = p_sys->bytestream.p_block->i_pts = 0;
         }
     }
 
-    block_Release( p_block );
     return VLC_SUCCESS;
 }
 
@@ -337,6 +361,8 @@ static int EndDecoder( decoder_t *p_dec )
         sout_InputDelete( p_dec->p_sys->p_sout_input );
     }
 
+    if( p_dec->p_sys->p_chain ) block_ChainRelease( p_sys->p_chain );
+
     free( p_dec->p_sys );
 
     return VLC_SUCCESS;
@@ -345,7 +371,7 @@ static int EndDecoder( decoder_t *p_dec )
 /*****************************************************************************
  * GetOutBuffer:
  *****************************************************************************/
-static int GetOutBuffer ( decoder_t *p_dec, uint8_t **pp_out_buffer )
+static int GetOutBuffer( decoder_t *p_dec, uint8_t **pp_out_buffer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     int i_ret;
@@ -371,25 +397,11 @@ static int GetOutBuffer ( decoder_t *p_dec, uint8_t **pp_out_buffer )
  *****************************************************************************/
 static int GetAoutBuffer( decoder_t *p_dec, aout_buffer_t **pp_buffer )
 {
-    int i_bit_rate;
-    unsigned int i_rate, i_channels, i_channels_conf;
-
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    /* Check if frame is valid and get frame info */
-    p_sys->i_frame_size = SyncInfo( p_sys->p_header,
-                                    &i_channels, &i_channels_conf,
-                                    &i_rate, &i_bit_rate );
-
-    if( !p_sys->i_frame_size )
-    {
-        msg_Warn( p_dec, "a52 syncinfo failed" );
-        *pp_buffer = NULL;
-        return VLC_SUCCESS;
-    }
-
-    if( p_sys->p_aout_input != NULL && ( p_sys->aout_format.i_rate != i_rate
-        || p_sys->aout_format.i_original_channels != i_channels_conf
+    if( p_sys->p_aout_input != NULL &&
+        ( p_sys->aout_format.i_rate != p_sys->i_rate
+        || p_sys->aout_format.i_original_channels != p_sys->i_channels_conf
         || (int)p_sys->aout_format.i_bytes_per_frame != p_sys->i_frame_size ) )
     {
         /* Parameters changed - this should not happen. */
@@ -400,13 +412,13 @@ static int GetAoutBuffer( decoder_t *p_dec, aout_buffer_t **pp_buffer )
     /* Creating the audio input if not created yet. */
     if( p_sys->p_aout_input == NULL )
     {
-        p_sys->aout_format.i_rate = i_rate;
-        p_sys->aout_format.i_original_channels = i_channels_conf;
+        p_sys->aout_format.i_rate = p_sys->i_rate;
+        p_sys->aout_format.i_original_channels = p_sys->i_channels_conf;
         p_sys->aout_format.i_physical_channels
-            = i_channels_conf & AOUT_CHAN_PHYSMASK;
+            = p_sys->i_channels_conf & AOUT_CHAN_PHYSMASK;
         p_sys->aout_format.i_bytes_per_frame = p_sys->i_frame_size;
         p_sys->aout_format.i_frame_length = A52_FRAME_NB;
-        aout_DateInit( &p_sys->end_date, i_rate );
+        aout_DateInit( &p_sys->end_date, p_sys->i_rate );
         aout_DateSet( &p_sys->end_date, p_sys->pts );
         p_sys->p_aout_input = aout_DecNew( p_dec,
                                            &p_sys->p_aout,
@@ -445,26 +457,11 @@ static int GetAoutBuffer( decoder_t *p_dec, aout_buffer_t **pp_buffer )
  *****************************************************************************/
 static int GetSoutBuffer( decoder_t *p_dec, sout_buffer_t **pp_buffer )
 {
-    int i_bit_rate;
-    unsigned int i_rate, i_channels, i_channels_conf;
-
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    /* Check if frame is valid and get frame info */
-    p_sys->i_frame_size = SyncInfo( p_sys->p_header,
-                                    &i_channels, &i_channels_conf,
-                                    &i_rate, &i_bit_rate );
-
-    if( !p_sys->i_frame_size )
-    {
-        msg_Warn( p_dec, "a52 syncinfo failed" );
-        *pp_buffer = NULL;
-        return VLC_SUCCESS;
-    }
-
     if( p_sys->p_sout_input != NULL &&
-        ( p_sys->sout_format.i_sample_rate != (int)i_rate
-          || p_sys->sout_format.i_channels != (int)i_channels ) )
+        ( p_sys->sout_format.i_sample_rate != (int)p_sys->i_rate
+          || p_sys->sout_format.i_channels != (int)p_sys->i_channels ) )
     {
         /* Parameters changed - this should not happen. */
     }
@@ -472,19 +469,17 @@ static int GetSoutBuffer( decoder_t *p_dec, sout_buffer_t **pp_buffer )
     /* Creating the sout input if not created yet. */
     if( p_sys->p_sout_input == NULL )
     {
-        p_sys->sout_format.i_sample_rate = i_rate;
-        p_sys->sout_format.i_channels    = i_channels;
+        p_sys->sout_format.i_sample_rate = p_sys->i_rate;
+        p_sys->sout_format.i_channels    = p_sys->i_channels;
         p_sys->sout_format.i_block_align = 0;
-        p_sys->sout_format.i_bitrate     = i_bit_rate;
+        p_sys->sout_format.i_bitrate     = p_sys->i_bit_rate;
         p_sys->sout_format.i_extra_data  = 0;
         p_sys->sout_format.p_extra_data  = NULL;
 
-        aout_DateInit( &p_sys->end_date, i_rate );
+        aout_DateInit( &p_sys->end_date, p_sys->i_rate );
         aout_DateSet( &p_sys->end_date, p_sys->pts );
 
-        p_sys->p_sout_input = sout_InputNew( p_dec,
-                                             &p_sys->sout_format );
-
+        p_sys->p_sout_input = sout_InputNew( p_dec, &p_sys->sout_format );
         if( p_sys->p_sout_input == NULL )
         {
             msg_Err( p_dec, "cannot add a new stream" );
@@ -492,7 +487,7 @@ static int GetSoutBuffer( decoder_t *p_dec, sout_buffer_t **pp_buffer )
             return VLC_EGENERIC;
         }
         msg_Info( p_dec, "A/52 channels:%d samplerate:%d bitrate:%d",
-                  i_channels, i_rate, i_bit_rate );
+                  p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
     }
 
     if( !aout_DateGet( &p_sys->end_date ) )
@@ -538,6 +533,8 @@ static int SendOutBuffer( decoder_t *p_dec )
                       p_sys->p_aout_buffer );
         p_sys->p_aout_buffer = NULL;
     }
+
+    p_dec->p_sys->p_out_buffer = NULL;
 
     return VLC_SUCCESS;
 }
