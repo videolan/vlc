@@ -4,7 +4,8 @@
  * Copyright (C) 2003 VideoLAN
  * $Id$
  *
- * Authors: Laurent Aimar
+ * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,15 +46,23 @@ static void Close        ( vlc_object_t * );
 #define WIDTH_TEXT N_("Goom display width")
 #define HEIGHT_TEXT N_("Goom display height")
 #define RES_LONGTEXT N_("Allows you to change the resolution of the " \
-    "goom display (bigger resolution will be prettier but more CPU intensive)")
+  "goom display (bigger resolution will be prettier but more CPU intensive).")
+
+#define SPEED_TEXT N_("Goom animation speed")
+#define SPEED_LONGTEXT N_("Allows you to reduce the speed of the animation " \
+  "(default 7, max 10).")
+
+#define MAX_SPEED 10
 
 vlc_module_begin();
-    set_description( _("goom effect") );
+    set_description( _("Goom effect") );
     set_capability( "audio filter", 0 );
     add_integer( "goom-width", 320, NULL,
                  WIDTH_TEXT, RES_LONGTEXT, VLC_FALSE );
     add_integer( "goom-height", 240, NULL,
                  HEIGHT_TEXT, RES_LONGTEXT, VLC_FALSE );
+    add_integer( "goom-speed", 7, NULL,
+                 SPEED_TEXT, SPEED_LONGTEXT, VLC_FALSE );
     set_callbacks( Open, Close );
     add_shortcut( "goom" );
 vlc_module_end();
@@ -61,6 +70,8 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+#define MAX_BLOCKS 10
+#define GOOM_DELAY 400000
 
 typedef struct
 {
@@ -72,9 +83,15 @@ typedef struct
     vlc_mutex_t   lock;
     vlc_cond_t    wait;
 
-    mtime_t       i_pts;
-    int           i_samples;
-    int16_t       samples[2][512];
+    /* Audio properties */
+    int i_channels;
+
+    /* Audio samples queue */
+    block_t       *pp_blocks[MAX_BLOCKS];
+    int           i_blocks;
+
+    audio_date_t  date;
+
 } goom_thread_t;
 
 typedef struct aout_filter_sys_t
@@ -143,8 +160,11 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( p_filter, &p_thread->lock );
     vlc_cond_init( p_filter, &p_thread->wait );
 
-    p_thread->i_samples = 0;
-    memset( &p_thread->samples, 0, 512*2*2 );
+    p_thread->i_blocks = 0;
+    aout_DateInit( &p_thread->date, p_filter->output.i_rate );
+    aout_DateSet( &p_thread->date, 0 );
+    p_thread->i_channels = aout_FormatNbChannels( &p_filter->input );
+
     p_thread->psz_title = TitleGet( VLC_OBJECT( p_filter ) );
 
     if( vlc_thread_create( p_thread, "Goom Update Thread", Thread,
@@ -165,9 +185,40 @@ static int Open( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * Play: play a sound samples buffer
+ * DoWork: process samples buffer
  *****************************************************************************
- * This function writes a buffer of i_length bytes in the socket
+ * This function queues the audio buffer to be processed by the goom thread
+ *****************************************************************************/
+static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
+                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+{
+    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    block_t *p_block;
+
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+
+    /* Queue sample */
+    vlc_mutex_lock( &p_sys->p_thread->lock );
+    if( p_sys->p_thread->i_blocks == MAX_BLOCKS )
+    {
+        vlc_mutex_unlock( &p_sys->p_thread->lock );
+        return;
+    }
+
+    p_block = block_New( p_sys->p_thread, p_in_buf->i_nb_bytes );
+    if( !p_block ) return;
+    memcpy( p_block->p_buffer, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+    p_block->i_pts = p_in_buf->start_date;
+
+    p_sys->p_thread->pp_blocks[p_sys->p_thread->i_blocks++] = p_block;
+
+    vlc_cond_signal( &p_sys->p_thread->wait );
+    vlc_mutex_unlock( &p_sys->p_thread->lock );
+}
+
+/*****************************************************************************
+ * float to s16 conversion
  *****************************************************************************/
 static inline int16_t FloatToInt16( float f )
 {
@@ -179,107 +230,127 @@ static inline int16_t FloatToInt16( float f )
         return (int16_t)( f * 32768.0 );
 }
 
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+/*****************************************************************************
+ * Fill buffer
+ *****************************************************************************/
+static int FillBuffer( int16_t *p_data, int *pi_data,
+                       audio_date_t *pi_date, audio_date_t *pi_date_end,
+                       goom_thread_t *p_this )
 {
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    int i_samples = 0;
+    block_t *p_block;
 
-    int16_t *p_isample;
-    float   *p_fsample = (float*)p_in_buf->p_buffer;
-    int     i_samples = 0;
-    int     i_channels = aout_FormatNbChannels( &p_filter->input );
-
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
-
-    /* copy samples */
-    vlc_mutex_lock( &p_sys->p_thread->lock );
-    p_sys->p_thread->i_pts = p_in_buf->start_date;
-    if( p_sys->p_thread->i_samples >= 512 )
+    while( *pi_data < 512 )
     {
-        p_sys->p_thread->i_samples = 0;
-    }
-    p_isample = &p_sys->p_thread->samples[0][p_sys->p_thread->i_samples];
+        if( !p_this->i_blocks ) return VLC_EGENERIC;
 
-    i_samples = __MIN( 512 - p_sys->p_thread->i_samples,
-                       (int)p_out_buf->i_nb_samples );
-    p_sys->p_thread->i_samples += i_samples;
+        p_block = p_this->pp_blocks[0];
+        i_samples = __MIN( 512 - *pi_data, p_block->i_buffer /
+                           sizeof(float) / p_this->i_channels );
 
-    while( i_samples > 0 )
-    {
-        p_isample[0] = FloatToInt16( p_fsample[0] );
-        if( i_channels > 1 )
+        /* Date management */
+        if( p_block->i_pts > 0 &&
+            p_block->i_pts != aout_DateGet( pi_date_end ) )
         {
-            p_isample[512] = FloatToInt16( p_fsample[1] );
+           aout_DateSet( pi_date_end, p_block->i_pts );
+        }
+        p_block->i_pts = 0;
+
+        aout_DateIncrement( pi_date_end, i_samples );
+
+        while( i_samples > 0 )
+        {
+            float *p_float = (float *)p_block->p_buffer;
+
+            p_data[*pi_data] = FloatToInt16( p_float[0] );
+            if( p_this->i_channels > 1 )
+                p_data[512 + *pi_data] = FloatToInt16( p_float[1] );
+
+            (*pi_data)++;
+            p_block->p_buffer += (sizeof(float) * p_this->i_channels);
+            p_block->i_buffer -= (sizeof(float) * p_this->i_channels);
+            i_samples--;
         }
 
-        p_isample++;
-        p_fsample += i_channels;
-
-        i_samples--;
+        if( !p_block->i_buffer )
+        {
+            block_Release( p_block );
+            p_this->i_blocks--;
+            if( p_this->i_blocks )
+                memmove( p_this->pp_blocks, p_this->pp_blocks + 1,
+                         p_this->i_blocks * sizeof(block_t *) );
+        }
     }
-    if( p_sys->p_thread->i_samples == 512 )
-    {
-        vlc_cond_signal( &p_sys->p_thread->wait );
-    }
-    vlc_mutex_unlock( &p_sys->p_thread->lock );
 
+    *pi_date = *pi_date_end;
+    *pi_data = 0;
+    return VLC_SUCCESS;
 }
+
 /*****************************************************************************
  * Thread:
  *****************************************************************************/
 static void Thread( vlc_object_t *p_this )
 {
     goom_thread_t *p_thread = (goom_thread_t*)p_this;
-    vlc_value_t width, height;
+    vlc_value_t width, height, speed;
+    audio_date_t i_pts;
+    int16_t p_data[2][512];
+    int i_data = 0, i_count = 0;
 
     var_Get( p_this, "goom-width", &width );
     var_Get( p_this, "goom-height", &height );
+
+    var_Create( p_thread, "goom-speed", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Get( p_thread, "goom-speed", &speed );
+    speed.i_int = MAX_SPEED - speed.i_int;
+    if( speed.i_int < 0 ) speed.i_int = 0;
 
     goom_init( width.i_int, height.i_int, 0 );
     goom_set_font( NULL, NULL, NULL );
 
     while( !p_thread->b_die )
     {
-        mtime_t   i_pts;
-        int16_t   data[2][512];
         uint32_t  *plane;
         picture_t *p_pic;
 
         /* goom_update is damn slow, so just copy data and release the lock */
         vlc_mutex_lock( &p_thread->lock );
-        vlc_cond_wait( &p_thread->wait, &p_thread->lock );
-        i_pts = p_thread->i_pts;
-        memcpy( data, p_thread->samples, 512 * 2 * 2 );
+        if( FillBuffer( (int16_t *)p_data, &i_data, &i_pts,
+                        &p_thread->date, p_thread ) != VLC_SUCCESS )
+            vlc_cond_wait( &p_thread->wait, &p_thread->lock );
         vlc_mutex_unlock( &p_thread->lock );
 
-        plane = goom_update( data, 0, 0.0, p_thread->psz_title, NULL );
+        /* Speed selection */
+        if( speed.i_int && (++i_count % (speed.i_int+1)) ) continue;
+
+        /* Frame dropping if necessary */
+        if( aout_DateGet( &i_pts ) + GOOM_DELAY <= mdate() ) continue;
+
+        plane = goom_update( p_data, 0, 0.0, p_thread->psz_title, NULL );
 
         if( p_thread->psz_title )
         {
             free( p_thread->psz_title );
             p_thread->psz_title = NULL;
         }
+
         while( !( p_pic = vout_CreatePicture( p_thread->p_vout, 0, 0, 0 ) ) &&
                !p_thread->b_die )
         {
             msleep( VOUT_OUTMEM_SLEEP );
         }
 
-        if( p_pic == NULL )
-        {
-            break;
-        }
+        if( p_pic == NULL ) break;
 
         memcpy( p_pic->p[0].p_pixels, plane, width.i_int * height.i_int * 4 );
-        vout_DatePicture( p_thread->p_vout, p_pic, i_pts );
+        vout_DatePicture( p_thread->p_vout, p_pic,
+                          aout_DateGet( &i_pts ) + GOOM_DELAY );
         vout_DisplayPicture( p_thread->p_vout, p_pic );
-
     }
 
     goom_close();
 }
-
 
 /*****************************************************************************
  * Close: close the plugin
@@ -303,11 +374,16 @@ static void Close( vlc_object_t *p_this )
     vlc_mutex_destroy( &p_sys->p_thread->lock );
     vlc_cond_destroy( &p_sys->p_thread->wait );
     vlc_object_detach( p_sys->p_thread );
+
+    while( p_sys->p_thread->i_blocks-- )
+    {
+        block_Release( p_sys->p_thread->pp_blocks[p_sys->p_thread->i_blocks] );
+    }
+
     vlc_object_destroy( p_sys->p_thread );
 
     free( p_sys );
 }
-
 
 static char *TitleGet( vlc_object_t *p_this )
 {
