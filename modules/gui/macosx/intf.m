@@ -68,6 +68,7 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     
     p_intf->p_sys->o_sendport = [[NSPort port] retain];
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
+    p_intf->b_play = VLC_TRUE;
     p_intf->pf_run = Run;
     
     [[VLCApplication sharedApplication] autorelease];
@@ -488,7 +489,21 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
     [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
-
+    
+    /* Check if we need to start playing */
+    if( p_intf->b_play )
+    {
+        playlist_t *p_playlist =
+            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        NSLog( @"Ja Nu!!!!");
+        if( p_playlist )
+        {
+            playlist_Play( p_playlist );
+            vlc_object_release( p_playlist );
+        }
+        
+    }
 }
 
 - (void)initStrings
