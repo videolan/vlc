@@ -30,6 +30,7 @@
 #include "win32_window.hpp"
 #include "win32_tooltip.hpp"
 #include "win32_loop.hpp"
+#include "../src/theme.hpp"
 
 
 LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
@@ -125,7 +126,7 @@ bool Win32Factory::init()
 
     // Create Window
     m_hParentWindow = CreateWindowEx( WS_EX_APPWINDOW, "SkinWindowClass",
-        "VLC media player", WS_SYSMENU, -200, -200, 0, 0, 0, 0, m_hInst, 0 );
+        "VLC media player", WS_SYSMENU|WS_POPUP, -200, -200, 0, 0, 0, 0, m_hInst, 0 );
     if( m_hParentWindow == NULL )
     {
         msg_Err( getIntf(), "Cannot create parent window" );
@@ -225,6 +226,10 @@ void Win32Factory::destroyOSLoop()
 
 void Win32Factory::minimize()
 {
+    /* Make sure no tooltip is visible first */
+    getIntf()->p_sys->p_theme->getWindowManager().hideTooltip();
+
+    ShowWindow( m_hParentWindow, SW_MINIMIZE );
 }
 
 OSTimer *Win32Factory::createOSTimer( const Callback &rCallback )
