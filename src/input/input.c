@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.232 2003/06/28 17:20:41 fenrir Exp $
+ * $Id: input.c,v 1.233 2003/06/28 21:27:35 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -595,9 +595,7 @@ static void EndThread( input_thread_t * p_input )
 
     /* Close the video output that should have been re-attached
      * to our object */
-    p_object = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
-
-    if( p_object )
+    while( ( p_object = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD ) ) != NULL )
     {
         vlc_object_detach( p_object );
         vlc_object_release( p_object );
