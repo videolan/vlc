@@ -1,6 +1,6 @@
 Summary: The VideoLAN client, also a very good standalone video player.
 Name: vlc
-Version: 0.5.2
+Version: 0.5.3
 Release: 1
 Group: Applications/Multimedia
 License: GPL
@@ -8,59 +8,60 @@ URL: http://www.videolan.org/
 Source: http://www.videolan.org/pub/videolan/vlc/vlc-%{version}.tar.bz2
 Buildroot: %{_tmppath}/%{name}-root
 Packager: Jason Luka <jason@geshp.com>
-Requires: XFree86, desktop-file-utils
-%{!?_without_dvd:Requires: libdvdcss}
-%{!?_without_dvdread:Requires: libdvdread}
-%{!?_without_dvdplay:Requires: libdvdplay}
-%{!?_without_dvbpsi:Requires: libdvbpsi}
-%{!?_without_ogg:Requires: libogg}
-%{!?_without_mad:Requires: libmad}
-%{!?_without_ffmpeg:Requires: libffmpeg}
-%{!?_without_xvid:Requires: xvidcore}
-%{!?_without_a52:Requires: a52dec}
-%{?_with_dv:Requires: libdv}
-%{!?_without_flac:Requires: flac}
-%{!?_without_vorbis:Requires: libvorbis}
-%{!?_without_sdl:Requires: SDL}
-%{!?_without_aa:Requires: aalib}
-%{!?_without_esd:Requires: esound}
-%{!?_without_arts:Requires: arts}
-%{!?_without_alsa:Requires: alsa-lib}
-%{!?_without_gtk:Requires: gtk+}
-%{!?_without_gnome:Requires: gnome-libs}
-%{?_with_qt:Requires: qt}
-%{?_with_kde:Requires: kdelibs}
-%{?_with_ncurses:Requires: ncurses}
-%{!?_without_xosd:Requires: xosd}
+Buildrequires: XFree86-devel, desktop-file-utils
+%{!?_without_dvd:Buildrequires: libdvdcss-devel}
+%{!?_without_dvdread:Buildrequires: libdvdread-devel}
+%{!?_without_dvdplay:Buildrequires: libdvdplay-devel}
+%{!?_without_dvbpsi:Buildrequires: libdvbpsi-devel}
+%{!?_without_ogg:Buildrequires: libogg-devel}
+%{!?_without_mad:Buildrequires: libmad}
+%{!?_without_ffmpeg:Buildrequires: ffmpeg-devel}
+%{!?_without_xvid:Buildrequires: xvidcore-devel}
+%{!?_without_a52:Buildrequires: a52dec-devel}
+%{?_with_dv:Buildrequires: libdv-devel}
+%{!?_without_flac:Buildrequires: flac-devel}
+%{!?_without_vorbis:Buildrequires: libvorbis-devel}
+%{!?_without_sdl:Buildrequires: SDL-devel}
+%{!?_without_aa:Buildrequires: aalib-devel}
+%{!?_without_esd:Buildrequires: esound-devel}
+%{!?_without_arts:Buildrequires: arts-devel}
+%{!?_without_alsa:Buildrequires: alsa-lib-devel}
+%{!?_without_gtk:Buildrequires: gtk+-devel}
+%{!?_without_gnome:Buildrequires: gnome-libs-devel}
+%{!?_without_lirc:Buildrequires: lirc}
+%{?_with_qt:Buildrequires: qt-devel}
+%{?_with_kde:Buildrequires: kdelibs-devel}
+%{?_with_ncurses:Buildrequires: ncurses-devel >= 5}
+%{!?_without_xosd:Buildrequires: xosd-devel}
 %{!?_without_lirc:Requires: lirc}
-%{?_with_mozilla:Requires: mozilla}
+%{?_with_mozilla:Requires: mozilla-devel}
 
 Requires: XFree86, desktop-file-utils
 %{!?_without_dvd:Requires: libdvdcss}
 %{!?_without_dvdread:Requires: libdvdread}
 %{!?_without_dvdplay:Requires: libdvdplay}
-%{!?_without_dvbpsi:Requires: libdvbpsi}
-%{!?_without_ogg:Requires: libogg}
+#%%{!?_without_dvbpsi:Requires: libdvbpsi}
+#%%{!?_without_ogg:Requires: libogg}
 %{!?_without_mad:Requires: libmad}
-%{!?_without_ffmpeg:Requires: libffmpeg}
-%{!?_without_xvid:Requires: xvidcore}
+%{!?_without_ffmpeg:Requires: ffmpeg}
+#%%{!?_without_xvid:Requires: xvidcore}
 %{!?_without_a52:Requires: a52dec}
-%{?_with_dv:Requires: libdv}
-%{!?_without_flac:Requires: flac}
-%{!?_without_vorbis:Requires: libvorbis}
-%{!?_without_sdl:Requires: SDL}
-%{!?_without_aa:Requires: aalib}
-%{!?_without_esd:Requires: esound}
-%{!?_without_arts:Requires: arts}
-%{!?_without_alsa:Requires: alsa-lib}
-%{!?_without_gtk:Requires: gtk+}
-%{!?_without_gnome:Requires: gnome-libs}
-%{?_with_qt:Requires: qt}
-%{?_with_kde:Requires: kdelibs}
-%{?_with_ncurses:Requires: ncurses}
-%{!?_without_xosd:Requires: xosd}
-%{!?_without_lirc:Requires: lirc}
-%{?_with_mozilla:Requires: mozilla}
+#%%{?_with_dv:Requires: libdv}
+#%%{!?_without_flac:Requires: flac}
+#%%{!?_without_vorbis:Requires: libvorbis}
+#%%{!?_without_sdl:Requires: SDL}
+#%%{!?_without_aa:Requires: aalib}
+#%%{!?_without_esd:Requires: esound}
+#%%{!?_without_arts:Requires: arts}
+#%%{!?_without_alsa:Requires: alsa-lib}
+#%%{!?_without_gtk:Requires: gtk+}
+#%%{!?_without_gnome:Requires: gnome-libs}
+#%%{?_with_qt:Requires: qt}
+#%%{?_with_kde:Requires: kdelibs}
+#%%{?_with_ncurses:Requires: ncurses}
+#%%{!?_without_xosd:Requires: xosd}
+#%%{!?_without_lirc:Requires: lirc}
+#%%{?_with_mozilla:Requires: mozilla}
 
 %description
 VideoLAN Client (VLC) is a highly portable multimedia player for various
@@ -208,6 +209,18 @@ rm -rf %{buildroot}
 %{_libdir}/libvlc.a
 
 %changelog
+* Mon Apr 7 2003 Jason Luka <jason@geshp.com>
+- Update to 0.5.3
+
+* Sat Apr 5 2003 Jason Luka <jason@geshp.com>
+- Rebuilt for Red Hat 9
+- Changed dependencies for ffmpeg's new name
+- Required lirc support at build-time 
+
+* Sat Mar 25 2003 Jason Luka <jason@geshp.com>
+- Fixed Buildrequire statements to require all plugins at compile-time
+- Fixed Require statements so users don't have to install every plugin
+
 * Thu Mar 23 2003 Jason Luka <jason@geshp.com>
 - Renamed ffmpeg to libffmpeg
 - Rebuilt for videolan site
