@@ -361,6 +361,7 @@ SOURCES_libvlc_common = \
 	src/stream_output/sap.c \
 	src/misc/charset.c \
 	src/misc/httpd.c \
+	src/misc/tls.c \
 	src/misc/mtime.c \
 	src/misc/block.c \
 	src/misc/modules.c \

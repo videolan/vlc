@@ -68,7 +68,8 @@ struct tls_session_t
  * Allocates a whole server's TLS credentials.
  * Returns NULL on error.
  *****************************************************************************/
-# define tls_ServerCreate( a, b, c ) (((tls_t *)a)->pf_server_create (a, b, c))
+# define __tls_ServerCreate( a, b, c ) (((tls_t *)a)->pf_server_create (a, b, c))
+VLC_EXPORT( tls_server_t *, tls_ServerCreate, ( vlc_object_t *, const char *, const char * ) );
 
 /*****************************************************************************
  * tls_ServerAddCA:
@@ -88,7 +89,8 @@ struct tls_session_t
 # define tls_ServerAddCRL( a, b ) (((tls_server_t *)a)->pf_add_CRL (a, b))
 
 
-# define tls_ServerDelete( a ) (((tls_server_t *)a)->pf_delete ( a ))
+# define __tls_ServerDelete( a ) (((tls_server_t *)a)->pf_delete ( a ))
+VLC_EXPORT( void, tls_ServerDelete, ( tls_server_t * ) );
 
 
 # define tls_ServerSessionPrepare( a ) (((tls_server_t *)a)->pf_session_prepare (a))
