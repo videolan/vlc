@@ -2,7 +2,7 @@
  * playlist.c :  Playlist import module
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: playlist.c,v 1.4 2004/01/26 20:48:51 fenrir Exp $
+ * $Id: playlist.c,v 1.5 2004/02/13 23:54:42 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -124,7 +124,7 @@ char *ProcessMRL( char *psz_mrl, char *psz_prefix )
         psz_name = malloc( strlen(psz_prefix) + strlen(psz_mrl) + 2 );
         sprintf( psz_name, "%s/%s", psz_prefix, psz_mrl );
 #else
-        if ( *p_m3u->psz_prefix != '\0' )
+        if ( *psz_prefix != '\0' )
         {
             psz_name = malloc( strlen(psz_prefix) + strlen(psz_mrl) + 2 );
             sprintf( psz_name, "%s\\%s", psz_prefix, psz_mrl );
