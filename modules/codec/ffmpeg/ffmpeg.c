@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.49 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.50 2003/09/20 01:36:57 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -296,8 +296,8 @@ static int InitThread( generic_thread_t *p_decoder )
         avcodec_register_all();
         b_ffmpeginit = 1;
 
-        msg_Dbg( p_decoder->p_fifo, "libavcodec initialized (interface "
-                                    LIBAVCODEC_BUILD_STR ")" );
+        msg_Dbg( p_decoder->p_fifo, "libavcodec initialized (interface %d )",
+                                                           LIBAVCODEC_BUILD );
     }
     else
     {
