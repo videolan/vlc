@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.31 2003/01/26 13:37:09 gbazin Exp $
+ * $Id: input.c,v 1.32 2003/02/21 22:59:38 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -178,7 +178,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
 
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
-    p_input->input_alloc.i_bytes_per_sec = -1;
     aout_FiltersHintBuffers( p_aout, p_input->pp_filters,
                              p_input->i_nb_filters,
                              &p_input->input_alloc );
