@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.132.2.1 2001/12/10 04:54:17 sam Exp $
+ * $Id: main.c,v 1.132.2.2 2001/12/17 03:48:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -149,16 +149,6 @@
 #define USAGE                     0
 #define SHORT_HELP                1
 #define LONG_HELP                 2
-
-/* Needed for x86 CPU capabilities detection */
-#define cpuid( a )                 \
-    asm volatile ( "cpuid"         \
-                 : "=a" ( i_eax ), \
-                   "=b" ( i_ebx ), \
-                   "=c" ( i_ecx ), \
-                   "=d" ( i_edx )  \
-                 : "a"  ( a )      \
-                 : "cc" );
 
 /* Long options */
 static const struct option longopts[] =
@@ -1129,15 +1119,7 @@ static int CPUCapabilities( void )
 {
     volatile int i_capabilities = CPU_CAPABILITY_NONE;
 
-#if defined( SYS_BEOS )
-    i_capabilities |= CPU_CAPABILITY_FPU
-                      | CPU_CAPABILITY_486
-                      | CPU_CAPABILITY_586
-                      | CPU_CAPABILITY_MMX;
-
-    return( i_capabilities );
-
-#elif defined( SYS_DARWIN )
+#if defined( SYS_DARWIN )
     struct host_basic_info hi;
     kern_return_t          ret;
     host_name_port_t       host;
@@ -1173,27 +1155,43 @@ static int CPUCapabilities( void )
     volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
     volatile boolean_t     b_amd;
 
+    /* Needed for x86 CPU capabilities detection */
+#   define cpuid( a )                      \
+        asm volatile ( "pushl %%ebx\n\t"   \
+                       "cpuid\n\t"         \
+                       "movl %%ebx,%1\n\t" \
+                       "popl %%ebx\n\t"    \
+                     : "=a" ( i_eax ),     \
+                       "=r" ( i_ebx ),     \
+                       "=c" ( i_ecx ),     \
+                       "=d" ( i_edx )      \
+                     : "a"  ( a )          \
+                     : "cc" );
+
     i_capabilities |= CPU_CAPABILITY_FPU;
 
     signal( SIGILL, InstructionSignalHandler );
-    
+
     /* test for a 486 CPU */
-    asm volatile ( "pushfl\n\t"
+    asm volatile ( "pushl %%ebx\n\t"
+                   "pushfl\n\t"
                    "popl %%eax\n\t"
                    "movl %%eax, %%ebx\n\t"
                    "xorl $0x200000, %%eax\n\t"
                    "pushl %%eax\n\t"
                    "popfl\n\t"
                    "pushfl\n\t"
-                   "popl %%eax"
+                   "popl %%eax\n\t"
+                   "movl %%ebx,%1\n\t"
+                   "popl %%ebx\n\t"
                  : "=a" ( i_eax ),
-                   "=b" ( i_ebx )
+                   "=r" ( i_ebx )
                  :
                  : "cc" );
 
     if( i_eax == i_ebx )
     {
-        signal( SIGILL, NULL );     
+        signal( SIGILL, NULL );
         return( i_capabilities );
     }
 

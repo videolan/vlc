@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.36.2.1 2001/12/10 10:59:14 massiot Exp $
+ * $Id: vout_xvideo.c,v 1.36.2.2 2001/12/17 03:48:12 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -1204,6 +1204,8 @@ static int XVideoGetPort( Display *dpy )
     /* No special xv port has been requested so try all of them */
     for( i_adaptor = 0; i_adaptor < i_num_adaptors; ++i_adaptor )
     {
+        XvImageFormatValues *p_formats;
+        int i_format, i_num_formats;
         int i_port;
 
         /* If we requested an adaptor and it's not this one, we aren't
@@ -1213,101 +1215,100 @@ static int XVideoGetPort( Display *dpy )
             continue;
 	}
 
-	/* If the adaptor doesn't have the required properties, skip it */
-        if( !( p_adaptor[ i_adaptor ].type & XvInputMask ) ||
-            !( p_adaptor[ i_adaptor ].type & XvImageMask ) )
-        {
-            continue;
-	}
+        /* Check that port supports YUV12 planar format... */
+        p_formats = XvListImageFormats( dpy, p_adaptor[i_adaptor].base_id,
+                                        &i_num_formats );
 
-        for( i_port = p_adaptor[i_adaptor].base_id;
-             i_port < p_adaptor[i_adaptor].base_id
-                       + p_adaptor[i_adaptor].num_ports;
-             i_port++ )
+        for( i_format = 0; i_format < i_num_formats; i_format++ )
         {
-            XvImageFormatValues *p_formats;
-            int i_format, i_num_formats;
+            XvEncodingInfo  *p_enc;
+            int             i_enc, i_num_encodings;
+            XvAttribute     *p_attr;
+            int             i_attr, i_num_attributes;
 
-            /* If we already found a port, we aren't interested */
-            if( i_selected_port != -1 )
+            /* If this is not the format we want, forget it */
+            if( p_formats[ i_format ].id != GUID_YUV12_PLANAR )
             {
                 continue;
             }
 
-            /* Check that port supports YUV12 planar format... */
-            p_formats = XvListImageFormats( dpy, i_port, &i_num_formats );
-
-            for( i_format = 0; i_format < i_num_formats; i_format++ )
+            /* Look for the first available port supporting this format */
+            for( i_port = p_adaptor[i_adaptor].base_id;
+                 ( i_port < p_adaptor[i_adaptor].base_id
+                             + p_adaptor[i_adaptor].num_ports )
+                   && ( i_selected_port == -1 );
+                 i_port++ )
             {
-                XvEncodingInfo  *p_enc;
-                int             i_enc, i_num_encodings;
-                XvAttribute     *p_attr;
-                int             i_attr, i_num_attributes;
-
-                if( p_formats[ i_format ].id != GUID_YUV12_PLANAR )
+                if( XvGrabPort( dpy, i_port, CurrentTime ) == Success )
                 {
-                    continue;
-                }
-
-                /* Found a matching port, print a description of this port */
-                i_selected_port = i_port;
-
-                intf_WarnMsg( 3, "vout: XVideoGetPort found adaptor %i port %i",
-                                 i_adaptor, i_port);
-                intf_WarnMsg( 3, "  image format 0x%x (%4.4s) %s supported",
-                                 p_formats[ i_format ].id,
-                                 (char *)&p_formats[ i_format ].id,
-                                 ( p_formats[ i_format ].format
-                                    == XvPacked ) ? "packed" : "planar" );
-
-                intf_WarnMsg( 4, " encoding list:" );
-
-                if( XvQueryEncodings( dpy, i_port, &i_num_encodings, &p_enc )
-                     != Success )
-                {
-                    intf_WarnMsg( 4, "  XvQueryEncodings failed" );
-                    continue;
-                }
-
-                for( i_enc = 0; i_enc < i_num_encodings; i_enc++ )
-                {
-                    intf_WarnMsg( 4, "  id=%ld, name=%s, size=%ldx%ld,"
-                                     " numerator=%d, denominator=%d",
-                                  p_enc[i_enc].encoding_id, p_enc[i_enc].name,
-                                  p_enc[i_enc].width, p_enc[i_enc].height,
-                                  p_enc[i_enc].rate.numerator,
-                                  p_enc[i_enc].rate.denominator );
-                }
-
-                if( p_enc != NULL )
-                {
-                    XvFreeEncodingInfo( p_enc );
-                }
-
-                intf_WarnMsg( 4, " attribute list:" );
-                p_attr = XvQueryPortAttributes( dpy, i_port,
-                                                &i_num_attributes );
-                for( i_attr = 0; i_attr < i_num_attributes; i_attr++ )
-                {
-                    intf_WarnMsg( 4,
-                          "  name=%s, flags=[%s%s ], min=%i, max=%i",
-                          p_attr[i_attr].name,
-                          (p_attr[i_attr].flags & XvGettable) ? " get" : "",
-                          (p_attr[i_attr].flags & XvSettable) ? " set" : "",
-                          p_attr[i_attr].min_value, p_attr[i_attr].max_value );
-                }
-
-                if( p_attr != NULL )
-                {
-                    XFree( p_attr );
+                    i_selected_port = i_port;
                 }
             }
 
-            if( p_formats != NULL )
+            /* If no free port was found, forget it */
+            if( i_selected_port == -1 )
             {
-                XFree( p_formats );
+                continue;
+            }
+
+            /* If we found a port, print information about it */
+            intf_WarnMsg( 3, "vout: GetXVideoPort found adaptor %i, port %i",
+                             i_adaptor, i_selected_port );
+            intf_WarnMsg( 3, "  image format 0x%x (%4.4s) %s supported",
+                             p_formats[ i_format ].id,
+                             (char *)&p_formats[ i_format ].id,
+                             ( p_formats[ i_format ].format
+                                == XvPacked ) ? "packed" : "planar" );
+
+            intf_WarnMsg( 4, " encoding list:" );
+
+            if( XvQueryEncodings( dpy, i_selected_port,
+                                  &i_num_encodings, &p_enc )
+                 != Success )
+            {
+                intf_WarnMsg( 4, "  XvQueryEncodings failed" );
+                continue;
+            }
+
+            for( i_enc = 0; i_enc < i_num_encodings; i_enc++ )
+            {
+                intf_WarnMsg( 4, "  id=%ld, name=%s, size=%ldx%ld,"
+                                 " numerator=%d, denominator=%d",
+                              p_enc[i_enc].encoding_id, p_enc[i_enc].name,
+                              p_enc[i_enc].width, p_enc[i_enc].height,
+                              p_enc[i_enc].rate.numerator,
+                              p_enc[i_enc].rate.denominator );
+            }
+
+            if( p_enc != NULL )
+            {
+                XvFreeEncodingInfo( p_enc );
+            }
+
+            intf_WarnMsg( 4, " attribute list:" );
+            p_attr = XvQueryPortAttributes( dpy, i_selected_port,
+                                            &i_num_attributes );
+            for( i_attr = 0; i_attr < i_num_attributes; i_attr++ )
+            {
+                intf_WarnMsg( 4,
+                      "  name=%s, flags=[%s%s ], min=%i, max=%i",
+                      p_attr[i_attr].name,
+                      (p_attr[i_attr].flags & XvGettable) ? " get" : "",
+                      (p_attr[i_attr].flags & XvSettable) ? " set" : "",
+                      p_attr[i_attr].min_value, p_attr[i_attr].max_value );
+            }
+
+            if( p_attr != NULL )
+            {
+                XFree( p_attr );
             }
         }
+
+        if( p_formats != NULL )
+        {
+            XFree( p_formats );
+        }
+
     }
 
     if( i_num_adaptors > 0 )
@@ -1319,12 +1320,12 @@ static int XVideoGetPort( Display *dpy )
     {
         if( i_requested_adaptor == -1 )
         {
-            intf_WarnMsg( 3, "vout: no XVideo port found supporting YUV12" );
+            intf_WarnMsg( 3, "vout: no free XVideo port found for YV12" );
         }
         else
         {
-            intf_WarnMsg( 3, "vout: XVideo adaptor %i does not support YUV12",
-                             i_requested_adaptor );
+            intf_WarnMsg( 3, "vout: XVideo adaptor %i does not have a free "
+                             "XVideo port for YV12", i_requested_adaptor );
         }
     }
 
