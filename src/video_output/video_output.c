@@ -69,6 +69,7 @@ static void     RenderSubPicture  ( vout_thread_t *p_vout,
                                     subpicture_t *p_subpic );
 static void     RenderInterface   ( vout_thread_t *p_vout );
 static int      RenderIdle        ( vout_thread_t *p_vout );
+static int      RenderSplash( vout_thread_t *p_vout );
 static void     RenderInfo        ( vout_thread_t *p_vout );
 static void     Synchronize       ( vout_thread_t *p_vout, s64 i_delay );
 static int      Manage            ( vout_thread_t *p_vout );
@@ -169,6 +170,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     /* Initialize idle screen */
     p_vout->last_display_date   = 0;
     p_vout->last_idle_date      = 0;
+    p_vout->init_display_date   = mdate();
 
 #ifdef STATS
     /* Initialize statistics fields */
@@ -1064,9 +1066,11 @@ last_display_date = display_date;
             }
         }
 
+
         /*
          * Perform rendering, sleep and display rendered picture
          */
+        
         if( p_pic )                        /* picture and perhaps subpicture */
         {
             b_display = p_vout->b_active;
@@ -1110,7 +1114,7 @@ last_display_date = display_date;
             }
 
         }
-        else if( p_vout->b_active )        /* idle or interface screen alone */
+        else if( p_vout->b_active && p_vout->init_display_date == 0)        /* idle or interface screen alone */
         {
             if( p_vout->b_interface && 0 /* && XXX?? intf_change */ )
             {
@@ -1137,6 +1141,30 @@ last_display_date = display_date;
             b_display = 0;
         }
 
+
+        /*
+         * chech for the current time and
+         * display splash screen if everything is on time
+         */
+        if( p_vout->init_display_date > 0) 
+        {
+            if( p_vout->b_active && 
+                    mdate()-p_vout->init_display_date < 5000000)
+            {
+                /* there is something to display ! */
+                    b_display = 1;
+                    RenderSplash( p_vout );
+                
+            } else {
+                /* no splash screen ! */
+                intf_ErrMsgImm("End of splash screen\n");  
+                p_vout->init_display_date=0;
+            }
+        }
+            
+
+
+        
         /*
          * Sleep, wake up and display rendered picture
          */
@@ -1733,6 +1761,42 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
+ * RenderSplash: render splash picture
+ *****************************************************************************
+ * This function will print something on the screen. It will return 0 if
+ * nothing has been rendered, or 1 if something has been changed on the screen.
+ * Note that if you absolutely want something to be printed, you will have
+ * to force it by setting the last idle date to 0.
+ * Unlike other rendering functions, this one calls the SetBufferPicture
+ * function when needed.
+ *****************************************************************************/
+int RenderSplash( vout_thread_t *p_vout )
+{
+    int         i_x = 0, i_y = 0;                           /* text position */
+    int         i_width, i_height;                              /* text size */
+    char *psz_text =    "VideoLan Client (" VERSION ")";            /* text to display */
+
+    memset( p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
+                  p_vout->i_bytes_per_line * p_vout->i_height, 12);
+
+ //   SetBufferPicture( p_vout, NULL );
+    vout_TextSize( p_vout->p_large_font, WIDE_TEXT | OUTLINED_TEXT, psz_text,
+                   &i_width, &i_height );
+    if( !Align( p_vout, &i_x, &i_y, i_width, i_height, CENTER_RALIGN, CENTER_RALIGN ) )
+    {
+        vout_Print( p_vout->p_large_font,
+                    p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
+                    i_x * p_vout->i_bytes_per_pixel + (i_y - 16 ) * p_vout->i_bytes_per_line,
+                    p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
+                    p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
+                    WIDE_TEXT | OUTLINED_TEXT, psz_text, 100);
+        SetBufferArea( p_vout, i_x, i_y, i_width, i_height);
+    }
+    return( 1 );
+}
+
+
+/*****************************************************************************
  * RenderIdle: render idle picture
  *****************************************************************************
  * This function will print something on the screen. It will return 0 if
@@ -1742,7 +1806,7 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
  * Unlike other rendering functions, this one calls the SetBufferPicture
  * function when needed.
  *****************************************************************************/
-static int RenderIdle( vout_thread_t *p_vout )
+int RenderIdle( vout_thread_t *p_vout )
 {
     int         i_x = 0, i_y = 0;                           /* text position */
     int         i_width, i_height;                              /* text size */
@@ -1764,7 +1828,7 @@ static int RenderIdle( vout_thread_t *p_vout )
         SetBufferPicture( p_vout, NULL );
         vout_TextSize( p_vout->p_large_font, WIDE_TEXT | OUTLINED_TEXT, psz_text,
                        &i_width, &i_height );
-        if( !Align( p_vout, &i_x, &i_y, i_width, i_height, CENTER_RALIGN, CENTER_RALIGN ) )
+        if( !Align( p_vout, &i_x, &i_y, i_width, i_height * 2, CENTER_RALIGN, CENTER_RALIGN ) )
         {
             i_amount = (int) ((current_date - p_vout->last_display_date ) / 5000LL);            
             vout_Print( p_vout->p_large_font,
@@ -1772,17 +1836,17 @@ static int RenderIdle( vout_thread_t *p_vout )
                         i_x * p_vout->i_bytes_per_pixel + i_y * p_vout->i_bytes_per_line,
                         p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                         p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
-                        WIDE_TEXT | OUTLINED_TEXT, psz_text,  (i_amount / 10 ) %100);
+                        WIDE_TEXT | OUTLINED_TEXT, psz_text,  (i_amount / 3 ) %110);
 
             vout_Print( p_vout->p_large_font,
                     p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
                     i_x * p_vout->i_bytes_per_pixel + (i_y + 16) * p_vout->i_bytes_per_line,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                     p_vout->i_white_pixel, p_vout->i_gray_pixel, 0,
-                    WIDE_TEXT | OUTLINED_TEXT, psz_wtext,  (i_amount/30)%110 );
+                    WIDE_TEXT | OUTLINED_TEXT, psz_wtext,  (i_amount/5)%110 );
             
 
-            SetBufferArea( p_vout, i_x, i_y, i_width, i_height + 16 );
+            SetBufferArea( p_vout, i_x, i_y, i_width, i_height * 2 );
         }
         return( 1 );
     }

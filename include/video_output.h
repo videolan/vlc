@@ -179,6 +179,7 @@ typedef struct vout_thread_s
     /* Idle screens management */
     mtime_t             last_display_date;     /* last non idle display date */
     mtime_t             last_idle_date;            /* last idle display date */
+    mtime_t             init_display_date;
 
 #ifdef STATS
     /* Statistics - these numbers are not supposed to be accurate, but are a
