@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.3 2002/07/21 18:47:22 fenrir Exp $
+ * $Id: mp4.h,v 1.4 2002/07/21 19:57:22 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -220,7 +220,10 @@ static struct
 
     /* Audio codec */
     { FOURCC_soun,  UNKNOWN_ES,     "Generic AudioSampleEntry" },
-    { FOURCC_mp4a,  UNKNOWN_ES,     "MP4AudioSampleEntry (AAC)" },
+    /* The things with mp4a is that we could have aac audio but
+       also mpeg audio, depend on objectTypeIndication,
+       it would be probe later */
+    { FOURCC_mp4a,  MPEG2_AUDIO_ES, "MP4AudioSampleEntry (MPEGAUDIO-AAC)" },
     { FOURCC__mp3,  MPEG2_AUDIO_ES, ".mp3 SampleEntry (MPEG-I/II layer 3)" },
     
     /* Last entry with fourcc == 0 */

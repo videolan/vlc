@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.2 2002/07/21 18:47:22 fenrir Exp $
+ * $Id: mp4.c,v 1.3 2002/07/21 19:57:22 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -833,7 +833,8 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             MP4_Set4BytesLE( p_bmih, 40 );
             if( p_sample->data.p_sample_mp4v->i_width )
             {
-                MP4_Set4BytesLE( p_bmih + 4, p_sample->data.p_sample_mp4v->i_width );
+                MP4_Set4BytesLE( p_bmih + 4, 
+                                 p_sample->data.p_sample_mp4v->i_width );
             }
             else
             {
@@ -842,7 +843,8 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             }
             if( p_sample->data.p_sample_mp4v->i_height )
             {
-                MP4_Set4BytesLE( p_bmih + 8, p_sample->data.p_sample_mp4v->i_height );
+                MP4_Set4BytesLE( p_bmih + 8, 
+                                 p_sample->data.p_sample_mp4v->i_height );
             }
             else
             {
@@ -858,36 +860,77 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             break;
     }
 
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    input_SelectES( p_input, p_demux_track->p_es );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-    
-
-    p_demux_track->b_ok = 1;
-
     /* now see if esds is present and i so create a data packet 
         with decoder_specific_info  */
     if( ( p_esds = MP4_FindBox( p_sample, FOURCC_esds ) )&&
-        ( p_esds->data.p_esds->es_descriptor.p_decConfigDescr )&&
-        ( p_esds->data.p_esds->es_descriptor.p_decConfigDescr->i_decoder_specific_info_len ) )
+        ( p_esds->data.p_esds->es_descriptor.p_decConfigDescr ) )
     {
-        data_packet_t *p_data;
-        int i_size = p_esds->data.p_esds->es_descriptor.p_decConfigDescr->i_decoder_specific_info_len;
-
-        /* data packet for the data */
-        if( !(p_data = input_NewPacket( p_input->p_method_data, i_size ) ) )
+#define es_descriptor p_esds->data.p_esds->es_descriptor
+        /* First update information based on i_objectTypeIndication */
+        switch( es_descriptor.p_decConfigDescr->i_objectTypeIndication )
         {
-            return;
+            case( 0x20 ):
+                p_demux_track->p_es->i_type = MPEG4_VIDEO_ES;
+                break;
+            case( 0x40):
+                p_demux_track->p_es->i_type = UNKNOWN_ES; /* In fact AAC */
+                break;
+            case( 0x60):
+            case( 0x61):
+            case( 0x62):
+            case( 0x63):
+            case( 0x64):
+            case( 0x65):
+                p_demux_track->p_es->i_type = MPEG2_VIDEO_ES;
+                break;
+            case( 0x66):
+            case( 0x67):
+            case( 0x68):
+            case( 0x69):
+                p_demux_track->p_es->i_type = MPEG2_AUDIO_ES;
+                break;
+            case( 0x6a):
+                p_demux_track->p_es->i_type = MPEG1_VIDEO_ES;
+                break;
+            case( 0x6b):
+                p_demux_track->p_es->i_type = MPEG1_AUDIO_ES;
+                break;
+
+            default:
+                /* Unknown entry, don't touch i_type */
+                msg_Warn( p_input, "objectTypeIndication(0x%x) unknow",
+                      es_descriptor.p_decConfigDescr->i_objectTypeIndication );
+                break;
+        }
+        /* Create a packet to init the decoder, send with the first frame */
+        if( es_descriptor.p_decConfigDescr->i_decoder_specific_info_len )
+        {
+            data_packet_t *p_data;
+            int i_size = 
+            
+            i_size = 
+                es_descriptor.p_decConfigDescr->i_decoder_specific_info_len;
+    
+            /* data packet for the data */
+            if( !(p_data = input_NewPacket( p_input->p_method_data, i_size ) ) )
+            {
+                return;
+            }
+
+            memcpy( p_data->p_payload_start,
+                    es_descriptor.p_decConfigDescr->p_decoder_specific_info,
+                    i_size ); 
+            p_demux_track->p_data_init = p_data;
         }
 
-        /* initialisation of all the field */
-        memcpy( p_data->p_payload_start,
-                p_esds->data.p_esds->es_descriptor.p_decConfigDescr->p_decoder_specific_info,
-                i_size ); 
-        p_demux_track->p_data_init = p_data;
+#undef es_descriptor
     }
-                           
-    
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    input_SelectES( p_input, p_demux_track->p_es );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+   
+    p_demux_track->b_ok = 1;
     return;
 }
 
