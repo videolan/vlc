@@ -68,10 +68,15 @@ class X11Display: public SkinObject
         /// Get the pixel value corresponding to the given colors
         unsigned long getPixelValue( uint8_t r, uint8_t g, uint8_t b ) const;
 
+        /// Get the main window ID
+        Window getMainWindow() const { return m_mainWindow; }
+
         //XXX
         Window m_voutWindow;
 
     private:
+        /// Dummy parent window for the task bar
+        Window m_mainWindow;
         /// Display parameters
         Display *m_pDisplay;
         Visual *m_pVisual;
@@ -81,7 +86,6 @@ class X11Display: public SkinObject
         int m_redLeftShift, m_redRightShift;
         int m_greenLeftShift, m_greenRightShift;
         int m_blueLeftShift, m_blueRightShift;
-
 
         /// Pointer on the right implementation of getPixel
         MakePixelFunc_t makePixelImpl;

@@ -101,8 +101,11 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         pFactory->m_dndMap[m_wnd] = m_pDropTarget;
     }
 
-    // Change the window title XXX
+    // Change the window title
     XStoreName( XDISPLAY, m_wnd, "VLC" );
+
+    // Associate the window to the main "parent" window
+    XSetTransientForHint( XDISPLAY, m_wnd, m_rDisplay.getMainWindow() );
 
     // XXX Kludge to tell VLC that this window is the vout
     if (pParentWindow)
