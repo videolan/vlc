@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.11 2003/04/15 16:42:02 karibu Exp $
+ * $Id: gtk2_window.cpp,v 1.12 2003/04/15 16:47:20 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -170,12 +170,6 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
 
 
         case GDK_MOTION_NOTIFY:
-//            TRACKMOUSEEVENT TrackEvent;
-//            TrackEvent.cbSize      = sizeof( TRACKMOUSEEVENT );
-//            TrackEvent.dwFlags     = TME_LEAVE;
-//            TrackEvent.hwndTrack   = hWnd;
-//            TrackEvent.dwHoverTime = 1;
-//            TrackMouseEvent( &TrackEvent );
             if( LButtonDown )
                 MouseMove( (int)( (GdkEventButton *)p2 )->x,
                            (int)( (GdkEventButton *)p2 )->y, 1 );
@@ -233,6 +227,9 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
             }
             return true;
 
+        case GDK_LEAVE_NOTIFY:
+            OSAPI_PostMessage( this, WINDOW_LEAVE, -1, -1 );
+            return true;
 /*
         case WM_RBUTTONDOWN:
             MouseDown( LOWORD( p2 ), HIWORD( p2 ), 2 );
@@ -246,9 +243,6 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
             MouseDblClick( LOWORD( p2 ), HIWORD( p2 ), 1 );
             return true;
 
-        case WM_MOUSELEAVE:
-            OSAPI_PostMessage( this, WINDOW_LEAVE, 0, 0 );
-            return true;
 */
         default:
             return false;
