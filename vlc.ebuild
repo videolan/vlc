@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.15 2003/07/19 00:02:35 hartman Exp $
+# $Id: vlc.ebuild,v 1.16 2003/07/20 19:48:30 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -25,7 +25,7 @@
 # Thanks to the Gentoo Team for supporting us.
 ###############################################################################
 
-IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l lirc wxwindows imlib matroska dvb pvr mozilla mad debug"
+IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l lirc wxwindows imlib matroska dvb pvr mozilla mad debug xvid"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
@@ -45,7 +45,7 @@ HOMEPAGE="http://www.videolan.org/vlc"
 
 SLOT="0"
 LICENSE="GPL-2"
-KEYWORDS="~x86 ~ppc ~sparc ~alpha ~mips ~hppa"
+KEYWORDS="~x86 ~ppc ~sparc ~alpha ~mips ~hppa ~amd64"
 
 DEPEND="X? ( virtual/x11 )
 	aalib? ( >=media-libs/aalib-1.4_rc4-r2 )
@@ -75,6 +75,7 @@ DEPEND="X? ( virtual/x11 )
 	slp? ( >=net-libs/openslp-1.0.10 )
 	truetype? ( >=media-libs/freetype-2.1.4 )
 	wxwindows? ( >=x11-libs/wxGTK-2.4.1 )
+	xvid? ( >=media-libs/xvid-0.9.1 )
 	>=media-sound/lame-3.93.1
 	>=media-libs/libdvbpsi-0.1.2
 	>=media-libs/faad2-1.1
@@ -212,16 +213,15 @@ src_compile(){
 
 	use mad && myconf="${myconf} --enable-mad"
 
-	use truetype && myconf="${myconf} --enable-freetype"
-
 	# xvid is a local USE var, see /usr/portage/profiles/use.local.desc for more details
 	use xvid && myconf="${myconf} --enable-xvid"
+
+	use truetype && myconf="${myconf} --enable-freetype"
 
 	# v4l is a local USE var, see /usr/portage/profiles/use.local.desc for more details
 	use v4l && myconf="${myconf} --enable-v4l"
 
-	# wxwindows is a local USE var. already enabled by default, but depends on wxGTK
-	# but if we use wxwindows and imlib, then we can also use skins
+	# If we use wxwindows and imlib, then we can also use skins
 	(use imlib && use wxwindows) && myconf="${myconf} --enable-skins"
 
 	# matroska is a local USE var. 
@@ -271,7 +271,8 @@ src_compile(){
 	# parallel make doesn't work with our complicated makefile
 	# this is also the reason as why you shouldn't run autoconf
 	# or automake yourself. (or bootstrap for that matter)
-	make || die "make of VLC failed"
+	MAKEOPTS="${MAKEOPTS} -j1
+	emake || die "make of VLC failed"
 }
 
 src_install() {
@@ -279,6 +280,6 @@ src_install() {
 	einstall || die "make install failed"
 
 	dodoc ABOUT-NLS AUTHORS COPYING ChangeLog HACKING INSTALL* \
-	MAINTAINERS NEWS README* MODULES THANKS doc/ChangeLog-*
+	MAINTAINERS NEWS README* THANKS doc/ChangeLog-*
 
 }

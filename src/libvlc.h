@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.76 2003/07/18 20:52:10 gbazin Exp $
+ * $Id: libvlc.h,v 1.77 2003/07/20 19:48:30 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -25,9 +25,10 @@
 
 #define Nothing here, this is just to prevent update-po from being stupid
 
-static char *ppsz_sout_acodec[] = { "", "mpga", "a52", NULL };
+static char *ppsz_sout_acodec[] = { "", "mpga", "mp3", "vorb", "a52", NULL };
 static char *ppsz_sout_vcodec[] = { "", "mpgv", "mp4v", "DIV1", "DIV2", 
-                                 "DIV3", "h263", "i263", "WMV1", NULL };
+                                 "DIV3", "h263", "i263", "WMV1", "WMV2",
+                                 "MJPG", NULL };
 
 static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
                                  "ja", "nl", "no", "pl", "ru", "sv", NULL };

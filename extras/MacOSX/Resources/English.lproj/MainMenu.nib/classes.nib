@@ -256,6 +256,7 @@
                 outputInfoChanged = id; 
                 outputMethodChanged = id; 
                 outputSettings = id; 
+                sapChanged = id; 
                 streamPortStepperChanged = id; 
                 streamTTLStepperChanged = id; 
                 transcodeChanged = id; 
@@ -269,6 +270,7 @@
                 "o_display" = id; 
                 "o_file_field" = id; 
                 "o_method" = id; 
+                "o_misc_lbl" = id; 
                 "o_mux_lbl" = id; 
                 "o_mux_selector" = id; 
                 "o_open_panel" = id; 
@@ -276,6 +278,8 @@
                 "o_output_ckbox" = id; 
                 "o_output_settings" = id; 
                 "o_output_sheet" = id; 
+                "o_sap_chkbox" = id; 
+                "o_sap_name" = id; 
                 "o_stream_address" = id; 
                 "o_stream_address_lbl" = id; 
                 "o_stream_port" = id; 
@@ -288,6 +292,8 @@
                 "o_stream_type_lbl" = id; 
                 "o_transcode_audio_bitrate" = id; 
                 "o_transcode_audio_bitrate_lbl" = id; 
+                "o_transcode_audio_channels" = id; 
+                "o_transcode_audio_channels_lbl" = id; 
                 "o_transcode_audio_chkbox" = id; 
                 "o_transcode_audio_selector" = id; 
                 "o_transcode_lbl" = id; 

@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.9 2003/06/22 15:30:22 hartman Exp $
+ * $Id: output.m,v 1.10 2003/07/20 19:48:30 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -105,6 +105,14 @@
         selector: @selector(transcodeInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: o_transcode_audio_bitrate];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(transcodeInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_transcode_audio_channels];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(transcodeInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_sap_name];
 
     [o_mux_selector setAutoenablesItems: NO];
     [self transcodeChanged:nil];
@@ -112,9 +120,14 @@
 
 - (void)initStrings
 {
-    NSArray *o_a_bitrates = [NSArray arrayWithObjects:@"96", @"128", @"192", @"256", @"512", nil];
+    NSArray *o_a_channels = [NSArray arrayWithObjects: @"1", @"2", @"4", @"6", nil];
+    NSArray *o_a_bitrates = [NSArray arrayWithObjects: @"96", @"128", @"192", @"256", @"512", nil];
     NSArray *o_v_bitrates = [NSArray arrayWithObjects:
-        @"100", @"150", @"200", @"400", @"500", @"500", @"750", @"1000", @"2000", @"3000", nil];
+        @"100", @"150", @"200", @"400", @"500", @"750", @"1000", @"2000", @"3000", nil];
+    NSArray *o_a_codecs = [NSArray arrayWithObjects:
+        @"mpga", @"mp3 ", @"a52 ", @"vorb", nil];
+    NSArray *o_v_codecs = [NSArray arrayWithObjects:
+        @"mpgv", @"mp4v", @"DIV1", @"DIV2", @"DIV3", @"H263", @"I263", @"WMV1", @"WMV2", @"MJPG", nil];
     
     [o_output_ckbox setTitle: _NS("Advanced output:")];
     [o_output_settings setTitle: _NS("Settings...")];
@@ -136,27 +149,30 @@
     [o_mux_lbl setStringValue: _NS("Encapsulation Method")];
     [[o_mux_selector itemAtIndex: 0] setTitle: _NS("MPEG TS")];
     [[o_mux_selector itemAtIndex: 1] setTitle: _NS("MPEG PS")];
-    [[o_mux_selector itemAtIndex: 2] setTitle: _NS("AVI")];
-    [[o_mux_selector itemAtIndex: 3] setTitle: _NS("Ogg")];
-    //[[o_mux_selector itemAtIndex: 4] setTitle: _NS("mp4")];
+    [[o_mux_selector itemAtIndex: 1] setTitle: _NS("MPEG1")];
+    [[o_mux_selector itemAtIndex: 3] setTitle: _NS("AVI")];
+    [[o_mux_selector itemAtIndex: 4] setTitle: _NS("Ogg")];
+    //[[o_mux_selector itemAtIndex: 5] setTitle: _NS("mp4")];
     
     [o_transcode_lbl setTitle: _NS("Transcode options")];
     [o_transcode_video_chkbox setTitle: _NS("Video")];
-    [[o_transcode_video_selector itemAtIndex: 0] setTitle: @"mpgv"];
-    [[o_transcode_video_selector itemAtIndex: 1] setTitle: @"mp4v"];
-    [[o_transcode_video_selector itemAtIndex: 2] setTitle: @"DIV1"];
-    [[o_transcode_video_selector itemAtIndex: 3] setTitle: @"DIV2"];
-    [[o_transcode_video_selector itemAtIndex: 4] setTitle: @"DIV3"];
-    [[o_transcode_video_selector itemAtIndex: 5] setTitle: @"H263"];
-    [[o_transcode_video_selector itemAtIndex: 6] setTitle: @"I263"];
-    [[o_transcode_video_selector itemAtIndex: 7] setTitle: @"WMV1"];
+    [o_transcode_video_selector removeAllItems];
+    [o_transcode_video_selector addItemsWithTitles: o_v_codecs];
     [o_transcode_video_bitrate_lbl setStringValue: _NS("Bitrate (kb/s)")];
+    [o_transcode_video_bitrate removeAllItems];
     [o_transcode_video_bitrate addItemsWithObjectValues: o_v_bitrates];
     [o_transcode_audio_chkbox setTitle: _NS("Audio")];
-    [[o_transcode_audio_selector itemAtIndex: 0] setTitle: @"mpga"];
-    [[o_transcode_audio_selector itemAtIndex: 1] setTitle: @"a52 "];
+    [o_transcode_audio_selector removeAllItems];
+    [o_transcode_audio_selector addItemsWithTitles: o_a_codecs];
     [o_transcode_audio_bitrate_lbl setStringValue: _NS("Bitrate (kb/s)")];
+    [o_transcode_audio_bitrate removeAllItems];
     [o_transcode_audio_bitrate addItemsWithObjectValues: o_a_bitrates];
+    [o_transcode_audio_channels_lbl setStringValue: _NS("Channels")];
+    [o_transcode_audio_channels removeAllItems];
+    [o_transcode_audio_channels addItemsWithObjectValues: o_a_channels];
+    
+    [o_misc_lbl setTitle: _NS("Miscellaneous Options")];
+    [o_sap_chkbox setTitle: _NS("Announce streams via SAP Channel:")];
 }
 
 - (IBAction)outputChanged:(id)sender;
@@ -194,8 +210,10 @@
 - (void)outputMethodChanged:(NSNotification *)o_notification
 {
     NSString *o_mode;
-
     o_mode = [[o_method selectedCell] title];
+    
+    [o_sap_chkbox setEnabled: NO];
+    [o_sap_name setEnabled: NO];
 
     if( [o_mode isEqualToString: _NS("File")] )
     {
@@ -211,7 +229,8 @@
         [[o_mux_selector itemAtIndex: 1] setEnabled: YES];
         [[o_mux_selector itemAtIndex: 2] setEnabled: YES];
         [[o_mux_selector itemAtIndex: 3] setEnabled: YES];
-        //[[o_mux_selector itemAtIndex: 4] setEnabled: YES];
+        [[o_mux_selector itemAtIndex: 4] setEnabled: YES];
+        //[[o_mux_selector itemAtIndex: 5] setEnabled: YES];
     }
     else if( [o_mode isEqualToString: _NS("Stream")] )
     {
@@ -230,9 +249,10 @@
             [o_stream_ttl setEnabled: NO];
             [o_stream_ttl_stp setEnabled: NO];
             [[o_mux_selector itemAtIndex: 1] setEnabled: YES];
-            [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
-            [[o_mux_selector itemAtIndex: 3] setEnabled: YES];
-            //[[o_mux_selector itemAtIndex: 4] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 2] setEnabled: YES];
+            [[o_mux_selector itemAtIndex: 3] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 4] setEnabled: YES];
+            //[[o_mux_selector itemAtIndex: 5] setEnabled: NO];
         }
         else if( [o_mode isEqualToString: _NS("UDP")] )
         {
@@ -242,7 +262,10 @@
             [[o_mux_selector itemAtIndex: 1] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 3] setEnabled: NO];
-            //[[o_mux_selector itemAtIndex: 4] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 4] setEnabled: NO];
+            //[[o_mux_selector itemAtIndex: 5] setEnabled: NO];
+            [o_sap_chkbox setEnabled: YES];
+            [o_sap_name setEnabled: YES];
         }
         else if( [o_mode isEqualToString: _NS("RTP")] )
         {
@@ -252,7 +275,8 @@
             [[o_mux_selector itemAtIndex: 1] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 3] setEnabled: NO];
-            //[[o_mux_selector itemAtIndex: 4] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 4] setEnabled: NO];
+            //[[o_mux_selector itemAtIndex: 5] setEnabled: NO];
         }
     }
     if( ![[o_mux_selector selectedItem] isEnabled] )
@@ -264,7 +288,7 @@
 
 - (void)outputInfoChanged:(NSNotification *)o_notification
 {
-    NSString *o_mode, *o_mux, *o_mux_string;
+    NSString *o_mode, *o_mux, *o_mux_string, *o_sap;
     NSMutableString *o_mrl_string = [NSMutableString stringWithString:@"#"];
 
     [o_mrl_string appendString: o_transcode];
@@ -280,6 +304,7 @@
     else if ( [o_mux isEqualToString: _NS("Ogg")] ) o_mux_string = @"ogg";
     else if ( [o_mux isEqualToString: _NS("MPEG PS")] ) o_mux_string = @"ps";
     else if ( [o_mux isEqualToString: _NS("mp4")] ) o_mux_string = @"mp4";
+    else if ( [o_mux isEqualToString: _NS("MPEG1")] ) o_mux_string = @"mpeg1";
     else o_mux_string = @"ts";
 
     if( [o_mode isEqualToString: _NS("File")] )
@@ -291,17 +316,27 @@
     else if( [o_mode isEqualToString: _NS("Stream")] )
     {
         o_mode = [o_stream_type titleOfSelectedItem];
+        o_sap = @"";
         
-        if ( [o_mode isEqualToString: _NS("HTTP")] ) o_mode = @"http";
+        if ( [o_mode isEqualToString: _NS("HTTP")] )
+            o_mode = @"http";
         else if ( [o_mode isEqualToString: _NS("UDP")] )
+        {
             o_mode = @"udp";
+            if( [o_sap_chkbox state] == NSOnState )
+            {
+                o_sap = @",sap";
+                if ( ![[o_sap_name stringValue] isEqualToString: @""] )
+                    o_sap = [NSString stringWithFormat:@",sap=%@", [o_sap_name stringValue]];
+            }
+        }
         else if ( [o_mode isEqualToString: _NS("RTP")] )
             o_mode = @"rtp";
             
         [o_mrl_string appendFormat:
-                        @"std{access=%@,mux=%@,url=\"%@:%@\"}",
+                        @"std{access=%@,mux=%@,url=\"%@:%@\"%@}",
                         o_mode, o_mux_string, [o_stream_address stringValue],
-                        [o_stream_port stringValue]];
+                        [o_stream_port stringValue], o_sap];
     }
     if( [o_display state] == NSOnState )
     {
@@ -322,6 +357,8 @@
     NSString *o_mux_string;
     if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("MPEG PS")] )
         o_mux_string = @"vob";
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("MPEG1")] )
+        o_mux_string = @"mpg";
     else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("AVI")] )
         o_mux_string = @"avi";
     else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("Ogg")] )
@@ -374,11 +411,13 @@
     {
         [o_transcode_audio_selector setEnabled: YES];
         [o_transcode_audio_bitrate setEnabled: YES];
+        [o_transcode_audio_channels setEnabled: YES];
     }
     else
     {
         [o_transcode_audio_selector setEnabled: NO];
         [o_transcode_audio_bitrate setEnabled: NO];
+        [o_transcode_audio_channels setEnabled: NO];
     }
 
     [self transcodeInfoChanged:nil];
@@ -417,5 +456,13 @@
     [self setTranscode: o_transcode_string];
     [self outputInfoChanged:nil];
 }
+
+- (IBAction)sapChanged:(id)sender
+{
+    [o_sap_name setEnabled: [o_sap_chkbox state]];
+    [self outputInfoChanged: nil];
+}
+
+
 
 @end
