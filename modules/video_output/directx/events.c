@@ -4,7 +4,7 @@
  * Copyright (C) 2001-2004 VideoLAN
  * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,8 @@ static void DirectXCloseWindow ( vout_thread_t *p_vout );
 static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
 static long FAR PASCAL DirectXVideoEventProc( HWND, UINT, WPARAM, LPARAM );
 
+static int Control( vout_thread_t *p_vout, int i_query, va_list args );
+
 static void DirectXPopupMenu( event_thread_t *p_event, vlc_bool_t b_open )
 {
     playlist_t *p_playlist =
@@ -84,6 +86,7 @@ void DirectXEventThread( event_thread_t *p_event )
     int i_width, i_height, i_x, i_y;
 
     /* Initialisation */
+    p_event->p_vout->pf_control = Control;
 
     /* Create a window for the video */
     /* Creating a window under Windows also initializes the thread's event
@@ -129,15 +132,18 @@ void DirectXEventThread( event_thread_t *p_event )
                 i_x = i_y = 0;
             }
 
-            val.i_int = ( GET_X_LPARAM(msg.lParam) - i_x )
-                         * p_event->p_vout->render.i_width / i_width;
-            var_Set( p_event->p_vout, "mouse-x", val );
-            val.i_int = ( GET_Y_LPARAM(msg.lParam) - i_y )
-                         * p_event->p_vout->render.i_height / i_height;
-            var_Set( p_event->p_vout, "mouse-y", val );
+            if( i_width && i_height )
+            {
+                val.i_int = ( GET_X_LPARAM(msg.lParam) - i_x )
+                             * p_event->p_vout->render.i_width / i_width;
+                var_Set( p_event->p_vout, "mouse-x", val );
+                val.i_int = ( GET_Y_LPARAM(msg.lParam) - i_y )
+                             * p_event->p_vout->render.i_height / i_height;
+                var_Set( p_event->p_vout, "mouse-y", val );
 
-            val.b_bool = VLC_TRUE;
-            var_Set( p_event->p_vout, "mouse-moved", val );
+                val.b_bool = VLC_TRUE;
+                var_Set( p_event->p_vout, "mouse-moved", val );
+            }
 
         case WM_NCMOUSEMOVE:
             if( (abs(GET_X_LPARAM(msg.lParam) - old_mouse_pos.x) > 2 ||
@@ -318,17 +324,17 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     HMENU      hMenu;
     RECT       rect_window;
 
-    vlc_value_t val;
-
     msg_Dbg( p_vout, "DirectXCreateWindow" );
 
     /* Get this module's instance */
     hInstance = GetModuleHandle(NULL);
 
     /* If an external window was specified, we'll draw in it. */
-    var_Get( p_vout->p_vlc, "drawable", &val );
     p_vout->p_sys->hparent = p_vout->p_sys->hwnd =
-             val.i_int ?  (void*)(ptrdiff_t) val.i_int : NULL;
+        vout_RequestWindow( p_vout, &p_vout->p_sys->i_window_x,
+                            &p_vout->p_sys->i_window_y,
+                            &p_vout->p_sys->i_window_width,
+                            &p_vout->p_sys->i_window_height );
 
     if( p_vout->p_sys->hparent )
     {
@@ -418,8 +424,10 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
                     VOUT_TITLE " (DirectX Output)", /* window title bar text */
                     WS_OVERLAPPEDWINDOW | WS_SIZEBOX | WS_VISIBLE |
                     WS_CLIPCHILDREN,                         /* window style */
-                    CW_USEDEFAULT,                   /* default X coordinate */
-                    0,                               /* default Y coordinate */
+                    (p_vout->p_sys->i_window_x < 0) ? CW_USEDEFAULT :
+                        p_vout->p_sys->i_window_x,   /* default X coordinate */
+                    (p_vout->p_sys->i_window_y < 0) ? CW_USEDEFAULT :
+                        p_vout->p_sys->i_window_y,   /* default Y coordinate */
                     rect_window.right - rect_window.left,    /* window width */
                     rect_window.bottom - rect_window.top,   /* window height */
                     NULL,                                /* no parent window */
@@ -476,6 +484,8 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
 
         /* Blam! Erase everything that might have been there. */
         InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
+
+        vout_ReleaseWindow( p_vout, (void *)p_vout->p_sys->hparent );
     }
 
     p_vout->p_sys->hwnd = NULL;
@@ -751,6 +761,14 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         }
         break;
 
+    case WM_PAINT:
+    case WM_NCPAINT:
+    case WM_ERASEBKGND:
+        /* We do not want to relay these messages to the parent window
+         * because we rely on the background color for the overlay. */
+        return DefWindowProc(hwnd, message, wParam, lParam);
+        break;
+
     default:
         //msg_Dbg( p_vout, "WinProc WM Default %i", message );
         break;
@@ -887,4 +905,35 @@ static int DirectXConvertKey( int i_key )
     }
 
     return 0;
+}
+
+/*****************************************************************************
+ * Control: control facility for the vout
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    double f_arg;
+    RECT rect_window;
+
+    switch( i_query )
+    {
+    case VOUT_SET_ZOOM:
+        f_arg = va_arg( args, double );
+
+        /* Update dimensions */
+        rect_window.top = rect_window.left = 0;
+        rect_window.right  = p_vout->i_window_width * f_arg;
+        rect_window.bottom = p_vout->i_window_height * f_arg;
+        AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
+
+        SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
+                      rect_window.right - rect_window.left,
+                      rect_window.bottom - rect_window.top, SWP_NOMOVE );
+
+        return VLC_SUCCESS;
+
+    default:
+        msg_Dbg( p_vout, "control query not supported" );
+        return VLC_EGENERIC;
+    }
 }
