@@ -272,7 +272,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     if( p_intf != NULL )
     {
         // Do nothing is skins2 is not the main interface
-        if( var_Type( p_intf, "skin-to-load" ) != VLC_VAR_STRING )
+        if( var_Type( p_intf, "skin-to-load" ) == VLC_VAR_STRING )
         {
             playlist_t *p_playlist =
                 (playlist_t *) vlc_object_find( p_this, VLC_OBJECT_PLAYLIST,

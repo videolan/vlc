@@ -360,6 +360,7 @@ static void RunThread ( playlist_t *p_playlist )
                 if( p_playlist->pp_items[p_playlist->i_index]->b_autodeletion )
                 {
                     playlist_Delete( p_playlist, p_playlist->i_index );
+                    p_playlist->i_status = PLAYLIST_RUNNING;
                 }
 
                 /* Select the next playlist item */
