@@ -108,10 +108,15 @@ int E_(OpenDemux)( vlc_object_t *p_this )
         ( !strcmp( fmt->name, "mpeg" ) ||
           !strcmp( fmt->name, "vcd" ) ||
           !strcmp( fmt->name, "vob" ) ||
-          !strcmp( fmt->name, "mpegts" ) ) )
+          !strcmp( fmt->name, "mpegts" ) ||
+          /* libavformat's redirector won't work */
+          !strcmp( fmt->name, "redir" ) ||
+          !strcmp( fmt->name, "sdp" ) ) )
     {
         return VLC_EGENERIC;
     }
+
+    msg_Dbg( p_demux, "detected format: %s", fmt->name );
 
     /* Fill p_demux fields */
     p_demux->pf_demux = Demux;
