@@ -345,6 +345,7 @@ int intf_getKey( intf_thread_t *p_intf, int r_key)
 
 void intf_AssignNormalKeys( intf_thread_t *p_intf)
 {
+     intf_AssignKey( p_intf , 'q', 'Q');
      intf_AssignKey( p_intf , 'Q', 'Q');
      intf_AssignKey( p_intf ,  27, 'Q');
      intf_AssignKey( p_intf ,   3, 'Q');
