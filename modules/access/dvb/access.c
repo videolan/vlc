@@ -637,7 +637,8 @@ static int ParseMRL( access_t *p_access )
             return VLC_EGENERIC;
         }
 
-        psz_parser++;
+        if ( *psz_parser )
+            psz_parser++;
     }
 #undef GET_OPTION_INT
 #undef GET_OPTION_BOOL
