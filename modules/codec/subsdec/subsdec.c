@@ -2,7 +2,7 @@
  * subsdec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.9 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: subsdec.c,v 1.10 2003/09/10 15:03:49 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -104,9 +104,9 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_dec->pf_run = RunDecoder;
 
-    var_Create( p_this, "subsdec-align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_dec->p_fifo, "subsdec-align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 #if defined(HAVE_ICONV)
-    var_Create( p_this, "subsdec-encoding", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_dec->p_fifo, "subsdec-encoding", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 #endif
     return VLC_SUCCESS;
 }
