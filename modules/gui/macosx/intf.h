@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.13 2003/01/16 13:49:44 hartman Exp $
+ * $Id: intf.h,v 1.14 2003/01/21 17:08:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -91,7 +91,6 @@ struct intf_sys_t
     IBOutlet id o_window;       /* main window    */
     IBOutlet id o_timefield;    /* time field     */
     IBOutlet id o_timeslider;   /* time slider    */
-    NSLock * o_slider_lock;     /* slider lock    */
     float f_slider;             /* slider value   */
     float f_slider_old;         /* old slider val */ 
     IBOutlet id o_volumeslider; /* volume slider  */

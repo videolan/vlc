@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.27 2003/01/20 03:45:06 hartman Exp $
+ * $Id: intf.m,v 1.28 2003/01/21 17:08:16 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -286,7 +286,6 @@ static void Run( intf_thread_t *p_intf )
     intf_thread_t * p_intf = [NSApp getIntf];
 
     f_slider_old = f_slider = 0.0;
-    o_slider_lock = [[NSLock alloc] init];
 
     [NSThread detachNewThreadSelector: @selector(manage)
         toTarget: self withObject: nil];
@@ -564,8 +563,6 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_release( p_vout );
         vout_Destroy( p_vout );
     }
-
-    [o_slider_lock release];
 
     if( o_prefs != nil )
     {
@@ -1043,13 +1040,17 @@ static void Run( intf_thread_t *p_intf )
 {
     switch( [[NSApp currentEvent] type] )
     {
-        case NSLeftMouseDown:
-            [o_slider_lock lock];
+        case NSLeftMouseDragged:
+            f_slider = [sender floatValue];
+            [self displayTime];
             break;
 
         case NSLeftMouseUp:
             f_slider = [sender floatValue];
-            [o_slider_lock unlock];
+            [self displayTime];
+            intf_thread_t * p_intf = [NSApp getIntf];
+            input_thread_t * p_input = p_intf->p_sys->p_input;
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
             break;
 
         default:
@@ -1094,10 +1095,9 @@ static void Run( intf_thread_t *p_intf )
                 float f_updated = ( 100. * p_area->i_tell ) /
                                            p_area->i_size;
 
-                if( f_slider != f_updated && [o_slider_lock tryLock] )
+                if( f_slider != f_updated )
                 {
                     [o_timeslider setFloatValue: f_updated];
-                    [o_slider_lock unlock]; 
                 }
             }
             else
