@@ -559,15 +559,14 @@ static rtsp_client_t *RtspClientGet( vod_media_t *p_media, char *psz_session )
 
 static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
 {
-    int i;
-
     msg_Dbg( p_media->p_vod, "closing session: %s", p_rtsp->psz_session );
 
     while( p_rtsp->i_es-- )
     {
-        rtsp_client_es_t *p_es = p_rtsp->es[p_rtsp->i_es];
-        TAB_REMOVE( p_rtsp->i_es, p_rtsp->es, p_es );
-        if( p_es[i].psz_ip ) free( p_es[i].psz_ip );
+        if( p_rtsp->es[p_rtsp->i_es]->psz_ip )
+            free( p_rtsp->es[p_rtsp->i_es]->psz_ip );
+        free( p_rtsp->es[p_rtsp->i_es] );
+        if( !p_rtsp->i_es ) free( p_rtsp->es );
     }
 
     TAB_REMOVE( p_media->i_rtsp, p_media->rtsp, p_rtsp );
