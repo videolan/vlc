@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.84 2001/02/12 13:20:15 massiot Exp $
+ * $Id: vpar_synchro.c,v 1.85 2001/02/12 18:18:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -441,7 +441,9 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
 {
     mtime_t         period = 1000000 * 1001 / p_vpar->sequence.i_frame_rate
                               * p_vpar->sequence.i_current_rate / DEFAULT_RATE;
+#if 0
     mtime_t         now = mdate(); 
+#endif
 
     switch( i_coding_type )
     {
@@ -572,6 +574,8 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
     }
 #undef PTS_THRESHOLD
 
+#if 0
+    /* Removed for incompatibility with slow motion */
     if( p_vpar->synchro.current_pts + DEFAULT_PTS_DELAY < now )
     {
         /* We cannot be _that_ late, something must have happened, reinit
@@ -580,11 +584,13 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                       now - p_vpar->synchro.current_pts - DEFAULT_PTS_DELAY );
         p_vpar->synchro.current_pts = now + DEFAULT_PTS_DELAY;
     }
-    if( p_vpar->synchro.backward_pts + DEFAULT_PTS_DELAY < now )
+    if( p_vpar->synchro.backward_pts
+         && p_vpar->synchro.backward_pts + DEFAULT_PTS_DELAY < now )
     {
         /* The same. */
         p_vpar->synchro.backward_pts = 0;
     }
+#endif
 
 #ifdef STATS
     p_vpar->synchro.i_pic++;
