@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.78 2003/12/14 15:42:19 gbazin Exp $
+ * $Id: interface.cpp,v 1.79 2003/12/16 13:22:51 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -439,11 +439,8 @@ void Interface::CreateOurToolBar()
 
 #ifndef WIN32
     frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth(), -1 );
-#else
-    frame_sizer->SetMinSize( toolbar->GetToolSize().GetWidth() * 11 +
-                             toolbar->GetToolSeparation() * 3 +
-                             (toolbar->GetMargins().GetWidth() + 2) *
-                             toolbar->GetToolsCount(), -1 );
+#else /* That sucks but for some reason it works better */
+    frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth()*2/3, -1 );
 #endif
 
 #if !defined(__WXX11__)
