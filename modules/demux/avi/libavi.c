@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.23 2003/08/22 20:31:47 fenrir Exp $
+ * $Id: libavi.c,v 1.24 2003/08/22 22:52:48 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -43,8 +43,6 @@ static vlc_fourcc_t GetFOURCC( byte_t *p_buff )
 
 #define AVI_ChunkFree( a, b ) _AVI_ChunkFree( (a), (avi_chunk_t*)(b) )
 void    _AVI_ChunkFree( stream_t *, avi_chunk_t *p_chk );
-
-
 
 /****************************************************************************
  *
@@ -767,7 +765,46 @@ void _AVI_ChunkFree( stream_t *s,
     return;
 }
 
-static void AVI_ChunkDumpDebug( stream_t *, avi_chunk_t  *);
+static void AVI_ChunkDumpDebug_level( vlc_object_t *p_obj,
+                                      avi_chunk_t  *p_chk, int i_level )
+{
+    char str[1024];
+    int i;
+    avi_chunk_t *p_child;
+
+    memset( str, ' ', sizeof( str ) );
+    for( i = 1; i < i_level; i++ )
+    {
+        str[i * 5] = '|';
+    }
+    if( p_chk->common.i_chunk_fourcc == AVIFOURCC_RIFF||
+        p_chk->common.i_chunk_fourcc == AVIFOURCC_LIST )
+    {
+        sprintf( str + i_level * 5,
+                 "%c %4.4s-%4.4s size:"I64Fu" pos:"I64Fu,
+                 i_level ? '+' : '*',
+                 (char*)&p_chk->common.i_chunk_fourcc,
+                 (char*)&p_chk->list.i_type,
+                 p_chk->common.i_chunk_size,
+                 p_chk->common.i_chunk_pos );
+    }
+    else
+    {
+        sprintf( str + i_level * 5,
+                 "+ %4.4s size:"I64Fu" pos:"I64Fu,
+                 (char*)&p_chk->common.i_chunk_fourcc,
+                 p_chk->common.i_chunk_size,
+                 p_chk->common.i_chunk_pos );
+    }
+    msg_Dbg( p_obj, "%s", str );
+
+    p_child = p_chk->common.p_first;
+    while( p_child )
+    {
+        AVI_ChunkDumpDebug_level( p_obj, p_child, i_level + 1 );
+        p_child = p_child->common.p_next;
+    }
+}
 
 int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
 {
@@ -816,7 +853,7 @@ int AVI_ChunkReadRoot( stream_t *s, avi_chunk_t *p_root )
         }
     }
 
-    AVI_ChunkDumpDebug( s, p_root );
+    AVI_ChunkDumpDebug_level( (vlc_object_t*)s, p_root, 0 );
     return VLC_SUCCESS;
 }
 
@@ -879,52 +916,6 @@ void *_AVI_ChunkFind( avi_chunk_t *p_chk,
         p_child = p_child->common.p_next;
     }
     return NULL;
-}
-
-static void AVI_ChunkDumpDebug_level( vlc_object_t *p_obj,
-                                      avi_chunk_t  *p_chk, int i_level )
-{
-    char str[1024];
-    int i;
-    avi_chunk_t *p_child;
-
-    memset( str, ' ', sizeof( str ) );
-    for( i = 1; i < i_level; i++ )
-    {
-        str[i * 5] = '|';
-    }
-    if( p_chk->common.i_chunk_fourcc == AVIFOURCC_RIFF||
-        p_chk->common.i_chunk_fourcc == AVIFOURCC_LIST )
-    {
-        sprintf( str + i_level * 5,
-                 "%c %4.4s-%4.4s size:"I64Fu" pos:"I64Fu,
-                 i_level ? '+' : '*',
-                 (char*)&p_chk->common.i_chunk_fourcc,
-                 (char*)&p_chk->list.i_type,
-                 p_chk->common.i_chunk_size,
-                 p_chk->common.i_chunk_pos );
-    }
-    else
-    {
-        sprintf( str + i_level * 5,
-                 "+ %4.4s size:"I64Fu" pos:"I64Fu,
-                 (char*)&p_chk->common.i_chunk_fourcc,
-                 p_chk->common.i_chunk_size,
-                 p_chk->common.i_chunk_pos );
-    }
-    msg_Dbg( p_obj, "%s", str );
-
-    p_child = p_chk->common.p_first;
-    while( p_child )
-    {
-        AVI_ChunkDumpDebug_level( p_obj, p_child, i_level + 1 );
-        p_child = p_child->common.p_next;
-    }
-}
-
-static void AVI_ChunkDumpDebug( stream_t *s, avi_chunk_t  *p_chk )
-{
-    AVI_ChunkDumpDebug_level( (vlc_object_t*)s, p_chk, 0 );
 }
 
 
