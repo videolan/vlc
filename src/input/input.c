@@ -49,6 +49,7 @@
  * Local prototypes
  ******************************************************************************/
 static void input_Thread( input_thread_t *p_input );
+static void ErrorThread( input_thread_t *p_input );
 static void EndThread( input_thread_t *p_input );
 static __inline__ int input_ReadPacket( input_thread_t *p_input );
 static __inline__ void input_SortPacket( input_thread_t *p_input,
@@ -279,14 +280,14 @@ void input_CloseVideoStream( input_thread_t *p_input, int i_id )
 static void input_Thread( input_thread_t *p_input )
 {
     intf_DbgMsg("input debug 11-1: thread %p is active\n", p_input);
-    while( !p_input->b_die )
+    while( !p_input->b_die && !p_input->b_error )
     {
         /* Scatter read the UDP packet from the network or the file. */
         if( (input_ReadPacket( p_input )) == (-1) )
         {
             /* ??? Normally, a thread can't kill itself, but we don't have
              * any method in case of an error condition ... */
-            p_input->b_die = 1;
+            p_input->b_error = 1;
         }
 
 #ifdef STATS
@@ -294,11 +295,28 @@ static void input_Thread( input_thread_t *p_input )
 #endif
     }
 
+    if( p_input->b_error )
+    {
+        ErrorThread( p_input );
+    }
+
     /* Ohoh, we have to die as soon as possible. */
     EndThread( p_input );
 
     intf_DbgMsg("input debug: thread %p destroyed\n", p_input);
     pthread_exit( 0 );
+}
+
+
+/******************************************************************************
+ * ErrorThread: RunThread() error loop
+ ******************************************************************************/
+static void ErrorThread( input_thread_t *p_input )
+{
+    while( !p_input->b_die )
+    {
+        msleep( INPUT_IDLE_SLEEP );
+    }
 }
 
 /*******************************************************************************

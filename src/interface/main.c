@@ -459,5 +459,5 @@ static void SignalHandler( int i_signal )
 
   /* Try to terminate everything */
   /* ?? this probably needs to be changed */
- /*  p_program_data->intf_thread.b_die = 1; */
+  p_program_data->intf_thread.b_die = 1;
 }
