@@ -103,7 +103,7 @@ vlc_module_begin();
     add_string( "telnet-password", "admin", NULL,
                     TELNETPWD_TEXT, TELNETPWD_LONGTEXT, VLC_TRUE );
     set_description( _("Telnet remote control interface") );
-    add_category_hint( N_( "VLM" ), NULL, VLC_FALSE );
+    add_category_hint( "VLM", NULL, VLC_FALSE );
     set_capability( "interface", 0 );
     set_callbacks( Open , Close );
 vlc_module_end();

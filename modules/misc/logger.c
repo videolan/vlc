@@ -88,7 +88,7 @@ static void HtmlPrint         ( const msg_item_t *, FILE * );
  * Module descriptor
  *****************************************************************************/
 static char *mode_list[] = { "text", "html" };
-static char *mode_list_text[] = { N_("Text"), N_("HTML") };
+static char *mode_list_text[] = { N_("Text"), "HTML" };
 
 #define LOGMODE_TEXT N_("Log format")
 #define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are \"text\" (default) and \"html\".")

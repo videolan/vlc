@@ -98,7 +98,7 @@
        "Sets the scope for IPv6 announces (default is 8)")
 #define SAP_TIMEOUT_TEXT N_("SAP timeout (seconds)")
 #define SAP_TIMEOUT_LONGTEXT N_( \
-       "Sets the time before SAP items get deleted if no new announce" \
+       "Sets the time before SAP items get deleted if no new announce " \
        "is received.")
 
 static int  Open ( vlc_object_t * );

@@ -319,11 +319,11 @@ static char *ppsz_align_descriptions[] =
 #define INPUT_REPEAT_TEXT N_("Number of time the same input will be repeated")
 #define INPUT_REPEAT_LONGTEXT N_("Number of time the same input will be repeated")
 
-#define START_TIME_TEXT N_("Input start time (second)")
-#define START_TIME_LONGTEXT N_("Input start time (second)")
+#define START_TIME_TEXT N_("Input start time (seconds)")
+#define START_TIME_LONGTEXT N_("Input start time (seconds)")
 
-#define STOP_TIME_TEXT N_("Input stop time (second)")
-#define STOP_TIME_LONGTEXT N_("Input stop time (second)")
+#define STOP_TIME_TEXT N_("Input stop time (seconds)")
+#define STOP_TIME_LONGTEXT N_("Input stop time (seconds)")
 
 #define BOOKMARKS_TEXT N_("Bookmarks list for a stream")
 #define BOOKMARKS_LONGTEXT N_("You can specify a list of bookmarks for a stream in " \

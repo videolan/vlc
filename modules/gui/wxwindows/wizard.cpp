@@ -89,7 +89,7 @@ END_EVENT_TABLE()
 #define ITEM_NAME _("Streaming/Transcoding Wizard")
 
 /* Hello page */
-#define HELLO_TITLE _("Streaming / Transcoding Wizard")
+#define HELLO_TITLE _("Streaming/Transcoding Wizard")
 #define HELLO_TEXT _("Welcome, streaming wizard")
 #define HELLO_STREAMING _("Stream")
 #define HELLO_STREAMING_DESC _("Use this to stream on a network")
@@ -111,12 +111,12 @@ END_EVENT_TABLE()
 
 /* Transcode 1 */
 #define TRANSCODE1_TITLE _("Transcode")
-#define TRANSCODE1_TEXT _("If you want to change the compression format of the audio or video tracks, fill in this page. (If you only want to change the container format, proceed to next page")
+#define TRANSCODE1_TEXT _("If you want to change the compression format of the audio or video tracks, fill in this page. (If you only want to change the container format, proceed to next page)")
 
 #define TR_VIDEO_TEXT0 _("If your stream has video and you want to " \
                          "transcode it, enable this")
 #define TR_VIDEO_TEXT _("Select your video codec. Click one to get more " \
-                        " information")
+                        "information")
 
 #define TR_AUDIO_TEXT0 _("If your stream has audio and you want to "\
                          "transcode it, enable this")
@@ -139,12 +139,12 @@ END_EVENT_TABLE()
 
 /* Transcode 2 */
 #define EXTRATRANSCODE_TITLE _("Additional transcode options")
-#define EXTRATRANSCODE_TEXT _("In this page, you will define a few" \
+#define EXTRATRANSCODE_TEXT _("In this page, you will define a few " \
                               "additionnal parameters for your transcoding" )
 
 /* Streaming 2 */
 #define EXTRASTREAMING_TITLE _("Additional streaming options")
-#define EXTRASTREAMING_TEXT _("In this page, you will define a few" \
+#define EXTRASTREAMING_TEXT _("In this page, you will define a few " \
                               "additionnal parameters for your stream" )
 
 
@@ -1213,7 +1213,7 @@ wizStreamingExtraPage *st_page2;
 wizEncapPage *encap_page;
 
 WizardDialog::WizardDialog(intf_thread_t *_p_intf, wxWindow *_p_parent ) :
-wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding wizard")), wxNullBitmap, wxDefaultPosition)
+wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding Wizard")), wxNullBitmap, wxDefaultPosition)
 {
     /* Initializations */
     p_intf = _p_intf;
