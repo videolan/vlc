@@ -317,7 +317,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
-    fmt.i_aspect = VOUT_ASPECT_FACTOR;
+    fmt.i_aspect = 0;
     fmt.i_width = fmt.i_visible_width = i_width + 4;
     fmt.i_height = fmt.i_visible_height = i_height + 4;
     fmt.i_x_offset = fmt.i_y_offset = 0;
