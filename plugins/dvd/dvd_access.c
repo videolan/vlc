@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.17 2002/05/21 00:34:41 sam Exp $
+ * $Id: dvd_access.c,v 1.18 2002/05/21 13:27:32 lool Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -518,7 +518,12 @@ static ssize_t DVDRead( input_thread_t * p_input,
 
     while( i_blocks )
     {
-        if( ( i_block_once = __MIN( LbMaxOnce( p_dvd ), i_blocks ) ) <= 0 )
+        i_block_once = LbMaxOnce( p_dvd );
+        if( i_block_once > i_blocks )
+        {
+            i_block_once = i_blocks;
+        }
+        else if( i_block_once <= 0 )
         {
             /* EOT */
             break;
