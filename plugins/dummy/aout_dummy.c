@@ -97,7 +97,7 @@ int aout_DummySetRate( aout_thread_t *p_aout )
  *****************************************************************************/
 long aout_DummyGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
-    return( 2 * l_buffer_limit );               /* value big enough to sleep */
+    return( sizeof(s16) * l_buffer_limit + 1 ); /* value big enough to sleep */
 }
 
 /*****************************************************************************
@@ -105,7 +105,6 @@ long aout_DummyGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
  *****************************************************************************/
 void aout_DummyPlaySamples( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
-    ;
 }
 
 /*****************************************************************************
