@@ -810,6 +810,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             sizer->Add( help ,0 ,wxEXPAND | wxALL, 5 );
         }
 
+        vlc_object_release( p_module );
     }
     sizer->Layout();
     SetSizer( sizer );
