@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.46 2002/12/27 15:31:55 sam Exp $
+ * $Id: vlc_common.h,v 1.47 2002/12/30 17:36:01 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -283,6 +283,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #if defined( WIN32 ) || defined( UNDER_CE )
 #   define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
+#   define IS_WINNT ( GetVersion() < 0x80000000 )
 #endif
 
 #include "vlc_threads.h"
@@ -578,6 +579,9 @@ typedef long long _off_t;
 typedef _off_t off_t;
 #           define _OFF_T_
 #       else
+#           ifdef off_t
+#               undef off_t
+#           endif
 #           define off_t long long
 #       endif
 #   endif
