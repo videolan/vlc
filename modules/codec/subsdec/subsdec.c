@@ -2,7 +2,7 @@
  * subsdec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.3 2003/07/24 19:07:03 sigmunau Exp $
+ * $Id: subsdec.c,v 1.4 2003/07/25 01:11:32 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -97,6 +97,9 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_fifo->pf_run = RunDecoder;
 
+#if defined(HAVE_ICONV)
+    var_Create( p_this, "subsdec-encoding", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+#endif
     return VLC_SUCCESS;
 }
 
@@ -106,6 +109,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int RunDecoder( decoder_fifo_t * p_fifo )
 {
     subsdec_thread_t *    p_subsdec;
+    vlc_value_t           val;
 
     /* Allocate the memory needed to store the thread's structure */
     p_subsdec = (subsdec_thread_t *)malloc( sizeof(subsdec_thread_t) );
@@ -139,12 +143,13 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     {
         /* Here we are dealing with text subtitles */
 #if defined(HAVE_ICONV)
-	p_subsdec->iconv_handle = iconv_open( "UTF-8",
-            config_GetPsz( p_subsdec->p_fifo, "subsdec-encoding" ) );
+	var_Get( p_subsdec->p_fifo, "subsdec-encoding", &val );
+	p_subsdec->iconv_handle = iconv_open( "UTF-8", val.psz_string);
 	if( p_subsdec->iconv_handle == (iconv_t)-1 )
 	{
 	    msg_Warn( p_subsdec->p_fifo, "Unable to do requested conversion" );
 	}
+        free( val.psz_string);
 #endif
         while( (!p_subsdec->p_fifo->b_die) && (!p_subsdec->p_fifo->b_error) )
         {
