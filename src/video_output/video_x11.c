@@ -58,8 +58,6 @@ typedef struct vout_sys_s
     int                 i_buffer_index;                        /* buffer index */
     XImage *            p_ximage[2];                         /* XImage pointer */   
     XShmSegmentInfo     shm_info[2];         /* shared memory zone information */
-
-    int                 i_completion_type;                               /* ?? */
 } vout_sys_t;
 
 /*******************************************************************************
@@ -234,6 +232,20 @@ void vout_SysDisplay( vout_thread_t *p_vout )
     p_vout->p_sys->i_buffer_index = ++p_vout->p_sys->i_buffer_index & 1;
 }
 
+/*******************************************************************************
+ * vout_SysGetPicture: get current display buffer informations
+ *******************************************************************************
+ * This function returns the address of the current display buffer, and the
+ * number of samples per line. For 15, 16 and 32 bits displays, this value is 
+ * the number of pixels in a line.
+ *******************************************************************************/
+byte_t * vout_SysGetPicture( vout_thread_t *p_vout, int *pi_eol_offset )
+{
+    *pi_eol_offset = p_vout->i_width;
+    return( p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->data );        
+}
+
+
 /* following functions are local */
 
 /*******************************************************************************
@@ -256,40 +268,16 @@ static int X11GetProperties( vout_thread_t *p_vout )
     switch( p_vout->i_screen_depth )
     {
     case 15:                        /* 15 bpp (16bpp with a missing green bit) */
-        p_vout->i_bytes_per_pixel = 2;              
-        /*
-         ?? */
-        break;
-
     case 16:                                          /* 16 bpp (65536 colors) */
         p_vout->i_bytes_per_pixel = 2;
-       /*
-        Process_Frame=Translate_Frame;
-        Process_Top_Field=Translate_Top_Field;
-        Process_Bottom_Field=Translate_Bottom_Field;
-        Process_Top_Field420=Translate_Top_Field420;
-        Process_Bottom_Field420=Translate_Bottom_Field420; ?? */
         break;
 
     case 24:                                    /* 24 bpp (millions of colors) */
         p_vout->i_bytes_per_pixel = 3;
-
-        /*
-        Process_Frame=Translate_Frame;
-        Process_Top_Field=Translate_Top_Field;
-        Process_Bottom_Field=Translate_Bottom_Field;
-        Process_Top_Field420=Translate_Top_Field420;
-        Process_Bottom_Field420=Translate_Bottom_Field420; ?? */
         break;
 
     case 32:                                    /* 32 bpp (millions of colors) */
         p_vout->i_bytes_per_pixel = 4;
-        /*
-        Process_Frame=Translate_Frame;
-        Process_Top_Field=Translate_Top_Field;
-        Process_Bottom_Field=Translate_Bottom_Field;
-        Process_Top_Field420=Translate_Top_Field420;
-        Process_Bottom_Field420=Translate_Bottom_Field420; ?? */
         break;
 
     default:                                       /* unsupported screen depth */
@@ -579,11 +567,6 @@ static int X11CreateShmImage( vout_thread_t *p_vout, XImage **pp_ximage,
         XDestroyImage( *pp_ximage );
         return( -1 );
     }
-
-    /* ?? don't know what it is. Function XShmGetEventBase prototype is defined
-     * in mit-shm document, but does not appears in any header. */
-    p_vout->p_sys->i_completion_type = XShmGetEventBase(p_vout->p_sys->p_display) + ShmCompletion;
-
     return( 0 );
 }
 

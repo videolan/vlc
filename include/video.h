@@ -29,6 +29,7 @@ typedef struct
     /* Type and flags - should NOT be modified except by the vout thread */
     int             i_type;                                    /* picture type */
     int             i_status;                                 /* picture flags */
+    int             i_matrix_coefficients;       /* in YUV type, encoding type */    
     
     /* Picture properties - those properties are fixed at initialization and 
      * should NOT be modified. Note that for YUV pictures, i_bytes_per_line is

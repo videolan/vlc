@@ -155,6 +155,20 @@ void vout_SysDisplay( vout_thread_t *p_vout )
 //??    p_vout->p_sys->i_buffer_index = ++p_vout->p_sys->i_buffer_index & 1;
 }
 
+/*******************************************************************************
+ * vout_SysGetPicture: get current display buffer informations
+ *******************************************************************************
+ * This function returns the address of the current display buffer, and the
+ * number of samples per line. For 15, 16 and 32 bits displays, this value is 
+ * the number of pixels in a line.
+ *******************************************************************************/
+byte_t * vout_SysGetPicture( vout_thread_t *p_vout, int *pi_eol_offset )
+{
+    *pi_eol_offset = p_vout->i_width;
+//????
+//    return( p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ].data );        
+}
+
 /* following functions are local */
 
 /*******************************************************************************
@@ -219,10 +233,30 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     
     p_vout->i_width =                   var_info.xres;
     p_vout->i_height =                  var_info.yres;
-    p_vout->i_screen_depth =            var_info.bits_per_pixel;        
-    p_vout->p_sys->i_page_size =        var_info.xres *
-        var_info.yres * var_info.bits_per_pixel / 8;
+    p_vout->i_screen_depth =            var_info.bits_per_pixel;         
+    switch( p_vout->i_screen_depth )
+    {
+    case 15:                        /* 15 bpp (16bpp with a missing green bit) */
+    case 16:                                          /* 16 bpp (65536 colors) */
+        p_vout->i_bytes_per_pixel = 2;
+        break;
 
+    case 24:                                    /* 24 bpp (millions of colors) */
+        p_vout->i_bytes_per_pixel = 3;
+        break;
+
+    case 32:                                    /* 32 bpp (millions of colors) */
+        p_vout->i_bytes_per_pixel = 4;
+        break;
+
+    default:                                       /* unsupported screen depth */
+        intf_ErrMsg("vout error: screen depth %i is not supported\n", 
+                     p_vout->i_screen_depth);
+        return( 1  );
+        break;
+    }
+    p_vout->p_sys->i_page_size =        var_info.xres *
+        var_info.yres * p_vout->i_bytes_per_pixel;
 
     /* Map two framebuffers a the very beginning of the fb */
     p_vout->p_sys->p_video = mmap(0, p_vout->p_sys->i_page_size * 2, 

@@ -26,10 +26,18 @@
 
 /* Program options */
 #if defined(VIDEO_X11)
-#define PROGRAM_OPTIONS         "X11"
+#define VIDEO_OPTIONS           "X11"
 #elif defined(VIDEO_FB)
-#define PROGRAM_OPTIONS         "Framebuffer"
+#define VIDEO_OPTIONS           "Framebuffer"
+#else
+#define VIDEO_OPTIONS           ""
 #endif
+#if defined(HAVE_MMX)
+#define ARCH_OPTIONS            "MMX"
+#else
+#define ARCH_OPTIONS            ""
+#endif
+#define PROGRAM_OPTIONS         VIDEO_OPTIONS " " ARCH_OPTIONS
 
 /* Program version and copyright message */
 #define PROGRAM_VERSION		"DR 2.1"
