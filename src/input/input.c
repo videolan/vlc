@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.267 2003/11/28 17:04:31 fenrir Exp $
+ * $Id: input.c,v 1.268 2003/11/29 18:36:13 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -180,6 +180,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->pf_demux  = NULL;
     p_input->pf_rewind = NULL;
     p_input->pf_demux_control = NULL;
+    p_input->i_cr_average = config_GetInt( p_input, "cr-average" );
 
     /* Access */
     p_input->p_access = NULL;

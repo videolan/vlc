@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.55 2003/11/27 22:44:51 massiot Exp $
+ * $Id: transcode.c,v 1.56 2003/11/29 18:36:13 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1383,7 +1383,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
         pic.b_progressive = 1; /* ffmpeg doesn't support interlaced encoding */
         pic.i_nb_fields = frame->repeat_pict;
+#if LIBAVCODEC_BUILD >= 4684
         pic.b_top_field_first = frame->top_field_first;
+#endif
 
         /* Interpolate the next PTS
          * (needed by the mpeg video packetizer which can send pts <= 0 ) */

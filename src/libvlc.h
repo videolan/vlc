@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.109 2003/11/27 05:46:01 fenrir Exp $
+ * $Id: libvlc.h,v 1.110 2003/11/29 18:36:13 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -256,6 +256,11 @@ static char *ppsz_language_text[] =
 #endif
 
 #define INPUT_CAT_LONGTEXT N_( " " )
+
+#define CR_AVERAGE_TEXT N_("Clock reference average counter")
+#define CR_AVERAGE_LONGTEXT N_( \
+    "When using the PVR input (or a very irregular source), you should " \
+    "set this to 10000.")
 
 #define SERVER_PORT_TEXT N_("Server port")
 #define SERVER_PORT_LONGTEXT N_( \
@@ -669,6 +674,8 @@ vlc_module_begin();
 
     /* Input options */
     add_category_hint( N_("Input"), INPUT_CAT_LONGTEXT , VLC_FALSE );
+    add_integer( "cr-average", 40, NULL, CR_AVERAGE_TEXT,
+                 CR_AVERAGE_LONGTEXT, VLC_FALSE );
     add_integer( "server-port", 1234, NULL,
                  SERVER_PORT_TEXT, SERVER_PORT_LONGTEXT, VLC_FALSE );
     add_integer( "mtu", 1500, NULL, MTU_TEXT, MTU_LONGTEXT, VLC_TRUE );

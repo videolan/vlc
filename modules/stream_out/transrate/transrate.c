@@ -6,7 +6,7 @@
  * Copyright (C) 2003 Antoine Missout
  * Copyright (C) 2000-2003 Michel Lespinasse <walken@zoy.org>
  * Copyright (C) 1999-2000 Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
- * $Id: transrate.c,v 1.4 2003/11/22 17:03:57 fenrir Exp $
+ * $Id: transrate.c,v 1.5 2003/11/29 18:36:13 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -194,7 +194,10 @@ typedef struct
     int   h_offset, v_offset;
 
     // mb
-    double quant_corr, fact_x;
+    double quant_corr, fact_x, current_fact_x;
+    int level_i, level_p;
+
+    ssize_t i_current_gop_size, i_wanted_gop_size, i_new_gop_size;
 } transrate_t;
 
 
@@ -233,7 +236,6 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->i_next_gop_size = 0;
         memset( &id->tr, 0, sizeof( transrate_t ) );
         id->tr.bs.i_byte_in = id->tr.bs.i_byte_out = 0;
-        id->tr.quant_corr = 0.0;
         id->tr.fact_x = 1.0;
 
         /* open output stream */
@@ -300,11 +302,17 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
  * transrater, code from M2VRequantizer http://www.metakine.com/
  ****************************************************************************/
 
-// toggles:
-// #define NDEBUG // turns off asserts
 /* This is awful magic --Meuuh */
 //#define REACT_DELAY (1024.0*128.0)
-#define REACT_DELAY (1024.0*4.0)
+#define REACT_DELAY (256.0)
+
+#define QUANT_I (1.7)
+
+#define QUANT_P (1.4)
+
+#define QUANT_P_INC (0.1)
+
+#define B_HANDICAP 5
 
 // notes:
 //
@@ -468,11 +476,12 @@ static int scale_quant( unsigned int q_scale_type, double quant )
 
 static int increment_quant( transrate_t *tr, int quant )
 {
-    if( tr->q_scale_type)
+    if( tr->q_scale_type )
     {
-        assert(quant >= 1 && quant <= 112);
+        assert(quant >= 1 && quant <= 112 );
         quant = map_non_linear_mquant[quant] + 1;
-        if( tr->quant_corr < -60.0f) quant++;
+        if( tr->picture_coding_type == P_TYPE )
+            quant += tr->level_p;
         if( quant > 31) quant = 31;
         quant = non_linear_mquant_table[quant];
     }
@@ -480,7 +489,8 @@ static int increment_quant( transrate_t *tr, int quant )
     {
         assert(!(quant & 1));
         quant += 2;
-        if( tr->quant_corr < -60.0f) quant += 2;
+        if( tr->picture_coding_type == P_TYPE )
+            quant += 2 * tr->level_p;
         if (quant > 62) quant = 62;
     }
     return quant;
@@ -502,19 +512,19 @@ static int getNewQuant( transrate_t *tr, int curQuant)
     double calc_quant, quant_to_use;
     int mquant = 0;
 
-    tr->quant_corr = (((bs->i_byte_in - (bs->p_r - 4 - bs->p_c)) / tr->fact_x) - (bs->i_byte_out + (bs->p_w - bs->p_ow))) / REACT_DELAY;
-    calc_quant = curQuant * tr->fact_x;
-    quant_to_use = calc_quant - tr->quant_corr;
-
-    switch (tr->picture_coding_type )
+    switch ( tr->picture_coding_type )
     {
         case I_TYPE:
         case P_TYPE:
-            mquant = increment_quant( tr, curQuant);
+            mquant = increment_quant( tr, curQuant );
             break;
 
         case B_TYPE:
-            mquant = intmax(scale_quant( tr->q_scale_type, quant_to_use), increment_quant( tr, curQuant));
+            tr->quant_corr = (((bs->i_byte_in - (bs->p_r - 4 - bs->p_c)) / tr->fact_x) - (bs->i_byte_out + (bs->p_w - bs->p_ow))) / REACT_DELAY + B_HANDICAP;
+            calc_quant = curQuant * tr->current_fact_x;
+            quant_to_use = calc_quant - tr->quant_corr;
+
+            mquant = intmax(scale_quant( tr->q_scale_type, quant_to_use), increment_quant( tr, curQuant) );
             break;
 
         default:
@@ -940,26 +950,26 @@ static void get_intra_block_B14( bs_transrate_t *bs, const int i_qscale, const i
         {
             tab = DCT_B14_10 + (UBITS (bs->i_bit_in_cache, 10) - 8);
             i += tab->run;
-            if (i < 64) goto normal_code;
+            if (i < 64 ) goto normal_code;
         }
         else if (bs->i_bit_in_cache >= 0x00800000)
         {
             tab = DCT_13 + (UBITS (bs->i_bit_in_cache, 13) - 16);
             i += tab->run;
-            if (i < 64) goto normal_code;
+            if (i < 64 ) goto normal_code;
         }
         else if (bs->i_bit_in_cache >= 0x00200000)
         {
             tab = DCT_15 + (UBITS (bs->i_bit_in_cache, 15) - 16);
             i += tab->run;
-            if (i < 64) goto normal_code;
+            if (i < 64 ) goto normal_code;
         }
         else
         {
             tab = DCT_16 + UBITS (bs->i_bit_in_cache, 16);
-            bs_flush( bs, 16);
+            bs_flush( bs, 16 );
             i += tab->run;
-            if (i < 64) goto normal_code;
+            if (i < 64 ) goto normal_code;
         }
         break;  /* illegal, check needed to avoid buffer overflow */
     }
@@ -1159,19 +1169,20 @@ static int get_non_intra_block_drop( transrate_t *tr, RunLevel *blk)
     if (blk != sblk)
     {
         blk--;
-        // remove more coeffs if very late
-        if ((tr->quant_corr < -60.0f) && (blk != sblk))
+    }
+
+    // remove more coeffs if very late
+    if (tr->level_p >= 4 && (blk != sblk))
+    {
+        blk--;
+        if (tr->level_p >= 5 && (blk != sblk))
         {
             blk--;
-            if ((tr->quant_corr < -80.0f) && (blk != sblk))
+            if (tr->level_p >= 6 && (blk != sblk))
             {
                 blk--;
-                if ((tr->quant_corr < -100.0f) && (blk != sblk))
-                {
+                if (tr->level_p >= 7 && (blk != sblk))
                     blk--;
-                    if ((tr->quant_corr < -120.0f) && (blk != sblk))
-                        blk--;
-                }
             }
         }
     }
@@ -1819,9 +1830,15 @@ static int do_next_start_code( transrate_t *tr )
     {
         uint8_t *outTemp = bs->p_w, *inTemp = bs->p_c;
 
+#if 0
         if( ( tr->picture_coding_type == B_TYPE && tr->quant_corr <  2.5f ) || // don't recompress if we're in advance!
             ( tr->picture_coding_type == P_TYPE && tr->quant_corr < -2.5f ) ||
             ( tr->picture_coding_type == I_TYPE && tr->quant_corr < -5.0f ) )
+#else
+        if( ( tr->picture_coding_type == B_TYPE ) ||
+            ( tr->picture_coding_type == P_TYPE && tr->level_p ) ||
+            ( tr->picture_coding_type == I_TYPE && tr->level_i ) )
+#endif
         {
             if( !tr->horizontal_size_value || !tr->vertical_size_value )
             {
@@ -1881,6 +1898,8 @@ static void process_frame( sout_stream_t *p_stream,
 
     sout_buffer_t       *p_out;
 
+    double              next_fact_x = 1.0;
+
     /* The output buffer can't be bigger than the input buffer. */
     p_out = sout_BufferNew( p_stream->p_sout, in->i_size );
 
@@ -1898,7 +1917,50 @@ static void process_frame( sout_stream_t *p_stream,
     *(in->p_buffer + in->i_size + 1) = 0;
     *(in->p_buffer + in->i_size + 2) = 1;
     *(in->p_buffer + in->i_size + 3) = 0;
-    bs->i_byte_in += in->i_size;
+
+    /* Calculate how late we are */
+    tr->quant_corr = 0.0 + B_HANDICAP;
+    tr->level_i = 0;
+    tr->level_p = 0;
+    bs->i_byte_in = in->i_size;
+    bs->i_byte_out  = 0;
+
+    if (tr->i_current_gop_size - in->i_size > 100)
+    {
+        if (tr->i_wanted_gop_size == in->i_size)
+        {
+            next_fact_x = 1.0;
+        }
+        else if ( tr->i_wanted_gop_size < in->i_size )
+        {
+            /* We're really late */
+            next_fact_x = 10.0;
+        }
+        else
+        {
+            next_fact_x = ((double)(tr->i_current_gop_size - in->i_size)) /
+                          (tr->i_wanted_gop_size - in->i_size);
+        }
+
+        if (next_fact_x > QUANT_I)
+        {
+            tr->level_i = 1;
+        }
+        if (next_fact_x > QUANT_P)
+        {
+            tr->level_p = 1 + (next_fact_x - QUANT_P) / (QUANT_P_INC);
+        }
+    }
+    if ( tr->i_wanted_gop_size < 0 )
+    {
+        /* We're really late */
+        tr->current_fact_x = 3.0;
+    }
+    else
+    {
+        tr->current_fact_x = ((double)(tr->i_current_gop_size) /
+                              (tr->i_wanted_gop_size));
+    }
 
     for ( ; ; )
     {
@@ -1947,11 +2009,21 @@ static void process_frame( sout_stream_t *p_stream,
             break;
         }
 
-        tr->quant_corr = (((bs->i_byte_in - (bs->p_r - 4 - bs->p_c)) / tr->fact_x) - (bs->i_byte_out + (bs->p_w - bs->p_ow))) / REACT_DELAY;
+        tr->quant_corr = (((bs->i_byte_in - (bs->p_r - 4 - bs->p_c)) / tr->fact_x) - (bs->i_byte_out + (bs->p_w - bs->p_ow))) / REACT_DELAY + B_HANDICAP;
     }
 
     bs->i_byte_out += bs->p_w - bs->p_ow;
     p_out->i_size = bs->p_w - bs->p_ow;
+    tr->i_current_gop_size -= in->i_size;
+    tr->i_wanted_gop_size -= p_out->i_size;
+    tr->i_new_gop_size += bs->i_byte_out;
+
+#if 0
+    msg_Dbg( p_stream, "%d: %d -> %d (r: %f, n:%f, corr:%f)",
+             tr->picture_coding_type, in->i_size, p_out->i_size,
+             (float)in->i_size / p_out->i_size,
+             next_fact_x, tr->quant_corr);
+#endif
 }
 
 static int transrate_video_process( sout_stream_t *p_stream,
@@ -1966,7 +2038,7 @@ static int transrate_video_process( sout_stream_t *p_stream,
     if( GetDWBE( in->p_buffer ) != 0x100 )
     {
         uint8_t *p = in->p_buffer;
-        uint8_t *p_end = &in->p_buffer[in->i_buffer];
+        uint8_t *p_end = &in->p_buffer[in->i_size];
         uint32_t code = GetDWBE( p );
 
         /* We may have a GOP */
@@ -1987,7 +2059,7 @@ static int transrate_video_process( sout_stream_t *p_stream,
     }
 
 
-    if( b_gop )
+    if( b_gop && id->i_next_gop_duration >= 300000 )
     {
         while ( id->p_current_buffer != NULL )
         {
@@ -2012,10 +2084,19 @@ static int transrate_video_process( sout_stream_t *p_stream,
                                     / (id->i_next_gop_duration / 1000);
             static mtime_t i_old_bitrate = 0;
             static mtime_t i_old_duration = 0;
-            if (i_old_bitrate)
+            if (i_old_bitrate && tr->fact_x != 1.0)
             {
-                msg_Dbg(p_stream, "bitrate = %lld -> %lld", i_old_bitrate,
-                        (mtime_t)bs->i_byte_out * 8000 / (i_old_duration / 1000));
+                mtime_t i_new_bitrate = tr->i_new_gop_size * 8000 / (i_old_duration / 1000);
+                if (i_new_bitrate > p_stream->p_sys->i_vbitrate + 300000)
+                    msg_Err(p_stream, "%lld -> %lld (%f, r:%f)",
+                            i_old_bitrate, i_new_bitrate, tr->fact_x,
+                            (float)i_old_bitrate / i_new_bitrate);
+#if 0
+                else
+                    msg_Dbg(p_stream, "%lld -> %lld (%f, r:%f)",
+                            i_old_bitrate, i_new_bitrate, tr->fact_x,
+                            (float)i_old_bitrate / i_new_bitrate);
+#endif
             }
             i_old_bitrate = i_bitrate;
             i_old_duration = id->i_next_gop_duration;
@@ -2027,14 +2108,15 @@ static int transrate_video_process( sout_stream_t *p_stream,
             {
                 tr->fact_x = 1.0;
             }
-            msg_Dbg(p_stream, "new fact_x = %f", tr->fact_x);
+            id->tr.i_current_gop_size = id->i_next_gop_size;
+            id->tr.i_wanted_gop_size = (p_stream->p_sys->i_vbitrate)
+                                    * (id->i_next_gop_duration / 1000) / 8000;
+            id->tr.i_new_gop_size = 0;
 
             id->p_current_buffer = id->p_next_gop;
             id->p_next_gop = NULL;
             id->i_next_gop_duration = 0;
             id->i_next_gop_size = 0;
-            bs->i_byte_in = 0;
-            bs->i_byte_out  = 0;
         }
     }
 

@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: encoder.c,v 1.16 2003/11/29 18:06:12 fenrir Exp $
+ * $Id: encoder.c,v 1.17 2003/11/29 18:36:13 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -326,7 +326,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     frame.pict_type = 0;
     frame.repeat_pict = p_pict->i_nb_fields;
 
-#if LIBAVCODEC_BUILD >= 468
+#if LIBAVCODEC_BUILD >= 4684
     frame.interlaced_frame = !p_pict->b_progressive;
     frame.top_field_first = p_pict->b_top_field_first;
 #endif

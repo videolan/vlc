@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.42 2003/09/07 22:51:11 fenrir Exp $
+ * $Id: input_clock.c,v 1.43 2003/11/29 18:36:13 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -61,18 +61,18 @@
  * in all the FIFOs, but it may be not enough.
  */
 
+/* p_input->i_cr_average : Maximum number of samples used to compute the
+ * dynamic average value.
+ * We use the following formula :
+ * new_average = (old_average * c_average + new_sample_value) / (c_average +1)
+ */
+
 static void ClockNewRef( pgrm_descriptor_t * p_pgrm,
                          mtime_t i_clock, mtime_t i_sysdate );
 
 /*****************************************************************************
  * Constants
  *****************************************************************************/
-
-/* Maximum number of samples used to compute the dynamic average value.
- * We use the following formula :
- * new_average = (old_average * c_average + new_sample_value) / (c_average +1)
- */
-#define CR_MAX_AVERAGE_COUNTER 40
 
 /* Maximum gap allowed between two CRs. */
 #define CR_MAX_GAP 2000000
@@ -291,12 +291,12 @@ void input_ClockManageRef( input_thread_t * p_input,
             mtime_t     i_extrapoled_clock = ClockCurrent( p_input, p_pgrm );
 
             /* Bresenham algorithm to smooth variations. */
-            if( p_pgrm->c_average_count == CR_MAX_AVERAGE_COUNTER )
+            if( p_pgrm->c_average_count == p_input->i_cr_average )
             {
                 p_pgrm->delta_cr = ( p_pgrm->delta_cr
-                                        * (CR_MAX_AVERAGE_COUNTER - 1)
+                                        * (p_input->i_cr_average - 1)
                                       + ( i_extrapoled_clock - i_clock ) )
-                                    / CR_MAX_AVERAGE_COUNTER;
+                                    / p_input->i_cr_average;
             }
             else
             {
