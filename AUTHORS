@@ -5,9 +5,16 @@
 # The fields are: name (N), email (E), web-address (W), CVS account login (C),
 # PGP key ID and fingerprint (P), description (D), and snail-mail address (S).
 
+N: Laurent Aimar
+E: fenrir@via.ecp.fr
+C: fenrir
+D: AVI demultiplexer
+D: MPEG-4, Div & OpenDivX decoder (ffmpeg)
+S: France
+
 N: Marc Ariberti
-C: marcari
 E: marcari@via.ecp.fr
+C: marcari
 D: communication with channel server
 S: France
 
@@ -39,6 +46,7 @@ E: gbazin@netcourrier.com
 C: gbazin
 D: mingw32 port, various win32 fixes
 D: DirectX audio and video output
+D: Configuration file infrastructure
 S: Spain
 
 N: Johan Bilien
@@ -78,6 +86,11 @@ C: tcastley
 D: BeOS interface, BeOS Video
 S: Australia
 
+N: Rudolf Cornelissen
+E: rag.cornelissen@inter.nl.net
+D: BeOS fixes
+S: Netherlands
+
 N: Renaud Dartus
 E: reno@via.ecp.fr
 C: reno
@@ -92,7 +105,7 @@ S: USA, Pennsylvania
 N: Cyril Deguet
 E: asmax@via.ecp.fr
 C: asmax
-D: PS input packet allocator
+D: Audio output
 S: France
 
 N: Colin Delacroix
@@ -119,11 +132,15 @@ E: regis@via.ecp.fr
 C: regis
 S: USA, California
 
+N: Bill Eldridge
+E: bill@rfa.org
+D: Documentation
+
 N: Henri Fallon
 E: henri@via.ecp.fr
 C: henri
 D: ALSA audio output
-D: MPEG TS input, input netlist
+D: MPEG TS input
 D: Decoder modularization
 S: France
 
@@ -163,7 +180,7 @@ S: United Kingdom
 N: Gaël Hendryckx
 E: jimmy@via.ecp.fr
 C: jimmy
-D: IDCT and YUV transformations
+D: IDCT and YUV transforms
 S: France
 
 N: Samuel Hocevar
@@ -172,6 +189,7 @@ C: sam
 D: playlist and modules system
 D: Gnome and Gtk+ interfaces, Glide and fb video outputs, Esound audio output
 D: DVD subtitles decoder
+D: Video output
 S: France
 
 N: Aaron Holtzman
@@ -203,6 +221,7 @@ C: jlj
 D: PS input fixes
 D: Win32 DVD input port
 D: QNX RTOS plug-in
+D: MacOS X port
 D: norwegian translation
 S: Norway
 
@@ -244,6 +263,11 @@ D: MPEG audio decoder
 D: MPEG video decoder
 S: USA, California
 
+N: Pascal Levesque
+E: pascal.levesque@mindready.com
+D: QNX RTOS video output
+S: Canada, Québec
+
 N: Paul Mackerras
 E: paulus@linuxcare.com.au
 D: AltiVec IDCT and motion
@@ -263,10 +287,10 @@ S: France
 N: Christophe Massiot
 E: massiot@via.ecp.fr
 C: massiot
-D: MPEG PS input
-D: bitstream and input core functions
+D: decoder and input core functions
 D: MPEG video decoder
-D: Many ports
+D: Many ports (Mac OS X, iPAQ, *BSD, Solaris...)
+D: documentation
 S: France
 
 N: Arkadiusz Miskiewicz
@@ -306,7 +330,8 @@ E: seguin@via.ecp.fr
 C: seguin
 D: core vlc structure
 D: interface and message queue
-D: YUV transformations
+D: video output
+D: YUV transforms
 D: X11 and GGI video outputs
 S: France
 
