@@ -2,9 +2,10 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.1 2002/10/28 06:26:11 fenrir Exp $
+ * $Id: video.c,v 1.2 2002/11/05 10:07:56 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,30 +33,25 @@
 #include <vlc/decoder.h>
 #include <vlc/input.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>                                              /* getpid() */
-#endif
-
-#include <errno.h>
 #include <string.h>
 
 #ifdef HAVE_SYS_TIMES_H
 #   include <sys/times.h>
 #endif
 
-#include "avcodec.h"                                            /* ffmpeg */
+#include "avcodec.h"                                               /* ffmpeg */
 
 #include "postprocessing/postprocessing.h"
 
 #include "ffmpeg.h"
 #include "video.h"
 
-/*
+/*****************************************************************************
  * Local prototypes
- */
-int      E_( InitThread_Video )   ( vdec_thread_t * );
-void     E_( EndThread_Video )    ( vdec_thread_t * );
-void     E_( DecodeThread_Video ) ( vdec_thread_t * );
+ *****************************************************************************/
+static void ffmpeg_CopyPicture( picture_t *, AVPicture *, vdec_thread_t * );
+static void ffmpeg_PostProcPicture( vdec_thread_t *, picture_t * );
+static int  ffmpeg_GetFrameBuf( struct AVCodecContext *, int, int, int );
 
 /* FIXME FIXME some of them are wrong */
 static int i_ffmpeg_PixFmtToChroma[] =
@@ -70,6 +66,10 @@ static int i_ffmpeg_PixFmtToChroma[] =
     0,                           VLC_FOURCC('Y','4','2','2'),
     VLC_FOURCC('I','4','4','4'), 0
 };
+
+/*****************************************************************************
+ * Local Functions
+ *****************************************************************************/
 
 static inline u32 ffmpeg_PixFmtToChroma( int i_ffmpegchroma )
 {
@@ -99,47 +99,6 @@ static inline int ffmpeg_FfAspect( int i_width, int i_height, int i_ffaspect )
     }
 }
 
-
-/*****************************************************************************
- * locales Functions
- *****************************************************************************/
-
-static void ffmpeg_ParseBitMapInfoHeader( bitmapinfoheader_t *p_bh, 
-                                          u8 *p_data )
-{
-    p_bh->i_size          = GetDWLE( p_data );
-    p_bh->i_width         = GetDWLE( p_data + 4 );
-    p_bh->i_height        = GetDWLE( p_data + 8 );
-    p_bh->i_planes        = GetWLE( p_data + 12 );
-    p_bh->i_bitcount      = GetWLE( p_data + 14 );
-    p_bh->i_compression   = GetDWLE( p_data + 16 );
-    p_bh->i_sizeimage     = GetDWLE( p_data + 20 );
-    p_bh->i_xpelspermeter = GetDWLE( p_data + 24 );
-    p_bh->i_ypelspermeter = GetDWLE( p_data + 28 );
-    p_bh->i_clrused       = GetDWLE( p_data + 32 );
-    p_bh->i_clrimportant  = GetDWLE( p_data + 36 );
-
-    if( p_bh->i_size > 40 )
-    {
-        p_bh->i_data = p_bh->i_size - 40;
-        if( ( p_bh->p_data = malloc( p_bh->i_data ) ) )
-        {
-            memcpy( p_bh->p_data, p_data + 40, p_bh->i_data );
-        }
-        else
-        {
-            p_bh->i_data = 0;
-        }
-    }
-    else
-    {
-        p_bh->i_data = 0;
-        p_bh->p_data = NULL;
-    } 
-
-}
-
-
 /* Check if we have a Vout with good parameters */
 static int ffmpeg_CheckVout( vout_thread_t *p_vout,
                              int i_width,
@@ -156,7 +115,7 @@ static int ffmpeg_CheckVout( vout_thread_t *p_vout,
         /* we will try to make conversion */
         i_chroma = VLC_FOURCC('I','4','2','0');
     } 
-    
+
     if( ( p_vout->render.i_width != i_width )||
         ( p_vout->render.i_height != i_height )||
         ( p_vout->render.i_chroma != i_chroma )||
@@ -172,7 +131,6 @@ static int ffmpeg_CheckVout( vout_thread_t *p_vout,
 }
 
 /* Return a Vout */
-
 static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t *p_vdec,
                                          int i_width,
                                          int i_height,
@@ -196,7 +154,7 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t *p_vdec,
     } 
 
     i_aspect = ffmpeg_FfAspect( i_width, i_height, i_aspect );
-    
+
     /* Spawn a video output if there is none. First we look for our children,
      * then we look for any other vout that might be available. */
     p_vout = vlc_object_find( p_vdec->p_fifo, VLC_OBJECT_VOUT,
@@ -230,12 +188,12 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t *p_vdec,
     if( p_vout == NULL )
     {
         msg_Dbg( p_vdec->p_fifo, "no vout present, spawning one" );
-    
+
         p_vout = vout_CreateThread( p_vdec->p_fifo,
                                     i_width, i_height,
                                     i_chroma, i_aspect );
     }
-    
+
     return( p_vout );
 }
 
@@ -251,14 +209,14 @@ static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
     u8 *p_src, *p_dst;
     u8 *p_plane[3];
     int i_plane;
-    
+
     int i_stride, i_lines;
     int i_height, i_width;
     int i_y, i_x;
-    
+
     i_height = p_vdec->p_context->height;
     i_width  = p_vdec->p_context->width;
-    
+
     p_dst = p_pic->p[0].p_pixels;
     p_src  = p_avpicture->data[0];
 
@@ -269,7 +227,7 @@ static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
         p_dst += p_pic->p[0].i_pitch;
         p_src += p_avpicture->linesize[0];
     }
-    
+
     /* process each plane in a temporary buffer */
     for( i_plane = 1; i_plane < 3; i_plane++ )
     {
@@ -290,12 +248,10 @@ static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
             }
             p_dst[2 * i_stride - 2] = p_src[i_x];
             p_dst[2 * i_stride - 1] = p_src[i_x];
-                           
+
             p_dst += 4 * i_stride; /* process the next even lines */
             p_src += i_stride;
         }
-
-
     }
 
     for( i_plane = 1; i_plane < 3; i_plane++ )
@@ -312,7 +268,7 @@ static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
             {
                 p_dst[i_x] = ( p_src[i_x] + p_src[i_x + 4*i_stride])/2;
             }
-                           
+
             p_dst += 4 * i_stride; /* process the next odd lines */
             p_src += 4 * i_stride;
         }
@@ -324,7 +280,6 @@ static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
        temporaries buffers */
     for( i_plane = 1; i_plane < 3; i_plane++ )
     {
-
         int i_size; 
         p_src  = p_plane[i_plane];
         p_dst = p_pic->p[i_plane].p_pixels;
@@ -338,74 +293,7 @@ static void ffmpeg_ConvertPictureI410toI420( picture_t *p_pic,
         }
         free( p_plane[i_plane] );
     }
-
 }
-
-static void ffmpeg_GetPicture( picture_t *p_pic,
-                               AVPicture *p_avpicture,
-                               vdec_thread_t   *p_vdec )
-{
-    int i_plane; 
-    int i_size;
-    int i_line;
-
-    u8  *p_dst;
-    u8  *p_src;
-    int i_src_stride;
-    int i_dst_stride;
-
-    if( ffmpeg_PixFmtToChroma( p_vdec->p_context->pix_fmt ) )
-    {
-        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
-        {
-            p_src  = p_avpicture->data[i_plane];
-            p_dst = p_pic->p[i_plane].p_pixels;
-            i_src_stride = p_avpicture->linesize[i_plane];
-            i_dst_stride = p_pic->p[i_plane].i_pitch;
-            
-            i_size = __MIN( i_src_stride, i_dst_stride );
-            for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
-            {
-                p_vdec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, i_size );
-                p_src += i_src_stride;
-                p_dst += i_dst_stride;
-            }
-        }
-        if( ( p_vdec->i_pp_mode )&&
-            ( ( p_vdec->p_vout->render.i_chroma == 
-                    VLC_FOURCC( 'I','4','2','0' ) )||
-              ( p_vdec->p_vout->render.i_chroma == 
-                    VLC_FOURCC( 'Y','V','1','2' ) ) ) )
-        {
-            /* Make postproc */
-#if LIBAVCODEC_BUILD > 4313
-            p_vdec->p_pp->pf_postprocess( p_pic,
-                                          p_vdec->p_context->quant_store, 
-                                          p_vdec->p_context->qstride,
-                                          p_vdec->i_pp_mode );
-#endif
-        }
-    }
-    else
-    {
-        /* we need to convert to I420 */
-        switch( p_vdec->p_context->pix_fmt )
-        {
-#if LIBAVCODEC_BUILD >= 4615
-            case( PIX_FMT_YUV410P ):
-                ffmpeg_ConvertPictureI410toI420( p_pic, p_avpicture, p_vdec );
-                break;
-#endif            
-            default:
-                p_vdec->p_fifo->b_error = 1;
-                break;
-        }
-
-    }
-  
-}
-
-
 
 /*****************************************************************************
  *
@@ -425,26 +313,24 @@ static void ffmpeg_GetPicture( picture_t *p_pic,
  * flag are not modified inside this function.
  *
  * ffmpeg codec will be open, some memory allocated. But Vout is not yet
- *   open (done after the first decoded frame)
+ * open (done after the first decoded frame)
  *****************************************************************************/
 int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 {
     int i_tmp;
-    
+
     if( p_vdec->p_fifo->p_demux_data )
     {
-        ffmpeg_ParseBitMapInfoHeader( &p_vdec->format, 
-                                      (u8*)p_vdec->p_fifo->p_demux_data );
+        p_vdec->p_format = (BITMAPINFOHEADER *)p_vdec->p_fifo->p_demux_data;
     }
     else
     {
         msg_Warn( p_vdec->p_fifo, "display informations missing" );
     }
 
-    
     /* ***** Fill p_context with init values ***** */
-    p_vdec->p_context->width  = p_vdec->format.i_width;
-    p_vdec->p_context->height = p_vdec->format.i_height;
+    p_vdec->p_context->width  = p_vdec->p_format->biWidth;
+    p_vdec->p_context->height = p_vdec->p_format->biHeight;
     
     /*  ***** Get configuration of ffmpeg plugin ***** */
 #if LIBAVCODEC_BUILD >= 4611
@@ -460,11 +346,24 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         p_vdec->p_context->flags|= CODEC_FLAG_GRAY;
     }
 #endif
-    p_vdec->b_hurry_up = config_GetInt(p_vdec->p_fifo, "ffmpeg-hurry-up");
-    
 
-    /* ***** Open the codec ***** */ 
-    if (avcodec_open(p_vdec->p_context, p_vdec->p_codec) < 0)
+    p_vdec->b_hurry_up = config_GetInt(p_vdec->p_fifo, "ffmpeg-hurry-up");
+
+    p_vdec->b_direct_rendering = 0;
+#if LIBAVCODEC_BUILD > 4615
+    if( (p_vdec->p_codec->capabilities & CODEC_CAP_DR1)
+        && (p_vdec->p_context->pix_fmt != PIX_FMT_YUV410P) )
+    {
+        msg_Dbg( p_vdec->p_fifo, "using direct rendering" );
+        p_vdec->b_direct_rendering = 1;
+        p_vdec->p_context->flags|= CODEC_FLAG_EMU_EDGE | CODEC_FLAG_DR1; 
+        p_vdec->p_context->get_buffer_callback = ffmpeg_GetFrameBuf;
+        p_vdec->p_context->opaque = p_vdec;
+    }
+#endif
+
+    /* ***** Open the codec ***** */
+    if( avcodec_open(p_vdec->p_context, p_vdec->p_codec) < 0 )
     {
         msg_Err( p_vdec->p_fifo, "cannot open codec (%s)",
                                  p_vdec->psz_namecodec );
@@ -477,7 +376,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     }
 
     /* ***** init this codec with special data ***** */
-    if( p_vdec->format.i_data )
+    if( p_vdec->p_format->biSize > sizeof(BITMAPINFOHEADER) )
     {
         AVPicture avpicture;
         int b_gotpicture;
@@ -487,8 +386,9 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
             case( CODEC_ID_MPEG4 ):
                 avcodec_decode_video( p_vdec->p_context, &avpicture, 
                                       &b_gotpicture,
-                                      p_vdec->format.p_data,
-                                      p_vdec->format.i_data );
+                                      (void *)&p_vdec->p_format[1],
+                                      p_vdec->p_format->biSize
+                                        - sizeof(BITMAPINFOHEADER) );
                 break;
             default:
                 if( p_vdec->p_fifo->i_fourcc == FOURCC_MP4S ||
@@ -496,11 +396,13 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
                     p_vdec->p_fifo->i_fourcc == FOURCC_M4S2 ||
                     p_vdec->p_fifo->i_fourcc == FOURCC_m4s2 )
                 {
-                    p_vdec->p_context->extradata_size = p_vdec->format.i_data;
-                    p_vdec->p_context->extradata = malloc( p_vdec->format.i_data );
+                    p_vdec->p_context->extradata_size =
+                        p_vdec->p_format->biSize - sizeof(BITMAPINFOHEADER);
+                    p_vdec->p_context->extradata =
+                        malloc( p_vdec->p_context->extradata_size );
                     memcpy( p_vdec->p_context->extradata,
-                            p_vdec->format.p_data,
-                            p_vdec->format.i_data );
+                            &p_vdec->p_format[1],
+                            p_vdec->p_context->extradata_size );
                 }
 
                 break;
@@ -523,7 +425,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         p_vdec->i_pp_mode |= PP_DERING_Y;
     if( config_GetInt( p_vdec->p_fifo, "ffmpeg-dr-c" ) )
         p_vdec->i_pp_mode |= PP_DERING_C;
-    
+
     if( ( config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-q" ) > 0 )||
         ( config_GetInt( p_vdec->p_fifo, "ffmpeg-pp-auto" )  )||
         ( p_vdec->i_pp_mode != 0 ) )
@@ -543,7 +445,7 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 //            case( CODEC_ID_H263P ): I don't use it up to now
             case( CODEC_ID_H263I ):
                 /* Ok we can make postprocessing :)) */
-               /* first try to get a postprocess module */
+                /* first try to get a postprocess module */
 #if LIBAVCODEC_BUILD > 4613
                 p_vdec->p_pp = vlc_object_create( p_vdec->p_fifo,
                                                   sizeof( postprocessing_t ) );
@@ -592,9 +494,11 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
     return( 0 );
 }
 
-
 /*****************************************************************************
  * DecodeThread: Called for decode one frame
+ *****************************************************************************
+ * We have to get a frame stored in a pes, give it to ffmpeg decoder and send
+ * the image to the output.
  *****************************************************************************/
 void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
 {
@@ -603,16 +507,12 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
     int     i_status;
     int     b_drawpicture;
     int     b_gotpicture;
-    AVPicture avpicture;  /* ffmpeg picture */
-    picture_t *p_pic; /* videolan picture */
-    /* we have to get a frame stored in a pes 
-       give it to ffmpeg decoder 
-       and send the image to the output */ 
+    AVPicture avpicture;                                   /* ffmpeg picture */
+    picture_t *p_pic;                                    /* videolan picture */
 
     /* TODO implement it in a better way */
     /* A good idea could be to decode all I pictures and see for the other */
-    if( ( p_vdec->b_hurry_up )&&
-        ( p_vdec->i_frame_late > 4 ) )
+    if( ( p_vdec->b_hurry_up )&& ( p_vdec->i_frame_late > 4 ) )
     {
 #if LIBAVCODEC_BUILD > 4603
         b_drawpicture = 0;
@@ -683,7 +583,6 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
                                      p_vdec->p_buffer,
                                      i_frame_size );
 
-
     if( i_status < 0 )
     {
         msg_Warn( p_vdec->p_fifo, "cannot decode one frame (%d bytes)",
@@ -702,44 +601,55 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
         p_vdec->i_frame_late = 0;
     }
 
-    if( !b_gotpicture || avpicture.linesize[0] == 0 || !b_drawpicture)
+    if( !b_gotpicture || avpicture.linesize[0] == 0 || !b_drawpicture )
     {
         return;
     }
-    
-    /* Check our vout */
-    if( !ffmpeg_CheckVout( p_vdec->p_vout,
+
+    if( !p_vdec->b_direct_rendering )
+    {
+        /* Check our vout */
+        if( !ffmpeg_CheckVout( p_vdec->p_vout,
                            p_vdec->p_context->width,
                            p_vdec->p_context->height,
                            p_vdec->p_context->aspect_ratio_info,
                            ffmpeg_PixFmtToChroma(p_vdec->p_context->pix_fmt)) )
-    {
-        p_vdec->p_vout = 
-          ffmpeg_CreateVout( p_vdec,
-                             p_vdec->p_context->width,
-                             p_vdec->p_context->height,
-                             p_vdec->p_context->aspect_ratio_info,
-                             ffmpeg_PixFmtToChroma(p_vdec->p_context->pix_fmt));
-        if( !p_vdec->p_vout )
         {
-            msg_Err( p_vdec->p_fifo, "cannot create vout" );
-            p_vdec->p_fifo->b_error = 1; /* abort */
-            return;
+            p_vdec->p_vout = ffmpeg_CreateVout( p_vdec,
+                           p_vdec->p_context->width,
+                           p_vdec->p_context->height,
+                           p_vdec->p_context->aspect_ratio_info,
+                           ffmpeg_PixFmtToChroma(p_vdec->p_context->pix_fmt) );
+            if( !p_vdec->p_vout )
+            {
+                msg_Err( p_vdec->p_fifo, "cannot create vout" );
+                p_vdec->p_fifo->b_error = 1; /* abort */
+                return;
+            }
         }
+
+        /* Get a new picture */
+        while( !(p_pic = vout_CreatePicture( p_vdec->p_vout, 0, 0, 0 ) ) )
+        {
+            if( p_vdec->p_fifo->b_die || p_vdec->p_fifo->b_error )
+            {
+                return;
+            }
+            msleep( VOUT_OUTMEM_SLEEP );
+        }
+
+        /* fill p_picture_t from avpicture, do I410->I420 if needed */
+        ffmpeg_CopyPicture( p_pic, &avpicture, p_vdec );
+    }
+    else
+    {
+#if LIBAVCODEC_BUILD > 4615
+        p_pic = (picture_t *)p_vdec->p_context->dr_opaque_frame;
+#endif
     }
 
-    /* Get a new picture */
-    while( !(p_pic = vout_CreatePicture( p_vdec->p_vout, 0, 0, 0 ) ) )
-    {
-        if( p_vdec->p_fifo->b_die || p_vdec->p_fifo->b_error )
-        {
-            return;
-        }
-        msleep( VOUT_OUTMEM_SLEEP );
-    }
-    /* fill p_picture_t from avpicture, do I410->I420 if needed
-       and do post-processing if requested */    
-    ffmpeg_GetPicture( p_pic, &avpicture, p_vdec );
+    /* Do post-processing if requested */
+    ffmpeg_PostProcPicture( p_vdec, p_pic );
 
     /* FIXME correct avi and use i_dts */
 
@@ -750,7 +660,6 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
     return;
 }
 
-
 /*****************************************************************************
  * EndThread: thread destruction
  *****************************************************************************
@@ -759,7 +668,6 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
  *****************************************************************************/
 void E_( EndThread_Video )( vdec_thread_t *p_vdec )
 {
-    
     if( p_vdec->p_pp )
     {
         /* release postprocessing module */
@@ -774,7 +682,142 @@ void E_( EndThread_Video )( vdec_thread_t *p_vdec )
         vlc_object_detach( p_vdec->p_vout );
         vlc_object_attach( p_vdec->p_vout, p_vdec->p_fifo->p_vlc );
     }
-
-    FREE( p_vdec->format.p_data );
 }
 
+/*****************************************************************************
+ * ffmpeg_CopyPicture: copy a picture from ffmpeg internal buffers to a
+ *                     picture_t structure (when not in direct rendering mode).
+ *****************************************************************************/
+static void ffmpeg_CopyPicture( picture_t *p_pic, AVPicture *p_avpicture,
+                                vdec_thread_t *p_vdec )
+{
+    int i_plane; 
+    int i_size;
+    int i_line;
+
+    u8  *p_dst;
+    u8  *p_src;
+    int i_src_stride;
+    int i_dst_stride;
+
+    if( ffmpeg_PixFmtToChroma( p_vdec->p_context->pix_fmt ) )
+    {
+        for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
+        {
+            p_src  = p_avpicture->data[i_plane];
+            p_dst = p_pic->p[i_plane].p_pixels;
+            i_src_stride = p_avpicture->linesize[i_plane];
+            i_dst_stride = p_pic->p[i_plane].i_pitch;
+
+            i_size = __MIN( i_src_stride, i_dst_stride );
+            for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
+            {
+                p_vdec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src, i_size );
+                p_src += i_src_stride;
+                p_dst += i_dst_stride;
+            }
+        }
+    }
+    else
+    {
+        /* we need to convert to I420 */
+        switch( p_vdec->p_context->pix_fmt )
+        {
+#if LIBAVCODEC_BUILD >= 4615
+            case( PIX_FMT_YUV410P ):
+                ffmpeg_ConvertPictureI410toI420( p_pic, p_avpicture, p_vdec );
+                break;
+#endif            
+            default:
+                p_vdec->p_fifo->b_error = 1;
+                break;
+        }
+    }
+}
+
+/*****************************************************************************
+ * ffmpeg_PostProcPicture: Postprocessing is done here.
+ *****************************************************************************/
+static void ffmpeg_PostProcPicture( vdec_thread_t *p_vdec, picture_t *p_pic )
+{
+#if LIBAVCODEC_BUILD > 4313
+    if( ( p_vdec->i_pp_mode )&&
+        ( ( p_vdec->p_vout->render.i_chroma == 
+            VLC_FOURCC( 'I','4','2','0' ) )||
+          ( p_vdec->p_vout->render.i_chroma == 
+            VLC_FOURCC( 'Y','V','1','2' ) ) ) )
+    {
+        /* Make postproc */
+        p_vdec->p_pp->pf_postprocess( p_pic,
+                                      p_vdec->p_context->quant_store, 
+                                      p_vdec->p_context->qstride,
+                                      p_vdec->i_pp_mode );
+    }
+#endif
+}
+
+/*****************************************************************************
+ * ffmpeg_GetFrameBuf: callback used by ffmpeg to get a frame buffer.
+ *                     (used for direct rendering)
+ *****************************************************************************/
+static int ffmpeg_GetFrameBuf( struct AVCodecContext *avctx, int width,
+                               int height, int pict_type )
+{
+#if LIBAVCODEC_BUILD > 4615
+    vdec_thread_t *p_vdec = (vdec_thread_t *)avctx->opaque;
+    picture_t *p_pic;
+
+    /* Check our vout */
+    if( !ffmpeg_CheckVout( p_vdec->p_vout,
+                           p_vdec->p_context->width,
+                           p_vdec->p_context->height,
+                           p_vdec->p_context->aspect_ratio_info,
+                           ffmpeg_PixFmtToChroma(p_vdec->p_context->pix_fmt)) )
+    {
+        p_vdec->p_vout = ffmpeg_CreateVout( p_vdec,
+                           p_vdec->p_context->width,
+                           p_vdec->p_context->height,
+                           p_vdec->p_context->aspect_ratio_info,
+                           ffmpeg_PixFmtToChroma(p_vdec->p_context->pix_fmt) );
+        if( !p_vdec->p_vout )
+        {
+            msg_Err( p_vdec->p_fifo, "cannot create vout" );
+            p_vdec->p_fifo->b_error = 1; /* abort */
+            return -1;
+        }
+    }
+
+    /* Get a new picture */
+    while( !(p_pic = vout_CreatePicture( p_vdec->p_vout, 0, 0, 0 ) ) )
+    {
+        if( p_vdec->p_fifo->b_die || p_vdec->p_fifo->b_error )
+        {
+            return -1;
+        }
+        msleep( VOUT_OUTMEM_SLEEP );
+    }
+
+    /* FIXME: we may have to use link/unlinkPicture to fully support streams
+     * with B FRAMES */
+
+    avctx->draw_horiz_band= NULL;
+    avctx->dr_buffer[0]= p_pic->p[0].p_pixels;
+    avctx->dr_buffer[1]= p_pic->p[1].p_pixels;
+    avctx->dr_buffer[2]= p_pic->p[2].p_pixels;
+
+    avctx->dr_stride   = p_pic->p[0].i_pitch;
+    avctx->dr_uvstride = p_pic->p[1].i_pitch;
+
+    avctx->dr_opaque_frame = p_pic;
+
+    /* FIXME: this variable is used to determine if a macro-block to be written
+     * can be skipped. The idea behind this is that if a macro-block hasn't
+     * changed and all the frame-buffers already have the value of this
+     * macro-block, then we can skip the writting.
+     * But currently we cannot ensure this is the case, so we decide to write
+     * everything. */
+    avctx->dr_ip_buffer_count = 999;
+
+    return 0;
+#endif
+}

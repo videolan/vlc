@@ -2,7 +2,7 @@
  * libasf.h : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.h,v 1.2 2002/10/21 09:18:37 fenrir Exp $
+ * $Id: libasf.h,v 1.3 2002/11/05 10:07:56 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -20,36 +20,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
+
 /*****************************************************************************
  * Structure needed for decoder
  *****************************************************************************/
-typedef struct bitmapinfoheader_s
-{
-    u32 i_size; /* size of header 40 + size of data follwoing this header */
-    u32 i_width;
-    u32 i_height;
-    u16 i_planes;
-    u16 i_bitcount;
-    u32 i_compression;
-    u32 i_sizeimage;
-    u32 i_xpelspermeter;
-    u32 i_ypelspermeter;
-    u32 i_clrused;
-    u32 i_clrimportant;
-} bitmapinfoheader_t;
-
-typedef struct waveformatex_s
-{
-    u16 i_format;
-    u16 i_channels;
-    u32 i_samplepersec;
-    u32 i_avgbytespersec;
-    u16 i_blockalign;
-    u16 i_bitspersample;
-    u16 i_size;          /* This give size of data 
-                            imediatly following this header. */
-} waveformatex_t;
-
 typedef struct guid_s
 {
     u32 v1; /* le */

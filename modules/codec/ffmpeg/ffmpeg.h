@@ -2,7 +2,7 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.7 2002/10/28 06:26:11 fenrir Exp $
+ * $Id: ffmpeg.h,v 1.8 2002/11/05 10:07:56 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -21,6 +21,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include "codecs.h"                                      /* BITMAPINFOHEADER */
 
 
 #define DECODER_THREAD_COMMON \

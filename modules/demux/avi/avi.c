@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.8 2002/10/28 01:51:37 fenrir Exp $
+ * $Id: avi.c,v 1.9 2002/11/05 10:07:56 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -937,17 +937,17 @@ static int AVIInit( vlc_object_t * p_this )
                 /* XXX quick hack for playing ffmpeg video, I don't know 
                     who is doing something wrong */
                 p_info->i_samplesize = 0;
-                p_info->i_fourcc = p_avi_strf_vids->i_compression;
+                p_info->i_fourcc = p_avi_strf_vids->p_bih->biCompression;
                 p_info->i_codec = 
                     AVI_FourccGetCodec( VIDEO_ES, p_info->i_fourcc );
                 i_init_size = p_avi_strf_vids->i_chunk_size;
                 p_init_data = p_avi_strf_vids->p_bih;
                 msg_Dbg( p_input, "stream[%d] video(%4.4s) %dx%d %dbpp %ffps",
                         i,
-                         (char*)&p_avi_strf_vids->i_compression,
-                         p_avi_strf_vids->i_width,
-                         p_avi_strf_vids->i_height,
-                         p_avi_strf_vids->i_bitcount,
+                         (char*)&p_avi_strf_vids->p_bih->biCompression,
+                         p_avi_strf_vids->p_bih->biWidth,
+                         p_avi_strf_vids->p_bih->biHeight,
+                         p_avi_strf_vids->p_bih->biBitCount,
                          (float)p_info->i_rate /
                              (float)p_info->i_scale );
                 break;

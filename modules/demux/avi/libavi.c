@@ -2,7 +2,7 @@
  * libavi.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.3 2002/10/27 15:37:16 fenrir Exp $
+ * $Id: libavi.c,v 1.4 2002/11/05 10:07:56 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -539,29 +539,29 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
             break;
         case( AVIFOURCC_vids ):
             p_strh->strh.i_samplesize = 0; // XXX for ffmpeg avi file
-            AVI_READ4BYTES( p_chk->strf.vids.i_size );
-            AVI_READ4BYTES( p_chk->strf.vids.i_width );
-            AVI_READ4BYTES( p_chk->strf.vids.i_height );
-            AVI_READ2BYTES( p_chk->strf.vids.i_planes );
-            AVI_READ2BYTES( p_chk->strf.vids.i_bitcount );
-            AVI_READFOURCC( p_chk->strf.vids.i_compression );
-            AVI_READ4BYTES( p_chk->strf.vids.i_sizeimage );
-            AVI_READ4BYTES( p_chk->strf.vids.i_xpelspermeter );
-            AVI_READ4BYTES( p_chk->strf.vids.i_ypelspermeter );
-            AVI_READ4BYTES( p_chk->strf.vids.i_clrused );
-            AVI_READ4BYTES( p_chk->strf.vids.i_clrimportant );
             p_chk->strf.vids.p_bih = malloc( p_chk->common.i_chunk_size );
-            memcpy( p_chk->strf.vids.p_bih, 
-                    p_buff + 8, 
-                    p_chk->common.i_chunk_size );
+            AVI_READ4BYTES( p_chk->strf.vids.p_bih->biSize );
+            AVI_READ4BYTES( p_chk->strf.vids.p_bih->biWidth );
+            AVI_READ4BYTES( p_chk->strf.vids.p_bih->biHeight );
+            AVI_READ2BYTES( p_chk->strf.vids.p_bih->biPlanes );
+            AVI_READ2BYTES( p_chk->strf.vids.p_bih->biBitCount );
+            AVI_READFOURCC( p_chk->strf.vids.p_bih->biCompression );
+            AVI_READ4BYTES( p_chk->strf.vids.p_bih->biSizeImage );
+            AVI_READ4BYTES( p_chk->strf.vids.p_bih->biXPelsPerMeter );
+            AVI_READ4BYTES( p_chk->strf.vids.p_bih->biYPelsPerMeter );
+            AVI_READ4BYTES( p_chk->strf.vids.p_bih->biClrUsed );
+            AVI_READ4BYTES( p_chk->strf.vids.p_bih->biClrImportant );
+            memcpy( &p_chk->strf.vids.p_bih[1],
+                    p_buff + sizeof(BITMAPINFOHEADER),
+                    p_chk->common.i_chunk_size - sizeof(BITMAPINFOHEADER) );
 #ifdef AVI_DEBUG
             msg_Dbg( p_input,
                      "strf: video:%c%c%c%c %dx%d planes:%d %dbpp",
-                     AVIFOURCC_PRINT( p_chk->strf.vids.i_compression ),
-                     p_chk->strf.vids.i_width,
-                     p_chk->strf.vids.i_height,
-                     p_chk->strf.vids.i_planes,
-                     p_chk->strf.vids.i_bitcount );
+                     AVIFOURCC_PRINT( p_chk->strf.vids.p_bih->biCompression ),
+                     p_chk->strf.vids.p_bih->biWidth,
+                     p_chk->strf.vids.p_bih->biHeight,
+                     p_chk->strf.vids.p_bih->biPlanes,
+                     p_chk->strf.vids.p_bih->biBitCount );
 #endif
             break;
         default:

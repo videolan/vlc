@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.13 2002/10/28 22:23:23 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.14 2002/11/05 10:07:56 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -32,11 +32,6 @@
 #include <vlc/decoder.h>
 #include <vlc/input.h>
 
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>                                              /* getpid() */
-#endif
-
-#include <errno.h>
 #include <string.h>
 
 #ifdef HAVE_SYS_TIMES_H

@@ -2,7 +2,7 @@
  * libavi.h : LibAVI library 
  ******************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.1 2002/10/15 00:56:43 fenrir Exp $
+ * $Id: libavi.h,v 1.2 2002/11/05 10:07:56 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -20,6 +20,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#include "codecs.h"                                      /* BITMAPINFOHEADER */
 
 /* flags for use in <dwFlags> in AVIFileHdr */
 #define AVIF_HASINDEX       0x00000010  /* Index at end of file? */
@@ -255,18 +256,7 @@ typedef struct avi_chunk_strf_auds_s
 typedef struct avi_chunk_strf_vids_s
 {
     AVI_CHUNK_COMMON
-    void *p_bih;    // bitmapinfoheader_t loaded from file
-    u32 i_size; /* size of header */
-    u32 i_width;
-    u32 i_height;
-    u16 i_planes;
-    u16 i_bitcount;
-    u32 i_compression;
-    u32 i_sizeimage;
-    u32 i_xpelspermeter;
-    u32 i_ypelspermeter;
-    u32 i_clrused;
-    u32 i_clrimportant;
+    BITMAPINFOHEADER *p_bih;
 } avi_chunk_strf_vids_t;
 
 typedef union avi_chunk_strf_u
