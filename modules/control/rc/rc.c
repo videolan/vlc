@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: rc.c,v 1.2 2002/08/13 13:15:14 sigmunau Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -288,27 +288,33 @@ static void Run( intf_thread_t *p_intf )
                 break;
             case 'i':
             case 'I':
-                printf( "Dumping stream info\n" );
-                vlc_mutex_lock( &p_input->stream.stream_lock );
-                p_category = p_input->stream.p_info;
-                while ( p_category )
-                {
-                    psz_dashes[72 - strlen(p_category->psz_name) ] = '\0';
-                    printf( "+--| %s |%s+\n", p_category->psz_name, psz_dashes);
-                    psz_dashes[72 - strlen(p_category->psz_name) ] = '-';
-                    p_info = p_category->p_info;
-                    while ( p_info )
+                if ( p_input ) {
+                    printf( "Dumping stream info\n" );
+                    vlc_mutex_lock( &p_input->stream.stream_lock );
+                    p_category = p_input->stream.p_info;
+                    while ( p_category )
                     {
-                        printf( "| %s: %s\n", p_info->psz_name,
-                                p_info->psz_value );
-                        p_info = p_info->p_next;
+                        psz_dashes[72 - strlen(p_category->psz_name) ] = '\0';
+                        printf( "+--| %s |%s+\n", p_category->psz_name, psz_dashes);
+                        psz_dashes[72 - strlen(p_category->psz_name) ] = '-';
+                        p_info = p_category->p_info;
+                        while ( p_info )
+                        {
+                            printf( "| %s: %s\n", p_info->psz_name,
+                                    p_info->psz_value );
+                            p_info = p_info->p_next;
+                        }
+                        printf("|\n");
+                        p_category = p_category->p_next;
                     }
-                    printf("|\n");
-                    p_category = p_category->p_next;
+                    psz_dashes[78] = '\0';
+                    printf( "+%s+\n", psz_dashes );
+                    vlc_mutex_unlock( &p_input->stream.stream_lock );
                 }
-                psz_dashes[78] = '\0';
-                printf( "+%s+\n", psz_dashes );
-                vlc_mutex_unlock( &p_input->stream.stream_lock );
+                else
+                {
+                    printf( "no input" );
+                }
                 break;
             case '\0':
                 /* Ignore empty lines */
