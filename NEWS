@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.4 2003/02/01 20:34:55 massiot Exp $
+$Id: NEWS,v 1.5 2003/02/01 20:59:37 jpsaman Exp $
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
@@ -75,4 +75,10 @@ Win32 port:
   * support for VCDs
 
 BeOS port:
+
+iPaq port:
+  * slider bar in GTK+/GPE Familiar interface
+  * fixed crash on directory change in Familiar interface
+  * added qte_main module for use in all modules that need Opie or Qte support
+  * native video output module for Qt Embedded/Opie is not working
 
