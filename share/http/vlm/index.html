@@ -14,7 +14,7 @@
  </head>
  <body>
     <h2>
-     <a href="http://www.videolan.org/">VLC media player<vlc id="value" param1="version" /></a> (http interface)</h2>
+     <a href="http://www.videolan.org/">VLC media player <vlc id="value" param1="version" /></a> (http interface)</h2>
     <div class="sectitle">VLM - Configuration</div>
     <div class="section">
 
@@ -68,7 +68,9 @@
        <table>
         <tr>
          <td>
-          <vlc id="value" param1="el.state" />
+          <vlc id="foreach" param1="instance" param2="el.instances" />
+           <vlc id="value" param1="instance" />
+          <vlc id="end" />
          </td>
          <td align="right">
           <form method="get" action="" />

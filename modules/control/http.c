@@ -1317,10 +1317,17 @@ static mvar_t *mvar_VlmSetNew( char *name, vlm_t *vlm )
                     /* fprintf( stderr, "        child=%s [%d]\n", ch->psz_name, ch->i_child ); */
                     for( c = 0; c < ch->i_child; c++ )
                     {
-                        mvar_t *in = mvar_New( ch->psz_name, ch->child[c]->psz_name );
-                        mvar_AppendVar( n, in );
-
-                        /* fprintf( stderr, "            sub=%s\n", ch->child[c]->psz_name );*/
+                        if( ch->child[c]->psz_value )
+                        {
+                            mvar_AppendNewVar( n, ch->child[c]->psz_name, ch->child[c]->psz_value );
+                            /* fprintf( stderr, "            sub=%s->%s\n", ch->child[c]->psz_name, ch->child[c]->psz_value ); */
+                        }
+                        else
+                        {
+                            mvar_t *in = mvar_New( ch->psz_name, ch->child[c]->psz_name );
+                            mvar_AppendVar( n, in );
+                            /* fprintf( stderr, "            sub=%s\n", ch->child[c]->psz_name ); */
+                        }
                     }
                     mvar_AppendVar( set, n );
                 }
