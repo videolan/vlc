@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.18 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: ogg.c,v 1.19 2003/01/29 12:59:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -1392,7 +1392,8 @@ static int Demux( input_thread_t * p_input )
         if( p_stream->i_cat == SPU_ES )
             continue;
 
-        if( p_stream->i_interpolated_pcr < p_ogg->i_pcr )
+        if( p_stream->i_interpolated_pcr > 0
+            && p_stream->i_interpolated_pcr < p_ogg->i_pcr )
             p_ogg->i_pcr = p_stream->i_interpolated_pcr;
     }
 #undef p_stream
