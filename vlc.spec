@@ -1,5 +1,3 @@
-
-
 %define name 		vlc
 %define vlc_ver 	0.4.5
 %define version		%vlc_ver
@@ -7,12 +5,13 @@
 %define cvs     	0
 %if %{cvs}
 %define cvsdate 	20010619
-%define release		0.%{cvsdate}mdk
+%define release		0.%{cvsdate}
 %define cvs_name 	%{name}-snapshot-%{cvsdate}-00
 %else
-%define release 	1mdk
+%define release 	1
 %endif
 
+# The QT interface is not functional yet
 %define	plugin_qt	0
 %define	plugin_lirc	1
 
@@ -31,12 +30,12 @@ License:	GPL
 Group:		Video
 URL:		http://www.videolan.org/
 Requires:	vlc-gui
-# yves 0.4.0-1mdk needed by ffmpeg builtin (i want MPEG4 support out of box)
+# vlc-mad needed by ffmpeg builtin (i want MPEG4 support out of box)
 Requires:	vlc-mad
 
 BuildRoot:	%_tmppath/%name-%version-%release-root
 Buildrequires:	libncurses5-devel
-Buildrequires:	libqt2-devel
+#Buildrequires:	libqt2-devel
 Buildrequires:	libgtk+1.2-devel
 Buildrequires:	gnome-libs-devel
 Buildrequires:	db1-devel
@@ -51,18 +50,16 @@ Buildrequires:	liblirc-devel
 Buildrequires:	libffmpeg-devel
 
 %description
-VideoLAN is a free network-aware MPEG1, MPEG2, MPEG4 (aka DivX)
-and DVD player.
-The VideoLAN Client allows to play MPEG2 Transport Streams from the
-network or from a file, as well as direct DVD playback.
-VideoLAN is a project of students from the Ecole Centrale Paris.
-This version add MPEG1 support, direct DVD support, DVD decryption, 
-arbitrary, seeking in the stream, pause, fast forward and slow motion, 
-hardware YUV acceleration and a few new interface features 
-including drag'n'drop.
-You may install vlc-gnome, vlc-gtk and vlc-ncurses.
-This package contains no CSS unscrambling functionality.
-You need the libdvdcss library available from 
+VideoLAN is an OpenSource streaming solution for every OS developed by
+students from the Ecole Centrale Paris and developers from all over the
+World.
+The VideoLAN Client (vlc) plays MPEG1, MPEG2 and MPEG4 (aka DivX) files,
+DVDs, VCDs, SVCDs, from a satellite card, from an MPEG2 Transport
+Streams sent by the VideoLAN Server (vls) or from a Web server (with the
+HTTP input).
+You may install vlc-gnome or vlc-gtk to have a nice graphical interface.
+This package contains no CSS unscrambling functionality for DVDs ;
+you need the libdvdcss library available from 
 http://www.videolan.org/libdvdcss/ or http://plf.zarb.org/
 
 # intf plugins
@@ -277,7 +274,6 @@ rm -fr %buildroot
 %dir %{_libdir}/videolan/vlc
 %{_libdir}/videolan/vlc/ac3_spdif.so
 %{_libdir}/videolan/vlc/avi.so
-%{_libdir}/videolan/vlc/dsp.so
 %{_libdir}/videolan/vlc/dummy.so
 %{_libdir}/videolan/vlc/dvd.so
 %{_libdir}/videolan/vlc/fb.so
@@ -301,6 +297,7 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/mpeg_ps.so
 %{_libdir}/videolan/vlc/mpeg_ts.so
 %{_libdir}/videolan/vlc/null.so
+%{_libdir}/videolan/vlc/dsp.so
 %{_libdir}/videolan/vlc/rc.so
 %{_libdir}/videolan/vlc/spudec.so
 %{_libdir}/videolan/vlc/udp.so
@@ -411,16 +408,10 @@ rm -fr %buildroot
 %{_libdir}/videolan/vlc/alsa.so
 
 %changelog
-* Fri Oct 11 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.5-1mdk
+* Mon Oct 14 2002 Alexis de Lattre <alexis@videolan.org> 0.4.5
 - new upstream release
 
-* Sun Aug 11 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.4-1mdk
-- new upstream release
-
-* Fri Jul 26 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.3-1mdk
-- new upstream release
-
-* Sun Jul 7 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.2-1mdk
+* Mon Jun 20 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.2-1mdk
 - new upstream release
 
 * Mon Jun 3 2002 Yves Duret <yduret@mandrakesoft.com> 0.4.1-1mdk
