@@ -612,8 +612,16 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     }
     else if( p_first == NULL )
     {
-        msg_Err( p_this, "no %s module matched \"%s\"",
+        if( !strcmp( psz_capability, "access_demux" ) )
+        {
+            msg_Warn( p_this, "no %s module matched \"%s\"",
                  psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
+        }
+        else
+        {  
+            msg_Err( p_this, "no %s module matched \"%s\"",
+                 psz_capability, (psz_name && *psz_name) ? psz_name : "any" );
+        }
     }
     else if( psz_name != NULL && *psz_name )
     {
