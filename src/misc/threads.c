@@ -705,7 +705,49 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
     i_ret = st_thread_join( p_this->thread_id, NULL );
 
 #elif defined( UNDER_CE ) || defined( WIN32 )
+    HMODULE hmodule;
+    BOOL (WINAPI *OurGetThreadTimes)( HANDLE, FILETIME*, FILETIME*,
+                                      FILETIME*, FILETIME* );
+    FILETIME create_ft, exit_ft, kernel_ft, user_ft;
+    int64_t real_time, kernel_time, user_time;
+
     WaitForSingleObject( p_this->thread_id, INFINITE );
+
+#if defined( UNDER_CE )
+    hmodule = GetModuleHandle( _T("COREDLL") );
+#else
+    hmodule = GetModuleHandle( _T("KERNEL32") );
+#endif
+    OurGetThreadTimes = (BOOL (WINAPI*)( HANDLE, FILETIME*, FILETIME*,
+                                         FILETIME*, FILETIME* ))
+        GetProcAddress( hmodule, _T("GetThreadTimes") );
+
+    if( OurGetThreadTimes &&
+        OurGetThreadTimes( p_this->thread_id,
+                           &create_ft, &exit_ft, &kernel_ft, &user_ft ) )
+    {
+        real_time =
+          ((((int64_t)exit_ft.dwHighDateTime)<<32)| exit_ft.dwLowDateTime) -
+          ((((int64_t)create_ft.dwHighDateTime)<<32)| create_ft.dwLowDateTime);
+        real_time /= 10;
+
+        kernel_time =
+          ((((int64_t)kernel_ft.dwHighDateTime)<<32)|
+           kernel_ft.dwLowDateTime) / 10;
+
+        user_time =
+          ((((int64_t)user_ft.dwHighDateTime)<<32)|
+           user_ft.dwLowDateTime) / 10;
+
+        msg_Dbg( p_this, "thread times: "
+                 "real "I64Fd"m%fs, kernel "I64Fd"m%fs, user "I64Fd"m%fs",
+                 real_time/60/1000000,
+                 (double)((real_time%(60*1000000))/1000000.0),
+                 kernel_time/60/1000000,
+                 (double)((kernel_time%(60*1000000))/1000000.0),
+                 user_time/60/1000000,
+                 (double)((user_time%(60*1000000))/1000000.0) );
+    }
     CloseHandle( p_this->thread_id );
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
