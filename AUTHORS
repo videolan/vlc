@@ -109,6 +109,7 @@ D: IDCT and YUV transformations
 N: Håkan Hjort
 E: d95hjort@dtek.chalmers.se
 D: Solaris port of the DVD ioctls
+D: libdvdcss enhancements
 
 N: Samuel Hocevar
 E: sam@zoy.org

@@ -4,6 +4,7 @@
 
 HEAD
 
+  * Minor changes to the (non-working) ncurses interface.
   * Fixed a packet leak in DemuxPSI.
   * Added gnome.h check and cleaned the error messages in the configure script.
   * Tiny small optim in LPCM decoder.

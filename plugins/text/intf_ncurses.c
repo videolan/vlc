@@ -2,7 +2,7 @@
  * intf_ncurses.c: ncurses interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_ncurses.c,v 1.4 2001/07/25 03:12:33 sam Exp $
+ * $Id: intf_ncurses.c,v 1.5 2001/09/09 13:43:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -108,21 +108,21 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
     {
-        intf_ErrMsg("error: %s", strerror(ENOMEM));
+        intf_ErrMsg( "intf error: %s", strerror(ENOMEM) );
         return( 1 );
     }
 
     /* Initialize the curses library */
     initscr();
-
     /* Don't do NL -> CR/NL */
     nonl();
-
     /* Take input chars one at a time */
     cbreak();
-
     /* Don't echo */
     noecho();
+
+    curs_set(0);
+    timeout(0);
 
     return( 0 );
 }
@@ -144,11 +144,32 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
+    signed char i_key;
+
     while( !p_intf->b_die )
     {
         p_intf->pf_manage( p_intf );
 
         msleep( INTF_IDLE_SLEEP );
+
+        mvaddstr( 1, 2, VOUT_TITLE " (ncurses interface)" );
+        mvaddstr( 3, 2, "keys:" );
+        mvaddstr( 4, 2, "Q,q.......quit" );
+        //mvaddstr( 5, 2, "No other keys are active yet." );
+
+        while( (i_key = getch()) != -1 )
+	{
+            switch( i_key )
+            {
+                case 'q':
+                case 'Q':
+                    p_intf->b_die = 1;
+                    break;
+
+                default:
+                    break;
+            }
+        }
     }
 }
 

@@ -2,10 +2,11 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.14 2001/08/06 13:28:00 sam Exp $
+ * $Id: libdvdcss.c,v 1.15 2001/09/09 13:43:25 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
+ *          Håkan Hjort <d95hjort@dtek.chalmers.se>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -113,16 +114,19 @@ extern dvdcss_handle dvdcss_open ( char *psz_target, int i_flags )
     i_ret = CSSTest( dvdcss );
     if( i_ret < 0 )
     {
-        _dvdcss_error( dvdcss, "css test failed" );
-        _dvdcss_close( dvdcss );
-        free( dvdcss );
-        return NULL;
+        _dvdcss_error( dvdcss, "CSS test failed" );
+        /* Disable the CSS ioctls and hope that it works? */
+        dvdcss->b_ioctls = 0;
+        dvdcss->b_encrypted = 1;
+    }
+    else
+    {
+        dvdcss->b_ioctls = 1;
+        dvdcss->b_encrypted = i_ret;
     }
 
-    dvdcss->b_encrypted = i_ret;
-
-    /* If drive is encrypted, crack its key */
-    if( dvdcss->b_encrypted )
+    /* If disc is CSS protected and the ioctls work, authenticate the drive */
+    if( dvdcss->b_encrypted && dvdcss->b_ioctls )
     {
         i_ret = CSSInit( dvdcss );
 
@@ -203,7 +207,8 @@ extern int dvdcss_title ( dvdcss_handle dvdcss, int i_block )
     //         p_key[0], p_key[1], p_key[2], p_key[3], p_key[4] );
 
     /* Add key to keytable if it isn't empty */
-    if( p_key[0] | p_key[1] | p_key[2] | p_key[3] | p_key[4] )
+    /* We need to cache the fact that a title is unencrypted
+       if( p_key[0] | p_key[1] | p_key[2] | p_key[3] | p_key[4] ) */
     {
         dvd_title_t *p_newtitle;
 
@@ -273,6 +278,24 @@ extern int dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer,
     {
         /* no css key found to use, so no decryption to do */
         return 0;
+    }
+
+    /* For what we believe is an unencrypted title, 
+       check that there are no encrypted blocks */
+    if( !( p_title->p_key[0] | p_title->p_key[1] | p_title->p_key[2] |
+           p_title->p_key[3] | p_title->p_key[4] ) ) 
+    {
+        for( i_index = i_ret; i_index; i_index-- )
+        {
+            if( ((u8*)p_buffer)[0x14] & 0x30 )
+            {
+                _dvdcss_error( dvdcss, "no key but found encrypted block" );
+                /* Only return the initial range of unscrambled blocks? */
+                i_ret = i_index;
+                /* or fail completely? return 0; */
+            }
+            (u8*)p_buffer += DVDCSS_BLOCK_SIZE;
+        }
     }
 
     /* Decrypt the blocks we managed to read */

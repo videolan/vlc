@@ -2,9 +2,10 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.8 2001/08/06 13:27:59 sam Exp $
+ * $Id: css.c,v 1.9 2001/09/09 13:43:25 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
+ *         Håkan Hjort <d95hjort@dtek.chalmers.se>
  *
  * based on:
  *  - css-auth by Derek Fawcus <derek@spider.com>
@@ -295,6 +296,7 @@ int CSSGetKey( dvdcss_handle dvdcss, int i_pos, dvd_key_t p_titlekey )
      * Does not use any player key table and ioctls.
      */
     u8          p_buf[0x800];
+    u8          p_packstart[4] = { 0x00, 0x00, 0x01, 0xba };
     dvd_key_t   p_key;
     boolean_t   b_encrypted;
     boolean_t   b_stop_scanning;
@@ -310,14 +312,30 @@ int CSSGetKey( dvdcss_handle dvdcss, int i_pos, dvd_key_t p_titlekey )
 
     b_encrypted = 0;
     b_stop_scanning = 0;
+    i_blocks_read = 0;
 
     do
     {
         i_pos = dvdcss_seek( dvdcss, i_pos );
-        i_blocks_read = dvdcss_read( dvdcss, p_buf, 1, DVDCSS_NOFLAGS );
+        if( dvdcss_read( dvdcss, p_buf, 1, DVDCSS_NOFLAGS ) != 1 ) break;
 
-        /* PES_scrambling_control */
-        if( p_buf[0x14] & 0x30 )
+        /* Stop when we find a non MPEG stream block */
+        if( memcmp( p_buf, p_packstart, 4 ) )
+        {
+            /* The title is unencrypted */
+            if( !b_encrypted )
+                break;
+            /* dvdcss some times fail to find/crack the key, 
+               hope that it's the same as the one in the next title
+               _dvdcss_debug( dvdcss, "no key found at end of title" );
+            */
+        }
+
+        /* PES_scrambling_control on and make sure that the packet type 
+           is one that can be scrambled */
+        if( p_buf[0x14] & 0x30  && ! ( p_buf[0x11] == 0xbb 
+                                       || p_buf[0x11] == 0xbe  
+                                       || p_buf[0x11] == 0xbf ) )
         {
             b_encrypted = 1;
             i_best_plen = 0;
@@ -347,9 +365,13 @@ int CSSGetKey( dvdcss_handle dvdcss, int i_pos, dvd_key_t p_titlekey )
             }
         }
 
-        i_pos += i_blocks_read;
+        i_pos += 1;
+        i_blocks_read += 1;
 
-    } while( i_blocks_read == 0x1 && !b_stop_scanning );
+        /* If we haven't seen any encrypted ones after 3000 blocks stop */
+        if( !b_encrypted && i_blocks_read >= 1000 ) break;
+
+    } while( !b_stop_scanning );
 
     if( b_stop_scanning )
     {

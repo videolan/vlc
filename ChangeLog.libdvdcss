@@ -4,7 +4,12 @@
 
 HEAD
 
-  * Nothing yet.
+  * If we see 3000 unencrypted blocks assume that the title is unencrypted.
+  * If we have not seen any encrypted block and then discover that the block
+    just read is not a valid block of an MPEG2 Program stream, assume that the
+    title is unencrypted.
+  * Empty keys (for unscrambled sectors) are now cached as well.
+  * We try to decrypt the file even if DVD ioctls are not available.
 
 0.0.3
 Wed, 22 Aug 2001 15:18:01 +0200

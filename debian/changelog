@@ -1,3 +1,9 @@
+vlc (0.2.83-3) unstable; urgency=low
+
+  * Fixed syntax error in build dependencies (Closes: #109722).
+
+ -- Samuel Hocevar <sam@zoy.org>  Sun,  9 Sep 2001 09:28:06 +0200
+
 vlc (0.2.83-2) unstable; urgency=low
 
   * Fixed build dependencies for architectures not supporting libasound2
