@@ -246,6 +246,11 @@ static int Create( vlc_object_t *p_this )
         var_Get( p_filter, "freetype-rel-fontsize", &val );
         i_fontsize = (int)p_filter->fmt_out.video.i_height / val.i_int;
     }
+    if( i_fontsize <= 0 )
+    {
+        msg_Warn( p_filter, "Invalid fontsize, using 12" );
+        i_fontsize = 12;
+    }
     msg_Dbg( p_filter, "Using fontsize: %i", i_fontsize);
 
     i_error = FT_Set_Pixel_Sizes( p_sys->p_face, 0, i_fontsize );
