@@ -141,7 +141,7 @@ void Timer::Notify()
             if( psz_now_playing && *psz_now_playing )
             {
                 p_main_interface->statusbar->SetStatusText(
-                    wxU(psz_now_playing) + wxT( " - " ) +
+                    wxString(wxU(psz_now_playing)) + wxT( " - " ) +
                     wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
             }
             else
@@ -211,7 +211,7 @@ void Timer::Notify()
             if( psz_now_playing && *psz_now_playing )
             {
                 p_main_interface->statusbar->SetStatusText(
-                    wxU(psz_now_playing) + wxT( " - " ) +
+                    wxString(wxU(psz_now_playing)) + wxT( " - " ) +
                     wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
             }
             else

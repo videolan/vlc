@@ -458,12 +458,12 @@ void  ModuleListCatConfigControl::OnUpdate( wxCommandEvent &event )
             if( b_waschecked )
             {
                 /* Maybe not the clest solution */
-                if( ! newtext.Replace(wxU(",")
+                if( ! newtext.Replace(wxString(wxT(","))
                                       +wxU(pp_checkboxes[i]->psz_module),
-                                      wxU("")))
+                                      wxT("")))
                 {
-                    if( ! newtext.Replace(wxU(pp_checkboxes[i]->psz_module)
-                                           + wxU(","),wxU("")))
+                    if( ! newtext.Replace(wxString(wxU(pp_checkboxes[i]->psz_module))
+                                           + wxT(","),wxT("")))
 		    { 
                         newtext.Replace(wxU(pp_checkboxes[i]->psz_module),wxU(""));
                     }
