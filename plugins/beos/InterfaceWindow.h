@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.12 2002/03/22 13:16:35 tcastley Exp $
+ * $Id: InterfaceWindow.h,v 1.13 2002/06/01 09:20:16 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -23,6 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 class MediaControlView;
+class PlayListWindow;
 
 class CDMenu : public BMenu
 {
@@ -65,6 +66,7 @@ private:
     intf_thread_t  *p_intf;
     bool            b_empty_playlist;
 	BFilePanel *file_panel;
+	PlayListWindow* playlist_window;
     BMenuItem      *miOnTop;
 	es_descriptor_t *  p_audio_es;
     es_descriptor_t *  p_spu_es;
