@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.13 2002/11/26 17:38:33 gbazin Exp $
+ * $Id: ogg.c,v 1.14 2002/12/16 18:30:12 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -620,6 +620,145 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     msg_Dbg( p_input,
                              "found tarkin header, bitrate: %i, rate: %f",
                              p_stream->i_bitrate, p_stream->f_rate );
+                }
+                else if( oggpacket.bytes >= 142 &&
+                         !strncmp( &oggpacket.packet[1],
+                                   "Direct Show Samples embedded in Ogg", 35 ))
+                {
+                    /* Old header type */
+
+                    /* Check for video header (old format) */
+                    if( GetDWLE((oggpacket.packet+96)) == 0x05589f80 &&
+                        oggpacket.bytes >= 184 )
+                    {
+                        p_stream->i_cat = VIDEO_ES;
+
+                        p_stream->p_bih = (BITMAPINFOHEADER *)
+                            malloc( sizeof(BITMAPINFOHEADER) );
+                        if( !p_stream->p_bih )
+                        {
+                            /* Mem allocation error, just ignore the stream */
+                            free( p_stream );
+                            p_ogg->i_streams--;
+                            continue;
+                        }
+                        p_stream->p_bih->biSize = sizeof(BITMAPINFOHEADER);
+                        p_stream->p_bih->biCompression= p_stream->i_fourcc =
+                            VLC_FOURCC( oggpacket.packet[68],
+                                        oggpacket.packet[69],
+                                        oggpacket.packet[70],
+                                        oggpacket.packet[71] );
+                        msg_Dbg( p_input, "found video header of type: %.4s",
+                                 (char *)&p_stream->i_fourcc );
+
+                        p_stream->f_rate = 10000000.0 /
+                            GetQWLE((oggpacket.packet+164));
+                        p_stream->p_bih->biBitCount =
+                            GetWLE((oggpacket.packet+182));
+                        if( !p_stream->p_bih->biBitCount )
+                            p_stream->p_bih->biBitCount=24; // hack, FIXME
+                        p_stream->p_bih->biWidth =
+                            GetDWLE((oggpacket.packet+176));
+                        p_stream->p_bih->biHeight =
+                            GetDWLE((oggpacket.packet+180));
+                        p_stream->p_bih->biPlanes= 1 ;
+                        p_stream->p_bih->biSizeImage =
+                            (p_stream->p_bih->biBitCount >> 3) *
+                            p_stream->p_bih->biWidth *
+                            p_stream->p_bih->biHeight;
+
+                        msg_Dbg( p_input,
+                             "fps: %f, width:%i; height:%i, bitcount:%i",
+                            p_stream->f_rate, p_stream->p_bih->biWidth,
+                            p_stream->p_bih->biHeight,
+                            p_stream->p_bih->biBitCount);
+
+                        p_stream->i_bitrate = 0;
+                    }
+                    /* Check for audio header (old format) */
+                    else if( GetDWLE((oggpacket.packet+96)) == 0x05589F81 )
+                    {
+                        unsigned int i_extra_size;
+
+                        p_stream->i_cat = AUDIO_ES;
+
+                        i_extra_size = GetWLE((oggpacket.packet+140));
+
+                        p_stream->p_wf = (WAVEFORMATEX *)
+                            malloc( sizeof(WAVEFORMATEX) + i_extra_size );
+                        if( !p_stream->p_wf )
+                        {
+                            /* Mem allocation error, just ignore the stream */
+                            free( p_stream );
+                            p_ogg->i_streams--;
+                            continue;
+                        }
+
+                        p_stream->p_wf->wFormatTag =
+                            GetWLE((oggpacket.packet+124));
+                        p_stream->p_wf->nChannels =
+                            GetWLE((oggpacket.packet+126));
+                        p_stream->f_rate = p_stream->p_wf->nSamplesPerSec =
+                            GetDWLE((oggpacket.packet+128));
+                        p_stream->i_bitrate = p_stream->p_wf->nAvgBytesPerSec =
+                            GetDWLE((oggpacket.packet+132));
+                        p_stream->i_bitrate *= 8;
+                        p_stream->p_wf->nBlockAlign =
+                            GetWLE((oggpacket.packet+136));
+                        p_stream->p_wf->wBitsPerSample =
+                            GetWLE((oggpacket.packet+138));
+                        p_stream->p_wf->cbSize = i_extra_size;
+
+                        if( i_extra_size > 0 )
+                            memcpy( p_stream->p_wf+sizeof(WAVEFORMATEX),
+                                    oggpacket.packet+142, i_extra_size );
+
+                        switch( p_stream->p_wf->wFormatTag )
+                        {
+                        case WAVE_FORMAT_PCM:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'a', 'r', 'a', 'w' );
+                            break;
+                        case WAVE_FORMAT_MPEG:
+                        case WAVE_FORMAT_MPEGLAYER3:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'm', 'p', 'g', 'a' );
+                            break;
+                        case WAVE_FORMAT_A52:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'a', '5', '2', ' ' );
+                            break;
+                        case WAVE_FORMAT_WMA1:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'w', 'm', 'a', '1' );
+                            break;
+                        case WAVE_FORMAT_WMA2:
+                            p_stream->i_fourcc =
+                                VLC_FOURCC( 'w', 'm', 'a', '2' );
+                            break;
+                        default:
+                            p_stream->i_fourcc = VLC_FOURCC( 'm', 's',
+                                ( p_stream->p_wf->wFormatTag >> 8 ) & 0xff,
+                                p_stream->p_wf->wFormatTag & 0xff );
+                        }
+
+                        msg_Dbg( p_input, "found audio header of type: %.4s",
+                                 (char *)&p_stream->i_fourcc );
+                        msg_Dbg( p_input, "audio:0x%4.4x channels:%d %dHz "
+                                 "%dbits/sample %dkb/s",
+                                 p_stream->p_wf->wFormatTag,
+                                 p_stream->p_wf->nChannels,
+                                 p_stream->p_wf->nSamplesPerSec,
+                                 p_stream->p_wf->wBitsPerSample,
+                                 p_stream->p_wf->nAvgBytesPerSec * 8 / 1024 );
+                    }
+                    else
+                    {
+                        msg_Dbg( p_input, "stream %d has an old header "
+                            "but is of an unknown type", p_ogg->i_streams-1 );
+                        free( p_stream );
+                        p_ogg->i_streams--;
+                    }
                 }
                 else if( (*oggpacket.packet & PACKET_TYPE_BITS )
                          == PACKET_TYPE_HEADER && 
