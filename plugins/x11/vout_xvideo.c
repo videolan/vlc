@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.32 2001/11/28 15:08:06 massiot Exp $
+ * $Id: vout_xvideo.c,v 1.33 2001/12/03 13:58:59 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -1295,7 +1295,7 @@ static void XVideoDisplay( vout_thread_t *p_vout )
     int         i_dest_width, i_dest_height;
     int         i_dest_x, i_dest_y;
 
-    if( !p_vout->p_sys->p_xvimage )
+    if( !p_vout->p_sys->p_xvimage || !p_vout->p_rendered_pic )
     {
         return;
     }

@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.30 2001/11/29 10:20:56 massiot Exp $
+ * $Id: threads.h,v 1.31 2001/12/03 13:58:59 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -681,8 +681,8 @@ static __inline__ int _vlc_cond_wait( char * psz_file, int i_line,
 
         if( (i_result = pthread_cond_timedwait( p_condvar, p_mutex, &timeout )) )
         {
-            intf_ErrMsg( "thread %d warning: Possible deadlock detected in cond_wait at %s:%d (%s)",
-                         pthread_self(), psz_file, i_line, strerror(i_result) );
+            intf_WarnMsg( 1, "thread %d warning: Possible deadlock detected in cond_wait at %s:%d (%s)",
+                          pthread_self(), psz_file, i_line, strerror(i_result) );
         }
         else
         {
