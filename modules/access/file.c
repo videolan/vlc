@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.15 2003/03/30 18:14:35 gbazin Exp $
+ * $Id: file.c,v 1.16 2003/04/02 15:20:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -101,7 +101,7 @@ static int Open( vlc_object_t *p_this )
     char *              psz_name = p_input->psz_name;
 #ifdef HAVE_SYS_STAT_H
     int                 i_stat;
-    struct stat         stat_info;                                              
+    struct stat         stat_info;
 #endif
     _input_socket_t *   p_access_data;
     vlc_bool_t          b_stdin;
@@ -280,6 +280,45 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         i_ret = -1;
     }
 #else
+#   ifndef WIN32
+    if ( !p_input->stream.b_pace_control )
+    {
+        /* Find if some data is available. This won't work under Windows. */
+        struct timeval  timeout;
+        fd_set          fds;
+
+        /* Initialize file descriptor set */
+        FD_ZERO( &fds );
+        FD_SET( p_access_data->_socket.i_handle, &fds );
+
+        /* We'll wait 0.5 second if nothing happens */
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 500000;
+
+        /* Find if some data is available */
+        while( (i_ret = select( p_access_data->_socket.i_handle + 1, &fds,
+                                NULL, NULL, &timeout )) == 0
+                || (i_ret < 0 && errno == EINTR) )
+        {
+            FD_ZERO( &fds );
+            FD_SET( p_access_data->_socket.i_handle, &fds );
+            timeout.tv_sec = 0;
+            timeout.tv_usec = 500000;
+
+            if( p_input->b_die || p_input->b_error )
+            {
+                return 0;
+            }
+        }
+
+        if( i_ret < 0 )
+        {
+            msg_Err( p_input, "network select error (%s)", strerror(errno) );
+            return -1;
+        }
+    }
+#   endif
+
     i_ret = read( p_access_data->_socket.i_handle, p_buffer, i_len );
 #endif
 
