@@ -1,9 +1,10 @@
 /*****************************************************************************
- * spu_decoder.h : sub picture unit decoder thread interface
+ * audio_decoder_thread.h : audio decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
  * Authors:
+ * Michel Kaempf <maxx@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,50 +22,40 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * spudec_thread_t : sub picture unit decoder thread descriptor
+ * adec_thread_t : audio decoder thread descriptor
  *****************************************************************************/
-typedef struct spudec_thread_s
+typedef struct adec_thread_s
 {
     /*
-     * Thread properties and locks
+     * Thread properties
      */
-    boolean_t           b_die;                                 /* `die' flag */
-    boolean_t           b_run;                                 /* `run' flag */
-    boolean_t           b_active;                           /* `active' flag */
-    boolean_t           b_error;                             /* `error' flag */
     vlc_thread_t        thread_id;                /* id for thread functions */
+    boolean_t           b_die;                                 /* `die' flag */
+    boolean_t           b_error;                             /* `error' flag */
 
     /*
      * Input properties
      */
-    decoder_fifo_t      fifo;                  /* stores the PES stream data */
-    /* The bit stream structure handles the PES stream at the bit level */
-    bit_stream_t        bit_stream;
+    decoder_fifo_t *    p_fifo;                /* stores the PES stream data */
+    data_packet_t *     p_data;
+    int                 align;
+    adec_config_t *     p_config;
+
 
     /*
      * Decoder properties
      */
-    unsigned int        total_bits_read;
-    /* ... */
-    vout_thread_t *     p_vout;          /* needed to create the spu objects */
+    audiodec_t		audio_decoder;
 
-} spudec_thread_t;
+    /*
+     * Output properties
+     */
+    aout_fifo_t *       p_aout_fifo; /* stores the decompressed audio frames */
+    aout_thread_t *     p_aout;           /* needed to create the audio fifo */
 
-/*****************************************************************************
- * SPU commands
- *****************************************************************************/
-#define SPU_CMD_FORCE_DISPLAY       0x00
-#define SPU_CMD_START_DISPLAY       0x01
-#define SPU_CMD_STOP_DISPLAY        0x02
-#define SPU_CMD_SET_PALETTE         0x03
-#define SPU_CMD_SET_ALPHACHANNEL    0x04
-#define SPU_CMD_SET_COORDINATES     0x05
-#define SPU_CMD_SET_OFFSETS         0x06
-#define SPU_CMD_END                 0xff
+} adec_thread_t;
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-spudec_thread_t *       spudec_CreateThread( input_thread_t * p_input );
-void                    spudec_DestroyThread( spudec_thread_t * p_spudec );
-
+vlc_thread_t adec_CreateThread       ( adec_config_t * p_config );

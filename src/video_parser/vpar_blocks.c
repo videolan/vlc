@@ -40,9 +40,9 @@
 #include "intf_msg.h"
 #include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
-#include "input.h"
-#include "input_netlist.h"
-#include "decoder_fifo.h"
+#include "stream_control.h"
+#include "input_ext-dec.h"
+
 #include "video.h"
 #include "video_output.h"
 
@@ -652,7 +652,7 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
     i_coef = 0;
     b_sign = 0;
 
-    for( i_parse = 0; !p_vpar->b_die; i_parse++ )
+    for( i_parse = 0; !p_vpar->p_fifo->b_die; i_parse++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         if( i_code >= 16384 )
@@ -810,7 +810,7 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
     i_coef = 0;
     b_sign = 0;
 
-    for( i_parse = 1; !p_vpar->b_die/*i_parse < 64*/; i_parse++ )
+    for( i_parse = 1; !p_vpar->p_fifo->b_die/*i_parse < 64*/; i_parse++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         /* We use 2 main tables for the coefficients */
@@ -932,7 +932,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
 
     i_nc = 0;
     i_coef = 0;
-    for( i_parse = 0; !p_vpar->b_die; i_parse++ )
+    for( i_parse = 0; !p_vpar->p_fifo->b_die; i_parse++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         if( i_code >= 16384 )
@@ -1078,7 +1078,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
 
     i_coef = 0;
     b_vlc_intra = p_vpar->picture.b_intra_vlc_format;
-    for( i_parse = 1; !p_vpar->b_die/*i_parse < 64*/; i_parse++ )
+    for( i_parse = 1; !p_vpar->p_fifo->b_die/*i_parse < 64*/; i_parse++ )
     {
         i_code = ShowBits( &p_vpar->bit_stream, 16 );
         /* We use 2 main tables for the coefficients */
@@ -2283,8 +2283,9 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
             return;
         }
     }
-    while( ShowBits( &p_vpar->bit_stream, 23 ) && !p_vpar->b_die );
-    NextStartCode( p_vpar );
+    while( ShowBits( &p_vpar->bit_stream, 23 )
+            && !p_vpar->p_fifo->b_die );
+    NextStartCode( &p_vpar->bit_stream );
 }
 
 /*****************************************************************************
@@ -2295,13 +2296,13 @@ void vpar_PictureData( vpar_thread_t * p_vpar, int i_mb_base )
     int         i_mb_address = 0;
     u32         i_dummy;
 
-    NextStartCode( p_vpar );
+    NextStartCode( &p_vpar->bit_stream );
     while( ((p_vpar->picture.i_coding_type != I_CODING_TYPE
                     && p_vpar->picture.i_coding_type != D_CODING_TYPE)
              || !p_vpar->picture.b_error)
            && i_mb_address < (p_vpar->sequence.i_mb_size
                     >> (p_vpar->picture.i_structure != FRAME_STRUCTURE))
-           && !p_vpar->b_die )
+           && !p_vpar->p_fifo->b_die )
     {
         if( ((i_dummy = ShowBits( &p_vpar->bit_stream, 32 ))
                  < SLICE_START_CODE_MIN) ||

@@ -239,7 +239,7 @@
 
 /* Duration between the time we receive the TS packet, and the time we will
  * mark it to be presented */
-#define INPUT_PTS_DELAY                 (.5*CLOCK_FREQ)
+#define DEFAULT_PTS_DELAY               (.5*CLOCK_FREQ)
 
 #define INPUT_DVD_AUDIO_VAR             "vlc_dvd_audio"
 #define INPUT_DVD_CHANNEL_VAR           "vlc_dvd_channel"

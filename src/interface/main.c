@@ -42,8 +42,8 @@
 #include "tests.h"                                              /* TestMMX() */
 #include "plugins.h"
 #include "playlist.h"
-#include "input_vlan.h"
-#include "input_ps.h"
+#include "stream_control.h"
+#include "input_ext-intf.h"
 
 #include "intf_msg.h"
 #include "interface.h"
@@ -241,6 +241,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Initialize shared resources and libraries
      */
+    /* FIXME: no VLANs */
+#if 0
     if( p_main->b_vlans && input_VlanCreate() )
     {
         /* On error during vlans initialization, switch off vlans */
@@ -248,6 +250,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
                   "vlans management is deactivated\n" );
         p_main->b_vlans = 0;
     }
+#endif
 
     /*
      * Open audio device and start aout thread
@@ -290,10 +293,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Free shared resources and libraries
      */
+    /* FIXME */
+#if 0
     if( p_main->b_vlans )
     {
         input_VlanDestroy();
     }
+#endif
 
     /*
      * Free plugin bank
@@ -519,6 +525,8 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( YUV_METHOD_VAR, optarg );
             break;
 
+            /* FIXME */
+#if 0
         /* DVD options */
         case 'a':
             if ( ! strcmp(optarg, "mpeg") )
@@ -530,6 +538,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             else
                 main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_AC3 );
             break;
+#endif
         case 'c':
             main_PutIntVariable( INPUT_DVD_CHANNEL_VAR, atoi(optarg) );
             break;

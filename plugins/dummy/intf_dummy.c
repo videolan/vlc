@@ -26,8 +26,6 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <sys/types.h>                        /* on BSD, uio.h needs types.h */
-#include <sys/uio.h>                                            /* "input.h" */
 
 #include "config.h"
 #include "common.h"
@@ -35,7 +33,9 @@
 #include "mtime.h"
 #include "plugins.h"
 
-#include "input.h"
+#include "stream_control.h"
+#include "input_ext-intf.h"
+
 #include "video.h"
 #include "video_output.h"
 

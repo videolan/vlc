@@ -95,10 +95,10 @@ typedef struct vpar_thread_s
 
 
     /* Input properties */
-    decoder_fifo_t      fifo;                              /* PES input fifo */
-
-    /* The bit stream structure handles the PES stream at the bit level */
+    decoder_fifo_t *    p_fifo;                            /* PES input fifo */
     bit_stream_t        bit_stream;
+    vdec_config_t *     p_config;
+
 
     /* Output properties */
     vout_thread_t *     p_vout;                       /* video output thread */
@@ -151,28 +151,20 @@ typedef struct vpar_thread_s
  *****************************************************************************/
 
 /* Thread management functions */
-vpar_thread_t * vpar_CreateThread       ( /* video_cfg_t *p_cfg, */ input_thread_t *p_input /*,
-                                          vout_thread_t *p_vout, int *pi_status */ );
-void            vpar_DestroyThread      ( vpar_thread_t *p_vpar /*, int *pi_status */ );
-
-/* Time management functions */
-/* XXX?? */
-
-/* Dynamic thread settings */
-/* XXX?? */
-
+vlc_thread_t vpar_CreateThread       ( vdec_config_t * );
 
 /*****************************************************************************
  * NextStartCode : Find the next start code
  *****************************************************************************/
-static __inline__ void NextStartCode( vpar_thread_t * p_vpar )
+static __inline__ void NextStartCode( bit_stream_t * p_bit_stream )
 {
     /* Re-align the buffer on an 8-bit boundary */
-    RealignBits( &p_vpar->bit_stream );
+    RealignBits( p_bit_stream );
 
-    while( ShowBits( &p_vpar->bit_stream, 24 ) != 0x01L && !p_vpar->b_die )
+    while( ShowBits( p_bit_stream, 24 ) != 0x01L
+            && !p_bit_stream->p_decoder_fifo->b_die )
     {
-        RemoveBits( &p_vpar->bit_stream, 8 );
+        RemoveBits( p_bit_stream, 8 );
     }
 }
 

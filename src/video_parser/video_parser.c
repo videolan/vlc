@@ -44,9 +44,9 @@
 #include "intf_msg.h"
 #include "debug.h"                 /* XXX?? temporaire, requis par netlist.h */
 
-#include "input.h"
-#include "input_netlist.h"
-#include "decoder_fifo.h"
+#include "stream_control.h"
+#include "input_ext-dec.h"
+
 #include "video.h"
 #include "video_output.h"
 
@@ -63,7 +63,6 @@
 /*
  * Local prototypes
  */
-//static int      CheckConfiguration  ( video_cfg_t *p_cfg );
 static int      InitThread          ( vpar_thread_t *p_vpar );
 static void     RunThread           ( vpar_thread_t *p_vpar );
 static void     ErrorThread         ( vpar_thread_t *p_vpar );
@@ -77,12 +76,7 @@ static void     EndThread           ( vpar_thread_t *p_vpar );
  * Following configuration properties are used:
  * XXX??
  *****************************************************************************/
-#include "main.h"
-#include "interface.h"
-extern main_t *     p_main;
-
-vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_input /*,
-                                   vout_thread_t *p_vout, int *pi_status */ )
+vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
 {
     vpar_thread_t *     p_vpar;
 
@@ -93,7 +87,7 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     {
         intf_ErrMsg( "vpar error: not enough memory "
                      "for vpar_CreateThread() to create the new thread\n");
-        return( NULL );
+        return( 0 );
     }
 
     /*
@@ -101,24 +95,10 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
      */
     p_vpar->b_die = 0;
     p_vpar->b_error = 0;
+    p_vpar->p_fifo = p_config->decoder_config.p_decoder_fifo;
+    p_vpar->p_config = p_config;
 
-    /*
-     * Initialize the input properties
-     */
-    /* Initialize the decoder fifo's data lock and conditional variable
-     * and set its buffer as empty */
-    vlc_mutex_init( &p_vpar->fifo.data_lock );
-    vlc_cond_init( &p_vpar->fifo.data_wait );
-    p_vpar->fifo.i_start = 0;
-    p_vpar->fifo.i_end = 0;
-    /* Initialize the bit stream structure */
-    p_vpar->bit_stream.p_input = p_input;
-    p_vpar->bit_stream.p_decoder_fifo = &p_vpar->fifo;
-    p_vpar->bit_stream.fifo.buffer = 0;
-    p_vpar->bit_stream.fifo.i_available = 0;
-
-    /* FIXME !!!!?? */
-    p_vpar->p_vout = p_main->p_intf->p_vout;
+    p_vpar->p_vout = p_config->p_vout;
 
     /* Spawn the video parser thread */
     if ( vlc_thread_create( &p_vpar->thread_id, "video parser",
@@ -126,53 +106,14 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     {
         intf_ErrMsg("vpar error: can't spawn video parser thread\n");
         free( p_vpar );
-        return( NULL );
+        return( 0 );
     }
 
     intf_DbgMsg("vpar debug: video parser thread (%p) created\n", p_vpar);
-    return( p_vpar );
-}
-
-/*****************************************************************************
- * vpar_DestroyThread: destroy a generic parser thread
- *****************************************************************************
- * Destroy a terminated thread. This function will return 0 if the thread could
- * be destroyed, and non 0 else. The last case probably means that the thread
- * was still active, and another try may succeed.
- *****************************************************************************/
-void vpar_DestroyThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
-{
-    intf_DbgMsg( "vpar debug: requesting termination of "
-                 "video parser thread %p\n", p_vpar);
-
-    /* Ask thread to kill itself */
-    p_vpar->b_die = 1;
-    /* Make sure the parser thread leaves the GetByte() function */
-    vlc_mutex_lock( &(p_vpar->fifo.data_lock) );
-    vlc_cond_signal( &(p_vpar->fifo.data_wait) );
-    vlc_mutex_unlock( &(p_vpar->fifo.data_lock) );
-
-    /* Waiting for the parser thread to exit */
-    /* Remove this as soon as the "status" flag is implemented */
-    vlc_thread_join( p_vpar->thread_id );
+    return( p_vpar->thread_id );
 }
 
 /* following functions are local */
-
-/*****************************************************************************
- * CheckConfiguration: check vpar_CreateThread() configuration
- *****************************************************************************
- * Set default parameters where required. In DEBUG mode, check if configuration
- * is valid.
- *****************************************************************************/
-#if 0
-static int CheckConfiguration( video_cfg_t *p_cfg )
-{
-    /* XXX?? */
-
-    return( 0 );
-}
-#endif
 
 /*****************************************************************************
  * InitThread: initialize vpar output thread
@@ -189,24 +130,8 @@ static int InitThread( vpar_thread_t *p_vpar )
 
     intf_DbgMsg("vpar debug: initializing video parser thread %p\n", p_vpar);
 
-    /* Our first job is to initialize the bit stream structure with the
-     * beginning of the input stream */
-    vlc_mutex_lock( &p_vpar->fifo.data_lock );
-    while ( DECODER_FIFO_ISEMPTY(p_vpar->fifo) )
-    {
-        if ( p_vpar->b_die )
-        {
-            vlc_mutex_unlock( &p_vpar->fifo.data_lock );
-            return( 1 );
-        }
-        vlc_cond_wait( &p_vpar->fifo.data_wait, &p_vpar->fifo.data_lock );
-    }
-    p_vpar->bit_stream.p_ts = DECODER_FIFO_START( p_vpar->fifo )->p_first_ts;
-    p_vpar->bit_stream.p_byte = p_vpar->bit_stream.p_ts->buffer
-                                + p_vpar->bit_stream.p_ts->i_payload_start;
-    p_vpar->bit_stream.p_end = p_vpar->bit_stream.p_ts->buffer
-                               + p_vpar->bit_stream.p_ts->i_payload_end;
-    vlc_mutex_unlock( &p_vpar->fifo.data_lock );
+    p_vpar->p_config->decoder_config.pf_init_bit_stream( &p_vpar->bit_stream,
+        p_vpar->p_config->decoder_config.p_decoder_fifo );
 
     /* Initialize parsing data */
     p_vpar->sequence.p_forward = NULL;
@@ -310,12 +235,12 @@ static void RunThread( vpar_thread_t *p_vpar )
      * Main loop - it is not executed if an error occured during
      * initialization
      */
-    while( (!p_vpar->b_die) && (!p_vpar->b_error) )
+    while( (!p_vpar->p_fifo->b_die) && (!p_vpar->b_error) )
     {
         /* Find the next sequence header in the stream */
         p_vpar->b_error = vpar_NextSequenceHeader( p_vpar );
 
-        while( (!p_vpar->b_die) && (!p_vpar->b_error) )
+        while( (!p_vpar->p_fifo->b_die) && (!p_vpar->b_error) )
         {
 #ifdef STATS
             p_vpar->c_loops++;
@@ -354,25 +279,25 @@ static void ErrorThread( vpar_thread_t *p_vpar )
 {
     /* We take the lock, because we are going to read/write the start/end
      * indexes of the decoder fifo */
-    vlc_mutex_lock( &p_vpar->fifo.data_lock );
+    vlc_mutex_lock( &p_vpar->p_fifo->data_lock );
 
     /* Wait until a `die' order is sent */
-    while( !p_vpar->b_die )
+    while( !p_vpar->p_fifo->b_die )
     {
         /* Trash all received PES packets */
-        while( !DECODER_FIFO_ISEMPTY(p_vpar->fifo) )
+        while( !DECODER_FIFO_ISEMPTY(*p_vpar->p_fifo) )
         {
-            input_NetlistFreePES( p_vpar->bit_stream.p_input,
-                                  DECODER_FIFO_START(p_vpar->fifo) );
-            DECODER_FIFO_INCSTART( p_vpar->fifo );
+            p_vpar->p_fifo->pf_delete_pes( p_vpar->p_fifo->p_packets_mgt,
+                                  DECODER_FIFO_START(*p_vpar->p_fifo) );
+            DECODER_FIFO_INCSTART( *p_vpar->p_fifo );
         }
 
         /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait( &p_vpar->fifo.data_wait, &p_vpar->fifo.data_lock );
+        vlc_cond_wait( &p_vpar->p_fifo->data_wait, &p_vpar->p_fifo->data_lock );
     }
 
     /* We can release the lock before leaving */
-    vlc_mutex_unlock( &p_vpar->fifo.data_lock );
+    vlc_mutex_unlock( &p_vpar->p_fifo->data_lock );
 }
 
 /*****************************************************************************

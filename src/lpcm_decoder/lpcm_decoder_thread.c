@@ -41,9 +41,8 @@
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
-#include "input.h"                                           /* pes_packet_t */
-#include "input_netlist.h"                         /* input_NetlistFreePES() */
-#include "decoder_fifo.h"         /* DECODER_FIFO_(ISEMPTY|START|INCSTART)() */
+#include "stream_control.h"
+#include "input_ext-dec.h"
 
 #include "audio_output.h"
 
@@ -63,7 +62,7 @@ static void     EndThread               (lpcmdec_thread_t * p_adec);
 /*****************************************************************************
  * lpcmdec_CreateThread: creates an lpcm decoder thread
  *****************************************************************************/
-lpcmdec_thread_t * lpcmdec_CreateThread (input_thread_t * p_input)
+vlc_thread_t lpcmdec_CreateThread (adec_config_t * p_config)
 {
     lpcmdec_thread_t *   p_lpcmdec;
     intf_DbgMsg ( "LPCM Debug: creating lpcm decoder thread\n" );
@@ -71,7 +70,7 @@ lpcmdec_thread_t * lpcmdec_CreateThread (input_thread_t * p_input)
     /* Allocate the memory needed to store the thread's structure */
     if ((p_lpcmdec = (lpcmdec_thread_t *)malloc (sizeof(lpcmdec_thread_t))) == NULL) {
         intf_ErrMsg ( "LPCM Error: not enough memory for lpcmdec_CreateThread() to create the new thread\n" );
-        return NULL;
+        return 0;
     }
 
     /*
@@ -79,58 +78,28 @@ lpcmdec_thread_t * lpcmdec_CreateThread (input_thread_t * p_input)
      */
     p_lpcmdec->b_die = 0;
     p_lpcmdec->b_error = 0;
+    p_lpcmdec->p_config = p_config;
+    p_lpcmdec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
-    /*
-     * Initialize the input properties
-     */
-    /* Initialize the decoder fifo's data lock and conditional variable and set
-     * its buffer as empty */
-    vlc_mutex_init (&p_lpcmdec->fifo.data_lock);
-    vlc_cond_init (&p_lpcmdec->fifo.data_wait);
-    p_lpcmdec->fifo.i_start = 0;
-    p_lpcmdec->fifo.i_end = 0;
 
     /* Initialize the lpcm decoder structures */
     lpcm_init (&p_lpcmdec->lpcm_decoder);
 
-    /* Initialize the bit stream structure */
-    p_lpcmdec->p_input = p_input;
-
     /*
      * Initialize the output properties
      */
-    p_lpcmdec->p_aout = p_input->p_aout;
+    p_lpcmdec->p_aout = p_config->p_aout;
     p_lpcmdec->p_aout_fifo = NULL;
 
     /* Spawn the lpcm decoder thread */
     if (vlc_thread_create(&p_lpcmdec->thread_id, "lpcm decoder", (vlc_thread_func_t)RunThread, (void *)p_lpcmdec)) {
         intf_ErrMsg  ( "LPCM Error: can't spawn lpcm decoder thread\n" );
         free (p_lpcmdec);
-        return NULL;
+        return 0;
     }
 
     intf_DbgMsg ( "LPCM Debug: lpcm decoder thread (%p) created\n", p_lpcmdec );
-    return p_lpcmdec;
-}
-
-/*****************************************************************************
- * lpcmdec_DestroyThread: destroys an lpcm decoder thread
- *****************************************************************************/
-void lpcmdec_DestroyThread (lpcmdec_thread_t * p_lpcmdec)
-{
-    intf_DbgMsg ( "LPCM Debug: requesting termination of lpcm decoder thread %p\n", p_lpcmdec );
-
-    /* Ask thread to kill itself */
-    p_lpcmdec->b_die = 1;
-
-    /* Make sure the decoder thread leaves the GetByte() function */
-    vlc_mutex_lock (&(p_lpcmdec->fifo.data_lock));
-    vlc_cond_signal (&(p_lpcmdec->fifo.data_wait));
-    vlc_mutex_unlock (&(p_lpcmdec->fifo.data_lock));
-
-    /* Waiting for the decoder thread to exit */
-    /* Remove this as soon as the "status" flag is implemented */
-    vlc_thread_join (p_lpcmdec->thread_id);
+    return p_lpcmdec->thread_id;
 }
 
 /* Following functions are local */
@@ -147,22 +116,20 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
 
     /* Our first job is to initialize the bit stream structure with the
      * beginning of the input stream */
-    vlc_mutex_lock (&p_lpcmdec->fifo.data_lock);
-    while (DECODER_FIFO_ISEMPTY(p_lpcmdec->fifo)) {
+    vlc_mutex_lock (&p_lpcmdec->p_fifo->data_lock);
+    while (DECODER_FIFO_ISEMPTY(*p_lpcmdec->p_fifo)) {
         if (p_lpcmdec->b_die) {
-            vlc_mutex_unlock (&p_lpcmdec->fifo.data_lock);
+            vlc_mutex_unlock (&p_lpcmdec->p_fifo->data_lock);
             return -1;
         }
-        vlc_cond_wait (&p_lpcmdec->fifo.data_wait, &p_lpcmdec->fifo.data_lock);
+        vlc_cond_wait (&p_lpcmdec->p_fifo->data_wait, &p_lpcmdec->p_fifo->data_lock);
     }
-    p_lpcmdec->p_ts = DECODER_FIFO_START (p_lpcmdec->fifo)->p_first_ts;
+    p_lpcmdec->p_data = DECODER_FIFO_START (*p_lpcmdec->p_fifo)->p_first;
     byte_stream = lpcm_byte_stream (&p_lpcmdec->lpcm_decoder);
-    byte_stream->p_byte =
-	p_lpcmdec->p_ts->buffer + p_lpcmdec->p_ts->i_payload_start;
-    byte_stream->p_end =
-	p_lpcmdec->p_ts->buffer + p_lpcmdec->p_ts->i_payload_end;
+    byte_stream->p_byte = p_lpcmdec->p_data->p_payload_start;
+    byte_stream->p_end = p_lpcmdec->p_data->p_payload_end;
     byte_stream->info = p_lpcmdec;
-    vlc_mutex_unlock (&p_lpcmdec->fifo.data_lock);
+    vlc_mutex_unlock (&p_lpcmdec->p_fifo->data_lock);
 
     aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
     aout_fifo.i_channels = 2;
@@ -188,7 +155,8 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
 
     intf_DbgMsg( "LPCM Debug: running lpcm decoder thread (%p) (pid== %i)\n", p_lpcmdec, getpid() );
 
-    msleep (INPUT_PTS_DELAY);
+    /* Fucking holy piece of shit ! */
+    //msleep (INPUT_PTS_DELAY);
 
     /* Initializing the lpcm decoder thread */
     if (InitThread (p_lpcmdec)) 
@@ -212,10 +180,10 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
             /* have to find a synchro point */
         }
     
-        if (DECODER_FIFO_START(p_lpcmdec->fifo)->b_has_pts)
+        if (DECODER_FIFO_START(*p_lpcmdec->p_fifo)->b_has_pts)
         {
-	        p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_lpcmdec->fifo)->i_pts;
-	        DECODER_FIFO_START(p_lpcmdec->fifo)->b_has_pts = 0;
+	        p_lpcmdec->p_aout_fifo->date[p_lpcmdec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(*p_lpcmdec->p_fifo)->i_pts;
+	        DECODER_FIFO_START(*p_lpcmdec->p_fifo)->b_has_pts = 0;
         }
         else
         {
@@ -258,22 +226,23 @@ static void ErrorThread (lpcmdec_thread_t * p_lpcmdec)
 {
     /* We take the lock, because we are going to read/write the start/end
      * indexes of the decoder fifo */
-    vlc_mutex_lock (&p_lpcmdec->fifo.data_lock);
+    vlc_mutex_lock (&p_lpcmdec->p_fifo->data_lock);
 
     /* Wait until a `die' order is sent */
     while (!p_lpcmdec->b_die) {
         /* Trash all received PES packets */
-        while (!DECODER_FIFO_ISEMPTY(p_lpcmdec->fifo)) {
-            input_NetlistFreePES (p_lpcmdec->p_input, DECODER_FIFO_START(p_lpcmdec->fifo));
-            DECODER_FIFO_INCSTART (p_lpcmdec->fifo);
+        while (!DECODER_FIFO_ISEMPTY(*p_lpcmdec->p_fifo)) {
+            p_lpcmdec->p_fifo->pf_delete_pes(p_lpcmdec->p_fifo->p_packets_mgt,
+                    DECODER_FIFO_START(*p_lpcmdec->p_fifo));
+            DECODER_FIFO_INCSTART (*p_lpcmdec->p_fifo);
         }
 
         /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait (&p_lpcmdec->fifo.data_wait, &p_lpcmdec->fifo.data_lock);
+        vlc_cond_wait (&p_lpcmdec->p_fifo->data_wait, &p_lpcmdec->p_fifo->data_lock);
     }
 
     /* We can release the lock before leaving */
-    vlc_mutex_unlock (&p_lpcmdec->fifo.data_lock);
+    vlc_mutex_unlock (&p_lpcmdec->p_fifo->data_lock);
 }
 
 /*****************************************************************************

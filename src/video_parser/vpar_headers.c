@@ -38,8 +38,9 @@
 
 #include "intf_msg.h"
 
-#include "input.h"
-#include "decoder_fifo.h"
+#include "stream_control.h"
+#include "input_ext-dec.h"
+
 #include "video.h"
 #include "video_output.h"
 
@@ -56,7 +57,7 @@
 /*
  * Local prototypes
  */
-static __inline__ void NextStartCode( vpar_thread_t * p_vpar );
+static __inline__ void NextStartCode( bit_stream_t * );
 static void SequenceHeader( vpar_thread_t * p_vpar );
 static void GroupHeader( vpar_thread_t * p_vpar );
 static void PictureHeader( vpar_thread_t * p_vpar );
@@ -264,9 +265,9 @@ static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
  *****************************************************************************/
 int vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
 {
-    while( !p_vpar->b_die )
+    while( !p_vpar->p_fifo->b_die )
     {
-        NextStartCode( p_vpar );
+        NextStartCode( &p_vpar->bit_stream );
         if( ShowBits( &p_vpar->bit_stream, 32 ) == SEQUENCE_HEADER_CODE )
         {
             return 0;
@@ -281,9 +282,9 @@ int vpar_NextSequenceHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 int vpar_ParseHeader( vpar_thread_t * p_vpar )
 {
-    while( !p_vpar->b_die )
+    while( !p_vpar->p_fifo->b_die )
     {
-        NextStartCode( p_vpar );
+        NextStartCode( &p_vpar->bit_stream );
         switch( GetBits32( &p_vpar->bit_stream ) )
         {
         case SEQUENCE_HEADER_CODE:
@@ -389,7 +390,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     /*
      * Sequence Extension
      */
-    NextStartCode( p_vpar );
+    NextStartCode( &p_vpar->bit_stream );
     if( ShowBits( &p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
     {
         int                         i_dummy;
@@ -520,7 +521,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     /*
      * Picture Coding Extension
      */
-    NextStartCode( p_vpar );
+    NextStartCode( &p_vpar->bit_stream );
     if( ShowBits( &p_vpar->bit_stream, 32 ) == EXTENSION_START_CODE )
     {
         /* Parse picture_coding_extension */
@@ -673,7 +674,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
              == NULL )
         {
             intf_DbgMsg("vpar debug: allocation error in vout_CreatePicture, delaying\n");
-            if( p_vpar->b_die || p_vpar->b_error )
+            if( p_vpar->p_fifo->b_die || p_vpar->b_error )
             {
                 return;
             }
@@ -736,7 +737,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
     vpar_PictureData( p_vpar, i_mb_base );
 
-    if( p_vpar->b_die || p_vpar->b_error )
+    if( p_vpar->p_fifo->b_die || p_vpar->b_error )
     {
         return;
     }
@@ -797,9 +798,9 @@ static void PictureHeader( vpar_thread_t * p_vpar )
  *****************************************************************************/
 static void ExtensionAndUserData( vpar_thread_t * p_vpar )
 {
-    while( !p_vpar->b_die )
+    while( !p_vpar->p_fifo->b_die )
     {
-        NextStartCode( p_vpar );
+        NextStartCode( &p_vpar->bit_stream );
         switch( ShowBits( &p_vpar->bit_stream, 32 ) )
         {
         case EXTENSION_START_CODE:

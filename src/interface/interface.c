@@ -40,7 +40,8 @@
 #include "mtime.h"
 #include "plugins.h"
 #include "playlist.h"
-#include "input.h"
+#include "stream_control.h"
+#include "input_ext-intf.h"
 
 #include "audio_output.h"
 
@@ -176,18 +177,43 @@ intf_thread_t* intf_Create( void )
 void intf_Run( intf_thread_t *p_intf )
 {
     char * psz_server = main_GetPszVariable( INPUT_SERVER_VAR, NULL );
+    input_config_t *    p_input_config;
 
     /* If a server was specified */
     if( psz_server )
     {
-        p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_UCAST,
-                              psz_server, 0, 0,
-                              p_intf->p_vout, p_main->p_aout, NULL );
+        if( (p_input_config =
+              (input_config_t *)malloc( sizeof(input_config_t) )) == NULL )
+        {
+            intf_ErrMsg("Out of memory");
+        }
+        else
+        {
+            p_input_config->i_method = INPUT_METHOD_UCAST;
+            p_input_config->p_source = psz_server;
+            p_input_config->p_default_aout = p_main->p_aout;
+            p_input_config->p_default_vout = p_intf->p_vout;
+
+            p_intf->p_input = input_CreateThread( p_input_config, NULL );
+        }
     }
     /* Or if a file was specified */
-    else if( p_main->p_playlist->p_list )
+    else if( p_main->p_playlist->p_list != NULL )
     {
-        p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_FILE, NULL, 0, 0, p_main->p_intf->p_vout, p_main->p_aout, NULL );
+        if( (p_input_config =
+              (input_config_t *)malloc( sizeof(input_config_t) )) == NULL )
+        {
+            intf_ErrMsg("Out of memory");
+        }
+        else
+        {
+            p_input_config->i_method = INPUT_METHOD_FILE;
+            p_input_config->p_source = p_main->p_playlist->p_list[0]; /* FIXME ??? */
+            p_input_config->p_default_aout = p_main->p_aout;
+            p_input_config->p_default_vout = p_intf->p_vout;
+
+            p_intf->p_input = input_CreateThread( p_input_config, NULL );
+        }
     }
     /* Execute the initialization script - if a positive number is returned,
      * the script could be executed but failed */
@@ -262,6 +288,8 @@ void intf_Destroy( intf_thread_t *p_intf )
  *****************************************************************************/
 int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
 {
+    /* FIXME */
+#if 0
     intf_channel_t *    p_channel;                                /* channel */
 
     /* Look for channel in array */
@@ -294,6 +322,7 @@ int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
 
     /* Channel does not exist */
     intf_Msg("Channel %d does not exist\n", i_channel );
+#endif
     return( 1 );
 }
 

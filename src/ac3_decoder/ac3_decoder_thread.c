@@ -50,9 +50,8 @@
 
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 
-#include "input.h"                                           /* pes_packet_t */
-#include "input_netlist.h"                         /* input_NetlistFreePES() */
-#include "decoder_fifo.h"         /* DECODER_FIFO_(ISEMPTY|START|INCSTART)() */
+#include "stream_control.h"
+#include "input_ext-dec.h"
 
 #include "audio_output.h"
 
@@ -72,7 +71,7 @@ static void     EndThread               (ac3dec_thread_t * p_adec);
 /*****************************************************************************
  * ac3dec_CreateThread: creates an ac3 decoder thread
  *****************************************************************************/
-ac3dec_thread_t * ac3dec_CreateThread (input_thread_t * p_input)
+vlc_thread_t ac3dec_CreateThread( adec_config_t * p_config )
 {
     ac3dec_thread_t *   p_ac3dec;
 
@@ -83,7 +82,7 @@ ac3dec_thread_t * ac3dec_CreateThread (input_thread_t * p_input)
     {
         intf_ErrMsg ( "ac3dec error: not enough memory "
                       "for ac3dec_CreateThread() to create the new thread\n");
-        return NULL;
+        return 0;
     }
 
     /*
@@ -91,27 +90,16 @@ ac3dec_thread_t * ac3dec_CreateThread (input_thread_t * p_input)
      */
     p_ac3dec->b_die = 0;
     p_ac3dec->b_error = 0;
-
-    /*
-     * Initialize the input properties
-     */
-    /* Initialize the decoder fifo's data lock and conditional variable and set
-     * its buffer as empty */
-    vlc_mutex_init (&p_ac3dec->fifo.data_lock);
-    vlc_cond_init (&p_ac3dec->fifo.data_wait);
-    p_ac3dec->fifo.i_start = 0;
-    p_ac3dec->fifo.i_end = 0;
+    p_ac3dec->p_config = p_config;
+    p_ac3dec->p_fifo = p_config->decoder_config.p_decoder_fifo;
 
     /* Initialize the ac3 decoder structures */
     ac3_init (&p_ac3dec->ac3_decoder);
 
-    /* Initialize the bit stream structure */
-    p_ac3dec->p_input = p_input;
-
     /*
      * Initialize the output properties
      */
-    p_ac3dec->p_aout = p_input->p_aout;
+    p_ac3dec->p_aout = p_config->p_aout;
     p_ac3dec->p_aout_fifo = NULL;
 
     /* Spawn the ac3 decoder thread */
@@ -119,31 +107,11 @@ ac3dec_thread_t * ac3dec_CreateThread (input_thread_t * p_input)
     {
         intf_ErrMsg( "ac3dec error: can't spawn ac3 decoder thread\n" );
         free (p_ac3dec);
-        return NULL;
+        return 0;
     }
 
     intf_DbgMsg ("ac3dec debug: ac3 decoder thread (%p) created\n", p_ac3dec);
-    return p_ac3dec;
-}
-
-/*****************************************************************************
- * ac3dec_DestroyThread: destroys an ac3 decoder thread
- *****************************************************************************/
-void ac3dec_DestroyThread (ac3dec_thread_t * p_ac3dec)
-{
-    intf_DbgMsg ("ac3dec debug: requesting termination of ac3 decoder thread %p\n", p_ac3dec);
-
-    /* Ask thread to kill itself */
-    p_ac3dec->b_die = 1;
-
-    /* Make sure the decoder thread leaves the GetByte() function */
-    vlc_mutex_lock (&(p_ac3dec->fifo.data_lock));
-    vlc_cond_signal (&(p_ac3dec->fifo.data_wait));
-    vlc_mutex_unlock (&(p_ac3dec->fifo.data_lock));
-
-    /* Waiting for the decoder thread to exit */
-    /* Remove this as soon as the "status" flag is implemented */
-    vlc_thread_join (p_ac3dec->thread_id);
+    return p_ac3dec->thread_id;
 }
 
 /* Following functions are local */
@@ -158,26 +126,12 @@ static int InitThread (ac3dec_thread_t * p_ac3dec)
 
     intf_DbgMsg ("ac3dec debug: initializing ac3 decoder thread %p\n", p_ac3dec);
 
-    /* Our first job is to initialize the bit stream structure with the
-     * beginning of the input stream */
-    vlc_mutex_lock (&p_ac3dec->fifo.data_lock);
-    while (DECODER_FIFO_ISEMPTY(p_ac3dec->fifo))
-    {
-        if (p_ac3dec->b_die)
-        {
-            vlc_mutex_unlock (&p_ac3dec->fifo.data_lock);
-            return -1;
-        }
-        vlc_cond_wait (&p_ac3dec->fifo.data_wait, &p_ac3dec->fifo.data_lock);
-    }
-    p_ac3dec->p_ts = DECODER_FIFO_START (p_ac3dec->fifo)->p_first_ts;
+    p_ac3dec->p_data = DECODER_FIFO_START(*p_ac3dec->p_fifo)->p_first;
     byte_stream = ac3_byte_stream (&p_ac3dec->ac3_decoder);
-    byte_stream->p_byte =
-        p_ac3dec->p_ts->buffer + p_ac3dec->p_ts->i_payload_start;
-    byte_stream->p_end =
-        p_ac3dec->p_ts->buffer + p_ac3dec->p_ts->i_payload_end;
+    byte_stream->p_byte = p_ac3dec->p_data->p_payload_start;
+    byte_stream->p_end = p_ac3dec->p_data->p_payload_end;
     byte_stream->info = p_ac3dec;
-    vlc_mutex_unlock (&p_ac3dec->fifo.data_lock);
+    vlc_mutex_unlock (&p_ac3dec->p_fifo->data_lock);
 
     aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;
     aout_fifo.i_channels = 2;
@@ -204,7 +158,8 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
 
     intf_DbgMsg ("ac3dec debug: running ac3 decoder thread (%p) (pid == %i)\n", p_ac3dec, getpid());
 
-    msleep (INPUT_PTS_DELAY);
+    /* FIXME ! Qu'est-ce que c'est que ce bordel !?!?!?!? --Meuuh */
+    //msleep (INPUT_PTS_DELAY);
 
     /* Initializing the ac3 decoder thread */
     if (InitThread (p_ac3dec)) /* XXX?? */
@@ -264,10 +219,10 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
             p_ac3dec->sync_ptr = 0;
         }
 
-        if (DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts)
+        if (DECODER_FIFO_START(*p_ac3dec->p_fifo)->b_has_pts)
         {
-            p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(p_ac3dec->fifo)->i_pts;
-            DECODER_FIFO_START(p_ac3dec->fifo)->b_has_pts = 0;
+            p_ac3dec->p_aout_fifo->date[p_ac3dec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START(*p_ac3dec->p_fifo)->i_pts;
+            DECODER_FIFO_START(*p_ac3dec->p_fifo)->b_has_pts = 0;
         }
         else
         {
@@ -315,24 +270,26 @@ static void ErrorThread (ac3dec_thread_t * p_ac3dec)
 {
     /* We take the lock, because we are going to read/write the start/end
      * indexes of the decoder fifo */
-    vlc_mutex_lock (&p_ac3dec->fifo.data_lock);
+    vlc_mutex_lock (&p_ac3dec->p_fifo->data_lock);
 
     /* Wait until a `die' order is sent */
     while (!p_ac3dec->b_die)
     {
         /* Trash all received PES packets */
-        while (!DECODER_FIFO_ISEMPTY(p_ac3dec->fifo))
+        while (!DECODER_FIFO_ISEMPTY(*p_ac3dec->p_fifo))
         {
-            input_NetlistFreePES (p_ac3dec->p_input, DECODER_FIFO_START(p_ac3dec->fifo));
-            DECODER_FIFO_INCSTART (p_ac3dec->fifo);
+            p_ac3dec->p_fifo->pf_delete_pes(p_ac3dec->p_fifo->p_packets_mgt,
+                    DECODER_FIFO_START(*p_ac3dec->p_fifo));
+            DECODER_FIFO_INCSTART (*p_ac3dec->p_fifo);
         }
 
         /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait (&p_ac3dec->fifo.data_wait, &p_ac3dec->fifo.data_lock);
+        vlc_cond_wait (&p_ac3dec->p_fifo->data_wait,
+                       &p_ac3dec->p_fifo->data_lock);
     }
 
     /* We can release the lock before leaving */
-    vlc_mutex_unlock (&p_ac3dec->fifo.data_lock);
+    vlc_mutex_unlock (&p_ac3dec->p_fifo->data_lock);
 }
 
 /*****************************************************************************
@@ -369,19 +326,19 @@ void ac3_byte_stream_next (ac3_byte_stream_t * p_byte_stream)
     {
         /* We were reading the last TS packet of this PES packet... It's
          * time to jump to the next PES packet */
-        if (p_ac3dec->p_ts->p_next_ts == NULL)
+        if (p_ac3dec->p_data->p_next == NULL)
         {
             int ptr;
 
             /* We are going to read/write the start and end indexes of the 
              * decoder fifo and to use the fifo's conditional variable, 
              * that's why we need to take the lock before */ 
-            vlc_mutex_lock (&p_ac3dec->fifo.data_lock);
+            vlc_mutex_lock (&p_ac3dec->p_fifo->data_lock);
 
             /* Is the input thread dying ? */
-            if (p_ac3dec->p_input->b_die)
+            if (p_ac3dec->p_fifo->b_die)
             {
-                vlc_mutex_unlock (&(p_ac3dec->fifo.data_lock));
+                vlc_mutex_unlock (&p_ac3dec->p_fifo->data_lock);
                 return;
             }
 
@@ -390,43 +347,42 @@ void ac3_byte_stream_next (ac3_byte_stream_t * p_byte_stream)
              * pointer to the current PES packet, and we weren't able to
              * give it back to the netlist. That's why we free the PES
              * packet first. */
-            input_NetlistFreePES (p_ac3dec->p_input, DECODER_FIFO_START(p_ac3dec->fifo));
+            p_ac3dec->p_fifo->pf_delete_pes(p_ac3dec->p_fifo->p_packets_mgt,
+                    DECODER_FIFO_START(*p_ac3dec->p_fifo));
 
-            DECODER_FIFO_INCSTART (p_ac3dec->fifo);
+            DECODER_FIFO_INCSTART (*p_ac3dec->p_fifo);
 
-            while (DECODER_FIFO_ISEMPTY(p_ac3dec->fifo))
+            while (DECODER_FIFO_ISEMPTY(*p_ac3dec->p_fifo))
             {
-                vlc_cond_wait (&p_ac3dec->fifo.data_wait, &p_ac3dec->fifo.data_lock);
+                vlc_cond_wait(&p_ac3dec->p_fifo->data_wait, &p_ac3dec->p_fifo->data_lock);
 
-                if (p_ac3dec->p_input->b_die)
+                if (p_ac3dec->p_fifo->b_die)
                 {
-                    vlc_mutex_unlock (&(p_ac3dec->fifo.data_lock));
+                    vlc_mutex_unlock (&p_ac3dec->p_fifo->data_lock);
                     return;
                 }
             }
 
             /* The next byte could be found in the next PES packet */
-            p_ac3dec->p_ts = DECODER_FIFO_START (p_ac3dec->fifo)->p_first_ts;
+            p_ac3dec->p_data = DECODER_FIFO_START(*p_ac3dec->p_fifo)->p_first;
 
             /* parse ac3 magic header */
-            ptr = p_ac3dec->p_ts->buffer [p_ac3dec->p_ts->i_payload_start+2];
+            ptr = *(p_ac3dec->p_data->p_payload_start + 2);
             ptr <<= 8;
-            ptr |= p_ac3dec->p_ts->buffer [p_ac3dec->p_ts->i_payload_start+3];
+            ptr |= *(p_ac3dec->p_data->p_payload_start + 3);
             p_ac3dec->sync_ptr = ptr;
-            p_ac3dec->p_ts->i_payload_start += 4;
+            p_ac3dec->p_data->p_payload_start += 4;
 
             /* We can release the fifo's data lock */
-            vlc_mutex_unlock (&p_ac3dec->fifo.data_lock);
+            vlc_mutex_unlock (&p_ac3dec->p_fifo->data_lock);
         }
         /* Perhaps the next TS packet of the current PES packet contains 
          * real data (ie its payload's size is greater than 0) */
         else
         {
-            p_ac3dec->p_ts = p_ac3dec->p_ts->p_next_ts;
+            p_ac3dec->p_data = p_ac3dec->p_data->p_next;
         }
-    } while (p_ac3dec->p_ts->i_payload_start == p_ac3dec->p_ts->i_payload_end);
-    p_byte_stream->p_byte =
-        p_ac3dec->p_ts->buffer + p_ac3dec->p_ts->i_payload_start; 
-    p_byte_stream->p_end =
-        p_ac3dec->p_ts->buffer + p_ac3dec->p_ts->i_payload_end; 
+    } while (p_ac3dec->p_data->p_payload_start == p_ac3dec->p_data->p_payload_end);
+    p_byte_stream->p_byte = p_ac3dec->p_data->p_payload_start; 
+    p_byte_stream->p_end = p_ac3dec->p_data->p_payload_end; 
 }

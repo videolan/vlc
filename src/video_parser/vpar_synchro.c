@@ -108,8 +108,9 @@
 
 #include "intf_msg.h"
 
-#include "input.h"
-#include "decoder_fifo.h"
+#include "stream_control.h"
+#include "input_ext-dec.h"
+
 #include "video.h"
 #include "video_output.h"
 
@@ -151,7 +152,7 @@ void vpar_SynchroInit( vpar_thread_t * p_vpar )
     memset( p_vpar->synchro.p_tau, 0, 4 * sizeof(mtime_t) );
     memset( p_vpar->synchro.pi_meaningful, 0, 4 * sizeof(unsigned int) );
     p_vpar->synchro.b_dropped_last = 0;
-    p_vpar->synchro.current_pts = mdate() + INPUT_PTS_DELAY;
+    p_vpar->synchro.current_pts = mdate() + DEFAULT_PTS_DELAY;
     p_vpar->synchro.backward_pts = 0;
 }
 

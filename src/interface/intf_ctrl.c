@@ -59,7 +59,8 @@
 #include "plugins.h"
 #include "intf_msg.h"
 
-#include "input.h"
+#include "stream_control.h"
+#include "input_ext-intf.h"
 #include "audio_output.h"
 #include "intf_cmd.h"
 #include "interface.h"
@@ -463,6 +464,8 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
     int                 i_port = 0;                        /* port parameter */
     int                 i_vlan = 0;                        /* vlan parameter */
 
+    /* FIXME */
+#if 0
     /* Parse parameters - see command list above */
     for ( i_arg = 1; i_arg < i_argc; i_arg++ )
     {
@@ -495,6 +498,7 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
                                                   p_main->p_intf->p_vout, p_main->p_aout,
                                                   NULL );
     return( INTF_NO_ERROR );
+#endif
 }
 
 /*****************************************************************************

@@ -1,0 +1,157 @@
+/*****************************************************************************
+ * input_ext-dec.c: services to the decoders
+ *****************************************************************************
+ * Copyright (C) 1998, 1999, 2000 VideoLAN
+ *
+ * Authors: 
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#include "defs.h"
+
+#include "config.h"
+#include "common.h"
+#include "threads.h"
+#include "mtime.h"
+
+#include "intf_msg.h"
+
+#include "stream_control.h"
+#include "input_ext-dec.h"
+#include "input.h"
+
+/*****************************************************************************
+ * InitBitstream: initialize a bit_stream_t structure
+ *****************************************************************************/
+void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo )
+{
+    p_bit_stream->p_decoder_fifo = p_fifo;
+    p_bit_stream->pf_next_data_packet = NextDataPacket;
+
+    /* Get the first data packet. */
+    vlc_mutex_lock( &p_fifo->data_lock );
+    while ( DECODER_FIFO_ISEMPTY( *p_fifo ) )
+    {
+        if ( p_fifo->b_die )
+        {
+            vlc_mutex_unlock( &p_fifo->data_lock );
+            return;
+        }
+        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+    }
+    p_bit_stream->p_data = DECODER_FIFO_START( *p_fifo )->p_first;
+    p_bit_stream->p_byte = p_bit_stream->p_data->p_payload_start;
+    p_bit_stream->p_end  = p_bit_stream->p_data->p_payload_end;
+    p_bit_stream->fifo.buffer = 0;
+    p_bit_stream->fifo.i_available = 0;
+    vlc_mutex_unlock( &p_fifo->data_lock );
+}
+
+/*****************************************************************************
+ * NextDataPacket: go to the next data packet
+ *****************************************************************************/
+void NextDataPacket( bit_stream_t * p_bit_stream )
+{
+    WORD_TYPE           buffer_left;
+    /* FIXME : not portable in a 64bit environment */
+    int                 i_bytes_left;
+    decoder_fifo_t *    p_fifo = p_bit_stream->p_decoder_fifo;
+
+    /* Buffer used at the end of a decoder thread, to give it zero
+     * values if needed. */
+    static byte_t       p_zero[64] = { 0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0,
+                                       0, 0, 0, 0, 0, 0, 0 };
+
+    /* Put the remaining bytes (not aligned on a word boundary) in a
+     * temporary buffer. */
+    i_bytes_left = p_bit_stream->p_end - p_bit_stream->p_byte;
+    buffer_left = *((WORD_TYPE *)p_bit_stream->p_end - 1);
+
+    /* We are looking for the next data packet that contains real data,
+     * and not just a PES header */
+    do
+    {
+        /* We were reading the last data packet of this PES packet... It's
+         * time to jump to the next PES packet */
+        if( p_bit_stream->p_data->p_next == NULL )
+        {
+            /* We are going to read/write the start and end indexes of the
+             * decoder fifo and to use the fifo's conditional variable,
+             * that's why we need to take the lock before. */
+            vlc_mutex_lock( &p_fifo->data_lock );
+
+            /* Is the input thread dying ? */
+            if( p_fifo->b_die )
+            {
+                vlc_mutex_unlock( &p_fifo->data_lock );
+                p_bit_stream->p_byte = p_zero;
+                p_bit_stream->p_end = &p_zero[sizeof(p_zero) - 1];
+                return;
+            }
+
+            /* We should increase the start index of the decoder fifo, but
+             * if we do this now, the input thread could overwrite the
+             * pointer to the current PES packet, and we weren't able to
+             * give it back to the netlist. That's why we free the PES
+             * packet first. */
+            p_fifo->pf_delete_pes( p_fifo->p_packets_mgt,
+                                   DECODER_FIFO_START( *p_fifo ) );
+            DECODER_FIFO_INCSTART( *p_fifo );
+
+            while( DECODER_FIFO_ISEMPTY( *p_fifo ) )
+            {
+                vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+                if( p_fifo->b_die )
+                {
+                    vlc_mutex_unlock( &p_fifo->data_lock );
+                    p_bit_stream->p_byte = p_zero;
+                    p_bit_stream->p_end = &p_zero[sizeof(p_zero) - 1];
+                    return;
+                }
+            }
+
+            /* The next byte could be found in the next PES packet */
+            p_bit_stream->p_data = DECODER_FIFO_START( *p_fifo )->p_first;
+
+            /* We can release the fifo's data lock */
+            vlc_mutex_unlock( &p_fifo->data_lock );
+        }
+        else
+        {
+            /* Perhaps the next data packet of the current PES packet contains
+             * real data (ie its payload's size is greater than 0). */
+            p_bit_stream->p_data = p_bit_stream->p_data->p_next;
+        }
+    } while ( p_bit_stream->p_data->p_payload_start
+               == p_bit_stream->p_data->p_payload_end );
+
+    /* We've found a data packet which contains interesting data... */
+    p_bit_stream->p_byte = p_bit_stream->p_data->p_payload_start;
+    p_bit_stream->p_end  = p_bit_stream->p_data->p_payload_end;
+
+    /* Copy remaining bits of the previous packet */
+    *((WORD_TYPE *)p_bit_stream->p_byte - 1) = buffer_left;
+    p_bit_stream->p_byte -= i_bytes_left;
+}

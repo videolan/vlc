@@ -39,8 +39,9 @@
 
 #include "intf_msg.h"
 
-#include "input.h"
-#include "decoder_fifo.h"
+#include "stream_control.h"
+#include "input_ext-dec.h"
+
 #include "video.h"
 #include "video_output.h"
 

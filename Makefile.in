@@ -100,7 +100,7 @@ ifeq ($(OPTIMS),1)
 CFLAGS += -O6
 CFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CFLAGS += -funroll-all-loops -fstrict-aliasing
-CFLAGS += -fomit-frame-pointer
+#CFLAGS += -fomit-frame-pointer
 
 # Optimizations for x86 familiy
 ifneq (,$(findstring 86,$(ARCH)))
@@ -176,13 +176,9 @@ interface_obj =  	interface/main.o \
 				interface/intf_ctrl.o \
 				interface/intf_console.o
 
-input_obj =		input/input_vlan.o \
-				input/input_file.o \
-				input/input_netlist.o \
-				input/input_network.o \
-				input/input_ctrl.o \
-				input/input_pcr.o \
-				input/input_psi.o \
+input_obj =		input/input_ps.o \
+				input/mpeg_system.o \
+				input/input_ext-dec.o \
 				input/input.o
 
 audio_output_obj = 	audio_output/audio_output.o
@@ -236,8 +232,7 @@ misc_obj =		misc/mtime.o \
 				misc/rsc_files.o \
 				misc/netutils.o \
 				misc/playlist.o \
-				misc/plugins.o \
-				misc/decoder_fifo.o
+				misc/plugins.o
 
 
 C_OBJ = $(interface_obj) \

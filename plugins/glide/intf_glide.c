@@ -36,7 +36,9 @@
 #include "mtime.h"
 #include "plugins.h"
 
-#include "input.h"
+#include "stream_control.h"
+#include "input_ext-intf.h"
+
 #include "video.h"
 #include "video_output.h"
 
