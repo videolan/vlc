@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.47 2004/01/21 22:55:34 hartman Exp $
+ * $Id: sap.c,v 1.48 2004/01/22 00:17:22 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -406,11 +406,11 @@ static void Run( intf_thread_t *p_intf )
            if( mdate() - p_intf->p_sys->pp_announces[i]->i_last > 1000000*
                p_sys->i_timeout )
            {
-              msg_Dbg(p_intf,"Time out for %s, deleting (%i/%i)",
-                             p_intf->p_sys->pp_announces[i]->psz_name,
-                             i , p_intf->p_sys->i_announces );
+               msg_Dbg(p_intf,"Time out for %s, deleting (%i/%i)",
+                       p_intf->p_sys->pp_announces[i]->psz_name,
+                       i , p_intf->p_sys->i_announces );
 
-              /* Remove the playlist item */
+               /* Remove the playlist item */
                p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                               FIND_ANYWHERE );
                if( p_playlist )
@@ -662,7 +662,9 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             if( !strcmp(p_intf->p_sys->pp_announces[i]->psz_uri,
                         psz_uri ) )
             {
-                    return;
+                p_intf->p_sys->pp_announces[i]->i_last = mdate();
+                free(psz_uri);
+                return;
             }
         }
         /* Add it to the playlist */
@@ -675,7 +677,6 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             i_pos = playlist_GetPositionById( p_playlist, i_id );
             playlist_SetGroup( p_playlist, i_pos, p_intf->p_sys->i_group );
         }
-        free( psz_uri );
 
         /* Remember it */
         p_announce = (struct sap_announce_t *)malloc(
@@ -697,6 +698,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             p_announce->psz_uri = strdup( "" );
         }
         p_announce->i_id = i_id;
+        p_announce->i_last = mdate();
 
         INSERT_ELEM( p_intf->p_sys->pp_announces,
                      p_intf->p_sys->i_announces,
@@ -704,6 +706,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
                      p_announce );
 
         vlc_object_release( p_playlist );
+        free( psz_uri );
         return;
     }
 
