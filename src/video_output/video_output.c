@@ -999,7 +999,7 @@ static void RunThread( vout_thread_t *p_vout)
 #endif
 // ???
 i_trash_count++;
-fprintf( stderr, "gap : %Ld\n", display_date-last_display_date );
+//fprintf( stderr, "gap : %Ld\n", display_date-last_display_date );
 last_display_date = display_date;
 #if 1
             if( display_date < current_date && i_trash_count > 4 )
@@ -1932,7 +1932,7 @@ static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
 
     if( i_delay < 0 )
     {
-        fprintf( stderr, "PANIC %d\n", i_panic_count );
+        //fprintf( stderr, "PANIC %d\n", i_panic_count );
         i_panic_count++;
     }
     
@@ -1949,12 +1949,7 @@ static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
         if( p_vout->i_pictures < VOUT_SYNCHRO_HEAP_IDEAL_SIZE )
         {
             i_truc = 32;
-            //i_synchro_inc += p_vout->i_pictures - VOUT_SYNCHRO_HEAP_IDEAL_SIZE;
-        }
-
-        if( i_delay < 1000 )
-        {
-            //i_truc = 4;
+            i_synchro_inc += p_vout->i_pictures - VOUT_SYNCHRO_HEAP_IDEAL_SIZE;
         }
     }
    
@@ -1991,8 +1986,8 @@ static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
         r_synchro_level = VOUT_SYNCHRO_LEVEL_MAX;
     }
 
-    fprintf( stderr, "synchro level : %d, heap : %d (%d, %d) (%d, %f) - %Ld\n", p_vout->i_synchro_level,
-            p_vout->i_pictures, i_last_synchro_inc, i_synchro_inc, i_truc, r_synchro_level, i_delay );    
+    //fprintf( stderr, "synchro level : %d, heap : %d (%d, %d) (%d, %f) - %Ld\n", p_vout->i_synchro_level,
+    //        p_vout->i_pictures, i_last_synchro_inc, i_synchro_inc, i_truc, r_synchro_level, i_delay );    
     i_last_synchro_inc = i_synchro_inc;    
 }
 
