@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.21 2003/04/28 12:00:13 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.22 2003/04/30 21:16:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -30,7 +30,9 @@
 #include <gtk/gtk.h>
 
 //--- WWWINDOWS -------------------------------------------------------------
+#ifndef BASIC_SKINS
 #include <wx/wx.h>
+#endif
 
 //--- VLC -------------------------------------------------------------------
 #include <vlc/intf.h>
@@ -46,7 +48,9 @@
 #include "../os_theme.h"
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
+#ifndef BASIC_SKINS
 #include "../src/wxdialogs.h"
+#endif
 
 // include the icon graphic
 #include "share/vlc32x32.xpm"
@@ -69,6 +73,7 @@ int  SkinManage( intf_thread_t *p_intf );
 //---------------------------------------------------------------------------
 // Local classes declarations.
 //---------------------------------------------------------------------------
+#ifndef BASIC_SKINS
 class Instance: public wxApp
 {
 public:
@@ -82,6 +87,7 @@ private:
     intf_thread_t *p_intf;
     CallBackObjects *callbackobj;
 };
+#endif
 
 
 //---------------------------------------------------------------------------
@@ -191,7 +197,9 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     // Check if vlc is closing
     proc->IsClosing();
 
+#ifndef BASIC_SKINS
     gtk_main_do_event( event );
+#endif
 
 }
 //---------------------------------------------------------------------------
@@ -211,6 +219,7 @@ gboolean RefreshTimer( gpointer data )
 //---------------------------------------------------------------------------
 // Implementation of Instance class
 //---------------------------------------------------------------------------
+#ifndef BASIC_SKINS
 Instance::Instance( )
 {
 }
@@ -241,7 +250,7 @@ bool Instance::OnInit()
 
     return TRUE;
 }
-
+#endif
 
 
 //---------------------------------------------------------------------------
@@ -255,10 +264,15 @@ void OSRun( intf_thread_t *p_intf )
     CallBackObjects *callbackobj = new CallBackObjects();
     callbackobj->Proc = new VlcProc( p_intf );
 
+#ifndef BASIC_SKINS
     wxTheApp = new Instance( p_intf, callbackobj );
-
     wxEntry( 1, p_args );
-    
+#else
+    gdk_event_handler_set( GTK2Proc, (gpointer)callbackobj, NULL );
+    // Add timer
+    g_timeout_add( 200, (GSourceFunc)RefreshTimer, (gpointer)p_intf );
+#endif
+
     delete callbackobj;
 }
 //---------------------------------------------------------------------------

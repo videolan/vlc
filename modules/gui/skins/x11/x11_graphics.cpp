@@ -2,7 +2,7 @@
  * x11_graphics.cpp: X11 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.cpp,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_graphics.cpp,v 1.2 2003/04/30 21:16:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,11 +28,15 @@
 //--- X11 -----------------------------------------------------------------
 #include <X11/Xlib.h>
 
+//--- VLC -----------------------------------------------------------------
+#include <vlc/intf.h>
+
 //--- SKIN ------------------------------------------------------------------
 #include "../src/graphics.h"
 #include "../src/window.h"
 #include "../os_window.h"
 #include "x11_graphics.h"
+#include "../src/skin_common.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -40,24 +44,32 @@
 //---------------------------------------------------------------------------
 // X11 GRAPHICS
 //---------------------------------------------------------------------------
-X11Graphics::X11Graphics( int w, int h, SkinWindow *from ) : Graphics( w, h )
+X11Graphics::X11Graphics( intf_thread_t *p_intf, int w, int h,
+                          SkinWindow *from ) : Graphics( w, h )
 {
-/*    if( from != NULL )
+    display = p_intf->p_sys->display;
+    int screen = DefaultScreen( display );
+
+    if( from != NULL )
     {
-        GdkWindow *fromWnd = ( (X11Window *)from )->GetHandle();
-        Image = (GdkDrawable*) gdk_pixmap_new( fromWnd, w, h, -1 );
-        Gc = gdk_gc_new( ( GdkDrawable* )fromWnd );
+        Window fromWnd = ( (X11Window *)from )->GetHandle();
+
+        XWindowAttributes attr;
+        XGetWindowAttributes( display, fromWnd, &attr);
+
+        Image = XCreatePixmap( display, fromWnd, w, h, attr.depth );
+        Gc = DefaultGC( display, screen );
     }
     else
     {
-        // FIXME: 8 -> screen depth
-        Image = (GdkDrawable*) gdk_pixmap_new( NULL, w, h, 16 );
-        gdk_drawable_set_colormap( Image, gdk_colormap_get_system() );
-        Gc = gdk_gc_new( Image );
-    }
+        Window root = DefaultRootWindow( display );
+        Image = XCreatePixmap( display, root, w, h,
+                               DefaultDepth( display, screen ) );
+        Gc = DefaultGC( display, screen );
+   }
 
     // Set the background color to black
-    gdk_draw_rectangle( Image, Gc, TRUE, 0, 0, w, h );*/
+ //   gdk_draw_rectangle( Image, Gc, TRUE, 0, 0, w, h );
 }
 //---------------------------------------------------------------------------
 X11Graphics::~X11Graphics()
@@ -69,8 +81,8 @@ X11Graphics::~X11Graphics()
 void X11Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,
                               int sx, int sy, int Flag )
 {
-/*    gdk_draw_drawable( Image, Gc, (( X11Graphics* )Src )->GetImage(),
-            sx, sy, dx, dy, dw, dh );*/
+    XCopyArea( display, (( X11Graphics* )Src )->GetImage(), Image, Gc, 
+            sx, sy, dw, dh, dx, dy );
 }
 //---------------------------------------------------------------------------
 void X11Graphics::DrawRect( int x, int y, int w, int h, int color )

@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.21 2003/04/28 12:00:14 asmax Exp $
+ * $Id: window.cpp,v 1.22 2003/04/30 21:16:24 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -290,6 +290,7 @@ void SkinWindow::RefreshImage( int x, int y, int w, int h )
     unsigned int i;
 
     // Create Bitmap Buffer
+//    Graphics *Buffer = (Graphics *)new OSGraphics( p_intf, w, h, this );
     Graphics *Buffer = (Graphics *)new OSGraphics( w, h, this );
 
     // Draw every control
@@ -490,8 +491,8 @@ void SkinWindow::ReSize()
         // Change image buffer
         if( Image != NULL )
             delete (OSGraphics *)Image;
+//        Image = (Graphics *)new OSGraphics( p_intf, w, h, this );
         Image = (Graphics *)new OSGraphics( w, h, this );
-
 
         Size( w, h );
     }

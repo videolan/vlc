@@ -6,6 +6,7 @@ GNOME2 gnome2
 GTK gtk
 GTK2 gtk2
 SKINS skins
+BASIC_SKINS basic-skins
 FAMILIAR familiar
 WXWINDOWS wxwindows
 QT qt

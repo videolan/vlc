@@ -2,7 +2,7 @@
  * x11_bitmap.cpp: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.cpp,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_bitmap.cpp,v 1.2 2003/04/30 21:16:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -146,11 +146,10 @@ void X11Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
 {
     if( Bmp )
     {
-/*        GdkDrawable *destImg = ( (X11Graphics *)dest )->GetImage();
-        GdkGC *destGC = ( (X11Graphics *)dest )->GetGC();
+        Drawable destImg = ( (X11Graphics *)dest )->GetImage();
+        GC destGC = ( (X11Graphics *)dest )->GetGC();
 
-        gdk_pixbuf_render_to_drawable( Bmp, destImg, destGC, x, y, xRef, yRef, 
-                w, h, GDK_RGB_DITHER_NORMAL, 0, 0);*/
+        XCopyArea( display, Bmp, destImg, destGC, x, y, w, h, xRef, yRef );
     }
 }
 //---------------------------------------------------------------------------

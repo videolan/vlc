@@ -2,7 +2,7 @@
  * x11_graphics.h: X11 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.h,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_graphics.h,v 1.2 2003/04/30 21:16:24 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -40,12 +40,13 @@ class SkinWindow;
 class X11Graphics : public Graphics
 {
     protected:
-       /* Drawable *Image;
-        GdkGC *Gc;*/
+        Display *display;
+        Drawable Image;
+        GC Gc;
 
     public:
         // Constructor
-        X11Graphics( int w, int h, SkinWindow *from = NULL );
+        X11Graphics( intf_thread_t *p_intf, int w, int h, SkinWindow *from = NULL );
         // Destructor
         virtual ~X11Graphics();
         // Drawing methods
@@ -60,8 +61,8 @@ class X11Graphics : public Graphics
         virtual void ResetClipRegion();
 
         // Specific X11 methods
-/*        GdkDrawable *GetImage() { return Image; };
-        GdkGC *GetGC()    { return Gc; };*/
+        Drawable GetImage() { return Image; };
+        GC GetGC()    { return Gc; };
 };
 //---------------------------------------------------------------------------
 class X11Region : public SkinRegion

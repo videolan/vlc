@@ -16,6 +16,7 @@ dep_bool '   Gnome interface support' CONFIG_GNOME $CONFIG_GTK
 bool 'GTK2 support' CONFIG_GTK2
 dep_bool '   Gnome2 support' CONFIG_GNOME2 $CONFIG_GTK2
 bool 'Skins module' CONFIG_SKINS
+bool 'Basic skins module (without wxWindows)' CONFIG_BASIC_SKINS
 bool 'Familiar GTK+ support' CONFIG_FAMILIAR
 bool 'wxWindows support' CONFIG_WXWINDOWS
 bool 'Qt interface support' CONFIG_QT
