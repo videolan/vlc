@@ -242,7 +242,7 @@ static block_t * CDDAReadBlocks( access_t * p_access )
 	  int i;
 	  for( i = 0; i < i_blocks; i++ )
 	    {
-	      int16_t *p_readbuf=paranoia_read(p_cdda->paranoia, NULL);
+	      int16_t *p_readbuf = cdio_paranoia_read(p_cdda->paranoia, NULL);
 	      char *psz_err=cdio_cddap_errors(p_cdda->paranoia_cd);
 	      char *psz_mes=cdio_cddap_messages(p_cdda->paranoia_cd);
 
