@@ -103,7 +103,7 @@ static int  Open ( vlc_object_t *p_this )
     sout_ParseCfg( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
 
     p_enc->fmt_out.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
-    p_enc->fmt_in.i_codec = VLC_FOURCC('R','V','2','4');
+    p_enc->fmt_in.i_codec = VLC_FOURCC('I','4','2','0');
 
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
@@ -219,7 +219,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 
     /* init pic */
     memset( &pic, 0, sizeof( x264_picture_t ) );
-    pic.img.i_csp = X264_CSP_RGB;
+    pic.img.i_csp = X264_CSP_I420;
     pic.img.i_plane = p_pict->i_planes;
     for( i = 0; i < p_pict->i_planes; i++ )
     {
