@@ -14,10 +14,10 @@
 #SHELL = /bin/sh
 
 # Video output settings
-VIDEO=X11
+#VIDEO=X11
 #VIDEO=DGA (not yet supported)
 #VIDEO=FB
-#VIDEO=GGI
+VIDEO=GGI
 #VIDEO=BEOS (not yet supported)
 
 # Target architecture and optimization
@@ -173,7 +173,8 @@ audio_output_obj = 		audio_output/audio_output.o \
 						audio_output/audio_dsp.o
 
 video_output_obj = 		video_output/video_output.o \
-						video_output/video_$(video).o
+						video_output/video_$(video).o \
+						video_output/video_yuv_c.o
 
 ac3_decoder_obj =		ac3_decoder/ac3_decoder.o
 

@@ -65,12 +65,11 @@ typedef struct vout_thread_s
      * on use. All tables are allocated in the same memory block, based at
      * p_trans_base, and shifted depending of the output thread configuration */
     byte_t *            p_trans_base;       /* base for all translation tables */    
-    void *              p_trans_red;
-    void *              p_trans_green;
-    void *              p_trans_blue;
-    void *              p_trans_gray;    
-
-    /* YUV translation tables, for optimized C YUV transform ?? */
+    void *              p_trans_red;                            /* regular red */
+    void *              p_trans_green;                        /* regular green */
+    void *              p_trans_blue;                          /* regular blue */
+    void *              p_trans_gray;                          /* regular gray */
+    void *              p_trans_optimized;           /* optimized (all colors) */
 } vout_thread_t;
 
 /*******************************************************************************

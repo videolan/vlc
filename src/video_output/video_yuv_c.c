@@ -7,7 +7,7 @@
 
 #include <stdlib.h>	/* malloc */
 
-#include "convert.h"
+//#include "convert.h"
 
 static int binaryLog (int i)
 {
@@ -68,7 +68,7 @@ static int colorMaskToShift (int * right, int * left, int mask)
  * calculated to minimize the cache interactions of the 3 tables.
  */
 
-static int rgbTable16 (short table [1935],
+int rgbTable16 (short table [1935],
 		       int redMask, int greenMask, int blueMask,
 		       unsigned char gamma[256])
 {
@@ -184,7 +184,7 @@ static int rgbTable32 (int table [1935],
 #define V_RED_COEF ((int)(1.596 * (1<<SHIFT) / 1.164))
 #define V_GREEN_COEF ((int)(-0.813 * (1<<SHIFT) / 1.164))
 
-static void yuvToRgb16 (unsigned char * Y,
+ void yuvToRgb16 (unsigned char * Y,
 			unsigned char * U, unsigned char * V,
 			short * dest, short table[1935], int width)
 {
@@ -733,105 +733,3 @@ static void yuvToRgb32 (unsigned char * Y,
 
 /* API routines */
 
-int convertGrey (CONVERTER * convert, DISPLAY * disp)
-{
-    if ((convert == NULL) || (disp == NULL))
-	return 1;
-
-    if (greyRgbTable (disp))
-	return 1;
-
-    switch (disp->bytesPerPixel) {
-    case 2:
-	convert->convert = &greyToRgb16;
-	break;
-    case 3:
-	convert->convert = &greyToRgb24;
-	break;
-    case 4:
-	convert->convert = &greyToRgb32;
-	break;
-    default:
-	return 1;
-    }
-    convert->table = disp->greyRgbTable;
-    return 0;
-}
-
-static void * greyRgbTable (DISP_COLORS * colors, unsigned char gamma[256])
-{
-    /* FIXME could avoid recalculating the same table */
-    void * table;
-
-	for (i = 0; i < 16; i++)
-	    gamma[i] = 0;
-#define Y_COEF ((int)(1.164 * 65536))
-	for (; i <= 235; i++)
-	    gamma[i] = (Y_COEF * i - Y_COEF * 16) >> 16;
-#undef Y_COEF
-	for (; i < 256; i++)
-	    gamma[i] = 255;
-    }
-
-    switch (colors->bytesPerPixel) {
-    case 2:
-	table = malloc (256 * sizeof (short));
-	if (table == NULL)
-	    break;
-	if (greyRgb16Table (table,
-			    colors->redMask,
-			    colors->greenMask,
-			    colors->blueMask,
-			    gamma))
-	    goto error;
-	return table;
-    case 3:
-    case 4:
-	table = malloc (256 * sizeof (int));
-	if (table == NULL)
-	    break;
-	if (greyRgb32Table (table,
-			    colors->redMask,
-			    colors->greenMask,
-			    colors->blueMask,
-			    gamma))
-	    goto error;
-	return table;
-    error:
-	free (table);
-    }
-
-    return NULL;
-}
-
-static void * rgbTable (DISP_COLORS * colors, unsigned char gamma[256])
-{
-    /* FIXME could avoid recalculating the same table */
-    void * table;
-
-    switch (colors->bytesPerPixel) {
-    case 2:
-	table = malloc (1935 * sizeof (short));
-	if (table == NULL)
-	    break;
-	if (rgbTable16 (table,
-			colors->redMask, colors->greenMask, colors->blueMask,
-			gamma))
-	    goto error;
-	return table;
-    case 3:
-    case 4:
-	table = malloc (1935 * sizeof (int));
-	if (table == NULL)
-	    break;
-	if (rgbTable32 (table,
-			colors->redMask, colors->greenMask, colors->blueMask,
-			gamma))
-	    goto error;
-	return table;
-    error:
-	free (table);
-    }
-
-    return NULL;
-}

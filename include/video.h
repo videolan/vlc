@@ -33,8 +33,8 @@ typedef struct
     
     /* Picture properties - those properties are fixed at initialization and 
      * should NOT be modified. Note that for YUV pictures, i_bytes_per_line is
-     * the number of bytes for ONE of the Y, U or V pictures, and therefore the
-     * number of bytes in the picture is 3 * i_height * i_bytes_per_line */
+     * the number of bytes for Y samples - the total size allocated will depend
+     * of the picture format */
     int             i_width;                                  /* picture width */
     int             i_height;                                /* picture height */
     int             i_bytes_per_line;        /* total number of bytes per line */

@@ -204,6 +204,18 @@ void vout_SysPrint( vout_thread_t *p_vout, int i_x, int i_y, int i_halign,
     ggiPuts( p_vout->p_sys->p_display, i_x, i_y, psz_text );
 }
 
+/*******************************************************************************
+ * vout_SysGetVisual: send visual to interface driver
+ *******************************************************************************
+ * This function is not part of the regular vout_Sys* API, but is used by GGI
+ * interface to get back visual display pointer once the output thread has
+ * been spawned. This visual is used to keep track of keyboard events.
+ *******************************************************************************/
+ggi_visual_t    vout_SysGetVisual( vout_thread_t *p_vout )
+{
+    return( p_vout->p_sys->p_display );    
+}
+
 /* following functions are local */
 
 /*******************************************************************************

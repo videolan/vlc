@@ -134,7 +134,7 @@ const int MATRIX_COEFFICIENTS_TABLE[8][4] =
  * External prototypes
  *******************************************************************************/
 #ifdef HAVE_MMX
-/* YUV transformations for MMX - in yuv-mmx.S 
+/* YUV transformations for MMX - in video_yuv_mmx.S 
  *      p_y, p_u, p_v:          Y U and V planes
  *      i_width, i_height:      frames dimensions (pixels)
  *      i_ypitch, i_vpitch:     Y and V lines sizes (bytes)
@@ -151,6 +151,16 @@ void vout_YUV420_16_MMX( u8* p_y, u8* p_u, u8 *p_v,
                          u32 i_dci_offset, u32 i_offset_to_line_0,
                          int CCOPitch, int i_colortype );
 #endif
+
+/* Optimized YUV functions: translations and tables building - in video_yuv_c.c
+ * ??? looks efficient, but does not work well - ask walken */
+void yuvToRgb16 ( unsigned char * Y,
+			unsigned char * U, unsigned char * V,
+                  short * dest, short table[1935], int width);
+int rgbTable16 (short table [1935],
+                int redMask, int greenMask, int blueMask,
+                unsigned char gamma[256]);
+
 
 /*******************************************************************************
  * Local prototypes
@@ -413,9 +423,19 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         /* Allocate memory */
         switch( i_type )
         {
-        case YUV_420_PICTURE:                   /* YUV picture: bits per pixel */
-        case YUV_422_PICTURE:
-        case YUV_444_PICTURE:
+        case YUV_420_PICTURE:          /* YUV 420: 1,1/4,1/4 samples per pixel */
+            p_free_picture->p_data = malloc( i_height * i_bytes_per_line * 3 / 2 );
+            p_free_picture->p_y = (yuv_data_t *) p_free_picture->p_data;
+            p_free_picture->p_u = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line);
+            p_free_picture->p_v = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line * 5 / 4);
+            break;
+        case YUV_422_PICTURE:          /* YUV 422: 1,1/2,1/2 samples per pixel */
+            p_free_picture->p_data = malloc( 2 * i_height * i_bytes_per_line );
+            p_free_picture->p_y = (yuv_data_t *) p_free_picture->p_data;
+            p_free_picture->p_u = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line);
+            p_free_picture->p_v = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line * 3 / 2);
+            break;
+        case YUV_444_PICTURE:              /* YUV 444: 1,1,1 samples per pixel */
             p_free_picture->p_data = malloc( 3 * i_height * i_bytes_per_line );                
             p_free_picture->p_y = (yuv_data_t *) p_free_picture->p_data;
             p_free_picture->p_u = (yuv_data_t *)(p_free_picture->p_data + i_height * i_bytes_per_line);
@@ -556,16 +576,17 @@ static int InitThread( vout_thread_t *p_vout )
     } 
 
     /* Allocate translation tables */
-    p_vout->p_trans_base = malloc( 4 * 1024 * p_vout->i_bytes_per_pixel );
+    p_vout->p_trans_base = malloc( ( 4 * 1024 + 1935 ) * p_vout->i_bytes_per_pixel );
     if( p_vout->p_trans_base == NULL )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
         return( 1 );                
     }
-    p_vout->p_trans_red =   p_vout->p_trans_base +           384 *p_vout->i_bytes_per_pixel;
-    p_vout->p_trans_green = p_vout->p_trans_base + (  1024 + 384)*p_vout->i_bytes_per_pixel;
-    p_vout->p_trans_blue =  p_vout->p_trans_base + (2*1024 + 384)*p_vout->i_bytes_per_pixel;
-    p_vout->p_trans_gray =  p_vout->p_trans_base + (3*1024 + 384)*p_vout->i_bytes_per_pixel;
+    p_vout->p_trans_red =       p_vout->p_trans_base +           384 *p_vout->i_bytes_per_pixel;
+    p_vout->p_trans_green =     p_vout->p_trans_base + (  1024 + 384)*p_vout->i_bytes_per_pixel;
+    p_vout->p_trans_blue =      p_vout->p_trans_base + (2*1024 + 384)*p_vout->i_bytes_per_pixel;
+    p_vout->p_trans_gray =      p_vout->p_trans_base + (3*1024 + 384)*p_vout->i_bytes_per_pixel;
+    p_vout->p_trans_optimized = p_vout->p_trans_base + (4*1024      )*p_vout->i_bytes_per_pixel;    
     
     /* Build translation tables */
     BuildTables( p_vout );
@@ -832,6 +853,7 @@ static void BuildTables( vout_thread_t *p_vout )
     /* Build gamma table */     
     for( i_index = 0; i_index < 256; i_index++ )
     {
+        //?? add contrast and brightness
         i_gamma[i_index] = 255. * pow( (double)i_index / 255., p_vout->f_gamma );        
     }
         
@@ -874,6 +896,15 @@ static void BuildTables( vout_thread_t *p_vout )
         break;      
 #endif
     } 
+
+    /* Build red, green and blue tables for optimized transformation */
+    //????
+    switch( p_vout->i_screen_depth )
+    {
+    case 16:
+        rgbTable16( (short *) p_vout->p_trans_optimized, 0xf800, 0x07e0, 0x01f, i_gamma );
+        break;        
+    }    
 }
 
 /*******************************************************************************
@@ -1033,6 +1064,7 @@ static void RenderYUV16Picture( vout_thread_t *p_vout, picture_t *p_pic )
                        p_trans_green, 
                        p_trans_blue,
                        p_data );            
+  //???      yuvToRgb16( p_y, p_u, p_v, p_data, p_vout->p_trans_optimized, i_width*i_height );
 #endif
         break;
     case YUV_422_PICTURE:                   /* 15 or 16 bpp 422 transformation */
