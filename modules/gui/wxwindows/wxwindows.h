@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.54 2003/08/19 21:16:09 adn Exp $
+ * $Id: wxwindows.h,v 1.55 2003/08/20 19:17:29 adn Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -379,6 +379,7 @@ private:
     void UpdateMRL();
     wxPanel *AudioPanel( wxWindow* parent );
     wxPanel *CommonPanel( wxWindow* parent );
+    wxPanel *BitratePanel( wxWindow* parent );
     void    ParseMRL();
 
     /* Event handlers (these functions should _not_ be virtual) */
@@ -393,6 +394,10 @@ private:
     void OnNorm( wxCommandEvent& event );
     void OnFrequencyEnable( wxCommandEvent& event );
     void OnFrequency( wxCommandEvent& event );
+    void OnBitrateEnable( wxCommandEvent& event );
+    void OnBitrate( wxCommandEvent& event );
+    void OnMaxBitrateEnable( wxCommandEvent& event );
+    void OnMaxBitrate( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -418,6 +423,13 @@ private:
     wxCheckBox *audio_checkbox;
     wxTextCtrl *audio_device;
     wxSpinCtrl *audio_channel;
+
+    wxPanel *bitrate_subpanel;
+    wxPanel *bitrate_panel;
+    wxCheckBox *bitrate_checkbox;
+    wxSpinCtrl *bitrate;
+    wxCheckBox *maxbitrate_checkbox;
+    wxSpinCtrl *maxbitrate;
 
 };
 
