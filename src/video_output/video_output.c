@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: video_output.c,v 1.243 2004/01/06 12:02:06 zorglub Exp $
+ * $Id: video_output.c,v 1.244 2004/01/10 13:59:25 rocky Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -64,6 +64,20 @@ static int DeinterlaceCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
 static int FilterCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
+
+/**
+ * vout_AspectRatio
+ *
+ * Set the i_aspect_x and i_aspect_y from i_aspect.
+ */
+void vout_AspectRatio( unsigned int i_aspect, 
+		       /*out*/ unsigned int *i_aspect_x, 
+		       /*out*/ unsigned int *i_aspect_y )
+{ 
+  unsigned int i_pgcd = ReduceHeight( i_aspect );
+  *i_aspect_x = i_aspect / i_pgcd;
+  *i_aspect_y = VOUT_ASPECT_FACTOR / i_pgcd;
+}
 
 /*****************************************************************************
  * vout_Request: find a video output thread, create one, or destroy one.
@@ -334,10 +348,12 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
             if( i_new_aspect && i_new_aspect != i_aspect )
             {
-                int i_pgcd = ReduceHeight( i_new_aspect );
+	        unsigned int i_aspect_x, i_aspect_y;
+		
+		vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
 
                 msg_Dbg( p_vout, "overriding source aspect ratio to %i:%i",
-                         i_new_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
+                         i_aspect_x, i_aspect_y );
 
                 p_vout->render.i_aspect = i_new_aspect;
 
@@ -533,7 +549,8 @@ void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static int InitThread( vout_thread_t *p_vout )
 {
-    int i, i_pgcd;
+    int i;
+    unsigned int i_aspect_x, i_aspect_y;
 
     vlc_mutex_lock( &p_vout->change_lock );
 
@@ -582,28 +599,29 @@ static int InitThread( vout_thread_t *p_vout )
 
             if( i_new_aspect && i_new_aspect != p_vout->output.i_aspect )
             {
-                int i_pgcd = ReduceHeight( i_new_aspect );
+		vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+
                 msg_Dbg( p_vout, "output ratio forced to %i:%i\n",
-                         i_new_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
+                         i_aspect_x, i_aspect_y );
                 p_vout->output.i_aspect = i_new_aspect;
             }
         }
     }
 #endif
 
-    i_pgcd = ReduceHeight( p_vout->render.i_aspect );
+    vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_x, &i_aspect_y );
     msg_Dbg( p_vout,
              "picture in %ix%i, chroma 0x%.8x (%4.4s), aspect ratio %i:%i",
              p_vout->render.i_width, p_vout->render.i_height,
              p_vout->render.i_chroma, (char*)&p_vout->render.i_chroma,
-             p_vout->render.i_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
+             i_aspect_x, i_aspect_y );
 
-    i_pgcd = ReduceHeight( p_vout->output.i_aspect );
+    vout_AspectRatio( p_vout->output.i_aspect, &i_aspect_x, &i_aspect_y );
     msg_Dbg( p_vout,
              "picture out %ix%i, chroma 0x%.8x (%4.4s), aspect ratio %i:%i",
              p_vout->output.i_width, p_vout->output.i_height,
              p_vout->output.i_chroma, (char*)&p_vout->output.i_chroma,
-             p_vout->output.i_aspect / i_pgcd, VOUT_ASPECT_FACTOR / i_pgcd );
+             i_aspect_x, i_aspect_y );
 
     /* Calculate shifts from system-updated masks */
     MaskToShift( &p_vout->output.i_lrshift, &p_vout->output.i_rrshift,

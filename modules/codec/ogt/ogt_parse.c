@@ -2,7 +2,7 @@
  * Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: ogt_parse.c,v 1.6 2004/01/04 22:22:10 gbazin Exp $
+ * $Id: ogt_parse.c,v 1.7 2004/01/10 13:59:25 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -372,9 +372,23 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
     /* The video is automatically scaled. However subtitle bitmaps
        assume a 1:1 aspect ratio. So we need to scale to compensate for
        or undo the effects of video output scaling. 
+
+       Perhaps this should go in the Render routine? The advantage would
+       be that it will deal with a dynamically changing aspect ratio.
+       The downside is having to scale many times for each render call.
     */
-    /* FIXME do the right scaling depending on vout. It may not be 4:3 */
-    VCDSubScaleX( p_dec, p_spu, 3, 4 );
+    
+    {
+      vout_thread_t *p_vout = vlc_object_find( p_spu->p_sys->p_input,
+					       VLC_OBJECT_VOUT, 
+					       FIND_CHILD );
+      unsigned int i_aspect_x, i_aspect_y;
+      if (p_vout) {
+	vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_x, &i_aspect_y );
+	VCDSubScaleX( p_dec, p_spu, 3, 4 );
+      }
+    }
+
 
     return VLC_SUCCESS;
 }

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_video.h,v 1.7 2003/11/20 22:10:55 fenrir Exp $
+ * $Id: vlc_video.h,v 1.8 2004/01/10 13:59:25 rocky Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -239,6 +239,19 @@ struct subpicture_t
 #define FREE_SUBPICTURE        0                   /* free and not allocated */
 #define RESERVED_SUBPICTURE    1                   /* allocated and reserved */
 #define READY_SUBPICTURE       2                        /* ready for display */
+
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+/**
+ * vout_AspectRatio
+ *
+ * Set the i_aspect_x and i_aspect_y from the encoded aspect ratio i_aspect.
+ * \param i_aspect the encoded aspect ratio
+ * \param i_aspect_x the decoded x-axis portion of i_aspect. This is set.
+ * \param i_aspect_y the decoded y-axis portion of i_aspect  This is set.
+ */
+VLC_EXPORT( void,  vout_AspectRatio, ( unsigned int i_aspect, unsigned int *i_aspect_x, unsigned int *i_aspect_y ) );
 
 /**@}*/
 

@@ -2,7 +2,7 @@
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.3 2004/01/03 12:54:56 rocky Exp $
+ * $Id: common.c,v 1.4 2004/01/10 13:59:25 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -211,8 +211,8 @@ VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu,
   unsigned int used=0;  /* Number of bytes used up in p_src1. */
 
   dbg_print( (DECODE_DBG_CALL|DECODE_DBG_TRANSFORM) , 
-	     "Old width: %d, new width: %d", 
-	     p_spu->i_width, i_new_width);
+	     "aspect ratio %i:%i, Old width: %d, new width: %d", 
+	     i_scale_x, i_scale_y, p_spu->i_width, i_new_width);
   
   for ( i_row=0; i_row <= p_spu->i_height - 1; i_row++ ) {
 
