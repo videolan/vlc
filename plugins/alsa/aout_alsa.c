@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: aout_alsa.c,v 1.29 2002/03/08 00:26:07 bozo Exp $
+ * $Id: aout_alsa.c,v 1.30 2002/03/19 05:49:30 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -68,9 +68,8 @@ typedef struct aout_sys_s
  *****************************************************************************/
 static int aout_Open( aout_thread_t *p_aout )
 {
-
-    int i_open_returns;
-    char str_alsadev[128];
+    int i_ret;
+    char psz_alsadev[128];
 
     /* Allocate structures */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
@@ -78,12 +77,12 @@ static int aout_Open( aout_thread_t *p_aout )
     {
         intf_ErrMsg( "aout error: failed allocating memory for ALSA (%s)",
                      strerror(ENOMEM) );
-        return( 1 );
+        return -1;
     }
 
     if( p_aout->i_format != AOUT_FMT_AC3 )
     {
-        strcpy(str_alsadev, "default");
+        strcpy( psz_alsadev, "default" );
     }
     else
     {
@@ -92,23 +91,22 @@ static int aout_Open( aout_thread_t *p_aout )
         s[1] = IEC958_AES1_CON_ORIGINAL | IEC958_AES1_CON_PCM_CODER;
         s[2] = 0;
         s[3] = IEC958_AES3_CON_FS_48000;
-        sprintf( str_alsadev, "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
+        sprintf( psz_alsadev, "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
                  s[0], s[1], s[2], s[3] );
     }
 
     /* Open device */
-    if( ( i_open_returns = snd_pcm_open(&(p_aout->p_sys->p_alsa_handle),
-                                        str_alsadev,
-                                        SND_PCM_STREAM_PLAYBACK, 0) ) > 0 )
+    i_ret = snd_pcm_open( &(p_aout->p_sys->p_alsa_handle),
+                          psz_alsadev, SND_PCM_STREAM_PLAYBACK, 0);
+    if( i_ret != 0 )
     {
         intf_ErrMsg( "aout error: could not open ALSA device (%s)",
-                     snd_strerror(i_open_returns) );
-        return( -1 );
+                     snd_strerror( i_ret ) );
+        return -1;
     }
 
-    return( 0 );
+    return 0;
 }
-
 
 /*****************************************************************************
  * aout_SetFormat : sets the alsa output format

@@ -1,0 +1,3 @@
+?package(vlc-kde):command="/usr/bin/kvlc" hotkey="V" needs="X11" \
+                 section="Apps/Viewers" title="KDE VideoLAN Client" \
+                 icon="/usr/share/videolan/kvlc.xpm" hints="Video"

@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.4 2002/03/15 04:41:54 sam Exp $
+ * $Id: http.c,v 1.5 2002/03/19 05:49:30 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -241,11 +241,11 @@ static int HTTPOpen( input_thread_t * p_input )
     if( *p_input->psz_access )
     {
         /* Find out which shortcut was used */
-        if( !strncmp( p_input->psz_access, "http6", 5 ) )
+        if( !strncmp( p_input->psz_access, "http6", 6 ) )
         {
             p_access_data->psz_network = "ipv6";
         }
-        else if( !strncmp( p_input->psz_access, "http4", 5 ) )
+        else if( !strncmp( p_input->psz_access, "http4", 6 ) )
         {
             p_access_data->psz_network = "ipv4";
         }
@@ -309,7 +309,7 @@ static int HTTPOpen( input_thread_t * p_input )
     }
 
     /* Check proxy */
-    if( (psz_proxy = getenv( "http_proxy" )) != NULL )
+    if( (psz_proxy = getenv( "http_proxy" )) != NULL && *psz_proxy )
     {
         /* http://myproxy.mydomain:myport/ */
         int                 i_proxy_port = 0;

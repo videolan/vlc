@@ -72,7 +72,7 @@ case x"${target_os}" in
     ;;
   xbeos)
     SYS=beos
-    LIB="${LIB} -lbe -lbind"
+    LIB_IPV4="${LIB_IPV4} -lbind"
     LIB_BEOS="${LIB_BEOS} -lbe -lgame -lroot -ltracker"
     PLDFLAGS="${PLDFLAGS} -nostart"
     ;;
@@ -84,10 +84,13 @@ esac
 dnl Check for system libs needed
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty)
 AC_CHECK_FUNC(connect,,[
-  AC_CHECK_LIB(socket,connect,LIB="${LIB} -lsocket")
+  AC_CHECK_LIB(socket,connect,LIB_IPV4="${LIB_IPV4} -lsocket")
 ])
 AC_CHECK_FUNC(gethostbyname,,[
-  AC_CHECK_LIB(nsl,gethostbyname,LIB="${LIB} -lnsl")
+  AC_CHECK_LIB(nsl,gethostbyname,LIB_IPV4="${LIB_IPV4} -lnsl")
+])
+AC_CHECK_FUNC(gethostbyname,,[
+  AC_CHECK_LIB(bind,gethostbyname,LIB_IPV4="${LIB_IPV4} -lbind")
 ])
 AC_CHECK_FUNC(nanosleep,,[
   AC_CHECK_LIB(rt,nanosleep,LIB="${LIB} -lrt",[
