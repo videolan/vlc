@@ -2,11 +2,12 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.1 2002/08/07 21:36:55 massiot Exp $
+ * $Id: alsa.c,v 1.2 2002/08/14 10:50:12 bozo Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
  *          John Paul Lorenti <jpl31@columbia.edu> - Device selection
+ *          Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr> - S/PDIF and aout3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +32,41 @@
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
 #include <vlc/vlc.h>
+
 #include <vlc/aout.h>
 
+#include "aout_internal.h"
+
+/* ALSA part */
 #include <alsa/asoundlib.h>
+
+/*****************************************************************************
+ * aout_sys_t: ALSA audio output method descriptor
+ *****************************************************************************
+ * This structure is part of the audio output thread descriptor.
+ * It describes the ALSA specific properties of an audio device.
+ *****************************************************************************/
+struct aout_sys_t
+{
+    snd_pcm_t         * p_snd_pcm;
+    snd_pcm_sframes_t   i_buffer_size;
+    int                 i_period_time;
+
+    volatile vlc_bool_t b_initialized;
+
+#ifdef DEBUG
+    snd_output_t      * p_snd_stderr;
+#endif
+};
+
+/* These values are in frames.
+ * To convert them to a numer of bytes you have to multiply them by the
+ * number of channel(s) (eg. 2 for stereo) and the size of a sample (eg.
+ * 2 for s16). */
+#define ALSA_DEFAULT_PERIOD_SIZE        2048
+#define ALSA_DEFAULT_BUFFER_SIZE        ( ALSA_DEFAULT_PERIOD_SIZE << 4 )
+#define ALSA_SPDIF_PERIOD_SIZE          1536
+#define ALSA_SPDIF_BUFFER_SIZE          ( ALSA_SPDIF_PERIOD_SIZE << 4 )
 
 /*****************************************************************************
  * Local prototypes
@@ -41,50 +74,23 @@
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
-static int  SetFormat    ( aout_thread_t * );
-static int  GetBufInfo   ( aout_thread_t *, int );
-static void Play         ( aout_thread_t *, byte_t *, int );
+static int  SetFormat    ( aout_instance_t * );
+static void Play         ( aout_instance_t *,
+                           aout_buffer_t * );
 
-static void HandleXrun   ( aout_thread_t *);
+static int  ALSAThread   ( aout_instance_t * );
+static void ALSAFill     ( aout_instance_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    add_category_hint( N_("Device"), NULL );
+    add_category_hint( N_("Audio"), NULL );
     add_string( "alsa-device", NULL, NULL, N_("Name"), NULL );
     set_description( _("ALSA audio module") );
     set_capability( "audio output", 50 );
     set_callbacks( Open, Close );
 vlc_module_end();
-
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-typedef struct alsa_device_t
-{
-    int i_num;
-} alsa_device_t;
-
-typedef struct alsa_card_t
-{
-    int i_num;
-} alsa_card_t;
-
-/* here we store plugin dependant informations */
-
-struct aout_sys_t
-{
-    snd_pcm_t   * p_alsa_handle;
-    unsigned long buffer_time;
-    unsigned long period_time;
-    unsigned long chunk_size;
-    unsigned long buffer_size;
-    unsigned long rate;
-    unsigned int  bytes_per_sample;
-    unsigned int  samples_per_frame;
-    unsigned int  bytes_per_frame;
-};
 
 /*****************************************************************************
  * Open: create a handle and open an alsa device
@@ -93,24 +99,26 @@ struct aout_sys_t
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_thread_t *p_aout = (aout_thread_t *)p_this;
+    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    struct aout_sys_t * p_sys;
+    char * psz_device;
 
     /* Allows user to choose which ALSA device to use */
     char  psz_alsadev[128];
-    char *psz_device, *psz_userdev;
-    int   i_ret;
+    char * psz_userdev;
+    int   i_snd_rc;
 
     /* Allocate structures */
-    p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
-    if( p_aout->p_sys == NULL )
+    p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
+    if( p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
         return -1;
     }
 
-    p_aout->pf_setformat = SetFormat;
-    p_aout->pf_getbufinfo = GetBufInfo;
-    p_aout->pf_play = Play;
+#ifdef DEBUG
+    snd_output_stdio_attach( &p_sys->p_snd_stderr, stderr, 0 );
+#endif
 
     /* Read in ALSA device preferences from configuration */
     psz_userdev = config_GetPsz( p_aout, "alsa-device" );
@@ -122,11 +130,7 @@ static int Open( vlc_object_t *p_this )
     else
     {
         /* Use the internal logic to decide on the device name */
-        if( p_aout->i_format != AOUT_FMT_A52 )
-        {
-            psz_device = "default";
-        }
-        else
+        if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
         {
             unsigned char s[4];
             s[0] = IEC958_AES0_CON_EMPHASIS_NONE | IEC958_AES0_NONAUDIO;
@@ -137,21 +141,28 @@ static int Open( vlc_object_t *p_this )
                      "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
                      s[0], s[1], s[2], s[3] );
             psz_device = psz_alsadev;
+            p_sys->i_buffer_size = ALSA_SPDIF_BUFFER_SIZE;
+            p_aout->output.i_nb_samples = ALSA_SPDIF_PERIOD_SIZE;
+        }
+        else
+        {
+            psz_device = "default";
+            p_sys->i_buffer_size = ALSA_DEFAULT_BUFFER_SIZE;
+            p_aout->output.i_nb_samples = ALSA_DEFAULT_PERIOD_SIZE;
         }
     }
 
     /* Open device */
-    i_ret = snd_pcm_open( &(p_aout->p_sys->p_alsa_handle),
-                          psz_device, SND_PCM_STREAM_PLAYBACK, 0);
-    if( i_ret != 0 )
+    i_snd_rc = snd_pcm_open( &p_sys->p_snd_pcm, psz_device,
+                             SND_PCM_STREAM_PLAYBACK, SND_PCM_NONBLOCK);
+    if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "cannot open ALSA device `%s' (%s)",
-                         psz_device, snd_strerror(i_ret) );
+                         psz_device, snd_strerror(i_snd_rc) );
         if( psz_userdev )
-        {
             free( psz_userdev );
-        }
-
+        free( p_sys );
+        p_sys->p_snd_pcm = NULL;
         return -1;
     }
 
@@ -159,6 +170,20 @@ static int Open( vlc_object_t *p_this )
     {
         free( psz_userdev );
     }
+
+    /* Create ALSA thread and wait for its readiness. */
+    p_sys->b_initialized = VLC_FALSE;
+    if( vlc_thread_create( p_aout, "aout", ALSAThread, VLC_FALSE ) )
+    {
+        msg_Err( p_aout, "cannot create ALSA thread (%s)", strerror(errno) );
+        if( psz_userdev )
+            free( psz_userdev );
+        free( p_sys );
+        return -1;
+    }
+
+    p_aout->output.pf_setformat = SetFormat;
+    p_aout->output.pf_play = Play;
 
     return 0;
 }
@@ -169,9 +194,11 @@ static int Open( vlc_object_t *p_this )
  * This function prepares the device, sets the rate, format, the mode
  * ( "play as soon as you have data" ), and buffer information.
  *****************************************************************************/
-static int SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_instance_t * p_aout )
 {
-    int i_rv;
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    int i_snd_rc;
     int i_format;
 
     snd_pcm_hw_params_t *p_hw;
@@ -180,223 +207,122 @@ static int SetFormat( aout_thread_t *p_aout )
     snd_pcm_hw_params_alloca(&p_hw);
     snd_pcm_sw_params_alloca(&p_sw);
 
-    /* default value for snd_pcm_hw_params_set_buffer_time_near() */
-    p_aout->p_sys->buffer_time = AOUT_BUFFER_DURATION;
-
-    switch (p_aout->i_format)
+    switch (p_aout->output.output.i_format)
     {
-        case AOUT_FMT_S16_LE:
-            i_format = SND_PCM_FORMAT_S16_LE;
-            p_aout->p_sys->bytes_per_sample = 2;
-            break;
-
-        case AOUT_FMT_A52:
-            i_format = SND_PCM_FORMAT_S16_LE;
-            p_aout->p_sys->bytes_per_sample = 2;
-            /* buffer_time must be 500000 to avoid a system crash */
-            p_aout->p_sys->buffer_time = 500000;
-            break;
-
+        case AOUT_FMT_MU_LAW:    i_format = SND_PCM_FORMAT_MU_LAW; break;
+        case AOUT_FMT_A_LAW:     i_format = SND_PCM_FORMAT_A_LAW; break;
+        case AOUT_FMT_IMA_ADPCM: i_format = SND_PCM_FORMAT_IMA_ADPCM; break;
+        case AOUT_FMT_U8:        i_format = SND_PCM_FORMAT_U8; break;
+        case AOUT_FMT_S16_LE:    i_format = SND_PCM_FORMAT_S16_LE; break;
+        case AOUT_FMT_S16_BE:    i_format = SND_PCM_FORMAT_S16_BE; break;
+        case AOUT_FMT_S8:        i_format = SND_PCM_FORMAT_S8; break;
+        case AOUT_FMT_U16_LE:    i_format = SND_PCM_FORMAT_U16_LE; break;
+        case AOUT_FMT_U16_BE:    i_format = SND_PCM_FORMAT_U16_BE; break;
+        case AOUT_FMT_FLOAT32:   i_format = SND_PCM_FORMAT_FLOAT; break;
+        case AOUT_FMT_FIXED32:
         default:
-            i_format = SND_PCM_FORMAT_S16_BE;
-            p_aout->p_sys->bytes_per_sample = 2;
+            msg_Err( p_aout, "audio output format 0x%x not supported",
+                     p_aout->output.output.i_format );
+            return -1;
             break;
     }
 
-    p_aout->p_sys->samples_per_frame = p_aout->i_channels;
-    p_aout->p_sys->bytes_per_frame = p_aout->p_sys->samples_per_frame *
-                                     p_aout->p_sys->bytes_per_sample;
-
-    i_rv = snd_pcm_hw_params_any( p_aout->p_sys->p_alsa_handle, p_hw );
-    if( i_rv < 0 )
+    i_snd_rc = snd_pcm_hw_params_any( p_sys->p_snd_pcm, p_hw );
+    if( i_snd_rc < 0 )
     {
-        msg_Err( p_aout, "unable to retrieve initial parameters" );
+        msg_Err( p_aout, "unable to retrieve initial hardware parameters" );
         return -1;
     }
 
-    i_rv = snd_pcm_hw_params_set_access( p_aout->p_sys->p_alsa_handle, p_hw,
-                                         SND_PCM_ACCESS_RW_INTERLEAVED );
-    if( i_rv < 0 )
+    i_snd_rc = snd_pcm_hw_params_set_access( p_sys->p_snd_pcm, p_hw,
+                                             SND_PCM_ACCESS_RW_INTERLEAVED );
+    if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "unable to set interleaved stream format" );
         return -1;
     }
 
-    i_rv = snd_pcm_hw_params_set_format( p_aout->p_sys->p_alsa_handle,
-                                         p_hw, i_format );
-    if( i_rv < 0 )
+    i_snd_rc = snd_pcm_hw_params_set_format( p_sys->p_snd_pcm, p_hw, i_format );
+    if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "unable to set stream sample size and word order" );
         return -1;
     }
 
-    i_rv = snd_pcm_hw_params_set_channels( p_aout->p_sys->p_alsa_handle, p_hw,
-                                           p_aout->i_channels );
-    if( i_rv < 0 )
+    i_snd_rc = snd_pcm_hw_params_set_channels( p_sys->p_snd_pcm, p_hw,
+                    p_aout->output.output.i_channels );
+    if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "unable to set number of output channels" );
         return -1;
     }
 
-    i_rv = snd_pcm_hw_params_set_rate_near( p_aout->p_sys->p_alsa_handle, p_hw,
-                                            p_aout->i_rate, 0 );
-    if( i_rv < 0 )
+    i_snd_rc = snd_pcm_hw_params_set_rate( p_sys->p_snd_pcm, p_hw,
+                                           p_aout->output.output.i_rate, 0 );
+    if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "unable to set sample rate" );
         return -1;
     }
-    p_aout->p_sys->rate = i_rv;
 
-    i_rv = snd_pcm_hw_params_set_buffer_time_near( p_aout->p_sys->p_alsa_handle,
-                                                   p_hw,
-                                                   p_aout->p_sys->buffer_time,
-                                                   0 );
-    if( i_rv < 0 )
+    i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm, p_hw,
+                                                       p_sys->i_buffer_size );
+    if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "unable to set buffer time" );
         return -1;
     }
-    p_aout->p_sys->buffer_time = i_rv;
+    p_sys->i_buffer_size = i_snd_rc;
 
-    i_rv = snd_pcm_hw_params_set_period_time_near( p_aout->p_sys->p_alsa_handle,
-         p_hw, p_aout->p_sys->buffer_time / p_aout->p_sys->bytes_per_frame, 0 );
-    if( i_rv < 0 )
+    i_snd_rc = snd_pcm_hw_params_set_period_size_near(
+                    p_sys->p_snd_pcm, p_hw, p_aout->output.i_nb_samples, 0 );
+    if( i_snd_rc < 0 )
     {
-        msg_Err( p_aout, "unable to set period time" );
+        msg_Err( p_aout, "unable to set period size" );
         return -1;
     }
-    p_aout->p_sys->period_time = i_rv;
+    p_aout->output.i_nb_samples = i_snd_rc;
+    p_sys->i_period_time = snd_pcm_hw_params_get_period_time( p_hw, 0 );
 
-    i_rv = snd_pcm_hw_params(p_aout->p_sys->p_alsa_handle, p_hw);
-    if (i_rv < 0)
+    i_snd_rc = snd_pcm_hw_params( p_sys->p_snd_pcm, p_hw );
+    if (i_snd_rc < 0)
     {
         msg_Err( p_aout, "unable to set hardware configuration" );
         return -1;
     }
 
-    p_aout->p_sys->chunk_size = snd_pcm_hw_params_get_period_size( p_hw, 0 );
-    p_aout->p_sys->buffer_size = snd_pcm_hw_params_get_buffer_size( p_hw );
+    snd_pcm_sw_params_current( p_sys->p_snd_pcm, p_sw );
+    i_snd_rc = snd_pcm_sw_params_set_sleep_min( p_sys->p_snd_pcm, p_sw, 0 );
 
-    snd_pcm_sw_params_current( p_aout->p_sys->p_alsa_handle, p_sw );
-    i_rv = snd_pcm_sw_params_set_sleep_min( p_aout->p_sys->p_alsa_handle, p_sw,
-                                            0 );
+    i_snd_rc = snd_pcm_sw_params_set_avail_min( p_sys->p_snd_pcm, p_sw,
+                                                p_aout->output.i_nb_samples );
 
-    i_rv = snd_pcm_sw_params_set_avail_min( p_aout->p_sys->p_alsa_handle, p_sw,
-                                            p_aout->p_sys->chunk_size );
-
-    /* Worked with the CVS version but not with 0.9beta3
-    i_rv = snd_pcm_sw_params_set_start_threshold( p_aout->p_sys->p_alsa_handle,
-                                            p_sw, p_aout->p_sys->buffer_size );
-
-    i_rv = snd_pcm_sw_params_set_stop_threshold( p_aout->p_sys->p_alsa_handle,
-                                             p_sw, p_aout->p_sys->buffer_size);
-    */
-    i_rv = snd_pcm_sw_params( p_aout->p_sys->p_alsa_handle, p_sw );
-    if( i_rv < 0 )
+    i_snd_rc = snd_pcm_sw_params( p_sys->p_snd_pcm, p_sw );
+    if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "unable to set software configuration" );
         return -1;
     }
 
+#ifdef DEBUG
+    snd_output_printf( p_sys->p_snd_stderr, "\nALSA hardware setup:\n\n" );
+    snd_pcm_dump_hw_setup( p_sys->p_snd_pcm, p_sys->p_snd_stderr );
+    snd_output_printf( p_sys->p_snd_stderr, "\nALSA software setup:\n\n" );
+    snd_pcm_dump_sw_setup( p_sys->p_snd_pcm, p_sys->p_snd_stderr );
+    snd_output_printf( p_sys->p_snd_stderr, "\n" );
+#endif
+
+    p_sys->b_initialized = VLC_TRUE;
+
     return 0;
 }
 
 /*****************************************************************************
- * HandleXrun : reprepare the output
- *****************************************************************************
- * When buffer gets empty, the driver goes in "Xrun" state, where it needs
- * to be reprepared before playing again
+ * Play: queue a buffer for playing by ALSAThread
  *****************************************************************************/
-static void HandleXrun(aout_thread_t *p_aout)
+static void Play( aout_instance_t *p_aout, aout_buffer_t * p_buffer )
 {
-    int i_rv;
-
-    msg_Err( p_aout, "resetting output after buffer underrun" );
-
-//    i_rv = snd_pcm_reset( p_aout->p_sys->p_alsa_handle );
-    i_rv = snd_pcm_prepare( p_aout->p_sys->p_alsa_handle );
-    if( i_rv < 0 )
-    {
-        msg_Err( p_aout, "unable to recover from buffer underrun (%s)",
-                         snd_strerror( i_rv ) );
-    }
-}
-
-
-/*****************************************************************************
- * BufInfo: buffer status query
- *****************************************************************************
- * This function returns the number of used byte in the queue.
- * It also deals with errors : indeed if the device comes to run out
- * of data to play, it switches to the "underrun" status. It has to
- * be flushed and re-prepared
- *****************************************************************************/
-static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
-{
-    snd_pcm_status_t *p_status;
-    int i_alsa_get_status_returns;
-
-    snd_pcm_status_alloca( &p_status );
-
-    i_alsa_get_status_returns = snd_pcm_status( p_aout->p_sys->p_alsa_handle,
-                                                p_status );
-
-    if( i_alsa_get_status_returns )
-    {
-        msg_Err( p_aout, "failed getting alsa buffer info (%s)",
-                         snd_strerror ( i_alsa_get_status_returns ) );
-        return ( -1 );
-    }
-
-    switch( snd_pcm_status_get_state( p_status ) )
-    {
-        case SND_PCM_STATE_XRUN :
-            HandleXrun( p_aout );
-            break;
-
-        case SND_PCM_STATE_OPEN:
-        case SND_PCM_STATE_PREPARED:
-        case SND_PCM_STATE_RUNNING:
-            break;
-
-        default:
-            msg_Err( p_aout, "unhandled condition %i",
-                             snd_pcm_status_get_state( p_status ) );
-            break;
-    }
-
-    return snd_pcm_status_get_avail(p_status) * p_aout->p_sys->bytes_per_frame;
-}
-
-/*****************************************************************************
- * Play : plays a sample
- *****************************************************************************
- * Plays a sample using the snd_pcm_writei function from the alsa API
- *****************************************************************************/
-static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
-{
-    snd_pcm_uframes_t tot_frames;
-    snd_pcm_uframes_t frames_left;
-    snd_pcm_uframes_t rv;
-
-    tot_frames = i_size / p_aout->p_sys->bytes_per_frame;
-    frames_left = tot_frames;
-
-    while( frames_left > 0 )
-    {
-        rv = snd_pcm_writei( p_aout->p_sys->p_alsa_handle, buffer +
-                             (tot_frames - frames_left) *
-                             p_aout->p_sys->bytes_per_frame, frames_left );
-
-        if( (signed int) rv < 0 )
-        {
-            msg_Err( p_aout, "failed writing to output (%s)",
-                             snd_strerror( rv ) );
-            return;
-        }
-
-        frames_left -= rv;
-    }
+    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
 }
 
 /*****************************************************************************
@@ -404,17 +330,134 @@ static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    aout_thread_t *p_aout = (aout_thread_t *)p_this;
-    int i_close_returns;
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    int i_snd_rc;
 
-    i_close_returns = snd_pcm_close( p_aout->p_sys->p_alsa_handle );
+    p_aout->b_die = 1;
+    vlc_thread_join( p_aout );
 
-    if( i_close_returns )
+    if( p_sys->p_snd_pcm )
     {
-        msg_Err( p_aout, "failed closing ALSA device (%s)",
-                         snd_strerror( i_close_returns ) );
+        i_snd_rc = snd_pcm_close( p_sys->p_snd_pcm );
+
+        if( i_snd_rc > 0 )
+        {
+            msg_Err( p_aout, "failed closing ALSA device (%s)",
+                             snd_strerror( i_snd_rc ) );
+        }
     }
 
-    free( p_aout->p_sys );
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * ALSAThread: asynchronous thread used to DMA the data to the device
+ *****************************************************************************/
+static int ALSAThread( aout_instance_t * p_aout )
+{
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    while ( !p_aout->b_die )
+    {
+        if( !p_sys->b_initialized )
+        {
+            msleep( THREAD_SLEEP );
+            continue;
+        }
+
+        ALSAFill( p_aout );
+
+        msleep( p_sys->i_period_time );
+    }
+
+    return 0;
+}
+
+/*****************************************************************************
+ * ALSAFill: function used to fill the ALSA buffer as much as possible
+ *****************************************************************************/
+static void ALSAFill( aout_instance_t * p_aout )
+{
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    aout_buffer_t * p_buffer;
+    mtime_t next_date = 0;
+    snd_pcm_status_t * p_status;
+    snd_timestamp_t ts_next;
+    int i_snd_rc, i_size;
+    byte_t * p_bytes;
+    snd_pcm_uframes_t i_avail;
+
+    snd_pcm_status_alloca( &p_status );
+
+    i_snd_rc = snd_pcm_wait( p_sys->p_snd_pcm, THREAD_SLEEP );
+    if( i_snd_rc < 0 )
+    {
+        msg_Err( p_aout, "alsa device not ready !!! (%s)",
+                         snd_strerror( i_snd_rc ) );
+        return;
+    }
+
+    while( VLC_TRUE )
+    {
+        i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
+        if( i_snd_rc < 0 )
+        {
+            msg_Err( p_aout, "unable to get the device's status (%s)",
+                             snd_strerror( i_snd_rc ) );
+            return;
+        }
+
+        if( snd_pcm_status_get_state( p_status ) == SND_PCM_STATE_XRUN )
+        {
+            i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
+            if( i_snd_rc == 0 )
+            {
+                msg_Err( p_aout, "recovered from buffer underrun" );
+                next_date = mdate();
+                i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
+                if( i_snd_rc < 0 )
+                {
+                    msg_Err( p_aout,
+                        "unable to get the device's status after recovery (%s)",
+                        snd_strerror( i_snd_rc ) );
+                    return;
+                }
+            }
+            else
+            {
+                msg_Err( p_aout, "unable to recover from buffer underrun" );
+                return;
+            }
+        }
+
+        i_avail = snd_pcm_status_get_avail( p_status );
+        if( i_avail >= p_aout->output.i_nb_samples )
+        {
+            snd_pcm_status_get_tstamp( p_status, &ts_next );
+            next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
+
+            p_buffer = aout_OutputNextBuffer( p_aout, next_date, 0 );
+
+            if( p_buffer == NULL )
+                return;
+
+            p_bytes = p_buffer->p_buffer;
+
+            i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_bytes,
+                                       p_buffer->i_nb_samples );
+
+            if( i_snd_rc < 0 )
+            {
+                msg_Err( p_aout, "write failed (%s)",
+                                 snd_strerror( i_snd_rc ) );
+            }
+            else
+            {
+                aout_BufferFree( p_buffer );
+            }
+        }
+    }
 }
 
