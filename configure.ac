@@ -1126,8 +1126,8 @@ then
   AX_ADD_PLUGINS([packetizer_copy])
 
   AX_ADD_PLUGINS([stream_out_dummy stream_out_standard stream_out_es stream_out_rtp])
-  AX_ADD_PLUGINS([stream_out_duplicate stream_out_display stream_out_gather])
-#  AX_ADD_PLUGINS([stream_out_transrate])
+  AX_ADD_PLUGINS([stream_out_duplicate stream_out_gather])
+#  AX_ADD_PLUGINS([stream_out_transrate stream_out_display])
 
   dnl Ogg and vorbis are handled in their respective section
 fi
