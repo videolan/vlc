@@ -2,7 +2,7 @@
  * rawvideo.c: Pseudo audio decoder; for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.4 2003/04/27 23:16:35 gbazin Exp $
+ * $Id: rawvideo.c,v 1.5 2003/05/02 03:40:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -239,6 +239,7 @@ static void FillPicture( pes_packet_t *p_pes, picture_t *p_pic )
             p_dst += i_copy;
 
             i_src -= i_copy;
+            p_src += i_copy;
             if( i_src <= 0 )
             {
                 do
