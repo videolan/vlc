@@ -49,26 +49,11 @@ void VCDSubClose( vlc_object_t *p_this )
 
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_EXT) , "");
 
-    if( !p_sys->b_packetizer )
+    if( !p_sys->b_packetizer && p_sys->p_vout )
     {
         /* FIXME check if it's ok to not lock vout */
-        if( p_sys->p_vout != NULL && p_sys->p_vout->p_subpicture != NULL )
-        {
-            subpicture_t *  p_subpic;
-            int             i_subpic;
-
-            for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
-            {
-                p_subpic = &p_sys->p_vout->p_subpicture[i_subpic];
-
-                if( p_subpic != NULL &&
-                    ( ( p_subpic->i_status == RESERVED_SUBPICTURE ) ||
-                      ( p_subpic->i_status == READY_SUBPICTURE ) ) )
-                {
-                    vout_DestroySubPicture( p_sys->p_vout, p_subpic );
-                }
-            }
-        }
+        spu_Control( p_sys->p_vout->p_spu, SPU_CHANNEL_CLEAR,
+                     p_sys->i_subpic_channel );
     }
 
     if( p_sys->p_block )

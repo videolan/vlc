@@ -91,6 +91,7 @@
 #include "vlc_video.h"
 #include "video_output.h"
 #include "vout_synchro.h"
+#include "vlc_spu.h"
 
 #include "audio_output.h"
 #include "aout_internal.h"

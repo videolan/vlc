@@ -37,6 +37,7 @@
 
 #include "vlc_video.h"
 #include "video_output.h"
+#include "vlc_spu.h"
 #include <vlc/input.h>                 /* for input_thread_t and i_pts_delay */
 
 #if defined( SYS_DARWIN )
@@ -85,7 +86,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
 
             if( p_playlist )
             {
-                vout_AttachSPU( p_vout, p_this, VLC_FALSE );
+                spu_Attach( p_vout->p_spu, p_this, VLC_FALSE );
                 vlc_object_detach( p_vout );
                 vlc_object_attach( p_vout, p_playlist );
 
@@ -180,7 +181,7 @@ vout_thread_t * __vout_Request ( vlc_object_t *p_this, vout_thread_t *p_vout,
         {
             /* This video output is cool! Hijack it. */
             vlc_object_detach( p_vout );
-            vout_AttachSPU( p_vout, p_this, VLC_TRUE );
+            spu_Attach( p_vout->p_spu, p_this, VLC_TRUE );
             vlc_object_attach( p_vout, p_this );
             vlc_object_release( p_vout );
         }
@@ -234,10 +235,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     /* No images in the heap */
     p_vout->i_heap_size = 0;
 
-    /* Register the default subpicture channel */
-    p_vout->p_default_channel = NULL;
-    p_vout->i_channel_count = 1;
-
     /* Initialize the rendering heap */
     I_RENDERPICTURES = 0;
     p_vout->render.i_width    = i_width;
@@ -280,7 +277,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
 
     /* Initialize locks */
     vlc_mutex_init( p_vout, &p_vout->picture_lock );
-    vlc_mutex_init( p_vout, &p_vout->subpicture_lock );
     vlc_mutex_init( p_vout, &p_vout->change_lock );
 
     /* Mouse coordinates */
@@ -291,8 +287,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     var_Create( p_vout, "mouse-clicked", VLC_VAR_INTEGER );
 
     /* Initialize subpicture unit */
-    vout_InitSPU( p_vout );
-    vout_AttachSPU( p_vout, p_parent, VLC_TRUE );
+    p_vout->p_spu = spu_Init( p_vout );
+    spu_Attach( p_vout->p_spu, p_parent, VLC_TRUE );
 
     /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach( p_vout, p_parent );
@@ -886,7 +882,7 @@ static void RunThread( vout_thread_t *p_vout)
         /*
          * Check for subpictures to display
          */
-        p_subpic = vout_SortSubPictures( p_vout, display_date );
+        p_subpic = spu_SortSubpictures( p_vout->p_spu, display_date );
 
         /*
          * Perform rendering
@@ -1100,7 +1096,8 @@ static void EndThread( vout_thread_t *p_vout )
     }
 
     /* Destroy subpicture unit */
-    vout_DestroySPU( p_vout );
+    spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), VLC_FALSE );
+    spu_Destroy( p_vout->p_spu );
 
     /* Destroy translation tables */
     p_vout->pf_end( p_vout );
@@ -1119,7 +1116,6 @@ static void DestroyThread( vout_thread_t *p_vout )
 {
     /* Destroy the locks */
     vlc_mutex_destroy( &p_vout->picture_lock );
-    vlc_mutex_destroy( &p_vout->subpicture_lock );
     vlc_mutex_destroy( &p_vout->change_lock );
 
     /* Release the module */

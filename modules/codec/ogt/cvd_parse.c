@@ -292,12 +292,10 @@ E_(ParsePacket)( decoder_t *p_dec)
     dbg_print( (DECODE_DBG_CALL|DECODE_DBG_EXT) , "");
 
     /* Allocate the subpicture internal data. */
-    p_spu = vout_CreateSubPicture( p_sys->p_vout, p_sys->i_subpic_channel,
-                                   MEMORY_SUBPICTURE );
-    if( p_spu == NULL )
-    {
-        return;
-    }
+    p_spu = spu_CreateSubpicture( p_sys->p_vout->p_spu );
+    if( p_spu == NULL ) return;
+
+    p_spu->i_channel = p_sys->i_subpic_channel;
 
     /* In ParseImage we expand the run-length encoded color 0's; also
        we expand pixels and remove the color palette. This should
@@ -349,12 +347,12 @@ E_(ParsePacket)( decoder_t *p_dec)
     if( ParseImage( p_dec, p_spu ) )
     {
         /* There was a parse error, delete the subpicture */
-        vout_DestroySubPicture( p_sys->p_vout, p_spu );
+        spu_DestroySubpicture( p_sys->p_vout->p_spu, p_spu );
         return;
     }
 
     /* SPU is finished - we can ask the video output to display it */
-    vout_DisplaySubPicture( p_sys->p_vout, p_spu );
+    spu_DisplaySubpicture( p_sys->p_vout->p_spu, p_spu );
 
 }
 

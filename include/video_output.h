@@ -126,22 +126,8 @@ struct vout_thread_t
     /* Picture heap */
     picture_t           p_picture[2*VOUT_MAX_PICTURES+1];      /**< pictures */
 
-    /* Subpicture properties */
-    subpicture_t        p_subpicture[VOUT_MAX_PICTURES];    /**< subpictures */
-    subpicture_t        *p_default_channel;   /**< subpicture in the default
-                                                   channel */
-    int                 i_channel_count;       /**< index of last subpicture
-                                                    channel registered */
-
-    filter_t *p_blend;                            /**< alpha blending module */
-    filter_t *p_text;                              /**< text renderer module */
-
-    vlc_bool_t b_force_crop;               /**< force cropping of subpicture */
-    int i_crop_x, i_crop_y, i_crop_width, i_crop_height;       /**< cropping */
-
-    vlc_bool_t b_force_alpha;         /**< force alpha palette of subpicture */
-    uint8_t pi_alpha[4];                           /**< forced alpha palette */
-
+    /* Subpicture unit */
+    spu_t            *p_spu;
 
     /* Statistics */
     count_t          c_loops;
@@ -260,27 +246,6 @@ enum output_query_e
     VOUT_CLOSE
 };
 
-/**
- * \addtogroup subpicture
- * @{
- */
-VLC_EXPORT( subpicture_t *,  vout_CreateSubPicture,   ( vout_thread_t *, int, int ) );
-VLC_EXPORT( void,            vout_DestroySubPicture,  ( vout_thread_t *, subpicture_t * ) );
-VLC_EXPORT( void,            vout_DisplaySubPicture,  ( vout_thread_t *, subpicture_t * ) );
-VLC_EXPORT( int,             vout_RegisterOSDChannel, ( vout_thread_t * ) );
-VLC_EXPORT( void,            vout_ClearOSDChannel,    ( vout_thread_t *, int ) );
-#define spu_CreateRegion(a,b) __spu_CreateRegion(VLC_OBJECT(a),b)
-VLC_EXPORT( subpicture_region_t *,__spu_CreateRegion, ( vlc_object_t *, video_format_t * ) );
-#define spu_DestroyRegion(a,b) __spu_DestroyRegion(VLC_OBJECT(a),b)
-VLC_EXPORT( void, __spu_DestroyRegion, ( vlc_object_t *, subpicture_region_t * ) );
-
-void           vout_InitSPU( vout_thread_t * );
-void           vout_DestroySPU( vout_thread_t * );
-void           vout_AttachSPU( vout_thread_t *, vlc_object_t *, vlc_bool_t );
-subpicture_t * vout_SortSubPictures  ( vout_thread_t *, mtime_t );
-void           vout_RenderSubPictures( vout_thread_t *, picture_t *,
-                                       picture_t *, subpicture_t * );
-/** @}*/
 /**
  * @}
  */

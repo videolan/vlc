@@ -151,24 +151,11 @@ void E_(CloseIntf) ( vlc_object_t *p_this )
 
     /* Erase the anchor text description from the video output if it exists */
     p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_vout != NULL && p_vout->p_subpicture != NULL )
+    if( p_vout )
     {
-        subpicture_t *p_subpic;
-        int          i_subpic;
-
-        for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
-        {
-            p_subpic = &p_vout->p_subpicture[i_subpic];
-
-            if( p_subpic != NULL &&
-              ( p_subpic->i_status == RESERVED_SUBPICTURE
-                || p_subpic->i_status == READY_SUBPICTURE ) )
-            {
-                vout_DestroySubPicture( p_vout, p_subpic );
-            }
-        }
+        spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR, DEFAULT_CHAN );
+        vlc_object_release( p_vout );
     }
-    if( p_vout ) vlc_object_release( p_vout );
 
     var_DelCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
 

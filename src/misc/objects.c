@@ -39,6 +39,7 @@
 
 #include "vlc_video.h"
 #include "video_output.h"
+#include "vlc_spu.h"
 
 #include "audio_output.h"
 #include "aout_internal.h"
@@ -51,6 +52,8 @@
 
 #include "vlc_httpd.h"
 #include "vlc_vlm.h"
+#include "vlc_vod.h"
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -158,6 +161,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof(vout_thread_t);
             psz_type = "video output";
             break;
+        case VLC_OBJECT_SPU:
+            i_size = sizeof(spu_t);
+            psz_type = "subpicture unit";
+            break;
         case VLC_OBJECT_AOUT:
             i_size = sizeof(aout_instance_t);
             psz_type = "audio output";
@@ -173,6 +180,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_VLM:
             i_size = sizeof( vlm_t );
             psz_type = "vlm dameon";
+            break;
+        case VLC_OBJECT_VOD:
+            i_size = sizeof( vod_t );
+            psz_type = "vod server";
             break;
         case VLC_OBJECT_OPENGL:
             i_size = sizeof( vout_thread_t );

@@ -222,8 +222,6 @@ static int  transcode_spu_new    ( sout_stream_t *, sout_stream_id_t * );
 static void transcode_spu_close  ( sout_stream_t *, sout_stream_id_t * );
 static int  transcode_spu_process( sout_stream_t *, sout_stream_id_t *,
                                    block_t *, block_t ** );
-static subpicture_t *transcode_spu_get( sout_stream_t *, sout_stream_id_t *,
-                                        mtime_t );
 
 static int  EncoderThread( struct sout_stream_sys_t * p_sys );
 
@@ -283,10 +281,7 @@ struct sout_stream_sys_t
     char            *psz_senc;
     vlc_bool_t      b_soverlay;
     sout_cfg_t      *p_spu_cfg;
-    subpicture_t    *pp_subpics[SUBPICTURE_RING_SIZE];
-
-    /* Filters */
-    filter_t        *p_filter_blend;
+    spu_t           *p_spu;
 
     /* Sync */
     vlc_bool_t      b_audio_sync;
@@ -310,7 +305,6 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
     vlc_value_t       val;
-    int               i;
 
     p_sys = vlc_object_create( p_this, sizeof( sout_stream_sys_t ) );
 
@@ -458,9 +452,7 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX "soverlay", &val );
     p_sys->b_soverlay = val.b_bool;
-    p_sys->p_filter_blend = 0;
-
-    for( i = 0; i < SUBPICTURE_RING_SIZE; i++ ) p_sys->pp_subpics[i] = 0;
+    p_sys->p_spu = 0;
 
     var_Get( p_stream, SOUT_CFG_PREFIX "audio-sync", &val );
     p_sys->b_audio_sync = val.b_bool;
@@ -481,7 +473,6 @@ static void Close( vlc_object_t * p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
-    int i;
 
     sout_StreamDelete( p_sys->p_out );
 
@@ -527,24 +518,7 @@ static void Close( vlc_object_t * p_this )
     }
     if( p_sys->psz_senc ) free( p_sys->psz_senc );
 
-    if( p_sys->p_filter_blend )
-    {
-        if( p_sys->p_filter_blend->p_module )
-            module_Unneed( p_sys->p_filter_blend,
-                           p_sys->p_filter_blend->p_module );
-
-        /* Clean-up pictures ring buffer */
-        for( i = 0; i < PICTURE_RING_SIZE; i++ )
-        {
-            if( p_sys->p_filter_blend->p_owner->pp_pics[i] )
-                video_del_buffer( VLC_OBJECT(p_sys->p_filter_blend),
-                                  p_sys->p_filter_blend->p_owner->pp_pics[i] );
-        }
-        free( p_sys->p_filter_blend->p_owner );
-
-        vlc_object_detach( p_sys->p_filter_blend );
-        vlc_object_destroy( p_sys->p_filter_blend );
-    }
+    if( p_sys->p_spu ) spu_Destroy( p_sys->p_spu );
 
     vlc_object_destroy( p_sys );
 }
@@ -1553,104 +1527,42 @@ static int transcode_video_process( sout_stream_t *p_stream,
          */
 
         /* Check if we have a subpicture to overlay */
-        if( p_sys->p_filter_blend )
+        if( p_sys->p_spu )
         {
-            p_subpic = transcode_spu_get( p_stream, id, p_pic->date );
+            p_subpic = spu_SortSubpictures( p_sys->p_spu, p_pic->date );
             /* TODO: get another pic */
         }
 
         /* Overlay subpicture */
         if( p_subpic )
         {
-            int i_width, i_height;
+            int i_scale_width, i_scale_height;
+            video_format_t *p_fmt;
 
-            p_sys->p_filter_blend->fmt_out = id->p_encoder->fmt_in;
-            p_sys->p_filter_blend->fmt_out.video.i_visible_width =
-                p_sys->p_filter_blend->fmt_out.video.i_width;
-            p_sys->p_filter_blend->fmt_out.video.i_visible_height =
-                p_sys->p_filter_blend->fmt_out.video.i_height;
-            p_sys->p_filter_blend->fmt_out.video.i_chroma =
-                VLC_FOURCC('I','4','2','0');
+            i_scale_width = id->p_encoder->fmt_in.video.i_width * 1000 /
+                id->p_decoder->fmt_out.video.i_width;
+            i_scale_height = id->p_encoder->fmt_in.video.i_height * 1000 /
+                id->p_decoder->fmt_out.video.i_height;
 
-            i_width = id->p_encoder->fmt_in.video.i_width;
-            i_height = id->p_encoder->fmt_in.video.i_height;
-
-            if( p_pic->i_refcount )
+            if( p_pic->i_refcount && !id->i_filter )
             {
                 /* We can't modify the picture, we need to duplicate it */
-                picture_t *p_tmp =
-                    video_new_buffer_filter( p_sys->p_filter_blend );
+                picture_t *p_tmp = video_new_buffer_decoder( id->p_decoder );
                 if( p_tmp )
                 {
-                    int i, j;
-                    for( i = 0; i < p_pic->i_planes; i++ )
-                    {
-                        for( j = 0; j < p_pic->p[i].i_visible_lines; j++ )
-                        {
-                            memcpy( p_tmp->p[i].p_pixels + j *
-                                    p_tmp->p[i].i_pitch,
-                                    p_pic->p[i].p_pixels + j *
-                                    p_pic->p[i].i_pitch,
-                                    p_tmp->p[i].i_visible_pitch );
-                        }
-                    }
-                    p_tmp->date = p_pic->date;
-                    p_tmp->b_force = p_pic->b_force;
-                    p_tmp->i_nb_fields = p_pic->i_nb_fields;
-                    p_tmp->b_progressive = p_pic->b_progressive;
-                    p_tmp->b_top_field_first = p_pic->b_top_field_first;
+                    vout_CopyPicture( p_stream, p_tmp, p_pic );
                     p_pic->pf_release( p_pic );
                     p_pic = p_tmp;
                 }
             }
 
-            while( p_subpic != NULL )
-            {
-                subpicture_region_t *p_region = p_subpic->p_region;
+            if( id->i_filter )
+                p_fmt = &id->pp_filter[id->i_filter -1]->fmt_out.video;
+            else
+                p_fmt = &id->p_decoder->fmt_out.video;
 
-                while( p_region && p_sys->p_filter_blend &&
-                       p_sys->p_filter_blend->pf_video_blend )
-                {
-                    int i_x_offset = p_region->i_x + p_subpic->i_x;
-                    int i_y_offset = p_region->i_y + p_subpic->i_y;
-
-                    if( p_subpic->i_flags & OSD_ALIGN_BOTTOM )
-                    {
-                        i_y_offset = i_height - p_region->fmt.i_height -
-                            p_subpic->i_y;
-                    }
-                    else if ( !(p_subpic->i_flags & OSD_ALIGN_TOP) )
-                    {
-                        i_y_offset = i_height / 2 - p_region->fmt.i_height / 2;
-                    }
-
-                    if( p_subpic->i_flags & OSD_ALIGN_RIGHT )
-                    {
-                        i_x_offset = i_width - p_region->fmt.i_width -
-                            p_subpic->i_x;
-                    }
-                    else if ( !(p_subpic->i_flags & OSD_ALIGN_LEFT) )
-                    {
-                        i_x_offset = i_width / 2 - p_region->fmt.i_width / 2;
-                    }
-
-                    if( p_subpic->b_absolute )
-                    {
-                        i_x_offset = p_region->i_x + p_subpic->i_x;
-                        i_y_offset = p_region->i_y + p_subpic->i_y;
-                    }
-
-                    p_sys->p_filter_blend->fmt_in.video = p_region->fmt;
-
-                    p_sys->p_filter_blend->pf_video_blend(
-                         p_sys->p_filter_blend, p_pic, p_pic,
-                         &p_region->picture, i_x_offset, i_y_offset );
-
-                    p_region = p_region->p_next;
-                }
-
-                p_subpic = p_subpic->p_next;
-            }
+            spu_RenderSubpictures( p_sys->p_spu, p_fmt, p_pic, p_pic, p_subpic,
+                                   i_scale_width, i_scale_height );
         }
 
         if( p_sys->i_threads >= 1 )
@@ -1872,6 +1784,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     /* Initialization of decoder structures */
     id->p_decoder->pf_spu_buffer_new = spu_new_buffer;
     id->p_decoder->pf_spu_buffer_del = spu_del_buffer;
+    id->p_decoder->p_owner = (decoder_owner_sys_t *)p_stream;
     //id->p_decoder->p_cfg = p_sys->p_spu_cfg;
 
     id->p_decoder->p_module =
@@ -1905,26 +1818,9 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
             return VLC_EGENERIC;
         }
     }
-    else if( !p_sys->p_filter_blend )
+    else if( !p_sys->p_spu )
     {
-        int i;
-
-        p_sys->p_filter_blend =
-            vlc_object_create( p_stream, VLC_OBJECT_FILTER );
-        vlc_object_attach( p_sys->p_filter_blend, p_stream );
-        p_sys->p_filter_blend->fmt_out.video.i_chroma =
-            VLC_FOURCC('I','4','2','0');
-        p_sys->p_filter_blend->fmt_in.video.i_chroma =
-            VLC_FOURCC('Y','U','V','A');
-
-        p_sys->p_filter_blend->pf_vout_buffer_new = video_new_buffer_filter;
-        p_sys->p_filter_blend->pf_vout_buffer_del = video_del_buffer_filter;
-        p_sys->p_filter_blend->p_owner = malloc( sizeof(filter_owner_sys_t) );
-        for( i = 0; i < PICTURE_RING_SIZE; i++ )
-            p_sys->p_filter_blend->p_owner->pp_pics[i] = 0;
-
-        p_sys->p_filter_blend->p_module =
-            module_Need( p_sys->p_filter_blend, "video blending", 0, 0 );
+        p_sys->p_spu = spu_Init( p_stream );
     }
 
     return VLC_SUCCESS;
@@ -1932,9 +1828,6 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_t *id )
 
 static void transcode_spu_close( sout_stream_t *p_stream, sout_stream_id_t *id)
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-    int i;
-
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_Unneed( id->p_decoder, id->p_decoder->p_module );
@@ -1942,15 +1835,6 @@ static void transcode_spu_close( sout_stream_t *p_stream, sout_stream_id_t *id)
     /* Close encoder */
     if( id->p_encoder->p_module )
         module_Unneed( id->p_encoder, id->p_encoder->p_module );
-
-    /* Free subpictures */
-    for( i = 0; i < SUBPICTURE_RING_SIZE; i++ )
-    {
-        if( !p_sys->pp_subpics[i] ) continue;
-
-        spu_del_buffer( id->p_decoder, p_sys->pp_subpics[i] );
-        p_sys->pp_subpics[i] = NULL;
-    }
 }
 
 static int transcode_spu_process( sout_stream_t *p_stream,
@@ -1964,24 +1848,10 @@ static int transcode_spu_process( sout_stream_t *p_stream,
     p_subpic = id->p_decoder->pf_decode_sub( id->p_decoder, &in );
     if( p_subpic && p_sys->b_soverlay )
     {
-        int i;
-
-        /* Find a free slot in our supictures ring buffer */
-        for( i = 0; i < SUBPICTURE_RING_SIZE; i++ )
-        {
-            if( !p_sys->pp_subpics[i] )
-            {
-                p_sys->pp_subpics[i] = p_subpic;
-                break;
-            }
-        }
-        if( i == SUBPICTURE_RING_SIZE )
-        {
-            spu_del_buffer( id->p_decoder, p_subpic );
-        }
+        spu_DisplaySubpicture( p_sys->p_spu, p_subpic );
     }
 
-    if(  p_subpic && !p_sys->b_soverlay )
+    if( p_subpic && !p_sys->b_soverlay )
     {
         block_t *p_block;
 
@@ -1998,78 +1868,14 @@ static int transcode_spu_process( sout_stream_t *p_stream,
     return VLC_EGENERIC;
 }
 
-static subpicture_t *transcode_spu_get( sout_stream_t *p_stream,
-                                        sout_stream_id_t *id,
-                                        mtime_t display_date )
-{
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-    subpicture_t *p_subpic = 0;
-    subpicture_t *p_ephemer = 0;
-    subpicture_t **pp_subpic = &p_subpic;
-    int i;
-
-    /* Find current subpictures and remove old ones */
-    for( i = 0; i < SUBPICTURE_RING_SIZE; i++ )
-    {
-        if( !p_sys->pp_subpics[i] ) continue;
-
-        if( !p_sys->pp_subpics[i]->b_ephemer &&
-            p_sys->pp_subpics[i]->i_stop < display_date )
-        {
-            spu_del_buffer( id->p_decoder, p_sys->pp_subpics[i] );
-            p_sys->pp_subpics[i] = NULL;
-            continue;
-        }
-
-        if( p_sys->pp_subpics[i]->i_start > display_date ) continue;
-
-        if( p_sys->pp_subpics[i]->b_ephemer && !p_ephemer )
-        {
-            p_ephemer = p_sys->pp_subpics[i];
-        }
-        else if( p_sys->pp_subpics[i]->b_ephemer )
-        {
-            if( p_ephemer->i_start < p_sys->pp_subpics[i]->i_start )
-            {
-                subpicture_t tmp;
-                tmp = *p_ephemer;
-                *p_ephemer = *p_sys->pp_subpics[i];
-                *p_sys->pp_subpics[i] = tmp;
-            }
-
-            spu_del_buffer( id->p_decoder, p_sys->pp_subpics[i] );
-            p_sys->pp_subpics[i] = NULL;
-            continue;
-        }
-
-        /* Add subpicture to the list */
-        *pp_subpic = p_sys->pp_subpics[i];
-        pp_subpic = &p_sys->pp_subpics[i]->p_next;
-    }
-
-    return p_subpic;
-}
-
 static subpicture_t *spu_new_buffer( decoder_t *p_dec )
 {
-    subpicture_t *p_subpic = (subpicture_t *)malloc(sizeof(subpicture_t));
-    memset( p_subpic, 0, sizeof(subpicture_t) );
-    p_subpic->b_absolute = VLC_TRUE;
-
-    p_subpic->pf_create_region = __spu_CreateRegion;
-    p_subpic->pf_destroy_region = __spu_DestroyRegion;
-
-    return p_subpic;
+    sout_stream_t *p_stream = (sout_stream_t *)p_dec->p_owner;
+    return spu_CreateSubpicture( p_stream->p_sys->p_spu );
 }
 
 static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
 {
-    while( p_subpic->p_region )
-    {
-        subpicture_region_t *p_region = p_subpic->p_region;
-        p_subpic->p_region = p_region->p_next;
-        p_subpic->pf_destroy_region( VLC_OBJECT(p_dec), p_region );
-    }
-
-    free( p_subpic );
+    sout_stream_t *p_stream = (sout_stream_t *)p_dec->p_owner;
+    spu_DestroySubpicture( p_stream->p_sys->p_spu, p_subpic );
 }

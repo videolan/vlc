@@ -156,8 +156,8 @@ Decode ( decoder_t *p_dec, block_t **pp_block )
         {
             if( p_last_vout != p_sys->p_vout )
             {
-                p_sys->i_subpic_channel =
-                    vout_RegisterOSDChannel( p_sys->p_vout );
+                spu_Control( p_sys->p_vout->p_spu, SPU_CHANNEL_REGISTER,
+                             &p_sys->i_subpic_channel );
             }
 
             /* Parse and decode */

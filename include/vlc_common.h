@@ -279,16 +279,18 @@ typedef struct aout_filter_t aout_filter_t;
 /* Video */
 typedef struct vout_thread_t vout_thread_t;
 typedef struct vout_sys_t vout_sys_t;
+typedef struct vout_synchro_t vout_synchro_t;
 typedef struct chroma_sys_t chroma_sys_t;
+
 typedef video_format_t video_frame_format_t;
 typedef struct picture_t picture_t;
 typedef struct picture_sys_t picture_sys_t;
 typedef struct picture_heap_t picture_heap_t;
+
+typedef struct spu_t spu_t;
 typedef struct subpicture_t subpicture_t;
 typedef struct subpicture_sys_t subpicture_sys_t;
 typedef struct subpicture_region_t subpicture_region_t;
-typedef struct vout_synchro_t vout_synchro_t;
-typedef struct text_renderer_sys_t text_renderer_sys_t;
 typedef struct text_style_t text_style_t;
 
 /* Stream output */

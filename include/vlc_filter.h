@@ -43,7 +43,7 @@ struct filter_t
 
     /* Module properties */
     module_t *          p_module;
-    filter_sys_t *     p_sys;
+    filter_sys_t *      p_sys;
 
     /* Input format */
     es_format_t         fmt_in;
@@ -56,6 +56,8 @@ struct filter_t
     void                ( * pf_video_blend )  ( filter_t *, picture_t *,
                                                 picture_t *, picture_t *,
                                                 int, int );
+
+    subpicture_t *      ( *pf_subpicture_filter ) ( filter_t * );
 
     subpicture_t *      ( *pf_render_string ) ( filter_t *, block_t * );
 

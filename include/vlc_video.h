@@ -210,8 +210,8 @@ struct subpicture_region_t
     int             i_y;                             /**< position of region */
 
     subpicture_region_t *p_next;                /**< next region in the list */
+    subpicture_region_t *p_cache;       /**< modified version of this region */
     /**@}*/
-
 };
 
 /**

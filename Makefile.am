@@ -108,6 +108,7 @@ HEADERS_include = \
 	include/vlc_meta.h \
 	include/vlc_objects.h \
 	include/vlc_playlist.h \
+	include/vlc_spu.h \
 	include/vlc_stream.h \
 	include/vlc_threads_funcs.h \
 	include/vlc_threads.h \

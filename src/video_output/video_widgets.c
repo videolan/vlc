@@ -382,11 +382,12 @@ subpicture_t *vout_CreateWidget( vout_thread_t *p_vout, int i_channel )
     p_widget = 0;
 
     /* Create and initialize a subpicture */
-    p_subpic = vout_CreateSubPicture( p_vout, i_channel, MEMORY_SUBPICTURE );
+    p_subpic = spu_CreateSubpicture( p_vout->p_spu );
     if( p_subpic == NULL )
     {
         return NULL;
     }
+    p_subpic->i_channel = i_channel;
     p_subpic->pf_render = Render;
     p_subpic->pf_destroy = FreeWidget;
     p_subpic->i_start = i_now;
@@ -397,7 +398,7 @@ subpicture_t *vout_CreateWidget( vout_thread_t *p_vout, int i_channel )
     if( p_widget == NULL )
     {
         FreeWidget( p_subpic );
-        vout_DestroySubPicture( p_vout, p_subpic );
+        spu_DestroySubpicture( p_vout->p_spu, p_subpic );
         return NULL;
     }
     p_subpic->p_sys = p_widget;
@@ -454,7 +455,7 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
     if( p_widget->p_pic == NULL )
     {
         FreeWidget( p_subpic );
-        vout_DestroySubPicture( p_vout, p_subpic );
+        spu_DestroySubpicture( p_vout->p_spu, p_subpic );
         return;
     }
     memset( p_widget->p_pic, 0, p_widget->i_width * p_widget->i_height );
@@ -462,7 +463,6 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
     if( i_type == OSD_HOR_SLIDER )
     {
         int i_x_pos = ( p_widget->i_width - 2 ) * i_position / 100;
-        int i_y_pos = p_widget->i_height / 2;
         DrawRect( p_vout, p_subpic, i_x_pos - 1, 2, i_x_pos + 1,
                   p_widget->i_height - 3, STYLE_FILLED );
         DrawRect( p_vout, p_subpic, 0, 0, p_widget->i_width - 1,
@@ -482,7 +482,7 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
                   p_widget->i_height - 1, STYLE_EMPTY );
     }
 
-    vout_DisplaySubPicture( p_vout, p_subpic );
+    spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
 
     vlc_object_release( p_vout );
     return;
@@ -525,7 +525,7 @@ void vout_OSDIcon( vlc_object_t *p_caller, int i_channel, short i_type )
     if( p_widget->p_pic == NULL )
     {
         FreeWidget( p_subpic );
-        vout_DestroySubPicture( p_vout, p_subpic );
+        spu_DestroySubpicture( p_vout->p_spu, p_subpic );
         return;
     }
     memset( p_widget->p_pic, 0, p_widget->i_width * p_widget->i_height );
@@ -567,7 +567,7 @@ void vout_OSDIcon( vlc_object_t *p_caller, int i_channel, short i_type )
         }
     }
 
-    vout_DisplaySubPicture( p_vout, p_subpic );
+    spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
 
     vlc_object_release( p_vout );
     return;

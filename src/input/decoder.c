@@ -193,6 +193,9 @@ void input_DecoderDelete( decoder_t *p_dec )
     }
     else
     {
+        /* Flush */
+        input_DecoderDecode( p_dec, NULL );
+
         module_Unneed( p_dec, p_dec->p_module );
     }
 
@@ -667,7 +670,7 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
             if( p_vout )
             {
-                vout_DisplaySubPicture( p_vout, p_spu );
+                spu_DisplaySubpicture( p_vout->p_spu, p_spu );
                 vlc_object_release( p_vout );
             }
         }
@@ -734,7 +737,8 @@ static void DeleteDecoder( decoder_t * p_dec )
         p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
         if( p_vout )
         {
-            vout_ClearOSDChannel( p_vout, p_dec->p_owner->i_spu_channel );
+            spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR,
+                         p_dec->p_owner->i_spu_channel );
             vlc_object_release( p_vout );
         }
     }
@@ -916,7 +920,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
 {
     decoder_owner_sys_t *p_sys = (decoder_owner_sys_t *)p_dec->p_owner;
     vout_thread_t *p_vout = NULL;
-    subpicture_t *p_spu;
+    subpicture_t *p_subpic;
     int i_attempts = 30;
 
     while( i_attempts-- )
@@ -937,20 +941,20 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec )
 
     if( p_sys->p_spu_vout != p_vout )
     {
-        p_sys->i_spu_channel =
-            vout_RegisterOSDChannel( p_vout );
+        spu_Control( p_vout->p_spu, SPU_CHANNEL_REGISTER,
+                     &p_sys->i_spu_channel );
         p_sys->p_spu_vout = p_vout;
     }
 
-    p_spu = vout_CreateSubPicture( p_vout, p_sys->i_spu_channel,
-                                   MEMORY_SUBPICTURE );
+    p_subpic = spu_CreateSubpicture( p_vout->p_spu );
+    p_subpic->i_channel = p_sys->i_spu_channel;
 
     vlc_object_release( p_vout );
 
-    return p_spu;
+    return p_subpic;
 }
 
-static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_spu )
+static void spu_del_buffer( decoder_t *p_dec, subpicture_t *p_subpic )
 {
-    vout_DestroySubPicture( p_dec->p_owner->p_vout, p_spu );
+    spu_DestroySubpicture( p_dec->p_owner->p_vout->p_spu, p_subpic );
 }

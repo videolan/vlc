@@ -33,6 +33,7 @@
 
 #include "vlc_video.h"
 #include "video_output.h"
+#include "vlc_spu.h"
 
 #include "vout_pictures.h"
 
@@ -285,12 +286,22 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                                                        subpicture_t *p_subpic )
 {
+    video_format_t fmt;
+    int i_scale_width, i_scale_height;
+
     if( p_pic == NULL )
     {
         /* XXX: subtitles */
 
         return NULL;
     }
+
+    fmt.i_aspect = p_vout->output.i_aspect;
+    fmt.i_chroma = p_vout->output.i_chroma;
+    fmt.i_width = p_vout->output.i_width;
+    fmt.i_height = p_vout->output.i_height;
+    i_scale_width = p_vout->output.i_width * 1000 / p_vout->render.i_width;
+    i_scale_height = p_vout->output.i_height * 1000 / p_vout->render.i_height;
 
     if( p_pic->i_type == DIRECT_PICTURE )
     {
@@ -307,8 +318,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                  * subtitles. */
                 vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
 
-                vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0],
-                                        p_pic , p_subpic );
+                spu_RenderSubpictures( p_vout->p_spu, &fmt,
+                                       PP_OUTPUTPICTURE[0], p_pic, p_subpic,
+                                       i_scale_width, i_scale_height );
 
                 return PP_OUTPUTPICTURE[0];
             }
@@ -322,7 +334,8 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         /* Picture is in a direct buffer but isn't used by the
          * decoder. We can safely render subtitles on it and
          * display it. */
-        vout_RenderSubPictures( p_vout, p_pic, p_pic, p_subpic );
+        spu_RenderSubpictures( p_vout->p_spu, &fmt, p_pic, p_pic, p_subpic,
+                               i_scale_width, i_scale_height );
 
         return p_pic;
     }
@@ -340,7 +353,8 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                 return NULL;
 
         vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
-        vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_pic, p_subpic );
+        spu_RenderSubpictures( p_vout->p_spu, &fmt, PP_OUTPUTPICTURE[0],
+                               p_pic, p_subpic, i_scale_width, i_scale_height);
 
         if( PP_OUTPUTPICTURE[0]->pf_unlock )
             PP_OUTPUTPICTURE[0]->pf_unlock( p_vout, PP_OUTPUTPICTURE[0] );
@@ -374,7 +388,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         p_vout->chroma.pf_convert( p_vout, p_pic, p_tmp_pic );
 
         /* Render subpictures on the first direct buffer */
-        vout_RenderSubPictures( p_vout, p_tmp_pic, p_tmp_pic, p_subpic );
+        spu_RenderSubpictures( p_vout->p_spu, &fmt, p_tmp_pic,
+                               p_tmp_pic, p_subpic,
+                               i_scale_width, i_scale_height );
 
         if( p_vout->p_picture[0].pf_lock )
             if( p_vout->p_picture[0].pf_lock( p_vout, &p_vout->p_picture[0] ) )
@@ -392,8 +408,9 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         p_vout->chroma.pf_convert( p_vout, p_pic, &p_vout->p_picture[0] );
 
         /* Render subpictures on the first direct buffer */
-        vout_RenderSubPictures( p_vout, &p_vout->p_picture[0],
-                                &p_vout->p_picture[0], p_subpic );
+        spu_RenderSubpictures( p_vout->p_spu, &fmt, &p_vout->p_picture[0],
+                               &p_vout->p_picture[0], p_subpic,
+                               i_scale_width, i_scale_height );
     }
 
     if( p_vout->p_picture[0].pf_unlock )
@@ -929,4 +946,8 @@ void __vout_CopyPicture( vlc_object_t *p_this,
     }
 
     p_dest->date = p_src->date;
+    p_dest->b_force = p_src->b_force;
+    p_dest->i_nb_fields = p_src->i_nb_fields;
+    p_dest->b_progressive = p_src->b_progressive;
+    p_dest->b_top_field_first = p_src->b_top_field_first;
 }

@@ -228,8 +228,8 @@ static void Run( intf_thread_t *p_intf )
         {
             for( i = 0; i < CHANNELS_NUMBER; i++ )
             {
-                p_intf->p_sys->p_channels[ i ] =
-                    vout_RegisterOSDChannel( p_vout );
+                spu_Control( p_vout->p_spu, SPU_CHANNEL_REGISTER,
+                             &p_intf->p_sys->p_channels[ i ] );
             }
         }
 
@@ -734,10 +734,11 @@ static void ClearChannels( intf_thread_t *p_intf, vout_thread_t *p_vout )
 
     if( p_vout )
     {
-        vout_ClearOSDChannel( p_vout, DEFAULT_CHAN );
+        spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR, DEFAULT_CHAN );
         for( i = 0; i < CHANNELS_NUMBER; i++ )
         {
-            vout_ClearOSDChannel( p_vout, p_intf->p_sys->p_channels[ i ] );
+            spu_Control( p_vout->p_spu, SPU_CHANNEL_CLEAR,
+                         p_intf->p_sys->p_channels[ i ] );
         }
     }
 }
