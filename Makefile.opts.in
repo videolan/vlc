@@ -234,7 +234,7 @@ endif
 #
 # Debugging and profiling support
 #
-ifeq ($(TRACE),1)
+ifeq ($(DEBUG),1)
 CFLAGS += -g
 endif
 
