@@ -54,6 +54,15 @@
 #define PORT_TEXT N_("Port")
 #define PORT_LONGTEXT N_( \
     "Allows you to specify the base port used for the RTP streaming." )
+
+#define PORT_AUDIO_TEXT N_("Audio port")
+#define PORT_AUDIO_LONGTEXT N_( \
+    "Allows you to specify the default audio port used for the RTP streaming." )
+
+#define PORT_VIDEO_TEXT N_("Video port")
+#define PORT_VIDEO_LONGTEXT N_( \
+    "Allows you to specify the default video port used for the RTP streaming." )
+
 #define TTL_TEXT N_("Time to live")
 #define TTL_LONGTEXT N_( \
     "Allows you to specify the time to live for the output stream." )
@@ -77,8 +86,13 @@ vlc_module_begin();
     add_string( SOUT_CFG_PREFIX "mux", "", NULL, MUX_TEXT,
                 MUX_LONGTEXT, VLC_TRUE );
 
-    add_integer( SOUT_CFG_PREFIX "port", 1234, NULL, PORT_TEXT,
+    add_integer( SOUT_CFG_PREFIX "port-audio", 1234, NULL, PORT_AUDIO_TEXT,
                  PORT_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "port-video", 1236, NULL, PORT_VIDEO_TEXT,
+                 PORT_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "port", 1238, NULL, PORT_TEXT,
+                 PORT_LONGTEXT, VLC_TRUE );
+
     add_integer( SOUT_CFG_PREFIX "ttl", 0, NULL, TTL_TEXT,
                  TTL_LONGTEXT, VLC_TRUE );
 
@@ -89,7 +103,7 @@ vlc_module_end();
  * Exported prototypes
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "dst", "name", "port", "sdp", "ttl", "mux", NULL
+    "dst", "name", "port", "port-audio", "port-video", "sdp", "ttl", "mux", NULL
 };
 
 static sout_stream_id_t *Add ( sout_stream_t *, es_format_t * );
@@ -140,6 +154,8 @@ struct sout_stream_sys_t
     /* */
     char *psz_destination;
     int  i_port;
+    int  i_port_audio;
+    int  i_port_video;
     int  i_ttl;
 
     /* when need to use a private one or when using muxer */
@@ -240,9 +256,16 @@ static int Open( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX "name", &val );
     p_sys->psz_session_name = *val.psz_string ? val.psz_string : NULL;
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "port", &val );
-    p_sys->i_port = val.i_int;
+    p_sys->i_port       = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port" );
+    p_sys->i_port_audio = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-audio" );
+    p_sys->i_port_video = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-video" );
 
+    if( p_sys->i_port_audio == p_sys->i_port_video )
+    {
+        msg_Err( p_stream, "audio and video port cannot be the same" );
+        p_sys->i_port_audio = 0;
+        p_sys->i_port_video = 0;
+    }
 
     if( !p_sys->psz_session_name )
     {
@@ -629,6 +652,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t  *id;
     sout_access_out_t *p_access = NULL;
+    int               i_port;
+    char              *psz_sdp;
 
     if( p_sys->p_mux != NULL )
     {
@@ -645,8 +670,32 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->p_input     = p_input;
         id->pf_packetize= NULL;
         id->p_rtsp_url  = NULL;
-
+        id->i_port      = 0;
         return id;
+    }
+
+
+    /* Choose the port */
+    i_port = 0;
+    if( p_fmt->i_cat == AUDIO_ES && p_sys->i_port_audio > 0 )
+    {
+        i_port = p_sys->i_port_audio;
+        p_sys->i_port_audio = 0;
+    }
+    else if( p_fmt->i_cat == VIDEO_ES && p_sys->i_port_video > 0 )
+    {
+        i_port = p_sys->i_port_video;
+        p_sys->i_port_video = 0;
+    }
+    while( i_port == 0 )
+    {
+        if( p_sys->i_port != p_sys->i_port_audio && p_sys->i_port != p_sys->i_port_video )
+        {
+            i_port = p_sys->i_port;
+            p_sys->i_port += 2;
+            break;
+        }
+        p_sys->i_port += 2;
     }
 
     if( p_sys->psz_destination )
@@ -663,7 +712,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         {
             sprintf( access, "udp{raw}" );
         }
-        sprintf( url, "%s:%d", p_sys->psz_destination, p_sys->i_port );
+        sprintf( url, "%s:%d", p_sys->psz_destination, i_port );
         if( ( p_access = sout_AccessOutNew( p_sout, access, url ) ) == NULL )
         {
             msg_Err( p_stream, "cannot create the access out for %s://%s",
@@ -682,7 +731,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->psz_rtpmap = NULL;
     id->psz_fmtp   = NULL;
     id->psz_destination = p_sys->psz_destination ? strdup( p_sys->psz_destination ) : NULL;
-    id->i_port = p_sys->i_port;
+    id->i_port = i_port;
     id->p_rtsp_url = NULL;
     vlc_mutex_init( p_stream, &id->lock_rtsp );
     id->i_rtsp_access = 0;
@@ -819,30 +868,24 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
 
     /* Update p_sys context */
-    /* update port used (2 -> 1 rtp, 1 rtcp )*/
     vlc_mutex_lock( &p_sys->lock_es );
     TAB_APPEND( p_sys->i_es, p_sys->es, id );
     vlc_mutex_unlock( &p_sys->lock_es );
 
-    if( p_sys->p_mux == NULL )
-    {
-        char *psz_sdp;
-        p_sys->i_port += 2;
-        psz_sdp = SDPGenerate( p_stream, p_sys->psz_destination, VLC_FALSE );
+    psz_sdp = SDPGenerate( p_stream, p_sys->psz_destination, VLC_FALSE );
 
-        vlc_mutex_lock( &p_sys->lock_sdp );
-        free( p_sys->psz_sdp );
-        p_sys->psz_sdp = psz_sdp;
-        vlc_mutex_unlock( &p_sys->lock_sdp );
+    vlc_mutex_lock( &p_sys->lock_sdp );
+    free( p_sys->psz_sdp );
+    p_sys->psz_sdp = psz_sdp;
+    vlc_mutex_unlock( &p_sys->lock_sdp );
 
-        p_sys->i_sdp_version++;
+    p_sys->i_sdp_version++;
 
-        fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
+    fprintf( stderr, "sdp=%s", p_sys->psz_sdp );
 
-        /* Update SDP (sap/file) */
-        if( p_sys->b_export_sap ) SapSetup( p_stream );
-        if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
-    }
+    /* Update SDP (sap/file) */
+    if( p_sys->b_export_sap ) SapSetup( p_stream );
+    if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
 
     return id;
 }
@@ -854,6 +897,15 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     vlc_mutex_lock( &p_sys->lock_es );
     TAB_REMOVE( p_sys->i_es, p_sys->es, id );
     vlc_mutex_unlock( &p_sys->lock_es );
+
+    /* Release port */
+    if( id->i_port > 0 )
+    {
+        if( id->i_cat == AUDIO_ES && p_sys->i_port_audio == 0 )
+            p_sys->i_port_audio = id->i_port;
+        else if( id->i_cat == VIDEO_ES && p_sys->i_port_video == 0 )
+            p_sys->i_port_video = id->i_port;
+    }
 
     if( id->p_access )
     {
