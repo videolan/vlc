@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.13 2002/07/11 18:44:12 sam Exp $
+ * $Id: libvlc.c,v 1.14 2002/07/15 19:15:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -404,17 +404,21 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         return VLC_EGENERIC;
     }
 
-
     /*
      * System specific configuration
      */
     system_Configure( p_vlc );
 
-    /* p_vlc inititalization. FIXME ? */
-    p_vlc->i_desync = config_GetInt( p_vlc, "desync" ) * (mtime_t)1000;
+    /*
+     * Output messages that may still be in the queue
+     */
     p_vlc->b_verbose = config_GetInt( p_vlc, "verbose" );
     p_vlc->b_quiet = config_GetInt( p_vlc, "quiet" );
     p_vlc->b_color = config_GetInt( p_vlc, "color" );
+    msg_Flush( p_vlc );
+
+    /* p_vlc inititalization. FIXME ? */
+    p_vlc->i_desync = config_GetInt( p_vlc, "desync" ) * (mtime_t)1000;
     if( !config_GetInt( p_vlc, "mmx" ) )
         p_vlc->i_cpu_capabilities &= ~CPU_CAPABILITY_MMX;
     if( !config_GetInt( p_vlc, "3dn" ) )

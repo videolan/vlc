@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_messages.h,v 1.2 2002/06/01 18:04:48 sam Exp $
+ * $Id: vlc_messages.h,v 1.3 2002/07/15 19:15:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -34,6 +34,7 @@
 typedef struct
 {
     int     i_type;                               /* message type, see below */
+    int     i_object_id;
     char *  psz_module;
     char *  psz_msg;                                   /* the message itself */
 
@@ -122,8 +123,10 @@ VLC_EXPORT( void, __msg_Dbg,    ( void *, const char *, ... ) );
 #endif /* HAVE_VARIADIC_MACROS */
 
 #define msg_Create(a) __msg_Create(CAST_TO_VLC_OBJECT(a))
+#define msg_Flush(a) __msg_Flush(CAST_TO_VLC_OBJECT(a))
 #define msg_Destroy(a) __msg_Destroy(CAST_TO_VLC_OBJECT(a))
 void __msg_Create  ( vlc_object_t * );
+void __msg_Flush   ( vlc_object_t * );
 void __msg_Destroy ( vlc_object_t * );
 
 #define msg_Subscribe(a) __msg_Subscribe(CAST_TO_VLC_OBJECT(a))

@@ -4,7 +4,7 @@
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.3 2002/06/27 19:05:17 sam Exp $
+ * $Id: messages.c,v 1.4 2002/07/15 19:15:05 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -48,6 +48,7 @@
 static void QueueMsg ( vlc_object_t *, int , const char *,
                        const char *, va_list );
 static void FlushMsg ( msg_bank_t * );
+static void PrintMsg ( vlc_object_t *, msg_item_t * );
 
 #if defined( WIN32 )
 static char *ConvertPrintfFormatString ( const char *psz_format );
@@ -63,11 +64,33 @@ void __msg_Create( vlc_object_t *p_this )
 {
     /* Message queue initialization */
     vlc_mutex_init( p_this, &p_this->p_vlc->msg_bank.lock );
+
     p_this->p_vlc->msg_bank.i_start = 0;
     p_this->p_vlc->msg_bank.i_stop = 0;
 
     p_this->p_vlc->msg_bank.i_sub = 0;
     p_this->p_vlc->msg_bank.pp_sub = NULL;
+}
+
+/*****************************************************************************
+ * msg_Flush: flush the message queue
+ *****************************************************************************/
+void __msg_Flush( vlc_object_t *p_this )
+{
+    int i_index;
+
+    vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
+
+    for( i_index = p_this->p_vlc->msg_bank.i_start;
+         i_index != p_this->p_vlc->msg_bank.i_stop;
+         i_index = (i_index+1) % VLC_MSG_QSIZE )
+    {
+        PrintMsg( p_this, &p_this->p_vlc->msg_bank.msg[i_index] );
+    }
+
+    FlushMsg( &p_this->p_vlc->msg_bank );
+
+    vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
 }
 
 /*****************************************************************************
@@ -187,79 +210,21 @@ void __msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
     va_end( args );
 }
 
-void __msg_Info( void *p_this, const char *psz_format, ... )
-{
-    va_list args;
-    va_start( args, psz_format );
-    QueueMsg( (vlc_object_t *)p_this, VLC_MSG_INFO, "unknown",
-              psz_format, args );
-    va_end( args );
-}
-
-void __msg_Err( void *p_this, const char *psz_format, ... )
-{
-    va_list args;
-    va_start( args, psz_format );
-    QueueMsg( (vlc_object_t *)p_this, VLC_MSG_ERR, "unknown",
-              psz_format, args );
-    va_end( args );
-}
-
-void __msg_Warn( void *p_this, const char *psz_format, ... )
-{
-    va_list args;
-    va_start( args, psz_format );
-    QueueMsg( (vlc_object_t *)p_this, VLC_MSG_WARN, "unknown",
-              psz_format, args );
-    va_end( args );
-}
-
-void __msg_Dbg( void *p_this, const char *psz_format, ... )
-{
-    va_list args;
-    va_start( args, psz_format );
-    QueueMsg( (vlc_object_t *)p_this, VLC_MSG_DBG, "unknown",
-              psz_format, args );
-    va_end( args );
-}
-
-#if 0
-/*****************************************************************************
- * intf_WarnHexDump : print a hexadecimal dump of a memory area
- *****************************************************************************
- * This is convenient for debugging purposes.
- *****************************************************************************/
-void intf_WarnHexDump( int i_level, void *p_data, int i_size )
-{
-    int   i_index = 0;
-    int   i_subindex;
-    char  p_string[75];
-    u8   *p_area = (u8 *)p_data;
-
-    msg_Dbg( "dumping %i bytes at address %p", i_size, p_data );
-
-    while( i_index < i_size )
-    {
-        i_subindex = 0;
-
-        while( ( i_subindex < 24 ) && ( i_index + i_subindex < i_size ) )
-        {
-            sprintf( p_string + 3 * i_subindex, "%.2x ",
-                     p_area[ i_index + i_subindex ] );
-
-            i_subindex++;
-        }
-
-        /* -1 here is safe because we know we printed at least one */
-        p_string[ 3 * i_subindex - 1 ] = '\0';
-        msg_Dbg( "0x%.4x: %s", i_index, p_string );
-
-        i_index += 24;
+/* Generic functions used when variadic macros are not available. */
+#define DECLARE_MSG_FN( FN_NAME, FN_TYPE ) \
+    void FN_NAME( void *p_this, const char *psz_format, ... ) \
+    { \
+        va_list args; \
+        va_start( args, psz_format ); \
+        QueueMsg( (vlc_object_t *)p_this, FN_TYPE, "unknown", \
+                  psz_format, args ); \
+        va_end( args ); \
     }
 
-    msg_Dbg( "hexdump: %i bytes dumped", i_size );
-}
-#endif
+DECLARE_MSG_FN( __msg_Info, VLC_MSG_INFO );
+DECLARE_MSG_FN( __msg_Err,  VLC_MSG_ERR );
+DECLARE_MSG_FN( __msg_Warn, VLC_MSG_WARN );
+DECLARE_MSG_FN( __msg_Dbg,  VLC_MSG_DBG );
 
 /*****************************************************************************
  * QueueMsg: add a message to a queue
@@ -272,9 +237,9 @@ void intf_WarnHexDump( int i_level, void *p_data, int i_size )
 static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
                       const char *psz_format, va_list args )
 {
-    static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
     char *              psz_str;                 /* formatted message string */
     msg_item_t *        p_item;                        /* pointer to message */
+    msg_item_t          item;             /* message in case of a full queue */
 #ifdef WIN32
     char *              psz_temp;
 #endif
@@ -315,38 +280,7 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     /* Put message in queue */
     vlc_mutex_lock( &p_this->p_vlc->msg_bank.lock );
 
-    /* Send the message to stderr */
-    if( (i_type == VLC_MSG_ERR)
-         || ( (i_type == VLC_MSG_INFO) && !p_this->p_vlc->b_quiet )
-         || ( (i_type == VLC_MSG_WARN) && p_this->p_vlc->b_verbose
-                                       && !p_this->p_vlc->b_quiet )
-         || ( (i_type == VLC_MSG_DBG) && p_this->p_vlc->b_verbose
-                                       && !p_this->p_vlc->b_quiet ) )
-    {
-        if( p_this->p_vlc->b_color )
-        {
-#           define COL(x)  "\033[" #x ";1m"
-#           define RED     COL(31)
-#           define GREEN   COL(32)
-#           define YELLOW  COL(33)
-#           define WHITE   COL(37)
-#           define GRAY    "\033[0m"
-            static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
-
-            fprintf( stderr, "[" GREEN "%.2x" GRAY ":" GREEN "%.6x" GRAY "] "
-                             "%s%s: %s%s" GRAY "\n", p_this->p_vlc->i_unique,
-                             p_this->i_object_id, psz_module,
-                             ppsz_type[i_type], ppsz_color[i_type], psz_str );
-        }
-        else
-        {
-            fprintf( stderr, "[%.2x:%.6x] %s%s: %s\n",
-                             p_this->p_vlc->i_unique, p_this->i_object_id,
-                             psz_module, ppsz_type[i_type], psz_str );
-        }
-    }
-
-    /* Put the message in the queue if there is room for it */
+    /* Check there is room in the queue for our message */
     if( ((p_this->p_vlc->msg_bank.i_stop - p_this->p_vlc->msg_bank.i_start + 1) % VLC_MSG_QSIZE) == 0 )
     {
         FlushMsg( &p_this->p_vlc->msg_bank );
@@ -354,18 +288,24 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         if( ((p_this->p_vlc->msg_bank.i_stop - p_this->p_vlc->msg_bank.i_start + 1) % VLC_MSG_QSIZE) == 0 )
         {
             fprintf( stderr, "main warning: message queue overflow\n" );
-            vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
-            return;
+            p_item = &item;
+            goto print_message;
         }
     }
 
+    /* Put the message in the queue */
     p_item = p_this->p_vlc->msg_bank.msg + p_this->p_vlc->msg_bank.i_stop;
-    p_this->p_vlc->msg_bank.i_stop = (p_this->p_vlc->msg_bank.i_stop + 1) % VLC_MSG_QSIZE;
+    p_this->p_vlc->msg_bank.i_stop =
+                (p_this->p_vlc->msg_bank.i_stop + 1) % VLC_MSG_QSIZE;
 
     /* Fill message information fields */
-    p_item->i_type =     i_type;
-    p_item->psz_module = strdup( psz_module );
-    p_item->psz_msg =    psz_str;
+print_message:
+    p_item->i_type =      i_type;
+    p_item->i_object_id = p_this->i_object_id;
+    p_item->psz_module =  strdup( psz_module );
+    p_item->psz_msg =     psz_str;
+
+    PrintMsg( p_this, p_item );
 
     vlc_mutex_unlock( &p_this->p_vlc->msg_bank.lock );
 }
@@ -412,6 +352,50 @@ static void FlushMsg ( msg_bank_t *p_bank )
 
     /* Update the new start value */
     p_bank->i_start = i_index;
+}
+
+/*****************************************************************************
+ * PrintMsg: output a message item to stderr
+ *****************************************************************************
+ * Print a message to stderr, with colour formatting if needed.
+ *****************************************************************************/
+static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
+{
+#   define COL(x)  "\033[" #x ";1m"
+#   define RED     COL(31)
+#   define GREEN   COL(32)
+#   define YELLOW  COL(33)
+#   define WHITE   COL(37)
+#   define GRAY    "\033[0m"
+
+    static const char * ppsz_type[4] = { "", " error", " warning", " debug" };
+    static const char *ppsz_color[4] = { WHITE, RED, YELLOW, GRAY };
+    int i_type = p_item->i_type;
+
+    /* Send the message to stderr */
+    if( (i_type == VLC_MSG_ERR)
+         || ( (i_type == VLC_MSG_INFO) && !p_this->p_vlc->b_quiet )
+         || ( (i_type == VLC_MSG_WARN) && p_this->p_vlc->b_verbose
+                                       && !p_this->p_vlc->b_quiet )
+         || ( (i_type == VLC_MSG_DBG) && p_this->p_vlc->b_verbose
+                                       && !p_this->p_vlc->b_quiet ) )
+    {
+        if( p_this->p_vlc->b_color )
+        {
+            fprintf( stderr, "[" GREEN "%.2x" GRAY ":" GREEN "%.6x" GRAY "] "
+                             "%s%s: %s%s" GRAY "\n", p_this->p_vlc->i_unique,
+                             p_item->i_object_id, p_item->psz_module,
+                             ppsz_type[i_type], ppsz_color[i_type],
+                             p_item->psz_msg );
+        }
+        else
+        {
+            fprintf( stderr, "[%.2x:%.6x] %s%s: %s\n",
+                             p_this->p_vlc->i_unique, p_item->i_object_id,
+                             p_item->psz_module, ppsz_type[i_type],
+                             p_item->psz_msg );
+        }
+    }
 }
 
 /*****************************************************************************
