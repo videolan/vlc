@@ -20,6 +20,7 @@ EXTRA_DIST = \
 	vlc-config.1 \
 	bugreport-howto.txt \
 	fortunes.txt \
+	intf-cdda.txt \
 	intf-vcd.txt \
 	release-howto.txt \
 	web-streaming.html \
