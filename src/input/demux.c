@@ -48,6 +48,13 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
     p_demux->psz_demux  = strdup( psz_demux );
     p_demux->psz_path   = strdup( psz_path );
 
+    /* Take into account "demux" to be able to do :demux=demuxdump */
+    if( *p_demux->psz_demux == '\0' )
+    {
+        free( p_demux->psz_demux );
+        p_demux->psz_demux = var_GetString( p_obj, "demux" );
+    }
+
     msg_Dbg( p_obj, "demux2_New: access='%s' demux='%s' path='%s'",
              p_demux->psz_access, p_demux->psz_demux, p_demux->psz_path );
 
