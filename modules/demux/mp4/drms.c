@@ -2,7 +2,7 @@
  * drms.c: DRMS
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: drms.c,v 1.11 2004/01/23 20:58:52 jlj Exp $
+ * $Id: drms.c,v 1.12 2004/01/26 17:15:40 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Sam Hocevar <sam@zoy.org>
@@ -54,8 +54,14 @@
 #   include <limits.h>
 #endif
 
+#ifdef SYS_DARWIN
+#   include <mach/mach.h>
+#   include <IOKit/IOKitLib.h>
+#   include <CoreFoundation/CFNumber.h>
+#endif
+
 #ifdef HAVE_SYSFS_LIBSYSFS_H
-#    include <sysfs/libsysfs.h>
+#   include <sysfs/libsysfs.h>
 #endif
 
 #include "drms.h"
@@ -130,7 +136,7 @@ static void EndMD5        ( struct md5_s * );
 static void Digest        ( struct md5_s *, uint32_t * );
 
 static void InitShuffle   ( struct shuffle_s *, uint32_t * );
-static void DoShuffle     ( struct shuffle_s *, uint32_t * );
+static void DoShuffle     ( struct shuffle_s *, uint32_t *, uint32_t );
 
 static int GetSystemKey   ( uint32_t *, vlc_bool_t );
 static int WriteUserKey   ( void *, uint32_t * );
@@ -677,12 +683,13 @@ static void InitShuffle( struct shuffle_s *p_shuffle, uint32_t *p_sys_key )
 }
 
 /*****************************************************************************
- * DoShuffle: shuffle 16 byte buffer
+ * DoShuffle: shuffle buffer
  *****************************************************************************
  * This is so ugly and uses so many MD5 checksums that it is most certainly
  * one-way, though why it needs to be so complicated is beyond me.
  *****************************************************************************/
-static void DoShuffle( struct shuffle_s *p_shuffle, uint32_t *p_buffer )
+static void DoShuffle( struct shuffle_s *p_shuffle,
+                       uint32_t *p_buffer, uint32_t i_size )
 {
     struct md5_s md5;
     uint32_t p_big_bordel[ 16 ];
@@ -733,7 +740,7 @@ static void DoShuffle( struct shuffle_s *p_shuffle, uint32_t *p_buffer )
     EndMD5( &md5 );
 
     /* XOR our buffer with the computed checksum */
-    for( i = 0; i < 4; i++ )
+    for( i = 0; i < i_size; i++ )
     {
         p_buffer[ i ] ^= md5.p_digest[ i ];
     }
@@ -875,8 +882,9 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
     struct shuffle_s shuffle;
     uint32_t i, y;
     uint32_t *p_sci_data;
+    uint32_t i_user, i_key;
     uint32_t p_sys_key[ 4 ];
-    uint32_t i_sci_size, i_blocks;
+    uint32_t i_sci_size, i_blocks, i_remaining;
     uint32_t *p_sci0, *p_sci1, *p_buffer;
     uint32_t p_sci_key[ 4 ];
     char *psz_ipod;
@@ -905,6 +913,7 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
 
     /* Skip the first 4 bytes (some sort of header). Decrypt the rest. */
     i_blocks = (i_sci_size - 4) / 16;
+    i_remaining = (i_sci_size - 4) - (i_blocks * 16);
     p_buffer = p_sci_data + 1;
 
     /* Decrypt and shuffle our data at the same time */
@@ -927,12 +936,19 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
         memcpy( p_sci_key, p_buffer, 16 );
 
         /* Shuffle the decrypted data using a custom routine */
-        DoShuffle( &shuffle, p_tmp );
+        DoShuffle( &shuffle, p_tmp, 4 );
 
         /* Copy this block back to p_buffer */
         memcpy( p_buffer, p_tmp, 16 );
 
         p_buffer += 4;
+    }
+
+    if( i_remaining >= 4 )
+    {
+        i_remaining /= 4;
+        REVERSE( p_buffer, i_remaining );
+        DoShuffle( &shuffle, p_buffer, i_remaining );
     }
 
     /* Phase 2: look for the user key in the generated data. I must admit I
@@ -970,15 +986,16 @@ static int GetUserKey( void *_p_drms, uint32_t *p_user_key )
             continue;
         }
 
-        REVERSE( p_sci0, 1 );
-        REVERSE( p_sci1, 1 );
-        if( U32_AT( p_sci0 ) == p_drms->i_user &&
-            ( ( U32_AT( p_sci1 ) == p_drms->i_key ) ||
-              ( !p_drms->i_key ) || ( p_sci1 == (p_sci0 + 18) ) ) )
+        i_user = U32_AT( p_sci0 );
+        i_key = U32_AT( p_sci1 );
+        REVERSE( &i_user, 1 );
+        REVERSE( &i_key, 1 );
+        if( i_user == p_drms->i_user && ( ( i_key == p_drms->i_key ) ||
+            ( !p_drms->i_key && ( p_sci1 == (p_sci0 + 18) ) ) ) )
         {
-            REVERSE( p_sci1 + 1, 4 );
             memcpy( p_user_key, p_sci1 + 1, 16 );
-            WriteUserKey( p_drms, p_user_key );
+            REVERSE( p_sci1 + 1, 4 );
+            WriteUserKey( p_drms, p_sci1 + 1 );
             i_ret = 0;
             break;
         }
@@ -1184,6 +1201,9 @@ static int GetiPodID( long long *p_ipod_id )
 {
     int i_ret = -1;
 
+#define PROD_NAME   "iPod"
+#define VENDOR_NAME "Apple Computer, Inc."
+
     char *psz_ipod_id = getenv( "IPODID" );
     if( psz_ipod_id != NULL )
     {
@@ -1191,7 +1211,60 @@ static int GetiPodID( long long *p_ipod_id )
         return 0;
     }
 
-#ifdef HAVE_SYSFS_LIBSYSFS_H
+#ifdef SYS_DARWIN
+    CFTypeRef value;
+    mach_port_t port;
+    io_object_t device;
+    io_iterator_t iterator;
+    CFMutableDictionaryRef matching_dic;
+
+    if( IOMasterPort( MACH_PORT_NULL, &port ) == KERN_SUCCESS )
+    {
+        if( ( matching_dic = IOServiceMatching( "IOFireWireUnit" ) ) != NULL )
+        {
+            CFDictionarySetValue( matching_dic,
+                                  CFSTR("FireWire Vendor Name"),
+                                  CFSTR(VENDOR_NAME) );
+            CFDictionarySetValue( matching_dic,
+                                  CFSTR("FireWire Product Name"),
+                                  CFSTR(PROD_NAME) );
+
+            if( IOServiceGetMatchingServices( port, matching_dic,
+                                              &iterator ) == KERN_SUCCESS )
+            {
+                while( ( device = IOIteratorNext( iterator ) ) != NULL )
+                {
+                    value = IORegistryEntryCreateCFProperty( device,
+                        CFSTR("GUID"), kCFAllocatorDefault, kNilOptions );
+
+                    if( value != NULL )
+                    {
+                        if( CFGetTypeID( value ) == CFNumberGetTypeID() )
+                        {
+                            long long i_ipod_id;
+                            CFNumberGetValue( (CFNumberRef)value,
+                                              kCFNumberLongLongType,
+                                              &i_ipod_id );
+                            *p_ipod_id = i_ipod_id;
+                            i_ret = 0;
+                        }
+
+                        CFRelease( value );
+                    }
+
+                    IOObjectRelease( device );
+
+                    if( !i_ret ) break;
+                }
+
+                IOObjectRelease( iterator );
+            }
+        }
+
+        mach_port_deallocate( mach_task_self(), port );
+    }
+
+#elif HAVE_SYSFS_LIBSYSFS_H
     struct sysfs_bus *bus = NULL;
     struct dlist *devlist = NULL;
     struct dlist *attributes = NULL;
@@ -1213,7 +1286,8 @@ static int GetiPodID( long long *p_ipod_id )
                                          struct sysfs_attribute )
                     {
                         if( ( strcmp( curattr->name, "model_name" ) == 0 ) &&
-                            ( strncmp( curattr->value, "iPod", 4 ) == 0 ) )
+                            ( strncmp( curattr->value, PROD_NAME,
+                                       sizeof(PROD_NAME) ) == 0 ) )
                         {
                             *p_ipod_id = strtoll( curdev->name, NULL, 16 );
                             i_ret = 0;
