@@ -2,7 +2,7 @@
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: a52tospdif.c,v 1.11 2002/09/02 23:17:05 massiot Exp $
+ * $Id: a52tospdif.c,v 1.12 2002/09/11 23:08:43 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -87,7 +87,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     u16 i;
 #   endif
 #endif
-    u16 i_length = p_in_buf->i_nb_samples;
+    u16 i_length = p_in_buf->i_nb_bytes;
     u16 * pi_length;
     byte_t * p_in = p_in_buf->p_buffer;
     byte_t * p_out = p_out_buf->p_buffer;
