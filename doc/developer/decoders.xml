@@ -28,8 +28,8 @@ src/input/input_dec.c</filename>. The <function>Dec_CreateThread</funcion>
 function selects the more accurate decoder module. Each decoder module 
 looks at decoder_config.i_type and returns a score [ see the modules 
 section ]. It then launches <function> module.pf_RunThread()</function>, 
-with an <type>decoder_config_t</type> (audio) or an <type> vdec_config_t
-</type>, described in <filename> include/input_ext-dec.h</filename>.
+with an <type>decoder_config_t</type>, described in <filename> 
+include/input_ext-dec.h</filename>.
     </para>
 
     <para>
@@ -280,15 +280,15 @@ also a new <type>pes_packet_t</type>. You can store your own structure in
     <para>
 VLC already features an MPEG layer 1 and 2 audio decoder, an MPEG MP@ML
 video decoder, an AC3 decoder (borrowed from LiViD), a DVD SPU decoder,
-and an LPCM decoder [not functional yet]. You can write your own
-decoder, just mimic the video parser.
+and an LPCM decoder. You can write your own decoder, just mimic the 
+video parser.
     </para>
 
     <note> <title> Limitations in the current design </title>
     <para>
-Currently, decoders are not "plug-ins", that is they are not dynamically
-loadable. The way the input chooses a decoder is also not final - it
-is hard-wired in <filename> src/input/input_programs.c</filename>.
+To add a new decoder, you'll still have to add the stream type as there's 
+still a a hard-wired piece of code in <filename> src/input/input_programs.c
+</filename>.
     </para> </note>
 
     <para>
