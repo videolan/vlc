@@ -147,7 +147,7 @@ block_fifo_t *__block_FifoNew( vlc_object_t *p_obj )
     p_fifo = malloc( sizeof( vlc_object_t ) );
     vlc_mutex_init( p_obj, &p_fifo->lock );
     vlc_cond_init( p_obj, &p_fifo->wait );
-    p_fifo->i_depth = 0;
+    p_fifo->i_depth = p_fifo->i_size = 0;
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
 
@@ -176,7 +176,7 @@ void block_FifoEmpty( block_fifo_t *p_fifo )
         b = p_next;
     }
 
-    p_fifo->i_depth = 0;
+    p_fifo->i_depth = p_fifo->i_size = 0;
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
     vlc_mutex_unlock( &p_fifo->lock );
@@ -194,6 +194,7 @@ int block_FifoPut( block_fifo_t *p_fifo, block_t *p_block )
         *p_fifo->pp_last = p_block;
         p_fifo->pp_last = &p_block->p_next;
         p_fifo->i_depth++;
+        p_fifo->i_size += p_block->i_buffer;
 
         p_block = p_block->p_next;
 
@@ -224,6 +225,7 @@ block_t *block_FifoGet( block_fifo_t *p_fifo )
 
     p_fifo->p_first = b->p_next;
     p_fifo->i_depth--;
+    p_fifo->i_size -= b->i_buffer;
 
     if( p_fifo->p_first == NULL )
     {
@@ -233,7 +235,7 @@ block_t *block_FifoGet( block_fifo_t *p_fifo )
     vlc_mutex_unlock( &p_fifo->lock );
 
     b->p_next = NULL;
-    return( b );
+    return b;
 }
 
 block_t *block_FifoShow( block_fifo_t *p_fifo )

@@ -207,8 +207,6 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
 {
     if( p_dec->p_owner->b_own_thread )
     {
-        block_FifoPut( p_dec->p_owner->p_fifo, p_block );
-
         if( p_dec->p_owner->p_input->b_out_pace_control )
         {
             /* FIXME !!!!! */
@@ -218,6 +216,16 @@ void input_DecoderDecode( decoder_t * p_dec, block_t *p_block )
                 msleep( 1000 );
             }
         }
+        else if( p_dec->p_owner->p_fifo->i_size > 50000000 /* 50 MB */ )
+        {
+            /* FIXME: ideally we would check the time amount of data
+             * in the fifo instead of its size. */
+            msg_Warn( p_dec, "decoder/packetizer fifo full (data not "
+                      "consummed quickly enough), resetting fifo!" );
+            block_FifoEmpty( p_dec->p_owner->p_fifo );
+        }
+
+        block_FifoPut( p_dec->p_owner->p_fifo, p_block );
     }
     else
     {

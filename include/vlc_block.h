@@ -243,6 +243,7 @@ struct block_fifo_t
     int                 i_depth;
     block_t             *p_first;
     block_t             **pp_last;
+    int                 i_size;
 };
 
 
