@@ -457,26 +457,41 @@ AC_ARG_WITH(ggi,
 dnl
 dnl  SDL module
 dnl
-AC_ARG_WITH(sdl,
-  [  --with-sdl[=name]       SDL support (default enabled)],
-  [ if test "x$withval" != "xno";
-    then
-      PLUGINS="${PLUGINS} sdl";
-      if test "x$withval" != "xyes";
-      then
-        LIB_SDL="${LIB_SDL} -L/usr/X11R6/lib -L"$withval"/lib -lSDL"
-        CFLAGS_SDL="-I"$withval"/include"
-      else
-        AC_CHECK_HEADERS(SDL/SDL.h, , [echo "Cannot find SDL headers !"; exit])
-        LIB_SDL="${LIB_SDL} -L/usr/X11R6/lib -lSDL"
-      fi
-    fi ])
-    if test "x$withval" = "x";
-    then
-      AC_CHECK_HEADERS(SDL/SDL.h,
-      [PLUGINS="${PLUGINS} sdl"
-       LIB_SDL="${LIB_SDL} -L/usr/X11R6/lib -lSDL"])
+AC_ARG_ENABLE(sdl,
+  [  --disable-sdl           SDL support (default enabled)])
+if test "x$withval" != "xno";
+then
+  AC_DEFINE(HAVE_SDL_SDL_H, 0, Define if you have SDL/SDL.h)
+  AC_DEFINE(HAVE_SDL11_SDL_H, 0, Define if you have SDL/SDL11.h)
+  AC_DEFINE(HAVE_SDL12_SDL_H, 0, Define if you have SDL/SDL12.h)
+  AC_PATH_PROG(SDL_CONFIG, sdl-config, no)
+  SDL_HEADER="SDL/SDL.h"
+  if test x${SDL_CONFIG} = xno; then
+    AC_PATH_PROG(SDL_CONFIG, sdl11-config, no)
+    SDL_HEADER="SDL11/SDL.h"
+  fi
+  if test x${SDL_CONFIG} = xno; then
+    AC_PATH_PROG(SDL_CONFIG, sdl12-config, no)
+    SDL_HEADER="SDL12/SDL.h"
+  fi
+  if test x${SDL_CONFIG} != xno; then
+    AC_CHECK_HEADERS($SDL_HEADER, [],
+	[ echo "The development package for SDL is not installed. Please install it"
+	  echo "and try again."
+	  exit ])
+    if expr 1.1.7 \> $($SDL_CONFIG --version); then
+      echo "You need SDL version 1.1.7 or later."
+      exit
     fi
+    PLUGINS="${PLUGINS} sdl"
+    CFLAGS_SDL="`${SDL_CONFIG} --cflags`"
+    LIB_SDL="`${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
+  elif test "x$withval" =  "xyes"; then
+    echo "I couldn't find the SDL package. You can download libSDL from"
+    echo "http://www.libsdl.org/."
+    exit
+  fi
+fi
 
 dnl
 dnl  Windows DirectX module
