@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.22 2003/10/15 12:24:14 gbazin Exp $
+ * $Id: menus.cpp,v 1.23 2003/10/19 23:38:09 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -100,13 +100,15 @@ wxMenu *OpenStreamMenu( intf_thread_t *p_intf )
 void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
                 const wxPoint& pos )
 {
+#define MAX_POPUP_ITEMS 35
+
     vlc_object_t *p_object;
-    char *ppsz_varnames[29];
-    int pi_objects[29];
+    char *ppsz_varnames[MAX_POPUP_ITEMS];
+    int pi_objects[MAX_POPUP_ITEMS];
     int i = 0;
 
     /* Initializations */
-    memset( pi_objects, 0, 29 * sizeof(int) );
+    memset( pi_objects, 0, MAX_POPUP_ITEMS * sizeof(int) );
 
     /* Audio menu */
     ppsz_varnames[i++] = _("Audio menu");
@@ -141,6 +143,10 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         ppsz_varnames[i] = "crop";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "directx-on-top";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "xvideo-on-top";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "x11-on-top";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
     }
@@ -211,13 +217,15 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
 
 wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 {
+#define MAX_AUDIO_ITEMS 10
+
     vlc_object_t *p_object;
-    char *ppsz_varnames[5];
-    int pi_objects[5];
+    char *ppsz_varnames[MAX_AUDIO_ITEMS];
+    int pi_objects[MAX_AUDIO_ITEMS];
     int i = 0;
 
     /* Initializations */
-    memset( pi_objects, 0, 5 * sizeof(int) );
+    memset( pi_objects, 0, MAX_AUDIO_ITEMS * sizeof(int) );
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
@@ -246,13 +254,15 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 
 wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 {
+#define MAX_VIDEO_ITEMS 15
+
     vlc_object_t *p_object;
-    char *ppsz_varnames[6];
-    int pi_objects[6];
+    char *ppsz_varnames[MAX_VIDEO_ITEMS];
+    int pi_objects[MAX_VIDEO_ITEMS];
     int i = 0;
 
     /* Initializations */
-    memset( pi_objects, 0, 6 * sizeof(int) );
+    memset( pi_objects, 0, MAX_VIDEO_ITEMS * sizeof(int) );
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_VOUT,
                                                 FIND_ANYWHERE );
@@ -267,6 +277,10 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
         ppsz_varnames[i] = "crop";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "directx-on-top";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "xvideo-on-top";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "x11-on-top";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
     }
@@ -289,13 +303,15 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 
 wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 {
+#define MAX_NAVIG_ITEMS 10
+
     vlc_object_t *p_object;
-    char *ppsz_varnames[10];
-    int pi_objects[10];
+    char *ppsz_varnames[MAX_NAVIG_ITEMS];
+    int pi_objects[MAX_NAVIG_ITEMS];
     int i = 0;
 
     /* Initializations */
-    memset( pi_objects, 0, 4 * sizeof(int) );
+    memset( pi_objects, 0, MAX_NAVIG_ITEMS * sizeof(int) );
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
                                                 FIND_ANYWHERE );
@@ -331,13 +347,15 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 
 wxMenu *MiscMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
 {
+#define MAX_MISC_ITEMS 10
+
     vlc_object_t *p_object;
-    char *ppsz_varnames[10];
-    int pi_objects[10];
+    char *ppsz_varnames[MAX_MISC_ITEMS];
+    int pi_objects[MAX_MISC_ITEMS];
     int i = 0;
 
     /* Initializations */
-    memset( pi_objects, 0, 4 * sizeof(int) );
+    memset( pi_objects, 0, MAX_MISC_ITEMS * sizeof(int) );
 
     p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INTF,
                                                 FIND_PARENT );
