@@ -2276,10 +2276,14 @@ if test "x${enable_coreaudio}" != "xno" &&
 then
   AC_CHECK_HEADERS(CoreAudio/CoreAudio.h, 
     [ BUILTINS="${BUILTINS} coreaudio"
-      PLUGINS="${PLUGINS} coreaudio_resampler"
       LDFLAGS_coreaudio="${LDFLAGS_coreaudio} -framework CoreAudio"
-      LDFLAGS_coreaudio_resampler="${LDFLAGS_coreaudio_resampler} -framework AudioToolbox" ], 
-    [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
+      AC_MSG_CHECKING(for kAudioConverterPrimeMethod in AudioToolbox/AudioConverter.h)
+      AC_EGREP_HEADER(kAudioConverterPrimeMethod,AudioToolbox/AudioConverter.h,[
+        AC_MSG_RESULT(yes)
+        PLUGINS="${PLUGINS} coreaudio_resampler"
+        LDFLAGS_coreaudio_resampler="${LDFLAGS_coreaudio_resampler} -framework AudioToolbox"
+      ],[ AC_MSG_RESULT(no) ])
+    ], [ AC_MSG_ERROR([cannot find CoreAudio headers]) ])
 fi
 
 dnl
