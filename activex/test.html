@@ -26,31 +26,31 @@ MRL:
 </OBJECT>
 <SCRIPT LANGUAGE="JScript">
 <!--
-function vlc::OnPlay()
+function vlc::play()
 {
-	alert("Playing");
+	alert("VLC is Playing");
 };
-function vlc::OnPause()
+function vlc::pause()
 {
-	alert("Paused");
+	alert("VLC has Paused");
 };
-function vlc::OnStop()
+function vlc::stop()
 {
-	alert("Stopped");
+	alert("VLC has Stopped");
 };
 //-->
 </SCRIPT>
 </TD></TR>
 <TR><TD>
-<INPUT type=submit value="Play" onClick='document.vlc.play();'>
-<INPUT type=submit value="Pause" onClick='document.vlc.pause();'>
-<INPUT type=submit value="Stop" onClick='document.vlc.stop();'>
-<INPUT type=submit value=" << " onClick='document.vlc.playSlower();'>
-<INPUT type=submit value=" >> " onClick='document.vlc.playFaster();'>
-<INPUT type=submit value="Mute" onClick='document.vlc.toggleMute();'>
-<INPUT type=submit value="Show" onClick='document.vlc.Visible = true;'>
-<INPUT type=submit value="Hide" onClick='document.vlc.Visible = false;'>
-<INPUT type=submit value="Version" onClick='alert(document.vlc.VersionInfo);'>
+<INPUT type=button value="Play" onClick='document.vlc.play();'>
+<INPUT type=button value="Stop" onClick='document.vlc.stop();'>
+<INPUT type=button value="Pause" onClick='document.vlc.pause();'>
+<INPUT type=button value=" << " onClick='document.vlc.playSlower();'>
+<INPUT type=button value=" >> " onClick='document.vlc.playFaster();'>
+<INPUT type=button value="Mute" onClick='document.vlc.toggleMute();'>
+<INPUT type=button value="Show" onClick='document.vlc.Visible = true;'>
+<INPUT type=button value="Hide" onClick='document.vlc.Visible = false;'>
+<INPUT type=button value="Version" onClick='alert(document.vlc.VersionInfo);'>
 </TD></TR>
 </TABLE>
 </BODY>

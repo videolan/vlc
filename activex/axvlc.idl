@@ -126,11 +126,11 @@ library AXVLC
         properties:
         methods:
             [id(1), helpstring("Playback in progress")]
-            void OnPlay();
+            void Play();
             [id(2), helpstring("Playback has paused")]
-            void OnPause();
+            void Pause();
             [id(3), helpstring("Playback has stopped")]
-            void OnStop();
+            void Stop();
     };
 
     [

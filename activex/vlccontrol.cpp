@@ -132,7 +132,7 @@ STDMETHODIMP VLCControl::get_Visible(VARIANT_BOOL *isVisible)
     if( _p_instance->isInPlaceActive() )
         *isVisible = _p_instance->isVisible() ? VARIANT_TRUE : VARIANT_FALSE;
     else
-        *isVisible = VARIANT_FALSE;
+        *isVisible =  _p_instance->getShowDisplay() ? VARIANT_TRUE : VARIANT_FALSE;
 
     return NOERROR;
 };

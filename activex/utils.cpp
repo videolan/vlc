@@ -39,7 +39,7 @@ char *CStrFromBSTR(int codePage, BSTR bstr)
         {
             char *buffer = (char *)malloc(mblen+1);
             ZeroMemory(buffer, mblen+1);
-            if( WideCharToMultiByte(CP_ACP, 0, bstr, len, buffer, mblen, NULL, NULL) )
+            if( WideCharToMultiByte(codePage, 0, bstr, len, buffer, mblen, NULL, NULL) )
                 return buffer;
         }
     }

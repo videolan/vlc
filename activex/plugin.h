@@ -80,7 +80,7 @@ public:
 
     /* custom methods */
     HRESULT getTypeLib(ITypeLib **pTL)
-        { return LoadRegTypeLib(LIBID_AXVLC, 1, 0, LOCALE_NEUTRAL, pTL); };
+        { return LoadRegTypeLib(LIBID_AXVLC, 1, 0, LOCALE_USER_DEFAULT, pTL); };
     REFCLSID getClassID(void) { return (REFCLSID)CLSID_VLCPlugin; };
     REFIID getDispEventID(void) { return (REFIID)DIID_DVLCEvents; };
 
@@ -103,7 +103,7 @@ public:
 
     int  getVLCObject(void) { return _i_vlc; };
 
-    // initial properties
+    // control properties
     void setSourceURL(const char *url) { _psz_src = strdup(url); };
     void setAutoStart(BOOL autostart) { _b_autostart = autostart; };
     void setLoopMode(BOOL loopmode) { _b_loopmode = loopmode; };
@@ -114,12 +114,14 @@ public:
         }
     };
     void setShowDisplay(BOOL show) { _b_showdisplay = show; };
+    BOOL getShowDisplay(void) { return _b_showdisplay; };
+    void setSendEvents(BOOL sendevents) { _b_sendevents = sendevents; };
 
+    // container events
     void onPositionChange(LPCRECT lprcPosRect, LPCRECT lprcClipRect);
     void onPaint(PAINTSTRUCT &ps, RECT &pr);
 
-    // plugin events
-    void setSendEvents(BOOL sendevents) { _b_sendevents = sendevents; };
+    // control events
     void fireOnPlayEvent(void);
     void fireOnPauseEvent(void);
     void fireOnStopEvent(void);

@@ -35,7 +35,7 @@ STDMETHODIMP VLCProvideClassInfo::GetClassInfo(ITypeInfo **ppTI)
     HRESULT hr = _p_instance->getTypeLib(&p_typelib);
     if( SUCCEEDED(hr) )
     {
-        hr = p_typelib->GetTypeInfoOfGuid(_p_instance->getDispEventID(), ppTI);
+        hr = p_typelib->GetTypeInfoOfGuid(_p_instance->getClassID(), ppTI);
         if( FAILED(hr) )
         {
             *ppTI = NULL;

@@ -133,7 +133,7 @@ STDMETHODIMP VLCConnectionPoint::EnumConnections(IEnumConnections **ppEnum)
     return (NULL != *ppEnum ) ? S_OK : E_OUTOFMEMORY;
 };
 
-void VLCConnectionPoint::fireEvent(DISPID dispId, LCID lcid, DISPPARAMS* pDispParams)
+void VLCConnectionPoint::fireEvent(DISPID dispId, DISPPARAMS* pDispParams)
 {
     vector<CONNECTDATA>::iterator end = _connections.end();
     vector<CONNECTDATA>::iterator iter = _connections.begin();
@@ -146,13 +146,7 @@ void VLCConnectionPoint::fireEvent(DISPID dispId, LCID lcid, DISPPARAMS* pDispPa
             IDispatch *pDisp;
             if( SUCCEEDED(cd.pUnk->QueryInterface(IID_IDispatch, (LPVOID *)&pDisp)) )
             {
-                unsigned int puArgErr;
-                VARIANT vRes;
-
-                if( SUCCEEDED(pDisp->Invoke(dispId, IID_NULL, lcid, DISPATCH_METHOD, pDispParams, &vRes, NULL, &puArgErr)) )
-                {
-                    VariantClear(&vRes);
-                }
+                pDisp->Invoke(dispId, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_METHOD, pDispParams, NULL, NULL, NULL);
                 pDisp->Release();
             }
         }
@@ -281,9 +275,9 @@ STDMETHODIMP VLCConnectionPointContainer::FindConnectionPoint(REFIID riid, IConn
     return NOERROR;
 };
 
-void VLCConnectionPointContainer::fireEvent(DISPID dispId, LCID lcid, DISPPARAMS* pDispParams)
+void VLCConnectionPointContainer::fireEvent(DISPID dispId, DISPPARAMS* pDispParams)
 {
-    _p_events->fireEvent(dispId,lcid, pDispParams);
+    _p_events->fireEvent(dispId, pDispParams);
 };
 
 void VLCConnectionPointContainer::firePropChangedEvent(DISPID dispId)

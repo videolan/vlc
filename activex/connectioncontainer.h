@@ -61,7 +61,7 @@ public:
     STDMETHODIMP Unadvise(DWORD);
     STDMETHODIMP EnumConnections(LPENUMCONNECTIONS *);
 
-    void fireEvent(DISPID dispIdMember, LCID lcid, DISPPARAMS* pDispParams);
+    void fireEvent(DISPID dispIdMember, DISPPARAMS* pDispParams);
     void firePropChangedEvent(DISPID dispId);
 
 private:
@@ -101,7 +101,7 @@ public:
     STDMETHODIMP EnumConnectionPoints(LPENUMCONNECTIONPOINTS *);
     STDMETHODIMP FindConnectionPoint(REFIID, LPCONNECTIONPOINT *);
 
-    void fireEvent(DISPID, LCID, DISPPARAMS*);
+    void fireEvent(DISPID, DISPPARAMS*);
     void firePropChangedEvent(DISPID dispId);
 
 private:

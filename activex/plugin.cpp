@@ -743,7 +743,7 @@ void VLCPlugin::fireOnPlayEvent(void)
     if( _b_sendevents )
     {
         DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-        vlcConnectionPointContainer->fireEvent(1, LOCALE_USER_DEFAULT, &dispparamsNoArgs); 
+        vlcConnectionPointContainer->fireEvent(1, &dispparamsNoArgs); 
     }
 };
 
@@ -752,7 +752,7 @@ void VLCPlugin::fireOnPauseEvent(void)
     if( _b_sendevents )
     {
         DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-        vlcConnectionPointContainer->fireEvent(2, LOCALE_USER_DEFAULT, &dispparamsNoArgs); 
+        vlcConnectionPointContainer->fireEvent(2, &dispparamsNoArgs); 
     }
 };
 
@@ -761,7 +761,7 @@ void VLCPlugin::fireOnStopEvent(void)
     if( _b_sendevents )
     {
         DISPPARAMS dispparamsNoArgs = {NULL, NULL, 0, 0};
-        vlcConnectionPointContainer->fireEvent(3, LOCALE_USER_DEFAULT, &dispparamsNoArgs); 
+        vlcConnectionPointContainer->fireEvent(3, &dispparamsNoArgs); 
     }
 };
 
