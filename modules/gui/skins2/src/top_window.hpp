@@ -52,7 +52,6 @@ class TopWindow: public GenericWindow
         virtual void processEvent( EvtMouse &rEvtMouse );
         virtual void processEvent( EvtLeave &rEvtLeave );
         virtual void processEvent( EvtKey &rEvtKey );
-        virtual void processEvent( EvtRefresh &rEvtRefresh );
         virtual void processEvent( EvtScroll &rEvtScroll );
 
         /// Forward an event to a control

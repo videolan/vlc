@@ -23,19 +23,53 @@
 
 #include "vout_window.hpp"
 #include "os_factory.hpp"
+#include "os_graphics.hpp"
 #include "os_window.hpp"
 
 
 VoutWindow::VoutWindow( intf_thread_t *pIntf, int left, int top,
-                        bool dragDrop, bool playOnDrop, GenericWindow &rParent ):
+                        bool dragDrop, bool playOnDrop,
+                        GenericWindow &rParent ):
     GenericWindow( pIntf, left, top, dragDrop, playOnDrop,
-                   &rParent )
+                   &rParent ), m_pImage( NULL )
 {
 }
 
 
 VoutWindow::~VoutWindow()
 {
+    if( m_pImage )
+    {
+        delete m_pImage;
+    }
     // XXX we should stop the vout before destroying the window!
 }
 
+
+void VoutWindow::resize( int width, int height )
+{
+    // Get the OSFactory
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+
+    // Recreate the image
+    if( m_pImage )
+    {
+        delete m_pImage;
+    }
+    m_pImage = pOsFactory->createOSGraphics( width, height );
+    // Draw a black rectangle
+    m_pImage->fillRect( 0, 0, width, height, 0 );
+
+    // Resize the window
+    GenericWindow::resize( width, height );
+}
+
+
+void VoutWindow::refresh( int left, int top, int width, int height )
+{
+    if( m_pImage )
+    {
+        m_pImage->copyToWindow( *getOSWindow(), left, top, width, height, left,
+                                top );
+    }
+}

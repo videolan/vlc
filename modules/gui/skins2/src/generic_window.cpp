@@ -25,6 +25,7 @@
 #include "generic_window.hpp"
 #include "os_window.hpp"
 #include "os_factory.hpp"
+#include "../events/evt_refresh.hpp"
 
 
 GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
@@ -60,6 +61,14 @@ GenericWindow::~GenericWindow()
     {
         delete m_pOsWindow;
     }
+}
+
+
+void GenericWindow::processEvent( EvtRefresh &rEvtRefresh )
+{
+    // Refresh the given area
+    refresh( rEvtRefresh.getXStart(), rEvtRefresh.getYStart(),
+             rEvtRefresh.getWidth(), rEvtRefresh.getHeight() );
 }
 
 

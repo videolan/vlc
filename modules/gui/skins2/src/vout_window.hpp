@@ -26,6 +26,8 @@
 
 #include "generic_window.hpp"
 
+class OSGraphics;
+
 
 /// Class to handle a video output window
 class VoutWindow: public GenericWindow
@@ -34,6 +36,16 @@ class VoutWindow: public GenericWindow
         VoutWindow( intf_thread_t *pIntf, int xPos, int yPos,
                     bool dragDrop, bool playOnDrop, GenericWindow &rParent );
         virtual ~VoutWindow();
+
+        /// Resize the window
+        virtual void resize( int width, int height );
+
+        /// Refresh an area of the window
+        virtual void refresh( int left, int top, int width, int height );
+
+    private:
+        /// Image when there is no video
+        OSGraphics *m_pImage;
 };
 
 typedef CountedPtr<VoutWindow> VoutWindowPtr;

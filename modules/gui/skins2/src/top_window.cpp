@@ -38,7 +38,6 @@
 #include "../events/evt_motion.hpp"
 #include "../events/evt_mouse.hpp"
 #include "../events/evt_key.hpp"
-#include "../events/evt_refresh.hpp"
 #include "../events/evt_special.hpp"
 #include "../events/evt_scroll.hpp"
 #include "../utils/position.hpp"
@@ -229,14 +228,6 @@ void TopWindow::processEvent( EvtKey &rEvtKey )
 
     // Always store the modifier, which can be needed for scroll events
     m_currModifier = rEvtKey.getMod();
-}
-
-
-void TopWindow::processEvent( EvtRefresh &rEvtRefresh )
-{
-    // Refresh the given area
-    refresh( rEvtRefresh.getXStart(), rEvtRefresh.getYStart(),
-             rEvtRefresh.getWidth(), rEvtRefresh.getHeight() );
 }
 
 

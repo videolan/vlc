@@ -54,8 +54,9 @@ class GenericWindow: public SkinObject, public Observer<VarBool>
         virtual void processEvent( EvtMouse &rEvtMouse ) {}
         virtual void processEvent( EvtLeave &rEvtLeave ) {}
         virtual void processEvent( EvtKey &rEvtKey ) {}
-        virtual void processEvent( EvtRefresh &rEvtRefresh ) {}
         virtual void processEvent( EvtScroll &rEvtScroll ) {}
+
+        virtual void processEvent( EvtRefresh &rEvtRefresh );
 
         // Show the window
         virtual void show();
