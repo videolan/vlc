@@ -1,3 +1,60 @@
+vlc (0.7.2.final-4) unstable; urgency=low
+
+  * debian/rules:
+    + Activated Theora support (Closes: #259061).
+    + Re-enabled the KDE plugin (Closes: #258295).
+  * debian/control:
+    + Set policy to 3.6.1.1.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 13 Jul 2004 00:21:20 +0200
+
+vlc (0.7.2.final-3) unstable; urgency=low
+
+  * extras/ffmpeg/configure: fixed HPPA architecture detection.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 25 Jun 2004 11:55:33 +0200
+
+vlc (0.7.2.final-2) unstable; urgency=low
+
+  * extras/ffmpeg/libavcodec/svq1.c: fixed vector/vect namespace issues on
+    powerpc.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 22 Jun 2004 15:21:09 +0200
+
+vlc (0.7.2.final-1) unstable; urgency=low
+
+  * New upstream release.
+  * Temporarily disabled the KDE GUI plugin.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sat, 29 May 2004 00:06:48 -0300
+
+vlc (0.7.2-test2-1) unstable; urgency=low
+
+  * New upstream snapshot.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Thu,  6 May 2004 11:11:25 +0200
+
+vlc (0.7.2-test1-4) unstable; urgency=low
+
+  * extras/ffmpeg/libacvodec/Makefile:
+    + Fixed a PARISC/HPPA mix-up.
+  * src/interface/interface.c:
+    + Removed the "switch interface" menu due to wxwin's utter bugosity.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 30 Apr 2004 13:15:59 +0200
+
+vlc (0.7.2-test1-3) unstable; urgency=low
+
+  * configure.ac:
+    + Link DTS plugins with libdts_pic.a, not libdts.a.
+  * debian/control:
+    + Build-depend on libid3tag0-dev for ID3 tag support.
+    + Made vlc depend on wxvlc for the moment.
+  * extras/ffmpeg/libacvodec/Makefile:
+    + Build motion_est.c with -O1.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 30 Apr 2004 10:49:59 +0200
+
 vlc (0.7.2-test1-2) unstable; urgency=low
 
   * debian/control:
