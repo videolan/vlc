@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.8 2003/07/09 09:30:23 adn Exp $
+ * $Id: messages.cpp,v 1.9 2003/07/09 10:59:11 adn Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -197,7 +197,7 @@ void Messages::OnClose( wxCommandEvent& WXUNUSED(event) )
 
 void Messages::OnClear( wxCommandEvent& WXUNUSED(event) )
 {
-    (*textctrl).Clear();
+    textctrl->Clear();
 }
 
 void Messages::OnVerbose( wxCommandEvent& event )
