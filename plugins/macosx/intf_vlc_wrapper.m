@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.m,v 1.3 2002/05/18 13:33:44 massiot Exp $
+ * $Id: intf_vlc_wrapper.m,v 1.4 2002/05/19 17:27:39 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -98,6 +98,7 @@ static Intf_VLCWrapper *o_intf = nil;
                 p_input_bank->pp_input[0]->stream.p_selected_area->i_part )
             {
                 [self setupMenus];
+                p_main->p_intf->p_sys->b_disabled_menus = 0;
             }
         }
 
@@ -106,6 +107,7 @@ static Intf_VLCWrapper *o_intf = nil;
     else if ( !p_main->p_intf->p_sys->b_disabled_menus )
     {
         [self setupMenus];
+        p_main->p_intf->p_sys->b_disabled_menus = 1;
     }
 
     return( 0 );
@@ -932,8 +934,6 @@ static Intf_VLCWrapper *o_intf = nil;
         }
         p_input->stream.b_changed = 0;
     }
-
-    p_main->p_intf->p_sys->b_disabled_menus = 1;
 }
 
 @end
