@@ -243,17 +243,19 @@ if test "${echo_target}" = yes; then
     for module in `echo "${plugins}"`; do
       register_targets "${module}"
     done
-    echo "${list}" | sed -e 's/[^ ][^ ]*/&_plugin/g'
+    for target in `echo ${list}`; do printf "${target}_plugin "; done
+    printf '\n'
   fi
   if test "${echo_builtin}"; then
     for module in `echo "${builtins}"`; do
       register_targets "${module}"
     done
     if test "${echo_pic}"; then
-      echo "${list}" | sed -e 's/[^ ][^ ]*/&_pic.a/g'
+      for target in `echo ${list}`; do printf "${target}_pic.a "; done
     else
-      echo "${list}" | sed -e 's/[^ ][^ ]*/&.a/g'
+      for target in `echo ${list}`; do printf "${target}.a "; done
     fi
+    printf '\n'
   fi
   exit 0
 fi
@@ -283,10 +285,11 @@ if test "${echo_libs}" = yes; then
       register_flags "${module}"
     done
     if test "${echo_pic}"; then
-      libs="`echo "${list}" | sed -e 's/[^ ][^ ]*/&_pic.a/g'` ${libs}"
+      for target in `echo ${list}`; do printf "${target}_pic.a "; done
     else
-      libs="`echo "${list}" | sed -e 's/[^ ][^ ]*/&.a/g'` ${libs}"
+      for target in `echo ${list}`; do printf "${target}.a "; done
     fi
+    printf '\n'
   fi
   echo "${libs} ${ldflags}"
 fi
