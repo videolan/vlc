@@ -36,7 +36,7 @@ PLUGINS_DIR :=	a52 \
 		dvdread \
 		dvdplay \
 		esd \
-      familiar \
+		familiar \
 		fb \
 		ffmpeg \
 		mp4 \
@@ -104,7 +104,7 @@ PLUGINS_TARGETS := a52/a52 \
 		dvdread/dvdread \
 		dvdplay/dvdplay \
 		esd/esd \
-      familiar/familiar \
+		familiar/familiar \
 		fb/fb \
 		ffmpeg/ffmpeg \
 		mp4/mp4 \
@@ -321,9 +321,9 @@ distclean: clean
 #
 # Install/uninstall rules
 #
-install: vlc-install plugins-install libvlc-install po-install mozilla-install
+install: vlc-install plugins-install builtins-install libvlc-install po-install mozilla-install
 
-uninstall: vlc-uninstall plugins-uninstall libvlc-install po-uninstall mozilla-uninstall
+uninstall: vlc-uninstall plugins-uninstall builtins-uninstall libvlc-uninstall po-uninstall mozilla-uninstall
 
 vlc-install:
 	mkdir -p $(DESTDIR)$(bindir)
@@ -615,7 +615,7 @@ endif
 # Main application target
 #
 vlc: Makefile.config Makefile.opts Makefile.dep Makefile $(VLC_OBJ) lib/libvlc.a $(BUILTIN_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) lib/libvlc.a $(LDFLAGS) $(vlc_LDFLAGS) $(builtins_LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) lib/libvlc.a $(LDFLAGS) $(vlc_LDFLAGS) $(BUILTIN_OBJ) $(builtins_LDFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@
@@ -628,20 +628,13 @@ endif
 #
 # Main library target
 #
-lib/libvlc.a: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ) $(BUILTIN_OBJ)
+lib/libvlc.a: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
 	rm -f $@
 	ar rc $@ $(LIBVLC_OBJ)
-ifneq (,$(BUILTINS))
-	rm -Rf lib/tmp && mkdir -p lib/tmp
-	cd lib/tmp && for i in $(BUILTINS) ; do ar x ../../plugins/$$i.a ; done
-	ar rcs $@ lib/tmp/*
-	rm -Rf lib/tmp
-endif
 	$(RANLIB) $@
 
 #lib/libvlc.so: Makefile.opts Makefile.dep Makefile $(LIBVLC_OBJ)
 #	$(CC) -shared $(LIBVLC_OBJ) $(LDFLAGS) $(vlc_LDFLAGS) -o $@
-#	chmod a-x $@
 
 #
 # Plugins target

@@ -1772,7 +1772,8 @@ then
   then
     MOZILLA=1
     mozilla_CFLAGS="${mozilla_CFLAGS} `${MOZILLA_CONFIG} --cflags plugin java --defines | xargs`"
-    mozilla_LDFLAGS="${mozilla_LDFLAGS} `${MOZILLA_CONFIG} --libs `"
+    dnl Workaround for http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=150490
+    mozilla_LDFLAGS="${mozilla_LDFLAGS} `${MOZILLA_CONFIG} --libs | sed 's#-I\(.*\)/mozilla/\([^ ]*\)#-I\1/\2 -I\1/mozilla/\2#g'`"
   fi
 fi
 
@@ -1824,7 +1825,7 @@ dnl
 dnl  Create the vlc-config script
 dnl
 libvlc_LDFLAGS="${vlc_LDFLAGS} ${builtins_LDFLAGS}"
-for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} @libdir@/${i}.a `eval echo '$'{${i}_LDFLAGS}`" ; done
+for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} ${libdir}/vlc/${i}.a `eval echo '$'{${i}_LDFLAGS}`" ; done
 AC_SUBST(libvlc_LDFLAGS)
 
 dnl 

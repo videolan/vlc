@@ -9137,7 +9137,7 @@ fi
   then
     MOZILLA=1
     mozilla_CFLAGS="${mozilla_CFLAGS} `${MOZILLA_CONFIG} --cflags plugin java --defines | xargs`"
-    mozilla_LDFLAGS="${mozilla_LDFLAGS} `${MOZILLA_CONFIG} --libs `"
+        mozilla_LDFLAGS="${mozilla_LDFLAGS} `${MOZILLA_CONFIG} --libs | sed 's#-I\(.*\)/mozilla/\([^ ]*\)#-I\1/\2 -I\1/mozilla/\2#g'`"
   fi
 fi
 
@@ -9193,7 +9193,7 @@ CFLAGS="${save_CFLAGS}"
 LDFLAGS="${save_LDFLAGS}"
 
 libvlc_LDFLAGS="${vlc_LDFLAGS} ${builtins_LDFLAGS}"
-for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} @libdir@/${i}.a `eval echo '$'{${i}_LDFLAGS}`" ; done
+for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} ${libdir}/vlc/${i}.a `eval echo '$'{${i}_LDFLAGS}`" ; done
 
 
 

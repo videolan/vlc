@@ -2,7 +2,7 @@
  * videolan.c: a VideoLAN plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcplugin.h,v 1.1 2002/07/04 18:11:57 sam Exp $
+ * $Id: vlcplugin.h,v 1.2 2002/07/23 20:12:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -46,19 +46,29 @@ typedef struct _PluginInstance
  * Plugin properties.
  ******************************************************************************/
 #define PLUGIN_NAME         "VideoLAN Client Plug-in"
-#define PLUGIN_DESCRIPTION  "VideoLAN Client (VLC) Multimedia Player Plug-in"
+#define PLUGIN_DESCRIPTION \
+    "VideoLAN Client Multimedia Player Plugin <br>" \
+    " <br>" \
+    COPYRIGHT_MESSAGE " <br>" \
+    "VideoLAN WWW: <a href=\"http://www.videolan.org/\">http://www.videolan.org/</a>"
 
 #define PLUGIN_MIMETYPES \
-    /* MPEG audio */ \
-    "audio/mpeg:mp2,mp3:MPEG audio;" \
-    "audio/x-mpeg:mp2,mp3:MPEG audio;" \
-    /* MPEG video */ \
-    "video/mpeg:mpg,mpeg:MPEG video;" \
-    "video/x-mpeg:mpg,mpeg:MPEG video;" \
-    "video/mpeg-system:mpg,mpeg:MPEG video;" \
-    "video/x-mpeg-system:mpg,mpeg:MPEG video;" \
-    /* AVI video */ \
+    /* MPEG-1 and MPEG-2 */ \
+    "audio/mpeg:mp2,mp3,mpga,mpega:MPEG audio;" \
+    "audio/x-mpeg:mp2,mp3,mpga,mpega:MPEG audio;" \
+    "video/mpeg:mpg,mpeg,mpe:MPEG video;" \
+    "video/x-mpeg:mpg,mpeg,mpe:MPEG video;" \
+    "video/mpeg-system:mpg,mpeg,mpe,vob:MPEG video;" \
+    "video/x-mpeg-system:mpg,mpeg,mpe,vob:MPEG video;" \
+    /* MPEG-4 */ \
+    "video/mpeg4:mp4,mpg4:MPEG-4 video;" \
+    "audio/mpeg4:mp4,mpg4:MPEG-4 audio;" \
+    "application/mpeg4-iod:mp4,mpg4:MPEG-4 video;" \
+    "application/mpeg4-muxcodetable:mp4,mpg4:MPEG-4 video;" \
+    /* AVI */ \
     "video/x-msvideo:avi:AVI video;" \
+    /* QuickTime */ \
+    "video/quicktime:mov,qt:QuickTime video;" \
     /* explicit plugin call */ \
     "application/x-vlc-plugin::VLC plugin"
 
