@@ -185,6 +185,12 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         }
     }
 
+    if( p_context->frame_rate > 0 && p_context->frame_rate_base > 0 )
+    {
+        p_dec->fmt_out.video.i_frame_rate = p_context->frame_rate;
+        p_dec->fmt_out.video.i_frame_rate_base = p_context->frame_rate_base;
+    }
+
     p_pic = p_dec->pf_vout_buffer_new( p_dec );
 
 #ifdef LIBAVCODEC_PP

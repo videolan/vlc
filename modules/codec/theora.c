@@ -294,6 +294,12 @@ static int ProcessHeaders( decoder_t *p_dec )
             p_sys->ti.frame_width / p_sys->ti.frame_height;
     }
 
+    if( p_sys->ti.fps_numerator > 0 && p_sys->ti.fps_denominator > 0 )
+    {
+        p_dec->fmt_out.video.i_frame_rate = p_sys->ti.fps_numerator;
+        p_dec->fmt_out.video.i_frame_rate_base = p_sys->ti.fps_denominator;
+    }
+
     msg_Dbg( p_dec, "%dx%d %.02f fps video, frame content "
              "is %dx%d with offset (%d,%d)",
              p_sys->ti.width, p_sys->ti.height,

@@ -594,8 +594,20 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     picture_t *p_pic;
 
     p_dec->fmt_out.video.i_width = p_sys->p_info->sequence->width;
+    p_dec->fmt_out.video.i_visible_width =
+        p_sys->p_info->sequence->picture_width;
     p_dec->fmt_out.video.i_height = p_sys->p_info->sequence->height;
+    p_dec->fmt_out.video.i_visible_height =
+        p_sys->p_info->sequence->picture_height;
     p_dec->fmt_out.video.i_aspect = p_sys->i_aspect;
+
+    if( p_sys->p_info->sequence->frame_period > 0 )
+    {
+        p_dec->fmt_out.video.i_frame_rate =
+            (uint32_t)( (uint64_t)1001000000 * 27 /
+                        p_sys->p_info->sequence->frame_period );
+        p_dec->fmt_out.video.i_frame_rate_base = 1001;
+    }
 
     p_dec->fmt_out.i_codec =
         ( p_sys->p_info->sequence->chroma_height <
