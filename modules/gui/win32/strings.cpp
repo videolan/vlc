@@ -19,10 +19,10 @@
 
   Caption = _( "Open Disc" );
     Caption = _( "Device &name:" );
+    Caption = _( "&Menus" );
     Caption = _( "Starting position" );
       Caption = _( "&Title:" );
       Caption = _( "&Chapter:" );
-      Caption = _( "&Menus" );
     Caption = _( "Disc type" );
     Caption = _( "OK" );
     Caption = _( "Cancel" );
@@ -80,7 +80,8 @@
       Caption = _( "Audio settings" );
         Caption = _( "Device" );
         Caption = _( "Channels" );
-      Caption = _( "Screen" );
+      Caption = _( "Video settings" );
+        Caption = _( "Screen" );
       Caption = _( "Navigation" );
       Caption = _( "Program" );
       Caption = _( "Language" );
@@ -143,6 +144,8 @@
       Hint = _( "Decrease the volume" );
       Caption = _( "&Mute" );
       Hint = _( "Toggle mute" );
+      Caption = _( "Always on top..." );
+      Hint = _( "Set the window on top" );
 
 /*
  * from modules/gui/win32/messages.dfm:
@@ -168,15 +171,17 @@
       Caption = _( "Channel server" );
       Caption = _( "HTTP/FTP/MMS" );
       Text = _( "vlcs" );
+    Caption = _( "OK" );
+    Caption = _( "Cancel" );
 
 /*
  * from modules/gui/win32/playlist.dfm:
  */
 
   Caption = _( "Playlist" );
-    Caption = _( "OK" );
         Caption = _( "Filename" );
         Caption = _( "Duration" );
+    Caption = _( "OK" );
       Caption = _( "&Add" );
         Caption = _( "&File..." );
         Caption = _( "&Disc..." );
@@ -226,6 +231,8 @@
       Text = _( "239.239.0.1" );
         Caption = _( "PS" );
         Caption = _( "TS" );
+    Caption = _( "OK" );
+    Caption = _( "Cancel" );
 
 /*
  * from modules/gui/win32/subtitles.dfm:
@@ -240,3 +247,5 @@
       Hint = _( "Set the number of Frames Per Second" );
       Text = _( "0.0" );
       Caption = _( "Browse..." );
+    Caption = _( "OK" );
+    Caption = _( "Cancel" );

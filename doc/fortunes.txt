@@ -429,3 +429,10 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan, du code de pro
 %
+<Dnumgis> someone is not releasing a p_vout object corectly
+<tooney> it's not me
+<tooney> i was not there this afternoon
+* Meuuh looks in his pockets
+
+  -- #videolan
+%

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.37 2003/01/22 22:19:29 sigmunau Exp $
+ * $Id: libvlc.h,v 1.38 2003/01/28 02:03:33 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,7 +43,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define EXTRAINTF_TEXT N_("extra interface modules")
 #define EXTRAINTF_LONGTEXT N_( \
     "This option allows you to select additional interfaces used by vlc. " \
-    "These will be launch in the background in addition to the default " \
+    "They will be launched in the background in addition to the default " \
     "interface. Use a comma separated list of interface modules.")
 
 #define VERBOSE_TEXT N_("verbosity (0,1,2)")

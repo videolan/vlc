@@ -2,7 +2,7 @@
  * error.h: error handling routine
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: error.h,v 1.1 2002/10/14 16:35:16 sam Exp $
+ * $Id: error.h,v 1.2 2003/01/28 02:03:32 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
