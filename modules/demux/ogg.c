@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.29 2003/07/09 22:10:13 gbazin Exp $
+ * $Id: ogg.c,v 1.30 2003/08/09 19:49:13 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -421,7 +421,8 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     p_data->p_payload_end = p_data->p_payload_start + p_oggpacket->bytes;
 
     /* Convert the pcr into a pts */
-    if( p_stream->i_cat != SPU_ES )
+    if( p_stream->i_fourcc == VLC_FOURCC( 'v','o','r','b' ) ||
+        p_stream->i_fourcc == VLC_FOURCC( 't','h','e','o' ) )
     {
         p_pes->i_pts = ( p_stream->i_pcr < 0 ) ? 0 :
             input_ClockGetTS( p_input, p_input->stream.p_selected_program,

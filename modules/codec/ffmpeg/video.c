@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.37 2003/08/08 17:08:32 gbazin Exp $
+ * $Id: video.c,v 1.38 2003/08/09 19:49:13 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -585,8 +585,12 @@ usenextdata:
         p_pic = (picture_t *)p_vdec->p_ff_pic->opaque;
     }
 
-    /* Set the PTS */
-    if( p_vdec->p_ff_pic->pts )
+    /* Set the PTS
+     * There is an ugly hack here because some demuxers pass us a dts instead
+     * of a pts so this screw up things for streams with B frames. */
+    if( p_vdec->p_ff_pic->pts &&
+        ( !p_vdec->p_context->has_b_frames ||
+          p_vdec->p_ff_pic->pict_type == FF_B_TYPE ) )
     {
         p_vdec->pts = p_vdec->p_ff_pic->pts;
     }
