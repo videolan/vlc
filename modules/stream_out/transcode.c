@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.46 2003/10/27 19:48:16 gbazin Exp $
+ * $Id: transcode.c,v 1.47 2003/10/27 20:53:10 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -672,7 +672,8 @@ static int transcode_audio_ffmpeg_new( sout_stream_t *p_stream,
     if( !id->p_encoder->p_module )
     {
         vlc_object_destroy( id->p_encoder );
-        id->p_encoder = NULL;
+        msg_Err( p_stream, "cannot open encoder" );
+        return VLC_EGENERIC;
     }
 
     id->b_enc_inited = VLC_FALSE;
