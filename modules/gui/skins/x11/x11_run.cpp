@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.9 2003/05/26 02:09:27 gbazin Exp $
+ * $Id: x11_run.cpp,v 1.10 2003/05/28 23:56:51 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -161,7 +161,6 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
     
     // Create event to dispatch in windows
     // Skin event
-
     if( event->type == ClientMessage )
     {
         msg = ( (XClientMessageEvent *)event )->data.l[0];
@@ -211,14 +210,6 @@ void ProcessEvent( intf_thread_t *p_intf, VlcProc *proc, XEvent *event )
             wxExit();
 #endif
             return;      // Exit VLC !
-        }
-    }
-    else if( wnd == NULL )
-    {
-        for( win = p_intf->p_sys->p_theme->WindowList.begin();
-             win != p_intf->p_sys->p_theme->WindowList.end(); win++ )
-        {
-            (*win)->ProcessEvent( evt );
         }
     }
     else

@@ -2,7 +2,7 @@
  * x11_api.cpp: Various x11-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_api.cpp,v 1.2 2003/05/19 21:39:34 asmax Exp $
+ * $Id: x11_api.cpp,v 1.3 2003/05/28 23:56:51 asmax Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -30,6 +30,7 @@
 //--- SKIN ------------------------------------------------------------------
 #include <vlc/intf.h>
 #include "../src/skin_common.h"
+#include "../src/theme.h"
 #include "../src/window.h"
 #include "../os_window.h"
 #include "../os_api.h"
@@ -54,20 +55,32 @@ void OSAPI_PostMessage( SkinWindow *win, unsigned int message, unsigned int para
                         long param2 )
 {
     XEvent event;
-    
+
     event.type = ClientMessage;
     event.xclient.display = g_pIntf->p_sys->display;
-    if( win == NULL )
-        event.xclient.window = NULL;
-    else
-        event.xclient.window = (( X11Window *)win)->GetHandle();
     event.xclient.send_event = 0;
     event.xclient.message_type = NULL;
     event.xclient.format = 32;
     event.xclient.data.l[0] = message;
     event.xclient.data.l[1] = param1;
     event.xclient.data.l[2] = param2;
-    XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, &event );
+    
+    if( win == NULL )
+    {
+        // broadcast message
+        list<SkinWindow *>::const_iterator w;
+        for( w = g_pIntf->p_sys->p_theme->WindowList.begin();
+             w != g_pIntf->p_sys->p_theme->WindowList.end(); w++ )
+        {
+            event.xclient.window = (( X11Window *)*w)->GetHandle();
+            XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, &event );
+        }
+    }
+    else
+    {
+        event.xclient.window = (( X11Window *)win)->GetHandle();
+        XSendEvent( g_pIntf->p_sys->display, event.xclient.window, False, 0, &event );
+    }
 }
 //---------------------------------------------------------------------------
 
