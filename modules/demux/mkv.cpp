@@ -44,6 +44,7 @@
 #include <typeinfo>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
@@ -333,6 +334,15 @@ public:
     int                         i_current_sub_chapter;
     int                         i_seekpoint_num;
     int64_t                     i_uid;
+	
+	bool operator<( const chapter_item_t & item ) const
+	{
+		return ( i_user_start_time < item.i_user_start_time || (i_user_start_time == item.i_user_start_time && i_user_end_time < item.i_user_end_time) );
+	}
+
+protected:
+	bool Enter();
+	bool Leave();
 };
 
 class chapter_edition_t 
@@ -345,6 +355,7 @@ public:
 	
 	void RefreshChapters();
 	double Duration() const;
+	const chapter_item_t * FindTimecode();
     
     std::vector<chapter_item_t> chapters;
     int64_t                     i_uid;
@@ -381,6 +392,7 @@ public:
         ,meta(NULL)
         ,title(NULL)
         ,i_current_edition(0)
+	    ,psz_current_chapter(NULL)
     {}
 
     vlc_stream_io_callback  *in;
@@ -431,6 +443,7 @@ public:
     
     std::vector<chapter_edition_t> editions;
     int                            i_current_edition;
+	chapter_item_t                 *psz_current_chapter;
 };
 
 #define MKVD_TIMECODESCALE 1000000
@@ -1167,6 +1180,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_TITLE:
+			/* TODO handle editions as titles & DVD titles as well */
             if( p_sys->title && p_sys->title->i_seekpoint > 0 )
             {
                 return VLC_SUCCESS;
@@ -1477,11 +1491,11 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
     {
         if (p_sys->f_duration >= 0)
         {
-            i_date = f_percent * p_sys->f_duration * 1000;
+            i_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
         }
         else
         {
-            int64_t i_pos = f_percent * stream_Size( p_demux->s );
+            int64_t i_pos = int64_t( f_percent * stream_Size( p_demux->s ) );
 
             msg_Dbg( p_demux, "inacurate way of seeking" );
             for( i_index = 0; i_index < p_sys->i_index; i_index++ )
@@ -1614,7 +1628,6 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
 static int Demux( demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    mtime_t        i_start_pts;
     int            i_block_count = 0;
 
     KaxBlock *block;
@@ -1622,15 +1635,13 @@ static int Demux( demux_t *p_demux)
     int64_t i_block_ref1;
     int64_t i_block_ref2;
 
-    i_start_pts = -1;
-
     for( ;; )
     {
-        if ( p_sys->editions[p_sys->i_current_edition].b_ordered )
+        if ( p_sys->editions.size() && p_sys->editions[p_sys->i_current_edition].b_ordered )
         {
-            /* 1st, we need to know in which chapter we are */
+            /* TODO 1st, we need to know in which chapter we are */
             
-            /* check if we need to silently seek to a new location in the stream */
+            /* check if we need to silently seek to a new location in the stream (switch to another chapter) */
             /* count the last duration time found for each track in a table (-1 not found, -2 silent) */
             /* only seek after each duration >= end timecode of the current chapter */
         }
@@ -1656,7 +1667,8 @@ static int Demux( demux_t *p_demux)
         delete block;
         i_block_count++;
 
-        if( p_sys->i_pts > i_start_pts + (mtime_t)100000 || i_block_count > 5 )
+		// TODO optimize when there is need to leave or when seeking has been called
+        if( i_block_count > 5 )
         {
             return 1;
         }
@@ -3062,6 +3074,7 @@ int64_t chapter_item_t::RefreshChapters( bool b_ordered, int64_t i_prev_user_tim
 	}
 	else
 	{
+		std::sort( sub_chapters.begin(), sub_chapters.end() );
 		i_user_start_time = i_start_time;
 		i_user_end_time = i_end_time;
 	}
