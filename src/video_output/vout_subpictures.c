@@ -37,7 +37,6 @@
 #include "video_output.h"
 #include "vlc_spu.h"
 #include "vlc_filter.h"
-#include "osd.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -488,7 +487,7 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
         i_scale_width = i_scale_width_orig;
         i_scale_height = i_scale_height_orig;
 
-        if( p_subpic->i_original_picture_width ||
+        if( p_subpic->i_original_picture_width &&
             p_subpic->i_original_picture_height )
         {
             i_scale_width = i_scale_width * p_fmt->i_width /
@@ -569,42 +568,6 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 }
             }
 
-            if( p_subpic->i_flags & OSD_ALIGN_BOTTOM )
-            {
-                i_y_offset = p_fmt->i_height - p_region->fmt.i_height -
-                    p_subpic->i_y;
-            }
-            else if ( !(p_subpic->i_flags & OSD_ALIGN_TOP) )
-            {
-                i_y_offset = p_fmt->i_height / 2 - p_region->fmt.i_height / 2;
-            }
-
-            if( p_subpic->i_flags & OSD_ALIGN_RIGHT )
-            {
-                i_x_offset = p_fmt->i_width - p_region->fmt.i_width -
-                    p_subpic->i_x;
-            }
-            else if ( !(p_subpic->i_flags & OSD_ALIGN_LEFT) )
-            {
-                i_x_offset = p_fmt->i_width / 2 - p_region->fmt.i_width / 2;
-            }
-
-            if( p_subpic->b_absolute )
-            {
-                i_x_offset = p_region->i_x + p_subpic->i_x;
-                i_y_offset = p_region->i_y + p_subpic->i_y;
-
-                if( p_spu->i_margin >= 0 )
-                {
-                    if( p_subpic->i_height + (unsigned int)p_spu->i_margin <=
-                        p_fmt->i_height )
-                    {
-                        i_y_offset = p_fmt->i_height -
-                            p_spu->i_margin - p_subpic->i_height;
-                    }
-                }
-            }
-
             /* Force palette if requested */
             if( p_spu->b_force_alpha && VLC_FOURCC('Y','U','V','P') ==
                 p_region->fmt.i_chroma )
@@ -656,6 +619,8 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_spu->p_scale->fmt_out.video.i_visible_height =
                     p_region->fmt.i_visible_height * i_scale_height / 1000;
                 p_region->p_cache->fmt = p_spu->p_scale->fmt_out.video;
+                p_region->p_cache->i_x = p_region->i_x * i_scale_width / 1000;
+                p_region->p_cache->i_y = p_region->i_y * i_scale_height / 1000;
 
                 p_pic = p_spu->p_scale->pf_video_filter(
                                  p_spu->p_scale, &p_region->p_cache->picture );
@@ -673,10 +638,42 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
                 p_region = p_region->p_cache;
             }
 
+            if( p_subpic->i_flags & SUBPICTURE_ALIGN_BOTTOM )
+            {
+                i_y_offset = p_fmt->i_height - p_region->fmt.i_height -
+                    p_subpic->i_y;
+            }
+            else if ( !(p_subpic->i_flags & SUBPICTURE_ALIGN_TOP) )
+            {
+                i_y_offset = p_fmt->i_height / 2 - p_region->fmt.i_height / 2;
+            }
+
+            if( p_subpic->i_flags & SUBPICTURE_ALIGN_RIGHT )
+            {
+                i_x_offset = p_fmt->i_width - p_region->fmt.i_width -
+                    p_subpic->i_x;
+            }
+            else if ( !(p_subpic->i_flags & SUBPICTURE_ALIGN_LEFT) )
+            {
+                i_x_offset = p_fmt->i_width / 2 - p_region->fmt.i_width / 2;
+            }
+
             if( p_subpic->b_absolute )
             {
-                i_x_offset = i_x_offset * i_scale_width / 1000;
-                i_y_offset = i_y_offset * i_scale_height / 1000;
+                i_x_offset = p_region->i_x +
+                    p_subpic->i_x * i_scale_width / 1000;
+                i_y_offset = p_region->i_y +
+                    p_subpic->i_y * i_scale_height / 1000;
+
+                if( p_spu->i_margin >= 0 )
+                {
+                    if( p_subpic->i_height + (unsigned int)p_spu->i_margin <=
+                        p_fmt->i_height )
+                    {
+                        i_y_offset = p_fmt->i_height -
+                            p_spu->i_margin - p_subpic->i_height;
+                    }
+                }
             }
 
             p_spu->p_blend->fmt_in.video = p_region->fmt;
