@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.14 2003/01/16 14:08:39 massiot Exp $
+ * $Id: intf.c,v 1.15 2003/01/21 10:29:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -416,6 +416,7 @@ int aout_Restart( aout_instance_t * p_aout )
         aout_input_t * p_input = p_aout->pp_inputs[i];
 
         b_error |= aout_InputNew( p_aout, p_input );
+        p_input->b_changed = 1;
         vlc_mutex_unlock( &p_input->lock );
     }
 
