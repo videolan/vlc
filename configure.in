@@ -56,7 +56,7 @@ AC_CHECK_FUNC(inet_aton,,[
 ])
 AC_CHECK_FUNCS(vasprintf)
 AC_CHECK_FUNCS(swab)
-AC_CHECK_FUNCS(memalign)
+AC_CHECK_FUNCS([memalign valloc])
 
 AC_CHECK_FUNCS(sigrelse)
 

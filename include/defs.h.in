@@ -58,6 +58,9 @@
 /* Define if you have the usleep function.  */
 #undef HAVE_USLEEP
 
+/* Define if you have the valloc function.  */
+#undef HAVE_VALLOC
+
 /* Define if you have the vasprintf function.  */
 #undef HAVE_VASPRINTF
 

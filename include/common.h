@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.40 2001/09/25 11:46:13 massiot Exp $
+ * $Id: common.h,v 1.41 2001/09/28 09:57:08 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -204,8 +204,13 @@ struct pgrm_descriptor_s;
     /* Some systems have memalign() but no declaration for it */
     void * memalign( size_t align, size_t size );
 #else
-    /* Assume malloc alignment is sufficient */
-#   define memalign(align,size) malloc(size)
+#   ifdef HAVE_VALLOC
+        /* That's like using a hammer to kill a fly, but eh... */
+#       define memalign(align,size) valloc(size)
+#   else
+        /* Assume malloc alignment is sufficient */
+#       define memalign(align,size) malloc(size)
+#   endif
 #endif
 
 /* win32, cl and icl support */
