@@ -4,6 +4,10 @@
 
 HEAD
 
+  * Misc XVideo fixes (aspect ratio, mouse pointer, blue areas).
+  * AC3 decoder enhancements.
+  * Fixed an alignment issue in the bitstream callback.
+  * Got rid of asprintf.
   * XVideo fullscreen mode by David Kennedy <dkennedy@tinytoad.com>.
   * X11 fullscreen mode by David Kennedy <dkennedy@tinytoad.com>.
   * Fixed build process when no plugins or no builtins were chosen.

@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.9 2001/04/06 09:15:47 sam Exp $
+ * $Id: input_clock.c,v 1.10 2001/04/26 03:55:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -177,25 +177,45 @@ void input_ClockManageRef( input_thread_t * p_input,
 
             /* Now take into account interface changes. */
             vlc_mutex_lock( &p_input->stream.stream_lock );
+
+            if( p_input->stream.i_new_status == PAUSE_S )
+            {
+                int i_old_status;
+                vlc_mutex_lock( &p_input->stream.control.control_lock );
+                i_old_status = p_input->stream.control.i_status;
+
+                p_input->stream.control.i_status = PAUSE_S;
+                vlc_cond_wait( &p_input->stream.stream_wait,
+                               &p_input->stream.stream_lock );
+                ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
+
+                if( p_input->stream.i_new_status == PAUSE_S )
+                { 
+                    /* PAUSE_S undoes the pause state: Return to old state. */
+                    p_input->stream.control.i_status = i_old_status;
+                    p_input->stream.i_new_status = UNDEF_S;
+                    p_input->stream.i_new_rate = UNDEF_S;
+                }
+
+                /*  We handle i_new_status != PAUSE_S below... */
+                vlc_mutex_unlock( &p_input->stream.control.control_lock );
+            }
+
             if( p_input->stream.i_new_status != UNDEF_S )
             {
-                if( p_input->stream.i_new_status == PAUSE_S )
-                {
-                    vlc_cond_wait( &p_input->stream.stream_wait,
-                                   &p_input->stream.stream_lock );
-                    ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
-                }
-                else
-                {
-                    ClockNewRef( p_input, p_pgrm, i_clock,
-                               ClockToSysdate( p_input, p_pgrm, i_clock ) );
-                }
-
                 vlc_mutex_lock( &p_input->stream.control.control_lock );
+
                 p_input->stream.control.i_status = p_input->stream.i_new_status;
 
-                if( p_input->stream.control.i_status != PLAYING_S
-                     && p_input->stream.control.i_status != PAUSE_S )
+                ClockNewRef( p_input, p_pgrm, i_clock,
+                           ClockToSysdate( p_input, p_pgrm, i_clock ) );
+
+                if( p_input->stream.control.i_status == PLAYING_S )
+                {
+                    p_input->stream.control.i_rate = DEFAULT_RATE;
+                    p_input->stream.control.b_mute = 0;
+                }
+                else
                 {
                     p_input->stream.control.i_rate = p_input->stream.i_new_rate;
                     p_input->stream.control.b_mute = 1;
@@ -204,16 +224,13 @@ void input_ClockManageRef( input_thread_t * p_input,
                      * discontinuities. */
                     input_EscapeAudioDiscontinuity( p_input, p_pgrm );
                 }
-                else
-                {
-                    p_input->stream.control.i_rate = DEFAULT_RATE;
-                    p_input->stream.control.b_mute = 0;
-                }
-                vlc_mutex_unlock( &p_input->stream.control.control_lock );
 
                 p_input->stream.i_new_status = UNDEF_S;
                 p_input->stream.i_new_rate = UNDEF_S;
+
+                vlc_mutex_unlock( &p_input->stream.control.control_lock );
             }
+
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
         else
