@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.4 2003/01/15 23:55:22 massiot Exp $
+ * $Id: mpeg_audio.c,v 1.5 2003/01/16 14:08:39 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -115,6 +115,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     unsigned int i_layer = 0;
     byte_t p_sync[MAD_BUFFER_GUARD];
     mtime_t pts;
+    int i_free_frame_size = 0;
 
     /* Allocate the memory needed to store the thread's structure */
     p_dec = malloc( sizeof(dec_thread_t) );
@@ -149,9 +150,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     /* Decoder thread's main loop */
     while ( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
     {
-        int i_bit_rate;
+        int i_current_frame_size;
         unsigned int i_rate, i_original_channels, i_frame_size, i_frame_length;
-        unsigned int i_new_layer, i_current_frame_size;
+        unsigned int i_new_layer, i_bit_rate;
         uint32_t i_header;
         aout_buffer_t * p_buffer;
         int i;
@@ -194,6 +195,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                     }
                     if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
                         break;
+                    NextPTS( &p_dec->bit_stream, &pts, NULL );
                     GetChunk( &p_dec->bit_stream,p_sync, MAD_BUFFER_GUARD );
                 }
             }
@@ -215,8 +217,10 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                                          &i_original_channels, &i_rate,
                                          &i_bit_rate, &i_frame_length,
                                          &i_frame_size, &i_new_layer );
-
         if ( !i_current_frame_size )
+            i_current_frame_size = i_free_frame_size;
+
+        if ( i_current_frame_size == -1 )
         {
             msg_Warn( p_dec->p_fifo, "syncinfo failed" );
             /* This is probably an emulated startcode, drop the first byte
@@ -225,7 +229,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             p_sync[MAD_BUFFER_GUARD - 1] = GetBits( &p_dec->bit_stream, 8 );
             continue;
         }
-        if ( i_current_frame_size > i_frame_size )
+        if ( (unsigned int)i_current_frame_size > i_frame_size )
         {
             msg_Warn( p_dec->p_fifo, "frame too big %d > %d",
                       i_current_frame_size, i_frame_size );
@@ -284,9 +288,10 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             byte_t p_junk[MAX_FRAME_SIZE];
 
             /* We've just started the stream, wait for the first PTS. */
-            GetChunk( &p_dec->bit_stream, p_junk, i_current_frame_size );
-            memcpy( p_sync, &p_junk[i_current_frame_size - MAD_BUFFER_GUARD],
-                    MAD_BUFFER_GUARD );
+            GetChunk( &p_dec->bit_stream, p_junk, i_current_frame_size
+                        - MAD_BUFFER_GUARD );
+            NextPTS( &p_dec->bit_stream, &pts, NULL );
+            GetChunk( &p_dec->bit_stream, p_sync, MAD_BUFFER_GUARD );
             continue;
         }
 
@@ -303,8 +308,64 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
         /* Get the whole frame. */
         memcpy( p_buffer->p_buffer, p_sync, MAD_BUFFER_GUARD );
-        GetChunk( &p_dec->bit_stream, p_buffer->p_buffer + MAD_BUFFER_GUARD,
-                  i_current_frame_size - MAD_BUFFER_GUARD );
+        if ( i_current_frame_size )
+        {
+            GetChunk( &p_dec->bit_stream, p_buffer->p_buffer + MAD_BUFFER_GUARD,
+                      i_current_frame_size - MAD_BUFFER_GUARD );
+        }
+        else
+        {
+            /* Free bit-rate stream. Peek at next frame header. */
+            i = MAD_BUFFER_GUARD;
+            for ( ; ; )
+            {
+                int i_next_real_frame_size;
+                unsigned int i_next_channels, i_next_rate, i_next_bit_rate;
+                unsigned int i_next_frame_length, i_next_frame_size;
+                unsigned int i_next_layer;
+                while ( ShowBits( &p_dec->bit_stream, 11 ) != 0x07ff &&
+                        (!p_dec->p_fifo->b_die) &&
+                        (!p_dec->p_fifo->b_error) &&
+                        i < (int)i_frame_size + MAD_BUFFER_GUARD )
+                {
+                    ((uint8_t *)p_buffer->p_buffer)[i++] =
+                                GetBits( &p_dec->bit_stream, 8 );
+                }
+                if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error
+                      || i == (int)i_frame_size + MAD_BUFFER_GUARD )
+                    break;
+                i_header = ShowBits( &p_dec->bit_stream, 8 );
+                i_next_real_frame_size = SyncInfo( i_header,
+                                         &i_next_channels, &i_next_rate,
+                                         &i_next_bit_rate, &i_next_frame_length,
+                                         &i_next_frame_size, &i_next_layer );
+                if ( i_next_real_frame_size != 0 ||
+                     i_next_channels != i_original_channels ||
+                     i_next_rate != i_rate ||
+                     i_next_bit_rate != i_bit_rate ||
+                     i_next_frame_length != i_frame_length ||
+                     i_next_frame_size != i_frame_size ||
+                     i_next_layer != i_new_layer )
+                {
+                    /* This is an emulated start code, try again. */
+                    continue;
+                }
+                i_free_frame_size = i;
+                break;
+            }
+            if ( p_dec->p_fifo->b_die || p_dec->p_fifo->b_error )
+                break;
+            if ( i == (int)i_frame_size + MAD_BUFFER_GUARD )
+            {
+                /* Couldn't find the next start-code. This is sooo
+                 * embarassing. */
+                aout_DecDeleteBuffer( p_dec->p_aout, p_dec->p_aout_input,
+                                      p_buffer );
+                NextPTS( &p_dec->bit_stream, &pts, NULL );
+                GetChunk( &p_dec->bit_stream, p_sync, MAD_BUFFER_GUARD );
+                continue;
+            }
+        }
         if( p_dec->p_fifo->b_die )
         {
             aout_DecDeleteBuffer( p_dec->p_aout, p_dec->p_aout_input,
@@ -465,10 +526,13 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
             break;
 
         default:
-            i_current_frame_size = *pi_frame_size = 0;
-            *pi_frame_length = 0;
         }
+    }
+    else
+    {
+        return -1;
     }
     
     return i_current_frame_size;
 }
+

@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.13 2003/01/16 13:22:30 hartman Exp $
+ * $Id: intf.c,v 1.14 2003/01/16 14:08:39 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -92,7 +92,6 @@ int aout_VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 
     if ( p_aout->mixer.b_error )
     {
-        int i;
         /* The output module is destroyed. */
         vlc_mutex_unlock( &p_aout->mixer_lock );
         config_PutInt( p_aout, "volume", i_volume );
