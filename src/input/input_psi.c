@@ -310,7 +310,7 @@ static void DecodePgrmAssocSection(u8* p_pas, input_thread_t *p_input )
         if( p_descr->i_PAT_version== PSI_UNINITIALISED )
             intf_DbgMsg("Building Program Association table\n");
         else
-            intf_ErrMsg( "Stream Id has suddently changed ! Rebuilding PAT\n" );
+            intf_ErrMsg( "Stream Id has suddenly changed ! Rebuilding PAT\n" );
 
         /* Whatever it is, ask the PSI decoder to rebuild the table */
         b_is_invalid = 1;

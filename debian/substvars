@@ -1,1 +1,1 @@
-shlibs:Depends=gdk-imlib1 (>= 1.9.8-3), libart2 (>= 1.0.56-1), libaudiofile0, libc6 (>= 2.1.2), libdb2 (>= 1:2.4.14-7), libesd0 (>= 0.2.16) | libesd-alsa0 (>= 0.2.16), libglib1.2 (>= 1.2.0), libgnome32 (>= 1.0.56-1), libgnomesupport0 (>= 1.0.56-1), libgnomeui32 (>= 1.0.56-1), libgtk1.2 (>= 1.2.7-1), libz1, xlib6g (>= 3.3.6)
+shlibs:Depends=libc6 (>= 2.1.2), xlib6g (>= 3.3.6)

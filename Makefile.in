@@ -9,74 +9,23 @@
 # Configuration
 ################################################################################
 
-# Audio output settings
-AOUT += dsp
-#AOUT += esd
-# Not yet supported
-#AOUT += alsa
-# Fallback method that should always work
-AOUT += dummy
-
-# Video output settings
-VOUT += x11
-#VOUT += fb
-#VOUT += ggi
-#VOUT += glide
-#VOUT += gnome
-# Not yet supported
-#VOUT += mga
-#VOUT += beos
-#VOUT += dga
-# Fallback method that should always work
-VOUT += dummy
-
-# Interface settings
-INTF += x11
-#INTF += fb
-#INTF += ggi
-#INTF += glide
-#INTF += gnome
-# Not yet supported
-#INTF += mga
-#INTF += beos
-#INTF += dga
-# Fallback method that should always work
-INTF += dummy
-
-# Target architecture
-ARCH=X86
-#ARCH=PPC
-#ARCH=SPARC
-
-# Target operating system
-SYS=LINUX
-#SYS=GNU
-#SYS=BSD
-#SYS=BEOS
-
-# For x86 architecture, choose MMX support
-ARCH += MMX
-# For x86 architecture, optimize for Pentium Pro
-# (choose NO if you get `Invalid instruction' errors)
-ARCH += PPRO
-
-# Decoder choice - ?? old decoder will be removed soon
-#DECODER=old
-DECODER=new
-
 # Debugging mode on or off (set to 1 to activate)
 DEBUG=0
 
-#----------------- do not change anything below this line ----------------------
-
-prefix=@prefix@
+SYS=@SYS@
+ARCH=@ARCH@
+AOUT=@AOUT@
+VOUT=@VOUT@
+INTF=@VOUT@
+SNAPSHOTDIR=vlc-@VLC_VERSION@
 INSTALL=@INSTALL@
+prefix=@prefix@
+
+#----------------- do not change anything below this line ----------------------
 
 ################################################################################
 # Configuration pre-processing
 ################################################################################
-
-SNAPSHOTDIR=vlc-@VLC_VERSION@
 
 # PROGRAM_OPTIONS is an identification string of the compilation options
 PROGRAM_OPTIONS = $(SYS) $(ARCH)
@@ -92,9 +41,8 @@ PROGRAM_BUILD = `date` $(USER)
 #PROGRAM_BUILD = `date` $(USER)@`hostname`
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
-# including ARCH_xx and SYS_xx. It will be passed to C compiler.
-DEFINE += -DARCH_$(shell echo $(ARCH) | cut -f1 -d' ')
-DEFINE += -DSYS_$(SYS)
+# including SYS_xx. It will be passed to C compiler.
+DEFINE += -DSYS_`echo $(SYS) | sed 's/-.*//' | tr a-z A-Z`
 DEFINE += -DPLUGIN_PATH="\"$(prefix)/lib/videolan/vlc\""
 DEFINE += -DDATA_PATH="\"$(prefix)/share/videolan/vlc\""
 #DEFINE += -DPROGRAM_OPTIONS="\"$(shell echo $(PROGRAM_OPTIONS) | tr 'A-Z' 'a-z')\""
@@ -117,20 +65,20 @@ INCLUDE += -Iinclude -I/usr/local/include -I/usr/X11R6/include
 # Libraries
 #
 
-ifeq ($(SYS),GNU)
+ifeq ($(SYS),gnu)
 LIB += -lthreads -ldl
 endif
 
-ifeq ($(SYS),BSD)
+ifneq (,$(findstring bsd,$(SYS)))
 LIB += -pthread -lgnugetopt
 LIB += -L/usr/local/lib
 endif
 
-ifeq ($(SYS),LINUX)
+ifneq (,$(findstring linux,$(SYS)))
 LIB += -lpthread -ldl
 endif
 
-ifeq ($(SYS),BEOS)
+ifeq ($(SYS),beos)
 LIB += -lbe -lroot -lgame
 else
 LIB += -lm
@@ -153,28 +101,28 @@ CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
 CCFLAGS += -fomit-frame-pointer
 
 # Optimizations for x86 familiy
-ifneq (,$(findstring X86,$(ARCH)))
+ifneq (,$(findstring 86,$(ARCH)))
 CCFLAGS += -malign-double
 #CCFLAGS += -march=pentium
 # Eventual Pentium Pro optimizations
-ifneq (,$(findstring PPRO,$(ARCH)))
+ifneq (,$(findstring pentiumpro,$(ARCH)))
 ifneq ($(SYS), BSD)
 CCFLAGS += -march=pentiumpro
 endif
 endif
 # Eventual MMX optimizations for x86
-ifneq (,$(findstring MMX,$(ARCH)))
+ifneq (,$(findstring mmx,$(ARCH)))
 CFLAGS += -DHAVE_MMX
 endif
 endif
 
 # Optimizations for PowerPC
-ifneq (,$(findstring PPC,$(ARCH)))
+ifneq (,$(findstring ppc,$(ARCH)))
 CCFLAGS += -mcpu=604e -mmultiple -mhard-float -mstring
 endif
 
 # Optimizations for Sparc
-ifneq (,$(findstring SPARC,$(ARCH)))
+ifneq (,$(findstring sparc,$(ARCH)))
 CCFLAGS += -mhard-float
 endif
 
@@ -253,20 +201,6 @@ spu_decoder_obj =		spu_decoder/spu_decoder.o
 #??generic_decoder_obj =		generic_decoder/generic_decoder.o
 # remeber to add it to OBJ 
 
-ifeq ($(DECODER),old)
-CFLAGS += -DOLD_DECODER
-video_decoder_obj =		video_decoder_ref/video_decoder.o \
-						video_decoder_ref/display.o \
-						video_decoder_ref/getblk.o \
-						video_decoder_ref/gethdr.o \
-						video_decoder_ref/getpic.o \
-						video_decoder_ref/getvlc.o \
-						video_decoder_ref/idct.o \
-						video_decoder_ref/motion.o \
-						video_decoder_ref/mpeg2dec.o \
-						video_decoder_ref/recon.o \
-						video_decoder_ref/spatscal.o
-else
 video_parser_obj = 		video_parser/video_parser.o \
 						video_parser/vpar_headers.o \
 						video_parser/vpar_blocks.o \
@@ -277,7 +211,6 @@ video_decoder_obj =		video_decoder/video_decoder.o \
 						video_decoder/vdec_motion.o \
 						video_decoder/vdec_motion_inner.o \
 			                        video_decoder/vdec_idct.o
-endif
 
 misc_obj =			misc/mtime.o \
 						misc/rsc_files.o \
@@ -300,22 +233,17 @@ C_OBJ = $(interface_obj) \
 		$(vlan_obj) \
 		$(misc_obj)
 
-ifeq ($(SYS), BEOS)
+ifeq ($(SYS),beos)
 CPP_OBJ =			misc/beos_specific.o
 endif
 
 #
 # Assembler Objects
 # 
-ifneq (,$(findstring X86,$(ARCH)))
-ifneq (,$(findstring MMX,$(ARCH)))
-ifeq ($(DECODER),new)
+ifneq (,$(findstring 86,$(ARCH)))
+ifneq (,$(findstring mmx,$(ARCH)))
 ASM_OBJ = 			video_decoder/vdec_idctmmx.o \
 						video_output/video_yuv_mmx.o
-else
-ASM_OBJ = 			video_decoder_ref/vdec_idctmmx.o \
-						video_output/video_yuv_mmx.o
-endif
 endif
 endif
 
@@ -393,7 +321,7 @@ FORCE:
 # Real targets
 #
 vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
-ifeq ($(SYS), BEOS)
+ifeq ($(SYS),beos)
 	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) -Xlinker -soname=_APP_ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
 #	ln -s ../vlc ./plugins/_APP_
 else
@@ -429,7 +357,7 @@ $(ASM_OBJ): %.o: %.S
 # audio plugins
 plugins/aout/aout_dummy.so plugins/aout/aout_dsp.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
-ifeq ($(SYS), BEOS)
+ifeq ($(SYS),beos)
 		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
 else
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
@@ -437,7 +365,7 @@ endif
 
 plugins/aout/aout_esd.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
-ifeq ($(SYS), BSD)
+ifneq (,$(findstring bsd,$(SYS)))
 		@$(CC) $(CCFLAGS) $(CFLAGS) -lesd -shared -o $@ $<
 else
 		@$(CC) $(CCFLAGS) $(CFLAGS) -laudiofile -lesd -shared -o $@ $<
@@ -447,7 +375,7 @@ endif
 plugins/intf/intf_dummy.so plugins/vout/vout_dummy.so \
 	plugins/intf/intf_fb.so plugins/vout/vout_fb.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
-ifeq ($(SYS), BEOS)
+ifeq ($(SYS),beos)
 		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
 else
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
