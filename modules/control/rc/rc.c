@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.32 2003/05/05 22:23:34 gbazin Exp $
+ * $Id: rc.c,v 1.33 2003/05/13 12:09:29 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -242,7 +242,11 @@ static void Run( intf_thread_t *p_intf )
             {
 #ifdef WIN32
                 if( input_record.EventType != KEY_EVENT ||
-                    !input_record.Event.KeyEvent.bKeyDown )
+                    !input_record.Event.KeyEvent.bKeyDown ||
+                    input_record.Event.KeyEvent.wVirtualKeyCode == VK_SHIFT ||
+                    input_record.Event.KeyEvent.wVirtualKeyCode == VK_CONTROL||
+                    input_record.Event.KeyEvent.wVirtualKeyCode == VK_MENU ||
+                    input_record.Event.KeyEvent.wVirtualKeyCode == VK_CAPITAL )
                 {
                     /* nothing interesting */
                     continue;
