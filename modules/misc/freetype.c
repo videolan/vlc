@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.34 2003/11/19 13:25:48 hartman Exp $
+ * $Id: freetype.c,v 1.35 2003/11/22 00:41:07 titer Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -94,7 +94,7 @@ static line_desc_t *NewLine( byte_t * );
 #define FONTSIZER_TEXT N_("Font size")
 #define FONTSIZER_LONGTEXT N_("The size of the fonts used by the osd module" )
 
-static int  *pi_sizes[] = { 20, 18, 16, 12, 6 };
+static int   pi_sizes[] = { 20, 18, 16, 12, 6 };
 static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
                                    N_("Large"), N_("Larger") };
 
@@ -250,7 +250,7 @@ static int Create( vlc_object_t *p_this )
         FT_HAS_KERNING(p_vout->p_text_renderer_data->p_face);
 
     var_Get( p_vout, "freetype-fontsize", &val );
-    
+
     if( val.i_int )
     {
         i_fontsize = val.i_int;
@@ -472,7 +472,7 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
         int i_pic_width = p_pic->p[0].i_visible_pitch;
 
         p_in = p_pic->p[0].p_pixels;
-        
+
         if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
         {
             pen_y = p_pic->p[0].i_lines - p_string->i_height -
@@ -496,7 +496,7 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
         {
             pen_x = i_pic_width / 2 /2 - p_line->i_width / 2 + p_string->i_x_margin;
         }
-        
+
         for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
         {
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
@@ -543,7 +543,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
     line_desc_t *p_line;
 
     i_plane = 0;
-    
+
     for( p_line = p_subpic->p_sys->p_lines; p_line != NULL; p_line = p_line->p_next )
     {
         uint8_t *p_in;
@@ -551,7 +551,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
         int i_pic_width = p_pic->p[ i_plane ].i_visible_pitch;
 
         p_in = p_pic->p[ i_plane ].p_pixels;
-        
+
         if ( p_string->i_flags & OSD_ALIGN_BOTTOM )
         {
             pen_y = p_pic->p[ i_plane ].i_lines - p_string->i_height -
@@ -576,7 +576,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
             pen_x = i_pic_width / 2 / 4 - p_line->i_width / 2
                 + p_string->i_x_margin;
         }
-        
+
         for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
         {
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
@@ -640,7 +640,7 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     uint32_t *p_unicode_string, i_char;
     int i_string_length;
     iconv_t iconv_handle;
-    
+
     FT_BBox line;
     FT_BBox glyph_size;
     FT_Vector result;
@@ -706,7 +706,7 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     }
 #if defined(WORDS_BIGENDIAN)
     iconv_handle = iconv_open( "UCS-4BE", "UTF-8" );
-#else    
+#else
     iconv_handle = iconv_open( "UCS-4LE", "UTF-8" );
 #endif
     if( iconv_handle == (iconv_t)-1 )
@@ -732,7 +732,7 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
         *(uint32_t*)p_out_buffer = 0;
         i_string_length = ( i_out_bytes - i_out_bytes_left ) / sizeof(uint32_t);
     }
-        
+
 #if defined(HAVE_FRIBIDI)
     {
         uint32_t *p_fribidi_string;
@@ -747,7 +747,7 @@ static int AddText ( vout_thread_t *p_vout, byte_t *psz_string,
     }
 #endif
 #endif
-    
+
     /* Calculate relative glyph positions and a bounding box for the
      * entire string */
     p_line = NewLine( psz_string );
@@ -876,7 +876,7 @@ static void FreeString( subpicture_t *p_subpic )
         free( p_line->p_glyph_pos );
         free( p_line );
     }
-            
+
     free( p_string->psz_text );
     free( p_string );
 }

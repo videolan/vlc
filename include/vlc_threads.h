@@ -3,7 +3,7 @@
  * This header provides portable declarations for mutexes & conditions
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads.h,v 1.35 2003/11/07 19:30:28 massiot Exp $
+ * $Id: vlc_threads.h,v 1.36 2003/11/22 00:41:07 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -14,7 +14,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -42,6 +42,11 @@
 #elif defined( WIN32 )
 #   include <process.h>                                         /* Win32 API */
 
+#elif defined( HAVE_KERNEL_SCHEDULER_H )                             /* BeOS */
+#   include <kernel/OS.h>
+#   include <kernel/scheduler.h>
+#   include <byteorder.h>
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )  /* pthreads (like Linux & BSD) */
 #   include <pthread.h>
 #   ifdef DEBUG
@@ -53,11 +58,6 @@
 
 #elif defined( HAVE_CTHREADS_H )                                  /* GNUMach */
 #   include <cthreads.h>
-
-#elif defined( HAVE_KERNEL_SCHEDULER_H )                             /* BeOS */
-#   include <kernel/OS.h>
-#   include <kernel/scheduler.h>
-#   include <byteorder.h>
 
 #else
 #   error no threads available on your system !
@@ -75,6 +75,13 @@
 #   define VLC_THREAD_PRIORITY_AUDIO 37
 #   define VLC_THREAD_PRIORITY_VIDEO (-47)
 #   define VLC_THREAD_PRIORITY_OUTPUT 37
+
+#elif defined(SYS_BEOS)
+#   define VLC_THREAD_PRIORITY_LOW 5
+#   define VLC_THREAD_PRIORITY_INPUT 10
+#   define VLC_THREAD_PRIORITY_AUDIO 10
+#   define VLC_THREAD_PRIORITY_VIDEO 5
+#   define VLC_THREAD_PRIORITY_OUTPUT 15
 
 #elif defined(PTHREAD_COND_T_IN_PTHREAD_H)
 #   define VLC_THREAD_PRIORITY_LOW 0
@@ -96,13 +103,6 @@
         (IS_WINNT ? THREAD_PRIORITY_ABOVE_NORMAL : 0)
 #   define VLC_THREAD_PRIORITY_HIGHEST \
         (IS_WINNT ? THREAD_PRIORITY_TIME_CRITICAL : 0)
-
-#elif defined(SYS_BEOS)
-#   define VLC_THREAD_PRIORITY_LOW 5
-#   define VLC_THREAD_PRIORITY_INPUT 10
-#   define VLC_THREAD_PRIORITY_AUDIO 10
-#   define VLC_THREAD_PRIORITY_VIDEO 5
-#   define VLC_THREAD_PRIORITY_OUTPUT 15
 
 #else
 #   define VLC_THREAD_PRIORITY_LOW 0
@@ -172,6 +172,29 @@ typedef struct
     vlc_object_t * p_this;
 } vlc_cond_t;
 
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+/* This is the BeOS implementation of the vlc threads, note that the mutex is
+ * not a real mutex and the cond_var is not like a pthread cond_var but it is
+ * enough for what wee need */
+
+typedef thread_id vlc_thread_t;
+
+typedef struct
+{
+    int32_t         init;
+    sem_id          lock;
+
+    vlc_object_t * p_this;
+} vlc_mutex_t;
+
+typedef struct
+{
+    int32_t         init;
+    thread_id       thread;
+
+    vlc_object_t * p_this;
+} vlc_cond_t;
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 typedef pthread_t       vlc_thread_t;
 typedef struct
@@ -207,29 +230,6 @@ typedef struct
     struct cthread_queue queue;
     char *name;
     struct cond_imp *implications;
-
-    vlc_object_t * p_this;
-} vlc_cond_t;
-
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-/* This is the BeOS implementation of the vlc threads, note that the mutex is
- * not a real mutex and the cond_var is not like a pthread cond_var but it is
- * enough for what wee need */
-
-typedef thread_id vlc_thread_t;
-
-typedef struct
-{
-    int32_t         init;
-    sem_id          lock;
-
-    vlc_object_t * p_this;
-} vlc_mutex_t;
-
-typedef struct
-{
-    int32_t         init;
-    thread_id       thread;
 
     vlc_object_t * p_this;
 } vlc_cond_t;

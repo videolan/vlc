@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.107 2003/11/16 21:07:31 gbazin Exp $
+ * $Id: libvlc.h,v 1.108 2003/11/22 00:41:07 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -428,7 +428,7 @@ static char *ppsz_language_text[] =
 
 #define PLAYLIST_CAT_LONGTEXT N_( \
      "These options define the behaviour of the playlist. Some " \
-     "of them can be overriden in the playlist dialog box." ) 
+     "of them can be overriden in the playlist dialog box." )
 
 #define RANDOM_TEXT N_("Play files randomly forever")
 #define RANDOM_LONGTEXT N_( \
@@ -439,7 +439,7 @@ static char *ppsz_language_text[] =
 #define LOOP_LONGTEXT N_( \
     "If you want VLC to keep playing the playlist indefinitely then enable " \
     "this option.")
-    
+
 #define REPEAT_TEXT N_("Repeat the current playlistitem")
 #define REPEAT_LONGTEXT N_( \
     "When this is active VLC will keep playing the current playlistitem " \
@@ -593,7 +593,7 @@ vlc_module_begin();
     add_module( "intf", "interface", NULL, NULL, INTF_TEXT,
                 INTF_LONGTEXT, VLC_TRUE );
         change_short('I');
-    add_string( "extraintf", NULL, NULL, EXTRAINTF_TEXT, 
+    add_string( "extraintf", NULL, NULL, EXTRAINTF_TEXT,
                      EXTRAINTF_LONGTEXT, VLC_FALSE );
     add_integer( "verbose", 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT,
                  VLC_FALSE );
@@ -604,9 +604,9 @@ vlc_module_begin();
                 VLC_FALSE );
         change_string_list( ppsz_language, ppsz_language_text, 0 );
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
-    add_bool( "advanced", 0, NULL, ADVANCED_TEXT, 
+    add_bool( "advanced", 0, NULL, ADVANCED_TEXT,
                             ADVANCED_LONGTEXT, VLC_FALSE );
-    add_directory( "search-path", NULL, NULL, INTF_PATH_TEXT, 
+    add_directory( "search-path", NULL, NULL, INTF_PATH_TEXT,
                             INTF_PATH_LONGTEXT, VLC_TRUE );
     add_directory( "plugin-path", NULL, NULL,
                 PLUGIN_PATH_TEXT, PLUGIN_PATH_LONGTEXT, VLC_TRUE );
@@ -629,13 +629,13 @@ vlc_module_begin();
 #endif
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
 #if 0
-    add_bool( "headphone-opt", 0, NULL, HEADPHONE_TEXT, 
+    add_bool( "headphone-opt", 0, NULL, HEADPHONE_TEXT,
                         HEADPHONE_LONGTEXT, VLC_FALSE );
 #endif
     add_integer( "audio-desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
     add_string("audio-filter",0,NULL,AUDIO_FILTER_TEXT,
                     AUDIO_FILTER_LONGTEXT,VLC_FALSE);
-    
+
     /* Video options */
     add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , VLC_FALSE );
     add_module( "vout", "video output", NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT,
@@ -647,12 +647,12 @@ vlc_module_begin();
     add_integer( "align", -1, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );
     add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT, VLC_TRUE );
-    add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT, 
+    add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT,
                         FULLSCREEN_LONGTEXT, VLC_FALSE );
 #ifndef SYS_DARWIN
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
 #endif
-    add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT, 
+    add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT,
                         SPUMARGIN_LONGTEXT, VLC_TRUE );
     add_bool( "osd", 1, NULL, OSD_TEXT, OSD_LONGTEXT, VLC_FALSE );
     add_module( "filter", "video filter", NULL, NULL,
@@ -703,19 +703,19 @@ vlc_module_begin();
     /* Stream output options */
     add_category_hint( N_("Stream output"), SOUT_CAT_LONGTEXT , VLC_TRUE );
     add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT, VLC_TRUE );
-    add_bool( "sout-display", VLC_FALSE, NULL, SOUT_DISPLAY_TEXT, 
+    add_bool( "sout-display", VLC_FALSE, NULL, SOUT_DISPLAY_TEXT,
                                 SOUT_DISPLAY_LONGTEXT, VLC_TRUE );
-    add_bool( "sout-keep", VLC_FALSE, NULL, SOUT_KEEP_TEXT, 
+    add_bool( "sout-keep", VLC_FALSE, NULL, SOUT_KEEP_TEXT,
                                 SOUT_KEEP_LONGTEXT, VLC_TRUE );
 
-    add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT, 
+    add_bool( "sout-audio", 1, NULL, SOUT_AUDIO_TEXT,
                                 SOUT_AUDIO_LONGTEXT, VLC_TRUE );
-    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT, 
+    add_bool( "sout-video", 1, NULL, SOUT_VIDEO_TEXT,
                                 SOUT_VIDEO_LONGTEXT, VLC_TRUE );
 
     add_module( "packetizer", "packetizer", NULL, NULL,
                 PACKETIZER_TEXT, PACKETIZER_LONGTEXT, VLC_TRUE );
-    add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT, 
+    add_module( "mux", "sout mux", NULL, NULL, MUX_TEXT,
                                 MUX_LONGTEXT, VLC_TRUE );
     add_module( "access_output", "sout access", NULL, NULL,
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
@@ -749,7 +749,7 @@ vlc_module_begin();
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT, VLC_TRUE );
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT, VLC_TRUE );
 
-#if !defined(SYS_DARWIN) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
+#if !defined(SYS_DARWIN) && !defined(SYS_BEOS) && defined(PTHREAD_COND_T_IN_PTHREAD_H)
     add_bool( "rt-priority", 0, NULL, RT_PRIORITY_TEXT, RT_PRIORITY_LONGTEXT, VLC_TRUE );
 #endif
 

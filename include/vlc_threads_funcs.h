@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.15 2003/03/02 01:35:30 gbazin Exp $
+ * $Id: vlc_threads_funcs.h,v 1.16 2003/11/22 00:41:07 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -93,18 +93,6 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
     }
     i_result = 0;
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    i_result = pthread_mutex_lock( &p_mutex->mutex );
-    if ( i_result )
-    {
-        i_thread = (int)pthread_self();
-        psz_error = strerror(i_result);
-    }
-
-#elif defined( HAVE_CTHREADS_H )
-    mutex_lock( p_mutex->mutex );
-    i_result = 0;
-
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_mutex == NULL )
     {
@@ -118,6 +106,19 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
     {
         i_result = acquire_sem( p_mutex->lock );
     }
+
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    i_result = pthread_mutex_lock( &p_mutex->mutex );
+    if ( i_result )
+    {
+        i_thread = (int)pthread_self();
+        psz_error = strerror(i_result);
+    }
+
+#elif defined( HAVE_CTHREADS_H )
+    mutex_lock( p_mutex->mutex );
+    i_result = 0;
+
 #endif
 
     if( i_result )
@@ -164,18 +165,6 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
     }
     i_result = 0;
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    i_result = pthread_mutex_unlock( &p_mutex->mutex );
-    if ( i_result )
-    {
-        i_thread = (int)pthread_self();
-        psz_error = strerror(i_result);
-    }
-
-#elif defined( HAVE_CTHREADS_H )
-    mutex_unlock( p_mutex );
-    i_result = 0;
-
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_mutex == NULL )
     {
@@ -190,6 +179,19 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
         release_sem( p_mutex->lock );
         return B_OK;
     }
+
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    i_result = pthread_mutex_unlock( &p_mutex->mutex );
+    if ( i_result )
+    {
+        i_thread = (int)pthread_self();
+        psz_error = strerror(i_result);
+    }
+
+#elif defined( HAVE_CTHREADS_H )
+    mutex_unlock( p_mutex );
+    i_result = 0;
+
 #endif
 
     if( i_result )
@@ -279,22 +281,6 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
     }
     i_result = 0;
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    i_result = pthread_cond_signal( &p_condvar->cond );
-    if ( i_result )
-    {
-        i_thread = (int)pthread_self();
-        psz_error = strerror(i_result);
-    }
-
-#elif defined( HAVE_CTHREADS_H )
-    /* condition_signal() */
-    if ( p_condvar->queue.head || p_condvar->implications )
-    {
-        cond_signal( (condition_t)p_condvar );
-    }
-    i_result = 0;
-
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_condvar == NULL )
     {
@@ -331,6 +317,23 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
         }
         i_result = 0;
     }
+
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    i_result = pthread_cond_signal( &p_condvar->cond );
+    if ( i_result )
+    {
+        i_thread = (int)pthread_self();
+        psz_error = strerror(i_result);
+    }
+
+#elif defined( HAVE_CTHREADS_H )
+    /* condition_signal() */
+    if ( p_condvar->queue.head || p_condvar->implications )
+    {
+        cond_signal( (condition_t)p_condvar );
+    }
+    i_result = 0;
+
 #endif
 
     if( i_result )
@@ -425,22 +428,6 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
     }
     i_result = 0;
 
-#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
-    i_result = pthread_cond_broadcast( &p_condvar->cond );
-    if ( i_result )
-    {
-        i_thread = (int)pthread_self();
-        psz_error = strerror(i_result);
-    }
-
-#elif defined( HAVE_CTHREADS_H )
-    /* condition_signal() */
-    if ( p_condvar->queue.head || p_condvar->implications )
-    {
-        cond_signal( (condition_t)p_condvar );
-    }
-    i_result = 0;
-
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
     if( p_condvar == NULL )
     {
@@ -477,6 +464,23 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
         }
         i_result = 0;
     }
+
+#elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
+    i_result = pthread_cond_broadcast( &p_condvar->cond );
+    if ( i_result )
+    {
+        i_thread = (int)pthread_self();
+        psz_error = strerror(i_result);
+    }
+
+#elif defined( HAVE_CTHREADS_H )
+    /* condition_signal() */
+    if ( p_condvar->queue.head || p_condvar->implications )
+    {
+        cond_signal( (condition_t)p_condvar );
+    }
+    i_result = 0;
+
 #endif
 
     if( i_result )
@@ -599,6 +603,31 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
 
     i_result = 0;
 
+#elif defined( HAVE_KERNEL_SCHEDULER_H )
+    if( p_condvar == NULL )
+    {
+        i_result = B_BAD_VALUE;
+    }
+    else if( p_mutex == NULL )
+    {
+        i_result = B_BAD_VALUE;
+    }
+    else if( p_condvar->init < 2000 )
+    {
+        i_result = B_NO_INIT;
+    }
+
+    /* The p_condvar->thread var is initialized before the unlock because
+     * it enables to identify when the thread is interrupted beetwen the
+     * unlock line and the suspend_thread line */
+    p_condvar->thread = find_thread( NULL );
+    vlc_mutex_unlock( p_mutex );
+    suspend_thread( p_condvar->thread );
+    p_condvar->thread = -1;
+
+    vlc_mutex_lock( p_mutex );
+    i_result = 0;
+
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 
 #   ifdef DEBUG
@@ -636,31 +665,6 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
 
 #elif defined( HAVE_CTHREADS_H )
     condition_wait( (condition_t)p_condvar, (mutex_t)p_mutex );
-    i_result = 0;
-
-#elif defined( HAVE_KERNEL_SCHEDULER_H )
-    if( p_condvar == NULL )
-    {
-        i_result = B_BAD_VALUE;
-    }
-    else if( p_mutex == NULL )
-    {
-        i_result = B_BAD_VALUE;
-    }
-    else if( p_condvar->init < 2000 )
-    {
-        i_result = B_NO_INIT;
-    }
-
-    /* The p_condvar->thread var is initialized before the unlock because
-     * it enables to identify when the thread is interrupted beetwen the
-     * unlock line and the suspend_thread line */
-    p_condvar->thread = find_thread( NULL );
-    vlc_mutex_unlock( p_mutex );
-    suspend_thread( p_condvar->thread );
-    p_condvar->thread = -1;
-
-    vlc_mutex_lock( p_mutex );
     i_result = 0;
 
 #endif
