@@ -2,7 +2,7 @@
  * prefs.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.h,v 1.4 2003/02/23 05:53:53 jlj Exp $
+ * $Id: prefs.h,v 1.5 2003/05/09 00:41:11 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -29,7 +29,8 @@
 @interface VLCPrefs : NSObject
 {
     intf_thread_t *p_intf;
-
+    vlc_bool_t b_advanced;
+    
     NSMutableDictionary *o_pref_panels;
     NSMutableDictionary *o_toolbars;
     NSMutableDictionary *o_scroll_views;

@@ -162,7 +162,6 @@
                 "o_mu_videotrack" = id; 
                 "o_mu_window" = id; 
                 "o_playlist" = id; 
-                "o_prefs" = id; 
                 "o_timefield" = id; 
                 "o_timeslider" = id; 
                 "o_volumeslider" = id; 

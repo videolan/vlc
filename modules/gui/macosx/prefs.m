@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.17 2003/03/06 10:15:37 hartman Exp $
+ * $Id: prefs.m,v 1.18 2003/05/09 00:41:11 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -49,6 +49,7 @@
         o_scroll_views = [[NSMutableDictionary alloc] init];
         o_panel_views = [[NSMutableDictionary alloc] init];
         o_save_prefs = [[NSMutableDictionary alloc] init];
+        b_advanced = config_GetInt( p_intf, "advanced" );
     }
 
     return( self );
@@ -283,7 +284,7 @@
 
     if( p_item ) do
     {
-        if( p_item->b_advanced && !config_GetInt( p_intf, "advanced" ) )
+        if( p_item->b_advanced && !b_advanced )
         {
             continue;
         }
@@ -438,6 +439,7 @@
 
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
+        case CONFIG_ITEM_DIRECTORY:
         {
 
             if( !p_item->ppsz_list )
@@ -586,9 +588,15 @@
     DEF_PANEL_BUTTON( 1, _NS("Cancel"), clickedApplyCancelOK: );
     [o_button setKeyEquivalent: @"\E"];
 
-    s_rc.origin.x -= s_rc.size.width;
-    DEF_PANEL_BUTTON( 2, _NS("Apply"), clickedApplyCancelOK: );
-    [o_button setEnabled: NO];
+    s_rc.origin.x = 20;
+    o_button = [[NSButton alloc] initWithFrame: s_rc];
+    [o_button setButtonType: NSSwitchButton];
+    [o_button setAction: @selector(clickedApplyCancelOK:)];
+    [o_button setTarget: self];
+    [o_button setTitle: _NS("Advanced")];
+    [o_button setTag: 2];
+    [o_panel_view addSubview: [o_button autorelease]];
+    [o_button setState: b_advanced];
 
 #undef DEF_PANEL_BUTTON
 
@@ -731,16 +739,14 @@
 {
     id o_vlc_control;
     NSEnumerator *o_enum;
-    BOOL b_adv_change = FALSE;
-    
+
     NSWindow *o_pref_panel = [[sender superview] window];
     NSString *o_module_name = [[o_pref_panel toolbar] identifier];
+    NSView *o_config_view = [sender superview];
 
-    if ( ![[sender title] isEqualToString: _NS("Cancel")] )
+    if ( [[sender title] isEqualToString: _NS("OK")] )
     {
-        NSView *o_config_view = [sender superview];
         NSWindow *o_config_panel = [o_config_view window];
-        NSButton *o_btn_apply = [o_config_view viewWithTag: 2];
         NSString *o_module_name = [[o_config_panel toolbar] identifier];
         NSMutableArray *o_prefs = [o_save_prefs objectForKey: o_module_name];
     
@@ -757,6 +763,7 @@
             case CONFIG_ITEM_MODULE:
             case CONFIG_ITEM_STRING:
             case CONFIG_ITEM_FILE:
+            case CONFIG_ITEM_DIRECTORY:
                 {
                     char *psz_value;
                     NSString *o_value;
@@ -774,12 +781,6 @@
                 {
                     int i_value = [o_vlc_control intValue];
 
-                    if( !strcmp( psz_name, "advanced" ) && 
-                        ( config_GetInt( p_intf, "advanced" ) != i_value ) )
-                    {
-                        b_adv_change = TRUE;
-                    }
-
                     config_PutInt( p_intf, psz_name, i_value );
                 }
                 break;
@@ -795,34 +796,35 @@
             }
         }
     
-        [o_btn_apply setEnabled: NO];
         [o_prefs removeAllObjects];
     
         config_SaveConfigFile( p_intf, NULL );
     }
-    
-    if( ![[sender title] isEqualToString: _NS("Apply")] || b_adv_change )
+    if( [[sender title] isEqualToString: _NS("Advanced")] )
     {
-        [o_pref_panel close];
+        NSButton *o_btn_apply = [o_config_view viewWithTag: 2];
+        b_advanced = !b_advanced;
+        [o_btn_apply setState: b_advanced];
+    }
+    [o_pref_panel close];
 
-        if( [self respondsToSelector: @selector(performSelectorOnMainThread:
-                                                withObject:waitUntilDone:)] )
-        {
-            [self performSelectorOnMainThread: @selector(destroyPrefPanel:)
-                                            withObject: o_module_name
-                                            waitUntilDone: YES];
-        }
-        else
-        {
-            [NSTimer scheduledTimerWithTimeInterval: 0.1
-                    target: self selector: @selector(destroyPrefPanel:)
-                    userInfo: o_module_name repeats: NO];
-        }
-
-        if( [[sender title] isEqualToString: _NS("Apply")] && b_adv_change )
-        {
-            [self createPrefPanel: o_module_name];
-        }
+    if( [self respondsToSelector: @selector(performSelectorOnMainThread:
+                                            withObject:waitUntilDone:)] )
+    {
+        [self performSelectorOnMainThread: @selector(destroyPrefPanel:)
+                                        withObject: o_module_name
+                                        waitUntilDone: YES];
+    }
+    else
+    {
+        [NSTimer scheduledTimerWithTimeInterval: 0.1
+                target: self selector: @selector(destroyPrefPanel:)
+                userInfo: o_module_name repeats: NO];
+    }
+    
+    if( [[sender title] isEqualToString: _NS("Advanced")] )
+    {
+        [self createPrefPanel: o_module_name];
     }
 }
 
