@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.21 2002/05/28 18:34:42 stef Exp $
+ * $Id: vpar_headers.c,v 1.22 2002/05/30 13:58:17 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -279,7 +279,8 @@ int vpar_ParseHeader( vpar_thread_t * p_vpar )
     case SEQUENCE_END_CODE:
         intf_WarnMsg(3, "vpar warning: sequence end code received");
 
-        p_vpar->sequence.p_backward->b_force = 1;
+        if( p_vpar->sequence.p_backward != NULL )
+            p_vpar->sequence.p_backward->b_force = 1;
         ReferenceUpdate( p_vpar, I_CODING_TYPE, NULL );
 
         return 1;
