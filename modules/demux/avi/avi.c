@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.12 2002/11/15 18:10:26 fenrir Exp $
+ * $Id: avi.c,v 1.13 2002/11/16 22:25:07 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -647,7 +647,7 @@ static vlc_bool_t AVI_StreamStart( input_thread_t *p_input,
     }
     p_stream->b_activated = p_stream->p_es->p_decoder_fifo ? VLC_TRUE
                                                            : VLC_FALSE;
-    if( p_stream->b_activated )
+    if( p_stream->b_activated && p_avi->b_seekable)
     {
         AVI_StreamSeek( p_input, p_avi, i_stream, p_avi->i_time );
     }
@@ -1108,6 +1108,8 @@ static int AVIInit( vlc_object_t * p_this )
     {
         // already at begining of p_movi
     }
+    msg_Info( p_input, "skipping 12 bytes" );
+
     AVI_SkipBytes( p_input, 12 ); // enter in p_movi
 
     p_avi->i_movi_begin = p_movi->i_chunk_pos;
