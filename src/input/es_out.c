@@ -698,7 +698,9 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
         if( i_cat == AUDIO_ES )
         {
             if( p_sys->i_mode == ES_OUT_MODE_AUTO &&
-                p_sys->p_es_audio && p_sys->p_es_audio->p_dec )
+                p_sys->p_es_audio &&
+                p_sys->p_es_audio != es &&
+                p_sys->p_es_audio->p_dec )
             {
                 EsUnselect( out, p_sys->p_es_audio, VLC_FALSE );
             }
@@ -707,7 +709,9 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, vlc_bool_t b_force )
         else if( i_cat == SPU_ES )
         {
             if( p_sys->i_mode == ES_OUT_MODE_AUTO &&
-                p_sys->p_es_sub && p_sys->p_es_sub->p_dec )
+                p_sys->p_es_sub &&
+                p_sys->p_es_sub != es &&
+                p_sys->p_es_sub->p_dec )
             {
                 EsUnselect( out, p_sys->p_es_sub, VLC_FALSE );
             }
