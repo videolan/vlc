@@ -48,6 +48,10 @@
 
 #include "audio_output.h"
 
+#ifdef SYS_BEOS
+#include "beos_specific.h"
+#endif
+
 #include "main.h"
 
 /*****************************************************************************
@@ -147,6 +151,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main = &main_data;                       /* set up the global variable */
 
     /*
+     * System specific initialization code
+     */
+#ifdef SYS_BEOS
+    beos_Init();
+#endif
+
+    /*
      * Read configuration, initialize messages interface and set up program
      */
 #ifdef HAVE_MMX
@@ -220,6 +231,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     {
         input_VlanDestroy();
     }
+
+    /*
+     * System specific cleaning code
+     */
+#ifdef SYS_BEOS
+    beos_Clean();
+#endif
 
     /*
      * Terminate messages interface and program

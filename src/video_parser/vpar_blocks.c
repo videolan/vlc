@@ -439,7 +439,7 @@ void vpar_InitCrop( vpar_thread_t * p_vpar )
  *****************************************************************************/
 
 /* Function for filling up the lookup table for mb_addr_inc */
-static void __inline__ FillMbAddrIncTable( vpar_thread_t * p_vpar,
+static void FillMbAddrIncTable( vpar_thread_t * p_vpar,
                                     int i_start, int i_end, int i_step,
                                     int * pi_value, int i_length )
 {
@@ -502,7 +502,7 @@ void vpar_InitMbAddrInc( vpar_thread_t * p_vpar )
  *****************************************************************************/
 
 /* Fonction for filling up the tables */
-static void __inline__ FillMBType( vpar_thread_t * p_vpar,
+static void FillMBType( vpar_thread_t * p_vpar,
                                    int           i_mb_type,
                                    int           i_start,
                                    int           i_end,
@@ -563,7 +563,7 @@ void vpar_InitBMBType( vpar_thread_t * p_vpar )
  *****************************************************************************/
 
 /* First fonction for filling the table */
-static void __inline__ FillDCTTable( dct_lookup_t * p_tab_dest, dct_lookup_t * p_tab_src,
+static void FillDCTTable( dct_lookup_t * p_tab_dest, dct_lookup_t * p_tab_src,
                                      int i_step, int i_nb_elem, int i_offset )
 {
     int i_dummy, i_dummy2;
@@ -619,7 +619,7 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * DecodeMPEG1NonIntra : decode MPEG-1 non-intra blocks
  *****************************************************************************/
-static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
+static void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
                                             macroblock_t * p_mb, int i_b,
                                             int i_chroma_format )
 {
@@ -730,7 +730,7 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * DecodeMPEG1Intra : decode MPEG-1 intra blocks
  *****************************************************************************/
-static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
+static void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb, int i_b ,
                                          int i_chroma_format )
 {
@@ -877,7 +877,7 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * DecodeMPEG2NonIntra : decode MPEG-2 non-intra blocks
  *****************************************************************************/
-static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
+static void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
                                             macroblock_t * p_mb, int i_b,
                                             int i_chroma_format )
 {
@@ -986,7 +986,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * DecodeMPEG2Intra : decode MPEG-2 intra blocks
  *****************************************************************************/
-static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
+static void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
                                          macroblock_t * p_mb, int i_b,
                                          int i_chroma_format )
 {
@@ -1136,7 +1136,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
 /****************************************************************************
  * MotionCode : Parse the next motion code
  ****************************************************************************/
-static __inline__ int MotionCode( vpar_thread_t * p_vpar )
+static int MotionCode( vpar_thread_t * p_vpar )
 {
     int i_code;
     static lookup_t pl_mv_tab0[8] =
@@ -1185,7 +1185,7 @@ static __inline__ int MotionCode( vpar_thread_t * p_vpar )
 /****************************************************************************
  * DecodeMotionVector : Decode a motion_vector
  ****************************************************************************/
-static __inline__ void DecodeMotionVector( int * pi_prediction, int i_r_size,
+static void DecodeMotionVector( int * pi_prediction, int i_r_size,
         int i_motion_code, int i_motion_residual, int i_full_pel )
 {
     int i_limit, i_vector;
@@ -1212,7 +1212,7 @@ static __inline__ void DecodeMotionVector( int * pi_prediction, int i_r_size,
 /****************************************************************************
  * MotionVector : Parse the next motion_vector field
  ****************************************************************************/
-static __inline__ void MotionVector( vpar_thread_t * p_vpar,
+static void MotionVector( vpar_thread_t * p_vpar,
                                      macroblock_t * p_mb, int i_r,
                                      int i_s, int i_full_pel, int i_structure )
 {
@@ -1321,7 +1321,7 @@ static __inline__ void MotionVector( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * DecodeMVMPEG1 : Parse the next MPEG-1 motion vectors
  *****************************************************************************/
-static __inline__ void DecodeMVMPEG1( vpar_thread_t * p_vpar,
+static void DecodeMVMPEG1( vpar_thread_t * p_vpar,
                             macroblock_t * p_mb, int i_s, int i_structure )
 {
     MotionVector( p_vpar, p_mb, 0, i_s,
@@ -1331,7 +1331,7 @@ static __inline__ void DecodeMVMPEG1( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * DecodeMVMPEG2 : Parse the next MPEG-2 motion_vectors field
  *****************************************************************************/
-static __inline__ void DecodeMVMPEG2( vpar_thread_t * p_vpar,
+static void DecodeMVMPEG2( vpar_thread_t * p_vpar,
                             macroblock_t * p_mb, int i_s, int i_structure )
 {
     if( p_vpar->mb.i_mv_count == 1 )
@@ -1364,7 +1364,7 @@ static __inline__ void DecodeMVMPEG2( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * MacroblockAddressIncrement : Get the macroblock_address_increment field
  *****************************************************************************/
-static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
+static int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 {
     int i_addr_inc = 0;
     /* Index in the lookup table mb_addr_inc */
@@ -1390,7 +1390,7 @@ static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * IMBType : macroblock_type in I pictures
  *****************************************************************************/
-static __inline__ int IMBType( vpar_thread_t * p_vpar )
+static int IMBType( vpar_thread_t * p_vpar )
 {
     /* Take two bits for testing */
     int                 i_type = ShowBits( &p_vpar->bit_stream, 2 );
@@ -1408,7 +1408,7 @@ static __inline__ int IMBType( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * PMBType : macroblock_type in P pictures
  *****************************************************************************/
-static __inline__ int PMBType( vpar_thread_t * p_vpar )
+static int PMBType( vpar_thread_t * p_vpar )
 {
     /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
@@ -1422,7 +1422,7 @@ static __inline__ int PMBType( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * BMBType : macroblock_type in B pictures
  *****************************************************************************/
-static __inline__ int BMBType( vpar_thread_t * p_vpar )
+static int BMBType( vpar_thread_t * p_vpar )
 {
      /* Testing on 6 bits */
     int                i_type = ShowBits( &p_vpar->bit_stream, 6 );
@@ -1437,7 +1437,7 @@ static __inline__ int BMBType( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * DMBType : macroblock_type in D pictures
  *****************************************************************************/
-static __inline__ int DMBType( vpar_thread_t * p_vpar )
+static int DMBType( vpar_thread_t * p_vpar )
 {
     return GetBits( &p_vpar->bit_stream, 1 );
 }
@@ -1445,7 +1445,7 @@ static __inline__ int DMBType( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * CodedPattern420 : coded_block_pattern with 4:2:0 chroma
  *****************************************************************************/
-static __inline__ int CodedPattern420( vpar_thread_t * p_vpar )
+static int CodedPattern420( vpar_thread_t * p_vpar )
 {
     /* Take the max 9 bits length vlc code for testing */
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
@@ -1460,7 +1460,7 @@ static __inline__ int CodedPattern420( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * CodedPattern422 : coded_block_pattern with 4:2:2 chroma
  *****************************************************************************/
-static __inline__ int CodedPattern422( vpar_thread_t * p_vpar )
+static int CodedPattern422( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
 
@@ -1474,7 +1474,7 @@ static __inline__ int CodedPattern422( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * CodedPattern444 : coded_block_pattern with 4:4:4 chroma
  *****************************************************************************/
-static __inline__ int CodedPattern444( vpar_thread_t * p_vpar )
+static int CodedPattern444( vpar_thread_t * p_vpar )
 {
     int      i_vlc = ShowBits( &p_vpar->bit_stream, 9 );
 
@@ -1487,7 +1487,7 @@ static __inline__ int CodedPattern444( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * InitMacroblock : Initialize macroblock values
  *****************************************************************************/
-static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
+static void InitMacroblock( vpar_thread_t * p_vpar,
                                        macroblock_t * p_mb, int i_coding_type,
                                        int i_chroma_format,
                                        int i_structure,
@@ -1522,7 +1522,7 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * UpdateContext : Update the p_vpar contextual values
  *****************************************************************************/
-static __inline__ void UpdateContext( vpar_thread_t * p_vpar, int i_structure )
+static void UpdateContext( vpar_thread_t * p_vpar, int i_structure )
 {
     /* Update macroblock real position. */
     p_vpar->mb.i_l_x += 16;
@@ -1540,7 +1540,7 @@ static __inline__ void UpdateContext( vpar_thread_t * p_vpar, int i_structure )
 /*****************************************************************************
  * SkippedMacroblock : Generate a skipped macroblock with NULL motion vector
  *****************************************************************************/
-static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
+static void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
                                           int i_mb_base, int i_coding_type,
                                           int i_chroma_format,
                                           int i_structure,
@@ -1600,7 +1600,7 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
 /*****************************************************************************
  * MacroblockModes : Get the macroblock_modes structure
  *****************************************************************************/
-static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
+static void MacroblockModes( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb,
                                         int i_chroma_format,
                                         int i_coding_type,
@@ -1747,7 +1747,7 @@ if( p_vpar->picture.b_error )                                           \
     }                                                                   \
 }
 
-static __inline__ void ParseMacroblock(
+static void ParseMacroblock(
                            vpar_thread_t * p_vpar,
                            int * pi_mb_address,     /* previous address to be
                                                      * used for mb_addr_incr */
@@ -1981,7 +1981,7 @@ i_count++;
 /*****************************************************************************
  * SliceHeader : Parse the next slice structure
  *****************************************************************************/
-static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
+static void SliceHeader( vpar_thread_t * p_vpar,
                                     int * pi_mb_address, int i_mb_base,
                                     u32 i_vert_code, boolean_t b_high,
                                     boolean_t b_dp_scalable,
@@ -2057,7 +2057,7 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * PictureData : Parse off all macroblocks (ISO/IEC 13818-2 6.2.3.7)
  *****************************************************************************/
-static __inline__ void PictureData( vpar_thread_t * p_vpar, int i_mb_base,
+static void PictureData( vpar_thread_t * p_vpar, int i_mb_base,
                                     boolean_t b_high, boolean_t b_dp_scalable,
                                     boolean_t b_mpeg2, int i_coding_type,
                                     int i_chroma_format, int i_structure,

@@ -1,4 +1,5 @@
 # Generated automatically from Makefile.in by configure.
+# Generated automatically from Makefile.in by configure.
 ################################################################################
 # vlc (VideoLAN Client) main makefile
 # (c)1998 VideoLAN
@@ -19,7 +20,7 @@ AOUT += dsp
 AOUT += dummy
 
 # Video output settings
-VOUT += x11
+#VOUT += x11
 #VOUT += fb
 #VOUT += ggi
 #VOUT += glide
@@ -68,8 +69,8 @@ DEBUG=0
 
 #----------------- do not change anything below this line ----------------------
 
-prefix=@prefix@
-INSTALL=@INSTALL@
+prefix=/usr/local
+INSTALL=/bin/install -c
 
 ################################################################################
 # Configuration pre-processing
@@ -127,11 +128,11 @@ ifeq ($(SYS),LINUX)
 LIB += -lpthread -ldl
 endif
 
-ifeq ($SYS),BEOS)
-LIB += -llibroot -llibgame -llibbe
-endif
-
+ifeq ($(SYS),BEOS)
+LIB += -lbe -lroot -lgame
+else
 LIB += -lm
+endif
 
 #
 # C compiler flags: compilation
@@ -140,6 +141,9 @@ CCFLAGS += $(DEFINE) $(INCLUDE)
 CCFLAGS += -Wall
 CCFLAGS += -D_REENTRANT
 CCFLAGS += -D_GNU_SOURCE
+
+# flags needed for clean beos compilation
+CCFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
 
 # Optimizations : don't compile debug versions with them
 CCFLAGS += -O6
@@ -192,7 +196,7 @@ LCFLAGS += -Wall
 # Debugging support
 ifeq ($(DEBUG),1)
 CFLAGS += -g
-#CFLAGS += -pg
+CFLAGS += -pg
 endif
 
 #################################################################################
@@ -276,6 +280,7 @@ misc_obj =			misc/mtime.o \
 						misc/plugins.o \
 						misc/decoder_fifo.o
 
+
 C_OBJ = $(interface_obj) \
 		$(input_obj) \
 		$(audio_output_obj) \
@@ -288,6 +293,10 @@ C_OBJ = $(interface_obj) \
 		$(video_decoder_obj) \
 		$(vlan_obj) \
 		$(misc_obj)
+
+ifeq ($(SYS), BEOS)
+CPP_OBJ =			misc/beos_specific.o
+endif
 
 #
 # Assembler Objects
@@ -317,9 +326,10 @@ PLUGIN_OBJ = $(intf_plugin) $(aout_plugin) $(vout_plugin)
 # Other lists of files
 #
 C_OBJ := $(C_OBJ:%.o=src/%.o)
+CPP_OBJ := $(CPP_OBJ:%.o=src/%.o)
 ASM_OBJ := $(ASM_OBJ:%.o=src/%.o)
-sources := $(C_OBJ:%.o=%.c) $(PLUGIN_OBJ:%.so=%.c)
-dependancies := $(sources:%.c=.dep/%.d)
+sources_c := $(C_OBJ:%.o=%.c)
+dependancies := $(sources_c:%.c=.dep/%.d)
 
 # All symbols must be exported
 export
@@ -331,10 +341,10 @@ export
 #
 # Virtual targets
 #
-all: vlc
+all: vlc plugins
 
 clean:
-	rm -f $(C_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
+	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
 
 distclean: clean
 	rm -f **/*.o **/*.so **/*~ *.log
@@ -376,8 +386,15 @@ FORCE:
 #
 # Real targets
 #
-vlc: $(C_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
-	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(ASM_OBJ)	
+vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
+ifeq ($(SYS), BEOS)
+	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) -Xlinker -soname=_APP_ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
+#	ln -s ../vlc ./plugins/_APP_
+else
+	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
+endif
+
+plugins: $(PLUGIN_OBJ)
 
 #
 # Generic rules (see below)
@@ -391,19 +408,23 @@ $(C_OBJ): %.o: %.c
 	@echo "compiling $*.o from $*.c"
 	@$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
+$(CPP_OBJ): %.o: %.cpp
+	@echo "compiling $*.o from $*.cpp"
+	@$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
+
 $(ASM_OBJ): %.o: Makefile.dep
 $(ASM_OBJ): %.o: %.S
 	@echo "assembling $*.o from $*.S"
 	@$(CC) $(CFLAGS) -c -o $@ $<
 
-$(PLUGIN_OBJ): %.so: Makefile.dep
-$(PLUGIN_OBJ): %.so: .dep/%.d
+#$(PLUGIN_OBJ): %.so: Makefile.dep
+#$(PLUGIN_OBJ): %.so: .dep/%.d
 
 # audio plugins
 plugins/aout/aout_dummy.so plugins/aout/aout_dsp.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 ifeq ($(SYS), BEOS)
-		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -o $@ $<
+		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
 else
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
 endif
@@ -421,7 +442,7 @@ plugins/intf/intf_dummy.so plugins/vout/vout_dummy.so \
 	plugins/intf/intf_fb.so plugins/vout/vout_fb.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 ifeq ($(SYS), BEOS)
-		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -o $@ $<
+		@$(CC) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
 else
 		@$(CC) $(CCFLAGS) $(CFLAGS) -shared -o $@ $<
 endif
@@ -446,6 +467,14 @@ plugins/intf/intf_ggi.so plugins/vout/vout_ggi.so: %.so: %.c
 		@echo "compiling $*.so from $*.c"
 		@$(CC) $(CCFLAGS) $(CFLAGS) -lggi -shared -o $@ $<
 
+plugins/intf/intf_beos.so: %.so: %.cpp
+		@echo "compiling $*.so from $*.cpp"
+		@$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
+
+plugins/vout/vout_beos.so: %.so: %.cpp
+		@echo "compiling $*.so from $*.cpp"
+		@$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
+		
 
 ################################################################################
 # Note on generic rules and dependancies

@@ -95,7 +95,6 @@ aout_thread_t *aout_CreateThread( int *pi_status )
 
     /* Request an interface plugin */
     psz_method = main_GetPszVariable( AOUT_METHOD_VAR, AOUT_DEFAULT_METHOD );
-
     if( RequestPlugin( &p_aout->aout_plugin, "aout", psz_method ) )
     {
         intf_ErrMsg( "error: could not open audio plugin aout_%s.so\n", psz_method );

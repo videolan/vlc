@@ -1191,7 +1191,9 @@ last_display_date = display_date;
         if( b_display && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) )
         {
             p_vout->p_sys_display( p_vout );
+#ifndef SYS_BEOS
             p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
+#endif
         }
 
         /*

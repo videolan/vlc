@@ -349,7 +349,7 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
      * Convert message to string
      */
 #ifdef SYS_BEOS
-    psz_str = (char*) malloc( INTF_MAX_MSG_SIZE );
+    psz_str = (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
     vsprintf( psz_str, psz_format, ap );
 #else
     vasprintf( &psz_str, psz_format, ap );

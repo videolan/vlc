@@ -23,6 +23,8 @@
  * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
+#include <stdio.h>
+
 #if defined(HAVE_PTHREAD_H)            /* pthreads (Linux & BSD for example) */
 #include <pthread.h>
 
@@ -30,9 +32,10 @@
 #include <cthreads.h>
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)   /* BeOS */
+#undef MAX
+#undef MIN
 #include <kernel/OS.h>
 #include <kernel/scheduler.h>
-
 #else
 #error no threads available on your system !
 #endif
@@ -228,12 +231,11 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+/*
     // check the arguments and whether it's already been initialized
-    if( !p_mutex )
-        return B_BAD_VALUE;
-
-    if( p_mutex->init == 9999 )
-        return EALREADY;
+    if( !p_mutex ) return B_BAD_VALUE;
+    if( p_mutex->init == 9999 ) return EALREADY;
+*/
 
     p_mutex->lock = create_sem( 1, "BeMutex" );
     p_mutex->owner = -1;
@@ -257,18 +259,16 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err;
-
-    if( !p_mutex )
-        return B_BAD_VALUE;
-
-    if( p_mutex->init < 2000 )
-        return B_NO_INIT;
+/*
+    if( !p_mutex ) return B_BAD_VALUE;
+    if( p_mutex->init < 2000 ) return B_NO_INIT;
 
     lazy_init_mutex( p_mutex );
-
+*/
     err = acquire_sem( p_mutex->lock );
-    if( !err )
-        p_mutex->owner = find_thread( NULL );
+/*
+    if( !err ) p_mutex->owner = find_thread( NULL );
+*/
 
     return err;
 
@@ -288,11 +288,9 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
     return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
-    if(! p_mutex)
-        return B_BAD_VALUE;
-
-    if( p_mutex->init < 2000 )
-        return B_NO_INIT;
+/*
+    if(! p_mutex) return B_BAD_VALUE;
+    if( p_mutex->init < 2000 ) return B_NO_INIT;
 
     lazy_init_mutex( p_mutex );
 
@@ -300,6 +298,7 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
         return ENOLCK;
 
     p_mutex->owner = -1;
+*/
     release_sem( p_mutex->lock );
     return B_OK;
 
