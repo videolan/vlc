@@ -370,6 +370,12 @@ typedef struct tls_t tls_t;
 typedef struct tls_server_t tls_server_t;
 typedef struct tls_session_t tls_session_t;
 
+/* XML */
+typedef struct xml_t xml_t;
+typedef struct xml_sys_t xml_sys_t;
+typedef struct xml_reader_t xml_reader_t;
+typedef struct xml_reader_sys_t xml_reader_sys_t;
+
 /* vod server */
 typedef struct vod_t     vod_t;
 typedef struct vod_sys_t vod_sys_t;

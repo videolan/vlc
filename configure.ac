@@ -444,7 +444,7 @@ AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 if test "${SYS}" != "mingw32"; then
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32 x264],[-lm])
+  VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32 x264 goom],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
   VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transrate i420_rgb faad toolame equalizer vlc],[-lm])
@@ -954,7 +954,7 @@ VLC_ADD_PLUGINS([trivial_channel_mixer simple_channel_mixer headphone_channel_mi
 VLC_ADD_PLUGINS([trivial_mixer spdif_mixer float32_mixer])
 VLC_ADD_PLUGINS([aout_file equalizer])
 VLC_ADD_PLUGINS([i420_rgb i420_yuy2 i422_yuy2 i420_ymga])
-VLC_ADD_PLUGINS([id3 playlist export sgimb m3u])
+VLC_ADD_PLUGINS([id3 playlist export sgimb m3u xtag])
 VLC_ADD_PLUGINS([rawvideo blend scale time marq])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au])
 VLC_ADD_PLUGINS([access_file access_udp access_tcp access_http ipv4 access_mms])
@@ -2858,6 +2858,39 @@ from http://www.freetype.org/, or configure with --disable-freetype. Have a nice
 fi
 
 dnl
+dnl  libxml2 module
+dnl
+AC_ARG_ENABLE(libxml2,
+  [  --enable-libxml2       libxml2 support (default enabled)])
+if test "${enable_libxml2}" != "no"
+then
+  XML2_PATH="${PATH}"
+  AC_ARG_WITH(xml2-config-path,
+    [    --with-xml2-config-path=PATH xml2-config path (default search in \$PATH)],
+    [ if test "${with_xml2_config_path}" != "no"; then
+        XML2_PATH="${with_xml2_config_path}:${PATH}"
+      fi ])
+  AC_PATH_PROG(XML2_CONFIG, xml2-config, no, ${XML2_PATH})
+  if test "${XML2_CONFIG}" != "no"; then
+    VLC_ADD_CPPFLAGS([xml],[`${XML2_CONFIG} --cflags`])
+    VLC_ADD_LDFLAGS([xml],[`${XML2_CONFIG} --libs`])
+    dnl depends on the xmlTextReader extension
+    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_xml}"
+    AC_CHECK_LIB(xml2,xmlTextReaderConstName,[
+      VLC_ADD_PLUGINS([xml]) ],[
+      AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version])
+      if test "${enable_xml2}" = "yes"; then
+        AC_MSG_ERROR([libxml2 missing the xmlTextReader extension])
+      fi])
+    LDFLAGS="${LDFLAGS_save}"
+  else
+    if test "${enable_xml2}" = "yes"; then
+      AC_MSG_ERROR([Could not find libxml2])
+    fi
+  fi
+fi
+
+dnl
 dnl  SVG module
 dnl
 AC_ARG_ENABLE(svg,
@@ -3275,33 +3308,6 @@ if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}
     skins2_missing_lib="yes"
     if test "${enable_skins2}" = "yes"; then
       AC_MSG_ERROR([Could not find freetype (required for skins2)])
-    fi
-  fi
-
-  dnl libxml2
-  XML2_PATH="${PATH}"
-  AC_ARG_WITH(xml2-config-path,
-    [    --with-xml2-config-path=PATH xml2-config path (default search in \$PATH)],
-    [ if test "${with_xml2_config_path}" != "no"; then
-        XML2_PATH="${with_xml2_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(XML2_CONFIG, xml2-config, no, ${XML2_PATH})
-  if test "${XML2_CONFIG}" != "no"; then
-    VLC_ADD_CPPFLAGS([skins2],[`${XML2_CONFIG} --cflags`])
-    VLC_ADD_LDFLAGS([skins2],[`${XML2_CONFIG} --libs`])
-    dnl skins2 depends on the xmlTextReader extension
-    LDFLAGS="${LDFLAGS_save} ${LDFLAGS_skins2}"
-    AC_CHECK_LIB(xml2,xmlTextReaderConstName,[],[
-      skins2_missing_lib="yes"
-      AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version; maybe you are missing libpng.])
-      if test "${enable_skins2}" = "yes"; then
-        AC_MSG_ERROR([libxml2 missing the xmlTextReader extension (required for skins2)])
-      fi])
-    LDFLAGS="${LDFLAGS_save}"
-  else
-    skins2_missing_lib="yes"
-    if test "${enable_skins2}" = "yes"; then
-      AC_MSG_ERROR([Could not find libxml2 (required for skins2)])
     fi
   fi
 
@@ -3736,12 +3742,14 @@ then
     fi
   else
     AC_CHECK_HEADERS(goom/goom.h, [
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_goom}"
       AC_CHECK_LIB(goom2, goom_init, [
         VLC_ADD_PLUGINS([goom])
         VLC_ADD_LDFLAGS([goom],[-lgoom2])
       ],[
         AC_MSG_ERROR([Could not find goom on your system: you may get it from http://www.ios-software.com/.])
       ])
+      LDFLAGS="${LDFLAGS_save}"
     ])
   fi
 fi
@@ -4225,6 +4233,7 @@ AC_CONFIG_FILES([
   modules/misc/network/Makefile
   modules/misc/testsuite/Makefile
   modules/misc/playlist/Makefile
+  modules/misc/xml/Makefile
   modules/mux/Makefile
   modules/mux/mpeg/Makefile
   modules/packetizer/Makefile

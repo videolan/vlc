@@ -1,0 +1,2 @@
+SOURCES_xtag = xtag.c
+SOURCES_xml = libxml.c

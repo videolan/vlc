@@ -2,7 +2,7 @@
  * png_bitmap.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: png_bitmap.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>

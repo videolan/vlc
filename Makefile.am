@@ -116,6 +116,7 @@ HEADERS_include = \
 	include/vlc_video.h \
 	include/vlc_vlm.h \
 	include/vlc_vod.h \
+	include/vlc_xml.h \
 	include/vout_synchro.h \
 	include/win32_specific.h \
 	$(NULL)
@@ -376,6 +377,7 @@ SOURCES_libvlc_common = \
 	src/misc/error.c \
 	src/misc/net.c \
 	src/misc/vlm.c \
+	src/misc/xml.c \
 	src/extras/libc.c \
 	$(NULL)
 

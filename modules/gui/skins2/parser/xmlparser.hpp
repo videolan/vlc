@@ -2,7 +2,7 @@
  * xmlparser.hpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: xmlparser.hpp,v 1.6 2004/03/01 19:36:43 asmax Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -25,8 +25,11 @@
 #define XMLPARSER_HPP
 
 #include "../src/skin_common.hpp"
-#include <libxml/xmlreader.h>
+#include "vlc_xml.h"
 #include <map>
+
+// Current DTD version
+#define SKINS_DTD_VERSION "2.0"
 
 /// XML parser using libxml2 text reader API
 class XMLParser: public SkinObject
@@ -54,17 +57,16 @@ class XMLParser: public SkinObject
         bool m_errors;
 
         /// Callbacks
-        virtual void handleBeginElement( const string &rName, AttrList_t &attr ) {}
+        virtual void handleBeginElement( const string &rName,
+                                         AttrList_t &attr ) {}
         virtual void handleEndElement( const string &rName ) {}
 
     private:
-        /// Reader context
-        xmlTextReaderPtr m_pReader;
+        void LoadCatalog();
 
-        /// Callback for validation errors
-        static void handleError( void *pArg,  const char *pMsg,
-                                 xmlParserSeverities severity,
-                                 xmlTextReaderLocatorPtr locator);
+        /// Reader context
+        xml_t *m_pXML;
+        xml_reader_t *m_pReader;
 };
 
 #endif
