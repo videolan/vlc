@@ -165,6 +165,7 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
 	
     /* Initialize the libmad decoder structures */
     p_mad_adec->libmad_decoder = (struct mad_decoder*) malloc(sizeof(struct mad_decoder));
+
     if (p_mad_adec->libmad_decoder == NULL) {
         intf_ErrMsg ( "mad_adec error: not enough memory "
                       "for decoder_InitThread() to allocate p_mad_adec->libmad_decder" );
@@ -185,16 +186,14 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
 		      libmad_input,  	/* input_func */
 		      0,		/* header_func */
 		      0,		/* filter */
-		      libmad_output, 	/* output_func */
-		      0,  		/* error */
+		      libmad_output,	/* output_func */
+		      0, 	/* error */
 		      0);            	/* message */
 
     mad_decoder_options(p_mad_adec->libmad_decoder, MAD_OPTION_IGNORECRC);
     mad_timer_reset(&p_mad_adec->libmad_timer);
 
-    /*
-     * Initialize the output properties
-     */
+    /* output fifo will be created when needed */
     p_mad_adec->p_aout_fifo=NULL;
 
     intf_ErrMsg("mad_adec debug: mad decoder thread %p initialized", p_mad_adec);

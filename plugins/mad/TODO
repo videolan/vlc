@@ -24,7 +24,7 @@ commit to current vlc-dev tree in CVS at VideoLan
 [5 - all ready done by Christophe Massiot]
 make cross-compile possible for vlc without interface. With interface it is to damn difficult to do cross-compilation.
 
-[6 - ]
+[6 - busy ]
 extending mad plugin with more features
 	do fancy stuff (enable MP3 decoding)
 
@@ -44,12 +44,3 @@ incorporate new libmad version if possible
 	see 7
 	see 8
 
-[10 - ]
-rewrite the audio decoding process by using a lower level API. In this way the decoding process can be steered and tuned better.
-Hopefully it will get rid of audio cracks and jitter.
-
-[11 - ]
-test plugin: native Intel, native iPaq
-
-[12 - ]
-commit to vlc-dev tree.

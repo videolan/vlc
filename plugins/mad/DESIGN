@@ -5,18 +5,22 @@ Directories:
 ============
 vlc/plugins/mad	        : mad audio decoder plugin for vlc
 
-Interface functions to implement in mad plugin are:
-=========
-decoder_Probe
-decoder_Run
-adec_mad_InitThred
-adec_mad_EndThread
+Interface functions
+===================
+The following interface functions are implemented in the mad plugin.
 
-libmad_input
-libmad_output
-libmad_header
-libmad_messages
-libmad_error
+decoder_Probe	: vlc probes for plugin capabilities
+decoder_Run	: vlc starts a decoder plugin by calling this function
+InitThread	: routine to do some initializations
+EndThread	: cleanup function
+
+The following functions are callback functions for the mad decoder library:
+
+libmad_input	: called when input data is needed
+libmad_output	: called whenever a frame has been decoded
+libmad_header	: called upon decoding of only a frame header
+libmad_messages : libmad messages
+libmad_error	: called whenever an error occured during the decoding process
 
 Design: (ASCII art)
 =======
@@ -35,10 +39,10 @@ initializing, starting and stopping them.
       _______________
             ^
             |
-      ________________________
-      |  <decoder interface> |
-      | vlc plugin interface |
-      ________________________
+   ________________________
+   |  <decoder interface> |
+   | vlc plugin interface |
+   ________________________
 
 
 Interface view:
@@ -49,6 +53,7 @@ Interface view:
                             	   -----------------------
 
 Rationel:
+========
 Keeping libmad as a separate library on the system, either dynamic or statically linked in, makes maintenance so much simpeler.
 Merging with a new libmad version should be straight forward as long as the interface stays stable.
 There is another benefit: Disk (actually flash ROM) resources and memory are very limited on a iPaq.

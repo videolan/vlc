@@ -23,8 +23,9 @@
 
 // FIXME: Ugly define inside a decoder
 #define ADEC_FRAME_SIZE (2*1152)
-#define MAD_BUFFER_SIZE (ADEC_FRAME_SIZE*2)
-//#define MAD_BUFFER_SIZE (MAD_BUFFER_MDLEN*2)
+// MAD_BUFFER_MDLEN (511 + 2048 + MAD_BUFLEN_GUARD) and MAD_BUFLEN_GUARD is 8
+#define MAD_BUFFER_SIZE (MAD_BUFFER_MDLEN)
+//#define MAD_BUFFER_SIZE (ADEC_FRAME_SIZE*2)
 #define MAD_OUTPUT_SIZE (ADEC_FRAME_SIZE*2)
 
 typedef struct mad_adec_thread_s
