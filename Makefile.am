@@ -472,6 +472,7 @@ vlc.app: vlc $(PLUGIN_FILES)
 		mkdir -p vlc.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES ; \
 		cp po/$$i vlc.app/Contents/MacOS/locale/$${i%.gmo}/LC_MESSAGES/vlc.mo ; \
 	done
+        echo -n "APPLVLC#" >| vlc.app/Contents/PkgInfo
 endif
 
 if HAVE_WIN32
