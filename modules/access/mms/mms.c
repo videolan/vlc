@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.12 2002/12/06 13:05:22 sam Exp $
+ * $Id: mms.c,v 1.13 2002/12/12 15:10:58 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -120,10 +120,18 @@ static void mms_ParseURL( url_t *p_url, char *psz_url );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Allows you to modify the default caching value for mms streams. This " \
+    "value should be set in miliseconds units." )
+
 vlc_module_begin();
     set_description( _("MMS access module") );
     set_capability( "access", 0 );
     add_category_hint( "stream", NULL );
+        add_integer( "mms-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
+                     CACHING_TEXT, CACHING_LONGTEXT );
+
         add_bool( "mms-all", 0, NULL,
                   "force selection of all streams",
                   "force selection of all streams" );
@@ -270,6 +278,9 @@ static int Open( vlc_object_t *p_this )
         FREE( p_access->url.psz_private );
         return( -1 );
     }
+
+    /* Update default_pts to a suitable value for mms access */
+    p_input->i_pts_delay = config_GetInt( p_input, "mms-caching" ) * 1000;
 
     return( 0 );
 }

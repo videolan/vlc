@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.5 2002/11/21 13:53:32 sam Exp $
+ * $Id: file.c,v 1.6 2002/12/12 15:10:58 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -60,8 +60,15 @@ static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Allows you to modify the default caching value for file streams. This " \
+    "value should be set in miliseconds units." )
+
 vlc_module_begin();
     set_description( _("Standard filesystem file reading") );
+    add_category_hint( N_("file"), NULL );
+    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT );
     set_capability( "access", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );
@@ -205,6 +212,9 @@ static int Open( vlc_object_t *p_this )
         }
 #endif
     }
+
+    /* Update default_pts to a suitable value for file access */
+    p_input->i_pts_delay = config_GetInt( p_input, "file-caching" ) * 1000;
 
     return VLC_SUCCESS;
 }

@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.80 2002/12/06 16:34:03 sam Exp $
+ * $Id: input_ext-intf.h,v 1.81 2002/12/12 15:10:58 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -305,6 +305,7 @@ struct input_thread_t
     void          (* pf_seek ) ( input_thread_t *, off_t );
     access_sys_t *   p_access_data;
     size_t           i_mtu;
+    int              i_pts_delay;                        /* internal caching */
 
     /* Demux module */
     module_t *       p_demux;

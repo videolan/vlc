@@ -2,7 +2,7 @@
  * http.c: HTTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: http.c,v 1.16 2002/12/11 20:13:50 fenrir Exp $
+ * $Id: http.c,v 1.17 2002/12/12 15:10:58 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -76,9 +76,15 @@ static ssize_t Read    ( input_thread_t *, byte_t *, size_t );
     "http://myproxy.mydomain:myport . If none is specified, the HTTP_PROXY" \
     "environment variable will be tried." )
 
+#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Allows you to modify the default caching value for http streams. This " \
+    "value should be set in miliseconds units." )
+
 vlc_module_begin();
     add_category_hint( N_("http"), NULL );
     add_string( "http-proxy", NULL, NULL, PROXY_TEXT, PROXY_LONGTEXT );
+    add_integer( "http-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT );
     set_description( _("HTTP access module") );
     set_capability( "access", 0 );
     add_shortcut( "http" );
@@ -363,7 +369,6 @@ static int HTTPConnect( input_thread_t * p_input, off_t i_tell )
     if( p_input->stream.p_selected_area->i_size )
     {
         p_input->stream.p_selected_area->i_tell = i_tell;
-            + (p_input->p_last_data - p_input->p_current_data);
     }
     else
     {
@@ -620,6 +625,9 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
     }
+
+    /* Update default_pts to a suitable value for http access */
+    p_input->i_pts_delay = config_GetInt( p_input, "http-caching" ) * 1000;
 
     return VLC_SUCCESS;
 }

@@ -2,7 +2,7 @@
  * rtp.c: RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rtp.c,v 1.8 2002/12/11 20:13:50 fenrir Exp $
+ * $Id: rtp.c,v 1.9 2002/12/12 15:10:58 gbazin Exp $
  *
  * Authors: Tristan Leteurtre <tooney@via.ecp.fr>
  *
@@ -69,8 +69,15 @@ static ssize_t Read    ( input_thread_t *, byte_t *, size_t );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Allows you to modify the default caching value for rtp streams. This " \
+    "value should be set in miliseconds units." )
+
 vlc_module_begin();
     set_description( _("RTP access module") );
+    add_category_hint( N_("rtp"), NULL );
+    add_integer( "rtp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT );
     set_capability( "access", 0 );
     add_shortcut( "rtp" );
     add_shortcut( "rtpstream" );
@@ -272,6 +279,9 @@ static int Open( vlc_object_t *p_this )
     {
         p_input->psz_demux = "ts";
     }
+
+    /* Update default_pts to a suitable value for rtp access */
+    p_input->i_pts_delay = config_GetInt( p_input, "rtp-caching" ) * 1000;
 
     return( 0 );
 }

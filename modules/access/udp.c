@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.5 2002/12/11 20:13:50 fenrir Exp $
+ * $Id: udp.c,v 1.6 2002/12/12 15:10:58 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -62,8 +62,15 @@ static ssize_t Read    ( input_thread_t *, byte_t *, size_t );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define CACHING_TEXT N_("caching value in ms")
+#define CACHING_LONGTEXT N_( \
+    "Allows you to modify the default caching value for udp streams. This " \
+    "value should be set in miliseconds units." )
+
 vlc_module_begin();
     set_description( _("raw UDP access module") );
+    add_category_hint( N_("udp"), NULL );
+    add_integer( "udp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT );
     set_capability( "access", 0 );
     add_shortcut( "udp" );
     add_shortcut( "udpstream" );
@@ -261,6 +268,9 @@ static int Open( vlc_object_t *p_this )
 
     p_access_data->i_handle = socket_desc.i_handle;
     p_input->i_mtu = socket_desc.i_mtu;
+
+    /* Update default_pts to a suitable value for udp access */
+    p_input->i_pts_delay = config_GetInt( p_input, "udp-caching" ) * 1000;
 
     return( 0 );
 }
