@@ -2,7 +2,7 @@
  * rawvideo.c: Pseudo audio decoder; for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.2 2003/04/26 12:26:46 gbazin Exp $
+ * $Id: rawvideo.c,v 1.3 2003/04/27 17:53:20 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -80,9 +80,25 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     switch( p_fifo->i_fourcc )
     {
-        case VLC_FOURCC('I','4','2','0'):
+        /* Planar YUV */
+        case VLC_FOURCC('I','4','4','4'):
         case VLC_FOURCC('I','4','2','2'):
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','Y','U','V'):
+        case VLC_FOURCC('I','4','1','1'):
+        case VLC_FOURCC('I','4','1','0'):
+
+	/* Packed YUV */
         case VLC_FOURCC('Y','U','Y','2'):
+        case VLC_FOURCC('U','Y','V','Y'):
+
+	/* RGB */
+        case VLC_FOURCC('R','V','3','2'):
+        case VLC_FOURCC('R','V','2','4'):
+        case VLC_FOURCC('R','V','1','6'):
+        case VLC_FOURCC('R','V','1','5'):
+
             p_fifo->pf_run = RunDecoder;
             return VLC_SUCCESS;
 
@@ -145,7 +161,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
  *****************************************************************************/
 static int InitThread( vdec_thread_t * p_vdec )
 {
-    vlc_fourcc_t i_chroma;
+    picture_t *p_pic;
+    int i;
 
 #define bih ((BITMAPINFOHEADER*)p_vdec->p_fifo->p_bitmapinfoheader)
     if( bih == NULL )
@@ -162,35 +179,34 @@ static int InitThread( vdec_thread_t * p_vdec )
         return( VLC_EGENERIC );
     }
 
-    switch( p_vdec->p_fifo->i_fourcc )
-    {
-        case VLC_FOURCC( 'I', '4', '2', '0' ):
-            i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
-            p_vdec->i_raw_size = bih->biWidth * bih->biHeight * 3 / 2;
-            break;
-        case VLC_FOURCC( 'I', '4', '2', '2' ):
-            i_chroma = VLC_FOURCC( 'I', '4', '2', '2' );
-            p_vdec->i_raw_size = bih->biWidth * bih->biHeight * 2;
-            break;
-        case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
-            i_chroma = VLC_FOURCC( 'Y', 'U', 'Y', '2' );
-            p_vdec->i_raw_size = bih->biWidth * bih->biHeight * 2;
-            break;
-        default:
-            msg_Err( p_vdec->p_fifo, "invalid codec=%4.4s", (char*)&p_vdec->p_fifo->i_fourcc );
-            return( VLC_EGENERIC );
-    }
-
     p_vdec->p_vout = vout_Request( p_vdec->p_fifo, NULL,
                                    bih->biWidth, bih->biHeight,
-                                   i_chroma,
-                                   VOUT_ASPECT_FACTOR * bih->biWidth / bih->biHeight );
+                                   p_vdec->p_fifo->i_fourcc,
+                                   VOUT_ASPECT_FACTOR * bih->biWidth /
+                                   bih->biHeight );
 
     if( p_vdec->p_vout == NULL )
     {
         msg_Err( p_vdec->p_fifo, "failled created vout" );
         return( VLC_EGENERIC );
     }
+
+    /* Get a 1 picture to be able to compute p_vdec->i_raw_size */
+    p_pic = vout_CreatePicture( p_vdec->p_vout, 0, 0, 0 );
+    if( p_pic == NULL )
+    {
+        msg_Err( p_vdec->p_fifo, "failled to get a vout picture" );
+        return( VLC_EGENERIC );
+    }
+
+    p_vdec->i_raw_size = 0;
+    for( i = 0; i < p_pic->i_planes; i++ )
+    {
+        p_vdec->i_raw_size += p_pic->p[i].i_lines * p_pic->p[i].i_visible_pitch
+            * p_pic->p[i].i_pixel_pitch;
+    }
+
+    vout_DestroyPicture( p_vdec->p_vout, p_pic );
 
     return( VLC_SUCCESS );
 #undef bih

@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.218 2003/04/14 22:22:32 massiot Exp $
+ * $Id: video_output.c,v 1.219 2003/04/27 17:53:20 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -394,7 +394,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent,
     vlc_object_attach( p_vout, p_parent );
 
     if( vlc_thread_create( p_vout, "video output", RunThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+                           VLC_THREAD_PRIORITY_OUTPUT, VLC_TRUE ) )
     {
         msg_Err( p_vout, "out of memory" );
         module_Unneed( p_vout, p_vout->p_module );
@@ -620,6 +620,10 @@ static void RunThread( vout_thread_t *p_vout)
      * Initialize thread
      */
     p_vout->b_error = InitThread( p_vout );
+
+    /* signal the creation of the vout */
+    vlc_thread_ready( p_vout );
+
     if( p_vout->b_error )
     {
         /* Destroy thread structures allocated by Create and InitThread */
@@ -885,7 +889,8 @@ static void RunThread( vout_thread_t *p_vout)
             }
 
             /* Need to reinitialise the chroma plugin */
-            p_vout->chroma.p_module->pf_deactivate( VLC_OBJECT(p_vout) );
+            if( p_vout->chroma.p_module->pf_deactivate )
+                p_vout->chroma.p_module->pf_deactivate( VLC_OBJECT(p_vout) );
             p_vout->chroma.p_module->pf_activate( VLC_OBJECT(p_vout) );
         }
     }

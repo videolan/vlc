@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.37 2003/04/20 12:59:02 massiot Exp $
+ * $Id: vout_pictures.c,v 1.38 2003/04/27 17:53:21 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -448,6 +448,19 @@ void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
     /* Calculate coordinates */
     switch( i_chroma )
     {
+        case FOURCC_I411:
+            p_pic->p[ Y_PLANE ].i_lines = i_height;
+            p_pic->p[ Y_PLANE ].i_pitch = i_width;
+            p_pic->p[ Y_PLANE ].i_visible_pitch = p_pic->p[ Y_PLANE ].i_pitch;
+            p_pic->p[ U_PLANE ].i_lines = i_height;
+            p_pic->p[ U_PLANE ].i_pitch = i_width / 4;
+            p_pic->p[ U_PLANE ].i_visible_pitch = p_pic->p[ U_PLANE ].i_pitch;
+            p_pic->p[ V_PLANE ].i_lines = i_height;
+            p_pic->p[ V_PLANE ].i_pitch = i_width / 4;
+            p_pic->p[ V_PLANE ].i_visible_pitch = p_pic->p[ V_PLANE ].i_pitch;
+            p_pic->i_planes = 3;
+            break;
+
         case FOURCC_I410:
             p_pic->p[ Y_PLANE ].i_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width;
