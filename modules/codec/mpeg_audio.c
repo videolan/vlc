@@ -2,7 +2,7 @@
  * mpeg_audio.c: parse MPEG audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: mpeg_audio.c,v 1.18 2003/10/04 12:04:06 gbazin Exp $
+ * $Id: mpeg_audio.c,v 1.19 2003/10/05 00:50:05 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -50,6 +50,7 @@ struct decoder_sys_t
      * Input properties
      */
     int        i_state;
+    vlc_bool_t b_synchro;
 
     block_t *p_chain;
     block_bytestream_t bytestream;
@@ -93,7 +94,6 @@ enum {
     STATE_DATA
 };
 
-#define MAX_FRAME_SIZE 10000
 /* This isn't the place to put mad-specific stuff. However, it makes the
  * mad plug-in's life much easier if we put 8 extra bytes at the end of the
  * buffer, because that way it doesn't have to copy the aout_buffer_t to a
@@ -118,9 +118,10 @@ static int GetSoutBuffer( decoder_t *, sout_buffer_t ** );
 static int SendOutBuffer( decoder_t * );
 
 static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
+                     unsigned int * pi_channels_conf,
                      unsigned int * pi_sample_rate, unsigned int * pi_bit_rate,
                      unsigned int * pi_frame_length,
-                     unsigned int * pi_current_frame_length,
+                     unsigned int * pi_max_frame_size,
                      unsigned int * pi_layer );
 
 /*****************************************************************************
@@ -182,6 +183,7 @@ static int OpenPacketizer( vlc_object_t *p_this )
 static int InitDecoder( decoder_t *p_dec )
 {
     p_dec->p_sys->i_state = STATE_NOSYNC;
+    p_dec->p_sys->b_synchro = VLC_FALSE;
 
     p_dec->p_sys->p_out_buffer = NULL;
     aout_DateSet( &p_dec->p_sys->end_date, 0 );
@@ -196,7 +198,7 @@ static int InitDecoder( decoder_t *p_dec )
     p_dec->p_sys->sout_format.i_cat = AUDIO_ES;
     p_dec->p_sys->sout_format.i_fourcc = VLC_FOURCC('m','p','g','a');
 
-    /* Start with the inimum size for a free bitrate frame */
+    /* Start with the minimum size for a free bitrate frame */
     p_dec->p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
 
     p_dec->p_sys->p_chain = NULL;
@@ -215,10 +217,12 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
     uint8_t p_header[MAD_BUFFER_GUARD];
     uint32_t i_header;
 
-    if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
+    if( (!aout_DateGet( &p_sys->end_date ) && !p_block->i_pts)
+        || p_block->b_discontinuity )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
+        p_sys->b_synchro = VLC_FALSE;
         return VLC_SUCCESS;
     }
 
@@ -248,6 +252,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                     break;
                 }
                 block_SkipByte( &p_sys->bytestream );
+                p_sys->b_synchro = VLC_FALSE;
             }
             if( p_sys->i_state != STATE_SYNC )
             {
@@ -284,11 +289,12 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
             /* Check if frame is valid and get frame info */
             p_sys->i_frame_size = SyncInfo( i_header,
+                                            &p_sys->i_channels,
                                             &p_sys->i_channels_conf,
                                             &p_sys->i_rate,
                                             &p_sys->i_bit_rate,
                                             &p_sys->i_frame_length,
-                                            &p_sys->i_frame_size,
+                                            &p_sys->i_max_frame_size,
                                             &p_sys->i_layer );
 
             if( p_sys->i_frame_size == -1 )
@@ -296,6 +302,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                 msg_Dbg( p_dec, "emulated start code" );
                 block_SkipByte( &p_sys->bytestream );
                 p_sys->i_state = STATE_NOSYNC;
+                p_sys->b_synchro = VLC_FALSE;
                 break;
             }
 
@@ -328,7 +335,8 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             {
                 /* Startcode is fine, let's try the header as an extra check */
                 int i_next_frame_size;
-                unsigned int i_next_channels, i_next_rate, i_next_bit_rate;
+                unsigned int i_next_channels, i_next_channels_conf;
+                unsigned int i_next_rate, i_next_bit_rate;
                 unsigned int i_next_frame_length, i_next_max_frame_size;
                 unsigned int i_next_layer;
 
@@ -338,6 +346,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
                 i_next_frame_size = SyncInfo( i_header,
                                               &i_next_channels,
+                                              &i_next_channels_conf,
                                               &i_next_rate,
                                               &i_next_bit_rate,
                                               &i_next_frame_length,
@@ -375,7 +384,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                 }
 
                 /* Check info is in sync with previous one */
-                if( i_next_channels != p_sys->i_channels_conf ||
+                if( i_next_channels_conf != p_sys->i_channels_conf ||
                     i_next_rate != p_sys->i_rate ||
                     i_next_layer != p_sys->i_layer ||
                     i_next_frame_length != p_sys->i_frame_length )
@@ -391,16 +400,27 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                              "(emulated startcode ?)" );
                     block_SkipByte( &p_sys->bytestream );
                     p_sys->i_state = STATE_NOSYNC;
+                    p_sys->b_synchro = VLC_FALSE;
                     break;
                 }
             }
             else
             {
-                msg_Dbg( p_dec, "emulated startcode "
-                         "(no startcode on following frame)" );
-                p_sys->i_state = STATE_NOSYNC;
-                block_SkipByte( &p_sys->bytestream );
-                break;
+                /* Free bitrate only */
+                if( p_sys->i_bit_rate == 0 )
+                {
+                    p_sys->i_frame_size++;
+                    break;
+                }
+
+                if( !p_sys->b_synchro )
+                {
+                    msg_Dbg( p_dec, "emulated startcode "
+                             "(no startcode on following frame)" );
+                    p_sys->i_state = STATE_NOSYNC;
+                    block_SkipByte( &p_sys->bytestream );
+                    break;
+                }
             }
 
             if( GetOutBuffer( p_dec, &p_sys->p_out_buffer ) != VLC_SUCCESS )
@@ -436,6 +456,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
 
             SendOutBuffer( p_dec );
             p_sys->i_state = STATE_NOSYNC;
+            p_sys->b_synchro = VLC_TRUE;
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->pts == p_sys->bytestream.p_block->i_pts )
@@ -480,7 +501,7 @@ static int GetAoutBuffer( decoder_t *p_dec, aout_buffer_t **pp_buffer )
     if( p_sys->p_aout_input != NULL &&
         ( p_sys->aout_format.i_rate != p_sys->i_rate
         || p_sys->aout_format.i_original_channels != p_sys->i_channels_conf
-        || (int)p_sys->aout_format.i_bytes_per_frame !=
+        || p_sys->aout_format.i_bytes_per_frame !=
            p_sys->i_max_frame_size + MAD_BUFFER_GUARD
         || p_sys->aout_format.i_frame_length != p_sys->i_frame_length
         || p_sys->i_current_layer != p_sys->i_layer ) )
@@ -570,7 +591,7 @@ static int GetSoutBuffer( decoder_t *p_dec, sout_buffer_t **pp_buffer )
             *pp_buffer = NULL;
             return VLC_EGENERIC;
         }
-        msg_Info( p_dec, "A/52 channels:%d samplerate:%d bitrate:%d",
+        msg_Info( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
                   p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
     }
 
@@ -606,6 +627,8 @@ static int SendOutBuffer( decoder_t *p_dec )
     else
     {
         /* We have all we need, send the buffer to the aout core. */
+        p_sys->p_aout_buffer->i_nb_bytes =
+            p_sys->i_frame_size + MAD_BUFFER_GUARD;
         aout_DecPlay( p_sys->p_aout, p_sys->p_aout_input,
                       p_sys->p_aout_buffer );
         p_sys->p_aout_buffer = NULL;
@@ -655,11 +678,12 @@ static int EndDecoder( decoder_t *p_dec )
  * SyncInfo: parse MPEG audio sync info
  *****************************************************************************/
 static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
+                     unsigned int * pi_channels_conf,
                      unsigned int * pi_sample_rate, unsigned int * pi_bit_rate,
                      unsigned int * pi_frame_length,
-                     unsigned int * pi_frame_size, unsigned int * pi_layer )
+                     unsigned int * pi_max_frame_size, unsigned int * pi_layer)
 {
-    static const int pppi_mpegaudio_bitrate[2][3][16] =
+    static const int ppi_bitrate[2][3][16] =
     {
         {
             /* v1 l1 */
@@ -686,7 +710,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
         }
     };
 
-    static const int ppi_mpegaudio_samplerate[2][4] = /* version 1 then 2 */
+    static const int ppi_samplerate[2][4] = /* version 1 then 2 */
     {
         { 44100, 48000, 32000, 0 },
         { 22050, 24000, 16000, 0 }
@@ -694,7 +718,7 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
 
     int i_version, i_mode, i_emphasis;
     vlc_bool_t b_padding, b_mpeg_2_5;
-    int i_current_frame_size = 0;
+    int i_frame_size = 0;
     int i_bitrate_index, i_samplerate_index;
     int i_max_bit_rate;
 
@@ -719,19 +743,22 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
         {
         case 0: /* stereo */
         case 1: /* joint stereo */
-            *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+            *pi_channels = 2;
+            *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
             break;
         case 2: /* dual-mono */
-            *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
-                            | AOUT_CHAN_DUALMONO;
+            *pi_channels = 2;
+            *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                                | AOUT_CHAN_DUALMONO;
             break;
         case 3: /* mono */
-            *pi_channels = AOUT_CHAN_CENTER;
+            *pi_channels = 1;
+            *pi_channels_conf = AOUT_CHAN_CENTER;
             break;
         }
-        *pi_bit_rate = pppi_mpegaudio_bitrate[i_version][*pi_layer-1][i_bitrate_index];
-        i_max_bit_rate = pppi_mpegaudio_bitrate[i_version][*pi_layer-1][14];
-        *pi_sample_rate = ppi_mpegaudio_samplerate[i_version][i_samplerate_index];
+        *pi_bit_rate = ppi_bitrate[i_version][*pi_layer-1][i_bitrate_index];
+        i_max_bit_rate = ppi_bitrate[i_version][*pi_layer-1][14];
+        *pi_sample_rate = ppi_samplerate[i_version][i_samplerate_index];
 
         if ( b_mpeg_2_5 )
         {
@@ -741,24 +768,23 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
         switch( *pi_layer )
         {
         case 1:
-            i_current_frame_size = ( 12000 * *pi_bit_rate /
-                                     *pi_sample_rate + b_padding ) * 4;
-            *pi_frame_size = ( 12000 * i_max_bit_rate /
-                               *pi_sample_rate + 1 ) * 4;
+            i_frame_size = ( 12000 * *pi_bit_rate / *pi_sample_rate +
+                           b_padding ) * 4;
+            *pi_max_frame_size = ( 12000 * i_max_bit_rate /
+                                 *pi_sample_rate + 1 ) * 4;
             *pi_frame_length = 384;
             break;
 
         case 2:
-            i_current_frame_size = 144000 * *pi_bit_rate /
-                                   *pi_sample_rate + b_padding;
-            *pi_frame_size = 144000 * i_max_bit_rate / *pi_sample_rate + 1;
+            i_frame_size = 144000 * *pi_bit_rate / *pi_sample_rate + b_padding;
+            *pi_max_frame_size = 144000 * i_max_bit_rate / *pi_sample_rate + 1;
             *pi_frame_length = 1152;
             break;
 
         case 3:
-            i_current_frame_size = ( i_version ? 72000 : 144000 ) *
-                                   *pi_bit_rate / *pi_sample_rate + b_padding;
-            *pi_frame_size = ( i_version ? 72000 : 144000 ) *
+            i_frame_size = ( i_version ? 72000 : 144000 ) *
+                           *pi_bit_rate / *pi_sample_rate + b_padding;
+            *pi_max_frame_size = ( i_version ? 72000 : 144000 ) *
                                  i_max_bit_rate / *pi_sample_rate + 1;
             *pi_frame_length = i_version ? 576 : 1152;
             break;
@@ -772,5 +798,5 @@ static int SyncInfo( uint32_t i_header, unsigned int * pi_channels,
         return -1;
     }
 
-    return i_current_frame_size;
+    return i_frame_size;
 }

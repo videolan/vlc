@@ -2,7 +2,7 @@
  * vlc_block_helper.h: Helper functions for data blocks management.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block_helper.h,v 1.2 2003/09/30 20:36:46 gbazin Exp $
+ * $Id: vlc_block_helper.h,v 1.3 2003/10/05 00:50:05 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -165,9 +165,10 @@ static inline int block_SkipBytes( block_bytestream_t *p_bytestream,
     {
         i_copy = __MIN( i_data, p_block->i_buffer - i_offset );
         i_data -= i_copy;
-        i_offset = 0;
 
         if( !i_data ) break;
+
+        i_offset = 0;
     }
 
     if( i_data )
@@ -177,7 +178,7 @@ static inline int block_SkipBytes( block_bytestream_t *p_bytestream,
     }
 
     p_bytestream->p_block = p_block;
-    p_bytestream->i_offset = i_copy;
+    p_bytestream->i_offset = i_offset + i_copy;
     return VLC_SUCCESS;
 }
 
@@ -273,14 +274,14 @@ static inline int block_GetBytes( block_bytestream_t *p_bytestream,
             p_data += i_copy;
         }
 
-        i_offset = 0;
-
         if( !i_size ) break;
+
+        i_offset = 0;
     }
 
     /* No buffer given, just skip the data */
     p_bytestream->p_block = p_block;
-    p_bytestream->i_offset = i_copy;
+    p_bytestream->i_offset = i_offset + i_copy;
 
     return VLC_SUCCESS;
 }
