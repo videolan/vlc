@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.9 2001/12/29 15:40:53 massiot Exp $
+ * $Id: input_dvdread.c,v 1.10 2001/12/29 22:22:01 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -117,7 +117,7 @@ DECLARE_BUFFERS_NEWPACKET_SHARED( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_DELETEPACKET_SHARED( FLAGS, NB_LIFO, 1000 );
 DECLARE_BUFFERS_NEWPES( FLAGS, NB_LIFO );
 DECLARE_BUFFERS_DELETEPES( FLAGS, NB_LIFO, 1000 );
-DECLARE_BUFFERS_TOIO( FLAGS, DVD_LB_SIZE );
+DECLARE_BUFFERS_TOIO( FLAGS, DVD_VIDEO_LB_LEN );
 DECLARE_BUFFERS_SHAREBUFFER( FLAGS );
 
 /*****************************************************************************
@@ -878,7 +878,7 @@ static int DvdReadRead( input_thread_t * p_input,
         data_packet_t * p_current = p_data_p;
         i_pos = 0;
 
-        while( i_pos < DVD_LB_SIZE )
+        while( i_pos < DVD_VIDEO_LB_LEN )
         {
             pi_cur = (u8*)p_vec[i_iovec].iov_base + i_pos;
 

@@ -2,7 +2,7 @@
  * input_dvdread.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dvdread.h,v 1.2 2001/12/26 00:01:18 massiot Exp $
+ * $Id: input_dvdread.h,v 1.3 2001/12/29 22:22:01 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -35,7 +35,6 @@
 #include "videolan/dvdread.h"
 
 /* Logical block size for DVD-VIDEO */
-#define DVD_LB_SIZE 2048
 #define LB2OFF(x) ((off_t)(x) * (off_t)(DVD_VIDEO_LB_LEN))
 #define OFF2LB(x) ((x) >> 11)
 
