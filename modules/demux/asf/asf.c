@@ -426,8 +426,7 @@ static int DemuxPacket( demux_t *p_demux )
         }
         else if( i_replicated_data_length == 1 )
         {
-
-            msg_Dbg( p_demux, "found compressed payload" );
+            /* msg_Dbg( p_demux, "found compressed payload" ); */
 
             i_pts = (mtime_t)i_tmp * 1000;
             i_pts_delta = (mtime_t)p_peek[i_skip] * 1000; i_skip++;
