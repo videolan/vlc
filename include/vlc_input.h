@@ -265,8 +265,12 @@ struct input_thread_t
     /* Internal caching common for all inputs */
     int64_t i_pts_delay;
 
-    /* By input properties (will become an array with multi-input) */
+    /* Main input properties */
     input_source_t input;
+
+    /* Slave demuxers (subs, and others) */
+    int            i_slave;
+    input_source_t **slave;
 
     /* Buffer of pending actions */
     vlc_mutex_t lock_control;
