@@ -55,7 +55,7 @@ static void sub_close( subtitle_demux_t *p_sub );
 
 static void sub_fix( subtitle_demux_t *p_sub );
 
-static char *ppsz_sub_type[] = { "auto", "microdvd", "subrip", "ssa1",
+static char *ppsz_sub_type[] = { "auto", "microdvd", "subrip", "subviewer", "ssa1",
   "ssa2-4", "vplayer", "sami", "vobsub" };
 
 /*****************************************************************************
@@ -207,6 +207,7 @@ static void text_rewind( text_t *txt )
 
 static int  sub_MicroDvdRead( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_SubRipRead  ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+static int  sub_SubViewer   ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_SSARead     ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_Vplayer     ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_Sami        ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
@@ -224,6 +225,7 @@ static struct
 {
     { "microdvd",   SUB_TYPE_MICRODVD,  "MicroDVD", sub_MicroDvdRead },
     { "subrip",     SUB_TYPE_SUBRIP,    "SubRIP",   sub_SubRipRead },
+    { "subviewer",  SUB_TYPE_SUBVIEWER, "SubViewer",sub_SubViewer },
     { "ssa1",       SUB_TYPE_SSA1,      "SSA-1",    sub_SSARead },
     { "ssa2-4",     SUB_TYPE_SSA2_4,    "SSA-2/3/4",sub_SSARead },
     { "vplayer",    SUB_TYPE_VPLAYER,   "VPlayer",  sub_Vplayer },
@@ -391,6 +393,11 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
             else if( !strncasecmp( s, "Dialogue: Marked", 16  ) )
             {
                 i_sub_type = SUB_TYPE_SSA2_4; /* could be wrong */
+                break;
+            }
+            else if( local_stristr( s, "[INFORMATION]" ) )
+            {
+                i_sub_type = SUB_TYPE_SUBVIEWER; /* I hope this will work */
                 break;
             }
             else if( sscanf( s, "%d:%d:%d:", &i_dummy, &i_dummy, &i_dummy ) == 3 ||
@@ -872,6 +879,98 @@ static int  sub_SubRipRead( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_
     }
 }
 
+static int  sub_SubViewer( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
+{
+    /*
+     * h1:m1:s1.d1,h2:m2:s2.d2
+     * Line1[br]Line2
+     * Line3
+     * ...
+     * [empty line]
+     * ( works with subviewer and subviewer v2 )
+     */
+    char *s;
+    char buffer_text[ 10 * MAX_LINE];
+    int  i_buffer_text;
+    mtime_t     i_start;
+    mtime_t     i_stop;
+
+    p_subtitle->i_start = 0;
+    p_subtitle->i_stop  = 0;
+    p_subtitle->i_vobsub_location  = 0;
+    p_subtitle->psz_text = NULL;
+
+    for( ;; )
+    {
+        int h1, m1, s1, d1, h2, m2, s2, d2;
+        if( ( s = text_get_line( txt ) ) == NULL )
+        {
+            return( VLC_EGENERIC );
+        }
+        if( sscanf( s,
+                    "%d:%d:%d.%d,%d:%d:%d.%d",
+                    &h1, &m1, &s1, &d1,
+                    &h2, &m2, &s2, &d2 ) == 8 )
+        {
+            i_start = ( (mtime_t)h1 * 3600*1000 +
+                        (mtime_t)m1 * 60*1000 +
+                        (mtime_t)s1 * 1000 +
+                        (mtime_t)d1 ) * 1000;
+
+            i_stop  = ( (mtime_t)h2 * 3600*1000 +
+                        (mtime_t)m2 * 60*1000 +
+                        (mtime_t)s2 * 1000 +
+                        (mtime_t)d2 ) * 1000;
+
+            /* Now read text until an empty line */
+            for( i_buffer_text = 0;; )
+            {
+                int i_len, i;
+                if( ( s = text_get_line( txt ) ) == NULL )
+                {
+                    return( VLC_EGENERIC );
+                }
+
+                i_len = strlen( s );
+                if( i_len <= 1 )
+                {
+                    /* empty line -> end of this subtitle */
+                    buffer_text[__MAX( i_buffer_text - 1, 0 )] = '\0';
+                    p_subtitle->i_start = i_start;
+                    p_subtitle->i_stop = i_stop;
+
+                    /* replace [br] by \n */
+                    for( i = 0; i < strlen( buffer_text ) - 3; i++ )
+                    {
+                        if( buffer_text[i] == '[' && buffer_text[i+1] == 'b' &&
+                            buffer_text[i+2] == 'r' && buffer_text[i+3] == ']' )
+                        {
+                            char *temp = buffer_text + i + 1;
+                            buffer_text[i] = '\n';
+                            memmove( temp, temp+3, strlen( temp-3 ));
+                        }
+                    }
+                    p_subtitle->psz_text = strdup( buffer_text );
+                    return( 0 );
+                }
+                else
+                {
+                    if( i_buffer_text + i_len + 1 < 10 * MAX_LINE )
+                    {
+                        memcpy( buffer_text + i_buffer_text,
+                                s,
+                                i_len );
+                        i_buffer_text += i_len;
+
+                        buffer_text[i_buffer_text] = '\n';
+                        i_buffer_text++;
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 static int  sub_SSARead( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe )
 {
@@ -961,7 +1060,6 @@ static int  sub_Vplayer( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_sub
      *  h:m:s:Line1|Line2|Line3....
      *  or
      *  h:m:s Line1|Line2|Line3....
-     * where n1 and n2 are the video frame number...
      *
      */
     char *p;

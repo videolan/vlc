@@ -29,6 +29,7 @@
 #define SUB_TYPE_SSA2_4     0x03
 #define SUB_TYPE_VPLAYER    0x04
 #define SUB_TYPE_SAMI       0x05
+#define SUB_TYPE_SUBVIEWER  0x06
 #define SUB_TYPE_VOBSUB     0x100
 #define SUB_TYPE_UNKNOWN    0xffff
 
