@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.17 2001/05/06 18:32:30 stef Exp $
+ * $Id: input_ts.c,v 1.18 2001/05/07 04:35:21 henri Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -132,6 +132,13 @@ static int TSProbe( probedata_t * p_data )
         psz_name += 5;
     }
 
+    if( ( strlen(psz_name) > 3 ) && 
+                    !strncasecmp( psz_name+strlen(psz_name)-3, ".ts", 3) )
+    {
+        /* If it is a ".ts" file it's probably a TS file ... */
+        return( 900 );
+    }
+    
     i_handle = open( psz_name, 0 );
     if( i_handle == -1 )
     {
