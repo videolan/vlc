@@ -66,11 +66,11 @@ static void     EndThread               (lpcmdec_thread_t * p_adec);
 lpcmdec_thread_t * lpcmdec_CreateThread (input_thread_t * p_input)
 {
     lpcmdec_thread_t *   p_lpcmdec;
-    fprintf (stderr, "LPCM Debug: creating lpcm decoder thread\n");
+    intf_DbgMsg ( "LPCM Debug: creating lpcm decoder thread\n" );
 
     /* Allocate the memory needed to store the thread's structure */
     if ((p_lpcmdec = (lpcmdec_thread_t *)malloc (sizeof(lpcmdec_thread_t))) == NULL) {
-        fprintf (stderr, "LPCM Error: not enough memory for lpcmdec_CreateThread() to create the new thread\n");
+        intf_ErrMsg ( "LPCM Error: not enough memory for lpcmdec_CreateThread() to create the new thread\n" );
         return NULL;
     }
 
@@ -104,12 +104,12 @@ lpcmdec_thread_t * lpcmdec_CreateThread (input_thread_t * p_input)
 
     /* Spawn the lpcm decoder thread */
     if (vlc_thread_create(&p_lpcmdec->thread_id, "lpcm decoder", (vlc_thread_func_t)RunThread, (void *)p_lpcmdec)) {
-        fprintf  (stderr, "LPCM Error: can't spawn lpcm decoder thread\n");
+        intf_ErrMsg  ( "LPCM Error: can't spawn lpcm decoder thread\n" );
         free (p_lpcmdec);
         return NULL;
     }
 
-    fprintf (stderr, "LPCM Debug: lpcm decoder thread (%p) created\n", p_lpcmdec);
+    intf_DbgMsg ( "LPCM Debug: lpcm decoder thread (%p) created\n", p_lpcmdec );
     return p_lpcmdec;
 }
 
@@ -118,7 +118,7 @@ lpcmdec_thread_t * lpcmdec_CreateThread (input_thread_t * p_input)
  *****************************************************************************/
 void lpcmdec_DestroyThread (lpcmdec_thread_t * p_lpcmdec)
 {
-    fprintf (stderr, "LPCM Debug: requesting termination of lpcm decoder thread %p\n", p_lpcmdec);
+    intf_DbgMsg ( "LPCM Debug: requesting termination of lpcm decoder thread %p\n", p_lpcmdec );
 
     /* Ask thread to kill itself */
     p_lpcmdec->b_die = 1;
@@ -143,7 +143,7 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
     aout_fifo_t         aout_fifo;
     lpcm_byte_stream_t * byte_stream;
 
-    fprintf (stderr, "LPCM Debug: initializing lpcm decoder thread %p\n", p_lpcmdec);
+    intf_DbgMsg ( "LPCM Debug: initializing lpcm decoder thread %p\n", p_lpcmdec );
 
     /* Our first job is to initialize the bit stream structure with the
      * beginning of the input stream */
@@ -175,7 +175,7 @@ static int InitThread (lpcmdec_thread_t * p_lpcmdec)
         return -1;
     }
 
-    fprintf (stderr,"LPCM Debug: lpcm decoder thread %p initialized\n", p_lpcmdec);
+    intf_DbgMsg ( "LPCM Debug: lpcm decoder thread %p initialized\n", p_lpcmdec );
     return 0;
 }
 
@@ -186,7 +186,7 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
 {
     int sync;
 
-    fprintf (stderr,"LPCM Debug: running lpcm decoder thread (%p) (pid== %i)\n", p_lpcmdec, getpid());
+    intf_DbgMsg( "LPCM Debug: running lpcm decoder thread (%p) (pid== %i)\n", p_lpcmdec, getpid() );
 
     msleep (INPUT_PTS_DELAY);
 
@@ -237,7 +237,7 @@ static void RunThread (lpcmdec_thread_t * p_lpcmdec)
 	    vlc_cond_signal (&p_lpcmdec->p_aout_fifo->data_wait);
 	    vlc_mutex_unlock (&p_lpcmdec->p_aout_fifo->data_lock);
 
-        fprintf(stderr, "LPCM Debug: %x\n", *buffer);
+        intf_DbgMsg( "LPCM Debug: %x\n", *buffer );
         bad_frame:
     }
 
@@ -281,7 +281,7 @@ static void ErrorThread (lpcmdec_thread_t * p_lpcmdec)
  *****************************************************************************/
 static void EndThread (lpcmdec_thread_t * p_lpcmdec)
 {
-    fprintf (stderr, "LPCM Debug: destroying lpcm decoder thread %p\n", p_lpcmdec);
+    intf_DbgMsg( "LPCM Debug: destroying lpcm decoder thread %p\n", p_lpcmdec );
 
     /* If the audio output fifo was created, we destroy it */
     if (p_lpcmdec->p_aout_fifo != NULL) {
@@ -296,7 +296,7 @@ static void EndThread (lpcmdec_thread_t * p_lpcmdec)
     /* Destroy descriptor */
     free (p_lpcmdec);
 
-    fprintf (stderr, "LPCM Debug: lpcm decoder thread %p destroyed\n", p_lpcmdec);
+    intf_DbgMsg( "LPCM Debug: lpcm decoder thread %p destroyed\n", p_lpcmdec );
 }
 
 void lpcm_byte_stream_next (lpcm_byte_stream_t * p_byte_stream)

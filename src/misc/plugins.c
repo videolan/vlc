@@ -78,11 +78,12 @@ int RequestPlugin ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name )
 
 #if defined(HAVE_DLFCN_H)
 	if( *p_plugin != NULL )
-            return( 0 );
 #elif defined(HAVE_IMAGE_H)
         if( *p_plugin >= 0 )
-            return( 0 );
 #endif
+        {
+            return( 0 );
+        }
     }
 
     return( -1 );

@@ -111,15 +111,9 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
 
         i_displaydate = p_vpar->synchro.i_last_display_pts
                        + 1000000.0 / (p_vpar->synchro.theorical_fps);
-        //fprintf (stderr, "  ");
     }
 
     decoder_fifo->buffer[decoder_fifo->i_start]->b_has_pts = 0;
-
-    /* else fprintf (stderr, "R ");
-    if (dropped) fprintf (stderr, "  "); else fprintf (stderr, "* ");
-    fprintf (stderr, "%i ", i_coding_type);
-    fprintf (stderr, "pts %lli delta %lli\n", i_displaydate, i_displaydate - p_vpar->synchro.i_last_display_pts); */
 
     p_vpar->synchro.i_images_since_pts--;
     p_vpar->synchro.i_last_display_pts = i_displaydate;
@@ -261,8 +255,7 @@ void vpar_SynchroUpdateStructures( vpar_thread_t * p_vpar,
                 p_vpar->synchro.displayable_b = 0;
 
 #if 0
-            fprintf( stderr,
-                "I %i  P %i (%f)  B %i (%f)\n",
+            intf_DbgMsg( "I %i  P %i (%f)  B %i (%f)\n",
                 p_vpar->synchro.can_display_i,
                 p_vpar->synchro.can_display_p,
                 p_vpar->synchro.displayable_p,
@@ -308,7 +301,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             if( p_vpar->synchro.displayable_p * i_delay
                 < p_vpar->synchro.i_mean_decode_time )
             {
-                //fprintf( stderr, "trashed a P\n");
+                //intf_ErrMsg( "trashed a P\n" );
                 return( 0 );
             }
 
@@ -324,7 +317,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
             if( i_delay < (1 + (p_vpar->synchro.modulo & 0x3))
                 * p_vpar->synchro.i_mean_decode_time )
             {
-                //fprintf( stderr, "trashed a B\n");
+                //intf_ErrMsg( "trashed a B\n" );
                 return( 0 );
             }
 
@@ -379,9 +372,8 @@ void vpar_SynchroEnd( vpar_thread_t * p_vpar )
     p_vpar->synchro.i_mean_decode_time =
         ( 7 * p_vpar->synchro.i_mean_decode_time + i_decode_time ) / 8;
 
-    /* fprintf (stderr,
-        "decoding time was %lli\n",
-        p_vpar->synchro.i_mean_decode_time); */
+    /* intf_ErrMsg( "decoding time was %lli\n",
+        p_vpar->synchro.i_mean_decode_time ); */
 
     p_vpar->synchro.i_fifo_start = (p_vpar->synchro.i_fifo_start + 1) & 0xf;
 
@@ -397,14 +389,12 @@ mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 #if 0
     static mtime_t i_delta = 0;
 
-    fprintf( stderr,
-        "displaying type %i with delay %lli and delta %lli\n",
+    intf_ErrMsg( "displaying type %i with delay %lli and delta %lli\n",
         p_vpar->synchro.fifo[p_vpar->synchro.i_fifo_start].i_image_type,
         i_displaydate - mdate(),
         i_displaydate - i_delta );
 
-    fprintf (stderr,
-        "theorical fps: %f - actual fps: %f \n",
+    intf_ErrMsg ( "theorical fps: %f - actual fps: %f \n",
         p_vpar->synchro.theorical_fps, p_vpar->synchro.actual_fps );
 
     i_delta = i_displaydate;
@@ -603,9 +593,6 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
     {
     case I_CODING_TYPE:
 
-//fprintf( stderr, "p : %d (%d), b : %d (%d)\n", p_vpar->synchro.i_p_count, p_vpar->synchro.i_p_nb,
-//         p_vpar->synchro.i_b_count, p_vpar->synchro.i_b_nb );
-
         p_vpar->synchro.r_p_average =
             (p_vpar->synchro.r_p_average*(SYNC_AVERAGE_COUNT-1)+p_vpar->synchro.i_p_count)/SYNC_AVERAGE_COUNT;
         p_vpar->synchro.r_b_average =
@@ -665,7 +652,6 @@ void vpar_SynchroUpdateLevel()
 
 mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 {
-//fprintf( stderr, "delay : %Ld\n" , mdate() - p_vpar->synchro.i_current_frame_date );
     return( p_vpar->synchro.i_current_frame_date );
 }
 

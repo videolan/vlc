@@ -22,12 +22,20 @@
 #include <stdio.h>
 #include "defs.h"
 
-#include "int_types.h"
+#include "config.h"
+#include "common.h"
+#include "threads.h"
+#include "mtime.h"
+#include "plugins.h"
+
+#include "intf_msg.h"
+
+//#include "int_types.h"
 #include "lpcm_decoder.h"
 
 int lpcm_init (lpcmdec_t * p_lpcmdec)
 {
-    fprintf (stderr, "LPCM Debug: lpmcm init called\n");
+    intf_DbgMsg( "LPCM Debug: lpmcm init called\n" );
     return 0;
 }
 

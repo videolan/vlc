@@ -144,11 +144,11 @@ static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
     p_mb->p_picture->i_deccount--;
     b_finished = (p_mb->p_picture->i_deccount == 1);
     vlc_mutex_unlock( &p_mb->p_picture->lock_deccount );
-//fprintf(stderr, "%d ", p_mb->p_picture->i_deccount);
+//intf_DbgMsg( "%d ", p_mb->p_picture->i_deccount );
     /* Test if it was the last block of the picture */
     if( b_finished )
     {
-//fprintf(stderr, "Image decodee\n");
+//intf_DbgMsg( "Image decodee\n" );
         /* Mark the picture to be displayed */
         vout_DisplayPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 
@@ -204,7 +204,7 @@ static __inline__ void vpar_DestroyMacroblock( video_fifo_t * p_fifo,
     /* Test if it was the last block of the picture */
     if( b_finished )
     {
-fprintf(stderr, "Image trashee\n");
+        intf_DbgMsg( "Image trashee\n" );
         /* Mark the picture to be trashed */
         vout_DestroyPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 

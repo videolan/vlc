@@ -1362,8 +1362,8 @@ int adec_decode_frame (audiodec_t * p_adec, s16 * buffer)
     /* XXX rewrite the byte counting system to reduce overhead */
 
 #if 0
-    printf ("skip %d\n",
-	    p_adec->frame_size - p_adec->bit_stream.total_bytes_read);
+    intf_DbgMsg ( "skip %d\n",
+	    p_adec->frame_size - p_adec->bit_stream.total_bytes_read );
 #endif
 
     if (p_adec->bit_stream.total_bytes_read > p_adec->frame_size)

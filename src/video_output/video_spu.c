@@ -59,7 +59,6 @@ static int NewLine  ( vout_spu_t *p_vspu, int *i_id );
     if( b_aligned ) \
     { \
         i_next = *p_from[i_id]; \
-        /*printf("%.1x", i_next >> 4);*/ \
         p_from[ i_id ]++; \
         b_aligned = 0; \
         i = i_next >> 4; \
@@ -67,7 +66,6 @@ static int NewLine  ( vout_spu_t *p_vspu, int *i_id );
     else \
     { \
         b_aligned = 1; \
-        /*printf("%.1x", i_next & 0xf);*/ \
         i = i_next & 0xf; \
     }
 
@@ -76,7 +74,6 @@ static int NewLine  ( vout_spu_t *p_vspu, int *i_id );
     if( b_aligned ) \
     { \
         i_next = *p_from[i_id]; \
-        /*printf("%.1x", i_next >> 4);*/ \
         p_from[ i_id ]++; \
         b_aligned = 0; \
         i = (j) + (i_next >> 4); \
@@ -84,7 +81,6 @@ static int NewLine  ( vout_spu_t *p_vspu, int *i_id );
     else \
     { \
         b_aligned = 1; \
-        /*printf("%.1x", i_next & 0xf);*/ \
         i = (j) + (i_next & 0xf); \
     }
 

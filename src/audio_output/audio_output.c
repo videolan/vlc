@@ -545,7 +545,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
     l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) * (p_fifo->l_frame_size >> (p_fifo->b_stereo));
 
     l_rate = p_fifo->l_rate + ((aout_date - p_fifo->date[p_fifo->l_start_frame]) / 256);
-//    fprintf( stderr, "aout debug: %lli (%li);\n", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
+//    intf_DbgMsg( "aout debug: %lli (%li);\n", aout_date - p_fifo->date[p_fifo->l_start_frame], l_rate );
 
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->l_rate );
 
@@ -753,7 +753,7 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                         if ( p_aout->fifo[i_fifo].l_units > l_units )
                         {
                             l_buffer_limit = p_aout->l_units /*<< 1*/; /* p_aout->b_stereo == 1 */
-//fprintf(stderr,"l_buffer_limit:%d\n",l_buffer_limit);
+//intf_DbgMsg( "l_buffer_limit:%d\n",l_buffer_limit );
                             while ( l_buffer < l_buffer_limit )
                             {
 #if SOUND
@@ -764,20 +764,20 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                                     (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit+1] );
 
 /*
-//fprintf(stderr,"1deb ");
+//intf_DbgMsg( "1deb " );
 l_buffer++;
 p_aout->s32_buffer[l_buffer] += (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) / 2;
 p_aout->s32_buffer[l_buffer] += (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit+1] ) / 2;
 l_buffer++;
-//fprintf (stderr,"1fin ");
+//intf_DbgMsg( "1fin" );
 */
 #endif
 
 #if DEBUG 
-//fprintf(stderr,"p_aout->s32_buffer[l_buffer] 11 : %x (%d)",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1]);
-fprintf(stderr,"p_aout->fifo %ld\n",COEFF*p_aout->fifo[i_fifo].l_unit);
-fprintf(stderr,"%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) );
-//fprintf(stderr,"p_aout->s32_buffer[l_buffer] 12 : %x (%d)\n",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1]);
+//intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 11 : %x (%d)",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
+intf_DbgMsg( "p_aout->fifo %ld\n",COEFF*p_aout->fifo[i_fifo].l_unit );
+intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) );
+//intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 12 : %x (%d)\n",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
 #endif
 
                                 UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
@@ -795,7 +795,7 @@ fprintf(stderr,"%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo
                         {
 //#if 0
                             l_buffer_limit = l_buffer + (p_aout->fifo[i_fifo].l_units /*<< 1*/);
-//fprintf(stderr,"l_buffer_limit:%d\n",l_buffer_limit);
+//intf_DbgMsg( "l_buffer_limit:%d\n",l_buffer_limit );
                            /* p_aout->b_stereo == 1 */
                             while ( l_buffer < l_buffer_limit )
                             {
@@ -807,87 +807,87 @@ fprintf(stderr,"%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo
                                     (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit+1] );
 
 /*
-//fprintf(stderr,"2deb ");
+//intf_DbgMsg( "2deb " );
 l_buffer++;
-//fprintf(stderr,"793 ");
+//intf_DbgMsg( "793 ");
 // !!!!!! Seg Fault !!!!!!! 
-//fprintf(stderr,"\n p->aout_buffer : %d\t%d\n",p_aout->s32_buffer[l_buffer],COEFF*p_aout->fifo[i_fifo].l_unit);
+//intf_DbgMsg( "\n p->aout_buffer : %d\t%d\n",p_aout->s32_buffer[l_buffer],COEFF*p_aout->fifo[i_fifo].l_unit );
 if( COEFF*p_aout->fifo[i_fifo].l_unit < 60000 )
 {
     p_aout->s32_buffer[l_buffer] += (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) / 2;
-//    fprintf(stderr,"795 ");
+//    intf_DbgMsg( "795 ");
     p_aout->s32_buffer[l_buffer] += (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit+1] ) / 2;
-//fprintf(stderr,"797 ");
+//intf_DbgMsg( "797 ");
     l_buffer++;
 }
-//fprintf(stderr,"2fin ");
+//intf_DbgMsg( "2fin " );
 */
 #endif
 
 #if DEBUG
-//fprintf(stderr,"p_aout->s32_buffer[l_buffer] 21 : %x (%d)",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1]);
-fprintf(stderr,"p_aout->fifo %ld\n",COEFF*p_aout->fifo[i_fifo].l_unit);
-fprintf(stderr,"%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) );
-//fprintf(stderr,"p_aout->s32_buffer[l_buffer] 22 : %x (%d)\n",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1]);
+//intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 21 : %x (%d)",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
+intf_DbgMsg( "p_aout->fifo %ld\n",COEFF*p_aout->fifo[i_fifo].l_unit );
+intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i_fifo].buffer)[COEFF*p_aout->fifo[i_fifo].l_unit] ) );
+//intf_DbgMsg( "p_aout->s32_buffer[l_buffer] 22 : %x (%d)\n",p_aout->s32_buffer[l_buffer-1],p_aout->s32_buffer[l_buffer-1] );
 #endif
 
                                 UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
-//fprintf(stderr,"807 ");
+//intf_DbgMsg( "807 ");
                                 if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 1 */
                                      ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 2/*1*/)) )
                                 {
-//fprintf(stderr,"811 ");
+//intf_DbgMsg( "811 ");
                                     p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 1 */
                                         ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 2/*1*/));
                                 }
                             }
-//fprintf(stderr,"816 ");
+//intf_DbgMsg( "816 ");
                             l_units -= p_aout->fifo[i_fifo].l_units;
-//fprintf(stderr,"818 ");
+//intf_DbgMsg( "818 ");
                             vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
-//fprintf(stderr,"820 ");
+//intf_DbgMsg( "820 ");
                             p_aout->fifo[i_fifo].l_start_frame = p_aout->fifo[i_fifo].l_next_frame;
-//fprintf(stderr,"822 ");
+//intf_DbgMsg( "822 ");
                             vlc_cond_signal( &p_aout->fifo[i_fifo].data_wait );
-//fprintf(stderr,"824 ");
+//intf_DbgMsg( "824 ");
                             vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
-//fprintf(stderr,"826 ");
+//intf_DbgMsg( "826 ");
                             /* p_aout->fifo[i_fifo].b_start_frame = 1; */
                             p_aout->fifo[i_fifo].l_next_frame += 1;
-//fprintf(stderr,"829 ");
+//intf_DbgMsg( "829 ");
                             p_aout->fifo[i_fifo].l_next_frame &= AOUT_FIFO_SIZE;
-//fprintf(stderr,"831 ");
+//intf_DbgMsg( "831 ");
                             p_aout->fifo[i_fifo].b_next_frame = 0;
 //#endif
-//fprintf(stderr,"837 ");
+//intf_DbgMsg( "837 ");
                         }
-//fprintf(stderr,"838 ");
+//intf_DbgMsg( "838 ");
 /* !!!!!!!!!!!!! Seg Fault !!!!!!!!!!!!!!!!! */
                     }
-//fprintf(stderr,"839 ");
+//intf_DbgMsg( "839 ");
                     break;
 
 	        default:
-//fprintf(stderr,"841 ");
+//intf_DbgMsg( "841 ");
                     intf_DbgMsg("aout debug: unknown fifo type (%i)\n", p_aout->fifo[i_fifo].i_type);
-//fprintf(stderr,"842 ");
+//intf_DbgMsg( "842 ");
                     break;
             }
         }
-//fprintf(stderr,"843 ");
+//intf_DbgMsg( "843 ");
         vlc_mutex_unlock( &p_aout->fifos_lock );
-//fprintf(stderr,"845 ");
+//intf_DbgMsg( "845 ");
         l_buffer_limit = p_aout->l_units  /*<< 1*/ ; /* p_aout->b_stereo == 1 */
-//fprintf(stderr,"\nici commence l'envoie sur sb\n");
+//intf_DbgMsg( "\nici commence l'envoi sur sb\n" );
         for ( l_buffer = 0; l_buffer < l_buffer_limit; l_buffer++ )
     	{
-//fprintf(stderr,"3deb ");
-//fprintf(stderr,"p_aout->s_32_buffer[l_buffer] : %x (%d)\n",p_aout->s32_buffer[l_buffer],p_aout->s32_buffer[l_buffer]);   
+//intf_DbgMsg( "3deb ");
+//intf_DbgMsg( "p_aout->s_32_buffer[l_buffer] : %x (%d)\n",p_aout->s32_buffer[l_buffer],p_aout->s32_buffer[l_buffer] );
             ((u8 *)p_aout->buffer)[l_buffer] = (u8)( (p_aout->s32_buffer[/*2 **/ l_buffer] / 256) + 128 );
-//fprintf(stderr,"p_aout->buffer[l_buffer] : %x (%d)\n", ((u8 *)p_aout->buffer)[l_buffer], ((u8 *)p_aout->buffer)[l_buffer] );   
+//intf_DbgMsg( "p_aout->buffer[l_buffer] : %x (%d)\n", ((u8 *)p_aout->buffer)[l_buffer], ((u8 *)p_aout->buffer)[l_buffer] );
             p_aout->s32_buffer[/*2 **/ l_buffer] = 0;
 //            p_aout->s32_buffer[2 * l_buffer + 1] = 0;
-//fprintf(stderr,"3fin ");
+//intf_DbgMsg( "3fin ");
         }
         l_bytes = p_aout->p_sys_getbufinfo( p_aout, l_buffer_limit );
         p_aout->date = mdate() + ((((mtime_t)(l_bytes / 2 )) * 1000000) / ((mtime_t)p_aout->l_rate)); /* sizeof(u8) << (p_aout->b_stereo) == 2 */

@@ -82,7 +82,7 @@ static __inline__ int exp_unpack_ch (ac3dec_t * p_ac3dec, u16 type,
     case EXP_D15:	/* 1 */
 	for (i = 0; i < ngrps; i++) {
 	    if (exps[i] > 124) {
-		fprintf (stderr, "ac3dec debug: invalid exponent\n");
+		intf_ErrMsg ( "ac3dec error: invalid exponent\n" );
 		return 1;
 	    }
 	    exp_acc += (exps_1[exps[i]] /*- 2*/);
@@ -97,7 +97,7 @@ static __inline__ int exp_unpack_ch (ac3dec_t * p_ac3dec, u16 type,
     case EXP_D25:	/* 2 */
 	for (i = 0; i < ngrps; i++) {
 	    if (exps[i] > 124) {
-		fprintf (stderr, "ac3dec debug: invalid exponent\n");
+		intf_ErrMsg ( "ac3dec error: invalid exponent\n" );
 		return 1;
 	    }
 	    exp_acc += (exps_1[exps[i]] /*- 2*/);
@@ -115,7 +115,7 @@ static __inline__ int exp_unpack_ch (ac3dec_t * p_ac3dec, u16 type,
     case EXP_D45:	/* 3 */
 	for (i = 0; i < ngrps; i++) {
 	    if (exps[i] > 124) {
-		fprintf (stderr, "ac3dec debug: invalid exponent\n");
+		intf_ErrMsg ( "ac3dec error: invalid exponent\n" );
 		return 1;
 	    }
 	    exp_acc += (exps_1[exps[i]] /*- 2*/);

@@ -180,13 +180,12 @@ static void wait_a_moment( input_file_t * p_if, file_ts_packet *ts)
     sendtime = p_synchro->last_pcr_time + p_synchro->delta_clock +
         p_synchro->slope * ((ts - p_synchro->last_pcr + (BUF_SIZE+1)*TS_IN_UDP) % ((BUF_SIZE+1)*TS_IN_UDP)); 
     wait = sendtime - mdate();
-    //fprintf(stderr,"last  PCR Time : %Ld\n", p_synchro->last_pcr_time );
     if( wait > 0 )
     { 
         retard_count = 0;
         if(wait > 100000)
         {
-            fprintf( stderr, "Warning : wait time may be too long : %Ld\n", wait );
+            intf_DbgMsg( "input warning: wait time may be too long : %Ld\n", wait );
             return;
         }
         msleep( wait );
@@ -201,8 +200,6 @@ static void wait_a_moment( input_file_t * p_if, file_ts_packet *ts)
         if( retard_count == 16 )
         {
             retard_count = 0;
-            //fprintf( stderr, "delay : %Ldms, max delay : %Ldms\n", -wait/1000, -wait_max/1000 );
-            fflush(stdout);
         }
     }
 }
@@ -245,15 +242,13 @@ static void adjust( input_file_t * p_if, file_ts_packet *ts )
         
         if( (next_pcr_time - current_pcr_time < 0) || (next_pcr_time - current_pcr_time > 700000))
         {
-            fprintf( stderr, "Warning: possible discontinuity\n" );
+            intf_DbgMsg( "input warning: possible discontinuity\n" );
             p_synchro->delta_clock = mdate() - next_pcr_time;
         }
         else
         {
-                //fprintf(stderr,"next - current : %Ld\n", next_pcr_time - current_pcr_time);
             p_synchro->slope = (next_pcr_time - current_pcr_time) /
                 ((next_pcr - ts + (BUF_SIZE+1)*TS_IN_UDP) % ((BUF_SIZE+1)*TS_IN_UDP));
-                //fprintf(stderr,"slope : %Ld\n", p_synchro->slope);
         }
     }
     
@@ -353,7 +348,7 @@ int get_pid (ps_t *p_ps)
     p_ps->association_table[i] = tofind;
     p_ps->media_counter[i] = 0;
 
-    fprintf( stderr, "allocated new PID 0x%.2x to stream ID 0x%.2x\n", i, tofind );
+    intf_Msg( "input: allocated new PID 0x%.2x to stream ID 0x%.2x\n", i, tofind );
     
     return ( i );
 }
@@ -373,7 +368,6 @@ void write_media_ts(ps_t *ps, unsigned char *ts, unsigned int pid)
     {
         if (ps->pes_size < 184) {
 
-            //fprintf(stderr,"[WARNING: small PES]\n");
             ts[0] = 0x47;    /* sync_byte */
             ts[1] = 0x40;    /* payload_unit_start_indicator si début de PES */
             ts[2] = pid;
@@ -388,7 +382,6 @@ void write_media_ts(ps_t *ps, unsigned char *ts, unsigned int pid)
             ps->pes_type = NO_PES;
             ps->ps_data += ps->pes_size;
             ps->offset += ps->pes_size;
-	    //fprintf( stderr, "wrote %i final data (size was 0x%.2x)\n", ps->offset, ps->pes_size);
             return;
 
         }
@@ -400,8 +393,6 @@ void write_media_ts(ps_t *ps, unsigned char *ts, unsigned int pid)
     ts[1] = (ps->offset == 0) ? 0x40 : 0x00;    /* payload_unit_start_indicator si début de PES */
     ts[2] = pid;
 
-    //fprintf( stderr, "checking clock for %.2x while we have %.2x\n", ps->pcr_pid, pid );
-    //fprintf( stderr, "offset 0x%.2x, pts 0x%.2x, pid %i \n", ps->offset, ps->has_pts, pid );
     if ( (ps->offset == 0) && (ps->has_pts == 0xc0) && (ps->pcr_pid == pid) )
     {
 
@@ -414,7 +405,6 @@ void write_media_ts(ps_t *ps, unsigned char *ts, unsigned int pid)
             (((s64)U16_AT(ps->ps_data + 10) << 14) - (1 << 14)) |
             ((s64)U16_AT(ps->ps_data + 12) >> 1) );
         
-        //fprintf( stderr, "clock is %lli\n", clock );
         ps->has_pts = 0;
 
         extclock = 0x000;
@@ -459,10 +449,8 @@ void write_media_ts(ps_t *ps, unsigned char *ts, unsigned int pid)
         ps->pes_type = NO_PES;
         ps->sent_ts++;
 
-        //fprintf( stderr, "wrote 0x%.2x data (size was 0x%.2x)\n", ps->offset, ps->pes_size);
     }
 
-    //fprintf(stderr, "[PES size: %i]\n", ps->pes_size);
 }
 
 /******************************************************************************
@@ -472,8 +460,6 @@ void write_media_ts(ps_t *ps, unsigned char *ts, unsigned int pid)
 void write_pat(ps_t *ps, unsigned char *ts)
 {
     int i;
-
-    //fprintf( stderr, "wrote a PAT\n");
 
     ts[0] = 0x47;        /* sync_byte */
     ts[1] = 0x40;
@@ -513,8 +499,6 @@ void write_pmt(ps_t *ps, unsigned char *ts)
 {
     int i;
     
-    //fprintf( stderr, "wrote a PMT\n");
-
     ts[0] = 0x47;        /* sync_byte */
     ts[1] = 0x40;
     ts[2] = 0x0064;        /* PID = 0x0064 */
@@ -652,7 +636,7 @@ ssize_t ps_read (int fd, ps_t * p_ps, void *ts)
 
             if(readbytes == 0)
             {
-                fprintf (stderr,"ps READ ERROR\n");
+                intf_ErrMsg ( "input: ps read error\n");
                 return -1;
             }
             p_ps->ps_data = p_ps->ps_buffer;
@@ -664,7 +648,7 @@ ssize_t ps_read (int fd, ps_t * p_ps, void *ts)
         {
             if( p_ps->ps_data[0] || p_ps->ps_data[1] || (p_ps->ps_data[2] != 0x01) )
             {
-                fprintf (stderr,"Error: not a startcode (0x%.2x%.2x%.2x instead of 0x000001)\n", p_ps->ps_data[0], p_ps->ps_data[1], p_ps->ps_data[2] );
+                intf_ErrMsg ( "input error: not a startcode (0x%.2x%.2x%.2x instead of 0x000001)\n", p_ps->ps_data[0], p_ps->ps_data[1], p_ps->ps_data[2] );
                 return -1;
             }
 
@@ -762,7 +746,7 @@ ssize_t ps_read (int fd, ps_t * p_ps, void *ts)
         {
             if (p_ps->has_pts)
             {
-                fprintf(stderr, "found a PTS, at last ...\n");
+                intf_Msg( "input: found a PTS, at last ...\n" );
                 p_ps->found_pts = 1;
             }
             else
@@ -979,7 +963,6 @@ int input_FileRead( input_thread_t *p_input, const struct iovec *p_vector,
      * End condition not verified, should put a flag in ps_fill
      */
     howmany = TS_IN_UDP;
-    //fprintf( stderr, "XXX icount = %d\n", (int)i_count );
 
     vlc_mutex_lock( &p_in_data->lock );
     while( p_in_data->end == p_in_data->start )

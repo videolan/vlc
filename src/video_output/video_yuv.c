@@ -72,8 +72,7 @@
 #define V_RED_COEF      ((int)(1.596 * (1<<SHIFT) / 1.164))
 #define V_GREEN_COEF    ((int)(-0.813 * (1<<SHIFT) / 1.164))
 
-#define MMX
-#ifdef MMX
+#ifdef HAVE_MMX
 /* hope these constant values are cache line aligned */
 static unsigned long long mmx_80w     = 0x0080008000800080;
 static unsigned long long mmx_10w     = 0x1010101010101010;
@@ -315,11 +314,11 @@ static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data
 #define SCALE_HEIGHT( CHROMA, BPP )                                           \
                                                                               \
     /* If line is odd, rewind 4:2:0 U and V samples */                        \
-    if( ((CHROMA == 420) || (CHROMA == 422)) && !(i_y & 0x1) )                \
-    {                                                                         \
-        p_u -= i_chroma_width;                                                \
-        p_v -= i_chroma_width;                                                \
-    }                                                                         \
+    /*if( ((CHROMA == 420) || (CHROMA == 422)) && !(i_y & 0x1) )                */\
+    /*{                                                                         */\
+      /*  p_u -= i_chroma_width;                                                */\
+      /*  p_v -= i_chroma_width;                                                */\
+    /*}                                                                         */\
                                                                               \
     /*                                                                        \
      * Handle vertical scaling. The current line can be copied or next one    \
@@ -1353,11 +1352,15 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
     int         i_vertical_scaling;                 /* vertical scaling type */
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_scale_count;                       /* scale modulo counter */
+#ifndef HAVE_MMX
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
+#endif
     int         i_chroma_width;                              /* chroma width */
     u16 *       p_yuv;                              /* base conversion table */
+#ifndef HAVE_MMX
     u16 *       p_ybase;                     /* Y dependant conversion table */
+#endif
     u16 *       p_pic_start;       /* beginning of the current line for copy */
     u16 *       p_buffer_start;                   /* conversion buffer start */
     u16 *       p_buffer;                       /* conversion buffer pointer */
@@ -1387,7 +1390,7 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *
         p_buffer =      b_horizontal_scaling ? p_buffer_start : p_pic;
 
 
-#ifndef MMX
+#ifndef HAVE_MMX
 
         /* Do YUV conversion to buffer - YUV picture is always formed of 16
          * pixels wide blocks */

@@ -126,7 +126,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                 {
                     
                     case AC3_AUDIO_ES:
-                        fprintf (stderr, "Start an AC3 decoder\n");
+                        intf_Msg( "Start an AC3 decoder\n" );
                         /* Spawn ac3 thread */
                         if ( ((ac3dec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
                             ac3dec_CreateThread(p_input)) == NULL )
@@ -139,7 +139,7 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
 
 		             case LPCM_AUDIO_ES:
                         /* Spawn lpcm thread */
-                        fprintf (stderr, "Start a LPCM decoder\n");
+                        intf_Msg ( "Start a LPCM decoder\n" );
                         if ( ((lpcmdec_thread_t *)(p_input->p_es[i_es_loop].p_dec) =
                             lpcmdec_CreateThread(p_input)) == NULL )
                         {

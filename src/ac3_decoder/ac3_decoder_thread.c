@@ -218,7 +218,7 @@ static void RunThread (ac3dec_thread_t * p_ac3dec)
 	    int ptr;
 	    ac3_byte_stream_t * p_byte_stream;
 
-	    printf ("sync\n");
+	    intf_Msg ("ac3dec: sync\n");
 
 	    p_byte_stream = ac3_byte_stream (&p_ac3dec->ac3_decoder);
 
