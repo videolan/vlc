@@ -1,49 +1,87 @@
-{
-    "Name" = "vlc";
-    "AppleEventCode" = "VLC#";
-    
-    "Commands" = {
-        "OpenURL" = {
-            AppleEventClassCode = "WWW!"; 
-            AppleEventCode = "OURL"; 
-            CommandClass = "VLGetURLScriptCommand"; 
-        };
-        "GetURL" = {
-            AppleEventClassCode = "GURL";
-            AppleEventCode = "GURL";
-            CommandClass = "VLGetURLScriptCommand";
-        };
-        "play" = {
-            AppleEventCode = "VLC1";
-            CommandClass = "VLControlScriptCommand";
-        };
-        "stop" = {
-            AppleEventCode = "VLC2";
-            CommandClass = "VLControlScriptCommand";
-        };
-        "previous" = {
-            AppleEventCode = "GURL";
-            CommandClass = "VLControlScriptCommand";
-        };
-        "next" = {
-            AppleEventCode = "VLC3";
-            CommandClass = "VLControlScriptCommand";
-        };
-        "fullscreen" = {
-            AppleEventCode = "VLC4";
-            CommandClass = "VLControlScriptCommand";
-        };
-        "mute" = {
-            AppleEventCode = "VLC5";
-            CommandClass = "VLControlScriptCommand";
-        };
-        "volumeUp" = {
-            AppleEventCode = "VLC6";
-            CommandClass = "VLControlScriptCommand";
-        };
-        "volumeDown" = {
-            AppleEventCode = "VLC7";
-            CommandClass = "VLControlScriptCommand";
-        };
-    };
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Name</key>
+    <string>vlc</string>
+    <key>AppleEventCode</key>
+    <string>VLC#</string>
+    <key>Commands</key>
+    <dict>
+        <key>OpenURL</key>
+        <dict>
+            <key>AppleEventClassCode</key>
+            <string>WWW!</string>
+            <key>AppleEventCode</key>
+            <string>OURL</string>
+            <key>CommandClass</key>
+            <string>VLGetURLScriptCommand</string>
+        </dict>
+        <key>GetURL</key>
+        <dict>
+            <key>AppleEventClassCode</key>
+            <string>GURL</string>
+            <key>AppleEventCode</key>
+            <string>GURL</string>
+            <key>CommandClass</key>
+            <string>VLGetURLScriptCommand</string>
+        </dict>
+        <key>play</key>
+        <dict>
+            <key>AppleEventCode</key>
+            <string>VLC1</string>
+            <key>CommandClass</key>
+            <string>VLControlScriptCommand</string>
+        </dict>
+        <key>stop</key>
+        <dict>
+            <key>AppleEventCode</key>
+            <string>VLC2</string>
+            <key>CommandClass</key>
+            <string>VLControlScriptCommand</string>
+        </dict>
+        <key>previous</key>
+        <dict>
+            <key>AppleEventCode</key>
+            <string>VLC3</string>
+            <key>CommandClass</key>
+            <string>VLControlScriptCommand</string>
+        </dict>
+        <key>next</key>
+        <dict>
+            <key>AppleEventCode</key>
+            <string>VLC4</string>
+            <key>CommandClass</key>
+            <string>VLControlScriptCommand</string>
+        </dict>
+        <key>fullscreen</key>
+        <dict>
+            <key>AppleEventCode</key>
+            <string>VLC5</string>
+            <key>CommandClass</key>
+            <string>VLControlScriptCommand</string>
+        </dict>
+        <key>mute</key>
+        <dict>
+            <key>AppleEventCode</key>
+            <string>VLC6</string>
+            <key>CommandClass</key>
+            <string>VLControlScriptCommand</string>
+        </dict>
+        <key>volumeUp</key>
+        <dict>
+            <key>AppleEventCode</key>
+            <string>VLC7</string>
+            <key>CommandClass</key>
+            <string>VLControlScriptCommand</string>
+        </dict>
+        <key>volumeDown</key>
+        <dict>
+            <key>AppleEventCode</key>
+            <string>VLC8</string>
+            <key>CommandClass</key>
+            <string>VLControlScriptCommand</string>
+        </dict>
+    </dict>
+</dict>
+</plist>

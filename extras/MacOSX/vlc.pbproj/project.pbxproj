@@ -709,7 +709,7 @@
 			<string>RTSP</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>rtsp</string>
+				<string>rtsp,rts</string>
 			</array>
 		</dict>
 		<dict>
@@ -750,7 +750,7 @@
 				8ED6C29F03E2F32E0059A3A7,
 				8ED6C2A003E2F32E0059A3A7,
 				8EBF3FA403F13FFB0059A3A7,
-				8EBF3FA803F140A80059A3A7,
+				DCC9AE9507F77DE600394C42,
 				A0E6B59904407FBD0080DD97,
 				8EDAC3440440F72D0059A3A7,
 				8EE1AFA40444660F0059A3A7,
@@ -839,7 +839,7 @@
 				8ED6C29E03E2F32E0059A3A7,
 				A0E6B59804407FBD0080DD97,
 				8EBF3FA303F13FFB0059A3A7,
-				8EBF3FA703F140A80059A3A7,
+				8EBF3FA503F140960059A3A7,
 				8EDAC3430440F72D0059A3A7,
 			);
 			isa = PBXGroup;
@@ -1862,26 +1862,11 @@
 		};
 		8EBF3FA503F140960059A3A7 = {
 			isa = PBXFileReference;
-			lastKnownFileType = text;
+			lastKnownFileType = text.xml;
 			name = vlc.scriptTerminology;
-			path = Resources/English.lproj/vlc.scriptTerminology;
+			path = Resources/vlc.scriptTerminology;
 			refType = 2;
 			sourceTree = SOURCE_ROOT;
-		};
-		8EBF3FA703F140A80059A3A7 = {
-			children = (
-				8EBF3FA503F140960059A3A7,
-			);
-			isa = PBXVariantGroup;
-			name = vlc.scriptTerminology;
-			refType = 4;
-			sourceTree = "<group>";
-		};
-		8EBF3FA803F140A80059A3A7 = {
-			fileRef = 8EBF3FA703F140A80059A3A7;
-			isa = PBXBuildFile;
-			settings = {
-			};
 		};
 		8ECA7E520563CD9500DFC000 = {
 			children = (
@@ -2209,6 +2194,12 @@
 		};
 		DCA693C30789DF8700139EC6 = {
 			fileRef = DCA693C10789DF8700139EC6;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
+		DCC9AE9507F77DE600394C42 = {
+			fileRef = 8EBF3FA503F140960059A3A7;
 			isa = PBXBuildFile;
 			settings = {
 			};

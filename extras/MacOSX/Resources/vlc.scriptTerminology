@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Name</key>
+    <string>VLC suite</string>
+    <key>Description</key>
+    <string>VLC commands.</string>
+    <key>Commands</key>
+    <dict>
+        <key>OpenURL</key>
+        <dict>
+            <key>Name</key>
+            <string>OpenURL</string>
+            <key>Description</key>
+            <string>Open a URL</string>
+        </dict>
+        <key>GetURL</key>
+        <dict>
+            <key>Name</key>
+            <string>GetURL</string>
+            <key>Description</key>
+            <string>Get a URL</string>
+        </dict>
+        <key>play</key>
+        <dict>
+            <key>Name</key>
+            <string>play</string>
+            <key>Description</key>
+            <string>Start playing the current playlistitem or pause it when it is already playing.</string>
+        </dict>
+        <key>stop</key>
+        <dict>
+            <key>Name</key>
+            <string>stop</string>
+            <key>Description</key>
+            <string>Stop playing the current playlistitem</string>
+        </dict>
+        <key>previous</key>
+        <dict>
+            <key>Name</key>
+            <string>previous</string>
+            <key>Description</key>
+            <string>Go to the previous item in the playlist or the previous chapter in the DVD/VCD.</string>
+        </dict>
+        <key>next</key>
+        <dict>
+            <key>Name</key>
+            <string>next</string>
+            <key>Description</key>
+            <string>Go to the next item in the playlist or the next chapter in the DVD/VCD.</string>
+        </dict>
+        <key>fullscreen</key>
+        <dict>
+            <key>Name</key>
+            <string>fullscreen</string>
+            <key>Description</key>
+            <string>Toggle between fullscreen and windowed mode.</string>
+        </dict>
+        <key>mute</key>
+        <dict>
+            <key>Name</key>
+            <string>mute</string>
+            <key>Description</key>
+            <string>Mute the audio</string>
+        </dict>
+        <key>volumeUp</key>
+        <dict>
+            <key>Name</key>
+            <string>volumeUp</string>
+            <key>Description</key>
+            <string>Bring the volume up by one step. There are 32 steps from 0 to 100% volume.</string>
+        </dict>
+        <key>volumeDown</key>
+        <dict>
+            <key>Name</key>
+            <string>volumeDown</string>
+            <key>Description</key>
+            <string>Bring the volume down by one step. There are 32 steps from 0 to 100% volume.</string>
+        </dict>
+    </dict>
+</dict>
+</plist>
