@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.23 2002/11/25 16:00:26 massiot Exp $
+ * $Id: input.c,v 1.24 2002/11/25 16:16:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -176,7 +176,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
-        if ( i_nb_resamplers != 0 )
+        if ( p_input->i_nb_resamplers != 0 )
         {
             p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
             p_input->pp_resamplers[0]->b_reinit = VLC_TRUE;
@@ -206,7 +206,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     if ( ( p_input->i_resampling_type == AOUT_RESAMPLING_NONE ) &&
          ( start_date < p_buffer->start_date - AOUT_PTS_TOLERANCE
            || start_date > p_buffer->start_date + AOUT_PTS_TOLERANCE ) &&
-         i_nb_resamplers > 0 )
+         p_input->i_nb_resamplers > 0 )
     {
         /* Can happen in several circumstances :
          * 1. A problem at the input (clock drift)
@@ -285,7 +285,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         (p_buffer->end_date - p_buffer->start_date);
 
     /* Actually run the resampler now. */
-    if ( i_nb_resamplers > 0 && p_aout->mixer.mixer.i_rate !=
+    if ( p_input->i_nb_resamplers > 0 && p_aout->mixer.mixer.i_rate !=
          p_input->pp_resamplers[0]->input.i_rate )
     {
         aout_FiltersPlay( p_aout, p_input->pp_resamplers,
