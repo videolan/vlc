@@ -2,7 +2,7 @@
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2003 VideoLAN
- * $Id: cdda.c,v 1.14 2004/02/06 18:15:44 gbazin Exp $
+ * $Id: cdda.c,v 1.15 2004/02/14 17:25:39 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -30,24 +30,8 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include "codecs.h"
 #include "vcd/cdrom.h"
-
-typedef struct WAVEHEADER
-{
-    uint32_t MainChunkID;                      // it will be 'RIFF'
-    uint32_t Length;
-    uint32_t ChunkTypeID;                      // it will be 'WAVE'
-    uint32_t SubChunkID;                       // it will be 'fmt '
-    uint32_t SubChunkLength;
-    uint16_t Format;
-    uint16_t Modus;
-    uint32_t SampleFreq;
-    uint32_t BytesPerSec;
-    uint16_t BytesPerSample;
-    uint16_t BitsPerSample;
-    uint32_t DataChunkID;                      // it will be 'data'
-    uint32_t DataLength;
-} WAVEHEADER;
 
 /*****************************************************************************
  * Module descriptior
@@ -287,6 +271,7 @@ static int Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         i_blocks = (i_len - sizeof(WAVEHEADER)) / CDDA_DATA_SIZE;
         memcpy( p_buffer, &p_sys->waveheader, sizeof(WAVEHEADER) );
         p_buffer += sizeof(WAVEHEADER);
+        i_read += sizeof(WAVEHEADER);
     }
 
     if( ioctl_ReadSectors( VLC_OBJECT(p_input), p_sys->vcddev, p_sys->i_sector,

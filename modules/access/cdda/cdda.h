@@ -3,7 +3,7 @@
  *          using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cdda.h,v 1.5 2004/02/11 18:08:05 gbazin Exp $
+ * $Id: cdda.h,v 1.6 2004/02/14 17:25:39 gbazin Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *
@@ -49,26 +49,6 @@
 #else
 #define dbg_print(mask, s, args...)
 #endif
-
-/*****************************************************************************
- * Wave header structure definition
- *****************************************************************************/
-typedef struct WAVEHEADER
-{
-    uint32_t MainChunkID;                      // it will be 'RIFF'
-    uint32_t Length;
-    uint32_t ChunkTypeID;                      // it will be 'WAVE'
-    uint32_t SubChunkID;                       // it will be 'fmt '
-    uint32_t SubChunkLength;
-    uint16_t Format;
-    uint16_t Modus;
-    uint32_t SampleFreq;
-    uint32_t BytesPerSec;
-    uint16_t BytesPerSample;
-    uint16_t BitsPerSample;
-    uint32_t DataChunkID;                      // it will be 'data'
-    uint32_t DataLength;
-} WAVEHEADER;
 
 /*****************************************************************************
  * cdda_data_t: CD audio information
