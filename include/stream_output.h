@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.14 2003/09/12 18:34:44 fenrir Exp $
+ * $Id: stream_output.h,v 1.15 2003/11/07 16:53:54 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -37,6 +37,7 @@
  *
  */
 #define SOUT_BUFFER_FLAGS_HEADER    0x0001
+#define SOUT_BUFFER_FLAGS_GOP       0x0002
 
 /*
  * Flags for muxer/access private usage.

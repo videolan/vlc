@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.19 2003/09/02 20:19:26 gbazin Exp $
+ * $Id: mpegvideo.c,v 1.20 2003/11/07 16:53:54 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -70,6 +70,7 @@ typedef struct packetizer_s
     uint8_t                 p_sequence_header[150];
     int                     i_sequence_header_length;
     int                     i_last_sequence_header;
+    vlc_bool_t              b_expect_discontinuity;
 
 } packetizer_t;
 
@@ -79,6 +80,7 @@ static int  Run     ( decoder_fifo_t * );
 static int  InitThread     ( packetizer_t * );
 static void PacketizeThread   ( packetizer_t * );
 static void EndThread      ( packetizer_t * );
+static void BitstreamCallback ( bit_stream_t *, vlc_bool_t );
 
 /*****************************************************************************
  * Module descriptor
@@ -178,10 +180,11 @@ static int InitThread( packetizer_t *p_pack )
     p_pack->output_format.i_extra_data = 0;
     p_pack->output_format.p_extra_data = NULL;
 
+    p_pack->b_expect_discontinuity = 0;
     p_pack->p_sout_input = NULL;
 
     if( InitBitstream( &p_pack->bit_stream, p_pack->p_fifo,
-                       NULL, NULL ) != VLC_SUCCESS )
+                       BitstreamCallback, (void *)p_pack ) != VLC_SUCCESS )
     {
         msg_Err( p_pack->p_fifo, "cannot initialize bitstream" );
         return -1;
@@ -381,6 +384,7 @@ static void PacketizeThread( packetizer_t *p_pack )
                i_pos += p_pack->i_sequence_header_length;
                p_pack->i_last_sequence_header = 0;
             }
+            p_sout_buffer->i_flags |= SOUT_BUFFER_FLAGS_GOP;
             CopyUntilNextStartCode( p_pack, p_sout_buffer, &i_pos );
         }
         else if( i_code == 0x100 ) /* Picture */
@@ -528,7 +532,16 @@ static void PacketizeThread( packetizer_t *p_pack )
              p_sout_buffer->i_length );
 #endif
 
-    sout_InputSendBuffer( p_pack->p_sout_input, p_sout_buffer );
+    if ( p_pack->b_expect_discontinuity )
+    {
+        msg_Warn( p_pack->p_fifo, "discontinuity encountered, dropping a frame" );
+        p_pack->b_expect_discontinuity = 0;
+        sout_BufferDelete( p_pack->p_sout_input->p_sout, p_sout_buffer );
+    }
+    else
+    {
+        sout_InputSendBuffer( p_pack->p_sout_input, p_sout_buffer );
+    }
 }
 
 
@@ -542,3 +555,21 @@ static void EndThread ( packetizer_t *p_pack)
         sout_InputDelete( p_pack->p_sout_input );
     }
 }
+
+/*****************************************************************************
+ * BitstreamCallback: Import parameters from the new data/PES packet
+ *****************************************************************************
+ * This function is called by input's NextDataPacket.
+ *****************************************************************************/
+static void BitstreamCallback ( bit_stream_t * p_bit_stream,
+                                vlc_bool_t b_new_pes )
+{
+    packetizer_t * p_pack = (packetizer_t *)p_bit_stream->p_callback_arg;
+
+    if( p_bit_stream->p_data->b_discard_payload
+            || (b_new_pes && p_bit_stream->p_pes->b_discontinuity) )
+    {
+        p_pack->b_expect_discontinuity = 1;
+    }
+}
+
