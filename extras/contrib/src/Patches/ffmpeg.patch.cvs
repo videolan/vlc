@@ -1,7 +1,16 @@
-diff -ru ffmpeg-original/configure ffmpeg/configure
---- ffmpeg-original/configure	Fri Aug 13 02:59:48 2004
-+++ ffmpeg/configure	Mon Aug 16 12:54:10 2004
-@@ -351,11 +351,11 @@
+diff -ru ffmpeg.orig/configure ffmpeg/configure
+--- ffmpeg.orig/configure	Tue Nov 23 19:28:23 2004
++++ ffmpeg/configure	Sun Nov 28 20:54:48 2004
+@@ -210,7 +210,7 @@
+ 2.9-beos-991026*|2.9-beos-000224*) echo "R5/GG gcc"
+ mmx="no"
+ ;;
+-*20010315*) echo "BeBits gcc"
++*20010315*|2.95.3*) echo "BeBits gcc"
+ CFLAGS="$CFLAGS -fno-expensive-optimizations"
+ ;;
+ esac
+@@ -370,11 +370,11 @@
    ;;
    --make=*) make=`echo $opt | cut -d '=' -f 2`
    ;;
@@ -16,9 +25,9 @@ diff -ru ffmpeg-original/configure ffmpeg/configure
    ;;
    --cpu=*) cpu=`echo $opt | cut -d '=' -f 2`
    ;;
-diff -ru ffmpeg-original/libavcodec/eval.c ffmpeg/libavcodec/eval.c
---- ffmpeg-original/libavcodec/eval.c	Wed Feb 18 13:49:30 2004
-+++ ffmpeg/libavcodec/eval.c	Mon Aug 16 12:46:02 2004
+diff -ru ffmpeg.orig/libavcodec/eval.c ffmpeg/libavcodec/eval.c
+--- ffmpeg.orig/libavcodec/eval.c	Wed Feb 18 13:49:30 2004
++++ ffmpeg/libavcodec/eval.c	Sun Nov 28 20:29:15 2004
 @@ -34,6 +34,8 @@
  #include <string.h>
  #include <math.h>
@@ -28,9 +37,9 @@ diff -ru ffmpeg-original/libavcodec/eval.c ffmpeg/libavcodec/eval.c
  #ifndef NAN
    #define NAN 0
  #endif
-diff -ru ffmpeg-original/libavformat/tcp.c ffmpeg/libavformat/tcp.c
---- ffmpeg-original/libavformat/tcp.c	Thu Aug 12 02:09:32 2004
-+++ ffmpeg/libavformat/tcp.c	Mon Aug 16 12:46:02 2004
+diff -ru ffmpeg.orig/libavformat/tcp.c ffmpeg/libavformat/tcp.c
+--- ffmpeg.orig/libavformat/tcp.c	Thu Aug 12 02:09:32 2004
++++ ffmpeg/libavformat/tcp.c	Sun Nov 28 20:29:15 2004
 @@ -32,6 +32,7 @@
  #include <netdb.h>
  #include <sys/time.h>
