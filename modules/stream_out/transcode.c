@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.10 2003/05/03 01:12:13 fenrir Exp $
+ * $Id: transcode.c,v 1.11 2003/05/03 13:18:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -77,8 +77,10 @@ struct sout_stream_sys_t
 
     vlc_fourcc_t    i_vcodec;   /*    "   video  " "   "      " */
     int             i_vbitrate;
+    int             i_vtolerance;
     int             i_width;
     int             i_height;
+    int             i_key_int;
     vlc_bool_t      b_deinterlace;
 
     int             i_crop_top;
@@ -106,8 +108,10 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_vcodec     = 0;
     p_sys->i_vbitrate   = 0;
+    p_sys->i_vtolerance = -1;
     p_sys->i_width      = 0;
     p_sys->i_height     = 0;
+    p_sys->i_key_int    = -1;
     p_sys->b_deinterlace= VLC_FALSE;
 
     p_sys->i_crop_top   = 0;
@@ -163,6 +167,14 @@ static int Open( vlc_object_t *p_this )
         if( ( val = sout_cfg_find_value( p_stream->p_cfg, "vb" ) ) )
         {
             p_sys->i_vbitrate = atoi( val );
+            if( p_sys->i_vbitrate < 16000 )
+            {
+                p_sys->i_vbitrate *= 1000;
+            }
+        }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "vt" ) ) )
+        {
+            p_sys->i_vtolerance = atoi( val );
         }
         if( sout_cfg_find( p_stream->p_cfg, "deinterlace" ) )
         {
@@ -184,6 +196,10 @@ static int Open( vlc_object_t *p_this )
         if( ( val = sout_cfg_find_value( p_stream->p_cfg, "cropright" ) ) )
         {
             p_sys->i_crop_right = atoi( val );
+        }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "keyint" ) ) )
+        {
+            p_sys->i_key_int    = atoi( val );
         }
 
         msg_Dbg( p_stream, "codec video=%4.4s %dx%d %dkb/s",
@@ -780,6 +796,8 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
  */
 static int transcode_video_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
+    sout_stream_sys_t   *p_sys = p_stream->p_sys;
+
     int i_ff_codec;
 
     if( id->f_src.i_fourcc == VLC_FOURCC( 'I', '4', '2', '0' ) ||
@@ -867,7 +885,12 @@ static int transcode_video_ffmpeg_new   ( sout_stream_t *p_stream, sout_stream_i
 #else
     id->ff_enc_c->frame_rate     = 25 * FRAME_RATE_BASE;
 #endif
-    id->ff_enc_c->gop_size       = 25;
+    id->ff_enc_c->gop_size       = p_sys->i_key_int >= 0 ? p_sys->i_key_int : 50;
+
+    if( p_sys->i_vtolerance >= 0 )
+    {
+        id->ff_enc_c->bit_rate_tolerance = p_sys->i_vtolerance;
+    }
     id->ff_enc_c->qmin           = 2;
     id->ff_enc_c->qmax           = 31;
 
