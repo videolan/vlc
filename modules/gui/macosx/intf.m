@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.49 2003/02/08 17:26:00 massiot Exp $
+ * $Id: intf.m,v 1.50 2003/02/08 20:32:44 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -291,7 +291,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
     [o_msgs_btn_crashlog setTitle: _NS("Open CrashLog")];
 
     /* main menu */
-    [o_mi_about setTitle: _NS("About VLC Media Player")];
+    [o_mi_about setTitle: _NS("About VLC media player")];
     [o_mi_prefs setTitle: _NS("Preferences")];
     [o_mi_hide setTitle: _NS("Hide VLC")];
     [o_mi_hide_others setTitle: _NS("Hide Others")];

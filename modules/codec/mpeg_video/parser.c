@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.9 2002/12/18 14:17:10 sam Exp $
+ * $Id: parser.c,v 1.10 2003/02/08 20:32:43 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -154,11 +154,7 @@ static int RunDecoder ( decoder_fifo_t * p_fifo )
             p_vpar->c_loops++;
 
             /* Parse the next sequence, group or picture header */
-            if( vpar_ParseHeader( p_vpar ) )
-            {
-                /* End of sequence */
-                break;
-            }
+            vpar_ParseHeader( p_vpar );
         }
     }
 
