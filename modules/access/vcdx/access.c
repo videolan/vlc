@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.18 2004/01/29 17:51:07 zorglub Exp $
+ * $Id: access.c,v 1.19 2004/02/19 02:05:12 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -963,6 +963,7 @@ VCDReadSector( vlc_object_t *p_this, const vcdinfo_obj_t *p_vcd,
   typedef struct {
     uint8_t subheader   [8];
     uint8_t data        [M2F2_SECTOR_SIZE];
+    uint8_t spare       [4];
   } vcdsector_t;
   vcdsector_t vcd_sector;
 
