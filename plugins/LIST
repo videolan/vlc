@@ -1,5 +1,5 @@
 List of vlc plugins
-$Id: LIST,v 1.1.2.1 2002/08/07 19:59:02 massiot Exp $
+$Id: LIST,v 1.1.2.2 2002/09/30 20:13:19 jpsaman Exp $
 
  * ac3_adec: software AC3 decoder.
 
@@ -40,6 +40,8 @@ $Id: LIST,v 1.1.2.1 2002/08/07 19:59:02 massiot Exp $
  * dvdread: input module for accessing DVDs, uses libdvdread.
 
  * esd: audio output module using the Esound sound daemon.
+
+ * familiar: interface for iPaq using the Gtk+ widget set.
 
  * fb: video output module for the Linux framebuffer.
 
@@ -122,6 +124,8 @@ $Id: LIST,v 1.1.2.1 2002/08/07 19:59:02 massiot Exp $
  * null: a module with no capabilities.
 
  * qt: interface module using the Qt widget set.
+
+ * qte: video output module for Qt Embedded.
 
  * rc: interface module using stdio.
 

@@ -33,6 +33,7 @@ PLUGINS_DIR :=	a52 \
 		dvd \
 		dvdread \
 		esd \
+		familiar \
 		fb \
 		ffmpeg \
 		filter \
@@ -55,8 +56,10 @@ PLUGINS_DIR :=	a52 \
 		mpeg_vdec \
 		network \
 		ogg \
+		opie \
 		qnx \
 		qt \
+		qte \
 		satellite \
 		sdl \
 		spudec \
@@ -94,6 +97,7 @@ PLUGINS_TARGETS := a52/a52 \
 		dvd/dvd \
 		dvdread/dvdread \
 		esd/esd \
+		familiar/familiar \
 		fb/fb \
 		ffmpeg/ffmpeg \
 		filter/filter_deinterlace \
@@ -143,8 +147,10 @@ PLUGINS_TARGETS := a52/a52 \
 		network/ipv4 \
 		network/ipv6 \
 		ogg/vorbis \
+		opie/opie \
 		qnx/qnx \
 		qt/qt \
+		qte/qte \
 		satellite/satellite \
 		sdl/sdl \
 		spudec/spudec \

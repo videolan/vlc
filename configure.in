@@ -1185,6 +1185,39 @@ from http://www.libsdl.org/, or configure with --disable-sdl. Have a nice day.
 fi
 
 dnl
+dnl  Qt Embedded module
+dnl  (disabled by default)
+dnl
+AC_ARG_ENABLE(qte,
+  [  --enable-qte            QT Embedded support (default disabled)])
+if test "x${enable_qte}" != "xno"
+then
+  AC_ARG_WITH(qte,
+  [    --with-qte=PATH    Qt Embedded headers and libraries])
+  if test "x${with_qte}" = "x"
+  then
+    test_LDFLAGS="-L${QTDIR}/lib"
+    test_CFLAGS="-I$(QTDIR)/include"
+  else
+    test_LDFLAGS="-L${with_qte}/lib"
+    test_CFLAGS="-I${with_qte}/include"
+  fi
+
+  CPPFLAGS="${save_CPPFLAGS} ${test_CFLAGS}"
+  AC_CHECK_HEADERS(qt.h, [
+    qte_CFLAGS="${qte_CFLAGS} ${test_CFLAGS} -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
+    qte_LDFLAGS="${qte_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
+    if test "x${with_qte}" = "x"
+    then
+      PLUGINS="${PLUGINS} qte"
+    else
+      BUILTINS="${BUILTINS} qte"
+    fi
+  ])
+  CPPFLAGS="${save_CPPFLAGS}"
+fi
+
+dnl
 dnl  Windows DirectX module
 dnl
 AC_ARG_ENABLE(directx,
@@ -1421,6 +1454,51 @@ then
 fi
 
 dnl
+dnl  Familiar module uses Gtk+ library
+dnl
+AC_ARG_ENABLE(familiar,
+  [  --enable-familiar       Familiar Gtk+ support (default disabled)])
+if test "x${enable_familiar}" = "xyes"
+then
+  GTK_PATH="${PATH}"
+  AC_ARG_WITH(gtk-config-path,
+    [    --with-gtk-config-path=PATH gtk-config path (default search in \$PATH)],
+    [ if test "x${with_gtk_config_path}" != "xno"
+      then
+        GTK_PATH="${with_gtk_config_path}:${PATH}"
+      fi ])
+  # look for gtk-config
+  AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, ${GTK_PATH})
+  GTK_CONFIG=${GTK12_CONFIG}
+  if test "x${GTK_CONFIG}" = "xno"
+  then
+    AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
+  fi
+  if test "x${GTK_CONFIG}" != "xno"
+  then
+    if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
+    then
+      AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-familiar.])
+    fi
+    familiar_CFLAGS="${familiar_CFLAGS} `${GTK_CONFIG} --cflags gtk gthread`"
+    familiar_LDFLAGS="${familiar_LDFLAGS} `${GTK_CONFIG} --libs gtk gthread | sed 's,-rdynamic,,'`"
+    # now look for the gtk.h header
+    CPPFLAGS="${save_CPPFLAGS} ${familiar_CFLAGS}"
+    ac_cv_gtk_headers=yes
+    AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
+      ac_cv_gtk_headers=no
+      echo "Cannot find gtk development headers."
+    ])
+    if test "x${ac_cv_gtk_headers}" = "xyes"
+    then
+      PLUGINS="${PLUGINS} familiar"
+      NEED_GTK_MAIN=yes
+    fi
+    CPPFLAGS="${save_CPPFLAGS}"
+  fi
+fi
+
+dnl
 dnl  Gnome module
 dnl
 AC_ARG_ENABLE(gnome,
@@ -1474,6 +1552,34 @@ AC_ARG_ENABLE(kde,
      kde_LDFLAGS="${kde_LDFLAGS} -L${KDEDIR}/lib -lkfile"
      kde_CFLAGS="${kde_CFLAGS} -I/usr/include/kde -I/usr/include/qt"
      kde_CFLAGS="${kde_CFLAGS} -I${KDEDIR}/include -I${QTDIR}/include"
+     if test -x ${QTDIR}/bin/moc
+     then
+       MOC=${QTDIR}/bin/moc
+     else
+       MOC=moc
+     fi
+   fi])
+
+dnl
+dnl  Opie QT embedded module
+dnl
+AC_ARG_ENABLE(opie,
+  [  --enable-opie           Qt embedded interface support (default disabled)],
+  [if test "x${enable_opie}" = "xyes"; then
+     AC_ARG_WITH(qte,
+     [    --with-qte=PATH    Qt Embedded headers and libraries])
+     if test "x${with_qte}" = "x"
+     then
+       test_LDFLAGS="-L$(QTDIR)/lib"
+       test_CFLAGS="-I${QTDIR}/include"
+     else
+       test_LDFLAGS="-L${with_qte}/lib"
+       test_CFLAGS="-I${with_qte}/include"
+     fi
+
+     PLUGINS="${PLUGINS} opie"
+     opie_LDFLAGS="${opie_LDFLAGS} ${test_LDFLAGS} -lqpe -lqte"
+     opie_CFLAGS="${opie_CFLAGS} ${test_CFLAGS}-DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti"
      if test -x ${QTDIR}/bin/moc
      then
        MOC=${QTDIR}/bin/moc
@@ -1733,6 +1839,7 @@ AC_SUBST(dvdread_CFLAGS)
 AC_SUBST(mpeg_ts_dvbpsi_CFLAGS)
 AC_SUBST(directx_CFLAGS)
 AC_SUBST(esd_CFLAGS)
+AC_SUBST(familiar_CFLAGS)
 AC_SUBST(ffmpeg_CFLAGS)
 AC_SUBST(glide_CFLAGS)
 AC_SUBST(gnome_CFLAGS)
@@ -1743,7 +1850,9 @@ AC_SUBST(macosx_CFLAGS)
 AC_SUBST(mad_CFLAGS)
 AC_SUBST(memcpyaltivec_CFLAGS)
 AC_SUBST(motionaltivec_CFLAGS)
+AC_SUBST(opie_CFLAGS)
 AC_SUBST(qt_CFLAGS)
+AC_SUBST(qte_CFLAGS)
 AC_SUBST(sdl_CFLAGS)
 AC_SUBST(x11_CFLAGS)
 AC_SUBST(xvideo_CFLAGS)
@@ -1764,6 +1873,7 @@ AC_SUBST(dvd_LDFLAGS)
 AC_SUBST(dvdread_LDFLAGS)
 AC_SUBST(mpeg_ts_dvbpsi_LDFLAGS)
 AC_SUBST(esd_LDFLAGS)
+AC_SUBST(familiar_LDFLAGS)
 AC_SUBST(filter_distort_LDFLAGS)
 AC_SUBST(ffmpeg_LDFLAGS)
 AC_SUBST(ggi_LDFLAGS)
@@ -1784,8 +1894,10 @@ AC_SUBST(mad_LDFLAGS)
 AC_SUBST(memcpyaltivec_LDFLAGS)
 AC_SUBST(motionaltivec_LDFLAGS)
 AC_SUBST(ncurses_LDFLAGS)
+AC_SUBST(opie_LDFLAGS)
 AC_SUBST(qnx_LDFLAGS)
 AC_SUBST(qt_LDFLAGS)
+AC_SUBST(qte_LDFLAGS)
 AC_SUBST(rc_LDFLAGS)
 AC_SUBST(sdl_LDFLAGS)
 AC_SUBST(vcd_LDFLAGS)
