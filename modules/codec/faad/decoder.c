@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.28 2003/08/24 00:34:13 hartman Exp $
+ * $Id: decoder.c,v 1.29 2003/08/24 23:22:02 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -381,9 +381,9 @@ static void DecodeThread( adec_thread_t *p_adec )
         }
 
 #if 0
-        msg_Dbg( p_adec->p_fifo,
-                 "decoded frame samples:%d, channels:%d, consumed:%d",
-                 faad_frame.samples,
+        msg_Err( p_adec->p_fifo,
+                 "decoded frame samples:%d, rate:%d, channels:%d, consumed:%d",
+                 faad_frame.samples, faad_frame.samplerate,
                  faad_frame.channels,
                  faad_frame.bytesconsumed );
 #endif
@@ -392,10 +392,12 @@ static void DecodeThread( adec_thread_t *p_adec )
         /* **** Now we can output these samples **** */
 
         /* **** First check if we have a valid output **** */
-        if( ( !p_adec->p_aout_input )||
-            ( p_adec->output_format.i_original_channels != pi_channels_maps[faad_frame.channels] ) 
+        if( !p_adec->p_aout_input ||
+            p_adec->output_format.i_original_channels
+              != pi_channels_maps[faad_frame.channels] ||
 #ifndef HAVE_OLD_FAAD2
-            || ( p_adec->output_format.i_rate != faad_frame.samplerate )
+            ( faad_frame.samplerate &&
+              p_adec->output_format.i_rate != faad_frame.samplerate )
 #endif
             )
         {
@@ -410,7 +412,8 @@ static void DecodeThread( adec_thread_t *p_adec )
                 p_adec->output_format.i_original_channels =
                     pi_channels_maps[faad_frame.channels];
 #ifndef HAVE_OLD_FAAD2
-            p_adec->output_format.i_rate = faad_frame.samplerate;
+            if( faad_frame.samplerate )
+                p_adec->output_format.i_rate = faad_frame.samplerate;
 #endif
 
             aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
