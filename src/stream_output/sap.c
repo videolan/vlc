@@ -250,7 +250,7 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
         {
             /* IPv4 */
             p_method->psz_address = (char*)malloc( 15*sizeof(char) );
-            sprintf(p_method->psz_address, SAP_IPV4_ADDR );
+            snprintf(p_method->psz_address, 15, SAP_IPV4_ADDR );
         }
     }
     msg_Dbg( p_sap, "using SAP address: %s",p_method->psz_address);
@@ -386,6 +386,8 @@ static int announce_SAPAnnounceAdd( sap_handler_t *p_sap,
     memcpy( p_sap_session->psz_data+i_header_size, p_sap_session->psz_sdp,
             strlen( p_sap_session->psz_sdp) );
 
+    free( psz_head );
+
     /* Enqueue the announce */
     INSERT_ELEM( p_sap->pp_sessions,
                  p_sap->i_sessions,
@@ -425,7 +427,7 @@ static int announce_SAPAnnounceDel( sap_handler_t *p_sap,
 
     /* XXX: Dequeue the address too if it is not used anymore
      * TODO: - address refcount
-             - send a SAP deletion packet */  
+             - send a SAP deletion packet */
 
     msg_Dbg( p_sap,"%i announces remaining", p_sap->i_sessions );
 

@@ -355,6 +355,9 @@ static int Open( vlc_object_t *p_this )
             p_stream->p_sys->p_session = p_session;
         }
         vlc_UrlClean( &url );
+
+        if( p_method->psz_address) free( p_method->psz_address );
+        free( p_method );
     }
 
     /* *** Register with slp *** */
@@ -402,6 +405,7 @@ static int Open( vlc_object_t *p_this )
     if( psz_mux ) free( psz_mux );
     if( psz_url ) free( psz_url );
 
+
     return VLC_SUCCESS;
 }
 
@@ -417,6 +421,7 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->p_session != NULL )
     {
         sout_AnnounceUnRegister( p_stream->p_sout, p_sys->p_session );
+        sout_AnnounceSessionDestroy( p_sys->p_session );
     }
 
 #ifdef HAVE_SLP_H
