@@ -48,7 +48,6 @@ DIST_misc = \
     README.TXT \
     axvlc.def \
     axvlc.idl \
-    axvlc.reg \
     axvlc.tlb \
     inplace.bmp \
     test.html \
