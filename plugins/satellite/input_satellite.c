@@ -311,7 +311,6 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             if ( p_es->p_decoder_fifo )
             {
                 input_UnselectES( p_input , p_es );
-                p_es->p_pes = NULL; /* FIXME */
             }
             if ( p_es->i_dmx_fd )
             {

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_programs.c,v 1.76 2002/03/21 02:27:04 jobi Exp $
+ * $Id: input_programs.c,v 1.77 2002/03/28 03:53:15 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -692,6 +692,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
     }
 
     input_EndDecoder( p_input, p_es );
+    free( p_es->p_pes );
 
     if( ( p_es->p_decoder_fifo == NULL ) &&
         ( p_input->stream.i_selected_es_number > 0 ) )
