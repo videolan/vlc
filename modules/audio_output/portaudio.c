@@ -36,13 +36,24 @@
 
 #define FRAME_SIZE 1024              /* The size is in samples, not in bytes */
 
+#ifdef WIN32
+#   define PORTAUDIO_IS_SERIOUSLY_BROKEN 1
+#endif
+
 /*****************************************************************************
  * aout_sys_t: portaudio audio output method descriptor
  *****************************************************************************/
 typedef struct pa_thread_t
 {
     VLC_COMMON_MEMBERS
-    aout_instance_t * p_aout;
+    aout_instance_t *p_aout;
+
+    vlc_cond_t  wait;
+    vlc_mutex_t lock_wait;
+    vlc_bool_t  b_wait;
+    vlc_cond_t  signal;
+    vlc_mutex_t lock_signal;
+    vlc_bool_t  b_signal;
 
 } pa_thread_t;
 
@@ -55,12 +66,13 @@ struct aout_sys_t
     int i_sample_size;
     PaDeviceIndex i_device_id;
     const PaDeviceInfo *deviceInfo;
-
-    vlc_mutex_t lock;
-    vlc_cond_t wait;
-
-    pa_thread_t *pa_thread;
 };
+
+#ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
+static vlc_bool_t b_init = 0;
+static pa_thread_t *pa_thread;
+static void PORTAUDIOThread( pa_thread_t * );
+#endif
 
 /*****************************************************************************
  * Local prototypes.
@@ -68,7 +80,6 @@ struct aout_sys_t
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
 static void Play        ( aout_instance_t * );
-static void PORTAUDIOThread( pa_thread_t * );
 
 static int PAOpenDevice( aout_instance_t * );
 static int PAOpenStream( aout_instance_t * );
@@ -92,10 +103,9 @@ vlc_module_end();
  * that could mess up the system like calling malloc() or free().
  */
 static int paCallback( const void *inputBuffer, void *outputBuffer,
-                            unsigned long framesPerBuffer,
-                            const PaStreamCallbackTimeInfo *paDate,
-                            PaStreamCallbackFlags statusFlags,
-                            void *p_cookie )
+                       unsigned long framesPerBuffer,
+                       const PaStreamCallbackTimeInfo *paDate,
+                       PaStreamCallbackFlags statusFlags, void *p_cookie )
 {
     struct aout_sys_t *p_sys = (struct aout_sys_t*) p_cookie;
     aout_instance_t   *p_aout = p_sys->p_aout;
@@ -156,35 +166,66 @@ static int Open( vlc_object_t * p_this )
     var_Get( p_aout, "portaudio-device", &val );
     p_sys->i_device_id = val.i_int;
 
-    if( PAOpenDevice( p_aout ) != VLC_SUCCESS )
+#ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
+    if( !b_init )
     {
-        msg_Err( p_aout, "cannot open portaudio device" );
-        free( p_sys );
-        return VLC_EGENERIC;
+        /* Test device */
+        if( PAOpenDevice( p_aout ) != VLC_SUCCESS )
+        {
+            msg_Err( p_aout, "cannot open portaudio device" );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+
+        /* Close device for now. We'll re-open it later on */
+        if( ( i_err = Pa_Terminate() ) != paNoError )
+        {
+            msg_Err( p_aout, "Pa_Terminate returned %d", i_err );
+        }
+
+        b_init = VLC_TRUE;
+
+        /* Now we need to setup our DirectSound play notification structure */
+        pa_thread = vlc_object_create( p_aout, sizeof(pa_thread_t) );
+        pa_thread->p_aout = p_aout;
+        pa_thread->b_error = VLC_FALSE;
+        vlc_mutex_init( p_aout, &pa_thread->lock_wait );
+        vlc_cond_init( p_aout, &pa_thread->wait );
+        pa_thread->b_wait = VLC_FALSE;
+        vlc_mutex_init( p_aout, &pa_thread->lock_signal );
+        vlc_cond_init( p_aout, &pa_thread->signal );
+        pa_thread->b_signal = VLC_FALSE;
+
+        /* Create PORTAUDIOThread */
+        if( vlc_thread_create( pa_thread, "aout", PORTAUDIOThread,
+                               VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
+        {
+            msg_Err( p_aout, "cannot create PORTAUDIO thread" );
+            return VLC_EGENERIC;
+        }
+    }
+    else
+    {
+        pa_thread->p_aout = p_aout;
+        pa_thread->b_wait = VLC_FALSE;
+        pa_thread->b_signal = VLC_FALSE;
+        pa_thread->b_error = VLC_FALSE;
     }
 
-    /* Close device for now. We'll re-open it later on */
-    if( ( i_err = Pa_Terminate() ) != paNoError )
-    {
-        msg_Err( p_aout, "Pa_Terminate returned %d", i_err );
-    }
+    /* Signal start of stream */
+    vlc_mutex_lock( &pa_thread->lock_signal );
+    pa_thread->b_signal = VLC_TRUE;
+    vlc_cond_signal( &pa_thread->signal );
+    vlc_mutex_unlock( &pa_thread->lock_signal );
 
-    /* Now we need to setup our DirectSound play notification structure */
-    p_sys->pa_thread = vlc_object_create( p_aout, sizeof(pa_thread_t) );
-    p_sys->pa_thread->p_aout = p_aout;
+    /* Wait until thread is ready */
+    vlc_mutex_lock( &pa_thread->lock_wait );
+    if( !pa_thread->b_wait )
+        vlc_cond_wait( &pa_thread->wait, &pa_thread->lock_wait );
+    vlc_mutex_unlock( &pa_thread->lock_wait );
+    pa_thread->b_wait = VLC_FALSE;
 
-    vlc_mutex_init( p_aout, &p_sys->lock );
-    vlc_cond_init( p_aout, &p_sys->wait );
-
-    /* Create PORTAUDIOThread */
-    if( vlc_thread_create( p_sys->pa_thread, "aout", PORTAUDIOThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_TRUE ) )
-    {
-        msg_Err( p_aout, "cannot create PORTAUDIO thread" );
-        return VLC_EGENERIC;
-    }
-
-    if( p_sys->pa_thread->b_error )
+    if( pa_thread->b_error )
     {
         msg_Err( p_aout, "PORTAUDIO thread failed" );
         Close( p_this );
@@ -192,6 +233,24 @@ static int Open( vlc_object_t * p_this )
     }
 
     return VLC_SUCCESS;
+
+#else
+
+    if( PAOpenDevice( p_aout ) != VLC_SUCCESS )
+    {
+        msg_Err( p_aout, "cannot open portaudio device" );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    if( PAOpenStream( p_aout ) != VLC_SUCCESS )
+    {
+        msg_Err( p_aout, "cannot open portaudio device" );
+    }
+
+    return VLC_SUCCESS;
+
+#endif
 }
 
 /*****************************************************************************
@@ -201,61 +260,26 @@ static void Close ( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     aout_sys_t *p_sys = p_aout->output.p_sys;
+    int i_err;
 
     msg_Dbg( p_aout, "closing portaudio");
 
-    vlc_mutex_lock( &p_sys->lock );
-    p_sys->pa_thread->b_die = VLC_TRUE;
-    vlc_cond_signal( &p_sys->wait );
-    vlc_mutex_unlock( &p_sys->lock );
+#ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
 
-    vlc_thread_join( p_sys->pa_thread );
-    vlc_cond_destroy( &p_sys->wait );
-    vlc_mutex_destroy( &p_sys->lock );
+    /* Signal end of stream */
+    vlc_mutex_lock( &pa_thread->lock_signal );
+    pa_thread->b_signal = VLC_TRUE;
+    vlc_cond_signal( &pa_thread->signal );
+    vlc_mutex_unlock( &pa_thread->lock_signal );
 
-    msg_Dbg( p_aout, "portaudio closed");
-    free( p_sys );
-}
+    /* Wait until thread is ready */
+    vlc_mutex_lock( &pa_thread->lock_wait );
+    if( !pa_thread->b_wait )
+        vlc_cond_wait( &pa_thread->wait, &pa_thread->lock_wait );
+    vlc_mutex_unlock( &pa_thread->lock_wait );
+    pa_thread->b_wait = VLC_FALSE;
 
-/*****************************************************************************
- * Play: play sound
- *****************************************************************************/
-static void Play( aout_instance_t * p_aout )
-{
-}
-
-/*****************************************************************************
- * PORTAUDIOThread: all interactions with libportaudio.a are handled
- * in this single thread.  Otherwise libportaudio.a is _not_ happy :-(
- *****************************************************************************/
-static void PORTAUDIOThread( pa_thread_t *pa_thread )
-{
-    aout_instance_t *p_aout = pa_thread->p_aout;
-    aout_sys_t *p_sys = p_aout->output.p_sys;
-    int i_err;
-
-    if( PAOpenDevice( p_aout ) != VLC_SUCCESS )
-    {
-        msg_Err( p_aout, "cannot open portaudio device" );
-        pa_thread->b_error = VLC_TRUE;
-        vlc_thread_ready( pa_thread );
-        return;
-    }
-
-    if( PAOpenStream( p_aout ) != VLC_SUCCESS )
-    {
-        msg_Err( p_aout, "cannot open portaudio device" );
-        pa_thread->b_error = VLC_TRUE;
-        vlc_thread_ready( pa_thread );
-        goto end;
-    }
-
-    /* Tell the main thread that we are ready */
-    vlc_thread_ready( pa_thread );
-
-    vlc_mutex_lock( &p_sys->lock );
-    if( !pa_thread->b_die ) vlc_cond_wait( &p_sys->wait, &p_sys->lock );
-    vlc_mutex_unlock( &p_sys->lock );
+#else
 
     i_err = Pa_StopStream( p_sys->p_stream );
     if( i_err != paNoError )
@@ -270,13 +294,17 @@ static void PORTAUDIOThread( pa_thread_t *pa_thread )
                  Pa_GetErrorText( i_err ) );
     }
 
- end:
     i_err = Pa_Terminate();
     if( i_err != paNoError )
     {
         msg_Err( p_aout, "Pa_Terminate: %d (%s)", i_err,
                  Pa_GetErrorText( i_err ) );
     }
+
+#endif
+
+    msg_Dbg( p_aout, "portaudio closed");
+    free( p_sys );
 }
 
 static int PAOpenDevice( aout_instance_t *p_aout )
@@ -488,3 +516,95 @@ static int PAOpenStream( aout_instance_t *p_aout )
 
     return VLC_SUCCESS;
 }
+
+/*****************************************************************************
+ * Play: play sound
+ *****************************************************************************/
+static void Play( aout_instance_t * p_aout )
+{
+}
+
+#ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
+/*****************************************************************************
+ * PORTAUDIOThread: all interactions with libportaudio.a are handled
+ * in this single thread.  Otherwise libportaudio.a is _not_ happy :-(
+ *****************************************************************************/
+static void PORTAUDIOThread( pa_thread_t *pa_thread )
+{
+    aout_instance_t *p_aout;
+    aout_sys_t *p_sys;
+    int i_err;
+
+    while( !pa_thread->b_die )
+    {
+        /* Wait for start of stream */
+        vlc_mutex_lock( &pa_thread->lock_signal );
+        if( !pa_thread->b_signal )
+            vlc_cond_wait( &pa_thread->signal, &pa_thread->lock_signal );
+        vlc_mutex_unlock( &pa_thread->lock_signal );
+        pa_thread->b_signal = VLC_FALSE;
+
+        p_aout = pa_thread->p_aout;
+        p_sys = p_aout->output.p_sys;
+
+        if( PAOpenDevice( p_aout ) != VLC_SUCCESS )
+        {
+            msg_Err( p_aout, "cannot open portaudio device" );
+            pa_thread->b_error = VLC_TRUE;
+        }
+
+        if( !pa_thread->b_error && PAOpenStream( p_aout ) != VLC_SUCCESS )
+        {
+            msg_Err( p_aout, "cannot open portaudio device" );
+            pa_thread->b_error = VLC_TRUE;
+
+            i_err = Pa_Terminate();
+            if( i_err != paNoError )
+            {
+                msg_Err( p_aout, "Pa_Terminate: %d (%s)", i_err,
+                         Pa_GetErrorText( i_err ) );
+            }
+        }
+
+        /* Tell the main thread that we are ready */
+        vlc_mutex_lock( &pa_thread->lock_wait );
+        pa_thread->b_wait = VLC_TRUE;
+        vlc_cond_signal( &pa_thread->wait );
+        vlc_mutex_unlock( &pa_thread->lock_wait );
+
+        /* Wait for end of stream */
+        vlc_mutex_lock( &pa_thread->lock_signal );
+        if( !pa_thread->b_signal )
+            vlc_cond_wait( &pa_thread->signal, &pa_thread->lock_signal );
+        vlc_mutex_unlock( &pa_thread->lock_signal );
+        pa_thread->b_signal = VLC_FALSE;
+
+        if( pa_thread->b_error ) continue;
+
+        i_err = Pa_StopStream( p_sys->p_stream );
+        if( i_err != paNoError )
+        {
+            msg_Err( p_aout, "Pa_StopStream: %d (%s)", i_err,
+                     Pa_GetErrorText( i_err ) );
+        }
+        i_err = Pa_CloseStream( p_sys->p_stream );
+        if( i_err != paNoError )
+        {
+            msg_Err( p_aout, "Pa_CloseStream: %d (%s)", i_err,
+                     Pa_GetErrorText( i_err ) );
+        }
+        i_err = Pa_Terminate();
+        if( i_err != paNoError )
+        {
+            msg_Err( p_aout, "Pa_Terminate: %d (%s)", i_err,
+                     Pa_GetErrorText( i_err ) );
+        }
+
+        /* Tell the main thread that we are ready */
+        vlc_mutex_lock( &pa_thread->lock_wait );
+        pa_thread->b_wait = VLC_TRUE;
+        vlc_cond_signal( &pa_thread->wait );
+        vlc_mutex_unlock( &pa_thread->lock_wait );
+    }
+}
+#endif
