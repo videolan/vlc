@@ -1,8 +1,8 @@
 /*****************************************************************************
- * dvd_csstables.h: CSS Tables for DVD unscrambling
+ * csstables.h: CSS Tables for DVD unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_csstables.h,v 1.1 2001/03/02 13:47:01 sam Exp $
+ * $Id: csstables.h,v 1.1 2001/06/12 22:14:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *

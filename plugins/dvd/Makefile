@@ -7,10 +7,10 @@
 # Objects
 #
 
-PLUGIN_C = dvd.o input_dvd.o dvd_netlist.o dvd_ioctl.o dvd_ifo.o dvd_udf.o dvd_css.o dvd_summary.o
-BUILTIN_C = $(PLUGIN_C:%.o=BUILTIN_%.o)
+PLUGIN_DVD = dvd.o input_dvd.o dvd_netlist.o dvd_ifo.o dvd_udf.o dvd_summary.o
+BUILTIN_DVD = $(PLUGIN_DVD:%.o=BUILTIN_%.o)
 
-ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
+ALL_OBJ = $(PLUGIN_DVD) $(BUILTIN_DVD)
 
 #
 # Virtual targets
@@ -18,14 +18,25 @@ ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
 
 include ../../Makefile.modules
 
+$(PLUGIN_DVD): %.o: .dep/%.d
+$(PLUGIN_DVD): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_DVD) -DPLUGIN -c -o $@ $<
+
+$(BUILTIN_DVD): BUILTIN_%.o: .dep/%.d
+$(BUILTIN_DVD): BUILTIN_%.o: %.c
+	$(CC) $(CFLAGS) $(CFLAGS_DVD) -DBUILTIN -c -o $@ $<
+
 #
 # Real targets
 #
 
-../../lib/dvd.so: $(PLUGIN_C)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+../../lib/dvd.so: libdvdcss $(PLUGIN_DVD)
+	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD)
 
-../../lib/dvd.a: $(BUILTIN_C)
-	ar r $@ $^
+../../lib/dvd.a: libdvdcss $(BUILTIN_DVD)
+	ar r $@ $(BUILTIN_DVD)
 	$(RANLIB) $@
+
+libdvdcss:
+	cd ../../ && $(MAKE) libdvdcss
 

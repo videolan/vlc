@@ -5,12 +5,12 @@
  * especially the 2048 bytes logical block size.
  * It depends on:
  *  -input_netlist used to read packets
+ *  -libdvdcss for access and unscrambling
  *  -dvd_ifo for ifo parsing and analyse
- *  -dvd_css for unscrambling
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.70 2001/06/12 18:16:49 stef Exp $
+ * $Id: input_dvd.c,v 1.71 2001/06/12 22:14:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -49,10 +49,6 @@
 #   include <unistd.h>
 #endif
 
-#if !defined( WIN32 )
-#   include <netinet/in.h>
-#endif
-
 #include <fcntl.h>
 #include <sys/types.h>
 #include <string.h>
@@ -68,6 +64,8 @@
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
+
+#include <videolan/dvdcss.h>
 
 #include "config.h"
 #include "common.h"
@@ -88,7 +86,6 @@
 #include "input_dvd.h"
 #include "dvd_netlist.h"
 #include "dvd_ifo.h"
-#include "dvd_css.h"
 #include "dvd_summary.h"
 #include "mpeg_system.h"
 
@@ -99,10 +96,10 @@
 
 /* how many blocks DVDRead will read in each loop */
 #define DVD_BLOCK_READ_ONCE 64
-#define DVD_DATA_READ_ONCE  4*DVD_BLOCK_READ_ONCE
+#define DVD_DATA_READ_ONCE  (4 * DVD_BLOCK_READ_ONCE)
 
 /* Size of netlist */
-#define DVD_NETLIST_SIZE    1024
+#define DVD_NETLIST_SIZE    2048
 
 /*****************************************************************************
  * Local prototypes
@@ -111,6 +108,8 @@
 static int  DVDProbe    ( probedata_t *p_data );
 static void DVDInit     ( struct input_thread_s * );
 static void DVDEnd      ( struct input_thread_s * );
+static void DVDOpen     ( struct input_thread_s * );
+static void DVDClose    ( struct input_thread_s * );
 static int  DVDSetArea  ( struct input_thread_s *, struct input_area_s * );
 static int  DVDRead     ( struct input_thread_s *, data_packet_t ** );
 static void DVDSeek     ( struct input_thread_s *, off_t );
@@ -131,8 +130,8 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = DVDProbe;
     input.pf_init             = DVDInit;
-    input.pf_open             = NULL; /* Set in DVDInit */
-    input.pf_close            = NULL;
+    input.pf_open             = DVDOpen;
+    input.pf_close            = DVDClose;
     input.pf_end              = DVDEnd;
     input.pf_read             = DVDRead;
     input.pf_set_area         = DVDSetArea;
@@ -216,6 +215,7 @@ static void DVDInit( input_thread_t * p_input )
     input_area_t *       p_area;
     int                  i_title;
     int                  i_chapter;
+    int                  i_ret;
     int                  i;
 
     p_dvd = malloc( sizeof(thread_dvd_data_t) );
@@ -229,7 +229,35 @@ static void DVDInit( input_thread_t * p_input )
     p_input->p_plugin_data = (void *)p_dvd;
     p_input->p_method_data = NULL;
 
-    p_dvd->i_fd = p_input->i_handle;
+    p_dvd->dvdhandle = dvdcss_init( DVDCSS_INIT_QUIET );
+
+    if( p_dvd->dvdhandle == NULL )
+    {
+        free( p_dvd );
+        p_input->b_error = 1;
+        return;
+    }
+
+    /* XXX: put this shit in an access plugin */
+    if( strlen( p_input->p_source ) > 4
+         && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    {
+        i_ret = dvdcss_open( p_dvd->dvdhandle, p_input->p_source + 4 );
+    }
+    else
+    {
+        i_ret = dvdcss_open( p_dvd->dvdhandle, p_input->p_source );
+    }
+
+    if( i_ret < 0 )
+    {
+        dvdcss_end( p_dvd->dvdhandle );
+        free( p_dvd );
+        p_input->b_error = 1;
+        return;
+    }
+
+    dvdcss_seek( p_dvd->dvdhandle, 0 );
 
     /* We read DVD_BLOCK_READ_ONCE in each loop, so the input will receive
      * DVD_DATA_READ_ONCE at most */
@@ -237,27 +265,9 @@ static void DVDInit( input_thread_t * p_input )
     /* this value mustn't be modifed */
     p_input->i_read_once = DVD_DATA_READ_ONCE;
 
-    i = CSSTest( p_input->i_handle );
-
-    if( i < 0 )
-    {
-        intf_ErrMsg( "dvd error: error in css" );
-        free( p_dvd );
-        p_input->b_error = 1;
-        return;
-    }
-
-    p_dvd->b_encrypted = i;
-
-#if !defined( WIN32 )
-    lseek( p_input->i_handle, 0, SEEK_SET );
-#else
-    SetFilePointer( (HANDLE) p_input->i_handle, 0, 0, FILE_BEGIN );
-#endif
-
     /* Reading structures initialisation */
     p_input->p_method_data =
-        DVDNetlistInit( DVD_NETLIST_SIZE, 2*DVD_NETLIST_SIZE,
+        DVDNetlistInit( DVD_NETLIST_SIZE, 2 * DVD_NETLIST_SIZE,
                         DVD_NETLIST_SIZE, DVD_LB_SIZE, p_dvd->i_block_once );
     intf_WarnMsg( 2, "dvd info: netlist initialized" );
 
@@ -265,6 +275,9 @@ static void DVDInit( input_thread_t * p_input )
     if( IfoCreate( p_dvd ) < 0 )
     {
         intf_ErrMsg( "dvd error: allcation error in ifo" );
+        dvdcss_close( p_dvd->dvdhandle );
+        dvdcss_end( p_dvd->dvdhandle );
+        free( p_dvd );
         p_input->b_error = 1;
         return;
     }
@@ -272,35 +285,12 @@ static void DVDInit( input_thread_t * p_input )
     if( IfoInit( p_dvd->p_ifo ) < 0 )
     {
         intf_ErrMsg( "dvd error: fatal failure in ifo" );
+        IfoDestroy( p_dvd->p_ifo );
+        dvdcss_close( p_dvd->dvdhandle );
+        dvdcss_end( p_dvd->dvdhandle );
         free( p_dvd );
         p_input->b_error = 1;
         return;
-    }
-
-    /* CSS initialisation */
-    if( p_dvd->b_encrypted )
-    {
-        p_dvd->p_css = malloc( sizeof(css_t) );
-        if( p_dvd->p_css == NULL )
-        {
-            intf_ErrMsg( "dvd error: couldn't create css structure" );
-            free( p_dvd );
-            p_input->b_error = 1;
-            return;
-        }
-
-        p_dvd->p_css->i_agid = 0;
-
-        if( CSSInit( p_input->i_handle, p_dvd->p_css ) < 0 )
-        {
-            intf_ErrMsg( "dvd error: fatal failure in css" );
-            free( p_dvd->p_css );
-            free( p_dvd );
-            p_input->b_error = 1;
-            return;
-        }
-
-        intf_WarnMsg( 2, "dvd info: css initialized" );
     }
 
     /* Set stream and area data */
@@ -340,8 +330,8 @@ static void DVDInit( input_thread_t * p_input )
         area[i]->i_angle = 1;
 
         /* Offset to vts_i_0.ifo */
-        area[i]->i_plugin_data = p_dvd->p_ifo->i_off +
-                       ( title_inf.p_attr[i-1].i_start_sector * DVD_LB_SIZE );
+        area[i]->i_plugin_data = p_dvd->p_ifo->i_start +
+                       title_inf.p_attr[i-1].i_start_sector;
     }   
 #undef area
 
@@ -384,13 +374,14 @@ static void DVDEnd( input_thread_t * p_input )
     p_dvd = (thread_dvd_data_t*)p_input->p_plugin_data;
     p_netlist = (dvd_netlist_t *)p_input->p_method_data;
 
-    if( p_dvd->b_encrypted )
-    {
-        free( p_dvd->p_css );
-    }
-
     IfoDestroy( p_dvd->p_ifo );
+
+    /* Clean up libdvdcss */
+    dvdcss_close( p_dvd->dvdhandle );
+    dvdcss_end( p_dvd->dvdhandle );
+
     free( p_dvd );
+
     DVDNetlistEnd( p_netlist );
 }
 
@@ -410,7 +401,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     int                  i_audio;
     int                  i_spu;
     int                  i;
-    int                  j;
 
     p_dvd = (thread_dvd_data_t*)p_input->p_plugin_data;
 
@@ -456,32 +446,12 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                         i_vts_title,
                         p_dvd->i_title_id );
 
-        /* css title key for current vts */
-        if( p_dvd->b_encrypted )
-        {
-            /* this one is vts number */
-            p_dvd->p_css->i_title =
-                    vmg.title_inf.p_attr[p_dvd->i_title-1].i_title_set_num;
-            p_dvd->p_css->i_title_pos =
-                    vts.i_pos +
-                    vts.manager_inf.i_title_vob_start_sector * DVD_LB_SIZE;
-
-            j = CSSGetKey( p_input->i_handle, p_dvd->p_css );
-            if( j < 0 )
-            {
-                intf_ErrMsg( "dvd error: fatal error in vts css key" );
-                free( p_dvd );
-                p_input->b_error = 1;
-                return -1;
-            }
-            else if( j > 0 )
-            {
-                intf_ErrMsg( "dvd error: css decryption unavailable" );
-                free( p_dvd );
-                p_input->b_error = 1;
-                return -1;
-            }
-        }
+        /*
+         * CSS cracking has to be done again
+         */
+        dvdcss_crack( p_dvd->dvdhandle,
+                      vmg.title_inf.p_attr[p_dvd->i_title-1].i_title_set_num,
+                      vts.i_pos + vts.manager_inf.i_title_vob_start_sector );
 
         /*
          * Angle management
@@ -497,12 +467,13 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
          * Set selected title start and size
          */
         
-        /* title set offset */
-        p_dvd->i_title_start = vts.i_pos + DVD_LB_SIZE *
-                      (off_t)( vts.manager_inf.i_title_vob_start_sector );
+        /* title set offset XXX: convert to block values */
+        p_dvd->i_title_start =
+            vts.i_pos + vts.manager_inf.i_title_vob_start_sector;
 
         /* last video cell */
         p_dvd->i_cell = 0;
+	intf_FlushMsg();
         p_dvd->i_prg_cell = -1 +
             vts.title_unit.p_title[p_dvd->i_title_id-1].title.i_cell_nb;
 
@@ -520,10 +491,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         }
 
         p_dvd->i_sector = 0;
-        p_dvd->i_size = DVD_LB_SIZE *
-          (off_t)( vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
-        intf_WarnMsg( 2, "dvd info: stream size 1: %lld @ %d", p_dvd->i_size,
-                      vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector );
+        p_dvd->i_size = vts.cell_inf.p_cell_map[p_dvd->i_cell].i_end_sector;
+        intf_WarnMsg( 2, "dvd info: stream size 1: %d", p_dvd->i_size );
 
         if( DVDChapterSelect( p_dvd, 1 ) < 0 )
         {
@@ -532,13 +501,13 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             return -1;
         }
 
-        p_dvd->i_size -= (off_t)( p_dvd->i_sector + 1 ) *DVD_LB_SIZE;
+        p_dvd->i_size -= p_dvd->i_sector + 1;
 
         IfoPrintTitle( p_dvd );
 
         /* Area definition */
-        p_input->stream.p_selected_area->i_start = p_dvd->i_start;
-        p_input->stream.p_selected_area->i_size = p_dvd->i_size;
+        p_input->stream.p_selected_area->i_start = LB2OFF( p_dvd->i_start );
+        p_input->stream.p_selected_area->i_size = LB2OFF( p_dvd->i_size );
         p_input->stream.p_selected_area->i_angle_nb = p_dvd->i_angle_nb;
         p_input->stream.p_selected_area->i_angle = p_dvd->i_angle;
 
@@ -755,8 +724,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 return -1;
             }
     
-            p_input->stream.p_selected_area->i_tell = p_dvd->i_start -
-                                                      p_area->i_start;
+            p_input->stream.p_selected_area->i_tell =
+                                   LB2OFF( p_dvd->i_start ) - p_area->i_start;
             p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
     
             intf_WarnMsg( 4, "dvd info: chapter %d start at: %lld",
@@ -821,7 +790,6 @@ static int DVDRead( input_thread_t * p_input,
     int                     i_iovec;
     int                     i_packet;
     int                     i_pos;
-    int                     i_read_bytes;
     int                     i_read_blocks;
     off_t                   i_off;
     boolean_t               b_eof;
@@ -849,9 +817,8 @@ static int DVDRead( input_thread_t * p_input,
         }
 
         /* Position the fd pointer on the right address */
-        i_off = lseek( p_dvd->i_fd,
-                       p_dvd->i_title_start +
-                       (off_t)( p_dvd->i_sector ) *DVD_LB_SIZE, SEEK_SET );
+        i_off = LB2OFF( dvdcss_seek( p_dvd->dvdhandle,
+                                     p_dvd->i_title_start + p_dvd->i_sector ) );
 
         /* update chapter : it will be easier when we have navigation
          * ES support */
@@ -883,7 +850,7 @@ static int DVDRead( input_thread_t * p_input,
         i_block_once = p_dvd->i_end_sector - p_dvd->i_sector + 1;
     }
 
-    /* the number of blocks read is the maw between the requested
+    /* The number of blocks read is the max between the requested
      * value and the leaving block in the cell */
     if( i_block_once > p_dvd->i_block_once )
     {
@@ -901,12 +868,8 @@ static int DVDRead( input_thread_t * p_input,
     }
 
     /* Reads from DVD */
-#if !defined( WIN32 )
-    i_read_bytes = readv( p_dvd->i_fd, p_vec, i_block_once );
-#else
-    i_read_bytes = ReadFileV( p_dvd->i_fd, p_vec, i_block_once );
-#endif
-    i_read_blocks = ( i_read_bytes + 0x7ff ) >> 11;
+    i_read_blocks = dvdcss_readv( p_dvd->dvdhandle, p_vec,
+                                  i_block_once, DVDCSS_READ_DECRYPT );
 
     /* Update netlist indexes: we don't do it in DVDGetiovec since we
      * need know the real number of blocks read */
@@ -920,13 +883,6 @@ static int DVDRead( input_thread_t * p_input,
     /* Read headers to compute payload length */
     for( i_iovec = 0 ; i_iovec < i_read_blocks ; i_iovec++ )
     {
-        if( p_dvd->b_encrypted )
-        {
-            CSSDescrambleSector( p_dvd->p_css->pi_title_key, 
-                                 p_vec[i_iovec].iov_base );
-            ((u8*)(p_vec[i_iovec].iov_base))[0x14] &= 0x8F;
-        }
-
         i_pos = 0;
 
         while( i_pos < p_netlist->i_buffer_size )
@@ -987,8 +943,9 @@ static int DVDRead( input_thread_t * p_input,
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    p_input->stream.p_selected_area->i_tell += i_read_bytes;
-    b_eot = !( p_input->stream.p_selected_area->i_tell < p_dvd->i_size );
+    p_input->stream.p_selected_area->i_tell += LB2OFF( i_read_blocks );
+    b_eot = !( p_input->stream.p_selected_area->i_tell
+                < LB2OFF( p_dvd->i_size ) );
     b_eof = b_eot && ( ( p_dvd->i_title + 1 ) >= p_input->stream.i_area_nb );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -1034,7 +991,6 @@ static int DVDRewind( input_thread_t * p_input )
 static void DVDSeek( input_thread_t * p_input, off_t i_off )
 {
     thread_dvd_data_t *     p_dvd;
-    off_t                   i_pos;
     int                     i_prg_cell;
     int                     i_cell;
     int                     i_chapter;
@@ -1043,11 +999,8 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_dvd = ( thread_dvd_data_t * )p_input->p_plugin_data;
 
     /* we have to take care of offset of beginning of title */
-    i_pos = i_off + p_input->stream.p_selected_area->i_start
-                  - p_dvd->i_title_start;
-
-    /* update navigation data */
-    p_dvd->i_sector = i_pos >> 11;
+    p_dvd->i_sector = OFF2LB(i_off + p_input->stream.p_selected_area->i_start)
+                       - p_dvd->i_title_start;
 
     i_prg_cell = 0;
     i_chapter = 0;
@@ -1128,23 +1081,25 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
     p_dvd->i_chapter = i_chapter;
     p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
 
-#if !defined( WIN32 )
     p_input->stream.p_selected_area->i_tell =
-                lseek( p_dvd->i_fd, p_dvd->i_title_start +
-                       (off_t)( p_dvd->i_sector ) *DVD_LB_SIZE, SEEK_SET ) -
-                p_input->stream.p_selected_area->i_start;
-#else
-    p_input->stream.p_selected_area->i_tell =
-                SetFilePointer( (HANDLE) p_dvd->i_fd, p_dvd->i_title_start +
-                        (off_t)( p_dvd->i_sector ) *DVD_LB_SIZE, NULL, FILE_BEGIN) -
-                         p_input->stream.p_selected_area->i_start;
-
-#endif
-
-/*    intf_WarnMsg( 3, "Program Cell: %d Cell: %d Chapter: %d",
+        LB2OFF ( dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_title_start
+                                                 + p_dvd->i_sector ) )
+         - p_input->stream.p_selected_area->i_start;
+/*
+    intf_WarnMsg( 3, "Program Cell: %d Cell: %d Chapter: %d",
                      p_dvd->i_prg_cell, p_dvd->i_cell, p_dvd->i_chapter );
 */
 
+    return;
+}
+
+static void DVDOpen     ( struct input_thread_s *p_input )
+{
+    return;
+}
+
+static void DVDClose    ( struct input_thread_s *p_input )
+{
     return;
 }
 
@@ -1266,16 +1221,10 @@ static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
     }
 
     /* start is : beginning of vts vobs + offset to vob x */
-    p_dvd->i_start = p_dvd->i_title_start +
-                         DVD_LB_SIZE * (off_t)( p_dvd->i_sector );
+    p_dvd->i_start = p_dvd->i_title_start + p_dvd->i_sector;
 
     /* Position the fd pointer on the right address */
-#if !defined( WIN32 )
-    p_dvd->i_start = lseek( p_dvd->i_fd, p_dvd->i_start, SEEK_SET );
-#else
-    p_dvd->i_start = SetFilePointer( (HANDLE) p_dvd->i_fd,
-                        p_dvd->i_start, NULL, FILE_BEGIN );
-#endif
+    p_dvd->i_start = dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start );
 
     p_dvd->i_chapter = i_chapter;
     return 0;

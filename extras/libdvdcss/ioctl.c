@@ -1,8 +1,8 @@
 /*****************************************************************************
- * dvd_ioctl.c: DVD ioctl replacement function
+ * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.17 2001/06/03 12:47:21 sam Exp $
+ * $Id: ioctl.c,v 1.1 2001/06/12 22:14:44 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -55,20 +55,12 @@
 
 #include "config.h"
 #include "common.h"
-#include "threads.h"
-#include "mtime.h"
-
-#include "intf_msg.h"
 
 #ifdef SYS_DARWIN1_3
 #   include "DVDioctl/DVDioctl.h"
 #endif
 
-#include "dvd_css.h"
-#include "dvd_ioctl.h"
-
-#include "modules.h"
-#include "modules_export.h"
+#include "ioctl.h"
 
 /*****************************************************************************
  * Local prototypes, BeOS specific
@@ -115,8 +107,8 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
     *pi_copyright = p_buffer[ 4 ];
 
 #elif defined( SYS_DARWIN1_3 )
-    intf_ErrMsg( "css error: DVD ioctls not fully functional yet" );
-    intf_ErrMsg( "css error: assuming disc is encrypted" );
+    _dvd_error( dvdcss, "DVD ioctls not fully functional yet, "
+                           "assuming disc is encrypted" );
 
     *pi_copyright = 1;
 
@@ -159,8 +151,8 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
     else
     {
         /* TODO: add WNASPI support for Win9x */
-        intf_ErrMsg( "css error: DVD ioctls not functional yet" );
-        intf_ErrMsg( "css error: assuming disc is unencrypted" );
+        _dvd_error( dvdcss, "DVD ioctls not functional yet, "
+                               "assuming disc is unencrypted" );
         *pi_copyright = 0;
         i_ret = 0;
     }
@@ -228,8 +220,8 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
     memcpy( p_key, p_buffer + 4, 2048 );
 
 #elif defined( SYS_DARWIN1_3 )
-    intf_ErrMsg( "css error: DVD ioctls not fully functional yet" );
-    intf_ErrMsg( "css error: sending an empty key" );
+    _dvd_error( dvdcss, "DVD ioctls not fully functional yet, "
+                           "sending an empty key" );
 
     i_ret = 0;
 

@@ -2,7 +2,7 @@
  * dvd_ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.h,v 1.10 2001/05/31 03:57:54 sam Exp $
+ * $Id: ioctl.h,v 1.1 2001/06/12 22:14:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

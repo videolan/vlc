@@ -249,6 +249,9 @@ snapshot: Makefile.opts
 		cp share/$$icon.xpm share/$$icon.png \
 			/tmp/vlc-${PROGRAM_VERSION}/share/ ; done
 
+	# make distclean
+	(cd /tmp/vlc-${PROGRAM_VERSION} ; ./configure ; make distclean )
+
 	# build css-enabled archives
 	(cd /tmp ; tar cf vlc-${PROGRAM_VERSION}.tar vlc-${PROGRAM_VERSION} ; \
 		bzip2 -f -9 < vlc-${PROGRAM_VERSION}.tar \
@@ -347,4 +350,10 @@ $(PLUGIN_OBJ): FORCE
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 $(BUILTIN_OBJ): FORCE
 	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:lib/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
+
+#
+# libdvdcss target
+#
+libdvdcss:
+	cd extras/libdvdcss && $(MAKE)
 

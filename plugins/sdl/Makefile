@@ -7,10 +7,10 @@
 # Objects
 #
 
-PLUGIN_C = sdl.o vout_sdl.o aout_sdl.o
-BUILTIN_C = $(PLUGIN_C:%.o=BUILTIN_%.o)
+PLUGIN_SDL = sdl.o vout_sdl.o aout_sdl.o
+BUILTIN_SDL = $(PLUGIN_SDL:%.o=BUILTIN_%.o)
 
-ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
+ALL_OBJ = $(PLUGIN_SDL) $(BUILTIN_SDL)
 
 #
 # Virtual targets
@@ -22,18 +22,18 @@ $(PLUGIN_SDL): %.o: .dep/%.d
 $(PLUGIN_SDL): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_SDL) -DPLUGIN -c -o $@ $<
 
-$(BUILTIN_SDL): BUILTIN_SDL_%.o: .dep/%.d
-$(BUILTIN_SDL): BUILTIN_SDL_%.o: %.c
+$(BUILTIN_SDL): BUILTIN_%.o: .dep/%.d
+$(BUILTIN_SDL): BUILTIN_%.o: %.c
 	$(CC) $(CFLAGS) $(CFLAGS_SDL) -DBUILTIN -c -o $@ $<
 
 #
 # Real targets
 #
 
-../../lib/sdl.so: $(PLUGIN_C)
+../../lib/sdl.so: $(PLUGIN_SDL)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_SDL)
 
-../../lib/sdl.a: $(BUILTIN_C)
+../../lib/sdl.a: $(BUILTIN_SDL)
 	ar r $@ $^
 	$(RANLIB) $@
 

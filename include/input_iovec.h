@@ -30,7 +30,6 @@ struct iovec
     size_t iov_len;     /* Length of data.  */
 };
 
-#if defined( WIN32 )
 /*****************************************************************************
  * readv: readv() replacement for iovec-impaired C libraries
  *****************************************************************************/
@@ -86,4 +85,3 @@ static __inline int readv( int i_fd, struct iovec *p_iovec, int i_count )
     return i_total;
 }
 
-#endif

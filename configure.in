@@ -180,6 +180,8 @@ dnl  DVD module: check for DVD ioctls
 dnl
 AC_CHECK_HEADERS(sys/ioctl.h,[
   BUILTINS="${BUILTINS} dvd"
+  LIB_DVD="${LIB_DVD} -Llib -L../../lib -ldvdcss"
+  CFLAGS_DVD="${CFLAGS_DVD} -I../../extras/libdvdcss"
   AC_CHECK_HEADERS(sys/cdio.h sys/dvdio.h linux/cdrom.h)
   BSD_DVD_STRUCT=0
   dnl
@@ -592,6 +594,7 @@ AC_SUBST(LIB)
 AC_SUBST(LIB_ALSA)
 AC_SUBST(LIB_BEOS)
 AC_SUBST(LIB_DARWIN)
+AC_SUBST(LIB_DVD)
 AC_SUBST(LIB_ESD)
 AC_SUBST(LIB_GGI)
 AC_SUBST(LIB_GLIDE)
@@ -609,6 +612,7 @@ AC_SUBST(LIB_XVIDEO)
 AC_SUBST(LIB_YUV)
 
 AC_SUBST(CFLAGS_VLC)
+AC_SUBST(CFLAGS_DVD)
 AC_SUBST(CFLAGS_GTK)
 AC_SUBST(CFLAGS_SDL)
 AC_SUBST(CFLAGS_X11)
@@ -616,20 +620,27 @@ AC_SUBST(CFLAGS_X11)
 AC_OUTPUT([Makefile.opts include/config.h])
 
 echo "
+global configuration
+--------------------
+system                : ${SYS}
+architecture          : ${ARCH}
+optimizations         : ${OPTIMS}
+
 vlc configuration
 -----------------
 vlc version           : ${VLC_VERSION}
-system                : ${SYS}
-architecture          : ${ARCH}
 debug mode            : ${DEBUG}
 statistics            : ${STATS}
 trace mode            : ${TRACE}
-optimizations         : ${OPTIMS}
-CSS decryption        : ${CSS}
 need builtin getopt   : ${GETOPT}
 built-in modules      :${BUILTINS}
 plugin modules        :${PLUGINS}
 vlc aliases           :${ALIASES}
 
-You may now tune Makefile.opts at your convenience."
+libdvdcss configuration
+-----------------------
+CSS decryption        : ${CSS}
+
+You may now tune Makefile.opts at your convenience. To build vlc, type
+\`make vlc'. To build libdvdcss only, type \`make libdvdcss'."
 

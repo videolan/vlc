@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.16 2001/06/07 15:27:44 sam Exp $
+ * $Id: dvd_ifo.h,v 1.17 2001/06/12 22:14:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -521,7 +521,7 @@ typedef struct time_inf_s
 typedef struct vts_s
 {
     boolean_t       b_initialized;
-    off_t           i_pos;
+    int             i_pos;
     vts_manager_t   manager_inf;
     vts_title_t     title_inf;
     title_unit_t    menu_unit;
@@ -538,18 +538,17 @@ typedef struct vts_s
  */
 typedef struct ifo_s
 {
-    int             i_fd;           /* File descriptor for the device */
-    off_t           i_off;          /* Offset to video_ts.ifo on the device */
-    off_t           i_pos;          /* Position of stream pointer */
+    dvdcss_handle   dvdhandle;      /* File descriptor for the device */
+    int             i_start;        /* Offset to video_ts.ifo on the device */
+    int             i_pos;          /* Position of stream pointer */
     boolean_t       b_error;        /* Error Management */
     vmg_t           vmg;            /* Structure described in video_ts */
     int             i_title;        /* Current title number */
     vts_t           vts;            /* Vts ifo for current title set */
     
-    #if defined(__FreeBSD__)
-    uint8_t         p_remap[ 2 * DVD_LB_SIZE ]; 
-                                    /* Remap buffer for unaligned reads */
-    #endif
+    /* Remap buffer for unaligned reads */
+    u8              p_remap[ 2 * DVD_LB_SIZE ]; 
+
 } ifo_t;
 
 
@@ -562,3 +561,4 @@ int   IfoCreate   ( struct thread_dvd_data_s * );
 int   IfoInit     ( struct ifo_s * );
 int   IfoTitleSet ( struct ifo_s * );
 void  IfoDestroy  ( struct ifo_s * );
+

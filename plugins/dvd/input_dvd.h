@@ -2,7 +2,7 @@
  * input_dvd.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dvd.h,v 1.23 2001/06/07 22:25:42 sam Exp $
+ * $Id: input_dvd.h,v 1.24 2001/06/12 22:14:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -26,14 +26,15 @@
  *****************************************************************************/
 /* Logical block size for DVD-VIDEO */
 #define DVD_LB_SIZE 2048
+#define LB2OFF(x) ((off_t)(x) * (off_t)(DVD_LB_SIZE))
+#define OFF2LB(x) ((x) >> 11)
 
 /*****************************************************************************
  * thread_dvd_data_t: extension of input_thread_t for DVD specificity.
  *****************************************************************************/
 typedef struct thread_dvd_data_s
 {
-    int                     i_fd;               // File descriptor of device
-    boolean_t               b_encrypted;        // CSS encryption
+    dvdcss_handle           dvdhandle;                   /* libdvdcss handle */
 
     int                     i_block_once;       // Nb of block read once by 
                                                 // readv
@@ -55,9 +56,9 @@ typedef struct thread_dvd_data_s
     int                     i_sector;
     int                     i_end_sector;     /* last sector of current cell */
 
-    off_t                   i_title_start;
-    off_t                   i_start;
-    off_t                   i_size;
+    int                     i_title_start;
+    int                     i_start;
+    int                     i_size;
 
     /* Scrambling Information */
     struct css_s *          p_css;

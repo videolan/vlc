@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.101 2001/06/12 11:02:07 reno Exp $
+ * $Id: main.c,v 1.102 2001/06/12 22:14:44 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -132,6 +132,16 @@
 #define USAGE                     0
 #define SHORT_HELP                1
 #define LONG_HELP                 2
+
+/* Needed for x86 CPU capabilities detection */
+#define cpuid( a )                 \
+    asm volatile ( "cpuid"         \
+                 : "=a" ( i_eax ), \
+                   "=b" ( i_ebx ), \
+                   "=c" ( i_ecx ), \
+                   "=d" ( i_edx )  \
+                 : "a"  ( a )      \
+                 : "cc" );
 
 /* Long options */
 static const struct option longopts[] =
@@ -912,16 +922,13 @@ static void InstructionSignalHandler( int i_signal )
      * to an interface having been destroyed */
 
     /* Acknowledge the signal received */
-    fprintf(stderr,"illegal instruction : optimization disable\n");
+    fprintf( stderr, "illegal instruction : optimization disabled\n" );
 
     i_illegal = 1;
     
     sigrelse( i_signal );
     longjmp( env, 1 );
 }
-
-
-
 
 /*****************************************************************************
  * CPUCapabilities: list the processors MMX support and other capabilities
@@ -937,8 +944,9 @@ static int CPUCapabilities( void )
                       | CPU_CAPABILITY_586
                       | CPU_CAPABILITY_MMX;
 
-#elif defined( SYS_DARWIN1_3 )
+    return( i_capabilities );
 
+#elif defined( SYS_DARWIN1_3 )
     struct host_basic_info hi;
     kern_return_t          ret;
     host_name_port_t       host;
@@ -966,21 +974,14 @@ static int CPUCapabilities( void )
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
     }
 
+    return( i_capabilities );
+
 #elif defined( __i386__ )
     volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
     volatile boolean_t     b_amd;
 
     signal( SIGILL,  InstructionSignalHandler );
     
-#   define cpuid( a )              \
-    asm volatile ( "cpuid"         \
-                 : "=a" ( i_eax ), \
-                   "=b" ( i_ebx ), \
-                   "=c" ( i_ecx ), \
-                   "=d" ( i_edx )  \
-                 : "a"  ( a )      \
-                 : "cc" );         \
-
     /* test for a 486 CPU */
     asm volatile ( "pushfl\n\t"
                    "popl %%eax\n\t"
@@ -1032,19 +1033,20 @@ static int CPUCapabilities( void )
 
     if( i_edx & 0x02000000 )
     {
-        
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
 
         /* We test if OS support the SSE instructions */
         i_illegal = 0;
-        if(setjmp(env)==0) { /* Test a SSE instruction */
-            __asm__ __volatile__ (
-            "xorps %%xmm0,%%xmm0\n"
-            ::);
+        if( setjmp( env ) == 0 )
+        {
+            /* Test a SSE instruction */
+            __asm__ __volatile__ ( "xorps %%xmm0,%%xmm0\n" : : );
         }
-        
-        if( i_illegal != 1 )
+
+        if( i_illegal == 0 )
+        {
             i_capabilities |= CPU_CAPABILITY_SSE;
+        }
     }
     
     /* test for additional capabilities */
@@ -1062,26 +1064,30 @@ static int CPUCapabilities( void )
     if( i_edx & 0x80000000 )
     {
         i_illegal = 0;
-        if(setjmp(env)==0) { /* Test a 3D Now! instruction */
-            __asm__ __volatile__ (
-            "pfadd %%mm0,%%mm0\n"
-            "femms\n"
-            ::);
+        if( setjmp( env ) == 0 )
+        {
+            /* Test a 3D Now! instruction */
+            __asm__ __volatile__ ( "pfadd %%mm0,%%mm0\n" "femms\n" : : );
         }
-        
-        if( i_illegal != 1 ) 
+
+        if( i_illegal == 0 ) 
+        {
             i_capabilities |= CPU_CAPABILITY_3DNOW;
+        }
     }
 
     if( b_amd && ( i_edx & 0x00400000 ) )
     {
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
     }
-#else
-    /* default behaviour */
 
-#endif
     signal( SIGILL, NULL );     
     return( i_capabilities );
+
+#else
+    /* default behaviour */
+    return( i_capabilities );
+
+#endif
 }
 

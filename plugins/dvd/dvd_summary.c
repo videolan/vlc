@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.5 2001/06/12 18:16:49 stef Exp $
+ * $Id: dvd_summary.c,v 1.6 2001/06/12 22:14:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -53,6 +53,8 @@
 #   include <strings.h>
 #endif
 #include <errno.h>
+
+#include <videolan/dvdcss.h>
 
 #include "config.h"
 #include "common.h"
@@ -260,8 +262,8 @@ char * IfoLanguage( u16 i_code )
 void IfoPrintTitle( thread_dvd_data_t * p_dvd )
 {
     intf_WarnMsg( 5, "dvd info: title: %d", p_dvd->i_title );
-    intf_WarnMsg( 5, "    vobstart at: %lld", p_dvd->i_start );
-    intf_WarnMsg( 5, "    stream size: %lld", p_dvd->i_size );
+    intf_WarnMsg( 5, "    vobstart at: %d blocks", p_dvd->i_start );
+    intf_WarnMsg( 5, "    stream size: %d blocks", p_dvd->i_size );
     intf_WarnMsg( 5, "    number of chapters: %d", p_dvd->i_chapter_nb );
     intf_WarnMsg( 5, "    number of angles: %d", p_dvd->i_angle_nb );
 }

@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.10 2001/06/07 22:25:42 sam Exp $
+ * $Id: dvd_udf.c,v 1.11 2001/06/12 22:14:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -55,6 +55,8 @@
 #   include <strings.h>
 #endif
 
+#include <videolan/dvdcss.h>
+
 #include "config.h"
 #include "common.h"
 #include "threads.h"
@@ -63,7 +65,6 @@
 #include "intf_msg.h"
 
 #include "input_dvd.h"
-#include "dvd_css.h"
 #include "dvd_ifo.h"
 
 #include "modules.h"
@@ -75,15 +76,15 @@
 
 typedef struct partition_s
 {
-    boolean_t   b_valid;
-    u8          pi_volume_desc[128];
-    u16         i_flags;
-    u16         i_number;
-    u8          pi_contents[32];
-    u32         i_access_type;
-    u32         i_start;
-    u32         i_length;
-    int         i_fd;
+    boolean_t     b_valid;
+    u8            pi_volume_desc[128];
+    u16           i_flags;
+    u16           i_number;
+    u8            pi_contents[32];
+    u32           i_access_type;
+    u32           i_start;
+    u32           i_length;
+    dvdcss_handle dvdhandle;
 } partition_t;
 
 typedef struct ad_s
@@ -106,41 +107,16 @@ typedef struct ad_s
  *****************************************************************************
  * Returns number of read bytes on success, 0 on error
  *****************************************************************************/
-static int UDFReadLB( int i_fd, off_t i_lba, size_t i_block_count, u8 *pi_data )
+static int UDFReadLB( dvdcss_handle dvdhandle, off_t i_lba,
+                      size_t i_block_count, u8 *pi_data )
 {
-#if !defined( WIN32 )
-    if( i_fd < 0 )
-#else
-    DWORD read;
-
-    if( (HANDLE) i_fd == INVALID_HANDLE_VALUE )
-#endif
-    {
-        return 0;
-    }
-
-#if !defined( WIN32 )
-    if( lseek( i_fd, i_lba * (off_t) DVD_LB_SIZE, SEEK_SET ) < 0 )
-#else
-    if( SetFilePointer( (HANDLE) i_fd, i_lba * (off_t) DVD_LB_SIZE,
-        NULL, FILE_BEGIN ) == -1 )
-#endif
+    if( dvdcss_seek( dvdhandle, i_lba ) < 0 )
     {
         intf_ErrMsg( "UDF: Postion not found" );
         return 0;
     }
 
-#if !defined( WIN32 )
-    return read( i_fd, pi_data, i_block_count *DVD_LB_SIZE);
-#else
-    if(!ReadFile( (HANDLE) i_fd, pi_data, i_block_count * DVD_LB_SIZE,
-        &read, NULL) || read != i_block_count * DVD_LB_SIZE )
-    {
-        return 0;
-    }
-
-    return read;
-#endif
+    return dvdcss_read( dvdhandle, pi_data, i_block_count, DVDCSS_NOFLAGS );
 }
 
 
@@ -413,7 +389,7 @@ static int UDFMapICB( struct ad_s icb, u8 * pi_file_type, struct ad_s * p_file,
 
     do
     {
-        if( !UDFReadLB( partition.i_fd, i_lba++, 1, pi_lb ) )
+        if( !UDFReadLB( partition.dvdhandle, i_lba++, 1, pi_lb ) )
         {
             i_tag_id = 0;
         }
@@ -457,7 +433,7 @@ static int UDFScanDir( struct ad_s dir, char * psz_filename,
 #if 0
     do
     {
-        if( !UDFReadLB( partition.i_fd, i_lba++, 1, pi_lb ) )
+        if( !UDFReadLB( partition.dvdhandle, i_lba++, 1, pi_lb ) )
         {
             i_tag_id = 0;
         }
@@ -489,7 +465,7 @@ static int UDFScanDir( struct ad_s dir, char * psz_filename,
 
 #else
 
-    if( UDFReadLB( partition.i_fd, i_lba, 2, pi_lb ) <= 0 ) {
+    if( UDFReadLB( partition.dvdhandle, i_lba, 2, pi_lb ) <= 0 ) {
         return 0;
     }
 
@@ -501,7 +477,7 @@ static int UDFScanDir( struct ad_s dir, char * psz_filename,
             ++i_lba;
             p -= DVD_LB_SIZE;
             dir.i_length -= DVD_LB_SIZE;
-            if( UDFReadLB( partition.i_fd, i_lba, 2, pi_lb ) <= 0 )
+            if( UDFReadLB( partition.dvdhandle, i_lba, 2, pi_lb ) <= 0 )
             {
                 return 0;
             }
@@ -558,7 +534,7 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
     /* Search anchor loop */
     while( 1 )
     {
-        if( UDFReadLB( p_partition->i_fd, i_lba, 1, pi_anchor ) )
+        if( UDFReadLB( p_partition->dvdhandle, i_lba, 1, pi_anchor ) )
         {
             UDFDescriptor( pi_anchor, &i_tag_id );
         }
@@ -622,7 +598,7 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
 
         do
         {
-            if( !UDFReadLB( p_partition->i_fd, i_lba++, 1, pi_lb ) )
+            if( !UDFReadLB( p_partition->dvdhandle, i_lba++, 1, pi_lb ) )
             {
                 i_tag_id = 0;
             }
@@ -679,7 +655,7 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
  * starting with '/'.
  * returns absolute LB number, or 0 on error
  *****************************************************************************/
-u32 UDFFindFile( int i_fd, char * psz_path )
+u32 UDFFindFile( dvdcss_handle dvdhandle, char * psz_path )
 {
     struct partition_s  partition;
     struct ad_s         root_icb;
@@ -696,7 +672,7 @@ u32 UDFFindFile( int i_fd, char * psz_path )
     strcat( psz_tokenline, psz_path );
 
     /* Init file descriptor of UDF filesystem (== DVD) */
-    partition.i_fd = i_fd;
+    partition.dvdhandle = dvdhandle;
 
     /* Find partition 0, standard partition for DVD-Video */
     i_partition = 0;
@@ -711,7 +687,7 @@ u32 UDFFindFile( int i_fd, char * psz_path )
 
     do
     {
-        if( !UDFReadLB( i_fd, i_lba++, 1, pi_lb ) )
+        if( !UDFReadLB( dvdhandle, i_lba++, 1, pi_lb ) )
         {
             i_tag_id = 0;
         }
