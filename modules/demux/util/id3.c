@@ -2,7 +2,7 @@
  * id3.c: simple id3 tag skipper
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3.c,v 1.3 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: id3.c,v 1.4 2003/07/13 12:52:40 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  * 
@@ -37,8 +37,6 @@
  *****************************************************************************/
 static int  SkipID3Tag ( vlc_object_t * );
 
-/* TODO: support MPEG-2.5, not difficult, but I need somes samples... */
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -48,18 +46,9 @@ vlc_module_begin();
     set_callbacks( SkipID3Tag, NULL );
 vlc_module_end();
 
-/*****************************************************************************
- * Definitions of structures  and functions used by this plugins 
- *****************************************************************************/
-
-
 /****************************************************************************
- * ParseID3Tag : check if an ID3 header is present and parse and skip it
- ****************************************************************************
- *
- * Author : Sigmund Augdal 
- * 
-' ****************************************************************************/
+ * SkipID3Tag : check if an ID3 tag is present, and skip it if it is
+ ****************************************************************************/
 static int SkipID3Tag( vlc_object_t *p_this )
 {
     input_thread_t *p_input;
