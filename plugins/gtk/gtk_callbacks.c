@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.41 2002/06/01 18:04:48 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.42 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -303,29 +303,7 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
     msg_Dbg( p_intf, "joining channel %d", i_channel );
 
     vlc_mutex_lock( &p_intf->change_lock );
-    if( p_intf->p_sys->p_input != NULL )
-    {
-        /* end playing item */
-        p_intf->p_sys->p_input->b_eof = 1;
-
-#if 0 /* PLAYLIST TARASS */
-        /* update playlist */
-        vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-
-        p_intf->p_vlc->p_playlist->i_index--;
-        p_intf->p_vlc->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
-#endif
-    }
-
     network_ChannelJoin( p_intf, i_channel );
-
-    /* FIXME 2 */
-#if 0 /* PLAYLIST TARASS */
-    p_intf->p_vlc->p_playlist->b_stopped = 0;
-#endif
-
     vlc_mutex_unlock( &p_intf->change_lock );
 
 //    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );

@@ -92,17 +92,8 @@ struct module_symbols_s
     int (* __network_ChannelJoin_inner) ( vlc_object_t *, int ) ;
     int (* __network_ChannelCreate_inner) ( vlc_object_t * ) ;
     void (* playlist_Command_inner) ( playlist_t *, int, int ) ;
-    int (* __playlist_Add_inner) ( vlc_object_t *, int, const char * ) ;
+    int (* playlist_Add_inner) ( playlist_t *, int, const char * ) ;
     int (* playlist_Delete_inner) ( playlist_t *, int ) ;
-    int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
-    int (* vlc_threads_end_inner) ( void ) ;
-    int (* __vlc_mutex_init_inner) ( vlc_object_t *, vlc_mutex_t * ) ;
-    int (* __vlc_mutex_destroy_inner) ( char *, int, vlc_mutex_t * ) ;
-    int (* vlc_cond_init_inner) ( vlc_cond_t * ) ;
-    int (* __vlc_cond_destroy_inner) ( char *, int, vlc_cond_t * ) ;
-    int (* __vlc_thread_create_inner) ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), vlc_bool_t ) ;
-    void (* __vlc_thread_ready_inner) ( vlc_object_t * ) ;
-    void (* __vlc_thread_join_inner) ( vlc_object_t *, char *, int ) ;
     vout_thread_t * (* __vout_CreateThread_inner) ( vlc_object_t *, int, int, u32, int ) ;
     void (* vout_DestroyThread_inner) ( vout_thread_t * ) ;
     int (* vout_ChromaCmp_inner) ( u32, u32 ) ;
@@ -133,6 +124,15 @@ struct module_symbols_s
     void (* __vlc_object_detach_all_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_attach_inner) ( vlc_object_t *, vlc_object_t * ) ;
     void (* __vlc_dumpstructure_inner) ( vlc_object_t * ) ;
+    int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
+    int (* vlc_threads_end_inner) ( void ) ;
+    int (* __vlc_mutex_init_inner) ( vlc_object_t *, vlc_mutex_t * ) ;
+    int (* __vlc_mutex_destroy_inner) ( char *, int, vlc_mutex_t * ) ;
+    int (* vlc_cond_init_inner) ( vlc_cond_t * ) ;
+    int (* __vlc_cond_destroy_inner) ( char *, int, vlc_cond_t * ) ;
+    int (* __vlc_thread_create_inner) ( vlc_object_t *, char *, int, char *, void * ( * ) ( void * ), vlc_bool_t ) ;
+    void (* __vlc_thread_ready_inner) ( vlc_object_t * ) ;
+    void (* __vlc_thread_join_inner) ( vlc_object_t *, char *, int ) ;
 };
 
 #ifdef __PLUGIN__
@@ -226,17 +226,8 @@ struct module_symbols_s
 #   define __network_ChannelJoin p_symbols->__network_ChannelJoin_inner
 #   define __network_ChannelCreate p_symbols->__network_ChannelCreate_inner
 #   define playlist_Command p_symbols->playlist_Command_inner
-#   define __playlist_Add p_symbols->__playlist_Add_inner
+#   define playlist_Add p_symbols->playlist_Add_inner
 #   define playlist_Delete p_symbols->playlist_Delete_inner
-#   define __vlc_threads_init p_symbols->__vlc_threads_init_inner
-#   define vlc_threads_end p_symbols->vlc_threads_end_inner
-#   define __vlc_mutex_init p_symbols->__vlc_mutex_init_inner
-#   define __vlc_mutex_destroy p_symbols->__vlc_mutex_destroy_inner
-#   define vlc_cond_init p_symbols->vlc_cond_init_inner
-#   define __vlc_cond_destroy p_symbols->__vlc_cond_destroy_inner
-#   define __vlc_thread_create p_symbols->__vlc_thread_create_inner
-#   define __vlc_thread_ready p_symbols->__vlc_thread_ready_inner
-#   define __vlc_thread_join p_symbols->__vlc_thread_join_inner
 #   define __vout_CreateThread p_symbols->__vout_CreateThread_inner
 #   define vout_DestroyThread p_symbols->vout_DestroyThread_inner
 #   define vout_ChromaCmp p_symbols->vout_ChromaCmp_inner
@@ -267,5 +258,14 @@ struct module_symbols_s
 #   define __vlc_object_detach_all p_symbols->__vlc_object_detach_all_inner
 #   define __vlc_object_attach p_symbols->__vlc_object_attach_inner
 #   define __vlc_dumpstructure p_symbols->__vlc_dumpstructure_inner
+#   define __vlc_threads_init p_symbols->__vlc_threads_init_inner
+#   define vlc_threads_end p_symbols->vlc_threads_end_inner
+#   define __vlc_mutex_init p_symbols->__vlc_mutex_init_inner
+#   define __vlc_mutex_destroy p_symbols->__vlc_mutex_destroy_inner
+#   define vlc_cond_init p_symbols->vlc_cond_init_inner
+#   define __vlc_cond_destroy p_symbols->__vlc_cond_destroy_inner
+#   define __vlc_thread_create p_symbols->__vlc_thread_create_inner
+#   define __vlc_thread_ready p_symbols->__vlc_thread_ready_inner
+#   define __vlc_thread_join p_symbols->__vlc_thread_join_inner
 #endif /* __PLUGIN__ */
 

@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.5 2002/06/02 15:51:30 gbazin Exp $
+ * $Id: threads.c,v 1.6 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -371,9 +371,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
 {
     int i_ret;
 
-    vlc_mutex_init( p_this, &p_this->thread_lock );
-    vlc_cond_init( &p_this->thread_wait );
-    vlc_mutex_lock( &p_this->thread_lock );
+    vlc_mutex_lock( &p_this->object_lock );
 
 #ifdef GPROF
     wrapper_t wrapper;
@@ -448,18 +446,16 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
         if( b_wait )
         {
             msg_Dbg( p_this, "waiting for thread completion" );
-            vlc_cond_wait( &p_this->thread_wait, &p_this->thread_lock );
+            vlc_cond_wait( &p_this->object_wait, &p_this->object_lock );
         }
 
-        vlc_mutex_unlock( &p_this->thread_lock );
+        vlc_mutex_unlock( &p_this->object_lock );
     }
     else
     {
         msg_Err( p_this, "%s thread could not be created at %s:%d (%s)",
                          psz_name, psz_file, i_line, strerror(i_ret) );
-        vlc_mutex_unlock( &p_this->thread_lock );
-        vlc_mutex_destroy( &p_this->thread_lock );
-        vlc_cond_destroy( &p_this->thread_wait );
+        vlc_mutex_unlock( &p_this->object_lock );
     }
 
     return i_ret;
@@ -470,9 +466,9 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
  *****************************************************************************/
 void __vlc_thread_ready( vlc_object_t *p_this )
 {
-    vlc_mutex_lock( &p_this->thread_lock );
-    vlc_cond_signal( &p_this->thread_wait );
-    vlc_mutex_unlock( &p_this->thread_lock );
+    vlc_mutex_lock( &p_this->object_lock );
+    vlc_cond_signal( &p_this->object_wait );
+    vlc_mutex_unlock( &p_this->object_lock );
 }
 
 /*****************************************************************************
@@ -503,9 +499,6 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
     wait_for_thread( p_this->thread_id, &exit_value );
 
 #endif
-
-    vlc_mutex_destroy( &p_this->thread_lock );
-    vlc_cond_destroy( &p_this->thread_wait );
 
     if( i_ret )
     {

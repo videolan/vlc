@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.38 2002/06/02 09:03:54 sam Exp $
+ * $Id: xcommon.c,v 1.39 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -678,6 +678,19 @@ static int vout_Manage( vout_thread_t *p_vout )
                 input_SetStatus( p_vout, INPUT_STATUS_PAUSE );
                 break;
 
+            case XK_F1: network_ChannelJoin( p_vout, 1 ); break;
+            case XK_F2: network_ChannelJoin( p_vout, 2 ); break;
+            case XK_F3: network_ChannelJoin( p_vout, 3 ); break;
+            case XK_F4: network_ChannelJoin( p_vout, 4 ); break;
+            case XK_F5: network_ChannelJoin( p_vout, 5 ); break;
+            case XK_F6: network_ChannelJoin( p_vout, 6 ); break;
+            case XK_F7: network_ChannelJoin( p_vout, 7 ); break;
+            case XK_F8: network_ChannelJoin( p_vout, 8 ); break;
+            case XK_F9: network_ChannelJoin( p_vout, 9 ); break;
+            case XK_F10: network_ChannelJoin( p_vout, 10 ); break;
+            case XK_F11: network_ChannelJoin( p_vout, 11 ); break;
+            case XK_F12: network_ChannelJoin( p_vout, 12 ); break;
+
             default:
                 /* "Normal Keys"
                  * The reason why I use this instead of XK_0 is that 
@@ -697,17 +710,6 @@ static int vout_Manage( vout_thread_t *p_vout )
                     case 'F':
                         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
                         break;
-
-                    case '0': network_ChannelJoin( p_vout, 0 ); break;
-                    case '1': network_ChannelJoin( p_vout, 1 ); break;
-                    case '2': network_ChannelJoin( p_vout, 2 ); break;
-                    case '3': network_ChannelJoin( p_vout, 3 ); break;
-                    case '4': network_ChannelJoin( p_vout, 4 ); break;
-                    case '5': network_ChannelJoin( p_vout, 5 ); break;
-                    case '6': network_ChannelJoin( p_vout, 6 ); break;
-                    case '7': network_ChannelJoin( p_vout, 7 ); break;
-                    case '8': network_ChannelJoin( p_vout, 8 ); break;
-                    case '9': network_ChannelJoin( p_vout, 9 ); break;
 
                     default:
                         break;

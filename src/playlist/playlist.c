@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.4 2002/06/02 11:59:46 sam Exp $
+ * $Id: playlist.c,v 1.5 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -57,8 +57,6 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
         return NULL;
     }
 
-    vlc_object_attach( p_playlist, p_parent );
-
     p_playlist->p_input = NULL;
     p_playlist->i_status = PLAYLIST_RUNNING;
     p_playlist->i_index = -1;
@@ -66,11 +64,13 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->pp_items = NULL;
     vlc_mutex_init( p_playlist, &p_playlist->change_lock );
 
+    vlc_object_attach( p_playlist, p_parent );
+
     if( vlc_thread_create( p_playlist, "playlist", RunThread, 0 ) )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
-        vlc_mutex_destroy( &p_playlist->change_lock );
         vlc_object_detach_all( p_playlist );
+        vlc_mutex_destroy( &p_playlist->change_lock );
         vlc_object_destroy( p_playlist );
         return NULL;
     }
@@ -99,26 +99,9 @@ void playlist_Destroy( playlist_t * p_playlist )
  * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
  * add it at the end regardless of the playlist current size.
  *****************************************************************************/
-int __playlist_Add( vlc_object_t *p_this, int i_pos, const char * psz_item )
+int playlist_Add( playlist_t *p_playlist, int i_pos, const char * psz_item )
 {
-    playlist_t *p_playlist;
-
-    p_playlist = vlc_object_find( p_this, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-
-    if( p_playlist == NULL )
-    {
-        msg_Dbg( p_this, "no playlist present, creating one" );
-        p_playlist = playlist_Create( p_this->p_vlc );
-
-        if( p_playlist == NULL )
-        {
-            return VLC_EGENERIC;
-        }
-
-        vlc_object_yield( p_playlist );
-    }
-
-    msg_Warn( p_this, "adding playlist item « %s »", psz_item );
+    msg_Warn( p_playlist, "adding playlist item « %s »", psz_item );
 
     vlc_mutex_lock( &p_playlist->change_lock );
 
@@ -139,8 +122,9 @@ int __playlist_Add( vlc_object_t *p_this, int i_pos, const char * psz_item )
     p_playlist->pp_items[i_pos]->i_type = 0;
     p_playlist->pp_items[i_pos]->i_status = 0;
 
+    p_playlist->i_status = PLAYLIST_RUNNING;
+
     vlc_mutex_unlock( &p_playlist->change_lock );
-    vlc_object_release( p_playlist );
 
     return 0;
 }
@@ -152,6 +136,10 @@ int __playlist_Add( vlc_object_t *p_this, int i_pos, const char * psz_item )
  *****************************************************************************/
 int playlist_Delete( playlist_t * p_playlist, int i_pos )
 {
+    vlc_mutex_lock( &p_playlist->change_lock );
+
+    vlc_mutex_unlock( &p_playlist->change_lock );
+
     return 0;
 }
 
@@ -162,6 +150,8 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
  *****************************************************************************/
 void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
 {   
+    vlc_mutex_lock( &p_playlist->change_lock );
+
     switch( i_command )
     {
     case PLAYLIST_STOP:
@@ -184,6 +174,8 @@ void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
         break;
     }
 
+    vlc_mutex_unlock( &p_playlist->change_lock );
+
     return;
 }
 
@@ -199,6 +191,7 @@ static void RunThread ( playlist_t *p_playlist )
         /* If there is an input, check that it doesn't need to die. */
         if( p_playlist->p_input )
         {
+            /* This input is dead. Remove it ! */
             if( p_playlist->p_input->b_dead )
             {
                 input_thread_t *p_input;
@@ -207,14 +200,20 @@ static void RunThread ( playlist_t *p_playlist )
                 vlc_mutex_lock( &p_playlist->change_lock );
                 p_input = p_playlist->p_input;
                 p_playlist->p_input = NULL;
+                vlc_object_detach_all( p_input );
                 vlc_mutex_unlock( &p_playlist->change_lock );
 
                 /* Destroy input */
-                vlc_object_detach_all( p_input );
                 vlc_object_release( p_input );
                 input_DestroyThread( p_input );
                 vlc_object_destroy( p_input );
             }
+            /* This input is dying, let him do */
+            else if( p_playlist->p_input->b_die )
+            {
+                ;
+            }
+            /* This input has finished, ask him to die ! */
             else if( p_playlist->p_input->b_error
                       || p_playlist->p_input->b_eof )
             {
@@ -264,13 +263,18 @@ static void RunThread ( playlist_t *p_playlist )
             vlc_mutex_lock( &p_playlist->change_lock );
             p_input = p_playlist->p_input;
             p_playlist->p_input = NULL;
+            vlc_object_detach_all( p_input );
             vlc_mutex_unlock( &p_playlist->change_lock );
 
             /* Destroy input */
-            vlc_object_detach_all( p_input );
             vlc_object_release( p_input );
             input_DestroyThread( p_input );
             vlc_object_destroy( p_input );
+        }
+        /* This input is dying, let him do */
+        else if( p_playlist->p_input->b_die )
+        {
+            ;
         }
         else if( p_playlist->p_input->b_error || p_playlist->p_input->b_eof )
         {

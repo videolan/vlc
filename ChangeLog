@@ -4,6 +4,11 @@
 
 HEAD
 
+  * ./src/interface/interface.c: interfaces are no longer attached only to
+    p_vlc.
+  * ./src/libvlc.c, ./src/misc/modules.c, ./src/playlist/playlist.c,
+    ./src/input/input.c: improvements in the playlist handling (not quite that
+    yet though).
   * ./plugins/spudec/spu_decoder.c: we now use FIND_ANYWHERE to find a vout.
   * ./plugins/dvd/dvd_es.c, ./plugins/satellite/input_satellite.c,
     ./plugins/dvdread/input_dvdread.c: updated outdated variable names.
@@ -35,8 +40,21 @@ HEAD
   * ALL: the first libvlc commit.
 
 0.4.1
-Not released yet
+Mon,  3 Jun 2002 23:43:35 +0200
 
+  * ./configure.in, ./plugins/mpeg_system/mpeg_ts.c: fixed libdvbpsi handling.
+  * ./src/misc/configuration.c: fixed the --nofoo option handling.
+  * ./src/interface/main.c: fixed two compilation warnings under Solaris.
+  * ./plugins/avi/avi.c, ./plugins/mpeg_system/mpeg_audio.c: ES will be
+    selected only once.
+  * ./plugins/win32/waveout.c: waveOutUnprepareHeader() was never being
+    called. This should fix the memory leak some people reported when using
+    the waveout plugin.
+  * ./src/misc/netutils.c: factored code common to the interfaces into the
+    network_ChannelJoin function.
+  * ./plugins/mga/xmga.c, ./plugins/x11/xcommon.c, ./plugins/sdl/vout_sdl.c,
+    ./plugins/directx/vout_events.c: we can now use keys F1 to F12 to switch
+    channels from the video output window.
   * ./plugins/motion/motionmmx.c: MMX motion optimizations courtesy of
     Vladimir Chernyshov <greengrass@writeme.com>.
   * ./plugins/dvdread/dvdread.c: disabled the dvdread plugin because it

@@ -538,29 +538,7 @@ void __fastcall TMainFrameDlg::ButtonGoClick( TObject *Sender )
     msg_Dbg( p_intf, "joining channel %d", i_channel );
 
     vlc_mutex_lock( &p_intf->change_lock );
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        /* end playing item */
-        p_input_bank->pp_input[0]->b_eof = 1;
-
-        /* update playlist */
-        vlc_mutex_lock( &p_intf->p_vlc->p_playlist->change_lock );
-
-        p_intf->p_vlc->p_playlist->i_index--;
-        p_intf->p_vlc->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_intf->p_vlc->p_playlist->change_lock );
-
-        /* FIXME: ugly hack to close input and outputs */
-        p_intf->pf_manage( p_intf );
-    }
-
     network_ChannelJoin( p_intf, i_channel );
-
-    /* FIXME 2 */
-    p_intf->p_vlc->p_playlist->b_stopped = 0;
-    p_intf->pf_manage( p_intf );
-
     vlc_mutex_unlock( &p_intf->change_lock );
 
 //    input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );

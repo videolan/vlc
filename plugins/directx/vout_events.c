@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.22 2002/06/02 09:03:54 sam Exp $
+ * $Id: vout_events.c,v 1.23 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -141,10 +141,22 @@ void DirectXEventThread( event_thread_t *p_event )
             switch( msg.wParam )
             {
             case VK_ESCAPE:
-            case VK_F12:
                 /* exit application */
                 p_event->p_vlc->b_die = 1;
                 break;
+
+            case VK_F1: network_ChannelJoin( p_event, 1 ); break;
+            case VK_F2: network_ChannelJoin( p_event, 2 ); break;
+            case VK_F3: network_ChannelJoin( p_event, 3 ); break;
+            case VK_F4: network_ChannelJoin( p_event, 4 ); break;
+            case VK_F5: network_ChannelJoin( p_event, 5 ); break;
+            case VK_F6: network_ChannelJoin( p_event, 6 ); break;
+            case VK_F7: network_ChannelJoin( p_event, 7 ); break;
+            case VK_F8: network_ChannelJoin( p_event, 8 ); break;
+            case VK_F9: network_ChannelJoin( p_event, 9 ); break;
+            case VK_F10: network_ChannelJoin( p_event, 10 ); break;
+            case VK_F11: network_ChannelJoin( p_event, 11 ); break;
+            case VK_F12: network_ChannelJoin( p_event, 12 ); break;
             }
             TranslateMessage(&msg);
             break;
@@ -185,17 +197,6 @@ void DirectXEventThread( event_thread_t *p_event )
                 p_event->p_vout->b_interface = ! p_event->p_vout->b_interface;
                 p_event->p_vout->p_sys->i_changes |= VOUT_INTF_CHANGE;
                 break;
-
-            case '0': network_ChannelJoin( p_event, 0 ); break;
-            case '1': network_ChannelJoin( p_event, 1 ); break;
-            case '2': network_ChannelJoin( p_event, 2 ); break;
-            case '3': network_ChannelJoin( p_event, 3 ); break;
-            case '4': network_ChannelJoin( p_event, 4 ); break;
-            case '5': network_ChannelJoin( p_event, 5 ); break;
-            case '6': network_ChannelJoin( p_event, 6 ); break;
-            case '7': network_ChannelJoin( p_event, 7 ); break;
-            case '8': network_ChannelJoin( p_event, 8 ); break;
-            case '9': network_ChannelJoin( p_event, 9 ); break;
 
             default:
                 break;

@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.68 2002/06/01 18:04:49 sam Exp $
+ * $Id: netutils.c,v 1.69 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -156,24 +156,17 @@ int __network_ChannelJoin( vlc_object_t *p_this, int i_channel )
     struct timeval delay;
     fd_set fds;
 
+    if( p_this->p_vlc->p_channel->i_channel == i_channel )
+    {
+        return 0;
+    }
+
     if( !config_GetInt( p_this, "network-channel" ) )
     {
         msg_Err( p_this, "channels disabled, to enable them, use the"
                          " --channels option" );
         return -1;
     }
-
-    /* If last change is too recent, wait a while */
-//    if( mdate() - p_this->p_vlc->p_channel->last_change
-//            < INPUT_CHANNEL_CHANGE_DELAY )
-//    {
-//        msg_Warn( p_this, "waiting before changing channel" );
-        /* XXX Isn't this completely brain-damaged ??? -- Sam */
-        /* Yes it is. I don't think this is still justified with the new
-         * vlanserver --Meuuh */
-//        mwait( p_this->p_vlc->p_channel->last_change
-//                   + INPUT_CHANNEL_CHANGE_DELAY );
-//    }
 
     if( config_GetInt( p_this, "ipv4" ) )
     {

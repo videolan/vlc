@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: playlist.h,v 1.4 2002/06/01 18:04:48 sam Exp $
+ * $Id: playlist.h,v 1.5 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,9 +26,9 @@
  *****************************************************************************/
 struct playlist_item_s
 {
-    char*             psz_name;
-    int               i_type;   /* unused yet */
-    int               i_status; /* unused yet */
+    char *  psz_name;
+    int     i_type;   /* unused yet */
+    int     i_status; /* unused yet */
 };
 
 /*****************************************************************************
@@ -91,7 +91,6 @@ void           playlist_Destroy  ( playlist_t * );
 #define playlist_Goto(p,i) playlist_Command(p,PLAYLIST_GOTO,i)
 VLC_EXPORT( void, playlist_Command, ( playlist_t *, int, int ) );
 
-#define playlist_Add(a,b,c) __playlist_Add(CAST_TO_VLC_OBJECT(a),b,c)
-VLC_EXPORT( int, __playlist_Add,    ( vlc_object_t *, int, const char * ) );
-VLC_EXPORT( int,   playlist_Delete, ( playlist_t *, int ) );
+VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, int, const char * ) );
+VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2002-06-02 10:58+0200\n"
+"POT-Creation-Date: 2002-06-04 02:09+0200\n"
 "PO-Revision-Date: 2002-05-26 18:31+0200\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"
@@ -19,7 +19,7 @@ msgid "Usage: %s [options] [parameters] [file]...\n"
 msgstr "U¿ycie: %s [opcje] [parametry] [plik]...\n"
 
 #. Print module name
-#: src/libvlc.c:868
+#: src/libvlc.c:891
 #, fuzzy, c-format
 msgid ""
 "%s module options:\n"
@@ -27,27 +27,27 @@ msgid ""
 msgstr "opcje modu³u %s:\n"
 
 #. We could also have "=<" here
-#: src/libvlc.c:888 src/misc/configuration.c:798
+#: src/libvlc.c:911 src/misc/configuration.c:798
 msgid "string"
 msgstr "napis"
 
-#: src/libvlc.c:891 src/misc/configuration.c:783
+#: src/libvlc.c:914 src/misc/configuration.c:783
 msgid "integer"
 msgstr "liczba ca³kowita"
 
-#: src/libvlc.c:894 src/misc/configuration.c:790
+#: src/libvlc.c:917 src/misc/configuration.c:790
 msgid "float"
 msgstr "liczba zmiennoprz."
 
-#: src/libvlc.c:900
+#: src/libvlc.c:923
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:901
+#: src/libvlc.c:924
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:955
+#: src/libvlc.c:1006
 #, fuzzy
 msgid ""
 "\n"
@@ -76,7 +76,7 @@ msgstr ""
 "  vlc:pause                      zatrzymanie odtwarzania obiektów listy\n"
 "  vlc:quit                       wyj¶cie z VLC"
 
-#: src/libvlc.c:976 src/libvlc.c:1025 src/libvlc.c:1049 src/libvlc.c:1068
+#: src/libvlc.c:1027 src/libvlc.c:1076 src/libvlc.c:1100 src/libvlc.c:1119
 #, fuzzy
 msgid ""
 "\n"
@@ -86,19 +86,19 @@ msgstr ""
 "Naci¶nij klawisz ENTER aby kontynuowaæ..."
 
 #. Usage
-#: src/libvlc.c:999
+#: src/libvlc.c:1050
 #, fuzzy, c-format
 msgid ""
 "Usage: %s [options] [parameters] [file]...\n"
 "\n"
 msgstr "U¿ycie: %s [opcje] [parametry] [plik]...\n"
 
-#: src/libvlc.c:1002
+#: src/libvlc.c:1053
 #, fuzzy
 msgid "[module]              [description]\n"
 msgstr "[modu³]               [opis]"
 
-#: src/libvlc.c:1043
+#: src/libvlc.c:1094
 #, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -742,7 +742,7 @@ msgid "Playlist"
 msgstr "Lista odtwarzania"
 
 #. Misc options
-#: plugins/a52/a52.c:83 plugins/ac3_adec/ac3_adec.c:72 plugins/dsp/dsp.c:81
+#: plugins/a52/a52.c:85 plugins/ac3_adec/ac3_adec.c:72 plugins/dsp/dsp.c:81
 #: plugins/dummy/dummy.c:51 plugins/fb/fb.c:70 plugins/filter/deinterlace.c:50
 #: plugins/filter/distort.c:50 plugins/filter/transform.c:51
 #: plugins/filter/wall.c:45 plugins/ggi/ggi.c:64 plugins/gtk/gnome.c:73
@@ -790,12 +790,12 @@ msgstr "zm. logiczna"
 #. ****************************************************************************
 #. * Build configuration structure.
 #. ****************************************************************************
-#: plugins/a52/a52.c:74
+#: plugins/a52/a52.c:76
 #, fuzzy
 msgid "A/52 dynamic range compression"
 msgstr "wy³±czona kompresja dynamicznego zakresu A/52"
 
-#: plugins/a52/a52.c:76
+#: plugins/a52/a52.c:78
 #, fuzzy
 msgid ""
 "Dynamic range compression makes the loud sounds softer, and the soft sounds "
@@ -809,7 +809,7 @@ msgstr ""
 "Je¶li zostanie wy³±czona kompresja dynamicznego zakresu bêdzie to lepiej "
 "pasuj±ca opcja w przypadku sali kinowej lub pokoju akustycznego."
 
-#: plugins/a52/a52.c:88
+#: plugins/a52/a52.c:90
 msgid "a52 ATSC A/52 aka AC-3 audio decoder module"
 msgstr "modu³ dekodera d¼wiêku a52 ATSC A/52 aka AC-3"
 
@@ -1973,7 +1973,7 @@ msgstr "modu³ kompensacji ruchu 3D Now!"
 msgid "AltiVec motion compensation module"
 msgstr "modu³ kompensacji ruchu AltiVec"
 
-#: plugins/motion/motionmmx.c:47
+#: plugins/motion/motionmmx.c:48
 msgid "MMX motion compensation module"
 msgstr "modu³ kompensacji ruchu MMX"
 
@@ -1993,11 +1993,11 @@ msgstr "Elementarne wej¶cie strumienia ISO 13818-2 MPEG"
 msgid "ISO 13818-1 MPEG Program Stream input"
 msgstr "Programowe wej¶cie strumienia ISO 13818-1 MPEG"
 
-#: plugins/mpeg_system/mpeg_ts.c:79
+#: plugins/mpeg_system/mpeg_ts.c:88
 msgid "ISO 13818-1 MPEG Transport Stream input"
 msgstr "Wej¶cie transportu strumienia ISO 13818-1 MPEG"
 
-#: plugins/mpeg_system/mpeg_ts.c:83
+#: plugins/mpeg_system/mpeg_ts.c:92
 msgid "ISO 13818-1 MPEG Transport Stream input (libdvbpsi)"
 msgstr "Wej¶cie transportu strumienia ISO 13818-1 MPEG (libdvbpsi)"
 

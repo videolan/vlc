@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.200 2002/06/02 11:59:46 sam Exp $
+ * $Id: input.c,v 1.201 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -153,7 +153,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     vlc_object_attach( p_input, p_parent );
 
     /* Create thread and wait for its readiness. */
-    if( vlc_thread_create( p_input, "input", RunThread, 1 ) )
+    if( vlc_thread_create( p_input, "input", RunThread, VLC_TRUE ) )
     {
         msg_Err( p_input, "cannot create input thread (%s)", strerror(errno) );
         free( p_input );
@@ -202,16 +202,17 @@ void input_DestroyThread( input_thread_t *p_input )
  *****************************************************************************/
 static int RunThread( input_thread_t *p_input )
 {
+    /* Signal right now, otherwise we'll get stuck in a peek */
+    vlc_thread_ready( p_input );
+
     if( InitThread( p_input ) )
     {
         /* If we failed, wait before we are killed, and exit */
         p_input->b_error = 1;
-        vlc_thread_ready( p_input );
         ErrorThread( p_input );
+        p_input->b_dead = 1;
         return 0;
     }
-
-    vlc_thread_ready( p_input );
 
     /* initialization is complete */
     vlc_mutex_lock( &p_input->stream.stream_lock );

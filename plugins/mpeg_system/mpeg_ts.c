@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.14 2002/06/01 12:32:00 sam Exp $
+ * $Id: mpeg_ts.c,v 1.15 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -35,12 +35,21 @@
 #include "iso_lang.h"
 
 #if defined MODULE_NAME_IS_mpeg_ts_dvbpsi
-#include <dvbpsi/dvbpsi.h>
-#include <dvbpsi/descriptor.h>
-#include <dvbpsi/pat.h>
-#include <dvbpsi/pmt.h>
-#include <dvbpsi/dr.h>
+#   ifdef HAVE_DVBPSI_DR_H
+#       include <dvbpsi/dvbpsi.h>
+#       include <dvbpsi/descriptor.h>
+#       include <dvbpsi/pat.h>
+#       include <dvbpsi/pmt.h>
+#       include <dvbpsi/dr.h>
+#   else
+#       include "dvbpsi.h"
+#       include "descriptor.h"
+#       include "tables/pat.h"
+#       include "tables/pmt.h"
+#       include "descriptors/dr.h"
+#   endif
 #endif
+
 /*****************************************************************************
  * Constants
  *****************************************************************************/

@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.5 2002/06/02 15:51:30 gbazin Exp $
+ * $Id: objects.c,v 1.6 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -146,6 +146,9 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     p_new->pp_children = NULL;
     p_new->i_children = 0;
 
+    vlc_mutex_init( p_new, &p_new->object_lock );
+    vlc_cond_init( &p_new->object_wait );
+
     //msg_Dbg( p_new, "created object" );
 
     return p_new;
@@ -179,6 +182,9 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     }
 
     //msg_Dbg( p_this, "destroyed object" );
+
+    vlc_mutex_destroy( &p_this->object_lock );
+    vlc_cond_destroy( &p_this->object_wait );
 
     free( p_this );
 }

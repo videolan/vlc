@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.6 2002/06/02 23:11:48 sam Exp $
+ * $Id: libvlc.c,v 1.7 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -135,8 +135,8 @@ vlc_t * vlc_create( void )
     p_vlc->p_global_lock = &global_lock;
     p_vlc->pp_global_data = &p_global_data;
 
-    p_vlc->b_verbose = 0;
-    p_vlc->b_quiet = 0; /* FIXME: delay message queue output! */
+    p_vlc->b_verbose = VLC_FALSE;
+    p_vlc->b_quiet = VLC_FALSE; /* FIXME: delay message queue output! */
 
     /* Initialize the threads system */
     vlc_threads_init( p_vlc );
@@ -261,7 +261,7 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     p_vlc->module_bank.first = p_help_module;
     /* End hack */
 
-    if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, 1 ) )
+    if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE ) )
     {
         p_vlc->module_bank.first = p_help_module->next;
         config_Free( p_help_module );
@@ -383,7 +383,7 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /*
      * Override configuration with command line settings
      */
-    if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, 0 ) )
+    if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_FALSE ) )
     {
 #ifdef WIN32
         ShowConsole();
@@ -466,7 +466,7 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         /* On error during Channels initialization, switch off channels */
         msg_Err( p_vlc,
                  "channels initialization failed, deactivating channels" );
-        config_PutInt( p_vlc, "network-channel", 0 );
+        config_PutInt( p_vlc, "network-channel", VLC_FALSE );
     }
 
     /* Update the handle status */
@@ -632,7 +632,7 @@ vlc_error_t vlc_stop( vlc_t *p_vlc )
         vlc_object_release( p_vout );
         vout_DestroyThread( p_vout );
     }
-    
+
     /*
      * Free audio outputs
      */
@@ -783,6 +783,8 @@ vlc_status_t vlc_status( vlc_t *p_vlc )
 
 vlc_error_t vlc_add_target( vlc_t *p_vlc, char *psz_target )
 {
+    playlist_t *p_playlist;
+
     if( !p_vlc || ( p_vlc->i_status != VLC_STATUS_STOPPED
                      && p_vlc->i_status != VLC_STATUS_RUNNING ) )
     {
@@ -790,7 +792,24 @@ vlc_error_t vlc_add_target( vlc_t *p_vlc, char *psz_target )
         return VLC_ESTATUS;
     }
 
-    playlist_Add( p_vlc, PLAYLIST_END, psz_target );
+    p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
+    if( p_playlist == NULL )
+    {
+        msg_Dbg( p_vlc, "no playlist present, creating one" );
+        p_playlist = playlist_Create( p_vlc );
+
+        if( p_playlist == NULL )
+        {
+            return VLC_EGENERIC;
+        }
+
+        vlc_object_yield( p_playlist );
+    }
+
+    playlist_Add( p_playlist, PLAYLIST_END, psz_target );
+
+    vlc_object_release( p_playlist );
 
     return VLC_SUCCESS;
 }
@@ -809,7 +828,7 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /* We assume that the remaining parameters are filenames */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
-        playlist_Add( p_vlc, PLAYLIST_END, ppsz_argv[ i_opt ] );
+        vlc_add_target( p_vlc, ppsz_argv[ i_opt ] );
     }
 
     return VLC_SUCCESS;
@@ -929,13 +948,13 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                 if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL
                      && !b_help_module )
                 {
-                    vlc_bool_t b_dash = 0;
+                    vlc_bool_t b_dash = VLC_FALSE;
                     psz_prefix = p_item->psz_name;
                     while( *psz_prefix )
                     {
                         if( *psz_prefix++ == '-' )
                         {
-                            b_dash = 1;
+                            b_dash = VLC_TRUE;
                             break;
                         }
                     }
@@ -1165,7 +1184,7 @@ static void SimpleSignalHandler( int i_signal )
 static void FatalSignalHandler( int i_signal )
 {
     static mtime_t abort_time = 0;
-    static volatile vlc_bool_t b_die = 0;
+    static volatile vlc_bool_t b_die = VLC_FALSE;
     int i_index;
 
     /* Once a signal has been trapped, the termination sequence will be
@@ -1175,7 +1194,7 @@ static void FatalSignalHandler( int i_signal )
     vlc_mutex_lock( &global_lock );
     if( !b_die )
     {
-        b_die = 1;
+        b_die = VLC_TRUE;
         abort_time = mdate();
 
         /* Try to terminate everything - this is done by requesting the end of
@@ -1185,7 +1204,7 @@ static void FatalSignalHandler( int i_signal )
             /* Acknowledge the signal received */
             msg_Err( pp_vlc[ i_index ], "signal %d received, exiting - do it "
                      "again in case vlc gets stuck", i_signal );
-            pp_vlc[ i_index ]->b_die = 1;
+            pp_vlc[ i_index ]->b_die = VLC_TRUE;
         }
     }
     else if( mdate() > abort_time + 1000000 )

@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.37 2002/06/01 12:32:01 sam Exp $
+ * $Id: input_ext-intf.c,v 1.38 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -387,7 +387,6 @@ int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
 int input_ToggleES( input_thread_t * p_input, es_descriptor_t * p_es,
                     vlc_bool_t b_select )
 {
-
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     if( p_es != NULL )

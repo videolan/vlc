@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.53 2002/06/01 18:04:48 sam Exp $
+ * $Id: modules.h,v 1.54 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -122,9 +122,8 @@ struct module_s
      * Variables set by the module to store its config options
      */
     module_config_t *p_config;             /* Module configuration structure */
-    vlc_mutex_t            config_lock;    /* lock used to modify the config */
-    unsigned int           i_config_items;  /* number of configuration items */
-    unsigned int           i_bool_items;      /* number of bool config items */
+    unsigned int     i_config_items;        /* number of configuration items */
+    unsigned int     i_bool_items;            /* number of bool config items */
 
     /*
      * Variables used internally by the module manager

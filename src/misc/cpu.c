@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.2 2002/06/01 18:04:49 sam Exp $
+ * $Id: cpu.c,v 1.3 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -50,7 +50,9 @@ static void IllegalSignalHandler( int i_signal );
  *****************************************************************************/
 static jmp_buf env;
 static int     i_illegal;
+#if defined( __i386__ )
 static char   *psz_capability;
+#endif
 
 /*****************************************************************************
  * CPUCapabilities: list the processors MMX support and other capabilities
@@ -250,7 +252,6 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
 #   ifdef CAN_COMPILE_ALTIVEC
     signal( SIGILL, IllegalSignalHandler );
 
-    psz_capability = "AltiVec";
     i_illegal = 0;
 
     vlc_mutex_lock( p_this->p_vlc->p_global_lock );

@@ -269,17 +269,8 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->__network_ChannelJoin_inner = __network_ChannelJoin; \
     (p_symbols)->__network_ChannelCreate_inner = __network_ChannelCreate; \
     (p_symbols)->playlist_Command_inner = playlist_Command; \
-    (p_symbols)->__playlist_Add_inner = __playlist_Add; \
+    (p_symbols)->playlist_Add_inner = playlist_Add; \
     (p_symbols)->playlist_Delete_inner = playlist_Delete; \
-    (p_symbols)->__vlc_threads_init_inner = __vlc_threads_init; \
-    (p_symbols)->vlc_threads_end_inner = vlc_threads_end; \
-    (p_symbols)->__vlc_mutex_init_inner = __vlc_mutex_init; \
-    (p_symbols)->__vlc_mutex_destroy_inner = __vlc_mutex_destroy; \
-    (p_symbols)->vlc_cond_init_inner = vlc_cond_init; \
-    (p_symbols)->__vlc_cond_destroy_inner = __vlc_cond_destroy; \
-    (p_symbols)->__vlc_thread_create_inner = __vlc_thread_create; \
-    (p_symbols)->__vlc_thread_ready_inner = __vlc_thread_ready; \
-    (p_symbols)->__vlc_thread_join_inner = __vlc_thread_join; \
     (p_symbols)->__vout_CreateThread_inner = __vout_CreateThread; \
     (p_symbols)->vout_DestroyThread_inner = vout_DestroyThread; \
     (p_symbols)->vout_ChromaCmp_inner = vout_ChromaCmp; \
@@ -310,4 +301,13 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->__vlc_object_detach_all_inner = __vlc_object_detach_all; \
     (p_symbols)->__vlc_object_attach_inner = __vlc_object_attach; \
     (p_symbols)->__vlc_dumpstructure_inner = __vlc_dumpstructure; \
+    (p_symbols)->__vlc_threads_init_inner = __vlc_threads_init; \
+    (p_symbols)->vlc_threads_end_inner = vlc_threads_end; \
+    (p_symbols)->__vlc_mutex_init_inner = __vlc_mutex_init; \
+    (p_symbols)->__vlc_mutex_destroy_inner = __vlc_mutex_destroy; \
+    (p_symbols)->vlc_cond_init_inner = vlc_cond_init; \
+    (p_symbols)->__vlc_cond_destroy_inner = __vlc_cond_destroy; \
+    (p_symbols)->__vlc_thread_create_inner = __vlc_thread_create; \
+    (p_symbols)->__vlc_thread_ready_inner = __vlc_thread_ready; \
+    (p_symbols)->__vlc_thread_join_inner = __vlc_thread_join; \
 

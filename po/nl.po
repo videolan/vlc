@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-02 10:58+0200\n"
+"POT-Creation-Date: 2002-06-04 02:09+0200\n"
 "PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Jean-Paul Saman <jpsaman@wxs.nl>\n"
 "Language-Team: Nederlands <nl@li.org>\n"
@@ -20,7 +20,7 @@ msgid "Usage: %s [options] [parameters] [file]...\n"
 msgstr "Gebruik: %s [opties] [parameters] [file] ...\n"
 
 #. Print module name
-#: src/libvlc.c:868
+#: src/libvlc.c:891
 #, fuzzy, c-format
 msgid ""
 "%s module options:\n"
@@ -28,27 +28,27 @@ msgid ""
 msgstr "%s module opties:\n"
 
 #. We could also have "=<" here
-#: src/libvlc.c:888 src/misc/configuration.c:798
+#: src/libvlc.c:911 src/misc/configuration.c:798
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:891 src/misc/configuration.c:783
+#: src/libvlc.c:914 src/misc/configuration.c:783
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:894 src/misc/configuration.c:790
+#: src/libvlc.c:917 src/misc/configuration.c:790
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:900
+#: src/libvlc.c:923
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:901
+#: src/libvlc.c:924
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:955
+#: src/libvlc.c:1006
 #, fuzzy
 msgid ""
 "\n"
@@ -77,7 +77,7 @@ msgstr ""
 "  vlc:pause                      \tpauzeer speellijst items\n"
 "  vlc:quit                       \tstop VLC"
 
-#: src/libvlc.c:976 src/libvlc.c:1025 src/libvlc.c:1049 src/libvlc.c:1068
+#: src/libvlc.c:1027 src/libvlc.c:1076 src/libvlc.c:1100 src/libvlc.c:1119
 #, fuzzy
 msgid ""
 "\n"
@@ -87,19 +87,19 @@ msgstr ""
 "Druk op RETURN om verder te gaan..."
 
 #. Usage
-#: src/libvlc.c:999
+#: src/libvlc.c:1050
 #, fuzzy, c-format
 msgid ""
 "Usage: %s [options] [parameters] [file]...\n"
 "\n"
 msgstr "Gebruik: %s [opties] [parameters] [file] ...\n"
 
-#: src/libvlc.c:1002
+#: src/libvlc.c:1053
 #, fuzzy
 msgid "[module]              [description]\n"
 msgstr "[module]              [beschrijving]"
 
-#: src/libvlc.c:1043
+#: src/libvlc.c:1094
 #, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -705,7 +705,7 @@ msgid "Playlist"
 msgstr "Speellijst"
 
 #. Misc options
-#: plugins/a52/a52.c:83 plugins/ac3_adec/ac3_adec.c:72 plugins/dsp/dsp.c:81
+#: plugins/a52/a52.c:85 plugins/ac3_adec/ac3_adec.c:72 plugins/dsp/dsp.c:81
 #: plugins/dummy/dummy.c:51 plugins/fb/fb.c:70 plugins/filter/deinterlace.c:50
 #: plugins/filter/distort.c:50 plugins/filter/transform.c:51
 #: plugins/filter/wall.c:45 plugins/ggi/ggi.c:64 plugins/gtk/gnome.c:73
@@ -753,11 +753,11 @@ msgstr ""
 #. ****************************************************************************
 #. * Build configuration structure.
 #. ****************************************************************************
-#: plugins/a52/a52.c:74
+#: plugins/a52/a52.c:76
 msgid "A/52 dynamic range compression"
 msgstr ""
 
-#: plugins/a52/a52.c:76
+#: plugins/a52/a52.c:78
 msgid ""
 "Dynamic range compression makes the loud sounds softer, and the soft sounds "
 "louder, so you can more easily listen to the stream in a noisy environment "
@@ -765,7 +765,7 @@ msgid ""
 "playback will be more adapted to a movie theater or a listening room."
 msgstr ""
 
-#: plugins/a52/a52.c:88
+#: plugins/a52/a52.c:90
 msgid "a52 ATSC A/52 aka AC-3 audio decoder module"
 msgstr ""
 
@@ -1919,7 +1919,7 @@ msgstr "3D Now! motion compensatie module"
 msgid "AltiVec motion compensation module"
 msgstr "AltiVec motion compensatie module"
 
-#: plugins/motion/motionmmx.c:47
+#: plugins/motion/motionmmx.c:48
 msgid "MMX motion compensation module"
 msgstr "MMX motion compensatie module"
 
@@ -1939,11 +1939,11 @@ msgstr ""
 msgid "ISO 13818-1 MPEG Program Stream input"
 msgstr ""
 
-#: plugins/mpeg_system/mpeg_ts.c:79
+#: plugins/mpeg_system/mpeg_ts.c:88
 msgid "ISO 13818-1 MPEG Transport Stream input"
 msgstr ""
 
-#: plugins/mpeg_system/mpeg_ts.c:83
+#: plugins/mpeg_system/mpeg_ts.c:92
 msgid "ISO 13818-1 MPEG Transport Stream input (libdvbpsi)"
 msgstr ""
 

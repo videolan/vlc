@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.29 2002/06/02 23:11:48 sam Exp $
+ * $Id: configuration.c,v 1.30 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -326,7 +326,7 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
     }
 
     /* Initialize the global lock */
-    vlc_mutex_init( p_module, &p_module->config_lock );
+    vlc_mutex_init( p_module, &p_module->object_lock );
 
     /* Do the duplication job */
     for( i = 0; i < i_lines ; i++ )
@@ -346,7 +346,7 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
         p_module->p_config[i].psz_value = p_orig[i].psz_value ?
                                    strdup( _(p_orig[i].psz_value) ) : NULL;
 
-        p_module->p_config[i].p_lock = &p_module->config_lock;
+        p_module->p_config[i].p_lock = &p_module->object_lock;
 
         /* the callback pointer is only valid when the module is loaded so this
          * value is set in ActivateModule() and reset in DeactivateModule() */
@@ -390,7 +390,7 @@ void config_Free( module_t *p_module )
     p_module->p_config = NULL;
 
     /* Remove the global lock */
-    vlc_mutex_destroy( &p_module->config_lock );
+    vlc_mutex_destroy( &p_module->object_lock );
 }
 
 /*****************************************************************************
@@ -1002,8 +1002,8 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
             module_config_t *p_conf;
             char *psz_name = (char *)p_longopts[i_index].name;
 
-            /* Check if we deal with a --no-foo long option */
-            if( flag ) psz_name += 3;
+            /* Check if we deal with a --nofoo or --no-foo long option */
+            if( flag ) psz_name += psz_name[2] == '-' ? 3 : 2;
 
             /* Store the configuration option */
             p_conf = config_FindConfig( p_this, psz_name );

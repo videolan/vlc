@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.95 2002/06/01 18:04:49 sam Exp $
+ * $Id: interface.c,v 1.96 2002/06/04 00:11:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -96,8 +96,8 @@ intf_thread_t* __intf_Create( vlc_object_t *p_this )
 
     msg_Dbg( p_intf, "interface initialized" );
 
-    /* An interface's parent is always the root */
-    vlc_object_attach( p_intf, p_intf->p_vlc );
+    /* Attach interface to its parent object */
+    vlc_object_attach( p_intf, p_this );
 
     return p_intf;
 }
