@@ -36,7 +36,7 @@
 void bit_allocate (ac3dec_t *);
 
 /* ac3_downmix.c */
-int downmix (ac3dec_t *, s16 *);
+int downmix (ac3dec_t *, float *, s16 *);
 
 /* ac3_exponent.c */
 int exponent_unpack (ac3dec_t *);

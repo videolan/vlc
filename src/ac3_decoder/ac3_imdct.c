@@ -184,7 +184,7 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
     
     if (do_imdct)
     {
-        i_stream_done = downmix(p_ac3dec, buffer);
+        i_stream_done = downmix(p_ac3dec, p_ac3dec->coeffs.fbw[0], buffer);
         do_imdct(&p_ac3dec->imdct,p_ac3dec->coeffs.fbw[0],p_ac3dec->samples.channel[0], 0);
         do_imdct(&p_ac3dec->imdct, p_ac3dec->coeffs.fbw[1],p_ac3dec->samples.channel[1], 1);
     } else {
@@ -194,7 +194,7 @@ void imdct (ac3dec_t * p_ac3dec, s16 * buffer)
             else
                 imdct_do_512(&p_ac3dec->imdct, p_ac3dec->coeffs.fbw[i],p_ac3dec->samples.channel[i], i);
         }
-        i_stream_done = downmix(p_ac3dec, buffer);
+        i_stream_done = downmix(p_ac3dec, p_ac3dec->samples.channel[0], buffer);
     }
 
     if ( !i_stream_done ) /* We have to stream sample */

@@ -37,7 +37,7 @@ static const float smixlev_lut[4] = { 0.2928, 0.2071, 0.0   , 0.2071 };
  * to reduce complexity. Realistically, there aren't many machines around
  * with > 2 channel output anyways */
 
-int __inline__ downmix (ac3dec_t * p_ac3dec, s16 * out_buf)
+int __inline__ downmix (ac3dec_t * p_ac3dec, float * channel, s16 * out_buf)
 {
 
     dm_par_t    dm_par;
@@ -65,19 +65,19 @@ int __inline__ downmix (ac3dec_t * p_ac3dec, s16 * out_buf)
     switch(p_ac3dec->bsi.acmod)
     {
         case 7:		// 3/2
-		    downmix_3f_2r_to_2ch_c (p_ac3dec->samples.channel[0], &dm_par);
+		    downmix_3f_2r_to_2ch_c (channel, &dm_par);
    			break;
    		case 6:		// 2/2
-   			downmix_2f_2r_to_2ch_c (p_ac3dec->samples.channel[0], &dm_par);
+   			downmix_2f_2r_to_2ch_c (channel, &dm_par);
    			break;
    		case 5:		// 3/1
-   			downmix_3f_1r_to_2ch_c (p_ac3dec->samples.channel[0], &dm_par);
+   			downmix_3f_1r_to_2ch_c (channel, &dm_par);
    			break;
    		case 4:		// 2/1
-   			downmix_2f_1r_to_2ch_c (p_ac3dec->samples.channel[0], &dm_par);
+   			downmix_2f_1r_to_2ch_c (channel, &dm_par);
    			break;
    		case 3:		// 3/0
-   			downmix_3f_0r_to_2ch_c (p_ac3dec->samples.channel[0], &dm_par);
+   			downmix_3f_0r_to_2ch_c (channel, &dm_par);
    			break;
    		case 2:
    			break;
