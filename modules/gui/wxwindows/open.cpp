@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.42 2003/11/10 00:14:05 gbazin Exp $
+ * $Id: open.cpp,v 1.43 2003/11/10 18:21:35 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -761,11 +761,11 @@ void OpenDialog::UpdateMRL( int i_access_method )
                 case CONFIG_ITEM_INTEGER:
                 case CONFIG_ITEM_BOOL:
                     mrltemp +=
-                        wxString::Format( "%i", control->GetIntValue() );
+                        wxString::Format( wxT("%i"), control->GetIntValue() );
                     break;
                 case CONFIG_ITEM_FLOAT:
                     mrltemp +=
-                        wxString::Format( "%f", control->GetFloatValue() );
+                        wxString::Format( wxT("%f"), control->GetFloatValue());
                     break;
                 }
             }
