@@ -484,7 +484,7 @@ static void ThreadWrite( vlc_object_t *p_this )
             else if( i_date - i_date_last < 0 )
             {
                 if( !i_dropped_packets )
-                    msg_Dbg( p_thread, "mmh, paquets in the past -> drop" );
+                    msg_Dbg( p_thread, "mmh, packets in the past -> drop" );
 
                 block_Release( p_pk  );
                 i_date_last = i_date;
