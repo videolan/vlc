@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.11 2002/10/29 13:22:48 sam Exp $
+ * $Id: variables.c,v 1.12 2002/10/29 13:38:37 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -420,9 +420,10 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
 }
 
 /*****************************************************************************
- * var_Type: request a variable's type, 0 if not found
+ * var_Type: request a variable's type
  *****************************************************************************
- * 
+ * This function returns the variable type if it exists, or an error if the
+ * variable could not be found.
  *****************************************************************************/
 int __var_Type( vlc_object_t *p_this, const char *psz_name )
 {
@@ -435,7 +436,7 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
     if( i_var < 0 )
     {
         vlc_mutex_unlock( &p_this->var_lock );
-        return 0;
+        return i_var;
     }
 
     i_type = p_this->p_vars[i_var].i_type;
