@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.100 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: input_programs.c,v 1.101 2003/01/31 11:23:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -267,10 +267,10 @@ input_area_t * input_AddArea( input_thread_t * p_input )
 int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
 {
     unsigned int i_es_index;
-    unsigned int i_required_audio_es;
-    unsigned int i_required_spu_es;
-    unsigned int i_audio_es = 0;
-    unsigned int i_spu_es = 0;
+    int i_required_audio_es;
+    int i_required_spu_es;
+    int i_audio_es = 0;
+    int i_spu_es = 0;
 
     if ( p_input->stream.p_selected_program )
     {
