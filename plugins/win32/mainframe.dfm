@@ -203,7 +203,7 @@ object MainFrameDlg: TMainFrameDlg
       Hint = 'Play stream'
       Caption = 'Eject'
       ImageIndex = 5
-      OnClick = ToolButtonEjecttempClick
+      OnClick = ToolButtonEjectClick
     end
     object ToolButtonPlay: TToolButton
       Left = 242
@@ -495,6 +495,7 @@ object MainFrameDlg: TMainFrameDlg
         Caption = '&Eject Disc'
         Hint = 'Eject disc'
         Visible = False
+        OnClick = ToolButtonEjectClick
       end
       object N1: TMenuItem
         Caption = '-'
@@ -510,6 +511,7 @@ object MainFrameDlg: TMainFrameDlg
       Caption = '&View'
       object MenuHideinterface: TMenuItem
         Caption = '&Hide interface'
+        Enabled = False
         Hint = 'Hide the main interface window'
       end
       object MenuFullscreen: TMenuItem

@@ -292,7 +292,7 @@ void __fastcall TMainFrameDlg::ToolButtonNextClick( TObject *Sender )
     p_intfGlobal->p_sys->p_playlist->Next();
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainFrameDlg::ToolButtonEjecttempClick( TObject *Sender )
+void __fastcall TMainFrameDlg::ToolButtonEjectClick( TObject *Sender )
 {
     AnsiString Device = "";
 
@@ -723,5 +723,4 @@ void __fastcall TMainFrameDlg::CreatePreferences( AnsiString Name )
     Preferences->Show();
 }
 //---------------------------------------------------------------------------
-
 

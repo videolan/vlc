@@ -276,3 +276,8 @@ N: Peter Surda
 E: shurdeek@panorama.sth.ac.at
 D: rc plugin for vlc control through /dev/stdin
 
+N: Olivier Teulière
+E: ipkiss@via.ecp.fr
+C: ipkiss
+D: WIN32 interface
+

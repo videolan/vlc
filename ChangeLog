@@ -4,6 +4,11 @@
 
 HEAD
 
+  * ./AUTHORS: added ipkiss.
+  * ./plugins/win32/mainframe.cpp: disabled the "hide interface" menu
+    item, not yet implemented.
+  * ./plugins/win32/about.dfm: replaced the outdated author list with a
+    "VideoLAN Team" entry.
   * ./plugins/gtk/gtk.glade, plugins/gtk/gnome.glade, ./plugins/kde/kde.cpp:
     replaced the outdated author list with a "VideoLAN Team" entry.
   * ./debian/rules, ./debian/control: deactivated the vlc-kde package because
@@ -21,6 +26,7 @@ HEAD
   * ./configure.in: added (hopefully) explicit messages on how to get
     libdvdcss and link vlc with it.
   * ./plugins/dvdread/input_dvdread.c: removed inclusion of dvd_udf.h.
+  * ./plugins/win32/*: Added management for secondary config dialogs
   * ./plugins/ogg/*: added preliminary files for an Ogg/Vorbis decoder a
     contributor is currently working on.
   * ALL: removed libdvdcss from the vlc tree.

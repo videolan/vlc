@@ -159,7 +159,7 @@ __published:	// IDE-managed Components
     void __fastcall ToolButtonFastClick( TObject *Sender );
     void __fastcall ToolButtonPrevClick( TObject *Sender );
     void __fastcall ToolButtonNextClick( TObject *Sender );
-    void __fastcall ToolButtonEjecttempClick( TObject *Sender );
+    void __fastcall ToolButtonEjectClick( TObject *Sender );
     void __fastcall PopupCloseClick( TObject *Sender );
     void __fastcall PopupPlayClick( TObject *Sender );
     void __fastcall PopupPauseClick( TObject *Sender );

@@ -34,10 +34,13 @@
 //#pragma package(smart_init)
 #pragma resource "*.dfm"
 
+extern  struct intf_thread_s *p_intfGlobal;
+
 //---------------------------------------------------------------------------
 __fastcall TAboutDlg::TAboutDlg( TComponent* Owner )
         : TForm( Owner )
 {
+    Image1->Picture->Icon = p_intfGlobal->p_sys->p_window->Icon;
 }
 //---------------------------------------------------------------------------
 

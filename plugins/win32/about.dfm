@@ -1,10 +1,10 @@
 object AboutDlg: TAboutDlg
-  Left = 422
-  Top = 159
+  Left = 442
+  Top = 281
   BorderStyle = bsDialog
   Caption = 'About'
-  ClientHeight = 509
-  ClientWidth = 360
+  ClientHeight = 204
+  ClientWidth = 286
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -246,24 +246,28 @@ object AboutDlg: TAboutDlg
   PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
-    Left = 141
-    Top = 8
-    Width = 77
-    Height = 13
+    Left = 114
+    Top = 18
+    Width = 132
+    Height = 20
     Caption = 'VideoLAN Client'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
   end
   object Label2: TLabel
-    Left = 5
-    Top = 40
-    Width = 346
+    Left = 10
+    Top = 64
+    Width = 267
     Height = 13
-    Caption = 
-      '(C) Copyright 1996, 1997, 1998, 1999, 2000, 2001 - The VideoLAN ' +
-      'Team'
+    Caption = '(C) Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002'
   end
-  object Label21: TLabel
-    Left = 52
-    Top = 424
+  object Label4: TLabel
+    Left = 15
+    Top = 115
     Width = 255
     Height = 39
     Caption = 
@@ -271,148 +275,27 @@ object AboutDlg: TAboutDlg
       'MPEG and MPEG 2 files from a file or from a network source.'
     WordWrap = True
   end
-  object GroupBoxAuthors: TGroupBox
-    Left = 6
-    Top = 64
-    Width = 345
-    Height = 353
-    Caption = 'Authors'
-    TabOrder = 0
-    object Label3: TLabel
-      Left = 24
-      Top = 14
-      Width = 171
-      Height = 13
-      Caption = 'Régis Duchesne <regis@via.ecp.fr>'
-    end
-    object Label4: TLabel
-      Left = 24
-      Top = 32
-      Width = 181
-      Height = 13
-      Caption = 'Michel Lespinasse <walken@zoy.org>'
-    end
-    object Label5: TLabel
-      Left = 24
-      Top = 51
-      Width = 159
-      Height = 13
-      Caption = 'Olivier Pomel <pomel@via.ecp.fr>'
-    end
-    object Label6: TLabel
-      Left = 24
-      Top = 69
-      Width = 133
-      Height = 13
-      Caption = 'Pierre Baillet <oct@zoy.org>'
-    end
-    object Label7: TLabel
-      Left = 24
-      Top = 87
-      Width = 207
-      Height = 13
-      Caption = 'Jean-Philippe Grimaldi <jeanphi@via.ecp.fr>'
-    end
-    object Label8: TLabel
-      Left = 24
-      Top = 106
-      Width = 149
-      Height = 13
-      Caption = 'Andres Krapf <dae@via.ecp.fr>'
-    end
-    object Label9: TLabel
-      Left = 24
-      Top = 124
-      Width = 194
-      Height = 13
-      Caption = 'Christophe Massiot <massiot@via.ecp.fr>'
-    end
-    object Label10: TLabel
-      Left = 24
-      Top = 142
-      Width = 173
-      Height = 13
-      Caption = 'Vincent Seguin <seguin@via.ecp.fr>'
-    end
-    object Label11: TLabel
-      Left = 24
-      Top = 161
-      Width = 165
-      Height = 13
-      Caption = 'Benoit Steiner <benny@via.ecp.fr>'
-    end
-    object Label12: TLabel
-      Left = 24
-      Top = 179
-      Width = 241
-      Height = 13
-      Caption = 'Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>'
-    end
-    object Label13: TLabel
-      Left = 24
-      Top = 198
-      Width = 186
-      Height = 13
-      Caption = 'Jean-Marc Dressler <polux@via.ecp.fr>'
-    end
-    object Label14: TLabel
-      Left = 24
-      Top = 216
-      Width = 171
-      Height = 13
-      Caption = 'Gaël Hendryckx <jimmy@via.ecp.fr>'
-    end
-    object Label15: TLabel
-      Left = 24
-      Top = 234
-      Width = 158
-      Height = 13
-      Caption = 'Samuel Hocevar <sam@zoy.org>'
-    end
-    object Label16: TLabel
-      Left = 24
-      Top = 253
-      Width = 178
-      Height = 13
-      Caption = 'Brieuc Jeunhomme <bbp@via.ecp.fr>'
-    end
-    object Label17: TLabel
-      Left = 24
-      Top = 271
-      Width = 164
-      Height = 13
-      Caption = 'Michel Kaempf <maxx@via.ecp.fr>'
-    end
-    object Label18: TLabel
-      Left = 24
-      Top = 289
-      Width = 160
-      Height = 13
-      Caption = 'Stéphane Borel <stef@via.ecp.fr>'
-    end
-    object Label19: TLabel
-      Left = 24
-      Top = 308
-      Width = 163
-      Height = 13
-      Caption = 'Renaud Dartus <reno@via.ecp.fr>'
-    end
-    object Label20: TLabel
-      Left = 24
-      Top = 326
-      Width = 149
-      Height = 13
-      Caption = 'Henri Fallon <henri@via.ecp.fr>'
-    end
+  object Label3: TLabel
+    Left = 38
+    Top = 80
+    Width = 227
+    Height = 13
+    Caption = 'The VideoLAN Team  <videolan@videolan.org>'
+  end
+  object Image1: TImage
+    Left = 32
+    Top = 8
+    Width = 49
+    Height = 49
   end
   object BitBtnOk: TBitBtn
-    Left = 7
-    Top = 471
-    Width = 345
+    Left = 64
+    Top = 170
+    Width = 145
     Height = 25
     Caption = 'OK'
     Default = True
     ModalResult = 1
-    TabOrder = 1
+    TabOrder = 0
   end
 end
