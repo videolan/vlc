@@ -70,6 +70,7 @@
 - (void)playlistUpdated;
 
 - (IBAction)playItem:(id)sender;
+- (IBAction)deleteItem:(id)sender;
 - (IBAction)selectAll:(id)sender;
 
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue;
