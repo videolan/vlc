@@ -848,10 +848,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     for( i = 2; i < 8192; i++ )
                     {
                         ts_pid_t *pid = &p_sys->pid[i];
+                        int i_prg;
 
                         if( !pid->b_valid || pid->psi ) continue;
 
-                        int i_prg;
                         for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
                         {
                             if( pid->p_owner->prg[i_prg]->i_pid_pcr == i_pmt_pid && pid->es->id )
@@ -888,10 +888,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     for( i = 2; i < 8192; i++ )
                     {
                         ts_pid_t *pid = &p_sys->pid[i];
+                        int i_prg;
 
                         if( !pid->b_valid || pid->psi ) continue;
 
-                        int i_prg;
                         for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
                         {
                             if( pid->p_owner->prg[i_prg]->i_pid_pcr == i_pmt_pid && pid->es->id )
