@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.40 2003/06/01 23:48:17 hartman Exp $
+ * $Id: controls.m,v 1.41 2003/06/03 22:21:46 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -569,16 +569,32 @@
 {
     NSMenuItem *o_mi = (NSMenuItem *)sender;
     VLCMenuExt *o_data = [[o_mi representedObject] pointerValue];
+    [NSThread detachNewThreadSelector: @selector(toggleVarThread:)
+        toTarget: self withObject: o_data];
+
+    return;
+}
+
+- (int)toggleVarThread: (id)_o_data
+{
     vlc_object_t *p_object;
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+    VLCMenuExt *o_data = (VLCMenuExt *)_o_data;
+
+    vlc_thread_set_priority( [NSApp getIntf] , VLC_THREAD_PRIORITY_LOW );
 
     p_object = (vlc_object_t *)vlc_object_get( [NSApp getIntf],
                                     [o_data objectID] );
-    if( p_object == NULL ) return;
 
-    var_Set( p_object, strdup([o_data name]), [o_data value] );
-    vlc_object_release( p_object );
-    
-    return;
+    if( p_object != NULL )
+    {
+        var_Set( p_object, strdup([o_data name]), [o_data value] );
+        vlc_object_release( p_object );
+        [o_pool release];
+        return VLC_TRUE;
+    }
+    [o_pool release];
+    return VLC_EGENERIC;
 }
 
 @end

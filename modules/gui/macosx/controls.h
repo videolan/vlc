@@ -2,7 +2,7 @@
  * controls.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.h,v 1.5 2003/06/01 23:48:17 hartman Exp $
+ * $Id: controls.h,v 1.6 2003/06/03 22:21:46 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -64,6 +64,7 @@
                     var:(const char *)psz_variable
                     selector:(SEL)pf_callback;
 - (IBAction)toggleVar:(id)sender;
+- (int)toggleVarThread:(id)_o_data;
 
 @end
 
