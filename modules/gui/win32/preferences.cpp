@@ -41,24 +41,24 @@
 /****************************************************************************
  * A THintWindow with a limited width
  ****************************************************************************/
-void __fastcall TNarrowHintWindow::ActivateHint(const Windows::TRect &Rect,
-    const System::AnsiString AHint)
+void __fastcall TNarrowHintWindow::ActivateHint( const Windows::TRect &Rect,
+    const System::AnsiString AHint )
 {
-    TRect NarrowRect = CalcHintRect ( 300 , AHint , NULL );
+    TRect NarrowRect = CalcHintRect( 300, AHint, NULL );
     NarrowRect.Left = Rect.Left;
     NarrowRect.Top = Rect.Top;
     NarrowRect.Right += Rect.Left;
     NarrowRect.Bottom += Rect.Top;
-    THintWindow::ActivateHint ( NarrowRect , AHint );
+    THintWindow::ActivateHint( NarrowRect, AHint );
 }
 
 
 /****************************************************************************
  * Just a wrapper to embed an AnsiString into a TObject
  ****************************************************************************/
-__fastcall TObjectString::TObjectString(char * String)
+__fastcall TObjectString::TObjectString( char * String )
 {
-    FString = AnsiString(String);
+    FString = AnsiString( String );
 }
 //---------------------------------------------------------------------------
 AnsiString __fastcall TObjectString::String()
@@ -73,9 +73,10 @@ AnsiString __fastcall TObjectString::String()
  ****************************************************************************/
 __fastcall TCleanCheckListBox::~TCleanCheckListBox()
 {
-    for ( int i = 0 ; i < Items->Count ; i++ )
+    for( int i = 0 ; i < Items->Count ; i++ )
     {
-        if ( Items->Objects[i] != NULL ) delete Items->Objects[i];
+        if( Items->Objects[i] != NULL )
+            delete Items->Objects[i];
     }
 }
 
@@ -214,7 +215,7 @@ __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
     ButtonConfig->OnClick = ButtonConfigClick;
 
     /* init label */
-    AnsiString Text = AnsiString(p_config->psz_text) + ":";
+    AnsiString Text = AnsiString( p_config->psz_text ) + ":";
     Label = CreateLabel( this,
             LIBWIN32_PREFSIZE_LEFT,
             LIBWIN32_PREFSIZE_RIGHT - LIBWIN32_PREFSIZE_BUTTON_WIDTH
@@ -233,9 +234,9 @@ __fastcall TPanelPlugin::TPanelPlugin( TComponent* Owner,
     CleanCheckListBox = CreateCleanCheckListBox( this,
             LIBWIN32_PREFSIZE_EDIT_LEFT,
             LIBWIN32_PREFSIZE_EDIT_WIDTH,
-            max ( Label->Top + Label->Height , ButtonConfig->Top
-             + ButtonConfig->Height ) + LIBWIN32_PREFSIZE_VPAD,
-            LIBWIN32_PREFSIZE_CHECKLISTBOX_HEIGHT );
+            max( Label->Top + Label->Height , ButtonConfig->Top
+                 + ButtonConfig->Height ) + LIBWIN32_PREFSIZE_VPAD,
+                 LIBWIN32_PREFSIZE_CHECKLISTBOX_HEIGHT );
     CleanCheckListBox->OnClick = CheckListBoxClick;
     CleanCheckListBox->OnClickCheck = CheckListBoxClickCheck;
     CleanCheckListBox->Hint = p_config->psz_longtext;
@@ -532,7 +533,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     int                 i_pages, i_ctrl;
 
     TTabSheet          *TabSheet;
-    TScrollBox         *ScrollBox;
+    TScrollBox         *ScrollBox = NULL;
     TPanel             *Panel;
     TPanelPlugin       *PanelPlugin;
     TPanelString       *PanelString;
@@ -605,21 +606,21 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
                 {
                     AnsiString ModuleDesc;
                     if ( p_parser->psz_longname != NULL ) {
-                        ModuleDesc = AnsiString(p_parser->psz_longname) +
-                            " (" + AnsiString(p_parser->psz_object_name) +
+                        ModuleDesc = AnsiString( p_parser->psz_longname ) +
+                            " (" + AnsiString( p_parser->psz_object_name ) +
                             ")";
                     }
                     else
-                        ModuleDesc = AnsiString(p_parser->psz_object_name);
+                        ModuleDesc = AnsiString( p_parser->psz_object_name );
 
                     int item = PanelPlugin->CleanCheckListBox->Items->AddObject(
                         ModuleDesc.c_str(),
-                        new TObjectString(p_parser->psz_object_name) );
+                        new TObjectString( p_parser->psz_object_name ) );
 
                     /* check the box if it's the default module */
                     AnsiString Name = p_item->psz_value ?
                         p_item->psz_value : "";
-                    if( !strcmp( p_parser->psz_object_name, Name.c_str()) )
+                    if( !strcmp( p_parser->psz_object_name, Name.c_str() ) )
                     {
                         PanelPlugin->CleanCheckListBox->Checked[item] = true;
                     }

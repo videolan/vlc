@@ -39,8 +39,8 @@
 class TCleanCheckListBox : public TCheckListBox
 {
 public:
-    __fastcall TCleanCheckListBox(Classes::TComponent* AOwner)
-        : TCheckListBox( AOwner ) { };
+    __fastcall TCleanCheckListBox( Classes::TComponent* AOwner )
+        : TCheckListBox( AOwner ) {};
     virtual __fastcall ~TCleanCheckListBox();
 };
 //---------------------------------------------------------------------------
@@ -48,8 +48,8 @@ public:
 class TNarrowHintWindow : public THintWindow
 {
 public:
-   virtual void __fastcall ActivateHint(const Windows::TRect &Rect,
-       const System::AnsiString AHint);
+   virtual void __fastcall ActivateHint( const Windows::TRect &Rect,
+       const System::AnsiString AHint );
 };
 //---------------------------------------------------------------------------
 /* Just a wrapper to embed an AnsiString into a TObject */
@@ -58,7 +58,7 @@ class TObjectString : public TObject
 private:
     AnsiString FString;
 public:
-    __fastcall TObjectString(char * String);
+    __fastcall TObjectString( char * String );
     AnsiString __fastcall String();
 };
 //---------------------------------------------------------------------------
