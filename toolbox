@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.13 2003/03/12 04:16:02 sam Exp $
+##  $Id: toolbox,v 1.14 2003/03/12 05:12:05 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -20,60 +20,64 @@ help()
 {
   cat << EOF
 recognized flags are:
-  --update-changelog  update the CVS changelog
-  --update-vc         update Microsoft Visual Studio files
-  --update-po         update translation files
-  --update-glade      generate and fix Glade code
+  --update-changelog            update the CVS changelog
+  --update-vc                   update Microsoft Visual Studio files
+  --update-po                   update translation files
+  --update-includes [BUILTINS]  generate various include files
+  --update-glade                generate and fix Glade code
 EOF
   exit 1
+}
+
+##
+##  Extract stuff from Makefile.am
+##
+getfiles()
+{
+  awk 'BEGIN{a=0}{if(!a&&/^'"$1"'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | \
+    tr '\\ ' '\n\n' | \
+    sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'
 }
 
 ###
 ###  argument check
 ###
-do_help=no
 do_changelog=no
 do_po=no
 do_vc=no
+do_includes=no
 do_glade=no
 
 if test "$1" = ""
 then
-  do_help=yes
-fi
-
-while test $# -gt 0; do
-  case "$1" in
-    --update-changelog)
-      do_changelog=yes
-      ;;
-    --update-vc)
-      do_vc=yes
-      ;;
-    --update-po)
-      do_po=yes
-      ;;
-    --update-glade|--fix-glade)
-      do_glade=yes
-      ;;
-    --help)
-      do_help=yes
-      ;;
-    *)
-      echo "$0: unknown option $1"
-      do_help=yes
-      ;;
-  esac
-  shift
-done
-
-##
-##  Give help if needed
-##
-if test "$do_help" = "yes"
-then
   help
 fi
+
+case "$1" in
+  --update-changelog)
+    do_changelog=yes
+    ;;
+  --update-vc)
+    do_vc=yes
+    ;;
+  --update-po)
+    do_po=yes
+    ;;
+  --update-includes)
+    do_includes=yes
+    ;;
+  --update-glade|--fix-glade)
+    do_glade=yes
+    ;;
+  --help)
+    help
+    ;;
+  *)
+    echo "$0: unknown option $1"
+    help
+    ;;
+esac
+shift
 
 ##
 ##  Update the CVS changelog
@@ -85,6 +89,7 @@ then
   cvs2cl --hide-filenames --no-wrap -w --stdout | \
     sed -e 's/^[^0-9]/ /' -e 's/^  *$//' | \
     uniq > ChangeLog
+  exit 0
 fi
 
 ##
@@ -103,11 +108,11 @@ then
   LIBVLC_SYMBOL=`echo $LIBVLC_VERSION | sed -e 'y/.-/__/'`
 
   #  Sources that get built under Win32 - FIXME: anyone wanna deuglify this? :)
-  LIBVLC_SOURCES=`awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_common'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p';  awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_win32'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_dirent'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_getopt'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'SOURCES_libvlc_libc'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
+  LIBVLC_SOURCES=`getfiles SOURCES_libvlc_common; getfiles SOURCES_libvlc_win32; getfiles SOURCES_libvlc_dirent; getfiles SOURCES_libvlc_getopt; getfiles SOURCES_libvlc_libc`
 
-  LIBVLC_HEADERS=`awk 'BEGIN{a=0}{if(!a&&/^'HEADERS_include'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'; awk 'BEGIN{a=0}{if(!a&&/^'HEADERS_include_built'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
+  LIBVLC_HEADERS=`getfiles HEADERS_include; getfiles HEADERS_include_built`
 
-  LIBVLC_PKG_HEADERS=`awk 'BEGIN{a=0}{if(!a&&/^'dist_pkginclude_HEADERS'[^-_a-zA-Z0-9]*=/){a=1;print$0;next;}if(a){if(/^[a-zA-Z]/){exit;}print $0}}' < Makefile.am | tr '\\ ' '\n\n' | sed -ne 's/[^$-_a-zA-Z0-9][^$-_a-zA-Z0-9]*\([a-zA-Z]\)/\1/p'`
+  LIBVLC_PKG_HEADERS=`getfiles dist_pkginclude_HEADERS`
 
   # Clean up
   rm -f evc/*.vcp msvc/*.dsp
@@ -323,6 +328,80 @@ then
   make vlc.pot || exit 1
   make update-po || exit 1
   cd ..
+
+  exit 0
+fi
+
+##
+##  Create include files
+##
+if test "$do_includes" = "yes"
+then
+  set -x
+
+  LIBVLC_HEADERS=`getfiles HEADERS_include`
+  BUILTINS=`while test $# -gt 0; do echo $1; shift; done`
+
+  file=include/vlc_symbols.h
+
+  rm -f ${file}.in
+  echo '/* DO NOT EDIT THIS FILE! See Makefile.am */' >> ${file}.in
+  echo 'struct module_symbols_t {' >> ${file}.in
+  cat ${LIBVLC_HEADERS} | grep '^ *VLC_EXPORT.*;' | sed -e 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/    \1 (* \2_inner) \3;/' >> ${file}.in
+  echo '};' >> ${file}.in
+  echo '#ifdef __PLUGIN__' >> ${file}.in
+  cat ${LIBVLC_HEADERS} | grep '^ *VLC_EXPORT.*;' | sed -e 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/#   define \2 p_symbols->\2_inner/' >> ${file}.in
+  echo '#endif /* __PLUGIN__ */' >> ${file}.in
+  if ! diff -q ${file} ${file}.in
+  then
+    mv -f ${file}.in ${file}
+  else
+    rm -f ${file}.in
+  fi
+
+  file=src/misc/modules_plugin.h
+
+  rm -f ${file}.tmp && cp ${file}.in ${file}.tmp
+  sed -e 's#.*\$[I][d]:.*# * Automatically generated from '${file}'.in by bootstrap#' < ${file}.in > ${file}.tmp
+  echo '#define STORE_SYMBOLS( p_symbols ) \' >> ${file}.tmp
+  cat ${LIBVLC_HEADERS} | grep '^ *VLC_EXPORT.*;' | sed -e 's/VLC_EXPORT( *\([^,]*\), *\([^,]*\), *\(.*\));.*/    (p_symbols)->\2_inner = \2; \\/' >> ${file}.tmp
+  echo '' >> ${file}.tmp
+  if ! diff -q ${file} ${file}.tmp
+  then
+    mv -f ${file}.tmp ${file}
+  else
+    rm -f ${file}.tmp
+  fi
+
+  file=src/misc/modules_builtin.h
+
+  rm -f ${file}.tmp && cp ${file}.in ${file}.tmp
+  if test "${BUILTINS}" != ""
+  then
+    for i in `echo ${BUILTINS}`
+    do
+      echo "int vlc_entry__`echo $i | sed -e 'y@/@_@' -e 's@\..*@@'`( module_t* );" >>${file}.tmp
+    done
+    echo "" >> ${file}.tmp
+  fi
+  echo "#define ALLOCATE_ALL_BUILTINS() \\" >> ${file}.tmp
+  echo "    do \\" >> ${file}.tmp
+  echo "    { \\" >> ${file}.tmp
+  if test "${BUILTINS}" != ""
+  then
+    for i in `echo ${BUILTINS}`
+    do
+      echo "        ALLOCATE_BUILTIN(`echo $i | sed -e 'y@/@_@' -e 's@\..*@@'`); \\" >> ${file}.tmp
+    done
+  fi
+  echo "    } while( 0 );" >> ${file}.tmp
+  echo "" >> ${file}.tmp
+  if ! diff -q ${file} ${file}.tmp
+  then
+    mv -f ${file}.tmp ${file}
+  else
+    rm -f ${file}.tmp
+  fi
 
   exit 0
 fi
