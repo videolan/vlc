@@ -161,16 +161,19 @@ void sout_DeleteInstance( sout_instance_t * p_sout )
     /* Unlink object */
     vlc_object_detach( p_sout );
 
+    /* remove the stream out chain */
+    sout_stream_delete( p_sout->p_stream );
+
     /* *** free all string *** */
     FREE( p_sout->psz_sout );
     FREE( p_sout->psz_chain );
 
+    /* delete meta */
     if( p_sout->p_meta )
     {
         vlc_meta_Delete( p_sout->p_meta );
     }
 
-    sout_stream_delete( p_sout->p_stream );
     vlc_mutex_destroy( &p_sout->lock );
 
     /* *** free structure *** */
