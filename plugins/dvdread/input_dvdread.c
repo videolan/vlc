@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.24 2002/03/02 03:29:13 stef Exp $
+ * $Id: input_dvdread.c,v 1.25 2002/03/04 01:53:56 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -236,18 +236,56 @@ static int DvdReadRewind( input_thread_t * p_input )
  *****************************************************************************/
 static int DvdReadOpen( struct input_thread_s *p_input )
 {
+    char *                  psz_parser = p_input->psz_name;
+    char *                  psz_source = p_input->psz_name;
+    char *                  psz_next;
     struct stat             stat_info;
     thread_dvd_data_t *     p_dvd;
     dvd_reader_t *          p_dvdread;
     input_area_t *          p_area;
-    int                     i_title;
-    int                     i_chapter;
+    boolean_t               b_need_free = 0;
+    int                     i_title = 1;
+    int                     i_chapter = 1;
+    int                     i_angle = 1;
     int                     i;
 
-    if( stat( p_input->psz_name, &stat_info ) == -1 )
+    while( *psz_parser && *psz_parser != '@' )
     {
-        intf_ErrMsg( "input error: cannot stat() device `%s' (%s)",
-                     p_input->psz_name, strerror(errno));
+        psz_parser++;
+    }
+
+    if( *psz_parser == '@' )
+    {
+        /* Found options */
+        *psz_parser = '\0';
+        ++psz_parser;
+
+        i_title = (int)strtol( psz_parser, &psz_next, 10 );
+        if( *psz_next )
+        {
+            psz_parser = psz_next + 1;
+            i_chapter = (int)strtol( psz_parser, &psz_next, 10 );
+            if( *psz_next )
+            {
+                i_angle = (int)strtol( psz_next + 1, NULL, 10 );
+            }
+        }
+
+        i_title = i_title ? i_title : 1;
+        i_chapter = i_chapter ? i_chapter : 1;
+        i_angle = i_angle ? i_angle : 1;
+    }
+
+    if( !*psz_source )
+    {
+        psz_source = config_GetPszVariable( INPUT_DVD_DEVICE_VAR );
+        b_need_free = 1;
+    }
+
+    if( stat( psz_source, &stat_info ) == -1 )
+    {
+        intf_ErrMsg( "input error: cannot stat() source `%s' (%s)",
+                     psz_source, strerror(errno));
         return( -1 );
     }
     if( !S_ISBLK(stat_info.st_mode) &&
@@ -259,7 +297,17 @@ static int DvdReadOpen( struct input_thread_s *p_input )
         return -1;
     }
     
-    p_dvdread = DVDOpen( p_input->psz_name );
+    intf_WarnMsg( 2, "input: dvdroot=%s title=%d chapter=%d angle=%d",
+                  psz_source, i_title, i_chapter, i_angle );
+    
+
+    p_dvdread = DVDOpen( psz_source );
+
+    if( b_need_free )
+    {
+        free( psz_source );
+    }
+
     if( ! p_dvdread )
     {
         intf_ErrMsg( "dvdread error: libdvdcss can't open source" );
@@ -279,6 +327,10 @@ static int DvdReadOpen( struct input_thread_s *p_input )
     p_dvd->p_dvdread = p_dvdread;
     p_dvd->p_title = NULL;
     p_dvd->p_vts_file = NULL;
+
+    p_dvd->i_title = i_title;
+    p_dvd->i_chapter = i_chapter;
+    p_dvd->i_angle = i_angle;
 
     p_input->p_access_data = (void *)p_dvd;
 
@@ -339,22 +391,7 @@ static int DvdReadOpen( struct input_thread_s *p_input )
         area[i]->i_plugin_data = tt_srpt->title[i-1].title_set_nr;
     }
 #undef area
-
-    /* Get requested title - if none try the first title */
-    i_title = config_GetIntVariable( INPUT_TITLE_VAR );
-    if( i_title <= 0 || i_title > tt_srpt->nr_of_srpts )
-    {
-        i_title = 1;
-    }
-
 #undef tt_srpt
-
-    /* Get requested chapter - if none defaults to first one */
-    i_chapter = config_GetIntVariable( INPUT_CHAPTER_VAR );
-    if( i_chapter <= 0 )
-    {
-        i_chapter = 1;
-    }
 
     p_input->stream.pp_areas[i_title]->i_part = i_chapter;
 
@@ -515,15 +552,15 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
         /*
          * Angle management
          */
-        p_area->i_angle_nb = p_vmg->tt_srpt->title[p_area->i_id-1].nr_of_angles;
-        p_area->i_angle = config_GetIntVariable( INPUT_ANGLE_VAR );
+        p_dvd->i_angle_nb = p_vmg->tt_srpt->title[p_area->i_id-1].nr_of_angles;
 
-        if( ( p_area->i_angle <= 0 ) || p_area->i_angle > p_area->i_angle_nb )
+        if( p_dvd->i_angle > p_area->i_angle_nb )
         {
-            p_area->i_angle = 1;
+            p_dvd->i_angle = 1;
         }
-        p_dvd->i_angle = p_area->i_angle;
-        p_dvd->i_angle_nb = p_area->i_angle_nb;
+
+        p_area->i_angle = p_dvd->i_angle;
+        p_area->i_angle_nb = p_dvd->i_angle_nb;
 
         /*
          * We've got enough info, time to open the title set data.

@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.16 2002/02/24 20:51:10 gbazin Exp $
+ * $Id: gtk_open.c,v 1.17 2002/03/04 01:53:56 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -181,18 +181,11 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     GtkCList *      p_playlist_clist;
     char *          psz_device, *psz_source, *psz_method;
     int             i_end = p_main->p_playlist->i_size;
+    int             i_title, i_chapter;
 
     gtk_widget_hide( p_intf->p_sys->p_disc );
     psz_device = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                          GTK_WIDGET(button), "disc_name" ) ) );
-
-    /* "dvd:foo" has size 5 + strlen(foo) */
-    psz_source = malloc( 3 /* "dvd" */ + 1 /* ":" */
-                           + strlen( psz_device ) + 1 /* "\0" */ );
-    if( psz_source == NULL )
-    {
-        return;
-    }
 
     /* Check which method was activated */
     if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
@@ -213,16 +206,26 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     }
     
     /* Select title and chapter */
-    config_PutIntVariable( INPUT_TITLE_VAR, gtk_spin_button_get_value_as_int(
+    i_title = gtk_spin_button_get_value_as_int(
                               GTK_SPIN_BUTTON( lookup_widget(
-                                  GTK_WIDGET(button), "disc_title" ) ) ) );
+                                  GTK_WIDGET(button), "disc_title" ) ) );
 
-    config_PutIntVariable( INPUT_CHAPTER_VAR, gtk_spin_button_get_value_as_int(
+    i_chapter = gtk_spin_button_get_value_as_int(
                               GTK_SPIN_BUTTON( lookup_widget(
-                                  GTK_WIDGET(button), "disc_chapter" ) ) ) );
+                                  GTK_WIDGET(button), "disc_chapter" ) ) );
+    
+    /* "dvd:foo" has size 5 + strlen(foo) */
+    psz_source = malloc( 3 /* "dvd" */ + 1 /* ":" */
+                           + strlen( psz_device ) + 2 /* @, */
+                           + 4 /* i_title & i_chapter < 100 */ + 1 /* "\0" */ );
+    if( psz_source == NULL )
+    {
+        return;
+    }
 
     /* Build source name and add it to playlist */
-    sprintf( psz_source, "%s:%s", psz_method, psz_device );
+    sprintf( psz_source, "%s:%s@%d,%d",
+             psz_method, psz_device, i_title, i_chapter );
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
     free( psz_source );
 

@@ -2,7 +2,7 @@
  * input_dvdread.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dvdread.h,v 1.5 2002/03/01 01:12:28 stef Exp $
+ * $Id: input_dvdread.h,v 1.6 2002/03/04 01:53:56 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -48,6 +48,11 @@ typedef struct thread_dvd_data_s
     ifo_handle_t *          p_vmg_file;
     ifo_handle_t *          p_vts_file;
             
+    int                     i_title;
+    int                     i_chapter;
+    int                     i_angle;
+    int                     i_angle_nb;
+
     tt_srpt_t *             p_tt_srpt;
     pgc_t *                 p_cur_pgc;
 
@@ -62,9 +67,6 @@ typedef struct thread_dvd_data_s
 
     int                     i_cur_cell;
     int                     i_next_cell;
-    int                     i_chapter;
     boolean_t               b_eoc;
-    int                     i_angle_nb;
-    int                     i_angle;
 } thread_dvd_data_t;
 

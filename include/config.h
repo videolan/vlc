@@ -339,9 +339,6 @@
 /* Variable containing network interface */
 #define INPUT_IFACE_VAR                 "iface"
 
-#define INPUT_TITLE_VAR                 "input_title"
-#define INPUT_CHAPTER_VAR               "input_chapter"
-#define INPUT_ANGLE_VAR                 "input_angle"
 #define INPUT_AUDIO_VAR                 "input_audio"
 #define INPUT_CHANNEL_VAR               "input_channel"
 #define INPUT_SUBTITLE_VAR              "input_subtitle"

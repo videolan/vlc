@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.157 2002/02/27 03:47:56 sam Exp $
+ * $Id: main.c,v 1.158 2002/03/04 01:53:56 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -163,9 +163,6 @@ ADD_STRING  ( INPUT_CHANNEL_SERVER_VAR, "localhost", NULL,
 ADD_INTEGER ( INPUT_CHANNEL_PORT_VAR, 6010, NULL, "channel server port", NULL )
 ADD_STRING  ( INPUT_IFACE_VAR, "eth0", NULL, "network interface", NULL )
 
-ADD_INTEGER ( INPUT_TITLE_VAR, -1, NULL, "choose title", NULL )
-ADD_INTEGER ( INPUT_CHAPTER_VAR, -1, NULL, "choose chapter", NULL )
-ADD_INTEGER ( INPUT_ANGLE_VAR, -1, NULL, "chosse angle", NULL )
 ADD_INTEGER ( INPUT_AUDIO_VAR, -1, NULL, "choose audio", NULL )
 ADD_INTEGER ( INPUT_CHANNEL_VAR, -1, NULL, "choose channel", NULL )
 ADD_INTEGER ( INPUT_SUBTITLE_VAR, -1, NULL, "choose subtitles", NULL )

@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.126 2002/03/03 17:34:27 xav Exp $
+ * $Id: input_dvd.c,v 1.127 2002/03/04 01:53:56 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -52,18 +52,12 @@
 
 #if defined( WIN32 )
 #   include <io.h>                                                 /* read() */
-#else
-#   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
 #ifdef GOD_DAMN_DMCA
 #   include "dummy_dvdcss.h"
 #else
 #   include <videolan/dvdcss.h>
-#endif
-
-#if defined( WIN32 )
-#   include "input_iovec.h"
 #endif
 
 #include "stream_control.h"
@@ -243,6 +237,19 @@ static int DVDRewind( input_thread_t * p_input )
  * Data access functions
  */
 
+#define PARSE( chr, action )                            \
+    psz_parser = p_input->psz_name;                     \
+    while( *(psz_parser) && *(psz_parser) != (chr) )    \
+    {                                                   \
+        (psz_parser)++;                                 \
+    }                                                   \
+                                                        \
+    if( *(psz_parser) == (chr) )                        \
+    {                                                   \
+        *(psz_parser) = '\0';                           \
+        (action);                                       \
+    }
+
 /*****************************************************************************
  * DVDOpen: open dvd
  *****************************************************************************/
@@ -251,14 +258,20 @@ static int DVDOpen( struct input_thread_s *p_input )
     struct stat          stat_info;
     char *               psz_parser = p_input->psz_name;
     char *               psz_device = p_input->psz_name;
+    char *               psz_raw;
+    char *               psz_next;
     dvdcss_handle        dvdhandle;
     thread_dvd_data_t *  p_dvd;
     input_area_t *       p_area;
-    int                  i_title;
-    int                  i_chapter;
+    boolean_t            b_need_free = 0;
+    boolean_t            b_options = 0;
+    int                  i_title = 1;
+    int                  i_chapter = 1;
+    int                  i_angle = 1;
     int                  i;
 
-    /* Parse input string : device[@rawdevice] */
+    /* Parse input string :
+     * [device][@rawdevice][@[title][,[chapter][,angle]]] */
     while( *psz_parser && *psz_parser != '@' )
     {
         psz_parser++;
@@ -268,9 +281,75 @@ static int DVDOpen( struct input_thread_s *p_input )
     {
         /* Found raw device */
         *psz_parser = '\0';
-        psz_parser++;
+        psz_raw = ++psz_parser;
+    }
+    else
+    {
+        psz_raw = NULL;
+    }
 
-        config_PutPszVariable( "DVDCSS_RAW_DEVICE", psz_parser );
+    if( !strtol( psz_parser, NULL, 10 ) )
+    {
+        while( *psz_parser && *psz_parser != '@' )
+        {
+            psz_parser++;
+        }
+        
+        if( *psz_parser == '@' )
+        {
+            *psz_parser = '\0';
+            ++psz_parser;
+            b_options = 1;
+        }
+        else
+        {
+            psz_parser = psz_raw + 1;
+            for( i=0 ; i<3 ; i++ )
+            {
+                if( !*psz_parser )
+                {
+                    break;
+                }
+                if( strtol( psz_parser, NULL, 10 ) )
+                {
+                    psz_parser = psz_raw;
+                    psz_raw = NULL;
+                    b_options = 1;
+                    break;
+                }
+                psz_parser++;
+            }
+        }
+    }
+    else
+    {
+        psz_raw = NULL;
+        b_options = 1;
+    }
+
+    if( b_options )
+    {
+        /* Found options */
+        i_title = (int)strtol( psz_parser, &psz_next, 10 );
+        if( *psz_next )
+        {
+            psz_parser = psz_next + 1;
+            i_chapter = (int)strtol( psz_parser, &psz_next, 10 );
+            if( *psz_next )
+            {
+                i_angle = (int)strtol( psz_next + 1, NULL, 10 );
+            }
+        }
+
+        i_title = i_title ? i_title : 1;
+        i_chapter = i_chapter ? i_chapter : 1;
+        i_angle = i_angle ? i_angle : 1;
+    }
+
+    if( !*psz_device )
+    {
+        psz_device = config_GetPszVariable( INPUT_DVD_DEVICE_VAR );
+        b_need_free = 1;
     }
 
     if( stat( psz_device, &stat_info ) == -1 )
@@ -283,13 +362,26 @@ static int DVDOpen( struct input_thread_s *p_input )
 #ifndef WIN32    
     if( !S_ISBLK(stat_info.st_mode) && !S_ISCHR(stat_info.st_mode) )
     {
-        intf_WarnMsg( 3, "input : DVD plugin discarded"
+        intf_WarnMsg( 3, "input: DVD plugin discarded"
                          " (not a valid block device)" );
         return -1;
     }
 #endif
+    
+    if( psz_raw )
+    {
+        if( *psz_raw )
+        {
+            setenv( "DVDCSS_RAW_DEVICE", psz_raw, 1 );
+        }
+        else
+        {
+            psz_raw = NULL;
+        }
+    }
 
-    intf_WarnMsg( 2, "input: dvd=%s raw=%s", psz_device, psz_parser );
+    intf_WarnMsg( 2, "input: dvd=%s raw=%s title=%d chapter=%d angle=%d",
+                  psz_device, psz_raw, i_title, i_chapter, i_angle );
     
     /* 
      * set up input
@@ -314,6 +406,11 @@ static int DVDOpen( struct input_thread_s *p_input )
      *  get plugin ready
      */ 
     dvdhandle = dvdcss_open( psz_device );
+    
+    if( b_need_free )
+    {
+        free( psz_device );
+    }
 
     if( dvdhandle == NULL )
     {
@@ -330,6 +427,10 @@ static int DVDOpen( struct input_thread_s *p_input )
 
     p_dvd->dvdhandle = (dvdcss_handle) dvdhandle;
     p_input->p_access_data = (void *)p_dvd;
+
+    p_dvd->i_title = i_title;
+    p_dvd->i_chapter = i_chapter;
+    p_dvd->i_angle = i_angle;
 
     if( dvdcss_seek( p_dvd->dvdhandle, 0, DVDCSS_NOFLAGS ) < 0 )
     {
@@ -391,22 +492,7 @@ static int DVDOpen( struct input_thread_s *p_input )
                        title_inf.p_attr[i-1].i_start_sector;
     }   
 #undef area
-
-    /* Get requested title - if none try the first title */
-    i_title = config_GetIntVariable( INPUT_TITLE_VAR );
-    if( i_title <= 0 || i_title > title_inf.i_title_nb )
-    {
-        i_title = 1;
-    }
-
 #undef title_inf
-
-    /* Get requested chapter - if none defaults to first one */
-    i_chapter = config_GetIntVariable( INPUT_CHAPTER_VAR );
-    if( i_chapter <= 0 )
-    {
-        i_chapter = 1;
-    }
 
     p_area = p_input->stream.pp_areas[i_title];
     p_area->i_part = i_chapter;
@@ -516,7 +602,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
          * Angle management
          */
         p_dvd->i_angle_nb = vmg.title_inf.p_attr[p_dvd->i_title-1].i_angle_nb;
-        p_dvd->i_angle = config_GetIntVariable( INPUT_ANGLE_VAR );
         if( ( p_dvd->i_angle <= 0 ) || p_dvd->i_angle > p_dvd->i_angle_nb )
         {
             p_dvd->i_angle = 1;
