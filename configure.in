@@ -479,8 +479,8 @@ then
 	[ echo "The development package for SDL is not installed. Please install it"
 	  echo "and try again."
 	  exit ])
-    if expr 1.1.7 \> $($SDL_CONFIG --version); then
-      echo "You need SDL version 1.1.7 or later."
+    if expr 1.1.5 \> $($SDL_CONFIG --version); then
+      echo "You need SDL version 1.1.5 or later."
       exit
     fi
     PLUGINS="${PLUGINS} sdl"
