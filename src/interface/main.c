@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.121 2001/11/05 15:22:44 massiot Exp $
+ * $Id: main.c,v 1.122 2001/11/12 12:54:16 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -123,6 +123,7 @@
 #define OPT_SERVER              171
 #define OPT_PORT                172
 #define OPT_BROADCAST           173
+#define OPT_CHANNELSERVER       174
 
 #define OPT_INPUT               180
 #define OPT_MOTION              181
@@ -210,6 +211,7 @@ static const struct option longopts[] =
     {   "port",             1,          0,      OPT_PORT },
     {   "broadcast",        1,          0,      OPT_BROADCAST },
     {   "channels",         0,          0,      OPT_CHANNELS },
+    {   "channelserver",    1,          0,      OPT_CHANNELSERVER },
 
     /* Synchro options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
@@ -781,6 +783,9 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         case OPT_CHANNELS:                                     /* --channels */
             main_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, 1 );
             break;
+        case OPT_CHANNELSERVER:                           /* --channelserver */
+            main_PutPszVariable( INPUT_CHANNEL_SERVER_VAR, optarg );
+            break;
         case OPT_SERVER:                                         /* --server */
             main_PutPszVariable( INPUT_SERVER_VAR, optarg );
             break;
@@ -903,6 +908,7 @@ static void Usage( int i_fashion )
           "\n"
           "\n      --input                    \tinput method"
           "\n      --channels                 \tenable channels"
+          "\n      --channelserver <host>     \tchannel server address"
           "\n      --server <host>            \tvideo server address"
           "\n      --port <port>              \tvideo server port"
           "\n      --broadcast                \tlisten to a broadcast"
