@@ -1,8 +1,8 @@
 /*****************************************************************************
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001,2003 VideoLAN
- * $Id: interface.cpp,v 1.74 2003/12/03 04:19:59 rocky Exp $
+ * Copyright (C) 2000-2001, 2003 VideoLAN
+ * $Id: interface.cpp,v 1.75 2003/12/03 13:41:49 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -24,11 +24,6 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <errno.h>                                                 /* ENOMEM */
-#include <string.h>                                            /* strerror() */
-#include <stdio.h>
-
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
