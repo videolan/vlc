@@ -37,13 +37,16 @@ static void Access2Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("Access2 adaptation layer" ) );
-    set_capability( "access", 0 );
+    set_capability( "access", 50 );
     set_callbacks( Access2Open, Access2Close );
     add_shortcut( "access2" );
     add_shortcut( "http" );
     add_shortcut( "ftp" );
     add_shortcut( "tcp" );
     add_shortcut( "pvr" );
+    add_shortcut( "file" );
+    add_shortcut( "stream" );
+    add_shortcut( "kfir" );
 
     /* Hack */
     //add_shortcut( "file" );
@@ -54,12 +57,17 @@ vlc_module_end();
  *****************************************************************************/
 static int  Access2Read   ( input_thread_t *, byte_t *, size_t );
 static void Access2Seek   ( input_thread_t *, off_t );
+static int  Access2SetArea( input_thread_t *, input_area_t * );
 static int  Access2Control( input_thread_t *, int, va_list );
 
 typedef struct
 {
     access_t  *p_access;
     block_t   *p_block;
+
+    int i_title;
+    input_title_t **title;
+
 } access2_sys_t;
 
 /*****************************************************************************
@@ -104,7 +112,7 @@ static int Access2Open( vlc_object_t * p_this )
     p_input->pf_read           = Access2Read;
     p_input->pf_seek           = Access2Seek;
     p_input->pf_set_program    = input_SetProgram;
-    p_input->pf_set_area       = NULL;
+    p_input->pf_set_area       = Access2SetArea;
     p_input->pf_access_control = Access2Control;
     p_input->p_access_data = (access_sys_t*)p_sys;
     /* mtu */
@@ -119,9 +127,42 @@ static int Access2Open( vlc_object_t * p_this )
         if( !p_input->psz_demux || *p_input->psz_demux == '\0' )
             p_input->psz_demux = strdup( p_access->psz_demux );
     }
+    /* title */
+    if( access2_Control( p_access, ACCESS_GET_TITLE_INFO,
+                         &p_sys->title, &p_sys->i_title ) )
+    {
+        p_sys->i_title = 0;
+        p_sys->title   = NULL;
+    }
 
     /* Init p_input->stream.* */
     vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( p_sys->i_title > 0 )
+    {
+        /* FIXME handle the area 0 */
+        int64_t i_start = 0;
+        int i;
+
+#define area p_input->stream.pp_areas
+        for( i = 0 ; i <= p_sys->i_title ; i++ )
+        {
+            input_title_t *t = p_sys->title[i];
+
+            input_AddArea( p_input, i+1,
+                           t->i_seekpoint > 0 ? t->i_seekpoint : 1 );
+
+            /* Absolute start offset and size */
+            area[i]->i_start = i_start;
+            area[i]->i_size  = t->i_size;
+
+            i_start += t->i_size;
+        }
+#undef area
+
+        /* Set the area */
+        Access2SetArea( p_input, p_input->stream.pp_areas[1] );
+    }
+
     /* size */
     p_input->stream.p_selected_area->i_size  = p_access->info.i_size;
     /* seek */
@@ -153,8 +194,15 @@ static void Access2Close( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     access2_sys_t  *p_sys = (access2_sys_t*)p_input->p_access_data;
+    int i;
 
     access2_Delete( p_sys->p_access );
+
+    for( i = 0; i < p_sys->i_title; i++ )
+    {
+        vlc_input_title_Delete( p_sys->title[i] );
+    }
+    if( p_sys->title ) free( p_sys->title );
 
     if( p_sys->p_block )
         block_Release( p_sys->p_block );
@@ -221,6 +269,7 @@ update:
     {
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.p_selected_area->i_size  = p_access->info.i_size;
+        p_input->stream.b_changed = VLC_TRUE;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
         p_access->info.i_update &= ~INPUT_UPDATE_SIZE;
@@ -239,6 +288,46 @@ update:
 
     return i_total;
 }
+
+/*****************************************************************************
+ * Access2SetArea: initialize input data for title x.
+ * It should be called for each user navigation request.
+ ****************************************************************************/
+static int Access2SetArea( input_thread_t * p_input, input_area_t * p_area )
+{
+#if 0
+    access_sys_t *p_sys = p_input->p_access_data;
+    vlc_value_t  val;
+    /* we can't use the interface slider until initilization is complete */
+    p_input->stream.b_seekable = 0;
+
+    if( p_area != p_input->stream.p_selected_area )
+    {
+        /* Change the default area */
+        p_input->stream.p_selected_area = p_area;
+
+        /* Change the current track */
+        p_sys->i_track = p_area->i_id - 1;
+        p_sys->i_sector = p_sys->p_sectors[p_sys->i_track];
+
+        /* Update the navigation variables without triggering a callback */
+        val.i_int = p_area->i_id;
+        var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+    }
+
+    p_sys->i_sector = p_sys->p_sectors[p_sys->i_track];
+
+    p_input->stream.p_selected_area->i_tell =
+        (off_t)p_sys->i_sector * (off_t)CDDA_DATA_SIZE
+         - p_input->stream.p_selected_area->i_start;
+
+    /* warn interface that something has changed */
+    p_input->stream.b_seekable = 1;
+    p_input->stream.b_changed = 1;
+#endif
+    return VLC_EGENERIC;
+}
+
 
 /*****************************************************************************
  * Access2Seek:
