@@ -327,7 +327,6 @@ SOURCES_libvlc_win32 = \
 
 SOURCES_libvlc_dirent = \
 	src/extras/dirent.c \
-	src/extras/dirent.h \
 	$(NULL)
 
 SOURCES_libvlc_getopt = \

@@ -57,8 +57,7 @@
 #   include <io.h>
 #endif
 
-#if (!defined( WIN32 ) || defined(__MINGW32__))
-/* Mingw has its own version of dirent */
+#ifdef HAVE_DIRENT_H
 #   include <dirent.h>
 #endif
 
@@ -302,16 +301,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_files  = 0;
     p_sys->pp_files = NULL;
 
-#if defined(SYS_DARWIN) || defined(SYS_BEOS) || \
-        ( defined(WIN32) && !defined(UNDER_CE ) )
+#if defined(SYS_DARWIN) || defined(SYS_BEOS) || defined(WIN32)
     if ( ( psz_src = config_GetPsz( p_intf, "http-src" )) == NULL )
     {
         char * psz_vlcpath = p_intf->p_libvlc->psz_vlcpath;
         psz_src = malloc( strlen(psz_vlcpath) + strlen("/share/http" ) + 1 );
-        if( !psz_src )
-        {
-            return VLC_ENOMEM;
-        }
+        if( !psz_src ) return VLC_ENOMEM;
 #if defined(WIN32)
         sprintf( psz_src, "%s/http", psz_vlcpath);
 #else

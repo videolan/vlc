@@ -872,6 +872,30 @@ static inline void _SetQWBE( uint8_t *p, uint64_t i_qw )
 #   define vlc_strcasestr NULL
 #endif
 
+#ifndef HAVE_DIRENT_H
+    typedef struct DIR DIR;
+#   ifndef FILENAME_MAX
+#       define FILENAME_MAX (260)
+#   endif
+    struct dirent
+    {
+        long            d_ino;          /* Always zero. */
+        unsigned short  d_reclen;       /* Always zero. */
+        unsigned short  d_namlen;       /* Length of name in d_name. */
+        char            d_name[FILENAME_MAX]; /* File name. */
+    };
+#   define opendir vlc_opendir
+#   define readdir vlc_readdir
+#   define closedir vlc_closedir
+    VLC_EXPORT( DIR *, vlc_opendir, ( const char * ) );
+    VLC_EXPORT( struct dirent *, vlc_readdir, ( DIR * ) );
+    VLC_EXPORT( int, vlc_closedir, ( DIR * ) );
+#elif !defined(__PLUGIN__)
+#   define vlc_opendir  NULL
+#   define vlc_readdir  NULL
+#   define vlc_closedir NULL
+#endif
+
 /* Format type specifiers for 64 bits numbers */
 #if !defined(WIN32) && !defined(UNDER_CE)
 #   define I64Fd "%lld"

@@ -8,7 +8,7 @@
  * Updated by Jeremy Bettis <jeremy@hksys.com>
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
- *	
+ *      
  * $Revision: 1.6 $
  * $Author: sam $
  * $Date: 2002/11/13 20:51:04 $
@@ -18,6 +18,8 @@
 #include "config.h"
 
 #include <stdlib.h>
+#include <stdio.h>
+
 #ifdef HAVE_ERRNO_H
 #   include <errno.h>
 #else
@@ -33,15 +35,49 @@
 #ifndef UNDER_CE
 #   include <io.h>
 #   include <direct.h>
+#else
+#   define FILENAME_MAX (260)
 #endif
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h> /* for GetFileAttributes */
 
-#include "dirent.h"
+#include <tchar.h>
+#define SUFFIX  "*"
+#define SLASH   "\\"
 
-#define SUFFIX	"*"
-#define	SLASH	"\\"
+struct dirent
+{
+	long		d_ino;		/* Always zero. */
+	unsigned short	d_reclen;	/* Always zero. */
+	unsigned short	d_namlen;	/* Length of name in d_name. */
+	char            d_name[FILENAME_MAX]; /* File name. */
+};
+
+typedef struct
+{
+	/* disk transfer area for this dir */
+	WIN32_FIND_DATA		dd_dta;
+
+	/* dirent struct to return from dir (NOTE: this makes this thread
+	 * safe as long as only one thread uses a particular DIR struct at
+	 * a time) */
+	struct dirent		dd_dir;
+
+	/* findnext handle */
+	HANDLE			dd_handle;
+
+	/*
+         * Status of search:
+	 *   0 = not started yet (next entry to read is first entry)
+	 *  -1 = off the end
+	 *   positive = 0 based index of next entry
+	 */
+	int			dd_stat;
+
+	/* given path for dir with search pattern (struct is extended) */
+	char			dd_name[1];
+} DIR;
 
 /*
  * opendir
@@ -50,12 +86,12 @@
  * searching a directory.
  */
 DIR * 
-opendir (const CHAR *szPath)
+vlc_opendir (const CHAR *szPath)
 {
   DIR *nd;
   unsigned int rc;
   CHAR szFullPath[MAX_PATH];
-	
+
   errno = 0;
 
   if (!szPath)
@@ -71,8 +107,17 @@ opendir (const CHAR *szPath)
     }
 
   /* Attempt to determine if the given path really is a directory. */
+#ifdef UNICODE
+  {
+    wchar_t szPathTmp[MAX_PATH];
+    mbstowcs( szPathTmp, szPath, MAX_PATH );
+    szPathTmp[MAX_PATH-1] = 0;
+    rc = GetFileAttributes (szPathTmp);
+  }
+#else
   rc = GetFileAttributes (szPath);
-  if (rc == -1)
+#endif
+  if (rc == (unsigned int)-1)
     {
       /* call GetLastError for more error info */
       errno = ENOENT;
@@ -89,13 +134,22 @@ opendir (const CHAR *szPath)
 #if defined( UNDER_CE )
   if (szPath[0] == '\\' || szPath[0] == '/')
     {
-      sprintf (szFullPath, MAX_PATH, "%s", szPath);
+      sprintf (szFullPath, "%s", szPath);
       szFullPath[0] = '\\';
     }
   else
     {
-      /* FIXME: if I wasn't lazy, I'd check for overflows here. */
-      sprintf (szFullPath, MAX_PATH, "\\%s", szPath );
+      wchar_t szFullPathTmp[MAX_PATH];
+      if (GetModuleFileName( NULL, szFullPathTmp, MAX_PATH ) )
+        {
+          wcstombs( szFullPath, szFullPathTmp, MAX_PATH );
+          szFullPath[MAX_PATH-1] = 0;
+        }
+      else
+        {
+          /* FIXME: if I wasn't lazy, I'd check for overflows here. */
+          sprintf (szFullPath, "\\%s", szPath );
+        }
     }
 #else
   _fullpath (szFullPath, szPath, MAX_PATH);
@@ -103,8 +157,8 @@ opendir (const CHAR *szPath)
 
   /* Allocate enough space to store DIR structure and the complete
    * directory path given. */
-  nd = (DIR *) malloc (sizeof (DIR) + strlen (szFullPath) + strlen (SLASH) +
-		       strlen (SUFFIX));
+  nd = (DIR *) malloc (sizeof (DIR) + strlen (szFullPath) + sizeof (SLASH) +
+                       sizeof (SUFFIX));
 
   if (!nd)
     {
@@ -127,9 +181,9 @@ opendir (const CHAR *szPath)
   /* Add on the search pattern */
   strcat (nd->dd_name, SUFFIX);
 
-  /* Initialize handle to -1 so that a premature closedir doesn't try
+  /* Initialize handle so that a premature closedir doesn't try
    * to call FindClose on it. */
-  nd->dd_handle = -1;
+  nd->dd_handle = INVALID_HANDLE_VALUE;
 
   /* Initialize the status. */
   nd->dd_stat = 0;
@@ -140,7 +194,7 @@ opendir (const CHAR *szPath)
   nd->dd_dir.d_ino = 0;
   nd->dd_dir.d_reclen = 0;
   nd->dd_dir.d_namlen = 0;
-  nd->dd_dir.d_name = nd->dd_dta.cFileName;
+  memset (nd->dd_dir.d_name, 0, FILENAME_MAX);
 
   return nd;
 }
@@ -153,7 +207,7 @@ opendir (const CHAR *szPath)
  * next entry in the directory.
  */
 struct dirent *
-readdir (DIR * dirp)
+vlc_readdir (DIR * dirp)
 {
   errno = 0;
 
@@ -161,13 +215,6 @@ readdir (DIR * dirp)
   if (!dirp)
     {
       errno = EFAULT;
-      return (struct dirent *) 0;
-    }
-
-  if (dirp->dd_dir.d_name != dirp->dd_dta.cFileName)
-    {
-      /* The structure does not seem to be set up correctly. */
-      errno = EINVAL;
       return (struct dirent *) 0;
     }
 
@@ -179,44 +226,59 @@ readdir (DIR * dirp)
     }
   else if (dirp->dd_stat == 0)
     {
+#ifdef UNICODE
+        wchar_t dd_name[MAX_PATH];
+        mbstowcs( dd_name, dirp->dd_name, MAX_PATH );
+        dd_name[MAX_PATH-1] = 0;
+#else
+        char *dd_name = dirp->dd_name;
+#endif
       /* We haven't started the search yet. */
       /* Start the search */
-      dirp->dd_handle = (long)FindFirstFile (dirp->dd_name, &(dirp->dd_dta));
+      dirp->dd_handle = FindFirstFile (dd_name, &(dirp->dd_dta));
 
-  	  if (dirp->dd_handle == -1)
-	{
-	  /* Whoops! Seems there are no files in that
-	   * directory. */
-	  dirp->dd_stat = -1;
-	}
+          if (dirp->dd_handle == INVALID_HANDLE_VALUE)
+        {
+          /* Whoops! Seems there are no files in that
+           * directory. */
+          dirp->dd_stat = -1;
+        }
       else
-	{
-	  dirp->dd_stat = 1;
-	}
+        {
+          dirp->dd_stat = 1;
+        }
     }
   else
     {
       /* Get the next search entry. */
-      if (FindNextFile ((HANDLE)dirp->dd_handle, &(dirp->dd_dta)))
-	{
-	  /* We are off the end or otherwise error. */
-	  FindClose ((HANDLE)dirp->dd_handle);
-	  dirp->dd_handle = -1;
-	  dirp->dd_stat = -1;
-	}
+      if (!FindNextFile ((HANDLE)dirp->dd_handle, &(dirp->dd_dta)))
+        {
+          /* We are off the end or otherwise error. */
+          FindClose ((HANDLE)dirp->dd_handle);
+          dirp->dd_handle = INVALID_HANDLE_VALUE;
+          dirp->dd_stat = -1;
+        }
       else
-	{
-	  /* Update the status to indicate the correct
-	   * number. */
-	  dirp->dd_stat++;
-	}
+        {
+          /* Update the status to indicate the correct
+           * number. */
+          dirp->dd_stat++;
+        }
     }
 
   if (dirp->dd_stat > 0)
     {
-      /* Successfully got an entry. Everything about the file is
-       * already appropriately filled in except the length of the
-       * file name. */
+      /* Successfully got an entry */
+
+#ifdef UNICODE
+      char d_name[MAX_PATH];
+      wcstombs( d_name, dirp->dd_dta.cFileName, MAX_PATH );
+      d_name[MAX_PATH-1] = 0;
+#else
+      char *d_name = dirp->dd_dta.cFileName;
+#endif
+
+      strcpy (dirp->dd_dir.d_name, d_name);
       dirp->dd_dir.d_namlen = strlen (dirp->dd_dir.d_name);
       return &dirp->dd_dir;
     }
@@ -231,7 +293,7 @@ readdir (DIR * dirp)
  * Frees up resources allocated by opendir.
  */
 int
-closedir (DIR * dirp)
+vlc_closedir (DIR * dirp)
 {
   int rc;
 
@@ -244,7 +306,7 @@ closedir (DIR * dirp)
       return -1;
     }
 
-  if (dirp->dd_handle != -1)
+  if (dirp->dd_handle != INVALID_HANDLE_VALUE)
     {
       rc = FindClose ((HANDLE)dirp->dd_handle);
     }
@@ -262,7 +324,7 @@ closedir (DIR * dirp)
  * and then reset things like an opendir.
  */
 void
-rewinddir (DIR * dirp)
+vlc_rewinddir (DIR * dirp)
 {
   errno = 0;
 
@@ -272,12 +334,12 @@ rewinddir (DIR * dirp)
       return;
     }
 
-  if (dirp->dd_handle != -1)
+  if (dirp->dd_handle != INVALID_HANDLE_VALUE)
     {
       FindClose ((HANDLE)dirp->dd_handle);
     }
 
-  dirp->dd_handle = -1;
+  dirp->dd_handle = INVALID_HANDLE_VALUE;
   dirp->dd_stat = 0;
 }
 
@@ -288,7 +350,7 @@ rewinddir (DIR * dirp)
  * seekdir to go back to an old entry. We simply return the value in stat.
  */
 long
-telldir (DIR * dirp)
+vlc_telldir (DIR * dirp)
 {
   errno = 0;
 
@@ -310,7 +372,7 @@ telldir (DIR * dirp)
  * any such system.
  */
 void
-seekdir (DIR * dirp, long lPos)
+vlc_seekdir (DIR * dirp, long lPos)
 {
   errno = 0;
 
@@ -329,19 +391,19 @@ seekdir (DIR * dirp, long lPos)
   else if (lPos == -1)
     {
       /* Seek past end. */
-      if (dirp->dd_handle != -1)
-	{
-	  FindClose ((HANDLE)dirp->dd_handle);
-	}
-      dirp->dd_handle = -1;
+      if (dirp->dd_handle != INVALID_HANDLE_VALUE)
+        {
+          FindClose ((HANDLE)dirp->dd_handle);
+        }
+      dirp->dd_handle = INVALID_HANDLE_VALUE;
       dirp->dd_stat = -1;
     }
   else
     {
       /* Rewind and read forward to the appropriate index. */
-      rewinddir (dirp);
+      vlc_rewinddir (dirp);
 
-      while ((dirp->dd_stat < lPos) && readdir (dirp))
-	;
+      while ((dirp->dd_stat < lPos) && vlc_readdir (dirp))
+        ;
     }
 }

@@ -33,8 +33,6 @@
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
-#else
-#   include "../extras/dirent.h"
 #endif
 
 #include <ctype.h>
@@ -299,7 +297,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     for( j = -1; j == -1 || ( j >= 0 && subdirs != NULL && *subdirs != NULL );
          j++)
     {
-#ifdef HAVE_DIRENT_H
         d = opendir( j < 0 ? f_dir : *subdirs );
         if( d )
         {
@@ -378,7 +375,6 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             }
             closedir( d );
         }
-#endif
         if( j >= 0 ) free( *subdirs++ );
     }
 

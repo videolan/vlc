@@ -534,13 +534,13 @@ protected:
     static inline wchar_t *_FROMMB( const char *psz_in )
     {
         mbstowcs( pwsz_mbtow, psz_in, 2048 );
-        pwsz_mbtow[2048] = 0;
+        pwsz_mbtow[2048-1] = 0;
         return pwsz_mbtow;
     }
     static inline char *_TOMB( const wchar_t *pwsz_in )
     {
         wcstombs( psz_wtomb, pwsz_in, 2048 );
-        psz_wtomb[2048] = 0;
+        psz_wtomb[2048-1] = 0;
         return psz_wtomb;
     }
 #else

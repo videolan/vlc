@@ -47,8 +47,6 @@
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
-#else
-#   include "../../src/extras/dirent.h"
 #endif
 
 /* libebml and matroska */
