@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: audio.c,v 1.29 2004/02/26 17:07:37 hartman Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -68,6 +68,12 @@ struct decoder_sys_t
      */
     audio_sample_format_t aout_format;
     audio_date_t          end_date;
+
+    /*
+     *
+     */
+    uint8_t *p_samples;
+    int     i_samples;
 };
 
 /*****************************************************************************
@@ -91,10 +97,10 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
         return VLC_EGENERIC;
     }
 
-    p_dec->p_sys->p_context = p_context;
-    p_dec->p_sys->p_codec = p_codec;
-    p_dec->p_sys->i_codec_id = i_codec_id;
-    p_dec->p_sys->psz_namecodec = psz_namecodec;
+    p_sys->p_context = p_context;
+    p_sys->p_codec = p_codec;
+    p_sys->i_codec_id = i_codec_id;
+    p_sys->psz_namecodec = psz_namecodec;
 
     /* ***** Fill p_context with init values ***** */
     p_sys->p_context->sample_rate = p_dec->fmt_in.audio.i_rate;
@@ -125,6 +131,8 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     msg_Dbg( p_dec, "ffmpeg codec (%s) started", p_sys->psz_namecodec );
 
     p_sys->p_output = malloc( 3 * AVCODEC_MAX_AUDIO_FRAME_SIZE );
+    p_sys->p_samples = NULL;
+    p_sys->i_samples = 0;
 
     aout_DateSet( &p_sys->end_date, 0 );
 
@@ -135,20 +143,58 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
     return VLC_SUCCESS;
 }
 
+/* XXX Needed as aout really doesn't like big audio chunk and wma produce easily > 30000 samples... */
+aout_buffer_t *SplitBuffer( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    int i_samples = __MIN( p_sys->i_samples, 4096 );
+    aout_buffer_t *p_buffer;
+
+    if( i_samples == 0 )
+    {
+        return NULL;
+    }
+    if( ( p_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples ) ) == NULL )
+    {
+        msg_Err( p_dec, "cannot get aout buffer" );
+        return NULL;
+    }
+
+    p_buffer->start_date = aout_DateGet( &p_sys->end_date );
+    p_buffer->end_date = aout_DateIncrement( &p_sys->end_date, i_samples );
+
+    memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_nb_bytes );
+
+    p_sys->p_samples += p_buffer->i_nb_bytes;
+    p_sys->i_samples -= i_samples;
+
+    return p_buffer;
+}
+
 /*****************************************************************************
  * DecodeAudio: Called to decode one frame
  *****************************************************************************/
 aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_used, i_output, i_samples;
-    uint8_t *p_samples;
+    int i_used, i_output;
     aout_buffer_t *p_buffer;
     block_t *p_block;
 
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
+
+    if( p_block->i_buffer <= 0 && p_sys->i_samples > 0 )
+    {
+        /* More data */
+        p_buffer = SplitBuffer( p_dec );
+        if( p_buffer == NULL )
+        {
+            block_Release( p_block );
+        }
+        return p_buffer;
+    }
 
     if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
     {
@@ -214,22 +260,14 @@ aout_buffer_t *E_( DecodeAudio )( decoder_t *p_dec, block_t **pp_block )
     p_block->i_pts = 0;
 
     /* **** Now we can output these samples **** */
-    i_samples = i_output / 2 / p_sys->p_context->channels;
-    p_samples = p_sys->p_output;
+    p_sys->i_samples = i_output / 2 / p_sys->p_context->channels;
+    p_sys->p_samples = p_sys->p_output;
 
-    p_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples );
+    p_buffer = SplitBuffer( p_dec );
     if( !p_buffer )
     {
-        msg_Err( p_dec, "cannot get aout buffer" );
         block_Release( p_block );
-        return NULL;
     }
-
-    p_buffer->start_date = aout_DateGet( &p_sys->end_date );
-    p_buffer->end_date = aout_DateIncrement( &p_sys->end_date, i_samples );
-
-    memcpy( p_buffer->p_buffer, p_samples, p_buffer->i_nb_bytes );
-
     return p_buffer;
 }
 
