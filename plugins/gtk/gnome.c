@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.15 2002/03/27 18:43:30 lool Exp $
+ * $Id: gnome.c,v 1.16 2002/03/31 22:35:44 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -61,10 +61,20 @@ static gint GnomeManage      ( gpointer p_data );
 /*****************************************************************************
  * Building configuration tree
  *****************************************************************************/
+#define TOOLTIPS_TEXT "hide tooltips"
+#define TOOLTIPS_LONGTEXT "Do not show tooltips for configuration options"
+
+#define PREFS_MAXH_TEXT "maximum height for the configuration windows"
+#define PREFS_MAXH_LONGTEXT "You can set the maximum height that the " \
+                            "configuration windows in the prefences menu " \
+                            "will take"
+
 MODULE_CONFIG_START
     ADD_CATEGORY_HINT( "Misc Options", NULL )
-    ADD_BOOL ( "gnome_hide_tooltips", NULL, "hide tooltips", "Do not show" \
-               " tooltips for configuration options" )
+    ADD_BOOL    ( "gnome_hide_tooltips", NULL, TOOLTIPS_TEXT,
+                  TOOLTIPS_LONGTEXT )
+    ADD_INTEGER ( "gnome_prefs_maxh", 480, NULL, PREFS_MAXH_TEXT,
+                  PREFS_MAXH_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
