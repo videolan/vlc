@@ -349,19 +349,17 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
     case INTF_KEY_DEC_GAMMA:                                      /* gamma - */
         if( (p_main->p_vout != NULL) && (p_main->p_vout->f_gamma > -INTF_GAMMA_LIMIT) )
         {
-            vlc_mutex_lock( &p_main->p_vout->change_lock );
+            /* FIXME: we should lock if called from the interface */
             p_main->p_vout->f_gamma   -= INTF_GAMMA_STEP;
             p_main->p_vout->i_changes |= VOUT_GAMMA_CHANGE;
-            vlc_mutex_unlock( &p_main->p_vout->change_lock );
         }
         break;
     case INTF_KEY_INC_GAMMA:                                      /* gamma + */
         if( (p_main->p_vout != NULL) && (p_main->p_vout->f_gamma < INTF_GAMMA_LIMIT) )
         {
-            vlc_mutex_lock( &p_main->p_vout->change_lock );
+            /* FIXME: we should lock if called from the interface */
             p_main->p_vout->f_gamma   += INTF_GAMMA_STEP;
             p_main->p_vout->i_changes |= VOUT_GAMMA_CHANGE;
-            vlc_mutex_unlock( &p_main->p_vout->change_lock );
         }
         break;
    default:                                                   /* unknown key */

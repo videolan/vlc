@@ -39,27 +39,33 @@
 #include "input.h"
 
 /*****************************************************************************
- * input_SetRate: change the reading pace
+ * input_SetStatus: change the reading status
  *****************************************************************************/
-void input_SetRate( input_thread_t * p_input, int i_mode )
+void input_SetStatus( input_thread_t * p_input, int i_mode )
 {
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
     switch( i_mode )
     {
-    case INPUT_RATE_PLAY:
+    case INPUT_STATUS_END:
+        p_input->stream.i_new_status = PLAYING_S;
+        p_input->b_eof = 1;
+        intf_Msg( "input: end of stream" );
+        break;
+
+    case INPUT_STATUS_PLAY:
         p_input->stream.i_new_status = PLAYING_S;
         intf_Msg( "input: playing at normal rate" );
         break;
 
-    case INPUT_RATE_PAUSE:
+    case INPUT_STATUS_PAUSE:
         /* XXX: we don't need to check i_status, because input_clock.c
          * does it for us */
         p_input->stream.i_new_status = PAUSE_S;
         intf_Msg( "input: toggling pause" );
         break;
 
-    case INPUT_RATE_FASTER:
+    case INPUT_STATUS_FASTER:
         /* If we are already going too fast, go back to default rate */
         if( p_input->stream.control.i_rate * 8 <= DEFAULT_RATE )
         {
@@ -85,7 +91,7 @@ void input_SetRate( input_thread_t * p_input, int i_mode )
         }
         break;
 
-    case INPUT_RATE_SLOWER:
+    case INPUT_STATUS_SLOWER:
         /* If we are already going too slow, go back to default rate */
         if( p_input->stream.control.i_rate >= 8 * DEFAULT_RATE )
         {
@@ -118,6 +124,14 @@ void input_SetRate( input_thread_t * p_input, int i_mode )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
+/*****************************************************************************
+ * input_SetRate: change the reading rate
+ *****************************************************************************/
+void input_SetRate( input_thread_t * p_input, int i_mode )
+{
+    ; /* FIXME: stub */
+}
+ 
 /*****************************************************************************
  * input_Seek: changes the stream postion
  *****************************************************************************/

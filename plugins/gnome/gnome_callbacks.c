@@ -37,6 +37,7 @@
 
 #include "interface.h"
 #include "intf_plst.h"
+#include "intf_msg.h"
 
 #include "gnome_sys.h"
 #include "gnome_callbacks.h"
@@ -171,7 +172,7 @@ on_toolbar_play_clicked                (GtkButton       *button,
 
     if( p_intf->p_input != NULL )
     {
-        input_SetRate( p_intf->p_input, INPUT_RATE_PLAY );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
     }
 }
 
@@ -184,7 +185,7 @@ on_toolbar_pause_clicked               (GtkButton       *button,
 
     if( p_intf->p_input != NULL )
     {
-        input_SetRate( p_intf->p_input, INPUT_RATE_PAUSE );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
     }
 }
 
@@ -244,7 +245,7 @@ on_popup_play_activate                 (GtkMenuItem     *menuitem,
 
     if( p_intf->p_input != NULL )
     {
-        input_SetRate( p_intf->p_input, INPUT_RATE_PLAY );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
     }
 }
 
@@ -257,7 +258,7 @@ on_popup_pause_activate                (GtkMenuItem     *menuitem,
 
     if( p_intf->p_input != NULL )
     {
-        input_SetRate( p_intf->p_input, INPUT_RATE_PAUSE );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
     }
 }
 
@@ -379,7 +380,7 @@ on_popup_slow_activate                 (GtkMenuItem     *menuitem,
 
     if( p_intf->p_input != NULL )
     {
-        input_SetRate( p_intf->p_input, INPUT_RATE_SLOWER );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_SLOWER );
     }
 }
 
@@ -392,7 +393,7 @@ on_popup_fast_activate                 (GtkMenuItem     *menuitem,
 
     if( p_intf->p_input != NULL )
     {
-        input_SetRate( p_intf->p_input, INPUT_RATE_FASTER );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
     }
 }
 
@@ -405,7 +406,7 @@ on_toolbar_slow_clicked                (GtkButton       *button,
 
     if( p_intf->p_input != NULL )
     {
-        input_SetRate( p_intf->p_input, INPUT_RATE_SLOWER );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_SLOWER );
     }
 }
 
@@ -418,7 +419,7 @@ on_toolbar_fast_clicked                (GtkButton       *button,
 
     if( p_intf->p_input != NULL )
     {
-        input_SetRate( p_intf->p_input, INPUT_RATE_FASTER );
+        input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
     }
 }
 
@@ -524,5 +525,57 @@ on_menubar_modules_activate            (GtkMenuItem     *menuitem,
     }
     gtk_widget_show( p_intf->p_sys->p_modules );
     gdk_window_raise( p_intf->p_sys->p_modules->window );
+}
+
+
+void
+on_intf_window_drag_data_received      (GtkWidget       *widget,
+                                        GdkDragContext  *drag_context,
+                                        gint             x,
+                                        gint             y,
+                                        GtkSelectionData *data,
+                                        guint            info,
+                                        guint            time,
+                                        gpointer         user_data)
+{
+    char *psz_text = data->data;
+    int i_len      = strlen( psz_text );
+
+    switch( info )
+    {
+    case DROP_ACCEPT_TEXT_PLAIN: /* FIXME: handle multiple files */
+
+        if( i_len < 1 )
+        {
+            return;
+        }
+
+        /* get rid of ' ' at the end */
+        *( psz_text + i_len - 1 ) = 0;
+
+        intf_WarnMsg( 1, "intf: dropped text/uri-list data `%s'", psz_text );
+        intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, psz_text );
+
+        break;
+
+    case DROP_ACCEPT_TEXT_URI_LIST: /* FIXME: handle multiple files */
+
+        if( i_len < 2 )
+        {
+            return;
+        }
+
+        /* get rid of \r\n at the end */
+        *( psz_text + i_len - 2 ) = 0;
+
+        intf_WarnMsg( 1, "intf: dropped text/uri-list data `%s'", psz_text );
+        intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, psz_text );
+        break;
+
+    default:
+
+        intf_ErrMsg( "intf error: unknown dropped type");
+        break;
+    }
 }
 

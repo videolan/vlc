@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.12 2001/02/15 07:59:38 sam Exp $
+ * $Id: intf_gnome.c,v 1.13 2001/02/16 06:37:09 sam Exp $
  *
  * Authors:
  *
@@ -111,7 +111,7 @@ static int intf_Probe( probedata_t *p_data )
         return( 999 );
     }
 
-    return( 40 );
+    return( 100 );
 }
 
 /*****************************************************************************
@@ -163,12 +163,24 @@ static void intf_Run( intf_thread_t *p_intf )
      * give it an empty one */
     char *p_args[] = { };
 
+    /* The data types we are allowed to receive */
+    static GtkTargetEntry target_table[] =
+    {
+        { "text/uri-list", 0, DROP_ACCEPT_TEXT_URI_LIST },
+        { "text/plain", 0, DROP_ACCEPT_TEXT_PLAIN }
+    };
+
     /* Initialize Gnome */
     gnome_init( p_main->psz_arg0, VERSION, 1, p_args );
 
     /* create some useful widgets that will certainly be used */
-    p_intf->p_sys->p_window = create_intf_window();
+    p_intf->p_sys->p_window = create_intf_window( );
     p_intf->p_sys->p_popup = create_intf_popup( );
+
+    /* accept file drops on the main window */
+    gtk_drag_dest_set( GTK_WIDGET( p_intf->p_sys->p_window ),
+                       GTK_DEST_DEFAULT_ALL, target_table,
+                       1, GDK_ACTION_COPY );
 
     /* we don't create these ones yet because we perhaps won't need them */
     p_intf->p_sys->p_about = NULL;
@@ -191,6 +203,7 @@ static void intf_Run( intf_thread_t *p_intf )
     p_intf->p_sys->i_timeout = gtk_timeout_add( INTF_IDLE_SLEEP / 1000,
                                                 GnomeManage, p_intf );
  
+
     /* enter gnome mode */
     gtk_main();
 

@@ -84,8 +84,9 @@ create_intf_window (void)
   GtkWidget *toolbar_next;
   GtkWidget *vbox2;
   GtkWidget *label6;
-  GtkWidget *label7;
+  GtkWidget *entry1;
   GtkWidget *hscale;
+  GtkWidget *label13;
   GtkWidget *appbar;
 
   intf_window = gnome_app_new ("VideoLAN Client", _("VideoLAN Client"));
@@ -298,7 +299,7 @@ create_intf_window (void)
   gtk_widget_show (vbox2);
   gnome_app_set_contents (GNOME_APP (intf_window), vbox2);
 
-  label6 = gtk_label_new (_("File name: wazaa.mpeg"));
+  label6 = gtk_label_new (_("File name: this part of the interface doesn't work yet.mpeg"));
   gtk_widget_ref (label6);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "label6", label6,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -308,16 +309,13 @@ create_intf_window (void)
   gtk_misc_set_alignment (GTK_MISC (label6), 0, 0.5);
   gtk_misc_set_padding (GTK_MISC (label6), 5, 0);
 
-  label7 = gtk_label_new (_("File type: awesome movie"));
-  gtk_widget_ref (label7);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label7", label7,
+  entry1 = gtk_entry_new ();
+  gtk_widget_ref (entry1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "entry1", entry1,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label7);
-  gtk_box_pack_start (GTK_BOX (vbox2), label7, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label7), GTK_JUSTIFY_LEFT);
-  gtk_label_set_line_wrap (GTK_LABEL (label7), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (label7), 0, 0.5);
-  gtk_misc_set_padding (GTK_MISC (label7), 5, 0);
+  gtk_widget_show (entry1);
+  gtk_box_pack_start (GTK_BOX (vbox2), entry1, FALSE, FALSE, 0);
+  gtk_entry_set_text (GTK_ENTRY (entry1), _("Tired of boring stub messages ? Write your own exciting message here !!"));
 
   hscale = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 5, 1)));
   gtk_widget_ref (hscale);
@@ -328,6 +326,14 @@ create_intf_window (void)
   gtk_scale_set_value_pos (GTK_SCALE (hscale), GTK_POS_BOTTOM);
   gtk_range_set_update_policy (GTK_RANGE (hscale), GTK_UPDATE_DELAYED);
 
+  label13 = gtk_label_new (_("HEY ! YOU CAN DROP A FILE ON VLC TOO :-)"));
+  gtk_widget_ref (label13);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "label13", label13,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label13);
+  gtk_box_pack_start (GTK_BOX (vbox2), label13, FALSE, FALSE, 0);
+  gtk_misc_set_padding (GTK_MISC (label13), 0, 5);
+
   appbar = gnome_appbar_new (TRUE, TRUE, GNOME_PREFERENCES_NEVER);
   gtk_widget_ref (appbar);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "appbar", appbar,
@@ -337,6 +343,9 @@ create_intf_window (void)
 
   gtk_signal_connect (GTK_OBJECT (intf_window), "destroy",
                       GTK_SIGNAL_FUNC (on_intf_window_destroy),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (intf_window), "drag_data_received",
+                      GTK_SIGNAL_FUNC (on_intf_window_drag_data_received),
                       NULL);
   gnome_app_install_menu_hints (GNOME_APP (intf_window), menubar_uiinfo);
   gtk_signal_connect (GTK_OBJECT (toolbar_open), "clicked",

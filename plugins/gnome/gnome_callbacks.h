@@ -187,3 +187,13 @@ on_playlist_ok_clicked                 (GtkButton       *button,
 void
 on_menubar_modules_activate            (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
+
+void
+on_intf_window_drag_data_received      (GtkWidget       *widget,
+                                        GdkDragContext  *drag_context,
+                                        gint             x,
+                                        gint             y,
+                                        GtkSelectionData *data,
+                                        guint            info,
+                                        guint            time,
+                                        gpointer         user_data);

@@ -2,9 +2,9 @@
  * gnome_sys.h: private Gnome interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gnome_sys.h,v 1.4 2001/02/14 07:48:18 sam Exp $
+ * $Id: gnome_sys.h,v 1.5 2001/02/16 06:37:09 sam Exp $
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/*****************************************************************************
+ * drag'n'drop stuff
+ *****************************************************************************/
+#define DROP_ACCEPT_TEXT_URI_LIST  0
+#define DROP_ACCEPT_TEXT_PLAIN     1
 
 /*****************************************************************************
  * intf_sys_t: description and status of Gnome interface

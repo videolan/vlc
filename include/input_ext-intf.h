@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.19 2001/02/12 09:39:15 sam Exp $
+ * $Id: input_ext-intf.h,v 1.20 2001/02/16 06:37:09 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -294,11 +294,12 @@ typedef struct input_config_s
 #define INPUT_METHOD_BCAST         22                       /* UDP broadcast */
 #define INPUT_METHOD_VLAN_BCAST    32            /* UDP broadcast with VLANs */
 
-/* Rate changing methods */
-#define INPUT_RATE_PLAY             0
-#define INPUT_RATE_PAUSE            1
-#define INPUT_RATE_FASTER           2
-#define INPUT_RATE_SLOWER           3
+/* Status changing methods */
+#define INPUT_STATUS_END            0
+#define INPUT_STATUS_PLAY           1
+#define INPUT_STATUS_PAUSE          2
+#define INPUT_STATUS_FASTER         3
+#define INPUT_STATUS_SLOWER         4
 
 /*****************************************************************************
  * Prototypes
@@ -307,6 +308,7 @@ struct input_thread_s * input_CreateThread ( struct playlist_item_s *,
                                              int *pi_status );
 void input_DestroyThread( struct input_thread_s *, int *pi_status );
 
-void input_SetRate( struct input_thread_s *, int );
-void input_Seek   ( struct input_thread_s *, off_t );
+void input_SetStatus( struct input_thread_s *, int );
+void input_SetRate  ( struct input_thread_s *, int );
+void input_Seek     ( struct input_thread_s *, off_t );
 

@@ -184,6 +184,9 @@ AC_ARG_WITH(glide,
     else
       LIB_GLIDE="-lglide2x"
     fi ])
+AC_ARG_ENABLE(ncurses,
+  [  --enable-ncurses        ncurses interface support (default disabled)],
+  [if test x$enable_ncurses = xyes; then PLUGINS=${PLUGINS}"ncurses "; fi])
 AC_ARG_ENABLE(gnome,
   [  --disable-gnome         Gnome support (default enabled)])
 if test x$enable_gnome != xno; then PLUGINS=${PLUGINS}"gnome "; ALIASES=${ALIASES}"gvlc "; fi

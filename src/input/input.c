@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.80 2001/02/12 13:20:14 massiot Exp $
+ * $Id: input.c,v 1.81 2001/02/16 06:37:09 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -61,10 +61,11 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void RunThread   ( input_thread_t *p_input );
-static void InitThread  ( input_thread_t *p_input );
-static void ErrorThread ( input_thread_t *p_input );
-static void EndThread   ( input_thread_t *p_input );
+static void RunThread       ( input_thread_t *p_input );
+static  int InitThread      ( input_thread_t *p_input );
+static void ErrorThread     ( input_thread_t *p_input );
+static void DestroyThread   ( input_thread_t *p_input );
+static void EndThread       ( input_thread_t *p_input );
 
 /*****************************************************************************
  * input_CreateThread: creates a new input thread
@@ -188,7 +189,16 @@ static void RunThread( input_thread_t *p_input )
     data_packet_t *         pp_packets[INPUT_READ_ONCE];
     int                     i_error, i;
 
-    InitThread( p_input );
+    if( InitThread( p_input ) )
+    {
+
+        /* If we failed, wait before we are killed, and exit */
+        *p_input->pi_status = THREAD_ERROR;
+        p_input->b_error = 1;
+        ErrorThread( p_input );
+        DestroyThread( p_input );
+        return;
+    }
 
     while( !p_input->b_die && !p_input->b_error && !p_input->b_eof )
     {
@@ -250,13 +260,16 @@ static void RunThread( input_thread_t *p_input )
     }
 
     EndThread( p_input );
+
+    DestroyThread( p_input );
+
     intf_DbgMsg("Thread end");
 }
 
 /*****************************************************************************
  * InitThread: init the input Thread
  *****************************************************************************/
-static void InitThread( input_thread_t * p_input )
+static int InitThread( input_thread_t * p_input )
 {
 
 #ifdef STATS
@@ -274,8 +287,8 @@ static void InitThread( input_thread_t * p_input )
     if( p_input->p_input_module == NULL )
     {
         intf_ErrMsg( "input error: no suitable input module" );
-        p_input->b_error = 1;
-        return;
+        module_Unneed( p_main->p_bank, p_input->p_input_module );
+        return( -1 );
     }
 
 #define f p_input->p_input_module->p_functions->input.functions.input
@@ -297,14 +310,17 @@ static void InitThread( input_thread_t * p_input )
 
     if( p_input->b_error )
     {
+        /* We barfed -- exit nicely */
+        p_input->pf_close( p_input );
         module_Unneed( p_main->p_bank, p_input->p_input_module );
-    }
-    else
-    {
-        p_input->pf_init( p_input );
+        return( -1 );
     }
 
+    p_input->pf_init( p_input );
+
     *p_input->pi_status = THREAD_READY;
+
+    return( 0 );
 }
 
 /*****************************************************************************
@@ -345,14 +361,25 @@ static void EndThread( input_thread_t * p_input )
     /* Free all ES and destroy all decoder threads */
     input_EndStream( p_input );
 
-    /* Close stream */
-    p_input->pf_close( p_input );
-
     /* Free demultiplexer's data */
     p_input->pf_end( p_input );
 
+    /* Close stream */
+    p_input->pf_close( p_input );
+
     /* Release modules */
     module_Unneed( p_main->p_bank, p_input->p_input_module );
+}
+
+/*****************************************************************************
+ * DestroyThread: destroy the input thread
+ *****************************************************************************/
+static void DestroyThread( input_thread_t * p_input )
+{
+    int *       pi_status;                                  /* thread status */
+
+    /* Store status */
+    pi_status = p_input->pi_status;
 
     /* Destroy Mutex locks */
     vlc_mutex_destroy( &p_input->stream.control.control_lock );

@@ -345,6 +345,9 @@ PLUGIN_MOTIONMMXEXT =	plugins/motion/motionmmxext.o \
 			plugins/motion/vdec_motion_common.o \
 			plugins/motion/vdec_motion_inner_mmxext.o
 
+PLUGIN_NCURSES =	plugins/text/ncurses.o \
+			plugins/text/intf_ncurses.o
+
 PLUGIN_NULL =	plugins/null/null.o
 
 PLUGIN_PS =	plugins/mpeg/ps.o \
@@ -385,6 +388,7 @@ STD_PLUGIN_OBJ = \
 		$(PLUGIN_MOTION) \
 		$(PLUGIN_MOTIONMMX) \
 		$(PLUGIN_MOTIONMMXEXT) \
+		$(PLUGIN_NCURSES) \
 		$(PLUGIN_NULL) \
 		$(PLUGIN_PS) \
 		$(PLUGIN_SDL) \
@@ -611,6 +615,9 @@ lib/ggi.so: $(PLUGIN_GGI)
 
 lib/sdl.so: $(PLUGIN_SDL)
 	$(CC) $(PCFLAGS) -shared -o $@ $^ $(LIB_SDL)
+
+lib/ncurses.so: $(PLUGIN_NCURSES)
+	$(CC) $(PCFLAGS) -shared -o $@ $^ -lcurses
 
 ifeq ($(SYS),beos)
 lib/null.so: $(PLUGIN_NULL)

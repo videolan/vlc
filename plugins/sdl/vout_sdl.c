@@ -560,7 +560,8 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
     else
         SDL_ShowCursor( 1 );
 
-    SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
+    SDL_WM_SetCaption( VOUT_TITLE " (SDL output)",
+                       VOUT_TITLE " (SDL output)" );
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);                /* ignore keys up */
     SDL_EventState(SDL_MOUSEBUTTONUP, SDL_IGNORE);          
 

@@ -149,13 +149,6 @@
 /* Maximum number of channels */
 #define INTF_MAX_CHANNELS               10
 
-/*
- * X11 settings
- */
-
-/* Title of the X11 window */
-#define VOUT_TITLE                      "VideoLAN Client"
-
 /*****************************************************************************
  * Input thread configuration
  *****************************************************************************/
@@ -381,7 +374,8 @@
  * FB_NOYPAN
  */
 // #define FB_NOYPAN
-   
+
+#define VOUT_TITLE                      "VideoLAN Client @VLC_VERSION@"
 
 /*****************************************************************************
  * Video parser configuration
