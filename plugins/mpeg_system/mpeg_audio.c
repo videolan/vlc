@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.11 2002/07/11 18:57:08 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.12 2002/07/21 18:57:02 sigmunau Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -451,6 +451,7 @@ static int MPEGAudioInit( input_thread_t * p_input )
     es_descriptor_t * p_es;
     int i_pos;
     int b_forced;
+    input_info_category_t * p_category;
 
     /* XXX: i don't know what it's supposed to do, copied from ESInit */
     /* Initialize access plug-in structures. */
@@ -562,13 +563,25 @@ static int MPEGAudioInit( input_thread_t * p_input )
     /* all is ok :)) */
     msg_Dbg( p_input, "audio MPEG-%d layer %d %s %dHz %dKb/s %s",
                 mpeg.i_version + 1,
-                mpeg.i_layer +1 ,
+                mpeg.i_layer + 1,
                 mpegaudio_mode[mpeg.i_mode],
                 mpeg.i_samplingfreq,
                 p_mpegaudio->xingheader.i_avgbitrate / 1000,
                 p_mpegaudio->xingheader.i_flags ?
                         "VBR (Xing)" : "" 
                     );
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_category = input_InfoCategory( p_input, "mpeg" );
+    input_AddInfo( p_category, "input type", "audio MPEG-%d",
+                   mpeg.i_version +1 );
+    input_AddInfo( p_category, "layer", "%d", mpeg.i_layer + 1 );
+    input_AddInfo( p_category, "mode", mpegaudio_mode[mpeg.i_mode] );
+    input_AddInfo( p_category, "sample rate", "%dHz", mpeg.i_samplingfreq );
+    input_AddInfo( p_category, "average bitrate", "%dKb/s",
+                   p_mpegaudio->xingheader.i_avgbitrate / 1000 );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    
     return( 0 );
 }
 
@@ -595,7 +608,6 @@ static int MPEGAudioDemux( input_thread_t * p_input )
     mpegaudio_format_t mpeg;
     demux_data_mpegaudio_t *p_mpegaudio = 
                         (demux_data_mpegaudio_t*) p_input->p_demux_data;
-
     /*  look for a frame */
     if( !MPEGAudio_FindFrame( p_input, &i_pos, &mpeg, 4096 ) )
     {

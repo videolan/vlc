@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.22 2002/07/20 18:01:43 sam Exp $
+ * $Id: rc.c,v 1.23 2002/07/21 18:57:02 sigmunau Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -151,6 +151,8 @@ static void intf_Run( intf_thread_t *p_intf )
 {
     char       p_buffer[ MAX_LINE_LENGTH + 1 ];
     vlc_bool_t b_complete = 0;
+    input_info_category_t * p_category;
+    input_info_t * p_info;
 
     int        i_dummy;
     off_t      i_oldpos = 0;
@@ -159,7 +161,11 @@ static void intf_Run( intf_thread_t *p_intf )
     struct timeval tv;                                   /* how long to wait */
 
     double     f_ratio = 1;
+    char       psz_dashes[81];
 
+    memset(psz_dashes, '-', 80);
+    psz_dashes[80] = '\0';
+    
     p_intf->p_sys->p_input = NULL;
 
     while( !p_intf->b_die )
@@ -325,7 +331,30 @@ static void intf_Run( intf_thread_t *p_intf )
                 printf( "q . . . . . . . . . . . . . . . . . . . . . quit\n" );
                 printf( "end of help\n" );
                 break;
-
+            case 'i':
+            case 'I':
+                printf( "Dumping stream info\n" );
+                vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+                p_category = p_intf->p_sys->p_input->stream.p_info;
+                while ( p_category )
+                {
+                    psz_dashes[72 - strlen(p_category->psz_name) ] = '\0';
+                    printf( "+--| %s |%s+\n", p_category->psz_name, psz_dashes);
+                    psz_dashes[72 - strlen(p_category->psz_name) ] = '-';
+                    p_info = p_category->p_info;
+                    while ( p_info )
+                    {
+                        printf( "| %s: %s\n", p_info->psz_name,
+                                p_info->psz_value );
+                        p_info = p_info->p_next;
+                    }
+                    printf("|\n");
+                    p_category = p_category->p_next;
+                }
+                psz_dashes[78] = '\0';
+                printf( "+%s+\n", psz_dashes );
+                vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+                break;
             default:
                 printf( "unknown command `%s'\n", p_cmd );
                 break;

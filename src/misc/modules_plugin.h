@@ -229,6 +229,8 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->input_ClockManageControl_inner = input_ClockManageControl; \
     (p_symbols)->input_ClockManageRef_inner = input_ClockManageRef; \
     (p_symbols)->input_ClockGetTS_inner = input_ClockGetTS; \
+    (p_symbols)->input_InfoCategory_inner = input_InfoCategory; \
+    (p_symbols)->input_AddInfo_inner = input_AddInfo; \
     (p_symbols)->input_BuffersEnd_inner = input_BuffersEnd; \
     (p_symbols)->input_NewBuffer_inner = input_NewBuffer; \
     (p_symbols)->input_ReleaseBuffer_inner = input_ReleaseBuffer; \

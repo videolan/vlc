@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.205 2002/06/27 19:05:17 sam Exp $
+ * $Id: input.c,v 1.206 2002/07/21 18:57:02 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -71,6 +71,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
                                       playlist_item_t *p_item, int *pi_status )
 {
     input_thread_t *    p_input;                        /* thread descriptor */
+    input_info_category_t * p_info;
 
     /* Allocate descriptor */
     p_input = vlc_object_create( p_parent, VLC_OBJECT_INPUT );
@@ -148,8 +149,28 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->stream.control.b_grayscale = config_GetInt( p_input, "grayscale" );
     p_input->stream.control.i_smp = config_GetInt( p_input, "vdec-smp" );
 
+    /* Initialize input info */
+    p_input->stream.p_info = malloc( sizeof( input_info_category_t ) );
+    if( !p_input->stream.p_info )
+    {
+        msg_Err( p_input, "No memory!" );
+        return NULL;
+    }
+    p_input->stream.p_info->psz_name = strdup("General") ;
+    p_input->stream.p_info->p_info = NULL;
+    p_input->stream.p_info->p_next = NULL;
+
+    /* test code */
+    msg_Dbg( p_input, "finding category \"hepp\"");
+    p_info = input_InfoCategory( p_input, "hepp" );
+    msg_Dbg( p_input, "adding testkey/testval");    
+    input_AddInfo( p_info, "testkey", "testval");
+    /* end test code */
+
     msg_Info( p_input, "playlist item `%s'", p_input->psz_source );
 
+    p_info = input_InfoCategory( p_input, "General");
+    input_AddInfo( p_info, "Playlist item", p_input->psz_source );
     vlc_object_attach( p_input, p_parent );
 
     /* Create thread and wait for its readiness. */
@@ -545,6 +566,10 @@ static void EndThread( input_thread_t * p_input )
     msg_Dbg( p_input, "%d loops", p_input->c_loops );
 #endif
 
+    /* Free info structures */
+    msg_Dbg( p_input, "freeing info structures...");
+    input_DelInfo( p_input );
+    
     input_DumpStream( p_input );
 
     /* Tell we're dead */
@@ -556,7 +581,7 @@ static void EndThread( input_thread_t * p_input )
     /* Free demultiplexer's data */
     p_input->pf_end( p_input );
     module_Unneed( p_input->p_demux_module );
-
+    
     /* Close the access plug-in */
     CloseThread( p_input );
 }

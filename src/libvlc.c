@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.17 2002/07/20 18:01:43 sam Exp $
+ * $Id: libvlc.c,v 1.18 2002/07/21 18:57:02 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -971,8 +971,25 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
             case CONFIG_ITEM_STRING:
             case CONFIG_ITEM_FILE:
             case CONFIG_ITEM_MODULE: /* We could also have "=<" here */
-                psz_bra = " <"; psz_type = _("string"); psz_ket = ">";
-                break;
+                if( !p_item->ppsz_list )
+                {
+                    psz_bra = " <"; psz_type = _("string"); psz_ket = ">";
+                    break;
+                }
+                else
+                {
+                    psz_bra = " [";
+                    psz_type = malloc( 1000 );
+                    memset( psz_type, 0, 1000 );
+                    for( i=0; p_item->ppsz_list[i]; i++ )
+                    {
+                        strcat( psz_type, p_item->ppsz_list[i] );
+                        strcat( psz_type, "|" );
+                    }
+                    psz_type[ strlen( psz_type ) - 1 ] = '\0';
+                    psz_ket = "]";
+                    break;
+                }
             case CONFIG_ITEM_INTEGER:
                 psz_bra = " <"; psz_type = _("integer"); psz_ket = ">";
                 break;
@@ -1058,6 +1075,10 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                              p_item->psz_text, psz_suf );
                 }
                 psz_spaces[i] = ' ';
+                if ( p_item->ppsz_list )
+                {
+                    free( psz_type );
+                }
             }
         }
 
