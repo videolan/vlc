@@ -38,12 +38,12 @@
 
 /* Callback prototype */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
-                        vlc_value_t old_val, vlc_value_t new_val, void *param );
+                        vlc_value_t old_val, vlc_value_t new_val, void * );
 
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-Timer::Timer( intf_thread_t *_p_intf, HWND hwnd, Interface *_p_main_interface)//, Interface *_p_main_interface )
+Timer::Timer( intf_thread_t *_p_intf, HWND hwnd, Interface *_p_main_interface)
 {
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
@@ -241,8 +241,9 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param )
 {
     intf_thread_t *p_intf = (intf_thread_t *)param;
+    POINT point = {0};
 
-    /* Nothing for now */
+    PopupMenu( p_intf, p_intf->p_sys->p_main_window->hWnd, point );
 
     return VLC_SUCCESS;
 }

@@ -63,7 +63,6 @@
 #define HELP_FILEINFO   _T("Show information about the file being played")
 
 #define HELP_PREFS _T("Go to the preferences menu")
-#define EXTRA_PREFS _T("Shows the extended GUI")
 
 #define HELP_ABOUT _T("About this program")
 
@@ -194,12 +193,12 @@ static HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
 #endif
 
     AppendMenu( hmenu_file, MF_STRING, ID_FILE_QUICKOPEN,
-                _T("Quick &Open File") );
+                _T("Quick &Open File...") );
     AppendMenu( hmenu_file, MF_SEPARATOR, 0, 0 );
     AppendMenu( hmenu_file, MF_STRING, ID_FILE_OPENFILE,
-                _T("Open &File") );
+                _T("Open &File...") );
     AppendMenu( hmenu_file, MF_STRING, ID_FILE_OPENNET,
-                _T("Open Network Stream") );
+                _T("Open &Network Stream...") );
     AppendMenu( hmenu_file, MF_SEPARATOR, 0, 0 );
     AppendMenu( hmenu_file, MF_STRING, ID_FILE_ABOUT,
                 _T("About VLC") );
@@ -207,15 +206,13 @@ static HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
                 _T("E&xit") );
 
     AppendMenu( hmenu_view, MF_STRING, ID_VIEW_PLAYLIST,
-                _T("&Playlist") );
+                _T("&Playlist...") );
     AppendMenu( hmenu_view, MF_STRING, ID_VIEW_MESSAGES,
-                _T("&Messages") );
+                _T("&Messages...") );
     AppendMenu( hmenu_view, MF_STRING, ID_VIEW_STREAMINFO,
-                _T("&Stream and Media info") );
+                _T("Stream and Media &info...") );
 
-    AppendMenu( hmenu_settings, MF_STRING, ID_SETTINGS_EXTEND,
-                _T("&Extended GUI") );
-    AppendMenu( hmenu_settings, MF_STRING, ID_SETTINGS_PREF,
+    AppendMenu( hmenu_settings, MF_STRING, ID_PREFERENCES,
                 _T("&Preferences...") );
 
 
@@ -461,7 +458,7 @@ int CBaseWindow::CreateDialogBox( HWND hwnd, CBaseWindow *p_obj )
         DS_MODALFRAME|WS_POPUP|WS_CAPTION|WS_SYSMENU|WS_SIZEBOX;
 
     return DialogBoxIndirectParam( GetModuleHandle(0), p_dlg_template, hwnd,
-				   (DLGPROC)p_obj->BaseWndProc, (LPARAM)p_obj );
+                                   (DLGPROC)p_obj->BaseWndProc, (LPARAM)p_obj );
 }
 
 /***********************************************************************
@@ -481,7 +478,7 @@ LRESULT CALLBACK CBaseWindow::BaseWndProc( HWND hwnd, UINT msg, WPARAM wParam,
     {
         p_obj = (CBaseWindow *)(((LPCREATESTRUCT)lParam)->lpCreateParams);
         SetWindowLong( hwnd, GWL_USERDATA,
-		       (LONG)((LPCREATESTRUCT)lParam)->lpCreateParams );
+                       (LONG)((LPCREATESTRUCT)lParam)->lpCreateParams );
 
         p_obj->hWnd = hwnd;
     }
@@ -540,45 +537,45 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         {
         case ID_FILE_QUICKOPEN: 
             OnOpenFileSimple();
-	    break;
+            break;
 
         case ID_FILE_OPENFILE: 
-	    open = new OpenDialog( p_intf, hInst, FILE_ACCESS,
-				   ID_FILE_OPENFILE, OPEN_NORMAL );
-	    CreateDialogBox( hwnd, open );
-	    delete open;
-	    break;
+            open = new OpenDialog( p_intf, hInst, FILE_ACCESS,
+                                   ID_FILE_OPENFILE, OPEN_NORMAL );
+            CreateDialogBox( hwnd, open );
+            delete open;
+            break;
 
         case ID_FILE_OPENNET:
             open = new OpenDialog( p_intf, hInst, NET_ACCESS, ID_FILE_OPENNET,
                                    OPEN_NORMAL );
-	    CreateDialogBox( hwnd, open );
+            CreateDialogBox( hwnd, open );
             delete open;
-	    break;
+            break;
 
         case PlayStream_Event: 
             OnPlayStream();
-	    break;
+            break;
 
         case StopStream_Event: 
             OnStopStream();
-	    break;
+            break;
 
         case PrevStream_Event: 
             OnPrevStream();
-	    break;
+            break;
 
         case NextStream_Event: 
             OnNextStream();
-	    break;
+            break;
 
         case SlowStream_Event: 
             OnSlowStream();
-	    break;
+            break;
 
         case FastStream_Event: 
             OnFastStream();
-	    break;
+            break;
 
         case ID_FILE_ABOUT: 
         {
@@ -590,36 +587,36 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
 
             MessageBox( hwnd, _FROMMB(about.c_str()),
                         _T("About VLC media player"), MB_OK );
-	    break;
+            break;
         }
 
         case ID_FILE_EXIT:
             SendMessage( hwnd, WM_CLOSE, 0, 0 );
-	    break;
+            break;
 
         case ID_VIEW_STREAMINFO:
             fi = new FileInfo( p_intf, hInst );
-	    CreateDialogBox( hwnd, fi );
+            CreateDialogBox( hwnd, fi );
             delete fi;
-	    break;
+            break;
 
         case ID_VIEW_MESSAGES:
             hmsg = new Messages( p_intf, hInst );
-	    CreateDialogBox( hwnd, hmsg );
+            CreateDialogBox( hwnd, hmsg );
             delete hmsg;
-	    break;
+            break;
 
         case ID_VIEW_PLAYLIST:
             pl = new Playlist( p_intf, hInst );
-	    CreateDialogBox( hwnd, pl );
+            CreateDialogBox( hwnd, pl );
             delete pl;
-	    break;
+            break;
 
-        case ID_SETTINGS_PREF:
+        case ID_PREFERENCES:
             pref = new PrefsDialog( p_intf, hInst );
-	    CreateDialogBox( hwnd, pref );
+            CreateDialogBox( hwnd, pref );
             delete pref;
-	    break;
+            break;
                   
         default:
             OnMenuEvent( p_intf, GET_WM_COMMAND_ID(wp,lp) );
@@ -687,20 +684,34 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
                          WM_NOTIFY, wp, lp );
         return lResult;
 #endif
-	break;
+        break;
+
+    case WM_LBUTTONDOWN:
+        {
+            SHRGINFO shrg;
+            shrg.cbSize = sizeof( shrg );
+            shrg.hwndClient = hwnd;
+            shrg.ptDown.x = LOWORD(lp);
+            shrg.ptDown.y = HIWORD(lp);
+            shrg.dwFlags = SHRG_RETURNCMD ;
+
+            if( SHRecognizeGesture( &shrg ) == GN_CONTEXTMENU )
+                PopupMenu( p_intf, hwnd, shrg.ptDown );
+        }
+        break;
 
     case WM_HELP:
         MessageBox (hwnd, _T("Help"), _T("Help"), MB_OK);
-	break;
+        break;
 
     case WM_CLOSE:
         DestroyWindow( hwndCB );
         DestroyWindow( hwnd );
-	break;
+        break;
 
     case WM_DESTROY:
         PostQuitMessage( 0 );
-	break;
+        break;
     }
 
     return DefWindowProc( hwnd, msg, wp, lp );

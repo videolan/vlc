@@ -46,6 +46,7 @@
 #include <vector>
 using namespace std; 
 
+class CBaseWindow;
 class MenuItemExt;
 class VideoWindow;
 
@@ -74,6 +75,8 @@ struct intf_sys_t
     /* Send an event to show a dialog */
     void (*pf_show_dialog) ( intf_thread_t *p_intf, int i_dialog, int i_arg,
                              intf_dialog_args_t *p_arg );
+
+    CBaseWindow *p_main_window;
 
     /* Dynamic Menu management */
     vector<MenuItemExt*> *p_audio_menu;
@@ -124,6 +127,7 @@ class OpenDialog;
 class PrefsDialog;
 
 CBaseWindow *CreateVideoWindow( intf_thread_t *, HWND );
+void PopupMenu( intf_thread_t *, HWND, POINT );
 
 /* Main Interface */
 class Interface : public CBaseWindow
@@ -538,6 +542,8 @@ protected:
 #define SHCMBF_EMPTYBAR             0x0001
 #define SHFS_SHOWSIPBUTTON          0x0004
 #define GN_CONTEXTMENU              1000
+#define SHRG_RETURNCMD              0x0001
+#define SHRG_NOTIFYPARENT           0x0002
 #define SHCMBM_GETSUBMENU           (WM_USER + 401)
 #define SHCMBM_GETMENU              (WM_USER + 402)
 #ifndef TBSTYLE_NO_DROPDOWN_ARROW
@@ -583,12 +589,23 @@ extern "C" {
     } NMRGINFO, *PNMRGINFO;
 
     BOOL WINAPI CommandBar_InsertMenubarEx(HWND, HINSTANCE, LPTSTR, WORD);
+
+    typedef struct tagSHRGI
+    {
+        DWORD cbSize;
+        HWND hwndClient;
+        POINT ptDown;
+        DWORD dwFlags;
+    } SHRGINFO, *PSHRGINFO;
+
+    DWORD SHRecognizeGesture(SHRGINFO *shrg);
 }
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
 #   define SHFullScreen(a,b)
 #   define SHInitDialog(a)
 #   define SHCreateMenuBar(a) 1
+#   define SHRecognizeGesture(a) 0
 #endif
 
 #endif //WINCE_RESOURCE
@@ -598,7 +615,6 @@ extern "C" {
 #define IDB_BITMAP1                     103
 #define IDB_BITMAP2                     111
 #define IDR_MENUBAR1                    113
-#define IDR_ACCELERATOR1                116
 #define IDD_FILEINFO                    118
 #define IDD_DUMMY                       118
 #define IDD_MESSAGES                    119
@@ -607,30 +623,10 @@ extern "C" {
 #define IDD_PLAYLIST                    122
 #define IDB_BITMAP3                     123
 #define IDD_ITEMINFO                    124
-#define IDR_DUMMYMENU                   126
 #define IDCLEAR                         1001
 #define IDSAVEAS                        1002
-#define IDC_TEXTCTRL                    1004
-#define IDC_CUSTOM1                     1012
-#define IDS_MAIN_MENUITEM1              40001
-#define IDS_TITLE                       40002
-#define IDS_CLASSNAME                   40003
-#define IDS_CAP_QUICKFILEOPEN           40006
-#define IDS_CAP_VIEW                    40009
-#define IDS_CAP_SETTINGS                40012
-#define IDS_CAP_AUDIO                   40015
-#define IDS_CAP_VIDEO                   40018
-#define IDS_CAP_HELP                    40021
-#define IDS_CAP_Navigation              40024
-#define IDS_CAP_FILE                    40025
-#define ID_COLOR_OPTIONS                40026
-#define IDS_DYNAMENU                    40027
 #define ID_FILE                         40028
-#define IDS_BLACK                       40028
-#define IDS_LTGRAY                      40029
 #define ID_VIEW                         40030
-#define IDS_DKGRAY                      40030
-#define IDS_WHITE                       40031
 #define ID_SETTINGS                     40032
 #define ID_AUDIO                        40034
 #define ID_EMPTY                        40034
@@ -642,21 +638,16 @@ extern "C" {
 #define IDM_AUDIO                       40048
 #define IDM_VIDEO                       40050
 #define IDM_NAVIGATION                  40053
-#define ID_FILE_QUICK_OPEN              40056
-#define ID_FILE_OPENFILE                40057
-#define ID_FILE_QUICKOPEN               40058
-#define ID_FILE_OPENNETWORKSTREAM       40059
-#define ID_FILE_OPENNET                 40060
+#define ID_FILE_QUICKOPEN               40057
+#define ID_FILE_OPENFILE                40058
+#define ID_FILE_OPENNET                 40059
 #define ID_FILE_EXIT                    40061
 #define ID_VIEW_PLAYLIST                40063
 #define ID_VIEW_MESSAGES                40064
 #define ID_VIEW_MEDIAINFO               40065
 #define ID_VIEW_STREAMINFO              40066
-#define IDS_CAP_NAV                     40067
+#define ID_PREFERENCES                  40071
 #define ID_FILE_ABOUT                   40069
-#define ID_SETTINGS_PREF                40071
-#define ID_SETTINGS_EXTEND              40072
-#define IDS_CAP_XXX                     40084
 #define IDM_MANAGE                      40087
 #define IDM_SORT                        40088
 #define IDM_SEL                         40089
@@ -675,24 +666,9 @@ extern "C" {
 #define ID_MANAGE_ADDMRL                40106
 #define ID_MANAGE_OPENPL                40107
 #define ID_MANAGE_SAVEPL                40108
-#define ID_MENUITEM40108                40109
-#define IDS_CAP_MENUITEM40109           40110
-#define IDS_STOP                        57601
 #define StopStream_Event                57601
-#define IDS_PLAY                        57602
 #define PlayStream_Event                57602
 #define PrevStream_Event                57603
 #define NextStream_Event                57604
 #define SlowStream_Event                57605
 #define FastStream_Event                57606
-
-// Next default values for new objects
-// 
-#ifdef APSTUDIO_INVOKED
-#ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        128
-#define _APS_NEXT_COMMAND_VALUE         40111
-#define _APS_NEXT_CONTROL_VALUE         1013
-#define _APS_NEXT_SYMED_VALUE           101
-#endif
-#endif

@@ -159,6 +159,7 @@ static void Run( intf_thread_t *p_intf )
 {
     MSG msg;
     Interface *pInterface = new Interface();
+    p_intf->p_sys->p_main_window = pInterface;
 
     if( !hInstance ) hInstance = GetModuleHandle(NULL);
 

@@ -54,6 +54,187 @@ enum
     PopupMenu_Events = 6000
 };
 
+HMENU OpenStreamMenu( intf_thread_t *p_intf )
+{
+    HMENU hmenu = CreatePopupMenu();
+    AppendMenu( hmenu, MF_STRING, ID_FILE_QUICKOPEN,
+                _T("Quick &Open File...") );
+    AppendMenu( hmenu, MF_STRING, ID_FILE_OPENFILE,
+                _T("Open &File...") );
+    AppendMenu( hmenu, MF_STRING, ID_FILE_OPENNET,
+                _T("Open &Network Stream...") );
+    return hmenu;
+}
+
+HMENU MiscMenu( intf_thread_t *p_intf )
+{
+    HMENU hmenu = CreatePopupMenu();
+    AppendMenu( hmenu, MF_STRING, ID_VIEW_STREAMINFO, _T("Media &Info...") );
+    AppendMenu( hmenu, MF_STRING, ID_VIEW_MESSAGES, _T("&Messages...") );
+    AppendMenu( hmenu, MF_STRING, ID_PREFERENCES, _T("&Preferences...") );
+    return hmenu;
+}
+
+void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
+{
+#define MAX_POPUP_ITEMS 45
+
+    vlc_object_t *p_object, *p_input;
+    char *ppsz_varnames[MAX_POPUP_ITEMS];
+    int pi_objects[MAX_POPUP_ITEMS];
+    vector<MenuItemExt*>::iterator iter;
+    int i = 0, i_last_separator = 0;
+
+    /* Initializations */
+    memset( pi_objects, 0, MAX_POPUP_ITEMS * sizeof(int) );
+
+    /* Input menu */
+    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                FIND_ANYWHERE );
+    if( p_object != NULL )
+    {
+        ppsz_varnames[i] = "bookmark";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "title";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "chapter";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "program";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "navigation";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "dvd_menus";
+        pi_objects[i++] = p_object->i_object_id;
+
+        ppsz_varnames[i] = "video-es";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "audio-es";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "spu-es";
+        pi_objects[i++] = p_object->i_object_id;
+    }
+    p_input = p_object;
+    if( !p_input ) goto interfacemenu;
+
+    /* Video menu */
+    if( i != i_last_separator ) ppsz_varnames[i++] = NULL; /* Separator */
+    i_last_separator = i;
+
+    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                FIND_ANYWHERE );
+    if( p_object != NULL )
+    {
+        vlc_object_t *p_dec_obj;
+
+        ppsz_varnames[i] = "fullscreen";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "zoom";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "deinterlace";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "aspect-ratio";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "crop";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "video-on-top";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "directx-wallpaper";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "video-snapshot";
+        pi_objects[i++] = p_object->i_object_id;
+
+        p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,
+                                                     VLC_OBJECT_DECODER,
+                                                     FIND_PARENT );
+        if( p_dec_obj != NULL )
+        {
+            ppsz_varnames[i] = "ffmpeg-pp-q";
+            pi_objects[i++] = p_dec_obj->i_object_id;
+            vlc_object_release( p_dec_obj );
+        }
+
+        vlc_object_release( p_object );
+    }
+
+    /* Audio menu */
+    if( i != i_last_separator ) ppsz_varnames[i++] = NULL; /* Separator */
+    i_last_separator  = i;
+
+    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+    if( p_object != NULL )
+    {
+        ppsz_varnames[i] = "audio-device";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "audio-channels";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "visual";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "equalizer";
+        pi_objects[i++] = p_object->i_object_id;
+        vlc_object_release( p_object );
+    }
+
+ interfacemenu:
+    /* Interface menu */
+    if( i != i_last_separator ) ppsz_varnames[i++] = NULL; /* Separator */
+    i_last_separator = i;
+
+    /* vlc_object_find is needed because of the dialogs provider case */
+    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INTF,
+                                                FIND_PARENT );
+    if( p_object != NULL )
+    {
+        /* Nothing for now */
+        vlc_object_release( p_object );
+    }
+
+    /* Build menu */
+    vector<MenuItemExt*> popup_menu;
+    HMENU hmenu = CreatePopupMenu();
+    RefreshMenu( p_intf, &popup_menu, hmenu, i,
+                 ppsz_varnames, pi_objects, PopupMenu_Events );
+
+    /* Add static entries */
+    if( p_input != NULL )
+    {
+        vlc_value_t val;
+        AppendMenu( hmenu, MF_SEPARATOR, 0, _T("") );
+        AppendMenu( hmenu, MF_STRING, StopStream_Event, _T("Stop") );
+        AppendMenu( hmenu, MF_STRING, PrevStream_Event, _T("Previous") );
+        AppendMenu( hmenu, MF_STRING, NextStream_Event, _T("Next") );
+
+        var_Get( p_input, "state", &val );
+        if( val.i_int == PAUSE_S )
+            AppendMenu( hmenu, MF_STRING, PlayStream_Event, _T("Play") );
+        else
+            AppendMenu( hmenu, MF_STRING, PlayStream_Event, _T("Pause") );
+
+        vlc_object_release( p_input );
+    }
+    else
+    {
+        playlist_t * p_playlist =
+            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist && p_playlist->i_size )
+        {
+            AppendMenu( hmenu, MF_SEPARATOR, 0, _T("") );
+            AppendMenu( hmenu, MF_STRING, PlayStream_Event, _T("Play") );
+        }
+        if( p_playlist ) vlc_object_release( p_playlist );
+    }
+
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)MiscMenu( p_intf ),
+                _T("Miscellaneous") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)OpenStreamMenu( p_intf ),
+                _T("Open") );
+
+    TrackPopupMenu( hmenu, 0, point.x, point.y, 0, p_parent, 0 );
+    PostMessage( p_parent, WM_NULL, 0, 0 );
+    DestroyMenu( hmenu );
+}
+
 void RefreshAudioMenu( intf_thread_t *p_intf, HMENU hMenu )
 {
 #define MAX_AUDIO_ITEMS 10
@@ -272,8 +453,7 @@ void RefreshSettingsMenu( intf_thread_t *p_intf, HMENU hMenu )
     memset( pi_objects, 0, MAX_SETTINGS_ITEMS * sizeof(int) );
     i = 0;
 
-    AppendMenu( hMenu, MF_STRING, ID_SETTINGS_EXTEND, _T("&Extended GUI") );
-    AppendMenu( hMenu, MF_STRING, ID_SETTINGS_PREF, _T("&Preferences...") );
+    AppendMenu( hMenu, MF_STRING, ID_PREFERENCES, _T("&Preferences...") );
 
     p_object = (vlc_object_t *)
         vlc_object_find( p_intf, VLC_OBJECT_INTF, FIND_PARENT );
