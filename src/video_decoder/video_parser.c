@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.7 2001/10/03 03:32:05 xav Exp $
+ * $Id: video_parser.c,v 1.8 2001/10/03 13:14:05 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -36,8 +36,8 @@
 #include <errno.h>
 #include <string.h>
 
-#ifndef WIN32
-#include <sys/times.h>
+#ifdef HAVE_SYS_TIMES_H
+#   include <sys/times.h>
 #endif
 
 #include "config.h"
@@ -318,15 +318,18 @@ static void EndThread( vpar_thread_t *p_vpar )
 
     if( p_main->b_stats )
     {
-        #ifndef WIN32
+#ifdef HAVE_SYS_TIMES_H
         struct tms cpu_usage;
         times( &cpu_usage );
+#endif
 
         intf_StatMsg( "vpar stats: %d loops among %d sequence(s)",
                       p_vpar->c_loops, p_vpar->c_sequences );
 
+#ifdef HAVE_SYS_TIMES_H
         intf_StatMsg( "vpar stats: cpu usage (user: %d, system: %d)",
                       cpu_usage.tms_utime, cpu_usage.tms_stime );
+#endif
 
         intf_StatMsg( "vpar stats: Read %d frames/fields (I %d/P %d/B %d)",
                       p_vpar->pc_pictures[I_CODING_TYPE]
@@ -359,7 +362,6 @@ static void EndThread( vpar_thread_t *p_vpar )
                       S.i_scalable_mode ? "scalable" : "non-scalable",
                       S.i_matrix_coefficients );
 #undef S
-        #endif
     }
 
     /* Dispose of matrices if they have been allocated. */

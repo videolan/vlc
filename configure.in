@@ -33,11 +33,68 @@ AC_PROG_RANLIB
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
 
-dnl Check for endianness
-dnl if we cross compile for win32, we don't need to test it.
-dnl quick and udly hack. Gonna search the way to do it better.
-if eval "test $CC = gcc"; then
-AC_C_BIGENDIAN
+dnl
+dnl  Endianness check, with a special test for cross-compilation
+dnl
+if test x${cross_compiling} != xyes; then
+  AC_C_BIGENDIAN
+else
+  dnl  We are crosscompiling, give the user the opportunity to specify
+  dnl  --with-words=big or --with-words=little ; otherwise, try to guess
+  AC_ARG_WITH(words,
+    [  --with-words=endianness Set endianness (big or little)])
+  case "x$withval" in
+    xbig)
+      ac_cv_c_bigendian=yes
+      ;;
+    xlittle)
+      ac_cv_c_bigendian=no
+      ;;
+    *)
+      dnl  Try to guess endianness by matching patterns on a compiled
+      dnl  binary, by looking for an ASCII or EBCDIC string
+      ac_cv_c_bigendian=unknown
+      AC_MSG_CHECKING(what the byte order looks to be)[
+        cat >conftest.c <<EOF
+        short am[] = { 0x4249, 0x4765, 0x6e44, 0x6961, 0x6e53, 0x7953, 0 };
+        short ai[] = { 0x694c, 0x5454, 0x656c, 0x6e45, 0x6944, 0x6e61, 0 };
+        void _a(void) { char*s = (char*)am; s = (char *)ai; }
+        short ei[] = { 0x89D3, 0xe3e3, 0x8593, 0x95c5, 0x89c4, 0x9581, 0 };
+        short em[] = { 0xc2c9, 0xc785, 0x95c4, 0x8981, 0x95e2, 0xa8e2, 0 };
+        void _e(void) { char*s = (char*)em; s = (char*)ei; }
+        int main(void) { _a(); _e(); return 0; }
+EOF
+      ]
+      if test -f conftest.c
+      then 
+        if ${CC-cc} conftest.c -o conftest.o >config.log 2>&1 \
+            && test -f conftest.o
+        then
+          if test `grep -l BIGenDianSyS conftest.o`
+          then
+            AC_MSG_RESULT("big endian")
+            ac_cv_c_bigendian=yes
+          fi
+          if test `grep -l LiTTleEnDian conftest.o`
+          then
+            AC_MSG_RESULT("little endian")
+            ac_cv_c_bigendian=no
+          fi
+        fi
+      fi
+      if test $ac_cv_c_bigendian = xunknown
+      then
+        AC_MSG_ERROR([Could not guess endianness, please use --with-words])
+      fi
+      dnl  Now we know what to use for endianness, just put it in the header
+      if test $ac_cv_c_bigendian = yes
+      then
+        cat >> confdefs.h <<\EOF
+#define WORDS_BIGENDIAN 1
+EOF
+      fi
+      ;;
+  esac
 fi
 
 dnl Check for system libs needed
@@ -106,7 +163,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
 
 dnl Check for headers
 AC_CHECK_HEADERS(stddef.h getopt.h strings.h)
-AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/time.h)
+AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(sys/soundcard.h machine/soundcard.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
@@ -177,7 +234,7 @@ Your system doesn't seem to have support for dynamic linking. You may
 have problems using libdvdcss.
 ------------
 "
-	fi
+    fi
 fi
 
 dnl End of the bizarre compilation tests
@@ -250,7 +307,7 @@ ALTIVEC_MODULES="idctaltivec motionaltivec"
 AC_CACHE_CHECK([if \$CC groks MMX inline assembly],
     [ac_cv_mmx_inline],
     [AC_TRY_COMPILE(,[void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],
-	ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
+                    ac_cv_mmx_inline=yes, ac_cv_mmx_inline=no)])
 if test x"$ac_cv_mmx_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
 fi
@@ -258,7 +315,7 @@ fi
 AC_CACHE_CHECK([if \$CC groks MMX EXT inline assembly],
     [ac_cv_mmxext_inline],
     [AC_TRY_COMPILE(,[void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],
-	ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
+                    ac_cv_mmxext_inline=yes, ac_cv_mmxext_inline=no)])
 if test x"$ac_cv_mmxext_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
 fi
@@ -266,7 +323,7 @@ fi
 AC_CACHE_CHECK([if \$CC groks 3D Now! inline assembly],
     [ac_cv_3dnow_inline],
     [AC_TRY_COMPILE(,[void quux(){void *p;asm("pfadd %%mm1,%%mm2"::"r"(p));}],
-	ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
+                    ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
 if test x"$ac_cv_3dnow_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${THREEDNOW_MODULES}"
 fi
@@ -274,7 +331,7 @@ fi
 AC_CACHE_CHECK([if \$CC groks SSE inline assembly],
     [ac_cv_sse_inline],
     [AC_TRY_COMPILE(,[void quux(){void *p;asm("xorps %%xmm1,%%xmm2"::"r"(p));}],
-	ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
+                    ac_cv_sse_inline=yes, ac_cv_sse_inline=no)])
 if test x"$ac_cv_sse_inline" != x"no"; then
   ACCEL_MODULES="${ACCEL_MODULES} ${SSE_MODULES}"
 fi
@@ -287,7 +344,7 @@ AC_CACHE_CHECK([if \$CC groks Altivec inline assembly],
           CFLAGS="$CFLAGS -Wa,-m7400"
           AC_TRY_COMPILE(,[void quux(){asm("mtspr 256,%0"::"r"(-1));}],
             [ac_cv_altivec_inline=yes; CFLAGS_ALTIVEC="-Wa,-m7400"],
-	        ac_cv_altivec_inline=no)
+            ac_cv_altivec_inline=no)
           CFLAGS=$save_CFLAGS
          ])])
 if test x"$ac_cv_altivec_inline" != x"no"; then
@@ -804,8 +861,8 @@ AC_ARG_WITH(directx,
         INCLUDE="${INCLUDE} -I"$withval"/include"
       else
         AC_CHECK_HEADERS(directx.h, , 
-	  AC_MSG_ERROR([Cannot find DirectX headers !])
-	)
+          AC_MSG_ERROR([Cannot find DirectX headers !])
+        )
         LIB_DIRECTX="${LIB_DIRECTX} -L/usr/lib -lgdi32 -ldxguid"
       fi
     fi ])
