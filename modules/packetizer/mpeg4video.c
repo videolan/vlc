@@ -2,7 +2,7 @@
  * mpeg4video.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpeg4video.c,v 1.1 2002/12/14 21:32:41 fenrir Exp $
+ * $Id: mpeg4video.c,v 1.2 2002/12/18 16:33:09 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -303,6 +303,7 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
             else if( i_startcode == GROUP_OF_VOP_START_CODE )
             {
                 msg_Dbg( p_pack->p_fifo, "<group_of_vop>" );
+#if 0
                 if( p_pack->p_vol && p_pack->i_vop_since_vol > 100 ) // FIXME
                 {
                     sout_BufferAddMem( p_sout, p_frame,
@@ -310,18 +311,21 @@ static void PacketizeThread( packetizer_thread_t *p_pack )
                                        p_pack->p_vol->p_buffer );
                     p_pack->i_vop_since_vol = 0;
                 }
+#endif
                 CopyUntilNextStartCode( p_pack, p_frame, &p_frame->i_size );
             }
             else if( i_startcode == VOP_START_CODE )
             {
                 msg_Dbg( p_pack->p_fifo, "<vop>" );
-                if( p_pack->p_vol && p_pack->i_vop_since_vol > 100 ) // FIXME
+#if 1
+                if( p_pack->p_vol && p_pack->i_vop_since_vol > 30 ) // FIXME
                 {
                     sout_BufferAddMem( p_sout, p_frame,
                                        p_pack->p_vol->i_size,
                                        p_pack->p_vol->p_buffer );
                     p_pack->i_vop_since_vol = 0;
                 }
+#endif
                 CopyUntilNextStartCode( p_pack, p_frame, &p_frame->i_size );
                 p_pack->i_vop_since_vol++;
                 break;
