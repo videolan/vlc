@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.26 2002/04/23 14:16:20 sam Exp $
+ * $Id: gtk_preferences.c,v 1.27 2002/05/04 16:17:08 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -67,7 +67,7 @@ static void GtkBoolChanged       ( GtkToggleButton *, gpointer );
 
 static void GtkFreeHashTable     ( gpointer );
 static void GtkFreeHashValue     ( gpointer, gpointer, gpointer );
-static void GtkSaveHashValue     ( gpointer, gpointer, gpointer );
+static gboolean GtkSaveHashValue ( gpointer, gpointer, gpointer );
 
 static void GtkModuleConfigure   ( GtkButton *, gpointer );
 static void GtkModuleSelected    ( GtkButton *, gpointer );
@@ -539,6 +539,9 @@ static void GtkCreateConfigDialog( char *psz_module_name,
     gtk_signal_connect( GTK_OBJECT(ok_button), "clicked",
                         GTK_SIGNAL_FUNC(GtkConfigOk),
                         config_dialog );
+    gtk_widget_set_sensitive( apply_button, FALSE );
+    gtk_object_set_data( GTK_OBJECT(config_dialog), "apply_button",
+                         apply_button );
     gtk_signal_connect( GTK_OBJECT(apply_button), "clicked",
                         GTK_SIGNAL_FUNC(GtkConfigApply),
                         config_dialog );
@@ -570,14 +573,21 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
 /****************************************************************************
  * GtkConfigApply: store the changes to the config inside the modules
- * configuration structure
+ * configuration structure and clear the hash table.
  ****************************************************************************/
 void GtkConfigApply( GtkButton * button, gpointer user_data )
 {
     GHashTable *hash_table;
+    GtkWidget *apply_button;
+
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
-    g_hash_table_foreach( hash_table, GtkSaveHashValue, NULL );
+    g_hash_table_foreach_remove( hash_table, GtkSaveHashValue, NULL );
+
+    /* change the highlight status of the Apply button */
+    apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "apply_button" );
+    gtk_widget_set_sensitive( apply_button, FALSE );
 
 }
 
@@ -679,6 +689,7 @@ static void GtkStringChanged( GtkEditable *editable, gpointer user_data )
     module_config_t *p_config;
 
     GHashTable *hash_table;
+    GtkWidget *apply_button;
 
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
@@ -695,6 +706,11 @@ static void GtkStringChanged( GtkEditable *editable, gpointer user_data )
 
     g_hash_table_insert( hash_table, (gpointer)editable,
                          (gpointer)p_config );
+
+    /* change the highlight status of the Apply button */
+    apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "apply_button" );
+    gtk_widget_set_sensitive( apply_button, TRUE );
 }
 
 /****************************************************************************
@@ -705,6 +721,7 @@ static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
     module_config_t *p_config;
 
     GHashTable *hash_table;
+    GtkWidget *apply_button;
 
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
@@ -723,6 +740,11 @@ static void GtkIntChanged( GtkEditable *editable, gpointer user_data )
 
     g_hash_table_insert( hash_table, (gpointer)editable,
                          (gpointer)p_config );
+
+    /* change the highlight status of the Apply button */
+    apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "apply_button" );
+    gtk_widget_set_sensitive( apply_button, TRUE );
 }
 
 /****************************************************************************
@@ -733,6 +755,7 @@ static void GtkFloatChanged( GtkEditable *editable, gpointer user_data )
     module_config_t *p_config;
 
     GHashTable *hash_table;
+    GtkWidget *apply_button;
 
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
@@ -751,6 +774,11 @@ static void GtkFloatChanged( GtkEditable *editable, gpointer user_data )
 
     g_hash_table_insert( hash_table, (gpointer)editable,
                          (gpointer)p_config );
+
+    /* change the highlight status of the Apply button */
+    apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "apply_button" );
+    gtk_widget_set_sensitive( apply_button, TRUE );
 }
 
 /****************************************************************************
@@ -761,6 +789,7 @@ static void GtkBoolChanged( GtkToggleButton *button, gpointer user_data )
     module_config_t *p_config;
 
     GHashTable *hash_table;
+    GtkWidget *apply_button;
 
     hash_table = (GHashTable *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                     "config_hash_table" );
@@ -778,6 +807,11 @@ static void GtkBoolChanged( GtkToggleButton *button, gpointer user_data )
 
     g_hash_table_insert( hash_table, (gpointer)button,
                          (gpointer)p_config );
+
+    /* change the highlight status of the Apply button */
+    apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
+                                                    "apply_button" );
+    gtk_widget_set_sensitive( apply_button, TRUE );
 }
 
 /****************************************************************************
@@ -808,7 +842,8 @@ static void GtkFreeHashValue( gpointer key, gpointer value, gpointer user_data)
  * GtkSaveHashValue: callback used when enumerating the hash table in
  * GtkConfigApply().
  ****************************************************************************/
-static void GtkSaveHashValue( gpointer key, gpointer value, gpointer user_data)
+static gboolean GtkSaveHashValue( gpointer key, gpointer value,
+                                  gpointer user_data )
 {
     module_config_t *p_config = (module_config_t *)value;
 
@@ -829,6 +864,14 @@ static void GtkSaveHashValue( gpointer key, gpointer value, gpointer user_data)
         config_PutFloatVariable( p_config->psz_name, p_config->f_value );
         break;
     }
+
+    /* free the hash value we allocated */
+    if( p_config->i_type == MODULE_CONFIG_ITEM_STRING )
+        g_free( p_config->psz_value );
+    free( p_config );
+
+    /* return TRUE so glib will free the hash entry */
+    return TRUE;
 }
 
 /****************************************************************************
