@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.6 2003/02/24 10:45:55 fenrir Exp $
+ * $Id: stream_output.h,v 1.7 2003/02/24 11:00:54 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -121,9 +121,11 @@ struct sout_access_out_t
 #define SOUT_MUX_CAP_ERR_UNKNOWN            0x01
 #define SOUT_MUX_CAP_ERR_UNIMPLEMENTED      0x02
 
+typedef struct sout_instance_sys_t sout_instance_sys_t;
 struct sout_instance_t
 {
     VLC_COMMON_MEMBERS
+
 
     char * psz_dest;
     char * psz_access;
@@ -150,6 +152,8 @@ struct sout_instance_t
 
     int                     i_nb_inputs;
     sout_input_t            **pp_inputs;
+
+    sout_instance_sys_t     *p_sys;
 };
 
 
