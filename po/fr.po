@@ -8093,7 +8093,7 @@ msgstr "Déplacements basés sur le pourcentage et non le temps"
 
 #: modules/demux/mkv.cpp:3043
 msgid "Segment filename"
-msgstr "Segment de nom de fichier"
+msgstr "Nom de fichier du Segment"
 
 #: modules/demux/mkv.cpp:3047
 msgid "Muxing application"

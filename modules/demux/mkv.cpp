@@ -121,7 +121,15 @@ vlc_module_begin();
     set_category( CAT_INPUT );
     set_subcategory( SUBCAT_INPUT_DEMUX );
 
-    add_bool( "mkv-seek-percent", 1, NULL,
+    add_bool( "mkv-use-ordered-chapters", 1, NULL,
+            N_("Ordered chapters"),
+            N_("Play chapters in the specified order as specified in the file"), VLC_TRUE );
+
+    add_bool( "mkv-use-chapter-codec", 1, NULL,
+            N_("Chapter codecs"),
+            N_("Use chapter codecs found in the file"), VLC_TRUE );
+
+    add_bool( "mkv-seek-percent", 0, NULL,
             N_("Seek based on percent not time"),
             N_("Seek based on percent not time"), VLC_TRUE );
 
@@ -3100,7 +3108,7 @@ void matroska_segment_t::ParseChapters( EbmlElement *chapters )
                 }
                 else if( MKV_IS_ID( l, KaxEditionFlagOrdered ) )
                 {
-                    edition.b_ordered = uint8(*static_cast<KaxEditionFlagOrdered *>( l )) != 0;
+					edition.b_ordered = config_GetInt( &sys.demuxer, "mkv-use-ordered-chapters" ) ? (uint8(*static_cast<KaxEditionFlagOrdered *>( l )) != 0) : 0;
                 }
                 else if( MKV_IS_ID( l, KaxEditionFlagDefault ) )
                 {
