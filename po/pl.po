@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-07-01 15:53+0200\n"
+"POT-Creation-Date: 2003-07-08 15:11+0200\n"
 "PO-Revision-Date: 2002-07-12 11:49+0100\n"
 "Last-Translator: Arkadiusz Lipiec <alipiec@elka.pw.edu.pl>\n"
 "Language-Team: polish <pl@li.org>\n"
@@ -122,7 +122,7 @@ msgid "Program"
 msgstr "Program"
 
 #: src/input/input_programs.c:98 modules/demux/asf/libasf.c:696
-#: modules/demux/mkv.cpp:2392 modules/gui/beos/MediaControlView.cpp:1258
+#: modules/demux/mkv.cpp:2394 modules/gui/beos/MediaControlView.cpp:1258
 #: modules/gui/gtk/gnome_interface.c:1650 modules/gui/gtk/gtk_interface.c:1956
 #: modules/gui/gtk/menu.c:1402 modules/gui/gtk/menu.c:1423
 #: modules/gui/kde/interface.cpp:144 modules/gui/macosx/intf.m:373
@@ -1098,7 +1098,7 @@ msgstr "Interfejs"
 
 #: src/libvlc.h:458 modules/audio_output/coreaudio.c:227
 #: modules/audio_output/file.c:108 modules/demux/asf/asf.c:228
-#: modules/demux/mkv.cpp:2443 modules/demux/ogg.c:557 modules/demux/ogg.c:829
+#: modules/demux/mkv.cpp:2445 modules/demux/ogg.c:557 modules/demux/ogg.c:829
 #: modules/demux/ogg.c:1002 modules/gui/beos/InterfaceWindow.cpp:259
 #: modules/gui/gtk/gnome_interface.c:1092 modules/gui/gtk/gtk_interface.c:1219
 #: modules/gui/macosx/intf.m:378 modules/gui/macosx/output.m:155
@@ -1106,7 +1106,7 @@ msgid "Audio"
 msgstr "D¼wiêk"
 
 #: src/libvlc.h:477 modules/demux/asf/asf.c:302 modules/demux/avi/avi.c:1208
-#: modules/demux/mkv.cpp:2459 modules/demux/ogg.c:629 modules/demux/ogg.c:669
+#: modules/demux/mkv.cpp:2461 modules/demux/ogg.c:629 modules/demux/ogg.c:669
 #: modules/demux/ogg.c:734 modules/demux/ogg.c:909
 #: modules/gui/gtk/gnome_interface.c:1099 modules/gui/gtk/gtk_interface.c:1296
 #: modules/gui/macosx/intf.m:389 modules/gui/macosx/macosx.m:68
@@ -1130,7 +1130,7 @@ msgstr "Dekodery"
 
 #: src/libvlc.h:529 modules/gui/gtk/gnome_interface.c:2042
 #: modules/gui/gtk/gtk_interface.c:2361 modules/gui/gtk/gtk_interface.c:3034
-#: modules/gui/wxwindows/open.cpp:218 modules/gui/wxwindows/streamout.cpp:155
+#: modules/gui/wxwindows/open.cpp:218 modules/gui/wxwindows/streamout.cpp:171
 msgid "Stream output"
 msgstr ""
 
@@ -1467,7 +1467,7 @@ msgstr "modu³ wej¶cia VCD"
 msgid "VCD input"
 msgstr "modu³ wej¶cia VCD"
 
-#: modules/access/vlcs.c:131 modules/misc/sap.c:142
+#: modules/access/vlcs.c:131 modules/misc/sap.c:154
 msgid "SAP"
 msgstr ""
 
@@ -2133,6 +2133,15 @@ msgstr ""
 msgid "Xvid video decoder"
 msgstr "modu³ dekodera obrazu MPEG I/II"
 
+#: modules/control/corba/corba.c:614
+msgid "Corba control"
+msgstr ""
+
+#: modules/control/corba/corba.c:615
+#, fuzzy
+msgid "corba control module"
+msgstr "modu³ dekodera podtytu³ów DVD"
+
 #: modules/control/gestures.c:77
 msgid "Motion threshold"
 msgstr ""
@@ -2268,7 +2277,7 @@ msgid "Layer"
 msgstr ""
 
 #: modules/demux/aac/demux.c:562 modules/demux/asf/asf.c:275
-#: modules/demux/avi/avi.c:1176 modules/demux/mkv.cpp:2447
+#: modules/demux/avi/avi.c:1176 modules/demux/mkv.cpp:2449
 #: modules/demux/ogg.c:561 modules/demux/ogg.c:837 modules/demux/ogg.c:1010
 #: modules/gui/gtk/gnome_interface.c:148 modules/gui/gtk/gnome_interface.c:931
 #: modules/gui/gtk/gtk_interface.c:481 modules/gui/gtk/gtk_interface.c:1282
@@ -2276,7 +2285,7 @@ msgid "Channels"
 msgstr "Kana³y"
 
 #: modules/demux/aac/demux.c:564 modules/demux/asf/asf.c:277
-#: modules/demux/avi/avi.c:1178 modules/demux/mkv.cpp:2451
+#: modules/demux/avi/avi.c:1178 modules/demux/mkv.cpp:2453
 #: modules/demux/mpeg/audio.c:632 modules/demux/ogg.c:559
 #: modules/demux/ogg.c:671 modules/demux/ogg.c:832 modules/demux/ogg.c:1005
 #, fuzzy
@@ -2287,15 +2296,15 @@ msgstr "Szybko¶æ symboliczna"
 msgid "ASF v1.0 demuxer (file only)"
 msgstr ""
 
-#: modules/demux/asf/asf.c:165 modules/demux/mkv.cpp:2410
+#: modules/demux/asf/asf.c:165 modules/demux/mkv.cpp:2412
 #, fuzzy
 msgid "Number of streams"
 msgstr "Liczba wierszy"
 
 #: modules/demux/asf/asf.c:228 modules/demux/asf/asf.c:302
 #: modules/demux/avi/avi.c:1172 modules/demux/avi/avi.c:1208
-#: modules/demux/avi/avi.c:1239 modules/demux/mkv.cpp:2443
-#: modules/demux/mkv.cpp:2459 modules/demux/mkv.cpp:2475
+#: modules/demux/avi/avi.c:1239 modules/demux/mkv.cpp:2445
+#: modules/demux/mkv.cpp:2461 modules/demux/mkv.cpp:2477
 #: modules/demux/ogg.c:557 modules/demux/ogg.c:629 modules/demux/ogg.c:669
 #: modules/demux/ogg.c:734 modules/demux/ogg.c:829 modules/demux/ogg.c:909
 #: modules/demux/ogg.c:1002 modules/gui/familiar/interface.c:370
@@ -2305,8 +2314,8 @@ msgstr ""
 
 #: modules/demux/asf/asf.c:260 modules/demux/asf/asf.c:318
 #: modules/demux/avi/avi.c:1174 modules/demux/avi/avi.c:1209
-#: modules/demux/mkv.cpp:2444 modules/demux/mkv.cpp:2460
-#: modules/demux/mkv.cpp:2476 modules/demux/ogg.c:558 modules/demux/ogg.c:630
+#: modules/demux/mkv.cpp:2446 modules/demux/mkv.cpp:2462
+#: modules/demux/mkv.cpp:2478 modules/demux/ogg.c:558 modules/demux/ogg.c:630
 #: modules/demux/ogg.c:670 modules/demux/ogg.c:735 modules/demux/ogg.c:830
 #: modules/demux/ogg.c:910 modules/demux/ogg.c:1003
 #, fuzzy
@@ -2318,7 +2327,7 @@ msgid "Avg. byterate"
 msgstr ""
 
 #: modules/demux/asf/asf.c:282 modules/demux/avi/avi.c:1180
-#: modules/demux/mkv.cpp:2455
+#: modules/demux/mkv.cpp:2457
 msgid "Bits Per Sample"
 msgstr ""
 
@@ -2327,7 +2336,7 @@ msgid "Size"
 msgstr ""
 
 #: modules/demux/asf/asf.c:335 modules/demux/avi/avi.c:1211
-#: modules/demux/mkv.cpp:2463
+#: modules/demux/mkv.cpp:2465
 #, fuzzy
 msgid "Resolution"
 msgstr "Wybór"
@@ -2467,66 +2476,66 @@ msgstr ""
 msgid "mka/mkv stream demuxer"
 msgstr "dekoder d¼wiêku MPEG warstwa I/II"
 
-#: modules/demux/mkv.cpp:2387 modules/gui/gtk/gnome_interface.c:2436
+#: modules/demux/mkv.cpp:2389 modules/gui/gtk/gnome_interface.c:2436
 #: modules/gui/gtk/gtk_interface.c:2857 modules/gui/wxwindows/playlist.cpp:148
 msgid "Duration"
 msgstr "Czas trwania"
 
-#: modules/demux/mkv.cpp:2396
+#: modules/demux/mkv.cpp:2398
 msgid "Date UTC"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2400
+#: modules/demux/mkv.cpp:2402
 #, fuzzy
 msgid "Segment Filename"
 msgstr "nazwa pliku dziennika"
 
-#: modules/demux/mkv.cpp:2404
+#: modules/demux/mkv.cpp:2406
 #, fuzzy
 msgid "Muxing Application"
 msgstr "Informacje dotycz±ce tej aplikacji"
 
-#: modules/demux/mkv.cpp:2408
+#: modules/demux/mkv.cpp:2410
 #, fuzzy
 msgid "Writing Application"
 msgstr "Pozycja pocz±tkowa"
 
-#: modules/demux/mkv.cpp:2421 modules/gui/beos/PlayListWindow.cpp:144
+#: modules/demux/mkv.cpp:2423 modules/gui/beos/PlayListWindow.cpp:144
 #: modules/gui/familiar/interface.c:362 modules/gui/gtk/preferences.c:325
 #: modules/gui/kde/pluginsbox.cpp:45
 msgid "Name"
 msgstr "Nazwa"
 
-#: modules/demux/mkv.cpp:2425
+#: modules/demux/mkv.cpp:2427
 #, fuzzy
 msgid "Codec Name"
 msgstr "Nazwa urz±dzenia"
 
-#: modules/demux/mkv.cpp:2429
+#: modules/demux/mkv.cpp:2431
 #, fuzzy
 msgid "Codec Setting"
 msgstr "U_stawienia"
 
-#: modules/demux/mkv.cpp:2433
+#: modules/demux/mkv.cpp:2435
 #, fuzzy
 msgid "Codec Info"
 msgstr "Nazwa urz±dzenia"
 
-#: modules/demux/mkv.cpp:2437
+#: modules/demux/mkv.cpp:2439
 #, fuzzy
 msgid "Codec Download"
 msgstr "Nazwa urz±dzenia"
 
-#: modules/demux/mkv.cpp:2467
+#: modules/demux/mkv.cpp:2469
 #, fuzzy
 msgid "Display Resolution"
 msgstr "Wybór"
 
-#: modules/demux/mkv.cpp:2471
+#: modules/demux/mkv.cpp:2473
 msgid "Frame Per Second"
 msgstr ""
 
-#: modules/demux/mkv.cpp:2475 modules/gui/gtk/gnome_interface.c:1963
+#: modules/demux/mkv.cpp:2477 modules/gui/gtk/gnome_interface.c:1963
 #: modules/gui/gtk/gtk_interface.c:2278
 #, fuzzy
 msgid "Subtitle"
@@ -3068,7 +3077,7 @@ msgstr "Komunikaty"
 #: modules/gui/macosx/open.m:141 modules/gui/macosx/open.m:264
 #: modules/gui/macosx/output.m:125 modules/gui/macosx/output.m:200
 #: modules/gui/macosx/output.m:285 modules/gui/wxwindows/interface.cpp:358
-#: modules/gui/wxwindows/open.cpp:276 modules/gui/wxwindows/streamout.cpp:347
+#: modules/gui/wxwindows/open.cpp:276 modules/gui/wxwindows/streamout.cpp:376
 msgid "File"
 msgstr "Plik"
 
@@ -3154,7 +3163,7 @@ msgstr "Lista odtwarzania"
 #: modules/gui/wxwindows/fileinfo.cpp:96
 #: modules/gui/wxwindows/messages.cpp:101 modules/gui/wxwindows/open.cpp:267
 #: modules/gui/wxwindows/preferences.cpp:253
-#: modules/gui/wxwindows/streamout.cpp:198
+#: modules/gui/wxwindows/streamout.cpp:217
 #: modules/gui/wxwindows/subtitles.cpp:149
 msgid "OK"
 msgstr "OK"
@@ -3383,7 +3392,7 @@ msgstr "UDP Multicast"
 #: modules/gui/familiar/interface.c:412 modules/gui/gtk/gnome_interface.c:1747
 #: modules/gui/gtk/gtk_interface.c:2062 modules/gui/macosx/open.m:160
 #: modules/gui/macosx/output.m:128 modules/gui/wxwindows/open.cpp:456
-#: modules/gui/wxwindows/streamout.cpp:387
+#: modules/gui/wxwindows/streamout.cpp:416
 msgid "Address"
 msgstr "Adres"
 
@@ -3393,13 +3402,13 @@ msgstr "Adres"
 #: modules/gui/gtk/gtk_interface.c:2101 modules/gui/gtk/gtk_interface.c:3225
 #: modules/gui/macosx/open.m:159 modules/gui/macosx/open.m:161
 #: modules/gui/macosx/output.m:129 modules/gui/wxwindows/open.cpp:441
-#: modules/gui/wxwindows/open.cpp:464 modules/gui/wxwindows/streamout.cpp:398
+#: modules/gui/wxwindows/open.cpp:464 modules/gui/wxwindows/streamout.cpp:427
 msgid "Port"
 msgstr "Port"
 
 #: modules/gui/familiar/interface.c:478 modules/gui/macosx/output.m:131
 #: modules/gui/macosx/output.m:227 modules/gui/macosx/output.m:295
-#: modules/gui/wxwindows/streamout.cpp:348
+#: modules/gui/wxwindows/streamout.cpp:377
 msgid "HTTP"
 msgstr "HTTP"
 
@@ -3897,7 +3906,7 @@ msgstr ""
 #: modules/gui/macosx/output.m:127 modules/gui/macosx/prefs.m:464
 #: modules/gui/wxwindows/open.cpp:246 modules/gui/wxwindows/open.cpp:354
 #: modules/gui/wxwindows/preferences.cpp:829
-#: modules/gui/wxwindows/streamout.cpp:374
+#: modules/gui/wxwindows/streamout.cpp:403
 #: modules/gui/wxwindows/subtitles.cpp:107
 msgid "Browse..."
 msgstr ""
@@ -4072,13 +4081,13 @@ msgstr "Otwiera plik"
 
 #: modules/gui/gtk/gnome_interface.c:2857 modules/gui/gtk/gtk_interface.c:3112
 #: modules/gui/macosx/output.m:132 modules/gui/macosx/output.m:237
-#: modules/gui/macosx/output.m:296 modules/gui/wxwindows/streamout.cpp:349
+#: modules/gui/macosx/output.m:296 modules/gui/wxwindows/streamout.cpp:378
 msgid "UDP"
 msgstr "UDP"
 
 #: modules/gui/gtk/gnome_interface.c:2867 modules/gui/gtk/gtk_interface.c:3122
 #: modules/gui/macosx/output.m:133 modules/gui/macosx/output.m:247
-#: modules/gui/macosx/output.m:298 modules/gui/wxwindows/streamout.cpp:350
+#: modules/gui/macosx/output.m:298 modules/gui/wxwindows/streamout.cpp:379
 msgid "RTP"
 msgstr "RPT"
 
@@ -4227,7 +4236,7 @@ msgstr ""
 #: modules/gui/gtk/preferences.c:618 modules/gui/macosx/open.m:139
 #: modules/gui/macosx/prefs.m:79 modules/gui/wxwindows/open.cpp:270
 #: modules/gui/wxwindows/preferences.cpp:256
-#: modules/gui/wxwindows/streamout.cpp:201
+#: modules/gui/wxwindows/streamout.cpp:220
 #: modules/gui/wxwindows/subtitles.cpp:152
 msgid "Cancel"
 msgstr "Anuluj"
@@ -4355,7 +4364,7 @@ msgstr "modu³ interfejsu KDE"
 msgid "Messages:"
 msgstr "Komunikaty"
 
-#: modules/gui/kde/preferences.cpp:95
+#: modules/gui/kde/preferences.cpp:96
 #: modules/gui/wxwindows/preferences.cpp:398
 msgid "Plugins"
 msgstr ""
@@ -4702,7 +4711,7 @@ msgstr "Zatrzymuje strumieñ"
 msgid "TTL"
 msgstr ""
 
-#: modules/gui/macosx/output.m:136 modules/gui/wxwindows/streamout.cpp:446
+#: modules/gui/macosx/output.m:136 modules/gui/wxwindows/streamout.cpp:522
 msgid "Encapsulation Method"
 msgstr ""
 
@@ -4726,8 +4735,8 @@ msgid "Transcode options"
 msgstr "Wstrzymuje strumieñ"
 
 #: modules/gui/macosx/output.m:153 modules/gui/macosx/output.m:158
-#: modules/gui/wxwindows/streamout.cpp:521
-#: modules/gui/wxwindows/streamout.cpp:558
+#: modules/gui/wxwindows/streamout.cpp:600
+#: modules/gui/wxwindows/streamout.cpp:640
 msgid "Bitrate (kb/s)"
 msgstr ""
 
@@ -5101,7 +5110,7 @@ msgstr ""
 msgid "CD Audio"
 msgstr "D¼wiêk"
 
-#: modules/gui/wxwindows/open.cpp:854 modules/gui/wxwindows/streamout.cpp:649
+#: modules/gui/wxwindows/open.cpp:854 modules/gui/wxwindows/streamout.cpp:750
 #, fuzzy
 msgid "Save file"
 msgstr "Wybierz plik"
@@ -5172,47 +5181,61 @@ msgstr "Wy¶wietlanie podpowiedzi dla opcji konfiguracji."
 msgid "Advanced options"
 msgstr "modu³ d¼wiêkowy ALSA"
 
-#: modules/gui/wxwindows/streamout.cpp:170
+#: modules/gui/wxwindows/streamout.cpp:186
 msgid "Stream output MRL"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:174
+#: modules/gui/wxwindows/streamout.cpp:190
 #, fuzzy
 msgid "Destination Target:"
 msgstr "Otwiera plik"
 
-#: modules/gui/wxwindows/streamout.cpp:177
+#: modules/gui/wxwindows/streamout.cpp:193
 msgid ""
 "You can use this field directly by typing the full MRL you want to open.\n"
 "Alternatively, the field will be filled automatically when you use the "
 "controls below"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:340
+#: modules/gui/wxwindows/streamout.cpp:369
 msgid "Output Methods"
 msgstr ""
 
-#: modules/gui/wxwindows/streamout.cpp:346
+#: modules/gui/wxwindows/streamout.cpp:375
 #, fuzzy
 msgid "Play locally"
 msgstr "Zwalnia odtwarzanie"
 
-#: modules/gui/wxwindows/streamout.cpp:370
+#: modules/gui/wxwindows/streamout.cpp:399
 #, fuzzy
 msgid "Filename"
 msgstr "nazwa pliku dziennika"
 
-#: modules/gui/wxwindows/streamout.cpp:484
+#: modules/gui/wxwindows/streamout.cpp:475
+#, fuzzy
+msgid "Miscellaneous Options"
+msgstr "Ró¿ne"
+
+#: modules/gui/wxwindows/streamout.cpp:487
+msgid "SAP Announce"
+msgstr ""
+
+#: modules/gui/wxwindows/streamout.cpp:489
+#, fuzzy
+msgid "Channel Name "
+msgstr "Serwer kana³ów"
+
+#: modules/gui/wxwindows/streamout.cpp:560
 #, fuzzy
 msgid "Transcoding options"
 msgstr "Czas trwania"
 
-#: modules/gui/wxwindows/streamout.cpp:515
+#: modules/gui/wxwindows/streamout.cpp:593
 #, fuzzy
 msgid "Video codec"
 msgstr "urz±dzenie VCD"
 
-#: modules/gui/wxwindows/streamout.cpp:552
+#: modules/gui/wxwindows/streamout.cpp:633
 #, fuzzy
 msgid "Audio codec"
 msgstr "urz±dzenie VCD"
@@ -5395,7 +5418,35 @@ msgstr ""
 msgid "Qt Embedded GUI helper"
 msgstr "modu³ demux"
 
-#: modules/misc/sap.c:161
+#: modules/misc/sap.c:144 modules/misc/sap.c:145
+msgid "SAP multicast address"
+msgstr ""
+
+#: modules/misc/sap.c:146
+msgid "No IPv4-SAP listening"
+msgstr ""
+
+#: modules/misc/sap.c:147
+msgid "Set this if you do not want SAP to listen for IPv4 announces"
+msgstr ""
+
+#: modules/misc/sap.c:148
+msgid "IPv6-SAP listening"
+msgstr ""
+
+#: modules/misc/sap.c:149
+msgid "Set this if you want SAP to listen for IPv6 announces"
+msgstr ""
+
+#: modules/misc/sap.c:150
+msgid "IPv6 SAP scope"
+msgstr ""
+
+#: modules/misc/sap.c:151
+msgid "Sets the scope for IPv6 announces (default is 8)"
+msgstr ""
+
+#: modules/misc/sap.c:167
 #, fuzzy
 msgid "SAP interface"
 msgstr "interfejs sieciowy"
@@ -5499,7 +5550,7 @@ msgstr "Zatrzymuje strumieñ"
 msgid "Standard stream"
 msgstr "Zatrzymuje strumieñ"
 
-#: modules/stream_out/transcode.c:68
+#: modules/stream_out/transcode.c:71
 #, fuzzy
 msgid "Transcode stream"
 msgstr "Wstrzymuje strumieñ"
@@ -5659,6 +5710,44 @@ msgstr "ró¿ne modu³y efektów obrazu"
 #, fuzzy
 msgid "invert video filter"
 msgstr "modu³ odwracania obrazu"
+
+#: modules/video_filter/logo.c:58
+#, fuzzy
+msgid "Logo File"
+msgstr "Plik"
+
+#: modules/video_filter/logo.c:59
+msgid "It must be a PNG in RGBA 8bits (for now)"
+msgstr ""
+
+#: modules/video_filter/logo.c:60
+msgid "x postion of the logo"
+msgstr ""
+
+#: modules/video_filter/logo.c:61 modules/video_filter/logo.c:63
+msgid "You can move the logo by left-clicking on it"
+msgstr ""
+
+#: modules/video_filter/logo.c:62
+msgid "y position of the logo"
+msgstr ""
+
+#: modules/video_filter/logo.c:64
+msgid "transparency of the logo"
+msgstr ""
+
+#: modules/video_filter/logo.c:65
+msgid "You can change it by middle-clicking and moving mouse left or right"
+msgstr ""
+
+#: modules/video_filter/logo.c:68
+msgid "logo"
+msgstr ""
+
+#: modules/video_filter/logo.c:73
+#, fuzzy
+msgid "logo video filter"
+msgstr "modu³ ¶ciany obrazu (image wall)"
 
 #: modules/video_filter/motionblur.c:54
 msgid "Blur factor"
@@ -6424,10 +6513,6 @@ msgstr "modu³ interfejsu"
 #~ msgstr "modu³ dekodera podtytu³ów DVD"
 
 #, fuzzy
-#~ msgid "Theora decoder module"
-#~ msgstr "modu³ dekodera podtytu³ów DVD"
-
-#, fuzzy
 #~ msgid "User"
 #~ msgstr "Przyspiesz"
 
@@ -6587,7 +6672,3 @@ msgstr "modu³ interfejsu"
 #, fuzzy
 #~ msgid "Jump to next chapter"
 #~ msgstr "Wybierz nastêpny rozdzia³"
-
-#, fuzzy
-#~ msgid "Channel Server"
-#~ msgstr "Serwer kana³ów"
