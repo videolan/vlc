@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.22 2003/12/06 22:41:40 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.23 2003/12/07 18:58:38 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -380,6 +380,7 @@ void onPlay(GtkButton *button, gpointer user_data)
         {
             vlc_mutex_unlock( &p_playlist->object_lock );
             playlist_Play( p_playlist );
+            gdk_window_lower( p_intf->p_sys->p_window->window );
         }
         else
         {
@@ -399,6 +400,7 @@ void onStop(GtkButton *button, gpointer user_data)
     {
         playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
+        gdk_window_raise( p_intf->p_sys->p_window->window );
     }
 }
 
@@ -518,15 +520,7 @@ void onFileListRow(GtkTreeView *treeview, GtkTreePath *path,
                     g_object_unref(p_store);
                 }
             }
-            else
-            {
-                gtk_tree_selection_selected_foreach(p_selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) treeview);
-            }
         }
-    }
-    else
-    {
-        gtk_tree_selection_selected_foreach(p_selection, (GtkTreeSelectionForeachFunc) &addSelectedToPlaylist, (gpointer) treeview);
     }
 }
 
@@ -749,6 +743,39 @@ gboolean onPlaylistRowSelected(GtkTreeView *treeview, gboolean start_editing, gp
 void onPlaylistRow(GtkTreeView *treeview, GtkTreePath *path,
                    GtkTreeViewColumn *column, gpointer user_data)
 {
+    intf_thread_t *p_intf = GtkGetIntf( GTK_WIDGET(treeview) );
+    GtkTreeSelection *p_selection = gtk_tree_view_get_selection(treeview);
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    if( p_playlist == NULL )
+    {
+        return; // FALSE;
+    }
+
+    if (gtk_tree_selection_count_selected_rows(p_selection) == 1)
+    {
+        GtkTreeModel *p_model;
+        GtkTreeIter   iter;
+        int           i_row;
+
+        /* This might be a directory selection */
+        p_model = gtk_tree_view_get_model(treeview);
+        if (!p_model)
+        {
+            msg_Err(p_intf, "PDA: Playlist model contains a NULL pointer\n" );
+            return;
+        }
+        if (!gtk_tree_model_get_iter(p_model, &iter, path))
+        {
+            msg_Err( p_intf, "PDA: Playlist could not get iter from model" );
+            return;
+        }
+
+        gtk_tree_model_get(p_model, &iter, 2, &i_row, -1);
+        playlist_Goto( p_playlist, i_row );
+    }
+    vlc_object_release( p_playlist );
 }
 
 
