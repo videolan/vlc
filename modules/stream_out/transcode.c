@@ -1219,8 +1219,10 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
 
     /* The dimensions will be set properly later on.
      * Just put sensible values so we can test if there is an encoder. */
-    id->p_encoder->fmt_in.video.i_width = 16;
-    id->p_encoder->fmt_in.video.i_height = 16;
+    id->p_encoder->fmt_in.video.i_width =
+        id->f_src.video.i_width ?  id->f_src.video.i_width : 16;
+    id->p_encoder->fmt_in.video.i_height =
+        id->f_src.video.i_height ? id->f_src.video.i_height : 16;
 
     id->p_encoder->fmt_in.video.i_frame_rate = 25; /* FIXME as it break mpeg */
     id->p_encoder->fmt_in.video.i_frame_rate_base= 1;
