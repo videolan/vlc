@@ -188,7 +188,7 @@ while test $# -gt 0; do
       usage 1 1>&1
       ;;
     vlc)
-      cppflags="${cppflags} -D__VLC__"
+      cppflags="${cppflags} -D__VLC__ -I${top_builddir}src/misc"
       ;;
     plugin)
       echo_plugin=yes
