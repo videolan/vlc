@@ -2,7 +2,7 @@
  * cdrom_internals.h: cdrom tools private header
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom_internals.h,v 1.1 2003/05/17 20:30:31 gbazin Exp $
+ * $Id: cdrom_internals.h,v 1.2 2003/05/18 15:44:03 gbazin Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -134,7 +134,9 @@ typedef struct __RAW_READ_INFO {
 
 #define READ_CD 0xbe
 #define SECTOR_TYPE_MODE2_FORM2 0x14
+#define SECTOR_TYPE_CDDA 0x04
 #define READ_CD_RAW_MODE2 0xF0
+#define READ_CD_USERDATA 0x10
 
 #define READ_TOC 0x43
 #define READ_TOC_FORMAT_TOC 0x0

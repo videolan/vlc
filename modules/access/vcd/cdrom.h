@@ -2,7 +2,7 @@
  * cdrom.h: cdrom tools header
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.h,v 1.5 2003/05/17 20:30:31 gbazin Exp $
+ * $Id: cdrom.h,v 1.6 2003/05/18 15:44:03 gbazin Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -21,6 +21,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#define CDDA_TYPE 0
+#define VCD_TYPE 1
 
 /* where the data start on a VCD sector */
 #define VCD_DATA_START 24
@@ -90,5 +93,5 @@ typedef struct entries_sect_s
 vcddev_t *ioctl_Open         ( vlc_object_t *, const char * );
 void      ioctl_Close        ( vlc_object_t *, vcddev_t * );
 int       ioctl_GetTracksMap ( vlc_object_t *, const vcddev_t *, int ** );
-int       ioctl_ReadSector   ( vlc_object_t *, const vcddev_t *,
-                               int, byte_t *, size_t, size_t );
+int       ioctl_ReadSectors  ( vlc_object_t *, const vcddev_t *,
+                               int, byte_t *, int, int );

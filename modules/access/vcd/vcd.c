@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.20 2003/05/17 20:30:31 gbazin Exp $
+ * $Id: vcd.c,v 1.21 2003/05/18 15:44:03 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -297,9 +297,9 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
 
     for ( i_index = 0 ; i_index < i_blocks ; i_index++ )
     {
-        if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->vcddev,
-             p_vcd->i_sector, p_buffer + i_index * VCD_DATA_SIZE,
-             VCD_DATA_START, VCD_DATA_SIZE ) < 0 )
+        if ( ioctl_ReadSectors( VLC_OBJECT(p_input), p_vcd->vcddev,
+             p_vcd->i_sector, p_buffer + i_index * VCD_DATA_SIZE, 1,
+             VCD_TYPE ) < 0 )
         {
             msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );
             return -1;
@@ -351,9 +351,8 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
 
     if ( i_len % VCD_DATA_SIZE ) /* this should not happen */
     {
-        if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->vcddev,
-             p_vcd->i_sector, p_last_sector, VCD_DATA_START,
-             VCD_DATA_SIZE ) < 0 )
+        if ( ioctl_ReadSectors( VLC_OBJECT(p_input), p_vcd->vcddev,
+             p_vcd->i_sector, p_last_sector, 1, VCD_TYPE ) < 0 )
         {
             msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );
             return -1;
@@ -499,8 +498,8 @@ static int VCDEntryPoints( input_thread_t * p_input )
         return -1;
     }
 
-    if( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->vcddev,
-        VCD_ENTRIES_SECTOR, p_sector, VCD_DATA_START, VCD_DATA_SIZE ) < 0 )
+    if( ioctl_ReadSectors( VLC_OBJECT(p_input), p_vcd->vcddev,
+        VCD_ENTRIES_SECTOR, p_sector, 1, VCD_TYPE ) < 0 )
     {
         msg_Err( p_input, "could not read entry points sector" );
         free( p_sector );

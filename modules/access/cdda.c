@@ -2,7 +2,7 @@
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cdda.c,v 1.1 2003/05/17 20:30:31 gbazin Exp $
+ * $Id: cdda.c,v 1.2 2003/05/18 15:44:03 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -240,6 +240,9 @@ static int CDDAOpen( vlc_object_t *p_this )
     p_input->pf_set_area = CDDASetArea;
     p_input->pf_set_program = CDDASetProgram;
 
+    /* Update default_pts to a suitable value for cdda access */
+    p_input->i_pts_delay = config_GetInt( p_input, "cdda-caching" ) * 1000;
+
     return 0;
 }
 
@@ -277,16 +280,15 @@ static int CDDARead( input_thread_t * p_input, byte_t * p_buffer,
 
     i_blocks = i_len / CDDA_DATA_SIZE;
 
+    if ( ioctl_ReadSectors( VLC_OBJECT(p_input), p_cdda->vcddev,
+             p_cdda->i_sector, p_buffer, i_blocks, CDDA_TYPE ) < 0 )
+    {
+        msg_Err( p_input, "could not read sector %d", p_cdda->i_sector );
+        return -1;
+    }
+
     for ( i_index = 0; i_index < i_blocks; i_index++ )
     {
-        if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_cdda->vcddev,
-                 p_cdda->i_sector, p_buffer + i_index * CDDA_DATA_SIZE,
-                 CDDA_DATA_START, CDDA_DATA_SIZE ) < 0 )
-        {
-            msg_Err( p_input, "could not read sector %d", p_cdda->i_sector );
-            return -1;
-        }
-
         p_cdda->i_sector ++;
         if ( p_cdda->i_sector == p_cdda->p_sectors[p_cdda->i_track + 1] )
         {
