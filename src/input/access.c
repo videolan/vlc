@@ -116,6 +116,13 @@ access_t *__access2_New( vlc_object_t *p_obj, char *psz_mrl )
     p_access->pf_seek    = NULL;
     p_access->pf_control = NULL;
     p_access->p_sys      = NULL;
+    p_access->info.i_update = 0;
+    p_access->info.i_size   = 0;
+    p_access->info.i_pos    = 0;
+    p_access->info.b_eof    = VLC_FALSE;
+    p_access->info.i_title  = 0;
+    p_access->info.i_seekpoint = 0;
+
 
     /* Before module_Need (for var_Create...) */
     vlc_object_attach( p_access, p_obj );
