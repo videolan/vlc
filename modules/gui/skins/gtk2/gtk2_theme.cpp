@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.2 2003/04/13 17:46:22 asmax Exp $
+ * $Id: gtk2_theme.cpp,v 1.3 2003/04/13 19:09:59 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -22,6 +22,7 @@
  * USA.
  *****************************************************************************/
 
+#if !defined WIN32
 
 //--- GTK2 -----------------------------------------------------------------
 #include <gdk/gdk.h>
@@ -380,3 +381,4 @@ void GTK2Theme::ChangeTaskbar()
 }
 //---------------------------------------------------------------------------
 
+#endif

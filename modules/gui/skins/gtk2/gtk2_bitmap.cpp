@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.1 2003/04/12 21:43:27 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.2 2003/04/13 19:09:59 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -22,6 +22,7 @@
  * USA.
  *****************************************************************************/
 
+#if !defined WIN32
 
 //--- GTK2 -----------------------------------------------------------------
 //#define WINVER  0x0500
@@ -171,3 +172,4 @@ void GTK2Bitmap::SetBmpPixel( int x, int y, int color )
 }
 //---------------------------------------------------------------------------
 
+#endif

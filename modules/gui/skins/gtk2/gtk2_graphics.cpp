@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.3 2003/04/13 17:46:22 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.4 2003/04/13 19:09:59 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -22,6 +22,7 @@
  * USA.
  *****************************************************************************/
 
+#if !defined WIN32
 
 //--- GTK2 -----------------------------------------------------------------
 #include <gdk/gdk.h>
@@ -141,3 +142,4 @@ bool GTK2Region::Hit( int x, int y )
 }
 //---------------------------------------------------------------------------
 
+#endif
