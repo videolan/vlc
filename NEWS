@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.52 2003/06/22 15:03:33 hartman Exp $
+$Id: NEWS,v 1.53 2003/06/22 18:07:23 gbazin Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -17,6 +17,7 @@ Input demux:
  * Better detection of AAC and mp3 files
  * Support for OpenDML avi files
  * More complete .mp4/.mov support
+ * Very early support for the Matroska container format (don't complain if it doesn't work ;)
 
 Codecs:
  * VLC's own MPEG1/2 decoder has been replaced with libmpeg2
