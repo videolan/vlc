@@ -2,11 +2,11 @@
  * controls.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.60 2004/01/25 17:01:57 murray Exp $
+ * $Id: controls.m,v 1.61 2004/02/17 03:12:00 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
- *          Derk-Jan Hartman <thedj@users.sourceforge.net>
+ *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@
     }
     if( p_input && val.i_int != PAUSE_S )
     {
-        vout_OSDMessage( VLC_OBJECT(p_intf), _( "Pause" ) );
+        vout_OSDMessage( p_intf, _( "Pause" ) );
         val.i_int = PAUSE_S;
         var_Set( p_input, "state", val );
     }
@@ -70,7 +70,7 @@
             if( p_playlist->i_size )
             {
                 vlc_mutex_unlock( &p_playlist->object_lock );
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Play" ) );
+                vout_OSDMessage( p_intf, _( "Play" ) );
                 playlist_Play( p_playlist );
                 vlc_object_release( p_playlist );
             }
@@ -92,7 +92,7 @@
                                                        FIND_ANYWHERE );
     if( p_playlist != NULL )
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Stop" ) );
+        vout_OSDMessage( p_intf, _( "Stop" ) );
         playlist_Stop( p_playlist );
         vlc_object_release( p_playlist );
     }
@@ -108,7 +108,7 @@
         vlc_value_t val; val.b_bool = VLC_TRUE;
 
         var_Set( p_input, "rate-faster", val );
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Faster" ) );
+        vout_OSDMessage( p_intf, _( "Faster" ) );
         vlc_object_release( p_input );
     }
 }
@@ -123,7 +123,7 @@
         vlc_value_t val; val.b_bool = VLC_TRUE;
 
         var_Set( p_input, "rate-slower", val );
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Slower" ) );
+        vout_OSDMessage( p_intf, _( "Slower" ) );
         vlc_object_release( p_input );
     }
 }
@@ -137,7 +137,7 @@
     {
         playlist_Prev( p_playlist );
         vlc_object_release( p_playlist );
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Previous" ) );
+        vout_OSDMessage( p_intf, _( "Previous" ) );
     }
 }
 
@@ -150,7 +150,7 @@
     {
         playlist_Next( p_playlist );
         vlc_object_release( p_playlist );
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Next" ) );
+        vout_OSDMessage( p_intf, _( "Next" ) );
     }
 }
 
@@ -170,11 +170,11 @@
     var_Set( p_playlist, "random", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Random On" ) );
+        vout_OSDMessage( p_intf, _( "Random On" ) );
     }
     else
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Random Off" ) );
+        vout_OSDMessage( p_intf, _( "Random Off" ) );
     }    
 
     p_intf->p_sys->b_playlist_update = VLC_TRUE;
@@ -198,11 +198,11 @@
     var_Set( p_playlist, "repeat", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Repeat All" ) );
+        vout_OSDMessage( p_intf, _( "Repeat All" ) );
     }
     else
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Repeat Off" ) );
+        vout_OSDMessage( p_intf, _( "Repeat Off" ) );
     }
 
     p_intf->p_sys->b_playlist_update = VLC_TRUE;    
@@ -226,11 +226,11 @@
     var_Set( p_playlist, "loop", val );
     if( val.b_bool )
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Repeat One" ) );
+        vout_OSDMessage( p_intf, _( "Repeat One" ) );
     }
     else
     {
-        vout_OSDMessage( (vlc_object_t *)p_intf, _( "Repeat Off" ) );
+        vout_OSDMessage( p_intf, _( "Repeat Off" ) );
     }    
 
     p_intf->p_sys->b_playlist_update = VLC_TRUE;
@@ -317,14 +317,12 @@
 {
     intf_thread_t * p_intf = [NSApp getIntf];
     audio_volume_t i_volume;
-    char string[9];
 
     aout_VolumeGet( p_intf, &i_volume );
 
     [o_volumeslider setFloatValue: (float)(i_volume / AOUT_VOLUME_STEP)];
 
-    sprintf( string, "Vol %d%%", i_volume*100/AOUT_VOLUME_MAX );
-    vout_OSDMessage( (vlc_object_t *)p_intf, string );
+    vout_OSDMessage( p_intf, "Vol %d%%", i_volume*100/AOUT_VOLUME_MAX );
 }
 
 - (IBAction)windowAction:(id)sender

@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: video_text.c,v 1.51 2004/02/15 18:22:26 sigmunau Exp $
+ * $Id: video_text.c,v 1.52 2004/02/17 03:12:00 hartman Exp $
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -88,7 +88,7 @@ void vout_ShowTextAbsolute( vout_thread_t *p_vout, char *psz_string,
  * \brief Write an informative message at the default location,
  *        for the default duration and only if the OSD option is enabled.
  * \param p_caller The object that called the function.
- * \param psz_string The text to be shown
+ * \param psz_format printf style formatting
  **/
 void __vout_OSDMessage( vlc_object_t *p_caller, char *psz_format, ... )
 {

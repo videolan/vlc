@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: hotkeys.c,v 1.16 2004/01/25 16:17:03 anil Exp $
+ * $Id: hotkeys.c,v 1.17 2004/02/17 03:12:00 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -232,24 +232,20 @@ static void Run( intf_thread_t *p_intf )
         if( i_action == ACTIONID_QUIT )
         {
             p_intf->p_vlc->b_die = VLC_TRUE;
-            vout_OSDMessage( VLC_OBJECT(p_intf), _( "Quit" ) );
+            vout_OSDMessage( p_intf, _( "Quit" ) );
             continue;
         }
         else if( i_action == ACTIONID_VOL_UP )
         {
             audio_volume_t i_newvol;
-            char string[9];
             aout_VolumeUp( p_intf, 1, &i_newvol );
-            sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
-            vout_OSDMessage( VLC_OBJECT(p_intf), string );
+            vout_OSDMessage( p_intf, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
         }
         else if( i_action == ACTIONID_VOL_DOWN )
         {
             audio_volume_t i_newvol;
-            char string[9];
             aout_VolumeDown( p_intf, 1, &i_newvol );
-            sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
-            vout_OSDMessage( VLC_OBJECT(p_intf), string );
+            vout_OSDMessage( p_intf, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX);
         }
         else if( i_action == ACTIONID_VOL_MUTE )
         {
@@ -257,13 +253,11 @@ static void Run( intf_thread_t *p_intf )
             aout_VolumeMute( p_intf, &i_newvol );
             if( i_newvol == 0 )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Mute" ) );
+                vout_OSDMessage( p_intf, _( "Mute" ) );
             }
             else
             {
-                char string[9];
-                sprintf( string, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
-                vout_OSDMessage( VLC_OBJECT(p_intf), string );
+                vout_OSDMessage( p_intf, "Vol %d%%", i_newvol*100/AOUT_VOLUME_MAX );
             }
         }
         else if( i_action == ACTIONID_FULLSCREEN )
@@ -297,7 +291,7 @@ static void Run( intf_thread_t *p_intf )
             }
             if( p_input && val.i_int != PAUSE_S )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Pause" ) );
+                vout_OSDMessage( p_intf, _( "Pause" ) );
                 val.i_int = PAUSE_S;
                 var_Set( p_input, "state", val );
             }
@@ -311,7 +305,7 @@ static void Run( intf_thread_t *p_intf )
                     if( p_playlist->i_size )
                     {
                         vlc_mutex_unlock( &p_playlist->object_lock );
-                        vout_OSDMessage( VLC_OBJECT(p_intf), _( "Play" ) );
+                        vout_OSDMessage( p_intf, _( "Play" ) );
                         playlist_Play( p_playlist );
                         vlc_object_release( p_playlist );
                     }
@@ -322,43 +316,43 @@ static void Run( intf_thread_t *p_intf )
         {
             if( i_action == ACTIONID_PAUSE )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Pause" ) );
+                vout_OSDMessage( p_intf, _( "Pause" ) );
                 val.i_int = PAUSE_S;
                 var_Set( p_input, "state", val );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_10SEC )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -10 seconds" ) );
+                vout_OSDMessage( p_intf, _( "Jump -10 seconds" ) );
                 val.i_time = -10000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_10SEC )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +10 seconds" ) );
+                vout_OSDMessage( p_intf, _( "Jump +10 seconds" ) );
                 val.i_time = 10000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_1MIN )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -1 minute" ) );
+                vout_OSDMessage( p_intf, _( "Jump -1 minute" ) );
                 val.i_time = -60000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_1MIN )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +1 minute" ) );
+                vout_OSDMessage( p_intf, _( "Jump +1 minute" ) );
                 val.i_time = 60000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_BACKWARD_5MIN )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump -5 minutes" ) );
+                vout_OSDMessage( p_intf, _( "Jump -5 minutes" ) );
                 val.i_time = -300000000;
                 var_Set( p_input, "time-offset", val );
             }
             else if( i_action == ACTIONID_JUMP_FORWARD_5MIN )
             {
-                vout_OSDMessage( VLC_OBJECT(p_intf), _( "Jump +5 minutes" ) );
+                vout_OSDMessage( p_intf, _( "Jump +5 minutes" ) );
                 val.i_time = 300000000;
                 var_Set( p_input, "time-offset", val );
             }
@@ -423,16 +417,12 @@ static void Run( intf_thread_t *p_intf )
                                                                                                                             
                     if( dur != -1 )
                     {
-                        char psz_position[2*MSTRTIME_MAX_SIZE + 3];
                         secstotimestr( psz_duration, dur/1000000 );
-                        strcpy( psz_position, psz_time );
-                        strcat( psz_position, " / " );
-                        strcat( psz_position, psz_duration );
-                        vout_OSDMessage( VLC_OBJECT(p_playlist), psz_position );
+                        vout_OSDMessage( p_playlist, "%s / %s", psz_time, psz_duration );
                     }
                     else if( i_seconds > 0 )
                     { 
-                        vout_OSDMessage( VLC_OBJECT(p_playlist), psz_time );
+                        vout_OSDMessage( p_playlist, psz_time );
                     }
                     vlc_object_release( p_playlist );
                 }
