@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.12 2002/11/21 10:12:34 gbazin Exp $
+ * $Id: ogg.c,v 1.13 2002/11/26 17:38:33 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -356,7 +356,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
 {
     pes_packet_t  *p_pes;
     data_packet_t *p_data;
-    //demux_sys_t *p_ogg = p_input->p_demux_data;
+    vlc_bool_t b_trash = VLC_FALSE;
     int i_header_len = 0;
 
     if( p_stream->b_force_backup )
@@ -390,7 +390,14 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
         }
     }
 
-    if( !p_stream->p_es->p_decoder_fifo )
+    vlc_mutex_lock( &p_input->stream.control.control_lock );
+    if( p_stream->i_cat == AUDIO_ES && p_input->stream.control.b_mute )
+    {
+        b_trash = VLC_TRUE;
+    }
+    vlc_mutex_unlock( &p_input->stream.control.control_lock );
+
+    if( !p_stream->p_es->p_decoder_fifo || b_trash )
     {
         /* This stream isn't currently selected so we don't need to decode it,
          * but we do need to store its pcr as it might be selected later on. */
