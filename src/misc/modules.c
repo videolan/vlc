@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.132 2003/09/23 16:07:49 gbazin Exp $
+ * $Id: modules.c,v 1.133 2003/09/26 11:30:06 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -582,16 +582,6 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
     /* If the user provided a plugin path, we add it to the list */
     path[ sizeof(path)/sizeof(char*) - 2 ] = config_GetPsz( p_this,
                                                             "plugin-path" );
-
-#if defined( WIN32 ) && !defined( UNDER_CE ) && !defined( _MSC_VER )
-    /* If there is no 'plugins' nor 'modules' subdirectory, the user may have
-     * screwed up the unzipping stage, so we look into '.' instead */
-    if( !opendir( "plugins" ) && !opendir( "modules" )
-        && !strcmp( *ppsz_path, "modules" ) )
-    {
-        *ppsz_path = ".";
-    }
-#endif
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
