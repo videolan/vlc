@@ -110,8 +110,13 @@ int spu_Init( spu_t *p_spu )
     var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_spu, "sub-filter", &val );
     psz_filter = psz_filter_orig = val.psz_string;
-    if( psz_filter && *psz_filter )
+    while( psz_filter && *psz_filter )
     {
+        char *psz_parser = strchr( psz_filter, ',' );
+        if( !psz_parser ) psz_parser = strchr( psz_filter, ':' );
+
+        if( psz_parser ) *psz_parser++ = 0;
+
         p_spu->pp_filter[p_spu->i_filter] =
             vlc_object_create( p_spu, VLC_OBJECT_FILTER );
         vlc_object_attach( p_spu->pp_filter[p_spu->i_filter], p_spu );
@@ -134,6 +139,13 @@ int spu_Init( spu_t *p_spu )
             vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
             vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
         }
+
+        if( p_spu->i_filter >= 10 )
+        {
+            msg_Dbg( p_spu, "can't add anymore filters" );
+        }
+
+        psz_filter = psz_parser;
     }
     if( psz_filter_orig ) free( psz_filter_orig );
 
