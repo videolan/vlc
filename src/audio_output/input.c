@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.37 2003/08/23 14:51:30 fenrir Exp $
+ * $Id: input.c,v 1.38 2003/09/02 18:06:45 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -68,7 +68,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 
         aout_FifoDestroy( p_aout, &p_input->fifo );
         p_input->b_error = 1;
-     }
+        return -1;
+    }
 
     /* Now add user filters */
     if( ( psz_filters = config_GetPsz( p_aout , "audio-filter" ) ) )
@@ -77,8 +78,10 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         char *psz_next;
         audio_sample_format_t format_in, format_out;
 
-        memcpy( &format_in, &p_aout->mixer.mixer, sizeof( audio_sample_format_t ) );
-        memcpy( &format_out,&p_aout->mixer.mixer, sizeof( audio_sample_format_t ) );
+        memcpy( &format_in, &p_aout->mixer.mixer,
+                sizeof( audio_sample_format_t ) );
+        memcpy( &format_out,&p_aout->mixer.mixer,
+                sizeof( audio_sample_format_t ) );
 
         format_in.i_rate  = p_input->input.i_rate;
         format_out.i_rate = p_input->input.i_rate;
@@ -112,22 +115,25 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             p_filter = vlc_object_create( p_aout, sizeof(aout_filter_t) );
             if( p_filter == NULL )
             {
-                msg_Err( p_aout, "cannot add user filter %s (skipped)", psz_parser );
+                msg_Err( p_aout, "cannot add user filter %s (skipped)",
+                         psz_parser );
                 psz_parser = psz_next;
                 continue;
             }
 
             vlc_object_attach( p_filter , p_aout );
-            memcpy( &p_filter->input, &format_in, sizeof(audio_sample_format_t) );
-            memcpy( &p_filter->output,&format_out,sizeof(audio_sample_format_t) );
-
+            memcpy( &p_filter->input, &format_in,
+                    sizeof(audio_sample_format_t) );
+            memcpy( &p_filter->output, &format_out,
+                    sizeof(audio_sample_format_t) );
 
             p_filter->p_module =
                 module_Need( p_filter,"audio filter", psz_parser );
 
             if( p_filter->p_module== NULL )
             {
-                msg_Err( p_aout, "cannot add user filter %s (skipped)", psz_parser );
+                msg_Err( p_aout, "cannot add user filter %s (skipped)",
+                         psz_parser );
 
                 vlc_object_detach( p_filter );
                 vlc_object_destroy( p_filter );
