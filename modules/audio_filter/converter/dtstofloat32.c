@@ -303,7 +303,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if( !dts_syncinfo( p_sys->p_libdts, p_in_buf->p_buffer, &i_flags,
                        &i_sample_rate, &i_bit_rate, &i_frame_length ) )
     {
-        msg_Warn( VLC_OBJECT(p_aout), "libdts couldn't sync on frame" );
+        msg_Warn( p_aout, "libdts couldn't sync on frame" );
         p_out_buf->i_nb_samples = p_out_buf->i_nb_bytes = 0;
         return;
     }
@@ -315,7 +315,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if ( (i_flags & DTS_CHANNEL_MASK) != (p_sys->i_flags & DTS_CHANNEL_MASK)
           && !p_sys->b_dontwarn )
     {
-        msg_Warn( VLC_OBJECT(p_aout),
+        msg_Warn( p_aout,
                   "libdts couldn't do the requested downmix 0x%x->0x%x",
                   p_sys->i_flags  & DTS_CHANNEL_MASK,
                   i_flags & DTS_CHANNEL_MASK );
@@ -334,7 +334,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
         if( dts_block( p_sys->p_libdts ) )
         {
-            msg_Warn( p_filter, "dts_block failed for block %d", i );
+            msg_Warn( p_aout, "dts_block failed for block %d", i );
             break;
         }
 
