@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.28 2002/04/23 14:16:20 sam Exp $
+ * $Id: xcommon.c,v 1.29 2002/04/28 11:56:13 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -638,7 +638,14 @@ static int vout_Manage( vout_thread_t *p_vout )
             switch( x_key_symbol )
             {
                  case XK_Escape:
-                     p_main->p_intf->b_die = 1;
+                     if( p_vout->b_fullscreen )
+                     {
+                         p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                     }
+                     else
+                     {
+                         p_main->p_intf->b_die = 1;
+                     }
                      break;
                  case XK_Menu:
                      p_main->p_intf->b_menu_change = 1;

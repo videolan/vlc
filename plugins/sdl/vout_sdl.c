@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.87 2002/03/21 22:10:33 gbazin Exp $
+ * $Id: vout_sdl.c,v 1.88 2002/04/28 11:56:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -407,8 +407,18 @@ static int vout_Manage( vout_thread_t *p_vout )
 
             switch( event.key.keysym.sym )
             {
-            case SDLK_q:                                             /* quit */
             case SDLK_ESCAPE:
+                if( p_vout->b_fullscreen )
+                {
+                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                }
+                else
+                {
+                    p_main->p_intf->b_die = 1;
+                }
+                break;
+
+            case SDLK_q:                                             /* quit */
                 p_main->p_intf->b_die = 1;
                 break;
 
