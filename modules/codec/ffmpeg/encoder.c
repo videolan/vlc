@@ -508,10 +508,14 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     frame.top_field_first = p_pict->b_top_field_first;
 #endif
 
+#if LIBAVCODEC_BUILD < 4702
     /* Set the pts of the frame being encoded (segfaults with mpeg4!)*/
     if( p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', 'g', 'v' ) ||
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '1', 'v' ) ||
         p_enc->fmt_out.i_codec == VLC_FOURCC( 'm', 'p', '2', 'v' ) )
+#else
+    if( 1 )
+#endif
     {
         frame.pts = p_pict->date ? p_pict->date : AV_NOPTS_VALUE;
 
