@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.35 2002/12/06 16:34:04 sam Exp $
+ * $Id: oss.c,v 1.36 2002/12/07 15:25:26 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -111,7 +111,7 @@ static void Probe( aout_instance_t * p_aout )
     vlc_value_t val;
     int i_format, i_nb_channels;
 
-    var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_ISLIST );
+    var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
 
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
     {

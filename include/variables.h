@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.8 2002/11/11 14:39:11 sam Exp $
+ * $Id: variables.h,v 1.9 2002/12/07 15:25:26 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -69,22 +69,25 @@ struct variable_t
 #define VLC_VAR_FLAGS     0xff00
 
 /* Different types */
-#define VLC_VAR_BOOL      0x0010
-#define VLC_VAR_INTEGER   0x0020
-#define VLC_VAR_STRING    0x0030
-#define VLC_VAR_MODULE    0x0031
-#define VLC_VAR_FILE      0x0032
-#define VLC_VAR_FLOAT     0x0040
-#define VLC_VAR_TIME      0x0050
-#define VLC_VAR_ADDRESS   0x0060
-#define VLC_VAR_COMMAND   0x0070
+#define VLC_VAR_VOID      0x0010
+#define VLC_VAR_BOOL      0x0020
+#define VLC_VAR_INTEGER   0x0030
+#define VLC_VAR_STRING    0x0040
+#define VLC_VAR_MODULE    0x0041
+#define VLC_VAR_FILE      0x0042
+#define VLC_VAR_DIRECTORY 0x0043
+#define VLC_VAR_FLOAT     0x0050
+#define VLC_VAR_TIME      0x0060
+#define VLC_VAR_ADDRESS   0x0070
 #define VLC_VAR_MUTEX     0x0080
 
 /* Additive flags */
-#define VLC_VAR_ISLIST    0x0100
+#define VLC_VAR_HASCHOICE 0x0100
 #define VLC_VAR_HASMIN    0x0200
 #define VLC_VAR_HASMAX    0x0400
 #define VLC_VAR_HASSTEP   0x0800
+
+#define VLC_VAR_ISCOMMAND 0x1000
 
 /*****************************************************************************
  * Variable actions

@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.14 2002/12/06 16:34:06 sam Exp $
+ * $Id: rc.c,v 1.15 2002/12/07 15:25:26 gbazin Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -60,12 +60,18 @@
 static int  Activate     ( vlc_object_t * );
 static void Run          ( intf_thread_t *p_intf );
 
-static int  Playlist     ( vlc_object_t *, char *, char * );
-static int  Quit         ( vlc_object_t *, char *, char * );
-static int  Intf         ( vlc_object_t *, char *, char * );
-static int  Volume       ( vlc_object_t *, char *, char * );
-static int  VolumeMove   ( vlc_object_t *, char *, char * );
-static int  AudioConfig  ( vlc_object_t *, char *, char * );
+static int  Playlist     ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+static int  Quit         ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+static int  Intf         ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+static int  Volume       ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+static int  VolumeMove   ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
+static int  AudioConfig  ( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -140,47 +146,47 @@ static void Run( intf_thread_t *p_intf )
     p_playlist = NULL;
 
     /* Register commands that will be cleaned up upon object destruction */
-    var_Create( p_intf, "quit", VLC_VAR_COMMAND );
-    var_Set( p_intf, "quit", (vlc_value_t)(void*)Quit );
-    var_Create( p_intf, "intf", VLC_VAR_COMMAND );
-    var_Set( p_intf, "intf", (vlc_value_t)(void*)Intf );
+    var_Create( p_intf, "quit", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "quit", Quit, NULL );
+    var_Create( p_intf, "intf", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "intf", Intf, NULL );
 
-    var_Create( p_intf, "play", VLC_VAR_COMMAND );
-    var_Set( p_intf, "play", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "stop", VLC_VAR_COMMAND );
-    var_Set( p_intf, "stop", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "pause", VLC_VAR_COMMAND );
-    var_Set( p_intf, "pause", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "seek", VLC_VAR_COMMAND );
-    var_Set( p_intf, "seek", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "prev", VLC_VAR_COMMAND );
-    var_Set( p_intf, "prev", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "next", VLC_VAR_COMMAND );
-    var_Set( p_intf, "next", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "play", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "play", Playlist, NULL );
+    var_Create( p_intf, "stop", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "stop", Playlist, NULL );
+    var_Create( p_intf, "pause", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "pause", Playlist, NULL );
+    var_Create( p_intf, "seek", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "seek", Playlist, NULL );
+    var_Create( p_intf, "prev", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "prev", Playlist, NULL );
+    var_Create( p_intf, "next", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "next", Playlist, NULL );
 
-    var_Create( p_intf, "title", VLC_VAR_COMMAND );
-    var_Set( p_intf, "title", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "title_n", VLC_VAR_COMMAND );
-    var_Set( p_intf, "title_n", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "title_p", VLC_VAR_COMMAND );
-    var_Set( p_intf, "title_p", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "chapter", VLC_VAR_COMMAND );
-    var_Set( p_intf, "chapter", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "chapter_n", VLC_VAR_COMMAND );
-    var_Set( p_intf, "chapter_n", (vlc_value_t)(void*)Playlist );
-    var_Create( p_intf, "chapter_p", VLC_VAR_COMMAND );
-    var_Set( p_intf, "chapter_p", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "title", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "title", Playlist, NULL );
+    var_Create( p_intf, "title_n", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "title_n", Playlist, NULL );
+    var_Create( p_intf, "title_p", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "title_p", Playlist, NULL );
+    var_Create( p_intf, "chapter", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "chapter", Playlist, NULL );
+    var_Create( p_intf, "chapter_n", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "chapter_n", Playlist, NULL );
+    var_Create( p_intf, "chapter_p", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "chapter_p", Playlist, NULL );
 
-    var_Create( p_intf, "volume", VLC_VAR_COMMAND );
-    var_Set( p_intf, "volume", (vlc_value_t)(void*)Volume );
-    var_Create( p_intf, "volup", VLC_VAR_COMMAND );
-    var_Set( p_intf, "volup", (vlc_value_t)(void*)VolumeMove );
-    var_Create( p_intf, "voldown", VLC_VAR_COMMAND );
-    var_Set( p_intf, "voldown", (vlc_value_t)(void*)VolumeMove );
-    var_Create( p_intf, "adev", VLC_VAR_COMMAND );
-    var_Set( p_intf, "adev", (vlc_value_t)(void*)AudioConfig );
-    var_Create( p_intf, "achan", VLC_VAR_COMMAND );
-    var_Set( p_intf, "achan", (vlc_value_t)(void*)AudioConfig );
+    var_Create( p_intf, "volume", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "volume", Volume, NULL );
+    var_Create( p_intf, "volup", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "volup", VolumeMove, NULL );
+    var_Create( p_intf, "voldown", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "voldown", VolumeMove, NULL );
+    var_Create( p_intf, "adev", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "adev", AudioConfig, NULL );
+    var_Create( p_intf, "achan", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_intf, "achan", AudioConfig, NULL );
 
     while( !p_intf->b_die )
     {
@@ -292,18 +298,18 @@ static void Run( intf_thread_t *p_intf )
             }
 
             /* If the user typed a registered local command, try it */
-            if( var_Type( p_intf, psz_cmd ) == VLC_VAR_COMMAND )
+            if( var_Type( p_intf, psz_cmd ) & VLC_VAR_ISCOMMAND )
             {
                 vlc_value_t val;
                 int i_ret;
 
                 val.psz_string = psz_arg;
-                i_ret = var_Get( p_intf, psz_cmd, &val );
+                i_ret = var_Set( p_intf, psz_cmd, val );
                 printf( "%s: returned %i (%s)\n",
                         psz_cmd, i_ret, vlc_error( i_ret ) );
             }
             /* Or maybe it's a global command */
-            else if( var_Type( p_intf->p_libvlc, psz_cmd ) == VLC_VAR_COMMAND )
+            else if( var_Type( p_intf->p_libvlc, psz_cmd ) & VLC_VAR_ISCOMMAND )
             {
                 vlc_value_t val;
                 int i_ret;
@@ -311,7 +317,7 @@ static void Run( intf_thread_t *p_intf )
                 val.psz_string = psz_arg;
                 /* FIXME: it's a global command, but we should pass the
                  * local object as an argument, not p_intf->p_libvlc. */
-                i_ret = var_Get( p_intf->p_libvlc, psz_cmd, &val );
+                i_ret = var_Set( p_intf->p_libvlc, psz_cmd, val );
                 printf( "%s: returned %i (%s)\n",
                         psz_cmd, i_ret, vlc_error( i_ret ) );
             }
@@ -431,7 +437,8 @@ static void Run( intf_thread_t *p_intf )
     }
 }
 
-static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t * p_input;
     playlist_t *     p_playlist;
@@ -452,7 +459,7 @@ static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
     }
     else if( !strcmp( psz_cmd, "seek" ) )
     {
-        input_Seek( p_input, atoi( psz_arg ),
+        input_Seek( p_input, atoi( newval.psz_string ),
                     INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
     }
     else if( !strcmp( psz_cmd, "chapter" ) ||
@@ -463,10 +470,10 @@ static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
 
         if( !strcmp( psz_cmd, "chapter" ) )
         {
-            if ( *psz_arg )
+            if ( *newval.psz_string )
             {
                 /* Set. */
-                i_chapter = atoi( psz_arg );
+                i_chapter = atoi( newval.psz_string );
             }
             else
             {
@@ -517,10 +524,10 @@ static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
 
         if( !strcmp( psz_cmd, "title" ) )
         {
-            if ( *psz_arg )
+            if ( *newval.psz_string )
             {
                 /* Set. */
-                i_title = atoi( psz_arg );
+                i_title = atoi( newval.psz_string );
             }
             else
             {
@@ -596,18 +603,20 @@ static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
     return VLC_SUCCESS;
 }
 
-static int Quit( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+static int Quit( vlc_object_t *p_this, char const *psz_cmd,
+                 vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     p_this->p_vlc->b_die = VLC_TRUE;
     return VLC_SUCCESS;
 }
 
-static int Intf( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+static int Intf( vlc_object_t *p_this, char const *psz_cmd,
+                 vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_newintf;
     char *psz_oldmodule = config_GetPsz( p_this->p_vlc, "intf" );
 
-    config_PutPsz( p_this->p_vlc, "intf", psz_arg );
+    config_PutPsz( p_this->p_vlc, "intf", newval.psz_string );
     p_newintf = intf_Create( p_this->p_vlc );
     config_PutPsz( p_this->p_vlc, "intf", psz_oldmodule );
 
@@ -629,23 +638,18 @@ static int Intf( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
     return VLC_SUCCESS;
 }
 
-static int Signal( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
-{
-    raise( atoi(psz_arg) );
-    return VLC_SUCCESS;
-}
-
-static int Volume( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+static int Volume( vlc_object_t *p_this, char const *psz_cmd,
+                   vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     aout_instance_t * p_aout;
     int i_error;
     p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT, FIND_ANYWHERE );
     if ( p_aout == NULL ) return VLC_ENOOBJ;
 
-    if ( *psz_arg )
+    if ( *newval.psz_string )
     {
         /* Set. */
-        audio_volume_t i_volume = atoi( psz_arg );
+        audio_volume_t i_volume = atoi( newval.psz_string );
         if ( i_volume > AOUT_VOLUME_MAX )
         {
             printf( "Volume must be in the range %d-%d\n", AOUT_VOLUME_MIN,
@@ -673,11 +677,12 @@ static int Volume( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
     return i_error;
 }
 
-static int VolumeMove( vlc_object_t * p_this, char * psz_cmd, char * psz_arg )
+static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     aout_instance_t * p_aout;
     audio_volume_t i_volume;
-    int i_nb_steps = atoi(psz_arg);
+    int i_nb_steps = atoi(newval.psz_string);
     int i_error = VLC_SUCCESS;
 
     if ( i_nb_steps <= 0 || i_nb_steps > (AOUT_VOLUME_MAX/AOUT_VOLUME_STEP) )
@@ -704,7 +709,8 @@ static int VolumeMove( vlc_object_t * p_this, char * psz_cmd, char * psz_arg )
     return i_error;
 }
 
-static int AudioConfig( vlc_object_t * p_this, char * psz_cmd, char * psz_arg )
+static int AudioConfig( vlc_object_t *p_this, char const *psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     aout_instance_t * p_aout;
     const char * psz_variable;
@@ -725,7 +731,7 @@ static int AudioConfig( vlc_object_t * p_this, char * psz_cmd, char * psz_arg )
         psz_name = "audio channels";
     }
 
-    if ( !*psz_arg )
+    if ( !*newval.psz_string )
     {
         /* Retrieve all registered ***. */
         vlc_value_t val;
@@ -768,7 +774,7 @@ static int AudioConfig( vlc_object_t * p_this, char * psz_cmd, char * psz_arg )
     else
     {
         vlc_value_t val;
-        val.psz_string = psz_arg;
+        val.psz_string = newval.psz_string;
 
         i_error = var_Set( (vlc_object_t *)p_aout, psz_variable, val );
     }
@@ -776,4 +782,3 @@ static int AudioConfig( vlc_object_t * p_this, char * psz_cmd, char * psz_arg )
 
     return i_error;
 }
-

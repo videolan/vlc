@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.15 2002/11/14 22:38:47 massiot Exp $
+ * $Id: sdl.c,v 1.16 2002/12/07 15:25:26 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -105,7 +105,7 @@ static int Open ( vlc_object_t *p_this )
     }
 
     if ( var_Type( p_aout, "audio-device" ) ==
-             (VLC_VAR_STRING | VLC_VAR_ISLIST) )
+             (VLC_VAR_STRING | VLC_VAR_HASCHOICE) )
     {
         /* The user has selected an audio device. */
         vlc_value_t val;
@@ -173,7 +173,7 @@ static int Open ( vlc_object_t *p_this )
         if ( var_Type( p_aout, "audio-device" ) < 0 )
         {
             vlc_value_t val;
-            var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_ISLIST );
+            var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
             val.psz_string = (obtained.channels == 2) ? N_("Stereo") :
                               N_("Mono");
             var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
@@ -185,7 +185,7 @@ static int Open ( vlc_object_t *p_this )
     {
         /* First launch. */
         vlc_value_t val;
-        var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_ISLIST );
+        var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         val.psz_string = N_("Stereo");
         var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
         val.psz_string = N_("Mono");

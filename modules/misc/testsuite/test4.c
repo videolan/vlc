@@ -2,7 +2,7 @@
  * test4.c : Miscellaneous stress tests module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: test4.c,v 1.4 2002/11/10 18:04:22 sam Exp $
+ * $Id: test4.c,v 1.5 2002/12/07 15:25:26 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,43 +41,51 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int    Foo       ( vlc_object_t *, char *, char * );
-
-static int    Callback  ( vlc_object_t *, char *, char * );
+static int    Foo       ( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+static int    Callback  ( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
 static int    MyCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
 static void * MyThread  ( vlc_object_t * );
 
-static int    Stress    ( vlc_object_t *, char *, char * );
+static int    Stress    ( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
 static void * Dummy     ( vlc_object_t * );
 
-static int    Signal    ( vlc_object_t *, char *, char * );
+static int    Signal    ( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("Miscellaneous stress tests") );
-    var_Create( p_module->p_libvlc, "foo-test", VLC_VAR_COMMAND );
-    var_Set( p_module->p_libvlc, "foo-test", (vlc_value_t)(void*)Foo );
-    var_Create( p_module->p_libvlc, "callback-test", VLC_VAR_COMMAND );
-    var_Set( p_module->p_libvlc, "callback-test", (vlc_value_t)(void*)Callback );
-    var_Create( p_module->p_libvlc, "stress-test", VLC_VAR_COMMAND );
-    var_Set( p_module->p_libvlc, "stress-test", (vlc_value_t)(void*)Stress );
-    var_Create( p_module->p_libvlc, "signal", VLC_VAR_COMMAND );
-    var_Set( p_module->p_libvlc, "signal", (vlc_value_t)(void*)Signal );
+    var_Create( p_module->p_libvlc, "foo-test",
+                VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_module->p_libvlc, "foo-test", Foo, NULL );
+    var_Create( p_module->p_libvlc, "callback-test",
+                VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_module->p_libvlc, "callback-test", Callback, NULL );
+    var_Create( p_module->p_libvlc, "stress-test",
+                VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_module->p_libvlc, "stress-test", Stress, NULL );
+    var_Create( p_module->p_libvlc, "signal",
+                VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+    var_AddCallback( p_module->p_libvlc, "signal", Signal, NULL );
 vlc_module_end();
 
 /*****************************************************************************
  * Foo: put anything here
  *****************************************************************************/
-static int Foo( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+static int Foo( vlc_object_t *p_this, char const *psz_cmd,
+                vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vlc_value_t val;
     int i, i_vals;
     vlc_value_t *p_vals;
 
-    var_Create( p_this, "honk", VLC_VAR_STRING | VLC_VAR_ISLIST );
+    var_Create( p_this, "honk", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
 
     val.psz_string = "foo";
     var_Change( p_this, "honk", VLC_VAR_ADDCHOICE, &val );
@@ -121,7 +129,8 @@ static int Foo( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
 /*****************************************************************************
  * Callback: test callback functions
  *****************************************************************************/
-static int Callback( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+static int Callback( vlc_object_t *p_this, char const *psz_cmd,
+                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     int i;
     char psz_var[20];
@@ -244,7 +253,8 @@ static void * MyThread( vlc_object_t *p_this )
 /*****************************************************************************
  * Stress: perform various stress tests
  *****************************************************************************/
-static int Stress( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+static int Stress( vlc_object_t *p_this, char const *psz_cmd,
+                   vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     vlc_object_t **pp_objects;
     mtime_t start;
@@ -252,9 +262,9 @@ static int Stress( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
     char *  psz_blob;
     int     i, i_level;
 
-    if( *psz_arg )
+    if( *newval.psz_string )
     {
-        i_level = atoi( psz_arg );
+        i_level = atoi( newval.psz_string );
         if( i_level <= 0 )
         {
             i_level = 1;
@@ -426,9 +436,9 @@ static void * Dummy( vlc_object_t *p_this )
 /*****************************************************************************
  * Signal: send a signal to the current thread.
  *****************************************************************************/
-static int Signal( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+static int Signal( vlc_object_t *p_this, char const *psz_cmd,
+                   vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    raise( atoi(psz_arg) );
+    raise( atoi(newval.psz_string) );
     return VLC_SUCCESS;
 }
-

@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.30 2002/12/06 10:10:39 sam Exp $
+ * $Id: objects.c,v 1.31 2002/12/07 15:25:27 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -47,7 +47,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  DumpCommand( vlc_object_t *, char *, char * );
+static int  DumpCommand( vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void * );
 
 static vlc_object_t * FindObject    ( vlc_object_t *, int, int );
 static void           DetachObject  ( vlc_object_t * );
@@ -213,15 +214,12 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
 
     if( i_type == VLC_OBJECT_ROOT )
     {
-        vlc_value_t val;
-		val.p_address = DumpCommand;
-
         vlc_mutex_init( p_new, &structure_lock );
 
-        var_Create( p_new, "list", VLC_VAR_COMMAND );
-        var_Set( p_new, "list", val );
-        var_Create( p_new, "tree", VLC_VAR_COMMAND );
-        var_Set( p_new, "tree", val );
+        var_Create( p_new, "list", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+        var_AddCallback( p_new, "list", DumpCommand, NULL );
+        var_Create( p_new, "tree", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
+        var_AddCallback( p_new, "tree", DumpCommand, NULL );
     }
 
     return p_new;
@@ -528,16 +526,17 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
  * vlc objects, and additional information such as their refcount, thread ID,
  * etc. (command "tree"), or the same data as a simple list (command "list").
  *****************************************************************************/
-static int DumpCommand( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     if( *psz_cmd == 't' )
     {
         char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
         vlc_object_t *p_object;
 
-        if( *psz_arg )
+        if( *newval.psz_string )
         {
-            p_object = vlc_object_get( p_this, atoi(psz_arg) );
+            p_object = vlc_object_get( p_this, atoi(newval.psz_string) );
 
             if( !p_object )
             {
@@ -899,4 +898,3 @@ static vlc_list_t * ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
 
     return p_list;
 }
-

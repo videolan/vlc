@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.25 2002/12/06 10:10:39 sam Exp $
+ * $Id: output.c,v 1.26 2002/12/07 15:25:27 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -63,7 +63,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     }
 
     if ( var_Type( p_aout, "audio-channels" ) ==
-             (VLC_VAR_STRING | VLC_VAR_ISLIST) )
+             (VLC_VAR_STRING | VLC_VAR_HASCHOICE) )
     {
         /* The user may have selected a different channels configuration. */
         vlc_value_t val;
@@ -93,7 +93,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     {
         /* Mono - create the audio-channels variable. */
         vlc_value_t val;
-        var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_ISLIST );
+        var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
         {
             /* Go directly to the left channel. */
@@ -118,7 +118,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     {
         /* Stereo - create the audio-channels variable. */
         vlc_value_t val;
-        var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_ISLIST );
+        var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
         val.psz_string = N_("Both");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         val.psz_string = N_("Left");

@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.14 2002/12/06 10:10:40 sam Exp $
+ * $Id: variables.c,v 1.15 2002/12/07 15:25:27 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -167,7 +167,6 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             /* FIXME: TODO */
             break;
         case VLC_VAR_ADDRESS:
-        case VLC_VAR_COMMAND:
             p_var->pf_cmp = CmpAddress;
             p_var->val.p_address = NULL;
             break;
@@ -436,7 +435,7 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
     if( i_var < 0 )
     {
         vlc_mutex_unlock( &p_this->var_lock );
-        return i_var;
+        return 0;
     }
 
     i_type = p_this->p_vars[i_var].i_type;
@@ -541,30 +540,6 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
     }
 
     p_var = &p_this->p_vars[i_var];
-
-    /* Some variables trigger special behaviour. */
-    switch( p_var->i_type & VLC_VAR_TYPE )
-    {
-        case VLC_VAR_COMMAND:
-            if( p_var->val.p_address )
-            {
-                /* We need to save data before releasing the lock */
-                int i_ret;
-                int (*pf_command) (vlc_object_t *, char *, char *) =
-                                          p_var->val.p_address;
-                char *psz_cmd = strdup( p_var->psz_name );
-                char *psz_arg = strdup( p_val->psz_string );
-
-                vlc_mutex_unlock( &p_this->var_lock );
-
-                i_ret = pf_command( p_this, psz_cmd, psz_arg );
-                free( psz_cmd );
-                free( psz_arg );
-
-                return i_ret;
-            }
-            break;
-    }
 
     /* Really get the variable */
     *p_val = p_var->val;
@@ -868,7 +843,7 @@ static int LookupInner( variable_t *p_vars, int i_count, uint32_t i_hash )
 static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
 {
     /* Check that our variable is in the list */
-    if( p_var->i_type & VLC_VAR_ISLIST && p_var->i_choices )
+    if( p_var->i_type & VLC_VAR_HASCHOICE && p_var->i_choices )
     {
         int i;
 
