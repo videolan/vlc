@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.3 2002/11/18 16:39:36 gbazin Exp $
+ * $Id: interface.cpp,v 1.4 2002/11/18 17:31:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -50,6 +50,9 @@
 #include "bitmaps/file.xpm"
 #include "bitmaps/disc.xpm"
 #include "bitmaps/net.xpm"
+#if 0
+#include "bitmaps/sat.xpm"
+#endif
 #include "bitmaps/play.xpm"
 #include "bitmaps/pause.xpm"
 #include "bitmaps/stop.xpm"
