@@ -991,7 +991,7 @@ VLC_ADD_PLUGINS([access_file access_udp access_tcp access_http access_mms])
 VLC_ADD_PLUGINS([access_ftp ipv4])
 
 if test "${SYS}" != "mingwce"; then
-  VLC_ADD_PLUGINS([access_directory sap http])
+  VLC_ADD_PLUGINS([access_directory sap])
   VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq])
 fi
 
@@ -1230,6 +1230,7 @@ AC_ARG_ENABLE(httpd,
   [  --enable-httpd          HTTP daemon (default enabled)])
 if test "${enable_httpd}" != "no"
 then
+  VLC_ADD_PLUGINS([http])
   AC_DEFINE(ENABLE_HTTPD, 1, Define if you want the HTTP dameon support)
 fi
 
@@ -3588,6 +3589,8 @@ if test "${SYS}" = "mingwce"; then
   VLC_ADD_PLUGINS([wince])
   VLC_ADD_CXXFLAGS([wince],[])
   VLC_ADD_LDFLAGS([wince],[-lcommctrl -lcommdlg -laygshell])
+  dnl Gross hack
+  VLC_ADD_LDFLAGS([wince],[modules/gui/wince/wince_rc.o])
 fi
 
 dnl
