@@ -674,5 +674,14 @@ Video Files( .avi, .mkv, .mov, .mpg, .m2v, etc)<br />
 Subtitle Files( .idx, .sub, .utf, .srt)<br />
 Status: Todo
 
+Task
+Difficulty: Medium
+Platform: Any
+Urgency: Important
+Description: fix subtitle regressions
+Multi-line subtitles are not aligned correctly. Text subtitles don't work
+with 32bpp rgb. Investigate behaviour of subpictures when pausing.
+Status: Todo
+
 # Do not remove me
 Task
