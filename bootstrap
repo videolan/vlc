@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.14 2002/09/30 11:05:32 sam Exp $
+##  $Id: bootstrap,v 1.15 2002/10/02 12:59:59 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -248,19 +248,16 @@ perl -ne 'if(/^.{500}/) {s/(.{200}[^ ]* )/$1\\\n\t/g} print $_' < Makefile.in > 
 autoconf || exit 1
 
 ##
+##  headers which need to be regenerated
+##
+rm -f src/misc/modules_builtin.h src/misc/modules_plugin.h
+rm -f include/vlc_symbols.h
+rm -f mozilla/vlcintf.h
+
+##
 ##  Shut up
 ##
 set +x
-
-##
-##  headers which need to be regenerated because of the VLC_EXPORT macro
-##
-files="src/misc/modules_builtin.h src/misc/modules_plugin.h include/vlc_symbols.h"
-for file in src/misc/modules_builtin.h src/misc/modules_plugin.h include/vlc_symbols.h mozilla/vlcintf.h
-do
-  echo "touching $file"
-  echo > $file
-done
 
 ##
 ##  Glade sometimes sucks

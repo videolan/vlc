@@ -29,6 +29,10 @@ noinst_HEADERS =
 # Tell aclocal to use -I m4. Wonder if it really works.
 ACLOCAL_AMFLAGS = -I m4
 
+# XXX: these flags could be set in configure.ac.in, but we set them here
+# because old versions of automake don't support them in configure.ac.
+AUTOMAKE_OPTIONS = foreign dist-bzip2 subdir-objects
+
 ###############################################################################
 # Compilation flags for debug mode, profiling, and others
 ###############################################################################
@@ -217,6 +221,10 @@ endif
 	echo "" >> $@.tmp
 	mv -f $@.tmp $@
 
+# These dependencies are mandatory
+$(SOURCES): include/vlc_symbols.h
+$(SOURCES_libvlc): src/misc/modules_plugin.h src/misc/modules_builtin.h
+
 ###############################################################################
 # Optional getopt
 ###############################################################################
@@ -288,9 +296,6 @@ EXTRA_DIST += \
 	src/misc/darwin_specific.c \
 	src/misc/win32_specific.c
 
-BUILT_SOURCES += \
-	src/misc/modules_builtin.h
-
 SOURCES_libvlc = \
 	src/libvlc.c \
 	src/libvlc.h \
@@ -346,7 +351,7 @@ vlc_SOURCES = src/vlc.c $(SOURCES_libgetopt)
 # @AUTOMAKE_SUCKS@ gets expanded to $(L_builtin) $(LDFLAGS_builtin)
 # but we don't write it directly, otherwise automake will go amok and eat all
 # the memory because of its 2^N crap algorithm. So we fool him. Nuahaha.
-vlc_LDADD = lib/libvlc.a $(LDFLAGS_vlc) $(noinst_share_vlc_win32_rc_DATA) @AUTOMAKE_SUCKS@
+vlc_LDADD = lib/libvlc.a $(LDFLAGS_vlc) $(DATA_win32_rc) @AUTOMAKE_SUCKS@
 vlc_DEPENDENCIES = lib/libvlc.a $(L_builtin)
 vlc_CFLAGS = $(CPPFLAGS_default) $(CFLAGS_default)
 
@@ -381,6 +386,7 @@ vlc.app: vlc
 endif
 
 if HAVE_WIN32
+DATA_win32_rc = $(noinst_share_vlc_win32_rc_DATA)
 noinst_share_vlc_win32_rc_DATA = share/vlc_win32_rc.$(OBJEXT)
 noinst_share_vlc_win32_rcdir = $(libdir)
 share/vlc_win32_rc.$(OBJEXT): share/vlc_win32_rc.rc
@@ -420,6 +426,7 @@ mozilla_libvlcplugin_a_CXXFLAGS = $(CPPFLAGS_pic) $(CXXFLAGS_pic) \
 mozilla_libvlcplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(L_builtin_pic)
 
 BUILT_SOURCES_mozilla = mozilla/vlcintf.h
+$(SOURCES_mozilla): mozilla/vlcintf.h
 
 mozilla_libvlcplugin_DATA = mozilla/libvlcplugin$(LIBEXT)
 mozilla_libvlcplugindir = $(libdir)/mozilla/plugins

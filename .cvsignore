@@ -20,9 +20,6 @@ conftest.cc
 autom4te.cache
 Makefile
 Makefile.in
-Makefile.opts
-Makefile.modules
-Makefile.config
 Modules.am
 build-stamp
 stamp-h*
