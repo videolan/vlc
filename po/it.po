@@ -7378,11 +7378,11 @@ msgstr "Info Sorgente..."
 
 #: modules/gui/wxwindows/interface.cpp:363
 msgid "&File"
-msgstr "&Archivio"
+msgstr "&File"
 
 #: modules/gui/wxwindows/interface.cpp:364
 msgid "&View"
-msgstr "&Vista"
+msgstr "&Visualizza"
 
 #: modules/gui/wxwindows/interface.cpp:365
 #: modules/gui/wxwindows/interface.cpp:766
