@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.20 2002/05/25 16:23:07 fenrir Exp $
+ * $Id: avi.c,v 1.20.2.1 2002/06/03 16:33:51 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -538,7 +538,7 @@ static int AVIInit( input_thread_t *p_input )
         return( -1 );
     }
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    p_input->stream.p_new_program = p_input->stream.pp_programs[0] ;
+/*    p_input->stream.p_new_program = p_input->stream.pp_programs[0] ; */
     p_input->stream.i_mux_rate = p_avi_demux->avih.i_maxbytespersec / 50;
     vlc_mutex_unlock( &p_input->stream.stream_lock ); 
 

@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.8 2002/05/18 17:47:47 sam Exp $
+ * $Id: mpeg_audio.c,v 1.8.2.1 2002/06/03 16:33:51 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -448,8 +448,8 @@ static int MPEGAudioInit( input_thread_t * p_input )
         return( -1 );
     }
     p_input->stream.pp_programs[0]->b_is_ok = 0;
-    p_input->stream.p_selected_program = 
-            p_input->stream.p_new_program = p_input->stream.pp_programs[0];
+    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
+/*    p_input->stream.p_new_program p_input->stream.pp_programs[0]; */
     
     /* create our ES */ 
     p_es = input_AddES( p_input, 
