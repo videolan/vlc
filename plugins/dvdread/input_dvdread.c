@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.12 2001/12/30 07:09:55 sam Exp $
+ * $Id: input_dvdread.c,v 1.13 2001/12/30 22:10:26 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -85,6 +85,7 @@ static void DvdReadEnd      ( struct input_thread_s * );
 static void DvdReadOpen     ( struct input_thread_s * );
 static void DvdReadClose    ( struct input_thread_s * );
 static int  DvdReadSetArea  ( struct input_thread_s *, struct input_area_s * );
+static int  DvdReadSetProgram( struct input_thread_s *, pgrm_descriptor_t * );
 static int  DvdReadRead     ( struct input_thread_s *, data_packet_t ** );
 static void DvdReadSeek     ( struct input_thread_s *, off_t );
 static int  DvdReadRewind   ( struct input_thread_s * );
@@ -123,6 +124,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_init_bit_stream  = InitBitstream;
     input.pf_read             = DvdReadRead;
     input.pf_set_area         = DvdReadSetArea;
+    input.pf_set_program      = DvdReadSetProgram;
     input.pf_demux            = input_DemuxPS;
     input.pf_new_packet       = input_NewPacket;
     input.pf_new_pes          = input_NewPES;
@@ -130,6 +132,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
     input.pf_delete_pes       = input_DeletePES;
     input.pf_rewind           = DvdReadRewind;
     input.pf_seek             = DvdReadSeek;
+
 #undef input
 }
 
@@ -147,17 +150,12 @@ static int DvdReadProbe( probedata_t *p_data )
     char * psz_name = p_input->p_source;
     int i_score = 5;
 
-    if( TestMethod( INPUT_METHOD_VAR, "dvdread" ) )
-    {
-        return( 999 );
-    }
-
     if( ( strlen(psz_name) > 8 ) && !strncasecmp( psz_name, "dvdread:", 8 ) )
     {
         /* If the user specified "dvdread:" then he probably wants
          * to use libdvdread */
         i_score = 100;
-        psz_name += 4;
+        psz_name += 8;
     }
 
     return( i_score );
@@ -351,6 +349,15 @@ static void DvdReadEnd( input_thread_t * p_input )
     input_BuffersEnd( p_input->p_method_data );
 }
 
+/*****************************************************************************
+ * DvdReadSetProgram: Does nothing, a DVD is mono-program
+ *****************************************************************************/
+static int DvdReadSetProgram( input_thread_t * p_input,
+                              pgrm_descriptor_t * p_program )
+{
+    return 0;
+}
+
 #define p_pgc         p_dvd->p_cur_pgc
 
 /*****************************************************************************
@@ -508,23 +515,24 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
             }
 
             free( p_input->stream.pp_selected_es );
-            input_DelProgram( p_input, p_input->stream.pp_programs[0] );
+            input_DelProgram( p_input, p_input->stream.p_selected_program );
 
             p_input->stream.pp_selected_es = NULL;
             p_input->stream.i_selected_es_number = 0;
         }
 
         input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
+        p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
 
         /* No PSM to read in DVD mode, we already have all information */
-        p_input->stream.pp_programs[0]->b_is_ok = 1;
+        p_input->stream.p_selected_program->b_is_ok = 1;
 
         p_es = NULL;
 
         /* ES 0 -> video MPEG2 */
 //        IfoPrintVideo( p_dvd );
 
-        p_es = input_AddES( p_input, p_input->stream.pp_programs[0], 0xe0, 0 );
+        p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xe0, 0 );
         p_es->i_stream_id = 0xe0;
         p_es->i_type = MPEG2_VIDEO_ES;
         p_es->i_cat = VIDEO_ES;
@@ -555,7 +563,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                 case 0x00:              /* AC3 */
                     i_id = ( ( 0x80 + i_position ) << 8 ) | 0xbd;
                     p_es = input_AddES( p_input,
-                               p_input->stream.pp_programs[0], i_id, 0 );
+                               p_input->stream.p_selected_program, i_id, 0 );
                     p_es->i_stream_id = 0xbd;
                     p_es->i_type = AC3_AUDIO_ES;
                     p_es->b_audio = 1;
@@ -569,7 +577,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                 case 0x03:              /* MPEG audio */
                     i_id = 0xc0 + i_position;
                     p_es = input_AddES( p_input,
-                                    p_input->stream.pp_programs[0], i_id, 0 );
+                                    p_input->stream.p_selected_program, i_id, 0 );
                     p_es->i_stream_id = i_id;
                     p_es->i_type = MPEG2_AUDIO_ES;
                     p_es->b_audio = 1;
@@ -583,7 +591,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
 
                     i_id = ( ( 0xa0 + i_position ) << 8 ) | 0xbd;
                     p_es = input_AddES( p_input,
-                                    p_input->stream.pp_programs[0], i_id, 0 );
+                                    p_input->stream.p_selected_program, i_id, 0 );
                     p_es->i_stream_id = i_id;
                     p_es->i_type = LPCM_AUDIO_ES;
                     p_es->b_audio = 1;
@@ -648,7 +656,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
 
                 i_id = ( ( 0x20 + i_position ) << 8 ) | 0xbd;
                 p_es = input_AddES( p_input,
-                                    p_input->stream.pp_programs[0], i_id, 0 );
+                                    p_input->stream.p_selected_program, i_id, 0 );
                 p_es->i_stream_id = 0xbd;
                 p_es->i_type = DVD_SPU_ES;
                 p_es->i_cat = SPU_ES;
@@ -782,6 +790,7 @@ static int DvdReadRead( input_thread_t * p_input,
     int                     i_packet;
     int                     i_pos;
     data_packet_t *         p_data_p;
+    boolean_t               b_eot = 0;
 
     p_dvd = (thread_dvd_data_t *)p_input->p_plugin_data;
 
@@ -807,26 +816,35 @@ static int DvdReadRead( input_thread_t * p_input,
             return -1;
         }
 
+        /* basic check to be sure we don't have a empty title
+         * go to next title if so */
         assert( p_data[41] == 0xbf && p_data[1027] == 0xbf );
-
-        /*
-         * Parse the contained dsi packet.
-         */
-
-        DvdReadHandleDSI( p_dvd, p_data );
-
-        /* End of File */
-        if( p_dvd->i_next_vobu >= p_dvd->i_end_block + 1 )
+        if( p_data[41] == 0xbf && p_data[1027] == 0xbf )
         {
-            return 1;
+            /*
+             * Parse the contained dsi packet.
+             */
+
+            DvdReadHandleDSI( p_dvd, p_data );
+
+            /* End of File */
+            if( p_dvd->i_next_vobu >= p_dvd->i_end_block + 1 )
+            {
+                return 1;
+            }
+
+            assert( p_dvd->i_pack_len < 1024 );
+            /* FIXME: Ugly kludge: we send the pack block to the input for it
+             * sometimes has a zero scr and restart the sync */
+            //p_dvd->i_cur_block ++;
+            p_dvd->i_pack_len++;
         }
-
-        assert( p_dvd->i_pack_len < 1024 );
-        /* Ugly kludge: we send the pack block to the input for it
-         * sometimes has a zero scr and restart the sync */
-//        p_dvd->i_cur_block ++;
-        p_dvd->i_pack_len++;
-
+        else
+        {
+            b_eot = 1;
+            p_dvd->i_pack_len = 0;
+	    return 1;
+        }
     }
 
     /*
@@ -900,6 +918,9 @@ static int DvdReadRead( input_thread_t * p_input,
             (*pp_data)->p_payload_end =
                     (*pp_data)->p_payload_start + i_packet_size + 6;
 
+//            pp_packets[i_packet]->p_next = NULL;
+//            pp_packets[i_packet]->b_discard_payload = 0;
+
             i_packet++;
             i_pos += i_packet_size + 6;
             pp_data = &(*pp_data)->p_next;
@@ -908,6 +929,13 @@ static int DvdReadRead( input_thread_t * p_input,
 
     p_input->pf_delete_packet( p_input->p_method_data, p_data_p );
     *pp_data = NULL;
+
+    while( p_data_p != NULL )
+    {
+        data_packet_t * p_next = p_data_p->p_next;
+        p_input->pf_delete_packet( p_input->p_method_data, p_data_p );
+        p_data_p = p_next;
+    }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -922,7 +950,25 @@ static int DvdReadRead( input_thread_t * p_input,
         p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
         p_dvd->b_eoc = 0;
     }
+    
+    if( p_input->stream.p_selected_area->i_tell
+            >= p_input->stream.p_selected_area->i_size || b_eot )
+    {
+        if( ( p_input->stream.p_selected_area->i_id + 1 ) >= 
+			p_input->stream.i_area_nb )
+        {
+            /* EOF */
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+            return 1;
+        }
 
+        /* EOT */
+        intf_WarnMsg( 4, "dvd info: new title" );
+        DvdReadSetArea( p_input, p_input->stream.pp_areas[
+			p_input->stream.p_selected_area->i_id+1] );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        return 0;
+    }
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -973,9 +1019,9 @@ static void DvdReadSeek( input_thread_t * p_input, off_t i_off )
 
         i_chapter++;
         pgc_id = p_dvd->p_vts_file->vts_ptt_srpt->title[
-                    p_dvd->i_ttn-1].ptt[i_chapter].pgcn;
+                    p_dvd->i_ttn-1].ptt[i_chapter-1].pgcn;
         pgn = p_dvd->p_vts_file->vts_ptt_srpt->title[
-                    p_dvd->i_ttn-1].ptt[i_chapter].pgn;
+                    p_dvd->i_ttn-1].ptt[i_chapter-1].pgn;
 
         p_pgc = p_dvd->p_vts_file->vts_pgcit->pgci_srp[pgc_id-1].pgc;
         i_tmp = p_pgc->program_map[pgn-1];
@@ -1150,14 +1196,14 @@ static void DvdReadFindCell( thread_dvd_data_t * p_dvd )
     }
 #undef cell
     pgc_id = p_dvd->p_vts_file->vts_ptt_srpt->title[
-                p_dvd->i_ttn-1].ptt[p_dvd->i_chapter].pgcn;
+                p_dvd->i_ttn-1].ptt[p_dvd->i_chapter-1].pgcn;
     pgn = p_dvd->p_vts_file->vts_ptt_srpt->title[
-                p_dvd->i_ttn-1].ptt[p_dvd->i_chapter].pgn;
+                p_dvd->i_ttn-1].ptt[p_dvd->i_chapter-1].pgn;
     p_pgc = p_dvd->p_vts_file->vts_pgcit->pgci_srp[pgc_id-1].pgc;
 
     if( p_pgc->program_map[pgn-1] <= p_dvd->i_cur_cell )
     {
         p_dvd->i_chapter++;
-	p_dvd->b_eoc = 1;
+        p_dvd->b_eoc = 1;
     }
 }

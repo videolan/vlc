@@ -17,32 +17,21 @@ SOFLAGS :=
 endif
 
 #
+# C headers directories
+#
+CFLAGS := -I../../include -I../../extras $(CFLAGS)
+
+#
 # Objects
 #
 
 OBJ_C = dvdread.o dvd_udf.o nav_print.o nav_read.o ifo_print.o ifo_read.o
+ALL_OBJ = $(OBJ_C) $(OBJ_LIBDVDREAD)
 
-PLUGIN_OBJ = $(OBJ_C) $(OBJ_LIBDVDREAD)
-BUILTIN_OBJ = $(OBJ_C:%.o=DVDREAD_%.o)
-
-ALL_OBJ = $(PLUGIN_OBJ) $(BUILTIN_OBJ)
-
-$(OBJ_C): %.o: .dep/%.d
-$(OBJ_C): %.o: %.c
-	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDREAD) $(PCFLAGS) -c -o $@ $<
-
-$(BUILTIN_OBJ): DVDREAD_%.o: .dep/%.d
-$(BUILTIN_OBJ): DVDREAD_%.o: %.c
-	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDREAD) $(PCFLAGS) -c -o $@ $<
-
-../../lib/$(FULL_SO): $(OBJ_C) $(OBJ_LIBDVDREAD)
-	$(CC) $(PCFLAGS) $(ALL_SOFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_LIBDVDREAD)
-	rm -f ../../lib/$(BASE_SO) && ln -s $(FULL_SO) ../../lib/$(BASE_SO)
-	rm -f ../../lib/$(MAJOR_SO) && ln -s $(FULL_SO) ../../lib/$(MAJOR_SO)
-
-../../lib/$(BASE_A): libdvdcss $(BUILTIN_OBJ) $(OBJ_LIBDVDREAD)
-	ar r $@ $(BUILTIN_OBJ)
-	$(RANLIB) $@
+#
+# Standard dependencies
+# 
+C_DEP := $(ALL_OBJ:%.o=.dep/%.d)
 
 #
 # Virtual targets
@@ -54,22 +43,23 @@ clean:
 	rm -f *.o
 	rm -rf .dep
 
-libdvdcss:
-	@cd ../../ && $(MAKE) libdvdcss
+FORCE:
 
-#install:
-#	mkdir -p $(DESTDIR)$(includedir)/videolan
-#	$(INSTALL) -m 644 videolan/dvdcss.h $(DESTDIR)$(includedir)/videolan
-#	mkdir -p $(DESTDIR)$(libdir)
-#	-$(INSTALL) -m 644 ../../lib/$(BASE_A) $(DESTDIR)$(libdir)
-#	-$(INSTALL) -m 644 ../../lib/$(FULL_SO) $(DESTDIR)$(libdir)
-#	rm -f $(DESTDIR)$(libdir)/$(BASE_SO) && ln -s $(FULL_SO) $(DESTDIR)$(libdir)/$(BASE_SO)
-#	rm -f $(DESTDIR)$(libdir)/$(MAJOR_SO) && ln -s $(FULL_SO) $(DESTDIR)$(libdir)/$(MAJOR_SO)
-#
-#uninstall:
-#	rm -f $(DESTDIR)$(includedir)/videolan/dvdcss.h
-#	rm -f $(DESTDIR)$(libdir)/$(BASE_A)
-#	rm -f $(DESTDIR)$(libdir)/$(BASE_SO)
-#	rm -f $(DESTDIR)$(libdir)/$(MAJOR_SO)
-#	rm -f $(DESTDIR)$(libdir)/$(FULL_SO)
+$(ALL_OBJ): %.o: ../../Makefile.dep Makefile
+
+$(C_DEP): %.d: FORCE
+	        @$(MAKE) -s --no-print-directory -f ../../Makefile.dep $@
+
+$(OBJ_C): %.o: .dep/%.d
+$(OBJ_C): %.o: %.c
+	$(CC) $(CFLAGS) $(CFLAGS_LIBDVDREAD) $(PCFLAGS) -c -o $@ $<
+
+../../lib/$(FULL_SO): $(OBJ_C) $(OBJ_LIBDVDREAD)
+	$(CC) $(PCFLAGS) $(ALL_SOFLAGS) -o $@ $^ $(PLCFLAGS) $(LIB_LIBDVDREAD)
+	rm -f ../../lib/$(BASE_SO) && ln -s $(FULL_SO) ../../lib/$(BASE_SO)
+	rm -f ../../lib/$(MAJOR_SO) && ln -s $(FULL_SO) ../../lib/$(MAJOR_SO)
+
+../../lib/$(BASE_A): $(OBJ_C) $(OBJ_LIBDVDREAD)
+	ar r $@ $^
+	$(RANLIB) $@
 

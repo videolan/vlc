@@ -2,7 +2,7 @@
  * dvdread.c : DvdRead input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dvdread.c,v 1.4 2001/12/30 07:09:55 sam Exp $
+ * $Id: dvdread.c,v 1.5 2001/12/30 22:10:26 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -52,18 +52,18 @@ static void UnprobeLibDVDCSS( void );
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-ADD_WINDOW( "Configuration for DVD module" )
-    ADD_COMMENT( "foobar !" )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_INPUT;
 #ifdef GOD_DAMN_DMCA
-    p_module->psz_longname = "DVD input module, uses libdvdcss if present";
+    SET_DESCRIPTION( "DVDRead input module, uses libdvdcss if present" )
+    ADD_CAPABILITY( INPUT, 70 )
 #else
-    p_module->psz_longname = "DVD input module, linked with libdvdcss";
+    SET_DESCRIPTION( "DVDRead input module, linked with libdvdcss" )
+    ADD_CAPABILITY( INPUT, 80 )
 #endif
+    ADD_SHORTCUT( "dvdread" )
+	    
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
