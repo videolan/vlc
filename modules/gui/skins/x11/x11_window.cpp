@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.14 2003/06/08 11:33:14 asmax Exp $
+ * $Id: x11_window.cpp,v 1.15 2003/06/08 12:45:13 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -63,26 +63,23 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
               dragdrop )
 {
     // Set handles
-    Wnd           = wnd;
-
-    display = p_intf->p_sys->display;
-    int screen = DefaultScreen( display );
-
-    Gc = DefaultGC( display, screen );
-
+    Wnd         = wnd;
+    display     = p_intf->p_sys->display;
+    int screen  = DefaultScreen( display );
     Name        = name;
-
     LButtonDown = false;
     RButtonDown = false;
 
+    // Creation of a graphic context that doesn't generate a GraphicsExpose
+    // event when using functions like XCopyArea
+    XGCValues gcVal;
+    gcVal.graphics_exposures = False;
+    XLOCK;
+    Gc = XCreateGC( display, wnd, GCGraphicsExposures, &gcVal );
+    XUNLOCK;
+
     // Removing fading effect
     Transition  = 0;
-/*
-    // Set position parameters
-    CursorPos    = new POINT;
-    WindowPos    = new POINT;
-
-*/
 
     if( DragDrop )
     {
@@ -104,10 +101,11 @@ X11Window::X11Window( intf_thread_t *p_intf, Window wnd, int x, int y,
     XSetWindowAttributes attr;
     attr.background_pixel = color.pixel;
     attr.override_redirect = True;
-    ToolTip.window = XCreateWindow( display, root, 0, 0, 1, 1, 1, 0, InputOutput,
-                                    CopyFromParent, CWBackPixel|CWOverrideRedirect, &attr );
-    XGCValues gcVal;
-    ToolTip.font = XLoadFont( display, "-*-helvetica-bold-r-*-*-*-80-*-*-*-*-*-*" );
+    ToolTip.window = XCreateWindow( display, root, 0, 0, 1, 1, 1, 0,
+                                    InputOutput, CopyFromParent,
+                                    CWBackPixel|CWOverrideRedirect, &attr );
+    ToolTip.font = XLoadFont( display,
+                              "-*-helvetica-bold-r-*-*-*-80-*-*-*-*-*-*" );
     gcVal.font = ToolTip.font;
     gcVal.foreground = 0;
     gcVal.background = color.pixel;
@@ -138,7 +136,10 @@ X11Window::~X11Window()
     {
         DestroyWindow( hWnd );
     }*/
+
+    XFreeGC( display, Gc );
     XDestroyWindow( display, ToolTip.window );
+
     /*
     if( DragDrop )
     {
@@ -148,17 +149,62 @@ X11Window::~X11Window()
         // Uninitialize the OLE library
         OleUninitialize();
     }*/
- /*   if( gWnd )
-    {
-        gdk_window_destroy( gWnd );
-    }*/
 }
 //---------------------------------------------------------------------------
 void X11Window::OSShow( bool show )
 {
     if( show )
     {
+        // We do the call to XShapeCombineRegion() here because the window
+        // must be unmapped for this to work.
+        Drawable drawable = (( X11Graphics* )Image )->GetImage();
+
         XLOCK;
+        XImage *image = XGetImage( display, drawable, 0, 0, Width, Height, 
+                                   AllPlanes, ZPixmap );
+        if( image )
+        {
+            // Mask for transparency
+            Region region = XCreateRegion();
+            region = XCreateRegion();
+            for( int line = 0; line < Height; line++ )
+            {
+                int start = 0, end = 0;
+                while( start < Width )
+                {
+                    while( start < Width && XGetPixel( image, start, line )
+                           == 0 )
+                    {
+                        start++;
+                    }
+                    end = start;
+                    while( end < Width && XGetPixel( image, end, line ) != 0)
+                    {
+                        end++;
+                    }
+                    XRectangle rect;
+                    rect.x = start;
+                    rect.y = line;
+                    rect.width = end - start + 1;
+                    rect.height = 1;
+                    Region newRegion = XCreateRegion();
+                    XUnionRectWithRegion( &rect, region, newRegion );
+                    XDestroyRegion( region );
+                    region = newRegion;
+                    start = end + 1;
+                }
+            }
+
+            XShapeCombineRegion( display, Wnd, ShapeBounding, 0, 0, region,
+                                 ShapeSet );
+            XDestroyRegion( region );
+
+        }
+        else
+        {
+            msg_Err( p_intf, "X11Window::OSShow XShapeCombineRegion() failed");
+        }
+
         XMapWindow( display, Wnd );
         XMoveWindow( display, Wnd, Left, Top );
         XUNLOCK;
@@ -262,14 +308,14 @@ bool X11Window::ProcessOSEvent( Event *evt )
                     MouseUp( (int)( (XButtonEvent *)p2 )->x,
                              (int)( (XButtonEvent *)p2 )->y, 2 );
                     break; 
-                    
+
                 case 4:
                     // Scroll up
                     MouseScroll( (int)( (XButtonEvent *)p2 )->x,
                                  (int)( (XButtonEvent *)p2 )->y,
                                  MOUSE_SCROLL_UP);
                     break;
-                    
+ 
                 case 5:
                     // Scroll down
                     MouseScroll( (int)( (XButtonEvent *)p2 )->x,
@@ -306,48 +352,9 @@ void X11Window::SetTransparency( int Value )
 void X11Window::RefreshFromImage( int x, int y, int w, int h )
 {
     Drawable drawable = (( X11Graphics* )Image )->GetImage();
-    
+
     XLOCK;
     XCopyArea( display, drawable, Wnd, Gc, x, y, w, h, x, y );
- 
-    XImage *image = XGetImage( display, drawable, 0, 0, Width, Height, 
-                               AllPlanes, ZPixmap );
-    if( !image )
-    {
-        msg_Err( p_intf, "X11Window::RefreshFromImage failed");
-    }
- 
-    // Mask for transparency
-    Region region = XCreateRegion();
-    for( int line = 0; line < Height; line++ )
-    {
-        int start = 0, end = 0;
-        while( start < Width )
-        {
-            while( start < Width && XGetPixel( image, start, line ) == 0 )
-            {
-                start++;
-            } 
-            end = start;
-            while( end < Width && XGetPixel( image, end, line ) != 0)
-            {
-                end++;
-            }
-            XRectangle rect;
-            rect.x = start;
-            rect.y = line;
-            rect.width = end - start + 1;
-            rect.height = 1;
-            Region newRegion = XCreateRegion();
-            XUnionRectWithRegion( &rect, region, newRegion );
-            XDestroyRegion( region );
-            region = newRegion;
-            start = end + 1;
-        }
-    }
-    XShapeCombineRegion( display, Wnd, ShapeBounding, 0, 0, region, ShapeSet );
-    XDestroyRegion( region );
-
     XSync( display, 0);
     XUNLOCK;
 }

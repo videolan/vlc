@@ -2,7 +2,7 @@
  * x11_bitmap.cpp: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.cpp,v 1.9 2003/06/01 22:11:24 asmax Exp $
+ * $Id: x11_bitmap.cpp,v 1.10 2003/06/08 12:45:13 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -55,7 +55,7 @@ X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
     : Bitmap( p_intf, FileName, AColor )
 {
     p_intf = _p_intf;
-    
+
     // Find the display
     display = p_intf->p_sys->display;
     int screen = DefaultScreen( display );
@@ -70,10 +70,10 @@ X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
     {
         return;
     }
- 
+
     AlphaColor = (AColor & 0xff) << 16 | (AColor & 0xff00) | 
                  (AColor & 0xff0000) >> 16;
-     
+
     XLOCK;
     imlib_context_set_display( display );
     imlib_context_set_visual( visual );
@@ -85,7 +85,7 @@ X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
     imlib_context_set_image( Img );
     Width = imlib_image_get_width();
     Height = imlib_image_get_height();
- 
+
     // Add an alpha layer
     DATA32 *data = imlib_image_get_data();
     DATA32 *ptr = data;

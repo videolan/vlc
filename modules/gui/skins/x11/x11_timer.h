@@ -2,7 +2,7 @@
  * x11_timer.h: helper class to implement timers
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_timer.h,v 1.3 2003/06/08 11:33:14 asmax Exp $
+ * $Id: x11_timer.h,v 1.4 2003/06/08 12:45:13 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -26,7 +26,8 @@
 #ifndef VLC_SKIN_X11_TIMER
 #define VLC_SKIN_X11_TIMER
 
-#include <list.h>
+#include <list>
+using namespace std;
 
 typedef struct
 {
