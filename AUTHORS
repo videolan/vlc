@@ -198,6 +198,7 @@ D: autoconf and Makefile patches
 
 N: Florian G. Pflug
 E: fgp@phlo.org
+C: fgp
 D: MacOS X port
 
 N: Olivier Pomel
