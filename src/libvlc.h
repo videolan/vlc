@@ -1001,6 +1001,7 @@ vlc_module_begin();
     add_category_hint( N_("Playlist"), PLAYLIST_CAT_LONGTEXT , VLC_FALSE );
     add_string( "services-discovery", 0, NULL,
                 SD_TEXT, SD_LONGTEXT, VLC_FALSE );
+        change_short('S');
     add_bool( "random", 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
         change_short('Z');
     add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );

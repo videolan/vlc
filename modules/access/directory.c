@@ -169,6 +169,9 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     char *psz;
     int  i_mode, i_pos;
 
+    playlist_item_t *p_item;
+    vlc_bool_t b_play = VLC_FALSE;
+
     playlist_t *p_playlist =
         (playlist_t *) vlc_object_find( p_access,
                                         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
@@ -207,24 +210,45 @@ static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
     free( psz );
 
     /* Make sure we are deleted when we are done */
-//    p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
     /* The playlist position we will use for the add */
     i_pos = p_playlist->i_index + 1;
 
     msg_Dbg( p_access, "opening directory `%s'", psz_name );
 
-    p_playlist->status.p_item->input.i_type = ITEM_TYPE_DIRECTORY;
-    if( ReadDir( p_playlist, psz_name , i_mode, &i_pos,
-                            p_playlist->status.p_item
-               ) != VLC_SUCCESS )
+    if( &p_playlist->status.p_item->input ==
+        ((input_thread_t *)p_access->p_parent)->input.p_item )
     {
-        goto end;
+        p_item = p_playlist->status.p_item;
+        b_play = VLC_TRUE;
+        msg_Dbg( p_access, "starting directory playback");
     }
-
+    else
+    {
+        input_item_t *p_current = ( (input_thread_t*)p_access->p_parent)->
+                                                        input.p_item;
+        p_item = playlist_ItemGetByInput( p_playlist, p_current );
+        msg_Dbg( p_access, "not starting directory playback");
+        if( !p_item )
+        {
+            msg_Dbg( p_playlist, "unable to find item in playlist");
+            return -1;
+        }
+        b_play = VLC_FALSE;
+    }
+    p_item->input.i_type = ITEM_TYPE_DIRECTORY;
+    if( ReadDir( p_playlist, psz_name , i_mode, &i_pos,
+                 p_item ) != VLC_SUCCESS )
+    {
+    }
 end:
+
     /* Begin to read the directory */
-    playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,p_playlist->status.i_view,
-                      p_playlist->status.p_item, NULL );
+    if( b_play )
+    {
+        playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
+                          p_playlist->status.i_view,
+                          p_playlist->status.p_item, NULL );
+    }
     if( psz_name ) free( psz_name );
     vlc_object_release( p_playlist );
 
