@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.29 2002/08/20 18:08:51 sam Exp $
+ * $Id: libvlc.c,v 1.30 2002/08/21 09:26:53 xav Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -48,6 +48,10 @@
 #   include <unistd.h>
 #elif defined( _MSC_VER ) && defined( _WIN32 )
 #   include <io.h>
+#endif
+
+#ifdef WIN32                       /* optind, getopt(), included in unistd.h */
+#   include "GNUgetopt/getopt.h"
 #endif
 
 #ifdef HAVE_LOCALE_H
