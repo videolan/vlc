@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.47 2003/06/03 23:17:43 massiot Exp $
+$Id: NEWS,v 1.48 2003/06/11 18:45:41 gbazin Exp $
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
@@ -11,6 +11,7 @@ Input access:
  * fixed large file support on Windows
  * Video 4 Linux support
  * CD Digital Audio support
+ * Fixed an ipv6 link-local multicasting bug.
 
 Input demux:
  * Better detection of AAC and mp3 files
@@ -22,6 +23,7 @@ Codecs:
  * Support for Sorenson 3 (SVQ3 or Quicktime content) via ffmpeg
  * OSX support for QDM2 and QDMC sound, often used in QT content.
  * Fixed a bug which was causing artefacts in DivX video (ffmpeg)
+ * Updated our theora decoder to use the alpha 2 release of libtheora
  * If ffmpeg cannot keep up, skip and try to recover instead of stopping altogether
 
 Interfaces:
@@ -31,6 +33,7 @@ Interfaces:
 Stream output:
  * New stream output scheme. It is now possible to build a chain of stream outputs allowing for instance to stream and display some content at the same time.
  * The stream output now allows to transcode content on the fly.
+ * Fixed major bug that prevented streaming mpeg 1/2 video with pulldown content.
  * SAP (Session Announcement Protocol) support.
 
 Miscellaneous:
@@ -38,9 +41,11 @@ Miscellaneous:
  * You can set your language in the prefences
  * New video chroma conversion module using ffmpeg
  * Added a Gentoo ebuild file to the distribution
+ * Added a new smaller subtitles font + scripts to generate your own
 
 UNIX ports:
  * Basic support for the X11 Xinerama extension.
+ * New skinnable interface ported to X11.
 
 Mac OS X port:
  * When you add several items to the playlist, they are sorted alphabetically.
@@ -61,6 +66,8 @@ Win32 port:
  * Improved skinnable interface (it now uses the wxWindows interface dialogs).
  * Added support for compressed skins files (.vlt files)
  * Fixed SVCD chapters support.
+ * Fixed memory leak with 5.1 audio.
+ * Fixed ipv6 multicast support (not tested).
 
 BeOS port:
  * Interface localization
