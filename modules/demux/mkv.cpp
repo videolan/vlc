@@ -1158,7 +1158,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double, NULL );
+            f = (double)va_arg( args, double );
             Seek( p_demux, -1, f, NULL );
             return VLC_SUCCESS;
 
