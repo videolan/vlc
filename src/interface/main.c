@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.189 2002/04/27 22:11:22 gbazin Exp $
+ * $Id: main.c,v 1.190 2002/05/09 21:24:22 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1130,21 +1130,40 @@ static void SimpleSignalHandler( int i_signal )
  *****************************************************************************/
 static void FatalSignalHandler( int i_signal )
 {
+    static mtime_t abort_time = 0;
+    static volatile boolean_t b_die = 0;
+
     /* Once a signal has been trapped, the termination sequence will be
      * armed and following signals will be ignored to avoid sending messages
      * to an interface having been destroyed */
+    if( !b_die )
+    {
+        b_die = 1;
+        abort_time = mdate();
+
+        /* Acknowledge the signal received */
+        intf_ErrMsg( "intf error: signal %d received, exiting - do it again "
+                     "if vlc gets stuck", i_signal );
+
+        /* Try to terminate everything - this is done by requesting the end
+         * of the interface thread */
+        p_main->p_intf->b_die = 1;
+
+        return;
+    }
+
+    /* If user asks again 1 second later, die badly */
+    if( mdate() > abort_time + 1000000 )
+    {
 #ifndef WIN32
-    signal( SIGINT,  SIG_IGN );
-    signal( SIGHUP,  SIG_IGN );
-    signal( SIGQUIT, SIG_IGN );
+        signal( SIGINT,  SIG_IGN );
+        signal( SIGHUP,  SIG_IGN );
+        signal( SIGQUIT, SIG_IGN );
 #endif
 
-    /* Acknowledge the signal received */
-    intf_ErrMsg( "intf error: signal %d received, exiting", i_signal );
-
-    /* Try to terminate everything - this is done by requesting the end of the
-     * interface thread */
-    p_main->p_intf->b_die = 1;
+        intf_ErrMsg( "intf error: user insisted too much, dying badly" );
+        exit( 1 );
+    }
 }
 
 /*****************************************************************************
