@@ -880,7 +880,7 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     {
         char *psz_temp;
         vlc_mutex_lock( &p_playlist->object_lock );
-        psz_temp = playlist_GetInfo( p_playlist, i_row ,_("General"),_("Author") );
+        psz_temp = playlist_GetInfo( p_playlist, i_row ,_("Meta-information"),_("Artist") );
         vlc_mutex_unlock( &p_playlist->object_lock );
 
         if( psz_temp == NULL )
