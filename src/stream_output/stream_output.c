@@ -947,6 +947,7 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_
     while( cfg )
     {
         vlc_value_t val;
+        vlc_bool_t b_yes = VLC_TRUE;
 
         if( cfg->psz_name == NULL || *cfg->psz_name == '\0' )
         {
@@ -971,9 +972,20 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_
 
         /* get the type of the variable */
         i_type = config_GetType( p_this, psz_name );
-        if( !i_type )
+        if( !i_type && !strncmp( cfg->psz_name, "no", 2 ) )
         {
-            /* TODO check for no, no- */
+            free( psz_name );
+            b_yes = VLC_FALSE;
+
+            if( !strncmp( cfg->psz_name, "no-", 3 ) )
+            {
+                asprintf( &psz_name, "%s%s", psz_prefix, cfg->psz_name + 3 );
+            }
+            else
+            {
+                asprintf( &psz_name, "%s%s", psz_prefix, cfg->psz_name + 2 );
+            }
+            i_type = config_GetType( p_this, psz_name );
         }
 
         if( !i_type )
@@ -989,6 +1001,9 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_
 
         switch( i_type )
         {
+            case VLC_VAR_BOOL:
+                val.b_bool = b_yes;
+                break;
             case VLC_VAR_INTEGER:
                 val.i_int = atoi( cfg->psz_value ? cfg->psz_value : "0" );
                 break;
@@ -998,8 +1013,6 @@ void __sout_ParseCfg( vlc_object_t *p_this, char *psz_prefix, const char **ppsz_
             case VLC_VAR_STRING:
                 val.psz_string = cfg->psz_value;
                 break;
-
-            case VLC_VAR_BOOL:
             default:
                 msg_Warn( p_this, "unhandled config var type" );
                 memset( &val, 0, sizeof( vlc_value_t ) );
