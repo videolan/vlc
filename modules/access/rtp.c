@@ -2,7 +2,7 @@
  * rtp.c: RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rtp.c,v 1.5 2002/11/12 13:57:12 sam Exp $
+ * $Id: rtp.c,v 1.6 2002/11/13 20:23:21 fenrir Exp $
  *
  * Authors: Tristan Leteurtre <tooney@via.ecp.fr>
  *
@@ -268,8 +268,10 @@ static int Open( vlc_object_t *p_this )
 
     p_access_data->i_handle = socket_desc.i_handle;
     p_input->i_mtu = socket_desc.i_mtu;
-
-    p_input->psz_demux = "ts";
+    if( !p_input->psz_demux || !*p_input->psz_demux )
+    {
+        p_input->psz_demux = "ts";
+    }
     
     return( 0 );
 }

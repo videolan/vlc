@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.4 2002/11/08 10:26:52 gbazin Exp $
+ * $Id: access.c,v 1.5 2002/11/13 20:23:21 fenrir Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -252,7 +252,10 @@ int E_(DVDOpen) ( vlc_object_t *p_this )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    p_input->psz_demux = "dvdold";
+    if( !p_input->psz_demux || !*p_input->psz_demux )
+    {
+        p_input->psz_demux = "dvdold";
+    }
 
     return 0;
 }

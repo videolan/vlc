@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.8 2002/11/08 10:26:52 gbazin Exp $
+ * $Id: input.c,v 1.9 2002/11/13 20:23:21 fenrir Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -419,7 +419,10 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    p_input->psz_demux = "dvdread";
+    if( !p_input->psz_demux || !*p_input->psz_demux )
+    {
+        p_input->psz_demux = "dvdread";
+    }
 
     return 0;
 }

@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.5 2002/11/06 18:07:57 sam Exp $
+ * $Id: access.c,v 1.6 2002/11/13 20:23:21 fenrir Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -182,7 +182,10 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    p_input->psz_demux = "dvdplay";
+    if( !p_input->psz_demux || !*p_input->psz_demux )
+    {
+        p_input->psz_demux = "dvdplay";
+    }
 
     /* FIXME: we might lose variables here */
     var_Create( p_input, "x-start", VLC_VAR_INTEGER );
