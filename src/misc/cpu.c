@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: cpu.c,v 1.13 2004/01/20 15:34:44 hartman Exp $
+ * $Id: cpu.c,v 1.14 2004/02/01 23:02:02 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -182,6 +182,25 @@ uint32_t CPUCapabilities( void )
         if( i_illegal == 0 )
         {
             i_capabilities |= CPU_CAPABILITY_SSE;
+        }
+#   endif
+    }
+    if( i_edx & 0x04000000 )
+    {
+#   ifdef CAN_COMPILE_SSE
+        /* We test if OS supports the SSE instructions */
+        psz_capability = "SSE2";
+        i_illegal = 0;
+
+        if( setjmp( env ) == 0 )
+        {
+            /* Test a SSE2 instruction */
+            __asm__ __volatile__ ( "movupd %%xmm0, %%xmm0\n" : : );
+        }
+
+        if( i_illegal == 0 )
+        {
+            i_capabilities |= CPU_CAPABILITY_SSE2;
         }
 #   endif
     }
