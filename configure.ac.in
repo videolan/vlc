@@ -1057,6 +1057,11 @@ then
     PLUGINS="${PLUGINS} vcd"
   ])
 
+  AC_EGREP_HEADER(scsireq,sys/scsiio.h,[
+    PLUGINS="${PLUGINS} vcd"
+    AC_DEFINE(HAVE_SCSIREQ_IN_SYS_SCSIIO_H, 1, For NetBSD VCD support)
+  ])
+
   AC_EGREP_HEADER(ioc_toc_header ,sys/cdio.h,[
     PLUGINS="${PLUGINS} vcd"
     AC_DEFINE(HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H, 1, For FreeBSD VCD support)

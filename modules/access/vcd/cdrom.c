@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.5 2002/10/16 23:12:46 massiot Exp $
+ * $Id: cdrom.c,v 1.6 2002/12/02 18:19:43 sam Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -53,6 +53,10 @@
 #   include <IOKit/storage/IOCDTypes.h>
 #   include <IOKit/storage/IOCDMedia.h>
 #   include <IOKit/storage/IOCDMediaBSDClient.h>
+#elif defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
+#   include <sys/inttypes.h>
+#   include <sys/cdio.h>
+#   include <sys/scsiio.h>
 #elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
 #   include <sys/cdio.h>
 #   include <sys/cdrio.h>
@@ -258,7 +262,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                 if( track > CD_MAX_TRACK_NO || track < CD_MIN_TRACK_NO )
                     continue;
 
-                (*pp_sectors)[i_tracks++] = 
+                (*pp_sectors)[i_tracks++] =
                     CDConvertMSFToLBA( pTrackDescriptors[i].p );
             }
 
@@ -271,7 +275,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             }
 
             /* set leadout sector */
-            (*pp_sectors)[i_tracks] = 
+            (*pp_sectors)[i_tracks] =
                 CDConvertMSFToLBA( pTrackDescriptors[i_leadout].p );
         }
 
@@ -429,7 +433,8 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             }
         }
 
-#elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
+#elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H ) \
+       || defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
         struct ioc_toc_header tochdr;
         struct ioc_read_toc_entry toc_entries;
 
@@ -456,7 +461,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
              toc_entries.address_format = CD_LBA_FORMAT;
              toc_entries.starting_track = 0;
              toc_entries.data_len = ( i_tracks + 1 ) *
-                                        sizeof( struct cd_toc_entry ); 
+                                        sizeof( struct cd_toc_entry );
              toc_entries.data = (struct cd_toc_entry *)
                                     malloc( toc_entries.data_len );
              if( toc_entries.data == NULL )
@@ -465,7 +470,7 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                  free( *pp_sectors );
                  return 0;
              }
- 
+
              /* Read the TOC */
              if( ioctl( p_vcddev->i_device_handle, CDIOREADTOCENTRYS,
                         &toc_entries ) == -1 )
@@ -475,11 +480,16 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                  free( toc_entries.data );
                  return 0;
              }
-    
+
              /* Fill the p_sectors structure with the track/sector matches */
              for( i = 0 ; i <= i_tracks ; i++ )
              {
+#if defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
+                 /* FIXME: is this ok? */
+                 (*pp_sectors)[ i ] = toc_entries.data[i].addr.lba;
+#else
                  (*pp_sectors)[ i ] = ntohl( toc_entries.data[i].addr.lba );
+#endif
              }
         }
 #else
@@ -675,11 +685,58 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             {
                 return -1;
             }
- 
+
             /* We don't want to keep the header of the read sector */
             memcpy( p_buffer, p_block + VCD_DATA_START, VCD_DATA_SIZE );
 
             return 0;
+        }
+
+#elif defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
+        struct scsireq  sc;
+
+        int i_blocks = 1;
+        int i_ret;
+
+        int sector_type = 5; /* mode2/form2 */
+        int sync = 0,
+            header_code = 0,
+            user_data = 1,
+            edc_ecc = 0,
+            error_field = 0;
+        int sub_channel = 0;
+
+        memset( &sc, 0, sizeof(sc) );
+        sc.cmd[0] = 0xBE;
+        sc.cmd[1] = (sector_type) << 2;
+        sc.cmd[2] = (i_sector >> 24) & 0xff;
+        sc.cmd[3] = (i_sector >> 16) & 0xff;
+        sc.cmd[4] = (i_sector >>  8) & 0xff;
+        sc.cmd[5] = (i_sector >>  0) & 0xff;
+        sc.cmd[6] = (i_blocks >> 16) & 0xff;
+        sc.cmd[7] = (i_blocks >>  8) & 0xff;
+        sc.cmd[8] = (i_blocks >>  0) & 0xff;
+        sc.cmd[9] = (sync << 7) | (header_code << 5) | (user_data << 4) |
+                    (edc_ecc << 3) | (error_field << 1);
+        sc.cmd[10] = sub_channel;
+        sc.cmdlen = 12;
+        sc.databuf = (caddr_t)p_block;
+        sc.datalen = VCD_SECTOR_SIZE;      // was 2328 == VCD_DATA_SIZE + 4;
+        sc.senselen = sizeof( sc.sense );
+        sc.flags = SCCMD_READ;
+        sc.timeout = 10000;
+
+        i_ret = ioctl( i_fd, SCIOCCOMMAND, &sc );
+        if( i_ret == -1 )
+        {
+            msg_Err( p_this, "SCIOCCOMMAND failed" );
+            return -1;
+        }
+        if( sc.retsts || sc.error )
+        {
+            msg_Err( p_this, "SCSI command failed: status %d error %d\n",
+                             sc.retsts, sc.error );
+           return -1;
         }
 
 #elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H )
@@ -722,8 +779,13 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         }
 #endif
 
+#if defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
+        /* FIXME: is this ok? */
+        memcpy( p_buffer, p_block, VCD_DATA_SIZE );
+#else
         /* We don't want to keep the header of the read sector */
         memcpy( p_buffer, p_block + VCD_DATA_START, VCD_DATA_SIZE );
+#endif
 
         return( 0 );
     }
