@@ -111,16 +111,18 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
              * time to jump to the next PES packet */
             if ( p_bit_stream->p_ts->p_next_ts == NULL )
             {
-                /* Is the input thread dying ? */
-                if ( p_bit_stream->p_input->b_die )
-                {
-                    return( 0 );
-                }
-			
                 /* We are going to read/write the start and end indexes of the
                  * decoder fifo and to use the fifo's conditional variable,
                  * that's why we need to take the lock before */
                 vlc_mutex_lock( &p_bit_stream->p_decoder_fifo->data_lock );
+
+                /* Is the input thread dying ? */
+                if ( p_bit_stream->p_input->b_die )
+                {
+                    vlc_mutex_unlock( &(p_bit_stream->p_decoder_fifo->data_lock) );
+                    return( 0 );
+                }
+
                 /* We should increase the start index of the decoder fifo, but
                  * if we do this now, the input thread could overwrite the
                  * pointer to the current PES packet, and we weren't able to
@@ -131,8 +133,7 @@ static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
 
                 while ( DECODER_FIFO_ISEMPTY(*p_bit_stream->p_decoder_fifo) )
                 {
-                    vlc_cond_wait( &p_bit_stream->p_decoder_fifo->data_wait,
-                                       &p_bit_stream->p_decoder_fifo->data_lock );
+                    vlc_cond_wait( &p_bit_stream->p_decoder_fifo->data_wait, &p_bit_stream->p_decoder_fifo->data_lock );
                     if ( p_bit_stream->p_input->b_die )
                     {
                         vlc_mutex_unlock( &(p_bit_stream->p_decoder_fifo->data_lock) );
