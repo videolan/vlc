@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.8 2003/01/16 13:49:44 hartman Exp $
+ * $Id: controls.m,v 1.9 2003/01/17 21:46:04 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -358,10 +358,15 @@
 - (IBAction)fullscreen:(id)sender
 {
     id o_window = [NSApp keyWindow];
-
-    if( [[o_window className] isEqualToString: @"VLCWindow"] )
+    NSArray *o_windows = [NSApp windows];
+    NSEnumerator *o_enumerator = [o_windows objectEnumerator];
+    
+    while ((o_window = [o_enumerator nextObject]))
     {
-        [o_window toggleFullscreen];
+        if( [[o_window className] isEqualToString: @"VLCWindow"] )
+        {
+            [o_window toggleFullscreen];
+        }
     }
 }
 
@@ -549,16 +554,18 @@
     }
     else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] )    
     {
-        id o_window = [NSApp keyWindow];
-
-        if( [[o_window className] isEqualToString: @"VLCWindow"] )
+        id o_window;
+        NSArray *o_windows = [NSApp windows];
+        NSEnumerator *o_enumerator = [o_windows objectEnumerator];
+        bEnabled = FALSE;
+        
+        while ((o_window = [o_enumerator nextObject]))
         {
-            [o_mi setState: [o_window isFullscreen] ? 
-                             NSOnState : NSOffState]; 
-        }
-        else
-        {
-            bEnabled = FALSE;
+            if( [[o_window className] isEqualToString: @"VLCWindow"] )
+            {
+                bEnabled = TRUE;
+                break;
+            }
         }
     }
     else if( o_menu != nil && 
