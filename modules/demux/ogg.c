@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.22 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: ogg.c,v 1.23 2003/03/31 23:37:36 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -810,7 +810,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             sprintf( title, "Stream %d", p_ogg->i_streams );
                             p_cat = input_InfoCategory( p_input, title );
                             input_AddInfo( p_cat, _("Type"), _("Audio") );
-                            input_AddInfo( p_cat, _("Codec"), _("%.4s"), 
+                            input_AddInfo( p_cat, _("Codec"), "%.4s", 
                                            (char *)&p_stream->i_fourcc );
                             input_AddInfo( p_cat, _("Sample Rate"), "%d",
                                            p_stream->p_wf->nSamplesPerSec );
