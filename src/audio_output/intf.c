@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.16 2003/02/09 01:13:43 massiot Exp $
+ * $Id: intf.c,v 1.17 2003/02/12 14:22:23 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -140,6 +140,7 @@ int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
         i = AOUT_VOLUME_MAX;
     }
     config_PutInt( p_object, "volume", i );
+    config_PutInt( p_object, "saved-volume", i );
     if ( pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
 
     if ( p_aout == NULL ) return 0;
@@ -175,6 +176,7 @@ int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
         i = AOUT_VOLUME_MIN;
     }
     config_PutInt( p_object, "volume", i );
+    config_PutInt( p_object, "saved-volume", i );
     if ( pi_volume != NULL ) *pi_volume = (audio_volume_t)i;
 
     if ( p_aout == NULL ) return 0;

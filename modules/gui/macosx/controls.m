@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.27 2003/02/10 00:41:45 hartman Exp $
+ * $Id: controls.m,v 1.28 2003/02/12 14:22:23 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -312,12 +312,12 @@
 {
     intf_thread_t * p_intf = [NSApp getIntf];
 
-    aout_VolumeUp( p_intf, 1, NULL );
-
     if( p_intf->p_sys->b_mute )
     {
         [self mute: nil];
     }
+
+    aout_VolumeUp( p_intf, 1, NULL );
 
     [self updateVolumeSlider];
 }
@@ -326,12 +326,12 @@
 {
     intf_thread_t * p_intf = [NSApp getIntf];
 
-    aout_VolumeDown( p_intf, 1, NULL );
-
     if( p_intf->p_sys->b_mute )
     {
         [self mute: nil];
     }
+    
+    aout_VolumeDown( p_intf, 1, NULL );
 
     [self updateVolumeSlider];
 }
