@@ -2,7 +2,7 @@
  * modules_plugin.h : Plugin management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_plugin.h.in,v 1.11 2003/10/04 11:17:04 sam Exp $
+ * $Id: modules_plugin.h.in,v 1.12 2003/10/04 12:30:53 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,7 +34,6 @@
 static int module_load( const MYCHAR * psz_filename, module_handle_t * handle )
 {
 #if defined(HAVE_DL_DYLD)
-    NSModule handle;
     NSObjectFileImage image;
     NSObjectFileImageReturnCode ret;
 
