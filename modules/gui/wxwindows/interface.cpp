@@ -455,7 +455,7 @@ VLCVolCtrl::VLCVolCtrl( intf_thread_t *p_intf, wxWindow *p_parent,
               wxBORDER_NONE ),
    i_y_offset((VLCVOL_HEIGHT - TOOLBAR_BMP_HEIGHT) / 2)
 {
-    *pp_volctrl = new wxVolCtrl( p_intf, this, -1, wxPoint( 18, i_y_offset ),
+    *pp_volctrl = new wxVolCtrl( p_intf, this, -1, wxPoint( 0 , i_y_offset ),
                                  wxSize( 44, TOOLBAR_BMP_HEIGHT ) );
 }
 
@@ -509,8 +509,10 @@ void Interface::CreateOurToolBar()
 
     toolbar->AddControl( p_dummy_ctrl );
 
-    toolbar->AddTool( Mute_Event, wxT(""), wxBitmap( speaker_xpm ),
-                      wxU(_(HELP_MUTE)) );
+    wxToolBarToolBase *p_tool2 = toolbar->AddTool( Mute_Event, wxT(""),
+                    wxBitmap( speaker_xpm ), wxU(_(HELP_MUTE)) );
+    p_tool2->SetClientData( p_tool2 );
+
     VLCVolCtrl *sound_control = new VLCVolCtrl( p_intf, toolbar, &volctrl );
     toolbar->AddControl( sound_control );
 
@@ -1206,17 +1208,19 @@ void Interface::OnMute( wxCommandEvent& WXUNUSED(event) )
         GetToolBar()->GetToolClientData( Mute_Event );
     if( !p_tool ) return;
 
-    if( i_volume >= 0 )
+    if( i_volume != 0 )
     {
         p_tool->SetNormalBitmap( wxBitmap( speaker_xpm ) );
         p_tool->SetLabel( wxU(_("")) );
         p_tool->SetShortHelp( wxU(_(HELP_MUTE)) );
+        fprintf( stderr, "sound is on\n");
     }
     else
     {
         p_tool->SetNormalBitmap( wxBitmap( speaker_mute_xpm ) );
         p_tool->SetLabel( wxU(_("")) );
         p_tool->SetShortHelp( wxU(_(HELP_MUTE)) );
+        fprintf( stderr, "sound is off\n");
     }
 
     GetToolBar()->Realize();
