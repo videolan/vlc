@@ -1185,7 +1185,7 @@ then
   fi
   # check for cross-compiling
   SDL_PREFIX=
-  AC_ARG_WITH(sdl,
+  AC_ARG_WITH(sdl-prefix,
     [    --with-sdl-prefix=PATH path to libsdl (needed for cross-compiling),
                                e.g use as:
                                --with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
@@ -1512,7 +1512,7 @@ then
   fi
   # check for cross-compiling
   GTK_PREFIX=
-  AC_ARG_WITH(gtk,
+  AC_ARG_WITH(gtk-prefix,
     [    --with-gtk-prefix=PATH path to libgtk (needed for cross-compiling),
                           e.g use as:
                           --with-gtk-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
@@ -1542,21 +1542,20 @@ then
     if test "x$with_gpe_prefix" != "xno"  -a "x$with_gpe_prefix" != "x"
     then
       gpe_CFLAGS="-I$with_gpe_prefix/include"
-      gpe_LDFLAGS="-lXi -lgdk_pixbuf -L$with_gpe_prefix/lib"
-
+      gpe_LDFLAGS="-lXi -lgdk_pixbuf -L$with_gpe_prefix/lib -lgpewidget"
       # now look for gpe/init.h header file
       save_CFLAGS=$CFLAGS
       save_LDFLAGS=$LDFLAGS
-#      CFLAGS="${familiar_CFLAGS} ${gpe_CFLAGS}"
+      CFLAGS="${familiar_CFLAGS} ${gpe_CFLAGS}"
       LDFLAGS="${familiar_LDFLAGS} ${gpe_LDFLAGS}"
       CPPFLAGS="${save_CPPFLAGS} ${familiar_CFLAGS} ${gpe_CFLAGS}"
       ac_cv_gpe_headers=yes
       AC_CHECK_HEADERS(gpe/init.h, ,
         [ ac_cv_gpe_headers=no 
           AC_MSG_ERROR([Cannot find development headers for libgpewidget...]) ])
-      AC_CHECK_LIB(gpewidget,  gpe_application_init, 
-        [ gpe_LDFLAGS="${gpe_LDFLAGS} -lgpewidget" ],
-        [ AC_MSG_ERROR([Cannot find libgpewidget library...]) ])
+#      AC_CHECK_LIB(gpewidget, gpe_application_init, 
+#        [ gpe_LDFLAGS="${gpe_LDFLAGS} -lgpewidget" ],
+#        [ AC_MSG_ERROR([Cannot find libgpewidget library...]) ])
       CFLAGS=$save_CFLAGS
       LDFLAGS=$save_LDFLAG 
       if test "x${ac_cv_gpe_headers}" = "xyes"
