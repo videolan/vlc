@@ -21,13 +21,11 @@ EXTRA_DIST = \
 	mozilla-plugin-vlc.dirs \
 	qvlc.dirs \
 	qvlc.menu \
-	vlc-plugin-aa.dirs \
 	vlc-plugin-alsa.dirs \
 	vlc-plugin-arts.dirs \
 	vlc-plugin-esd.dirs \
 	vlc-plugin-ggi.dirs \
 	vlc-plugin-glide.dirs \
-	vlc-plugin-lirc.dirs \
 	vlc-plugin-sdl.dirs \
 	vlc-plugin-svgalib.dirs \
 	woody-buildpackage \
