@@ -1,15 +1,15 @@
 /*****************************************************************************
- * libavi.c : 
+ * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.9 2002/12/06 16:34:06 sam Exp $
+ * $Id: libavi.c,v 1.10 2002/12/16 13:04:36 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -41,7 +41,7 @@
     if( p ) {free( p ); p = NULL; }
 
 #define __EVEN( x ) ( (x)&0x01 ? (x)+1 : (x) )
-  
+
 /* Some functions to manipulate memory */
 static uint16_t GetWLE( uint8_t *p_buff )
 {
@@ -61,7 +61,7 @@ static vlc_fourcc_t GetFOURCC( byte_t *p_buff )
  * Some basic functions to manipulate stream more easily in vlc
  *
  * AVI_TellAbsolute get file position
- * 
+ *
  * AVI_SeekAbsolute seek in the file
  *
  * AVI_ReadData read data from the file in a buffer
@@ -72,9 +72,9 @@ static vlc_fourcc_t GetFOURCC( byte_t *p_buff )
 off_t AVI_TellAbsolute( input_thread_t *p_input )
 {
     off_t i_pos;
-    
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    
+
     i_pos= p_input->stream.p_selected_area->i_tell;
 //            - ( p_input->p_last_data - p_input->p_current_data  );
 
@@ -82,7 +82,7 @@ off_t AVI_TellAbsolute( input_thread_t *p_input )
 
     return i_pos;
 }
- 
+
 int AVI_SeekAbsolute( input_thread_t *p_input,
                       off_t i_pos)
 {
@@ -92,7 +92,7 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
     {
         return VLC_EGENERIC;
     }
-    
+
     i_filepos = AVI_TellAbsolute( p_input );
 
     if( i_filepos == i_pos )
@@ -111,7 +111,7 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
     {
         data_packet_t   *p_data;
         int             i_skip = i_pos - i_filepos;
-        
+
         msg_Warn( p_input, "will skip %d bytes, slow", i_skip );
         if( i_skip < 0 )
         {
@@ -120,7 +120,7 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
         while (i_skip > 0 )
         {
             int i_read;
-            
+
             i_read = input_SplitBuffer( p_input, &p_data, 
                                         __MIN( 4096, i_skip ) );
             if( i_read < 0 )
@@ -128,7 +128,7 @@ int AVI_SeekAbsolute( input_thread_t *p_input,
                 return VLC_EGENERIC;
             }
             i_skip -= i_read;
-            
+
             input_DeletePacket( p_input->p_method_data, p_data );
             if( i_read == 0 && i_skip > 0 )
             {
@@ -162,7 +162,7 @@ int AVI_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
     int i_count;
     int i_read = 0;
 
-    
+
     if( !i_size )
     {
         return 0;
@@ -177,13 +177,13 @@ int AVI_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size )
         }
         memcpy( p_buff, p_data->p_payload_start, i_count );
         input_DeletePacket( p_input->p_method_data, p_data );
-        
+
         p_buff += i_count;
         i_size -= i_count;
         i_read += i_count;
-                
+
     } while( i_size );
-    
+
     return i_read;
 }
 
@@ -195,11 +195,11 @@ int  AVI_SkipBytes( input_thread_t *p_input, int i_count )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     i_buff_size = p_input->p_last_data - p_input->p_current_data;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-            
+
     if( i_count > 0 && i_count + 1 < i_buff_size )
     {
         uint8_t *p_peek;
-        
+
         input_Peek( p_input, &p_peek, i_count + 1 );
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -210,7 +210,7 @@ int  AVI_SkipBytes( input_thread_t *p_input, int i_count )
     else
 #endif
     {
-        return AVI_SeekAbsolute( p_input, 
+        return AVI_SeekAbsolute( p_input,
                                  AVI_TellAbsolute( p_input ) + i_count );
     }
 }
@@ -218,14 +218,14 @@ int  AVI_SkipBytes( input_thread_t *p_input, int i_count )
 /*****************************************************************************
  *
  * AVI_TestFile: look at first bytes to see if it's a valid avi file
- * 
+ *
  * unseekable: ok
  *
  *****************************************************************************/
 int AVI_TestFile( input_thread_t *p_input )
 {
     uint8_t  *p_peek;
-    
+
     if( input_Peek( p_input, &p_peek, 8 ) < 8 )
     {
         msg_Err( p_input, "cannot peek()" );
@@ -259,7 +259,7 @@ static int AVI_ChunkReadCommon( input_thread_t *p_input,
     {
         return VLC_EGENERIC;
     }
-    
+
     p_chk->common.i_chunk_fourcc = GetFOURCC( p_peek );
     p_chk->common.i_chunk_size   = GetDWLE( p_peek + 4 );
     p_chk->common.i_chunk_pos    = AVI_TellAbsolute( p_input );
@@ -270,7 +270,8 @@ static int AVI_ChunkReadCommon( input_thread_t *p_input,
     p_chk->common.p_next = NULL;
 #ifdef AVI_DEBUG
     msg_Dbg( p_input, 
-             "Found Chunk fourcc:%c%c%c%c size:"I64Fd" pos:"I64Fd,
+             "Found Chunk fourcc:%8.8x (%c%c%c%c) size:"I64Fd" pos:"I64Fd,
+             p_chk->common.i_chunk_fourcc,
              AVIFOURCC_PRINT( p_chk->common.i_chunk_fourcc ),
              p_chk->common.i_chunk_size,
              p_chk->common.i_chunk_pos );
@@ -282,7 +283,7 @@ static int AVI_NextChunk( input_thread_t *p_input,
                           avi_chunk_t *p_chk )
 {
     avi_chunk_t chk;
-    
+
     if( !p_chk )
     {
         if( AVI_ChunkReadCommon( p_input, &chk ) )
@@ -328,7 +329,7 @@ static int AVI_ChunkRead_list( input_thread_t *p_input,
 {
     avi_chunk_t *p_chk;
     uint8_t *p_peek;
-    
+
     if( p_container->common.i_chunk_size < 8 )
     {
         /* empty box */
@@ -356,12 +357,17 @@ static int AVI_ChunkRead_list( input_thread_t *p_input,
         }
     }
 
-    AVI_SkipBytes( p_input, 12 );
+    if( AVI_SkipBytes( p_input, 12 ) )
+    {
+        msg_Err( p_input, "cannot enter chunk" );
+        return VLC_EGENERIC;
+    }
 #ifdef AVI_DEBUG
     msg_Dbg( p_input, 
              "found LIST chunk: \'%c%c%c%c\'",
              AVIFOURCC_PRINT( p_container->list.i_type ) );
 #endif
+    msg_Dbg( p_input, "<list \'%c%c%c%c\'>", AVIFOURCC_PRINT( p_container->list.i_type ) );
     for( ; ; )
     {
         p_chk = malloc( sizeof( avi_chunk_t ) );
@@ -390,8 +396,9 @@ static int AVI_ChunkRead_list( input_thread_t *p_input,
             break;
         }
 
-    } 
-    
+    }
+    msg_Dbg( p_input, "</list \'%c%c%c%c\'>", AVIFOURCC_PRINT( p_container->list.i_type ) );
+
     return VLC_SUCCESS;
 }
 
@@ -405,7 +412,7 @@ static int AVI_ChunkRead_list( input_thread_t *p_input,
     i_read = AVI_ReadData( p_input, p_read, i_read ); \
     p_read += 8; \
     i_read -= 8
-    
+
 #define AVI_READCHUNK_EXIT( code ) \
     free( p_buff ); \
     if( i_read < 0 ) \
@@ -422,7 +429,7 @@ static int AVI_ChunkRead_list( input_thread_t *p_input,
     i_dword = GetDWLE( p_read ); \
     p_read += 4; \
     i_read -= 4
-    
+
 #define AVI_READFOURCC( i_dword ) \
     i_dword = GetFOURCC( p_read ); \
     p_read += 4; \
@@ -488,7 +495,7 @@ static int AVI_ChunkRead_strh( input_thread_t *p_input,
              ( p_chk->strh.i_scale ? 
                 (float)p_chk->strh.i_rate / (float)p_chk->strh.i_scale : -1) );
 #endif
-    
+
     AVI_READCHUNK_EXIT( VLC_SUCCESS );
 }
 
@@ -509,7 +516,7 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
         msg_Err( p_input, "malformed avi file" );
         AVI_READCHUNK_EXIT( VLC_EGENERIC );
     }
-    
+
     switch( p_strh->strh.i_type )
     {
         case( AVIFOURCC_auds ):
@@ -694,7 +701,7 @@ static int AVI_ChunkRead_strz( input_thread_t *p_input,
         memcpy( p_strz->p_str, p_read, i_read );
     }
     p_strz->p_str[i_read] = 0;
-    
+
 #ifdef AVI_DEBUG
     msg_Dbg( p_input, "%c%c%c%c: %s : %s", 
              AVIFOURCC_PRINT( p_strz->i_chunk_fourcc), p_strz->p_type, p_strz->p_str);
@@ -799,6 +806,11 @@ int  _AVI_ChunkRead( input_thread_t *p_input,
         msg_Warn( p_input, "cannot read one chunk" );
         return VLC_EGENERIC;
     }
+    if( p_chk->common.i_chunk_fourcc == VLC_FOURCC( 0, 0, 0, 0 ) )
+    {
+        msg_Warn( p_input, "found null fourcc chunk (corrupted file?)" );
+        return VLC_EGENERIC;
+    }
     p_chk->common.p_father = p_father;
 
     i_index = AVI_ChunkFunctionFind( p_chk->common.i_chunk_fourcc );
@@ -822,7 +834,7 @@ void _AVI_ChunkFree( input_thread_t *p_input,
     {
         return;
     }
-    
+
     /* Free all child chunk */
     p_child = p_chk->common.p_first;
     while( p_child )
@@ -848,7 +860,7 @@ void _AVI_ChunkFree( input_thread_t *p_input,
     }
     p_chk->common.p_first = NULL;
     p_chk->common.p_last  = NULL;
-    
+
     return;
 }
 
@@ -858,7 +870,7 @@ int AVI_ChunkReadRoot( input_thread_t *p_input,
 {
     avi_chunk_list_t *p_list = (avi_chunk_list_t*)p_root;
     avi_chunk_t      *p_chk;
-    
+
     p_list->i_chunk_pos  = 0;
     p_list->i_chunk_size = p_input->stream.p_selected_area->i_size;
     p_list->i_chunk_fourcc = AVIFOURCC_LIST;
@@ -868,7 +880,7 @@ int AVI_ChunkReadRoot( input_thread_t *p_input,
     p_list->p_last  = NULL;
 
     p_list->i_type = VLC_FOURCC( 'r', 'o', 'o', 't' );
-    
+
     for( ; ; )
     {
         p_chk = malloc( sizeof( avi_chunk_t ) );
@@ -897,7 +909,7 @@ int AVI_ChunkReadRoot( input_thread_t *p_input,
             break;
         }
     } 
-    
+
     return VLC_SUCCESS;
 }
 
