@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.33 2003/11/08 23:02:38 sigmunau Exp $
+ * $Id: sap.c,v 1.34 2003/11/12 08:10:21 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -464,7 +464,7 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
     int i_count , i;
     vlc_bool_t b_http = VLC_FALSE;
     char *psz_http_path = NULL;
-    playlist_t *p_playlist;
+    playlist_t *p_playlist = NULL;
 
     psz_uri_default = NULL;
     cfield_parse( p_sd->psz_connection, &psz_uri_default );
@@ -528,6 +528,31 @@ static void sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
             if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "http-path"))
             {
                 psz_http_path = strdup(  p_sd->pp_attributes[i]->psz_value );
+            }
+            if(!strcasecmp( p_sd->pp_attributes[i]->psz_field , "plgroup"))
+            {
+                p_playlist =
+                (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                        FIND_ANYWHERE );
+                if( p_playlist == NULL )
+                {
+                    return;
+                }
+
+                int i_id=playlist_GroupToId( p_playlist,
+                                      p_sd->pp_attributes[i]->psz_value);
+                if( i_id != 0 )
+                {
+                    p_item->i_group = i_id;
+                }
+                else
+                {
+                    playlist_group_t *p_group =
+                            playlist_CreateGroup( p_playlist,
+                                       p_sd->pp_attributes[i]->psz_value);
+                    p_item->i_group = p_group->i_id;
+                }
+                vlc_object_release( p_playlist );
             }
         }
 
@@ -615,7 +640,7 @@ static sess_descr_t *  parse_sdp( intf_thread_t * p_intf, char *p_packet )
         {
             psz_end--;
         }
-        
+
         if( psz_end <= p_packet )
         {
             break;
@@ -794,4 +819,3 @@ static ssize_t NetRead( intf_thread_t *p_intf,
     return 0;
 #endif
 }
-

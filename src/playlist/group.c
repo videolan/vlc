@@ -2,7 +2,7 @@
  * playlist.c : Playlist groups management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: group.c,v 1.1 2003/10/29 18:00:46 zorglub Exp $
+ * $Id: group.c,v 1.2 2003/11/12 08:10:21 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -123,4 +123,27 @@ char *playlist_FindGroup( playlist_t *p_playlist, int i_id )
         }
     }
     return NULL;
+}
+
+/**
+ * Find the Id with the given name
+ *
+ * \param p_playlist the playlist where to find the group
+ * \param char * the name to search for
+ * \return the id of the group
+ */
+int playlist_GroupToId( playlist_t *p_playlist, char *psz_name )
+{
+    int i;
+    for( i=0 ; i< p_playlist->i_groups; i++ )
+    {
+        if( p_playlist->pp_groups[i]->psz_name)
+        {
+            if( ! strcasecmp( p_playlist->pp_groups[i]->psz_name ,  psz_name ) )
+            {
+                return p_playlist->pp_groups[i]->i_id;
+            }
+        }
+    }
+    return 0;
 }
