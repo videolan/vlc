@@ -6,6 +6,9 @@ Changes between 0.8.1 and 0.8.2-svn:
 Core support:
  * Rewrite of the playlist
 
+BeOS port:
+ * Support for single-buffered overlay
+
 Changes between 0.8.0 and 0.8.1:
 -----------------------------------------------------
 
