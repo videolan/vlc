@@ -80,6 +80,7 @@ struct decoder_sys_t
 
     /* Useful values of the Slice Header */
     int i_nal_type;
+    int i_nal_ref_idc;
     int i_idr_pic_id;
     int i_frame_num;
 };
@@ -155,12 +156,16 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_sps   = VLC_FALSE;
 
     p_sys->i_nal_type = -1;
+    p_sys->i_nal_ref_idc = -1;
     p_sys->i_idr_pic_id = -1;
     p_sys->i_frame_num = -1;
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
+    /* FIXME: FFMPEG isn't happy at all if you leave this */
+    if( p_dec->fmt_out.i_extra ) free( p_dec->fmt_out.p_extra );
+    p_dec->fmt_out.i_extra = 0; p_dec->fmt_out.p_extra = 0;
 
     if( p_dec->fmt_in.i_codec == VLC_FOURCC( 'a', 'v', 'c', '1' ) )
     {
@@ -204,6 +209,8 @@ static int Open( vlc_object_t *p_this )
         p_dec->pf_packetize = Packetize;
     }
 
+        block_ChainRelease( p_sys->p_frame );
+        p_sys->p_frame = 0;
     return VLC_SUCCESS;
 }
 
@@ -237,7 +244,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         {
             case STATE_NOSYNC:
                 if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                        &p_sys->i_offset, p_sys->startcode, 4 ) == VLC_SUCCESS )
+                      &p_sys->i_offset, p_sys->startcode+1, 3 ) == VLC_SUCCESS)
                 {
                     p_sys->i_state = STATE_NEXT_SYNC;
                 }
@@ -260,10 +267,15 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             case STATE_NEXT_SYNC:
                 /* Find the next startcode */
                 if( block_FindStartcodeFromOffset( &p_sys->bytestream,
-                        &p_sys->i_offset, p_sys->startcode, 4 ) != VLC_SUCCESS )
+                      &p_sys->i_offset, p_sys->startcode, 3 ) != VLC_SUCCESS)
                 {
-                    /* Need more data */
-                    return NULL;
+                    if( block_FindStartcodeFromOffset( &p_sys->bytestream,
+                          &p_sys->i_offset, p_sys->startcode+1, 3 ) !=
+                        VLC_SUCCESS )
+                    {
+                        /* Need more data */
+                        return NULL;
+                    }
                 }
 
                 /* Get the new fragment and set the pts/dts */
@@ -342,16 +354,15 @@ static block_t *nal_get_annexeb( decoder_t *p_dec, uint8_t *p, int i_size )
 {
     block_t *p_nal;
 
-    p_nal = block_New( p_dec, 4 + i_size );
+    p_nal = block_New( p_dec, 3 + i_size );
 
     /* Add start code */
     p_nal->p_buffer[0] = 0x00;
     p_nal->p_buffer[1] = 0x00;
-    p_nal->p_buffer[2] = 0x00;
-    p_nal->p_buffer[3] = 0x01;
+    p_nal->p_buffer[2] = 0x01;
 
     /* Copy nalu */
-    memcpy( &p_nal->p_buffer[4], p, i_size );
+    memcpy( &p_nal->p_buffer[3], p, i_size );
 
     return p_nal;
 }
@@ -405,8 +416,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_pic = NULL;
 
-    const int i_ref_idc  = (p_frag->p_buffer[4] >> 5)&0x03;
-    const int i_nal_type = p_frag->p_buffer[4]&0x1f;
+    const int i_nal_ref_idc = (p_frag->p_buffer[3] >> 5)&0x03;
+    const int i_nal_type = p_frag->p_buffer[3]&0x1f;
 
     if( p_sys->b_slice && !p_sys->b_sps )
     {
@@ -432,8 +443,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         bs_t s;
 
         /* do not convert the whole frame */
-        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5],
-                         __MIN( p_frag->i_buffer - 5, 60 ) );
+        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[4],
+                         __MIN( p_frag->i_buffer - 4, 60 ) );
         bs_init( &s, dec, i_dec );
 
         /* first_mb_in_slice */
@@ -464,11 +475,16 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         /* frame_num */
         i_frame_num = bs_read( &s, p_sys->i_log2_max_frame_num + 4 );
 
-        if( i_nal_type != NAL_SLICE_IDR && i_frame_num != p_sys->i_frame_num )
+        /* Detection of the first VCL NAL unit of a primary coded picture
+         * (cf. 7.4.1.2.4) */
+        if( i_frame_num != p_sys->i_frame_num ||
+            ( (i_nal_ref_idc != p_sys->i_nal_ref_idc) &&
+              (!i_nal_ref_idc || !p_sys->i_nal_ref_idc) ) )
         {
             b_pic = VLC_TRUE;
         }
         p_sys->i_frame_num = i_frame_num;
+        p_sys->i_nal_ref_idc = i_nal_ref_idc;
 
         if( !p_sys->b_frame_mbs_only )
         {
@@ -521,8 +537,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
 
         p_sys->b_sps = VLC_TRUE;
 
-        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[5],
-                         p_frag->i_buffer - 5 );
+        nal_get_decoded( &dec, &i_dec, &p_frag->p_buffer[4],
+                         p_frag->i_buffer - 4 );
 
         bs_init( &s, dec, i_dec );
         /* Skip profile(8), constraint_set012, reserver(5), level(8) */
@@ -574,18 +590,18 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
         /* b_direct8x8_inference */
         bs_skip( &s, 1 );
 
-        /* crop ? */
+        /* crop */
         i_tmp = bs_read( &s, 1 );
         if( i_tmp )
         {
             /* left */
-            p_dec->fmt_out.video.i_width -= 2 * bs_read_ue( &s );
+            bs_read_ue( &s );
             /* right */
-            p_dec->fmt_out.video.i_width -= 2 * bs_read_ue( &s );
+            bs_read_ue( &s );
             /* top */
-            p_dec->fmt_out.video.i_height -= 2 * bs_read_ue( &s );
+            bs_read_ue( &s );
             /* bottom */
-            p_dec->fmt_out.video.i_height -= 2 * bs_read_ue( &s );
+            bs_read_ue( &s );
         }
 
         /* vui */
@@ -627,7 +643,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, block_t *p_frag )
     else if( i_nal_type == NAL_PPS )
     {
         bs_t s;
-        bs_init( &s, &p_frag->p_buffer[5], p_frag->i_buffer - 5 );
+        bs_init( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
 
         /* TODO */
         msg_Dbg( p_dec, "found NAL_PPS" );
