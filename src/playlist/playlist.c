@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.82 2004/02/23 21:57:56 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -562,7 +562,6 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
 static void PlayItem( playlist_t *p_playlist )
 {
     playlist_item_t *p_item;
-    int             i, j;
     vlc_value_t val;
     if( p_playlist->i_index == -1 )
     {
