@@ -1,0 +1,288 @@
+<?xml version="1.0"?>
+<GTK-Interface>
+
+<project>
+  <name>Familiar</name>
+  <program_name>familiar</program_name>
+  <directory></directory>
+  <source_directory>src</source_directory>
+  <pixmaps_directory>share</pixmaps_directory>
+  <language>C</language>
+  <gnome_support>False</gnome_support>
+  <gettext_support>True</gettext_support>
+  <main_source_file>familiar_interface.c</main_source_file>
+  <main_header_file>familiar_interface.h</main_header_file>
+  <handler_source_file>familiar_callbacks.c</handler_source_file>
+  <handler_header_file>familiar_callbacks.h</handler_header_file>
+  <support_source_file>familiar_support.c</support_source_file>
+  <support_header_file>familiar_support.h</support_header_file>
+</project>
+
+<widget>
+  <class>GtkWindow</class>
+  <name>familiar</name>
+  <width>240</width>
+  <height>320</height>
+  <title>vlc (familiar)</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>False</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkVBox</class>
+    <name>vbox</name>
+    <homogeneous>False</homogeneous>
+    <spacing>0</spacing>
+
+    <widget>
+      <class>GtkToolbar</class>
+      <name>toolbar</name>
+      <width>112</width>
+      <height>16</height>
+      <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
+      <type>GTK_TOOLBAR_ICONS</type>
+      <space_size>5</space_size>
+      <space_style>GTK_TOOLBAR_SPACE_EMPTY</space_style>
+      <relief>GTK_RELIEF_NORMAL</relief>
+      <tooltips>True</tooltips>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkPixmap</class>
+	<name>xpm_open</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>button_press_event</name>
+	  <handler>on_xpm_open_button_press_event</handler>
+	  <last_modification_time>Mon, 22 Jul 2002 13:18:11 GMT</last_modification_time>
+	</signal>
+	<filename>familiar-openb16x16.xpm</filename>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<build_insensitive>True</build_insensitive>
+      </widget>
+
+      <widget>
+	<class>GtkPixmap</class>
+	<name>xpm_preferences</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>button_press_event</name>
+	  <handler>on_xpm_preferences_button_press_event</handler>
+	  <last_modification_time>Mon, 22 Jul 2002 13:17:55 GMT</last_modification_time>
+	</signal>
+	<filename>familiar-preferencesb16x16.xpm</filename>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<build_insensitive>True</build_insensitive>
+      </widget>
+
+      <widget>
+	<class>GtkPixmap</class>
+	<name>xpm_rewind</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>button_press_event</name>
+	  <handler>on_xpm_rewind_button_press_event</handler>
+	  <last_modification_time>Mon, 22 Jul 2002 13:18:17 GMT</last_modification_time>
+	</signal>
+	<filename>familiar-rewindb16x16.xpm</filename>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<build_insensitive>True</build_insensitive>
+	<child>
+	  <new_group>True</new_group>
+	</child>
+      </widget>
+
+      <widget>
+	<class>GtkPixmap</class>
+	<name>xpm_pause</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>button_press_event</name>
+	  <handler>on_xpm_pause_button_press_event</handler>
+	  <last_modification_time>Mon, 22 Jul 2002 13:18:29 GMT</last_modification_time>
+	</signal>
+	<filename>familiar-pauseb16x16.xpm</filename>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<build_insensitive>True</build_insensitive>
+      </widget>
+
+      <widget>
+	<class>GtkPixmap</class>
+	<name>xpm_play</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>button_press_event</name>
+	  <handler>on_xpm_play_button_press_event</handler>
+	  <last_modification_time>Mon, 22 Jul 2002 13:18:36 GMT</last_modification_time>
+	</signal>
+	<filename>familiar-playb16x16.xpm</filename>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<build_insensitive>True</build_insensitive>
+      </widget>
+
+      <widget>
+	<class>GtkPixmap</class>
+	<name>xpm_stop</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>button_press_event</name>
+	  <handler>on_xpm_stop_button_press_event</handler>
+	  <last_modification_time>Mon, 22 Jul 2002 13:18:43 GMT</last_modification_time>
+	</signal>
+	<filename>familiar-stopb16x16.xpm</filename>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<build_insensitive>True</build_insensitive>
+      </widget>
+
+      <widget>
+	<class>GtkPixmap</class>
+	<name>xpm_forward</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>button_press_event</name>
+	  <handler>on_xpm_forward_button_press_event</handler>
+	  <last_modification_time>Mon, 22 Jul 2002 13:18:55 GMT</last_modification_time>
+	</signal>
+	<filename>familiar-forwardb16x16.xpm</filename>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+	<build_insensitive>True</build_insensitive>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkProgressBar</class>
+      <name>progress</name>
+      <value>0</value>
+      <lower>0</lower>
+      <upper>100</upper>
+      <bar_style>GTK_PROGRESS_CONTINUOUS</bar_style>
+      <orientation>GTK_PROGRESS_LEFT_TO_RIGHT</orientation>
+      <activity_mode>True</activity_mode>
+      <show_text>False</show_text>
+      <format>%P %%</format>
+      <text_xalign>0.5</text_xalign>
+      <text_yalign>0.5</text_yalign>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>False</fill>
+      </child>
+    </widget>
+
+    <widget>
+      <class>GtkNotebook</class>
+      <name>notebook</name>
+      <can_focus>True</can_focus>
+      <show_tabs>True</show_tabs>
+      <show_border>True</show_border>
+      <tab_pos>GTK_POS_TOP</tab_pos>
+      <scrollable>False</scrollable>
+      <tab_hborder>2</tab_hborder>
+      <tab_vborder>2</tab_vborder>
+      <popup_enable>False</popup_enable>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>Placeholder</class>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>media</name>
+	<label>Media</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+      </widget>
+
+      <widget>
+	<class>Placeholder</class>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>preference</name>
+	<label>Preference</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+      </widget>
+
+      <widget>
+	<class>Placeholder</class>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>help</name>
+	<label>Help</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+      </widget>
+
+      <widget>
+	<class>Placeholder</class>
+      </widget>
+
+      <widget>
+	<class>GtkLabel</class>
+	<child_name>Notebook:tab</child_name>
+	<name>about</name>
+	<label>About</label>
+	<justify>GTK_JUSTIFY_CENTER</justify>
+	<wrap>False</wrap>
+	<xalign>0.5</xalign>
+	<yalign>0.5</yalign>
+	<xpad>0</xpad>
+	<ypad>0</ypad>
+      </widget>
+    </widget>
+  </widget>
+</widget>
+
+</GTK-Interface>
