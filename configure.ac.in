@@ -151,17 +151,16 @@ case "x${target_os}" in
     ;;
   xbeos)
     SYS=beos
-    CFLAGS_save="${CFLAGS_save} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"; CXXFLAGS="${CXXFLAGS_save}"
+    CFLAGS_save="${CFLAGS_save} -Wno-multichar"; CFLAGS="${CFLAGS_save}"
+    CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
     LDFLAGS_vlc="${LDFLAGS_vlc} -lbe"
-    LDFLAGS_plugins="${LDFLAGS_plugins} -nostart"
-    LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -lroot -ltracker -lstdc++.r4 -ltranslation -lgame"
-    dnl BONE or not BONE ? only BONE has libbind.so
-    AC_CHECK_LIB( bind, inet_ntoa,
-        [ LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket -lbind"
-          LDFLAGS_ipv4="${LDFLAGS_ipv4} -lsocket -lbind"
-          LDFLAGS_httpd="${LDFLAGS_httpd} -lsocket -lbind"],
-        [])
+    LDFLAGS_beos="${LDFLAGS_beos} -lbe -lmedia -ltranslation -ltracker -lgame -lstdc++.r4"
+    dnl Check if we have BONE (old net_server doesn't have libsocket.so)
+    AC_CHECK_LIB( socket, connect,
+        LDFLAGS_vlc="${LDFLAGS_vlc} -lsocket -lbind" 
+        LDFLAGS_access_mms="${LDFLAGS_access_mms} -lsocket -lbind"
+        LDFLAGS_ipv4="${LDFLAGS_ipv4} -lsocket -lbind"
+        LDFLAGS_httpd="${LDFLAGS_httpd} -lsocket -lbind" )
     ;;
   x*)
     SYS="${target_os}"
@@ -717,12 +716,17 @@ if test "x${ac_cv_ld_darwin}" != "xno"; then
 fi
 
 dnl Check for standard plugin linking flags
-AC_CACHE_CHECK([if \$CC accepts -shared],
-    [ac_cv_ld_plugins],
-    [CFLAGS="${CFLAGS_save} -shared"
-     AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
-if test "x${ac_cv_ld_plugins}" != "xno"; then
-    LDFLAGS_plugins="${LDFLAGS_plugins} -shared"
+dnl BeOS' gcc needs -nostart instead of -shared, even if -shared isn't harmful (just a warning)
+if test "x${SYS}" = "xbeos"; then
+    LDFLAGS_plugins="${LDFLAGS_plugins} -nostart"
+else
+    AC_CACHE_CHECK([if \$CC accepts -shared],
+        [ac_cv_ld_plugins],
+        [CFLAGS="${CFLAGS_save} -shared"
+         AC_TRY_COMPILE([],, ac_cv_ld_plugins=yes, ac_cv_ld_plugins=no)])
+    if test "x${ac_cv_ld_plugins}" != "xno"; then
+        LDFLAGS_plugins="${LDFLAGS_plugins} -shared"
+    fi
 fi
 
 dnl Check for variadic macros
