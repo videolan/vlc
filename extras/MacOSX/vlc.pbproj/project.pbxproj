@@ -125,12 +125,12 @@
 			<string>Viewer</string>
 		</dict>
 		<dict>
-			<key>CFBundleTypeMIMETypes</key>
+			<key>CFBundleTypeName</key>
+			<string>Folder</string>
+			<key>CFBundleTypeOSTypes</key>
 			<array>
 				<string>fold</string>
 			</array>
-			<key>CFBundleTypeName</key>
-			<string>Folder</string>
 			<key>CFBundleTypeRole</key>
 			<string>Viewer</string>
 		</dict>

@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.24 2003/03/06 11:43:07 hartman Exp $
+ * $Id: open.m,v 1.25 2003/03/24 15:20:26 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -348,11 +348,18 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     NSString *o_filename = [o_file_path stringValue];
     NSString *o_ext = [o_filename pathExtension];
     vlc_bool_t b_stream = [o_file_stream state];
+    BOOL b_dir = NO;
+    
+    [[NSFileManager defaultManager] fileExistsAtPath:o_filename isDirectory:&b_dir];
 
-    if ([o_ext isEqualToString: @"bin"] ||
+    if( b_dir )
+    {
+        o_mrl_string = [NSString stringWithFormat: @"dir:%@", o_filename];
+    }
+    else if( [o_ext isEqualToString: @"bin"] ||
         [o_ext isEqualToString: @"cue"] ||
         [o_ext isEqualToString: @"vob"] ||
-        [o_ext isEqualToString: @"iso"])
+        [o_ext isEqualToString: @"iso"] )
     {
         o_mrl_string = o_filename;
     }
@@ -370,6 +377,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
     
     [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setCanChooseDirectories: YES];
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
 
@@ -797,6 +805,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
     
     [o_open_panel setAllowsMultipleSelection: YES];
+    [o_open_panel setCanChooseDirectories: YES];
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
     
