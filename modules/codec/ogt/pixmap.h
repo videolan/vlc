@@ -2,7 +2,7 @@
  * Common pixel/chroma manipulation routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: pixmap.h,v 1.2 2004/01/16 13:32:37 rocky Exp $
+ * $Id: pixmap.h,v 1.3 2004/01/29 11:50:22 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -57,10 +57,37 @@ yuv2rgb(ogt_yuvt_t *p_yuv, uint8_t *p_rgb_out )
   i_green = clip_8_bit( i_green );
   i_blue  = clip_8_bit( i_blue );
   
+#ifdef WORDS_BIGENDIAN
   *p_rgb_out++ = i_red;
   *p_rgb_out++ = i_green;
   *p_rgb_out++ = i_blue;
+#else
+  *p_rgb_out++ = i_blue;
+  *p_rgb_out++ = i_green;
+  *p_rgb_out++ = i_red;
+#endif
   
 }
+
+#define GREEN_PIXEL 1
+#ifdef WORDS_BIGENDIAN
+#define RED_PIXEL   0
+#define BLUE_PIXEL  2
+#else
+#define BLUE_PIXEL  2
+#define RED_PIXEL   0
+#endif
+
+static inline void
+put_rgb24_pixel(uint8_t *rgb, uint8_t *p_pixel)
+{
+#ifdef WORDS_BIGENDIAN
+  *p_pixel++;
+#endif
+  *p_pixel++ = rgb[RED_PIXEL];
+  *p_pixel++ = rgb[GREEN_PIXEL];
+  *p_pixel++ = rgb[BLUE_PIXEL];
+}
+
 
 #endif /* PIXMAP_H */

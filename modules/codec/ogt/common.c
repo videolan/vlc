@@ -2,7 +2,7 @@
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.9 2004/01/23 10:19:37 rocky Exp $
+ * $Id: common.c,v 1.10 2004/01/29 11:50:21 rocky Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from:
@@ -510,7 +510,6 @@ void VCDSubDumpImage( uint8_t *p_image, uint32_t i_height, uint32_t i_width )
 
 #ifdef HAVE_LIBPNG
 
-#define BYTES_PER_RGB 3
 #define PALETTE_SIZE  4
 /* Note the below assumes the above is a power of 2 */
 #define PALETTE_SIZE_MASK (PALETTE_SIZE-1)
@@ -529,11 +528,11 @@ VCDSubDumpPNG( uint8_t *p_image, decoder_t *p_dec,
 {
   decoder_sys_t *p_sys = p_dec->p_sys;
   uint8_t *p = p_image;
-  uint8_t *image_data = malloc(BYTES_PER_RGB * i_height * i_width );
+  uint8_t *image_data = malloc(RGB_SIZE * i_height * i_width );
   uint8_t *q = image_data;
   unsigned int i_row;    /* scanline row number */
   unsigned int i_column; /* scanline column number */
-  uint8_t rgb_palette[PALETTE_SIZE * BYTES_PER_RGB];
+  uint8_t rgb_palette[PALETTE_SIZE * RGB_SIZE];
   int i;
 
   dbg_print( (DECODE_DBG_CALL), "%s", filename);
@@ -543,14 +542,14 @@ VCDSubDumpPNG( uint8_t *p_image, decoder_t *p_dec,
   /* Convert palette YUV into RGB. */
   for (i=0; i<PALETTE_SIZE; i++) {
     ogt_yuvt_t *p_yuv     = &(p_sys->p_palette[i]);
-    uint8_t   *p_rgb_out  = &(rgb_palette[i*BYTES_PER_RGB]);
+    uint8_t   *p_rgb_out  = &(rgb_palette[i*RGB_SIZE]);
     yuv2rgb( p_yuv, p_rgb_out );
   }
   
   /* Convert palette entries into linear RGB array. */
   for ( i_row=0; i_row < i_height; i_row ++ ) {
     for ( i_column=0; i_column<i_width; i_column++ ) {
-      uint8_t *p_rgb = &rgb_palette[ ((*p)&PALETTE_SIZE_MASK)*BYTES_PER_RGB ];
+      uint8_t *p_rgb = &rgb_palette[ ((*p)&PALETTE_SIZE_MASK)*RGB_SIZE ];
       *q++ = p_rgb[0];
       *q++ = p_rgb[1];
       *q++ = p_rgb[2];

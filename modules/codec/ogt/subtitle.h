@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.13 2004/01/25 19:27:09 rocky Exp $
+ * $Id: subtitle.h,v 1.14 2004/01/29 11:50:22 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -115,11 +115,16 @@ typedef enum  {
   SUBTITLE_BLOCK_COMPLETE
 } packet_state_t;
 
-/* The storage used by one pixel */
+/* The byte storage of an RGB pixel. */ 
+#define RGB_SIZE 3
+
+/* The byte storage used by one pixel */
 #define PIXEL_SIZE 4
 
 /* Size in bytes of YUV portion above. */ 
 #define YUV_SIZE 3
+
+
 
 /* Transparency plane. NOTE: see vlc_video.h for V_PLANE */
 #define T_PLANE  V_PLANE+1
