@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -323,7 +324,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     tk = p_input->p_sys = &p_sys->track[p_sys->i_track];
-    tk->i_id  = p_sys->i_track;
+    tk->i_id  = p_sys->i_track + 1;
     tk->i_cat = p_input->p_fmt->i_cat;
     tk->i_sequence = 0;
 
