@@ -302,6 +302,7 @@
     if( p_parser->i_object_type != VLC_OBJECT_MODULE )
     {
         /* 0OOoo something went really bad */
+        vlc_list_release( p_list );
         return;
     }
     
@@ -822,6 +823,7 @@
     #undef X_ORIGIN
         }
         while( p_item->i_type != CONFIG_HINT_END && p_item++ );
+        vlc_object_release( p_parser );
         vlc_list_release( p_list );
     
     [o_prefs_view setDocumentView: o_view];
@@ -1073,6 +1075,7 @@ static VLCTreeItem *o_root_item = nil;
             /* all the other stuff are leafs */
             o_children = IsALeafNode;
         }
+        vlc_list_release( p_list );
     }
     return o_children;
 }
