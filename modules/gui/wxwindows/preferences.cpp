@@ -41,6 +41,7 @@
 #include <wx/statline.h>
 #include <wx/clntdata.h>
 #include <wx/dynarray.h>
+#include <wx/imaglist.h>
 
 #include "bitmaps/type_net.xpm"
 #include "bitmaps/codec.xpm"
