@@ -27,7 +27,7 @@
 
 /* Number of tries before we unload an unused module */
 #define MODULE_HIDE_DELAY 50
-#define MODULE_SHORTCUT_MAX 20
+#define MODULE_SHORTCUT_MAX 50
 
 /* The module handle type. */
 #if defined(HAVE_DL_DYLD)
