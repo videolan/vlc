@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.92 2002/08/11 01:27:01 massiot Exp $
+ * $Id: audio_output.c,v 1.93 2002/08/11 23:26:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -194,7 +194,7 @@ int aout_FormatTo( audio_sample_format_t * p_format, int i_multiplier )
         /* Please note that we don't multiply by multiplier, because i_rate
          * and i_nb_samples do not have any sense for S/PDIF (yes, it
          * _is_ kludgy). --Meuuh */
-        return AOUT_SPDIF_FRAME;
+        return AOUT_SPDIF_SIZE;
 
     default:
         return 0; /* will segfault much sooner... */

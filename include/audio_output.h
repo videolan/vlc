@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.56 2002/08/11 22:46:34 massiot Exp $
+ * $Id: audio_output.h,v 1.57 2002/08/11 23:26:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -109,7 +109,8 @@ struct aout_buffer_t
     struct aout_buffer_t *  p_next;
 };
 
-#define AOUT_SPDIF_FRAME 1536
+/* Size of a frame for S/PDIF output. */
+#define AOUT_SPDIF_SIZE 6144
 
 /*****************************************************************************
  * Prototypes

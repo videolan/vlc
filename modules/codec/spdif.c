@@ -2,7 +2,7 @@
  * spdif.c: A52 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: spdif.c,v 1.2 2002/08/11 22:36:35 massiot Exp $
+ * $Id: spdif.c,v 1.3 2002/08/11 23:26:28 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -77,7 +77,7 @@ static int  RunDecoder     ( decoder_fifo_t * );
 static int  InitThread     ( spdif_thread_t *, decoder_fifo_t * );
 static void EndThread      ( spdif_thread_t * );
 
-int         SyncInfo       ( const byte_t *, int *, int *, int * );
+static int  SyncInfo       ( const byte_t *, int *, int *, int * );
 
 /*****************************************************************************
  * Module descriptor
@@ -145,7 +145,6 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         /* Temporary buffer to store the raw frame to be decoded */
         byte_t p_header[7];
         aout_buffer_t * p_buffer;
-        u16 * pi_length;
 
         /* Look for sync word - should be 0x0b77 */
         RealignBits( &p_dec->bit_stream );
@@ -209,17 +208,13 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             continue;
         }
 
-        p_buffer = aout_BufferNew( p_dec->p_aout, p_dec->p_aout_input, 1 );
+        p_buffer = aout_BufferNew( p_dec->p_aout, p_dec->p_aout_input,
+                                   i_frame_size );
         if ( p_buffer == NULL ) return -1;
         p_buffer->start_date = last_date;
         last_date += (mtime_t)(A52_FRAME_SIZE * 1000000)
                        / p_dec->output_format.i_rate;
         p_buffer->end_date = last_date;
-
-        /* The first two bytes store the length of the frame - this is
-         * a bit kludgy. */
-        pi_length = (u16 *)p_buffer->p_buffer;
-        *pi_length = i_frame_size;
 
         /* Get the whole frame. */
         memcpy( p_buffer->p_buffer + sizeof(u16), p_header, 7 );

@@ -2,7 +2,7 @@
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: a52tospdif.c,v 1.1 2002/08/11 22:36:35 massiot Exp $
+ * $Id: a52tospdif.c,v 1.2 2002/08/11 23:26:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -78,7 +78,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     static const u8 p_sync[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x01, 0x00 };
-    u16 i_length = *(u16 *)p_in_buf->p_buffer;
+    u16 i_length = p_in_buf->i_nb_samples;
     u16 * pi_length;
     byte_t * p_in = p_in_buf->p_buffer;
     byte_t * p_out = p_out_buf->p_buffer;
@@ -93,10 +93,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
 #ifndef WORDS_BIGENDIAN
 #   ifdef HAVE_SWAB
-    swab( p_out + 8, p_in + sizeof(u16), i_length );
+    swab( p_out + 8, p_in, i_length );
 #   else
     p_out += 8;
-    p_in += sizeof(u16);
     for ( i = 0; i < i_length / 2; i++ )
     {
         p_out[0] = p_in[1];
@@ -106,9 +105,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #   endif
 
 #else
-    p_filter->p_vlc->pf_memcpy( p_out + 8, p_in + sizeof(u16), i_length );
+    p_filter->p_vlc->pf_memcpy( p_out + 8, p_in, i_length );
 #endif
 
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples; /* == 1 */
+    p_filter->p_vlc->pf_memset( p_out + 8 + i_length, 0,
+                               AOUT_SPDIF_SIZE - i_length - 8 );
+
+    p_out_buf->i_nb_samples = 1;
 }
 
