@@ -562,6 +562,7 @@ create_intf_window (void)
   gtk_widget_show (slider);
   gtk_box_pack_start (GTK_BOX (vbox2), slider, TRUE, TRUE, 0);
   gtk_scale_set_draw_value (GTK_SCALE (slider), FALSE);
+  gtk_scale_set_digits (GTK_SCALE (slider), 3);
 
   intf_statusbar = gtk_statusbar_new ();
   gtk_widget_ref (intf_statusbar);

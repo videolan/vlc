@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.1 2001/03/15 01:42:20 sam Exp $
+ * $Id: intf_qt.cpp,v 1.2 2001/03/18 00:01:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -69,6 +69,7 @@ extern "C"
 #include <qmessagebox.h>
 #include <qlabel.h> 
 #include <qtimer.h> 
+#include <qiconset.h> 
 
 #include <qvbox.h>
 #include <qhbox.h>
@@ -275,7 +276,8 @@ IntfWindow::IntfWindow( intf_thread_t *p_intf )
     p_toolbar = new QToolBar( this, "toolbar" );
     p_toolbar->setHorizontalStretchable( TRUE );
 
-    QPixmap pixmap = QPixmap( 0, 0 );
+    QIconSet * set = new QIconSet();
+    QPixmap pixmap = set->pixmap( QIconSet::Automatic, QIconSet::Normal );
 
 #define addbut( l, t, s ) new QToolButton( pixmap, l, t, this, s, p_toolbar );
     addbut( "Open", "Open a File", SLOT(FileOpen()) );
@@ -487,13 +489,10 @@ void IntfWindow::Manage( void )
 #undef p_area
     }
 
-    /* If the "display popup" flag has changed */
+    /* If the "display popup" flag has changed, popup the context menu */
     if( p_intf->b_menu_change )
     {
-        /* FIXME: find a way to display this menu right under the mouse */
-        p_popup->popup( QPoint(
-                p_intf->p_sys->p_app->desktop()->width() / 2,
-                p_intf->p_sys->p_app->desktop()->height() / 2 ), 0 );
+        p_popup->popup( QCursor::pos() );
         p_intf->b_menu_change = 0;
     }
 

@@ -568,7 +568,7 @@
       </signal>
       <draw_value>False</draw_value>
       <value_pos>GTK_POS_TOP</value_pos>
-      <digits>1</digits>
+      <digits>3</digits>
       <policy>GTK_UPDATE_CONTINUOUS</policy>
       <value>0</value>
       <lower>0</lower>

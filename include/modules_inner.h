@@ -44,24 +44,24 @@
  */
 
 /* I can't believe I need to do this to change « foo » to « "foo" » */
-#define UGLY_KLUDGE( z ) NASTY_CROCK( z )
-#define NASTY_CROCK( z ) #z
+#define STRINGIFY( z )   UGLY_KLUDGE( z )
+#define UGLY_KLUDGE( z ) #z
 /* And I need to do _this_ to change « foo bar » to « module_foo_bar » ! */
-#define AWFUL_BRITTLE( y, z ) CRUDE_HACK( y, z )
-#define CRUDE_HACK( y, z ) module_##y##_##z
+#define CONCATENATE( y, z ) CRUDE_HACK( y, z )
+#define CRUDE_HACK( y, z )  module_##y##_##z
 
 #define MODULE_VAR( z ) "VLC_MODULE_" #z
 
 /* If the module is built-in, then we need to define foo_InitModule instead
  * of InitModule. Same for Activate- and DeactivateModule. */
 #ifdef BUILTIN
-#   define _M( function )    AWFUL_BRITTLE( MODULE_NAME, function )
+#   define _M( function ) CONCATENATE( MODULE_NAME, function )
 #   define MODULE_INIT \
-      int AWFUL_BRITTLE( MODULE_NAME, InitModule )      ( module_t *p_module )
+      int CONCATENATE( MODULE_NAME, InitModule )      ( module_t *p_module )
 #   define MODULE_ACTIVATE \
-      int AWFUL_BRITTLE( MODULE_NAME, ActivateModule )  ( module_t *p_module )
+      int CONCATENATE( MODULE_NAME, ActivateModule )  ( module_t *p_module )
 #   define MODULE_DEACTIVATE \
-      int AWFUL_BRITTLE( MODULE_NAME, DeactivateModule )( module_t *p_module )
+      int CONCATENATE( MODULE_NAME, DeactivateModule )( module_t *p_module )
 #else
 #   define _M( function )    function
 #   define MODULE_INIT       int InitModule       ( module_t *p_module )
@@ -70,7 +70,7 @@
 #endif
 
 /* Now the real stuff */
-#define MODULE_STRING UGLY_KLUDGE( MODULE_NAME )
+#define MODULE_STRING STRINGIFY( MODULE_NAME )
 
 /*****************************************************************************
  * Macros used to build the configuration structure.

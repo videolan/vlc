@@ -453,14 +453,14 @@ create_intf_window (void)
   gtk_widget_show (label_bar);
   gtk_box_pack_start (GTK_BOX (hbox4), label_bar, FALSE, FALSE, 0);
 
-  slider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 0, 6.25, 0)));
+  slider = gtk_hscale_new (GTK_ADJUSTMENT (gtk_adjustment_new (0, 0, 100, 1, 6.25, 0)));
   gtk_widget_ref (slider);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "slider", slider,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (slider);
   gtk_box_pack_start (GTK_BOX (vbox2), slider, TRUE, TRUE, 0);
   gtk_scale_set_draw_value (GTK_SCALE (slider), FALSE);
-  gtk_scale_set_digits (GTK_SCALE (slider), 0);
+  gtk_scale_set_digits (GTK_SCALE (slider), 3);
 
   appbar = gnome_appbar_new (TRUE, TRUE, GNOME_PREFERENCES_NEVER);
   gtk_widget_ref (appbar);

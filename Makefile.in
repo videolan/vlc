@@ -301,6 +301,9 @@ PLUGIN_BEOS =	plugins/beos/beos.o \
 		plugins/beos/DrawingTidbits.o \
 		plugins/beos/TransportButton.o
 
+PLUGIN_DARWIN =	plugins/darwin/darwin.o \
+		plugins/darwin/aout_darwin.o
+
 PLUGIN_DSP =	plugins/dsp/dsp.o \
 		plugins/dsp/aout_dsp.o
 
@@ -360,6 +363,10 @@ PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o \
 PLUGIN_IDCTMMXEXT =	plugins/idct/idctmmxext.o \
 			plugins/idct/idct_common.o
 
+PLUGIN_MACOSX =	plugins/macosx/macosx.o \
+		plugins/macosx/intf_macosx.o \
+		plugins/macosx/vout_macosx.o
+
 PLUGIN_MGA =	plugins/mga/mga.o \
 		plugins/mga/vout_mga.o
 
@@ -403,6 +410,7 @@ PLUGIN_YUVMMX =	plugins/yuv/yuvmmx.o \
 
 STD_PLUGIN_OBJ = \
 		$(PLUGIN_ALSA) \
+		$(PLUGIN_DARWIN) \
 		$(PLUGIN_DSP) \
 		$(PLUGIN_DUMMY) \
 		$(PLUGIN_DVD) \
@@ -413,6 +421,7 @@ STD_PLUGIN_OBJ = \
 		$(PLUGIN_IDCTCLASSIC) \
 		$(PLUGIN_IDCTMMX) \
 		$(PLUGIN_IDCTMMXEXT) \
+		$(PLUGIN_MACOSX) \
 		$(PLUGIN_MGA) \
 		$(PLUGIN_MOTION) \
 		$(PLUGIN_MOTIONMMX) \
@@ -640,6 +649,12 @@ ifneq (,$(findstring bsd,$(SYS)))
 else
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^ -laudiofile -lesd
 endif
+
+lib/macosx.so: $(PLUGIN_MACOSX)
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
+
+lib/darwin.so: $(PLUGIN_DARWIN)
+	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
 
 lib/dsp.so: $(PLUGIN_DSP)
 	$(CC) $(PCFLAGS) $(PLCFLAGS) -o $@ $^
