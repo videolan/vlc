@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.30 2003/07/22 18:06:04 gbazin Exp $
+ * $Id: stream_output.c,v 1.31 2003/07/31 19:24:10 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -37,6 +37,8 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static void sout_cfg_free( sout_cfg_t * );
+
 #define sout_stream_url_to_chain( p, s ) _sout_stream_url_to_chain( VLC_OBJECT(p), s )
 static char *_sout_stream_url_to_chain( vlc_object_t *, char * );
 
@@ -237,6 +239,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
                                       char *psz_access, char *psz_name )
 {
     sout_access_out_t *p_access;
+    char              *psz_next;
 
     if( !( p_access = vlc_object_create( p_sout,
                                          sizeof( sout_access_out_t ) ) ) )
@@ -244,7 +247,12 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
         msg_Err( p_sout, "out of memory" );
         return NULL;
     }
-    p_access->psz_access = strdup( psz_access ? psz_access : "" );
+
+    psz_next = sout_cfg_parser( &p_access->psz_access, &p_access->p_cfg, psz_access );
+    if( psz_next )
+    {
+        free( psz_next );
+    }
     p_access->psz_name   = strdup( psz_name ? psz_name : "" );
     p_access->p_sout     = p_sout;
     p_access->p_sys = NULL;
@@ -274,6 +282,9 @@ void sout_AccessOutDelete( sout_access_out_t *p_access )
         module_Unneed( p_access, p_access->p_module );
     }
     free( p_access->psz_access );
+
+    sout_cfg_free( p_access->p_cfg );
+
     free( p_access->psz_name );
 
     vlc_object_destroy( p_access );
@@ -304,6 +315,7 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
                                    sout_access_out_t *p_access )
 {
     sout_mux_t *p_mux;
+    char       *psz_next;
 
     p_mux = vlc_object_create( p_sout,
                                sizeof( sout_mux_t ) );
@@ -314,7 +326,11 @@ sout_mux_t * sout_MuxNew         ( sout_instance_t *p_sout,
     }
 
     p_mux->p_sout       = p_sout;
-    p_mux->psz_mux      = strdup( psz_mux ? psz_mux : "" );
+    psz_next = sout_cfg_parser( &p_mux->psz_mux, &p_mux->p_cfg, psz_mux );
+    if( psz_next )
+    {
+        free( psz_next );
+    }
     p_mux->p_access     = p_access;
     p_mux->i_preheader  = 0;
     p_mux->pf_capacity  = NULL;
@@ -376,6 +392,8 @@ void sout_MuxDelete              ( sout_mux_t *p_mux )
         module_Unneed( p_mux, p_mux->p_module );
     }
     free( p_mux->psz_mux );
+
+    sout_cfg_free( p_mux->p_cfg );
 
     vlc_object_destroy( p_mux );
 }
@@ -1082,8 +1100,21 @@ char * sout_cfg_parser( char **ppsz_name, sout_cfg_t **pp_cfg, char *psz_chain )
     return( NULL );
 }
 
+static void sout_cfg_free( sout_cfg_t *p_cfg )
+{
+    while( p_cfg != NULL )
+    {
+        sout_cfg_t *p_next;
 
+        p_next = p_cfg->p_next;
 
+        FREE( p_cfg->psz_name );
+        FREE( p_cfg->psz_value );
+        free( p_cfg );
+
+        p_cfg = p_next;
+    }
+}
 
 
 /*
@@ -1138,19 +1169,7 @@ void sout_stream_delete( sout_stream_t *p_stream )
     FREE( p_stream->psz_name );
     FREE( p_stream->psz_next );
 
-    p_cfg = p_stream->p_cfg;
-    while( p_cfg != NULL )
-    {
-        sout_cfg_t *p_next;
-
-        p_next = p_cfg->p_next;
-
-        FREE( p_cfg->psz_name );
-        FREE( p_cfg->psz_value );
-        free( p_cfg );
-
-        p_cfg = p_next;
-    }
+    sout_cfg_free( p_stream->p_cfg );
 
     msg_Dbg( p_stream, "destroying chain done" );
     vlc_object_destroy( p_stream );
@@ -1209,13 +1228,14 @@ static char *_sout_stream_url_to_chain( vlc_object_t *p_this, char *psz_url )
 
     if( config_GetInt( p_this, "sout-display" ) )
     {
-        p += sprintf( p, "duplicate{dst=display,dst=std{mux=%s,access=%s,url=\"%s\"}}", mrl.psz_way, mrl.psz_access, mrl.psz_name );
+        p += sprintf( p, "duplicate{dst=display,dst=std{mux=\"%s\",access=\"%s\",url=\"%s\"}}", mrl.psz_way, mrl.psz_access, mrl.psz_name );
     }
     else
     {
-        p += sprintf( p, "std{mux=%s,access=%s,url=\"%s\"}", mrl.psz_way, mrl.psz_access, mrl.psz_name );
+        p += sprintf( p, "std{mux=\"%s\",access=\"%s\",url=\"%s\"}", mrl.psz_way, mrl.psz_access, mrl.psz_name );
     }
 
+    mrl_Clean( &mrl );
     return( psz_chain );
 }
 
