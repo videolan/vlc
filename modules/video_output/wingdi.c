@@ -33,12 +33,15 @@
 
 #include <commctrl.h>
 
+#define SHFS_SHOWSIPBUTTON 0x0004
+#define SHFS_HIDESIPBUTTON 0x0008
+
 #ifdef UNDER_CE
-#   define SHFS_HIDESIPBUTTON   0x0008
 #   define MENU_HEIGHT 26
+    BOOL SHFullScreen(HWND hwndRequester, DWORD dwState);
 #else
-#   define SHFS_HIDESIPBUTTON 0
 #   define MENU_HEIGHT 0
+#   define SHFullScreen(a,b)
 #endif
 
 #ifdef MODULE_NAME_IS_wingapi
@@ -167,9 +170,11 @@ struct vout_sys_t
     RGBQUAD    blue;
 
     /* WINCE stuff */
-    HWND hMenu;
-    HWND hTaskBar;
     vlc_bool_t   b_video_display;
+
+    /* Window focus states */
+    vlc_bool_t b_focus;
+    vlc_bool_t b_parent_focus;
 
 #ifdef MODULE_NAME_IS_wingapi
     HINSTANCE  gapi_dll;                    /* handle of the opened gapi dll */
@@ -190,8 +195,14 @@ struct vout_sys_t
 #define GXBeginDraw p_vout->p_sys->GXBeginDraw
 #define GXEndDraw p_vout->p_sys->GXEndDraw
 #define GXGetDisplayProperties p_vout->p_sys->GXGetDisplayProperties
-#define GXSuspend p_vout->p_sys->GXSuspend
-#define GXResume p_vout->p_sys->GXResume
+
+#ifdef MODULE_NAME_IS_wingapi
+#   define GXSuspend p_vout->p_sys->GXSuspend
+#   define GXResume p_vout->p_sys->GXResume
+#else
+#   define GXSuspend()
+#   define GXResume()
+#endif
 
 #define DX_POSITION_CHANGE 0x1000
 
@@ -291,6 +302,9 @@ static int OpenVideo ( vlc_object_t *p_this )
     p_vout->pf_display = DisplayGDI;
 #endif
     p_vout->p_sys->i_changes = 0;
+
+    p_vout->p_sys->b_focus = 0;
+    p_vout->p_sys->b_parent_focus = 0;
 
     return VLC_SUCCESS;
 }
@@ -775,7 +789,8 @@ static void EventThread ( vlc_object_t *p_event )
                             (unsigned int *)&p_vout->p_sys->i_window_width,
                             (unsigned int *)&p_vout->p_sys->i_window_height );
 
-    ShowWindow( p_vout->p_sys->hparent, SW_SHOW );
+    if( p_vout->p_sys->hparent )
+        ShowWindow( p_vout->p_sys->hparent, SW_SHOW );
 
     if( p_vout->p_sys->hparent )
         i_style = WS_VISIBLE|WS_CLIPCHILDREN|WS_CHILD;
@@ -819,7 +834,7 @@ static void EventThread ( vlc_object_t *p_event )
                             WS_NONAVDONEBUTTON|WS_CLIPCHILDREN,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
-                            NULL, NULL, GetModuleHandle(NULL), NULL );
+                            NULL, NULL, GetModuleHandle(NULL), (LPVOID)p_vout);
     }
 
     /* Display our window */
@@ -1049,6 +1064,7 @@ static long FAR PASCAL WndProc( HWND hWnd, UINT message,
     }
 
     if( hWnd != p_vout->p_sys->hwnd &&
+        hWnd != p_vout->p_sys->hfswnd &&
         hWnd != p_vout->p_sys->hvideownd )
         return DefWindowProc(hWnd, message, wParam, lParam);
 
@@ -1059,27 +1075,57 @@ static long FAR PASCAL WndProc( HWND hWnd, UINT message,
             UpdateRects( p_vout, VLC_TRUE );
         break;
 
+#if 0
     case WM_ACTIVATE:
         msg_Err( p_vout, "WM_ACTIVATE: %i", wParam );
-#ifdef MODULE_NAME_IS_wingapi
         if( wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE )
             GXResume();
         else if( wParam == WA_INACTIVE )
             GXSuspend();
-#endif
         break;
+#endif
 
-#ifdef MODULE_NAME_IS_wingapi
     case WM_KILLFOCUS:
-      msg_Err( p_vout, "WM_KILLFOCUS" );
-        GXSuspend();
+        p_vout->p_sys->b_focus = VLC_FALSE;
+        if( !p_vout->p_sys->b_parent_focus ) GXSuspend();
+
+        if( hWnd == p_vout->p_sys->hfswnd )
+        {
+#ifdef UNDER_CE
+            HWND htbar = FindWindow( _T("HHTaskbar"), NULL );
+            ShowWindow( htbar, SW_SHOW );
+#endif
+        }
+
+        if( !p_vout->p_sys->hparent ||
+            hWnd == p_vout->p_sys->hfswnd )
+        {
+            SHFullScreen( hWnd, SHFS_SHOWSIPBUTTON );
+        }
         break;
 
     case WM_SETFOCUS:
-      msg_Err( p_vout, "WM_SETFOCUS" );
+        p_vout->p_sys->b_focus = VLC_TRUE;
         GXResume();
-        break;
+
+        if( p_vout->p_sys->hparent &&
+            hWnd != p_vout->p_sys->hfswnd && p_vout->b_fullscreen )
+            p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
+
+        if( hWnd == p_vout->p_sys->hfswnd )
+        {
+#ifdef UNDER_CE
+            HWND htbar = FindWindow( _T("HHTaskbar"), NULL );
+            ShowWindow( htbar, SW_HIDE );
 #endif
+        }
+
+        if( !p_vout->p_sys->hparent ||
+            hWnd == p_vout->p_sys->hfswnd )
+        {
+            SHFullScreen( hWnd, SHFS_HIDESIPBUTTON );
+        }
+        break;
 
     case WM_LBUTTONDOWN:
         p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
@@ -1133,42 +1179,8 @@ static void InitBuffers( vout_thread_t *p_vout )
     msg_Dbg( p_vout, "GDI depth is %i", p_vout->p_sys->i_depth );
 
 #ifdef MODULE_NAME_IS_wingapi
-    if( p_vout->b_fullscreen )
-    {
-        /* We need to restore Maximized sized window */
-        GetWindowRect( p_vout->p_sys->hwnd,
-                       &p_vout->p_sys->window_placement );
-
-        /* Maximized window */
-        if( p_vout->p_sys->hparent )
-        {
-            SetWindowPos( GetParent( p_vout->p_sys->hwnd ), HWND_TOP,
-                          0, 0, GetSystemMetrics(SM_CXSCREEN),
-                          GetSystemMetrics(SM_CYSCREEN), SWP_SHOWWINDOW );
-            SetWindowPos( p_vout->p_sys->hwnd, HWND_TOP,
-                          0, 0, GetSystemMetrics(SM_CXSCREEN),
-                          GetSystemMetrics(SM_CYSCREEN), SWP_SHOWWINDOW );
-
-#if 0//def UNDER_CE
-            /* Hide SIP button, taskbar and menubar */
-            SHFullScreen( GetParent(p_vout->p_sys->hwnd),
-                          SHFS_HIDESIPBUTTON );
-            p_vout->p_sys->hTaskBar = FindWindow(_T("HHTaskbar"),NULL);
-            ShowWindow( p_vout->p_sys->hTaskBar, SW_HIDE);
-            p_vout->p_sys->hMenu =
-              SHFindMenuBar( GetParent( p_vout->p_sys->hwnd ) );
-            ShowWindow( p_vout->p_sys->hMenu,SW_HIDE );
-#endif
-        }
-        else
-        {
-            SetWindowPos( p_vout->p_sys->hwnd, HWND_TOP,
-                          0, 0, CW_USEDEFAULT, CW_USEDEFAULT, SWP_SHOWWINDOW );
-        }
-
-    }
-
     GXOpenDisplay( p_vout->p_sys->hvideownd, GX_FULLSCREEN );
+
 #else
 
     /* Initialize offscreen bitmap */
@@ -1250,10 +1262,11 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     {
     case VOUT_SET_FOCUS:
         b_bool = va_arg( args, vlc_bool_t );
-#ifdef MODULE_NAME_IS_wingapi
+
+        p_vout->p_sys->b_parent_focus = b_bool;
         if( b_bool ) GXResume();
-        else GXSuspend();
-#endif
+        else if( !p_vout->p_sys->b_focus ) GXSuspend();
+
         return VLC_SUCCESS;
 
     default:
