@@ -993,6 +993,7 @@ void __sout_CfgParse( vlc_object_t *p_this, char *psz_prefix,
                 val.f_float = atof( cfg->psz_value ? cfg->psz_value : "0" );
                 break;
             case VLC_VAR_STRING:
+            case VLC_VAR_MODULE:
                 val.psz_string = cfg->psz_value;
                 break;
             default:
