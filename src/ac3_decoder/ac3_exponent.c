@@ -53,8 +53,8 @@ static __inline__ void exp_unpack_ch( u16 type, u16 expstr, u16 ngrps, u16 initi
 		if ( exps[i] > 124 )
 		{
 			//FIXME set an error flag and mute the frame
-			printf( "\n!! Invalid exponent !!\n" );
-			exit( 1 );
+			fprintf( stderr, "!! Invalid exponent !!\n" );
+//			exit( 1 );
 		}
 		*/
 

@@ -168,6 +168,7 @@ static int index = 0;
 static __inline__ float dither_gen( u16 exp )
 {
 	int tmp;
+	fprintf( stderr, "dither suxx\n" );
 	tmp = fuck[(index+3)%31];
 	tmp ^= fuck[index];
 	fuck[index] = tmp;
@@ -210,7 +211,7 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			/*
 			if(group_code > 26)
 				//FIXME do proper block error handling
-				printf("\n!! Invalid mantissa !!\n");
+				fprintf( stderr, "!! Invalid mantissa !!\n" );
 			*/
 
 			//q_1[ 0 ] = q_1_0[ group_code ];
@@ -234,7 +235,7 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			/*
 			if(group_code > 124)
 				//FIXME do proper block error handling
-				printf("\n!! Invalid mantissa !!\n");
+				fprintf( stderr, "!! Invalid mantissa !!\n" );
 			*/
 
 			//q_2[ 0 ] = q_2_0[ group_code ];
@@ -254,7 +255,7 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			/*
 			if(group_code > 6)
 				//FIXME do proper block error handling
-				printf("\n!! Invalid mantissa !!\n");
+				fprintf( stderr, "!! Invalid mantissa !!\n" );
 			*/
 
 			return( q_3[group_code] * exp_lut[exp] );
@@ -272,7 +273,7 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			/*
 			if(group_code > 120)
 				//FIXME do proper block error handling
-				printf("\n!! Invalid mantissa !!\n");
+				fprintf( stderr, "!! Invalid mantissa !!\n" );
 			*/
 
 			//q_4[ 0 ] = q_4_0[ group_code ];
@@ -291,7 +292,7 @@ static __inline__ float float_get( ac3dec_thread_t * p_ac3dec, u16 bap, u16 exp 
 			/*
 			if(group_code > 14)
 				//FIXME do proper block error handling
-				printf("\n!! Invalid mantissa !!\n");
+				fprintf( stderr, "!! Invalid mantissa !!\n" );
 			*/
 
 			return( q_5[group_code] * exp_lut[exp] );

@@ -252,8 +252,6 @@ void bit_allocate( ac3dec_thread_t * p_ac3dec )
 
 		ba_compute_excitation(start, end , fgain, fastleak, slowleak, 0, bndpsd, excite);
 
-//		if ( p_ac3dec->audblk.deltnseg[i] >= 8 )
-//			fprintf( stderr, "ba debug: p_ac3dec->audblk.deltnseg[%i] == %i\n", i, p_ac3dec->audblk.deltnseg[i] );
 		ba_compute_mask(start, end, p_ac3dec->syncinfo.fscod, p_ac3dec->audblk.deltbae[i], p_ac3dec->audblk.deltnseg[i], p_ac3dec->audblk.deltoffst[i], p_ac3dec->audblk.deltba[i], p_ac3dec->audblk.deltlen[i], excite, mask);
 
 		ba_compute_bap(start, end, snroffset, psd, mask, p_ac3dec->audblk.fbw_bap[i]);
@@ -333,7 +331,6 @@ static void ba_compute_excitation(s16 start, s16 end,s16 fgain,
 		s16 fastleak, s16 slowleak, s16 is_lfe, s16 bndpsd[],
 		s16 excite[])
 {
-#if 1
 	int bin;
 	s16 bndstrt;
 	s16 bndend;
@@ -396,14 +393,12 @@ static void ba_compute_excitation(s16 start, s16 end,s16 fgain,
 		slowleak = max(slowleak, bndpsd[bin] - sgain); 
 		excite[bin] = max(fastleak, slowleak) ; 
 	} 
-#endif
 }
 
 static void ba_compute_mask(s16 start, s16 end, u16 fscod,
 		u16 deltbae, u16 deltnseg, u16 deltoffst[], u16 deltba[],
 		u16 deltlen[], s16 excite[], s16 mask[])
 {
-#if 1
 	int bin,k;
 	s16 bndstrt;
 	s16 bndend;
@@ -446,13 +441,11 @@ static void ba_compute_mask(s16 start, s16 end, u16 fscod,
 			}
 		}
 	}
-#endif
 }
 
 static void ba_compute_bap(s16 start, s16 end, s16 snroffset,
 		s16 psd[], s16 mask[], s16 bap[])
 {
-#if 1
 	int i,j,k;
 	s16 lastbin = 0;
 	s16 address = 0;
@@ -481,5 +474,4 @@ static void ba_compute_bap(s16 start, s16 end, s16 snroffset,
 		} 
 		j++; 
 	} while (end > lastbin);
-#endif
 }

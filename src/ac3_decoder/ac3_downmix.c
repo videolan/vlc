@@ -22,6 +22,8 @@
 #include "ac3_decoder.h"
 #include "ac3_downmix.h"
 
+#define NORM 16384
+
 typedef struct prefs_s
 {
 	u16 use_dolby_surround;
@@ -72,8 +74,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp += 0.3204f * *right++ + 0.2265f * *centre;
 					left_tmp  += 0.3204f * *left++  + 0.2265f * *centre++;
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -95,8 +97,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp += 0.3204f * *right++;
 					left_tmp  += 0.3204f * *left++ ;
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -119,8 +121,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp += 0.3204f * *right++ + 0.2265f * *centre;
 					left_tmp  += 0.3204f * *left++  + 0.2265f * *centre++;
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -142,8 +144,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp += 0.3204f * *right++; 
 					left_tmp  += 0.3204f * *left++;
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -162,8 +164,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp = 0.3204f * *right++ + 0.2265f * *centre;
 					left_tmp  = 0.3204f * *left++  + 0.2265f * *centre++;
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -178,8 +180,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 
 				for ( j = 0; j < 256; j++ )
 				{
-					*(out_buf++) = *(left++) * 32766;
-					*(out_buf++) = *(right++) * 32766;
+					*(out_buf++) = *(left++) * NORM;
+					*(out_buf++) = *(right++) * NORM;
 				}
 			break;
 
@@ -192,8 +194,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				{
 					right_tmp = 0.7071f * *right++;
 
-					*(out_buf++) = right_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = right_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = right_tmp;
@@ -210,8 +212,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				{
 					right_tmp = 0.7071f * *right++;
 
-					*(out_buf++) = right_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = right_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = right_tmp;
@@ -241,8 +243,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp= 0.4142f * *right++ + clev * *centre   + slev * *right_sur++;
 					left_tmp = 0.4142f * *left++  + clev * *centre++ + slev * *left_sur++;
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -264,8 +266,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp= 0.4142f * *right++ + slev * *right_sur++;
 					left_tmp = 0.4142f * *left++  + slev * *left_sur++;
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -289,8 +291,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp= 0.4142f * *right++ + clev * *centre   + slev * *right_sur;
 					left_tmp = 0.4142f * *left++  + clev * *centre++ + slev * *right_sur++;
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -312,8 +314,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp= 0.4142f * *right++ + slev * *right_sur;
 					left_tmp = 0.4142f * *left++  + slev * *right_sur++;
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -334,8 +336,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 					right_tmp= 0.4142f * *right++ + clev * *centre;   
 					left_tmp = 0.4142f * *left++  + clev * *centre++; 
 
-					*(out_buf++) = left_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = left_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = left_tmp;
@@ -349,8 +351,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 
 				for ( j = 0; j < 256; j++ )
 				{
-					*(out_buf++) = *(left++) * 32766;
-					*(out_buf++) = *(right++) * 32766;
+					*(out_buf++) = *(left++) * NORM;
+					*(out_buf++) = *(right++) * NORM;
 				}
 			break;
 
@@ -363,8 +365,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				{
 					right_tmp = 0.7071f * *right++;
 
-					*(out_buf++) = right_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = right_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = right_tmp;
@@ -381,8 +383,8 @@ void downmix( ac3dec_thread_t * p_ac3dec, s16 * out_buf )
 				{
 					right_tmp = 0.7071f * *right++;
 
-					*(out_buf++) = right_tmp * 32766;
-					*(out_buf++) = right_tmp * 32766;
+					*(out_buf++) = right_tmp * NORM;
+					*(out_buf++) = right_tmp * NORM;
 					/*
 					p_ac3dec->samples.channel[1][j] = right_tmp;
 					p_ac3dec->samples.channel[0][j] = right_tmp;
