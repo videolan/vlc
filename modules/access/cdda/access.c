@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.16 2003/12/14 23:40:36 rocky Exp $
+ * $Id: access.c,v 1.17 2003/12/16 22:14:22 gbazin Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -41,6 +41,10 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
+#endif
+
+#ifdef HAVE_ERRNO_H
+#   include <errno.h>
 #endif
 
 #include <string.h>
