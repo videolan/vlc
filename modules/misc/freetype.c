@@ -433,7 +433,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     p_string = malloc( sizeof(subpicture_data_t) );
     if( !p_string )
     {
-        msg_Err( p_filter, "Out of memory" );
+        msg_Err( p_filter, "out of memory" );
         goto error;
     }
     p_string->p_lines = 0;
@@ -443,7 +443,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
         malloc( ( strlen(psz_string) + 1 ) * sizeof(uint32_t) );
     if( psz_unicode == NULL )
     {
-        msg_Err( p_filter, "Out of memory" );
+        msg_Err( p_filter, "out of memory" );
         goto error;
     }
 #if defined(WORDS_BIGENDIAN)
@@ -453,7 +453,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
 #endif
     if( iconv_handle == (vlc_iconv_t)-1 )
     {
-        msg_Warn( p_filter, "Unable to do convertion" );
+        msg_Warn( p_filter, "unable to do convertion" );
         goto error;
     }
 
@@ -472,7 +472,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
 
         if( i_in_bytes )
         {
-            msg_Warn( p_filter, "Failed to convert string to unicode (%s), "
+            msg_Warn( p_filter, "failed to convert string to unicode (%s), "
                       "bytes left %d", strerror(errno), i_in_bytes );
             goto error;
         }
@@ -498,7 +498,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     p_line = NewLine( psz_string );
     if( p_line == NULL )
     {
-        msg_Err( p_filter, "Out of memory" );
+        msg_Err( p_filter, "out of memory" );
         goto error;
     }
     p_string->p_lines = p_line;
@@ -525,7 +525,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
             p_next = NewLine( psz_string );
             if( p_next == NULL )
             {
-                msg_Err( p_filter, "Out of memory" );
+                msg_Err( p_filter, "out of memory" );
                 goto error;
             }
             p_line->p_next = p_next;
@@ -601,7 +601,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
             }
             if( psz_unicode == psz_line_start )
             {
-                msg_Err( p_filter, "Unbreakable string" );
+                msg_Warn( p_filter, "unbreakable string" );
                 goto error;
             }
             else
@@ -617,7 +617,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
             line.yMin = 0;
             line.yMax = 0;
             i = 0;
-            continue;            
+            continue;
         }
         line.yMax = __MAX( line.yMax, glyph_size.yMax );
         line.yMin = __MIN( line.yMin, glyph_size.yMin );
@@ -704,7 +704,7 @@ static line_desc_t *NewLine( byte_t *psz_string )
         return NULL;
     }
     p_line->pp_glyphs[0] = NULL;
-    
+
     p_line->p_glyph_pos = malloc( sizeof( FT_Vector )
                                   * i_count + 1 );
     if( p_line->p_glyph_pos == NULL )
