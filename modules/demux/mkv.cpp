@@ -47,12 +47,6 @@
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
-#else if defined(MSCVER)
-extern "C" {
-void * vlc_opendir ( const char * ) ;
-void * vlc_readdir ( void * );
-int vlc_closedir ( void * ) ;
-}
 #endif
 
 /* libebml and matroska */
