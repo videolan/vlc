@@ -336,8 +336,6 @@ typedef struct data_buffer_t data_buffer_t;
 typedef struct stream_ctrl_t stream_ctrl_t;
 typedef struct pes_packet_t pes_packet_t;
 typedef struct network_socket_t network_socket_t;
-typedef struct tls_server_t tls_server_t;
-typedef struct tls_session_t tls_session_t;
 typedef struct iso639_lang_t iso639_lang_t;
 
 /* block */
@@ -357,6 +355,11 @@ typedef struct httpd_file_sys_t httpd_file_sys_t;
 typedef int (*httpd_file_callback_t)( httpd_file_sys_t*, httpd_file_t *, uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
 typedef struct httpd_redirect_t httpd_redirect_t;
 typedef struct httpd_stream_t httpd_stream_t;
+
+/* TLS support */
+typedef struct tls_t tls_t;
+typedef struct tls_server_t tls_server_t;
+typedef struct tls_session_t tls_session_t;
 
 /* vod server */
 typedef struct vod_t     vod_t;
