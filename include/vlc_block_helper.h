@@ -2,7 +2,7 @@
  * vlc_block_helper.h: Helper functions for data blocks management.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_block_helper.h,v 1.5 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: vlc_block_helper.h,v 1.6 2003/12/06 23:25:23 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -434,6 +434,74 @@ static inline int block_PeekOffsetBytes( block_bytestream_t *p_bytestream,
     }
 
     return VLC_SUCCESS;
+}
+
+static inline int block_FindStartcodeFromOffset(
+    block_bytestream_t *p_bytestream, int *pi_offset,
+    uint8_t *p_startcode, int i_startcode_length )
+{
+    block_t *p_block, *p_block_backup = 0;
+    int i_size, i_offset, i_offset_backup = 0;
+    int i_caller_offset_backup = 0, i_match;
+
+    /* Find the right place */
+    i_size = *pi_offset + p_bytestream->i_offset;
+    for( p_block = p_bytestream->p_block;
+         p_block != NULL; p_block = p_block->p_next )
+    {
+        i_size -= p_block->i_buffer;
+        if( i_size < 0 ) break;
+    }
+
+    if( i_size >= 0 )
+    {
+        /* Not enough data, bail out */
+        return VLC_EGENERIC;
+    }
+
+    /* Begin the search.
+     * We first look for an occurence of the 1st startcode byte and
+     * if found, we do a more thorough check. */
+    i_size = p_block->i_buffer + i_size;
+    *pi_offset -= i_size;
+    i_match = 0;
+    for( ; p_block != NULL; p_block = p_block->p_next )
+    {
+        for( i_offset = i_size; i_offset < p_block->i_buffer; i_offset++ )
+        {
+            if( p_block->p_buffer[i_offset] == p_startcode[i_match] )
+            {
+                if( !i_match )
+                {
+                    p_block_backup = p_block;
+                    i_offset_backup = i_offset;
+                    i_caller_offset_backup = *pi_offset;
+                }
+
+                if( i_match + 1 == i_startcode_length )
+                {
+                    /* We have it */
+                    *pi_offset += i_offset - i_match;
+                    return VLC_SUCCESS;
+                }
+
+                i_match++;
+            }
+            else if ( i_match )
+            {
+                /* False positive */
+                p_block = p_block_backup;
+                i_offset = i_offset_backup;
+                *pi_offset = i_caller_offset_backup;
+                i_match = 0;
+            }
+
+        }
+        i_size = 0;
+        *pi_offset += i_offset;
+    }
+
+    return VLC_EGENERIC;
 }
 
 #endif /* VLC_BLOCK_HELPER_H */
