@@ -2,7 +2,7 @@
  * es.c: functions to handle elementary streams.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: es.c,v 1.6 2003/05/05 22:23:32 gbazin Exp $
+ * $Id: es.c,v 1.7 2003/10/25 00:49:13 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -58,7 +58,7 @@ void dvdplay_DeleteES( input_thread_t* p_input )
 
     p_input->stream.pp_selected_es = NULL;
     p_input->stream.i_selected_es_number = 0;
-    
+
     while( p_input->stream.i_es_number )
     {
         input_DelES( p_input, p_input->stream.pp_es[0] );
@@ -98,10 +98,10 @@ void dvdplay_Video( input_thread_t * p_input )
 
     p_dvd = (dvd_data_t*)(p_input->p_access_data);
     p_attr = dvdplay_video_attr( p_dvd->vmg );
-    
+
     /* ES 0 -> video MPEG2 */
     i_id = 0xe0;
-    
+
     if( p_attr->display_aspect_ratio )
     {
         ADDES( 0xe0, VLC_FOURCC('m','p','g','v'), VIDEO_ES, 0,
@@ -112,7 +112,7 @@ void dvdplay_Video( input_thread_t * p_input )
     {
         ADDES( 0xe0, VLC_FOURCC('m','p','g','v'), VIDEO_ES, 0, "", 0 );
     }
-        
+
 }
 
 /*****************************************************************************
@@ -133,7 +133,7 @@ void dvdplay_Audio( input_thread_t * p_input )
     p_dvd = (dvd_data_t*)(p_input->p_access_data);
     p_dvd->i_audio_nb = 0;
     dvdplay_audio_info( p_dvd->vmg, &i_audio_nr, &i_audio );
-    
+
     /* Audio ES, in the order they appear in .ifo */
     for( i = 1 ; i <= i_audio_nr ; i++ )
     {
@@ -190,7 +190,7 @@ void dvdplay_Subp( input_thread_t * p_input )
     dvd_data_t *            p_dvd;
     es_descriptor_t *       p_es;
     subp_attr_t *           p_attr;
-    u32 *                   pi_palette;
+    uint32_t *              pi_palette;
     int                     i_subp_nr   = -1;
     int                     i_subp      = -1;
     int                     i_id;
@@ -212,10 +212,10 @@ void dvdplay_Subp( input_thread_t * p_input )
             if( pi_palette )
             {
                 ADDES( i_id, VLC_FOURCC('s','p','u','b'), SPU_ES,
-                       p_attr->lang_code, "", sizeof(int) + 16*sizeof(u32) );
+                       p_attr->lang_code, "", sizeof(int) + 16*sizeof(uint32_t) );
                 *(int*)p_es->p_demux_data = 0xBeeF;
                 memcpy( (void*)p_es->p_demux_data + sizeof(int),
-                        pi_palette, 16*sizeof(u32) ); 
+                        pi_palette, 16*sizeof(uint32_t) );
             }
             else
             {

@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.25 2003/10/24 21:27:06 gbazin Exp $
+ * $Id: v4l.c,v 1.26 2003/10/25 00:49:13 sam Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *         Paul Forgey <paulf at aphrodite dot com>
@@ -399,10 +399,10 @@ static int AccessOpen( vlc_object_t *p_this )
 
                 p_sys->b_mjpeg = VLC_TRUE;
             }
-            else if( !strncmp( psz_parser, "decimation=", 
+            else if( !strncmp( psz_parser, "decimation=",
                         strlen( "decimation=" ) ) )
             {
-                p_sys->i_decimation = 
+                p_sys->i_decimation =
                     strtol( psz_parser + strlen( "decimation=" ),
                             &psz_parser, 0 );
             }
@@ -559,7 +559,7 @@ static int AccessOpen( vlc_object_t *p_this )
 #endif
 
         // show a warning if frequency is < than 30000. User is certainly usint old syntax.
-        
+
 
         /* set frequency */
         if( p_sys->i_frequency >= 0 )
@@ -1127,7 +1127,7 @@ static uint8_t *GrabMJPEG( input_thread_t *p_input )
         p_app1 = (struct quicktime_mjpeg_app1 *)(p_field + 6);
         tag = 0xffd9;
         tag = hton16( tag );
-        p = memmem( p_field, sync.length - (size_t)(p_field - p_frame), 
+        p = memmem( p_field, sync.length - (size_t)(p_field - p_frame),
                 &tag, 2 );
 
         if( !p )

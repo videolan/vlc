@@ -3,16 +3,16 @@
  *                      with endianness change
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s16tofloat32swab.c,v 1.9 2003/04/22 22:25:09 gbazin Exp $
+ * $Id: s16tofloat32swab.c,v 1.10 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -54,7 +54,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( 
+    set_description(
             _("audio filter for s16->float32 with endianness conversion") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );
@@ -68,7 +68,7 @@ vlc_module_end();
 static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
-    
+
     if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
     {
         return -1;
@@ -97,30 +97,30 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
 
     /* We start from the end because b_in_place is true */
-    s16 * p_in;
+    int16_t * p_in;
     float * p_out = (float *)p_out_buf->p_buffer + i - 1;
 
 #ifdef HAVE_SWAB
 #   ifdef HAVE_ALLOCA
-    s16 * p_swabbed = alloca( i * sizeof(s16) );
+    int16_t * p_swabbed = alloca( i * sizeof(int16_t) );
 #   else
-    s16 * p_swabbed = malloc( i * sizeof(s16) );
+    int16_t * p_swabbed = malloc( i * sizeof(int16_t) );
 #   endif
 
-    swab( p_in_buf->p_buffer, (void *)p_swabbed, i * sizeof(s16) );
+    swab( p_in_buf->p_buffer, (void *)p_swabbed, i * sizeof(int16_t) );
     p_in = p_swabbed + i - 1;
 
 #else
     byte_t p_tmp[2];
-    p_in = (s16 *)p_in_buf->p_buffer + i - 1;
+    p_in = (int16_t *)p_in_buf->p_buffer + i - 1;
 #endif
-   
+
     while( i-- )
     {
 #ifndef HAVE_SWAB
         p_tmp[0] = ((byte_t *)p_in)[1];
         p_tmp[1] = ((byte_t *)p_in)[0];
-        *p_out = (float)( *(s16 *)p_tmp ) / 32768.0;
+        *p_out = (float)( *(int16_t *)p_tmp ) / 32768.0;
 #else
         *p_out = (float)*p_in / 32768.0;
 #endif

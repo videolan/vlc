@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.13 2003/05/04 22:42:14 gbazin Exp $
+ * $Id: access.c,v 1.14 2003/10/25 00:49:13 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -400,9 +400,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
     if( p_area != p_input->stream.p_selected_area )
     {
-        int     i_vts_title;
-        u32     i_first;
-        u32     i_last;
+        int i_vts_title;
+        uint32_t i_first;
+        uint32_t i_last;
         unsigned int i;
 
         /* Reset the Chapter position of the old title */

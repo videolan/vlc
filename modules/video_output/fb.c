@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.6 2003/04/20 21:15:31 sam Exp $
+ * $Id: fb.c,v 1.7 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -337,7 +337,7 @@ static void End( vout_thread_t *p_vout )
 static void Destroy( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    
+
     CloseDisplay( p_vout );
 
     /* Reset the terminal */
@@ -366,7 +366,7 @@ static void Destroy( vlc_object_t *p_this )
 static int Manage( vout_thread_t *p_vout )
 {
 #if 0
-    u8 buf;
+    uint8_t buf;
 
     if ( read(0, &buf, 1) == 1)
     {
@@ -427,7 +427,7 @@ static int panned=0;
     {
         p_vout->p_sys->var_info.yoffset = 0;
         /*p_vout->p_sys->var_info.yoffset = p_vout->p_sys->var_info.yres; */
-   
+
         /* the X offset should be 0, but who knows ...
          * some other app might have played with the framebuffer */
         p_vout->p_sys->var_info.xoffset = 0;
@@ -441,8 +441,8 @@ panned++;
 }
 
 #if 0
-static void SetPalette( vout_thread_t *p_vout,
-                             u16 *red, u16 *green, u16 *blue, u16 *transp )
+static void SetPalette( vout_thread_t *p_vout, uint16_t *red, uint16_t *green,
+                                               uint16_t *blue, uint16_t *transp )
 {
     struct fb_cmap cmap = { 0, 256, red, green, blue, transp };
 
@@ -536,13 +536,13 @@ static int OpenDisplay( vout_thread_t *p_vout )
     switch( p_vout->p_sys->var_info.bits_per_pixel )
     {
     case 8:
-        p_vout->p_sys->p_palette = malloc( 8 * 256 * sizeof( u16 ) );
+        p_vout->p_sys->p_palette = malloc( 8 * 256 * sizeof( uint16_t ) );
         p_vout->p_sys->fb_cmap.start = 0;
         p_vout->p_sys->fb_cmap.len = 256;
         p_vout->p_sys->fb_cmap.red = p_vout->p_sys->p_palette;
-        p_vout->p_sys->fb_cmap.green = p_vout->p_sys->p_palette + 256 * sizeof( u16 );
-        p_vout->p_sys->fb_cmap.blue = p_vout->p_sys->p_palette + 2 * 256 * sizeof( u16 );
-        p_vout->p_sys->fb_cmap.transp = p_vout->p_sys->p_palette + 3 * 256 * sizeof( u16 );
+        p_vout->p_sys->fb_cmap.green = p_vout->p_sys->p_palette + 256 * sizeof( uint16_t );
+        p_vout->p_sys->fb_cmap.blue = p_vout->p_sys->p_palette + 2 * 256 * sizeof( uint16_t );
+        p_vout->p_sys->fb_cmap.transp = p_vout->p_sys->p_palette + 3 * 256 * sizeof( uint16_t );
 
         /* Save the colormap */
         ioctl( p_vout->p_sys->i_fd, FBIOGETCMAP, &p_vout->p_sys->fb_cmap );

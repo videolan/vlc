@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.6 2003/02/01 12:01:11 stippi Exp $
+ * $Id: VideoWindow.h,v 1.7 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -38,7 +38,7 @@ typedef struct colorcombo
 {
 	color_space colspace;
 	const char *name;
-	u32 chroma;
+	uint32_t chroma;
 	int planes;
 	int pixel_bytes;
 } colorcombo;
@@ -71,8 +71,8 @@ class VideoSettings
 		SIZE_200			= 3,
 	};
 
-			void			SetVideoSize( uint32 mode );
-	inline	uint32			VideoSize() const
+			void			SetVideoSize( uint32_t mode );
+	inline	uint32_t			VideoSize() const
 								{ return fVideoSize; }
 	enum
 	{
@@ -82,15 +82,15 @@ class VideoSettings
 		FLAG_FULL_SCREEN	= 0x0008,
 	};
 
-	inline	void			SetFlags( uint32 flags )
+	inline	void			SetFlags( uint32_t flags )
 								{ fFlags = flags; }
-	inline	void			AddFlags( uint32 flags )
+	inline	void			AddFlags( uint32_t flags )
 								{ fFlags |= flags; }
-	inline	void			ClearFlags( uint32 flags )
+	inline	void			ClearFlags( uint32_t flags )
 								{ fFlags &= ~flags; }
-	inline	bool			HasFlags( uint32 flags ) const
+	inline	bool			HasFlags( uint32_t flags ) const
 								{ return fFlags & flags; }
-	inline	uint32			Flags() const
+	inline	uint32_t			Flags() const
 								{ return fFlags; }
 
  private:
@@ -98,8 +98,8 @@ class VideoSettings
 
 	static	VideoSettings	fDefaultSettings;
 
-			uint32			fVideoSize;
-			uint32			fFlags;
+			uint32_t			fVideoSize;
+			uint32_t			fFlags;
 			BMessage*		fSettings;
 };
 
@@ -113,15 +113,15 @@ class VLCView : public BView
 	virtual	void			AttachedToWindow();
 	virtual	void			MouseDown(BPoint where);
 	virtual	void			MouseUp(BPoint where);
-	virtual	void			MouseMoved(BPoint where, uint32 transit,
+	virtual	void			MouseMoved(BPoint where, uint32_t transit,
 									   const BMessage* dragMessage);
 	virtual	void			Pulse();
 	virtual	void			Draw(BRect updateRect);
-	virtual	void			KeyDown(const char* bytes, int32 numBytes);
+	virtual	void			KeyDown(const char* bytes, int32_t numBytes);
 
  private:
             vout_thread_t   *p_vout;
-            
+
 			bigtime_t		fLastMouseMovedTime;
 			bool			fCursorHidden;
 			bool			fCursorInside;
@@ -132,13 +132,13 @@ class VLCView : public BView
 class VideoWindow : public BWindow
 {
 public:
-							VideoWindow(int v_width, 
+							VideoWindow(int v_width,
 										int v_height,
 										BRect frame,
-										vout_thread_t *p_vout); 
+										vout_thread_t *p_vout);
 	virtual					~VideoWindow();
 
-							// BWindow    
+							// BWindow
 	virtual	void			MessageReceived(BMessage* message);
 	virtual	void			Zoom(BPoint origin,
 								 float width, float height);
@@ -168,8 +168,8 @@ public:
 
 
     // this is the hook controling direct screen connection
-    int32           i_width;     // aspect corrected bitmap size 
-    int32           i_height;
+    int32_t         i_width;     // aspect corrected bitmap size
+    int32_t         i_height;
     BRect           winSize;     // current window size
     BBitmap	        *bitmap[3];
 //    BBitmap         *overlaybitmap;
@@ -186,27 +186,27 @@ private:
 											 int* mode);
 			void			_FreeBuffers();
 			void			_BlankBitmap(BBitmap* bitmap) const;
-			void			_SetVideoSize(uint32 mode);
+			void			_SetVideoSize(uint32_t mode);
 			void			_SetToSettings();
 
 			void			_SaveScreenShot( BBitmap* bitmap,
 											 char* path,
-											 uint32 translatorID ) const;
-	static	int32			_save_screen_shot( void* cookie );
+											 uint32_t translatorID ) const;
+	static	int32_t			_save_screen_shot( void* cookie );
 
 	struct screen_shot_info
 	{
 		BBitmap*	bitmap;
 		char*		path;
-		uint32		translatorID;
-		int32		width;
-		int32		height;
+		uint32_t	translatorID;
+		int32_t		width;
+		int32_t		height;
 	};
 
     vout_thread_t   *p_vout;
 
-	int32			fTrueWidth;     // incomming bitmap size 
-	int32			fTrueHeight;
+	int32_t			fTrueWidth;     // incomming bitmap size
+	int32_t			fTrueHeight;
 	window_feel		fCachedFeel;
 	bool			fInterfaceShowing;
 	status_t		fInitStatus;
@@ -214,4 +214,4 @@ private:
 };
 
 #endif	// BEOS_VIDEO_WINDOW_H
- 
+

@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout.c,v 1.5 2003/10/24 21:27:06 gbazin Exp $
+ * $Id: vout.c,v 1.6 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -42,7 +42,7 @@ static void End        ( vout_thread_t * );
 static int  Manage     ( vout_thread_t * );
 static void Render     ( vout_thread_t *, picture_t * );
 static void Display    ( vout_thread_t *, picture_t * );
-static void SetPalette ( vout_thread_t *, u16 *, u16 *, u16 * );
+static void SetPalette ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 /*****************************************************************************
  * OpenVideo: activates dummy video thread output method
@@ -198,8 +198,8 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  * SetPalette: set the palette for the picture
  *****************************************************************************/
-static void SetPalette ( vout_thread_t *p_vout, u16 *red, u16 *green,
-                         u16 *blue )
+static void SetPalette ( vout_thread_t *p_vout,
+                         uint16_t *red, uint16_t *green, uint16_t *blue )
 {
     /* No need to do anything, the fake direct buffers stay as they are */
-}    
+}

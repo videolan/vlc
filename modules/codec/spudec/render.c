@@ -2,7 +2,7 @@
  * render.c : SPU renderer
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: render.c,v 1.5 2003/07/22 20:49:10 hartman Exp $
+ * $Id: render.c,v 1.6 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -95,13 +95,13 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
-    u8  *p_dest;
-    u8  *p_destptr;
-    u16 *p_source = (u16 *)p_spu->p_sys->p_data;
+    uint8_t *p_dest;
+    uint8_t *p_destptr;
+    uint16_t *p_source = (uint16_t *)p_spu->p_sys->p_data;
 
     int i_x, i_y;
     int i_len, i_color;
-    u16 i_colprecomp, i_destalpha;
+    uint16_t i_colprecomp, i_destalpha;
 
     /* Crop-specific */
     int i_x_start, i_y_start, i_x_end, i_y_end;
@@ -147,8 +147,8 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                     /* To be able to divide by 16 (>>4) we add 1 to the alpha.
                      * This means Alpha 0 won't be completely transparent, but
                      * that's handled in a special case above anyway. */
-                    i_colprecomp = (u16)p_spu->p_sys->pi_yuv[i_color][0]
-                                 * (u16)(p_spu->p_sys->pi_alpha[i_color] + 1);
+                    i_colprecomp = (uint16_t)p_spu->p_sys->pi_yuv[i_color][0]
+                                 * (uint16_t)(p_spu->p_sys->pi_alpha[i_color] + 1);
                     i_destalpha = 15 - p_spu->p_sys->pi_alpha[i_color];
 
                     for ( p_destptr = p_dest - i_x - i_y;
@@ -156,7 +156,7 @@ static void RenderI420( vout_thread_t *p_vout, picture_t *p_pic,
                           p_destptr++ )
                     {
                         *p_destptr = ( i_colprecomp +
-                                        (u16)*p_destptr * i_destalpha ) >> 4;
+                                        (uint16_t)*p_destptr * i_destalpha ) >> 4;
                     }
                     break;
             }
@@ -168,9 +168,9 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
-    u16  p_clut16[4];
-    u8  *p_dest;
-    u16 *p_source = (u16 *)p_spu->p_sys->p_data;
+    uint16_t p_clut16[4];
+    uint8_t *p_dest;
+    uint16_t *p_source = (uint16_t *)p_spu->p_sys->p_data;
 
     int i_x, i_y;
     int i_len, i_color;
@@ -186,7 +186,7 @@ static void RenderRV16( vout_thread_t *p_vout, picture_t *p_pic,
     for( i_color = 0; i_color < 4; i_color++ )
     {
         p_clut16[i_color] = 0x1111
-                             * ( (u16)p_spu->p_sys->pi_yuv[i_color][0] >> 4 );
+                             * ( (uint16_t)p_spu->p_sys->pi_yuv[i_color][0] >> 4 );
     }
 
     i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
@@ -305,9 +305,9 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
-    u32  p_clut32[4];
-    u8  *p_dest;
-    u16 *p_source = (u16 *)p_spu->p_sys->p_data;
+    uint32_t p_clut32[4];
+    uint8_t *p_dest;
+    uint16_t *p_source = (uint16_t *)p_spu->p_sys->p_data;
 
     int i_x, i_y;
     int i_len, i_color;
@@ -323,7 +323,7 @@ static void RenderRV32( vout_thread_t *p_vout, picture_t *p_pic,
     for( i_color = 0; i_color < 4; i_color++ )
     {
         p_clut32[i_color] = 0x11111111
-                             * ( (u16)p_spu->p_sys->pi_yuv[i_color][0] >> 4 );
+                             * ( (uint16_t)p_spu->p_sys->pi_yuv[i_color][0] >> 4 );
     }
 
     i_xscale = ( p_vout->output.i_width << 6 ) / p_vout->render.i_width;
@@ -440,12 +440,12 @@ static void RenderYUY2( vout_thread_t *p_vout, picture_t *p_pic,
                         const subpicture_t *p_spu, vlc_bool_t b_crop )
 {
     /* Common variables */
-    u8  *p_dest;
-    u16 *p_source = (u16 *)p_spu->p_sys->p_data;
+    uint8_t *p_dest;
+    uint16_t *p_source = (uint16_t *)p_spu->p_sys->p_data;
 
     int i_x, i_y;
     int i_len, i_color;
-    u8  i_cnt;
+    uint8_t i_cnt;
 
     /* Crop-specific */
     int i_x_start, i_y_start, i_x_end, i_y_end;

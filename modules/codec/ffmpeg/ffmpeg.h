@@ -2,15 +2,15 @@
  * ffmpeg_vdec.h: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ffmpeg.h,v 1.25 2003/10/01 22:39:43 hartman Exp $
+ * $Id: ffmpeg.h,v 1.26 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -38,7 +38,7 @@
     mtime_t pts; \
     \
     /* Private stuff for frame gathering */ \
-    u8      *p_buffer;      /* buffer for gather pes */  \
+    uint8_t *p_buffer;      /* buffer for gather pes */  \
     int     i_buffer_size;  /* size of allocated p_buffer */ \
     int     i_buffer;       /* bytes already present in p_buffer */
 
@@ -57,7 +57,7 @@ typedef struct generic_thread_s
 
 #define FREE( p ) if( p ) free( p ); p = NULL
 
-int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
+int E_( GetPESData )( uint8_t *p_buf, int i_max, pes_packet_t *p_pes );
 
 /*****************************************************************************
  * Video codec fourcc
@@ -115,7 +115,7 @@ int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 #define FOURCC_3IVD         VLC_FOURCC('3','I','V','D')
 #define FOURCC_3ivd         VLC_FOURCC('3','i','v','d')
 
-/* 3ivx delta 3.5 Unsupported */ 
+/* 3ivx delta 3.5 Unsupported */
 #define FOURCC_3IV1         VLC_FOURCC('3','I','V','1')
 #define FOURCC_3iv1         VLC_FOURCC('3','i','v','1')
 
@@ -156,12 +156,12 @@ int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes );
 #define FOURCC_JPGL         VLC_FOURCC( 'J', 'P', 'G', 'L' )
 
 /* Microsoft Video 1 */
-#define FOURCC_MSVC         VLC_FOURCC('M','S','V','C') 
-#define FOURCC_msvc         VLC_FOURCC('m','s','v','c') 
-#define FOURCC_CRAM         VLC_FOURCC('C','R','A','M') 
-#define FOURCC_cram         VLC_FOURCC('c','r','a','m') 
-#define FOURCC_WHAM         VLC_FOURCC('W','H','A','M') 
-#define FOURCC_wham         VLC_FOURCC('w','h','a','m') 
+#define FOURCC_MSVC         VLC_FOURCC('M','S','V','C')
+#define FOURCC_msvc         VLC_FOURCC('m','s','v','c')
+#define FOURCC_CRAM         VLC_FOURCC('C','R','A','M')
+#define FOURCC_cram         VLC_FOURCC('c','r','a','m')
+#define FOURCC_WHAM         VLC_FOURCC('W','H','A','M')
+#define FOURCC_wham         VLC_FOURCC('w','h','a','m')
 
 /* Windows Screen Video */
 #define FOURCC_MSS1         VLC_FOURCC('M','S','S','1')

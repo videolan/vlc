@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.17 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: araw.c,v 1.18 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -42,7 +42,7 @@ typedef struct adec_thread_s
 
     /* Input properties */
     decoder_fifo_t *p_fifo;
-    int16_t        *p_logtos16;  // used with m/alaw to s16
+    int16_t        *p_logtos16;  // used with m/alaw to int16_t
 
     /* Output properties */
     aout_instance_t *   p_aout;       /* opaque */
@@ -379,7 +379,7 @@ static int InitThread( adec_thread_t * p_adec )
     return( 0 );
 }
 
-static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
+static void GetPESData( uint8_t *p_buf, int i_max, pes_packet_t *p_pes )
 {
     int i_copy;
     int i_count;

@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.35 2003/10/23 21:55:50 gbazin Exp $
+ * $Id: alsa.c,v 1.36 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -70,7 +70,7 @@ struct aout_sys_t
 /* These values are in frames.
    To convert them to a number of bytes you have to multiply them by the
    number of channel(s) (eg. 2 for stereo) and the size of a sample (eg.
-   2 for s16). */
+   2 for int16_t). */
 #define ALSA_DEFAULT_PERIOD_SIZE        1024
 #define ALSA_DEFAULT_BUFFER_SIZE        ( ALSA_DEFAULT_PERIOD_SIZE << 8 )
 #define ALSA_SPDIF_PERIOD_SIZE          A52_FRAME_NB

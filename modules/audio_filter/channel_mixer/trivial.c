@@ -2,7 +2,7 @@
  * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.11 2003/01/23 11:48:18 massiot Exp $
+ * $Id: trivial.c,v 1.12 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -72,12 +72,12 @@ static int Create( vlc_object_t *p_this )
            > aout_FormatNbChannels( &p_filter->output ) )
     {
         /* Downmixing */
-    	p_filter->b_in_place = 1;
+        p_filter->b_in_place = 1;
     }
     else
     {
         /* Upmixing */
-    	p_filter->b_in_place = 0;
+        p_filter->b_in_place = 0;
     }
 
     return 0;
@@ -86,7 +86,7 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * SparseCopy: trivially downmix or upmix a buffer
  *****************************************************************************/
-static void SparseCopy( s32 * p_dest, const s32 * p_src, size_t i_len,
+static void SparseCopy( int32_t * p_dest, const int32_t * p_src, size_t i_len,
                         int i_output_stride, int i_input_stride )
 {
     int i;
@@ -110,8 +110,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     int i_input_nb = aout_FormatNbChannels( &p_filter->input );
     int i_output_nb = aout_FormatNbChannels( &p_filter->output );
-    s32 * p_dest = (s32 *)p_out_buf->p_buffer;
-    s32 * p_src = (s32 *)p_in_buf->p_buffer;
+    int32_t * p_dest = (int32_t *)p_out_buf->p_buffer;
+    int32_t * p_src = (int32_t *)p_in_buf->p_buffer;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
@@ -120,7 +120,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 != (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
            && (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
                 == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
-    { 
+    {
         int i;
         /* This is a bit special. */
         if ( !(p_filter->output.i_original_channels & AOUT_CHAN_LEFT) )

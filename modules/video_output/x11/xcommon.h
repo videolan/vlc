@@ -2,7 +2,7 @@
  * xcommon.h: Defines common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.h,v 1.9 2003/10/24 21:27:06 gbazin Exp $
+ * $Id: xcommon.h,v 1.10 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -166,11 +166,11 @@ struct picture_sys_t
 #define PROP_MWM_HINTS_ELEMENTS 5
 typedef struct mwmhints_t
 {
-    u32 flags;
-    u32 functions;
-    u32 decorations;
-    s32 input_mode;
-    u32 status;
+    uint32_t flags;
+    uint32_t functions;
+    uint32_t decorations;
+    int32_t  input_mode;
+    uint32_t status;
 } mwmhints_t;
 
 /*****************************************************************************

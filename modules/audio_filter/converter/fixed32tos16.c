@@ -2,7 +2,7 @@
  * fixed32tos16.c : converter from fixed32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: fixed32tos16.c,v 1.10 2002/12/24 19:09:12 jpsaman Exp $
+ * $Id: fixed32tos16.c,v 1.11 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -92,10 +92,10 @@ static int Create( vlc_object_t *p_this )
 #define VLC_F_FRACBITS  28
 
 # if VLC_F_FRACBITS == 28
-#  define VLC_F(x)		((vlc_fixed_t) (x##L))
+#  define VLC_F(x) ((vlc_fixed_t) (x##L))
 # endif
 
-# define VLC_F_ONE		VLC_F(0x10000000)
+# define VLC_F_ONE VLC_F(0x10000000)
 
 struct audio_dither {
     vlc_fixed_t error[3];
@@ -115,8 +115,8 @@ static inline unsigned long prng(unsigned long state)
  * NAME:        mpg321_s24_to_s16_pcm()
  * DESCRIPTION: generic linear sample quantize and dither routine
  ********************************************************************/
-static inline s16 mpg321_s24_to_s16_pcm(unsigned int bits, vlc_fixed_t sample,
-                                    struct audio_dither *dither)
+static inline int16_t mpg321_s24_to_s16_pcm(unsigned int bits, vlc_fixed_t sample,
+                                            struct audio_dither *dither)
 {
     unsigned int scalebits;
     vlc_fixed_t output, mask, random;
@@ -171,7 +171,7 @@ static inline s16 mpg321_s24_to_s16_pcm(unsigned int bits, vlc_fixed_t sample,
 /*****************************************************************************
  * s24_to_s16_pcm: Scale a 24 bit pcm sample to a 16 bit pcm sample.
  *****************************************************************************/
-static inline s16 s24_to_s16_pcm(vlc_fixed_t sample)
+static inline int16_t s24_to_s16_pcm(vlc_fixed_t sample)
 {
   /* round */
   sample += (1L << (VLC_F_FRACBITS - 16));
@@ -194,7 +194,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     int i;
     vlc_fixed_t * p_in = (vlc_fixed_t *)p_in_buf->p_buffer;
-    s16 * p_out = (s16 *)p_out_buf->p_buffer;
+    int16_t * p_out = (int16_t *)p_out_buf->p_buffer;
 #if 0
     static struct audio_dither dither;
 #endif

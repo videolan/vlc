@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.2 2003/03/30 18:14:39 gbazin Exp $
+ * $Id: mga.c,v 1.3 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -47,15 +47,15 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );                         
-static void Display   ( vout_thread_t *, picture_t * );            
+static void End       ( vout_thread_t * );
+static void Display   ( vout_thread_t *, picture_t * );
 
 static int  NewPicture     ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-vlc_module_begin();  
+vlc_module_begin();
     set_description( _("Matrox Graphic Array video output") );
     set_capability( "video output", 10 );
     set_callbacks( Create, Destroy );
@@ -89,22 +89,22 @@ vlc_module_end();
 
 typedef struct mga_vid_config_t
 {
-    u16 version;
-    u16 card_type;
-    u32 ram_size;
-    u32 src_width;
-    u32 src_height;
-    u32 dest_width;
-    u32 dest_height;
-    u32 x_org;
-    u32 y_org;
-    u8  colkey_on;
-    u8  colkey_red;
-    u8  colkey_green;
-    u8  colkey_blue;
-    u32 format;
-    u32 frame_size;
-    u32 num_frames;
+    uint16_t version;
+    uint16_t card_type;
+    uint32_t ram_size;
+    uint32_t src_width;
+    uint32_t src_height;
+    uint32_t dest_width;
+    uint32_t dest_height;
+    uint32_t x_org;
+    uint32_t y_org;
+    uint8_t  colkey_on;
+    uint8_t  colkey_red;
+    uint8_t  colkey_green;
+    uint8_t  colkey_blue;
+    uint32_t format;
+    uint32_t frame_size;
+    uint32_t num_frames;
 } mga_vid_config_t;
 #endif
 
@@ -190,7 +190,7 @@ static int Init( vout_thread_t *p_vout )
      * YV12, but it's actually some strange format with packed UV. */
     p_vout->output.i_chroma = VLC_FOURCC('Y','M','G','A');
     p_vout->p_sys->mga.format = MGA_VID_FORMAT_YV12;
-    
+
     if( ioctl(p_vout->p_sys->i_fd, MGA_VID_CONFIG, &p_vout->p_sys->mga) )
     {
         msg_Err( p_vout, "MGA config ioctl failed" );
@@ -281,8 +281,8 @@ static void End( vout_thread_t *p_vout )
  * Terminate an output method created by DummyCreateOutputMethod
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
-{   
-    vout_thread_t *p_vout = (vout_thread_t *)p_this; 
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
     close( p_vout->p_sys->i_fd );
     free( p_vout->p_sys );
 }

@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.9 2003/08/14 23:32:51 fenrir Exp $
+ * $Id: system.h,v 1.10 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -78,7 +78,7 @@
  * Used by TS demux to handle a PSI, either with the builtin decoder, either
  * with a library such as libdvbpsi
  ****************************************************************************/
-typedef void( * psi_callback_t )( 
+typedef void( * psi_callback_t )(
         input_thread_t  * p_input,
         data_packet_t   * p_data,
         es_descriptor_t * p_es,
@@ -113,19 +113,19 @@ typedef struct psi_section_t
 {
     byte_t                  buffer[PSI_SECTION_SIZE];
 
-    u8                      i_section_number;
-    u8                      i_last_section_number;
-    u8                      i_version_number;
-    u16                     i_section_length;
-    u16                     i_read_in_section;
-    
+    uint8_t                 i_section_number;
+    uint8_t                 i_last_section_number;
+    uint8_t                 i_version_number;
+    uint16_t                i_section_length;
+    uint16_t                i_read_in_section;
+
     /* the PSI is complete */
     vlc_bool_t              b_is_complete;
-    
+
     /* packet missed up ? */
     vlc_bool_t              b_trash;
 
-    /*about sections  */ 
+    /*about sections  */
     vlc_bool_t              b_section_complete;
 
     /* where are we currently ? */
@@ -252,7 +252,7 @@ typedef struct es_ts_data_t
  *****************************************************************************/
 typedef struct pgrm_ts_data_t
 {
-    u16                     i_pcr_pid;             /* PCR ES, for TS streams */
+    uint16_t                i_pcr_pid;             /* PCR ES, for TS streams */
     int                     i_pmt_version;
     /* libdvbpsi pmt decoder handle */
     void *                  p_pmt_handle;
@@ -281,7 +281,7 @@ typedef struct stream_ps_data_t
 {
     vlc_bool_t              b_has_PSM;                 /* very rare, in fact */
 
-    u8                      i_PSM_version;
+    uint8_t                 i_PSM_version;
 } stream_ps_data_t;
 
 /* PSM version is 5 bits, so -1 is not a valid value */

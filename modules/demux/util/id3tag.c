@@ -2,15 +2,15 @@
  * id3tag.c: id3 tag parser/skipper based on libid3tag
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3tag.c,v 1.12 2003/10/20 01:07:28 hartman Exp $
+ * $Id: id3tag.c,v 1.13 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -51,13 +51,13 @@ set_callbacks( ParseID3Tags, NULL );
 vlc_module_end();
 
 /*****************************************************************************
- * Definitions of structures  and functions used by this plugins 
+ * Definitions of structures  and functions used by this plugins
  *****************************************************************************/
 
 /*****************************************************************************
  * ParseID3Tag : parse an id3tag into the info structures
  *****************************************************************************/
-static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
+static void ParseID3Tag( input_thread_t *p_input, uint8_t *p_data, int i_size )
 {
     playlist_t * p_playlist;
     struct id3_tag * p_id3_tag;
@@ -67,7 +67,7 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
     char * psz_temp;
     int i;
     vlc_value_t val;
-    
+
     var_Get( p_input, "demuxed-id3", &val );
 
     if( val.b_bool )
@@ -75,11 +75,11 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
         msg_Dbg( p_input, "The ID3 tag was already parsed" );
         return;
     }
-    
+
     p_id3_tag = id3_tag_parse( p_data, i_size );
     p_category = input_InfoCategory( p_input, "ID3" );
     i = 0;
-    
+
     while ( ( p_frame = id3_tag_findframe( p_id3_tag , "T", i ) ) )
     {
         i_strings = id3_field_getnstrings( &p_frame->fields[1] );
@@ -124,7 +124,7 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
             {
                 input_AddInfo( p_category, (char *)p_frame->description, psz_temp );
             }
-            free( psz_temp ); 
+            free( psz_temp );
         }
         i++;
     }
@@ -140,7 +140,7 @@ static void ParseID3Tag( input_thread_t *p_input, u8 *p_data, int i_size )
 static int ParseID3Tags( vlc_object_t *p_this )
 {
     input_thread_t *p_input;
-    u8  *p_peek;
+    uint8_t *p_peek;
     int i_size;
     int i_size2;
 
@@ -154,7 +154,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
 
     if ( p_input->stream.b_seekable &&
          p_input->stream.i_method != INPUT_METHOD_NETWORK )
-    {        
+    {
         stream_position_t pos;
 
         /*look for a id3v1 tag at the end of the file*/
@@ -163,8 +163,8 @@ static int ParseID3Tags( vlc_object_t *p_this )
         {
             input_AccessReinit( p_input );
             p_input->pf_seek( p_input, pos.i_size - 128 );
-            
-            /* get 10 byte id3 header */    
+
+            /* get 10 byte id3 header */
             if( input_Peek( p_input, &p_peek, 10 ) < 10 )
             {
                 msg_Err( p_input, "cannot peek()" );
@@ -183,7 +183,7 @@ static int ParseID3Tags( vlc_object_t *p_this )
             }
 
             /* look for id3v2.4 tag at end of file */
-            /* get 10 byte id3 footer */    
+            /* get 10 byte id3 footer */
             if( input_Peek( p_input, &p_peek, 128 ) < 128 )
             {
                 msg_Err( p_input, "cannot peek()" );
@@ -203,10 +203,10 @@ static int ParseID3Tags( vlc_object_t *p_this )
                 ParseID3Tag( p_input, p_peek, i_size2 );
             }
         }
-        input_AccessReinit( p_input );    
+        input_AccessReinit( p_input );
         p_input->pf_seek( p_input, 0 );
     }
-    /* get 10 byte id3 header */    
+    /* get 10 byte id3 header */
     if( input_Peek( p_input, &p_peek, 10 ) < 10 )
     {
         msg_Err( p_input, "cannot peek()" );

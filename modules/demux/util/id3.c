@@ -2,15 +2,15 @@
  * id3.c: simple id3 tag skipper
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3.c,v 1.4 2003/07/13 12:52:40 sigmunau Exp $
+ * $Id: id3.c,v 1.5 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,9 +52,9 @@ vlc_module_end();
 static int SkipID3Tag( vlc_object_t *p_this )
 {
     input_thread_t *p_input;
-    u8  *p_peek;
+    uint8_t *p_peek;
     int i_size;
-    u8  version, revision;
+    uint8_t version, revision;
     int b_footer;
 
     if ( p_this->i_object_type != VLC_OBJECT_INPUT )
@@ -64,7 +64,7 @@ static int SkipID3Tag( vlc_object_t *p_this )
     p_input = (input_thread_t *)p_this;
 
     msg_Dbg( p_input, "Checking for ID3 tag" );
-    /* get 10 byte id3 header */    
+    /* get 10 byte id3 header */
     if( input_Peek( p_input, &p_peek, 10 ) < 10 )
     {
         msg_Err( p_input, "cannot peek()" );
@@ -75,7 +75,7 @@ static int SkipID3Tag( vlc_object_t *p_this )
     {
         return( VLC_SUCCESS );
     }
-    
+
     version = p_peek[3];  /* These may become usfull later, */
     revision = p_peek[4]; /* but we ignore them for now */
     b_footer = p_peek[5] & 0x10;

@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.53 2003/10/02 18:07:26 hartman Exp $
+ * $Id: ffmpeg.c,v 1.54 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -368,7 +368,7 @@ static void EndThread( generic_thread_t *p_decoder )
  * locales Functions
  *****************************************************************************/
 
-int E_( GetPESData )( u8 *p_buf, int i_max, pes_packet_t *p_pes )
+int E_( GetPESData )( uint8_t *p_buf, int i_max, pes_packet_t *p_pes )
 {
     int i_copy;
     int i_count;

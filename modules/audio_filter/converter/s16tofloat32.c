@@ -2,7 +2,7 @@
  * s16tofloat32.c : converter from signed 16 bits integer to float32
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s16tofloat32.c,v 1.5 2002/11/20 16:43:32 sam Exp $
+ * $Id: s16tofloat32.c,v 1.6 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -83,7 +83,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
 
     /* We start from the end because b_in_place is true */
-    s16 * p_in = (s16 *)p_in_buf->p_buffer + i - 1;
+    int16_t * p_in = (int16_t *)p_in_buf->p_buffer + i - 1;
     float * p_out = (float *)p_out_buf->p_buffer + i - 1;
 
     while( i-- )
@@ -95,7 +95,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         /* This is walken's trick based on IEEE float format. On my PIII
          * this takes 16 seconds to perform one billion conversions, instead
          * of 19 seconds for the above division. */
-        s32 i_out = *p_in + 0x43c00000;
+        int32_t i_out = *p_in + 0x43c00000;
         float f_out = *(float *)&i_out;
         *p_out = f_out - 384.0;
 #endif

@@ -2,7 +2,7 @@
  * glide.c : 3dfx Glide plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: glide.c,v 1.2 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: glide.c,v 1.3 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -77,7 +77,7 @@ struct vout_sys_t
 {
     GrLfbInfo_t                 p_buffer_info;           /* back buffer info */
 
-    u8* pp_buffer[2];
+    uint8_t * pp_buffer[2];
     int i_index;
 };
 
@@ -107,8 +107,8 @@ static int Create( vlc_object_t *p_this )
     }
 
     p_vout->pf_init = Init;
-    p_vout->pf_end = End;                                     
-    p_vout->pf_manage = Manage;                                 
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
     p_vout->pf_render = NULL;
     p_vout->pf_display = Display;
 
@@ -298,7 +298,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         return( 1 );
     }
     grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER );
-    
+
     grBufferClear( 0, 0, 0 );
 
     p_vout->p_sys->pp_buffer[0] = p_vout->p_sys->p_buffer_info.lfbPtr;

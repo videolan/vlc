@@ -2,7 +2,7 @@
  * postprocessing.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: postprocessing.c,v 1.3 2003/03/30 18:14:36 gbazin Exp $
+ * $Id: postprocessing.c,v 1.4 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -36,7 +36,7 @@
 
 static int Open ( vlc_object_t *p_this );
 
-static u32 pp_getmode( int i_quality, int b_autolevel );
+static uint32_t pp_getmode( int i_quality, int b_autolevel );
 static int pp_postprocess( picture_t *,
                            QT_STORE_T *, unsigned int,
                            unsigned int i_mode );
@@ -73,14 +73,14 @@ static int Open ( vlc_object_t *p_this )
 
     p_pp->pf_getmode = pp_getmode;
     p_pp->pf_postprocess = pp_postprocess;
-    
+
     return VLC_SUCCESS;
 }
 
 
-static u32 pp_getmode( int i_quality, int b_autolevel )
+static uint32_t pp_getmode( int i_quality, int b_autolevel )
 {
-    u32 i_mode;
+    uint32_t i_mode;
     i_quality = i_quality < 0 ? 0 : i_quality;
     i_quality = i_quality > 6 ? 6 : i_quality;
 
@@ -125,7 +125,7 @@ static u32 pp_getmode( int i_quality, int b_autolevel )
 }
 
 /*****************************************************************************
- * pp_postprocess : make post-filter as defined in MPEG4-ISO 
+ * pp_postprocess : make post-filter as defined in MPEG4-ISO
  *****************************************************************************
  *****************************************************************************/
 
@@ -168,12 +168,12 @@ static int pp_postprocess( picture_t *p_pic,
     if( i_mode&PP_DEBLOCK_C_V )
     {
         E_( pp_deblock_V )( p_pic->U_PIXELS,
-                            p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1, 
+                            p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1,
                             p_pic->U_PITCH,
                             p_QP_store, i_QP_stride,
                             1 );
         E_( pp_deblock_V )( p_pic->V_PIXELS,
-                            p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1, 
+                            p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1,
                             p_pic->V_PITCH,
                             p_QP_store, i_QP_stride,
                             1 );
@@ -181,36 +181,36 @@ static int pp_postprocess( picture_t *p_pic,
     if( i_mode&PP_DEBLOCK_C_H )
     {
         E_( pp_deblock_H )( p_pic->U_PIXELS,
-                            p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1, 
+                            p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1,
                             p_pic->U_PITCH,
                             p_QP_store, i_QP_stride,
                             1 );
         E_( pp_deblock_H )( p_pic->V_PIXELS,
-                            p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1, 
+                            p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1,
                             p_pic->V_PITCH,
                             p_QP_store, i_QP_stride,
                             1 );
     }
- 
-    /* After deblocking do dering */   
+
+    /* After deblocking do dering */
     /* TODO check for min size */
-    
+
     if( i_mode&PP_DERING_Y )
     {
         E_( pp_dering_Y )( p_pic->Y_PIXELS,
-                           p_pic->p_heap->i_width, p_pic->p_heap->i_height, 
+                           p_pic->p_heap->i_width, p_pic->p_heap->i_height,
                            p_pic->Y_PITCH,
                            p_QP_store, i_QP_stride );
     }
     if( i_mode&PP_DERING_C )
     {
         E_( pp_dering_C )( p_pic->U_PIXELS,
-                           p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1, 
+                           p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1,
                            p_pic->U_PITCH,
                            p_QP_store, i_QP_stride );
 
         E_( pp_dering_C )( p_pic->V_PIXELS,
-                           p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1, 
+                           p_pic->p_heap->i_width >> 1, p_pic->p_heap->i_height >> 1,
                            p_pic->V_PITCH,
                            p_QP_store, i_QP_stride );
 

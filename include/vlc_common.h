@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.82 2003/10/24 21:27:06 gbazin Exp $
+ * $Id: vlc_common.h,v 1.83 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 /**
- * \file 
+ * \file
  * This file is a collection of common definitions and types
  */
 
@@ -132,22 +132,6 @@ typedef uint16_t            audio_volume_t;
 #ifndef HAVE_SOCKLEN_T
 typedef int                 socklen_t;
 #endif
-
-/*****************************************************************************
- * Old types definitions
- *****************************************************************************
- * We still provide these types because most of the VLC code uses them
- * instead of the C9x types. They should be removed when the transition is
- * complete (probably in 10 years).
- *****************************************************************************/
-typedef uint8_t    u8;
-typedef int8_t     s8;
-typedef uint16_t   u16;
-typedef int16_t    s16;
-typedef uint32_t   u32;
-typedef int32_t    s32;
-typedef uint64_t   u64;
-typedef int64_t    s64;
 
 /*****************************************************************************
  * mtime_t: high precision date or time interval
@@ -803,7 +787,7 @@ VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 #endif
 #   undef _
 #if defined( __BORLANDC__ )
-#define _(String) vlc_dgettext (PACKAGE_TARNAME, String) 
+#define _(String) vlc_dgettext (PACKAGE_TARNAME, String)
 #else
 #   define _(String) vlc_dgettext (PACKAGE, String)
 #endif

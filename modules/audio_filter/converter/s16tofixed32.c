@@ -2,7 +2,7 @@
  * s16tofixed32.c : converter from signed 16 bits integer to fixed 32
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s16tofixed32.c,v 1.1 2003/03/12 23:59:19 marcari Exp $
+ * $Id: s16tofixed32.c,v 1.2 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Marc Ariberti <marcari@videolan.ord>
  *
@@ -84,7 +84,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
 
     /* We start from the end because b_in_place is true */
-    s16 * p_in = (s16 *)p_in_buf->p_buffer + i - 1;
+    int16_t * p_in = (int16_t *)p_in_buf->p_buffer + i - 1;
     vlc_fixed_t * p_out = (vlc_fixed_t *)p_out_buf->p_buffer + i - 1;
 
     while( i-- )
@@ -94,6 +94,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes 
-            * sizeof(vlc_fixed_t) / sizeof(s16);
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes
+            * sizeof(vlc_fixed_t) / sizeof(int16_t);
 }

@@ -2,7 +2,7 @@
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.10 2003/10/18 20:09:23 gbazin Exp $
+ * $Id: dshow.cpp,v 1.11 2003/10/25 00:49:13 sam Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -283,7 +283,7 @@ static int AccessOpen( vlc_object_t *p_this )
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.i_method = INPUT_METHOD_FILE;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
- 
+
     var_Create( p_input, "dshow-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Get( p_input, "dshow-caching", &val );
     p_input->i_pts_delay = val.i_int * 1000;
@@ -333,7 +333,7 @@ static int AccessOpen( vlc_object_t *p_this )
         p_sys->p_graph->Release();
 
         /* Uninitialize OLE/COM */
-        CoUninitialize();   
+        CoUninitialize();
 
         free( p_sys->p_header );
         free( p_sys->pp_streams );
@@ -377,7 +377,7 @@ static void AccessClose( vlc_object_t *p_this )
     p_sys->p_graph->Release();
 
     /* Uninitialize OLE/COM */
-    CoUninitialize();   
+    CoUninitialize();
 
     free( p_sys->p_header );
     for( int i = 0; i < p_sys->i_streams; i++ ) delete p_sys->pp_streams[i];
@@ -674,7 +674,7 @@ FindCaptureDevice( vlc_object_t *p_this, string *p_devicename,
         return NULL;
     }
 
-    /* If there are no enumerators for the requested type, then 
+    /* If there are no enumerators for the requested type, then
      * CreateClassEnumerator will succeed, but p_class_enum will be NULL */
     if( p_class_enum == NULL )
     {

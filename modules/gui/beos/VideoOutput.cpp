@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.22 2003/06/19 18:44:16 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.23 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -14,7 +14,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -66,11 +66,11 @@ struct vout_sys_t
 {
     VideoWindow *  p_window;
 
-    s32 i_width;
-    s32 i_height;
+    int32_t i_width;
+    int32_t i_height;
 
-//    u8 *pp_buffer[3];
-    u32 source_chroma;
+//    uint8_t *pp_buffer[3];
+    uint32_t source_chroma;
     int i_index;
 
 };
@@ -86,9 +86,9 @@ struct vout_sys_t
 BWindow*
 beos_GetAppWindow(char *name)
 {
-    int32       index;
+    int32_t     index;
     BWindow     *window;
-    
+
     for (index = 0 ; ; index++)
     {
         window = be_app->WindowAt(index);
@@ -104,7 +104,7 @@ beos_GetAppWindow(char *name)
             window->Unlock();
         }
     }
-    return window; 
+    return window;
 }
 
 /*****************************************************************************
@@ -135,7 +135,7 @@ class BackgroundView : public BView
 								// let him handle it
 								fVideoView->MouseDown(where);
 							}
-	virtual	void			MouseMoved(BPoint where, uint32 transit,
+	virtual	void			MouseMoved(BPoint where, uint32_t transit,
 									   const BMessage* dragMessage)
 							{
 								// convert coordinates
@@ -164,11 +164,11 @@ VideoSettings::VideoSettings()
 	status_t ret = load_settings( fSettings, "video_settings", "VideoLAN Client" );
 	if ( ret == B_OK )
 	{
-		uint32 flags;
-		if ( fSettings->FindInt32( "flags", (int32*)&flags ) == B_OK )
+		uint32_t flags;
+		if ( fSettings->FindInt32( "flags", (int32_t*)&flags ) == B_OK )
 			SetFlags( flags );
-		uint32 size;
-		if ( fSettings->FindInt32( "video size", (int32*)&size ) == B_OK )
+		uint32_t size;
+		if ( fSettings->FindInt32( "video size", (int32_t*)&size ) == B_OK )
 			SetVideoSize( size );
 	}
 	else
@@ -179,10 +179,10 @@ VideoSettings::VideoSettings()
 		BScreen screen(B_MAIN_SCREEN_ID);
 		if (screen.IsValid())
 		{
-			display_mode mode; 
-			screen.GetMode(&mode); 
+			display_mode mode;
+			screen.GetMode(&mode);
 			float refresh = (mode.timing.pixel_clock * 1000)
-							/ ((mode.timing.h_total)* (mode.timing.v_total)); 
+							/ ((mode.timing.h_total)* (mode.timing.v_total));
 			if (refresh < MIN_AUTO_VSYNC_REFRESH)
 				AddFlags(FLAG_SYNC_RETRACE);
 		}
@@ -234,7 +234,7 @@ VideoSettings::DefaultSettings()
  * VideoSettings::SetVideoSize
  *****************************************************************************/
 void
-VideoSettings::SetVideoSize( uint32 mode )
+VideoSettings::SetVideoSize( uint32_t mode )
 {
 	fVideoSize = mode;
 }
@@ -263,7 +263,7 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
 	  fSettings(new VideoSettings(*VideoSettings::DefaultSettings()))
 {
     p_vout = p_videoout;
-    
+
     // create the view to do the display
     view = new VLCView( Bounds(), p_vout );
 
@@ -273,7 +273,7 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
     mainView->AddChild(view);
 
 	// allocate bitmap buffers
-	for (int32 i = 0; i < 3; i++)
+	for (int32_t i = 0; i < 3; i++)
 		bitmap[i] = NULL;
 	fInitStatus = _AllocateBuffers(v_width, v_height, &mode);
 
@@ -288,7 +288,7 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
        SetSizeLimits((i_width * r.min_width_scale), i_width * r.max_width_scale,
                      (i_height * r.min_height_scale), i_height * r.max_height_scale);
     }
-    
+
 	// vlc settings override settings from disk
 	if (config_GetInt(p_vout, "fullscreen"))
 		fSettings->AddFlags(VideoSettings::FLAG_FULL_SCREEN);
@@ -298,19 +298,19 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
     AddShortcut( '1', 0, new BMessage( RESIZE_50 ) );
     AddShortcut( '2', 0, new BMessage( RESIZE_100 ) );
     AddShortcut( '3', 0, new BMessage( RESIZE_200 ) );
-    
+
     // workaround for french keyboards
     AddShortcut( '&', 0, new BMessage( RESIZE_50 ) );
     AddShortcut( 'é', 0, new BMessage( RESIZE_100 ) );
         // FIXME - this one doesn't work because 'é' is a multi-byte character
     AddShortcut( '"', 0, new BMessage( RESIZE_200 ) );
-    
+
     _SetToSettings();
 }
 
 VideoWindow::~VideoWindow()
 {
-    int32 result;
+    int32_t result;
 
     teardownwindow = true;
     wait_for_thread(fDrawThreadID, &result);
@@ -345,7 +345,7 @@ VideoWindow::MessageReceived( BMessage *p_message )
 		case WINDOW_FEEL:
 			{
 				window_feel winFeel;
-				if (p_message->FindInt32("WinFeel", (int32*)&winFeel) == B_OK)
+				if (p_message->FindInt32("WinFeel", (int32_t*)&winFeel) == B_OK)
 				{
 					SetFeel(winFeel);
 					fCachedFeel = winFeel;
@@ -371,13 +371,13 @@ VideoWindow::MessageReceived( BMessage *p_message )
 				BBitmap* temp = new BBitmap( current->Bounds(), current->ColorSpace() );
 				if ( temp && temp->IsValid() )
 				{
-					int32 height = (int32)current->Bounds().Height();
-					uint8* dst = (uint8*)temp->Bits();
-					uint8* src = (uint8*)current->Bits();
-					int32 dstBpr = temp->BytesPerRow();
-					int32 srcBpr = current->BytesPerRow();
-					int32 validBytes = dstBpr > srcBpr ? srcBpr : dstBpr;
-					for ( int32 y = 0; y < height; y++ )
+					int32_t height = (int32_t)current->Bounds().Height();
+					uint8_t* dst = (uint8_t*)temp->Bits();
+					uint8_t* src = (uint8_t*)current->Bits();
+					int32_t dstBpr = temp->BytesPerRow();
+					int32_t srcBpr = current->BytesPerRow();
+					int32_t validBytes = dstBpr > srcBpr ? srcBpr : dstBpr;
+					for ( int32_t y = 0; y < height; y++ )
 					{
 						memcpy( dst, src, validBytes );
 						dst += dstBpr;
@@ -390,7 +390,7 @@ VideoWindow::MessageReceived( BMessage *p_message )
 					/* FIXME - we should check which translators are
 					   actually available */
 					char * psz_format = config_GetPsz( p_vout, "beos-screenshotformat" );
-					int32 format = DEFAULT_SCREEN_SHOT_FORMAT;
+					int32_t format = DEFAULT_SCREEN_SHOT_FORMAT;
 					if( !strcmp( psz_format, "TGA" ) )
 						format = 'TGA ';
 					else if( !strcmp( psz_format, "PPM" ) )
@@ -427,7 +427,7 @@ VideoWindow::Zoom(BPoint origin, float width, float height )
  * VideoWindow::FrameMoved
  *****************************************************************************/
 void
-VideoWindow::FrameMoved(BPoint origin) 
+VideoWindow::FrameMoved(BPoint origin)
 {
 	if (IsFullScreen())
 		return ;
@@ -440,8 +440,8 @@ VideoWindow::FrameMoved(BPoint origin)
 void
 VideoWindow::FrameResized( float width, float height )
 {
-	int32 useWidth = CorrectAspectRatio() ? i_width : fTrueWidth;
-	int32 useHeight = CorrectAspectRatio() ? i_height : fTrueHeight;
+    int32_t useWidth = CorrectAspectRatio() ? i_width : fTrueWidth;
+    int32_t useHeight = CorrectAspectRatio() ? i_height : fTrueHeight;
     float out_width, out_height;
     float out_left, out_top;
     float width_scale = width / useWidth;
@@ -451,7 +451,7 @@ VideoWindow::FrameResized( float width, float height )
     {
         out_width = (useWidth * width_scale);
         out_height = (useHeight * width_scale);
-        out_left = 0; 
+        out_left = 0;
         out_top = (height - out_height) / 2;
     }
     else   /* if the height is proportionally smaller */
@@ -475,10 +475,10 @@ void
 VideoWindow::ScreenChanged(BRect frame, color_space format)
 {
 	BScreen screen(this);
-	display_mode mode; 
-	screen.GetMode(&mode); 
+	display_mode mode;
+	screen.GetMode(&mode);
 	float refresh = (mode.timing.pixel_clock * 1000)
-					/ ((mode.timing.h_total) * (mode.timing.v_total)); 
+					/ ((mode.timing.h_total) * (mode.timing.v_total));
 	SetSyncToRetrace(refresh < MIN_AUTO_VSYNC_REFRESH);
 }
 
@@ -510,7 +510,7 @@ VideoWindow::drawBuffer(int bufferIndex)
        if (mode == OVERLAY)
        {
           rgb_color key;
-          view->SetViewOverlay(bitmap[i_buffer], 
+          view->SetViewOverlay(bitmap[i_buffer],
                             bitmap[i_buffer]->Bounds() ,
                             view->Bounds(),
                             &key, B_FOLLOW_ALL,
@@ -674,12 +674,12 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
     for (int i = 0; i < COLOR_COUNT; i++)
     {
         if (noOverlay) break;
-        bitmap[0] = new BBitmap ( bitmapFrame, 
+        bitmap[0] = new BBitmap ( bitmapFrame,
                                   B_BITMAP_WILL_OVERLAY |
                                   B_BITMAP_RESERVE_OVERLAY_CHANNEL,
                                   colspace[i].colspace);
 
-        if(bitmap[0] && bitmap[0]->InitCheck() == B_OK) 
+        if(bitmap[0] && bitmap[0]->InitCheck() == B_OK)
         {
             colspace_index = i;
 
@@ -691,7 +691,7 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
             {
                *mode = OVERLAY;
                rgb_color key;
-               view->SetViewOverlay(bitmap[0], 
+               view->SetViewOverlay(bitmap[0],
                                     bitmap[0]->Bounds() ,
                                     view->Bounds(),
                                     &key, B_FOLLOW_ALL,
@@ -721,7 +721,7 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
     }
     // see if everything went well
     status_t status = B_ERROR;
-    for (int32 i = 0; i < 3; i++)
+    for (int32_t i = 0; i < 3; i++)
     {
     	if (bitmap[i])
     		status = bitmap[i]->InitCheck();
@@ -731,7 +731,7 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
     if (status >= B_OK)
     {
 	    // clear bitmaps to black
-	    for (int32 i = 0; i < 3; i++)
+	    for (int32_t i = 0; i < 3; i++)
 	    	_BlankBitmap(bitmap[i]);
     }
     return status;
@@ -760,22 +760,22 @@ VideoWindow::_BlankBitmap(BBitmap* bitmap) const
 {
 	// no error checking (we do that earlier on and since it's a private function...
 
-	// YCbCr: 
+	// YCbCr:
 	// Loss/Saturation points are Y 16-235 (absoulte); Cb/Cr 16-240 (center 128)
 
-	// YUV: 
+	// YUV:
 	// Extrema points are Y 0 - 207 (absolute) U -91 - 91 (offset 128) V -127 - 127 (offset 128)
 
 	// we only handle weird colorspaces with special care
 	switch (bitmap->ColorSpace()) {
 		case B_YCbCr422: {
 			// Y0[7:0]  Cb0[7:0]  Y1[7:0]  Cr0[7:0]  Y2[7:0]  Cb2[7:0]  Y3[7:0]  Cr2[7:0]
-			int32 height = bitmap->Bounds().IntegerHeight() + 1;
-			uint8* bits = (uint8*)bitmap->Bits();
-			int32 bpr = bitmap->BytesPerRow();
-			for (int32 y = 0; y < height; y++) {
+			int32_t height = bitmap->Bounds().IntegerHeight() + 1;
+			uint8_t* bits = (uint8_t*)bitmap->Bits();
+			int32_t bpr = bitmap->BytesPerRow();
+			for (int32_t y = 0; y < height; y++) {
 				// handle 2 bytes at a time
-				for (int32 i = 0; i < bpr; i += 2) {
+				for (int32_t i = 0; i < bpr; i += 2) {
 					// offset into line
 					bits[i] = 16;
 					bits[i + 1] = 128;
@@ -789,12 +789,12 @@ VideoWindow::_BlankBitmap(BBitmap* bitmap) const
 // TODO: untested!!
 			// Non-interlaced only, Cb0  Y0  Y1  Cb2 Y2  Y3  on even scan lines ...
 			// Cr0  Y0  Y1  Cr2 Y2  Y3  on odd scan lines
-			int32 height = bitmap->Bounds().IntegerHeight() + 1;
-			uint8* bits = (uint8*)bitmap->Bits();
-			int32 bpr = bitmap->BytesPerRow();
-			for (int32 y = 0; y < height; y += 1) {
+			int32_t height = bitmap->Bounds().IntegerHeight() + 1;
+			uint8_t* bits = (uint8_t*)bitmap->Bits();
+			int32_t bpr = bitmap->BytesPerRow();
+			for (int32_t y = 0; y < height; y += 1) {
 				// handle 3 bytes at a time
-				for (int32 i = 0; i < bpr; i += 3) {
+				for (int32_t i = 0; i < bpr; i += 3) {
 					// offset into line
 					bits[i] = 128;
 					bits[i + 1] = 16;
@@ -808,12 +808,12 @@ VideoWindow::_BlankBitmap(BBitmap* bitmap) const
 		case B_YUV422: {
 // TODO: untested!!
 			// U0[7:0]  Y0[7:0]   V0[7:0]  Y1[7:0]  U2[7:0]  Y2[7:0]   V2[7:0]  Y3[7:0]
-			int32 height = bitmap->Bounds().IntegerHeight() + 1;
-			uint8* bits = (uint8*)bitmap->Bits();
-			int32 bpr = bitmap->BytesPerRow();
-			for (int32 y = 0; y < height; y += 1) {
+			int32_t height = bitmap->Bounds().IntegerHeight() + 1;
+			uint8_t* bits = (uint8_t*)bitmap->Bits();
+			int32_t bpr = bitmap->BytesPerRow();
+			for (int32_t y = 0; y < height; y += 1) {
 				// handle 2 bytes at a time
-				for (int32 i = 0; i < bpr; i += 2) {
+				for (int32_t i = 0; i < bpr; i += 2) {
 					// offset into line
 					bits[i] = 128;
 					bits[i + 1] = 0;
@@ -833,11 +833,11 @@ VideoWindow::_BlankBitmap(BBitmap* bitmap) const
  * VideoWindow::_SetVideoSize
  *****************************************************************************/
 void
-VideoWindow::_SetVideoSize(uint32 mode)
+VideoWindow::_SetVideoSize(uint32_t mode)
 {
 	// let size depend on aspect correction
-	int32 width = CorrectAspectRatio() ? i_width : fTrueWidth;
-	int32 height = CorrectAspectRatio() ? i_height : fTrueHeight;
+	int32_t width = CorrectAspectRatio() ? i_width : fTrueWidth;
+	int32_t height = CorrectAspectRatio() ? i_height : fTrueHeight;
 	switch (mode)
 	{
 		case RESIZE_50:
@@ -863,7 +863,7 @@ void
 VideoWindow::_SetToSettings()
 {
 	// adjust dimensions
-	uint32 mode = RESIZE_100;
+	uint32_t mode = RESIZE_100;
 	switch (fSettings->VideoSize())
 	{
 		case VideoSettings::SIZE_50:
@@ -895,7 +895,7 @@ VideoWindow::_SetToSettings()
  *****************************************************************************/
 void
 VideoWindow::_SaveScreenShot( BBitmap* bitmap, char* path,
-						  uint32 translatorID ) const
+						  uint32_t translatorID ) const
 {
 	// make the info object from the parameters
 	screen_shot_info* info = new screen_shot_info;
@@ -916,7 +916,7 @@ VideoWindow::_SaveScreenShot( BBitmap* bitmap, char* path,
 /*****************************************************************************
  * VideoWindow::_save_screen_shot
  *****************************************************************************/
-int32
+int32_t
 VideoWindow::_save_screen_shot( void* cookie )
 {
 	screen_shot_info* info = (screen_shot_info*)cookie;
@@ -931,7 +931,7 @@ VideoWindow::_save_screen_shot( void* cookie )
 		create_directory( folder.String(), 0777 );
 		path << "/vlc screenshot";
 		BEntry entry( path.String() );
-		int32 appendedNumber = 0;
+		int32_t appendedNumber = 0;
 		if ( entry.Exists() && !entry.IsSymLink() )
 		{
 			// we would clobber an existing entry
@@ -962,42 +962,42 @@ VideoWindow::_save_screen_shot( void* cookie )
 		if ( status == B_OK )
 		{
 			BTranslatorRoster* roster = BTranslatorRoster::Default();
-			uint32 imageFormat = 0;
+			uint32_t imageFormat = 0;
 			translator_id translator = 0;
 			bool found = false;
 
 			// find suitable translator
 			translator_id* ids = NULL;
-			int32 count = 0;
+			int32_t count = 0;
 		
 			status = roster->GetAllTranslators( &ids, &count );
 			if ( status >= B_OK )
 			{
 				for ( int tix = 0; tix < count; tix++ )
-				{ 
-					const translation_format *formats = NULL; 
-					int32 num_formats = 0; 
-					bool ok = false; 
+				{
+					const translation_format *formats = NULL;
+					int32_t num_formats = 0;
+					bool ok = false;
 					status = roster->GetInputFormats( ids[tix],
 													  &formats, &num_formats );
 					if (status >= B_OK)
 					{
 						for ( int iix = 0; iix < num_formats; iix++ )
-						{ 
+						{
 							if ( formats[iix].type == B_TRANSLATOR_BITMAP )
-							{ 
-								ok = true; 
-								break; 
+							{
+								ok = true;
+								break;
 							}
 						}
 					}
 					if ( !ok )
-						continue; 
+						continue;
 					status = roster->GetOutputFormats( ids[tix],
-													   &formats, &num_formats); 
+													   &formats, &num_formats);
 					if ( status >= B_OK )
 					{
-						for ( int32 oix = 0; oix < num_formats; oix++ )
+						for ( int32_t oix = 0; oix < num_formats; oix++ )
 						{
 				 			if ( formats[oix].type != B_TRANSLATOR_BITMAP )
 				 			{
@@ -1028,20 +1028,20 @@ VideoWindow::_save_screen_shot( void* cookie )
 						BNodeInfo nodeInfo( &outFile );
 						if ( nodeInfo.InitCheck() == B_OK )
 						{
-							translation_format* formats; 
-							int32 count;
+							translation_format* formats;
+							int32_t count;
 							status = roster->GetOutputFormats( translator,
 															   (const translation_format **) &formats,
 															   &count);
 							if ( status >= B_OK )
 							{
-								const char * mime = NULL; 
+								const char * mime = NULL;
 								for ( int ix = 0; ix < count; ix++ ) {
 									if ( formats[ix].type == imageFormat ) {
 										mime = formats[ix].MIME;
 										break;
 									}
-								} 
+								}
 								if ( mime )
 									nodeInfo.SetType( mime );
 							}
@@ -1105,10 +1105,10 @@ VLCView::MouseDown(BPoint where)
 {
 	VideoWindow* videoWindow = dynamic_cast<VideoWindow*>(Window());
 	BMessage* msg = Window()->CurrentMessage();
-	int32 clicks;
-	uint32 buttons;
+	int32_t clicks;
+	uint32_t buttons;
 	msg->FindInt32("clicks", &clicks);
-	msg->FindInt32("buttons", (int32*)&buttons);
+	msg->FindInt32("buttons", (int32_t*)&buttons);
 
 	if (videoWindow)
 	{
@@ -1122,7 +1122,7 @@ VLCView::MouseDown(BPoint where)
 		}
 	    else
 	    {
-			if (buttons & B_SECONDARY_MOUSE_BUTTON) 
+			if (buttons & B_SECONDARY_MOUSE_BUTTON)
 			{
 				// clicks will be 2 next time (if interval short enough)
 				// even if the first click and the second
@@ -1167,19 +1167,19 @@ VLCView::MouseDown(BPoint where)
 	
 				// Windwo Feel Items
 /*				BMessage *winNormFeel = new BMessage(WINDOW_FEEL);
-				winNormFeel->AddInt32("WinFeel", (int32)B_NORMAL_WINDOW_FEEL);
+				winNormFeel->AddInt32("WinFeel", (int32_t)B_NORMAL_WINDOW_FEEL);
 				BMenuItem *normWindItem = new BMenuItem("Normal Window", winNormFeel);
 				normWindItem->SetMarked(videoWindow->Feel() == B_NORMAL_WINDOW_FEEL);
 				menu->AddItem(normWindItem);
 				
 				BMessage *winFloatFeel = new BMessage(WINDOW_FEEL);
-				winFloatFeel->AddInt32("WinFeel", (int32)B_FLOATING_APP_WINDOW_FEEL);
+				winFloatFeel->AddInt32("WinFeel", (int32_t)B_FLOATING_APP_WINDOW_FEEL);
 				BMenuItem *onTopWindItem = new BMenuItem("App Top", winFloatFeel);
 				onTopWindItem->SetMarked(videoWindow->Feel() == B_FLOATING_APP_WINDOW_FEEL);
 				menu->AddItem(onTopWindItem);
 				
 				BMessage *winAllFeel = new BMessage(WINDOW_FEEL);
-				winAllFeel->AddInt32("WinFeel", (int32)B_FLOATING_ALL_WINDOW_FEEL);
+				winAllFeel->AddInt32("WinFeel", (int32_t)B_FLOATING_ALL_WINDOW_FEEL);
 				BMenuItem *allSpacesWindItem = new BMenuItem("On Top All Workspaces", winAllFeel);
 				allSpacesWindItem->SetMarked(videoWindow->Feel() == B_FLOATING_ALL_WINDOW_FEEL);
 				menu->AddItem(allSpacesWindItem);*/
@@ -1187,7 +1187,7 @@ VLCView::MouseDown(BPoint where)
 				BMessage *windowFeelMsg = new BMessage( WINDOW_FEEL );
 				bool onTop = videoWindow->Feel() == B_FLOATING_ALL_WINDOW_FEEL;
 				window_feel feel = onTop ? B_NORMAL_WINDOW_FEEL : B_FLOATING_ALL_WINDOW_FEEL;
-				windowFeelMsg->AddInt32( "WinFeel", (int32)feel );
+				windowFeelMsg->AddInt32( "WinFeel", (int32_t)feel );
 				BMenuItem *windowFeelItem = new BMenuItem( _("Stay On Top"), windowFeelMsg );
 				windowFeelItem->SetMarked( onTop );
 				menu->AddItem( windowFeelItem );
@@ -1225,7 +1225,7 @@ VLCView::MouseUp( BPoint where )
  * VLCVIew::MouseMoved
  *****************************************************************************/
 void
-VLCView::MouseMoved(BPoint point, uint32 transit, const BMessage* dragMessage)
+VLCView::MouseMoved(BPoint point, uint32_t transit, const BMessage* dragMessage)
 {
 	fLastMouseMovedTime = system_time();
 	fCursorHidden = false;
@@ -1247,7 +1247,7 @@ VLCView::MouseMoved(BPoint point, uint32 transit, const BMessage* dragMessage)
 /*****************************************************************************
  * VLCVIew::Pulse
  *****************************************************************************/
-void 
+void
 VLCView::Pulse()
 {
 	// We are getting the pulse messages no matter if the mouse is over
@@ -1274,10 +1274,10 @@ VLCView::Pulse()
 	    system_time() - fLastMouseMovedTime > 29000000 )
 	{
 	    BPoint where;
-		uint32 buttons;
+		uint32_t buttons;
 		GetMouse(&where, &buttons, false);
 		ConvertToScreen(&where);
-		set_mouse_position((int32) where.x, (int32) where.y);
+		set_mouse_position((int32_t) where.x, (int32_t) where.y);
 	}
 }
 
@@ -1285,12 +1285,12 @@ VLCView::Pulse()
  * VLCVIew::KeyDown
  *****************************************************************************/
 void
-VLCView::KeyDown(const char *bytes, int32 numBytes)
+VLCView::KeyDown(const char *bytes, int32_t numBytes)
 {
     VideoWindow *videoWindow = dynamic_cast<VideoWindow*>(Window());
     BWindow* interfaceWindow = get_interface_window();
 	if (videoWindow && numBytes > 0) {
-		uint32 mods = modifiers();
+		uint32_t mods = modifiers();
 		switch (*bytes) {
 			case B_TAB:
 			case 'f':
@@ -1356,7 +1356,7 @@ VLCView::KeyDown(const char *bytes, int32 numBytes)
  * VLCVIew::Draw
  *****************************************************************************/
 void
-VLCView::Draw(BRect updateRect) 
+VLCView::Draw(BRect updateRect)
 {
 	VideoWindow* window = dynamic_cast<VideoWindow*>( Window() );
 	if ( window && window->mode == BITMAP )
@@ -1452,17 +1452,17 @@ int Init( vout_thread_t *p_vout )
        {
            return 0;
        }
-       p_pic->p->p_pixels = (u8*)p_vout->p_sys->p_window->bitmap[buffer_index]->Bits();
+       p_pic->p->p_pixels = (uint8_t*)p_vout->p_sys->p_window->bitmap[buffer_index]->Bits();
        p_pic->p->i_lines = p_vout->p_sys->i_height;
 
        p_pic->p->i_pixel_pitch = colspace[p_vout->p_sys->p_window->colspace_index].pixel_bytes;
        p_pic->i_planes = colspace[p_vout->p_sys->p_window->colspace_index].planes;
-       p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[buffer_index]->BytesPerRow(); 
+       p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[buffer_index]->BytesPerRow();
        p_pic->p->i_visible_pitch = p_pic->p->i_pixel_pitch * ( p_vout->p_sys->p_window->bitmap[buffer_index]->Bounds().IntegerWidth() + 1 );
 
        p_pic->i_status = DESTROYED_PICTURE;
        p_pic->i_type   = DIRECT_PICTURE;
- 
+
        PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
 
        I_OUTPUTPICTURES++;
@@ -1501,14 +1501,14 @@ void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     VideoWindow * p_win = p_vout->p_sys->p_window;
 
-    /* draw buffer if required */    
+    /* draw buffer if required */
     if (!p_win->teardownwindow)
-    { 
+    {
        p_win->drawBuffer(p_vout->p_sys->i_index);
     }
     /* change buffer */
     p_vout->p_sys->i_index = ++p_vout->p_sys->i_index % 3;
-    p_pic->p->p_pixels = (u8*)p_vout->p_sys->p_window->bitmap[p_vout->p_sys->i_index]->Bits();
+    p_pic->p->p_pixels = (uint8_t*)p_vout->p_sys->p_window->bitmap[p_vout->p_sys->i_index]->Bits();
 }
 
 /* following functions are local */
@@ -1517,12 +1517,12 @@ void Display( vout_thread_t *p_vout, picture_t *p_pic )
  * BeosOpenDisplay: open and initialize BeOS device
  *****************************************************************************/
 static int BeosOpenDisplay( vout_thread_t *p_vout )
-{ 
+{
 
     p_vout->p_sys->p_window = new VideoWindow( p_vout->p_sys->i_width - 1,
                                                p_vout->p_sys->i_height - 1,
                                                BRect( 20, 50,
-                                                      20 + p_vout->i_window_width - 1, 
+                                                      20 + p_vout->i_window_width - 1,
                                                       50 + p_vout->i_window_height - 1 ),
                                                p_vout );
     if( p_vout->p_sys->p_window == NULL )
@@ -1534,7 +1534,7 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
     {
         p_vout->p_sys->p_window->Show();
     }
-    
+
     return( 0 );
 }
 
@@ -1545,7 +1545,7 @@ static int BeosOpenDisplay( vout_thread_t *p_vout )
  * state of the device.
  *****************************************************************************/
 static void BeosCloseDisplay( vout_thread_t *p_vout )
-{    
+{
     VideoWindow * p_win = p_vout->p_sys->p_window;
     /* Destroy the video window */
     if( p_win != NULL && !p_win->teardownwindow)

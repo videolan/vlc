@@ -2,16 +2,16 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.4 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: ggi.c,v 1.5 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -42,13 +42,13 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );                         
-static int  Manage    ( vout_thread_t * );               
-static void Display   ( vout_thread_t *, picture_t * );            
+static void End       ( vout_thread_t * );
+static int  Manage    ( vout_thread_t * );
+static void Display   ( vout_thread_t *, picture_t * );
 
 static int  OpenDisplay    ( vout_thread_t * );
 static void CloseDisplay   ( vout_thread_t * );
-static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
+static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -58,7 +58,7 @@ static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
                            "\nBy default VLC will use the value of the DISPLAY"\
                            " environment variable.")
 
-vlc_module_begin();                                
+vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL, VLC_FALSE );
     add_string( "ggi-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, VLC_TRUE );
     set_description( "General Graphics Interface video output" );
@@ -254,9 +254,9 @@ static void End( vout_thread_t *p_vout )
  * Terminate an output method created by Create
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
-{   
-    vout_thread_t *p_vout = (vout_thread_t *)p_this; 
-    
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
     CloseDisplay( p_vout );
 
     free( p_vout->p_sys );
@@ -278,7 +278,7 @@ static int Manage( vout_thread_t *p_vout )
     mask = emKeyboard | emPtrButtonPress | emPtrButtonRelease;
 
     ggiEventPoll( p_vout->p_sys->p_display, mask, &tv );
-    
+
     while( ggiEventsQueued( p_vout->p_sys->p_display, mask) )
     {
         ggiEventRead( p_vout->p_sys->p_display, &event, mask);
@@ -511,11 +511,12 @@ static void CloseDisplay( vout_thread_t *p_vout )
 /*****************************************************************************
  * SetPalette: sets an 8 bpp palette
  *****************************************************************************/
-static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
+static void SetPalette( vout_thread_t *p_vout,
+                        uint16_t *red, uint16_t *green, uint16_t *blue )
 {
     ggi_color colors[256];
     int i;
-  
+
     /* Fill colors with color information */
     for( i = 0; i < 256; i++ )
     {

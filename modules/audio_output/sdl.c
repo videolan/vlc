@@ -2,18 +2,18 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.22 2003/05/04 22:42:15 gbazin Exp $
+ * $Id: sdl.c,v 1.23 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -48,7 +48,7 @@
  * It describes the specific properties of an audio device.
  *****************************************************************************/
 struct aout_sys_t
-{   
+{
     mtime_t next_date;
     mtime_t buffer_time;
 };
@@ -82,7 +82,7 @@ static int Open ( vlc_object_t *p_this )
     vlc_value_t val, text;
 
     /* Check that no one uses the DSP. */
-    Uint32 i_flags = SDL_INIT_AUDIO;
+    uint32_t i_flags = SDL_INIT_AUDIO;
     if( SDL_WasInit( i_flags ) )
     {
         return VLC_EGENERIC;

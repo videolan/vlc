@@ -119,7 +119,7 @@ static int  QNXDestroyWnd  ( vout_thread_t * );
 static int  NewPicture     ( vout_thread_t *, picture_t *, int );
 static void FreePicture    ( vout_thread_t *, picture_t * );
 static int  ResizeOverlayOutput ( vout_thread_t * );
-static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
+static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 /*****************************************************************************
  * OpenVideo: allocate QNX video thread output method
@@ -1071,7 +1071,8 @@ static int ResizeOverlayOutput(vout_thread_t *p_vout)
  * anything, but could later send information on which colors it was unable
  * to set.
  *****************************************************************************/
-static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
+static void SetPalette( vout_thread_t *p_vout,
+                        uint16_t *red, uint16_t *green, uint16_t *blue )
 {
     int i;
 

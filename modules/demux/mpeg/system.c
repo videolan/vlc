@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.17 2003/09/10 11:51:00 fenrir Exp $
+ * $Id: system.c,v 1.18 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -485,7 +485,7 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
             if( p_data->p_payload_end - p_data->p_payload_start
                     >= PES_HEADER_SIZE )
             {
-                p_es->i_pes_real_size = ((u16)p_data->p_payload_start[4] << 8)
+                p_es->i_pes_real_size = ((uint16_t)p_data->p_payload_start[4] << 8)
                                          + p_data->p_payload_start[5];
                 if ( p_es->i_pes_real_size )
                 {
@@ -534,9 +534,9 @@ static void GatherPES( input_thread_t * p_input, data_packet_t * p_data,
 /*****************************************************************************
  * GetID: Get the ID of a stream
  *****************************************************************************/
-static u16 GetID( data_packet_t * p_data )
+static uint16_t GetID( data_packet_t * p_data )
 {
-    u16         i_id;
+    uint16_t i_id;
 
     i_id = p_data->p_demux_start[3];                            /* stream_id */
     if( i_id == 0xBD )
@@ -974,13 +974,13 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
  *****************************************************************************/
 static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
 {
-    u32                 i_code;
-    vlc_bool_t          b_trash = 0;
-    es_descriptor_t *   p_es = NULL;
+    uint32_t i_code;
+    vlc_bool_t b_trash = 0;
+    es_descriptor_t * p_es = NULL;
 
-    i_code = ((u32)p_data->p_demux_start[0] << 24)
-                | ((u32)p_data->p_demux_start[1] << 16)
-                | ((u32)p_data->p_demux_start[2] << 8)
+    i_code = ((uint32_t)p_data->p_demux_start[0] << 24)
+                | ((uint32_t)p_data->p_demux_start[1] << 16)
+                | ((uint32_t)p_data->p_demux_start[2] << 8)
                 | p_data->p_demux_start[3];
     if( i_code <= 0x1BC )
     {
@@ -989,8 +989,8 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         case 0x1BA: /* PACK_START_CODE */
             {
                 /* Read the SCR. */
-                mtime_t         scr_time;
-                u32             i_mux_rate;
+                mtime_t scr_time;
+                uint32_t i_mux_rate;
 
                 if( (p_data->p_demux_start[4] & 0xC0) == 0x40 )
                 {
@@ -1015,7 +1015,7 @@ static void DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                                         >> 11);
 
                     /* mux_rate */
-                    i_mux_rate = ((u32)U16_AT(p_header + 10) << 6)
+                    i_mux_rate = ((uint32_t)U16_AT(p_header + 10) << 6)
                                    | (p_header[12] >> 2);
                     /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
                      * This is the biggest kludge ever !

@@ -2,7 +2,7 @@
  * ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ifo.c,v 1.5 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: ifo.c,v 1.6 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -68,13 +68,13 @@ static int      ReadCellInf     ( ifo_t * , cell_inf_t *, int );
 static int      FreeCellInf     ( cell_inf_t * );
 static int      FreeTitleSet    ( vts_t * );
 
-static u8*      FillBuffer      ( ifo_t *, u8 *, int );
-static u8       ReadByte        ( ifo_t *, u8 *, u8 ** );
-static void     ReadBytes       ( ifo_t *, u8 *, u8 **, u8 *, int );
-static void     DumpBytes       ( ifo_t *, u8 *, u8 **, int );
-static u16      ReadWord        ( ifo_t *, u8 *, u8 ** );
-static u32      ReadDouble      ( ifo_t *, u8 *, u8 ** );
-static u64      ReadQuad        ( ifo_t *, u8 *, u8 ** );
+static uint8_t* FillBuffer      ( ifo_t *, uint8_t *, int );
+static uint8_t  ReadByte        ( ifo_t *, uint8_t *, uint8_t ** );
+static void     ReadBytes       ( ifo_t *, uint8_t *, uint8_t **, uint8_t *, int );
+static void     DumpBytes       ( ifo_t *, uint8_t *, uint8_t **, int );
+static uint16_t ReadWord        ( ifo_t *, uint8_t *, uint8_t ** );
+static uint32_t ReadDouble      ( ifo_t *, uint8_t *, uint8_t ** );
+static uint64_t ReadQuad        ( ifo_t *, uint8_t *, uint8_t ** );
 
 /*
  * IFO Management.
@@ -105,9 +105,9 @@ int IfoCreate( thread_dvd_data_t * p_dvd )
  *****************************************************************************/
 int IfoInit( ifo_t * p_ifo )
 {
-    u8                  p_buf[DVD_LB_SIZE];
-    u8*                 p_tmp;
-    u64                 i_temp;
+    uint8_t             p_buf[DVD_LB_SIZE];
+    uint8_t *           p_tmp;
+    uint64_t            i_temp;
     int                 i, j, k;
     int                 i_start;
 
@@ -168,7 +168,7 @@ int IfoInit( ifo_t * p_ifo )
 
     for( i = 0 ; i < MGINF.i_spu_nb ; i++ )
     {
-        ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
+        ReadBytes( p_ifo, p_buf, &p_tmp, (uint8_t*)(&i_temp), 6 );
         /* FIXME : take care of endianness */
     }
 
@@ -192,19 +192,19 @@ int IfoInit( ifo_t * p_ifo )
         p_tmp = FillBuffer( p_ifo, p_buf,
                         p_ifo->i_start + MGINF.i_title_inf_start_sector );
         /*fprintf( stderr, "title inf %d\n", p_ifo->i_pos ); */
-    
+
         TITINF.i_title_nb = ReadWord( p_ifo, p_buf, &p_tmp );
         /*fprintf( stderr, "title_inf: TTU nb %d\n", TITINF.i_title_nb ); */
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
         TITINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
-    
+
         /* parsing of title attributes */
         TITINF.p_attr = malloc( TITINF.i_title_nb *sizeof(title_attr_t) );
         if( TITINF.p_attr == NULL )
         {
             return -1;
         }
-    
+
         for( i = 0 ; i < TITINF.i_title_nb ; i++ )
         {
             TITINF.p_attr[i].i_play_type = ReadByte( p_ifo, p_buf, &p_tmp );
@@ -246,11 +246,11 @@ int IfoInit( ifo_t * p_ifo )
         i_start = p_ifo->i_pos;
 
         /*fprintf( stderr, "PTL\n" ); */
-    
+
         PARINF.i_country_nb = ReadWord( p_ifo, p_buf, &p_tmp );
         PARINF.i_vts_nb = ReadWord( p_ifo, p_buf, &p_tmp );
         PARINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
-        
+
         PARINF.p_parental_desc = malloc( PARINF.i_country_nb
                                           * sizeof(parental_desc_t) );
         if( PARINF.p_parental_desc == NULL )
@@ -284,7 +284,7 @@ int IfoInit( ifo_t * p_ifo )
             for( j = 0 ; j < 8 ; j++ )
             {
                 PARINF.p_parental_mask[i].ppi_mask[j] =
-                            malloc( ( PARINF.i_vts_nb + 1 ) * sizeof(u16) );
+                            malloc( ( PARINF.i_vts_nb + 1 ) * sizeof(uint16_t) );
 
                 if( PARINF.p_parental_mask[i].ppi_mask[j] == NULL )
                 {
@@ -307,20 +307,20 @@ int IfoInit( ifo_t * p_ifo )
 #define VTSINF     p_ifo->vmg.vts_inf
     if( MGINF.i_vts_inf_start_sector )
     {
-        u64             i_temp;
+        uint64_t i_temp;
 
         p_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_start +
                                 MGINF.i_vts_inf_start_sector );
         i_start = p_ifo->i_pos;
-    
+
         /*fprintf( stderr, "VTS ATTR\n" ); */
-    
+
         VTSINF.i_vts_nb = ReadWord( p_ifo, p_buf, &p_tmp );;
         /*fprintf( stderr, "VTS ATTR Nb: %d\n", VTSINF.i_vts_nb ); */
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
         VTSINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
         VTSINF.pi_vts_attr_start_byte =
-                            malloc( VTSINF.i_vts_nb * sizeof(u32) );
+                            malloc( VTSINF.i_vts_nb * sizeof(uint32_t) );
         if( VTSINF.pi_vts_attr_start_byte == NULL )
         {
             return -1;
@@ -367,7 +367,7 @@ int IfoInit( ifo_t * p_ifo )
             for( j = 0 ; j < 28 ; j++ )
             {
                 /* FIXME : Fix endianness issue here */
-                ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
+                ReadBytes( p_ifo, p_buf, &p_tmp, (uint8_t*)(&i_temp), 6 );
             }
 
             DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
@@ -390,7 +390,7 @@ int IfoInit( ifo_t * p_ifo )
             for( j = 0 ; j < 28 /*VTSINF.p_vts_vts_inf[i].i_vtstt_subpic_nb*/ ; j++ )
             {
                 /* FIXME : Fix endianness issue here */
-                ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
+                ReadBytes( p_ifo, p_buf, &p_tmp, (uint8_t*)(&i_temp), 6 );
             }
         }
     }
@@ -431,12 +431,12 @@ int IfoInit( ifo_t * p_ifo )
  *****************************************************************************/
 int IfoTitleSet( ifo_t * p_ifo, int i_title )
 {
-    u8          p_buf[DVD_LB_SIZE];
-    u8 *        p_tmp;
+    uint8_t     p_buf[DVD_LB_SIZE];
+    uint8_t *   p_tmp;
     int         i_off;
     int         i_start;
-    u64         i_temp;
-    u16         i_short;
+    uint64_t    i_temp;
+    uint16_t    i_short;
     int         i, j;
 
     if( p_ifo->vts.b_initialized )
@@ -497,7 +497,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
     for( i = 0 ; i < 28 ; i++ )
     {
         /* FIXME : take care of endianness */
-        ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
+        ReadBytes( p_ifo, p_buf, &p_tmp, (uint8_t*)(&i_temp), 6 );
     }
 
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
@@ -562,7 +562,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
 
     for( i=0 ; i<MGINF.i_spu_nb ; i++ )
     {
-        ReadBytes( p_ifo, p_buf, &p_tmp, (u8*)(&i_temp), 6 );
+        ReadBytes( p_ifo, p_buf, &p_tmp, (uint8_t*)(&i_temp), 6 );
         i_temp = hton64( i_temp ) >> 16;
         /*fprintf( stderr, "Subpic %d: "I64Fx"\n", i, i_temp ); */
         MGINF.p_spu_attr[i].i_caption = i_temp & 0xff;
@@ -584,15 +584,15 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
                                           MGINF.i_title_inf_start_sector );
 
         i_start = p_ifo->i_pos;
-    
+
         /*fprintf( stderr, "VTS PTR\n" ); */
-   
+
         TITINF.i_title_nb = ReadWord( p_ifo, p_buf, &p_tmp );
         /*fprintf( stderr, "VTS title_inf nb: %d\n", TITINF.i_title_nb ); */
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
         TITINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
-        TITINF.pi_start_byte = malloc( TITINF.i_title_nb * sizeof(u32) );
+        TITINF.pi_start_byte = malloc( TITINF.i_title_nb * sizeof(uint32_t) );
         if( TITINF.pi_start_byte == NULL )
         {
             return -1;
@@ -655,7 +655,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
 #define TIMINF p_ifo->vts.time_inf
     if( MGINF.i_time_inf_start_sector )
     {
-        u8      p_buf[DVD_LB_SIZE];
+        uint8_t p_buf[DVD_LB_SIZE];
 
         p_tmp = FillBuffer( p_ifo, p_buf, p_ifo->vts.i_pos +
                                           MGINF.i_time_inf_start_sector );
@@ -666,14 +666,14 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
         TIMINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
-        TIMINF.pi_start_byte = malloc( TIMINF.i_nb * sizeof(u32) );
+        TIMINF.pi_start_byte = malloc( TIMINF.i_nb * sizeof(uint32_t) );
         if( TIMINF.pi_start_byte == NULL )
         {
             return -1;
         }
 
         for( i = 0 ; i < TIMINF.i_nb ; i++ )
-        {    
+        {
             TIMINF.pi_start_byte[i] = ReadDouble( p_ifo, p_buf, &p_tmp );
         }
 
@@ -684,7 +684,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
         }
 
         for( i = 0 ; i < TIMINF.i_nb ; i++ )
-        {    
+        {
             TIMINF.p_time_map[i].i_time_unit = ReadByte( p_ifo, p_buf, &p_tmp );
             DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
             TIMINF.p_time_map[i].i_entry_nb = ReadWord( p_ifo, p_buf, &p_tmp );
@@ -692,7 +692,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
             if( TIMINF.p_time_map[i].i_entry_nb )
             {
                 TIMINF.p_time_map[i].pi_sector =
-                     malloc( TIMINF.p_time_map[i].i_entry_nb * sizeof(u32) );
+                     malloc( TIMINF.p_time_map[i].i_entry_nb * sizeof(uint32_t) );
                 if( TIMINF.p_time_map[i].pi_sector == NULL )
                 {
                     return -1;
@@ -805,7 +805,7 @@ static int FreeTitleSet( vts_t * p_vts )
     }
 
     p_vts->b_initialized = 0;
-    
+
     return 0;
 }
 
@@ -882,11 +882,11 @@ void IfoDestroy( ifo_t * p_ifo )
  *****************************************************************************/
 static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes )
 {
-    u8          p_buf[DVD_LB_SIZE];
-    u8 *        p_tmp;
+    uint8_t     p_buf[DVD_LB_SIZE];
+    uint8_t *   p_tmp;
     int         i_start;
-    u16         i_audio;
-    u32         i_spu;
+    uint16_t    i_audio;
+    uint32_t    i_spu;
     int         i;
 
     p_tmp = FillBuffer( p_ifo, p_buf, i_block ) + i_bytes;
@@ -1032,10 +1032,10 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
         p_ifo->i_pos = dvdcss_seek( p_ifo->dvdhandle,
                OFF2LB( i_start + p_title->i_chapter_map_start_byte ),
                DVDCSS_NOFLAGS );
-        
+
         p_title->chapter_map.pi_start_cell =
                     malloc( p_title->i_chapter_nb * sizeof(chapter_map_t) );
-        
+
         if( p_title->chapter_map.pi_start_cell == NULL )
         {
             return -1;
@@ -1046,7 +1046,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
     }
     else
     {
-        p_title->chapter_map.pi_start_cell = NULL; 
+        p_title->chapter_map.pi_start_cell = NULL;
     }
 
     /* parsing of cell_play_t */
@@ -1058,7 +1058,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
 
         p_title->p_cell_play = malloc( p_title->i_cell_nb
                                         * sizeof(cell_play_t) );
-    
+
         if( p_title->p_cell_play == NULL )
         {
             return -1;
@@ -1100,7 +1100,7 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
             DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
             p_title->p_cell_pos[i].i_cell_id = ReadByte( p_ifo, p_buf, &p_tmp );
         }
-    } 
+    }
 
     return 0;
 }
@@ -1152,8 +1152,8 @@ static int FreeTitle( title_t * p_title )
 static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf,
                         int i_block, int i_bytes )
 {
-    u8              p_buf[DVD_LB_SIZE];
-    u8 *            p_tmp;
+    uint8_t         p_buf[DVD_LB_SIZE];
+    uint8_t *       p_tmp;
     int             i_start;
     int             i;
 
@@ -1198,18 +1198,18 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf,
 
 /*****************************************************************************
  * FreeUnitInf : frees a structure allocated by ReadUnit
- *****************************************************************************/ 
+ *****************************************************************************/
 static int FreeUnitInf( unit_inf_t * p_unit_inf )
 {
     int i;
-    
+
     if( p_unit_inf->p_title != NULL )
     {
         for( i = 0 ; i < p_unit_inf->i_title_nb ; i++ )
         {
             FreeTitle( &p_unit_inf->p_title[i].title );
         }
-            
+
         free( p_unit_inf->p_title );
     }
 
@@ -1223,8 +1223,8 @@ static int FreeUnitInf( unit_inf_t * p_unit_inf )
 static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit,
                           int i_block )
 {
-    u8              p_buf[DVD_LB_SIZE];
-    u8 *            p_tmp;
+    uint8_t         p_buf[DVD_LB_SIZE];
+    uint8_t *       p_tmp;
     int             i;
     int             i_start;
 
@@ -1298,8 +1298,8 @@ static int FreeTitleUnit( title_unit_t * p_title_unit )
  *****************************************************************************/
 static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
 {
-    u8              p_buf[DVD_LB_SIZE];
-    u8 *            p_tmp;
+    uint8_t         p_buf[DVD_LB_SIZE];
+    uint8_t *       p_tmp;
     int             i_start;
     int             i;
 
@@ -1329,11 +1329,11 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
         MAP.i_cell_id = ReadByte( p_ifo, p_buf, &p_tmp );
         DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
         MAP.i_first_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
-/*        fprintf(stderr, "sector[%d] %d (%d)\n", i,ntohl(*(u32*)(p_tmp)), p_ifo->i_pos);*/
+/*        fprintf(stderr, "sector[%d] %d (%d)\n", i,ntohl(*(uint32_t*)(p_tmp)), p_ifo->i_pos);*/
         MAP.i_last_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
 #undef MAP
     }
-    
+
     return 0;
 }
 
@@ -1352,20 +1352,20 @@ static int FreeCellInf( cell_inf_t * p_cell_inf )
  *****************************************************************************/
 static int ReadVobuMap( ifo_t * p_ifo, vobu_map_t * p_vobu_map, int i_block )
 {
-    u8                  p_buf[DVD_LB_SIZE];
-    u8 *                p_tmp;
+    uint8_t             p_buf[DVD_LB_SIZE];
+    uint8_t *           p_tmp;
     int                 i_start;
     int                 i, i_max;
-    
+
     p_tmp = FillBuffer( p_ifo, p_buf, i_block );
     i_start = p_ifo->i_pos;
     /*fprintf( stderr, "VOBU ADMAP\n" ); */
 
     p_vobu_map->i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
     i_max = ( i_start + p_vobu_map->i_last_byte + 1 - p_ifo->i_pos )
-             / sizeof(u32);
+             / sizeof(uint32_t);
 
-    p_vobu_map->pi_vobu_start_sector = malloc( i_max * sizeof(u32) );
+    p_vobu_map->pi_vobu_start_sector = malloc( i_max * sizeof(uint32_t) );
     if( p_vobu_map->pi_vobu_start_sector == NULL )
     {
         return -1;
@@ -1431,7 +1431,7 @@ static char * IfoMath( char val )
     static char math_op[][10] =
     {
         "none",
-        "=", 
+        "=",
         "<->",    /* swap */
         "+=",
         "-=",
@@ -1493,7 +1493,7 @@ char * IfoMenuName( char index )
     return ifo_menu_id[index&0x07];
 }
 
-static void IfoRegister( u16 i_data, u8 i_direct)
+static void IfoRegister( uint16_t i_data, uint8_t i_direct)
 {
     if( i_direct )
     {
@@ -1537,9 +1537,8 @@ static void IfoRegister( u16 i_data, u8 i_direct)
     }
 }
 
-static void IfoAdvanced( u8 *pi_code )
-{
-    u8      i_cmd = pi_code[0];
+static void IfoAdvanced( uint8_t *pi_code ){
+    uint8_t i_cmd = pi_code[0];
 
     printf(" { ");
 
@@ -1614,7 +1613,7 @@ static void IfoJmp( ifo_command_t com )
         {
         case 0x00:
             printf( "to play first PGC" );
-            break;                
+            break;
         case 0x01:
             printf( "to VMG title menu (?)" );
             break;
@@ -1623,7 +1622,7 @@ static void IfoJmp( ifo_command_t com )
                             OP_VAL_8(2),
                             OP_VAL_8(1),
                             IfoMenuName( OP_VAL_8(3)&0xF ) );
-            break;                
+            break;
         case 0x03:
             printf( "vmg pgc 0x%04x (?)", ( OP_VAL_8(0)<<8) | OP_VAL_8(1) );
             break;
@@ -1657,7 +1656,7 @@ static void IfoJmp( ifo_command_t com )
         /* it is processed BEFORE switch */
         /* under some conditions, it is ignored */
         /* I don't understand exactly what it means */
-        printf( " ( spec cell 0x%02X ) ", OP_VAL_8(2) ); 
+        printf( " ( spec cell 0x%02X ) ", OP_VAL_8(2) );
 
         switch( OP_VAL_8(3)>>6 )
         {
@@ -1670,11 +1669,11 @@ static void IfoJmp( ifo_command_t com )
         case 2:
             printf( "to VTS menu \"%s\" (?)",
                     IfoMenuName(OP_VAL_8(3)&0xF) );
-            break; 
+            break;
         case 3:
             printf( "vmg pgc 0x%02x (?)", (OP_VAL_8(0)<<8)|OP_VAL_8(1) );
             break;
-        }    
+        }
 #endif
         break;
     }
@@ -1682,7 +1681,7 @@ static void IfoJmp( ifo_command_t com )
 
 static void IfoLnk( ifo_command_t com )
 {
-    u16     i_button=OP_VAL_8(4)>>2;
+    uint16_t i_button = OP_VAL_8(4)>>2;
 
     printf ("lnk to ");
 
@@ -1694,11 +1693,11 @@ static void IfoLnk( ifo_command_t com )
 
     case 0x04:
         printf( "PGC 0x%02x", OP_VAL_16(2) );
-        break; 
+        break;
 
     case 0x05:
         printf( "PTT 0x%02x", OP_VAL_16(2) );
-        break; 
+        break;
 
     case 0x06:
         printf( "Program 0x%02x this PGC", OP_VAL_8(5) );
@@ -1715,7 +1714,7 @@ static void IfoLnk( ifo_command_t com )
     {
         printf( ", Highlight 0x%02x", OP_VAL_8(4)>>2 );
     }
-            
+
 }
 
 void IfoSetSystem( ifo_command_t com )
@@ -1769,7 +1768,7 @@ void IfoSetSystem( ifo_command_t com )
             printf( "s[%s] = r[0x%02x]", ifo_reg[9], OP_VAL_8(1)&0x0f );
         }
 
-        printf( "s[%s] = (s[%s]&0x7FFF)|0x%02x", 
+        printf( "s[%s] = (s[%s]&0x7FFF)|0x%02x",
                         ifo_reg[10], ifo_reg[10], OP_VAL_16(1)&0x8000);
         break;
     case 3:
@@ -1825,7 +1824,7 @@ static void IfoSet( ifo_command_t com )
  *****************************************************************************/
 void CommandRead( ifo_command_t com )
 {
-    u8*     pi_code = (u8*)(&com);
+    uint8_t * pi_code = (uint8_t*)(&com);
 
     switch( com.i_type )
     {
@@ -1845,24 +1844,24 @@ void CommandRead( ifo_command_t com )
                 IfoRegister (OP_VAL_16(1), com.i_dir_cmp);
                 printf (") ");
             }
-        
+
             /* Sub command */
             switch( com.i_sub_cmd )
             {
             case 1:
                 printf( "goto Line 0x%02x", OP_VAL_16(2) );
                 break;
-        
+
             case 2:
                 printf( "stop VM" );
                 break;
-        
+
             case 3:
                 printf( "Set Parental Level To %s and goto Line 0x%02x",
                                      ifo_parental[OP_VAL_8(4)&0x7],
                                      OP_VAL_8(5) );
                 break;
-        
+
             default:
                 printf( "Illegal" );
                 break;
@@ -1893,7 +1892,7 @@ void CommandRead( ifo_command_t com )
                 IfoJmp( com );
             }
             else
-            {    
+            {
                 if( com.i_cmp )
                 {
                     printf( "if (r[0x%02x] %s ", OP_VAL_8(1)&0x0f,
@@ -1960,7 +1959,7 @@ void CommandRead( ifo_command_t com )
         }
         break;
 
-    /* 
+    /*
      * math command on r[opcode[1]] and
      * direct?be2me_16(OP_VAL_8(0)):reg[OP_VAL_8(1)] is executed
      * ( unless command is swap; then r[opcode[1]] and r[OP_VAL_8(1)]
@@ -2072,7 +2071,7 @@ void CommandPrint( ifo_t ifo )
 /*****************************************************************************
  * ReadByte and so
  *****************************************************************************/
-static u8* FillBuffer( ifo_t* p_ifo, u8* p_buf, int i_pos )
+static uint8_t* FillBuffer( ifo_t* p_ifo, uint8_t* p_buf, int i_pos )
 {
     p_ifo->i_pos = dvdcss_seek( p_ifo->dvdhandle, i_pos, DVDCSS_NOFLAGS );
     dvdcss_read( p_ifo->dvdhandle, p_buf, 1, DVDCSS_NOFLAGS );
@@ -2080,8 +2079,8 @@ static u8* FillBuffer( ifo_t* p_ifo, u8* p_buf, int i_pos )
     return p_buf;
 }
 
-static void ReadBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp,
-                                     u8* pi_dest, int i_nb )
+static void ReadBytes( ifo_t* p_ifo, uint8_t* p_buf, uint8_t** pp_tmp,
+                                     uint8_t* pi_dest, int i_nb )
 {
     if( i_nb > DVD_LB_SIZE )
     {
@@ -2109,7 +2108,7 @@ static void ReadBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp,
     return;
 }
 
-static void DumpBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp, int i_nb )
+static void DumpBytes( ifo_t* p_ifo, uint8_t* p_buf, uint8_t** pp_tmp, int i_nb )
 {
     if( i_nb > DVD_LB_SIZE )
     {
@@ -2137,30 +2136,30 @@ static void DumpBytes( ifo_t* p_ifo, u8* p_buf, u8** pp_tmp, int i_nb )
     } \
     i_ret <<= 8; i_ret |= **pp_tmp; (*pp_tmp)++;
 
-static u8 ReadByte( ifo_t * p_ifo, u8* p_buf, u8** pp_tmp )
+static uint8_t ReadByte( ifo_t * p_ifo, uint8_t* p_buf, uint8_t** pp_tmp )
 {
-    u8     i_ret = 0;
+    uint8_t i_ret = 0;
     ADDBYTE;
     return i_ret;
 }
 
-static u16 ReadWord( ifo_t * p_ifo, u8* p_buf, u8** pp_tmp )
+static uint16_t ReadWord( ifo_t * p_ifo, uint8_t* p_buf, uint8_t** pp_tmp )
 {
-    u16    i_ret = 0;
+    uint16_t i_ret = 0;
     ADDBYTE; ADDBYTE;
     return i_ret;
 }
 
-static u32 ReadDouble( ifo_t * p_ifo, u8* p_buf, u8** pp_tmp )
+static uint32_t ReadDouble( ifo_t * p_ifo, uint8_t* p_buf, uint8_t** pp_tmp )
 {
-    u32    i_ret = 0;
+    uint32_t i_ret = 0;
     ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE;
     return i_ret;
 }
 
-static u64 ReadQuad( ifo_t * p_ifo, u8* p_buf, u8** pp_tmp )
+static uint64_t ReadQuad( ifo_t * p_ifo, uint8_t* p_buf, uint8_t** pp_tmp )
 {
-    u64    i_ret = 0;
+    uint64_t i_ret = 0;
     ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE; ADDBYTE;
     return i_ret;
 }

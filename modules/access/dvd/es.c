@@ -1,7 +1,7 @@
 /* es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: es.c,v 1.5 2003/05/05 22:23:32 gbazin Exp $
+ * $Id: es.c,v 1.6 2003/10/25 00:49:13 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -228,10 +228,10 @@ void DVDReadSPU( input_thread_t * p_input )
             {
                 ADDES( 0xbd, 0x20 + i_id, VLC_FOURCC('s','p','u','b'), SPU_ES,
                        vts.manager_inf.p_spu_attr[i-1].i_lang_code, "",
-                       sizeof(int) + 16*sizeof(u32) );
+                       sizeof(int) + 16*sizeof(uint32_t) );
                 *(int*)p_es->p_demux_data = 0xBeeF;
                 memcpy( (char*)p_es->p_demux_data + sizeof(int),
-                        palette, 16*sizeof(u32) );
+                        palette, 16*sizeof(uint32_t) );
             }
             else
             {

@@ -2,7 +2,7 @@
  * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: sdl.c,v 1.13 2003/05/05 16:09:37 gbazin Exp $
+ * $Id: sdl.c,v 1.14 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -612,8 +612,8 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int OpenDisplay( vout_thread_t *p_vout )
 {
-    Uint32   i_flags;
-    int      i_bpp;
+    uint32_t i_flags;
+    int i_bpp;
 
     /* SDL fucked up fourcc definitions on bigendian machines */
     uint32_t i_sdl_chroma;

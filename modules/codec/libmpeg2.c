@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.30 2003/10/08 21:03:36 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.31 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -195,7 +195,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                 return VLC_SUCCESS;
             }
 
-            if( p_block->b_discontinuity && p_sys->p_synchro 
+            if( p_block->b_discontinuity && p_sys->p_synchro
                 && p_sys->p_info->sequence->width != (unsigned)-1 )
             {
                 vout_SynchroReset( p_sys->p_synchro );
@@ -315,15 +315,15 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
                 msg_Err( p_dec, "cannot create vout" );
                 block_Release( p_block );
                 return -1;
-            } 
+            }
 
             msg_Dbg( p_dec, "%dx%d, aspect %d, %u.%03u fps",
                      p_sys->p_info->sequence->width,
                      p_sys->p_info->sequence->height, i_aspect,
-                     (uint32_t)((u64)1001000000 * 27 /
-                     p_sys->p_info->sequence->frame_period / 1001),
-                     (uint32_t)((u64)1001000000 * 27 /
-                     p_sys->p_info->sequence->frame_period % 1001) );
+                     (uint32_t)((uint64_t)1001000000 * 27 /
+                                 p_sys->p_info->sequence->frame_period / 1001),
+                     (uint32_t)((uint64_t)1001000000 * 27 /
+                                 p_sys->p_info->sequence->frame_period % 1001) );
 
             mpeg2_custom_fbuf( p_sys->p_mpeg2dec, 1 );
 
@@ -468,7 +468,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             buf[0] = buf[1] = buf[2] = NULL;
 
             msg_Warn( p_dec, "invalid picture encountered" );
-            if ( ( p_sys->p_info->current_picture == NULL ) || 
+            if ( ( p_sys->p_info->current_picture == NULL ) ||
                ( ( p_sys->p_info->current_picture->flags & PIC_MASK_CODING_TYPE)
                   != B_CODING_TYPE ) )
             {

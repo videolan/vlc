@@ -1,8 +1,8 @@
 /*****************************************************************************
- * beos_init.cpp: Initialization for BeOS specific features 
+ * beos_init.cpp: Initialization for BeOS specific features
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.32 2003/09/29 17:36:35 gbazin Exp $
+ * $Id: beos_specific.cpp,v 1.33 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -52,7 +52,7 @@ public:
     virtual void RefsReceived(BMessage* message);
     virtual void MessageReceived(BMessage* message);
     virtual bool QuitRequested();
-    
+
 private:
     BWindow*     fInterfaceWindow;
     BMessage*    fRefsMessage;
@@ -62,7 +62,7 @@ private:
  * Static vars
  *****************************************************************************/
 
-//const uint32 INTERFACE_CREATED = 'ifcr';  /* message sent from interface */
+//const uint32_t INTERFACE_CREATED = 'ifcr';  /* message sent from interface */
 #include "../../modules/gui/beos/MsgVals.h"
 
 extern "C"
@@ -163,12 +163,12 @@ void VlcApplication::AboutRequested( )
 void VlcApplication::ReadyToRun( )
 {
     BPath path;
-    app_info info; 
+    app_info info;
 
     /* Get the program path */
-    be_app->GetAppInfo( &info ); 
-    BEntry entry( &info.ref ); 
-    entry.GetPath( &path ); 
+    be_app->GetAppInfo( &info );
+    BEntry entry( &info.ref );
+    entry.GetPath( &path );
     path.GetParent( &path );
     p_this->p_libvlc->psz_vlcpath = strdup( path.Path() );
 
@@ -224,7 +224,7 @@ void VlcApplication::MessageReceived(BMessage* message)
 
 bool VlcApplication::QuitRequested()
 {
-    if( CurrentMessage() && CurrentMessage()->FindBool( "shortcut" ) ) 
+    if( CurrentMessage() && CurrentMessage()->FindBool( "shortcut" ) )
     {
         /* The user hit Alt+Q, don't let the be_app exit without cleaning.
            Let the interface do the job */

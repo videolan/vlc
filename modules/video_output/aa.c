@@ -2,7 +2,7 @@
  * vout_aa.c: Aa video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aa.c,v 1.2 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: aa.c,v 1.3 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -46,7 +46,7 @@ static int  Manage    ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 static void Display   ( vout_thread_t *, picture_t * );
 
-static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
+static void SetPalette     ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -246,7 +246,8 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  * SetPalette: set the 8bpp palette
  *****************************************************************************/
-static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
+static void SetPalette( vout_thread_t *p_vout,
+                        uint16_t *red, uint16_t *green, uint16_t *blue )
 {
     int i;
 

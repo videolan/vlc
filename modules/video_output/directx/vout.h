@@ -2,7 +2,7 @@
  * vout.h: Windows DirectX video output header file
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout.h,v 1.6 2003/09/26 16:03:21 gbazin Exp $
+ * $Id: vout.h,v 1.7 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -77,8 +77,8 @@ struct vout_sys_t
 
     int          i_rgb_colorkey;      /* colorkey in RGB used by the overlay */
     int          i_colorkey;                 /* colorkey used by the overlay */
- 
-    volatile u16 i_changes;             /* changes made to the video display */
+
+    volatile uint16_t i_changes;        /* changes made to the video display */
 
     /* Mouse */
     volatile vlc_bool_t b_cursor_hidden;

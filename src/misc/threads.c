@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.41 2003/08/28 17:19:41 sam Exp $
+ * $Id: threads.c,v 1.42 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -705,7 +705,7 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
     i_ret = 1;
 
 #elif defined( HAVE_KERNEL_SCHEDULER_H )
-    int32 exit_value;
+    int32_t exit_value;
     wait_for_thread( p_this->thread_id, &exit_value );
 
 #endif

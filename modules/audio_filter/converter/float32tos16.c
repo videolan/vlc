@@ -2,7 +2,7 @@
  * float32tos16.c : converter from float32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tos16.c,v 1.12 2002/11/20 16:43:32 sam Exp $
+ * $Id: float32tos16.c,v 1.13 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -80,7 +80,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     int i;
     float * p_in = (float *)p_in_buf->p_buffer;
-    s16 * p_out = (s16 *)p_out_buf->p_buffer;
+    int16_t * p_out = (int16_t *)p_out_buf->p_buffer;
 
     for ( i = p_in_buf->i_nb_samples
                * aout_FormatNbChannels( &p_filter->input ); i-- ; )
@@ -93,8 +93,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #else
         /* This is walken's trick based on IEEE float format. */
         float f_in = *p_in + 384.0;
-        s32 i_in;
-        i_in = *(s32 *)&f_in;
+        int32_t i_in;
+        i_in = *(int32_t *)&f_in;
         if ( i_in > 0x43c07fff ) *p_out = 32767;
         else if ( i_in < 0x43bf8000 ) *p_out = -32768;
         else *p_out = i_in - 0x43c00000;

@@ -2,7 +2,7 @@
  * s8tofloat32.c : converter from signed 8 bits integer to float32.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: s8tofloat32.c,v 1.2 2002/11/20 16:43:32 sam Exp $
+ * $Id: s8tofloat32.c,v 1.3 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -81,7 +81,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
 
     /* We start from the end because b_in_place is true */
-    s8 * p_in = (s8 *)p_in_buf->p_buffer + i - 1;
+    int8_t * p_in = (int8_t *)p_in_buf->p_buffer + i - 1;
     float * p_out = (float *)p_out_buf->p_buffer + i - 1;
 
     while( i-- )

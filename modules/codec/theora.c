@@ -2,7 +2,7 @@
  * theora.c: theora decoder module making use of libtheora.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: theora.c,v 1.12 2003/10/09 18:53:00 gbazin Exp $
+ * $Id: theora.c,v 1.13 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -218,7 +218,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
         }
         p_sys->i_headers++;
 
- 
+
         if( p_sys->b_packetizer )
         {
             /* add a input for the stream ouput */
@@ -290,7 +290,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             return VLC_EGENERIC;
         }
         p_sys->i_headers++;
-    
+
         ParseTheoraComments( p_dec );
 
         if( p_sys->b_packetizer )
@@ -317,7 +317,7 @@ static int RunDecoder( decoder_t *p_dec, block_t *p_block )
             return VLC_EGENERIC;
         }
         p_sys->i_headers++;
-    
+
         if( !p_sys->b_packetizer )
         {
             /* We have all the headers, initialize decoder */
@@ -498,7 +498,7 @@ static void theora_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
 {
     int i_plane, i_line, i_width, i_dst_stride, i_src_stride;
     int i_src_xoffset, i_src_yoffset;
-    u8  *p_dst, *p_src;
+    uint8_t *p_dst, *p_src;
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
     {
@@ -513,7 +513,7 @@ static void theora_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
         {
             i_src_xoffset /= 2;
             i_src_yoffset /= 2;
-        } 
+        }
 
         p_src += (i_src_yoffset * i_src_stride + i_src_yoffset);
 

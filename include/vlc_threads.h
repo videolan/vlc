@@ -3,7 +3,7 @@
  * This header provides portable declarations for mutexes & conditions
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads.h,v 1.33 2003/08/28 17:19:42 sam Exp $
+ * $Id: vlc_threads.h,v 1.34 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -213,7 +213,7 @@ typedef thread_id vlc_thread_t;
 
 typedef struct
 {
-    int32           init;
+    int32_t         init;
     sem_id          lock;
 
     vlc_object_t * p_this;
@@ -221,7 +221,7 @@ typedef struct
 
 typedef struct
 {
-    int32           init;
+    int32_t         init;
     thread_id       thread;
 
     vlc_object_t * p_this;

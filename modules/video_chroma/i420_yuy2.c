@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.3 2003/08/29 18:58:05 fenrir Exp $
+ * $Id: i420_yuy2.c,v 1.4 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -55,8 +55,8 @@ static void I420_Y211           ( vout_thread_t *, picture_t *, picture_t * );
 #endif
 
 #ifdef MODULE_NAME_IS_i420_yuy2_mmx
-static unsigned long long i_00ffw;
-static unsigned long long i_80w;
+static uint64_t i_00ffw;
+static uint64_t i_80w;
 #endif
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * u8tofixed32.c : converter from unsigned 8 bits integer to fixed32.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: u8tofixed32.c,v 1.1 2002/11/21 13:53:32 sam Exp $
+ * $Id: u8tofixed32.c,v 1.2 2003/10/25 00:49:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -81,7 +81,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
 
     /* We start from the end because b_in_place is true */
-    u8 * p_in = (u8 *)p_in_buf->p_buffer + i - 1;
+    uint8_t * p_in = (uint8_t *)p_in_buf->p_buffer + i - 1;
     vlc_fixed_t * p_out = (vlc_fixed_t *)p_out_buf->p_buffer + i - 1;
 
     while( i-- )

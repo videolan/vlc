@@ -2,15 +2,15 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.41 2003/10/23 16:48:45 gbazin Exp $
+ * $Id: ogg.c,v 1.42 2003/10/25 00:49:14 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,7 +39,7 @@
 #define OGG_BLOCK_SIZE 4096
 
 /*****************************************************************************
- * Definitions of structures and functions used by this plugins 
+ * Definitions of structures and functions used by this plugins
  *****************************************************************************/
 typedef struct logical_stream_s
 {
@@ -107,7 +107,7 @@ typedef struct stream_header_video
     ogg_int32_t width;
     ogg_int32_t height;
 } stream_header_video;
-        
+
 typedef struct stream_header_audio
 {
     ogg_int16_t channels;
@@ -251,7 +251,7 @@ static void Ogg_ElemStreamStop( input_thread_t *p_input,
  ****************************************************************************/
 static int Ogg_Check( input_thread_t *p_input )
 {
-    u8 *p_peek;
+    uint8_t *p_peek;
     int i_size = input_Peek( p_input, &p_peek, 4 );
 
     /* Check for the Ogg capture pattern */
@@ -910,7 +910,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             sprintf( title, "Stream %d", p_ogg->i_streams );
                             p_cat = input_InfoCategory( p_input, title );
                             input_AddInfo( p_cat, _("Type"), _("Audio") );
-                            input_AddInfo( p_cat, _("Codec"), "%.4s", 
+                            input_AddInfo( p_cat, _("Codec"), "%.4s",
                                            (char *)&p_stream->i_fourcc );
                             input_AddInfo( p_cat, _("Sample Rate"), "%d",
                                            p_stream->p_wf->nSamplesPerSec );
@@ -933,7 +933,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     }
                 }
                 else if( (*oggpacket.packet & PACKET_TYPE_BITS )
-                         == PACKET_TYPE_HEADER && 
+                         == PACKET_TYPE_HEADER &&
                          oggpacket.bytes >= (int)sizeof(stream_header)+1 )
                 {
                     stream_header *st = (stream_header *)(oggpacket.packet+1);
@@ -1083,7 +1083,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                             sprintf( title, "Stream %d", p_ogg->i_streams );
                             p_cat = input_InfoCategory( p_input, title );
                             input_AddInfo( p_cat, _("Type"), _("Audio") );
-                            input_AddInfo( p_cat, _("Codec"), "%.4s", 
+                            input_AddInfo( p_cat, _("Codec"), "%.4s",
                                            (char *)&p_stream->i_fourcc );
                             input_AddInfo( p_cat, _("Sample Rate"), "%d",
                                            p_stream->p_wf->nSamplesPerSec );
@@ -1386,7 +1386,7 @@ static void Ogg_EndOfStream( input_thread_t *p_input, demux_sys_t *p_ogg )
 static void Deactivate( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t *p_ogg = (demux_sys_t *)p_input->p_demux_data  ; 
+    demux_sys_t *p_ogg = (demux_sys_t *)p_input->p_demux_data  ;
 
     if( p_ogg )
     {
