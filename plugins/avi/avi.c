@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.2 2002/04/25 03:01:03 fenrir Exp $
+ * $Id: avi.c,v 1.3 2002/04/25 11:41:38 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -224,7 +224,7 @@ static int __AVI_ParseStreamHeader( u32 i_id, int *i_number, u16 *i_type )
     *i_type = ( c3 << 8) + c4;
     return( 0 );
 }   
-
+/*
 static int __AVI_HeaderMoviValid( u32 i_header )
 {
     switch( i_header&0xFFFF0000 )
@@ -245,7 +245,7 @@ static int __AVI_HeaderMoviValid( u32 i_header )
     }
     return( 0 );
 }
-
+*/
 static void __AVI_AddEntryIndex( AVIStreamInfo_t *p_info,
                                  AVIIndexEntry_t *p_index)
 {
@@ -890,9 +890,12 @@ static void __AVI_SynchroReInit( input_thread_t *p_input,
     p_avi_demux = (demux_data_avi_file_t*)p_input->p_demux_data;
     p_avi_demux->i_date = mdate() + DEFAULT_PTS_DELAY 
                             - __AVI_GetPTS( p_info_master );
-    /* TODO: a optimiser */
-    p_info_slave->i_idxpos = 0; 
-    p_info_slave->b_unselected = 1; /* to correct audio */
+    if( p_info_slave != NULL )
+    {
+        /* TODO: a optimiser */
+        p_info_slave->i_idxpos = 0; 
+        p_info_slave->b_unselected = 1; /* to correct audio */
+    }
     p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_OK;
 } 
 /** -1 in case of error, 0 of EOF, 1 otherwise **/
@@ -951,6 +954,7 @@ static int AVIDemux( input_thread_t *p_input )
         intf_ErrMsg( "input error: no video ouput selected" );
         return( -1 );
     }
+
     if( input_ClockManageControl( p_input, p_input->stream.p_selected_program,
                             (mtime_t)0) == PAUSE_S )
     {   
@@ -960,7 +964,6 @@ static int AVIDemux( input_thread_t *p_input )
     /* after updated p_avi_demux->pp_info[i]->b_unselected  !! */
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     { 
-        /* TODO check if we have seek */
         __AVI_ReAlign( p_input, p_info_video ); /*on se realigne pr la video */
         __AVI_SynchroReInit( p_input, p_info_video, p_info_audio );
     }
@@ -1013,11 +1016,11 @@ static int AVIDemux( input_thread_t *p_input )
         __AVI_NextIndexEntry( p_input, p_info );
         return( 1 );
     }
-    
+/*    
     intf_WarnMsg( 6, "input demux: read %4.4s chunk %d bytes",
                     (char*)&p_chunk->i_id,
                     p_chunk->i_size);
-                    
+*/                    
     if( RIFF_LoadChunkDataInPES(p_input, p_chunk, &p_pes) != 0 )
     {
         intf_ErrMsg( "input error: cannot read data" );
@@ -1028,9 +1031,10 @@ static int AVIDemux( input_thread_t *p_input )
     p_pes->i_pts = p_avi_demux->i_date + __AVI_GetPTS( p_info );
     p_pes->i_dts = 0;
     
-    __AVI_NextIndexEntry( p_input, p_info );
     /* send to decoder */
     vlc_mutex_lock( &p_info->p_es->p_decoder_fifo->data_lock );
+    /* change MAX_PACKET and replace it to have same duration of audio 
+        and video in buffer, to avoid unsynchronization while seeking */
     if( p_info->p_es->p_decoder_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
     {
         /* Wait for the decoder. */
@@ -1040,6 +1044,12 @@ static int AVIDemux( input_thread_t *p_input )
     vlc_mutex_unlock( &p_info->p_es->p_decoder_fifo->data_lock );
     input_DecodePES( p_info->p_es->p_decoder_fifo, p_pes );
 
-    return( 1 );
+    __AVI_NextIndexEntry( p_input, p_info );
+    if( p_info->i_idxpos >= p_info->i_idxnb ) 
+    {
+        /* reach end of p_index , to be corrected to use p_movi instead */
+        return( 0 ); 
+    }
 
+    return( 1 );
 }
