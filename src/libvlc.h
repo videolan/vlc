@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.126 2003/12/22 02:24:50 sam Exp $
+ * $Id: libvlc.h,v 1.127 2003/12/24 12:38:04 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -530,13 +530,13 @@ static char *ppsz_language_text[] =
 #define WIN9X_CV_TEXT N_("Condition variables implementation for Win9x " \
     "(developers only)")
 #define WIN9X_CV_LONGTEXT N_( \
-    "On Windows 9x/Me we use a fast but not correct condition variables " \
+    "On Windows 9x/Me you can use a fast but incorrect condition variables " \
     "implementation (more precisely there is a possibility for a race " \
     "condition to happen). " \
-    "However it is possible to use slower alternatives which should be more " \
+    "However it is possible to use slower alternatives which are more " \
     "robust. " \
     "Currently you can choose between implementation 0 (which is the " \
-    "default and the fastest), 1 and 2.")
+    "fastest but slightly incorrect), 1 (default) and 2.")
 
 #define HOTKEY_CAT_LONGTEXT N_( "These settings are the global VLC key " \
     "bindings, known as \"hotkeys\"." )
@@ -824,7 +824,7 @@ vlc_module_begin();
     add_bool( "one-instance", 0, NULL, ONEINSTANCE_TEXT, ONEINSTANCE_LONGTEXT, VLC_TRUE );
     add_bool( "high-priority", 1, NULL, HPRIORITY_TEXT, HPRIORITY_LONGTEXT, VLC_TRUE );
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT, VLC_TRUE );
-    add_integer( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT, VLC_TRUE );
+    add_integer( "win9x-cv-method", 1, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT, VLC_TRUE );
 #endif
 
     /* Hotkey options*/
