@@ -361,11 +361,7 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     free( format.psz_string );
 
     /* Save the snapshot */
-    fmt_in.i_chroma = p_vout->render.i_chroma;
-    fmt_in.i_width = p_vout->render.i_width;
-    fmt_in.i_height = p_vout->render.i_height;
-    fmt_in.i_sar_num = p_vout->fmt_render.i_sar_num;
-    fmt_in.i_sar_den = p_vout->fmt_render.i_sar_den;
+    fmt_in = p_vout->fmt_in;
     fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     i_ret = image_WriteUrl( p_image, p_pic, &fmt_in, &fmt_out, psz_filename );
     if( i_ret != VLC_SUCCESS )
@@ -380,10 +376,8 @@ int vout_Snapshot( vout_thread_t *p_vout, picture_t *p_pic )
     free( psz_filename );
 
     /* Inject a subpicture with the snapshot */
+    memset( &fmt_out, 0, sizeof(fmt_out) );
     fmt_out.i_chroma = VLC_FOURCC('Y','U','V','A');
-    fmt_out.i_width = fmt_out.i_visible_width = p_vout->render.i_width;
-    fmt_out.i_height = fmt_out.i_visible_height = p_vout->render.i_height;
-    fmt_out.i_aspect = VOUT_ASPECT_FACTOR;
     p_pif = image_Convert( p_image, p_pic, &fmt_in, &fmt_out );
     image_HandlerDelete( p_image );
     if( !p_pif ) return VLC_EGENERIC;

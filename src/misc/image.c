@@ -356,9 +356,28 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     void (*pf_release)( picture_t * );
     picture_t *p_pif;
 
+    if( !p_fmt_out->i_width && !p_fmt_out->i_height &&
+        p_fmt_out->i_sar_num && p_fmt_out->i_sar_den &&
+        p_fmt_out->i_sar_num * p_fmt_in->i_sar_den !=
+        p_fmt_out->i_sar_den * p_fmt_in->i_sar_num )
+    {
+        p_fmt_out->i_width =
+            p_fmt_in->i_sar_num * (int64_t)p_fmt_out->i_sar_den *
+            p_fmt_in->i_width / p_fmt_in->i_sar_den / p_fmt_out->i_sar_num;
+        p_fmt_out->i_visible_width =
+            p_fmt_in->i_sar_num * (int64_t)p_fmt_out->i_sar_den *
+            p_fmt_in->i_visible_width / p_fmt_in->i_sar_den /
+            p_fmt_out->i_sar_num;
+    }
+
     if( !p_fmt_out->i_chroma ) p_fmt_out->i_chroma = p_fmt_in->i_chroma;
-    if( !p_fmt_out->i_width ) p_fmt_out->i_width = p_fmt_in->i_width;
-    if( !p_fmt_out->i_height ) p_fmt_out->i_height = p_fmt_in->i_height;
+    if( !p_fmt_out->i_width )
+        p_fmt_out->i_width = p_fmt_out->i_visible_width = p_fmt_in->i_width;
+    if( !p_fmt_out->i_height )
+        p_fmt_out->i_height = p_fmt_out->i_visible_height = p_fmt_in->i_height;
+    if( !p_fmt_out->i_sar_num ) p_fmt_out->i_sar_num = p_fmt_in->i_sar_num;
+    if( !p_fmt_out->i_sar_den ) p_fmt_out->i_sar_den = p_fmt_in->i_sar_den;
+    if( !p_fmt_out->i_aspect ) p_fmt_out->i_aspect = p_fmt_in->i_aspect;
 
     if( p_image->p_filter )
     if( p_image->p_filter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
@@ -580,14 +599,29 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
     {
         p_enc->fmt_in.video.i_width = fmt_out->i_width;
         p_enc->fmt_in.video.i_height = fmt_out->i_height;
+
+        if( fmt_out->i_visible_width > 0 &&
+            fmt_out->i_visible_height > 0 )
+        {
+            p_enc->fmt_in.video.i_visible_width = fmt_out->i_visible_width;
+            p_enc->fmt_in.video.i_visible_height = fmt_out->i_visible_height;
+        }
+        else
+        {
+            p_enc->fmt_in.video.i_visible_width = fmt_out->i_width;
+            p_enc->fmt_in.video.i_visible_height = fmt_out->i_height;
+        }
     }
     else if( fmt_out->i_sar_num && fmt_out->i_sar_den &&
-	     fmt_out->i_sar_num * fmt_in->i_sar_den !=
+             fmt_out->i_sar_num * fmt_in->i_sar_den !=
              fmt_out->i_sar_den * fmt_in->i_sar_num )
     {
         p_enc->fmt_in.video.i_width =
-	    fmt_in->i_sar_num * (int64_t)fmt_out->i_sar_den * fmt_in->i_width /
+            fmt_in->i_sar_num * (int64_t)fmt_out->i_sar_den * fmt_in->i_width /
             fmt_in->i_sar_den / fmt_out->i_sar_num;
+        p_enc->fmt_in.video.i_visible_width =
+            fmt_in->i_sar_num * (int64_t)fmt_out->i_sar_den *
+            fmt_in->i_visible_width / fmt_in->i_sar_den / fmt_out->i_sar_num;
     }
 
     p_enc->fmt_in.video.i_frame_rate = 25;

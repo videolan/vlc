@@ -2,7 +2,7 @@
  * picture.c:
  *****************************************************************************
  * Copyright (C) 2004-2005 VideoLAN
- * $Id: picture.c 10081 2005-03-01 15:33:51Z dionoea $
+ * $Id$
  *
  * Authors: Antoine Cellerier <dionoea@videolan.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -426,9 +426,7 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
         picture_t *p_new_pic2;
 #endif
 
-        fmt_in.i_chroma = p_vout->render.i_chroma;
-        fmt_in.i_width = p_vout->render.i_width;
-        fmt_in.i_height = p_vout->render.i_height;
+        fmt_in = p_vout->fmt_in;
 
 #ifdef IMAGE_2PASSES
         fmt_middle.i_chroma = p_vout->render.i_chroma;
