@@ -2,7 +2,7 @@
  * ipv6.c: IPv6 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ipv6.c,v 1.11 2002/06/09 22:57:00 massiot Exp $
+ * $Id: ipv6.c,v 1.12 2002/06/09 23:35:33 massiot Exp $
  *
  * Authors: Alexis Guillard <alexis.guillard@bt.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -151,11 +151,11 @@ static int BuildAddr( struct sockaddr_in6 * p_socket,
         {
             *psz_multicast_interface = '\0';
             psz_multicast_interface++;
-            intf_WarnMsg( 3, "Interface name specified: \"%s\"",
-                          psz_multicast_interface );
+//X            msg_Dbg( p_this, "Interface name specified: \"%s\"",
+//                          psz_multicast_interface );
             /* now convert that interface name to an index */
             p_socket->sin6_scope_id = if_nametoindex(psz_multicast_interface);
-            intf_WarnMsg( 3, " = #%i\n", p_socket->sin6_scope_id );
+//X            msg_Warn( p_this, " = #%i\n", p_socket->sin6_scope_id );
         }
         psz_address[strlen(psz_address) - 1] = '\0' ;
 
@@ -333,7 +333,7 @@ static int OpenUDP( vlc_object_t * p_this, network_socket_t * p_socket )
 
         if( res == -1 )
         {
-            intf_ErrMsg( "ipv6 error: setsockopt JOIN_GROUP failed" );
+//X            intf_ErrMsg( "ipv6 error: setsockopt JOIN_GROUP failed" );
         }
     }
 
