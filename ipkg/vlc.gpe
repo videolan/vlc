@@ -1,0 +1,9 @@
+?package(vlc): \
+ needs=x11 \
+ section=Video \
+ logtitle="VideoLAN Client" \
+ title="VideoLAN Client" \
+ command="vlc -vvvvvv 2>1" \
+ icon48=/usr/share/videolan/vlc48x48.png \
+ windowtitle="VideoLAN Client"
+
