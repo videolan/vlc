@@ -452,29 +452,33 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo, m
             return( -1 );
         }
     }
-
+/*
     if ( aout_date < p_fifo->date[p_fifo->l_start_frame] )
     {
         fprintf(stderr, "+");
         pthread_mutex_unlock( &p_fifo->data_lock );
         return( -1 );
     }
-
+*/
     /* We are looking for the next dated frame */
     while ( p_fifo->l_next_frame != p_fifo->l_end_frame )
     {
         if ( p_fifo->date[p_fifo->l_next_frame] != LAST_MDATE )
         {
+/*
             if ( aout_date < p_fifo->date[p_fifo->l_next_frame] )
             {
+*/
                 p_fifo->b_next_frame = 1;
                 break;
+/*
             }
             else
             {
                 fprintf(stderr, "-");
                 p_fifo->l_start_frame = p_fifo->l_next_frame;
             }
+*/
         }
         p_fifo->l_next_frame = (p_fifo->l_next_frame + 1) & AOUT_FIFO_SIZE;
     }
