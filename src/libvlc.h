@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.63 2003/05/08 15:58:44 gbazin Exp $
+ * $Id: libvlc.h,v 1.64 2003/05/10 13:40:37 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -27,6 +27,8 @@
 
 static char *ppsz_sout_acodec[] = { "", "mpeg1", "mpeg2", "mpeg4", "vorbis", NULL };
 static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
+static char *ppsz_language[] = { "auto", "de", "en_GB", "fr", "it",
+                                 "ja", "nl", "no", "pl", "ru", "sv" };
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
@@ -55,12 +57,10 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define QUIET_LONGTEXT N_( \
     "This options turns off all warning and information messages.")
 
-#define TRANSLATION_TEXT N_("Translation")
-#define TRANSLATION_LONGTEXT N_( \
-    "This option allows you to set the language of the interface or disable " \
-    "the translation alltogether " \
-    "(e.g. 'C' (for disable), 'fr', 'de', 'en_GB', ...). " \
-    "The system language is auto-detected if nothing is specified here." )
+#define LANGUAGE_TEXT N_("Language")
+#define LANGUAGE_LONGTEXT N_( "This option allows you to set the language " \
+    "of the interface. The system language is auto-detected if \"auto\" is " \
+    "specified here." )
 
 #define COLOR_TEXT N_("Color messages")
 #define COLOR_LONGTEXT N_( \
@@ -446,7 +446,7 @@ vlc_module_begin();
     add_integer_with_short( "verbose", 'v', -1, NULL,
                             VERBOSE_TEXT, VERBOSE_LONGTEXT, VLC_FALSE );
     add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
-    add_string( "translation", NULL, NULL, TRANSLATION_TEXT, TRANSLATION_LONGTEXT, VLC_FALSE );
+    add_string_from_list( "language", "auto", ppsz_language, NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT, VLC_FALSE );
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT, VLC_FALSE );
     add_string( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT, VLC_TRUE );

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.84 2003/05/08 15:58:44 gbazin Exp $
+ * $Id: libvlc.c,v 1.85 2003/05/10 13:40:37 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -212,7 +212,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     char *       p_tmp;
     char *       psz_modules;
     char *       psz_parser;
-    char *       psz_translation;
+    char *       psz_language;
     vlc_bool_t   b_exit = VLC_FALSE;
     vlc_t *      p_vlc;
     module_t    *p_help_module;
@@ -331,11 +331,12 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     config_LoadConfigFile( p_vlc, "main" );
     config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
 
-    psz_translation = config_GetPsz( p_vlc, "translation" );
-    if( psz_translation && *psz_translation )
+    /* Check if the user specified a custom language */
+    psz_language = config_GetPsz( p_vlc, "language" );
+    if( psz_language && *psz_language && strcmp( psz_language, "auto" ) )
     {
         /* Reset the default domain */
-        SetLanguage( psz_translation );
+        SetLanguage( psz_language );
 
         /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
         msg_Dbg( p_vlc, "translation test: code is \"%s\"", _("C") );
@@ -347,6 +348,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         module_LoadMain( &libvlc );
         config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE );
     }
+    if( psz_language ) free( psz_language );
 #endif
 
     /*
