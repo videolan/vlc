@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.36 2003/11/20 23:13:28 sigmunau Exp $
+ * $Id: sap.c,v 1.37 2003/11/22 12:17:08 sigmunau Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -876,16 +876,19 @@ static void free_sd( sess_descr_t * p_sd )
 
     FREE( p_sd->psz_sessionname );
     FREE( p_sd->psz_connection );
+    FREE( p_sd->psz_sdp );
 
     for( i = 0; i < p_sd->i_media ; i++ )
     {
         FREE( p_sd->pp_media[i]->psz_medianame );
         FREE( p_sd->pp_media[i]->psz_mediaconnection );
+        FREE( p_sd->pp_media[i] );
     }
     for( i = 0; i < p_sd->i_attributes ; i++ )
     {
         FREE( p_sd->pp_attributes[i]->psz_field );
         FREE( p_sd->pp_attributes[i]->psz_value );
+        FREE( p_sd->pp_attributes[i] );
     }
     FREE( p_sd->pp_attributes );
     FREE( p_sd->pp_media );
