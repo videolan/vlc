@@ -3,7 +3,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.61 2003/10/31 15:54:53 hartman Exp $
+ * $Id: vout.m,v 1.62 2003/11/05 00:40:08 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1026,7 +1026,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     vlc_mutex_lock( &p_playlist->object_lock );
     o_title = [NSMutableString stringWithUTF8String: 
-        p_playlist->pp_items[p_playlist->i_index]->psz_name]; 
+        p_playlist->pp_items[p_playlist->i_index]->psz_uri]; 
     vlc_mutex_unlock( &p_playlist->object_lock );
 
     vlc_object_release( p_playlist );
