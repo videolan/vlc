@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.49 2003/05/26 14:59:37 hartman Exp $
+ * $Id: avi.c,v 1.50 2003/06/24 00:50:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1725,38 +1725,41 @@ static int AVI_StreamSeek( input_thread_t *p_input,
             return VLC_EGENERIC;
         }
 
-        /* search key frame */
         msg_Dbg( p_input,
                  "old:"I64Fd" %s new "I64Fd,
                  i_oldpts,
                  i_oldpts > i_date ? ">" : "<",
                  i_date );
 
-        if( i_date < i_oldpts )
+        if( p_stream->i_cat == VIDEO_ES )
         {
-            while( p_stream->i_idxposc > 0 &&
-               !( p_stream->p_index[p_stream->i_idxposc].i_flags &
-                                                            AVIIF_KEYFRAME ) )
+            /* search key frame */
+            if( i_date < i_oldpts )
             {
-                if( AVI_SetStreamChunk( p_input,
-                                        i_stream,
-                                        p_stream->i_idxposc - 1 ) )
+                while( p_stream->i_idxposc > 0 &&
+                   !( p_stream->p_index[p_stream->i_idxposc].i_flags &
+                                                                AVIIF_KEYFRAME ) )
                 {
-                    return VLC_EGENERIC;
+                    if( AVI_SetStreamChunk( p_input,
+                                            i_stream,
+                                            p_stream->i_idxposc - 1 ) )
+                    {
+                        return VLC_EGENERIC;
+                    }
                 }
             }
-        }
-        else
-        {
-            while( p_stream->i_idxposc < p_stream->i_idxnb &&
-                    !( p_stream->p_index[p_stream->i_idxposc].i_flags &
-                                                            AVIIF_KEYFRAME ) )
+            else
             {
-                if( AVI_SetStreamChunk( p_input,
-                                        i_stream,
-                                        p_stream->i_idxposc + 1 ) )
+                while( p_stream->i_idxposc < p_stream->i_idxnb &&
+                        !( p_stream->p_index[p_stream->i_idxposc].i_flags &
+                                                                AVIIF_KEYFRAME ) )
                 {
-                    return VLC_EGENERIC;
+                    if( AVI_SetStreamChunk( p_input,
+                                            i_stream,
+                                            p_stream->i_idxposc + 1 ) )
+                    {
+                        return VLC_EGENERIC;
+                    }
                 }
             }
         }
