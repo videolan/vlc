@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.66 2003/05/27 01:48:50 hartman Exp $
+ * $Id: vlc_common.h,v 1.67 2003/06/05 11:52:19 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -581,7 +581,7 @@ static inline uint64_t U64_AT( void * _p )
 #endif /* defined(WIN32)||defined(UNDER_CE) */
 
 /* 64 bits integer constant suffix */
-#if !defined(WIN32) && !defined(UNDER_CE)
+#if defined( __MINGW32__ ) || (!defined(WIN32) && !defined(UNDER_CE))
 #   define I64C(x)         x##LL
 #else
 #   define I64C(x)         x##i64

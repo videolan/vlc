@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.35 2002/11/11 14:39:12 sam Exp $
+ * $Id: mtime.c,v 1.36 2003/06/05 11:52:19 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -96,19 +96,44 @@ mtime_t mdate( void )
     return( real_time_clock_usecs() );
 
 #elif defined( WIN32 ) || defined( UNDER_CE )
-    /* We don't get the real date, just the value of a high precision timer.
-     * this is because the usual time functions have at best only a milisecond
-     * resolution */
-    mtime_t freq, usec_time;
+    /* We don't need the real date, just the value of a high precision timer */
+    static mtime_t freq = I64C(-1);
+    mtime_t usec_time;
 
-    if( QueryPerformanceFrequency( (LARGE_INTEGER *)&freq ) )
+    if( freq == I64C(-1) )
+    {
+        /* Extract from the Tcl source code:
+         * (http://www.cs.man.ac.uk/fellowsd-bin/TIP/7.html)
+         *
+         * Some hardware abstraction layers use the CPU clock
+         * in place of the real-time clock as a performance counter
+         * reference.  This results in:
+         *    - inconsistent results among the processors on
+         *      multi-processor systems.
+         *    - unpredictable changes in performance counter frequency
+         *      on "gearshift" processors such as Transmeta and
+         *      SpeedStep.
+         * There seems to be no way to test whether the performance
+         * counter is reliable, but a useful heuristic is that
+         * if its frequency is 1.193182 MHz or 3.579545 MHz, it's
+         * derived from a colorburst crystal and is therefore
+         * the RTC rather than the TSC.  If it's anything else, we
+         * presume that the performance counter is unreliable.
+         */
+
+        freq = ( QueryPerformanceFrequency( (LARGE_INTEGER *)&freq ) &&
+                 (freq == I64C(1193182) || freq == I64C(3579545) ) )
+               ? freq : 0;
+    }
+
+    if( freq != 0 )
     {
         /* Microsecond resolution */
         QueryPerformanceCounter( (LARGE_INTEGER *)&usec_time );
         return ( usec_time * 1000000 ) / freq;
     }
 
-    /* Milisecond resolution */
+    /* Milisecond resolution (actually, best case is about 10 ms resolution) */
     return 1000 * GetTickCount();
 
 #else
