@@ -582,11 +582,11 @@ DISTCLEAN_PKG += lame-$(LAME_VERSION).tar.gz
 # libebml
 # ***************************************************************************
 
-libebml-$(LIBEBML_VERSION).tar.gz:
+libebml-$(LIBEBML_VERSION).tar.bz2:
 	$(WGET) $(LIBEBML_URL)
 
-libebml: libebml-$(LIBEBML_VERSION).tar.gz
-	$(EXTRACT_GZ)
+libebml: libebml-$(LIBEBML_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 	patch -p 0 < Patches/ebml.patch
 	-rm -rf $@/CVS
 
@@ -597,17 +597,17 @@ libebml: libebml-$(LIBEBML_VERSION).tar.gz
 
 CLEAN_FILE += .ebml
 CLEAN_PKG += libebml
-DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.gz
+DISTCLEAN_PKG += libebml-$(LIBEBML_VERSION).tar.bz2
 
 # ***************************************************************************
 # libmatroska
 # ***************************************************************************
 
-libmatroska-$(LIBMATROSKA_VERSION).tar.gz:
+libmatroska-$(LIBMATROSKA_VERSION).tar.bz2:
 	$(WGET) $(LIBMATROSKA_URL)
 
-libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.gz
-	$(EXTRACT_GZ)
+libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
 	patch -p 0 < Patches/matroska.patch
 	-rm -rf $@/CVS
 
@@ -618,7 +618,7 @@ libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 
 CLEAN_FILE += .matroska
 CLEAN_PKG += libmatroska
-DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.gz
+DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 
 # ***************************************************************************
 # ffmpeg
@@ -921,6 +921,25 @@ mash-code: mash-src-$(MASH_VERSION).tar.gz
 CLEAN_FILE += .mash
 CLEAN_PKG += mash-code
 DISTCLEAN_PKG += mash-src-$(MASH_VERSION).tar.gz
+
+# ***************************************************************************
+# toolame
+# ***************************************************************************
+
+toolame-$(TOOLAME_VERSION).tar.bz2:
+	$(WGET) $(TOOLAME_URL)
+
+toolame: toolame-$(TOOLAME_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+
+.toolame: toolame
+	(cd toolame; ./configure --prefix=$(PREFIX) && make && make install)
+	$(INSTALL_NAME)
+	touch $@
+
+CLEAN_FILE += .toolame
+CLEAN_PKG += toolame
+DISTCLEAN_PKG += toolame-$(TOOLAME_VERSION).tar.bz2
 
 # ***************************************************************************
 # Some cleansing
