@@ -1688,13 +1688,8 @@ static int XVideoGetPort( vout_thread_t *p_vout,
              i_format < i_num_formats && ( i_selected_port == -1 );
              i_format++ )
         {
-            /* Code removed, we can get this through xvinfo anyway */
-#if 0
-            XvEncodingInfo  *p_enc;
-            int             i_enc, i_num_encodings;
             XvAttribute     *p_attr;
             int             i_attr, i_num_attributes;
-#endif
 
             /* If this is not the format we want, or at least a
              * similar one, forget it */
@@ -1731,50 +1726,28 @@ static int XVideoGetPort( vout_thread_t *p_vout,
                      ( p_formats[ i_format ].format == XvPacked ) ?
                          "packed" : "planar" );
 
-#if 0
-            msg_Dbg( p_vout, " encoding list:" );
-
-            if( XvQueryEncodings( p_vout->p_sys->p_display, i_selected_port,
-                                  &i_num_encodings, &p_enc )
-                 != Success )
-            {
-                msg_Dbg( p_vout, "  XvQueryEncodings failed" );
-                continue;
-            }
-
-            for( i_enc = 0; i_enc < i_num_encodings; i_enc++ )
-            {
-                msg_Dbg( p_vout, "  id=%ld, name=%s, size=%ldx%ld,"
-                                      " numerator=%d, denominator=%d",
-                             p_enc[i_enc].encoding_id, p_enc[i_enc].name,
-                             p_enc[i_enc].width, p_enc[i_enc].height,
-                             p_enc[i_enc].rate.numerator,
-                             p_enc[i_enc].rate.denominator );
-            }
-
-            if( p_enc != NULL )
-            {
-                XvFreeEncodingInfo( p_enc );
-            }
-
-            msg_Dbg( p_vout, " attribute list:" );
+            /* Make sure XV_AUTOPAINT_COLORKEY is set */
             p_attr = XvQueryPortAttributes( p_vout->p_sys->p_display,
                                             i_selected_port,
                                             &i_num_attributes );
+
             for( i_attr = 0; i_attr < i_num_attributes; i_attr++ )
             {
-                msg_Dbg( p_vout, "  name=%s, flags=[%s%s ], min=%i, max=%i",
-                      p_attr[i_attr].name,
-                      (p_attr[i_attr].flags & XvGettable) ? " get" : "",
-                      (p_attr[i_attr].flags & XvSettable) ? " set" : "",
-                      p_attr[i_attr].min_value, p_attr[i_attr].max_value );
+                if( !strcmp( p_attr[i_attr].name, "XV_AUTOPAINT_COLORKEY" ) )
+                {
+                    const Atom autopaint =
+                        XInternAtom( p_vout->p_sys->p_display,
+                                     "XV_AUTOPAINT_COLORKEY", False );
+                    XvSetPortAttribute( p_vout->p_sys->p_display,
+                                        i_selected_port, autopaint, 1 );
+                    break;
+                }
             }
 
             if( p_attr != NULL )
             {
                 XFree( p_attr );
             }
-#endif
         }
 
         if( p_formats != NULL )
