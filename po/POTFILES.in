@@ -195,6 +195,7 @@ modules/access_output/file.c
 modules/access_output/http.c
 modules/access_output/udp.c
 modules/audio_filter/channel_mixer/headphone.c
+modules/audio_filter/channel_mixer/simple.c
 modules/audio_filter/channel_mixer/trivial.c
 modules/audio_filter/converter/a52tofloat32.c
 modules/audio_filter/converter/a52tospdif.c

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-09-29 19:27+0200\n"
+"POT-Creation-Date: 2004-09-30 23:31+0200\n"
 "PO-Revision-Date: 2004-08-06 21:09+0100\n"
 "Last-Translator: Felix Kühne <fkuehne@users.sf.net>\n"
 "Language-Team: \n"
@@ -268,7 +268,7 @@ msgstr ""
 msgid "Title"
 msgstr "Titel"
 
-#: include/vlc_meta.h:29 src/input/input.c:809 src/playlist/sort.c:119
+#: include/vlc_meta.h:29 src/input/input.c:814 src/playlist/sort.c:119
 #: src/playlist/sort.c:121 modules/access/cdda/access.c:702
 #: modules/access/vcdx/access.c:1326 modules/gui/macosx/playlist.m:181
 #: modules/gui/macosx/playlist.m:505 modules/gui/macosx/playlistinfo.m:63
@@ -618,7 +618,7 @@ msgstr "Bildschirmauflösung"
 msgid "Subtitle"
 msgstr "Untertitel"
 
-#: src/input/input.c:808 src/input/input.c:1499 src/playlist/item-ext.c:302
+#: src/input/input.c:813 src/input/input.c:1504 src/playlist/item-ext.c:302
 #: src/playlist/item.c:62 src/playlist/sort.c:119 src/playlist/sort.c:121
 #: modules/access/cdda/access.c:447 modules/access/cdda/access.c:702
 #: modules/access/cdda/access.c:706 modules/access/vcdx/access.c:1051
@@ -630,16 +630,16 @@ msgstr "Untertitel"
 msgid "General"
 msgstr "Allgemein"
 
-#: src/input/input.c:811 modules/gui/macosx/playlist.m:883
+#: src/input/input.c:816 modules/gui/macosx/playlist.m:883
 msgid "Meta-information"
 msgstr "Meta-Information"
 
-#: src/input/input.c:822 src/input/input.c:826 modules/gui/macosx/output.m:143
+#: src/input/input.c:827 src/input/input.c:831 modules/gui/macosx/output.m:143
 #: modules/gui/macosx/output.m:253 modules/gui/macosx/output.m:395
 msgid "Stream"
 msgstr "Stream"
 
-#: src/input/input.c:1499 src/playlist/item-ext.c:302
+#: src/input/input.c:1504 src/playlist/item-ext.c:302
 #: modules/access/cdda/access.c:447 modules/access/cdda/access.c:456
 #: modules/gui/gtk/gnome_interface.c:2448 modules/gui/gtk/gtk_interface.c:2869
 #: modules/gui/macosx/playlist.m:182 modules/gui/wxwindows/playlist.cpp:321
@@ -4855,16 +4855,21 @@ msgstr "Distanz zwischen dem linken Lautsprecher und dem Hörer in Metern."
 msgid "headphone channel mixer with virtual spatialization effect"
 msgstr "Kanal-Mixer für Kopfhörer mit virtuellem räumlichen Klangbild"
 
+#: modules/audio_filter/channel_mixer/simple.c:46
+#, fuzzy
+msgid "audio filter for simple channel mixing"
+msgstr "Audiofilter für einfache Kanalvermischungen"
+
 #: modules/audio_filter/channel_mixer/trivial.c:46
 msgid "audio filter for trivial channel mixing"
 msgstr "Audiofilter für einfache Kanalvermischungen"
 
-#: modules/audio_filter/converter/a52tofloat32.c:83
+#: modules/audio_filter/converter/a52tofloat32.c:94
 msgid "A/52 dynamic range compression"
 msgstr "A/52 Kompression mit dynamischen Abschnitten"
 
-#: modules/audio_filter/converter/a52tofloat32.c:85
-#: modules/audio_filter/converter/dtstofloat32.c:72
+#: modules/audio_filter/converter/a52tofloat32.c:96
+#: modules/audio_filter/converter/dtstofloat32.c:83
 msgid ""
 "Dynamic range compression makes the loud sounds softer, and the soft sounds "
 "louder, so you can more easily listen to the stream in a noisy environment "
@@ -4876,8 +4881,8 @@ msgstr ""
 "jemanden zu stören. Wenn sie die Kompression mit dyn. Abständen "
 "deaktivieren, wird die Wiedergabe ähnlich wie im Kino."
 
-#: modules/audio_filter/converter/a52tofloat32.c:92
-#: modules/audio_filter/converter/a52tofloat32.c:98
+#: modules/audio_filter/converter/a52tofloat32.c:103
+#: modules/audio_filter/converter/a52tofloat32.c:109
 msgid "ATSC A/52 (AC-3) audio decoder"
 msgstr "ATSC A/52 (AC-3) Audiodekoder"
 
@@ -4885,12 +4890,12 @@ msgstr "ATSC A/52 (AC-3) Audiodekoder"
 msgid "audio filter for A/52->S/PDIF encapsulation"
 msgstr "Audiofilter für A/52->S/PDIF-Verkapselung"
 
-#: modules/audio_filter/converter/dtstofloat32.c:70
+#: modules/audio_filter/converter/dtstofloat32.c:81
 msgid "DTS dynamic range compression"
 msgstr "DTS-Kompression mit dynamischen Abschnitten"
 
-#: modules/audio_filter/converter/dtstofloat32.c:79
-#: modules/audio_filter/converter/dtstofloat32.c:85
+#: modules/audio_filter/converter/dtstofloat32.c:90
+#: modules/audio_filter/converter/dtstofloat32.c:96
 msgid "DTS Coherent Acoustics audio decoder"
 msgstr "Kohärenter DTS Audiodekoder"
 
@@ -6597,32 +6602,32 @@ msgstr "Zurzeit wiedergegebenes Kapitel: %d/%d\n"
 msgid "Currently playing title %d/%d\n"
 msgstr "Zurzeit wiedergegebener Titel: %d/%d\n"
 
-#: modules/control/rc.c:823
+#: modules/control/rc.c:822
 #, c-format
 msgid "trying to add %s to playlist\n"
 msgstr "Versuche %s der Wiedergabeliste hinzuzufügen\n"
 
-#: modules/control/rc.c:838
+#: modules/control/rc.c:837
 #, c-format
 msgid "| no entries\n"
 msgstr "| keine Einträge\n"
 
-#: modules/control/rc.c:847 modules/control/rc.c:912
+#: modules/control/rc.c:846 modules/control/rc.c:911
 #, c-format
 msgid "unknown command!\n"
 msgstr "Unbekannter Befehl!\n"
 
-#: modules/control/rc.c:958
+#: modules/control/rc.c:957
 #, c-format
 msgid "Volume must be in the range %d-%d\n"
 msgstr "Die Lautstärke muss im Bereich %d-%d sein\n"
 
-#: modules/control/rc.c:974 modules/control/rc.c:1006
+#: modules/control/rc.c:973 modules/control/rc.c:1005
 #, c-format
 msgid "Volume is %d\n"
 msgstr "Lautstärke beträgt %d\n"
 
-#: modules/control/rc.c:1068
+#: modules/control/rc.c:1067
 #, c-format
 msgid "+----[ end of %s ]\n"
 msgstr "+----[ Ende von %s ]\n"
@@ -6896,7 +6901,7 @@ msgstr "M3U-Wiedergabelistenimport"
 msgid "PLS playlist import"
 msgstr "PLS-Wiedergabelistenimport"
 
-#: modules/demux/ps.c:47 modules/demux/ps.c:52
+#: modules/demux/ps.c:47 modules/demux/ps.c:53
 msgid "PS demuxer"
 msgstr "PS Demuxer"
 
@@ -6920,7 +6925,7 @@ msgstr "Kasenna-MediaBase-Metademux"
 msgid "Text subtitles demux"
 msgstr "Textuntertitel-Demuxer"
 
-#: modules/demux/subtitle.c:67 modules/gui/wxwindows/subtitles.cpp:153
+#: modules/demux/subtitle.c:67 modules/gui/wxwindows/subtitles.cpp:174
 msgid "Frames per second"
 msgstr "Frames pro Sekunde"
 
@@ -7275,7 +7280,7 @@ msgstr "ID3-Tag-Parser mit libid3tag-Benutzung"
 msgid "Vobsub subtitles demux"
 msgstr "Vobsub - Textuntertitel-Demuxer"
 
-#: modules/demux/wav.c:41
+#: modules/demux/wav.c:42
 msgid "WAV demuxer"
 msgstr "WAV Demuxer"
 
@@ -7309,7 +7314,7 @@ msgstr "Dateien auch aus allen Unterverzeichnissen öffnen?"
 #: modules/gui/wxwindows/open.cpp:462 modules/gui/wxwindows/playlist.cpp:1327
 #: modules/gui/wxwindows/preferences.cpp:197
 #: modules/gui/wxwindows/streamout.cpp:199
-#: modules/gui/wxwindows/subtitles.cpp:177
+#: modules/gui/wxwindows/subtitles.cpp:198
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -7414,7 +7419,7 @@ msgstr "Fenster"
 #: modules/gui/wxwindows/open.cpp:459 modules/gui/wxwindows/playlist.cpp:1324
 #: modules/gui/wxwindows/preferences.cpp:194
 #: modules/gui/wxwindows/streamout.cpp:196
-#: modules/gui/wxwindows/subtitles.cpp:174
+#: modules/gui/wxwindows/subtitles.cpp:195
 msgid "OK"
 msgstr "OK"
 
@@ -10248,17 +10253,13 @@ msgstr "Untertitel-Datei"
 msgid "Subtitles options"
 msgstr "Untertiteloptionen"
 
-#: modules/gui/wxwindows/subtitles.cpp:141
-msgid "Delay subtitles (in 1/10s)"
-msgstr "Untertitel verzögern (in 1/10s)"
-
-#: modules/gui/wxwindows/subtitles.cpp:162
+#: modules/gui/wxwindows/subtitles.cpp:183
 msgid "Override frames per second. It will only work with MicroDVD subtitles."
 msgstr ""
 "Bilder pro Sekunde übergehen. Dies wird nur mit MicroDVD-Untertiteln "
 "arbeiten."
 
-#: modules/gui/wxwindows/subtitles.cpp:218
+#: modules/gui/wxwindows/subtitles.cpp:239
 msgid "Open file"
 msgstr "Datei öffnen"
 
@@ -10659,7 +10660,7 @@ msgstr ""
 msgid "MP4/MOV muxer"
 msgstr "MP4/MOV Muxer"
 
-#: modules/mux/mpeg/ps.c:43 modules/mux/mpeg/ts.c:101
+#: modules/mux/mpeg/ps.c:43 modules/mux/mpeg/ts.c:103
 msgid "DTS delay (ms)"
 msgstr "DTS-Verzögerung (ms)"
 
@@ -10697,11 +10698,20 @@ msgstr "Audio-PID"
 msgid "Assigns a fixed PID to the audio stream."
 msgstr "Fügt dem Audiostream eine feste PID hinzu."
 
+#: modules/mux/mpeg/ts.c:82
+msgid "PMT PID"
+msgstr ""
+
 #: modules/mux/mpeg/ts.c:83
+#, fuzzy
+msgid "Assings a fixed PID to the PMT"
+msgstr "Fügt dem Audiostream eine feste PID hinzu."
+
+#: modules/mux/mpeg/ts.c:85
 msgid "Shaping delay (ms)"
 msgstr "Shaping-Verzögerung (ms)"
 
-#: modules/mux/mpeg/ts.c:84
+#: modules/mux/mpeg/ts.c:86
 msgid ""
 "If enabled, the TS muxer will cut the stream in slices of the given "
 "duration, and ensure a constant bitrate between the two boundaries. This "
@@ -10712,11 +10722,11 @@ msgstr ""
 "sicherstellen. Dies verhindert insbesondere hohe Datenratenausschläge für "
 "Referenzframes."
 
-#: modules/mux/mpeg/ts.c:88
+#: modules/mux/mpeg/ts.c:90
 msgid "Use keyframes"
 msgstr "Keyframes benutzen"
 
-#: modules/mux/mpeg/ts.c:89
+#: modules/mux/mpeg/ts.c:91
 msgid ""
 "If enabled, and shaping is specified, the TS muxer will place the boundaries "
 "at the end of I pictures. In that case, the shaping duration given by the "
@@ -10730,11 +10740,11 @@ msgstr ""
 "die Effizienz des Shaping-Algorithmuses, da I-Frames üblicherweise die "
 "größen Frames eines Streams sind."
 
-#: modules/mux/mpeg/ts.c:96
+#: modules/mux/mpeg/ts.c:98
 msgid "PCR delay (ms)"
 msgstr "PCR-Verzögerung (ms)"
 
-#: modules/mux/mpeg/ts.c:97
+#: modules/mux/mpeg/ts.c:99
 msgid ""
 "This option allows you to set at which interval PCRs (Program Clock "
 "Reference) will be sent. This value should be below 100ms. (default is 30)"
@@ -10743,7 +10753,7 @@ msgstr ""
 "Clock-Referenzen) gesendet werden. Dieser Wert sollte unter 100ms sein "
 "(standardmäßig 30)."
 
-#: modules/mux/mpeg/ts.c:102
+#: modules/mux/mpeg/ts.c:104
 msgid ""
 "This option will delay the DTS (decoding time stamps) and PTS (presentation "
 "timestamps) of the data in the stream, compared to the PCRs. This allows for "
@@ -10753,19 +10763,19 @@ msgstr ""
 "(Präsentationszeitmarken) der Daten des Streams verglichen mit den PCRs "
 "verzögern. Dies erlaubt etwas Puffern im Client-Dekoder."
 
-#: modules/mux/mpeg/ts.c:107
+#: modules/mux/mpeg/ts.c:109
 msgid "Crypt audio"
 msgstr "Audio verschlüsseln"
 
-#: modules/mux/mpeg/ts.c:108
+#: modules/mux/mpeg/ts.c:110
 msgid "Crypt audio using CSA"
 msgstr "Audioverschlüsselung durch CSA"
 
-#: modules/mux/mpeg/ts.c:110
+#: modules/mux/mpeg/ts.c:112
 msgid "CSA Key"
 msgstr "CSA-Schlüssel"
 
-#: modules/mux/mpeg/ts.c:111
+#: modules/mux/mpeg/ts.c:113
 msgid ""
 "Defines the CSA encryption key. This must be a 16 char string (8 hexadecimal "
 "bytes)."
@@ -10773,7 +10783,7 @@ msgstr ""
 "Definiert den CSA-Verschlüsselungsschlüssel. Dies muss ein String mit 16 "
 "Zeichen sein (8 hexadezimale Bytes)."
 
-#: modules/mux/mpeg/ts.c:117
+#: modules/mux/mpeg/ts.c:119
 msgid "TS muxer (libdvbpsi)"
 msgstr "TS Muxer (libdvbpsi)"
 
@@ -12142,6 +12152,32 @@ msgstr ""
 #: modules/visualization/xosd.c:80
 msgid "XOSD interface"
 msgstr "XOSD Interface"
+
+#, fuzzy
+#~ msgid "Force the rtci module to use stdin as if it was a TTY."
+#~ msgstr "Das rc-Modulzwingen stdin zu benutzen, als ob es ein TTY sei."
+
+#, fuzzy
+#~ msgid ""
+#~ "By default the rtci interface plugin will start a DOS command box. "
+#~ "Enabling the quiet mode will not launch this command box."
+#~ msgstr ""
+#~ "Standardmäßig wird das rc-Interface-Plugin ein DOS-Eingabe-Fenster "
+#~ "öffnen. Wenn Sie den 'ruhig sein'-Modus aktivieren, erscheint dieses "
+#~ "Fenster nicht. Dies kann jedoch recht nervig sein, wenn Sie VLC stoppen "
+#~ "möchten und kein Videofenster geöffnet ist."
+
+#, fuzzy
+#~ msgid "Real time control interface"
+#~ msgstr "Remote-Control-Interface"
+
+#, fuzzy
+#~ msgid "Real time control interface initialized, `h' for help\n"
+#~ msgstr ""
+#~ "Remote-Control-Interface initialisiert. Geben Sie `h' für Hilfe ein\n"
+
+#~ msgid "Delay subtitles (in 1/10s)"
+#~ msgstr "Untertitel verzögern (in 1/10s)"
 
 #~ msgid "The above message had unknown cdio log level"
 #~ msgstr "Die obere Meldung hat ein unbekanntes cdio-Protokollniveau"
