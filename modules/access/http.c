@@ -305,9 +305,8 @@ static int Open( vlc_object_t *p_this )
     {
         if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "video/nsv" ) )
             p_access->psz_demux = strdup( "nsv" );
-        else if( p_sys->psz_mime && ( !strcasecmp( p_sys->psz_mime, "audio/aac" ) ||
-                 !strcasecmp( p_sys->psz_mime, "audio/aacp" ) ) )
-            p_access->psz_demux = strdup( "m4a" );
+        else if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "audio/aacp" ) )
+            p_access->psz_demux = strdup( "aac" );
         else
             p_access->psz_demux = strdup( "mp3" );
 
@@ -782,6 +781,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
                  !strncasecmp( p, "Icecast", 7 ) )
         {
             p_sys->b_reconnect = VLC_TRUE;
+            p_sys->b_pace_control = VLC_FALSE;
             msg_Dbg( p_access, "Server: %s", p );
         }
         else if( !strcasecmp( psz, "Transfer-Encoding" ) )
