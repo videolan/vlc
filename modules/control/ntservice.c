@@ -119,6 +119,7 @@ void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
+    intf_thread_t *p_extraintf;
     SERVICE_TABLE_ENTRY dispatchTable[] =
     {
         { VLCSERVICENAME, &ServiceDispatch },
@@ -149,6 +150,15 @@ static void Run( intf_thread_t *p_intf )
     }
 
     free( p_intf->p_sys->psz_service );
+
+    /* Stop and destroy the interfaces we spawned */
+    while( (p_extraintf = vlc_object_find(p_intf, VLC_OBJECT_INTF, FIND_CHILD)))
+    {
+        intf_StopThread( p_extraintf );
+        vlc_object_detach( p_extraintf );
+        vlc_object_release( p_extraintf );
+        intf_Destroy( p_extraintf );
+    }
 
     /* Make sure we exit (In case other interfaces have been spawned) */
     p_intf->p_vlc->b_die = VLC_TRUE;
