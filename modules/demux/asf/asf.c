@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.46 2003/11/23 13:15:27 gbazin Exp $
+ * $Id: asf.c,v 1.47 2003/12/22 00:26:01 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -319,9 +319,10 @@ static int Open( vlc_object_t * p_this )
 
         if( p_sys->stream[i] )
         {
-            char psz_cat[sizeof(_("Stream "))+10];
-            sprintf( psz_cat, _("Stream %d"), i_stream );
+            char *psz_cat = malloc( strlen(_("Stream")) + 10 );
+            sprintf( psz_cat, "%s %d", _("Stream"), i_stream );
             p_cat = input_InfoCategory( p_input, psz_cat);
+            free( psz_cat );
 
             if( p_cl && i_stream < p_cl->i_codec_entries_count )
             {
