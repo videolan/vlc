@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.26 2003/08/25 01:32:26 fenrir Exp $
+ * $Id: httpd.c,v 1.27 2003/08/26 00:40:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -188,9 +188,11 @@ enum httpd_connection_state_e
 
 enum httpd_connection_method_e
 {
-    HTTPD_CONNECTION_METHOD_GET = 1,
-    HTTPD_CONNECTION_METHOD_POST = 2,
-    HTTPD_CONNECTION_METHOD_HEAD =3
+    HTTPD_CONNECTION_METHOD_GET     = 1,
+    HTTPD_CONNECTION_METHOD_POST    = 2,
+    HTTPD_CONNECTION_METHOD_HEAD    = 3,
+    /* cludgy, only used when parsing connection request */
+    HTTPD_CONNECTION_METHOD_ASFHEAD = 4
 };
 
 typedef struct httpd_connection_s
@@ -1092,6 +1094,30 @@ static int Control( httpd_t *p_httpd,
 /****************************************************************************/
 /****************************************************************************/
 
+static int  httpd_page_400_get( httpd_file_callback_args_t *p_args,
+                                uint8_t *p_request, int i_request,
+                                uint8_t **pp_data, int *pi_data )
+{
+    char *p;
+
+    p = *pp_data = malloc( 1024 );
+
+    p += sprintf( p, "<html>\n" );
+    p += sprintf( p, "<head>\n" );
+    p += sprintf( p, "<title>Error 400</title>\n" );
+    p += sprintf( p, "</head>\n" );
+    p += sprintf( p, "<body>\n" );
+    p += sprintf( p, "<h1><center> 400  Bad Request</center></h1>\n" );
+    p += sprintf( p, "<hr />\n" );
+    p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
+    p += sprintf( p, "</body>\n" );
+    p += sprintf( p, "</html>\n" );
+
+    *pi_data = strlen( *pp_data ) + 1;
+
+    return VLC_SUCCESS;
+}
+
 static int  httpd_page_401_get( httpd_file_callback_args_t *p_args,
                                 uint8_t *p_request, int i_request,
                                 uint8_t **pp_data, int *pi_data )
@@ -1440,7 +1466,7 @@ static void httpd_ConnectionParseRequest( httpd_sys_t *p_httpt, httpd_connection
     char user[512] = "";
     char password[512] = "";
 
-    //msg_Dbg( p_httpt, "new request=\n%s", p_con->p_buffer );
+    msg_Dbg( p_httpt, "new request=\n%s", p_con->p_buffer );
 
 
     p = p_con->p_buffer;
@@ -1608,22 +1634,33 @@ search_file:
     {
         p_con->psz_file = strdup( "/404.html" );
         p_con->i_http_error = 404;
+        p_con->i_method = HTTPD_CONNECTION_METHOD_GET;
 
         /* XXX be sure that "/404.html" exist else ... */
         goto search_file;
     }
-
     if( p_con->p_file->i_authenticate_method == HTTPD_AUTHENTICATE_BASIC )
     {
-        if( strcmp( user, p_con->p_file->psz_user ) || strcmp( password, p_con->p_file->psz_password ) )
+        if( strcmp( user, p_con->p_file->psz_user ) ||
+            strcmp( password, p_con->p_file->psz_password ) )
         {
             p_con->psz_file = strdup( "/401.html" );
             strcpy( user, p_con->p_file->psz_user );
             p_con->i_http_error = 401;
+            p_con->i_method = HTTPD_CONNECTION_METHOD_GET;
 
             /* XXX do not put password on 404 else ... */
             goto search_file;
         }
+    }
+    if( !strcmp( p_con->p_file->psz_mime, "video/x-ms-asf-stream" ) &&
+        p_con->i_method == HTTPD_CONNECTION_METHOD_POST )
+    {
+        p_con->psz_file = strdup( "/400.html" );
+        p_con->i_http_error = 400;
+        p_con->i_method = HTTPD_CONNECTION_METHOD_GET;
+
+        goto search_file;
     }
 
     p_con->p_file->i_ref++;
@@ -1634,7 +1671,9 @@ search_file:
         case 200:
             psz_status = "OK";
             break;
-
+        case 400:
+            psz_status = "Bad Request";
+            break;
         case 401:
             psz_status = "Authorization Required";
             break;
@@ -1657,31 +1696,50 @@ search_file:
     p = p_con->p_buffer = malloc( p_con->i_buffer_size );
 
     p += sprintf( p, "HTTP/1.0 %d %s\r\n", p_con->i_http_error, psz_status );
-    if( !strcmp( p_con->p_file->psz_mime, "video/x-ms-asf-stream" ) )
+
+    /* Special mmsh case cludgy but ...*/
+    if( !strcmp( p_con->p_file->psz_mime, "video/x-ms-asf-stream" ) &&
+        p_con->i_method == HTTPD_CONNECTION_METHOD_GET )
     {
-        p += sprintf( p, "Server: Cougar 4.1.0.3923\r\n" );
         p += sprintf( p, "Content-type: application/octet-stream\r\n" );
-        p += sprintf( p, "Pragma: client-id=%d\r\n", rand()&0x7fffffff );
+        p += sprintf( p, "Server: Cougar 4.1.0.3921\r\n" );
+        p += sprintf( p, "Cache-Control: no-cache\r\n" );
+        p += sprintf( p, "Pragma: no-cache\r\n" );
+        p += sprintf( p, "Pragma: client-id=%d\r\n", rand()&0x7fff );
         p += sprintf( p, "Pragma: features=\"broadcast\"\r\n" );
+
         if( !b_xplaystream )
         {
-            p_con->i_method = HTTPD_CONNECTION_METHOD_HEAD;
+            p_con->i_method = HTTPD_CONNECTION_METHOD_ASFHEAD;
         }
     }
     else
     {
         p += sprintf( p, "Content-type: %s\r\n", p_con->p_file->psz_mime );
+        p += sprintf( p, "Cache-Control: no-cache\r\n" );
     }
-    p += sprintf( p, "Cache-Control: no-cache\r\n" );
     if( p_con->i_http_error == 401 )
     {
         p += sprintf( p, "WWW-Authenticate: Basic realm=\"%s\"\r\n", user );
     }
+#if 0
+    if( p_con->i_method == HTTPD_CONNECTION_METHOD_HEAD )
+    {
+        p += sprintf( p, "Content-Length: 0\r\n" );
+    }
+    else if( p_con->i_method == HTTPD_CONNECTION_METHOD_ASFHEAD &&
+             p_con->p_file->i_header_size > 0 )
+    {
+        p += sprintf( p, "Content-Length: %d\r\n", p_con->p_file->i_header_size );
+    }
+#endif
     p += sprintf( p, "\r\n" );
 
     p_con->i_buffer_size = strlen( p_con->p_buffer );// + 1;
 
-    if( p_con->i_http_error == 200 && p_con->p_file->b_stream && p_con->p_file->i_header_size > 0 )
+    if( p_con->i_http_error == 200 &&
+        p_con->i_method != HTTPD_CONNECTION_METHOD_HEAD &&
+        p_con->p_file->b_stream && p_con->p_file->i_header_size > 0 )
     {
         /* add stream header */
         memcpy( &p_con->p_buffer[p_con->i_buffer_size],
@@ -1690,17 +1748,29 @@ search_file:
         p_con->i_buffer_size += p_con->p_file->i_header_size;
     }
 
+    if( p_con->i_method == HTTPD_CONNECTION_METHOD_ASFHEAD )
+    {
+        p_con->i_method = HTTPD_CONNECTION_METHOD_HEAD;
+    }
     //msg_Dbg( p_httpt, "answer=\n%s", p_con->p_buffer );
 }
 #define HTTPD_STREAM_PACKET 10000
 static void httpd_Thread( httpd_sys_t *p_httpt )
 {
+    httpd_file_t    *p_page_400;
     httpd_file_t    *p_page_401;
     httpd_file_t    *p_page_404;
 
     httpd_connection_t *p_con;
 
     msg_Info( p_httpt, "httpd started" );
+
+    p_page_400 = _RegisterFile( p_httpt,
+                                "/400.html", "text/html",
+                                NULL, NULL,
+                                httpd_page_400_get,
+                                NULL,
+                                (httpd_file_callback_args_t*)NULL );
 
     p_page_401 = _RegisterFile( p_httpt,
                                 "/401.html", "text/html",
@@ -2030,6 +2100,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
 
     msg_Info( p_httpt, "httpd stopped" );
 
+    _UnregisterFile( p_httpt, p_page_400 );
     _UnregisterFile( p_httpt, p_page_401 );
     _UnregisterFile( p_httpt, p_page_404 );
 }
