@@ -566,15 +566,12 @@ static int Manage( vout_thread_t *p_vout )
         (mdate() - p_vout->p_sys->i_lastmoved) > 5000000 )
     {
         POINT point;
-        RECT rect;
+        HWND hwnd;
 
         /* Hide the cursor only if it is inside our window */
-        GetClientRect( p_vout->p_sys->hwnd, &rect );
-        point.x = point.y = 0;
-        ClientToScreen( p_vout->p_sys->hwnd, &point );
-        OffsetRect( &rect, point.x, point.y );
         GetCursorPos( &point );
-        if( PtInRect( &rect, point ) )
+        hwnd = WindowFromPoint(point);
+        if( hwnd == p_vout->p_sys->hwnd || hwnd == p_vout->p_sys->hvideownd )
         {
             PostMessage( p_vout->p_sys->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
         }
