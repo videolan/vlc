@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.7 2001/04/15 04:46:41 sam Exp $
+ * $Id: vout_xvideo.c,v 1.8 2001/04/17 18:22:51 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -239,7 +239,7 @@ static int vout_Create( vout_thread_t *p_vout )
 
     if( (p_vout->p_sys->xv_port = XVideoGetPort( p_vout->p_sys->p_display ))<0 )
         return 1;
-    intf_DbgMsg( 1, "Using xv port %d" , p_vout->p_sys->xv_port );
+    intf_DbgMsg( "Using xv port %d" , p_vout->p_sys->xv_port );
 
 #if 0
     /* XXX The brightness and contrast values should be read from environment
