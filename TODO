@@ -346,5 +346,44 @@ Description: rendezvous announces
 DMAP protocol announce for videos.
 Status: Todo
 
+Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: SDL vout cleaning
+The SDL vout hasn't been updated for a long while. It needs some cleaning up. New hotkeys support, better resizing, alignment etc. Even though SDL isn't used much, this vout shouldn't disappear, because it is a crossplatform API.
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: SDL vout cleaning
+The SDL vout hasn't been updated for a long while. It needs some cleaning up. New hotkeys support, better resizing, alignment etc. Even though SDL isn't used much, this vout shouldn't disappear, because it is a crossplatform API.
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: Win32/Linux
+Description: V4L and dshow tuning support
+We need an API that allows us to control the tuning of V4L and dshow TV cards.
+Status: Todo (CryHavoc)
+
+Task
+Difficulty: Easy
+Urgency: Wishlist
+Platform: any
+Description: Electronic Program Guide
+Integrate a EPG system into VLC.
+Status: Todo (CryHavoc)
+
+Difficulty: Hard
+Urgency: Wishlist
+Platform: any
+Description: a Time Shifting module
+This module should create TiVo like capabilities for VLC.
+Status: Todo (CryHavoc)
+
 # Do not remove me
 Task
