@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.12 2003/02/24 14:14:43 fenrir Exp $
+ * $Id: ts.c,v 1.13 2003/02/26 12:38:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -140,9 +140,11 @@ vlc_module_begin();
     set_description( _("TS muxer") );
     set_capability( "sout mux", 100 );
     add_shortcut( "ts" );
+    add_shortcut( "ts_nodvbpsi" );
 #elif defined MODULE_NAME_IS_mux_ts_dvbpsi
     set_description( _("TS muxer (libdvbpsi)") );
     set_capability( "sout mux", 120 );
+    add_shortcut( "ts" );
     add_shortcut( "ts_dvbpsi" );
 #endif
     set_callbacks( Open, Close );
