@@ -40,6 +40,26 @@
 #include "intf.h"
 #include "vout.h"
 
+
+/*****************************************************************************
+ * DeviceCallback: Callback triggered when the video-device variable is changed
+ *****************************************************************************/
+int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    vlc_value_t val;
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    
+    msg_Dbg( p_vout, "set %d", new_val.i_int );
+    var_Create( p_vout->p_vlc, "video-device", VLC_VAR_INTEGER );
+    var_Set( p_vout->p_vlc, "video-device", new_val );
+    
+    val.b_bool = VLC_TRUE;
+    var_Set( p_vout, "intf-change", val );
+    return VLC_SUCCESS;
+}
+
+
 /*****************************************************************************
  * VLCWindow implementation
  *****************************************************************************/
@@ -47,7 +67,11 @@
 
 - (id)initWithVout:(vout_thread_t *)_p_vout frame:(NSRect *)s_frame
 {
-    int i_timeout;
+    NSAutoreleasePool *o_pool;
+    NSArray *o_screens = [NSScreen screens];
+    NSScreen *o_screen;
+    vlc_bool_t b_menubar_screen = VLC_FALSE;
+    int i_timeout, i_device;
     vlc_value_t value_drawable;
 
     p_vout = _p_vout;
@@ -76,6 +100,12 @@
             return NULL;
         }
     }
+    
+    if( [o_screens count] <= 0 )
+    {
+        msg_Err( p_vout, "no OSX screens available" );
+        return NULL;
+    }
 
     /* p_real_vout: the vout we have to use to check for video-on-top
        and a few other things. If we are the QuickTime output, it's us.
@@ -92,30 +122,40 @@
     p_fullscreen_state = NULL;
     i_time_mouse_last_moved = mdate();
 
-    NSScreen * o_screen;
-    vlc_bool_t b_main_screen;
-
     var_Create( p_vout, "macosx-vdev", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
 
-    /* Setup the menuitem for the multiple displays. Read the vlc preference (macosx-vdev) for the primary display */
-    NSArray * o_screens = [NSScreen screens];
-    if( [o_screens count] > 0 && var_Type( p_real_vout, "video-device" ) == 0 )
+    /* Get the pref value when this is the first time, otherwise retrieve the device from the top level video-device var */
+    if( var_Type( p_real_vout->p_vlc, "video-device" ) == 0 )
+    {
+        i_device = var_GetInteger( p_vout, "macosx-vdev" );
+    }
+    else
+    {
+        i_device = var_GetInteger( p_real_vout->p_vlc, "video-device" );
+    }
+
+    /* Setup the menuitem for the multiple displays. */
+    if( var_Type( p_real_vout, "video-device" ) == 0 )
     {
         int i = 1;
-        vlc_value_t val, val2, text;
+        vlc_value_t val2, text;
         NSScreen * o_screen;
-
-        var_Get( p_real_vout, "macosx-vdev", &val );
 
         var_Create( p_real_vout, "video-device", VLC_VAR_INTEGER |
                                             VLC_VAR_HASCHOICE );
-        text.psz_string = _("Video device");
+        text.psz_string = _("Video Device");
         var_Change( p_real_vout, "video-device", VLC_VAR_SETTEXT, &text, NULL );
 
         NSEnumerator * o_enumerator = [o_screens objectEnumerator];
+
+        val2.i_int = 0;
+        text.psz_string = _("Default");
+        var_Change( p_real_vout, "video-device",
+                        VLC_VAR_ADDCHOICE, &val2, &text );
+        var_Set( p_real_vout, "video-device", val2 );
 
         while( (o_screen = [o_enumerator nextObject]) != NULL )
         {
@@ -130,15 +170,14 @@
             val2.i_int = i;
             var_Change( p_real_vout, "video-device",
                         VLC_VAR_ADDCHOICE, &val2, &text );
-
-            if( ( i - 1 ) == val.i_int )
+            if( i == i_device )
             {
                 var_Set( p_real_vout, "video-device", val2 );
             }
             i++;
         }
 
-        var_AddCallback( p_real_vout, "video-device", vout_VarCallback,
+        var_AddCallback( p_real_vout, "video-device", DeviceCallback,
                          NULL );
 
         val2.b_bool = VLC_TRUE;
@@ -146,32 +185,21 @@
     }
 
     /* Find out on which screen to open the window */
-    int i_device = var_GetInteger( p_real_vout, "video-device" );
-    if( i_device < 0 )
+    if( i_device <= 0 || i_device > (int)[o_screens count] )
     {
          /* No preference specified. Use the main screen */
         o_screen = [NSScreen mainScreen];
-        b_main_screen = 1;
+        if( o_screen == [o_screens objectAtIndex: 0] )
+            b_menubar_screen = VLC_TRUE;
     }
     else
     {
-        NSArray *o_screens = [NSScreen screens];
-        
-        if( [o_screens count] < (unsigned) i_device )
-        {
-            o_screen = [NSScreen mainScreen];
-            b_main_screen = 1;
-        }
-        else
-        {
-            i_device--;
-            o_screen = [o_screens objectAtIndex: i_device];
-            var_SetInteger( p_real_vout, "macosx-vdev", i_device );
-            b_main_screen = ( i_device == 0 );
-        }
+        i_device--;
+        o_screen = [o_screens objectAtIndex: i_device];
+        b_menubar_screen = ( i_device == 0 );
     }
 
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    o_pool = [[NSAutoreleasePool alloc] init];
 
     if( p_vout->b_fullscreen )
     {
@@ -184,7 +212,7 @@
               backing: NSBackingStoreBuffered
               defer: YES screen: o_screen];
 
-        if( b_main_screen )
+        if( b_menubar_screen )
         {
             BeginFullScreen( &p_fullscreen_state, NULL, 0, 0,
                              NULL, NULL, fullScreenAllowEvents );
