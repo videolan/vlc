@@ -2,7 +2,7 @@
  * avi.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: avi.c,v 1.17 2003/12/22 02:24:53 sam Exp $
+ * $Id: avi.c,v 1.18 2004/02/06 23:43:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -126,15 +126,6 @@ static void SetFCC( uint8_t *p, char *fcc )
 {
     memcpy( p, fcc, 4 );
 }
-
-static void SetDWLE( uint8_t *p, uint32_t i_dw )
-{
-    p[3] = ( i_dw >> 24 )&0xff;
-    p[2] = ( i_dw >> 16 )&0xff;
-    p[1] = ( i_dw >>  8 )&0xff;
-    p[0] = ( i_dw       )&0xff;
-}
-
 
 /*****************************************************************************
  * Open:

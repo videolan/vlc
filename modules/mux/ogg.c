@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.27 2003/12/14 18:44:50 gbazin Exp $
+ * $Id: ogg.c,v 1.28 2004/02/06 23:43:32 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -125,30 +125,6 @@ typedef struct
     int32_t i_padding_1; /* Because the original is using MSVC packing style */
 
 } oggds_header_t;
-
-/* Helper writer functions */
-
-#define SetWLE( p, v ) _SetWLE( (uint8_t*)p, v)
-static void _SetWLE( uint8_t *p, uint16_t i_dw )
-{
-    p[1] = ( i_dw >>  8 )&0xff;
-    p[0] = ( i_dw       )&0xff;
-}
-
-#define SetDWLE( p, v ) _SetDWLE( (uint8_t*)p, v)
-static void _SetDWLE( uint8_t *p, uint32_t i_dw )
-{
-    p[3] = ( i_dw >> 24 )&0xff;
-    p[2] = ( i_dw >> 16 )&0xff;
-    p[1] = ( i_dw >>  8 )&0xff;
-    p[0] = ( i_dw       )&0xff;
-}
-#define SetQWLE( p, v ) _SetQWLE( (uint8_t*)p, v)
-static void _SetQWLE( uint8_t *p, uint64_t i_qw )
-{
-    SetDWLE( p,   i_qw&0xffffffff );
-    SetDWLE( p+4, ( i_qw >> 32)&0xffffffff );
-}
 
 /*
  * TODO  move this function to src/stream_output.c (used by nearly all muxers)

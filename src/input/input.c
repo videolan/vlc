@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.286 2004/02/02 12:58:29 fenrir Exp $
+ * $Id: input.c,v 1.287 2004/02/06 23:43:32 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -685,6 +685,7 @@ static int InitThread( input_thread_t * p_input )
         {
             free( p_input->psz_dupsource );
         }
+        input_EsOutDelete( p_input->p_es_out );
         return VLC_EGENERIC;
     }
 
@@ -722,6 +723,7 @@ static int InitThread( input_thread_t * p_input )
                 {
                     free( p_input->psz_dupsource );
                 }
+                input_EsOutDelete( p_input->p_es_out );
                 return VLC_EGENERIC;
             }
         }
@@ -746,6 +748,7 @@ static int InitThread( input_thread_t * p_input )
         {
             free( p_input->psz_dupsource );
         }
+        input_EsOutDelete( p_input->p_es_out );
         return VLC_EGENERIC;
     }
 
@@ -772,6 +775,7 @@ static int InitThread( input_thread_t * p_input )
         {
             free( p_input->psz_dupsource );
         }
+        input_EsOutDelete( p_input->p_es_out );
         return VLC_EGENERIC;
     }
 

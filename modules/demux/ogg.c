@@ -2,7 +2,7 @@
  * ogg.c : ogg stream demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.53 2004/01/25 20:05:28 hartman Exp $
+ * $Id: ogg.c,v 1.54 2004/02/06 23:43:32 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -256,7 +256,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     block_t *p_block;
     vlc_bool_t b_selected;
     int i_header_len = 0;
-    mtime_t i_pts;
+    mtime_t i_pts = 0;
 
     /* Sanity check */
     if( !p_oggpacket->bytes )
@@ -409,44 +409,43 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
             input_ClockManageRef( p_input,
                                   p_input->stream.p_selected_program,
                                   p_stream->i_pcr );
+
+            /* The granulepos is the end date of the sample */
+            i_pts =  input_ClockGetTS( p_input,
+                                       p_input->stream.p_selected_program,
+                                       p_stream->i_pcr );
         }
-
-        /* The granulepos is the end date of the sample */
-        i_pts = ( p_stream->i_pcr < 0 ) ? 0 :
-            input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                              p_stream->i_pcr );
-
-        /* Convert the granulepos into the next pcr */
-        Ogg_UpdatePCR( p_stream, p_oggpacket );
     }
-    else
+
+    /* Convert the granulepos into the next pcr */
+    Ogg_UpdatePCR( p_stream, p_oggpacket );
+
+    if( p_stream->i_pcr >= 0 )
     {
-        /* Convert the granulepos into the current pcr */
-        Ogg_UpdatePCR( p_stream, p_oggpacket );
+        /* This is for streams where the granulepos of the header packets
+         * doesn't match these of the data packets (eg. ogg web radios). */
+        if( p_stream->i_previous_pcr == 0 &&
+            p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY * 9/100 )
+            p_input->stream.p_selected_program->i_synchro_state =
+                SYNCHRO_REINIT;
 
-        if( p_stream->i_pcr >= 0 )
-        {
-            /* This is for streams where the granulepos of the header packets
-             * doesn't match these of the data packets (eg. ogg web radios). */
-            if( p_stream->i_previous_pcr == 0 &&
-                p_stream->i_pcr  > 3 * DEFAULT_PTS_DELAY * 9/100 )
-                p_input->stream.p_selected_program->i_synchro_state =
-                    SYNCHRO_REINIT;
+        /* Call the pace control */
+        if( p_input->stream.p_selected_program->i_synchro_state ==
+            SYNCHRO_REINIT )
+          input_ClockManageRef( p_input, p_input->stream.p_selected_program,
+                                p_stream->i_pcr );
+    }
 
-            p_stream->i_previous_pcr = p_stream->i_pcr;
-
-            /* Call the pace control */
-            if( p_input->stream.p_selected_program->i_synchro_state ==
-                SYNCHRO_REINIT )
-            input_ClockManageRef( p_input,
-                                  p_input->stream.p_selected_program,
-                                  p_stream->i_pcr );
-        }
+    if( !p_stream->fmt.i_codec == VLC_FOURCC( 'v','o','r','b' ) &&
+        !p_stream->fmt.i_codec == VLC_FOURCC( 's','p','x',' ' ) &&
+        !p_stream->fmt.i_codec == VLC_FOURCC( 'f','l','a','c' ) &&
+        p_stream->i_pcr >= 0 )
+    {
+        p_stream->i_previous_pcr = p_stream->i_pcr;
 
         /* The granulepos is the start date of the sample */
-        i_pts = ( p_stream->i_pcr < 0 ) ? 0 :
-            input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                              p_stream->i_pcr );
+        i_pts = input_ClockGetTS( p_input, p_input->stream.p_selected_program,
+                                  p_stream->i_pcr );
     }
 
     if( !b_selected )
@@ -1078,7 +1077,8 @@ static int Ogg_BeginningOfStream( input_thread_t *p_input, demux_sys_t *p_ogg)
         p_input->stream.i_mux_rate += (p_stream->fmt.i_bitrate / ( 8 * 50 ));
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-        p_stream->i_pcr  = p_stream->i_previous_pcr = -1;
+        p_stream->i_pcr = p_stream->i_previous_pcr =
+            p_stream->i_interpolated_pcr = -1;
         p_stream->b_reinit = 0;
 #undef p_stream
     }
