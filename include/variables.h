@@ -327,6 +327,84 @@ static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
 #define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
 
 /**
+ * Get a integer value
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline int __var_GetInteger( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t val;
+    if( !__var_Get( p_obj, psz_name, &val ) )
+        return val.i_int;
+    else
+        return 0;
+}
+
+/**
+ * Get a time value
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline int64_t __var_GetTime( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t val;
+    if( !__var_Get( p_obj, psz_name, &val ) )
+        return val.i_time;
+    else
+        return 0;
+}
+
+/**
+ * Get a float value
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline float __var_GetFloat( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t val;
+    if( !__var_Get( p_obj, psz_name, &val ) )
+        return val.f_float;
+    else
+        return 0.0;
+}
+
+/**
+ * Get a string value
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+static inline char *__var_GetString( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t val;
+    if( !__var_Get( p_obj, psz_name, &val ) )
+        return val.psz_string;
+    else
+        return strdup( "" );
+}
+
+/**
+ * __var_GetInteger() with automatic casting
+ */
+#define var_GetInteger(a,b)   __var_GetInteger( VLC_OBJECT(a),b)
+/**
+ * __var_GetTime() with automatic casting
+ */
+#define var_GetTime(a,b)   __var_GetTime( VLC_OBJECT(a),b)
+/**
+ * __var_GetFloat() with automatic casting
+ */
+#define var_GetFloat(a,b)   __var_GetFloat( VLC_OBJECT(a),b)
+/**
+ * __var_GetString() with automatic casting
+ */
+#define var_GetString(a,b)   __var_GetString( VLC_OBJECT(a),b)
+
+
+/**
  * Create a integer variable with inherit and get its value.
  *
  * \param p_obj The object that holds the variable
