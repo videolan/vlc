@@ -48,7 +48,8 @@ E: gbazin@netcourrier.com
 C: gbazin
 D: mingw32 port, various win32 fixes
 D: DirectX audio and video output, win32 WaveOut audio output
-D: a52 decoder using liba52
+D: a52 decoder using liba52 and vorbis decoder using libvorbis
+D: ogg demultiplexer
 D: Configuration file infrastructure
 S: France
 

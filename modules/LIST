@@ -1,5 +1,5 @@
 List of vlc plugins
-$Id: LIST,v 1.2 2002/09/15 20:54:12 jpsaman Exp $
+$Id: LIST,v 1.3 2002/10/23 23:17:45 gbazin Exp $
 
  * a52_system: input module for A52 decapsulation.
 
@@ -125,6 +125,8 @@ $Id: LIST,v 1.2 2002/09/15 20:54:12 jpsaman Exp $
 
  * null: a module with no capabilities.
 
+ * ogg: input module for OGG decapsulation.
+
  * qt: interface module using the Qt widget set.
 
  * qte: video output module for Qt Embedded.
@@ -136,6 +138,8 @@ $Id: LIST,v 1.2 2002/09/15 20:54:12 jpsaman Exp $
  * spudec: DVD subtitles decoder.
 
  * vcd: input module for accessing Video CDs.
+
+ * vorbis: a vorbis audio decoder using the libvorbis library.
 
  * waveout: simple audio output module for Windows.
 

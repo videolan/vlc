@@ -1,4 +1,4 @@
-# $Id: STATUS,v 1.4 2002/08/16 14:30:39 bozo Exp $
+# $Id: STATUS,v 1.5 2002/10/23 23:17:45 gbazin Exp $
 #
 #                              VLC STATUS
 #
@@ -46,8 +46,6 @@ Jon Lech Johansen <jon-vl@nanocrew.net> :
 Xavier Maillard <zedek@fxgsproject.org> :
     - Xinerama fullscreen support
       ETA : completed
-    - Ogg/Vorbis decoder plug-in
-      ETA : soon
 
 Christophe Massiot <massiot@via.ecp.fr> :
     - Audio output 3

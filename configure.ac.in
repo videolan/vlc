@@ -1072,6 +1072,19 @@ then
 fi
 
 dnl
+dnl  ogg plugin
+dnl
+AC_ARG_ENABLE(ogg,
+  [  --enable-ogg            Ogg demux support (default enabled)])
+if test "x${enable_ogg}" != "xno"
+then
+  AC_CHECK_HEADERS(ogg/ogg.h, [
+    PLUGINS="${PLUGINS} ogg"
+    LDFLAGS_ogg="${LDFLAGS_ogg} -logg"
+   ],[])
+fi
+
+dnl
 dnl  Codec plugins
 dnl
 
@@ -1356,20 +1369,6 @@ then
 fi
 
 dnl
-dnl  ogg vorbis plugin
-dnl
-AC_ARG_ENABLE(vorbis,
-  [  --enable-vorbis         Ogg/Vorbis decoder support (default enabled)])
-if test "x${enable_vorbis}" != "xno"
-then
-  AC_CHECK_HEADERS(ogg/ogg.h, [
-    dnl disabled for the moment
-    #PLUGINS="${PLUGINS} ogg vorbis"
-    LDFLAGS_vorbis="${LDFLAGS_vorbis} -lvorbis"
-   ],[])
-fi
-
-dnl
 dnl  DV plugin
 dnl
 AC_ARG_ENABLE(dv,
@@ -1379,6 +1378,19 @@ then
   AC_CHECK_HEADERS(libdv/dv.h, [
     PLUGINS="${PLUGINS} dv"
     LDFLAGS_dv="${LDFLAGS_dv} -ldv"
+   ],[])
+fi
+
+dnl
+dnl  Vorbis plugin
+dnl
+AC_ARG_ENABLE(vorbis,
+  [  --enable-vorbis            Vorbis decoder support (default enabled)])
+if test "x${enable_vorbis}" != "xno"
+then
+  AC_CHECK_HEADERS(vorbis/codec.h, [
+    PLUGINS="${PLUGINS} vorbis"
+    LDFLAGS_vorbis="${LDFLAGS_vorbis} -lvorbis"
    ],[])
 fi
 

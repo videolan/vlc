@@ -1,4 +1,4 @@
-# $Id: MAINTAINERS,v 1.2 2002/08/16 14:30:39 bozo Exp $
+# $Id: MAINTAINERS,v 1.3 2002/10/23 23:17:45 gbazin Exp $
 #
 #                            VLC MAINTAINERS
 #
@@ -79,7 +79,7 @@
   - AC3 SPDIF : [stef]
   - A/52 : [gibalou] ([meuuh])
   - SPU : [sam]
-  - Ogg/Vorbis : Xavier Maillard
+  - Ogg/Vorbis : [gibalou]
 
 * DOCUMENTATION
 

@@ -478,7 +478,7 @@ Description: Ogg/Vorbis audio decoder support
  The Ogg/Vorbis audio format is a free alternative to the patent-encumbered
  MP3 format. The system packets are quite different than the MPEG ones, so
  adding support for it would require a lot of code rewrite.
-Status: In the works (Xavier Maillard)
+Status: Done 24 Nov 2002 (gbazin)
 
 Task: 0x23
 Difficulty: Guru
