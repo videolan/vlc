@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.95 2003/10/26 12:46:55 sigmunau Exp $
+dnl $Id: configure.ac,v 1.96 2003/10/26 12:49:24 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2275,6 +2275,8 @@ dnl  freetype module
 dnl
 AC_ARG_ENABLE(freetype,
   [  --enable-freetype       freetype support (default enabled)])
+AC_ARG_ENABLE(fribidi,
+  [  --enable-fribidi        fribidi support (default enabled)])
 if test "${enable_freetype}" != "no"
 then
   FREETYPE_PATH="${PATH}"
@@ -2285,21 +2287,12 @@ then
         FREETYPE_PATH="${with_freetype_config_path}:${PATH}"
       fi ])
   AC_PATH_PROG(FREETYPE_CONFIG, freetype-config, no, ${FREETYPE_PATH})
-  FRIBIDI_PATH="${PATH}"
-  AC_ARG_WITH(fribidi-config-path,
-    [    --with-fribidi-config-path=PATH fribidi-config path (default search in \$PATH)],
-    [ if test "${with_fribidi_config_path}" != "no"
-      then
-        FRIBIDI_PATH="${with_fribidi_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(FRIBIDI_CONFIG, fribidi-config, no, ${FRIBIDI_PATH})
-
 
   if test "${FREETYPE_CONFIG}" != "no"
   then
     AX_ADD_PLUGINS([freetype])
-    AX_ADD_CFLAGS([freetype],[`${FREETYPE_CONFIG} --cflags`])
-    AX_ADD_LDFLAGS([freetype],[`${FREETYPE_CONFIG} --libs`])
+    AX_ADD_CFLAGS([freetype],[`${FREETYPE_CONFIG} --cflags` ${INCICONV}])
+    AX_ADD_LDFLAGS([freetype],[`${FREETYPE_CONFIG} --libs` ${LIBICONV}])
     AC_CHECK_HEADERS(Carbon/Carbon.h,
       [AX_ADD_LDFLAGS([freetype],[-framework Carbon])])
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_freetype}"
@@ -2309,10 +2302,24 @@ then
 from http://www.freetype.org/, or configure with --disable-freetype. Have a nice day.
     ])
   fi
-  if test "${FRIBIDI_CONFIG}" != "no"
+
+  dnl fribidi support
+  if test "${enable_fribidi}" != "no"
   then
-    AX_ADD_CFLAGS([freetype], [`${FRIBIDI_CONFIG} --cflags` -DHAVE_FRIBIDI])
-    AX_ADD_LDFLAGS([freetype], [`${FRIBIDI_CONFIG} --libs`])
+    FRIBIDI_PATH="${PATH}"
+    AC_ARG_WITH(fribidi-config-path,
+      [    --with-fribidi-config-path=PATH fribidi-config path (default search in \$PATH)],
+      [ if test "${with_fribidi_config_path}" != "no"
+        then
+          FRIBIDI_PATH="${with_fribidi_config_path}:${PATH}"
+        fi ])
+    AC_PATH_PROG(FRIBIDI_CONFIG, fribidi-config, no, ${FRIBIDI_PATH})
+
+    if test "${FRIBIDI_CONFIG}" != "no"
+    then
+      AX_ADD_CFLAGS([freetype], [`${FRIBIDI_CONFIG} --cflags` -DHAVE_FRIBIDI])
+      AX_ADD_LDFLAGS([freetype], [`${FRIBIDI_CONFIG} --libs`])
+    fi
   fi
 fi
 
