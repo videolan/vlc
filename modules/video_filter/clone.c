@@ -2,7 +2,7 @@
  * clone.c : Clone video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: clone.c,v 1.11 2003/10/15 22:49:48 gbazin Exp $
+ * $Id: clone.c,v 1.12 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -60,11 +60,12 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define VOUTLIST_LONGTEXT N_("Select the specific vout modules that you want to activate")
 
 vlc_module_begin();
-    add_category_hint( N_("Clone"), NULL, VLC_FALSE );
+    set_description( _("Clone video filter") );
+    set_capability( "video filter", 0 );
+    
     add_integer( "clone-count", 2, NULL, COUNT_TEXT, COUNT_LONGTEXT, VLC_FALSE );
     add_string ( "clone-vout-list", NULL, NULL, VOUTLIST_TEXT, VOUTLIST_LONGTEXT, VLC_FALSE );
-    set_description( _("clone video filter") );
-    set_capability( "video filter", 0 );
+    
     add_shortcut( "clone" );
     set_callbacks( Create, Destroy );
 vlc_module_end();

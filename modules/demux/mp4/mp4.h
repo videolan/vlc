@@ -1,8 +1,8 @@
 /*****************************************************************************
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.13 2004/01/18 22:00:00 fenrir Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: mp4.h,v 1.14 2004/01/25 20:05:28 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify

@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.7 2004/01/25 02:26:04 fenrir Exp $
+ * $Id: ts.c,v 1.8 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -65,12 +65,11 @@ static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("ISO 13818-1 MPEG Transport Stream input - new" ) );
-    add_category_hint( "TS demuxer", NULL, VLC_TRUE );
-        add_string( "ts-extra-pmt", NULL, NULL, "extra PMT", "allow user to specify an extra pmt (pmt_pid=pid:stream_type[,...])", VLC_TRUE );
-        add_bool( "ts-es-id-pid", 0, NULL, "set id of es to pid", "set id of es to pid", VLC_TRUE );
-        add_string( "ts-out", NULL, NULL, "fast udp streaming", "send TS to specific ip:port by udp (you must know what you are doing)", VLC_TRUE );
-        add_integer( "ts-out-mtu", 1500, NULL, "MTU for out mode", "MTU for out mode", VLC_TRUE );
-        add_string( "ts-csa-ck", NULL, NULL, "CSA ck", "CSA ck", VLC_TRUE );
+    add_string( "ts-extra-pmt", NULL, NULL, "extra PMT", "allow user to specify an extra pmt (pmt_pid=pid:stream_type[,...])", VLC_TRUE );
+    add_bool( "ts-es-id-pid", 0, NULL, "set id of es to pid", "set id of es to pid", VLC_TRUE );
+    add_string( "ts-out", NULL, NULL, "fast udp streaming", "send TS to specific ip:port by udp (you must know what you are doing)", VLC_TRUE );
+    add_integer( "ts-out-mtu", 1500, NULL, "MTU for out mode", "MTU for out mode", VLC_TRUE );
+    add_string( "ts-csa-ck", NULL, NULL, "CSA ck", "CSA ck", VLC_TRUE );
     set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "ts2" );
@@ -359,7 +358,7 @@ static int Open( vlc_object_t *p_this )
         {
             ts_pid_t *pmt = &p_sys->pid[i_pid];
 
-            msg_Dbg( p_demux, "Extra pmt specified (pid=0x%x)", i_pid );
+            msg_Dbg( p_demux, "extra pmt specified (pid=0x%x)", i_pid );
             PIDInit( pmt, VLC_TRUE, NULL );
             /* FIXME we should also ask for a number */
             pmt->psi->handle = dvbpsi_AttachPMT( 1, (dvbpsi_pmt_callback)PMTCallBack, p_demux );
@@ -1538,7 +1537,7 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         pmt->psi->iod = NULL;
     }
 
-    msg_Dbg( p_demux, "New PMT program number=%d version=%d pid_pcr=0x%x", p_pmt->i_program_number, p_pmt->i_version, p_pmt->i_pcr_pid );
+    msg_Dbg( p_demux, "new PMT program number=%d version=%d pid_pcr=0x%x", p_pmt->i_program_number, p_pmt->i_version, p_pmt->i_pcr_pid );
     pmt->psi->i_pid_pcr = p_pmt->i_pcr_pid;
     pmt->psi->i_version = p_pmt->i_version;
 
@@ -1765,7 +1764,7 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         return;
     }
 
-    msg_Dbg( p_demux, "New PAT ts_id=0x%x version=%d current_next=%d", p_pat->i_ts_id, p_pat->i_version, p_pat->b_current_next );
+    msg_Dbg( p_demux, "new PAT ts_id=0x%x version=%d current_next=%d", p_pat->i_ts_id, p_pat->i_version, p_pat->b_current_next );
 
     /* Clean old */
     for( i = 2; i < 8192; i++ )

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * m3u.c: a meta demux to parse pls, m3u, asx et b4s playlists
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.25 2004/01/05 13:07:02 zorglub Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: m3u.c,v 1.26 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -60,7 +60,7 @@ static int  Demux ( input_thread_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("playlist metademux") );
+    set_description( _("Playlist metademux") );
     set_capability( "demux", 180 );
     set_callbacks( Activate, Deactivate );
     add_shortcut( "m3u" );
@@ -121,8 +121,8 @@ static int Activate( vlc_object_t * p_this )
 
     /* we had no luck looking at the file extention, so we have a look
      * at the content. This is useful for .asp, .php and similar files
-     * that are actually html. Also useful for som asx files that have
-     * another extention */
+     * that are actually html. Also useful for some asx files that have
+     * another extension */
     /* XXX we double check for file != m3u as some asx ... are just m3u file */
     if( i_type != TYPE_M3U )
     {

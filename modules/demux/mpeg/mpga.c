@@ -1,8 +1,8 @@
 /*****************************************************************************
  * mpga.c : MPEG-I/II Audio input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: mpga.c,v 1.15 2004/01/03 00:23:04 gbazin Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: mpga.c,v 1.16 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *

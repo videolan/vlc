@@ -2,7 +2,7 @@
  * demuxstream.c: Read an MPEG stream from the satellite and stream it
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: demuxstream.c,v 1.1 2003/11/06 16:06:28 massiot Exp $
+ * $Id: demuxstream.c,v 1.2 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -140,7 +140,6 @@ vlc_module_begin();
     set_capability( "demux", 0 );
     add_shortcut( "demuxstream" );
 #endif
-    add_category_hint( N_("Miscellaneous"), NULL, VLC_TRUE );
     add_bool( "vls-backwards-compat", 0, NULL,
               VLS_BACKWARDS_COMPAT_TEXT, VLS_BACKWARDS_COMPAT_LONGTEXT, VLC_TRUE );
     add_bool( "buggy-psi", 0, NULL, BUGGY_PSI_TEXT, BUGGY_PSI_LONGTEXT, VLC_TRUE );
@@ -1283,7 +1282,7 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
           ( p_new_pat->i_version != p_stream_data->i_pat_version ) ) ||
         p_stream_data->i_pat_version == PAT_UNINITIALIZED  )
     {
-        msg_Dbg( p_input, "Processing PAT version %d", p_new_pat->i_version );
+        msg_Dbg( p_input, "processing PAT version %d", p_new_pat->i_version );
 
         /* Delete all programs */
         while( p_input->stream.i_pgrm_number )
@@ -1308,7 +1307,7 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
 
         while( p_pgrm )
         {
-            msg_Dbg( p_input, "New program: %d", p_pgrm->i_number );
+            msg_Dbg( p_input, "new program: %d", p_pgrm->i_number );
 
             /* If program = 0, we're having info about NIT not PMT */
             if( p_pgrm->i_number )
@@ -1386,7 +1385,7 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
         dvbpsi_descriptor_t *p_dr = p_new_pmt->p_first_descriptor;
         int i_loop;
 
-        msg_Dbg( p_input, "Processing PMT for program %d version %d",
+        msg_Dbg( p_input, "processing PMT for program %d version %d",
                  p_new_pmt->i_program_number, p_new_pmt->i_version );
 
         /* Delete all ES in this program  except the PSI. We start from the
@@ -1717,7 +1716,7 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                 if( i_fourcc == VLC_FOURCC(0,0,0,0) )
                 {
                     msg_Warn( p_input,
-                              "Unknown codec/type for Private PES stream" );
+                              "unknown codec/type for Private PES stream" );
                 }
             }
 

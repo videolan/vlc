@@ -2,7 +2,7 @@
  * id3genres.h: list of genres for id3 genre tags
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: id3genres.h,v 1.3 2003/12/22 14:23:13 sam Exp $
+ * $Id: id3genres.h,v 1.4 2004/01/25 20:05:29 hartman Exp $
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *         list found at http://www.id3.org/id3v2.4.0-frames.txt
@@ -65,7 +65,7 @@ static char *ppsz_genres[] = {
     N_("Sound clip"),
     N_("Gospel"),
     N_("Noise"),
-    N_("Alternrock"),
+    N_("Alternative rock"),
     N_("Bass"),
     N_("Soul"),
     N_("Punk"),

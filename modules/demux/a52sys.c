@@ -1,8 +1,8 @@
 /*****************************************************************************
  * a52.c : Raw A/52 Stream input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: a52sys.c,v 1.11 2003/12/22 02:24:52 sam Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: a52sys.c,v 1.12 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.84 2004/01/05 13:00:20 zorglub Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: avi.c,v 1.85 2004/01/25 20:05:28 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,20 +36,26 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+
+#define INTERLEAVE_TEXT N_("Force interleaved method" )
+#define INTERLEAVE_LONGTEXT N_( "Force interleaved method" )
+
+#define INDEX_TEXT N_("Force index creation")
+#define INDEX_LONGTEXT N_( \
+    "Recreate a index for the AVI file so we can seek trough it more reliably." ) 
+
 static int  Open   ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    add_category_hint( N_("AVI demuxer"), NULL, VLC_TRUE );
-        add_bool( "avi-interleaved", 0, NULL,
-                  N_("force interleaved method"),
-                  N_("force interleaved method"), VLC_TRUE );
-        add_bool( "avi-index", 0, NULL,
-                  N_("force index creation"),
-                  N_("force index creation"), VLC_TRUE );
-
-    set_description( N_("AVI demuxer") );
+    set_description( _("AVI demuxer") );
     set_capability( "demux", 212 );
+    
+    add_bool( "avi-interleaved", 0, NULL,
+              INTERLEAVE_TEXT, INTERLEAVE_LONGTEXT, VLC_TRUE );
+    add_bool( "avi-index", 0, NULL,
+              INDEX_TEXT, INDEX_LONGTEXT, VLC_TRUE );
+
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -356,7 +362,7 @@ static int Open( vlc_object_t * p_this )
 
     if( p_sys->i_track <= 0 )
     {
-        msg_Err( p_input, "No valid track" );
+        msg_Err( p_input, "no valid track" );
         goto error;
     }
 
@@ -1072,7 +1078,7 @@ static int Seek( input_thread_t *p_input, mtime_t i_date, int i_percent )
 /*                p_sys->i_time = __MAX( AVI_GetPTS( p_stream ), p_sys->i_time );*/
             }
         }
-        msg_Dbg( p_input, "seek: "I64Fd" secondes", p_sys->i_time /1000000 );
+        msg_Dbg( p_input, "seek: "I64Fd" seconds", p_sys->i_time /1000000 );
         /* set true movie time */
 #endif
         if( !p_sys->i_time )

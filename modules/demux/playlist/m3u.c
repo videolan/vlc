@@ -2,7 +2,7 @@
  * m3u.c : M3U playlist format import
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: m3u.c,v 1.2 2004/01/11 17:46:58 sigmunau Exp $
+ * $Id: m3u.c,v 1.3 2004/01/25 20:05:29 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -76,7 +76,7 @@ int Import_M3U( vlc_object_t *p_this )
         return VLC_EGENERIC;
         
     }
-    msg_Info( p_demux, "Found valid M3U playlist file");
+    msg_Dbg( p_demux, "found valid M3U playlist file");
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;

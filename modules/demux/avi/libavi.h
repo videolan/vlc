@@ -1,8 +1,8 @@
 /*****************************************************************************
  * libavi.h : LibAVI library
  ******************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: libavi.h,v 1.13 2003/11/30 22:14:39 fenrir Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: libavi.h,v 1.14 2004/01/25 20:05:28 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,6 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
 /* flags for use in <dwFlags> in AVIFileHdr */
 #define AVIF_HASINDEX       0x00000010  /* Index at end of file? */
 #define AVIF_MUSTUSEINDEX   0x00000020

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * ogg.c : ogg stream input module for vlc
+ * ogg.c : ogg stream demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.52 2003/12/22 14:32:55 sam Exp $
+ * $Id: ogg.c,v 1.53 2004/01/25 20:05:28 hartman Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -150,7 +150,7 @@ static void Ogg_EndOfStream( input_thread_t *p_input, demux_sys_t *p_ogg );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("ogg stream demuxer" ) );
+    set_description( _("Ogg stream demuxer" ) );
     set_capability( "demux", 50 );
     set_callbacks( Activate, Deactivate );
     add_shortcut( "ogg" );
@@ -295,7 +295,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
                       p_stream->fmt.audio.i_channels =
                           bs_read( &s, 3 ) + 1;
 
-                      msg_Dbg( p_input, "Flac header, channels: %i, rate: %i",
+                      msg_Dbg( p_input, "FLAC header, channels: %i, rate: %i",
                                p_stream->fmt.audio.i_channels,
                                (int)p_stream->f_rate );
                   }
@@ -494,7 +494,7 @@ static void Ogg_DecodePacket( input_thread_t *p_input,
     if( p_stream->fmt.i_codec == VLC_FOURCC( 't','a','r','k' ) )
     {
         /* FIXME: the biggest hack I've ever done */
-        msg_Warn( p_input, "tark pts: "I64Fd", granule: "I64Fd,
+        msg_Warn( p_input, "tarkin pts: "I64Fd", granule: "I64Fd,
                   p_block->i_pts, p_block->i_dts );
         msleep(10000);
     }
@@ -552,7 +552,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 if( ogg_stream_pagein( &p_stream->os, &oggpage ) < 0 )
                 {
                     /* error. stream version mismatch perhaps */
-                    msg_Err( p_input, "Error reading first page of "
+                    msg_Err( p_input, "error reading first page of "
                              "Ogg bitstream data" );
                     return VLC_EGENERIC;
                 }
@@ -619,7 +619,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                 else if( oggpacket.bytes >= 4 &&
                     ! strncmp( &oggpacket.packet[0], "fLaC", 4 ) )
                 {
-                    msg_Dbg( p_input, "found Flac header" );
+                    msg_Dbg( p_input, "found FLAC header" );
 
                     /* Grrrr!!!! Did they really have to put all the
                      * important info in the second header packet!!!

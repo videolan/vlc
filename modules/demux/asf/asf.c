@@ -1,8 +1,8 @@
 /*****************************************************************************
- * asf.c : ASFv01 file input module for vlc
+ * asf.c : ASF demux module
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: asf.c,v 1.48 2004/01/05 13:00:20 zorglub Exp $
+ * $Id: asf.c,v 1.49 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -285,7 +285,7 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* We add all info about this stream */
-    p_cat = input_InfoCategory( p_input, "Asf" );
+    p_cat = input_InfoCategory( p_input, _("Asf") );
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_input,
                                      VLC_OBJECT_PLAYLIST,  FIND_PARENT);
     if( p_sys->i_length > 0 )
@@ -486,7 +486,7 @@ static void Close( vlc_object_t * p_this )
     demux_sys_t    *p_sys = p_input->p_demux_data;
     int i_stream;
 
-    msg_Dbg( p_input, "Freeing all memory" );
+    msg_Dbg( p_input, "freeing all memory" );
 
     ASF_FreeObjectRoot( p_input->s, p_sys->p_root );
     for( i_stream = 0; i_stream < 128; i_stream++ )

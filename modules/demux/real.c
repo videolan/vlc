@@ -2,7 +2,7 @@
  * real.c: Real demuxer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: real.c,v 1.2 2004/01/07 15:31:31 fenrir Exp $
+ * $Id: real.c,v 1.3 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -117,7 +117,7 @@ static int Open( vlc_object_t *p_this )
     if( HeaderRead( p_demux ) )
     {
         int i;
-        msg_Err( p_demux, "Invalid header" );
+        msg_Err( p_demux, "invalid header" );
         for( i = 0; i < p_sys->i_track; i++ )
         {
             real_track_t *tk = p_sys->track[i];
@@ -569,7 +569,7 @@ static int HeaderRead( demux_t *p_demux )
         i_size      = GetDWBE( &header[4] );
         i_version   = GetWBE( &header[8] );
 
-        msg_Dbg( p_demux, "Object %4.4s size=%d version=%d",
+        msg_Dbg( p_demux, "object %4.4s size=%d version=%d",
                  (char*)&i_id, i_size, i_version );
 
         if( i_size < 10 )

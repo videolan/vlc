@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.13 2003/12/04 18:13:28 gbazin Exp $
+ * $Id: livedotcom.cpp,v 1.14 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -51,7 +51,7 @@ static void DemuxClose( vlc_object_t * );
 static int  AccessOpen ( vlc_object_t * );
 static void AccessClose( vlc_object_t * );
 
-#define CACHING_TEXT N_("Caching value in ms")
+#define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for rtsp streams. This " \
     "value should be set in miliseconds units." )
@@ -68,11 +68,11 @@ vlc_module_begin();
         add_shortcut( "sdp" );
         set_capability( "access", 0 );
         set_callbacks( AccessOpen, AccessClose );
-        add_category_hint( N_("RTSP"), NULL, VLC_TRUE );
-            add_bool( "rtsp-tcp", 0, NULL,
-                      "Use rtp over rtsp(tcp)",
-                      "Use rtp over rtsp(tcp)", VLC_TRUE );
-            add_integer( "rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+        add_bool( "rtsp-tcp", 0, NULL,
+                  N_("Use rtp over rtsp (tcp)"),
+                  N_("Use rtp over rtsp (tcp)"), VLC_TRUE );
+        add_integer( "rtsp-caching", 4 * DEFAULT_PTS_DELAY / 1000, NULL,
+            CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
 vlc_module_end();
 
 /* TODO:
@@ -645,7 +645,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
 
     if( p_sys->i_track <= 0 )
     {
-        msg_Err( p_input, "No codec supported, aborting" );
+        msg_Err( p_input, "no codec supported, aborting" );
         goto error;
     }
 

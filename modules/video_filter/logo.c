@@ -2,7 +2,7 @@
  * logo.c : logo video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: logo.c,v 1.9 2004/01/25 15:55:37 sigmunau Exp $
+ * $Id: logo.c,v 1.10 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *
@@ -65,13 +65,15 @@ static int MouseEvent( vlc_object_t *, char const *,
 #define TRANS_LONGTEXT N_("You can change it by middle-clicking and moving mouse left or right")
 
 vlc_module_begin();
-    add_category_hint( N_("logo"), NULL, VLC_FALSE );
+    set_description( _("Logo video filter") );
+    set_capability( "video filter", 0 );
+
     add_file( "logo-file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
     add_integer( "logo-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
     add_integer( "logo-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
-    add_integer_with_range( "logo-transparency", 255, 0, 255, NULL, TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
-    set_description( _("Logo video filter") );
-    set_capability( "video filter", 0 );
+    add_integer_with_range( "logo-transparency", 255, 0, 255, NULL,
+        TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
+
     add_shortcut( "logo" );
     set_callbacks( Create, Destroy );
 vlc_module_end();

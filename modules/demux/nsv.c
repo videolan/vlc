@@ -2,7 +2,7 @@
  * nsv.c: NullSoft Video demuxer.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: nsv.c,v 1.4 2004/01/07 15:31:31 fenrir Exp $
+ * $Id: nsv.c,v 1.5 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -357,7 +357,7 @@ static int ReadNSVf( demux_t *p_demux )
     uint8_t     *p;
     int         i_size;
 
-    msg_Dbg( p_demux, "New NSVf chunk" );
+    msg_Dbg( p_demux, "new NSVf chunk" );
     if( stream_Peek( p_demux->s, &p, 8 ) < 8 )
     {
         return VLC_EGENERIC;
@@ -383,7 +383,7 @@ static int ReadNSVs( demux_t *p_demux )
         return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_demux, "New NSVs chunk" );
+    msg_Dbg( p_demux, "new NSVs chunk" );
     /* Video */
     switch( ( fcc = VLC_FOURCC( header[4], header[5], header[6], header[7] ) ) )
     {
@@ -394,7 +394,7 @@ static int ReadNSVs( demux_t *p_demux )
         case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             break;
         default:
-            msg_Warn( p_demux, "unknow codec" );
+            msg_Warn( p_demux, "unknown codec" );
             break;
     }
     if( fcc != VLC_FOURCC( 'N', 'O', 'N', 'E' ) && fcc != p_sys->fmt_video.i_codec  )
@@ -426,7 +426,7 @@ static int ReadNSVs( demux_t *p_demux )
         case VLC_FOURCC( 'N', 'O', 'N', 'E' ):
             break;
         default:
-            msg_Warn( p_demux, "unknow codec" );
+            msg_Warn( p_demux, "unknown codec" );
             break;
     }
 
@@ -456,7 +456,7 @@ static int ReadNSVs( demux_t *p_demux )
                 p_sys->i_pcr_inc = 66755;
                 break;
             default:
-                msg_Dbg( p_demux, "unknow fps (0x%x)", header[16] );
+                msg_Dbg( p_demux, "unknown fps (0x%x)", header[16] );
                 p_sys->i_pcr_inc = 40000;
                 break;
         }

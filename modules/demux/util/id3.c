@@ -2,7 +2,7 @@
  * id3.c: simple id3 tag skipper
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: id3.c,v 1.6 2003/11/02 22:15:14 gbazin Exp $
+ * $Id: id3.c,v 1.7 2004/01/25 20:05:29 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -65,7 +65,7 @@ static int SkipID3Tag( vlc_object_t *p_this )
     }
     p_input = (input_thread_t *)p_this;
 
-    msg_Dbg( p_input, "Checking for ID3 tag" );
+    msg_Dbg( p_input, "checking for ID3 tag" );
 
     /* get 10 byte id3 header */
     if( stream_Peek( p_input->s, &p_peek, 10 ) < 10 )

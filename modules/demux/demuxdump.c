@@ -1,8 +1,8 @@
 /*****************************************************************************
  * demuxdump.c : Pseudo demux module for vlc (dump raw stream)
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: demuxdump.c,v 1.11 2003/11/05 17:57:29 gbazin Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: demuxdump.c,v 1.12 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -38,24 +38,23 @@
  *****************************************************************************/
 static int  Activate ( vlc_object_t * );
 static int  Demux ( input_thread_t * );
-static void Desactivate ( vlc_object_t * );
+static void Deactivate ( vlc_object_t * );
 
 #define DUMP_BLOCKSIZE  16384
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define FILE_TEXT N_("Dump file name")
+#define FILE_TEXT N_("Filename of dump")
 #define FILE_LONGTEXT N_( \
     "Specify a file name to which the raw stream will be dumped." )
 
 vlc_module_begin();
-    set_description( _("file dump demuxer") );
+    set_description( _("Filedump demuxer") );
     set_capability( "demux", 0 );
-    add_category_hint( "File", NULL, VLC_FALSE );
-        add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT, 
-                  FILE_LONGTEXT, VLC_FALSE );
-    set_callbacks( Activate, Desactivate );
+    add_file( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT, 
+              FILE_LONGTEXT, VLC_FALSE );
+    set_callbacks( Activate, Deactivate );
     add_shortcut( "dump" );
 vlc_module_end();
 
@@ -164,9 +163,9 @@ static int Activate( vlc_object_t * p_this )
 }
 
 /*****************************************************************************
- * Desctivate: initializes dump structures
+ * Deactivate: initializes dump structures
  *****************************************************************************/
-static void Desactivate ( vlc_object_t *p_this )
+static void Deactivate ( vlc_object_t *p_this )
 {
     input_thread_t      *p_input = (input_thread_t *)p_this;
     demux_sys_t         *p_demux = (demux_sys_t*)p_input->p_demux_data;

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.56 2004/01/23 08:07:17 gbazin Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: mp4.c,v 1.57 2004/01/25 20:05:28 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -41,7 +41,7 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("MP4 demuxer") );
+    set_description( _("MP4 stream demuxer") );
     set_capability( "demux", 242 );
     set_callbacks( Open, Close );
 vlc_module_end();
@@ -1297,7 +1297,7 @@ static int  TrackGotoChunkSample( input_thread_t   *p_input,
         p_track->chunk[p_track->i_chunk].i_sample_description_index !=
             p_track->chunk[i_chunk].i_sample_description_index )
     {
-        msg_Warn( p_input, "Recreate ES" );
+        msg_Warn( p_input, "recreate ES" );
 
         es_out_Control( p_input->p_es_out, ES_OUT_GET_ES_STATE, p_track->p_es, &b_reselect );
 

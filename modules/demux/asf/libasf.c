@@ -1,8 +1,8 @@
 /*****************************************************************************
  * libasf.c :
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.18 2003/09/07 22:48:29 fenrir Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: libasf.c,v 1.19 2004/01/25 20:05:28 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -89,7 +89,7 @@ static int ASF_ReadObjectCommon( stream_t *s, asf_object_t *p_obj )
     p_common->p_next = NULL;
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-             "Found Object guid: " GUID_FMT " size:"I64Fd,
+             "found object guid: " GUID_FMT " size:"I64Fd,
              GUID_PRINT( p_common->i_object_id ),
              p_common->i_object_size );
 #endif
@@ -153,7 +153,7 @@ static int  ASF_ReadObject_Header( stream_t *s, asf_object_t *p_obj )
     p_hdr->p_last  = NULL;
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-             "Read \"Header Object\" subobj:%d, reserved1:%d, reserved2:%d",
+             "read \"header object\" subobj:%d, reserved1:%d, reserved2:%d",
              p_hdr->i_sub_object_count,
              p_hdr->i_reserved1,
              p_hdr->i_reserved2 );
@@ -193,7 +193,7 @@ static int ASF_ReadObject_Data( stream_t *s, asf_object_t *p_obj )
     p_data->i_reserved = GetWLE( p_peek + 48 );
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-             "Read \"Data Object\" file_id:" GUID_FMT " total data packet:"
+             "read \"data object\" file_id:" GUID_FMT " total data packet:"
              I64Fd" reserved:%d",
              GUID_PRINT( p_data->i_file_id ),
              p_data->i_total_data_packets,
@@ -220,7 +220,7 @@ static int ASF_ReadObject_Index( stream_t *s, asf_object_t *p_obj )
 
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-            "Read \"Index Object\" file_id:" GUID_FMT
+            "read \"index object\" file_id:" GUID_FMT
             " index_entry_time_interval:"I64Fd" max_packet_count:%d "
             "index_entry_count:%ld",
             GUID_PRINT( p_index->i_file_id ),
@@ -261,7 +261,7 @@ static int ASF_ReadObject_file_properties( stream_t *s, asf_object_t *p_obj )
 
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-            "Read \"File Properties Object\" file_id:" GUID_FMT
+            "read \"file properties object\" file_id:" GUID_FMT
             " file_size:"I64Fd" creation_date:"I64Fd" data_packets_count:"
             I64Fd" play_duration:"I64Fd" send_duration:"I64Fd" preroll:"
             I64Fd" flags:%d min_data_packet_size:%d max_data_packet_size:%d "
@@ -307,7 +307,7 @@ static int ASF_ReadObject_header_extention( stream_t *s, asf_object_t *p_obj )
     }
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-            "Read \"Header Extention Object\" reserved1:" GUID_FMT " reserved2:%d header_extention_size:%d",
+            "read \"header extention object\" reserved1:" GUID_FMT " reserved2:%d header_extention_size:%d",
             GUID_PRINT( p_he->i_reserved1 ),
             p_he->i_reserved2,
             p_he->i_header_extention_size );
@@ -365,7 +365,7 @@ static int ASF_ReadObject_stream_properties( stream_t *s, asf_object_t *p_obj )
 
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-            "Read \"Stream Properties Object\" stream_type:" GUID_FMT
+            "read \"stream Properties object\" stream_type:" GUID_FMT
             " error_correction_type:" GUID_FMT " time_offset:"I64Fd
             " type_specific_data_length:%d error_correction_data_length:%d"
             " flags:0x%x stream_number:%d",
@@ -463,7 +463,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
 
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-            "Read \"Codec List Object\" reserved_guid:" GUID_FMT " codec_entries_count:%d",
+            "read \"codec list object\" reserved_guid:" GUID_FMT " codec_entries_count:%d",
             GUID_PRINT( p_cl->i_reserved ),
             p_cl->i_codec_entries_count );
 
@@ -471,7 +471,7 @@ static int ASF_ReadObject_codec_list( stream_t *s, asf_object_t *p_obj )
     {
 #define codec p_cl->codec[i_codec]
         msg_Dbg( (vlc_object_t*)s,
-                 "Read \"Codec List Object\" codec[%d] %s name:\"%s\" description:\"%s\" information_length:%d",
+                 "read \"codec list object\" codec[%d] %s name:\"%s\" description:\"%s\" information_length:%d",
                  i_codec,
                  ( codec.i_type == ASF_CODEC_TYPE_VIDEO ) ? "video" : ( ( codec.i_type == ASF_CODEC_TYPE_AUDIO ) ? "audio" : "unknown" ),
                  codec.psz_name,
@@ -546,7 +546,7 @@ static int ASF_ReadObject_content_description(stream_t *s, asf_object_t *p_obj)
 
 #ifdef ASF_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-             "Read \"Content Description Object\" title:\"%s\" author:\"%s\" copyright:\"%s\" description:\"%s\" rating:\"%s\"",
+             "Read \"content description object\" title:\"%s\" author:\"%s\" copyright:\"%s\" description:\"%s\" rating:\"%s\"",
              p_cd->psz_title,
              p_cd->psz_author,
              p_cd->psz_copyright,
@@ -601,7 +601,7 @@ static int ASF_ReadObject( stream_t *s,
     }
     if( ASF_ReadObjectCommon( s, p_obj ) )
     {
-        msg_Warn( (vlc_object_t*)s, "Cannot read one asf object" );
+        msg_Warn( (vlc_object_t*)s, "cannot read one asf object" );
         return VLC_EGENERIC;
     }
     p_obj->common.p_father = p_father;
@@ -612,7 +612,7 @@ static int ASF_ReadObject( stream_t *s,
 
     if( p_obj->common.i_object_size < 24 )
     {
-        msg_Warn( (vlc_object_t*)s, "Found a corrupted asf object (size<24)" );
+        msg_Warn( (vlc_object_t*)s, "found a corrupted asf object (size<24)" );
         return VLC_EGENERIC;
     }
     /* find this object */
@@ -631,7 +631,7 @@ static int ASF_ReadObject( stream_t *s,
     /* Now load this object */
     if( ASF_Object_Function[i_index].ASF_ReadObject_function == NULL )
     {
-        msg_Warn( (vlc_object_t*)s, "Unknown asf object (not loaded)" );
+        msg_Warn( (vlc_object_t*)s, "unknown asf object (not loaded)" );
         i_result = VLC_SUCCESS;
     }
     else
@@ -694,14 +694,14 @@ static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
     if( ASF_Object_Function[i_index].ASF_FreeObject_function == NULL )
     {
         msg_Warn( (vlc_object_t*)s,
-                  "Unknown asf object " GUID_FMT,
+                  "unknown asf object " GUID_FMT,
                   GUID_PRINT( p_obj->common.i_object_id ) );
     }
     else
     {
 #ifdef ASF_DEBUG
         msg_Dbg( (vlc_object_t*)s,
-                  "Free asf object " GUID_FMT,
+                  "free asf object " GUID_FMT,
                   GUID_PRINT( p_obj->common.i_object_id ) );
 #endif
         (ASF_Object_Function[i_index].ASF_FreeObject_function)( p_obj );
@@ -750,7 +750,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
                 p_root->p_index = (asf_object_index_t*)p_obj;
                 break;
             default:
-                msg_Warn( (vlc_object_t*)s, "Unknow Object found" );
+                msg_Warn( (vlc_object_t*)s, "unknow object found" );
                 break;
         }
         if( p_obj->common.i_type == ASF_OBJECT_TYPE_DATA &&
@@ -780,7 +780,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
         {
             return p_root;
         }
-        msg_Warn( (vlc_object_t*)s, "cannot fine file properties object" );
+        msg_Warn( (vlc_object_t*)s, "cannot find file properties object" );
     }
 
     /* Invalid file */

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * mkv.cpp : matroska demuxer
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.54 2004/01/22 20:48:07 sigmunau Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: mkv.cpp,v 1.55 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -91,14 +91,14 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin();
-    add_category_hint( N_("mkv demuxer"), NULL, VLC_TRUE );
-        add_bool( "mkv-seek-percent", 1, NULL,
-                  N_("Seek based on percent not time"),
-                  N_("Seek based on percent not time"), VLC_TRUE );
-
-    set_description( _("mka/mkv stream demuxer" ) );
+    set_description( _("Matroska stream demuxer" ) );
     set_capability( "demux", 50 );
     set_callbacks( Open, Close );
+    
+    add_bool( "mkv-seek-percent", 1, NULL,
+            N_("Seek based on percent not time"),
+            N_("Seek based on percent not time"), VLC_TRUE );
+
     add_shortcut( "mka" );
     add_shortcut( "mkv" );
 vlc_module_end();
@@ -1554,7 +1554,7 @@ static void Seek( input_thread_t *p_input, mtime_t i_date, int i_percent)
     {
         int64_t i_pos = i_percent * stream_Size( p_input->s ) / 100;
 
-        msg_Dbg( p_input, "imprecise way of seeking" );
+        msg_Dbg( p_input, "inacurate way of seeking" );
         for( i_index = 0; i_index < p_sys->i_index; i_index++ )
         {
             if( p_sys->index[i_index].i_position >= i_pos)
@@ -2179,7 +2179,7 @@ static void InformationsCreate( input_thread_t *p_input )
     playlist_t            *p_playlist;
     int                   i_track;
 
-    p_cat = input_InfoCategory( p_input, "Matroska" );
+    p_cat = input_InfoCategory( p_input, _("Matroska") );
     if( p_sys->f_duration > 1000.1 )
     {
         char psz_buffer[MSTRTIME_MAX_SIZE];

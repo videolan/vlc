@@ -1,8 +1,8 @@
 /*****************************************************************************
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
- * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.29 2004/01/24 03:48:29 rocky Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: system.c,v 1.30 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -52,9 +52,9 @@ static void              DemuxTS ( input_thread_t *, data_packet_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("generic ISO 13818-1 MPEG demultiplexing") );
+    set_description( _("Generic ISO 13818-1 MPEG demultiplexing") );
     set_capability( "mpeg-system", 100 );
-set_callbacks( Activate, NULL );
+    set_callbacks( Activate, NULL );
 vlc_module_end();
 
 /*****************************************************************************

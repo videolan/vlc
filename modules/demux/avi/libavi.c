@@ -1,8 +1,8 @@
 /*****************************************************************************
- * libavi.c :
+ * libavi.c : LibAVI
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.29 2003/10/24 12:22:51 fenrir Exp $
+ * $Id: libavi.c,v 1.30 2004/01/25 20:05:28 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -71,7 +71,7 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk )
 
 #ifdef AVI_DEBUG
     msg_Dbg( (vlc_object_t*)s,
-             "Found Chunk fourcc:%8.8x (%4.4s) size:"I64Fd" pos:"I64Fd,
+             "found Chunk fourcc:%8.8x (%4.4s) size:"I64Fd" pos:"I64Fd,
              p_chk->common.i_chunk_fourcc,
              (char*)&p_chk->common.i_chunk_fourcc,
              p_chk->common.i_chunk_size,
@@ -137,7 +137,7 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     if( p_container->common.i_chunk_fourcc == AVIFOURCC_LIST &&
         p_container->list.i_type == AVIFOURCC_movi )
     {
-        msg_Dbg( (vlc_object_t*)s, "Skipping movi chunk" );
+        msg_Dbg( (vlc_object_t*)s, "skipping movi chunk" );
         if( b_seekable )
         {
             return AVI_NextChunk( s, p_container );
@@ -580,7 +580,7 @@ static struct
     { AVIFOURCC_ICRP, "cropped" },
     { AVIFOURCC_IDIM, "dimensions" },
     { AVIFOURCC_IDPI, "dots per inch" },
-    { AVIFOURCC_IENG, "enginner" },
+    { AVIFOURCC_IENG, "engineer" },
     { AVIFOURCC_IGNR, "genre" },
     { AVIFOURCC_IKEY, "keywords" },
     { AVIFOURCC_ILGT, "lightness" },

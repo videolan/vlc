@@ -2,7 +2,7 @@
  * pls.c : PLS playlist format import
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: pls.c,v 1.1 2004/01/11 17:46:58 sigmunau Exp $
+ * $Id: pls.c,v 1.2 2004/01/25 20:05:29 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -76,7 +76,7 @@ int Import_PLS( vlc_object_t *p_this )
         return VLC_EGENERIC;
         
     }
-    msg_Info( p_demux, "Found valid PLS playlist file");
+    msg_Dbg( p_demux, "found valid PLS playlist file");
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
@@ -170,7 +170,7 @@ static int Demux( demux_t *p_demux )
         }
         if( i_new_item == 0 )
         {
-            msg_Warn( p_demux, "couldn't find number of item" );
+            msg_Warn( p_demux, "couldn't find number of items" );
             free( psz_line );
             continue;
         }

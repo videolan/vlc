@@ -1,8 +1,8 @@
 /*****************************************************************************
  * flac.c : FLAC demux module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: flac.c,v 1.9 2003/11/24 00:39:01 fenrir Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: flac.c,v 1.10 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -51,7 +51,7 @@ struct demux_sys_t
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();                                      
-    set_description( _("flac demuxer") );                       
+    set_description( _("FLAC demuxer") );                       
     set_capability( "demux", 155 );
     set_callbacks( Open, Close );
     add_shortcut( "flac" );
@@ -103,13 +103,13 @@ static int Open( vlc_object_t * p_this )
     i_peek = stream_Peek( p_input->s, &p_peek, 8 );
     if( p_peek[4] & 0x7F )
     {
-        msg_Err( p_input, "This isn't a STREAMINFO metadata block" );
+        msg_Err( p_input, "this isn't a STREAMINFO metadata block" );
         return VLC_EGENERIC;
     }
 
     if( ((p_peek[5]<<16)+(p_peek[6]<<8)+p_peek[7]) != (STREAMINFO_SIZE - 4) )
     {
-        msg_Err( p_input, "Invalid size for a STREAMINFO metadata block" );
+        msg_Err( p_input, "invalid size for a STREAMINFO metadata block" );
         return VLC_EGENERIC;
     }
 

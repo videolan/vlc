@@ -2,7 +2,7 @@
  * dvdnav.c: DVD module using the dvdnav library.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: dvdnav.c,v 1.7 2004/01/19 21:30:43 fenrir Exp $
+ * $Id: dvdnav.c,v 1.8 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -51,15 +51,15 @@ static int  DemuxOpen ( vlc_object_t * );
 static void DemuxClose( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( "DVDnav Input" );
-    add_category_hint( N_("DVD"), NULL , VLC_TRUE );
-    add_integer( "dvdnav-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
+    set_description( _("DVDnav Input") );
+    add_integer( "dvdnav-caching", DEFAULT_PTS_DELAY / 1000, NULL,
+        CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
     set_capability( "access", 0 );
     add_shortcut( "dvdnav" );
     set_callbacks( AccessOpen, AccessClose );
 
     add_submodule();
-        set_description( "DVDnav Input (demux)" );
+        set_description( _("DVDnav Input (demux)") );
         set_capability( "demux2", 1 );
         add_shortcut( "dvdnav" );
         set_callbacks( DemuxOpen, DemuxClose );
@@ -330,7 +330,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     /* Configure dvdnav */
     if( dvdnav_set_readahead_flag( p_sys->dvdnav, 1 ) != DVDNAV_STATUS_OK )
     {
-        msg_Warn( p_demux, "cannot set readahead flag" );
+        msg_Warn( p_demux, "cannot set read-a-head flag" );
     }
 
     if( dvdnav_set_PGC_positioning_flag( p_sys->dvdnav, 1 ) !=
@@ -711,11 +711,11 @@ static void ButtonUpdate( demux_t *p_demux )
             val.b_bool = VLC_TRUE; var_Set( p_sys->p_input, "highlight", val );
             vlc_mutex_unlock( p_mutex );
 
-            msg_Dbg( p_demux, "ButtonUpdate %d", i_button );
+            msg_Dbg( p_demux, "buttonUpdate %d", i_button );
         }
         else
         {
-            msg_Dbg( p_demux, "ButtonUpdate not done b=%d t=%d", i_button, i_title );
+            msg_Dbg( p_demux, "buttonUpdate not done b=%d t=%d", i_button, i_title );
 
             /* Show all */
             vlc_mutex_lock( p_mutex );

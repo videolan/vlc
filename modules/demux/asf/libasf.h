@@ -1,8 +1,8 @@
 /*****************************************************************************
  * libasf.h :
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: libasf.h,v 1.7 2003/08/18 19:18:47 fenrir Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: libasf.h,v 1.8 2004/01/25 20:05:28 hartman Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify

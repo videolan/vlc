@@ -1,8 +1,8 @@
 /*****************************************************************************
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001, 2004 VideoLAN
- * $Id: ps.c,v 1.16 2004/01/11 15:02:15 rocky Exp $
+ * Copyright (C) 2000-2004, 2004 VideoLAN
+ * $Id: ps.c,v 1.17 2004/01/25 20:05:28 hartman Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *

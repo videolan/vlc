@@ -2,7 +2,7 @@
  * ps.c
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ps.c,v 1.1 2004/01/17 22:32:50 fenrir Exp $
+ * $Id: ps.c,v 1.2 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -43,7 +43,7 @@ static int  Open    ( vlc_object_t * );
 static void Close  ( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( "PS demuxer" );
+    set_description( _("PS demuxer") );
     set_capability( "demux2", 0 );
     set_callbacks( Open, Close );
     add_shortcut( "ps2" );

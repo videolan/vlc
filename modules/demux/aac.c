@@ -1,8 +1,8 @@
 /*****************************************************************************
  * aac.c : Raw aac Stream input module for vlc
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: aac.c,v 1.8 2003/11/21 00:38:01 gbazin Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: aac.c,v 1.9 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *

@@ -2,7 +2,7 @@
  * old.c : Old playlist format import
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: old.c,v 1.1 2004/01/11 00:45:06 zorglub Exp $
+ * $Id: old.c,v 1.2 2004/01/25 20:05:29 hartman Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -59,7 +59,7 @@ int Import_Old( vlc_object_t *p_this )
         msg_Warn(p_demux, "old import module discarded: invalid file");
         return VLC_EGENERIC;
     }
-    msg_Info( p_demux, "Found valid old playlist file");
+    msg_Dbg( p_demux, "found valid old playlist file");
 
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;

@@ -2,7 +2,7 @@
  * au.c : au file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: au.c,v 1.11 2003/11/21 00:38:01 gbazin Exp $
+ * $Id: au.c,v 1.12 2004/01/25 20:05:28 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -336,7 +336,7 @@ static int DemuxPCM( input_thread_t *p_input )
             i_pos += p_sys->fmt.audio.i_blockalign - i_pos % p_sys->fmt.audio.i_blockalign;
             if( stream_Seek( p_input->s, i_pos ) )
             {
-                msg_Err( p_input, "Seek failed(cannot resync)" );
+                msg_Err( p_input, "seek failed (cannot resync)" );
             }
         }
     }
