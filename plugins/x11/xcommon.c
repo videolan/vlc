@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.34 2002/05/20 22:30:19 sam Exp $
+ * $Id: xcommon.c,v 1.35 2002/05/29 10:08:03 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1540,13 +1540,20 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
                                  &attributes);
     }
 
-    /* We need to unmap and remap the window if we want the window 
-     * manager to take our changes into effect */
+    /* We need to reparent the window if we want the window 
+     * manager to take our changes into effect. We also resize the window
+     * twice to avoid an annoying flickering. */
+    if( !p_vout->b_fullscreen )
+        XMoveResizeWindow( p_vout->p_sys->p_display,
+                           p_vout->p_sys->window,
+                           i_xpos,
+                           i_ypos,
+                           i_width,
+                           i_height );
     XReparentWindow( p_vout->p_sys->p_display,
                      p_vout->p_sys->window,
                      DefaultRootWindow( p_vout->p_sys->p_display ),
                      0, 0 );
-    XSync( p_vout->p_sys->p_display, True );
     XMoveResizeWindow( p_vout->p_sys->p_display,
                        p_vout->p_sys->window,
                        i_xpos,
