@@ -1,0 +1,2 @@
+rtsp://hostname.domain.org:1554/film1	/opt/media/film1.mpg	A sample stream file	239.255.12.42
+rtsp://hostname.domain.org:1554/film2	/opt/media/film2.mpg	Another stream	239.255.42.12
