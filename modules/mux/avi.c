@@ -421,7 +421,7 @@ static int Mux      ( sout_mux_t *p_mux )
 
         p_fifo = p_mux->pp_inputs[i]->p_fifo;
         i_count = p_fifo->i_depth;
-        while( i_count > 0 )
+        while( i_count > 1 )
         {
             avi_idx1_entry_t *p_idx;
             block_t *p_data;
