@@ -12,6 +12,7 @@ SOURCES_wxwindows = \
 	timer.cpp \
 	fileinfo.cpp \
 	subtitles.cpp \
+	v4l.cpp \
 	$(NULL)
 
 EXTRA_DIST += \
