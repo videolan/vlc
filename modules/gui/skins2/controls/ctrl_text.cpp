@@ -157,8 +157,11 @@ void CtrlText::draw( OSGraphics &rImage, int xDest, int yDest )
                          getPosition()->getWidth() );
         int height = min( m_pCurrImg->getHeight(), getPosition()->getHeight() );
         // Draw the current image
-        rImage.drawBitmap( *m_pCurrImg, -m_xPos, 0, xDest, yDest,
-                           width, height );
+        if( width > 0 && height > 0 )
+        {
+            rImage.drawBitmap( *m_pCurrImg, -m_xPos, 0, xDest, yDest,
+                            width, height );
+        }
     }
 }
 
