@@ -16,6 +16,9 @@
 #include <stdlib.h>                               /* atoi(), malloc(), free() */
 #include <string.h>
 #include <netinet/in.h>                                              /* ntohs */
+#include <sys/soundcard.h>
+#include <X11/Xlib.h>
+#include <X11/extensions/XShm.h>
 
 #include "common.h"
 #include "config.h"
@@ -26,12 +29,29 @@
 #include "input.h"
 #include "input_ctrl.h"
 #include "input_psi.h"
+#include "input_vlan.h"
+
+#include "audio_output.h"
+#include "video.h"
+#include "video_output.h"
+#include "xconsole.h"
+#include "interface.h"
+
+#include "pgm_data.h"
 
 /*
  * Precalculated 32-bits CRC table, shared by all instances of the PSI decoder
  */
 boolean_t b_crc_initialised = 0;
 u32 i_crc_32_table[256];
+
+/*
+ * Global configuration variable, need by AUTO_SPAWN to determine
+ * the option (audio and video) passed to the VideoLAN client.
+ */
+#ifdef AUTO_SPAWN
+extern program_data_t *p_program_data;
+#endif
 
 /*
  * Locale type definitions
@@ -597,10 +617,19 @@ static void DecodePgrmMapSection( u8* p_pms, input_thread_t* p_input )
                   {
                   case MPEG1_VIDEO_ES:
                   case MPEG2_VIDEO_ES:
+                      if( p_program_data->cfg.b_video )
+                      {
+                           /* Spawn a video thread */
+                           input_AddPgrmElem( p_input, p_input->p_es[i_es_loop].i_id );
+                      }
+                      break;
                   case MPEG1_AUDIO_ES:
                   case MPEG2_AUDIO_ES:
-                      /* Spawn an audio thread */
-                      input_AddPgrmElem( p_input, p_input->p_es[i_es_loop].i_id );
+                      if( p_program_data->cfg.b_audio )
+                      {
+                          /* Spawn an audio thread */
+                          input_AddPgrmElem( p_input, p_input->p_es[i_es_loop].i_id );
+                      }
                       break;
                   default:
                   }
