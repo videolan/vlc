@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.8 2001/07/25 00:23:40 sam Exp $
+ * $Id: libdvdcss.c,v 1.9 2001/07/25 08:41:21 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,7 +65,7 @@ static int _dvdcss_readv ( dvdcss_handle, struct iovec *p_iovec, int i_blocks );
  *****************************************************************************/
 #if defined( WIN32 )
 static int _win32_dvdcss_readv  ( int i_fd, struct iovec *p_iovec,
-                                  int i_num_buffers );
+                                  int i_num_buffers, char *p_tmp_buffer );
 static int _win32_dvdcss_aopen  ( char c_drive, dvdcss_handle dvdcss );
 static int _win32_dvdcss_aclose ( int i_fd );
 static int _win32_dvdcss_aseek  ( int i_fd, int i_blocks, int i_method );
@@ -403,6 +403,10 @@ static int _dvdcss_open ( dvdcss_handle dvdcss, char *psz_target )
         }
     }
 
+    /* initialise readv temporary buffer */
+    dvdcss->p_readv_buffer   = NULL;
+    dvdcss->i_readv_buf_size = 0;
+
 #else
     dvdcss->i_fd = open( psz_target, 0 );
 
@@ -428,8 +432,18 @@ static int _dvdcss_close ( dvdcss_handle dvdcss )
     {
         _win32_dvdcss_aclose( dvdcss->i_fd );
     }
+
+    /* Free readv temporary buffer */
+    if( dvdcss->p_readv_buffer )
+    {
+        free( dvdcss->p_readv_buffer );
+        dvdcss->p_readv_buffer   = NULL;
+        dvdcss->i_readv_buf_size = 0;
+    }
+
 #else
     close( dvdcss->i_fd );
+
 #endif
 
     return 0;
@@ -513,13 +527,35 @@ static int _dvdcss_readv ( dvdcss_handle dvdcss, struct iovec *p_iovec,
     int i_read;
 
 #if defined( WIN32 )
-    i_read = _win32_dvdcss_readv( dvdcss->i_fd, p_iovec, i_blocks );
+    /* Check the size of the readv temp buffer, just in case we need to
+     * realloc something bigger */
+    if( dvdcss->i_readv_buf_size < i_blocks * DVDCSS_BLOCK_SIZE )
+    {
+        dvdcss->i_readv_buf_size = i_blocks * DVDCSS_BLOCK_SIZE;
+
+        if( dvdcss->p_readv_buffer ) free( dvdcss->p_readv_buffer );
+
+        /* Allocate a buffer which will be used as a temporary storage
+         * for readv */
+        dvdcss->p_readv_buffer = malloc( dvdcss->i_readv_buf_size );
+        if( !dvdcss->p_readv_buffer )
+        {
+            _dvdcss_error( dvdcss, " failed (readv)" );
+            return -1;
+        }
+    }
+
+    i_read = _win32_dvdcss_readv( dvdcss->i_fd, p_iovec, i_blocks,
+                                  dvdcss->p_readv_buffer );
     return i_read;
+
 #else
     i_read = readv( dvdcss->i_fd, p_iovec, i_blocks );
     return i_read / DVDCSS_BLOCK_SIZE;
+
 #endif
 }
+
 
 #if defined( WIN32 )
 
@@ -528,75 +564,58 @@ static int _dvdcss_readv ( dvdcss_handle dvdcss, struct iovec *p_iovec,
  *                      _win32_dvdcss_aread for win9x
  *****************************************************************************/
 static int _win32_dvdcss_readv( int i_fd, struct iovec *p_iovec,
-                                int i_num_buffers )
+                                int i_num_buffers, char *p_tmp_buffer )
 {
-    int i_index, i_len, i_total = 0;
-    unsigned char *p_base;
-    int i_blocks;
+    int i_index;
+    int i_blocks, i_blocks_total = 0;
+
+    for( i_index = i_num_buffers; i_index; i_index-- )
+    {
+        i_blocks_total += p_iovec[i_index-1].iov_len; 
+    }
+
+    if( i_blocks_total <= 0 ) return 0;
+
+    i_blocks_total /= DVDCSS_BLOCK_SIZE;
 
     if( WIN2K )
     {
-        for( i_index = i_num_buffers; i_index; i_index-- )
+        unsigned long int i_bytes;
+        if( !ReadFile( (HANDLE)i_fd, p_tmp_buffer,
+                       i_blocks_total * DVDCSS_BLOCK_SIZE, &i_bytes, NULL ) )
         {
-            i_len  = p_iovec->iov_len;
-            p_base = p_iovec->iov_base;
-
-            if( i_len > 0 )
-            {
-                unsigned long int i_bytes;
-                if( !ReadFile( (HANDLE) i_fd, p_base, i_len, &i_bytes, NULL ) )
-                {
-                    return -1;
-                    /* One of the reads failed, too bad.
-                       We won't even bother returning the reads that went well,
-                       and like in the posix spec the file postition is left
-                       unspecified after a failure */
-                }
-                i_blocks = i_bytes / DVDCSS_BLOCK_SIZE;
-
-                i_total += i_blocks;
-
-                if( i_blocks != (i_len / DVDCSS_BLOCK_SIZE) )
-                {
-                    /* we reached the end of the file */
-                    return i_total;
-                }
-
-            }
-
-            p_iovec++;
+            return -1;
+            /* The read failed... too bad.
+               As in the posix spec the file postition is left
+               unspecified after a failure */
         }
+        i_blocks = i_bytes / DVDCSS_BLOCK_SIZE;
     }
     else /* Win9x */
     {
-        for( i_index = i_num_buffers; i_index; i_index-- )
+        i_blocks = _win32_dvdcss_aread( i_fd, p_tmp_buffer, i_blocks_total );
+        if( i_blocks < 0 )
         {
-            i_len  = p_iovec->iov_len / DVDCSS_BLOCK_SIZE;
-            p_base = p_iovec->iov_base;
-
-            if( i_len > 0 )
-            {
-                i_blocks = _win32_dvdcss_aread( i_fd, p_base, i_len );
-                if( i_blocks < 0 )
-                {
-                    return -1;  /* idem */
-                }
-
-                i_total += i_blocks;
-
-                if( i_blocks != i_len )
-                {
-                    /* we reached the end of the file or a signal interrupted
-                       the read */
-                    return i_total;
-                }
-            }
-
-            p_iovec++;
+            return -1;  /* idem */
         }
     }
 
-    return i_total;
+    /* We just have to copy the content of the temp buffer into the iovecs */
+    i_index = 0;
+    i_blocks_total = i_blocks;
+    while( i_blocks_total > 0 )
+    {
+        memcpy( p_iovec[i_index].iov_base,
+                &p_tmp_buffer[(i_blocks - i_blocks_total) * DVDCSS_BLOCK_SIZE],
+                p_iovec[i_index].iov_len );
+        /* if we read less blocks than asked, we'll just end up copying
+           garbage, this isn't an issue as we return the number of
+           blocks actually read */
+        i_blocks_total -= ( p_iovec[i_index].iov_len / DVDCSS_BLOCK_SIZE );
+        i_index++;
+    } 
+
+    return i_blocks;
 }
 
 /*****************************************************************************
@@ -611,7 +630,7 @@ static int _win32_dvdcss_aopen( char c_drive, dvdcss_handle dvdcss )
     int i, j, i_hostadapters;
     long (*lpGetSupport)( void );
     long (*lpSendCommand)( void* );
-    
+     
     hASPI = LoadLibrary( "wnaspi32.dll" );
     if( hASPI == NULL )
     {
@@ -621,7 +640,7 @@ static int _win32_dvdcss_aopen( char c_drive, dvdcss_handle dvdcss )
 
     (FARPROC) lpGetSupport = GetProcAddress( hASPI, "GetASPI32SupportInfo" );
     (FARPROC) lpSendCommand = GetProcAddress( hASPI, "SendASPI32Command" );
-    
+ 
     if(lpGetSupport == NULL || lpSendCommand == NULL )
     {
         _dvdcss_debug( dvdcss, "unable to get aspi function pointers" );
@@ -680,8 +699,8 @@ static int _win32_dvdcss_aopen( char c_drive, dvdcss_handle dvdcss )
 
             lpSendCommand( (void*) &srbDiskInfo );
 
-            if( srbDiskInfo.SRB_Status == SS_COMP &&
-                srbDiskInfo.SRB_Int13HDriveInfo == c_drive )
+            if( (srbDiskInfo.SRB_Status == SS_COMP) &&
+                (srbDiskInfo.SRB_Int13HDriveInfo == c_drive) )
             {
                 fd->i_sid = MAKEWORD( i, j );
                 return (int) fd;
@@ -692,8 +711,7 @@ static int _win32_dvdcss_aopen( char c_drive, dvdcss_handle dvdcss )
     free( (void*) fd );
     FreeLibrary( hASPI );
     _dvdcss_debug( dvdcss, "unable to get haid and target (aspi)" );
-
-    return( -1 );
+    return( -1 );        
 }
 
 /*****************************************************************************
@@ -743,56 +761,78 @@ static int _win32_dvdcss_aseek( int i_fd, int i_blocks, int i_method )
 static int _win32_dvdcss_aread( int i_fd, void *p_data, int i_blocks )
 {
     HANDLE hEvent;
-    DWORD dwStart, dwLen;
     struct SRB_ExecSCSICmd ssc;
     struct w32_aspidev *fd = (struct w32_aspidev *) i_fd;
 
-    memset( &ssc, 0, sizeof( ssc ) );
-
-    dwStart = fd->i_blocks;
-    dwLen = i_blocks;
-
+    /* Create the transfer completion event */
     hEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
     if( hEvent == NULL )
     {
         return -1;
     }
 
+    memset( &ssc, 0, sizeof( ssc ) );
+
     ssc.SRB_Cmd         = SC_EXEC_SCSI_CMD;
     ssc.SRB_Flags       = SRB_DIR_IN | SRB_EVENT_NOTIFY;
     ssc.SRB_HaId        = LOBYTE( fd->i_sid );
     ssc.SRB_Target      = HIBYTE( fd->i_sid );
     ssc.SRB_SenseLen    = SENSE_LEN;
-    ssc.SRB_PostProc    = (LPVOID) hEvent;
-
-    ssc.SRB_BufLen      = dwLen * DVDCSS_BLOCK_SIZE;
+    
+    ssc.SRB_PostProc = (LPVOID) hEvent;
     ssc.SRB_BufPointer  = p_data;
     ssc.SRB_CDBLen      = 12;
-
+    
     ssc.CDBByte[0]      = 0xA8; /* RAW */
-    ssc.CDBByte[2]      = (UCHAR) dwStart >> 24;
-    ssc.CDBByte[3]      = (UCHAR) (dwStart >> 16) & 0xff;
-    ssc.CDBByte[4]      = (UCHAR) (dwStart >> 8) & 0xff;
-    ssc.CDBByte[5]      = (UCHAR) (dwStart) & 0xff;
-    ssc.CDBByte[6]      = (UCHAR) dwLen >> 24;
-    ssc.CDBByte[7]      = (UCHAR) (dwLen >> 16) & 0xff;
-    ssc.CDBByte[8]      = (UCHAR) (dwLen >> 8) & 0xff;
-    ssc.CDBByte[9]      = (UCHAR) (dwLen) & 0xff;
+    ssc.CDBByte[2]      = (UCHAR) (fd->i_blocks >> 24);
+    ssc.CDBByte[3]      = (UCHAR) (fd->i_blocks >> 16) & 0xff;
+    ssc.CDBByte[4]      = (UCHAR) (fd->i_blocks >> 8) & 0xff;
+    ssc.CDBByte[5]      = (UCHAR) (fd->i_blocks) & 0xff;
+    
+    /* We have to break down the reads into 64kb pieces (ASPI restriction) */
+    if( i_blocks > 32 )
+    {
+        ssc.SRB_BufLen = 32 * DVDCSS_BLOCK_SIZE;
+        ssc.CDBByte[9] = 32;
+        fd->i_blocks  += 32;
 
-    ResetEvent( hEvent );
-    if( fd->lpSendCommand( (void*) &ssc ) == SS_PENDING )
+        /* Initiate transfer */  
+        ResetEvent( hEvent );
+        fd->lpSendCommand( (void*) &ssc );
+
+        /* transfer the next 64kb (_win32_dvdcss_aread is called recursively)
+         * We need to check the status of the read on return */
+        if( _win32_dvdcss_aread( i_fd, p_data + 32 * DVDCSS_BLOCK_SIZE,
+                                 i_blocks - 32) < 0 )
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        /* This is the last transfer */
+        ssc.SRB_BufLen   = i_blocks * DVDCSS_BLOCK_SIZE;
+        ssc.CDBByte[9]   = (UCHAR) i_blocks;
+        fd->i_blocks += i_blocks;
+
+        /* Initiate transfer */  
+        ResetEvent( hEvent );
+        fd->lpSendCommand( (void*) &ssc );
+
+    }
+
+    /* If the command has still not been processed, wait until it's finished */
+    if( ssc.SRB_Status == SS_PENDING )
     {
         WaitForSingleObject( hEvent, INFINITE );
     }
-
     CloseHandle( hEvent );
 
+    /* check that the transfer went as planned */
     if( ssc.SRB_Status != SS_COMP )
     {
-        return -1;
+      return -1;
     }
-        
-    fd->i_blocks += i_blocks;
 
     return i_blocks;
 }

@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_directx.c,v 1.5 2001/07/12 20:44:52 reno Exp $
+ * $Id: aout_directx.c,v 1.6 2001/07/25 08:41:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -306,7 +306,9 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
                : (p_aout->p_sys->l_buffer_size - l_play_position
                   + p_aout->p_sys->l_write_position) /2 ;
 
+#if 0
     intf_WarnMsg( 5, "aout: DirectX aout_GetBufInfo: %li", l_result);
+#endif
     return l_result;
 }
 

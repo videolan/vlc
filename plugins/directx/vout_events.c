@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_events.c,v 1.2 2001/07/12 23:06:54 gbazin Exp $
+ * $Id: vout_events.c,v 1.3 2001/07/25 08:41:21 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -179,7 +179,6 @@ void DirectXEventThread( vout_thread_t *p_vout )
                 
             case WM_RBUTTONUP:
                 intf_WarnMsg( 4, "vout: vout_Manage WM_RBUTTONUP" );
-                /* FIXME: need locking ! */
                 p_main->p_intf->b_menu_change = 1;
                 break;
 
@@ -192,7 +191,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
                 {
                 case VK_ESCAPE:
                 case VK_F12:
-                    p_main->p_intf->b_die = 1;
+                    PostQuitMessage( 0 );
                     break;
                 }
                 TranslateMessage(&msg);
@@ -205,7 +204,7 @@ void DirectXEventThread( vout_thread_t *p_vout )
                 {
                 case 'q':
                 case 'Q':
-                    p_main->p_intf->b_die = 1;
+                    PostQuitMessage( 0 );
                     break;
                   
                 case 'f':                            /* switch to fullscreen */
@@ -295,7 +294,6 @@ void DirectXEventThread( vout_thread_t *p_vout )
     /* Set thread Status */
     p_vout->p_sys->i_event_thread_status = THREAD_OVER;
 
-    return;
 }
 
 

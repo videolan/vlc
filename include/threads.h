@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.20 2001/07/18 14:21:00 massiot Exp $
+ * $Id: threads.h,v 1.21 2001/07/25 08:41:21 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -45,7 +45,7 @@
 #   include <kernel/scheduler.h>
 #   include <byteorder.h>
 
-#elif defined( WIN32 )                        /* Win32 with MinGW32 compiler */
+#elif defined( WIN32 )
 #   include <windows.h>
 #   include <process.h>
 
@@ -134,9 +134,15 @@ typedef struct
 } vlc_cond_t;
 
 #elif defined( WIN32 )
-typedef HANDLE      vlc_thread_t;
-typedef HANDLE      vlc_mutex_t;
-typedef HANDLE      vlc_cond_t; 
+typedef HANDLE           vlc_thread_t;
+typedef CRITICAL_SECTION vlc_mutex_t;
+
+typedef struct
+{
+    int             i_waiting_threads;
+    HANDLE          signal;
+} vlc_cond_t;
+
 typedef unsigned (__stdcall *PTHREAD_START) (void *);
 
 #endif
@@ -188,7 +194,23 @@ typedef struct wrapper_s
     struct itimerval itimer;
 
 } wrapper_t;
-#endif
+
+#ifdef WIN32
+struct itimerval
+{
+    struct timeval it_value;
+    struct timeval it_interval;
+};
+
+int setitimer(int kind, const struct itimerval* itnew,
+	      struct itimerval* itold);
+
+#define ITIMER_REAL 1
+#define ITIMER_PROF 2
+
+#endif /* WIN32 */
+
+#endif /* PROFILING */
 
 /*****************************************************************************
  * vlc_threads_init: initialize threads system
@@ -274,8 +296,8 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
     return B_OK;
 
 #elif defined( WIN32 )
-    *p_mutex = CreateMutex(0,FALSE,0);
-    return (*p_mutex?0:1);
+    InitializeCriticalSection( p_mutex );
+    return 0;
 
 #endif
 }
@@ -312,7 +334,7 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
     return err;
 
 #elif defined( WIN32 )
-    WaitForSingleObject( *p_mutex, INFINITE );
+    EnterCriticalSection( p_mutex );
     return 0;
 
 #endif
@@ -348,7 +370,7 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
     return B_OK;
 
 #elif defined( WIN32 )
-    ReleaseMutex( *p_mutex );
+    LeaveCriticalSection( p_mutex );
     return 0;
 
 #endif
@@ -375,7 +397,7 @@ static __inline__ int vlc_mutex_destroy( vlc_mutex_t *p_mutex )
     return B_OK;
 
 #elif defined( WIN32 )
-    CloseHandle(*p_mutex);
+    DeleteCriticalSection( p_mutex );
     return 0;
 
 #endif    
@@ -417,13 +439,16 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
     return 0;
 
 #elif defined( WIN32 )
-    /* Create an auto-reset event. */
-    *p_condvar = CreateEvent( NULL,   /* no security */
-                              FALSE,  /* auto-reset event */
-                              FALSE,  /* non-signaled initially */
-                              NULL ); /* unnamed */
+    /* initialise counter */
+    p_condvar->i_waiting_threads = 0;
 
-    return( *p_condvar ? 0 : 1 );
+    /* Create an auto-reset event. */
+    p_condvar->signal = CreateEvent( NULL, /* no security */
+				     FALSE,  /* auto-reset event */
+				     FALSE,  /* non-signaled initially */
+				     NULL ); /* unnamed */
+
+    return( !p_condvar->signal );
     
 #endif
 }
@@ -484,8 +509,14 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
     return 0;
 
 #elif defined( WIN32 )
-    /* Try to release one waiting thread. */
-    PulseEvent ( *p_condvar );
+    /* Release one waiting thread if one is available. */
+    /* For this trick to work properly, the vlc_cond_signal must be surrounded
+     * by a mutex. This will prevent another thread from stealing the signal */
+    while( p_condvar->i_waiting_threads )
+    {
+        PulseEvent( p_condvar->signal );
+        Sleep( 0 ); /* deschedule the current thread */
+    }
     return 0;
 
 #endif
@@ -552,8 +583,14 @@ static __inline__ int vlc_cond_broadcast( vlc_cond_t *p_condvar )
     return 0;
 
 #elif defined( WIN32 )
-    /* Try to release one waiting thread. */
-    PulseEvent ( *p_condvar );
+    /* Release all waiting threads. */
+    /* For this trick to work properly, the vlc_cond_signal must be surrounded
+     * by a mutex. This will prevent another thread from stealing the signal */
+    while( p_condvar->i_waiting_threads )
+    {
+        PulseEvent( p_condvar->signal );
+        Sleep( 0 ); /* deschedule the current thread */
+    }
     return 0;
 
 #endif
@@ -602,16 +639,31 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
     return 0;
 
 #elif defined( WIN32 )
-    /* Release the <external_mutex> here and wait for the event
-     * to become signaled, due to <pthread_cond_signal> being
-     * called. */
+    /* The ideal would be to use a function which atomically releases the
+     * mutex and initiate the waiting.
+     * Unfortunately only the SignalObjectAndWait function does this and it's
+     * only supported on WinNT/2K, furthermore it cannot take multiple
+     * events as parameters.
+     *
+     * The solution we use should however fulfill all our needs (even though
+     * it is not a correct pthreads implementation)
+     */
+    int i_result;
+
+    p_condvar->i_waiting_threads ++;
+
+    /* Release the mutex */
     vlc_mutex_unlock( p_mutex );
 
-    WaitForSingleObject( *p_condvar, INFINITE );
+    i_result = WaitForSingleObject( p_condvar->signal, INFINITE); 
+
+    /* maybe we should protect this with a mutex ? */
+    p_condvar->i_waiting_threads --;
 
     /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
-    return 0;
+
+    return( i_result == WAIT_FAILED );
 
 #endif
 }
@@ -632,8 +684,7 @@ static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
     return 0;
 
 #elif defined( WIN32 )
-    CloseHandle( *p_condvar );
-    return 0;
+    return( !CloseHandle( p_condvar->signal ) );
 
 #endif    
 }
@@ -642,7 +693,8 @@ static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
  * vlc_thread_create: create a thread
  *****************************************************************************/
 static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
-                                         char *psz_name, vlc_thread_func_t func,
+                                         char *psz_name,
+                                         vlc_thread_func_t func,
                                          void *p_data )
 {
     int i_ret;
@@ -785,4 +837,3 @@ static void *vlc_thread_wrapper( void *p_wrapper )
     return func( p_data );
 }
 #endif
-

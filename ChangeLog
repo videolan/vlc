@@ -3,7 +3,13 @@
 #===================#
 
 HEAD
-
+  * dvdcss_readv() optimisations for Win32.
+  * Fixed _win32_dvdcss_aread() to work around the WinASPI32 64kb transfer
+    size restriction.
+  * New and theoretically better Win32 pthread implementation.
+  * dvd_ifo.c now takes into account error messages from UDFFindFile.
+  * Fixed the "quit" event handling in directx/vout_events.c.
+  * Temporarily disabled aout_Probe() in aout_SDL (libSDL bug).
   * libdvdcss segfault fixes.
   * Tuned constants, since it seems to make people happy.
   * Fixed the "paused movie won't restart" bug.
@@ -22,10 +28,11 @@ HEAD
   * Fixed 2 Win32 bugs in libdvdcss (in _win32_dvdcss_readv), one of them
     should have prevented the Win9x dvd input from working.
   * Moved the "if(Win2k)" out of the loop in _win32_dvdcss_readv.
-  * Put a readv() function in input_iovec.h, the input_es now compiles.
-  * Modified input_ts to use this function.
+  * Put a readv() function in input_iovec.h, the input_es plugin now compiles
+    (Win32).
+  * Modified input_ts to use readv() in input_iovec.h (Win32).
   * Fixed an initialisation bug in vout_directx.c.
-  * Right clicking on the mouse now displays the navigation menu.
+  * Right clicking on the mouse displays the navigation menu (DirectX plugin).
   * Fixed audio/video synchro bug with esd, should fix buggy sound due
     to 44100-48000 Hz conversions.
   * The Win32 GetMessage function has been isolated in a thread. This has

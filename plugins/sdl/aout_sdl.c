@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_sdl.c,v 1.14 2001/07/12 20:44:52 reno Exp $
+ * $Id: aout_sdl.c,v 1.15 2001/07/25 08:41:21 gbazin Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -108,6 +108,7 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Probe( probedata_t *p_data )
 {
+#if 0
     SDL_AudioSpec desired, obtained;
 
     /* Start AudioSDL */
@@ -135,6 +136,7 @@ static int aout_Probe( probedata_t *p_data )
     /* Otherwise, there are good chances we can use this plugin, return 100. */
     intf_DbgMsg( "aout: SDL_OpenAudio successfully run" );
     SDL_CloseAudio();
+#endif
 
     if( TestMethod( AOUT_METHOD_VAR, "sdl" ) )
     {

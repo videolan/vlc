@@ -2,7 +2,7 @@
  * vdec_idct.c : common IDCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_idct.c,v 1.2 2001/07/17 09:48:07 massiot Exp $
+ * $Id: vdec_idct.c,v 1.3 2001/07/25 08:41:21 gbazin Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -33,6 +33,7 @@
  *****************************************************************************/
 #include "defs.h"
 
+#include <stdlib.h>                                              /* malloc() */
 #include <string.h>                                    /* memcpy(), memset() */
 
 #include "config.h"

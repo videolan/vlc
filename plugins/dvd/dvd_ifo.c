@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.34 2001/06/20 07:43:48 sam Exp $
+ * $Id: dvd_ifo.c,v 1.35 2001/07/25 08:41:21 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -121,6 +121,7 @@ int IfoInit( ifo_t * p_ifo )
 
     /* find the start sector of video information on the dvd */
     p_ifo->i_start = UDFFindFile( p_ifo->dvdhandle, "/VIDEO_TS/VIDEO_TS.IFO" );
+    if( !p_ifo->i_start ) return -1;
 
     p_tmp = FillBuffer( p_ifo, p_buf, p_ifo->i_start );
     //i_start = p_ifo->i_pos;
