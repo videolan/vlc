@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.13 2003/06/17 16:09:16 gbazin Exp $
+ * $Id: sap.c,v 1.14 2003/06/18 12:18:51 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -26,7 +26,7 @@
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
-
+ 
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>
 #include <ctype.h>
@@ -61,7 +61,7 @@
 #      include <net/netdb.h>
 #   endif
 #endif
-
+ 
 #ifdef UNDER_CE
 #   define close(a) CloseHandle(a);
 #elif defined( WIN32 )
@@ -77,6 +77,9 @@
 #define HELLO_GROUP "224.2.127.254"
 #define ADD_SESSION 1
 
+#define IPV6_ADDR_1 "FF0"  /* Scope is inserted between them */
+#define IPV6_ADDR_2 "::2:7FFE"
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -88,7 +91,7 @@ static int  Activate     ( vlc_object_t * );
 static void Run          ( intf_thread_t *p_intf );
 static int Kill          ( intf_thread_t * );
 
-static ssize_t NetRead    ( intf_thread_t*, int , byte_t *, size_t );
+static ssize_t NetRead    ( intf_thread_t*, int, int , byte_t *, size_t );
 
 /* playlist related functions */
 static int  sess_toitem( intf_thread_t *, sess_descr_t * );
@@ -137,6 +140,22 @@ vlc_module_begin();
     add_category_hint( N_("SAP"), NULL, VLC_TRUE );
         add_string( "sap-addr", NULL, NULL,
                      "SAP multicast address", "SAP multicast address", VLC_TRUE );
+    
+        add_bool( "no-sap-ipv4", 0 , NULL,
+                     "NO IPv4-SAP listening",
+                     "Set this if you do not want SAP to listen for IPv4 announces",
+                     VLC_TRUE);
+
+        add_bool( "sap-ipv6", 0 , NULL,
+                   "IPv6-SAP listening", 
+                   "Set this if you want SAP to listen for IPv6 announces",
+                   VLC_TRUE);
+
+        add_string( "sap-ipv6-scope", "3" , NULL,
+                    "IPv6-SAP scope",
+                    "Sets the scope for IPv6 announces (default is 3)",
+                    VLC_TRUE);
+
     set_description( _("SAP interface") );
     set_capability( "interface", 0 );
     set_callbacks( Activate, NULL);
@@ -164,41 +183,89 @@ static int Activate( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     char *psz_addr;
+    char *psz_addrv6;
     char *psz_network = NULL;
-    int fd;
-
+    int fd            = - 1;
+    int fdv6          = -1;
+    
+    int no_sap_ipv4      = config_GetInt( p_intf, "no-sap-ipv4" );
+    int sap_ipv6         = config_GetInt( p_intf, "sap-ipv6" );
+    char *sap_ipv6_scope = config_GetPsz( p_intf, "sap-ipv6-scope" );
+    
     char buffer[MAX_SAP_BUFFER + 1];
 
     module_t            *p_network;
     network_socket_t    socket_desc;
 
-    if( !(psz_addr = config_GetPsz( p_intf, "sap-addr" ) ) )
+    if( no_sap_ipv4 == -1 || sap_ipv6 == -1 || sap_ipv6_scope == NULL )
     {
-        psz_addr = strdup( HELLO_GROUP );
-    }
-
-    /* Prepare the network_socket_t structure */
-    socket_desc.i_type = NETWORK_UDP;
-    socket_desc.psz_bind_addr = psz_addr;
-    socket_desc.i_bind_port   = HELLO_PORT;
-    socket_desc.psz_server_addr   = "";
-    socket_desc.i_server_port     = 0;
-    p_intf->p_private = (void*) &socket_desc;
-
-    psz_network = "ipv4"; // FIXME
-
-    /* Create, Bind the socket, ... with the appropriate module  */
-
-    if( !( p_network = module_Need( p_intf, "network", psz_network ) ) )
-    {
-        msg_Warn( p_intf, "failed to open a connection (udp)" );
+        msg_Warn( p_intf, "Unable to parse module configuration" );
         return;
     }
-    module_Unneed( p_intf, p_network );
+    
+    /* Prepare IPv4 Networking */
+    if ( no_sap_ipv4 == 0)
+    {
+        if( !(psz_addr = config_GetPsz( p_intf, "sap-addr" ) ) )
+        { 
+            psz_addr = strdup( HELLO_GROUP );
+        } 
+            
+        /* Prepare the network_socket_t structure */
+        socket_desc.i_type            = NETWORK_UDP;
+        socket_desc.psz_bind_addr     = psz_addr;
+        socket_desc.i_bind_port       = HELLO_PORT;
+        socket_desc.psz_server_addr   = "";
+        socket_desc.i_server_port     = 0;
+        p_intf->p_private = (void*) &socket_desc;
 
-    fd = socket_desc.i_handle;
+        psz_network = "ipv4"; 
 
+       /* Create, Bind the socket, ... with the appropriate module  */
+ 
+        if( !( p_network = module_Need( p_intf, "network", psz_network ) ) )
+        {
+            msg_Warn( p_intf, "failed to open a connection (udp)" );
+            return;
+        }
+        module_Unneed( p_intf, p_network );
 
+        fd = socket_desc.i_handle;
+    }
+
+    /* Prepare IPv6 Networking */
+    if ( sap_ipv6 > 0)
+    {
+        /* Prepare the network_socket_t structure */
+
+        psz_addrv6=(char *)malloc(sizeof(char)*38); 
+        /* Max size of an IPv6 address */
+        
+        sprintf(psz_addrv6,"[%s%c%s]",IPV6_ADDR_1,
+                        sap_ipv6_scope[0],IPV6_ADDR_2);
+        
+        socket_desc.i_type            = NETWORK_UDP;
+        socket_desc.psz_bind_addr     = psz_addrv6;
+        socket_desc.i_bind_port       = HELLO_PORT;
+        socket_desc.psz_server_addr   = "";
+        socket_desc.i_server_port     = 0;
+        p_intf->p_private = (void*) &socket_desc;
+
+        psz_network = "ipv6"; 
+
+       /* Create, Bind the socket, ... with the appropriate module  */
+ 
+        if( !( p_network = module_Need( p_intf, "network", psz_network ) ) )
+        {
+            msg_Warn( p_intf, "failed to open a connection (udp)" );
+            return;
+        }
+        module_Unneed( p_intf, p_network );
+
+        fdv6 = socket_desc.i_handle;
+    }
+
+    
     /* read SAP packets */
     while( !p_intf->b_die )
     {
@@ -206,7 +273,7 @@ static void Run( intf_thread_t *p_intf )
 
         //memset( buffer, 0, MAX_SAP_BUFFER + 1);
 
-        i_read = NetRead( p_intf, fd, buffer, MAX_SAP_BUFFER );
+        i_read = NetRead( p_intf, fd, fdv6, buffer, MAX_SAP_BUFFER );
 
         if( i_read < 0 )
         {
@@ -676,8 +743,7 @@ static int ismult( char *psz_uri )
 
     i_value = strtol( psz_uri, &psz_end, 0 );
 
-    /* FIXME: This is an ugly way to detect IPv6 and to say that this is
-multicast */
+    /* FIXME: This is an ugly way to detect IPv6 multicast */
     if( psz_uri[0] == '[') { return( VLC_TRUE ); } 
 
     if( *psz_end != '.' ) { return( VLC_FALSE ); }
@@ -691,7 +757,8 @@ multicast */
  * Taken from udp.c
  ******************************************************************************/
 static ssize_t NetRead( intf_thread_t *p_intf,
-                        int i_handle, byte_t *p_buffer, size_t i_len)
+                        int i_handle, int i_handle_v6, 
+                        byte_t *p_buffer, size_t i_len)
 {
 #ifdef UNDER_CE
     return -1;
@@ -700,17 +767,29 @@ static ssize_t NetRead( intf_thread_t *p_intf,
     struct timeval  timeout;
     fd_set          fds;
     int             i_ret;
+    int             i_max_handle;
 
+    ssize_t i_recv=-1;
+    
+    /* Get the max handle for select */
+    if( i_handle_v6 > i_handle )
+        i_max_handle = i_handle_v6;
+    else
+        i_max_handle = i_handle;
+
+    
     /* Initialize file descriptor set */
     FD_ZERO( &fds );
-    FD_SET( i_handle, &fds );
+    if(   i_handle > 0   ) FD_SET( i_handle, &fds );
+    if( i_handle_v6  > 0 ) FD_SET( i_handle_v6, &fds);
+
 
     /* We'll wait 0.5 second if nothing happens */
     timeout.tv_sec = 0;
     timeout.tv_usec = 500000;
 
     /* Find if some data is available */
-    i_ret = select( i_handle + 1, &fds,
+    i_ret = select( i_max_handle + 1, &fds,
     NULL, NULL, &timeout );
 
     if( i_ret == -1 && errno != EINTR )
@@ -718,14 +797,27 @@ static ssize_t NetRead( intf_thread_t *p_intf,
         msg_Err( p_intf, "network select error (%s)", strerror(errno) );
     }
     else if( i_ret > 0 )
-    {
-        ssize_t i_recv = recv( i_handle, p_buffer, i_len, 0 );
-
-        if( i_recv < 0 )
+   {
+      /* Get the data */     
+      if(i_handle >0)
+      {
+         if(FD_ISSET( i_handle, &fds ))
+         {
+             i_recv = recv( i_handle, p_buffer, i_len, 0 );
+         }
+      }
+      if(i_handle_v6 >0)
+      {
+         if(FD_ISSET( i_handle_v6, &fds ))
+         {
+            i_recv = recv( i_handle_v6, p_buffer, i_len, 0 );
+         }
+      }
+      
+       if( i_recv < 0 )
         {
            msg_Err( p_intf, "recv failed (%s)", strerror(errno) );
         }
-
         return i_recv;
     }
 
