@@ -47,7 +47,7 @@ CONFIG_FLAGS += \
 	--enable-mkv \
 	--enable-v4l \
 	--enable-pvr \
-	--enable-speex \
+	--disable-speex \
 	--enable-caca \
 	--enable-livedotcom \
 	--enable-libmpeg2 \
@@ -57,6 +57,7 @@ CONFIG_FLAGS += \
 	--enable-mod \
 	--enable-theora \
 	--enable-modplug \
+	--enable-dvdnav \
 	$(NULL)
 
 # These ones are currently shipped with VLC

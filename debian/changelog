@@ -1,3 +1,14 @@
+vlc (0.8.0-test1-1) unstable; urgency=high
+
+  * New upstream tarball.
+  * debian/rules:
+    + Fixed previously broken DVD support.
+    + Removed currently broken Speex support.
+  * debian/control:
+    + Build-depend on libdvdnav.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sat,  4 Sep 2004 02:32:49 +0200
+
 vlc (0.7.2.svn20040827-1) unstable; urgency=high
 
   * New SVN snapshot.
