@@ -436,3 +436,10 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<BeKavlie> seriously though, out of curiosity: why are people working on
+           VideoLAN?  It can't be to keep us BeOS people happy  ;-)
+<jlj> world domination
+<jlj> didn't you get the memo ?
+
+  -- #videolan
+%

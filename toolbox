@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for vlc, the VideoLAN Client
-##  $Id: toolbox,v 1.7 2003/01/28 20:02:03 sam Exp $
+##  $Id: toolbox,v 1.8 2003/01/29 18:10:52 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -22,7 +22,7 @@ help()
 recognized flags are:
   --update-vc     update Microsoft Visual Studio files
   --update-po     update translation files
-  --fix-glade     fix Glade-generated files
+  --update-glade  generate and fix Glade code
 EOF
   exit 1
 }
@@ -44,7 +44,7 @@ while test $# -gt 0; do
       do_help=no
       do_po=yes
       ;;
-    --fix-glade)
+    --update-glade|--fix-glade)
       do_help=no
       do_glade=yes
       ;;

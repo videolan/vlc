@@ -1629,20 +1629,20 @@ create_intf_open (void)
   GtkWidget *open_browse;
   GtkWidget *open_file;
   GtkWidget *table5;
-  GtkWidget *label21;
-  GtkWidget *label20;
-  GtkObject *disc_chapter_adj;
-  GtkWidget *disc_chapter;
   GtkWidget *label35;
   GtkWidget *hbox24;
   GSList *disc_group = NULL;
   GtkWidget *disc_dvd;
   GtkWidget *disc_vcd;
-  GtkWidget *disc_dvd_use_menu;
   GtkWidget *label19;
+  GtkWidget *disc_chapter_label;
+  GtkWidget *disc_title_label;
+  GtkWidget *disc_name;
   GtkObject *disc_title_adj;
   GtkWidget *disc_title;
-  GtkWidget *disc_name;
+  GtkObject *disc_chapter_adj;
+  GtkWidget *disc_chapter;
+  GtkWidget *disc_dvd_use_menu;
   GtkWidget *open_disc;
   GtkWidget *table4;
   GSList *table4_group = NULL;
@@ -1829,7 +1829,7 @@ create_intf_open (void)
   gtk_widget_show (open_file);
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (open_notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (open_notebook), 0), open_file);
 
-  table5 = gtk_table_new (4, 2, FALSE);
+  table5 = gtk_table_new (5, 2, FALSE);
   gtk_widget_ref (table5);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "table5", table5,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1838,36 +1838,6 @@ create_intf_open (void)
   gtk_container_set_border_width (GTK_CONTAINER (table5), 5);
   gtk_table_set_row_spacings (GTK_TABLE (table5), 5);
   gtk_table_set_col_spacings (GTK_TABLE (table5), 5);
-
-  label21 = gtk_label_new (_("Title"));
-  gtk_widget_ref (label21);
-  gtk_object_set_data_full (GTK_OBJECT (intf_open), "label21", label21,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label21);
-  gtk_table_attach (GTK_TABLE (table5), label21, 0, 1, 2, 3,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label21), 0, 0.5);
-
-  label20 = gtk_label_new (_("Chapter"));
-  gtk_widget_ref (label20);
-  gtk_object_set_data_full (GTK_OBJECT (intf_open), "label20", label20,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label20);
-  gtk_table_attach (GTK_TABLE (table5), label20, 0, 1, 3, 4,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
-  gtk_misc_set_alignment (GTK_MISC (label20), 0, 0.5);
-
-  disc_chapter_adj = gtk_adjustment_new (0, 0, 65536, 1, 10, 10);
-  disc_chapter = gtk_spin_button_new (GTK_ADJUSTMENT (disc_chapter_adj), 1, 0);
-  gtk_widget_ref (disc_chapter);
-  gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_chapter", disc_chapter,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (disc_chapter);
-  gtk_table_attach (GTK_TABLE (table5), disc_chapter, 1, 2, 3, 4,
-                    (GtkAttachOptions) (GTK_FILL),
-                    (GtkAttachOptions) (0), 0, 0);
 
   label35 = gtk_label_new (_("Disc type"));
   gtk_widget_ref (label35);
@@ -1904,14 +1874,6 @@ create_intf_open (void)
   gtk_widget_show (disc_vcd);
   gtk_box_pack_start (GTK_BOX (hbox24), disc_vcd, FALSE, FALSE, 0);
 
-  disc_dvd_use_menu = gtk_check_button_new_with_label (_("Use DVD menus"));
-  gtk_widget_ref (disc_dvd_use_menu);
-  gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_dvd_use_menu", disc_dvd_use_menu,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (disc_dvd_use_menu);
-  gtk_box_pack_start (GTK_BOX (hbox24), disc_dvd_use_menu, FALSE, FALSE, 0);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (disc_dvd_use_menu), TRUE);
-
   label19 = gtk_label_new (_("Device name"));
   gtk_widget_ref (label19);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "label19", label19,
@@ -1920,16 +1882,27 @@ create_intf_open (void)
   gtk_table_attach (GTK_TABLE (table5), label19, 0, 1, 1, 2,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label19), 0, 0.5);
 
-  disc_title_adj = gtk_adjustment_new (0, 0, 65536, 1, 10, 10);
-  disc_title = gtk_spin_button_new (GTK_ADJUSTMENT (disc_title_adj), 1, 0);
-  gtk_widget_ref (disc_title);
-  gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_title", disc_title,
+  disc_chapter_label = gtk_label_new (_("Chapter"));
+  gtk_widget_ref (disc_chapter_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_chapter_label", disc_chapter_label,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (disc_title);
-  gtk_table_attach (GTK_TABLE (table5), disc_title, 1, 2, 2, 3,
+  gtk_widget_show (disc_chapter_label);
+  gtk_table_attach (GTK_TABLE (table5), disc_chapter_label, 0, 1, 4, 5,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (disc_chapter_label), 0, 0.5);
+
+  disc_title_label = gtk_label_new (_("Title"));
+  gtk_widget_ref (disc_title_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_title_label", disc_title_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_title_label);
+  gtk_table_attach (GTK_TABLE (table5), disc_title_label, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (disc_title_label), 0, 0.5);
 
   disc_name = gtk_entry_new ();
   gtk_widget_ref (disc_name);
@@ -1940,6 +1913,35 @@ create_intf_open (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
   gtk_entry_set_text (GTK_ENTRY (disc_name), "/dev/dvd");
+
+  disc_title_adj = gtk_adjustment_new (1, 1, 65536, 1, 10, 10);
+  disc_title = gtk_spin_button_new (GTK_ADJUSTMENT (disc_title_adj), 1, 0);
+  gtk_widget_ref (disc_title);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_title", disc_title,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_title);
+  gtk_table_attach (GTK_TABLE (table5), disc_title, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  disc_chapter_adj = gtk_adjustment_new (1, 1, 65536, 1, 10, 10);
+  disc_chapter = gtk_spin_button_new (GTK_ADJUSTMENT (disc_chapter_adj), 1, 0);
+  gtk_widget_ref (disc_chapter);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_chapter", disc_chapter,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_chapter);
+  gtk_table_attach (GTK_TABLE (table5), disc_chapter, 1, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  disc_dvd_use_menu = gtk_check_button_new_with_label (_("Use DVD menus"));
+  gtk_widget_ref (disc_dvd_use_menu);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "disc_dvd_use_menu", disc_dvd_use_menu,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_dvd_use_menu);
+  gtk_table_attach (GTK_TABLE (table5), disc_dvd_use_menu, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
 
   open_disc = gtk_label_new (_("Disc"));
   gtk_widget_ref (open_disc);
@@ -2420,22 +2422,22 @@ create_intf_open (void)
   gtk_signal_connect (GTK_OBJECT (open_browse), "clicked",
                       GTK_SIGNAL_FUNC (GtkFileShow),
                       "entry_file");
-  gtk_signal_connect (GTK_OBJECT (disc_chapter), "changed",
-                      GTK_SIGNAL_FUNC (GtkOpenChanged),
-                      NULL);
   gtk_signal_connect (GTK_OBJECT (disc_dvd), "toggled",
                       GTK_SIGNAL_FUNC (GtkDiscOpenDvd),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (disc_vcd), "toggled",
                       GTK_SIGNAL_FUNC (GtkDiscOpenVcd),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (disc_dvd_use_menu), "toggled",
+  gtk_signal_connect (GTK_OBJECT (disc_name), "changed",
                       GTK_SIGNAL_FUNC (GtkOpenChanged),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (disc_title), "changed",
                       GTK_SIGNAL_FUNC (GtkOpenChanged),
                       NULL);
-  gtk_signal_connect (GTK_OBJECT (disc_name), "changed",
+  gtk_signal_connect (GTK_OBJECT (disc_chapter), "changed",
+                      GTK_SIGNAL_FUNC (GtkOpenChanged),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (disc_dvd_use_menu), "toggled",
                       GTK_SIGNAL_FUNC (GtkOpenChanged),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (network_udp), "toggled",

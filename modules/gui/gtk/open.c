@@ -2,16 +2,16 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.12 2003/01/29 17:28:22 gbazin Exp $
+ * $Id: open.c,v 1.13 2003/01/29 18:10:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -177,12 +177,18 @@ void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
 static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
 {
     GString * p_target = g_string_new( "" );
-    int i_title, i_chapter;
+    GtkWidget * p_open;
+    vlc_bool_t b_menus = VLC_FALSE;
 
-    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button), 
+    p_open = gtk_widget_get_toplevel( GTK_WIDGET (button) );
+
+    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                           "disc_dvd" ) )->active )
     {
-        if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button), "disc_dvd_use_menu" ) )->active )
+        b_menus = GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                               "disc_dvd_use_menu" ) )->active;
+
+        if( b_menus )
         {
             g_string_append( p_target, "dvd://" );
         }
@@ -195,30 +201,31 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
                                                "disc_vcd" ) )->active )
     {
         g_string_append( p_target, "vcd://" );
-    }       
+    }
 
     g_string_append( p_target,
                      gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                      GTK_WIDGET(button), "disc_name" ) ) ) );
 
-    i_title = gtk_spin_button_get_value_as_int(
-                  GTK_SPIN_BUTTON( lookup_widget( GTK_WIDGET(button),
-                                                  "disc_title" ) ) );
-    i_chapter = gtk_spin_button_get_value_as_int(
-                    GTK_SPIN_BUTTON( lookup_widget( GTK_WIDGET(button),
-                                                    "disc_chapter" ) ) );
-    if( i_title )
+    if( !b_menus )
     {
-        if( i_chapter )
-            g_string_sprintfa( p_target, "@%i,%i", i_title, i_chapter );
-        else
-            g_string_sprintfa( p_target, "@%i", i_title );
+        g_string_sprintfa( p_target, "@%i,%i",
+                           gtk_spin_button_get_value_as_int(
+                                GTK_SPIN_BUTTON( lookup_widget(
+                                    GTK_WIDGET(button), "disc_title" ) ) ),
+                           gtk_spin_button_get_value_as_int(
+                                GTK_SPIN_BUTTON( lookup_widget(
+                                    GTK_WIDGET(button), "disc_chapter" ) ) ) );
     }
-    else
-    {
-        if( i_chapter )
-            g_string_sprintfa( p_target, "@,%i", i_chapter );
-    }
+
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
+                    "disc_title_label" ), !b_menus );
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
+                    "disc_title" ), !b_menus );
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
+                    "disc_chapter_label" ), !b_menus );
+    gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
+                    "disc_chapter" ), !b_menus );
 
     gtk_entry_set_text( GTK_ENTRY( lookup_widget(
                                    GTK_WIDGET(button), "entry_open" ) ),
@@ -383,7 +390,7 @@ void GtkNetworkOpenChannel( GtkToggleButton *togglebutton,
 
 void GtkNetworkOpenHTTP( GtkToggleButton *togglebutton,
                                          gpointer user_data )
-{   
+{
     GtkWidget *     p_open;
 
     p_open = gtk_widget_get_toplevel( GTK_WIDGET (togglebutton) );
@@ -420,7 +427,7 @@ static void GtkSatOpenChanged( GtkWidget * button, gpointer user_data )
                                   GTK_WIDGET(button), "sat_freq" ) ) ),
                        !GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET( button ),
                                                "sat_pol_vert" ) )->active,
-                       strtol( gtk_entry_get_text( GTK_ENTRY( GTK_COMBO( 
+                       strtol( gtk_entry_get_text( GTK_ENTRY( GTK_COMBO(
                                lookup_widget( GTK_WIDGET( button ), "sat_fec" )
                                )->entry ) ), NULL, 10 ),
                        gtk_spin_button_get_value_as_int(
@@ -690,7 +697,7 @@ void GtkOpenOk( GtkButton * button, gpointer user_data )
             gtk_widget_hide( GTK_WIDGET( p_channel ) );
         }
     }
-    
+
 }
 
 void GtkOpenCancel( GtkButton * button, gpointer user_data )
