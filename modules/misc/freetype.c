@@ -203,11 +203,12 @@ static int Create( vlc_object_t *p_this )
     
     for( i = 0; i < 256; i++ )
     {
-        double f_i_norm = (double)i/ 255.0;
+        double f_i_norm, f_pow, f_res;
+        f_i_norm = (double)i/ 255.0;
         msg_Dbg( p_filter, "i_norm: %f", f_i_norm );
-        double f_pow = pow( f_i_norm, 0.5f );
+        f_pow = pow( f_i_norm, 0.5f );
         msg_Dbg( p_filter, "pow: %f", f_pow );
-        double f_res = f_pow * 255.0;
+        f_res = f_pow * 255.0;
         msg_Dbg( p_filter, "res: %f", f_res );
         p_sys->pi_gamma[i] = (uint8_t)f_res;
         msg_Dbg( p_filter, "%d", p_sys->pi_gamma[i] );
