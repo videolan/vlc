@@ -349,6 +349,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'W', 'M', 'V', '1' ):
         case VLC_FOURCC( 'W', 'M', 'V', '2' ):
         case VLC_FOURCC( 'W', 'M', 'V', '3' ):
+        case VLC_FOURCC( 'S', 'N', 'O', 'W' ):
             p_stream->p_oggds_header = malloc( sizeof(oggds_header_t) );
             memset( p_stream->p_oggds_header, 0, sizeof(oggds_header_t) );
             p_stream->p_oggds_header->i_packet_type = PACKET_TYPE_HEADER;
