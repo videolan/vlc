@@ -141,7 +141,8 @@ static int InitThread( spudec_thread_t *p_spudec )
     }
 
     p_spudec->bit_stream.p_ts = DECODER_FIFO_START( p_spudec->fifo )->p_first_ts;
-    p_spudec->bit_stream.i_byte = p_spudec->bit_stream.p_ts->i_payload_start;
+    p_spudec->bit_stream.p_byte = p_spudec->bit_stream.p_ts->buffer + p_spudec->bit_stream.p_ts->i_payload_start;
+    p_spudec->bit_stream.p_end = p_spudec->bit_stream.p_ts->buffer + p_spudec->bit_stream.p_ts->i_payload_end;
     vlc_mutex_unlock( &p_spudec->fifo.data_lock );
 
     /* Mark thread as running and return */

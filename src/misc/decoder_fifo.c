@@ -71,5 +71,6 @@ void decoder_fifo_next( bit_stream_t * p_bit_stream )
     } while ( p_bit_stream->p_ts->i_payload_start == p_bit_stream->p_ts->i_payload_end );
 
     /* We've found a TS packet which contains interesting data... */
-    p_bit_stream->i_byte = p_bit_stream->p_ts->i_payload_start;
+    p_bit_stream->p_byte = p_bit_stream->p_ts->buffer + p_bit_stream->p_ts->i_payload_start;
+    p_bit_stream->p_end = p_bit_stream->p_ts->buffer + p_bit_stream->p_ts->i_payload_end;
 }

@@ -177,7 +177,8 @@ static int InitThread( ac3dec_thread_t * p_ac3dec )
         vlc_cond_wait( &p_ac3dec->fifo.data_wait, &p_ac3dec->fifo.data_lock );
     }
     p_ac3dec->bit_stream.p_ts = DECODER_FIFO_START( p_ac3dec->fifo )->p_first_ts;
-    p_ac3dec->bit_stream.i_byte = p_ac3dec->bit_stream.p_ts->i_payload_start;
+    p_ac3dec->bit_stream.p_byte = p_ac3dec->bit_stream.p_ts->buffer + p_ac3dec->bit_stream.p_ts->i_payload_start;
+    p_ac3dec->bit_stream.p_end = p_ac3dec->bit_stream.p_ts->buffer + p_ac3dec->bit_stream.p_ts->i_payload_end;
     vlc_mutex_unlock( &p_ac3dec->fifo.data_lock );
 
     aout_fifo.i_type = AOUT_ADEC_STEREO_FIFO;

@@ -22,7 +22,7 @@ AUDIO += dummy
 
 # Video output settings
 VIDEO = x11
-VIDEO += fb
+#VIDEO += fb
 #VIDEO += ggi
 #VIDEO += glide
 # Not yet supported

@@ -80,8 +80,10 @@ typedef struct bit_stream_s
      */
     /* Current TS packet (in the current PES packet of the PES stream) */
     ts_packet_t *       p_ts;
-    /* Index of the next byte that is to be read (in the current TS packet) */
-    unsigned int        i_byte;
+    /* Pointer to the next byte that is to be read (in the current TS packet) */
+    byte_t *            p_byte;
+    /* Pointer to the last byte that is to be read (in the current TS packet */
+    byte_t *            p_end;
 
     /*
      * Bit structures
@@ -98,13 +100,14 @@ void decoder_fifo_next( bit_stream_t * p_bit_stream );
 static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
 {
     /* Are there some bytes left in the current TS packet ? */
-    if ( p_bit_stream->i_byte >= p_bit_stream->p_ts->i_payload_end )
+    /* could change this test to have a if (! (bytes--)) instead */
+    if ( p_bit_stream->p_byte >= p_bit_stream->p_end )
     {
 	/* no, switch to next TS packet */
 	decoder_fifo_next( p_bit_stream );
     }
 
-    return( p_bit_stream->p_ts->buffer[ p_bit_stream->i_byte++ ] );
+    return( *(p_bit_stream->p_byte++));
 }
 
 /*****************************************************************************

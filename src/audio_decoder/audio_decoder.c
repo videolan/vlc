@@ -721,7 +721,8 @@ static int InitThread( adec_thread_t * p_adec )
         vlc_cond_wait( &p_adec->fifo.data_wait, &p_adec->fifo.data_lock );
     }
     p_adec->bit_stream.p_ts = DECODER_FIFO_START( p_adec->fifo )->p_first_ts;
-    p_adec->bit_stream.i_byte = p_adec->bit_stream.p_ts->i_payload_start;
+    p_adec->bit_stream.p_byte = p_adec->bit_stream.p_ts->buffer + p_adec->bit_stream.p_ts->i_payload_start;
+    p_adec->bit_stream.p_end = p_adec->bit_stream.p_ts->buffer + p_adec->bit_stream.p_ts->i_payload_end;
     vlc_mutex_unlock( &p_adec->fifo.data_lock );
 
     /* Now we look for an audio frame header in the input stream */

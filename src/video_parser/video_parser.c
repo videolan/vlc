@@ -181,7 +181,8 @@ static int InitThread( vpar_thread_t *p_vpar )
         vlc_cond_wait( &p_vpar->fifo.data_wait, &p_vpar->fifo.data_lock );
     }
     p_vpar->bit_stream.p_ts = DECODER_FIFO_START( p_vpar->fifo )->p_first_ts;
-    p_vpar->bit_stream.i_byte = p_vpar->bit_stream.p_ts->i_payload_start;
+    p_vpar->bit_stream.p_byte = p_vpar->bit_stream.p_ts->buffer + p_vpar->bit_stream.p_ts->i_payload_start;
+    p_vpar->bit_stream.p_end = p_vpar->bit_stream.p_ts->buffer + p_vpar->bit_stream.p_ts->i_payload_end;
     vlc_mutex_unlock( &p_vpar->fifo.data_lock );
 
     /* Initialize parsing data */
