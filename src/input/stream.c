@@ -100,7 +100,8 @@ stream_t *input_StreamNew( input_thread_t *p_input )
         s->pf_peek   = IStreamPeek;
         s->pf_control= IStreamControl;
 
-        p_sys = (input_stream_sys_t*)s->p_sys = malloc( sizeof( input_stream_sys_t ) );
+        s->p_sys = malloc( sizeof( input_stream_sys_t ) );
+        p_sys = (input_stream_sys_t*)s->p_sys;
         p_sys->p_input = p_input;
     }
     return s;
@@ -358,7 +359,8 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, char *psz_demux, es_out_t *out
     s->pf_peek   = DStreamPeek;
     s->pf_control= DStreamControl;
 
-    p_sys = (d_stream_sys_t*)s->p_sys = malloc( sizeof( d_stream_sys_t) );
+    s->p_sys = malloc( sizeof( d_stream_sys_t) );
+    p_sys = (d_stream_sys_t*)s->p_sys;
 
     vlc_mutex_init( s, &p_sys->lock );
     p_sys->i_buffer = 0;

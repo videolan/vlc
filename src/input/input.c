@@ -497,6 +497,11 @@ static int RunThread( input_thread_t *p_input )
                         subtitle_Seek( p_input->p_sys->sub[i], i_time );
                     }
                 }
+                if( !demux_Control( p_input, DEMUX_GET_POSITION, &f ) )
+                {
+                    val.f_float = (float)f;
+                    var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
+                }
                 vlc_mutex_lock( &p_input->stream.stream_lock );
             }
             p_input->stream.p_selected_area->i_seek = NO_SEEK;
