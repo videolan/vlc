@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.28 2003/01/04 16:27:49 gbazin Exp $
+ * $Id: output.c,v 1.29 2003/01/20 10:59:29 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -89,7 +89,9 @@ int aout_OutputNew( aout_instance_t * p_aout,
         }
         free( val.psz_string );
     }
-    else if ( p_aout->output.output.i_physical_channels == AOUT_CHAN_CENTER )
+    else if ( p_aout->output.output.i_physical_channels == AOUT_CHAN_CENTER
+              && (p_aout->output.output.i_original_channels
+                   & AOUT_CHAN_PHYSMASK) == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     {
         /* Mono - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
@@ -112,8 +114,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
     }
     else if ( p_aout->output.output.i_physical_channels ==
                  (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
-              && p_aout->output.output.i_original_channels ==
-                 (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
+              && (p_aout->output.output.i_original_channels
+                   & AOUT_CHAN_PHYSMASK) == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     {
         /* Stereo - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
