@@ -2,7 +2,7 @@
  * ipv4.c: IPv4 network abstraction layer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ipv4.c,v 1.21 2004/01/15 13:47:01 fenrir Exp $
+ * $Id: ipv4.c,v 1.22 2004/01/15 14:57:00 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Mathias Kretschmer <mathias@research.att.com>
@@ -411,18 +411,16 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
         goto error;
     }
 
-    /* We need errno to use non blocking connect */
-#ifdef HAVE_ERRNO_H
-    /* set to non-blocking */
+    /* Set to non-blocking */
 #if defined( WIN32 ) || defined( UNDER_CE )
     {
         unsigned long i_dummy = 1;
-        if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
+        if( ioctlsocket( i_handle, FIONBIO, &i_dummy ) != 0 )
         {
-            msg_Err( p_httpt, "cannot set socket to non-blocking mode" );
+            msg_Err( p_this, "cannot set socket to non-blocking mode" );
         }
     }
-#else
+#elif defined( HAVE_ERRNO_H )
     {
         int i_flags;
         if( ( i_flags = fcntl( i_handle, F_GETFL, 0 ) ) < 0 ||
@@ -432,13 +430,17 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
         }
     }
 #endif
-#endif
 
     /* Connect the socket */
     if( connect( i_handle, (struct sockaddr *) &sock, sizeof( sock ) ) == -1 )
     {
-#ifdef HAVE_ERRNO_H
+#if defined( WIN32 ) || defined( UNDER_CE )
+        if( WSAGetLastError() == WSAEWOULDBLOCK )
+#elif defined( HAVE_ERRNO_H )
         if( errno == EINPROGRESS )
+#else
+        if( 0 )
+#endif
         {
             int i_ret;
             int i_opt;
@@ -462,15 +464,25 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
                 /* We'll wait 0.1 second if nothing happens */
                 timeout.tv_sec = 0;
                 timeout.tv_usec = 100000;
-            } while( ( i_ret = select( i_handle + 1, NULL, &fds, NULL, &timeout )) == 0 ||
+
+            } while( ( i_ret = select( i_handle + 1, NULL, &fds, NULL,
+                                       &timeout ) ) == 0 ||
+#if defined( WIN32 ) || defined( UNDER_CE )
+                     ( i_ret < 0 && WSAGetLastError() == WSAEWOULDBLOCK ) );
+#elif defined( HAVE_ERRNO_H )
                      ( i_ret < 0 && errno == EINTR ) );
+#else
+                     ( i_ret < 0 ) );
+#endif
+
             if( i_ret < 0 )
             {
                 msg_Warn( p_this, "cannot connect socket (select failed)" );
                 goto error;
             }
-            if( getsockopt( i_handle, SOL_SOCKET, SO_ERROR, (void*)&i_opt, &i_opt_size ) == -1 ||
-                i_opt != 0 )
+
+            if( getsockopt( i_handle, SOL_SOCKET, SO_ERROR, (void*)&i_opt,
+                            &i_opt_size ) == -1 || i_opt != 0 )
             {
                 msg_Warn( p_this, "cannot connect socket (SO_ERROR)" );
                 goto error;
@@ -478,13 +490,13 @@ static int OpenTCP( vlc_object_t * p_this, network_socket_t * p_socket )
         }
         else
         {
+#if defined( HAVE_ERRNO_H )
             msg_Warn( p_this, "cannot connect socket (%s)", strerror(errno) );
+#else
+            msg_Warn( p_this, "cannot connect socket" );
+#endif
             goto error;
         }
-#else
-        msg_Warn( p_this, "cannot connect socket" );
-        goto error;
-#endif
     }
 
     p_socket->i_handle = i_handle;
