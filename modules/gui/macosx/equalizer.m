@@ -284,6 +284,7 @@ static vlc_bool_t GetFiltersStatus( intf_thread_t *p_intf,
     for( i = 0; i < 10; i++ )
         sprintf( psz_values, "%s %.1f", psz_values, eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[i] );
     var_SetString( p_object, "equalizer-bands", psz_values );
+    var_SetFloat( p_object, "equalizer-preamp", eqz_preset_10b[[sender indexOfSelectedItem]]->f_preamp);
 
     [o_slider_preamp setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_preamp];
     [o_slider_band1 setFloatValue: eqz_preset_10b[[sender indexOfSelectedItem]]->f_amp[0]];
