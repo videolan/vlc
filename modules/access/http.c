@@ -2,7 +2,7 @@
  * http.c: HTTP input module
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.59 2004/02/24 16:31:46 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -572,7 +572,7 @@ static int Connect( input_thread_t *p_input, vlc_bool_t *pb_seekable,
         b64 = b64_encode( buf );
 
         net_Printf( VLC_OBJECT(p_input), p_sys->fd,
-                    "Authorization: Basic %s", b64 );
+                    "Authorization: Basic %s\r\n", b64 );
         free( b64 );
     }
     net_Printf( VLC_OBJECT(p_input), p_sys->fd, "Connection: Close\r\n" );
