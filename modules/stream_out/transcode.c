@@ -27,6 +27,7 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
@@ -671,7 +672,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         if( p_sys->f_fps > 0 )
         {
-            id->p_encoder->fmt_out.video.i_frame_rate = p_sys->f_fps * 1000;
+            id->p_encoder->fmt_out.video.i_frame_rate = nearbyint(p_sys->f_fps * 1000) ;
             id->p_encoder->fmt_out.video.i_frame_rate_base = 1000;
         }
     }
@@ -1363,7 +1364,6 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
         id->p_encoder->fmt_out.video.i_frame_rate;
     id->p_encoder->fmt_in.video.i_frame_rate_base =
         id->p_encoder->fmt_out.video.i_frame_rate_base;
-
     date_Init( &id->interpolated_pts,
                id->p_encoder->fmt_out.video.i_frame_rate,
                id->p_encoder->fmt_out.video.i_frame_rate_base );
