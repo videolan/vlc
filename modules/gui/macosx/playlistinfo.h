@@ -35,8 +35,8 @@
     IBOutlet id o_uri_txt;
     IBOutlet id o_title_txt;
     IBOutlet id o_author_txt;
-    IBOutlet id o_btn_info_ok;
-    IBOutlet id o_btn_info_cancel;
+    IBOutlet id o_btn_ok;
+    IBOutlet id o_btn_cancel;
     IBOutlet id o_btn_delete_group;
     IBOutlet id o_btn_add_group;
     IBOutlet id o_outline_view;

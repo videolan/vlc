@@ -61,8 +61,8 @@
     [o_uri_lbl setStringValue: _NS("URI")];
     [o_title_lbl setStringValue: _NS("Title")];
     [o_author_lbl setStringValue: _NS("Author")];
-    [o_btn_info_ok setTitle: _NS("OK")];
-    [o_btn_info_cancel setTitle: _NS("Cancel")];
+    [o_btn_ok setTitle: _NS("OK")];
+    [o_btn_cancel setTitle: _NS("Cancel")];
     [o_btn_delete_group setTitle: _NS("Delete Group")];
     [o_btn_add_group setTitle: _NS("Add Group")];
     [o_group_lbl setStringValue: _NS("Group")];
