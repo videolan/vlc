@@ -240,6 +240,7 @@ typedef struct es_out_t     es_out_t;
 typedef struct es_out_id_t  es_out_id_t;
 typedef struct es_out_sys_t es_out_sys_t;
 typedef struct demux_t  demux_t;
+typedef struct access_t access_t;
 
 /* Audio */
 typedef struct aout_instance_t aout_instance_t;

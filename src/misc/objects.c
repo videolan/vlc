@@ -132,6 +132,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof(demux_t);
             psz_type = "demux";
             break;
+        case VLC_OBJECT_ACCESS:
+            i_size = sizeof(access_t);
+            psz_type = "access";
+            break;
         case VLC_OBJECT_DECODER:
             i_size = sizeof(decoder_t);
             psz_type = "decoder";

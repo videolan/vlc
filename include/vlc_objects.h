@@ -50,6 +50,7 @@
 #define VLC_OBJECT_VLM        (-16)
 #define VLC_OBJECT_ANNOUNCE   (-17)
 #define VLC_OBJECT_DEMUX      (-18)
+#define VLC_OBJECT_ACCESS     (-19)
 
 #define VLC_OBJECT_GENERIC  (-666)
 

@@ -300,6 +300,7 @@ struct input_thread_t
     int           (* pf_set_program )( input_thread_t *, pgrm_descriptor_t * );
     int           (* pf_set_area )( input_thread_t *, input_area_t * );
     void          (* pf_seek ) ( input_thread_t *, off_t );
+    int           (* pf_access_control )( input_thread_t *, int, va_list );
     access_sys_t *   p_access_data;
     size_t           i_mtu;
     int              i_pts_delay;                        /* internal caching */

@@ -46,7 +46,7 @@ struct es_out_id_t
 struct es_out_sys_t
 {
     input_thread_t *p_input;
-    vlc_bool_t      b_pcr_set;
+    vlc_bool_t      b_convert_ts_auto;  /* automatically convert TimeStamp */
 
     /* all es */
     int         i_id;
@@ -99,7 +99,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input )
     out->p_sys      = p_sys;
 
     p_sys->p_input = p_input;
-    p_sys->b_pcr_set = VLC_FALSE;
+    p_sys->b_convert_ts_auto = VLC_TRUE;
 
     p_sys->b_active = VLC_FALSE;
     p_sys->i_mode   = ES_OUT_MODE_AUTO;
@@ -159,7 +159,7 @@ void input_EsOutDelete( es_out_t *out )
 static pgrm_descriptor_t *EsOutAddProgram( es_out_t *out, int i_group )
 {
     input_thread_t    *p_input = out->p_sys->p_input;
-    pgrm_descriptor_t *p_prgm;
+    pgrm_descriptor_t *p_pgrm;
     es_descriptor_t   *p_pmt;
 
     /* FIXME we should use a object variable but a lot of place in src/input
@@ -167,23 +167,23 @@ static pgrm_descriptor_t *EsOutAddProgram( es_out_t *out, int i_group )
     int               i_select = config_GetInt( p_input, "program" );
 
     /* create it */
-    p_prgm = input_AddProgram( p_input, i_group, 0 );
+    p_pgrm = input_AddProgram( p_input, i_group, 0 );
 
     /* XXX welcome to kludge, add a dummy es, if you want to understand
      * why have a look at input_SetProgram. Basicaly, it assume the first
      * es to be the PMT, how that is stupid, nevertheless it is needed for
      * the old ts demuxer */
-    p_pmt = input_AddES( p_input, p_prgm, 0, UNKNOWN_ES, NULL, 0 );
+    p_pmt = input_AddES( p_input, p_pgrm, 0, UNKNOWN_ES, NULL, 0 );
     p_pmt->i_fourcc = VLC_FOURCC( 'n', 'u', 'l', 'l' );
 
     /* Select i_select or the first by default */
     if( p_input->stream.p_selected_program == NULL &&
         ( i_select <= 0 || i_select == i_group ) )
     {
-        p_input->stream.p_selected_program = p_prgm;
+        p_input->stream.p_selected_program = p_pgrm;
     }
 
-    return p_prgm;
+    return p_pgrm;
 }
 
 /**
@@ -297,7 +297,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
     es_out_id_t       *es = malloc( sizeof( es_out_id_t ) );
-    pgrm_descriptor_t *p_prgm = NULL;
+    pgrm_descriptor_t *p_pgrm = NULL;
     char              psz_cat[sizeof( _("Stream ") ) + 10];
     char              *psz_description;
 
@@ -305,12 +305,12 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     if( fmt->i_group >= 0 )
     {
         /* search program */
-        p_prgm = input_FindProgram( p_input, fmt->i_group );
+        p_pgrm = input_FindProgram( p_input, fmt->i_group );
 
-        if( p_prgm == NULL )
+        if( p_pgrm == NULL )
         {
             /* Create it */
-            p_prgm = EsOutAddProgram( out, fmt->i_group );
+            p_pgrm = EsOutAddProgram( out, fmt->i_group );
         }
     }
     if( fmt->i_id < 0 )
@@ -319,7 +319,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     }
 
     psz_description = LanguageGetName( fmt->psz_language );
-    es->p_es = input_AddES( p_input, p_prgm, fmt->i_id + 1,
+    es->p_es = input_AddES( p_input, p_pgrm, fmt->i_id + 1,
                             fmt->i_cat, psz_description, 0 );
     es->p_es->i_stream_id = fmt->i_id;
     es->p_es->i_fourcc = fmt->i_codec;
@@ -451,7 +451,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 {
     es_out_sys_t *p_sys = out->p_sys;
 
-    if( p_sys->b_pcr_set )
+    if( p_sys->b_convert_ts_auto )
     {
         pgrm_descriptor_t *p_pgrm = es->p_es->p_pgrm;
         input_thread_t    *p_input = p_sys->p_input;
@@ -665,31 +665,30 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
         case ES_OUT_SET_PCR:
         case ES_OUT_SET_GROUP_PCR:
         {
-            pgrm_descriptor_t *p_prgm = NULL;
+            pgrm_descriptor_t *p_pgrm = NULL;
             int64_t           i_pcr;
 
             if( i_query == ES_OUT_SET_PCR )
             {
-                p_prgm = p_sys->p_input->stream.p_selected_program;
+                p_pgrm = p_sys->p_input->stream.p_selected_program;
             }
             else
             {
                 int i_group = (int)va_arg( args, int );
-                p_prgm = input_FindProgram( p_sys->p_input, i_group );
-                if( p_prgm == NULL )
+                p_pgrm = input_FindProgram( p_sys->p_input, i_group );
+                if( p_pgrm == NULL )
                 {
                     /* we create the requested program */
-                    p_prgm = EsOutAddProgram( out, i_group );
+                    p_pgrm = EsOutAddProgram( out, i_group );
                 }
             }
             i_pcr = (int64_t)va_arg( args, int64_t );
             /* search program */
-            if( p_prgm )
+            if( p_pgrm )
             {
                 /* 11 is a vodoo trick to avoid non_pcr*9/100 to be null */
-                input_ClockManageRef( p_sys->p_input, p_prgm, (i_pcr + 11 ) * 9 / 100);
+                input_ClockManageRef( p_sys->p_input, p_pgrm, (i_pcr + 11 ) * 9 / 100);
             }
-            p_sys->b_pcr_set = VLC_TRUE;
             return VLC_SUCCESS;
         }
 
@@ -700,8 +699,31 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                     SYNCHRO_REINIT;
                 p_sys->p_input->stream.pp_programs[i]->last_pts = 0;
             }
-            p_sys->b_pcr_set = VLC_TRUE;
             return VLC_SUCCESS;
+
+        case ES_OUT_CONVERT_TIMESTAMP:
+        case ES_OUT_CONVERT_GROUP_TIMESTAMP:
+        {
+            pgrm_descriptor_t *p_pgrm = NULL;
+
+            if( i_query == ES_OUT_CONVERT_TIMESTAMP )
+            {
+                p_pgrm = p_sys->p_input->stream.p_selected_program;
+            }
+            else
+            {
+                int i_group = (int)va_arg( args, int );
+                p_pgrm = input_FindProgram( p_sys->p_input, i_group );
+            }
+            if( p_pgrm )
+            {
+                int64_t *pi_ts = (int64_t*)va_arg( args, int64_t* );
+
+                *pi_ts = input_ClockGetTS( p_sys->p_input, p_pgrm, ( *pi_ts + 11 ) * 9 / 100 );
+            }
+            p_sys->b_convert_ts_auto = VLC_FALSE;
+            return VLC_SUCCESS;
+        }
 
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );

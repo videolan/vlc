@@ -496,6 +496,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
         case VLC_OBJECT_VLM: psz_object = "vlm"; break;
         case VLC_OBJECT_ANNOUNCE: psz_object = "announce handler"; break;
         case VLC_OBJECT_DEMUX: psz_object = "demuxer"; break;
+        case VLC_OBJECT_ACCESS: psz_object = "access"; break;
     }
 
 #ifdef UNDER_CE

@@ -51,10 +51,15 @@ enum es_out_query_e
     ES_OUT_SET_ES_STATE,/* arg1= es_out_id_t* arg2=vlc_bool_t   */
     ES_OUT_GET_ES_STATE,/* arg1= es_out_id_t* arg2=vlc_bool_t*  */
 
-    /* XXX XXX XXX Don't use them YET !!! */
+    /* PCR handling, by default dts/pts will be automatically computed using thoses PCR */
     ES_OUT_SET_PCR,             /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
     ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
-    ES_OUT_RESET_PCR    /* no arg */
+    ES_OUT_RESET_PCR,           /* no arg */
+
+    /* ByBass automatic stream timestamp to absolute timestamp using pcr (and disable the automatic mode XXX:for all groups) */
+    ES_OUT_CONVERT_TIMESTAMP,       /* arg1=int64_t *pi_ts(microsecond!) */
+    ES_OUT_CONVERT_GROUP_TIMESTAMP, /* arg1=int i_group, arg2=int64_t *pi_ts(microsecond!)*/
+
 };
 
 struct es_out_t
@@ -95,6 +100,71 @@ static inline int es_out_Control( es_out_t *out, int i_query, ... )
     va_end( args );
     return i_result;
 }
+/**
+ * \defgroup access Access
+ * @{
+ */
+
+enum access_query_e
+{
+    /* capabilities */
+    ACCESS_CAN_FASTSEEK,    /* arg1= vlc_bool_t*    cannot fail */
+    ACCESS_CAN_PAUSE,       /* arg1= vlc_bool_t*    cannot fail */
+    ACCESS_CAN_CONTROL_PACE,/* arg1= vlc_bool_t*    cannot fail */
+
+    /* */
+    ACCESS_GET_MTU,         /* arg1= int*           cannot fail (0 if no sense) */
+    ACCESS_GET_SIZE,        /* arg1= int64_t*       cannot fail (0 if unknown) */
+    ACCESS_GET_POS,         /* arg1= int64_t*       cannot fail */
+
+    /* */
+    ACCESS_SET_PAUSE_STATE  /* arg1= vlc_bool_t     can fail if unsuported */
+};
+
+struct access_t
+{
+    VLC_COMMON_MEMBERS
+
+    /* Module properties */
+    module_t    *p_module;
+
+    /* Access name (empty if non forced) */
+    char        *psz_access;
+    char        *psz_path;
+    /* Access can fill this entry to force a deluxer */
+    char        *psz_demux;
+
+    /* set by access (only one of pf_read/pf_block may be filled) */
+    int         (*pf_read) ( access_t *, uint8_t *, int );  /* Return -1 if no data yet, 0 if no more data, else real data read */
+    block_t    *(*pf_block)( access_t * );                  /* return a block of data in his 'natural' size */
+    int         (*pf_seek) ( access_t *, int64_t );
+
+    int         (*pf_control)( access_t *, int i_query, va_list args);
+    access_sys_t *p_sys;
+};
+
+#define access2_New( a, b, c, d ) __acess2_New(VLC_OBJECT(a), b, c, d)
+VLC_EXPORT( demux_t *, __access2_New,  ( vlc_object_t *p_obj, char *psz_mrl, stream_t *s, es_out_t *out ) );
+VLC_EXPORT( void,      access2_Delete, ( demux_t * ) );
+
+static inline int access2_vaControl( access_t *p_access, int i_query, va_list args )
+{
+    return p_access->pf_control( p_access, i_query, args );
+}
+static inline int access2_Control( access_t *p_access, int i_query, ... )
+{
+    va_list args;
+    int     i_result;
+
+    va_start( args, i_query );
+    i_result = access2_vaControl( p_access, i_query, args );
+    va_end( args );
+    return i_result;
+}
+
+/**
+ * @}
+ */
 
 /**
  * \defgroup stream Stream
@@ -328,8 +398,12 @@ VLC_EXPORT( int, demux_Control,          ( input_thread_t *, int i_query, ...  )
 
 VLC_EXPORT( int, demux_vaControlDefault, ( input_thread_t *, int i_query, va_list  ) );
 
+/* Access */
+VLC_EXPORT( int, access_vaControl,       ( input_thread_t *, int i_query, va_list  ) );
+VLC_EXPORT( int, access_Control,         ( input_thread_t *, int i_query, ...  ) );
+VLC_EXPORT( int, access_vaControlDefault,( input_thread_t *, int i_query, va_list  ) );
 
-/* New demux arch: don't touch that */
+
 /* stream_t *s could be null and then it mean a access+demux in one */
 #define demux2_New( a, b, c, d ) __demux2_New(VLC_OBJECT(a), b, c, d)
 VLC_EXPORT( demux_t *, __demux2_New,  ( vlc_object_t *p_obj, char *psz_mrl, stream_t *s, es_out_t *out ) );
