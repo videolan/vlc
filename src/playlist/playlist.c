@@ -400,15 +400,22 @@ static void RunThread ( playlist_t *p_playlist )
         }
         else if( p_playlist->i_status != PLAYLIST_STOPPED )
         {
+            /* Start another input. Let's check if that item has
+             * been forced. In that case, we override random (by not skipping)
+             * and play-and-stop */
+            vlc_bool_t b_forced;
             var_Get( p_playlist, "prevent-skip", &val );
+            b_forced = val.b_bool;
             if( val.b_bool == VLC_FALSE )
             {
                 SkipItem( p_playlist, 0 );
             }
-            val.b_bool = VLC_TRUE;
+            /* Reset forced status */
+            val.b_bool = VLC_FALSE;
             var_Set( p_playlist, "prevent-skip", val );
+            /* Check for play-and-stop */
             var_Get( p_playlist, "play-and-stop", &val );
-            if( val.b_bool == VLC_FALSE )
+            if( val.b_bool == VLC_FALSE || b_forced == VLC_TRUE )
             {
                 PlayItem( p_playlist );
             }
