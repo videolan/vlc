@@ -2,7 +2,7 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: effects.c,v 1.6 2003/09/08 22:00:47 zorglub Exp $
+ * $Id: effects.c,v 1.7 2003/09/20 00:37:53 fenrir Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -24,6 +24,12 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include <stdlib.h>                                      /* malloc(), free() */
+#include <vlc/vlc.h>
+#include <vlc/vout.h>
+#include "audio_output.h"
+#include "aout_internal.h"
+
 #include "visual.h"
 #include <math.h>
 

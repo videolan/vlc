@@ -2,7 +2,7 @@
  * visual.h : Header for the visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.h,v 1.4 2003/09/10 10:21:09 zorglub Exp $
+ * $Id: visual.h,v 1.5 2003/09/20 00:37:53 fenrir Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -21,19 +21,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
-#include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-#include <errno.h>
+typedef struct visual_effect_t
+{
+    char *     psz_name;    /* Filter name*/
 
-#include <vlc/vlc.h>
-#include <vlc/vout.h>
+    int         (*pf_run)( struct visual_effect_t * , aout_instance_t *,
+                           aout_buffer_t *, picture_t *);
+    void *     p_data; /* The effect stores whatever it wants here */
+    int        i_width;
+    int        i_height;
+    char *     psz_args;
+    int        i_nb_chans;
+} visual_effect_t ;
 
-#include "audio_output.h"
-
-#include "aout_internal.h"
 
 /*****************************************************************************
  * aout_filter_sys_t: visualizer audio filter method descriptor
@@ -41,28 +41,16 @@
  * This structure is part of the audio filter descriptor.
  * It describes some visualizer specific variables.
  *****************************************************************************/
-typedef struct visual_effect_t
-{
-    int         (*pf_run) 
-                   (struct visual_effect_t * , aout_instance_t *,
-                   aout_buffer_t *, picture_t *);
-    void *     p_data; /* The effect stores whatever it wants here */
-    char *     psz_func;
-    struct     visual_effect_t * p_next;
-    int        i_width;
-    int        i_height;
-    char *     psz_args; 
-    int        i_nb_chans;
-} visual_effect_t ;
-
-
-struct aout_filter_sys_t
+typedef struct aout_filter_sys_t
 {
     vout_thread_t   *p_vout;
-    visual_effect_t *p_first_effect;
+
     int             i_width;
     int             i_height;
-};
+
+    int             i_effect;
+    visual_effect_t **effect;
+} aout_filter_sys_t;
 
 /* Prototypes */
 int scope_Run
@@ -78,6 +66,6 @@ int blur_Run
         (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
 #endif
 
-/* Default vout size */       
+/* Default vout size */
 #define VOUT_WIDTH 320
 #define VOUT_HEIGHT 120
