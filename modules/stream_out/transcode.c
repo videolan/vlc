@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.47 2003/10/27 20:53:10 gbazin Exp $
+ * $Id: transcode.c,v 1.48 2003/10/30 12:01:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -821,21 +821,21 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         /* Encode as much data as possible */
         if( !id->b_enc_inited && id->p_encoder->pf_header )
         {
- 	    p_block = id->p_encoder->pf_header( id->p_encoder );
-	    while( p_block )
-	    {
-	        sout_buffer_t *p_out;
-		block_t *p_prev_block = p_block;
+            p_block = id->p_encoder->pf_header( id->p_encoder );
+            while( p_block )
+            {
+                sout_buffer_t *p_out;
+                block_t *p_prev_block = p_block;
 
-		p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
-		memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
-		p_out->i_dts = p_out->i_pts = in->i_dts;
-		p_out->i_length = 0;
-		sout_BufferChain( out, p_out );
+                p_out = sout_BufferNew( p_stream->p_sout, p_block->i_buffer );
+                memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
+                p_out->i_dts = p_out->i_pts = in->i_dts;
+                p_out->i_length = 0;
+                sout_BufferChain( out, p_out );
 
-		p_block = p_block->p_next;
-		block_Release( p_prev_block );
-	    }
+                p_block = p_block->p_next;
+                block_Release( p_prev_block );
+            }
 
             id->b_enc_inited = VLC_TRUE;
         }
@@ -845,6 +845,9 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         aout_buf.i_nb_samples = id->i_buffer_pos / 2 / id->f_src.i_channels;
         aout_buf.start_date = id->i_dts;
         aout_buf.end_date = id->i_dts;
+
+        id->i_dts += ( I64C(1000000) * id->i_buffer_pos / 2 /
+            id->f_src.i_channels / id->f_src.i_sample_rate );
 
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, &aout_buf );
         while( p_block )
@@ -1071,13 +1074,17 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
     i_data = in->i_size;
     p_data = in->p_buffer;
-
+ 
     for( ;; )
     {
+        block_t *p_block;
+        picture_t pic;
+        int i_plane;
+
         /* decode frame */
         frame = id->p_ff_pic;
         p_sys->i_input_pts = in->i_pts;
-        if( id->ff_dec )
+       if( id->ff_dec )
         {
             i_used = avcodec_decode_video( id->ff_dec_c, frame,
                                            &b_gotpicture,
@@ -1119,8 +1126,6 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
 
         if( !id->b_enc_inited )
         {
-            block_t *p_block;
-
             /* XXX hack because of copy packetizer and mpeg4video that can fail
              * detecting size */
             if( id->p_encoder->format.video.i_width <= 0 )
@@ -1178,6 +1183,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                 memcpy( p_out->p_buffer, p_block->p_buffer, p_block->i_buffer);
                 p_out->i_dts = in->i_dts;
                 p_out->i_pts = in->i_dts;
+                p_out->i_length = 0;
                 sout_BufferChain( out, p_out );
             }
 
@@ -1275,19 +1281,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             frame = id->p_ff_pic_tmp2;
         }
 
-        /* Interpolate the next PTS
-         * (needed by the mpeg video packetizer which can send pts <= 0 ) */
-        if( id->ff_dec_c && id->ff_dec_c->frame_rate > 0 )
-        {
-            p_sys->i_output_pts += I64C(1000000) * (2 + frame->repeat_pict) *
-              id->ff_dec_c->frame_rate_base / (2 * id->ff_dec_c->frame_rate);
-        }
-
         /* Encoding */
-        block_t *p_block;
-        picture_t pic;
-        int i_plane;
-
         vout_InitPicture( VLC_OBJECT(p_stream), &pic,
                           id->p_encoder->format.video.i_chroma,
                           id->f_dst.i_width, id->f_dst.i_height,
@@ -1300,7 +1294,16 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             pic.p[i_plane].i_pitch = frame->linesize[i_plane];
         }
 
-        pic.date = frame->pts;
+        /* Set the pts of the frame being encoded */
+        pic.date = p_sys->i_output_pts;
+
+        /* Interpolate the next PTS
+         * (needed by the mpeg video packetizer which can send pts <= 0 ) */
+        if( id->ff_dec_c && id->ff_dec_c->frame_rate > 0 )
+        {
+            p_sys->i_output_pts += I64C(1000000) * (2 + frame->repeat_pict) *
+              id->ff_dec_c->frame_rate_base / (2 * id->ff_dec_c->frame_rate);
+        }
 
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, &pic );
         while( p_block )
