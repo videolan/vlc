@@ -26,20 +26,21 @@
 
 int
 E_(CDDADebugCB)   ( vlc_object_t *p_this, const char *psz_name,
-		    vlc_value_t oldval, vlc_value_t val, void *p_data )
+                    vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
-  cdda_data_t *p_cdda;
+    cdda_data_t *p_cdda;
 
-  if (NULL == p_cdda_input) return VLC_EGENERIC;
+    if (NULL == p_cdda_input) return VLC_EGENERIC;
 
-  p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
+    p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
-  if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old debug (x%0x) %d, new debug (x%0x) %d",
-             p_cdda->i_debug, p_cdda->i_debug, val.i_int, val.i_int);
-  }
-  p_cdda->i_debug = val.i_int;
-  return VLC_SUCCESS;
+    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
+    {
+        msg_Dbg( p_cdda_input, "Old debug (x%0x) %d, new debug (x%0x) %d",
+                 p_cdda->i_debug, p_cdda->i_debug, val.i_int, val.i_int);
+    }
+    p_cdda->i_debug = val.i_int;
+    return VLC_SUCCESS;
 }
 
 /* FIXME: could probably shorten some of the below boilerplate code...
@@ -48,86 +49,90 @@ int
 E_(CDDBEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
                       vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
-  cdda_data_t *p_cdda;
+    cdda_data_t *p_cdda;
 
-  if (NULL == p_cdda_input) return VLC_EGENERIC;
+    if (NULL == p_cdda_input) return VLC_EGENERIC;
 
-  p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
+    p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
 #ifdef HAVE_LIBCDDB
-  if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old CDDB Enabled (x%0x) %d, new (x%0x) %d",
-             p_cdda->b_cddb_enabled, p_cdda->b_cddb_enabled,
-             val.b_bool, val.b_bool);
-  }
-  p_cdda->b_cddb_enabled = val.b_bool;
+    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
+    {
+        msg_Dbg( p_cdda_input, "Old CDDB Enabled (x%0x) %d, new (x%0x) %d",
+                 p_cdda->b_cddb_enabled, p_cdda->b_cddb_enabled,
+                 val.b_bool, val.b_bool);
+    }
+    p_cdda->b_cddb_enabled = val.b_bool;
 #endif
-  return VLC_SUCCESS;
+    return VLC_SUCCESS;
 }
 
 int
 E_(CDTextEnabledCB)   ( vlc_object_t *p_this, const char *psz_name,
-			vlc_value_t oldval, vlc_value_t val, void *p_data )
+                        vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
-  cdda_data_t *p_cdda;
+    cdda_data_t *p_cdda;
 
-  if (NULL == p_cdda_input) return VLC_EGENERIC;
+    if (NULL == p_cdda_input) return VLC_EGENERIC;
 
-  p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
+    p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
-  if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old CDText Enabled (x%0x) %d, new (x%0x) %d",
-             p_cdda->b_cdtext_enabled, p_cdda->b_cdtext_enabled,
-             val.b_bool, val.b_bool);
-  }
-  p_cdda->b_cdtext_enabled = val.b_bool;
-  return VLC_SUCCESS;
+    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT))
+    {
+        msg_Dbg( p_cdda_input, "Old CDText Enabled (x%0x) %d, new (x%0x) %d",
+                 p_cdda->b_cdtext_enabled, p_cdda->b_cdtext_enabled,
+                 val.b_bool, val.b_bool);
+    }
+    p_cdda->b_cdtext_enabled = val.b_bool;
+    return VLC_SUCCESS;
 }
 
 int
 E_(CDTextPreferCB)   ( vlc_object_t *p_this, const char *psz_name,
-		       vlc_value_t oldval, vlc_value_t val, void *p_data )
+                       vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
-  cdda_data_t *p_cdda;
+    cdda_data_t *p_cdda;
 
-  if (NULL == p_cdda_input) return VLC_EGENERIC;
+    if (NULL == p_cdda_input) return VLC_EGENERIC;
 
-  p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
+    p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
 #ifdef HAVE_LIBCDDB
-  if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old CDText Prefer (x%0x) %d, new (x%0x) %d",
-             p_cdda->b_cdtext_prefer, p_cdda->b_cdtext_prefer,
-             val.b_bool, val.b_bool);
-  }
-  p_cdda->b_cdtext_prefer = val.b_bool;
+    if ( p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
+    {
+        msg_Dbg( p_cdda_input, "Old CDText Prefer (x%0x) %d, new (x%0x) %d",
+                 p_cdda->b_cdtext_prefer, p_cdda->b_cdtext_prefer,
+                 val.b_bool, val.b_bool);
+    }
+    p_cdda->b_cdtext_prefer = val.b_bool;
 #endif
-  return VLC_SUCCESS;
+    return VLC_SUCCESS;
 }
 
 int
 E_(CDDABlocksPerReadCB) ( vlc_object_t *p_this, const char *psz_name,
-			  vlc_value_t oldval, vlc_value_t val, void *p_data )
+                          vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
-  cdda_data_t *p_cdda;
+    cdda_data_t *p_cdda;
 
-  if (NULL == p_cdda_input) return VLC_EGENERIC;
+    if (NULL == p_cdda_input) return VLC_EGENERIC;
 
-  p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
+    p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
-  if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
-    msg_Dbg( p_cdda_input, "Old blocks per read: %d, new %d",
-             p_cdda->i_blocks_per_read, val.i_int);
-  }
+    if (p_cdda->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) 
+    {
+        msg_Dbg( p_cdda_input, "Old blocks per read: %d, new %d",
+                 p_cdda->i_blocks_per_read, val.i_int);
+    }
 
-  if (0 == val.i_int) val.i_int = DEFAULT_BLOCKS_PER_READ;
-  if ( val.i_int >= MIN_BLOCKS_PER_READ && val.i_int <= MAX_BLOCKS_PER_READ )
-    p_cdda->i_blocks_per_read = val.i_int;
-  else {
-    msg_Warn( p_cdda_input, 
-	      "Number of blocks (%d) has to be between %d and %d. No change.", 
-	      val.i_int, MIN_BLOCKS_PER_READ, MAX_BLOCKS_PER_READ );
-  }
-  
-  return VLC_SUCCESS;
+    if (0 == val.i_int) val.i_int = DEFAULT_BLOCKS_PER_READ;
+    if ( val.i_int >= MIN_BLOCKS_PER_READ && val.i_int <= MAX_BLOCKS_PER_READ )
+         p_cdda->i_blocks_per_read = val.i_int;
+    else
+    {
+        msg_Warn( p_cdda_input,
+             "Number of blocks (%d) has to be between %d and %d. No change.",
+              val.i_int, MIN_BLOCKS_PER_READ, MAX_BLOCKS_PER_READ );
+    }
+    return VLC_SUCCESS;
 }

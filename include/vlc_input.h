@@ -62,6 +62,8 @@ struct input_item_t
     int         i_es;                /**< Number of es format descriptions */
     es_format_t **es;                /**< Pointer to an array of es formats */
 
+    vlc_bool_t  b_fixed_name;        /**< Can the interface change the name ?*/
+
     vlc_mutex_t lock;                /**< Item cannot be changed without this lock */
 };
 
@@ -85,6 +87,7 @@ static inline void vlc_input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
     p_i->pp_categories = 0;
     p_i->es = 0;
     p_i->i_type = ITEM_TYPE_UNKNOWN;
+    p_i->b_fixed_name = VLC_TRUE;
     vlc_mutex_init( p_o, &p_i->lock );
 }
 

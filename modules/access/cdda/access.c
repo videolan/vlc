@@ -63,8 +63,8 @@ access_t *p_cdda_input = NULL;
  *****************************************************************************/
 static block_t *CDDAReadBlocks( access_t * p_access );
 static int      CDDASeek( access_t * p_access, int64_t i_pos );
-static int      CDDAControl( access_t *p_access, int i_query, 
-			     va_list args );
+static int      CDDAControl( access_t *p_access, int i_query,
+                             va_list args );
 
 static int      CDDAInit( access_t *p_access, cdda_data_t *p_cdda ) ;
 
@@ -111,15 +111,17 @@ cdio_log_handler (cdio_log_level_t level, const char message[])
 static void
 cddb_log_handler (cddb_log_level_t level, const char message[])
 {
-  cdda_data_t *p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
-  switch (level) {
-  case CDDB_LOG_DEBUG:
-  case CDDB_LOG_INFO:
-    if (!(p_cdda->i_debug & INPUT_DBG_CDDB)) return;
-    /* Fall through if to warn case */
-  default:
-    cdio_log_handler (level, message);
-  }
+    cdda_data_t *p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
+    switch (level)
+    {
+        case CDDB_LOG_DEBUG:
+        case CDDB_LOG_INFO:
+        if (!(p_cdda->i_debug & INPUT_DBG_CDDB)) return;
+
+        /* Fall through if to warn case */
+        default:
+            cdio_log_handler (level, message);
+    }
 }
 #endif /*HAVE_LIBCDDB*/
 
@@ -130,34 +132,35 @@ cddb_log_handler (cddb_log_level_t level, const char message[])
 static void
 uninit_log_handler (cdio_log_level_t level, const char message[])
 {
-  cdda_data_t *p_cdda = NULL;
+    cdda_data_t *p_cdda = NULL;
 
-  if (p_cdda_input)
-    p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
+    if (p_cdda_input)
+        p_cdda = (cdda_data_t *)p_cdda_input->p_sys;
 
-  switch (level) {
-  case CDIO_LOG_DEBUG:
-  case CDIO_LOG_INFO:
-    if (!p_cdda || !(p_cdda->i_debug & (INPUT_DBG_CDIO|INPUT_DBG_CDDB)))
-      return;
-    /* Fall through if to warn case */
-  case CDIO_LOG_WARN:
-    fprintf(stderr, "WARN: %s\n", message);
-    break;
-  case CDIO_LOG_ERROR:
-    fprintf(stderr, "ERROR: %s\n", message);
-    break;
-  case CDIO_LOG_ASSERT:
-    fprintf(stderr, "ASSERT ERROR: %s\n", message);
-    break;
-  default:
-    fprintf(stderr, "UNKNOWN ERROR: %s\n%s %d\n",
-            message,
-            "The above message had unknown cdio log level",
-            level);
-  }
+     switch (level)
+     {
+        case CDIO_LOG_DEBUG:
+        case CDIO_LOG_INFO:
+        if (!p_cdda || !(p_cdda->i_debug & (INPUT_DBG_CDIO|INPUT_DBG_CDDB)))
+            return;
 
-  /* gl_default_cdio_log_handler (level, message); */
+        /* Fall through if to warn case */
+        case CDIO_LOG_WARN:
+            fprintf(stderr, "WARN: %s\n", message);
+            break;
+        case CDIO_LOG_ERROR:
+            fprintf(stderr, "ERROR: %s\n", message);
+            break;
+        case CDIO_LOG_ASSERT:
+            fprintf(stderr, "ASSERT ERROR: %s\n", message);
+            break;
+        default:
+            fprintf(stderr, "UNKNOWN ERROR: %s\n%s %d\n", message,
+                            "The above message had unknown cdio log level",
+                            level);
+    }
+
+    /* gl_default_cdio_log_handler (level, message); */
 }
 
 /*****************************************************************************
@@ -166,15 +169,14 @@ uninit_log_handler (cdio_log_level_t level, const char message[])
  * read. It is also possible if we haven't read a RIFF header in which
  * case one that we creaded during Open/Initialization is returned.
  *****************************************************************************/
-static block_t *
-CDDAReadBlocks( access_t * p_access )
+static block_t * CDDAReadBlocks( access_t * p_access )
 {
     block_t     *p_block;
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
     int          i_blocks = p_cdda->i_blocks_per_read;
 
-    dbg_print((INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_LSN), "called %d", 
-	      p_cdda->i_lsn);
+    dbg_print((INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_LSN), "called %d",
+              p_cdda->i_lsn);
 
     /* Check end of file */
     if( p_access->info.b_eof ) return NULL;
@@ -199,10 +201,10 @@ CDDAReadBlocks( access_t * p_access )
 
         p_access->info.i_update |= INPUT_UPDATE_TITLE | INPUT_UPDATE_SIZE;
         p_access->info.i_title++;
-        p_access->info.i_size = 
-	  p_cdda->p_title[p_access->info.i_title]->i_size;
+        p_access->info.i_size =
+                  p_cdda->p_title[p_access->info.i_title]->i_size;
         p_access->info.i_pos = 0;
-	p_cdda->i_track++;
+        p_cdda->i_track++;
     }
 
     /* Possibly adjust i_blocks so we don't read past the end of a track. */
@@ -216,26 +218,26 @@ CDDAReadBlocks( access_t * p_access )
     if( !p_block)
     {
       msg_Err( p_access, "Cannot get a new block of size: %i",
-	       i_blocks * CDIO_CD_FRAMESIZE_RAW );
+               i_blocks * CDIO_CD_FRAMESIZE_RAW );
       return NULL;
     }
 
     if( cdio_read_audio_sectors( p_cdda->p_cdio, p_block->p_buffer,
                                  p_cdda->i_lsn, i_blocks) != 0 )
-        {
-	  msg_Err( p_access, "could not read sector %lu",
-		   (long unsigned int) p_cdda->i_lsn );
-	  block_Release( p_block );
+    {
+        msg_Err( p_access, "could not read sector %lu",
+                 (long unsigned int) p_cdda->i_lsn );
+        block_Release( p_block );
 
-	  /* If we had problems above, assume the problem is with
-	     the first sector of the read and set to skip it.  In
-	     the future libcdio may have cdparanoia support.
-	  */
-	  p_cdda->i_lsn++;
-	  p_access->info.i_pos += CDIO_CD_FRAMESIZE_RAW;
-	  return NULL;
-        }
-    
+        /* If we had problems above, assume the problem is with
+           the first sector of the read and set to skip it.  In
+           the future libcdio may have cdparanoia support.
+        */
+        p_cdda->i_lsn++;
+        p_access->info.i_pos += CDIO_CD_FRAMESIZE_RAW;
+        return NULL;
+    }
+
     p_cdda->i_lsn        += i_blocks;
     p_access->info.i_pos += p_block->i_buffer;
 
@@ -246,8 +248,7 @@ CDDAReadBlocks( access_t * p_access )
  * CDDASeek - change position for subsequent reads. For example, this
  * can happen if the user moves a position slider bar in a GUI.
  ****************************************************************************/
-static int 
-CDDASeek( access_t * p_access, int64_t i_pos )
+static int CDDASeek( access_t * p_access, int64_t i_pos )
 {
     cdda_data_t *p_cdda = (cdda_data_t *) p_access->p_sys;
 
@@ -256,8 +257,8 @@ CDDASeek( access_t * p_access, int64_t i_pos )
     p_access->info.i_pos = i_pos;
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_SEEK),
-               "lsn %lu, offset: %lld",  
-	       (long unsigned int) p_cdda->i_lsn, i_pos );
+               "lsn %lu, offset: %lld",
+               (long unsigned int) p_cdda->i_lsn, i_pos );
     return VLC_SUCCESS;
 }
 
@@ -266,11 +267,10 @@ CDDASeek( access_t * p_access, int64_t i_pos )
  ****************************************************************************/
 
 /*****************************************************************************
- * Open: open cdda device or image file and initialize structures 
- * for subsequent operations.
+ * Open: open cdda device or image file and initialize structures
+ *       for subsequent operations.
  *****************************************************************************/
-int
-E_(CDDAOpen)( vlc_object_t *p_this )
+int E_(CDDAOpen)( vlc_object_t *p_this )
 {
     access_t    *p_access = (access_t*)p_this;
     char *      psz_source = NULL;
@@ -289,51 +289,53 @@ E_(CDDAOpen)( vlc_object_t *p_this )
 
     if( p_access->psz_path && *p_access->psz_path )
     {
-      char *psz_parser = psz_source = strdup( p_access->psz_path );
+        char *psz_parser = psz_source = strdup( p_access->psz_path );
 
-      while( *psz_parser && *psz_parser != '@' )
-	{
-	  psz_parser++;
-	}
-      
-      if( *psz_parser == '@' )
-	{
-	  /* Found options */
-	  *psz_parser = '\0';
-	  ++psz_parser;
-	  
-	  if ('T' == *psz_parser || 't' == *psz_parser )
+        while( *psz_parser && *psz_parser != '@' )
+        {
+            psz_parser++;
+        }
+
+        if( *psz_parser == '@' )
+        {
+            /* Found options */
+            *psz_parser = '\0';
             ++psz_parser;
-	  
-	  i_track = (int)strtol( psz_parser, NULL, 10 );
-	  i_track = i_track ? i_track : 1;
-	  b_single_track = true;
-	}
-    } 
+
+            if ('T' == *psz_parser || 't' == *psz_parser )
+            ++psz_parser;
+
+            i_track = (int)strtol( psz_parser, NULL, 10 );
+            i_track = i_track ? i_track : 1;
+            b_single_track = true;
+        }
+    }
 
     if (!psz_source || !*psz_source)
-      {
-        /* No device/track given. Continue only when this plugin was 
-	   selected */
+    {
+        /* No device/track given. Continue only when this plugin was
+           selected */
         if( !p_this->b_force ) return VLC_EGENERIC;
 
         psz_source = var_CreateGetString( p_this, "cd-audio" );
 
-	if( !psz_source || !*psz_source ) {
-        /* Scan for a CD-ROM drive with a CD-DA in it. */
-        char **cd_drives =
-          cdio_get_devices_with_cap(NULL,  CDIO_FS_AUDIO, false);
+        if( !psz_source || !*psz_source )
+        {
+            /* Scan for a CD-ROM drive with a CD-DA in it. */
+            char **cd_drives =
+              cdio_get_devices_with_cap(NULL,  CDIO_FS_AUDIO, false);
 
-        if (NULL == cd_drives || NULL == cd_drives[0] ) {
-	  msg_Err( p_access, 
-		   "libcdio couldn't find something with a CD-DA in it" );
-          if (cd_drives) cdio_free_device_list(cd_drives);
-	  return VLC_EGENERIC;
-	}
-	
-        psz_source = strdup(cd_drives[0]);
-        cdio_free_device_list(cd_drives);
-      }
+            if (NULL == cd_drives || NULL == cd_drives[0] )
+            {
+                msg_Err( p_access,
+                     "libcdio couldn't find something with a CD-DA in it" );
+                if (cd_drives) cdio_free_device_list(cd_drives);
+                return VLC_EGENERIC;
+            }
+
+            psz_source = strdup(cd_drives[0]);
+            cdio_free_device_list(cd_drives);
+        }
     }
 
     cdio_log_set_handler ( cdio_log_handler );
@@ -342,7 +344,7 @@ E_(CDDAOpen)( vlc_object_t *p_this )
     if( !(p_cdio = cdio_open( psz_source, DRIVER_UNKNOWN )) )
     {
         msg_Warn( p_access, "could not open %s", psz_source );
-	goto error2;
+        goto error2;
     }
 
     p_cdda = malloc( sizeof(cdda_data_t) );
@@ -375,23 +377,23 @@ E_(CDDAOpen)( vlc_object_t *p_this )
     p_cdda->i_blocks_per_read
                      = config_GetInt(p_this, MODULE_STRING "-blocks-per-read");
 
-    p_cdda->p_input  = vlc_object_find( p_access, VLC_OBJECT_INPUT, 
-					FIND_PARENT );
+    p_cdda->p_input  = vlc_object_find( p_access, VLC_OBJECT_INPUT,
+                                        FIND_PARENT );
 
     if (0 == p_cdda->i_blocks_per_read)
-      p_cdda->i_blocks_per_read = DEFAULT_BLOCKS_PER_READ;
-    
-    if ( p_cdda->i_blocks_per_read < MIN_BLOCKS_PER_READ 
-	 || p_cdda->i_blocks_per_read > MAX_BLOCKS_PER_READ ) {
-      msg_Warn( p_cdda_input, 
-		"Number of blocks (%d) has to be between %d and %d. "
-		"Using %d.", 
-		p_cdda->i_blocks_per_read, 
-		MIN_BLOCKS_PER_READ, MAX_BLOCKS_PER_READ,
-		DEFAULT_BLOCKS_PER_READ );
-      p_cdda->i_blocks_per_read = DEFAULT_BLOCKS_PER_READ;
-    }
+        p_cdda->i_blocks_per_read = DEFAULT_BLOCKS_PER_READ;
 
+    if ( p_cdda->i_blocks_per_read < MIN_BLOCKS_PER_READ
+         || p_cdda->i_blocks_per_read > MAX_BLOCKS_PER_READ )
+    {
+        msg_Warn( p_cdda_input,
+                "Number of blocks (%d) has to be between %d and %d. "
+                "Using %d.",
+                p_cdda->i_blocks_per_read,
+                MIN_BLOCKS_PER_READ, MAX_BLOCKS_PER_READ,
+                DEFAULT_BLOCKS_PER_READ );
+        p_cdda->i_blocks_per_read = DEFAULT_BLOCKS_PER_READ;
+    }
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "%s", psz_source );
 
@@ -415,8 +417,8 @@ E_(CDDAOpen)( vlc_object_t *p_this )
     if ( VLC_SUCCESS != i_rc ) goto error;
 
     CDDAFixupPlaylist( p_access, p_cdda, psz_source, b_single_track );
-    
-    /* Build a WAV header to put in front of the output data. 
+
+    /* Build a WAV header to put in front of the output data.
        This gets sent back in the Block (read) routine.
      */
     memset( &p_cdda->waveheader, 0, sizeof(WAVEHEADER) );
@@ -432,13 +434,14 @@ E_(CDDAOpen)( vlc_object_t *p_this )
     SetWLE( &p_cdda->waveheader.BytesPerSample,
             2 /*Modus*/ * 16 /*BitsPerSample*/ / 8 );
     SetDWLE( &p_cdda->waveheader.BytesPerSec,
-	     2*16/8 /*BytesPerSample*/ * CDDA_FREQUENCY_SAMPLE );
+             2*16/8 /*BytesPerSample*/ * CDDA_FREQUENCY_SAMPLE );
     p_cdda->waveheader.DataChunkID = VLC_FOURCC('d', 'a', 't', 'a');
     p_cdda->waveheader.DataLength  = 0;    /* we just don't know */
 
     /* PTS delay */
-    var_Create( p_access, MODULE_STRING "-caching", 
-		VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    var_Create( p_access, MODULE_STRING "-caching",
+                VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
+    vlc_object_release( p_cdda->p_input );
     return VLC_SUCCESS;
 
  error:
@@ -446,6 +449,7 @@ E_(CDDAOpen)( vlc_object_t *p_this )
     free( p_cdda );
  error2:
     free( psz_source );
+    vlc_object_release( p_cdda->p_input );
     return i_rc;
 
 }
@@ -453,8 +457,7 @@ E_(CDDAOpen)( vlc_object_t *p_this )
 /*****************************************************************************
  * CDDAClose: closes cdda and frees any resources associded with it.
  *****************************************************************************/
-void
-E_(CDDAClose)( vlc_object_t *p_this )
+void E_(CDDAClose)( vlc_object_t *p_this )
 {
     access_t    *p_access = (access_t *) p_this;
     cdda_data_t *p_cdda   = (cdda_data_t *) p_access->p_sys;
@@ -500,73 +503,83 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
     switch( i_query )
     {
         /* Pass back a copy of meta information that was gathered when we
-	   during the Open/Initialize call.
-	 */
+           during the Open/Initialize call.
+         */
         case ACCESS_GET_META:
-	  { 
-	    vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
-	    if ( p_cdda->p_meta ) {
-	      *pp_meta = vlc_meta_Duplicate( p_cdda->p_meta );
-	      dbg_print( INPUT_DBG_META, "%s", "Meta copied" );
-	    } else 
-	      msg_Warn( p_access, "tried to copy NULL meta info" );
-	    
-	    return VLC_SUCCESS;
-	  }
-	  return VLC_EGENERIC;
+        {
+            vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
+            if ( p_cdda->p_meta )
+            {
+                *pp_meta = vlc_meta_Duplicate( p_cdda->p_meta );
+                dbg_print( INPUT_DBG_META, "%s", "Meta copied" );
+            }
+            else
+                msg_Warn( p_access, "tried to copy NULL meta info" );
+
+            return VLC_SUCCESS;
+        }
 
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE: 
-	  {
+        case ACCESS_CAN_CONTROL_PACE:
+        {
             vlc_bool_t *pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
             *pb_bool = VLC_TRUE;
-            break;
-	  }
+            return VLC_SUCCESS;;
+        }
 
         /* */
         case ACCESS_GET_MTU:
+        {
             pi_int = (int*)va_arg( args, int * );
             *pi_int = p_cdda-> i_blocks_per_read * CDIO_CD_FRAMESIZE_RAW;
             break;
+        }
 
         case ACCESS_GET_PTS_DELAY:
-	  { 
-	    int64_t *pi_64 = (int64_t*)va_arg( args, int64_t * );
+        {
+            int64_t *pi_64 = (int64_t*)va_arg( args, int64_t * );
             *pi_64 = var_GetInteger( p_access, MODULE_STRING "-caching" )
-	      * MILLISECONDS_PER_SEC;
+              * MILLISECONDS_PER_SEC;
             break;
-	  }
+        }
 
         /* */
         case ACCESS_SET_PAUSE_STATE:
             break;
 
         case ACCESS_GET_TITLE_INFO:
-	  { input_title_t ***ppp_title;
+        {
+            input_title_t ***ppp_title;
             ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
             pi_int    = (int*)va_arg( args, int* );
-	    *((int*)va_arg( args, int* )) = 1; /* Title offset */
+            *((int*)va_arg( args, int* )) = 1; /* Title offset */
 
             /* Duplicate title info */
-	    /*** printf("+++ i_tracks %d, i_titles %d\n", 
-		 p_cdda->i_tracks, p_cdda->i_titles);  ***/
+            printf("+++ i_tracks %d, i_titles %d\n",
+                 p_cdda->i_tracks, p_cdda->i_titles);
+            if( p_cdda->i_titles == 0 )
+            {
+                *pi_int = 0; ppp_title = NULL;
+                return VLC_SUCCESS;
+            }
             *pi_int = p_cdda->i_titles;
             *ppp_title = malloc(sizeof( input_title_t **) * p_cdda->i_titles );
 
-	    if (!*ppp_title) return VLC_ENOMEM;
+            if (!*ppp_title) return VLC_ENOMEM;
 
             for( i = 0; i < p_cdda->i_titles; i++ )
             {
-	      if ( p_cdda->p_title[i] )
-                (*ppp_title)[i] = 
-		  vlc_input_title_Duplicate( p_cdda->p_title[i] );
+                if ( p_cdda->p_title[i] )
+                   (*ppp_title)[i] =
+                          vlc_input_title_Duplicate( p_cdda->p_title[i] );
             }
-	  }
-	  break;
+            break;
+        }
 
         case ACCESS_SET_TITLE:
+        {
             i = (int)va_arg( args, int );
             if( i != p_access->info.i_title )
             {
@@ -581,13 +594,14 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
                 p_cdda->i_lsn = p_cdda->lsn[p_cdda->i_first_track+i];
             }
             break;
+        }
 
         case ACCESS_SET_SEEKPOINT:
         case ACCESS_SET_PRIVATE_ID_STATE:
             return VLC_EGENERIC;
 
         default:
-	  msg_Warn( p_access, "unimplemented query in control" );
+            msg_Warn( p_access, "unimplemented query in control" );
             return VLC_EGENERIC;
 
     }
@@ -595,7 +609,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 }
 
 /*****************************************************************************
-  CDDAInit: 
+  CDDAInit:
 
  Initialize information pertaining to the CD: the number of tracks,
  first track number, LSNs for each track and the leadout. The leadout
@@ -607,8 +621,7 @@ static int CDDAControl( access_t *p_access, int i_query, va_list args )
 
  We return the VLC-type status, e.g. VLC_SUCCESS, VLC_ENOMEM, etc.
  *****************************************************************************/
-static int
-CDDAInit( access_t *p_access, cdda_data_t *p_cdda ) 
+static int CDDAInit( access_t *p_access, cdda_data_t *p_cdda )
 {
     track_t i;
     discmode_t  discmode = CDIO_DISC_MODE_NO_INFO;
@@ -620,26 +633,26 @@ CDDAInit( access_t *p_access, cdda_data_t *p_cdda )
     switch(discmode) {
     case CDIO_DISC_MODE_CD_DA:
     case CDIO_DISC_MODE_CD_MIXED:
-      /* These are possible for CD-DA */
-      break;
+        /* These are possible for CD-DA */
+        break;
     default:
-      /* These are not possible for CD-DA */
-      msg_Err( p_access, 
-	       "Disc seems not to be CD-DA. libcdio reports it is %s",
-	       discmode2str[discmode]
-	       );
-      return VLC_EGENERIC;
+        /* These are not possible for CD-DA */
+        msg_Err( p_access,
+               "Disc seems not to be CD-DA. libcdio reports it is %s",
+               discmode2str[discmode]
+               );
+        return VLC_EGENERIC;
     }
-    
+
     /* Fill the lsn array with the track/sector matches.
        Note cdio_get_track_lsn when given num_tracks + 1 will return
        the leadout LSN.
      */
     for( i = 0 ; i <= p_cdda->i_tracks ; i++ )
-      {
-	track_t i_track = p_cdda->i_first_track + i;
+    {
+        track_t i_track = p_cdda->i_first_track + i;
         (p_cdda->lsn)[ i_track ] = cdio_get_track_lsn(p_cdda->p_cdio, i_track);
-      }
+    }
 
     /* Set reading start LSN. */
     p_cdda->i_lsn = p_cdda->lsn[p_cdda->i_track];

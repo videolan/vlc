@@ -436,6 +436,11 @@ playlist_item_t * playlist_ItemGetByInput( playlist_t * p_playlist ,
                                            input_item_t *p_item )
 {
     int i;
+    if( &p_playlist->status.p_item->input == p_item )
+    {
+        return p_playlist->status.p_item;
+    }
+
     for( i =  0 ; i < p_playlist->i_size ; i++ )
     {
         if( &p_playlist->pp_items[i]->input == p_item )

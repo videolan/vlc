@@ -1560,7 +1560,8 @@ static int  UpdateMeta( input_thread_t *p_input )
         msg_Dbg( p_input, "  - '%s' = '%s'",
                 _(p_meta->name[i]), p_meta->value[i] );
 
-        if( !strcmp(p_meta->name[i], VLC_META_TITLE) && p_meta->value[i] )
+        if( !strcmp(p_meta->name[i], VLC_META_TITLE) && p_meta->value[i] &&
+            !p_input->input.p_item->b_fixed_name )
             input_Control( p_input, INPUT_SET_NAME, p_meta->value[i] );
 
         if( !strcmp( p_meta->name[i], VLC_META_AUTHOR ) )
