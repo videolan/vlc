@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.195.2.4 2002/07/19 21:14:40 massiot Exp $
+ * $Id: main.c,v 1.195.2.5 2002/07/29 16:12:24 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -337,11 +337,23 @@
 #define DEMUX_LONGTEXT N_( \
     "This is a legacy entry to let you configure demux modules")
 
-#define FAST_PTHREAD_TEXT N_("fast pthread on NT/2K/XP (developpers only)")
-#define FAST_PTHREAD_LONGTEXT N_( \
-    "On Windows NT/2K/XP we use a slow but correct pthread implementation, " \
-    "you can also use this faster implementation but you might experience " \
-    "problems with it.")
+#define FAST_MUTEX_TEXT N_("fast mutex on NT/2K/XP (developpers only)")
+#define FAST_MUTEX_LONGTEXT N_( \
+    "On Windows NT/2K/XP we use a slow mutex implementation but which " \
+    "allows us to correctely implement condition variables. " \
+    "You can also use the faster Win9x implementation but you might " \
+    "experience problems with it.")
+
+#define WIN9X_CV_TEXT N_("Condition variables implementation for Win9x " \
+    "(developpers only)")
+#define WIN9X_CV_LONGTEXT N_( \
+    "On Windows 9x/Me we use a fast but not correct condition variables " \
+    "implementation (more precisely there is a possibility for a race " \
+    "condition to happen). " \
+    "However it is possible to use slower alternatives which should be more " \
+    "robust. " \
+    "Currently you can choose between implementation 0 (which is the " \
+    "default and the fastest), 1 and 2.")
 
 /*
  * Quick usage guide for the configuration options:
@@ -436,7 +448,8 @@ ADD_MODULE  ( "access", MODULE_CAPABILITY_ACCESS, NULL, NULL, ACCESS_TEXT, ACCES
 ADD_MODULE  ( "demux", MODULE_CAPABILITY_DEMUX, NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT )
 
 #if defined(WIN32)
-ADD_BOOL ( "fast_pthread", 0, NULL, FAST_PTHREAD_TEXT, FAST_PTHREAD_LONGTEXT )
+ADD_BOOL ( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT )
+ADD_INTEGER ( "win9x-cv-method", 0, NULL, WIN9X_CV_TEXT, WIN9X_CV_LONGTEXT )
 #endif
 
 MODULE_CONFIG_STOP

@@ -2,7 +2,7 @@
  * win32_specific.h: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.h,v 1.2 2002/04/02 23:43:57 gbazin Exp $
+ * $Id: win32_specific.h,v 1.2.2.1 2002/07/29 16:12:24 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -36,6 +36,7 @@ typedef BOOL (WINAPI *SIGNALOBJECTANDWAIT)( HANDLE, HANDLE, DWORD, BOOL );
 typedef struct main_sys_s
 {
     SIGNALOBJECTANDWAIT SignalObjectAndWait;
-    boolean_t b_fast_pthread;
+    boolean_t b_fast_mutex;
+    int i_win9x_cv;
 
 } main_sys_t;

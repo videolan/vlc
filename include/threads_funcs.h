@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads_funcs.h,v 1.4.2.2 2002/07/25 22:23:52 sam Exp $
+ * $Id: threads_funcs.h,v 1.4.2.3 2002/07/29 16:12:24 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -97,7 +97,7 @@ static inline int vlc_mutex_init( vlc_mutex_t *p_mutex )
      * function and have a 100% correct vlc_cond_wait() implementation.
      * As this function is not available on Win9x, we can use the faster
      * CriticalSections */
-    if( (GetVersion() < 0x80000000) && !p_main->p_sys->b_fast_pthread )
+    if( p_main->p_sys->SignalObjectAndWait && !p_main->p_sys->b_fast_mutex )
     {
         /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
         p_mutex->mutex = CreateMutex( 0, FALSE, 0 );
@@ -349,24 +349,34 @@ static inline int vlc_cond_init( vlc_cond_t *p_condvar )
     /* Initialize counter */
     p_condvar->i_waiting_threads = 0;
 
-    if( (GetVersion() < 0x80000000) && !p_main->p_sys->b_fast_pthread )
+    if( p_main->p_sys->i_win9x_cv == 0 )
     {
-        /* Create an auto-reset event and a semaphore. */
-        p_condvar->signal = CreateEvent( NULL, FALSE, FALSE, NULL );
-        p_condvar->semaphore = CreateSemaphore( NULL, 0, 0x7fffffff, NULL );
-    
-        p_condvar->b_broadcast = 0;
+        /* Create an auto-reset event. */
+        p_condvar->event = CreateEvent( NULL,   /* no security */
+                                        FALSE,  /* auto-reset event */
+                                        FALSE,  /* start non-signaled */
+                                        NULL ); /* unnamed */
 
-        return !p_condvar->signal || !p_condvar->semaphore;
+        p_condvar->semaphore = NULL;
+        return !p_condvar->event;
     }
     else
     {
-        p_condvar->signal = NULL;
+        p_condvar->semaphore = CreateSemaphore( NULL,       /* no security */
+                                                0,          /* initial count */
+                                                0x7fffffff, /* max count */
+                                                NULL );     /* unnamed */
 
-        /* Create an auto-reset event and a manual-reset event. */
-        p_condvar->p_events[0] = CreateEvent( NULL, FALSE, FALSE, NULL );
-        p_condvar->p_events[1] = CreateEvent( NULL, TRUE, FALSE, NULL );
-        return !p_condvar->p_events[0] || !p_condvar->p_events[1];
+        if( p_main->p_sys->i_win9x_cv == 1 )
+            /* Create a manual-reset event initially signaled. */
+            p_condvar->event = CreateEvent( NULL, TRUE, TRUE, NULL );
+        else
+            /* Create a auto-reset event. */
+            p_condvar->event = CreateEvent( NULL, FALSE, FALSE, NULL );
+
+        InitializeCriticalSection( &p_condvar->csection );
+
+        return !p_condvar->semaphore || !p_condvar->event;
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -414,15 +424,40 @@ static inline int vlc_cond_signal( vlc_cond_t *p_condvar )
     /* Release one waiting thread if one is available. */
     /* For this trick to work properly, the vlc_cond_signal must be surrounded
      * by a mutex. This will prevent another thread from stealing the signal */
-    if( p_condvar->i_waiting_threads )
+
+    if( !p_condvar->semaphore )
     {
-        if( p_condvar->signal )
+        PulseEvent( p_condvar->event );
+    }
+    else if( p_main->p_sys->i_win9x_cv == 1 )
+    {
+        /* Wait for the gate to be open */
+        WaitForSingleObject( p_condvar->event, INFINITE );
+
+        if( p_condvar->i_waiting_threads )
         {
+            /* Using a semaphore exposes us to a race condition. It is
+             * possible for another thread to start waiting on the semaphore
+             * just after we signaled it and thus steal the signal.
+             * We have to prevent new threads from entering the cond_wait(). */
+            ResetEvent( p_condvar->event );
+
+            /* A semaphore is used here because Win9x doesn't have
+             * SignalObjectAndWait() and thus a race condition exists
+             * during the time we release the mutex and the time we start
+             * waiting on the event (more precisely, the signal can sometimes
+             * be missed by the waiting thread if we use PulseEvent()). */
             ReleaseSemaphore( p_condvar->semaphore, 1, 0 );
         }
-        else
+    }
+    else
+    {
+        if( p_condvar->i_waiting_threads )
         {
-            SetEvent( p_condvar->p_events[0] );
+            ReleaseSemaphore( p_condvar->semaphore, 1, 0 );
+
+            /* Wait for the last thread to be awakened */
+            WaitForSingleObject( p_condvar->event, INFINITE );
         }
     }
     return 0;
@@ -495,23 +530,36 @@ static inline int vlc_cond_broadcast( vlc_cond_t *p_condvar )
 
 #elif defined( WIN32 )
     /* Release all waiting threads. */
-    if( p_condvar->i_waiting_threads )
+    int i;
+
+    if( !p_condvar->semaphore )
+        for( i = p_condvar->i_waiting_threads; i > 0; i-- )
+            PulseEvent( p_condvar->event );
+    else if( p_main->p_sys->i_win9x_cv == 1 )
     {
-        if( p_condvar->signal )
+        /* Wait for the gate to be open */
+        WaitForSingleObject( p_condvar->event, INFINITE );
+
+        if( p_condvar->i_waiting_threads )
         {
-            p_condvar->b_broadcast = 1;
-            /* This call is atomic */
+            /* close gate */
+            ResetEvent( p_condvar->event );
+
             ReleaseSemaphore( p_condvar->semaphore,
                               p_condvar->i_waiting_threads, 0 );
-            /* Wait for all threads to get the semaphore */
-            WaitForSingleObject( p_condvar->signal, INFINITE );
-            p_condvar->b_broadcast = 0;
-        }
-        else
-        {
-            SetEvent( p_condvar->p_events[1] );
         }
     }
+    else
+    {
+        if( p_condvar->i_waiting_threads )
+        {
+            ReleaseSemaphore( p_condvar->semaphore,
+                              p_condvar->i_waiting_threads, 0 );
+            /* Wait for the last thread to be awakened */
+            WaitForSingleObject( p_condvar->event, INFINITE );
+        }
+    }
+
     return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -592,57 +640,75 @@ static inline int _vlc_cond_wait( char * psz_file, int i_line,
     return i_ret;
 
 #elif defined( WIN32 )
-    /* Increase our wait count */
-    p_condvar->i_waiting_threads++;
-
-    if( p_condvar->signal )
+    if( !p_condvar->semaphore )
     {
+        /* Increase our wait count */
+        p_condvar->i_waiting_threads++;
+
+        if( p_main->p_sys->SignalObjectAndWait )
         /* It is only possible to atomically release the mutex and initiate the
          * waiting on WinNT/2K/XP. Win9x doesn't have SignalObjectAndWait(). */
-        p_main->p_sys->SignalObjectAndWait( p_mutex->mutex,
-                                            p_condvar->semaphore,
-                                            INFINITE, FALSE );
-        /* XXX: we should protect i_waiting_threads with a mutex, but
-         * is it really worth it ? */
-        p_condvar->i_waiting_threads--;
-
-        if( p_condvar->b_broadcast
-             && p_condvar->i_waiting_threads == 0 )
-        {
-            p_main->p_sys->SignalObjectAndWait( p_condvar->signal,
-                                                p_mutex->mutex,
+            p_main->p_sys->SignalObjectAndWait( p_mutex->mutex,
+                                                p_condvar->event,
                                                 INFINITE, FALSE );
-        }
         else
         {
-            /* Just take back the lock */
-            WaitForSingleObject( p_mutex->mutex, INFINITE );
+            LeaveCriticalSection( &p_mutex->csection );
+            WaitForSingleObject( p_condvar->event, INFINITE );
         }
-        return 0;
+    }
+    else if( p_main->p_sys->i_win9x_cv == 1 )
+    {
+        int i_waiting_threads;
+
+        /* Wait for the gate to be open */
+        WaitForSingleObject( p_condvar->event, INFINITE );
+
+        /* Increase our wait count */
+        p_condvar->i_waiting_threads++;
+
+        LeaveCriticalSection( &p_mutex->csection );
+        WaitForSingleObject( p_condvar->semaphore, INFINITE );
+
+        /* Decrement and test must be atomic */
+        EnterCriticalSection( &p_condvar->csection );
+
+        /* Decrease our wait count */
+        i_waiting_threads = --p_condvar->i_waiting_threads;
+
+        LeaveCriticalSection( &p_condvar->csection );
+
+        /* Reopen the gate if we were the last waiting thread */
+        if( !i_waiting_threads )
+            SetEvent( p_condvar->event );
     }
     else
     {
-        int i_ret;
+        int i_waiting_threads;
 
-        /* Release the mutex, wait, and reacquire. */
+        /* Increase our wait count */
+        p_condvar->i_waiting_threads++;
+
         LeaveCriticalSection( &p_mutex->csection );
-        i_ret = WaitForMultipleObjects( 2, p_condvar->p_events,
-                                        FALSE, INFINITE );
-        EnterCriticalSection( &p_mutex->csection );
+        WaitForSingleObject( p_condvar->semaphore, INFINITE );
+
+        /* Decrement and test must be atomic */
+        EnterCriticalSection( &p_condvar->csection );
 
         /* Decrease our wait count */
-        p_condvar->i_waiting_threads--;
+        i_waiting_threads = --p_condvar->i_waiting_threads;
 
-        /* If we are the last waiter and it was a broadcast signal, reset
-         * the broadcast event. */
-        if( i_ret == WAIT_OBJECT_0 + 1
-             && p_condvar->i_waiting_threads == 0 )
-        {
-            ResetEvent( p_condvar->p_events[1] );
-        } 
-    
-        return( i_ret == WAIT_FAILED );
+        LeaveCriticalSection( &p_condvar->csection );
+
+        /* Signal that the last waiting thread just went through */
+        if( !i_waiting_threads )
+            SetEvent( p_condvar->event );
     }
+
+    /* Reacquire the mutex before returning. */
+    vlc_mutex_lock( p_mutex );
+
+    return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
 
@@ -733,16 +799,11 @@ static inline int _vlc_cond_destroy( char * psz_file, int i_line,
     return st_cond_destroy( *p_condvar );
 
 #elif defined( WIN32 )
-    if( p_condvar->signal )
-    {
-        return !CloseHandle( p_condvar->signal )
-                 || !CloseHandle( p_condvar->semaphore );
-    }
+    if( !p_condvar->semaphore )
+        return !CloseHandle( p_condvar->event );
     else
-    {
-        return !CloseHandle( p_condvar->p_events[0] )
-                 || !CloseHandle( p_condvar->p_events[1] );
-    }
+        return !CloseHandle( p_condvar->event )
+          || !CloseHandle( p_condvar->semaphore );
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     int i_result = pthread_cond_destroy( p_condvar );

@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.42.2.1 2002/06/17 08:37:56 sam Exp $
+ * $Id: threads.h,v 1.42.2.2 2002/07/29 16:12:24 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -114,14 +114,12 @@ typedef struct
 
 typedef struct
 {
-    int                 i_waiting_threads;
+    volatile int        i_waiting_threads;
     /* WinNT/2K/XP implementation */
-    HANDLE              semaphore;
-    HANDLE              signal;
-    boolean_t           b_broadcast;
+    HANDLE              event;
     /* Win95/98/ME implementation */
-    enum                { SIGNAL = 0, BROADCAST = 1 };
-    HANDLE              p_events[2];
+    HANDLE              semaphore;
+    CRITICAL_SECTION    csection;
 } vlc_cond_t;
 
 typedef unsigned (__stdcall *PTHREAD_START) (void *);

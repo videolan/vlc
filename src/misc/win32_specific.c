@@ -2,7 +2,7 @@
  * win32_specific.c: Win32 specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.7 2002/04/27 22:11:22 gbazin Exp $
+ * $Id: win32_specific.c,v 1.7.2.1 2002/07/29 16:12:24 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -49,9 +49,16 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /* dynamically get the address of SignalObjectAndWait */
-    hInstLib = LoadLibrary( "kernel32" );
-    p_main->p_sys->SignalObjectAndWait =
-        (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib, "SignalObjectAndWait" );
+    if( (GetVersion() < 0x80000000) )
+    {
+        /* We are running on NT/2K/XP, we can use SignalObjectAndWait */
+        hInstLib = LoadLibrary( "kernel32" );
+        if( hInstLib)
+            p_main->p_sys->SignalObjectAndWait =
+                (SIGNALOBJECTANDWAIT)GetProcAddress( hInstLib,
+                                                     "SignalObjectAndWait" );
+    }
+    else p_main->p_sys->SignalObjectAndWait = NULL;
 
     /* WinSock Library Init. */
     i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
@@ -69,7 +76,8 @@ void system_Init( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
  *****************************************************************************/
 void system_Configure( void )
 {
-    p_main->p_sys->b_fast_pthread = config_GetIntVariable( "fast_pthread" );
+    p_main->p_sys->b_fast_mutex = config_GetIntVariable( "fast-mutex" );
+    p_main->p_sys->i_win9x_cv = config_GetIntVariable( "win9x-cv-method" );
 }
 
 /*****************************************************************************
