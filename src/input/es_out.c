@@ -319,11 +319,8 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     }
 
     psz_description = LanguageGetName( fmt->psz_language );
-    es->p_es = input_AddES( p_input,
-                            p_prgm,
-                            fmt->i_id + 1,
-                            fmt->i_cat,
-                            psz_description, 0 );
+    es->p_es = input_AddES( p_input, p_prgm, fmt->i_id + 1,
+                            fmt->i_cat, psz_description, 0 );
     es->p_es->i_stream_id = fmt->i_id;
     es->p_es->i_fourcc = fmt->i_codec;
 
@@ -495,13 +492,14 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     if( es->p_es->p_dec &&
         (es->p_es->i_cat!=AUDIO_ES || !p_sys->p_input->stream.control.b_mute) )
     {
+        vlc_mutex_unlock( &out->p_sys->p_input->stream.stream_lock );
         input_DecodeBlock( es->p_es->p_dec, p_block );
     }
     else
     {
+        vlc_mutex_unlock( &out->p_sys->p_input->stream.stream_lock );
         block_Release( p_block );
     }
-    vlc_mutex_unlock( &out->p_sys->p_input->stream.stream_lock );
 
     return VLC_SUCCESS;
 }

@@ -190,36 +190,20 @@ decoder_t * input_RunDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     decoder_t *p_dec = p_es->p_dec;
-    int i_dummy;
 
     p_dec->b_die = VLC_TRUE;
 
     if( p_dec->p_owner->b_own_thread )
     {
-        /* Make sure the thread leaves the NextDataPacket() function by
-         * sending it a few null packets. */
-        for( i_dummy = 0; i_dummy < PADDING_PACKET_NUMBER; i_dummy++ )
-        {
-            input_NullPacket( p_input, p_es );
-        }
+        /* Make sure the thread leaves the function by
+         * sending it an empty block. */
+        block_t *p_block = block_New( p_dec, 0 );
+        input_DecodeBlock( p_dec, p_block );
 
-        if( p_es->p_pes != NULL )
-        {
-            input_DecodePES( p_es->p_dec, p_es->p_pes );
-        }
-
-        /* Waiting for the thread to exit */
-        /* I thought that unlocking was better since thread join can be long
-         * but it actually creates late pictures and freezes --stef */
-        /* vlc_mutex_unlock( &p_input->stream.stream_lock ); */
         vlc_thread_join( p_dec );
-        /* vlc_mutex_lock( &p_input->stream.stream_lock ); */
-#if 0
-        /* XXX We don't do it here because of dll loader that want close in the
-         * same thread than open/decode */
-        /* Unneed module */
-        module_Unneed( p_dec, p_dec->p_module );
-#endif
+
+        /* Don't module_Unneed() here because of the dll loader that wants
+         * close() in the same thread than open()/decode() */
     }
     else
     {
@@ -261,7 +245,7 @@ void input_DecodePES( decoder_t * p_dec, pes_packet_t * p_pes )
         {
             uint8_t *p_buffer = p_block->p_buffer;
 
-            for( p_data = p_pes->p_first; p_data != NULL; p_data = p_data->p_next )
+            for( p_data = p_pes->p_first; p_data; p_data = p_data->p_next )
             {
                 int i_copy = p_data->p_payload_end - p_data->p_payload_start;
 
@@ -553,7 +537,7 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
  */
 static int DecoderThread( decoder_t * p_dec )
 {
-    block_t       *p_block;
+    block_t *p_block;
 
     /* The decoder's main loop */
     while( !p_dec->b_die && !p_dec->b_error )
@@ -563,12 +547,7 @@ static int DecoderThread( decoder_t * p_dec )
             p_dec->b_error = 1;
             break;
         }
-        if( p_block->i_buffer <= 0 )
-        {
-            block_Release( p_block );
-            continue;
-        }
-        if( DecoderDecode( p_dec, p_block ) )
+        if( DecoderDecode( p_dec, p_block ) != VLC_SUCCESS )
         {
             break;
         }
@@ -578,15 +557,11 @@ static int DecoderThread( decoder_t * p_dec )
     {
         /* Trash all received PES packets */
         p_block = block_FifoGet( p_dec->p_owner->p_fifo );
-        if( p_block )
-        {
-            block_Release( p_block );
-        }
+        if( p_block ) block_Release( p_block );
     }
 
-    /* XXX We do it here because of dll loader that want close in the
-     * same thread than open/decode */
-    /* Unneed module */
+    /* We do it here because of the dll loader that wants close() in the
+     * same thread than open()/decode() */
     module_Unneed( p_dec, p_dec->p_module );
 
     return 0;

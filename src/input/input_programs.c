@@ -132,6 +132,8 @@ int input_InitStream( input_thread_t * p_input, size_t i_data_len )
  *****************************************************************************/
 void input_EndStream( input_thread_t * p_input )
 {
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
     /* Free all programs and associated ES, and associated decoders. */
     while( p_input->stream.i_pgrm_number )
     {
@@ -160,6 +162,8 @@ void input_EndStream( input_thread_t * p_input )
     {
         free( p_input->stream.p_demux_data );
     }
+
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     /* Free navigation variables */
     var_Destroy( p_input, "program" );
@@ -958,8 +962,13 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
         var_Change( p_input, psz_var, VLC_VAR_SETVALUE, &val, NULL );
     }
 
+    /* FIXME: input_UnselectES() shouldn't actually be entered with the
+     * input lock, the locking should be done here and only where necessary. */
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
     /* Actually unselect the ES */
     input_EndDecoder( p_input, p_es );
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+
     p_es->p_pes = NULL;
 
     if( ( p_es->p_dec == NULL ) &&
