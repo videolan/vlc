@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.25 2001/12/05 03:31:04 jobi Exp $
+ * $Id: input_clock.c,v 1.26 2001/12/06 10:53:42 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -39,6 +39,8 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
+
+#include "main.h"
 
 /*
  * DISCUSSION : SYNCHRONIZATION METHOD
@@ -312,7 +314,8 @@ mtime_t input_ClockGetTS( input_thread_t * p_input,
     if( p_pgrm->i_synchro_state == SYNCHRO_OK )
     {
         return( ClockToSysdate( p_input, p_pgrm, i_ts + p_pgrm->delta_cr )
-                 + DEFAULT_PTS_DELAY );
+                 + DEFAULT_PTS_DELAY
+                 + (p_main->i_desync > 0 ? p_main->i_desync : 0) );
     }
     else
     {

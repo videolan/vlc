@@ -38,6 +38,8 @@
 #include "audio_output.h"
 #include "aout_common.h"
 
+#include "main.h"
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -90,7 +92,8 @@ void aout_S16StereoThread( aout_thread_t * p_aout )
 
         /* sizeof(s16) << (p_aout->b_stereo) == 4 */
         p_aout->date = mdate() + ((((mtime_t)((l_bytes + 4 * p_aout->i_latency) / 4)) * 1000000)
-                                   / ((mtime_t)p_aout->l_rate));
+                                   / ((mtime_t)p_aout->l_rate))
+                        + p_main->i_desync;
         p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer,
                          l_buffer_limit * sizeof(s16) );
 

@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.34 2001/12/03 16:18:37 sam Exp $
+ * $Id: vout_xvideo.c,v 1.35 2001/12/06 10:53:42 massiot Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -531,8 +531,11 @@ static int vout_Manage( vout_thread_t *p_vout )
             switch( ((XButtonEvent *)&xevent)->button )
             {
                 case Button1:
-                    /* in this part we will eventually manage
-                     * clicks for DVD navigation for instance */
+                    /* In this part we will eventually manage
+                     * clicks for DVD navigation for instance. For the
+                     * moment just pause the stream. */
+                    input_SetStatus( p_main->p_intf->p_input,
+                                     INPUT_STATUS_PAUSE );
                     break;
             }
         }

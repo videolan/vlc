@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.66 2001/11/28 15:08:06 massiot Exp $
+ * $Id: audio_output.c,v 1.67 2001/12/06 10:53:42 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -312,7 +312,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
     }
 
     /* Rough estimate of the playing date */
-    p_aout->date = mdate();
+    p_aout->date = mdate() + p_main->i_desync;
 
     /* Launch the thread */
     if ( vlc_thread_create( &p_aout->thread_id, "audio output",

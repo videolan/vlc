@@ -4939,7 +4939,7 @@ fi
 
       CFLAGS=$save_CFLAGS
       LDFLAGS=$save_LDFLAGS
-      PLUGINS="${PLUGINS} mad_adec"
+      BUILTINS="${BUILTINS} mad_adec"
     fi 
 fi
 

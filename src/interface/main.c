@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.130 2001/12/05 10:30:25 massiot Exp $
+ * $Id: main.c,v 1.131 2001/12/06 10:53:42 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -112,6 +112,7 @@
 #define OPT_MONO                152
 #define OPT_SPDIF               153
 #define OPT_VOLUME              154
+#define OPT_DESYNC              155
 
 #define OPT_NOVIDEO             160
 #define OPT_DISPLAY             161
@@ -187,6 +188,7 @@ static const struct option longopts[] =
     {   "downmix",          1,          0,      OPT_DOWNMIX },
     {   "imdct",            1,          0,      OPT_IMDCT },
     {   "volume",           1,          0,      OPT_VOLUME },
+    {   "desync",           1,          0,      OPT_DESYNC },
 
     /* Video options */
     {   "novideo",          0,          0,      OPT_NOVIDEO },
@@ -596,6 +598,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     p_main->i_warning_level = 0;
     p_main->b_stats = 0;
+    p_main->i_desync = 0; /* No desynchronization by default */
 
     p_main->p_channel = NULL;
 
@@ -731,6 +734,9 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
         case OPT_VOLUME:                                         /* --volume */
             main_PutIntVariable( AOUT_VOLUME_VAR, atoi(optarg) );
+            break;
+        case OPT_DESYNC:                                         /* --desync */
+            p_main->i_desync = atoi(optarg);
             break;
 
         /* Video options */
@@ -915,6 +921,7 @@ static void Usage( int i_fashion )
           "\n      --downmix <module>         \tAC3 downmix method"
           "\n      --imdct <module>           \tAC3 IMDCT method"
           "\n      --volume [0..1024]         \tVLC output volume"
+          "\n      --desync <time in ms>      \tCompensate desynchronization of the audio"
           "\n"
           "\n      --novideo                  \tdisable video"
           "\n  -V, --vout <module>            \tvideo output method"
@@ -948,7 +955,16 @@ static void Usage( int i_fashion )
           "\n"
           "\n  -h, --help                     \tprint help and exit"
           "\n  -H, --longhelp                 \tprint long help and exit"
-          "\n      --version                  \toutput version information and exit" );
+          "\n      --version                  \toutput version information and exit"
+          "\n\nPlaylist items :"
+          "\n  *.mpg, *.vob                   \tPlain MPEG-1/2 files"
+          "\n  dvd:<device>[@<raw device>]    \tDVD device"
+          "\n  vcd:<device>                   \tVCD device"
+          "\n  udpstream:[<server>[:<server port>]][@[<bind address>][:<bind port>]]"
+          "\n                                 \tUDP stream sent by VLS"
+          "\n  vlc:loop                       \tLoop execution of the playlist"
+          "\n  vlc:pause                      \tPause execution of playlist items"
+          "\n  vlc:quit                       \tQuit VLC");
 
     if( i_fashion == SHORT_HELP )
         return;
@@ -970,7 +986,7 @@ static void Usage( int i_fashion )
         "\n  " DOWNMIX_METHOD_VAR "=<method name>     \tAC3 downmix method"
         "\n  " IMDCT_METHOD_VAR "=<method name>       \tAC3 IMDCT method"
         "\n  " AOUT_VOLUME_VAR "=[0..1024]            \tVLC output volume"
-        "\n  " AOUT_RATE_VAR "=<rate>             \toutput rate" );
+        "\n  " AOUT_RATE_VAR "=<rate>                 \toutput rate" );
 
     /* Video parameters */
     intf_MsgImm( "\nVideo parameters:"
@@ -1289,7 +1305,7 @@ static int CPUCapabilities( void )
     if( setjmp( env ) == 0 )
     {
         asm volatile ("mtspr 256, %0\n\t"
-                      "vand %v0, %v0, %v0"
+                      "vand %%v0, %%v0, %%v0"
                       :
                       : "r" (-1));
     }

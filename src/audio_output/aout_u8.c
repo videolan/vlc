@@ -2,7 +2,7 @@
  * aout_u8.c: 8 bit unsigned audio output functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_u8.c,v 1.7 2001/11/28 15:08:06 massiot Exp $
+ * $Id: aout_u8.c,v 1.8 2001/12/06 10:53:42 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -38,6 +38,8 @@
 
 #include "audio_output.h"
 #include "aout_common.h"
+
+#include "main.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -84,7 +86,8 @@ void aout_U8MonoThread( aout_thread_t * p_aout )
         l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
         /* sizeof(u8) << (p_aout->b_stereo) == 1 */
         p_aout->date = mdate() + ((((mtime_t)((l_bytes + 4 * p_aout->i_latency) / 1)) * 1000000)
-                                   / ((mtime_t)p_aout->l_rate));
+                                   / ((mtime_t)p_aout->l_rate))
+                        + p_main->i_desync;
  
         p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
         if ( l_bytes > (l_buffer_limit * sizeof(u8) * 2) ) /* There are 2 channels (left & right) */
@@ -138,7 +141,8 @@ void aout_U8StereoThread( aout_thread_t * p_aout )
         l_bytes = p_aout->pf_getbufinfo( p_aout, l_buffer_limit );
         /* sizeof(u8) << (p_aout->b_stereo) == 2 */
         p_aout->date = mdate() + ((((mtime_t)((l_bytes + 4 * p_aout->i_latency) / 2)) * 1000000)
-                                   / ((mtime_t)p_aout->l_rate));
+                                   / ((mtime_t)p_aout->l_rate))
+                        + p_main->i_desync;
  
         p_aout->pf_play( p_aout, (byte_t *)p_aout->buffer, l_buffer_limit * sizeof(u8) );
         if ( l_bytes > (l_buffer_limit * sizeof(u8)) )
