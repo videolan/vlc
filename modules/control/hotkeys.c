@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.9 2003/12/08 13:04:58 gbazin Exp $
+ * $Id: hotkeys.c,v 1.10 2003/12/10 17:19:05 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -350,6 +350,42 @@ static void Run( intf_thread_t *p_intf )
             {
                 vlc_value_t val; val.b_bool = VLC_TRUE;
                 var_Set( p_input, "rate-slower", val );
+            }
+            else if( i_action == ACTIONID_POSITION )
+            {
+                p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                              FIND_ANYWHERE );
+                char psz_duration[MSTRTIME_MAX_SIZE];
+                char psz_time[MSTRTIME_MAX_SIZE];
+                vlc_value_t time;
+                mtime_t i_seconds;
+                                                                                                                            
+                var_Get( p_input, "time", &time );
+                                                                                                                            
+                if( p_playlist )
+                {
+                    mtime_t dur =
+                        p_playlist->pp_items[p_playlist->i_index]->i_duration;
+
+                    i_seconds = time.i_time / 1000000;
+                    secstotimestr ( psz_time, i_seconds );
+                                                                                                                            
+                    if( dur != -1 )
+                    {
+                        char psz_position[2*MSTRTIME_MAX_SIZE + 3];
+                        secstotimestr( psz_duration, dur/1000000 );
+                        strcpy( psz_position, psz_time );
+                        strcat( psz_position, " / " );
+                        strcat( psz_position, psz_duration );
+                        vout_OSDMessage( VLC_OBJECT(p_playlist), psz_position );
+                    }
+                    else if( i_seconds > 0 )
+                    { 
+                        vout_OSDMessage( VLC_OBJECT(p_playlist), psz_time );
+                    }
+                }
+                                                                                                                            
+                vlc_object_release( p_playlist );
             }
         }
 

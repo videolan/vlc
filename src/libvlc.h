@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.115 2003/12/09 00:46:03 yoann Exp $
+ * $Id: libvlc.h,v 1.116 2003/12/10 17:19:05 yoann Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -545,6 +545,8 @@ static char *ppsz_language_text[] =
 #define PREV_KEY_LONGTEXT N_("Select the hotkey to use to skip to the previous item in the playlist")
 #define STOP_KEY_TEXT N_("Stop")
 #define STOP_KEY_LONGTEXT N_("Select the hotkey to stop the playback")
+#define POSITION_KEY_TEXT N_("Position")
+#define POSITION_KEY_LONGTEXT N_("Select the hotkey to display the position")
 
 #define JB10SEC_KEY_TEXT N_("Jump backward 10 seconds")
 #define JB10SEC_KEY_LONGTEXT N_("Select the hotkey to jump backward by 10 seconds")
@@ -800,6 +802,7 @@ vlc_module_begin();
     add_key( "key-next", KEY_MODIFIER_COMMAND|KEY_RIGHT, NULL, NEXT_KEY_TEXT, NEXT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-prev", KEY_MODIFIER_COMMAND|KEY_LEFT, NULL, PREV_KEY_TEXT, PREV_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-stop", KEY_MODIFIER_COMMAND|'.', NULL, STOP_KEY_TEXT, STOP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-position", KEY_MODIFIER_COMMAND|'t', NULL, POSITION_KEY_TEXT, POSITION_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump-10sec", KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_LEFT, NULL, JB10SEC_KEY_TEXT, JB10SEC_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump+10sec", KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_RIGHT, NULL, JF10SEC_KEY_TEXT, JF10SEC_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump-1min", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_LEFT, NULL, JB1MIN_KEY_TEXT, JB1MIN_KEY_LONGTEXT, VLC_FALSE );
@@ -824,6 +827,7 @@ vlc_module_begin();
     add_key( "key-next", 'n', NULL, NEXT_KEY_TEXT, NEXT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-prev", 'p', NULL, PREV_KEY_TEXT, PREV_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-stop", 's', NULL, STOP_KEY_TEXT, STOP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-position", 't', NULL, POSITION_KEY_TEXT, POSITION_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump-10sec", KEY_MODIFIER_ALT|KEY_LEFT, NULL, JB10SEC_KEY_TEXT, JB10SEC_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump+10sec", KEY_MODIFIER_ALT|KEY_RIGHT, NULL, JF10SEC_KEY_TEXT, JF10SEC_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump-1min", KEY_MODIFIER_CTRL|KEY_LEFT, NULL, JB1MIN_KEY_TEXT, JB1MIN_KEY_LONGTEXT, VLC_FALSE );
@@ -882,6 +886,7 @@ static struct hotkey p_hotkeys[] =
     { "key-play", ACTIONID_PLAY, 0 },
     { "key-pause", ACTIONID_PAUSE, 0 },
     { "key-stop", ACTIONID_STOP, 0 },
+    { "key-position", ACTIONID_POSITION, 0 },
     { "key-jump-10sec", ACTIONID_JUMP_BACKWARD_10SEC, 0 },
     { "key-jump+10sec", ACTIONID_JUMP_FORWARD_10SEC, 0 },
     { "key-jump-1min", ACTIONID_JUMP_BACKWARD_1MIN, 0 },
