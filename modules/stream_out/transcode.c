@@ -549,7 +549,6 @@ struct sout_stream_id_t
 
     /* Sync */
     date_t          interpolated_pts;
-    mtime_t         i_initial_pts;
 };
 
 
@@ -1211,6 +1210,8 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         }
     }
 
+    date_Set( &id->interpolated_pts, 0 );
+
     return VLC_SUCCESS;
 }
 
@@ -1376,12 +1377,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
             mtime_t i_master_drift = p_sys->i_master_drift;
             mtime_t i_pts;
 
-            if( !id->i_initial_pts ) id->i_initial_pts = p_pic->date;
-
             if( !i_master_drift )
             {
                 /* No audio track ? */
-                i_master_drift = id->i_initial_pts;
+                p_sys->i_master_drift = i_master_drift = p_pic->date;
             }
 
             i_pts = date_Get( &id->interpolated_pts ) + 1;
@@ -1393,18 +1392,20 @@ static int transcode_video_process( sout_stream_t *p_stream,
 
             if( i_video_drift < i_master_drift - 50000 )
             {
+#if 0
                 msg_Dbg( p_stream, "dropping frame (%i)",
                          (int)(i_video_drift - i_master_drift) );
+#endif
                 return VLC_EGENERIC;
             }
             else if( i_video_drift > i_master_drift + 50000 )
             {
+#if 0
                 msg_Dbg( p_stream, "adding frame (%i)",
                          (int)(i_video_drift - i_master_drift) );
+#endif
                 i_duplicate = 2;
             }
-
-            date_Increment( &id->interpolated_pts, 1 );
         }
 
         if( !id->p_encoder->p_module )
@@ -1606,6 +1607,9 @@ static int transcode_video_process( sout_stream_t *p_stream,
             block_t *p_block;
             p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
             block_ChainAppend( out, p_block );
+
+            if( p_sys->b_audio_sync )
+                date_Increment( &id->interpolated_pts, 1 );
 
             if( p_sys->b_audio_sync && i_duplicate > 1 )
             {
