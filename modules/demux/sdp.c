@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.2 2003/08/03 16:22:48 fenrir Exp $
+ * $Id: sdp.c,v 1.3 2003/08/04 00:48:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -54,6 +54,11 @@ vlc_module_end();
  *****************************************************************************/
 static int  Demux ( input_thread_t * );
 
+#define FREE( p ) if( p ) { free( p ) ; (p) = NULL; }
+
+/*
+ * SDP definitions
+ */
 typedef struct
 {
     char *psz_name;
@@ -102,17 +107,53 @@ typedef struct
 
 } sdp_t;
 
+
+static sdp_t *sdp_Parse     ( char * );
+static void   sdp_Dump      ( input_thread_t *, sdp_t * );
+static void   sdp_Release   ( sdp_t * );
+
+#define RTP_PAYLOAD_MAX 10
+typedef struct
+{
+    int     i_cat;          /* AUDIO_ES, VIDEO_ES */
+
+    char    *psz_control;   /* If any, eg rtsp://blabla/... */
+
+    int     i_port;         /* base port */
+    int     i_port_count;   /* for hierachical stream */
+
+    int     i_address_count;/* for hierachical stream */
+    int     i_address_ttl;
+    char    *psz_address;
+
+    char    *psz_transport; /* RTP/AVP, udp, ... */
+
+    int     i_payload_count;
+    struct
+    {
+        int     i_type;
+        char    *psz_rtpmap;
+        char    *psz_fmtp;
+    } payload[RTP_PAYLOAD_MAX];
+
+} sdp_track_t;
+
+static sdp_track_t *sdp_TrackCreate ( sdp_t *, int , int , char * );
+static void         sdp_TrackRelease( sdp_track_t * );
+
+/*
+ * Module specific
+ */
+
+
 struct demux_sys_t
 {
     stream_t *s;
 
     int      i_session;
     sdp_t    *p_sdp;
-};
 
-static sdp_t *sdp_Parse  ( char * );
-static void  sdp_Dump    ( input_thread_t *, sdp_t * );
-static void   sdp_Release( sdp_t * );
+};
 
 /*****************************************************************************
  * Open:
@@ -128,6 +169,9 @@ static int Open( vlc_object_t * p_this )
     char           *psz_sdp;
 
     vlc_value_t    val;
+
+    int            i;
+    sdp_session_t  *p_session;
 
     /* See if it looks like a SDP
        v, o, s fields are mandatory and in this order */
@@ -147,6 +191,9 @@ static int Open( vlc_object_t * p_this )
     p_input->pf_demux = Demux;
     p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
 
+    /* Init private data */
+    p_sys->i_session= 0;
+    p_sys->p_sdp    = NULL;
     if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
     {
         msg_Err( p_input, "cannot create stream" );
@@ -162,7 +209,7 @@ static int Open( vlc_object_t * p_this )
         int i_read;
 
         i_read = stream_Read( p_sys->s, &psz_sdp[i_sdp], i_sdp_max - i_sdp -1 );
-        if( i_read <= i_sdp_max - i_sdp -1 )
+        if( i_read < i_sdp_max - i_sdp -1 )
         {
             if( i_read > 0 )
             {
@@ -183,6 +230,7 @@ static int Open( vlc_object_t * p_this )
 
     }
 
+    /* Parse this SDP */
     if( ( p_sys->p_sdp = sdp_Parse( psz_sdp ) ) == NULL )
     {
         msg_Err( p_input, "cannot parse SDP" );
@@ -198,10 +246,40 @@ static int Open( vlc_object_t * p_this )
     {
         p_sys->i_session = 0;
     }
+    p_session = &p_sys->p_sdp->session[p_sys->i_session];
 
-    /* Now create a handler for each media */
+    /* Now create a track for each media */
+    for( i = 0; i < p_session->i_media; i++ )
+    {
+        sdp_track_t *tk;
+        int j;
 
+        tk = sdp_TrackCreate( p_sys->p_sdp, p_sys->i_session, i, p_input->psz_source );
+        if( tk == NULL )
+        {
+            msg_Warn( p_input, "media[%d] invalid", i );
+            continue;
+        }
 
+        msg_Dbg( p_input, "media[%d] :", i );
+        msg_Dbg( p_input, "    - cat : %s",
+                 tk->i_cat == AUDIO_ES ? "audio" :
+                                ( tk->i_cat == VIDEO_ES ? "video":"unknown") );
+        msg_Dbg( p_input, "    - control : %s", tk->psz_control );
+        msg_Dbg( p_input, "    - address : %s ttl : %d count : %d",
+                 tk->psz_address, tk->i_address_ttl, tk->i_address_count );
+        msg_Dbg( p_input, "    - port : %d count : %d", tk->i_port, tk->i_port_count );
+        msg_Dbg( p_input, "    - transport : %s", tk->psz_transport );
+        for( j = 0; j < tk->i_payload_count; j++ )
+        {
+            msg_Dbg( p_input, "    - payload[%d] : type : %d rtpmap : %s fmtp : %s",
+                     j, tk->payload[j].i_type,
+                     tk->payload[j].psz_rtpmap,
+                     tk->payload[j].psz_fmtp );
+        }
+
+        sdp_TrackRelease( tk );
+    }
     return VLC_SUCCESS;
 
 error:
@@ -379,6 +457,12 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
                 }
                 else
                 {
+                    /* FIXME could be multiple address FIXME */
+                    /* For instance
+                           c=IN IP4 224.2.1.1/127
+                           c=IN IP4 224.2.1.2/127
+                           c=IN IP4 224.2.1.3/127
+                        is valid */
                     p_session->psz_connection = strdup( psz );
                 }
                 break;
@@ -447,6 +531,7 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
                 break;
         }
 
+#undef p_media
 #undef p_session
     }
 
@@ -462,7 +547,6 @@ static sdp_t *sdp_Parse  ( char *psz_sdp )
 }
 static void   sdp_Release( sdp_t *p_sdp )
 {
-#define FREE( p ) if( p ) { free( p ) ; (p) = NULL; }
     int i, j, i_attr;
     for( i = 0; i < p_sdp->i_session; i++ )
     {
@@ -501,7 +585,6 @@ static void   sdp_Release( sdp_t *p_sdp )
     }
     FREE( p_sdp->session );
     free( p_sdp );
-#undef FREE
 }
 
 static void  sdp_Dump   ( input_thread_t *p_input, sdp_t *p_sdp )
@@ -553,3 +636,212 @@ static void  sdp_Dump   ( input_thread_t *p_input, sdp_t *p_sdp )
     }
 #undef PRINTS
 }
+
+static char * sdp_AttributeValue( int i_attribute, sdp_attribute_t *attribute,
+                                  char *name )
+{
+    int i;
+
+    for( i = 0; i < i_attribute; i++ )
+    {
+        if( !strcmp( attribute[i].psz_name, name ) )
+        {
+            return attribute[i].psz_value;
+        }
+    }
+    return NULL;
+}
+
+/*
+ * Create a track from an SDP session/media
+ */
+static sdp_track_t *sdp_TrackCreate( sdp_t *p_sdp, int i_session, int i_media,
+                                     char *psz_url_base )
+{
+    sdp_track_t   *tk = malloc( sizeof( sdp_track_t ) );
+    sdp_session_t *p_session = &p_sdp->session[i_session];
+    sdp_media_t   *p_media = &p_session->media[i_media];
+
+    char *p;
+    char *psz;
+
+    /* Get track type */
+    if( !strncmp( p_media->psz_media, "audio", 5 ) )
+    {
+        tk->i_cat = AUDIO_ES;
+    }
+    else if( !strncmp( p_media->psz_media, "video", 5 ) )
+    {
+        tk->i_cat = VIDEO_ES;
+    }
+    else
+    {
+        free( tk );
+        return NULL;
+    }
+    p = &p_media->psz_media[5];
+
+    /* Get track port base and count */
+    tk->i_port = strtol( p, &p, 0 );
+
+    if( *p == '/' )
+    {
+        p++;
+        tk->i_port_count = strtol( p, &p, 0 );
+    }
+    else
+    {
+        tk->i_port_count = 0;
+    }
+
+    while( *p == ' ' )
+    {
+        p++;
+    }
+
+    /* Get transport */
+    tk->psz_transport = strdup( p );
+    if( ( psz = strchr( tk->psz_transport, ' ' ) ) )
+    {
+        *psz = '\0';
+    }
+    while( *p && *p != ' ' )
+    {
+        p++;
+    }
+
+    /* Get payload type+fmt */
+    tk->i_payload_count = 0;
+    for( ;; )
+    {
+        int i;
+
+        tk->payload[tk->i_payload_count].i_type     = strtol( p, &p, 0 );
+        tk->payload[tk->i_payload_count].psz_rtpmap = NULL;
+        tk->payload[tk->i_payload_count].psz_fmtp   = NULL;
+
+        for( i = 0; i < p_media->i_attribute; i++ )
+        {
+            if( !strcmp( p_media->attribute[i].psz_name, "rtpmap" ) &&
+                p_media->attribute[i].psz_value )
+            {
+                char *p = p_media->attribute[i].psz_value;
+                int i_type = strtol( p, &p, 0 );
+
+                if( i_type == tk->payload[tk->i_payload_count].i_type )
+                {
+                    tk->payload[tk->i_payload_count].psz_rtpmap = strdup( p );
+                }
+            }
+            else if( !strcmp( p_media->attribute[i].psz_name, "fmtp" ) &&
+                     p_media->attribute[i].psz_value )
+            {
+                char *p = p_media->attribute[i].psz_value;
+                int i_type = strtol( p, &p, 0 );
+
+                if( i_type == tk->payload[tk->i_payload_count].i_type )
+                {
+                    tk->payload[tk->i_payload_count].psz_fmtp = strdup( p );
+                }
+            }
+
+        }
+        tk->i_payload_count++;
+        if( *p == '\0' || tk->i_payload_count >= RTP_PAYLOAD_MAX )
+        {
+            break;
+        }
+    }
+
+    /* Get control */
+    psz = sdp_AttributeValue( p_media->i_attribute, p_media->attribute, "control" );
+    if( !psz || *psz == '\0' )
+    {
+        psz = sdp_AttributeValue( p_session->i_attribute, p_session->attribute,
+                                  "control" );
+    }
+
+    if( psz )
+    {
+        if( strstr( psz, "://" ) || psz_url_base == NULL )
+        {
+            tk->psz_control = strdup( psz );
+        }
+        else
+        {
+            tk->psz_control = malloc( strlen( psz_url_base ) + strlen( psz ) + 1 );
+            strcpy( tk->psz_control, psz_url_base );
+            strcat( tk->psz_control, psz );
+        }
+    }
+    else
+    {
+        tk->psz_control = NULL;
+    }
+
+    /* Get address */
+    psz = p_media->psz_connection;
+    if( psz == NULL )
+    {
+        psz = p_session->psz_connection;
+    }
+    if( psz )
+    {
+        tk->i_address_count = 0;
+        tk->i_address_ttl   = 0;
+        tk->psz_address     = NULL;
+
+        if( ( p = strstr( psz, "IP4" ) ) == NULL )
+        {
+            p = strstr( psz, "IP6" );   /* FIXME No idea if it exists ... */
+        }
+        if( p )
+        {
+            p += 3;
+            while( *p == ' ' )
+            {
+                p++;
+            }
+
+            tk->psz_address = p = strdup( p );
+            p = strchr( p, '/' );
+            if(p )
+            {
+                *p++ = '\0';
+
+                tk->i_address_ttl= strtol( p, &p, 0 );
+                if( p )
+                {
+                    tk->i_address_count = strtol( p, &p, 0 );
+                }
+            }
+        }
+    }
+    else
+    {
+        tk->i_address_count = 0;
+        tk->i_address_ttl   = 0;
+        tk->psz_address     = NULL;
+    }
+
+    return tk;
+}
+
+
+static void         sdp_TrackRelease( sdp_track_t *tk )
+{
+    int i;
+
+    FREE( tk->psz_control );
+    FREE( tk->psz_address );
+    FREE( tk->psz_transport );
+    for( i = 0; i < tk->i_payload_count; i++ )
+    {
+        FREE( tk->payload[i].psz_rtpmap );
+        FREE( tk->payload[i].psz_fmtp );
+    }
+    free( tk );
+}
+
+
+
