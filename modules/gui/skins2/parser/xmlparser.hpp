@@ -2,10 +2,9 @@
  * xmlparser.hpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: xmlparser.hpp,v 1.2 2004/01/24 14:25:16 asmax Exp $
+ * $Id: xmlparser.hpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,9 +37,10 @@ class XMLParser: public SkinObject
         XMLParser( intf_thread_t *pIntf, const string &rFileName );
         virtual ~XMLParser();
 
-        int parse();
+        /// Parse the file. Returns true on success
+        bool parse();
 
-    private:
+    protected:
         // Key comparison function for type "const char*"
         struct ltstr
         {
@@ -52,11 +52,20 @@ class XMLParser: public SkinObject
         /// Type for attribute lists
         typedef map<const char*, const char*, ltstr> AttrList_t;
 
+        /// Callbacks
+        virtual void handleBeginElement( const string &rName, AttrList_t &attr ) {}
+        virtual void handleEndElement( const string &rName ) {}
+
+    private:
         /// Reader context
         xmlTextReaderPtr m_pReader;
+        /// Flag for validation errors
+        bool m_errors;
 
-        void handleBeginElement( const string &rName, AttrList_t &attributes );
-        void handleEndElement( const string &rName );
+        /// Callback for validation errors
+        static void handleError( void *pArg,  const char *pMsg,
+                                 xmlParserSeverities severity,
+                                 xmlTextReaderLocatorPtr locator);
 };
 
 #endif

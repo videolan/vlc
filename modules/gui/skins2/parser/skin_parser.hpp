@@ -1,11 +1,10 @@
 /*****************************************************************************
- * parser_context.hpp
+ * skin_parser.hpp
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: parser_context.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ * Copyright (C) 2004 VideoLAN
+ * $Id: skin_parser.hpp,v 1.1 2004/01/25 11:44:19 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,37 +21,42 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#ifndef PARSER_CONTEXT_HPP
-#define PARSER_CONTEXT_HPP
+#ifndef SKIN_PARSER_HPP
+#define SKIN_PARSER_HPP
 
-#include <vlc/intf.h>
+#include "xmlparser.hpp"
 #include "builder_data.hpp"
-#include <list>
 
 
-/// Context for the FLEX parser
-class ParserContext
+/// Parser for the skin DTD
+class SkinParser: public XMLParser
 {
     public:
-        ParserContext( intf_thread_t *pIntf ):
-            m_pIntf( pIntf ), m_xOffset( 0 ), m_yOffset( 0 ) {}
+        SkinParser( intf_thread_t *pIntf, const string &rFileName );
+        virtual ~SkinParser() {}
 
-        intf_thread_t *m_pIntf;
+        const BuilderData &getData() const { return m_data; }
 
+    private:
         /// Container for mapping data from the XML
         BuilderData m_data;
-
         /// Current IDs
         string m_curWindowId;
         string m_curLayoutId;
         string m_curListId;
-
         /// Current offset of the controls
         int m_xOffset, m_yOffset;
         list<int> m_xOffsetList, m_yOffsetList;
-
         /// Layer of the current control in the layout
         int m_curLayer;
+
+        /// Callbacks
+        virtual void handleBeginElement( const string &rName, AttrList_t &attr );
+        virtual void handleEndElement( const string &rName );
+
+        /// Helper functions
+        bool ConvertBoolean( const char *value ) const;
+        int ConvertColor( const char *transcolor ) const;
 };
 
 #endif

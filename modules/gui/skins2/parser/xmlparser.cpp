@@ -2,10 +2,9 @@
  * xmlparser.cpp
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: xmlparser.cpp,v 1.2 2004/01/24 14:25:16 asmax Exp $
+ * $Id: xmlparser.cpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
- *          Olivier Teulière <ipkiss@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +33,12 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName ):
                  rFileName.c_str() );
     }
 
+    // Activate DTD validation
+    xmlTextReaderSetParserProp( m_pReader, XML_PARSER_DEFAULTATTRS, 1 );
     xmlTextReaderSetParserProp( m_pReader, XML_PARSER_VALIDATE, 1 );
+
+    // Set the error handler
+    xmlTextReaderSetErrorHandler( m_pReader, handleError, this );
 }
 
 
@@ -47,12 +51,14 @@ XMLParser::~XMLParser()
 }
 
 
-int XMLParser::parse()
+bool XMLParser::parse()
 {
     if( !m_pReader )
     {
         return -1;
     }
+
+    m_errors = false;
 
     int ret = xmlTextReaderRead( m_pReader );
     while (ret == 1)
@@ -104,23 +110,17 @@ int XMLParser::parse()
         }
         ret = xmlTextReaderRead( m_pReader );
     }
-    return 0;
+    return (ret == 0 && !m_errors );
 }
 
 
-void XMLParser::handleBeginElement( const string &rName,
-                                    AttrList_t &attributes )
+void XMLParser::handleError( void *pArg,  const char *pMsg,
+                             xmlParserSeverities severity,
+                             xmlTextReaderLocatorPtr locator)
 {
-    fprintf(stderr,"%s\n", rName.c_str());
-    AttrList_t::const_iterator it;
-    for (it = attributes.begin(); it != attributes.end(); it++)
-    {
-        fprintf(stderr,"  %s = %s\n", (*it).first, (*it).second);
-    }
+    XMLParser *pThis = (XMLParser*)pArg;
+    int line = xmlTextReaderLocatorLineNumber( locator );
+    msg_Err( pThis->getIntf(), "XML parser error (line %d) : %s", line, pMsg );
+    pThis->m_errors = true;
 }
-
-
-void XMLParser::handleEndElement( const string &rName )
-{
-    fprintf(stderr,"--> %s\n", rName.c_str());
-} 
+ 

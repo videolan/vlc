@@ -2,7 +2,7 @@
  * builder.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: builder.hpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -47,7 +47,7 @@ class Theme;
 class Builder: public SkinObject
 {
     public:
-        Builder( intf_thread_t *pIntf, BuilderData &rData );
+        Builder( intf_thread_t *pIntf, const BuilderData &rData );
         virtual ~Builder() {}
 
         /// Create a Theme object, ready to use.
@@ -59,7 +59,7 @@ class Builder: public SkinObject
 
     private:
         /// Data from the XML
-        BuilderData &m_rData;
+        const BuilderData &m_rData;
 
         /// Theme under construction
         Theme *m_pTheme;

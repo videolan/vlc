@@ -2,7 +2,7 @@
  * theme_loader.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme_loader.cpp,v 1.6 2004/01/24 14:25:16 asmax Exp $
+ * $Id: theme_loader.cpp,v 1.7 2004/01/25 11:44:19 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -25,8 +25,7 @@
 #include "theme_loader.hpp"
 #include "theme.hpp"
 #include "../parser/builder.hpp"
-#include "../parser/parser_context.hpp"
-#include "../parser/xmlparser.hpp"
+#include "../parser/skin_parser.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/window_manager.hpp"
 
@@ -54,12 +53,6 @@ int tar_close       ( TAR *t );
 
 #define DEFAULT_XML_FILE "theme.xml"
 
-extern "C"
-{
-    extern FILE *yyin;
-    int yylex( void *pContext );
-    void yyrestart( FILE *input_file );
-}
 
 bool ThemeLoader::load( const string &fileName )
 {
@@ -166,20 +159,6 @@ void ThemeLoader::deleteTempFiles( const string &path )
 
 bool ThemeLoader::parse( const string &xmlFile )
 {
-    XMLParser parser( getIntf(), xmlFile );
-    parser.parse();
-
-    // Set the file to parse
-    FILE *file = fopen( xmlFile.c_str(), "r" );
-    if( file == NULL )
-    {
-        // Skin cannot be opened
-        msg_Err( getIntf(), "Cannot open the specified skin file: %s",
-                 xmlFile.c_str() );
-        return false;
-    }
-    yyrestart( file );
-
     // File loaded
     msg_Dbg( getIntf(), "Using skin file: %s", xmlFile.c_str() );
 
@@ -197,22 +176,19 @@ bool ThemeLoader::parse( const string &xmlFile )
     }
 
     // Start the parser
-    ParserContext context( getIntf() );
-    int lex = yylex( &context );
-    fclose( file );
-
-    if( lex )
+    SkinParser parser( getIntf(), xmlFile );
+    bool ret = parser.parse();
+    if( !ret )
     {
+        msg_Err( getIntf(), "Failed to parse %s", xmlFile.c_str() );
         // Set old working directory to current
         chdir( cwd );
         delete[] cwd;
-
-        msg_Warn( getIntf(), "yylex failed: %i", lex );
         return false;
     }
 
     // Build and store the theme
-    Builder builder( getIntf(), context.m_data );
+    Builder builder( getIntf(), parser.getData() );
     getIntf()->p_sys->p_theme = builder.build();
 
     // Set old working directory to current.

@@ -2,7 +2,7 @@
  * builder_data.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder_data.hpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: builder_data.hpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -32,7 +32,6 @@ using namespace std;
 
 #include <vlc/vlc.h>
 #include <list>
-#include <map>
 #include <string>
 
 /// Structure for mapping data from XML file

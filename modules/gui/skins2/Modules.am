@@ -67,16 +67,12 @@ SOURCES_skins2 = \
 	parser/builder.cpp \
 	parser/builder.hpp \
 	parser/builder_data.hpp \
-	parser/flex.c \
 	parser/interpreter.cpp \
 	parser/interpreter.hpp \
-	parser/parser_context.hpp \
-	parser/skin.c \
-	parser/skin.h \
+	parser/skin_parser.cpp \
+	parser/skin_parser.hpp \
 	parser/xmlparser.cpp \
 	parser/xmlparser.hpp \
-	parser/wrappers.cpp \
-	parser/wrappers.h \
 	\
 	src/anchor.cpp \
 	src/anchor.hpp \

@@ -2,7 +2,7 @@
  * builder.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: builder.cpp,v 1.2 2004/01/11 17:12:17 asmax Exp $
+ * $Id: builder.cpp,v 1.3 2004/01/25 11:44:19 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -47,7 +47,7 @@
 #include "../utils/var_text.hpp"
 
 
-Builder::Builder( intf_thread_t *pIntf, BuilderData &rData):
+Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData):
     SkinObject( pIntf ), m_rData( rData ), m_pTheme( NULL )
 {
 }

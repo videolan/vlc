@@ -2,7 +2,7 @@
  * window_manager.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window_manager.cpp,v 1.3 2004/01/18 00:50:24 asmax Exp $
+ * $Id: window_manager.cpp,v 1.4 2004/01/25 11:44:19 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -143,8 +143,12 @@ void WindowManager::raise( GenericWindow *pWindow )
     WinSet_t::const_iterator it;
     for( it = m_allWindows.begin(); it != m_allWindows.end(); it++ )
     {
-        (*it)->raise();
+        if( *it !=  pWindow )
+        {
+            (*it)->raise();
+        }
     }
+    pWindow->raise();
 }
 
 
