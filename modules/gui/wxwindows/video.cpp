@@ -27,7 +27,6 @@
 #include <vlc/vlc.h>
 #include <vlc/vout.h>
 #include <vlc/intf.h>
-#include "stream_control.h"
 
 #include "wxwindows.h"
 

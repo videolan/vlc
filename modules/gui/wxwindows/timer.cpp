@@ -50,7 +50,7 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
     i_old_playing_status = PAUSE_S;
-    i_old_rate = DEFAULT_RATE;
+    i_old_rate = INPUT_RATE_DEFAULT;
 
     /* Register callback for the intf-popupmenu variable */
     playlist_t *p_playlist =
@@ -106,7 +106,7 @@ void Timer::Notify()
             b_old_seekable = VLC_FALSE;
 
             p_main_interface->statusbar->SetStatusText(
-                wxU(p_intf->p_sys->p_input->p_item->psz_name), 2 );
+                wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;
@@ -135,15 +135,71 @@ void Timer::Notify()
     if( p_intf->p_sys->p_input )
     {
         input_thread_t *p_input = p_intf->p_sys->p_input;
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
+        vlc_value_t val;
 
         if( !p_input->b_die )
         {
+            vlc_value_t pos;
+
             /* New input or stream map change */
             p_intf->p_sys->b_playing = 1;
 
             /* Manage the slider */
+            /* FIXME --fenrir */
+            /* Change the name of b_old_seekable into b_show_bar or something like that */
+            var_Get( p_input, "position", &pos );
+
+            if( !b_old_seekable )
+            {
+                if( pos.f_float > 0.0 )
+                {
+                    /* Done like this, as it's the only way to know if the slider
+                     * has to be displayed */
+                    b_old_seekable = VLC_TRUE;
+                    p_main_interface->slider_frame->Show();
+                    p_main_interface->frame_sizer->Show(
+                        p_main_interface->slider_frame );
+                    p_main_interface->frame_sizer->Layout();
+                    p_main_interface->frame_sizer->Fit( p_main_interface );
+
+                }
+            }
+
+            if( p_intf->p_sys->b_playing && b_old_seekable )
+            {
+                /* Update the slider if the user isn't dragging it. */
+                if( p_intf->p_sys->b_slider_free )
+                {
+                    char psz_time[ MSTRTIME_MAX_SIZE ];
+                    char psz_total[ MSTRTIME_MAX_SIZE ];
+                    vlc_value_t time;
+                    mtime_t i_seconds;
+
+                    /* Update the value */
+                    if( pos.f_float >= 0.0 )
+                    {
+                        p_intf->p_sys->i_slider_pos =
+                            (int)(SLIDER_MAX_POS * pos.f_float);
+
+                        p_main_interface->slider->SetValue(
+                            p_intf->p_sys->i_slider_pos );
+
+                        var_Get( p_intf->p_sys->p_input, "time", &time );
+                        i_seconds = time.i_time / 1000000;
+                        secstotimestr ( psz_time, i_seconds );
+
+                        var_Get( p_intf->p_sys->p_input, "length",  &time );
+                        i_seconds = time.i_time / 1000000;
+                        secstotimestr ( psz_total, i_seconds );
+
+                        p_main_interface->statusbar->SetStatusText(
+                            wxU(psz_time) + wxString(wxT(" / ")) +
+                            wxU(psz_total), 0 );
+                    }
+                }
+            }
+#if 0
+        vlc_mutex_lock( &p_input->stream.stream_lock );
             if( p_intf->p_sys->p_input->stream.b_seekable && !b_old_seekable )
             {
                 /* Done like this because b_seekable is set slightly after
@@ -190,14 +246,16 @@ void Timer::Notify()
                     }
                 }
             }
-
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+#endif
             /* Take care of the volume, etc... */
             p_main_interface->Update();
 
             /* Manage Playing status */
-            if( i_old_playing_status != p_input->stream.control.i_status )
+            var_Get( p_input, "state", &val );
+            if( i_old_playing_status != val.i_int )
             {
-                if( p_input->stream.control.i_status == PAUSE_S )
+                if( val.i_int == PAUSE_S )
                 {
                     p_main_interface->TogglePlayButton( PAUSE_S );
                 }
@@ -205,20 +263,20 @@ void Timer::Notify()
                 {
                     p_main_interface->TogglePlayButton( PLAYING_S );
                 }
-                i_old_playing_status = p_input->stream.control.i_status;
+                i_old_playing_status = val.i_int;
             }
 
             /* Manage Speed status */
-            if( i_old_rate != p_input->stream.control.i_rate )
+            var_Get( p_input, "rate", &val );
+            if( i_old_rate != val.i_int )
             {
                 p_main_interface->statusbar->SetStatusText(
                     wxString::Format(wxT("x%.2f"),
-                    1000.0 / p_input->stream.control.i_rate), 1 );
-                i_old_rate = p_input->stream.control.i_rate;
+                    (float)INPUT_RATE_DEFAULT / val.i_int ), 1 );
+                i_old_rate = val.i_int;
             }
         }
 
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     else if( p_intf->p_sys->b_playing && !p_intf->b_die )
     {

@@ -1018,7 +1018,8 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         vlc_value_t val_list;
 
         /* Source */
-        mvnprintw( y++, 0, COLS, " Source   : %s", p_input->psz_source );
+        mvnprintw( y++, 0, COLS, " Source   : %s",
+                   p_input->input.p_item->psz_uri );
 
         /* State */
         var_Get( p_input, "state", &val );
@@ -1173,10 +1174,10 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         if( p_input )
         {
             int i,j;
-            vlc_mutex_lock( &p_input->p_item->lock );
-            for ( i = 0; i < p_input->p_item->i_categories; i++ )
+            vlc_mutex_lock( &p_input->input.p_item->lock );
+            for ( i = 0; i < p_input->input.p_item->i_categories; i++ )
             {
-                info_category_t *p_category = p_input->p_item->pp_categories[i];
+                info_category_t *p_category = p_input->input.p_item->pp_categories[i];
                 if( y >= y_end ) break;
                 MainBoxWrite( p_intf, l++, 1, "  [%s]", p_category->psz_name );
                 for ( j = 0; j < p_category->i_infos; j++ )
@@ -1186,7 +1187,7 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
                     MainBoxWrite( p_intf, l++, 1, "      %s: %s", p_info->psz_name, p_info->psz_value );
                 }
             }
-            vlc_mutex_unlock( &p_input->p_item->lock );
+            vlc_mutex_unlock( &p_input->input.p_item->lock );
         }
         else
         {

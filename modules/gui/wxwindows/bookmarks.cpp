@@ -340,14 +340,25 @@ void BookmarksDialog::OnAdd( wxCommandEvent& event )
 
     seekpoint_t bookmark;
     vlc_value_t pos;
+    bookmark.psz_name = NULL;
+    bookmark.i_byte_offset = 0;
+    bookmark.i_time_offset = 0;
+
+
+    /* FIXME --fenrir
+     * - stream_Tell can't be use (not reentrant)
+     * - nobody except src/input/ could touch p_input
+     *   -> create new INPUT_CONTROL ...
+     */
+#if 0
     var_Get( p_input, "position", &pos );
     bookmark.psz_name = NULL;
-    bookmark.i_byte_offset =
-      (int64_t)((double)pos.f_float * p_input->stream.p_selected_area->i_size);
+    bookmark.i_byte_offset = stream_Tell( p_input->input.p_stream );
+      (int64_t)((double)pos.f_float * p_input->input.p_access->info.i_size);
     var_Get( p_input, "time", &pos );
     bookmark.i_time_offset = pos.i_time;
     input_Control( p_input, INPUT_ADD_BOOKMARK, &bookmark );
-
+#endif
     vlc_object_release( p_input );
 
     Update();
@@ -424,7 +435,7 @@ void BookmarksDialog::OnExtract( wxCommandEvent& event )
     if( i_first < i_bookmarks && i_second <= i_bookmarks )
     {
         WizardDialog *p_wizard_dialog = new WizardDialog( p_intf, this,
-                               p_input->p_item->psz_uri,
+                               p_input->input.p_item->psz_uri,
                                pp_bookmarks[i_first]->i_time_offset/1000000,
                                pp_bookmarks[i_second]->i_time_offset/1000000 );
         vlc_object_release( p_input );

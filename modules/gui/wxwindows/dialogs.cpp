@@ -32,7 +32,6 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/intf.h>
-#include "stream_control.h"
 
 #include "wxwindows.h"
 

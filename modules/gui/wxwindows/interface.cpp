@@ -28,7 +28,6 @@
 #include <vlc/aout.h>
 #include <vlc/vout.h>
 #include <vlc/intf.h>
-#include "stream_control.h"
 
 #include "wxwindows.h"
 
@@ -1259,7 +1258,8 @@ void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )
         return;
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
+    /* FIXME --fenrir */
+#if 0
     if( p_playlist->p_input != NULL )
     {
         vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
@@ -1272,6 +1272,7 @@ void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )
             vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
+#endif
 
     playlist_Prev( p_playlist );
     vlc_object_release( p_playlist );
@@ -1287,6 +1288,9 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
         return;
     }
 
+    /* FIXME --fenrir */
+#if 0
+    var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
     vlc_mutex_lock( &p_playlist->object_lock );
     if( p_playlist->p_input != NULL )
     {
@@ -1302,7 +1306,7 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
             vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
-
+#endif
     playlist_Next( p_playlist );
     vlc_object_release( p_playlist );
 }
