@@ -142,7 +142,7 @@ int32 DrawingThread(void *data)
  *****************************************************************************/
 
 VideoWindow::VideoWindow(BRect frame, const char *name, vout_thread_t *p_video_output )
-        : BWindow(frame, name, B_TITLED_WINDOW, NULL)
+        : BWindow(frame, name, B_DOCUMENT_WINDOW, NULL)
 {
 	float minWidth, minHeight, maxWidth, maxHeight; 
 
@@ -247,6 +247,7 @@ void VideoWindow::Zoom(BPoint origin, float width, float height )
 {
 if(is_zoomed)
 	{
+	SetLook(B_DOCUMENT_WINDOW_LOOK);
 	MoveTo(rect.left, rect.top);
 	ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
 	be_app->ShowCursor();
@@ -258,6 +259,7 @@ else
 	screen = new BScreen(this);
 	BRect rect = screen->Frame();
 	delete screen;
+	SetLook(B_NO_BORDER_WINDOW_LOOK);
 	MoveTo(0,0);
 	ResizeTo(rect.IntegerWidth(), rect.IntegerHeight());
 	be_app->HideCursor();
@@ -500,7 +502,7 @@ void vout_Display( vout_thread_t *p_vout )
 static int BeosOpenDisplay( vout_thread_t *p_vout )
 { 
     p_vout->p_sys->p_window =
-        new VideoWindow(  BRect( 50, 180, 50+p_vout->i_width-1, 180+p_vout->i_height-1 ), NULL, p_vout );
+        new VideoWindow(  BRect( 80, 50, 80+p_vout->i_width-1, 50+p_vout->i_height-1 ), NULL, p_vout );
     if( p_vout->p_sys->p_window == 0 )
     {
         free( p_vout->p_sys );

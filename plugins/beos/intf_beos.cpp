@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.16 2001/03/05 22:29:02 richards Exp $
+ * $Id: intf_beos.cpp,v 1.17 2001/03/06 01:26:06 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,6 +53,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <FilePanel.h>
+#include <Screen.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -102,8 +103,8 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
     file_panel = NULL;
     p_intf = p_interface;
 	BRect ButtonRect;
-	float xStart = 2.0;
-	float yStart = 40.0;
+	float xStart = 5.0;
+	float yStart = 20.0;
 
     SetName( "interface" );
     SetTitle(VOUT_TITLE " (BeOS interface)");
@@ -127,7 +128,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
     rect.top += menu_bar->Bounds().IntegerHeight()+1;
 
     BBox* p_view;
-	p_view = new BBox( rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW );
+	p_view = new BBox( rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW, B_PLAIN_BORDER );
 	p_view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     
    	/* Buttons */
@@ -195,14 +196,14 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
  
    	/* Seek Status */	
     rgb_color fill_color = {0,255,0};
-	p_seek = new SeekSlider(BRect(5,10,250,30), this, 0, 100,
+	p_seek = new SeekSlider(BRect(5,2,255,15), this, 0, 100,
 						B_TRIANGLE_THUMB);
 	p_seek->SetValue(0);
 	p_seek->UseFillColor(true, &fill_color);
     p_view->AddChild( p_seek );
 
    	/* Volume Slider */	
-	p_vol = new MediaSlider(BRect(xStart,40,250,60), new BMessage(VOLUME_CHG),
+	p_vol = new MediaSlider(BRect(xStart,20,255,30), new BMessage(VOLUME_CHG),
 							0, VOLUME_MAX);
 	p_vol->SetValue(VOLUME_DEFAULT);
 	p_vol->UseFillColor(true, &fill_color);
@@ -210,7 +211,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
     
 	/* Set size and Show */
     AddChild( p_view );
-	ResizeTo(260,70 + menu_bar->Bounds().IntegerHeight()+1);
+	ResizeTo(260,50 + menu_bar->Bounds().IntegerHeight()+1);
     Show();
 }
 
@@ -225,8 +226,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 {
 	int vol_val = p_vol->Value();	// remember the current volume
 	static int playback_status;		// remember playback state
-	BAlert *alert;
 	
+	BAlert *alert;
 	Activate();
     switch( p_message->what )
     {
@@ -242,7 +243,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
     	break;
 
     case OPEN_DVD:
-	    alert = new BAlert(VOUT_TITLE, "Opening DVD not yet supported", "Bummer");
+	    alert = new BAlert(VOUT_TITLE, "Play DVD from menu not yet supported", "Bummer");
 	    alert->Go();
 	    //intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, "dvd:/dev/disk/ide/atapi/1/master/0/raw" );
     	break;
@@ -411,12 +412,19 @@ void MediaSlider::DrawThumb(void)
 	BRect r;
 	BView *v;
 
+	rgb_color black = {0,0,0};
 	r = ThumbFrame();
 	v = OffscreenView();
-	v->SetHighColor(0,0,0);
+	if(IsEnabled())
+		v->SetHighColor(black);
+	else
+		v->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
 	r.InsetBy(r.IntegerWidth()/4, r.IntegerHeight()/6);
 	v->StrokeEllipse(r);
-	v->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	if(IsEnabled())
+		v->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	else
+		v->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
 	r.InsetBy(1,1);
 	v->FillEllipse(r);
 }
@@ -516,6 +524,15 @@ static int intf_Probe( probedata_t *p_data )
  *****************************************************************************/
 static int intf_Open( intf_thread_t *p_intf )
 {
+    BScreen *screen;
+    screen = new BScreen();
+    BRect rect = screen->Frame();
+    rect.top = rect.bottom-100;
+    rect.bottom -= 50;
+    rect.left += 50;
+    rect.right = rect.left + 350;
+    delete screen;
+    
     /* Allocate instance and initialize some members */
     p_intf->p_sys = (intf_sys_t*) malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
@@ -527,7 +544,7 @@ static int intf_Open( intf_thread_t *p_intf )
     
     /* Create the interface window */
     p_intf->p_sys->p_window =
-        new InterfaceWindow( BRect( 50, 50, 400, 100 ),
+        new InterfaceWindow( rect,
                              VOUT_TITLE " (BeOS interface)", p_intf );
     if( p_intf->p_sys->p_window == 0 )
     {
