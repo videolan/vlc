@@ -2,7 +2,7 @@
  * intf_open.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_open.m,v 1.2 2002/05/22 21:08:42 sam Exp $
+ * $Id: intf_open.m,v 1.3 2002/05/23 22:18:55 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -225,7 +225,7 @@ static Intf_Open *o_open = nil;
     
     [o_panel setAllowsMultipleSelection: YES];
 
-    if( [o_panel runModalForDirectory: NSHomeDirectory() 
+    if( [o_panel runModalForDirectory: nil 
             file: nil types: nil] == NSOKButton )
     {
         [[Intf_VLCWrapper instance] openFiles: [o_panel filenames]];
