@@ -95,7 +95,7 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     "Number of P frames between two I frames." )
 #define QSCALE_TEXT N_("Quantizer scale")
 #define QSCALE_LONGTEXT N_( \
-    "" )
+    "Quantizer scale." )
 
 vlc_module_begin();
     set_description( _("MPEG2 video switcher stream output") );
