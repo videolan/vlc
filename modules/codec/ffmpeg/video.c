@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.35 2003/07/10 01:33:41 fenrir Exp $
+ * $Id: video.c,v 1.36 2003/07/26 15:34:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -339,10 +339,16 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
 
         if( p_vdec->i_codec_id == CODEC_ID_MPEG4 )
         {
+            uint8_t *p_vol = malloc( i_size + FF_INPUT_BUFFER_PADDING_SIZE );
+
+            memcpy( p_vol, &p_vdec->p_format[1], i_size );
+            memset( &p_vol[i_size], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+
             avcodec_decode_video( p_vdec->p_context, p_vdec->p_ff_pic,
                                   &b_gotpicture,
-                                  (void *)&p_vdec->p_format[1],
+                                  p_vol,
                                   i_size );
+            free( p_vol );
         }
 #if LIBAVCODEC_BUILD >= 4666
         else if( p_vdec->i_codec_id == CODEC_ID_SVQ3 )
