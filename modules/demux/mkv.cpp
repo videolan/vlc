@@ -339,6 +339,8 @@ public:
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time );
     void PublishChapters( input_title_t & title, int i_level );
     const chapter_item_t * FindTimecode( mtime_t i_timecode ) const;
+    void Append( const chapter_item_t & edition );
+    chapter_item_t * FindChapter( const chapter_item_t & chapter );
     
     int64_t                     i_start_time, i_end_time;
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
@@ -369,8 +371,6 @@ public:
     void RefreshChapters( );
     mtime_t Duration() const;
     void PublishChapters( input_title_t & title );
-    void Append( const chapter_edition_t & edition );
-    chapter_item_t * FindChapter( const chapter_item_t & chapter ) const;
     
     bool                        b_ordered;
 };
@@ -1604,7 +1604,6 @@ bool virtual_segment_t::Select( input_title_t & title )
     // copy editions from the first segment
     p_segment = linked_segments[0];
     editions = p_segment->stored_editions;
-    i_current_edition = p_segment->i_default_edition;
 
     for ( i=1 ; i<linked_segments.size(); i++ )
     {
@@ -1641,9 +1640,9 @@ void chapter_item_t::PublishChapters( input_title_t & title, int i_level )
         title.i_seekpoint++;
         title.seekpoint = (seekpoint_t**)realloc( title.seekpoint, title.i_seekpoint * sizeof( seekpoint_t* ) );
         title.seekpoint[title.i_seekpoint-1] = sk;
+    
+        i_seekpoint_num = title.i_seekpoint;
     }
-
-    i_seekpoint_num = title.i_seekpoint;
 
     for ( size_t i=0; i<sub_chapters.size() ; i++)
     {
@@ -1687,25 +1686,37 @@ void virtual_segment_t::UpdateCurrentToChapter( demux_t & demux )
     }
 }
 
-void chapter_edition_t::Append( const chapter_edition_t & edition )
+void chapter_item_t::Append( const chapter_item_t & chapter )
 {
+    // we are appending content for the same chapter UID
     size_t i;
     chapter_item_t *p_chapter;
 
-    for ( i=0; i<edition.sub_chapters.size(); i++ )
+    for ( i=0; i<chapter.sub_chapters.size(); i++ )
     {
-        p_chapter = FindChapter( edition.sub_chapters[i] );
+        p_chapter = FindChapter( chapter.sub_chapters[i] );
         if ( p_chapter != NULL )
         {
+            p_chapter->Append( chapter.sub_chapters[i] );
         }
         else
         {
+            sub_chapters.push_back( chapter.sub_chapters[i] );
         }
     }
+
+    i_user_start_time = min( i_user_start_time, chapter.i_user_start_time );
+    i_user_end_time = max( i_user_end_time, chapter.i_user_end_time );
 }
 
-chapter_item_t * chapter_edition_t::FindChapter( const chapter_item_t & chapter ) const
+chapter_item_t * chapter_item_t::FindChapter( const chapter_item_t & chapter )
 {
+    size_t i;
+    for ( i=0; i<sub_chapters.size(); i++)
+    {
+        if ( sub_chapters[i].i_uid == chapter.i_uid )
+            return &sub_chapters[i];
+    }
     return NULL;
 }
 
@@ -3587,6 +3598,7 @@ void virtual_segment_t::PreloadLinked( )
     {
         linked_segments[i]->Preload( );
     }
+    i_current_edition = linked_segments[0]->i_default_edition;
 }
 
 mtime_t virtual_segment_t::Duration() const
