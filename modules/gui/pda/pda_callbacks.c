@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.2 2003/10/27 22:42:02 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.3 2003/11/07 07:59:00 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -547,7 +547,6 @@ gboolean addSelectedToPlaylist(GtkTreeModel *model,
     gtk_tree_model_get(model, iter, 0, &filename, -1);
     g_print("selected %s\n", filename);
 
-#if 1
     tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(userdata), "tvPlaylist");
     if (NULL != tvplaylist)
     {
@@ -563,7 +562,6 @@ gboolean addSelectedToPlaylist(GtkTreeModel *model,
     else
 //       msg_Err(p_intf, "Error obtaining pointer to Play List");
        g_print("Error obtaining pointer to Play List");
-#endif
 }
 
 void
@@ -720,7 +718,34 @@ void
 onAddNetworkPlaylist                   (GtkButton       *button,
                                         gpointer         user_data)
 {
+#if 0
+    GtkEntry *p_mrl;
 
+    p_mrl = (GtkEntry*) lookup_widget(GTK_WIDGET(button),"" );
+    if (NULL != p_mrl)
+    {
+        GtkTreeView  *tvplaylist = NULL;
+        GtkTreeModel *play_model;
+        GtkTreeIter   play_iter;
+        gchar *name;
+        
+        tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(button), "tvPlaylist");
+        if (NULL != tvplaylist)
+        {
+            play_model = gtk_tree_view_get_model(tvplaylist);
+            /* Add a new row to the playlist treeview model */
+            gtk_list_store_append (play_model, &play_iter);
+            gtk_list_store_set (play_model, &play_iter,
+                                    0, name,   /* Add path to it !!! */
+                                    1, "00:00:00",
+                                    -1 );
+            /* do we need to unref ?? */
+        }
+        else
+    //       msg_Err(p_intf, "Error obtaining pointer to Play List");
+           g_print("Error obtaining pointer to Play List");
+    }
+#endif
 }
 
 

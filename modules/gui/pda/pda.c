@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.5 2003/10/27 22:42:02 jpsaman Exp $
+ * $Id: pda.c,v 1.6 2003/11/07 07:59:00 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -34,10 +34,6 @@
 #include <vlc/intf.h>
 
 #include <gtk/gtk.h>
-
-#ifdef HAVE_GPE_INIT_H
-#include <gpe/init.h>
-#endif
 
 #include "pda_callbacks.h"
 #include "pda_interface.h"
@@ -152,21 +148,14 @@ static void Run( intf_thread_t *p_intf )
     GtkCellRenderer   *renderer = NULL;
     GtkTreeViewColumn *column   = NULL;
 
-#ifdef HAVE_GPE_INIT_H
-    /* Initialize GPE interface */
-    msg_Dbg( p_intf, "Starting pda GPE interface" );
-    if (gpe_application_init(&i_args, &pp_args) == FALSE)
-        exit (1);
-#else
     gtk_set_locale ();
-#   ifndef NEED_GTK2_MAIN
+#ifndef NEED_GTK2_MAIN
     msg_Dbg( p_intf, "Starting pda GTK2+ interface" );
     gtk_init( &i_args, &pp_args );
-#   else
+#else
     /* Initialize Gtk+ */
     msg_Dbg( p_intf, "Starting pda GTK+ interface thread" );
     gdk_threads_enter();
-#   endif
 #endif
 
     /* Create some useful widgets that will certainly be used */
