@@ -1,9 +1,10 @@
 # libvlc
+include/interface.h
+src/audio_output/output.c
+src/input/input_programs.c
 src/libvlc.c
 src/libvlc.h
 src/misc/configuration.c
-src/audio_output/output.c
-include/interface.h
 
 # access modules
 modules/access/directory.c

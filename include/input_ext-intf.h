@@ -4,7 +4,7 @@
  * control the pace of reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.88 2003/04/13 20:00:20 fenrir Exp $
+ * $Id: input_ext-intf.h,v 1.89 2003/05/05 22:23:31 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -52,7 +52,7 @@ struct es_descriptor_t
     uint8_t                 i_cat;    /* stream category (audio, video, spu) */
     int                     i_demux_fd;   /* used to store demux device
                                              file handle */
-    char                    psz_desc[20]; /* description of ES: audio language
+    char                    *psz_desc;    /* description of ES: audio language
                                            * for instance ; NULL if not
                                            *  available */
 

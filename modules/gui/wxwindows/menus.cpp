@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.1 2003/05/04 22:42:16 gbazin Exp $
+ * $Id: menus.cpp,v 1.2 2003/05/05 22:23:40 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -92,12 +92,12 @@ END_EVENT_TABLE()
 void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
 {
     vlc_object_t *p_object;
-    char *ppsz_varnames[16];
-    int pi_objects[16];
+    char *ppsz_varnames[19];
+    int pi_objects[19];
     int i = 0;
 
     /* Initializations */
-    memset( pi_objects, 0, 16 * sizeof(int) );
+    memset( pi_objects, 0, 19 * sizeof(int) );
 
     /* Audio menu */
     ppsz_varnames[i++] = _("Audio menu");
@@ -143,6 +143,14 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "navigation";
         pi_objects[i++] = p_object->i_object_id;
+
+        ppsz_varnames[i] = "video-es";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "audio-es";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "spu-es";
+        pi_objects[i++] = p_object->i_object_id;
+
         vlc_object_release( p_object );
     }
 
@@ -165,12 +173,12 @@ void PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
 wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
 {
     vlc_object_t *p_object;
-    char *ppsz_varnames[4];
-    int pi_objects[4];
+    char *ppsz_varnames[5];
+    int pi_objects[5];
     int i = 0;
 
     /* Initializations */
-    memset( pi_objects, 0, 4 * sizeof(int) );
+    memset( pi_objects, 0, 5 * sizeof(int) );
 
     /* Audio menu */
     ppsz_varnames[i++] = NULL; /* Separator */
@@ -183,6 +191,15 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
         ppsz_varnames[i] = "audio-device";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "audio-channels";
+        pi_objects[i++] = p_object->i_object_id;
+        vlc_object_release( p_object );
+    }
+
+    p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
+                                                FIND_ANYWHERE );
+    if( p_object != NULL )
+    {
+        ppsz_varnames[i] = "audio-es";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
     }
@@ -209,6 +226,17 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, Interface *_p_main_interface )
     if( p_object != NULL )
     {
         ppsz_varnames[i] = "fullscreen";
+        pi_objects[i++] = p_object->i_object_id;
+        vlc_object_release( p_object );
+    }
+
+    p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INPUT,
+                                                FIND_ANYWHERE );
+    if( p_object != NULL )
+    {
+        ppsz_varnames[i] = "video-es";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "spu-es";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
     }

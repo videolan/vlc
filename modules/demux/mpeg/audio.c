@@ -2,7 +2,7 @@
  * audio.c : mpeg audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: audio.c,v 1.17 2003/04/26 20:51:54 fenrir Exp $
+ * $Id: audio.c,v 1.18 2003/05/05 22:23:36 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -583,10 +583,8 @@ static int Activate( vlc_object_t * p_this )
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
 
     /* create our ES */
-    p_demux->p_es = input_AddES( p_input,
-                                 p_input->stream.p_selected_program,
-                                 1, /* id */
-                                 0 );
+    p_demux->p_es = input_AddES( p_input, p_input->stream.p_selected_program,
+                                 1 /* id */, AUDIO_ES, NULL, 0 );
     if( !p_demux->p_es )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -596,7 +594,6 @@ static int Activate( vlc_object_t * p_this )
     }
     p_demux->p_es->i_stream_id = 1;
     p_demux->p_es->i_fourcc = VLC_FOURCC('m','p','g','a');
-    p_demux->p_es->i_cat = AUDIO_ES;
 
     input_SelectES( p_input, p_demux->p_es );
 

@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: input.c,v 1.20 2003/05/04 22:42:14 gbazin Exp $
+ * $Id: input.c,v 1.21 2003/05/05 22:23:33 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -666,10 +666,9 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
         /* ES 0 -> video MPEG2 */
 //        IfoPrintVideo( p_dvd );
 
-        p_es = input_AddES( p_input, NULL, 0xe0, 0 );
+        p_es = input_AddES( p_input, NULL, 0xe0, VIDEO_ES, NULL, 0 );
         p_es->i_stream_id = 0xe0;
         p_es->i_fourcc = VLC_FOURCC('m','p','g','v');
-        p_es->i_cat = VIDEO_ES;
 
 #define audio_control \
     p_dvd->p_vts_file->vts_pgcit->pgci_srp[pgc_id-1].pgc->audio_control[i-1]
@@ -687,42 +686,36 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                 i_audio_nb++;
                 i_position = ( audio_control & 0x7F00 ) >> 8;
 
-            msg_Dbg( p_input, "audio position  %d", i_position );
+                msg_Dbg( p_input, "audio position  %d", i_position );
                 switch( p_vts->vtsi_mat->vts_audio_attr[i-1].audio_format )
                 {
                 case 0x00:              /* A52 */
                     i_id = ( ( 0x80 + i_position ) << 8 ) | 0xbd;
-                    p_es = input_AddES( p_input, NULL, i_id, 0 );
+                    p_es = input_AddES( p_input, NULL, i_id, AUDIO_ES,
+                                        DecodeLanguage(
+                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ), 0 );
                     p_es->i_stream_id = 0xbd;
                     p_es->i_fourcc = VLC_FOURCC('a','5','2','b');
-                    p_es->i_cat = AUDIO_ES;
-                    strcpy( p_es->psz_desc, DecodeLanguage(
-                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) );
-                    strcat( p_es->psz_desc, " (A52)" );
 
                     break;
                 case 0x02:
                 case 0x03:              /* MPEG audio */
                     i_id = 0xc0 + i_position;
-                    p_es = input_AddES( p_input, NULL, i_id, 0 );
+                    p_es = input_AddES( p_input, NULL, i_id, AUDIO_ES,
+                                        DecodeLanguage(
+                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ), 0 );
                     p_es->i_stream_id = i_id;
                     p_es->i_fourcc = VLC_FOURCC('m','p','g','a');
-                    p_es->i_cat = AUDIO_ES;
-                    strcpy( p_es->psz_desc, DecodeLanguage(
-                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) );
-                    strcat( p_es->psz_desc, " (mpeg)" );
 
                     break;
                 case 0x04:              /* LPCM */
 
                     i_id = ( ( 0xa0 + i_position ) << 8 ) | 0xbd;
-                    p_es = input_AddES( p_input, NULL, i_id, 0 );
+                    p_es = input_AddES( p_input, NULL, i_id, AUDIO_ES,
+                                        DecodeLanguage(
+                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ), 0 );
                     p_es->i_stream_id = i_id;
                     p_es->i_fourcc = VLC_FOURCC('l','p','c','b');
-                    p_es->i_cat = AUDIO_ES;
-                    strcpy( p_es->psz_desc, DecodeLanguage(
-                        p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) );
-                    strcat( p_es->psz_desc, " (lpcm)" );
 
                     break;
                 case 0x06:              /* DTS */
@@ -779,12 +772,11 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                 }
 
                 i_id = ( ( 0x20 + i_position ) << 8 ) | 0xbd;
-                p_es = input_AddES( p_input, NULL, i_id, 0 );
+                p_es = input_AddES( p_input, NULL, i_id, SPU_ES,
+                                    DecodeLanguage(
+                    p_vts->vtsi_mat->vts_subp_attr[i-1].lang_code ), 0 );
                 p_es->i_stream_id = 0xbd;
                 p_es->i_fourcc = VLC_FOURCC('s','p','u','b');
-                p_es->i_cat = SPU_ES;
-                strcpy( p_es->psz_desc, DecodeLanguage(
-                    p_vts->vtsi_mat->vts_subp_attr[i-1].lang_code ) );
             }
         }
 #undef spu_control

@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.28 2003/04/23 15:18:24 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.29 2003/05/05 22:23:38 gbazin Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -193,10 +193,11 @@ BList * VlcWrapper::GetChannels( int i_cat )
             {
                 message = new BMessage( what );
                 message->AddInt32( fieldName, i );
-                if( strlen( p_input->stream.pp_es[i]->psz_desc ) )
-                    trackName = strdup( p_input->stream.pp_es[i]->psz_desc );
-                else
+                if( !p_input->stream.pp_es[i]->psz_desc ||
+                    !*p_input->stream.pp_es[i]->psz_desc )
                     trackName = _("<unknown>");
+                else
+                    trackName = strdup( p_input->stream.pp_es[i]->psz_desc );
                 menuItem = new BMenuItem( trackName, message );
                 if( p_input->stream.pp_es[i] == p_es )
                     menuItem->SetMarked( true );

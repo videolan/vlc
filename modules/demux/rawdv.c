@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.7 2003/04/27 15:25:11 gbazin Exp $
+ * $Id: rawdv.c,v 1.8 2003/05/05 22:23:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -292,10 +292,9 @@ static int Activate( vlc_object_t * p_this )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_rawdv->p_video_es = input_AddES( p_input,
                                        p_input->stream.p_selected_program,
-                                       1, 0 );
+                                       1, VIDEO_ES, NULL, 0 );
     p_rawdv->p_video_es->i_stream_id = 0;
     p_rawdv->p_video_es->i_fourcc = VLC_FOURCC( 'd','v','s','d' );
-    p_rawdv->p_video_es->i_cat = VIDEO_ES;
     p_rawdv->p_video_es->p_bitmapinfoheader = (void *)p_rawdv->p_bih;
     input_SelectES( p_input, p_rawdv->p_video_es );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -304,10 +303,9 @@ static int Activate( vlc_object_t * p_this )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_rawdv->p_audio_es = input_AddES( p_input,
                                        p_input->stream.p_selected_program,
-                                       2, 0 );
+                                       2, AUDIO_ES, NULL, 0 );
     p_rawdv->p_audio_es->i_stream_id = 1;
     p_rawdv->p_audio_es->i_fourcc = VLC_FOURCC( 'd','v','a','u' );
-    p_rawdv->p_audio_es->i_cat = AUDIO_ES;
     p_rawdv->p_audio_es->p_waveformatex = (void *)p_rawdv->p_wf;
     input_SelectES( p_input, p_rawdv->p_audio_es );
     vlc_mutex_unlock( &p_input->stream.stream_lock );

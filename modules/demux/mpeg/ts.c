@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.20 2003/03/18 23:59:07 massiot Exp $
+ * $Id: ts.c,v 1.21 2003/05/05 22:23:36 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -216,8 +216,8 @@ static int Activate( vlc_object_t * p_this )
     /* We'll have to catch the PAT in order to continue
      * Then the input will catch the PMT and then the others ES
      * The PAT es is indepedent of any program. */
-    p_pat_es = input_AddES( p_input, NULL,
-                            0x00, sizeof( es_ts_data_t ) );
+    p_pat_es = input_AddES( p_input, NULL, 0x00,
+                            UNKNOWN_ES, NULL, sizeof( es_ts_data_t ) );
     p_demux_data = (es_ts_data_t *)p_pat_es->p_demux_data;
     p_demux_data->b_psi = 1;
     p_demux_data->i_psi_type = PSI_IS_PAT;
@@ -532,7 +532,7 @@ static void TSDecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
 
                     /* Add the PMT ES to this program */
                     p_current_es = input_AddES( p_input, p_pgrm,(u16)i_pmt_pid,
-                                        sizeof( es_ts_data_t) );
+                        UNKNOWN_ES, NULL, sizeof( es_ts_data_t) );
                     p_es_demux = (es_ts_data_t *)p_current_es->p_demux_data;
                     p_es_demux->b_psi = 1;
                     p_es_demux->i_psi_type = PSI_IS_PMT;
@@ -629,14 +629,11 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                 i_es_info_length = ( ((u32)*(p_current_data + 3) & 0xF) << 8 ) |
                                       *(p_current_data + 4);
 
-                /* Add this ES to the program */
-                p_new_es = input_AddES( p_input, p_es->p_pgrm,
-                                        (u16)i_pid, sizeof( es_ts_data_t ) );
-                ((es_ts_data_t *)p_new_es->p_demux_data)->i_continuity_counter = 0xFF;
-
                 /* Tell the interface what kind of stream it is and select
                  * the required ones */
                 {
+                    int i_fourcc, i_cat, i_stream_id;
+
                     switch( i_stream_type )
                     {
                         case MPEG1_VIDEO_ES:
@@ -644,72 +641,83 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                         case MPEG2_MOTO_VIDEO_ES:
                             /* This isn't real, but we don't actually use
                              * it. */
-                            p_new_es->i_stream_id = 0xE0;
-                            p_new_es->i_fourcc = VLC_FOURCC('m','p','g','v');
-                            p_new_es->i_cat = VIDEO_ES;
+                            i_stream_id = 0xE0;
+                            i_fourcc = VLC_FOURCC('m','p','g','v');
+                            i_cat = VIDEO_ES;
                             break;
                         case MPEG1_AUDIO_ES:
                         case MPEG2_AUDIO_ES:
                             /* This isn't real, but we don't actually use
                              * it. */
-                            p_new_es->i_stream_id = 0xC0;
-                            p_new_es->i_fourcc = VLC_FOURCC('m','p','g','a');
-                            p_new_es->i_cat = AUDIO_ES;
+                            i_stream_id = 0xC0;
+                            i_fourcc = VLC_FOURCC('m','p','g','a');
+                            i_cat = AUDIO_ES;
                             break;
                         case A52_AUDIO_ES:
                         case A52DVB_AUDIO_ES:
                             if ( !b_vls_compat )
-                                p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                                i_fourcc = VLC_FOURCC('a','5','2',' ');
                             else
-                                p_new_es->i_fourcc = VLC_FOURCC('a','5','2','b');
-                            p_new_es->i_stream_id = 0xBD;
-                            p_new_es->i_cat = AUDIO_ES;
+                                i_fourcc = VLC_FOURCC('a','5','2','b');
+                            i_stream_id = 0xBD;
+                            i_cat = AUDIO_ES;
                             break;
                         case LPCM_AUDIO_ES:
-                            p_new_es->i_fourcc = VLC_FOURCC('l','p','c','m');
-                            p_new_es->i_stream_id = 0xBD;
-                            p_new_es->i_cat = AUDIO_ES;
+                            i_fourcc = VLC_FOURCC('l','p','c','m');
+                            i_stream_id = 0xBD;
+                            i_cat = AUDIO_ES;
                             break;
                         case DVD_SPU_ES:
                             if ( !b_vls_compat )
-                                p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                                i_fourcc = VLC_FOURCC('s','p','u',' ');
                             else
-                                p_new_es->i_fourcc = VLC_FOURCC('s','p','u','b');
-                            p_new_es->i_stream_id = 0xBD;
-                            p_new_es->i_cat = SPU_ES;
+                                i_fourcc = VLC_FOURCC('s','p','u','b');
+                            i_stream_id = 0xBD;
+                            i_cat = SPU_ES;
                             break;
                         case SDDS_AUDIO_ES:
-                            p_new_es->i_fourcc = VLC_FOURCC('s','d','d','s');
-                            p_new_es->i_stream_id = 0xBD;
-                            p_new_es->i_cat = AUDIO_ES;
+                            i_fourcc = VLC_FOURCC('s','d','d','s');
+                            i_stream_id = 0xBD;
+                            i_cat = AUDIO_ES;
                             break;
                         case DTS_AUDIO_ES:
-                            p_new_es->i_fourcc = VLC_FOURCC('d','t','s',' ');
-                            p_new_es->i_stream_id = 0xBD;
-                            p_new_es->i_cat = AUDIO_ES;
+                            i_fourcc = VLC_FOURCC('d','t','s',' ');
+                            i_stream_id = 0xBD;
+                            i_cat = AUDIO_ES;
                             break;
                         /* 'b' stands for 'buggy' */
                         case A52B_AUDIO_ES:
-                            p_new_es->i_fourcc = VLC_FOURCC('a','5','2','b');
-                            p_new_es->i_stream_id = 0xBD;
-                            p_new_es->i_cat = AUDIO_ES;
+                            i_fourcc = VLC_FOURCC('a','5','2','b');
+                            i_stream_id = 0xBD;
+                            i_cat = AUDIO_ES;
                             break;
                         case LPCMB_AUDIO_ES:
-                            p_new_es->i_fourcc = VLC_FOURCC('l','p','c','b');
-                            p_new_es->i_stream_id = 0xBD;
-                            p_new_es->i_cat = AUDIO_ES;
+                            i_fourcc = VLC_FOURCC('l','p','c','b');
+                            i_stream_id = 0xBD;
+                            i_cat = AUDIO_ES;
                             break;
                         case DVDB_SPU_ES:
-                            p_new_es->i_fourcc = VLC_FOURCC('s','p','u','b');
-                            p_new_es->i_stream_id = 0xBD;
-                            p_new_es->i_cat = SPU_ES;
+                            i_fourcc = VLC_FOURCC('s','p','u','b');
+                            i_stream_id = 0xBD;
+                            i_cat = SPU_ES;
                             break;
 
                         default :
-                            p_new_es->i_fourcc = 0;
-                            p_new_es->i_cat = UNKNOWN_ES;
+                            i_stream_id = 0;
+                            i_fourcc = 0;
+                            i_cat = UNKNOWN_ES;
                             break;
                     }
+
+                    /* Add this ES to the program */
+                    p_new_es = input_AddES( p_input, p_es->p_pgrm, (u16)i_pid,
+                                   i_cat, NULL, sizeof( es_ts_data_t ) );
+
+                    ((es_ts_data_t *)p_new_es->p_demux_data)->i_continuity_counter = 0xFF;
+
+                    p_new_es->i_stream_id = i_stream_id;
+                    p_new_es->i_fourcc = i_fourcc;
+
                 }
 
                 p_current_data += 5 + i_es_info_length;
@@ -1200,8 +1208,8 @@ static void TS_DVBPSI_HandlePAT( input_thread_t * p_input,
 
                 /* Add the PMT ES to this program */
                 p_current_es = input_AddES( p_input, p_new_pgrm,
-                                            (u16) p_pgrm->i_pid,
-                                            sizeof( es_ts_data_t) );
+                                            (u16)p_pgrm->i_pid, UNKNOWN_ES,
+                                            NULL, sizeof(es_ts_data_t) );
                 p_es_demux = (es_ts_data_t *)p_current_es->p_demux_data;
                 p_es_demux->b_psi = 1;
                 p_es_demux->i_psi_type = PSI_IS_PMT;
@@ -1281,96 +1289,101 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
         p_es = p_new_pmt->p_first_es;
         while( p_es )
         {
-            /* Add this ES */
-            p_new_es = input_AddES( p_input, p_pgrm,
-                            (u16)p_es->i_pid, sizeof( es_ts_data_t ) );
-            if( p_new_es == NULL )
-            {
-                msg_Err( p_input, "could not add ES %d", p_es->i_pid );
-                p_input->b_error = 1;
-                return;
-            }
-            ((es_ts_data_t *)p_new_es->p_demux_data)->i_continuity_counter = 0xFF;
+            int i_fourcc, i_cat, i_stream_id;
 
             switch( p_es->i_type )
             {
                 case MPEG1_VIDEO_ES:
                 case MPEG2_VIDEO_ES:
                 case MPEG2_MOTO_VIDEO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('m','p','g','v');
-                    p_new_es->i_cat = VIDEO_ES;
+                    i_fourcc = VLC_FOURCC('m','p','g','v');
+                    i_cat = VIDEO_ES;
                     break;
                 case MPEG1_AUDIO_ES:
                 case MPEG2_AUDIO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('m','p','g','a');
-                    p_new_es->i_cat = AUDIO_ES;
+                    i_fourcc = VLC_FOURCC('m','p','g','a');
+                    i_cat = AUDIO_ES;
                     break;
                 case A52_AUDIO_ES:
                 case A52DVB_AUDIO_ES:
                     if ( !b_vls_compat )
-                        p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                        i_fourcc = VLC_FOURCC('a','5','2',' ');
                     else
-                        p_new_es->i_fourcc = VLC_FOURCC('a','5','2','b');
-                    p_new_es->i_cat = AUDIO_ES;
-                    p_new_es->i_stream_id = 0xBD;
+                        i_fourcc = VLC_FOURCC('a','5','2','b');
+                    i_cat = AUDIO_ES;
+                    i_stream_id = 0xBD;
                     break;
                 case DVD_SPU_ES:
                     if ( !b_vls_compat )
-                        p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                        i_fourcc = VLC_FOURCC('s','p','u',' ');
                     else
-                        p_new_es->i_fourcc = VLC_FOURCC('s','p','u','b');
-                    p_new_es->i_cat = SPU_ES;
-                    p_new_es->i_stream_id = 0xBD;
+                        i_fourcc = VLC_FOURCC('s','p','u','b');
+                    i_cat = SPU_ES;
+                    i_stream_id = 0xBD;
                     break;
                 case LPCM_AUDIO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('l','p','c','m');
-                    p_new_es->i_cat = AUDIO_ES;
-                    p_new_es->i_stream_id = 0xBD;
+                    i_fourcc = VLC_FOURCC('l','p','c','m');
+                    i_cat = AUDIO_ES;
+                    i_stream_id = 0xBD;
                     break;
                 case SDDS_AUDIO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('s','d','d','s');
-                    p_new_es->i_stream_id = 0xBD;
-                    p_new_es->i_cat = AUDIO_ES;
+                    i_fourcc = VLC_FOURCC('s','d','d','s');
+                    i_stream_id = 0xBD;
+                    i_cat = AUDIO_ES;
                     break;
                 case DTS_AUDIO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('d','t','s',' ');
-                    p_new_es->i_stream_id = 0xBD;
-                    p_new_es->i_cat = AUDIO_ES;
+                    i_fourcc = VLC_FOURCC('d','t','s',' ');
+                    i_stream_id = 0xBD;
+                    i_cat = AUDIO_ES;
                     break;
                 case A52B_AUDIO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('a','5','2','b');
-                    p_new_es->i_cat = AUDIO_ES;
-                    p_new_es->i_stream_id = 0xBD;
+                    i_fourcc = VLC_FOURCC('a','5','2','b');
+                    i_cat = AUDIO_ES;
+                    i_stream_id = 0xBD;
                     break;
                 case DVDB_SPU_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('s','p','u','b');
-                    p_new_es->i_cat = SPU_ES;
-                    p_new_es->i_stream_id = 0xBD;
+                    i_fourcc = VLC_FOURCC('s','p','u','b');
+                    i_cat = SPU_ES;
+                    i_stream_id = 0xBD;
                     break;
                 case LPCMB_AUDIO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('l','p','c','b');
-                    p_new_es->i_cat = AUDIO_ES;
-                    p_new_es->i_stream_id = 0xBD;
+                    i_fourcc = VLC_FOURCC('l','p','c','b');
+                    i_cat = AUDIO_ES;
+                    i_stream_id = 0xBD;
                     break;
                 case MPEG4_VIDEO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('m','p','4','v');
-                    p_new_es->i_cat = VIDEO_ES;
-                    p_new_es->i_stream_id = 0xfa;
+                    i_fourcc = VLC_FOURCC('m','p','4','v');
+                    i_cat = VIDEO_ES;
+                    i_stream_id = 0xfa;
                     break;
                 case MPEG4_AUDIO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('m','p','4','a');
-                    p_new_es->i_cat = AUDIO_ES;
-                    p_new_es->i_stream_id = 0xfa;
+                    i_fourcc = VLC_FOURCC('m','p','4','a');
+                    i_cat = AUDIO_ES;
+                    i_stream_id = 0xfa;
                     break;
                 case MSCODEC_VIDEO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC(0,0,0,0);   // fixed later
-                    p_new_es->i_cat = VIDEO_ES;
-                    p_new_es->i_stream_id = 0xa0;
+                    i_fourcc = VLC_FOURCC(0,0,0,0);   // fixed later
+                    i_cat = VIDEO_ES;
+                    i_stream_id = 0xa0;
                     break;
                 default:
-                    p_new_es->i_fourcc = 0;
-                    p_new_es->i_cat = UNKNOWN_ES;
+                    i_fourcc = 0;
+                    i_cat = UNKNOWN_ES;
             }
+
+            /* Add this ES */
+            p_new_es = input_AddES( p_input, p_pgrm, (u16)p_es->i_pid,
+                                    i_cat, NULL, sizeof( es_ts_data_t ) );
+            if( p_new_es == NULL )
+            {
+                msg_Err( p_input, "could not add ES %d", p_es->i_pid );
+                p_input->b_error = 1;
+                return;
+            }
+            p_new_es->i_fourcc = i_fourcc;
+            p_new_es->i_stream_id = i_stream_id;
+
+            ((es_ts_data_t *)p_new_es->p_demux_data)->i_continuity_counter = 0xFF;
 
             if( p_es->i_type == MPEG4_VIDEO_ES || p_es->i_type == MPEG4_AUDIO_ES )
             {

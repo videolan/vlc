@@ -2,7 +2,7 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.9 2003/05/04 22:42:15 gbazin Exp $
+ * $Id: menu.c,v 1.10 2003/05/05 22:23:38 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -764,13 +764,17 @@ static gint GtkLanguageMenus( gpointer          p_data,
                  p_intf->p_sys->p_input->stream.p_selected_program ) )
         {
             i_item++;
-            strcpy( psz_name,
-                    p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc );
-            if( psz_name[0] == '\0' )
+            if( !p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc ||
+                !*p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc )
             {
                 snprintf( psz_name, GTK_MENU_LABEL_SIZE,
                           "Language %d", i_item );
                 psz_name[ GTK_MENU_LABEL_SIZE - 1 ] = '\0';
+            }
+            else
+            {
+                strcpy( psz_name,
+                        p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc );
             }
 
             p_item = gtk_radio_menu_item_new_with_label( p_group, psz_name );

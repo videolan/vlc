@@ -2,7 +2,7 @@
  * a52sys.c : A/52 input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: flac.c,v 1.2 2003/02/27 13:19:43 gbazin Exp $
+ * $Id: flac.c,v 1.3 2003/05/05 22:23:34 gbazin Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -104,10 +104,10 @@ static int Init( vlc_object_t * p_this )
     input_AddProgram( p_input, 0, 0 );
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xBD, 0 );
+    p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xBD,
+                        AUDIO_ES, NULL, 0 );
     p_es->i_stream_id = 0xBD;
     p_es->i_fourcc = VLC_FOURCC('f','l','a','c');
-    p_es->i_cat = AUDIO_ES;
     input_SelectES( p_input, p_es );
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.p_selected_program->b_is_ok = 1;

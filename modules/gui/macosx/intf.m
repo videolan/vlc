@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.73 2003/05/05 22:04:11 hartman Exp $
+ * $Id: intf.m,v 1.74 2003/05/05 22:23:39 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -1272,11 +1272,7 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
             NSMenuItem * o_lmi;
             NSString * o_title;
 
-            if( *ES->psz_desc )
-            {
-                o_title = [NSApp localizedString: ES->psz_desc];
-            }
-            else
+            if( !ES->psz_desc || !*ES->psz_desc )
             {
                 char psz_title[ 256 ];
 
@@ -1285,6 +1281,10 @@ int ExecuteOnMainThread( id target, SEL sel, void * p_arg )
                 psz_title[sizeof(psz_title) - 1] = '\0';
 
                 o_title = [NSApp localizedString: psz_title];
+            }
+            else
+            {
+                o_title = [NSApp localizedString: ES->psz_desc];
             }
 
             o_lmi = [o_menu addItemWithTitle: o_title

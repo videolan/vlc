@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.27 2003/04/30 21:45:52 fenrir Exp $
+ * $Id: mp4.c,v 1.28 2003/05/05 22:23:36 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -882,6 +882,7 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
 {
     MP4_Box_t *  p_sample;
     unsigned int i;
+    char psz_lang[4];
 
     unsigned int i_decoder_specific_info_len;
     uint8_t *    p_decoder_specific_info;
@@ -940,19 +941,17 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
         }
     }
 
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_es = input_AddES( p_input,
-                        p_input->stream.p_selected_program,
-                        p_track->i_track_ID,
-                        0 );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
     /* Initialise ES, first language as description */
     for( i = 0; i < 3; i++ )
     {
-        p_es->psz_desc[i] = p_track->i_language[i];
+        psz_lang[i] = p_track->i_language[i];
     }
-    p_es->psz_desc[3] = '\0';
+    psz_lang[3] = '\0';
+
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_es = input_AddES( p_input, p_input->stream.p_selected_program,
+                        p_track->i_track_ID, p_track->i_cat, psz_lang, 0 );
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_es->i_stream_id = p_track->i_track_ID;
 
@@ -970,8 +969,6 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
             p_es->i_fourcc = p_sample->i_type;
             break;
     }
-
-    p_es->i_cat = p_track->i_cat;
 
     i_decoder_specific_info_len = 0;
     p_decoder_specific_info = NULL;

@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.15 2003/05/04 22:42:16 gbazin Exp $
+ * $Id: menu.cpp,v 1.16 2003/05/05 22:23:39 gbazin Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -867,7 +867,8 @@ void __fastcall TMenusGen::LanguageMenu( TMenuItem *Root, es_descriptor_t *p_es,
                 p_intf->p_sys->p_input->stream.p_selected_program ) )
         {
             i_item++;
-            Name = p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc;
+            if( p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc )
+                Name = p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc;
             if( Name.IsEmpty() )
                 Name.sprintf( "Language %d", i_item );
 

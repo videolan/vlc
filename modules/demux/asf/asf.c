@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.27 2003/04/24 20:26:32 fenrir Exp $
+ * $Id: asf.c,v 1.28 2003/05/05 22:23:35 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -205,11 +205,7 @@ static int Activate( vlc_object_t * p_this )
         p_stream->p_sp = p_sp;
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        p_stream->p_es =
-            input_AddES( p_input,
-                         p_input->stream.p_selected_program,
-                         p_sp->i_stream_number,
-                         0 );
+        p_stream->p_es = NULL;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         if( CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) )
@@ -225,6 +221,10 @@ static int Activate( vlc_object_t * p_this )
             }
 
             p_stream->i_cat = AUDIO_ES;
+            p_stream->p_es = input_AddES( p_input,
+                         p_input->stream.p_selected_program,
+                         p_sp->i_stream_number, AUDIO_ES, NULL, 0 );
+
             input_AddInfo( p_cat, _("Type"), _("Audio") );
             msg_Dbg( p_input,
                     "adding new audio stream(codec:0x%x,ID:%d)",
@@ -295,10 +295,13 @@ static int Activate( vlc_object_t * p_this )
         if( CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) )
         {
             p_stream->i_cat = VIDEO_ES;
+            p_stream->p_es = input_AddES( p_input,
+                         p_input->stream.p_selected_program,
+                         p_sp->i_stream_number, VIDEO_ES, NULL, 0 );
+
             input_AddInfo( p_cat, _("Type"), _("Video") );
-            msg_Dbg( p_input,
-                    "adding new video stream(ID:%d)",
-                    p_sp->i_stream_number );
+            msg_Dbg( p_input, "adding new video stream(ID:%d)",
+                     p_sp->i_stream_number );
             if( p_sp->p_type_specific_data )
             {
                 p_stream->p_es->i_fourcc =
@@ -356,15 +359,12 @@ static int Activate( vlc_object_t * p_this )
         else
         {
             p_stream->i_cat = UNKNOWN_ES;
-            msg_Dbg( p_input,
-                    "ignoring unknown stream(ID:%d)",
-                    p_sp->i_stream_number );
-            p_stream->p_es->i_fourcc = VLC_FOURCC( 'u','n','d','f' );
+            msg_Dbg( p_input, "ignoring unknown stream(ID:%d)",
+                     p_sp->i_stream_number );
         }
-        p_stream->p_es->i_cat = p_stream->i_cat;
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
-        if( p_stream->p_es->i_fourcc != VLC_FOURCC( 'u','n','d','f' ) )
+        if( p_stream->p_es )
         {
             input_SelectES( p_input, p_stream->p_es );
         }

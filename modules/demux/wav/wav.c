@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: wav.c,v 1.14 2003/03/11 06:45:59 fenrir Exp $
+ * $Id: wav.c,v 1.15 2003/05/05 22:23:37 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -527,11 +527,10 @@ static int WAVInit( vlc_object_t * p_this )
         p_input->stream.i_mux_rate = 0 ; /* FIXME */
 
         p_demux->p_es = input_AddES( p_input,
-                                     p_input->stream.p_selected_program, 1,
-                                     0 );
+                                     p_input->stream.p_selected_program,
+                                     1, AUDIO_ES, NULL, 0 );
         p_demux->p_es->i_stream_id = 1;
         p_demux->p_es->i_fourcc = p_demux->i_fourcc;
-        p_demux->p_es->i_cat = AUDIO_ES;
         p_demux->p_es->p_waveformatex = malloc( p_demux->i_wf );
         memcpy( p_demux->p_es->p_waveformatex, p_demux->p_wf, p_demux->i_wf );
 

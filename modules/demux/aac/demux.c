@@ -2,7 +2,7 @@
  * demux.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.7 2003/03/30 18:14:37 gbazin Exp $
+ * $Id: demux.c,v 1.8 2003/05/05 22:23:34 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -489,10 +489,8 @@ static int Activate( vlc_object_t * p_this )
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
 
     /* create our ES */
-    p_aac->p_es = input_AddES( p_input,
-                               p_input->stream.p_selected_program, 
-                               1, /* id */
-                               0 );
+    p_aac->p_es = input_AddES( p_input, p_input->stream.p_selected_program, 
+                               1 /* id */, AUDIO_ES, NULL, 0 );
     if( !p_aac->p_es )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -502,7 +500,6 @@ static int Activate( vlc_object_t * p_this )
 
     p_aac->p_es->i_stream_id = 1;
     p_aac->p_es->i_fourcc = VLC_FOURCC( 'm', 'p', '4', 'a' );
-    p_aac->p_es->i_cat = AUDIO_ES;
     input_SelectES( p_input, p_aac->p_es );
 
     p_input->stream.p_selected_program->b_is_ok = 1;

@@ -2,7 +2,7 @@
  * v4l.c : Video4Linux input module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: v4l.c,v 1.12 2003/05/03 12:36:17 fenrir Exp $
+ * $Id: v4l.c,v 1.13 2003/05/05 22:23:33 gbazin Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -1191,13 +1191,12 @@ static int DemuxOpen( vlc_object_t *p_this )
     {
         es_descriptor_t *p_es;
 
-        p_es = input_AddES( p_input,
-                            p_input->stream.pp_programs[0], i + 1, 0 );
-        p_es->i_stream_id   = i + 1;
         if( !strncmp( p_peek, "auds", 4 ) )
         {
 #define wf ((WAVEFORMATEX*)p_es->p_waveformatex)
-            p_es->i_cat         = AUDIO_ES;
+            p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
+                                i + 1, AUDIO_ES, NULL, 0 );
+            p_es->i_stream_id   = i + 1;
             p_es->i_fourcc      =
                 VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] );
 
@@ -1220,7 +1219,9 @@ static int DemuxOpen( vlc_object_t *p_this )
         else if( !strncmp( p_peek, "vids", 4 ) )
         {
 #define bih ((BITMAPINFOHEADER*)p_es->p_bitmapinfoheader)
-            p_es->i_cat = VIDEO_ES;
+            p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
+                                i + 1, VIDEO_ES, NULL, 0 );
+            p_es->i_stream_id   = i + 1;
             p_es->i_fourcc  =
                 VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] );
 

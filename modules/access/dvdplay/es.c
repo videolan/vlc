@@ -2,7 +2,7 @@
  * es.c: functions to handle elementary streams.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: es.c,v 1.5 2003/01/29 11:17:44 gbazin Exp $
+ * $Id: es.c,v 1.6 2003/05/05 22:23:32 gbazin Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -71,16 +71,20 @@ void dvdplay_DeleteES( input_thread_t* p_input )
 
 }
 
-#define ADDES( id, fourcc, cat, lang, size )                            \
+#define ADDES( id, fourcc, cat, lang, descr, size )                     \
     msg_Dbg( p_input, "new es 0x%x", i_id );                            \
-    p_es = input_AddES( p_input, NULL, id, size );                      \
-    p_es->i_stream_id = i_id & 0xff;                                    \
-    p_es->i_fourcc = (fourcc);                                          \
-    p_es->i_cat = (cat);                                                \
-    if( lang )                                                          \
     {                                                                   \
-        strcpy( p_es->psz_desc, DecodeLanguage( lang ) );               \
-    }
+        char *psz_descr;                                                \
+        psz_descr = malloc( strlen(DecodeLanguage( lang )) +            \
+                            strlen(descr) + 1 );                        \
+        if( psz_descr ) {strcpy( psz_descr, DecodeLanguage( lang ) );   \
+            strcat( psz_descr, descr );}                                \
+        p_es = input_AddES( p_input, NULL, id, cat,                     \
+                            psz_descr, size );                          \
+        if( psz_descr ) free( psz_descr );                              \
+    }                                                                   \
+    p_es->i_stream_id = i_id & 0xff;                                    \
+    p_es->i_fourcc = (fourcc);
 
 /*****************************************************************************
  * dvdplay_Video: read video ES
@@ -100,12 +104,13 @@ void dvdplay_Video( input_thread_t * p_input )
     
     if( p_attr->display_aspect_ratio )
     {
-        ADDES( 0xe0, VLC_FOURCC('m','p','g','v'), VIDEO_ES, 0, sizeof(int) );
+        ADDES( 0xe0, VLC_FOURCC('m','p','g','v'), VIDEO_ES, 0,
+               "", sizeof(int) );
         *(int*)(p_es->p_demux_data) = p_attr->display_aspect_ratio;
     }
     else
     {
-        ADDES( 0xe0, VLC_FOURCC('m','p','g','v'), VIDEO_ES, 0, 0 );
+        ADDES( 0xe0, VLC_FOURCC('m','p','g','v'), VIDEO_ES, 0, "", 0 );
     }
         
 }
@@ -143,29 +148,29 @@ void dvdplay_Audio( input_thread_t * p_input )
             switch( p_attr->audio_format )
             {
             case 0x00:              /* A52 */
-                ADDES( i_id, VLC_FOURCC('a','5','2','b'), AUDIO_ES, i_lang, 0 );
-                strcat( p_es->psz_desc, " (A52)" );
+                ADDES( i_id, VLC_FOURCC('a','5','2','b'), AUDIO_ES, i_lang,
+                       " (A52)", 0 );
 
                 break;
             case 0x02:
             case 0x03:              /* MPEG audio */
-                ADDES( i_id, VLC_FOURCC('m','p','g','a'), AUDIO_ES, i_lang, 0 );
-                strcat( p_es->psz_desc, " (mpeg)" );
+                ADDES( i_id, VLC_FOURCC('m','p','g','a'), AUDIO_ES, i_lang,
+                       " (mpeg)", 0 );
 
                 break;
             case 0x04:              /* LPCM */
-                ADDES( i_id, VLC_FOURCC('l','p','c','b'), AUDIO_ES, i_lang, 0 );
-                strcat( p_es->psz_desc, " (lpcm)" );
+                ADDES( i_id, VLC_FOURCC('l','p','c','b'), AUDIO_ES, i_lang,
+                       " (lpcm)", 0 );
 
                 break;
             case 0x05:              /* SDDS */
-                ADDES( i_id, VLC_FOURCC('s','d','d','b'), AUDIO_ES, i_lang, 0 );
-                strcat( p_es->psz_desc, " (sdds)" );
+                ADDES( i_id, VLC_FOURCC('s','d','d','b'), AUDIO_ES, i_lang,
+                       " (sdds)", 0 );
 
                 break;
             case 0x06:              /* DTS */
-                ADDES( i_id, VLC_FOURCC('d','t','s','b'), AUDIO_ES, i_lang, 0 );
-                strcat( p_es->psz_desc, " (dts)" );
+                ADDES( i_id, VLC_FOURCC('d','t','s','b'), AUDIO_ES, i_lang,
+                       " (dts)", 0 );
 
                 break;
             default:
@@ -207,7 +212,7 @@ void dvdplay_Subp( input_thread_t * p_input )
             if( pi_palette )
             {
                 ADDES( i_id, VLC_FOURCC('s','p','u','b'), SPU_ES,
-                       p_attr->lang_code, sizeof(int) + 16*sizeof(u32) );
+                       p_attr->lang_code, "", sizeof(int) + 16*sizeof(u32) );
                 *(int*)p_es->p_demux_data = 0xBeeF;
                 memcpy( (void*)p_es->p_demux_data + sizeof(int),
                         pi_palette, 16*sizeof(u32) ); 
@@ -215,7 +220,7 @@ void dvdplay_Subp( input_thread_t * p_input )
             else
             {
                 ADDES( i_id, VLC_FOURCC('s','p','u','b'), SPU_ES,
-                       p_attr->lang_code, 0 );
+                       p_attr->lang_code, "", 0 );
             }
         }
     }

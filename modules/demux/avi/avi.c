@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.46 2003/05/03 01:12:13 fenrir Exp $
+ * $Id: avi.c,v 1.47 2003/05/05 22:23:35 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1239,13 +1239,11 @@ static int AVIInit( vlc_object_t * p_this )
         /* add one ES */
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_info->p_es =
-            p_es = input_AddES( p_input,
-                                p_input->stream.p_selected_program, 1+i,
-                                0 );
+            p_es = input_AddES( p_input, p_input->stream.p_selected_program,
+                                1+i, p_info->i_cat, NULL, 0 );
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         p_es->i_stream_id =i; /* XXX: i don't use it */
         p_es->i_fourcc = p_info->i_fourcc;
-        p_es->i_cat = p_info->i_cat;
         if( p_es->i_cat == AUDIO_ES )
         {
             if( i_init_size < sizeof( WAVEFORMATEX ) )

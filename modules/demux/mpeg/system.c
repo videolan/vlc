@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.13 2003/04/01 10:46:35 massiot Exp $
+ * $Id: system.c,v 1.14 2003/05/05 22:23:36 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -645,38 +645,43 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
          * so that we can close them more easily at the end. */
         if( p_es == NULL )
         {
-            p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
-                                i_stream_id, 0 );
+            int i_fourcc, i_cat;
+
             switch( p_byte[0] )
             {
             case MPEG1_VIDEO_ES:
             case MPEG2_VIDEO_ES:
             case MPEG2_MOTO_VIDEO_ES:
-                p_es->i_fourcc = VLC_FOURCC('m','p','g','v');
-                p_es->i_cat = VIDEO_ES;
+                i_fourcc = VLC_FOURCC('m','p','g','v');
+                i_cat = VIDEO_ES;
                 break;
             case DVD_SPU_ES:
-                p_es->i_fourcc = VLC_FOURCC('s','p','u','b');
-                p_es->i_cat = SPU_ES;
+                i_fourcc = VLC_FOURCC('s','p','u','b');
+                i_cat = SPU_ES;
                 break;
             case MPEG1_AUDIO_ES:
             case MPEG2_AUDIO_ES:
-                p_es->i_fourcc = VLC_FOURCC('m','p','g','a');
-                p_es->i_cat = AUDIO_ES;
+                i_fourcc = VLC_FOURCC('m','p','g','a');
+                i_cat = AUDIO_ES;
                 break;
             case A52_AUDIO_ES:
             case A52DVB_AUDIO_ES:
-                p_es->i_fourcc = VLC_FOURCC('a','5','2','b');
-                p_es->i_cat = AUDIO_ES;
+                i_fourcc = VLC_FOURCC('a','5','2','b');
+                i_cat = AUDIO_ES;
                 break;
             case LPCM_AUDIO_ES:
-                p_es->i_fourcc = VLC_FOURCC('l','p','c','b');
-                p_es->i_cat = AUDIO_ES;
+                i_fourcc = VLC_FOURCC('l','p','c','b');
+                i_cat = AUDIO_ES;
                 break;
             default:
-                p_es->i_fourcc = 0;
+                i_cat = UNKNOWN_ES;
+                i_fourcc = 0;
                 break;
             }
+
+            p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
+                                i_stream_id, i_cat, NULL, 0 );
+            p_es->i_fourcc = i_fourcc;
 
             /* input_AddES has inserted the new element at the end. */
             p_input->stream.pp_programs[0]->pp_es[
@@ -844,6 +849,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
         }
         else
         {
+            vlc_bool_t b_auto_spawn = VLC_FALSE;
             stream_ps_data_t * p_demux =
               (stream_ps_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
 
@@ -852,104 +858,107 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
 
             if( p_es == NULL && !p_demux->b_has_PSM )
             {
-                p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
-                                    i_id, 0 );
-                if( p_es != NULL )
-                {
-                    p_es->i_stream_id = p_data->p_demux_start[3];
+                int i_fourcc, i_cat;
 
-                    /* Set stream type and auto-spawn. */
-                    if( (i_id & 0xF0) == 0xE0 )
-                    {
-                        /* MPEG video */
-                        p_es->i_fourcc = VLC_FOURCC('m','p','g','v');
-                        p_es->i_cat = VIDEO_ES;
+                /* Set stream type and auto-spawn. */
+                if( (i_id & 0xF0) == 0xE0 )
+                {
+                    /* MPEG video */
+                    i_fourcc = VLC_FOURCC('m','p','g','v');
+                    i_cat = VIDEO_ES;
 #ifdef AUTO_SPAWN
-                        if( !p_input->stream.b_seekable )
-                            input_SelectES( p_input, p_es );
+                    if( !p_input->stream.b_seekable ) b_auto_spawn = VLC_TRUE;
 #endif
-                    }
-                    else if( (i_id & 0xE0) == 0xC0 )
-                    {
-                        /* MPEG audio */
-                        p_es->i_fourcc = VLC_FOURCC('m','p','g','a');
-                        p_es->i_cat = AUDIO_ES;
-#ifdef AUTO_SPAWN
-                        if( !p_input->stream.b_seekable )
-                        if( config_GetInt( p_input, "audio-channel" )
-                                == (p_es->i_id & 0x1F) ||
-                            ( config_GetInt( p_input, "audio-channel" ) < 0
-                              && !(p_es->i_id & 0x1F) ) )
-                        switch( config_GetInt( p_input, "audio-type" ) )
-                        {
-                        case -1:
-                        case REQUESTED_MPEG:
-                            input_SelectES( p_input, p_es );
-                        }
-#endif
-                    }
-                    else if( (i_id & 0xF8FF) == 0x88BD )
-                    {
-                        p_es->i_fourcc = VLC_FOURCC('d','t','s','b');
-                        p_es->i_cat = AUDIO_ES;
-#ifdef AUTO_SPAWN
-                        if( !p_input->stream.b_seekable )
-                        if( config_GetInt( p_input, "audio-channel" )
-                                == ((p_es->i_id & 0x700) >> 8) ||
-                            ( config_GetInt( p_input, "audio-channel" ) < 0
-                              && !((p_es->i_id & 0x700) >> 8)) )
-                        switch( config_GetInt( p_input, "audio-type" ) )
-                        {
-                        case -1:
-                        case REQUESTED_DTS:
-                            input_SelectES( p_input, p_es );
-                        }
-#endif
-                    }
-                    else if( (i_id & 0xF0FF) == 0x80BD )
-                    {
-                        /* A52 audio (0x80->0x8F) */
-                        p_es->i_fourcc = VLC_FOURCC('a','5','2','b');
-                        p_es->i_cat = AUDIO_ES;
-#ifdef AUTO_SPAWN
-                        if( !p_input->stream.b_seekable )
-                        if( config_GetInt( p_input, "audio-channel" )
-                                == ((p_es->i_id & 0xF00) >> 8) ||
-                            ( config_GetInt( p_input, "audio-channel" ) < 0
-                              && !((p_es->i_id & 0xF00) >> 8)) )
-                        switch( config_GetInt( p_input, "audio-type" ) )
-                        {
-                        case -1:
-                        case REQUESTED_A52:
-                            input_SelectES( p_input, p_es );
-                        }
-#endif
-                    }
-                    else if( (i_id & 0xE0FF) == 0x20BD )
-                    {
-                        /* Subtitles video (0x20->0x3F) */
-                        p_es->i_fourcc = VLC_FOURCC('s','p','u','b');
-                        p_es->i_cat = SPU_ES;
-#ifdef AUTO_SPAWN
-                        if( config_GetInt( p_input, "spu-channel" )
-                                == ((p_es->i_id & 0x1F00) >> 8) )
-                        {
-                            if( !p_input->stream.b_seekable )
-                                input_SelectES( p_input, p_es );
-                        }
-#endif
-                    }
-                    else if( (i_id & 0xF0FF) == 0xA0BD )
-                    {
-                        /* LPCM audio (0xA0->0xAF) */
-                        p_es->i_fourcc = VLC_FOURCC('l','p','c','b');
-                        p_es->i_cat = AUDIO_ES;
-                    }
-                    else
-                    {
-                        p_es->i_fourcc = 0;
-                    }
                 }
+                else if( (i_id & 0xE0) == 0xC0 )
+                {
+                    /* MPEG audio */
+                    i_fourcc = VLC_FOURCC('m','p','g','a');
+                    i_cat = AUDIO_ES;
+#ifdef AUTO_SPAWN
+                    if( !p_input->stream.b_seekable )
+                    if( config_GetInt( p_input, "audio-channel" )
+                            == (i_id & 0x1F) ||
+                        ( config_GetInt( p_input, "audio-channel" ) < 0
+                          && !(i_id & 0x1F) ) )
+                    switch( config_GetInt( p_input, "audio-type" ) )
+                    {
+                    case -1:
+                    case REQUESTED_MPEG:
+                        b_auto_spawn = VLC_TRUE;
+                    }
+#endif
+                }
+                else if( (i_id & 0xF8FF) == 0x88BD )
+                {
+                    i_fourcc = VLC_FOURCC('d','t','s','b');
+                    i_cat = AUDIO_ES;
+#ifdef AUTO_SPAWN
+                    if( !p_input->stream.b_seekable )
+                    if( config_GetInt( p_input, "audio-channel" )
+                            == ((i_id & 0x700) >> 8) ||
+                        ( config_GetInt( p_input, "audio-channel" ) < 0
+                          && !((i_id & 0x700) >> 8)) )
+                    switch( config_GetInt( p_input, "audio-type" ) )
+                    {
+                    case -1:
+                    case REQUESTED_DTS:
+                        b_auto_spawn = VLC_TRUE;
+                    }
+#endif
+                }
+                else if( (i_id & 0xF0FF) == 0x80BD )
+                {
+                    /* A52 audio (0x80->0x8F) */
+                    i_fourcc = VLC_FOURCC('a','5','2','b');
+                    i_cat = AUDIO_ES;
+#ifdef AUTO_SPAWN
+                    if( !p_input->stream.b_seekable )
+                    if( config_GetInt( p_input, "audio-channel" )
+                            == ((i_id & 0xF00) >> 8) ||
+                        ( config_GetInt( p_input, "audio-channel" ) < 0
+                          && !((i_id & 0xF00) >> 8)) )
+                    switch( config_GetInt( p_input, "audio-type" ) )
+                    {
+                    case -1:
+                    case REQUESTED_A52:
+                        b_auto_spawn = VLC_TRUE;
+                    }
+#endif
+                }
+                else if( (i_id & 0xE0FF) == 0x20BD )
+                {
+                    /* Subtitles video (0x20->0x3F) */
+                    i_fourcc = VLC_FOURCC('s','p','u','b');
+                    i_cat = SPU_ES;
+#ifdef AUTO_SPAWN
+                    if( !p_input->stream.b_seekable )
+                    if( config_GetInt( p_input, "spu-channel" )
+                           == ((i_id & 0x1F00) >> 8) )
+                    {
+                        b_auto_spawn = VLC_TRUE;
+                    }
+#endif
+                }
+                else if( (i_id & 0xF0FF) == 0xA0BD )
+                {
+                    /* LPCM audio (0xA0->0xAF) */
+                    i_fourcc = VLC_FOURCC('l','p','c','b');
+                    i_cat = AUDIO_ES;
+                }
+                else
+                {
+                    i_cat = UNKNOWN_ES;
+                    i_fourcc = 0;
+                }
+
+                p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
+                                    i_id, i_cat, NULL, 0 );
+
+                p_es->i_stream_id = p_data->p_demux_start[3];
+                p_es->i_fourcc = i_fourcc;
+
+                if( b_auto_spawn ) input_SelectES( p_input, p_es );
 
                 /* Tell the interface the stream has changed */
                 p_input->stream.b_changed = 1;
@@ -1425,4 +1434,3 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
 #undef p
 
 }
-

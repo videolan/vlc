@@ -2,7 +2,7 @@
  * au.c : au file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: au.c,v 1.1 2003/03/11 07:03:16 fenrir Exp $
+ * $Id: au.c,v 1.2 2003/05/05 22:23:34 gbazin Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -406,13 +406,10 @@ static int AUInit( vlc_object_t * p_this )
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     p_input->stream.i_mux_rate =  wf.nAvgBytesPerSec / 50;
 
-    p_es = input_AddES( p_input,
-                        p_input->stream.p_selected_program,
-                        0x01,
-                        0 );
+    p_es = input_AddES( p_input, p_input->stream.p_selected_program,
+                        0x01, AUDIO_ES, NULL, 0 );
 
     p_es->i_stream_id   = 0x01;
-    p_es->i_cat         = AUDIO_ES;
     p_es->i_fourcc      = i_codec;
     p_es->p_waveformatex= malloc( sizeof( WAVEFORMATEX ) );
     memcpy( p_es->p_waveformatex,

@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.12 2003/04/14 03:23:30 fenrir Exp $
+ * $Id: sub.c,v 1.13 2003/05/05 22:23:37 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -425,15 +425,13 @@ static int  sub_open ( subtitle_demux_t *p_sub,
 
     /* *** add subtitle ES *** */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_sub->p_es = input_AddES( p_input,
-                               p_input->stream.p_selected_program,
+    p_sub->p_es = input_AddES( p_input, p_input->stream.p_selected_program,
                                0xff,    // FIXME
-                               0 );
+                               SPU_ES, NULL, 0 );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     p_sub->p_es->i_stream_id = 0xff;    // FIXME
     p_sub->p_es->i_fourcc    = VLC_FOURCC( 's','u','b','t' );
-    p_sub->p_es->i_cat       = SPU_ES;
 
     p_sub->i_previously_selected = 0;
     return VLC_SUCCESS;
