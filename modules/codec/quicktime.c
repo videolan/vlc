@@ -2,7 +2,7 @@
  * quicktime.c: a quicktime decoder that uses the QT library/dll
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: quicktime.c,v 1.13 2003/09/19 23:03:27 hartman Exp $
+ * $Id: quicktime.c,v 1.14 2003/10/01 20:57:34 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir at via.ecp.fr>
  *          Derk-Jan Hartman <thedj at users.sf.net>
@@ -492,10 +492,10 @@ static int InitThreadAudio( adec_thread_t *p_dec )
 #endif
 
     p_dec->output_format.i_format   = AOUT_FMT_S16_NE;
-    p_dec->output_format.i_rate     = p_wf->nSamplesPerSec;
+    p_dec->output_format.i_rate     = p_dec->OutputFormatInfo.sampleRate;
     p_dec->output_format.i_physical_channels =
         p_dec->output_format.i_original_channels =
-            pi_channels_maps[p_wf->nChannels];
+            pi_channels_maps[p_dec->OutputFormatInfo.numChannels];
     aout_DateInit( &p_dec->date, p_dec->output_format.i_rate );
     p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
                                        &p_dec->p_aout,
