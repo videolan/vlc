@@ -1617,6 +1617,26 @@ then
 fi
 
 dnl
+dnl  Screen capture module
+dnl
+AC_ARG_ENABLE(screen,
+  [  --enable-screen            Screen capture support (default enabled)])
+if test "${enable_screen}" != "no"; then
+  if test "${SYS}" != "mingw32"; then
+    CPPFLAGS="${CPPFLAGS_save} -I${x_includes}"
+    AC_CHECK_HEADERS(X11/Xlib.h, [
+      VLC_ADD_PLUGINS([screen])
+      VLC_ADD_LDFLAGS([screen],[-L${x_libraries} -lX11 -lXext])
+      VLC_ADD_CPPFLAGS([screen],[-I${x_includes}])
+    ])
+    CPPFLAGS="${CPPFLAGS_save}"
+  else
+    VLC_ADD_PLUGINS([screen])
+    VLC_ADD_LDFLAGS([screen],[-lgdi32])
+  fi
+fi
+
+dnl
 dnl  ipv6 plugin - not for QNX yet
 dnl
 if test "${SYS}" != "nto" && test "${SYS}" != "mingw32"
