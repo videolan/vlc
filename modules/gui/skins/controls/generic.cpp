@@ -2,7 +2,7 @@
  * generic.cpp: Generic control, parent of the others
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: generic.cpp,v 1.4 2003/04/21 21:51:16 asmax Exp $
+ * $Id: generic.cpp,v 1.5 2003/04/23 10:29:52 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -51,6 +51,11 @@ GenericControl::GenericControl( string id, bool visible, string help,
     Visible = visible;
     Help    = help;
     ParentWindow = Parent;
+    Left    = 0;
+    Top     = 0;
+    Width   = 0;
+    Height  = 0;
+    State   = 0;
     Img     = NULL;
     p_intf  = Parent->GetIntf();
 }
@@ -58,7 +63,7 @@ GenericControl::GenericControl( string id, bool visible, string help,
 GenericControl::~GenericControl()
 {
     if( Img != NULL )
-        delete Img;
+        delete[] Img;
 }
 //---------------------------------------------------------------------------
 bool GenericControl::GenericProcessEvent( Event *evt )

@@ -2,7 +2,7 @@
  * skin_common.h: Private Skin interface description
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_common.h,v 1.4 2003/04/21 02:50:49 asmax Exp $
+ * $Id: skin_common.h,v 1.5 2003/04/23 10:29:52 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -77,6 +77,7 @@ struct intf_sys_t
     // Wait wxwindows initialization
     vlc_mutex_t init_lock;
     vlc_cond_t  init_cond;
+
 };
 
 #endif

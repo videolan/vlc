@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.17 2003/04/22 19:26:02 asmax Exp $
+ * $Id: skin_main.cpp,v 1.18 2003/04/23 10:29:52 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -114,9 +114,9 @@ static int Open ( vlc_object_t *p_this )
     gdk_init( &i_args, &pp_args );
 #endif
 
-    // Initialize conditions
-    vlc_mutex_init( p_intf, &p_intf->p_sys->init_lock);
-    vlc_cond_init( p_intf, &p_intf->p_sys->init_cond);
+    // Initialize conditions and mutexes
+    vlc_mutex_init( p_intf, &p_intf->p_sys->init_lock );
+    vlc_cond_init( p_intf, &p_intf->p_sys->init_cond );
     
     p_intf->p_sys->p_theme = (Theme *)new OSTheme( p_intf );
 
@@ -147,9 +147,9 @@ static void Close ( vlc_object_t *p_this )
     // Unsuscribe to messages bank
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
-    // Destroy conditions
-    vlc_cond_destroy( &p_intf->p_sys->init_cond);
-    vlc_mutex_destroy( &p_intf->p_sys->init_lock);
+    // Destroy conditions and mutexes
+    vlc_cond_destroy( &p_intf->p_sys->init_cond );
+    vlc_mutex_destroy( &p_intf->p_sys->init_lock );
     
     // Destroy structure
     free( p_intf->p_sys );
