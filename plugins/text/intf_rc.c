@@ -66,6 +66,8 @@ typedef struct intf_sys_s
 
 } intf_sys_t;
 
+#define MAX_LINE_LENGTH 256
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -138,7 +140,7 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-    char      p_cmd[ 32 ];
+    char      p_cmd[ MAX_LINE_LENGTH + 1 ];
     int       i_cmd_pos;
     boolean_t b_complete = 0;
 
@@ -153,10 +155,10 @@ static void intf_Run( intf_thread_t *p_intf )
 
     while( !p_intf->b_die )
     {
+#define S p_intf->p_input->stream
         if( p_intf->p_input != NULL )
         {
             /* Get position */
-#define S p_intf->p_input->stream
             if( S.i_mux_rate )
             {
                 f_ratio = 1.0 / ( 50 * S.i_mux_rate );
@@ -170,83 +172,93 @@ static void intf_Run( intf_thread_t *p_intf )
                                           S.p_selected_area->i_size ) );
                 }
             }
+	}
 #undef S
 
-            b_complete = 0;
-            i_cmd_pos = 0;
+        b_complete = 0;
+        i_cmd_pos = 0;
 
-            /* Check stdin */
-            tv.tv_sec = 0;
-            tv.tv_usec = 50000;
-            FD_ZERO( &fds );
-            FD_SET( STDIN_FILENO, &fds );
+        /* Check stdin */
+        tv.tv_sec = 0;
+        tv.tv_usec = 50000;
+        FD_ZERO( &fds );
+        FD_SET( STDIN_FILENO, &fds );
 
-            if( select( 32, &fds, NULL, NULL, &tv ) )
+        if( select( 32, &fds, NULL, NULL, &tv ) )
+        {
+            while( !p_intf->b_die
+                    && i_cmd_pos < MAX_LINE_LENGTH
+                    && read( STDIN_FILENO, p_cmd + i_cmd_pos, 1 ) > 0
+                    && p_cmd[ i_cmd_pos ] != '\r'
+                    && p_cmd[ i_cmd_pos ] != '\n' )
             {
-                while( i_cmd_pos < 32
-                       && read( STDIN_FILENO, p_cmd + i_cmd_pos, 1 ) > 0
-                       && p_cmd[ i_cmd_pos ] != '\r'
-                       && p_cmd[ i_cmd_pos ] != '\n' )
-                {
-                    i_cmd_pos++;
-                }
-
-                if( i_cmd_pos == 31 || p_cmd[ i_cmd_pos ] == '\r'
-                                    || p_cmd[ i_cmd_pos ] == '\n' )
-                {
-                    p_cmd[ i_cmd_pos ] = 0;
-                    b_complete = 1;
-                }
+                i_cmd_pos++;
             }
 
-            /* Is there something to do? */
-            if( b_complete == 1 )
+            if( i_cmd_pos == MAX_LINE_LENGTH
+                 || p_cmd[ i_cmd_pos ] == '\r'
+                 || p_cmd[ i_cmd_pos ] == '\n' )
             {
-                switch( p_cmd[ 0 ] )
+                p_cmd[ i_cmd_pos ] = 0;
+                b_complete = 1;
+            }
+        }
+
+        /* Is there something to do? */
+        if( b_complete == 1 )
+        {
+            switch( p_cmd[ 0 ] )
+            {
+            case 'p':
+            case 'P':
+                if( p_intf->p_input != NULL )
                 {
-                case 'p':
-                case 'P':
                     input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
-                    break;
+                }
+                break;
 
-                case 'f':
-                case 'F':
-                    vlc_mutex_lock( &p_vout_bank->lock );
-                    /* XXX: only fullscreen the first video output */
-                    if( p_vout_bank->i_count )
-                    {
-                        p_vout_bank->pp_vout[0]->i_changes
-                                          |= VOUT_FULLSCREEN_CHANGE;
-                    }
-                    vlc_mutex_unlock( &p_vout_bank->lock );
-                    break;
+            case 'f':
+            case 'F':
+                vlc_mutex_lock( &p_vout_bank->lock );
+                /* XXX: only fullscreen the first video output */
+                if( p_vout_bank->i_count )
+                {
+                    p_vout_bank->pp_vout[0]->i_changes
+                                      |= VOUT_FULLSCREEN_CHANGE;
+                }
+                vlc_mutex_unlock( &p_vout_bank->lock );
+                break;
 
-                case 'm':
-                case 'M':
+            case 'm':
+            case 'M':
 #if 0
-                    double picratio = p_intf->p_input->p_default_vout->i_width 
-                        / p_intf->p_input->p_default_vout->i_height;
-                    if (picratio
-                    p_intf->p_input->p_default_vout->i_width=800
-                    p_intf->p_input->p_default_vout->i_changes |= 
-                        VOUT_FULLSCREEN_CHANGE;
+                double picratio = p_intf->p_input->p_default_vout->i_width 
+                    / p_intf->p_input->p_default_vout->i_height;
+                if (picratio
+                p_intf->p_input->p_default_vout->i_width=800
+                p_intf->p_input->p_default_vout->i_changes |= 
+                    VOUT_FULLSCREEN_CHANGE;
 #endif
-                    break;
+                break;
 
-                case 's':
-                case 'S':
-                    ;
-                    break;
+            case 's':
+            case 'S':
+                ;
+                break;
 
-                case 'q':
-                case 'Q':
-                    p_intf->b_die = 1;
-                    break;
+            case 'q':
+            case 'Q':
+                p_intf->b_die = 1;
+                break;
 
-                case 'r':
-                case 'R':
-                    for( i_dummy = 1; i_dummy < 32 && p_cmd[ i_dummy ] >= '0'
-                         && p_cmd[ i_dummy ] <= '9'; ++i_dummy )
+            case 'r':
+            case 'R':
+                if( p_intf->p_input != NULL )
+                {
+                    for( i_dummy = 1;
+                         i_dummy < MAX_LINE_LENGTH && p_cmd[ i_dummy ] >= '0'
+                                                   && p_cmd[ i_dummy ] <= '9';
+                         i_dummy++ )
                     {
                         ;
                     }
@@ -255,12 +267,12 @@ static void intf_Run( intf_thread_t *p_intf )
                     f_cpos = atof( p_cmd + 1 );
                     input_Seek( p_intf->p_input, (off_t) (f_cpos / f_ratio) );
                     /* rcreseek(f_cpos); */
-                    break;
-
-                default:
-                    intf_Msg( "rc: unknown command: %s", p_cmd );
-                    break;
                 }
+                break;
+
+            default:
+                intf_Msg( "rc: unknown command `%s'", p_cmd );
+                break;
             }
         }
 

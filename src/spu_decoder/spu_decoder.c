@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.47 2001/06/02 01:09:03 sam Exp $
+ * $Id: spu_decoder.c,v 1.48 2001/08/06 13:13:06 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -319,6 +319,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
     {
         GetChunk( &p_spudec->bit_stream, p_src + i_offset, SPU_CHUNK_SIZE );
 
+        /* Abort subtitle parsing if we were requested to stop */
         if( p_spudec->p_fifo->b_die )
         {
             free( p_src );
@@ -336,13 +337,17 @@ static void ParsePacket( spudec_thread_t *p_spudec )
 #endif
 
     /* Getting the control part */
-    if( p_spudec->p_fifo->b_die || ParseControlSequences( p_spudec, p_spu ) )
+    if( ParseControlSequences( p_spudec, p_spu ) )
     {
         /* There was a parse error, delete the subpicture */
         free( p_src );
         vout_DestroySubPicture( p_spudec->p_vout, p_spu );
         return;
     }
+
+    /* At this point, no more GetBit() command is needed, so we have all
+     * the data we need to tell whether the subtitle is valid. Thus we
+     * try to display it and we ignore b_die. */
 
     if( ParseRLE( p_spudec, p_spu, p_src ) )
     {
@@ -489,6 +494,12 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                     return( 1 );
             }
 
+            /* We need to check for quit commands here */
+            if( p_spudec->p_fifo->b_die )
+            {
+                return( 1 );
+            }
+
         } while( i_command != SPU_CMD_END );
 
     } while( i_index == i_next_seq );
@@ -534,7 +545,7 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
          * we can deal with it */
         default:
             intf_WarnMsg( 2, "spudec warning: %i padding bytes, we usually "
-                             "get 1 or none",
+                             "get 0 or 1 of them",
                           p_spudec->i_spu_size - i_index );
 
             while( i_index < p_spudec->i_spu_size )
@@ -632,7 +643,7 @@ static int ParseRLE( spudec_thread_t *p_spudec,
             {
                 intf_ErrMsg( "spudec error: out of bounds, %i at (%i,%i) is "
                              "out of %ix%i",
-                             i_code >> 2, i_x, i_y, i_width, i_height);
+                             i_code >> 2, i_x, i_y, i_width, i_height );
                 return( 1 );
             }
 
