@@ -94,6 +94,7 @@ static int Activate( vlc_object_t * p_this )
     psz_ext = strrchr ( p_input->psz_name, '.' );
 
     if( ( psz_ext && !strcasecmp( psz_ext, ".m3u") ) ||
+        ( psz_ext && !strcasecmp( psz_ext, ".ram") ) || /* a .ram file can contain a single rtsp link */
         ( p_input->psz_demux && !strcmp(p_input->psz_demux, "m3u") ) )
     {
         i_type = TYPE_M3U;
