@@ -47,8 +47,9 @@
 #endif
 
 #define TYPE_CATEGORY 0
-#define TYPE_SUBCATEGORY 1
-#define TYPE_MODULE 2
+#define TYPE_CATSUBCAT 1  /* Category with embedded subcategory */
+#define TYPE_SUBCATEGORY 2
+#define TYPE_MODULE 3
 
 /*****************************************************************************
  * Classes declarations.
@@ -369,7 +370,32 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
                                            -1, -1, config_data );
                 break;
             case CONFIG_SUBCATEGORY:
+                if( p_item->i_value == SUBCAT_VIDEO_GENERAL ||
+                    p_item->i_value == SUBCAT_AUDIO_GENERAL )
+                {
+                    ConfigTreeData *cd = (ConfigTreeData *)
+                                            GetItemData( current_item );
+                    cd->i_type = TYPE_CATSUBCAT;
+                    cd->i_object_id = p_item->i_value;
+                    if( cd->psz_name ) free( cd->psz_name );
+                    cd->psz_name = strdup(  config_CategoryNameGet(
+                                                      p_item->i_value ) );
+                    if( cd->psz_help ) free( cd->psz_help );
+                    char *psz_help = config_CategoryHelpGet( p_item->i_value );
+                    if( psz_help )
+                    {
+                        cd->psz_help = wraptext( strdup( psz_help ),72 ,
+                                                 ISUTF8 );
+                    }
+                    else
+                    {
+                        cd->psz_help = NULL;
+                    }
+                    continue;
+                }
+
                 config_data = new ConfigTreeData;
+
                 config_data->psz_name = strdup(  config_CategoryNameGet(
                                                            p_item->i_value ) );
                 psz_help = config_CategoryHelpGet( p_item->i_value );
@@ -605,47 +631,6 @@ void PrefsTreeCtrl::CleanChanges()
         category = GetNextChild( root_item, cookie );
     }
 
-#if 0
-    /* Clean changes for the main module */
-    wxTreeItemId item = GetFirstChild( root_item, cookie );
-    for( size_t i_child_index = 0;
-         i_child_index < GetChildrenCount( root_item, FALSE );
-         i_child_index++ )
-    {
-        config_data = (ConfigTreeData *)GetItemData( item );
-        if( config_data && config_data->panel )
-        {
-            delete config_data->panel;
-            config_data->panel = NULL;
-        }
-
-        item = GetNextChild( root_item, cookie );
-    }
-    /* Clean changes for the plugins */
-    item = GetFirstChild( plugins_item, cookie );
-    for( size_t i_child_index = 0;
-         i_child_index < GetChildrenCount( plugins_item, FALSE );
-         i_child_index++ )
-    {
-        wxTreeItemId item2 = GetFirstChild( item, cookie2 );
-        for( size_t i_child_index = 0;
-             i_child_index < GetChildrenCount( item, FALSE );
-             i_child_index++ )
-        {
-            config_data = (ConfigTreeData *)GetItemData( item2 );
-
-            if( config_data && config_data->panel )
-            {
-                delete config_data->panel;
-                config_data->panel = NULL;
-            }
-
-            item2 = GetNextChild( item, cookie2 );
-        }
-
-        item = GetNextChild( plugins_item, cookie );
-    }
-#endif
     if( GetSelection() )
     {
         wxTreeEvent event;
@@ -818,7 +803,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             }
             if( !p_module && !b_found )
             {
-                msg_Warn( p_intf, "ohoh, unable to find main module");
+                msg_Warn( p_intf, "ohoh, unable to find main module" );
                 return;
             }
         }
@@ -838,7 +823,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             p_item = p_module->p_config;
 
         /* Find the category if it has been specified */
-        if( config_data->i_type == TYPE_SUBCATEGORY )
+        if( config_data->i_type == TYPE_SUBCATEGORY ||
+            config_data->i_type == TYPE_CATSUBCAT )
         {
             do
             {
@@ -854,7 +840,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
         /* Add a head title to the panel */
         char *psz_head;
-        if( config_data->i_type == TYPE_SUBCATEGORY )
+        if( config_data->i_type == TYPE_SUBCATEGORY ||
+            config_data->i_type == TYPE_CATSUBCAT )
         {
             psz_head = config_data->psz_name;
             p_item++;
@@ -883,7 +870,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         if( p_item ) do
         {
             /* If a category has been specified, check we finished the job */
-            if( config_data->i_type == TYPE_SUBCATEGORY &&
+            if( (config_data->i_type == TYPE_SUBCATEGORY ||
+                 config_data->i_type == TYPE_CATSUBCAT ) &&
                 (p_item->i_type == CONFIG_CATEGORY ||
                   p_item->i_type == CONFIG_SUBCATEGORY ) &&
                 p_item->i_value != config_data->i_object_id )
@@ -902,7 +890,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
             config_sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
         }
         while( !( p_item->i_type == CONFIG_HINT_END ||
-               ( config_data->i_type == TYPE_SUBCATEGORY &&
+               ( ( config_data->i_type == TYPE_SUBCATEGORY ||
+                   config_data->i_type == TYPE_CATSUBCAT ) &&
                  ( p_item->i_type == CONFIG_CATEGORY ||
                    p_item->i_type == CONFIG_SUBCATEGORY ) ) ) && p_item++ );
 
