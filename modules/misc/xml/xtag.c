@@ -240,12 +240,13 @@ static int ReaderRead( xml_reader_t *p_reader )
             return 1;
         }
 
-        if( !p_reader->p_sys->b_endtag )
+        if( p_reader->p_sys->p_curtag->name && /* no end tag for pcdata */
+            !p_reader->p_sys->b_endtag )
         {
             p_reader->p_sys->b_endtag = VLC_TRUE;
             return 1;
         }
-        
+
         p_reader->p_sys->b_endtag = VLC_FALSE;
         if( !p_reader->p_sys->p_curtag->parent ) return 0;
         p_reader->p_sys->p_curtag = p_reader->p_sys->p_curtag->parent;
@@ -268,7 +269,12 @@ static char *ReaderName( xml_reader_t *p_reader )
     const char *psz_name;
 
     if( !p_reader->p_sys->p_curattr )
+    {
         psz_name = xtag_get_name( p_reader->p_sys->p_curtag );
+#ifdef XTAG_DEBUG
+        printf( "TAG: %s\n", psz_name );
+#endif
+    }
     else
         psz_name = ((XAttribute *)p_reader->p_sys->p_curattr->data)->name;
 
@@ -532,7 +538,9 @@ static XTag *xtag_parse_tag( XTagParser *parser )
 
     if( !parser->valid ) return NULL;
 
-    xtag_skip_whitespace (parser);
+#if 0 /* Do we really want all the whitespace pcdata ? */
+    xtag_skip_whitespace( parser );
+#endif
 
     if( (pcdata = xtag_slurp_to( parser, X_OPENTAG, X_NONE )) != NULL )
     {
@@ -563,12 +571,12 @@ static XTag *xtag_parse_tag( XTagParser *parser )
 
         while( (xi = xtag_index( parser, X_DASH )) >= 0 )
         {
-            parser->start = s = &s[xi];
+            parser->start = s = &s[xi+1];
 
-            if( xtag_cin( s[0], X_DASH ) && xtag_cin( s[1], X_DASH ) &&
-                xtag_cin( s[2], X_CLOSETAG ) )
+            if( xtag_cin( s[0], X_DASH ) && xtag_cin( s[1], X_CLOSETAG ) )
             {
-                parser->start = &s[3];
+                parser->start = &s[2];
+                xtag_skip_whitespace( parser );
                 return xtag_parse_tag( parser );
             }
         }
@@ -583,6 +591,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
         if( xi <= 0 ) return NULL;
 
         parser->start = &s[xi+1];
+        xtag_skip_whitespace( parser );
         return xtag_parse_tag( parser );
     }
 
@@ -613,7 +622,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
         }
     }
 
-    xtag_skip_whitespace (parser);
+    xtag_skip_whitespace( parser );
 
     s = parser->start;
 
@@ -621,18 +630,19 @@ static XTag *xtag_parse_tag( XTagParser *parser )
     {
         parser->current_tag = tag;
 
-        xtag_assert_and_pass (parser, X_CLOSETAG);
+        xtag_assert_and_pass( parser, X_CLOSETAG );
 
         while( (inner = xtag_parse_tag( parser ) ) != NULL )
         {
             tag->children = xlist_append( tag->children, inner );
         }
 
-        xtag_skip_whitespace (parser);
+        parser->current_tag = tag->parent;
+        xtag_skip_whitespace( parser );
 
-        xtag_assert_and_pass (parser, X_OPENTAG);
-        xtag_assert_and_pass (parser, X_SLASH);
-        name = xtag_slurp_to (parser, X_WHITESPACE | X_CLOSETAG, X_NONE);
+        xtag_assert_and_pass( parser, X_OPENTAG );
+        xtag_assert_and_pass( parser, X_SLASH );
+        name = xtag_slurp_to( parser, X_WHITESPACE | X_CLOSETAG, X_NONE );
         if( name )
         {
             if( strcmp( name, tag->name ) )
