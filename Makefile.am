@@ -93,7 +93,7 @@ if RELEASE
 CPPFLAGS_release = -DHAVE_RELEASE
 endif
 if DEBUG
-CPPFLAGS_debug = -DDEBUG -DHAVE_RELEASE
+CPPFLAGS_debug = -DDEBUG
 CFLAGS_debug = -g
 endif
 if GPROF
@@ -468,7 +468,7 @@ mozilla_plugindir = $(libdir)/mozilla/plugins
 $(LIBRARIES_mozilla): $(mozilla_libplugin_a_OBJECTS) \
                       $(mozilla_libplugin_a_DEPENDENCIES) \
                       $(L_builtin_pic)
-	$(CXXLINK) -o $@ $(mozilla_libplugin_a_OBJECTS) $(DATA_npvlc_rc) \
+	$(CXXLINK) $(mozilla_libplugin_a_OBJECTS) $(DATA_npvlc_rc) \
 		lib/libvlc_pic.a $(L_builtin_pic) -shared $(LDFLAGS) \
 		$(LDFLAGS_vlc) $(LDFLAGS_mozilla) $(LDFLAGS_builtin_pic)
 
