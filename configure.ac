@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.25 2003/07/06 23:14:50 massiot Exp $
+dnl $Id: configure.ac,v 1.26 2003/07/07 14:56:22 massiot Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -1930,7 +1930,12 @@ then
   AC_CHECK_HEADERS(theora/theora.h, [
     AC_CHECK_LIB(theora, theora_granule_time, [
       AX_ADD_BUILTINS([theora])
-      AX_ADD_LDFLAGS([theora],[-ltheora -logg]) ],[
+      if test "${SYS}" = "darwin"; then
+        theora_libs="-ltheora"
+      else
+        theora_libs="-ltheora -logg"
+      fi
+      AX_ADD_LDFLAGS([theora],[${theora_libs}]) ],[
       AC_MSG_ERROR([libtheora doesn't appear to be installed on you system.
 You also need to check that you have a libogg posterior to the 1.0 release.])],
       [-logg])
