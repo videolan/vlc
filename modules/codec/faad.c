@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: faad.c,v 1.11 2004/02/19 15:42:25 jpsaman Exp $
+ * $Id: faad.c,v 1.12 2004/02/19 16:19:41 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -116,10 +116,10 @@ static int Open( vlc_object_t *p_this )
     aout_DateSet( &p_sys->date, 0 );
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
-    if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+    if (p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
         p_dec->fmt_out.i_codec = VLC_FOURCC('f','l','3','2');
     else
-        p_dec->fmt_out.i_codec = VLC_FOURCC('f','i','1','6');
+        p_dec->fmt_out.i_codec = AOUT_FMT_S16_NE;
     p_dec->pf_decode_audio = DecodeBlock;
 
     p_dec->fmt_out.audio.i_physical_channels =
@@ -151,7 +151,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set the faad config */
     cfg = faacDecGetCurrentConfiguration( p_sys->hfaad );
-    if (p_intf->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
+    if (p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_FPU)
         cfg->outputFormat = FAAD_FMT_FLOAT;
     else
         cfg->outputFormat = FAAD_FMT_16BIT;
@@ -376,12 +376,14 @@ static void DoReordering( decoder_t *p_dec,
     }
 
     /* Do the actual reordering */
-    for( i = 0; i < i_samples; i++ )
-    {
-        for( j = 0; j < i_nb_channels; j++ )
-        {
-            p_out[i * i_nb_channels + pi_chan_table[j]] =
-                p_in[i * i_nb_channels + j];
-        }
-    }
+    if( p_dec->p_libvlc->i_cpu & CPU_CAPABILITY_FPU )
+        for( i = 0; i < i_samples; i++ )
+            for( j = 0; j < i_nb_channels; j++ )
+                p_out[i * i_nb_channels + pi_chan_table[j]] =
+                    p_in[i * i_nb_channels + j];
+    else
+        for( i = 0; i < i_samples; i++ )
+            for( j = 0; j < i_nb_channels; j++ )
+                ((uint16_t *)p_out)[i * i_nb_channels + pi_chan_table[j]] =
+                    ((uint16_t *)p_in)[i * i_nb_channels + j];
 }
