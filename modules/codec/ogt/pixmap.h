@@ -2,7 +2,7 @@
  * Common pixel/chroma manipulation routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: pixmap.h,v 1.4 2004/01/30 13:17:12 rocky Exp $
+ * $Id: pixmap.h,v 1.5 2004/01/31 05:53:35 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -35,6 +35,15 @@ typedef union {
     uint8_t t;
   } s;
 } ogt_yuvt_t;
+
+/** An undefined or invalid colormap index. */
+#define INVALID_CMAP_ENTRY -1
+
+/** Type of a palette/colormap index*/
+typedef int16_t cmap_t;
+
+/** Number of entries in RGB palette/colormap*/
+#define CMAP_RGB2_SIZE 256
 
 /**
    Force v in the range 0..255. In video_chroma/i420_rgb.c, this
@@ -113,7 +122,7 @@ yuv2rgb(const ogt_yuvt_t *p_yuv, uint8_t *p_rgb_out )
    to do.)
  */
 static inline void
-put_rgb24_pixel(const uint8_t *rgb, uint8_t *p_pixel)
+put_rgb24_pixel(const uint8_t *rgb, /*out*/ uint8_t *p_pixel)
 {
 #ifdef WORDS_BIGENDIAN
   *p_pixel++;
@@ -124,14 +133,24 @@ put_rgb24_pixel(const uint8_t *rgb, uint8_t *p_pixel)
 }
 
 /**
- Find the nearest colormap entry in p_vout (assumed to have RGB2
- chroma, i.e. 256 RGB entries) that is closest in color to p_yuv.  Set
- rgb to the color found and return the colormap index. -1 is returned
- if there is some error.
+   Find the nearest colormap entry in p_vout (assumed to have RGB2
+   chroma, i.e. 256 RGB 8bpp entries) that is closest in color to p_rgb.  Set
+   out_rgb to the color found and return the colormap index. 
+   INVALID_CMAP_ENTRY is returned if there is some error.
 */
-int
-find_cmap_nearest(const vout_thread_t *p_vout, const ogt_yuvt_t *p_yuv,
-		  uint8_t *rgb);
+cmap_t
+find_cmap_rgb8_nearest(const vout_thread_t *p_vout, const uint8_t *p_rgb,
+                       /*out*/ uint8_t *out_rgb);
+
+/**
+   Get the the rgb value for a given colormap entry for p_vout (which is'
+   assumed to have RGB2 chroma). 
+   
+   VLC_FALSE is returned if there was some error.
+*/
+vlc_bool_t
+query_color(const vout_thread_t *p_vout, cmap_t i_cmap,
+            /*out*/ uint8_t *rgb);
 
 #endif /* PIXMAP_H */
 

@@ -2,7 +2,7 @@
  * Common pixel/chroma manipulation routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: pixmap.c,v 1.2 2004/01/30 13:23:08 rocky Exp $
+ * $Id: pixmap.c,v 1.3 2004/01/31 05:53:35 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -50,14 +50,11 @@ struct chroma_sys_t
     /* To get RGB value for palette entry i, use (p_rgb_r[i], p_rgb_g[i],
        p_rgb_b[i])
      */
-    uint8_t  *p_rgb_r;                   /* Red values of palette */
-    uint8_t  *p_rgb_g;                   /* Green values of palette */
-    uint8_t  *p_rgb_b;                   /* Blue values of palette */
+    uint16_t  p_rgb_r[CMAP_RGB2_SIZE];    /* Red values of palette */
+    uint16_t  p_rgb_g[CMAP_RGB2_SIZE];    /* Green values of palette */
+    uint16_t  p_rgb_b[CMAP_RGB2_SIZE];    /* Blue values of palette */
 };
 
-
-/* Number of entries in RGB palette/colormap*/
-#define CMAP_SIZE 256
 
 /* 
     From
@@ -110,9 +107,9 @@ struct chroma_sys_t
 
 /** 
    Find the nearest colormap entry in p_vout (assumed to have RGB2
-   chroma, i.e. 256 RGB entries) that is closest in color to p_yuv.  Set
-   RGB to the color found and return the colormap index. -1 is returned
-   if there is some error.
+   chroma, i.e. 256 RGB 8bpp entries) that is closest in color to p_rgb.  Set
+   out_rgb to the color found and return the colormap index.
+   INVALID_CMAP_ENTRY is returned if there is some error.
 
    The closest match is determined by the the Euclidean distance
    using integer-scaled 601-2 coefficients described above.
@@ -121,31 +118,28 @@ struct chroma_sys_t
    comparisons it amounts to the same thing.
 */
 
-int
-find_cmap_rgb8_nearest(const vout_thread_t *p_vout, const ogt_yuvt_t *p_yuv,
+cmap_t
+find_cmap_rgb8_nearest(const vout_thread_t *p_vout, const uint8_t *rgb,
 		       uint8_t *out_rgb) 
 {
-  uint8_t *p_cmap_r;
-  uint8_t *p_cmap_g;
-  uint8_t *p_cmap_b;
-  uint8_t rgb[RGB_SIZE];
+  uint16_t *p_cmap_r;
+  uint16_t *p_cmap_g;
+  uint16_t *p_cmap_b;
   
   int i;
-  int i_bestmatch=0;
+  cmap_t i_bestmatch = INVALID_CMAP_ENTRY;
   uint32_t i_mindist = 0xFFFFFFFF; /* The largest number here. */
 
   /* Check that we really have RGB2. */
   
   if ( !p_vout && p_vout->output.i_chroma  != VLC_FOURCC('R','G','B','2') )
-    return -1;
+    return INVALID_CMAP_ENTRY;
 
   p_cmap_r=p_vout->chroma.p_sys->p_rgb_r;
   p_cmap_g=p_vout->chroma.p_sys->p_rgb_g;
   p_cmap_b=p_vout->chroma.p_sys->p_rgb_b;
 
-  yuv2rgb(p_yuv, rgb);
-
-  for (i = 0; i < CMAP_SIZE; i++) {
+  for (i = 0; i < CMAP_RGB2_SIZE; i++) {
     /* Interval range calculations to show that we don't overflow the
        word sizes below. pixels component values start out 8
        bits. When we subtract two components we get 9 bits, then
@@ -170,25 +164,71 @@ find_cmap_rgb8_nearest(const vout_thread_t *p_vout, const ogt_yuvt_t *p_yuv,
 #define SCALEBITS 6 
 #define int32_sqr(x) ( ((int32_t) (x)) * ((int32_t) x) )
 
-    uint32_t dr = ( RED_COEF   * ( int32_sqr(rgb[RED_PIXEL]   - p_cmap_r[i])
+    /* colormap entires are scaled to 16 bits, so we need to shift
+       them back down to 8. */
+#define CMAP8_RED(i) (p_cmap_r[i]>>8)
+#define CMAP8_GREEN(i) (p_cmap_g[i]>>8)
+#define CMAP8_BLUE(i) (p_cmap_b[i]>>8)
+
+    uint32_t dr = ( RED_COEF   * ( int32_sqr(rgb[RED_PIXEL]   - CMAP8_RED(i))
 				 << SCALEBITS ) ) >> (SCALEBITS*2);
-    uint32_t dg = ( GREEN_COEF * ( int32_sqr(rgb[GREEN_PIXEL] - p_cmap_g[i])
+    uint32_t dg = ( GREEN_COEF * ( int32_sqr(rgb[GREEN_PIXEL] - CMAP8_GREEN(i))
 				 << SCALEBITS ) ) >> (SCALEBITS*2);
-    uint32_t db = ( BLUE_COEF  * ( int32_sqr(rgb[BLUE_PIXEL]  - p_cmap_b[i])
-				  << SCALEBITS ) ) >> (SCALEBITS*2);
+    uint32_t db = ( BLUE_COEF  * ( int32_sqr(rgb[BLUE_PIXEL]  - CMAP8_BLUE(i))
+				 << SCALEBITS ) ) >> (SCALEBITS*2);
 
     uint32_t i_dist = dr + dg + db;
     if (i_dist < i_mindist) {
       i_bestmatch = i;
       i_mindist = i_dist;
+#if 0      
+      printf("+++Change dist to %d RGB cmap %d (%0x, %0x, %0x)\n", 
+             i_dist, i, p_cmap_r[ i ], p_cmap_g[ i ], p_cmap_b[ i ]);
+#endif
     }
   }
 
-  out_rgb[RED_PIXEL]   = p_cmap_r[i_bestmatch];
-  out_rgb[GREEN_PIXEL] = p_cmap_g[i_bestmatch];
-  out_rgb[BLUE_PIXEL]  = p_cmap_b[i_bestmatch];
+  if (out_rgb) 
+    {
+      out_rgb[RED_PIXEL]   = CMAP8_RED(i_bestmatch);
+      out_rgb[GREEN_PIXEL] = CMAP8_GREEN(i_bestmatch);
+      out_rgb[BLUE_PIXEL]  = CMAP8_BLUE(i_bestmatch);
+    }
 
   return i_bestmatch;
+}
+
+/**
+   Get the the rgb value for a given colormap entry for p_vout (which is'
+   assumed to have RGB2 chroma). 
+
+   VLC_FALSE is returned if there was some error.
+*/
+vlc_bool_t
+query_color(const vout_thread_t *p_vout, cmap_t i_cmap,
+            /*out*/ uint8_t *out_rgb) 
+{
+  uint16_t *p_cmap_r;
+  uint16_t *p_cmap_g;
+  uint16_t *p_cmap_b;
+
+  /* Check that we really have RGB2. */
+  
+  if ( !p_vout && p_vout->output.i_chroma  != VLC_FOURCC('R','G','B','2') )
+    return VLC_FALSE;
+
+  if ( !out_rgb ) 
+    return VLC_FALSE;
+
+  p_cmap_r=p_vout->chroma.p_sys->p_rgb_r;
+  p_cmap_g=p_vout->chroma.p_sys->p_rgb_g;
+  p_cmap_b=p_vout->chroma.p_sys->p_rgb_b;
+
+  out_rgb[RED_PIXEL]   = CMAP8_RED(i_cmap);
+  out_rgb[GREEN_PIXEL] = CMAP8_GREEN(i_cmap);
+  out_rgb[BLUE_PIXEL]  = CMAP8_BLUE(i_cmap);
+
+  return VLC_TRUE;
 }
 
 

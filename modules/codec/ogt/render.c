@@ -2,7 +2,7 @@
  * render.c : Philips OGT and CVD (VCD Subtitle) blending routines
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.26 2004/01/29 11:50:22 rocky Exp $
+ * $Id: render.c,v 1.27 2004/01/31 05:53:35 rocky Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from: 
@@ -25,7 +25,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*#define TESTING_BLENDING 1*/
+/*#define TESTING_TRANSPARENCY 1*/
 
 /*****************************************************************************
  * Preamble
@@ -235,7 +235,7 @@ static void BlendI420( vout_thread_t *p_vout, picture_t *p_pic,
 	    }
           }
 
-#ifdef TESTING_BLENDING
+#ifdef TESTING_TRANSPARENCY
           if (p_source->s.t == MAX_ALPHA) p_source->s.t >>= 1;
 #endif
 
@@ -434,7 +434,7 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
           else 
             i_avg_tr = ( p_source->s.t + (p_source+1)->s.t ) / 2;
           
-#ifdef TESTING_BLENDING 
+#ifdef TESTING_TRANSPARENCY 
           if (i_avg_tr == MAX_ALPHA) i_avg_tr >>= 1;
 #endif
 
@@ -801,7 +801,7 @@ BlendRV16( vout_thread_t *p_vout, picture_t *p_pic,
 		return;
 	      }
 	      
-#ifdef TESTING_BLENDING
+#ifdef TESTING_TRANSPARENCY
               if (p_source->s.t == MAX_ALPHA) p_source->s.t >>= 1;
 #endif
 
@@ -1110,7 +1110,7 @@ BlendRV24( vout_thread_t *p_vout, picture_t *p_pic,
 		return;
 	      }
 	      
-#ifdef TESTING_BLENDING
+#ifdef TESTING_TRANSPARENCY
               if (p_source->s.t == MAX_ALPHA) p_source->s.t >>= 2;
 #endif
 
@@ -1574,6 +1574,62 @@ BlendRV32( vout_thread_t *p_vout, picture_t *p_pic,
     }
 }
 
+/*
+  Return the colormap index for the average of p_pixel and a subtitle
+  pixel in RGB form.
+ */
+static inline cmap_t
+avg_rgb2(const vout_thread_t *p_vout, uint8_t i_pixel, cmap_t i_cmap_sub,
+         const uint8_t rgb_sub[] )
+{
+  uint8_t rgb_vout[RGB_SIZE];
+  static cmap_t avg_cache[CMAP_RGB2_SIZE][NUM_SUBTITLE_COLORS];
+  static vlc_bool_t b_first_time = VLC_TRUE;
+  int i;
+
+  /* FIXME: really we need to save subtitle number since in theory
+     the palette can change each on each distinct subtitle. In practice
+     this doesn't happen that much.
+   */
+  if (b_first_time) 
+    {
+      int i, j;
+      for (i=0; i<CMAP_RGB2_SIZE; i++) 
+        for (j=0; j<NUM_SUBTITLE_COLORS; j++) 
+          avg_cache[i][j] = INVALID_CMAP_ENTRY;
+    }
+
+  if ( avg_cache[i_pixel][i_cmap_sub] != INVALID_CMAP_ENTRY ) 
+    return avg_cache[i_pixel][i_cmap_sub];
+
+  if ( !query_color(p_vout, i_pixel, rgb_vout) ) return INVALID_CMAP_ENTRY;
+
+  for (i = 0; i < RGB_SIZE; i++) 
+    {
+      rgb_vout[i] = (rgb_vout[i] + rgb_sub[i]) / 2;
+    }
+
+#if 0
+ {
+  uint8_t rgb_approx[RGB_SIZE];
+
+  avg_cache[i_pixel][i_cmap_sub] = 
+    find_cmap_rgb8_nearest(p_vout, rgb_vout, rgb_approx);
+  printf(
+         "cmap old %0x new 0%x sub=(%0x, %0x, %0x) "
+         "avg=(%0x, %0x, %0x) vout=(%0x, %0x, %0x)\n", 
+         i_pixel, i_cmap,
+         rgb_sub[RED_PIXEL], rgb_sub[GREEN_PIXEL], rgb_sub[BLUE_PIXEL],
+         rgb_approx[RED_PIXEL], rgb_approx[GREEN_PIXEL], rgb_approx[BLUE_PIXEL],
+         rgb_vout[RED_PIXEL], rgb_vout[GREEN_PIXEL], rgb_vout[BLUE_PIXEL]);
+ }  
+#else 
+  avg_cache[i_pixel][i_cmap_sub] = 
+    find_cmap_rgb8_nearest(p_vout, rgb_vout, NULL);
+#endif
+  return avg_cache[i_pixel][i_cmap_sub];
+}
+
 #undef  BYTES_PER_PIXEL
 #define BYTES_PER_PIXEL 1
 
@@ -1601,9 +1657,12 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
     /* Crop-specific */
     int i_x_start, i_y_start, i_x_end, i_y_end;
 
-    /* 4 entry colormap */
+    /* 4-entry array of colormap indices */
     uint8_t cmap[NUM_SUBTITLE_COLORS];
-    int i_cmap;
+    int i;
+
+    /* Actual RGB values for above; this is used in blending.*/
+    uint8_t cmap_rgb[NUM_SUBTITLE_COLORS][RGB_SIZE];
 
     struct subpicture_sys_t *p_sys = p_spu->p_sys;
     unsigned int i_aspect_x, i_aspect_y;
@@ -1611,24 +1670,6 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
     vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_y, 
                       &i_aspect_x );
     
-    /* Find a corresponding colormap entries for our palette entries. */
-    for( i_cmap = 0; i_cmap < NUM_SUBTITLE_COLORS; i_cmap++ )
-    {
-      uint8_t Y = p_sys->p_palette[i_cmap].s.y;
-
-      /* FIXME: when we have a way to look at colormap entries we can
-         do better.  For now we have to use 0xff for white 0x00 for
-         black and 0x44 for something in between. To do this we use
-         only the Y component.
-      */
-      if (Y > 0x70) 
-        cmap[i_cmap] = 0xff; /* Use white. */
-      else if (Y < 0x10) 
-        cmap[i_cmap] = 0x00; /* Use black. */
-      else 
-        cmap[i_cmap] = 0x44; /* Use something else. */
-    }
-
     i_xscale = (( p_vout->output.i_width << ASCALE ) * i_aspect_x)
       / (i_aspect_y * p_vout->render.i_width);
     i_yscale = ( p_vout->output.i_height << ASCALE ) / p_vout->render.i_height;
@@ -1643,6 +1684,25 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
 
     i_width  = p_spu->i_width  * i_xscale;
     i_height = p_spu->i_height * i_yscale;
+
+
+    /** FIXME: do once per subtitle in subtitle processing, not here
+        each time we render.  */
+    /* Find a corresponding colormap entries for our palette entries. */
+    for( i = 0; i < NUM_SUBTITLE_COLORS; i++ )
+    {
+
+      if ( p_sys->p_palette[i].s.t != 0 ) {
+        uint8_t rgb[RGB_SIZE]; 
+        uint8_t approx_rgb[RGB_SIZE]; 
+        yuv2rgb(&(p_sys->p_palette[i]), rgb);
+        cmap[i] = 
+          find_cmap_rgb8_nearest(p_vout, rgb, approx_rgb);
+        dbg_print( (DECODE_DBG_RENDER), 
+                   "palette %d RGB=(%0x, %0x, %0x)\n", i,
+                   rgb[RED_PIXEL], rgb[GREEN_PIXEL], rgb[BLUE_PIXEL]);
+      }
+    }
 
     /* Set where we will start blending subtitle from using
        the picture coordinates subtitle offsets
@@ -1706,25 +1766,57 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
               }
               
               p_yuvt = p_sys->p_palette[*p_source & 0x3];
-              if ( (p_yuvt.s.t) < (MAX_ALPHA) / 2 ) {
-                /* Completely or relatively transparent. Don't change pixel. */
-                ;
-#if 0
-                printf(" "); /*++++*/
+
+#ifdef TESTING_TRANSPARENCY
+              if (p_yuvt.s.t == MAX_ALPHA) p_yuvt.s.t >>= 1;
 #endif
-              } else {
-                uint32_t i_xdest = ( ((i_x*i_xscale) >> ASCALE) 
-                                     * BYTES_PER_PIXEL );
-                uint32_t i_xlast = ( (((i_x+1)*i_xscale) >> ASCALE)
-                                     * BYTES_PER_PIXEL );
-                /* This is the pixel that's going to change;*/
-                uint8_t *p_dest = p_pixel_base_y + i_xdest;
-                memset( p_dest, cmap[*p_source & 0x3], i_xlast - i_xdest );
+
+              switch ( p_yuvt.s.t ) 
+                {
+                case 0:
+		  /* Completely transparent. Don't change pixel. */
 #if 0
-                printf("%1d", *p_source); /*++++*/
+                  printf(" "); /*++++*/
 #endif
-              }
-              
+                  break;
+                case MAX_ALPHA: 
+                  {
+                    uint32_t i_xdest = ( ((i_x*i_xscale) >> ASCALE) 
+                                         * BYTES_PER_PIXEL );
+                    uint32_t i_xlast = ( (((i_x+1)*i_xscale) >> ASCALE)
+                                         * BYTES_PER_PIXEL );
+                    /* This is the pixel that's going to change;*/
+                    uint8_t *p_dest = p_pixel_base_y + i_xdest;
+                    memset( p_dest, cmap[*p_source & 0x3], i_xlast - i_xdest );
+#if 0
+                    printf("%1d", *p_source); /*++++*/
+#endif
+                    break;
+                  }
+                default:
+                  {
+                    uint32_t i_xdest = ( ((i_x*i_xscale) >> ASCALE) 
+                                         * BYTES_PER_PIXEL );
+                    uint32_t i_xlast = ( (((i_x+1)*i_xscale) >> ASCALE)
+                                         * BYTES_PER_PIXEL );
+                    /* This is the pixel that's going to change;*/
+                    uint8_t *p_pixel = p_pixel_base_y + i_xdest;
+                    uint32_t len     = i_xlast - i_xdest;
+
+                    for ( len = i_xlast - i_xdest -1; len >= 0; len-- ) 
+                      {
+                        cmap_t i_cmap  = avg_rgb2(p_vout, *p_pixel, 
+                                                  cmap[*p_source],
+                                                  cmap_rgb[*p_source]);
+                        if (i_cmap != INVALID_CMAP_ENTRY) 
+                          *p_pixel= (uint8_t) i_cmap;
+                        p_pixel++;
+                      }
+#if 0
+                    printf("%1d", *p_source); /*++++*/
+#endif
+                  }
+                }
             }
 #if 0
           printf("\n"); /*++++*/
@@ -1758,29 +1850,62 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                 return;
               }
               
-              if ( (p_yuvt.s.t) < (MAX_ALPHA) / 2 ) {
-                /* Completely or relatively transparent. Don't change pixel. */
-                ;
-#if 0
-                printf(" "); /*++++*/
+#ifdef TESTING_TRANSPARENCY
+              if (p_yuvt.s.t == MAX_ALPHA) p_yuvt.s.t >>= 1;
 #endif
-              } else {
-                uint32_t i_xdest = ( ((i_x*i_xscale) >> ASCALE) 
-                                     * BYTES_PER_PIXEL );
-                uint32_t i_xlast = ( (((i_x+1)*i_xscale) >> ASCALE)
-                                     * BYTES_PER_PIXEL );
-                uint32_t len     = i_xlast - i_xdest;
+              switch ( p_yuvt.s.t ) 
+                {
+                case 0:
+		  /* Completely transparent. Don't change pixel. */
 #if 0
-                printf("%1d", *p_source); /*++++*/
+                  printf(" "); /*++++*/
 #endif
-                for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
-                     i_ytmp += p_pic->p->i_pitch ) {
-                  uint8_t *p_dest = p_pixel_base + i_ytmp + i_xdest;
-                  memset( p_dest, cmap[*p_source & 0x3], len );
-                }
-              }
-            }
+                  break;
+                case MAX_ALPHA: 
+                  {
+                    uint32_t i_xdest = ( ((i_x*i_xscale) >> ASCALE) 
+                                         * BYTES_PER_PIXEL );
+                    uint32_t i_xlast = ( (((i_x+1)*i_xscale) >> ASCALE)
+                                         * BYTES_PER_PIXEL );
+                    uint32_t len     = i_xlast - i_xdest;
+#if 0
+                    printf("%1d", *p_source); /*++++*/
+#endif
+                    for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
+                         i_ytmp += p_pic->p->i_pitch ) {
+                      uint8_t *p_dest = p_pixel_base + i_ytmp + i_xdest;
+                      memset( p_dest, cmap[*p_source & 0x3], len );
+                    }
+                    break;
+                  }
+                default:
+                  {
+                    uint32_t i_xdest = ( ((i_x*i_xscale) >> ASCALE) 
+                                         * BYTES_PER_PIXEL );
+                    uint32_t i_xlast = ( (((i_x+1)*i_xscale) >> ASCALE)
+                                         * BYTES_PER_PIXEL );
+                    int32_t len;
+#if 0
+                    printf("%1d", *p_source); /*++++*/
+#endif
 
+                    for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
+                         i_ytmp += p_pic->p->i_pitch ) {
+                      /* This is the pixel that's going to change;*/
+                      uint8_t *p_pixel = p_pixel_base + i_ytmp + i_xdest;
+                      for ( len = i_xlast - i_xdest -1; len >= 0; len-- ) 
+                        {
+                          cmap_t i_cmap  = avg_rgb2(p_vout, *p_pixel, 
+                                                    cmap[*p_source],
+                                                    cmap_rgb[*p_source]);
+                          if (i_cmap != INVALID_CMAP_ENTRY) 
+                            *p_pixel= (uint8_t) i_cmap;
+                          p_pixel++;
+                        }
+                    }
+                  }
+                }
+             }
         }
       }
 }

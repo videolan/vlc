@@ -1,8 +1,8 @@
 /*****************************************************************************
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.6 2003/12/22 14:32:56 sam Exp $
+ * Copyright (C) 2000, 2001, 2004 VideoLAN
+ * $Id: i420_rgb.c,v 1.7 2004/01/31 05:53:35 rocky Exp $
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *
@@ -344,7 +344,10 @@ static void Set8bppPalette( vout_thread_t *p_vout, uint8_t *p_rgb8 )
     int y,u,v;
     int r,g,b;
     int i = 0, j = 0;
-    uint16_t red[ 256 ], green[ 256 ], blue[ 256 ];
+    uint16_t *p_cmap_r=p_vout->chroma.p_sys->p_rgb_r;
+    uint16_t *p_cmap_g=p_vout->chroma.p_sys->p_rgb_g;
+    uint16_t *p_cmap_b=p_vout->chroma.p_sys->p_rgb_b;
+
     unsigned char p_lookup[PALETTE_TABLE_SIZE];
 
     /* This loop calculates the intersection of an YUV box and the RGB cube. */
@@ -371,9 +374,15 @@ static void Set8bppPalette( vout_thread_t *p_vout, uint8_t *p_rgb8 )
                     }
 
                     /* Clip the colors */
-                    red[ j ] = CLIP( r );
-                    green[ j ] = CLIP( g );
-                    blue[ j ] = CLIP( b );
+                    p_cmap_r[ j ] = CLIP( r );
+                    p_cmap_g[ j ] = CLIP( g );
+                    p_cmap_b[ j ] = CLIP( b );
+
+#if 0
+		    printf("+++Alloc RGB cmap %d (%d, %d, %d)\n", j,
+			   p_cmap_r[ j ] >>8, p_cmap_g[ j ] >>8, 
+			   p_cmap_b[ j ] >>8);
+#endif
 
                     /* Allocate color */
                     p_lookup[ i ] = 1;
@@ -390,7 +399,7 @@ static void Set8bppPalette( vout_thread_t *p_vout, uint8_t *p_rgb8 )
     }
 
     /* The colors have been allocated, we can set the palette */
-    p_vout->output.pf_setpalette( p_vout, red, green, blue );
+    p_vout->output.pf_setpalette( p_vout, p_cmap_r, p_cmap_g, p_cmap_b );
 
 #if 0
     /* There will eventually be a way to know which colors

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * Common SVCD and VCD subtitle routines.
+ * Common SVCD and CVD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.11 2004/01/30 13:17:12 rocky Exp $
+ * $Id: common.c,v 1.12 2004/01/31 05:53:35 rocky Exp $
  *
  * Author: Rocky Bernstein <rocky@panix.com>
  *   based on code from:

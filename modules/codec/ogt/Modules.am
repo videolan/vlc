@@ -20,6 +20,7 @@ SOURCES_cvdsub = \
 	cvd.h \
 	subtitle.h \
 	cvd_parse.c \
+	pixmap.c \
 	pixmap.h \
 	render.c \
 	render.h \

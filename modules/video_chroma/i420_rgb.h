@@ -1,8 +1,8 @@
 /*****************************************************************************
  * i420_rgb.h : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb.h,v 1.4 2003/08/29 18:58:05 fenrir Exp $
+ * Copyright (C) 2000, 2004 VideoLAN
+ * $Id: i420_rgb.h,v 1.5 2004/01/31 05:53:35 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,23 +21,34 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
+/** Number of entries in RGB palette/colormap */
+#define CMAP_RGB2_SIZE 256
+
+/**
  * chroma_sys_t: chroma method descriptor
- *****************************************************************************
+
  * This structure is part of the chroma transformation descriptor, it
  * describes the yuv2rgb specific properties.
- *****************************************************************************/
+ */
 struct chroma_sys_t
 {
     uint8_t  *p_buffer;
     int *p_offset;
 
 #ifdef MODULE_NAME_IS_i420_rgb
-    /* Pre-calculated conversion tables */
-    void *p_base;                          /* base for all conversion tables */
-    uint8_t   *p_rgb8;                                   /* RGB 8 bits table */
-    uint16_t  *p_rgb16;                                 /* RGB 16 bits table */
-    uint32_t  *p_rgb32;                                 /* RGB 32 bits table */
+    /**< Pre-calculated conversion tables */
+    void *p_base;                      /**< base for all conversion tables */
+    uint8_t   *p_rgb8;                 /**< RGB 8 bits table */
+    uint16_t  *p_rgb16;                /**< RGB 16 bits table */
+    uint32_t  *p_rgb32;                /**< RGB 32 bits table */
+
+    /**< To get RGB value for palette entry i, use (p_rgb_r[i], p_rgb_g[i],
+       p_rgb_b[i]). Note these are 16 bits per pixel. For 8bpp entries,
+       shift right 8 bits.
+    */
+    uint16_t  p_rgb_r[CMAP_RGB2_SIZE];  /**< Red values of palette */
+    uint16_t  p_rgb_g[CMAP_RGB2_SIZE];  /**< Green values of palette */
+    uint16_t  p_rgb_b[CMAP_RGB2_SIZE];  /**< Blue values of palette */
 #endif
 };
 
