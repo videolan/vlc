@@ -2,7 +2,7 @@
  * http.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: http.c,v 1.1 2003/02/23 19:05:22 fenrir Exp $
+ * $Id: http.c,v 1.2 2003/02/25 17:17:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -66,8 +66,59 @@ struct sout_access_out_sys_t
 
     /* stream */
     httpd_stream_t      *p_httpd_stream;
+
+    /* gather header from stream */
+    int                 i_header_allocated;
+    int                 i_header_size;
+    uint8_t             *p_header;
+    vlc_bool_t          b_header_complete;
 };
 
+static struct
+{
+    char *psz_ext;
+    char *psz_mime;
+} http_mime[] =
+{
+    { ".avi",   "video/avi" },
+    { ".asf",   "video/x-ms-asf" },
+    { ".m1a",   "audio/mpeg" },
+    { ".m2a",   "audio/mpeg" },
+    { ".m1v",   "video/mpeg" },
+    { ".m2v",   "video/mpeg" },
+    { ".mp2",   "audio/mpeg" },
+    { ".mp3",   "audio/mpeg" },
+    { ".mpa",   "audio/mpeg" },
+    { ".mpg",   "video/mpeg" },
+    { ".mpeg",  "video/mpeg" },
+    { ".mpe",   "video/mpeg" },
+    { ".mov",   "video/quicktime" },
+    { ".moov",  "video/quicktime" },
+    { ".ogg",   "application/ogg" },
+    { ".ogm",   "application/ogg" },
+    { ".wav",   "audio/wav" },
+    { NULL,     NULL }
+};
+
+static char *GetMime( char *psz_name )
+{
+    char *psz_ext;
+
+    psz_ext = strrchr( psz_name, '.' );
+    if( psz_ext )
+    {
+        int i;
+
+        for( i = 0; http_mime[i].psz_ext != NULL ; i++ )
+        {
+            if( !strcmp( http_mime[i].psz_ext, psz_ext ) )
+            {
+                return( http_mime[i].psz_mime );
+            }
+        }
+    }
+    return( "application/octet-stream" );
+}
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
@@ -165,7 +216,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_httpd_stream =
         p_sys->p_httpd->pf_register_stream( p_sys->p_httpd,
-                                            psz_file_name, "application/x-octet_stream",
+                                            psz_file_name,
+                                            GetMime( psz_file_name ),
                                             NULL, NULL );
 
     if( !p_sys->p_httpd_stream )
@@ -180,6 +232,11 @@ static int Open( vlc_object_t *p_this )
 
         return( VLC_EGENERIC );
     }
+
+    p_sys->i_header_allocated = 1024;
+    p_sys->i_header_size      = 0;
+    p_sys->p_header           = malloc( p_sys->i_header_allocated );
+    p_sys->b_header_complete  = VLC_FALSE;
 
     p_access->pf_write       = Write;
     p_access->pf_seek        = Seek;
@@ -200,6 +257,8 @@ static void Close( vlc_object_t * p_this )
 
     httpd_Release( p_sys->p_httpd );
 
+    FREE( p_sys->p_header );
+
     msg_Info( p_access, "Close" );
 
     free( p_sys );
@@ -217,6 +276,34 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
     {
         sout_buffer_t *p_next;
 
+        if( p_buffer->i_flags & SOUT_BUFFER_FLAGS_HEADER )
+        {
+            /* gather header */
+            if( p_sys->b_header_complete )
+            {
+                /* free previously gathered header */
+                p_sys->i_header_size = 0;
+                p_sys->b_header_complete = VLC_FALSE;
+            }
+            if( p_buffer->i_size + p_sys->i_header_size > p_sys->i_header_allocated )
+            {
+                p_sys->i_header_allocated = p_buffer->i_size + p_sys->i_header_size + 1024;
+                p_sys->p_header = realloc( p_sys->p_header, p_sys->i_header_allocated );
+            }
+            memcpy( &p_sys->p_header[p_sys->i_header_size],
+                    p_buffer->p_buffer,
+                    p_buffer->i_size );
+            p_sys->i_header_size += p_buffer->i_size;
+        }
+        else if( !p_sys->b_header_complete )
+        {
+            p_sys->b_header_complete = VLC_TRUE;
+
+            p_sys->p_httpd->pf_header_stream( p_sys->p_httpd,
+                                              p_sys->p_httpd_stream,
+                                              p_sys->p_header, p_sys->i_header_size );
+        }
+            /* send data */
         i_err = p_sys->p_httpd->pf_send_stream( p_sys->p_httpd, p_sys->p_httpd_stream,
                                                 p_buffer->p_buffer, p_buffer->i_size );
 
@@ -229,6 +316,7 @@ static int Write( sout_access_out_t *p_access, sout_buffer_t *p_buffer )
             break;
         }
     }
+
     if( i_err < 0 )
     {
         sout_buffer_t *p_next;

@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.7 2003/02/24 11:00:54 fenrir Exp $
+ * $Id: stream_output.h,v 1.8 2003/02/25 17:17:43 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -36,6 +36,7 @@
  * i_size: size of valid data
  *
  */
+#define SOUT_BUFFER_FLAGS_HEADER    0x0001
 struct sout_buffer_t
 {
     size_t                  i_allocated_size;
@@ -50,6 +51,7 @@ struct sout_buffer_t
     mtime_t                 i_dts;
     mtime_t                 i_pts;
 
+    uint32_t                i_flags;
     int                     i_bitrate;
 
     struct sout_buffer_t    *p_next;

@@ -2,7 +2,7 @@
  * ogg.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.1 2003/02/24 23:27:20 fenrir Exp $
+ * $Id: ogg.c,v 1.2 2003/02/25 17:17:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -327,9 +327,12 @@ static int DelStream( sout_instance_t *p_sout, sout_input_t *p_input )
     /* flush all remaining data */
 
     p_og = OggStreamFlush( p_sout, &p_stream->os, 0 );
-    OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
+    if( p_og )
+    {
+        OggSetDate( p_og, p_stream->i_dts, p_stream->i_length );
 
-    sout_AccessOutWrite( p_sout->p_access, p_og );
+        sout_AccessOutWrite( p_sout->p_access, p_og );
+    }
 
     ogg_stream_clear( &p_stream->os );
 
@@ -509,6 +512,11 @@ static sout_buffer_t *OggCreateHeader( sout_instance_t *p_sout, mtime_t i_dts )
         sout_BufferChain( &p_hdr, p_og );
     }
 
+    /* set HEADER flag */
+    for( p_og = p_hdr; p_og != NULL; p_og = p_og->p_next )
+    {
+        p_og->i_flags |= SOUT_BUFFER_FLAGS_HEADER;
+    }
     return( p_hdr );
 }
 

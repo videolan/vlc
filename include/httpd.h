@@ -2,7 +2,7 @@
  * httpd.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.h,v 1.1 2003/02/23 19:05:22 fenrir Exp $
+ * $Id: httpd.h,v 1.2 2003/02/25 17:17:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -55,6 +55,9 @@ struct httpd_t
                                               char *psz_file, char *psz_mime,
                                               char *psz_user, char *psz_password );
     int             (*pf_send_stream)       ( httpd_t *,
+                                              httpd_stream_t *,
+                                              uint8_t *, int );
+    int             (*pf_header_stream)     ( httpd_t *,
                                               httpd_stream_t *,
                                               uint8_t *, int );
     void            (*pf_unregister_stream) ( httpd_t *, httpd_stream_t * );

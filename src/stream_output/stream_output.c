@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.15 2003/02/24 23:28:18 fenrir Exp $
+ * $Id: stream_output.c,v 1.16 2003/02/25 17:17:43 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -634,11 +634,12 @@ sout_buffer_t *sout_BufferNew( sout_instance_t *p_sout, size_t i_size )
     p_buffer->i_allocated_size = i_size + i_prehader;
     p_buffer->i_buffer_size = i_size;
 
-    p_buffer->i_size = i_size;
-    p_buffer->i_length = 0;
-    p_buffer->i_dts = 0;
-    p_buffer->i_pts = 0;
+    p_buffer->i_size    = i_size;
+    p_buffer->i_length  = 0;
+    p_buffer->i_dts     = 0;
+    p_buffer->i_pts     = 0;
     p_buffer->i_bitrate = 0;
+    p_buffer->i_flags   = 0x0000;
     p_buffer->p_next = NULL;
 
     return( p_buffer );
@@ -715,6 +716,7 @@ sout_buffer_t *sout_BufferDuplicate( sout_instance_t *p_sout,
     p_dup->i_dts    = p_buffer->i_dts;
     p_dup->i_pts    = p_buffer->i_pts;
     p_dup->i_length = p_buffer->i_length;
+    p_dup->i_flags  = p_buffer->i_flags;
     p_sout->p_vlc->pf_memcpy( p_dup->p_buffer, p_buffer->p_buffer, p_buffer->i_size );
 
     return( p_dup );

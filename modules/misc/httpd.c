@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.2 2003/02/24 11:14:16 gbazin Exp $
+ * $Id: httpd.c,v 1.3 2003/02/25 17:17:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -96,21 +96,22 @@ vlc_module_end();
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-static httpd_host_t     *RegisterHost( httpd_t *, char *, int );
-static void             UnregisterHost( httpd_t *, httpd_host_t * );
+static httpd_host_t     *RegisterHost   ( httpd_t *, char *, int );
+static void             UnregisterHost  ( httpd_t *, httpd_host_t * );
 
-static httpd_file_t     *RegisterFile( httpd_t *,
-                                       char *psz_file, char *psz_mime,
-                                       char *psz_user, char *psz_password,
-                                       httpd_file_callback pf_fill,
-                                       httpd_file_callback_args_t *p_args );
-static void             UnregisterFile( httpd_t *, httpd_file_t * );
+static httpd_file_t     *RegisterFile   ( httpd_t *,
+                                          char *psz_file, char *psz_mime,
+                                          char *psz_user, char *psz_password,
+                                          httpd_file_callback pf_fill,
+                                          httpd_file_callback_args_t *p_args );
+static void             UnregisterFile  ( httpd_t *, httpd_file_t * );
 
 //#define httpd_stream_t              httpd_file_t
-static httpd_stream_t   *RegisterStream( httpd_t *,
+static httpd_stream_t   *RegisterStream ( httpd_t *,
                                          char *psz_file, char *psz_mime,
                                          char *psz_user, char *psz_password );
-static int              SendStream( httpd_t *, httpd_stream_t *, uint8_t *, int );
+static int              SendStream      ( httpd_t *, httpd_stream_t *, uint8_t *, int );
+static int              HeaderStream    ( httpd_t *, httpd_stream_t *, uint8_t *, int );
 static void             UnregisterStream( httpd_t *, httpd_stream_t* );
 
 /*****************************************************************************
@@ -151,11 +152,16 @@ struct httpd_file_t
     httpd_file_callback pf_fill;       /* it should allocate and fill *pp_data and *pi_data */
 
     /* private */
-    int         i_buffer_size;  /* buffer size */
-    uint8_t     *p_buffer;      /* buffer */
-    int         i_buffer;       /* reading pointer */
-    int         i_buffer_valid; /* valid data from 0 */
 
+    /* circular buffer for stream only */
+    int         i_buffer_size;      /* buffer size, can't be reallocated smaller */
+    uint8_t     *p_buffer;          /* buffer */
+    int64_t     i_buffer_pos;       /* absolute position from begining */
+    int         i_buffer_last_pos;  /* a new connection will start with that */
+
+    /* data to be send at connection time (if any) */
+    int         i_header_size;
+    uint8_t     *p_header;
 };
 
 
@@ -181,9 +187,13 @@ typedef struct httpd_connection_s
 
     httpd_file_t    *p_file;
 
+    /* used while sending header and file */
     int     i_buffer_size;
     uint8_t *p_buffer;
-    int     i_buffer;                   /* private */
+    int     i_buffer;            /* private */
+
+    /* used for stream */
+    int64_t i_stream_pos;   /* absolute pos in stream */
 } httpd_connection_t;
 
 /*
@@ -264,6 +274,7 @@ static int Open( vlc_object_t *p_this )
     p_httpd->pf_register_file   = RegisterFile;
     p_httpd->pf_unregister_file = UnregisterFile;
     p_httpd->pf_register_stream = RegisterStream;
+    p_httpd->pf_header_stream   = HeaderStream;
     p_httpd->pf_send_stream     = SendStream;
     p_httpd->pf_unregister_stream=UnregisterStream;
 
@@ -633,14 +644,17 @@ static httpd_file_t    *_RegisterFile( httpd_sys_t *p_httpt,
         p_file->psz_password          = NULL;
     }
 
-    p_file->b_stream        = VLC_FALSE;
-    p_file->p_sys           = p_args;
-    p_file->pf_fill         = pf_fill;
+    p_file->b_stream          = VLC_FALSE;
+    p_file->p_sys             = p_args;
+    p_file->pf_fill           = pf_fill;
 
-    p_file->i_buffer_size   = 0;
-    p_file->i_buffer_valid  = 0;
-    p_file->i_buffer        = 0;
-    p_file->p_buffer        = NULL;
+    p_file->i_buffer_size     = 0;
+    p_file->i_buffer_last_pos = 0;
+    p_file->i_buffer_pos      = 0;
+    p_file->p_buffer          = NULL;
+
+    p_file->i_header_size     = 0;
+    p_file->p_header          = NULL;
 
     __RegisterFile( p_httpt, p_file );
 
@@ -677,7 +691,7 @@ static httpd_stream_t  *_RegisterStream( httpd_sys_t *p_httpt,
     if( i < p_httpt->i_file_count )
     {
         vlc_mutex_unlock( &p_httpt->file_lock );
-        msg_Err( p_httpt, "%s already registeret", psz_file );
+        msg_Err( p_httpt, "%s already registered", psz_file );
         return NULL;
     }
 
@@ -701,10 +715,14 @@ static httpd_stream_t  *_RegisterStream( httpd_sys_t *p_httpt,
     p_stream->b_stream        = VLC_TRUE;
     p_stream->p_sys           = NULL;
     p_stream->pf_fill         = NULL;
-    p_stream->i_buffer_size   = 1024*1024;
-    p_stream->i_buffer_valid  = 0;
-    p_stream->i_buffer        = 0;
+
+    p_stream->i_buffer_size   = 1024*1024*10;
+    p_stream->i_buffer_pos      = 0;
+    p_stream->i_buffer_last_pos = 0;
     p_stream->p_buffer        = malloc( p_stream->i_buffer_size );
+
+    p_stream->i_header_size   = 0;
+    p_stream->p_header        = NULL;
 
     __RegisterFile( p_httpt, p_stream );
 
@@ -768,6 +786,7 @@ static void            _UnregisterFile( httpd_sys_t *p_httpt, httpd_file_t *p_fi
         FREE( p_file->psz_password );
     }
     FREE( p_file->p_buffer );
+    FREE( p_file->p_header );
 
     FREE( p_file );
 
@@ -806,29 +825,38 @@ static void             UnregisterStream( httpd_t *p_httpd, httpd_stream_t *p_st
 
 static int             _SendStream( httpd_sys_t *p_httpt, httpd_stream_t *p_stream, uint8_t *p_data, int i_data )
 {
-    if( i_data <= 0 )
+    int i_count;
+    int i_pos;
+
+    if( i_data <= 0 || p_data == NULL )
     {
         return( VLC_SUCCESS );
     }
+    //fprintf( stderr, "## i_data=%d pos=%lld\n", i_data, p_stream->i_buffer_pos );
 
     vlc_mutex_lock( &p_httpt->file_lock );
-    if( p_stream->i_buffer_size < p_stream->i_buffer_valid + i_data )
+
+    /* save this pointer (to be used by new connection) */
+    p_stream->i_buffer_last_pos = p_stream->i_buffer_pos;
+
+    i_pos = p_stream->i_buffer_pos % p_stream->i_buffer_size;
+    i_count = i_data;
+    while( i_count > 0)
     {
-        /* not enough room */
-        if( p_stream->i_buffer < p_stream->i_buffer_valid )
-        {
-            memmove( p_stream->p_buffer,
-                     p_stream->p_buffer + p_stream->i_buffer,
-                     p_stream->i_buffer_valid - p_stream->i_buffer );
-        }
-        p_stream->i_buffer_valid -= p_stream->i_buffer;
+        int i_copy;
 
-        p_stream->i_buffer = 0;
+        i_copy = __MIN( i_data, p_stream->i_buffer_size - i_pos );
+
+        memcpy( &p_stream->p_buffer[i_pos],
+                p_data,
+                i_copy );
+
+        i_pos = ( i_pos + i_copy ) % p_stream->i_buffer_size;
+        i_count -= i_copy;
+        p_data += i_copy;
     }
-    i_data = __MIN( i_data, p_stream->i_buffer_size - p_stream->i_buffer_valid );
-    memcpy( p_stream->p_buffer + p_stream->i_buffer_valid, p_data, i_data );
-    p_stream->i_buffer_valid += i_data;
 
+    p_stream->i_buffer_pos += i_data;
     vlc_mutex_unlock( &p_httpt->file_lock );
 
     return( VLC_SUCCESS );
@@ -836,6 +864,30 @@ static int             _SendStream( httpd_sys_t *p_httpt, httpd_stream_t *p_stre
 static int             SendStream( httpd_t *p_httpd, httpd_stream_t *p_stream, uint8_t *p_data, int i_data )
 {
     return( _SendStream( p_httpd->p_sys, p_stream, p_data, i_data ) );
+}
+
+static int             HeaderStream( httpd_t *p_httpd, httpd_stream_t *p_stream, uint8_t *p_data, int i_data )
+{
+    httpd_sys_t *p_httpt = p_httpd->p_sys;
+
+    vlc_mutex_lock( &p_httpt->file_lock );
+
+    FREE( p_stream->p_header );
+    if( p_data == NULL || i_data <= 0 )
+    {
+        p_stream->i_header_size = 0;
+    }
+    else
+    {
+        p_stream->i_header_size = i_data;
+        p_stream->p_header = malloc( i_data );
+        memcpy( p_stream->p_header,
+                p_data,
+                i_data );
+    }
+    vlc_mutex_unlock( &p_httpt->file_lock );
+
+    return( VLC_SUCCESS );
 }
 
 /****************************************************************************/
@@ -1012,6 +1064,7 @@ static void httpd_ConnnectionNew( httpd_sys_t *p_httpt, int fd, struct sockaddr_
     p_con->i_buffer_size = 8096;
     p_con->p_buffer = malloc( p_con->i_buffer_size );
 
+    p_con->i_stream_pos = 0; // updated by httpd_thread */
     p_con->p_next = NULL;
 
     if( p_httpt->p_first_connection )
@@ -1310,6 +1363,12 @@ search_file:
 
     p_con->i_state = HTTPD_CONNECTION_SENDING_HEADER;
 
+    /* we send stream header with this one */
+    if( p_con->i_http_error == 200 && p_con->p_file->b_stream )
+    {
+        p_con->i_buffer_size = 4096 + p_con->p_file->i_header_size;
+    }
+
     p_con->i_buffer_size = 4096;
     p_con->i_buffer = 0;
     p = p_con->p_buffer = malloc( p_con->i_buffer_size );
@@ -1322,11 +1381,20 @@ search_file:
     }
     p += sprintf( p, "\r\n" );
 
-    p_con->i_buffer_size = strlen( p_con->p_buffer ) + 1;
+    p_con->i_buffer_size = strlen( p_con->p_buffer );// + 1;
+
+    if( p_con->i_http_error == 200 && p_con->p_file->b_stream && p_con->p_file->i_header_size > 0 )
+    {
+        /* add stream header */
+        memcpy( &p_con->p_buffer[p_con->i_buffer_size],
+                p_con->p_file->p_header,
+                p_con->p_file->i_header_size );
+        p_con->i_buffer_size += p_con->p_file->i_header_size;
+    }
 
     //msg_Dbg( p_httpt, "answer=\n%s", p_con->p_buffer );
 }
-#define HTTPD_STREAM_PACKET 1300
+#define HTTPD_STREAM_PACKET 10000
 static void httpd_Thread( httpd_sys_t *p_httpt )
 {
     httpd_file_t    *p_page_admin;
@@ -1477,6 +1545,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                             else
                             {
                                 p_con->i_state = HTTPD_CONNECTION_SENDING_STREAM;
+                                p_con->i_stream_pos = p_con->p_file->i_buffer_last_pos;
                             }
                             p_con = p_con->p_next;
                         }
@@ -1501,34 +1570,49 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
             }
             else if( p_con->i_state == HTTPD_CONNECTION_SENDING_STREAM )
             {
-                httpd_file_t *p_file = p_con->p_file;
-                int i_len;
+                httpd_stream_t *p_stream = p_con->p_file;
+                int i_send;
+                int i_write;
 
-                //msg_Dbg( p_httpt, "buffer=%d buffer_size=%d", p_file->i_buffer, p_file->i_buffer_size );
-                if( p_file->i_buffer < p_file->i_buffer_valid )
+                if( p_con->i_stream_pos < p_stream->i_buffer_pos )
                 {
-                    int i_write;
-                    /* write data */
-                    i_write = __MIN( p_file->i_buffer_valid - p_file->i_buffer, HTTPD_STREAM_PACKET );
-                    i_len = send( p_con->fd, p_file->p_buffer + p_file->i_buffer, i_write, 0 );
+                    int i_pos;
+                    /* check if this p_con aren't to late */
+                    if( p_con->i_stream_pos + p_stream->i_buffer_size < p_stream->i_buffer_pos )
+                    {
+                        fprintf(stderr, "fixing i_stream_pos (old=%lld i_buffer_pos=%lld\n", p_con->i_stream_pos, p_stream->i_buffer_pos  );
+                        p_con->i_stream_pos = p_stream->i_buffer_last_pos;
+                    }
 
-                    if( ( i_len < 0 && errno != EAGAIN && errno != EINTR )||
-                        ( i_len == 0 ) )
+                    i_pos = p_con->i_stream_pos % p_stream->i_buffer_size;
+                    /* size until end of buffer */
+                    i_write = p_stream->i_buffer_size - i_pos;
+                    /* is it more than valid data */
+                    if( i_write >= p_stream->i_buffer_pos - p_con->i_stream_pos )
+                    {
+                        i_write = p_stream->i_buffer_pos - p_con->i_stream_pos;
+                    }
+                    /* limit to HTTPD_STREAM_PACKET */
+                    if( i_write > HTTPD_STREAM_PACKET )
+                    {
+                        i_write = HTTPD_STREAM_PACKET;
+                    }
+                    i_send = send( p_con->fd, &p_stream->p_buffer[i_pos], i_write, 0 );
+
+                    if( ( i_send < 0 && errno != EAGAIN && errno != EINTR )|| ( i_send == 0 ) )
                     {
                         httpd_connection_t *p_next = p_con->p_next;
 
                         httpd_ConnnectionClose( p_httpt, p_con );
                         p_con = p_next;
+                        continue;
                     }
-                    else
+                    else if( i_send > 0 )
                     {
-                        p_con = p_con->p_next;
+                        p_con->i_stream_pos += i_send;
                     }
                 }
-                else
-                {
-                    p_con = p_con->p_next;
-                }
+                p_con = p_con->p_next;
                 continue;   /* just for clarity */
             }
             else
@@ -1538,7 +1622,7 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
             }
         }   /* for over connection */
 
-
+#if 0
         b_wait = VLC_TRUE;
         /* update position for stream based file */
         for( i = 0; i < p_httpt->i_file_count; i++ )
@@ -1554,8 +1638,9 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                 }
             }
         }
+#endif
         vlc_mutex_unlock( &p_httpt->file_lock );
-        if( b_wait ) msleep( 100 );
+        /*if( b_wait )*/ msleep( 10 );
     }
     msg_Info( p_httpt, "httpd stopped" );
 
