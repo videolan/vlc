@@ -57,7 +57,7 @@ struct demux_sys_t
 static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );
 
-#define H264_PACKET_SIZE 50
+#define H264_PACKET_SIZE 2048
 
 /*****************************************************************************
  * Open: initializes demux structures

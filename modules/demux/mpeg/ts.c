@@ -1449,6 +1449,10 @@ static void TS_DVBPSI_HandlePMT( input_thread_t * p_input,
                     i_cat = AUDIO_ES;
                     i_stream_id = 0xfa;
                     break;
+                case H264_VIDEO_ES:
+                    i_fourcc = VLC_FOURCC('h','2','6','4');
+                    i_cat = VIDEO_ES;
+                    break;
                 case MSCODEC_VIDEO_ES:
                     i_fourcc = VLC_FOURCC(0,0,0,0);   /* fixed later */
                     i_cat = VIDEO_ES;
