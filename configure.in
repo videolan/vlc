@@ -111,7 +111,8 @@ if test x$SYS = xmingw32
 then
     AC_CHECK_LIB(mingwex,opendir,
         AC_CHECK_LIB(mingw32,opendir,vlc_LDFLAGS="${vlc_LDFLAGS}",
-            vlc_LDFLAGS="${vlc_LDFLAGS} -lmingwex")
+            [vlc_LDFLAGS="${vlc_LDFLAGS} -lmingwex"
+             gtk_LDFLAGS="${gtk_LDFLAGS} -lmingwex"])
     )
 fi
 

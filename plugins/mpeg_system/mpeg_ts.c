@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.13.2.2 2002/09/25 23:11:53 massiot Exp $
+ * $Id: mpeg_ts.c,v 1.13.2.3 2002/10/12 21:26:26 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -28,6 +28,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+
+#ifdef HAVE_STDINT_H
+#   include <stdint.h>                                            /* uint8_t */
+#endif
 
 #include <videolan/vlc.h>
 
