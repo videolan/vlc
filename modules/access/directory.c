@@ -56,24 +56,13 @@
 #endif
 
 /*****************************************************************************
- * Constants and structures
- *****************************************************************************/
-#define MODE_EXPAND 0
-#define MODE_COLLAPSE 1
-#define MODE_NONE 2
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int     Open   ( vlc_object_t * );
-static void    Close  ( vlc_object_t * );
-
-static ssize_t Read   ( input_thread_t *, byte_t *, size_t );
-int ReadDir( playlist_t *p_playlist, char *psz_name , int i_mode, int *pi_pos );
-
-/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
+static int  DemuxOpen ( vlc_object_t * );
+
 #define RECURSIVE_TEXT N_("Subdirectory behavior")
 #define RECURSIVE_LONGTEXT N_( \
         "Select whether subdirectories must be expanded.\n" \
@@ -87,50 +76,67 @@ static char *psz_recursive_list_text[] = { N_("none"), N_("collapse"),
 
 vlc_module_begin();
     set_description( _("Standard filesystem directory input") );
-    set_capability( "access", 55 );
+    set_capability( "access2", 55 );
     add_shortcut( "directory" );
     add_shortcut( "dir" );
     add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
                 RECURSIVE_LONGTEXT, VLC_FALSE );
       change_string_list( psz_recursive_list, psz_recursive_list_text, 0 );
     set_callbacks( Open, Close );
+
+    add_submodule();
+        set_description( _("Directory EOF") );
+        set_capability( "demux2", 0 );
+        add_shortcut( "directory" );
+        set_callbacks( DemuxOpen, NULL );
 vlc_module_end();
 
+
+/*****************************************************************************
+ * Local prototypes, constants, structures
+ *****************************************************************************/
+
+#define MODE_EXPAND 0
+#define MODE_COLLAPSE 1
+#define MODE_NONE 2
+
+static int Read( access_t *, uint8_t *, int );
+static int ReadNull( access_t *, uint8_t *, int );
+static int Control( access_t *, int, va_list );
+
+static int Demux( demux_t *p_demux );
+static int DemuxControl( demux_t *p_demux, int i_query, va_list args );
+
+
+static int ReadDir( playlist_t *, char *psz_name, int i_mode, int *pi_pos );
 
 /*****************************************************************************
  * Open: open the directory
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    input_thread_t *            p_input = (input_thread_t *)p_this;
-#ifdef HAVE_SYS_STAT_H
-    struct stat                 stat_info;
-#endif
-
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
-    {
-        /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
-    }
-
-    p_input->pf_read = Read;
-    p_input->pf_set_program = NULL;
-    p_input->pf_set_area = NULL;
-    p_input->pf_seek = NULL;
+    access_t *p_access = (access_t*)p_this;
 
 #ifdef HAVE_SYS_STAT_H
-    if( ( stat( p_input->psz_name, &stat_info ) == -1 ) ||
+    struct stat stat_info;
+
+    if( ( stat( p_access->psz_path, &stat_info ) == -1 ) ||
         !S_ISDIR( stat_info.st_mode ) )
 #else
-    if( !p_input->psz_access || strcmp(p_input->psz_access, "dir") )
+    if( strcmp( p_access->psz_access, "dir") &&
+        strcmp( p_access->psz_access, "directory") )
 #endif
     {
         return VLC_EGENERIC;
     }
 
+    p_access->pf_read  = Read;
+    p_access->pf_block = NULL;
+    p_access->pf_seek  = NULL;
+    p_access->pf_control= Control;
+
     /* Force a demux */
-    p_input->psz_demux = "dummy";
+    p_access->psz_demux = strdup( "directory" );
 
     return VLC_SUCCESS;
 }
@@ -140,32 +146,40 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t * p_this )
 {
-    input_thread_t * p_input = (input_thread_t *)p_this;
 
-    msg_Info( p_input, "closing `%s/%s://%s'",
-              p_input->psz_access, p_input->psz_demux, p_input->psz_name );
+}
+
+/*****************************************************************************
+ * ReadNull: read the directory
+ *****************************************************************************/
+static int ReadNull( access_t *p_access, uint8_t *p_buffer, int i_len)
+{
+    /* Return fake data */
+    memset( p_buffer, 0, i_len );
+    return i_len;
 }
 
 /*****************************************************************************
  * Read: read the directory
  *****************************************************************************/
-static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len)
+static int Read( access_t *p_access, uint8_t *p_buffer, int i_len)
 {
     char *psz_name = 0;
-    char *psz_mode = 0;
+    vlc_value_t val;
     int  i_mode, i_pos;
 
-    playlist_t * p_playlist = (playlist_t *) vlc_object_find(
-                        p_input, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    playlist_t *p_playlist =
+        (playlist_t *) vlc_object_find( p_access,
+                                        VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
     if( !p_playlist )
     {
-        msg_Err( p_input, "can't find playlist" );
+        msg_Err( p_access, "can't find playlist" );
         goto end;
     }
-    
+
     /* Remove the ending '/' char */
-    psz_name = strdup( p_input->psz_name );
+    psz_name = strdup( p_access->psz_path );
     if( psz_name == NULL )
         goto end;
 
@@ -174,14 +188,15 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len)
     {
         psz_name[strlen(psz_name)-1] = '\0';
     }
-    
+
     /* Initialize structure */
-    psz_mode = config_GetPsz( p_input , "recursive" );
-    if( !psz_mode || !strncmp( psz_mode, "none" , 4 )  )
+    var_Create( p_access, "recursive", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Get( p_access, "recursive", &val );
+    if( *val.psz_string == '\0' || !strncmp( val.psz_string, "none" , 4 )  )
     {
         i_mode = MODE_NONE;
     }
-    else if( !strncmp( psz_mode, "collapse", 8 )  )
+    else if( !strncmp( val.psz_string, "collapse", 8 )  )
     {
         i_mode = MODE_COLLAPSE;
     }
@@ -189,13 +204,14 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len)
     {
         i_mode = MODE_EXPAND;
     }
-    
+    free( val.psz_string );
+
     /* Make sure we are deleted when we are done */
     p_playlist->pp_items[p_playlist->i_index]->b_autodeletion = VLC_TRUE;
     /* The playlist position we will use for the add */
     i_pos = p_playlist->i_index + 1;
 
-    msg_Dbg( p_input, "opening directory `%s'", psz_name );
+    msg_Dbg( p_access, "opening directory `%s'", psz_name );
     if( ReadDir( p_playlist, psz_name , i_mode, &i_pos ) != VLC_SUCCESS )
     {
         goto end;
@@ -203,18 +219,95 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len)
 
 end:
     if( psz_name ) free( psz_name );
-    if( psz_mode ) free( psz_mode );
     vlc_object_release( p_playlist );
-    p_input->b_eof = 1;
-    return 0;
+
+    /* Return fake data forever */
+    p_access->pf_read = ReadNull;
+    return ReadNull( p_access, p_buffer, i_len );
 }
 
-/* Local functions */
+/*****************************************************************************
+ * DemuxOpen:
+ *****************************************************************************/
+static int Control( access_t *p_access, int i_query, va_list args )
+{
+    vlc_bool_t   *pb_bool;
+    int          *pi_int;
+    int64_t      *pi_64;
+
+    switch( i_query )
+    {
+        /* */
+        case ACCESS_CAN_SEEK:
+        case ACCESS_CAN_FASTSEEK:
+        case ACCESS_CAN_PAUSE:
+        case ACCESS_CAN_CONTROL_PACE:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_FALSE;    /* FIXME */
+            break;
+
+        /* */
+        case ACCESS_GET_MTU:
+            pi_int = (int*)va_arg( args, int * );
+            *pi_int = 0;
+            break;
+
+        case ACCESS_GET_PTS_DELAY:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = DEFAULT_PTS_DELAY * 1000;
+            break;
+
+        /* */
+        case ACCESS_SET_PAUSE_STATE:
+        case ACCESS_GET_TITLE_INFO:
+        case ACCESS_SET_TITLE:
+        case ACCESS_SET_SEEKPOINT:
+            return VLC_EGENERIC;
+
+        default:
+            msg_Err( p_access, "unimplemented query in control" );
+            return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * DemuxOpen:
+ *****************************************************************************/
+static int DemuxOpen ( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+
+    if( strcmp( p_demux->psz_demux, "directory" ) )
+        return VLC_EGENERIC;
+
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = DemuxControl;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Demux: EOF
+ *****************************************************************************/
+static int Demux( demux_t *p_demux )
+{
+    return 0;
+}
+/*****************************************************************************
+ * DemuxControl:
+ *****************************************************************************/
+static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
+{
+    return demux2_vaControlHelper( p_demux->s,
+                                   0, 0, 0, 1,
+                                   i_query, args );
+}
 
 /*****************************************************************************
  * ReadDir: read a directory and add its content to the list
  *****************************************************************************/
-int ReadDir( playlist_t *p_playlist, char *psz_name , int i_mode, int *pi_position )
+static int ReadDir( playlist_t *p_playlist,
+                    char *psz_name , int i_mode, int *pi_position )
 {
     DIR *                       p_current_dir;
     struct dirent *             p_dir_content;
@@ -288,3 +381,5 @@ int ReadDir( playlist_t *p_playlist, char *psz_name , int i_mode, int *pi_positi
     closedir( p_current_dir );
     return VLC_SUCCESS;
 }
+
+
