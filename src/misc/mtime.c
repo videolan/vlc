@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001, 2003 VideoLAN
- * $Id: mtime.c,v 1.40 2003/12/09 19:18:48 gbazin Exp $
+ * $Id: mtime.c,v 1.41 2003/12/11 10:44:32 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -168,7 +168,7 @@ mtime_t mdate( void )
         if( i_wrap_counts == -1 )
         {
             /* Initialization */
-            i_previous_time = usec_time;
+            i_previous_time = I64C(1000) * GetTickCount();
             InitializeCriticalSection( &date_lock );
             i_wrap_counts = 0;
         }
