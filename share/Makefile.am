@@ -132,6 +132,7 @@ DIST_http = \
 	http/info.html \
 	http/admin/index.html \
 	http/admin/browse.html \
+	http/admin/dboxfiles.html \
 	http/admin/.access \
 	http/style.css \
 	$(NULL)
