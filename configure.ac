@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.166 2004/01/28 20:53:21 gbazin Exp $
+dnl $Id: configure.ac,v 1.167 2004/01/29 18:48:40 gbazin Exp $
 
 AC_INIT(vlc,0.7.1-cvs)
 
@@ -2781,7 +2781,7 @@ dnl Skins2 module
 dnl
 AC_ARG_ENABLE(skins2,
   [  --enable-skins2         Skins2 interface module (experimental)])
-if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}" != "beos" && "${enable_skins2}" != "no"); then
+if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}" != "beos" && test "${enable_skins2}" != "no"); then
 
   dnl test for the required libraries
   skins2_missing_lib="no"
@@ -2839,8 +2839,7 @@ if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}
     AX_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 -I${x_includes} -DX11_SKINS])
     AX_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
     AX_ADD_LDFLAGS([skins2],[-L${x_libraries} -lXext -lX11])
-  fi
-  fi
+  fi fi
 fi
 
 
