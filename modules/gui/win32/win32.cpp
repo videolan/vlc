@@ -1,8 +1,8 @@
 /*****************************************************************************
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: win32.cpp,v 1.7 2003/01/08 02:16:09 ipkiss Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: win32.cpp,v 1.8 2003/01/13 17:11:14 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -129,9 +129,6 @@ static void Run( intf_thread_t *p_intf )
  *****************************************************************************/
 int Win32Manage( intf_thread_t *p_intf )
 {
-    aout_instance_t * p_aout;
-    vout_thread_t   * p_vout;
-
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* If the "display popup" flag has changed */
@@ -163,67 +160,98 @@ int Win32Manage( intf_thread_t *p_intf )
         p_intf->p_sys->p_input = NULL;
     }
 
-    if( p_intf->p_sys->p_input )
+    if( p_intf->p_sys->p_input != NULL && !p_intf->p_sys->p_input->b_die )
     {
-        input_thread_t *p_input = p_intf->p_sys->p_input;
+        vlc_bool_t b_need_menus = 0;
+        input_thread_t  * p_input = p_intf->p_sys->p_input;
+        aout_instance_t * p_aout = NULL;
+        vout_thread_t   * p_vout = NULL;
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
-        if( !p_input->b_die )
+        /* New input or stream map change */
+        if( p_input->stream.b_changed )
         {
-            /* New input or stream map change */
-            if( p_input->stream.b_changed )
-            {
-                p_intf->p_sys->p_window->ModeManage();
-                p_intf->p_sys->p_menus->SetupMenus();
-                p_intf->p_sys->b_playing = 1;
-            }
+            p_intf->p_sys->p_window->ModeManage();
+            b_need_menus = 1;
+            p_intf->p_sys->b_playing = 1;
+        }
 
-            /* Manage the slider */
-            if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
-            {
-                TTrackBar * TrackBar = p_intf->p_sys->p_window->TrackBar;
-                off_t NewValue = TrackBar->Position;
+        /* Manage the slider */
+        if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
+        {
+            TTrackBar * TrackBar = p_intf->p_sys->p_window->TrackBar;
+            off_t NewValue = TrackBar->Position;
 
 #define p_area p_input->stream.p_selected_area
-                /* If the user hasn't touched the slider since the last time,
-                 * then the input can safely change it */
-                if( NewValue == p_intf->p_sys->OldValue )
-                {
-                    /* Update the value */
-                    TrackBar->Position = p_intf->p_sys->OldValue =
-                        ( (off_t)SLIDER_MAX_VALUE * p_area->i_tell ) /
-                                p_area->i_size;
-                }
-                /* Otherwise, send message to the input if the user has
-                 * finished dragging the slider */
-                else if( p_intf->p_sys->b_slider_free )
-                {
-                    off_t i_seek = ( NewValue * p_area->i_size ) /
-                                (off_t)SLIDER_MAX_VALUE;
-
-                    /* release the lock to be able to seek */
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
-                    input_Seek( p_input, i_seek, INPUT_SEEK_SET );
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-                    /* Update the old value */
-                    p_intf->p_sys->OldValue = NewValue;
-                }
-
-                /* Update the display */
-//                TrackBar->Invalidate();
-
-#    undef p_area
-            }
-
-            if( p_intf->p_sys->i_part !=
-                p_input->stream.p_selected_area->i_part )
+            /* If the user hasn't touched the slider since the last time,
+             * then the input can safely change it */
+            if( NewValue == p_intf->p_sys->OldValue )
             {
-//                p_intf->p_sys->b_chapter_update = 1;
-                p_intf->p_sys->p_menus->SetupMenus();
+                /* Update the value */
+                TrackBar->Position = p_intf->p_sys->OldValue =
+                    ( (off_t)SLIDER_MAX_VALUE * p_area->i_tell ) /
+                      p_area->i_size;
             }
+            /* Otherwise, send message to the input if the user has
+             * finished dragging the slider */
+            else if( p_intf->p_sys->b_slider_free )
+            {
+                off_t i_seek = ( NewValue * p_area->i_size ) /
+                                 (off_t)SLIDER_MAX_VALUE;
+
+                /* release the lock to be able to seek */
+                vlc_mutex_unlock( &p_input->stream.stream_lock );
+                input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+                vlc_mutex_lock( &p_input->stream.stream_lock );
+
+                /* Update the old value */
+                p_intf->p_sys->OldValue = NewValue;
+            }
+#    undef p_area
+
         }
+
+        if( p_intf->p_sys->i_part != p_input->stream.p_selected_area->i_part )
+        {
+            p_intf->p_sys->b_chapter_update = 1;
+            b_need_menus = 1;
+        }
+
+        /* Does the audio output require to update the menus ? */
+        p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                     FIND_ANYWHERE );
+        if( p_aout != NULL )
+        {
+            vlc_value_t val;
+            if( var_Get( (vlc_object_t *)p_aout, "intf-change", &val ) >= 0
+                && val.b_bool )
+            {
+                p_intf->p_sys->b_aout_update = 1;
+                b_need_menus = 1;
+            }
+
+            vlc_object_release( (vlc_object_t *)p_aout );
+        }
+        
+        /* Does the video output require to update the menus ? */
+        p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                                   FIND_ANYWHERE );
+        if( p_vout != NULL )
+        {
+            vlc_value_t val;
+            if( var_Get( (vlc_object_t *)p_vout, "intf-change", &val ) >= 0
+                && val.b_bool )
+            {
+                p_intf->p_sys->b_vout_update = 1;
+                b_need_menus = 1;
+            }
+
+            vlc_object_release( (vlc_object_t *)p_vout );
+        }
+
+        if( b_need_menus )
+            p_intf->p_sys->p_menus->SetupMenus();
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
@@ -231,42 +259,6 @@ int Win32Manage( intf_thread_t *p_intf )
     {
         p_intf->p_sys->p_window->ModeManage();
         p_intf->p_sys->b_playing = 0;
-    }
-
-    /* Does the audio output require to update the menus ? */
-    p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                 FIND_ANYWHERE );
-    if( p_aout != NULL )
-    {
-        vlc_value_t val;
-        if( var_Get( (vlc_object_t *)p_aout, "intf-change", &val ) >= 0
-            && val.b_bool )
-        {
-#if 0
-            p_intf->p_sys->b_aout_update = 1;
-            p_intf->p_sys->p_menus->SetupMenus();
-#endif
-        }
-
-        vlc_object_release( (vlc_object_t *)p_aout );
-    }
-
-    /* Does the video output require to update the menus ? */
-    p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                               FIND_ANYWHERE );
-    if( p_vout != NULL )
-    {
-        vlc_value_t val;
-        if( var_Get( (vlc_object_t *)p_vout, "intf-change", &val ) >= 0
-            && val.b_bool )
-        {
-#if 0
-            p_intf->p_sys->b_vout_update = 1;
-            p_intf->p_sys->p_menus->SetupMenus();
-#endif
-        }
-
-        vlc_object_release( (vlc_object_t *)p_vout );
     }
 
     if( p_intf->b_die )

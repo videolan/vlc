@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.22 2003/01/12 18:25:05 jlj Exp $
+ * $Id: intf.m,v 1.23 2003/01/13 17:11:14 ipkiss Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -782,7 +782,7 @@ static void Run( intf_thread_t *p_intf )
 
     for( i = 0 ; i < p_input->stream.i_selected_es_number ; i++ )
     {
-        if( p_input->stream.pp_selected_es[i]->i_cat == SPU_ES )
+        if( p_input->stream.pp_selected_es[i]->i_cat == AUDIO_ES )
         {
             p_audio_es = p_input->stream.pp_selected_es[i];
         }

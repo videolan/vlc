@@ -1,8 +1,8 @@
 /*****************************************************************************
  * menu.cpp: functions to handle menu items
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: menu.cpp,v 1.3 2003/01/08 02:16:09 ipkiss Exp $
+ * Copyright (C) 2002-2003 VideoLAN
+ * $Id: menu.cpp,v 1.4 2003/01/13 17:11:14 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -239,6 +239,11 @@ __fastcall TMenusGen::TMenusGen( intf_thread_t *_p_intf ) : TObject()
 }
 
 
+/*****************************************************************************
+ * SetupMenus: This function dynamically generates some menus
+ *****************************************************************************
+ * The lock on p_input->stream must be taken before you call this function
+ *****************************************************************************/
 void __fastcall TMenusGen::SetupMenus()
 {
     TMainFrameDlg  * p_window = p_intf->p_sys->p_window;
@@ -349,7 +354,7 @@ void __fastcall TMenusGen::SetupMenus()
         p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
                                                      FIND_ANYWHERE );
 
-        if ( p_aout != NULL )
+        if( p_aout != NULL )
         {
             vlc_value_t val;
             val.b_bool = 0;
@@ -378,7 +383,7 @@ void __fastcall TMenusGen::SetupMenus()
         p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                    FIND_ANYWHERE );
 
-        if ( p_vout != NULL )
+        if( p_vout != NULL )
         {
             vlc_value_t val;
             val.b_bool = 0;
@@ -447,8 +452,17 @@ void __fastcall TMenusGen::VarChange( vlc_object_t *p_object,
     vlc_value_t val;
     int i_index;
 
+    /* We must delete all the '&' characters in the caption string, because
+     * Borland automatically adds one when (and only when!) you click on
+     * the menuitem. Grrrrr... */
+    AnsiString Caption = Item->Caption;
+    while( Caption.LastDelimiter( "&" ) != 0 )
+    {
+        Caption.Delete( Caption.LastDelimiter( "&" ), 1 );
+    }
+    val.psz_string = Caption.c_str();
+
     /* set the new value */
-    val.psz_string = Item->Name.c_str();
     if( var_Set( p_object, psz_variable, val ) < 0 )
     {
         msg_Warn( p_object, "cannot set variable (%s)", val.psz_string );
@@ -546,27 +560,27 @@ void __fastcall TMenusGen::SetupVarMenu( vlc_object_t *p_object,
 {
     TMenuItem * Item;
     vlc_value_t val;
-    char * psz_value;
+    char * psz_value = NULL;
     int i;
 
     /* remove previous menu */
     Root->Clear();
 
     /* get the current value */
-    if ( var_Get( p_object, psz_variable, &val ) < 0 )
+    if( var_Get( p_object, psz_variable, &val ) < 0 )
     {
         return;
     }
     psz_value = val.psz_string;
 
-    if ( var_Change( p_object, psz_variable, VLC_VAR_GETLIST, &val ) < 0 )
+    if( var_Change( p_object, psz_variable, VLC_VAR_GETLIST, &val ) < 0 )
     {
         free( psz_value );
         return;
     }
 
     /* append a menuitem for each option */
-    for ( i = 0; i < val.p_list->i_count; i++ )
+    for( i = 0; i < val.p_list->i_count; i++ )
     {
         Item = new TMenuItem( Root );
         Item->Caption = val.p_list->p_values[i].psz_string;
@@ -585,7 +599,7 @@ void __fastcall TMenusGen::SetupVarMenu( vlc_object_t *p_object,
 
     /* clean up everything */
     var_Change( p_object, psz_variable, VLC_VAR_FREELIST, &val );
-    free( psz_value );
+//    free( psz_value );
 }
 
 /*****************************************************************************
@@ -928,4 +942,5 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
     /* be sure that menu is sensitive */
     Root->Enabled = true;
 }
+
 

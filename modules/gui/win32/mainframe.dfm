@@ -2391,6 +2391,7 @@ object MainFrameDlg: TMainFrameDlg
       object PopupADevice: TMenuItem
         Tag = 3
         Caption = 'Device'
+        Enabled = False
       end
       object VolumeUp1: TMenuItem
         Tag = 3
@@ -2407,10 +2408,12 @@ object MainFrameDlg: TMainFrameDlg
       object PopupChannel: TMenuItem
         Tag = 3
         Caption = 'Channels'
+        Enabled = False
       end
     end
     object PopupVDevice: TMenuItem
       Caption = 'Screen'
+      Enabled = False
     end
     object N1: TMenuItem
       Caption = '-'
