@@ -143,10 +143,10 @@ int E_(Open) ( vlc_object_t *p_this )
         else if (strncmp( p_input->psz_access, "terrestrial",11) ==0)
             frontend_info.type = FE_OFDM;
 
-        frontend_info.frequency_max = 12999 * 1000;
-        frontend_info.frequency_min = 9750 * 1000;
-        frontend_info.symbol_rate_max = 30000 * 1000;
-        frontend_info.symbol_rate_min = 1000 * 1000;
+        frontend_info.frequency_max =   12999000;
+        frontend_info.frequency_min =    9750000;
+        frontend_info.symbol_rate_max = 30000000;
+        frontend_info.symbol_rate_min =  1000000;
     }
     
     /* Register Callback functions */
@@ -172,14 +172,19 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
+    /* Workaround for backwards compatibility */
+    if (strncmp( p_input->psz_access, "satellite",9 ) ==0)
+    {
+        msg_Warn( p_input, "invalid frequency %d possibly in kHz, trying value *1000 Hz", u_freq );
+        u_freq *= 1000;
+    }
+    
     /* Validating input values */
-    u_freq *= 1000;
     if ( ((u_freq) > frontend_info.frequency_max) ||
          ((u_freq) < frontend_info.frequency_min) )
     {
-        msg_Warn( p_input, "invalid frequency %d (kHz), using default one", u_freq );
+        msg_Warn( p_input, "invalid frequency %d (Hz), using default one", u_freq );
         u_freq = config_GetInt( p_input, "frequency" );
-        u_freq *= 1000;
         if ( ((u_freq) > frontend_info.frequency_max) ||
              ((u_freq) < frontend_info.frequency_min) )
         {
@@ -188,13 +193,18 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
-    u_srate *= 1000;
+    /* Workaround for backwards compatibility */
+    if (strncmp( p_input->psz_access, "satellite", 9 ) ==0)
+    {
+        msg_Warn( p_input, "invalid symbol rate %d possibly specified in kHz, trying value *1000 Hz", u_freq );
+        u_srate *= 1000;
+    }
+    
     if ( ((u_srate) > frontend_info.symbol_rate_max) ||
          ((u_srate) < frontend_info.symbol_rate_min) )
     {
         msg_Warn( p_input, "invalid symbol rate, using default one" );
         u_srate = config_GetInt( p_input, "symbol-rate" );
-        u_srate *= 1000;
         if ( ((u_srate) > frontend_info.symbol_rate_max) ||
              ((u_srate) < frontend_info.symbol_rate_min) )
         {
@@ -227,9 +237,9 @@ int E_(Open) ( vlc_object_t *p_this )
 
     /* Get antenna configuration options */
     b_diseqc = config_GetInt( p_input, "diseqc" );
-    u_lnb_lof1 = config_GetInt( p_input, "lnb-lof1" ) * 1000;
-    u_lnb_lof2 = config_GetInt( p_input, "lnb-lof2" ) * 1000;
-    u_lnb_slof = config_GetInt( p_input, "lnb-slof" ) * 1000;
+    u_lnb_lof1 = config_GetInt( p_input, "lnb-lof1" );
+    u_lnb_lof2 = config_GetInt( p_input, "lnb-lof2" );
+    u_lnb_slof = config_GetInt( p_input, "lnb-slof" );
 
     /* Setting frontend parameters for tuning the hardware */      
     switch( frontend_info.type )
@@ -528,7 +538,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             default:
                 ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 21, u_adapter, u_device);
                 input_SelectES( p_input , p_es );
-                msg_Dbg(p_input, "Warning ES streamtype 0x%d found used as DMX_PES_OTHER !!",(int) p_es->i_cat);
+                msg_Warn(p_input, "ES streamtype 0x%d found used as DMX_PES_OTHER !!",(int) p_es->i_cat);
                 break;
 #undef p_es
         }

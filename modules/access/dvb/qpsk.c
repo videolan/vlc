@@ -47,7 +47,7 @@ void E_(Close)   ( vlc_object_t * );
 #define DEVICE_TEXT N_("device nummer to use on adapter")
 #define DEVICE_LONGTEXT ""
 
-#define FREQ_TEXT N_("satellite default transponder frequency")
+#define FREQ_TEXT N_("satellite default transponder frequency in Hz")
 #define FREQ_LONGTEXT ""
 
 #define POL_TEXT N_("satellite default transponder polarization")
@@ -56,19 +56,19 @@ void E_(Close)   ( vlc_object_t * );
 #define FEC_TEXT N_("satellite default transponder FEC")
 #define FEC_LONGTEXT N_("FEC=Forward Error Correction mode")
 
-#define SRATE_TEXT N_("satellite default transponder symbol rate")
+#define SRATE_TEXT N_("satellite default transponder symbol rate in Hz")
 #define SRATE_LONGTEXT ""
 
 #define DISEQC_TEXT N_("use diseqc with antenna")
 #define DISEQC_LONGTEXT ""
 
-#define LNB_LOF1_TEXT N_("antenna lnb_lof1 (kHz)")
+#define LNB_LOF1_TEXT N_("antenna lnb_lof1 (Hz)")
 #define LNB_LOF1_LONGTEXT ""
 
-#define LNB_LOF2_TEXT N_("antenna lnb_lof2 (kHz)")
+#define LNB_LOF2_TEXT N_("antenna lnb_lof2 (Hz)")
 #define LNB_LOF2_LONGTEXT ""
 
-#define LNB_SLOF_TEXT N_("antenna lnb_slof (kHz)")
+#define LNB_SLOF_TEXT N_("antenna lnb_slof (Hz)")
 #define LNB_SLOF_LONGTEXT ""
 
 #define PROBE_TEXT	N_("probe the dvb card for capabilities (default disabled)")
@@ -101,14 +101,14 @@ vlc_module_begin();
     add_category_hint( N_("Input"), NULL, VLC_FALSE );
         add_integer( "adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT, VLC_FALSE );
         add_integer( "device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT, VLC_FALSE );
-        add_integer( "frequency", 11954, NULL, FREQ_TEXT, FREQ_LONGTEXT, VLC_FALSE );
+        add_integer( "frequency", 11954000, NULL, FREQ_TEXT, FREQ_LONGTEXT, VLC_FALSE );
         add_integer( "polarization", 0, NULL, POL_TEXT, POL_LONGTEXT, VLC_FALSE );
         add_integer( "fec", 3, NULL, FEC_TEXT, FEC_LONGTEXT, VLC_FALSE );
-        add_integer( "symbol-rate", 27500, NULL, SRATE_TEXT, SRATE_LONGTEXT, VLC_FALSE );
+        add_integer( "symbol-rate", 27500000, NULL, SRATE_TEXT, SRATE_LONGTEXT, VLC_FALSE );
         add_bool( "diseqc", 0, NULL, DISEQC_TEXT, DISEQC_LONGTEXT, VLC_FALSE );
-        add_integer( "lnb-lof1",  9750, NULL, LNB_LOF1_TEXT, LNB_LOF1_LONGTEXT, VLC_FALSE );
-        add_integer( "lnb-lof2", 10600, NULL, LNB_LOF2_TEXT, LNB_LOF2_LONGTEXT, VLC_FALSE );
-        add_integer( "lnb-slof", 11700, NULL, LNB_SLOF_TEXT, LNB_SLOF_LONGTEXT, VLC_FALSE );
+        add_integer( "lnb-lof1",  9750000, NULL, LNB_LOF1_TEXT, LNB_LOF1_LONGTEXT, VLC_FALSE );
+        add_integer( "lnb-lof2", 10600000, NULL, LNB_LOF2_TEXT, LNB_LOF2_LONGTEXT, VLC_FALSE );
+        add_integer( "lnb-slof", 11700000, NULL, LNB_SLOF_TEXT, LNB_SLOF_LONGTEXT, VLC_FALSE );
         add_bool( "probe", 0, NULL, PROBE_TEXT, PROBE_LONGTEXT, VLC_FALSE );
         add_integer( "code-rate-hp", 9, NULL, CODE_RATE_HP_TEXT, CODE_RATE_HP_LONGTEXT, VLC_FALSE );
         add_integer( "code-rate-lp", 9, NULL, CODE_RATE_LP_TEXT, CODE_RATE_LP_LONGTEXT, VLC_FALSE );
