@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.16.2.5 2002/10/09 15:29:51 stippi Exp $
+ * $Id: InterfaceWindow.cpp,v 1.16.2.6 2002/10/11 00:46:59 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -37,7 +37,6 @@
 #include <fs_info.h>
 #include <string.h>
 
-
 /* VLC headers */
 extern "C"
 {
@@ -60,6 +59,41 @@ extern "C"
 #include "InterfaceWindow.h"
 
 #define INTERFACE_UPDATE_TIMEOUT 80000 // 2 frames if at 25 fps
+
+
+bool
+get_volume_info( BVolume& volume, BString& volumeName, bool& isCDROM, BString& deviceName )
+{
+	bool success = false;
+	isCDROM = false;
+	deviceName = "";
+	volumeName = "";
+	char name[B_FILE_NAME_LENGTH];
+	if ( volume.GetName( name ) >= B_OK )	// disk is currently mounted
+	{
+		volumeName = name;
+		dev_t dev = volume.Device();
+		fs_info info;
+		if ( fs_stat_dev( dev, &info ) == B_OK )
+		{
+			success = true;
+			deviceName = info.device_name;
+			if ( volume.IsReadOnly() )
+			{
+				int i_dev = open( info.device_name, O_RDONLY );
+				if ( i_dev >= 0 )
+				{
+					device_geometry g;
+					if ( ioctl( i_dev, B_GET_GEOMETRY, &g, sizeof( g ) ) >= 0 )
+						isCDROM = ( g.device_type == B_CD );
+					close( i_dev );
+				}
+			}
+		}
+ 	}
+ 	return success;
+}
+
 
 
 /*****************************************************************************
@@ -453,9 +487,48 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				{
 					BPath path( &ref );
 					if ( path.InitCheck() == B_OK )
-						// the BString objects will be deleted
-						// by the wrapper function further down
-						files.AddItem( new BString( (char*)path.Path() ) );
+					{
+						bool add = true;
+						// has the user dropped a dvd disk icon?
+						BDirectory dir( &ref );
+						if ( dir.InitCheck() == B_OK && dir.IsRootDirectory() )
+						{
+							BVolumeRoster volRoster;
+							BVolume vol;
+							BDirectory volumeRoot;
+							status_t status = volRoster.GetNextVolume( &vol );
+							while ( status == B_NO_ERROR )
+							{
+								if ( vol.GetRootDirectory( &volumeRoot ) == B_OK
+									 && dir == volumeRoot )
+								{
+									BString volumeName;
+									BString deviceName;
+									bool isCDROM;
+									if ( get_volume_info( vol, volumeName, isCDROM, deviceName )
+										 && isCDROM )
+									{
+										BMessage msg( OPEN_DVD );
+										msg.AddString( "device", deviceName.String() );
+										PostMessage( &msg );
+										add = false;
+									}
+							 		break;
+								}
+								else
+								{
+							 		vol.Unset();
+									status = volRoster.GetNextVolume( &vol );
+								}
+							}
+						}
+						if ( add )
+						{
+							// the BString objects will be deleted
+							// by the wrapper function further down
+							files.AddItem( new BString( path.Path() ) );
+						}
+					}
 				}
 				// give the list to VLC
 				Intf_VLCWrapper::openFiles(&files, replace);
@@ -878,9 +951,9 @@ CDMenu::~CDMenu()
 void CDMenu::AttachedToWindow(void)
 {
 	// remove all items
-	while (BMenuItem* item = RemoveItem(0L))
+	while ( BMenuItem* item = RemoveItem( 0L ) )
 		delete item;
-	GetCD("/dev/disk");
+	GetCD( "/dev/disk" );
 	BMenu::AttachedToWindow();
 }
 
@@ -889,52 +962,25 @@ void CDMenu::AttachedToWindow(void)
  *****************************************************************************/
 int CDMenu::GetCD( const char *directory )
 {
-	BVolumeRoster *volRoster;
-	BVolume	   *vol;
-	BDirectory	*dir;
-	int		   status;
-	int		   mounted;   
-	char		  name[B_FILE_NAME_LENGTH]; 
-	fs_info	   info;
-	dev_t		 dev;
-	
-	volRoster = new BVolumeRoster();
-	vol = new BVolume();
-	dir = new BDirectory();
-	status = volRoster->GetNextVolume(vol);
-	status = vol->GetRootDirectory(dir);
-	while (status ==  B_NO_ERROR)
+	BVolumeRoster volRoster;
+	BVolume vol;
+	BDirectory dir;
+	status_t status = volRoster.GetNextVolume( &vol );
+	while ( status ==  B_NO_ERROR )
 	{
-		mounted = vol->GetName(name);	
-		if ((mounted == B_OK) && /* Disk is currently Mounted */
-			(vol->IsReadOnly()) ) /* Disk is read-only */
+		BString deviceName;
+		BString volumeName;
+		bool isCDROM;
+		if ( get_volume_info( vol, volumeName, isCDROM, deviceName )
+			 && isCDROM )
 		{
-			dev = vol->Device();
-			fs_stat_dev(dev, &info);
-			
-			device_geometry g;
-			int i_dev;
-			i_dev = open( info.device_name, O_RDONLY );
-		   
-			if( i_dev >= 0 )
-			{
-				if( ioctl(i_dev, B_GET_GEOMETRY, &g, sizeof(g)) >= 0 )
-				{
-					if( g.device_type == B_CD ) //ensure the drive is a CD-ROM
-					{
-						BMessage *msg;
-						msg = new BMessage( OPEN_DVD );
-						msg->AddString( "device", info.device_name );
-						BMenuItem *menu_item;
-						menu_item = new BMenuItem( name, msg );
-						AddItem( menu_item );
-					}
-					close(i_dev);
-				}
-			}
- 		}
- 		vol->Unset();
-		status = volRoster->GetNextVolume(vol);
+			BMessage* msg = new BMessage( OPEN_DVD );
+			msg->AddString( "device", deviceName.String() );
+			BMenuItem* item = new BMenuItem( volumeName.String(), msg );
+			AddItem( item );
+		}
+ 		vol.Unset();
+		status = volRoster.GetNextVolume( &vol );
 	}
 }
 
@@ -983,6 +1029,7 @@ void LanguageMenu::_GetChannels()
 	es_descriptor_t *p_es  = NULL;
 
 	// Insert the "None" item if in subtitle mode
+	bool emptyItemAdded = false;
 	if( kind != AUDIO_ES ) //subtitle
 	{
 		msg = new BMessage( SELECT_SUBTITLE );
@@ -990,6 +1037,7 @@ void LanguageMenu::_GetChannels()
 		menu_item = new BMenuItem( "None", msg );
 		AddItem( menu_item );
 		menu_item->SetMarked( true );
+		emptyItemAdded = true;
 	}
 
 	input_thread_s* input = p_input_bank->pp_input[0];
@@ -1003,7 +1051,6 @@ void LanguageMenu::_GetChannels()
 		}
 	
 		int32 addedItems = 0;
-		bool emptyItemAdded = false;
 		uint32 what = kind == AUDIO_ES ? SELECT_CHANNEL : SELECT_SUBTITLE;
 		const char* fieldName = kind == AUDIO_ES ? "channel" : "subtitle";
 	
