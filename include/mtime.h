@@ -20,12 +20,12 @@
  *******************************************************************************
  * Store an high precision date or time interval. The maximum precision is the
  * micro-second, and a 64 bits integer is used to avoid any overflow (maximum
- * time interval is then 584542 years, which should be length enough for any
+ * time interval is then 292271 years, which should be length enough for any
  * video). Date are stored as a time interval since a common date.
- * Note than date and time intervals can be manipulated using regular arithmetic
+ * Note that date and time intervals can be manipulated using regular arithmetic
  * operators, and that no special functions are required.
  *******************************************************************************/
-typedef u64 mtime_t;
+typedef s64 mtime_t;
 
 /*******************************************************************************
  * LAST_MDATE: date which will never happen
@@ -35,16 +35,16 @@ typedef u64 mtime_t;
  * returning the date of the first image to be displayed. It can be used in
  * comparaison with other values: all existing dates will be earlier.
  *******************************************************************************/
-#define LAST_MDATE          ((mtime_t) -1)
+#define LAST_MDATE ((mtime_t)((u64)(-1)/2))
 
 /*******************************************************************************
  * MSTRTIME_MAX_SIZE: maximum possible size of mstrtime
  *******************************************************************************
  * This values is the maximal possible size of the string returned by the
- * mstrtime() function, including the final '\0'. It should be used to allocate
- * the buffer.
+ * mstrtime() function, including '-' and the final '\0'. It should be used to
+ * allocate the buffer.
  *******************************************************************************/
-#define MSTRTIME_MAX_SIZE   20
+#define MSTRTIME_MAX_SIZE 22
 
 /*******************************************************************************
  * Prototypes

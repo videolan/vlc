@@ -11,6 +11,7 @@
 
 #include "common.h"
 #include "config.h"
+#include "mtime.h"
 
 #include "input.h"
 #include "input_file.h"
@@ -39,6 +40,3 @@ int input_FileRead( input_thread_t *p_input, const struct iovec *p_vector,
 void input_FileDestroyMethod( input_thread_t *p_input )
 {
 }
-
-
-

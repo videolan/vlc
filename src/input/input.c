@@ -882,16 +882,16 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                     }
                     else
                     {
-                        p_pes->i_pts = ( ((s64)p_pes->p_pes_header[9] << 29) +
-                                         ((s64)U16_AT(p_pes->p_pes_header + 10) << 14) +
-                                         ((s64)U16_AT(p_pes->p_pes_header + 12) >> 1) -
+                        p_pes->i_pts = ( ((mtime_t)p_pes->p_pes_header[9] << 29) +
+                                         ((mtime_t)U16_AT(p_pes->p_pes_header + 10) << 14) +
+                                         ((mtime_t)U16_AT(p_pes->p_pes_header + 12) >> 1) -
                                          (1 << 14) - (1 << 29) );
                         p_pes->i_pts *= 300;
                         p_pes->i_pts /= 27;
                         p_pes->i_pts += p_pcr->delta_clock;
                         if( p_pcr->c_pts == 0 )
                         {
-                            p_pcr->delta_decode = (s64)mdate() - p_pes->i_pts + 500000;
+                            p_pcr->delta_decode = mdate() - p_pes->i_pts + 500000;
                         }
                         p_pes->i_pts += p_pcr->delta_decode;
                     }

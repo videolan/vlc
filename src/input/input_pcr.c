@@ -71,7 +71,7 @@ int input_PcrInit( input_thread_t *p_input )
 void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
                       u8* p_pcr_data )
 {
-    s64 pcr_time, sys_time, delta_clock;
+    mtime_t pcr_time, sys_time, delta_clock;
     pcr_descriptor_t *p_pcr;
         
     ASSERT(p_pcr_data);
@@ -87,7 +87,7 @@ void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
     
     /* Express the PCR in microseconde
      * WARNING: do not remove the casts in the following calculation ! */
-    pcr_time = ( (( (s64)U32_AT((u32*)p_pcr_data) << 1 ) | ( p_pcr_data[4] >> 7 )) * 300 ) / 27;
+    pcr_time = ( (( (mtime_t)U32_AT((u32*)p_pcr_data) << 1 ) | ( p_pcr_data[4] >> 7 )) * 300 ) / 27;
     sys_time = mdate();
     delta_clock = sys_time - pcr_time;
     
@@ -109,7 +109,7 @@ void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
     
 #ifdef STATS
     {
-        s64 jitter;
+        mtime_t jitter;
         
         jitter = delta_clock - p_pcr->delta_clock;
         /* Compute the maximum jitter */

@@ -60,6 +60,7 @@ int XTryLoadFont( Display *p_display, char *psz_font, XFontStruct **p_font )
 int XEnableScreenSaver( Display *p_display )
 {
     /* ?? */
+    return( 0 );
 }
 
 /*******************************************************************************
@@ -70,5 +71,5 @@ int XEnableScreenSaver( Display *p_display )
 int XDisableScreenSaver( Display *p_display )
 {
     /* ?? */
+    return( 0 );
 }
-

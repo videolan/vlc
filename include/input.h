@@ -3,7 +3,7 @@
  * (c)1999 VideoLAN
  *******************************************************************************/
 
-/* needs : "netlist.h", "config.h" */
+/* needs : "netlist.h", "config.h", "mtime.h" */
 
 /* ?? missing: 
  *              tables version control */
@@ -60,7 +60,7 @@ typedef struct
     boolean_t               b_data_alignment;  /* used to find the beginning of a
                                                 * video or audio unit          */
     boolean_t               b_has_pts;         /* is the following field set ? */
-    s64                     i_pts;   /* the PTS for this packet (if set above) */
+    mtime_t                 i_pts;   /* the PTS for this packet (if set above) */
     boolean_t               b_random_access;
               /* if TRUE, in the payload of this packet, there is the first byte 
                * of a video sequence header, or the first byte of an audio frame.
@@ -209,8 +209,8 @@ typedef struct pcr_descriptor_struct
 {
     pthread_mutex_t         lock;                     /* pcr modification lock */
 
-    s64                     delta_clock;
-    s64                     delta_decode;
+    mtime_t                 delta_clock;
+    mtime_t                 delta_decode;
                             /* represents decoder_time - pcr_time in usecondes */
     count_t                 c_average;
                              /* counter used to compute dynamic average values */
@@ -218,10 +218,10 @@ typedef struct pcr_descriptor_struct
 #ifdef STATS
     /* Stats */
     count_t     c_average_jitter;
-    s64         max_jitter;                    /* the evalueted maximum jitter */
-    s64         average_jitter;                /* the evalueted average jitter */
+    mtime_t     max_jitter;                    /* the evalueted maximum jitter */
+    mtime_t     average_jitter;                /* the evalueted average jitter */
     count_t     c_pcr;            /* the number of PCR which have been decoded */
-#endif    
+#endif
 } pcr_descriptor_t;
 
 /*******************************************************************************
