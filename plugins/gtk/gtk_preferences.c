@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.12 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.13 2002/03/11 20:14:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -50,11 +50,13 @@
 #include "gtk_preferences.h"
 
 /* local functions */
-static GtkWidget *GtkCreateConfigDialog( char *, intf_thread_t * );
+static void GtkCreateConfigDialog( char *, intf_thread_t * );
 
 static void GtkConfigOk          ( GtkButton *, gpointer );
 static void GtkConfigApply       ( GtkButton *, gpointer );
 static void GtkConfigCancel      ( GtkButton *, gpointer );
+
+static void GtkConfigDialogDestroyed ( GtkObject *, gpointer );
 
 static void GtkStringChanged     ( GtkEditable *, gpointer );
 static void GtkIntChanged        ( GtkEditable *, gpointer );
@@ -76,23 +78,15 @@ void GtkPreferencesActivate( GtkMenuItem * menuitem, gpointer user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), (char*)user_data );
 
-    /* If we have never used the preferences selector, open it */
-    if( !GTK_IS_WIDGET( p_intf->p_sys->p_preferences ) )
-    {
-        p_intf->p_sys->p_preferences = GtkCreateConfigDialog( "main",
-                                                              p_intf );
-    }
-
-    gtk_widget_show( p_intf->p_sys->p_preferences );
-    gdk_window_raise( p_intf->p_sys->p_preferences->window );
+    GtkCreateConfigDialog( "main", p_intf );
 }
 
 /****************************************************************************
  * GtkCreateConfigDialog: dynamically creates the configuration dialog
  * box from all the configuration data provided by the selected module.
  ****************************************************************************/
-static GtkWidget *GtkCreateConfigDialog( char *psz_module_name,
-                                         intf_thread_t *p_intf )
+static void GtkCreateConfigDialog( char *psz_module_name,
+                                   intf_thread_t *p_intf )
 {
     module_t *p_module, *p_module_bis;
     int i;
@@ -123,6 +117,23 @@ static GtkWidget *GtkCreateConfigDialog( char *psz_module_name,
     GtkWidget *plugin_config_button;
     GtkWidget *plugin_select_button;
 
+
+    /* Check if the dialog box is already opened, if so this will save us
+     * quite a bit of work. (the interface will be destroyed when you actually
+     * close the dialog window, but remember that it is only hidden if you
+     * clicked on the action buttons). This trick also allows us not to
+     * duplicate identical dialog windows. */
+    config_dialog = (GtkWidget *)gtk_object_get_data(
+                    GTK_OBJECT(p_intf->p_sys->p_window), psz_module_name );
+    if( config_dialog )
+    {
+        /* Yeah it was open */
+        gtk_widget_show( config_dialog );
+        gtk_widget_grab_focus( config_dialog );
+        return;
+    }
+
+
     /* Look for the selected module */
     for( p_module = p_module_bank->first ; p_module != NULL ;
          p_module = p_module->next )
@@ -131,7 +142,7 @@ static GtkWidget *GtkCreateConfigDialog( char *psz_module_name,
         if( psz_module_name && !strcmp( psz_module_name, p_module->psz_name ) )
             break;
     }
-    if( !p_module ) return NULL;
+    if( !p_module ) return;
 
 
     /*
@@ -264,6 +275,8 @@ static GtkWidget *GtkCreateConfigDialog( char *psz_module_name,
             gtk_widget_show( plugin_config_button );
             gtk_table_attach( GTK_TABLE(item_table), plugin_config_button,
                               0, 1, 1, 2, GTK_FILL, GTK_FILL, 5, 5 );
+            gtk_object_set_data( GTK_OBJECT(plugin_config_button),
+                                 "p_intf", p_intf );
             gtk_object_set_data( GTK_OBJECT(plugin_clist),
                                  "config_button", plugin_config_button );
 
@@ -485,7 +498,18 @@ static GtkWidget *GtkCreateConfigDialog( char *psz_module_name,
                         GTK_SIGNAL_FUNC(GtkConfigCancel),
                         config_dialog );
 
-    return config_dialog;
+    /* Ok, job done successfully. Let's keep a reference to the dialog box */
+    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
+                         psz_module_name, config_dialog );
+    gtk_object_set_data( GTK_OBJECT(config_dialog), "psz_module_name",
+                         psz_module_name );
+
+    /* we want this ref to be destroyed if the object is destroyed */
+    gtk_signal_connect( GTK_OBJECT(config_dialog), "destroy",
+                       GTK_SIGNAL_FUNC(GtkConfigDialogDestroyed),
+                       (gpointer)p_intf );
+
+    gtk_widget_show( config_dialog );
 }
 
 /****************************************************************************
@@ -560,17 +584,16 @@ void GtkPluginHighlighted( GtkCList *plugin_clist, int row, int column,
 void GtkPluginConfigure( GtkButton *button, gpointer user_data )
 {
     module_t *p_module;
-    GtkWidget *widget;
+    intf_thread_t *p_intf;
 
     p_module = (module_t *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                 "plugin_highlighted" );
 
     if( !p_module ) return;
 
-    widget = GtkCreateConfigDialog( p_module->psz_name, NULL );
-
-    gtk_widget_show( widget );
-    gdk_window_raise( widget->window );
+    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT(button),
+                                                   "p_intf" );
+    GtkCreateConfigDialog( p_module->psz_name, (gpointer)p_intf );
 
 }
 
@@ -585,7 +608,7 @@ void GtkPluginSelected( GtkButton *button, gpointer user_data )
     p_module = (module_t *)gtk_object_get_data( GTK_OBJECT(user_data),
                                                 "plugin_highlighted" );
     widget = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
-                                                "plugin_entry" );
+                                               "plugin_entry" );
     if( !p_module ) return;
 
     gtk_entry_set_text( GTK_ENTRY(widget), p_module->psz_name );
@@ -715,4 +738,21 @@ static void GtkSaveHashValue( gpointer key, gpointer value, gpointer user_data)
         config_PutIntVariable( p_config->psz_name, p_config->i_value );
         break;
     }
+}
+
+/****************************************************************************
+ * GtkConfigDialogDestroyed: callback triggered when the config dialog box is
+ * destroyed.
+ ****************************************************************************/
+static void GtkConfigDialogDestroyed( GtkObject *object, gpointer user_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)user_data;
+    char *psz_module_name;
+
+    psz_module_name = gtk_object_get_data( object, "psz_module_name" );
+
+    /* remove the ref to the dialog box */
+    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
+                         psz_module_name, NULL );
+
 }

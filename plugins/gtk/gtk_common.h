@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_common.h,v 1.4 2002/03/05 17:46:33 stef Exp $
+ * $Id: gtk_common.h,v 1.5 2002/03/11 20:14:16 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -69,7 +69,6 @@ typedef struct intf_sys_s
     GtkWidget *         p_fileopen;                      /* file open window */
     GtkWidget *         p_disc;                     /* disc selection window */
     GtkWidget *         p_network;                  /* network stream window */
-    GtkWidget *         p_preferences;                 /* preferences window */
     GtkWidget *         p_jump;                               /* jump window */
 
     /* The slider */
