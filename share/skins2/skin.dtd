@@ -9,7 +9,6 @@
         magnet      CDATA   "15"
         alpha       CDATA   "255"
         movealpha   CDATA   "255"
-        fadetime    CDATA   "400"
     >
 
 <!-- main elements -->

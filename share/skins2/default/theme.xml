@@ -1,6 +1,6 @@
 <!DOCTYPE Theme PUBLIC "-//VideoLAN//DTD VLC Skins V2.0//EN" "skin.dtd">
 
-<Theme version="2.0" magnet="20" alpha="255" movealpha="192" fadetime="500">
+<Theme version="2.0" magnet="20" alpha="255" movealpha="192">
   <ThemeInfo name="VLC OSX Interface" author="BigBen"
              email="bigben@videolan.org" webpage="http://www.videolan.org"/>
 

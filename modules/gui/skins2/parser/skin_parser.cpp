@@ -255,8 +255,7 @@ void SkinParser::handleBeginElement( const string &rName, AttrList_t &attr )
         const BuilderData::Theme theme( attr["tooltipfont"],
                 atoi( attr["magnet"] ),
                 convertInRange( attr["alpha"], 1, 255, "alpha" ),
-                convertInRange( attr["movealpha"], 1, 255, "movealpha" ),
-                atoi( attr["fadetime"] ) );
+                convertInRange( attr["movealpha"], 1, 255, "movealpha" ) );
         m_data.m_listTheme.push_back( theme );
     }
 
