@@ -257,10 +257,9 @@ int Win32Manage( intf_thread_t *p_intf )
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL );
     add_integer( "intfwin-max-lines", 500, NULL, MAX_LINES_TEXT, MAX_LINES_LONGTEXT );
-    set_description( _("Win32 interface module") );
+    set_description( _("Native Windows interface module") );
     set_capability( "interface", 100 );
     set_callbacks( E_(Open), E_(Close) );
     add_shortcut( "win" );
     add_shortcut( "win32" );
 vlc_module_end();
-

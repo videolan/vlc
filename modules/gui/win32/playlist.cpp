@@ -298,7 +298,10 @@ void __fastcall TPlaylistDlg::Play()
     if( p_playlist == NULL )
         return;
 
-    playlist_Play( p_playlist );
+    if ( p_playlist->i_size )
+        playlist_Play( p_playlist );
+    else
+        Show();
 }
 //---------------------------------------------------------------------------
 void __fastcall TPlaylistDlg::Pause()
