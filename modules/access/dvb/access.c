@@ -6,6 +6,7 @@
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ *          Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,13 +27,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <vlc/vlc.h>
 #include <vlc/input.h>
-
-#include "../../demux/mpeg/system.h"
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -41,36 +37,16 @@
 #include <fcntl.h>
 #include <sys/types.h>
 
-#ifdef HAVE_ERRNO_H
-#    include <string.h>
-#    include <errno.h>
-#endif
-
-#ifdef STRNCASECMP_IN_STRINGS_H
-#   include <strings.h>
-#endif
+#include <errno.h>
 
 #include "dvb.h"
-
-#define SATELLITE_READ_ONCE 3
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int     Open( vlc_object_t *p_this );
-static void    Close( vlc_object_t *p_this );
-static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
-                              size_t i_len);
-static int     SetArea    ( input_thread_t *, input_area_t * );
-static int     SetProgram ( input_thread_t *, pgrm_descriptor_t * );
-static void    Seek       ( input_thread_t *, off_t );
-static void    AllocateDemux( input_thread_t * p_input, int i_pid,
-                              int i_type );
-static void    CloseProgram( input_thread_t * p_input );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open( vlc_object_t *p_this );
+static void Close( vlc_object_t *p_this );
+
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for dvb streams. This " \
@@ -206,63 +182,288 @@ vlc_module_begin();
     set_callbacks( Open, Close );
 vlc_module_end();
 
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static block_t *Block( access_t * );
+static int Control( access_t *, int, va_list );
+
+#define SATELLITE_READ_ONCE 3
+#if 0
+static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
+                              size_t i_len);
+static int     SetArea    ( input_thread_t *, input_area_t * );
+static int     SetProgram ( input_thread_t *, pgrm_descriptor_t * );
+static void    Seek       ( input_thread_t *, off_t );
+static void    AllocateDemux( input_thread_t * p_input, int i_pid,
+                              int i_type );
+static void    CloseProgram( input_thread_t * p_input );
+#endif
+
+static void FilterUnset( access_t *, int i_start, int i_max );
+static void FilterSet( access_t *, int i_pid, int i_type );
+
+static void VarInit( access_t * );
+static int  ParseMRL( access_t * );
+
+
 /*****************************************************************************
  * Open: open the frontend device
  *****************************************************************************/
-#define GET_OPTION_INT( option )                                            \
-    if ( !strncmp( psz_parser, option "=", strlen(option "=") ) )           \
-    {                                                                       \
-        val.i_int = strtol( psz_parser + strlen(option "="), &psz_parser,   \
-                            0 );                                            \
-        var_Set( p_input, "dvb-" option, val );                             \
-    }
-
-#define GET_OPTION_BOOL( option )                                           \
-    if ( !strncmp( psz_parser, option "=", strlen(option "=") ) )           \
-    {                                                                       \
-        val.b_bool = strtol( psz_parser + strlen(option "="), &psz_parser,  \
-                             0 );                                           \
-        var_Set( p_input, "dvb-" option, val );                             \
-    }
-
 static int Open( vlc_object_t *p_this )
 {
-    input_thread_t *    p_input = (input_thread_t *)p_this;
-    thread_dvb_data_t * p_dvb;
-    char *              psz_parser;
-    char *              psz_next;
-    vlc_value_t         val;
-    int                 i_test;
+    access_t     *p_access = (access_t*)p_this;
+    access_sys_t *p_sys;
 
-    /* Initialize structure */
-    p_dvb = (thread_dvb_data_t *)malloc( sizeof( thread_dvb_data_t ) );
-    if( p_dvb == NULL )
+    /* Only if selected */
+    if( *p_access->psz_acces == '\0' )
+        return VLC_EGENERIC;
+
+    /* Set up access */
+    p_access->pf_read = NULL;
+    p_access->pf_block = Block;
+    p_access->pf_control = Control;
+    p_access->pf_seek = NULL;
+    p_access->info.i_update = 0;
+    p_access->info.i_size = 0;
+    p_access->info.i_pos = 0;
+    p_access->info.b_eof = VLC_FALSE;
+    p_access->info.i_title = 0;
+    p_access->info.i_seekpoint = 0;
+
+    p_access->p_sys = p_sys = malloc( sizeof( access_sys_t ) );
+    memset( p_sys, 0, sizeof( access_sys_t ) );
+
+    /* Create all variables */
+    VarInit( p_access );
+
+    /* Parse the command line */
+    if( ParseMRL( p_access ) )
     {
-        msg_Err( p_input, "out of memory" );
-        return -1;
+        free( p_sys );
+        return VLC_EGENERIC;
     }
-    memset( p_dvb, 0, sizeof(thread_dvb_data_t) );
-    p_input->p_access_data = (void *)p_dvb;
 
-    /* Register callback functions */
-    p_input->pf_read = Read;
-    p_input->pf_set_program = SetProgram;
-    p_input->pf_set_area = SetArea;
-    p_input->pf_seek = Seek;
-
-    /* Parse the options passed in command line */
-
-    psz_parser = strdup( p_input->psz_name );
-    if ( !psz_parser )
+    /* Getting frontend info */
+    if( E_(FrontendOpen)( p_access) )
     {
-        free( p_dvb );
-        return( -1 );
+        free( p_sys );
+        return VLC_EGENERIC;
     }
 
+    /* Setting frontend parameters for tuning the hardware */
+    msg_Dbg( p_access, "trying to tune the frontend...");
+    if( E_(FrontendSet)( p_access ) < 0 )
+    {
+        E_(FrontendClose)( p_access );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    /* Opening DVR device */
+    if( E_(DVROpen)( p_access ) < 0 )
+    {
+        E_(FrontendClose)( p_access );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    p_sys->b_budget_mode = var_GetBool( p_access, "dvb-budget-mode" );
+    if( p_sys->b_budget_mode )
+    {
+        msg_Dbg( p_access, "setting filter on all PIDs" );
+        AllocateDemux( p_access, 0x2000, OTHER_TYPE );
+    }
+    else
+    {
+        msg_Dbg( p_access, "setting filter on PAT" );
+        AllocateDemux( p_access, 0x0, OTHER_TYPE );
+    }
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Close : Close the device
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    access_t     *p_access = (access_t*)p_this;
+    access_sys_t *p_sys = p_access->p_sys;
+
+    FilterUnset( p_access, 0, p_sys->b_budget_mode ? 1 : MAX_DEMUX );
+
+    E_(DVRClose)( p_access );
+    E_(FrontendClose)( p_access );
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * Block:
+ *****************************************************************************/
+static block_t *Block( access_t *p_access )
+{
+    access_t     *p_access = (access_t*)p_this;
+    access_sys_t *p_sys = p_access->p_sys;
+    struct timeval timeout;
+    fd_set fds;
+    int i_ret;
+    block_t *p_block;
+
+    /* Initialize file descriptor set */
+    FD_ZERO( &fds );
+    FD_SET( p_sys->i_handle, &fds );
+
+    /* We'll wait 0.5 second if nothing happens */
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 500000;
+
+    /* Find if some data is available */
+    while( (i_ret = select( p_sys->i_handle + 1, &fds, NULL, NULL, &timeout )) == 0 ||
+           (i_ret < 0 && errno == EINTR) )
+    {
+        FD_ZERO( &fds );
+        FD_SET( p_sys->i_handle, &fds );
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 500000;
+
+        if( p_access->b_die )
+            return NULL;
+    }
+
+    if ( i_ret < 0 )
+    {
+        msg_Err( p_input, "select error (%s)", strerror(errno) );
+        return NULL;
+    }
+
+    p_block = block_New( p_access, p_sys->i_mtu );
+    if( ( p_block->i_buffer = read( p_sys->i_handle, p_block->p_buffer, SATELLITE_READ_ONCE * TS_PACKET_SIZE ) ) <= 0 )
+    {
+        msg_Err( p_input, "read failed (%s)", strerror(errno) );
+        block_Release( p_block );
+        return NULL;
+    }
+
+    return p_block;
+}
+
+/*****************************************************************************
+ * Control:
+ *****************************************************************************/
+static int Control( access_t *p_access, int i_query, va_list args )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    vlc_bool_t   *pb_bool, b_bool;
+    int          *pi_int, i_int;
+    int64_t      *pi_64;
+    vlc_value_t  val;
+
+    switch( i_query )
+    {
+        /* */
+        case ACCESS_CAN_SEEK:
+        case ACCESS_CAN_FASTSEEK:
+        case ACCESS_CAN_PAUSE:
+        case ACCESS_CAN_CONTROL_PACE:
+            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
+            *pb_bool = VLC_FALSE;
+            break;
+        /* */
+        case ACCESS_GET_MTU:
+            pi_int = (int*)va_arg( args, int * );
+            *pi_int = SATELLITE_READ_ONCE * TS_PACKET_SIZE;
+            break;
+
+        case ACCESS_GET_PTS_DELAY:
+            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            *pi_64 = var_GetInteger( p_access, "dvb-caching" ) * 1000;
+            break;
+
+        /* */
+        case ACCESS_SET_PAUSE_STATE:
+        case ACCESS_GET_TITLE_INFO:
+        case ACCESS_SET_TITLE:
+        case ACCESS_SET_SEEKPOINT:
+            return VLC_EGENERIC;
+
+        case ACCESS_SET_PRIVATE_ID_STATE:
+            b_bool = (vlc_bool_t)va_arg( args, vlc_bool_t ); /* b_selected */
+            i_int  = (int)va_arg( args, int );               /* Private data (pid for now)*/
+            if( !p_sys->b_budget_mode )
+            {
+                /* FIXME we may want to give the real type (me ?, I don't ;) */
+                if( b_bool )
+                    FilterSet( p_access, i_int, OTHER_TYPE );
+                else
+                    FilterUnset( p_access, i_int, i_int+1 );
+            }
+            break;
+
+        default:
+            msg_Err( p_access, "unimplemented query in control" );
+            return VLC_EGENERIC;
+
+    }
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * FilterSet/FilterUnset:
+ *****************************************************************************/
+static void FilterSet( access_t *p_access, int i_pid, int i_type );
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i;
+
+    /* Find first free slot */
+    for( i = 0; i < MAX_DEMUX; i++ )
+    {
+        if( !p_sys->p_demux_handles[i].i_type )
+            break;
+    }
+
+    if( i >= MAX_DEMUX )
+    {
+        msg_Err( p_access, "no free p_demux_handles !" );
+        return;
+    }
+
+    if( E_(DMXSetFilter)( p_access, i_pid,
+                           &p_sys->p_demux_handles[i].i_handle, i_type ) )
+    {
+        msg_Err( p_access, "DMXSetFilter failed" );
+        return;
+    }
+    p_sys->p_demux_handles[i].i_type = i_type;
+    p_sys->p_demux_handles[i].i_pid = i_pid;
+}
+
+static void FilterUnset( access_t *p_access, int i_start, int i_max )
+{
+    access_sys_t *p_sys = p_access->p_sys;
+    int i;
+
+    for( i = i_start; i < i_max; i++ )
+    {
+        if( p_sys->p_demux_handles[i].i_type )
+        {
+            E_(DMXUnsetFilter)( p_access, p_sys->p_demux_handles[i].i_handle );
+            p_sys->p_demux_handles[i].i_type = 0;
+        }
+    }
+}
+
+/*****************************************************************************
+ * VarInit/ParseMRL:
+ *****************************************************************************/
+static void VarInit( access_t *p_access )
+{
+    /* */
     var_Create( p_input, "dvb-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_input, "dvb-caching", &val );
-    p_input->i_pts_delay = val.i_int * 1000;
 
+    /* */
     var_Create( p_input, "dvb-adapter", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-device", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-frequency", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -272,6 +473,7 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_input, "dvb-lnb-lof2", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-lnb-slof", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
+    /* */
     var_Create( p_input, "dvb-budget-mode", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-satno", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-voltage", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -279,407 +481,119 @@ static int Open( vlc_object_t *p_this )
     var_Create( p_input, "dvb-fec", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-srate", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
+    /* */
     var_Create( p_input, "dvb-modulation", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
+    /* */
     var_Create( p_input, "dvb-code-rate-hp", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-code-rate-lp", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-bandwidth", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-transmission", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-guard", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_input, "dvb-hierarchy", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+}
 
-    i_test = strtol( psz_parser, &psz_next, 10 );
-    if ( psz_next == psz_parser )
+/* */
+static int ParseMRL( access_t *p_access )
+{
+    char *psz_dup = strdup( p_input->psz_path );
+    char *psz_parser = psz_dup;
+    char *psz_next;
+    vlc_value_t         val;
+
+#define GET_OPTION_INT( option )                                            \
+    if ( !strncmp( psz_parser, option "=", strlen(option "=") ) )           \
+    {                                                                       \
+        val.i_int = strtol( psz_parser+strlen(option "="), &psz_parser, 0 );\
+        var_Set( p_access, "dvb-" option, val );                             \
+    }
+
+#define GET_OPTION_BOOL( option )                                           \
+    if ( !strncmp( psz_parser, option "=", strlen(option "=") ) )           \
+    {                                                                       \
+        val.b_bool = strtol( psz_parser + strlen(option "="), &psz_parser,  \
+                             0 );                                           \
+        var_Set( p_access, "dvb-" option, val );                             \
+    }
+
+    /* Test for old syntax */
+    strtol( psz_parser, &psz_next, 10 );
+    if( psz_next != psz_parser )
     {
-        for ( ; ; )
+        msg_Err( p_access, "the DVB input old syntax is deprecated, use vlc "
+                          "-p dvb to see an explanation of the new syntax" );
+        free( psz_dup );
+        return VLC_EGENERIC;
+    }
+
+    while( *psz_parser )
+    {
+        GET_OPTION_INT("adapter")
+        else GET_OPTION_INT("device")
+        else GET_OPTION_INT("frequency")
+        else GET_OPTION_INT("inversion")
+        else GET_OPTION_BOOL("probe")
+        else GET_OPTION_INT("lnb-lof1")
+        else GET_OPTION_INT("lnb-lof2")
+        else GET_OPTION_INT("lnb-slof")
+
+        else GET_OPTION_BOOL("budget-mode")
+        else GET_OPTION_INT("voltage")
+        else GET_OPTION_INT("tone")
+        else GET_OPTION_INT("fec")
+        else GET_OPTION_INT("srate")
+
+        else GET_OPTION_INT("modulation")
+
+        else GET_OPTION_INT("code-rate-hp")
+        else GET_OPTION_INT("code-rate-lp")
+        else GET_OPTION_INT("bandwidth")
+        else GET_OPTION_INT("transmission")
+        else GET_OPTION_INT("guard")
+        else GET_OPTION_INT("hierarchy")
+
+        else if( !strncmp( psz_parser, "satno=",
+                           strlen( "satno=" ) ) )
         {
-            GET_OPTION_INT("adapter")
-            else GET_OPTION_INT("device")
-            else GET_OPTION_INT("frequency")
-            else GET_OPTION_INT("inversion")
-            else GET_OPTION_BOOL("probe")
-            else GET_OPTION_INT("lnb-lof1")
-            else GET_OPTION_INT("lnb-lof2")
-            else GET_OPTION_INT("lnb-slof")
-
-            else GET_OPTION_BOOL("budget-mode")
-            else GET_OPTION_INT("voltage")
-            else GET_OPTION_INT("tone")
-            else GET_OPTION_INT("fec")
-            else GET_OPTION_INT("srate")
-
-            else GET_OPTION_INT("modulation")
-
-            else GET_OPTION_INT("code-rate-hp")
-            else GET_OPTION_INT("code-rate-lp")
-            else GET_OPTION_INT("bandwidth")
-            else GET_OPTION_INT("transmission")
-            else GET_OPTION_INT("guard")
-            else GET_OPTION_INT("hierarchy")
-
-            else if( !strncmp( psz_parser, "satno=",
-                               strlen( "satno=" ) ) )
-            {
-                psz_parser += strlen( "satno=" );
-                if ( *psz_parser == 'A' || *psz_parser == 'a' )
-                    val.i_int = -1;
-                else if ( *psz_parser == 'B' || *psz_parser == 'b' )
-                    val.i_int = -2;
-                else
-                    val.i_int = strtol( psz_parser, &psz_parser, 0 );
-                var_Set( p_input, "dvb-satno", val );
-            }
-            /* Redundant with voltage but much easier to use */
-            else if( !strncmp( psz_parser, "polarization=",
-                               strlen( "polarization=" ) ) )
-            {
-                psz_parser += strlen( "polarization=" );
-                if ( *psz_parser == 'V' || *psz_parser == 'v' )
-                    val.i_int = 13;
-                else if ( *psz_parser == 'H' || *psz_parser == 'h' )
-                    val.i_int = 18;
-                else
-                {
-                    msg_Err( p_input, "illegal polarization %c", *psz_parser );
-                    free( p_dvb );
-                    return -1;
-                }
-                var_Set( p_input, "dvb-voltage", val );
-            }
-            if ( *psz_parser )
-                psz_parser++;
+            psz_parser += strlen( "satno=" );
+            if ( *psz_parser == 'A' || *psz_parser == 'a' )
+                val.i_int = -1;
+            else if ( *psz_parser == 'B' || *psz_parser == 'b' )
+                val.i_int = -2;
             else
-                break;
+                val.i_int = strtol( psz_parser, &psz_parser, 0 );
+            var_Set( p_access, "dvb-satno", val );
         }
-    }
-    else
-    {
-        msg_Err( p_input, "the DVB input old syntax is deprecated, use vlc " \
-                 "-p dvb to see an explanation of the new syntax" );
-        free( p_dvb );
-        return -1;
-    }
-
-    /* Getting frontend info */
-    if ( E_(FrontendOpen)( p_input ) < 0 )
-    {
-        free( p_dvb );
-        return -1;
-    }
-
-    /* Setting frontend parameters for tuning the hardware */      
-    msg_Dbg( p_input, "trying to tune the frontend...");
-    if ( E_(FrontendSet)( p_input ) < 0 )
-    {
-        E_(FrontendClose)( p_input );
-        free( p_dvb );
-        return -1;
-    }
-
-    /* Opening DVR device */      
-    if ( E_(DVROpen)( p_input ) < 0 )
-    {
-        E_(FrontendClose)( p_input );
-        free( p_dvb );
-        return -1;
-    }
-
-    var_Get( p_input, "dvb-budget-mode", &val );
-    p_dvb->b_budget_mode = val.b_bool;
-    if ( val.b_bool )
-    {
-        msg_Dbg( p_input, "setting filter on all PIDs" );
-        AllocateDemux( p_input, 0x2000, OTHER_TYPE );
-    }
-    else
-    {
-        msg_Dbg( p_input, "setting filter on PAT" );
-        AllocateDemux( p_input, 0x0, OTHER_TYPE );
-    }
-
-    if( input_InitStream( p_input, sizeof( stream_ts_data_t ) ) == -1 )
-    {
-        msg_Err( p_input, "could not initialize stream structure" );
-	E_(FrontendClose)( p_input );
-        close( p_dvb->i_handle );
-        free( p_dvb );
-        return( -1 );
-    }
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    p_input->stream.b_pace_control = 0;
-    p_input->stream.b_seekable = 0;
-    p_input->stream.p_selected_area->i_tell = 0;
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    p_input->i_mtu = SATELLITE_READ_ONCE * TS_PACKET_SIZE;
-    p_input->stream.i_method = INPUT_METHOD_SATELLITE;
-
-    return 0;
-}
-
-/*****************************************************************************
- * Close : Close the device
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    input_thread_t *    p_input = (input_thread_t *)p_this;
-    thread_dvb_data_t * p_dvb = (thread_dvb_data_t *)p_input->p_access_data;
-
-    if ( !p_dvb->b_budget_mode )
-    {
-        CloseProgram( p_input );
-    }
-    if ( p_dvb->p_demux_handles[0].i_type )
-    {
-        E_(DMXUnsetFilter)( p_input, p_dvb->p_demux_handles[0].i_handle );
-        p_dvb->p_demux_handles[0].i_type = 0;
-    }
-    E_(DVRClose)( p_input );
-    E_(FrontendClose)( p_input );
-    free( p_dvb );
-}
-
-/*****************************************************************************
- * Read: reads data from the satellite card
- *****************************************************************************/
-static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer,
-                     size_t i_len )
-{
-    thread_dvb_data_t * p_dvb = (thread_dvb_data_t *)p_input->p_access_data;
-    ssize_t i_ret;
-    vlc_value_t val;
-    struct timeval timeout;
-    fd_set fds;
-
-    if ( !p_dvb->b_budget_mode && !p_dvb->p_demux_handles[1].i_type )
-    {
-        int i_program;
-        unsigned int i;
-        var_Get( p_input, "program", &val );
-        i_program = val.i_int;
-
-        /* FIXME : this is not demux2-compatible */
-        for ( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+        /* Redundant with voltage but much easier to use */
+        else if( !strncmp( psz_parser, "polarization=",
+                           strlen( "polarization=" ) ) )
         {
-            /* Only set a filter on the selected program : some boards
-             * (read: Dreambox) only have 8 filters, so you don't want to
-             * spend them on unwanted PMTs. --Meuuh */
-            if ( !i_program
-                   || p_input->stream.pp_programs[i]->i_number == i_program )
+            psz_parser += strlen( "polarization=" );
+            if ( *psz_parser == 'V' || *psz_parser == 'v' )
+                val.i_int = 13;
+            else if ( *psz_parser == 'H' || *psz_parser == 'h' )
+                val.i_int = 18;
+            else
             {
-                msg_Dbg( p_input, "setting filter on PMT pid %d",
-                         p_input->stream.pp_programs[i]->pp_es[0]->i_id );
-                AllocateDemux( p_input,
-                        p_input->stream.pp_programs[i]->pp_es[0]->i_id,
-                        OTHER_TYPE );
+                msg_Err( p_access, "illegal polarization %c", *psz_parser );
+                free( psz_dup );
+                return VLC_EGENERIC;
             }
+            var_Set( p_access, "dvb-voltage", val );
         }
-    }
-
-    /* Find if some data is available. This won't work under Windows. */
-
-    /* Initialize file descriptor set */
-    FD_ZERO( &fds );
-    FD_SET( p_dvb->i_handle, &fds );
-
-    /* We'll wait 0.5 second if nothing happens */
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500000;
-
-    /* Find if some data is available */
-    while ( (i_ret = select( p_dvb->i_handle + 1, &fds,
-                             NULL, NULL, &timeout )) == 0
-             || (i_ret < 0 && errno == EINTR) )
-    {
-        FD_ZERO( &fds );
-        FD_SET( p_dvb->i_handle, &fds );
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 500000;
-
-        if ( p_input->b_die || p_input->b_error )
+        else
         {
-            return 0;
+            msg_Err( p_access, "unknown option (%d)", psz_parser );
+            free( psz_dup );
+            return VLC_EGENERIC;
         }
-    }
 
-    if ( i_ret < 0 )
-    {
-#ifdef HAVE_ERRNO_H
-        msg_Err( p_input, "select error (%s)", strerror(errno) );
-#else
-        msg_Err( p_input, "select error" );
-#endif
-        return -1;
+        psz_parser++;
     }
+#undef GET_OPTION_INT
+#undef GET_OPTION_BOOL
 
-    i_ret = read( p_dvb->i_handle, p_buffer, i_len );
- 
-    if( i_ret < 0 )
-    {
-#ifdef HAVE_ERRNO_H
-        msg_Err( p_input, "read failed (%s)", strerror(errno) );
-#else
-        msg_Err( p_input, "read failed" );
-#endif
-    }
-
-    return i_ret;
+    free( psz_dup );
+    return VLC_SUCCESS;
 }
-
-/*****************************************************************************
- * SetArea : Does nothing
- *****************************************************************************/
-static int SetArea( input_thread_t * p_input, input_area_t * p_area )
-{
-    return -1;
-}
-
-/*****************************************************************************
- * SetProgram : Sets the card filters according to the selected program,
- *              and makes the appropriate changes to stream structure.
- *****************************************************************************/
-static int SetProgram( input_thread_t    * p_input,
-                       pgrm_descriptor_t * p_new_prg )
-{
-    thread_dvb_data_t * p_dvb = (thread_dvb_data_t *)p_input->p_access_data;
-    unsigned int i_es_index;
-    vlc_value_t val;
-    int i_video_type = VIDEO0_TYPE;
-    int i_audio_type = AUDIO0_TYPE;
-
-    if ( p_input->stream.p_selected_program )
-    {
-        for ( i_es_index = 0; /* 0 should be the PMT */
-                i_es_index < p_input->stream.p_selected_program->i_es_number;
-                i_es_index ++ )
-        {
-#define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
-            if ( p_es->p_dec )
-            {
-                input_UnselectES( p_input , p_es );
-            }
-#undef p_es
-        }
-    }
-
-    if ( !p_dvb->b_budget_mode )
-    {
-        msg_Dbg( p_input, "unsetting filters on all pids" );
-        CloseProgram( p_input );
-        msg_Dbg( p_input, "setting filter on PMT pid %d",
-                 p_new_prg->pp_es[0]->i_id );
-        AllocateDemux( p_input, p_new_prg->pp_es[0]->i_id, OTHER_TYPE );
-    }
-
-    for ( i_es_index = 1; i_es_index < p_new_prg->i_es_number;
-          i_es_index++ )
-    {
-#define p_es p_new_prg->pp_es[i_es_index]
-        switch( p_es->i_cat )
-        {
-        case VIDEO_ES:
-            if ( !p_dvb->b_budget_mode )
-            {
-                msg_Dbg(p_input, "setting filter on video ES 0x%x",
-                        p_es->i_id);
-                /* Always set the filter. This may seem a little odd, but
-                 * it allows you to stream the video with demuxstream
-                 * without having a decoder or a stream output behind.
-                 * The result is you'll sometimes filter a PID which you
-                 * don't really want, but in the most common cases it
-                 * should be OK. --Meuuh */
-                AllocateDemux( p_input, p_es->i_id, i_video_type );
-                i_video_type += TYPE_INTERVAL;
-            }
-            input_SelectES( p_input, p_es );
-            break;
-
-        case AUDIO_ES:
-            if ( !p_dvb->b_budget_mode )
-            {
-                msg_Dbg(p_input, "setting filter on audio ES 0x%x",
-                        p_es->i_id);
-                AllocateDemux( p_input, p_es->i_id, i_audio_type );
-                i_audio_type += TYPE_INTERVAL;
-            }
-            input_SelectES( p_input, p_es );
-            break;
-        default:
-            if ( !p_dvb->b_budget_mode )
-            {
-                msg_Dbg(p_input, "setting filter on other ES 0x%x",
-                        p_es->i_id);
-                AllocateDemux( p_input, p_es->i_id, OTHER_TYPE );
-            }
-            input_SelectES( p_input, p_es );
-            break;
-        }
-#undef p_es
-    }
-
-    p_input->stream.p_selected_program = p_new_prg;
-
-    /* Update the navigation variables without triggering a callback */
-    val.i_int = p_new_prg->i_number;
-    var_Change( p_input, "program", VLC_VAR_SETVALUE, &val, NULL );
-
-    return 0;
-}
-
-/*****************************************************************************
- * Seek: does nothing (not a seekable stream
- *****************************************************************************/
-static void Seek( input_thread_t * p_input, off_t i_off )
-{
-    ;
-}
-
-/*****************************************************************************
- * AllocateDemux:
- *****************************************************************************/
-static void AllocateDemux( input_thread_t * p_input, int i_pid,
-                           int i_type )
-{
-    thread_dvb_data_t * p_dvb = (thread_dvb_data_t *)p_input->p_access_data;
-    int                 i;
-
-    /* Find first free slot */
-    for ( i = 0; i < MAX_DEMUX; i++ )
-    {
-        if ( !p_dvb->p_demux_handles[i].i_type )
-        {
-            if ( E_(DMXSetFilter)( p_input, i_pid,
-                                   &p_dvb->p_demux_handles[i].i_handle,
-                                   i_type ) < 0 )
-            {
-                break;
-            }
-            p_dvb->p_demux_handles[i].i_type = i_type;
-            p_dvb->p_demux_handles[i].i_pid = i_pid;
-            break;
-        }
-    }
-}
-
-/*****************************************************************************
- * CloseProgram:
- *****************************************************************************/
-static void CloseProgram( input_thread_t * p_input )
-{
-    thread_dvb_data_t * p_dvb = (thread_dvb_data_t *)p_input->p_access_data;
-    int                 i;
-
-    for ( i = 1; i < MAX_DEMUX; i++ )
-    {
-        if ( p_dvb->p_demux_handles[i].i_type )
-        {
-            E_(DMXUnsetFilter)( p_input, p_dvb->p_demux_handles[i].i_handle );
-            p_dvb->p_demux_handles[i].i_type = 0;
-        }
-    }
-}
-
 

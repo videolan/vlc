@@ -34,40 +34,43 @@
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
-typedef struct demux_handle_t
+typedef struct
 {
     int i_pid;
     int i_handle;
     int i_type;
 } demux_handle_t;
 
+typedef struct frontend_t frontend_t;
+
 #define MAX_DEMUX 24
 
-typedef struct thread_dvb_data_t
+struct access_t
 {
     int i_handle;
     demux_handle_t p_demux_handles[MAX_DEMUX];
-    void * p_frontend;
+    frontend_t *p_frontend;
     vlc_bool_t b_budget_mode;
-} thread_dvb_data_t;
+};
 
-#define VIDEO0_TYPE 1
-#define AUDIO0_TYPE 2
-#define TELETEXT0_TYPE 3
-#define SUBTITLE0_TYPE 4
-#define PCR0_TYPE 5
-#define TYPE_INTERVAL 5
-#define OTHER_TYPE 21
+#define VIDEO0_TYPE     1
+#define AUDIO0_TYPE     2
+#define TELETEXT0_TYPE  3
+#define SUBTITLE0_TYPE  4
+#define PCR0_TYPE       5
+#define TYPE_INTERVAL   5
+#define OTHER_TYPE     21
 
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int E_(FrontendOpen)( input_thread_t * p_input );
-void E_(FrontendClose)( input_thread_t * p_input );
-int E_(FrontendSet)( input_thread_t * p_input );
-int E_(DMXSetFilter)( input_thread_t * p_input, int i_pid, int * pi_fd,
-		      int i_type );
-int E_(DMXUnsetFilter)( input_thread_t * p_input, int i_fd );
-int E_(DVROpen)( input_thread_t * p_input );
-void E_(DVRClose)( input_thread_t * p_input );
+int  E_(FrontendOpen)( access_t * );
+int  E_(FrontendSet)( access_t * );
+void E_(FrontendClose)( access_t * );
+
+int E_(DMXSetFilter)( access_t *, int i_pid, int * pi_fd, int i_type );
+int E_(DMXUnsetFilter)( access_t *, int i_fd );
+
+int  E_(DVROpen)( access_t * );
+void E_(DVRClose)( access_t * );
 
