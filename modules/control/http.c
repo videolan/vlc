@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.33 2003/11/12 02:56:13 garf Exp $
+ * $Id: http.c,v 1.34 2003/11/16 20:41:36 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -931,6 +931,9 @@ static mvar_t *mvar_PlaylistSetNew( char *name, playlist_t *p_pl )
         mvar_AppendNewVar( itm, "index", value );
 
         mvar_AppendNewVar( itm, "name", p_pl->pp_items[i]->psz_name );
+
+        sprintf( value, "%d", p_pl->pp_items[i]->i_group );
+        mvar_AppendNewVar( itm, "group", value );
 
         mvar_AppendVar( s, itm );
     }
@@ -2951,7 +2954,7 @@ playlist_item_t * parse_MRL( char *psz )
         p_item = malloc( sizeof( playlist_item_t ) );
 
         p_item->psz_name   = mrl;
-        p_item->psz_uri    = mrl;
+        p_item->psz_uri    = strdup( mrl );
         p_item->psz_author = strdup( "" );
         p_item->i_duration = -1;
         p_item->i_type = 0;
