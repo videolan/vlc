@@ -23,20 +23,20 @@ chapters.
   <sect1> <title> Decoder configuration </title>
 
     <para>
-The input thread spawns the appropriate decoders [the relation is
-currently hard-wired in <filename>src/input/input_programs.c</filename>].
-It then launches <function> *_CreateThread()</function>, with either
-an <type>adec_config_t</type> (audio) or an <type> vdec_config_t</type>
-(video) structure, described in <filename> include/input_ext-dec.h</filename>.
+The input thread spawns the appropriate decoder modules from <filename>
+src/input/input_dec.c</filename>. The <function>Dec_CreateThread</funcion>
+function selects the more accurate decoder module. Each decoder module 
+looks at decoder_config.i_type and returns a score [ see the modules 
+section ]. It then launches <function> module.pf_RunThread()</function>, 
+with an <type>decoder_config_t</type> (audio) or an <type> vdec_config_t
+</type>, described in <filename> include/input_ext-dec.h</filename>.
     </para>
 
     <para>
-It contains some parameters relative to the output thread, which will
-be described in the following chapters, and a generic <type>
-decoder_config_t</type>, which gives the decoder the ES ID and type, and
-pointers to a <type> stream_control_t </type> structure (gives
-information on the play status), a <type> decoder_fifo_t </type>
-and <parameter> pf_init_bit_stream</parameter>, which will be
+The generic <type>decoder_config_t</type> structure, gives the decoder 
+the ES ID and type, and pointers to a <type> stream_control_t </type> 
+structure (gives information on the play status), a <type> decoder_fifo_t 
+</type> and <parameter> pf_init_bit_stream</parameter>, which will be
 described in the next two sections.
     </para>
 
@@ -379,7 +379,8 @@ seven methods :
 
         <itemizedlist>
           <listitem> <para> <function> vdec_IDCT </function> <parameter>
-          ( vdec_thread_t * p_vdec, dctelem_t * p_block, int ) </parameter> :
+          ( decoder_config_t * p_config, dctelem_t * p_block, int ) 
+          </parameter> : 
           Does the complete 2-D IDCT. 64 coefficients are in <parameter>
           p_block</parameter>.
           </para> </listitem>

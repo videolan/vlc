@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.13 2001/07/18 14:21:00 massiot Exp $
+ * $Id: input_dec.c,v 1.14 2001/11/13 12:09:18 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,14 +41,44 @@
 #include "input_ext-intf.h"
 #include "input_ext-plugins.h"
 
+#include "modules.h"
+
 /*****************************************************************************
  * input_RunDecoder: spawns a new decoder thread
  *****************************************************************************/
-vlc_thread_t input_RunDecoder( decoder_capabilities_t * p_decoder,
-                               void * p_data )
+vlc_thread_t input_RunDecoder( void * p_data )
 {
-    return( p_decoder->pf_create_thread( p_data ) );
+    decoder_config_t *  p_config;
+    probedata_t         probedata;
+
+    p_config = (decoder_config_t *)p_data;
+    
+    probedata.i_type = p_config->i_type;
+    p_config->p_dec_module = module_Need( 
+            MODULE_CAPABILITY_DEC, &probedata);
+    if( p_config->p_dec_module == NULL )
+    {
+        intf_ErrMsg( "dec error: no suitable dec module for type 0x%x",
+                      p_config->i_type );
+        return( 0 );
+    }
+
+    /* Spawn the decoder thread */
+    if ( vlc_thread_create(&p_config->thread_id, 
+         "decoder", (vlc_thread_func_t)p_config->p_dec_module->
+            p_functions->dec.functions.dec.pf_RunThread, (void *)p_config) ) 
+    {
+        intf_ErrMsg( "dec error: can't spawn decoder thread \"%s\"",
+                     p_config->p_dec_module->psz_name );
+        return( 0 );
+    }
+
+    intf_DbgMsg( "dec debug: decoder \"%s\"thread (%p) created", 
+                 p_config->p_dec_module->psz_name, p_dec );
+    
+    return p_config->thread_id;
 }
+
 
 /*****************************************************************************
  * input_EndDecoder: kills a decoder thread and waits until it's finished
@@ -77,6 +107,9 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
 //    vlc_mutex_unlock( &p_input->stream.stream_lock );
     vlc_thread_join( p_es->thread_id );
 //    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+    /* Unneed module*/
+    module_Unneed( p_es->p_dec_config->p_dec_module );
 
     /* Freeing all packets still in the decoder fifo. */
     while( !DECODER_FIFO_ISEMPTY( *p_es->p_decoder_fifo ) )

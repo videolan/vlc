@@ -3699,8 +3699,8 @@ fi
 
 ARCH=${target_cpu}
 
-BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion imdct downmix"
-PLUGINS="${PLUGINS}"
+BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion imdct downmix mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
+PLUGINS="${PLUGINS} ac3_spdif spu_dec"
 
 MMX_MODULES="yuvmmx idctmmx motionmmx"
 MMXEXT_MODULES="idctmmxext motionmmxext"

@@ -295,8 +295,8 @@ ARCH=${target_cpu}
 dnl
 dnl  default modules
 dnl
-BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion imdct downmix"
-PLUGINS="${PLUGINS}"
+BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion imdct downmix mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
+PLUGINS="${PLUGINS} ac3_spdif spu_dec"
 
 dnl
 dnl  Accelerated modules

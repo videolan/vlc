@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.47 2001/11/08 21:07:24 jlj Exp $
+ * $Id: common.h,v 1.48 2001/11/13 12:09:17 henri Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -85,6 +85,7 @@ typedef struct plugin_info_s *          p_plugin_info_t;
 /* Plugins */
 struct playlist_s;
 struct playlist_item_s;
+struct module_s;
 
 typedef struct playlist_s *             p_playlist_t;
 typedef struct playlist_item_s *        p_playlist_item_t;
@@ -125,6 +126,7 @@ struct vout_sys_s;
 struct vdec_thread_s;
 struct vpar_thread_s;
 struct video_parser_s;
+struct picture_t;
 
 typedef struct vout_thread_s *          p_vout_thread_t;
 typedef struct vout_font_s *            p_vout_font_t;
@@ -138,6 +140,13 @@ struct macroblock_s;
 struct data_packet_s;
 struct es_descriptor_s;
 struct pgrm_descriptor_s;
+struct pes_packet_s;
+struct input_area_s;
+struct bit_stream_s;
+
+/* Decoders */
+struct decoder_config_s;
+struct decoder_fifo_s;
 
 /*****************************************************************************
  * Macros and inline functions

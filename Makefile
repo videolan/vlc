@@ -13,7 +13,9 @@ endif
 # 
 # All possible plugin directories, needed for make clean
 #
-PLUGINS_DIR :=	alsa \
+PLUGINS_DIR :=	ac3_adec \
+		ac3_spdif \
+		alsa \
 		beos \
 		darwin \
 		directx \
@@ -29,21 +31,24 @@ PLUGINS_DIR :=	alsa \
 		idct \
 		imdct \
 		kde \
+		lpcm_adec \
 		macosx \
 		mga \
 		motion \
 		mpeg \
+		mpeg_adec \
+		mpeg_vdec \
 		qt \
 		sdl \
+		spu_dec \
 		text \
 		vcd \
 		x11 \
 		yuv
 
-#
-# All possible plugin objects
-#
-PLUGINS_TARGETS := alsa/alsa \
+PLUGINS_TARGETS := ac3_adec/ac3_adec \
+		ac3_spdif/ac3_spdif \
+		alsa/alsa \
 		beos/beos \
 		darwin/darwin \
 		directx/directx \
@@ -69,6 +74,7 @@ PLUGINS_TARGETS := alsa/alsa \
 		imdct/imdct3dn \
 		imdct/imdctsse \
 		kde/kde \
+		lpcm_adec/lpcm_adec \
 		macosx/macosx \
 		macosx/macosx_qt \
 		mga/mga \
@@ -77,11 +83,14 @@ PLUGINS_TARGETS := alsa/alsa \
 		motion/motionmmxext \
 		motion/motion3dnow \
 		motion/motionaltivec \
+		mpeg_adec/mpeg_adec \
+		mpeg_vdec/mpeg_vdec \
 		mpeg/es \
 		mpeg/ps \
 		mpeg/ts \
 		qt/qt \
 		sdl/sdl \
+		spu_dec/spu_dec \
 		text/ncurses \
 		text/rc \
 		vcd/vcd \
@@ -89,7 +98,6 @@ PLUGINS_TARGETS := alsa/alsa \
 		x11/xvideo \
 		yuv/yuv \
 		yuv/yuvmmx
-
 #
 # C Objects
 # 
@@ -97,24 +105,12 @@ INTERFACE := main interface intf_msg intf_playlist intf_channels
 INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_netlist input_clock mpeg_system
 VIDEO_OUTPUT := video_output video_text video_spu video_yuv
 AUDIO_OUTPUT := audio_output aout_ext-dec aout_u8 aout_s8 aout_u16 aout_s16 aout_spdif
-AC3_DECODER := ac3_decoder_thread ac3_decoder ac3_parse ac3_exponent ac3_bit_allocate ac3_mantissa ac3_rematrix ac3_imdct
-AC3_SPDIF := ac3_spdif ac3_iec958
-LPCM_DECODER := lpcm_decoder_thread
-AUDIO_DECODER := audio_decoder adec_generic adec_layer1 adec_layer2 adec_math
-SPU_DECODER := spu_decoder
-VIDEO_DECODER := video_parser vpar_headers vpar_blocks vpar_synchro vpar_pool video_decoder
 MISC := mtime tests modules netutils iso_lang
 
 C_OBJ :=	$(INTERFACE:%=src/interface/%.o) \
 		$(INPUT:%=src/input/%.o) \
 		$(VIDEO_OUTPUT:%=src/video_output/%.o) \
 		$(AUDIO_OUTPUT:%=src/audio_output/%.o) \
-		$(AC3_DECODER:%=src/ac3_decoder/%.o) \
-		$(AC3_SPDIF:%=src/ac3_spdif/%.o) \
-		$(LPCM_DECODER:%=src/lpcm_decoder/%.o) \
-		$(AUDIO_DECODER:%=src/audio_decoder/%.o) \
-		$(SPU_DECODER:%=src/spu_decoder/%.o) \
-		$(VIDEO_DECODER:%=src/video_decoder/%.o) \
 		$(MISC:%=src/misc/%.o)
 
 #

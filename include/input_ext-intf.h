@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.46 2001/11/11 18:15:41 sam Exp $
+ * $Id: input_ext-intf.h,v 1.47 2001/11/13 12:09:17 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -75,6 +75,8 @@ typedef struct es_descriptor_s
 
     count_t                 c_packets;                 /* total packets read */
     count_t                 c_invalid_packets;       /* invalid packets read */
+
+    struct decoder_config_s * p_dec_config;
 } es_descriptor_t;
 
 /* Special PID values - note that the PID is only on 13 bits, and that values
@@ -83,16 +85,6 @@ typedef struct es_descriptor_s
 #define CONDITIONNAL_ACCESS_TABLE_PID   0x0001                   /* not used */
 #define EMPTY_ID                        0xffff    /* empty record in a table */
  
-/* ES streams types - see ISO/IEC 13818-1 table 2-29 numbers */
-#define MPEG1_VIDEO_ES      0x01
-#define MPEG2_VIDEO_ES      0x02
-#define MPEG1_AUDIO_ES      0x03
-#define MPEG2_AUDIO_ES      0x04
-#define AC3_AUDIO_ES        0x81
-/* These ones might violate the norm : */
-#define DVD_SPU_ES          0x82
-#define LPCM_AUDIO_ES       0x83
-#define UNKNOWN_ES          0xFF
 
 /* ES Categories to be used by interface plugins */
 #define VIDEO_ES        0x00

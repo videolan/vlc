@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.36 2001/10/03 12:46:17 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.37 2001/11/13 12:09:17 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -21,6 +21,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/* ES streams types - see ISO/IEC 13818-1 table 2-29 numbers */
+#define MPEG1_VIDEO_ES      0x01
+#define MPEG2_VIDEO_ES      0x02
+#define MPEG1_AUDIO_ES      0x03
+#define MPEG2_AUDIO_ES      0x04
+#define AC3_AUDIO_ES        0x81
+/* These ones might violate the norm : */
+#define DVD_SPU_ES          0x82
+#define LPCM_AUDIO_ES       0x83
+#define UNKNOWN_ES          0xFF
 
 /* Structures exported to the decoders */
 
@@ -203,9 +214,11 @@ typedef struct bit_stream_s
 /*****************************************************************************
  * Protoypes from input_ext-dec.c
  *****************************************************************************/
+#ifndef PLUGIN
 u32  UnalignedShowBits( struct bit_stream_s *, unsigned int );
 void UnalignedRemoveBits( struct bit_stream_s * );
 u32  UnalignedGetBits( struct bit_stream_s *, unsigned int );
+#endif
 
 /*****************************************************************************
  * AlignWord : fill in the bit buffer so that the byte pointer be aligned
@@ -517,53 +530,13 @@ typedef struct decoder_config_s
                  void (* pf_bitstream_callback)( struct bit_stream_s *,
                                                  boolean_t ),
                                                  void * );
+    /* Decoder thread */
+    vlc_thread_t        thread_id;
+
+    /* Plugin/Builtin properties */
+    struct module_s *   p_dec_module;
+
 } decoder_config_t;
-
-/*****************************************************************************
- * vdec_config_t
- *****************************************************************************
- * Pointers given to video decoders threads.
- *****************************************************************************/
-struct vout_thread_s;
-
-typedef struct vdec_config_s
-{
-    struct picture_s *   (* pf_create_picture)( struct vout_thread_s *,
-                                                int i_type, int i_width,
-                                                int i_height );
-    void                 (* pf_destroy_picture)( struct vout_thread_s *,
-                                                 struct picture_s * );
-    void                 (* pf_display_picture)( struct vout_thread_s *,
-                                                 struct picture_s * );
-    void                 (* pf_date_picture)( struct vout_thread_s *,
-                                              struct picture_s *, mtime_t date );
-    void                 (* pf_link_picture)( struct vout_thread_s *,
-                                              struct picture_s *, mtime_t date );
-    void                 (* pf_unlink_picture)( struct vout_thread_s *,
-                                                struct picture_s *, mtime_t date );
-    struct subpicture_s *(* pf_create_subpicture)( struct vout_thread_s *,
-                                                   int i_type, int i_size );
-    void                 (* pf_destroy_subpicture)( struct vout_thread_s *,
-                                                    struct subpicture_s * );
-    void                 (* pf_display_subpicture)( struct vout_thread_s *,
-                                                    struct subpicture_s * );
-
-    decoder_config_t        decoder_config;
-} vdec_config_t;
-
-/*****************************************************************************
- * adec_config_t
- *****************************************************************************
- * Pointers given to audio decoders threads.
- *****************************************************************************/
-typedef struct adec_config_s
-{
-    struct aout_fifo_s * (* pf_create_fifo)( struct aout_fifo_s * );
-    void                 (* pf_destroy_fifo)( void );
-
-    decoder_config_t        decoder_config;
-} adec_config_t;
-
 
 /*
  * Communication interface between decoders and input

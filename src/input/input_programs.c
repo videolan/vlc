@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.63 2001/10/03 15:10:55 sam Exp $
+ * $Id: input_programs.c,v 1.64 2001/11/13 12:09:18 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -553,44 +553,20 @@ static int InitDecConfig( input_thread_t * p_input, es_descriptor_t * p_es,
 }
 
 /*****************************************************************************
- * GetVdecConfig: returns a valid vdec_config_t
+ * GetDecConfig: returns a valid decoder_config_t
  *****************************************************************************/
-static vdec_config_t * GetVdecConfig( input_thread_t * p_input,
+static decoder_config_t * GetDecConfig( input_thread_t * p_input,
                                       es_descriptor_t * p_es )
 {
-    vdec_config_t *     p_config;
+    decoder_config_t *     p_config;
 
-    p_config = (vdec_config_t *)malloc( sizeof(vdec_config_t) );
+    p_config = (decoder_config_t *)malloc( sizeof(decoder_config_t) );
     if( p_config == NULL )
     {
-        intf_ErrMsg( "Unable to allocate memory in GetVdecConfig" );
+        intf_ErrMsg( "Unable to allocate memory in GetDecConfig" );
         return( NULL );
     }
-    if( InitDecConfig( p_input, p_es, &p_config->decoder_config ) == -1 )
-    {
-        free( p_config );
-        return( NULL );
-    }
-
-    return( p_config );
-}
-
-/*****************************************************************************
- * GetAdecConfig: returns a valid adec_config_t
- *****************************************************************************/
-static adec_config_t * GetAdecConfig( input_thread_t * p_input,
-                                      es_descriptor_t * p_es )
-{
-    adec_config_t *     p_config;
-
-    p_config = (adec_config_t *)malloc( sizeof(adec_config_t));
-    if( p_config == NULL )
-    {
-        intf_ErrMsg( "Unable to allocate memory in GetAdecConfig" );
-        return( NULL );
-    }
-
-    if( InitDecConfig( p_input, p_es, &p_config->decoder_config ) == -1 )
+    if( InitDecConfig( p_input, p_es, p_config ) == -1 )
     {
         free( p_config );
         return( NULL );
@@ -617,7 +593,6 @@ vlc_thread_t lpcmdec_CreateThread( void * );
 int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
     /* FIXME ! */
-    decoder_capabilities_t  decoder;
     void *                  p_config;
 
     if( p_es == NULL )
@@ -638,83 +613,47 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 
     switch( p_es->i_type )
     {
+    case AC3_AUDIO_ES:
     case MPEG1_AUDIO_ES:
     case MPEG2_AUDIO_ES:
+    case LPCM_AUDIO_ES:
         if( p_main->b_audio )
         {
-            decoder.pf_create_thread = adec_CreateThread;
-            p_config = (void *)GetAdecConfig( p_input, p_es );
-            p_main->b_ac3 = 0;
+            decoder_config_t * p_dec_config;
+            
+            p_dec_config = GetDecConfig( p_input, p_es );            
+            p_config =(void *)p_dec_config;
+            p_dec_config->i_type = p_es->i_type;
+            
+            p_main->b_ac3 = ( p_es->i_type == AC3_AUDIO_ES );
+            /* Useful to Unned decoder module */
+            p_es->p_dec_config = p_dec_config;
 
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->thread_id = input_RunDecoder( &decoder, p_config );
+            p_es->thread_id = input_RunDecoder( p_config );
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
 
     case MPEG1_VIDEO_ES:
     case MPEG2_VIDEO_ES:
-        if( p_main->b_video )
-        {
-            decoder.pf_create_thread = vpar_CreateThread;
-            p_config = (void *)GetVdecConfig( p_input, p_es );
-
-            /* Release the lock, not to block the input thread during
-             * the creation of the thread. */
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->thread_id = input_RunDecoder( &decoder, p_config );
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-        }
-        break;
-
-    case AC3_AUDIO_ES:
-        if( p_main->b_audio )
-        {
-            if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) )
-            {
-                decoder.pf_create_thread = spdif_CreateThread;
-            }
-            else
-            {
-                decoder.pf_create_thread = ac3dec_CreateThread;
-            }
-
-            p_config = (void *)GetAdecConfig( p_input, p_es );
-            p_main->b_ac3 = 1;
-
-            /* Release the lock, not to block the input thread during
-             * the creation of the thread. */
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->thread_id = input_RunDecoder( &decoder, p_config );
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-        }
-        break;
-    case LPCM_AUDIO_ES:
-        if( p_main->b_audio )
-        {
-            decoder.pf_create_thread = lpcmdec_CreateThread;
-            p_config = (void *)GetAdecConfig( p_input, p_es );
-            p_main->b_ac3 = 0;
-
-            /* Release the lock, not to block the input thread during
-             * the creation of the thread. */
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->thread_id = input_RunDecoder( &decoder, p_config );
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-        }
-        break;
     case DVD_SPU_ES:
         if( p_main->b_video )
         {
-            decoder.pf_create_thread = spudec_CreateThread;
-            p_config = (void *)GetVdecConfig( p_input, p_es );
+            decoder_config_t * p_dec_config;
+
+            p_dec_config = GetDecConfig( p_input, p_es );
+            p_config = (void *)p_dec_config;
+            p_dec_config->i_type = p_es->i_type;
+            /* Useful to Unned decoder module */
+            p_es->p_dec_config = p_dec_config;
 
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->thread_id = input_RunDecoder( &decoder, p_config );
+            p_es->thread_id = input_RunDecoder( p_config );
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;

@@ -49,8 +49,15 @@
       S.A.S. </ulink> </orgname>
     </affiliation>
   </collab>
-
-  <pubdate> $Id: manual.xml,v 1.1 2001/07/16 15:54:59 massiot Exp $ </pubdate>
+  <collab>
+    <collabname> <ulink url="mailto:henri@via.ecp.fr">Henri Fallon
+    </ulink> </collabname>
+    <affiliation>
+      <jobtitle> Developer </jobtitle>
+      <orgname> VideoLAN project </orgname>
+    </affiliation>
+  </collab>
+  <pubdate> $Id: manual.xml,v 1.2 2001/11/13 12:09:17 henri Exp $ </pubdate>
   <copyright> <year> 2001 </year>
               <holder> Christophe Massiot, for IDEALX S.A.S. </holder>
   </copyright>

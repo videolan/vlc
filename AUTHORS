@@ -83,8 +83,8 @@ N: Henri Fallon
 E: henri@via.ecp.fr
 C: henri
 D: ALSA audio output
-D: input netlist
-D: MPEG TS input
+D: MPEG TS input, input netlist.
+D: Decoder modularization
 
 N: Arnaud Gomes-do-Vale
 E: arnaud@carrosse.frmug.org

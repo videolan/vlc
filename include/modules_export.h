@@ -19,6 +19,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+struct module_t;
 
 typedef struct module_symbols_s
 {
@@ -40,6 +41,7 @@ typedef struct module_symbols_s
 
     void ( * intf_Msg )        ( char *, ... );
     void ( * intf_ErrMsg )     ( char *, ... );
+    void ( * intf_StatMsg )    ( char *, ... );
     void ( * intf_WarnMsg )    ( int, char *, ... );
     void ( * intf_WarnMsgImm ) ( int, char *, ... );
 #ifdef TRACE
@@ -132,6 +134,38 @@ typedef struct module_symbols_s
     void ( * input_NetlistDeletePES )    ( void *, struct pes_packet_s * );
     void ( * input_NetlistEnd )          ( struct input_thread_s * );
 
+    struct aout_fifo_s * ( * aout_CreateFifo ) 
+                                       ( int, int, long, long, long, void * );
+    void ( * aout_DestroyFifo )     ( struct aout_fifo_s * );
+
+    struct vout_thread_s * (* vout_CreateThread) ( int *, int, int );
+    struct subpicture_s * (* vout_CreateSubPicture) ( struct vout_thread_s *, 
+                                                      int, int );
+    struct picture_s * ( * vout_CreatePicture ) ( struct vout_thread_s *, 
+                                                  int, int, int );
+
+    void  ( * vout_DestroySubPicture )  ( struct vout_thread_s *, 
+                                          struct subpicture_s * );
+    void  ( * vout_DisplaySubPicture )  ( struct vout_thread_s *, 
+                                          struct subpicture_s * );
+    void  ( * vout_DisplayPicture ) ( struct vout_thread_s *, 
+                                      struct picture_s * );
+    void  ( * vout_DestroyPicture ) ( struct vout_thread_s *,
+                                      struct picture_s * );
+    void  ( * vout_LinkPicture )    ( struct vout_thread_s *,
+                                      struct picture_s * );
+    void  ( * vout_UnlinkPicture )    ( struct vout_thread_s *,
+                                      struct picture_s * );
+    void  ( * vout_DatePicture )    ( struct vout_thread_s *p_vout, 
+                                      struct picture_s *p_pic, mtime_t );
+    
+    
+    u32  ( * UnalignedShowBits )    ( struct bit_stream_s *, unsigned int );
+    void ( * UnalignedRemoveBits )  ( struct bit_stream_s * );
+    u32  ( * UnalignedGetBits )     ( struct bit_stream_s *, unsigned int );
+
+    struct module_s * ( * module_Need )    ( int, void * );
+    void ( * module_Unneed )        ( struct module_s * );
 } module_symbols_t;
 
 #define STORE_SYMBOLS( p_symbols ) \
@@ -149,6 +183,7 @@ typedef struct module_symbols_s
     (p_symbols)->intf_ProcessKey = intf_ProcessKey; \
     (p_symbols)->intf_Msg = intf_Msg; \
     (p_symbols)->intf_ErrMsg = intf_ErrMsg; \
+    (p_symbols)->intf_StatMsg = intf_StatMsg;\
     (p_symbols)->intf_WarnMsg = intf_WarnMsg; \
     (p_symbols)->intf_WarnMsgImm = intf_WarnMsgImm; \
     (p_symbols)->intf_PlaylistAdd = intf_PlaylistAdd; \
@@ -197,7 +232,24 @@ typedef struct module_symbols_s
     (p_symbols)->input_NetlistNewPES = input_NetlistNewPES; \
     (p_symbols)->input_NetlistDeletePacket = input_NetlistDeletePacket; \
     (p_symbols)->input_NetlistDeletePES = input_NetlistDeletePES; \
-    (p_symbols)->input_NetlistEnd = input_NetlistEnd;
+    (p_symbols)->input_NetlistEnd = input_NetlistEnd; \
+    (p_symbols)->aout_CreateFifo = aout_CreateFifo; \
+    (p_symbols)->aout_DestroyFifo = aout_DestroyFifo; \
+    (p_symbols)->vout_CreateThread = vout_CreateThread; \
+    (p_symbols)->vout_CreateSubPicture = vout_CreateSubPicture; \
+    (p_symbols)->vout_DestroySubPicture = vout_DestroySubPicture; \
+    (p_symbols)->vout_DisplaySubPicture = vout_DisplaySubPicture; \
+    (p_symbols)->vout_CreatePicture = vout_CreatePicture; \
+    (p_symbols)->vout_DisplayPicture = vout_DisplayPicture; \
+    (p_symbols)->vout_DestroyPicture = vout_DestroyPicture; \
+    (p_symbols)->vout_DatePicture = vout_DatePicture; \
+    (p_symbols)->vout_LinkPicture = vout_LinkPicture; \
+    (p_symbols)->vout_UnlinkPicture = vout_UnlinkPicture; \
+    (p_symbols)->UnalignedGetBits = UnalignedGetBits; \
+    (p_symbols)->UnalignedRemoveBits = UnalignedRemoveBits; \
+    (p_symbols)->UnalignedShowBits = UnalignedShowBits; \
+    (p_symbols)->module_Need = module_Need; \
+    (p_symbols)->module_Unneed = module_Unneed;
     
 #define STORE_TRACE_SYMBOLS( p_symbols ) \
     (p_symbols)->intf_DbgMsg = _intf_DbgMsg; \
@@ -224,6 +276,7 @@ extern module_symbols_t* p_symbols;
 
 #   define intf_Msg p_symbols->intf_Msg
 #   define intf_ErrMsg p_symbols->intf_ErrMsg
+#   define intf_StatMsg p_symbols->intf_StatMsg
 #   define intf_WarnMsg p_symbols->intf_WarnMsg
 #   define intf_WarnMsgImm p_symbols->intf_WarnMsgImm
 #ifdef TRACE
@@ -291,5 +344,25 @@ extern module_symbols_t* p_symbols;
 #   define input_NetlistDeletePES p_symbols->input_NetlistDeletePES
 #   define input_NetlistEnd p_symbols->input_NetlistEnd
 
+#   define aout_CreateFifo p_symbols->aout_CreateFifo
+#   define aout_DestroyFifo p_symbols->aout_DestroyFifo
+
+#   define vout_CreateThread p_symbols->vout_CreateThread
+#   define vout_CreateSubPicture p_symbols->vout_CreateSubPicture
+#   define vout_DestroySubPicture p_symbols->vout_DestroySubPicture
+#   define vout_DisplaySubPicture p_symbols->vout_DisplaySubPicture
+#   define vout_CreatePicture p_symbols->vout_CreatePicture
+#   define vout_DisplayPicture p_symbols->vout_DisplayPicture
+#   define vout_DestroyPicture p_symbols->vout_DestroyPicture
+#   define vout_DatePicture p_symbols->vout_DatePicture
+#   define vout_LinkPicture p_symbols->vout_LinkPicture
+#   define vout_UnlinkPicture p_symbols->vout_UnlinkPicture
+    
+#   define UnalignedShowBits p_symbols->UnalignedShowBits
+#   define UnalignedRemoveBits p_symbols->UnalignedRemoveBits
+#   define UnalignedGetBits p_symbols->UnalignedGetBits   
+#   define module_Need p_symbols->module_Need
+#   define module_Unneed p_symbols->module_Unneed
+    
 #endif
 

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.30 2001/11/08 01:48:09 jlj Exp $
+ * $Id: modules.h,v 1.31 2001/11/13 12:09:17 henri Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -59,15 +59,14 @@ typedef void *  module_handle_t;
 #define MODULE_CAPABILITY_ACCESS   1 <<  1  /* Input */
 #define MODULE_CAPABILITY_INPUT    1 <<  2  /* Input */
 #define MODULE_CAPABILITY_DECAPS   1 <<  3  /* Decaps */
-#define MODULE_CAPABILITY_ADEC     1 <<  4  /* Audio decoder */
-#define MODULE_CAPABILITY_VDEC     1 <<  5  /* Video decoder */
-#define MODULE_CAPABILITY_MOTION   1 <<  6  /* Motion compensation */
-#define MODULE_CAPABILITY_IDCT     1 <<  7  /* IDCT transformation */
-#define MODULE_CAPABILITY_AOUT     1 <<  8  /* Audio output */
-#define MODULE_CAPABILITY_VOUT     1 <<  9  /* Video output */
-#define MODULE_CAPABILITY_YUV      1 << 10  /* YUV colorspace conversion */
-#define MODULE_CAPABILITY_IMDCT    1 << 11  /* IMDCT transformation */
-#define MODULE_CAPABILITY_DOWNMIX  1 << 12  /* AC3 downmix */
+#define MODULE_CAPABILITY_DEC      1 <<  4  /* Video decoder */
+#define MODULE_CAPABILITY_MOTION   1 <<  5  /* Motion compensation */
+#define MODULE_CAPABILITY_IDCT     1 <<  6  /* IDCT transformation */
+#define MODULE_CAPABILITY_AOUT     1 <<  7  /* Audio output */
+#define MODULE_CAPABILITY_VOUT     1 <<  8  /* Video output */
+#define MODULE_CAPABILITY_YUV      1 <<  9  /* YUV colorspace conversion */
+#define MODULE_CAPABILITY_IMDCT    1 << 10  /* IMDCT transformation */
+#define MODULE_CAPABILITY_DOWNMIX  1 << 11  /* AC3 downmix */
 
 /* FIXME: kludge */
 struct input_area_s;
@@ -77,9 +76,12 @@ struct dm_par_s;
 struct bit_stream_s;
 struct decoder_fifo_s;
 
+struct decoder_config_s;
+
 /* FIXME: not yet used */
 typedef struct probedata_s
 {
+    u8  i_type;
     struct
     {
         char * psz_data;
@@ -214,6 +216,12 @@ typedef struct function_list_s
 
         } downmix;
 
+        /* Decoder plugins */
+        struct
+        {
+            int  ( * pf_RunThread ) ( struct decoder_config_s * p_config );
+        } dec;
+
     } functions;
 
 } function_list_t;
@@ -225,8 +233,7 @@ typedef struct module_functions_s
     function_list_t access;
     function_list_t input;
     function_list_t decaps;
-    function_list_t adec;
-    function_list_t vdec;
+    function_list_t dec;
     function_list_t motion;
     function_list_t idct;
     function_list_t aout;

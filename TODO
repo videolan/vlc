@@ -198,7 +198,7 @@ Task: 0x47
 Difficulty: Hard
 Urgency: Normal
 Description: Make decoders dynamically loadable
-Status: Todo
+Status: Done 05 October 2001 (henri)
 
 Task: 0x46
 Difficulty: Hard
