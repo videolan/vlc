@@ -1,19 +1,41 @@
 $Id$
 
-Changes between 0.8.0 and 0.8.1-svn:
+Changes between 0.8.1 and 0.8.2:
 -----------------------------------------------------
 
 Core support:
- * Include TLS/SSL API
- * SSL support in the HTTP daemon
+ * Rewrite of the playlist
+
+Changes between 0.8.0 and 0.8.1:
+-----------------------------------------------------
+
+Core support:
+ * Include TLS/SSL API (on plattforms where libgnutls is available)
+ * SSL support in the HTTP daemon (HTTP stream output and HTTP interface)
 
 Windows port:
- * Fixed multichannel audio support (which was broken in 0.8.0)
+ * Fixed win32 multichannel audio output support (which was broken in 0.8.0)
  * Fixed DV and MPEG (WinTV PVR 250/350) support in the dshow input
+ * Fixed spurious taskbar item after switching to fullscreen
+
+WinCE port:
+ * A few more updates (we still miss an interface and a fast video output).
+
+Audio Output:
+ * Portaudio audio output plugin improvements
+
+Video Output:
+ * Proper subpictures scaling using the aspect-ratio info when available
+
+Demuxers:
+ * Fixed crash with ODML avi files
+ * Fixed autodetection of VCD/SVCD bin files
 
 Stream Output:
- Encoders:
-  * Fixed aspect ratio and interlaced support in ffmpeg encoder module
+ * Encoders:
+   * Fixed aspect ratio and interlaced support in ffmpeg encoder module
+ * Stream output:
+   * Support of playlist group announcement
 
 Changes between 0.7.2 and 0.8.0:
 -----------------------------------------------------
