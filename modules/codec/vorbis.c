@@ -162,7 +162,9 @@ vlc_module_begin();
     add_submodule();
     set_description( _("Vorbis audio encoder") );
     set_capability( "encoder", 100 );
-    set_callbacks( OpenEncoder, CloseEncoder );
+#if defined(HAVE_VORBIS_VORBISENC_H)
+	set_callbacks( OpenEncoder, CloseEncoder );
+#endif
 
     add_integer( ENC_CFG_PREFIX "quality", 3, NULL, ENC_QUALITY_TEXT,
                  ENC_QUALITY_LONGTEXT, VLC_FALSE );

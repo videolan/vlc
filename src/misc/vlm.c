@@ -2321,7 +2321,7 @@ vlm_t *__vlm_New( vlc_object_t *a )
 void vlm_Delete( vlm_t *a ){}
 int vlm_ExecuteCommand( vlm_t *a, char *b, vlm_message_t **c ){ return -1; }
 void vlm_MessageDelete( vlm_message_t *a ){}
-vlm_media_t *vlm_MediaNew( vlm_t *a, char *b, int c ){ return NULL }
+vlm_media_t *vlm_MediaNew( vlm_t *a, char *b, int c ){ return NULL; }
 void vlm_MediaDelete( vlm_t *a, vlm_media_t *b, char *c ){}
 int vlm_MediaSetup( vlm_t *a, vlm_media_t *b, char *c, char *d ){ return -1; }
 int vlm_MediaControl( vlm_t *a, vlm_media_t *b, char *c, char *d, char *e )
@@ -2329,7 +2329,7 @@ int vlm_MediaControl( vlm_t *a, vlm_media_t *b, char *c, char *d, char *e )
 vlm_schedule_t * vlm_ScheduleNew( vlm_t *a, char *b ){ return NULL; }
 void  vlm_ScheduleDelete( vlm_t *a, vlm_schedule_t *b, char *c ){}
 int vlm_ScheduleSetup( vlm_schedule_t *a, char *b, char *c ){ return -1; }
-int vlm_MediaVodControl( void *a, vod_media_t *b, char *c, int, va_list d )
+int vlm_MediaVodControl( void *a, vod_media_t *b, char *c, int d, va_list e )
     { return -1; }
 int vlm_Save( vlm_t *a, char *b ){ return -1; }
 int vlm_Load( vlm_t *a, char *b ){ return -1; }
