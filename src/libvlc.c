@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.52 2002/12/14 19:34:06 gbazin Exp $
+ * $Id: libvlc.c,v 1.53 2002/12/14 19:43:25 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -466,9 +466,6 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
                   "channels initialization failed, deactivating channels" );
         config_PutInt( p_vlc, "network-channel", VLC_FALSE );
     }
-
-    msg_Err( p_vlc, "SIZEOF: %i", sizeof(vlc_list_t) );
-    msg_Err( p_vlc, "SIZEOF: %i", sizeof(vlc_value_t) );
 
     /*
      * Initialize playlist and get commandline files
