@@ -76,7 +76,7 @@ char * playlist_ItemGetInfo( playlist_item_t *p_item,
      {
          info_category_t *p_category = p_item->input.pp_categories[i];
 
-         if( strcmp( p_category->psz_name , psz_cat ) ) continue;
+         if( !psz_cat || strcmp( p_category->psz_name , psz_cat ) ) continue;
 
          for( j = 0 ; j< p_category->i_infos ; j++ )
          {
