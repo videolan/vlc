@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.74 2001/12/17 15:59:15 sam Exp $
+ * $Id: mpeg_system.c,v 1.75 2001/12/17 16:42:27 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -632,9 +632,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     }
 
     /* Un-select the streams that are no longer parts of the program. */
-    for( i = i_new_es_number;
-         i < p_input->stream.pp_programs[0]->i_es_number;
-         i++ )
+    while( i_new_es_number < p_input->stream.pp_programs[0]->i_es_number )
     {
         /* We remove pp_es[i_new_es_member] and not pp_es[i] because the
          * list will be emptied starting from the end */
@@ -1387,9 +1385,9 @@ static void input_DecodePAT( input_thread_t * p_input, es_descriptor_t * p_es )
         p_current_data = p_psi->buffer;
 
         /* Delete all programs */
-        for( i_loop = 0; i_loop < p_input->stream.i_pgrm_number; i_loop++ )
+        while( p_input->stream.i_pgrm_number )
         {
-            input_DelProgram( p_input, p_input->stream.pp_programs[i_loop] );
+            input_DelProgram( p_input, p_input->stream.pp_programs[0] );
         }
         
         do
@@ -1517,13 +1515,17 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
             i_required_spu_es = 0;
         }
         
-        /* Delete all ES in this program  except the PSI */
-        for( i_loop=0; i_loop < p_es->p_pgrm->i_es_number; i_loop++ )
+        /* Delete all ES in this program  except the PSI. We start from the
+         * end because i_es_number gets decremented after each deletion. */
+        for( i_loop = p_es->p_pgrm->i_es_number ; i_loop ; )
         {
+            i_loop--;
             p_es_demux = (es_ts_data_t *)
                          p_es->p_pgrm->pp_es[i_loop]->p_demux_data;
             if ( ! p_es_demux->b_psi )
-            input_DelES( p_input, p_es->p_pgrm->pp_es[i_loop] );
+            {
+                input_DelES( p_input, p_es->p_pgrm->pp_es[i_loop] );
+            }
         }
 
         /* Then add what we received in this PMT */
