@@ -23,34 +23,27 @@
 
 #include <vlc/vlc.h>
 
-#if defined(HAVE_ICONV)
-#include <iconv.h>
-#include "charset.h"
-#endif
-
 #include "playlist.hpp"
 #include "../utils/ustring.hpp"
+
+#include "charset.h"
 
 Playlist::Playlist( intf_thread_t *pIntf ): VarList( pIntf )
 {
     // Get the playlist VLC object
     m_pPlaylist = pIntf->p_sys->p_playlist;
 
-#ifdef HAVE_ICONV
     // Try to guess the current charset
     char *pCharset = (char*)malloc( 100 );
     vlc_current_charset( &pCharset );
-    iconvHandle = iconv_open( "UTF-8", pCharset );
+    iconvHandle = vlc_iconv_open( "UTF-8", pCharset );
     msg_Dbg( pIntf, "Using character encoding: %s", pCharset );
     free( pCharset );
 
-    if( iconvHandle == (iconv_t)-1 )
+    if( iconvHandle == (vlc_iconv_t)-1 )
     {
         msg_Warn( pIntf, "Unable to do requested conversion" );
     }
-#else
-    msg_Dbg( pIntf, "No iconv support available" );
-#endif
 
     buildList();
 }
@@ -58,12 +51,7 @@ Playlist::Playlist( intf_thread_t *pIntf ): VarList( pIntf )
 
 Playlist::~Playlist()
 {
-#ifdef HAVE_ICONV
-    if( iconvHandle != (iconv_t)-1 )
-    {
-        iconv_close( iconvHandle );
-    }
-#endif
+    if( iconvHandle != (vlc_iconv_t)-1 ) vlc_iconv_close( iconvHandle );
 }
 
 
@@ -133,8 +121,7 @@ void Playlist::buildList()
 
 UString *Playlist::convertName( const char *pName )
 {
-#ifdef HAVE_ICONV
-    if( iconvHandle == (iconv_t)-1 )
+    if( iconvHandle == (vlc_iconv_t)-1 )
     {
         return new UString( getIntf(), pName );
     }
@@ -150,8 +137,8 @@ UString *Playlist::convertName( const char *pName )
     inbytesLeft = strlen( pName );
     outbytesLeft = 6 * inbytesLeft;
     // ICONV_CONST is defined in config.h
-    ret = iconv( iconvHandle, (ICONV_CONST char **)&pBufferIn, &inbytesLeft,
-                 &pBufferOut, &outbytesLeft );
+    ret = vlc_iconv( iconvHandle, (char **)&pBufferIn, &inbytesLeft,
+                     &pBufferOut, &outbytesLeft );
     *pBufferOut = '\0';
 
     if( inbytesLeft )
@@ -166,8 +153,5 @@ UString *Playlist::convertName( const char *pName )
         free( pNewName );
         return pString;
     }
-#else
-    return new UString( getIntf(), pName );
-#endif
 }
 

@@ -938,7 +938,7 @@ dnl  default modules
 dnl
 VLC_ADD_PLUGINS([dummy rc telnet logger gestures memcpy hotkeys netsync])
 VLC_ADD_PLUGINS([mpgv mpga m4v h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg demuxdump])
-VLC_ADD_PLUGINS([cvdsub svcdsub spudec dvbsub mpeg_audio lpcm a52 dts cinepak])
+VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak])
 VLC_ADD_PLUGINS([deinterlace invert adjust wall transform distort clone crop motionblur])
 VLC_ADD_PLUGINS([float32tos16 float32tos8 float32tou16 float32tou8 a52tospdif dtstospdif fixed32tofloat32 fixed32tos16 s16tofixed32 s16tofloat32 s16tofloat32swab s8tofloat32 u8tofixed32 u8tofloat32 audio_format])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler linear_resampler bandlimited_resampler])
@@ -2495,13 +2495,6 @@ if test "${enable_x264}" != "no"; then
 fi
 
 dnl
-dnl   subsdec support
-dnl
-VLC_ADD_LDFLAGS([subsdec],[${LIBICONV}])
-VLC_ADD_CPPFLAGS([subsdec],[${INCICONV}])
-VLC_ADD_PLUGINS([subsdec])
-
-dnl
 dnl  CMML plugin
 dnl
 AC_ARG_ENABLE(cmml,
@@ -2766,8 +2759,8 @@ then
   if test "${FREETYPE_CONFIG}" != "no"
   then
     VLC_ADD_PLUGINS([freetype])
-    VLC_ADD_CFLAGS([freetype],[`${FREETYPE_CONFIG} --cflags` ${INCICONV}])
-    VLC_ADD_LDFLAGS([freetype],[`${FREETYPE_CONFIG} --libs` ${LIBICONV}])
+    VLC_ADD_CFLAGS([freetype],[`${FREETYPE_CONFIG} --cflags`])
+    VLC_ADD_LDFLAGS([freetype],[`${FREETYPE_CONFIG} --libs`])
     AC_CHECK_HEADERS(Carbon/Carbon.h,
       [VLC_ADD_LDFLAGS([freetype],[-framework Carbon])])
   elif test "${enable_freetype}" =  "yes"
@@ -3192,22 +3185,11 @@ if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}
   dnl freetype
   if test "${FREETYPE_CONFIG}" != "no"; then
     VLC_ADD_CPPFLAGS([skins2],[`${FREETYPE_CONFIG} --cflags`])
-    VLC_ADD_LDFLAGS([skins2],[`${FREETYPE_CONFIG} --libs`])
+    VLC_ADD_LDFLAGS([skins2],[`${FREETYPE_CONFIG} --libs` -lpng])
   else
     skins2_missing_lib="yes"
     if test "${enable_skins2}" = "yes"; then
       AC_MSG_ERROR([Could not find freetype (required for skins2)])
-    fi
-  fi
-
-  dnl iconv
-  if test "$am_cv_func_iconv" = "yes"; then
-    VLC_ADD_CPPFLAGS([skins2],[${INCICONV}])
-    VLC_ADD_LDFLAGS([skins2],[${LIBICONV} -lpng])
-  else
-    skins2_missing_lib="yes"
-    if test "${enable_skins2}" = "yes"; then
-      AC_MSG_ERROR([Could not find iconv (required for skins2)])
     fi
   fi
 

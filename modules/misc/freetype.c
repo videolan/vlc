@@ -58,9 +58,6 @@
 #define DEFAULT_FONT "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
 #endif
 
-#if defined(HAVE_ICONV)
-#include <iconv.h>
-#endif
 #if defined(HAVE_FRIBIDI)
 #include <fribidi/fribidi.h>
 #endif
@@ -74,11 +71,6 @@ static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
 
 static subpicture_t *RenderText( filter_t *, block_t * );
-
-#if !defined(HAVE_ICONV)
-static int  GetUnicodeCharFromUTF8( byte_t ** );
-#endif
-
 static line_desc_t *NewLine( byte_t * );
 
 /*****************************************************************************
@@ -407,10 +399,7 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     uint32_t *p_unicode_string, i_char;
     int i_string_length;
     char *psz_string;
-
-#if defined(HAVE_ICONV)
-    iconv_t iconv_handle;
-#endif
+    vlc_iconv_t iconv_handle = (vlc_iconv_t)(-1);
 
     FT_BBox line;
     FT_BBox glyph_size;
@@ -448,7 +437,6 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
     p_string->p_lines = 0;
     p_string->psz_text = strdup( psz_string );
 
-#if defined(HAVE_ICONV)
     p_unicode_string = malloc( ( strlen(psz_string) + 1 ) * sizeof(uint32_t) );
     if( p_unicode_string == NULL )
     {
@@ -456,11 +444,11 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
         goto error;
     }
 #if defined(WORDS_BIGENDIAN)
-    iconv_handle = iconv_open( "UCS-4BE", "UTF-8" );
+    iconv_handle = vlc_iconv_open( "UCS-4BE", "UTF-8" );
 #else
-    iconv_handle = iconv_open( "UCS-4LE", "UTF-8" );
+    iconv_handle = vlc_iconv_open( "UCS-4LE", "UTF-8" );
 #endif
-    if( iconv_handle == (iconv_t)-1 )
+    if( iconv_handle == (vlc_iconv_t)-1 )
     {
         msg_Warn( p_filter, "Unable to do convertion" );
         goto error;
@@ -474,8 +462,11 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
         i_out_bytes_left = i_out_bytes;
         p_in_buffer = psz_string;
         p_out_buffer = (char *)p_unicode_string;
-        i_ret = iconv( iconv_handle, &p_in_buffer, &i_in_bytes,
-                       &p_out_buffer, &i_out_bytes_left );
+        i_ret = vlc_iconv( iconv_handle, &p_in_buffer, &i_in_bytes,
+                           &p_out_buffer, &i_out_bytes_left );
+
+        vlc_iconv_close( iconv_handle );
+
         if( i_in_bytes )
         {
             msg_Warn( p_filter, "Failed to convert string to unicode (%s), "
@@ -497,7 +488,6 @@ static subpicture_t *RenderText( filter_t *p_filter, block_t *p_block )
         p_unicode_string = p_fribidi_string;
         p_fribidi_string[ i_string_length ] = 0;
     }
-#endif
 #endif
 
     /* Calculate relative glyph positions and a bounding box for the
@@ -638,52 +628,6 @@ static void FreeString( subpicture_data_t *p_string )
     free( p_string->psz_text );
     free( p_string );
 }
-
-#if !defined( HAVE_ICONV )
-/* convert one or more utf8 bytes into a unicode character */
-static int GetUnicodeCharFromUTF8( byte_t **ppsz_utf8_string )
-{
-    int i_remaining_bytes, i_char = 0;
-    if( ( **ppsz_utf8_string & 0xFC ) == 0xFC )
-    {
-        i_char = **ppsz_utf8_string & 1;
-        i_remaining_bytes = 5;
-    }
-    else if( ( **ppsz_utf8_string & 0xF8 ) == 0xF8 )
-    {
-        i_char = **ppsz_utf8_string & 3;
-        i_remaining_bytes = 4;
-    }
-    else if( ( **ppsz_utf8_string & 0xF0 ) == 0xF0 )
-    {
-        i_char = **ppsz_utf8_string & 7;
-        i_remaining_bytes = 3;
-    }
-    else if( ( **ppsz_utf8_string & 0xE0 ) == 0xE0 )
-    {
-        i_char = **ppsz_utf8_string & 15;
-        i_remaining_bytes = 2;
-    }
-    else if( ( **ppsz_utf8_string & 0xC0 ) == 0xC0 )
-    {
-        i_char = **ppsz_utf8_string & 31;
-        i_remaining_bytes = 1;
-    }
-    else
-    {
-        i_char = **ppsz_utf8_string;
-        i_remaining_bytes = 0;
-    }
-    while( i_remaining_bytes )
-    {
-        (*ppsz_utf8_string)++;
-        i_remaining_bytes--;
-        i_char = ( i_char << 6 ) + ( **ppsz_utf8_string & 0x3F );
-    }
-    (*ppsz_utf8_string)++;
-    return i_char;
-}
-#endif
 
 static line_desc_t *NewLine( byte_t *psz_string )
 {

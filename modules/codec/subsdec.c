@@ -32,10 +32,6 @@
 #include "osd.h"
 #include "vlc_filter.h"
 
-#if defined(HAVE_ICONV)
-#include <iconv.h>
-#endif
-
 #include "charset.h"
 
 /*****************************************************************************
@@ -44,11 +40,7 @@
 struct decoder_sys_t
 {
     int                 i_align;          /* Subtitles alignment on the vout */
-
-#if defined(HAVE_ICONV)
-    iconv_t             iconv_handle;            /* handle to iconv instance */
-#endif
-
+    vlc_iconv_t         iconv_handle;            /* handle to iconv instance */
 };
 
 /*****************************************************************************
@@ -66,7 +58,6 @@ static void         StripTags      ( char * );
 /*****************************************************************************
  * Module descriptor.
  *****************************************************************************/
-#if defined(HAVE_ICONV)
 static char *ppsz_encodings[] = { DEFAULT_NAME, "ASCII", "UTF-8", "",
     "ISO-8859-1", "CP1252", "MacRoman", "MacIceland","ISO-8859-15", "",
     "ISO-8859-2", "CP1250", "MacCentralEurope", "MacCroatian", "MacRomania", "",
@@ -88,7 +79,6 @@ static char *ppsz_encodings[] = { DEFAULT_NAME, "ASCII", "UTF-8", "",
     "HZ", "GBK", "GB18030", "JOHAB", "ARMSCII-8",
     "Georgian-Academy", "Georgian-PS", "TIS-620", "MuleLao-1", "VISCII", "TCVN",
     "HPROMAN8", "NEXTSTEP" };
-#endif
 
 static int  pi_justification[] = { 0, 1, 2 };
 static char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Right")};
@@ -106,11 +96,9 @@ vlc_module_begin();
     add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
                  VLC_TRUE );
         change_integer_list( pi_justification, ppsz_justification_text, 0 );
-#if defined(HAVE_ICONV)
     add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
                 ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
         change_string_list( ppsz_encodings, 0, 0 );
-#endif
 vlc_module_end();
 
 /*****************************************************************************
@@ -145,13 +133,12 @@ static int OpenDecoder( vlc_object_t *p_this )
     var_Get( p_dec, "subsdec-align", &val );
     p_sys->i_align = val.i_int;
 
-#if defined(HAVE_ICONV)
     if( p_dec->fmt_in.subs.psz_encoding && *p_dec->fmt_in.subs.psz_encoding )
     {
         msg_Dbg( p_dec, "using character encoding: %s",
                  p_dec->fmt_in.subs.psz_encoding );
         p_sys->iconv_handle =
-            iconv_open( "UTF-8", p_dec->fmt_in.subs.psz_encoding );
+            vlc_iconv_open( "UTF-8", p_dec->fmt_in.subs.psz_encoding );
     }
     else
     {
@@ -162,27 +149,23 @@ static int OpenDecoder( vlc_object_t *p_this )
         {
             char *psz_charset =(char*)malloc( 100 );
             vlc_current_charset( &psz_charset );
-            p_sys->iconv_handle = iconv_open( "UTF-8", psz_charset );
+            p_sys->iconv_handle = vlc_iconv_open( "UTF-8", psz_charset );
             msg_Dbg( p_dec, "using character encoding: %s", psz_charset );
             free( psz_charset );
         }
         else if( val.psz_string )
         {
             msg_Dbg( p_dec, "using character encoding: %s", val.psz_string );
-            p_sys->iconv_handle = iconv_open( "UTF-8", val.psz_string );
+            p_sys->iconv_handle = vlc_iconv_open( "UTF-8", val.psz_string );
         }
 
-        if( p_sys->iconv_handle == (iconv_t)-1 )
+        if( p_sys->iconv_handle == (vlc_iconv_t)-1 )
         {
             msg_Warn( p_dec, "unable to do requested conversion" );
         }
 
         if( val.psz_string ) free( val.psz_string );
     }
-#else
-
-    msg_Dbg( p_dec, "no iconv support available" );
-#endif
 
     return VLC_SUCCESS;
 }
@@ -214,12 +197,10 @@ static void CloseDecoder( vlc_object_t *p_this )
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-#if defined(HAVE_ICONV)
-    if( p_sys->iconv_handle != (iconv_t)-1 )
+    if( p_sys->iconv_handle != (vlc_iconv_t)-1 )
     {
-        iconv_close( p_sys->iconv_handle );
+        vlc_iconv_close( p_sys->iconv_handle );
     }
-#endif
 
     free( p_sys );
 }
@@ -255,8 +236,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     i_align_h = p_sys->i_align ? 20 : 0;
     i_align_v = 10;
 
-#if defined(HAVE_ICONV)
-    if( p_sys->iconv_handle != (iconv_t)-1 )
+    if( p_sys->iconv_handle != (vlc_iconv_t)-1 )
     {
         char *psz_new_subtitle;
         char *psz_convert_buffer_out;
@@ -268,8 +248,9 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         psz_convert_buffer_in = psz_subtitle;
         inbytes_left = strlen( psz_subtitle );
         outbytes_left = 6 * inbytes_left;
-        ret = iconv( p_sys->iconv_handle, &psz_convert_buffer_in,
-                     &inbytes_left, &psz_convert_buffer_out, &outbytes_left );
+        ret = vlc_iconv( p_sys->iconv_handle, &psz_convert_buffer_in,
+                         &inbytes_left, &psz_convert_buffer_out,
+                         &outbytes_left );
         *psz_convert_buffer_out = '\0';
 
         if( inbytes_left )
@@ -286,7 +267,6 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
             psz_subtitle = psz_new_subtitle;
         }
     }
-#endif
 
     if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ') )
     {

@@ -26,6 +26,15 @@
 
 #include <vlc/vlc.h>
 
+#undef iconv_t
+#undef iconv_open
+#undef iconv
+#undef iconv_close
+
+#if defined(HAVE_ICONV)
+#   include <iconv.h>
+#endif
+
 /*****************************************************************************
  * getenv: just in case, but it should never be called
  *****************************************************************************/
@@ -144,7 +153,8 @@ char * vlc_strcasestr( const char *psz_big, const char *psz_little )
         {
             char * psz_cur1 = p_pos + 1;
             char * psz_cur2 = psz_little + 1;
-            while( *psz_cur1 && *psz_cur2 && toupper( *psz_cur1 ) == toupper( *psz_cur2 ) )
+            while( *psz_cur1 && *psz_cur2 &&
+                   toupper( *psz_cur1 ) == toupper( *psz_cur2 ) )
             {
                 psz_cur1++;
                 psz_cur2++;
@@ -372,4 +382,42 @@ char *vlc_wraptext( const char *psz_text, int i_line, vlc_bool_t b_utf8 )
     }
 
     return psz_new_text;
+}
+
+/*****************************************************************************
+ * iconv wrapper
+ *****************************************************************************/
+vlc_iconv_t vlc_iconv_open( const char *tocode, const char *fromcode )
+{
+#if defined(HAVE_ICONV)
+    return iconv_open( tocode, fromcode );
+#else
+    return NULL;
+#endif
+}
+
+size_t vlc_iconv( vlc_iconv_t cd, char **inbuf, size_t *inbytesleft,
+                  char **outbuf, size_t *outbytesleft )
+{
+#if defined(HAVE_ICONV)
+    return iconv( cd, inbuf, inbytesleft, outbuf, outbytesleft );
+#else
+    int i_bytes = __MIN(inbytesleft, outbytesleft);
+    if( !inbuf || !outbuf || !i_bytes ) return (size_t)(-1);
+    memcpy( *outbuf, *inbuf, i_bytes );
+    inbuf += i_bytes;
+    outbuf += i_bytes;
+    inbytesleft -= i_bytes;
+    outbytesleft -= i_bytes;
+    return i_bytes;
+#endif
+}
+
+int vlc_iconv_close( vlc_iconv_t cd )
+{
+#if defined(HAVE_ICONV)
+    return iconv_close( cd );
+#else
+    return 0;
+#endif
 }
