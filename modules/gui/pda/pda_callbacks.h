@@ -2,7 +2,7 @@
  * callbacks.h : pda plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: pda_callbacks.h,v 1.7 2003/11/09 19:49:48 jpsaman Exp $
+ * $Id: pda_callbacks.h,v 1.8 2003/11/09 21:29:52 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -27,7 +27,9 @@
 #include <vlc/intf.h>
 
 void ReadDirectory( GtkListStore *p_list, char *psz_dir );
+#if 0
 void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
+#endif
 void PlaylistRebuildListStore( GtkListStore *p_list, playlist_t * p_playlist );
 
 

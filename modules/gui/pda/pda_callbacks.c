@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.12 2003/11/09 19:49:48 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.13 2003/11/09 21:29:52 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -85,6 +85,31 @@ void * E_(__GtkGetIntf)( GtkWidget * widget )
     return p_data;
 }
 
+void PlaylistAddItem( GtkWidget *widget, gchar *name)
+{
+    GtkTreeView  *p_tvplaylist = NULL;
+
+    /* Add to playlist object. */
+    p_tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(widget), "tvPlaylist");
+    if (p_tvplaylist)
+    {
+        GtkTreeModel *p_play_model;
+        GtkTreeIter   p_play_iter;
+
+        p_play_model = gtk_tree_view_get_model(p_tvplaylist);
+
+        if (p_play_model)
+        {
+            /* Add a new row to the playlist treeview model */
+            gtk_list_store_append (GTK_LIST_STORE(p_play_model), &p_play_iter);
+            gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
+                                    0, name,   /* Add path to it !!! */
+                                    1, "no info",
+                                    -1 );
+        }
+    }
+}
+
 void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
 {
     GtkTreeIter iter;
@@ -109,10 +134,7 @@ void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
     vlc_mutex_unlock( &p_playlist->object_lock );
 }
 
-
-/*****************************************************************************
- * Helper functions for URL changes in Media and Preferences notebook pages.
- ****************************************************************************/
+#if 0
 void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
 {
     intf_thread_t *p_intf = GtkGetIntf( widget );
@@ -150,6 +172,7 @@ void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url )
         }
     }
 }
+#endif
 
 /*****************************************************************
  * Read directory helper function.
@@ -454,30 +477,12 @@ void addSelectedToPlaylist(GtkTreeModel *model,
                                GtkTreeIter *iter,
                                gpointer *userdata)
 {
-    GtkTreeView  *p_tvplaylist = NULL;
     gchar *filename;
 
     gtk_tree_model_get(model, iter, 0, &filename, -1);
 
     /* Add to playlist object. */
-    p_tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(userdata), "tvPlaylist");
-    if (p_tvplaylist)
-    {
-        GtkTreeModel *p_play_model;
-        GtkTreeIter   p_play_iter;
-
-        p_play_model = gtk_tree_view_get_model(p_tvplaylist);
-
-        if (p_play_model)
-        {
-            /* Add a new row to the playlist treeview model */
-            gtk_list_store_append (GTK_LIST_STORE(p_play_model), &p_play_iter);
-            gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
-                                    0, filename,   /* Add path to it !!! */
-                                    1, "no info",
-                                    -1 );
-        }
-    }
+    PlaylistAddItem(GTK_WIDGET(userdata), filename);
 }
 
 void
@@ -618,9 +623,6 @@ onAddNetworkPlaylist                   (GtkButton       *button,
                                         gpointer         user_data)
 {
     GtkEntry     *p_mrl = NULL;
-    GtkTreeView  *p_tvplaylist = NULL;
-    GtkTreeModel *p_play_model;
-    GtkTreeIter   p_play_iter;
     const gchar  *mrl_name;
 
     p_mrl = (GtkEntry*) lookup_widget(GTK_WIDGET(button),"entryMRL" );
@@ -628,18 +630,7 @@ onAddNetworkPlaylist                   (GtkButton       *button,
     {
         mrl_name = gtk_entry_get_text(p_mrl);
 
-        p_tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(button), "tvPlaylist");
-        if (NULL != p_tvplaylist)
-        {
-            p_play_model = gtk_tree_view_get_model(p_tvplaylist);
-
-            /* Add a new row to the playlist treeview model */
-            gtk_list_store_append (GTK_LIST_STORE(p_play_model), &p_play_iter);
-            gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
-                                    0, mrl_name,   /* Add path to it !!! */
-                                    1, "no info",
-                                    -1 );
-        }
+        PlaylistAddItem(GTK_WIDGET(button), (gchar *)p_mrl);
     }
 }
 
@@ -648,10 +639,6 @@ void
 onAddCameraToPlaylist                  (GtkButton       *button,
                                         gpointer         user_data)
 {
-    GtkTreeView  *p_tvplaylist = NULL;
-    GtkTreeModel *p_play_model;
-    GtkTreeIter   p_play_iter;
-
     GtkSpinButton *entryV4LChannel = NULL;
     GtkSpinButton *entryV4LFrequency = NULL;
     GtkSpinButton *entryV4LSampleRate = NULL;
@@ -737,18 +724,8 @@ onAddCameraToPlaylist                  (GtkButton       *button,
         v4l_mrl[VLC_MAX_MRL-1]='\0';
 
     g_print( "%s\n", v4l_mrl );
-    p_tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(button), "tvPlaylist");
-    if (NULL != p_tvplaylist)
-    {
-        p_play_model = gtk_tree_view_get_model(p_tvplaylist);
 
-        /* Add a new row to the playlist treeview model */
-        gtk_list_store_append (GTK_LIST_STORE(p_play_model), &p_play_iter);
-        gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
-                                0, &v4l_mrl,
-                                1, "no info",
-                                -1 );
-    }
+    PlaylistAddItem(GTK_WIDGET(button), (gchar*) &v4l_mrl);
 }
 
 
@@ -851,7 +828,92 @@ void
 onAddTranscodeToPlaylist               (GtkButton       *button,
                                         gpointer         user_data)
 {
+    GtkEntry       *entryVideoCodec = NULL;
+    GtkSpinButton  *entryVideoBitrate = NULL;
+    GtkSpinButton  *entryVideoBitrateTolerance = NULL;
+    GtkSpinButton  *entryVideoKeyFrameInterval = NULL;
+    GtkCheckButton *checkVideoDeinterlace = NULL;
+    GtkEntry       *entryAudioCodec = NULL;
+    GtkSpinButton  *entryAudioBitrate = NULL;
+    const gchar    *p_video_codec;
+    gint            i_video_bitrate;
+    gint            i_video_bitrate_tolerance;
+    gint            i_video_keyframe_interval;
+    gboolean        b_video_deinterlace;
+    const gchar    *p_audio_codec;
+    gint            i_audio_bitrate;
 
+    GtkEntry       *entryStdAccess = NULL;
+    GtkEntry       *entryStdMuxer = NULL;
+    GtkEntry       *entryStdURL = NULL;
+    GtkSpinButton  *entryStdTTL = NULL;
+    const gchar    *p_std_access;
+    const gchar    *p_std_muxer;
+    const gchar    *p_std_url;
+    gint            i_std_ttl;
+
+    gchar mrl[VLC_MAX_MRL];
+    int   pos;
+
+    pos = snprintf( &mrl[0], VLC_MAX_MRL, "--sout '#transcode{");
+
+    entryVideoCodec   = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryVideoCodec" );
+    entryVideoBitrate = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryVideoBitrate" );
+    entryVideoBitrateTolerance = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryVideoBitrateTolerance" );
+    entryVideoKeyFrameInterval = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryVideoKeyFrameInterval" );
+    
+    p_video_codec = gtk_entry_get_text(GTK_ENTRY(entryVideoCodec));
+    i_video_bitrate = gtk_spin_button_get_value_as_int(entryVideoBitrate);
+    i_video_bitrate_tolerance = gtk_spin_button_get_value_as_int(entryVideoBitrateTolerance);
+    i_video_keyframe_interval = gtk_spin_button_get_value_as_int(entryVideoKeyFrameInterval);
+    
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "vcodec=%s,", (char*)p_video_codec );
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "vb=%d,", (int)i_video_bitrate );
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "vt=%d,", (int)i_video_bitrate_tolerance );
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "keyint=%d,", (int)i_video_keyframe_interval );
+
+    checkVideoDeinterlace = (GtkCheckButton*) lookup_widget( GTK_WIDGET(button), "checkVideoDeinterlace" );
+    b_video_deinterlace = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(checkVideoDeinterlace));
+    if (b_video_deinterlace)
+    {
+        pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "deinterlace," );
+    }
+    entryAudioCodec   = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryAudioCodec" );
+    entryAudioBitrate = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryAudioBitrate" );
+
+    p_audio_codec = gtk_entry_get_text(GTK_ENTRY(entryAudioCodec));
+    i_audio_bitrate = gtk_spin_button_get_value_as_int(entryAudioBitrate);
+
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "acodec=%s,", (char*)p_audio_codec );
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "ab=%d", (int)i_audio_bitrate );
+
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "}:std{" );
+
+    entryStdAccess = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryStdAccess" );
+    entryStdMuxer  = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryStdMuxer" );
+    entryStdURL = (GtkEntry*) lookup_widget( GTK_WIDGET(button), "entryStdURL" );
+    entryStdTTL = (GtkSpinButton*) lookup_widget( GTK_WIDGET(button), "entryStdTTL" );
+
+    p_std_access = gtk_entry_get_text(GTK_ENTRY(entryStdAccess));
+    p_std_muxer = gtk_entry_get_text(GTK_ENTRY(entryStdMuxer));
+    p_std_url = gtk_entry_get_text(GTK_ENTRY(entryStdURL));
+
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "access=%s,", (char*)p_std_access);
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "mux=%s,", (char*)p_std_muxer);
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "url=%s", (char*)p_std_url);
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, "}'");
+
+    i_std_ttl = gtk_spin_button_get_value_as_int(entryStdTTL);
+
+    pos += snprintf( &mrl[pos], VLC_MAX_MRL - pos, " --ttl=%d", (int)i_std_ttl);
+
+
+    if (pos >= VLC_MAX_MRL)
+        _mrl[VLC_MAX_MRL-1]='\0';
+
+    g_print( "%s\n", mrl );
+
+    PlaylistAddItem(GTK_WIDGET(button), (gchar*) &mrl);
 }
 
 

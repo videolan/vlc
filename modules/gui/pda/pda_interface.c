@@ -126,7 +126,44 @@ create_pda (void)
   GtkWidget *vbox1;
   GtkWidget *scrolledwindowTranscode;
   GtkWidget *viewport5;
-  GtkWidget *table6;
+  GtkWidget *tableTranscode;
+  GtkWidget *labelVideoCodec;
+  GtkWidget *comboVideoCodec;
+  GList *comboVideoCodec_items = NULL;
+  GtkWidget *entryVideoCodec;
+  GtkWidget *labelVideoBitrate;
+  GtkWidget *labelVideoBitrateTolerance;
+  GtkWidget *labelVideoKeyInterval;
+  GtkWidget *labelAudioCodec;
+  GtkWidget *labelVideoDeinterlace;
+  GtkWidget *labelStdAccess;
+  GtkWidget *labelStdMuxer;
+  GtkWidget *labelStdUrl;
+  GtkWidget *labelStdTimeToLive;
+  GtkObject *entryStdTTL_adj;
+  GtkWidget *entryStdTTL;
+  GtkWidget *comboStdURL;
+  GList *comboStdURL_items = NULL;
+  GtkWidget *entryStdURL;
+  GtkWidget *comboStdMuxer;
+  GList *comboStdMuxer_items = NULL;
+  GtkWidget *entryStdMuxer;
+  GtkWidget *comboStdAccess;
+  GList *comboStdAccess_items = NULL;
+  GtkWidget *entryStdAccess;
+  GtkObject *entryAudioBitrate_adj;
+  GtkWidget *entryAudioBitrate;
+  GtkWidget *comboAudioCodec;
+  GList *comboAudioCodec_items = NULL;
+  GtkWidget *entryAudioCodec;
+  GtkWidget *checkVideoDeinterlace;
+  GtkObject *entryVideoKeyFrameInterval_adj;
+  GtkWidget *entryVideoKeyFrameInterval;
+  GtkObject *entryVideoBitrateTolerance_adj;
+  GtkWidget *entryVideoBitrateTolerance;
+  GtkObject *entryVideoBitrate_adj;
+  GtkWidget *entryVideoBitrate;
+  GtkWidget *labelAudioBitrate;
   GtkWidget *hbox14;
   GtkWidget *AddTranscodeToPlaylist;
   GtkWidget *Transcode;
@@ -153,6 +190,9 @@ create_pda (void)
   GtkWidget *labelProgramName;
   GtkWidget *labelCopyright;
   GtkWidget *about;
+  GtkTooltips *tooltips;
+
+  tooltips = gtk_tooltips_new ();
 
   pda = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_widget_set_name (pda, "pda");
@@ -717,6 +757,7 @@ create_pda (void)
   gtk_table_attach (GTK_TABLE (tableV4L), entryV4LFrequency, 1, 2, 5, 6,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_tooltips_set_tip (tooltips, entryV4LFrequency, _("kHz"), NULL);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryV4LFrequency), TRUE);
 
   entryV4LSampleRate_adj = gtk_adjustment_new (44100, 0, 65535, 1, 10, 10);
@@ -726,6 +767,7 @@ create_pda (void)
   gtk_table_attach (GTK_TABLE (tableV4L), entryV4LSampleRate, 1, 2, 6, 7,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_tooltips_set_tip (tooltips, entryV4LSampleRate, _("Hz/s"), NULL);
   gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryV4LSampleRate), TRUE);
 
   entryV4LQuality_adj = gtk_adjustment_new (100, 0, 65535, 1, 10, 10);
@@ -807,17 +849,278 @@ create_pda (void)
   gtk_widget_set_name (scrolledwindowTranscode, "scrolledwindowTranscode");
   gtk_widget_show (scrolledwindowTranscode);
   gtk_box_pack_start (GTK_BOX (vbox1), scrolledwindowTranscode, TRUE, TRUE, 0);
-  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindowTranscode), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+  gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolledwindowTranscode), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 
   viewport5 = gtk_viewport_new (NULL, NULL);
   gtk_widget_set_name (viewport5, "viewport5");
   gtk_widget_show (viewport5);
   gtk_container_add (GTK_CONTAINER (scrolledwindowTranscode), viewport5);
 
-  table6 = gtk_table_new (14, 2, FALSE);
-  gtk_widget_set_name (table6, "table6");
-  gtk_widget_show (table6);
-  gtk_container_add (GTK_CONTAINER (viewport5), table6);
+  tableTranscode = gtk_table_new (11, 2, FALSE);
+  gtk_widget_set_name (tableTranscode, "tableTranscode");
+  gtk_widget_show (tableTranscode);
+  gtk_container_add (GTK_CONTAINER (viewport5), tableTranscode);
+
+  labelVideoCodec = gtk_label_new (_("Video Codec:"));
+  gtk_widget_set_name (labelVideoCodec, "labelVideoCodec");
+  gtk_widget_show (labelVideoCodec);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelVideoCodec, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVideoCodec), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelVideoCodec), 0, 0.5);
+
+  comboVideoCodec = gtk_combo_new ();
+  g_object_set_data (G_OBJECT (GTK_COMBO (comboVideoCodec)->popwin),
+                     "GladeParentKey", comboVideoCodec);
+  gtk_widget_set_name (comboVideoCodec, "comboVideoCodec");
+  gtk_widget_show (comboVideoCodec);
+  gtk_table_attach (GTK_TABLE (tableTranscode), comboVideoCodec, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_SHRINK | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("huffyuv"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("mpgv"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("mp4v"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("h263"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("DIV1"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("DIV2"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("DIV3"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("I420"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("I422"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("I444"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("RV24"));
+  comboVideoCodec_items = g_list_append (comboVideoCodec_items, (gpointer) _("YUY2"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboVideoCodec), comboVideoCodec_items);
+  g_list_free (comboVideoCodec_items);
+
+  entryVideoCodec = GTK_COMBO (comboVideoCodec)->entry;
+  gtk_widget_set_name (entryVideoCodec, "entryVideoCodec");
+  gtk_widget_show (entryVideoCodec);
+  gtk_entry_set_text (GTK_ENTRY (entryVideoCodec), _("huffyuv"));
+  gtk_entry_set_activates_default (GTK_ENTRY (entryVideoCodec), TRUE);
+
+  labelVideoBitrate = gtk_label_new (_("Video Bitrate:"));
+  gtk_widget_set_name (labelVideoBitrate, "labelVideoBitrate");
+  gtk_widget_show (labelVideoBitrate);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelVideoBitrate, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVideoBitrate), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelVideoBitrate), 0, 0.5);
+
+  labelVideoBitrateTolerance = gtk_label_new (_("Bitrate Tolerance:"));
+  gtk_widget_set_name (labelVideoBitrateTolerance, "labelVideoBitrateTolerance");
+  gtk_widget_show (labelVideoBitrateTolerance);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelVideoBitrateTolerance, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVideoBitrateTolerance), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelVideoBitrateTolerance), 0, 0.5);
+
+  labelVideoKeyInterval = gtk_label_new (_("Keyframe Interval:"));
+  gtk_widget_set_name (labelVideoKeyInterval, "labelVideoKeyInterval");
+  gtk_widget_show (labelVideoKeyInterval);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelVideoKeyInterval, 0, 1, 3, 4,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVideoKeyInterval), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelVideoKeyInterval), 0, 0.5);
+
+  labelAudioCodec = gtk_label_new (_("Audio Codec:"));
+  gtk_widget_set_name (labelAudioCodec, "labelAudioCodec");
+  gtk_widget_show (labelAudioCodec);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelAudioCodec, 0, 1, 5, 6,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelAudioCodec), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelAudioCodec), 0, 0.5);
+
+  labelVideoDeinterlace = gtk_label_new (_("Deinterlace:"));
+  gtk_widget_set_name (labelVideoDeinterlace, "labelVideoDeinterlace");
+  gtk_widget_show (labelVideoDeinterlace);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelVideoDeinterlace, 0, 1, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelVideoDeinterlace), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelVideoDeinterlace), 0, 0.5);
+
+  labelStdAccess = gtk_label_new (_("Access:"));
+  gtk_widget_set_name (labelStdAccess, "labelStdAccess");
+  gtk_widget_show (labelStdAccess);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelStdAccess, 0, 1, 7, 8,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelStdAccess), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelStdAccess), 0, 0.5);
+
+  labelStdMuxer = gtk_label_new (_("Muxer:"));
+  gtk_widget_set_name (labelStdMuxer, "labelStdMuxer");
+  gtk_widget_show (labelStdMuxer);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelStdMuxer, 0, 1, 8, 9,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelStdMuxer), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelStdMuxer), 0, 0.5);
+
+  labelStdUrl = gtk_label_new (_("URL:"));
+  gtk_widget_set_name (labelStdUrl, "labelStdUrl");
+  gtk_widget_show (labelStdUrl);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelStdUrl, 0, 1, 9, 10,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelStdUrl), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelStdUrl), 0, 0.5);
+
+  labelStdTimeToLive = gtk_label_new (_("Time To Live (TTL):"));
+  gtk_widget_set_name (labelStdTimeToLive, "labelStdTimeToLive");
+  gtk_widget_show (labelStdTimeToLive);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelStdTimeToLive, 0, 1, 10, 11,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelStdTimeToLive), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelStdTimeToLive), 0, 0.5);
+
+  entryStdTTL_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
+  entryStdTTL = gtk_spin_button_new (GTK_ADJUSTMENT (entryStdTTL_adj), 1, 0);
+  gtk_widget_set_name (entryStdTTL, "entryStdTTL");
+  gtk_widget_show (entryStdTTL);
+  gtk_table_attach (GTK_TABLE (tableTranscode), entryStdTTL, 1, 2, 10, 11,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  comboStdURL = gtk_combo_new ();
+  g_object_set_data (G_OBJECT (GTK_COMBO (comboStdURL)->popwin),
+                     "GladeParentKey", comboStdURL);
+  gtk_widget_set_name (comboStdURL, "comboStdURL");
+  gtk_widget_show (comboStdURL);
+  gtk_table_attach (GTK_TABLE (tableTranscode), comboStdURL, 1, 2, 9, 10,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  comboStdURL_items = g_list_append (comboStdURL_items, (gpointer) _("127.0.0.1"));
+  comboStdURL_items = g_list_append (comboStdURL_items, (gpointer) _("localhost"));
+  comboStdURL_items = g_list_append (comboStdURL_items, (gpointer) _("localhost.localdomain"));
+  comboStdURL_items = g_list_append (comboStdURL_items, (gpointer) _("239.0.0.42"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboStdURL), comboStdURL_items);
+  g_list_free (comboStdURL_items);
+
+  entryStdURL = GTK_COMBO (comboStdURL)->entry;
+  gtk_widget_set_name (entryStdURL, "entryStdURL");
+  gtk_widget_show (entryStdURL);
+  gtk_entry_set_text (GTK_ENTRY (entryStdURL), _("127.0.0.1"));
+  gtk_entry_set_activates_default (GTK_ENTRY (entryStdURL), TRUE);
+
+  comboStdMuxer = gtk_combo_new ();
+  g_object_set_data (G_OBJECT (GTK_COMBO (comboStdMuxer)->popwin),
+                     "GladeParentKey", comboStdMuxer);
+  gtk_widget_set_name (comboStdMuxer, "comboStdMuxer");
+  gtk_widget_show (comboStdMuxer);
+  gtk_table_attach (GTK_TABLE (tableTranscode), comboStdMuxer, 1, 2, 8, 9,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  comboStdMuxer_items = g_list_append (comboStdMuxer_items, (gpointer) _("udp"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboStdMuxer), comboStdMuxer_items);
+  g_list_free (comboStdMuxer_items);
+
+  entryStdMuxer = GTK_COMBO (comboStdMuxer)->entry;
+  gtk_widget_set_name (entryStdMuxer, "entryStdMuxer");
+  gtk_widget_show (entryStdMuxer);
+  gtk_entry_set_text (GTK_ENTRY (entryStdMuxer), _("udp"));
+  gtk_entry_set_activates_default (GTK_ENTRY (entryStdMuxer), TRUE);
+
+  comboStdAccess = gtk_combo_new ();
+  g_object_set_data (G_OBJECT (GTK_COMBO (comboStdAccess)->popwin),
+                     "GladeParentKey", comboStdAccess);
+  gtk_widget_set_name (comboStdAccess, "comboStdAccess");
+  gtk_widget_show (comboStdAccess);
+  gtk_table_attach (GTK_TABLE (tableTranscode), comboStdAccess, 1, 2, 7, 8,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  comboStdAccess_items = g_list_append (comboStdAccess_items, (gpointer) _("ts"));
+  comboStdAccess_items = g_list_append (comboStdAccess_items, (gpointer) _("rtp"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboStdAccess), comboStdAccess_items);
+  g_list_free (comboStdAccess_items);
+
+  entryStdAccess = GTK_COMBO (comboStdAccess)->entry;
+  gtk_widget_set_name (entryStdAccess, "entryStdAccess");
+  gtk_widget_show (entryStdAccess);
+  gtk_entry_set_text (GTK_ENTRY (entryStdAccess), _("ts"));
+  gtk_entry_set_activates_default (GTK_ENTRY (entryStdAccess), TRUE);
+
+  entryAudioBitrate_adj = gtk_adjustment_new (256, 0, 65535, 1, 10, 10);
+  entryAudioBitrate = gtk_spin_button_new (GTK_ADJUSTMENT (entryAudioBitrate_adj), 1, 0);
+  gtk_widget_set_name (entryAudioBitrate, "entryAudioBitrate");
+  gtk_widget_show (entryAudioBitrate);
+  gtk_table_attach (GTK_TABLE (tableTranscode), entryAudioBitrate, 1, 2, 6, 7,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_tooltips_set_tip (tooltips, entryAudioBitrate, _("kbits/s"), NULL);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryAudioBitrate), TRUE);
+
+  comboAudioCodec = gtk_combo_new ();
+  g_object_set_data (G_OBJECT (GTK_COMBO (comboAudioCodec)->popwin),
+                     "GladeParentKey", comboAudioCodec);
+  gtk_widget_set_name (comboAudioCodec, "comboAudioCodec");
+  gtk_widget_show (comboAudioCodec);
+  gtk_table_attach (GTK_TABLE (tableTranscode), comboAudioCodec, 1, 2, 5, 6,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  comboAudioCodec_items = g_list_append (comboAudioCodec_items, (gpointer) _("alaw"));
+  comboAudioCodec_items = g_list_append (comboAudioCodec_items, (gpointer) _("ulaw"));
+  comboAudioCodec_items = g_list_append (comboAudioCodec_items, (gpointer) _("mpga"));
+  comboAudioCodec_items = g_list_append (comboAudioCodec_items, (gpointer) _("mp3"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboAudioCodec), comboAudioCodec_items);
+  g_list_free (comboAudioCodec_items);
+
+  entryAudioCodec = GTK_COMBO (comboAudioCodec)->entry;
+  gtk_widget_set_name (entryAudioCodec, "entryAudioCodec");
+  gtk_widget_show (entryAudioCodec);
+  gtk_entry_set_text (GTK_ENTRY (entryAudioCodec), _("alaw"));
+  gtk_entry_set_activates_default (GTK_ENTRY (entryAudioCodec), TRUE);
+
+  checkVideoDeinterlace = gtk_check_button_new_with_mnemonic (_("enable"));
+  gtk_widget_set_name (checkVideoDeinterlace, "checkVideoDeinterlace");
+  gtk_widget_show (checkVideoDeinterlace);
+  gtk_table_attach (GTK_TABLE (tableTranscode), checkVideoDeinterlace, 1, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  entryVideoKeyFrameInterval_adj = gtk_adjustment_new (80, 0, 65535, 1, 10, 10);
+  entryVideoKeyFrameInterval = gtk_spin_button_new (GTK_ADJUSTMENT (entryVideoKeyFrameInterval_adj), 1, 0);
+  gtk_widget_set_name (entryVideoKeyFrameInterval, "entryVideoKeyFrameInterval");
+  gtk_widget_show (entryVideoKeyFrameInterval);
+  gtk_table_attach (GTK_TABLE (tableTranscode), entryVideoKeyFrameInterval, 1, 2, 3, 4,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryVideoKeyFrameInterval), TRUE);
+
+  entryVideoBitrateTolerance_adj = gtk_adjustment_new (800000, 0, 1e+06, 1, 10, 10);
+  entryVideoBitrateTolerance = gtk_spin_button_new (GTK_ADJUSTMENT (entryVideoBitrateTolerance_adj), 1, 0);
+  gtk_widget_set_name (entryVideoBitrateTolerance, "entryVideoBitrateTolerance");
+  gtk_widget_show (entryVideoBitrateTolerance);
+  gtk_table_attach (GTK_TABLE (tableTranscode), entryVideoBitrateTolerance, 1, 2, 2, 3,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_tooltips_set_tip (tooltips, entryVideoBitrateTolerance, _("bits/s"), NULL);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryVideoBitrateTolerance), TRUE);
+
+  entryVideoBitrate_adj = gtk_adjustment_new (3000, 0, 65535, 1, 10, 10);
+  entryVideoBitrate = gtk_spin_button_new (GTK_ADJUSTMENT (entryVideoBitrate_adj), 1, 0);
+  gtk_widget_set_name (entryVideoBitrate, "entryVideoBitrate");
+  gtk_widget_show (entryVideoBitrate);
+  gtk_table_attach (GTK_TABLE (tableTranscode), entryVideoBitrate, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_tooltips_set_tip (tooltips, entryVideoBitrate, _("kbits/s"), NULL);
+  gtk_spin_button_set_numeric (GTK_SPIN_BUTTON (entryVideoBitrate), TRUE);
+
+  labelAudioBitrate = gtk_label_new (_("Audio Bitrate :"));
+  gtk_widget_set_name (labelAudioBitrate, "labelAudioBitrate");
+  gtk_widget_show (labelAudioBitrate);
+  gtk_table_attach (GTK_TABLE (tableTranscode), labelAudioBitrate, 0, 1, 6, 7,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_label_set_justify (GTK_LABEL (labelAudioBitrate), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (labelAudioBitrate), 0, 0.5);
 
   hbox14 = gtk_hbox_new (FALSE, 0);
   gtk_widget_set_name (hbox14, "hbox14");
@@ -1136,7 +1439,34 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, vbox1, "vbox1");
   GLADE_HOOKUP_OBJECT (pda, scrolledwindowTranscode, "scrolledwindowTranscode");
   GLADE_HOOKUP_OBJECT (pda, viewport5, "viewport5");
-  GLADE_HOOKUP_OBJECT (pda, table6, "table6");
+  GLADE_HOOKUP_OBJECT (pda, tableTranscode, "tableTranscode");
+  GLADE_HOOKUP_OBJECT (pda, labelVideoCodec, "labelVideoCodec");
+  GLADE_HOOKUP_OBJECT (pda, comboVideoCodec, "comboVideoCodec");
+  GLADE_HOOKUP_OBJECT (pda, entryVideoCodec, "entryVideoCodec");
+  GLADE_HOOKUP_OBJECT (pda, labelVideoBitrate, "labelVideoBitrate");
+  GLADE_HOOKUP_OBJECT (pda, labelVideoBitrateTolerance, "labelVideoBitrateTolerance");
+  GLADE_HOOKUP_OBJECT (pda, labelVideoKeyInterval, "labelVideoKeyInterval");
+  GLADE_HOOKUP_OBJECT (pda, labelAudioCodec, "labelAudioCodec");
+  GLADE_HOOKUP_OBJECT (pda, labelVideoDeinterlace, "labelVideoDeinterlace");
+  GLADE_HOOKUP_OBJECT (pda, labelStdAccess, "labelStdAccess");
+  GLADE_HOOKUP_OBJECT (pda, labelStdMuxer, "labelStdMuxer");
+  GLADE_HOOKUP_OBJECT (pda, labelStdUrl, "labelStdUrl");
+  GLADE_HOOKUP_OBJECT (pda, labelStdTimeToLive, "labelStdTimeToLive");
+  GLADE_HOOKUP_OBJECT (pda, entryStdTTL, "entryStdTTL");
+  GLADE_HOOKUP_OBJECT (pda, comboStdURL, "comboStdURL");
+  GLADE_HOOKUP_OBJECT (pda, entryStdURL, "entryStdURL");
+  GLADE_HOOKUP_OBJECT (pda, comboStdMuxer, "comboStdMuxer");
+  GLADE_HOOKUP_OBJECT (pda, entryStdMuxer, "entryStdMuxer");
+  GLADE_HOOKUP_OBJECT (pda, comboStdAccess, "comboStdAccess");
+  GLADE_HOOKUP_OBJECT (pda, entryStdAccess, "entryStdAccess");
+  GLADE_HOOKUP_OBJECT (pda, entryAudioBitrate, "entryAudioBitrate");
+  GLADE_HOOKUP_OBJECT (pda, comboAudioCodec, "comboAudioCodec");
+  GLADE_HOOKUP_OBJECT (pda, entryAudioCodec, "entryAudioCodec");
+  GLADE_HOOKUP_OBJECT (pda, checkVideoDeinterlace, "checkVideoDeinterlace");
+  GLADE_HOOKUP_OBJECT (pda, entryVideoKeyFrameInterval, "entryVideoKeyFrameInterval");
+  GLADE_HOOKUP_OBJECT (pda, entryVideoBitrateTolerance, "entryVideoBitrateTolerance");
+  GLADE_HOOKUP_OBJECT (pda, entryVideoBitrate, "entryVideoBitrate");
+  GLADE_HOOKUP_OBJECT (pda, labelAudioBitrate, "labelAudioBitrate");
   GLADE_HOOKUP_OBJECT (pda, hbox14, "hbox14");
   GLADE_HOOKUP_OBJECT (pda, AddTranscodeToPlaylist, "AddTranscodeToPlaylist");
   GLADE_HOOKUP_OBJECT (pda, Transcode, "Transcode");
@@ -1163,6 +1493,7 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, labelProgramName, "labelProgramName");
   GLADE_HOOKUP_OBJECT (pda, labelCopyright, "labelCopyright");
   GLADE_HOOKUP_OBJECT (pda, about, "about");
+  GLADE_HOOKUP_OBJECT_NO_REF (pda, tooltips, "tooltips");
 
   return pda;
 }
