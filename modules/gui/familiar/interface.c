@@ -315,9 +315,9 @@ create_familiar (void)
   comboURL_items = g_list_append (comboURL_items, (gpointer) "ftp://");
   comboURL_items = g_list_append (comboURL_items, (gpointer) "http://");
   comboURL_items = g_list_append (comboURL_items, (gpointer) "udp://:1234");
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("udp6://:1234"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) "udp6://:1234");
   comboURL_items = g_list_append (comboURL_items, (gpointer) "rtp://:1234");
-  comboURL_items = g_list_append (comboURL_items, (gpointer) _("rtp6://:1234"));
+  comboURL_items = g_list_append (comboURL_items, (gpointer) "rtp6://:1234");
   gtk_combo_set_popdown_strings (GTK_COMBO (comboURL), comboURL_items);
   g_list_free (comboURL_items);
 
