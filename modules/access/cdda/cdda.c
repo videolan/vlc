@@ -72,7 +72,8 @@
 "   %n : The number of tracks on the CD\n" \
 "   %p : The artist/performer/composer in the track\n" \
 "   %T : The track number\n" \
-"   %s : Number of seconds in this track \n" \
+"   %s : Number of seconds in this track\n" \
+"   %S : Number of seconds in the CD\n" \
 "   %t : The track title or MRL if no title\n" \
 "   %Y : The year 19xx or 20xx\n" \
 "   %% : a % \n")
@@ -84,7 +85,8 @@
 "   %m : The CD-DA Media Catalog Number (MCN)\n" \
 "   %n : The number of tracks on the CD\n" \
 "   %T : The track number\n" \
-"   %s : Number of seconds in this track \n" \
+"   %s : Number of seconds in this track\n" \
+"   %S : Number of seconds in the CD\n" \
 "   %t : The track title or MRL if no title\n" \
 "   %% : a % \n")
 
