@@ -81,6 +81,17 @@ Disable VLANs support.
 .B \-\-server <host>, \-\-port <port>
 Choose the video server address and port.
 .TP
+.B \-\-synchro <type>
+Choose a fixed synchro value instead of the internal auto-adaptative
+heuristics based on CPU usage.
+
+`I' displays only I images, `IP' displays I and P images, `IP+'
+displays I and P images and every second B image, and `IPB' forces
+displaying of all images.
+
+Note that the vlc is certainly going to crash if you ask it to
+display more images than your CPU can cope with.
+.TP
 .B \-h, \-\-help
 Print help and exit.
 .TP
@@ -122,6 +133,9 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_iface=<interface>    network interface
  vlc_vlan_server=<host>   vlan server
  vlc_vlan_port=<port>     vlan server port
+.TP
+.B Synchro parameters:
+ vlc_synchro=<type>       synchro algorithm
 
 .SH SEE ALSO
 .BR vls (1), vlms (1)

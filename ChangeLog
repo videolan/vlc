@@ -1,3 +1,8 @@
+0.1.99g :
+
+  * removed all "*vlc" aliases except "gvlc" and "fbvlc". The other sucked.
+  * new --synchro flag which lets you force which images are decoded.
+
 Tue Aug  8 11:24:01 CEST 2000
 0.1.99f :
 

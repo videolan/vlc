@@ -80,6 +80,8 @@
 #define OPT_SERVER              171
 #define OPT_PORT                172
 
+#define OPT_SYNCHRO             180
+
 /* Usage fashion */
 #define USAGE                     0
 #define SHORT_HELP                1
@@ -120,6 +122,9 @@ static const struct option longopts[] =
     {   "novlans",          0,          0,      OPT_NOVLANS },
     {   "server",           1,          0,      OPT_SERVER },
     {   "port",             1,          0,      OPT_PORT },
+
+    /* Synchro options */
+    {   "synchro",          1,          0,      OPT_SYNCHRO },
 
     {   0,                  0,          0,      0 }
 };
@@ -433,7 +438,7 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     intf_MsgImm( COPYRIGHT_MESSAGE "\n" );
 
-    /* Get the executable name */
+    /* Get the executable name (similar to the basename command) */
     p_main->psz_arg0 = p_pointer = ppsz_argv[ 0 ];
     while( *p_pointer )
     {
@@ -537,6 +542,11 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( INPUT_PORT_VAR, optarg );
             break;
 
+        /* Synchro options */
+        case OPT_SYNCHRO:
+            main_PutPszVariable( VPAR_SYNCHRO_VAR, optarg );
+            break;
+
         /* Internal error: unknown option */
         case '?':
         default:
@@ -587,13 +597,15 @@ static void Usage( int i_fashion )
               "  -g, --grayscale                \tgrayscale output\n"
               "      --color                    \tcolor output\n"
               "\n"
-              "  -a, --dvdaudio                 \tchoose DVD audio type\n"
-              "  -c, --dvdchannel               \tchoose DVD audio channel\n"
-              "  -s, --dvdsubtitle              \tchoose DVD subtitle channel\n"
+              "  -a, --dvdaudio <type>          \tchoose DVD audio type\n"
+              "  -c, --dvdchannel <channel>     \tchoose DVD audio channel\n"
+              "  -s, --dvdsubtitle <channel>    \tchoose DVD subtitle channel\n"
               "\n"
               "      --novlans                  \tdisable vlans\n"
               "      --server <host>            \tvideo server address\n"
               "      --port <port>              \tvideo server port\n"
+              "\n"
+              "      --synchro <type>           \tforce synchro algorithm\n"
               "\n"
               "  -h, --help                     \tprint help and exit\n"
               "  -H, --longhelp                 \tprint long help and exit\n"
@@ -605,7 +617,7 @@ static void Usage( int i_fashion )
     /* Interface parameters */
     intf_Msg( "\n"
               "Interface parameters:\n"
-              "  " INTF_INIT_SCRIPT_VAR "=<filename>             \tinitialization script\n"
+              "  " INTF_INIT_SCRIPT_VAR "=<filename>               \tinitialization script\n"
               "  " INTF_CHANNELS_VAR "=<filename>            \tchannels list\n" );
 
     /* Audio parameters */
@@ -641,6 +653,11 @@ static void Usage( int i_fashion )
               "  " INPUT_IFACE_VAR "=<interface>          \tnetwork interface\n"
               "  " INPUT_VLAN_SERVER_VAR "=<hostname>     \tvlan server\n"
               "  " INPUT_VLAN_PORT_VAR "=<port>           \tvlan server port\n" );
+
+    /* Synchro parameters */
+    intf_Msg( "\n"
+              "Synchro parameters:\n"
+              "  " VPAR_SYNCHRO_VAR "={I|IP|IP+|IPB}      \tsynchro algorithm\n");
 }
 
 /*****************************************************************************

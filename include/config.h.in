@@ -372,6 +372,9 @@
 /* Maximum number of macroblocks in a picture. */
 #define MAX_MB                          2048
 
+/* The synchro variable name */
+#define VPAR_SYNCHRO_VAR                "vlc_synchro"
+
 /*****************************************************************************
  * Video decoder configuration
  *****************************************************************************/

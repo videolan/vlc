@@ -1691,7 +1691,7 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
      */
     if( p_vout->c_fps_samples > VOUT_FPS_SAMPLES )
     {
-        sprintf( psz_buffer, "%.2f fps/10", VOUT_FPS_SAMPLES * 1000000 * 10 /
+        sprintf( psz_buffer, "%lli fps/10", VOUT_FPS_SAMPLES * 1000000 * 10 /
                  ( p_vout->p_fps_sample[ (p_vout->c_fps_samples - 1) % VOUT_FPS_SAMPLES ] -
                    p_vout->p_fps_sample[ p_vout->c_fps_samples % VOUT_FPS_SAMPLES ] ) );
         Print( p_vout, 0, 0, RIGHT_RALIGN, TOP_RALIGN, psz_buffer );

@@ -203,52 +203,81 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
     {
         case I_CODING_TYPE:
 
-            //intf_ErrMsg( " I	%f	%f\nI ", 1000000.0 / p_vpar->synchro.i_theorical_delay, 1000000.0 / p_vpar->synchro.i_delay );
+            if( p_vpar->synchro.i_type != VPAR_SYNCHRO_DEFAULT )
+            {
+                /* I, IP, IP+, IPB */
+                return( 1 );
+            }
+
             return( p_vpar->synchro.b_all_I );
 
         case P_CODING_TYPE:
 
-            //return(1);
+            if( p_vpar->synchro.i_type == VPAR_SYNCHRO_I ) /* I */
+            {
+                return( 0 );
+            }
+
+            if( p_vpar->synchro.i_type >= VPAR_SYNCHRO_IP ) /* IP, IP+, IPB */
+            {
+                return( 1 );
+            }
+
             if( p_vpar->synchro.b_all_P )
             {
-                //intf_ErrMsg( " p  " );
                 return( 1 );
             }
 
             if( p_vpar->synchro.displayable_p * i_delay
                 < p_vpar->synchro.i_delay )
             {
-                //intf_ErrMsg( " -  " );
                 return( 0 );
             }
 
-            p_vpar->synchro.displayable_p--;
-            //intf_ErrMsg( " p> " );
+            p_vpar->synchro.displayable_p -= 1024;
+
             return( 1 );
 
         case B_CODING_TYPE:
 
+            if( p_vpar->synchro.i_type != VPAR_SYNCHRO_DEFAULT )
+            {
+                if( p_vpar->synchro.i_type <= VPAR_SYNCHRO_IP ) /* I, IP */
+                {
+                    return( 0 );
+                }
+                else if( p_vpar->synchro.i_type == VPAR_SYNCHRO_IPB ) /* IPB */
+                {
+                    return( 1 );
+                }
+
+                if( p_vpar->synchro.b_dropped_last_B ) /* IP+ */
+                {
+                    p_vpar->synchro.b_dropped_last_B = 0;
+                    return( 1 );
+                }
+
+                p_vpar->synchro.b_dropped_last_B = 1;
+                return( 0 );
+            }
+
             if( p_vpar->synchro.b_all_B )
             {
-                //intf_ErrMsg( "b " );
                 return( 1 );
             }
 
             if( p_vpar->synchro.displayable_b <= 0 )
             {
-                //intf_ErrMsg( "  " );
                 return( 0 );
             }
 
             if( i_delay < 0 )
             {
-                //intf_ErrMsg( "· " );
-                p_vpar->synchro.displayable_b -= 0.5;
+                p_vpar->synchro.displayable_b -= 512;
                 return( 0 );
             }
 
-            //intf_ErrMsg( "b " );
-            p_vpar->synchro.displayable_b--;
+            p_vpar->synchro.displayable_b -= 1024;
             return( 1 );
     }
 

@@ -43,6 +43,9 @@
 #ifdef SAM_SYNCHRO
 typedef struct video_synchro_s
 {
+    /* synchro algorithm */
+    int          i_type;
+
     /* fifo containing decoding dates */
     mtime_t      i_date_fifo[16];
     unsigned int i_start;
@@ -70,11 +73,18 @@ typedef struct video_synchro_s
     int           displayable_p;
     boolean_t     b_all_B;
     int           displayable_b;
+    boolean_t     b_dropped_last_B;
 
 } video_synchro_t;
 
 #define FIFO_INCREMENT( i_counter ) \
     p_vpar->synchro.i_counter = (p_vpar->synchro.i_counter + 1) & 0xf;
+
+#define VPAR_SYNCHRO_DEFAULT   0
+#define VPAR_SYNCHRO_I         1
+#define VPAR_SYNCHRO_IP        2
+#define VPAR_SYNCHRO_IPplus    3
+#define VPAR_SYNCHRO_IPB       4
 
 #endif
 

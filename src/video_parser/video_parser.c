@@ -65,6 +65,7 @@ static int      InitThread          ( vpar_thread_t *p_vpar );
 static void     RunThread           ( vpar_thread_t *p_vpar );
 static void     ErrorThread         ( vpar_thread_t *p_vpar );
 static void     EndThread           ( vpar_thread_t *p_vpar );
+static int      SynchroType         ( );
 
 /*****************************************************************************
  * vpar_CreateThread: create a generic parser thread
@@ -272,11 +273,14 @@ static int InitThread( vpar_thread_t *p_vpar )
     vpar_InitBMBType( p_vpar );
     vpar_InitDCTTables( p_vpar );
 
-
     /*
      * Initialize the synchro properties
      */
 #ifdef SAM_SYNCHRO
+    /* Get an possible synchro algorithm */
+    p_vpar->synchro.i_type = SynchroType();
+
+    /* last seen PTS */
     p_vpar->synchro.i_last_pts = 0;
 
     /* for i frames */
@@ -296,6 +300,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->synchro.displayable_p = 2 << 10;
     p_vpar->synchro.b_all_B = 0;
     p_vpar->synchro.displayable_b = 0;
+    p_vpar->synchro.b_dropped_last_B = 0;
     /* assume there were about 3 P and 6 B images between I's */
     p_vpar->synchro.i_P_seen = p_vpar->synchro.i_P_kept = 1 << 10;
     p_vpar->synchro.i_B_seen = p_vpar->synchro.i_B_kept = 1 << 10;
@@ -470,3 +475,57 @@ static void EndThread( vpar_thread_t *p_vpar )
 
     intf_DbgMsg("vpar debug: EndThread(%p)\n", p_vpar);
 }
+
+/*****************************************************************************
+ * SynchroType: Get the user's synchro type
+ *****************************************************************************
+ * This function is called at initialization.
+ *****************************************************************************/
+static int SynchroType( )
+{
+    char * psz_synchro = main_GetPszVariable( VPAR_SYNCHRO_VAR, NULL );
+
+    if( psz_synchro == NULL )
+    {
+        return VPAR_SYNCHRO_DEFAULT;
+    }
+
+    switch( *psz_synchro++ )
+    {
+      case 'i':
+      case 'I':
+        switch( *psz_synchro++ )
+        {
+          case '\0':
+            return VPAR_SYNCHRO_I;
+
+          case 'p':
+          case 'P':
+            switch( *psz_synchro++ )
+            {
+              case '\0':
+                return VPAR_SYNCHRO_IP;
+
+              case '+':
+                if( *psz_synchro ) return 0;
+                return VPAR_SYNCHRO_IPplus;
+
+              case 'b':
+              case 'B':
+                if( *psz_synchro ) return 0;
+                return VPAR_SYNCHRO_IPB;
+
+              default:
+                return VPAR_SYNCHRO_DEFAULT;
+                
+            }
+
+          default:
+            return VPAR_SYNCHRO_DEFAULT;
+        }
+    }
+
+    return VPAR_SYNCHRO_DEFAULT;
+
+}
+
