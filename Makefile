@@ -234,7 +234,6 @@ else
 video_parser_obj = 		video_parser/video_parser.o \
 						video_parser/vpar_headers.o \
 						video_parser/vpar_blocks.o \
-						video_parser/vpar_motion.o \
 						video_parser/vpar_synchro.o \
 						video_parser/video_fifo.o
 
