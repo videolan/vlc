@@ -1249,21 +1249,6 @@ int vlm_MediaControl( vlm_t *vlm, vlm_media_t *media, char *psz_id,
 /*****************************************************************************
  * Schedule handling
  *****************************************************************************/
-#ifdef __APPLE__
-int ftime(struct timeb *tp)
-{
-     struct timeval tv;
-
-     gettimeofday(&tv, NULL);
-     tp->time = tv.tv_sec;
-     tp->millitm = tv.tv_usec / 1000;
-     tp->timezone = 0;
-     tp->dstflag = 0;
-     
-     return (0);
-}
-#endif
-
 static int64_t vlm_Date()
 {
 #ifdef WIN32
