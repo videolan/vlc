@@ -3103,6 +3103,21 @@ AC_ARG_ENABLE(esd,
    fi])
 
 dnl
+dnl  Portaudio module
+dnl
+AC_ARG_ENABLE(portaudio,
+  [  --enable-portaudio      Portaudio library support (default disabled)],
+  [if test "${enable_portaudio}" = "yes"
+   then
+     VLC_ADD_PLUGINS([portaudio])
+     if test "${SYS}" = "mingw32"; then
+        VLC_ADD_LDFLAGS([portaudio],[-lportaudio -lwinmm -lole32])
+     else
+        VLC_ADD_LDFLAGS([portaudio],[-lportaudio])
+     fi
+   fi])
+
+dnl
 dnl  aRts module
 dnl
 AC_ARG_ENABLE(arts,

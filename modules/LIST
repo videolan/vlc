@@ -336,6 +336,8 @@ $Id$
 
  * playlist: playlist import module
  
+ * portaudio: audio output module that uses the portaudio library (www.portaudio.com)
+
  * postprocessing_c: Video Postprocessing module
 
  * postprocessing_mmx: Video Postprocessing module using MMX
