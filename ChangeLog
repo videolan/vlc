@@ -1,8 +1,9 @@
-[insert date here]
+Thu Jul 20 15:14:06 CEST 2000
 0.1.99e :
 
   * new bitstream syntax and slight performance increase
   * BeOS build fix
+  * removed the sample code from the reference decoder
 
 Wed Jul 12 01:24:40 CEST 2000
 0.1.99d :

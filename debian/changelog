@@ -2,7 +2,7 @@ vlc (0.1.99e) unstable; urgency=low
 
   * new bitstream syntax and slight performance increase
 
- -- Samuel Hocevar <sam@via.ecp.fr>  [ insert date here ]
+ -- Samuel Hocevar <sam@via.ecp.fr>  Thu, 20 Jul 2000 15:14:06 +0200
 
 vlc (0.1.99d) unstable; urgency=low
 

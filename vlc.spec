@@ -1,10 +1,10 @@
 Name: vlc
-Version: 0.1.99d
+Version: 0.1.99e
 Release: 1
 Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
-Source0: http://www.videolan.org/packages/0.1.99d/vlc-0.1.99d.tar.gz
+Source0: http://www.videolan.org/packages/0.1.99e/vlc-0.1.99e.tar.gz
 Packager: Samuel Hocevar <sam@via.ecp.fr>
 
 Buildroot: /tmp/vlc-build
