@@ -972,8 +972,67 @@ static int transcode_audio_ffmpeg_process( sout_stream_t *p_stream,
         id->i_dts += ( I64C(1000000) * id->i_buffer_pos / 2 /
             id->f_src.audio.i_channels / id->f_src.audio.i_rate );
 
-        if( id->f_src.audio.i_channels !=
-            id->p_encoder->fmt_in.audio.i_channels )
+        if( id->p_encoder->fmt_in.audio.i_channels == 1 &&
+            id->f_src.audio.i_channels > 1 )
+        {
+            int16_t *p_sample = (int16_t *)aout_buf.p_buffer;
+            int i_src_c = id->f_src.audio.i_channels;
+            unsigned int i;
+
+            for( i = 0; i < aout_buf.i_nb_samples; i++ )
+            {
+                int j, c = 0;
+
+                for( j = 1; j < i_src_c; j++ )
+                {
+                    c += p_sample[i_src_c * i + j];
+                }
+                p_sample[i] = c / (i_src_c-1);
+            }
+            aout_buf.i_nb_bytes = i * 2;
+        }
+        else if( id->p_encoder->fmt_in.audio.i_channels == 2 &&
+                 id->f_src.audio.i_channels > 2 )
+        {
+            int i_src_c = id->f_src.audio.i_channels;
+            unsigned int i;
+
+            static const float mixf_l[4][6] = /* [i_src_c - 3][channel index] */
+            {
+                { 0.00, 1.00, 0.00, 0.00, 0.00, 0.00 }, /* 3 channels */
+                { 0.00, 0.50, 0.50, 0.00, 0.00, 0.00 }, /* 4 channels */
+                { 0.00, 0.50, 0.00, 0.50, 0.00, 0.00 }, /* 5 channels */
+                { 0.00, 0.34, 0.33, 0.00, 0.33, 0.00 }, /* 6 channels */
+            };
+            static const float mixf_r[4][6] = /* [i_src_c - 3][channel index] */
+            {
+                { 0.00, 1.00, 0.00, 0.00, 0.00, 0.00 }, /* 3 channels */
+                { 0.00, 0.00, 0.50, 0.50, 0.00, 0.00 }, /* 4 channels */
+                { 0.00, 0.00, 0.50, 0.00, 0.50, 0.00 }, /* 5 channels */
+                { 0.00, 0.00, 0.33, 0.34, 0.00, 0.33 }, /* 6 channels */
+            };
+
+
+            for( i = 0; i < aout_buf.i_nb_samples; i++ )
+            {
+                int16_t *p_src = (int16_t *)aout_buf.p_buffer + i_src_c * i;
+                int16_t *p_dst = (int16_t *)aout_buf.p_buffer + 2 * i;
+
+                int j;
+                float l = 0.0, r = 0.0;
+                for( j = 0; j < i_src_c; j++ )
+                {
+                    l += mixf_l[i_src_c-3][j] * p_src[j];
+                    r += mixf_r[i_src_c-3][j] * p_src[j];
+                }
+
+                p_dst[0] = (int)( l + 0.5 );
+                p_dst[1] = (int)( r + 0.5 );
+            }
+            aout_buf.i_nb_bytes = i * 2 * 2;
+        }
+        else if( id->f_src.audio.i_channels !=
+                 id->p_encoder->fmt_in.audio.i_channels )
         {
             unsigned int i;
             int j;
