@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.21 2003/07/31 23:44:49 fenrir Exp $
+ * $Id: udp.c,v 1.22 2003/08/24 16:59:35 hartman Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -466,7 +466,7 @@ static ssize_t RTPChoose( input_thread_t * p_input, byte_t * p_buffer,
 
     if ( i_rtp_version != 2 )
     {
-        msg_Dbg( p_input, "no RTP header detected" );
+        msg_Dbg( p_input, "no supported RTP header detected" );
         p_input->pf_read = Read;
         p_input->p_vlc->pf_memcpy( p_buffer, p_tmp_buffer, i_ret );
         return i_ret;
