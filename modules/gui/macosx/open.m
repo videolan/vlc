@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: open.m,v 1.36 2003/07/27 23:05:41 hartman Exp $
+ * $Id: open.m,v 1.37 2003/09/09 13:51:45 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -231,8 +231,6 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     if( i_result )
     {
-        intf_thread_t * p_intf = [NSApp getIntf];
-
         NSMutableDictionary *o_dic;
         NSMutableArray *o_options = [NSMutableArray array];
         BOOL b_enq = [o_ckbox_enqueue state] == NSOnState ? YES : NO;

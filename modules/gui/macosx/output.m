@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.12 2003/07/28 21:41:20 massiot Exp $
+ * $Id: output.m,v 1.13 2003/09/09 13:51:45 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -112,6 +112,8 @@
 
 - (void)initStrings
 {
+    NSArray *o_muxers = [NSArray arrayWithObjects: @"MPEG TS", @"MPEG PS", @"MPEG1",
+        @"AVI", @"Ogg", @"MPEG4", @"Quicktime", nil];
     NSArray *o_a_channels = [NSArray arrayWithObjects: @"1", @"2", @"4", @"6", nil];
     NSArray *o_a_bitrates = [NSArray arrayWithObjects: @"96", @"128", @"192", @"256", @"512", nil];
     NSArray *o_v_bitrates = [NSArray arrayWithObjects:
@@ -119,7 +121,7 @@
     NSArray *o_a_codecs = [NSArray arrayWithObjects:
         @"mpga", @"mp3 ", @"a52 ", @"vorb", nil];
     NSArray *o_v_codecs = [NSArray arrayWithObjects:
-        @"mpgv", @"mp4v", @"DIV1", @"DIV2", @"DIV3", @"H263", @"I263", @"WMV1", @"WMV2", @"MJPG", nil];
+        @"mp1v", @"mp2v", @"mp4v", @"DIV1", @"DIV2", @"DIV3", @"H263", @"I263", @"WMV1", @"WMV2", @"MJPG", nil];
     
     [o_output_ckbox setTitle: _NS("Advanced output:")];
     [o_output_settings setTitle: _NS("Settings...")];
@@ -139,12 +141,8 @@
     [o_stream_type_lbl setStringValue: _NS("Type")];
     
     [o_mux_lbl setStringValue: _NS("Encapsulation Method")];
-    [[o_mux_selector itemAtIndex: 0] setTitle: _NS("MPEG TS")];
-    [[o_mux_selector itemAtIndex: 1] setTitle: _NS("MPEG PS")];
-    [[o_mux_selector itemAtIndex: 1] setTitle: _NS("MPEG1")];
-    [[o_mux_selector itemAtIndex: 3] setTitle: _NS("AVI")];
-    [[o_mux_selector itemAtIndex: 4] setTitle: _NS("Ogg")];
-    //[[o_mux_selector itemAtIndex: 5] setTitle: _NS("mp4")];
+    [o_mux_selector removeAllItems];
+    [o_mux_selector addItemsWithTitles: o_muxers];
     
     [o_transcode_lbl setTitle: _NS("Transcode options")];
     [o_transcode_video_chkbox setTitle: _NS("Video")];
@@ -220,7 +218,8 @@
         [[o_mux_selector itemAtIndex: 2] setEnabled: YES];
         [[o_mux_selector itemAtIndex: 3] setEnabled: YES];
         [[o_mux_selector itemAtIndex: 4] setEnabled: YES];
-        //[[o_mux_selector itemAtIndex: 5] setEnabled: YES];
+        [[o_mux_selector itemAtIndex: 5] setEnabled: YES];
+        [[o_mux_selector itemAtIndex: 6] setEnabled: YES];
     }
     else if( [o_mode isEqualToString: _NS("Stream")] )
     {
@@ -242,7 +241,8 @@
             [[o_mux_selector itemAtIndex: 2] setEnabled: YES];
             [[o_mux_selector itemAtIndex: 3] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 4] setEnabled: YES];
-            //[[o_mux_selector itemAtIndex: 5] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 5] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
         }
         else if( [o_mode isEqualToString: _NS("UDP")] )
         {
@@ -253,7 +253,8 @@
             [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 3] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 4] setEnabled: NO];
-            //[[o_mux_selector itemAtIndex: 5] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 5] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
             [o_sap_chkbox setEnabled: YES];
             [o_sap_name setEnabled: YES];
         }
@@ -266,7 +267,8 @@
             [[o_mux_selector itemAtIndex: 2] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 3] setEnabled: NO];
             [[o_mux_selector itemAtIndex: 4] setEnabled: NO];
-            //[[o_mux_selector itemAtIndex: 5] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 5] setEnabled: NO];
+            [[o_mux_selector itemAtIndex: 6] setEnabled: NO];
         }
     }
     if( ![[o_mux_selector selectedItem] isEnabled] )
@@ -293,8 +295,9 @@
     if ( [o_mux isEqualToString: _NS("AVI")] ) o_mux_string = @"avi";
     else if ( [o_mux isEqualToString: _NS("Ogg")] ) o_mux_string = @"ogg";
     else if ( [o_mux isEqualToString: _NS("MPEG PS")] ) o_mux_string = @"ps";
-    else if ( [o_mux isEqualToString: _NS("mp4")] ) o_mux_string = @"mp4";
+    else if ( [o_mux isEqualToString: _NS("MPEG4")] ) o_mux_string = @"mp4";
     else if ( [o_mux isEqualToString: _NS("MPEG1")] ) o_mux_string = @"mpeg1";
+    else if ( [o_mux isEqualToString: _NS("Quicktime")] ) o_mux_string = @"mov";
     else o_mux_string = @"ts";
 
     if( [o_mode isEqualToString: _NS("File")] )
@@ -353,8 +356,10 @@
         o_mux_string = @"avi";
     else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("Ogg")] )
         o_mux_string = @"ogm";
-    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("mp4")] )
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("MPEG4")] )
         o_mux_string = @"mp4";
+    else if ( [[o_mux_selector titleOfSelectedItem] isEqualToString: _NS("Quicktime")] )
+        o_mux_string = @"mov";
     else
         o_mux_string = @"ts";
 
