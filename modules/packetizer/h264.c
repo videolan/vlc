@@ -182,7 +182,7 @@ static int Open( vlc_object_t *p_this )
         for( i = 0; i < i_sps; i++ )
         {
             int i_length = GetWBE( p );
-            block_t *p_sps = nal_get_annexeb( p_dec, p+2, i_length );
+            block_t *p_sps = nal_get_annexeb( p_dec, p + 2, i_length );
 
             ParseNALBlock( p_dec, p_sps );
             p += 2 + i_length;
@@ -192,7 +192,7 @@ static int Open( vlc_object_t *p_this )
         for( i = 0; i < i_pps; i++ )
         {
             int i_length = GetWBE( p );
-            block_t *p_pps = nal_get_annexeb( p_dec, p+2, i_length );
+            block_t *p_pps = nal_get_annexeb( p_dec, p + 2, i_length );
 
             ParseNALBlock( p_dec, p_pps );
             p += 2 + i_length;
@@ -209,8 +209,6 @@ static int Open( vlc_object_t *p_this )
         p_dec->pf_packetize = Packetize;
     }
 
-        block_ChainRelease( p_sys->p_frame );
-        p_sys->p_frame = 0;
     return VLC_SUCCESS;
 }
 
