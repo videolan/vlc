@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.42 2003/07/25 11:33:24 gbazin Exp $
+dnl $Id: configure.ac,v 1.43 2003/07/27 12:31:50 ipkiss Exp $
 
 AC_INIT(vlc,0.6.1-test1)
 
@@ -3296,7 +3296,6 @@ AC_OUTPUT([
   modules/gui/qnx/Makefile
   modules/gui/qt/Makefile
   modules/gui/skins/Makefile
-  modules/gui/win32/Makefile
   modules/gui/wxwindows/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
