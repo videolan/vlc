@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.269 2003/11/30 16:00:24 fenrir Exp $
+ * $Id: input.c,v 1.270 2003/12/02 12:57:35 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,7 +43,7 @@
 
 #include "vlc_interface.h"
 #include "codecs.h"
-#include "modules/demux/util/sub.h"
+#include "../../modules/demux/util/sub.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -509,7 +509,7 @@ static int RunThread( input_thread_t *p_input )
                 subtitle_Demux( p_input->p_sys->sub[i], i_time );
             }
 
-            i_update_next = mdate() + 150000LL;
+            i_update_next = mdate() + I64C(150000);
         }
     }
 

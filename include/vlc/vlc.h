@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.27 2003/09/20 19:37:53 hartman Exp $
+ * $Id: vlc.h,v 1.28 2003/12/02 12:57:35 gbazin Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,12 @@ typedef union
     void *          p_address;
     vlc_object_t *  p_object;
     vlc_list_t *    p_list;
+
+#if defined( WIN32 ) && !defined( __MINGW32__ )
+    signed __int64   i_time;
+# else
     signed long long i_time;
+#endif
 
     struct { char *psz_name; int i_object_id; } var;
 

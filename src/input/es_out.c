@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.5 2003/11/30 17:29:56 fenrir Exp $
+ * $Id: es_out.c,v 1.6 2003/12/02 12:57:35 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -228,7 +228,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     input_thread_t    *p_input = p_sys->p_input;
     es_out_id_t       *es = malloc( sizeof( es_out_id_t ) );
     pgrm_descriptor_t *p_prgm = NULL;
-    char              psz_cat[strlen( "Stream " ) + 10];
+    char              psz_cat[sizeof( "Stream " ) + 10];
     input_info_category_t *p_cat;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );

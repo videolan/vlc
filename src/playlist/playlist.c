@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.66 2003/11/29 11:12:46 fenrir Exp $
+ * $Id: playlist.c,v 1.67 2003/12/02 12:57:36 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -249,7 +249,7 @@ static void ObjectGarbageCollector( playlist_t *p_playlist,
     if( *pi_obj_destroyed_date == 0 )
     {
         /* give a little time */
-        *pi_obj_destroyed_date = mdate() + 300000LL;
+        *pi_obj_destroyed_date = mdate() + I64C(300000);
     }
     else
     {

@@ -2,7 +2,7 @@
  * subtitles.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: subtitles.c,v 1.4 2003/10/11 22:40:05 hartman Exp $
+ * $Id: subtitles.c,v 1.5 2003/12/02 12:57:36 gbazin Exp $
  *
  * Authors: Derk-Jan Hartman <hartman at videolan.org>
  * This is adapted code from the GPL'ed MPlayer (http://mplayerhq.hu)
@@ -32,7 +32,13 @@
 #include <vlc/input.h>
 
 #include "ninput.h"
-#include <dirent.h>
+
+#ifdef HAVE_DIRENT_H
+#   include <dirent.h>
+#else
+#   include "../extras/dirent.h"
+#endif
+
 #include <ctype.h>
 
 /**

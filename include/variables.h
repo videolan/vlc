@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.18 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: variables.h,v 1.19 2003/12/02 12:57:35 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -255,7 +255,7 @@ static inline int __var_SetInteger( vlc_object_t *p_obj, const char *psz_name, i
  * \param psz_name The name of the variable
  * \param i The new time value of this variable
  */
-static inline int __var_SetTime( vlc_object_t *p_obj, const char *psz_name, signed long long i )
+static inline int __var_SetTime( vlc_object_t *p_obj, const char *psz_name, int64_t i )
 {
     vlc_value_t val;
     val.i_time = i;
