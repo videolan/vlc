@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.4 2002/05/05 17:20:49 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.5 2002/05/06 22:02:32 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -156,7 +156,7 @@ static pes_packet_t *__PES_GET( decoder_fifo_t *p_fifo )
     vlc_mutex_lock( &p_fifo->data_lock );
 
     /* if fifo is emty wait */
-    while( p_fifo->p_first == NULL )
+    while( !p_fifo->p_first )
     {
         if( p_fifo->b_die )
         {
@@ -184,12 +184,12 @@ static void __PES_NEXT( decoder_fifo_t *p_fifo )
     p_fifo->p_first = p_next;
     p_fifo->i_depth--;
 
-    if( p_fifo->p_first == NULL )
+    if( !p_fifo->p_first )
     {
         /* No PES in the fifo */
         /* pp_last no longer valid */
         p_fifo->pp_last = &p_fifo->p_first;
-        while( p_fifo->p_first == NULL )
+        while( !p_fifo->p_first )
         {
             vlc_cond_signal( &p_fifo->data_wait );
             vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
@@ -218,7 +218,7 @@ static void __PACKET_NEXT( videodec_thread_t *p_vdec )
     do
     {
         p_vdec->p_data = p_vdec->p_data->p_next;
-        if( p_vdec->p_data == NULL )
+        if( !p_vdec->p_data )
         {
             __PES_NEXT( p_vdec->p_fifo );
             if( p_vdec->p_fifo->b_die )
@@ -249,20 +249,24 @@ static void __PACKET_FILL( videodec_thread_t *p_vdec )
 static __inline__ void __ConvertAVPictureToPicture( AVPicture *p_avpicture, 
                                                     picture_t *p_picture )
 {
-    int i_plane, i_line;
+    int i_plane, i_line, i_inc;
     u8 *p_dest,*p_src;
     
-    for( i_plane = 0; i_plane < p_picture->i_planes; i_plane++ )
+    for( i_plane = 0; i_plane < __MIN(p_picture->i_planes, 3); i_plane++ )
     {
         p_dest = p_picture->p[i_plane].p_pixels;
         p_src  = p_avpicture->data[i_plane];
-        if( (p_dest == NULL)||( p_src == NULL)||(i_plane >= 3) ) { return; }
+        if( ( !p_dest )||( !p_src )) 
+        { 
+            return; 
+        }
+        i_inc = __MIN( p_picture->p[i_plane].i_pitch,
+                       p_avpicture->linesize[i_plane] );
         for( i_line = 0; i_line < p_picture->p[i_plane].i_lines; i_line++ )
         {
             FAST_MEMCPY( p_dest, 
-                         p_src, 
-                         __MIN( p_picture->p[i_plane].i_pitch,
-                                p_avpicture->linesize[i_plane] ) );
+                         p_src,
+                         i_inc );
             p_dest += p_picture->p[i_plane].i_pitch;
             p_src  += p_avpicture->linesize[i_plane];
         }
@@ -278,14 +282,12 @@ static __inline__ u32 __FfmpegChromaToFourCC( int i_ffmpegchroma )
             return FOURCC_I420;
         case( PIX_FMT_RGB24 ):
             return FOURCC_RV24;
-        case( PIX_FMT_BGR24 ):
-            return 0; /* FIXME pas trouvé ds video.h */
         case( PIX_FMT_YUV422P ):
             return FOURCC_Y422;
         case( PIX_FMT_YUV444P ):
-            return  0; /* FIXME pas trouvé FOURCC_IYU2; */
+        case( PIX_FMT_BGR24 ):
         default:
-            return  0;
+            return( 0 );
     }
 
 }
@@ -383,11 +385,11 @@ static int InitThread( videodec_thread_t *p_vdec )
             break;
         case( MSMPEG4_VIDEO_ES):
             p_vdec->p_codec = avcodec_find_decoder( CODEC_ID_MSMPEG4 );
-            p_vdec->psz_namecodec = "MS MPEG-4";
+            p_vdec->psz_namecodec = "MS MPEG-4/divx";
             break;
         case( MPEG4_VIDEO_ES):
             p_vdec->p_codec = avcodec_find_decoder( CODEC_ID_MPEG4 );
-            p_vdec->psz_namecodec = "MPEG-4";
+            p_vdec->psz_namecodec = "MPEG-4/opendivx";
             break;
         default:
             p_vdec->p_codec = NULL;
@@ -419,7 +421,17 @@ static int InitThread( videodec_thread_t *p_vdec )
         intf_WarnMsg( 1, "vdec info: ffmpeg codec (%s) started",
                          p_vdec->psz_namecodec );
     }
-
+    /* destroy each p_vout */
+    vlc_mutex_lock( &p_vout_bank->lock );
+    if( p_vout_bank->i_count != 0 )
+    {
+        vlc_mutex_unlock( &p_vout_bank->lock );
+        vout_DestroyThread( p_vout_bank->pp_vout[ 0 ], NULL );
+        p_vout_bank->i_count--; 
+        p_vout_bank->pp_vout[ 0 ] = NULL;
+        vlc_mutex_lock( &p_vout_bank->lock );
+    }
+    vlc_mutex_unlock( &p_vout_bank->lock );
     __PACKET_REINIT( p_vdec );
     return( 0 );
 }
@@ -445,10 +457,15 @@ static void EndThread( videodec_thread_t *p_vdec )
                         p_vdec->psz_namecodec);
     }
 
-    if( p_vdec->p_vout != NULL )
+    if( p_vout_bank->i_count != 0 )
     {
-        vout_DestroyThread( p_vdec->p_vout, NULL );
+        vlc_mutex_unlock( &p_vout_bank->lock );
+        vout_DestroyThread( p_vout_bank->pp_vout[ 0 ], NULL );
+        p_vout_bank->i_count--; 
+        p_vout_bank->pp_vout[ 0 ] = NULL;
+        vlc_mutex_lock( &p_vout_bank->lock );
     }
+    vlc_mutex_unlock( &p_vout_bank->lock );
 
     free( p_vdec );
 }
@@ -459,7 +476,6 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
     int     b_gotpicture;
     int     b_convert;
     mtime_t i_pts; 
-    pes_packet_t  *p_pes;
     AVPicture avpicture;  /* ffmpeg picture */
     u32 i_chroma;
     picture_t *p_picture; /* videolan picture */
@@ -467,16 +483,8 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
        give it to ffmpeg decoder 
        and send the image to the output */ 
     /* when we have the first image we create the video output */
-/* int avcodec_decode_video(AVCodecContext *avctx, AVPicture *picture, 
-                            int *got_picture_ptr,
-                            UINT8 *buf, int buf_size);
- typedef struct AVPicture 
- {
-     UINT8 *data[3];
-     int linesize[3];
- } AVPicture;
- */
-    i_pts = -1 ;
+
+    i_pts = 0 ;
     do
     {
         __PACKET_FILL( p_vdec );
@@ -485,7 +493,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
             return;
         }
         /* save pts */
-        if( i_pts < 0 ) {i_pts =  __PES_GET( p_vdec->p_fifo )->i_pts;}
+        if( !i_pts ) {i_pts =  __PES_GET( p_vdec->p_fifo )->i_pts;}
 
         i_len = avcodec_decode_video( p_vdec->p_context,
                                       &avpicture,
@@ -495,7 +503,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
                                       
         if( i_len < 0 )
         {
-            intf_WarnMsg( 1, "vdec error: cannot decode one frame (%d bytes)",
+            intf_WarnMsg( 3, "vdec error: cannot decode one frame (%d bytes)",
                         p_vdec->i_data_size );
             __PES_NEXT( p_vdec->p_fifo );
             __PACKET_REINIT( p_vdec );
@@ -505,8 +513,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
         p_vdec->p_buff += i_len;
     } while( !b_gotpicture );
 
-    i_chroma =__FfmpegChromaToFourCC( p_vdec->p_context->pix_fmt );
-    if( i_chroma == 0 )
+    if( !(i_chroma =__FfmpegChromaToFourCC( p_vdec->p_context->pix_fmt ) ) )
     {
         b_convert = 1;
         i_chroma = FOURCC_I420;
@@ -517,17 +524,12 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
     }
     
     /* Send decoded frame to vout */
-    if( p_vdec->p_vout == NULL )
+    if( !p_vdec->p_vout )
     {
-        /* FIXME FIXME faire ca comme il faut avec :
-         * pp_vout_bank
-         * bon aspect, ds avi pas definie mais pour le reste a voir ...
-         */
-
         /* create vout */
 
         /* ffmpeg set it for our with some codec */  
-        if( (p_vdec->format.i_width == 0)||(p_vdec->format.i_height == 0) )
+        if( (!p_vdec->format.i_width )||(!p_vdec->format.i_height) )
         {
             p_vdec->format.i_width  = p_vdec->p_context->width;
             p_vdec->format.i_height = p_vdec->p_context->height; 
@@ -537,12 +539,6 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
                                 p_vdec->format.i_height;
         p_vdec->i_chroma = i_chroma;
 
-        intf_WarnMsg( 1, "vdec info: creating vout %dx%d chroma %4.4s %s",
-                         p_vdec->format.i_width,
-                         p_vdec->format.i_height,
-                         (char*)&p_vdec->i_chroma,
-                         b_convert ? "(with convertion)" : "" );
-
         p_vdec->p_vout = vout_CreateThread( 
                                 NULL,
                                 p_vdec->format.i_width,
@@ -550,12 +546,17 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
                                 p_vdec->i_chroma,
                                 p_vdec->i_aspect );
 
-        if( p_vdec->p_vout == NULL )
+
+        if( !p_vdec->p_vout )
         {
             intf_ErrMsg( "vdec error: can't open vout, aborting" );
             p_vdec->p_fifo->b_error = 1;
             return;
         }
+        vlc_mutex_lock( &p_vout_bank->lock );
+        p_vout_bank->pp_vout[ 0 ] = p_vdec->p_vout;
+        p_vout_bank->i_count++; 
+        vlc_mutex_unlock( &p_vout_bank->lock );
     }
 
     while( (p_picture = vout_CreatePicture( p_vdec->p_vout,
@@ -571,7 +572,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
-    if( b_convert == 1 )
+    if( b_convert )
     {
         /* we convert in a supported format */
         int i_status;
@@ -610,5 +611,5 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
     vout_DisplayPicture( p_vdec->p_vout, p_picture );
     
     return;
-}   
+}
 
