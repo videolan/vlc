@@ -181,19 +181,23 @@
 
 /* Default remote server */
 #define INPUT_SERVER_VAR                "vlc_server"
-#define INPUT_SERVER_DEFAULT            "138.195.143.220"
+#define INPUT_SERVER_DEFAULT            "138.195.143.224"
 
 /* Default input port */
 #define INPUT_PORT_VAR                  "vlc_server_port"
 #define INPUT_PORT_DEFAULT              1234
 
 /* Default broadcast address */
-#define INPUT_BCAST_ADRR_VAR            "vlc_broadcast_addr"
+#define INPUT_BCAST_ADDR_VAR            "vlc_broadcast_addr"
 #define INPUT_BCAST_ADDR_DEFAULT        "138.195.143.255"
 
 /* Broadcast mode */
 #define INPUT_BROADCAST_VAR             "vlc_broadcast"
 #define INPUT_BROADCAST_DEFAULT         0
+
+/* Channels mode */
+#define INPUT_NETWORK_CHANNEL_VAR       "vlc_channel"
+#define INPUT_NETWORK_CHANNEL_DEFAULT   0
 
 /*
  * Channel method
@@ -205,7 +209,7 @@
 
 /* Default server and port */
 #define INPUT_CHANNEL_SERVER_VAR           "vlc_channel_server"
-#define INPUT_CHANNEL_SERVER_DEFAULT       "138.195.139.95"
+#define INPUT_CHANNEL_SERVER_DEFAULT       "138.195.143.220"
 #define INPUT_CHANNEL_PORT_VAR             "vlc_channel_port"
 #define INPUT_CHANNEL_PORT_DEFAULT         6010
 

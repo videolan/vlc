@@ -259,3 +259,5 @@ GnomePopupJumpActivate                 (GtkMenuItem     *menuitem,
 {
     GtkJumpShow( GTK_WIDGET( menuitem ), NULL, "intf_popup" );
 }
+
+

@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.5 2001/05/07 03:14:09 stef Exp $
+ * $Id: ac3_spdif.c,v 1.6 2001/05/30 05:19:03 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -80,7 +80,7 @@ vlc_thread_t spdif_CreateThread( adec_config_t * p_config )
     }
     
     /* Temporary buffer to store ac3 frames to be transformed */
-    p_spdif->p_ac3 = malloc( /*ac3_info.i_frame_size*/SPDIF_FRAME_SIZE );
+    p_spdif->p_ac3 = malloc( SPDIF_FRAME_SIZE );
 
     if( p_spdif->p_ac3 == NULL )
     {
@@ -126,7 +126,7 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
             BitstreamCallback, (void*)p_spdif );
 
     /* Creating the audio output fifo */
-    p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_SPDIF_FIFO, 1, 0, 0,
+    p_spdif->p_aout_fifo = aout_CreateFifo( AOUT_ADEC_SPDIF_FIFO, 1, 48000, 0,
                                             SPDIF_FRAME_SIZE, NULL );
 
     if( p_spdif->p_aout_fifo == NULL )
@@ -146,7 +146,10 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
         return -1;
     }
 
-    /* Check that we can handle the rate */
+    
+    /* Check that we can handle the rate 
+     * FIXME: we should check that we have the same rate for all fifos 
+     * but all rates should be supported by the decoder (32, 44.1, 48) */
     if( p_spdif->ac3_info.i_sample_rate != 48000 )
     {
         intf_ErrMsg( "spdif error: Only 48000 Hz streams supported");
@@ -154,6 +157,7 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
         aout_DestroyFifo( p_spdif->p_aout_fifo );
         return -1;
     }
+    p_spdif->p_aout_fifo->l_rate = p_spdif->ac3_info.i_sample_rate;
 
     GetChunk( &p_spdif->bit_stream, p_spdif->p_ac3 + sizeof(sync_frame_t),
         p_spdif->ac3_info.i_frame_size - sizeof(sync_frame_t) );
@@ -167,38 +171,50 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
  ****************************************************************************/
 static void RunThread( ac3_spdif_thread_t * p_spdif )
 {
+    mtime_t     m_last_pts = 0;
+    mtime_t     m_frame_time;
+
     /* Initializing the spdif decoder thread */
     if( InitThread( p_spdif ) )
     {
          p_spdif->p_fifo->b_error = 1;
     }
 
+    /* Compute the theorical duration of an ac3 frame */
+    m_frame_time = 1000000 * AC3_FRAME_SIZE /
+                             p_spdif->ac3_info.i_sample_rate;
+
     while( !p_spdif->p_fifo->b_die && !p_spdif->p_fifo->b_error )
     {
         /* Handle the dates */
         if(DECODER_FIFO_START(*p_spdif->p_fifo)->i_pts)
         {
-            p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->l_end_frame] =
-                DECODER_FIFO_START(*p_spdif->p_fifo)->i_pts;
+            m_last_pts = DECODER_FIFO_START(*p_spdif->p_fifo)->i_pts;
             DECODER_FIFO_START(*p_spdif->p_fifo)->i_pts = 0;
         }
         else
         {
-            p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->l_end_frame] =
-                LAST_MDATE;
+            m_last_pts += m_frame_time;
         }
 
-        /* Write in the first free packet of aout fifo */
-        p_spdif->p_iec = (p_spdif->p_aout_fifo->buffer) + 
-            (p_spdif->p_aout_fifo->l_end_frame * SPDIF_FRAME_SIZE );
-
-        /* Build burst to be sent to hardware decoder */
-        ac3_iec958_build_burst( p_spdif );
-
-        vlc_mutex_lock (&p_spdif->p_aout_fifo->data_lock);
-        p_spdif->p_aout_fifo->l_end_frame = 
-                (p_spdif->p_aout_fifo->l_end_frame + 1 ) & AOUT_FIFO_SIZE;
-        vlc_mutex_unlock (&p_spdif->p_aout_fifo->data_lock);
+        /* if we're late here the output won't have to play the frame */
+        if( m_last_pts > mdate() )
+        {
+            p_spdif->p_aout_fifo->date[p_spdif->p_aout_fifo->l_end_frame] =
+                m_last_pts;
+    
+            /* Write in the first free packet of aout fifo */
+            p_spdif->p_iec = (p_spdif->p_aout_fifo->buffer) + 
+                (p_spdif->p_aout_fifo->l_end_frame * SPDIF_FRAME_SIZE );
+    
+            /* Build burst to be sent to hardware decoder */
+            ac3_iec958_build_burst( p_spdif );
+    
+            vlc_mutex_lock (&p_spdif->p_aout_fifo->data_lock);
+            p_spdif->p_aout_fifo->l_end_frame = 
+                    (p_spdif->p_aout_fifo->l_end_frame + 1 ) & AOUT_FIFO_SIZE;
+            vlc_mutex_unlock (&p_spdif->p_aout_fifo->data_lock);
+        }
 
         /* Find syncword again in case of stream discontinuity */
         while( ShowBits( &p_spdif->bit_stream, 16 ) != 0xb77 ) 

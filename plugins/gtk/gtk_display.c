@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.1 2001/05/23 23:08:20 stef Exp $
+ * $Id: gtk_display.c,v 1.2 2001/05/30 05:19:03 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -130,6 +130,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
         switch( p_intf->p_input->stream.i_method & 0xf0 )
         {
             case INPUT_METHOD_FILE:
+//intf_WarnMsg( 2, "intf info: file method" );
                 gtk_widget_show( GTK_WIDGET( p_file_box ) );
                 p_label = gtk_object_get_data( GTK_OBJECT(
                             p_intf->p_sys->p_window ),
@@ -138,9 +139,11 @@ gint GtkModeManage( intf_thread_t * p_intf )
                                     p_intf->p_input->p_source );
                 break;
             case INPUT_METHOD_DISC:
+//intf_WarnMsg( 2, "intf info: disc method" );
                 gtk_widget_show( GTK_WIDGET( p_dvd_box ) );
                 break;
             case INPUT_METHOD_NETWORK:
+//intf_WarnMsg( 2, "intf info: network method" );
                 gtk_widget_show( GTK_WIDGET( p_network_box ) );
                 p_label = gtk_object_get_data( GTK_OBJECT(
                             p_intf->p_sys->p_window ),
@@ -176,6 +179,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
     }
     else
     {
+//intf_WarnMsg( 2, "intf info: default to file method" );
         /* default mode */
         p_label = gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_window ),
                         "label_status" );

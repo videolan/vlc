@@ -92,8 +92,9 @@ create_intf_window (void)
   GtkWidget *network_address;
   GtkWidget *network_channel_box;
   GtkWidget *channel_label;
-  GtkObject *channel_spinbutton_adj;
-  GtkWidget *channel_spinbutton;
+  GtkObject *network_channel_spinbutton_adj;
+  GtkWidget *network_channel_spinbutton;
+  GtkWidget *network_channel_go_button;
   GtkWidget *intf_statusbar;
   GtkAccelGroup *accel_group;
   GtkTooltips *tooltips;
@@ -741,13 +742,21 @@ create_intf_window (void)
   gtk_widget_show (channel_label);
   gtk_box_pack_start (GTK_BOX (network_channel_box), channel_label, FALSE, FALSE, 5);
 
-  channel_spinbutton_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
-  channel_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (channel_spinbutton_adj), 1, 0);
-  gtk_widget_ref (channel_spinbutton);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "channel_spinbutton", channel_spinbutton,
+  network_channel_spinbutton_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
+  network_channel_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (network_channel_spinbutton_adj), 1, 0);
+  gtk_widget_ref (network_channel_spinbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_channel_spinbutton", network_channel_spinbutton,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (channel_spinbutton);
-  gtk_box_pack_start (GTK_BOX (network_channel_box), channel_spinbutton, FALSE, TRUE, 0);
+  gtk_widget_show (network_channel_spinbutton);
+  gtk_box_pack_start (GTK_BOX (network_channel_box), network_channel_spinbutton, FALSE, TRUE, 0);
+
+  network_channel_go_button = gtk_button_new_with_label (_("Go!"));
+  gtk_widget_ref (network_channel_go_button);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_channel_go_button", network_channel_go_button,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_channel_go_button);
+  gtk_box_pack_start (GTK_BOX (network_channel_box), network_channel_go_button, FALSE, FALSE, 0);
+  gtk_button_set_relief (GTK_BUTTON (network_channel_go_button), GTK_RELIEF_NONE);
 
   intf_statusbar = gtk_statusbar_new ();
   gtk_widget_ref (intf_statusbar);
@@ -846,6 +855,12 @@ create_intf_window (void)
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (chapter_next_button), "clicked",
                       GTK_SIGNAL_FUNC (GtkChapterNext),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (network_channel_spinbutton), "activate",
+                      GTK_SIGNAL_FUNC (GtkNetworkJoin),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (network_channel_go_button), "clicked",
+                      GTK_SIGNAL_FUNC (GtkChannelGo),
                       "intf_window");
 
   gtk_object_set_data (GTK_OBJECT (intf_window), "tooltips", tooltips);

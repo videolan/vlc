@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.111 2001/05/28 04:23:52 sam Exp $
+ * $Id: input.c,v 1.112 2001/05/30 05:19:03 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -666,7 +666,16 @@ void input_NetworkOpen( input_thread_t * p_input )
     if( psz_broadcast == NULL )
     {
         /* Are we broadcasting ? */
-        psz_broadcast = main_GetPszVariable( INPUT_BROADCAST_VAR, NULL );
+        if( main_GetIntVariable( INPUT_BROADCAST_VAR,
+                                 INPUT_BROADCAST_DEFAULT ) )
+        {
+            psz_broadcast = main_GetPszVariable( INPUT_BCAST_ADDR_VAR,
+                                                 INPUT_BCAST_ADDR_DEFAULT );
+        }
+        else
+        {
+           psz_broadcast = NULL; 
+        }
     }
 
     intf_WarnMsg( 2, "input: server: %s port: %d broadcast: %s",

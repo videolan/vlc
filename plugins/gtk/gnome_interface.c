@@ -178,8 +178,9 @@ create_intf_window (void)
   GtkWidget *network_address_label;
   GtkWidget *network_channel_box;
   GtkWidget *label_network;
-  GtkObject *network_spinbutton_adj;
-  GtkWidget *network_spinbutton;
+  GtkObject *network_channel_spinbutton_adj;
+  GtkWidget *network_channel_spinbutton;
+  GtkWidget *network_channel_go_button;
   GtkWidget *appbar;
   GtkTooltips *tooltips;
 
@@ -634,6 +635,7 @@ create_intf_window (void)
   gtk_widget_ref (network_channel_box);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_channel_box", network_channel_box,
                             (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_channel_box);
   gtk_box_pack_start (GTK_BOX (network_box), network_channel_box, FALSE, FALSE, 0);
 
   label_network = gtk_label_new (_("Network Channel:"));
@@ -643,14 +645,21 @@ create_intf_window (void)
   gtk_widget_show (label_network);
   gtk_box_pack_start (GTK_BOX (network_channel_box), label_network, TRUE, FALSE, 5);
 
-  network_spinbutton_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
-  network_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (network_spinbutton_adj), 1, 0);
-  gtk_widget_ref (network_spinbutton);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_spinbutton", network_spinbutton,
+  network_channel_spinbutton_adj = gtk_adjustment_new (1, 0, 100, 1, 10, 10);
+  network_channel_spinbutton = gtk_spin_button_new (GTK_ADJUSTMENT (network_channel_spinbutton_adj), 1, 0);
+  gtk_widget_ref (network_channel_spinbutton);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_channel_spinbutton", network_channel_spinbutton,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (network_spinbutton);
-  gtk_box_pack_start (GTK_BOX (network_channel_box), network_spinbutton, FALSE, TRUE, 5);
-  gtk_widget_set_sensitive (network_spinbutton, FALSE);
+  gtk_widget_show (network_channel_spinbutton);
+  gtk_box_pack_start (GTK_BOX (network_channel_box), network_channel_spinbutton, FALSE, TRUE, 5);
+
+  network_channel_go_button = gtk_button_new_with_label (_("Go!"));
+  gtk_widget_ref (network_channel_go_button);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "network_channel_go_button", network_channel_go_button,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (network_channel_go_button);
+  gtk_box_pack_start (GTK_BOX (network_channel_box), network_channel_go_button, FALSE, FALSE, 0);
+  gtk_button_set_relief (GTK_BUTTON (network_channel_go_button), GTK_RELIEF_NONE);
 
   appbar = gnome_appbar_new (FALSE, TRUE, GNOME_PREFERENCES_NEVER);
   gtk_widget_ref (appbar);
@@ -720,6 +729,12 @@ create_intf_window (void)
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (button_chapter_next), "clicked",
                       GTK_SIGNAL_FUNC (GtkChapterNext),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (network_channel_spinbutton), "activate",
+                      GTK_SIGNAL_FUNC (GtkNetworkJoin),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (network_channel_go_button), "clicked",
+                      GTK_SIGNAL_FUNC (GtkChannelGo),
                       "intf_window");
 
   gtk_object_set_data (GTK_OBJECT (intf_window), "tooltips", tooltips);
@@ -1497,6 +1512,7 @@ create_intf_network (void)
   gtk_table_attach (GTK_TABLE (table2), broadcast_check, 0, 1, 2, 3,
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (broadcast_check), TRUE);
 
   network_broadcast_combo = gnome_entry_new (NULL);
   gtk_widget_ref (network_broadcast_combo);
@@ -1513,6 +1529,7 @@ create_intf_network (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_broadcast);
   gtk_widget_set_sensitive (network_broadcast, FALSE);
+  gtk_entry_set_text (GTK_ENTRY (network_broadcast), _("138.195.143.255"));
 
   network_server_combo = gnome_entry_new (NULL);
   gtk_widget_ref (network_server_combo);
@@ -1528,7 +1545,7 @@ create_intf_network (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_network), "network_server", network_server,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (network_server);
-  gtk_entry_set_text (GTK_ENTRY (network_server), _("vls"));
+  gtk_entry_set_text (GTK_ENTRY (network_server), _("vlsppc-02"));
 
   hbuttonbox1 = GNOME_DIALOG (intf_network)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_network), "hbuttonbox1", hbuttonbox1);

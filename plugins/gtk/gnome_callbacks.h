@@ -125,3 +125,11 @@ GnomePlaylistNetworkOpenActivate       (GtkMenuItem     *menuitem,
 void
 GnomePopupJumpActivate                 (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
+
+void
+GtkNetworkJoin                         (GtkEditable     *editable,
+                                        gpointer         user_data);
+
+void
+GtkChannelGo                           (GtkButton       *button,
+                                        gpointer         user_data);

@@ -2,7 +2,7 @@
  * audio_output.h : audio output thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: audio_output.h,v 1.35 2001/05/06 18:32:30 stef Exp $
+ * $Id: audio_output.h,v 1.36 2001/05/30 05:19:03 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -194,8 +194,11 @@ typedef struct aout_thread_s
 #define AOUT_FMT_S16_NE      AOUT_FMT_S16_LE
 #endif
 
+/* Number of samples in an AC3 frame */
+#define AC3_FRAME_SIZE      1536
+
 /* Size of a frame for spdif output */
-#define SPDIF_FRAME_SIZE 6144
+#define SPDIF_FRAME_SIZE    6144
 
 /*****************************************************************************
  * Prototypes

@@ -894,8 +894,14 @@
 
 	<widget>
 	  <class>GtkSpinButton</class>
-	  <name>channel_spinbutton</name>
+	  <name>network_channel_spinbutton</name>
 	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>activate</name>
+	    <handler>GtkNetworkJoin</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Wed, 30 May 2001 02:48:10 GMT</last_modification_time>
+	  </signal>
 	  <climb_rate>1</climb_rate>
 	  <digits>0</digits>
 	  <numeric>False</numeric>
@@ -912,6 +918,25 @@
 	    <padding>0</padding>
 	    <expand>False</expand>
 	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>network_channel_go_button</name>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>GtkChannelGo</handler>
+	    <data>&quot;intf_window&quot;</data>
+	    <last_modification_time>Wed, 30 May 2001 02:49:18 GMT</last_modification_time>
+	  </signal>
+	  <label>Go!</label>
+	  <relief>GTK_RELIEF_NONE</relief>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>False</fill>
 	  </child>
 	</widget>
       </widget>

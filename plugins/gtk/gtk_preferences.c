@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.3 2001/05/23 23:08:20 stef Exp $
+ * $Id: gtk_preferences.c,v 1.4 2001/05/30 05:19:03 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -108,7 +108,7 @@ gboolean GtkPreferencesShow( GtkWidget       *widget,
                           "preferences_network_port_spinbutton" );
     
         /* Broadcast address */
-        ASSIGN_PSZ_ENTRY( INPUT_BCAST_ADRR_VAR, INPUT_BCAST_ADDR_DEFAULT,
+        ASSIGN_PSZ_ENTRY( INPUT_BCAST_ADDR_VAR, INPUT_BCAST_ADDR_DEFAULT,
                           "preferences_network_broadcast_entry" );
     
         /* Broadcast stream by default ? */
@@ -233,7 +233,7 @@ void GtkPreferencesApply( GtkButton * button, gpointer user_data )
     ASSIGN_INT_VALUE( INPUT_PORT_VAR, "preferences_network_port_spinbutton" );
 
     /* Broadcast address */
-    ASSIGN_PSZ_ENTRY( INPUT_BCAST_ADRR_VAR,
+    ASSIGN_PSZ_ENTRY( INPUT_BCAST_ADDR_VAR,
                       "preferences_network_broadcast_entry" );
 
     /* Broadcast stream by default ? */

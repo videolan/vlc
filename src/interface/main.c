@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.96 2001/05/15 19:36:27 sam Exp $
+ * $Id: main.c,v 1.97 2001/05/30 05:19:03 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -645,6 +645,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             break;
         case OPT_CHANNELS:                                     /* --channels */
             p_main->b_channels = 1;
+            main_PutIntVariable( INPUT_NETWORK_CHANNEL_VAR, 1 );
             break;
         case OPT_SERVER:                                         /* --server */
             main_PutPszVariable( INPUT_SERVER_VAR, optarg );
@@ -653,7 +654,8 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( INPUT_PORT_VAR, optarg );
             break;
         case OPT_BROADCAST:                                   /* --broadcast */
-            main_PutPszVariable( INPUT_BROADCAST_VAR, optarg );
+            main_PutIntVariable( INPUT_BROADCAST_VAR, 1 );
+            main_PutPszVariable( INPUT_BCAST_ADDR_VAR, optarg );
             break;
 
         /* Synchro options */

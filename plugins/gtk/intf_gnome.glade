@@ -869,7 +869,6 @@
 	<widget>
 	  <class>GtkHBox</class>
 	  <name>network_channel_box</name>
-	  <visible>False</visible>
 	  <homogeneous>False</homogeneous>
 	  <spacing>0</spacing>
 	  <child>
@@ -897,9 +896,14 @@
 
 	  <widget>
 	    <class>GtkSpinButton</class>
-	    <name>network_spinbutton</name>
-	    <sensitive>False</sensitive>
+	    <name>network_channel_spinbutton</name>
 	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>GtkNetworkJoin</handler>
+	      <data>&quot;intf_window&quot;</data>
+	      <last_modification_time>Wed, 30 May 2001 02:28:48 GMT</last_modification_time>
+	    </signal>
 	    <climb_rate>1</climb_rate>
 	    <digits>0</digits>
 	    <numeric>False</numeric>
@@ -916,6 +920,25 @@
 	      <padding>5</padding>
 	      <expand>False</expand>
 	      <fill>True</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkButton</class>
+	    <name>network_channel_go_button</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>clicked</name>
+	      <handler>GtkChannelGo</handler>
+	      <data>&quot;intf_window&quot;</data>
+	      <last_modification_time>Wed, 30 May 2001 02:38:25 GMT</last_modification_time>
+	    </signal>
+	    <label>Go!</label>
+	    <relief>GTK_RELIEF_NONE</relief>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
 	    </child>
 	  </widget>
 	</widget>
@@ -2026,7 +2049,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	      <last_modification_time>Sat, 19 May 2001 02:57:46 GMT</last_modification_time>
 	    </signal>
 	    <label>Broadcast</label>
-	    <active>False</active>
+	    <active>True</active>
 	    <draw_indicator>True</draw_indicator>
 	    <child>
 	      <left_attach>0</left_attach>
@@ -2072,7 +2095,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	      <editable>True</editable>
 	      <text_visible>True</text_visible>
 	      <text_max_length>0</text_max_length>
-	      <text></text>
+	      <text>138.195.143.255</text>
 	    </widget>
 	  </widget>
 
@@ -2103,7 +2126,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;
 	      <editable>True</editable>
 	      <text_visible>True</text_visible>
 	      <text_max_length>0</text_max_length>
-	      <text>vls</text>
+	      <text>vlsppc-02</text>
 	    </widget>
 	  </widget>
 	</widget>
