@@ -22,8 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#define MENU_HEIGHT 15
-
 class InterfaceWindow : public BWindow
 {
 public:

@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.15 2001/03/05 20:36:04 richards Exp $
+ * $Id: intf_beos.cpp,v 1.16 2001/03/05 22:29:02 richards Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -49,10 +49,10 @@
 #include <Locker.h>
 #include <DirectWindow.h>
 #include <Box.h>
+#include <Alert.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <FilePanel.h>
-#include <Alert.h>
 #include <malloc.h>
 #include <string.h>
 
@@ -107,14 +107,13 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
 
     SetName( "interface" );
     SetTitle(VOUT_TITLE " (BeOS interface)");
-    BRect rect(0, 0, 0, MENU_HEIGHT);
+    BRect rect(0, 0, 0, 0);
     
     BMenuBar *menu_bar; 
     menu_bar = new BMenuBar(rect, "main menu");
     AddChild( menu_bar );
 
 	BMenu *m;
-	BMenuItem *i;
 
 	menu_bar->AddItem( m = new BMenu("File") );
 	menu_bar->ResizeToPreferred();
@@ -226,7 +225,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 {
 	int vol_val = p_vol->Value();	// remember the current volume
 	static int playback_status;		// remember playback state
-	
 	BAlert *alert;
 	
 	Activate();
@@ -244,8 +242,9 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
     	break;
 
     case OPEN_DVD:
-    	alert = new BAlert(VOUT_TITLE, "Opening DVDs not yet implemented", "Bummer");
-    	alert->Go();
+	    alert = new BAlert(VOUT_TITLE, "Opening DVD not yet supported", "Bummer");
+	    alert->Go();
+	    //intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, "dvd:/dev/disk/ide/atapi/1/master/0/raw" );
     	break;
 
     case STOP_PLAYBACK:
@@ -349,10 +348,12 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
    	    {
 			if (p_main->p_aout->vol == 0)
 			{
+				p_vol->SetEnabled(true);
 				p_main->p_aout->vol = vol_val;
 			}	
 			else
 			{
+				p_vol->SetEnabled(false);
 				p_main->p_aout->vol = 0;
 			}
 		}
