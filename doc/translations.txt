@@ -1,0 +1,68 @@
+Create translations for VLC media player
+==============
+Edit the appropriate file (for instance fr.po for French translation).
+Write the translation of "msgid" strings into the "msgstr" field.
+You can always ask vlc-devel@videolan.org for assistance.
+
+
+Writing a new localization
+==========================
+If there is no localization file for your language, send a mail to
+vlc-devel@videolan.org. In return we will send you a localization file,
+along with a special VLC binary for your tests.
+
+
+Testing your localization on UNIX
+=================================
+You must install the gettext package. See your UNIX distribution, or
+  http://www.gnu.org/software/gettext
+Use the convert-po.sh script attached :
+  ./convert-po.sh <LANG>.po
+Copy the resulting vlc.mo file to
+  /usr/local/share/locale/<LANG>/LC_MESSAGES
+
+
+Testing your localization on Mac OS X
+=====================================
+If you do not have GNU gettext installed (you'd probably know if you had
+it :), you must download its binaries from our website :
+  http://download.videolan.org/pub/videolan/devtools/gettext-macosx.tar.gz
+and extract them into the current directory :
+  tar xvzf gettext-macosx.tar.gz
+
+Use the convert-po.sh script attached :
+  setenv PATH gettext-macosx:$PATH
+  setenv DYLD_LIBRARY_PATH=gettext-macosx
+  ./convert-po.sh <LANG>.po
+[*]
+
+Copy the resulting vlc.mo file to
+  VLC.app/Contents/MacOS/locale/<LANG>/LC_MESSAGES
+
+
+"fuzzy" translations
+====================
+A fuzzy translation is an untranslated string for which gettext did an
+automatic suggestion, but needs your confirmation. They are marked with
+the "#, fuzzy" comment. If you think the suggestion is OK, or if you
+fixed the suggestion, do not forget to remove the "#, fuzzy" comment.
+
+
+[*] Step by step process to localize under Mac OS X (excerpt from a mail) :
+cd ~/Desktop
+curl -O http://www.videolan.org/pub/videolan/devtools/vlc-po-files.tar.gz
+tar xzf vlc-po-files.tar.gz
+cd vlc-po-files
+curl -O http://www.videolan.org/pub/videolan/devtools/gettext-macosx.tar.gz
+tar xzf gettext-macosx.tar.gz
+setenv PATH ./gettext-macosx:$PATH
+setenv DYLD_LIBRARY_PATH ./gettext-macosx
+[here you copy your it.po file to the vlc-po-files folder on your Desktop]
+./convert-po.sh it.po
+[here you copy the vlc.mo file to your
+VLC.app/Contents/MacOS/locale/it/LC_MESSAGES]
+
+-- 
+Christophe Massiot <massiot@via.ecp.fr>
+Derk-Jan Hartman <hartman at videolan dot org>
+$Id: translations.txt,v 1.1 2004/02/04 03:23:25 hartman Exp $
