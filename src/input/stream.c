@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: stream.c,v 1.3 2003/08/18 19:17:54 fenrir Exp $
+ * $Id: stream.c,v 1.4 2003/08/20 01:18:50 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -145,7 +145,10 @@ int         stream_vaControl( stream_t *s, int i_query, va_list args )
                 data_packet_t   *p_data;
                 int             i_skip = i64 - s->p_input->stream.p_selected_area->i_tell;
 
-                msg_Warn( s, "will skip %d bytes, slow", i_skip );
+                if( i_skip > 1000 )
+                {
+                    msg_Warn( s, "will skip %d bytes, slow", i_skip );
+                }
 
                 while (i_skip > 0 )
                 {
