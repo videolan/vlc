@@ -185,7 +185,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->file = NULL;
     p_sys->i_file = 0;
     p_sys->i_index = 0;
+#ifndef UNDER_CE
     p_sys->fd = -1;
+#endif
 
     if( !strcasecmp( p_access->psz_access, "stream" ) )
     {
@@ -577,7 +579,7 @@ static int _OpenFile( access_t * p_access, char * psz_name )
     p_sys->fd = fopen( psz_name, "rb" );
     if ( !p_sys->fd )
     {
-        msg_Err( p_access, "cannot open file %s" );
+        msg_Err( p_access, "cannot open file %s", psz_name );
         return VLC_EGENERIC;
     }
 

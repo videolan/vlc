@@ -1544,23 +1544,19 @@ static void * _module_getsymbol( module_handle_t handle,
 static char * GetWindowsError( void )
 {
 #if defined(UNDER_CE)
-    wchar_t psz_tmp[256];
-    char * psz_buffer = malloc( 256 );
+    wchar_t psz_tmp[MAX_PATH];
+    char * psz_buffer = malloc( MAX_PATH );
 #else
-    char * psz_tmp = malloc( 256 );
+    char * psz_tmp = malloc( MAX_PATH );
 #endif
     int i = 0, i_error = GetLastError();
 
     FormatMessage( FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                    NULL, i_error, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT),
-                   (LPTSTR) psz_tmp, 256, NULL );
+                   (LPTSTR)psz_tmp, MAX_PATH, NULL );
 
     /* Go to the end of the string */
-#if defined(UNDER_CE)
-    while( psz_tmp[i] && psz_tmp[i] != L'\r' && psz_tmp[i] != L'\n' )
-#else
-    while( psz_tmp[i] && psz_tmp[i] != '\r' && psz_tmp[i] != '\n' )
-#endif
+    while( psz_tmp[i] && psz_tmp[i] != _T('\r') && psz_tmp[i] != _T('\n') )
     {
         i++;
     }
@@ -1577,8 +1573,7 @@ static char * GetWindowsError( void )
     }
 
 #if defined(UNDER_CE)
-    WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, psz_tmp, -1,
-                         psz_buffer, 256, NULL, NULL );
+    wcstombs( psz_buffer, psz_tmp, MAX_PATH );
     return psz_buffer;
 #else
     return psz_tmp;

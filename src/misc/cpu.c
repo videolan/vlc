@@ -283,7 +283,7 @@ uint32_t CPUCapabilities( void )
     i_capabilities |= CPU_CAPABILITY_FPU;
     return i_capabilities;
 
-#elif defined( _MSC_VER )
+#elif defined( _MSC_VER ) && !defined( UNDER_CE )
     i_capabilities |= CPU_CAPABILITY_FPU;
     return i_capabilities;
 
