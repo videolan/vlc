@@ -115,12 +115,18 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     }
 
     /* Get plugins */
-    p_vout->p_sys_create =  GetPluginFunction( p_vout->vout_plugin, "vout_SysCreate" );
-    p_vout->p_sys_init =    GetPluginFunction( p_vout->vout_plugin, "vout_SysInit" );
-    p_vout->p_sys_end =     GetPluginFunction( p_vout->vout_plugin, "vout_SysEnd" );
-    p_vout->p_sys_destroy = GetPluginFunction( p_vout->vout_plugin, "vout_SysDestroy" );
-    p_vout->p_sys_manage =  GetPluginFunction( p_vout->vout_plugin, "vout_SysManage" );
-    p_vout->p_sys_display = GetPluginFunction( p_vout->vout_plugin, "vout_SysDisplay" );
+    p_vout->p_sys_create = 
+        GetPluginFunction( p_vout->vout_plugin, "vout_SysCreate" );
+    p_vout->p_sys_init =
+        GetPluginFunction( p_vout->vout_plugin, "vout_SysInit" );
+    p_vout->p_sys_end =
+        GetPluginFunction( p_vout->vout_plugin, "vout_SysEnd" );
+    p_vout->p_sys_destroy =
+        GetPluginFunction( p_vout->vout_plugin, "vout_SysDestroy" );
+    p_vout->p_sys_manage =
+        GetPluginFunction( p_vout->vout_plugin, "vout_SysManage" );
+    p_vout->p_sys_display =
+        GetPluginFunction( p_vout->vout_plugin, "vout_SysDisplay" );
 
     /* Initialize thread properties - thread id and locks will be initialized
      * later */
@@ -140,16 +146,17 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
     p_vout->i_bytes_per_pixel   = 2;
     p_vout->f_gamma             = VOUT_GAMMA;
 
-    p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR, VOUT_GRAYSCALE_DEFAULT );
+    p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR,
+                                                       VOUT_GRAYSCALE_DEFAULT );
     p_vout->b_info              = 0;
     p_vout->b_interface         = 0;
     p_vout->b_scale             = 0;
 
     p_vout->p_set_palette       = SetPalette;
 
-    intf_DbgMsg("wished configuration: %dx%d, %d/%d bpp (%d Bpl)\n",
-                p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
-                p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line );
+    intf_DbgMsg( "wished configuration: %dx%d, %d/%d bpp (%d Bpl)\n",
+                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
+                 p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line );
 
     /* Initialize idle screen */
     p_vout->last_display_date   = mdate();
@@ -1852,7 +1859,7 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
                 break;
             }
             vout_RenderSPU( p_subpic->p_data, p_subpic->type.spu.i_offset,
-                            p_subpic->type.spu.i_x1, p_subpic->type.spu.i_y1,
+                            p_subpic,
                             p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
                             p_vout->i_bytes_per_pixel,
                             p_vout->i_bytes_per_line );

@@ -49,11 +49,16 @@
 /*
  * Local prototypes
  */
-static int  ParseCommandArguments   ( char *psz_argv[INTF_MAX_ARGS], char *psz_cmd );
-static int  CheckCommandArguments   ( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
-                                      char *psz_argv[INTF_MAX_ARGS], char *psz_format );
-static void ParseFormatString       ( intf_arg_t format[INTF_MAX_ARGS], char *psz_format );
-static int  ConvertArgument         ( intf_arg_t *p_arg, int i_flags, char *psz_str );
+static int  ParseCommandArguments   ( char *psz_argv[INTF_MAX_ARGS],
+                                      char *psz_cmd );
+static int  CheckCommandArguments   ( intf_arg_t argv[INTF_MAX_ARGS],
+                                      int i_argc,
+                                      char *psz_argv[INTF_MAX_ARGS],
+                                      char *psz_format );
+static void ParseFormatString       ( intf_arg_t format[INTF_MAX_ARGS],
+                                      char *psz_format );
+static int  ConvertArgument         ( intf_arg_t *p_arg, int i_flags,
+                                      char *psz_str );
 
 /*****************************************************************************
  * intf_ExecCommand: parse and execute a command
@@ -99,10 +104,12 @@ int intf_ExecCommand( char *psz_cmd )
     }
 
     /* Check arguments validity */
-    if( CheckCommandArguments( argv, i_argc, psz_argv, control_command[i_index].psz_format ) )
+    if( CheckCommandArguments( argv, i_argc, psz_argv,
+                               control_command[i_index].psz_format ) )
     {
-        /* The given arguments does not match the format string. An error message has
-         * already been displayed, so only the usage string is printed */
+        /* The given arguments does not match the format string. An error
+         * message has already been displayed, so only the usage string
+         * is printed */
         intf_IntfMsg( "usage: %s", control_command[i_index].psz_usage );
         return( INTF_USAGE_ERROR );
     }
@@ -121,9 +128,10 @@ int intf_ExecCommand( char *psz_cmd )
 
     case INTF_CRITICAL_ERROR:                              /* critical error */
         /* Print message, flush messages queue and exit. Note that this
-         * error should be very rare since it does not even try to cancel other
-         * threads... */
-        intf_ErrMsg("critical error in command `%s'. Please report this error !\n", psz_argv[0] );
+         * error should be very rare since it does not even try to cancel
+         * other threads... */
+        intf_ErrMsg( "critical error in command `%s', "
+                     "please report this error !\n", psz_argv[0] );
         intf_FlushMsg();
         exit( INTF_CRITICAL_ERROR );
         break;
@@ -170,7 +178,9 @@ int intf_ExecScript( char *psz_filename )
         if( psz_line[0] != '#' )
         {
             /* The final '\n' needs to be removed before execution */
-            for( psz_index = psz_line; *psz_index && (*psz_index != '\n'); psz_index++ )
+            for( psz_index = psz_line;
+                 *psz_index && (*psz_index != '\n');
+                 psz_index++ )
             {
                 ;
             }
@@ -215,7 +225,9 @@ static int ParseCommandArguments( char *psz_argv[INTF_MAX_ARGS], char *psz_cmd )
 
     /* Go through command until end has been reached or maximal number of
      * arguments has been reached */
-    for( psz_index = psz_cmd; *psz_index && (i_argc < INTF_MAX_ARGS); psz_index++ )
+    for( psz_index = psz_cmd;
+         *psz_index && (i_argc < INTF_MAX_ARGS);
+         psz_index++ )
     {
         /* Inside a block, end of blocks are marked by spaces */
         if( b_block )
@@ -254,7 +266,8 @@ static int ParseCommandArguments( char *psz_argv[INTF_MAX_ARGS], char *psz_cmd )
  * can be modified.
  *****************************************************************************/
 static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
-                                  char *psz_argv[INTF_MAX_ARGS], char *psz_format )
+                                  char *psz_argv[INTF_MAX_ARGS],
+                                  char *psz_format )
 {
     intf_arg_t  format[INTF_MAX_ARGS];           /* parsed format indicators */
     int         i_arg;                                     /* argument index */
@@ -283,7 +296,9 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
 
         /* Test if argument can be taken as a named argument: try to find a
          * '=' in the string */
-        for( psz_index = psz_argv[i_arg]; *psz_index && ( *psz_index != '=' ); psz_index++ )
+        for( psz_index = psz_argv[i_arg];
+             *psz_index && ( *psz_index != '=' );
+             psz_index++ )
         {
             ;
         }
@@ -298,8 +313,10 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
                 /* Current format string is named... compare start of two
                  * names. A local inline ntation of a strcmp is used since
                  * string isn't ended by '\0' but by '=' */
-                for( psz_index = psz_argv[i_arg], psz_cmp_index = format[i_index].ps_name;
-                     (*psz_index == *psz_cmp_index) && (*psz_index != '=') && (*psz_cmp_index != '=');
+                for( psz_index = psz_argv[i_arg],
+                         psz_cmp_index = format[i_index].ps_name;
+                     (*psz_index == *psz_cmp_index) && (*psz_index != '=')
+                         && (*psz_cmp_index != '=');
                      psz_index++, psz_cmp_index++ )
                 {
                     ;
@@ -307,17 +324,18 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
                 if( *psz_index == *psz_cmp_index )        /* the names match */
                 {
                     /* The argument is a named argument which name match the
-                     * named argument i_index. To be valid, the argument should
-                     * not have been already encountered and the type must
-                     * match. Before going further, the '=' is replaced by
-                     * a '\0'. */
+                     * named argument i_index. To be valid, the argument
+                     * should not have been already encountered and the type
+                     * must match. Before going further, the '=' is replaced
+                     * by a '\0'. */
                     *psz_index = '\0';
 
-                    /* Check unicity. If the argument has already been encountered,
-                     * print an error message and return. */
-                    if( format[i_index].i_flags & INTF_PRESENT_ARG )/* present */
+                    /* Check unicity. If the argument has already been
+                     * encountered, print an error message and return. */
+                    if( format[i_index].i_flags & INTF_PRESENT_ARG )
                     {
-                        intf_IntfMsg("error: `%s' has already been encountered", psz_argv[i_arg] );
+                        intf_IntfMsg( "error: `%s' has already been "
+                                      "encountered", psz_argv[i_arg] );
                         return( 1 );
                     }
 
@@ -330,10 +348,12 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
 
                     /* Check type and store value */
                     psz_index++;
-                    if( ConvertArgument( &argv[i_arg], format[i_index].i_flags, psz_index ) )
+                    if( ConvertArgument( &argv[i_arg],
+                                         format[i_index].i_flags, psz_index ) )
                     {
                         /* An error occured during conversion */
-                        intf_IntfMsg( "error: invalid type for `%s'", psz_index );
+                        intf_IntfMsg( "error: invalid type for `%s'",
+                                      psz_index );
                     }
                 }
             }
@@ -351,17 +371,20 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
              * be browsed starting from last position until the argument is
              * found, an error occurs or the last format argument is
              * reached */
-            while( !b_found && (i_format < INTF_MAX_ARGS) && format[i_format].i_flags )
+            while( !b_found && (i_format < INTF_MAX_ARGS)
+                       && format[i_format].i_flags )
             {
                 /* Try to convert argument */
-                if( !ConvertArgument( &argv[i_arg], format[i_format].i_flags, psz_argv[i_arg] ) )
+                if( !ConvertArgument( &argv[i_arg], format[i_format].i_flags,
+                                      psz_argv[i_arg] ) )
                 {
                     /* Matching format has been found */
                     b_found = 1;
                     format[i_format].i_flags |= INTF_PRESENT_ARG;
                     argv[i_arg].i_index = i_format;
 
-                    /* If argument is repeatable, dot not increase format counter */
+                    /* If argument is repeatable, dot not increase format
+                     * counter */
                     if( !(format[i_format].i_flags & INTF_REP_ARG) )
                     {
                         i_format++;
@@ -369,8 +392,8 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
                 }
                 else
                 {
-                    /* Argument does not match format. This can be an error, or
-                     * just a missing optionnal parameter, or the end of a
+                    /* Argument does not match format. This can be an error,
+                     * or just a missing optionnal parameter, or the end of a
                      * repeated argument */
                     if( (format[i_format].i_flags & INTF_OPT_ARG)
                         || (format[i_format].i_flags & INTF_PRESENT_ARG) )
@@ -382,7 +405,8 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
                     {
                         /* The present format argument is mandatory and does
                          * not match the argument */
-                        intf_IntfMsg("error: missing argument before `%s'", psz_argv[i_arg] );
+                        intf_IntfMsg( "error: missing argument before `%s'",
+                                      psz_argv[i_arg] );
                         return( 1 );
                     }
                 }
@@ -394,17 +418,18 @@ static int CheckCommandArguments( intf_arg_t argv[INTF_MAX_ARGS], int i_argc,
          * return */
         if( !b_found )
         {
-            intf_IntfMsg("error: `%s' does not match any argument", psz_argv[i_arg] );
+            intf_IntfMsg( "error: `%s' does not match any argument",
+                          psz_argv[i_arg] );
             return( 1 );
         }
 
-        intf_DbgMsg("argument flags=0x%x (index=%d) name=%s str=%s int=%d float=%f\n",
-                    argv[i_arg].i_flags,
-                    argv[i_arg].i_index,
-                    (argv[i_arg].i_flags & INTF_NAMED_ARG) ? argv[i_arg].ps_name : "NA",
-                    (argv[i_arg].i_flags & INTF_STR_ARG) ? argv[i_arg].psz_str : "NA",
-                    (argv[i_arg].i_flags & INTF_INT_ARG) ? argv[i_arg].i_num : 0,
-                    (argv[i_arg].i_flags & INTF_FLOAT_ARG) ? argv[i_arg].f_num : 0);
+        intf_DbgMsg(
+            "argument flags=0x%x (index=%d) name=%s str=%s int=%d float=%f\n",
+            argv[i_arg].i_flags, argv[i_arg].i_index,
+            (argv[i_arg].i_flags & INTF_NAMED_ARG) ? argv[i_arg].ps_name : "NA",
+            (argv[i_arg].i_flags & INTF_STR_ARG) ? argv[i_arg].psz_str : "NA",
+            (argv[i_arg].i_flags & INTF_INT_ARG) ? argv[i_arg].i_num : 0,
+            (argv[i_arg].i_flags & INTF_FLOAT_ARG) ? argv[i_arg].f_num : 0 );
     }
 
     /* Parse all remaining format specifier to verify they are all optionnal */
@@ -476,16 +501,16 @@ static int ConvertArgument( intf_arg_t *p_arg, int i_flags, char *psz_str )
 }
 
 /*****************************************************************************
- * ParseFormatString: parse a format string                              (ok ?)
+ * ParseFormatString: parse a format string                             (ok ?)
  *****************************************************************************
  * This function read a format string, as specified in the control_command
  * array, and fill a format array, to allow easier argument identification.
  * Note that no memory is allocated by this function, but that, in a named
  * argument, the name field does not end with a '\0' but with an '='.
  * See command.h for format string specifications.
- * Note that this function is designed to be efficient, not to check everything
- * in a format string, which should be entered by a developper and therefore
- * should be correct (TRUST !).
+ * Note that this function is designed to be efficient, not to check
+ * everything in a format string, which should be entered by a developper
+ * and therefore should be correct (TRUST !).
  *****************************************************************************/
 static void ParseFormatString( intf_arg_t format[INTF_MAX_ARGS], char *psz_format )
 {

@@ -182,6 +182,7 @@ static int aout_SpawnThread( aout_thread_t * p_aout )
 
     /* We want the audio output thread to live */
     p_aout->b_die = 0;
+    p_aout->b_active = 1;
 
     /* Initialize the fifos lock */
     vlc_mutex_init( &p_aout->fifos_lock );

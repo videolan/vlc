@@ -419,10 +419,11 @@ static int LoadChannels( intf_thread_t *p_intf, char *psz_filename )
         {
             if( !ParseChannel( p_channel, psz_line ) )
             {
-                intf_DbgMsg("channel [%d] %s : method %d (%s:%d vlan %d)\n",
-                            p_channel->i_channel, p_channel->psz_description,
-                            p_channel->i_input_method, p_channel->psz_input_source,
-                            p_channel->i_input_port, p_channel->i_input_vlan );
+                intf_DbgMsg( "channel [%d] %s : method %d (%s:%d vlan %d)\n",
+                         p_channel->i_channel, p_channel->psz_description,
+                         p_channel->i_input_method,
+                         p_channel->psz_input_source,
+                         p_channel->i_input_port, p_channel->i_input_vlan );
                 p_channel++;
             }
         }

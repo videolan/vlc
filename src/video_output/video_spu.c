@@ -30,11 +30,14 @@
 
 #include "config.h"
 #include "common.h"
+#include "threads.h"
+#include "mtime.h"
+#include "video.h"
 #include "video_spu.h"
 
 #include "intf_msg.h"
 
-typedef struct spu_s
+typedef struct vout_spu_s
 {
     int i_id;
     byte_t *p_data;
@@ -44,9 +47,9 @@ typedef struct spu_s
     int width;
     int height;
 
-} spu_t;
+} vout_spu_t;
 
-static int NewLine  ( spu_t *p_spu, int *i_id );
+static int NewLine  ( vout_spu_t *p_vspu, int *i_id );
 
 /* i = get_nibble(); */
 #define GET_NIBBLE( i ) \
@@ -88,27 +91,29 @@ static int NewLine  ( spu_t *p_spu, int *i_id );
  * 
  *****************************************************************************/
 void vout_RenderSPU( byte_t *p_data, int p_offset[2],
-                     int i_x, int i_y, byte_t *p_pic,
+                     subpicture_t *p_subpic, byte_t *p_pic,
                      int i_bytes_per_pixel, int i_bytes_per_line )
 {
     int i_code = 0x00;
     int i_next = 0;
     int i_id = 0;
     int i_color;
+
+    /* fake palette - the real one has to be sought in the .IFO */
     static int p_palette[4] = { 0x0000, 0xffff, 0x5555, 0x0000 };
 
     boolean_t b_aligned = 1;
     byte_t *p_from[2];
-    spu_t spu;
+    vout_spu_t vspu;
 
     p_from[1] = p_data + p_offset[1];
     p_from[0] = p_data + p_offset[0];
 
-    spu.x = 0;
-    spu.y = 0;
-    spu.width = 720;
-    spu.height = 576;
-    spu.p_data = p_pic + i_x * i_bytes_per_pixel + i_y * i_bytes_per_line;
+    vspu.x = 0;
+    vspu.y = 0;
+    vspu.width = 720;
+    vspu.height = 576;
+    vspu.p_data = p_pic + p_subpic->i_x * i_bytes_per_pixel + p_subpic->i_y * i_bytes_per_line;
 
     while( p_from[0] < p_data + p_offset[1] )
     {
@@ -118,78 +123,78 @@ void vout_RenderSPU( byte_t *p_data, int p_offset[2],
         {
             found_code:
 
-            if( ((i_code >> 2) + spu.x + spu.y * spu.width)
-                    > spu.height * spu.width )
+            if( ((i_code >> 2) + vspu.x + vspu.y * vspu.width)
+                    > vspu.height * vspu.width )
             {
                 intf_DbgMsg ( "video_spu: invalid draw request ! %d %d\n",
-                              i_code >> 2, spu.height * spu.width
-                               - ( (i_code >> 2) + spu.x
-                                   + spu.y * spu.width ) );
+                              i_code >> 2, vspu.height * vspu.width
+                               - ( (i_code >> 2) + vspu.x
+                                   + vspu.y * vspu.width ) );
                 return;
             }
             else
             {
                 if( (i_color = i_code & 0x3) )
                 {
-                    u8 *p_target = &spu.p_data[ 2 * 
-                                    ( spu.x + spu.y * spu.width ) ];
+                    u8 *p_target = &vspu.p_data[ 2 * 
+                                    ( vspu.x + vspu.y * vspu.width ) ];
                     memset( p_target, p_palette[i_color], 2 * (i_code >> 2) );
                 }
-                spu.x += i_code >> 2;
+                vspu.x += i_code >> 2;
             }
 
-            if( spu.x >= spu.width )
+            if( vspu.x >= vspu.width )
             {
                 /* byte-align the stream */
                 b_aligned = 1;
                 /* finish the line */
-                NewLine( &spu, &i_id );
+                NewLine( &vspu, &i_id );
             }
             continue;
         }
 
         ADD_NIBBLE( i_code, (i_code << 4) );
-        if( i_code >= 0x10 )       /* 1x .. 3x */
-            goto found_code;
+        if( i_code >= 0x10 )   /* 00 11 xx cc */
+            goto found_code;   /* 00 01 xx cc */
 
         ADD_NIBBLE( i_code, (i_code << 4) );
-        if( i_code >= 0x40 )       /* 04x .. 0fx */
-            goto found_code;
+        if( i_code >= 0x040 )  /* 00 00 11 xx xx cc */
+            goto found_code;   /* 00 00 01 xx xx cc */
 
         ADD_NIBBLE( i_code, (i_code << 4) );
-        if( i_code >= 0x100 )      /* 01xx .. 03xx */
-            goto found_code;
+        if( i_code >= 0x0100 ) /* 00 00 00 11 xx xx xx cc */
+            goto found_code;   /* 00 00 00 01 xx xx xx cc */
 
-        /* 00xx - should only happen for 00 00 */
-        if( !b_aligned )
+        /* if the 14 first bits are 0, then it's a newline */
+        if( i_code <= 0x0003 )
         {
-            ADD_NIBBLE( i_code, (i_code << 4) );
+            if( NewLine( &vspu, &i_id ) < 0 )
+                return;
+
+            if( !b_aligned )
+                b_aligned = 1;
         }
-
-        if( i_code )
+        else
         {
+            /* we have a boo boo ! */
             intf_DbgMsg( "video_spu: unknown code 0x%x "
                          "(dest %x side %x, x=%d, y=%d)\n",
-                         i_code, p_from[i_id], i_id, spu.x, spu.y );
-            if( NewLine( &spu, &i_id ) < 0 )
+                         i_code, p_from[i_id], i_id, vspu.x, vspu.y );
+            if( NewLine( &vspu, &i_id ) < 0 )
                 return;
             continue;
         }
-
-        /* aligned 00 00 */
-        if( NewLine( &spu, &i_id ) < 0 )
-            return;
     }
 }
 
-static int NewLine( spu_t *p_spu, int *i_id )
+static int NewLine( vout_spu_t *p_vspu, int *i_id )
 {
     *i_id = 1 - *i_id;
 
-    p_spu->x = 0;
-    p_spu->y++;
+    p_vspu->x = 0;
+    p_vspu->y++;
 
-    return( p_spu->width - p_spu->y );
+    return( p_vspu->width - p_vspu->y );
 
 }
 

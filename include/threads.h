@@ -150,10 +150,11 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
 {
 #if defined(HAVE_CTHREADS_H)
     *p_thread = cthread_fork( (cthread_fn_t)func, (any_t)p_data );
-    return( 0 );
+    return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
-    *p_thread = spawn_thread( (thread_func)func, psz_name, B_NORMAL_PRIORITY, p_data );
+    *p_thread = spawn_thread( (thread_func)func, psz_name,
+                              B_NORMAL_PRIORITY, p_data );
     return resume_thread( *p_thread );
 
 #elif defined(HAVE_PTHREAD_H)
@@ -189,7 +190,7 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
     cthread_join( thread );
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
-    int32 exit_value;	
+    int32 exit_value;
     wait_for_thread( thread, &exit_value );
 
 #elif defined(HAVE_PTHREAD_H)
@@ -209,7 +210,10 @@ static __inline__ void lazy_init_mutex(vlc_mutex_t* p_mutex)
     }
     else /* we're not the first, so wait until the init is finished */
     {
-        while( p_mutex->init != 9999 ) snooze( 10000 );
+        while( p_mutex->init != 9999 )
+        {
+            snooze( 10000 );
+        }
     }
 }
 #endif
@@ -221,12 +225,15 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
 #if defined(HAVE_CTHREADS_H)
     mutex_init( p_mutex );
-    return( 0 );
+    return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     // check the arguments and whether it's already been initialized
-    if( !p_mutex ) return B_BAD_VALUE;
-    if( p_mutex->init == 9999 ) return EALREADY;
+    if( !p_mutex )
+        return B_BAD_VALUE;
+
+    if( p_mutex->init == 9999 )
+        return EALREADY;
 
     p_mutex->lock = create_sem( 1, "BeMutex" );
     p_mutex->owner = -1;
@@ -246,17 +253,23 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
 {
 #if defined(HAVE_CTHREADS_H)
     mutex_lock( p_mutex );
-    return( 0 );
+    return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err;
 
-    if( !p_mutex ) return B_BAD_VALUE;
-    if( p_mutex->init < 2000 ) return B_NO_INIT;
+    if( !p_mutex )
+        return B_BAD_VALUE;
+
+    if( p_mutex->init < 2000 )
+        return B_NO_INIT;
+
     lazy_init_mutex( p_mutex );
 
     err = acquire_sem( p_mutex->lock );
-    if( !err ) p_mutex->owner = find_thread( NULL );
+    if( !err )
+        p_mutex->owner = find_thread( NULL );
+
     return err;
 
 #elif defined(HAVE_PTHREAD_H)
@@ -272,14 +285,20 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 {
 #if defined(HAVE_CTHREADS_H)
     mutex_unlock( p_mutex );
-    return( 0 );
+    return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
-    if(! p_mutex) return B_BAD_VALUE;
-    if( p_mutex->init < 2000 ) return B_NO_INIT;
+    if(! p_mutex)
+        return B_BAD_VALUE;
+
+    if( p_mutex->init < 2000 )
+        return B_NO_INIT;
+
     lazy_init_mutex( p_mutex );
 
-    if( p_mutex->owner != find_thread(NULL) ) return ENOLCK;
+    if( p_mutex->owner != find_thread(NULL) )
+        return ENOLCK;
+
     p_mutex->owner = -1;
     release_sem( p_mutex->lock );
     return B_OK;
@@ -301,7 +320,10 @@ static __inline__ void lazy_init_cond( vlc_cond_t* p_condvar )
     }
     else /* we're not the first, so wait until the init is finished */
     {
-        while( p_condvar->init != 9999 ) snooze( 10000 );
+        while( p_condvar->init != 9999 )
+        {
+            snooze( 10000 );
+        }
     }
 }
 #endif
@@ -318,11 +340,14 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
     p_condvar->name = 0;
     p_condvar->implications = 0;
 
-    return( 0 );
+    return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
-    if( !p_condvar ) return B_BAD_VALUE;
-    if( p_condvar->init == 9999 ) return EALREADY;
+    if( !p_condvar )
+        return B_BAD_VALUE;
+
+    if( p_condvar->init == 9999 )
+        return EALREADY;
 
     p_condvar->sem = create_sem( 0, "CVSem" );
     p_condvar->handshakeSem = create_sem( 0, "CVHandshake" );
@@ -348,24 +373,32 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
     {
         cond_signal( (condition_t)p_condvar );
     }
-    return( 0 );
+    return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err = B_OK;
 
-    if( !p_condvar ) return B_BAD_VALUE;
-    if( p_condvar->init < 2000 ) return B_NO_INIT;
+    if( !p_condvar )
+        return B_BAD_VALUE;
+
+    if( p_condvar->init < 2000 )
+        return B_NO_INIT;
+
     lazy_init_cond( p_condvar );
 
-    if( acquire_sem(p_condvar->signalSem) == B_INTERRUPTED) return B_INTERRUPTED;
+    if( acquire_sem(p_condvar->signalSem) == B_INTERRUPTED)
+        return B_INTERRUPTED;
 
     if( p_condvar->nw > p_condvar->ns )
     {
         p_condvar->ns += 1;
         release_sem( p_condvar->sem );
         release_sem( p_condvar->signalSem );
+
         while( acquire_sem(p_condvar->handshakeSem) == B_INTERRUPTED )
-            { err = B_INTERRUPTED; }
+        {
+            err = B_INTERRUPTED;
+        }
     }
     else
     {
@@ -386,17 +419,25 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
 {
 #if defined(HAVE_CTHREADS_H)
     condition_wait( (condition_t)p_condvar, (mutex_t)p_mutex );
-    return( 0 );
+    return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err;
 
-    if( !p_condvar ) return B_BAD_VALUE;
-    if( !p_mutex ) return B_BAD_VALUE;
-    if( p_condvar->init < 2000 ) return B_NO_INIT;
+    if( !p_condvar )
+        return B_BAD_VALUE;
+
+    if( !p_mutex )
+        return B_BAD_VALUE;
+
+    if( p_condvar->init < 2000 )
+        return B_NO_INIT;
+
     lazy_init_cond( p_condvar );
 
-    if( acquire_sem(p_condvar->signalSem) == B_INTERRUPTED ) return B_INTERRUPTED;
+    if( acquire_sem(p_condvar->signalSem) == B_INTERRUPTED )
+        return B_INTERRUPTED;
+
     p_condvar->nw += 1;
     release_sem( p_condvar->signalSem );
 
@@ -404,7 +445,10 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
     err = acquire_sem( p_condvar->sem );
 
     while( acquire_sem(p_condvar->signalSem) == B_INTERRUPTED)
-        { err = B_INTERRUPTED; }
+    {
+        err = B_INTERRUPTED;
+    }
+
     if( p_condvar->ns > 0 )
     {
         release_sem( p_condvar->handshakeSem );
@@ -414,7 +458,9 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
     release_sem( p_condvar->signalSem );
 
     while( vlc_mutex_lock(p_mutex) == B_INTERRUPTED)
-        { err = B_INTERRUPTED; }
+    {
+        err = B_INTERRUPTED;
+    }
     return err;
 
 #elif defined(HAVE_PTHREAD_H)

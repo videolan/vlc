@@ -152,8 +152,6 @@ typedef struct subpicture_s
         struct
         {
             int                 i_offset[2];         /* byte offsets to data */
-            int                 i_x1, i_x2;                 /* X coordinates */
-            int                 i_y1, i_y2;                 /* Y coordinates */
         } spu;
     } type;
 

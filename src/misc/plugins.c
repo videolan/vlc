@@ -45,8 +45,9 @@ int RequestPlugin ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name )
     char * psz_plugin;
     char * psz_plugin_path[ PLUGIN_PATH_COUNT ] =
     {
-        ".", PLUGIN_PATH,
-        "plugins/aout", "plugins/vout", "plugins/intf" /* these ones should disappear */
+        ".",
+        "plugins/aout", "plugins/vout", "plugins/intf", /* these ones should disappear */
+        PLUGIN_PATH
     };
 
     i_length = strlen( psz_mask ) + strlen( psz_name );

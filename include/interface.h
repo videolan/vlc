@@ -63,6 +63,8 @@ typedef struct intf_thread_s
     intf_sys_manage_t *     p_sys_manage;                       /* main loop */
     intf_sys_destroy_t *    p_sys_destroy;              /* destroy interface */
 
+    /* XXX: Channels array - new API */
+    //p_intf_channel_t *  p_channel[INTF_MAX_CHANNELS];/* channel descriptions */
     /* Channels array - NULL if not used */
     p_intf_channel_t    p_channel;                /* description of channels */
 

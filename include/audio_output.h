@@ -179,6 +179,7 @@ typedef struct aout_thread_s
 {
     vlc_thread_t        thread_id;
     boolean_t           b_die;
+    boolean_t           b_active;
 
     vlc_mutex_t         fifos_lock;
     aout_fifo_t         fifo[ AOUT_MAX_FIFOS ];

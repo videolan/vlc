@@ -356,6 +356,21 @@ show:
 	@echo "Command line for assembler objects:"
 	@echo $(CC) $(CFLAGS) -c -o "<dest.o>" "<src.S>"
 
+# ugliest of all, but I have no time to do it -- sam
+snapshot:
+	rm -rf /tmp/${SNAPSHOTDIR}
+	mkdir /tmp/${SNAPSHOTDIR}
+	cp -a * /tmp/${SNAPSHOTDIR}
+		(cd /tmp/${SNAPSHOTDIR} ; \
+		make distclean ; \
+		find . -type d -name CVS | xargs rm -rf ; \
+		find . -type f -name '.*.swp' | xargs rm -f ; \
+		cd .. ; \
+		tar czvf ${SNAPSHOTDIR}.tar.gz ${SNAPSHOTDIR} )
+	rm -rf /tmp/${SNAPSHOTDIR}
+	mv /tmp/${SNAPSHOTDIR}.tar.gz ..
+	@echo "Sources are in ../${SNAPSHOTDIR}.tar.gz"
+
 FORCE:
 
 #

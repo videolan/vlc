@@ -185,9 +185,9 @@ static int InitThread (adec_thread_t * p_adec)
     p_adec->p_ts = DECODER_FIFO_START ( p_adec->fifo )->p_first_ts;
     byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
     byte_stream->p_byte =
-	p_adec->p_ts->buffer + p_adec->p_ts->i_payload_start;
+        p_adec->p_ts->buffer + p_adec->p_ts->i_payload_start;
     byte_stream->p_end =
-	p_adec->p_ts->buffer + p_adec->p_ts->i_payload_end;
+        p_adec->p_ts->buffer + p_adec->p_ts->i_payload_end;
     byte_stream->info = p_adec;
     vlc_mutex_unlock ( &p_adec->fifo.data_lock );
 
@@ -235,7 +235,7 @@ static void RunThread (adec_thread_t * p_adec)
         adec_sync_info_t sync_info;
 
         if ( !sync )
-        {	
+        {
             /* have to find a synchro point */
             adec_byte_stream_t * p_byte_stream;
             
@@ -246,32 +246,36 @@ static void RunThread (adec_thread_t * p_adec)
             do 
             {
                 adec_byte_stream_next ( p_byte_stream );
-            } while ( (!p_adec->align) && (!p_adec->b_die) &&  (!p_adec->b_error) );
+            } while ( 0 && (!p_adec->align) && (!p_adec->b_die)
+                        && (!p_adec->b_error) );
 
-	        sync = 1;
-	    }
+            sync = 1;
+        }
 
         if( DECODER_FIFO_START( p_adec->fifo)->b_has_pts )
         {
-            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = DECODER_FIFO_START( p_adec->fifo )->i_pts;
+            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
+                DECODER_FIFO_START( p_adec->fifo )->i_pts;
             DECODER_FIFO_START(p_adec->fifo)->b_has_pts = 0;
         }
         else
         {
-            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] = LAST_MDATE;
-	    }
+            p_adec->p_aout_fifo->date[p_adec->p_aout_fifo->l_end_frame] =
+                LAST_MDATE;
+        }
 
         if( adec_sync_frame (&p_adec->audio_decoder, &sync_info) )
         {
             sync = 0;
             goto bad_frame;
-	    }
+        }
 
         p_adec->p_aout_fifo->l_rate = sync_info.sample_rate;
 
-        buffer = ((s16 *)p_adec->p_aout_fifo->buffer) + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
+        buffer = ((s16 *)p_adec->p_aout_fifo->buffer)
+                    + (p_adec->p_aout_fifo->l_end_frame * ADEC_FRAME_SIZE);
 
-	    if( adec_decode_frame (&p_adec->audio_decoder, buffer) )
+        if( adec_decode_frame (&p_adec->audio_decoder, buffer) )
         {
             sync = 0;
             goto bad_frame;
@@ -279,7 +283,8 @@ static void RunThread (adec_thread_t * p_adec)
 
         vlc_mutex_lock (&p_adec->p_aout_fifo->data_lock);
 
-        p_adec->p_aout_fifo->l_end_frame = (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
+        p_adec->p_aout_fifo->l_end_frame =
+            (p_adec->p_aout_fifo->l_end_frame + 1) & AOUT_FIFO_SIZE;
         vlc_cond_signal (&p_adec->p_aout_fifo->data_wait);
         vlc_mutex_unlock (&p_adec->p_aout_fifo->data_lock);
 
@@ -315,7 +320,8 @@ static void ErrorThread ( adec_thread_t *p_adec )
         /* Trash all received PES packets */
         while ( !DECODER_FIFO_ISEMPTY(p_adec->fifo) ) 
         {
-            input_NetlistFreePES ( p_adec->p_input, DECODER_FIFO_START(p_adec->fifo) );
+            input_NetlistFreePES ( p_adec->p_input,
+                                   DECODER_FIFO_START(p_adec->fifo) );
             DECODER_FIFO_INCSTART ( p_adec->fifo );
         }
 
@@ -397,8 +403,10 @@ void adec_byte_stream_next ( adec_byte_stream_t * p_byte_stream )
 
             /* The next byte could be found in the next PES packet */
             p_adec->p_ts = DECODER_FIFO_START (p_adec->fifo)->p_first_ts;
-	    if (DECODER_FIFO_START (p_adec->fifo)->b_data_alignment)
-		p_adec->align = 1;
+            if (DECODER_FIFO_START (p_adec->fifo)->b_data_alignment)
+            {
+                p_adec->align = 1;
+            }
 
             /* We can release the fifo's data lock */
             vlc_mutex_unlock (&p_adec->fifo.data_lock);
@@ -413,7 +421,7 @@ void adec_byte_stream_next ( adec_byte_stream_t * p_byte_stream )
 
     /* We've found a TS packet which contains interesting data... */
     p_byte_stream->p_byte =
-	p_adec->p_ts->buffer + p_adec->p_ts->i_payload_start;
+        p_adec->p_ts->buffer + p_adec->p_ts->i_payload_start;
     p_byte_stream->p_end =
-	p_adec->p_ts->buffer + p_adec->p_ts->i_payload_end;
+        p_adec->p_ts->buffer + p_adec->p_ts->i_payload_end;
 }

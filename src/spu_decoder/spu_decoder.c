@@ -214,13 +214,16 @@ static void RunThread( spudec_thread_t *p_spudec )
         while( !DECODER_FIFO_ISEMPTY(p_spudec->fifo) )
         {
             /* wait for the next SPU ID.
-             * FIXME: We trash 0xff bytes since they come from
+             * XXX: We trash 0xff bytes since they come from
              * an incomplete previous packet */
             do
             {
                 i_packet_size = GetByte( &p_spudec->bit_stream );
             }
             while( i_packet_size == 0xff );
+
+            if( p_spudec->b_die )
+                break;
 
             /* the total size - should equal the sum of the
              * PES packet size that form the SPU packet */
@@ -284,14 +287,22 @@ static void RunThread( spudec_thread_t *p_spudec )
                             case 0x00:
                                 /* 00 (force displaying) */
                                 break;
+                            /* FIXME: here we have to calculate dates. It's
+                             * around i_date * 1000000 / 83 but I don't know
+                             * how much exactly. Here are my findings :
+                             *
+                             * - 80 is too small ( Lain Deus, VTS_01_2.VOB )
+                             *  -> 82 seems to be the minimum, 83 is fine.
+                             *
+                             */
                             case 0x01:
                                 /* 01 (start displaying) */
-                                p_spu->begin_date += (i_date * 1000000 / 80);
-                                break;    /* FIXME: 80 is absolutely empiric */
+                                p_spu->begin_date += ( i_date * 1000000 / 83 );
+                                break;
                             case 0x02:
                                 /* 02 (stop displaying) */
-                                p_spu->end_date += (i_date * 1000000 / 80);
-                                break;    /* FIXME: 80 is absolutely empiric */
+                                p_spu->end_date += ( i_date * 1000000 / 83 );
+                                break;
                             case 0x03:
                                 /* 03xxxx (palette) */
                                 GetWord( i_word );
@@ -303,20 +314,20 @@ static void RunThread( spudec_thread_t *p_spudec )
                             case 0x05:
                                 /* 05xxxyyyxxxyyy (coordinates) */
                                 i_word = GetByte( &p_spudec->bit_stream );
-                                p_spu->type.spu.i_x1 = (i_word << 4)
-                                        | GetBits( &p_spudec->bit_stream, 4 );
+                                p_spu->i_x = (i_word << 4)
+                                    | GetBits( &p_spudec->bit_stream, 4 );
 
                                 i_word = GetBits( &p_spudec->bit_stream, 4 );
-                                p_spu->type.spu.i_x2 = (i_word << 8)
-                                        | GetByte( &p_spudec->bit_stream );
+                                p_spu->i_width = p_spu->i_x - ( (i_word << 8)
+                                    | GetByte( &p_spudec->bit_stream ) ) + 1;
 
                                 i_word = GetByte( &p_spudec->bit_stream );
-                                p_spu->type.spu.i_y1 = (i_word << 4)
-                                        | GetBits( &p_spudec->bit_stream, 4 );
+                                p_spu->i_y = (i_word << 4)
+                                    | GetBits( &p_spudec->bit_stream, 4 );
 
                                 i_word = GetBits( &p_spudec->bit_stream, 4 );
-                                p_spu->type.spu.i_y2 = (i_word << 8)
-                                        | GetByte( &p_spudec->bit_stream );
+                                p_spu->i_height = p_spu->i_y - ( (i_word << 8)
+                                    | GetByte( &p_spudec->bit_stream ) ) + 1;
 
 				i_index += 6;
                                 break;
@@ -345,6 +356,7 @@ static void RunThread( spudec_thread_t *p_spudec )
             else 
             {
                 /* Unexpected PES packet - trash it */
+                intf_ErrMsg( "spudec: trying to recover from bad packet\n" );
                 vlc_mutex_lock( &p_spudec->fifo.data_lock );
                 input_NetlistFreePES( p_spudec->bit_stream.p_input,
                                       DECODER_FIFO_START(p_spudec->fifo) );
@@ -353,10 +365,6 @@ static void RunThread( spudec_thread_t *p_spudec )
             }
 
         }
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait( &p_spudec->fifo.data_wait, &p_spudec->fifo.data_lock );
-
-        if( p_spu ) vout_DestroySubPicture( p_spudec->p_vout, p_spu );
     }
 
     /*
@@ -416,3 +424,4 @@ static void EndThread( spudec_thread_t *p_spudec )
     free( p_spudec );
     intf_DbgMsg( "spudec debug: spu decoder thread %p destroyed\n", p_spudec);
 }
+
