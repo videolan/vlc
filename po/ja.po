@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-11 13:45+0100\n"
+"POT-Creation-Date: 2004-11-14 17:42+0100\n"
 "PO-Revision-Date: 2004-09-20 02:46+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -447,7 +447,7 @@ msgstr "オーディオチャンネル"
 #: src/audio_output/output.c:105 src/audio_output/output.c:140
 #: modules/audio_output/alsa.c:178 modules/audio_output/alsa.c:209
 #: modules/audio_output/directx.c:447 modules/audio_output/oss.c:202
-#: modules/audio_output/portaudio.c:381 modules/audio_output/sdl.c:181
+#: modules/audio_output/portaudio.c:405 modules/audio_output/sdl.c:181
 #: modules/audio_output/sdl.c:198 modules/audio_output/waveout.c:392
 msgid "Stereo"
 msgstr "ステレオ"
@@ -5111,27 +5111,27 @@ msgstr "ALSA デバイス名"
 
 #: modules/audio_output/alsa.c:118 modules/audio_output/coreaudio.c:217
 #: modules/audio_output/directx.c:383 modules/audio_output/oss.c:129
-#: modules/audio_output/portaudio.c:367 modules/audio_output/sdl.c:176
+#: modules/audio_output/portaudio.c:391 modules/audio_output/sdl.c:176
 #: modules/audio_output/sdl.c:194 modules/audio_output/waveout.c:343
 #: modules/gui/macosx/intf.m:465 modules/gui/macosx/intf.m:466
 msgid "Audio Device"
 msgstr "オーディオデバイス"
 
 #: modules/audio_output/alsa.c:172 modules/audio_output/directx.c:460
-#: modules/audio_output/oss.c:222 modules/audio_output/portaudio.c:373
+#: modules/audio_output/oss.c:222 modules/audio_output/portaudio.c:397
 #: modules/audio_output/sdl.c:182 modules/audio_output/sdl.c:201
 #: modules/audio_output/waveout.c:405
 msgid "Mono"
 msgstr "モノラル"
 
 #: modules/audio_output/alsa.c:185 modules/audio_output/directx.c:433
-#: modules/audio_output/oss.c:178 modules/audio_output/portaudio.c:392
+#: modules/audio_output/oss.c:178 modules/audio_output/portaudio.c:416
 #: modules/audio_output/waveout.c:377
 msgid "2 Front 2 Rear"
 msgstr "フロント 2, リア 2"
 
 #: modules/audio_output/alsa.c:191 modules/audio_output/directx.c:397
-#: modules/audio_output/oss.c:167 modules/audio_output/portaudio.c:408
+#: modules/audio_output/oss.c:167 modules/audio_output/portaudio.c:432
 #: modules/audio_output/waveout.c:358
 msgid "5.1"
 msgstr "5.1"
@@ -5161,7 +5161,7 @@ msgstr "コアオーディオ出力"
 msgid "DirectX audio output"
 msgstr "DirectX オーディオ出力"
 
-#: modules/audio_output/directx.c:415 modules/audio_output/portaudio.c:400
+#: modules/audio_output/directx.c:415 modules/audio_output/portaudio.c:424
 msgid "3 Front 2 Rear"
 msgstr "フロント 3, リア 2"
 
@@ -5237,16 +5237,16 @@ msgstr "Linux OSS オーディオ出力"
 msgid "OSS DSP device"
 msgstr "OSS DSP デバイス"
 
-#: modules/audio_output/portaudio.c:90
+#: modules/audio_output/portaudio.c:107
 #, fuzzy
 msgid "Output device"
 msgstr "出力フォーマット"
 
-#: modules/audio_output/portaudio.c:91
+#: modules/audio_output/portaudio.c:108
 msgid "Portaudio identifier for the output device"
 msgstr ""
 
-#: modules/audio_output/portaudio.c:94
+#: modules/audio_output/portaudio.c:111
 #, fuzzy
 msgid "PORTAUDIO audio output"
 msgstr "ALSAオーディオ・モジュール"
@@ -6973,7 +6973,7 @@ msgstr "MPEG 1/2レイヤ1/2オーディオ・デコーダ"
 msgid "Real demuxer"
 msgstr "MPEG 1/2レイヤ1/2オーディオ・デコーダ"
 
-#: modules/demux/sgimb.c:70
+#: modules/demux/sgimb.c:113
 msgid "Kasenna MediaBase metademux"
 msgstr ""
 

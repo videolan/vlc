@@ -1,4 +1,731 @@
 ------------------------------------------------------------------------
+r9320 | ipkiss | 2004-11-14 18:32:25 +0100 (Sun, 14 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/modules/gui/skins2/src/generic_window.hpp
+   M /branches/0.8.1/modules/gui/skins2/src/vout_window.hpp
+   M /branches/0.8.1/modules/gui/skins2/win32/win32_loop.cpp
+
+ * Merged trunk changeset 9319 to 0.8.1 branch.
+
+------------------------------------------------------------------------
+r9318 | gbazin | 2004-11-14 18:27:44 +0100 (Sun, 14 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/src/audio_output/input.c
+
+* Merged trunk changeset 9317 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9316 | zorglub | 2004-11-14 18:23:08 +0100 (Sun, 14 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/NEWS
+
+Update NEWS
+
+------------------------------------------------------------------------
+r9314 | fkuehne | 2004-11-14 15:01:04 +0100 (Sun, 14 Nov 2004) | 1 line
+Changed paths:
+   A /branches/0.8.1/po/da.po
+
+* partial Danish l10n by Jonas Larsen (E-bola)
+------------------------------------------------------------------------
+r9313 | fkuehne | 2004-11-14 14:59:36 +0100 (Sun, 14 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/configure.ac
+
+* added Danish to the list of possible localisations
+------------------------------------------------------------------------
+r9307 | gbazin | 2004-11-13 14:09:42 +0100 (Sat, 13 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/codec/ffmpeg/ffmpeg.c
+
+* modules/codec/ffmpeg/ffmpeg.c: merged trunk changeset 9306 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9303 | gbazin | 2004-11-13 12:25:55 +0100 (Sat, 13 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/NEWS
+
+* NEWS: update for 0.8.1
+------------------------------------------------------------------------
+r9300 | hartman | 2004-11-13 02:35:28 +0100 (Sat, 13 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/modules/demux/sgimb.c
+
+* Support Kasenna simulcast. Weird stuff is still happening though with the image. 
+
+------------------------------------------------------------------------
+r9299 | hartman | 2004-11-13 01:24:09 +0100 (Sat, 13 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/modules/demux/sgimb.c
+
+* Document the sgimb fileformat. for everyones pleasure.
+
+------------------------------------------------------------------------
+r9298 | hartman | 2004-11-12 23:23:11 +0100 (Fri, 12 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/modules/demux/livedotcom.cpp
+
+* Force kasenna sometimes
+
+------------------------------------------------------------------------
+r9296 | hartman | 2004-11-12 17:48:24 +0100 (Fri, 12 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/demux/sgimb.c
+
+* sgimb.c: Fix construction of RTSP URL when opening simulcast sessions
+------------------------------------------------------------------------
+r9294 | jpsaman | 2004-11-12 15:29:23 +0100 (Fri, 12 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/configure.ac
+
+Make sure the wxWindows development headers and libraries are present when skins2 module is enabled. Without wxWindows the skins2 interface is not very usable.
+------------------------------------------------------------------------
+r9292 | gbazin | 2004-11-12 11:44:50 +0100 (Fri, 12 Nov 2004) | 1 line
+Changed paths:
+   D /branches/0.8.1/evc/vlc.c
+   M /branches/0.8.1/src/extras/libc.c
+   M /branches/0.8.1/src/vlc.c
+   M /branches/0.8.1/toolbox
+
+* Merged trunk changesets 9290 and 9291 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9289 | gbazin | 2004-11-12 09:12:11 +0100 (Fri, 12 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/include/vlc_common.h
+   M /branches/0.8.1/src/extras/libc.c
+
+* Merged trunk changeset 9288 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9287 | gbazin | 2004-11-12 09:06:26 +0100 (Fri, 12 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/audio_output/portaudio.c
+
+* Merged trunk changeset 9286 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9285 | fkuehne | 2004-11-11 20:03:54 +0100 (Thu, 11 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/po/de.po
+
+* updated to the latest strings
+------------------------------------------------------------------------
+r9284 | gbazin | 2004-11-11 19:50:53 +0100 (Thu, 11 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/src/misc/httpd.c
+
+* Merged trunk changeset 9283 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9282 | hartman | 2004-11-11 13:46:01 +0100 (Thu, 11 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/NEWS
+
+* Updated NEWS
+
+------------------------------------------------------------------------
+r9281 | zorglub | 2004-11-11 13:45:53 +0100 (Thu, 11 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/modules/control/http.c
+   M /branches/0.8.1/modules/misc/gnutls.c
+   M /branches/0.8.1/po/de.po
+   M /branches/0.8.1/po/en_GB.po
+   M /branches/0.8.1/po/es.po
+   M /branches/0.8.1/po/fr.po
+   M /branches/0.8.1/po/hu.po
+   M /branches/0.8.1/po/it.po
+   M /branches/0.8.1/po/ja.po
+   M /branches/0.8.1/po/nl.po
+   M /branches/0.8.1/po/no.po
+   M /branches/0.8.1/po/pl.po
+   M /branches/0.8.1/po/pt_BR.po
+   M /branches/0.8.1/po/ru.po
+   M /branches/0.8.1/po/sv.po
+   M /branches/0.8.1/po/vlc.pot
+
+Update po-files and french translation
+
+------------------------------------------------------------------------
+r9280 | zorglub | 2004-11-11 13:31:27 +0100 (Thu, 11 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/modules/access_output/http.c
+   M /branches/0.8.1/modules/codec/x264.c
+
+Fix strings
+
+------------------------------------------------------------------------
+r9275 | fkuehne | 2004-11-10 17:05:14 +0100 (Wed, 10 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/po/POTFILES.in
+   M /branches/0.8.1/po/de.po
+   M /branches/0.8.1/po/en_GB.po
+   M /branches/0.8.1/po/es.po
+   M /branches/0.8.1/po/fr.po
+   M /branches/0.8.1/po/hu.po
+   M /branches/0.8.1/po/it.po
+   M /branches/0.8.1/po/ja.po
+   M /branches/0.8.1/po/nl.po
+   M /branches/0.8.1/po/no.po
+   M /branches/0.8.1/po/pl.po
+   M /branches/0.8.1/po/pt_BR.po
+   M /branches/0.8.1/po/ru.po
+   M /branches/0.8.1/po/sv.po
+   M /branches/0.8.1/po/vlc.pot
+
+* ALL: updated the po-files
+* de.po: finished the G. l10n for 0.8.1
+------------------------------------------------------------------------
+r9274 | gbazin | 2004-11-10 16:16:51 +0100 (Wed, 10 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/include/vlc_video.h
+   M /branches/0.8.1/src/video_output/video_widgets.c
+   M /branches/0.8.1/src/video_output/vout_subpictures.c
+
+* Merged trunk changesets 9185 9204 9205 9273 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9272 | fkuehne | 2004-11-10 15:49:52 +0100 (Wed, 10 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/control/rc.c
+   M /branches/0.8.1/modules/control/rtci.c
+
+* removed l10n for every string, but the help, 'initialised' and 'command not found' - strings
+------------------------------------------------------------------------
+r9270 | gbazin | 2004-11-10 14:05:27 +0100 (Wed, 10 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/demux/avi/avi.c
+   M /branches/0.8.1/modules/demux/avi/libavi.h
+
+* Merged trunk changeset 9265 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9269 | gbazin | 2004-11-10 14:04:45 +0100 (Wed, 10 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/video_output/directx/directx.c
+   M /branches/0.8.1/modules/video_output/directx/events.c
+   M /branches/0.8.1/modules/video_output/directx/glwin32.c
+   M /branches/0.8.1/modules/video_output/directx/vout.h
+
+* Merged trunk changesets 9258 and 9266 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9268 | gbazin | 2004-11-10 14:01:48 +0100 (Wed, 10 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/include/vlc_es.h
+   M /branches/0.8.1/modules/stream_out/transcode.c
+   M /branches/0.8.1/modules/video_filter/logo.c
+   M /branches/0.8.1/modules/video_output/x11/x11.c
+   M /branches/0.8.1/src/video_output/vout_pictures.c
+   M /branches/0.8.1/src/video_output/vout_subpictures.c
+
+* Merged trunk changes r9244:9250 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9254 | gbazin | 2004-11-08 22:07:28 +0100 (Mon, 08 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/audio_output/portaudio.c
+
+* Merged trunk changeset 9253 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9244 | gbazin | 2004-11-08 13:24:32 +0100 (Mon, 08 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/access/dshow/dshow.cpp
+
+* Merged trunk changes r9242:9243 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9239 | hartman | 2004-11-08 00:12:49 +0100 (Mon, 08 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/extras/contrib/src/Makefile
+   M /branches/0.8.1/extras/contrib/src/packages.mak
+
+* backport r9238 to 0.8.1 branch
+
+------------------------------------------------------------------------
+r9236 | gbazin | 2004-11-07 21:20:35 +0100 (Sun, 07 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/codec/ffmpeg/demux.c
+
+* Merged trunk changes r9234:9235 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9233 | hartman | 2004-11-07 21:14:34 +0100 (Sun, 07 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/modules/gui/macosx/voutqt.m
+
+* merged the QT patch from r9231 to 0.8.1
+
+------------------------------------------------------------------------
+r9232 | gbazin | 2004-11-07 21:12:51 +0100 (Sun, 07 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/modules/control/rc.c
+
+* modules/control/rc.c: reverted commit r9223 and added proper MRL parsing.
+
+------------------------------------------------------------------------
+r9223 | jpsaman | 2004-11-07 15:17:31 +0100 (Sun, 07 Nov 2004) | 6 lines
+Changed paths:
+   M /branches/0.8.1/modules/control/rc.c
+
+First pass at Media Resource Locator parsing in the rc interface. It allows the following types to be used with the add command:
+
+add dvd:///dev/dvd:sout='#std{mux="ts",access="udp",url="127.0.0.1:1234"}'
+add dvd:///dev/dvd --sout '#std{mux="ts",access="udp",url="127.0.0.1:1234"}'
+
+
+------------------------------------------------------------------------
+r9219 | courmisch | 2004-11-07 12:17:37 +0100 (Sun, 07 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/include/network.h
+   M /trunk/include/network.h
+
+Allow multiple inclusions of "network.h"
+
+------------------------------------------------------------------------
+r9215 | jpsaman | 2004-11-07 10:11:02 +0100 (Sun, 07 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/control/rc.c
+
+Fix typo
+------------------------------------------------------------------------
+r9211 | jpsaman | 2004-11-07 00:02:55 +0100 (Sun, 07 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/control/rc.c
+   M /branches/0.8.1/modules/control/rtci.c
+
+removed overloaded standard library function printf and replaced by msg_rc() and msg_rtci()
+------------------------------------------------------------------------
+r9209 | courmisch | 2004-11-06 20:43:26 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/src/misc/tls.c
+   M /trunk/src/misc/tls.c
+
+Remove unused variable
+
+------------------------------------------------------------------------
+r9206 | courmisch | 2004-11-06 19:40:52 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/modules/misc/gnutls.c
+   M /trunk/modules/misc/gnutls.c
+
+Fixes malloc's parameter
+
+------------------------------------------------------------------------
+r9203 | gbazin | 2004-11-06 17:54:39 +0100 (Sat, 06 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/Makefile.am
+   M /branches/0.8.1/TODO
+   M /branches/0.8.1/include/vlc_tls.h
+   M /branches/0.8.1/modules/access_output/http.c
+   M /branches/0.8.1/modules/control/http.c
+   A /branches/0.8.1/src/misc/tls.c (from /trunk/src/misc/tls.c:9196)
+
+* Merged trunk changes r9191:9196 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9202 | gbazin | 2004-11-06 17:52:48 +0100 (Sat, 06 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/misc/gnutls.c
+
+* Merged trunk changes r9187:9188 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9201 | yoann | 2004-11-06 17:51:46 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/include/stream_output.h
+   M /branches/0.8.1/modules/stream_out/standard.c
+   M /branches/0.8.1/src/stream_output/announce.c
+   M /branches/0.8.1/src/stream_output/sap.c
+
+* ported r9191 (group announcing support) from trunk
+
+------------------------------------------------------------------------
+r9200 | gbazin | 2004-11-06 17:51:26 +0100 (Sat, 06 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/include/vlc_filter.h
+   M /branches/0.8.1/modules/misc/gnutls.c
+   M /branches/0.8.1/modules/video_filter/blend.c
+   M /branches/0.8.1/modules/video_filter/logo.c
+   M /branches/0.8.1/src/video_output/vout_subpictures.c
+
+* Merged trunk changes r9184:9186 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9199 | gbazin | 2004-11-06 17:50:31 +0100 (Sat, 06 Nov 2004) | 1 line
+Changed paths:
+   M /branches/0.8.1/modules/misc/gnutls.c
+
+* Merged trunk changes r9181:9183 to 0.8.1 branch.
+------------------------------------------------------------------------
+r9198 | gbazin | 2004-11-06 17:43:59 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /branches/0.8.1/configure.ac
+   M /branches/0.8.1/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /branches/0.8.1/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* ALL: renamed version number to 0.8.1
+
+------------------------------------------------------------------------
+r9197 | gbazin | 2004-11-06 17:32:25 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   A /branches/0.8.1 (from /trunk:9171)
+
+* 0.8.1 branch based on revision 9171.
+
+------------------------------------------------------------------------
+r9171 | zorglub | 2004-11-06 12:15:50 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_help.h
+
+Missing help string
+
+------------------------------------------------------------------------
+r9170 | zorglub | 2004-11-06 12:14:00 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/net.c
+
+add a comment to explain what it does
+
+------------------------------------------------------------------------
+r9169 | zorglub | 2004-11-06 12:13:23 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/include/network.h
+   M /trunk/src/misc/net.c
+
+added net_Select
+
+------------------------------------------------------------------------
+r9168 | courmisch | 2004-11-06 11:50:22 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   D /trunk/src/misc/tls.c
+
+No longer used
+
+------------------------------------------------------------------------
+r9167 | courmisch | 2004-11-06 11:49:57 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+Checks for gnutls
+
+------------------------------------------------------------------------
+r9166 | courmisch | 2004-11-06 11:49:21 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http.c
+
+Fix to use TLS module dynamically
+
+------------------------------------------------------------------------
+r9165 | courmisch | 2004-11-06 11:48:53 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/misc/Modules.am
+   A /trunk/modules/misc/gnutls.c (from /trunk/src/misc/tls.c:9158)
+
+gnutls TLS module
+
+------------------------------------------------------------------------
+r9164 | courmisch | 2004-11-06 11:48:15 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_common.h
+
+common tls types
+
+------------------------------------------------------------------------
+r9163 | courmisch | 2004-11-06 11:47:27 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+
+No longer build src/misc/tls.c
+
+------------------------------------------------------------------------
+r9162 | courmisch | 2004-11-06 11:47:04 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/objects.c
+
+Support for creating TLS objects
+
+------------------------------------------------------------------------
+r9161 | courmisch | 2004-11-06 11:45:07 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_tls.h
+
+TLS modules interface
+
+------------------------------------------------------------------------
+r9160 | courmisch | 2004-11-06 11:43:35 +0100 (Sat, 06 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_objects.h
+
+New TLS object type
+
+------------------------------------------------------------------------
+r9159 | ipkiss | 2004-11-05 21:11:21 +0100 (Fri, 05 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/doc/skins/skins2-howto.xml
+
+Added the items specific to VLC 0.8.0
+
+------------------------------------------------------------------------
+r9158 | hartman | 2004-11-05 16:18:12 +0100 (Fri, 05 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/avi/avi.c
+
+* unknow -> unknown
+
+------------------------------------------------------------------------
+r9157 | gbazin | 2004-11-05 15:59:11 +0100 (Fri, 05 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/NEWS
+
+* NEWS: update to current changes in 0.8.1-svn.
+------------------------------------------------------------------------
+r9156 | gbazin | 2004-11-05 15:57:53 +0100 (Fri, 05 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/encoder.c
+   M /trunk/modules/codec/ffmpeg/video.c
+
+* modules/codec/ffmpeg/*: fix interlaced encoding (top field first + repeat field.)
+------------------------------------------------------------------------
+r9155 | hartman | 2004-11-05 15:40:07 +0100 (Fri, 05 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/avi/avi.c
+   M /trunk/modules/demux/avi/libavi.h
+
+* recognize subtitles streams in avi. Now to decode them. if anyone has ANY info on how this works :)
+
+------------------------------------------------------------------------
+r9154 | hartman | 2004-11-05 15:16:09 +0100 (Fri, 05 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/avi/avi.c
+
+* Trackname support for avi
+
+------------------------------------------------------------------------
+r9153 | gbazin | 2004-11-05 13:56:35 +0100 (Fri, 05 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/audio_output/directx.c
+   M /trunk/modules/audio_output/waveout.c
+
+* modules/audio_output/waveout.c,directx.c: fixed audio channel ordering.
+------------------------------------------------------------------------
+r9152 | hartman | 2004-11-05 13:42:32 +0100 (Fri, 05 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/src/input/demux.c
+
+* comment correction
+
+------------------------------------------------------------------------
+r9151 | gbazin | 2004-11-05 12:51:47 +0100 (Fri, 05 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/encoder.c
+
+* modules/codec/ffmpeg/encoder.c: hmm better be safe than sorry.
+------------------------------------------------------------------------
+r9150 | gbazin | 2004-11-05 12:50:32 +0100 (Fri, 05 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/codec/ffmpeg/encoder.c
+
+* modules/codec/ffmpeg/encoder.c: stupid rounding error in aspect ratio calculation.
+------------------------------------------------------------------------
+r9149 | courmisch | 2004-11-05 00:08:52 +0100 (Fri, 05 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/control/http.c
+
+Use --http-intf-* for certificates stuff instead of --http-*
+(might conflict with HTTP streaming output at a later stage)
+
+------------------------------------------------------------------------
+r9148 | hartman | 2004-11-05 00:00:37 +0100 (Fri, 05 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+   M /trunk/extras/MacOSX/Resources/English.lproj/InfoPlist.strings
+   M /trunk/extras/MacOSX/vlc.pbproj/project.pbxproj
+
+* We are now at 0.8.1-svn
+
+------------------------------------------------------------------------
+r9147 | courmisch | 2004-11-04 23:57:56 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/control/http.c
+
+HTTP interface SSL options
+
+------------------------------------------------------------------------
+r9146 | courmisch | 2004-11-04 23:57:16 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_httpd.h
+
+Export HTTP/SSL support otherwise it's not much use
+
+------------------------------------------------------------------------
+r9145 | courmisch | 2004-11-04 23:55:54 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/httpd.c
+
+HTTPd core optional SSL support
+
+------------------------------------------------------------------------
+r9144 | courmisch | 2004-11-04 23:54:17 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.am
+   M /trunk/include/vlc_common.h
+   M /trunk/src/misc/modules.c
+   M /trunk/src/misc/tls.c
+
+Include TLS/SSL API
+
+------------------------------------------------------------------------
+r9143 | courmisch | 2004-11-04 23:51:20 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/configure.ac
+
+Check for libgnutls
+
+------------------------------------------------------------------------
+r9142 | hartman | 2004-11-04 23:32:40 +0100 (Thu, 04 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/demux/mp4/libmp4.c
+   M /trunk/modules/demux/mp4/libmp4.h
+   M /trunk/modules/demux/mp4/mp4.c
+
+* Added more annotations boxes
+* if we find the track name, then store in the fmt.
+
+------------------------------------------------------------------------
+r9141 | courmisch | 2004-11-04 23:01:48 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   A /trunk/include/vlc_tls.h
+   A /trunk/src/misc/tls.c
+
+Initial partial SSL/TLS support (to be continued)
+
+------------------------------------------------------------------------
+r9140 | courmisch | 2004-11-04 22:37:28 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/src/misc/net.c
+
+Compile warning fixed
+
+------------------------------------------------------------------------
+r9139 | hartman | 2004-11-04 22:05:57 +0100 (Thu, 04 Nov 2004) | 4 lines
+Changed paths:
+   M /trunk/src/input/es_out.c
+
+* src/input/es_out.c:
+  - renamed es_out_id_t->psz_description to psz_language to better reflect it's use.
+  - Reflect both track name and language (if we know them) in the menu's.
+
+------------------------------------------------------------------------
+r9138 | hartman | 2004-11-04 21:58:51 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/demux/ts.c
+
+* Fix the psz_description of telx and vbi streams
+
+------------------------------------------------------------------------
+r9137 | hartman | 2004-11-04 17:52:27 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/po/es.po
+
+* Updated Spanish translation (UTF-8 conversion fixing)
+
+------------------------------------------------------------------------
+r9136 | hartman | 2004-11-04 17:41:56 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/wizard.cpp
+
+* Spelling correction
+
+------------------------------------------------------------------------
+r9135 | hartman | 2004-11-04 17:40:39 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/doc/translations.txt
+
+* Update environment instructions for 10.3 (which uses bash instead of tcsh)
+
+------------------------------------------------------------------------
+r9134 | hartman | 2004-11-04 17:39:40 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/src/libvlc.h
+
+* Spelling correction
+
+------------------------------------------------------------------------
+r9133 | zorglub | 2004-11-04 14:37:17 +0100 (Thu, 04 Nov 2004) | 3 lines
+Changed paths:
+   M /trunk/modules/audio_filter/equalizer.c
+   M /trunk/modules/gui/wxwindows/extrapanel.cpp
+
+Save equalizer values so that they don't get overriden on filter enable
+Set default preamp to 12.0 dB
+
+------------------------------------------------------------------------
+r9132 | zorglub | 2004-11-04 14:02:38 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/mux/mpeg/ts.c
+
+Wrong options descriptions in TS muxer
+
+------------------------------------------------------------------------
+r9131 | zorglub | 2004-11-04 13:58:22 +0100 (Thu, 04 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/modules/gui/wxwindows/extrapanel.cpp
+
+Remember adjust settings when there is a vout so that settings are applied as soon as filter is re-enabled
+
+------------------------------------------------------------------------
+r9130 | gbazin | 2004-11-03 19:32:30 +0100 (Wed, 03 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/mux/mpeg/pes.c
+
+* modules/mux/mpeg/pes.c: for mpgv, don't store dts if pts == dts.
+------------------------------------------------------------------------
+r9129 | gbazin | 2004-11-03 12:56:16 +0100 (Wed, 03 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+
+* modules/access/dshow/dshow.cpp: fixed initialization bug.
+------------------------------------------------------------------------
+r9128 | gbazin | 2004-11-03 11:25:04 +0100 (Wed, 03 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/access/dshow/dshow.cpp
+
+* modules/access/dshow/dshow.cpp: really fix DV/PVR support this time (hopefully ;).
+------------------------------------------------------------------------
+r9126 | gbazin | 2004-11-03 01:07:38 +0100 (Wed, 03 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/modules/audio_filter/normvol.c
+
+* modules/audio_filter/normvol.c: oops.
+------------------------------------------------------------------------
+r9125 | sam | 2004-11-03 01:05:22 +0100 (Wed, 03 Nov 2004) | 2 lines
+Changed paths:
+   M /trunk/include/vlc_interface.h
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+   M /trunk/src/libvlc.h
+
+  * include/vlc_interface.h src/libvlc.h: typography.
+
+------------------------------------------------------------------------
+r9124 | gbazin | 2004-11-03 00:59:02 +0100 (Wed, 03 Nov 2004) | 1 line
+Changed paths:
+   M /trunk/ChangeLog
+   M /trunk/po/de.po
+   M /trunk/po/en_GB.po
+   M /trunk/po/es.po
+   M /trunk/po/fr.po
+   M /trunk/po/hu.po
+   M /trunk/po/it.po
+   M /trunk/po/ja.po
+   M /trunk/po/nl.po
+   M /trunk/po/no.po
+   M /trunk/po/pl.po
+   M /trunk/po/pt_BR.po
+   M /trunk/po/ru.po
+   M /trunk/po/sv.po
+   M /trunk/po/vlc.pot
+
+* ChangeLog, po: YAUF 0.8.0 (yet another update for 0.8.0).
+------------------------------------------------------------------------
 r9123 | sam | 2004-11-03 00:51:21 +0100 (Wed, 03 Nov 2004) | 2 lines
 Changed paths:
    M /trunk/modules/access/cdda/cdda.c

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VLAN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-11-11 13:45+0100\n"
+"POT-Creation-Date: 2004-11-14 17:42+0100\n"
 "PO-Revision-Date: 2003-10-26 02:54+0100\n"
 "Last-Translator: DirektX <DirektX @ freemail.hu>\n"
 "Language-Team: DirektX <DirektX @ freemail.hu>\n"
@@ -441,7 +441,7 @@ msgstr "Hang csatornák"
 #: src/audio_output/output.c:105 src/audio_output/output.c:140
 #: modules/audio_output/alsa.c:178 modules/audio_output/alsa.c:209
 #: modules/audio_output/directx.c:447 modules/audio_output/oss.c:202
-#: modules/audio_output/portaudio.c:381 modules/audio_output/sdl.c:181
+#: modules/audio_output/portaudio.c:405 modules/audio_output/sdl.c:181
 #: modules/audio_output/sdl.c:198 modules/audio_output/waveout.c:392
 msgid "Stereo"
 msgstr "Sztereó"
@@ -4952,7 +4952,7 @@ msgstr "Eszköz neve"
 
 #: modules/audio_output/alsa.c:118 modules/audio_output/coreaudio.c:217
 #: modules/audio_output/directx.c:383 modules/audio_output/oss.c:129
-#: modules/audio_output/portaudio.c:367 modules/audio_output/sdl.c:176
+#: modules/audio_output/portaudio.c:391 modules/audio_output/sdl.c:176
 #: modules/audio_output/sdl.c:194 modules/audio_output/waveout.c:343
 #: modules/gui/macosx/intf.m:465 modules/gui/macosx/intf.m:466
 #, fuzzy
@@ -4960,20 +4960,20 @@ msgid "Audio Device"
 msgstr "Hang eszköz"
 
 #: modules/audio_output/alsa.c:172 modules/audio_output/directx.c:460
-#: modules/audio_output/oss.c:222 modules/audio_output/portaudio.c:373
+#: modules/audio_output/oss.c:222 modules/audio_output/portaudio.c:397
 #: modules/audio_output/sdl.c:182 modules/audio_output/sdl.c:201
 #: modules/audio_output/waveout.c:405
 msgid "Mono"
 msgstr "Monó"
 
 #: modules/audio_output/alsa.c:185 modules/audio_output/directx.c:433
-#: modules/audio_output/oss.c:178 modules/audio_output/portaudio.c:392
+#: modules/audio_output/oss.c:178 modules/audio_output/portaudio.c:416
 #: modules/audio_output/waveout.c:377
 msgid "2 Front 2 Rear"
 msgstr "2 elsõ, 2 hátsó"
 
 #: modules/audio_output/alsa.c:191 modules/audio_output/directx.c:397
-#: modules/audio_output/oss.c:167 modules/audio_output/portaudio.c:408
+#: modules/audio_output/oss.c:167 modules/audio_output/portaudio.c:432
 #: modules/audio_output/waveout.c:358
 msgid "5.1"
 msgstr ""
@@ -5005,7 +5005,7 @@ msgstr "Hang kimenet modul"
 msgid "DirectX audio output"
 msgstr "Teljesképernyõs kép"
 
-#: modules/audio_output/directx.c:415 modules/audio_output/portaudio.c:400
+#: modules/audio_output/directx.c:415 modules/audio_output/portaudio.c:424
 #, fuzzy
 msgid "3 Front 2 Rear"
 msgstr "2 elsõ, 2 hátsó"
@@ -5083,16 +5083,16 @@ msgstr "Teljesképernyõs kép"
 msgid "OSS DSP device"
 msgstr "VCD meghajtó"
 
-#: modules/audio_output/portaudio.c:90
+#: modules/audio_output/portaudio.c:107
 #, fuzzy
 msgid "Output device"
 msgstr "Fájl megnyitása"
 
-#: modules/audio_output/portaudio.c:91
+#: modules/audio_output/portaudio.c:108
 msgid "Portaudio identifier for the output device"
 msgstr ""
 
-#: modules/audio_output/portaudio.c:94
+#: modules/audio_output/portaudio.c:111
 #, fuzzy
 msgid "PORTAUDIO audio output"
 msgstr "Teljesképernyõs kép"
@@ -6814,7 +6814,7 @@ msgstr "hang kódoló"
 msgid "Real demuxer"
 msgstr "hang kódoló"
 
-#: modules/demux/sgimb.c:70
+#: modules/demux/sgimb.c:113
 msgid "Kasenna MediaBase metademux"
 msgstr ""
 
