@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.19 2003/05/26 19:06:47 gbazin Exp $
+ * $Id: xcommon.c,v 1.20 2003/05/28 00:52:05 titer Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -532,6 +532,8 @@ static int ManageVideo( vout_thread_t *p_vout )
             case XK_Menu:
                 {
                     intf_thread_t *p_intf;
+                    playlist_t * p_playlist;
+
                     p_intf = vlc_object_find( p_vout, VLC_OBJECT_INTF,
                                                       FIND_ANYWHERE );
                     if( p_intf )
@@ -540,9 +542,8 @@ static int ManageVideo( vout_thread_t *p_vout )
                         vlc_object_release( p_intf );
                     }
 
-                    playlist_t *p_playlist =
-                        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                         FIND_ANYWHERE );
+                    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                           FIND_ANYWHERE );
                     if( p_playlist != NULL )
                     {
                         vlc_value_t val;
@@ -676,6 +677,8 @@ static int ManageVideo( vout_thread_t *p_vout )
                 case Button3:
                     {
                         intf_thread_t *p_intf;
+                        playlist_t *p_playlist;
+
                         var_Get( p_vout, "mouse-button-down", &val );
                         val.i_int &= ~4;
                         var_Set( p_vout, "mouse-button-down", val );
@@ -687,9 +690,9 @@ static int ManageVideo( vout_thread_t *p_vout )
                             vlc_object_release( p_intf );
                         }
 
-                        playlist_t *p_playlist =
-                        vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                         FIND_ANYWHERE );
+                        p_playlist = vlc_object_find( p_intf,
+                                                      VLC_OBJECT_PLAYLIST,
+                                                      FIND_ANYWHERE );
                         if( p_playlist != NULL )
                         {
                             vlc_value_t val;
