@@ -73,6 +73,9 @@
 #ifndef IN_MULTICAST
 #   define IN_MULTICAST(a) IN_CLASSD(a)
 #endif
+#ifndef PF_INET
+#    define PF_INET AF_INET                                          /* BeOS */
+#endif
 
 
 /*****************************************************************************

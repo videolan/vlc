@@ -53,6 +53,10 @@
 static const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
 #endif
 
+#ifndef PF_INET
+#    define PF_INET AF_INET                                          /* BeOS */
+#endif
+
 #if 0
 typedef struct httpd_t          httpd_t;
 
