@@ -491,6 +491,7 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     int i_oldindex = p_playlist->i_index;
     vlc_bool_t b_random, b_repeat, b_loop;
     vlc_value_t val;
+    int i_count;
 
     /* If the playlist is empty, there is no current item */
     if( p_playlist->i_size == 0 )
@@ -510,7 +511,7 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     if( b_random )
     {
         srand( (unsigned int)mdate() );
-        int i_count = 0;
+        i_count = 0;
         while( i_count < p_playlist->i_size )
         {
             p_playlist->i_index =

@@ -101,6 +101,8 @@ static int Activate( vlc_object_t * p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys;
+    byte_t *p_peek;
+    int i_size;
 
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
@@ -116,8 +118,7 @@ static int Activate( vlc_object_t * p_this )
 
 
     /* Lets check the content to see if this is a sgi mediabase file */
-    byte_t *p_peek;
-    int i_size = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
+    i_size = stream_Peek( p_demux->s, &p_peek, MAX_LINE );
     i_size -= sizeof("sgiNameServerHost=") - 1;
     if ( i_size > 0 ) {
         while ( i_size
