@@ -196,6 +196,9 @@
 /* Maximum supported data alignment */
 #undef ATTRIBUTE_ALIGNED_MAX
 
+/* Define if your compiler groks C altivec extensions. */
+#undef HAVE_C_ALTIVEC
+
 /* Define if <sys/dvdio.h> defines dvd_struct. */
 #undef DVD_STRUCT_IN_SYS_DVDIO_H
 
