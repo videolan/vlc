@@ -19,8 +19,9 @@
 vlc \- The VideoLAN Client
 .SH SYNOPSIS
 .B vlc
-.RI [ options ] 
-.RI [ parameters ]
+.RI [ OPTIONS ] 
+.RI [ PARAMETERS ]
+.RI [ FILE ]...
 .SH DESCRIPTION
 This manual page documents briefly the
 .B vlc
@@ -58,6 +59,19 @@ Grayscale output.
 .B \-\-color
 Color output.
 .TP
+.B \-a, \-\-dvdaudio [ ac3 | lpcm | mpeg | off ]
+Choose the audio channel type. Most DVDs have AC3 audio channels, but
+you can also have Linear PCM or MPEG layer 2 sound. Also, one might decide
+not to activate the audio channel.
+.TP
+.B \-c, \-\-dvdchannel [ 0\-15 ]
+Select the audio channel. Most DVDs only have one or two audio channels,
+but some of them have a great number of available languages. Note that the
+audio channel will also depend on the channel type.
+.TP
+.B \-s, \-\-dvdsubtitle [ 0\-31 ]
+Select the subtitle channel, if there is one in the stream.
+.TP
 .B \-\-novlans
 Disable VLANs support.
 .TP
@@ -93,6 +107,11 @@ also accepts a lot of parameters to customize its behaviour.
  vlc_height=<height>      dislay height
  vlc_fb_dev=<filename>    framebuffer device path
  vlc_grayscale={1|0}      grayscale or color output
+.TP
+.B DVD parameters:
+ vlc_dvd_audio={ac3|lpcm|mpeg|off} audio type
+ vlc_dvd_channel=[0-15]            audio channel
+ vlc_dvd_subtitle=[0-31]           subtitle channel
 .TP
 .B Input parameters:
  vlc_server=<hostname>    video server

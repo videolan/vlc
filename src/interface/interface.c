@@ -157,9 +157,13 @@ intf_thread_t* intf_Create( void )
  *****************************************************************************/
 void intf_Run( intf_thread_t *p_intf )
 {
+    if( p_intf->p_playlist )
+    {
+        p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_FILE, (void *)p_intf->p_playlist, p_intf->i_list_index, 0, p_main->p_intf->p_vout, p_main->p_aout, NULL );
+    }
     /* Execute the initialization script - if a positive number is returned,
      * the script could be executed but failed */
-    if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
+    else if( intf_ExecScript( main_GetPszVariable( INTF_INIT_SCRIPT_VAR, INTF_INIT_SCRIPT_DEFAULT ) ) > 0 )
     {
         intf_ErrMsg("warning: error(s) during startup script\n");
     }

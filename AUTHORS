@@ -20,3 +20,5 @@
   Renaud Dartus <reno@via.ecp.fr>
   Henri Fallon <henri@via.ecp.fr>
 
+  Contributors include Aaron Holtzman for his ac3dec decoder, and the
+  LiViD team for a few lines of code we borrowed here and there.

@@ -35,12 +35,13 @@
 #include <malloc.h>                                      /* malloc, read ... */
 #include <string.h>
 
-
 #include "config.h"
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
 #include "intf_msg.h"
+
+#include "main.h"
 
 #include "input.h"
 #include "input_file.h"
@@ -53,13 +54,23 @@
 #define TS_PACKET_SIZE 188
 #define TS_IN_UDP 7
 
+#define MAX_AUDIO_CHANNEL 15
+#define MAX_SUBTITLES_CHANNEL 31
+#define NO_SUBTITLES 255
+
+#define REQUESTED_AC3          0
+#define REQUESTED_MPEG         1
+#define REQUESTED_LPCM         2
+#define REQUESTED_NOAUDIO    255
+
 #define PS_BUFFER_SIZE 16384
 #define NO_PES 0
 #define AUDIO_PES 1
 #define VIDEO_PES 2
 #define AC3_PES 3
 #define SUBTITLE_PES 4
-#define PRIVATE_PES 5
+#define LPCM_PES 5
+#define PRIVATE_PES 6
 #define UNKNOWN_PES 12
 
 #define PCR_PID 0x20 /* 0x20 == first video stream
@@ -98,12 +109,23 @@ typedef struct options_s
     unsigned int pcr_pid;
     u8 i_file_type;
     int in; 
+    char **playlist;
+    int i_list_index;
 } options_t;
 
 typedef struct s_ps
 {
     unsigned int pat_counter;
     unsigned int pmt_counter;
+
+    /*
+     * These 3 parameters are passed 
+     * as command line arguments
+     */
+    unsigned int audio_channel;
+    unsigned int subtitles_channel;
+    unsigned int audio_type;
+
     /* 
      * 16 audio mpeg streams
      * 16 audio AV3 streams
@@ -149,7 +171,7 @@ typedef struct input_file_s
 
 /* local prototypes */
 void ps_fill( input_file_t * p_if, boolean_t wait );
-ssize_t safe_read(int fd, unsigned char *buf, int count);
+ssize_t safe_read(options_t *p_options, unsigned char *buf, int count);
 void input_DiskThread( input_file_t * p_if );
 int init_synchro( input_file_t * p_if );
 
@@ -255,21 +277,63 @@ static void adjust( input_file_t * p_if, file_ts_packet *ts )
     vlc_mutex_unlock(&p_own_pcr->lock);
 }
 
-/******************************************************************************
- * safe_read : Buffered reading method
- ******************************************************************************/
+/*****************************************************************************
+ * file_next : Opens the next available file
+ *****************************************************************************/
 
-ssize_t safe_read(int fd, unsigned char *buf, int count)
+int file_next( options_t *options )
+{
+    /* the check for index == 0 should be done _before_ */
+    options->i_list_index--;
+    
+    if( options->in != -1 )
+    {
+            close( options->in );
+    }
+
+    if( !strcmp( options->playlist[options->i_list_index], "-" ) )
+    {
+        /* read stdin */
+        return ( options->in = 0 );
+    }
+    else
+    {
+        /* read the actual file */
+        fprintf( stderr, "Playing file %s\n",
+                 options->playlist[options->i_list_index] );
+        return ( options->in = open( options->playlist[options->i_list_index],
+                                     O_RDONLY | O_NDELAY ) );
+    }
+}
+
+/*****************************************************************************
+ * safe_read : Buffered reading method
+ *****************************************************************************/
+
+ssize_t safe_read( options_t *options, unsigned char *buf, int count )
 {
     int ret, cnt=0;
-
-    while(cnt < count)
+    
+    while( cnt < count )
     {
-        ret = read(fd, buf+cnt, count-cnt);
-        if(ret < 0)
+        ret = read( options->in, buf + cnt, count - cnt );
+    
+        if( ret < 0 )
             return ret;
-        if(ret == 0)
-            break;
+    
+        if( ret == 0 )
+        {
+            /* zero means end of file */
+            if( options->i_list_index )
+            {
+                file_next( options );
+            }
+            else
+            {
+                break;
+            }
+        }
+    
         cnt += ret;
     }
 
@@ -308,49 +372,52 @@ int keep_pcr(int pcr_pid, file_ts_packet *ts)
 int get_pid (ps_t *p_ps)
 {
     int i, tofind, delta;
+    char* type;
 
     switch( p_ps->pes_type )
     {
         case VIDEO_PES:
-            delta = 0x20;
+            delta = 0x20; /* 0x20 - 0x2f */
+            type = "MPEG video";
             tofind = p_ps->pes_id;
             break;
         case AUDIO_PES:
-            delta = 0x40;
+            delta = 0x40; /* 0x40 - 0x5f */
+            type = "MPEG audio";
             tofind = p_ps->pes_id;
             break;
-        case SUBTITLE_PES:
-            delta = 0x60;
-            tofind = p_ps->private_id;
-            break;
+        /* XXX: 0x64 is for the PMT, so don't take it !!! */
         case AC3_PES:
-            delta = 0x80;
+            delta = 0x80; /* 0x80 - 0x8f */
+            type = "MPEG private (AC3 audio)";
             tofind = p_ps->private_id;
             break;
-	default:
-            return(-1);
-    }
-	    
-    /* look in the table if we can find one */
-    for ( i=delta; i < delta + 0x20; i++ )
-    {
-        if ( p_ps->association_table[i] == tofind )
-            return (i);
-
-        if( !p_ps->association_table[i] )
+        case LPCM_PES:
+            delta = 0x90; /* 0x90 - 0x9f */
+            type = "MPEG private (LPCM audio)";
+            tofind = p_ps->private_id;
             break;
+        case SUBTITLE_PES:
+            delta = 0xa0; /* 0xa0 - 0xbf */
+            type = "MPEG private (DVD subtitle)";
+            tofind = p_ps->private_id;
+            break;
+        default:
+            return(-1);
+
     }
 
-    /* we must allocate a new entry */
-    if (i == delta + 0x20)
-        return(-1);
-    
-    p_ps->association_table[i] = tofind;
-    p_ps->media_counter[i] = 0;
+    i = delta + (tofind & 0x1f);
 
-    intf_Msg( "input: allocated new PID 0x%.2x to stream ID 0x%.2x\n", i, tofind );
-    
+    if( p_ps->association_table[i] == 0)
+    {
+        intf_Msg( "Found %s stream at 0x%.2x, allocating PID 0x%.2x\n",
+                  type, tofind, i );
+        p_ps->association_table[i] = 1;
+    }
+
     return ( i );
+
 }
 
 /******************************************************************************
@@ -528,34 +595,60 @@ void write_pmt(ps_t *ps, unsigned char *ts)
     ts[17] = 0x02; /* stream type = video */
     ts[18] = 0xe0; ts[19] = 0x20;
     ts[20] = 0xf0; ts[21] = 0x09; /* es info length */
+
     /* useless info */
     ts[22] = 0x07; ts[23] = 0x04; ts[24] = 0x08; ts[25] = 0x80; ts[26] = 0x24;
     ts[27] = 0x02; ts[28] = 0x11; ts[29] = 0x01; ts[30] = 0xfe;
 
-    /* Audio PID */
-    ts[31] = 0x88; /* stream type = audio */ /* FIXME : was 0x04 */
-    ts[32] = 0xe0; ts[33] = 0x40;
-    ts[34] = 0xf0; ts[35] = 0x00; /* es info length */
+    switch ( ps->audio_type )
+    {
+    case 12 :
+    case REQUESTED_AC3 :
+        /* ac3 */
+        ts[31] = 0x81; /* stream type = audio */
+        ts[32] = 0xe0; ts[33] = 0x80 + ps->audio_channel;
+        ts[34] = 0xf0; ts[35] = 0x00; /* es info length */
+        break;
 
-    /* reserved PID */
-#if 0
-    ts[36] = 0x82; /* stream type = private */
-    ts[37] = 0xe0; ts[38] = 0x60; /* subtitles */
-#else
-    ts[36] = 0x81; /* stream type = private */
-    ts[37] = 0xe0; ts[38] = 0x80; /* ac3 audio */
-#endif
-    ts[39] = 0xf0; ts[40] = 0x0f; /* es info length */
-    /* useless info */
-    ts[41] = 0x90; ts[42] = 0x01; ts[43] = 0x85; ts[44] = 0x89; ts[45] = 0x04;
-    ts[46] = 0x54; ts[47] = 0x53; ts[48] = 0x49; ts[49] = 0x00; ts[50] = 0x0f;
-    ts[51] = 0x04; ts[52] = 0x00; ts[53] = 0x00; ts[54] = 0x00; ts[55] = 0x10;
+    case REQUESTED_MPEG :
+        /* mpeg */
+        ts[31] = 0x04; /* stream type = audio */
+        ts[32] = 0xe0; ts[33] = 0x40 + ps->audio_channel;
+        ts[34] = 0xf0; ts[35] = 0x00; /* es info length */
+        break;
 
-    /* CRC */
-    ts[56] = 0x96; ts[57] = 0x70; ts[58] = 0x0b; ts[59] = 0x7c; /* for video pts */
-    //ts[56] = 0xa1; ts[57] = 0x7c; ts[58] = 0xd8; ts[59] = 0xaa; /* for audio pts */
+    case REQUESTED_LPCM :
+        /* LPCM audio */
+        ts[31] = 0x81;
+        ts[32] = 0xe0; ts[33] = 0xa0 + ps->audio_channel;
+        ts[34] = 0xf0; ts[35] = 0x00; /* es info  length */
+        break;
 
-    for (i=60 ; i < 188 ; i++) ts[i]=0xFF; /* facultatif ? */
+    default :
+        /* No audio */
+        ts[31] = 0x00;
+        ts[35] = 0x00; /* es info  length */
+    }
+
+    /* Subtitles */
+    if( ps->subtitles_channel == NO_SUBTITLES )
+    {
+        ts[36] = 0x00;
+        ts[37] = 0x00; ts[38] = 0x00;
+        ts[39] = 0xf0; ts[40] = 0x00; /* es info length */
+    }
+    else
+    {
+        ts[36] = 0x82;
+        ts[37] = 0xe0; ts[38] = 0xa0 + ( ps->subtitles_channel );
+        ts[39] = 0xf0; ts[40] = 0x00; /* es info length */
+    }
+
+    /* CRC FIXME: not calculated yet*/
+    ts[41] = 0x96; ts[42] = 0x70; ts[43] = 0x0b; ts[44] = 0x7c;
+
+    /* stuffing bytes */
+    for (i=45 ; i < 188 ; i++) ts[i]=0xff; /* facultatif ? */
 
     ps->sent_ts++;
 }
@@ -584,6 +677,10 @@ void ps_thread( input_file_t * p_if )
     vlc_cond_init( &p_in_data->notfull );
     vlc_cond_init( &p_in_data->notempty );
     
+    p_ps->audio_type = main_GetIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_AC3 );
+    p_ps->audio_channel = main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 );
+    p_ps->subtitles_channel = main_GetIntVariable( INPUT_DVD_SUBTITLE_VAR, 0 );
+
     p_ps->pes_type = NO_PES;
     p_ps->pes_id = 0;
     p_ps->private_id = 0;
@@ -608,7 +705,8 @@ void ps_thread( input_file_t * p_if )
     /* Fill the fifo until it is full */
     ps_fill( p_if, 0 );
     /* Launch the thread which fills the fifo */
-	vlc_thread_create( &p_if->disk_thread, "disk thread", (vlc_thread_func_t)input_DiskThread, p_if ); 	
+    vlc_thread_create( &p_if->disk_thread, "disk thread",
+                       (vlc_thread_func_t)input_DiskThread, p_if ); 
     /* Init the synchronization XXX add error detection !!! */
     init_synchro( p_if );
 }
@@ -617,12 +715,12 @@ void ps_thread( input_file_t * p_if )
  * ps_read : ps reading method
  ******************************************************************************/
 
-ssize_t ps_read (int fd, ps_t * p_ps, void *ts)
+ssize_t ps_read( options_t *p_options, ps_t * p_ps, void *ts )
 {
     int pid, readbytes = 0;
     int datasize;
     p_ps->ts_written = 0;
-	  
+  
     while(p_ps->ts_to_write)
     {   
 
@@ -632,7 +730,7 @@ ssize_t ps_read (int fd, ps_t * p_ps, void *ts)
             /* copy the remaining bits at the beginning of the PS buffer */
             memmove ( p_ps->ps_buffer, p_ps->ps_data, datasize);
             /* read some bytes */
-            readbytes = safe_read(fd, p_ps->ps_buffer + datasize, PS_BUFFER_SIZE - datasize);
+            readbytes = safe_read( p_options, p_ps->ps_buffer + datasize, PS_BUFFER_SIZE - datasize);
 
             if(readbytes == 0)
             {
@@ -652,17 +750,17 @@ ssize_t ps_read (int fd, ps_t * p_ps, void *ts)
                 return -1;
             }
 
-	    p_ps->pes_type = NO_PES;
-	    p_ps->offset = 0;
+    p_ps->pes_type = NO_PES;
+    p_ps->offset = 0;
             p_ps->pes_size = (p_ps->ps_data[4] << 8) + p_ps->ps_data[5] + 6;
-	    p_ps->has_pts = p_ps->ps_data[7] & 0xc0;
+    p_ps->has_pts = p_ps->ps_data[7] & 0xc0;
         }
 
         /* if the actual data we have in pes_data is not a PES, then
          * we read the next one. */
         if( (p_ps->pes_type == NO_PES) && !p_ps->to_skip )
         {
-	    p_ps->pes_id = p_ps->ps_data[3];
+    p_ps->pes_id = p_ps->ps_data[3];
 
             if (p_ps->pes_id == 0xbd)
             {
@@ -752,14 +850,14 @@ ssize_t ps_read (int fd, ps_t * p_ps, void *ts)
             else
                 p_ps->pes_type = NO_PES;
         }
-	
+
         if (p_ps->ts_to_write)
         {
             switch(p_ps->pes_type)
             {
                 case VIDEO_PES:
                 case AUDIO_PES:
-		case SUBTITLE_PES:
+case SUBTITLE_PES:
                 case AC3_PES:
                     pid = get_pid (p_ps);
                     write_media_ts(p_ps, ts, pid);
@@ -787,7 +885,6 @@ void ps_fill( input_file_t * p_if, boolean_t wait )
 {
     in_data_t * p_in_data = &p_if->in_data;
     ps_t * p_ps = &p_if->ps;
-    int fd = p_if->options.in;
     int i, how_many;
     int pcr_flag;
     file_ts_packet *ts;
@@ -824,7 +921,7 @@ void ps_fill( input_file_t * p_if, boolean_t wait )
         
         /* read a whole UDP packet from the file */
         p_ps->ts_to_write = how_many;
-        if(ps_read(fd, p_ps, ts = (file_ts_packet *)(p_in_data->buf + p_in_data->end)) != how_many)
+        if(ps_read(&p_if->options, p_ps, ts = (file_ts_packet *)(p_in_data->buf + p_in_data->end)) != how_many)
         {
             msleep( 50000 ); /* XXX we need an INPUT_IDLE */
             intf_ErrMsg( "input error: read() error\n" );
@@ -904,7 +1001,7 @@ int init_synchro( input_file_t * p_if )
 }
 
 /*****************************************************************************
- * input_FileOpen : open a file descriptor
+ * input_DiskThread : main thread
  *****************************************************************************/
 
 void input_DiskThread( input_file_t * p_if )
@@ -920,14 +1017,18 @@ int input_FileOpen( input_thread_t *p_input )
 {
     options_t * p_options = &input_file.options;
 
-    p_options->in = open( p_input->psz_source, O_RDONLY );
-    if( p_options->in < 0 )
+    p_options->in = -1;
+
+    p_options->playlist = (char **)p_input->p_source;
+    p_options->i_list_index = p_input->i_port;
+
+    if( file_next( p_options ) < 0 )
     {
-        intf_ErrMsg( "input error: cannot open the file %s", p_input->psz_source );
+        intf_ErrMsg( "input error: cannot open the file %s", p_input->p_source );
     }
 
     input_file.b_die = 0;
-    read( p_options->in, &p_options->i_file_type, 1 );
+    safe_read( p_options, &p_options->i_file_type, 1 );
     
     switch( p_options->i_file_type )
     {
@@ -944,7 +1045,7 @@ int input_FileOpen( input_thread_t *p_input )
     }
 
     
-	return( 0 );	
+return( 0 );
 }
 
 /*****************************************************************************
@@ -997,7 +1098,7 @@ int input_FileRead( input_thread_t *p_input, const struct iovec *p_vector,
     vlc_cond_signal(&p_in_data->notfull);
     vlc_mutex_unlock(&p_in_data->lock);
     
-  	return( 188*howmany );
+    return( 188*howmany );
 }
 
 /*****************************************************************************

@@ -459,9 +459,11 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
 {
     int                 i_arg;
     int                 i_method = 0;                    /* method parameter */
-    char *              psz_source = NULL;               /* source parameter */
+    char *              p_source = NULL;                 /* source parameter */
     int                 i_port = 0;                        /* port parameter */
     int                 i_vlan = 0;                        /* vlan parameter */
+
+    fprintf( stderr, "spawn input\n" );
 
     /* Parse parameters - see command list above */
     for ( i_arg = 1; i_arg < i_argc; i_arg++ )
@@ -474,7 +476,7 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
         case 1:                                    /* filename, hostname, ip */
         case 2:
         case 3:
-            psz_source = p_argv[i_arg].psz_str;
+            p_source = p_argv[i_arg].psz_str;
             break;
         case 4:                                                      /* port */
             i_port = p_argv[i_arg].i_num;
@@ -491,7 +493,7 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
         input_DestroyThread( p_main->p_intf->p_input, NULL );
     }
 
-    p_main->p_intf->p_input = input_CreateThread( i_method, psz_source, i_port, i_vlan,
+    p_main->p_intf->p_input = input_CreateThread( i_method, p_source, i_port, i_vlan,
                                                   p_main->p_intf->p_vout, p_main->p_aout,
                                                   NULL );
     return( INTF_NO_ERROR );

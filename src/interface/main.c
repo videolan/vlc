@@ -41,6 +41,7 @@
 #include "mtime.h"
 #include "plugins.h"
 #include "input_vlan.h"
+#include "input_file.h"
 
 #include "intf_msg.h"
 #include "interface.h"
@@ -106,6 +107,11 @@ static const struct option longopts[] =
     {   "grayscale",        0,          0,      'g' },
     {   "color",            0,          0,      OPT_COLOR },
 
+    /* DVD options */
+    {   "dvdaudio",         1,          0,      'a' },
+    {   "dvdchannel",       1,          0,      'c' },
+    {   "dvdsubtitle",      1,          0,      's' },
+    
     /* Input options */
     {   "novlans",          0,          0,      OPT_NOVLANS },
     {   "server",           1,          0,      OPT_SERVER },
@@ -115,7 +121,7 @@ static const struct option longopts[] =
 };
 
 /* Short options */
-static const char *psz_shortopts = "hHvg";
+static const char *psz_shortopts = "hHvga:s:c:";
 
 /*****************************************************************************
  * Global variable program_data - this is the one and only, see main.h
@@ -149,6 +155,9 @@ static int  TestMMX                 ( void );
 int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
     main_t  main_data;                      /* root of all data - see main.h */
+    char **p_playlist;
+    int i_list_index;
+
     p_main = &main_data;                       /* set up the global variable */
 
     /*
@@ -180,6 +189,29 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         intf_MsgDestroy();
         return( errno );
     }
+
+    /* get command line files */
+    i_list_index = 0;
+
+    if( optind < i_argc )
+    {
+        int i_index = 0;
+        p_playlist = malloc( (i_list_index = i_argc - optind)
+                                        * sizeof(int) );
+
+        while( i_argc - i_index > optind )
+        {
+            p_playlist[ i_index ] = ppsz_argv[ i_argc - i_index - 1];
+            i_index++;
+        }
+    }
+    else
+    {
+        p_playlist = malloc( sizeof(int) );
+        p_playlist[ 0 ] = "-";
+        i_list_index = 1;
+    }
+
     intf_MsgImm( COPYRIGHT_MESSAGE "\n" );          /* print welcome message */
 
     /*
@@ -212,7 +244,11 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     main_data.p_intf = intf_Create();
     if( main_data.p_intf != NULL )
     {
+        main_data.p_intf->p_playlist = p_playlist;
+        main_data.p_intf->i_list_index = i_list_index;
+
         InitSignalHandler();             /* prepare signals for interception */
+
         intf_Run( main_data.p_intf );
         intf_Destroy( main_data.p_intf );
     }
@@ -426,6 +462,24 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutIntVariable( VOUT_GRAYSCALE_VAR, 0 );
             break;
 
+        /* DVD options */
+        case 'a':
+            if ( ! strcmp(optarg, "mpeg") )
+                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_MPEG );
+            else if ( ! strcmp(optarg, "lpcm") )
+                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_LPCM );
+            else if ( ! strcmp(optarg, "off") )
+                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_NOAUDIO );
+            else
+                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_AC3 );
+            break;
+        case 'c':
+            main_PutIntVariable( INPUT_DVD_CHANNEL_VAR, atoi(optarg) );
+            break;
+        case 's':
+            main_PutIntVariable( INPUT_DVD_SUBTITLE_VAR, atoi(optarg) );
+            break;
+
         /* Input options */
         case OPT_NOVLANS:                                       /* --novlans */
             p_main->b_vlans = 0;
@@ -487,6 +541,10 @@ static void Usage( int i_fashion )
               "  -g, --grayscale                \tgrayscale output\n"
               "      --color                    \tcolor output\n"
               "\n"
+              "  -a, --dvdaudio                 \tchoose DVD audio type\n"
+              "  -c, --dvdchannel               \tchoose DVD audio channel\n"
+              "  -s, --dvdsubtitle              \tchoose DVD subtitle channel\n"
+              "\n"
               "      --novlans                  \tdisable vlans\n"
               "      --server <host>            \tvideo server address\n"
               "      --port <port>              \tvideo server port\n"
@@ -522,6 +580,13 @@ static void Usage( int i_fashion )
               "  " VOUT_FB_DEV_VAR "=<filename>           \tframebuffer device path\n"
               "  " VOUT_GRAYSCALE_VAR "={1|0}             \tgrayscale or color output\n" );
 
+    /* DVD parameters */
+    intf_Msg( "\n"
+              "DVD parameters:\n"
+              "  " INPUT_DVD_AUDIO_VAR "={ac3|lpcm|mpeg|off} \taudio type\n"
+              "  " INPUT_DVD_CHANNEL_VAR "=[0-15]            \taudio channel\n"
+              "  " INPUT_DVD_SUBTITLE_VAR "=[0-31]           \tsubtitle channel\n" );
+
     /* Input parameters */
     intf_Msg( "\n"
               "Input parameters:\n"
@@ -544,7 +609,7 @@ static void Version( void )
               "You may redistribute it under the terms of the GNU General Public License;\n"
               "see the file named COPYING for details.\n"
               "Written by the VideoLAN team at Ecole Centrale, Paris.\n" );
-	    
+
 }
 
 /*****************************************************************************

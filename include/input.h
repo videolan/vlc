@@ -328,8 +328,8 @@ typedef struct input_thread_s
     /* Input method description */
     int                         i_method;                    /* input method */
     int                         i_handle;          /* file/socket descriptor */
-    char *                      psz_source;                        /* source */
-    int                         i_port;                     /* port number */
+    char *                      p_source;                          /* source */
+    int                         i_port;                       /* port number */
     int                         i_vlan;                /* id for vlan method */
     input_open_t *              p_Open;              /* opener of the method */
     input_read_t *              p_Read;                  /* reading function */
@@ -371,7 +371,7 @@ typedef struct input_thread_s
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-input_thread_t *input_CreateThread      ( int i_method, char *psz_source, int i_port,
+input_thread_t *input_CreateThread      ( int i_method, void *p_source, int i_port,
                                           int i_vlan, p_vout_thread_t p_vout,
                                           p_aout_thread_t p_aout, int *pi_status );
 void            input_DestroyThread     ( input_thread_t *p_input, int *pi_status );

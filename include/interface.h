@@ -64,6 +64,10 @@ typedef struct intf_thread_s
 
     /* XXX: Channels array - new API */
     //p_intf_channel_t *  p_channel[INTF_MAX_CHANNELS];/* channel descriptions */
+    /* file list - quick hack */
+    char **p_playlist;
+    int i_list_index;
+
     /* Channels array - NULL if not used */
     p_intf_channel_t    p_channel;                /* description of channels */
 

@@ -108,7 +108,7 @@ static __inline__ void  input_DemuxPSI( input_thread_t *p_input,
  * If pi_status is NULL, then the function will block until the thread is ready.
  * If not, it will be updated using one of the THREAD_* constants.
  *****************************************************************************/
-input_thread_t *input_CreateThread ( int i_method, char *psz_source, int i_port, int i_vlan,
+input_thread_t *input_CreateThread ( int i_method, void *p_source, int i_port, int i_vlan,
                                      p_vout_thread_t p_vout, p_aout_thread_t p_aout, int *pi_status )
 {
     input_thread_t *    p_input;                        /* thread descriptor */
@@ -132,7 +132,7 @@ input_thread_t *input_CreateThread ( int i_method, char *psz_source, int i_port,
 
     /* Initialize input method description */
     p_input->i_method           = i_method;
-    p_input->psz_source         = psz_source;
+    p_input->p_source           = p_source;
     p_input->i_port             = i_port;
     p_input->i_vlan             = i_vlan;
     switch( i_method )
@@ -208,7 +208,7 @@ input_thread_t *input_CreateThread ( int i_method, char *psz_source, int i_port,
     }
 
     intf_DbgMsg("configuration: method=%d, source=%s, port=%d, vlan=%d\n",
-                i_method, psz_source, i_port, i_vlan );
+                i_method, p_source, i_port, i_vlan );
 
     /* Let the appropriate method open the socket. */
     if( p_input->p_Open( p_input ) )

@@ -186,12 +186,12 @@ int input_NetworkOpen( input_thread_t *p_input )
      */
 
     /* Use default host if not specified */
-    if( p_input->psz_source == NULL )
+    if( p_input->p_source == NULL )
     {
-        p_input->psz_source = main_GetPszVariable( INPUT_SERVER_VAR, INPUT_SERVER_DEFAULT );
+        p_input->p_source = main_GetPszVariable( INPUT_SERVER_VAR, INPUT_SERVER_DEFAULT );
     }
 
-    if( BuildInetAddr( &sa_in, p_input->psz_source, htons(0) ) == (-1) )
+    if( BuildInetAddr( &sa_in, p_input->p_source, htons(0) ) == (-1) )
     {
         close( p_input->i_handle );
         return( -1 );

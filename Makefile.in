@@ -281,14 +281,15 @@ clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(PLUGIN_OBJ)
 
 distclean: clean
-	rm -f **/*.o **/*.so **/*~ *.log
+	rm -f */*/*.o plugins/*/*.so **/*~ *.log
 	rm -f Makefile include/defs.h include/config.h
 	rm -f config.status config.cache config.log
-	rm -f vlc gmon.out core
+	rm -f vlc gvlc gmon.out core
 	rm -rf .dep
 
 install:
 	$(INSTALL) vlc $(prefix)/bin
+	$(INSTALL) gvlc $(prefix)/bin
 	mkdir -p $(prefix)/lib/videolan/vlc
 	$(INSTALL) $(PLUGIN_OBJ) $(prefix)/lib/videolan/vlc
 	$(INSTALL) share/*.psf $(prefix)/share/videolan/vlc
