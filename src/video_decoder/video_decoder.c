@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.46 2001/02/11 01:15:11 sam Exp $
+ * $Id: video_decoder.c,v 1.47 2001/02/19 19:08:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -482,7 +482,7 @@ void vdec_DecodeMacroblockC ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
          */
         if( p_mb->pf_motion == 0 )
         {
-            intf_ErrMsg( "vdec error: pf_motion set to NULL" );
+            intf_WarnMsg( 2, "pf_motion set to NULL" );
         }
         else
         {
@@ -512,7 +512,7 @@ void vdec_DecodeMacroblockBW ( vdec_thread_t *p_vdec, macroblock_t * p_mb )
          */
         if( p_mb->pf_motion == 0 )
         {
-            intf_ErrMsg( "vdec error: pf_motion set to NULL" );
+            intf_WarnMsg( 2, "pf_motion set to NULL" );
         }
         else
         {

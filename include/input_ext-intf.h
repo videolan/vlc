@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.21 2001/02/19 03:12:26 stef Exp $
+ * $Id: input_ext-intf.h,v 1.22 2001/02/19 19:08:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -153,6 +153,8 @@ typedef struct stream_descriptor_s
                                                  * (in arbitrary units) */
     off_t                   i_seek;         /* next requested location (changed
                                              * by the interface thread */
+    u32                     i_mux_rate; /* the rate we read the stream (in
+                                         * units of 50 bytes/s) ; 0 if undef */
 
     /* For DVD streams: */
     int                     i_title_nb;

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.78 2001/02/13 13:01:15 massiot Exp $
+ * $Id: vpar_headers.c,v 1.79 2001/02/19 19:08:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -579,7 +579,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         p_vpar->picture.i_current_structure = 0;
 
-        intf_ErrMsg("vpar error: odd number of field pictures.");
+        intf_WarnMsg( 2, "Odd number of field pictures." );
     }
 
     /* Do we have the reference pictures ? */

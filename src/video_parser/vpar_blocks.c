@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.76 2001/02/13 13:01:15 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.77 2001/02/19 19:08:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -627,10 +627,6 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
     boolean_t       b_sign;
     dct_lookup_t *  p_tab;
 
-    /* There should be no D picture in non-intra blocks */
-    if( p_vpar->picture.i_coding_type == D_CODING_TYPE )
-        intf_ErrMsg("vpar error : D-picture in non intra block");
-    
     /* Decoding of the AC coefficients */
 
     i_nc = 0;
@@ -710,7 +706,7 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
         p_mb->ppi_blocks[i_b][i_pos] = i_level;
     }
 
-    intf_ErrMsg("vpar error: DCT coeff (non-intra) is out of bounds");
+    intf_WarnMsg( 2, "DCT coeff (non-intra) is out of bounds" );
     p_vpar->picture.b_error = 1;
 }
 
@@ -858,7 +854,7 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
         p_mb->ppi_blocks[i_b][i_pos] = i_level;
     }
 
-    intf_ErrMsg("vpar error: DCT coeff (intra) is out of bounds");
+    intf_WarnMsg( 2, "DCT coeff (intra) is out of bounds" );
     p_vpar->picture.b_error = 1;
 }
 
@@ -967,7 +963,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
         i_mismatch ^= i_level;
     }
 
-    intf_ErrMsg("vpar error: DCT coeff (non-intra) is out of bounds");
+    intf_WarnMsg( 2, "DCT coeff (non-intra) is out of bounds" );
     p_vpar->picture.b_error = 1;
 }
 
@@ -1118,7 +1114,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
         i_mismatch ^= i_level;
     }
 
-    intf_ErrMsg("vpar error: DCT coeff (intra) is out of bounds");
+    intf_WarnMsg( 2, "DCT coeff (intra) is out of bounds" );
     p_vpar->picture.b_error = 1;
 }
 
@@ -1250,7 +1246,7 @@ static __inline__ int MotionCode( vpar_thread_t * p_vpar )
     if( (i_code -= 12) < 0 )
     {
         p_vpar->picture.b_error = 1;
-        intf_ErrMsg( "vpar error: Invalid motion_vector code" );
+        intf_WarnMsg( 2, "Invalid motion_vector code" );
         return 0;
     }
 
@@ -1634,7 +1630,7 @@ static __inline__ void SkippedMacroblock( vpar_thread_t * p_vpar, int i_mb,
 
     if( i_coding_type == I_CODING_TYPE )
     {
-        intf_ErrMsg("vpar error: skipped macroblock in I-picture");
+        intf_WarnMsg( 2, "skipped macroblock in I-picture" );
         p_vpar->picture.b_error = 1;
         return;
     }
@@ -1799,7 +1795,7 @@ static __inline__ void ParseMacroblock(
 
     if( i_inc < 0 )
     {
-        intf_ErrMsg( "vpar error: bad address increment (%d)", i_inc );
+        intf_WarnMsg( 2, "Bad address increment (%d)", i_inc );
         p_vpar->picture.b_error = 1;
         return;
     }
@@ -2029,7 +2025,7 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
 
     if( *pi_mb_address < i_mb_address_save )
     {
-        intf_ErrMsg( "vpar error: slices do not follow, maybe a PES has been trashed" );
+        intf_WarnMsg( 2, "Slices do not follow" );
         p_vpar->picture.b_error = 1;
         return;
     }
@@ -2078,7 +2074,7 @@ static __inline__ void vpar_PictureData( vpar_thread_t * p_vpar,
                  < SLICE_START_CODE_MIN) ||
             (i_dummy > SLICE_START_CODE_MAX) )
         {
-            intf_ErrMsg("vpar error: premature end of picture");
+            intf_WarnMsg( 2, "Premature end of picture" );
             p_vpar->picture.b_error = 1;
             break;
         }

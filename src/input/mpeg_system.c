@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.36 2001/02/14 15:58:29 henri Exp $
+ * $Id: mpeg_system.c,v 1.37 2001/02/19 19:08:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -518,9 +518,6 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
     int                 i;
     int                 i_new_es_number = 0;
 
-    intf_Msg("input info: Your stream contains Program Stream Map information");
-    intf_Msg("input info: Please send a mail to <massiot@via.ecp.fr>");
-
     if( p_data->p_payload_start + 10 > p_data->p_payload_end )
     {
         intf_ErrMsg( "PSM too short : packet corrupt" );
@@ -786,6 +783,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
             {
                 /* Read the SCR. */
                 mtime_t         scr_time;
+                u32             i_mux_rate;
 
                 if( (p_data->p_buffer[4] & 0xC0) == 0x40 )
                 {
@@ -796,6 +794,9 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                                         << 4) |
                          ((mtime_t)(U32_AT(p_data->p_buffer + 6) & 0x03FFF800)
                                         >> 11);
+
+                    /* mux_rate */
+                    i_mux_rate = (U32_AT(p_data->p_buffer + 10) & 0xFFFFFC00);
                 }
                 else
                 {
@@ -805,11 +806,22 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                          (((mtime_t)U16_AT(p_data->p_buffer + 5) << 14)
                            - (1 << 14)) |
                          ((mtime_t)U16_AT(p_data->p_buffer + 7) >> 1);
+
+                    /* mux_rate */
+                    i_mux_rate = (U32_AT(p_data->p_buffer + 8) & 0x8FFFFE);
                 }
                 /* Call the pace control. */
-                //intf_Msg("+%lld", scr_time);
                 input_ClockManageRef( p_input, p_input->stream.pp_programs[0],
                                       scr_time );
+
+                if( i_mux_rate != p_input->stream.i_mux_rate
+                     && p_input->stream.i_mux_rate )
+                {
+                    intf_WarnMsg(2,
+                                 "Mux_rate changed - expect cosmetic errors");
+                }
+                p_input->stream.i_mux_rate = i_mux_rate;
+
                 b_trash = 1;
             }
             break;

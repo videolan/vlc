@@ -2,7 +2,7 @@
  * vdec_motion_common.c : common motion compensation routines common
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_common.c,v 1.3 2001/02/13 13:01:14 massiot Exp $
+ * $Id: vdec_motion_common.c,v 1.4 2001/02/19 19:08:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -209,7 +209,7 @@ static __inline__ void Motion420(
                        + (i_mv_y >> 1) * i_l_stride;
     if( i_source_offset >= p_source->i_width * p_source->i_height )
     {
-        intf_ErrMsg( "vdec error: bad motion vector (lum)" );
+        intf_WarnMsg( 2, "Bad motion vector (lum)" );
         return;
     }
 
@@ -236,7 +236,7 @@ static __inline__ void Motion420(
                         + ((i_mv_y/2) >> 1) * i_c_stride;
     if( i_source_offset >= (p_source->i_width * p_source->i_height) / 4 )
     {
-        intf_ErrMsg( "vdec error: bad motion vector (chroma)" );
+        intf_WarnMsg( 2, "Bad motion vector (chroma)" );
         return;
     }
 
