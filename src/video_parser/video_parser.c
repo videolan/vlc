@@ -306,8 +306,8 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->synchro.i_current_frame_date = 0;
     p_vpar->synchro.i_backward_frame_date = 0;
     
-    p_vpar->synchro.i_p_nb = 5;
-    p_vpar->synchro.i_b_nb = 6;
+    p_vpar->synchro.r_p_average = p_vpar->synchro.i_p_nb = 6;
+    p_vpar->synchro.r_b_average = p_vpar->synchro.i_b_nb = 6;
     p_vpar->synchro.i_p_count = 0;
     p_vpar->synchro.i_b_count = 0;
     p_vpar->synchro.i_i_count = 0;

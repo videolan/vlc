@@ -97,6 +97,8 @@ typedef struct video_synchro_s
 
 #ifdef POLUX_SYNCHRO
 
+#define SYNC_AVERAGE_COUNT 10
+
 typedef struct video_synchro_s
 {
     /* Date Section */
@@ -109,6 +111,7 @@ typedef struct video_synchro_s
     /* Frame Trashing Section */
     
     int         i_b_nb, i_p_nb;   /* number of decoded P and B between two I */
+    float       r_b_average, r_p_average;
     int         i_b_count, i_p_count, i_i_count;
     int         i_b_trasher;                /* used for brensenham algorithm */
     

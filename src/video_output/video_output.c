@@ -942,6 +942,10 @@ static int InitThread( vout_thread_t *p_vout )
  *****************************************************************************/
 static void RunThread( vout_thread_t *p_vout)
 {
+    //?? welcome to gore land
+    static int i_trash_count = 0;
+    static mtime_t last_display_date = 0;
+    
     int             i_index;                                /* index in heap */
     mtime_t         current_date;                            /* current date */
     mtime_t         display_date;                            /* display date */
@@ -993,8 +997,12 @@ static void RunThread( vout_thread_t *p_vout)
             /* Computes FPS rate */
             p_vout->p_fps_sample[ p_vout->c_fps_samples++ % VOUT_FPS_SAMPLES ] = display_date;
 #endif
-#if 0
-            if( display_date < current_date )
+// ???
+i_trash_count++;
+fprintf( stderr, "gap : %Ld\n", display_date-last_display_date );
+last_display_date = display_date;
+#if 1
+            if( display_date < current_date && i_trash_count > 4 )
             {
                 /* Picture is late: it will be destroyed and the thread will sleep and
                  * go to next picture */
@@ -1012,12 +1020,13 @@ static void RunThread( vout_thread_t *p_vout)
                 intf_DbgMsg( "warning: late picture %p skipped refcount=%d\n", p_pic, p_pic->i_refcount );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 
-                p_pic =         NULL;
-                display_date =  0;
-
                 /* Update synchronization information as if display delay 
                  * was 0 */
-                Synchronize( p_vout, 0 );                
+                Synchronize( p_vout, display_date - current_date );
+                
+                p_pic =         NULL;
+                display_date =  0;
+                i_trash_count = 0;
             }
             else 
 #endif                
@@ -1034,9 +1043,8 @@ static void RunThread( vout_thread_t *p_vout)
                 /* Picture will be displayed, update synchronization 
                  * information */
                 Synchronize( p_vout, display_date - current_date );
-            }            
+            }
         }
-
         /*
          * Find the subpicture to display - this operation does not need lock, since
          * only READY_SUBPICTURES are handled. If no picture has been selected,
@@ -1917,64 +1925,74 @@ static void Synchronize( vout_thread_t *p_vout, s64 i_delay )
 {
     int i_synchro_inc = 0;
     //???? gore following
-    //static int i_panic_count = 0;
+    static int i_panic_count = 0;
     static int i_last_synchro_inc = 0;
     static float r_synchro_level = VOUT_SYNCHRO_LEVEL_START;
-    static int i_truc = 1;
+    static int i_truc = 10;
 
-    //?? heap size is p_vout->i_pictures
-    //?? 
     if( i_delay < 0 )
     {
-//        intf_Msg("PANIC %d\n", i_panic_count++);
+        fprintf( stderr, "PANIC %d\n", i_panic_count );
+        i_panic_count++;
     }
-/*
+    
+    i_truc *= 2;
+    
     if( p_vout->i_pictures > VOUT_SYNCHRO_HEAP_IDEAL_SIZE+1 )
     {
-        i_synchro_inc++;
+        i_truc = 40;
+        i_synchro_inc += p_vout->i_pictures - VOUT_SYNCHRO_HEAP_IDEAL_SIZE - 1;
+        
     }
-    else if( p_vout->i_pictures < VOUT_SYNCHRO_HEAP_IDEAL_SIZE )
+    else 
     {
-        i_synchro_inc--;
+        if( p_vout->i_pictures < VOUT_SYNCHRO_HEAP_IDEAL_SIZE )
+        {
+            i_truc = 32;
+            //i_synchro_inc += p_vout->i_pictures - VOUT_SYNCHRO_HEAP_IDEAL_SIZE;
+        }
+
+        if( i_delay < 1000 )
+        {
+            //i_truc = 4;
+        }
     }
-*/    
-    if( i_delay < 10000 )
+   
+    if( i_truc > VOUT_SYNCHRO_LEVEL_MAX*2*2*2*2*2 || 
+        i_synchro_inc*i_last_synchro_inc < 0 )
     {
-        i_truc = 4;
+        i_truc = 32;
     }
     
-    if( i_delay < 20000 )
+    if( i_delay < 6000 )
     {
-        i_synchro_inc--;
+        i_truc = 16;
+        i_synchro_inc -= 2;
+    }
+    else if( i_delay < 70000 )
+    {
+        i_truc = 24+(24*i_delay)/70000;
+        if( i_truc < 16 )
+            i_truc = 16;
+        i_synchro_inc -= 1+(5*(70000-i_delay))/70000;
     }   
-    else if( i_delay > 50000 )
+    else if( i_delay > 100000 )
     {
-        i_synchro_inc++;
+        r_synchro_level += 1;
+        if( i_delay > 130000 )
+            r_synchro_level += 1;
     }
-    
-    if( i_synchro_inc*i_last_synchro_inc < 0 )
-    {
-        i_truc = 2;
-    }
-    else
-    {
-        i_truc *= 2;
-    }
-    if( i_truc > VOUT_SYNCHRO_LEVEL_MAX || i_delay == 0 )
-    {
-        i_truc = 2;
-    }
-    
+      
     r_synchro_level += (float)i_synchro_inc / i_truc;
-    p_vout->i_synchro_level = (int) r_synchro_level;
+    p_vout->i_synchro_level = (int)(r_synchro_level+0.5);
     
     if( r_synchro_level > VOUT_SYNCHRO_LEVEL_MAX )
     {
         r_synchro_level = VOUT_SYNCHRO_LEVEL_MAX;
     }
 
-//    printf( "synchro level : %d, (%d, %d) (%d, %f) - %Ld\n", p_vout->i_synchro_level,
-//            i_last_synchro_inc, i_synchro_inc, i_truc, r_synchro_level, i_delay );    
+    fprintf( stderr, "synchro level : %d, heap : %d (%d, %d) (%d, %f) - %Ld\n", p_vout->i_synchro_level,
+            p_vout->i_pictures, i_last_synchro_inc, i_synchro_inc, i_truc, r_synchro_level, i_delay );    
     i_last_synchro_inc = i_synchro_inc;    
 }
 

@@ -301,7 +301,7 @@
  * Video parser configuration
  *****************************************************************************/
 
-#define VPAR_IDLE_SLEEP                 100000
+#define VPAR_IDLE_SLEEP                 10000
 
 /* Time to sleep when waiting for a buffer (from vout or the video fifo).
  * It should be approximately the time needed to perform a complete picture

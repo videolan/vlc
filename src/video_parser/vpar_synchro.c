@@ -542,7 +542,7 @@ void vpar_SynchroSetCurrentDate( vpar_thread_t * p_vpar, int i_coding_type )
         }
         else
         {
-            p_vpar->synchro.i_current_frame_date += 1000000/(1+p_vpar->sequence.r_frame_rate);
+            p_vpar->synchro.i_current_frame_date += 1000000/(p_vpar->sequence.r_frame_rate);
         }
         break;
         
@@ -550,7 +550,7 @@ void vpar_SynchroSetCurrentDate( vpar_thread_t * p_vpar, int i_coding_type )
 
         if( p_vpar->synchro.i_backward_frame_date == 0 )
         {
-            p_vpar->synchro.i_current_frame_date += 1000000/(1+p_vpar->sequence.r_frame_rate);
+            p_vpar->synchro.i_current_frame_date += 1000000/(p_vpar->sequence.r_frame_rate);
         }
         else
         {
@@ -588,15 +588,22 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
     switch( i_coding_type )
     {
     case I_CODING_TYPE:
-       if( p_vpar->synchro.i_i_count != 0 )
-        {
-            p_vpar->synchro.i_p_nb = p_vpar->synchro.i_p_count;
-            p_vpar->synchro.i_b_nb = p_vpar->synchro.i_b_count;
-        }
+
+//fprintf( stderr, "p : %d (%d), b : %d (%d)\n", p_vpar->synchro.i_p_count, p_vpar->synchro.i_p_nb,
+//         p_vpar->synchro.i_b_count, p_vpar->synchro.i_b_nb );
+
+        p_vpar->synchro.r_p_average =
+            (p_vpar->synchro.r_p_average*(SYNC_AVERAGE_COUNT-1)+p_vpar->synchro.i_p_count)/SYNC_AVERAGE_COUNT;
+        p_vpar->synchro.r_b_average =
+            (p_vpar->synchro.r_b_average*(SYNC_AVERAGE_COUNT-1)+p_vpar->synchro.i_b_count)/SYNC_AVERAGE_COUNT;
+        
+        p_vpar->synchro.i_p_nb = (int)(p_vpar->synchro.r_p_average+0.5);
+        p_vpar->synchro.i_b_nb = (int)(p_vpar->synchro.r_b_average+0.5);
+
         p_vpar->synchro.i_p_count = p_vpar->synchro.i_b_count = 0;
         p_vpar->synchro.i_b_trasher = p_vpar->synchro.i_b_nb / 2;
         p_vpar->synchro.i_i_count++;
-        break;
+       break;
 
     case P_CODING_TYPE:
         p_vpar->synchro.i_p_count++;
