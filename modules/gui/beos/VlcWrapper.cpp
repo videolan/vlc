@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.41 2004/01/05 13:07:03 zorglub Exp $
+ * $Id: VlcWrapper.cpp,v 1.42 2004/01/17 12:28:57 gbazin Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -706,11 +706,9 @@ VlcWrapper::PlaylistCloneItem( void* castToItem ) const
 		if ( copy )
 		{
 			// make a copy of the item at index
+                        *copy = *item;
 			copy->psz_name = strdup( item->psz_name );
 			copy->psz_uri  = strdup( item->psz_uri );
-			copy->i_type = item->i_type;
-			copy->i_status = item->i_status;
-			copy->b_autodeletion = item->b_autodeletion;
 		}
 	}
 	return (void*)copy;

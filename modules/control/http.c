@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.43 2004/01/10 03:36:03 hartman Exp $
+ * $Id: http.c,v 1.44 2004/01/17 12:28:57 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -2945,12 +2945,10 @@ playlist_item_t * parse_MRL( char *psz )
     {
         /* now create an item */
         p_item = malloc( sizeof( playlist_item_t ) );
-
+        memset( p_item, 0, sizeof( playlist_item_t ) );
         p_item->psz_name   = mrl;
         p_item->psz_uri    = strdup( mrl );
         p_item->i_duration = -1;
-        p_item->i_status = 0;
-        p_item->b_autodeletion = VLC_FALSE;
         p_item->b_enabled = VLC_TRUE;
         p_item->i_group = PLAYLIST_TYPE_MANUAL;
 

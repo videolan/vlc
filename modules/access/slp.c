@@ -2,7 +2,7 @@
  * slp.c: SLP access plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: slp.c,v 1.18 2004/01/05 13:07:02 zorglub Exp $
+ * $Id: slp.c,v 1.19 2004/01/17 12:28:56 gbazin Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -179,6 +179,7 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
 
     /* create a playlist  item */
     p_playlist_item = malloc( sizeof( playlist_item_t ) );
+    memset( p_playlist_item, 0, sizeof( playlist_item_t ) );
     if( p_playlist_item == NULL )
     {
         msg_Err( p_input, "out of memory" );
@@ -187,13 +188,9 @@ static SLPBoolean SrvUrlCallback( SLPHandle slph_slp,
 
     p_playlist_item->psz_name = NULL;
     p_playlist_item->psz_uri  = strdup( psz_s );
-    p_playlist_item->i_status = 0;
-    p_playlist_item->b_autodeletion = VLC_FALSE;
     p_playlist_item->i_duration = -1;
     p_playlist_item->i_group = i_group;
     p_playlist_item->b_enabled = VLC_TRUE;
-    p_playlist_item->pp_categories = NULL;
-    p_playlist_item->i_categories = NULL;
 
     /* search the description of the stream */
     if( SLPOpen( config_GetPsz( p_input, "slp-lang" ),

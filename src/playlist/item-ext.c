@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.8 2004/01/11 00:45:06 zorglub Exp $
+ * $Id: item-ext.c,v 1.9 2004/01/17 12:28:57 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -60,6 +60,7 @@ int playlist_AddWDuration( playlist_t *p_playlist, const char * psz_uri,
         msg_Err( p_playlist, "Not adding NULL item");
         return -1;
     }
+    memset( p_item, 0, sizeof( playlist_item_t ) );
     p_item->psz_uri    = strdup( psz_uri );
     if( psz_name != NULL )
     {
@@ -69,14 +70,9 @@ int playlist_AddWDuration( playlist_t *p_playlist, const char * psz_uri,
     {
         p_item->psz_name = strdup ( psz_uri );
     }
-    p_item->i_status = 0;
-    p_item->b_autodeletion = VLC_FALSE;
     p_item->b_enabled = VLC_TRUE;
     p_item->i_group = PLAYLIST_TYPE_MANUAL;
     p_item->i_duration = i_duration;
-
-    p_item->pp_categories = NULL;
-    p_item->i_categories = 0;
 
     playlist_CreateItemCategory( p_item, _("General") );
     playlist_CreateItemCategory( p_item, _("Options") );
