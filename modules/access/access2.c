@@ -231,6 +231,12 @@ static void Access2Seek( input_thread_t *p_input, off_t i_pos )
     {
         if( !p_access->pf_seek( p_access, i_pos ) )
         {
+            if( p_sys->p_block )
+            {
+                block_Release( p_sys->p_block );
+                p_sys->p_block = NULL;
+            }
+
             vlc_mutex_lock( &p_input->stream.stream_lock );
             p_input->stream.p_selected_area->i_tell = i_pos;
             vlc_mutex_unlock( &p_input->stream.stream_lock );
