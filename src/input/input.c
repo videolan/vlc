@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.159 2001/11/25 05:04:38 stef Exp $
+ * $Id: input.c,v 1.160 2001/11/27 10:50:35 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -48,6 +48,7 @@
 
 #ifdef WIN32
 #   include <winsock2.h>
+#   include <ws2tcpip.h>
 #elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
@@ -948,9 +949,6 @@ static void NetworkOpen( input_thread_t * p_input )
 #   define IN_MULTICAST(a)         IN_CLASSD(a)
 #endif
 
-    /* TODO : make this compile under Win32 */
-    /* Enabled this so that windows people have a serious look at it :)) */
-//#ifndef WIN32    
     if( IN_MULTICAST( ntohl(sock.sin_addr.s_addr) ) )
     {
         struct ip_mreq imr;
@@ -990,7 +988,6 @@ static void NetworkOpen( input_thread_t * p_input )
             return;
         }
     }
-//#endif
 
     p_input->stream.b_pace_control = 0;
     p_input->stream.b_seekable = 0;
