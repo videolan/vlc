@@ -858,13 +858,28 @@ void vout_Pixel2RGB( vout_thread_t *p_vout, u32 i_pixel, int *pi_red, int *pi_gr
  *****************************************************************************/
 static int BinaryLog(u32 i)
 {
-    int i_log;
+    int i_log = 0;
 
-    i_log = 16 & (i & 0xffff0000);
-    i_log += 8 & (i & 0xff00ff00);
-    i_log += 4 & (i & 0xf0f0f0f0);
-    i_log += 2 & (i & 0xcccccccc);
-    i_log += 1 & (i & 0xaaaaaaaa);
+    if(i & 0xffff0000)
+    {
+	i_log += 16;
+    }
+    if(i & 0xff00ff00)
+    {
+	i_log += 8;
+    }
+    if(i & 0xf0f0f0f0)
+    {
+	i_log += 4;
+    }
+    if(i & 0xcccccccc)
+    {
+	i_log += 2;
+    }
+    if(i & 0xaaaaaaaa)
+    {
+	i_log += 1;
+    }
 
     if (i != ((u32)1 << i_log))
     {
