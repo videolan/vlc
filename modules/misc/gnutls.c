@@ -29,7 +29,7 @@
  * - client-side server cert validation (?).
  */
 
- 
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -53,7 +53,7 @@ static void Close( vlc_object_t * );
 
 #define DH_BITS_TEXT N_("Diffie-Hellman prime bits")
 #define DH_BITS_LONGTEXT N_( \
-    "Allows you to modify the Diffie-Hellman prime's number of bits" \
+    "Allows you to modify the Diffie-Hellman prime's number of bits " \
     "(used for TLS or SSL-based server-side encryption)." )
 
 vlc_module_begin();
@@ -585,7 +585,7 @@ static int gcry_vlc_mutex_unlock (void **lock)
     return vlc_mutex_unlock ((vlc_mutex_t *)*lock);
 }
 
-static struct gcry_thread_cbs gcry_threads_vlc =                        
+static struct gcry_thread_cbs gcry_threads_vlc =
 {
     GCRY_THREAD_OPTION_USER,
     NULL,

@@ -53,14 +53,23 @@ static void Close( vlc_object_t * );
                          "requested to access the stream." )
 #define MIME_TEXT N_("Mime")
 #define MIME_LONGTEXT N_("Allows you to give the mime returned by the server." )
+
 #define CERT_TEXT N_( "Certificate file" )
-#define CERT_LONGTEXT N_( "HTTP/SSL stream output x509 PEM certificate file" )
+#define CERT_LONGTEXT N_( "Path to the x509 PEM certificate file that will "\
+                          "be used by the HTTP/SSL stream output" )
 #define KEY_TEXT N_( "Private key file" )
-#define KEY_LONGTEXT N_( "HTTP/SSL stream output x509 PEM private key file" )
+#define KEY_LONGTEXT N_( "Path to the x509 PEM private key file that will " \
+                         " be used by the HTTP/SSL stream output. Leave " \
+                         "empty if you don't have one." )
 #define CA_TEXT N_( "Root CA file" )
-#define CA_LONGTEXT N_( "HTTP/SSL stream output x509 PEM trusted root CA certificates file" )
+#define CA_LONGTEXT N_( "Path to the x509 PEM trusted root CA certificates " \
+                        "(certificate authority) file that will be used by " \
+                        "the HTTP/SSL stream output. Leave empty if you " \
+                        "don't have one." )
 #define CRL_TEXT N_( "CRL file" )
-#define CRL_LONGTEXT N_( "HTTP/SSL stream output Certificates Revocation List file" )
+#define CRL_LONGTEXT N_( "Path to the x509 PEM Certificates Revocation List " \
+                         "file that will be HTTP/SSL stream output. Leave " \
+                         "empty if you don't have one." )
 
 vlc_module_begin();
     set_description( _("HTTP stream output") );
@@ -68,13 +77,20 @@ vlc_module_begin();
     add_shortcut( "http" );
     add_shortcut( "https" );
     add_shortcut( "mmsh" );
-    add_string( SOUT_CFG_PREFIX "user", "", NULL, USER_TEXT, USER_LONGTEXT, VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "pwd", "", NULL, PASS_TEXT, PASS_LONGTEXT, VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "mime", "", NULL, MIME_TEXT, MIME_LONGTEXT, VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "cert", "vlc.pem", NULL, CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "key", NULL, NULL, KEY_TEXT, KEY_LONGTEXT, VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "ca", NULL, NULL, CA_TEXT, CA_LONGTEXT, VLC_TRUE );
-    add_string( SOUT_CFG_PREFIX "crl", NULL, NULL, CRL_TEXT, CRL_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "user", "", NULL,
+                USER_TEXT, USER_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "pwd", "", NULL,
+                PASS_TEXT, PASS_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "mime", "", NULL,
+                MIME_TEXT, MIME_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "cert", "vlc.pem", NULL,
+                CERT_TEXT, CERT_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "key", NULL, NULL,
+                KEY_TEXT, KEY_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "ca", NULL, NULL,
+                CA_TEXT, CA_LONGTEXT, VLC_TRUE );
+    add_string( SOUT_CFG_PREFIX "crl", NULL, NULL,
+                CRL_TEXT, CRL_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 

@@ -63,8 +63,8 @@ static void Close( vlc_object_t * );
 #define ANALYSE_LONGTEXT N_( "This selects the analysing mode.")
 
 #define KEYINT_TEXT N_("Sets maximum interval between I frames")
-#define KEYINT_LONGTEXT N_( "Larger values save bits, thus improve quality, " \
-    "at the cost of seeking precision." )
+#define KEYINT_LONGTEXT N_( "Larger values save bits, thus improve quality "\
+    "for a given bitrate, at the cost of seeking precision." )
 
 #define IDRINT_TEXT N_("IDR frames")
 #define IDRINT_LONGTEXT N_("In H.264, I-Frames do not necessarily bound a " \
