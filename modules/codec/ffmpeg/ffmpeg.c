@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.22 2002/12/18 15:03:48 sam Exp $
+ * $Id: ffmpeg.c,v 1.23 2003/02/08 19:10:21 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -65,7 +65,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
  *****************************************************************************/
 
 #define ERROR_RESILIENCE_LONGTEXT \
-    "ffmpeg can make errors resiliences.          \n"\
+    "ffmpeg can make errors resiliences.          \n" \
     "Nevertheless, with buggy encoder (like ISO MPEG-4 encoder from M$) " \
     "this will produce a lot of errors.\n" \
     "Valid range is -1 to 99 (-1 disable all errors resiliences)."
@@ -78,14 +78,14 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 #define POSTPROCESSING_Q_LONGTEXT \
     "Quality of post processing\n"\
     "Valid range is 0 to 6\n" \
-    "( Overridden by others setting)"
+    "(Overridden by others setting)"
     
 #define POSTPROCESSING_AQ_LONGTEXT \
-    "Post processing quality is selected upon time left" \
+    "Post processing quality is selected upon time left " \
     "but no more than requested quality\n" \
     "Not yet implemented !"
 
-#define WORAROUND_BUG_LONGTEXT \
+#define WORKAROUND_BUGS_LONGTEXT \
     "Try to fix some bugs\n" \
     "1  autodetect\n" \
     "2  old msmpeg4\n" \
@@ -96,7 +96,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
     "64 Qpel chroma"
 
 vlc_module_begin();
-    add_category_hint( N_("Ffmpeg"), NULL );
+    add_category_hint( N_("ffmpeg"), NULL );
 #if LIBAVCODEC_BUILD >= 4615
     add_bool( "ffmpeg-dr", 0, NULL,
               "direct rendering", 
@@ -106,7 +106,7 @@ vlc_module_begin();
     add_integer ( "ffmpeg-error-resilience", -1, NULL, 
                   "error resilience", ERROR_RESILIENCE_LONGTEXT );
     add_integer ( "ffmpeg-workaround-bugs", 1, NULL, 
-                  "workaround bugs", WORAROUND_BUG_LONGTEXT );
+                  "workaround bugs", WORKAROUND_BUGS_LONGTEXT );
 #endif
     add_bool( "ffmpeg-hurry-up", 0, NULL, "hurry up", HURRY_UP_LONGTEXT );
     

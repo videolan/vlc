@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.14 2002/11/11 19:16:21 gbazin Exp $
+ * $Id: file.c,v 1.15 2003/02/08 19:10:20 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -80,9 +80,9 @@ static void    Play        ( aout_instance_t * );
  * Module descriptor
  *****************************************************************************/
 #define FORMAT_TEXT N_("output format")
-#define FORMAT_LONGTEXT N_("one of \"u8\", \"s8\", \"u16\", \"s16\"," \
-                        " \"u16_le\", \"s16_le\", \"u16_be\"," \
-                        " \"s16_be\", \"fixed32\", \"float32\" or \"spdif\"")
+#define FORMAT_LONGTEXT N_("one of \"u8\", \"s8\", \"u16\", \"s16\", " \
+                        "\"u16_le\", \"s16_le\", \"u16_be\", " \
+                        "\"s16_be\", \"fixed32\", \"float32\" or \"spdif\"")
 #define WAV_TEXT N_("add wave header")
 #define WAV_LONGTEXT N_("instead of writing a raw file, you can add a wav " \
                         "header to the file")

@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.9 2003/02/04 11:07:45 massiot Exp $
+ * $Id: system.c,v 1.10 2003/02/08 19:10:21 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1154,6 +1154,8 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     es_descriptor_t *   p_es = NULL;
     es_ts_data_t *      p_es_demux = NULL;
     pgrm_ts_data_t *    p_pgrm_demux = NULL;
+    stream_ts_data_t *  p_stream_demux =
+                          (stream_ts_data_t *)p_input->stream.p_demux_data;
 
 #define p (p_data->p_demux_start)
     /* Extract flags values from TS common header. */
@@ -1175,7 +1177,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         }
     }
 
-    p_es= input_FindES( p_input, i_pid );
+    p_es = input_FindES( p_input, i_pid );
 
     if( (p_es != NULL) && (p_es->p_demux_data != NULL) )
     {
@@ -1210,7 +1212,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     /* Don't change the order of the tests : if b_psi then p_pgrm_demux
      * may still be null. Who said it was ugly ?
      * I have written worse. --Meuuh */
-    if( ( p_es  ) &&
+    if( ( p_es ) &&
         ((p_es->p_decoder_fifo != NULL) || b_psi || b_pcr ) )
     {
         p_es->c_packets++;
@@ -1273,7 +1275,7 @@ static void DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
         } /* has adaptation field */
         /* Check the continuity of the stream. */
         i_dummy = ((p[3] & 0x0f) - p_es_demux->i_continuity_counter) & 0x0f;
-        if( i_dummy == 1 )
+        if( i_dummy == 1 || (b_psi && p_stream_demux->b_buggy_psi) )
         {
             /* Everything is ok, just increase our counter */
             (p_es_demux->i_continuity_counter)++;

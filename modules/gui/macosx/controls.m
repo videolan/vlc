@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.22 2003/02/08 17:26:00 massiot Exp $
+ * $Id: controls.m,v 1.23 2003/02/08 19:10:21 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -569,7 +569,7 @@
         NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
         
         [o_open_panel setAllowsMultipleSelection: NO];
-        [o_open_panel setTitle: _NS("Open subtitlefile")];
+        [o_open_panel setTitle: _NS("Open subtitle file")];
         [o_open_panel setPrompt: _NS("Open")];
     
         if( [o_open_panel runModalForDirectory: nil 

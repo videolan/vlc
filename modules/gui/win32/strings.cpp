@@ -152,6 +152,7 @@
 
   Caption = _( "Messages" );
     Caption = _( "OK" );
+      Caption = _( "&Copy text" );
 
 /*
  * from modules/gui/win32/network.dfm:

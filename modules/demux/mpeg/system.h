@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.4 2003/01/08 16:40:29 fenrir Exp $
+ * $Id: system.h,v 1.5 2003/02/08 19:10:21 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -263,8 +263,9 @@ typedef struct pgrm_ts_data_t
  *****************************************************************************/
 typedef struct stream_ts_data_t
 {
-    int i_pat_version;          /* Current version of the PAT */
-    /* libdvbpsi pmt decoder handle */
+    int                     i_pat_version; /* Current version of the PAT */
+    vlc_bool_t              b_buggy_psi;
+    /* libdvbpsi PMT decoder handle */
     void *                  p_pat_handle;
 } stream_ts_data_t;
 

@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.15 2003/02/04 11:07:45 massiot Exp $
+ * $Id: ts.c,v 1.16 2003/02/08 19:10:21 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -100,6 +100,11 @@ static void TS_DVBPSI_HandlePMT ( input_thread_t *, dvbpsi_pmt_t * );
     "0.3.x and 0.4. By default VLC assumes you have the latest VLS. In case " \
     "you're using an old version, select this option.")
 
+#define BUGGY_PSI_TEXT N_("buggy PSI")
+#define BUGGY_PSI_LONGTEXT N_( \
+    "If you have a stream whose PSI packets do not feature incremented " \
+    "continuity counters, select this option.")
+
 vlc_module_begin();
 #if defined MODULE_NAME_IS_ts
     set_description( _("ISO 13818-1 MPEG Transport Stream input") );
@@ -113,6 +118,7 @@ vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL );
     add_bool( "vls-backwards-compat", 0, NULL,
               VLS_BACKWARDS_COMPAT_TEXT, VLS_BACKWARDS_COMPAT_LONGTEXT );
+    add_bool( "buggy-psi", 0, NULL, BUGGY_PSI_TEXT, BUGGY_PSI_LONGTEXT );
     set_callbacks( Activate, Deactivate );
 vlc_module_end();
 
@@ -192,6 +198,7 @@ static int Activate( vlc_object_t * p_this )
 
     p_stream_data = (stream_ts_data_t *)p_input->stream.p_demux_data;
     p_stream_data->i_pat_version = PAT_UNINITIALIZED ;
+    p_stream_data->b_buggy_psi = config_GetInt( p_input, "buggy-psi" );
 
 #ifdef MODULE_NAME_IS_ts_dvbpsi
     p_stream_data->p_pat_handle = (dvbpsi_handle *)
@@ -756,20 +763,20 @@ static void TS_DVBPSI_DemuxPSI( input_thread_t  * p_input,
     pgrm_ts_data_t      * p_pgrm_demux_data;
     stream_ts_data_t    * p_stream_demux_data;
 
-    p_es_demux_data = ( es_ts_data_t * ) p_es->p_demux_data;
-    p_stream_demux_data = ( stream_ts_data_t * ) p_input->stream.p_demux_data;
+    p_es_demux_data = (es_ts_data_t *)p_es->p_demux_data;
+    p_stream_demux_data = (stream_ts_data_t *) p_input->stream.p_demux_data;
 
     switch( p_es_demux_data->i_psi_type)
     {
         case PSI_IS_PAT:
             dvbpsi_PushPacket(
-                    ( dvbpsi_handle ) p_stream_demux_data->p_pat_handle,
+                    (dvbpsi_handle)p_stream_demux_data->p_pat_handle,
                     p_data->p_demux_start );
             break;
         case PSI_IS_PMT:
             p_pgrm_demux_data = ( pgrm_ts_data_t * )p_es->p_pgrm->p_demux_data;
             dvbpsi_PushPacket(
-                    ( dvbpsi_handle ) p_pgrm_demux_data->p_pmt_handle,
+                    (dvbpsi_handle)p_pgrm_demux_data->p_pmt_handle,
                     p_data->p_demux_start );
             break;
         default:

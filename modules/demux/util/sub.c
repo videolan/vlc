@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.3 2003/01/23 09:00:36 fenrir Exp $
+ * $Id: sub.c,v 1.4 2003/02/08 19:10:21 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -60,11 +60,11 @@ static char *ppsz_sub_type[] = { "microdvd", "subrip", "ssa1", "ssa2-4", NULL };
  *****************************************************************************/
 
 #define SUB_FPS_LONGTEXT \
-    "Override frames per second" \
+    "Override frames per second. " \
     "It will work only with MicroDVD"
 #define SUB_TYPE_LONGTEXT \
-    "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\"" \
-    "(nothing for autodetection, It should always work)"
+    "One from \"microdvd\", \"subrip\", \"ssa1\", \"ssa2-4\" " \
+    "(nothing for autodetection, it should always work)"
 
 vlc_module_begin();
     set_description( _("text subtitle demux") );

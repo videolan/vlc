@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.40 2003/02/02 00:29:29 sam Exp $
+ * $Id: libvlc.h,v 1.41 2003/02/08 19:10:22 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -323,12 +323,12 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define THREE_DN_TEXT N_("enable CPU 3D Now! support")
 #define THREE_DN_LONGTEXT N_( \
-    "If your processor supports the 3D Now! instructions set, VLC can take "\
+    "If your processor supports the 3D Now! instructions set, VLC can take " \
     "advantage of them.")
 
 #define MMXEXT_TEXT N_("enable CPU MMX EXT support")
 #define MMXEXT_LONGTEXT N_( \
-    "If your processor supports the MMX EXT instructions set, VLC can take "\
+    "If your processor supports the MMX EXT instructions set, VLC can take " \
     "advantage of them.")
 
 #define SSE_TEXT N_("enable CPU SSE support")
@@ -338,7 +338,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 
 #define ALTIVEC_TEXT N_("enable CPU AltiVec support")
 #define ALTIVEC_LONGTEXT N_( \
-    "If your processor supports the AltiVec instructions set, VLC can take "\
+    "If your processor supports the AltiVec instructions set, VLC can take " \
     "advantage of them.")
 
 #define RANDOM_TEXT N_("play files randomly forever")
