@@ -2,7 +2,7 @@
  * AudioOutput.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.28 2003/05/07 19:20:23 titer Exp $
+ * $Id: AudioOutput.cpp,v 1.29 2003/05/08 10:40:31 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -46,19 +46,10 @@ extern "C"
  * aout_sys_t: BeOS audio output method descriptor
  *****************************************************************************/
 
-typedef struct latency_t
-{
-    VLC_COMMON_MEMBERS
-    
-    BSoundPlayer * p_player;
-    mtime_t        latency;
-
-} latency_t;
-
 typedef struct aout_sys_t
 {
     BSoundPlayer * p_player;
-    latency_t *    p_latency;
+    mtime_t        latency;
     
 } aout_sys_t;
 
@@ -68,7 +59,6 @@ typedef struct aout_sys_t
 static void Play         ( void * p_aout, void * p_buffer, size_t size,
                            const media_raw_audio_format & format );
 static void DoNothing    ( aout_instance_t * p_aout );
-static int  CheckLatency ( latency_t * p_latency );
 
 /*****************************************************************************
  * OpenAudio
@@ -122,22 +112,8 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
         return -1;
     }
 
-    /* FIXME
-     * We should check BSoundPlayer Latency() everytime we call
-     * aout_OutputNextBuffer(). Unfortunatly, it does not seem to work
-     * correctly: on my computer, it hangs for about 5 seconds at the
-     * beginning of the file. This is not acceptable, so we will start
-     * playing the file with a default latency (my computer's one ;p )
-     * and we create a thread which is going to update it ASAP. */
-    p_sys->p_latency = (latency_t*) vlc_object_create( p_aout, sizeof(latency_t) );
-    p_sys->p_latency->p_player = p_sys->p_player;
-    p_sys->p_latency->latency = 27613;
-    if( vlc_thread_create( p_sys->p_latency, "latency", CheckLatency,
-                           VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
-    {
-        msg_Err( p_aout, "cannot create Latency thread" );
-    }
-
+    /* Start playing */
+    p_sys->latency = p_sys->p_player->Latency();
     p_sys->p_player->Start();
     p_sys->p_player->SetHasData( true );
 
@@ -152,11 +128,6 @@ void E_(CloseAudio) ( vlc_object_t * p_this )
     aout_instance_t * p_aout = (aout_instance_t *) p_this;
     aout_sys_t * p_sys = (aout_sys_t *) p_aout->output.p_sys;
 
-    /* Stop the latency thread */
-    p_sys->p_latency->b_die = VLC_TRUE;
-    vlc_thread_join( p_sys->p_latency );
-    vlc_object_destroy( p_sys->p_latency );
-    
     /* Clean up */
     p_sys->p_player->Stop();
     delete p_sys->p_player;
@@ -172,16 +143,21 @@ static void Play( void * _p_aout, void * _p_buffer, size_t i_size,
     aout_instance_t * p_aout = (aout_instance_t*) _p_aout;
     float * p_buffer = (float*) _p_buffer;
     aout_sys_t * p_sys = (aout_sys_t*) p_aout->output.p_sys;
-    
-    /* FIXME (see above) */
-    mtime_t play_time = mdate() + p_sys->p_latency->latency;
-    
-    aout_buffer_t * p_aout_buffer =
-        aout_OutputNextBuffer( p_aout, play_time, VLC_FALSE );
+    aout_buffer_t * p_aout_buffer;
+
+    p_aout_buffer = aout_OutputNextBuffer( p_aout,
+                                           mdate() + p_sys->latency,
+                                           VLC_FALSE );
 
     if( p_aout_buffer != NULL )
     {
-        p_aout->p_vlc->pf_memcpy( p_buffer, p_aout_buffer->p_buffer, i_size );
+        p_aout->p_vlc->pf_memcpy( p_buffer, p_aout_buffer->p_buffer,
+                                  MIN( i_size, p_aout_buffer->i_nb_bytes ) );
+        if( p_aout_buffer->i_nb_bytes < i_size )
+        {
+            p_aout->p_vlc->pf_memset( p_buffer + p_aout_buffer->i_nb_bytes,
+                                      0, i_size - p_aout_buffer->i_nb_bytes );
+        }
         aout_BufferFree( p_aout_buffer );
     }
     else
@@ -196,17 +172,4 @@ static void Play( void * _p_aout, void * _p_buffer, size_t i_size,
 static void DoNothing( aout_instance_t *p_aout )
 {
     return;
-}
-
-/*****************************************************************************
- * CheckLatency
- *****************************************************************************/
-static int CheckLatency( latency_t * p_latency )
-{
-    while( !p_latency->b_die )
-    {
-        p_latency->latency = p_latency->p_player->Latency();
-        snooze( 5000 );
-    }
-    return VLC_SUCCESS;
 }

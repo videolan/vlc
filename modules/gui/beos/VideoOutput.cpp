@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.18 2003/05/07 14:49:19 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.19 2003/05/08 10:40:31 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -300,7 +300,6 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
     AddShortcut( '3', 0, new BMessage( RESIZE_200 ) );
     
     // workaround for french keyboards
-    fprintf( stderr, "%x\n", '&' );
     AddShortcut( '&', 0, new BMessage( RESIZE_50 ) );
     AddShortcut( 'é', 0, new BMessage( RESIZE_100 ) );
         // FIXME - this one doesn't work because 'é' is a multi-byte character
@@ -327,6 +326,9 @@ VideoWindow::MessageReceived( BMessage *p_message )
 {
 	switch( p_message->what )
 	{
+	    case SHOW_INTERFACE:
+	        SetInterfaceShowing( true );
+	        break;
 		case TOGGLE_FULL_SCREEN:
 			BWindow::Zoom();
 			break;
@@ -384,6 +386,7 @@ VideoWindow::MessageReceived( BMessage *p_message )
 					char* path = config_GetPsz( p_vout, "beos-screenshotpath" );
 					if ( !path )
 						path = strdup( DEFAULT_SCREEN_SHOT_PATH );
+					/* TODO: handle the format */
 					/* config_GetPsz( p_vout, "beos-screenshotformat" ); */
 					int32 format = DEFAULT_SCREEN_SHOT_FORMAT;
 					_SaveScreenShot( temp, path, format );
@@ -1115,6 +1118,13 @@ VLCView::MouseDown(BPoint where)
 				// launch popup menu
 				BPopUpMenu *menu = new BPopUpMenu("context menu");
 				menu->SetRadioMode(false);
+				// In full screen, add an item to show/hide the interface
+				if( videoWindow->IsFullScreen() )
+				{
+				    BMenuItem *intfItem =
+				        new BMenuItem( _("Show Interface"), new BMessage(SHOW_INTERFACE) );
+				    menu->AddItem( intfItem );
+				}
 				// Resize to 50%
 				BMenuItem *halfItem = new BMenuItem(_("50%"), new BMessage(RESIZE_50));
 				menu->AddItem(halfItem);

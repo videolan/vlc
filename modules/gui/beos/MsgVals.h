@@ -2,7 +2,7 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.7 2003/02/09 17:10:52 stippi Exp $
+ * $Id: MsgVals.h,v 1.8 2003/05/08 10:40:31 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -58,6 +58,7 @@ const uint32 NAVIGATE_NEXT      = 'navn';    // could be chapter, title or file
 const uint32 OPEN_PREFERENCES   = 'pref';
 const uint32 OPEN_MESSAGES      = 'mess';
 const uint32 TOGGLE_ON_TOP      = 'ontp';
+const uint32 SHOW_INTERFACE     = 'shin';
 const uint32 TOGGLE_FULL_SCREEN = 'tgfs';
 const uint32 RESIZE_50          = 'rshl';
 const uint32 RESIZE_100         = 'rsor';
