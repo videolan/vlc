@@ -2,7 +2,7 @@
  * input_dummy.c: dummy input plugin, to manage "vlc:***" special options
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dummy.c,v 1.5 2001/08/09 08:20:26 sam Exp $
+ * $Id: input_dummy.c,v 1.6 2001/11/07 22:58:13 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,6 +30,7 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <sys/types.h>
 #include <string.h>
 #include <errno.h>
 

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.150 2001/11/06 17:12:02 massiot Exp $
+ * $Id: input.c,v 1.151 2001/11/07 22:58:13 jlj Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,15 +47,12 @@
 #endif
 
 #ifdef WIN32
-#   include <winsock.h>
 #   include <winsock2.h>
 #elif !defined( SYS_BEOS ) && !defined( SYS_NTO )
 #   include <netdb.h>                                         /* hostent ... */
 #   include <sys/socket.h>
 #   include <netinet/in.h>
 #   include <arpa/inet.h>
-#   include <sys/types.h>
-#   include <sys/socket.h>
 #endif
 
 #ifdef HAVE_SYS_TIMES_H

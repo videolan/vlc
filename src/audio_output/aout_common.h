@@ -2,7 +2,7 @@
  * aout_common.h: audio output inner functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_common.h,v 1.5 2001/11/01 00:29:54 asmax Exp $
+ * $Id: aout_common.h,v 1.6 2001/11/07 22:58:13 jlj Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -79,7 +79,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo,
                                  mtime_t aout_date )
 {
     long l_units, l_rate;
-    long long l_delta;    
+    u64 l_delta;    
 
     /* We take the lock */
     vlc_mutex_lock( &p_fifo->data_lock );
