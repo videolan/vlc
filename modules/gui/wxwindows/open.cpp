@@ -879,15 +879,15 @@ void OpenDialog::UpdateMRL( int i_access_method )
         switch( i_net_type )
         {
         case 0:
-            mrltemp = wxT("udp://");
+            mrltemp = wxT("udp://@");
             if ( net_ipv6->GetValue() )
             {
-                mrltemp += wxT("@[::]");
+                mrltemp += wxT("[::]");
             }
             if( i_net_ports[0] !=
                 config_GetInt( p_intf, "server-port" ) )
             {
-                mrltemp += wxString::Format( wxT("@:%d"), i_net_ports[0] );
+                mrltemp += wxString::Format( wxT(":%d"), i_net_ports[0] );
             }
 
             caching_name = wxT("udp-caching");
