@@ -2,7 +2,7 @@
  * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: coreaudio.c,v 1.1 2003/03/30 23:35:06 jlj Exp $
+ * $Id: coreaudio.c,v 1.2 2003/05/04 15:02:42 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -337,6 +337,26 @@ static int Open( vlc_object_t * p_this )
 
         msg_Dbg( p_aout, "device buffer size set to: [%ld]", 
                  p_sys->i_buffer_size );
+
+        /* Set buffer frame size */
+        i_param_size = sizeof( p_aout->output.i_nb_samples );
+        err = AudioDeviceSetProperty( p_sys->devid, 0, 0, FALSE,
+                                      kAudioDevicePropertyBufferFrameSize,
+                                      i_param_size,
+                                      &p_aout->output.i_nb_samples );
+        if( err != noErr )
+        {
+            msg_Err( p_aout, "failed to set buffer frame size: [%4.4s]", 
+                     (char *)&err );
+            FreeDevice( p_aout );
+            FreeHardwareInfo( p_aout );
+            vlc_mutex_destroy( &p_sys->lock );
+            free( (void *)p_sys );
+            return( VLC_EGENERIC );
+        }
+
+        msg_Dbg( p_aout, "device buffer frame size set to: [%d]",
+                 p_aout->output.i_nb_samples );
     }
 
     switch( p_sys->stream_format.mFormatID )
@@ -411,26 +431,6 @@ static int Open( vlc_object_t * p_this )
         free( (void *)p_sys );
         return( VLC_EGENERIC );
     }
-
-    /* Set buffer frame size */
-    i_param_size = sizeof( p_aout->output.i_nb_samples );
-    err = AudioDeviceSetProperty( p_sys->devid, 0, 0, FALSE,
-                                  kAudioDevicePropertyBufferFrameSize,
-                                  i_param_size,
-                                  &p_aout->output.i_nb_samples );
-    if( err != noErr )
-    {
-        msg_Err( p_aout, "failed to set buffer frame size: [%4.4s]", 
-                 (char *)&err );
-        FreeDevice( p_aout );
-        FreeHardwareInfo( p_aout );
-        vlc_mutex_destroy( &p_sys->lock );
-        free( (void *)p_sys );
-        return( VLC_EGENERIC );
-    }
-
-    msg_Dbg( p_aout, "device buffer frame size set to: [%d]",
-             p_aout->output.i_nb_samples );
 
     /* Add callback */
     err = AudioDeviceAddIOProc( p_sys->devid,

@@ -2,7 +2,7 @@
  * coreaudio.c resampler based on CoreAudio's AudioConverter
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: coreaudio.c,v 1.2 2003/03/31 22:39:27 massiot Exp $
+ * $Id: coreaudio.c,v 1.3 2003/05/04 15:02:42 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -62,7 +62,7 @@ struct aout_filter_sys_t
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("audio filter using CoreAudio for resampling") );
-    set_capability( "audio filter", 0 );
+    set_capability( "audio filter", 40 );
     set_callbacks( Create, Close );
 vlc_module_end();
 
