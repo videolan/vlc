@@ -54,6 +54,22 @@ static int               Del ( sout_stream_t *, sout_stream_id_t * );
 static int               Send( sout_stream_t *, sout_stream_id_t *,
                                block_t* );
 
+/* For unicast/interleaved streaming */
+typedef struct
+{
+    char    *psz_session;
+    int64_t i_last; /* for timeout */
+
+    /* is it in "play" state */
+    vlc_bool_t b_playing;
+
+    /* output (id-access) */
+    int               i_id;
+    sout_stream_id_t  **id;
+    int               i_access;
+    sout_access_out_t **access;
+} rtsp_client_t;
+
 struct sout_stream_sys_t
 {
     /* sdp */
@@ -90,8 +106,13 @@ struct sout_stream_sys_t
     block_t     *packet;
 
     /* */
+    vlc_mutex_t      lock_es;
     int              i_es;
     sout_stream_id_t **es;
+
+    /* */
+    int              i_rtsp;
+    rtsp_client_t    **rtsp;
 };
 
 typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
@@ -99,6 +120,7 @@ typedef int (*pf_rtp_packetizer_t)( sout_stream_t *, sout_stream_id_t *,
 
 struct sout_stream_id_t
 {
+    sout_stream_t *p_stream;
     /* rtp field */
     uint8_t     i_payload_type;
     uint16_t    i_sequence;
@@ -119,6 +141,12 @@ struct sout_stream_id_t
 
     /* for sending the packets */
     sout_access_out_t *p_access;
+
+    vlc_mutex_t       lock_rtsp;
+    int               i_rtsp_access;
+    sout_access_out_t **rtsp_access;
+
+    /* */
     sout_input_t      *p_input;
 
     /* RTSP url control */
@@ -130,24 +158,15 @@ static int AccessOutGrabberWrite( sout_access_out_t *, block_t * );
 static int HttpSetup( sout_stream_t *p_stream, vlc_url_t * );
 static int RtspSetup( sout_stream_t *p_stream, vlc_url_t * );
 
-typedef struct
-{
-    char    *psz_session;
-    int64_t i_last;
-
-    int                 i_access;
-    sout_access_out_t **p_access;
-} rtsp_session_t;
-
-#if 0
-static rtsp_session_t *RtspSessionNew   ( sout_stream_t *p_stream );
-static rtsp_session_t *RtspSessionFind  ( sout_stream_t *p_stream, char *psz_session );
-static void            RtspSessionDelete( sout_stream_t *p_stream, rtsp_session_t *sess );
-#endif
-
 static int  RtspCallback( httpd_callback_sys_t *, httpd_client_t *,
                           httpd_message_t *, httpd_message_t * );
+static int  RtspCallbackId( httpd_callback_sys_t *, httpd_client_t *,
+                            httpd_message_t *, httpd_message_t * );
 
+
+static rtsp_client_t *RtspClientNew( sout_stream_t *, char *psz_session );
+static rtsp_client_t *RtspClientGet( sout_stream_t *, char *psz_session );
+static void           RtspClientDel( sout_stream_t *, rtsp_client_t * );
 
 /*****************************************************************************
  * Open:
@@ -166,13 +185,29 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->i_port = atoi( val );
     }
-    if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' ||
-        p_sys->i_port <= 0 )
+    else
     {
-        msg_Err( p_stream, "invalid/missing dst or port" );
+        p_sys->i_port = 1234;
+    }
+
+    if( !p_sys->psz_destination || *p_sys->psz_destination == '\0' )
+    {
+        val = sout_cfg_find_value( p_stream->p_cfg, "sdp" );
+        if( val == NULL || strncasecmp( val, "rtsp", 4 ) )
+        {
+            msg_Err( p_stream, "missing destination and not in rtsp mode" );
+            free( p_sys );
+            return VLC_EGENERIC;
+        }
+        p_sys->psz_destination = NULL;
+    }
+    else if( p_sys->i_port <= 0 )
+    {
+        msg_Err( p_stream, "invalid port" );
         free( p_sys );
         return VLC_EGENERIC;
     }
+
     if( ( val = sout_cfg_find_value( p_stream->p_cfg, "ttl" ) ) )
     {
         p_sys->i_ttl = atoi( val );
@@ -185,6 +220,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_payload_type = 96;
     p_sys->i_es = 0;
     p_sys->es   = NULL;
+    p_sys->i_rtsp = 0;
+    p_sys->rtsp   = NULL;
     p_sys->psz_sdp = NULL;
 
     p_sys->i_sdp_id = mdate();
@@ -198,6 +235,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_rtsp_path = NULL;
 
     vlc_mutex_init( p_stream, &p_sys->lock_sdp );
+    vlc_mutex_init( p_stream, &p_sys->lock_es );
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
@@ -323,6 +361,7 @@ static int Open( vlc_object_t *p_this )
         }
         if( url.psz_protocol && !strcasecmp( url.psz_protocol, "rtsp" ) )
         {
+            /* FIXME test if destination is multicast or no destination at all FIXME */
             if( RtspSetup( p_stream, &url ) )
             {
                 msg_Err( p_stream, "cannot export sdp as rtsp" );
@@ -362,6 +401,11 @@ static void Close( vlc_object_t * p_this )
         {
             block_Release( p_sys->packet );
         }
+    }
+
+    while( p_sys->i_rtsp > 0 )
+    {
+        RtspClientDel( p_stream, p_sys->rtsp[0] );
     }
 
     vlc_mutex_destroy( &p_sys->lock_sdp );
@@ -404,7 +448,7 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
              strlen( "o=- * * IN IP4 127.0.0.1\n" ) +
              strlen( "s=NONE\n" ) +
              strlen( "c=IN IP4 */*\n" ) +
-             strlen( psz_destination ) +
+             strlen( psz_destination ? psz_destination : "0.0.0.0") +
              20 + 10 + 10 + 1;
     for( i = 0; i < p_sys->i_es; i++ )
     {
@@ -430,7 +474,7 @@ static char *SDPGenerate( sout_stream_t *p_stream, char *psz_destination, vlc_bo
     p += sprintf( p, "o=- "I64Fd" %d IN IP4 127.0.0.1\n",
                   p_sys->i_sdp_id, p_sys->i_sdp_version );
     p += sprintf( p, "s=NONE\n" );
-    p += sprintf( p, "c=IN IP4 %s/%d\n", psz_destination,
+    p += sprintf( p, "c=IN IP4 %s/%d\n", psz_destination ? psz_destination : "0.0.0.0",
                   p_sys->i_ttl );
 
     for( i = 0; i < p_sys->i_es; i++ )
@@ -501,9 +545,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_id_t  *id;
     sout_access_out_t *p_access = NULL;
 
-    char access[100];
-    char url[strlen( p_sys->psz_destination ) + 1 + 12 + 1];
-
     if( p_sys->p_mux != NULL )
     {
         sout_input_t      *p_input  = NULL;
@@ -521,32 +562,43 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         return id;
     }
 
-    /* first try to create the access out */
-    if( p_sys->i_ttl > 0 )
+    if( p_sys->psz_destination )
     {
-        sprintf( access, "udp{raw,ttl=%d}", p_sys->i_ttl );
-    }
-    else
-    {
-        sprintf( access, "udp{raw}" );
-    }
-    sprintf( url, "%s:%d", p_sys->psz_destination, p_sys->i_port );
-    if( ( p_access = sout_AccessOutNew( p_sout, access, url ) ) == NULL )
-    {
-        msg_Err( p_stream, "cannot create the access out for %s://%s",
-                 access, url );
-        return NULL;
+        char access[100];
+        char url[strlen( p_sys->psz_destination ) + 1 + 12 + 1];
+
+        /* first try to create the access out */
+        if( p_sys->i_ttl > 0 )
+        {
+            sprintf( access, "udp{raw,ttl=%d}", p_sys->i_ttl );
+        }
+        else
+        {
+            sprintf( access, "udp{raw}" );
+        }
+        sprintf( url, "%s:%d", p_sys->psz_destination, p_sys->i_port );
+        if( ( p_access = sout_AccessOutNew( p_sout, access, url ) ) == NULL )
+        {
+            msg_Err( p_stream, "cannot create the access out for %s://%s",
+                     access, url );
+            return NULL;
+        }
+        msg_Dbg( p_stream, "access out %s:%s", access, url );
     }
 
     /* not create the rtp specific stuff */
     id = malloc( sizeof( sout_stream_id_t ) );
+    id->p_stream   = p_stream;
     id->p_access   = p_access;
     id->p_input    = NULL;
     id->psz_rtpmap = NULL;
     id->psz_fmtp   = NULL;
-    id->psz_destination = strdup( p_sys->psz_destination );
+    id->psz_destination = p_sys->psz_destination ? strdup( p_sys->psz_destination ) : NULL;
     id->i_port = p_sys->i_port;
     id->p_rtsp_url = NULL;
+    vlc_mutex_init( p_stream, &id->lock_rtsp );
+    id->i_rtsp_access = 0;
+    id->rtsp_access = NULL;
 
     switch( p_fmt->i_codec )
     {
@@ -652,7 +704,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         /* better than nothing */
         id->i_mtu = 1500;
     }
-    msg_Dbg( p_stream, "access out %s:%s mtu=%d", access, url, id->i_mtu );
+    msg_Dbg( p_stream, "using mtu=%d", id->i_mtu );
 
     if( p_sys->p_rtsp_url )
     {
@@ -664,17 +716,19 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         if( id->p_rtsp_url )
         {
-            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_SETUP,    RtspCallback, (void*)p_stream );
-            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_TEARDOWN, RtspCallback, (void*)p_stream );
-            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallback, (void*)p_stream );
-            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PLAY,     RtspCallback, (void*)p_stream );
+            httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_SETUP,    RtspCallbackId, (void*)id );
+            //httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PLAY,     RtspCallback, (void*)p_stream );
+            //httpd_UrlCatch( id->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallback, (void*)p_stream );
         }
     }
 
 
     /* Update p_sys context */
     /* update port used (2 -> 1 rtp, 1 rtcp )*/
+    vlc_mutex_lock( &p_sys->lock_es );
     TAB_APPEND( p_sys->i_es, p_sys->es, id );
+    vlc_mutex_unlock( &p_sys->lock_es );
+
     if( p_sys->p_mux == NULL )
     {
         char *psz_sdp;
@@ -698,7 +752,9 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
+    vlc_mutex_lock( &p_sys->lock_es );
     TAB_REMOVE( p_sys->i_es, p_sys->es, id );
+    vlc_mutex_unlock( &p_sys->lock_es );
 
     if( id->p_access )
     {
@@ -710,7 +766,8 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         {
             free( id->psz_fmtp );
         }
-        free( id->psz_destination );
+        if( id->psz_destination )
+            free( id->psz_destination );
         sout_AccessOutDelete( id->p_access );
     }
     else if( id->p_input )
@@ -721,6 +778,9 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     {
         httpd_UrlDelete( id->p_rtsp_url );
     }
+    vlc_mutex_destroy( &id->lock_rtsp );
+    if( id->rtsp_access ) free( id->rtsp_access );
+
     free( id );
     return VLC_SUCCESS;
 }
@@ -889,6 +949,51 @@ static int  HttpCallback( httpd_file_sys_t *p_args,
 /****************************************************************************
  * RTSP:
  ****************************************************************************/
+static rtsp_client_t *RtspClientNew( sout_stream_t *p_stream, char *psz_session )
+{
+    rtsp_client_t *rtsp = malloc( sizeof( rtsp_client_t ));
+
+    rtsp->psz_session = psz_session;
+    rtsp->i_last = 0;
+    rtsp->b_playing = VLC_FALSE;
+    rtsp->i_id = 0;
+    rtsp->id = NULL;
+    rtsp->i_access = 0;
+    rtsp->access = NULL;
+
+    TAB_APPEND( p_stream->p_sys->i_rtsp, p_stream->p_sys->rtsp, rtsp );
+
+    return rtsp;
+}
+static rtsp_client_t *RtspClientGet( sout_stream_t *p_stream, char *psz_session )
+{
+    int i;
+    for( i = 0; i < p_stream->p_sys->i_rtsp; i++ )
+    {
+        if( !strcmp( p_stream->p_sys->rtsp[i]->psz_session, psz_session ) )
+        {
+            return p_stream->p_sys->rtsp[i];
+        }
+    }
+    return NULL;
+}
+
+static void RtspClientDel( sout_stream_t *p_stream, rtsp_client_t *rtsp )
+{
+    int i;
+    TAB_REMOVE( p_stream->p_sys->i_rtsp, p_stream->p_sys->rtsp, rtsp );
+
+    for( i = 0; i < rtsp->i_access; i++ )
+    {
+        sout_AccessOutDelete( rtsp->access[i] );
+    }
+    if( rtsp->id )     free( rtsp->id );
+    if( rtsp->access ) free( rtsp->access );
+
+    free( rtsp->psz_session );
+    free( rtsp );
+}
+
 static int RtspSetup( sout_stream_t *p_stream, vlc_url_t *url )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -912,9 +1017,8 @@ static int RtspSetup( sout_stream_t *p_stream, vlc_url_t *url )
         return VLC_EGENERIC;
     }
     httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_DESCRIBE, RtspCallback, (void*)p_stream );
-    httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_SETUP,    RtspCallback, (void*)p_stream );
     httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_PLAY,     RtspCallback, (void*)p_stream );
-    /* httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallback, (void*)p_stream ); */
+    httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_PAUSE,    RtspCallback, (void*)p_stream );
     httpd_UrlCatch( p_sys->p_rtsp_url, HTTPD_MSG_TEARDOWN, RtspCallback, (void*)p_stream );
 
     return VLC_SUCCESS;
@@ -925,13 +1029,9 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
                           httpd_message_t *answer, httpd_message_t *query )
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_args;
-    char          *psz_destination = p_stream->p_sys->psz_destination;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    char          *psz_destination = p_sys->psz_destination;
     char          *psz_session = NULL;
-
-    if( psz_destination && *psz_destination == 0 )
-    {
-        psz_destination = NULL;
-    }
 
     if( answer == NULL || query == NULL )
     {
@@ -958,37 +1058,9 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             break;
         }
 
-        case HTTPD_MSG_SETUP:
-        {
-            char *psz_transport = httpd_MsgGet( query, "Transport" );
-
-            fprintf( stderr, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
-            if( strstr( psz_transport, "multicast" ) )
-            {
-                fprintf( stderr, "HTTPD_MSG_SETUP: multicast\n" );
-                answer->i_status = 200;
-                answer->psz_status = strdup( "OK" );
-                answer->i_body = 0;
-                answer->p_body = NULL;
-                psz_session = httpd_MsgGet( query, "Session" );
-                if( *psz_session == 0 )
-                {
-                    psz_session = malloc( 100 );
-                    sprintf( psz_session, "%d", rand() );
-                }
-            }
-            else /*if( strstr( psz_transport, "unicast" ) ||
-                       strstr( psz_transport, "interleaved" ) ) */
-            {
-                answer->i_status = 400;
-                answer->psz_status = strdup( "Bad Request" );
-                answer->i_body = 0;
-                answer->p_body = NULL;
-            }
-            break;
-        }
         case HTTPD_MSG_PLAY:
         {
+            rtsp_client_t *rtsp;
             /* for now only multicast so easy */
             answer->i_status = 200;
             answer->psz_status = strdup( "OK" );
@@ -996,12 +1068,41 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             answer->p_body = NULL;
 
             psz_session = httpd_MsgGet( query, "Session" );
+            rtsp = RtspClientGet( p_stream, psz_session );
+            if( rtsp && !rtsp->b_playing )
+            {
+                int i_id;
+                /* FIXME */
+                rtsp->b_playing = VLC_TRUE;
+
+                vlc_mutex_lock( &p_sys->lock_es );
+                for( i_id = 0; i_id < rtsp->i_id; i_id++ )
+                {
+                    sout_stream_id_t *id = rtsp->id[i_id];
+                    int i;
+
+                    for( i = 0; i < p_sys->i_es; i++ )
+                    {
+                        if( id == p_sys->es[i] )
+                            break;
+                    }
+                    if( i >= p_sys->i_es ) continue;
+
+                    vlc_mutex_lock( &id->lock_rtsp );
+                    TAB_APPEND( id->i_rtsp_access, id->rtsp_access, rtsp->access[i_id] );
+                    vlc_mutex_unlock( &id->lock_rtsp );
+                }
+                vlc_mutex_unlock( &p_sys->lock_es );
+            }
             break;
         }
         case HTTPD_MSG_PAUSE:
             /* FIXME */
             return VLC_EGENERIC;
         case HTTPD_MSG_TEARDOWN:
+        {
+            rtsp_client_t *rtsp;
+
             /* for now only multicast so easy again */
             answer->i_status = 200;
             answer->psz_status = strdup( "OK" );
@@ -1009,7 +1110,34 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
             answer->p_body = NULL;
 
             psz_session = httpd_MsgGet( query, "Session" );
+            rtsp = RtspClientGet( p_stream, psz_session );
+            if( rtsp )
+            {
+                int i_id;
+
+                vlc_mutex_lock( &p_sys->lock_es );
+                for( i_id = 0; i_id < rtsp->i_id; i_id++ )
+                {
+                    sout_stream_id_t *id = rtsp->id[i_id];
+                    int i;
+
+                    for( i = 0; i < p_sys->i_es; i++ )
+                    {
+                        if( id == p_sys->es[i] )
+                            break;
+                    }
+                    if( i >= p_sys->i_es ) continue;
+
+                    vlc_mutex_lock( &id->lock_rtsp );
+                    TAB_REMOVE( id->i_rtsp_access, id->rtsp_access, rtsp->access[i_id] );
+                    vlc_mutex_unlock( &id->lock_rtsp );
+                }
+                vlc_mutex_unlock( &p_sys->lock_es );
+
+                RtspClientDel( p_stream, rtsp );
+            }
             break;
+        }
 
         default:
             return VLC_EGENERIC;
@@ -1022,6 +1150,140 @@ static int  RtspCallback( httpd_callback_sys_t *p_args,
     if( psz_session )
     {
         httpd_MsgAdd( answer, "Session", "%s;timeout=5", psz_session );
+    }
+    return VLC_SUCCESS;
+}
+
+static int  RtspCallbackId( httpd_callback_sys_t *p_args,
+                          httpd_client_t *cl,
+                          httpd_message_t *answer, httpd_message_t *query )
+{
+    sout_stream_id_t *id = (sout_stream_id_t*)p_args;
+    sout_stream_t    *p_stream = id->p_stream;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    char          *psz_session = NULL;
+
+    if( answer == NULL || query == NULL )
+    {
+        return VLC_SUCCESS;
+    }
+    fprintf( stderr, "RtspCallback query: type=%d\n", query->i_type );
+
+    answer->i_proto = HTTPD_PROTO_RTSP;
+    answer->i_version= query->i_version;
+    answer->i_type   = HTTPD_MSG_ANSWER;
+
+    switch( query->i_type )
+    {
+        case HTTPD_MSG_SETUP:
+        {
+            char *psz_transport = httpd_MsgGet( query, "Transport" );
+
+            fprintf( stderr, "HTTPD_MSG_SETUP: transport=%s\n", psz_transport );
+
+            if( strstr( psz_transport, "multicast" ) && id->psz_destination )
+            {
+                fprintf( stderr, "HTTPD_MSG_SETUP: multicast\n" );
+                answer->i_status = 200;
+                answer->psz_status = strdup( "OK" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+                psz_session = httpd_MsgGet( query, "Session" );
+                if( *psz_session == 0 )
+                {
+                    psz_session = malloc( 100 );
+                    sprintf( psz_session, "%d", rand() );
+                }
+                httpd_MsgAdd( answer, "Transport",
+                              "RTP/AVP/UDP;destination=%s;port=%d-%d;ttl=%d",
+                              id->psz_destination, id->i_port,id->i_port+1, p_sys->i_ttl );
+            }
+            else if( strstr( psz_transport, "unicast" ) && strstr( psz_transport, "client_port=" ) )
+            {
+                int  i_port = atoi( strstr( psz_transport, "client_port=" ) + strlen("client_port=") );
+                char *ip    = httpd_ClientIP( cl );
+
+                char psz_access[100];
+                char psz_url[100];
+
+                sout_access_out_t *p_access;
+
+                rtsp_client_t *rtsp = NULL;
+
+                fprintf( stderr, "HTTPD_MSG_SETUP: unicast ip=%s port=%d\n",
+                         ip, i_port );
+
+                psz_session = httpd_MsgGet( query, "Session" );
+                if( *psz_session == 0 )
+                {
+                    psz_session = malloc( 100 );
+                    sprintf( psz_session, "%d", rand() );
+
+                    rtsp = RtspClientNew( p_stream, psz_session );
+                }
+                else
+                {
+                    rtsp = RtspClientGet( p_stream, psz_session );
+                    if( rtsp == NULL )
+                    {
+                        /* FIXME right error code */
+                        answer->i_status = 400;
+                        answer->psz_status = strdup( "Unknown session id" );
+                        answer->i_body = 0;
+                        answer->p_body = NULL;
+                        break;
+                    }
+                }
+
+                /* first try to create the access out */
+                if( p_sys->i_ttl > 0 )
+                    sprintf( psz_access, "udp{raw,ttl=%d}", p_sys->i_ttl );
+                else
+                    sprintf( psz_access, "udp{raw}" );
+                sprintf( psz_url, "%s:%d", ip, i_port );
+                if( ( p_access = sout_AccessOutNew( p_stream->p_sout, psz_access, psz_url ) ) == NULL )
+                {
+                    msg_Err( p_stream, "cannot create the access out for %s://%s",
+                             psz_access, psz_url );
+                    answer->i_status = 400;
+                    answer->psz_status = strdup( "Server internal error" );
+                    answer->i_body = 0;
+                    answer->p_body = NULL;
+                    break;
+                }
+
+                TAB_APPEND( rtsp->i_id, rtsp->id, id );
+                TAB_APPEND( rtsp->i_access, rtsp->access, p_access );
+
+                answer->i_status = 200;
+                answer->psz_status = strdup( "OK" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+
+                httpd_MsgAdd( answer, "Transport",
+                              "RTP/AVP/UDP;client_port=%d-%d", i_port, i_port + 1 );
+            }
+            else /* TODO  strstr( psz_transport, "interleaved" ) ) */
+            {
+                answer->i_status = 400;
+                answer->psz_status = strdup( "Bad Request" );
+                answer->i_body = 0;
+                answer->p_body = NULL;
+            }
+            break;
+        }
+
+        default:
+            return VLC_EGENERIC;
+    }
+    httpd_MsgAdd( answer, "Server", "VLC Server" );
+    httpd_MsgAdd( answer, "Content-Length", "%d", answer->i_body );
+    httpd_MsgAdd( answer, "Cseq", "%d", atoi( httpd_MsgGet( query, "Cseq" ) ) );
+    httpd_MsgAdd( answer, "Cache-Control", "%s", "no-cache" );
+
+    if( psz_session )
+    {
+        httpd_MsgAdd( answer, "Session", "%s"/*;timeout=5*/, psz_session );
     }
     return VLC_SUCCESS;
 }
@@ -1050,6 +1312,26 @@ static void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
 
     out->i_buffer = 12;
     id->i_sequence++;
+}
+
+static void rtp_packetize_send( sout_stream_id_t *id, block_t *out )
+{
+    int i;
+    vlc_mutex_lock( &id->lock_rtsp );
+    for( i = 0; i < id->i_rtsp_access; i++ )
+    {
+        sout_AccessOutWrite( id->rtsp_access[i], block_Duplicate( out ) );
+    }
+    vlc_mutex_unlock( &id->lock_rtsp );
+
+    if( id->p_access )
+    {
+        sout_AccessOutWrite( id->p_access, out );
+    }
+    else
+    {
+        block_Release( out );
+    }
 }
 
 static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
@@ -1081,7 +1363,7 @@ static int rtp_packetize_mpa( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
-        sout_AccessOutWrite( id->p_access, out );
+        rtp_packetize_send( id, out );
 
         p_data += i_payload;
         i_data -= i_payload;
@@ -1185,7 +1467,7 @@ static int rtp_packetize_mpv( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
-        sout_AccessOutWrite( id->p_access, out );
+        rtp_packetize_send( id, out );
 
         p_data += i_payload;
         i_data -= i_payload;
@@ -1221,7 +1503,7 @@ static int rtp_packetize_ac3( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
-        sout_AccessOutWrite( id->p_access, out );
+        rtp_packetize_send( id, out );
 
         p_data += i_payload;
         i_data -= i_payload;
@@ -1254,7 +1536,7 @@ static int rtp_packetize_split( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
-        sout_AccessOutWrite( id->p_access, out );
+        rtp_packetize_send( id, out );
 
         p_data += i_payload;
         i_data -= i_payload;
@@ -1287,7 +1569,7 @@ static int rtp_packetize_l16( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->i_dts    = in->i_dts + i_packet * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
-        sout_AccessOutWrite( id->p_access, out );
+        rtp_packetize_send( id, out );
 
         p_data += i_payload;
         i_data -= i_payload;
@@ -1321,7 +1603,7 @@ static int rtp_packetize_l8( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->i_dts    = in->i_dts + i_packet * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
-        sout_AccessOutWrite( id->p_access, out );
+        rtp_packetize_send( id, out );
 
         p_data += i_payload;
         i_data -= i_payload;
@@ -1362,7 +1644,7 @@ static int rtp_packetize_mp4a( sout_stream_t *p_stream, sout_stream_id_t *id,
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
         out->i_length = in->i_length / i_count;
 
-        sout_AccessOutWrite( id->p_access, out );
+        rtp_packetize_send( id, out );
 
         p_data += i_payload;
         i_data -= i_payload;
