@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.12 2004/01/08 10:27:07 fenrir Exp $
+ * $Id: libc.c,v 1.13 2004/01/08 11:36:40 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -147,7 +147,7 @@ int vlc_vasprintf(char **strp, const char *fmt, va_list ap)
     for( ;; )
     {
         /* Try to print in the allocated space. */
-        n = vsnprintf( p, i_size, fmt, args );
+        n = vsnprintf( p, i_size, fmt, ap );
 
         /* If that worked, return the string. */
         if (n > -1 && n < i_size)
