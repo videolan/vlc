@@ -2,7 +2,7 @@ Package: gpe-vlc-h3600
 Section: graphics
 Priority: optional
 Version: 0.7.2
-Release: 1.test1
+Release: 1
 Architecture: arm
 Source: http://www.videolan.org/vlc/download-sources.html
 Conflicts: gpe-vlc, vlc, opie-vlc, opie-base, libffmpeg, gpe-vlc

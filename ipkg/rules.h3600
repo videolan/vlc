@@ -3,7 +3,7 @@
 # based on Joey Hess's one.
 # Kludged for ipkg
 
-VERSION=0.7.2-test1
+VERSION=0.7.2
 # Compilation options
 export CC=arm-linux-gcc
 export LD=arm-linux-ld
