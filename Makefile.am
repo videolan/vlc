@@ -628,12 +628,12 @@ package-win32-base:
             || true ; \
 	done
 
-	mkdir -p $(srcdir)/vlc-${VERSION}/skins2/fonts
+	mkdir -p $(srcdir)/vlc-${VERSION}/skins/fonts
 	for i in $(srcdir)/share/skins2/fonts/*.*; do \
-	  cp $$i $(srcdir)/vlc-${VERSION}/skins2/fonts/ || true ; \
+	  cp $$i $(srcdir)/vlc-${VERSION}/skins/fonts/ || true ; \
 	done
 	for i in $(srcdir)/share/skins2/*.*; do \
-	  cp $$i $(srcdir)/vlc-${VERSION}/skins2/ || true ; \
+	  cp $$i $(srcdir)/vlc-${VERSION}/skins/ || true ; \
 	done
 
 	mkdir -p "$(srcdir)/vlc-${VERSION}/http/admin"

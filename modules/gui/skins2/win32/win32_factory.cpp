@@ -181,9 +181,13 @@ bool Win32Factory::init()
 
     // Initialize the resource path
     m_resourcePath.push_back( (string)getIntf()->p_vlc->psz_homedir +
-                               "\\" + CONFIG_DIR + "\\skins2" );
+                               "\\" + CONFIG_DIR + "\\skins" );
+    m_resourcePath.push_back( (string)getIntf()->p_libvlc->psz_vlcpath +
+                              "\\skins" );
     m_resourcePath.push_back( (string)getIntf()->p_libvlc->psz_vlcpath +
                               "\\skins2" );
+    m_resourcePath.push_back( (string)getIntf()->p_libvlc->psz_vlcpath +
+                              "\\share\\skins" );
     m_resourcePath.push_back( (string)getIntf()->p_libvlc->psz_vlcpath +
                               "\\share\\skins2" );
 
