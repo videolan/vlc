@@ -444,7 +444,7 @@ static int Mux      ( sout_mux_t *p_mux )
                                              p_sys->idx1.i_entry_max * sizeof( avi_idx1_entry_t ) );
             }
 
-            p_data = block_Realloc( p_data, 8, 0 );
+            p_data = block_Realloc( p_data, 8, p_data->i_buffer );
             if( p_data )
             {
                 SetFCC( p_data->p_buffer, p_stream->fcc );

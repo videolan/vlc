@@ -273,7 +273,7 @@ int E_( EStoPES )( sout_instance_t *p_sout,
 
         if( p_es )
         {
-            p_es = block_Realloc( p_es, i_pes_header, 0 );
+            p_es = block_Realloc( p_es, i_pes_header, p_es->i_buffer );
             /* reuse p_es for first frame */
             *pp_pes = p_pes = p_es;
             /* don't touch i_dts, i_pts, i_length as are already set :) */
