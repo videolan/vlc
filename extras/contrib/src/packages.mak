@@ -2,7 +2,7 @@
 # src/packages.mak : Archives locations
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.1 2003/11/15 01:21:48 massiot Exp $
+# $Id: packages.mak,v 1.2 2003/11/15 22:02:15 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -69,6 +69,7 @@ LIBMATROSKA_VERSION=20031021
 LIBMATROSKA_URL=$(VIDEOLAN)/libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 FFMPEG_VERSION=0.4.8
 FFMPEG_URL=$(SF)/ffmpeg/ffmpeg-$(FFMPEG_VERSION).tar.gz
+FFMPEG_CVSOOT=:pserver:anonymous@mplayerhq.hu:/cvsroot/ffmpeg
 OPENSLP_VERSION=1.0.11
 OPENSLP_URL=$(SF)/openslp/openslp-$(OPENSLP_VERSION).tar.gz
 LIBDVDCSS_VERSION=1.2.8
