@@ -399,10 +399,23 @@ static int ReadDir( playlist_t *p_playlist,
                 }
                 else if(i_mode == MODE_EXPAND )
                 {
+                    char *psz_newname;
                     msg_Dbg(p_playlist, "Reading subdirectory %s", psz_uri );
+
+                    if( !strncmp( psz_uri, psz_name, strlen( psz_name ) ) )
+                    {
+                        char *psz_subdir = psz_uri;
+                        /* Skip the parent path + the separator */
+                        psz_subdir += strlen( psz_name ) + 1;
+                        psz_newname = strdup( psz_subdir );
+                    }
+                    else
+                    {
+                        psz_newname = strdup( psz_uri );
+                    }
                     p_node = playlist_NodeCreate( p_playlist,
                                        p_parent->pp_parents[0]->i_view,
-                                       psz_uri, p_parent );
+                                       psz_newname, p_parent );
 
                     playlist_CopyParents(  p_parent, p_node );
 
@@ -413,6 +426,8 @@ static int ReadDir( playlist_t *p_playlist,
                     {
                         return VLC_EGENERIC;
                     }
+
+                    free( psz_newname );
                 }
             }
             else
