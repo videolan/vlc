@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.6 2004/01/11 01:54:20 rocky Exp $
+ * $Id: subtitle.h,v 1.7 2004/01/14 11:47:19 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -58,6 +58,13 @@
     "squareness. For example 1.25 or 1.3333 which mean the same thing as " \
     "4:3 and 16:9 respectively." \
     )
+
+#define DURATION_SCALE_TEXT N_("factor to increase subtitle display interval")
+#define DURATION_SCALE_LONGTEXT N_(			    \
+  "If you find you need extra time for reading subtitles, " \
+  "you can set this higher and it will multiply the display "	\
+  "time by that amount. Use 0 to mean until the next "		\
+  "subtitle.")
 
 #define DECODE_DEBUG 1
 #if DECODE_DEBUG
@@ -144,7 +151,7 @@ struct decoder_sys_t
 
   int subtitle_data_pos;	/* where to write next chunk */
 
-  uint32_t i_duration;		/* how long to display the image, 0 stands
+  mtime_t i_duration;		/* how long to display the image, 0 stands
 				   for "until next subtitle" */
 
   uint16_t i_x_start, i_y_start; /* position of top leftmost pixel of

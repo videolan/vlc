@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: cvd_parse.c,v 1.10 2004/01/11 01:54:20 rocky Exp $
+ * $Id: cvd_parse.c,v 1.11 2004/01/14 11:47:19 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -136,12 +136,20 @@ void E_(ParseMetaInfo)( decoder_t *p_dec  )
     switch ( p[0] ) {
       
     case 0x04:	/* subtitle duration in 1/90000ths of a second */
+      {
+	mtime_t i_duration = (p[1]<<16) + (p[2]<<8) + p[3];
+	mtime_t i_duration_scale = config_GetInt( p_dec, MODULE_STRING 
+				     "-duration-scaling" );
+		
+	dbg_print( DECODE_DBG_PACKET, 
+		   "subtitle display duration %lu secs  (scaled %lu secs)", 
+		   (long unsigned int) (i_duration / 90000), 
+		   (long unsigned int) (i_duration * i_duration_scale / 90000)
+		   );
+	p_sys->i_duration = i_duration * i_duration_scale ;
+	break;
+      }
       
-      p_sys->i_duration = (p[1]<<16) + (p[2]<<8) + p[3];
-      
-      dbg_print( DECODE_DBG_PACKET, 
-		 "subtitle display duration %u", p_sys->i_duration);
-      break;
       
     case 0x0c:	/* unknown */
       dbg_print( DECODE_DBG_PACKET, 
@@ -523,46 +531,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 #endif /*HAVE_LIBPNG*/
 
     VCDInlinePalette( p_dest, p_sys, i_height, i_width );
-
-    /* The video may be scaled. However subtitle bitmaps assume an 1:1
-       aspect ratio. So unless the user has specified otherwise, we
-       need to scale to compensate for or undo the effects of video
-       output scaling.
-
-       Perhaps this should go in the Render routine? The advantage would
-       be that it will deal with a dynamically changing aspect ratio.
-       The downside is having to scale many times for each render call.
-    */
-    
-    {
-      vlc_object_t * p_input = p_spu->p_sys->p_input;
-      vout_thread_t *p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, 
-					       FIND_CHILD );
-      unsigned int i_aspect_x, i_aspect_y;
-      if (p_vout) {
-        /* Check for user-configuration override. */
-        unsigned int i_new_aspect = VCDSubGetAROverride( p_input, p_vout );
-        if (i_new_aspect == VOUT_ASPECT_FACTOR) {
-          /* For scaling 1:1, nothing needs to be done. Note this means
-             subtitles will get scaled the same way the video does.
-           */
-          ;
-        } else {
-          if (0 == i_new_aspect) {
-            /* Counteract the effects of background video
-               scaling. That's why x and y are reversed from the 
-	       else branch in the call below.
-             */
-            vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_y, 
-                              &i_aspect_x );
-          } else {
-            /* User knows best? */
-            vout_AspectRatio( i_new_aspect, &i_aspect_y, &i_aspect_x );
-          }
-          VCDSubScaleX( p_dec, p_spu, i_aspect_x, i_aspect_y );
-        }
-      }
-    }
+    VCDSubHandleScaling( p_spu, p_dec );
 
     return VLC_SUCCESS;
 

@@ -2,7 +2,7 @@
  * Common SVCD and VCD subtitle routines.
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: common.c,v 1.5 2004/01/11 01:54:20 rocky Exp $
+ * $Id: common.c,v 1.6 2004/01/14 11:47:19 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -188,6 +188,7 @@ VCDInlinePalette ( /*inout*/ uint8_t *p_dest, decoder_sys_t *p_sys,
   
   for ( ; n >= 0 ; n-- ) {
     p_to[n] = p_sys->p_palette[p_from[n]];
+    /*p_to[n] = p_sys->p_palette[p_from[3]];*/
   }
 }
 
@@ -324,6 +325,73 @@ VCDSubScaleX( decoder_t *p_dec, subpicture_t *p_spu,
   }
 
 }
+
+/* The video may be scaled. However subtitle bitmaps assume an 1:1
+   aspect ratio. So unless the user has specified otherwise, we
+   need to scale to compensate for or undo the effects of video
+   output scaling.
+   
+   Perhaps this should go in the Render routine? The advantage would
+   be that it will deal with a dynamically changing aspect ratio.
+   The downside is having to scale many times for each render call.
+*/
+
+void 
+VCDSubHandleScaling( subpicture_t *p_spu, decoder_t *p_dec )
+{
+  vlc_object_t * p_input = p_spu->p_sys->p_input;
+  vout_thread_t *p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, 
+                                           FIND_CHILD );
+  unsigned int i_aspect_x, i_aspect_y;
+  if (p_vout) {
+    /* Check for user-configuration override. */
+    unsigned int i_new_aspect = VCDSubGetAROverride( p_input, p_vout );
+        if (i_new_aspect == VOUT_ASPECT_FACTOR) {
+          /* For scaling 1:1, nothing needs to be done. Note this means
+             subtitles will get scaled the same way the video does.
+          */
+          ;
+        } else {
+          if (0 == i_new_aspect) {
+            /* Counteract the effects of background video scaling when
+               there is scaling. That's why x and y are reversed from
+               the else branch in the call below.
+            */
+            switch( p_vout->output.i_chroma )
+              {
+                /* chromas which are not scaled: */
+              case VLC_FOURCC('I','4','2','0'):
+              case VLC_FOURCC('I','Y','U','V'):
+              case VLC_FOURCC('Y','V','1','2'):
+              case VLC_FOURCC('Y','U','Y','2'):
+                return;
+                break;
+                
+                /* chromas which are scaled: */
+              case VLC_FOURCC('R','V','1','6'):
+              case VLC_FOURCC('R','V','2','4'):
+              case VLC_FOURCC('R','V','3','2'):
+              case VLC_FOURCC('R','G','B','2'):
+                break;
+                
+              default:
+                msg_Err( p_vout, "unknown chroma %x", 
+                         p_vout->output.i_chroma );
+                return;
+                break;
+              }
+            /* We get here only for scaled chromas. */
+            vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_y, 
+                              &i_aspect_x );
+          } else {
+            /* User knows best? */
+            vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
+          }
+          VCDSubScaleX( p_dec, p_spu, i_aspect_x, i_aspect_y );
+        }
+  }
+}
+
 
 /**
  * DestroySPU: subpicture destructor

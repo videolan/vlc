@@ -2,7 +2,7 @@
  * Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: ogt_parse.c,v 1.8 2004/01/11 01:54:20 rocky Exp $
+ * $Id: ogt_parse.c,v 1.9 2004/01/14 11:47:19 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -88,7 +88,7 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
   decoder_sys_t *p_sys = p_dec->p_sys;
   uint8_t *p = p_buffer;
   int i;
-  
+
   dbg_print( (DECODE_DBG_CALL|DECODE_DBG_EXT) , "");
 
   p_sys->i_pts    = p_block->i_pts;
@@ -98,6 +98,8 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
   
   if ( p_sys->i_options & 0x08 ) {
     p_sys->i_duration = GETINT32(p);
+    p_sys->i_duration *= config_GetInt( p_dec, MODULE_STRING 
+                                        "-duration-scaling" );
   } else {
     /* 0 means display until next subtitle comes in. */
     p_sys->i_duration = 0;
@@ -132,10 +134,10 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
 
   if (p_sys && p_sys->i_debug & DECODE_DBG_PACKET) {
     msg_Dbg( p_dec, "x-start: %d, y-start: %d, width: %d, height %d, "
-	     "spu size: %d, duration: %u (d:%d p:%d)",
+	     "spu size: %d, duration: %lu (d:%d p:%d)",
 	     p_sys->i_x_start, p_sys->i_y_start, 
 	     p_sys->i_width, p_sys->i_height, 
-	     p_sys->i_spu_size, p_sys->i_duration,
+	     p_sys->i_spu_size, (long unsigned int) p_sys->i_duration,
 	     p_sys->i_image_length, p_sys->i_image_offset);
     
     for (i=0; i<4; i++) {
@@ -193,7 +195,7 @@ E_(ParsePacket)( decoder_t *p_dec)
     p_spu->i_height   = p_sys->i_height;
 
     p_spu->i_start    = p_sys->i_pts;
-    p_spu->i_stop     = p_sys->i_pts + (p_sys->i_duration * 10);
+    p_spu->i_stop     = p_sys->i_pts + p_sys->i_duration;
     
     p_spu->p_sys->b_crop  = VLC_FALSE;
     p_spu->p_sys->i_debug = p_sys->i_debug;
@@ -367,47 +369,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 #endif /*HAVE_LIBPNG*/
     
     VCDInlinePalette( p_dest, p_sys, i_height, i_width );
-    
-    /* The video may be scaled. However subtitle bitmaps assume an 1:1
-       aspect ratio. So unless the user has specified otherwise, we
-       need to scale to compensate for or undo the effects of video
-       output scaling.
-
-       Perhaps this should go in the Render routine? The advantage would
-       be that it will deal with a dynamically changing aspect ratio.
-       The downside is having to scale many times for each render call.
-    */
-    
-    {
-      vlc_object_t * p_input = p_spu->p_sys->p_input;
-      vout_thread_t *p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, 
-					       FIND_CHILD );
-      unsigned int i_aspect_x, i_aspect_y;
-      if (p_vout) {
-        /* Check for user-configuration override. */
-        unsigned int i_new_aspect = VCDSubGetAROverride( p_input, p_vout );
-        if (i_new_aspect == VOUT_ASPECT_FACTOR) {
-          /* For scaling 1:1, nothing needs to be done. Note this means
-             subtitles will get scaled the same way the video does.
-           */
-          ;
-        } else {
-          if (0 == i_new_aspect) {
-            /* Counteract the effects of background video
-               scaling. That's why x and y are reversed from the 
-	       else branch in the call below.
-             */
-            vout_AspectRatio( p_vout->render.i_aspect, &i_aspect_y, 
-                              &i_aspect_x );
-          } else {
-            /* User knows best? */
-            vout_AspectRatio( i_new_aspect, &i_aspect_x, &i_aspect_y );
-          }
-          VCDSubScaleX( p_dec, p_spu, i_aspect_x, i_aspect_y );
-        }
-      }
-    }
-
+    VCDSubHandleScaling( p_spu, p_dec );
     return VLC_SUCCESS;
 }
 

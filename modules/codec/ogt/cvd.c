@@ -2,7 +2,7 @@
  * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd.c,v 1.9 2004/01/11 01:54:20 rocky Exp $
+ * $Id: cvd.c,v 1.10 2004/01/14 11:47:19 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -54,6 +54,10 @@ vlc_module_begin();
     add_string( "sub-aspect-ratio", "", NULL,
                 SUB_ASPECT_RATIO_TEXT, SUB_ASPECT_RATIO_LONGTEXT, 
 		VLC_TRUE );
+
+    add_integer( MODULE_STRING "-duration-scaling", 9, NULL,
+		 DURATION_SCALE_TEXT, DURATION_SCALE_LONGTEXT,
+		 VLC_TRUE );
 
     add_submodule();
     set_description( _("Chaoji VCD subtitle packetizer") );
