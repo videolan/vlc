@@ -1,7 +1,7 @@
 /*****************************************************************************
  * sap.c :  SAP interface module
  *****************************************************************************
- * Copyright (C) 2004 VideoLAN
+ * Copyright (C) 2004-2005 VideoLAN
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -243,13 +243,13 @@ struct demux_sys_t
     static void CacheLoad( services_discovery_t *p_sd );
     static void CacheSave( services_discovery_t *p_sd );
 /* Helper functions */
-   static char *GetAttribute( sdp_t *p_sdp, const char *psz_search );
-   static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
-   static char *convert_from_utf8( struct services_discovery_t *p_sd,
+    static char *GetAttribute( sdp_t *p_sdp, const char *psz_search );
+    static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
+    static char *convert_from_utf8( struct services_discovery_t *p_sd,
                                    char *psz_unicode );
-   static int InitSocket( services_discovery_t *p_sd, char *psz_address, int i_port );
+    static int InitSocket( services_discovery_t *p_sd, char *psz_address, int i_port );
 #ifdef HAVE_ZLIB_H
-   static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len );
+    static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len );
     static void FreeSDP( sdp_t *p_sdp );
 #endif
 
@@ -272,7 +272,7 @@ static int Open( vlc_object_t *p_this )
     char                *psz_addr, *psz_charset;
     vlc_value_t         val;
 
-    p_sys->i_timeout = config_GetInt( p_sd,"sap-timeout" );
+    p_sys->i_timeout = var_CreateGetInteger( p_sd, "sap-timeout" );
 
     vlc_current_charset( &psz_charset );
     p_sys->iconvHandle = vlc_iconv_open( psz_charset, "UTF-8" );
@@ -288,24 +288,24 @@ static int Open( vlc_object_t *p_this )
     p_sys->pi_fd = NULL;
     p_sys->i_fd = 0;
 
-    p_sys->b_strict = config_GetInt( p_sd, "sap-strict");
-    p_sys->b_parse = config_GetInt( p_sd, "sap-parse" );
+    p_sys->b_strict = var_CreateGetInteger( p_sd, "sap-strict");
+    p_sys->b_parse = var_CreateGetInteger( p_sd, "sap-parse" );
 
-    if( config_GetInt( p_sd, "sap-cache" ) )
+    if( var_CreateGetInteger( p_sd, "sap-cache" ) )
     {
         CacheLoad( p_sd );
     }
 
-    if( config_GetInt( p_sd, "sap-ipv4" ) )
+    if( var_CreateGetInteger( p_sd, "sap-ipv4" ) )
     {
         InitSocket( p_sd, SAP_V4_ADDRESS, SAP_PORT );
     }
-    if( config_GetInt( p_sd, "sap-ipv6" ) )
+    if( var_CreateGetInteger( p_sd, "sap-ipv6" ) )
     {
         /* [ + 8x4+7*':' + ] */
         char psz_address[42];
         char c_scope;
-        char *psz_scope = config_GetPsz( p_sd, "sap-ipv6-scope" );
+        char *psz_scope = var_CreateGetString( p_sd, "sap-ipv6-scope" );
 
         if( psz_scope == NULL || *psz_scope == '\0')
         {
@@ -320,7 +320,7 @@ static int Open( vlc_object_t *p_this )
         InitSocket( p_sd, psz_address, SAP_PORT );
     }
 
-    psz_addr = config_GetPsz( p_sd, "sap-addr" );
+    psz_addr = var_CreateGetString( p_sd, "sap-addr" );
     if( psz_addr && *psz_addr )
     {
         InitSocket( p_sd, psz_addr, SAP_PORT );
@@ -328,7 +328,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->i_fd == 0 )
     {
-        msg_Err( p_sd, "unable to read on any address");
+        msg_Err( p_sd, "unable to read on any address" );
         return VLC_EGENERIC;
     }
 
@@ -504,10 +504,9 @@ static void CloseDemux( vlc_object_t *p_this )
 
 static void Run( services_discovery_t *p_sd )
 {
+    int		i;
     uint8_t     *p_buffer;
-    /* Dirty hack to slow down the startup of the sap interface */
-    /* Unneeded now : our node is in no_select mode */
-    //    msleep( 500000 );
+    playlist_t  *p_playlist;
 
     /* read SAP packets */
     while( !p_sd->b_die )
@@ -525,45 +524,37 @@ static void Run( services_discovery_t *p_sd )
         i_read = net_Select( p_sd, p_sd->p_sys->pi_fd, NULL,
                              p_sd->p_sys->i_fd, p_buffer,
                              MAX_SAP_BUFFER, 500000 );
-#if 0
+
         /* Check for items that need deletion */
-        for( i = 0 ; i< p_sd->p_sys->i_announces ; i++ )
+        for( i = 0; i < p_sd->p_sys->i_announces; i++ )
         {
-           struct sap_announce_t *p_announce;
-           mtime_t i_timeout = ( mtime_t ) 1000000*p_sys->i_timeout;
-           if( mdate() - p_sd->p_sys->pp_announces[i]->i_last > i_timeout )
-           {
-               msg_Dbg( p_sd,"Time out for %s, deleting (%i/%i)",
-                        p_sd->p_sys->pp_announces[i]->psz_name,
+            mtime_t i_timeout = ( mtime_t ) 1000000 * p_sd->p_sys->i_timeout;
+
+            if( mdate() - p_sd->p_sys->pp_announces[i]->i_last > i_timeout )
+            {
+                struct sap_announce_t *p_announce;
+                p_announce = p_sd->p_sys->pp_announces[i];
+
+                msg_Dbg( p_sd, "Time out for %s, deleting (%i/%i)",
+                        p_announce->p_item->input.psz_name,
                         i , p_sd->p_sys->i_announces );
 
-             /* Remove the playlist item */
-               p_playlist = vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
+                /* Remove the playlist item */
+                p_playlist = vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
                               FIND_ANYWHERE );
-               if( p_playlist )
-               {
-                   int i_pos = playlist_GetPositionById( p_playlist,
-                              p_sd->p_sys->pp_announces[i]->i_id );
-                   playlist_Delete( p_playlist, i_pos );
-                   vlc_object_release( p_playlist );
-               }
+                if( p_playlist )
+                {
+                    playlist_Delete( p_playlist, p_announce->p_item->input.i_id );
+                    vlc_object_release( p_playlist );
+                }
 
-               /* Free the p_announce */
-               p_announce =  p_sd->p_sys->pp_announces[i];
-               if( p_announce->psz_name )
-                  free(  p_announce->psz_name );
-               if( p_announce->psz_uri )
-                  free(  p_announce->psz_uri );
-
-              /* Remove the sap_announce from the array */
-              REMOVE_ELEM( p_sd->p_sys->pp_announces,
+                /* Remove the sap_announce from the array */
+                REMOVE_ELEM( p_sd->p_sys->pp_announces,
                            p_sd->p_sys->i_announces, i );
 
-              free( p_announce );
-
-           }
+                free( p_announce );
+            }
         }
-#endif
 
         /* Minimum length is > 6 */
         if( i_read <= 6 )
@@ -594,18 +585,18 @@ static int Demux( demux_t *p_demux )
     sdp_t *p_sdp = p_demux->p_sys->p_sdp;
     playlist_t *p_playlist;
 
-   p_playlist = (playlist_t *)vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
+    p_playlist = (playlist_t *)vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST,
                                                FIND_ANYWHERE );
 
-   p_playlist->status.p_item->i_flags |= PLAYLIST_DEL_FLAG;
+    p_playlist->status.p_item->i_flags |= PLAYLIST_DEL_FLAG;
 
-   playlist_Add( p_playlist, p_sdp->psz_uri, p_sdp->psz_sessionname,
+    playlist_Add( p_playlist, p_sdp->psz_uri, p_sdp->psz_sessionname,
                  PLAYLIST_APPEND, PLAYLIST_END );
 
-   vlc_object_release( p_playlist );
-   if( p_sdp ) FreeSDP( p_sdp );
+    vlc_object_release( p_playlist );
+    if( p_sdp ) FreeSDP( p_sdp );
 
-   return VLC_SUCCESS;
+    return VLC_SUCCESS;
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
@@ -677,7 +668,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
         psz_sdp += 4;
         if( i_read <= 9 )
         {
-            msg_Warn( p_sd,"too short SAP packet\n" );
+            msg_Warn( p_sd, "too short SAP packet\n" );
             return VLC_EGENERIC;
         }
     }
@@ -686,7 +677,7 @@ static int ParseSAP( services_discovery_t *p_sd, uint8_t *p_buffer, int i_read )
         psz_sdp += 16;
         if( i_read <= 21 )
         {
-            msg_Warn( p_sd,"too short SAP packet\n" );
+            msg_Warn( p_sd, "too short SAP packet\n" );
             return VLC_EGENERIC;
         }
     }
@@ -873,11 +864,13 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
                 p_child = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                                psz_grp, p_sd->p_sys->p_node );
             free( psz_grp );
+            free( psz_value );
         }
         else
         {
             vlc_object_release( p_playlist );
             msg_Err( p_sd, "out of memory");
+            free( psz_value );
             free( p_sap );
             return NULL;
         }
@@ -1060,7 +1053,7 @@ static int ParseConnection( vlc_object_t *p_obj, sdp_t *p_sdp )
         free( psz_proto );
         psz_proto = strdup( "rtp" );
     }
-    if( psz_proto && !strncmp( psz_proto, "UDP", 3 ) )
+    if( psz_proto && !strncasecmp( psz_proto, "UDP", 3 ) )
     {
         free( psz_proto );
         psz_proto = strdup( "udp" );
