@@ -31,6 +31,7 @@ prefix=@prefix@
 PROGRAM_OPTIONS = $(SYS) $(ARCH)
 ifeq ($(DEBUG),1)
 PROGRAM_OPTIONS += DEBUG
+DEFINE += -DDEBUG
 endif
 
 # PROGRAM_BUILD is a complete identification of the build
@@ -45,11 +46,6 @@ PROGRAM_BUILD = `date` $(USER)
 DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr a-z A-Z)
 DEFINE += -DPLUGIN_PATH="\"$(prefix)/lib/videolan/vlc\""
 DEFINE += -DDATA_PATH="\"$(prefix)/share/videolan/vlc\""
-#DEFINE += -DPROGRAM_OPTIONS="\"$(shell echo $(PROGRAM_OPTIONS) | tr 'A-Z' 'a-z')\""
-#DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
-ifeq ($(DEBUG),1)
-DEFINE += -DDEBUG
-endif
 
 ################################################################################
 # Tuning and other variables - do not change anything except if you know
