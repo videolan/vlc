@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.7 2001/07/11 14:26:19 gbazin Exp $
+ * $Id: vout_directx.c,v 1.8 2001/07/12 23:06:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -159,6 +159,7 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->hbrush = NULL;
     p_vout->p_sys->hwnd = NULL;
     p_vout->p_sys->i_changes = 0;
+    p_vout->p_sys->b_event_thread_die = 0;
     p_vout->p_sys->b_display_enabled = 0;
 
     p_vout->p_sys->b_cursor = 1; /* TODO should be done with a main_GetInt.. */

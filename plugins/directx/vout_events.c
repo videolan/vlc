@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_events.c,v 1.1 2001/07/11 14:26:19 gbazin Exp $
+ * $Id: vout_events.c,v 1.2 2001/07/12 23:06:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -177,6 +177,12 @@ void DirectXEventThread( vout_thread_t *p_vout )
                 }               
                 break;
                 
+            case WM_RBUTTONUP:
+                intf_WarnMsg( 4, "vout: vout_Manage WM_RBUTTONUP" );
+                /* FIXME: need locking ! */
+                p_main->p_intf->b_menu_change = 1;
+                break;
+
             case WM_KEYDOWN:
                 /* the key events are first processed here. The next
                  * message processed by this main message loop will be the

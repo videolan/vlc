@@ -2,7 +2,7 @@
  * input_ts.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ts.h,v 1.9 2001/06/21 07:22:03 sam Exp $
+ * $Id: input_ts.h,v 1.10 2001/07/12 23:06:54 gbazin Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Boris Dorès <babal@via.ecp.fr>
@@ -44,59 +44,9 @@ typedef struct thread_ts_data_s
 } thread_ts_data_t;
 
 /*****************************************************************************
- * readv_*: readv() replacements for iovec-impaired C libraries
+ * network readv() replacement for iovec-impaired C libraries
  *****************************************************************************/
-
-#if defined( WIN32 )
-static __inline__ int readv_file( int i_fd, struct iovec *p_iovec, int i_count )
-{
-    int i_index, i_len, i_total = 0;
-    u8 *p_base;
-
-    for( i_index = i_count; i_index; i_index-- )
-    {
-        register signed int i_bytes;
-
-        i_len  = p_iovec->iov_len;
-        p_base = p_iovec->iov_base;
-
-        /* Loop is unrolled one time to spare the (i_bytes <= 0) test */
-
-        if( i_len > 0 )
-        {
-            i_bytes = read( i_fd, p_base, i_len );
-
-            if( ( i_total == 0 ) && ( i_bytes < 0 ) )
-            {
-                return -1;
-            }
-
-            if( i_bytes <= 0 )
-            {
-                return i_total;
-            }
-
-            i_len -= i_bytes; i_total += i_bytes; p_base += i_bytes;
-
-            while( i_len > 0 )
-            {
-                i_bytes = read( i_fd, p_base, i_len );
-
-                if( i_bytes <= 0 )
-                {
-                    return i_total;
-                }
-
-                i_len -= i_bytes; i_total += i_bytes; p_base += i_bytes;
-            }
-        }
-
-        p_iovec++;
-    }
-
-    return i_total;
-}
-
+#if defined(WIN32)
 static __inline__ int read_network( int i_fd, char * p_base,
                                     thread_ts_data_t *p_sys, int i_len )
 {

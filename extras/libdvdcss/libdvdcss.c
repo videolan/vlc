@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.5 2001/07/11 02:01:03 sam Exp $
+ * $Id: libdvdcss.c,v 1.6 2001/07/12 23:06:54 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -516,19 +516,18 @@ static int _win32_dvdcss_readv( int i_fd, struct iovec *p_iovec,
                                 int i_num_buffers )
 {
     int i_index, i_len, i_total = 0;
-    char *p_base;
+    unsigned char *p_base;
     int i_blocks;
 
-    for( i_index = i_num_buffers; i_index; i_index-- )
+    if( WIN2K )
     {
+        for( i_index = i_num_buffers; i_index; i_index-- )
+	{
+	    i_len  = p_iovec->iov_len;
+	    p_base = p_iovec->iov_base;
 
-        i_len  = p_iovec->iov_len;
-        p_base = p_iovec->iov_base;
-
-        if( i_len > 0 )
-        {
-            if( WIN2K )
-            {
+	    if( i_len > 0 )
+	    {
                 unsigned long int i_bytes;
                 if( !ReadFile( (HANDLE) i_fd, p_base, i_len, &i_bytes, NULL ) )
                 {
@@ -539,26 +538,47 @@ static int _win32_dvdcss_readv( int i_fd, struct iovec *p_iovec,
                        unspecified after a failure */
                 }
                 i_blocks = i_bytes / DVDCSS_BLOCK_SIZE;
-            }
-            else  /* Win9x */
-            {
+
+		i_total += i_blocks;
+
+		if( i_blocks != (i_len / DVDCSS_BLOCK_SIZE) )
+		{
+		    /* we reached the end of the file */
+		    return i_total;
+		}
+
+	    }
+
+	    p_iovec++;
+	}
+    }
+    else /* Win9x */
+    {
+        for( i_index = i_num_buffers; i_index; i_index-- )
+	{
+	    i_len  = p_iovec->iov_len / DVDCSS_BLOCK_SIZE;
+	    p_base = p_iovec->iov_base;
+
+	    if( i_len > 0 )
+	    {
                 i_blocks = _win32_dvdcss_aread( i_fd, p_base, i_len );
                 if( i_blocks < 0 )
                 {
                     return -1;  /* idem */
                 }
-            }
 
-            if( i_blocks != (i_len / DVDCSS_BLOCK_SIZE) )
-            {
-                /* we reached the end of the file */
-                return i_total;
-            }
+		i_total += i_blocks;
 
-            i_total += i_blocks;
-        }
+		if( i_blocks != i_len )
+		{
+		    /* we reached the end of the file or a signal interrupted
+                       the read */
+		    return i_total;
+		}
+	    }
 
-        p_iovec++;
+	    p_iovec++;
+	}
     }
 
     return i_total;
