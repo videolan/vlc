@@ -249,8 +249,10 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 #undef VEC_MERGE
 #endif
 
-    const int i_source_margin = p_source->p->i_pitch
-                                 - p_source->p->i_visible_pitch;
+    const int i_source_margin = p_source->p[0].i_pitch
+                                 - p_source->p[0].i_visible_pitch;
+    const int i_source_margin_c = p_source->p[1].i_pitch
+                                 - p_source->p[1].i_visible_pitch;
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
@@ -280,6 +282,8 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
+        p_u += i_source_margin_c;
+        p_v += i_source_margin_c;
         p_line1 += i_dest_margin;
         p_line2 += i_dest_margin;
     }
@@ -303,8 +307,10 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    const int i_source_margin = p_source->p->i_pitch
-                                 - p_source->p->i_visible_pitch;
+    const int i_source_margin = p_source->p[0].i_pitch
+                                 - p_source->p[0].i_visible_pitch;
+    const int i_source_margin_c = p_source->p[1].i_pitch
+                                 - p_source->p[1].i_visible_pitch;
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
@@ -330,6 +336,8 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
+        p_u += i_source_margin_c;
+        p_v += i_source_margin_c;
         p_line1 += i_dest_margin;
         p_line2 += i_dest_margin;
     }
@@ -348,8 +356,10 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    const int i_source_margin = p_source->p->i_pitch
-                                 - p_source->p->i_visible_pitch;
+    const int i_source_margin = p_source->p[0].i_pitch
+                                 - p_source->p[0].i_visible_pitch;
+    const int i_source_margin_c = p_source->p[1].i_pitch
+                                 - p_source->p[1].i_visible_pitch;
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
@@ -375,6 +385,8 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
+        p_u += i_source_margin_c;
+        p_v += i_source_margin_c;
         p_line1 += i_dest_margin;
         p_line2 += i_dest_margin;
     }
@@ -407,8 +419,10 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    const int i_source_margin = p_source->p->i_pitch
-                                 - p_source->p->i_visible_pitch;
+    const int i_source_margin = p_source->p[0].i_pitch
+                                 - p_source->p[0].i_visible_pitch;
+    const int i_source_margin_c = p_source->p[1].i_pitch
+                                 - p_source->p[1].i_visible_pitch;
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
@@ -434,6 +448,8 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
+        p_u += i_source_margin_c;
+        p_v += i_source_margin_c;
         p_line1 += i_dest_margin;
         p_line2 += i_dest_margin;
     }
@@ -454,8 +470,10 @@ static void I420_Y211( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    const int i_source_margin = p_source->p->i_pitch
-                                 - p_source->p->i_visible_pitch;
+    const int i_source_margin = p_source->p[0].i_pitch
+                                 - p_source->p[0].i_visible_pitch;
+    const int i_source_margin_c = p_source->p[1].i_pitch
+                                 - p_source->p[1].i_visible_pitch;
     const int i_dest_margin = p_dest->p->i_pitch
                                - p_dest->p->i_visible_pitch;
 
@@ -475,6 +493,8 @@ static void I420_Y211( vout_thread_t *p_vout, picture_t *p_source,
 
         p_y1 += i_source_margin;
         p_y2 += i_source_margin;
+        p_u += i_source_margin_c;
+        p_v += i_source_margin_c;
         p_line1 += i_dest_margin;
         p_line2 += i_dest_margin;
     }
