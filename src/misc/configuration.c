@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.17 2002/04/21 18:32:12 sam Exp $
+ * $Id: configuration.c,v 1.18 2002/04/21 21:29:20 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -735,6 +735,9 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
     module_config_t *pp_shortopts[256];
     char *psz_shortopts;
 
+    /* reset warning level */
+    p_main->i_warning_level = 0;
+
     /* Set default configuration and copy arguments */
     p_main->i_argc    = *pi_argc;
     p_main->ppsz_argv = ppsz_argv;
@@ -916,13 +919,15 @@ int config_LoadCmdLine( int *pi_argc, char *ppsz_argv[],
         }
     }
 
-    if( p_main->i_warning_level < 0 )
-    {
-        p_main->i_warning_level = 0;
-    }
-
     free( p_longopts );
     free( psz_shortopts );
+
+    /* Update the warning level */
+    p_main->i_warning_level += config_GetIntVariable( "warning" );
+    p_main->i_warning_level = ( p_main->i_warning_level < 0 ) ? 0 :
+        p_main->i_warning_level;
+    config_PutIntVariable( "warning", p_main->i_warning_level );
+
     return( 0 );
 }
 

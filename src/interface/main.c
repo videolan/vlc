@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.183 2002/04/21 18:32:12 sam Exp $
+ * $Id: main.c,v 1.184 2002/04/21 21:29:20 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -522,8 +522,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_aout_bank   = &aout_bank;
     p_vout_bank   = &vout_bank;
 
-    p_main->i_warning_level = 0;
-
     /*
      * Support for gettext
      */
@@ -713,8 +711,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 #endif
 
     /* p_main inititalization. FIXME ? */
-    p_main->i_desync = (mtime_t)config_GetIntVariable( "desync" )
-      * (mtime_t)1000;
+    p_main->i_warning_level = config_GetIntVariable( "warning" );
+    p_main->i_desync = config_GetIntVariable( "desync" ) * (mtime_t)1000;
     p_main->b_stats = config_GetIntVariable( "stats" );
     p_main->b_audio = !config_GetIntVariable( "noaudio" );
     p_main->b_stereo= !config_GetIntVariable( "mono" );
@@ -733,7 +731,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 
     if( p_main->b_stats )
     {
-        char          p_capabilities[200];
+        char p_capabilities[200];
         p_capabilities[0] = '\0';
 
 #define PRINT_CAPABILITY( capability, string )                              \
