@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.8 2004/01/25 20:05:28 hartman Exp $
+ * $Id: ts.c,v 1.9 2004/01/30 17:50:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -234,7 +234,6 @@ static inline int PIDGet( block_t *p )
 }
 
 static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk );
-static char *LanguageNameISO639( char *p );
 
 static iod_descriptor_t *IODNew( int , uint8_t * );
 static void              IODFree( iod_descriptor_t * );
@@ -1042,30 +1041,6 @@ static vlc_bool_t GatherPES( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
     return i_ret;
 }
 
-static char *LanguageNameISO639( char *psz_code )
-{
-    const iso639_lang_t *pl;
-
-    pl = GetLang_2B( psz_code );
-    if( !strcmp( pl->psz_iso639_1, "??" ) )
-    {
-        pl = GetLang_2T( psz_code );
-    }
-
-    if( !strcmp( pl->psz_iso639_1, "??" ) )
-    {
-       return strdup( psz_code );
-    }
-    else
-    {
-        if( *pl->psz_native_name )
-        {
-            return strdup( pl->psz_native_name );
-        }
-        return strdup( pl->psz_eng_name );
-    }
-}
-
 static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
 {
     es_format_t *fmt = &pid->es->fmt;
@@ -1726,8 +1701,13 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
             if( p_dr )
             {
                 dvbpsi_iso639_dr_t *p_decoded = dvbpsi_DecodeISO639Dr( p_dr );
-                pid->es->fmt.psz_language =
-                    LanguageNameISO639( (char*)&p_decoded->i_iso_639_code );
+
+                if( p_decoded )
+                {
+                    pid->es->fmt.psz_language = malloc( 4 );
+                    memcpy( pid->es->fmt.psz_language, p_decoded->i_iso_639_code, 3 );
+                    pid->es->fmt.psz_language[3] = 0;
+                }
             }
         }
 
