@@ -74,9 +74,11 @@ typedef struct picture_s
 /* Pictures status */
 #define FREE_PICTURE            0         /* picture is free and not allocated */
 #define RESERVED_PICTURE        1         /* picture is allocated and reserved */
-#define READY_PICTURE           2              /* picture is ready for display */
-#define DISPLAYED_PICTURE       3  /* picture has been displayed but is linked */
-#define DESTROYED_PICTURE       4     /* picture is allocated but no more used */
+#define RESERVED_DATED_PICTURE  2     /* picture is waiting for DisplayPicture */
+#define RESERVED_DISP_PICTURE   3      /* picture is waiting for a DatePixture */
+#define READY_PICTURE           4              /* picture is ready for display */
+#define DISPLAYED_PICTURE       5  /* picture has been displayed but is linked */
+#define DESTROYED_PICTURE       6     /* picture is allocated but no more used */
 
 /* Aspect ratios (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
 #define AR_SQUARE_PICTURE       1                             /* square pixels */

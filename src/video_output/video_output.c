@@ -248,31 +248,30 @@ void vout_DestroySubtitle( vout_thread_t *p_vout, subtitle_t *p_sub )
  * vout_DisplayPicture: display a picture
  *******************************************************************************
  * Remove the reservation flag of a picture, which will cause it to be ready for
- * display. The picture does not need to be locked, since it is ignored by
- * the output thread if is reserved. The picture won't be displayed until 
- * vout_DatePicture has been called.
+ * display. The picture won't be displayed until vout_DatePicture has been 
+ * called.
  *******************************************************************************/
 void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#ifdef DEBUG_VIDEO
-    char        psz_date[MSTRTIME_MAX_SIZE];         /* buffer for date string */
-#endif
-
-#ifdef DEBUG
-    /* Check if picture status is valid */
-    if( p_pic->i_status != RESERVED_PICTURE )
+    vlc_mutex_lock( &p_vout->picture_lock );
+    switch( p_pic->i_status )
     {
-        intf_DbgMsg("error: picture %p has invalid status %d\n", p_pic, p_pic->i_status );       
-    }   
+    case RESERVED_PICTURE:        
+        p_pic->i_status = RESERVED_DISP_PICTURE;
+        break;        
+    case RESERVED_DATED_PICTURE:
+        p_pic->i_status = READY_PICTURE;
+        break;        
+#ifdef DEBUG
+    default:        
+        intf_DbgMsg("error: picture %p has invalid status %d\n", p_pic, p_pic->i_status );    
+        break;        
 #endif
-
-    /* Remove reservation flag */
-    p_pic->i_status = READY_PICTURE;
+    }
+    vlc_mutex_unlock( &p_vout->picture_lock );
 
 #ifdef DEBUG_VIDEO
-    /* Send picture informations */
-    intf_DbgMsg("picture %p: type=%d, %dx%d, date=%s\n", p_pic, p_pic->i_type, 
-                p_pic->i_width,p_pic->i_height, mstrtime( psz_date, p_pic->date ) );    
+    intf_DbgMsg("picture %p\n", p_pic );
 #endif
 }
 
@@ -280,13 +279,32 @@ void  vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
  * vout_DatePicture: date a picture
  *******************************************************************************
  * Remove the reservation flag of a picture, which will cause it to be ready for
- * display. The picture does not need to be locked, since it is ignored by
- * the output thread if is reserved. The picture won't be displayed until
- * vout_DisplayPicture has been called.
+ * display. The picture won't be displayed until vout_DisplayPicture has been 
+ * called.
  *******************************************************************************/
 void  vout_DatePicture( vout_thread_t *p_vout, picture_t *p_pic, mtime_t date )
 {
-    //??
+    vlc_mutex_lock( &p_vout->picture_lock );
+    p_pic->date = date;    
+    switch( p_pic->i_status )
+    {
+    case RESERVED_PICTURE:        
+        p_pic->i_status = RESERVED_DATED_PICTURE;
+        break;        
+    case RESERVED_DISP_PICTURE:
+        p_pic->i_status = READY_PICTURE;
+        break;        
+#ifdef DEBUG
+    default:        
+        intf_DbgMsg("error: picture %p has invalid status %d\n", p_pic, p_pic->i_status );    
+        break;        
+#endif
+    }
+    vlc_mutex_unlock( &p_vout->picture_lock );
+
+#ifdef DEBUG_VIDEO
+    intf_DbgMsg("picture %p\n", p_pic);
+#endif
 }
 
 /*******************************************************************************
@@ -447,7 +465,9 @@ void vout_DestroyPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
 #ifdef DEBUG
    /* Check if picture status is valid */
-   if( p_pic->i_status != RESERVED_PICTURE )
+   if( (p_pic->i_status != RESERVED_PICTURE) && 
+       (p_pic->i_status != RESERVED_DATED_PICTURE) &&
+       (p_pic->i_status != RESERVED_DISP_PICTURE) )
    {
        intf_DbgMsg("error: picture %p has invalid status %d\n", p_pic, p_pic->i_status );       
    }   
@@ -1020,6 +1040,8 @@ static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
         switch( p_vout->p_picture[i_picture].i_status )
         {
         case RESERVED_PICTURE:
+        case RESERVED_DATED_PICTURE:
+        case RESERVED_DISP_PICTURE:
             i_reserved_pic++;            
             break;            
         case READY_PICTURE:
