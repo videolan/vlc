@@ -20,6 +20,7 @@ Input:
     - uses libdvdread for simple playback with menus (eg. for streaming)
  * Experimental --input-slave option to start playing with multi-input
  * Automatic MTU discovery for UDP streams
+ * More powerful MRL syntax for DVD/VCD/CDDA access (selection of titles/chapters).
 
 Demux:
  * Support iTunes Music Store previews
@@ -29,6 +30,7 @@ Demux:
  * Support for MPEG TS streams with error correction (204/192 bytes TS packets)
  * Support for DTS audio in MPEG TS (ETSI TS 102 154 Annex G)
  * Skins2 .vlt file loader (only when skin2 is the current interface)
+ * Improved Ogg demuxer
 
 Codecs:
  * G.726 audio support
@@ -50,6 +52,9 @@ Stream Output:
  * DVB subtitles encoder
  * Subtitles overlaying in transcoder
  * MPEG 1 layer 2 audio encoder using libtoolame
+ * Improved vorbis/theora encoding
+ * Re-use audio/video/spu decoders in transcoder module. From now on,
+   everything that is playable by VLC should be transcodable as well
 
 Audio Output:
  * New audio equalizer filter
