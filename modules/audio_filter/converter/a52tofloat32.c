@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52tofloat32.c,v 1.13 2003/02/20 01:52:45 sigmunau Exp $
+ * $Id: a52tofloat32.c,v 1.14 2003/02/24 17:06:21 jlj Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -192,7 +192,7 @@ static int Create( vlc_object_t * _p_filter )
         break;
 
     default:
-        msg_Err( p_filter, "unknown sample format !" );
+        msg_Warn( p_filter, "unknown sample format !" );
         free( p_sys );
         return -1;
     }
