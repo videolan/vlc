@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.55 2002/05/16 12:47:59 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.56 2002/05/20 11:21:01 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -488,63 +488,58 @@ int vout_Init( vout_thread_t *p_vout )
     /* Assume we have square pixels */
     p_vout->output.i_aspect = p_vout->p_sys->i_width
                                * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
-
     p_vout->output.i_chroma = colspace[p_vout->p_sys->p_window->colspace_index].chroma;
+    p_vout->p_sys->i_index = 0;
 
     p_vout->output.i_rmask  = 0x00ff0000;
     p_vout->output.i_gmask  = 0x0000ff00;
     p_vout->output.i_bmask  = 0x000000ff;
 
-    p_pic = NULL;
-
-    /* Find an empty picture slot */
-    for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+    for (int buffer_index = 0 ; buffer_index < 3; buffer_index++)
     {
-        if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-        {
-            p_pic = p_vout->p_picture + i_index;
-            break;
-        }
+       p_pic = NULL;
+       /* Find an empty picture slot */
+       for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
+       {
+           p_pic = NULL;
+           if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
+           {
+               p_pic = p_vout->p_picture + i_index;
+               break;
+           }
+       }
+
+       if( p_pic == NULL )
+       {
+           return 0;
+       }
+       p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[0];
+       p_pic->p->i_lines = p_vout->p_sys->i_height;
+
+       p_pic->p->i_pixel_bytes = colspace[p_vout->p_sys->p_window->colspace_index].pixel_bytes;
+       p_pic->i_planes = colspace[p_vout->p_sys->p_window->colspace_index].planes;
+       p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[0]->BytesPerRow(); 
+
+       if (p_vout->p_sys->p_window->mode == OVERLAY)
+       {
+          p_pic->p->i_visible_bytes = (p_vout->p_sys->p_window->bitmap[0]->Bounds().IntegerWidth()+1) 
+                                     * p_pic->p->i_pixel_bytes; 
+          p_pic->p->b_margin = 1;
+          p_pic->p->b_hidden = 0;
+       }
+       else
+       {
+          p_pic->p->b_margin = 0;
+          p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
+       }
+
+       p_pic->i_status = DESTROYED_PICTURE;
+       p_pic->i_type   = DIRECT_PICTURE;
+ 
+       PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
+
+       I_OUTPUTPICTURES++;
     }
-
-    if( p_pic == NULL )
-    {
-        return 0;
-    }
-
-    p_vout->p_sys->i_index = 0;
-    p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[0];
-    p_pic->p->i_lines = p_vout->p_sys->i_height;
-
-    p_pic->p->i_pixel_bytes = p_vout->p_sys->p_window->bitmap[0]->BytesPerRow() / 
-                              p_vout->p_sys->p_window->bitmap[0]->Bounds().IntegerWidth();
-    if (p_vout->p_sys->p_window->mode == OVERLAY)
-    {
-       /* Get the overlay Restrictions */
-       overlay_restrictions r;
-       p_vout->p_sys->p_window->bitmap[0]->GetOverlayRestrictions(&r);
-       p_pic->p->i_pitch = r.source.max_width * p_pic->p->i_pixel_bytes;
-       p_pic->p->b_margin = 1;
-       p_pic->p->i_visible_bytes =p_vout->p_sys->p_window->bitmap[0]->BytesPerRow(); 
-       p_pic->p->b_hidden = 0;    
-
-       intf_Msg("i_pitch : %d", p_pic->p->i_pitch);
-    }
-    else
-    {
-       p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[0]->BytesPerRow();
-       intf_Msg("i_pitch : %d", p_pic->p->i_pitch);
-    }
-    p_pic->p->b_margin = 0;
-
-    p_pic->i_planes = colspace[p_vout->p_sys->p_window->colspace_index].planes;
-
-    p_pic->i_status = DESTROYED_PICTURE;
-    p_pic->i_type   = DIRECT_PICTURE;
-
-    PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
-    I_OUTPUTPICTURES++;
 
     return( 0 );
 }

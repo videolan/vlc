@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.18 2002/05/16 11:38:42 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.19 2002/05/20 11:21:01 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -32,15 +32,16 @@ typedef struct colorcombo
 	const char *name;
 	u32 chroma;
 	int planes;
+	int pixel_bytes;
 } colorcombo;
 
 colorcombo colspace[]=
 {
-	{B_YUV420,   "B_YUV420",   FOURCC_I420, 3},
-	{B_YUV422,   "B_YUV422",   FOURCC_Y422, 3},
-	{B_YCbCr422, "B_YCbCr422", FOURCC_YUY2, 3},
-	{B_RGB32,    "B_RGB32",    FOURCC_RV32, 1},
-	{B_RGB16,    "B_RGB16",    FOURCC_RV16, 1}
+	{B_YCbCr420, "B_YCbCr420", FOURCC_I420, 3, 2},
+	{B_YUV422,   "B_YUV422",   FOURCC_Y422, 3, 2},
+	{B_YCbCr422, "B_YCbCr422", FOURCC_YUY2, 3, 2},
+	{B_RGB32,    "B_RGB32",    FOURCC_RV32, 1, 4},
+	{B_RGB16,    "B_RGB16",    FOURCC_RV16, 1, 2}
 };
 
 #define COLOR_COUNT 5
