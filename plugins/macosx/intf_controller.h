@@ -65,6 +65,7 @@
 - (void)applicationDidResignActive:(NSNotification*)aNotification ;
 
 //Functions atteched to user interface 
+- (IBAction) openFile:(id)sender ;
 - (IBAction) pause:(id)sender ;
 - (IBAction) play:(id)sender ;
 - (IBAction) timeslider_update:(id)slider ;

@@ -23,7 +23,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-struct vlc_thread_s ;
 typedef enum intf_speed_e {SPEED_SLOW=0, SPEED_NORMAL, SPEED_FAST} intf_speed_t ;
 @protocol VlcWrapper_Delegate
     - (void) requestQDPortFullscreen:(bool)b_fullscreen ;
@@ -52,28 +51,22 @@ typedef enum intf_speed_e {SPEED_SLOW=0, SPEED_NORMAL, SPEED_FAST} intf_speed_t 
 - (NSSize) videoSize ;
 
 // Playback control
-- (void) play ;
-- (void) pause ;
-- (void) stop ;
-- (void) stepf ;
-- (void) stepr ;
 - (void) setSpeed:(intf_speed_t)e_speed ;
 - (NSString*) getTimeAsString ;
 - (float) getTimeAsFloat ;
 - (void) setTimeAsFloat:(float)i_offset ;
 
 // Playlist control
-- (void) lockPlaylist ;
-- (void) unlockPlaylist ;
-- (int) getPlaylistLength ;
-- (NSString*) getPlaylistItem:(int)i_pos ;
-- (void) playNextPlaylistItem ;
-- (void) playPrevPlaylistItem ;
-- (void) addPlaylistItem:(NSString*)o_filename ;
-
-//private
-- (bool) hasInput ;
-- (struct vout_thread_s*) lockVout ;
-- (void) unlockVout ;
+- (NSArray*) playlistAsArray ;
+- (int) playlistLength ;
+- (NSString*) playlistItem:(int) i_pos ;
+- (bool) playlistPlayCurrent ;
+- (void) playlistPause ;
+- (void) playlistStop ;
+- (void) playlistPlayNext ;
+- (void) playlistPlayPrev ;
+- (void) playlistPlayItem:(int)i_item ;
+- (void) playlistAdd:(NSString*)o_filename ;
+- (void) clearPlaylist ;
 @end
 

@@ -54,6 +54,11 @@
 
 #define p_area p_main->p_intf->p_input->stream.p_selected_area
 
+@interface Intf_VlcWrapper(Private) 
+- (struct vout_thread_s*) lockVout ;
+- (void) unlockVout ;
+@end
+
 @implementation Intf_VlcWrapper
 //Initialization,.....
     + (Intf_VlcWrapper*) instance {
@@ -139,63 +144,28 @@
 
 
 //Playback control
-    - (void) play {
-        if (![self hasInput]) return ;
-    
-        switch (e_speed)
-        {
-            case SPEED_SLOW:
-                input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_SLOWER) ;
-                break ;
-            case SPEED_NORMAL:
-                input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_PLAY) ;
-                break ;
-            case SPEED_FAST:
-                input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_FASTER) ;
-                break ;
-        }
-    }
-    
-    - (void) pause {
-        if (![self hasInput]) return ;
-    
-        input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_PAUSE) ;
-    }
-    
-    - (void) stop {
-        return ;
-    }
-    
-    - (void) stepf {
-        return ;
-    }
-    
-    - (void) stepr {
-        return ;
-    }
-    
     - (void) setSpeed:(intf_speed_t) _e_speed {
         e_speed = _e_speed ;
-        [self play] ;
+        [self playlistPlayCurrent] ;
     }
     
     - (NSString *) getTimeAsString {
         static char psz_currenttime[ OFFSETTOTIME_MAX_SIZE ] ;
         
-        if (![self hasInput]) return [NSString stringWithCString:"00:00:00"] ;
+        if (!p_main->p_intf->p_input) return [NSString stringWithCString:"00:00:00"] ;
         
         input_OffsetToTime( p_main->p_intf->p_input, psz_currenttime, p_area->i_tell ) ;        
         return [NSString stringWithCString:psz_currenttime] ;
     }
     
     - (float) getTimeAsFloat {
-        if (![self hasInput]) return 0.0 ;
+        if (!p_main->p_intf->p_input) return 0.0 ;
     
         return (float)p_area->i_tell / (float)p_area->i_size ;
     }
 
     - (void) setTimeAsFloat:(float) f_position {
-        if (![self hasInput]) return ;
+        if (!p_main->p_intf->p_input) return ;
     
         input_Seek(p_main->p_intf->p_input, p_area->i_size * f_position) ;
     }
@@ -204,45 +174,114 @@
 
     
 //Playlist control
-    - (void) lockPlaylist {
+    - (NSArray*) playlistAsArray {
+        NSMutableArray* p_list = [NSMutableArray arrayWithCapacity:p_main->p_playlist->i_size] ;
+        int i ;
+    
         vlc_mutex_lock(&p_main->p_playlist->change_lock) ;
-    }
-    
-    - (void) unlockPlaylist {
+        for (i=0; i < p_main->p_playlist->i_size; i++)
+            [p_list addObject:[NSString stringWithCString:p_main->p_playlist->p_item[i].psz_name]] ;
         vlc_mutex_unlock(&p_main->p_playlist->change_lock) ;
+        
+        return [NSArray arrayWithArray:p_list] ;
     }
-    
-     - (int) getPlaylistLength {
+
+     - (int) playlistLength {
         return p_main->p_playlist->i_size ;
     }
     
-    - (NSString*) getPlaylistItem:(int) i_pos {
-        if (i_pos >= p_main->p_playlist->i_size)
-            return nil ;
-            
-        return [NSString stringWithCString:p_main->p_playlist->p_item[i_pos].psz_name] ;
+    - (NSString*) playlistItem:(int) i_pos {
+        NSString* o_item = nil ;
+    
+        vlc_mutex_lock(&p_main->p_playlist->change_lock) ;
+            if (i_pos < p_main->p_playlist->i_size)
+                o_item = [NSString stringWithCString:p_main->p_playlist->p_item[i_pos].psz_name] ;
+        vlc_mutex_unlock(&p_main->p_playlist->change_lock) ;
+                
+        return o_item ;
     }
     
-    - (void) playNextPlaylistItem {
-        intf_PlaylistNext(p_main->p_playlist) ;
+    - (bool) playlistPlayCurrent {
+        if (p_main->p_intf->p_input) {
+            switch (e_speed)
+            {
+                case SPEED_SLOW:
+                    input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_SLOWER) ;
+                    break ;
+                case SPEED_NORMAL:
+                    input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_PLAY) ;
+                    break ;
+                case SPEED_FAST:
+                    input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_FASTER) ;
+                    break ;
+            }
+            p_main->p_playlist->b_stopped = 0 ;
+        }
+        else if (p_main->p_playlist->b_stopped) {
+            if (p_main->p_playlist->i_size)
+                intf_PlaylistJumpto(p_main->p_playlist, p_main->p_playlist->i_index) ;
+            else
+                return FALSE ;
+        }
+        
+        return TRUE ;
+    }
+
+    - (void) playlistPause {
+        if (p_main->p_intf->p_input)
+            input_SetStatus(p_main->p_intf->p_input, INPUT_STATUS_PAUSE) ;
     }
     
-    - (void) playPrevPlaylistItem {
-        intf_PlaylistPrev(p_main->p_playlist) ;
+    - (void) playlistStop {
+        if (p_main->p_intf->p_input) p_main->p_intf->p_input->b_eof = 1 ;
+        vlc_mutex_lock(&p_main->p_playlist->change_lock) ;
+            p_main->p_playlist->i_index-- ;
+            p_main->p_playlist->b_stopped = 1 ;
+        vlc_mutex_unlock(&p_main->p_playlist->change_lock) ;
     }
     
-    - (void) addPlaylistItem:(NSString*)o_filename {
+    - (void) playlistPlayNext {
+        [self playlistStop] ;
+        vlc_mutex_lock(&p_main->p_playlist->change_lock) ;
+            p_main->p_playlist->i_index++ ;
+        vlc_mutex_unlock(&p_main->p_playlist->change_lock) ;
+        [self playlistPlayCurrent] ;
+    }
+    
+    - (void) playlistPlayPrev {
+        [self playlistStop] ;
+        vlc_mutex_lock(&p_main->p_playlist->change_lock) ;
+            p_main->p_playlist->i_index-- ;
+        vlc_mutex_unlock(&p_main->p_playlist->change_lock) ;
+        [self playlistPlayCurrent] ;    
+    }
+    
+    - (void) playlistPlayItem:(int)i_item {
+        [self playlistStop] ;
+        vlc_mutex_lock(&p_main->p_playlist->change_lock) ;
+            if (i_item < p_main->p_playlist->i_size)
+                p_main->p_playlist->i_index-- ;
+        vlc_mutex_unlock(&p_main->p_playlist->change_lock) ;        
+        [self playlistPlayCurrent] ;
+    }
+    
+    - (void) playlistAdd:(NSString*)o_filename {
         intf_PlaylistAdd(p_main->p_playlist, PLAYLIST_END, [o_filename lossyCString]) ;
+    }
+    
+    - (void) clearPlaylist {
+        int i ;
+    
+        vlc_mutex_lock(&p_main->p_playlist->change_lock) ;
+            for(i=0; i < p_main->p_playlist->i_size; i++)
+                intf_PlaylistDelete(p_main->p_playlist, i) ;
+        vlc_mutex_unlock(&p_main->p_playlist->change_lock) ;        
     }
     
 
 
 
 // Private Functions. This are just some utilities for other functions
-    - (bool) hasInput {
-        return (p_main->p_intf->p_input != NULL) ? TRUE : FALSE ;
-    }
-
     - (struct vout_thread_s*) lockVout {
         vlc_mutex_lock(&p_vout_bank->lock) ;
         if (p_vout_bank->i_count) {

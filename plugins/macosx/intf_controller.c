@@ -58,13 +58,13 @@
     - (void)applicationDidBecomeActive:(NSNotification*)aNotification {
         if (b_window_is_fullscreen) {
             [o_window orderFront:self] ;
-            [o_vlc play] ;
+            [o_vlc playlistPlayCurrent] ;
         }
     }
     
     - (void)applicationDidResignActive:(NSNotification*)aNotification {
         if (b_window_is_fullscreen) {
-            [o_vlc pause] ;
+            [o_vlc playlistPause] ;
             [o_window orderOut:self] ;
         }
     }
@@ -72,13 +72,28 @@
         
         
         
-//Functions attached to user interface         
+//Functions attached to user interface     
+    - (IBAction) openFile:(id)sender {
+        NSOpenPanel *o_panel = [NSOpenPanel openPanel] ;
+        
+        [o_panel setAllowsMultipleSelection:YES] ;
+        if ([o_panel runModalForDirectory:NSHomeDirectory() file:nil types:nil] == NSOKButton) {
+            NSEnumerator* o_files = [[o_panel filenames] objectEnumerator] ;
+            NSString* o_file ;
+            
+            while ((o_file = (NSString*)[o_files nextObject])) {
+                [o_vlc playlistAdd:o_file] ;
+            }
+        }
+        [o_vlc playlistPlayCurrent] ;
+    }
+    
     - (IBAction) pause:(id)sender {
-        [o_vlc pause] ;
+        [o_vlc playlistPause] ;
     }
     
     - (IBAction) play:(id)sender {
-        [o_vlc play] ;
+        [o_vlc playlistPlayCurrent] ;
     }
     
     - (IBAction) timeslider_update:(id)slider {
@@ -168,21 +183,11 @@
 @implementation Intf_PlaylistDS
     - (void ) awakeFromNib {
         o_vlc = [Intf_VlcWrapper instance] ;
-        o_playlist = [[NSMutableArray arrayWithCapacity:10] retain] ;
+        o_playlist = nil ;
     }
     
     - (void) readPlaylist {
-        static unsigned int i_length_old = 0;
-        unsigned int i ;
-    
-        if (i_length_old == [o_vlc getPlaylistLength])
-            return ;
-    
-        [o_playlist removeAllObjects] ;
-        [o_vlc lockPlaylist] ;
-        for(i=0; i < [o_vlc getPlaylistLength]; i++)
-            [o_playlist addObject:[o_vlc getPlaylistItem:i]] ;
-        [o_vlc unlockPlaylist] ;
+        o_playlist = [[o_vlc playlistAsArray] retain] ;
     }
 
     - (int) numberOfRowsInTableView:(NSTableView*)o_table {
