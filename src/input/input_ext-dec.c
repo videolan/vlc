@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.24 2001/12/30 05:38:44 sam Exp $
+ * $Id: input_ext-dec.c,v 1.25 2001/12/30 05:46:14 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -87,9 +87,9 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
 }
 
 /*****************************************************************************
- * EmptyFifo : an error occured, use this function to empty the fifo
+ * DecoderError : an error occured, use this function to empty the fifo
  *****************************************************************************/
-void EmptyFifo( decoder_fifo_t * p_fifo )
+void DecoderError( decoder_fifo_t * p_fifo )
 {
     /* We take the lock, because we are going to read/write the start/end
      * indexes of the decoder fifo */
