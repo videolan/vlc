@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.29 2002/05/19 20:26:11 gbazin Exp $
+ * $Id: gtk_preferences.c,v 1.29.2.1 2002/06/11 13:11:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -65,7 +65,7 @@ static void GtkIntChanged        ( GtkEditable *, gpointer );
 static void GtkFloatChanged      ( GtkEditable *, gpointer );
 static void GtkBoolChanged       ( GtkToggleButton *, gpointer );
 
-static void GtkFreeHashTable     ( gpointer );
+static void GtkFreeHashTable     ( GtkObject *object );
 static void GtkFreeHashValue     ( gpointer, gpointer, gpointer );
 static gboolean GtkSaveHashValue ( gpointer, gpointer, gpointer );
 
@@ -159,18 +159,13 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
     gint category_max_height;
 
-    /* Check if the dialog box is already opened, if so this will save us
-     * quite a bit of work. (the interface will be destroyed when you actually
-     * close the dialog window, but remember that it is only hidden if you
-     * clicked on the action buttons). This trick also allows us not to
+    /* Check if the dialog box is already opened because we don't want to
      * duplicate identical dialog windows. */
-
     config_dialog = (GtkWidget *)gtk_object_get_data(
                     GTK_OBJECT(p_intf->p_sys->p_window), psz_module_name );
     if( config_dialog )
     {
         /* Yeah it was open */
-        gtk_widget_show( config_dialog );
         gtk_widget_grab_focus( config_dialog );
         return;
     }
@@ -205,9 +200,8 @@ static void GtkCreateConfigDialog( char *psz_module_name,
 
     /* Create our config hash table and associate it with the dialog box */
     config_hash_table = g_hash_table_new( NULL, NULL );
-    gtk_object_set_data_full( GTK_OBJECT(config_dialog),
-                              "config_hash_table", config_hash_table,
-                              (GtkDestroyNotify)GtkFreeHashTable );
+    gtk_object_set_data( GTK_OBJECT(config_dialog),
+                         "config_hash_table", config_hash_table );
 
     /* Create notebook */
     config_notebook = gtk_notebook_new();
@@ -594,13 +588,13 @@ void GtkConfigApply( GtkButton * button, gpointer user_data )
 void GtkConfigOk( GtkButton * button, gpointer user_data )
 {
     GtkConfigApply( button, user_data );
-    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+    gtk_widget_destroy( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
 
 void GtkConfigCancel( GtkButton * button, gpointer user_data )
 {
-    gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
+    gtk_widget_destroy( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
 void GtkConfigSave( GtkButton * button, gpointer user_data )
@@ -821,11 +815,14 @@ static void GtkBoolChanged( GtkToggleButton *button, gpointer user_data )
 /****************************************************************************
  * GtkFreeHashTable: signal called when the config hash table is destroyed.
  ****************************************************************************/
-static void GtkFreeHashTable( gpointer user_data )
+static void GtkFreeHashTable( GtkObject *object )
 {
-    GHashTable *hash_table = (GHashTable *)user_data;
+    GHashTable *hash_table = (GHashTable *)gtk_object_get_data( object,
+                                                         "config_hash_table" );
+    intf_thread_t *p_intf = (intf_thread_t *)gtk_object_get_data( object,
+                                                                  "p_intf" );
 
-    g_hash_table_foreach( hash_table, GtkFreeHashValue, NULL );
+    g_hash_table_foreach( hash_table, GtkFreeHashValue, (void *)p_intf );
     g_hash_table_destroy( hash_table );
 }
 
@@ -893,4 +890,5 @@ static void GtkConfigDialogDestroyed( GtkObject *object, gpointer user_data )
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
                          psz_module_name, NULL );
 
+    GtkFreeHashTable( object );
 }
