@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.11 2003/01/20 03:45:06 hartman Exp $
+ * $Id: open.m,v 1.12 2003/01/23 11:48:18 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -773,23 +773,22 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 {
     NSString *o_mode;
     BOOL b_file = FALSE;
-    BOOL b_udp = FALSE;
-    BOOL b_rtp = FALSE;
+    BOOL b_net = FALSE;
 
     o_mode = [[o_sout_access selectedCell] title];
 
     if( [o_mode isEqualToString: _NS("File")] ) b_file = TRUE;   
-    else if( [o_mode isEqualToString: _NS("UDP")] ) b_udp = TRUE;
-    else if( [o_mode isEqualToString: _NS("RTP")] ) b_rtp = TRUE;
+    else if( [o_mode isEqualToString: _NS("UDP")] ) b_net = TRUE;
+    else if( [o_mode isEqualToString: _NS("RTP")] ) b_net = TRUE;
 
     [o_sout_file_path setEnabled: b_file];
     [o_sout_file_btn_browse setEnabled: b_file];
-    [o_sout_udp_addr setEnabled: b_udp|b_rtp];
-    [o_sout_udp_port setEnabled: b_udp|b_rtp];
-    [o_sout_udp_port_stp setEnabled: b_udp|b_rtp];
-    [[o_sout_mux cellAtRow:0 column: 0] setEnabled: !b_rtp];
+    [o_sout_udp_addr setEnabled: b_net];
+    [o_sout_udp_port setEnabled: b_net];
+    [o_sout_udp_port_stp setEnabled: b_net];
+    [[o_sout_mux cellAtRow:0 column: 0] setEnabled: !b_net];
 
-    if ( b_rtp )
+    if ( b_net )
     {
         [[o_sout_mux cellAtRow: 0 column:1] setState: YES];
     }

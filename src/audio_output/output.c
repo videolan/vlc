@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.31 2003/01/22 18:31:47 massiot Exp $
+ * $Id: output.c,v 1.32 2003/01/23 11:48:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -100,20 +100,19 @@ int aout_OutputNew( aout_instance_t * p_aout,
     {
         /* Mono - create the audio-channels variable. */
         var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_HASCHOICE );
-        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
-        {
-            /* Go directly to the left channel. */
-            p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
-        }
-        else
-        {
-            val.psz_string = N_("Both");
-            var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
-        }
+        val.psz_string = N_("Both");
+        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         val.psz_string = N_("Left");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         val.psz_string = N_("Right");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
+        {
+            /* Go directly to the left channel. */
+            p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
+            val.psz_string = N_("Left");
+            var_Set( p_aout, "audio-channels", val );
+        }
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }
@@ -137,6 +136,13 @@ int aout_OutputNew( aout_instance_t * p_aout,
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
         val.psz_string = N_("Reverse stereo");
         var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
+        {
+            /* Go directly to the left channel. */
+            p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
+            val.psz_string = N_("Left");
+            var_Set( p_aout, "audio-channels", val );
+        }
         var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
                          NULL );
     }

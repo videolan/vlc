@@ -2,7 +2,7 @@
  * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.10 2003/01/22 18:31:47 massiot Exp $
+ * $Id: trivial.c,v 1.11 2003/01/23 11:48:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -113,6 +113,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     s32 * p_dest = (s32 *)p_out_buf->p_buffer;
     s32 * p_src = (s32 *)p_in_buf->p_buffer;
 
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
+
     if ( (p_filter->output.i_original_channels & AOUT_CHAN_PHYSMASK)
                 != (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
            && (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
@@ -134,17 +137,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 p_src += 2;
             }
         }
-        else if ( p_filter->output.i_original_channels
-                                        & AOUT_CHAN_REVERSESTEREO )
-        {
-            /* Reverse-stereo mode */
-            for ( i = p_in_buf->i_nb_samples; i -= 2; )
-            {
-                *p_dest++ = p_src[1];
-                *p_dest++ = p_src[0];
-                p_src += 2;
-            }
-        }
         else
         {
             /* Fake-stereo mode */
@@ -158,13 +150,24 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             }
         }
     }
+    else if ( p_filter->output.i_original_channels
+                                    & AOUT_CHAN_REVERSESTEREO )
+    {
+        /* Reverse-stereo mode */
+        int i;
+        for ( i = p_in_buf->i_nb_samples; i--; )
+        {
+            *p_dest = p_src[1];
+            p_dest++;
+            *p_dest = p_src[0];
+            p_dest++;
+            p_src += 2;
+        }
+    }
     else
     {
         SparseCopy( p_dest, p_src, p_in_buf->i_nb_samples, i_output_nb,
                     i_input_nb );
     }
-
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
 }
 
