@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.118 2003/12/11 13:21:11 rocky Exp $
+ * $Id: libvlc.h,v 1.119 2003/12/11 14:58:06 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -816,7 +816,7 @@ vlc_module_begin();
     add_key( "key-next", KEY_MODIFIER_COMMAND|KEY_RIGHT, NULL, NEXT_KEY_TEXT, NEXT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-prev", KEY_MODIFIER_COMMAND|KEY_LEFT, NULL, PREV_KEY_TEXT, PREV_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-stop", KEY_MODIFIER_COMMAND|'.', NULL, STOP_KEY_TEXT, STOP_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-position", KEY_MODIFIER_COMMAND|'t', NULL, POSITION_KEY_TEXT, POSITION_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-position", 't', NULL, POSITION_KEY_TEXT, POSITION_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump-10sec", KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_LEFT, NULL, JB10SEC_KEY_TEXT, JB10SEC_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump+10sec", KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_RIGHT, NULL, JF10SEC_KEY_TEXT, JF10SEC_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump-1min", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_LEFT, NULL, JB1MIN_KEY_TEXT, JB1MIN_KEY_LONGTEXT, VLC_FALSE );
@@ -831,7 +831,7 @@ vlc_module_begin();
     add_key( "key-quit", KEY_MODIFIER_COMMAND|'q', NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-up", KEY_MODIFIER_COMMAND|KEY_UP, NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-down", KEY_MODIFIER_COMMAND|KEY_DOWN, NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-vol-mute", KEY_MODIFIER_COMMAND|'m', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-vol-mute", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFTq|'m', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
 #else
     add_key( "key-fullscreen", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
