@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.15 2001/10/01 16:44:07 massiot Exp $
+ * $Id: video_parser.h,v 1.16 2001/10/11 13:19:27 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -116,6 +116,8 @@ typedef struct sequence_s
     unsigned int        i_aspect_ratio;        /* height/width display ratio */
     unsigned int        i_matrix_coefficients;/* coeffs of the YUV transform */
     int                 i_chroma_format, i_scalable_mode;
+    int                 i_chroma_nb_blocks;
+    boolean_t           b_chroma_h_subsampled, b_chroma_v_subsampled;
     int                 i_frame_rate;  /* theoritical frame rate in fps*1001 */
     boolean_t           b_mpeg2;                                    /* guess */
     boolean_t           b_progressive;              /* progressive (ie.
@@ -202,6 +204,7 @@ typedef struct picture_parsing_s
 #define SC_TEMP     4
 
 /* Chroma types */
+#define CHROMA_NONE 0
 #define CHROMA_420 1
 #define CHROMA_422 2
 #define CHROMA_444 3

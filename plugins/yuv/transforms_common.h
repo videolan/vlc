@@ -2,7 +2,7 @@
  * transforms_common.h: YUV transformation macros for truecolor
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: transforms_common.h,v 1.2 2001/03/21 13:42:34 sam Exp $
+ * $Id: transforms_common.h,v 1.3 2001/10/11 13:19:27 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -95,7 +95,7 @@
  *****************************************************************************/
 #define SCALE_HEIGHT( CHROMA, BPP )                                           \
     /* If line is odd, rewind 4:2:0 U and V samples */                        \
-    if( ((CHROMA == 420) || (CHROMA == 422)) && !(i_y & 0x1) )                \
+    if( (CHROMA == 420) && !(i_y & 0x1) )                                     \
     {                                                                         \
         p_u -= i_chroma_width;                                                \
         p_v -= i_chroma_width;                                                \
@@ -113,7 +113,7 @@
             /* Height reduction: skip next source line */                     \
             p_y += i_width;                                                   \
             i_y++;                                                            \
-            if( (CHROMA == 420) || (CHROMA == 422) )                          \
+            if( CHROMA == 420 )                                               \
             {                                                                 \
                 if( i_y & 0x1 )                                               \
                 {                                                             \
@@ -121,7 +121,7 @@
                     p_v += i_chroma_width;                                    \
                 }                                                             \
             }                                                                 \
-            else if( CHROMA == 444 )                                          \
+            else if( (CHROMA == 422) || (CHROMA == 444) )                     \
             {                                                                 \
                 p_u += i_width;                                               \
                 p_v += i_width;                                               \

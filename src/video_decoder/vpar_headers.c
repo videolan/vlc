@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.11 2001/10/01 16:44:07 massiot Exp $
+ * $Id: vpar_headers.c,v 1.12 2001/10/11 13:19:27 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -46,6 +46,7 @@
 #include "vdec_ext-plugins.h"
 #include "vpar_pool.h"
 #include "video_parser.h"
+#include "video_decoder.h"
 
 /*
  * Local prototypes
@@ -397,6 +398,24 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     p_vpar->sequence.i_height = (p_vpar->sequence.i_mb_height * 16);
     p_vpar->sequence.i_size = p_vpar->sequence.i_width
                                         * p_vpar->sequence.i_height;
+    switch( p_vpar->sequence.i_chroma_format )
+    {
+    case CHROMA_420:
+        p_vpar->sequence.i_chroma_nb_blocks = 2;
+        p_vpar->sequence.b_chroma_h_subsampled = 1;
+        p_vpar->sequence.b_chroma_v_subsampled = 1;
+        break;
+    case CHROMA_422:
+        p_vpar->sequence.i_chroma_nb_blocks = 4;
+        p_vpar->sequence.b_chroma_h_subsampled = 1;
+        p_vpar->sequence.b_chroma_v_subsampled = 0;
+        break;
+    case CHROMA_444:
+        p_vpar->sequence.i_chroma_nb_blocks = 6;
+        p_vpar->sequence.b_chroma_h_subsampled = 0;
+        p_vpar->sequence.b_chroma_v_subsampled = 0;
+        break;
+    }
 
 #if 0
     if(    p_vpar->sequence.i_width != i_width_save
@@ -749,6 +768,28 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         (i_structure != p_vpar->picture.i_current_structure);
     p_vpar->picture.b_current_field =
         (i_structure == BOTTOM_FIELD );
+
+    if( !p_vpar->p_config->decoder_config.p_stream_ctrl->b_grayscale )
+    {
+        switch( p_vpar->sequence.i_chroma_format )
+        {
+        case CHROMA_422:
+            p_vpar->pool.pf_vdec_decode = vdec_DecodeMacroblock422;
+            break;
+        case CHROMA_444:
+            p_vpar->pool.pf_vdec_decode = vdec_DecodeMacroblock444;
+            break;
+        case CHROMA_420:
+        default:
+            p_vpar->pool.pf_vdec_decode = vdec_DecodeMacroblock420;
+            break;
+        }
+    }
+    else
+    {
+        p_vpar->pool.pf_vdec_decode = vdec_DecodeMacroblockBW;
+    }
+
 
     if( p_vpar->sequence.b_mpeg2 )
     {

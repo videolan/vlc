@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.12 2001/10/01 16:44:07 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.13 2001/10/11 13:19:27 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *          Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
@@ -179,14 +179,14 @@ static __inline__ int GetChromaDCDiff( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * MPEG2IntraB14 : Decode an intra block according to ISO/IEC 13818-2 table B14
  *****************************************************************************/
-static void MPEG2IntraB14( vpar_thread_t * p_vpar, idct_inner_t * p_idct )
+static void MPEG2IntraB14( vpar_thread_t * p_vpar, idct_inner_t * p_idct,
+                           u8 * pi_quant )
 {
     int         i_coeff, i_mismatch, i_code, i_pos, i_value, i_nc;
     s32         i_sign;
     dct_lookup_t * p_tab;
 
     int         i_q_scale = p_vpar->mb.i_quantizer_scale;
-    u8 *        pi_quant = p_vpar->sequence.intra_quant.pi_matrix;
     dctelem_t * p_dest = p_idct->pi_block;
     u8 *        p_scan = p_vpar->picture.pi_scan;
 
@@ -327,14 +327,14 @@ store_coeff:
 /*****************************************************************************
  * MPEG2IntraB15 : Decode an intra block according to ISO/IEC 13818-2 table B15
  *****************************************************************************/
-static void MPEG2IntraB15( vpar_thread_t * p_vpar, idct_inner_t * p_idct )
+static void MPEG2IntraB15( vpar_thread_t * p_vpar, idct_inner_t * p_idct,
+                           u8 * pi_quant )
 {
     int         i_coeff, i_mismatch, i_code, i_pos, i_value, i_nc;
     s32         i_sign;
     dct_lookup_t * p_tab;
 
     int         i_q_scale = p_vpar->mb.i_quantizer_scale;
-    u8 *        pi_quant = p_vpar->sequence.intra_quant.pi_matrix;
     dctelem_t * p_dest = p_idct->pi_block;
     u8 *        p_scan = p_vpar->picture.pi_scan;
 
@@ -471,20 +471,16 @@ store_coeff:
 /*****************************************************************************
  * MPEG2NonIntra : Decode a non-intra MPEG-2 block
  *****************************************************************************/
-static void MPEG2NonIntra( vpar_thread_t * p_vpar, idct_inner_t * p_idct )
+static void MPEG2NonIntra( vpar_thread_t * p_vpar, idct_inner_t * p_idct,
+                           u8 * pi_quant )
 {
     int         i_coeff, i_mismatch, i_code, i_pos, i_value, i_nc;
     s32         i_sign;
     dct_lookup_t * p_tab;
 
     int         i_q_scale = p_vpar->mb.i_quantizer_scale;
-    u8 *        pi_quant = p_vpar->sequence.nonintra_quant.pi_matrix;
     dctelem_t * p_dest = p_idct->pi_block;
     u8 *        p_scan = p_vpar->picture.pi_scan;
-static int meuh = 0;
-meuh++;
-    if( meuh == 3745 )
-        i_coeff = 0;
 
     i_coeff = -1;
     i_mismatch = 1;
@@ -644,14 +640,14 @@ coeff_2:
 /*****************************************************************************
  * MPEG1Intra : Decode an MPEG-1 intra block
  *****************************************************************************/
-static void MPEG1Intra( vpar_thread_t * p_vpar, idct_inner_t * p_idct )
+static void MPEG1Intra( vpar_thread_t * p_vpar, idct_inner_t * p_idct,
+                        u8 * pi_quant )
 {
     int         i_coeff, i_code, i_pos, i_value, i_nc;
     s32         i_sign;
     dct_lookup_t * p_tab;
 
     int         i_q_scale = p_vpar->mb.i_quantizer_scale;
-    u8 *        pi_quant = p_vpar->sequence.intra_quant.pi_matrix;
     dctelem_t * p_dest = p_idct->pi_block;
     u8 *        p_scan = p_vpar->picture.pi_scan;
 
@@ -787,14 +783,14 @@ store_coeff:
 /*****************************************************************************
  * MPEG1NonIntra : Decode a non-intra MPEG-1 block
  *****************************************************************************/
-static void MPEG1NonIntra( vpar_thread_t * p_vpar, idct_inner_t * p_idct )
+static void MPEG1NonIntra( vpar_thread_t * p_vpar, idct_inner_t * p_idct,
+                           u8 * pi_quant )
 {
     int         i_coeff, i_code, i_pos, i_value, i_nc;
     s32         i_sign;
     dct_lookup_t * p_tab;
 
     int         i_q_scale = p_vpar->mb.i_quantizer_scale;
-    u8 *        pi_quant = p_vpar->sequence.nonintra_quant.pi_matrix;
     dctelem_t * p_dest = p_idct->pi_block;
     u8 *        p_scan = p_vpar->picture.pi_scan;
 
@@ -951,57 +947,48 @@ coeff_2:
 /*****************************************************************************
  * *MB : decode all blocks of the macroblock
  *****************************************************************************/
-#define DECODE_LUMABLOCK( i_b, p_dest, PF_MBFUNC )                          \
-    p_idct = &p_mb->p_idcts[i_b];                                           \
+#define DECODE_LUMABLOCK( I_B, PF_MBFUNC )                                  \
+    p_idct = &p_mb->p_idcts[I_B];                                           \
     memset( p_idct->pi_block, 0, 64*sizeof(dctelem_t) );                    \
-    p_idct->p_dct_data = p_dest;                                            \
     p_vpar->mb.pi_dc_dct_pred[0] += GetLumaDCDiff( p_vpar );                \
     p_idct->pi_block[0] = p_vpar->mb.pi_dc_dct_pred[0]                      \
                          << (3 - p_vpar->picture.i_intra_dc_precision );    \
-    PF_MBFUNC( p_vpar, p_idct );
+    PF_MBFUNC( p_vpar, p_idct, p_vpar->sequence.intra_quant.pi_matrix );
+
+#define DECODE_CHROMABLOCK( I_B, PF_MBFUNC, I_CC )                          \
+    p_idct = &p_mb->p_idcts[I_B];                                           \
+    memset( p_idct->pi_block, 0, 64*sizeof(dctelem_t) );                    \
+    p_vpar->mb.pi_dc_dct_pred[I_CC] += GetChromaDCDiff( p_vpar );           \
+    p_idct->pi_block[0] = p_vpar->mb.pi_dc_dct_pred[I_CC]                   \
+                         << (3 - p_vpar->picture.i_intra_dc_precision );    \
+    PF_MBFUNC( p_vpar, p_idct,                                              \
+               p_vpar->sequence.chroma_intra_quant.pi_matrix );
 
 #define DECLARE_INTRAMB( PSZ_NAME, PF_MBFUNC )                              \
 static __inline__ void PSZ_NAME( vpar_thread_t * p_vpar,                    \
                                  macroblock_t * p_mb )                      \
 {                                                                           \
-    int             i_dct_offset;                                           \
-    yuv_data_t *    p_lum_dest;                                             \
     idct_inner_t *  p_idct;                                                 \
+    int             i_b = 4;                                                \
                                                                             \
-    p_lum_dest = p_mb->pp_dest[0] + p_vpar->mb.i_offset;                    \
+    p_mb->p_y_data = p_mb->pp_dest[0] + p_vpar->mb.i_offset;                \
+    p_mb->p_u_data = p_mb->pp_dest[1] + (p_vpar->mb.i_offset                \
+                            >> p_vpar->sequence.b_chroma_h_subsampled);     \
+    p_mb->p_v_data = p_mb->pp_dest[2] + (p_vpar->mb.i_offset                \
+                            >> p_vpar->sequence.b_chroma_h_subsampled);     \
                                                                             \
-    if( p_mb->i_mb_modes & DCT_TYPE_INTERLACED )                            \
+    DECODE_LUMABLOCK( 0, PF_MBFUNC );                                       \
+    DECODE_LUMABLOCK( 1, PF_MBFUNC );                                       \
+    DECODE_LUMABLOCK( 2, PF_MBFUNC );                                       \
+    DECODE_LUMABLOCK( 3, PF_MBFUNC );                                       \
+                                                                            \
+    do                                                                      \
     {                                                                       \
-        i_dct_offset = p_vpar->picture.i_field_width;                       \
-        p_mb->i_lum_dct_stride = p_vpar->picture.i_field_width * 2;         \
+        DECODE_CHROMABLOCK( i_b, PF_MBFUNC, 1 );                            \
+        DECODE_CHROMABLOCK( i_b + 1, PF_MBFUNC, 2 );                        \
+        i_b += 2;                                                           \
     }                                                                       \
-    else                                                                    \
-    {                                                                       \
-        i_dct_offset = p_vpar->picture.i_field_width * 8;                   \
-        p_mb->i_lum_dct_stride = p_vpar->picture.i_field_width;             \
-    }                                                                       \
-    p_mb->i_chrom_dct_stride = p_vpar->picture.i_field_width >> 1;          \
-                                                                            \
-    DECODE_LUMABLOCK( 0, p_lum_dest, PF_MBFUNC );                           \
-    DECODE_LUMABLOCK( 1, p_lum_dest + 8, PF_MBFUNC );                       \
-    DECODE_LUMABLOCK( 2, p_lum_dest + i_dct_offset, PF_MBFUNC );            \
-    DECODE_LUMABLOCK( 3, p_lum_dest + i_dct_offset + 8, PF_MBFUNC );        \
-                                                                            \
-    p_idct = &p_mb->p_idcts[4];                                             \
-    memset( p_idct->pi_block, 0, 64*sizeof(dctelem_t) );                    \
-    p_idct->p_dct_data = p_mb->pp_dest[1] + (p_vpar->mb.i_offset >> 1);     \
-    p_vpar->mb.pi_dc_dct_pred[1] += GetChromaDCDiff( p_vpar );              \
-    p_idct->pi_block[0] = p_vpar->mb.pi_dc_dct_pred[1]                      \
-                         << (3 - p_vpar->picture.i_intra_dc_precision );    \
-    PF_MBFUNC( p_vpar, p_idct );                                            \
-                                                                            \
-    p_idct = &p_mb->p_idcts[5];                                             \
-    memset( p_idct->pi_block, 0, 64*sizeof(dctelem_t) );                    \
-    p_idct->p_dct_data = p_mb->pp_dest[2] + (p_vpar->mb.i_offset >> 1);     \
-    p_vpar->mb.pi_dc_dct_pred[2] += GetChromaDCDiff( p_vpar );              \
-    p_idct->pi_block[0] = p_vpar->mb.pi_dc_dct_pred[2]                      \
-                         << (3 - p_vpar->picture.i_intra_dc_precision );    \
-    PF_MBFUNC( p_vpar, p_idct );                                            \
+    while( i_b < 4 + p_vpar->sequence.i_chroma_nb_blocks );                 \
 }
 
 DECLARE_INTRAMB( MPEG1IntraMB, MPEG1Intra );
@@ -1010,53 +997,59 @@ DECLARE_INTRAMB( MPEG2IntraB15MB, MPEG2IntraB15 );
 
 #undef DECLARE_INTRAMB
 #undef DECODE_LUMABLOCK
+#undef DECODE_CHROMABLOCK
 
-#define DECODE_BLOCK( i_b, p_dest, PF_MBFUNC )                              \
-    if( p_mb->i_coded_block_pattern & (1 << (5 - i_b)) )                    \
+#define DECODE_LUMABLOCK( I_B, PF_MBFUNC )                                  \
+    if( p_mb->i_coded_block_pattern & (1 << (3 + p_vpar->sequence.i_chroma_nb_blocks - (I_B))) )                    \
     {                                                                       \
-        p_idct = &p_mb->p_idcts[i_b];                                       \
+        p_idct = &p_mb->p_idcts[I_B];                                       \
         memset( p_idct->pi_block, 0, 64*sizeof(dctelem_t) );                \
-        p_idct->p_dct_data = p_dest;                                        \
-        PF_MBFUNC( p_vpar, p_idct );                                        \
+        PF_MBFUNC( p_vpar, p_idct,                                          \
+                   p_vpar->sequence.nonintra_quant.pi_matrix );             \
+    }
+
+#define DECODE_CHROMABLOCK( I_B, PF_MBFUNC )                                \
+    if( p_mb->i_coded_block_pattern & (1 << (3 + p_vpar->sequence.i_chroma_nb_blocks - (I_B))) )                    \
+    {                                                                       \
+        p_idct = &p_mb->p_idcts[I_B];                                       \
+        memset( p_idct->pi_block, 0, 64*sizeof(dctelem_t) );                \
+        PF_MBFUNC( p_vpar, p_idct,                                          \
+                   p_vpar->sequence.chroma_nonintra_quant.pi_matrix );      \
     }
 
 #define DECLARE_NONINTRAMB( PSZ_NAME, PF_MBFUNC )                           \
 static __inline__ void PSZ_NAME( vpar_thread_t * p_vpar,                    \
                                  macroblock_t * p_mb )                      \
 {                                                                           \
-    int             i_dct_offset;                                           \
-    yuv_data_t *    p_lum_dest;                                             \
     idct_inner_t *  p_idct;                                                 \
+    int             i_b = 4;                                                \
                                                                             \
-    p_lum_dest = p_mb->pp_dest[0] + p_vpar->mb.i_offset;                    \
+    p_mb->p_y_data = p_mb->pp_dest[0] + p_vpar->mb.i_offset;                \
+    p_mb->p_u_data = p_mb->pp_dest[1] + (p_vpar->mb.i_offset                \
+                            >> p_vpar->sequence.b_chroma_h_subsampled);     \
+    p_mb->p_v_data = p_mb->pp_dest[2] + (p_vpar->mb.i_offset                \
+                            >> p_vpar->sequence.b_chroma_h_subsampled);     \
                                                                             \
-    if( p_mb->i_mb_modes & DCT_TYPE_INTERLACED )                            \
+    DECODE_LUMABLOCK( 0, PF_MBFUNC );                                       \
+    DECODE_LUMABLOCK( 1, PF_MBFUNC );                                       \
+    DECODE_LUMABLOCK( 2, PF_MBFUNC );                                       \
+    DECODE_LUMABLOCK( 3, PF_MBFUNC );                                       \
+                                                                            \
+    do                                                                      \
     {                                                                       \
-        i_dct_offset = p_vpar->picture.i_field_width;                       \
-        p_mb->i_lum_dct_stride = p_vpar->picture.i_field_width * 2;         \
+        DECODE_CHROMABLOCK( i_b, PF_MBFUNC );                               \
+        DECODE_CHROMABLOCK( i_b + 1, PF_MBFUNC );                           \
+        i_b += 2;                                                           \
     }                                                                       \
-    else                                                                    \
-    {                                                                       \
-        i_dct_offset = p_vpar->picture.i_field_width * 8;                   \
-        p_mb->i_lum_dct_stride = p_vpar->picture.i_field_width;             \
-    }                                                                       \
-    p_mb->i_chrom_dct_stride = p_vpar->picture.i_field_width >> 1;          \
-                                                                            \
-    DECODE_BLOCK( 0, p_lum_dest, PF_MBFUNC );                               \
-    DECODE_BLOCK( 1, p_lum_dest + 8, PF_MBFUNC );                           \
-    DECODE_BLOCK( 2, p_lum_dest + i_dct_offset, PF_MBFUNC );                \
-    DECODE_BLOCK( 3, p_lum_dest + i_dct_offset + 8, PF_MBFUNC );            \
-    DECODE_BLOCK( 4, p_mb->pp_dest[1] + (p_vpar->mb.i_offset >> 1),         \
-                  PF_MBFUNC );                                              \
-    DECODE_BLOCK( 5, p_mb->pp_dest[2] + (p_vpar->mb.i_offset >> 1),         \
-                  PF_MBFUNC );                                              \
+    while( i_b < 4 + p_vpar->sequence.i_chroma_nb_blocks );                 \
 }
 
 DECLARE_NONINTRAMB( MPEG1NonIntraMB, MPEG1NonIntra );
 DECLARE_NONINTRAMB( MPEG2NonIntraMB, MPEG2NonIntra );
 
 #undef DECLARE_NONINTRAMB
-#undef DECODE_BLOCK
+#undef DECODE_LUMABLOCK
+#undef DECODE_CHROMABLOCK
 
 
 /*
@@ -1592,16 +1585,48 @@ static __inline__ int CodedPattern( vpar_thread_t * p_vpar )
     lookup_t *  p_tab;
     int         i_code;
 
-    if( (i_code = ShowBits( &p_vpar->bit_stream, 7 )) >= 0x10 ) /* ? */
+    if( (i_code = ShowBits( &p_vpar->bit_stream, 7 )) >= 0x10 )
     {
         p_tab = CBP_7 - 16 + i_code;
         RemoveBits( &p_vpar->bit_stream, p_tab->i_length );
+        if( p_vpar->sequence.i_chroma_format != CHROMA_420 )
+        {
+            int i_value = p_tab->i_value;
+
+            if( p_vpar->sequence.i_chroma_format != CHROMA_444 )
+            {
+                i_value <<= 2;
+                i_value |= GetBits( &p_vpar->bit_stream, 2 );
+            }
+            else
+            {
+                i_value <<= 6;
+                i_value |= GetBits( &p_vpar->bit_stream, 6 );
+            }
+            return( i_value );
+        }
         return( p_tab->i_value );
     }
     else
     {
         p_tab = CBP_9 + ShowBits( &p_vpar->bit_stream, 9 );
         RemoveBits( &p_vpar->bit_stream, p_tab->i_length );
+        if( p_vpar->sequence.i_chroma_format != CHROMA_420 )
+        {
+            int i_value = p_tab->i_value;
+
+            if( p_vpar->sequence.i_chroma_format != CHROMA_444 )
+            {
+                i_value <<= 2;
+                i_value |= GetBits( &p_vpar->bit_stream, 2 );
+            }
+            else
+            {
+                i_value <<= 6;
+                i_value |= GetBits( &p_vpar->bit_stream, 6 );
+            }
+            return( i_value );
+        }
         return( p_tab->i_value );
     }
 }
@@ -1746,18 +1771,18 @@ mb_intra:
             p_vpar->picture.b_concealment_mv )                              \
         {                                                                   \
             p_f_motion->pppi_ref[0][0] += 16 * i_offset;                    \
-            p_f_motion->pppi_ref[0][1] += 4 * i_offset;                     \
-            p_f_motion->pppi_ref[0][2] += 4 * i_offset;                     \
+            p_f_motion->pppi_ref[0][1] += i_chroma_tmp;                  \
+            p_f_motion->pppi_ref[0][2] += i_chroma_tmp;                  \
         }                                                                   \
         if( i_coding_type == B_CODING_TYPE )                                \
         {                                                                   \
             p_b_motion->pppi_ref[0][0] += 16 * i_offset;                    \
-            p_b_motion->pppi_ref[0][1] += 4 * i_offset;                     \
-            p_b_motion->pppi_ref[0][2] += 4 * i_offset;                     \
+            p_b_motion->pppi_ref[0][1] += i_chroma_tmp;                  \
+            p_b_motion->pppi_ref[0][2] += i_chroma_tmp;                  \
         }                                                                   \
         p_dest[0] += 16 * i_offset;                                         \
-        p_dest[1] += 4 * i_offset;                                          \
-        p_dest[2] += 4 * i_offset;                                          \
+        p_dest[1] += 4 * i_offset;                                       \
+        p_dest[2] += 4 * i_offset;                                       \
         i_offset = 0;                                                       \
     }                                                                       \
     p_vpar->mb.i_offset = i_offset;
@@ -1774,7 +1799,7 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
                                    u32 i_vert_code, boolean_t b_mpeg2,
                                    int i_coding_type, int i_structure )
 {
-    int             i_offset, i_width;
+    int             i_offset, i_width, i_chroma_tmp;
     picture_t *     pp_forward_ref[2];
     yuv_data_t *    p_dest[3];
 
@@ -1805,6 +1830,10 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
     if( i_structure != FRAME_STRUCTURE )
     {
         i_offset <<= 1;
+        i_chroma_tmp =
+            i_offset * (2 - p_vpar->sequence.b_chroma_v_subsampled)
+             * (2 - p_vpar->sequence.b_chroma_h_subsampled)
+              + (i_width >> p_vpar->sequence.b_chroma_h_subsampled);
         pp_forward_ref[1] = p_vpar->sequence.p_forward;
 
         if( i_coding_type != B_CODING_TYPE && p_vpar->picture.b_second_field )
@@ -1815,28 +1844,31 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
         if( i_coding_type != I_CODING_TYPE || p_vpar->picture.b_concealment_mv )
         {
             p_f_motion->pppi_ref[1][0] =
-                    pp_forward_ref[1]->p_y + i_offset * 4 + i_width;
+                pp_forward_ref[1]->p_y + i_offset * 4 + i_width;
             p_f_motion->pppi_ref[1][1] =
-                    pp_forward_ref[1]->p_u + i_offset + (i_width >> 1);
+                pp_forward_ref[1]->p_u + i_chroma_tmp;
             p_f_motion->pppi_ref[1][2] =
-                    pp_forward_ref[1]->p_v + i_offset + (i_width >> 1);
+                pp_forward_ref[1]->p_v + i_chroma_tmp;
         }
         if( i_coding_type == B_CODING_TYPE )
         {
             p_b_motion->pppi_ref[1][0] =
                 p_vpar->sequence.p_backward->p_y + i_offset * 4 + i_width;
             p_b_motion->pppi_ref[1][1] =
-                p_vpar->sequence.p_backward->p_u + i_offset + (i_width >> 1);
+                p_vpar->sequence.p_backward->p_u + i_chroma_tmp;
             p_b_motion->pppi_ref[1][2] =
-                p_vpar->sequence.p_backward->p_v + i_offset + (i_width >> 1);
+                p_vpar->sequence.p_backward->p_v + i_chroma_tmp;
         }
     }
 
+    i_chroma_tmp = i_offset
+                        * (2 - p_vpar->sequence.b_chroma_v_subsampled)
+                        * (2 - p_vpar->sequence.b_chroma_h_subsampled);
     if( i_coding_type != I_CODING_TYPE || p_vpar->picture.b_concealment_mv )
     {
         p_f_motion->pppi_ref[0][0] = pp_forward_ref[0]->p_y + i_offset * 4;
-        p_f_motion->pppi_ref[0][1] = pp_forward_ref[0]->p_u + i_offset;
-        p_f_motion->pppi_ref[0][2] = pp_forward_ref[0]->p_v + i_offset;
+        p_f_motion->pppi_ref[0][1] = pp_forward_ref[0]->p_u + i_chroma_tmp;
+        p_f_motion->pppi_ref[0][2] = pp_forward_ref[0]->p_v + i_chroma_tmp;
         p_f_motion->pi_f_code[0] = p_vpar->picture.ppi_f_code[0][0];
         p_f_motion->pi_f_code[1] = p_vpar->picture.ppi_f_code[0][1];
         p_f_motion->ppi_pmv[0][0] = p_f_motion->ppi_pmv[0][1] = 0;
@@ -1848,9 +1880,9 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
         p_b_motion->pppi_ref[0][0] = p_vpar->sequence.p_backward->p_y
                                         + i_offset * 4;
         p_b_motion->pppi_ref[0][1] = p_vpar->sequence.p_backward->p_u
-                                        + i_offset;
+            + i_chroma_tmp;
         p_b_motion->pppi_ref[0][2] = p_vpar->sequence.p_backward->p_v
-                                        + i_offset;
+            + i_chroma_tmp;
         p_b_motion->pi_f_code[0] = p_vpar->picture.ppi_f_code[1][0];
         p_b_motion->pi_f_code[1] = p_vpar->picture.ppi_f_code[1][1];
         p_b_motion->ppi_pmv[0][0] = p_b_motion->ppi_pmv[0][1] = 0;
@@ -1859,14 +1891,14 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
 
     /* Initialize destination pointers. */
     p_dest[0] = p_vpar->picture.p_picture->p_y + i_offset * 4;
-    p_dest[1] = p_vpar->picture.p_picture->p_u + i_offset;
-    p_dest[2] = p_vpar->picture.p_picture->p_v + i_offset;
+    p_dest[1] = p_vpar->picture.p_picture->p_u + i_chroma_tmp;
+    p_dest[2] = p_vpar->picture.p_picture->p_v + i_chroma_tmp;
 
     if( i_structure == BOTTOM_FIELD )
     {
         p_dest[0] += i_width;
-        p_dest[1] += i_width >> 1;
-        p_dest[2] += i_width >> 1;
+        p_dest[1] += i_width >> p_vpar->sequence.b_chroma_h_subsampled;
+        p_dest[2] += i_width >> p_vpar->sequence.b_chroma_h_subsampled;
     }
     i_width = p_vpar->picture.i_field_width;
 
@@ -1877,19 +1909,22 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
 
     p_vpar->mb.i_offset = MacroblockAddressIncrement( p_vpar ) << 4;
 
+    i_chroma_tmp = i_width * 4
+                        * (2 - p_vpar->sequence.b_chroma_v_subsampled)
+                        * (2 - p_vpar->sequence.b_chroma_h_subsampled);
     while( (int)(p_vpar->mb.i_offset - p_vpar->sequence.i_width) >= 0 )
     {
         /* Unusual construct at the start of some slices. Jump one line. */
         p_vpar->mb.i_offset -= p_vpar->sequence.i_width;
         p_dest[0] += i_width * 16;
-        p_dest[1] += i_width * 4;
-        p_dest[2] += i_width * 4;
+        p_dest[1] += i_chroma_tmp;
+        p_dest[2] += i_chroma_tmp;
         p_f_motion->pppi_ref[0][0] += i_width * 16;
-        p_f_motion->pppi_ref[0][1] += i_width * 4;
-        p_f_motion->pppi_ref[0][2] += i_width * 4;
+        p_f_motion->pppi_ref[0][1] += i_chroma_tmp;
+        p_f_motion->pppi_ref[0][2] += i_chroma_tmp;
         p_f_motion->pppi_ref[1][0] += i_width * 16;
-        p_f_motion->pppi_ref[1][1] += i_width * 4;
-        p_f_motion->pppi_ref[1][2] += i_width * 4;
+        p_f_motion->pppi_ref[1][1] += i_chroma_tmp;
+        p_f_motion->pppi_ref[1][2] += i_chroma_tmp;
     }
 
     for( ; ; )
@@ -1937,7 +1972,6 @@ static __inline__ void ParseSlice( vpar_thread_t * p_vpar,
             }
 
             /* Decode blocks */
-            p_mb->i_coded_block_pattern = (1 << 6) - 1;
             if( b_mpeg2 )
             {
                 if( p_vpar->picture.b_intra_vlc_format )

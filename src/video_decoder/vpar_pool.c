@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: vpar_pool.c,v 1.3 2001/09/25 11:46:14 massiot Exp $
+ * $Id: vpar_pool.c,v 1.4 2001/10/11 13:19:27 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -77,6 +77,7 @@ void vpar_InitPool( vpar_thread_t * p_vpar )
     p_vpar->pool.p_macroblocks = NULL;
     p_vpar->pool.pp_empty_macroblocks = NULL;
     p_vpar->pool.pp_new_macroblocks = NULL;
+    p_vpar->pool.p_vpar = p_vpar;
     vpar_SpawnPool( p_vpar );
 
     /* Initialize fake video decoder structure (used when
@@ -92,7 +93,7 @@ void vpar_InitPool( vpar_thread_t * p_vpar )
     p_vpar->pool.p_vdec->p_pool = &p_vpar->pool;
     vdec_InitThread( p_vpar->pool.p_vdec );
 
-    for( j = 0; j < 6; j++ )
+    for( j = 0; j < 12; j++ )
     {
         p_vpar->pool.mb.p_idcts[j].pi_block =
         memalign( 16, 64 * sizeof(dctelem_t) );
@@ -110,13 +111,11 @@ void vpar_InitPool( vpar_thread_t * p_vpar )
 void vpar_SpawnPool( vpar_thread_t * p_vpar )
 {
     int                 i_new_smp;
-    boolean_t           b_grayscale;
     stream_ctrl_t *     p_control;
 
     p_control = p_vpar->p_config->decoder_config.p_stream_ctrl;
     vlc_mutex_lock( &p_control->control_lock );
     i_new_smp = p_control->i_smp;
-    b_grayscale = p_control->b_grayscale;
     vlc_mutex_unlock( &p_control->control_lock );
 
     /* FIXME: No error check because I'm tired. Come back later... */
@@ -136,7 +135,7 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
 
                 vdec_DestroyThread( p_vpar->pool.pp_vdec[i] );
 
-                for( j = 0; j < 6; j++ )
+                for( j = 0; j < 12; j++ )
                 {
                     free( p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block );
                 }
@@ -172,7 +171,7 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
             {
                 int j;
 
-                for( j = 0; j < 6; j++ )
+                for( j = 0; j < 12; j++ )
                 {
                     p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block =
                         memalign( 16, 64 * sizeof(dctelem_t) );
@@ -206,15 +205,6 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
         p_vpar->pool.pf_free_mb = FreeMacroblockDummy;
         p_vpar->pool.pf_decode_mb = DecodeMacroblockDummy;
     }
-
-    if( !b_grayscale )
-    {
-        p_vpar->pool.pf_vdec_decode = vdec_DecodeMacroblockC;
-    }
-    else
-    {
-        p_vpar->pool.pf_vdec_decode = vdec_DecodeMacroblockBW;
-    }
 }
 
 /*****************************************************************************
@@ -230,7 +220,7 @@ void vpar_EndPool( vpar_thread_t * p_vpar )
 
         vdec_DestroyThread( p_vpar->pool.pp_vdec[i] );
 
-        for( j = 0; j < 6; j++ )
+        for( j = 0; j < 12; j++ )
         {
             free( p_vpar->pool.p_macroblocks[i].p_idcts[j].pi_block );
         }

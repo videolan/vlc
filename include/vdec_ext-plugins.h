@@ -2,7 +2,7 @@
  * vdec_ext-plugins.h : structures from the video decoder exported to plug-ins
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_ext-plugins.h,v 1.5 2001/09/25 11:46:13 massiot Exp $
+ * $Id: vdec_ext-plugins.h,v 1.6 2001/10/11 13:19:27 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,8 +34,6 @@ typedef struct idct_inner_s
                                         /* sparse IDCT or not, add or copy ? */
     int                     i_sparse_pos;                  /* position of the
                                                             * non-NULL coeff */
-    yuv_data_t *            p_dct_data;              /* pointer to the position
-                                                      * in the final picture */
 } idct_inner_t;
 
 typedef struct motion_inner_s
@@ -53,11 +51,14 @@ typedef struct macroblock_s
     int                     i_mb_modes;
 
     /* IDCT information */
-    idct_inner_t            p_idcts[6];
+    idct_inner_t            p_idcts[12];
     int                     i_coded_block_pattern;
                                                  /* which blocks are coded ? */
-    int                     i_lum_dct_stride, i_chrom_dct_stride;
-                                 /* nb of coeffs to jump when changing lines */
+    yuv_data_t *            p_y_data;
+    yuv_data_t *            p_u_data;
+    yuv_data_t *            p_v_data;
+                                                    /* pointers to the position
+                                                     * in the final picture  */
 
     /* Motion compensation information */
     motion_inner_t          p_motions[8];

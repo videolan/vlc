@@ -2,7 +2,7 @@
  * video_decoder.c : video decoder thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_decoder.c,v 1.58 2001/09/05 16:07:50 massiot Exp $
+ * $Id: video_decoder.c,v 1.59 2001/10/11 13:19:27 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -183,7 +183,8 @@ static __inline__ void MotionBlock( vdec_pool_t * p_pool,
                                     yuv_data_t * pp_dest[3], int i_dest_offset,
                                     yuv_data_t * pp_src[3], int i_src_offset,
                                     int i_stride, int i_height,
-                                    boolean_t b_second_half, boolean_t b_color )
+                                    boolean_t b_second_half,
+                                    int i_chroma_format )
 {
     int             i_xy_half;
     yuv_data_t *    p_src1;
@@ -199,28 +200,37 @@ static __inline__ void MotionBlock( vdec_pool_t * p_pool,
             ( pp_dest[0] + i_dest_offset + b_second_half * (i_stride << 3),
               p_src1, i_stride, i_height );
 
-    if( b_color )
+    if( i_chroma_format != CHROMA_NONE )
     {
         /* Expanded at compile-time. */
-        i_x_pred /= 2;
-        i_y_pred /= 2;
+        if( i_chroma_format != CHROMA_444 )
+        {
+            i_x_pred /= 2;
+            i_stride >>= 1;
+            i_src_offset >>= 1;
+            i_dest_offset >>= 1;
+        }
+        if( i_chroma_format == CHROMA_420 )
+        {
+            i_y_pred /= 2;
+            i_height >>= 1;
+        }
 
         i_xy_half = ((i_y_pred & 1) << 1) | (i_x_pred & 1);
-        i_stride >>= 1;
-        i_height >>= 1;
-        i_src_offset >>= 1;
-        i_src_offset += b_second_half * (i_stride << 2);
-        i_dest_offset >>= 1;
-        i_dest_offset += b_second_half * (i_stride << 2);
+
+        i_src_offset += b_second_half * (i_stride << 3);
+        i_dest_offset += b_second_half * (i_stride << 3);
 
         p_src1 = pp_src[1] + i_src_offset
                     + (i_x_pred >> 1) + (i_y_pred >> 1) * i_stride;
         p_src2 = pp_src[2] + i_src_offset
                     + (i_x_pred >> 1) + (i_y_pred >> 1) * i_stride;
 
-        p_pool->ppppf_motion[b_average][1][i_xy_half]
+        p_pool->ppppf_motion[b_average][(i_chroma_format != CHROMA_444)]
+                            [i_xy_half]
                 ( pp_dest[1] + i_dest_offset, p_src1, i_stride, i_height );
-        p_pool->ppppf_motion[b_average][1][i_xy_half]
+        p_pool->ppppf_motion[b_average][(i_chroma_format != CHROMA_444)]
+                            [i_xy_half]
                 ( pp_dest[2] + i_dest_offset, p_src2, i_stride, i_height );
     }
 }
@@ -229,12 +239,62 @@ static __inline__ void MotionBlock( vdec_pool_t * p_pool,
 /*****************************************************************************
  * DecodeMacroblock: decode a macroblock
  *****************************************************************************/
-#define DECLARE_DECODEMB( PSZ_NAME, B_COLOR )                               \
+#define DECODE_INTRA_BLOCK( i_b, p_dest, I_CHROMA )                         \
+    p_idct = &p_mb->p_idcts[i_b];                                           \
+    p_idct->pf_idct( p_idct->pi_block, p_dest,                              \
+                     i_b < 4 ? i_lum_dct_stride :                           \
+                         I_CHROMA == CHROMA_420 ?                           \
+                         p_vpar->picture.i_field_width >> 1 :               \
+                         i_chrom_dct_stride,                                \
+                     p_vdec->p_idct_data, p_idct->i_sparse_pos ); 
+
+#define DECODE_NONINTRA_BLOCK( i_b, p_dest, I_CHROMA )                      \
+    if( p_mb->i_coded_block_pattern & (1 << (3 + p_vpar->sequence.i_chroma_nb_blocks - i_b)) )                    \
+    {                                                                       \
+        DECODE_INTRA_BLOCK( i_b, p_dest, I_CHROMA );                        \
+    }
+    
+#define DECLARE_DECODEMB( PSZ_NAME, I_CHROMA )                              \
 void PSZ_NAME ( vdec_thread_t *p_vdec, macroblock_t * p_mb )                \
 {                                                                           \
-    int             i;                                                      \
+    int             i, i_lum_dct_offset, i_lum_dct_stride;                  \
+    /* This is to keep the compiler happy with CHROMA_420 and CHROMA_NONE */\
+    int             i_chrom_dct_offset __attribute__((unused));             \
+    int             i_chrom_dct_stride __attribute__((unused));             \
     idct_inner_t *  p_idct;                                                 \
     vdec_pool_t *   p_pool = p_vdec->p_pool;                                \
+    vpar_thread_t * p_vpar = p_pool->p_vpar;                                \
+                                                                            \
+    if( p_mb->i_mb_modes & DCT_TYPE_INTERLACED )                            \
+    {                                                                       \
+        i_lum_dct_offset = p_vpar->picture.i_field_width;                   \
+        i_lum_dct_stride = p_vpar->picture.i_field_width * 2;             \
+        if( I_CHROMA == CHROMA_422 )                                        \
+        {                                                                   \
+            i_chrom_dct_offset = p_vpar->picture.i_field_width >> 1;        \
+            i_chrom_dct_stride = p_vpar->picture.i_field_width;             \
+        }                                                                   \
+        else if( I_CHROMA == CHROMA_444 )                                   \
+        {                                                                   \
+            i_chrom_dct_offset = p_vpar->picture.i_field_width;             \
+            i_chrom_dct_stride = p_vpar->picture.i_field_width * 2;         \
+        }                                                                   \
+    }                                                                       \
+    else                                                                    \
+    {                                                                       \
+        i_lum_dct_offset = p_vpar->picture.i_field_width * 8;               \
+        i_lum_dct_stride = p_vpar->picture.i_field_width;                   \
+        if( I_CHROMA == CHROMA_422 )                                        \
+        {                                                                   \
+            i_chrom_dct_offset = p_vpar->picture.i_field_width * 4;         \
+            i_chrom_dct_stride = p_vpar->picture.i_field_width >> 1;        \
+        }                                                                   \
+        else if( I_CHROMA == CHROMA_444 )                                   \
+        {                                                                   \
+            i_chrom_dct_offset = p_vpar->picture.i_field_width * 8;         \
+            i_chrom_dct_stride = p_vpar->picture.i_field_width;             \
+        }                                                                   \
+    }                                                                       \
                                                                             \
     if( !(p_mb->i_mb_modes & MB_INTRA) )                                    \
     {                                                                       \
@@ -249,44 +309,81 @@ void PSZ_NAME ( vdec_thread_t *p_vdec, macroblock_t * p_mb )                \
                          p_mb->pp_dest, p_motion->i_dest_offset,            \
                          p_motion->pp_source, p_motion->i_src_offset,       \
                          p_motion->i_stride, p_motion->i_height,            \
-                         p_motion->b_second_half, B_COLOR );                \
+                         p_motion->b_second_half, I_CHROMA );               \
         }                                                                   \
                                                                             \
-        for( i = 0, p_idct = p_mb->p_idcts; i < 4 + 2 * B_COLOR;            \
-             i++, p_idct++ )                                                \
+        /*                                                                  \
+         * Inverse DCT (ISO/IEC 13818-2 section Annex A) and                \
+         * adding prediction and coefficient data (ISO/IEC                  \
+         * 13818-2 section 7.6.8)                                           \
+         */                                                                 \
+        DECODE_NONINTRA_BLOCK( 0, p_mb->p_y_data, I_CHROMA );               \
+        DECODE_NONINTRA_BLOCK( 1, p_mb->p_y_data + 8, I_CHROMA );           \
+        DECODE_NONINTRA_BLOCK( 2, p_mb->p_y_data + i_lum_dct_offset,        \
+                               I_CHROMA );                                  \
+        DECODE_NONINTRA_BLOCK( 3, p_mb->p_y_data + i_lum_dct_offset + 8,    \
+                               I_CHROMA );                                  \
+        if( I_CHROMA != CHROMA_NONE )                                       \
         {                                                                   \
-            if( p_mb->i_coded_block_pattern & (1 << (5 - i)) )              \
+            DECODE_NONINTRA_BLOCK( 4, p_mb->p_u_data, I_CHROMA );           \
+            DECODE_NONINTRA_BLOCK( 5, p_mb->p_v_data, I_CHROMA );           \
+            if( I_CHROMA != CHROMA_420 )                                    \
             {                                                               \
-                /*                                                          \
-                 * Inverse DCT (ISO/IEC 13818-2 section Annex A) and        \
-                 * adding prediction and coefficient data (ISO/IEC          \
-                 * 13818-2 section 7.6.8)                                   \
-                 */                                                         \
-                p_idct->pf_idct( p_idct->pi_block, p_idct->p_dct_data,      \
-                                 i < 4 ? p_mb->i_lum_dct_stride :           \
-                                         p_mb->i_chrom_dct_stride,          \
-                                 p_vdec->p_idct_data,                       \
-                                 p_idct->i_sparse_pos );                    \
+                DECODE_NONINTRA_BLOCK( 6, p_mb->p_u_data                    \
+                                           + i_chrom_dct_offset, I_CHROMA );\
+                DECODE_NONINTRA_BLOCK( 7, p_mb->p_v_data                    \
+                                           + i_chrom_dct_offset, I_CHROMA );\
+                if( I_CHROMA == CHROMA_444 )                                \
+                {                                                           \
+                    DECODE_NONINTRA_BLOCK( 8, p_mb->p_u_data + 8,           \
+                                           I_CHROMA );                      \
+                    DECODE_NONINTRA_BLOCK( 9, p_mb->p_v_data + 8,           \
+                                           I_CHROMA );                      \
+                    DECODE_NONINTRA_BLOCK( 10, p_mb->p_u_data + 8           \
+                                           + i_chrom_dct_offset, I_CHROMA );\
+                    DECODE_NONINTRA_BLOCK( 11, p_mb->p_v_data + 8           \
+                                           + i_chrom_dct_offset, I_CHROMA );\
+                }                                                           \
             }                                                               \
         }                                                                   \
     }                                                                       \
     else                                                                    \
     {                                                                       \
         /* Intra macroblock */                                              \
-        for( i = 0, p_idct = p_mb->p_idcts; i < 4 + 2 * B_COLOR;            \
-             i++, p_idct++ )                                                \
+        DECODE_INTRA_BLOCK( 0, p_mb->p_y_data, I_CHROMA );                  \
+        DECODE_INTRA_BLOCK( 1, p_mb->p_y_data + 8, I_CHROMA );              \
+        DECODE_INTRA_BLOCK( 2, p_mb->p_y_data + i_lum_dct_offset,           \
+                            I_CHROMA );                                     \
+        DECODE_INTRA_BLOCK( 3, p_mb->p_y_data + i_lum_dct_offset + 8,       \
+                            I_CHROMA );                                     \
+        if( I_CHROMA != CHROMA_NONE )                                       \
         {                                                                   \
-            p_idct->pf_idct( p_idct->pi_block, p_idct->p_dct_data,          \
-                             i < 4 ? p_mb->i_lum_dct_stride :               \
-                                     p_mb->i_chrom_dct_stride,              \
-                             p_vdec->p_idct_data,                           \
-                             p_idct->i_sparse_pos );                        \
+            DECODE_INTRA_BLOCK( 4, p_mb->p_u_data, I_CHROMA );              \
+            DECODE_INTRA_BLOCK( 5, p_mb->p_v_data, I_CHROMA );              \
+            if( I_CHROMA != CHROMA_420 )                                    \
+            {                                                               \
+                DECODE_INTRA_BLOCK( 6, p_mb->p_u_data                       \
+                                        + i_chrom_dct_offset, I_CHROMA );   \
+                DECODE_INTRA_BLOCK( 7, p_mb->p_v_data                       \
+                                        + i_chrom_dct_offset, I_CHROMA );   \
+                if( I_CHROMA == CHROMA_444 )                                \
+                {                                                           \
+                    DECODE_INTRA_BLOCK( 8, p_mb->p_u_data + 8, I_CHROMA );  \
+                    DECODE_INTRA_BLOCK( 9, p_mb->p_v_data + 8, I_CHROMA );  \
+                    DECODE_INTRA_BLOCK( 10, p_mb->p_u_data + 8              \
+                                           + i_chrom_dct_offset, I_CHROMA );\
+                    DECODE_INTRA_BLOCK( 11, p_mb->p_v_data + 8              \
+                                           + i_chrom_dct_offset, I_CHROMA );\
+                }                                                           \
+            }                                                               \
         }                                                                   \
     }                                                                       \
 }
 
-DECLARE_DECODEMB( vdec_DecodeMacroblockC, 1 );
-DECLARE_DECODEMB( vdec_DecodeMacroblockBW, 0 );
+DECLARE_DECODEMB( vdec_DecodeMacroblockBW, CHROMA_NONE );
+DECLARE_DECODEMB( vdec_DecodeMacroblock420, CHROMA_420 );
+DECLARE_DECODEMB( vdec_DecodeMacroblock422, CHROMA_422 );
+DECLARE_DECODEMB( vdec_DecodeMacroblock444, CHROMA_444 );
 
 #undef DECLARE_DECODEMB
 
