@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.7 2002/06/05 18:29:24 stef Exp $
+ * $Id: objects.c,v 1.8 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -163,22 +163,42 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
  *****************************************************************************/
 void __vlc_object_destroy( vlc_object_t *p_this )
 {
-    if( p_this->i_refcount )
-    {
-        msg_Err( p_this, "refcount is %i", p_this->i_refcount );
-        vlc_dumpstructure( p_this );
-    }
+    int i_delay = 0;
 
     if( p_this->i_children )
     {
-        msg_Err( p_this, "object still has children" );
+        msg_Err( p_this, "cannot delete object with children" );
         vlc_dumpstructure( p_this );
+        return;
     }
 
     if( p_this->i_parents )
     {
-        msg_Err( p_this, "object still has parents" );
+        msg_Err( p_this, "cannot delete object with parents" );
         vlc_dumpstructure( p_this );
+        return;
+    }
+
+    while( p_this->i_refcount )
+    {
+        if( i_delay == 0 )
+        {
+            msg_Warn( p_this, "refcount is %i, delaying before deletion",
+                              p_this->i_refcount );
+        }
+        else if( i_delay == 12 )
+        {
+            msg_Err( p_this, "refcount is %i, I have a bad feeling about this",
+                             p_this->i_refcount );
+        }
+        else if( i_delay == 42 )
+        {
+            msg_Err( p_this, "we waited too long, cancelling destruction" );
+            return;
+        }
+
+        i_delay++;
+        msleep( 100000 );
     }
 
     //msg_Dbg( p_this, "destroyed object" );
@@ -187,7 +207,6 @@ void __vlc_object_destroy( vlc_object_t *p_this )
     vlc_cond_destroy( &p_this->object_wait );
 
     free( p_this );
-    p_this = NULL;
 }
 
 /*****************************************************************************

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-04 02:09+0200\n"
+"POT-Creation-Date: 2002-06-07 11:11+0200\n"
 "PO-Revision-Date: 2002-04-20 16:58GMT\n"
 "Last-Translator: Jean-Paul Saman <jpsaman@wxs.nl>\n"
 "Language-Team: Nederlands <nl@li.org>\n"
@@ -14,13 +14,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.8\n"
 
-#: src/libvlc.c:277
+#: src/libvlc.c:281
 #, c-format
 msgid "Usage: %s [options] [parameters] [file]...\n"
 msgstr "Gebruik: %s [opties] [parameters] [file] ...\n"
 
 #. Print module name
-#: src/libvlc.c:891
+#: src/libvlc.c:898
 #, fuzzy, c-format
 msgid ""
 "%s module options:\n"
@@ -28,27 +28,27 @@ msgid ""
 msgstr "%s module opties:\n"
 
 #. We could also have "=<" here
-#: src/libvlc.c:911 src/misc/configuration.c:798
+#: src/libvlc.c:918 src/misc/configuration.c:798
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:914 src/misc/configuration.c:783
+#: src/libvlc.c:921 src/misc/configuration.c:783
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:917 src/misc/configuration.c:790
+#: src/libvlc.c:924 src/misc/configuration.c:790
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:923
+#: src/libvlc.c:930
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:924
+#: src/libvlc.c:931
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:1006
+#: src/libvlc.c:1013
 #, fuzzy
 msgid ""
 "\n"
@@ -77,7 +77,7 @@ msgstr ""
 "  vlc:pause                      \tpauzeer speellijst items\n"
 "  vlc:quit                       \tstop VLC"
 
-#: src/libvlc.c:1027 src/libvlc.c:1076 src/libvlc.c:1100 src/libvlc.c:1119
+#: src/libvlc.c:1034 src/libvlc.c:1083 src/libvlc.c:1107 src/libvlc.c:1126
 #, fuzzy
 msgid ""
 "\n"
@@ -87,19 +87,19 @@ msgstr ""
 "Druk op RETURN om verder te gaan..."
 
 #. Usage
-#: src/libvlc.c:1050
+#: src/libvlc.c:1057
 #, fuzzy, c-format
 msgid ""
 "Usage: %s [options] [parameters] [file]...\n"
 "\n"
 msgstr "Gebruik: %s [opties] [parameters] [file] ...\n"
 
-#: src/libvlc.c:1053
+#: src/libvlc.c:1060
 #, fuzzy
 msgid "[module]              [description]\n"
 msgstr "[module]              [beschrijving]"
 
-#: src/libvlc.c:1094
+#: src/libvlc.c:1101
 #, fuzzy
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
@@ -176,10 +176,9 @@ msgid "audio output module"
 msgstr "audio output module"
 
 #: src/libvlc.h:60
-#, fuzzy
 msgid ""
-"This option allows you to select the audio audio output method used by vlc. "
-"The default behavior is to automatically select the best method available."
+"This option allows you to select the audio output method used by vlc. The "
+"default behavior is to automatically select the best method available."
 msgstr ""
 "Deze optie selecteert de audio output methode, die gebruikt wordt door vlc.\n"
 "Noot: Standaard wordt automatisch de best beschikbare methode gekozen."

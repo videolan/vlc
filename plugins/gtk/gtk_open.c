@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.27 2002/06/02 09:03:54 sam Exp $
+ * $Id: gtk_open.c,v 1.28 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -53,7 +53,6 @@
  * The following callbacks are related to the file requester.
  *****************************************************************************/
 gboolean GtkFileOpenShow( GtkWidget       *widget,
-                          GdkEventButton  *event,
                           gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
@@ -106,24 +105,16 @@ void GtkFileOpenOk( GtkButton * button, gpointer user_data )
     /* add the new file to the interface playlist */
     psz_filename =
         gtk_file_selection_get_filename( GTK_FILE_SELECTION( p_filesel ) );
-    playlist_Add( p_playlist, 0, (char*)psz_filename );
+    playlist_Add( p_playlist, (char*)psz_filename,
+                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
     /* catch the GTK CList */
     p_playlist_clist = GTK_CLIST( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+        GTK_OBJECT( p_intf->p_sys->p_playwin ), "playlist_clist" ) );
     /* update the plugin display */
     GtkRebuildCList( p_playlist_clist, p_playlist );
 
     vlc_object_release( p_playlist );
-    /* end current item, select added item  */
-#if 0
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
-    {
-        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-    }
-
-    intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, i_end - 1 );
-#endif
 }
 
 /*****************************************************************************
@@ -132,7 +123,6 @@ void GtkFileOpenOk( GtkButton * button, gpointer user_data )
  * The following callbacks are related to the disc manager.
  *****************************************************************************/
 gboolean GtkDiscOpenShow( GtkWidget       *widget,
-                          GdkEventButton  *event,
                           gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
@@ -239,25 +229,16 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     /* Build source name and add it to playlist */
     sprintf( psz_source, "%s:%s@%d,%d",
              psz_method, psz_device, i_title, i_chapter );
-    playlist_Add( p_playlist, 0, psz_source );
+    playlist_Add( p_playlist, psz_source,
+                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
     free( psz_source );
 
     /* catch the GTK CList */
     p_playlist_clist = GTK_CLIST( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+        GTK_OBJECT( p_intf->p_sys->p_playwin ), "playlist_clist" ) );
 
     /* update the display */
     GtkRebuildCList( p_playlist_clist, p_playlist );
-
-    /* stop current item, select added item */
-#if 0
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
-    {
-        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-    }
-
-    intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, i_end - 1 );
-#endif
 
     vlc_object_release( p_playlist );
 }
@@ -275,7 +256,6 @@ void GtkDiscOpenCancel( GtkButton * button, gpointer user_data )
  * The following callbacks are related to the network stream manager.
  *****************************************************************************/
 gboolean GtkNetworkOpenShow( GtkWidget       *widget,
-                             GdkEventButton  *event,
                              gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
@@ -374,19 +354,15 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
 
         /* Build source name and add it to playlist */
         sprintf( psz_source, "udp:@:%i", i_port );
-
-        playlist_Add( p_playlist, 0, psz_source );
+        playlist_Add( p_playlist, psz_source,
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
         free( psz_source );
 
         /* catch the GTK CList */
         p_playlist_clist = GTK_CLIST( gtk_object_get_data(
-            GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+            GTK_OBJECT( p_intf->p_sys->p_playwin ), "playlist_clist" ) );
         /* update the display */
         GtkRebuildCList( p_playlist_clist, p_playlist );
-
-#if 0
-        intf_PlaylistJumpto( p_playlist, i_end - 1 );
-#endif
     }
 
     /* UDP Multicast */
@@ -417,19 +393,15 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
 
         /* Build source name and add it to playlist */
         sprintf( psz_source, "udp:@%s:%i", psz_address, i_port );
-
-        playlist_Add( p_playlist, 0, psz_source );
+        playlist_Add( p_playlist, psz_source,
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
         free( psz_source );
 
         /* catch the GTK CList */
         p_playlist_clist = GTK_CLIST( gtk_object_get_data(
-            GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+            GTK_OBJECT( p_intf->p_sys->p_playwin ), "playlist_clist" ) );
         /* update the display */
         GtkRebuildCList( p_playlist_clist, p_playlist );
-
-#if 0
-        intf_PlaylistJumpto( p_playlist, i_end - 1 );
-#endif
     }
     
     /* Channel server */
@@ -476,19 +448,15 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
 
         /* Build source name and add it to playlist */
         sprintf( psz_source, "http://%s", psz_address );
-
-        playlist_Add( p_playlist, 0, psz_source );
+        playlist_Add( p_playlist, psz_source,
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
         free( psz_source );
 
         /* catch the GTK CList */
         p_playlist_clist = GTK_CLIST( gtk_object_get_data(
-            GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+            GTK_OBJECT( p_intf->p_sys->p_playwin ), "playlist_clist" ) );
         /* update the display */
         GtkRebuildCList( p_playlist_clist, p_playlist );
-
-#if 0
-        intf_PlaylistJumpto( p_playlist, i_end - 1 );
-#endif
     }
 
     /* This shouldn't occur */
@@ -593,8 +561,7 @@ void GtkNetworkOpenHTTP( GtkToggleButton *togglebutton,
  * The following callbacks are related to the satellite card manager.
  *****************************************************************************/
 gboolean GtkSatOpenShow( GtkWidget       *widget,
-                          GdkEventButton  *event,
-                          gpointer         user_data)
+                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
@@ -662,25 +629,16 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
     /* Build source name and add it to playlist */
     sprintf( psz_source, "%s:%d,%d,%d,%d",
              "satellite", i_freq, b_pol, i_fec, i_srate );
-    playlist_Add( p_playlist, 0, psz_source );
+    playlist_Add( p_playlist, psz_source,
+                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
     free( psz_source );
 
     /* catch the GTK CList */
     p_playlist_clist = GTK_CLIST( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+        GTK_OBJECT( p_intf->p_sys->p_playwin ), "playlist_clist" ) );
 
     /* update the display */
     GtkRebuildCList( p_playlist_clist, p_playlist );
-
-    /* stop current item, select added item */
-#if 0
-    if( p_intf->p_vlc->p_input_bank->pp_input[0] != NULL )
-    {
-        p_intf->p_vlc->p_input_bank->pp_input[0]->b_eof = 1;
-    }
-
-    intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, i_end - 1 );
-#endif
 
     vlc_object_release( p_playlist );
 }
@@ -689,25 +647,5 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
 void GtkSatOpenCancel( GtkButton * button, gpointer user_data )
 {
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
-}
-
-/****************************************************************************
- * Callbacks for menuitem
- ****************************************************************************/
-void GtkFileOpenActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkFileOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void GtkDiscOpenActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkDiscOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void GtkNetworkOpenActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkNetworkOpenShow( GTK_WIDGET( menuitem ), NULL, user_data );
 }
 

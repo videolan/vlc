@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.17 2002/06/02 09:03:54 sam Exp $
+ * $Id: rc.c,v 1.18 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -53,7 +53,7 @@
  *****************************************************************************/
 struct intf_sys_s
 {
-    vlc_mutex_t         change_lock;
+    input_thread_t * p_input;
 };
 
 #define MAX_LINE_LENGTH 256
@@ -151,7 +151,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
     double     f_ratio = 1;
 
-    input_thread_t *p_input;
+    p_intf->p_sys->p_input = NULL;
 
     while( !p_intf->b_die )
     {
@@ -187,10 +187,21 @@ static void intf_Run( intf_thread_t *p_intf )
         }
 
         /* Manage the input part */
-        p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
-
-        if( p_input )
+        if( p_intf->p_sys->p_input == NULL )
         {
+            p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                                              FIND_ANYWHERE );
+        }
+        else if( p_intf->p_sys->p_input->b_dead )
+        {
+            vlc_object_release( p_intf->p_sys->p_input );
+            p_intf->p_sys->p_input = NULL;
+        }
+
+        if( p_intf->p_sys->p_input )
+        {
+            input_thread_t *p_input = p_intf->p_sys->p_input;
+
             /* Get position */
             vlc_mutex_lock( &p_input->stream.stream_lock );
             if( !p_input->b_die && p_input->stream.i_mux_rate )
@@ -234,18 +245,19 @@ static void intf_Run( intf_thread_t *p_intf )
 
             case 'p':
             case 'P':
-                if( p_input )
+                if( p_intf->p_sys->p_input )
                 {
-                    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+                    input_SetStatus( p_intf->p_sys->p_input,
+                                     INPUT_STATUS_PAUSE );
                 }
                 break;
 
             case 'f':
             case 'F':
-                if( p_input )
+                if( p_intf->p_sys->p_input )
                 {
                     vout_thread_t *p_vout;
-                    p_vout = vlc_object_find( p_input,
+                    p_vout = vlc_object_find( p_intf->p_sys->p_input,
                                               VLC_OBJECT_VOUT, FIND_CHILD );
 
                     if( p_vout )
@@ -268,7 +280,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
             case 'r':
             case 'R':
-                if( p_input )
+                if( p_intf->p_sys->p_input )
                 {
                     for( i_dummy = 1;
                          i_dummy < MAX_LINE_LENGTH && p_cmd[ i_dummy ] >= '0'
@@ -279,7 +291,8 @@ static void intf_Run( intf_thread_t *p_intf )
                     }
 
                     p_cmd[ i_dummy ] = 0;
-                    input_Seek( p_input, (off_t)atoi( p_cmd + 1 ),
+                    input_Seek( p_intf->p_sys->p_input,
+                                (off_t)atoi( p_cmd + 1 ),
                                 INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
                     /* rcreseek(f_cpos); */
                 }
@@ -304,12 +317,14 @@ static void intf_Run( intf_thread_t *p_intf )
             }
         }
 
-        if( p_input )
-        {
-            vlc_object_release( p_input );
-        }
-
         msleep( INTF_IDLE_SLEEP );
     }
+
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+        p_intf->p_sys->p_input = NULL;
+    }
+
 }
 

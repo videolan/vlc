@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.32 2002/06/01 12:31:59 sam Exp $
+ * $Id: gtk_playlist.c,v 1.33 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -62,27 +62,33 @@ static void UrlDecode( char *encoded_path );
  * Playlist window management
  ****************************************************************************/
 gboolean GtkPlaylistShow( GtkWidget       *widget,
-                          GdkEventButton  *event,
                           gpointer         user_data )
 {
-#if 0 /* PLAYLIST TARASS */
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t *p_playlist;
 
-    if( GTK_WIDGET_VISIBLE( p_intf->p_sys->p_playlist ) )
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+    if( p_playlist == NULL )
     {
-        gtk_widget_hide( p_intf->p_sys->p_playlist );
+        return FALSE;
+    }
+
+    if( GTK_WIDGET_VISIBLE( p_intf->p_sys->p_playwin ) )
+    {
+        gtk_widget_hide( p_intf->p_sys->p_playwin );
     } 
     else 
     {        
         GtkCList * p_clist;
 
         p_clist = GTK_CLIST( gtk_object_get_data(
-            GTK_OBJECT( p_intf->p_sys->p_playlist ), "playlist_clist" ) );
-        GtkRebuildCList( p_clist , p_intf->p_vlc->p_playlist );
-        gtk_widget_show( p_intf->p_sys->p_playlist );
-        gdk_window_raise( p_intf->p_sys->p_playlist->window );
+            GTK_OBJECT( p_intf->p_sys->p_playwin ), "playlist_clist" ) );
+        GtkRebuildCList( p_clist , p_playlist );
+        gtk_widget_show( p_intf->p_sys->p_playwin );
+        gdk_window_raise( p_intf->p_sys->p_playwin->window );
     }
-#endif
+
+    vlc_object_release( p_playlist );
 
     return TRUE;
 }
@@ -102,62 +108,39 @@ void GtkPlaylistCancel( GtkButton * button, gpointer user_data )
 
 
 gboolean GtkPlaylistPrev( GtkWidget       *widget,
-                          GdkEventButton  *event,
                           gpointer         user_data )
 {
-#if 0 /* PLAYLIST TARASS */
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t *p_playlist;
 
-    if( p_intf->p_sys->p_input != NULL )
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
+    if( p_playlist )
     {
-        /* FIXME: temporary hack */
-        intf_PlaylistPrev( p_intf->p_vlc->p_playlist );
-        intf_PlaylistPrev( p_intf->p_vlc->p_playlist );
-        p_intf->p_sys->p_input->b_eof = 1;
+        playlist_Prev( p_playlist );
+        vlc_object_release( p_playlist );
     }
-#endif
 
     return TRUE;
 }
 
 
 gboolean GtkPlaylistNext( GtkWidget       *widget,
-                          GdkEventButton  *event,
                           gpointer         user_data)
 {
-#if 0 /* PLAYLIST TARASS */
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t *p_playlist;
 
-    if( p_intf->p_sys->p_input != NULL )
+    p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
+
+    if( p_playlist )
     {
-        /* FIXME: temporary hack */
-        p_intf->p_sys->p_input->b_eof = 1;
+        playlist_Next( p_playlist );
+        vlc_object_release( p_playlist );
     }
-#endif
 
     return TRUE;
 }
-
-/****************************************************************************
- * Menu callbacks for playlist functions
- ****************************************************************************/
-void GtkPlaylistActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkPlaylistShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void GtkNextActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkPlaylistNext( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void GtkPrevActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkPlaylistPrev( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
 
 /****************************************************************************
  * Playlist core functions
@@ -191,7 +174,7 @@ void GtkPlaylistDeleteSelected( GtkMenuItem * menuitem, gpointer user_data )
     vlc_mutex_lock( &p_intf->change_lock );
 
     p_clist = GTK_CLIST( gtk_object_get_data( GTK_OBJECT(
-        p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+        p_intf->p_sys->p_playwin ), "playlist_clist" ) );
     
     /* I use UNDOCUMENTED features to retrieve the selection... */
     p_selection = p_clist->selection;
@@ -237,7 +220,7 @@ void GtkPlaylistInvert( GtkMenuItem * menuitem, gpointer user_data )
     vlc_mutex_lock( &p_intf->change_lock );
 
     p_clist = GTK_CLIST( gtk_object_get_data( GTK_OBJECT(
-        p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+        p_intf->p_sys->p_playwin ), "playlist_clist" ) );
     
     /* have to copy the selection to an int *
        I wasn't able to copy the g_list to another g_list
@@ -277,8 +260,13 @@ gboolean GtkPlaylistEvent( GtkWidget * widget,
                            GdkEvent  * event,
                            gpointer    user_data)
 {
-#if 0 /* PLAYLIST TARASS */
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    intf_thread_t *  p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return FALSE;
+    }
 
     if( ( event->button ).type == GDK_2BUTTON_PRESS )
     {
@@ -287,24 +275,19 @@ gboolean GtkPlaylistEvent( GtkWidget * widget,
         gint        i_col;
 
         p_clist = GTK_CLIST( gtk_object_get_data( GTK_OBJECT(
-            p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+            p_intf->p_sys->p_playwin ), "playlist_clist" ) );
         
         if( gtk_clist_get_selection_info( p_clist, (event->button).x, 
                     (event->button).y, &i_row, &i_col ) == 1 )
         {
-            /* clicked is in range. */
-            if( p_intf->p_sys->p_input != NULL )
-            {
-                /* FIXME: temporary hack */
-                p_intf->p_sys->p_input->b_eof = 1;
-            }
-
-            intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, i_row - 1 );
+            playlist_Goto( p_playlist, i_row );
         }
+
+        vlc_object_release( p_playlist );
         return TRUE;
     }
-#endif
 
+    vlc_object_release( p_playlist );
     return FALSE;
 }
 
@@ -325,7 +308,7 @@ void GtkPlaylistDragData( GtkWidget       *widget,
     int             i_end = p_intf->p_vlc->p_playlist->i_size;
 
     p_clist = GTK_CLIST( gtk_object_get_data( GTK_OBJECT(
-        p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+        p_intf->p_sys->p_playwin ), "playlist_clist" ) );
    
     if( gtk_clist_get_selection_info( p_clist, x, y, &i_row, &i_col ) == 1 )
     {
@@ -361,11 +344,11 @@ gboolean GtkPlaylistDragMotion( GtkWidget       *widget,
     p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
 
     p_clist = GTK_CLIST( gtk_object_get_data( GTK_OBJECT(
-        p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+        p_intf->p_sys->p_playwin ), "playlist_clist" ) );
 
     if( !GTK_WIDGET_TOPLEVEL(widget) )
     {
-        gdk_window_raise( p_intf->p_sys->p_playlist->window );
+        gdk_window_raise( p_intf->p_sys->p_playwin->window );
     }
 
     color.red =   0xffff;
@@ -502,7 +485,7 @@ void GtkDropDataReceived( intf_thread_t * p_intf,
         GtkAppendList( p_playlist, i_position, p_files );
 
         /* get the CList  and rebuild it. */
-        p_clist = GTK_CLIST( lookup_widget( p_intf->p_sys->p_playlist,
+        p_clist = GTK_CLIST( lookup_widget( p_intf->p_sys->p_playwin,
                                             "playlist_clist" ) ); 
         GtkRebuildCList( p_clist , p_playlist );
         
@@ -662,20 +645,24 @@ int GtkAppendList( playlist_t * p_playlist, int i_pos, GList * p_list )
 /* statis timeouted function */
 void GtkPlayListManage( intf_thread_t * p_intf )
 {
-#if 0 /* PLAYLIST TARASS */
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    GtkCList *   p_clist;
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
     /* this thing really sucks for now :( */
 
     /* TODO speak more with interface/intf_playlist.c */
-
-    playlist_t *    p_playlist = p_intf->p_vlc->p_playlist ;
-    GtkCList *      p_clist;
-
-    if( GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
+    if( GTK_IS_WIDGET( p_intf->p_sys->p_playwin ) )
     {
         p_clist = GTK_CLIST( gtk_object_get_data( GTK_OBJECT(
-                       p_intf->p_sys->p_playlist ), "playlist_clist" ) );
+                       p_intf->p_sys->p_playwin ), "playlist_clist" ) );
     
-        vlc_mutex_lock( &p_playlist->change_lock );
+        vlc_mutex_lock( &p_playlist->object_lock );
     
         if( p_intf->p_sys->i_playing != p_playlist->i_index )
         {
@@ -698,14 +685,14 @@ void GtkPlayListManage( intf_thread_t * p_intf )
             p_intf->p_sys->i_playing = p_playlist->i_index;
         }
     
-        vlc_mutex_unlock( &p_playlist->change_lock );
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
-#endif
+
+    vlc_object_release( p_playlist );
 }
 
 void GtkRebuildCList( GtkCList * p_clist, playlist_t * p_playlist )
 {
-#if 0 /* PLAYLIST TARASS */
     int         i_dummy;
     gchar *     ppsz_text[2];
     GdkColor    red;
@@ -716,18 +703,17 @@ void GtkRebuildCList( GtkCList * p_clist, playlist_t * p_playlist )
     gtk_clist_freeze( p_clist );
     gtk_clist_clear( p_clist );
    
-    vlc_mutex_lock( &p_playlist->change_lock );
+    vlc_mutex_lock( &p_playlist->object_lock );
     for( i_dummy = p_playlist->i_size ; i_dummy-- ; )
     {
-        ppsz_text[0] = p_playlist->p_item[i_dummy].psz_name;
+        ppsz_text[0] = p_playlist->pp_items[i_dummy]->psz_name;
         ppsz_text[1] = "no info";
         gtk_clist_insert( p_clist, 0, ppsz_text );
     }
-    vlc_mutex_unlock( &p_playlist->change_lock );
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
     gtk_clist_set_background( p_clist, p_playlist->i_index, &red);
     gtk_clist_thaw( p_clist );
-#endif
 }
 
 /* URL-decode a file: URL path, return NULL if it's not what we expect */

@@ -2,7 +2,7 @@
  * gtk_playlist.h : Playlist functions for the Gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_playlist.h,v 1.6 2002/06/01 12:31:59 sam Exp $
+ * $Id: gtk_playlist.h,v 1.7 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -35,9 +35,9 @@ gint     GtkCompareItems      ( gconstpointer, gconstpointer );
 int      GtkHasValidExtension ( gchar * );
 GList *  GtkReadFiles         ( gchar * );
 
-gboolean GtkPlaylistShow      ( GtkWidget *, GdkEventButton *, gpointer );
-gboolean GtkPlaylistPrev      ( GtkWidget *, GdkEventButton *, gpointer );
-gboolean GtkPlaylistNext      ( GtkWidget *, GdkEventButton *, gpointer );
+gboolean GtkPlaylistShow      ( GtkWidget *, gpointer );
+gboolean GtkPlaylistPrev      ( GtkWidget *, gpointer );
+gboolean GtkPlaylistNext      ( GtkWidget *, gpointer );
 gboolean GtkPlaylistDragMotion( GtkWidget *, GdkDragContext *,
                                 gint, gint, guint, gpointer );
 gboolean GtkPlaylistEvent     ( GtkWidget *, GdkEvent *, gpointer );
@@ -45,10 +45,6 @@ void     GtkPlaylistDragData  ( GtkWidget *, GdkDragContext *,
                                 gint, gint, GtkSelectionData *,
                                 guint, guint, gpointer  );
 void     GtkDeleteGListItem   ( gpointer, gpointer );
-
-void     GtkPlaylistActivate  ( GtkMenuItem *, gpointer );
-void     GtkNextActivate      ( GtkMenuItem *, gpointer );
-void     GtkPrevActivate      ( GtkMenuItem *, gpointer );
 
 void GtkDropDataReceived ( intf_thread_t *, GtkSelectionData *, guint, int );
 int  GtkAppendList       ( playlist_t *, int, GList * );

@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.43 2002/06/04 20:33:25 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.44 2002/06/07 14:30:40 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -55,7 +55,6 @@
  */
 
 gboolean GtkExit( GtkWidget       *widget,
-                  GdkEventButton  *event,
                   gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
@@ -71,14 +70,13 @@ gboolean GtkWindowDelete( GtkWidget       *widget,
                           GdkEvent        *event,
                           gpointer         user_data )
 {
-    GtkExit( GTK_WIDGET( widget ), NULL, user_data );
+    GtkExit( GTK_WIDGET( widget ), user_data );
 
     return TRUE;
 }
 
 
 gboolean GtkWindowToggle( GtkWidget       *widget,
-                          GdkEventButton  *event,
                           gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
@@ -97,7 +95,6 @@ gboolean GtkWindowToggle( GtkWidget       *widget,
 }
 
 gboolean GtkFullscreen( GtkWidget       *widget,
-                        GdkEventButton  *event,
                         gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
@@ -125,19 +122,8 @@ void GtkWindowDrag( GtkWidget       *widget,
                     guint            time,
                     gpointer         user_data)
 {
-#if 0 /* PLAYLIST TARASS */
     intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_window" );
-    int end = p_intf->p_vlc->p_playlist->i_size;
     GtkDropDataReceived( p_intf, data, info, PLAYLIST_END );
-
-    if( p_intf->p_sys->p_input != NULL )
-    {
-        /* FIXME: temporary hack */
-        p_intf->p_sys->p_input->b_eof = 1;
-    }
-     
-    intf_PlaylistJumpto( p_intf->p_vlc->p_playlist, end-1 );
-#endif
 }
 
 
@@ -200,8 +186,6 @@ void GtkTitlePrev( GtkButton * button, gpointer user_data )
         GtkSetupMenus( p_intf );
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
-
-    vlc_object_release( p_intf->p_sys->p_input );
 }
 
 
@@ -226,7 +210,6 @@ void GtkTitleNext( GtkButton * button, gpointer user_data )
         GtkSetupMenus( p_intf );
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
     }
-
 }
 
 
@@ -316,7 +299,6 @@ void GtkChannelGo( GtkButton * button, gpointer user_data )
  ****************************************************************************/
 
 gboolean GtkAboutShow( GtkWidget       *widget,
-                       GdkEventButton  *event,
                        gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
@@ -346,7 +328,6 @@ void GtkAboutOk( GtkButton * button, gpointer user_data)
  ****************************************************************************/
 
 gboolean GtkJumpShow( GtkWidget       *widget,
-                      GdkEventButton  *event,
                       gpointer         user_data)
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
@@ -371,6 +352,11 @@ void GtkJumpOk( GtkButton       *button,
     intf_thread_t * p_intf = GetIntf( GTK_WIDGET( button ), (char*)user_data );
     int i_hours, i_minutes, i_seconds;
 
+    if( p_intf->p_sys->p_input == NULL )
+    {
+        return;
+    }
+
 #define GET_VALUE( name )                                                   \
     gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( gtk_object_get_data( \
         GTK_OBJECT( p_intf->p_sys->p_jump ), name ) ) )
@@ -379,12 +365,10 @@ void GtkJumpOk( GtkButton       *button,
     i_seconds = GET_VALUE( "jump_second_spinbutton" );
 #undef GET_VALUE
 
-    input_Seek( p_intf, i_seconds + 60 * i_minutes + 3600 * i_hours,
-                        INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
+    input_Seek( p_intf->p_sys->p_input,
+                i_seconds + 60 * i_minutes + 3600 * i_hours,
+                INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
 
-#if 0 /* PLAYLIST TARASS */
-    p_intf->p_vlc->p_playlist->b_stopped = 0;
-#endif
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
@@ -395,51 +379,10 @@ void GtkJumpCancel( GtkButton       *button,
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
-
-/****************************************************************************
- * Callbacks for menuitems
- ****************************************************************************/
-void GtkExitActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkExit( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void GtkFullscreenActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkFullscreen( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void GtkWindowToggleActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkWindowToggle( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void GtkAboutActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkAboutShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void GtkJumpActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkJumpShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
-void GtkMessagesActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkMessagesShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
-
 /****************************************************************************
  * Callbacks for disc ejection
  ****************************************************************************/
-gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
-                        gpointer user_data )
+gboolean GtkDiscEject ( GtkWidget *widget, gpointer user_data )
 {
 #if 0 /* PLAYLIST TARASS */
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
@@ -523,17 +466,11 @@ gboolean GtkDiscEject ( GtkWidget *widget, GdkEventButton *event,
     return TRUE;
 }
 
-void GtkEjectDiscActivate ( GtkMenuItem *menuitem, gpointer user_data )
-{
-    GtkDiscEject( GTK_WIDGET( menuitem ), NULL, user_data );
-}
-
 /****************************************************************************
  * Messages window
  ****************************************************************************/
 
 gboolean GtkMessagesShow( GtkWidget       *widget,
-                          GdkEventButton  *event,
                           gpointer         user_data)
 {
     static GdkColor black = { 0, 0x0000, 0x0000, 0x0000 };

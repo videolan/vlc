@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.2 2002/06/01 17:09:25 sam Exp $
+ * $Id: libvlc.h,v 1.3 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,9 +57,9 @@
 
 #define AOUT_TEXT N_("audio output module")
 #define AOUT_LONGTEXT N_( \
-    "This option allows you to select the audio audio output method used by " \
-    "vlc. The default behavior is to automatically select the " \
-    "best method available.")
+    "This option allows you to select the audio output method used by vlc. " \
+    "The default behavior is to automatically select the best method " \
+    "available.")
 
 #define AUDIO_TEXT N_("enable audio")
 #define AUDIO_LONGTEXT N_( \
@@ -360,9 +360,9 @@ ADD_BOOL ( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT )
 
 /* Playlist options */
 ADD_CATEGORY_HINT( N_("Playlist"), NULL )
-ADD_BOOL ( "launch-playlist", 0, NULL, PL_LAUNCH_TEXT, PL_LAUNCH_LONGTEXT )
-ADD_BOOL ( "enqueue-playlist", 0, NULL, PL_ENQUEUE_TEXT, PL_ENQUEUE_LONGTEXT )
-ADD_BOOL ( "loop-playlist", 0, NULL, PL_LOOP_TEXT, PL_LOOP_LONGTEXT )
+ADD_BOOL ( "playlist", 0, NULL, PL_LAUNCH_TEXT, PL_LAUNCH_LONGTEXT )
+ADD_BOOL ( "enqueue", 0, NULL, PL_ENQUEUE_TEXT, PL_ENQUEUE_LONGTEXT )
+ADD_BOOL ( "loop", 0, NULL, PL_LOOP_TEXT, PL_LOOP_LONGTEXT )
 
 /* Misc options */
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )

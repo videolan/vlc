@@ -92,7 +92,7 @@ struct module_symbols_s
     int (* __network_ChannelJoin_inner) ( vlc_object_t *, int ) ;
     int (* __network_ChannelCreate_inner) ( vlc_object_t * ) ;
     void (* playlist_Command_inner) ( playlist_t *, int, int ) ;
-    int (* playlist_Add_inner) ( playlist_t *, int, const char * ) ;
+    int (* playlist_Add_inner) ( playlist_t *, const char *, int, int ) ;
     int (* playlist_Delete_inner) ( playlist_t *, int ) ;
     vout_thread_t * (* __vout_CreateThread_inner) ( vlc_object_t *, int, int, u32, int ) ;
     void (* vout_DestroyThread_inner) ( vout_thread_t * ) ;

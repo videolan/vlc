@@ -18,21 +18,21 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("_Open File..."),
     N_("Open a File"),
-    (gpointer) GnomeMenubarFileOpenActivate, NULL, NULL,
+    (gpointer) GtkFileOpenShow, "intf_window", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_OPEN,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Open _Disc..."),
     N_("Open a DVD or VCD"),
-    (gpointer) GnomeMenubarDiscOpenActivate, NULL, NULL,
+    (gpointer) GtkDiscOpenShow, "intf_window", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CDROM,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("_Network Stream..."),
     N_("Select a Network Stream"),
-    (gpointer) GnomeMenubarNetworkOpenActivate, NULL, NULL,
+    (gpointer) GtkNetworkOpenShow, "intf_window", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_REFRESH,
     0, (GdkModifierType) 0, NULL
   },
@@ -40,12 +40,12 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("_Eject Disc"),
     N_("Eject disc"),
-    (gpointer) GnomeMenubarDiscEjectActivate, NULL, NULL,
+    (gpointer) GtkDiscEject, "intf_window", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TOP,
     0, (GdkModifierType) 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_MENU_EXIT_ITEM (GnomeMenubarExitActivate, NULL),
+  GNOMEUIINFO_MENU_EXIT_ITEM (GtkExit, "intf_window"),
   GNOMEUIINFO_END
 };
 
@@ -54,14 +54,14 @@ static GnomeUIInfo menubar_view_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("_Hide interface"),
     NULL,
-    (gpointer) GnomeMenubarWindowToggleActivate, NULL, NULL,
+    (gpointer) GtkWindowToggle, "intf_window", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("_Fullscreen"),
     NULL,
-    (gpointer) GnomeMenubarFullscreenActivate, NULL, NULL,
+    (gpointer) GtkFullscreen, "intf_window", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
@@ -91,21 +91,21 @@ static GnomeUIInfo menubar_view_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("_Playlist..."),
     N_("Open the playlist window"),
-    (gpointer) GnomeMenubarPlaylistActivate, NULL, NULL,
+    (gpointer) GtkPlaylistShow, "intf_window", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_INDEX,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("_Modules..."),
     N_("Open the module manager"),
-    (gpointer) GnomeMenubarModulesActivate, NULL, NULL,
+    (gpointer) GtkModulesShow, "intf_window", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_ATTACH,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Messages..."),
     N_("Open the messages window"),
-    (gpointer) GnomeMenubarMessagesActivate, NULL, NULL,
+    (gpointer) GtkMessagesShow, "intf_window", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
@@ -129,13 +129,13 @@ static GnomeUIInfo menubar_settings_menu_uiinfo[] =
     0, (GdkModifierType) 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_MENU_PREFERENCES_ITEM (GnomeMenubarPreferencesActivate, NULL),
+  GNOMEUIINFO_MENU_PREFERENCES_ITEM (GtkPreferencesShow, "intf_window"),
   GNOMEUIINFO_END
 };
 
 static GnomeUIInfo menubar_help_menu_uiinfo[] =
 {
-  GNOMEUIINFO_MENU_ABOUT_ITEM (GnomeMenubarAboutActivate, NULL),
+  GNOMEUIINFO_MENU_ABOUT_ITEM (GtkAboutShow, "intf_window"),
   GNOMEUIINFO_END
 };
 
@@ -722,46 +722,46 @@ create_intf_window (void)
                       GTK_SIGNAL_FUNC (GtkWindowDrag),
                       "intf_window");
   gnome_app_install_menu_hints (GNOME_APP (intf_window), menubar_uiinfo);
-  gtk_signal_connect (GTK_OBJECT (toolbar_file), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_file), "clicked",
                       GTK_SIGNAL_FUNC (GtkFileOpenShow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_disc), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_disc), "clicked",
                       GTK_SIGNAL_FUNC (GtkDiscOpenShow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_network), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_network), "clicked",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenShow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_sat), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_sat), "clicked",
                       GTK_SIGNAL_FUNC (GtkSatOpenShow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_back), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_back), "clicked",
                       GTK_SIGNAL_FUNC (GtkControlBack),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_stop), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_stop), "clicked",
                       GTK_SIGNAL_FUNC (GtkControlStop),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_eject), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_eject), "clicked",
                       GTK_SIGNAL_FUNC (GtkDiscEject),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_play), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_play), "clicked",
                       GTK_SIGNAL_FUNC (GtkControlPlay),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_pause), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_pause), "clicked",
                       GTK_SIGNAL_FUNC (GtkControlPause),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_slow), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_slow), "clicked",
                       GTK_SIGNAL_FUNC (GtkControlSlow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_fast), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_fast), "clicked",
                       GTK_SIGNAL_FUNC (GtkControlFast),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_playlist), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_playlist), "clicked",
                       GTK_SIGNAL_FUNC (GtkPlaylistShow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_prev), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_prev), "clicked",
                       GTK_SIGNAL_FUNC (GtkPlaylistPrev),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_next), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_next), "clicked",
                       GTK_SIGNAL_FUNC (GtkPlaylistNext),
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (slider), "button_press_event",
@@ -799,26 +799,26 @@ static GnomeUIInfo popup_file_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("_Open File..."),
     N_("Open a File"),
-    (gpointer) GnomePopupFileOpenActivate, NULL, NULL,
+    (gpointer) GtkFileOpenShow, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_OPEN,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Open _Disc..."),
     N_("Open a DVD or VCD"),
-    (gpointer) GnomePopupDiscOpenActivate, NULL, NULL,
+    (gpointer) GtkDiscOpenShow, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CDROM,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("_Network Stream..."),
     N_("Select a Network Stream"),
-    (gpointer) GnomePopupNetworkOpenActivate, NULL, NULL,
+    (gpointer) GtkNetworkOpenShow, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_REFRESH,
     0, (GdkModifierType) 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_MENU_ABOUT_ITEM (GnomePopupAboutActivate, NULL),
+  GNOMEUIINFO_MENU_ABOUT_ITEM (GtkAboutShow, "intf_popup"),
   GNOMEUIINFO_END
 };
 
@@ -827,42 +827,42 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("Play"),
     NULL,
-    (gpointer) GnomePopupPlayActivate, NULL, NULL,
+    (gpointer) GtkControlPlay, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_FORWARD,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Pause"),
     NULL,
-    (gpointer) GnomePopupPauseActivate, NULL, NULL,
+    (gpointer) GtkControlPause, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_BOTTOM,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Stop"),
     NULL,
-    (gpointer) GnomePopupStopActivate, NULL, NULL,
+    (gpointer) GtkControlStop, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_STOP,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Back"),
     NULL,
-    (gpointer) GnomePopupBackActivate, NULL, NULL,
+    (gpointer) GtkControlBack, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_BACK,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Slow"),
     NULL,
-    (gpointer) GnomePopupSlowActivate, NULL, NULL,
+    (gpointer) GtkControlSlow, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TIMER_STOP,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Fast"),
     NULL,
-    (gpointer) GnomePopupFastActivate, NULL, NULL,
+    (gpointer) GtkControlFast, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_TIMER,
     0, (GdkModifierType) 0, NULL
   },
@@ -870,14 +870,14 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("Toggle _Interface"),
     NULL,
-    (gpointer) GnomePopupWindowToggleActivate, NULL, NULL,
+    (gpointer) GtkWindowToggle, "intf_popup", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("_Fullscreen"),
     N_("Toggle fullscreen mode"),
-    (gpointer) GnomePopupFullscreenActivate, NULL, NULL,
+    (gpointer) GtkFullscreen, "intf_popup", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
@@ -885,21 +885,21 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("Next"),
     NULL,
-    (gpointer) GnomePopupNextActivate, NULL, NULL,
+    (gpointer) GtkPlaylistNext, "intf_popup", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Prev"),
     NULL,
-    (gpointer) GnomePopupPrevActivate, NULL, NULL,
+    (gpointer) GtkPlaylistPrev, "intf_popup", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("_Jump..."),
     N_("Got directly so specified point"),
-    (gpointer) GnomePopupJumpActivate, NULL, NULL,
+    (gpointer) GtkJumpShow, "intf_popup", NULL,
     GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_JUMP_TO,
     0, (GdkModifierType) 0, NULL
   },
@@ -936,13 +936,13 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("Playlist..."),
     NULL,
-    (gpointer) GnomePopupPlaylistActivate, NULL, NULL,
+    (gpointer) GtkPlaylistShow, "intf_popup", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
-  GNOMEUIINFO_MENU_PREFERENCES_ITEM (GnomePopupPreferencesActivate, NULL),
+  GNOMEUIINFO_MENU_PREFERENCES_ITEM (GtkPreferencesShow, "intf_popup"),
   GNOMEUIINFO_SEPARATOR,
-  GNOMEUIINFO_MENU_EXIT_ITEM (GnomePopupExitActivate, NULL),
+  GNOMEUIINFO_MENU_EXIT_ITEM (GtkExit, "intf_popup"),
   GNOMEUIINFO_END
 };
 
@@ -1706,21 +1706,21 @@ static GnomeUIInfo playlist_add_menu_uiinfo[] =
   {
     GNOME_APP_UI_ITEM, N_("Disc"),
     NULL,
-    (gpointer) GnomePlaylistDiscOpenActivate, NULL, NULL,
+    (gpointer) GtkDiscOpenShow, "intf_playlist", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("File"),
     NULL,
-    (gpointer) GnomePlaylistFileOpenActivate, NULL, NULL,
+    (gpointer) GtkFileOpenShow, "intf_playlist", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },
   {
     GNOME_APP_UI_ITEM, N_("Network"),
     NULL,
-    (gpointer) GnomePlaylistNetworkOpenActivate, NULL, NULL,
+    (gpointer) GtkNetworkOpenShow, "intf_playlist", NULL,
     GNOME_APP_PIXMAP_NONE, NULL,
     0, (GdkModifierType) 0, NULL
   },

@@ -2,7 +2,7 @@
  * gtk_open.h: prototypes for open functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_open.h,v 1.3 2001/05/30 23:02:04 stef Exp $
+ * $Id: gtk_open.h,v 1.4 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -22,22 +22,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-gboolean GtkFileOpenShow        ( GtkWidget *, GdkEventButton *, gpointer );
+gboolean GtkFileOpenShow        ( GtkWidget *, gpointer );
 void     GtkFileOpenCancel      ( GtkButton *, gpointer );
 void     GtkFileOpenOk          ( GtkButton *, gpointer );
 
-gboolean GtkDiscOpenShow        ( GtkWidget *, GdkEventButton *, gpointer );
+gboolean GtkDiscOpenShow        ( GtkWidget *, gpointer );
 void     GtkDiscOpenDvd         ( GtkToggleButton *, gpointer );
 void     GtkDiscOpenVcd         ( GtkToggleButton *, gpointer );
 void     GtkDiscOpenOk          ( GtkButton *, gpointer );
 void     GtkDiscOpenCancel      ( GtkButton *, gpointer );
 
-gboolean GtkNetworkOpenShow     ( GtkWidget *, GdkEventButton *, gpointer );
+gboolean GtkNetworkOpenShow     ( GtkWidget *, gpointer );
 void     GtkNetworkOpenOk       ( GtkButton *, gpointer );
 void     GtkNetworkOpenCancel   ( GtkButton *, gpointer );
 void     GtkNetworkOpenBroadcast( GtkToggleButton *, gpointer );
 void     GtkNetworkOpenChannel  ( GtkToggleButton *, gpointer );
 
-void     GtkFileOpenActivate    ( GtkMenuItem *, gpointer );
-void     GtkDiscOpenActivate    ( GtkMenuItem *, gpointer );
-void     GtkNetworkOpenActivate ( GtkMenuItem *, gpointer );

@@ -92,7 +92,7 @@
 	      <tooltip>Open a File</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarFileOpenActivate</handler>
+		<handler>GtkFileOpenShow_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Sat, 19 May 2001 16:27:02 GMT</last_modification_time>
 	      </signal>
 	      <label>_Open File...</label>
@@ -106,7 +106,7 @@
 	      <tooltip>Open a DVD or VCD</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarDiscOpenActivate</handler>
+		<handler>GtkDiscOpenShow_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Sat, 19 May 2001 16:27:10 GMT</last_modification_time>
 	      </signal>
 	      <label>Open _Disc...</label>
@@ -120,7 +120,7 @@
 	      <tooltip>Select a Network Stream</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarNetworkOpenActivate</handler>
+		<handler>GtkNetworkOpenShow_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Fri, 21 Dec 2001 13:11:28 GMT</last_modification_time>
 	      </signal>
 	      <label>_Network Stream...</label>
@@ -140,7 +140,7 @@
 	      <tooltip>Eject disc</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarDiscEjectActivate</handler>
+		<handler>GtkDiscEject_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Fri, 21 Dec 2001 13:11:28 GMT</last_modification_time>
 	      </signal>
 	      <label>_Eject Disc</label>
@@ -159,7 +159,7 @@
 	      <name>menubar_exit</name>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarExitActivate</handler>
+		<handler>GtkExit_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Sat, 19 May 2001 16:27:52 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_EXIT_ITEM</stock_item>
@@ -181,7 +181,7 @@
 	      <name>menubar_hide_interface</name>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarWindowToggleActivate</handler>
+		<handler>GtkWindowToggle_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Sat, 19 May 2001 16:28:06 GMT</last_modification_time>
 	      </signal>
 	      <label>_Hide interface</label>
@@ -193,7 +193,7 @@
 	      <name>menubar_fullscreen</name>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarFullscreenActivate</handler>
+		<handler>GtkFullscreen_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Sat, 19 May 2001 16:28:15 GMT</last_modification_time>
 	      </signal>
 	      <label>_Fullscreen</label>
@@ -245,7 +245,7 @@
 	      <tooltip>Open the playlist window</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarPlaylistActivate</handler>
+		<handler>GtkPlaylistShow_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Sat, 19 May 2001 16:28:41 GMT</last_modification_time>
 	      </signal>
 	      <label>_Playlist...</label>
@@ -260,7 +260,7 @@
 	      <tooltip>Open the module manager</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarModulesActivate</handler>
+		<handler>GtkModulesShow_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Sat, 19 May 2001 16:28:53 GMT</last_modification_time>
 	      </signal>
 	      <label>_Modules...</label>
@@ -274,7 +274,7 @@
 	      <tooltip>Open the messages window</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarMessagesActivate</handler>
+		<handler>GtkMessagesShow_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Wed, 20 Feb 2002 05:43:55 GMT</last_modification_time>
 	      </signal>
 	      <label>Messages...</label>
@@ -321,7 +321,7 @@
 	      <name>menubar_preferences</name>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarPreferencesActivate</handler>
+		<handler>GtkPreferencesShow_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Sat, 19 May 2001 16:29:03 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_PREFERENCES_ITEM</stock_item>
@@ -343,7 +343,7 @@
 	      <name>menubar_about</name>
 	      <signal>
 		<name>activate</name>
-		<handler>GnomeMenubarAboutActivate</handler>
+		<handler>GtkAboutShow_GLADE_SUX_intf_window</handler>
 		<last_modification_time>Sat, 19 May 2001 16:29:19 GMT</last_modification_time>
 	      </signal>
 	      <stock_item>GNOMEUIINFO_MENU_ABOUT_ITEM</stock_item>
@@ -384,7 +384,7 @@
 	  <name>toolbar_file</name>
 	  <tooltip>Open a File</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkFileOpenShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:14:43 GMT</last_modification_time>
@@ -399,7 +399,7 @@
 	  <name>toolbar_disc</name>
 	  <tooltip>Open a DVD or VCD</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkDiscOpenShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:14:38 GMT</last_modification_time>
@@ -414,7 +414,7 @@
 	  <name>toolbar_network</name>
 	  <tooltip>Select a Network Stream</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkNetworkOpenShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:14:33 GMT</last_modification_time>
@@ -429,7 +429,7 @@
 	  <name>toolbar_sat</name>
 	  <tooltip>Open a Satellite Card</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkSatOpenShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Mon, 25 Mar 2002 01:02:49 GMT</last_modification_time>
@@ -445,7 +445,7 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Go Backward</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlBack</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:14:27 GMT</last_modification_time>
@@ -463,7 +463,7 @@
 	  <name>toolbar_stop</name>
 	  <tooltip>Stop Stream</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlStop</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:14:22 GMT</last_modification_time>
@@ -478,7 +478,7 @@
 	  <name>toolbar_eject</name>
 	  <tooltip>Eject disc</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkDiscEject</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Fri, 21 Dec 2001 15:24:18 GMT</last_modification_time>
@@ -493,10 +493,10 @@
 	  <name>toolbar_play</name>
 	  <tooltip>Play Stream</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlPlay</handler>
 	    <data>&quot;intf_window&quot;</data>
-	    <last_modification_time>Sat, 19 May 2001 03:14:17 GMT</last_modification_time>
+	    <last_modification_time>Wed, 05 Jun 2002 15:10:19 GMT</last_modification_time>
 	  </signal>
 	  <label>Play</label>
 	  <stock_pixmap>GNOME_STOCK_PIXMAP_FORWARD</stock_pixmap>
@@ -509,7 +509,7 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Pause Stream</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlPause</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:14:05 GMT</last_modification_time>
@@ -525,7 +525,7 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Play Slower</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlSlow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:13:58 GMT</last_modification_time>
@@ -544,7 +544,7 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Play Faster</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlFast</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:13:53 GMT</last_modification_time>
@@ -559,7 +559,7 @@
 	  <name>toolbar_playlist</name>
 	  <tooltip>Open Playlist</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkPlaylistShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:13:48 GMT</last_modification_time>
@@ -574,7 +574,7 @@
 	  <name>toolbar_prev</name>
 	  <tooltip>Previous File</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkPlaylistPrev</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:13:44 GMT</last_modification_time>
@@ -589,7 +589,7 @@
 	  <name>toolbar_next</name>
 	  <tooltip>Next File</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkPlaylistNext</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sat, 19 May 2001 03:13:40 GMT</last_modification_time>
@@ -1021,7 +1021,7 @@
     <name>popup_play</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupPlayActivate</handler>
+      <handler>GtkControlPlay_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:16:58 GMT</last_modification_time>
     </signal>
@@ -1035,7 +1035,7 @@
     <name>popup_pause</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupPauseActivate</handler>
+      <handler>GtkControlPause_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:17:31 GMT</last_modification_time>
     </signal>
@@ -1049,7 +1049,7 @@
     <name>popup_stop</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupStopActivate</handler>
+      <handler>GtkControlStop_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:10 GMT</last_modification_time>
     </signal>
@@ -1064,7 +1064,7 @@
     <sensitive>False</sensitive>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupBackActivate</handler>
+      <handler>GtkControlBack_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:21 GMT</last_modification_time>
     </signal>
@@ -1078,7 +1078,7 @@
     <name>popup_slow</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupSlowActivate</handler>
+      <handler>GtkControlSlow_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:29 GMT</last_modification_time>
     </signal>
@@ -1092,7 +1092,7 @@
     <name>popup_fast</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupFastActivate</handler>
+      <handler>GtkControlFast_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:37 GMT</last_modification_time>
     </signal>
@@ -1112,7 +1112,7 @@
     <name>popup_interface_toggle</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupWindowToggleActivate</handler>
+      <handler>GtkWindowToggle_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:18:51 GMT</last_modification_time>
     </signal>
@@ -1126,7 +1126,7 @@
     <tooltip>Toggle fullscreen mode</tooltip>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupFullscreenActivate</handler>
+      <handler>GtkFullscreen_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:19:07 GMT</last_modification_time>
     </signal>
@@ -1145,7 +1145,7 @@
     <name>popup_next</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupNextActivate</handler>
+      <handler>GtkPlaylistNext_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:19:18 GMT</last_modification_time>
     </signal>
@@ -1158,7 +1158,7 @@
     <name>popup_prev</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupPrevActivate</handler>
+      <handler>GtkPlaylistPrev_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:19:26 GMT</last_modification_time>
     </signal>
@@ -1172,7 +1172,7 @@
     <tooltip>Got directly so specified point</tooltip>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupJumpActivate</handler>
+      <handler>GtkJumpShow_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:34:46 GMT</last_modification_time>
     </signal>
@@ -1241,7 +1241,7 @@
 	<tooltip>Open a File</tooltip>
 	<signal>
 	  <name>activate</name>
-	  <handler>GnomePopupFileOpenActivate</handler>
+	  <handler>GtkFileOpenShow_GLADE_SUX_intf_popup</handler>
 	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Sat, 19 May 2001 16:20:08 GMT</last_modification_time>
 	</signal>
@@ -1256,7 +1256,7 @@
 	<tooltip>Open a DVD or VCD</tooltip>
 	<signal>
 	  <name>activate</name>
-	  <handler>GnomePopupDiscOpenActivate</handler>
+	  <handler>GtkDiscOpenShow_GLADE_SUX_intf_popup</handler>
 	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Sat, 19 May 2001 16:20:44 GMT</last_modification_time>
 	</signal>
@@ -1271,7 +1271,7 @@
 	<tooltip>Select a Network Stream</tooltip>
 	<signal>
 	  <name>activate</name>
-	  <handler>GnomePopupNetworkOpenActivate</handler>
+	  <handler>GtkNetworkOpenShow_GLADE_SUX_intf_popup</handler>
 	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Sat, 19 May 2001 16:20:54 GMT</last_modification_time>
 	</signal>
@@ -1291,7 +1291,7 @@
 	<name>popup_about</name>
 	<signal>
 	  <name>activate</name>
-	  <handler>GnomePopupAboutActivate</handler>
+	  <handler>GtkAboutShow_GLADE_SUX_intf_popup</handler>
 	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Sat, 19 May 2001 16:21:02 GMT</last_modification_time>
 	</signal>
@@ -1305,7 +1305,7 @@
     <name>popup_playlist</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupPlaylistActivate</handler>
+      <handler>GtkPlaylistShow_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:21:14 GMT</last_modification_time>
     </signal>
@@ -1318,7 +1318,7 @@
     <name>popup_preferences</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupPreferencesActivate</handler>
+      <handler>GtkPreferencesShow_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:21:25 GMT</last_modification_time>
     </signal>
@@ -1336,7 +1336,7 @@
     <name>popup_exit</name>
     <signal>
       <name>activate</name>
-      <handler>GnomePopupExitActivate</handler>
+      <handler>GtkExit_GLADE_SUX_intf_popup</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Sat, 19 May 2001 16:21:45 GMT</last_modification_time>
     </signal>
@@ -2613,7 +2613,7 @@ http://www.videolan.org/
 	    <name>playlist_add_disc</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GnomePlaylistDiscOpenActivate</handler>
+	      <handler>GtkDiscOpenShow_GLADE_SUX_intf_playlist</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Sat, 19 May 2001 16:22:26 GMT</last_modification_time>
 	    </signal>
@@ -2626,7 +2626,7 @@ http://www.videolan.org/
 	    <name>playlist_add_file</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GnomePlaylistFileOpenActivate</handler>
+	      <handler>GtkFileOpenShow_GLADE_SUX_intf_playlist</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Sat, 19 May 2001 16:22:37 GMT</last_modification_time>
 	    </signal>
@@ -2639,7 +2639,7 @@ http://www.videolan.org/
 	    <name>playlist_add_network</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GnomePlaylistNetworkOpenActivate</handler>
+	      <handler>GtkNetworkOpenShow_GLADE_SUX_intf_playlist</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Sat, 19 May 2001 16:22:52 GMT</last_modification_time>
 	    </signal>

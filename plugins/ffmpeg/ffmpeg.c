@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.12 2002/06/01 18:04:48 sam Exp $
+ * $Id: ffmpeg.c,v 1.13 2002/06/07 14:30:40 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -375,24 +375,59 @@ static int InitThread( videodec_thread_t *p_vdec )
                                  p_vdec->psz_namecodec );
     }
 
-    /* create vout */
-    p_vdec->p_vout = vout_CreateThread( p_vdec->p_fifo,
-                                p_vdec->format.i_width,
-                                p_vdec->format.i_height,
-                                FOURCC_I420,
-                                VOUT_ASPECT_FACTOR * p_vdec->format.i_width /
-                                    p_vdec->format.i_height );
+    /* Spawn a video output if there is none. First we look for our children,
+     * then we look for any other vout that might be available. */
+    p_vdec->p_vout = vlc_object_find( p_vdec->p_fifo, VLC_OBJECT_VOUT,
+                                                      FIND_CHILD );
+    if( p_vdec->p_vout == NULL )
+    {
+        p_vdec->p_vout = vlc_object_find( p_vdec->p_fifo, VLC_OBJECT_VOUT,
+                                                          FIND_ANYWHERE );
+    }
+
+    if( p_vdec->p_vout )
+    {
+        if( p_vdec->p_vout->render.i_width != p_vdec->format.i_width
+             || p_vdec->p_vout->render.i_height != p_vdec->format.i_height
+             || p_vdec->p_vout->render.i_chroma != FOURCC_I420
+             || p_vdec->p_vout->render.i_aspect != VOUT_ASPECT_FACTOR
+                           * p_vdec->format.i_width / p_vdec->format.i_height )
+        {
+            /* We are not interested in this format, close this vout */
+            vlc_object_detach_all( p_vdec->p_vout );
+            vlc_object_release( p_vdec->p_vout );
+            vout_DestroyThread( p_vdec->p_vout );
+            p_vdec->p_vout = NULL;
+        }
+        else
+        {
+            /* This video output is cool! Hijack it. */
+            vlc_object_detach_all( p_vdec->p_vout );
+            vlc_object_attach( p_vdec->p_vout, p_vdec->p_fifo );
+            vlc_object_release( p_vdec->p_vout );
+        }
+    }
 
     if( p_vdec->p_vout == NULL )
     {
-        msg_Err( p_vdec->p_fifo, "cannot open vout, aborting" );
-        avcodec_close( p_vdec->p_context );
-        msg_Dbg( p_vdec->p_fifo, "ffmpeg codec (%s) stopped",
-                                 p_vdec->psz_namecodec );
-        return -1;
+        msg_Dbg( p_vdec->p_fifo, "no vout present, spawning one" );
+    
+        p_vdec->p_vout = vout_CreateThread( p_vdec->p_fifo,
+                           p_vdec->format.i_width,
+                           p_vdec->format.i_height,
+                           FOURCC_I420,
+                           VOUT_ASPECT_FACTOR * p_vdec->format.i_width /
+                               p_vdec->format.i_height );
+    
+        /* Everything failed */
+        if( p_vdec->p_vout == NULL )
+        {
+            msg_Err( p_vdec->p_fifo, "cannot open vout, aborting" );
+            avcodec_close( p_vdec->p_context );
+            p_vdec->p_fifo->b_error = 1; 
+            return -1;
+        }
     }
-
-    vlc_object_yield( p_vdec->p_vout );
 
     return( 0 );
 }
@@ -418,8 +453,12 @@ static void EndThread( videodec_thread_t *p_vdec )
                                  p_vdec->psz_namecodec );
     }
 
-    vlc_object_release( p_vdec->p_vout );
-    vout_DestroyThread( p_vdec->p_vout );
+    if( p_vdec->p_vout != NULL )
+    {
+        /* We are about to die. Reattach video output to p_vlc. */
+        vlc_object_detach( p_vdec->p_vout, p_vdec->p_fifo );
+        vlc_object_attach( p_vdec->p_vout, p_vdec->p_fifo->p_vlc );
+    }
     
     free( p_vdec );
 }

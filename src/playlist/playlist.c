@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.5 2002/06/04 00:11:12 sam Exp $
+ * $Id: playlist.c,v 1.6 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -39,6 +39,10 @@
  * Local prototypes
  *****************************************************************************/
 static void RunThread ( playlist_t * );
+static void SkipItem  ( playlist_t *, int );
+static void PlayItem  ( playlist_t * );
+
+static void Poubellize ( playlist_t *, input_thread_t * );
 
 /*****************************************************************************
  * playlist_Create: create playlist
@@ -62,18 +66,16 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->i_index = -1;
     p_playlist->i_size = 0;
     p_playlist->pp_items = NULL;
-    vlc_mutex_init( p_playlist, &p_playlist->change_lock );
 
-    vlc_object_attach( p_playlist, p_parent );
-
-    if( vlc_thread_create( p_playlist, "playlist", RunThread, 0 ) )
+    if( vlc_thread_create( p_playlist, "playlist", RunThread, VLC_TRUE ) )
     {
         msg_Err( p_playlist, "cannot spawn playlist thread" );
-        vlc_object_detach_all( p_playlist );
-        vlc_mutex_destroy( &p_playlist->change_lock );
         vlc_object_destroy( p_playlist );
         return NULL;
     }
+
+    /* The object has been initialized, now attach it */
+    vlc_object_attach( p_playlist, p_parent );
 
     return p_playlist;
 }
@@ -89,7 +91,6 @@ void playlist_Destroy( playlist_t * p_playlist )
 
     vlc_thread_join( p_playlist );
 
-    vlc_mutex_destroy( &p_playlist->change_lock );
     vlc_object_destroy( p_playlist );
 }
 
@@ -99,32 +100,88 @@ void playlist_Destroy( playlist_t * p_playlist )
  * Add an item to the playlist at position i_pos. If i_pos is PLAYLIST_END,
  * add it at the end regardless of the playlist current size.
  *****************************************************************************/
-int playlist_Add( playlist_t *p_playlist, int i_pos, const char * psz_item )
+int playlist_Add( playlist_t *p_playlist, const char * psz_target,
+                                          int i_mode, int i_pos )
 {
-    msg_Warn( p_playlist, "adding playlist item « %s »", psz_item );
+    playlist_item_t *p_item;
 
-    vlc_mutex_lock( &p_playlist->change_lock );
+    msg_Warn( p_playlist, "adding playlist item « %s »", psz_target );
 
-    p_playlist->i_size++;
-    p_playlist->pp_items = realloc( p_playlist->pp_items,
-                                    p_playlist->i_size * sizeof(void*) );
-    if( p_playlist->pp_items == NULL )
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    /* Create the new playlist item */
+    p_item = malloc( sizeof( playlist_item_t ) );
+    if( p_item == NULL )
     {
         msg_Err( p_playlist, "out of memory" );
-        vlc_mutex_unlock( &p_playlist->change_lock );
-        vlc_object_release( p_playlist );
-        return -1;
+        vlc_mutex_unlock( &p_playlist->object_lock );
     }
 
-    i_pos = p_playlist->i_size - 1; /* FIXME */
-    p_playlist->pp_items[i_pos] = malloc( sizeof( playlist_item_t ) );
-    p_playlist->pp_items[i_pos]->psz_name = strdup( psz_item );
-    p_playlist->pp_items[i_pos]->i_type = 0;
-    p_playlist->pp_items[i_pos]->i_status = 0;
+    p_item->psz_name = strdup( psz_target );
+    p_item->i_type = 0;
+    p_item->i_status = 0;
 
+    /* Do a few boundary checks and allocate space for the item */
+    if( i_pos == PLAYLIST_END )
+    {
+        i_pos = p_playlist->i_size - 1;
+    }
+
+    if( !(i_mode & PLAYLIST_REPLACE)
+         || i_pos < 0 || i_pos >= p_playlist->i_size )
+    {
+        int i_index;
+
+        p_playlist->i_size++;
+        p_playlist->pp_items = realloc( p_playlist->pp_items,
+                                        p_playlist->i_size * sizeof(void*) );
+        if( p_playlist->pp_items == NULL )
+        {
+            msg_Err( p_playlist, "out of memory" );
+            free( p_item->psz_name );
+            free( p_item );
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            return -1;
+        }
+
+        /* Additional boundary checks */
+        if( i_mode & PLAYLIST_APPEND )
+        {
+            i_pos++;
+        }
+
+        if( i_pos < 0 )
+        {
+            i_pos = 0;
+        }
+        else if( i_pos > p_playlist->i_size - 1 )
+        {
+            i_pos = p_playlist->i_size - 1;
+        }
+
+        /* Now we know exactly where it goes. Just renumber the playlist */
+        for( i_index = p_playlist->i_size - 2; i_index > i_pos ; i_index-- )
+        {
+            p_playlist->pp_items[i_index + 1] = p_playlist->pp_items[i_index];
+        }
+
+        if( p_playlist->i_index >= i_pos )
+        {
+            i_index++;
+        }
+    }
+    else
+    {
+        /* i_mode == PLAYLIST_REPLACE and 0 <= i_pos < p_playlist->i_size */
+        free( p_playlist->pp_items[i_pos]->psz_name );
+        free( p_playlist->pp_items[i_pos] );
+        /* XXX: what if the item is still in use? */
+    }
+
+    p_playlist->pp_items[i_pos] = p_item;
     p_playlist->i_status = PLAYLIST_RUNNING;
 
-    vlc_mutex_unlock( &p_playlist->change_lock );
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
     return 0;
 }
@@ -136,9 +193,9 @@ int playlist_Add( playlist_t *p_playlist, int i_pos, const char * psz_item )
  *****************************************************************************/
 int playlist_Delete( playlist_t * p_playlist, int i_pos )
 {
-    vlc_mutex_lock( &p_playlist->change_lock );
+    vlc_mutex_lock( &p_playlist->object_lock );
 
-    vlc_mutex_unlock( &p_playlist->change_lock );
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
     return 0;
 }
@@ -146,35 +203,54 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
 /*****************************************************************************
  * playlist_Command: do a playlist action
  *****************************************************************************
- * 
+ *
  *****************************************************************************/
 void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
-{   
-    vlc_mutex_lock( &p_playlist->change_lock );
+{
+    vlc_mutex_lock( &p_playlist->object_lock );
 
     switch( i_command )
     {
     case PLAYLIST_STOP:
-        msg_Dbg( p_playlist, "stopping" );
         p_playlist->i_status = PLAYLIST_STOPPED;
+        if( p_playlist->p_input )
+        {
+            input_StopThread( p_playlist->p_input );
+        }
         break;
+
     case PLAYLIST_PLAY:
-        msg_Dbg( p_playlist, "running" );
         p_playlist->i_status = PLAYLIST_RUNNING;
         break;
+
     case PLAYLIST_SKIP:
-        msg_Dbg( p_playlist, "next" );
-        if( p_playlist->i_size )
+        p_playlist->i_status = PLAYLIST_STOPPED;
+        SkipItem( p_playlist, i_arg );
+        if( p_playlist->p_input )
         {
-            p_playlist->i_index = 0;
+            input_StopThread( p_playlist->p_input );
+        }
+        p_playlist->i_status = PLAYLIST_RUNNING;
+        break;
+
+    case PLAYLIST_GOTO:
+        if( i_arg >= 0 && i_arg < p_playlist->i_size )
+        {
+            p_playlist->i_index = i_arg;
+            if( p_playlist->p_input )
+            {
+                input_StopThread( p_playlist->p_input );
+            }
             p_playlist->i_status = PLAYLIST_RUNNING;
         }
         break;
+
     default:
+        msg_Err( p_playlist, "unknown playlist command" );
         break;
     }
 
-    vlc_mutex_unlock( &p_playlist->change_lock );
+    vlc_mutex_unlock( &p_playlist->object_lock );
 
     return;
 }
@@ -186,8 +262,13 @@ void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
  *****************************************************************************/
 static void RunThread ( playlist_t *p_playlist )
 {
+    /* Tell above that we're ready */
+    vlc_thread_ready( p_playlist );
+
     while( !p_playlist->b_die )
     {
+        vlc_mutex_lock( &p_playlist->object_lock );
+
         /* If there is an input, check that it doesn't need to die. */
         if( p_playlist->p_input )
         {
@@ -197,16 +278,18 @@ static void RunThread ( playlist_t *p_playlist )
                 input_thread_t *p_input;
 
                 /* Unlink current input */
-                vlc_mutex_lock( &p_playlist->change_lock );
                 p_input = p_playlist->p_input;
                 p_playlist->p_input = NULL;
                 vlc_object_detach_all( p_input );
-                vlc_mutex_unlock( &p_playlist->change_lock );
+
+                /* Release the playlist lock, because we may get stuck
+                 * in input_DestroyThread() for some time. */
+                vlc_mutex_unlock( &p_playlist->object_lock );
 
                 /* Destroy input */
-                vlc_object_release( p_input );
                 input_DestroyThread( p_input );
                 vlc_object_destroy( p_input );
+                continue;
             }
             /* This input is dying, let him do */
             else if( p_playlist->p_input->b_die )
@@ -217,75 +300,145 @@ static void RunThread ( playlist_t *p_playlist )
             else if( p_playlist->p_input->b_error
                       || p_playlist->p_input->b_eof )
             {
+                /* Select the next playlist item */
+                SkipItem( p_playlist, 1 );
+
+                /* Release the playlist lock, because we may get stuck
+                 * in input_StopThread() for some time. */
+                vlc_mutex_unlock( &p_playlist->object_lock );
                 input_StopThread( p_playlist->p_input );
+                continue;
             }
         }
         else if( p_playlist->i_status != PLAYLIST_STOPPED )
         {
-            /* Select the next playlist item */
-            playlist_Next( p_playlist );
-
-            /* don't loop by default: stop at playlist end */
-            if( p_playlist->i_index == -1 )
-            {
-                p_playlist->i_status = PLAYLIST_STOPPED;
-            }
-            else
-            {
-                input_thread_t *p_input;
-
-                //p_playlist->i_mode = PLAYLIST_FORWARD +
-                //    config_GetInt( p_playlist, "loop-playlist" );
-                msg_Dbg( p_playlist, "creating new input thread" );
-                p_input = input_CreateThread( p_playlist,
-                            p_playlist->pp_items[p_playlist->i_index], NULL );
-                if( p_input != NULL )
-                {
-                    /* Link current input */
-                    vlc_mutex_lock( &p_playlist->change_lock );
-                    p_playlist->p_input = p_input;
-                    vlc_mutex_unlock( &p_playlist->change_lock );
-                }
-            }
+            PlayItem( p_playlist );
         }
+
+        vlc_mutex_unlock( &p_playlist->object_lock );
 
         msleep( INTF_IDLE_SLEEP );
     }
 
     /* If there is an input, kill it */
-    while( p_playlist->p_input )
+    while( 1 )
     {
+        vlc_mutex_lock( &p_playlist->object_lock );
+
+        if( p_playlist->p_input == NULL )
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            break;
+        }
+
         if( p_playlist->p_input->b_dead )
         {
             input_thread_t *p_input;
 
             /* Unlink current input */
-            vlc_mutex_lock( &p_playlist->change_lock );
             p_input = p_playlist->p_input;
             p_playlist->p_input = NULL;
             vlc_object_detach_all( p_input );
-            vlc_mutex_unlock( &p_playlist->change_lock );
+            vlc_mutex_unlock( &p_playlist->object_lock );
 
             /* Destroy input */
-            vlc_object_release( p_input );
             input_DestroyThread( p_input );
             vlc_object_destroy( p_input );
+            continue;
         }
-        /* This input is dying, let him do */
         else if( p_playlist->p_input->b_die )
         {
+            /* This input is dying, leave him alone */
             ;
         }
         else if( p_playlist->p_input->b_error || p_playlist->p_input->b_eof )
         {
+            vlc_mutex_unlock( &p_playlist->object_lock );
             input_StopThread( p_playlist->p_input );
+            continue;
         }
         else
         {
             p_playlist->p_input->b_eof = 1;
         }
 
+        vlc_mutex_unlock( &p_playlist->object_lock );
+
         msleep( INTF_IDLE_SLEEP );
     }
+}
+
+/*****************************************************************************
+ * SkipItem: go to Xth playlist item
+ *****************************************************************************
+ * This function calculates the position of the next playlist item, depending
+ * on the playlist course mode (forward, backward, random...).
+ *****************************************************************************/
+static void SkipItem( playlist_t *p_playlist, int i_arg )
+{
+    int i_oldindex = p_playlist->i_index;
+
+    /* If the playlist is empty, there is no current item */
+    if( p_playlist->i_size == 0 )
+    {
+        p_playlist->i_index = -1;
+        return;
+    }
+
+    /* Increment */
+    p_playlist->i_index += i_arg;
+
+    /* Boundary check */
+    if( p_playlist->i_index >= p_playlist->i_size )
+    {
+        if( p_playlist->i_status == PLAYLIST_STOPPED
+             || config_GetInt( p_playlist, "loop" ) )
+        {
+            p_playlist->i_index = 0;
+        }
+        else
+        {
+            /* Don't loop by default: stop at playlist end */
+            p_playlist->i_index = i_oldindex;
+            p_playlist->i_status = PLAYLIST_STOPPED;
+        }
+    }
+    else if( p_playlist->i_index < 0 )
+    {
+        p_playlist->i_index = p_playlist->i_size - 1;
+    }
+}
+
+/*****************************************************************************
+ * PlayItem: play current playlist item
+ *****************************************************************************
+ * This function calculates the position of the next playlist item, depending
+ * on the playlist course mode (forward, backward, random...).
+ *****************************************************************************/
+static void PlayItem( playlist_t *p_playlist )
+{
+    if( p_playlist->i_index == -1 )
+    {
+        if( p_playlist->i_size == 0 )
+        {
+            return;
+        }
+
+        SkipItem( p_playlist, 1 );
+    }
+
+    msg_Dbg( p_playlist, "creating new input thread" );
+    p_playlist->p_input = input_CreateThread( p_playlist,
+                p_playlist->pp_items[p_playlist->i_index], NULL );
+}
+
+/*****************************************************************************
+ * Poubellize: put an input thread in the trashcan
+ *****************************************************************************
+ * XXX: unused
+ *****************************************************************************/
+static void Poubellize ( playlist_t *p_playlist, input_thread_t *p_input )
+{
+    
 }
 

@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.26 2002/06/02 09:03:54 sam Exp $
+ * $Id: gtk.c,v 1.27 2002/06/07 14:30:40 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -174,6 +174,11 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+    }
+
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 
     /* Destroy structure */
@@ -217,7 +222,7 @@ static void intf_Run( intf_thread_t *p_intf )
     /* Create some useful widgets that will certainly be used */
     p_intf->p_sys->p_window = create_intf_window();
     p_intf->p_sys->p_popup = create_intf_popup();
-    p_intf->p_sys->p_playlist = create_intf_playlist();
+    p_intf->p_sys->p_playwin = create_intf_playlist();
     p_intf->p_sys->p_messages = create_intf_messages();
     p_intf->p_sys->p_tooltips = gtk_tooltips_new();
 
@@ -231,7 +236,7 @@ static void intf_Run( intf_thread_t *p_intf )
                        1, GDK_ACTION_COPY );
 
     /* Accept file drops on the playlist window */
-    gtk_drag_dest_set( GTK_WIDGET( lookup_widget( p_intf->p_sys->p_playlist,
+    gtk_drag_dest_set( GTK_WIDGET( lookup_widget( p_intf->p_sys->p_playwin,
                                    "playlist_clist") ),
                        GTK_DEST_DEFAULT_ALL, target_table,
                        1, GDK_ACTION_COPY );
@@ -285,7 +290,7 @@ static void intf_Run( intf_thread_t *p_intf )
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_popup),
                          "p_intf", p_intf );
 
-    gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
+    gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playwin ),
                          "p_intf", p_intf );
 
     gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_messages ),
@@ -396,19 +401,15 @@ static gint GtkManage( gpointer p_data )
     GtkPlayListManage( p_data );
 
     /* Update the input */
-    if( p_intf->p_sys->p_input != NULL )
-    {
-        if( p_intf->p_sys->p_input->b_dead )
-        {
-            vlc_object_release( p_intf->p_sys->p_input );
-            p_intf->p_sys->p_input = NULL;
-        }
-    }
-
     if( p_intf->p_sys->p_input == NULL )
     {
         p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                           FIND_ANYWHERE );
+    }
+    else if( p_intf->p_sys->p_input->b_dead )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+        p_intf->p_sys->p_input = NULL;
     }
 
     if( p_intf->p_sys->p_input )

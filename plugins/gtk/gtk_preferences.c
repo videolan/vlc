@@ -2,7 +2,7 @@
  * gtk_preferences.c: functions to handle the preferences dialog box.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.31 2002/06/01 18:04:48 sam Exp $
+ * $Id: gtk_preferences.c,v 1.32 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Loïc Minier <lool@via.ecp.fr>
@@ -76,7 +76,7 @@ static void GtkModuleHighlighted ( GtkCList *, int, int, GdkEventButton *,
 /****************************************************************************
  * Callback for menuitems: display configuration interface window
  ****************************************************************************/
-void GtkPreferencesActivate( GtkMenuItem * menuitem, gpointer user_data )
+void GtkPreferencesShow( GtkMenuItem * menuitem, gpointer user_data )
 {
     intf_thread_t * p_intf;
 
@@ -836,7 +836,7 @@ static void GtkBoolChanged( GtkToggleButton *button, gpointer user_data )
 
     /* change the highlight status of the Apply button */
     apply_button = (GtkWidget *)gtk_object_get_data( GTK_OBJECT(user_data),
-                                                    "apply_button" );
+                                                     "apply_button" );
     gtk_widget_set_sensitive( apply_button, TRUE );
 }
 

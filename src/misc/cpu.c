@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.3 2002/06/04 00:11:12 sam Exp $
+ * $Id: cpu.c,v 1.4 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -82,7 +82,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
     if( ret != KERN_SUCCESS )
     {
         fprintf( stderr, "error: couldn't get CPU information\n" );
-        return( i_capabilities );
+        return i_capabilities;
     }
 
     slot_name( hi.cpu_type, hi.cpu_subtype, &psz_name, &psz_subname );
@@ -93,7 +93,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
     }
 
-    return( i_capabilities );
+    return i_capabilities;
 
 #elif defined( __i386__ )
     volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
@@ -140,7 +140,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, NULL );
 #   endif
-        return( i_capabilities );
+        return i_capabilities;
     }
 
     i_capabilities |= CPU_CAPABILITY_486;
@@ -153,7 +153,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, NULL );
 #   endif
-        return( i_capabilities );
+        return i_capabilities;
     }
 
     /* FIXME: this isn't correct, since some 486s have cpuid */
@@ -171,7 +171,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, NULL );
 #   endif
-        return( i_capabilities );
+        return i_capabilities;
     }
 
     i_capabilities |= CPU_CAPABILITY_MMX;
@@ -208,7 +208,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
         signal( SIGILL, NULL );
 #   endif
-        return( i_capabilities );
+        return i_capabilities;
     }
 
     /* list these additional capabilities */
@@ -243,7 +243,7 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
     signal( SIGILL, NULL );
 #   endif
-    return( i_capabilities );
+    return i_capabilities;
 
 #elif defined( __powerpc__ )
 
@@ -272,16 +272,16 @@ u32 __CPUCapabilities( vlc_object_t *p_this )
     signal( SIGILL, NULL );
 #   endif
 
-    return( i_capabilities );
+    return i_capabilities;
 
 #elif defined( __sparc__ )
 
     i_capabilities |= CPU_CAPABILITY_FPU;
-    return( i_capabilities );
+    return i_capabilities;
 
 #else
     /* default behaviour */
-    return( i_capabilities );
+    return i_capabilities;
 
 #endif
 }

@@ -88,7 +88,7 @@
 	      </accelerator>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkFileOpenActivate</handler>
+		<handler>GtkFileOpenShow</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:27:36 GMT</last_modification_time>
 	      </signal>
@@ -107,7 +107,7 @@
 	      </accelerator>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkDiscOpenActivate</handler>
+		<handler>GtkDiscOpenShow</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:27:47 GMT</last_modification_time>
 	      </signal>
@@ -126,7 +126,7 @@
 	      </accelerator>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkNetworkOpenActivate</handler>
+		<handler>GtkNetworkOpenShow</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:28:06 GMT</last_modification_time>
 	      </signal>
@@ -146,7 +146,7 @@
 	      <tooltip>Eject disc</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkEjectDiscActivate</handler>
+		<handler>GtkDiscEject</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Fri, 21 Dec 2001 12:51:34 GMT</last_modification_time>
 	      </signal>
@@ -171,7 +171,7 @@
 	      </accelerator>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkExitActivate</handler>
+		<handler>GtkExit</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:28:20 GMT</last_modification_time>
 	      </signal>
@@ -197,7 +197,7 @@
 	      <tooltip>Hide the main interface window</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkWindowToggleActivate</handler>
+		<handler>GtkWindowToggle</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:32:49 GMT</last_modification_time>
 	      </signal>
@@ -210,7 +210,7 @@
 	      <name>menubar_fullscreen</name>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkFullscreenActivate</handler>
+		<handler>GtkFullscreen</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:29:21 GMT</last_modification_time>
 	      </signal>
@@ -262,7 +262,7 @@
 	      <tooltip>Open the playlist window</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkPlaylistActivate</handler>
+		<handler>GtkPlaylistShow</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:29:34 GMT</last_modification_time>
 	      </signal>
@@ -277,7 +277,7 @@
 	      <tooltip>Open the module manager</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkModulesActivate</handler>
+		<handler>GtkModulesShow</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:29:44 GMT</last_modification_time>
 	      </signal>
@@ -291,7 +291,7 @@
 	      <tooltip>Open the messages window</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkMessagesActivate</handler>
+		<handler>GtkMessagesShow</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Tue, 19 Feb 2002 02:03:47 GMT</last_modification_time>
 	      </signal>
@@ -341,7 +341,7 @@
 	      <tooltip>Configure the application</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkPreferencesActivate</handler>
+		<handler>GtkPreferencesShow</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:30:02 GMT</last_modification_time>
 	      </signal>
@@ -367,7 +367,7 @@
 	      <tooltip>About this application</tooltip>
 	      <signal>
 		<name>activate</name>
-		<handler>GtkAboutActivate</handler>
+		<handler>GtkAboutShow</handler>
 		<data>&quot;intf_window&quot;</data>
 		<last_modification_time>Mon, 14 May 2001 21:30:15 GMT</last_modification_time>
 	      </signal>
@@ -408,7 +408,7 @@
 	  <name>toolbar_open</name>
 	  <tooltip>Open a File</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkFileOpenShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:10:21 GMT</last_modification_time>
@@ -422,7 +422,7 @@
 	  <name>toolbar_disc</name>
 	  <tooltip>Open a DVD or VCD</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkDiscOpenShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:10:30 GMT</last_modification_time>
@@ -436,7 +436,7 @@
 	  <name>toolbar_network</name>
 	  <tooltip>Select a Network Stream</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkNetworkOpenShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:10:37 GMT</last_modification_time>
@@ -450,7 +450,7 @@
 	  <name>toolbar_sat</name>
 	  <tooltip>Open a Satellite Card</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkSatOpenShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 24 Mar 2002 15:08:57 GMT</last_modification_time>
@@ -465,7 +465,7 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Go Backward</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlBack</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:10:47 GMT</last_modification_time>
@@ -482,7 +482,7 @@
 	  <name>toolbar_stop</name>
 	  <tooltip>Stop Stream</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlStop</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:10:57 GMT</last_modification_time>
@@ -495,7 +495,7 @@
 	  <child_name>Toolbar:button</child_name>
 	  <name>toolbar_eject</name>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkDiscEject</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Fri, 21 Dec 2001 15:33:26 GMT</last_modification_time>
@@ -509,7 +509,7 @@
 	  <name>toolbar_play</name>
 	  <tooltip>Play Stream</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlPlay</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:11:06 GMT</last_modification_time>
@@ -524,7 +524,7 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Pause Stream</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlPause</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:11:13 GMT</last_modification_time>
@@ -539,7 +539,7 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Play Slower</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlSlow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:11:20 GMT</last_modification_time>
@@ -557,7 +557,7 @@
 	  <sensitive>False</sensitive>
 	  <tooltip>Play Faster</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkControlFast</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:11:31 GMT</last_modification_time>
@@ -571,7 +571,7 @@
 	  <name>toolbar_playlist</name>
 	  <tooltip>Open Playlist</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkPlaylistShow</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:11:38 GMT</last_modification_time>
@@ -585,7 +585,7 @@
 	  <name>toolbar_prev</name>
 	  <tooltip>Previous File</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkPlaylistPrev</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:11:45 GMT</last_modification_time>
@@ -599,7 +599,7 @@
 	  <name>toolbar_next</name>
 	  <tooltip>Next File</tooltip>
 	  <signal>
-	    <name>button_press_event</name>
+	    <name>clicked</name>
 	    <handler>GtkPlaylistNext</handler>
 	    <data>&quot;intf_window&quot;</data>
 	    <last_modification_time>Sun, 13 May 2001 15:11:58 GMT</last_modification_time>
@@ -1024,7 +1024,7 @@
     <name>popup_play</name>
     <signal>
       <name>activate</name>
-      <handler>GtkPlayActivate</handler>
+      <handler>GtkControlPlay</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:53:43 GMT</last_modification_time>
     </signal>
@@ -1038,7 +1038,7 @@
     <sensitive>False</sensitive>
     <signal>
       <name>activate</name>
-      <handler>GtkPauseActivate</handler>
+      <handler>GtkControlPause</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:53:37 GMT</last_modification_time>
     </signal>
@@ -1051,7 +1051,7 @@
     <name>popup_stop</name>
     <signal>
       <name>activate</name>
-      <handler>GtKStopActivate</handler>
+      <handler>GtkControlStop</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:53:29 GMT</last_modification_time>
     </signal>
@@ -1065,7 +1065,7 @@
     <sensitive>False</sensitive>
     <signal>
       <name>activate</name>
-      <handler>GtkBackActivate</handler>
+      <handler>GtkControlBack</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:53:21 GMT</last_modification_time>
     </signal>
@@ -1079,7 +1079,7 @@
     <sensitive>False</sensitive>
     <signal>
       <name>activate</name>
-      <handler>GtkSlowActivate</handler>
+      <handler>GtkControlSlow</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:53:15 GMT</last_modification_time>
     </signal>
@@ -1093,7 +1093,7 @@
     <sensitive>False</sensitive>
     <signal>
       <name>activate</name>
-      <handler>GtkFastActivate</handler>
+      <handler>GtkControlFast</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:53:07 GMT</last_modification_time>
     </signal>
@@ -1112,7 +1112,7 @@
     <name>popup_interface_toggle</name>
     <signal>
       <name>activate</name>
-      <handler>GtkWindowToggleActivate</handler>
+      <handler>GtkWindowToggle</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:53:00 GMT</last_modification_time>
     </signal>
@@ -1125,7 +1125,7 @@
     <name>popup_fullscreen</name>
     <signal>
       <name>activate</name>
-      <handler>GtkFullscreenActivate</handler>
+      <handler>GtkFullscreen</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:52:38 GMT</last_modification_time>
     </signal>
@@ -1144,7 +1144,7 @@
     <name>popup_next</name>
     <signal>
       <name>activate</name>
-      <handler>GtkNextActivate</handler>
+      <handler>GtkPlaylistNext</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:52:31 GMT</last_modification_time>
     </signal>
@@ -1157,7 +1157,7 @@
     <name>popup_prev</name>
     <signal>
       <name>activate</name>
-      <handler>GtkPrevActivate</handler>
+      <handler>GtkPlaylistPrev</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:52:23 GMT</last_modification_time>
     </signal>
@@ -1170,7 +1170,7 @@
     <name>popup_jump</name>
     <signal>
       <name>activate</name>
-      <handler>GtkJumpActivate</handler>
+      <handler>GtkJumpShow</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:52:13 GMT</last_modification_time>
     </signal>
@@ -1226,7 +1226,7 @@
 	<tooltip>Open a File</tooltip>
 	<signal>
 	  <name>activate</name>
-	  <handler>GtkFileOpenActivate</handler>
+	  <handler>GtkFileOpenShow</handler>
 	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Mon, 14 May 2001 21:33:55 GMT</last_modification_time>
 	</signal>
@@ -1240,7 +1240,7 @@
 	<tooltip>Open a DVD or VCD</tooltip>
 	<signal>
 	  <name>activate</name>
-	  <handler>GtkDiscOpenActivate</handler>
+	  <handler>GtkDiscOpenShow</handler>
 	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Mon, 14 May 2001 21:34:09 GMT</last_modification_time>
 	</signal>
@@ -1254,7 +1254,7 @@
 	<tooltip>Select a Network Stream</tooltip>
 	<signal>
 	  <name>activate</name>
-	  <handler>GtkNetworkOpenActivate</handler>
+	  <handler>GtkNetworkOpenShow</handler>
 	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Mon, 14 May 2001 21:34:23 GMT</last_modification_time>
 	</signal>
@@ -1273,7 +1273,7 @@
 	<name>popup_about</name>
 	<signal>
 	  <name>activate</name>
-	  <handler>GtkAboutActivate</handler>
+	  <handler>GtkAboutShow</handler>
 	  <data>&quot;intf_popup&quot;</data>
 	  <last_modification_time>Mon, 14 May 2001 21:34:54 GMT</last_modification_time>
 	</signal>
@@ -1288,7 +1288,7 @@
     <name>popup_playlist</name>
     <signal>
       <name>activate</name>
-      <handler>GtkPlaylistActivate</handler>
+      <handler>GtkPlaylistShow</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:51:55 GMT</last_modification_time>
     </signal>
@@ -1301,7 +1301,7 @@
     <name>popup_preferences</name>
     <signal>
       <name>activate</name>
-      <handler>GtkPreferencesActivate</handler>
+      <handler>GtkPreferencesShow</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:51:46 GMT</last_modification_time>
     </signal>
@@ -1320,7 +1320,7 @@
     <name>popup_exit</name>
     <signal>
       <name>activate</name>
-      <handler>GtkExitActivate</handler>
+      <handler>GtkExit</handler>
       <data>&quot;intf_popup&quot;</data>
       <last_modification_time>Tue, 15 May 2001 13:52:03 GMT</last_modification_time>
     </signal>
@@ -2835,7 +2835,7 @@ http://www.videolan.org/</label>
 	    <name>playlist_add_disc</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GtkDiscOpenActivate</handler>
+	      <handler>GtkDiscOpenShow</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Mon, 14 May 2001 21:59:32 GMT</last_modification_time>
 	    </signal>
@@ -2848,7 +2848,7 @@ http://www.videolan.org/</label>
 	    <name>playlist_add_file</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GtkFileOpenActivate</handler>
+	      <handler>GtkFileOpenShow</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Mon, 14 May 2001 21:59:48 GMT</last_modification_time>
 	    </signal>
@@ -2861,7 +2861,7 @@ http://www.videolan.org/</label>
 	    <name>playlist_add_network</name>
 	    <signal>
 	      <name>activate</name>
-	      <handler>GtkNetworkOpenActivate</handler>
+	      <handler>GtkNetworkOpenShow</handler>
 	      <data>&quot;intf_playlist&quot;</data>
 	      <last_modification_time>Mon, 14 May 2001 22:00:03 GMT</last_modification_time>
 	    </signal>

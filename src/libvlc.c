@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.7 2002/06/04 00:11:12 sam Exp $
+ * $Id: libvlc.c,v 1.8 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -238,6 +238,10 @@ vlc_error_t vlc_init( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     {
         p_vlc->psz_object_name = "vlc";
     }
+
+    /* Announce who we are */
+    msg_Dbg( p_vlc, COPYRIGHT_MESSAGE );
+    msg_Dbg( p_vlc, "libvlc was configured with %s", CONFIGURE_LINE );
 
     /*
      * Initialize the module bank and and load the configuration of the main
@@ -781,8 +785,10 @@ vlc_status_t vlc_status( vlc_t *p_vlc )
     return p_vlc->i_status;
 }
 
-vlc_error_t vlc_add_target( vlc_t *p_vlc, char *psz_target )
+vlc_error_t vlc_add_target( vlc_t *p_vlc, char *psz_target,
+                                          int i_mode, int i_pos )
 {
+    vlc_error_t err;
     playlist_t *p_playlist;
 
     if( !p_vlc || ( p_vlc->i_status != VLC_STATUS_STOPPED
@@ -807,11 +813,11 @@ vlc_error_t vlc_add_target( vlc_t *p_vlc, char *psz_target )
         vlc_object_yield( p_playlist );
     }
 
-    playlist_Add( p_playlist, PLAYLIST_END, psz_target );
+    err = playlist_Add( p_playlist, psz_target, i_mode, i_pos );
 
     vlc_object_release( p_playlist );
 
-    return VLC_SUCCESS;
+    return err;
 }
 
 /* following functions are local */
@@ -828,7 +834,8 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     /* We assume that the remaining parameters are filenames */
     for( i_opt = optind; i_opt < i_argc; i_opt++ )
     {
-        vlc_add_target( p_vlc, ppsz_argv[ i_opt ] );
+        vlc_add_target( p_vlc, ppsz_argv[ i_opt ],
+                        PLAYLIST_APPEND, PLAYLIST_END );
     }
 
     return VLC_SUCCESS;

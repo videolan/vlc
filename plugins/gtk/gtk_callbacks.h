@@ -2,7 +2,7 @@
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.h,v 1.19 2002/05/18 02:12:20 ipkiss Exp $
+ * $Id: gtk_callbacks.h,v 1.20 2002/06/07 14:30:40 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -42,15 +42,15 @@
  *  main window callbacks: specific prototypes are in headers listed before
  *****************************************************************************/
 
-gboolean GtkExit                ( GtkWidget *, GdkEventButton *, gpointer );
-gboolean GtkWindowToggle        ( GtkWidget *, GdkEventButton *, gpointer );
-gboolean GtkFullscreen          ( GtkWidget *, GdkEventButton *, gpointer );
+gboolean GtkExit                ( GtkWidget *, gpointer );
+gboolean GtkWindowToggle        ( GtkWidget *, gpointer );
+gboolean GtkFullscreen          ( GtkWidget *, gpointer );
 gboolean GtkSliderRelease       ( GtkWidget *, GdkEventButton *, gpointer );
 gboolean GtkSliderPress         ( GtkWidget *, GdkEventButton *, gpointer );
 gboolean GtkWindowDelete        ( GtkWidget * widget, GdkEvent *, gpointer );
-gboolean GtkJumpShow            ( GtkWidget *, GdkEventButton *, gpointer );
-gboolean GtkAboutShow           ( GtkWidget *, GdkEventButton *, gpointer );
-gboolean GtkMessagesShow        ( GtkWidget *, GdkEventButton *, gpointer );
+gboolean GtkJumpShow            ( GtkWidget *, gpointer );
+gboolean GtkAboutShow           ( GtkWidget *, gpointer );
+gboolean GtkMessagesShow        ( GtkWidget *, gpointer );
 void     GtkTitlePrev           ( GtkButton * button, gpointer );
 void     GtkTitleNext           ( GtkButton * button, gpointer );
 void     GtkChapterPrev         ( GtkButton *, gpointer );
@@ -61,28 +61,14 @@ void     GtkWindowDrag          ( GtkWidget *, GdkDragContext *,
                                   guint , guint, gpointer );
 void     GtkJumpOk              ( GtkButton * button, gpointer );
 void     GtkJumpCancel          ( GtkButton * button, gpointer user_data );
-void     GtkExitActivate        ( GtkMenuItem *, gpointer );
-void     GtkWindowToggleActivate( GtkMenuItem *, gpointer );
-void     GtkFullscreenActivate  ( GtkMenuItem *, gpointer );
-void     GtkAboutActivate       ( GtkMenuItem *, gpointer );
-void     GtkJumpActivate        ( GtkMenuItem *, gpointer );
 
 void     GtkNetworkJoin         ( GtkEditable *, gpointer );
 void     GtkChannelGo           ( GtkButton *, gpointer );
 
 void     GtkNetworkOpenChannel  ( GtkToggleButton *, gpointer );
 
-void
-GtkEjectDiscActivate                   (GtkMenuItem     *menuitem,
-                                        gpointer         user_data);
-
 gboolean
 GtkDiscEject                           (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-void
-GtkMessagesActivate                    (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
 
 void
@@ -96,7 +82,6 @@ GtkMessagesDelete                      (GtkWidget       *widget,
 
 gboolean
 GtkSatOpenShow                         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
                                         gpointer         user_data);
 
 void

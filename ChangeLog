@@ -5,6 +5,22 @@
 0.5.0
 Not released yet
 
+  * ./src/playlist/playlist.c: lots of playlist behaviour enhancements.
+  * ./src/misc/objects.c: we do not hang on attempt to destroy an object with
+    a non-zero reference count, but we still complain.
+  * ./plugins/gtk/gtk_control.c, plugins/gtk/gtk_playlist.c: most controls such
+    as play, pause, stop, next, fast etc. work again.
+  * ./plugins/gtk/gnome_*: got rid of lots of useless wrappers which were a
+    workaround for a bug in Glade. Instead, bootstrap.sh does the Glade fixes.
+  * ./plugins/ffmpeg/ffmpeg.c: if there is already a video output with the
+    appropriate properties, we use it.
+  * ./Makefile: minor fix for the BeOS' make-package (icon loss).
+  * ./plugins/spudec/spu_decoder.c: release vout when we close spudec.
+  * ./plugins/ac3_spdif/ac3_spdif.c: only report initiliazation error when it
+    is really an error.
+  * ./include/video_output.h: added mouse coordinates to vout struct.
+  * ./plugins/mpeg_vdec/video_parser.c: check that p_vpar->p_vout is available
+    before detaching it.
   * ./plugins/gtk/gtk_callbacks.c: fixed a segfault when switching to
     fullscreen from the popup menu.
   * ./src/interface/interface.c: interfaces are no longer attached only to

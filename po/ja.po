@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-04 02:09+0200\n"
+"POT-Creation-Date: 2002-06-07 11:11+0200\n"
 "PO-Revision-Date: 2002-04-02 03:22+0900\n"
 "Last-Translator: Fumio Nakayama <endymion@ca2.so-net.ne.jp>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -12,13 +12,13 @@ msgstr ""
 "Content-Type: text/plain; charset=euc-jp\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libvlc.c:277
+#: src/libvlc.c:281
 #, c-format
 msgid "Usage: %s [options] [parameters] [file]...\n"
 msgstr ""
 
 #. Print module name
-#: src/libvlc.c:891
+#: src/libvlc.c:898
 #, c-format
 msgid ""
 "%s module options:\n"
@@ -26,27 +26,27 @@ msgid ""
 msgstr ""
 
 #. We could also have "=<" here
-#: src/libvlc.c:911 src/misc/configuration.c:798
+#: src/libvlc.c:918 src/misc/configuration.c:798
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:914 src/misc/configuration.c:783
+#: src/libvlc.c:921 src/misc/configuration.c:783
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:917 src/misc/configuration.c:790
+#: src/libvlc.c:924 src/misc/configuration.c:790
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:923
+#: src/libvlc.c:930
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:924
+#: src/libvlc.c:931
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:1006
+#: src/libvlc.c:1013
 msgid ""
 "\n"
 "Playlist items:\n"
@@ -62,25 +62,25 @@ msgid ""
 "  vlc:quit                       quit VLC\n"
 msgstr ""
 
-#: src/libvlc.c:1027 src/libvlc.c:1076 src/libvlc.c:1100 src/libvlc.c:1119
+#: src/libvlc.c:1034 src/libvlc.c:1083 src/libvlc.c:1107 src/libvlc.c:1126
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
 
 #. Usage
-#: src/libvlc.c:1050
+#: src/libvlc.c:1057
 #, c-format
 msgid ""
 "Usage: %s [options] [parameters] [file]...\n"
 "\n"
 msgstr ""
 
-#: src/libvlc.c:1053
+#: src/libvlc.c:1060
 msgid "[module]              [description]\n"
 msgstr ""
 
-#: src/libvlc.c:1094
+#: src/libvlc.c:1101
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -148,8 +148,8 @@ msgstr ""
 
 #: src/libvlc.h:60
 msgid ""
-"This option allows you to select the audio audio output method used by vlc. "
-"The default behavior is to automatically select the best method available."
+"This option allows you to select the audio output method used by vlc. The "
+"default behavior is to automatically select the best method available."
 msgstr ""
 
 #: src/libvlc.h:64

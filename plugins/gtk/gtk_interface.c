@@ -823,81 +823,81 @@ create_intf_window (void)
                       GTK_SIGNAL_FUNC (GtkWindowDelete),
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (menubar_open), "activate",
-                      GTK_SIGNAL_FUNC (GtkFileOpenActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_disc), "activate",
-                      GTK_SIGNAL_FUNC (GtkDiscOpenActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_network), "activate",
-                      GTK_SIGNAL_FUNC (GtkNetworkOpenActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_eject), "activate",
-                      GTK_SIGNAL_FUNC (GtkEjectDiscActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_exit), "activate",
-                      GTK_SIGNAL_FUNC (GtkExitActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_interface_hide), "activate",
-                      GTK_SIGNAL_FUNC (GtkWindowToggleActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_fullscreen), "activate",
-                      GTK_SIGNAL_FUNC (GtkFullscreenActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_playlist), "activate",
-                      GTK_SIGNAL_FUNC (GtkPlaylistActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_modules), "activate",
-                      GTK_SIGNAL_FUNC (GtkModulesActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_messages), "activate",
-                      GTK_SIGNAL_FUNC (GtkMessagesActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_preferences), "activate",
-                      GTK_SIGNAL_FUNC (GtkPreferencesActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (menubar_about), "activate",
-                      GTK_SIGNAL_FUNC (GtkAboutActivate),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_open), "button_press_event",
                       GTK_SIGNAL_FUNC (GtkFileOpenShow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_disc), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (menubar_disc), "activate",
                       GTK_SIGNAL_FUNC (GtkDiscOpenShow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_network), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (menubar_network), "activate",
                       GTK_SIGNAL_FUNC (GtkNetworkOpenShow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_sat), "button_press_event",
-                      GTK_SIGNAL_FUNC (GtkSatOpenShow),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_back), "button_press_event",
-                      GTK_SIGNAL_FUNC (GtkControlBack),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_stop), "button_press_event",
-                      GTK_SIGNAL_FUNC (GtkControlStop),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_eject), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (menubar_eject), "activate",
                       GTK_SIGNAL_FUNC (GtkDiscEject),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_play), "button_press_event",
-                      GTK_SIGNAL_FUNC (GtkControlPlay),
+  gtk_signal_connect (GTK_OBJECT (menubar_exit), "activate",
+                      GTK_SIGNAL_FUNC (GtkExit),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_pause), "button_press_event",
-                      GTK_SIGNAL_FUNC (GtkControlPause),
+  gtk_signal_connect (GTK_OBJECT (menubar_interface_hide), "activate",
+                      GTK_SIGNAL_FUNC (GtkWindowToggle),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_slow), "button_press_event",
-                      GTK_SIGNAL_FUNC (GtkControlSlow),
+  gtk_signal_connect (GTK_OBJECT (menubar_fullscreen), "activate",
+                      GTK_SIGNAL_FUNC (GtkFullscreen),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_fast), "button_press_event",
-                      GTK_SIGNAL_FUNC (GtkControlFast),
-                      "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_playlist), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (menubar_playlist), "activate",
                       GTK_SIGNAL_FUNC (GtkPlaylistShow),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_prev), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (menubar_modules), "activate",
+                      GTK_SIGNAL_FUNC (GtkModulesShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (menubar_messages), "activate",
+                      GTK_SIGNAL_FUNC (GtkMessagesShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (menubar_preferences), "activate",
+                      GTK_SIGNAL_FUNC (GtkPreferencesShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (menubar_about), "activate",
+                      GTK_SIGNAL_FUNC (GtkAboutShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_open), "clicked",
+                      GTK_SIGNAL_FUNC (GtkFileOpenShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_disc), "clicked",
+                      GTK_SIGNAL_FUNC (GtkDiscOpenShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_network), "clicked",
+                      GTK_SIGNAL_FUNC (GtkNetworkOpenShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_sat), "clicked",
+                      GTK_SIGNAL_FUNC (GtkSatOpenShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_back), "clicked",
+                      GTK_SIGNAL_FUNC (GtkControlBack),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_stop), "clicked",
+                      GTK_SIGNAL_FUNC (GtkControlStop),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_eject), "clicked",
+                      GTK_SIGNAL_FUNC (GtkDiscEject),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_play), "clicked",
+                      GTK_SIGNAL_FUNC (GtkControlPlay),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_pause), "clicked",
+                      GTK_SIGNAL_FUNC (GtkControlPause),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_slow), "clicked",
+                      GTK_SIGNAL_FUNC (GtkControlSlow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_fast), "clicked",
+                      GTK_SIGNAL_FUNC (GtkControlFast),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_playlist), "clicked",
+                      GTK_SIGNAL_FUNC (GtkPlaylistShow),
+                      "intf_window");
+  gtk_signal_connect (GTK_OBJECT (toolbar_prev), "clicked",
                       GTK_SIGNAL_FUNC (GtkPlaylistPrev),
                       "intf_window");
-  gtk_signal_connect (GTK_OBJECT (toolbar_next), "button_press_event",
+  gtk_signal_connect (GTK_OBJECT (toolbar_next), "clicked",
                       GTK_SIGNAL_FUNC (GtkPlaylistNext),
                       "intf_window");
   gtk_signal_connect (GTK_OBJECT (slider), "button_release_event",
@@ -1243,58 +1243,58 @@ create_intf_popup (void)
   gtk_container_add (GTK_CONTAINER (intf_popup), popup_exit);
 
   gtk_signal_connect (GTK_OBJECT (popup_play), "activate",
-                      GTK_SIGNAL_FUNC (GtkPlayActivate),
+                      GTK_SIGNAL_FUNC (GtkControlPlay),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_pause), "activate",
-                      GTK_SIGNAL_FUNC (GtkPauseActivate),
+                      GTK_SIGNAL_FUNC (GtkControlPause),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_stop), "activate",
-                      GTK_SIGNAL_FUNC (GtKStopActivate),
+                      GTK_SIGNAL_FUNC (GtkControlStop),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_back), "activate",
-                      GTK_SIGNAL_FUNC (GtkBackActivate),
+                      GTK_SIGNAL_FUNC (GtkControlBack),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_slow), "activate",
-                      GTK_SIGNAL_FUNC (GtkSlowActivate),
+                      GTK_SIGNAL_FUNC (GtkControlSlow),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_fast), "activate",
-                      GTK_SIGNAL_FUNC (GtkFastActivate),
+                      GTK_SIGNAL_FUNC (GtkControlFast),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_interface_toggle), "activate",
-                      GTK_SIGNAL_FUNC (GtkWindowToggleActivate),
+                      GTK_SIGNAL_FUNC (GtkWindowToggle),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_fullscreen), "activate",
-                      GTK_SIGNAL_FUNC (GtkFullscreenActivate),
+                      GTK_SIGNAL_FUNC (GtkFullscreen),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_next), "activate",
-                      GTK_SIGNAL_FUNC (GtkNextActivate),
+                      GTK_SIGNAL_FUNC (GtkPlaylistNext),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_prev), "activate",
-                      GTK_SIGNAL_FUNC (GtkPrevActivate),
+                      GTK_SIGNAL_FUNC (GtkPlaylistPrev),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_jump), "activate",
-                      GTK_SIGNAL_FUNC (GtkJumpActivate),
+                      GTK_SIGNAL_FUNC (GtkJumpShow),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_file), "activate",
-                      GTK_SIGNAL_FUNC (GtkFileOpenActivate),
+                      GTK_SIGNAL_FUNC (GtkFileOpenShow),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_disc), "activate",
-                      GTK_SIGNAL_FUNC (GtkDiscOpenActivate),
+                      GTK_SIGNAL_FUNC (GtkDiscOpenShow),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_network), "activate",
-                      GTK_SIGNAL_FUNC (GtkNetworkOpenActivate),
+                      GTK_SIGNAL_FUNC (GtkNetworkOpenShow),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_about), "activate",
-                      GTK_SIGNAL_FUNC (GtkAboutActivate),
+                      GTK_SIGNAL_FUNC (GtkAboutShow),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_playlist), "activate",
-                      GTK_SIGNAL_FUNC (GtkPlaylistActivate),
+                      GTK_SIGNAL_FUNC (GtkPlaylistShow),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_preferences), "activate",
-                      GTK_SIGNAL_FUNC (GtkPreferencesActivate),
+                      GTK_SIGNAL_FUNC (GtkPreferencesShow),
                       "intf_popup");
   gtk_signal_connect (GTK_OBJECT (popup_exit), "activate",
-                      GTK_SIGNAL_FUNC (GtkExitActivate),
+                      GTK_SIGNAL_FUNC (GtkExit),
                       "intf_popup");
 
   gtk_object_set_data (GTK_OBJECT (intf_popup), "tooltips", tooltips);
@@ -2295,13 +2295,13 @@ create_intf_playlist (void)
                       GTK_SIGNAL_FUNC (gtk_widget_hide),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (playlist_add_disc), "activate",
-                      GTK_SIGNAL_FUNC (GtkDiscOpenActivate),
+                      GTK_SIGNAL_FUNC (GtkDiscOpenShow),
                       "intf_playlist");
   gtk_signal_connect (GTK_OBJECT (playlist_add_file), "activate",
-                      GTK_SIGNAL_FUNC (GtkFileOpenActivate),
+                      GTK_SIGNAL_FUNC (GtkFileOpenShow),
                       "intf_playlist");
   gtk_signal_connect (GTK_OBJECT (playlist_add_network), "activate",
-                      GTK_SIGNAL_FUNC (GtkNetworkOpenActivate),
+                      GTK_SIGNAL_FUNC (GtkNetworkOpenShow),
                       "intf_playlist");
   gtk_signal_connect (GTK_OBJECT (playlist_add_url), "activate",
                       GTK_SIGNAL_FUNC (GtkPlaylistAddUrl),

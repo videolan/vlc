@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: playlist.h,v 1.5 2002/06/04 00:11:12 sam Exp $
+ * $Id: playlist.h,v 1.6 2002/06/07 14:30:40 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -42,20 +42,21 @@ struct playlist_s
 {
     VLC_COMMON_MEMBERS
 
-    /* Thread properties and lock */
-    vlc_mutex_t           change_lock;
-
     int                   i_index;                          /* current index */
-    int                   i_size;                              /* total size */
-    playlist_item_t **    pp_items;
-
     int                   i_status;
+    int                   i_size;                              /* total size */
+
+    playlist_item_t **    pp_items;
 
     input_thread_t *      p_input;
 };
 
 /* Used by playlist_Add */
-#define PLAYLIST_START            0
+#define PLAYLIST_INSERT      0x0001
+#define PLAYLIST_REPLACE     0x0002
+#define PLAYLIST_APPEND      0x0004
+#define PLAYLIST_GO          0x0008
+
 #define PLAYLIST_END             -1
 
 /* Playlist parsing mode */
@@ -91,6 +92,6 @@ void           playlist_Destroy  ( playlist_t * );
 #define playlist_Goto(p,i) playlist_Command(p,PLAYLIST_GOTO,i)
 VLC_EXPORT( void, playlist_Command, ( playlist_t *, int, int ) );
 
-VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, int, const char * ) );
+VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, int, int ) );
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
 

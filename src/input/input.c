@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.201 2002/06/04 00:11:12 sam Exp $
+ * $Id: input.c,v 1.202 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -77,7 +77,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     if( p_input == NULL )
     {
         msg_Err( p_parent, "out of memory" );
-        return( NULL );
+        return NULL;
     }
 
     /* Initialize thread properties */
@@ -446,7 +446,7 @@ static int InitThread( input_thread_t * p_input )
 
     if( input_AccessInit( p_input ) == -1 )
     {
-        return( -1 );
+        return -1;
     }
 
     /* Find and open appropriate access module */
@@ -458,7 +458,7 @@ static int InitThread( input_thread_t * p_input )
     {
         msg_Err( p_input, "no suitable access module for `%s/%s:%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
-        return( -1 );
+        return -1;
     }
 
 #define f p_input->p_access_module->p_functions->access.functions.access
@@ -487,7 +487,7 @@ static int InitThread( input_thread_t * p_input )
             if( p_input->b_die || p_input->b_error || p_input->b_eof )
             {
                 module_Unneed( p_input->p_access_module );
-                return( -1 );
+                return -1;
             }
         }
     }
@@ -502,7 +502,7 @@ static int InitThread( input_thread_t * p_input )
         msg_Err( p_input, "no suitable demux module for `%s/%s:%s'",
                  p_input->psz_access, p_input->psz_demux, p_input->psz_name );
         module_Unneed( p_input->p_access_module );
-        return( -1 );
+        return -1;
     }
 
 #define f p_input->p_demux_module->p_functions->demux.functions.demux
@@ -512,7 +512,7 @@ static int InitThread( input_thread_t * p_input )
     p_input->pf_rewind        = f.pf_rewind;
 #undef f
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************

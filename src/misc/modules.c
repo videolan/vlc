@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.65 2002/06/02 09:03:54 sam Exp $
+ * $Id: modules.c,v 1.66 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -279,8 +279,8 @@ module_t * __module_Need( vlc_object_t *p_this,
     module_t *p_module;
     char     *psz_realname = NULL;
 
-    msg_Info( p_this, "looking for %s module",
-                      MODULE_CAPABILITY( i_capability ) );
+    msg_Dbg( p_this, "looking for %s module",
+                     MODULE_CAPABILITY( i_capability ) );
 
     /* We take the global lock */
     vlc_mutex_lock( &p_this->p_vlc->module_bank.lock );

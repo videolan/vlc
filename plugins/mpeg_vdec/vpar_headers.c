@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.26 2002/06/02 09:03:54 sam Exp $
+ * $Id: vpar_headers.c,v 1.27 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -486,10 +486,15 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     /* Extension and User data */
     ExtensionAndUserData( p_vpar );
 
-    /* Spawn a video output if there is none */
-
+    /* Spawn a video output if there is none. First we look for our children,
+     * then we look for any other vout that might be available. */
     p_vpar->p_vout = vlc_object_find( p_vpar->p_fifo, VLC_OBJECT_VOUT,
-                                                      FIND_ANYWHERE );
+                                                      FIND_CHILD );
+    if( p_vpar->p_vout == NULL )
+    {
+        p_vpar->p_vout = vlc_object_find( p_vpar->p_fifo, VLC_OBJECT_VOUT,
+                                                          FIND_ANYWHERE );
+    }
     
     if( p_vpar->p_vout )
     {
@@ -511,6 +516,11 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
             vlc_object_attach( p_vpar->p_vout, p_vpar->p_fifo );
             vlc_object_release( p_vpar->p_vout );
         }
+    }
+
+    if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
+    {
+        return;
     }
 
     if( p_vpar->p_vout == NULL )

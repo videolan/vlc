@@ -2,7 +2,7 @@
  * gtk_modules.c : functions to build modules configuration boxes.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_modules.c,v 1.8 2002/06/01 12:31:59 sam Exp $
+ * $Id: gtk_modules.c,v 1.9 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -46,7 +46,6 @@
 #include "gtk_common.h"
 
 gboolean GtkModulesShow( GtkWidget       *widget,
-                         GdkEventButton  *event,
                          gpointer         user_data )
 {
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), "intf_window" );
@@ -70,10 +69,3 @@ void GtkModulesCancel( GtkButton * button, gpointer user_data )
     gtk_widget_hide( p_intf->p_sys->p_modules );
 }
 
-/****************************************************************************
- * Callbacks for menuitems
- ****************************************************************************/
-void GtkModulesActivate( GtkMenuItem * menuitem, gpointer user_data )
-{
-    GtkModulesShow( GTK_WIDGET( menuitem ), NULL, user_data );
-}

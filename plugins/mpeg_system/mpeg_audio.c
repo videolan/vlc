@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.9 2002/06/01 12:32:00 sam Exp $
+ * $Id: mpeg_audio.c,v 1.10 2002/06/07 14:30:41 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -430,7 +430,7 @@ static int MPEGAudioInit( input_thread_t * p_input )
                                              MPEGAUDIO_MAXTESTPOS) ) 
                     < (b_forced ? 1 : 2)  )
     {
-        msg_Warn( p_input, "MPEGAudio module discarded" );
+        msg_Warn( p_input, "MPEGAudio module discarded (no frame found)" );
         return( -1 );
     }
     
@@ -446,8 +446,7 @@ static int MPEGAudioInit( input_thread_t * p_input )
         return( -1 );
     }
     p_input->stream.pp_programs[0]->b_is_ok = 0;
-    p_input->stream.p_selected_program = 
-            p_input->stream.p_new_program = p_input->stream.pp_programs[0];
+    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
     
     /* create our ES */ 
     p_es = input_AddES( p_input, 
