@@ -1,8 +1,8 @@
 /*****************************************************************************
  * transforms_yuvmmx.h: MMX YUV transformation assembly
  *****************************************************************************
- * Copyright (C) 1999, 2000 VideoLAN
- * $Id: i420_rgb_mmx.h,v 1.4 2003/10/01 03:38:24 sam Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id$
  *
  * Authors: Olie Lho <ollie@sis.com.tw>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -24,21 +24,26 @@
  *****************************************************************************/
 
 /* hope these constant values are cache line aligned */
-#define UNUSED_U64(foo) \
+#if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ >= 3)
+#define USED_U64(foo) \
+    static const uint64_t foo __asm__ (#foo) __attribute__((used))
+#else
+#define USED_U64(foo) \
     static const uint64_t foo __asm__ (#foo) __attribute__((unused))
-UNUSED_U64(mmx_80w)     = 0x0080008000800080ULL;
-UNUSED_U64(mmx_10w)     = 0x1010101010101010ULL;
-UNUSED_U64(mmx_00ffw)   = 0x00ff00ff00ff00ffULL;
-UNUSED_U64(mmx_Y_coeff) = 0x253f253f253f253fULL;
+#endif
+USED_U64(mmx_80w)     = 0x0080008000800080ULL;
+USED_U64(mmx_10w)     = 0x1010101010101010ULL;
+USED_U64(mmx_00ffw)   = 0x00ff00ff00ff00ffULL;
+USED_U64(mmx_Y_coeff) = 0x253f253f253f253fULL;
 
-UNUSED_U64(mmx_U_green) = 0xf37df37df37df37dULL;
-UNUSED_U64(mmx_U_blue)  = 0x4093409340934093ULL;
-UNUSED_U64(mmx_V_red)   = 0x3312331233123312ULL;
-UNUSED_U64(mmx_V_green) = 0xe5fce5fce5fce5fcULL;
+USED_U64(mmx_U_green) = 0xf37df37df37df37dULL;
+USED_U64(mmx_U_blue)  = 0x4093409340934093ULL;
+USED_U64(mmx_V_red)   = 0x3312331233123312ULL;
+USED_U64(mmx_V_green) = 0xe5fce5fce5fce5fcULL;
 
-UNUSED_U64(mmx_mask_f8) = 0xf8f8f8f8f8f8f8f8ULL;
-UNUSED_U64(mmx_mask_fc) = 0xfcfcfcfcfcfcfcfcULL;
-#undef UNUSED_U64
+USED_U64(mmx_mask_f8) = 0xf8f8f8f8f8f8f8f8ULL;
+USED_U64(mmx_mask_fc) = 0xfcfcfcfcfcfcfcfcULL;
+#undef USED_U64
 
 #define MMX_INIT_16 "                                                       \n\
 movd      (%1), %%mm0       # Load 4 Cb       00 00 00 00 u3 u2 u1 u0       \n\
