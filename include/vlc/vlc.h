@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.12 2002/08/26 08:36:12 sam Exp $
+ * $Id: vlc.h,v 1.13 2002/08/26 23:36:20 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -95,17 +95,7 @@ typedef int        vlc_status_t;
  * Required internal headers
  *****************************************************************************/
 #if defined( __VLC__ )
-#   include "config.h"
-#   include "vlc_config.h"
-#   include "modules_inner.h"
 #   include "vlc_common.h"
-#   include "os_specific.h"
-#   include "vlc_messages.h"
-#   include "mtime.h"
-#   include "modules.h"
-#   include "main.h"
-#   include "configuration.h"
-#   include "vlc_objects.h"
 #endif
 
 /*****************************************************************************

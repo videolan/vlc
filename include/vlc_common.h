@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.23 2002/08/21 23:19:58 sam Exp $
+ * $Id: vlc_common.h,v 1.24 2002/08/26 23:36:20 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -25,12 +25,21 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * Compiler-specific workarounds
+ * Required vlc headers
  *****************************************************************************/
+#if defined( __BORLANDC__ )
+#   undef PACKAGE
+#endif
+
+#include "config.h"
+
 #if defined( __BORLANDC__ )
 #   undef HAVE_VARIADIC_MACROS
 #   undef HAVE_STDINT_H
 #endif
+
+#include "vlc_config.h"
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Required system headers
@@ -464,11 +473,6 @@ typedef __int64 off_t;
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-#ifndef PACKAGE /* Borland C++ uses this ! */
-#define PACKAGE VLC_PACKAGE
-#endif
-#define VERSION VLC_VERSION
-
 #if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT ) && !defined( __BORLANDC__ ) && !defined( NEED_GNOMESUPPORT_H )
 #   include <libintl.h>
 #   undef _
@@ -484,6 +488,19 @@ typedef __int64 off_t;
 #endif
 
 /*****************************************************************************
- * Plug-in stuff
+ * Additional vlc stuff
  *****************************************************************************/
 #include "vlc_symbols.h"
+#include "os_specific.h"
+#include "vlc_messages.h"
+#include "mtime.h"
+#include "modules.h"
+#include "main.h"
+#include "configuration.h"
+#include "vlc_objects.h"
+
+#if defined( __BORLANDC__ )
+#   undef PACKAGE
+#   define PACKAGE
+#endif
+

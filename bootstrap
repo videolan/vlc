@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  bootstrap.sh file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.5 2002/08/26 21:46:06 sam Exp $
+##  $Id: bootstrap,v 1.6 2002/08/26 23:36:20 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -49,6 +49,8 @@ else
   #            lcmessage.m4 progtest.m4
   #  do cp ${aclocaldir}/${file} m4/
   #done
+  # Yuck!
+  touch m4/Makefile.am
   # Yuck!
   echo 'AC_DEFUN([AM_GNU_GETTEXT_VERSION], [])' > m4/gettext.m4
 fi

@@ -40,7 +40,7 @@ __fastcall TAboutDlg::TAboutDlg( TComponent* Owner )
         : TForm( Owner )
 {
     Image1->Picture->Icon = p_intfGlobal->p_sys->p_window->Icon;
-    LabelVersion->Caption = "Version " VLC_VERSION;
+    LabelVersion->Caption = "Version " VERSION;
 }
 //---------------------------------------------------------------------------
 
