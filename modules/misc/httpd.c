@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.12 2003/04/27 03:08:36 fenrir Exp $
+ * $Id: httpd.c,v 1.13 2003/04/27 14:11:26 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1801,7 +1801,12 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
                               p_con->p_buffer + p_con->i_buffer,
                               p_con->i_buffer_size - p_con->i_buffer, 0 );
 
-                if( ( i_len < 0 && errno != EAGAIN && errno != EINTR )||
+
+#if defined( WIN32 ) || defined( UNDER_CE )
+                if( ( i_len < 0 && WSAGetLastError() == !WSAEWOULDBLOCK ) ||
+#else
+                if( ( i_len < 0 && errno != EAGAIN && errno != EINTR ) ||
+#endif
                     ( i_len == 0 ) )
                 {
                     httpd_connection_t *p_next = p_con->p_next;
