@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.18 2003/01/10 09:25:57 lool Exp $
+$Id: FAQ,v 1.19 2003/01/13 15:14:45 alexis Exp $
 
 1. Using VLC
 
@@ -31,7 +31,7 @@ It should disappear after a few seconds if you stop moving the mouse.
 
 1.5 How do I use vlc if I don't want to install Gnome and all this
 #@!£% *$@&§% !@# bloat?
----------------------------------------------------------------------------
+------------------------------------------------------------------
 You can run:
     vlc --intf dummy myfile.mpg
 Most commands are available from the command line, see vlc --help for
@@ -230,8 +230,8 @@ system.
 
 3.3.1 Do you have plans for a MacOS 9 / OS/2 / &{#!@}~ port?
 -----------------------------------------------------------
-No, nobody reported to be actually working on a MacOS 9 port.  If you
-feel like you could write it, we would of course welcome it.  Currently,
+No, nobody reported to be actually working on a MacOS 9 port. If you
+feel like you could write it, we would of course welcome it. Currently,
 the developers are more interested in supporting the latest Operating
 Systems and completing the functionalities.
 
@@ -267,8 +267,8 @@ You may use the VideoLAN logo using the following copyright:
   or any product developed by the VideoLAN team, but does not indicate
   endorsement by the project.
 
-4.2 May I reditribute VLC?
--------------------------
+4.2 May I redistribute VLC?
+--------------------------
 You may distribute an original or modified version of VideoLAN as long
 as you conform to the terms of its license. It is the GNU General Public
 License Version 2 (referred herein as GPL), and it is in the file named
