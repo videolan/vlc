@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.43 2002/12/06 10:10:39 sam Exp $
+ * $Id: input_ext-dec.c,v 1.44 2003/02/26 13:51:36 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -118,6 +118,10 @@ static inline vlc_bool_t _NextDataPacket( decoder_fifo_t * p_fifo,
      * and not just a PES header */
     do
     {
+        /* Sanity check. Yes, this can happen if the caller doesn't check
+         * for p_fifo->b_die beforehand. */
+        if( p_bit_stream->p_pes == NULL ) return 0;
+
         /* We were reading the last data packet of this PES packet... It's
          * time to jump to the next PES packet */
         if( p_bit_stream->p_data->p_next == NULL )
@@ -215,6 +219,7 @@ u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
         else
         {
             _BitstreamNextDataPacket( p_bit_stream );
+            if( p_bit_stream->p_decoder_fifo->b_die ) return 0;
 
             if( (ptrdiff_t)p_bit_stream->p_byte & (sizeof(WORD_TYPE) - 1) )
             {
@@ -240,6 +245,7 @@ u32 UnalignedShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
                         {
                             j = i;
                             _BitstreamNextDataPacket( p_bit_stream );
+                            if( p_bit_stream->p_decoder_fifo->b_die ) return 0;
                         }
                         ((byte_t *)&p_bit_stream->i_showbits_buffer)[i] =
                             * p_bit_stream->p_byte;
@@ -297,6 +303,7 @@ u32 UnalignedGetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
         else
         {
             _BitstreamNextDataPacket( p_bit_stream );
+            if( p_bit_stream->p_decoder_fifo->b_die ) return 0;
             i_result |= *(p_bit_stream->p_byte++) << (i_bits - 8);
             i_bits -= 8;
         }
@@ -317,6 +324,7 @@ u32 UnalignedGetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
         else
         {
             _BitstreamNextDataPacket( p_bit_stream );
+            if( p_bit_stream->p_decoder_fifo->b_die ) return 0;
             i_result |= *p_bit_stream->p_byte >> i_tmp;
             p_bit_stream->fifo.buffer = *(p_bit_stream->p_byte++)
                  << ( sizeof(WORD_TYPE) * 8 - i_tmp );
@@ -359,6 +367,7 @@ void UnalignedRemoveBits( bit_stream_t * p_bit_stream )
         else
         {
             _BitstreamNextDataPacket( p_bit_stream );
+            if( p_bit_stream->p_decoder_fifo->b_die ) return;
             p_bit_stream->p_byte++;
             p_bit_stream->fifo.i_available += 8;
         }
@@ -377,6 +386,7 @@ void UnalignedRemoveBits( bit_stream_t * p_bit_stream )
         else
         {
             _BitstreamNextDataPacket( p_bit_stream );
+            if( p_bit_stream->p_decoder_fifo->b_die ) return;
             p_bit_stream->fifo.buffer = *(p_bit_stream->p_byte++)
                  << ( sizeof(WORD_TYPE) * 8 - 8
                          - p_bit_stream->fifo.i_available );

@@ -2,7 +2,7 @@
  * mpegvideo.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.8 2003/01/23 15:52:04 sam Exp $
+ * $Id: mpegvideo.c,v 1.9 2003/02/26 13:51:36 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -234,7 +234,8 @@ static void PacketizeThread( packetizer_t *p_pack )
         /* TODO: store skipped somewhere so can send it to the mux
          * after the input is created */
         i_skipped = 0;
-        while( ShowBits( &p_pack->bit_stream, 32 ) != 0x1B3 )
+        while( ShowBits( &p_pack->bit_stream, 32 ) != 0x1B3 &&
+               !p_pack->p_fifo->b_die && !p_pack->p_fifo->b_error )
         {
             RemoveBits( &p_pack->bit_stream, 8 );
             i_skipped++;
