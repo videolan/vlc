@@ -129,10 +129,6 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux  ( demux_t * );
-static int  Control( demux_t *, int, va_list );
-static void Seek   ( demux_t *, mtime_t i_date, double f_percent );
-
 #ifdef HAVE_ZLIB_H
 block_t *block_zlib_decompress( vlc_object_t *p_this, block_t *p_in_block ) {
     int result, dstsize, n;
@@ -322,9 +318,9 @@ public:
     ,i_end_time(-1)
     ,i_user_start_time(-1)
     ,i_user_end_time(-1)
-    ,i_current_sub_chapter(-1)
     ,i_seekpoint_num(-1)
     ,b_display_seekpoint(false)
+    ,psz_parent(NULL)
     {}
     
     int64_t RefreshChapters( bool b_ordered, int64_t i_prev_user_time, input_title_t & title );
@@ -333,11 +329,11 @@ public:
     int64_t                     i_start_time, i_end_time;
     int64_t                     i_user_start_time, i_user_end_time; /* the time in the stream when an edition is ordered */
     std::vector<chapter_item_t> sub_chapters;
-    int                         i_current_sub_chapter;
     int                         i_seekpoint_num;
     int64_t                     i_uid;
     bool                        b_display_seekpoint;
     std::string                 psz_name;
+    chapter_item_t              *psz_parent;
     
     bool operator<( const chapter_item_t & item ) const
     {
@@ -384,6 +380,7 @@ public:
         ,cluster(NULL)
         ,i_pts(0)
         ,i_start_pts(0)
+        ,i_chapter_time(0)
         ,b_cues(false)
         ,i_index(0)
         ,i_index_max(0)
@@ -425,6 +422,7 @@ public:
 
     mtime_t                 i_pts;
     mtime_t                 i_start_pts;
+    mtime_t                 i_chapter_time;
 
     vlc_bool_t              b_cues;
     int                     i_index;
@@ -449,6 +447,10 @@ public:
     int                            i_current_edition;
     const chapter_item_t           *psz_current_chapter;
 };
+
+static int  Demux  ( demux_t * );
+static int  Control( demux_t *, int, va_list );
+static void Seek   ( demux_t *, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter );
 
 #define MKVD_TIMECODESCALE 1000000
 
@@ -1156,8 +1158,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double );
-            Seek( p_demux, -1, f );
+            f = (double)va_arg( args, double, NULL );
+            Seek( p_demux, -1, f, NULL );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
@@ -1197,10 +1199,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( p_sys->title && i_skp < p_sys->title->i_seekpoint)
             {
-                Seek( p_demux, (int64_t)p_sys->title->seekpoint[i_skp]->i_time_offset, -1);
+                Seek( p_demux, (int64_t)p_sys->title->seekpoint[i_skp]->i_time_offset, -1, NULL);
                 p_demux->info.i_seekpoint |= INPUT_UPDATE_SEEKPOINT;
                 p_demux->info.i_seekpoint = i_skp;
-/*                p_sys->i_current_chapter = i_skp;*/
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1419,20 +1420,14 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
         }
 #endif
 
-        if (p_sys->i_start_pts > i_pts)
-        {
-            p_block->i_dts = 0;
-            p_block->i_pts = -1;
-        }
-        else
         if( tk.fmt.i_cat != VIDEO_ES )
         {
             p_block->i_dts = p_block->i_pts = i_pts;
         }
         else
         {
-            p_block->i_dts = i_pts;
-            p_block->i_pts = 0;
+            p_block->i_pts = i_pts;
+            p_block->i_dts = 0;
         }
 
         if( tk.fmt.i_cat == SPU_ES && strcmp( tk.psz_codec, "S_VOBSUB" ) )
@@ -1448,7 +1443,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, mtime_t i_pts,
 #undef tk
 }
 
-static void UpdateCurrentChapter( demux_t & demux, mtime_t i_pts )
+static void UpdateCurrentToChapter( demux_t & demux )
 {
     demux_sys_t & sys = *demux.p_sys;
     const chapter_item_t *psz_curr_chapter;
@@ -1457,7 +1452,7 @@ static void UpdateCurrentChapter( demux_t & demux, mtime_t i_pts )
     if ( sys.editions.size())
     {
         /* 1st, we need to know in which chapter we are */
-        psz_curr_chapter = sys.editions[sys.i_current_edition].FindTimecode( i_pts );
+        psz_curr_chapter = sys.editions[sys.i_current_edition].FindTimecode( sys.i_pts );
 
         /* we have moved to a new chapter */
         if (sys.psz_current_chapter != NULL && psz_curr_chapter != NULL && sys.psz_current_chapter != psz_curr_chapter)
@@ -1471,17 +1466,23 @@ static void UpdateCurrentChapter( demux_t & demux, mtime_t i_pts )
             if (sys.editions[sys.i_current_edition].b_ordered )
             {
                 /* TODO check if we need to silently seek to a new location in the stream (switch to another chapter) */
+                if (sys.psz_current_chapter->i_end_time != psz_curr_chapter->i_start_time)
+                    Seek(&demux, sys.i_pts, -1, psz_curr_chapter);
                 /* count the last duration time found for each track in a table (-1 not found, -2 silent) */
                 /* only seek after each duration >= end timecode of the current chapter */
             }
+
+//            sys.i_user_time = psz_curr_chapter->i_user_start_time - psz_curr_chapter->i_start_time;
+//            sys.i_start_pts = psz_curr_chapter->i_user_start_time;
         }
         sys.psz_current_chapter = psz_curr_chapter;
     }
 }
 
-static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
+static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, const chapter_item_t *psz_chapter)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    mtime_t i_time_offset = 0;
 
     KaxBlock    *block;
     int64_t     i_block_duration;
@@ -1564,9 +1565,25 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
         }
     }
 
+    // find the actual time for an ordered edition
+    if ( psz_chapter == NULL )
+    {
+        if ( p_sys->editions.size() && p_sys->editions[p_sys->i_current_edition].b_ordered )
+        {
+            /* 1st, we need to know in which chapter we are */
+            psz_chapter = p_sys->editions[p_sys->i_current_edition].FindTimecode( i_date );
+        }
+    }
+
+    if ( psz_chapter != NULL )
+    {
+        p_sys->psz_current_chapter = psz_chapter;
+        p_sys->i_chapter_time = i_time_offset = psz_chapter->i_user_start_time - psz_chapter->i_start_time;
+    }
+
     for( ; i_index < p_sys->i_index; i_index++ )
     {
-        if( p_sys->index[i_index].i_time > i_date )
+        if( p_sys->index[i_index].i_time + i_time_offset > i_date )
         {
             break;
         }
@@ -1585,6 +1602,9 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
     p_sys->in->setFilePointer( p_sys->index[i_index].i_position,
                                 seek_beginning );
 
+    p_sys->i_start_pts = i_date;
+
+    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
     /* now parse until key frame */
 #define tk  p_sys->track[i_track]
@@ -1596,11 +1616,9 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
             tk.b_search_keyframe = VLC_TRUE;
             i_track_skipping++;
         }
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, tk.p_es, i_date );
     }
 
-    p_sys->i_start_pts = i_date;
-
-    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
     while( i_track_skipping > 0 )
     {
@@ -1611,8 +1629,6 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
             return;
         }
 
-        p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000;
-
         for( i_track = 0; i_track < p_sys->i_track; i_track++ )
         {
             if( tk.i_number == block->TrackNum() )
@@ -1620,6 +1636,8 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
                 break;
             }
         }
+
+        p_sys->i_pts = p_sys->i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
 
         if( i_track < p_sys->i_track )
         {
@@ -1632,7 +1650,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent)
                 }
                 if( !tk.b_search_keyframe )
                 {
-                    BlockDecode( p_demux, block, 0, 0 );
+                    BlockDecode( p_demux, block, p_sys->i_pts, 0 );
                 }
             }
         }
@@ -1659,6 +1677,9 @@ static int Demux( demux_t *p_demux)
 
     for( ;; )
     {
+        if( p_sys->i_pts >= p_sys->i_start_pts  )
+            UpdateCurrentToChapter( *p_demux );
+        
         if( BlockGet( p_demux, &block, &i_block_ref1, &i_block_ref2, &i_block_duration ) )
         {
             msg_Warn( p_demux, "cannot get block EOF?" );
@@ -1666,7 +1687,7 @@ static int Demux( demux_t *p_demux)
             return 0;
         }
 
-        p_sys->i_pts = block->GlobalTimecode() / (mtime_t) 1000;
+        p_sys->i_pts = p_sys->i_chapter_time + block->GlobalTimecode() / (mtime_t) 1000;
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
         {
@@ -1675,8 +1696,6 @@ static int Demux( demux_t *p_demux)
 
         BlockDecode( p_demux, block, p_sys->i_pts, i_block_duration );
 
-        UpdateCurrentChapter( *p_demux, p_sys->i_pts );
-        
         delete block;
         i_block_count++;
 
@@ -2823,6 +2842,7 @@ static void ParseChapterAtom( demux_t *p_demux, int i_level, EbmlMaster *ca, cha
         {
             chapter_item_t new_sub_chapter;
             ParseChapterAtom( p_demux, i_level+1, static_cast<EbmlMaster *>(l), new_sub_chapter );
+            new_sub_chapter.psz_parent = &chapters;
             chapters.sub_chapters.push_back( new_sub_chapter );
         }
     }
@@ -3039,6 +3059,7 @@ void chapter_edition_t::RefreshChapters( input_title_t & title )
 {
     int64_t i_prev_user_time = 0;
     std::vector<chapter_item_t>::iterator index = chapters.begin();
+
     while ( index != chapters.end() )
     {
         i_prev_user_time = (*index).RefreshChapters( b_ordered, i_prev_user_time, title );
