@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.47 2003/08/08 17:08:32 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.48 2003/08/15 13:16:38 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -504,6 +504,8 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_DX50:
         case FOURCC_mp4v:
         case FOURCC_4:
+        case FOURCC_m4cc:
+        case FOURCC_M4CC:
         /* 3iv1 is unsupported by ffmpeg
            putting it here gives extreme distorted images
         case FOURCC_3IV1:
