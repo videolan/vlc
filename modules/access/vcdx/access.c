@@ -4,7 +4,7 @@
  *         to go here.
  *****************************************************************************
  * Copyright (C) 2000, 2003, 2004 VideoLAN
- * $Id: access.c,v 1.21 2004/02/22 10:30:41 rocky Exp $
+ * $Id$
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -159,7 +159,8 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
     i_read = 0;
 
-    dbg_print( (INPUT_DBG_CALL), "lsn: %u", p_vcd->cur_lsn );
+    dbg_print( (INPUT_DBG_CALL), "lsn: %lu", 
+	       (long unsigned int) p_vcd->cur_lsn );
 
     /* Compute the number of blocks we have to read */
 
@@ -173,7 +174,8 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
 
         /* We've run off of the end of this entry. Do we continue or stop? */
         dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC),
-                   "end reached, cur: %u", p_vcd->cur_lsn );
+                   "end reached, cur: %lu", 
+		   (long unsigned int) p_vcd->cur_lsn );
 
         read_status = vcdplayer_pbc_is_on( p_vcd )
           ? vcdplayer_pbc_nav( p_input )
@@ -228,7 +230,8 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
                           p_vcd->cur_lsn,
                           p_buffer + (i_index*M2F2_SECTOR_SIZE) ) < 0 )
         {
-          LOG_ERR ("could not read sector %d", p_vcd->cur_lsn );
+          LOG_ERR ("could not read sector %lu", 
+		   (long unsigned int) p_vcd->cur_lsn );
           return -1;
         }
 
@@ -249,8 +252,8 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
               p_vcd->cur_lsn >= p_vcd->p_entries[i_entry+1] )
             {
               dbg_print( INPUT_DBG_PBC,
-                         "new entry, i_entry %d, sector %d, es %d",
-                         i_entry, p_vcd->cur_lsn,
+                         "new entry, i_entry %d, sector %lu, es %lu",
+                         i_entry, (long unsigned int) p_vcd->cur_lsn,
                          p_vcd->p_entries[i_entry] );
               p_vcd->play_item.num =
                 ++ p_input->stream.p_selected_area->i_part;
@@ -269,7 +272,8 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         if ( VCDReadSector( VLC_OBJECT(p_input), p_vcd->vcd,
                             p_vcd->cur_lsn, p_last_sector ) < 0 )
         {
-            LOG_ERR ("could not read sector %d", p_vcd->cur_lsn );
+            LOG_ERR ("could not read sector %lu", 
+		     (long unsigned int) p_vcd->cur_lsn );
             return -1;
         }
 
@@ -416,8 +420,9 @@ VCDSeek( input_thread_t * p_input, off_t i_off )
     p_input->stream.p_selected_area->i_tell = i_off;
 
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_SEEK),
-    "orig %d, cur: %d, offset: %lld, start: %lld, entry %d",
-               p_vcd->origin_lsn, p_vcd->cur_lsn, i_off,
+               "orig %lu, cur: %lu, offset: %lld, start: %lld, entry %d",
+               (long unsigned int) p_vcd->origin_lsn, 
+	       (long unsigned int) p_vcd->cur_lsn, i_off,
                p_input->stream.p_selected_area->i_start, i_entry );
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -568,9 +573,10 @@ VCDPlay( input_thread_t *p_input, vcdinfo_itemid_t itemid )
     p_vcd->play_item = itemid;
 
     dbg_print( (INPUT_DBG_CALL),
-               "i_start %lld, i_size: %lld, i_tell: %lld, lsn %d",
+               "i_start %lld, i_size: %lld, i_tell: %lld, lsn %lu",
                p_area->i_start, p_area->i_size,
-               p_area->i_tell, p_vcd->cur_lsn );
+               p_area->i_tell, 
+	       (long unsigned int) p_vcd->cur_lsn );
 
     return VLC_SUCCESS;
 }
@@ -918,8 +924,10 @@ VCDSetOrigin( input_thread_t *p_input, lsn_t origin_lsn,
   p_vcd->play_item.type = VCDINFO_ITEM_TYPE_ENTRY;
 
   dbg_print( (INPUT_DBG_CALL|INPUT_DBG_LSN),
-             "origin: %d, cur_lsn: %d, end_lsn: %d, entry: %d, track: %d",
-             origin_lsn, cur_lsn, end_lsn, cur_entry, cur_track );
+             "origin: %lu, cur_lsn: %lu, end_lsn: %lu, entry: %d, track: %d",
+             (long unsigned int) origin_lsn, 
+	     (long unsigned int) cur_lsn, 
+	     (long unsigned int) end_lsn, cur_entry, cur_track );
 
   p_input->stream.p_selected_area->i_tell =
     (off_t) (p_vcd->cur_lsn - p_vcd->origin_lsn) * (off_t)M2F2_SECTOR_SIZE;
@@ -971,7 +979,8 @@ VCDReadSector( vlc_object_t *p_this, const vcdinfo_obj_t *p_vcd,
                              &vcd_sector, cur_lsn, true)
       != 0)
     {
-      msg_Warn( p_this, "Could not read LSN %d", cur_lsn );
+      msg_Warn( p_this, "Could not read LSN %lu", 
+		(long unsigned int) cur_lsn );
       return -1;
     }
 
