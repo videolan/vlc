@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.64 2001/01/10 19:22:11 massiot Exp $
+ * $Id: video_parser.c,v 1.65 2001/01/12 17:33:18 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -307,6 +307,18 @@ static void EndThread( vpar_thread_t *p_vpar )
 #endif
 
     intf_DbgMsg("vpar debug: destroying video parser thread %p", p_vpar);
+
+    /* Release used video buffers. */
+    if( p_vpar->sequence.p_forward != NULL )
+    {
+        vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+    }
+    if( p_vpar->sequence.p_backward != NULL )
+    {
+        vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
+                          vpar_SynchroDate( p_vpar ) );
+        vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+    }
 
 #ifdef STATS
     intf_Msg("vpar stats: %d loops among %d sequence(s)",

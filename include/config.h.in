@@ -113,7 +113,7 @@
  */
 
 /* Size of the FIFO. FIFO_SIZE+1 must be a power of 2 */
-#define FIFO_SIZE                       1023
+#define FIFO_SIZE                       511
 
 /*
  * Paths
@@ -207,9 +207,9 @@
  * server */
 #define INPUT_VLAN_CHANGE_DELAY         (5*CLOCK_FREQ)
 
-/* Duration between the time we receive the TS packet, and the time we will
+/* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */
-#define DEFAULT_PTS_DELAY               (.5*CLOCK_FREQ)
+#define DEFAULT_PTS_DELAY               (.2*CLOCK_FREQ)
 
 #define INPUT_DVD_AUDIO_VAR             "vlc_dvd_audio"
 #define INPUT_DVD_CHANNEL_VAR           "vlc_dvd_channel"
@@ -301,10 +301,10 @@
 
 /* Video heap size - remember that a decompressed picture is big
  * (~1 Mbyte) before using huge values */
-#define VOUT_MAX_PICTURES               10
+#define VOUT_MAX_PICTURES               5
 
 /* Number of simultaneous subpictures */
-#define VOUT_MAX_SUBPICTURES            10
+#define VOUT_MAX_SUBPICTURES            5
 
 /* Maximum number of active areas in a rendering buffer. Active areas are areas
  * of the picture which need to be cleared before re-using the buffer. If a

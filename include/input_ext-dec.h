@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.12 2001/01/12 11:36:49 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.13 2001/01/12 17:33:18 massiot Exp $
  *
  * Authors:
  *
@@ -178,9 +178,9 @@ typedef struct bit_stream_s
  */
 
 /*****************************************************************************
- * GetByte : reads the next byte in the input stream
+ * GetByte : reads the next byte in the input stream (PRIVATE)
  *****************************************************************************/
-static __inline__ byte_t GetByte( bit_stream_t * p_bit_stream )
+static __inline__ byte_t _GetByte( bit_stream_t * p_bit_stream )
 {
     /* Are there some bytes left in the current data packet ? */
     /* could change this test to have a if (! (bytes--)) instead */
@@ -209,7 +209,7 @@ static __inline__ void NeedBits( bit_stream_t * p_bit_stream, int i_bits )
 {
     while ( p_bit_stream->fifo.i_available < i_bits )
     {
-        p_bit_stream->fifo.buffer |= ((WORD_TYPE)GetByte( p_bit_stream ))
+        p_bit_stream->fifo.buffer |= ((WORD_TYPE)_GetByte( p_bit_stream ))
                                      << (sizeof(WORD_TYPE) - 8
                                             - p_bit_stream->fifo.i_available);
         p_bit_stream->fifo.i_available += 8;
@@ -245,7 +245,7 @@ static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
 /*****************************************************************************
  * ShowBits : return i_bits bits from the bit stream
  *****************************************************************************/
-static __inline__ WORD_TYPE ShowWord( bit_stream_t * p_bit_stream )
+static __inline__ WORD_TYPE _ShowWord( bit_stream_t * p_bit_stream )
 {
     if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
     {
@@ -264,14 +264,14 @@ static __inline__ WORD_TYPE ShowBits( bit_stream_t * p_bit_stream, int i_bits )
     }
 
     return( (p_bit_stream->fifo.buffer |
-            (ShowWord( p_bit_stream ) >> p_bit_stream->fifo.i_available))
+            (_ShowWord( p_bit_stream ) >> p_bit_stream->fifo.i_available))
                     >> (8 * sizeof(WORD_TYPE) - i_bits) );
 }
 
 /*****************************************************************************
- * GetWord : returns the next word to be read
+ * GetWord : returns the next word to be read (PRIVATE)
  *****************************************************************************/
-static __inline__ WORD_TYPE GetWord( bit_stream_t * p_bit_stream )
+static __inline__ WORD_TYPE _GetWord( bit_stream_t * p_bit_stream )
 {
     if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
     {
@@ -297,7 +297,7 @@ static __inline__ void RemoveBits( bit_stream_t * p_bit_stream, int i_bits )
         p_bit_stream->fifo.buffer <<= i_bits;
         return;
     }
-    p_bit_stream->fifo.buffer = GetWord( p_bit_stream )
+    p_bit_stream->fifo.buffer = _GetWord( p_bit_stream )
                             << ( -p_bit_stream->fifo.i_available );
     p_bit_stream->fifo.i_available += sizeof(WORD_TYPE) * 8;
 }
@@ -310,12 +310,12 @@ static __inline__ void RemoveBits32( bit_stream_t * p_bit_stream )
 {
     if( p_bit_stream->fifo.i_available )
     {
-        p_bit_stream->fifo.buffer = GetWord( p_bit_stream )
+        p_bit_stream->fifo.buffer = _GetWord( p_bit_stream )
                             << (32 - p_bit_stream->fifo.i_available);
     }
     else
     {
-        p_bit_stream->fifo.buffer = GetWord( p_bit_stream );
+        _GetWord( p_bit_stream );
     }
 }
 
@@ -336,7 +336,7 @@ static __inline__ WORD_TYPE GetBits( bit_stream_t * p_bit_stream, int i_bits )
     }
 
     i_result = p_bit_stream->fifo.buffer >> (8 * sizeof(WORD_TYPE) - i_bits);
-    p_bit_stream->fifo.buffer = GetWord( p_bit_stream );
+    p_bit_stream->fifo.buffer = _GetWord( p_bit_stream );
     i_result |= p_bit_stream->fifo.buffer
                              >> (8 * sizeof(WORD_TYPE)
                                      + p_bit_stream->fifo.i_available);
@@ -353,18 +353,21 @@ static __inline__ WORD_TYPE GetBits32( bit_stream_t * p_bit_stream )
 {
     WORD_TYPE               i_result;
 
-    i_result = p_bit_stream->fifo.buffer;
-    p_bit_stream->fifo.buffer = GetWord( p_bit_stream );
-
-    i_result |= p_bit_stream->fifo.buffer
-                             >> (p_bit_stream->fifo.i_available);
     if( p_bit_stream->fifo.i_available )
     {
+        i_result = p_bit_stream->fifo.buffer;
+        p_bit_stream->fifo.buffer = _GetWord( p_bit_stream );
+
+        i_result |= p_bit_stream->fifo.buffer
+                             >> (p_bit_stream->fifo.i_available);
         p_bit_stream->fifo.buffer <<= (8 * sizeof(WORD_TYPE)
                                     - p_bit_stream->fifo.i_available);
+        return( i_result );
     }
-    
-    return( i_result );
+    else
+    {
+        return( _GetWord( p_bit_stream ) );
+    }
 }
 
 /*****************************************************************************
@@ -411,7 +414,7 @@ static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
             p_bit_stream->pf_next_data_packet( p_bit_stream );
         }
         while( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
-                <= i_buf_len );
+                <= i_buf_len && !p_bit_stream->p_decoder_fifo->b_die );
 
         if( i_buf_len )
         {

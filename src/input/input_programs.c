@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.24 2001/01/12 14:49:55 sam Exp $
+ * $Id: input_programs.c,v 1.25 2001/01/12 17:33:18 massiot Exp $
  *
  * Authors:
  *
@@ -75,19 +75,15 @@ void input_InitStream( input_thread_t * p_input, size_t i_data_len )
  *****************************************************************************/
 void input_EndStream( input_thread_t * p_input )
 {
-    int i;
-
     /* Free all programs and associated ES, and associated decoders. */
-    for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+    while( p_input->stream.i_pgrm_number )
     {
-        /* Don't put i instead of 0 !! */
         input_DelProgram( p_input, p_input->stream.pp_programs[0] );
     }
 
     /* Free standalone ES */
-    for( i = 0; i < p_input->stream.i_es_number; i++ )
+    while( p_input->stream.i_es_number )
     {
-        /* Don't put i instead of 0 !! */
         input_DelES( p_input, p_input->stream.pp_es[0] );
     }
 }
@@ -187,16 +183,15 @@ pgrm_descriptor_t * input_AddProgram( input_thread_t * p_input,
  *****************************************************************************/
 void input_DelProgram( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm )
 {
-    int i_index, i_pgrm_index;
+    int i_pgrm_index;
 
     ASSERT( p_pgrm );
 
     intf_DbgMsg("Deleting description for pgrm %d", p_pgrm->i_number);
 
     /* Free the structures that describe the es that belongs to that program */
-    for( i_index = 0; i_index < p_pgrm->i_es_number; i_index++ )
+    while( p_pgrm->i_es_number )
     {
-        /* Don't put i_index instead of 0 !! */
         input_DelES( p_input, p_pgrm->pp_es[0] );
     }
 
@@ -342,12 +337,6 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( p_es->p_decoder_fifo != NULL )
     {
         input_EndDecoder( p_input, p_es );
-
-        /* Destroy the lock and cond */
-        vlc_cond_destroy( &p_es->p_decoder_fifo->data_wait );
-        vlc_mutex_destroy( &p_es->p_decoder_fifo->data_lock );
-    
-        free( p_es->p_decoder_fifo );
     }
 
     /* Remove this ES from the description of the program if it is associated to
