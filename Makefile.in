@@ -19,6 +19,7 @@ PLUGINS=@PLUGINS@
 INSTALL=@INSTALL@
 ARCH=@ARCH@
 
+exec_prefix=@exec_prefix@
 prefix=@prefix@
 bindir=@bindir@
 datadir=@datadir@
@@ -298,9 +299,10 @@ PLUGIN_DUMMY =	plugins/dummy/dummy.o \
 
 PLUGIN_DVD =	plugins/dvd/dvd.o \
 		plugins/dvd/input_dvd.o \
+		plugins/dvd/dvd_ioctl.o \
 		plugins/dvd/dvd_ifo.o \
 		plugins/dvd/dvd_udf.o \
-	        plugins/dvd/dvd_css.o
+		plugins/dvd/dvd_css.o
 
 PLUGIN_ESD =	plugins/esd/esd.o \
 		plugins/esd/aout_esd.o
@@ -312,7 +314,6 @@ PLUGIN_GGI =	plugins/ggi/ggi.o \
 		plugins/ggi/vout_ggi.o
 
 PLUGIN_GLIDE =	plugins/glide/glide.o \
-		plugins/glide/intf_glide.o \
 		plugins/glide/vout_glide.o
 
 PLUGIN_GNOME =	plugins/gnome/gnome.o \
@@ -334,7 +335,6 @@ PLUGIN_IDCTMMXEXT =	plugins/idct/idctmmxext.o \
 			plugins/idct/idct_common.o
 
 PLUGIN_MGA =	plugins/mga/mga.o \
-		plugins/mga/intf_mga.o \
 		plugins/mga/vout_mga.o
 
 PLUGIN_MOTION =	plugins/motion/motion.o \

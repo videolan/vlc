@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.11 2001/02/20 02:53:13 stef Exp $
+ * $Id: dvd_css.c,v 1.12 2001/02/20 07:49:12 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -34,7 +34,7 @@
  *****************************************************************************/
 #include "defs.h"
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
 
 #include <stdio.h>
 #include <unistd.h>
@@ -52,9 +52,13 @@
 #endif
 
 #include "common.h"
+
 #include "intf_msg.h"
+
 #include "dvd_css.h"
+#include "dvd_ioctl.h"
 #include "dvd_ifo.h"
+
 #include "input_dvd.h"
 
 /*****************************************************************************
@@ -428,7 +432,7 @@ static int CSSGetASF( int i_fd )
     for( auth_info.lsasf.agid = 0 ; auth_info.lsasf.agid < 4 ;
                                                     auth_info.lsasf.agid++ )
     {
-        if( !( ioctl( i_fd, DVD_AUTH, &auth_info ) ) )
+        if( !( dvd_ioctl( i_fd, DVD_AUTH, &auth_info ) ) )
         {
             intf_WarnMsg( 3, "CSS: %sAuthenticated",
                                     ( auth_info.lsasf.asf ) ? "" : "not " );
@@ -795,7 +799,7 @@ int CSSTest( int i_fd )
     dvd.type = DVD_STRUCT_COPYRIGHT;
     dvd.copyright.layer_num = 0;
 
-    if( ioctl( i_fd, DVD_READ_STRUCT, &dvd ) < 0 )
+    if( dvd_ioctl( i_fd, DVD_READ_STRUCT, &dvd ) < 0 )
     {
         intf_ErrMsg( "DVD ioctl error" );
         return -1;
@@ -844,7 +848,7 @@ css_t CSSInit( int i_fd )
         intf_WarnMsg( 3, "CSS: Request AGID %d", i );
         auth_info.type = DVD_LU_SEND_AGID;
         auth_info.lsa.agid = 0;
-        i_error =  ioctl( i_fd, DVD_AUTH, &auth_info );
+        i_error =  dvd_ioctl( i_fd, DVD_AUTH, &auth_info );
         if( i_error != -1 )
         {
             /* No error during ioctl: we know if device
@@ -855,7 +859,7 @@ css_t CSSInit( int i_fd )
         intf_ErrMsg( "CSS: AGID N/A, invalidating" );
         auth_info.type = DVD_INVALIDATE_AGID;
         auth_info.lsa.agid = 0;
-        ioctl( i_fd, DVD_AUTH, &auth_info );
+        dvd_ioctl( i_fd, DVD_AUTH, &auth_info );
     }
 
     /* Unable to authenticate without AGID */
@@ -883,7 +887,7 @@ css_t CSSInit( int i_fd )
     css.i_agid = auth_info.lsa.agid;
 
     /* Send challenge to LU */
-    if( ioctl( i_fd, DVD_AUTH, &auth_info )<0 )
+    if( dvd_ioctl( i_fd, DVD_AUTH, &auth_info )<0 )
     {
         intf_ErrMsg( "CSS: Send challenge to LU failed ");
         css.b_error = 1;
@@ -891,7 +895,7 @@ css_t CSSInit( int i_fd )
     }
 
     /* Get key1 from LU */
-    if( ioctl( i_fd, DVD_AUTH, &auth_info ) < 0)
+    if( dvd_ioctl( i_fd, DVD_AUTH, &auth_info ) < 0)
     {
         intf_ErrMsg( "CSS: Get key1 from LU failed ");
         css.b_error = 1;
@@ -928,7 +932,7 @@ css_t CSSInit( int i_fd )
     }
 
     /* Get challenge from LU */
-    if( ioctl( i_fd, DVD_AUTH, &auth_info ) < 0 )
+    if( dvd_ioctl( i_fd, DVD_AUTH, &auth_info ) < 0 )
     {
         intf_ErrMsg( "CSS: Get challenge from LU failed ");
         css.b_error = 1;
@@ -953,7 +957,7 @@ css_t CSSInit( int i_fd )
     /* Returning data, let LU change state */
 
     /* Send key2 to LU */
-    if( ioctl( i_fd, DVD_AUTH, &auth_info ) < 0 )
+    if( dvd_ioctl( i_fd, DVD_AUTH, &auth_info ) < 0 )
     {
         intf_ErrMsg( "CSS: Send key2 to LU failed (expected)" );
         return css;
@@ -999,7 +1003,7 @@ css_t CSSInit( int i_fd )
     dvd.disckey.agid = css.i_agid;
     memset( dvd.disckey.value, 0, 2048 );
 
-    if( ioctl( i_fd, DVD_READ_STRUCT, &dvd ) < 0 )
+    if( dvd_ioctl( i_fd, DVD_READ_STRUCT, &dvd ) < 0 )
     {
         intf_ErrMsg( "CSS: Could not read Disc Key" );
         css.b_error = 1;

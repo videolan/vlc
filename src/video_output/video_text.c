@@ -27,6 +27,7 @@
 
 #include <errno.h>                                                  /* errno */
 #include <stdlib.h>                                                /* free() */
+#include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 #include <fcntl.h>                                                 /* open() */
 #include <unistd.h>                                       /* read(), close() */
@@ -203,16 +204,59 @@ static void PutByte32( u32 *p_pic, int i_byte, byte_t i_char, byte_t i_border,
  *****************************************************************************/
 vout_font_t *vout_LoadFont( const char *psz_name )
 {
+    static char * path[] = { "share", DATA_PATH, NULL };
+
+    char **             ppsz_path = path;
+    char *              psz_file;
+#ifdef SYS_BEOS
+    char *              psz_vlcpath = beos_GetProgramPath();
+    int                 i_vlclen = strlen( psz_vlcpath );
+#endif
     int                 i_char, i_line;        /* character and line indexes */
-    int                 i_file;                               /* source file */
+    int                 i_file = -1;                          /* source file */
     byte_t              pi_buffer[2];                         /* file buffer */
     vout_font_t *       p_font;                           /* the font itself */
 
-    /* Open file */
-    i_file = open( psz_name, O_RDONLY );
+    for( ; *ppsz_path != NULL ; ppsz_path++ )
+    {
+#ifdef SYS_BEOS
+        /* Under BeOS, we need to add beos_GetProgramPath() to access
+         * files under the current directory */
+        if( strncmp( *ppsz_path, "/", 1 ) )
+        {
+            psz_file = malloc( strlen( psz_name ) + strlen( *ppsz_path )
+                                + i_vlclen + 3 );
+            if( psz_file == NULL )
+            {
+                continue;
+            }
+            sprintf( psz_file, "%s/%s/%s", psz_vlcpath, *ppsz_path, psz_name );
+        }
+        else
+#endif
+        {
+            psz_file = malloc( strlen( psz_name ) + strlen( *ppsz_path ) + 2 );
+            if( psz_file == NULL )
+            {
+                continue;
+            }
+            sprintf( psz_file, "%s/%s", *ppsz_path, psz_name );
+        }
+
+        /* Open file */
+        i_file = open( psz_file, O_RDONLY );
+        free( psz_file );
+
+        if( i_file != -1 )
+        {
+            break;
+        }
+    }
+
     if( i_file == -1 )
     {
-        intf_DbgMsg("vout: can't open file '%s' (%s)", psz_name, strerror(errno));
+        intf_DbgMsg( "vout error: can't open file '%s' (%s)",
+                     psz_name, strerror(errno) );
         return( NULL );
     }
 

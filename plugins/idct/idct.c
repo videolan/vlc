@@ -2,7 +2,7 @@
  * idct.c : IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct.c,v 1.6 2001/01/18 05:13:22 sam Exp $
+ * $Id: idct.c,v 1.7 2001/02/20 07:49:13 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #define MODULE_NAME idct
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -42,7 +43,6 @@
 #include "video_decoder.h"
 
 #include "modules.h"
-#include "modules_inner.h"
 
 #include "idct.h"
 
@@ -70,7 +70,7 @@ MODULE_CONFIG_END
  * be unloaded later to save memory, and we want to be able to access this
  * data even after the module has been unloaded.
  *****************************************************************************/
-int InitModule( module_t * p_module )
+MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
     p_module->psz_longname = "IDCT module";
@@ -90,7 +90,7 @@ int InitModule( module_t * p_module )
  * be set to 0 and calls to NeedModule() be made to increment it. To unload
  * the module, one has to wait until i_usage == 0 and call DeactivateModule().
  *****************************************************************************/
-int ActivateModule( module_t * p_module )
+MODULE_ACTIVATE
 {
     p_module->p_functions = malloc( sizeof( module_functions_t ) );
     if( p_module->p_functions == NULL )
@@ -112,7 +112,7 @@ int ActivateModule( module_t * p_module )
  * returns, i_usage can be set to -1 and the module unloaded. Be careful to
  * lock usage_lock during the whole process.
  *****************************************************************************/
-int DeactivateModule( module_t * p_module )
+MODULE_DEACTIVATE
 {
     free( p_module->p_functions );
 

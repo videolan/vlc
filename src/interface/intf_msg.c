@@ -5,7 +5,7 @@
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -392,7 +392,6 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
     vasprintf( &psz_str, psz_format, ap );
 #else
     psz_str = (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
-    vsprintf( psz_str, psz_format, ap );
 #endif
     if( psz_str == NULL )
     {
@@ -402,6 +401,10 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
         fprintf(stderr, "\n" );
         exit( errno );
     }
+#ifdef HAVE_VASPRINTF
+#else
+    vsprintf( psz_str, psz_format, ap );
+#endif
 
 #ifdef INTF_MSG_QUEUE /*...................................... queue mode ...*/
     vlc_mutex_lock( &p_msg->lock );                              /* get lock */
@@ -421,7 +424,7 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
     p_msg_item->i_type =     i_type;
     p_msg_item->psz_msg =    psz_str;
 #ifdef DEBUG    
-    p_msg_item->date =         mdate();
+    p_msg_item->date =       mdate();
 #endif
 
 #ifdef INTF_MSG_QUEUE /*......................................... queue mode */

@@ -20,6 +20,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME ncurses
+#include "modules_inner.h"
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -69,7 +72,7 @@ static void intf_Run       ( intf_thread_t *p_intf );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void intf_getfunctions( function_list_t * p_function_list )
+void _M( intf_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = intf_Probe;
     p_function_list->functions.intf.pf_open  = intf_Open;

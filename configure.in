@@ -171,7 +171,7 @@ AC_ARG_WITH(sdl,
   [ PLUGINS=${PLUGINS}"sdl ";
     if test "x$withval" != "xyes";
     then
-      LIB_SDL="L /usr/X11R6/lib -l"$withval
+      LIB_SDL="L/usr/X11R6/lib -l"$withval
     else
       LIB_SDL="-L/usr/X11R6/lib -lSDL"
     fi ])

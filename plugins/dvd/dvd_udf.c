@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.2 2001/02/18 01:42:05 stef Exp $
+ * $Id: dvd_udf.c,v 1.3 2001/02/20 07:49:12 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -26,6 +26,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#define MODULE_NAME dvd
+#include "modules_inner.h"
+
 /*
  * Preamble
  */

@@ -2,9 +2,9 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.14 2001/02/20 02:53:13 stef Exp $
+ * $Id: intf_gnome.c,v 1.15 2001/02/20 07:49:13 sam Exp $
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#define MODULE_NAME gnome
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -90,7 +93,7 @@ void g_atexit( GVoidFunc func )
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void intf_getfunctions( function_list_t * p_function_list )
+void _M( intf_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = intf_Probe;
     p_function_list->functions.intf.pf_open  = intf_Open;

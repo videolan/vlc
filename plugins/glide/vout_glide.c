@@ -1,9 +1,9 @@
 /*****************************************************************************
  * vout_glide.c: 3dfx video output display method for 3dfx cards
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
+ * Copyright (C) 2000, 2001 VideoLAN
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME glide
+#include "modules_inner.h"
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -33,23 +36,27 @@
 #include <conio.h>                                            /* for glide ? */
 #endif
 #include <glide.h>
+#include <linutil.h>                            /* Glide kbhit() and getch() */
 
 #include "config.h"
 #include "common.h"
 #include "threads.h"
 #include "mtime.h"
-#include "plugins.h"
+#include "tests.h"
+#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
 
 #include "intf_msg.h"
+#include "interface.h"
+
 #include "main.h"
 
-#define WIDTH 800
-#define HEIGHT 600
-#define BITS_PER_PLANE 16
-#define BYTES_PER_PIXEL 2
+#define GLIDE_WIDTH 800
+#define GLIDE_HEIGHT 600
+#define GLIDE_BITS_PER_PLANE 16
+#define GLIDE_BYTES_PER_PIXEL 2
 
 /*****************************************************************************
  * vout_sys_t: Glide video output method descriptor
@@ -68,18 +75,61 @@ typedef struct vout_sys_s
 } vout_sys_t;
 
 /*****************************************************************************
- * Local prototypes
+ * Local prototypes.
  *****************************************************************************/
-static int     GlideOpenDisplay   ( vout_thread_t *p_vout );
-static void    GlideCloseDisplay  ( vout_thread_t *p_vout );
+static int  vout_Probe     ( probedata_t *p_data );
+static int  vout_Create    ( struct vout_thread_s * );
+static int  vout_Init      ( struct vout_thread_s * );
+static void vout_End       ( struct vout_thread_s * );
+static void vout_Destroy   ( struct vout_thread_s * );
+static int  vout_Manage    ( struct vout_thread_s * );
+static void vout_Display   ( struct vout_thread_s * );
+
+static int  GlideOpenDisplay   ( vout_thread_t *p_vout );
+static void GlideCloseDisplay  ( vout_thread_t *p_vout );
 
 /*****************************************************************************
- * vout_GlideCreate: allocates Glide video thread output method
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void _M( vout_getfunctions )( function_list_t * p_function_list )
+{
+    p_function_list->pf_probe = vout_Probe;
+    p_function_list->functions.vout.pf_create     = vout_Create;
+    p_function_list->functions.vout.pf_init       = vout_Init;
+    p_function_list->functions.vout.pf_end        = vout_End;
+    p_function_list->functions.vout.pf_destroy    = vout_Destroy;
+    p_function_list->functions.vout.pf_manage     = vout_Manage;
+    p_function_list->functions.vout.pf_display    = vout_Display;
+    p_function_list->functions.vout.pf_setpalette = NULL;
+}
+
+/*****************************************************************************
+ * vout_Probe: probe the video driver and return a score
+ *****************************************************************************
+ * This function tries to initialize SDL and returns a score to the
+ * plugin manager so that it can select the best plugin.
+ *****************************************************************************/
+static int vout_Probe( probedata_t *p_data )
+{
+    if( TestMethod( VOUT_METHOD_VAR, "glide" ) )
+    {
+        return( 999 );
+    }
+
+    /* We could do a grSstQueryBoards( GrHwConfiguration *hwConfig ) at
+     * this point, but if the user didn't configure his 3dfx card, we
+     * have great chances to segfault here. So we'd better assume
+     * everything is fine and worry only if we really need to use Glide */
+    return( 20 );
+}
+
+/*****************************************************************************
+ * vout_Create: allocates Glide video thread output method
  *****************************************************************************
  * This function allocates and initializes a Glide vout method.
  *****************************************************************************/
-int vout_GlideCreate( vout_thread_t *p_vout, char *psz_display,
-                    int i_root_window, void *p_data )
+int vout_Create( vout_thread_t *p_vout )
 {
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -101,50 +151,68 @@ int vout_GlideCreate( vout_thread_t *p_vout, char *psz_display,
 }
 
 /*****************************************************************************
- * vout_GlideInit: initialize Glide video thread output method
+ * vout_Init: initialize Glide video thread output method
  *****************************************************************************/
-int vout_GlideInit( vout_thread_t *p_vout )
+int vout_Init( vout_thread_t *p_vout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * vout_GlideEnd: terminate Glide video thread output method
+ * vout_End: terminate Glide video thread output method
  *****************************************************************************/
-void vout_GlideEnd( vout_thread_t *p_vout )
+void vout_End( vout_thread_t *p_vout )
 {
     ;
 }
 
 /*****************************************************************************
- * vout_GlideDestroy: destroy Glide video thread output method
+ * vout_Destroy: destroy Glide video thread output method
  *****************************************************************************
  * Terminate an output method created by vout_CreateOutputMethod
  *****************************************************************************/
-void vout_GlideDestroy( vout_thread_t *p_vout )
+void vout_Destroy( vout_thread_t *p_vout )
 {
     GlideCloseDisplay( p_vout );
     free( p_vout->p_sys );
 }
 
 /*****************************************************************************
- * vout_GlideManage: handle Glide events
+ * vout_Manage: handle Glide events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-int vout_GlideManage( vout_thread_t *p_vout )
+int vout_Manage( vout_thread_t *p_vout )
 {
+    int buf;
+
+    /* very Linux specific - see tlib.c in Glide for other versions */
+    while( kbhit() )
+    {
+        buf = getch();
+
+        switch( (char)buf )
+        {
+        case 'q':
+            p_main->p_intf->b_die = 1;
+            break;
+
+        default:
+            break;
+        }
+    }
+
     return 0;
 }
 
 /*****************************************************************************
- * vout_GlideDisplay: displays previously rendered output
+ * vout_Display: displays previously rendered output
  *****************************************************************************
  * This function send the currently rendered image to Glide image, waits until
  * it is displayed and switch the two rendering buffers, preparing next frame.
  *****************************************************************************/
-void vout_GlideDisplay( vout_thread_t *p_vout )
+void vout_Display( vout_thread_t *p_vout )
 {
     grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER );
 
@@ -171,14 +239,15 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
     GrScreenResolution_t resolution = GR_RESOLUTION_800x600;
     GrLfbInfo_t p_front_buffer_info;                    /* front buffer info */
 
-    p_vout->i_width =                   WIDTH;
-    p_vout->i_height =                  HEIGHT;
-    p_vout->i_screen_depth =            BITS_PER_PLANE;
-    p_vout->i_bytes_per_pixel =         BYTES_PER_PIXEL;
+    p_vout->i_width =            GLIDE_WIDTH;
+    p_vout->i_height =           GLIDE_HEIGHT;
+    p_vout->i_screen_depth =     GLIDE_BITS_PER_PLANE;
+    p_vout->i_bytes_per_pixel =  GLIDE_BYTES_PER_PIXEL;
     /* bytes per line value overriden later */
-    p_vout->i_bytes_per_line =          1024 * BYTES_PER_PIXEL;
+    p_vout->i_bytes_per_line =   1024 * GLIDE_BYTES_PER_PIXEL;
 
-    p_vout->p_sys->i_page_size = WIDTH * HEIGHT * BYTES_PER_PIXEL;
+    p_vout->p_sys->i_page_size = GLIDE_WIDTH * GLIDE_HEIGHT
+                                  * GLIDE_BYTES_PER_PIXEL;
 
     p_vout->i_red_mask =   0xf800;
     p_vout->i_green_mask = 0x07e0;

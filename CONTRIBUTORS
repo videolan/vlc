@@ -8,3 +8,8 @@ Arkadiusz Miskiewicz <misiek@pld.ORG.PL>
 
   * Makefile and configure patches.
 
+
+Markus Kuespert <ltlBeBoy@beosmail.com>
+
+  * BeOS port of the DVD ioctls.
+

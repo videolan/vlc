@@ -87,13 +87,15 @@ module_bank_t * module_CreateBank( void )
  *****************************************************************************/
 void module_InitBank( module_bank_t * p_bank )
 {
-    static char * path[] = { ".", "lib", PLUGIN_PATH, NULL } ;
+    static char * path[] = { ".", "lib", PLUGIN_PATH, NULL };
 
     char **         ppsz_path = path;
+    char *          psz_fullpath;
     char *          psz_file;
 #ifdef SYS_BEOS
     char *          psz_vlcpath = beos_GetProgramPath();
     int             i_vlclen = strlen( psz_vlcpath );
+    boolean_t       b_notinroot;
 #endif
     DIR *           dir;
     struct dirent * file;
@@ -105,11 +107,35 @@ void module_InitBank( module_bank_t * p_bank )
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
-        if( (dir = opendir( *ppsz_path )) )
-        {
-            /* Store strlen(*ppsz_path) for later use. */
-            int i_dirlen = strlen( *ppsz_path );
+        /* Store strlen(*ppsz_path) for later use. */
+        int i_dirlen = strlen( *ppsz_path );
 
+#ifdef SYS_BEOS
+        b_notinroot = 0;
+        /* Under BeOS, we need to add beos_GetProgramPath() to access
+         * files under the current directory */
+        if( ( i_dirlen > 1 ) && strncmp( *ppsz_path, "/", 1 ) )
+        {
+            i_dirlen += i_vlclen + 2;
+            b_notinroot = 1;
+
+            psz_fullpath = malloc( i_dirlen );
+            if( psz_fullpath == NULL )
+            {
+                continue;
+            }
+            sprintf( psz_fullpath, "%s/%s", psz_vlcpath, *ppsz_path );
+        }
+        else
+#endif
+        {
+            psz_fullpath = *ppsz_path;
+        }
+
+        intf_WarnMsgImm( 2, "module: browsing %s", psz_fullpath );
+
+        if( (dir = opendir( psz_fullpath )) )
+        {
             /* Parse the directory and try to load all files it contains. */
             while( (file = readdir( dir )) )
             {
@@ -119,30 +145,13 @@ void module_InitBank( module_bank_t * p_bank )
                 if( i_filelen > 3
                         && !strncmp( file->d_name + i_filelen - 3, ".so", 3 ) )
                 {
-#ifdef SYS_BEOS
-                    /* Under BeOS, we need to add beos_GetProgramPath() to
-                     * access files under the current directory */
-                    if( strncmp( file->d_name, "/", 1 ) )
+                    psz_file = malloc( i_dirlen + i_filelen + 2 );
+                    if( psz_file == NULL )
                     {
-                        psz_file = malloc( i_vlclen + i_dirlen
-                                               + i_filelen + 3 );
-                        if( psz_file == NULL )
-                        {
-                            continue;
-                        }
-                        sprintf( psz_file, "%s/%s/%s", psz_vlcpath,
-                                 *ppsz_path, file->d_name );
+                        continue;
                     }
-                    else
-#endif
-                    {
-                        psz_file = malloc( i_dirlen + i_filelen + 2 );
-                        if( psz_file == NULL )
-                        {
-                            continue;
-                        }
-                        sprintf( psz_file, "%s/%s", *ppsz_path, file->d_name );
-                    }
+                    sprintf( psz_file, "%s/%s", psz_fullpath, file->d_name );
+
                     /* We created a nice filename -- now we just try to load
                      * it as a dynamic module. */
                     AllocateDynModule( p_bank, psz_file );
@@ -151,7 +160,17 @@ void module_InitBank( module_bank_t * p_bank )
                     free( psz_file );
                 }
             }
+
+            /* Close the directory if successfully opened */
+            closedir( dir );
         }
+
+#ifdef SYS_BEOS
+        if( b_notinroot )
+        {
+            free( psz_fullpath );
+        }
+#endif
     }
 
     return;

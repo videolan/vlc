@@ -3471,16 +3471,16 @@ if test "${with_sdl+set}" = set; then
    PLUGINS=${PLUGINS}"sdl ";
     if test "x$withval" != "xyes";
     then
-      LIB_SDL="-l"$withval
+      LIB_SDL="L/usr/X11R6/lib -l"$withval
     else
-      LIB_SDL="-lSDL"
+      LIB_SDL="-L/usr/X11R6/lib -lSDL"
     fi 
 fi
 
     if test "x$withval" == "x";
     then
       PLUGINS=${PLUGINS}"sdl "
-      LIB_SDL="-lSDL"
+      LIB_SDL="-L/usr/X11R6/lib -lSDL"
     fi
 # Check whether --with-glide or --without-glide was given.
 if test "${with_glide+set}" = set; then

@@ -24,6 +24,9 @@
  * Boston, MA 02111-1307, USA.
  *****************************************************************************/
 
+#define MODULE_NAME yuv
+#include "modules_inner.h"
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -60,7 +63,7 @@ static void    SetYUV         ( vout_thread_t *p_vout );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void yuv_getfunctions( function_list_t * p_function_list )
+void _M( yuv_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = yuv_Probe;
     p_function_list->functions.yuv.pf_init = yuv_Init;

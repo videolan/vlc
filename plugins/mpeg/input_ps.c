@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.7 2001/02/20 02:53:13 stef Exp $
+ * $Id: input_ps.c,v 1.8 2001/02/20 07:49:13 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -20,6 +20,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#define MODULE_NAME ps
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -76,7 +79,7 @@ static void DeletePES   ( void *, struct pes_packet_s * );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void input_getfunctions( function_list_t * p_function_list )
+void _M( input_getfunctions )( function_list_t * p_function_list )
 {
 #define input p_function_list->functions.input
     p_function_list->pf_probe = PSProbe;

@@ -20,6 +20,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME fb
+#include "modules_inner.h"
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -107,7 +110,7 @@ static void FBGfxMode      ( int i_tty_dev );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void vout_getfunctions( function_list_t * p_function_list )
+void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;

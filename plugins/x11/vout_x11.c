@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.14 2001/02/17 08:48:56 sam Exp $
+ * $Id: vout_x11.c,v 1.15 2001/02/20 07:49:13 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -21,6 +21,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#define MODULE_NAME x11
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -132,7 +135,7 @@ static void X11DisableScreenSaver       ( vout_thread_t *p_vout );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void vout_getfunctions( function_list_t * p_function_list )
+void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;

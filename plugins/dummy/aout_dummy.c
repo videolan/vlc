@@ -20,6 +20,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME dummy
+#include "modules_inner.h"
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -63,7 +66,7 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void aout_getfunctions( function_list_t * p_function_list )
+void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;

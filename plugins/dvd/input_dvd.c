@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.15 2001/02/20 02:53:13 stef Exp $
+ * $Id: input_dvd.c,v 1.16 2001/02/20 07:49:12 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -28,6 +28,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#define MODULE_NAME dvd
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -78,7 +81,7 @@
  *****************************************************************************/
 static struct
 {
-	char    p_code[3];
+    char    p_code[3];
     char    p_lang_long[20];
 } lang_tbl[] =
     {
@@ -248,7 +251,7 @@ static int  DVDRewind   ( struct input_thread_s * );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void input_getfunctions( function_list_t * p_function_list )
+void _M( input_getfunctions )( function_list_t * p_function_list )
 {
 #define input p_function_list->functions.input
     p_function_list->pf_probe = DVDProbe;
@@ -329,7 +332,7 @@ static int DVDProbe( probedata_t *p_data )
  *****************************************************************************/
 static int DVDCheckCSS( input_thread_t * p_input )
 {
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
     return CSSTest( p_input->i_handle );
 #else
     /* DVD ioctls unavailable.
@@ -370,7 +373,7 @@ static int DVDSetArea( input_thread_t * p_input,
     IfoReadVTS( &(p_method->ifo) );
     intf_WarnMsg( 2, "Ifo: VTS initialized" );
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
     if( p_method->b_encrypted )
     {
         p_method->css.i_title = i_title;
@@ -664,7 +667,7 @@ static void DVDInit( input_thread_t * p_input )
     if( p_method->b_encrypted )
     {
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
         p_method->css = CSSInit( p_input->i_handle );
 
         if( ( p_input->b_error = p_method->css.b_error ) )
@@ -771,7 +774,7 @@ static int DVDRead( input_thread_t * p_input,
     /* Reads from DVD */
     readv( p_input->i_handle, p_vec, p_method->i_read_once );
 
-#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD )
+#if defined( HAVE_SYS_DVDIO_H ) || defined( LINUX_DVD ) || defined( SYS_BEOS )
     if( p_method->b_encrypted )
     {
         for( i=0 ; i<p_method->i_read_once ; i++ )

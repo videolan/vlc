@@ -222,11 +222,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
 
     /* Load fonts - fonts must be initialized after the system method since
      * they may be dependant on screen depth and other thread properties */
-    p_vout->p_default_font = vout_LoadFont( DATA_PATH "/" VOUT_DEFAULT_FONT );
-    if( p_vout->p_default_font == NULL )
-    {
-        p_vout->p_default_font = vout_LoadFont( "share/" VOUT_DEFAULT_FONT );
-    }
+    p_vout->p_default_font = vout_LoadFont( VOUT_DEFAULT_FONT );
     if( p_vout->p_default_font == NULL )
     {
         intf_ErrMsg( "vout error: could not load default font" );
@@ -234,11 +230,8 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
         free( p_vout );
         return( NULL );
     }
-    p_vout->p_large_font = vout_LoadFont( DATA_PATH "/" VOUT_LARGE_FONT );
-    if( p_vout->p_large_font == NULL )
-    {
-        p_vout->p_large_font = vout_LoadFont( "share/" VOUT_LARGE_FONT );
-    }
+
+    p_vout->p_large_font = vout_LoadFont( VOUT_LARGE_FONT );
     if( p_vout->p_large_font == NULL )
     {
         intf_ErrMsg( "vout error: could not load large font" );

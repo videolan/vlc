@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #define MODULE_NAME alsa
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -49,9 +50,6 @@
 #include "main.h"
 
 #include "modules.h"
-#include "modules_inner.h"
-
-
 
 typedef struct alsa_device_s
 {
@@ -85,12 +83,11 @@ static void    aout_Play        ( aout_thread_t *p_aout,
                                           byte_t *buffer, int i_size );
 static void    aout_Close       ( aout_thread_t *p_aout );
 
-
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void aout_getfunctions( function_list_t * p_function_list )
+void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;
@@ -99,7 +96,6 @@ void aout_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.aout.pf_play = aout_Play;
     p_function_list->functions.aout.pf_close = aout_Close;
 }
-    
 
 /*****************************************************************************
  * aout_Probe: probes the audio device and return a score

@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.9 2001/02/19 03:46:27 sam Exp $
+ * $Id: intf_beos.cpp,v 1.10 2001/02/20 07:49:12 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -21,6 +21,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#define MODULE_NAME beos
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -153,7 +156,7 @@ static void intf_Run       ( intf_thread_t *p_intf );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void intf_getfunctions( function_list_t * p_function_list )
+void _M( intf_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = intf_Probe;
     p_function_list->functions.intf.pf_open  = intf_Open;

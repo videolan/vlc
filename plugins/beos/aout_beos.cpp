@@ -2,7 +2,7 @@
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_beos.cpp,v 1.12 2001/02/18 03:32:02 polux Exp $
+ * $Id: aout_beos.cpp,v 1.13 2001/02/20 07:49:12 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -21,6 +21,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#define MODULE_NAME beos
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -88,7 +91,7 @@ static void    aout_Close       ( aout_thread_t *p_aout );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void aout_getfunctions( function_list_t * p_function_list )
+void _M( aout_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = aout_Probe;
     p_function_list->functions.aout.pf_open = aout_Open;

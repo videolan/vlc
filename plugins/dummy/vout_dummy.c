@@ -20,6 +20,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME dummy
+#include "modules_inner.h"
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -34,12 +37,13 @@
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-#include "modules.h"
 
 #include "video.h"
 #include "video_output.h"
 
 #include "intf_msg.h"
+
+#include "modules.h"
 
 #define DUMMY_WIDTH 16
 #define DUMMY_HEIGHT 16
@@ -75,7 +79,7 @@ static void vout_Display   ( struct vout_thread_s * );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void vout_getfunctions( function_list_t * p_function_list )
+void _M( vout_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = vout_Probe;
     p_function_list->functions.vout.pf_create     = vout_Create;

@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #define MODULE_NAME dummy
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -35,7 +36,6 @@
 #include "mtime.h"
 
 #include "modules.h"
-#include "modules_inner.h"
 
 /*****************************************************************************
  * Build configuration tree.
@@ -48,9 +48,9 @@ MODULE_CONFIG_END
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-extern void aout_getfunctions( function_list_t * p_function_list );
-extern void vout_getfunctions( function_list_t * p_function_list );
-extern void intf_getfunctions( function_list_t * p_function_list );
+void _M( aout_getfunctions )( function_list_t * p_function_list );
+void _M( vout_getfunctions )( function_list_t * p_function_list );
+void _M( intf_getfunctions )( function_list_t * p_function_list );
 
 /*****************************************************************************
  * InitModule: get the module structure and configuration.
@@ -60,7 +60,7 @@ extern void intf_getfunctions( function_list_t * p_function_list );
  * be unloaded later to save memory, and we want to be able to access this
  * data even after the module has been unloaded.
  *****************************************************************************/
-int InitModule( module_t * p_module )
+MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
     p_module->psz_longname = "dummy functions module";
@@ -82,7 +82,7 @@ int InitModule( module_t * p_module )
  * be set to 0 and calls to NeedModule() be made to increment it. To unload
  * the module, one has to wait until i_usage == 0 and call DeactivateModule().
  *****************************************************************************/
-int ActivateModule( module_t * p_module )
+MODULE_ACTIVATE
 {
     p_module->p_functions = malloc( sizeof( module_functions_t ) );
     if( p_module->p_functions == NULL )
@@ -90,9 +90,9 @@ int ActivateModule( module_t * p_module )
         return( -1 );
     }
 
-    aout_getfunctions( &p_module->p_functions->aout );
-    vout_getfunctions( &p_module->p_functions->vout );
-    intf_getfunctions( &p_module->p_functions->intf );
+    _M( aout_getfunctions )( &p_module->p_functions->aout );
+    _M( vout_getfunctions )( &p_module->p_functions->vout );
+    _M( intf_getfunctions )( &p_module->p_functions->intf );
 
     p_module->p_config = p_config;
 
@@ -106,7 +106,7 @@ int ActivateModule( module_t * p_module )
  * returns, i_usage can be set to -1 and the module unloaded. Be careful to
  * lock usage_lock during the whole process.
  *****************************************************************************/
-int DeactivateModule( module_t * p_module )
+MODULE_DEACTIVATE
 {
     free( p_module->p_functions );
 
