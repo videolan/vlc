@@ -402,7 +402,7 @@
             SUPERCLASS = NSObject; 
         }, 
         {
-            ACTIONS = {handlePopUp = id; }; 
+            ACTIONS = {handlePopUp = id; searchItem = id; }; 
             CLASS = VLCPlaylist; 
             LANGUAGE = ObjC; 
             OUTLETS = {
@@ -412,7 +412,6 @@
                 "o_outline_view" = id; 
                 "o_random_ckb" = id; 
                 "o_search_field" = id; 
-                "o_search_keyword" = id; 
                 "o_status_field" = id; 
                 "o_tc_author" = id; 
                 "o_tc_duration" = id; 

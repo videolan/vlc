@@ -173,6 +173,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
         o_descendingSortingImage = nil;
     }
 
+    o_outline_dict = [[NSMutableDictionary alloc] init];
+
     [self initStrings];
     //[self playlistUpdated];
 }
@@ -364,6 +366,126 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
      [self playlistUpdated];
 }
 
+- (NSMutableArray *)subSearchItem:(playlist_item_t *)p_item
+{
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    playlist_item_t * p_selected_item;
+    int i_current, i_selected_row;
+
+    if (!p_playlist)
+        return NULL;
+
+    i_selected_row = [o_outline_view selectedRow];
+    if (i_selected_row < 0)
+        i_selected_row = 0;
+
+    p_selected_item = (playlist_item_t *)[[o_outline_view itemAtRow:
+                                            i_selected_row] pointerValue];
+
+    for (i_current = 0; i_current < p_item->i_children ; i_current++)
+    {
+        char * psz_temp;
+        NSString * o_current_name, * o_current_author;
+
+        vlc_mutex_lock( &p_playlist->object_lock );
+        o_current_name = [NSString stringWithUTF8String:
+            p_item->pp_children[i_current]->input.psz_name];
+        psz_temp = playlist_ItemGetInfo(p_item ,_("Meta-information"),_("Author") );
+        o_current_author = [NSString stringWithUTF8String: psz_temp];
+        free( psz_temp);
+        vlc_mutex_unlock( &p_playlist->object_lock );
+
+        if (p_selected_item == p_item->pp_children[i_current] &&
+                    b_selected_item_met == NO)
+        {
+            b_selected_item_met = YES;
+        }
+        else if (p_selected_item == p_item->pp_children[i_current] &&
+                    b_selected_item_met == YES)
+        {
+            vlc_object_release(p_playlist);
+            return NULL;
+        }
+        else if (b_selected_item_met == YES &&
+                    ([o_current_name rangeOfString:[o_search_field
+                        stringValue] options:NSCaseInsensitiveSearch ].length ||
+                    [o_current_author rangeOfString:[o_search_field
+                        stringValue] options:NSCaseInsensitiveSearch ].length))
+        {
+            vlc_object_release(p_playlist);
+            /*Adds the parent items in the result array as well, so that we can
+            expand the tree*/
+            return [NSMutableArray arrayWithObject: [NSValue
+                            valueWithPointer: p_item->pp_children[i_current]]];
+        }
+        if (p_item->pp_children[i_current]->i_children > 0)
+        {
+            id o_result = [self subSearchItem:
+                                            p_item->pp_children[i_current]];
+            if (o_result != NULL)
+            {
+                vlc_object_release(p_playlist);
+                [o_result insertObject: [NSValue valueWithPointer:
+                                p_item->pp_children[i_current]] atIndex:0];
+                return o_result;
+            }
+        }
+    }
+    vlc_object_release(p_playlist);
+    return NULL;
+}
+
+- (IBAction)searchItem:(id)sender
+{
+    playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    playlist_view_t * p_view;
+    id o_result;
+
+    unsigned int i;
+    int i_row = -1;
+
+    b_selected_item_met = NO;
+
+    if( p_playlist == NULL )
+        return;
+
+    p_view = playlist_ViewFind( p_playlist, VIEW_SIMPLE );
+
+    if (p_view)
+    {
+        /*First, only search after the selected item:*
+         *(b_selected_item_met = NO)                 */
+        o_result = [self subSearchItem:p_view->p_root];
+        if (o_result == NULL)
+        {
+            /* If the first search failed, search again from the beginning */
+            o_result = [self subSearchItem:p_view->p_root];
+        }
+        if (o_result != NULL)
+        {
+            for (i = 0 ; i < [o_result count] - 1 ; i++)
+            {
+                [o_outline_view expandItem: [o_outline_dict objectForKey:
+                            [NSString stringWithFormat: @"%p",
+                            [[o_result objectAtIndex: i] pointerValue]]]];
+            }
+            i_row = [o_outline_view rowForItem: [o_outline_dict objectForKey:
+                            [NSString stringWithFormat: @"%p",
+                            [[o_result objectAtIndex: [o_result count] - 1 ]
+                            pointerValue]]]];
+        }
+        if (i_row > -1)
+        {
+            [o_outline_view selectRow:i_row byExtendingSelection: NO];
+            [o_outline_view scrollRowToVisible: i_row];
+        }
+    }
+    vlc_object_release(p_playlist);
+
+}
+
 @end
 
 @implementation VLCPlaylist (NSOutlineViewDataSource)
@@ -394,8 +516,6 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     vlc_object_release( p_playlist );
     if( i_return == -1 ) i_return = 0;
     msg_Dbg( p_playlist, "I have %d children", i_return );
-    [o_status_field setStringValue: [NSString stringWithFormat:
-                                _NS("%i items in playlist"), i_return]];
     return i_return;
 }
 
@@ -405,6 +525,8 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
     playlist_item_t *p_return = NULL;
     playlist_t * p_playlist = vlc_object_find( VLCIntf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
+    NSValue * o_value;
+
     if( p_playlist == NULL )
         return nil;
 
@@ -427,7 +549,15 @@ belongs to an Apple hidden private API, and then can "disapear" at any time*/
 
     vlc_object_release( p_playlist );
     msg_Dbg( p_playlist, "childitem with index %d", index );
-    return [[NSValue valueWithPointer: p_return] retain];
+
+    o_value = [NSValue valueWithPointer: p_return];
+
+    [o_outline_dict setObject:o_value forKey:[NSString stringWithFormat:@"%p",                                                                      p_return]];
+//    [o_status_field setStringValue: [NSString stringWithFormat:
+//                        _NS("%i items in playlist"), [o_outline_dict count]]];
+
+    return o_value;
+
 }
 
 /* is the item expandable */

@@ -49,9 +49,14 @@
 
     NSImage *o_descendingSortingImage;
     NSImage *o_ascendingSortingImage;
+
+    NSMutableDictionary * o_outline_dict;
+
+    bool b_selected_item_met;
 }
 
 - (IBAction)handlePopUp:(id)sender;
+- (IBAction)searchItem:(id)sender;
 
 - (void)initStrings;
 
