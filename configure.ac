@@ -1563,7 +1563,10 @@ AC_ARG_ENABLE(vcdx,
   [  --enable-vcdx           VCD support with Navigation (default enabled)])
 
 AC_ARG_ENABLE(cdda,           
-  [  --enable-cdda            CDDA plugin support (default enabled)])
+  [  --enable-cdda           CDDA plugin support (default enabled)])
+
+AC_ARG_ENABLE(cddax,
+  [  --enable-cddax          CDDAX plugin support (default enabled)])
 
 if test "${enable_cddax}" != "no"
 then
@@ -2637,6 +2640,29 @@ then
 fi
 
 dnl
+dnl  Qt Video output module
+dnl  (disabled by default)
+dnl
+dnl AC_ARG_ENABLE(qt_video,
+dnl   [  --enable-qt_video            QT Video Output support (default disabled)])
+dnl if test "${enable_qt_video}" = "yes"
+dnl then
+dnl  AX_ADD_PLUGINS([qt_video])
+dnl  AX_ADD_LDFLAGS([qt_video],[-L${QTDIR}/lib])
+dnl  LDFLAGS="${LDFLAGS_save} ${LDFLAGS_qt_video}"
+dnl   AC_CHECK_LIB(qt-mt,main,[
+dnl    AX_ADD_LDFLAGS([qt_video],[-lqt-mt])
+dnl  ],[
+dnl    AC_CHECK_LIB(qt,main,[
+dnl      AX_ADD_LDFLAGS([qt_video],[-lqt])
+dnl    ])
+dnl  ])
+dnl  NEED_QTE_MAIN=yes
+dnl  LDFLAGS="${LDFLAGS_save}"
+dnl  AX_ADD_CXXFLAGS([qt_video],[-I/usr/include/qt3 -I/usr/include/qt -I${QTDIR}/include])
+dnl fi
+
+dnl
 dnl  Windows DirectX module
 dnl
 AC_ARG_ENABLE(directx,
@@ -3668,9 +3694,9 @@ dnl
 if test "${NEED_QTE_MAIN}" != "no"
 then
     AX_ADD_PLUGINS([qte_main])
-    AX_ADD_CPPFLAGS([qte opie vout_sdl],[-DNEED_QTE_MAIN])
-    AX_ADD_CXXFLAGS([qte_main],[${CPPFLAGS_qte} ${CXXFLAGS_qte}])
-    AX_ADD_LDFLAGS([qte_main],[${LDFLAGS_qte}])
+    AX_ADD_CXXFLAGS([opie qte qt_video],[-DNEED_QTE_MAIN])
+    AX_ADD_CXXFLAGS([qte_main],[${CXXFLAGS_qte} ${CXXFLAGS_qt_video}])
+    AX_ADD_LDFLAGS([qte_main],[${LDFLAGS_qte} ${LDFLAGS_qt_video}])
 fi
 
 
