@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.11 2002/06/30 15:07:57 fenrir Exp $
+ * $Id: libioRIFF.c,v 1.12 2002/07/02 17:54:49 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -62,7 +62,7 @@ int 	__RIFF_SkipBytes(input_thread_t * p_input,int nb)
     data_packet_t *p_pack;
     int i;
     int i_rest;
-    if( p_input->stream.b_seekable )
+    if( ( p_input->stream.b_seekable )&&( p_input->stream.i_method == INPUT_METHOD_FILE ) )
     {
         u32 i_pos;
         __RIFF_TellPos( p_input, &i_pos);
@@ -120,6 +120,7 @@ riffchunk_t     * RIFF_ReadChunk(input_thread_t * p_input)
 	
 	p_riff->p_data = NULL;
 	/* peek to have the begining, 8+8 get i_8bytes */
+
 	if( ( count = input_Peek( p_input, &p_peek, 16 ) ) < 8 )
 	{
 		msg_Err( p_input, "cannot peek()" );
@@ -130,7 +131,7 @@ riffchunk_t     * RIFF_ReadChunk(input_thread_t * p_input)
 	p_riff->i_id = __GetDWLE( p_peek );
 	p_riff->i_size =__GetDWLE( p_peek + 4 );
 	p_riff->i_type = ( count >= 12 ) ? __GetDWLE( p_peek + 8 ) : 0 ;
-    memset( &p_riff->i_8bytes, 8, 0 );
+    memset( &p_riff->i_8bytes, 0, 8 );
     if( count >= 12 )
     {
         memcpy( &p_riff->i_8bytes, p_peek + 8, count - 8 );
