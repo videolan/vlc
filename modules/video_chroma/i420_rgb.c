@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2004 VideoLAN
- * $Id: i420_rgb.c,v 1.7 2004/01/31 05:53:35 rocky Exp $
+ * $Id$
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *
@@ -265,8 +265,10 @@ static void SetGammaTable( int *pi_table, double f_gamma )
  *****************************************************************************/
 static void SetYUV( vout_thread_t *p_vout )
 {
-    int         pi_gamma[256];                                /* gamma table */
-    int         i_index;                                  /* index in tables */
+    int          pi_gamma[256];                               /* gamma table */
+    volatile int i_index;                                 /* index in tables */
+                   /* We use volatile here to work around a strange gcc-3.3.4
+                    * optimization bug */
 
     /* Build gamma table */
     SetGammaTable( pi_gamma, p_vout->f_gamma );
