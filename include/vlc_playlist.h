@@ -155,7 +155,7 @@ VLC_EXPORT( int,  playlist_Enable, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_DisableGroup, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_EnableGroup, ( playlist_t *, int ) );
 
-/* Basic item informations accessors */
+/* Basic item information accessors */
 VLC_EXPORT( int, playlist_ItemSetGroup, (playlist_item_t *, int ) );
 VLC_EXPORT( int, playlist_ItemSetName, (playlist_item_t *,  char * ) );
 VLC_EXPORT( int, playlist_ItemSetDuration, (playlist_item_t *, mtime_t ) );

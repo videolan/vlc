@@ -201,7 +201,7 @@
 /* Maximum number of active areas in a rendering buffer. Active areas are areas
  * of the picture which need to be cleared before re-using the buffer. If a
  * picture, including its many additions such as subtitles, additionnal user
- * informations and interface, has too many active areas, some of them are
+ * information and interface, has too many active areas, some of them are
  * joined. */
 #define VOUT_MAX_AREAS                  5
 

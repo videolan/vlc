@@ -185,7 +185,7 @@ enum input_state_e
 #define INPUT_RATE_MIN       125            /* Up to 8/1 */
 #define INPUT_RATE_MAX      8000            /* Up to 1/8 */
 
-/* input_source_t: gathers all informations per input source */
+/* input_source_t: gathers all information per input source */
 typedef struct
 {
     /* Input item description */

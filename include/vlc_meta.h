@@ -46,7 +46,7 @@ struct vlc_meta_t
     char    **name;
     char    **value;
 
-    /* track meta informations */
+    /* track meta information */
     int         i_track;
     vlc_meta_t  **track;
 };
