@@ -153,7 +153,7 @@ endif
 
 	touch build-stamp
 
-clean:
+clean: unpatch
 	dh_testdir
 	dh_testroot
 	rm -f configure-stamp build-stamp
@@ -176,8 +176,12 @@ clean:
 	# Remove spurious autotools stuff
 	rm -f config.log confdefs.h
 
+	touch configure.ac -d yesterday
+	touch aclocal.m4 -d yesterday
+	touch configure -d yesterday
+	touch config.h.in -d yesterday
+	touch `find . -name Makefile.in` -d yesterday
 	-$(MAKE) distclean
-	$(MAKE) -f debian/rules unpatch
 
 	dh_clean
 
@@ -198,7 +202,7 @@ install: build
 	#cp doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc
 	#strfile doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc.dat
 
-	rm -Rf debian/vlc/usr/share/vlc/skins
+	rm -Rf debian/vlc/$(VIDDIR)/skins
 	ln -s vlc.1.gz debian/vlc/usr/share/man/man1/svlc.1.gz
 
 	# Package: libvlc0-dev
@@ -322,8 +326,7 @@ endif
 	ln -s vlc debian/kvlc/usr/share/doc/kvlc
 	mv debian/vlc/usr/lib/vlc/gui/libkde_plugin.so \
 	  debian/kvlc/usr/lib/vlc/gui/
-	mv debian/vlc/usr/share/vlc/ui.rc \
-	  debian/kvlc/usr/share/vlc
+	mv debian/vlc/$(VIDDIR)/ui.rc debian/kvlc/$(VIDDIR)
 	ln -s vlc.1.gz debian/kvlc/usr/share/man/man1/kvlc.1.gz
 	mv debian/vlc/$(VIDDIR)/kvlc32x32.xpm debian/kvlc/$(VIDDIR)/kvlc.xpm
 	mv debian/vlc/$(VIDDIR)/kvlc48x48.png debian/kvlc/$(PIXDIR)/kvlc.png
@@ -338,6 +341,7 @@ endif
 	# Package: wxvlc
 	mv debian/vlc/usr/bin/wxvlc debian/wxvlc/usr/bin/
 	ln -s vlc debian/wxvlc/usr/share/doc/wxvlc
+	cp debian/vlc/$(VIDDIR)/vlc.xpm debian/wxvlc/$(VIDDIR)/wxvlc.xpm
 	mv debian/vlc/usr/lib/vlc/gui/libwxwindows_plugin.so \
 	  debian/wxvlc/usr/lib/vlc/gui/
 	ln -s vlc.1.gz debian/wxvlc/usr/share/man/man1/wxvlc.1.gz

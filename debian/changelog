@@ -1,3 +1,41 @@
+vlc (0.7.2.final-11) unstable; urgency=medium
+
+  * configure.ac:
+    + Fixed an LDFLAGS/CFLAGS confusion.
+    + Don't use -finline-limit since it now tries to inline functions that
+      have not been explicitely inlined (Closes: #265673).
+  * debian/patches/20_configure.dpatch:
+    + Don't manage this patch with dpatch since it causes ownership issues.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Sun, 15 Aug 2004 01:35:35 +0200
+
+vlc (0.7.2.final-10) unstable; urgency=medium
+
+  * The "I hope I got it right this time" upload.
+  * configure.ac:
+    + Use -maltivec -mabi=altivec for the memcpyaltivec and deinterlace
+      plugins on PowerPC.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 10 Aug 2004 18:01:47 +0200
+
+vlc (0.7.2.final-9) unstable; urgency=low
+
+  * debian/control:
+    + Added a missing dpatch build dependency (Closes: #263363).
+    + Removed the modplug plugin until libmodplug-dev enters Debian.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 10 Aug 2004 11:01:15 +0200
+
+vlc (0.7.2.final-8) unstable; urgency=low
+
+  * debian/control:
+    + Added a missing dpatch build dependency.
+  * configure.ac:
+    + Fixed the powerpc build by conditionally re-enabling -maltivec
+      -mabi=altivec.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri, 30 Jul 2004 00:05:58 +0200
+
 vlc (0.7.2.final-7) unstable; urgency=low
 
   * debian/rules:
