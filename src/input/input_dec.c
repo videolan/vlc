@@ -443,10 +443,10 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
             memcpy( p_dec->fmt_in.subs.spu.palette,
                     p_es->p_demux_data, 17 * 4 );
         }
-        else if( p_es->i_fourcc == VLC_FOURCC( 'd', 'v', 'b', 's' ) )
+        else if( p_es->i_fourcc == VLC_FOURCC( 'd', 'v', 'b', 's' ) &&
+                 p_es->p_spuinfo )
         {
-            dvb_spuinfo_t *p_dvbs = (dvb_spuinfo_t*)p_es->p_demux_data;
-
+            dvb_spuinfo_t *p_dvbs = (dvb_spuinfo_t*)p_es->p_spuinfo;
             p_dec->fmt_in.subs.dvb.i_id = p_dvbs->i_id;
         }
     }
