@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: playlist.cpp,v 1.32 2003/12/22 14:31:01 gbazin Exp $
+ * $Id: playlist.cpp,v 1.33 2004/01/05 13:00:39 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -32,6 +32,10 @@
 
 /* Callback prototype */
 int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param );
+int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
+                     vlc_value_t old_val, vlc_value_t new_val, void *param );
+int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
                      vlc_value_t old_val, vlc_value_t new_val, void *param );
 
 /*****************************************************************************
@@ -72,6 +76,11 @@ enum
     Up_Event,
     Down_Event,
     Infos_Event,
+
+    PopupPlay_Event,
+    PopupDel_Event,
+    PopupEna_Event,
+    PopupInfo_Event,
 
     SearchText_Event,
     Search_Event,
@@ -114,6 +123,14 @@ BEGIN_EVENT_TABLE(Playlist, wxFrame)
     EVT_LIST_ITEM_ACTIVATED(ListView_Event, Playlist::OnActivateItem)
     EVT_LIST_COL_CLICK(ListView_Event, Playlist::OnColSelect)
     EVT_LIST_KEY_DOWN(ListView_Event, Playlist::OnKeyDown)
+    EVT_LIST_ITEM_RIGHT_CLICK(ListView_Event, Playlist::OnPopup)
+
+    /* Popup events */
+    EVT_MENU( PopupPlay_Event, Playlist::OnPopupPlay)
+    EVT_MENU( PopupDel_Event, Playlist::OnPopupDel)
+    EVT_MENU( PopupEna_Event, Playlist::OnPopupEna)
+    EVT_MENU( PopupInfo_Event, Playlist::OnPopupInfo)
+
 
     /* Button events */
     EVT_BUTTON( Search_Event, Playlist::OnSearch)
@@ -214,6 +231,12 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* Attach the menu bar to the frame */
     SetMenuBar( menubar );
 
+    /* Create the popup menu */
+    popup_menu = new wxMenu;
+    popup_menu->Append( PopupPlay_Event, wxU(_("Play item")) );
+    popup_menu->Append( PopupDel_Event, wxU(_("Delete item")) );
+    popup_menu->Append( PopupEna_Event, wxU(_("Toggle enabled")) );
+    popup_menu->Append( PopupInfo_Event, wxU(_("Info on item")) );
 
     /* Create a panel to put everything in */
     wxPanel *playlist_panel = new wxPanel( this, -1 );
@@ -340,7 +363,17 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     }
 
     /* We want to be noticed of playlist changes */
+
+    /* Some global changes happened -> Rebuild all */
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
+
+    /* We went to the next item */
+    var_AddCallback( p_playlist, "playlist-current", PlaylistNext, this );
+
+    /* One item has been updated */
+    var_AddCallback( p_playlist, "item-change", ItemChanged, this );
+
+
     vlc_object_release( p_playlist );
 
     /* Update the playlist */
@@ -361,6 +394,60 @@ Playlist::~Playlist()
 
     var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
     vlc_object_release( p_playlist );
+}
+
+/**********************************************************************
+ * Update one playlist item
+ **********************************************************************/
+void Playlist::UpdateItem( int i )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+    if( i < 0 || i > p_playlist->i_size )
+    {
+        vlc_object_release(p_playlist);
+        return;
+    }
+    listview->SetItem( i, 0, wxL2U(p_playlist->pp_items[i]->psz_name) );
+    listview->SetItem( i, 1, wxL2U( playlist_GetInfo( p_playlist, i,
+                                       "General" , "Author" ) ) );
+    listview->SetItem( i, 2,
+             wxL2U(playlist_FindGroup(p_playlist,p_playlist->
+                                    pp_items[i]->i_group) ) );
+
+    if( p_playlist->pp_items[i]->b_enabled == VLC_FALSE )
+    {
+        wxListItem listitem;
+        listitem.m_itemId = i;
+        listitem.SetTextColour( *wxLIGHT_GREY);
+        listview->SetItem(listitem);
+    }
+
+    char psz_duration[MSTRTIME_MAX_SIZE];
+    mtime_t dur = p_playlist->pp_items[i]->i_duration;
+    if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
+    else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
+    listview->SetItem( i, 3, wxU(psz_duration) );
+
+    /* Change the colour for the currenty played stream */
+    wxListItem listitem;
+    listitem.m_itemId = i;
+    if( i == p_playlist->i_index )
+    {
+        listitem.SetTextColour( *wxRED );
+    }
+    else
+    {
+        listitem.SetTextColour( *wxBLACK );
+    }
+    listview->SetItem( listitem );
+
+    vlc_object_release(p_playlist);
 }
 
 /**********************************************************************
@@ -387,31 +474,9 @@ void Playlist::Rebuild()
     {
         wxString filename = wxL2U(p_playlist->pp_items[i]->psz_name);
         listview->InsertItem( i, filename );
-        listview->SetItem( i, 1, wxL2U(p_playlist->pp_items[i]->psz_author) );
-        listview->SetItem( i, 2,
-            wxL2U(playlist_FindGroup( p_playlist,
-                                      p_playlist->pp_items[i]->i_group )) );
-        if( p_playlist->pp_items[i]->b_enabled == VLC_FALSE )
-        {
-            wxListItem listitem;
-            listitem.m_itemId = i;
-            listitem.SetTextColour( *wxLIGHT_GREY);
-            listview->SetItem(listitem);
-        }
-
-        char psz_duration[MSTRTIME_MAX_SIZE];
-        mtime_t dur = p_playlist->pp_items[i]->i_duration;
-        if( dur != -1 ) secstotimestr( psz_duration, dur/1000000 );
-        else memcpy( psz_duration , "-:--:--", sizeof("-:--:--") );
-        listview->SetItem( i, 3, wxU(psz_duration) );
+        UpdateItem( i );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
-
-    /* Change the colour for the currenty played stream */
-    wxListItem listitem;
-    listitem.m_itemId = p_playlist->i_index;
-    listitem.SetTextColour( *wxRED );
-    listview->SetItem( listitem );
 
     if( i_focused )
     {
@@ -815,10 +880,10 @@ void Playlist::OnEnableSelection( wxCommandEvent& WXUNUSED(event) )
         if( listview->IsSelected( item ) )
         {
             playlist_Enable( p_playlist, item );
+            UpdateItem( item );
         }
     }
     vlc_object_release( p_playlist);
-    Rebuild();
 }
 
 void Playlist::OnDisableSelection( wxCommandEvent& WXUNUSED(event) )
@@ -836,10 +901,10 @@ void Playlist::OnDisableSelection( wxCommandEvent& WXUNUSED(event) )
         if( listview->IsSelected( item ) )
         {
             playlist_Disable( p_playlist, item );
+            UpdateItem( item );
         }
     }
     vlc_object_release( p_playlist);
-    Rebuild();
 }
 
 void Playlist::OnSelectAll( wxCommandEvent& WXUNUSED(event) )
@@ -912,6 +977,7 @@ void Playlist::OnActivateItem( wxListEvent& event )
 
     vlc_object_release( p_playlist );
 }
+
 void Playlist::OnKeyDown( wxListEvent& event )
 {
     long keycode = event.GetKeyCode();
@@ -923,7 +989,7 @@ void Playlist::OnKeyDown( wxListEvent& event )
     }
 }
 
-void Playlist::OnInfos( wxCommandEvent& WXUNUSED(event) )
+void Playlist::ShowInfos( int i_item )
 {
     playlist_t *p_playlist =
         (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
@@ -932,23 +998,27 @@ void Playlist::OnInfos( wxCommandEvent& WXUNUSED(event) )
     {
         return;
     }
-
     if( iteminfo_dialog == NULL )
     {
-        /* We use the first selected item, so find it */
-        long i_item = listview->GetNextItem( i_item, wxLIST_NEXT_ALL,
-                                             wxLIST_STATE_SELECTED );
         if( i_item >= 0 && i_item < p_playlist->i_size )
         {
             iteminfo_dialog = new ItemInfoDialog(
                               p_intf, p_playlist->pp_items[i_item], this );
             if( iteminfo_dialog->ShowModal()  == wxID_OK )
-                Rebuild();
+                UpdateItem( i_item );
             delete iteminfo_dialog;
             iteminfo_dialog = NULL;
         }
     }
     vlc_object_release( p_playlist );
+}
+
+void Playlist::OnInfos( wxCommandEvent& WXUNUSED(event) )
+{
+    /* We use the first selected item, so find it */
+    long i_item = listview->GetNextItem( -1 , wxLIST_NEXT_ALL,
+                                         wxLIST_STATE_SELECTED );
+    ShowInfos( i_item );
 }
 
 void Playlist::OnEnDis( wxCommandEvent& event )
@@ -984,6 +1054,65 @@ void Playlist::OnEnDis( wxCommandEvent& event )
 }
 
 /*****************************************************************************
+ * Popup management functions
+ *****************************************************************************/
+void Playlist::OnPopup( wxListEvent& event )
+{
+    i_popup_item = event.GetIndex();
+    Playlist::PopupMenu( popup_menu , ScreenToClient( wxGetMousePosition() ) );
+}
+
+
+void Playlist::OnPopupPlay( wxMenuEvent& event )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+    if( i_popup_item != -1 )
+    {
+        playlist_Goto( p_playlist, i_popup_item );
+    }
+    vlc_object_release( p_playlist );
+}
+
+void Playlist::OnPopupDel( wxMenuEvent& event )
+{
+    DeleteItem( i_popup_item );
+}
+
+void Playlist::OnPopupEna( wxMenuEvent& event )
+{
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    if( p_playlist->pp_items[i_popup_item]->b_enabled )
+        //playlist_IsEnabled( p_playlist, i_popup_item ) )
+    {
+        playlist_Disable( p_playlist, i_popup_item );
+    }
+    else
+    {
+        playlist_Enable( p_playlist, i_popup_item );
+    }
+    vlc_object_release( p_playlist);
+    UpdateItem( i_popup_item );
+}
+
+void Playlist::OnPopupInfo( wxMenuEvent& event )
+{
+    ShowInfos( i_popup_item );
+}
+
+/*****************************************************************************
  * PlaylistChanged: callback triggered by the intf-change playlist variable
  *  We don't rebuild the playlist directly here because we don't want the
  *  caller to block for a too long time.
@@ -996,6 +1125,29 @@ int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     p_playlist_dialog->b_need_update = VLC_TRUE;
     vlc_mutex_unlock( &p_playlist_dialog->lock );
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * Next: callback triggered by the playlist-current playlist variable
+ *****************************************************************************/
+int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
+                 vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    Playlist *p_playlist_dialog = (Playlist *)param;
+    p_playlist_dialog->UpdateItem( old_val.i_int );
+    p_playlist_dialog->UpdateItem( new_val.i_int );
+    return 0;
+}
+
+
+/*****************************************************************************
+ * ItemChanged: callback triggered by the item-change playlist variable
+ *****************************************************************************/
+int ItemChanged( vlc_object_t *p_this, const char *psz_variable,
+                 vlc_value_t old_val, vlc_value_t new_val, void *param )
+{
+    Playlist *p_playlist_dialog = (Playlist *)param;
+    p_playlist_dialog->UpdateItem( new_val.i_int );
 }
 
 

@@ -2,7 +2,7 @@
  * dialogs.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dialogs.cpp,v 1.12 2003/12/11 02:26:03 asmax Exp $
+ * $Id: dialogs.cpp,v 1.13 2004/01/05 13:00:39 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -289,12 +289,13 @@ void DialogsProvider::OnOpenFileSimple( wxCommandEvent& event )
         for( size_t i = 0; i < paths.GetCount(); i++ )
             if( event.GetInt() )
                 playlist_Add( p_playlist, (const char *)paths[i].mb_str(),
-                              0, 0,
+                              (const char *)paths[i].mb_str(),
                               PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO),
                               PLAYLIST_END );
             else
                 playlist_Add( p_playlist, (const char *)paths[i].mb_str(),
-                              0, 0, PLAYLIST_APPEND, PLAYLIST_END );
+                              (const char *)paths[i].mb_str(),
+                              PLAYLIST_APPEND, PLAYLIST_END );
     }
 
     vlc_object_release( p_playlist );

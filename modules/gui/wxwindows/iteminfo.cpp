@@ -2,7 +2,7 @@
  * iteminfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: iteminfo.cpp,v 1.5 2003/12/22 02:24:52 sam Exp $
+ * $Id: iteminfo.cpp,v 1.6 2004/01/05 13:00:39 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -140,74 +140,84 @@ ItemInfoDialog::~ItemInfoDialog()
  *****************************************************************************/
 wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
 {
-    wxPanel *panel = new wxPanel( parent, -1, wxDefaultPosition,
+    wxPanel *info_panel = new wxPanel( parent, -1, wxDefaultPosition,
                                   wxDefaultSize );
+    info_panel->SetAutoLayout( TRUE );
+    wxBoxSizer *info_sizer = new wxBoxSizer( wxHORIZONTAL );
 
-    wxStaticBox *panel_box = new wxStaticBox( panel, -1,
+    /* Create a box to surround the controls */
+    wxStaticBox *panel_box = new wxStaticBox( info_panel, -1,
                                    wxU(_("Item informations")) );
-    wxStaticBoxSizer *panel_sizer = new wxStaticBoxSizer( panel_box,
+
+    wxStaticBoxSizer *box_sizer = new wxStaticBoxSizer( panel_box,
                                                           wxVERTICAL );
-
-    info_subpanel = new wxPanel( panel, -1 );
-
-    wxFlexGridSizer *subpanel_sizer =
-                    new wxFlexGridSizer( 3, 1 , 0 , 0 );
 
     /* URI Textbox */
     wxStaticText *uri_label =
-           new wxStaticText(info_subpanel, -1, wxU(_("URI")) );
+           new wxStaticText( info_panel, -1, wxU(_("URI")) );
 
-    uri_text =  new wxTextCtrl( info_subpanel, Uri_Event,
+    uri_text =  new wxTextCtrl( info_panel, Uri_Event,
                                 wxU(p_item->psz_uri),
                                 wxDefaultPosition, wxSize( 300, -1 ),
                                 wxTE_PROCESS_ENTER);
 
-    subpanel_sizer->Add( uri_label, 0, wxALIGN_LEFT |
-                         wxALIGN_CENTER_VERTICAL );
-    subpanel_sizer->Add( uri_text, 0, wxALIGN_RIGHT |
-                         wxALIGN_CENTER_VERTICAL );
+    wxBoxSizer *uri_sizer = new wxBoxSizer( wxHORIZONTAL );
 
+    uri_sizer->Add( uri_label, 0 , wxALIGN_RIGHT |wxALL , 5 );
+    uri_sizer->Add( uri_text, 1 , wxALIGN_RIGHT | wxALL , 5 );
+    uri_sizer->Layout();
+    box_sizer->Add( uri_sizer, 1, wxEXPAND , 5);
 
     /* Name Textbox */
     wxStaticText *name_label =
-           new wxStaticText(info_subpanel, -1, wxU(_("Name")) );
+           new wxStaticText(  info_panel, -1, wxU(_("Name")) );
 
     name_text =
-                   new wxTextCtrl( info_subpanel, Uri_Event,
+                   new wxTextCtrl( info_panel, Uri_Event,
                                    wxU(p_item->psz_name),
                                    wxDefaultPosition, wxSize( 300, -1 ),
                                    wxTE_PROCESS_ENTER);
 
-    subpanel_sizer->Add( name_label, 0, wxALIGN_LEFT |
-                         wxALIGN_CENTER_VERTICAL );
-    subpanel_sizer->Add( name_text, 0, wxALIGN_RIGHT |
-                         wxALIGN_CENTER_VERTICAL );
+    wxBoxSizer *name_sizer = new wxBoxSizer( wxHORIZONTAL );
+
+    name_sizer->Add( name_label, 0 , wxALIGN_RIGHT |wxALL , 5  );
+    name_sizer->Add( name_text, 1 , wxALIGN_RIGHT | wxALL , 5 );
+    name_sizer->Layout();
+    box_sizer->Add( name_sizer, 1 , wxEXPAND, 5 );
 
     /* Author Textbox */
     wxStaticText *author_label =
-           new wxStaticText(info_subpanel, -1, wxU(_("Author")) );
+           new wxStaticText( info_panel, -1, wxU(_("Author")) );
 
     author_text =
-                   new wxTextCtrl( info_subpanel, Uri_Event,
-                                   wxU(p_item->psz_author),
+                   new wxTextCtrl( info_panel, Uri_Event,
+                                   wxU( playlist_GetItemInfo( p_item,
+                                          _("General"), _("Author") ) ),
                                    wxDefaultPosition, wxSize( 300, -1 ),
                                    wxTE_PROCESS_ENTER);
 
-    subpanel_sizer->Add( author_label, 0, wxALIGN_LEFT |
-                         wxALIGN_CENTER_VERTICAL );
-    subpanel_sizer->Add( author_text, 0, wxALIGN_RIGHT |
-                         wxALIGN_CENTER_VERTICAL );
+    wxBoxSizer *author_sizer = new wxBoxSizer( wxHORIZONTAL );
+    author_sizer->Add( author_label, 0 , wxALIGN_RIGHT | wxALL , 5 );
+    author_sizer->Add( author_text, 1 , wxALIGN_RIGHT | wxALL , 5);
+    author_sizer->Layout();
+    box_sizer->Add( author_sizer, 1, wxEXPAND, 5 );
 
-    info_subpanel->SetSizerAndFit( subpanel_sizer );
+    /* Treeview */
+    info_tree = new wxTreeCtrl( info_panel, -1, wxDefaultPosition,
+                                wxSize(220,200),
+                                wxSUNKEN_BORDER |wxTR_HAS_BUTTONS |
+                                wxTR_HIDE_ROOT );
 
-    /* Stuff everything into the main panel */
-    panel_sizer->Add( info_subpanel, 1,
-                      wxEXPAND | wxALIGN_LEFT |
-                      wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+    box_sizer->Add( info_tree, 0, wxEXPAND, 5 );
+    info_sizer->Add( box_sizer, 1, wxBOTTOM, 5 );
 
-    panel->SetSizerAndFit( panel_sizer );
+    info_panel->SetSizer( info_sizer );
+    info_sizer->Layout();
+    info_sizer->SetSizeHints( info_panel );
 
-    return panel;
+    UpdateInfo();
+
+    return info_panel;
 }
 
 wxPanel *ItemInfoDialog::GroupPanel( wxWindow* parent )
@@ -276,6 +286,33 @@ wxPanel *ItemInfoDialog::GroupPanel( wxWindow* parent )
     return panel;
 }
 
+void ItemInfoDialog::UpdateInfo()
+{
+    if( !info_root )
+    {
+       info_root = info_tree->AddRoot( wxU( p_item->psz_name) );
+    }
+
+    /* Rebuild the tree */
+    for( int i = 0; i< p_item->i_categories ; i++)
+    {
+        if( !strcmp( p_item->pp_categories[i]->psz_name, _("Options") ) )
+        {
+            continue;
+        }
+        wxTreeItemId cat = info_tree->AppendItem( info_root,
+                            wxU( p_item->pp_categories[i]->psz_name) );
+
+        for( int j = 0 ; j < p_item->pp_categories[i]->i_infos ; j++ )
+        {
+           info_tree->AppendItem( cat , (wxString)
+                      wxU(p_item->pp_categories[i]->pp_infos[j]->psz_name) +
+                      wxT(": ") +
+                      wxU(p_item->pp_categories[i]->pp_infos[j]->psz_value) );
+        }
+    }
+}
+
 /*****************************************************************************
  * Events methods.
  *****************************************************************************/
@@ -283,7 +320,8 @@ void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 {
     p_item->psz_name = strdup( name_text->GetLineText(0).mb_str() );
     p_item->psz_uri = strdup( uri_text->GetLineText(0).mb_str() );
-    p_item->psz_author = strdup( author_text->GetLineText(0).mb_str() );
+    playlist_AddItemInfo( p_item,"General","Author",
+                            author_text->GetLineText(0).mb_str() );
     vlc_bool_t b_old_enabled = p_item->b_enabled;
 
     playlist_t * p_playlist =

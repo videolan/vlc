@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001, 2003 VideoLAN
- * $Id: interface.cpp,v 1.82 2004/01/03 10:55:07 gbazin Exp $
+ * $Id: interface.cpp,v 1.83 2004/01/05 13:00:39 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -208,7 +208,7 @@ END_EVENT_TABLE()
  *****************************************************************************/
 Interface::Interface( intf_thread_t *_p_intf ):
     wxFrame( NULL, -1, wxT("VLC media player"),
-             wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
+             wxDefaultPosition, wxSize(700,100), wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
@@ -1174,6 +1174,7 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
     }
 #endif
 
+#undef WIN32
     vlc_mutex_unlock( &p_intf->change_lock );
 }
 
@@ -1312,7 +1313,8 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
     }
 
     for( size_t i = 0; i < filenames.GetCount(); i++ )
-        playlist_Add( p_playlist, (const char *)filenames[i].mb_str(), 0, 0,
+        playlist_Add( p_playlist, (const char *)filenames[i].mb_str(),
+                      (const char *)filenames[i].mb_str(),
                       PLAYLIST_APPEND | ((i | b_enqueue) ? 0 : PLAYLIST_GO),
                       PLAYLIST_END );
 

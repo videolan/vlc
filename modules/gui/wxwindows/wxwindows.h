@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.82 2003/12/22 14:31:01 gbazin Exp $
+ * $Id: wxwindows.h,v 1.83 2004/01/05 13:00:39 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -749,12 +749,14 @@ public:
 
     void UpdatePlaylist();
     void ShowPlaylist( bool show );
+    void UpdateItem( int );
 
     bool b_need_update;
     vlc_mutex_t lock;
 
 private:
     void DeleteItem( int item );
+    void ShowInfos( int item );
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnAddFile( wxCommandEvent& event );
@@ -785,12 +787,19 @@ private:
     void OnKeyDown( wxListEvent& event );
     void OnNewGroup( wxCommandEvent& event );
 
+    /* Popup functions */
+    void OnPopup( wxListEvent& event );
+    void OnPopupPlay( wxMenuEvent& event );
+    void OnPopupDel( wxMenuEvent& event );
+    void OnPopupEna( wxMenuEvent& event );
+    void OnPopupInfo( wxMenuEvent& event );
     void Rebuild();
 
     wxTextCtrl *search_text;
     wxButton *search_button;
     DECLARE_EVENT_TABLE();
 
+    wxMenu *popup_menu;
 
     ItemInfoDialog *iteminfo_dialog;
 
@@ -799,6 +808,8 @@ private:
     wxTreeCtrl *treeview;
     int i_update_counter;
     int i_sort_mode;
+
+    int i_popup_item;
 
     int i_title_sorted;
     int i_author_sorted;
@@ -851,6 +862,8 @@ private:
     void OnCancel( wxCommandEvent& event );
     void OnNewGroup( wxCommandEvent& event );
 
+    void UpdateInfo();
+
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
@@ -867,6 +880,9 @@ private:
     wxTextCtrl *uri_text;
     wxTextCtrl *name_text;
     wxTextCtrl *author_text;
+
+    wxTreeCtrl *info_tree;
+    wxTreeItemId info_root;
 
     wxCheckBox *enabled_checkbox;
     wxComboBox *group_combo;

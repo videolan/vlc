@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.cpp,v 1.61 2003/12/22 15:42:43 gbazin Exp $
+ * $Id: open.cpp,v 1.62 2004/01/05 13:00:39 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -902,8 +902,12 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
     for( int i = 0; i < (int)mrl.GetCount(); i++ )
     {
-        int i_options = 0, i_total_options;
-        char **ppsz_options = NULL;
+        int i_options = 0;
+
+        int i_id = playlist_Add( p_playlist, (const char *)mrl[i].mb_str(),
+                      (const char *)mrl[i].mb_str(),
+                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
+        int i_pos = playlist_GetPositionById( p_playlist, i_id );
 
         /* Count the input options */
         while( i + i_options + 1 < (int)mrl.GetCount() &&
@@ -912,57 +916,31 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
             i_options++;
         }
 
-        /* Allocate ppsz_options */
+        /* Insert options */
         for( int j = 0; j < i_options; j++ )
         {
-            if( !ppsz_options )
-                ppsz_options = (char **)malloc( sizeof(char *) * i_options );
-
-            ppsz_options[j] = strdup( mrl[i + j  + 1].mb_str() );
+            playlist_AddOption( p_playlist, i_pos, mrl[i + j  + 1].mb_str() );
         }
-
-        i_total_options = i_options;
 
         /* Get the options from the subtitles dialog */
         if( subsfile_checkbox->IsChecked() && subsfile_mrl.GetCount() )
         {
-            ppsz_options = (char **)realloc( ppsz_options, sizeof(char *) *
-                               (i_total_options + subsfile_mrl.GetCount()) );
-
             for( int j = 0; j < (int)subsfile_mrl.GetCount(); j++ )
             {
-                ppsz_options[i_total_options + j] =
-                    strdup( subsfile_mrl[j].mb_str() );
+                playlist_AddOption( p_playlist, i_pos ,
+                                    subsfile_mrl[j].mb_str() );
             }
-
-            i_total_options += subsfile_mrl.GetCount();
         }
 
         /* Get the options from the stream output dialog */
         if( sout_checkbox->IsChecked() && sout_mrl.GetCount() )
         {
-            ppsz_options = (char **)realloc( ppsz_options, sizeof(char *) *
-                               (i_total_options + sout_mrl.GetCount()) );
-
             for( int j = 0; j < (int)sout_mrl.GetCount(); j++ )
             {
-                ppsz_options[i_total_options + j] =
-                    strdup( sout_mrl[j].mb_str() );
+                playlist_AddOption( p_playlist, i_pos ,
+                                    sout_mrl[j].mb_str() );
             }
-
-            i_total_options += sout_mrl.GetCount();
-
         }
-
-        playlist_Add( p_playlist, (const char *)mrl[i].mb_str(),
-                      (const char **)ppsz_options, i_total_options,
-                      PLAYLIST_APPEND | (i ? 0 : PLAYLIST_GO), PLAYLIST_END );
-
-        /* clean up */
-        for( int j = 0; j < i_total_options; j++ )
-            free( ppsz_options[j] );
-        if( ppsz_options ) free( ppsz_options );
-
         i += i_options;
     }
 
