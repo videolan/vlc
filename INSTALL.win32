@@ -1,0 +1,149 @@
+INSTALL file for the Windows9x/2k/XP version of vlc, the VideoLAN Client
+
+Running VideoLAN Client
+=======================
+
+If you have already built vlc (see below) or are using a binary release,
+just run 'vlc.exe'.
+
+You can also run vlc from a dos command box, in which case you'll be able
+to use the command line arguments. You can obtain a list of these command
+line arguments by typing 'vlc --help'.
+To store a debug log of the current vlc session, you can use
+'vlc -vvvvv --intf=logger nameofyourvideofile', but this will unfortunatly
+disable the GUI. You will end-up with a vlc.log file in your current directory.
+
+If you want to play a DVD, run vlc and click on the Disc option in the
+interface. You then have to type your drive letter in the 'Device name'
+box (eg. 'D:' if your dvdrom drive is assigned the letter 'D').
+( !WARNING: you have to be in administrator mode (for now) on Win2k/XP or the
+  DVD won't play. )
+
+Building VideoLAN Client from the source code
+=============================================
+
+If you want to do the tricky job of building vlc from sources, you can do it
+in two ways:
+
+- natively on Windows, using MSYS+MINGW (www.mingw.org)
+  (MSYS is a minimal build environnement to compile unixish projects under
+   windoze. It provides all the common unix tools like sh, gmake...)
+
+- or on Linux, using the mingw32 cross-compiler
+
+Getting the right tools
+=======================
+
+- cross-compiling with mingw32:
+All the necessary tools you need can be found on the videolan web site:
+http://www.videolan.org/vlc/windows.html
+
+You first need to download a linux cross-compiler version of mingw32.
+(for Debian GNU/Linux users, there is a mingw32 package)
+
+You must also not forget to install the extra development packages if you want
+to build the DirectX, GTK and SDL plugins.
+
+- compiling natively on Windoze:
+You first need to download and install MSYS-1.0.5 (version 1.0.6 doesn't seem
+to work as well) and MINGW.
+http://prdownloads.sourceforge.net/mingw/msys-1.0.5-i686-bin.tar.gz
+http://prdownloads.sourceforge.net/mingw/MinGW-1.1.tar.gz
+
+You must also not forget to install the extra development packages if you want
+to build the DirectX, GTK and SDL plugins.
+(http://www.videolan.org/vlc/windows.html)
+
+
+NOTE: by default, the GTK package is configured to be installed in
+/usr/local/gtk-win32, if you want to change this path, then you need to edit
+the gtk-win32/bin/gtk-config file and change "gtk_dir=" accordingly.
+The same is true for the SDL package, it is installed in
+/usr/local/SDL-1.2.3-win32 by default and you need to change "prefix=" in 
+SDL-1.2.3-win32/i386-mingw32msvc/bin/sdl-config if you plan to extract the
+archive in a different directory.
+
+Configuring the build
+=====================
+
+The best way to configure the build process of vlc is to use the
+`./configure' script.
+
+See `./configure --help' for more information.
+
+If you are cross-compiling from Debian, you can use something
+along those lines:
+
+  make distclean ; \
+  ./configure --host=i586-mingw32msvc --target=i586-mingw32msvc \
+  --with-gtk-config-path=/usr/local/gtk-win32/bin \
+  --with-sdl-config-path=/usr/local/SDL-1.2.3-win32/i386-mingw32msvc/bin \
+  --with-directx=/usr/local/dxheaders
+
+If you are cross-compiling using the mingw32 package provided by
+www.videolan.org, you have to use something along those lines:
+
+  CC=/usr/local/cross-tools/bin/i586-mingw32msvc-gcc \
+  PATH=/usr/local/cross-tools/bin:$PATH \
+  ./configure --host=i586-mingw32msvc --target=i586-mingw32msvc \
+  --with-gtk-config-path=/usr/local/gtk-win32/bin \
+  --with-sdl-config-path=/usr/local/SDL-1.2.3-win32/i386-mingw32msvc/bin \
+  --with-directx=/usr/local/dxheaders
+
+If you are compiling natively on Windoze, then you can use something
+along those lines:
+  MAKE=gmake ./configure \
+  --with-gtk-config-path=/c/dev/gtk-win32/bin \
+  --with-sdl-config-path=/c/dev/SDL-1.2.3-win32/i386-mingw32msvc/bin \
+  --with-directx=/c/dev/dxheaders
+
+Building VideoLAN Client
+========================
+
+Have a look at the generated Makefile.opts file, you may want to choose
+which modules will be compiled as plugins, and which ones will remain in
+the core application. The configure script tries to guess for you.
+
+Once configured, to build vlc you have to:
+
+If you are cross-compiling from Debian, then just run `make'.
+
+If you are cross-compiling using the mingw32 package provided by
+www.videolan.org, run `PATH=/usr/local/cross-tools/bin:$PATH make'.
+
+If you are compiling natively on Windoze, run `MAKE=gmake gmake'.
+(note that msys sometimes stops in the middle of the build process and
+complains about not being able to create .dep files. If this happens, just
+re-run the above command another time and it should work)
+
+Building Win32 interface with bcc32 (Borland's compiler)
+========================================================
+(This stage is only necessary if you want to use the Win32 native interface.
+ If you are happy with the GTK interface, then you can skip this section)
+
+[Steps 2 and 3 are temporary]
+
+1) Compile vlc as usual.
+include\defs.h should be generated.
+
+2) Edit include\defs.h, and add the following lines if necessary:
+#define WIN32
+#define MODULE_NAME win32
+#define MODULE_NAME_IS win32
+#define PLUGIN
+#define HAVE_DYNAMIC_PLUGINS
+
+3) Still in defs.h, comment the following line to avoid compilation warnings:
+#define PACKAGE "vlc"
+
+4) From the plugin\win32 directory, use Borland C++ command-line tools
+as follows:
+bpr2mak intfwin.bpr 	// Create a makefile from intfwin.bpr
+make -fintfwin 		// It's Borland's make utility !
+
+5) This should create a intfwin.so
+You can remove any other generated file.
+
+
+Well done, now you're ready to use vlc!
+=======================================
