@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.136 2001/08/03 18:03:32 gbazin Exp $
+ * $Id: video_output.c,v 1.137 2001/08/14 00:00:04 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -873,8 +873,8 @@ static int InitThread( vout_thread_t *p_vout )
     if( p_vout->pf_create( p_vout ) )
     {
         /* If pf_create has failed then we have to make sure
-	 * pf_destroy won't be called, because the plugin should have
-	 * cleaned up all its mess */
+         * pf_destroy won't be called, because the plugin should have
+         * cleaned up all its mess */
         p_vout->pf_destroy = NULL;
         return( 1 );
     }
@@ -922,8 +922,8 @@ static int InitThread( vout_thread_t *p_vout )
     if( p_vout->pf_init( p_vout ) )
     {
         /* If pf_init has failed then we have to make sure
-	 * pf_destroy won't be called, because the plugin should have
-	 * cleaned up all its mess */
+         * pf_destroy won't be called, because the plugin should have
+         * cleaned up all its mess */
         p_vout->pf_destroy = NULL;
         return( 1 );
     }
@@ -2001,11 +2001,17 @@ static void RenderSubPicture( vout_thread_t *p_vout, picture_t *p_pic,
         switch( p_subpic->i_type )
         {
         case DVD_SUBPICTURE:                          /* DVD subpicture unit */
-            vout_RenderRGBSPU( p_pic, p_subpic,
-                               &p_vout->p_buffer[ p_vout->i_buffer_index ],
-                               p_vout->i_bytes_per_pixel,
-                               p_vout->i_bytes_per_line );
-            /* vout_RenderYUVSPU( p_pic, p_subpic ); */
+            if( p_vout->b_need_render )
+            {
+                vout_RenderRGBSPU( p_pic, p_subpic,
+                                   &p_vout->p_buffer[ p_vout->i_buffer_index ],
+                                   p_vout->i_bytes_per_pixel,
+                                   p_vout->i_bytes_per_line );
+            }
+            else
+            {
+                vout_RenderYUVSPU( p_pic, p_subpic );
+            }
             break;
 
         case TEXT_SUBPICTURE:                            /* single line text */

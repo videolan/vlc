@@ -4,6 +4,9 @@
 
 HEAD
 
+  * Fixed a crash in subtitle rendering.
+  * Activated old crappy subtitle rendering in overlay mode (ugly but
+    probably better than having no subtitles at all).
   * Added proper Conflicts: rules in debian/control.
   * configure.in fixes for BSD/OS.
   * Added BSD/OS libdvd by Steven M. Schultz <sms@TO.GD-ES.COM> in
