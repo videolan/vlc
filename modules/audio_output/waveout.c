@@ -791,10 +791,14 @@ static int VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
 
 static int VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 {
-    aout_sys_t *p_sys = p_aout->output.p_sys;
     DWORD i_waveout_vol;
 
-    waveOutGetVolume( p_sys->h_waveout, &i_waveout_vol );
+#ifdef UNDER_CE
+    waveOutGetVolume( 0, &i_waveout_vol );
+#else
+    waveOutGetVolume( p_aout->output.p_sys->h_waveout, &i_waveout_vol );
+#endif
+
     i_waveout_vol &= 0xFFFF;
     *pi_volume = p_aout->output.i_volume =
         i_waveout_vol * AOUT_VOLUME_MAX / 2 / 0xFFFF;
@@ -803,11 +807,15 @@ static int VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
 
 static int VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 {
-    aout_sys_t *p_sys = p_aout->output.p_sys;
     unsigned long i_waveout_vol = i_volume * 0xFFFF * 2 / AOUT_VOLUME_MAX;
     i_waveout_vol |= (i_waveout_vol << 16);
 
-    waveOutSetVolume( p_sys->h_waveout, i_waveout_vol );
+#ifdef UNDER_CE
+    waveOutSetVolume( 0, i_waveout_vol );
+#else
+    waveOutSetVolume( p_aout->output.p_sys->h_waveout, i_waveout_vol );
+#endif
+
     p_aout->output.i_volume = i_volume;
     return 0;
 }
