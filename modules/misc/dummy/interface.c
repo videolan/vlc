@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: interface.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: interface.c,v 1.2 2002/10/03 17:01:58 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,14 +41,9 @@ static void Run   ( intf_thread_t * );
 int  E_(OpenIntf) ( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
-#ifdef WIN32
-    AllocConsole();
-    freopen( "CONOUT$", "w", stdout );
-    freopen( "CONOUT$", "w", stderr );
-    freopen( "CONIN$", "r", stdin );
-    msg_Info( p_intf, VERSION_MESSAGE );
-    msg_Info( p_intf, _("\nUsing the dummy interface plugin...") );
-#endif
+
+    CONSOLE_INTRO_MSG;
+    msg_Info( p_intf, _("Using the dummy interface plugin...") );
 
     p_intf->pf_run = Run;
 

@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.10 2002/07/25 22:34:37 lool Exp $
+$Id: FAQ,v 1.11 2002/10/03 17:01:59 gbazin Exp $
 
 1. Using VLC
 
@@ -73,6 +73,33 @@ For binary packages, remove old packages first and install the new ones
 -------------------------------------------------------------
 deb     ftp://ftp.videolan.org/pub/videolan/ debian/
 deb-src ftp://ftp.videolan.org/pub/videolan/ debian/
+
+1.10 How can I save my VLC configuration ?
+----------------------------------------
+Currently, the only way to save the configuration options in VLC is through
+the preferences menu in one of the graphical user interface plugins.
+
+1.11 Where does VLC store it's config file ?
+------------------------------------------
+Currently, a config file is created on a per user basis (there is no global
+configuration file). If you modify the available options in VLC and save the
+new configuration, then a configuration file will be created in your user
+directory. The precise location of this file depends on the Operating System
+you are running:
+
+- Unices (linux, etc...): "~/.videolan/vlcrc"
+- Windows: "Application Data\videolan\vlcrc"
+
+1.12 I don't have access to the GUI anymore
+-------------------------------------------
+If you change the default interface module in the preferences menu to a non
+GUI module (ie. to a command line interface) and then save the configuration,
+the only way to get VLC to show a GUI again is to run it directly from the
+command line.
+For instance on Windows, you need to open a dos command box, go to the
+directory where you installed VLC (usually
+c:\Program Files\VideoLAN\VideoLAN Client) and then type "vlc --intf win32"
+You will then be able to modify the configuration again and save it.
 
 
 2. Troubleshooting

@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.18 2002/10/03 13:21:55 sam Exp $
+ * $Id: threads.c,v 1.19 2002/10/03 17:01:58 gbazin Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -381,7 +381,8 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     p_condvar->i_win9x_cv = p_this->p_vlc->i_win9x_cv;
     p_condvar->SignalObjectAndWait = p_this->p_vlc->SignalObjectAndWait;
 
-    if( p_this->p_vlc->i_win9x_cv == 0 )
+    if( (p_condvar->SignalObjectAndWait && !p_this->p_vlc->b_fast_mutex)
+        || p_condvar->i_win9x_cv == 0 )
     {
         /* Create an auto-reset event. */
         p_condvar->event = CreateEvent( NULL,   /* no security */
