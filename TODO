@@ -7,6 +7,60 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
+Task: 0x35
+Difficulty: Medium
+Urgency: Important
+Description: Fix plugins namespace problem
+ When compiling a plugin, all symbols seem to be exported, while we
+ actually just need GetConfig and a few other things: the other
+ functions are accessed through function pointers.
+Status: Todo
+
+Task: 0x34
+Difficulty: Medium
+Urgency: Important
+Description: Fix plugin autoloading
+ At the moment, plugins to be detected are hardcoded in the code. We
+ need a better method to get all available plugins, by listing all the
+ files in selected directories.
+Status: Todo
+
+Task: 0x33
+Difficulty: Hard
+Urgency: Important
+Description: Real plugin API
+ We need some functions to register plugins, automatically detect which
+ ones are the most appropriate, as well as ways to express that plugin
+ A won't work unless plugin B is activated as well.
+Status: Todo
+
+Task: 0x32
+Difficulty: Medium
+Urgency: Important
+Description: Enable compiled-in plugins
+ Some plugins may have their place inside the main program, such as the
+ dummy plugin, or the beos plugin under BeOS. We should allow to link
+ them with the main app.
+Status: Todo
+
+Task: 0x31
+Difficulty: Easy
+Urgency: Normal
+Description: Optimize SPU rendering
+ There is an if() in the SPU display routine to double lines when needed,
+ whiwh is rather inefficient. It should be removed and put outside
+ the main loop.
+Status: Todo.
+
+Task: 0x30
+Difficulty: Hard
+Urgency: Important
+Description: SPU error recovery
+ The SPU decoder does not behave very well when a packet is missed or when
+ it gets the stream at the middle of an SPU packet. Make it more error-
+ friendly.
+Status: Todo
+
 Task: 0x29
 Difficulty: Medium
 Urgency: Normal
@@ -141,7 +195,7 @@ Status: Todo
 Task: 0x1b
 Difficulty: Hard
 Urgency: Wishlist
-Description: modularize decoder
+Description: Modularize decoder
  Make the decoder a plugin, so that two versions can coexist
  without recompilation (MMX and non-MMX).
 Status: Todo
@@ -231,7 +285,7 @@ Status: Todo
 Task: 0x10
 Difficulty: Easy
 Urgency: Normal
-Description: vlc icon
+Description: Draw a vlc icon
  The vlc needs an icon. It should render well in 48x48 but
  can be any size.
 Status: Todo
@@ -336,7 +390,7 @@ Status: Todo
 Task: 0x05
 Difficulty: Easy
 Urgency: Important
-Description: vlms backport
+Description: Backport vlms input
  The vlc uses the same file input code as the vlms (VideoLAN
  Mini Server) which has been much improved. Someone should
  port modifications done to the vlms back to the vlc.
