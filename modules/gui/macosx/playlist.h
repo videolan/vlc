@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.h,v 1.6 2003/02/23 05:53:53 jlj Exp $
+ * $Id: playlist.h,v 1.7 2003/03/17 17:10:21 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -27,8 +27,9 @@
  *****************************************************************************/
 @interface VLCPlaylistView : NSTableView
 {
-
 }
+
+- (void) drawStripesInRect:(NSRect)clipRect;
 
 @end
 

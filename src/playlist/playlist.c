@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.32 2003/02/13 00:09:51 hartman Exp $
+ * $Id: playlist.c,v 1.33 2003/03/17 17:10:21 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -287,6 +287,71 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
         REMOVE_ELEM( p_playlist->pp_items,
                      p_playlist->i_size,
                      i_pos );
+    }
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    val.b_bool = VLC_TRUE;
+    var_Set( p_playlist, "intf-change", val );
+
+    return 0;
+}
+
+/*****************************************************************************
+ * playlist_Move: move an item in the playlist
+ *****************************************************************************
+ * Move the item in the playlist with position i_pos before the current item
+ * at position i_newpos.
+ *****************************************************************************/
+int playlist_Move( playlist_t * p_playlist, int i_pos, int i_newpos)
+{
+    vlc_value_t     val;
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    /* take into account that our own row disappears. */
+    if ( i_pos < i_newpos ) i_newpos--;
+
+    if( i_pos >= 0 && i_newpos >=0 && i_pos <= p_playlist->i_size 
+                     && i_newpos <= p_playlist->i_size )
+    {
+        msg_Dbg( p_playlist, "moving playlist item « %s »",
+                             p_playlist->pp_items[i_pos]->psz_name );
+
+        if( i_pos == p_playlist->i_index )
+        {
+            p_playlist->i_index = i_newpos;
+        }
+        else if( i_pos > p_playlist->i_index && i_newpos <= p_playlist->i_index )
+        {
+            p_playlist->i_index++;
+        }
+        else if( i_pos < p_playlist->i_index && i_newpos >= p_playlist->i_index )
+        {
+            p_playlist->i_index--;
+        }
+        
+        playlist_item_t * temp;
+        if ( i_pos < i_newpos )
+        {
+             
+            temp = p_playlist->pp_items[i_pos];
+            while ( i_pos < i_newpos )
+            {
+                p_playlist->pp_items[i_pos] = p_playlist->pp_items[i_pos+1];
+                i_pos++;
+            }
+            p_playlist->pp_items[i_newpos] = temp;
+        }
+        else if ( i_pos > i_newpos )
+        {
+            temp = p_playlist->pp_items[i_pos];
+            while ( i_pos > i_newpos )
+            {
+                p_playlist->pp_items[i_pos] = p_playlist->pp_items[i_pos-1];
+                i_pos--;
+            }
+            p_playlist->pp_items[i_newpos] = temp;
+        }
     }
 
     vlc_mutex_unlock( &p_playlist->object_lock );
