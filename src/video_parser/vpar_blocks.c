@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.78 2001/02/23 14:07:25 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.79 2001/02/23 17:58:22 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -1766,10 +1766,8 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
 #define PARSEERROR                                                      \
 if( p_vpar->picture.b_error )                                           \
 {                                                                       \
-    /* Mark this block as skipped (better than green blocks), and       \
-     * go to the next slice. */                                         \
-    (*pi_mb_address)--;                                                 \
-    vpar_FreeMacroblock( &p_vpar->vfifo, p_mb );                     \
+    /* Go to the next slice. */                                         \
+    vpar_FreeMacroblock( &p_vpar->vfifo, p_mb );                        \
     return;                                                             \
 }
 
@@ -1969,9 +1967,7 @@ static __inline__ void ParseMacroblock(
     }
     else
     {
-        /* Mark this block as skipped (better than green blocks), and go
-         * to the next slice. */
-        (*pi_mb_address)--;
+        /* Go to the next slice. */
         vpar_FreeMacroblock( &p_vpar->vfifo, p_mb );
     }
 }
@@ -1992,8 +1988,6 @@ static __inline__ void SliceHeader( vpar_thread_t * p_vpar,
                                     int i_coding_type, int i_structure )
 {
     int         i_mb_address_save = *pi_mb_address;
-
-    p_vpar->picture.b_error = 0;
 
 #if 0
     /* FIXME : MP@ML doesn't support this. */
@@ -2068,6 +2062,7 @@ static __inline__ void vpar_PictureData( vpar_thread_t * p_vpar,
              || !p_vpar->picture.b_error)
            && i_mb_address < (p_vpar->sequence.i_mb_size
                                 >> (i_structure != FRAME_STRUCTURE))
+           && !p_vpar->picture.b_error
            && !p_vpar->p_fifo->b_die )
     {
         if( ((i_dummy = ShowBits( &p_vpar->bit_stream, 32 ))
@@ -2085,6 +2080,8 @@ static __inline__ void vpar_PictureData( vpar_thread_t * p_vpar,
                      b_mpeg2, i_coding_type, i_structure );
     }
 
+#if 0
+    /* Buggy */
     /* Try to recover from error. If we missed less than half the
      * number of macroblocks of the picture, mark the missed ones
      * as skipped. */
@@ -2109,6 +2106,7 @@ static __inline__ void vpar_PictureData( vpar_thread_t * p_vpar,
                                i_structure );
         }
     }
+#endif
 }
 
 #define DECLARE_PICD( FUNCNAME, B_MPEG2, I_CODING_TYPE, I_STRUCTURE )       \
