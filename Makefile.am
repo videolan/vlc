@@ -417,7 +417,7 @@ endif
 
 noinst_LIBRARIES += $(noinst_LIBRARIES_mozilla)
 
-MOSTLYCLEANFILES += mozilla/libvlcplugin$(LIBEXT)
+MOSTLYCLEANFILES += $(LIBRARIES_mozilla)
 
 EXTRA_DIST += $(SOURCES_mozilla) mozilla/vlcintf.idl
 
@@ -430,7 +430,20 @@ SOURCES_mozilla = \
 	mozilla/vlcpeer.cpp \
 	mozilla/vlcpeer.h \
 	mozilla/classinfo.h \
-	mozilla/npunix.c
+	$(SOURCES_mozilla_win32) \
+	$(SOURCES_mozilla_unix)
+
+# Under Win32, Mozilla plugins need to be named NP******.DLL, but under Unix
+# the common naming scheme is lib******plugin.so. Also, we need npwin.cpp
+# under Win32 and npunix.c under Unix.
+if HAVE_WIN32
+LIBRARIES_mozilla = mozilla/npvlc$(LIBEXT)
+SOURCES_mozilla_win32 = mozilla/npwin.cpp
+CPPFLAGS_mozilla_EXTRA = -DXP_WIN -DXP_WIN32
+else
+LIBRARIES_mozilla = mozilla/libvlcplugin$(LIBEXT)
+SOURCES_mozilla_unix = mozilla/npunix.c
+endif
 
 if BUILD_MOZILLA
 noinst_LIBRARIES_mozilla = mozilla/libvlcplugin.a
@@ -438,20 +451,22 @@ noinst_LIBRARIES_mozilla = mozilla/libvlcplugin.a
 mozilla_libvlcplugin_a_SOURCES = $(SOURCES_mozilla) $(BUILT_SOURCES_mozilla) \
                                  $(SOURCES_libgetopt)
 mozilla_libvlcplugin_a_CFLAGS = $(CPPFLAGS_pic) $(CFLAGS_pic) \
-                                $(CPPFLAGS_mozilla) $(CFLAGS_mozilla)
+                                $(CPPFLAGS_mozilla) $(CFLAGS_mozilla) \
+                                $(CPPFLAGS_mozilla_EXTRA)
 mozilla_libvlcplugin_a_CXXFLAGS = $(CPPFLAGS_pic) $(CXXFLAGS_pic) \
-                                  $(CPPFLAGS_mozilla) $(CXXFLAGS_mozilla)
-mozilla_libvlcplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(L_builtin_pic)
+                                  $(CPPFLAGS_mozilla) $(CXXFLAGS_mozilla) \
+                                  $(CPPFLAGS_mozilla_EXTRA)
+mozilla_libvlcplugin_a_DEPENDENCIES = lib/libvlc_pic.a $(L_builtin_pic) $(DATA_npvlc_rc)
 
 BUILT_SOURCES_mozilla = mozilla/vlcintf.h
 $(SOURCES_mozilla): mozilla/vlcintf.h
 
-mozilla_libvlcplugin_DATA = mozilla/libvlcplugin$(LIBEXT)
-mozilla_libvlcplugindir = $(libdir)/mozilla/plugins
-mozilla/libvlcplugin$(LIBEXT): mozilla/libvlcplugin.a $(L_builtin_pic)
-	$(CC) -o $@ $(mozilla_libvlcplugin_a_OBJECTS) lib/libvlc_pic.a \
-		$(L_builtin_pic) -shared $(LDFLAGS) $(LDFLAGS_vlc) \
-		$(LDFLAGS_mozilla) $(LDFLAGS_builtin_pic)
+mozilla_plugin_DATA = $(LIBRARIES_mozilla)
+mozilla_plugindir = $(libdir)/mozilla/plugins
+$(LIBRARIES_mozilla): mozilla/libvlcplugin.a $(L_builtin_pic)
+	$(CXXLINK) -o $@ $(mozilla_libvlcplugin_a_OBJECTS) $(DATA_npvlc_rc) \
+		lib/libvlc_pic.a $(L_builtin_pic) -shared $(LDFLAGS) \
+		$(LDFLAGS_vlc) $(LDFLAGS_mozilla) $(LDFLAGS_builtin_pic)
 
 mozilla_vlcintf_xpt_DATA = mozilla/vlcintf.xpt
 mozilla_vlcintf_xptdir = $(libdir)/mozilla/components
@@ -462,6 +477,14 @@ mozilla/vlcintf.xpt: Makefile mozilla/vlcintf.idl
 mozilla/vlcintf.h: Makefile mozilla/vlcintf.idl
 	$(XPIDL) -I/usr/share/idl/mozilla -m header \
 		-o mozilla/vlcintf mozilla/vlcintf.idl
+
+if HAVE_WIN32
+DATA_npvlc_rc = $(noinst_mozilla_npvlc_rc_DATA)
+noinst_mozilla_npvlc_rc_DATA = mozilla/npvlc_rc.$(OBJEXT)
+noinst_mozilla_npvlc_rcdir = $(libdir)
+mozilla/npvlc_rc.$(OBJEXT): mozilla/npvlc_rc.rc
+	$(WINDRES) -i $< -o $@
+endif
 endif
 
 ###############################################################################

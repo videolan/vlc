@@ -1,0 +1,44 @@
+
+/////////////////////////////////////////////////////////////////////////////
+//
+//  VideoLAN Client Plugin description.
+//
+
+//VS_VERSION_INFO VERSIONINFO
+1 VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "ProductName", "VideoLAN Client Plugin\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "OriginalFilename", "npvlc.dll\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "FileDescription", "VideoLAN Client Multimedia Player Plugin<br><br>VideoLAN WWW: <a href=""http://www.videolan.org/"">http://www.videolan.org/</a>\0"
+            VALUE "InternalName", "npvlc\0"
+            VALUE "CompanyName", "VideoLAN\0"
+            VALUE "LegalCopyright", "Copyright VideoLAN \251 1996-2002\0"
+            VALUE "MIMEType", "audio/mpeg|audio/x-mpeg|video/mpeg|video/x-mpeg|video/mpeg-system|video/x-mpeg-system|video/mpeg4|audio/mpeg4|application/mpeg4-iod|application/mpeg4-muxcodetable|video/x-msvideo|video/quicktime|application/x-vlc-plugin\0"
+            VALUE "FileExtents", "mp2,mp3,mpga,mpega|mp2,mp3,mpga,mpega|mpg,mpeg,mpe|mpg,mpeg,mpe|mpg,mpeg,vob|mpg,mpeg,vob|mp4,mpg4|mp4,mpg4|mp4,mpg4|mp4,mpg4|avi|mov,qt|\0"
+            VALUE "FileOpenName", "MPEG audio|MPEG audio|MPEG video|MPEG video|MPEG video|MPEG video|MPEG-4 video|MPEG-4 audio|MPEG-4 video|MPEG-4 video|AVI video|QuickTime video|VLC plugin\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+

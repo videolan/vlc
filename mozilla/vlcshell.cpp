@@ -2,7 +2,7 @@
  * vlcshell.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.4 2002/10/11 22:32:56 sam Exp $
+ * $Id: vlcshell.cpp,v 1.5 2002/10/22 21:10:28 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -168,10 +168,6 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
     {
         "vlc"
         /*, "--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins"*/
-        , "--vout", "xvideo,x11,dummy"
-        , "--aout", "dsp"
-        , "--intf", "dummy"
-        /*, "--noaudio"*/
     };
 
     if( instance == NULL )
@@ -190,7 +186,11 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
 
     p_plugin->fMode = mode;
     p_plugin->fWindow = NULL;
+#ifdef WIN32
+
+#else
     p_plugin->window = 0;
+#endif
 
     p_plugin->i_vlc = VLC_Create();
     if( p_plugin->i_vlc < 0 )
@@ -211,10 +211,20 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         return NPERR_GENERIC_ERROR;
     }
 
-    value.psz_string = "xvideo,x11,dummy";
-    VLC_Set( p_plugin->i_vlc, "conf::vout", value );
     value.psz_string = "dummy";
     VLC_Set( p_plugin->i_vlc, "conf::intf", value );
+#ifdef WIN32
+    value.psz_string = "directx,dummy";
+#else
+    value.psz_string = "xvideo,x11,dummy";
+#endif
+    VLC_Set( p_plugin->i_vlc, "conf::vout", value );
+#ifdef WIN32
+    value.psz_string = "none";//"directx,waveout,dummy";
+#else
+    value.psz_string = "dsp,dummy";
+#endif
+    VLC_Set( p_plugin->i_vlc, "conf::aout", value );
 
     p_plugin->b_stream = 0;
     p_plugin->b_autoplay = 0;
@@ -295,8 +305,12 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
 
     /* Write the window ID for vlc */
-    value.p_address = (void*)window->window;
-    VLC_Set( p_plugin->i_vlc, "drawable", value );
+    //value.p_address = (void*)window->window;
+    //VLC_Set( p_plugin->i_vlc, "drawable", value );
+    /* FIXME: this cast sucks */
+    value.i_int = (int) (long long) (void *) window->window;
+    VLC_Set( p_plugin->i_vlc, "conf::x11-drawable", value );
+    VLC_Set( p_plugin->i_vlc, "conf::xvideo-drawable", value );
 
     /*
      * PLUGIN DEVELOPERS:
@@ -306,6 +320,9 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
      *  size changes, etc.
      */
 
+#ifdef WIN32
+
+#else
     Widget netscape_widget;
 
     p_plugin->window = (Window) window->window;
@@ -318,6 +335,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     netscape_widget = XtWindowToWidget(p_plugin->display, p_plugin->window);
     XtAddEventHandler(netscape_widget, ExposureMask, FALSE, (XtEventHandler)Redraw, p_plugin);
     Redraw(netscape_widget, (XtPointer)p_plugin, NULL);
+#endif
 
     p_plugin->fWindow = window;
 
@@ -400,7 +418,7 @@ int32 NPP_WriteReady( NPP instance, NPStream *stream )
 int32 NPP_Write( NPP instance, NPStream *stream, int32 offset,
                  int32 len, void *buffer )
 {
-    fprintf(stderr, "NPP_Write %i\n", len);
+    fprintf(stderr, "NPP_Write %i\n", (int)len);
 
     if( instance != NULL )
     {

@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.3 2002/10/06 19:28:28 gbazin Exp $
+ * $Id: directx.c,v 1.4 2002/10/22 21:10:28 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -105,6 +105,7 @@ vlc_module_begin();
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT );
     set_description( _("DirectX video module") );
     set_capability( "video output", 100 );
+    add_shortcut( "directx" );
     set_callbacks( OpenVideo, CloseVideo );
 vlc_module_end();
 
