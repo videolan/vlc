@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.138 2003/11/05 17:57:29 gbazin Exp $
+ * $Id: modules.c,v 1.139 2003/11/19 10:17:51 gbazin Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -1159,6 +1159,7 @@ static int CallEntry( module_t * p_module )
 #else
 #   error "Something is wrong in modules.c"
 #endif
+        return -1;
     }
 
     /* We can now try to call the symbol */
