@@ -80,59 +80,6 @@ typedef struct module_bank_s
 } module_bank_t;
 
 /*****************************************************************************
- * Stuff for handling dynamic modules
- *****************************************************************************/
-
-/* Function to load a dynamic module, returns 0 if successful. */
-static __inline__ int
-module_load( char * psz_filename, module_handle_t * handle )
-{
-#ifdef SYS_BEOS
-    *handle = load_add_on( psz_filename );
-    return( *handle >= 0 );
-#else
-    *handle = dlopen( psz_filename, RTLD_NOW | RTLD_GLOBAL );
-    return( *handle != NULL );
-#endif
-}
-
-/* Unload a dynamic module. */
-static __inline__ void
-module_unload( module_handle_t handle )
-{
-#ifdef SYS_BEOS
-    unload_add_on( handle );
-#else
-    dlclose( handle );
-#endif
-    return;
-}
-
-/* Get a given symbol from a module. */
-static __inline__ void *
-module_getsymbol( module_handle_t handle, char * psz_function )
-{
-#ifdef SYS_BEOS
-    void * p_symbol;
-    get_image_symbol( handle, psz_function, B_SYMBOL_TYPE_TEXT, &p_symbol );
-    return( p_symbol );
-#else
-    return( dlsym( handle, psz_function ) );
-#endif
-}
-
-/* Wrapper to dlerror() for systems that don't have it. */
-static __inline__ char *
-module_error( void )
-{
-#ifdef SYS_BEOS
-    return( "failed" );
-#else
-    return( dlerror() );
-#endif
-}
-
-/*****************************************************************************
  * Exported functions.
  *****************************************************************************/
 module_bank_t * module_InitBank     ( void );

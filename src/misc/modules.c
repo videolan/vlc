@@ -52,6 +52,7 @@
 
 #include "intf_msg.h"
 #include "modules.h"
+#include "modules_core.h"
 
 /* Local prototypes */
 static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename );
