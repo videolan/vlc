@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.2 2001/12/13 12:47:17 sam Exp $
+ * $Id: video_parser.h,v 1.3 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -220,6 +220,12 @@ typedef struct picture_parsing_s
 #define TOP_FIELD               1
 #define BOTTOM_FIELD            2
 #define FRAME_STRUCTURE         3
+
+/* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
+#define AR_SQUARE_PICTURE       1                           /* square pixels */
+#define AR_3_4_PICTURE          2                        /* 3:4 picture (TV) */
+#define AR_16_9_PICTURE         3              /* 16:9 picture (wide screen) */
+#define AR_221_1_PICTURE        4                  /* 2.21:1 picture (movie) */
 
 /*****************************************************************************
  * Prototypes

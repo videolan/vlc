@@ -2,7 +2,7 @@
  * vout_dummy.c: Dummy video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_dummy.c,v 1.13 2001/12/30 07:09:55 sam Exp $
+ * $Id: vout_dummy.c,v 1.14 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -117,7 +117,9 @@ static int vout_Init( vout_thread_t *p_vout )
     /* Initialize the output structure */
     switch( p_vout->render.i_chroma )
     {
-        case YUV_420_PICTURE:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
             p_vout->output.i_chroma = p_vout->render.i_chroma;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
@@ -125,7 +127,7 @@ static int vout_Init( vout_thread_t *p_vout )
             break;
 
         default:
-            p_vout->output.i_chroma = RGB_16BPP_PICTURE;
+            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_16BPP;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
             p_vout->output.i_aspect = p_vout->render.i_aspect;
@@ -233,24 +235,26 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     {
     /* We know this chroma, allocate a buffer which will be used
      * directly by the decoder */
-    case YUV_420_PICTURE:
+    case FOURCC_I420:
+    case FOURCC_IYUV:
+    case FOURCC_YV12:
 
         /* Allocate the memory buffer */
         i_luma_bytes = i_width * i_height * sizeof(pixel_data_t);
         i_chroma_bytes = i_width * ( i_height / 2 ) * sizeof(pixel_data_t);
 
         /* Y buffer */
-        p_pic->planes[ Y_PLANE ].p_data = malloc( i_luma_bytes + 2 * i_chroma_bytes );
+        p_pic->P_Y = malloc( i_luma_bytes + 2 * i_chroma_bytes );
         p_pic->planes[ Y_PLANE ].i_bytes = i_luma_bytes;
         p_pic->planes[ Y_PLANE ].i_line_bytes = i_width * sizeof(pixel_data_t);
 
         /* U buffer */
-        p_pic->planes[ U_PLANE ].p_data = p_pic->planes[ Y_PLANE ].p_data + i_height * i_width;
+        p_pic->P_U = p_pic->P_Y + i_height * i_width;
         p_pic->planes[ U_PLANE ].i_bytes = i_chroma_bytes / 2;
         p_pic->planes[ U_PLANE ].i_line_bytes = i_width / 2 * sizeof(pixel_data_t);
 
         /* V buffer */
-        p_pic->planes[ V_PLANE ].p_data = p_pic->planes[ U_PLANE ].p_data + i_height * i_width / 2;
+        p_pic->P_V = p_pic->P_U + i_height * i_width / 2;
         p_pic->planes[ V_PLANE ].i_bytes = i_chroma_bytes / 2;
         p_pic->planes[ V_PLANE ].i_line_bytes = i_width / 2 * sizeof(pixel_data_t);
 
@@ -262,19 +266,28 @@ static int DummyNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Unknown chroma, allocate an RGB buffer, the video output's job
      * will be to do the chroma->RGB conversion */
-        /* XXX FIXME this is BROKEN ! See how the other plugins do it */
-    default:
+    case FOURCC_BI_BITFIELDS | DEPTH_16BPP:
 
         /* Precalculate some values */
         i_luma_bytes = sizeof(u16) * i_width * i_height;
 
         /* Allocate the memory buffer */
-        p_pic->planes[ RGB_PLANE ].p_data = malloc( i_luma_bytes );
-        p_pic->planes[ RGB_PLANE ].i_bytes = i_luma_bytes;
+        p_pic->P_MAIN = malloc( i_luma_bytes );
+        p_pic->planes[ MAIN_PLANE ].i_bytes = i_luma_bytes;
+
+        /* Fill important structures */
+        p_pic->planes[ MAIN_PLANE ].i_red_mask   = 0xf800;
+        p_pic->planes[ MAIN_PLANE ].i_green_mask = 0x07e0;
+        p_pic->planes[ MAIN_PLANE ].i_blue_mask  = 0x001f;
 
         /* We allocated 1 plane */
         p_pic->i_planes = 1;
 
+        return( 0 );
+        break;
+
+    default:
+        p_pic->i_planes = 0;
         return( 0 );
         break;
     }

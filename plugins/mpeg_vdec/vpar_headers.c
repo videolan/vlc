@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.8 2001/12/30 07:09:56 sam Exp $
+ * $Id: vpar_headers.c,v 1.9 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -208,6 +208,28 @@ static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, u8 * pi_array )
     }
 
     p_matrix->pi_matrix = pi_array;
+}
+
+/*****************************************************************************
+ * ChromaToFourCC: Return a FourCC value used by the video output.
+ *****************************************************************************/
+static __inline__ u64 ChromaToFourCC( int i_chroma )
+{
+    switch( i_chroma )
+    {
+        case CHROMA_420:
+            return FOURCC_I420;
+
+        case CHROMA_422:
+            return FOURCC_I422;
+
+        case CHROMA_444:
+            return FOURCC_I444;
+
+        default:
+            /* This can't happen */
+            return 0xdeadbeef;
+    }
 }
 
 /*
@@ -475,11 +497,11 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     {
         intf_WarnMsg( 1, "vpar: no vout present, spawning one" );
 
-        p_vpar->p_vout =
-            vout_CreateThread( NULL, p_vpar->sequence.i_width,
-                                     p_vpar->sequence.i_height,
-                                     99 + p_vpar->sequence.i_chroma_format,
-                                     p_vpar->sequence.i_aspect );
+        p_vpar->p_vout = vout_CreateThread(
+                           NULL, p_vpar->sequence.i_width,
+                           p_vpar->sequence.i_height,
+                           ChromaToFourCC( p_vpar->sequence.i_chroma_format ),
+                           p_vpar->sequence.i_aspect );
 
         /* Everything failed */
         if( p_vpar->p_vout == NULL )

@@ -50,6 +50,10 @@
 #undef VERSION
 #undef DVD_DEVICE
 #undef VCD_DEVICE
+#undef COPYRIGHT_MESSAGE
+#undef MODULE_SUFFIX
+#undef MODULE_SYMBOL
+#undef VERSION_MESSAGE
 
 /* Define if you have the __argz_count function.  */
 #undef HAVE___ARGZ_COUNT

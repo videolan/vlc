@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.12 2001/12/30 07:09:55 sam Exp $
+ * $Id: gtk_open.c,v 1.13 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -150,7 +150,7 @@ void GtkDiscOpenDvd( GtkToggleButton * togglebutton, gpointer user_data )
     {
         gtk_entry_set_text(
           GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton), "disc_name" ) ),
-          main_GetPszVariable( INPUT_DVD_DEVICE_VAR, INPUT_DVD_DEVICE_DEFAULT )
+          main_GetPszVariable( INPUT_DVD_DEVICE_VAR, DVD_DEVICE )
         );
     }
 }
@@ -161,7 +161,7 @@ void GtkDiscOpenVcd( GtkToggleButton * togglebutton, gpointer user_data )
     {
         gtk_entry_set_text(
           GTK_ENTRY( lookup_widget( GTK_WIDGET(togglebutton), "disc_name" ) ),
-          main_GetPszVariable( INPUT_VCD_DEVICE_VAR, INPUT_VCD_DEVICE_DEFAULT )
+          main_GetPszVariable( INPUT_VCD_DEVICE_VAR, VCD_DEVICE )
         );
     }
 }

@@ -244,7 +244,7 @@ distclean: clean
 	-cd po && $(MAKE) maintainer-clean
 	rm -f **/*.o **/*~ *.log
 	rm -f Makefile.opts
-	rm -f include/defs.h include/config.h include/modules_builtin.h
+	rm -f include/defs.h include/modules_builtin.h
 	rm -f src/misc/modules_builtin.h
 	rm -f config*status config*cache config*log
 	rm -f gmon.out core build-stamp
@@ -432,7 +432,7 @@ package-beos:
 	mv tmp/vlc tmp/vlc-${VLC_QUICKVERSION}
 	(cd tmp ; find vlc-${VLC_QUICKVERSION} | \
 	zip -9 -@ vlc-${VLC_QUICKVERSION}-beos.zip )
-	mv tmp/vlc-${VLC_QUICKVERSION}-beos.zip .
+	mv tmp/vlc-${VLC_QUICKVERSION}-BeOS-x86.zip .
 	# Clean up
 	rm -Rf tmp
 
@@ -444,7 +444,7 @@ libdvdcss-snapshot: snapshot-common
 	rm -Rf tmp/vlc/ipkg
 	# Remove useless headers
 	rm -f tmp/vlc/include/*
-	for file in defs.h.in config.h.in common.h int_types.h ; \
+	for file in defs.h.in config.h common.h int_types.h ; \
 		do cp include/$$file tmp/vlc/include/ ; done
 	# Remove misc files (??? - maybe not really needed)
 	rm -f tmp/vlc/vlc.spec tmp/vlc/INSTALL-win32.txt

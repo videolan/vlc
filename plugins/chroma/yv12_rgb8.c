@@ -2,7 +2,7 @@
  * yv12_rgb8.c : YUV to paletted RGB8 conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: yv12_rgb8.c,v 1.3 2001/12/30 07:09:54 sam Exp $
+ * $Id: yv12_rgb8.c,v 1.4 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -259,7 +259,7 @@ static void ConvertYUV420RGB8( vout_thread_t *p_vout, picture_t *p_source,
     u8* p_y = p_source->planes[ Y_PLANE ].p_data;
     u8* p_u = p_source->planes[ U_PLANE ].p_data;
     u8* p_v = p_source->planes[ V_PLANE ].p_data;
-    u8* p_pic = p_dest->planes[ RGB_PLANE ].p_data;
+    u8* p_pic = p_dest->planes[ MAIN_PLANE ].p_data;
 
     /* 
      * The dithering matrices

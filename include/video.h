@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.37 2001/12/31 04:53:33 sam Exp $
+ * $Id: video.h,v 1.38 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -105,13 +105,17 @@ typedef struct picture_heap_s
      * and should NOT be modified */
     int             i_width;                                /* picture width */
     int             i_height;                              /* picture height */
-    int             i_chroma;                              /* picture chroma */
+    u64             i_chroma;                              /* picture chroma */
     int             i_aspect;                                /* aspect ratio */
 
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];               /* pictures */
 
 } picture_heap_t;
+
+/*****************************************************************************
+ * Flags used to describe the status of a picture
+ *****************************************************************************/
 
 /* Picture type */
 #define EMPTY_PICTURE           0                            /* empty buffer */
@@ -127,24 +131,34 @@ typedef struct picture_heap_s
 #define DISPLAYED_PICTURE       5            /* been displayed but is linked */
 #define DESTROYED_PICTURE       6              /* allocated but no more used */
 
-/* Picture chroma */
-#define EMPTY_PICTURE           0     /* picture slot is empty and available */
-#define YUV_420_PICTURE         100                     /* 4:2:0 YUV picture */
-#define YUV_422_PICTURE         101                     /* 4:2:2 YUV picture */
-#define YUV_444_PICTURE         102                     /* 4:4:4 YUV picture */
-#define RGB_8BPP_PICTURE        200                      /* RGB 8bpp picture */
-#define RGB_16BPP_PICTURE       201                     /* RGB 16bpp picture */
-#define RGB_32BPP_PICTURE       202                     /* RGB 32bpp picture */
+/*****************************************************************************
+ * Flags used to describe the format of a picture
+ *****************************************************************************/
 
-/* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
-#define AR_SQUARE_PICTURE       1                           /* square pixels */
-#define AR_3_4_PICTURE          2                        /* 3:4 picture (TV) */
-#define AR_16_9_PICTURE         3              /* 16:9 picture (wide screen) */
-#define AR_221_1_PICTURE        4                  /* 2.21:1 picture (movie) */
+#define ONLY_FOURCC(i_chroma)   ((i_chroma)&0x00000000ffffffff)
+#define ONLY_EXTRA(i_chroma)    ((i_chroma)&0xffffffff00000000)
+
+/* Picture chroma - see http://www.webartz.com/fourcc/ */
+#define FOURCC_BI_RGB           0x00000000           /* Planar RGB, for 8bpp */
+#define FOURCC_RGB              0x32424752               /* alias for BI_RGB */
+#define FOURCC_BI_BITFIELDS     0x00000003  /* Planar RGB, for 16, 24, 32bpp */
+#define FOURCC_I420             0x30323449            /* Planar 4:2:0, Y:U:V */
+#define FOURCC_IYUV             0x56555949                 /* alias for I420 */
+#define FOURCC_YV12             0x32315659            /* Planar 4:2:0, Y:V:U */
+
+/* Custom formats which we use but which don't exist in the fourcc database */
+#define FOURCC_I422             0x32323449
+#define FOURCC_I444             0x34343449
+
+/* Picture format - gives more precise information than the chroma */
+#define DEPTH_8BPP              ((u64)0x00000008<<32)
+#define DEPTH_15BPP             ((u64)0x00000015<<32)
+#define DEPTH_16BPP             ((u64)0x00000016<<32)
+#define DEPTH_24BPP             ((u64)0x00000024<<32)
+#define DEPTH_32BPP             ((u64)0x00000032<<32)
 
 /* Plane indices */
-#define YUV_PLANE               0
-#define RGB_PLANE               0
+#define MAIN_PLANE              0
 #define Y_PLANE                 0
 #define U_PLANE                 1
 #define V_PLANE                 2
@@ -155,6 +169,7 @@ typedef struct picture_heap_s
 #define B_PLANE                 2
 
 /* Shortcuts */
+#define P_MAIN planes[ MAIN_PLANE ].p_data
 #define P_Y planes[ Y_PLANE ].p_data
 #define P_U planes[ U_PLANE ].p_data
 #define P_V planes[ V_PLANE ].p_data

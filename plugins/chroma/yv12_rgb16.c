@@ -2,7 +2,7 @@
  * yv12_rgb16.c : YUV to paletted RGB16 conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: yv12_rgb16.c,v 1.2 2001/12/31 04:53:33 sam Exp $
+ * $Id: yv12_rgb16.c,v 1.3 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -100,13 +100,26 @@ void _M( chroma_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int chroma_Probe( probedata_t *p_data )
 {
-    if( p_data->chroma.p_render->i_chroma != YUV_420_PICTURE
-         || p_data->chroma.p_output->i_chroma != RGB_16BPP_PICTURE )
+    switch( p_data->chroma.p_render->i_chroma )
     {
-        return 0;
+        case FOURCC_YV12:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+            switch( ONLY_FOURCC( p_data->chroma.p_output->i_chroma ) )
+            {
+                case FOURCC_BI_BITFIELDS:
+                    break;
+
+                default:
+                    return 0;
+            }
+            break;
+
+        default:
+            return 0;
     }
 
-    return( 100 );
+    return 100;
 }
 
 /*****************************************************************************
@@ -116,12 +129,34 @@ static int chroma_Probe( probedata_t *p_data )
  *****************************************************************************/
 static int chroma_Init( vout_thread_t *p_vout )
 {
-    if( p_vout->render.i_chroma != YUV_420_PICTURE
-         || p_vout->output.i_chroma != RGB_16BPP_PICTURE )
+    switch( p_vout->render.i_chroma )
     {
-        return -1;
-    }
+        case FOURCC_YV12:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+            switch( ONLY_FOURCC( p_vout->output.i_chroma ) )
+            {
+                case FOURCC_BI_BITFIELDS:
+                    switch( ONLY_EXTRA( p_vout->output.i_chroma ) )
+                    {
+                        case DEPTH_16BPP:
+                            p_vout->chroma.pf_convert = ConvertYUV420RGB16;
+                            break;
 
+                        default:
+                            return -1;
+                    }
+                    break;
+
+                default:
+                    return -1;
+            }
+            break;
+
+        default:
+            return -1;
+    }
+    
 #if 0
     p_vout->chroma.p_sys = malloc( sizeof( chroma_sys_t ) );
     if( p_vout->chroma.p_sys == NULL )
@@ -131,7 +166,6 @@ static int chroma_Init( vout_thread_t *p_vout )
 #endif
 
     /* FIXME: this is really suboptimal ! */
-    p_vout->chroma.pf_convert = ConvertYUV420RGB16;
 
     return 0; 
 }
@@ -170,16 +204,16 @@ static void ConvertYUV420RGB16( vout_thread_t *p_vout, picture_t *p_source,
 
     pixel_data_t *p_in, *p_in_end, *p_out, *p_out_end;
 
-    p_in = p_source->planes[ Y_PLANE ].p_data;
+    p_in = p_source->P_Y;
     p_in_end = p_in + p_source->planes[ Y_PLANE ].i_bytes;
 
-    p_out = p_dest->planes[ RGB_PLANE ].p_data;
-    p_out_end = p_out + p_dest->planes[ RGB_PLANE ].i_bytes;
+    p_out = p_dest->P_MAIN;
+    p_out_end = p_out + p_dest->planes[ MAIN_PLANE ].i_bytes;
 
     while( p_in < p_in_end && p_out < p_out_end )
     {
         int i_src = p_source->planes[ Y_PLANE ].i_line_bytes;
-        int i_dst = p_dest->planes[ RGB_PLANE ].i_line_bytes / 2;
+        int i_dst = p_dest->planes[ MAIN_PLANE ].i_line_bytes / 2;
 
         /* Masks: 0xf800 0x07e0 0x001f */
 #define RED ((u16*)p_out)[--i_dst] = (u16)(p_in[--i_src]>>3) << 11;
@@ -195,7 +229,7 @@ static void ConvertYUV420RGB16( vout_thread_t *p_vout, picture_t *p_source,
         }
 
         p_in += p_source->planes[ Y_PLANE ].i_line_bytes;
-        p_out += p_dest->planes[ RGB_PLANE ].i_line_bytes;
+        p_out += p_dest->planes[ MAIN_PLANE ].i_line_bytes;
 
         if( p_in >= p_in_end || p_out >= p_out_end )
         {
@@ -203,7 +237,7 @@ static void ConvertYUV420RGB16( vout_thread_t *p_vout, picture_t *p_source,
         }
 
         i_src = p_source->planes[ Y_PLANE ].i_line_bytes;
-        i_dst = p_dest->planes[ RGB_PLANE ].i_line_bytes / 2;
+        i_dst = p_dest->planes[ MAIN_PLANE ].i_line_bytes / 2;
 
         while( i_src && i_dst )
         {
@@ -212,7 +246,7 @@ static void ConvertYUV420RGB16( vout_thread_t *p_vout, picture_t *p_source,
         }
 
         p_in += p_source->planes[ Y_PLANE ].i_line_bytes;
-        p_out += p_dest->planes[ RGB_PLANE ].i_line_bytes;
+        p_out += p_dest->planes[ MAIN_PLANE ].i_line_bytes;
     }
 
     /**********************************************************************

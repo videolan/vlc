@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.1 2001/12/30 07:09:54 sam Exp $
+ * $Id: vlc.h,v 1.2 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -147,6 +147,7 @@ typedef struct aout_sys_s *             p_aout_sys_t;
 struct vout_thread_s;
 struct vout_font_s;
 struct vout_sys_s;
+struct chroma_sys_s;
 struct vdec_thread_s;
 struct vpar_thread_s;
 struct video_parser_s;
@@ -547,7 +548,7 @@ typedef struct module_symbols_s
                                        ( int, int, long, long, long, void * );
     void ( * aout_DestroyFifo )     ( struct aout_fifo_s * );
 
-    struct vout_thread_s * (* vout_CreateThread) ( int *, int, int, int, int );
+    struct vout_thread_s * (* vout_CreateThread) ( int *, int, int, u64, int );
     void  ( * vout_DestroyThread )  ( struct vout_thread_s *, int * );
 
     struct picture_s * ( * vout_CreatePicture )

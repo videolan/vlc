@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.6 2001/12/30 07:09:56 sam Exp $
+ * $Id: vout_pictures.c,v 1.7 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -457,7 +457,9 @@ void vout_AllocatePicture( picture_t *p_picture,
     /* Calculate coordinates */
     switch( i_chroma )
     {
-        case YUV_420_PICTURE:        /* YUV 420: 1,1/4,1/4 samples per pixel */
+        case FOURCC_YV12:            /* YUV 420: 1,1/4,1/4 samples per pixel */
+        case FOURCC_I420:
+        case FOURCC_IYUV:
             P[ Y_PLANE ].i_bytes = i_width * i_height;
             P[ Y_PLANE ].i_line_bytes = i_width;
             P[ U_PLANE ].i_bytes = i_width * i_height / 4;
@@ -467,7 +469,7 @@ void vout_AllocatePicture( picture_t *p_picture,
             p_picture->i_planes = 3;
             break;
 
-        case YUV_422_PICTURE:        /* YUV 422: 1,1/2,1/2 samples per pixel */
+        case FOURCC_I422:            /* YUV 422: 1,1/2,1/2 samples per pixel */
             P[ Y_PLANE ].i_bytes = i_width * i_height;
             P[ Y_PLANE ].i_line_bytes = i_width;
             P[ U_PLANE ].i_bytes = i_width * i_height / 2;
@@ -477,7 +479,7 @@ void vout_AllocatePicture( picture_t *p_picture,
             p_picture->i_planes = 3;
             break;
 
-        case YUV_444_PICTURE:            /* YUV 444: 1,1,1 samples per pixel */
+        case FOURCC_I444:                /* YUV 444: 1,1,1 samples per pixel */
             P[ Y_PLANE ].i_bytes = i_width * i_height;
             P[ Y_PLANE ].i_line_bytes = i_width;
             P[ U_PLANE ].i_bytes = i_width * i_height;

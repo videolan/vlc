@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.1 2001/12/30 07:09:55 sam Exp $
+ * $Id: deinterlace.c,v 1.2 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -172,8 +172,10 @@ static int vout_Init( vout_thread_t *p_vout )
      * the decoder to output directly to our structures. */
     switch( p_vout->render.i_chroma )
     {
-        case YUV_420_PICTURE:
-        case YUV_422_PICTURE:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
+        case FOURCC_I422:
             p_vout->output.i_chroma = p_vout->render.i_chroma;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
@@ -193,7 +195,9 @@ static int vout_Init( vout_thread_t *p_vout )
 
     switch( p_vout->render.i_chroma )
     {
-    case YUV_420_PICTURE:
+    case FOURCC_I420:
+    case FOURCC_IYUV:
+    case FOURCC_YV12:
         switch( p_vout->p_sys->i_mode )
         {
         case DEINTERLACE_MODE_BOB:
@@ -212,11 +216,11 @@ static int vout_Init( vout_thread_t *p_vout )
         }
         break;
 
-    case YUV_422_PICTURE:
+    case FOURCC_I422:
         p_vout->p_sys->p_vout =
             vout_CreateThread( NULL,
                        p_vout->output.i_width, p_vout->output.i_height,
-                       YUV_420_PICTURE, p_vout->output.i_aspect );
+                       FOURCC_I420, p_vout->output.i_aspect );
         break;
 
     default:
@@ -320,7 +324,9 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
             switch( p_vout->render.i_chroma )
             {
-            case YUV_420_PICTURE:
+            case FOURCC_I420:
+            case FOURCC_IYUV:
+            case FOURCC_YV12:
 
                 switch( p_vout->p_sys->i_mode )
                 {
@@ -378,7 +384,7 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                 }
                 break;
 
-            case YUV_422_PICTURE:
+            case FOURCC_I422:
 
                 i_increment = 2 * p_pic->planes[ i_index ].i_line_bytes;
 

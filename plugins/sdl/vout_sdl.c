@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.74 2001/12/30 07:09:56 sam Exp $
+ * $Id: vout_sdl.c,v 1.75 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -227,7 +227,9 @@ static int vout_Init( vout_thread_t *p_vout )
     /* Initialize the output structure */
     switch( p_vout->render.i_chroma )
     {
-        case YUV_420_PICTURE:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
             p_vout->output.i_chroma = p_vout->render.i_chroma;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
@@ -237,7 +239,7 @@ static int vout_Init( vout_thread_t *p_vout )
         default:
             /* All we have is a 16bpp image with square pixels */
             /* FIXME: and if screen depth != 16 ?! */
-            p_vout->output.i_chroma = RGB_16BPP_PICTURE;
+            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_16BPP;
             p_vout->output.i_width = p_vout->p_sys->i_width;
             p_vout->output.i_height = p_vout->p_sys->i_height;
             p_vout->output.i_aspect = p_vout->p_sys->i_width
@@ -297,17 +299,17 @@ static void vout_End( vout_thread_t *p_vout )
         i_index--;
         switch( p_vout->output.i_chroma )
         {
-            case YUV_420_PICTURE:
+            case FOURCC_I420:
+            case FOURCC_IYUV:
+            case FOURCC_YV12:
                 SDL_UnlockYUVOverlay(
                         PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
                 SDL_FreeYUVOverlay(
                         PP_OUTPUTPICTURE[ i_index ]->p_sys->p_overlay );
                 break;
 
-            case RGB_16BPP_PICTURE:
-                break;
-
             default:
+                /* RGB picture */
                 break;
         }
         free( PP_OUTPUTPICTURE[ i_index ]->p_sys );
@@ -534,17 +536,17 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch( p_vout->output.i_chroma )
     {
-        case RGB_16BPP_PICTURE:
-            SDL_Flip(p_vout->p_sys->p_display);
-            break;
-
-        case YUV_420_PICTURE:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
             SDL_UnlockYUVOverlay( p_pic->p_sys->p_overlay);
             SDL_DisplayYUVOverlay( p_pic->p_sys->p_overlay , &disp );
             SDL_LockYUVOverlay( p_pic->p_sys->p_overlay);
             break;
 
         default:
+            /* RGB picture */
+            SDL_Flip(p_vout->p_sys->p_display);
             break;
     }
 }
@@ -640,31 +642,9 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch( p_vout->output.i_chroma )
     {
-        case RGB_16BPP_PICTURE:
-            if( p_vout->p_sys->i_surfaces )
-            {
-                /* We already allocated this surface, return */
-                return -1;
-            }
-
-            p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
-
-            if( p_pic->p_sys == NULL )
-            {
-                return -1;
-            }
-
-            P[ RGB_PLANE ].p_data = p_vout->p_sys->p_display->pixels;
-            P[ RGB_PLANE ].i_bytes = 2 * i_width * i_height;
-            P[ RGB_PLANE ].i_line_bytes = 2 * i_width;
-
-            p_vout->p_sys->i_surfaces++;
-
-            p_pic->i_planes = 1;
-
-            return 0;
-
-        case YUV_420_PICTURE:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
             p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
 
             if( p_pic->p_sys == NULL )
@@ -699,6 +679,30 @@ static int SDLNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             P[ V_PLANE ].i_line_bytes = i_width / 2;
 
             p_pic->i_planes = 3;
+
+            return 0;
+
+        case FOURCC_BI_BITFIELDS | DEPTH_16BPP:
+            if( p_vout->p_sys->i_surfaces )
+            {
+                /* We already allocated this surface, return */
+                return -1;
+            }
+
+            p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
+
+            if( p_pic->p_sys == NULL )
+            {
+                return -1;
+            }
+
+            P[ MAIN_PLANE ].p_data = p_vout->p_sys->p_display->pixels;
+            P[ MAIN_PLANE ].i_bytes = 2 * i_width * i_height;
+            P[ MAIN_PLANE ].i_line_bytes = 2 * i_width;
+
+            p_vout->p_sys->i_surfaces++;
+
+            p_pic->i_planes = 1;
 
             return 0;
 

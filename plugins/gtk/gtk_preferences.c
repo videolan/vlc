@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.9 2001/12/30 07:09:55 sam Exp $
+ * $Id: gtk_preferences.c,v 1.10 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -89,11 +89,11 @@ gboolean GtkPreferencesShow( GtkWidget       *widget,
                           "preferences_file_path_entry" );
     
         /* Default DVD */
-        ASSIGN_PSZ_ENTRY( INPUT_DVD_DEVICE_VAR,INPUT_DVD_DEVICE_DEFAULT,
+        ASSIGN_PSZ_ENTRY( INPUT_DVD_DEVICE_VAR,DVD_DEVICE,
                           "preferences_disc_dvd_entry" );
     
         /* Default VCD */
-        ASSIGN_PSZ_ENTRY( INPUT_VCD_DEVICE_VAR, INPUT_VCD_DEVICE_DEFAULT,
+        ASSIGN_PSZ_ENTRY( INPUT_VCD_DEVICE_VAR, VCD_DEVICE,
                           "preferences_disc_vcd_entry" );
     
         /* Default server */

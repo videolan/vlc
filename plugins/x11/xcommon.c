@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.3 2002/01/02 06:46:02 gbazin Exp $
+ * $Id: xcommon.c,v 1.4 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -69,14 +69,13 @@
 #   define IMAGE_TYPE     XvImage
 #   define EXTRA_ARGS     int i_xvport, int i_format
 #   define EXTRA_ARGS_SHM int i_xvport, int i_format, XShmSegmentInfo *p_shm
-#   define DATA_SIZE      p_image->data_size
-    /* There is nothing like XvDestroyImage */
-#   define IMAGE_FREE     XFree
+#   define DATA_SIZE(p)   (p)->data_size
+#   define IMAGE_FREE     XFree      /* There is nothing like XvDestroyImage */
 #else
 #   define IMAGE_TYPE     XImage
 #   define EXTRA_ARGS     Visual *p_visual, int i_depth, int i_bytes_per_pixel
 #   define EXTRA_ARGS_SHM Visual *p_visual, int i_depth, XShmSegmentInfo *p_shm
-#   define DATA_SIZE      (p_image->bytes_per_line * p_image->height)
+#   define DATA_SIZE(p)   ((p)->bytes_per_line * (p)->height)
 #   define IMAGE_FREE     XDestroyImage
 #endif
 
@@ -425,7 +424,9 @@ static int vout_Init( vout_thread_t *p_vout )
     /* Initialize the output structure */
     switch( p_vout->render.i_chroma )
     {
-        case YUV_420_PICTURE:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
             p_vout->output.i_chroma = p_vout->render.i_chroma;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
@@ -438,9 +439,27 @@ static int vout_Init( vout_thread_t *p_vout )
 #else
     /* Initialize the output structure: RGB with square pixels, whatever
      * the input format is, since it's the only format we know */
-    p_vout->output.i_chroma = RGB_16BPP_PICTURE;
+    switch( p_vout->p_sys->i_screen_depth )
+    {
+        case 8: /* FIXME: set the palette */
+            p_vout->output.i_chroma = FOURCC_BI_RGB | DEPTH_8BPP; break;
+        case 15:
+            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_15BPP; break;
+        case 16:
+            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_16BPP; break;
+        case 24:
+            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_24BPP; break;
+        case 32:
+            p_vout->output.i_chroma = FOURCC_BI_BITFIELDS | DEPTH_32BPP; break;
+        default:
+            intf_ErrMsg( "vout error: unknown screen depth" );
+            return( 0 );
+    }
+
     p_vout->output.i_width = p_vout->p_sys->i_width;
     p_vout->output.i_height = p_vout->p_sys->i_height;
+
+    /* Assume we have square pixels */
     p_vout->output.i_aspect = p_vout->p_sys->i_width
                                * VOUT_ASPECT_FACTOR / p_vout->p_sys->i_height;
 #endif
@@ -1119,10 +1138,10 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     int i_width  = p_vout->output.i_width;
     int i_height = p_vout->output.i_height;
     
-    switch( p_vout->output.i_chroma )
+    switch( ONLY_FOURCC( p_vout->output.i_chroma ) )
     {
 #ifdef MODULE_NAME_IS_xvideo
-        case YUV_420_PICTURE:
+        case FOURCC_I420:
             /* We know this chroma, allocate a buffer which will be used
              * directly by the decoder */
             p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
@@ -1179,7 +1198,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 #endif
 
 #ifdef MODULE_NAME_IS_x11
-        case RGB_16BPP_PICTURE:
+        case FOURCC_BI_BITFIELDS:
             p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
 
             if( p_pic->p_sys == NULL )
@@ -1213,9 +1232,15 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             }
 
             /* FIXME: try to get the right i_bytes value from p_image */
-            P[ RGB_PLANE ].p_data = p_pic->p_sys->p_image->data;
-            P[ RGB_PLANE ].i_bytes = 2 * i_width * i_height;
-            P[ RGB_PLANE ].i_line_bytes = 2 * i_width;
+            P[ MAIN_PLANE ].p_data = p_pic->p_sys->p_image->data;
+            P[ MAIN_PLANE ].i_bytes = p_vout->p_sys->i_bytes_per_pixel
+                                       * i_width * i_height;
+            P[ MAIN_PLANE ].i_line_bytes = p_vout->p_sys->i_bytes_per_pixel
+                                            * i_width;
+
+            P[ MAIN_PLANE ].i_red_mask = p_vout->p_sys->i_red_mask;
+            P[ MAIN_PLANE ].i_green_mask = p_vout->p_sys->i_green_mask;
+            P[ MAIN_PLANE ].i_blue_mask = p_vout->p_sys->i_blue_mask;
 
             p_pic->i_planes = 1;
 
@@ -1241,11 +1266,11 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    /* FIXME: check the operation order */
-
+    /* The order of operations is correct */
     if( p_vout->p_sys->b_shm )
     {
         XShmDetach( p_vout->p_sys->p_display, &p_pic->p_sys->shminfo );
+        IMAGE_FREE( p_pic->p_sys->p_image );
 
         shmctl( p_pic->p_sys->shminfo.shmid, IPC_RMID, 0 );
         if( shmdt( p_pic->p_sys->shminfo.shmaddr ) )
@@ -1254,9 +1279,12 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
                          strerror(errno) );
         }
     }
+    else
+    {
+        IMAGE_FREE( p_pic->p_sys->p_image );
+    }
 
     XSync( p_vout->p_sys->p_display, False );
-    IMAGE_FREE( p_pic->p_sys->p_image );
 
     free( p_pic->p_sys );
 }
@@ -1679,12 +1707,12 @@ static int XVideoGetPort( Display *dpy, int i_id )
     {
         if( i_requested_adaptor == -1 )
         {
-            intf_WarnMsg( 3, "vout: no free XVideo port found for YV12" );
+            intf_WarnMsg( 3, "vout: no free XVideo port found for %i", i_id );
         }
         else
         {
             intf_WarnMsg( 3, "vout: XVideo adaptor %i does not have a free "
-                             "XVideo port for YV12", i_requested_adaptor );
+                             "XVideo port for %i", i_requested_adaptor, i_id );
         }
     }
 
@@ -1817,7 +1845,7 @@ static int InitDisplay( vout_thread_t *p_vout )
  * Prepare an XImage or XvImage for display function.
  * The order of the operations respects the recommandations of the mit-shm
  * document by J.Corbet and K.Packard. Most of the parameters were copied from
- * there.
+ * there. See http://ftp.xfree86.org/pub/XFree86/4.0/doc/mit-shm.TXT
  *****************************************************************************/
 static IMAGE_TYPE * CreateShmImage( Display* p_display, EXTRA_ARGS_SHM,
                                     int i_width, int i_height )
@@ -1840,7 +1868,7 @@ static IMAGE_TYPE * CreateShmImage( Display* p_display, EXTRA_ARGS_SHM,
 
     /* Allocate shared memory segment - 0776 set the access permission
      * rights (like umask), they are not yet supported by all X servers */
-    p_shm->shmid = shmget( IPC_PRIVATE, DATA_SIZE, IPC_CREAT | 0776 );
+    p_shm->shmid = shmget( IPC_PRIVATE, DATA_SIZE(p_image), IPC_CREAT | 0776 );
     if( p_shm->shmid < 0 )
     {
         intf_ErrMsg( "vout error: cannot allocate shared image data (%s)",
@@ -1852,22 +1880,24 @@ static IMAGE_TYPE * CreateShmImage( Display* p_display, EXTRA_ARGS_SHM,
     /* Attach shared memory segment to process (read/write) */
     p_shm->shmaddr = p_image->data = shmat( p_shm->shmid, 0, 0 );
     if(! p_shm->shmaddr )
-    {                                                               /* error */
+    {
         intf_ErrMsg( "vout error: cannot attach shared memory (%s)",
                     strerror(errno));
-        shmctl( p_shm->shmid, IPC_RMID, 0 );      /* free shared memory */
         IMAGE_FREE( p_image );
+        shmctl( p_shm->shmid, IPC_RMID, 0 );
         return( NULL );
     }
 
+    /* Read-only data. We won't be using XShmGetImage */
+    p_shm->readOnly = True;
+
     /* Attach shared memory segment to X server */
-    p_shm->readOnly = True; /* the X server doesn't need to write to our shm */
     if( XShmAttach( p_display, p_shm ) == False )
     {
         intf_ErrMsg( "vout error: cannot attach shared memory to X server" );
+        IMAGE_FREE( p_image );
         shmctl( p_shm->shmid, IPC_RMID, 0 );
         shmdt( p_shm->shmaddr );
-        IMAGE_FREE( p_image );
         return( NULL );
     }
 

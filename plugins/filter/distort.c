@@ -2,7 +2,7 @@
  * distort.c : Misc video effects plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: distort.c,v 1.3 2001/12/30 07:09:55 sam Exp $
+ * $Id: distort.c,v 1.4 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -180,7 +180,11 @@ static int vout_Init( vout_thread_t *p_vout )
     /* Initialize the output structure */
     switch( p_vout->render.i_chroma )
     {
-        case YUV_420_PICTURE:
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
+        case FOURCC_I422:
+        case FOURCC_I444:
             p_vout->output.i_chroma = p_vout->render.i_chroma;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;

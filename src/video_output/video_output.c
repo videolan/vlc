@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.150 2001/12/31 04:53:33 sam Exp $
+ * $Id: video_output.c,v 1.151 2002/01/02 14:37:42 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -89,7 +89,7 @@ void vout_EndBank ( void )
  *****************************************************************************/
 vout_thread_t * vout_CreateThread   ( int *pi_status,
                                       int i_width, int i_height,
-                                      int i_chroma, int i_aspect )
+                                      u64 i_chroma, int i_aspect )
 {
     vout_thread_t * p_vout;                             /* thread descriptor */
     int             i_status;                               /* thread status */
@@ -275,14 +275,14 @@ static int InitThread( vout_thread_t *p_vout )
     intf_WarnMsg( 1, "vout info: got %i direct buffer(s)", I_OUTPUTPICTURES );
 
     i_pgcd = ReduceHeight( p_vout->render.i_aspect );
-    intf_WarnMsg( 1, "vout info: picture in %ix%i, chroma %i, "
+    intf_WarnMsg( 1, "vout info: picture in %ix%i, chroma 0x%.16llx, "
                      "aspect ratio %i:%i",
                   p_vout->render.i_width, p_vout->render.i_height,
                   p_vout->render.i_chroma, p_vout->render.i_aspect / i_pgcd,
                   VOUT_ASPECT_FACTOR / i_pgcd );
 
     i_pgcd = ReduceHeight( p_vout->output.i_aspect );
-    intf_WarnMsg( 1, "vout info: picture out %ix%i, chroma %i, "
+    intf_WarnMsg( 1, "vout info: picture out %ix%i, chroma 0x%.16llx, "
                      "aspect ratio %i:%i",
                   p_vout->output.i_width, p_vout->output.i_height,
                   p_vout->output.i_chroma, p_vout->output.i_aspect / i_pgcd,

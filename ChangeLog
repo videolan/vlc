@@ -3,11 +3,163 @@
 #===================#
 
 HEAD
-  * Nothing yet
+
+  * Fixed detection of the esd plugin.
+  * Fixed the ts plugin's input type detection.
+  * Fixed the BadCursor error in the x11 and xvideo plugins. For real this
+    time (unlike my 2001/08/03 fix :p).
+  * Made the wall filter work a bit better. It now spawns a 3x2 mosaic,
+    but this will eventually be configurable, à la `--filter wall:3x3'.
+  * Removed duplicate function checks from configure.in.   
+  * Added extra magic to Makefile.modules so that the module Makefiles
+    are now ridiculously simple. And I mean *simple*. Check it! This will
+    make a possible switch to full autoconf/automake a lot easier.
+  * Added the vlc version name to the plugin symbols, to be sure we only load
+    plugins with the same version number. A nasty consequence is that you
+    need to rebuild your tree after midnight if you are using a CVS tree :-)
+  * Got rid of modules_export.h by #defining exported functions in the same
+    header as their prototype.
+  * Added modules_inner.h and other commonly used .h files to common.h so
+    there are less and less files to include, and renamed common.h to
+    <videolan/vlc.h>.
+  * First modifications to the module handling system towards my ultimate
+    goal to get rid of the *_Probe functions. Got rid of TestMethod and
+    TestCPU, as well as src/misc/tests.c.
+  * Wrote the chroma plugin handling functions. No YUV functions have been
+    ported yet because it'ls a lot of work, but the core system works, I
+    tried it with a naive yv12->rgb16 plugin (which will disappear when the
+    real functions are ready).
+  * Made a lot of functions in dvd_summary.c one-liners to avoid wasting
+    too many output lines.
+  * Fixed a segfault in input_dvd.c:DVDInit.
+  * Added a fixfiles.sh script in plugins/gtk to be run after Glade has
+    generated its C files.
+  * Did some work on the KDE interface to make it suck a bit less. It still
+    segfaults, but at least it runs and it looks less ugly.
+  * RGB SDL rendering works again, though in 16bpp only. 
+  * Made plugins/vcd/linux_cdrom_tools.c independent of any vlc structure
+    so that it'll be easily put in a library. Maybe libdvdcss?
+  * Fixed VCD date display.
+  * Merged vout_xvideo.c, vout_x11.c and vout_common.c into xcommon.c.
+  * Wrote non-Shm XVideo output.
+  * Made X11 output work again. Still pretty unstable, only works for 16bpp.
+  * Additional french translation in po/fr.po. Any taker for the rest?
+  * Fixed a segfault in video_output.c when the allocated pictures were
+    not direct buffers.
+  * Replaced 48x48 .xpm images with 32x32 ones to conform to Debian policy
+    (Closes Debian bug #126939).
+  * Removed the automatic ./configure launch when running `make all' for
+    the first time.
+  * --filter distort:ripple (Ok, ok, I promise it's the last one !! :-)
+  * Fixed compilation with dvdcss disabled.
+  * Fixed compilation with plugins disabled.
+  * Removed useless variables in the VCD and DVD plugins.
+  * Fixed a function which was returning "struct foo" in the VCD plugin.
+  * Fixed the old « XVideo eats more and more CPU » bug I mistakenly
+    reintroduced in my first vout4 commit.
+  * We now stop at the first ':' when looking for a module name, to easily
+    pass information to the modules. Possible example: --vout sdl:software,
+    implementation of such an option is left as an exercise.
+  * Merged filter_bob and filter_bob422 into filter_bob. Use --filter bob
+    to deinterlace 422 into 420 as well.
+  * Factorized code common to most filters and the video output, optimized
+    a few filters by aligning data and reading 64 bits at a time.
+  * Two new absolutely useless, CPU-eating, resource-wasting, but fun
+    filters: enjoy `transform', which performs flips and 90° rotations, and
+    `distort', which performs animated image effects (currently only a naive
+    sine wave is implemented). Usage examples: --filter transform:hflip,
+    --filter transform:vflip, --filter transform:90, --filter transform:180,
+    --filter transform:270, --filter distort:wave.
+  * Added missing XSync() in the XVideo plugin.
+  * Pathetic attempt at a 4:2:2 renderer and deinterlacer, combining the
+    most awful line dropping techniques of both BOB and 422 to 420
+    downscaling. Don't worry, it should only survive for a couple of days.
+  * New stupid plugin: "--filter wall" for split-image playback :-)
+     (will evolve into a real image wall plugin when I have time)
+  * Filter plugins. Not very polished (please don't look at how the dates are
+    calculated!), but worth a try. Use the following flags:
+     "--filter invert" for inverse video
+     "--filter bob" for BOB deinterlacing
+  * Buffer choice optimizations - vout4 should eat even less CPU now.
+  * Fixed aspect ratio handling.
+  * Additional fixes for OSes with no gettext (thanks to ej0).
+  * Don't try to use gettext if we don't have GNU gettext. This may change
+    in the future though (most GNU software seems to include a local copy of
+    gettext in case the operating system doesn't provide it).
+  * Added vlc-arts to the debian package generation.
+  * (very old) russian translation courtesy of Valek Filippov <frob@df.ru>.
+  * Fixed a charset issue in the french translation.
+  * Updated config.guess and config.sub from GNU's latest versions.
+  * Added vlc.pot skeleton for translators.
+  * Removed unused code (intf_channels.c, keystrokes.h).
+  * Put common_win32.h back into common.h -- it wasn't that big and we
+    should not multiply header files.
+  * Added gettext support by Thomas Graf <reeler@reeler.org>, may be
+    broken on other platforms but we'll only see it when I'm finished
+    with vout 4 :-)
+  * New video output version 4, featuring direct to YUV buffer decoding,
+    non-ugly subtitle blending, XVideo and SDL video output.
+  * Renamed spu_dec to spudec and mad_adec to mad to stay coherent with
+    other plugins. Also, renamed mpeg to mpeg_system.
+  * Added jobi to the AUTHORS file.
+  * Factored code common to vout_x11.c and vout_xvideo.c.
 
 0.2.92
-Fri,  7 Dec 2001 20:18:56 +0100
+Mon, 31 Dec 2001 19:50:40 +0100
 
+  * Added a missing call to DecoderError() in mpeg_adec.c.
+  * Fixed a segfault in the aRts plugin.
+  * Fixed a bug in DecoderError.
+  * Next Generation Buffer Manager.
+  * All decoders enter DecoderError() in case of error, even if they
+    haven't allocated all their data. This prevents the input from getting
+    stuck if a decoder has failed its initialization.
+  * Backported lool's fix for the Gtk+ playlist crash.
+  * If $DISPLAY isn't set, don't try to run the Gtk+ interface.
+  * Fixed a segfault in input_dvd.c:DVDInit.
+  * Fixed a PPC compilation issue.
+  * Mouse wheel seek patch for XVideo courtesy of Peter Surda.
+  * Ported to SDL.
+  * Backported a VCD crash fix from the main branch.
+  * Fixed compilation with dvdcss disabled.
+  * Bug fixes in the VCD input.
+  * The SDL plugin now says whether we are using software or hardware YUV
+    in its window title.
+  * Added --with-dll-path option for my automated Win32 package builds.
+  * Initialize SDL before opening the SDL audio output.
+  * Prevent two SDL video outputs or audio outputs to be spawned at the
+    same time to avoid ugly crashes.
+  * TS input: bugfix in DecodePAT and minor optimizations elsewhere.
+  * TS input: we now check that the contents of the PAT has changed
+    before updating it, instead of just relying on its version number.
+  * Disabled broken ALSA audio output. Closes Debian bugs #110869 and #119846.
+  * Fixed build dependencies on libasound2-dev. Closes Debian bug #121057.
+  * Changed configure.in so that libXv_pic is used instead of libXv.a when
+    available. Closes Debian bug #111790.
+  * CPU detection under BeOS.
+  * Fixed XVideo port selection.
+  * Fixed 4:2:2 software rendering.
+  * Removed cruft I forgot in aout_alsa.c.
+  * Minor compile fix under Hurd.
+  * Fixed a potential segfault if the subtitle stream was encountered
+    before the video stream.
+  * Fixed potential compilation issues under eg. BSD/OS.
+  * Fixed unnecessary target remake (recursive make is harmful !).
+  * Fixed a potential BeOS linking issue.
+  * Fixed a minor bug in input.c.
+  * Fixed an issue in Makefile.dep causing to rebuild unnecessary files
+    in the gtk/gnome plugins.
+  * Removed cruft from configure.in.
+  * Fixed major bugs in the PSI decoder.
+  * Fixed possible segfault with --input.
+  * Fix for EOF of ES-only streams.
+  * MPEG-1 aspect ratio patch, courtesy of Vladimir Chernyshov
+    <greengrass@writeme.com>.
+  * Seeking patch for X11, courtesy of Peter Surda
+    <shurdeek@panorama.sth.ac.at>.
+  * Fixed a segfault on exit when no fast_memcpy module was found.
+  * Workaround for a bug in the GLIBC dlopen() code.
+  * Fixed win32 compilation.
   * New libmad plug-in, courtesy of Jean-Paul Saman. We now have sound on
     iPAQ Familiar Linux.
   * Borrowed MPlayer's fast memcpy() routines. Best is autodetected, choose

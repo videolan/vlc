@@ -37,21 +37,6 @@
  */
 
 /*****************************************************************************
- * Program information
- *****************************************************************************/
-
-/* Program version and copyright message */
-#define VERSION_MESSAGE     "vlc @VLC_VERSION@ @VLC_CODENAME@ " \
-                          /* "(" PROGRAM_BUILD ") (" PROGRAM_OPTIONS ")\n" */ \
-                            "Copyright 1996-2001 VideoLAN\n"
-#define COPYRIGHT_MESSAGE   "VideoLAN Client - version @VLC_VERSION@" \
-                            " @VLC_CODENAME@ - (C)1996-2001 VideoLAN"
-
-#define VLC_VERSION         "@VLC_VERSION@"
-#define MODULE_SUFFIX       "__MODULE_@VLC_SYMBOL@"
-#define MODULE_SYMBOL       @VLC_SYMBOL@
-
-/*****************************************************************************
  * Debugging options - define or undefine symbols
  *****************************************************************************/
 #ifdef TRACE
@@ -98,9 +83,6 @@
 /*
  * Paths
  */
-
-#define DATA_PATH                       "@prefix@/share/videolan"
-#define PLUGIN_PATH                     "@prefix@/lib/videolan/vlc"
 
 #define MAX_PLUGIN_COUNT                32
 
@@ -218,7 +200,6 @@
 
 /* DVD defaults */
 #define INPUT_DVD_DEVICE_VAR            "vlc_dvd_device"
-#define INPUT_DVD_DEVICE_DEFAULT        "@DVD_DEVICE@"
 
 #define INPUT_TITLE_VAR                 "vlc_input_title"
 #define INPUT_CHAPTER_VAR               "vlc_input_chapter"
@@ -229,7 +210,6 @@
 
 /* VCD defaults */
 #define INPUT_VCD_DEVICE_VAR            "vlc_vcd_device"
-#define INPUT_VCD_DEVICE_DEFAULT        "@VCD_DEVICE@"
 
 /*****************************************************************************
  * Audio configuration
@@ -419,7 +399,7 @@
 #define VOUT_OUTMEM_SLEEP               ((int)(0.020*CLOCK_FREQ))
 
 /* The default video output window title */
-#define VOUT_TITLE                      "VideoLAN Client @VLC_VERSION@"
+#define VOUT_TITLE                      "VideoLAN Client " VERSION
 
 /* Environment variable for framebuffer device, and default value */
 #define VOUT_FB_DEV_VAR                 "vlc_fb_dev"

@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.14 2001/12/31 01:13:12 massiot Exp $
+ * $Id: input_dvdread.c,v 1.15 2002/01/02 14:37:42 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -779,7 +779,7 @@ static int DvdReadRead( input_thread_t * p_input,
 {
     thread_dvd_data_t *     p_dvd;
     u8                      p_data[DVD_VIDEO_LB_LEN];
-    struct iovec            p_vec[DVD_DATA_BLOCK_ONCE];
+    struct iovec            p_vec[DVD_BLOCK_READ_ONCE];
     u8 *                    pi_cur;
     int                     i_blocks;
     int                     i_read;

@@ -182,6 +182,10 @@ DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98
 # Gettext support
 DEFINE += -DLOCALEDIR=\"$(datadir)/locale\"
 
+# Data and plugin location
+DEFINE += -DDATA_PATH=\"@prefix@/share/videolan\"
+DEFINE += -DPLUGIN_PATH=\"@prefix@/lib/videolan/vlc\"
+
 ###############################################################################
 # Tuning and other variables - do not change anything except if you know
 # exactly what you are doing
