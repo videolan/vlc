@@ -2,7 +2,7 @@
  * demux.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.9 2003/05/14 14:58:35 fenrir Exp $
+ * $Id: demux.c,v 1.10 2003/05/14 21:29:42 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -409,9 +409,9 @@ static int Activate( vlc_object_t * p_this )
     int i_skip;
     int b_forced = VLC_FALSE;
 
-    if( *p_input->psz_demux != NULL && !strncmp( p_input->psz_demux, "aac", 3 ) )
+    if( p_input->psz_demux && !strncmp( p_input->psz_demux, "aac", 3 ) )
     {
-        b_force = VLC_TRUE;
+        b_forced = VLC_TRUE;
     }
     else if( p_input->psz_name )
     {
@@ -419,7 +419,7 @@ static int Activate( vlc_object_t * p_this )
 
         if( i_len > 4 && !strcasecmp( &p_input->psz_name[i_len - 4], ".aac" ) )
         {
-            b_force = VLC_TRUE;
+            b_forced = VLC_TRUE;
         }
     }
 
