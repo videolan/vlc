@@ -47,7 +47,7 @@ bin: contrib-macosx.tar.bz2
 	ranlib lib/*\.a
 
 clean-src: FORCE
-    rm -rf $(BUILDDIRS)
+	rm -rf $(BUILDDIRS)
 	$(MAKE) -C src clean-src
 
 clean-bin: FORCE
