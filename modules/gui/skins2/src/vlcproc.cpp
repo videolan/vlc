@@ -56,8 +56,8 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 }
 
 
-VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ), m_pVoutWindow( NULL ),
-    m_pVout( NULL )
+VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
+                  m_pVoutWindow( NULL ), m_pVout( NULL )
 {
     // Create a timer to poll the status of the vlc
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
@@ -117,6 +117,18 @@ VlcProc::~VlcProc()
     {
         vlc_object_release( getIntf()->p_sys->p_input );
     }
+
+    // Callbacks for vout requests
+    getIntf()->pf_request_window = NULL;
+    getIntf()->pf_release_window = NULL;
+    getIntf()->pf_control_window = NULL;
+
+    var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
+                     onIntfChange, this );
+    var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-current",
+                     onPlaylistChange, this );
+    var_DelCallback( getIntf()->p_sys->p_playlist, "item-change",
+                     onItemChange, this );
 }
 
 

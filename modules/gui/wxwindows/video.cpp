@@ -130,6 +130,10 @@ VideoWindow::~VideoWindow()
         if( vout_Control( p_vout, VOUT_REPARENT ) != VLC_SUCCESS )
             vout_Control( p_vout, VOUT_CLOSE );
     }
+
+    p_intf->pf_request_window = NULL;
+    p_intf->pf_release_window = NULL;
+    p_intf->pf_control_window = NULL;
     vlc_mutex_unlock( &lock );
 
     vlc_mutex_destroy( &lock );
