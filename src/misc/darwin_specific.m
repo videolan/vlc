@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.8 2003/02/01 20:34:55 massiot Exp $
+ * $Id: darwin_specific.m,v 1.9 2003/02/04 20:45:24 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -107,19 +107,15 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
         NSEnumerator * o_enumerator = [o_languages objectEnumerator]; 
         NSString * o_lang;
 
-        while ( (o_lang = [o_enumerator nextObject]) )
-        {
-            if( !b_found )
-            { 
-                const char * psz_string = [o_lang lossyCString];
-                if ( FindLanguage( psz_string ) )
-                {
-                    b_found = 1;
-                }
+        while ( (o_lang = [o_enumerator nextObject]) && ( !b_found ) )
+        { 
+            const char * psz_string = [o_lang lossyCString];
+            if ( FindLanguage( psz_string ) )
+            {
+                b_found = 1;
             }
         }
-
-        [o_languages release];
+        
         [o_pool release];
     }
 }
