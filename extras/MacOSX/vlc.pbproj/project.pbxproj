@@ -343,6 +343,8 @@
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>VLC</string>
+	<key>CFBundleGetInfoString</key>
+	<string>VLC media player 0.5.1a, Copyright (c) 1996-2003 VideoLAN.</string>
 	<key>CFBundleIconFile</key>
 	<string>vlc.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -353,6 +355,8 @@
 	<string>VLC media player</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.5.1a</string>
 	<key>CFBundleSignature</key>
 	<string>VLC#</string>
 	<key>CFBundleURLTypes</key>
