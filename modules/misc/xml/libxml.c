@@ -59,6 +59,8 @@ static char *ReaderName( xml_reader_t * );
 static char *ReaderValue( xml_reader_t * );
 static int ReaderNextAttr( xml_reader_t * );
 
+static int ReaderUseDTD ( xml_reader_t *, vlc_bool_t );
+
 static void CatalogLoad( xml_t *, const char * );
 static void CatalogAdd( xml_t *, const char *, const char *, const char * );
 static int StreamRead( void *p_context, char *p_buffer, int i_buffer );
@@ -136,10 +138,6 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *p_stream )
     p_reader->p_sys->p_reader = p_libxml_reader;
     p_reader->p_xml = p_xml;
 
-    /* Activate DTD validation */
-    xmlTextReaderSetParserProp( p_libxml_reader, XML_PARSER_DEFAULTATTRS, 1 );
-    xmlTextReaderSetParserProp( p_libxml_reader, XML_PARSER_VALIDATE, 1 );
-
     /* Set the error handler */
     xmlTextReaderSetErrorHandler( p_libxml_reader,
                                   ReaderErrorHandler, p_reader );
@@ -150,6 +148,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *p_stream )
     p_reader->pf_name = ReaderName;
     p_reader->pf_value = ReaderValue;
     p_reader->pf_next_attr = ReaderNextAttr;
+    p_reader->pf_use_dtd = ReaderUseDTD;
 
     return p_reader;
 }
@@ -159,6 +158,17 @@ static void ReaderDelete( xml_reader_t *p_reader )
     xmlFreeTextReader( p_reader->p_sys->p_reader );
     free( p_reader->p_sys );
     free( p_reader );
+}
+
+static int ReaderUseDTD ( xml_reader_t *p_reader, vlc_bool_t b_use )
+{
+    /* Activate DTD validation */
+    xmlTextReaderSetParserProp( p_reader->p_sys->p_reader,
+                                XML_PARSER_DEFAULTATTRS, b_use );
+    xmlTextReaderSetParserProp( p_reader->p_sys->p_reader,
+                                XML_PARSER_VALIDATE, b_use );
+
+    return VLC_SUCCESS;
 }
 
 static int ReaderRead( xml_reader_t *p_reader )

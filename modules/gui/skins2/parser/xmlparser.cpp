@@ -63,6 +63,9 @@ XMLParser::XMLParser( intf_thread_t *pIntf, const string &rFileName ):
                  rFileName.c_str() );
         return;
     }
+
+    xml_ReaderUseDTD( m_pReader, VLC_TRUE );
+
 }
 
 

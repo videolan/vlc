@@ -108,6 +108,8 @@ static char *ReaderName( xml_reader_t * );
 static char *ReaderValue( xml_reader_t * );
 static int ReaderNextAttr( xml_reader_t * );
 
+static int ReaderUseDTD ( xml_reader_t *, vlc_bool_t );
+
 static void CatalogLoad( xml_t *, const char * );
 static void CatalogAdd( xml_t *, const char *, const char *, const char * );
 
@@ -208,6 +210,7 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
     p_reader->pf_name = ReaderName;
     p_reader->pf_value = ReaderValue;
     p_reader->pf_next_attr = ReaderNextAttr;
+    p_reader->pf_use_dtd = ReaderUseDTD;
 
     return p_reader;
 }
@@ -217,6 +220,11 @@ static void ReaderDelete( xml_reader_t *p_reader )
     xtag_free( p_reader->p_sys->p_root );
     free( p_reader->p_sys );
     free( p_reader );
+}
+
+static int ReaderUseDTD ( xml_reader_t *p_reader, vlc_bool_t b_use )
+{
+    return VLC_EGENERIC;
 }
 
 static int ReaderRead( xml_reader_t *p_reader )
