@@ -166,13 +166,21 @@ static int Open( vlc_object_t * p_this )
     i_extended = 0;
 
     /* Handle new WAVE_FORMAT_EXTENSIBLE wav files */
+    /* see the following link for more information:
+     * http://www.microsoft.com/whdc/device/audio/multichaud.mspx#EFAA */
     if( GetWLE( &p_wf->wFormatTag ) == WAVE_FORMAT_EXTENSIBLE &&
         i_size >= sizeof( WAVEFORMATEXTENSIBLE ) )
     {
         int i, i_channel_mask;
+        GUID guid_subformat;
 
-        wf_tag_to_fourcc( GetWLE( &p_wf_ext->SubFormat ),
-                          &p_sys->fmt.i_codec, &psz_name );
+        guid_subformat = p_wf_ext->SubFormat;
+        guid_subformat.Data1 = GetDWLE( &p_wf_ext->SubFormat.Data1 );
+        guid_subformat.Data2 = GetWLE( &p_wf_ext->SubFormat.Data2 );
+        guid_subformat.Data3 = GetWLE( &p_wf_ext->SubFormat.Data3 );
+
+        sf_tag_to_fourcc( &guid_subformat, &p_sys->fmt.i_codec, &psz_name );
+
         i_extended = sizeof( WAVEFORMATEXTENSIBLE ) - sizeof( WAVEFORMATEX );
         p_sys->fmt.i_extra -= i_extended;
 

@@ -185,6 +185,22 @@ typedef struct
 #define WAVE_FORMAT_EXTENSIBLE          0xFFFE /* Microsoft */
 #endif
 
+/* GUID SubFormat IDs */
+/* We need both b/c const variables are not compile-time constants in C, giving
+ * us an error if we use the const GUID in an enum */
+
+#ifndef _KSDATAFORMAT_SUBTYPE_PCM_
+#define _KSDATAFORMAT_SUBTYPE_PCM_ {0x00000001, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}}
+static const GUID VLC_KSDATAFORMAT_SUBTYPE_PCM = {0xE923AABF, 0xCB58, 0x4471, {0xA1, 0x19, 0xFF, 0xFA, 0x01, 0xE4, 0xCE, 0x62}};
+#define KSDATAFORMAT_SUBTYPE_PCM VLC_KSDATAFORMAT_SUBTYPE_PCM
+#endif
+
+#ifndef _KSDATAFORMAT_SUBTYPE_UNKNOWN_ 
+#define _KSDATAFORMAT_SUBTYPE_UNKNOWN_ {0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}
+static const GUID VLC_KSDATAFORMAT_SUBTYPE_UNKNOWN = {0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}};
+#define KSDATAFORMAT_SUBTYPE_UNKNOWN VLC_KSDATAFORMAT_SUBTYPE_UNKNOWN
+#endif
+
 /* Microsoft speaker definitions */
 #define WAVE_SPEAKER_FRONT_LEFT             0x1
 #define WAVE_SPEAKER_FRONT_RIGHT            0x2
@@ -256,6 +272,43 @@ static inline void fourcc_to_wf_tag( vlc_fourcc_t fcc, uint16_t *pi_tag )
         if( wave_format_tag_to_fourcc[i].i_fourcc == fcc ) break;
     }
     if( pi_tag ) *pi_tag = wave_format_tag_to_fourcc[i].i_tag;
+}
+
+/* If wFormatTag is WAVEFORMATEXTENSIBLE, we must look at the SubFormat tag
+ * to determine the actual format.  Microsoft has stopped giving out wFormatTag
+ * assignments in lieu of letting 3rd parties generate their own GUIDs
+ */
+static struct
+{
+    GUID         guid_tag;
+    vlc_fourcc_t i_fourcc;
+    char         *psz_name;
+}
+sub_format_tag_to_fourcc[] =
+{
+    { _KSDATAFORMAT_SUBTYPE_PCM_, VLC_FOURCC( 'p', 'c', 'm', ' ' ), "PCM" },
+    { _KSDATAFORMAT_SUBTYPE_UNKNOWN_, VLC_FOURCC( 'u', 'n', 'd', 'f' ), "Unknown" }
+};
+
+/* compares two GUIDs, returns 1 if identical, 0 otherwise */
+static inline int guidcmp( const GUID *s1, const GUID *s2 )
+{
+    return( s1->Data1 == s2->Data1 && s1->Data2 == s2->Data2 &&
+            s1->Data3 == s2->Data3 && !memcmp( s1->Data4, s2->Data4, 8 ) );
+}
+
+static inline void sf_tag_to_fourcc( GUID *guid_tag,
+                                     vlc_fourcc_t *fcc, char **ppsz_name )
+{
+    int i;
+
+    for( i = 0; !guidcmp( &sub_format_tag_to_fourcc[i].guid_tag, 
+                          &KSDATAFORMAT_SUBTYPE_UNKNOWN ); i++ )
+    {
+        if( guidcmp( &sub_format_tag_to_fourcc[i].guid_tag, guid_tag ) ) break;
+    }
+    if( fcc ) *fcc = sub_format_tag_to_fourcc[i].i_fourcc;
+    if( ppsz_name ) *ppsz_name = sub_format_tag_to_fourcc[i].psz_name;
 }
 
 /**
