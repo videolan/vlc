@@ -2,7 +2,7 @@
  * cinepak.h: Cinepak video decoder
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: cinepak.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: cinepak.h,v 1.2 2002/11/27 13:17:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -62,6 +62,9 @@ typedef struct videodec_thread_s
 
     /* private */
     mtime_t i_pts;
-    int     i_framesize;
-    byte_t  *p_framedata;
+    u8      *p_buffer;      /* buffer for gather pes */  \
+    int     i_buffer;       /* size of allocated p_framedata */
+    
+//    int     i_framesize;
+//    byte_t  *p_framedata;
 } videodec_thread_t;

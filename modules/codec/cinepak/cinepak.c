@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.6 2002/10/27 16:58:14 gbazin Exp $
+ * $Id: cinepak.c,v 1.7 2002/11/27 13:17:27 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -156,60 +156,37 @@ static inline u32 GetDWBE( u8 *p_buff )
     if( p ) free( p )
 
 
-static inline void __GetFrame( videodec_thread_t *p_vdec )
-{
-    pes_packet_t  *p_pes;
-    data_packet_t *p_data;
-    byte_t        *p_buffer;
+static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
+{   
+    int i_copy; 
+    int i_count;
 
-    input_ExtractPES( p_vdec->p_fifo, &p_pes );
-    if( !p_pes )
-    {
-        p_vdec->p_framedata = NULL;
-        return;
-    }
+    data_packet_t   *p_data;
 
-    p_vdec->i_pts = p_pes->i_pts;
-
-    while( ( !p_pes->i_nb_data )||( !p_pes->i_pes_size ) )
-    {
-        input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
-        input_ExtractPES( p_vdec->p_fifo, &p_pes );
-        if( !p_pes )
-        {
-            p_vdec->p_framedata = NULL;
-            return;
-        }
-    }
-    p_vdec->i_framesize = p_pes->i_pes_size;
-    if( p_pes->i_nb_data == 1 )
-    {
-        p_vdec->p_framedata = p_pes->p_first->p_payload_start;
-        return;    
-    }
-    /* get a buffer and gather all data packet */
-    p_vdec->p_framedata = p_buffer = malloc( p_pes->i_pes_size );
+    i_count = 0;
     p_data = p_pes->p_first;
-    do
+    while( p_data != NULL && i_count < i_max )
     {
-        p_vdec->p_fifo->p_vlc->pf_memcpy( p_buffer, p_data->p_payload_start, 
-                     p_data->p_payload_end - p_data->p_payload_start );
-        p_buffer += p_data->p_payload_end - p_data->p_payload_start;
+
+        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, 
+                        i_max - i_count );
+
+        if( i_copy > 0 )
+        {
+            memcpy( p_buf,
+                    p_data->p_payload_start,
+                    i_copy );
+        }
+
         p_data = p_data->p_next;
-    } while( p_data );
-    input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
-}
-
-static inline void __NextFrame( videodec_thread_t *p_vdec )
-{
-    pes_packet_t  *p_pes;
-
-    input_ExtractPES( p_vdec->p_fifo, &p_pes );
-    if( p_pes && (p_pes->i_nb_data != 1) )
-    {
-        free( p_vdec->p_framedata ); /* FIXME keep this buffer */
+        i_count += i_copy;
+        p_buf   += i_copy;
     }
-    input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
+
+    if( i_count < i_max )
+    {
+        memset( p_buf, 0, i_max - i_count );
+    }
 }
 
 static int cinepak_CheckVout( vout_thread_t *p_vout,
@@ -819,23 +796,48 @@ static int InitThread( videodec_thread_t *p_vdec )
  *****************************************************************************/
 static void  DecodeThread( videodec_thread_t *p_vdec )
 {
+    pes_packet_t    *p_pes;
+    int             i_frame_size;
+                
     int     i_status;
-    
     int i_plane;
     u8 *p_dst, *p_src;
     picture_t *p_pic; /* videolan picture */
 
-    __GetFrame( p_vdec );
+    do
+    {
+        input_ExtractPES( p_vdec->p_fifo, &p_pes );
+        if( !p_pes )
+        {
+            p_vdec->p_fifo->b_error = 1;
+            return;
+        }
+        p_vdec->i_pts = p_pes->i_pts;
+        i_frame_size = p_pes->i_pes_size;
 
+        if( i_frame_size > 0 )
+        {
+            if( p_vdec->i_buffer < i_frame_size + 16 )
+            {
+                FREE( p_vdec->p_buffer );
+                p_vdec->p_buffer = malloc( i_frame_size + 16 );
+                p_vdec->i_buffer = i_frame_size + 16;
+            }
+
+            GetPESData( p_vdec->p_buffer, p_vdec->i_buffer, p_pes );
+        }
+        input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
+    } while( i_frame_size <= 0 );
+
+    
     i_status = cinepak_decode_frame( p_vdec->p_context,
-                                     p_vdec->i_framesize,
-                                     p_vdec->p_framedata );
-    __NextFrame( p_vdec );
+                                     i_frame_size,
+                                     p_vdec->p_buffer );
                                          
     if( i_status < 0 )
     {
         msg_Warn( p_vdec->p_fifo, "cannot decode one frame (%d bytes)",
-                                  p_vdec->i_framesize );
+                                  i_frame_size );
         return;
     }
     
