@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.33 2002/07/31 20:56:50 sam Exp $
+ * $Id: avi.c,v 1.34 2002/08/01 17:55:31 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -211,7 +211,6 @@ static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, u8 *p_byte )
         case FOURCC_div6:
         case FOURCC_AP41:
         case FOURCC_3IV1:
-//            printf( "\n Is a Key Frame %s", (*p_byte)&0xC0 ? "no" : "yes!!" );
             return( (*p_byte)&0xC0 ? 0 : AVIIF_KEYFRAME );
         case FOURCC_DIVX:
         case FOURCC_divx:
@@ -233,8 +232,6 @@ static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, u8 *p_byte )
             }
             else
             {
-//                printf( "\n Is a Key Frame %s", (*(p_byte+4))&0xC0 ? "no" : 
-//                                                                   "yes!!" );
                 return( (*(p_byte+4))&0xC0 ? 0 : AVIIF_KEYFRAME );
             }
         default:
@@ -1512,7 +1509,6 @@ static pes_packet_t *AVI_ReadStreamBytesInPES(  input_thread_t  *p_input,
     {
         return( NULL );
     }
-fprintf(stderr, "blah ibyte %i\n", i_byte);
     if( !( p_data = input_NewPacket( p_input->p_method_data, i_byte ) ) )
     {
         input_DeletePES( p_input->p_method_data, p_pes );
