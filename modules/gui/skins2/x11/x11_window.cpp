@@ -2,7 +2,7 @@
  * x11_window.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.2 2004/01/18 00:25:02 asmax Exp $
+ * $Id: x11_window.cpp,v 1.3 2004/01/25 18:41:08 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -44,6 +44,12 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     // Create the window
     m_wnd = XCreateWindow( XDISPLAY, root, 0, 0, 1, 1, 0, 0,
                            InputOutput, CopyFromParent, 0, &attr );
+
+    // Set the colormap for 8bpp mode
+    if( XPIXELSIZE == 1 )
+    {
+        XSetWindowColormap( XDISPLAY, m_wnd, m_rDisplay.getColormap() );
+    }
 
     // Select events received by the window
     XSelectInput( XDISPLAY, m_wnd, ExposureMask|KeyPressMask|PointerMotionMask|

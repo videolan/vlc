@@ -2,7 +2,7 @@
  * x11_graphics.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_graphics.cpp,v 1.2 2004/01/25 18:41:08 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -267,16 +267,9 @@ void X11Graphics::fillRect( int left, int top, int width, int height,
     XDestroyRegion( m_mask );
     m_mask = newMask;
 
-    XColor xcolor;
-    xcolor.red = (color & 0xff0000) >> 8;
-    xcolor.green = color & 0xff00;
-    xcolor.blue = (color & 0xff) << 8;
-
     // Draw the rectangle
-    Colormap cm = DefaultColormap( XDISPLAY, DefaultScreen( XDISPLAY ) );
-    XAllocColor( XDISPLAY, cm, &xcolor );
     XGCValues gcVal;
-    gcVal.foreground = xcolor.pixel;
+    gcVal.foreground = m_rDisplay.getPixelValue( color >> 16, color >> 8, color );
     XChangeGC( XDISPLAY, m_gc, GCForeground,  &gcVal );
     XSetRegion( XDISPLAY, m_gc, m_mask );
     XFillRectangle( XDISPLAY, m_pixmap, m_gc, left, top, width, height );
@@ -292,16 +285,9 @@ void X11Graphics::drawRect( int left, int top, int width, int height,
     addVSegmentInRegion( m_mask, top, top + height, left );
     addVSegmentInRegion( m_mask, top, top + height, left + width );
 
-    XColor xcolor;
-    xcolor.red = (color & 0xff0000) >> 8;
-    xcolor.green = color & 0xff00;
-    xcolor.blue = (color & 0xff) << 8;
-
     // Draw the rectangle
-    Colormap cm = DefaultColormap( XDISPLAY, DefaultScreen( XDISPLAY ) );
-    XAllocColor( XDISPLAY, cm, &xcolor );
     XGCValues gcVal;
-    gcVal.foreground = xcolor.pixel;
+    gcVal.foreground = m_rDisplay.getPixelValue( color >> 16, color >> 8, color );
     XChangeGC( XDISPLAY, m_gc, GCForeground,  &gcVal );
     XSetRegion( XDISPLAY, m_gc, m_mask );
     XDrawRectangle( XDISPLAY, m_pixmap, m_gc, left, top, width - 1, height - 1 );

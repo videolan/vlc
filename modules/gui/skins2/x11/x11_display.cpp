@@ -2,7 +2,7 @@
  * x11_display.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_display.cpp,v 1.2 2004/01/25 13:59:33 asmax Exp $
+ * $Id: x11_display.cpp,v 1.3 2004/01/25 18:41:08 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -32,7 +32,7 @@
 
 
 X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
-    m_gc( NULL )
+    m_gc( NULL ), m_colormap( 0 )
 {
     // Open a connection to the X Server
     m_pDisplay = XOpenDisplay( NULL );
@@ -61,6 +61,49 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
     switch( depth )
     {
+        case 8:
+            xVInfoTemplate.c_class = DirectColor;
+            // Get the DirectColor visual
+            pVInfo = XGetVisualInfo( m_pDisplay, VisualScreenMask |
+                                     VisualClassMask, &xVInfoTemplate,
+                                     &vCount );
+            if( pVInfo == NULL )
+            {
+                msg_Err( getIntf(), "no DirectColor visual available" );
+                m_pDisplay = NULL;
+                break;
+            }
+            m_pVisual = pVInfo->visual;
+
+            // Compute the color shifts
+            getShifts( pVInfo->red_mask, m_redLeftShift, m_redRightShift );
+            getShifts( pVInfo->green_mask, m_greenLeftShift,
+                       m_greenRightShift );
+            getShifts( pVInfo->blue_mask, m_blueLeftShift, m_blueRightShift );
+
+            // Create a color map
+            m_colormap = XCreateColormap( m_pDisplay,
+                    DefaultRootWindow( m_pDisplay ),
+                    DefaultVisual( m_pDisplay, screen ), AllocAll );
+
+            // Create the palette
+            XColor pColors[255];
+            for( uint16_t i = 0; i < 255; i++ )
+            {
+                // kludge: colors are indexed reversely because color 255 seems
+                // to bereserved for black even if we try to set it to white
+                pColors[i].pixel = 254-i;
+                pColors[i].pad   = 0;
+                pColors[i].flags = DoRed | DoGreen | DoBlue;
+                pColors[i].red   = (i >> m_redLeftShift) << (m_redRightShift + 8);
+                pColors[i].green = (i >> m_greenLeftShift) << (m_greenRightShift + 8);
+                pColors[i].blue  = (i >> m_blueLeftShift) << (m_blueRightShift + 8);
+            }
+            XStoreColors( m_pDisplay, m_colormap, pColors, 255 );
+            makePixelImpl = &X11Display::makePixel8;
+            m_pixelSize = 1;
+            break;
+
         case 16:
         case 24:
         case 32:
@@ -83,6 +126,12 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
             getShifts( pVInfo->green_mask, m_greenLeftShift,
                        m_greenRightShift );
             getShifts( pVInfo->blue_mask, m_blueLeftShift, m_blueRightShift );
+
+            if( depth == 8 )
+            {
+                makePixelImpl = &X11Display::makePixel8;
+                m_pixelSize = 1;
+            }
 
             if( depth == 16 )
             {
@@ -139,6 +188,10 @@ X11Display::~X11Display()
     {
         XFreeGC( m_pDisplay, m_gc );
     }
+    if( m_colormap )
+    {
+        XFreeColormap( m_pDisplay, m_colormap );
+    }
     if( m_pDisplay )
     {
         XCloseDisplay( m_pDisplay );
@@ -162,6 +215,31 @@ void X11Display::getShifts( uint32_t mask, int &rLeftShift,
         rLeftShift -= rRightShift;
         rRightShift = 0;
     }
+}
+
+
+void X11Display::makePixel8( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                             uint8_t a ) const
+{
+    // Get the current pixel value
+    uint8_t value = 255 - *pPixel;
+
+    // Compute the new color values
+    uint16_t temp;
+    temp = ((uint8_t)((value >> m_redLeftShift) << m_redRightShift));
+    uint8_t red = ( temp * (255 - a) + r * a ) / 255;
+    temp = ((uint8_t)((value >> m_greenLeftShift) << m_greenRightShift));
+    uint8_t green = ( temp * (255 - a) + g * a ) / 255;
+    temp = ((uint8_t)((value >> m_blueLeftShift) << m_blueRightShift));
+    uint8_t blue = ( temp * (255 - a) + b * a ) / 255;
+
+    // Set the new pixel value
+    value =
+        ( ((uint8_t)red >> m_redRightShift) << m_redLeftShift ) |
+        ( ((uint8_t)green >> m_greenRightShift) << m_greenLeftShift ) |
+        ( ((uint8_t)blue >> m_blueRightShift) << m_blueLeftShift );
+
+    *pPixel = 255 - value;
 }
 
 
@@ -280,6 +358,16 @@ void X11Display::makePixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
     pPixel[2] = value;
     value >>= 8;
     pPixel[3] = value;
+}
+
+
+unsigned long X11Display::getPixelValue( uint8_t r, uint8_t g, uint8_t b ) const
+{
+    unsigned long value;
+    value = ( ((uint32_t)r >> m_redRightShift) << m_redLeftShift ) |
+            ( ((uint32_t)g >> m_greenRightShift) << m_greenLeftShift ) |
+            ( ((uint32_t)b >> m_blueRightShift) << m_blueLeftShift );
+    return 255 - value;
 }
 
 

@@ -2,7 +2,7 @@
  * x11_display.hpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_display.hpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_display.hpp,v 1.2 2004/01/25 18:41:08 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -55,6 +55,9 @@ class X11Display: public SkinObject
         /// Get the graphics context
         GC getGC() const { return m_gc; }
 
+        /// Get the colormap
+        Colormap getColormap() const { return m_colormap; }
+
         /// Type of function to convert RGB values into a pixel
         typedef void (X11Display::*MakePixelFunc_t)( uint8_t *pPixel,
             uint8_t r, uint8_t g, uint8_t b, uint8_t a ) const;
@@ -62,12 +65,16 @@ class X11Display: public SkinObject
         /// Get a pointer on the right makePixel implementation
         MakePixelFunc_t getMakePixel() const { return makePixelImpl; }
 
+        /// Get the pixel value corresponding to the given colors
+        unsigned long getPixelValue( uint8_t r, uint8_t g, uint8_t b ) const;
+
     private:
         /// Display parameters
         Display *m_pDisplay;
         Visual *m_pVisual;
         int m_pixelSize;
         GC m_gc;
+        Colormap m_colormap;
         int m_redLeftShift, m_redRightShift;
         int m_greenLeftShift, m_greenRightShift;
         int m_blueLeftShift, m_blueRightShift;
@@ -79,6 +86,10 @@ class X11Display: public SkinObject
         /// Calculate shifts from a color mask
         void getShifts( uint32_t mask, int &rLeftShift,
                         int &rRightShift ) const;
+
+        /// 8 bpp version of makePixel
+        void makePixel8( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
+                         uint8_t a ) const;
 
         /// 16 bpp MSB first version of makePixel
         void makePixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,

@@ -2,7 +2,7 @@
  * x11_tooltip.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_tooltip.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: x11_tooltip.cpp,v 1.2 2004/01/25 18:41:08 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -42,6 +42,12 @@ X11Tooltip::X11Tooltip( intf_thread_t *pIntf,
     m_wnd = XCreateWindow( XDISPLAY, root, 0, 0, 1, 1, 0, 0,
                            InputOutput, CopyFromParent, CWOverrideRedirect,
                            &attr );
+
+    // Set the colormap for 8bpp mode
+    if( XPIXELSIZE == 1 )
+    {
+        XSetWindowColormap( XDISPLAY, m_wnd, m_rDisplay.getColormap() );
+    }
 }
 
 
