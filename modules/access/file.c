@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.17 2003/04/02 23:16:30 massiot Exp $
+ * $Id: file.c,v 1.18 2003/04/16 11:47:08 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -48,12 +48,6 @@
 #   include <io.h>
 #endif
 
-#if defined( WIN32 ) && !defined( UNDER_CE )
-#   ifdef lseek
-#       undef lseek
-#   endif
-#   define lseek _lseeki64
-#endif
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
@@ -400,7 +394,11 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
 #define S p_input->stream
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
 
+#if defined( WIN32 ) && !defined( UNDER_CE )
+    _lseeki64( p_access_data->i_handle, i_pos, SEEK_SET );
+#else
     lseek( p_access_data->i_handle, i_pos, SEEK_SET );
+#endif
 
     vlc_mutex_lock( &S.stream_lock );
     S.p_selected_area->i_tell = i_pos;

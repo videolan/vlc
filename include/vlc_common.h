@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.61 2003/04/14 22:22:32 massiot Exp $
+ * $Id: vlc_common.h,v 1.62 2003/04/16 11:47:08 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -531,7 +531,9 @@ static inline uint64_t U64_AT( void * _p )
 #ifndef HAVE_STRCASECMP
 #   ifdef HAVE_STRICMP
 #       define strcasecmp stricmp
-#       define vlc_strcasecmp NULL
+#       if !defined(__PLUGIN__)
+#           define vlc_strcasecmp NULL
+#       endif
 #   elif !defined(__PLUGIN__)
 #       define strcasecmp vlc_strcasecmp
         VLC_EXPORT( int, vlc_strcasecmp, ( const char *s1, const char *s2 ) );
@@ -543,7 +545,9 @@ static inline uint64_t U64_AT( void * _p )
 #ifndef HAVE_STRNCASECMP
 #   ifdef HAVE_STRNICMP
 #       define strncasecmp strnicmp
-#       define vlc_strncasecmp NULL
+#       if !defined(__PLUGIN__)
+#           define vlc_strncasecmp NULL
+#       endif
 #   elif !defined(__PLUGIN__)
 #       define strncasecmp vlc_strncasecmp
         VLC_EXPORT( int, vlc_strncasecmp, ( const char *s1, const char *s2, size_t n ) );
