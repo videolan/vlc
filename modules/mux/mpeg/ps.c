@@ -3,7 +3,7 @@
  *       multiplexer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ps.c,v 1.13 2003/07/15 13:12:00 gbazin Exp $
+ * $Id: ps.c,v 1.14 2003/07/15 16:07:33 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -238,7 +238,8 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     return( VLC_SUCCESS );
 }
 
-static int MuxWritePackHeader( sout_mux_t *p_mux, mtime_t i_dts )
+static int MuxWritePackHeader( sout_mux_t *p_mux, sout_buffer_t **p_buf,
+                               mtime_t i_dts )
 {
     sout_buffer_t   *p_hdr;
     bits_buffer_t   bits;
@@ -283,12 +284,12 @@ static int MuxWritePackHeader( sout_mux_t *p_mux, mtime_t i_dts )
     else
         p_hdr->i_size = 12;
 
-    sout_AccessOutWrite( p_mux->p_access, p_hdr );
+    sout_BufferChain( p_buf, p_hdr );
 
     return( 0 );
 }
 
-static int MuxWriteSystemHeader( sout_mux_t *p_mux )
+static int MuxWriteSystemHeader( sout_mux_t *p_mux, sout_buffer_t **p_buf )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     sout_buffer_t   *p_hdr;
@@ -339,7 +340,7 @@ static int MuxWriteSystemHeader( sout_mux_t *p_mux )
         }
     }
 
-    sout_AccessOutWrite( p_mux->p_access, p_hdr );
+    sout_BufferChain( p_buf, p_hdr );
 
     return( 0 );
 }
@@ -399,7 +400,7 @@ static int Mux( sout_mux_t *p_mux )
         sout_input_t *p_input;
         ps_stream_t *p_stream;
         sout_fifo_t  *p_fifo;
-        sout_buffer_t *p_data;
+        sout_buffer_t *p_hdr = NULL, *p_data;
 
         if( MuxGetStream( p_mux, &i_stream, &i_dts ) < 0 )
         {
@@ -412,18 +413,28 @@ static int Mux( sout_mux_t *p_mux )
 
         if( p_sys->i_pes_count % 30 == 0)
         {
-            MuxWritePackHeader( p_mux, i_dts );
+            MuxWritePackHeader( p_mux, &p_hdr, i_dts );
         }
 
         if( p_sys->i_pes_count % 300 == 0 )
         {
-            MuxWriteSystemHeader( p_mux );
+            sout_buffer_t *p_buf;
+
+            MuxWriteSystemHeader( p_mux, &p_hdr );
+
+            /* For MPEG1 streaming, set HEADER flag */
+            for( p_buf = p_hdr; p_buf != NULL; p_buf = p_buf->p_next )
+            {
+                p_buf->i_flags |= SOUT_BUFFER_FLAGS_HEADER;
+            }
         }
 
         p_data = sout_FifoGet( p_fifo );
         E_( EStoPES )( p_mux->p_sout, &p_data, p_data, p_stream->i_stream_id,
                        p_mux->p_sys->b_mpeg2 );
-        sout_AccessOutWrite( p_mux->p_access, p_data );
+
+        sout_BufferChain( &p_hdr, p_data );
+        sout_AccessOutWrite( p_mux->p_access, p_hdr );
 
         p_sys->i_pes_count++;
 
