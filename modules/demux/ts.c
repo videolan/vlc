@@ -2,7 +2,7 @@
  * ts.c: Transport Stream input module for VLC.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: ts.c,v 1.4 2004/01/18 06:15:21 fenrir Exp $
+ * $Id: ts.c,v 1.5 2004/01/19 18:16:32 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -49,6 +49,7 @@
 #endif
 
 /* TODO:
+ *  - XXX: do not mark options message to be translated, they are too osbcure for now ...
  *  - test it
  *  - ...
  */
@@ -63,6 +64,7 @@ vlc_module_begin();
     set_description( _("ISO 13818-1 MPEG Transport Stream input - new" ) );
     add_category_hint( "TS demuxer", NULL, VLC_TRUE );
         add_string( "ts-extra-pmt", NULL, NULL, "extra PMT", "allow user to specify an extra pmt (pmt_pid=pid:stream_type[,...])", VLC_TRUE );
+        add_bool( "ts-es-id-pid", 0, NULL, "set id of es to pid", "set id of es to pid", VLC_TRUE );
     set_capability( "demux2", 10 );
     set_callbacks( Open, Close );
     add_shortcut( "ts2" );
@@ -197,6 +199,9 @@ struct demux_sys_t
     /* All PMT */
     int         i_pmt;
     ts_pid_t    **pmt;
+
+    /* */
+    vlc_bool_t  b_es_id_pid;
 };
 
 static int Demux  ( demux_t *p_demux );
@@ -278,6 +283,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_pmt = 0;
     p_sys->pmt   = NULL;
 
+    var_Create( p_demux, "ts-es-id-pid", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Get( p_demux, "ts-es-id-pid", &val );
+    p_sys->b_es_id_pid = val.b_bool,
+
+
     /* We handle description of an extra PMT */
     var_Create( p_demux, "ts-extra-pmt", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "ts-extra-pmt", &val );
@@ -323,6 +333,10 @@ static int Open( vlc_object_t *p_this )
                         PIDFillFormat( pid, i_stream_type);
                         if( pid->es->fmt.i_cat != UNKNOWN_ES )
                         {
+                            if( p_sys->b_es_id_pid )
+                            {
+                                pid->es->fmt.i_id = i_pid;
+                            }
                             msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x fcc=%4.4s", i_pid, i_stream_type, (char*)&pid->es->fmt.i_codec );
                             pid->es->id = es_out_Add( p_demux->out, &pid->es->fmt );
                         }
@@ -1601,6 +1615,10 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         else
         {
             msg_Dbg( p_demux, "  * es pid=0x%x type=0x%x fcc=%4.4s", p_es->i_pid, p_es->i_type, (char*)&pid->es->fmt.i_codec );
+            if( p_sys->b_es_id_pid )
+            {
+                pid->es->fmt.i_id = p_es->i_pid;
+            }
             pid->es->id = es_out_Add( p_demux->out, &pid->es->fmt );
         }
     }
