@@ -21,3 +21,4 @@ SOURCES_mod = mod.c
 SOURCES_pva = pva.c
 SOURCES_aiff = aiff.c
 SOURCES_sgimb = sgimb.c
+SOURCES_mjpeg = mjpeg.c
