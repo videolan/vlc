@@ -79,6 +79,7 @@ struct decoder_sys_t
     IMediaObject *p_dmo;
 
     int i_min_output;
+    uint8_t *p_buffer;
 
     audio_date_t end_date;
 };
@@ -374,6 +375,8 @@ static int DecoderOpen( vlc_object_t *p_this )
             msg_Dbg( p_dec, "GetOutputSizeInfo(): bytes %i, align %i",
                      i_size, i_align );
             p_sys->i_min_output = i_size;
+            p_sys->p_buffer = malloc( i_size );
+            if( !p_sys->p_buffer ) goto error;
         }
     }
 
@@ -421,6 +424,7 @@ void DecoderClose( vlc_object_t *p_this )
 
     FreeLibrary( p_sys->hmsdmo_dll );
 
+    if( p_sys->p_buffer ) free( p_sys->p_buffer );
     free( p_sys );
 }
 
@@ -508,7 +512,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Get output from the DMO */
-    block_out.p_buffer = malloc( p_sys->i_min_output );
+    block_out.p_buffer = p_sys->p_buffer;;
     block_out.i_buffer = 0;
 
     p_out = CMediaBufferCreate( &block_out, p_sys->i_min_output, VLC_FALSE );
@@ -531,7 +535,6 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 #endif
 
         p_out->vt->Release( (IUnknown *)p_out );
-        free( block_out.p_buffer );
         return NULL;
     }
 
@@ -545,7 +548,6 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         msg_Dbg( p_dec, "GetBufferAndLength(): failed" );
         p_out->vt->Release( (IUnknown *)p_out );
-        free( block_out.p_buffer );
         return NULL;
     }
 
@@ -555,7 +557,6 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         msg_Dbg( p_dec, "ProcessOutput(): no output (i_buffer_out == 0)" );
 #endif
         p_out->vt->Release( (IUnknown *)p_out );
-        free( block_out.p_buffer );
         return NULL;
     }
 
@@ -572,7 +573,6 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         aout_DateIncrement( &p_sys->end_date, 1 );
 
         p_out->vt->Release( (IUnknown *)p_out );
-        free( block_out.p_buffer );
 
         return p_pic;
     }
@@ -592,7 +592,6 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             aout_DateIncrement( &p_sys->end_date, i_samples );
 
         p_out->vt->Release( (IUnknown *)p_out );
-        free( block_out.p_buffer );
 
         return p_aout_buffer;
     }
@@ -614,8 +613,6 @@ static void CopyPicture( decoder_t *p_dec, picture_t *p_pic, uint8_t *p_in )
         p_dst = p_pic->p[i_plane].p_pixels;
         i_width = p_pic->p[i_plane].i_visible_pitch;
         i_dst_stride  = p_pic->p[i_plane].i_pitch;
-
-        p_src += i_width;
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
         {
