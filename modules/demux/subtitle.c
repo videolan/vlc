@@ -526,7 +526,6 @@ static int Demux( demux_t *p_demux )
         return 0;
 
     i_maxdate = p_sys->i_next_demux_date;
-    msg_Dbg( p_demux, "sub demux until %lld", i_maxdate );
     if( i_maxdate <= 0 && p_sys->i_subtitle < p_sys->i_subtitles )
     {
         /* Should not happen */
@@ -541,7 +540,6 @@ static int Demux( demux_t *p_demux )
             block_t *p_block;
             int i_len = strlen( p_sys->subtitle[p_sys->i_subtitle].psz_text ) + 1;
 
-            msg_Dbg( p_demux, "sub[%d] '%s'", p_sys->i_subtitle, p_sys->subtitle[p_sys->i_subtitle].psz_text );
             if( i_len <= 1 )
             {
                 /* empty subtitle */
