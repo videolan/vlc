@@ -143,7 +143,6 @@ static void    CloseProgram( input_thread_t * p_input );
 vlc_module_begin();
     set_description( N_("DVB input with v4l2 support") );
 
-                 VLC_FALSE );
     add_integer( "dvb-adapter", 0, NULL, ADAPTER_TEXT, ADAPTER_LONGTEXT,
                  VLC_FALSE );
     add_integer( "dvb-device", 0, NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
