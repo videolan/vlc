@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.20 2003/03/14 00:24:08 sigmunau Exp $
+ * $Id: ogg.c,v 1.21 2003/03/21 02:05:20 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -94,8 +94,8 @@ struct demux_sys_t
     /* program clock reference (in units of 90kHz) derived from the pcr of
      * the sub-streams */
     mtime_t i_pcr;
+    mtime_t i_old_pcr;
 
-    mtime_t i_length;
     int     b_seekable;
     int     b_reinit;
 };
@@ -1386,6 +1386,7 @@ static int Demux( input_thread_t * p_input )
     }
 
     i_stream = 0;
+    p_ogg->i_old_pcr = p_ogg->i_pcr;
     p_ogg->i_pcr = p_stream->i_interpolated_pcr;
     for( ; i_stream < p_ogg->i_streams; i_stream++ )
     {
@@ -1398,6 +1399,10 @@ static int Demux( input_thread_t * p_input )
     }
 #undef p_stream
 
+    /* Sanity check for streams where the granulepos of the header packets
+     * don't match these of the data packets (eg. ogg web radios). */
+    if( p_ogg->i_old_pcr == 0 && p_ogg->i_pcr > 1000000 )
+        p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_REINIT;
 
     /* Call the pace control */
     input_ClockManageRef( p_input, p_input->stream.p_selected_program,
