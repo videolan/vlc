@@ -1,4 +1,4 @@
-$Id: cvd-subtitles.txt,v 1.2 2004/01/04 16:51:59 rocky Exp $
+$Id: cvd-subtitles.txt,v 1.3 2004/01/09 01:17:57 rocky Exp $
 The following information is culled from information from 
 Julio Sanchez Fernandez (http://subhandler.sourceforge.net)
 by Rocky Bernstein. 
@@ -11,40 +11,39 @@ whose correctness is not known and some experimentation.
 CVD subtitles are different in several ways from SVCD OGT subtitles
 (see see corresponding info on that.)
 
-Image comes first and meta data is at the end.  So that the metadata
-can be found easily, the subtitle packet starts with two bytes
-(everything is big-endian again) that gives the total size of the
-subtitle data and the offset to the metadata - i.e. size of the image
-data plus the four bytes at the beginning.
+The image data comes first and meta data is at the end.  So that the
+metadata can be found easily, the subtitle packet starts with two
+bytes (everything is big-endian again) that gives the total size of
+the subtitle data and the offset to the metadata - i.e. size of the
+image data plus the four bytes at the beginning.
 
-Data for single screen subtitle may come in several non-contiguous
-packets of a stream. From the scant data on the format, the only way
-known to detect the first packet in a subtitle.  The first packet
-seems to have a valid PTS while later packets for the same image
-don't.
+As with OGT subtitles, Data for single screen subtitle may come in
+several non-contiguous packets of a stream.  From the scant data on
+the format, the only way known to detect the first packet in a
+subtitle.  The first packet seems to have a valid PTS while later
+packets for the same image don't.
 
-Image data comes interlaced and is run-length encoded (RLE). Each
+The image data comes interlaced and is run-length encoded (RLE). Each
 field is a four-bit nibbles that is further subdivided in a two-bit
 repeat count and a two-bit color number - up to three pixels can be
-described in four bits.  What a 0 repeat count means is unknown.  It
+described in four bits.  What a 0 repeat count means not known.  It
 might be used for RLE extension.  There is a special case of a 0
-repeat count though.  When the full nibble is zero, the rest of the
-line is filled with the color value in the next nibble.  It is unknown
-what happens if the color value is greater than three.  The rest seems
-to use a 4-entries palette.  It is not impossible that the fill-line
-complete case above is not as described and the zero repeat count
-means fill line.  The sample code never produces this, so it may be
-untested.
+repeat count that has been inferred: when the full nibble is zero, the
+rest of the line is filled with the color value in the next nibble.
+It is unknown what happens if the color value is greater than three.
+The rest seems to use a 4-entries palette.  It is possible that the
+fill-line general case above is not as described and the zero repeat
+count means fill line.  But since this hasn't been ever seen, the
+preceding is only conjecture.
 
 Here is information given at the start of a subtitle:
 
 SPU size        2 bytes
 metadata offset 2 bytes
 
-Although metadata information does not have to come in a fixed field
-order, every metadata field consists of a tag byte followed by
-parameters. In all cases known, the size including the tag byte is
-exactly four bytes.
+Although metadata information does come in a fixed field order, every
+metadata field consists of a tag byte followed by parameters. In all
+cases seen, the size including the tag byte is exactly four bytes.
 
 code    Meaning 
 ----    -------
