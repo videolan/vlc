@@ -345,6 +345,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                     (i_modulo_time_base * p_dec->p_sys->i_fps_num);
             }
 
+            if( p_dec->p_sys->i_fps_num )
             p_sys->i_interpolated_pts +=
                 ( (i_time_ref + i_time_increment -
                    p_sys->i_last_time - p_sys->i_last_timeincr) *
