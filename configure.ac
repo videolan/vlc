@@ -406,6 +406,7 @@ AC_CACHE_CHECK([for getnameinfo], ac_cv_func_getnameinfo,
 # include <winsock.h>
 #elif defined( WIN32 )
 # include <winsock2.h>
+# include <ws2tcpip.h>
 #else
 # include <sys/socket.h>
 # include <netdb.h>
@@ -427,6 +428,7 @@ AC_CACHE_CHECK([for gai_strerror], ac_cv_func_gai_strerror,
 # include <winsock.h>
 #elif defined( WIN32 )
 # include <winsock2.h>
+# include <ws2tcpip.h>
 #else
 # include <sys/socket.h>
 # include <netdb.h>
