@@ -16,6 +16,7 @@
 # Video output settings
 VIDEO=X11
 #VIDEO=DGA (not yet supported)
+#VIDEO=DUMMY
 #VIDEO=FB
 #VIDEO=GGI
 #VIDEO=BEOS (not yet supported)
