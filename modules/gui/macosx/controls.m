@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: controls.m,v 1.42 2003/06/30 01:51:10 hartman Exp $
+ * $Id: controls.m,v 1.43 2003/06/30 01:52:57 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -152,10 +152,8 @@
     vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
 
 #define p_area p_playlist->p_input->stream.p_selected_area
-NSLog( @"current title: %d, all titles: %d\ncurrent chapter: %d, all chapters: %d", p_area->i_id, p_playlist->p_input->stream.i_area_nb, p_area->i_part, p_area->i_part_nb);
     if( p_area->i_part > 0 && p_area->i_part_nb > 1)
     {
-        NSLog(@"Prev Chap");
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         vlc_mutex_unlock( &p_playlist->object_lock );
         var_Get( p_playlist->p_input, "prev-chapter", &val );
@@ -165,7 +163,6 @@ NSLog( @"current title: %d, all titles: %d\ncurrent chapter: %d, all chapters: %
     }
     else if( p_area->i_id > 1 )
     {
-        NSLog(@"Prev Title");
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         vlc_mutex_unlock( &p_playlist->object_lock );
         var_Get( p_playlist->p_input, "prev-title", &val );
@@ -175,12 +172,10 @@ NSLog( @"current title: %d, all titles: %d\ncurrent chapter: %d, all chapters: %
     }
     else
     {
-        NSLog(@"Prev PlaylistItem");
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         vlc_mutex_unlock( &p_playlist->object_lock );
         playlist_Prev( p_playlist );
     }
-NSLog( @"current title: %d, all titles: %d\ncurrent chapter: %d, all chapters: %d", p_area->i_id, p_playlist->p_input->stream.i_area_nb, p_area->i_part, p_area->i_part_nb);
 #undef p_area
 
     vlc_object_release( p_playlist );
@@ -210,10 +205,8 @@ NSLog( @"current title: %d, all titles: %d\ncurrent chapter: %d, all chapters: %
     vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
 
 #define p_area p_playlist->p_input->stream.p_selected_area
-NSLog( @"current title: %d, all titles: %d\ncurrent chapter: %d, all chapters: %d", p_area->i_id, p_playlist->p_input->stream.i_area_nb, p_area->i_part, p_area->i_part_nb);
     if( p_area->i_part < p_area->i_part_nb && p_area->i_part_nb > 1 )
     {
-        NSLog(@"Next Chap");
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         vlc_mutex_unlock( &p_playlist->object_lock );
         var_Get( p_playlist->p_input, "next-chapter", &val );
@@ -223,7 +216,6 @@ NSLog( @"current title: %d, all titles: %d\ncurrent chapter: %d, all chapters: %
     }
     else if( p_area->i_id < p_playlist->p_input->stream.i_area_nb )
     {
-        NSLog(@"Next Title");
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         vlc_mutex_unlock( &p_playlist->object_lock );
         var_Get( p_playlist->p_input, "next-title", &val );
@@ -233,12 +225,10 @@ NSLog( @"current title: %d, all titles: %d\ncurrent chapter: %d, all chapters: %
     }
     else
     {
-        NSLog(@"Next PlaylistItem");
         vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         vlc_mutex_unlock( &p_playlist->object_lock );
         playlist_Next( p_playlist );
     }
-NSLog( @"current title: %d, all titles: %d\ncurrent chapter: %d, all chapters: %d", p_area->i_id, p_playlist->p_input->stream.i_area_nb, p_area->i_part, p_area->i_part_nb);
 #undef p_area
 
     vlc_object_release( p_playlist );
