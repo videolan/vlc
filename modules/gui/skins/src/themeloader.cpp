@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.7 2003/04/20 19:03:15 jlj Exp $
+ * $Id: themeloader.cpp,v 1.8 2003/04/24 15:57:50 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -29,6 +29,9 @@
 #include <fcntl.h>
 #if !defined WIN32
 #   include <unistd.h>
+#   ifndef PATH_MAX
+#       define MAX_PATH PATH_MAX;
+#   endif
 #else
 #   include <direct.h>
 #endif
@@ -37,10 +40,18 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 
-#if defined( HAVE_LIBTAR_H ) && defined( HAVE_ZLIB_H )
+#if defined( HAVE_ZLIB_H )
 #   include <zlib.h>
-#   include <libtar.h>
 #   include <errno.h>
+#endif
+
+#if defined( HAVE_ZLIB_H ) && defined( HAVE_LIBTAR_H )
+#   include <libtar.h>
+#elif defined( HAVE_ZLIB_H )
+    typedef gzFile TAR;
+    int tar_open         ( TAR **t, char *pathname, int oflags );
+    int tar_extract_all  ( TAR *t, char *prefix );
+    int tar_close        ( TAR *t );
 #endif
 
 //--- SKIN ------------------------------------------------------------------
@@ -72,12 +83,11 @@ ThemeLoader::~ThemeLoader()
 {
 }
 //---------------------------------------------------------------------------
+#if defined( HAVE_ZLIB_H )
 int gzopen_frontend( char *pathname, int oflags, int mode )
 {
-#if defined( HAVE_LIBTAR_H ) && defined( HAVE_ZLIB_H )
     char *gzflags;
     gzFile gzf;
-    int fd;
 
     switch( oflags & O_ACCMODE )
     {
@@ -93,14 +103,7 @@ int gzopen_frontend( char *pathname, int oflags, int mode )
             return -1;
     }
 
-    fd = open( pathname, oflags, mode );
-    if( fd == -1 )
-        return -1;
-
-//    if( ( oflags & O_CREAT ) && fchmod( fd, mode ) )
-//        return -1;
-
-    gzf = gzdopen( fd, gzflags );
+    gzf = gzopen( pathname, gzflags );
     if( !gzf )
     {
         errno = ENOMEM;
@@ -108,20 +111,23 @@ int gzopen_frontend( char *pathname, int oflags, int mode )
     }
 
     return (int)gzf;
-#else
-    return 0;
-#endif
 }
+#endif
+
 //---------------------------------------------------------------------------
-#if defined( HAVE_LIBTAR_H ) && defined( HAVE_ZLIB_H )
+#if defined( HAVE_ZLIB_H )
 bool ThemeLoader::ExtractTarGz( const string tarfile, const string rootdir )
 {
     TAR *t;
+#if defined( HAVE_LIBTAR_H )
     tartype_t gztype = { (openfunc_t) gzopen_frontend, (closefunc_t) gzclose,
         (readfunc_t) gzread, (writefunc_t) gzwrite };
 
     if( tar_open( &t, (char *)tarfile.c_str(), &gztype, O_RDONLY, 0,
                   TAR_GNU ) == -1 )
+#else
+    if( tar_open( &t, (char *)tarfile.c_str(), O_RDONLY ) == -1 )
+#endif
     {
         return false;
     }
@@ -189,13 +195,8 @@ bool ThemeLoader::Parse( const string XmlFile )
     msg_Dbg( p_intf, "Using skin file: %s", XmlFile.c_str() );
 
     // Save current working directory
-#ifdef WIN32    
-    char *cwd = new char[MAX_PATH];
-    getcwd( cwd, MAX_PATH );
-#else
     char *cwd = new char[PATH_MAX];
     getcwd( cwd, PATH_MAX );
-#endif
 
     // Directory separator is different in each OS !
     int p = XmlFile.rfind( DIRECTORY_SEPARATOR, XmlFile.size() );
@@ -234,7 +235,7 @@ bool ThemeLoader::Load( const string FileName )
 {
     // First, we try to un-targz the file, and if it fails we hope it's a XML
     // file...
-#if defined( HAVE_LIBTAR_H ) && defined( HAVE_ZLIB_H )
+#if defined( HAVE_ZLIB_H )
     if( ! Extract( FileName ) && ! Parse( FileName ) )
         return false;
 #else
@@ -256,4 +257,223 @@ bool ThemeLoader::Load( const string FileName )
 
     return true;
 }
+//---------------------------------------------------------------------------
+#if !defined( HAVE_LIBTAR_H ) && defined( HAVE_ZLIB_H )
+
+#ifdef WIN32
+#  define mkdir(dirname,mode) _mkdir(dirname)
+#endif
+
+/* Values used in typeflag field.  */
+#define REGTYPE  '0'            /* regular file */
+#define AREGTYPE '\0'           /* regular file */
+#define DIRTYPE  '5'            /* directory */
+
+#define BLOCKSIZE 512
+
+struct tar_header
+{                               /* byte offset */
+  char name[100];               /*   0 */
+  char mode[8];                 /* 100 */
+  char uid[8];                  /* 108 */
+  char gid[8];                  /* 116 */
+  char size[12];                /* 124 */
+  char mtime[12];               /* 136 */
+  char chksum[8];               /* 148 */
+  char typeflag;                /* 156 */
+  char linkname[100];           /* 157 */
+  char magic[6];                /* 257 */
+  char version[2];              /* 263 */
+  char uname[32];               /* 265 */
+  char gname[32];               /* 297 */
+  char devmajor[8];             /* 329 */
+  char devminor[8];             /* 337 */
+  char prefix[155];             /* 345 */
+                                /* 500 */
+};
+
+union tar_buffer {
+  char               buffer[BLOCKSIZE];
+  struct tar_header  header;
+};
+
+/* helper functions */
+int getoct( char *p, int width );
+int makedir( char *newdir );
+
+int tar_open( TAR **t, char *pathname, int oflags )
+{
+    gzFile f = gzopen( pathname, "rb" );
+    if( f == NULL )
+    {
+        fprintf( stderr, "Couldn't gzopen %s\n", pathname );
+        return -1;
+    }
+
+    *t = (gzFile *)malloc( sizeof(gzFile) );
+    **t = f;
+    return 0;
+}
+
+int tar_extract_all( TAR *t, char *prefix )
+{
+    union  tar_buffer buffer;
+    int    len, err, getheader = 1, remaining = 0;
+    FILE   *outfile = NULL;
+    char   fname[BLOCKSIZE + PATH_MAX];
+
+    while( 1 )
+    {
+        len = gzread( *t, &buffer, BLOCKSIZE );
+        if(len < 0) fprintf(stderr, "%s", gzerror(*t, &err) );
+
+        /*
+         * Always expect complete blocks to process
+         * the tar information.
+         */
+        if(len != BLOCKSIZE) fprintf(stderr, "gzread: incomplete block read");
+      
+        /*
+         * If we have to get a tar header
+         */
+        if( getheader == 1 )
+        {
+            /*
+             * if we met the end of the tar
+             * or the end-of-tar block,
+             * we are done
+             */
+            if( (len == 0)  || (buffer.header.name[0]== 0) ) break;
+
+            sprintf( fname, "%s/%s", prefix, buffer.header.name );
+          
+            switch (buffer.header.typeflag)
+            {
+            case DIRTYPE:
+                makedir( fname );
+                break;
+            case REGTYPE:
+            case AREGTYPE:
+                remaining = getoct( buffer.header.size, 12 );
+                if( remaining )
+                {
+                    outfile = fopen( fname, "wb" );
+                    if( outfile == NULL )
+                    {
+                        /* try creating directory */
+                        char *p = strrchr( fname, '/' );
+                        if( p != NULL )
+                        {
+                            *p = '\0';
+                            makedir( fname );
+                            *p = '/';
+                            outfile = fopen( fname, "wb" );
+                            if( !outfile )
+                                fprintf( stderr, "tar couldn't create %s",
+                                         fname );
+                        }
+                    }
+                }
+                else outfile = NULL;
+
+                /*
+                 * could have no contents
+                 */
+                getheader = (remaining) ? 0 : 1;
+                break;
+            default:
+                break;
+            }
+        }
+        else
+        {
+            unsigned int bytes = (remaining > BLOCKSIZE)?BLOCKSIZE:remaining;
+
+            if( outfile != NULL )
+            {
+                if( fwrite( &buffer, sizeof(char), bytes, outfile ) != bytes )
+                {
+                    fprintf( stderr, "error writing %s skipping...\n", fname );
+                    fclose( outfile );
+                    unlink( fname );
+                }
+            }
+            remaining -= bytes;
+            if( remaining == 0 )
+            {
+                getheader = 1;
+                if( outfile != NULL )
+                {
+                    fclose(outfile);
+                    outfile = NULL;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+int tar_close( TAR *t )
+{
+    if( gzclose( *t ) != Z_OK ) fprintf( stderr, "failed gzclose" );
+    free( t );
+    return 0;
+}
+
+/* helper functions */
+int getoct( char *p, int width )
+{
+    int result = 0;
+    char c;
+  
+    while( width-- )
+    {
+        c = *p++;
+        if (c == ' ') continue;
+        if (c == 0) break;
+        result = result * 8 + (c - '0');
+    }
+    return result;
+}
+
+/* Recursive make directory
+ * Abort if you get an ENOENT errno somewhere in the middle
+ * e.g. ignore error "mkdir on existing directory"
+ *
+ * return 1 if OK, 0 on error
+ */
+int makedir( char *newdir )
+{
+    char *p, *buffer = strdup(newdir);
+    int  len = strlen(buffer);
+  
+    if( len <= 0 ) { free(buffer); return 0; }
+
+    if( buffer[len-1] == '/' ) buffer[len-1] = '\0';
+
+    if( mkdir( buffer, 0775 ) == 0 ) { free(buffer); return 1; }
+
+    p = buffer+1;
+    while( 1 )
+    {
+        char hold;
+
+        while( *p && *p != '\\' && *p != '/' ) p++;
+        hold = *p;
+        *p = 0;
+        if( ( mkdir( buffer, 0775 ) == -1 ) && ( errno == ENOENT ) )
+        {
+            fprintf(stderr,"couldn't create directory %s\n", buffer);
+            free(buffer);
+            return 0;
+        }
+        if( hold == 0 ) break;
+        *p++ = hold;
+    }
+    free(buffer);
+    return 1;
+}
+
+#endif
 //---------------------------------------------------------------------------

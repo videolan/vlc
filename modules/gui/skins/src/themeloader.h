@@ -2,7 +2,7 @@
  * themeloader.h: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.h,v 1.2 2003/03/18 04:56:58 ipkiss Exp $
+ * $Id: themeloader.h,v 1.3 2003/04/24 15:57:50 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -33,14 +33,14 @@ using namespace std;
 
 //---------------------------------------------------------------------------
 struct intf_thread_t;
-int gzopen_frontend( char *pathname, int oFlags, int mode );
+
 //---------------------------------------------------------------------------
 class ThemeLoader
 {
     private:
         intf_thread_t *p_intf;
 
-#if defined( HAVE_LIBTAR_H ) && defined( HAVE_ZLIB_H )
+#if defined( HAVE_ZLIB_H )
         bool ExtractTarGz( const string tarfile, const string rootdir );
         bool Extract( const string FileName );
         void DeleteTempFiles( const string Path );
@@ -55,4 +55,3 @@ class ThemeLoader
 };
 
 #endif
-
