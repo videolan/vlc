@@ -36,12 +36,7 @@
             }; 
             CLASS = VLCControls; 
             LANGUAGE = ObjC; 
-            OUTLETS = {
-                "o_btn_fullscreen" = id; 
-                "o_main" = id; 
-                "o_open" = id; 
-                "o_volumeslider" = id; 
-            }; 
+            OUTLETS = {"o_btn_fullscreen" = id; "o_main" = id; "o_volumeslider" = id; }; 
             SUPERCLASS = NSObject; 
         }, 
         {
@@ -232,7 +227,6 @@
                 "o_mu_videotrack" = id; 
                 "o_mu_visual" = id; 
                 "o_mu_window" = id; 
-                "o_open" = id; 
                 "o_playlist" = id; 
                 "o_scrollfield" = id; 
                 "o_timefield" = id; 
@@ -242,20 +236,8 @@
             }; 
             SUPERCLASS = NSObject; 
         }, 
-        {
-            ACTIONS = {}; 
-            CLASS = VLCOpen; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {}; 
-            SUPERCLASS = NSObject; 
-        }, 
-        {
-            ACTIONS = {}; 
-            CLASS = VLCOutput; 
-            LANGUAGE = ObjC; 
-            OUTLETS = {}; 
-            SUPERCLASS = NSObject; 
-        }, 
+        {CLASS = VLCOpen; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = VLCOutput; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {
                 deleteItem = id; 

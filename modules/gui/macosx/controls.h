@@ -28,7 +28,6 @@
  *****************************************************************************/
 @interface VLCControls : NSObject
 {
-    IBOutlet id o_open;
     IBOutlet id o_main;
 
     IBOutlet id o_btn_fullscreen;

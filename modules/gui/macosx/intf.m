@@ -294,6 +294,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     
     o_about = [[VLAboutBox alloc] init];
     o_prefs = [[VLCPrefs alloc] init];
+    o_open = [[VLCOpen alloc] init];
     
     return _o_sharedMainInstance;
 }
@@ -376,10 +377,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
-    
-    /* let's load the open and sout-option dialogues and init the related classes */
-    o_open = [[VLCOpen alloc] init];
-    [o_open getReady];
 
     p_playlist = (playlist_t *) vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
@@ -1290,22 +1287,50 @@ static VLCMain *_o_sharedMainInstance = nil;
 
 - (IBAction)intfOpenFile:(id)sender
 {
-    [o_open openFile];
+    if (!nib_open_loaded)
+    {
+        nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
+        [o_open awakeFromNib];
+        [o_open openFile];
+    } else {
+        [o_open openFile];
+    }
 }
 
 - (IBAction)intfOpenFileGeneric:(id)sender
 {
-    [o_open openFileGeneric];
+    if (!nib_open_loaded)
+    {
+        nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
+        [o_open awakeFromNib];
+        [o_open openFileGeneric];
+    } else {
+        [o_open openFileGeneric];
+    }
 }
 
 - (IBAction)intfOpenDisc:(id)sender
 {
-    [o_open openDisc];
+    if (!nib_open_loaded)
+    {
+        nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
+        [o_open awakeFromNib];
+        [o_open openDisc];
+    } else {
+        [o_open openDisc];
+    }
 }
 
 - (IBAction)intfOpenNet:(id)sender
 {
-    [o_open openNet];
+    if (!nib_open_loaded)
+    {
+        nib_open_loaded = [NSBundle loadNibNamed:@"Open" owner:self];
+        [o_open awakeFromNib];
+        [o_open openNet];
+    } else {
+        [o_open openNet];
+    }
 }
 
 - (IBAction)viewAbout:(id)sender

@@ -84,6 +84,7 @@ struct intf_sys_t
     id o_prefs;                 /* VLCPrefs       */
     id o_about;                 /* VLAboutBox     */
     id o_open;                  /* VLCOpen        */
+    BOOL nib_open_loaded;       /* reference to the open-nib */
 
     IBOutlet id o_window;       /* main window    */
     IBOutlet id o_scrollfield;  /* info field     */

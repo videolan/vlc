@@ -132,6 +132,4 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (IBAction)panelOk:(id)sender;
 
 - (void)openFile;
-
-- (void)getReady;
 @end

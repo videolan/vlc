@@ -54,7 +54,7 @@
         {
             vlc_mutex_unlock( &p_playlist->object_lock );
             vlc_object_release( p_playlist );
-            [o_open openFileGeneric];
+            [o_main intfOpenFileGeneric: (id)sender];
         }
         else
         {

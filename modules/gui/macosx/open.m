@@ -147,11 +147,6 @@ static VLCOpen *_o_sharedMainInstance = nil;
     return _o_sharedMainInstance;
 }
 
-- (void)getReady
-{
-    [NSBundle loadNibNamed:@"Open" owner:self];
-}
-
 - (void)awakeFromNib
 {
     intf_thread_t * p_intf = VLCIntf;
