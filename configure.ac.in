@@ -130,6 +130,7 @@ case "x${target_os}" in
         LDFLAGS_access_ftp="${LDFLAGS_access_ftp} -lws2_32"
         LDFLAGS_access_output_udp="${LDFLAGS_access_output_udp} -lws2_32"
         LDFLAGS_sap="${LDFLAGS_sap} -lws2_32"
+        LDFALGS_httpd="${LDFLAGS_httpd} -lws2_32"
     fi
     ;;
   x*nto*)
@@ -154,7 +155,8 @@ case "x${target_os}" in
     dnl BONE or not BONE ?
     AC_CHECK_LIB( bind, inet_ntoa,
         [ LDFLAGS_access_mms="${LDFLAGS_access_mms} -lbind"
-          LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind"],
+          LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind"
+          LDFALGS_httpd="${LDFLAGS_httpd} -lbind"],
         [])
     ;;
   x*)
@@ -291,8 +293,8 @@ AC_CHECK_FUNCS(send,,[
 )])
 
 AC_CHECK_FUNCS(gethostbyname,,[
-  AC_CHECK_LIB(nsl,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lnsl",[
-    AC_CHECK_LIB(bind,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind")])
+  AC_CHECK_LIB(nsl,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lnsl" LDFLAGS_httpd="${LDFLAGS_httpd} -lnsl",[
+    AC_CHECK_LIB(bind,gethostbyname,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lbind" LDFLAGS_httpd="${LDFLAGS_httpd} -lbind")])
 ])
 
 have_nanosleep=false
@@ -325,7 +327,7 @@ dnl HP/UX port
 AC_CHECK_LIB(rt,sem_init, [LDFLAGS_vlc="${LDFLAGS_vlc} -lrt"])
 
 AC_CHECK_FUNCS(inet_aton,,[
-  AC_CHECK_LIB(resolv,inet_aton,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lresolv")
+  AC_CHECK_LIB(resolv,inet_aton,LDFLAGS_ipv4="${LDFLAGS_ipv4} -lresolv" LDFLAGS_httpd="${LDFLAGS_httpd} -lresolv")
 ])
 
 dnl Check for getopt
@@ -764,6 +766,7 @@ PLUGINS="${PLUGINS} id3 m3u"
 PLUGINS="${PLUGINS} wav araw demuxdump demuxsub adpcm a52sys"
 PLUGINS="${PLUGINS} access_udp access_http ipv4 access_mms access_ftp"
 PLUGINS="${PLUGINS} sap screensaver"
+PLUGINS="${PLUGINS} httpd"
 
 dnl
 dnl  Accelerated modules
@@ -945,7 +948,7 @@ AC_ARG_ENABLE(sout,
   [  --enable-sout           Stream output modules (default enabled)])
 if test "x${enable_sout}" != "xno"
 then
-  PLUGINS="${PLUGINS} access_output_dummy access_output_udp access_output_file"
+  PLUGINS="${PLUGINS} access_output_dummy access_output_udp access_output_file access_output_http"
   PLUGINS="${PLUGINS} mux_ts mux_ps mux_avi mux_dummy"
   PLUGINS="${PLUGINS} packetizer_mpegaudio packetizer_mpegvideo packetizer_a52"
   PLUGINS="${PLUGINS} packetizer_mpeg4video packetizer_mpeg4audio"
