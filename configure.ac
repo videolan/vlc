@@ -977,21 +977,22 @@ dnl
 VLC_ADD_PLUGINS([dummy logger memcpy])
 VLC_ADD_PLUGINS([mpgv mpga m4v m4a h264 ps pva avi asf aac mp4 rawdv nsv real aiff mjpeg demuxdump flac])
 VLC_ADD_PLUGINS([cvdsub svcdsub spudec subsdec dvbsub mpeg_audio lpcm a52 dts cinepak flacdec])
-VLC_ADD_PLUGINS([deinterlace invert adjust transform distort clone crop motionblur])
+VLC_ADD_PLUGINS([deinterlace invert adjust transform distort motionblur])
 VLC_ADD_PLUGINS([fixed32tos16 s16tofixed32 u8tofixed32])
 VLC_ADD_PLUGINS([trivial_resampler ugly_resampler])
 VLC_ADD_PLUGINS([trivial_channel_mixer trivial_mixer])
 VLC_ADD_PLUGINS([id3 playlist export sgimb m3u xtag])
 VLC_ADD_PLUGINS([i420_rgb rawvideo blend scale image logo])
 VLC_ADD_PLUGINS([wav araw subtitle vobsub adpcm a52sys dtssys au voc xa])
-VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp access_fake])
+VLC_ADD_PLUGINS([access_directory access_file access_udp access_tcp])
 VLC_ADD_PLUGINS([access_http access_mms access_ftp ipv4])
 VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 
 if test "${SYS}" != "mingwce"; then
+  VLC_ADD_PLUGINS([access_fake])
   VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap])
-  VLC_ADD_PLUGINS([picture mosaic wall motiondetect])
+  VLC_ADD_PLUGINS([picture mosaic wall motiondetect clone crop])
   VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga])
   VLC_ADD_PLUGINS([aout_file linear_resampler bandlimited_resampler])
   VLC_ADD_PLUGINS([float32_mixer spdif_mixer simple_channel_mixer])
@@ -1995,7 +1996,10 @@ then
   then
     AC_CHECK_HEADERS(ffmpeg/avcodec.h)
     AC_CHECK_HEADERS(postproc/postprocess.h)
-    VLC_ADD_PLUGINS([ffmpeg stream_out_switcher])
+    VLC_ADD_PLUGINS([ffmpeg])
+    if test "${enable_sout}" != "no"; then
+        VLC_ADD_PLUGINS([stream_out_switcher])
+    fi
     VLC_ADD_CFLAGS([ffmpeg stream_out_switcher],[`${FFMPEG_CONFIG} --cflags`])
     VLC_ADD_LDFLAGS([ffmpeg],[`${FFMPEG_CONFIG} --plugin-libs avcodec avformat postproc`])
   else
@@ -2031,7 +2035,10 @@ then
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [], [AC_MSG_ERROR([Missing header file ffmpeg/avcodec.h.])] )
       AC_CHECK_HEADERS(postproc/postprocess.h, [], [AC_MSG_ERROR([Missing header file postproc/postprocess.h.])] )
       AC_CHECK_LIB(avcodec, avcodec_init, [
-        VLC_ADD_BUILTINS([ffmpeg stream_out_switcher])
+        VLC_ADD_BUILTINS([ffmpeg])
+        if test "${enable_sout}" != "no"; then
+            VLC_ADD_BUILTINS([stream_out_switcher])
+        fi
         VLC_ADD_LDFLAGS([ffmpeg],[-lavcodec])],
          [ AC_MSG_ERROR([Could not find ffmpeg on your system: you may get it from http://ffmpeg.sf.net/ (cvs version is recommended). Alternatively you can use --disable-ffmpeg to disable the ffmpeg plugins.]) ])
       AC_CHECK_LIB(avformat, av_open_input_stream, [
@@ -2096,7 +2103,10 @@ then
         VLC_ADD_LDFLAGS([ffmpeg],[-lxvidcore])
       fi
 
-      VLC_ADD_BUILTINS([ffmpeg stream_out_switcher])
+      VLC_ADD_BUILTINS([ffmpeg])
+      if test "${enable_sout}" != "no"; then
+          VLC_ADD_BUILTINS([stream_out_switcher])
+      fi
       VLC_ADD_LDFLAGS([ffmpeg],[-L${real_ffmpeg_tree}/libavcodec ${real_ffmpeg_tree}/libavcodec/libavcodec.a])
       VLC_ADD_CPPFLAGS([ffmpeg stream_out_switcher],[-I${real_ffmpeg_tree}/libavcodec])
 
