@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.20 2003/05/21 15:54:08 gbazin Exp $
+ * $Id: directx.c,v 1.21 2003/06/11 18:20:38 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -888,6 +888,8 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
                              (float *)p_write_position,
                              p_aout->output.p_sys->pi_chan_table,
                              aout_FormatNbChannels( &p_aout->output.output ) );
+
+        aout_BufferFree( p_buffer );
     }
     else
     {
