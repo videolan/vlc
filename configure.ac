@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.97 2003/10/26 16:12:34 gbazin Exp $
+dnl $Id: configure.ac,v 1.98 2003/10/26 17:11:56 gbazin Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -2084,7 +2084,11 @@ if test "${enable_theora}" = "yes"
 then
   AC_CHECK_HEADERS(theora/theora.h, [
     AC_CHECK_LIB(theora, theora_granule_time, [
-      AX_ADD_BUILTINS([theora])
+      if test "${SYS}" = "mingw32"; then
+        AX_ADD_PLUGINS([theora])
+      else
+        AX_ADD_BUILTINS([theora])
+      fi
       if test "${SYS}" = "darwin"; then
         theora_libs="-ltheora"
       else
