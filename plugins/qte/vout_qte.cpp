@@ -2,7 +2,7 @@
  * vout_qte.cpp : Qt Embedded video output plugin implementation
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vout_qte.cpp,v 1.1.2.1 2002/11/26 19:54:12 jpsaman Exp $
+ * $Id: vout_qte.cpp,v 1.1.2.2 2002/12/04 20:52:27 jpsaman Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordina.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -136,14 +136,30 @@ typedef struct picture_sys_s
 extern "C"
 {
 
-
 /*****************************************************************************
  *  *  * Seeking function TODO: put this in a generic location !
  *****************************************************************************/
 static inline void vout_Seek( off_t i_seek )
 {
-}
+    off_t i_tell;
 
+    vlc_mutex_lock( &p_input_bank->lock );
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+#define S p_input_bank->pp_input[0]->stream
+        i_tell = S.p_selected_area->i_tell + i_seek * (off_t)50 * S.i_mux_rate;
+
+        i_tell = ( i_tell <= 0 /*S.p_selected_area->i_start*/ )
+                   ? 0 /*S.p_selected_area->i_start*/
+                   : ( i_tell >= S.p_selected_area->i_size )
+                       ? S.p_selected_area->i_size
+                       : i_tell;
+
+        input_Seek( p_input_bank->pp_input[0], i_tell );
+#undef S
+    }
+    vlc_mutex_unlock( &p_input_bank->lock );
+}
 
 void _M( vout_getfunctions )( function_list_t * p_function_list );
 	
@@ -181,6 +197,8 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     memset(p_vout->p_sys, 0, sizeof( vout_sys_t ));
+
+    p_vout->b_fullscreen = TRUE;
 
     CreateQtWindow(p_vout);
 
@@ -418,8 +436,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             }
 
             p_pic->p->p_pixels = (p_pic->p_sys->pQImage->jumpTable())[0];
-
-            p_pic->p->i_pitch = p_pic->p_sys->pQImage->bytesPerLine();
+            p_pic->p->i_pitch  = p_pic->p_sys->pQImage->bytesPerLine();
 
             p_pic->p->i_lines = p_vout->output.i_height;
             p_pic->p->i_pixel_bytes = 2;
@@ -444,8 +461,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             }
 
             p_pic->p->p_pixels = (p_pic->p_sys->pQImage->jumpTable())[0];
-
-            p_pic->p->i_pitch = p_pic->p_sys->pQImage->bytesPerLine();
+            p_pic->p->i_pitch  = p_pic->p_sys->pQImage->bytesPerLine();
 
             p_pic->p->i_lines = p_vout->output.i_height;
             p_pic->p->i_pixel_bytes = 4;
@@ -486,6 +502,8 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void ToggleFullScreen ( vout_thread_t *p_vout )
 {
+    p_vout->b_fullscreen = !p_vout->b_fullscreen;
+    // Need to change output window
 }
 
 
@@ -514,9 +532,16 @@ static int CreateQtWindow( vout_thread_t *p_vout )
         return( -1 );
     }
 
-    p_vout->p_sys->i_width  = 320;
-    p_vout->p_sys->i_height = 240;
-
+	if (p_vout->b_fullscreen == TRUE)
+	{
+        p_vout->p_sys->i_width  = 320;
+        p_vout->p_sys->i_height = 240;
+    }
+	else
+	{
+        p_vout->p_sys->i_width  = 220;
+        p_vout->p_sys->i_height = 160;
+    }
     // just wait until the crew is complete...
     while(p_vout->p_sys->pcVoutWidget == NULL)
     {
@@ -584,10 +609,10 @@ vout_run_qtapp_exec(void* pVoid)
 
     {
         QWidget vo(0, "vout");
-        vo.showFullScreen();
+        if (p_vout->b_fullscreen == TRUE)
+            vo.showFullScreen();
         vo.show();
         p_vout->p_sys->pcVoutWidget = &vo;
-
         p_vout->p_sys->bRunning = TRUE;
 
         if(p_vout->p_sys->bOwnsQApp)
