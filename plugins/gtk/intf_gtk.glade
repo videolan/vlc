@@ -656,12 +656,12 @@
 	<class>GtkLabel</class>
 	<name>label18</name>
 	<label>(C) 1996, 1997, 1998, 1999, 2000, 2001 - the VideoLAN Team</label>
-	<justify>GTK_JUSTIFY_CENTER</justify>
+	<justify>GTK_JUSTIFY_LEFT</justify>
 	<wrap>False</wrap>
 	<xalign>0.5</xalign>
 	<yalign>0.5</yalign>
 	<xpad>0</xpad>
-	<ypad>0</ypad>
+	<ypad>5</ypad>
 	<child>
 	  <padding>0</padding>
 	  <expand>False</expand>
@@ -670,32 +670,16 @@
       </widget>
 
       <widget>
-	<class>GtkHBox</class>
-	<name>hbox1</name>
-	<homogeneous>False</homogeneous>
-	<spacing>0</spacing>
+	<class>GtkFrame</class>
+	<name>frame1</name>
+	<label>Authors</label>
+	<label_xalign>0</label_xalign>
+	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
 	<child>
 	  <padding>0</padding>
 	  <expand>False</expand>
 	  <fill>False</fill>
 	</child>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label15</name>
-	  <label>Authors:</label>
-	  <justify>GTK_JUSTIFY_RIGHT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>1.67638e-08</yalign>
-	  <xpad>0</xpad>
-	  <ypad>10</ypad>
-	  <child>
-	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
-	</widget>
 
 	<widget>
 	  <class>GtkLabel</class>
@@ -722,13 +706,8 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
 	  <yalign>0</yalign>
-	  <xpad>10</xpad>
-	  <ypad>10</ypad>
-	  <child>
-	    <padding>0</padding>
-	    <expand>False</expand>
-	    <fill>False</fill>
-	  </child>
+	  <xpad>5</xpad>
+	  <ypad>5</ypad>
 	</widget>
       </widget>
 
@@ -745,7 +724,7 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
 	<child>
 	  <padding>0</padding>
 	  <expand>False</expand>
-	  <fill>True</fill>
+	  <fill>False</fill>
 	</child>
       </widget>
     </widget>

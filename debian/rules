@@ -16,13 +16,14 @@ build-stamp:
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
-		--enable-gnome --enable-fb --with-glide --with-ggi \
-		--with-sdl --enable-esd --enable-alsa --disable-ppro ; \
+		--enable-gnome --enable-gtk --enable-fb --with-glide \
+		--with-ggi --with-sdl --enable-esd --enable-alsa \
+		--disable-ppro ; \
 	else \
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
-		--enable-gnome --enable-fb --with-ggi \
+		--enable-gnome --enable-gtk --enable-fb --with-ggi \
 		--with-sdl --enable-esd --enable-alsa; \
 	fi
 
@@ -48,7 +49,7 @@ install: build
 	DESTDIR=`pwd`/debian/vlc/ $(MAKE) install prefix=/usr
 
 	# make symlinks for packages
-	for alias in ggi gnome glide esd sdl alsa ; do \
+	for alias in ggi gtk gnome glide esd sdl alsa ; do \
 		mkdir -p debian/vlc-$$alias/usr/share/doc/ ; \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
 		mkdir -p debian/vlc-$$alias/usr/lib/videolan/vlc/ ; \
@@ -56,13 +57,13 @@ install: build
 			debian/vlc-$$alias/usr/lib/videolan/vlc/ ; \
 	done
 
-	mkdir -p debian/vlc-gnome/usr/bin/
-	mv debian/vlc/usr/bin/gvlc debian/vlc-gnome/usr/bin/
-	mkdir -p debian/vlc-gnome/usr/share/videolan/
+	mkdir -p debian/vlc-gtk/usr/bin/
+	mv debian/vlc/usr/bin/gvlc debian/vlc-gtk/usr/bin/
+	mkdir -p debian/vlc-gtk/usr/share/videolan/
 	mv debian/vlc/usr/share/videolan/gvlc.png \
-		debian/vlc-gnome/usr/share/videolan/
-	mkdir -p debian/vlc-gnome/usr/share/man/man1/
-	ln -s vlc.1.gz debian/vlc-gnome/usr/share/man/man1/gvlc.1.gz
+		debian/vlc-gtk/usr/share/videolan/
+	mkdir -p debian/vlc-gtk/usr/share/man/man1/
+	ln -s vlc.1.gz debian/vlc-gtk/usr/share/man/man1/gvlc.1.gz
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -81,10 +82,10 @@ binary-arch: build install
 #	dh_installpam
 #	dh_installinit
 	dh_installcron
-	dh_installmanpages -Nvlc-gnome -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
+	dh_installmanpages -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
 	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
+	dh_installchangelogs -Nvlc-gnome -Nvlc-gtk -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
 	dh_link
 	dh_strip
 	dh_compress

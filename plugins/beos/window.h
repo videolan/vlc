@@ -1,10 +1,9 @@
 /*****************************************************************************
- * beos_window.h: beos window class prototype
+ * window.h: BeOS window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
- * Jean-Marc Dressler
+ * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

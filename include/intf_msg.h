@@ -85,3 +85,5 @@ void         intf_IntfMsg        ( char *psz_format, ... );
 void         intf_MsgImm         ( char *psz_format, ... );
 void         intf_ErrMsgImm      ( char *psz_format, ... );
 void         intf_WarnMsgImm     ( int i_level, char *psz_format, ... );
+void         intf_WarnHexDump    ( int i_level, void *p_data, int i_size );
+

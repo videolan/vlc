@@ -634,8 +634,7 @@ create_intf_about (void)
   GtkWidget *vbox3;
   GtkWidget *label14;
   GtkWidget *label18;
-  GtkWidget *hbox1;
-  GtkWidget *label15;
+  GtkWidget *frame1;
   GtkWidget *label16;
   GtkWidget *label17;
   GtkWidget *dialog_action_area;
@@ -673,40 +672,32 @@ create_intf_about (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label18);
   gtk_box_pack_start (GTK_BOX (vbox3), label18, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label18), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_padding (GTK_MISC (label18), 0, 5);
 
-  hbox1 = gtk_hbox_new (FALSE, 0);
-  gtk_widget_ref (hbox1);
-  gtk_object_set_data_full (GTK_OBJECT (intf_about), "hbox1", hbox1,
+  frame1 = gtk_frame_new (_("Authors"));
+  gtk_widget_ref (frame1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_about), "frame1", frame1,
                             (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (hbox1);
-  gtk_box_pack_start (GTK_BOX (vbox3), hbox1, FALSE, FALSE, 0);
-
-  label15 = gtk_label_new (_("Authors:"));
-  gtk_widget_ref (label15);
-  gtk_object_set_data_full (GTK_OBJECT (intf_about), "label15", label15,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (label15);
-  gtk_box_pack_start (GTK_BOX (hbox1), label15, FALSE, FALSE, 0);
-  gtk_label_set_justify (GTK_LABEL (label15), GTK_JUSTIFY_RIGHT);
-  gtk_misc_set_alignment (GTK_MISC (label15), 0.5, 1.67638e-08);
-  gtk_misc_set_padding (GTK_MISC (label15), 0, 10);
+  gtk_widget_show (frame1);
+  gtk_box_pack_start (GTK_BOX (vbox3), frame1, FALSE, FALSE, 0);
 
   label16 = gtk_label_new (_("Régis Duchesne <regis@via.ecp.fr>\nMichel Lespinasse <walken@zoy.org>\nOlivier Pomel <pomel@via.ecp.fr>\nPierre Baillet <oct@zoy.org>\nJean-Philippe Grimaldi <jeanphi@via.ecp.fr>\nAndres Krapf <dae@via.ecp.fr>\nChristophe Massiot <massiot@via.ecp.fr>\nVincent Seguin <seguin@via.ecp.fr>\nBenoit Steiner <benny@via.ecp.fr>\nArnaud de Bossoreille de Ribou <bozo@via.ecp.fr>\nJean-Marc Dressler <polux@via.ecp.fr>\nGaël Hendryckx <jimmy@via.ecp.fr>\nSamuel Hocevar <sam@zoy.org>\nBrieuc Jeunhomme <bbp@via.ecp.fr>\nMichel Kaempf <maxx@via.ecp.fr>\nStéphane Borel <stef@via.ecp.fr>\nRenaud Dartus <reno@via.ecp.fr>\nHenri Fallon <henri@via.ecp.fr>"));
   gtk_widget_ref (label16);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label16", label16,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label16);
-  gtk_box_pack_start (GTK_BOX (hbox1), label16, FALSE, FALSE, 0);
+  gtk_container_add (GTK_CONTAINER (frame1), label16);
   gtk_label_set_justify (GTK_LABEL (label16), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label16), 0.5, 0);
-  gtk_misc_set_padding (GTK_MISC (label16), 10, 10);
+  gtk_misc_set_padding (GTK_MISC (label16), 5, 5);
 
   label17 = gtk_label_new (_("This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source."));
   gtk_widget_ref (label17);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label17", label17,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label17);
-  gtk_box_pack_start (GTK_BOX (vbox3), label17, FALSE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (vbox3), label17, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label17), GTK_JUSTIFY_LEFT);
   gtk_label_set_line_wrap (GTK_LABEL (label17), TRUE);
   gtk_misc_set_padding (GTK_MISC (label17), 0, 5);

@@ -54,13 +54,13 @@ extern "C"
 #include "video.h"
 #include "video_output.h"
 
-#include "interface.h" /* XXX maybe to remove if beos_window.h is splitted */
+#include "interface.h" /* XXX maybe to remove if window.h is splitted */
 #include "intf_msg.h"
 
 #include "main.h"
 }
 
-#include "beos_window.h"
+#include "window.h"
 
 #define WIDTH 128
 #define HEIGHT 64

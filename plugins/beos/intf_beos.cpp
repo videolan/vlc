@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.10 2001/02/20 07:49:12 sam Exp $
+ * $Id: intf_beos.cpp,v 1.11 2001/02/26 12:16:28 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -61,7 +61,7 @@ extern "C"
 #include "main.h"
 }
 
-#include "beos_window.h"
+#include "window.h"
 
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface

@@ -451,7 +451,7 @@ all: vlc @ALIASES@ plugins
 clean:
 	rm -f $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ) $(STD_PLUGIN_OBJ)
 	rm -f plugins/*/*.o src/*/*.o lib/*.so
-	rm -f vlc @ALIASES@
+	rm -f vlc kvlc gvlc
 
 distclean: clean
 	rm -f src/*/*.o plugins/*/*.o **/*~ *.log

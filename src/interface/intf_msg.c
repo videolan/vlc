@@ -349,6 +349,43 @@ void _intf_DbgMsgImm( char *psz_file, char *psz_function, int i_line,
 #endif
 
 /*****************************************************************************
+ * intf_WarnHexDump : print a hexadecimal dump of a memory area
+ *****************************************************************************
+ * This is convenient for debugging purposes.
+ *****************************************************************************/
+void intf_WarnHexDump( int i_level, void *p_data, int i_size )
+{
+    int   i_index = 0;
+    int   i_subindex;
+    char  p_string[75];
+    u8   *p_area = (u8 *)p_data;
+
+    intf_WarnMsg( i_level, "hexdump: dumping %i bytes at address %p",
+                           i_size, p_data );
+
+    while( i_index < i_size )
+    {
+        i_subindex = 0;
+
+        while( ( i_subindex < 24 ) && ( i_index + i_subindex < i_size ) )
+        {
+            sprintf( p_string + 3 * i_subindex, "%.2x ",
+                     p_area[ i_index + i_subindex ] );
+
+            i_subindex++;
+        }
+
+        /* -1 here is safe because we know we printed at least one */
+        p_string[ 3 * i_subindex - 1 ] = '\0';
+        intf_WarnMsg( i_level, "0x%.4x: %s", i_index, p_string );
+
+        i_index += 24;
+    }
+
+    intf_WarnMsg( i_level, "hexdump: %i bytes dumped", i_size );
+}
+
+/*****************************************************************************
  * intf_FlushMsg                                                        (ok ?)
  *****************************************************************************
  * Print all messages remaining in queue: get lock and call FlushLockedMsg.

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.20 2001/02/22 08:59:54 stef Exp $
+ * $Id: input_dvd.c,v 1.21 2001/02/26 12:16:28 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -711,7 +711,7 @@ static void DVDInit( input_thread_t * p_input )
     /* FIXME: We consider here that one title is one title set
      * it is not true !!! */
 
-    intf_WarnMsg( 2, "DVD: Number of titles: %d\n",
+    intf_WarnMsg( 2, "DVD: Number of titles: %d",
                   p_method->ifo.vmg.mat.i_tts_nb );
 
 #define area p_input->stream.pp_areas

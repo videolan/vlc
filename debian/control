@@ -7,8 +7,8 @@ Standards-Version: 3.0.1
 
 Package: vlc
 Architecture: any
-Depends: ${shlibs:Depends}, vlc-gnome
-Suggests: vlc-sdl, vlc-esd
+Depends: ${shlibs:Depends}, vlc-gtk
+Suggests: vlc-sdl, vlc-esd, vlc-gnome
 Description: the free MPEG and DVD player VideoLAN Client
  VideoLAN is a free MPEG, MPEG2 and DVD software solution.
  .
@@ -17,11 +17,19 @@ Description: the free MPEG and DVD player VideoLAN Client
 
 Package: vlc-gnome
 Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Depends: vlc (= ${Source-Version}), vlc-gtk (= ${Source-Version}), ${shlibs:Depends}
 Description: Gnome plugin for the VideoLAN Client
  VideoLAN is a free MPEG, MPEG2 and DVD software solution.
  .
  This plugin adds a Gnome interface to the VideoLAN Client.
+
+Package: vlc-gtk
+Architecture: any
+Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
+Description: Gtk+ plugin for the VideoLAN Client
+ VideoLAN is a free MPEG, MPEG2 and DVD software solution.
+ .
+ This plugin adds a Gtk+ interface to the VideoLAN Client.
 
 Package: vlc-esd
 Architecture: any

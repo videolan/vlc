@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
  *
- * Authors:
+ * Authors: Samuel Hocevar <sam@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +42,13 @@ typedef struct spudec_thread_s
      * Output properties
      */
     vout_thread_t *     p_vout;          /* needed to create the spu objects */
+
+    /*
+     * Private properties
+     */
+    int                 i_spu_size;            /* size of current SPU packet */
+    int                 i_rle_size;                  /* size of the RLE part */
+    subpicture_t *      p_spu;
 
 } spudec_thread_t;
 
