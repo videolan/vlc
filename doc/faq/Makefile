@@ -1,32 +1,36 @@
-all: clean html html-zip txt pdf ps rtf
+# Makefile for the VideoLAN Documentation
+
+DOC := faq-alone
+NAME := FAQ-vlc
+
+# We build HTML, PS, PDF, RTF and TXT for the Web site
+all: html ps pdf rtf txt
 
 html:
-	rm -f *.html
-	sgmltools -b onehtml -s ../common/stylesheet-html.dsl faq-alone.sgml
+	sgmltools -b onehtml -s ../common/stylesheet-html.dsl $(DOC).sgml
+#	Delete empty file !
 	rm -f faq-alone.html
-	ln -s faq.html index.html
-
-clean:
-	rm -f *.html *.txt *.zip *.pdf *.ps *.rtf
-
-html-zip:
-	zip FAQ-vlc-html.zip *.html
-
-txt:
-	sgmltools -b txt faq-alone.sgml
-	mv -f faq-alone.txt FAQ-vlc.txt
-
-pdf:
-	sgmltools -b pdf -s ../common/stylesheet-print-noicones.dsl faq-alone.sgml
-	mv -f faq-alone.pdf FAQ-vlc.pdf
-	zip FAQ-vlc-pdf.zip FAQ-vlc.pdf
+	ln -sf faq.html index.html
+	zip $(NAME)-html.zip *.html
 
 ps:
-	sgmltools -b ps -s ../common/stylesheet-print-noicones.dsl faq-alone.sgml
-	mv -f faq-alone.ps FAQ-vlc.ps
-	zip FAQ-vlc-ps.zip FAQ-vlc.ps
+	sgmltools -b ps -s ../common/stylesheet-print-noicones.dsl $(DOC).sgml
+	mv -f $(DOC).ps $(NAME).ps
+	zip $(NAME)-ps.zip $(NAME).ps
+
+pdf:
+	sgmltools -b pdf -s ../common/stylesheet-print-noicones.dsl $(DOC).sgml
+	mv -f $(DOC).pdf $(NAME).pdf
+	zip $(NAME)-pdf.zip $(NAME).pdf
 
 rtf:
-	sgmltools -b rtf -s ../common/stylesheet-print-noicones.dsl faq-alone.sgml
-	mv -f faq-alone.rtf FAQ-vlc.rtf
-	zip FAQ-vlc-rtf.zip FAQ-vlc.rtf
+	sgmltools -b rtf -s ../common/stylesheet-print-noicones.dsl $(DOC).sgml
+	mv -f $(DOC).rtf $(NAME).rtf
+	zip $(NAME)-rtf.zip $(NAME).rtf
+
+txt:
+	sgmltools -b txt $(DOC).sgml
+	mv -f $(DOC).txt $(NAME).txt
+
+clean:
+	rm -f *.zip *.html *.pdf *.ps *.txt *.rtf
