@@ -2,7 +2,7 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.10 2004/01/23 17:56:14 gbazin Exp $
+ * $Id: mp4.c,v 1.11 2004/01/24 11:56:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin at videolan dot org>
@@ -392,16 +392,348 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
     return udta;
 }
 
+static bo_t *GetSounBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    vlc_bool_t b_descr = VLC_FALSE;
+    bo_t *soun;
+    char fcc[4] = "    ";
+    int  i;
+
+    switch( p_stream->p_fmt->i_codec )
+    {
+    case VLC_FOURCC('m','p','4','a'):
+        memcpy( fcc, "mp4a", 4 );
+        b_descr = VLC_TRUE;
+        break;
+
+    case VLC_FOURCC('m','p','g','a'):
+        if( p_sys->b_mov )
+            memcpy( fcc, ".mp3", 4 );
+        else
+            memcpy( fcc, "mp4a", 4 );
+        break;
+
+    default:
+        memcpy( fcc, (char*)&p_stream->p_fmt->i_codec, 4 );
+        break;
+    }
+
+    soun = box_new( fcc );
+    for( i = 0; i < 6; i++ )
+    {
+        bo_add_8( soun, 0 );        // reserved;
+    }
+    bo_add_16be( soun, 1 );         // data-reference-index
+
+    /* SoundDescription */
+    if( p_sys->b_mov &&
+        p_stream->p_fmt->i_codec == VLC_FOURCC('m','p','4','a') )
+    {
+        bo_add_16be( soun, 1 );     // version 1;
+    }
+    else
+    {
+        bo_add_16be( soun, 0 );     // version 0;
+    }
+    bo_add_16be( soun, 0 );         // revision level (0)
+    bo_add_32be( soun, 0 );         // vendor
+    // channel-count
+    bo_add_16be( soun, p_stream->p_fmt->audio.i_channels );
+    // sample size
+    bo_add_16be( soun, p_stream->p_fmt->audio.i_bitspersample ?
+                 p_stream->p_fmt->audio.i_bitspersample : 16 );
+    bo_add_16be( soun, -2 );        // compression id
+    bo_add_16be( soun, 0 );         // packet size (0)
+    bo_add_16be( soun, p_stream->p_fmt->audio.i_rate ); // sampleratehi
+    bo_add_16be( soun, 0 );                             // sampleratelo
+
+    /* Extended data for SoundDescription V1 */
+    if( p_sys->b_mov &&
+        p_stream->p_fmt->i_codec == VLC_FOURCC('m','p','4','a') )
+    {
+        /* samples per packet */
+        bo_add_32be( soun, p_stream->p_fmt->audio.i_frame_length );
+        bo_add_32be( soun, 1536 ); /* bytes per packet */
+        bo_add_32be( soun, 2 );    /* bytes per frame */
+        /* bytes per sample */
+        bo_add_32be( soun, 2 /*p_stream->p_fmt->audio.i_bitspersample/8 */);
+    }
+
+    /* Add an ES Descriptor */
+    if( b_descr )
+    {
+        bo_t *box;
+
+        if( p_sys->b_mov &&
+            p_stream->p_fmt->i_codec == VLC_FOURCC('m','p','4','a') )
+        {
+            box = GetWaveTag( p_stream );
+        }
+        else
+        {
+            box = GetESDS( p_stream );
+        }
+        box_fix( box );
+        box_gather( soun, box );
+    }
+
+    box_fix( soun );
+
+    return soun;
+}
+
+static bo_t *GetVideBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
+{
+
+    bo_t *vide;
+    char fcc[4] = "    ";
+    int  i;
+
+    switch( p_stream->p_fmt->i_codec )
+    {
+    case VLC_FOURCC('m','p','4','v'):
+    case VLC_FOURCC('m','p','g','v'):
+        memcpy( fcc, "mp4v", 4 );
+        break;
+
+    case VLC_FOURCC('M','J','P','G'):
+        memcpy( fcc, "mjpa", 4 );
+        break;
+
+    case VLC_FOURCC('S','V','Q','3'):
+        memcpy( fcc, "SVQ3", 4 );
+        break;
+
+    default:
+        memcpy( fcc, (char*)&p_stream->p_fmt->i_codec, 4 );
+        break;
+    }
+
+    vide = box_new( fcc );
+    for( i = 0; i < 6; i++ )
+    {
+        bo_add_8( vide, 0 );        // reserved;
+    }
+    bo_add_16be( vide, 1 );         // data-reference-index
+
+    bo_add_16be( vide, 0 );         // predefined;
+    bo_add_16be( vide, 0 );         // reserved;
+    for( i = 0; i < 3; i++ )
+    {
+        bo_add_32be( vide, 0 );     // predefined;
+    }
+
+    bo_add_16be( vide, p_stream->p_fmt->video.i_width );  // i_width
+    bo_add_16be( vide, p_stream->p_fmt->video.i_height ); // i_height
+
+    bo_add_32be( vide, 0x00480000 );                // h 72dpi
+    bo_add_32be( vide, 0x00480000 );                // v 72dpi
+
+    bo_add_32be( vide, 0 );         // data size, always 0
+    bo_add_16be( vide, 1 );         // frames count per sample
+
+    // compressor name;
+    for( i = 0; i < 32; i++ )
+    {
+        bo_add_8( vide, 0 );
+    }
+
+    bo_add_16be( vide, 0x18 );      // depth
+    bo_add_16be( vide, 0xffff );    // predefined
+
+    /* add an ES Descriptor */
+    switch( p_stream->p_fmt->i_codec )
+    {
+    case VLC_FOURCC('m','p','4','v'):
+    case VLC_FOURCC('m','p','g','v'):
+        {
+            bo_t *esds = GetESDS( p_stream );
+
+            box_fix( esds );
+            box_gather( vide, esds );
+        }
+        break;
+
+    case VLC_FOURCC('S','V','Q','3'):
+        {
+            bo_t *esds = GetSVQ3Tag( p_stream );
+
+            box_fix( esds );
+            box_gather( vide, esds );
+        }
+        break;
+
+    default:
+        break;
+    }
+
+    box_fix( vide );
+
+    return vide;
+}
+
+static bo_t *GetStblBox( sout_mux_t *p_mux, mp4_stream_t *p_stream )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    unsigned int i_chunk, i_stsc_last_val, i_stsc_entries, i, i_index;
+    bo_t *stbl, *stsd, *stts, *stco, *stsc, *stsz;
+    uint32_t i_timescale;
+
+    stbl = box_new( "stbl" );
+    stsd = box_full_new( "stsd", 0, 0 );
+    bo_add_32be( stsd, 1 );
+
+    if( p_stream->p_fmt->i_cat == AUDIO_ES )
+    {
+        bo_t *soun = GetSounBox( p_mux, p_stream );
+        box_gather( stsd, soun );
+    }
+    else if( p_stream->p_fmt->i_cat == VIDEO_ES )
+    {
+        bo_t *vide = GetVideBox( p_mux, p_stream );
+        box_gather( stsd, vide );
+    }
+
+    /* append stsd to stbl */
+    box_fix( stsd );
+    box_gather( stbl, stsd );
+
+    /* chunk offset table */
+    p_stream->i_stco_pos = stbl->i_buffer + 16;
+    if( p_sys->i_pos >= (((uint64_t)0x1) << 32) )
+    {
+        /* 64 bits version */
+        p_stream->b_stco64 = VLC_TRUE;
+        stco = box_full_new( "co64", 0, 0 );
+    }
+    else
+    {
+        /* 32 bits version */
+        p_stream->b_stco64 = VLC_FALSE;
+        stco = box_full_new( "stco", 0, 0 );
+    }
+    bo_add_32be( stco, 0 );     // entry-count (fixed latter)
+
+    /* sample to chunk table */
+    stsc = box_full_new( "stsc", 0, 0 );
+    bo_add_32be( stsc, 0 );     // entry-count (fixed latter)
+
+    for( i_chunk = 0, i_stsc_last_val = 0, i_stsc_entries = 0, i = 0;
+         i < p_stream->i_entry_count; i_chunk++ )
+    {
+        int i_first = i;
+
+        if( p_stream->b_stco64 )
+            bo_add_64be( stco, p_stream->entry[i].i_pos );
+        else
+            bo_add_32be( stco, p_stream->entry[i].i_pos );
+
+        while( i < p_stream->i_entry_count )
+        {
+            if( i + 1 < p_stream->i_entry_count &&
+                p_stream->entry[i].i_pos + p_stream->entry[i].i_size
+                != p_stream->entry[i + 1].i_pos )
+            {
+                i++;
+                break;
+            }
+
+            i++;
+        }
+
+        /* Add entry to the stsc table */
+        if( i_stsc_last_val != i - i_first )
+        {
+            bo_add_32be( stsc, 1 + i_chunk );   // first-chunk
+            bo_add_32be( stsc, i - i_first ) ;  // samples-per-chunk
+            bo_add_32be( stsc, 1 );             // sample-descr-index
+            i_stsc_last_val = i - i_first;
+            i_stsc_entries++;
+        }
+    }
+
+    /* Fix stco entry count */
+    bo_fix_32be( stco, 12, i_chunk );
+    msg_Dbg( p_mux, "created %d chunks (stco)", i_chunk );
+
+    /* append stco to stbl */
+    box_fix( stco );
+    box_gather( stbl, stco );
+
+    /* Fix stsc entry count */
+    bo_fix_32be( stsc, 12, i_stsc_entries  );
+
+    /* append stsc to stbl */
+    box_fix( stsc );
+    box_gather( stbl, stsc );
+
+    /* add stts */
+    stts = box_full_new( "stts", 0, 0 );
+    bo_add_32be( stts, 0 );     // entry-count (fixed latter)
+
+    if( p_stream->p_fmt->i_cat == AUDIO_ES )
+        i_timescale = p_stream->p_fmt->audio.i_rate;
+    else
+        i_timescale = 1001;
+
+    for( i = 0, i_index = 0; i < p_stream->i_entry_count; i_index++)
+    {
+        int64_t i_delta;
+        int     i_first;
+
+        i_first = i;
+        i_delta = p_stream->entry[i].i_length;
+
+        while( i < p_stream->i_entry_count )
+        {
+            if( i + 1 < p_stream->i_entry_count &&
+                p_stream->entry[i + 1].i_length != i_delta )
+            {
+                i++;
+                break;
+            }
+
+            i++;
+        }
+
+        bo_add_32be( stts, i - i_first );           // sample-count
+        bo_add_32be( stts, i_delta * (int64_t)i_timescale /
+                     (int64_t)1000000 );            // sample-delta
+    }
+    bo_fix_32be( stts, 12, i_index );
+
+    /* append stts to stbl */
+    box_fix( stts );
+    box_gather( stbl, stts );
+
+    /* FIXME add ctts ?? FIXME */
+
+    stsz = box_full_new( "stsz", 0, 0 );
+    bo_add_32be( stsz, 0 );                             // sample-size
+    bo_add_32be( stsz, p_stream->i_entry_count );       // sample-count
+    for( i = 0; i < p_stream->i_entry_count; i++ )
+    {
+        bo_add_32be( stsz, p_stream->entry[i].i_size ); // sample-size
+    }
+    /* append stsz to stbl */
+    box_fix( stsz );
+    box_gather( stbl, stsz );
+
+    box_fix( stbl );
+
+    return stbl;
+}
+
 static uint32_t mvhd_matrix[9] =
     { 0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000 };
 
-static bo_t *GetMoovTag( sout_mux_t *p_mux )
+static bo_t *GetMoovBox( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
 
     bo_t            *moov, *mvhd;
-    unsigned int    i;
-    int             i_trak, i_index;
+    int             i_trak, i;
 
     uint32_t        i_movie_timescale = 90000;
     int64_t         i_movie_duration  = 0;
@@ -464,23 +796,9 @@ static bo_t *GetMoovTag( sout_mux_t *p_mux )
     {
         mp4_stream_t *p_stream;
         uint32_t     i_timescale;
-        uint32_t     i_chunk_count;
-        unsigned int i_chunk;
 
-        bo_t *trak;
-        bo_t *tkhd;
-        bo_t *mdia;
-        bo_t *mdhd, *hdlr;
-        bo_t *minf;
-        bo_t *dinf;
-        bo_t *dref;
-        bo_t *url;
-        bo_t *stbl;
-        bo_t *stsd;
-        bo_t *stts;
-        bo_t *stco;
-        bo_t *stsc;
-        bo_t *stsz;
+        bo_t *trak, *tkhd, *mdia, *mdhd, *hdlr;
+        bo_t *minf, *dinf, *dref, *url, *stbl;
 
         p_stream = p_sys->pp_streams[i_trak];
 
@@ -490,14 +808,11 @@ static bo_t *GetMoovTag( sout_mux_t *p_mux )
             msg_Err( p_mux, "FIXME ignoring trak (noaudio&&novideo)" );
             continue;
         }
+
         if( p_stream->p_fmt->i_cat == AUDIO_ES )
-        {
             i_timescale = p_stream->p_fmt->audio.i_rate;
-        }
         else
-        {
             i_timescale = 1001;
-        }
 
         /* *** add /moov/trak *** */
         trak = box_new( "trak" );
@@ -540,7 +855,8 @@ static bo_t *GetMoovTag( sout_mux_t *p_mux )
         }
         bo_add_16be( tkhd, 0 );                     // layer
         bo_add_16be( tkhd, 0 );                     // pre-defined
-        bo_add_16be( tkhd, p_stream->p_fmt->i_cat == AUDIO_ES ? 0x100 : 0 ); // volume
+        // volume
+        bo_add_16be( tkhd, p_stream->p_fmt->i_cat == AUDIO_ES ? 0x100 : 0 );
         bo_add_16be( tkhd, 0 );                     // reserved
         for( i = 0; i < 9; i++ )
         {
@@ -553,8 +869,12 @@ static bo_t *GetMoovTag( sout_mux_t *p_mux )
         }
         else
         {
-            bo_add_32be( tkhd, p_stream->p_fmt->video.i_width  << 16 );     // width (presentation)
-            bo_add_32be( tkhd, p_stream->p_fmt->video.i_height << 16 );     // height(presentation)
+            // width (presentation)
+            bo_add_32be( tkhd, p_stream->p_fmt->video.i_aspect *
+                         p_stream->p_fmt->video.i_height /
+                         VOUT_ASPECT_FACTOR << 16 );
+            // height(presentation)
+            bo_add_32be( tkhd, p_stream->p_fmt->video.i_height << 16 );
         }
         box_fix( tkhd );
         box_gather( trak, tkhd );
@@ -663,315 +983,9 @@ static bo_t *GetMoovTag( sout_mux_t *p_mux )
         box_gather( minf, dinf );
 
         /* add stbl */
-        stbl = box_new( "stbl" );
-        stsd = box_full_new( "stsd", 0, 0 );
-        bo_add_32be( stsd, 1 );
-
-        if( p_stream->p_fmt->i_cat == AUDIO_ES )
-        {
-            bo_t *soun;
-            char fcc[4] = "    ";
-            int  i;
-            vlc_bool_t b_mpeg4_hdr;
-
-            switch( p_stream->p_fmt->i_codec )
-            {
-                case VLC_FOURCC( 'm', 'p', '4', 'a' ):
-                    memcpy( fcc, "mp4a", 4 );
-                    b_mpeg4_hdr = VLC_TRUE;
-                    break;
-
-                case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
-                    if( p_sys->b_mov )
-                        memcpy( fcc, ".mp3 ", 4 );
-                    else
-                        memcpy( fcc, "mp4a", 4 );
-                    b_mpeg4_hdr = VLC_FALSE;
-                    break;
-
-                default:
-                    memcpy( fcc, (char*)&p_stream->p_fmt->i_codec, 4 );
-                    b_mpeg4_hdr = VLC_FALSE;
-                    break;
-            }
-
-            soun = box_new( fcc );
-            for( i = 0; i < 6; i++ )
-            {
-                bo_add_8( soun, 0 );        // reserved;
-            }
-            bo_add_16be( soun, 1 );         // data-reference-index
-
-            /* SoundDescription */
-            if( p_sys->b_mov &&
-                p_stream->p_fmt->i_codec == VLC_FOURCC( 'm', 'p', '4', 'a' ) )
-            {
-                bo_add_16be( soun, 1 );     // version 1;
-            }
-            else
-            {
-                bo_add_16be( soun, 0 );     // version 0;
-            }
-            bo_add_16be( soun, 0 );         // revision level (0)
-            bo_add_32be( soun, 0 );         // vendor
-            bo_add_16be( soun, p_stream->p_fmt->audio.i_channels );   // channel-count
-            // sample size
-            bo_add_16be( soun, p_stream->p_fmt->audio.i_bitspersample ?
-                         p_stream->p_fmt->audio.i_bitspersample : 16 );
-            bo_add_16be( soun, -2 );        // compression id
-            bo_add_16be( soun, 0 );         // packet size (0)
-            bo_add_16be( soun, p_stream->p_fmt->audio.i_rate ); // sampleratehi
-            bo_add_16be( soun, 0 );                             // sampleratelo
-
-            /* Extended data for SoundDescription V1 */
-            if( p_sys->b_mov &&
-                p_stream->p_fmt->i_codec == VLC_FOURCC( 'm', 'p', '4', 'a' ) )
-            {
-                bo_add_32be( soun, p_stream->p_fmt->audio.i_frame_length );    /* samples per packet */
-                bo_add_32be( soun, 1536 ); /* bytes per packet */
-                bo_add_32be( soun, 2 );    /* bytes per frame */
-                /* bytes per sample */
-                bo_add_32be( soun, 2 /*p_stream->p_fmt->audio.i_bitspersample/8 */);
-            }
-
-            /* add an ES Descriptor */
-            if( b_mpeg4_hdr )
-            {
-                bo_t *box;
-
-                if( p_sys->b_mov &&
-                    p_stream->p_fmt->i_codec == VLC_FOURCC('m','p','4','a') )
-                {
-                    box = GetWaveTag( p_stream );
-                }
-                else
-                {
-                    box = GetESDS( p_stream );
-                }
-                box_fix( box );
-                box_gather( soun, box );
-            }
-
-            box_fix( soun );
-            box_gather( stsd, soun );
-        }
-        else if( p_stream->p_fmt->i_cat == VIDEO_ES )
-        {
-            bo_t *vide;
-            char fcc[4] = "    ";
-            int  i;
-
-            switch( p_stream->p_fmt->i_codec )
-            {
-                case VLC_FOURCC( 'm', 'p', '4', 'v' ):
-                case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
-                    memcpy( fcc, "mp4v", 4 );
-                    break;
-
-                case VLC_FOURCC( 'M', 'J', 'P', 'G' ):
-                    memcpy( fcc, "mjpa", 4 );
-                    break;
-
-                case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
-                    memcpy( fcc, "SVQ3", 4 );
-                    break;
-
-                default:
-                    memcpy( fcc, (char*)&p_stream->p_fmt->i_codec, 4 );
-                    break;
-            }
-
-            vide = box_new( fcc );
-            for( i = 0; i < 6; i++ )
-            {
-                bo_add_8( vide, 0 );        // reserved;
-            }
-            bo_add_16be( vide, 1 );         // data-reference-index
-
-            bo_add_16be( vide, 0 );         // predefined;
-            bo_add_16be( vide, 0 );         // reserved;
-            for( i = 0; i < 3; i++ )
-            {
-                bo_add_32be( vide, 0 );     // predefined;
-            }
-
-            bo_add_16be( vide, p_stream->p_fmt->video.i_width );  // i_width
-            bo_add_16be( vide, p_stream->p_fmt->video.i_height ); // i_height
-
-            bo_add_32be( vide, 0x00480000 );                // h 72dpi
-            bo_add_32be( vide, 0x00480000 );                // v 72dpi
-
-            bo_add_32be( vide, 0 );         // data size, always 0
-            bo_add_16be( vide, 1 );         // frames count per sample
-
-            // compressor name;
-            for( i = 0; i < 32; i++ )
-            {
-                bo_add_8( vide, 0 );
-            }
-
-            bo_add_16be( vide, 0x18 );      // depth
-            bo_add_16be( vide, 0xffff );    // predefined
-
-            /* add an ES Descriptor */
-            switch( p_stream->p_fmt->i_codec )
-            {
-            case VLC_FOURCC( 'm', 'p', '4', 'v' ):
-            case VLC_FOURCC( 'm', 'p', 'g', 'v' ):
-                {
-                    bo_t *esds = GetESDS( p_stream );
-
-                    box_fix( esds );
-                    box_gather( vide, esds );
-                }
-                break;
-
-            case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
-                {
-                    bo_t *esds = GetSVQ3Tag( p_stream );
-
-                    box_fix( esds );
-                    box_gather( vide, esds );
-                }
-                break;
-
-            default:
-                break;
-            }
-
-            box_fix( vide );
-            box_gather( stsd, vide );
-        }
-
-        /* append stsd to stbl */
-        box_fix( stsd );
-        box_gather( stbl, stsd );
-
-        /* we will create chunk table and stsc table
-         * FIXME optim stsc table FIXME */
-        i_chunk_count = 0;
-        for( i = 0; i < p_stream->i_entry_count; )
-        {
-            while( i < p_stream->i_entry_count )
-            {
-                if( i + 1 < p_stream->i_entry_count &&
-                    p_stream->entry[i].i_pos +
-                    p_stream->entry[i].i_size != p_stream->entry[i + 1].i_pos )
-                {
-                    i++;
-                    break;
-                }
-
-                i++;
-            }
-            i_chunk_count++;
-        }
-
-        /* chunk offset table */
-        p_stream->i_stco_pos = stbl->i_buffer + 16;
-        if( p_sys->i_pos >= (((uint64_t)0x1) << 32) )
-        {
-            /* 64 bits version */
-            msg_Dbg( p_mux, "creating %d chunk (co64)", i_chunk_count );
-            p_stream->b_stco64 = VLC_TRUE;
-            stco = box_full_new( "co64", 0, 0 );
-        }
-        else
-        {
-            /* 32 bits version */
-            msg_Dbg( p_mux, "creating %d chunk (stco)", i_chunk_count );
-            p_stream->b_stco64 = VLC_FALSE;
-            stco = box_full_new( "stco", 0, 0 );
-        }
-
-        bo_add_32be( stco, i_chunk_count );
-
-        stsc = box_full_new( "stsc", 0, 0 );
-        bo_add_32be( stsc, i_chunk_count );     // entry-count
-        for( i_chunk = 0, i = 0; i < p_stream->i_entry_count; i_chunk++ )
-        {
-            int i_first;
-
-            if( p_stream->b_stco64 )
-                bo_add_64be( stco, p_stream->entry[i].i_pos );
-            else
-                bo_add_32be( stco, p_stream->entry[i].i_pos );
-
-            i_first = i;
-
-            while( i < p_stream->i_entry_count )
-            {
-                if( i + 1 < p_stream->i_entry_count &&
-                    p_stream->entry[i].i_pos + p_stream->entry[i].i_size
-                    != p_stream->entry[i + 1].i_pos )
-                {
-                    i++;
-                    break;
-                }
-
-                i++;
-            }
-            bo_add_32be( stsc, 1 + i_chunk );   // first-chunk
-            bo_add_32be( stsc, i - i_first ) ;  // samples-per-chunk
-            bo_add_32be( stsc, 1 );             // sample-descr-index
-        }
-
-        /* append stco to stbl */
-        box_fix( stco );
-        box_gather( stbl, stco );
-
-        /* append stsc to stbl */
-        box_fix( stsc );
-        box_gather( stbl, stsc );
-
-        /* add stts */
-        stts = box_full_new( "stts", 0, 0 );
-        bo_add_32be( stts, 0 );     // fixed latter
-        for( i = 0, i_index = 0; i < p_stream->i_entry_count; i_index++)
-        {
-            int64_t i_delta;
-            int     i_first;
-
-            i_first = i;
-            i_delta = p_stream->entry[i].i_length;
-
-            while( i < p_stream->i_entry_count )
-            {
-                if( i + 1 < p_stream->i_entry_count &&
-                    p_stream->entry[i + 1].i_length != i_delta )
-                {
-                    i++;
-                    break;
-                }
-
-                i++;
-            }
-
-            bo_add_32be( stts, i - i_first );           // sample-count
-            bo_add_32be( stts, i_delta * (int64_t)i_timescale /
-                               (int64_t)1000000 );      // sample-delta
-        }
-        bo_fix_32be( stts, 12, i_index );
-
-        /* append stts to stbl */
-        box_fix( stts );
-        box_gather( stbl, stts );
-
-        /* FIXME add ctts ?? FIXME */
-
-        stsz = box_full_new( "stsz", 0, 0 );
-        bo_add_32be( stsz, 0 );                             // sample-size
-        bo_add_32be( stsz, p_stream->i_entry_count );       // sample-count
-        for( i = 0; i < p_stream->i_entry_count; i++ )
-        {
-            bo_add_32be( stsz, p_stream->entry[i].i_size ); // sample-size
-        }
-        /* append stsz to stbl */
-        box_fix( stsz );
-        box_gather( stbl, stsz );
+        stbl = GetStblBox( p_mux, p_stream );
 
         /* append stbl to minf */
-        box_fix( stbl );
         p_stream->i_stco_pos += minf->i_buffer;
         box_gather( minf, stbl );
 
@@ -1052,7 +1066,7 @@ static void Close( vlc_object_t * p_this )
 
     /* Create MOOV header */
     i_moov_pos = p_sys->i_pos;
-    moov = GetMoovTag( p_mux );
+    moov = GetMoovBox( p_mux );
 
     /* Check we need to create "fast start" files */
     var_Create( p_this, "mp4-faststart", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -1251,7 +1265,7 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 
 static int Mux( sout_mux_t *p_mux )
 {
-    sout_mux_sys_t  *p_sys = p_mux->p_sys;
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
 
     for( ;; )
     {
@@ -1273,7 +1287,6 @@ static int Mux( sout_mux_t *p_mux )
         p_stream = (mp4_stream_t*)p_input->p_sys;
 
         p_data  = sout_FifoGet( p_input->p_fifo );
-        //msg_Dbg( p_mux, "stream=%d size=%6d pos=%8lld", i_stream, p_data->i_size, p_sys->i_pos );
 
         /* add index entry */
         p_stream->entry[p_stream->i_entry_count].i_pos   = p_sys->i_pos;
