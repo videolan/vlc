@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.13 2002/12/15 20:48:40 jpsaman Exp $
+ * $Id: callbacks.c,v 1.14 2002/12/15 22:45:35 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -125,37 +125,43 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
     struct dirent **namelist;
     int n,status;
 
-    msg_Err(p_intf, "changing to dir %s\n", psz_dir);
-    if (psz_dir)
+    if ( p_intf->p_sys->b_filelist_update == 0)
     {
-       status = chdir(psz_dir);
-       if (status<0)
-          msg_Err( p_intf, "file is not a directory" );
-    }
-    n = scandir(".", &namelist, 0, alphasort);
-
-    if (n<0)
-        perror("scandir");
-    else
-    {
-        gchar *ppsz_text[2];
-        int i;
-
-        gtk_clist_freeze( clist );
-        gtk_clist_clear( clist );
-        for (i=0; i<n; i++)
+        msg_Err(p_intf, "changing to dir %s\n", psz_dir);
+        p_intf->p_sys->b_filelist_update = 1;
+        if (psz_dir)
         {
-            /* This is a list of strings. */
-            ppsz_text[0] = namelist[i]->d_name;
-            ppsz_text[1] = get_file_perm(namelist[i]->d_name);
-            if (strcmp(ppsz_text[1],"") == 0)
-                msg_Err( p_intf->p_sys->p_input, "File system error unknown filetype encountered.");
-            gtk_clist_insert( clist, i, ppsz_text );
-            free(namelist[i]);
+           status = chdir(psz_dir);
+           if (status<0)
+              msg_Err( p_intf, "file is not a directory" );
         }
-        gtk_clist_thaw( clist );
-        free(namelist);
+        n = scandir(".", &namelist, 0, alphasort);
+
+        if (n<0)
+            perror("scandir");
+        else
+        {
+            gchar *ppsz_text[2];
+            int i;
+
+            gtk_clist_freeze( clist );
+            gtk_clist_clear( clist );
+            for (i=0; i<n; i++)
+            {
+                /* This is a list of strings. */
+                ppsz_text[0] = namelist[i]->d_name;
+                ppsz_text[1] = get_file_perm(namelist[i]->d_name);
+                if (strcmp(ppsz_text[1],"") == 0)
+                    msg_Err( p_intf->p_sys->p_input, "File system error unknown filetype encountered.");
+                gtk_clist_insert( clist, i, ppsz_text );
+                free(namelist[i]);
+            }
+            gtk_clist_thaw( clist );
+            free(namelist);
+        }
     }
+    p_intf->p_sys->b_filelist_update = 0;
+
 }
 
 static char* get_file_perm(const char *path)
@@ -304,7 +310,6 @@ on_toolbar_pause_clicked               (GtkButton       *button,
     {
         input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
     }
-    intf_thread_t *  p_intf = GtkGetIntf( widget );
 }
 
 

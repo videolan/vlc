@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.14 2002/12/14 23:17:56 jpsaman Exp $
+ * $Id: familiar.c,v 1.15 2002/12/15 22:45:35 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -86,18 +86,20 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
+#ifdef NEED_GTK_MAIN
     p_intf->p_sys->p_gtk_main = module_Need( p_this, "gtk_main", "gtk" );
     if( p_intf->p_sys->p_gtk_main == NULL )
     {
         free( p_intf->p_sys );
         return VLC_ENOMOD;
     }
+#endif
 
     /* Initialize Gtk+ thread */
     p_intf->p_sys->p_input = NULL;
 
     p_intf->p_sys->b_autoplayfile = 1;
-
+    p_intf->p_sys->b_filelist_update = 0;
     p_intf->pf_run = Run;
 
     return VLC_SUCCESS;
@@ -115,7 +117,9 @@ static void Close( vlc_object_t *p_this )
         vlc_object_release( p_intf->p_sys->p_input );
     }
 
+#ifdef NEED_GTK_MAIN
     module_Unneed( p_intf, p_intf->p_sys->p_gtk_main );
+#endif
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -134,14 +138,25 @@ static void Run( intf_thread_t *p_intf )
     char **pp_args  = p_args;
     int    i_args   = 1;
 
-   /* Initialize GPE interface */
-   if (gpe_application_init(&i_args, &pp_args) == FALSE)
+    /* Initialize GPE interface */
+    if (gpe_application_init(&i_args, &pp_args) == FALSE)
         exit (1);
 #else
-   /* Initialize Gtk+ */
-   gtk_set_locale ();
+# ifdef NEED_GTK_MAIN
+    /* Initialize Gtk+ */
+    gtk_set_locale ();
+    gdk_threads_enter();
+# else
+    /* gtk_init needs to know the command line. We don't care, so we
+     * give it an empty one */
+    char  *p_args[] = { "" };
+    char **pp_args  = p_args;
+    int    i_args   = 1;
+    int    i_dummy;
 
-   gdk_threads_enter();
+    gtk_set_locale ();
+    gtk_init( &i_args, &pp_args );
+# endif
 #endif
     /* Create some useful widgets that will certainly be used */
 
@@ -181,6 +196,7 @@ static void Run( intf_thread_t *p_intf )
     gtk_widget_show( p_intf->p_sys->p_window );
     ReadDirectory(p_intf->p_sys->p_clist, "/mnt");
 
+#ifdef NEED_GTK_MAIN
     /* Sleep to avoid using all CPU - since some interfaces need to
      * access keyboard events, a 100ms delay is a good compromise */
     while( !p_intf->b_die )
@@ -189,11 +205,15 @@ static void Run( intf_thread_t *p_intf )
         msleep( INTF_IDLE_SLEEP );
         gdk_threads_enter();
     }
+#endif
 
     gtk_object_destroy( GTK_OBJECT(p_intf->p_sys->p_window) );
 
+#ifdef NEED_GTK_MAIN
     gdk_threads_leave();
+#else
     gtk_main_quit();
+#endif
 }
 
 /*****************************************************************************
