@@ -57,11 +57,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
     module_t            *p_network; /* Network module */
     network_socket_t    socket_desc; /* Socket descriptor */
     char                psz_network[6]; /* IPv4 or IPv6 */
-    struct              sockaddr_in addr; /* IPv4 connection structure */
-    struct              sockaddr_in6 addr6;/* IPv6 connection structure */
     char                *sap_ipv6_addr=NULL; /* IPv6 built address */     
-    void                *net_ipv6_addr=NULL; /* IPv6 address in net-format */
-    int                 i_status=0;  /* Problems on system calls*/
     
     /* Allocate the SAP structure */ 
     p_new = (sap_session_t *)malloc( sizeof ( sap_session_t ) ) ;
@@ -109,12 +105,6 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
             return NULL;
         }
         
-        /* Fill the sockaddr_in structure */ 
-        memset( &addr , 0 , sizeof(addr) );
-        addr.sin_family      = AF_INET;
-        addr.sin_addr.s_addr = inet_addr(SAP_IPV4_ADDR);
-        addr.sin_port        = htons( SAP_PORT );
-        p_new->addr = addr;
     }
     else
     {
@@ -133,28 +123,6 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
                          psz_v6_scope[0],
                          SAP_IPV6_ADDR_2); 
 
-        /* Convert it to network format */
-        net_ipv6_addr = (struct in6_addr *)malloc( sizeof(struct in6_addr) );
-        if ( !net_ipv6_addr )
-        {
-            msg_Err( p_sout, "No memory left" );        
-            return NULL;
-        }
-        
-#ifndef WIN32
-        i_status         = inet_pton(AF_INET6,sap_ipv6_addr,net_ipv6_addr);
-#endif
-        if(i_status < 0 )
-        {
-           msg_Warn(p_sout,"Unable to convert address to network format");
-           return NULL;
-        }
-        else if(i_status == 0)
-        {
-            msg_Warn(p_sout,"Adresse de diffusion SAP invalide"); 
-            return NULL;
-        }
-        
         /* Fill the socket descriptor */
         socket_desc.i_type        = NETWORK_UDP;
         socket_desc.psz_bind_addr = ""; 
@@ -182,18 +150,9 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
              return NULL;
          }
                 
-        /* Fill the sockaddr_in structure */
-        memset( &addr6 , 0 , sizeof(addr6) );
-        addr6.sin6_family      = AF_INET6;
-        memcpy( &addr6.sin6_addr.s6_addr , net_ipv6_addr ,
-                   sizeof(addr6.sin6_addr.s6_addr) );
-            
-        addr6.sin6_port        = htons( SAP_PORT );
-        p_new->addr6 = addr6;
 
         /* Free what we allocated */
         if( sap_ipv6_addr ) free(sap_ipv6_addr);
-        if( net_ipv6_addr ) free(net_ipv6_addr);
     }
             
     msg_Dbg (p_sout,"SAP initialization complete");
@@ -290,17 +249,13 @@ a=type:test\n", p_this->psz_name , p_this->psz_port , p_this->psz_url );
       {
           if( p_this->i_ip_version == 6)
           {
-               i_send_result =  sendto( p_this->socket , sap_send ,
-                           i_size , 0 , 
-                           (struct sockaddr *)&p_this->addr6, 
-                           sizeof(p_this->addr6) );
+               i_send_result =  send( p_this->socket , sap_send ,
+                           i_size , 0 );
           } 
           else
           {
-                i_send_result =  sendto( p_this->socket , sap_send ,
-                             i_size , 0 , 
-                             (struct sockaddr *)&p_this->addr , 
-                             sizeof(p_this->addr) );
+                i_send_result =  send( p_this->socket , sap_send ,
+                             i_size , 0 );
            }
       }
      

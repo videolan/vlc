@@ -2,10 +2,12 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.15 2003/06/20 11:42:07 alexis Exp $
+ * $Id: sap.c,v 1.16 2003/06/25 21:03:16 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
- *
+ *          Clément Stenac <zorglub@via.ecp.fr>
+ *          Damien Lucas <nitrox@videolan.org>
+ *          
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
