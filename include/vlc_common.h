@@ -282,11 +282,20 @@ typedef struct text_style_t text_style_t;
 
 /* Stream output */
 typedef struct sout_instance_t sout_instance_t;
+typedef struct sout_instance_sys_t sout_instance_sys_t;
+
 typedef struct sout_input_t sout_input_t;
 typedef struct sout_packetizer_input_t sout_packetizer_input_t;
+
 typedef struct sout_access_out_t sout_access_out_t;
+typedef struct sout_access_out_sys_t   sout_access_out_sys_t;
+
 typedef struct sout_mux_t sout_mux_t;
+typedef struct sout_mux_sys_t sout_mux_sys_t;
+
 typedef struct sout_stream_t    sout_stream_t;
+typedef struct sout_stream_sys_t sout_stream_sys_t;
+
 typedef struct sout_cfg_t       sout_cfg_t;
 typedef struct sap_session_t    sap_session_t;
 typedef struct sap_address_t sap_address_t;
