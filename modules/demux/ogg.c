@@ -297,8 +297,6 @@ static int Demux( demux_t * p_demux )
                 {
                     p_stream->secondary_header_packets = 0;
                 }
-
-                p_stream->secondary_header_packets--;
             }
 
             if( p_stream->b_reinit )
@@ -735,6 +733,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 p_stream = malloc( sizeof(logical_stream_t) );
                 memset( p_stream, 0, sizeof(logical_stream_t) );
                 p_stream->p_headers = 0;
+                p_stream->secondary_header_packets = 0;
 
                 es_format_Init( &p_stream->fmt, 0, 0 );
 
@@ -1313,14 +1312,17 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
         p_stream->secondary_header_packets =
             GetDWLE( &p_oggpacket->packet[24] );
 
-        msg_Dbg( p_this, "anxdata packet info: %qd/%qd, %d",
-                 granule_rate_numerator, granule_rate_denominator,
-                 p_stream->secondary_header_packets);
-
         /* we are guaranteed that the first header field will be
          * the content-type (by the Annodex standard) */
-        sscanf( &p_oggpacket->packet[28], "Content-Type: %1024s\r\n",
-                content_type_string );
+        if( !strncasecmp( &p_oggpacket->packet[28], "Content-Type: ", 14 ) )
+        {
+            sscanf( &p_oggpacket->packet[42], "%1024s\r\n",
+                    content_type_string );
+        }
+
+        msg_Dbg( p_this, "AnxData packet info: "I64Fd" / "I64Fd", %d, ``%s''",
+                 granule_rate_numerator, granule_rate_denominator,
+                 p_stream->secondary_header_packets, content_type_string );
 
         p_stream->f_rate = (float) granule_rate_numerator /
             (float) granule_rate_denominator;
