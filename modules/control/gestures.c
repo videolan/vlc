@@ -2,7 +2,7 @@
  * geatures.c: control vlc with mouse gestures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gestures.c,v 1.5 2003/06/22 13:27:41 sigmunau Exp $
+ * $Id: gestures.c,v 1.6 2003/11/05 00:39:16 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -83,13 +83,15 @@ static void RunIntf        ( intf_thread_t *p_intf );
 #define BUTTON_LONGTEXT N_( \
     "the mouse button to be held down during mouse gestures" )
 
-static char *button_list[] = { "left", "middle", "right", NULL };
+static char *button_list[] = { "left", "middle", "right" };
+static char *button_list_text[] = { N_("Left"), N_("Middle"), N_("Right") };
 
 vlc_module_begin();
     add_category_hint( N_( "Gestures" ), NULL, VLC_FALSE );
     add_integer( "gestures-threshold", 30, NULL, THRESHOLD_TEXT, THRESHOLD_LONGTEXT, VLC_TRUE );
-    add_string_from_list( "gestures-button", "right", button_list, NULL,
-                          BUTTON_TEXT, BUTTON_LONGTEXT, VLC_FALSE );
+    add_string( "gestures-button", "right", NULL,
+                BUTTON_TEXT, BUTTON_LONGTEXT, VLC_FALSE );
+        change_string_list( button_list, button_list_text, 0 );
     set_description( _("mouse gestures control interface") );
 
     set_capability( "interface", 0 );

@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.39 2003/10/30 21:44:48 gbazin Exp $
+ * $Id: modules_inner.h,v 1.40 2003/11/05 00:39:16 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -91,7 +91,7 @@
     EXTERN_SYMBOL DLL_SYMBOL int CDECL_SYMBOL                                 \
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
-        int i_shortcut = 1, i_config = 0;                                     \
+        int i_shortcut = 1, i_config = -1;                                    \
         module_config_t p_config[ 130 ];                                      \
         STORE_SYMBOLS;                                                        \
         p_module->b_submodule = VLC_FALSE;                                    \
@@ -114,7 +114,7 @@
         }                                                                     \
         {                                                                     \
             static module_config_t tmp = { CONFIG_HINT_END };                 \
-            p_config[ i_config ] = tmp;                                       \
+            p_config[ ++i_config ] = tmp;                                     \
         }                                                                     \
         config_Duplicate( p_module, p_config );                               \
         if( p_module->p_config == NULL )                                      \

@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.23 2003/10/25 00:49:13 sam Exp $
+ * $Id: file.c,v 1.24 2003/11/05 00:39:16 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -89,7 +89,7 @@ static void    Play        ( aout_instance_t * );
 
 static char *format_list[] = { "u8", "s8", "u16", "s16", "u16_le", "s16_le",
                                "u16_be", "s16_be", "fixed32", "float32",
-                               "spdif", NULL };
+                               "spdif" };
 static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
                             VLC_FOURCC('s','8',' ',' '),
                             AOUT_FMT_U16_NE, AOUT_FMT_S16_NE,
@@ -106,8 +106,9 @@ static int format_int[] = { VLC_FOURCC('u','8',' ',' '),
 
 vlc_module_begin();
     add_category_hint( N_("Audio"), NULL, VLC_FALSE );
-    add_string_from_list( "audiofile-format", "s16", format_list, NULL,
-                          FORMAT_TEXT, FORMAT_LONGTEXT, VLC_TRUE );
+    add_string( "audiofile-format", "s16", NULL,
+                FORMAT_TEXT, FORMAT_LONGTEXT, VLC_TRUE );
+        change_string_list( format_list, 0, 0 );
     add_file( "audiofile", "audiofile.wav", NULL, FILE_TEXT,
               FILE_LONGTEXT, VLC_FALSE );
     add_bool( "audiofile-wav", 1, NULL, WAV_TEXT, WAV_LONGTEXT, VLC_TRUE );

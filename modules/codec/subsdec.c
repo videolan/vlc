@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.4 2003/11/05 00:17:50 hartman Exp $
+ * $Id: subsdec.c,v 1.5 2003/11/05 00:39:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -89,13 +89,16 @@ static char *ppsz_encodings[] = { DEFAULT_NAME, "ASCII", "UTF-8", "",
     "C99", "JAVA", "UCS-2", "UCS-2BE", "UCS-2LE", "UCS-4", "UCS-4BE", "UCS-4LE", "",
     "HZ", "GBK", "GB18030", "JOHAB", "ARMSCII-8",
     "Georgian-Academy", "Georgian-PS", "TIS-620", "MuleLao-1", "VISCII", "TCVN",
-    "HPROMAN8", "NEXTSTEP", NULL };
+    "HPROMAN8", "NEXTSTEP" };
 #endif
+
+static int  pi_justification[] = { 0, 1, 2 };
+static char *ppsz_justification_text[] = {N_("Center"),N_("Left"),N_("Right")};
 
 #define ENCODING_TEXT N_("Subtitles text encoding")
 #define ENCODING_LONGTEXT N_("Change the encoding used in text subtitles")
 #define ALIGN_TEXT N_("Subtitles justification")
-#define ALIGN_LONGTEXT N_("Change the justification of substitles (0=center, 1=left, 2=right)")
+#define ALIGN_LONGTEXT N_("Change the justification of substitles")
 
 vlc_module_begin();
     set_description( _("text subtitles decoder") );
@@ -103,9 +106,13 @@ vlc_module_begin();
     set_callbacks( OpenDecoder, NULL );
 
     add_category_hint( N_("Subtitles"), NULL, VLC_FALSE );
-    add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, VLC_TRUE );
+    add_integer( "subsdec-align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT,
+                 VLC_TRUE );
+        change_integer_list( pi_justification, ppsz_justification_text, 0 );
 #if defined(HAVE_ICONV)
-    add_string_from_list( "subsdec-encoding", DEFAULT_NAME, ppsz_encodings, NULL, ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
+    add_string( "subsdec-encoding", DEFAULT_NAME, NULL,
+                ENCODING_TEXT, ENCODING_LONGTEXT, VLC_FALSE );
+        change_string_list( ppsz_encodings, 0, 0 );
 #endif
 vlc_module_end();
 

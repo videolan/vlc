@@ -2,7 +2,7 @@
  * transform.c : transform image plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: transform.c,v 1.14 2003/10/15 22:49:48 gbazin Exp $
+ * $Id: transform.c,v 1.15 2003/11/05 00:39:17 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -57,12 +57,15 @@ static int  SendEvents( vlc_object_t *, char const *,
 #define TYPE_TEXT N_("Transform type")
 #define TYPE_LONGTEXT N_("One of '90', '180', '270', 'hflip' and 'vflip'")
 
-static char *type_list[] = { "90", "180", "270", "hflip", "vflip", NULL };
+static char *type_list[] = { "90", "180", "270", "hflip", "vflip" };
+static char *type_list_text[] = { N_("Rotate by 90°"), N_("Rotate by 1800"),
+  N_("Rotate by 270°"), N_("Flip horizontally"), N_("Flip vertically") };
 
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL, VLC_FALSE );
-    add_string_from_list( "transform-type", "90", type_list, NULL,
+    add_string( "transform-type", "90", NULL,
                           TYPE_TEXT, TYPE_LONGTEXT, VLC_FALSE);
+        change_string_list( type_list, type_list_text, 0);
     set_description( _("video transformation filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "transform" );

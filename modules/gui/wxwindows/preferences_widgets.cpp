@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.9 2003/11/02 22:16:32 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.10 2003/11/05 00:39:16 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -53,7 +53,7 @@ ConfigControl *CreateConfigControl( vlc_object_t *p_this,
         break;
 
     case CONFIG_ITEM_STRING:
-        if( !p_item->ppsz_list )
+        if( !p_item->i_list )
         {
             p_control = new StringConfigControl( p_item, parent );
         }
@@ -69,7 +69,11 @@ ConfigControl *CreateConfigControl( vlc_object_t *p_this,
         break;
 
     case CONFIG_ITEM_INTEGER:
-        if( p_item->i_min != 0 || p_item->i_max != 0 )
+        if( p_item->i_list )
+        {
+            p_control = new IntegerListConfigControl( p_item, parent );
+        }
+        else if( p_item->i_min != 0 || p_item->i_max != 0 )
         {
             p_control = new RangedIntConfigControl( p_item, parent );
         }
@@ -359,22 +363,29 @@ StringListConfigControl::StringListConfigControl( module_config_t *p_item,
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
-    combo = new wxComboBox( this, -1, wxU(p_item->psz_value),
+    combo = new wxComboBox( this, -1, wxT(""),
                             wxDefaultPosition, wxDefaultSize,
                             0, NULL, wxCB_READONLY );
 
     /* build a list of available options */
-    for( int i_index = 0; p_item->ppsz_list[i_index];
-         i_index++ )
+    for( int i_index = 0; i_index < p_item->i_list; i_index++ )
     {
-        combo->Append( wxU(p_item->ppsz_list[i_index]) );
+        combo->Append( ( p_item->ppsz_list_text &&
+                         p_item->ppsz_list_text[i_index] ) ?
+                       wxU(p_item->ppsz_list_text[i_index]) :
+                       wxU(p_item->ppsz_list[i_index]) );
+        combo->SetClientData( i_index, (void *)p_item->ppsz_list[i_index] );
         if( p_item->psz_value && !strcmp( p_item->psz_value,
                                           p_item->ppsz_list[i_index] ) )
+        {
             combo->SetSelection( i_index );
+            combo->SetValue( ( p_item->ppsz_list_text &&
+                               p_item->ppsz_list_text[i_index] ) ?
+                             wxU(p_item->ppsz_list_text[i_index]) :
+                             wxU(p_item->ppsz_list[i_index]) );
+        }
     }
 
-    if( p_item->psz_value )
-        combo->SetValue( wxU(p_item->psz_value) );
     combo->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );    
     sizer->Layout();
@@ -388,7 +399,12 @@ StringListConfigControl::~StringListConfigControl()
 
 wxString StringListConfigControl::GetPszValue()
 {
-    return combo->GetStringSelection();
+    int selected = combo->GetSelection();
+    if( selected != -1 )
+    {
+        return (char *)combo->GetClientData( selected );
+    }
+    return wxString();
 }
 
 /*****************************************************************************
@@ -482,6 +498,60 @@ IntegerConfigControl::~IntegerConfigControl()
 int IntegerConfigControl::GetIntValue()
 {
     return spin->GetValue();
+}
+
+/*****************************************************************************
+ * IntegerListConfigControl implementation
+ *****************************************************************************/
+IntegerListConfigControl::IntegerListConfigControl( module_config_t *p_item,
+                                                    wxWindow *parent )
+  : ConfigControl( p_item, parent )
+{
+    label = new wxStaticText(this, -1, wxU(p_item->psz_text));
+    sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+    combo = new wxComboBox( this, -1, wxT(""),
+                            wxDefaultPosition, wxDefaultSize,
+                            0, NULL, wxCB_READONLY );
+
+    /* build a list of available options */
+    for( int i_index = 0; i_index < p_item->i_list; i_index++ )
+    {
+        combo->Append( ( p_item->ppsz_list_text &&
+                         p_item->ppsz_list_text[i_index] ) ?
+                       wxU(p_item->ppsz_list_text[i_index]) :
+                       wxString::Format(wxT("%i"),
+                                        p_item->pi_list[i_index]) );
+        combo->SetClientData( i_index, (void *)p_item->pi_list[i_index] );
+        if( p_item->i_value == p_item->pi_list[i_index] )
+        {
+            combo->SetSelection( i_index );
+            combo->SetValue( ( p_item->ppsz_list_text &&
+                               p_item->ppsz_list_text[i_index] ) ?
+                             wxU(p_item->ppsz_list_text[i_index]) :
+                             wxString::Format(wxT("%i"),
+                                              p_item->pi_list[i_index]) );
+        }
+    }
+
+    combo->SetToolTip( wxU(p_item->psz_longtext) );
+    sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );    
+    sizer->Layout();
+    this->SetSizerAndFit( sizer );
+}
+
+IntegerListConfigControl::~IntegerListConfigControl()
+{
+    ;
+}
+
+int IntegerListConfigControl::GetIntValue()
+{
+    int selected = combo->GetSelection();
+    if( selected != -1 )
+    {
+        return (int)combo->GetClientData( selected );
+    }
+    return -1;
 }
 
 /*****************************************************************************

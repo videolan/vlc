@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.8 2003/06/17 16:09:16 gbazin Exp $
+ * $Id: dvd.c,v 1.9 2003/11/05 00:39:16 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -79,14 +79,18 @@ static void UnprobeLibDVDCSS( void );
            "libcss.\n" \
     "The default method is: key.")
 
-static char *cssmethod_list[] = { "title", "disc", "key", NULL };
+static char *psz_css_list[] = { "title", "disc", "key" };
+static char *psz_css_list_text[] = { N_("title"), N_("Disc"), N_("Key") };
 
 vlc_module_begin();
     int i;
     add_usage_hint( N_("[dvd:][device][@raw_device][@[title][,[chapter][,angle]]]") );
     add_category_hint( N_("dvd"), NULL, VLC_TRUE );
-    add_string_from_list( "dvdcss-method", NULL, cssmethod_list, NULL,
-                          CSSMETHOD_TEXT, CSSMETHOD_LONGTEXT, VLC_TRUE );
+
+    add_string( "dvdcss-method", NULL, NULL, CSSMETHOD_TEXT,
+                CSSMETHOD_LONGTEXT, VLC_TRUE );
+        change_string_list( psz_css_list, psz_css_list_text, 0 );
+
 #ifdef GOD_DAMN_DMCA
     set_description( _("DVD input (uses libdvdcss if installed)") );
     i = 90;

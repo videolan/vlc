@@ -2,7 +2,7 @@
  * preferences_widgets.h : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: preferences_widgets.h,v 1.3 2003/10/20 12:25:22 gbazin Exp $
+ * $Id: preferences_widgets.h,v 1.4 2003/11/05 00:39:16 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -115,6 +115,16 @@ public:
     virtual int GetIntValue();
 private:
     wxSpinCtrl *spin;
+};
+
+class IntegerListConfigControl: public ConfigControl
+{
+public:
+    IntegerListConfigControl( module_config_t *p_item, wxWindow *parent );
+    ~IntegerListConfigControl();
+    virtual int GetIntValue();
+private:
+    wxComboBox *combo;
 };
 
 class RangedIntConfigControl: public ConfigControl

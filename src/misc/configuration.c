@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.66 2003/10/29 01:33:27 gbazin Exp $
+ * $Id: configuration.c,v 1.67 2003/11/05 00:39:17 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -424,6 +424,34 @@ module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 }
 
 /*****************************************************************************
+ * config_FindModule: find a specific module structure.
+ *****************************************************************************/
+module_t *config_FindModule( vlc_object_t *p_this, const char *psz_name )
+{
+    vlc_list_t *p_list;
+    module_t *p_module, *p_result = NULL;
+    int i_index;
+
+    if( !psz_name ) return NULL;
+
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    {
+        p_module = (module_t *)p_list->p_values[i_index].p_object;
+        if( !strcmp( p_module->psz_object_name, psz_name ) )
+        {
+             p_result = p_module;
+             break;
+        }
+    }
+
+    vlc_list_release( p_list );
+
+    return p_result;
+}
+
+/*****************************************************************************
  * config_Duplicate: creates a duplicate of a module's configuration data.
  *****************************************************************************
  * Unfortunatly we cannot work directly with the module's config data as
@@ -466,18 +494,7 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
     /* Do the duplication job */
     for( i = 0; i < i_lines ; i++ )
     {
-        p_module->p_config[i].i_type = p_orig[i].i_type;
-        p_module->p_config[i].i_short = p_orig[i].i_short;
-        p_module->p_config[i].i_value = p_orig[i].i_value;
-        p_module->p_config[i].i_value_orig = p_orig[i].i_value;
-        p_module->p_config[i].i_min = p_orig[i].i_min;
-        p_module->p_config[i].i_max = p_orig[i].i_max;
-        p_module->p_config[i].f_value = p_orig[i].f_value;
-        p_module->p_config[i].f_value_orig = p_orig[i].f_value;
-        p_module->p_config[i].f_min = p_orig[i].f_min;
-        p_module->p_config[i].f_max = p_orig[i].f_max;
-        p_module->p_config[i].b_dirty = p_orig[i].b_dirty;
-        p_module->p_config[i].b_advanced = p_orig[i].b_advanced;
+        p_module->p_config[i] = p_orig[i];
 
         p_module->p_config[i].psz_type = p_orig[i].psz_type ?
                                    strdup( p_orig[i].psz_type ) : NULL;
@@ -495,18 +512,43 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
         p_module->p_config[i].p_lock = &p_module->object_lock;
 
         /* duplicate the string list */
-        p_module->p_config[i].ppsz_list = NULL;
-        if( p_orig[i].ppsz_list )
+        if( p_orig[i].i_list )
         {
-            for( j = 0; p_orig[i].ppsz_list[j]; j++ );
-            p_module->p_config[i].ppsz_list = malloc( (j+1) *sizeof(char *) );
-            if( p_module->p_config[i].ppsz_list )
+            if( p_orig[i].ppsz_list )
             {
-                for( j = 0; p_orig[i].ppsz_list[j]; j++ )
-                    p_module->p_config[i].ppsz_list[j] =
-                        strdup( p_orig[i].ppsz_list[j] );
+                p_module->p_config[i].ppsz_list =
+                    malloc( (p_orig[i].i_list + 1) * sizeof(char *) );
+                if( p_module->p_config[i].ppsz_list )
+                {
+                    for( j = 0; j < p_orig[i].i_list; j++ )
+                        p_module->p_config[i].ppsz_list[j] =
+                            strdup( p_orig[i].ppsz_list[j] );
+                    p_module->p_config[i].ppsz_list[j] = NULL;
+                }
             }
-            p_module->p_config[i].ppsz_list[j] = NULL;
+            if( p_orig[i].ppsz_list_text )
+            {
+                p_module->p_config[i].ppsz_list_text =
+                    malloc( (p_orig[i].i_list + 1) * sizeof(char *) );
+                if( p_module->p_config[i].ppsz_list_text )
+                {
+                    for( j = 0; j < p_orig[i].i_list; j++ )
+                        p_module->p_config[i].ppsz_list_text[j] =
+                            strdup( _(p_orig[i].ppsz_list_text[j]) );
+                    p_module->p_config[i].ppsz_list_text[j] = NULL;
+                }
+            }
+            if( p_orig[i].pi_list )
+            {
+                p_module->p_config[i].pi_list =
+                    malloc( (p_orig[i].i_list + 1) * sizeof(int) );
+                if( p_module->p_config[i].pi_list )
+                {
+                    for( j = 0; j < p_orig[i].i_list; j++ )
+                        p_module->p_config[i].pi_list[j] =
+                            p_orig[i].pi_list[j];
+                }
+            }
         }
 
         p_module->p_config[i].pf_callback = p_orig[i].pf_callback;
@@ -548,11 +590,18 @@ void config_Free( module_t *p_module )
         if( p_item->psz_value_orig )
             free( p_item->psz_value_orig );
 
-        if( p_item->ppsz_list )
+        if( p_item->i_list )
         {
-            for( i = 0; p_item->ppsz_list[i]; i++ )
-                free(p_item->ppsz_list[i]);
-            free( p_item->ppsz_list );
+            for( i = 0; i < p_item->i_list; i++ )
+            {
+                if( p_item->ppsz_list && p_item->ppsz_list[i] )
+                    free( p_item->ppsz_list[i] );
+                if( p_item->ppsz_list_text && p_item->ppsz_list_text[i] )
+                    free( p_item->ppsz_list_text[i] );
+            }
+            if( p_item->ppsz_list ) free( p_item->ppsz_list );
+            if( p_item->ppsz_list_text ) free( p_item->ppsz_list_text );
+            if( p_item->pi_list ) free( p_item->pi_list );
         }
     }
 

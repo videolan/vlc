@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.100 2003/10/30 22:34:48 hartman Exp $
+ * $Id: libvlc.h,v 1.101 2003/11/05 00:39:17 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -26,8 +26,13 @@
 #define Nothing here, this is just to prevent update-po from being stupid
 #include "vlc_keys.h"
 
-static char *ppsz_language[] = { "auto", "en", "en_GB", "es", "de", "fr", "it", "ja",
-                                "nl", "no", "pl", "pt_BR", "ru", "sv", NULL };
+static char *ppsz_language[] =
+{ "auto", "en", "en_GB", "es", "de", "fr", "it", "ja",
+  "nl", "no", "pl", "pt_BR", "ru", "sv" };
+static char *ppsz_language_text[] =
+{ N_("Auto"), N_("English US"), N_("English GB"), N_("Spanish"), N_("German"),
+  N_("French"), N_("Italian"), N_("Japanese"), N_("Dutch"), N_("Norwegian"),
+  N_("Polish"), N_("Portugese BR"), N_("Russian"), N_("Swedish") };
 
 /*****************************************************************************
  * Configuration options for the main program. Each module will also separatly
@@ -584,16 +589,19 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "es", "de", "fr", "it", 
 vlc_module_begin();
     /* Interface options */
     add_category_hint( N_("Interface"), INTF_CAT_LONGTEXT , VLC_FALSE );
-    add_module_with_short( "intf", 'I', "interface", NULL, NULL,
-                           INTF_TEXT, INTF_LONGTEXT, VLC_TRUE );
+    add_module( "intf", "interface", NULL, NULL, INTF_TEXT,
+                INTF_LONGTEXT, VLC_TRUE );
+        change_short('I');
     add_string( "extraintf", NULL, NULL, EXTRAINTF_TEXT, 
                      EXTRAINTF_LONGTEXT, VLC_FALSE );
-    add_integer_with_short( "verbose", 'v', 0, NULL,
-                            VERBOSE_TEXT, VERBOSE_LONGTEXT, VLC_FALSE );
-    add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, 
-                            QUIET_LONGTEXT, VLC_TRUE );
-    add_string_from_list( "language", "auto", ppsz_language, NULL,
-                            LANGUAGE_TEXT, LANGUAGE_LONGTEXT, VLC_FALSE );
+    add_integer( "verbose", 0, NULL, VERBOSE_TEXT, VERBOSE_LONGTEXT,
+                 VLC_FALSE );
+        change_short('v');
+    add_bool( "quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
+        change_short('q');
+    add_string( "language", "auto", NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT,
+                VLC_FALSE );
+        change_string_list( ppsz_language, ppsz_language_text, 0 );
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, 
                             ADVANCED_LONGTEXT, VLC_FALSE );
@@ -604,8 +612,9 @@ vlc_module_begin();
 
     /* Audio options */
     add_category_hint( N_("Audio"), AOUT_CAT_LONGTEXT , VLC_FALSE );
-    add_module_with_short( "aout", 'A', "audio output", NULL, NULL,
-                           AOUT_TEXT, AOUT_LONGTEXT, VLC_TRUE);
+    add_module( "aout", "audio output", NULL, NULL, AOUT_TEXT, AOUT_LONGTEXT,
+                VLC_TRUE );
+        change_short('A');
     add_bool( "audio", 1, NULL, AUDIO_TEXT, AUDIO_LONGTEXT, VLC_FALSE );
     add_integer_with_range( "volume", AOUT_VOLUME_DEFAULT, AOUT_VOLUME_MIN,
                             AOUT_VOLUME_MAX, NULL, VOLUME_TEXT,
@@ -628,8 +637,9 @@ vlc_module_begin();
     
     /* Video options */
     add_category_hint( N_("Video"), VOUT_CAT_LONGTEXT , VLC_FALSE );
-    add_module_with_short( "vout", 'V', "video output", NULL, NULL,
-                           VOUT_TEXT, VOUT_LONGTEXT, VLC_TRUE );
+    add_module( "vout", "video output", NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT,
+                VLC_TRUE );
+        change_short('V');
     add_bool( "video", 1, NULL, VIDEO_TEXT, VIDEO_LONGTEXT, VLC_TRUE );
     add_integer( "width", -1, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, VLC_TRUE );
     add_integer( "height", -1, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, VLC_TRUE );
@@ -678,8 +688,10 @@ vlc_module_begin();
     add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT, VLC_FALSE );
     add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT, VLC_FALSE );
 
-    add_bool_with_short( "ipv6", '6', 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, VLC_FALSE );
-    add_bool_with_short( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
+    add_bool( "ipv6", 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, VLC_FALSE );
+        change_short('6');
+    add_bool( "ipv4", 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );
+        change_short('4');
 
     /* Decoder options */
     add_category_hint( N_("Decoders"), CODEC_CAT_LONGTEXT , VLC_TRUE );
@@ -722,9 +734,12 @@ vlc_module_begin();
 
     /* Playlist options */
     add_category_hint( N_("Playlist"), PLAYLIST_CAT_LONGTEXT , VLC_FALSE );
-    add_bool_with_short( "random", 'Z', 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
-    add_bool_with_short( "loop", 'L', 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
-    add_bool_with_short( "repeat", 'R', 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
+    add_bool( "random", 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
+        change_short('Z');
+    add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );
+        change_short('L');
+    add_bool( "repeat", 0, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, VLC_TRUE );
+        change_short('R');
 
     /* Misc options */
     add_category_hint( N_("Miscellaneous"), MISC_CAT_LONGTEXT, VLC_TRUE );

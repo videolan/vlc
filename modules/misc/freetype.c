@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.30 2003/10/29 12:23:50 gbazin Exp $
+ * $Id: freetype.c,v 1.31 2003/11/05 00:39:16 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -89,13 +89,17 @@ static line_desc_t *NewLine( byte_t * );
 #define FONTSIZE_TEXT N_("Font size")
 #define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module" )
 
-static char *ppsz_sizes[] = { "smaller", "small", "normal", "large", "larger", NULL};
+static char *ppsz_sizes[] = { "smaller", "small", "normal", "large", "larger"};
+static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
+                                   N_("Large"), N_("Larger") };
 
 vlc_module_begin();
     add_category_hint( N_("Fonts"), NULL, VLC_FALSE );
     add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT, VLC_FALSE );
     add_integer( "freetype-fontsize", 16, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_TRUE );
-    add_string_from_list( "freetype-rel-fontsize", "normal", ppsz_sizes, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_FALSE );
+    add_string( "freetype-rel-fontsize", "normal", NULL, FONTSIZE_TEXT,
+                FONTSIZE_LONGTEXT, VLC_FALSE );
+        change_string_list( ppsz_sizes, ppsz_sizes_text, 0 );
     set_description( _("freetype2 font renderer") );
     set_capability( "text renderer", 100 );
     add_shortcut( "text" );

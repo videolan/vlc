@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.8 2003/05/15 22:27:37 massiot Exp $
+ * $Id: logger.c,v 1.9 2003/11/05 00:39:16 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -81,14 +81,18 @@ static void HtmlPrint         ( const msg_item_t *, FILE * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static char *mode_list[] = { "text", "html", NULL };
+static char *mode_list[] = { "text", "html" };
+static char *mode_list_text[] = { N_("Text"), N_("Html") };
+
 #define LOGMODE_TEXT N_("Log format")
 #define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are \"text\" (default) and \"html\"")
 
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL, VLC_FALSE );
     add_file( "logfile", NULL, NULL, N_("log filename"), N_("Specify the log filename."), VLC_FALSE );
-    add_string_from_list( "logmode", "text", mode_list, NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT, VLC_FALSE );
+    add_string( "logmode", "text", NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT,
+                VLC_FALSE );
+        change_string_list( mode_list, mode_list_text, 0 );
     set_description( _("file logging interface") );
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
