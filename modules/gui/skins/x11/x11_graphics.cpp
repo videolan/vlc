@@ -2,7 +2,7 @@
  * x11_graphics.cpp: X11 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_graphics.cpp,v 1.2 2003/04/30 21:16:24 asmax Exp $
+ * $Id: x11_graphics.cpp,v 1.3 2003/05/18 17:48:05 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -66,16 +66,15 @@ X11Graphics::X11Graphics( intf_thread_t *p_intf, int w, int h,
         Image = XCreatePixmap( display, root, w, h,
                                DefaultDepth( display, screen ) );
         Gc = DefaultGC( display, screen );
-   }
+    }
 
     // Set the background color to black
- //   gdk_draw_rectangle( Image, Gc, TRUE, 0, 0, w, h );
+    XFillRectangle( display, Image, Gc, 0, 0, w, h );    
 }
 //---------------------------------------------------------------------------
 X11Graphics::~X11Graphics()
 {
-/*    g_object_unref( Gc );
-    g_object_unref( Image );*/
+    XFreePixmap( display, Image );
 }
 //---------------------------------------------------------------------------
 void X11Graphics::CopyFrom( int dx, int dy, int dw, int dh, Graphics *Src,

@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_theme.cpp,v 1.2 2003/05/18 17:48:05 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -165,17 +165,37 @@ void X11Theme::AddWindow( string name, int x, int y, bool visible,
 
     gdk_window_show( gwnd );*/
 
+    // Create the window
     Window root = DefaultRootWindow( display );
-    Window wnd = XCreateSimpleWindow( display, root, 0, 0, 200, 100, 0, 0, 0 );
+    Window wnd = XCreateSimpleWindow( display, root, 0, 0, 1, 1, 0, 0, 0 );
     XSelectInput( display, wnd, ExposureMask|
             KeyPressMask|KeyReleaseMask|ButtonPressMask|PointerMotionMask|
             PointerMotionHintMask| EnterWindowMask|LeaveWindowMask);
 
+    // Changing decorations
+    struct {
+        unsigned long flags;
+        unsigned long functions;
+        unsigned long decorations;
+        long input_mode;
+        unsigned long status;
+    } motifWmHints;
+
+    Atom hints_atom = XInternAtom( display, "_MOTIF_WM_HINTS", False );
+    
+    motifWmHints.flags = 2;    // MWM_HINTS_DECORATIONS;
+    motifWmHints.decorations = 0;
+
+    XChangeProperty( display, wnd, hints_atom, hints_atom, 32, 
+                     PropModeReplace, (unsigned char *)&motifWmHints, 
+                     sizeof( motifWmHints ) / sizeof( long ) );
+
+    // Display the window
     XMapRaised( display, wnd );
     XFlush( display );
 
-    WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, wnd, x, y, visible,
-        fadetime, alpha, movealpha, dragdrop, name ) ) ;
+    WindowList.push_back( (SkinWindow *)new OSWindow( p_intf, wnd, x, y, 
+        visible, fadetime, alpha, movealpha, dragdrop, name ) ) ;
 }
 //---------------------------------------------------------------------------
 void X11Theme::ChangeTray()

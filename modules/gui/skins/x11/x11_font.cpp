@@ -2,7 +2,7 @@
  * x11_font.cpp: X11 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_font.cpp,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_font.cpp,v 1.2 2003/05/18 17:48:05 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -91,6 +91,8 @@ void X11Font::AssignFont( Graphics *dest )
 //---------------------------------------------------------------------------
 void X11Font::GetSize( string text, int &w, int &h )
 {
+    w = 0;
+    h = 0;
 /*    pango_layout_set_text( Layout, text.c_str(), text.length() );
     pango_layout_get_pixel_size( Layout, &w, &h );*/
 }

@@ -2,7 +2,7 @@
  * x11_window.cpp: X11 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_window.cpp,v 1.3 2003/05/18 11:25:00 asmax Exp $
+ * $Id: x11_window.cpp,v 1.4 2003/05/18 17:48:05 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -32,6 +32,7 @@
 
 //--- X11 -------------------------------------------------------------------
 #include <X11/Xlib.h>
+#include <X11/extensions/shape.h>
 
 //--- SKIN ------------------------------------------------------------------
 #include "../os_api.h"
@@ -276,51 +277,45 @@ void X11Window::SetTransparency( int Value )
 //---------------------------------------------------------------------------
 void X11Window::RefreshFromImage( int x, int y, int w, int h )
 {
-    // Initialize painting
-/*    HDC DC = GetWindowDC( hWnd );
-
-    // Draw image on window
-    BitBlt( DC, x, y, w, h, ( (X11Graphics *)Image )->GetImageHandle(),
-            x, y, SRCCOPY );
-
-    // Release window device context
-    ReleaseDC( hWnd, DC );
-
-*/ 
     Drawable drawable = (( X11Graphics* )Image )->GetImage();
     
     XCopyArea( display, drawable, Wnd, Gc, x, y, w, h, x, y );
-    XSync( display, 0);
-/*
+ 
+    XImage *image = XGetImage( display, drawable, 0, 0, Width, Height, 
+                               AllPlanes, ZPixmap );
+ 
     // Mask for transparency
-    GdkRegion *region = gdk_region_new();
+    Region region = XCreateRegion();
     for( int line = 0; line < Height; line++ )
     {
         int start = 0, end = 0;
         while( start < Width )
         {
-            while( start < Width && gdk_image_get_pixel( image, start, line ) == 0 )
+            while( start < Width && XGetPixel( image, start, line ) == 0 )
             {
                 start++;
             } 
             end = start;
-            while( end < Width && gdk_image_get_pixel( image, end, line ) != 0)
+            while( end < Width && XGetPixel( image, end, line ) != 0)
             {
                 end++;
             }
-            GdkRectangle rect;
+            XRectangle rect;
             rect.x = start;
             rect.y = line;
             rect.width = end - start + 1;
             rect.height = 1;
-            GdkRegion *rectReg = gdk_region_rectangle( &rect );
-            gdk_region_union( region, rectReg );
-            gdk_region_destroy( rectReg );
+            Region newRegion = XCreateRegion();
+            XUnionRectWithRegion( &rect, region, newRegion );
+            XDestroyRegion( region );
+            region = newRegion;
             start = end + 1;
         }
     }
-    gdk_window_shape_combine_region( gWnd, region, 0, 0 );
-    gdk_region_destroy( region );*/
+    XShapeCombineRegion( display, Wnd, ShapeBounding, 0, 0, region, ShapeSet );
+    XDestroyRegion( region );
+
+    XSync( display, 0);
 }
 //---------------------------------------------------------------------------
 void X11Window::WindowManualMove()
@@ -347,14 +342,15 @@ void X11Window::Move( int left, int top )
 {
     Left = left;
     Top  = top;
-/*   gdk_window_move( gWnd, left, top );*/
+    XMoveWindow( display, Wnd, left, top );
+   
 }
 //---------------------------------------------------------------------------
 void X11Window::Size( int width, int height )
 {
     Width  = width;
     Height = height;
-/*    gdk_window_resize( gWnd, width, height );*/
+    XResizeWindow( display, Wnd, width, height );
 }
 //---------------------------------------------------------------------------
 void X11Window::ChangeToolTipText( string text )

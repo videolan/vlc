@@ -2,7 +2,7 @@
  * x11_bitmap.cpp: X11 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_bitmap.cpp,v 1.3 2003/05/18 11:25:00 asmax Exp $
+ * $Id: x11_bitmap.cpp,v 1.4 2003/05/18 17:48:05 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -66,11 +66,13 @@ X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
     Width = 0;
     Height = 0;
 
-    AlphaColor = AColor;
+    // TODO: check for endianness issues
+    AlphaColor = (AColor & 0xff) << 16 | (AColor & 0xff00) | 
+                 (AColor & 0xff0000) >> 16;
 
     if( FileName != "" )
     {
-        data = LoadFromFile( FileName, depth, Width, Height );
+        data = LoadFromFile( FileName, depth, AlphaColor, Width, Height );
     }
 
     // Create the image
@@ -78,45 +80,6 @@ X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, string FileName, int AColor )
                         Height, 32, 4 * Width );
     XInitImage( Bmp );
     
-    // Load the bitmap image
-/*    if( rc != BitmapSuccess )
-    {
-        if( FileName != "" )
-            msg_Warn( p_intf, "Couldn't load bitmap: %s", FileName.c_str() );
-        Width = 0;
-        Height = 0;
-    }*/
-/*    else
-    {    
-        Width = gdk_pixbuf_get_width( Bmp );
-        Height = gdk_pixbuf_get_height( Bmp );
-
-        if( AColor != 0 )
-        {
-            // Change black pixels to another color to avoid transparency
-            int rowstride = gdk_pixbuf_get_rowstride( Bmp );
-            guchar *pixel = gdk_pixbuf_get_pixels( Bmp ); 
-            int pix_size = ( gdk_pixbuf_get_has_alpha( Bmp ) ? 4 : 3 );
-            
-            for( int y = 0; y < Height; y++ )
-            {
-                for( int x = 0; x < Width; x++ )
-                {   
-                    guint32 r = pixel[0];
-                    guint32 g = pixel[1]<<8;
-                    guint32 b = pixel[2]<<16;
-                    if( r+g+b == 0 )
-                    {
-                        pixel[2] = 10; // slight blue
-                    }
-                    pixel += pix_size;
-                }
-            }
-        }
-
-        Bmp = gdk_pixbuf_add_alpha( Bmp, TRUE, AColor & 0xff, (AColor>>8) & 0xff, 
-                (AColor>>16) & 0xff );
-    }*/
 }
 //---------------------------------------------------------------------------
 X11Bitmap::X11Bitmap( intf_thread_t *_p_intf, Graphics *from, int x, int y,
@@ -178,6 +141,7 @@ bool X11Bitmap::Hit( int x, int y)
         return false;
     else
         return true;*/
+    return true;
 }
 //---------------------------------------------------------------------------
 int X11Bitmap::GetBmpPixel( int x, int y )
@@ -207,7 +171,8 @@ void X11Bitmap::SetBmpPixel( int x, int y, int color )
 //    SetPixelV( bmpDC, x, y, color );
 }
 //---------------------------------------------------------------------------
-char *X11Bitmap::LoadFromFile( string fileName, int depth, int &width, int &height )
+char *X11Bitmap::LoadFromFile( string fileName, int depth, int AColor,
+                               int &width, int &height )
 {
     // BMP header fields
     uint32_t fileSize;
@@ -241,7 +206,7 @@ char *X11Bitmap::LoadFromFile( string fileName, int depth, int &width, int &heig
     dataSize = U32( headers + 34 );
     nColors = U32( headers + 50 );
 
-//    fprintf(stderr,"image %d %d\n", width, height);
+    fprintf(stderr,"image %s %x\n", fileName.c_str(), AColor);
     switch( bpp )
     {
         case 24:
@@ -259,7 +224,17 @@ char *X11Bitmap::LoadFromFile( string fileName, int depth, int &width, int &heig
                     // Read a pixel
                     uint32_t pixel = 0;
                     fread( &pixel, 3, 1, file );
-                    *(ptr++) = U32( &pixel );
+                    pixel = U32( &pixel );
+                    // Handle transparency
+                    if( pixel == 0 && AColor != 0 )
+                    {
+                        pixel = 10; // slight blue
+                    }
+                    else if( pixel == AColor )
+                    {
+                        pixel = 0;  // global alpha color is black
+                    }
+                    *(ptr++) = pixel;
                 }
                 fseek( file, pad, SEEK_CUR );
             }

@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.4 2003/05/18 11:25:00 asmax Exp $
+ * $Id: x11_run.cpp,v 1.5 2003/05/18 17:48:05 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -368,7 +368,7 @@ void OSRun( intf_thread_t *p_intf )
         ProcessEvent( p_intf, proc, event );
 
 // kludge: add timer
-        SkinManage( p_intf );
+    //    SkinManage( p_intf );
     }
     
 }
