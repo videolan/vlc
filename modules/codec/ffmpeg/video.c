@@ -27,6 +27,7 @@
  *****************************************************************************/
 #include <vlc/vlc.h>
 #include <vlc/decoder.h>
+#include <vlc/input.h>                  /* hmmm, just for INPUT_RATE_DEFAULT */
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -172,8 +173,8 @@ static inline picture_t *ffmpeg_NewPictBuf( decoder_t *p_dec,
         p_dec->fmt_out.video.i_aspect =
             VOUT_ASPECT_FACTOR * ( av_q2d(p_context->sample_aspect_ratio) *
                 p_context->width / p_context->height );
-	p_dec->fmt_out.video.i_sar_num = p_context->sample_aspect_ratio.num;
-	p_dec->fmt_out.video.i_sar_den = p_context->sample_aspect_ratio.den;
+        p_dec->fmt_out.video.i_sar_num = p_context->sample_aspect_ratio.num;
+        p_dec->fmt_out.video.i_sar_den = p_context->sample_aspect_ratio.den;
 #else
         p_dec->fmt_out.video.i_aspect =
             VOUT_ASPECT_FACTOR * p_context->aspect_ratio;
@@ -657,7 +658,8 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             {
                 p_sys->i_pts += I64C(1000000) *
                     (2 + p_sys->p_ff_pic->repeat_pict) *
-                    p_sys->p_context->frame_rate_base /
+                    p_sys->p_context->frame_rate_base *
+                    p_block->i_rate / INPUT_RATE_DEFAULT /
                     (2 * p_sys->p_context->frame_rate);
             }
 
