@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.29 2002/12/07 22:15:10 gitan Exp $
+ * $Id: playlist.c,v 1.30 2002/12/13 16:26:35 babal Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -33,6 +33,13 @@
 
 #define PLAYLIST_STOPPED 0
 #define PLAYLIST_RUNNING 1
+
+#define PLAYLIST_FILE_HEADER_0_5  "# vlc playlist file version 0.5"
+#ifdef WIN32
+#   define PLAYLIST_FILE_EOL "\r\n"
+#else
+#   define PLAYLIST_FILE_EOL "\n"
+#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -103,8 +110,8 @@ void playlist_Destroy( playlist_t * p_playlist )
 int playlist_Add( playlist_t *p_playlist, const char * psz_target,
                                           int i_mode, int i_pos )
 {
-    playlist_item_t * p_item; 
-    
+    playlist_item_t * p_item;
+
     p_item = malloc( sizeof( playlist_item_t ) );
     if( p_item == NULL )
     {
@@ -128,20 +135,20 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
     vlc_mutex_lock( &p_playlist->object_lock );
 
     /*
-     * CHECK_INSERT : checks if the item is already enqued before 
+     * CHECK_INSERT : checks if the item is already enqued before
      * enqueing it
      */
     if ( i_mode & PLAYLIST_CHECK_INSERT )
     {
          int j;
-       
+
          if ( p_playlist->pp_items )
          {
              for ( j = 0; j < p_playlist->i_size; j++ )
              {
                  if ( !strcmp( p_playlist->pp_items[j]->psz_uri, p_item->psz_uri ) )
                  {
-                      if( p_item->psz_name ) 
+                      if( p_item->psz_name )
                       {
                           free( p_item->psz_name );
                       }
@@ -151,7 +158,7 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
                       }
                       free( p_item );
                       vlc_mutex_unlock( &p_playlist->object_lock );
-                      return 0;   
+                      return 0;
                  }
              }
          }
@@ -159,9 +166,9 @@ int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
          i_mode |= PLAYLIST_APPEND;
     }
 
-    
+
     msg_Dbg( p_playlist, "adding playlist item « %s »", p_item->psz_name );
-    
+
     /* Create the new playlist item */
 
 
@@ -299,10 +306,10 @@ void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
 
     case PLAYLIST_PLAY:
         p_playlist->i_status = PLAYLIST_RUNNING;
-	if ( p_playlist->p_input )
-	{
+        if ( p_playlist->p_input )
+        {
             input_SetStatus( p_playlist->p_input, INPUT_STATUS_PLAY );
-	}
+        }
         break;
 
     case PLAYLIST_SKIP:
@@ -550,3 +557,122 @@ static void Poubellize ( playlist_t *p_playlist, input_thread_t *p_input )
     msg_Dbg( p_playlist, "poubellizing input %i\n", p_input->i_object_id );
 }
 
+/*****************************************************************************
+ * playlist_LoadFile: load a playlist file.
+ ****************************************************************************/
+int playlist_LoadFile( playlist_t * p_playlist, const char *psz_filename )
+{
+    FILE *file;
+    char line[1024];
+    int i_current_status;
+    int i;
+
+    msg_Dbg( p_playlist, "opening playlist file %s", psz_filename );
+
+    file = fopen( psz_filename, "rt" );
+    if( !file )
+    {
+        msg_Err( p_playlist, "playlist file %s does not exist", psz_filename );
+        return -1;
+    }
+    fseek( file, 0L, SEEK_SET );
+
+    /* check the file is not empty */
+    if ( ! fgets( line, 1024, file ) )
+    {
+        msg_Err( p_playlist, "playlist file %s is empty", psz_filename );
+        fclose( file );
+        return -1;
+    }
+
+    /* get rid of line feed */
+    if( line[strlen(line)-1] == '\n' || line[strlen(line)-1] == '\r' )
+    {
+       line[strlen(line)-1] = (char)0;
+       if( line[strlen(line)-1] == '\r' ) line[strlen(line)-1] = (char)0;
+    }
+    /* check the file format is valid */
+    if ( strcmp ( line , PLAYLIST_FILE_HEADER_0_5 ) )
+    {
+        msg_Err( p_playlist, "playlist file %s format is unsupported"
+                , psz_filename );
+        fclose( file );
+        return -1;
+    }
+
+    /* stop playing */
+    i_current_status = p_playlist->i_status;
+    if ( p_playlist->i_status != PLAYLIST_STOPPED )
+    {
+        playlist_Stop ( p_playlist );
+    }
+
+    /* delete current content of the playlist */
+    for( i = p_playlist->i_size - 1; i >= 0; i-- )
+    {
+        playlist_Delete ( p_playlist , i );
+    }
+
+    /* simply add each line */
+    while( fgets( line, 1024, file ) )
+    {
+       /* ignore comments or empty lines */
+       if( (line[0] == '#') || (line[0] == '\r') || (line[0] == '\n')
+               || (line[0] == (char)0) )
+           continue;
+
+       /* get rid of line feed */
+       if( line[strlen(line)-1] == '\n' || line[strlen(line)-1] == '\r' )
+       {
+           line[strlen(line)-1] = (char)0;
+           if( line[strlen(line)-1] == '\r' ) line[strlen(line)-1] = (char)0;
+       }
+
+       playlist_Add ( p_playlist , (char*) &line , PLAYLIST_APPEND , PLAYLIST_END );
+    }
+
+    /* start playing */
+    if ( i_current_status != PLAYLIST_STOPPED )
+    {
+        playlist_Play ( p_playlist );
+    }
+
+    fclose( file );
+
+    return 0;
+}
+
+/*****************************************************************************
+ * playlist_SaveFile: Save a playlist in a file.
+ *****************************************************************************/
+int playlist_SaveFile( playlist_t * p_playlist, const char * psz_filename )
+{
+    FILE *file;
+    int i;
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    msg_Dbg( p_playlist, "saving playlist file %s", psz_filename );
+
+    file = fopen( psz_filename, "wt" );
+    if( !file )
+    {
+        msg_Err( p_playlist , "could not create playlist file %s"
+                , psz_filename );
+        return -1;
+    }
+
+    fprintf( file , PLAYLIST_FILE_HEADER_0_5 PLAYLIST_FILE_EOL );
+
+    for ( i = 0 ; i < p_playlist->i_size ; i++ )
+    {
+        fprintf( file , p_playlist->pp_items[i]->psz_uri );
+        fprintf( file , PLAYLIST_FILE_EOL );
+    }
+
+    fclose( file );
+
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    return 0;
+}

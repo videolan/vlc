@@ -1,6 +1,6 @@
 object MainFrameDlg: TMainFrameDlg
-  Left = 285
-  Top = 170
+  Left = 356
+  Top = 227
   Width = 541
   Height = 306
   BorderIcons = [biSystemMenu, biMinimize]
@@ -256,7 +256,7 @@ object MainFrameDlg: TMainFrameDlg
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 241
+    Top = 238
     Width = 533
     Height = 19
     Panels = <>
@@ -564,6 +564,7 @@ object MainFrameDlg: TMainFrameDlg
   end
   object OpenDialog1: TOpenDialog
     Filter = 'All Files (*.*)|*.*'
+    Options = [ofHideReadOnly, ofAllowMultiSelect, ofEnableSizing]
     Left = 8
     Top = 208
   end

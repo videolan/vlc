@@ -147,8 +147,9 @@ void __fastcall TMainFrameDlg::OpenFileActionExecute( TObject *Sender )
     if( OpenDialog1->Execute() )
     {
         /* add the new file to the interface playlist */
-         p_intf->p_sys->p_playwin->Add( OpenDialog1->FileName,
-                                        PLAYLIST_APPEND | PLAYLIST_GO,
+        for ( int i = 0 ; i < OpenDialog1->Files->Count ; i++ )
+            p_intf->p_sys->p_playwin->Add( OpenDialog1->Files->Strings[i],
+                                        PLAYLIST_APPEND,
                                         PLAYLIST_END );
     };
 }

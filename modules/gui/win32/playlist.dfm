@@ -1,6 +1,6 @@
 object PlaylistDlg: TPlaylistDlg
-  Left = 346
-  Top = 231
+  Left = 433
+  Top = 308
   Width = 335
   Height = 436
   Caption = 'Playlist'
@@ -58,23 +58,41 @@ object PlaylistDlg: TPlaylistDlg
   end
   object MainMenuPlaylist: TMainMenu
     Left = 8
-    Top = 352
+    Top = 8
+    object MenuFile: TMenuItem
+      Caption = '&File'
+      object MenuFileOpen: TMenuItem
+        Caption = '&Open...'
+        OnClick = MenuFileOpenClick
+      end
+      object MenuFileSave: TMenuItem
+        Caption = '&Save...'
+        OnClick = MenuFileSaveClick
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object MenuFileClose: TMenuItem
+        Caption = '&Close'
+        OnClick = MenuFileCloseClick
+      end
+    end
     object MenuAdd: TMenuItem
       Tag = 3
       Caption = '&Add'
       object MenuAddFile: TMenuItem
         Tag = 3
-        Caption = '&File'
+        Caption = '&File...'
         OnClick = MenuAddFileClick
       end
       object MenuAddDisc: TMenuItem
         Tag = 3
-        Caption = '&Disc'
+        Caption = '&Disc...'
         OnClick = MenuAddDiscClick
       end
       object MenuAddNet: TMenuItem
         Tag = 3
-        Caption = '&Network'
+        Caption = '&Network...'
         OnClick = MenuAddNetClick
       end
       object MenuAddUrl: TMenuItem
@@ -112,7 +130,7 @@ object PlaylistDlg: TPlaylistDlg
   end
   object PopupMenuPlaylist: TPopupMenu
     Left = 40
-    Top = 352
+    Top = 8
     object PopupPlay: TMenuItem
       Tag = 3
       Action = PlayStreamAction
@@ -145,8 +163,8 @@ object PlaylistDlg: TPlaylistDlg
     end
   end
   object ActionList1: TActionList
-    Left = 264
-    Top = 352
+    Left = 72
+    Top = 8
     object InvertSelectionAction: TAction
       Tag = 3
       Caption = 'Invert'
@@ -177,5 +195,17 @@ object PlaylistDlg: TPlaylistDlg
       Hint = 'Play the selected stream'
       OnExecute = PlayStreamActionExecute
     end
+  end
+  object PlaylistOpenDlg: TOpenDialog
+    Filter = 'All files(*.*)|*.*'
+    Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
+    Left = 136
+    Top = 8
+  end
+  object PlaylistSaveDlg: TSaveDialog
+    Filter = 'All files(*.*)|*.*'
+    Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
+    Left = 104
+    Top = 8
   end
 end

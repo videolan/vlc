@@ -33,7 +33,8 @@
 #include <ComCtrls.hpp>
 #include <ActnList.hpp>
 
-#include <oleidl.h>                                   /* for drag and drop */
+#include <oleidl.h>
+#include <Dialogs.hpp>                                   /* for drag and drop */
 
 /*****************************************************************************
  * This message is sent to the controls registered as drop targets
@@ -72,6 +73,13 @@ __published:	// IDE-managed Components
     TAction *DeleteSelectionAction;
     TAction *DeleteAllAction;
     TAction *PlayStreamAction;
+    TMenuItem *MenuFile;
+    TMenuItem *MenuFileOpen;
+    TMenuItem *MenuFileSave;
+   TMenuItem *N3;
+    TMenuItem *MenuFileClose;
+    TOpenDialog *PlaylistOpenDlg;
+    TSaveDialog *PlaylistSaveDlg;
     void __fastcall FormShow( TObject *Sender );
     void __fastcall FormHide( TObject *Sender );
     void __fastcall BitBtnOkClick( TObject *Sender );
@@ -88,6 +96,9 @@ __published:	// IDE-managed Components
     void __fastcall DeleteSelectionActionExecute( TObject *Sender );
     void __fastcall DeleteAllActionExecute( TObject *Sender );
     void __fastcall PlayStreamActionExecute( TObject *Sender );
+   void __fastcall MenuFileCloseClick(TObject *Sender);
+    void __fastcall MenuFileOpenClick(TObject *Sender);
+    void __fastcall MenuFileSaveClick(TObject *Sender);
 private:	// User declarations
     char * __fastcall rindex( char *s, char c );
     intf_thread_t *p_intf;

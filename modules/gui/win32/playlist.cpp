@@ -411,3 +411,29 @@ void __fastcall TPlaylistDlg::Next()
 }
 //---------------------------------------------------------------------------
 
+
+void __fastcall TPlaylistDlg::MenuFileCloseClick(TObject *Sender)
+{
+    Hide();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TPlaylistDlg::MenuFileOpenClick(TObject *Sender)
+{
+    if ( PlaylistOpenDlg->Execute() )
+    {
+        playlist_LoadFile ( p_playlist , PlaylistOpenDlg->FileName.c_str() );
+        UpdateGrid();
+    }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TPlaylistDlg::MenuFileSaveClick(TObject *Sender)
+{
+    if ( PlaylistSaveDlg->Execute() )
+    {
+        playlist_SaveFile ( p_playlist , PlaylistSaveDlg->FileName.c_str() );
+    }
+}
+//---------------------------------------------------------------------------
+
