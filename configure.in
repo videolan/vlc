@@ -408,18 +408,20 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
   dnl
   dnl Old FreeBSD: sys/cdio.h
   dnl
-  AC_EGREP_HEADER(dvd_struct,sys/dvdio.h,[
-    AC_DEFINE(DVD_STRUCT_IN_SYS_DVDIO_H, 1,
-              Define if <sys/dvdio.h> defines dvd_struct.)
-    BSD_DVD_STRUCT=1
+  AC_EGREP_HEADER(dvd_struct,sys/cdio.h,[
+    AC_DEFINE(DVD_STRUCT_IN_SYS_CDIO_H, 1,
+              Define if <sys/cdio.h> defines dvd_struct.)
+    AC_EGREP_HEADER(struct dvd_struct,sys/cdio.h,[
+                    BSD_DVD_STRUCT=1],[LINUX_DVD_STRUCT=1])
   ])
   dnl
   dnl Newer FreeBSD: sys/dvdio.h
   dnl
-  AC_EGREP_HEADER(dvd_struct,sys/cdio.h,[
-    AC_DEFINE(DVD_STRUCT_IN_SYS_CDIO_H, 1,
-              Define if <sys/cdio.h> defines dvd_struct.)
-    BSD_DVD_STRUCT=1
+  AC_EGREP_HEADER(dvd_struct,sys/dvdio.h,[
+    AC_DEFINE(DVD_STRUCT_IN_SYS_DVDIO_H, 1,
+              Define if <sys/dvdio.h> defines dvd_struct.)
+    AC_EGREP_HEADER(struct dvd_struct,sys/dvdio.h,[
+                    BSD_DVD_STRUCT=1],[LINUX_DVD_STRUCT=1])
   ])
   dnl
   dnl Linux: linux/cdrom.h
@@ -467,7 +469,7 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
   else
     if test x$BSD_DVD_STRUCT = x1; then
       AC_DEFINE(HAVE_BSD_DVD_STRUCT, 1,
-                Define if BSD-like dvd_struct is defined.)
+                Define if FreeBSD-like dvd_struct is defined.)
     fi
   fi
 ])
