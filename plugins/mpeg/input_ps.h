@@ -2,7 +2,7 @@
  * input_ps.h: thread structure of the PS plugin
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ps.h,v 1.8 2001/05/31 03:12:49 sam Exp $
+ * $Id: input_ps.h,v 1.9 2001/10/02 16:46:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -21,16 +21,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-/*****************************************************************************
- * thread_ps_data_t: extension of input_thread_t
- *****************************************************************************/
-typedef struct thread_ps_data_s
-{
-    /* We're necessarily reading a file. */
-    FILE *                  stream;
-} thread_ps_data_t;
-
 
 #define DATA_CACHE_SIZE 150
 #define PES_CACHE_SIZE 150

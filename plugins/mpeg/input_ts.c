@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.33 2001/09/06 18:21:02 henri Exp $
+ * $Id: input_ts.c,v 1.34 2001/10/02 16:46:59 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -89,7 +89,6 @@
  *****************************************************************************/
 static int  TSProbe     ( probedata_t * );
 static void TSInit      ( struct input_thread_s * );
-static void TSFakeOpen  ( struct input_thread_s * );
 static void TSEnd       ( struct input_thread_s * );
 static int  TSRead      ( struct input_thread_s *,
                           data_packet_t * p_packets[INPUT_READ_ONCE] );
@@ -103,8 +102,8 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = TSProbe;
     input.pf_init             = TSInit;
-    input.pf_open             = TSFakeOpen;
-    input.pf_close            = NULL;              /* Will be set by pf_open */
+    input.pf_open             = NULL;
+    input.pf_close            = NULL;
     input.pf_end              = TSEnd;
     input.pf_init_bit_stream  = InitBitstream;
     input.pf_set_area         = NULL;
@@ -127,8 +126,7 @@ static int TSProbe( probedata_t * p_data )
     input_thread_t * p_input = (input_thread_t *)p_data;
 
     char * psz_name = p_input->p_source;
-    int i_handle;
-    int i_score = 1;
+    int i_score = 2;
 
     if( TestMethod( INPUT_METHOD_VAR, "ts" ) )
     {
@@ -153,13 +151,6 @@ static int TSProbe( probedata_t * p_data )
         /* If it is a ".ts" file it's probably a TS file ... */
         return( 900 );
     }
-
-    i_handle = open( psz_name, 0 );
-    if( i_handle == -1 )
-    {
-        return( 0 );
-    }
-    close( i_handle );
 
     return( i_score );
 }
@@ -204,9 +195,6 @@ static void TSInit( input_thread_t * p_input )
     /* Initialize the stream */
     input_InitStream( p_input, sizeof( stream_ts_data_t ) );
 
-    /* input method type */
-    /* FIXME: should test if you have network or file here */
-    p_input->stream.i_method = INPUT_METHOD_NETWORK;
     p_input->stream.p_selected_area->i_tell = 0;
 
     /* Init */
@@ -224,30 +212,6 @@ static void TSInit( input_thread_t * p_input )
     p_demux_data->p_psi_section = malloc(sizeof(psi_section_t));
     p_demux_data->p_psi_section->b_is_complete = 1;
 
-}
-
-/*****************************************************************************
- * TSFakeOpen: open the stream and set pf_close
- *****************************************************************************/
-void TSFakeOpen( input_thread_t * p_input )
-{
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
-    char *psz_name = p_input->p_source;
-
-    if( ( strlen(psz_name) > 3 ) && !strncasecmp( psz_name, "ts:", 3 ) )
-    {
-        /* If the user specified "ts:" he wants a network stream */
-        p_input->pf_open  = p_input->pf_network_open;
-        p_input->pf_close = p_input->pf_network_close;
-    }
-    else
-#endif
-    {
-        p_input->pf_open  = p_input->pf_file_open;
-        p_input->pf_close = p_input->pf_file_close;
-    }
-
-    p_input->pf_open( p_input );
 }
 
 /*****************************************************************************

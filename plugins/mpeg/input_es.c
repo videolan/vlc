@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.9 2001/07/30 00:53:05 sam Exp $
+ * $Id: input_es.c,v 1.10 2001/10/02 16:46:59 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -100,7 +100,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = ESProbe;
     input.pf_init             = ESInit;
-    input.pf_open             = NULL; /* Set in ESInit */
+    input.pf_open             = NULL;
     input.pf_close            = NULL;
     input.pf_end              = ESEnd;
     input.pf_init_bit_stream  = ESInitBitstream;
@@ -127,21 +127,12 @@ static int ESProbe( probedata_t *p_data )
 {
     input_thread_t * p_input = (input_thread_t *)p_data;
 
-    char * psz_name = p_input->p_source;
-    int i_handle;
     int i_score = 5;
 
     if( TestMethod( INPUT_METHOD_VAR, "es" ) )
     {
         return( 999 );
     }
-
-    i_handle = open( psz_name, 0 );
-    if( i_handle == -1 )
-    {
-        return( 0 );
-    }
-    close( i_handle );
 
     return( i_score );
 }
@@ -163,9 +154,6 @@ static void ESInit( input_thread_t * p_input )
         return;
     }
 
-    p_input->pf_open  = p_input->pf_file_open;
-    p_input->pf_close = p_input->pf_file_close;
-
     /* FIXME : detect if InitStream failed */
     input_InitStream( p_input, 0 );
     input_AddProgram( p_input, 0, 0 );
@@ -175,7 +163,6 @@ static void ESInit( input_thread_t * p_input )
     p_es->i_type = MPEG1_VIDEO_ES;
     p_es->i_cat = VIDEO_ES;
     input_SelectES( p_input, p_es );
-    p_input->stream.i_method = INPUT_METHOD_FILE;
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.pp_programs[0]->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );

@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.40 2001/07/17 09:48:08 massiot Exp $
+ * $Id: modules.c,v 1.41 2001/10/02 16:46:59 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -365,6 +365,8 @@ module_t * module_Need( int i_capabilities, void *p_data )
                     }
                 }
             }
+            intf_WarnMsg( 3, "module: %s has score %d",
+                          p_module->psz_name, i_totalscore );
 
             /* If the high score was broken, we have a new champion */
             if( i_totalscore > i_bestscore )

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.61 2001/08/09 20:16:17 jlj Exp $
+ * $Id: input_programs.c,v 1.62 2001/10/02 16:46:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,7 +56,6 @@
 int input_InitStream( input_thread_t * p_input, size_t i_data_len )
 {
 
-    p_input->stream.i_method = INPUT_METHOD_NONE;
     p_input->stream.i_stream_id = 0;
 
     /* initialized to 0 since we don't give the signal to the interface

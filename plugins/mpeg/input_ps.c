@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.35 2001/10/01 16:18:48 massiot Exp $
+ * $Id: input_ps.c,v 1.36 2001/10/02 16:46:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -108,7 +108,7 @@ void _M( input_getfunctions )( function_list_t * p_function_list )
 #define input p_function_list->functions.input
     p_function_list->pf_probe = PSProbe;
     input.pf_init             = PSInit;
-    input.pf_open             = NULL; /* Set in PSInit */
+    input.pf_open             = NULL;
     input.pf_close            = NULL;
     input.pf_end              = PSEnd;
     input.pf_init_bit_stream  = InitBitstream;
@@ -136,7 +136,6 @@ static int PSProbe( probedata_t *p_data )
     input_thread_t * p_input = (input_thread_t *)p_data;
 
     char * psz_name = p_input->p_source;
-    int i_handle;
     int i_score = 10;
 
     if( TestMethod( INPUT_METHOD_VAR, "ps" ) )
@@ -144,19 +143,14 @@ static int PSProbe( probedata_t *p_data )
         return( 999 );
     }
 
-    if( ( strlen(psz_name) > 5 ) && !strncasecmp( psz_name, "file:", 5 ) )
+    if( ( strlen(psz_name) > 5 ) && (!strncasecmp( psz_name, "file:", 5 )
+                                      || !strncasecmp( psz_name, "http:", 5 )) )
     {
-        /* If the user specified "file:" then it's probably a file */
+        /* If the user specified "file:" or "http:" then it's probably a
+         * PS file */
         i_score = 100;
         psz_name += 5;
     }
-
-    i_handle = open( psz_name, 0 );
-    if( i_handle == -1 )
-    {
-        return( 0 );
-    }
-    close( i_handle );
 
     return( i_score );
 }
@@ -166,18 +160,8 @@ static int PSProbe( probedata_t *p_data )
  *****************************************************************************/
 static void PSInit( input_thread_t * p_input )
 {
-    thread_ps_data_t *  p_method;
     packet_cache_t *    p_packet_cache;
 
-    p_method = (thread_ps_data_t *)malloc( sizeof(thread_ps_data_t) );
-    if( p_method == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_input->p_plugin_data = (void *)p_method;
-    
     /* creates the packet cache structure */
     p_packet_cache = malloc( sizeof(packet_cache_t) );
     if ( p_packet_cache == NULL )
@@ -187,10 +171,6 @@ static void PSInit( input_thread_t * p_input )
         return;
     }
     p_input->p_method_data = (void *)p_packet_cache;
-
-    /* Set callback */
-    p_input->pf_open  = p_input->pf_file_open;
-    p_input->pf_close = p_input->pf_file_close;
 
     /* Initialize packet cache mutex */
     vlc_mutex_init( &p_packet_cache->lock );
@@ -239,16 +219,18 @@ static void PSInit( input_thread_t * p_input )
     }
     p_packet_cache->largebuffer.l_index = 0;
     
-    /* Re-open the socket as a buffered FILE stream */
-    p_method->stream = fdopen( p_input->i_handle, "r" );
-
-    if( p_method->stream == NULL )
+    if( p_input->p_stream == NULL )
     {
-        intf_ErrMsg( "Cannot open file (%s)", strerror(errno) );
-        p_input->b_error = 1;
-        return;
+        /* Re-open the socket as a buffered FILE stream */
+        p_input->p_stream = fdopen( p_input->i_handle, "r" );
+
+        if( p_input->p_stream == NULL )
+        {
+            intf_ErrMsg( "Cannot open file (%s)", strerror(errno) );
+            p_input->b_error = 1;
+            return;
+        }
     }
-    rewind( p_method->stream );
 
     /* FIXME : detect if InitStream failed */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
@@ -258,6 +240,8 @@ static void PSInit( input_thread_t * p_input )
     {
         stream_ps_data_t * p_demux_data =
              (stream_ps_data_t *)p_input->stream.pp_programs[0]->p_demux_data;
+
+        rewind( p_input->p_stream );
 
         /* Pre-parse the stream to gather stream_descriptor_t. */
         p_input->stream.pp_programs[0]->b_is_ok = 0;
@@ -298,10 +282,9 @@ static void PSInit( input_thread_t * p_input )
                 break;
             }
         }
-        rewind( p_method->stream );
+        rewind( p_input->p_stream );
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
-        p_input->stream.i_method = INPUT_METHOD_FILE;
         p_input->stream.p_selected_area->i_tell = 0;
 
         if( p_demux_data->b_has_PSM )
@@ -427,18 +410,16 @@ static void PSEnd( input_thread_t * p_input )
 static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
                                 size_t i_len )
 {
-    thread_ps_data_t *  p_method;
     int                 i_error;
 
-    p_method = (thread_ps_data_t *)p_input->p_plugin_data;
-    while( fread( p_buffer, i_len, 1, p_method->stream ) != 1 )
+    while( fread( p_buffer, i_len, 1, p_input->p_stream ) != 1 )
     {
-        if( feof( p_method->stream ) )
+        if( feof( p_input->p_stream ) )
         {
             return( 1 );
         }
 
-        if( (i_error = ferror( p_method->stream )) )
+        if( (i_error = ferror( p_input->p_stream )) )
         {
             intf_ErrMsg( "Read failed (%s)", strerror(i_error) );
             return( -1 );
@@ -463,9 +444,6 @@ static int PSRead( input_thread_t * p_input,
     data_packet_t *     p_data;
     size_t              i_packet_size;
     int                 i_packet, i_error;
-    thread_ps_data_t *  p_method;
-
-    p_method = (thread_ps_data_t *)p_input->p_plugin_data;
 
     memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
     for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
@@ -494,7 +472,7 @@ static int PSRead( input_thread_t * p_input,
             while( (i_startcode & 0xFFFFFF00) != 0x100L )
             {
                 i_startcode <<= 8;
-                if( (i_dummy = getc( p_method->stream )) != EOF )
+                if( (i_dummy = getc( p_input->p_stream )) != EOF )
                 {
                     i_startcode |= i_dummy;
                 }
@@ -600,15 +578,11 @@ static int PSRead( input_thread_t * p_input,
  *****************************************************************************/
 static void PSSeek( input_thread_t * p_input, off_t i_position )
 {
-    thread_ps_data_t *  p_method;
-
-    p_method = (thread_ps_data_t *)p_input->p_plugin_data;
-
     /* A little bourrin but should work for a while --Meuuh */
 #if defined( WIN32 ) || defined( SYS_GNU0_2 )
-    fseek( p_method->stream, (long)i_position, SEEK_SET );
+    fseek( p_input->p_stream, (long)i_position, SEEK_SET );
 #else
-    fseeko( p_method->stream, i_position, SEEK_SET );
+    fseeko( p_input->p_stream, i_position, SEEK_SET );
 #endif
 
     p_input->stream.p_selected_area->i_tell = i_position;

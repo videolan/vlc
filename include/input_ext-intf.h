@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.43 2001/10/01 16:18:48 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.44 2001/10/02 16:46:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -284,17 +284,10 @@ typedef struct input_thread_s
                                             * backwards (it's gonna be fun)  */
     void                 (* pf_seek)( struct input_thread_s *, off_t );
 
-    /* Special callback functions */
-    void                 (* pf_file_open )     ( struct input_thread_s * );
-    void                 (* pf_file_close )    ( struct input_thread_s * );
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
-    void                 (* pf_network_open )  ( struct input_thread_s * );
-    void                 (* pf_network_close ) ( struct input_thread_s * );
-#endif
-
     char *                  p_source;
 
     int                     i_handle;           /* socket or file descriptor */
+    FILE *                  p_stream;                       /* if applicable */
     int                     i_read_once;        /* number of packet read by
                                                  * pf_read once */
     void *                  p_method_data;     /* data of the packet manager */

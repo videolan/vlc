@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.86 2001/09/30 01:26:44 stef Exp $
+ * $Id: input_dvd.c,v 1.87 2001/10/02 16:46:59 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -238,9 +238,6 @@ static void DVDInit( input_thread_t * p_input )
 
     /* Initialize ES structures */
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
-
-    /* disc input method */
-    p_input->stream.i_method = INPUT_METHOD_DVD;
 
 #define title_inf p_dvd->p_ifo->vmg.title_inf
     intf_WarnMsg( 2, "dvd info: number of titles: %d", title_inf.i_title_nb );

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.132 2001/10/01 16:18:48 massiot Exp $
+ * $Id: input.c,v 1.133 2001/10/02 16:46:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -91,6 +91,7 @@ static void FileOpen        ( input_thread_t *p_input );
 static void FileClose       ( input_thread_t *p_input );
 #if !defined( SYS_BEOS ) && !defined( SYS_NTO )
 static void NetworkOpen     ( input_thread_t *p_input );
+static void HTTPOpen        ( input_thread_t *p_input );
 static void NetworkClose    ( input_thread_t *p_input );
 #endif
 
@@ -157,14 +158,6 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
                             VOUT_GRAYSCALE_VAR, VOUT_GRAYSCALE_DEFAULT );
     p_input->stream.control.i_smp = main_GetIntVariable(
                             VDEC_SMP_VAR, VDEC_SMP_DEFAULT );
-
-    /* Setup callbacks */
-    p_input->pf_file_open     = FileOpen;
-    p_input->pf_file_close    = FileClose;
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
-    p_input->pf_network_open  = NetworkOpen;
-    p_input->pf_network_close = NetworkClose;
-#endif
 
     intf_WarnMsg( 1, "input: playlist item `%s'", p_input->p_source );
 
@@ -387,16 +380,14 @@ static int InitThread( input_thread_t * p_input )
     p_input->c_loops                    = 0;
     p_input->stream.c_packets_read      = 0;
     p_input->stream.c_packets_trashed   = 0;
+    p_input->p_stream                   = NULL;
 
     /* Set locks. */
     vlc_mutex_init( &p_input->stream.stream_lock );
     vlc_cond_init( &p_input->stream.stream_wait );
     vlc_mutex_init( &p_input->stream.control.control_lock );
 
-    /* Default, might get overwritten */
-    p_input->pf_open = p_input->pf_file_open;
-    p_input->pf_close = p_input->pf_file_close;
-
+    /* Find appropriate module. */
     p_input->p_input_module = module_Need( MODULE_CAPABILITY_INPUT,
                                            (probedata_t *)p_input );
 
@@ -409,14 +400,6 @@ static int InitThread( input_thread_t * p_input )
 
 #define f p_input->p_input_module->p_functions->input.functions.input
     p_input->pf_init          = f.pf_init;
-    if( f.pf_open != NULL )
-    {
-        p_input->pf_open      = f.pf_open;
-    }
-    if( f.pf_close != NULL )
-    {
-        p_input->pf_close     = f.pf_close;
-    }
     p_input->pf_end           = f.pf_end;
     p_input->pf_init_bit_stream= f.pf_init_bit_stream;
     p_input->pf_read          = f.pf_read;
@@ -430,8 +413,31 @@ static int InitThread( input_thread_t * p_input )
     p_input->pf_seek          = f.pf_seek;
 #undef f
 
-    /* We found the appropriate plugin, open the target */
-    p_input->pf_open( p_input );
+    /* FIXME : this is waaaay too kludgy */
+    if( (strlen( p_input->p_source ) > 3) && !strncasecmp( p_input->p_source, "ts:", 3 ) )
+    {
+        /* Network stream */
+        NetworkOpen( p_input );
+        p_input->stream.i_method = INPUT_METHOD_NETWORK;
+    }
+    else if( ( strlen( p_input->p_source ) > 5 ) && !strncasecmp( p_input->p_source, "http:", 5 ) )
+    {
+        /* HTTP stream */
+        HTTPOpen( p_input );
+        p_input->stream.i_method = INPUT_METHOD_NETWORK;
+    }
+    else if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    {
+        /* DVD - this is THE kludge */
+        p_input->p_input_module->p_functions->input.functions.input.pf_open( p_input );
+        p_input->stream.i_method = INPUT_METHOD_DVD;
+    }
+    else
+    {
+        /* File input */
+        FileOpen( p_input );
+        p_input->stream.i_method = INPUT_METHOD_FILE;
+    }
 
     if( p_input->b_error )
     {
@@ -500,7 +506,22 @@ static void EndThread( input_thread_t * p_input )
     p_input->pf_end( p_input );
 
     /* Close stream */
-    p_input->pf_close( p_input );
+    if( (strlen( p_input->p_source ) > 3) && !strncasecmp( p_input->p_source, "ts:", 3 ) )
+    {
+        NetworkClose( p_input );
+    }
+    else if( ( strlen( p_input->p_source ) > 5 ) && !strncasecmp( p_input->p_source, "http:", 5 ) )
+    {
+        NetworkClose( p_input );
+    }
+    else if( ( strlen( p_input->p_source ) > 4 ) && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
+    {
+        p_input->p_input_module->p_functions->input.functions.input.pf_close( p_input );
+    }
+    else
+    {
+        FileClose( p_input );
+    }
 
     /* Release modules */
     module_Unneed( p_input->p_input_module );
@@ -538,8 +559,6 @@ static void FileOpen( input_thread_t * p_input )
 
     char *psz_name = p_input->p_source;
 
-    /* FIXME: this code ought to be in the plugin so that code can
-     * be shared with the *_Probe function */
     if( ( i_stat = stat( psz_name, &stat_info ) ) == (-1) )
     {
         int i_size = strlen( psz_name );
@@ -709,7 +728,7 @@ static void NetworkOpen( input_thread_t * p_input )
                 }
 
                 /* port before broadcast address */
-                if( *psz_port != ':' )
+                if( *psz_port != '\0' )
                 {
                     i_port = atoi( psz_port );
                 }
@@ -894,7 +913,286 @@ static void NetworkClose( input_thread_t * p_input )
 #ifdef WIN32 
     WSACleanup();
 #endif
-
 }
+
+/*****************************************************************************
+ * HTTPOpen : make an HTTP request
+ *****************************************************************************/
+static void HTTPOpen( input_thread_t * p_input )
+{
+    char                *psz_server = NULL;
+    char                *psz_path = NULL;
+    char                *psz_proxy;
+    int                 i_port = 0;
+    int                 i_opt;
+    struct sockaddr_in  sock;
+    char                psz_buffer[256];
+
+#ifdef WIN32
+    WSADATA Data;
+    int i_err;
 #endif
+    
+#ifdef WIN32
+    /* WinSock Library Init. */
+    i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
+
+    if( i_err )
+    {
+        intf_ErrMsg( "input: can't initiate WinSocks, error %i", i_err );
+        return ;
+    }
+#endif
+    
+    /* Get the remote server */
+    if( p_input->p_source != NULL )
+    {
+        psz_server = p_input->p_source;
+
+        /* Skip the protocol name */
+        while( *psz_server && *psz_server != ':' )
+        {
+            psz_server++;
+        }
+
+        /* Skip the "://" part */
+        while( *psz_server && (*psz_server == ':' || *psz_server == '/') )
+        {
+            psz_server++;
+        }
+
+        /* Found a server name */
+        if( *psz_server )
+        {
+            char *psz_port = psz_server;
+
+            /* Skip the hostname part */
+            while( *psz_port && *psz_port != ':' && *psz_port != '/' )
+            {
+                psz_port++;
+            }
+
+            /* Found a port name */
+            if( *psz_port )
+            {
+                if( *psz_port == ':' )
+                {
+                    /* Replace ':' with '\0' */
+                    *psz_port = '\0';
+                    psz_port++;
+                }
+
+                psz_path = psz_port;
+                while( *psz_path && *psz_path != '/' )
+                {
+                    psz_path++;
+                }
+
+                if( *psz_path )
+                {
+                    *psz_path = '\0';
+                    psz_path++;
+                }
+                else
+                {
+                    psz_path = NULL;
+                }
+
+                if( *psz_port != '\0' )
+                {
+                    i_port = atoi( psz_port );
+                }
+            }
+        }
+        else
+        {
+            psz_server = NULL;
+        }
+    }
+
+    /* Check that we got a valid server */
+    if( psz_server == NULL )
+    {
+        intf_ErrMsg( "input error: No server given" );
+        p_input->b_error = 1;
+        return;
+    }
+
+    /* Check that we got a valid port */
+    if( i_port == 0 )
+    {
+        i_port = 80; /* FIXME */
+    }
+
+    intf_WarnMsg( 2, "input: server=%s port=%d path=%s", psz_server,
+                  i_port, psz_path );
+
+    /* Open a SOCK_STREAM (TCP) socket, in the AF_INET domain, automatic (0)
+     *      * protocol */
+    p_input->i_handle = socket( AF_INET, SOCK_STREAM, 0 );
+    if( p_input->i_handle == -1 )
+    {
+        intf_ErrMsg( "input error: can't create socket (%s)", strerror(errno) );        p_input->b_error = 1;
+        return;
+    }
+
+    /* We may want to reuse an already used socket */
+    i_opt = 1;
+    if( setsockopt( p_input->i_handle, SOL_SOCKET, SO_REUSEADDR,
+                    (void *) &i_opt, sizeof( i_opt ) ) == -1 )
+    {
+        intf_ErrMsg( "input error: can't configure socket (SO_REUSEADDR: %s)",
+                     strerror(errno));
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+
+    /* Check proxy */
+    if( (psz_proxy = main_GetPszVariable( "http_proxy", NULL )) != NULL )
+    {
+        /* http://myproxy.mydomain:myport/ */
+        int                 i_proxy_port = 0;
+
+        /* Skip the protocol name */
+        while( *psz_proxy && *psz_proxy != ':' )
+        {
+            psz_proxy++;
+        }
+
+        /* Skip the "://" part */
+        while( *psz_proxy && (*psz_proxy == ':' || *psz_proxy == '/') )
+        {
+            psz_proxy++;
+        }
+
+        /* Found a proxy name */
+        if( *psz_proxy )
+        {
+            char *psz_port = psz_proxy;
+
+            /* Skip the hostname part */
+            while( *psz_port && *psz_port != ':' && *psz_port != '/' )
+            {
+                psz_port++;
+            }
+
+            /* Found a port name */
+            if( *psz_port )
+            {
+                char * psz_junk;
+
+                /* Replace ':' with '\0' */
+                *psz_port = '\0';
+                psz_port++;
+
+                psz_junk = psz_port;
+                while( *psz_junk && *psz_junk != '/' )
+                {
+                    psz_junk++;
+                }
+
+                if( *psz_junk )
+                {
+                    *psz_junk = '\0';
+                }
+
+                if( *psz_port != '\0' )
+                {
+                    i_proxy_port = atoi( psz_port );
+                }
+            }
+        }
+        else
+        {
+            intf_ErrMsg( "input error: http_proxy environment variable is invalid !" );
+            close( p_input->i_handle );
+            p_input->b_error = 1;
+            return;
+        }
+
+        /* Build socket for proxy connection */
+        if ( network_BuildRemoteAddr( &sock, psz_proxy ) == -1 )
+        {
+            intf_ErrMsg( "input error: can't build remote address" );
+            close( p_input->i_handle );
+            p_input->b_error = 1;
+            return;
+        }
+        sock.sin_port = htons( i_proxy_port );
+    }
+    else
+    {
+        /* No proxy, direct connection */
+        if ( network_BuildRemoteAddr( &sock, psz_server ) == -1 )
+        {
+            intf_ErrMsg( "input error: can't build remote address" );
+            close( p_input->i_handle );
+            p_input->b_error = 1;
+            return;
+        }
+        sock.sin_port = htons( i_port );
+    }
+
+    /* Connect the socket */
+    if( connect( p_input->i_handle, (struct sockaddr *) &sock,
+                 sizeof( sock ) ) == (-1) )
+    {
+        intf_ErrMsg( "input error: can't connect socket (%s)",
+                     strerror(errno) );
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+
+    p_input->stream.b_seekable = 0;
+    p_input->stream.b_pace_control = 1; /* TCP/IP... */
+
+    /* Prepare GET ... */
+    if( psz_proxy != NULL )
+    {
+        snprintf( psz_buffer, sizeof(psz_buffer),
+                  "GET http://%s:%d/%s HTTP/1.0\r\n\r\n", psz_server,
+                  i_port, psz_path );
+    }
+    else
+    {
+        snprintf( psz_buffer, sizeof(psz_buffer), "GET /%s HTTP/1.0\r\n\r\n",
+                  psz_path );
+    }
+    psz_buffer[sizeof(psz_buffer) - 1] = '\0';
+
+    /* Send GET ... */
+    if( write( p_input->i_handle, psz_buffer, strlen( psz_buffer ) ) == (-1) )
+    {
+        intf_ErrMsg( "input error: can't send request (%s)", strerror(errno) );
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+
+    /* Read HTTP header - this is gonna be fun with plug-ins which do not
+     * use p_input->p_stream :-( */
+    if( (p_input->p_stream = fdopen( p_input->i_handle, "r+" )) == NULL )
+    {
+        intf_ErrMsg( "input error: can't reopen socket (%s)", strerror(errno) );
+        close( p_input->i_handle );
+        p_input->b_error = 1;
+        return;
+    }
+
+    while( !feof( p_input->p_stream ) && !ferror( p_input->p_stream ) )
+    {
+        if( fgets( psz_buffer, sizeof(psz_buffer), p_input->p_stream ) == NULL
+             || *psz_buffer == '\r' || *psz_buffer == '\0' )
+        {
+            break;
+        }
+        /* FIXME : check Content-Type one day */
+    }
+
+    intf_WarnMsg( 3, "input: successfully opened HTTP mode" );
+}
+
+#endif /* !defined( SYS_BEOS ) && !defined( SYS_NTO ) */
 
