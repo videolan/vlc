@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.16 2003/06/03 22:18:58 gbazin Exp $
+ * $Id: streamout.cpp,v 1.17 2003/06/22 15:43:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -74,9 +74,9 @@ enum
     TS_ENCAPSULATION = 0,
     PS_ENCAPSULATION,
     AVI_ENCAPSULATION,
-    MP4_ENCAPSULATION,
     OGG_ENCAPSULATION,
-    ENCAPS_NUM
+    ENCAPS_NUM,
+    MP4_ENCAPSULATION
 };
 
 /*****************************************************************************
@@ -452,8 +452,8 @@ wxPanel *SoutDialog::EncapsulationPanel( wxWindow* parent )
         wxT("MPEG TS"),
         wxT("MPEG PS"),
         wxT("AVI"),
-        wxT("MP4/MOV"),
-        wxT("Ogg")
+        wxT("Ogg"),
+        wxT("MP4/MOV")
     };
 
     /* Stuff everything into the main panel */

@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.40 2003/02/07 00:29:53 sam Exp $
+ * $Id: interface.h,v 1.41 2003/06/22 15:43:54 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -72,7 +72,7 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
          msg_Info( p_intf, _("\nWarning: if you can't access the GUI " \
                              "anymore, open a dos command box, go to the " \
                              "directory where you installed VLC and run " \
-                             "\"vlc -I win32\"\n") )
+                             "\"vlc -I wxwin\"\n") )
 #else
 #    define CONSOLE_INTRO_MSG
 #endif
