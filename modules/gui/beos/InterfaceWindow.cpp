@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.40 2003/05/30 17:30:54 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.41 2003/05/30 18:43:31 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -858,8 +858,7 @@ InterfaceWindow::_SetMenusEnabled(bool hasFile, bool hasChapters, bool hasTitles
         if ( fSpeedMenu->IsEnabled() != hasFile )
              fSpeedMenu->SetEnabled( hasFile );
         // "goto menu" menu item
-        bool hasMenu = config_GetInt( p_intf, "beos-dvdmenus" ) ?
-                           hasTitles : false;
+        bool hasMenu = p_wrapper->IsUsingMenus();
         if ( fGotoMenuMI->IsEnabled() != hasMenu )
              fGotoMenuMI->SetEnabled( hasMenu );
         Unlock();
