@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.24 2003/07/23 01:13:47 gbazin Exp $
+ * $Id: vlc.h,v 1.25 2003/08/14 13:09:42 sigmunau Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@ typedef union
     struct { int i_low, i_high; } time;
     struct { char *psz_name; int i_object_id; } var;
 
-    /* Make sure the structure is at least 64bits */
+   /* Make sure the structure is at least 64bits */
     struct { char a, b, c, d, e, f, g, h; } padding;
 
 } vlc_value_t;
@@ -106,13 +106,15 @@ struct vlc_list_t
 #define PLAYLIST_RANDOM           3                          /* Shuffle play */
 #define PLAYLIST_REVERSE_RANDOM  -3                  /* Reverse shuffle play */
 
-/* Playlist commands */
-#define PLAYLIST_PLAY   1                         /* Starts playing. No arg. */
-#define PLAYLIST_PAUSE  2                 /* Toggles playlist pause. No arg. */
-#define PLAYLIST_STOP   3                          /* Stops playing. No arg. */
-#define PLAYLIST_SKIP   4                          /* Skip X items and play. */
-#define PLAYLIST_GOTO   5                                  /* Goto Xth item. */
-#define PLAYLIST_MODE   6                          /* Set playlist mode. ??? */
+/** Playlist commands */
+typedef enum {
+    PLAYLIST_PLAY,                              /**< Starts playing. No arg. */
+    PLAYLIST_PAUSE,                     /**< Toggles playlist pause. No arg. */
+    PLAYLIST_STOP,                               /**< Stops playing. No arg. */
+    PLAYLIST_SKIP,                               /**< Skip X items and play. */
+    PLAYLIST_GOTO,                                       /**< Goto Xth item. */
+    PLAYLIST_MODE                                /**< Set playlist mode. ??? */
+} playlist_command_t;
 
 /*****************************************************************************
  * Required internal headers
