@@ -2,7 +2,7 @@
  * ogg.c : ogg stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ogg.c,v 1.40 2003/10/22 17:12:30 gbazin Exp $
+ * $Id: ogg.c,v 1.41 2003/10/23 16:48:45 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  * 
@@ -606,7 +606,7 @@ static int Ogg_FindLogicalStreams( input_thread_t *p_input, demux_sys_t *p_ogg)
                     }
                 }
                 /* Check for Speex header */
-                if( oggpacket.bytes >= 7 &&
+                else if( oggpacket.bytes >= 7 &&
                     ! strncmp( &oggpacket.packet[0], "Speex", 5 ) )
                 {
                     oggpack_buffer opb;
