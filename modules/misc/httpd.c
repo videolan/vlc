@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.1 2003/02/23 19:05:22 fenrir Exp $
+ * $Id: httpd.c,v 1.2 2003/02/24 11:14:16 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -73,9 +73,9 @@
 #define FREE( p ) if( p ) { free( p); (p) = NULL; }
 
 #if defined( WIN32 ) || defined( UNDER_CE )
-#define SOCKET_CLOSE    closesocket;
+#define SOCKET_CLOSE(a)    closesocket(a)
 #else
-#define SOCKET_CLOSE    close
+#define SOCKET_CLOSE(a)    close(a)
 #endif
 
 /*****************************************************************************
@@ -389,14 +389,16 @@ static int BuildAddr( struct sockaddr_in * p_socket,
  * listen on a host for a httpd instance
  */
 
-static httpd_host_t     *_RegisterHost( httpd_sys_t *p_httpt, char *psz_host_addr, int i_port )
+static httpd_host_t *_RegisterHost( httpd_sys_t *p_httpt, char *psz_host_addr, int i_port )
 {
     httpd_host_t    *p_host;
     struct sockaddr_in  sock;
     int i;
     int fd = -1;
     int i_opt;
+#if !defined( WIN32 ) && !defined( UNDER_CE )
     int i_flags;
+#endif
 
     if( BuildAddr( &sock, psz_host_addr, i_port ) )
     {
@@ -440,12 +442,22 @@ static httpd_host_t     *_RegisterHost( httpd_sys_t *p_httpt, char *psz_host_add
         msg_Warn( p_httpt, "cannot configure socket (SO_REUSEADDR)" );
     }
     /* bind it */
-    if( bind( fd, &sock, sizeof( struct sockaddr_in ) ) < 0 )
+    if( bind( fd, (struct sockaddr *)&sock, sizeof( struct sockaddr_in ) ) < 0 )
     {
         msg_Err( p_httpt, "cannot bind socket" );
         goto socket_failed;
     }
     /* set to non-blocking */
+#if defined( WIN32 ) || defined( UNDER_CE )
+    {
+        unsigned long i_dummy = 1;
+        if( ioctlsocket( fd, FIONBIO, &i_dummy ) != 0 )
+        {
+            msg_Err( p_httpt, "cannot set socket to non-blocking mode" );
+            goto socket_failed;
+        }
+    }
+#else
     if( ( i_flags = fcntl( fd, F_GETFL, 0 ) ) < 0 )
     {
         msg_Err( p_httpt, "cannot F_GETFL socket" );
@@ -456,6 +468,7 @@ static httpd_host_t     *_RegisterHost( httpd_sys_t *p_httpt, char *psz_host_add
         msg_Err( p_httpt, "cannot F_SETFL O_NONBLOCK" );
         goto socket_failed;
     }
+#endif
     /* listen */
     if( listen( fd, LISTEN_BACKLOG ) < 0 )
     {
@@ -1357,10 +1370,18 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
             struct  sockaddr_in sock;
             int     fd;
 
-            fd = accept( p_httpt->host[i]->fd, &sock, &i_sock_size );
+            fd = accept( p_httpt->host[i]->fd, (struct sockaddr *)&sock,
+                         &i_sock_size );
             if( fd > 0 )
             {
+#if defined( WIN32 ) || defined( UNDER_CE )
+                {
+                    unsigned long i_dummy = 1;
+                    ioctlsocket( fd, FIONBIO, &i_dummy );
+                }
+#else
                 fcntl( fd, F_SETFL, O_NONBLOCK );
+#endif
 
                 if( p_httpt->i_connection_count >= HTTPD_MAX_CONNECTION )
                 {
@@ -1542,4 +1563,3 @@ static void httpd_Thread( httpd_sys_t *p_httpt )
     _UnregisterFile( p_httpt, p_page_404 );
     _UnregisterFile( p_httpt, p_page_admin );
 }
-
