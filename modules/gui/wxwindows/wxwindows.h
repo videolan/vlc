@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.14 2003/03/30 11:43:38 gbazin Exp $
+ * $Id: wxwindows.h,v 1.15 2003/04/01 16:11:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -39,6 +39,7 @@ struct intf_sys_t
 {
     /* the wx parent window */
     wxWindow            *p_wxwindow;
+    wxIcon              *p_icon;
 
     /* secondary windows */
     Playlist            *p_playlist_window;
@@ -156,7 +157,6 @@ private:
     intf_thread_t *p_intf;
 
     wxFrame *p_prefs_dialog;
-    wxFrame  *p_fileinfo_window;
 
     int i_old_playing_status;
 };

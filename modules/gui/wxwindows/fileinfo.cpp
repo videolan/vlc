@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.5 2003/03/26 00:56:22 gbazin Exp $
+ * $Id: fileinfo.cpp,v 1.6 2003/04/01 16:11:43 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -61,9 +61,9 @@ BEGIN_EVENT_TABLE(FileInfo, wxFrame)
     /* Button events */
     EVT_BUTTON(wxID_OK, FileInfo::OnClose)
 
-    /* Special events : we don't want to destroy the window when the user
-     * clicks on (X) */
+    /* Destroy the window when the user closes the window */
     EVT_CLOSE(FileInfo::OnClose)
+
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -76,13 +76,19 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     /* Initializations */
     intf_thread_t *p_intf = _p_intf;
     input_thread_t *p_input = p_intf->p_sys->p_input;
+    SetIcon( *p_intf->p_sys->p_icon );
+    SetAutoLayout(TRUE);
+
+    /* Create a panel to put everything in */
+    wxPanel *panel = new wxPanel( this, -1 );
+    panel->SetAutoLayout( TRUE );
 
     wxTreeCtrl *tree =
-        new wxTreeCtrl( this, -1, wxDefaultPosition, wxSize(350,350),
+        new wxTreeCtrl( panel, -1, wxDefaultPosition, wxSize(350,350),
                         wxTR_HAS_BUTTONS | wxTR_HIDE_ROOT | wxSUNKEN_BORDER );
 
     /* Create the OK button */
-    wxButton *ok_button = new wxButton( this, wxID_OK, _("OK") );
+    wxButton *ok_button = new wxButton( panel, wxID_OK, _("OK") );
     ok_button->SetDefault();
 
     /* Place everything in sizers */
@@ -90,14 +96,22 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     ok_button_sizer->Add( ok_button, 0, wxALL, 5 );
     ok_button_sizer->Layout();
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
-    main_sizer->Add( tree, 1, wxGROW|wxEXPAND | wxALL, 5 );
-    main_sizer->Add( ok_button_sizer, 0, wxALIGN_CENTRE );
+    wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
+    panel_sizer->Add( tree, 1, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( ok_button_sizer, 0, wxALIGN_CENTRE );
+    panel_sizer->Layout();
+    panel->SetSizerAndFit( panel_sizer );
+    main_sizer->Add( panel, 1, wxEXPAND, 0 );
     main_sizer->Layout();
-    SetAutoLayout(TRUE);
     SetSizerAndFit( main_sizer );
-    if ( !p_intf->p_sys->p_input ) {
+
+    if ( !p_intf->p_sys->p_input )
+    {
+        /* Nothing to show, but hey... */
+        Show( true );
         return;
     }
+
     vlc_mutex_lock( &p_input->stream.stream_lock );
     wxTreeItemId root = tree->AddRoot( p_input->psz_name );
     tree->Expand( root );
@@ -107,12 +121,15 @@ FileInfo::FileInfo( intf_thread_t *_p_intf, Interface *_p_main_interface ):
         wxTreeItemId cat = tree->AppendItem( root, p_cat->psz_name );
         input_info_t *p_info = p_cat->p_info;
         while ( p_info ) {
-            tree->AppendItem( cat, wxString(p_info->psz_name) + ": " + p_info->psz_value );
+            tree->AppendItem( cat, wxString(p_info->psz_name) + ": "
+                              + p_info->psz_value );
             p_info = p_info->p_next;
         }
         p_cat = p_cat->p_next;
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    Show( true );
 }
 
 FileInfo::~FileInfo()

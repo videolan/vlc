@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.11 2003/04/01 00:18:29 gbazin Exp $
+ * $Id: open.cpp,v 1.12 2003/04/01 16:11:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -144,6 +144,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
     /* Initializations */
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
+    SetIcon( *p_intf->p_sys->p_icon );
 
     /* Create a panel to put everything in */
     wxPanel *panel = new wxPanel( this, -1 );

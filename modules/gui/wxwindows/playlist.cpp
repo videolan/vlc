@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.6 2003/03/26 00:56:22 gbazin Exp $
+ * $Id: playlist.cpp,v 1.7 2003/04/01 16:11:43 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -98,6 +98,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     /* Initializations */
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
+    SetIcon( *p_intf->p_sys->p_icon );
 
     /* Create our "Manage" menu */
     wxMenu *manage_menu = new wxMenu;

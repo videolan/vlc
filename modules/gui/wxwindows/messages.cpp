@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: messages.cpp,v 1.1 2002/12/15 22:45:09 ipkiss Exp $
+ * $Id: messages.cpp,v 1.2 2003/04/01 16:11:43 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -76,6 +76,7 @@ Messages::Messages( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     /* Initializations */
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
+    SetIcon( *p_intf->p_sys->p_icon );
 
     /* Create a panel to put everything in */
     wxPanel *messages_panel = new wxPanel( this, -1 );

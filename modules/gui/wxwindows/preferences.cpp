@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.9 2003/04/01 00:18:29 gbazin Exp $
+ * $Id: preferences.cpp,v 1.10 2003/04/01 16:11:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -188,6 +188,8 @@ BEGIN_EVENT_TABLE(PrefsDialog, wxFrame)
     EVT_BUTTON(wxID_CANCEL, PrefsDialog::OnCancel)
     EVT_BUTTON(wxID_SAVE, PrefsDialog::OnSave)
 
+    /* Don't destroy the window when the user closes it */
+    EVT_CLOSE(PrefsDialog::OnCancel)
 END_EVENT_TABLE()
 
 // menu and control ids
@@ -223,6 +225,7 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, Interface *_p_main_interface)
     /* Initializations */
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
+    SetIcon( *p_intf->p_sys->p_icon );
 
     /* Create a panel to put everything in */
     wxPanel *panel = new wxPanel( this, -1 );
@@ -435,7 +438,9 @@ PrefsTreeCtrl::PrefsTreeCtrl( wxWindow *_p_parent, intf_thread_t *_p_intf,
     p_sizer->Layout();
 
     /* Update Tree Ctrl */
+#ifndef WIN32 /* Workaround a bug in win32 implementation */
     SelectItem( GetFirstChild( root_item, cookie ) );
+#endif
 }
 
 PrefsTreeCtrl::~PrefsTreeCtrl()
@@ -677,10 +682,10 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         case CONFIG_ITEM_FLOAT:
             label = new wxStaticText(panel, -1, p_item->psz_text);
             spin = new wxSpinCtrl( panel, -1,
-                                   wxString::Format("%d", p_item->i_value),
+                                   wxString::Format("%f", p_item->f_value),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
-                                   0, 16000, p_item->i_value);
+                                   0, 16000, (int)p_item->f_value);
             spin->SetToolTip( p_item->psz_longtext );
             config_data->control.spinctrl = spin;
             panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );

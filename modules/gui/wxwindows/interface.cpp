@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.18 2003/04/01 00:18:29 gbazin Exp $
+ * $Id: interface.cpp,v 1.19 2003/04/01 16:11:43 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -138,11 +138,11 @@ Interface::Interface( intf_thread_t *_p_intf ):
     /* Initializations */
     p_intf = _p_intf;
     p_prefs_dialog = NULL;
-    p_fileinfo_window = NULL;
     i_old_playing_status = PAUSE_S;
 
     /* Give our interface a nice little icon */
-    SetIcon( *new wxIcon( vlc_xpm ) );
+    p_intf->p_sys->p_icon = new wxIcon( vlc_xpm );
+    SetIcon( *p_intf->p_sys->p_icon );
 
     /* Create a sizer for the main frame */
     frame_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -183,7 +183,6 @@ Interface::Interface( intf_thread_t *_p_intf ):
 Interface::~Interface()
 {
     if( p_prefs_dialog ) p_prefs_dialog->Destroy();
-    if( p_fileinfo_window ) p_fileinfo_window->Destroy();
 }
 
 /*****************************************************************************
@@ -417,16 +416,8 @@ void Interface::OnLogs( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::OnFileInfo( wxCommandEvent& WXUNUSED(event) )
 {
-    /* Show/hide the fileinfo window */
-    if( p_fileinfo_window == NULL )
-    {
-        p_fileinfo_window = new FileInfo( p_intf, this );
-    }
-
-    if( p_fileinfo_window )
-    {
-        p_fileinfo_window->Show( true );//! p_messages_window->IsShown() );
-    }
+    /* Open a fileinfo window */
+    new FileInfo( p_intf, this );
 }
 
 void Interface::OnPreferences( wxCommandEvent& WXUNUSED(event) )
