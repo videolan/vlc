@@ -8,7 +8,7 @@
 %define cvs     	1
 %if %{cvs}
 %define	cvsrel		1
-%define cvsdate 	20021220
+%define cvsdate 	20030116
 %define release		0.%{cvsdate}.%{cvsrel}mdk
 %define cvs_name 	%{name}-snapshot-%cvsdate
 %else
@@ -46,6 +46,10 @@
 %define redhat80 0
 %if %redhat80
 %define release %rel
+# some mdk macros that do not exist in rh
+%define configure2_5x CFLAGS="$RPM_OPT_FLAGS" ./configure --prefix=/usr
+%define make %__make
+%define makeinstall_std make DESTDIR="$RPM_BUILD_ROOT" install
 # adjust define for Redhat.
 %endif
 
@@ -739,6 +743,7 @@ rm -fr %buildroot
 %_libdir/vlc/demux/libes_plugin.so
 %_libdir/vlc/demux/libid3_plugin.so
 %_libdir/vlc/demux/libm3u_plugin.so
+%_libdir/vlc/demux/libm4v_plugin.so
 %_libdir/vlc/demux/libmp4_plugin.so
 %_libdir/vlc/demux/libmpeg_system_plugin.so
 %_libdir/vlc/demux/libps_plugin.so
@@ -760,6 +765,7 @@ rm -fr %buildroot
 %_libdir/vlc/misc/libsap_plugin.so
 
 %dir %_libdir/vlc/mux
+%_libdir/vlc/mux/libmux_avi_plugin.so
 %_libdir/vlc/mux/libmux_dummy_plugin.so
 %_libdir/vlc/mux/libmux_ps_plugin.so
 %_libdir/vlc/mux/libmux_ts_plugin.so
@@ -950,7 +956,7 @@ rm -fr %buildroot
 %files plugin-mad
 %defattr(-,root,root)
 %doc README
-%_libdir/vlc/codec/libmad_plugin.so
+%_libdir/vlc/audio_filter/libmpgatofixed32_plugin.so
 %_libdir/vlc/demux/libid3tag_plugin.so
 %endif
 
