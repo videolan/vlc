@@ -34,7 +34,7 @@
 
 #include "vlc_bits.h"
 
-#define DEBUG_DVBSUB 1
+//#define DEBUG_DVBSUB 1
 
 /*****************************************************************************
  * Module descriptor.
