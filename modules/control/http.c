@@ -1662,9 +1662,9 @@ static void MacroDo( httpd_file_sys_t *p_args,
 #define POSITION_ABSOLUTE 12
 #define POSITION_REL_FOR 13
 #define POSITION_REL_BACK 11
-#define TIME_ABSOLUTE 0
-#define TIME_REL_FOR 1
-#define TIME_REL_BACK -1
+#define VL_TIME_ABSOLUTE 0
+#define VL_TIME_REL_FOR 1
+#define VL_TIME_REL_BACK -1
                     if( p_sys->p_input )
                     {
                         uri_extract_value( p_request, "seek_value", value, 20 );
@@ -1679,13 +1679,13 @@ static void MacroDo( httpd_file_sys_t *p_args,
                             {
                                 case '+':
                                 {
-                                    i_relative = TIME_REL_FOR;
+                                    i_relative = VL_TIME_REL_FOR;
                                     p_value++;
                                     break;
                                 }
                                 case '-':
                                 {
-                                    i_relative = TIME_REL_BACK;
+                                    i_relative = VL_TIME_REL_BACK;
                                     p_value++;
                                     break;
                                 }
@@ -1755,7 +1755,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
 
                         switch(i_relative)
                         {
-                            case TIME_ABSOLUTE:
+                            case VL_TIME_ABSOLUTE:
                             {
                                 if( (uint64_t)( i_value ) * 1000000 <= i_length )
                                     val.i_time = (uint64_t)( i_value ) * 1000000;
@@ -1766,7 +1766,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                                 msg_Dbg( p_intf, "requested seek position: %dsec", i_value );
                                 break;
                             }
-                            case TIME_REL_FOR:
+                            case VL_TIME_REL_FOR:
                             {
                                 var_Get( p_sys->p_input, "time", &val );
                                 if( (uint64_t)( i_value ) * 1000000 + val.i_time <= i_length )
@@ -1780,7 +1780,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
                                 msg_Dbg( p_intf, "requested seek position forward: %dsec", i_value );
                                 break;
                             }
-                            case TIME_REL_BACK:
+                            case VL_TIME_REL_BACK:
                             {
                                 var_Get( p_sys->p_input, "time", &val );
                                 if( (int64_t)( i_value ) * 1000000 > val.i_time )
@@ -1827,9 +1827,9 @@ static void MacroDo( httpd_file_sys_t *p_args,
 #undef POSITION_ABSOLUTE
 #undef POSITION_REL_FOR
 #undef POSITION_REL_BACK
-#undef TIME_ABSOLUTE
-#undef TIME_REL_FOR
-#undef TIME_REL_BACK
+#undef VL_TIME_ABSOLUTE
+#undef VL_TIME_REL_FOR
+#undef VL_TIME_REL_BACK
                     break;
                 }
                 case MVLC_VOLUME:
