@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.70 2002/08/26 23:00:22 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.71 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -24,18 +24,6 @@
 
 #ifndef _VLC_INPUT_EXT_DEC_H
 #define _VLC_INPUT_EXT_DEC_H 1
-
-/* ES streams types - see ISO/IEC 13818-1 table 2-29 numbers.
- * these values are used in src/input/mpeg_system.c, and in
- * the following plugins: mpeg_ts, mpeg_ts_dvbpsi, input_satellite. */
-#define MPEG1_VIDEO_ES      0x01
-#define MPEG2_VIDEO_ES      0x02
-#define MPEG1_AUDIO_ES      0x03
-#define MPEG2_AUDIO_ES      0x04
-#define A52_AUDIO_ES        0x81
-/* These ones might violate the norm : */
-#define DVD_SPU_ES          0x82
-#define LPCM_AUDIO_ES       0x83
 
 /* Structures exported to the decoders */
 

@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.12 2002/08/25 09:39:59 sam Exp $
+ * $Id: aout_internal.h,v 1.13 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -126,6 +126,10 @@ typedef struct aout_mixer_t
  *****************************************************************************/
 struct aout_input_t
 {
+    /* When this lock is taken, the pipeline cannot be changed by a
+     * third-party. */
+    vlc_mutex_t             lock;
+
     audio_sample_format_t   input;
     aout_alloc_t            input_alloc;
 
@@ -166,16 +170,26 @@ struct aout_instance_t
 {
     VLC_COMMON_MEMBERS
 
+    /* Locks : please note that if you need several of these locks, it is
+     * mandatory (to avoid deadlocks) to take them in the following order :
+     * p_input->lock, mixer_lock, output_fifo_lock, input_fifo_lock.
+     * --Meuuh */
+    /* When input_fifos_lock is taken, none of the p_input->fifo structures
+     * can be read or modified by a third-party thread. */
+    vlc_mutex_t             input_fifos_lock;
+    /* When mixer_lock is taken, all decoder threads willing to mix a
+     * buffer must wait until it is released. The output pipeline cannot
+     * be modified. No input stream can be added or removed. */
+    vlc_mutex_t             mixer_lock;
+    /* When output_fifo_lock is taken, the p_aout->output.fifo structure
+     * cannot be read or written  by a third-party thread. */
+    vlc_mutex_t             output_fifo_lock;
+
     /* Input streams & pre-filters */
-    vlc_mutex_t             input_lock;
-    vlc_cond_t              input_signal;
-    int                     i_inputs_active;
-    vlc_bool_t              b_change_requested;
     aout_input_t *          pp_inputs[AOUT_MAX_INPUTS];
     int                     i_nb_inputs;
 
     /* Mixer */
-    vlc_mutex_t             mixer_lock;
     aout_mixer_t            mixer;
 
     /* Output plug-in */

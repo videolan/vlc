@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.2 2002/08/11 21:59:46 massiot Exp $
+ * $Id: lpcm.c,v 1.3 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -64,7 +64,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
 
-    if( p_fifo->i_fourcc != VLC_FOURCC('l','p','c','m') )
+    if( p_fifo->i_fourcc != VLC_FOURCC('l','p','c','m')
+         && p_fifo->i_fourcc != VLC_FOURCC('l','p','c','b') )
     {   
         return VLC_EGENERIC;
     }

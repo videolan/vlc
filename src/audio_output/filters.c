@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.7 2002/08/28 22:25:39 massiot Exp $
+ * $Id: filters.c,v 1.8 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -183,7 +183,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
         return 0;
     }
 
-    /* We'll have to split the conversion. We always to the downmixing
+    /* We'll have to split the conversion. We always do the downmixing
      * before the resampling, and the upmixing after the resampling (to
      * maximize the resampling efficiency). */
     b_rate_first = (p_input_format->i_channels < p_output_format->i_channels);

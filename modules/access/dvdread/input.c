@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.3 2002/08/29 23:53:22 massiot Exp $
+ * $Id: input.c,v 1.4 2002/08/30 22:22:24 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -679,7 +679,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     i_id = ( ( 0x80 + i_position ) << 8 ) | 0xbd;
                     p_es = input_AddES( p_input, NULL, i_id, 0 );
                     p_es->i_stream_id = 0xbd;
-                    p_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                    p_es->i_fourcc = VLC_FOURCC('a','5','2','b');
                     p_es->i_cat = AUDIO_ES;
                     strcpy( p_es->psz_desc, DecodeLanguage(
                         p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ); 
@@ -703,7 +703,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     i_id = ( ( 0xa0 + i_position ) << 8 ) | 0xbd;
                     p_es = input_AddES( p_input, NULL, i_id, 0 );
                     p_es->i_stream_id = i_id;
-                    p_es->i_fourcc = VLC_FOURCC('l','p','c','m');
+                    p_es->i_fourcc = VLC_FOURCC('l','p','c','b');
                     p_es->i_cat = AUDIO_ES;
                     strcpy( p_es->psz_desc, DecodeLanguage(
                         p_vts->vtsi_mat->vts_audio_attr[i-1].lang_code ) ); 
@@ -766,7 +766,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                 i_id = ( ( 0x20 + i_position ) << 8 ) | 0xbd;
                 p_es = input_AddES( p_input, NULL, i_id, 0 );
                 p_es->i_stream_id = 0xbd;
-                p_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                p_es->i_fourcc = VLC_FOURCC('s','p','u','b');
                 p_es->i_cat = SPU_ES;
                 strcpy( p_es->psz_desc, DecodeLanguage(
                     p_vts->vtsi_mat->vts_subp_attr[i-1].lang_code ) ); 
@@ -1226,13 +1226,13 @@ static void DvdReadLauchDecoders( input_thread_t * p_input )
             {
                 int     i_a52 = i_audio;
                 while( ( p_input->stream.pp_es[i_a52]->i_fourcc !=
-                       VLC_FOURCC('a','5','2',' ') ) && ( i_a52 <=
+                       VLC_FOURCC('a','5','2','b') ) && ( i_a52 <=
                        p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams ) )
                 {
                     i_a52++;
                 }
                 if( p_input->stream.pp_es[i_a52]->i_fourcc
-                     == VLC_FOURCC('a','5','2',' ') )
+                     == VLC_FOURCC('a','5','2','b') )
                 {
                     input_SelectES( p_input,
                                     p_input->stream.pp_es[i_a52] );

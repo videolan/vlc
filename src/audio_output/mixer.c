@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.10 2002/08/26 23:00:23 massiot Exp $
+ * $Id: mixer.c,v 1.11 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,6 +38,8 @@
 
 /*****************************************************************************
  * aout_MixerNew: prepare a mixer plug-in
+ *****************************************************************************
+ * Please note that you must hold the mixer lock.
  *****************************************************************************/
 int aout_MixerNew( aout_instance_t * p_aout )
 {
@@ -52,6 +54,8 @@ int aout_MixerNew( aout_instance_t * p_aout )
 
 /*****************************************************************************
  * aout_MixerDelete: delete the mixer
+ *****************************************************************************
+ * Please note that you must hold the mixer lock.
  *****************************************************************************/
 void aout_MixerDelete( aout_instance_t * p_aout )
 {
@@ -69,6 +73,8 @@ static int MixBuffer( aout_instance_t * p_aout )
     audio_date_t exact_start_date;
 
     vlc_mutex_lock( &p_aout->mixer_lock );
+    vlc_mutex_lock( &p_aout->output_fifo_lock );
+    vlc_mutex_lock( &p_aout->input_fifos_lock );
 
     /* Retrieve the date of the next buffer. */
     memcpy( &exact_start_date, &p_aout->output.fifo.end_date,
@@ -86,6 +92,8 @@ static int MixBuffer( aout_instance_t * p_aout )
         aout_DateSet( &exact_start_date, 0 );
         start_date = 0;
     } 
+
+    vlc_mutex_unlock( &p_aout->output_fifo_lock );
 
     /* See if we have enough data to prepare a new buffer for the audio
      * output. First : start date. */
@@ -114,6 +122,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         if ( i < p_aout->i_nb_inputs )
         {
             /* Interrupted before the end... We can't run. */
+            vlc_mutex_unlock( &p_aout->input_fifos_lock );
             vlc_mutex_unlock( &p_aout->mixer_lock );
             return -1;
         }
@@ -231,6 +240,7 @@ static int MixBuffer( aout_instance_t * p_aout )
     if ( i < p_aout->i_nb_inputs )
     {
         /* Interrupted before the end... We can't run. */
+        vlc_mutex_unlock( &p_aout->input_fifos_lock );
         vlc_mutex_unlock( &p_aout->mixer_lock );
         return -1;
     }
@@ -246,6 +256,7 @@ static int MixBuffer( aout_instance_t * p_aout )
     if ( p_output_buffer == NULL )
     {
         msg_Err( p_aout, "out of memory" );
+        vlc_mutex_unlock( &p_aout->input_fifos_lock );
         vlc_mutex_unlock( &p_aout->mixer_lock );
         return -1;
     }
@@ -262,9 +273,11 @@ static int MixBuffer( aout_instance_t * p_aout )
 
     p_aout->mixer.pf_do_work( p_aout, p_output_buffer );
 
-    vlc_mutex_unlock( &p_aout->mixer_lock );
+    vlc_mutex_unlock( &p_aout->input_fifos_lock );
 
     aout_OutputPlay( p_aout, p_output_buffer );
+
+    vlc_mutex_unlock( &p_aout->mixer_lock );
 
     return 0;
 }

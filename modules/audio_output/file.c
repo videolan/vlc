@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.8 2002/08/19 23:12:57 massiot Exp $
+ * $Id: file.c,v 1.9 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -150,8 +150,6 @@ static void Play( aout_instance_t * p_aout )
 {
     aout_buffer_t * p_buffer;
 
-    /* We don't need the mixer lock, since Play is entered _with_ the
-     * mixer lock. */
     p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
 
     if( fwrite( p_buffer->p_buffer, p_buffer->i_nb_bytes, 1,

@@ -2,7 +2,7 @@
  * ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ps.c,v 1.4 2002/08/12 22:48:18 massiot Exp $
+ * $Id: ps.c,v 1.5 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -227,6 +227,7 @@ static int Activate( vlc_object_t * p_this )
                         break;
 
                     case VLC_FOURCC('a','5','2',' '):
+                    case VLC_FOURCC('a','5','2','b'):
                         if( config_GetInt( p_input, "audio-channel" )
                                 == ((p_es->i_id & 0xF00) >> 8) ||
                            ( config_GetInt( p_input, "audio-channel" ) < 0
@@ -240,6 +241,7 @@ static int Activate( vlc_object_t * p_this )
                         break;
 
                     case VLC_FOURCC('s','p','u',' '):
+                    case VLC_FOURCC('s','p','u','b'):
                         if( config_GetInt( p_input, "spu-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
@@ -248,6 +250,7 @@ static int Activate( vlc_object_t * p_this )
                         break;
 
                     case VLC_FOURCC('l','p','c','m'):
+                    case VLC_FOURCC('l','p','c','b'):
                         if( config_GetInt( p_input, "audio-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) ||
                            ( config_GetInt( p_input, "audio-channel" ) < 0

@@ -2,7 +2,7 @@
  * system.h: MPEG demultiplexing.
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: system.h,v 1.1 2002/08/07 00:29:36 sam Exp $
+ * $Id: system.h,v 1.2 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -38,6 +38,29 @@
 #define PSI_IS_PAT          0x00
 #define PSI_IS_PMT          0x01
 #define UNKNOWN_PSI         0xff
+
+/* ES streams types - see ISO/IEC 13818-1 table 2-29 numbers.
+ * these values are used in mpeg_system.c, and in
+ * the following plugins: mpeg_ts, mpeg_ts_dvbpsi, satellite. */
+#define MPEG1_VIDEO_ES      0x01
+#define MPEG2_VIDEO_ES      0x02
+#define MPEG1_AUDIO_ES      0x03
+#define MPEG2_AUDIO_ES      0x04
+#define A52_AUDIO_ES        0x81
+/* These ones might violate the usage : */
+#define DVD_SPU_ES          0x82
+#define LPCM_AUDIO_ES       0x83
+#define SDDS_AUDIO_ES       0x84
+#define DTS_AUDIO_ES        0x85
+/* These ones are only here to work around a bug in VLS - VLS doesn't
+ * skip the first bytes of the PES payload (stream private ID) when
+ * streaming. This is incompatible with all equipments. 'B' is for
+ * buggy. Please note that they are associated with FOURCCs '***b'.
+ * --Meuuh 2002-08-30
+ */
+#define A52B_AUDIO_ES       0x91
+#define DVDB_SPU_ES         0x92
+#define LPCMB_AUDIO_ES      0x93
 
 /****************************************************************************
  * psi_callback_t

@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.7 2002/08/26 23:00:22 massiot Exp $
+ * $Id: a52.c,v 1.8 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -118,7 +118,8 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
     
-    if( p_fifo->i_fourcc != VLC_FOURCC('a','5','2',' ') )
+    if( p_fifo->i_fourcc != VLC_FOURCC('a','5','2',' ')
+         && p_fifo->i_fourcc != VLC_FOURCC('a','5','2','b') )
     {   
         return VLC_EGENERIC;
     }

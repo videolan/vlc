@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.25 2002/08/29 23:53:22 massiot Exp $
+ * $Id: vlc_common.h,v 1.26 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -133,11 +133,19 @@ typedef s64 mtime_t;
  *****************************************************************************/
 typedef u32 vlc_fourcc_t;
 
-#define VLC_FOURCC( a, b, c, d ) \
-    ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
+#ifdef WORDS_BIGENDIAN
+#   define VLC_FOURCC( a, b, c, d ) \
+        ( ((u32)d) | ( ((u32)c) << 8 ) | ( ((u32)b) << 16 ) | ( ((u32)a) << 24 ) )
+#   define VLC_TWOCC( a, b ) \
+        ( (u16)(b) | ( (u16)(a) << 8 ) )
 
-#define VLC_TWOCC( a, b ) \
-    ( (u16)(a) | ( (u16)(b) << 8 ) )
+#else
+#   define VLC_FOURCC( a, b, c, d ) \
+        ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
+#   define VLC_TWOCC( a, b ) \
+        ( (u16)(a) | ( (u16)(b) << 8 ) )
+
+#endif
 
 /*****************************************************************************
  * Classes declaration

@@ -2,7 +2,7 @@
  * system.c: helper module for TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: system.c,v 1.1 2002/08/07 00:29:36 sam Exp $
+ * $Id: system.c,v 1.2 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -363,17 +363,19 @@ static void ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             break;
         }
 
-        if( p_es->i_stream_id == 0xbd )
+        /* Welcome to the kludge area ! --Meuuh */
+        if( p_es->i_fourcc == VLC_FOURCC('a','5','2','b') )
         {
-            /* With private stream 1, the first byte of the payload
-             * is a stream_private_id, so skip it. */
-            i_pes_header_size++;
+            /* With A/52 audio, we need to skip the first 4 bytes */
+            i_pes_header_size += 4;
         }
-
-        if( p_es->i_fourcc == VLC_FOURCC('a','5','2',' ') )
+        else if( p_es->i_fourcc == VLC_FOURCC('l','p','c','b')
+                  || p_es->i_fourcc == VLC_FOURCC('s','p','u','b')
+                  || p_es->i_fourcc == VLC_FOURCC('d','t','s','b')
+                  || p_es->i_fourcc == VLC_FOURCC('s','d','d','b') )
         {
-            /* With A52 audio, we need to skip first 3 bytes */
-            i_pes_header_size += 3;
+            /* With others, we need to skip the first byte */
+            i_pes_header_size += 1;
         }
 
         /* Now we've parsed the header, we just have to indicate in some
@@ -642,7 +644,7 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                 p_es->i_cat = VIDEO_ES;
                 break;
             case DVD_SPU_ES:
-                p_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                p_es->i_fourcc = VLC_FOURCC('s','p','u','b');
                 p_es->i_cat = SPU_ES;
                 break;
             case MPEG1_AUDIO_ES:
@@ -651,11 +653,11 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                 p_es->i_cat = AUDIO_ES;
                 break;
             case A52_AUDIO_ES:
-                p_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                p_es->i_fourcc = VLC_FOURCC('a','5','2','b');
                 p_es->i_cat = AUDIO_ES;
                 break;
             case LPCM_AUDIO_ES:
-                p_es->i_fourcc = VLC_FOURCC('l','p','c','m');
+                p_es->i_fourcc = VLC_FOURCC('l','p','c','b');
                 p_es->i_cat = AUDIO_ES;
                 break;
             default:
@@ -876,7 +878,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xF0FF) == 0x80BD )
                     {
                         /* A52 audio (0x80->0x8F) */
-                        p_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                        p_es->i_fourcc = VLC_FOURCC('a','5','2','b');
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
@@ -895,7 +897,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xE0FF) == 0x20BD )
                     {
                         /* Subtitles video (0x20->0x3F) */
-                        p_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                        p_es->i_fourcc = VLC_FOURCC('s','p','u','b');
                         p_es->i_cat = SPU_ES;
 #ifdef AUTO_SPAWN
                         if( config_GetInt( p_input, "spu-channel" )
@@ -909,7 +911,7 @@ static es_descriptor_t * ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xF0FF) == 0xA0BD )
                     {
                         /* LPCM audio (0xA0->0xAF) */
-                        p_es->i_fourcc = VLC_FOURCC('l','p','c','m');
+                        p_es->i_fourcc = VLC_FOURCC('l','p','c','b');
                         p_es->i_cat = AUDIO_ES;
                     }
                     else

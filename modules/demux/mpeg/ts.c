@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: ts.c,v 1.3 2002/08/08 22:28:22 sam Exp $
+ * $Id: ts.c,v 1.4 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -624,19 +624,44 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                             p_new_es->i_fourcc = VLC_FOURCC('m','p','g','a');
                             p_new_es->i_cat = AUDIO_ES;
                             break;
-                        case LPCM_AUDIO_ES:
-                            p_new_es->i_fourcc = VLC_FOURCC('l','p','c','m');
-                            p_new_es->i_stream_id = 0xBD;
-                            p_new_es->i_cat = AUDIO_ES;
-                            break;
                         case A52_AUDIO_ES:
                             p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = AUDIO_ES;
                             break;
-                        /* Not sure this one is fully specification-compliant */
+                        case LPCM_AUDIO_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('l','p','c','m');
+                            p_new_es->i_stream_id = 0xBD;
+                            p_new_es->i_cat = AUDIO_ES;
+                            break;
                         case DVD_SPU_ES:
                             p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                            p_new_es->i_stream_id = 0xBD;
+                            p_new_es->i_cat = SPU_ES;
+                            break;
+                        case SDDS_AUDIO_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('s','d','d','s');
+                            p_new_es->i_stream_id = 0xBD;
+                            p_new_es->i_cat = AUDIO_ES;
+                            break;
+                        case DTS_AUDIO_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('d','t','s',' ');
+                            p_new_es->i_stream_id = 0xBD;
+                            p_new_es->i_cat = AUDIO_ES;
+                            break;
+                        /* 'b' stands for 'buggy' */
+                        case A52B_AUDIO_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('a','5','2','b');
+                            p_new_es->i_stream_id = 0xBD;
+                            p_new_es->i_cat = AUDIO_ES;
+                            break;
+                        case LPCMB_AUDIO_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('l','p','c','b');
+                            p_new_es->i_stream_id = 0xBD;
+                            p_new_es->i_cat = AUDIO_ES;
+                            break;
+                        case DVDB_SPU_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('s','p','u','b');
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = SPU_ES;
                             break;
@@ -857,11 +882,6 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                     p_new_es->i_fourcc = VLC_FOURCC('m','p','g','a');
                     p_new_es->i_cat = AUDIO_ES;
                     break;
-                case LPCM_AUDIO_ES:
-                    p_new_es->i_fourcc = VLC_FOURCC('l','p','c','m');
-                    p_new_es->i_cat = AUDIO_ES;
-                    p_new_es->i_stream_id = 0xBD;
-                    break;
                 case A52_AUDIO_ES:
                     p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
                     p_new_es->i_cat = AUDIO_ES;
@@ -870,6 +890,36 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                 case DVD_SPU_ES:
                     p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
                     p_new_es->i_cat = SPU_ES;
+                    p_new_es->i_stream_id = 0xBD;
+                    break;
+                case LPCM_AUDIO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('l','p','c','m');
+                    p_new_es->i_cat = AUDIO_ES;
+                    p_new_es->i_stream_id = 0xBD;
+                    break;
+                case SDDS_AUDIO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('s','d','d','s');
+                    p_new_es->i_stream_id = 0xBD;
+                    p_new_es->i_cat = AUDIO_ES;
+                    break;
+                case DTS_AUDIO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('d','t','s',' ');
+                    p_new_es->i_stream_id = 0xBD;
+                    p_new_es->i_cat = AUDIO_ES;
+                    break;
+                case A52B_AUDIO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('a','5','2','b');
+                    p_new_es->i_cat = AUDIO_ES;
+                    p_new_es->i_stream_id = 0xBD;
+                    break;
+                case DVDB_SPU_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('s','p','u','b');
+                    p_new_es->i_cat = SPU_ES;
+                    p_new_es->i_stream_id = 0xBD;
+                    break;
+                case LPCMB_AUDIO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('l','p','c','b');
+                    p_new_es->i_cat = AUDIO_ES;
                     p_new_es->i_stream_id = 0xBD;
                     break;
                 default:
@@ -914,9 +964,11 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                         strcat( p_new_es->psz_desc, " (mpeg)" );
                         break;
                     case LPCM_AUDIO_ES:
+                    case LPCMB_AUDIO_ES:
                         strcat( p_new_es->psz_desc, " (lpcm)" );
                         break;
                     case A52_AUDIO_ES:
+                    case A52B_AUDIO_ES:
                         strcat( p_new_es->psz_desc, " (A52)" );
                         break;
                 }

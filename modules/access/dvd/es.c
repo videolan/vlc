@@ -1,7 +1,7 @@
 /* es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: es.c,v 1.1 2002/08/04 17:23:41 sam Exp $
+ * $Id: es.c,v 1.2 2002/08/30 22:22:24 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -137,7 +137,7 @@ void DVDReadAudio( input_thread_t * p_input )
             {
             case 0x00:              /* A52 */
                 ADDES( 0xbd, 0x80 + audio_status.i_position,
-                       VLC_FOURCC('a','5','2',' '), AUDIO_ES, i_lang, 0 );
+                       VLC_FOURCC('a','5','2','b'), AUDIO_ES, i_lang, 0 );
                 strcat( p_es->psz_desc, " (A52)" );
 
                 break;
@@ -150,13 +150,15 @@ void DVDReadAudio( input_thread_t * p_input )
                 break;
             case 0x04:              /* LPCM */
                 ADDES( 0xbd, 0xa0 + audio_status.i_position,
-                       VLC_FOURCC('l','p','c','m'), AUDIO_ES, i_lang, 0 );
+                       VLC_FOURCC('l','p','c','b'), AUDIO_ES, i_lang, 0 );
                 strcat( p_es->psz_desc, " (lpcm)" );
 
                 break;
             case 0x06:              /* DTS */
-                i_id = ( ( 0x88 + audio_status.i_position ) << 8 ) | 0xbd;
-                msg_Err( p_input, "DTS audio not handled yet (0x%x)", i_id );
+                ADDES( 0xbd, 0x88 + audio_status.i_position,
+                       VLC_FOURCC('d','t','s','b'), AUDIO_ES, i_lang, 0 );
+                strcat( p_es->psz_desc, " (dts)" );
+
                 break;
             default:
                 i_id = 0;
@@ -219,7 +221,7 @@ void DVDReadSPU( input_thread_t * p_input )
 
             if( vmg.title.pi_yuv_color )
             {
-                ADDES( 0xbd, 0x20 + i_id, VLC_FOURCC('s','p','u',' '), SPU_ES,
+                ADDES( 0xbd, 0x20 + i_id, VLC_FOURCC('s','p','u','b'), SPU_ES,
                        vts.manager_inf.p_spu_attr[i-1].i_lang_code,
                        sizeof(int) + 16*sizeof(u32) );
                 *(int*)p_es->p_demux_data = 0xBeeF;
@@ -228,7 +230,7 @@ void DVDReadSPU( input_thread_t * p_input )
             }
             else
             {
-                ADDES( 0xbd, 0x20 + i_id, VLC_FOURCC('s','p','u',' '), SPU_ES,
+                ADDES( 0xbd, 0x20 + i_id, VLC_FOURCC('s','p','u','b'), SPU_ES,
                    vts.manager_inf.p_spu_attr[i-1].i_lang_code, 0 );
             }
         }
@@ -273,13 +275,13 @@ void DVDLaunchDecoders( input_thread_t * p_input )
         {
             int     i_a52 = i_audio;
             while( ( p_input->stream.pp_es[i_a52]->i_fourcc !=
-                     VLC_FOURCC('a','5','2',' ') ) && ( i_a52 <=
+                     VLC_FOURCC('a','5','2','b') ) && ( i_a52 <=
                      p_dvd->p_ifo->vts.manager_inf.i_audio_nb ) )
             {
                 i_a52++;
             }
             if( p_input->stream.pp_es[i_a52]->i_fourcc
-                 == VLC_FOURCC('a','5','2',' ') )
+                 == VLC_FOURCC('a','5','2','b') )
             {
                 input_SelectES( p_input,
                                 p_input->stream.pp_es[i_a52] );
@@ -308,7 +310,7 @@ void DVDLaunchDecoders( input_thread_t * p_input )
             for( i = 0; i < p_input->stream.i_es_number; i++ )
             {
                 if ( p_input->stream.pp_es[i]->i_fourcc
-                      == VLC_FOURCC('s','p','u',' ') )
+                      == VLC_FOURCC('s','p','u','b') )
                 {
                     j++;
                     if ( i_spu == j ) break;

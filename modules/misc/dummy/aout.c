@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.c,v 1.6 2002/08/19 23:12:57 massiot Exp $
+ * $Id: aout.c,v 1.7 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -77,8 +77,6 @@ static int SetFormat( aout_instance_t * p_aout )
  *****************************************************************************/
 static void Play( aout_instance_t * p_aout )
 {
-    /* We don't need the mixer lock, since Play is entered _with_ the
-     * mixer lock. */
     aout_buffer_t * p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
     aout_BufferFree( p_buffer );
 }

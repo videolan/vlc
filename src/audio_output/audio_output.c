@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance miscellaneous functions
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.99 2002/08/21 22:41:59 massiot Exp $
+ * $Id: audio_output.c,v 1.100 2002/08/30 22:22:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -55,13 +55,10 @@ aout_instance_t * __aout_NewInstance( vlc_object_t * p_parent )
     }
 
     /* Initialize members. */
-    vlc_mutex_init( p_parent, &p_aout->input_lock );
-    vlc_cond_init( p_parent, &p_aout->input_signal );
-    p_aout->i_inputs_active = 0;
-    p_aout->b_change_requested = 0;
-    p_aout->i_nb_inputs = 0;
-
+    vlc_mutex_init( p_parent, &p_aout->input_fifos_lock );
     vlc_mutex_init( p_parent, &p_aout->mixer_lock );
+    vlc_mutex_init( p_parent, &p_aout->output_fifo_lock );
+    p_aout->i_nb_inputs = 0;
 
     vlc_object_attach( p_aout, p_parent->p_vlc );
 
@@ -73,9 +70,9 @@ aout_instance_t * __aout_NewInstance( vlc_object_t * p_parent )
  *****************************************************************************/
 void aout_DeleteInstance( aout_instance_t * p_aout )
 {
-    vlc_mutex_destroy( &p_aout->input_lock );
-    vlc_cond_destroy( &p_aout->input_signal );
+    vlc_mutex_destroy( &p_aout->input_fifos_lock );
     vlc_mutex_destroy( &p_aout->mixer_lock );
+    vlc_mutex_destroy( &p_aout->output_fifo_lock );
 
     /* Free structure. */
     vlc_object_destroy( p_aout );
