@@ -78,6 +78,12 @@
 #   define EXTERN_SYMBOL
 #endif
 
+#if defined( USE_DLL )
+#   define IMPORT_SYMBOL __declspec(dllimport)
+#else
+#   define IMPORT_SYMBOL
+#endif
+
 #define MODULE_STRING STRINGIFY( MODULE_NAME )
 
 /*

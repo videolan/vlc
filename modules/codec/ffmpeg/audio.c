@@ -116,7 +116,7 @@ int E_(InitAudioDec)( decoder_t *p_dec, AVCodecContext *p_context,
             malloc( p_dec->fmt_in.i_extra + FF_INPUT_BUFFER_PADDING_SIZE );
         memcpy( p_sys->p_context->extradata,
                 p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra );
-        memset( p_sys->p_context->extradata + p_dec->fmt_in.i_extra, 0,
+        memset( (char*)p_sys->p_context->extradata + p_dec->fmt_in.i_extra, 0,
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
 

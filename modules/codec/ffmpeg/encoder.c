@@ -156,8 +156,8 @@ static const char *ppsz_enc_options[] = {
 /*****************************************************************************
  * OpenEncoder: probe the encoder
  *****************************************************************************/
-extern int16_t ff_mpeg4_default_intra_matrix[];
-extern int16_t ff_mpeg4_default_non_intra_matrix[];
+extern int16_t IMPORT_SYMBOL ff_mpeg4_default_intra_matrix[];
+extern int16_t IMPORT_SYMBOL ff_mpeg4_default_non_intra_matrix[];
 
 int E_(OpenEncoder)( vlc_object_t *p_this )
 {

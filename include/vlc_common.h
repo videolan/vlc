@@ -526,11 +526,11 @@ static int64_t GCD( int64_t a, int64_t b )
     {                                                                         \
         if( i_oldsize )                                                       \
         {                                                                     \
-            (p_ar) = realloc( p_ar, ((i_oldsize) + 1) * sizeof( *(p_ar) ) );  \
+            (p_ar) = (void**)realloc( p_ar, ((i_oldsize) + 1) * sizeof( *(p_ar) ) );  \
         }                                                                     \
         else                                                                  \
         {                                                                     \
-            (p_ar) = malloc( ((i_oldsize) + 1) * sizeof( *(p_ar) ) );         \
+            (p_ar) = (void**)malloc( ((i_oldsize) + 1) * sizeof( *(p_ar) ) ); \
         }                                                                     \
         if( (i_oldsize) - (i_pos) )                                           \
         {                                                                     \
@@ -932,6 +932,7 @@ typedef __int64 off_t;
 #           define _OFF_T_DEFINED
 #       else
 #           define off_t __int64
+            /* for wx compatibility typedef long off_t; */
 #       endif
 #   endif
 
@@ -956,13 +957,7 @@ typedef __int64 off_t;
 #       define vsnprintf _vsnprintf
 #   endif
 
-#   ifndef _T
-#       ifdef UNICODE
-#           define _T(q) L##q
-#       else
-#           define _T(q) q
-#       endif
-#   endif
+#   include <tchar.h>
 #endif
 
 /* lseek (defined in src/extras/libc.c) */
