@@ -34,12 +34,12 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 
 #include "interface.h"
-#include "intf_msg.h"
 
 #include "modules.h"
 #include "modules_export.h"

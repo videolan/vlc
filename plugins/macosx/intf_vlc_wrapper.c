@@ -28,12 +28,12 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 
 #include "interface.h"
-#include "intf_msg.h"
 #include "intf_playlist.h"
 
 #include "main.h"
@@ -286,7 +286,6 @@
         vlc_mutex_lock(&p_vout_bank->lock) ;
         if (p_vout_bank->i_count) {
             vlc_mutex_lock(&p_vout_bank->pp_vout[0]->change_lock) ;
-            vlc_mutex_lock(&p_vout_bank->pp_vout[0]->p_sys->lock) ;
             return p_vout_bank->pp_vout[0] ;
         }
         else
@@ -297,7 +296,6 @@
     }
     
     - (void) unlockVout {
-        vlc_mutex_lock(&p_vout_bank->pp_vout[0]->p_sys->lock) ;
         vlc_mutex_unlock(&p_vout_bank->pp_vout[0]->change_lock) ;
         vlc_mutex_unlock(&p_vout_bank->lock) ;
     }

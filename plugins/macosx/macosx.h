@@ -39,7 +39,6 @@
     #define OSX_COM_STRUCT osx_com_s
 #endif
 typedef struct OSX_COM_STRUCT {
-    vlc_mutex_t lock ;
     unsigned int i_changes ;
     
     CGrafPtr p_qdport ;

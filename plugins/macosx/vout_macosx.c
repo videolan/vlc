@@ -36,12 +36,12 @@
 
 #include "config.h"
 #include "common.h"
+#include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
 
 #include "interface.h"
-#include "intf_msg.h"
 
 #include "video.h"
 #include "video_output.h"
@@ -154,9 +154,7 @@ static int vout_Init( vout_thread_t *p_vout )
     p_vout->b_need_render = 0 ;
     p_vout->i_bytes_per_line = p_vout->i_width ;
     p_vout->p_sys->c_codec = 'NONE' ;
-    vlc_mutex_lock( &p_vout->p_sys->osx_communication.lock ) ;
-        p_vout->p_sys->osx_communication.i_changes |= OSX_VOUT_INTF_REQUEST_QDPORT ;
-    vlc_mutex_unlock( &p_vout->p_sys->osx_communication.lock ) ;
+    p_vout->p_sys->osx_communication.i_changes |= OSX_VOUT_INTF_REQUEST_QDPORT ;
     
     return 0 ;
 }
@@ -166,11 +164,8 @@ static int vout_Init( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_End( vout_thread_t *p_vout )
 {
-    vlc_mutex_lock( &p_vout->p_sys->osx_communication.lock ) ;
-        p_vout->p_sys->osx_communication.i_changes |= OSX_VOUT_INTF_RELEASE_QDPORT ;
-    vlc_mutex_unlock( &p_vout->p_sys->osx_communication.lock ) ;
-    
     dispose_QTSequence( p_vout ) ;
+    p_vout->p_sys->osx_communication.i_changes |= OSX_VOUT_INTF_RELEASE_QDPORT ;
 }
 
 /*****************************************************************************
@@ -191,22 +186,20 @@ static void vout_Destroy( vout_thread_t *p_vout )
  *****************************************************************************/
 static int vout_Manage( vout_thread_t *p_vout )
 {    
-    vlc_mutex_lock( &p_vout->p_sys->osx_communication.lock ) ;
-        if ( p_vout->p_sys->osx_communication.i_changes & OSX_INTF_VOUT_QDPORT_CHANGE ) {
-            dispose_QTSequence( p_vout ) ;
-            create_QTSequenceBestCodec( p_vout ) ;
-        }
-        else if ( p_vout->p_sys->osx_communication.i_changes & OSX_INTF_VOUT_SIZE_CHANGE ) {
-            fillout_ScalingMatrix( p_vout ) ;
-            SetDSequenceMatrix( p_vout->p_sys->i_seq, p_vout->p_sys->p_matrix ) ;
-        }
-        
-        p_vout->p_sys->osx_communication.i_changes &= ~( 
-            OSX_INTF_VOUT_QDPORT_CHANGE |
-            OSX_INTF_VOUT_SIZE_CHANGE
-        ) ;
-    vlc_mutex_unlock( &p_vout->p_sys->osx_communication.lock ) ;
-        
+      if ( p_vout->p_sys->osx_communication.i_changes & OSX_INTF_VOUT_QDPORT_CHANGE ) {
+          dispose_QTSequence( p_vout ) ;
+          create_QTSequenceBestCodec( p_vout ) ;
+      }
+      else if ( p_vout->p_sys->osx_communication.i_changes & OSX_INTF_VOUT_SIZE_CHANGE ) {
+          fillout_ScalingMatrix( p_vout ) ;
+          SetDSequenceMatrix( p_vout->p_sys->i_seq, p_vout->p_sys->p_matrix ) ;
+      }
+
+      p_vout->p_sys->osx_communication.i_changes &= ~( 
+          OSX_INTF_VOUT_QDPORT_CHANGE |
+          OSX_INTF_VOUT_SIZE_CHANGE
+      ) ;
+
     return 0 ;
 }
 
@@ -220,7 +213,7 @@ static int vout_Manage( vout_thread_t *p_vout )
 void vout_Display( vout_thread_t *p_vout )
 {
     CodecFlags out_flags ;
-    
+
     switch (p_vout->p_sys->c_codec)
     {
         case 'yuv2':
