@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.39 2001/11/28 15:08:05 massiot Exp $
+ * $Id: input_ps.c,v 1.40 2001/12/03 11:49:04 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -291,78 +291,7 @@ static void PSInit( input_thread_t * p_input )
             /* (The PSM decoder will care about spawning the decoders) */
             p_input->stream.pp_programs[0]->b_is_ok = 1;
         }
-#ifdef AUTO_SPAWN
-        else
-        {
-            /* (We have to do it ourselves) */
-            int                 i_es;
 
-            /* FIXME: we should do multiple passes in case an audio type
-             * is not present */
-            for( i_es = 0;
-                 i_es < p_input->stream.pp_programs[0]->i_es_number;
-                 i_es++ )
-            {
-#define p_es p_input->stream.pp_programs[0]->pp_es[i_es]
-                switch( p_es->i_type )
-                {
-                    case MPEG1_VIDEO_ES:
-                    case MPEG2_VIDEO_ES:
-                        input_SelectES( p_input, p_es );
-                        break;
-
-                    case MPEG1_AUDIO_ES:
-                    case MPEG2_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                == (p_es->i_id & 0x1F) )
-                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
-                        {
-                        case 0:
-                            main_PutIntVariable( INPUT_AUDIO_VAR,
-                                                 REQUESTED_MPEG );
-                        case REQUESTED_MPEG:
-                            input_SelectES( p_input, p_es );
-                        }
-                        break;
-
-                    case AC3_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                == ((p_es->i_id & 0xF00) >> 8) )
-                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
-                        {
-                        case 0:
-                            main_PutIntVariable( INPUT_AUDIO_VAR,
-                                                 REQUESTED_AC3 );
-                        case REQUESTED_AC3:
-                            input_SelectES( p_input, p_es );
-                        }
-                        break;
-
-                    case DVD_SPU_ES:
-                        if( main_GetIntVariable( INPUT_SUBTITLE_VAR, -1 )
-                                == ((p_es->i_id & 0x1F00) >> 8) )
-                        {
-                            input_SelectES( p_input, p_es );
-                        }
-                        break;
-
-                    case LPCM_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_CHANNEL_VAR, 0 )
-                                == ((p_es->i_id & 0x1F00) >> 8) )
-                        switch( main_GetIntVariable( INPUT_AUDIO_VAR, 0 ) )
-                        {
-                        case 0:
-                            main_PutIntVariable( INPUT_AUDIO_VAR,
-                                                 REQUESTED_LPCM );
-                        case REQUESTED_LPCM:
-                            input_SelectES( p_input, p_es );
-                        }
-                        break;
-                }
-            }
-                    
-        }
-#endif
         if( p_main->b_stats )
         {
             input_DumpStream( p_input );
