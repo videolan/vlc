@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.9 2003/01/24 12:01:03 sam Exp $
+ * $Id: menu.cpp,v 1.10 2003/01/26 00:51:43 sam Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -926,7 +926,7 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
     Root->Enabled = false;
     Root->Clear();
 
-    i_title_nb = p_intf->p_sys->p_input->stream.i_area_nb;
+    i_title_nb = p_intf->p_sys->p_input->stream.i_area_nb - 1;
 
     /* loop on titles */
     for( unsigned int i_title = 1; i_title <= i_title_nb; i_title++ )
