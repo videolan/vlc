@@ -273,6 +273,8 @@ static const char * module_error( char *psz_buffer )
     (p_symbols)->msleep_inner = msleep; \
     (p_symbols)->__network_ChannelJoin_inner = __network_ChannelJoin; \
     (p_symbols)->__network_ChannelCreate_inner = __network_ChannelCreate; \
+    (p_symbols)->__sout_NewInstance_inner = __sout_NewInstance; \
+    (p_symbols)->sout_DeleteInstance_inner = sout_DeleteInstance; \
     (p_symbols)->__vout_CreateThread_inner = __vout_CreateThread; \
     (p_symbols)->vout_DestroyThread_inner = vout_DestroyThread; \
     (p_symbols)->vout_ChromaCmp_inner = vout_ChromaCmp; \

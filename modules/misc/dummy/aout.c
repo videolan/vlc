@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.c,v 1.2 2002/08/07 21:36:56 massiot Exp $
+ * $Id: aout.c,v 1.3 2002/08/12 22:12:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,6 +32,8 @@
 
 #include "aout_internal.h"
 
+#define FRAME_SIZE 2048
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
@@ -56,7 +58,7 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
  *****************************************************************************/
 static int SetFormat( aout_instance_t * p_aout )
 {
-    p_aout->output.i_nb_samples = 2048;
+    p_aout->output.i_nb_samples = FRAME_SIZE;
     return 0;
 }
 

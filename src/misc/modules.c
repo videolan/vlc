@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.83 2002/08/12 09:34:15 sam Exp $
+ * $Id: modules.c,v 1.84 2002/08/12 22:12:51 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -70,6 +70,8 @@
 #include "video_output.h"
 
 #include "audio_output.h"
+
+#include "stream_output.h"
 
 #include "iso_lang.h"
 

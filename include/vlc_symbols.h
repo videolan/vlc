@@ -60,6 +60,7 @@ struct module_symbols_t
     pgrm_descriptor_t * (* input_AddProgram_inner) ( input_thread_t *, u16, size_t ) ;
     pgrm_descriptor_t * (* input_FindProgram_inner) ( input_thread_t *, u16 ) ;
     picture_t * (* vout_CreatePicture_inner) ( vout_thread_t *, vlc_bool_t, vlc_bool_t, vlc_bool_t ) ;
+    sout_instance_t * (* __sout_NewInstance_inner) ( vlc_object_t *, char * ) ;
     ssize_t (* input_FDNetworkRead_inner) ( input_thread_t *, byte_t *, size_t ) ;
     ssize_t (* input_FDRead_inner) ( input_thread_t *, byte_t *, size_t ) ;
     ssize_t (* input_FillBuffer_inner) ( input_thread_t * ) ;
@@ -124,6 +125,7 @@ struct module_symbols_t
     void (* msleep_inner) ( mtime_t delay ) ;
     void (* mwait_inner) ( mtime_t date ) ;
     void (* playlist_Command_inner) ( playlist_t *, int, int ) ;
+    void (* sout_DeleteInstance_inner) ( sout_instance_t * ) ;
     void (* vout_AllocatePicture_inner) ( vout_thread_t *, picture_t *, int, int, u32 ) ;
     void (* vout_DatePicture_inner) ( vout_thread_t *, picture_t *, mtime_t ) ;
     void (* vout_DestroyPicture_inner) ( vout_thread_t *, picture_t * ) ;
@@ -181,6 +183,7 @@ struct module_symbols_t
 #   define __msg_Warn p_symbols->__msg_Warn_inner
 #   define __network_ChannelCreate p_symbols->__network_ChannelCreate_inner
 #   define __network_ChannelJoin p_symbols->__network_ChannelJoin_inner
+#   define __sout_NewInstance p_symbols->__sout_NewInstance_inner
 #   define __vlc_cond_destroy p_symbols->__vlc_cond_destroy_inner
 #   define __vlc_cond_init p_symbols->__vlc_cond_init_inner
 #   define __vlc_dumpstructure p_symbols->__vlc_dumpstructure_inner
@@ -262,6 +265,7 @@ struct module_symbols_t
 #   define playlist_Add p_symbols->playlist_Add_inner
 #   define playlist_Command p_symbols->playlist_Command_inner
 #   define playlist_Delete p_symbols->playlist_Delete_inner
+#   define sout_DeleteInstance p_symbols->sout_DeleteInstance_inner
 #   define vout_AllocatePicture p_symbols->vout_AllocatePicture_inner
 #   define vout_ChromaCmp p_symbols->vout_ChromaCmp_inner
 #   define vout_CreatePicture p_symbols->vout_CreatePicture_inner

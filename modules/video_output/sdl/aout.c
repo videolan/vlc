@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout.c,v 1.3 2002/08/12 09:34:15 sam Exp $
+ * $Id: aout.c,v 1.4 2002/08/12 22:12:51 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -38,7 +38,7 @@
 
 #include SDL_INCLUDE_FILE
 
-#define DEFAULT_FRAME_SIZE 2048
+#define FRAME_SIZE 2048
 
 /*****************************************************************************
  * Local prototypes
@@ -94,9 +94,9 @@ static int SetFormat( aout_instance_t *p_aout )
     desired.channels   = p_aout->output.output.i_channels;
     desired.callback   = SDLCallback;
     desired.userdata   = p_aout;
-    desired.samples    = DEFAULT_FRAME_SIZE;
+    desired.samples    = FRAME_SIZE;
 
-    /* Open the sound device - FIXME : get the "natural" paramaters */
+    /* Open the sound device - FIXME : get the "natural" parameters */
     if( SDL_OpenAudio( &desired, NULL ) < 0 )
     {
         return -1;
@@ -143,7 +143,7 @@ static void SDLCallback( void * _p_aout, byte_t * p_stream, int i_len )
     /* FIXME : take into account SDL latency instead of mdate() */
     aout_buffer_t * p_buffer = aout_OutputNextBuffer( p_aout, mdate() );
 
-    if ( i_len != DEFAULT_FRAME_SIZE * sizeof(s16)
+    if ( i_len != FRAME_SIZE * sizeof(s16)
                     * p_aout->output.output.i_channels )
     {
         msg_Err( p_aout, "SDL doesn't know its buffer size (%d)", i_len );

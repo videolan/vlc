@@ -3,8 +3,8 @@
  * Read an MPEG2 stream, demultiplex and parse it before sending it to
  * decoders.
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.209 2002/07/31 20:56:52 sam Exp $
+ * Copyright (C) 1998-2002 VideoLAN
+ * $Id: input.c,v 1.210 2002/08/12 22:12:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,6 +47,8 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
+
+#include "stream_output.h"
 
 #include "interface.h"
 
@@ -114,6 +116,7 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     p_input->stream.b_new_mute = MUTE_NO_CHANGE;
     p_input->stream.i_mux_rate = 0;
     p_input->stream.b_seekable = 0;
+    p_input->stream.p_sout = NULL;
 
     /* no stream, no program, no area, no es */
     p_input->stream.p_new_program = NULL;
@@ -497,6 +500,23 @@ static int InitThread( input_thread_t * p_input )
         return -1;
     }
 
+    /* Initialize optional stream output. */
+    psz_parser = config_GetPsz( p_input, "sout" );
+    if ( psz_parser != NULL )
+    {
+        if ( (p_input->stream.p_sout = sout_NewInstance( p_input, psz_parser ))
+              == NULL )
+        {
+            msg_Err( p_input, "cannot start stream output instance, aborting" );
+            free( psz_parser );
+            module_Unneed( p_input, p_input->p_access );
+            module_Unneed( p_input, p_input->p_demux );
+            return -1;
+        }
+
+        free( psz_parser );
+    }
+
     return 0;
 }
 
@@ -538,6 +558,12 @@ static void EndThread( input_thread_t * p_input )
 
     /* Free all ES and destroy all decoder threads */
     input_EndStream( p_input );
+
+    /* Close optional stream output instance */
+    if ( p_input->stream.p_sout != NULL )
+    {
+        sout_DeleteInstance( p_input->stream.p_sout );
+    }
 
     /* Free demultiplexer's data */
     module_Unneed( p_input, p_input->p_demux );

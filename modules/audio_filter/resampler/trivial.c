@@ -2,7 +2,7 @@
  * trivial.c : trivial resampler (skips samples or pads with zeroes)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.2 2002/08/10 20:01:00 massiot Exp $
+ * $Id: trivial.c,v 1.3 2002/08/12 22:12:50 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -50,7 +50,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Create: allocate trivial mixer
+ * Create: allocate trivial resampler
  *****************************************************************************
  * This function allocates and initializes a Crop vout method.
  *****************************************************************************/

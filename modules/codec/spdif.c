@@ -2,7 +2,7 @@
  * spdif.c: A52 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: spdif.c,v 1.3 2002/08/11 23:26:28 massiot Exp $
+ * $Id: spdif.c,v 1.4 2002/08/12 22:12:51 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -217,8 +217,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         p_buffer->end_date = last_date;
 
         /* Get the whole frame. */
-        memcpy( p_buffer->p_buffer + sizeof(u16), p_header, 7 );
-        GetChunk( &p_dec->bit_stream, p_buffer->p_buffer + 7 + sizeof(u16),
+        memcpy( p_buffer->p_buffer, p_header, 7 );
+        GetChunk( &p_dec->bit_stream, p_buffer->p_buffer + 7,
                   i_frame_size - 7 );
         if( p_dec->p_fifo->b_die ) break;
 

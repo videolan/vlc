@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.12 2002/08/08 00:35:11 sam Exp $
+ * $Id: libvlc.h,v 1.13 2002/08/12 22:12:51 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -234,6 +234,10 @@
     "'any' at the end of the list to make sure there is a fallback for the " \
     "types you didn't specify.")
 
+#define SOUT_TEXT N_("choose a stream output")
+#define SOUT_LONGTEXT N_( \
+    "Empty if no stream output.")
+
 #define MMX_TEXT N_("enable CPU MMX support")
 #define MMX_LONGTEXT N_( \
     "If your processor supports the MMX instructions set, vlc can take " \
@@ -426,6 +430,7 @@ vlc_module_begin();
     add_module( "memcpy", "memcpy", NULL, NULL, MEMCPY_TEXT, MEMCPY_LONGTEXT );
     add_module( "access", "access", NULL, NULL, ACCESS_TEXT, ACCESS_LONGTEXT );
     add_module( "demux", "demux", NULL, NULL, DEMUX_TEXT, DEMUX_LONGTEXT );
+    add_string( "sout", NULL, NULL, SOUT_TEXT, SOUT_LONGTEXT );
 
 #if defined(WIN32)
     add_bool( "fast-mutex", 0, NULL, FAST_MUTEX_TEXT, FAST_MUTEX_LONGTEXT );

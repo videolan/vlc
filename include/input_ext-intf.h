@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.75 2002/08/07 00:29:36 sam Exp $
+ * $Id: input_ext-intf.h,v 1.76 2002/08/12 22:12:50 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -232,6 +232,9 @@ struct stream_descriptor_t
     
     /* Stream control */
     stream_ctrl_t           control;
+
+    /* Optional stream output */
+    sout_instance_t *       p_sout;
 
     /* Input info */
     input_info_category_t * p_info;

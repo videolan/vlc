@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.3 2002/08/11 22:36:35 massiot Exp $
+ * $Id: output.c,v 1.4 2002/08/12 22:12:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -155,9 +155,14 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 
 /*****************************************************************************
  * aout_OutputNextBuffer : give the audio output plug-in the right buffer
+ *****************************************************************************
+ * If b_can_sleek is 1, the aout core functions won't try to resample
+ * new buffers to catch up - that is we suppose that the output plug-in can
+ * do it by itself. S/PDIF outputs should always set b_can_sleek = 1.
  *****************************************************************************/
 aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
-                                       mtime_t start_date )
+                                       mtime_t start_date /*,
+                                       vlc_bool_t b_can_sleek */ )
 {
     aout_buffer_t * p_buffer;
 
@@ -180,9 +185,10 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         return NULL;
     }
 
+    /* Here we suppose that all buffers have the same duration - this is
+     * generally true, and anyway if it's wrong it won't be a disaster. */
     if ( p_buffer->start_date > start_date
-                                 + (mtime_t)p_aout->output.i_nb_samples
-                                 * 1000000 / p_aout->output.output.i_rate )
+                         + (p_buffer->end_date - p_buffer->start_date) )
     {
         vlc_mutex_unlock( &p_aout->output.fifo.lock );
         msg_Dbg( p_aout, "audio output is starving (%lld)",
@@ -190,8 +196,22 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         return NULL;
     }
 
-    /* FIXME : there we should handle the case where start_date is not
-     * completely equal to p_buffer->start_date. */
+#if 0
+    if ( !b_can_sleek )
+    {
+        /* Try to compensate the drift by doing some resampling. */
+        int i;
+
+        /* Take the mixer lock because no input can be removed when the
+         * the mixer lock is taken. */
+        vlc_mutex_lock( &p_aout->mixer_lock );
+        for ( i = 0; i < p_input->i_nb_inputs; i++ )
+        {
+            aout_input_t * p_input = p_aout->pp_inputs[i];
+        }
+        vlc_mutex_lock( &p_aout->mixer_lock );
+    }
+#endif
 
     p_aout->output.fifo.p_first = p_buffer->p_next;
     if ( p_buffer->p_next == NULL )

@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.3 2002/08/09 23:47:23 massiot Exp $
+ * $Id: file.c,v 1.4 2002/08/12 22:12:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -32,6 +32,8 @@
 #include <vlc/aout.h>
 
 #include "aout_internal.h"
+
+#define FRAME_SIZE 2048
 
 /*****************************************************************************
  * Local prototypes.
@@ -126,7 +128,7 @@ static int SetFormat( aout_instance_t * p_aout )
     }
 
     p_aout->output.output.i_format = format_int[i];
-    p_aout->output.i_nb_samples = 2048;
+    p_aout->output.i_nb_samples = FRAME_SIZE;
     return 0;
 }
 

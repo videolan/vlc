@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.44 2002/08/12 09:34:15 sam Exp $
+ * $Id: input_dec.c,v 1.45 2002/08/12 22:12:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -228,6 +228,7 @@ static decoder_fifo_t * CreateDecoderFifo( input_thread_t * p_input,
     p_fifo->p_demux_data = p_es->p_demux_data;
     
     p_fifo->p_stream_ctrl = &p_input->stream.control;
+    p_fifo->p_sout = p_input->stream.p_sout;
 
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;

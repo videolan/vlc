@@ -23,6 +23,7 @@ PLAYLIST := playlist
 INPUT := input input_ext-plugins input_ext-dec input_ext-intf input_dec input_programs input_clock input_info
 VIDEO_OUTPUT := video_output video_text vout_pictures vout_subpictures
 AUDIO_OUTPUT := audio_output filters input mixer output
+STREAM_OUTPUT := stream_output
 MISC := mtime modules threads cpu configuration netutils iso_lang messages objects extras
 
 LIBVLC_OBJ :=	$(LIBVLC:%=src/%.o) \
@@ -31,6 +32,7 @@ LIBVLC_OBJ :=	$(LIBVLC:%=src/%.o) \
 		$(INPUT:%=src/input/%.o) \
 		$(VIDEO_OUTPUT:%=src/video_output/%.o) \
 		$(AUDIO_OUTPUT:%=src/audio_output/%.o) \
+		$(STREAM_OUTPUT:%=src/stream_output/%.o) \
 		$(MISC:%=src/misc/%.o)
 
 VLC_OBJ := $(VLC:%=src/%.o)
