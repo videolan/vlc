@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.71 2001/01/16 05:04:25 sam Exp $
+ * $Id: input.c,v 1.72 2001/01/20 20:59:44 stef Exp $
  *
  * Authors: 
  *
@@ -416,7 +416,7 @@ static void DvdOpen( input_thread_t * p_input )
 {
     intf_Msg( "input: opening DVD %s", p_input->p_config->p_source );
     if( (p_input->i_handle = open( p_input->p_config->p_source,
-                                   O_RDONLY|O_LARGEFILE )) == (-1) )
+                                O_RDONLY| O_NONBLOCK |O_LARGEFILE )) == (-1) )
     {
         intf_ErrMsg( "input error: cannot open device (%s)", strerror(errno) );
         p_input->b_error = 1;

@@ -39,10 +39,10 @@
  */
 
 /*****************************************************************************
- * IfoFindStart : When reading directly on a device, finds the offset to the
+ * IfoFindVMG : When reading directly on a device, finds the offset to the
  * beginning of video_ts.ifo.
  *****************************************************************************/
-static int IfoFindStart( ifo_t* p_ifo )
+static int IfoFindVMG( ifo_t* p_ifo )
 {
     char    psz_ifo_start[12] = "DVDVIDEO-VMG";
     char    psz_test[12];
@@ -103,7 +103,7 @@ ifo_t IfoInit( int i_fd )
      * 512000 bytes is just another value :) */
     ifo.i_pos = lseek64( ifo.i_fd, 250 *DVD_LB_SIZE, SEEK_SET );
     /* FIXME : use udf filesystem to find the beginning of the file */
-    IfoFindStart( &ifo );
+    IfoFindVMG( &ifo );
     
     return ifo;
 }
@@ -177,7 +177,7 @@ fprintf(stderr, "Pos : %lld Val : %llx\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                 (long long)*(p_field) );                    \
         p_ifo->i_pos =                                                      \
-                   lseek64( p_ifo->i_fd, p_ifo->i_pos + (i_len), SEEK_SET );  \
+                   lseek64( p_ifo->i_fd, p_ifo->i_pos + (i_len), SEEK_SET );\
     }
 
 #define GETC( p_field )                                                     \
@@ -186,7 +186,7 @@ fprintf(stderr, "Pos : %lld Val : %llx\n",                                  \
 fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                           *(p_field) );                     \
-        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 1 , SEEK_SET );  \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 1 , SEEK_SET );\
     }
 
 #define GETS( p_field )                                                     \
@@ -196,7 +196,7 @@ fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
 fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                           *(p_field) );                     \
-        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 2 , SEEK_SET );  \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 2 , SEEK_SET );\
     }
 
 #define GETL( p_field )                                                     \
@@ -206,7 +206,7 @@ fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
 fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                           *(p_field) );                     \
-        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 4 , SEEK_SET );  \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 4 , SEEK_SET );\
     }
 
 #define GETLL( p_field )                                                    \
@@ -216,13 +216,13 @@ fprintf(stderr, "Pos : %lld Value : %d\n",                                  \
 fprintf(stderr, "Pos : %lld Value : %lld\n",                                \
                                 (long long)(p_ifo->i_pos - i_start),        \
                                             *(p_field) );                   \
-        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 8 , SEEK_SET );  \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd , p_ifo->i_pos + 8 , SEEK_SET );\
     }
 
 #define FLUSH( i_len )                                                      \
     {                                                                       \
 fprintf(stderr, "Pos : %lld\n", (long long)(p_ifo->i_pos - i_start));       \
-        p_ifo->i_pos = lseek64( p_ifo->i_fd ,                                 \
+        p_ifo->i_pos = lseek64( p_ifo->i_fd ,                               \
                               p_ifo->i_pos + (i_len), SEEK_SET );           \
     }
 
@@ -1069,10 +1069,10 @@ void IfoRead( ifo_t* p_ifo )
         p_ifo->b_error = 1;
         return;
     }
-    for( i=0 ; i<p_ifo->vmg.mat.i_tts_nb ; i++ )
+    for( i=0 ; i<1 /*p_ifo->vmg.mat.i_tts_nb*/ ; i++ )
     {
 
-fprintf( stderr, "######### VTS %d #############\n", i );
+fprintf( stderr, "######### VTS %d #############\n", i+1 );
 
         i_off = p_ifo->vmg.ptt_srpt.p_tts[i].i_ssector *DVD_LB_SIZE;
         p_ifo->i_pos = lseek64( p_ifo->i_fd, i_off, SEEK_SET );

@@ -187,6 +187,7 @@ INTERFACE =	src/interface/main.o \
 INPUT =		src/input/input_ps.o \
 		src/input/input_ts.o \
 		src/input/dvd_ifo.o \
+        src/input/dvd_css.o \
 		src/input/input_dvd.o \
 		src/input/mpeg_system.o \
 		src/input/input_ext-dec.o \

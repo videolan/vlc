@@ -2,7 +2,7 @@
  * input_dvd.c: DVD reading
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.3 2001/01/16 04:41:20 stef Exp $
+ * $Id: input_dvd.c,v 1.4 2001/01/20 20:59:44 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -30,9 +30,22 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <netinet/in.h>
+
+#include <fcntl.h>
+#include <sys/types.h>
+
 #include <string.h>
 #include <errno.h>
 #include <malloc.h>
+
+#include <sys/ioctl.h>
+//#if defined(__NetBSD__) || defined(__OpenBSD__)
+//# include <sys/dvdio.h>
+//#elif defined(__linux__)
+#include <linux/cdrom.h>
+//#else
+//# error "Need the DVD ioctls"
+//#endif
 
 #include "config.h"
 #include "common.h"
@@ -50,6 +63,7 @@
 #include "input.h"
 
 #include "dvd_ifo.h"
+#include "dvd_css.h"
 #include "input_dvd.h"
 #include "mpeg_system.h"
 
@@ -79,9 +93,18 @@ static void DeletePES   ( void *, struct pes_packet_s * );
  *****************************************************************************/
 static int DVDProbe( input_thread_t * p_input )
 {
-    /* verify that the first three bytes are 0x000001, or unscramble and
-     * re-do. */
-    return 1;
+    dvd_struct dvd;
+
+    dvd.type = DVD_STRUCT_COPYRIGHT;
+    dvd.copyright.layer_num = 0;
+
+    if( ioctl( p_input->i_handle, DVD_READ_STRUCT, &dvd ) < 0 )
+    {
+        intf_ErrMsg( "DVD ioctl error" );
+        return -1;
+    }
+
+    return dvd.copyright.cpst;
 }
 
 /*****************************************************************************
@@ -102,18 +125,44 @@ static void DVDInit( input_thread_t * p_input )
     p_input->p_plugin_data = (void *)p_method;
     p_input->p_method_data = NULL;
 
+    p_method->i_fd = p_input->i_handle;
+
+
     lseek64( p_input->i_handle, 0, SEEK_SET );
 
     /* Ifo initialisation */
     p_method->ifo = IfoInit( p_input->i_handle );
     IfoRead( &(p_method->ifo) );
 
+    /* CSS authentication and keys */
+    if( ( p_method->b_encrypted = DVDProbe( p_input ) ) )
+    {
+fprintf(stderr, " CSS Init start\n" );
+        p_method->css = CSSInit( p_input->i_handle );
+fprintf(stderr, " CSS Init end\n" );
+        p_method->css.i_title_nb = 1/*p_method->ifo.vmg.ptt_srpt.i_nb*/;
+#if 0        
+        if( (p_title_key =
+             malloc( p_method->css.i_title_nb *sizeof(title_key_t) )) == NULL )
+        {
+            intf_ErrMsg( "Out of memory" );
+            p_input->b_error = 1;
+            return;
+        }
+#endif
+
+fprintf(stderr, " CSS Get start\n" );
+        CSSGetKeys( &(p_method->css) );
+fprintf(stderr, " CSS Get end\n" );
+
+    }
+
     i_start = p_method->ifo.p_vts[0].i_pos +
               p_method->ifo.p_vts[0].mat.i_tt_vobs_ssector *DVD_LB_SIZE;
 
     i_start = lseek64( p_input->i_handle, i_start, SEEK_SET );
     fprintf(stderr, "Begin at : %lld\n", (long long)i_start );
-
+#if 1
     input_InitStream( p_input, sizeof( stream_ps_data_t ) );
     input_AddProgram( p_input, 0, sizeof( stream_ps_data_t ) );
 
@@ -232,6 +281,7 @@ static void DVDInit( input_thread_t * p_input )
     }
     else
     {
+#endif
         /* The programs will be added when we read them. */
         vlc_mutex_lock( &p_input->stream.stream_lock );
         p_input->stream.pp_programs[0]->b_is_ok = 0;
@@ -270,6 +320,12 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
         default:
             break;
     }
+#if 0
+    if( p_method->b_encrypted )
+    {
+        CSSDescrambleSector( p_method->css.p_title_key.key, p_buffer );
+    }
+#endif
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.i_tell += i_nb;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
