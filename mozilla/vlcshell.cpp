@@ -2,7 +2,7 @@
  * vlcshell.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.6 2002/10/25 18:17:59 sam Exp $
+ * $Id: vlcshell.cpp,v 1.7 2002/11/28 23:53:03 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -61,7 +61,7 @@
 ******************************************************************************/
 #ifdef XP_UNIX
 #   define VOUT_PLUGINS "xvideo,x11,dummy"
-#   define AOUT_PLUGINS "dsp,dummy"
+#   define AOUT_PLUGINS "oss,dummy"
 
 static void Redraw( Widget w, XtPointer closure, XEvent *event );
 #endif
@@ -274,6 +274,22 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
                 p_plugin->b_autoplay = 1;
             }
         }
+        else if( !strcmp( argn[i], "autostart" ) )
+        {
+            if( !strcmp( argv[i], "1" ) || !strcmp( argv[i], "true" ) )
+            {
+                p_plugin->b_autoplay = 1;
+            }
+        }
+        else if( !strcmp( argn[i], "filename" ) )
+        {
+            p_plugin->psz_target = argv[i];
+        }
+        else if( !strcmp( argn[i], "src" ) )
+        {
+            p_plugin->psz_target = argv[i];
+        }
+        
 #if USE_LIBVLC
         else if( !strcmp( argn[i], "loop" ) )
         {
@@ -532,8 +548,8 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
 #if USE_LIBVLC
     VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
 
-    VLC_AddTarget( p_plugin->i_vlc, fname,
-                   PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+/*    VLC_AddTarget( p_plugin->i_vlc, fname,
+      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );*/
 #endif
 }
 
