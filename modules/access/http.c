@@ -117,6 +117,7 @@ struct access_sys_t
 
     vlc_bool_t b_seekable;
     vlc_bool_t b_reconnect;
+    vlc_bool_t b_pace_control;
 };
 
 /* */
@@ -132,7 +133,7 @@ static char *b64_encode( unsigned char *src );
 /*****************************************************************************
  * Open:
  *****************************************************************************/
-static int  Open ( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
@@ -184,7 +185,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->psz_mime = NULL;
     p_sys->psz_location = NULL;
     p_sys->psz_user_agent = NULL;
-
+    p_sys->b_pace_control = VLC_TRUE;
 
     /* Parse URI */
     ParseURL( p_sys, p_access->psz_path );
@@ -312,6 +313,8 @@ static int  Open ( vlc_object_t *p_this )
 
         msg_Info( p_access, "ICY server found, %s demuxer selected",
                   p_access->psz_demux );
+
+        p_sys->b_pace_control = VLC_FALSE;
     }
 
     if( p_sys->b_reconnect ) msg_Dbg( p_access, "auto re-connect enabled" );
@@ -505,12 +508,9 @@ static int Control( access_t *p_access, int i_query, va_list args )
             *pb_bool = VLC_FALSE;
             break;
         case ACCESS_CAN_PAUSE:
-            pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;    /* FIXME */
-            break;
         case ACCESS_CAN_CONTROL_PACE:
             pb_bool = (vlc_bool_t*)va_arg( args, vlc_bool_t* );
-            *pb_bool = VLC_TRUE;    /* FIXME */
+            *pb_bool = p_sys->b_pace_control;
             break;
 
         /* */
