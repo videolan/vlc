@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.15 2001/07/25 14:51:48 bozo Exp $
+ * $Id: aout_spdif.c,v 1.16 2001/09/30 00:33:22 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -41,7 +41,7 @@
 #include "audio_output.h"
 #include "aout_common.h"
 
-#define SLEEP_TIME      16000
+#define FRAME_TIME      32000
 
 /*****************************************************************************
  * aout_SpdifThread: audio output thread that sends raw spdif data
@@ -50,118 +50,107 @@
  * This output thread is quite specific as it can only handle one fifo now.
  *
  * Note: spdif can demux up to 8 ac3 streams, and can even take
- * care of time stamps (cf ac3 spec).
+ * care of time stamps (cf ac3 spec) but I'm not sure all decoders
+ * implement it.
  *****************************************************************************/
 void aout_SpdifThread( aout_thread_t * p_aout )
 {
-    u8          pi_spdif_blank [9] =
-                    { 0x72, 0xf8, 0x1f, 0x4e, 0x01, 0x00, 0x08, 0x00, 0x77 };
-    u8          pi_blank[SPDIF_FRAME_SIZE];
-    int         i_fifo;
-    int         i_frame;
-    int         i_blank;
-    mtime_t     mplay;
-    mtime_t     mdelta;
+  int         i_fifo;
+  mtime_t     m_frame_time = 0;
+  mtime_t     m_play;
+  mtime_t     m_old = 0;
 
-    /* get a blank frame ready */
-    memset( pi_blank, 0, sizeof(pi_blank) );
-    memcpy( pi_blank, pi_spdif_blank, sizeof(pi_spdif_blank) );
-   
-    intf_WarnMsg( 3, "aout info: starting spdif output loop" );
 
-    /* variable used to compute the nnumber of blank frames since the
-     * last significant frame */
-    i_blank = 0;
-    mdelta = 0;
-    mplay = 0;
+  intf_WarnMsg( 3, "aout info: starting spdif output loop" );
 
-    /* Compute the theorical duration of an ac3 frame */
-
-    while( !p_aout->b_die )
+  while( !p_aout->b_die )
+  {
+    for( i_fifo = 0 ; i_fifo < AOUT_MAX_FIFOS ; i_fifo++ )
     {
-        /* variable to check that we send data to the decoder
-         * once per loop at least */
-        i_frame = 0;
-
-        /* FIXME: find a way to handle the locks here */
-        for( i_fifo = 0 ; i_fifo < AOUT_MAX_FIFOS ; i_fifo++ )
+      /* the loop read each fifo so that we can change the stream
+       * on the fly but mulitplexing is not handled yet so
+       * the sound will be broken is more than one fifo has data */ 
+      /* TODO: write the muliplexer :) */
+      if( p_aout->fifo[i_fifo].i_type == AOUT_ADEC_SPDIF_FIFO )
+      {
+        vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
+        if( p_aout->fifo[i_fifo].b_die )
         {
-            /* the loop read each fifo so that we can change the stream
-             * on the fly but mulitplexing is not handled yet so
-             * the sound will be broken is more than one fifo has data */ 
-            /* TODO: write the muliplexer :) */
-            if( p_aout->fifo[i_fifo].i_type == AOUT_ADEC_SPDIF_FIFO )
-            {
-                vlc_mutex_lock( &p_aout->fifo[i_fifo].data_lock );
-                if( p_aout->fifo[i_fifo].b_die )
-                {
-                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
-                    aout_FreeFifo( &p_aout->fifo[i_fifo] );
-                }
-                else if( !AOUT_FIFO_ISEMPTY( p_aout->fifo[i_fifo] ) )
-                {
-                    mplay = p_aout->fifo[i_fifo].date[p_aout->fifo[i_fifo].
-                                l_start_frame];
-                    mdelta = mplay - mdate();
+          vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
 
-                    if( mdelta < ( 2 * SLEEP_TIME ) )
-                    {
-                        /* play spdif frame to the external decoder */
-                        p_aout->pf_play( p_aout,
-                                     ( (byte_t *)p_aout->fifo[i_fifo].buffer
-                                         + p_aout->fifo[i_fifo].l_start_frame
-                                            * SPDIF_FRAME_SIZE ),
-                                     p_aout->fifo[i_fifo].l_frame_size );
-
-                        p_aout->fifo[i_fifo].l_start_frame = 
-                            (p_aout->fifo[i_fifo].l_start_frame + 1 )
-                            & AOUT_FIFO_SIZE;
-
-                        intf_WarnMsg( 12, "spdif out (%d):"
-                                          "playing frame %lld",
-                                           i_fifo,
-                                           mdelta );
-                       
-                        i_frame++;
-                        i_blank = 0;
-                    }
-                    else
-                    {
-                        intf_WarnMsg( 12, "spdif out (%d): early frame %lld", 
-                                            i_fifo, mdelta );
-                    }
-                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
-                }
-                else
-                {
-                    vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
-                }
-            }
+          vlc_mutex_lock( &p_aout->fifos_lock );
+          aout_FreeFifo( &p_aout->fifo[i_fifo] );
+          vlc_mutex_unlock( &p_aout->fifos_lock );
         }
-
-        if( i_frame )
+        else if( !AOUT_FIFO_ISEMPTY( p_aout->fifo[i_fifo] ) )
         {
-            mwait( mplay + SLEEP_TIME );
+          /* Copy data from fifo to buffer to release the lock earlier */
+          memcpy( p_aout->buffer,
+                  (byte_t *)p_aout->fifo[i_fifo].buffer
+                          + p_aout->fifo[i_fifo].l_start_frame
+                          * SPDIF_FRAME_SIZE,
+                  SPDIF_FRAME_SIZE );
+
+          m_play = p_aout->fifo[i_fifo].date[p_aout->fifo[i_fifo].
+                       l_start_frame];
+
+          p_aout->fifo[i_fifo].l_start_frame =
+              (p_aout->fifo[i_fifo].l_start_frame + 1 )
+              & AOUT_FIFO_SIZE;
+
+          /* Compute the theorical duration of an ac3 frame */
+          m_frame_time = 1000000 * AC3_FRAME_SIZE
+                                 / p_aout->fifo[i_fifo].l_rate;
+
+          vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+
+          /* play spdif frame to the external decoder 
+           * the kernel driver will sleep until the
+           * dsp buffer is empty enough to accept the data */
+          if( m_play > ( mdate() - m_frame_time ) )
+          {
+            /* check continuity */
+            if( (m_play - m_old) != m_frame_time )
+            {
+              intf_WarnMsg( 6, "aout warning: long frame ? (%lld)",
+                               m_play - m_old );
+              mwait( m_play );
+            }
+            else
+            {
+              mwait( m_play - 4* m_frame_time );
+            }
+            m_old = m_play;
+
+            p_aout->pf_play( p_aout,
+                             (byte_t *)p_aout->buffer,
+                             SPDIF_FRAME_SIZE );
+          }
+          else
+          {
+            intf_WarnMsg( 6, "aout info: late spdif frame" );
+          }
         }
         else
         {
-            /* insert blank frame for stream continuity to
-             * the external decoder */
-            intf_WarnMsg( 6, "spdif warning: blank frame" );
-            p_aout->pf_play( p_aout, pi_blank, SPDIF_FRAME_SIZE );
+          vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
+          msleep( m_frame_time );
+          intf_WarnMsg( 6, "aout info: empty spdif fifo" );
         }
+      }
     }
-    
-    intf_WarnMsg( 3, "aout info: exiting spdif loop" );
-    vlc_mutex_lock( &p_aout->fifos_lock );
+  }
 
-    for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
-    {
-        aout_FreeFifo( &p_aout->fifo[i_fifo] );
-    }
+  intf_WarnMsg( 3, "aout info: exiting spdif loop" );
+  vlc_mutex_lock( &p_aout->fifos_lock );
 
-    vlc_mutex_unlock( &p_aout->fifos_lock );
+  for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
+  {
+    aout_FreeFifo( &p_aout->fifo[i_fifo] );
+  }
 
-    return;
+  vlc_mutex_unlock( &p_aout->fifos_lock );
+
+  return;
 }
 
