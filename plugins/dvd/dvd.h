@@ -2,7 +2,7 @@
  * dvd.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd.h,v 1.3 2002/03/09 16:48:33 stef Exp $
+ * $Id: dvd.h,v 1.4 2002/05/20 22:45:03 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -56,7 +56,7 @@ typedef struct thread_dvd_data_s
 
     int                     i_vts_start;  /* offset to beginning of vts */
     int                     i_vts_lb;     /* sector in vts */
-    int                     i_end_lb;     /* last sector of current cell */
+    int                     i_last_lb;    /* last sector of current cell */
 
     /* Structure that contains all information of the DVD */
     struct ifo_s *          p_ifo;

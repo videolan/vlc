@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.18 2002/03/08 22:58:12 stef Exp $
+ * $Id: dvd_ifo.h,v 1.19 2002/05/20 22:45:03 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -138,14 +138,14 @@ typedef struct chapter_map_s
 typedef struct cell_play_s
 {
     /* This information concerns the currently selected cell */
-    u16             i_category;                      // 2 bytes
+    u16             i_category;                 // 2 bytes
     u8              i_still_time;               // 1 byte; in seconds; ff=inf
-    u8              i_command_nb;                   // 1 byte; 0 = no com
+    u8              i_command_nb;               // 1 byte; 0 = no com
     u32             i_play_time;                // 4 bytes
-    u32             i_start_sector;             // 4 bytes
+    u32             i_first_sector;             // 4 bytes
     u32             i_first_ilvu_vobu_esector;  // 4 bytes; ???
-    u32             i_last_vobu_start_sector;            // 4 bytes
-    u32             i_end_sector;                  // 4 bytes
+    u32             i_last_vobu_start_sector;   // 4 bytes
+    u32             i_last_sector;              // 4 bytes
 } cell_play_t;
 
 /* Cell Position Information Table
@@ -220,7 +220,7 @@ typedef struct unit_inf_s
 {
     u16             i_title_nb;                   // 2 bytes
 //    char[2]         ???
-    u32             i_end_byte;                 // 4 bytes
+    u32             i_last_byte;                // 4 bytes
     unit_title_t *  p_title;                      // i_srp_nb * 8 bytes
 } unit_inf_t;
 
@@ -230,7 +230,7 @@ typedef struct title_unit_s
 {
     u16             i_unit_nb;                    // 2 bytes; ???
 //    char[2]         ???
-    u32             i_end_byte;                    // 4 bytes
+    u32             i_last_byte;                   // 4 bytes
     unit_t*         p_unit;                       // i_lu_nb * 8 bytes
     unit_inf_t*     p_unit_inf;                 // i_lu_nb * 8 bytes
 } title_unit_t;
@@ -243,15 +243,15 @@ typedef struct cell_map_s
     u16             i_vob_id;                   // 2 bytes
     u8              i_cell_id;                  // 1 byte
 //    char            ???
-    u32             i_start_sector;                  // 4 bytes
-    u32             i_end_sector;                  // 4 bytes
+    u32             i_first_sector;             // 4 bytes
+    u32             i_last_sector;              // 4 bytes
 } cell_map_t;
 
 typedef struct cell_inf_s
 {
     u16             i_vob_nb;                   // 2 bytes
 //    char[2]         ???
-    u32             i_end_byte;                    // 4 bytes
+    u32             i_last_byte;                // 4 bytes
     u16             i_cell_nb;                  // not in ifo; computed
                                                 // with e_byte
     cell_map_t*     p_cell_map;
@@ -263,7 +263,7 @@ typedef struct cell_inf_s
  */
 typedef struct vobu_map_s
 {
-    u32             i_end_byte;                    // 4 bytes
+    u32             i_last_byte;                   // 4 bytes
     u32*            pi_vobu_start_sector;            // (nb of vobu) * 4 bytes
 } vobu_map_t;
 
@@ -336,7 +336,7 @@ typedef struct title_inf_s
 {
     u16             i_title_nb;                   // 2 bytes
 //    char[2]         ???
-    u32             i_end_byte;                    // 4 bytes
+    u32             i_last_byte;                   // 4 bytes
     title_attr_t *  p_attr;                     // i_ttu_nb * 12 bytes
 } title_inf_t;
 
@@ -362,7 +362,7 @@ typedef struct parental_inf_s
 {
     u16             i_country_nb;               // 2 bytes
     u16             i_vts_nb;                   // 2 bytes
-    u32             i_end_byte;                    // 4 bytes
+    u32             i_last_byte;                   // 4 bytes
     parental_desc_t* p_parental_desc;             // i_country_nb * 8 bytes
     parental_mask_t* p_parental_mask;        // i_country_nb * sizeof(vmg_ptl_mask_t)
 } parental_inf_t;
@@ -375,7 +375,7 @@ typedef struct parental_inf_s
  * - start at pi_atrt_sbyte */
 typedef struct vts_attr_s
 {
-    u32             i_end_byte;                    // 4 bytes
+    u32             i_last_byte;                   // 4 bytes
     u32             i_cat_app_type;             // 4 bytes
     ifo_video_t     vts_menu_video_attr;          // 2 bytes
 //    char            ???
@@ -400,7 +400,7 @@ typedef struct vts_inf_s
 {
     u16             i_vts_nb;                   // 2 bytes
 //    char[2]         ???
-    u32             i_end_byte;                    // 4 bytes
+    u32             i_last_byte;                   // 4 bytes
     u32*            pi_vts_attr_start_byte;          // i_vts_nb * 4 bytes
     vts_attr_t*     p_vts_attr;
 } vts_inf_t;
@@ -430,9 +430,9 @@ typedef struct vmg_s
 typedef struct vts_manager_s
 {
     char            psz_id[13];                 // 12 bytes (DVDVIDEO-VTS)
-    u32             i_end_sector;                  // 4 bytes
+    u32             i_last_sector;              // 4 bytes
 //    char[12]        ???
-    u32             i_inf_end_sector;                // 4 bytes
+    u32             i_inf_last_sector;          // 4 bytes
 //    char            ???
     u8              i_spec_ver;                 // 1 byte
     u32             i_cat;                      // 4 bytes
@@ -486,7 +486,7 @@ typedef struct vts_title_s
 {
     u16             i_title_nb;                   // 2 bytes
 //    char[2]         ???
-    u32             i_end_byte;                    // 4 bytes
+    u32             i_last_byte;                   // 4 bytes
     u32*            pi_start_byte;
     title_start_t * p_title_start;                      // i_ttu_nb * 4 bytes
 } vts_title_t;
@@ -510,7 +510,7 @@ typedef struct time_inf_s
 {
     u16             i_nb;                       // 2 bytes
 //    char[2]         ???
-    u32             i_end_byte;                    // 4 bytes
+    u32             i_last_byte;                   // 4 bytes
     u32*            pi_start_byte;                   // i_tmap_nb * 4 bytes
     time_map_t*     p_time_map;
 } time_inf_t;

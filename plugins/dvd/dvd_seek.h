@@ -1,7 +1,7 @@
 /* dvd_seek.h: DVD access plugin.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_seek.h,v 1.3 2002/03/09 16:48:33 stef Exp $
+ * $Id: dvd_seek.h,v 1.4 2002/05/20 22:45:03 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -23,8 +23,8 @@
 int CellIsInterleaved( thread_dvd_data_t * );
 int CellAngleOffset  ( thread_dvd_data_t *, int );
 int CellPrg2Map      ( thread_dvd_data_t * );
-int CellStartSector  ( thread_dvd_data_t * );
-int CellEndSector    ( thread_dvd_data_t * );
+int CellFirstSector  ( thread_dvd_data_t * );
+int CellLastSector   ( thread_dvd_data_t * );
 
 int NextCellPrg      ( thread_dvd_data_t * );
 int Lb2CellPrg       ( thread_dvd_data_t * );

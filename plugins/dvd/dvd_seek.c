@@ -1,7 +1,7 @@
 /* dvd_seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_seek.c,v 1.6 2002/05/16 16:51:50 gbazin Exp $
+ * $Id: dvd_seek.c,v 1.7 2002/05/20 22:45:03 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -71,7 +71,7 @@ int CellPrg2Map( thread_dvd_data_t * p_dvd )
 {
     int     i_cell;
 
-    i_cell = p_dvd->i_map_cell;
+    i_cell = 0;
 
     if( i_cell >= cell.i_cell_nb )
     {
@@ -125,23 +125,23 @@ int CellAngleOffset( thread_dvd_data_t * p_dvd, int i_prg_cell )
     return i_cell_off;
 }
 
-int CellStartSector( thread_dvd_data_t * p_dvd )
+int CellFirstSector( thread_dvd_data_t * p_dvd )
 {
-    return __MAX( cell.p_cell_map[p_dvd->i_map_cell].i_start_sector,
-                  title.p_cell_play[p_dvd->i_prg_cell].i_start_sector );
+    return __MAX( cell.p_cell_map[p_dvd->i_map_cell].i_first_sector,
+                  title.p_cell_play[p_dvd->i_prg_cell].i_first_sector );
 }
     
-int CellEndSector( thread_dvd_data_t * p_dvd )
+int CellLastSector( thread_dvd_data_t * p_dvd )
 {
-    return __MIN( cell.p_cell_map[p_dvd->i_map_cell].i_end_sector,
-                  title.p_cell_play[p_dvd->i_prg_cell].i_end_sector );
+    return __MIN( cell.p_cell_map[p_dvd->i_map_cell].i_last_sector,
+                  title.p_cell_play[p_dvd->i_prg_cell].i_last_sector );
 }
 
 int NextCellPrg( thread_dvd_data_t * p_dvd )
 {
     int     i_cell = p_dvd->i_prg_cell;
     
-    if( p_dvd->i_vts_lb > title.p_cell_play[i_cell].i_end_sector )
+    if( p_dvd->i_vts_lb > title.p_cell_play[i_cell].i_last_sector )
     {
         i_cell ++;
         i_cell += CellAngleOffset( p_dvd, i_cell );
@@ -159,7 +159,7 @@ int Lb2CellPrg( thread_dvd_data_t * p_dvd )
 {
     int     i_cell = 0;
     
-    while( p_dvd->i_vts_lb > title.p_cell_play[i_cell].i_end_sector )
+    while( p_dvd->i_vts_lb > title.p_cell_play[i_cell].i_last_sector )
     {
         i_cell ++;
         i_cell += CellAngleOffset( p_dvd, i_cell );
@@ -177,7 +177,7 @@ int Lb2CellMap( thread_dvd_data_t * p_dvd )
 {
     int     i_cell = 0;
     
-    while( p_dvd->i_vts_lb > cell.p_cell_map[i_cell].i_end_sector )
+    while( p_dvd->i_vts_lb > cell.p_cell_map[i_cell].i_last_sector )
     {
         i_cell ++;
 
@@ -192,7 +192,7 @@ int Lb2CellMap( thread_dvd_data_t * p_dvd )
 
 int LbMaxOnce( thread_dvd_data_t * p_dvd )
 {
-    int i_block_once = p_dvd->i_end_lb - p_dvd->i_vts_lb + 1;
+    int i_block_once = p_dvd->i_last_lb - p_dvd->i_vts_lb + 1;
 
     /* Get the position of the next cell if we're at cell end */
     if( i_block_once <= 0 )
@@ -211,8 +211,8 @@ int LbMaxOnce( thread_dvd_data_t * p_dvd )
             return 0;
         }
 
-        p_dvd->i_vts_lb   = CellStartSector( p_dvd );
-        p_dvd->i_end_lb   = CellEndSector( p_dvd );
+        p_dvd->i_vts_lb   = CellFirstSector( p_dvd );
+        p_dvd->i_last_lb  = CellLastSector( p_dvd );
         
         if( ( p_dvd->i_chapter = NextChapter( p_dvd ) ) < 0)
         {
@@ -229,7 +229,7 @@ int LbMaxOnce( thread_dvd_data_t * p_dvd )
             return 0;
         }
 
-        i_block_once = p_dvd->i_end_lb - p_dvd->i_vts_lb + 1;
+        i_block_once = p_dvd->i_last_lb - p_dvd->i_vts_lb + 1;
     }
 
     return i_block_once;
@@ -275,6 +275,7 @@ int NextChapter( thread_dvd_data_t * p_dvd )
             return -1;
         }
         p_dvd->b_new_chapter = 1;
+
         return p_dvd->i_chapter;
     }
 
@@ -300,8 +301,8 @@ int DVDSetChapter( thread_dvd_data_t * p_dvd, int i_chapter )
             p_dvd->i_map_cell = 0;
         }
         p_dvd->i_map_cell = CellPrg2Map( p_dvd );
-        p_dvd->i_vts_lb   = CellStartSector( p_dvd );
-        p_dvd->i_end_lb   = CellEndSector( p_dvd );
+        p_dvd->i_vts_lb   = CellFirstSector( p_dvd );
+        p_dvd->i_last_lb  = CellLastSector( p_dvd );
 
         /* Position the fd pointer on the right address */
         if( dvdcss_seek( p_dvd->dvdhandle,

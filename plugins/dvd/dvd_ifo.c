@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.46 2002/04/03 06:23:08 sam Exp $
+ * $Id: dvd_ifo.c,v 1.47 2002/05/20 22:45:03 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -197,7 +197,7 @@ int IfoInit( ifo_t * p_ifo )
         TITINF.i_title_nb = ReadWord( p_ifo, p_buf, &p_tmp );
         //fprintf( stderr, "title_inf: TTU nb %d\n", TITINF.i_title_nb );
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
-        TITINF.i_end_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
+        TITINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
     
         /* parsing of title attributes */
         TITINF.p_attr = malloc( TITINF.i_title_nb *sizeof(title_attr_t) );
@@ -251,7 +251,7 @@ int IfoInit( ifo_t * p_ifo )
     
         PARINF.i_country_nb = ReadWord( p_ifo, p_buf, &p_tmp );
         PARINF.i_vts_nb = ReadWord( p_ifo, p_buf, &p_tmp );
-        PARINF.i_end_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
+        PARINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
         
         PARINF.p_parental_desc = malloc( PARINF.i_country_nb
                                           * sizeof(parental_desc_t) );
@@ -323,7 +323,7 @@ int IfoInit( ifo_t * p_ifo )
         VTSINF.i_vts_nb = ReadWord( p_ifo, p_buf, &p_tmp );;
         //fprintf( stderr, "VTS ATTR Nb: %d\n", VTSINF.i_vts_nb );
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
-        VTSINF.i_end_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
+        VTSINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
         VTSINF.pi_vts_attr_start_byte =
                             malloc( VTSINF.i_vts_nb * sizeof(u32) );
         if( VTSINF.pi_vts_attr_start_byte == NULL )
@@ -351,7 +351,7 @@ int IfoInit( ifo_t * p_ifo )
                                 OFF2LB( VTSINF.pi_vts_attr_start_byte[i] ) )
                      + ( VTSINF.pi_vts_attr_start_byte[i] & 0x7ff );
 
-            VTSINF.p_vts_attr[i].i_end_byte =
+            VTSINF.p_vts_attr[i].i_last_byte =
                                 ReadDouble( p_ifo, p_buf, &p_tmp );
             VTSINF.p_vts_attr[i].i_cat_app_type =
                                 ReadDouble( p_ifo, p_buf, &p_tmp );
@@ -471,9 +471,9 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
 
     ReadBytes( p_ifo, p_buf, &p_tmp, MGINF.psz_id , 12 );
     MGINF.psz_id[12] = '\0';
-    MGINF.i_end_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
+    MGINF.i_last_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
     DumpBytes( p_ifo, p_buf, &p_tmp, 12 );
-    MGINF.i_inf_end_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
+    MGINF.i_inf_last_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
     DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
     MGINF.i_spec_ver = ReadByte( p_ifo, p_buf, &p_tmp );
     MGINF.i_cat = ReadDouble( p_ifo, p_buf, &p_tmp );
@@ -599,7 +599,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
         TITINF.i_title_nb = ReadWord( p_ifo, p_buf, &p_tmp );
         //fprintf( stderr, "VTS title_inf nb: %d\n", TITINF.i_title_nb );
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
-        TITINF.i_end_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
+        TITINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
         TITINF.pi_start_byte = malloc( TITINF.i_title_nb * sizeof(u32) );
         if( TITINF.pi_start_byte == NULL )
@@ -675,7 +675,7 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
 
         TIMINF.i_nb = ReadWord( p_ifo, p_buf, &p_tmp );;
         DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
-        TIMINF.i_end_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
+        TIMINF.i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
         TIMINF.pi_start_byte = malloc( TIMINF.i_nb * sizeof(u32) );
         if( TIMINF.pi_start_byte == NULL )
@@ -702,18 +702,21 @@ int IfoTitleSet( ifo_t * p_ifo, int i_title )
             DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
             TIMINF.p_time_map[i].i_entry_nb = ReadWord( p_ifo, p_buf, &p_tmp );
 
-            TIMINF.p_time_map[i].pi_sector =
+            if( TIMINF.p_time_map[i].i_entry_nb )
+            {
+                TIMINF.p_time_map[i].pi_sector =
                      malloc( TIMINF.p_time_map[i].i_entry_nb * sizeof(u32) );
-            if( TIMINF.p_time_map[i].pi_sector == NULL )
-            {
-                intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
-                return -1;
-            }
+                if( TIMINF.p_time_map[i].pi_sector == NULL )
+                {
+                    intf_ErrMsg( "ifo error: out of memory in IfoTitleSet" );
+                    return -1;
+                }
 
-            for( j = 0 ; j < TIMINF.p_time_map[i].i_entry_nb ; j++ )
-            {
-                TIMINF.p_time_map[i].pi_sector[j] =
+                for( j = 0 ; j < TIMINF.p_time_map[i].i_entry_nb ; j++ )
+                {
+                    TIMINF.p_time_map[i].pi_sector[j] =
                                         ReadDouble( p_ifo, p_buf, &p_tmp );
+                }
             }
         }
     }
@@ -787,7 +790,10 @@ static int FreeTitleSet( vts_t * p_vts )
     {
         for( i = 0 ; i < p_vts->time_inf.i_nb ; i++ )
         {
-            free( p_vts->time_inf.p_time_map[i].pi_sector );
+            if( p_vts->time_inf.p_time_map[i].i_entry_nb )
+            {
+                free( p_vts->time_inf.p_time_map[i].pi_sector );
+            }
         }
 
         free( p_vts->time_inf.p_time_map );
@@ -1079,10 +1085,10 @@ static int ReadTitle( ifo_t * p_ifo, title_t * p_title, int i_block, int i_bytes
             PLAY.i_still_time = ReadByte( p_ifo, p_buf, &p_tmp );
             PLAY.i_command_nb = ReadByte( p_ifo, p_buf, &p_tmp );
             PLAY.i_play_time = ReadDouble( p_ifo, p_buf, &p_tmp );
-            PLAY.i_start_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
+            PLAY.i_first_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
             PLAY.i_first_ilvu_vobu_esector = ReadDouble( p_ifo, p_buf, &p_tmp );
             PLAY.i_last_vobu_start_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
-            PLAY.i_end_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
+            PLAY.i_last_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
 #undef PLAY
         }
     }
@@ -1174,7 +1180,7 @@ static int ReadUnitInf( ifo_t * p_ifo, unit_inf_t * p_unit_inf,
     p_unit_inf->i_title_nb = ReadWord( p_ifo, p_buf, &p_tmp );
     //fprintf( stderr, "Unit nb: %d\n", p_unit_inf->i_title_nb );
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
-    p_unit_inf->i_end_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
+    p_unit_inf->i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
     p_unit_inf->p_title =
             malloc( p_unit_inf->i_title_nb * sizeof(unit_title_t) );
@@ -1244,9 +1250,9 @@ static int ReadTitleUnit( ifo_t * p_ifo, title_unit_t * p_title_unit,
 
     p_title_unit->i_unit_nb = ReadWord( p_ifo, p_buf, &p_tmp );
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
-    p_title_unit->i_end_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
+    p_title_unit->i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
-    //fprintf(stderr, "Unit: nb %d end %d\n", p_title_unit->i_unit_nb, p_title_unit->i_end_byte );
+    //fprintf(stderr, "Unit: nb %d last %d\n", p_title_unit->i_unit_nb, p_title_unit->i_last_byte );
 
     p_title_unit->p_unit = malloc( p_title_unit->i_unit_nb * sizeof(unit_t) );
     if( p_title_unit->p_unit == NULL )
@@ -1321,11 +1327,11 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
 
     p_cell_inf->i_vob_nb = ReadWord( p_ifo, p_buf, &p_tmp );
     DumpBytes( p_ifo, p_buf, &p_tmp, 2 );
-    p_cell_inf->i_end_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
+    p_cell_inf->i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
 
-    p_cell_inf->i_cell_nb = (p_cell_inf->i_end_byte/* - 7*/) / sizeof(cell_map_t);
+    p_cell_inf->i_cell_nb = (p_cell_inf->i_last_byte + 1/* - 7*/) / sizeof(cell_map_t);
 
-/*    fprintf( stderr, "Cell inf: vob %d end %d cell %d\n", p_cell_inf->i_vob_nb, p_cell_inf->i_end_byte,  p_cell_inf->i_cell_nb );
+/*    fprintf( stderr, "Cell inf: vob %d, %d cells, last byte %d\n", p_cell_inf->i_vob_nb, p_cell_inf->i_cell_nb, p_cell_inf->i_last_byte );
 */
     p_cell_inf->p_cell_map =
                 malloc( p_cell_inf->i_cell_nb *sizeof(cell_map_t) );
@@ -1341,9 +1347,9 @@ static int ReadCellInf( ifo_t * p_ifo, cell_inf_t * p_cell_inf, int i_block )
         MAP.i_vob_id = ReadWord( p_ifo, p_buf, &p_tmp );
         MAP.i_cell_id = ReadByte( p_ifo, p_buf, &p_tmp );
         DumpBytes( p_ifo, p_buf, &p_tmp, 1 );
-        MAP.i_start_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
+        MAP.i_first_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
 /*        fprintf(stderr, "sector[%d] %d (%d)\n", i,ntohl(*(u32*)(p_tmp)), p_ifo->i_pos);*/
-        MAP.i_end_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
+        MAP.i_last_sector = ReadDouble( p_ifo, p_buf, &p_tmp );
 #undef MAP
     }
     
@@ -1374,8 +1380,8 @@ static int ReadVobuMap( ifo_t * p_ifo, vobu_map_t * p_vobu_map, int i_block )
     i_start = p_ifo->i_pos;
     //fprintf( stderr, "VOBU ADMAP\n" );
 
-    p_vobu_map->i_end_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
-    i_max = ( i_start + p_vobu_map->i_end_byte + 1 - p_ifo->i_pos )
+    p_vobu_map->i_last_byte = ReadDouble( p_ifo, p_buf, &p_tmp );
+    i_max = ( i_start + p_vobu_map->i_last_byte + 1 - p_ifo->i_pos )
              / sizeof(u32);
 
     p_vobu_map->pi_vobu_start_sector = malloc( i_max * sizeof(u32) );

@@ -8,7 +8,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_access.c,v 1.15 2002/04/25 21:52:42 sam Exp $
+ * $Id: dvd_access.c,v 1.16 2002/05/20 22:45:03 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -102,7 +102,6 @@ void _M( access_getfunctions)( function_list_t * p_function_list )
  * Data access functions
  */
 
-#define DVDLB     p_dvd->i_vts_start + p_dvd->i_vts_lb
 #define DVDTell   LB2OFF( p_dvd->i_vts_start + p_dvd->i_vts_lb ) \
                   - p_input->stream.p_selected_area->i_start
 
@@ -295,8 +294,8 @@ static int DVDSetProgram( input_thread_t    * p_input,
             p_dvd->i_prg_cell += ( p_program->i_number - p_dvd->i_angle );
             p_dvd->i_map_cell =  CellPrg2Map( p_dvd );
             p_dvd->i_map_cell += p_dvd->i_angle_cell;
-            p_dvd->i_vts_lb   =  CellStartSector( p_dvd );
-            p_dvd->i_end_lb   =  CellEndSector( p_dvd );
+            p_dvd->i_vts_lb   =  CellFirstSector( p_dvd );
+            p_dvd->i_last_lb  =  CellLastSector( p_dvd );
             p_dvd->i_angle    =  p_program->i_number;
         }
         else
@@ -379,8 +378,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     if( p_area != p_input->stream.p_selected_area )
     {
         int     i_vts_title;
-        u32     i_start;
-        u32     i_size;
+        u32     i_first;
+        u32     i_last;
 
         /* Reset the Chapter position of the old title */
         p_input->stream.p_selected_area->i_part = 1;
@@ -418,31 +417,32 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             vts.title_unit.p_title[p_dvd->i_title_id-1].title.i_cell_nb;
         p_dvd->i_map_cell = 0;
         p_dvd->i_map_cell = CellPrg2Map( p_dvd );
-        i_size            = CellEndSector( p_dvd );
+        i_last            = CellLastSector( p_dvd );
 
         /* first cell */
         p_dvd->i_prg_cell   = 0;
         p_dvd->i_map_cell   = 0;
         p_dvd->i_angle_cell = 0;
         p_dvd->i_map_cell   = CellPrg2Map    ( p_dvd );
-        p_dvd->i_vts_lb     = CellStartSector( p_dvd );
-        p_dvd->i_end_lb     = CellEndSector  ( p_dvd );
+        p_dvd->i_vts_lb     = CellFirstSector( p_dvd );
+        p_dvd->i_last_lb    = CellLastSector ( p_dvd );
 
         /* Force libdvdcss to check its title key.
          * It is only useful for title cracking method. Methods using the
          * decrypted disc key are fast enough to check the key at each seek */
-        if( ( i_start = dvdcss_seek( p_dvd->dvdhandle, DVDLB,
-                                     DVDCSS_SEEK_KEY ) ) < 0 )
+        i_first = dvdcss_seek( p_dvd->dvdhandle,
+                               p_dvd->i_vts_start + p_dvd->i_vts_lb,
+                               DVDCSS_SEEK_KEY );
+        if( i_first < 0 )
         {
             intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
             return -1;
         }
 
-        i_size -= p_dvd->i_vts_lb + 1;
-
         /* Area definition */
-        p_input->stream.p_selected_area->i_start = LB2OFF( i_start );
-        p_input->stream.p_selected_area->i_size  = LB2OFF( i_size );
+        p_input->stream.p_selected_area->i_start = LB2OFF( i_first );
+        p_input->stream.p_selected_area->i_size  =
+                                        LB2OFF( i_last - p_dvd->i_vts_lb + 1 );
 
         /* Destroy obsolete ES by reinitializing programs */
         DVDFlushStream( p_input );
@@ -457,8 +457,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         DVDSetProgram( p_input,
                        p_input->stream.pp_programs[p_dvd->i_angle-1] ); 
 
-        intf_WarnMsg( 3, "dvd info: title start: %d size: %d",
-                         i_start, i_size );
+        intf_WarnMsg( 3, "dvd info: title first %i, last %i, size %i",
+                         i_first, i_last, i_last - p_dvd->i_vts_lb + 1 );
         IfoPrintTitle( p_dvd );
 
         /* No PSM to read in DVD mode, we already have all information */
@@ -595,13 +595,13 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
         /* if we're inside a multi-angle zone, we have to choose i_sector
          * in the current angle ; we can't do it all the time since cells
          * can be very wide out of such zones */
-        p_dvd->i_vts_lb = CellStartSector( p_dvd );
+        p_dvd->i_vts_lb = CellFirstSector( p_dvd );
     }
     
-    p_dvd->i_end_lb   = CellEndSector  ( p_dvd );
+    p_dvd->i_last_lb  = CellLastSector( p_dvd );
     p_dvd->i_chapter  = CellPrg2Chapter( p_dvd );
 
-    if( dvdcss_seek( p_dvd->dvdhandle, DVDLB,
+    if( dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_vts_start + p_dvd->i_vts_lb,
                      DVDCSS_SEEK_MPEG ) < 0 )
     {
         intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );
