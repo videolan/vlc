@@ -2,7 +2,7 @@
  * ogg.c: ogg muxer module for vlc
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ogg.c,v 1.16 2003/10/09 18:53:01 gbazin Exp $
+ * $Id: ogg.c,v 1.17 2003/10/09 19:31:38 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -174,7 +174,6 @@ static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
             sout_buffer_t *p_buf;
 
             p_buf = sout_FifoShow( p_fifo );
-            if( p_buf->i_dts ) // To ignore vorbis and theora header packets
             if( i_stream < 0 || p_buf->i_dts < i_dts )
             {
                 i_dts = p_buf->i_dts;
