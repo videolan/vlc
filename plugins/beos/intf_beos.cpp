@@ -158,6 +158,11 @@ int intf_BeCreate( intf_thread_t *p_intf )
             return( 1 );
         }
     }
+    /* Bind normal keys. */
+    intf_AssignNormalKeys( p_intf );
+
+
+
     return( 0 );
 }
 

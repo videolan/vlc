@@ -106,7 +106,11 @@ int intf_GGICreate( intf_thread_t *p_intf )
         free( p_intf->p_sys );
         return( 1 );
     }
+    
+    /* Assign basic keys */
+    intf_AssignNormalKeys( p_intf );
 
+    
     return( 0 );
 }
 

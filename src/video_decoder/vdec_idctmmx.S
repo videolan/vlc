@@ -97,8 +97,9 @@ x0:
         .align 8
 .text
         .align 4
+/* this seems to annoy the compiler in -g mode, is it normal ? */
 .globl vdec_IDCT
-        .type    vdec_IDCT,@function
+        .type    vdec_IDCT,@function 
 vdec_IDCT:
         pushl %ebp
         movl %esp,%ebp

@@ -154,16 +154,35 @@ int vout_SDLManage( vout_thread_t *p_vout )
  *****************************************************************************/
 void vout_SDLDisplay( vout_thread_t *p_vout )
 {
-    /* Change display frame */
-    if( p_vout->p_sys->b_must_acquire )
+    SDL_Overlay * screen;
+    SDL_Rect    disp;
+    if(1)
     {
-        SDL_Flip( p_vout->p_sys->p_display );
-    }
-    /* Swap buffers and change write frame */
-    if( p_vout->p_sys->b_must_acquire )
+        /* Change display frame */
+        if( p_vout->p_sys->b_must_acquire )
+        {
+            SDL_Flip( p_vout->p_sys->p_display );
+        }
+        /* Swap buffers and change write frame */
+        if( p_vout->p_sys->b_must_acquire )
+        {
+            SDL_LockSurface ( p_vout->p_sys->p_display );
+        }
+    } 
+    else 
     {
-        SDL_LockSurface ( p_vout->p_sys->p_display );
-    }
+        /*
+         * p_vout->yuv.p_buffer contains the YUV buffer to render 
+         */
+        
+        screen = SDL_CreateYUVOverlay( p_vout->i_width, p_vout->i_height , SDL_IYUV_OVERLAY, p_vout->p_sys->p_display );
+        screen->pixels = p_vout->yuv.p_buffer;
+        disp.x = 0;
+        disp.y = 0;
+        disp.w = p_vout->i_width;
+        disp.h = p_vout->i_height;
+        SDL_DisplayYUVOverlay( screen , &disp );
+    }        
 }
 
 /* following functions are local */
@@ -184,19 +203,20 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
         return( 1 );
     }
 
-    /* Open display */
-    if( psz_display != NULL && strcmp(psz_display,"fullscreen") == 0 )
+    /* Open display 
+     * TODO: Check that we can request for a DOUBLEBUF HWSURFACE display
+     */
+    if(psz_display != NULL && strcmp(psz_display,"fullscreen")==0)
     {
-        p_vout->p_sys->p_display =
-            SDL_SetVideoMode( p_vout->i_width, p_vout->i_height, 15, 
-                              SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF |
-                              SDL_FULLSCREEN );
-    }
-    else
-    {
-        p_vout->p_sys->p_display =
-            SDL_SetVideoMode( p_vout->i_width, p_vout->i_height, 15, 
-                              SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF );
+        p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
+            p_vout->i_height, 
+            15, 
+            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF | SDL_FULLSCREEN );
+    } else {
+        p_vout->p_sys->p_display = SDL_SetVideoMode(p_vout->i_width, 
+            p_vout->i_height, 
+            15, 
+            SDL_ANYFORMAT | SDL_HWSURFACE | SDL_DOUBLEBUF );
     }
 	
     if( p_vout->p_sys->p_display == NULL )
@@ -205,19 +225,15 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
         return( 1 );
     }
     SDL_EventState(SDL_KEYUP , SDL_IGNORE);	/* ignore keys up */
-    //SDL_EventState(SDL_ACTIVEEVENT , SDL_IGNORE);
 
-    /* Check buffers properties */
-	
+    /* Check buffers properties */	
     p_vout->p_sys->b_must_acquire = 1;		/* always acquire */
-	
 	p_vout->p_sys->p_buffer[ 0 ] =
              p_vout->p_sys->p_display->pixels;
 	
 	SDL_Flip(p_vout->p_sys->p_display);
 	p_vout->p_sys->p_buffer[ 1 ] =
              p_vout->p_sys->p_display->pixels;
-	
 	SDL_Flip(p_vout->p_sys->p_display);
 
     /* Set graphic context colors */
@@ -258,8 +274,6 @@ static int SDLOpenDisplay( vout_thread_t *p_vout, char *psz_display, void *p_dat
     p_vout->i_blue_mask =       p_vout->p_sys->p_display->format->Bmask;
 
     /* FIXME: palette in 8bpp ?? */
-
-    
     /* Set and initialize buffers */
     vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ],
                              p_vout->p_sys->p_buffer[ 1 ] );

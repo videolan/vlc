@@ -137,6 +137,7 @@ intf_thread_t* intf_Create( void )
     p_intf->b_die =     0;
     p_intf->p_vout =    NULL;
     p_intf->p_input =   NULL;
+    p_intf->p_keys =    NULL;
 
     /* Load channels - the pointer will be set to NULL on failure. The
      * return value is ignored since the program can work without
@@ -216,6 +217,8 @@ void intf_Run( intf_thread_t *p_intf )
  *****************************************************************************/
 void intf_Destroy( intf_thread_t *p_intf )
 {
+    p_intf_key  p_cur;
+    p_intf_key  p_next;
     /* Destroy interfaces */
     p_intf->p_sys_destroy( p_intf );
     intf_ConsoleDestroy( p_intf->p_console );
@@ -223,6 +226,17 @@ void intf_Destroy( intf_thread_t *p_intf )
     /* Unload channels */
     UnloadChannels( p_intf );
 
+    /* Destroy keymap */
+    
+    p_cur = p_intf->p_keys;
+    while( p_cur != NULL)
+    {
+        p_next = p_cur->next;
+        free(p_cur);
+        p_cur = p_next;
+     }
+     
+    
     /* Free structure */
     free( p_intf );
 }
@@ -271,21 +285,107 @@ int intf_SelectChannel( intf_thread_t * p_intf, int i_channel )
 }
 
 /*****************************************************************************
+ * intf_AssignKey: assign standartkeys                                       *
+ *****************************************************************************
+ * This function fills in the associative array that links the key pressed   *
+ * and the key we use internally.                                            *
+ ****************************************************************************/
+
+void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key)
+{
+    p_intf_key  p_cur =  p_intf->p_keys;
+  
+    if( p_cur == NULL )
+    {
+        p_cur = (p_intf_key )(malloc ( sizeof( intf_key ) ) );
+        p_cur->received_key = r_key;
+        p_cur->forwarded_key = f_key;
+        p_cur->next = NULL;
+        p_intf->p_keys = p_cur;
+    } else {
+        while( p_cur->next != NULL && p_cur ->received_key != r_key)
+        {
+            p_cur = p_cur->next;
+        }
+        if( p_cur->next == NULL )
+        {   
+            p_cur->next  = ( p_intf_key )( malloc( sizeof( intf_key ) ) );
+            p_cur = p_cur->next;
+            p_cur->next = NULL;
+            p_cur->received_key = r_key;
+        }
+        p_cur->forwarded_key = f_key;
+    }        
+}
+
+
+int intf_getKey( intf_thread_t *p_intf, int r_key)
+{
+    p_intf_key current = p_intf->p_keys;
+    while(current != NULL && current->received_key != r_key)
+    {
+        
+        current = current->next;
+    }
+    if(current == NULL)
+       /* didn't find any key in the array */ 
+        return( -1 );
+    else
+        return( current->forwarded_key );
+    /* well, something went wrong */
+    return( -1 );
+}
+
+
+/*****************************************************************************
+ * intf_AssignNormalKeys: used for normal interfaces.
+ *****************************************************************************
+ * This function assign the basic key to the normal keys.
+ *****************************************************************************/
+
+void intf_AssignNormalKeys( intf_thread_t *p_intf)
+{
+     intf_AssignKey( p_intf , 'Q', 'Q');
+     intf_AssignKey( p_intf ,  27, 'Q');
+     intf_AssignKey( p_intf ,   3, 'Q');
+     intf_AssignKey( p_intf , '0', '0');
+     intf_AssignKey( p_intf , '1', '1');
+     intf_AssignKey( p_intf , '2', '2');
+     intf_AssignKey( p_intf , '3', '3');
+     intf_AssignKey( p_intf , '4', '4');
+     intf_AssignKey( p_intf , '5', '5');
+     intf_AssignKey( p_intf , '6', '6');
+     intf_AssignKey( p_intf , '7', '7');
+     intf_AssignKey( p_intf , '8', '8');
+     intf_AssignKey( p_intf , '9', '9');
+     intf_AssignKey( p_intf , '0', '0');
+     intf_AssignKey( p_intf , '+', '+');
+     intf_AssignKey( p_intf , '-', '-');
+     intf_AssignKey( p_intf , 'm', 'M');
+     intf_AssignKey( p_intf , 'M', 'M');
+     intf_AssignKey( p_intf , 'g', 'g');
+     intf_AssignKey( p_intf , 'G', 'G');
+     intf_AssignKey( p_intf , 'c', 'c');
+     intf_AssignKey( p_intf , ' ', ' ');
+     intf_AssignKey( p_intf , 'i', 'i');
+     intf_AssignKey( p_intf , 's', 's');
+}   
+
+/*****************************************************************************
  * intf_ProcessKey: process standard keys
  *****************************************************************************
  * This function will process standard keys and return non 0 if the key was
  * unknown.
  *****************************************************************************/
-int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
+int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
 {
     static int i_volbackup;
+    int i_key;
     
+    i_key = intf_getKey( p_intf, g_key); 
     switch( i_key )
     {
     case 'Q':                                                  /* quit order */
-    case 'q':
-    case 27:                                                   /* escape key */
-    case 3:                                                            /* ^C */
         p_intf->b_die = 1;
         break;
     case '0':                                               /* source change */
@@ -311,7 +411,6 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
             p_main->p_aout->vol -= VOLSTEP;
         break;
     case 'M':                                                 /* toggle mute */
-    case 'm':
         if( (p_main->p_aout != NULL) && (p_main->p_aout->vol))
         {
             i_volbackup = p_main->p_aout->vol;

@@ -54,7 +54,9 @@
 int vout_InitYUV( vout_thread_t *p_vout )
 {
     typedef void ( yuv_getplugin_t ) ( vout_thread_t * p_vout );
+    
     int          i_index;
+    int          i_best_index = 0, i_best_score = 0;
 
     /* Get a suitable YUV plugin */
     for( i_index = 0 ; i_index < p_main->p_bank->i_plugin_count ; i_index++ )
@@ -65,13 +67,28 @@ int vout_InitYUV( vout_thread_t *p_vout )
             /* ... and if this plugin provides the functions we want ... */
             if( p_main->p_bank->p_info[ i_index ]->yuv_GetPlugin != NULL )
             {
-                /* ... then get these functions */
-                ( (yuv_getplugin_t *)
-                  p_main->p_bank->p_info[ i_index ]->yuv_GetPlugin )( p_vout );
+                /* ... and if this plugin has a good score ... */
+                if(  p_main->p_bank->p_info[ i_index ]->i_score > i_best_score )
+                {
+                    /* ... then take it */
+                    i_best_score = p_main->p_bank->p_info[ i_index ]->i_score;
+                    i_best_index = i_index;
+                }
             }
         }
     }
 
+    if( i_best_score == 0 )
+    {
+        /* this should NEVER happen ! */
+        free( p_vout );
+        return( 12 ); 
+    }
+
+    /* Get the plugin functions */
+    ( ( yuv_getplugin_t * ) p_main->p_bank->p_info[ i_best_index ]->yuv_GetPlugin)( p_vout );
+ 
+    
     return p_vout->p_yuv_init( p_vout );
 }
 

@@ -189,7 +189,10 @@ int intf_FBCreate( intf_thread_t *p_intf )
             return( 1 );
         }
     }
-
+    
+    /* bind keys */
+    intf_AssignNormalKeys( p_intf );
+    
     return( 0 );
 }
 

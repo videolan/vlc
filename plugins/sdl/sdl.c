@@ -4,7 +4,9 @@
  * Copyright (C) 2000 VideoLAN
  *
  * Authors:
- *
+ *      . Initial plugin code by Samuel Hocevar <sam@via.ecp.fr>
+ *      . Modified to use the SDL by Pierre Baillet <octplane@via.ecp.fr>
+ *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -44,6 +46,7 @@
  *****************************************************************************/
 static void vout_GetPlugin( p_vout_thread_t p_vout );
 static void intf_GetPlugin( p_intf_thread_t p_intf );
+static void yuv_GetPlugin( p_vout_thread_t p_vout );
 
 /* Video output */
 int     vout_SDLCreate       ( vout_thread_t *p_vout, char *psz_display,
@@ -55,6 +58,13 @@ int     vout_SDLManage       ( p_vout_thread_t p_vout );
 void    vout_SDLDisplay      ( p_vout_thread_t p_vout );
 void    vout_SDLSetPalette   ( p_vout_thread_t p_vout,
                                u16 *red, u16 *green, u16 *blue, u16 *transp );
+
+
+/* YUV transformations */
+int     yuv_CInit          ( p_vout_thread_t p_vout );
+int     yuv_CReset         ( p_vout_thread_t p_vout );
+void    yuv_CEnd           ( p_vout_thread_t p_vout );
+
 
 /* Interface */
 int     intf_SDLCreate       ( p_intf_thread_t p_intf );
@@ -68,19 +78,29 @@ plugin_info_t * GetConfig( void )
 {
     plugin_info_t * p_info = (plugin_info_t *) malloc( sizeof(plugin_info_t) );
 
-    p_info->psz_name    = "SDL";
+    p_info->psz_name    = "SDL (video yuv conversion?, audio?)";
     p_info->psz_version = VERSION;
     p_info->psz_author  = "the VideoLAN team <vlc@videolan.org>";
 
     p_info->aout_GetPlugin = NULL;
     p_info->vout_GetPlugin = vout_GetPlugin;
     p_info->intf_GetPlugin = intf_GetPlugin;
-    p_info->yuv_GetPlugin  = NULL;
+    
+    
+    /* TODO: before doing this, we have to know if the videoCard is capable of 
+     * hardware YUV -> display acceleration....
+     */
 
+    
+    p_info->yuv_GetPlugin  = (void *) yuv_GetPlugin;
+    
     /* if the SDL libraries are there, assume we can enter the
      * initialization part at least, even if we fail afterwards */
-    p_info->i_score = 0x100;
-
+    
+    p_info->i_score = 0x50;
+    
+    
+    
     /* If this plugin was requested, score it higher */
     if( TestMethod( VOUT_METHOD_VAR, "sdl" ) )
     {
@@ -110,4 +130,12 @@ static void intf_GetPlugin( p_intf_thread_t p_intf )
     p_intf->p_sys_destroy = intf_SDLDestroy;
     p_intf->p_sys_manage  = intf_SDLManage;
 }
+
+static void yuv_GetPlugin( p_vout_thread_t p_vout )
+{
+    p_vout->p_yuv_init   = yuv_CInit;
+    p_vout->p_yuv_reset  = yuv_CReset;
+    p_vout->p_yuv_end    = yuv_CEnd;
+}
+
 

@@ -48,6 +48,15 @@ typedef int   ( intf_sys_create_t )   ( p_intf_thread_t p_intf );
 typedef void  ( intf_sys_destroy_t )  ( p_intf_thread_t p_intf );
 typedef void  ( intf_sys_manage_t )   ( p_intf_thread_t p_intf );
 
+typedef struct _key
+{
+    int received_key;
+    int forwarded_key;
+    struct _key *  next;
+} intf_key;
+
+typedef intf_key * p_intf_key;
+
 typedef struct intf_thread_s
 {
     boolean_t           b_die;                                 /* `die' flag */
@@ -55,7 +64,8 @@ typedef struct intf_thread_s
     /* Specific interfaces */
     p_intf_console_t    p_console;                                /* console */
     p_intf_sys_t        p_sys;                           /* system interface */
-
+    p_intf_key          p_keys;
+    
     /* Plugin */
     intf_sys_create_t *     p_sys_create;         /* create interface thread */
     intf_sys_manage_t *     p_sys_manage;                       /* main loop */
@@ -82,4 +92,10 @@ void            intf_Destroy            ( intf_thread_t * p_intf );
 
 int             intf_SelectChannel      ( intf_thread_t * p_intf, int i_channel );
 int             intf_ProcessKey         ( intf_thread_t * p_intf, int i_key );
+
+void intf_AssignKey( intf_thread_t *p_intf, int r_key, int f_key);
+
+int intf_getKey( intf_thread_t *p_intf, int r_key);
+
+void intf_AssignNormalKeys( intf_thread_t *p_intf);
 

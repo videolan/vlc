@@ -29,7 +29,7 @@ prefix=@prefix@
 PROGRAM_OPTIONS = $(SYS) $(ARCH)
 ifeq ($(DEBUG),1)
 PROGRAM_OPTIONS += DEBUG
-DEFINE += -DDEBUG
+DEFINE += -DDEBUG -g
 endif
 
 # PROGRAM_BUILD is a complete identification of the build
@@ -293,7 +293,10 @@ PLUGIN_GGI    = plugins/ggi/ggi.o \
 
 PLUGIN_SDL    = plugins/sdl/sdl.o \
 		plugins/sdl/intf_sdl.o \
-		plugins/sdl/vout_sdl.o
+		plugins/sdl/vout_sdl.o \
+		plugins/sdl/video_yuv.o \
+		plugins/sdl/video_yuvall.o
+
 
 PLUGIN_GLIDE  = plugins/glide/glide.o \
 		plugins/glide/intf_glide.o \
@@ -321,6 +324,7 @@ PLUGIN_YUV    = plugins/yuv/yuv.o \
 		plugins/yuv/video_yuv16.o \
 		plugins/yuv/video_yuv24.o \
 		plugins/yuv/video_yuv32.o
+
 
 PLUGIN_YUVMMX = plugins/yuvmmx/yuvmmx.o \
 		plugins/yuvmmx/video_yuv.o \
@@ -512,7 +516,7 @@ else
 	ld -shared -o $@ $^
 endif
 $(PLUGIN_YUV): %.o: %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(CCFLAGS) $(CFLAGS) -c -o $@ $<
 
 lib/yuvmmx.so: $(PLUGIN_YUVMMX)
 ifeq ($(SYS),beos)

@@ -103,6 +103,7 @@ void bank_Init( plugin_bank_t * p_bank )
     /* Video calculus */
     SEEK_PLUGIN( "yuvmmx" );
     SEEK_PLUGIN( "yuv" );
+    SEEK_PLUGIN( "yuvsdl" );
 
     /* Audio pluins */
     SEEK_PLUGIN( "dsp" );
@@ -116,6 +117,15 @@ void bank_Init( plugin_bank_t * p_bank )
 
 void bank_Destroy( plugin_bank_t * p_bank )
 {
+    int i;
+    for( i = 0 ; i < p_bank->i_plugin_count ; i++ )
+    {
+        if( p_bank->p_info[ i ] != NULL )
+        {
+            free( p_bank->p_info[ i ]-> psz_filename );
+        }
+    }
+
     free( p_bank );
 }
 
@@ -214,6 +224,8 @@ int AllocatePlugin( plugin_id_t plugin_id, plugin_bank_t * p_bank,
     /* run the plugin function to initialize the structure */
     p_bank->p_info[ i ]            = p_func( );
     p_bank->p_info[ i ]->plugin_id = plugin_id;
+    p_bank->p_info[ i ]->psz_filename = strdup( psz_filename );
+
 
     /* Tell the world we found it */
     intf_Msg( "Plugin %i: %s %s [0x%x]\n", i,

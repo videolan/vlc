@@ -57,6 +57,9 @@ typedef struct intf_sys_s
 	
 } intf_sys_t;
 
+/* local prototype */
+void    intf_SDL_Keymap( intf_thread_t * p_intf );
+    
 
 /*****************************************************************************
  * intf_SDLCreate: initialize and create SDL interface
@@ -94,7 +97,7 @@ int intf_SDLCreate( intf_thread_t *p_intf )
         free( p_intf->p_sys );
         return( 1 );
     }
-
+    intf_SDL_Keymap( p_intf );
     return( 0 );
 }
 
@@ -131,11 +134,14 @@ void intf_SDLManage( intf_thread_t *p_intf )
 	SDL_Event event; 										/*	SDL event	 */
     Uint8   i_key;
     
-    while ( SDL_PollEvent(&event) ) {
+    while ( SDL_PollEvent(&event) ) 
+    {
+        
+        i_key = event.key.keysym.sym;                  /* forward it */
+        intf_ErrMsgImm("key :%c:\n",(char) i_key);
+        
         switch (event.type) {           
             case SDL_KEYDOWN:                         /* if a key is pressed */
-                i_key = event.key.keysym.sym;                  /* forward it */
-                
                 if( intf_ProcessKey( p_intf, (char ) i_key ) )
                 {
                     intf_DbgMsg( "unhandled key '%c' (%i)\n", 
@@ -151,3 +157,30 @@ void intf_SDLManage( intf_thread_t *p_intf )
     }
 }
 
+void intf_SDL_Keymap(intf_thread_t * p_intf )
+{ 
+    intf_AssignKey(p_intf, SDLK_q,      'Q');
+    intf_AssignKey(p_intf, SDLK_ESCAPE, 'Q');
+    /* intf_AssignKey(p_intf,3,'Q'); */
+    intf_AssignKey(p_intf, SDLK_0,      '0');
+    intf_AssignKey(p_intf, SDLK_1,      '1');
+    intf_AssignKey(p_intf, SDLK_2,      '2');
+    intf_AssignKey(p_intf, SDLK_3,      '3');
+    intf_AssignKey(p_intf, SDLK_4,      '4');
+    intf_AssignKey(p_intf, SDLK_5,      '5');
+    intf_AssignKey(p_intf, SDLK_6,      '6');
+    intf_AssignKey(p_intf, SDLK_7,      '7');
+    intf_AssignKey(p_intf, SDLK_8,      '8');
+    intf_AssignKey(p_intf, SDLK_9,      '9');
+    intf_AssignKey(p_intf, SDLK_PLUS,   '+');
+    intf_AssignKey(p_intf, SDLK_MINUS,  '-');
+    intf_AssignKey(p_intf, SDLK_m,      'M');
+    /* intf_AssignKey(p_intf,'M','M'); */
+    intf_AssignKey(p_intf, SDLK_g,      'g');
+    /* intf_AssignKey(p_intf,'G','G'); */
+    intf_AssignKey(p_intf, SDLK_c,      'c');
+    intf_AssignKey(p_intf, SDLK_SPACE,  ' ');
+    intf_AssignKey(p_intf, 'i',      'i');
+    intf_AssignKey(p_intf, SDLK_s,      's');
+
+}

@@ -136,6 +136,10 @@ int intf_GnomeCreate( intf_thread_t *p_intf )
     vlc_thread_create( &p_intf->p_sys->p_gnome->thread_id, "gnome",
                        (void *)GnomeThread, p_intf->p_sys->p_gnome );
 
+    /* create basic key bindings */
+    intf_AssignNormalKeys( p_intf );
+    
+
     /* Disable screen saver and return */
     p_intf->p_sys->i_ss_count = 1;
     GnomeDisableScreenSaver( p_intf );

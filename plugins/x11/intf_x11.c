@@ -146,6 +146,9 @@ int intf_X11Create( intf_thread_t *p_intf )
 
     p_intf->p_sys->b_mouse = 1;
 
+    /* bind keys */
+    intf_AssignNormalKeys( p_intf );
+    
     /* Disable screen saver and return */
     p_intf->p_sys->i_ss_count = 1;
     X11DisableScreenSaver( p_intf );
