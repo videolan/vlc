@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.109 2003/11/08 14:54:03 massiot Exp $
+dnl $Id: configure.ac,v 1.110 2003/11/08 18:23:40 titer Exp $
 
 AC_INIT(vlc,0.6.3-cvs)
 
@@ -137,11 +137,6 @@ case "${target_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
     AX_ADD_LDFLAGS([vlc beos],[-lbe])
     AX_ADD_LDFLAGS([beos],[-lmedia -ltranslation -ltracker -lgame])
-
-    dnl Check for BONE presence
-    AC_CHECK_LIB(socket, connect,
-        AX_ADD_LDFLAGS([vlc ipv4 access_http access_mms access_udp access_ftp sap http access_output_udp],
-	               [-lbind]))
 
     dnl Ugly check for Zeta
     if test -f /boot/beos/system/lib/libzeta.so; then
@@ -281,7 +276,7 @@ AC_CHECK_FUNCS(connect,,[
 
 AC_CHECK_FUNCS(send,,[
   AC_CHECK_LIB(socket,send,[
-    AX_ADD_LDFLAGS([access_http access_mms access_udp access_ftp sap http access_output_udp],[-lsocket])
+    AX_ADD_LDFLAGS([access_http access_mms access_udp access_ftp sap httpd access_output_udp stream_out_standard],[-lsocket])
   ])
 ])
 

@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.24 2003/11/04 11:11:30 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.25 2003/11/08 18:23:40 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -49,6 +49,7 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+#include <vlc_keys.h>
 
 #include "InterfaceWindow.h"	// for load/save_settings()
 #include "DrawingTidbits.h"
@@ -105,6 +106,16 @@ beos_GetAppWindow(char *name)
         }
     }
     return window;
+}
+
+static int ConvertKey( int key )
+{
+    switch( key )
+    {
+        case B_SPACE:
+            return KEY_SPACE;
+    }
+    return key;
 }
 
 /*****************************************************************************
@@ -1284,72 +1295,27 @@ VLCView::Pulse()
 /*****************************************************************************
  * VLCVIew::KeyDown
  *****************************************************************************/
-void
-VLCView::KeyDown(const char *bytes, int32_t numBytes)
+void VLCView::KeyDown( const char *bytes, int32 numBytes )
 {
-    VideoWindow *videoWindow = dynamic_cast<VideoWindow*>(Window());
-    BWindow* interfaceWindow = get_interface_window();
-	if (videoWindow && numBytes > 0) {
-		uint32_t mods = modifiers();
-		switch (*bytes) {
-			case B_TAB:
-			case 'f':
-			case 'F':
-				// toggle window and full screen mode
-				// not passing on the tab key to the default KeyDown()
-				// implementation also avoids loosing the keyboard focus
-				videoWindow->PostMessage(TOGGLE_FULL_SCREEN);
-				break;
-			case B_ESCAPE:
-				// go back to window mode
-				if (videoWindow->IsFullScreen())
-					videoWindow->PostMessage(TOGGLE_FULL_SCREEN);
-				break;
-			case B_SPACE:
-				// toggle playback
-				if (interfaceWindow)
-					interfaceWindow->PostMessage(PAUSE_PLAYBACK);
-				break;
-			case B_RIGHT_ARROW:
-				if (interfaceWindow)
-				{
-					if (mods & B_SHIFT_KEY)
-						// next title
-						interfaceWindow->PostMessage(NEXT_TITLE);
-					else
-						// next chapter
-						interfaceWindow->PostMessage(NEXT_CHAPTER);
-				}
-				break;
-			case B_LEFT_ARROW:
-				if (interfaceWindow)
-				{
-					if (mods & B_SHIFT_KEY)
-						// previous title
-						interfaceWindow->PostMessage(PREV_TITLE);
-					else
-						// previous chapter
-						interfaceWindow->PostMessage(PREV_CHAPTER);
-				}
-				break;
-			case B_UP_ARROW:
-				// previous file in playlist
-				interfaceWindow->PostMessage(PREV_FILE);
-				break;
-			case B_DOWN_ARROW:
-				// next file in playlist
-				interfaceWindow->PostMessage(NEXT_FILE);
-				break;
-			case B_PRINT_KEY:
-			case 's':
-			case 'S':
-				videoWindow->PostMessage( SCREEN_SHOT );
-				break;
-			default:
-				BView::KeyDown(bytes, numBytes);
-				break;
-		}
-	}
+    VideoWindow * videoWindow = (VideoWindow *) Window();
+
+    if( !videoWindow || numBytes < 1 )
+    {
+        return;
+    }
+
+    uint32_t    mods = modifiers();
+    vlc_value_t val;
+
+    val.i_int = 0;
+
+    switch( *bytes )
+    {
+        default:
+            val.i_int |= ConvertKey( *bytes );
+            var_Set( p_vout->p_vlc, "key-pressed", val );
+            break;
+    }
 }
 
 /*****************************************************************************

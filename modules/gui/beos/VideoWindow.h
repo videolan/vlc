@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.8 2003/11/04 11:11:30 titer Exp $
+ * $Id: VideoWindow.h,v 1.9 2003/11/08 18:23:40 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -117,7 +117,7 @@ class VLCView : public BView
 									   const BMessage* dragMessage);
 	virtual	void			Pulse();
 	virtual	void			Draw(BRect updateRect);
-	virtual	void			KeyDown(const char* bytes, int32_t numBytes);
+	virtual	void			KeyDown(const char* bytes, int32 numBytes);
 
  private:
             vout_thread_t   *p_vout;

@@ -2,7 +2,7 @@
  * hotkeys.h: keycode defines
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_keys.h,v 1.6 2003/10/30 17:58:07 gbazin Exp $
+ * $Id: vlc_keys.h,v 1.7 2003/11/08 18:23:40 titer Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -67,7 +67,7 @@ typedef struct key_descriptor_s
 
 #define ADD_KEY(a) { a, *a }
 
-static const struct key_descriptor_s modifiers[] =
+static const struct key_descriptor_s vlc_modifiers[] =
 {
     { "Alt", KEY_MODIFIER_ALT },
     { "Shift", KEY_MODIFIER_SHIFT },
@@ -76,7 +76,7 @@ static const struct key_descriptor_s modifiers[] =
     { "Command", KEY_MODIFIER_COMMAND }
 };
 
-static const struct key_descriptor_s keys[] =
+static const struct key_descriptor_s vlc_keys[] =
 {
     { "Unset", KEY_UNSET },
     { "Left", KEY_LEFT },
@@ -152,11 +152,11 @@ static const struct key_descriptor_s keys[] =
 static inline char *KeyToString( int i_key )
 {
     unsigned int i = 0;
-    for ( i = 0; i < sizeof(keys) / sizeof(key_descriptor_t); i++ )
+    for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++ )
     {
-        if ( keys[i].i_key_code == i_key )
+        if ( vlc_keys[i].i_key_code == i_key )
         {
-            return keys[i].psz_key_string;
+            return vlc_keys[i].psz_key_string;
         }
     }
     return NULL;

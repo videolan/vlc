@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.69 2003/11/05 18:59:01 gbazin Exp $
+ * $Id: configuration.c,v 1.70 2003/11/08 18:23:40 titer Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1571,22 +1571,22 @@ static int ConfigStringToKey( char *psz_key )
     char *psz_parser = strchr( psz_key, '-' );
     while( psz_parser && psz_parser != psz_key )
     {
-        for( i = 0; i < sizeof(modifiers) / sizeof(key_descriptor_t); i++ )
+        for( i = 0; i < sizeof(vlc_modifiers) / sizeof(key_descriptor_t); i++ )
         {
-            if( !strncasecmp( modifiers[i].psz_key_string, psz_key,
-                              strlen( modifiers[i].psz_key_string ) ) )
+            if( !strncasecmp( vlc_modifiers[i].psz_key_string, psz_key,
+                              strlen( vlc_modifiers[i].psz_key_string ) ) )
             {
-                i_key |= modifiers[i].i_key_code;
+                i_key |= vlc_modifiers[i].i_key_code;
             }
         }
         psz_key = psz_parser + 1;
         psz_parser = strchr( psz_key, '-' );
     }
-    for( i = 0; i < sizeof(keys) / sizeof( key_descriptor_t ); i++ )
+    for( i = 0; i < sizeof(vlc_keys) / sizeof( key_descriptor_t ); i++ )
     {
-        if( !strcasecmp( keys[i].psz_key_string, psz_key ) )
+        if( !strcasecmp( vlc_keys[i].psz_key_string, psz_key ) )
         {
-            i_key |= keys[i].i_key_code;
+            i_key |= vlc_keys[i].i_key_code;
             break;
         }
     }
@@ -1605,20 +1605,20 @@ static char *ConfigKeyToString( int i_key )
     }
     *psz_key = '\0';
     p = psz_key;
-    for( index = 0; index < (sizeof(modifiers) / sizeof(key_descriptor_t));
+    for( index = 0; index < (sizeof(vlc_modifiers) / sizeof(key_descriptor_t));
          index++ )
     {
-        if( i_key & modifiers[index].i_key_code )
+        if( i_key & vlc_modifiers[index].i_key_code )
         {
-            p += sprintf( p, "%s-", modifiers[index].psz_key_string );
+            p += sprintf( p, "%s-", vlc_modifiers[index].psz_key_string );
         }
     }
-    for( index = 0; index < (sizeof(keys) / sizeof( key_descriptor_t));
+    for( index = 0; index < (sizeof(vlc_keys) / sizeof( key_descriptor_t));
          index++)
     {
-        if( (int)( i_key & ~KEY_MODIFIER ) == keys[index].i_key_code )
+        if( (int)( i_key & ~KEY_MODIFIER ) == vlc_keys[index].i_key_code )
         {
-            p += sprintf( p, "%s", keys[index].psz_key_string );
+            p += sprintf( p, "%s", vlc_keys[index].psz_key_string );
             break;
         }
     }
