@@ -165,6 +165,8 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "visual";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "equalizer";
+        pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
     }
 
@@ -303,6 +305,8 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
         ppsz_varnames[i] = "audio-channels";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "visual";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "equalizer";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
     }

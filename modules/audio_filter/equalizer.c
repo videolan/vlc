@@ -2,7 +2,7 @@
  * equalizer.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: goom.c 8019 2004-06-22 19:35:01Z fenrir $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -67,7 +67,7 @@ static char *preset_list[] = {
 };
 static char *preset_list_text[] = {
     N_("Flat"), N_("Classical"), N_("Club"), N_("Dance"), N_("Full bass"),
-    N_("Full bass and treeble"), N_("Full treeble"), N_("Laptop speakers and Headphones"),
+    N_("Full bass and treeble"), N_("Full treeble"), N_("Headphones"),
     N_("Large Hall"), N_("Live"), N_("Party"), N_("Pop"), N_("Reggae"),
     N_("Rock"), N_("Ska"), N_("Soft"), N_("Soft rock"), N_("Techno"),
 };
@@ -75,11 +75,15 @@ static char *preset_list_text[] = {
 vlc_module_begin();
     set_description( _("Equalizer 10 bands") );
     set_capability( "audio filter", 0 );
-    add_string( "equalizer-preset", "flat", NULL, PRESET_TEXT, PRESET_LONGTEXT, VLC_TRUE );
+    add_string( "equalizer-preset", "flat", NULL, PRESET_TEXT,
+                PRESET_LONGTEXT, VLC_TRUE );
         change_string_list( preset_list, preset_list_text, 0 );
-    add_string( "equalizer-bands", NULL, NULL, BANDS_TEXT, BANDS_LONGTEXT, VLC_TRUE );
-    add_bool( "equalizer-2pass", 0, NULL, TWOPASS_TEXT, TWOPASS_LONGTEXT, VLC_TRUE );
-    add_float( "equalizer-preamp", 0.0, NULL, PREAMP_TEXT, PREAMP_LONGTEXT, VLC_TRUE );
+    add_string( "equalizer-bands", NULL, NULL, BANDS_TEXT,
+                BANDS_LONGTEXT, VLC_TRUE );
+    add_bool( "equalizer-2pass", 0, NULL, TWOPASS_TEXT,
+              TWOPASS_LONGTEXT, VLC_TRUE );
+    add_float( "equalizer-preamp", 0.0, NULL, PREAMP_TEXT,
+               PREAMP_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
     add_shortcut( "equalizer" );
 vlc_module_end();
@@ -115,8 +119,8 @@ static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 
 #define EQZ_IN_FACTOR (0.25)
-static int  EqzInit( aout_filter_t *, int i_rate );
-static void EqzFilter( aout_filter_t *, float *out, float *in, int i_samples, int i_channels );
+static int  EqzInit( aout_filter_t *, int );
+static void EqzFilter( aout_filter_t *, float *, float *, int, int );
 static void EqzClean( aout_filter_t * );
 
 /*****************************************************************************
@@ -174,8 +178,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
 
-    EqzFilter( p_filter, (float*)p_out_buf->p_buffer, (float*)p_in_buf->p_buffer,
-               p_in_buf->i_nb_samples, aout_FormatNbChannels( &p_filter->input ) );
+    EqzFilter( p_filter, (float*)p_out_buf->p_buffer,
+               (float*)p_in_buf->p_buffer, p_in_buf->i_nb_samples,
+               aout_FormatNbChannels( &p_filter->input ) );
 }
 
 /*****************************************************************************
@@ -192,6 +197,7 @@ typedef struct
         float f_beta;
         float f_gamma;
     } band[];
+
 } eqz_config_t;
 
 /* Value from equ-xmms */
@@ -498,7 +504,8 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     return VLC_SUCCESS;
 }
 
-static void EqzFilter( aout_filter_t *p_filter, float *out, float *in, int i_samples, int i_channels )
+static void EqzFilter( aout_filter_t *p_filter, float *out, float *in,
+                       int i_samples, int i_channels )
 {
     aout_filter_sys_t *p_sys = p_filter->p_sys;
     int i, ch, j;
@@ -568,4 +575,3 @@ static void EqzClean( aout_filter_t *p_filter )
 
     free( p_sys->f_amp );
 }
-

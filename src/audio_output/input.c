@@ -38,7 +38,9 @@
 #include "aout_internal.h"
 
 static int VisualizationCallback( vlc_object_t *, char const *,
-                                vlc_value_t, vlc_value_t, void * );
+                                  vlc_value_t, vlc_value_t, void * );
+static int EqualizerCallback( vlc_object_t *, char const *,
+                              vlc_value_t, vlc_value_t, void * );
 static aout_filter_t * allocateUserChannelMixer( aout_instance_t *,
                                                  audio_sample_format_t *,
                                                  audio_sample_format_t * );
@@ -126,6 +128,34 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
             if( val.psz_string ) free( val.psz_string );
         }
         var_AddCallback( p_aout, "visual", VisualizationCallback, NULL );
+    }
+
+    if( var_Type( p_aout, "equalizer" ) == 0 )
+    {
+        module_config_t *p_config;
+	int i;
+
+	p_config = config_FindConfig( VLC_OBJECT(p_aout), "equalizer-preset" );
+	if( p_config && p_config->i_list )
+	{
+ 	    var_Create( p_aout, "equalizer",
+			VLC_VAR_STRING | VLC_VAR_HASCHOICE );
+	    text.psz_string = _("Equalizer");
+	    var_Change( p_aout, "equalizer", VLC_VAR_SETTEXT, &text, NULL );
+
+	    val.psz_string = ""; text.psz_string = _("Disable");
+	    var_Change( p_aout, "equalizer", VLC_VAR_ADDCHOICE, &val, &text );
+
+	    for( i = 0; i < p_config->i_list; i++ )
+	    {
+		val.psz_string = p_config->ppsz_list[i];
+		text.psz_string = p_config->ppsz_list_text[i];
+		var_Change( p_aout, "equalizer", VLC_VAR_ADDCHOICE,
+			    &val, &text );
+	    }
+
+	    var_AddCallback( p_aout, "equalizer", EqualizerCallback, NULL );
+	}
     }
 
     if( var_Type( p_aout, "audio-filter" ) == 0 )
@@ -475,6 +505,47 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     return 0;
 }
 
+static void ChangeFiltersString( aout_instance_t * p_aout,
+                                 char *psz_name, vlc_bool_t b_add )
+{
+    vlc_value_t val;
+    char *psz_parser;
+
+    var_Get( p_aout, "audio-filter", &val );
+
+    if( !val.psz_string ) val.psz_string = strdup("");
+
+    psz_parser = strstr( val.psz_string, psz_name );
+
+    if( b_add )
+    {
+        if( !psz_parser )
+        {
+            psz_parser = val.psz_string;
+            asprintf( &val.psz_string, (*val.psz_string) ? "%s,%s" : "%s%s",
+                      val.psz_string, psz_name );
+            free( psz_parser );
+        }
+    }
+    else
+    {
+        if( psz_parser )
+        {
+            memmove( psz_parser, psz_parser + strlen(psz_name) +
+                     (*(psz_parser + strlen(psz_name)) == ',' ? 1 : 0 ),
+                     strlen(psz_parser + strlen(psz_name)) + 1 );
+        }
+        else
+        {
+            free( val.psz_string );
+            return;
+        }
+    }
+
+    var_Set( p_aout, "audio-filter", val );
+    free( val.psz_string );
+}
+
 static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
@@ -485,14 +556,15 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !psz_mode || !*psz_mode )
     {
-        val.psz_string = "";
-        var_Set( p_aout, "audio-filter", val );
+        ChangeFiltersString( p_aout, "goom", VLC_FALSE );
+        ChangeFiltersString( p_aout, "visual", VLC_FALSE );
     }
     else
     {
         if( !strcmp( "goom", psz_mode ) )
         {
-            val.psz_string = "goom";
+            ChangeFiltersString( p_aout, "visual", VLC_FALSE );
+            ChangeFiltersString( p_aout, "goom", VLC_TRUE );
         }
         else
         {
@@ -500,10 +572,38 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
             var_Create( p_aout, "effect-list", VLC_VAR_STRING );
             var_Set( p_aout, "effect-list", val );
 
-            val.psz_string = "visual";
+            ChangeFiltersString( p_aout, "goom", VLC_FALSE );
+            ChangeFiltersString( p_aout, "visual", VLC_TRUE );
         }
+    }
 
-        var_Set( p_aout, "audio-filter", val );
+    /* That sucks */
+    for( i = 0; i < p_aout->i_nb_inputs; i++ )
+    {
+        p_aout->pp_inputs[i]->b_restart = VLC_TRUE;
+    }
+
+    return VLC_SUCCESS;
+}
+
+static int EqualizerCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    char *psz_mode = newval.psz_string;
+    vlc_value_t val;
+    int i;
+
+    if( !psz_mode || !*psz_mode )
+    {
+        ChangeFiltersString( p_aout, "equalizer", VLC_FALSE );
+    }
+    else
+    {
+        val.psz_string = psz_mode;
+        var_Create( p_aout, "equalizer-preset", VLC_VAR_STRING );
+        var_Set( p_aout, "equalizer-preset", val );
+        ChangeFiltersString( p_aout, "equalizer", VLC_TRUE );
     }
 
     /* That sucks */
