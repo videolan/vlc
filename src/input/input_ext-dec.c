@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-dec.c,v 1.13 2001/04/25 10:22:33 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.14 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -27,6 +27,7 @@
 #include "defs.h"
 
 #include <string.h>                                    /* memcpy(), memset() */
+#include <sys/types.h>                                              /* off_t */
 
 #include "config.h"
 #include "common.h"

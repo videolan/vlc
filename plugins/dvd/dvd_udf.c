@@ -1,11 +1,11 @@
 /*****************************************************************************
  * dvd_udf.c: udf filesystem tools.
- * ---
+ *****************************************************************************
  * Mainly used to find asolute logical block adress of *.ifo files. It only
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.5 2001/04/15 04:19:57 sam Exp $
+ * $Id: dvd_udf.c,v 1.6 2001/04/28 03:36:25 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -43,6 +43,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#ifdef STRNCASECMP_IN_STRINGS_H
+#   include <strings.h>
+#endif
 #include <fcntl.h>
 
 #include "common.h"
@@ -85,8 +88,8 @@ typedef struct ad_s
 
 /*****************************************************************************
  * UDFReadLB: reads absolute Logical Block of the disc
- * ---
- * returns number of read bytes on success, 0 on error
+ *****************************************************************************
+ * Returns number of read bytes on success, 0 on error
  *****************************************************************************/
 static int UDFReadLB( int i_fd, off_t i_lba, size_t i_block_count, u8 *pi_data )
 {
@@ -244,8 +247,8 @@ static int UDFPartition( u8 * pi_data, u16 * pi_flags, u16 * pi_nb,
 
 /*****************************************************************************
  * UDFLogVolume: reads the volume descriptor and checks the parameters
- * ---
- * returns 0 on OK, 1 on error
+ *****************************************************************************
+ * Returns 0 on OK, 1 on error
  *****************************************************************************/
 static int UDFLogVolume(u8 * pi_data, char * p_volume_descriptor )
 {
@@ -357,7 +360,7 @@ static int UDFFileIdentifier( u8 * pi_data, u8 * pi_file_characteristics,
 
 /*****************************************************************************
  * UDFMapICB: Maps ICB to FileAD
- * ---
+ *****************************************************************************
  * ICB: Location of ICB of directory to scan
  * FileType: Type of the file
  * File: Location of file the ICB is pointing to
@@ -397,7 +400,7 @@ static int UDFMapICB( struct ad_s icb, u8 * pi_file_type, struct ad_s * p_file,
 
 /*****************************************************************************
  * UDFScanDir: serach filename in dir
- * ---
+ *****************************************************************************
  * Dir: Location of directory to scan
  * FileName: Name of file to look for
  * FileICB: Location of ICB of the found file
@@ -489,14 +492,13 @@ static int UDFScanDir( struct ad_s dir, char * psz_filename,
     return 0;
 }
 
-
-/******************************************************************************
+/*****************************************************************************
  * UDFFindPartition: looks for a partition on the disc
- * ---
+ *****************************************************************************
  *   partnum: number of the partition, starting at 0
  *   part: structure to fill with the partition information
  *   return 1 if partition found, 0 on error;
- ******************************************************************************/
+ *****************************************************************************/
 static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
 {
     u8          pi_lb[DVD_LB_SIZE];
@@ -634,13 +636,13 @@ static int UDFFindPartition( int i_part_nb, struct partition_s *p_partition )
 }
 
 
-/******************************************************************************
+/*****************************************************************************
  * UDFFindFile: looks for a file on the UDF disc/imagefile
- * ---
+ *****************************************************************************
  * Path has to be the absolute pathname on the UDF filesystem,
  * starting with '/'.
  * returns absolute LB number, or 0 on error
- ******************************************************************************/
+ *****************************************************************************/
 u32 UDFFindFile( int i_fd, char * psz_path )
 {
     struct partition_s  partition;
@@ -737,3 +739,4 @@ u32 UDFFindFile( int i_fd, char * psz_path )
 
     return partition.i_start + file.i_location;
 }
+

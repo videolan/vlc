@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.14 2001/04/11 04:31:59 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.15 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -29,7 +29,7 @@
  * Preamble
  *****************************************************************************/
 #include "defs.h"
-
+#include <sys/types.h>                                              /* off_t */                           
 #include <stdlib.h>
 
 #include <gtk/gtk.h>
@@ -58,7 +58,7 @@
 
 /*****************************************************************************
  * Callbacks
- ******************************************************************************/
+ *****************************************************************************/
 void
 on_menubar_open_activate               (GtkMenuItem     *menuitem,
                                         gpointer         user_data)

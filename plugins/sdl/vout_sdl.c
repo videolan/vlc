@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.47 2001/04/11 02:01:24 henri Exp $
+ * $Id: vout_sdl.c,v 1.48 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -158,8 +158,12 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Initialize library */
-    if( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTTHREAD | SDL_INIT_NOPARACHUTE)
-            < 0 )
+    if( SDL_Init( SDL_INIT_VIDEO
+#ifndef WIN32
+    /* Win32 SDL implementation doesn't support SDL_INIT_EVENTTHREAD yet*/
+                | SDL_INIT_EVENTTHREAD
+#endif
+	        | SDL_INIT_NOPARACHUTE ) < 0 )
     {
         intf_ErrMsg( "vout error: can't initialize SDL (%s)", SDL_GetError() );
         free( p_vout->p_sys );

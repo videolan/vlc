@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.101 2001/04/27 18:07:56 henri Exp $
+ * $Id: input.c,v 1.102 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -34,12 +34,15 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#ifdef STRNCASECMP_IN_STRINGS_H
+#   include <strings.h>
+#endif
 #include <errno.h>
 
 /* Network functions */
 
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
-#include <netdb.h>                                             /* hostent ... */
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO ) && !defined( WIN32 )
+#include <netdb.h>                                            /* hostent ... */
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -488,7 +491,7 @@ void input_FileOpen( input_thread_t * p_input )
         p_input->stream.p_selected_area->i_size = stat_info.st_size;
     }
     else if( S_ISFIFO(stat_info.st_mode)
-#ifndef SYS_BEOS
+#if !defined( SYS_BEOS ) && !defined( WIN32 )
              || S_ISSOCK(stat_info.st_mode)
 #endif
              )
@@ -509,8 +512,13 @@ void input_FileOpen( input_thread_t * p_input )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     intf_Msg( "input: opening file `%s'", p_input->p_source );
+#ifndef WIN32
     if( (p_input->i_handle = open( psz_name,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
+#else
+    if( (p_input->i_handle = open( psz_name, O_BINARY
+                                   /*O_NONBLOCK | O_LARGEFILE*/ )) == (-1) )
+#endif
     {
         intf_ErrMsg( "input error: cannot open file (%s)", strerror(errno) );
         p_input->b_error = 1;
@@ -531,7 +539,7 @@ void input_FileClose( input_thread_t * p_input )
 }
 
 
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO ) && !defined( WIN32 )
 /*****************************************************************************
  * input_NetworkOpen : open a network socket 
  *****************************************************************************/

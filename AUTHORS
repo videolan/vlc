@@ -5,6 +5,11 @@
 # The fields are: name (N), email (E), web-address (W), CVS account login (C),
 # PGP key ID and fingerprint (P), description (D), and snail-mail address (S).
 
+N: Marc Ariberti
+C: marcari
+E: marcari@via.ecp.fr
+D: communication with channel server
+
 N: Pierre Baillet
 E: oct@zoy.org
 C: octplane
@@ -13,6 +18,10 @@ D: SDL audio and video output
 N: Ethan C. Baldridge
 E: BaldridgeE@cadmus.com
 D: directory browsing code in modules.c
+
+N: Gildas Bazin
+E: gbazin@netcourrier.com
+D: mingw32 port
 
 N: Stéphane Borel
 E: stef@via.ecp.fr
@@ -40,6 +49,7 @@ E: ndeb@ece.cmu.edu
 D: Minor configure.in and Makefile.in fixes
 
 N: Cyril Deguet
+C: asmax
 E: asmax@via.ecp.fr
 D: PS input packet allocator
 

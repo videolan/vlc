@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.51 2001/04/27 19:29:11 massiot Exp $
+ * $Id: input_programs.c,v 1.52 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,6 +28,7 @@
 
 #include <stdlib.h>
 #include <string.h>                                    /* memcpy(), memset() */
+#include <sys/types.h>                                              /* off_t */
 
 #include "config.h"
 #include "common.h"

@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.1 2001/04/20 15:02:48 sam Exp $
+ * $Id: input_es.c,v 1.2 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: 
  *
@@ -213,7 +213,11 @@ static void ESSeek( input_thread_t * p_input, off_t i_position )
     p_method = (thread_es_data_t *)p_input->p_plugin_data;
 
     /* A little bourrin but should work for a while --Meuuh */
+#ifndef WIN32
     fseeko( p_method->stream, i_position, SEEK_SET );
+#else
+    fseek( p_method->stream, (long)i_position, SEEK_SET );
+#endif
 
     p_input->stream.p_selected_area->i_tell = i_position;
 }

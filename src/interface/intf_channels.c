@@ -2,7 +2,7 @@
  * intf_channels.c: channel handling functions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_channels.c,v 1.2 2001/03/21 13:42:34 sam Exp $
+ * $Id: intf_channels.c,v 1.3 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -92,9 +92,9 @@ int intf_LoadChannels( intf_thread_t *p_intf, char *psz_filename )
 
     if( i_index != 0 )
     {
-        /* Allocate array and rewind - some of the lines may be invalid, and the
-         * array will probably be larger than the actual number of channels, but
-         * it has no consequence. */
+        /* Allocate array and rewind - some of the lines may be invalid,
+         * and the array will probably be larger than the actual number of
+         * channels, but it has no consequences. */
         p_intf->p_channel = malloc( sizeof( intf_channel_t ) * i_index );
         if( p_intf->p_channel == NULL )
         {
@@ -296,7 +296,7 @@ static int ParseChannel( intf_channel_t *p_channel, char *psz_str )
                     i_field = -1;
                 }
                 break;
-            case 5:                                          /* input vlan id */
+            case 5:                                         /* input vlan id */
                 p_channel->i_input_vlan_id = strtol( psz_str, &psz_end, 0);
                 if( (*psz_str == '\0') || (*psz_end != '\0') )
                 {

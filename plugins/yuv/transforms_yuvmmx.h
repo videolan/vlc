@@ -2,7 +2,7 @@
  * transforms_yuvmmx.h: MMX YUV transformation assembly
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: transforms_yuvmmx.h,v 1.3 2001/03/21 13:42:34 sam Exp $
+ * $Id: transforms_yuvmmx.h,v 1.4 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Olie Lho <ollie@sis.com.tw>
  *          Gaël Hendryckx <jimmy@via.ecp.fr>
@@ -44,7 +44,6 @@ UNUSED_LONGLONG(mmx_blueshift)  = 0x03;
 #undef UNUSED_LONGLONG
 
 #define MMX_INIT_16 "                                                       \n\
-                                                                            \n\
 movd      (%1), %%mm0       # Load 4 Cb       00 00 00 00 u3 u2 u1 u0       \n\
 movd      (%2), %%mm1       # Load 4 Cr       00 00 00 00 v3 v2 v1 v0       \n\
 pxor      %%mm4, %%mm4      # zero mm4                                      \n\
@@ -53,13 +52,11 @@ movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 "
 
 #define MMX_INIT_16_GRAY "                                                  \n\
-                                                                            \n\
 movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
 #movl      $0, (%3)         # cache preload for image                       \n\
 "
 
 #define MMX_INIT_32 "                                                       \n\
-                                                                            \n\
 movd      (%1), %%mm0       # Load 4 Cb       00 00 00 00 u3 u2 u1 u0       \n\
 movl      $0, (%3)          # cache preload for image                       \n\
 movd      (%2), %%mm1       # Load 4 Cr       00 00 00 00 v3 v2 v1 v0       \n\
@@ -76,7 +73,6 @@ movq      (%0), %%mm6       # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0       \n\
  */
 
 #define MMX_YUV_MUL "                                                       \n\
-                                                                            \n\
 # convert the chroma part                                                   \n\
 punpcklbw %%mm4, %%mm0          # scatter 4 Cb    00 u3 00 u2 00 u1 00 u0   \n\
 punpcklbw %%mm4, %%mm1          # scatter 4 Cr    00 v3 00 v2 00 v1 00 v0   \n\
@@ -104,7 +100,6 @@ pmulhw    mmx_Y_coeff, %%mm7    # Mul 4 Y odd     00 y7 00 y5 00 y3 00 y1   \n\
 "
 
 #define MMX_YUV_YCBR_422 "                                                  \n\
-                                                                            \n\
 punpcklbw %%mm1, %%mm0                                                      \n\
 movq %%mm6, %%mm2                                                           \n\
 punpckhbw %%mm0, %%mm6                                                      \n\
@@ -122,7 +117,6 @@ movq %%mm6, 8(%3)                                                           \n\
  */
 
 #define MMX_YUV_ADD "                                                       \n\
-                                                                            \n\
 # Do horizontal and vertical scaling                                        \n\
 movq      %%mm0, %%mm3          # Copy Cblue                                \n\
 movq      %%mm1, %%mm4          # Copy Cred                                 \n\
@@ -155,7 +149,6 @@ punpcklbw %%mm5, %%mm2          #                 G7 G6 G5 G4 G3 G2 G1 G0   \n\
  */
 
 #define MMX_YUV_GRAY "                                                      \n\
-                                                                            \n\
 # convert the luma part                                                     \n\
 psubusb   mmx_10w, %%mm6                                                    \n\
 movq      %%mm6, %%mm7                                                      \n\
@@ -201,7 +194,6 @@ movq      %%mm2, 8(%3)                                                      \n\
  */
 
 #define MMX_UNPACK_16 "                                                     \n\
-                                                                            \n\
 # mask unneeded bits off                                                    \n\
 pand      mmx_redmask, %%mm0    # b7b6b5b4 b3______ b7b6b5b4 b3______       \n\
 pand      mmx_grnmask, %%mm2    # g7g6g5g4 g3g2____ g7g6g5g4 g3g2____       \n\
@@ -237,7 +229,6 @@ movq      %%mm5, 8(%3)          # store pixel 4-7                           \n\
  */
 
 #define MMX_UNPACK_32 "                                                     \n\
-                                                                            \n\
 pxor      %%mm3, %%mm3  # zero mm3                                          \n\
 movq      %%mm0, %%mm6  #                 B7 B6 B5 B4 B3 B2 B1 B0           \n\
 movq      %%mm1, %%mm7  #                 R7 R6 R5 R4 R3 R2 R1 R0           \n\
@@ -265,3 +256,4 @@ movq      %%mm4, 24(%3) # Store ARGB7 ARGB6                                 \n\
 #pxor      %%mm4, %%mm4  # zero mm4                                          \n\
 #movq      8(%0), %%mm6  # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0           \n\
 "
+

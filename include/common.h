@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.30 2001/04/11 02:01:24 henri Exp $
+ * $Id: common.h,v 1.31 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -142,6 +142,7 @@ struct data_packet_s;
 
 #ifdef NTOHL_IN_SYS_PARAM_H
 #   include <sys/param.h>
+#elif defined(WIN32)
 #else
 #   include <netinet/in.h>
 #endif

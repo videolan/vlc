@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.21 2001/04/27 19:29:11 massiot Exp $
+ * $Id: vout_x11.c,v 1.22 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -559,7 +559,8 @@ static int vout_Manage( vout_thread_t *p_vout )
     if ( b_gofullscreen )
     {
         char *psz_display;
-        /* Open display, unsing 'vlc_display' or DISPLAY environment variable */
+        /* Open display, unsing 'vlc_display' or the DISPLAY
+         * environment variable */
         psz_display = XDisplayName( main_GetPszVariable( VOUT_DISPLAY_VAR, NULL ) );
 
         intf_DbgMsg( "vout: changing full-screen status" );

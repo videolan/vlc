@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.88 2001/04/27 18:07:56 henri Exp $
+ * $Id: main.c,v 1.89 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -261,7 +261,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Read configuration
      */
-    if( GetConfiguration( &i_argc, ppsz_argv, ppsz_env ) )  /* parse cmd line */
+    if( GetConfiguration( &i_argc, ppsz_argv, ppsz_env ) ) /* parse cmd line */
     {
         intf_MsgDestroy();
         return( errno );
@@ -864,13 +864,15 @@ static void Version( void )
 static void InitSignalHandler( void )
 {
     /* Termination signals */
-    signal( SIGHUP,  FatalSignalHandler );
+#ifndef WIN32
     signal( SIGINT,  FatalSignalHandler );
+    signal( SIGHUP,  FatalSignalHandler );
     signal( SIGQUIT, FatalSignalHandler );
 
     /* Other signals */
     signal( SIGALRM, SimpleSignalHandler );
     signal( SIGPIPE, SimpleSignalHandler );
+#endif
 }
 
 
@@ -897,9 +899,11 @@ static void FatalSignalHandler( int i_signal )
     /* Once a signal has been trapped, the termination sequence will be
      * armed and following signals will be ignored to avoid sending messages
      * to an interface having been destroyed */
-    signal( SIGHUP,  SIG_IGN );
+#ifndef WIN32
     signal( SIGINT,  SIG_IGN );
+    signal( SIGHUP,  SIG_IGN );
     signal( SIGQUIT, SIG_IGN );
+#endif
 
     /* Acknowledge the signal received */
     intf_ErrMsgImm( "intf error: signal %d received, exiting", i_signal );

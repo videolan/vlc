@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: audio_output.c,v 1.56 2001/03/21 13:42:34 sam Exp $
+ * $Id: audio_output.c,v 1.57 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -39,6 +39,9 @@
 #include "defs.h"
 
 #include <unistd.h>                                              /* getpid() */
+#ifdef WIN32                   /* getpid() for win32 is located in process.h */
+#include <process.h>
+#endif
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
@@ -116,8 +119,8 @@ aout_thread_t *aout_CreateThread( int *pi_status )
         return( NULL );
     }
 
-    p_aout->b_stereo = ( p_aout->i_channels == 2 ) ? 1 : 0; /* FIXME: only works
-                                                   for i_channels == 1 or 2 ??*/
+    /* FIXME: only works for i_channels == 1 or 2 ?? */
+    p_aout->b_stereo = ( p_aout->i_channels == 2 ) ? 1 : 0;
 
     if ( p_aout->pf_setformat( p_aout ) )
     {

@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.27 2001/04/27 18:07:57 henri Exp $
+ * $Id: netutils.c,v 1.28 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -28,15 +28,18 @@
  *****************************************************************************/
 #include "defs.h"
 
-#include <netdb.h>                                        /* gethostbyname() */
 #include <stdlib.h>                             /* free(), realloc(), atoi() */
 #include <errno.h>                                                /* errno() */
 #include <string.h>                                      /* bzero(), bcopy() */
 #include <unistd.h>                                         /* gethostname() */
 #include <sys/time.h>                                        /* gettimeofday */
 
+#ifndef WIN32
+#include <netdb.h>                                        /* gethostbyname() */
 #include <netinet/in.h>                               /* BSD: struct in_addr */
 #include <sys/socket.h>                              /* BSD: struct sockaddr */
+#endif
+
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>                           /* inet_ntoa(), inet_aton() */
 #endif
@@ -91,7 +94,7 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
     
     /* Reset struct */
     memset( p_socket, 0, sizeof( struct sockaddr_in ) );
-    p_socket->sin_family = AF_INET;                                 /* family */
+    p_socket->sin_family = AF_INET;                                /* family */
     p_socket->sin_port = htons( i_port );
     if( psz_broadcast == NULL )
     {
@@ -143,8 +146,8 @@ int network_BuildRemoteAddr( struct sockaddr_in * p_socket, char * psz_server )
 
     /* Reset structure */
     memset( p_socket, 0, sizeof( struct sockaddr_in ) );
-    p_socket->sin_family = AF_INET;                                 /* family */
-    p_socket->sin_port = htons( 0 );                /* This is for remote end */
+    p_socket->sin_family = AF_INET;                                /* family */
+    p_socket->sin_port = htons( 0 );               /* This is for remote end */
     
      /* Try to convert address directly from in_addr - this will work if
       * psz_in_addr is dotted decimal. */

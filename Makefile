@@ -176,7 +176,7 @@ distclean: clean
 	rm -f **/*.o **/*~ *.log
 	rm -f Makefile.opts
 	rm -f include/defs.h include/config.h include/modules_builtin.h
-	rm -f config.status config.cache config.log
+	rm -f config*status config*cache config*log
 	rm -f gmon.out core build-stamp
 	rm -Rf .dep
 	rm -f .gdb_history
@@ -353,5 +353,5 @@ $(PLUGIN_OBJ): FORCE
 builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 $(BUILTIN_OBJ): FORCE
 	cd $(shell echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.* \([^/]*/\)'$(@:lib/%.a=%)' .*@plugins/\1@' -e 's@^ .*@@') && $(MAKE) $(@:%=../../%)
-	ranlib $@
+	$(RANLIB) $@
 

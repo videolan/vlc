@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.81 2001/04/06 09:15:48 sam Exp $
+ * $Id: vpar_headers.c,v 1.82 2001/04/28 03:36:26 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -344,7 +344,7 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
                     p_vpar->pi_default_intra_quant );
     }
 
-    if( GetBits( &p_vpar->bit_stream, 1 ) ) /* load_non_intra_quantizer_matrix */
+    if( GetBits(&p_vpar->bit_stream, 1) ) /* load_non_intra_quantizer_matrix */
     {
         LoadMatrix( p_vpar, &p_vpar->sequence.nonintra_quant );
     }
@@ -381,7 +381,8 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
         p_vpar->sequence.i_chroma_format = GetBits( &p_vpar->bit_stream, 2 );
         p_vpar->sequence.i_width |= GetBits( &p_vpar->bit_stream, 2 ) << 12;
         p_vpar->sequence.i_height |= GetBits( &p_vpar->bit_stream, 2 ) << 12;
-        /* bit_rate_extension, marker_bit, vbv_buffer_size_extension, low_delay */
+        /* bit_rate_extension, marker_bit, vbv_buffer_size_extension,
+         * low_delay */
         RemoveBits( &p_vpar->bit_stream, 22 );
         /* frame_rate_extension_n */
         i_dummy = GetBits( &p_vpar->bit_stream, 2 );
@@ -693,7 +694,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     {
         /* This is a new frame. Get a structure from the video_output. */
         while( ( P_picture = vout_CreatePicture( p_vpar->p_vout,
-                                        99+p_vpar->sequence.i_chroma_format, /*XXX??*/
+                              /* XXX */ 99+p_vpar->sequence.i_chroma_format,
                                         p_vpar->sequence.i_width,
                                         p_vpar->sequence.i_height ) )
              == NULL )
@@ -727,7 +728,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
 #ifdef VDEC_SMP
         /* Link referenced pictures for the decoder
-         * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
+         * They are unlinked in vpar_ReleaseMacroblock() &
+         * vpar_DestroyMacroblock() */
         if( p_vpar->picture.i_coding_type == P_CODING_TYPE ||
             p_vpar->picture.i_coding_type == B_CODING_TYPE )
         {

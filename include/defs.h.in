@@ -109,6 +109,9 @@
 /* Define if you have the <stddef.h> header file.  */
 #undef HAVE_STDDEF_H
 
+/* Define if you have the <strings.h> header file.  */
+#undef HAVE_STRINGS_H
+
 /* Define if you have the <sys/ioctl.h> header file.  */
 #undef HAVE_SYS_IOCTL_H
 
@@ -133,7 +136,13 @@
 /* getopt support */
 #undef HAVE_GETOPT_LONG
 
-/* Define if ntohl is in <sys/param.h>. */
+/* Define if <pthread.h> defines pthread_cond_t. */
+#undef PTHREAD_COND_T_IN_PTHREAD_H
+
+/* Define if <strings.h> defines strncasecmp. */
+#undef STRNCASECMP_IN_STRINGS_H
+
+/* Define if <sys/param.h> defines ntohl. */
 #undef NTOHL_IN_SYS_PARAM_H
 
 /* Define if <sys/types.h> defines boolean_t. */

@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.26 2001/04/20 11:06:48 sam Exp $
+ * $Id: modules.c,v 1.27 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -72,7 +72,7 @@ static int AllocateBuiltinModule( module_bank_t *,
                                   int ( * ) ( module_t * ),
                                   int ( * ) ( module_t * ),
                                   int ( * ) ( module_t * ) );
-static int FreeModule   ( module_bank_t * p_bank, module_t * );
+static int DeleteModule ( module_bank_t * p_bank, module_t * );
 static int LockModule   ( module_t * );
 static int UnlockModule ( module_t * );
 #ifdef HAVE_DYNAMIC_PLUGINS
@@ -213,7 +213,7 @@ void module_DestroyBank( module_bank_t * p_bank )
 
     while( p_bank->first != NULL )
     {
-        if( FreeModule( p_bank, p_bank->first ) )
+        if( DeleteModule( p_bank, p_bank->first ) )
         {
             /* Module deletion failed */
             intf_ErrMsg( "module error: `%s' can't be removed. trying harder.",
@@ -406,7 +406,7 @@ void module_Unneed( module_bank_t * p_bank, module_t * p_module )
  *****************************************************************************
  * This function loads a dynamically loadable module and allocates a structure
  * for its information data. The module can then be handled by module_Need,
- * module_Unneed and HideModule. It can be removed by FreeModule.
+ * module_Unneed and HideModule. It can be removed by DeleteModule.
  *****************************************************************************/
 static int AllocatePluginModule( module_bank_t * p_bank, char * psz_filename )
 {
@@ -525,7 +525,7 @@ static int AllocatePluginModule( module_bank_t * p_bank, char * psz_filename )
  *****************************************************************************
  * This function registers a built-in module and allocates a structure
  * for its information data. The module can then be handled by module_Need,
- * module_Unneed and HideModule. It can be removed by FreeModule.
+ * module_Unneed and HideModule. It can be removed by DeleteModule.
  *****************************************************************************/
 static int AllocateBuiltinModule( module_bank_t * p_bank,
                                   int ( *pf_init ) ( module_t * ),
@@ -623,11 +623,11 @@ static int AllocateBuiltinModule( module_bank_t * p_bank,
 }
 
 /*****************************************************************************
- * FreeModule: delete a module and its structure.
+ * DeleteModule: delete a module and its structure.
  *****************************************************************************
  * This function can only be called if i_usage <= 0.
  *****************************************************************************/
-static int FreeModule( module_bank_t * p_bank, module_t * p_module )
+static int DeleteModule( module_bank_t * p_bank, module_t * p_module )
 {
     /* If the module is not in use but is still in memory, we first have
      * to hide it and remove it from memory before we can free the

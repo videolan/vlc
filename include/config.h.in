@@ -451,7 +451,7 @@
  * message function was called */
 #define INTF_MSG_DBG_FORMAT             "## %s:%s(),%i: "
 
-/* Maximal number of arguments on a command line, including the function name */
+/* Max number of arguments on a command line, including the function name */
 #define INTF_MAX_ARGS                   20
 
 /* Maximal size of a command line in a script */

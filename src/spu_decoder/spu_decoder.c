@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.37 2001/04/25 10:22:33 massiot Exp $
+ * $Id: spu_decoder.c,v 1.38 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,6 +27,9 @@
 #include "defs.h"
 
 #include <unistd.h>                                              /* getpid() */
+#ifdef WIN32                   /* getpid() for win32 is located in process.h */
+#include <process.h>
+#endif
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                    /* memcpy(), memset() */

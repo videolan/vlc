@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.19 2001/04/27 23:29:14 stef Exp $
+ * $Id: input_ps.c,v 1.20 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -32,6 +32,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+#ifdef STRNCASECMP_IN_STRINGS_H
+#   include <strings.h>
+#endif
 #include <errno.h>
 
 #include <sys/types.h>
@@ -527,7 +530,11 @@ static void PSSeek( input_thread_t * p_input, off_t i_position )
     p_method = (thread_ps_data_t *)p_input->p_plugin_data;
 
     /* A little bourrin but should work for a while --Meuuh */
+#ifndef WIN32
     fseeko( p_method->stream, i_position, SEEK_SET );
+#else
+    fseek( p_method->stream, (long)i_position, SEEK_SET );
+#endif
 
     p_input->stream.p_selected_area->i_tell = i_position;
 }

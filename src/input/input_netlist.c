@@ -2,7 +2,7 @@
  * input_netlist.c: netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_netlist.c,v 1.33 2001/04/06 09:15:47 sam Exp $
+ * $Id: input_netlist.c,v 1.34 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -29,7 +29,9 @@
 #include <stdlib.h>
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>
+#ifndef WIN32
 #include <sys/uio.h>                                         /* struct iovec */
+#endif
 #include <unistd.h>
 
 #include "config.h"
@@ -45,6 +47,13 @@
 #include "input.h"
 #include "input_netlist.h"
 
+#ifdef WIN32 
+struct iovec
+  {
+    void *iov_base;     /* Pointer to data.  */
+    size_t iov_len;     /* Length of data.  */
+  };
+#endif
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/

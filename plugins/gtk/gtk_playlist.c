@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.9 2001/04/08 13:09:32 octplane Exp $
+ * $Id: gtk_playlist.c,v 1.10 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *      
@@ -170,7 +170,11 @@ rebuildCList(GtkCList * clist, playlist_t * playlist_p)
    
     for( dummy=0; dummy < playlist_p->i_size; dummy++ )
     {
+#ifdef WIN32 /* WIN32 HACK */
+        text[0] = g_strdup( "" );
+#else
         text[0] = g_strdup( rindex( (char *)(playlist_p->p_item[playlist_p->i_size -1 - dummy].psz_name ), '/' ) + 1 );
+#endif
         text[1] = g_strdup( "no info");
         
         gtk_clist_insert( clist, 0, text );

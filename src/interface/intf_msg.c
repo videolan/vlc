@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.31 2001/04/27 19:29:11 massiot Exp $
+ * $Id: intf_msg.c,v 1.32 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -46,6 +46,10 @@
 #include "intf_console.h"
 
 #include "main.h"
+
+#ifdef WIN32
+#define snprintf _snprintf         /* snprintf not defined in mingw32 (bug?) */
+#endif
 
 /*****************************************************************************
  * intf_msg_item_t

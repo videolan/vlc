@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.c,v 1.25 2001/04/27 19:29:11 massiot Exp $
+ * $Id: video_text.c,v 1.26 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -254,7 +254,11 @@ vout_font_t *vout_LoadFont( const char *psz_name )
         }
 
         /* Open file */
+#ifndef WIN32
         i_file = open( psz_file, O_RDONLY );
+#else
+        i_file = open( psz_file, O_RDONLY | O_BINARY );
+#endif
         free( psz_file );
 
         if( i_file != -1 )

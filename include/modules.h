@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.20 2001/04/15 04:19:57 sam Exp $
+ * $Id: modules.h,v 1.21 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -20,6 +20,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#ifdef WIN32
+#include <sys/types.h>                                              /* off_t */
+#endif
 
 /* Number of tries before we unload an unused module */
 #define MODULE_HIDE_DELAY 100

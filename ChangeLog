@@ -4,7 +4,10 @@
 
 HEAD
 
-  * Changed broadcast handling
+  * Coding style fixes here and there.
+  * Miscellaneous QNX compile fixes.
+  * Beginning of the mingw32 port by Gildas Bazin <gbazin@netcourrier.com>.
+  * Changed broadcast handling.
   * Added a vlc-howto in sgml format in the doc directory.
   * Fixed the continuous 'seeking position' bug in network mode.
   * Support for `ts://foo:42' style input source.

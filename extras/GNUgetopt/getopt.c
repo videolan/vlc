@@ -75,6 +75,9 @@
 #include <unixlib.h>
 #if HAVE_STRING_H - 0
 #include <string.h>
+#ifdef STRNCASECMP_IN_STRINGS_H
+#   include <strings.h>
+#endif
 #endif
 #endif
 
@@ -650,6 +653,7 @@ int
 				else
 				{
 					if (opterr)
+					{
 						if (argv[optind - 1][1] == '-')
 							/* --option */
 							fprintf(stderr,
@@ -660,6 +664,7 @@ int
 							fprintf(stderr,
 								_("%s: option `%c%s' doesn't allow an argument\n"),
 								argv[0], argv[optind - 1][0], pfound->name);
+					}
 
 					nextchar += strlen(nextchar);
 

@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.15 2001/04/27 16:08:26 sam Exp $
+ * $Id: input_ts.c,v 1.16 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -31,14 +31,22 @@
 
 #include <stdlib.h>
 #include <string.h>
+#ifdef STRNCASECMP_IN_STRINGS_H
+#   include <strings.h>
+#endif
 #include <errno.h>
 
 #include <sys/types.h>
 #include <sys/time.h>
+
 #ifdef SYS_NTO
 #include <sys/select.h>
 #endif
+
+#ifndef WIN32
 #include <sys/uio.h>
+#endif
+
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -195,7 +203,7 @@ static void TSInit( input_thread_t * p_input )
  *****************************************************************************/
 void TSFakeOpen( input_thread_t * p_input )
 {
-#if !defined( SYS_BEOS ) && !defined( SYS_NTO )
+#if !defined( SYS_BEOS ) && !defined( SYS_NTO ) && !defined( WIN32 )
     char *psz_name = p_input->p_source;
 
     if( ( strlen(psz_name) > 3 ) && !strncasecmp( psz_name, "ts:", 3 ) )
@@ -279,7 +287,11 @@ static int TSRead( input_thread_t * p_input,
     
     if( i_data )
     {
+#ifndef WIN32
         i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
+#else
+        i_read = -1;
+#endif
         
         if( i_read == -1 )
         {
@@ -301,3 +313,4 @@ static int TSRead( input_thread_t * p_input,
     }
     return 0;
 }
+

@@ -2,7 +2,7 @@
  * sdl.c : SDL plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: sdl.c,v 1.14 2001/03/21 13:42:34 sam Exp $
+ * $Id: sdl.c,v 1.15 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -55,7 +55,7 @@ MODULE_CONFIG_END
 
 /*****************************************************************************
  * Capabilities defined in the other files.
- ******************************************************************************/
+ *****************************************************************************/
 void _M( aout_getfunctions )( function_list_t * p_function_list );
 void _M( vout_getfunctions )( function_list_t * p_function_list );
 

@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.79 2001/04/25 10:22:33 massiot Exp $
+ * $Id: video_parser.c,v 1.80 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -279,7 +279,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->pp_vdec[0]->b_error = 0;
     p_vpar->pp_vdec[0]->p_vpar = p_vpar;
 
-#   ifndef SYS_BEOS
+#   if !defined(SYS_BEOS) && !defined(WIN32)
 #       if VDEC_NICE
     /* Re-nice ourself */
     if( nice(VDEC_NICE) == -1 )

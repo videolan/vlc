@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.79 2001/02/23 17:58:22 massiot Exp $
+ * $Id: vpar_blocks.c,v 1.80 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -204,7 +204,8 @@ static lookup_t     pl_dct_dc_chrom_init_table_2[32] =
     };
  
 
-    /* Tables for ac DCT coefficients. There are cut in many parts to save space */
+    /* Tables for ac DCT coefficients. There are cut in many parts to
+     * save space */
     /* Table B-14, DCT coefficients table zero,
      * codes 0100 ... 1xxx (used for first (DC) coefficient)
      */
@@ -2135,3 +2136,4 @@ DECLARE_PICD( vpar_PictureData2IB, 1, I_CODING_TYPE, BOTTOM_FIELD );
 DECLARE_PICD( vpar_PictureData2PB, 1, P_CODING_TYPE, BOTTOM_FIELD );
 DECLARE_PICD( vpar_PictureData2BB, 1, B_CODING_TYPE, BOTTOM_FIELD );
 #endif
+

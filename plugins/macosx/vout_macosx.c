@@ -340,7 +340,8 @@ static int MakeWindow( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * AllocBuffer: forces offscreen allocation (if different than current) in memory type specified
+ * AllocBuffer: forces offscreen allocation (if different than current) in
+ * memory type specified
  *****************************************************************************/
 static int AllocBuffer ( vout_thread_t *p_vout, short index )
 {
@@ -462,7 +463,7 @@ static void vout_Display( vout_thread_t *p_vout )
 
 /*****************************************************************************
  * flushQD: flushes buffered window area
-  *****************************************************************************/
+ *****************************************************************************/
 void flushQD( vout_thread_t *p_vout )
 {
     CGrafPtr thePort;
@@ -491,7 +492,7 @@ void flushQD( vout_thread_t *p_vout )
 
 /*****************************************************************************
  * BlitToWindow: checks offscreen and blits it to the front
-  *****************************************************************************/
+ *****************************************************************************/
 
 void BlitToWindow( vout_thread_t *p_vout, short index )
 {

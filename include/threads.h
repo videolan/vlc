@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: threads.h,v 1.16 2001/03/21 13:42:33 sam Exp $
+ * $Id: threads.h,v 1.17 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -25,18 +25,23 @@
 
 #include <stdio.h>
 
-#if defined(HAVE_PTHREAD_H)            /* pthreads (Linux & BSD for example) */
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)      /* pthreads (like Linux & BSD) */
 #include <pthread.h>
 
 #elif defined(HAVE_CTHREADS_H)                                    /* GNUMach */
 #include <cthreads.h>
 
-#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)   /* BeOS */
+#elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)  /* BeOS */
 #undef MAX
 #undef MIN
 #include <kernel/OS.h>
 #include <kernel/scheduler.h>
 #include <byteorder.h>
+
+#elif defined(WIN32)                          /* Win32 with MinGW32 compiler */
+#include <windows.h>
+#include <process.h>
+
 #else
 #error no threads available on your system !
 #endif
@@ -71,17 +76,15 @@
  * Types definition
  *****************************************************************************/
 
-#if defined(HAVE_PTHREAD_H)
-
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
 typedef pthread_t        vlc_thread_t;
 typedef pthread_mutex_t  vlc_mutex_t;
 typedef pthread_cond_t   vlc_cond_t;
 
 #elif defined(HAVE_CTHREADS_H)
-
 typedef cthread_t        vlc_thread_t;
 
-/* those structs are the ones defined in /include/cthreads.h but we need
+/* Those structs are the ones defined in /include/cthreads.h but we need
  * to handle (*foo) where foo is a (mutex_t) while they handle (foo) where
  * foo is a (mutex_t*) */
 typedef struct s_mutex {
@@ -99,8 +102,7 @@ typedef struct s_condition {
 } vlc_cond_t;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
-
-/* This is the BeOS implementation of the vlc thread, note that the mutex is
+/* This is the BeOS implementation of the vlc threads, note that the mutex is
  * not a real mutex and the cond_var is not like a pthread cond_var but it is
  * enough for what wee need */
 
@@ -118,6 +120,12 @@ typedef struct
     thread_id       thread;
 } vlc_cond_t;
 
+#elif defined(WIN32)
+typedef HANDLE      vlc_thread_t;
+typedef HANDLE      vlc_mutex_t;
+typedef HANDLE      vlc_cond_t; 
+typedef unsigned (__stdcall *PTHREAD_START) (void *);
+
 #endif
 
 typedef void *(*vlc_thread_func_t)(void *p_data);
@@ -126,24 +134,24 @@ typedef void *(*vlc_thread_func_t)(void *p_data);
  * Prototypes
  *****************************************************************************/
 
-static __inline__ int  vlc_thread_create( vlc_thread_t *p_thread, char *psz_name,
-                                          vlc_thread_func_t func, void *p_data );
-static __inline__ void vlc_thread_exit  ( void );
-static __inline__ void vlc_thread_join  ( vlc_thread_t thread );
+static __inline__ int  vlc_thread_create ( vlc_thread_t *, char *,
+                                           vlc_thread_func_t, void * );
+static __inline__ void vlc_thread_exit   ( void );
+static __inline__ void vlc_thread_join   ( vlc_thread_t );
 
-static __inline__ int  vlc_mutex_init    ( vlc_mutex_t *p_mutex );
-static __inline__ int  vlc_mutex_lock    ( vlc_mutex_t *p_mutex );
-static __inline__ int  vlc_mutex_unlock  ( vlc_mutex_t *p_mutex );
-static __inline__ int  vlc_mutex_destroy ( vlc_mutex_t *p_mutex );
+static __inline__ int  vlc_mutex_init    ( vlc_mutex_t * );
+static __inline__ int  vlc_mutex_lock    ( vlc_mutex_t * );
+static __inline__ int  vlc_mutex_unlock  ( vlc_mutex_t * );
+static __inline__ int  vlc_mutex_destroy ( vlc_mutex_t * );
 
-static __inline__ int  vlc_cond_init    ( vlc_cond_t *p_condvar );
-static __inline__ int  vlc_cond_signal  ( vlc_cond_t *p_condvar );
-static __inline__ int  vlc_cond_wait    ( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex );
-static __inline__ int vlc_cond_destroy  ( vlc_cond_t *p_condvar );
+static __inline__ int  vlc_cond_init     ( vlc_cond_t * );
+static __inline__ int  vlc_cond_signal   ( vlc_cond_t * );
+static __inline__ int  vlc_cond_wait     ( vlc_cond_t *, vlc_mutex_t * );
+static __inline__ int  vlc_cond_destroy  ( vlc_cond_t * );
 
 #if 0
-static _inline__ int    vlc_cond_timedwait   ( vlc_cond_t * condvar, vlc_mutex_t * mutex,
-                              mtime_t absoute_timeout_time );
+static __inline__ int  vlc_cond_timedwait( vlc_cond_t *, vlc_mutex_t *,
+                                           mtime_t );
 #endif
 
 /*****************************************************************************
@@ -153,7 +161,7 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
                                          char *psz_name, vlc_thread_func_t func,
                                          void *p_data)
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     return pthread_create( p_thread, NULL, func, p_data );
 
 #elif defined(HAVE_CTHREADS_H)
@@ -165,6 +173,23 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
                               B_NORMAL_PRIORITY, p_data );
     return resume_thread( *p_thread );
 
+#elif defined(WIN32)
+#if 0
+    DWORD threadID;
+    /* This method is not recommended when using the MSVCRT C library,
+     * so we'll have to use _beginthreadex instead */
+    *p_thread = CreateThread(0, 0, (LPTHREAD_START_ROUTINE) func, 
+                             p_data, 0, &threadID);
+#endif
+    unsigned threadID;
+    /* When using the MSVCRT C library you have to use the _beginthreadex
+     * function instead of CreateThread, otherwise you'll end up with memory
+     * leaks and the signal function not working */
+    *p_thread = (HANDLE)_beginthreadex(NULL, 0, (PTHREAD_START) func, 
+                             p_data, 0, &threadID);
+    
+    return( *p_thread ? 0 : 1 );
+
 #endif
 }
 
@@ -173,7 +198,7 @@ static __inline__ int vlc_thread_create( vlc_thread_t *p_thread,
  *****************************************************************************/
 static __inline__ void vlc_thread_exit( void )
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     pthread_exit( 0 );
 
 #elif defined(HAVE_CTHREADS_H)
@@ -183,6 +208,14 @@ static __inline__ void vlc_thread_exit( void )
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     exit_thread( 0 );
 
+#elif defined(WIN32)
+#if 0
+    ExitThread( 0 );
+#endif
+    /* For now we don't close the thread handles (because of race conditions).
+     * Need to be looked at. */
+    _endthreadex(0);
+
 #endif
 }
 
@@ -191,7 +224,7 @@ static __inline__ void vlc_thread_exit( void )
  *****************************************************************************/
 static __inline__ void vlc_thread_join( vlc_thread_t thread )
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     pthread_join( thread, NULL );
 
 #elif defined(HAVE_CTHREADS_H)
@@ -201,6 +234,9 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
     int32 exit_value;
     wait_for_thread( thread, &exit_value );
 
+#elif defined(WIN32)
+    WaitForSingleObject( thread, INFINITE);
+
 #endif
 }
 
@@ -209,7 +245,7 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
  *****************************************************************************/
 static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     return pthread_mutex_init( p_mutex, NULL );
 
 #elif defined(HAVE_CTHREADS_H)
@@ -219,7 +255,11 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
 
     /* check the arguments and whether it's already been initialized */
-    if( p_mutex == NULL ) return B_BAD_VALUE;
+    if( p_mutex == NULL )
+    {
+        return B_BAD_VALUE;
+    }
+
     if( p_mutex->init == 9999 )
     {
         return EALREADY;
@@ -227,9 +267,16 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 
     p_mutex->lock = create_sem( 1, "BeMutex" );
     if( p_mutex->lock < B_NO_ERROR )
+    {
         return( -1 );
+    }
+
     p_mutex->init = 9999;
     return B_OK;
+
+#elif defined(WIN32)
+    *p_mutex = CreateMutex(0,FALSE,0);
+    return (*p_mutex?0:1);
 
 #endif
 }
@@ -239,7 +286,7 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     return pthread_mutex_lock( p_mutex );
 
 #elif defined(HAVE_CTHREADS_H)
@@ -249,11 +296,22 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     status_t err;
 
-    if( !p_mutex ) return B_BAD_VALUE;
-    if( p_mutex->init < 2000 ) return B_NO_INIT;
+    if( !p_mutex )
+    {
+        return B_BAD_VALUE;
+    }
+
+    if( p_mutex->init < 2000 )
+    {
+        return B_NO_INIT;
+    }
 
     err = acquire_sem( p_mutex->lock );
     return err;
+
+#elif defined(WIN32)
+    WaitForSingleObject( *p_mutex, INFINITE );
+    return 0;
 
 #endif
 }
@@ -263,7 +321,7 @@ static __inline__ int vlc_mutex_lock( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     return pthread_mutex_unlock( p_mutex );
 
 #elif defined(HAVE_CTHREADS_H)
@@ -271,12 +329,22 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
     return 0;
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+    if( !p_mutex)
+    {
+        return B_BAD_VALUE;
+    }
 
-    if(! p_mutex) return B_BAD_VALUE;
-    if( p_mutex->init < 2000 ) return B_NO_INIT;
+    if( p_mutex->init < 2000 )
+    {
+        return B_NO_INIT;
+    }
 
     release_sem( p_mutex->lock );
     return B_OK;
+
+#elif defined(WIN32)
+    ReleaseMutex( *p_mutex );
+    return 0;
 
 #endif
 }
@@ -286,13 +354,22 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_mutex_destroy( vlc_mutex_t *p_mutex )
 {
-#if defined(HAVE_PTHREAD_H)    
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)    
     return pthread_mutex_destroy( p_mutex );
+
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     if( p_mutex->init == 9999 )
+    {
         delete_sem( p_mutex->lock );
+    }
+
     p_mutex->init = 0;
     return B_OK;
+
+#elif defined(WIN32)
+    CloseHandle(*p_mutex);
+    return 0;
+
 #endif    
 }
 
@@ -301,7 +378,7 @@ static __inline__ int vlc_mutex_destroy( vlc_mutex_t *p_mutex )
  *****************************************************************************/
 static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     return pthread_cond_init( p_condvar, NULL );
 
 #elif defined(HAVE_CTHREADS_H)
@@ -315,15 +392,28 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     if( !p_condvar )
+    {
         return B_BAD_VALUE;
+    }
 
     if( p_condvar->init == 9999 )
+    {
         return EALREADY;
+    }
 
     p_condvar->thread = -1;
     p_condvar->init = 9999;
     return 0;
 
+#elif defined(WIN32)
+    /* Create an auto-reset event. */
+    *p_condvar = CreateEvent( NULL,   /* no security */
+                              FALSE,  /* auto-reset event */
+                              FALSE,  /* non-signaled initially */
+                              NULL ); /* unnamed */
+
+    return( *p_condvar ? 0 : 1 );
+    
 #endif
 }
 
@@ -332,7 +422,7 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
  *****************************************************************************/
 static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     return pthread_cond_signal( p_condvar );
 
 #elif defined(HAVE_CTHREADS_H)
@@ -345,31 +435,43 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     if( !p_condvar )
+    {
         return B_BAD_VALUE;
+    }
 
     if( p_condvar->init < 2000 )
+    {
         return B_NO_INIT;
+    }
+
     while( p_condvar->thread != -1 )
     {
         thread_info info;
         if( get_thread_info(p_condvar->thread, &info) == B_BAD_VALUE )
+        {
             return 0;
+        }
 
         if( info.state != B_THREAD_SUSPENDED )
         {
-            // The  waiting thread is not suspended so it could
-            // have been interrupted beetwen the unlock and the
-            // suspend_thread line. That is why we sleep a little
-            // before retesting p_condver->thread.
+            /* The  waiting thread is not suspended so it could
+             * have been interrupted beetwen the unlock and the
+             * suspend_thread line. That is why we sleep a little
+             * before retesting p_condver->thread. */
             snooze( 10000 );
         }
         else
         {
-            // Ok, we have to wake up that thread
+            /* Ok, we have to wake up that thread */
             resume_thread( p_condvar->thread );
             return 0;
         }
     }
+    return 0;
+
+#elif defined(WIN32)
+    /* Try to release one waiting thread. */
+    PulseEvent ( *p_condvar );
     return 0;
 
 #endif
@@ -380,7 +482,7 @@ static __inline__ int vlc_cond_signal( vlc_cond_t *p_condvar )
  *****************************************************************************/
 static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex )
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     return pthread_cond_wait( p_condvar, p_mutex );
 
 #elif defined(HAVE_CTHREADS_H)
@@ -389,22 +491,40 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
 
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     if( !p_condvar )
+    {
         return B_BAD_VALUE;
+    }
 
     if( !p_mutex )
+    {
         return B_BAD_VALUE;
+    }
 
     if( p_condvar->init < 2000 )
+    {
         return B_NO_INIT;
+    }
 
-    // The p_condvar->thread var is initialized before the unlock because
-    // it enables to identify when the thread is interrupted beetwen the
-    // unlock line and the suspend_thread line
+    /* The p_condvar->thread var is initialized before the unlock because
+     * it enables to identify when the thread is interrupted beetwen the
+     * unlock line and the suspend_thread line */
     p_condvar->thread = find_thread( NULL );
     vlc_mutex_unlock( p_mutex );
     suspend_thread( p_condvar->thread );
     p_condvar->thread = -1;
 
+    vlc_mutex_lock( p_mutex );
+    return 0;
+
+#elif defined(WIN32)
+    /* Release the <external_mutex> here and wait for the event
+     * to become signaled, due to <pthread_cond_signal> being
+     * called. */
+    vlc_mutex_unlock( p_mutex );
+
+    WaitForSingleObject( *p_condvar, INFINITE );
+
+    /* Reacquire the mutex before returning. */
     vlc_mutex_lock( p_mutex );
     return 0;
 
@@ -416,10 +536,17 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
  *****************************************************************************/
 static __inline__ int vlc_cond_destroy( vlc_cond_t *p_condvar )
 {
-#if defined(HAVE_PTHREAD_H)
+#if defined(PTHREAD_COND_T_IN_PTHREAD_H)
     return pthread_cond_destroy( p_condvar );
+
 #elif defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
     p_condvar->init = 0;
     return 0;
+
+#elif defined(WIN32)
+    CloseHandle( *p_condvar );
+    return 0;
+
 #endif    
 }
+

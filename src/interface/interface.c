@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.72 2001/04/11 02:01:24 henri Exp $
+ * $Id: interface.c,v 1.73 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -32,6 +32,7 @@
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                                   /* FILE */
 #include <string.h>                                            /* strerror() */
+#include <sys/types.h>                                              /* off_t */
 
 #include "config.h"
 #include "common.h"

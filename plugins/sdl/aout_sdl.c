@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_sdl.c,v 1.11 2001/04/26 11:23:16 sam Exp $
+ * $Id: aout_sdl.c,v 1.12 2001/04/28 03:36:25 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -109,7 +109,6 @@ static int aout_Probe( probedata_t *p_data )
 {
     SDL_AudioSpec desired, obtained;
 
-    return 0;
     /* Start AudioSDL */
     if( SDL_Init(SDL_INIT_AUDIO | SDL_INIT_NOPARACHUTE) != 0 )
     {
@@ -120,7 +119,7 @@ static int aout_Probe( probedata_t *p_data )
     desired.freq       = 11025;                                 /* frequency */
     desired.format     = AUDIO_U8;                        /* unsigned 8 bits */
     desired.channels   = 2;                                          /* mono */
-    desired.callback   = NULL;                   /* no callback function yet */
+    desired.callback   = aout_SDLCallback;    /* callback function mandatory */
     desired.userdata   = NULL;                     /* null parm for callback */
     desired.samples    = 4096;
 
@@ -133,6 +132,7 @@ static int aout_Probe( probedata_t *p_data )
     }
 
     /* Otherwise, there are good chances we can use this plugin, return 100. */
+    intf_DbgMsg( "aout: SDL_OpenAudio successfully run" );
     SDL_CloseAudio();
 
     if( TestMethod( AOUT_METHOD_VAR, "sdl" ) )

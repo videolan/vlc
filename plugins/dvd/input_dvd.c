@@ -1,6 +1,6 @@
 /*****************************************************************************
  * input_dvd.c: DVD raw reading plugin.
- * ---
+ *****************************************************************************
  * This plugins should handle all the known specificities of the DVD format,
  * especially the 2048 bytes logical block size.
  * It depends on:
@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.50 2001/04/27 19:29:11 massiot Exp $
+ * $Id: input_dvd.c,v 1.51 2001/04/28 03:36:25 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -51,6 +51,9 @@
 #include <sys/uio.h>
 
 #include <string.h>
+#ifdef STRNCASECMP_IN_STRINGS_H
+#   include <strings.h>
+#endif
 #include <errno.h>
 
 #include "config.h"
@@ -1346,7 +1349,8 @@ static int DVDChapterSelect( thread_dvd_data_t * p_dvd, int i_chapter )
 
     DVDChooseAngle( p_dvd );
 
-    /* Search for cell_index in cell adress_table and initialize start sector */
+    /* Search for cell_index in cell adress_table and initialize
+     * start sector */
     if( DVDFindSector( p_dvd ) < 0 )
     {
         intf_ErrMsg( "dvd error: can't select chapter" );

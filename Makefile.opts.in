@@ -13,13 +13,13 @@
 # the plugins in this line and put them as built-ins, otherwise your
 # application won't be able to load them.
 # 
-PLUGINS := @PLUGINS@
+PLUGINS :=@PLUGINS@
 
 # 
 # Built-in modules to build
 # WARNING: do NOT put gtk and gnome together in this rule.
 # 
-BUILTINS := @BUILTINS@
+BUILTINS :=@BUILTINS@
 
 # 
 # Additional build options
@@ -42,7 +42,9 @@ GETOPT = @GETOPT@
 # Build environment
 # 
 CC = @CC@
+CFLAGS = @CFLAGS@
 SHELL = @SHELL@
+RANLIB = @RANLIB@
 
 # 
 # Installation environment
@@ -136,6 +138,10 @@ INCLUDE += -Iinclude -Iextras -I/usr/local/include
 # Libraries
 #
 LIB += @LIB@ -L/usr/local/lib
+
+ifneq (,$(findstring mingw32,$(SYS)))
+LIB += -lws2_32
+endif
 
 #
 # Libraries needed by built-in modules
