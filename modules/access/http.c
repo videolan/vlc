@@ -268,15 +268,6 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    if( p_sys->psz_mime && !strcasecmp( p_sys->psz_mime, "video/x-ms-asf" ) )
-    {
-        if( !strcasestr( p_access->psz_path, "asx" ) )
-        {
-            msg_Dbg( p_access, "this isn't http, it's mms" );
-            goto error;
-        }
-    }
-
     if( ( p_sys->i_code == 301 || p_sys->i_code == 302 ||
           p_sys->i_code == 303 || p_sys->i_code == 307 ) &&
         p_sys->psz_location && *p_sys->psz_location )
