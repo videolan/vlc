@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.c,v 1.18 2003/12/12 22:41:31 rocky Exp $
+ * $Id: open.c,v 1.19 2003/12/12 22:46:25 rocky Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -264,8 +264,8 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
                            gtk_spin_button_get_value_as_int(
                            GTK_SPIN_BUTTON( lookup_widget(
                            GTK_WIDGET(button), "disc_title" ) ) ) );
-    }
 #endif
+    }
 
     else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
                                                "disc_cdda" ) )->active )
@@ -291,7 +291,6 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
 	g_string_append( p_target,
                      gtk_entry_get_text( GTK_ENTRY( lookup_widget(
                                      GTK_WIDGET(button), "disc_name" ) ) ) );
-
         g_string_sprintfa( p_target, "@%i:%i",
                            gtk_spin_button_get_value_as_int(
                            GTK_SPIN_BUTTON( lookup_widget(
@@ -305,9 +304,9 @@ static void GtkDiscOpenChanged( GtkWidget * button, gpointer user_data )
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
                     "disc_title" ), !b_menus );
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
-                    "disc_chapter_label" ), b_chapter_menu & !b_menus );
+                    "disc_chapter_label" ), b_chapter_menu && !b_menus );
     gtk_widget_set_sensitive( gtk_object_get_data( GTK_OBJECT( p_open ),
-                    "disc_chapter" ), b_chapter_menu & !b_menus );
+                    "disc_chapter" ), b_chapter_menu && !b_menus );
 
     gtk_entry_set_text( GTK_ENTRY( lookup_widget(
                                    GTK_WIDGET(button), "entry_open" ) ),
