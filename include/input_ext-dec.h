@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.10 2001/01/10 19:22:10 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.11 2001/01/11 15:35:35 sam Exp $
  *
  * Authors:
  *
@@ -242,33 +242,6 @@ static __inline__ void DumpBits( bit_stream_t * p_bit_stream, int i_bits )
 #   error Not supported word
 #endif
 
-/*
- * This is stolen from the livid source who stole it from the kernel
- * FIXME: The macro swab32 for little endian machines does
- *        not seem to work correctly
- */
-
-#if defined(SYS_BEOS)
-#   define swab32(x) B_BENDIAN_TO_HOST_INT32(x)
-#else
-#   ifdef WORDS_BIG_ENDIAN
-#       define swab32(x) (x)
-#   else
-#       if defined (HAVE_X86_BSWAP)
-static __inline__ const u32 __i386_swab32( u32 x )
-{
-    __asm__("bswap %0" : "=r" (x) : "0" (x));
-    return x;
-}
-#           define swab32(x) __i386_swab32(x)
-#       else
-#           define swab32(x)                                                 \
-            ( ( (u32)(((u8*)&x)[0]) << 24 ) | ( (u32)(((u8*)&x)[1]) << 16 ) |\
-              ( (u32)(((u8*)&x)[2]) << 8 )  | ( (u32)(((u8*)&x)[3])) )
-#       endif
-#   endif
-#endif
-
 /*****************************************************************************
  * ShowBits : return i_bits bits from the bit stream
  *****************************************************************************/
@@ -313,6 +286,7 @@ static __inline__ WORD_TYPE GetWord( bit_stream_t * p_bit_stream )
 
 /*****************************************************************************
  * RemoveBits : removes i_bits bits from the bit buffer
+ *              XXX: do not use for 32 bits, see RemoveBits32
  *****************************************************************************/
 static __inline__ void RemoveBits( bit_stream_t * p_bit_stream, int i_bits )
 {
@@ -330,17 +304,31 @@ static __inline__ void RemoveBits( bit_stream_t * p_bit_stream, int i_bits )
 
 /*****************************************************************************
  * RemoveBits32 : removes 32 bits from the bit buffer (and as a side effect,
- *                refill it). This should be faster than RemoveBits, though
- *                RemoveBits will work, too.
+ *                refill it)
  *****************************************************************************/
 static __inline__ void RemoveBits32( bit_stream_t * p_bit_stream )
 {
+#if (WORD_TYPE == u32)
+    /* If we are word aligned, do not touch the buffer */
+    if( p_bit_stream->fifo.i_available == 0 )
+    {
+        if( p_bit_stream->p_byte > p_bit_stream->p_end - sizeof(WORD_TYPE) )
+        {
+            p_bit_stream->pf_next_data_packet( p_bit_stream );
+        }
+
+        ((WORD_TYPE *)p_bit_stream->p_byte)++;
+        return;
+    }
+#endif
+
     p_bit_stream->fifo.buffer = GetWord( p_bit_stream )
                         << (32 - p_bit_stream->fifo.i_available);
 }
 
 /*****************************************************************************
  * GetBits : returns i_bits bits from the bit stream and removes them
+ *           XXX: do not use for 32 bits, see GetBits32
  *****************************************************************************/
 static __inline__ WORD_TYPE GetBits( bit_stream_t * p_bit_stream, int i_bits )
 {
@@ -372,13 +360,21 @@ static __inline__ WORD_TYPE GetBits32( bit_stream_t * p_bit_stream )
 {
     WORD_TYPE               i_result;
 
+#if (WORD_TYPE == u32)
+    /* If we are word aligned, do not touch the buffer */
+    if( p_bit_stream->fifo.i_available == 0 )
+    {
+        return( GetWord( p_bit_stream ) );
+    }
+#endif
+
     i_result = p_bit_stream->fifo.buffer;
     p_bit_stream->fifo.buffer = GetWord( p_bit_stream );
+
     i_result |= p_bit_stream->fifo.buffer
                              >> (p_bit_stream->fifo.i_available);
     p_bit_stream->fifo.buffer <<= (8 * sizeof(WORD_TYPE)
                                     - p_bit_stream->fifo.i_available);
-    
     return( i_result );
 }
 
