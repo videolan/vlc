@@ -1623,6 +1623,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
             break;
 
         case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','4','2','0'):
 
             /* U and V inverted compared to I420
              * Fixme: this should be handled by the vout core */
