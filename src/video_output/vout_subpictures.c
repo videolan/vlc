@@ -46,12 +46,20 @@ static void UpdateSPU   ( spu_t *, vlc_object_t * );
 static int  CropCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
 
+static int spu_vaControlDefault( spu_t *, int, va_list );
+
 static subpicture_t *sub_new_buffer( filter_t * );
 static void sub_del_buffer( filter_t *, subpicture_t * );
 static subpicture_t *spu_new_buffer( filter_t * );
 static void spu_del_buffer( filter_t *, subpicture_t * );
 static picture_t *spu_new_video_buffer( filter_t * );
 static void spu_del_video_buffer( filter_t *, picture_t * );
+
+struct filter_owner_sys_t
+{
+    spu_t *p_spu;
+    int i_channel;
+};
 
 /**
  * Creates the subpicture unit
@@ -66,16 +74,16 @@ spu_t *__spu_Create( vlc_object_t *p_this )
     for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++)
     {
         p_spu->p_subpicture[i_index].i_status = FREE_SUBPICTURE;
-        p_spu->p_subpicture[i_index].i_type   = EMPTY_SUBPICTURE;
     }
 
     p_spu->p_blend = NULL;
     p_spu->p_text = NULL;
     p_spu->p_scale = NULL;
     p_spu->i_filter = 0;
+    p_spu->pf_control = spu_vaControlDefault;
 
     /* Register the default subpicture channel */
-    p_spu->i_channel = 1;
+    p_spu->i_channel = 2;
 
     vlc_mutex_init( p_this, &p_spu->subpicture_lock );
 
@@ -109,12 +117,17 @@ int spu_Init( spu_t *p_spu )
         vlc_object_attach( p_spu->pp_filter[p_spu->i_filter], p_spu );
         p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_new = sub_new_buffer;
         p_spu->pp_filter[p_spu->i_filter]->pf_sub_buffer_del = sub_del_buffer;
-        p_spu->pp_filter[p_spu->i_filter]->p_owner =
-            (filter_owner_sys_t *)p_spu;
         p_spu->pp_filter[p_spu->i_filter]->p_module =
             module_Need( p_spu->pp_filter[p_spu->i_filter],
                          "sub filter", psz_filter, 0 );
-        if( p_spu->pp_filter[p_spu->i_filter]->p_module ) p_spu->i_filter++;
+        if( p_spu->pp_filter[p_spu->i_filter]->p_module )
+        {
+            filter_owner_sys_t *p_sys = malloc( sizeof(filter_owner_sys_t) );
+            p_spu->pp_filter[p_spu->i_filter]->p_owner = p_sys;
+            spu_Control( p_spu, SPU_CHANNEL_REGISTER, &p_sys->i_channel );
+            p_sys->p_spu = p_spu;
+            p_spu->i_filter++;
+        }
         else
         {
             msg_Dbg( p_spu, "no sub filter found" );
@@ -178,6 +191,7 @@ void spu_Destroy( spu_t *p_spu )
     {
         module_Unneed( p_spu->pp_filter[p_spu->i_filter],
                        p_spu->pp_filter[p_spu->i_filter]->p_module );
+        free( p_spu->pp_filter[p_spu->i_filter]->p_owner );
         vlc_object_detach( p_spu->pp_filter[p_spu->i_filter] );
         vlc_object_destroy( p_spu->pp_filter[p_spu->i_filter] );
     }
@@ -345,7 +359,6 @@ subpicture_t *spu_CreateSubpicture( spu_t *p_spu )
 
     /* Copy subpicture information, set some default values */
     memset( p_subpic, 0, sizeof(subpicture_t) );
-    p_subpic->i_type     = MEMORY_SUBPICTURE;
     p_subpic->i_status   = RESERVED_SUBPICTURE;
     p_subpic->b_absolute = VLC_TRUE;
     p_subpic->pf_render  = 0;
@@ -716,10 +729,10 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
  *****************************************************************************/
 subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date )
 {
-    int i_index;
-    subpicture_t *p_subpic     = NULL;
-    subpicture_t *p_ephemer    = NULL;
-    mtime_t       ephemer_date = 0;
+    int i_index, i_channel;
+    subpicture_t *p_subpic = NULL;
+    subpicture_t *p_ephemer;
+    mtime_t      ephemer_date;
 
     /* Run subpicture filters */
     for( i_index = 0; i_index < p_spu->i_filter; i_index++ )
@@ -735,91 +748,70 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date )
 
     /* We get an easily parsable chained list of subpictures which
      * ends with NULL since p_subpic was initialized to NULL. */
-    for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
+    for( i_channel = 0; i_channel < p_spu->i_channel; i_channel++ )
     {
-        if( p_spu->p_subpicture[i_index].i_status == READY_SUBPICTURE )
+        p_ephemer = 0;
+        ephemer_date = 0;
+
+        for( i_index = 0; i_index < VOUT_MAX_SUBPICTURES; i_index++ )
         {
-            /* If it is a DVD subpicture, check its date */
-            if( p_spu->p_subpicture[i_index].i_type == MEMORY_SUBPICTURE )
+            if( p_spu->p_subpicture[i_index].i_channel != i_channel ||
+                p_spu->p_subpicture[i_index].i_status != READY_SUBPICTURE )
             {
-                if( !p_spu->p_subpicture[i_index].b_ephemer
-                     && display_date > p_spu->p_subpicture[i_index].i_stop )
-                {
-                    /* Too late, destroy the subpic */
-                    spu_DestroySubpicture(p_spu,&p_spu->p_subpicture[i_index]);
-                    continue;
-                }
-
-                if( display_date
-                     && display_date < p_spu->p_subpicture[i_index].i_start )
-                {
-                    /* Too early, come back next monday */
-                    continue;
-                }
-
-                /* If this is an ephemer subpic, see if it's the
-                 * youngest we have */
-                if( p_spu->p_subpicture[i_index].b_ephemer )
-                {
-                    if( p_ephemer == NULL )
-                    {
-                        p_ephemer = &p_spu->p_subpicture[i_index];
-                        continue;
-                    }
-
-                    if( p_spu->p_subpicture[i_index].i_start
-                                                     < p_ephemer->i_start )
-                    {
-                        /* Link the previous ephemer subpicture and
-                         * replace it with the current one */
-                        p_ephemer->p_next = p_subpic;
-                        p_subpic = p_ephemer;
-                        p_ephemer = &p_spu->p_subpicture[i_index];
-
-                        /* If it's the 2nd youngest subpicture,
-                         * register its date */
-                        if( !ephemer_date
-                              || ephemer_date > p_subpic->i_start )
-                        {
-                            ephemer_date = p_subpic->i_start;
-                        }
-
-                        continue;
-                    }
-                }
-
-                p_spu->p_subpicture[i_index].p_next = p_subpic;
-                p_subpic = &p_spu->p_subpicture[i_index];
-
-                /* If it's the 2nd youngest subpicture, register its date */
-                if( !ephemer_date || ephemer_date > p_subpic->i_start )
-                {
-                    ephemer_date = p_subpic->i_start;
-                }
+                continue;
             }
-            /* If it's not a DVD subpicture, just register it */
+
+            if( display_date &&
+                display_date < p_spu->p_subpicture[i_index].i_start )
+            {
+                /* Too early, come back next monday */
+                continue;
+            }
+
+            if( p_spu->p_subpicture[i_index].i_start > ephemer_date )
+                ephemer_date = p_spu->p_subpicture[i_index].i_start;
+
+            if( display_date > p_spu->p_subpicture[i_index].i_stop &&
+                ( !p_spu->p_subpicture[i_index].b_ephemer ||
+                  p_spu->p_subpicture[i_index].i_stop >
+                  p_spu->p_subpicture[i_index].i_start ) )
+            {
+                /* Too late, destroy the subpic */
+                spu_DestroySubpicture( p_spu, &p_spu->p_subpicture[i_index] );
+                continue;
+            }
+
+            /* If this is an ephemer subpic, add it to our list */
+            if( p_spu->p_subpicture[i_index].b_ephemer )
+            {
+                p_spu->p_subpicture[i_index].p_next = p_ephemer;
+                p_ephemer = &p_spu->p_subpicture[i_index];
+
+                continue;
+            }
+
+            p_spu->p_subpicture[i_index].p_next = p_subpic;
+            p_subpic = &p_spu->p_subpicture[i_index];
+        }
+
+        /* If we found ephemer subpictures, check if they have to be
+         * displayed or destroyed */
+        while( p_ephemer != NULL )
+        {
+            subpicture_t *p_tmp = p_ephemer;
+            p_ephemer = p_ephemer->p_next;
+
+            if( p_tmp->i_start < ephemer_date )
+            {
+                /* Ephemer subpicture has lived too long */
+                spu_DestroySubpicture( p_spu, p_tmp );
+            }
             else
             {
-                p_spu->p_subpicture[i_index].p_next = p_subpic;
-                p_subpic = &p_spu->p_subpicture[i_index];
+                /* Ephemer subpicture can still live a bit */
+                p_tmp->p_next = p_subpic;
+                p_subpic = p_tmp;
             }
-        }
-    }
-
-    /* If we found an ephemer subpicture, check if it has to be
-     * displayed */
-    if( p_ephemer != NULL )
-    {
-        if( p_ephemer->i_start <= ephemer_date )
-        {
-            /* Ephemer subpicture has lived too long */
-            spu_DestroySubpicture( p_spu, p_ephemer );
-        }
-        else
-        {
-            /* Ephemer subpicture can still live a bit */
-            p_ephemer->p_next = p_subpic;
-            return p_ephemer;
         }
     }
 
@@ -834,8 +826,8 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date )
  *****************************************************************************/
 static void SpuClearChannel( spu_t *p_spu, int i_channel )
 {
-    int                 i_subpic;                        /* subpicture index */
-    subpicture_t *      p_subpic = NULL;            /* first free subpicture */
+    int          i_subpic;                               /* subpicture index */
+    subpicture_t *p_subpic = NULL;                  /* first free subpicture */
 
     vlc_mutex_lock( &p_spu->subpicture_lock );
 
@@ -869,7 +861,7 @@ static void SpuClearChannel( spu_t *p_spu, int i_channel )
 /*****************************************************************************
  * spu_ControlDefault: default methods for the subpicture unit control.
  *****************************************************************************/
-int spu_vaControlDefault( spu_t *p_spu, int i_query, va_list args )
+static int spu_vaControlDefault( spu_t *p_spu, int i_query, va_list args )
 {
     int *pi, i;
 
@@ -877,10 +869,9 @@ int spu_vaControlDefault( spu_t *p_spu, int i_query, va_list args )
     {
     case SPU_CHANNEL_REGISTER:
         pi = (int *)va_arg( args, int * );
-        p_spu->i_channel++;
-        if( pi ) *pi = p_spu->i_channel;
+        if( pi ) *pi = p_spu->i_channel++;
         msg_Dbg( p_spu, "Registering subpicture channel, ID: %i",
-                 p_spu->i_channel );
+                 p_spu->i_channel - 1 );
         break;
 
     case SPU_CHANNEL_CLEAR:
@@ -970,14 +961,16 @@ static int CropCallback( vlc_object_t *p_object, char const *psz_var,
  *****************************************************************************/
 static subpicture_t *sub_new_buffer( filter_t *p_filter )
 {
-    spu_t *p_spu = (spu_t *)p_filter->p_owner;
-    return spu_CreateSubpicture( p_spu );
+    filter_owner_sys_t *p_sys = p_filter->p_owner;
+    subpicture_t *p_subpicture = spu_CreateSubpicture( p_sys->p_spu );
+    if( p_subpicture ) p_subpicture->i_channel = p_sys->i_channel;
+    return p_subpicture;
 }
 
 static void sub_del_buffer( filter_t *p_filter, subpicture_t *p_subpic )
 {
-    spu_t *p_spu = (spu_t *)p_filter->p_owner;
-    spu_DestroySubpicture( p_spu, p_subpic );
+    filter_owner_sys_t *p_sys = p_filter->p_owner;
+    spu_DestroySubpicture( p_sys->p_spu, p_subpic );
 }
 
 static subpicture_t *spu_new_buffer( filter_t *p_filter )

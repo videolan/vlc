@@ -392,7 +392,7 @@ subpicture_t *vout_CreateWidget( vout_thread_t *p_vout, int i_channel )
     p_subpic->pf_destroy = FreeWidget;
     p_subpic->i_start = i_now;
     p_subpic->i_stop = i_now + 1200000;
-    p_subpic->b_ephemer = VLC_FALSE;
+    p_subpic->b_ephemer = VLC_TRUE;
 
     p_widget = malloc( sizeof(subpicture_sys_t) );
     if( p_widget == NULL )
