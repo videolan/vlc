@@ -251,7 +251,8 @@ enum output_query_e
     VOUT_SET_STAY_ON_TOP,  /* arg1= vlc_bool_t       res=    */
     VOUT_REPARENT,
     VOUT_SNAPSHOT,
-    VOUT_CLOSE
+    VOUT_CLOSE,
+    VOUT_SET_FOCUS         /* arg1= vlc_bool_t       res=    */
 };
 
 /**

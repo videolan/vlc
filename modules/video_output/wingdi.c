@@ -118,6 +118,8 @@ static long FAR PASCAL WndProc ( HWND, UINT, WPARAM, LPARAM );
 static void InitBuffers        ( vout_thread_t * );
 static void UpdateRects        ( vout_thread_t *, vlc_bool_t );
 
+static int Control( vout_thread_t *p_vout, int i_query, va_list args );
+
 /*****************************************************************************
  * Private structure
  *****************************************************************************/
@@ -689,7 +691,9 @@ static int GAPILockSurface( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( !(p_dest = GXBeginDraw()) )
         {
+#if 0
             msg_Err( p_vout, "GXBeginDraw error %d ", GetLastError() );
+#endif
             return VLC_EGENERIC;
         }
 
@@ -742,6 +746,7 @@ static void EventThread ( vlc_object_t *p_event )
     WNDCLASS   wc;
     MSG        msg;
 
+    /* Initialisations */
     var_Get( p_event, "p_vout", &val );
     p_vout = (vout_thread_t *)val.p_address;
 
@@ -834,6 +839,8 @@ static void EventThread ( vlc_object_t *p_event )
     /* Initialize offscreen buffer */
     InitBuffers( p_vout );
 
+    p_vout->pf_control = Control;
+
     /* Tell the video output we're ready to receive data */
     vlc_thread_ready( p_event );
 
@@ -863,16 +870,6 @@ static void EventThread ( vlc_object_t *p_event )
                 break;
             }
             break;
-
-#ifdef MODULE_NAME_IS_wingapi
-        case WM_KILLFOCUS:
-            GXSuspend();
-            break;
-
-        case WM_SETFOCUS:
-            GXResume();
-            break;
-#endif
 
         default:
             TranslateMessage( &msg );
@@ -1061,6 +1058,29 @@ static long FAR PASCAL WndProc( HWND hWnd, UINT message,
         if( hWnd == p_vout->p_sys->hwnd )
             UpdateRects( p_vout, VLC_TRUE );
         break;
+
+    case WM_ACTIVATE:
+        msg_Err( p_vout, "WM_ACTIVATE: %i", wParam );
+#ifdef MODULE_NAME_IS_wingapi
+        if( wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE )
+            GXResume();
+        else if( wParam == WA_INACTIVE )
+            GXSuspend();
+#endif
+        break;
+
+#ifdef MODULE_NAME_IS_wingapi
+    case WM_KILLFOCUS:
+      msg_Err( p_vout, "WM_KILLFOCUS" );
+        GXSuspend();
+        break;
+
+    case WM_SETFOCUS:
+      msg_Err( p_vout, "WM_SETFOCUS" );
+        GXResume();
+        break;
+#endif
+
     case WM_LBUTTONDOWN:
         p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
         break;
@@ -1129,7 +1149,7 @@ static void InitBuffers( vout_thread_t *p_vout )
                           0, 0, GetSystemMetrics(SM_CXSCREEN),
                           GetSystemMetrics(SM_CYSCREEN), SWP_SHOWWINDOW );
 
-#ifdef UNDER_CE
+#if 0//def UNDER_CE
             /* Hide SIP button, taskbar and menubar */
             SHFullScreen( GetParent(p_vout->p_sys->hwnd),
                           SHFS_HIDESIPBUTTON );
@@ -1217,4 +1237,26 @@ static void InitBuffers( vout_thread_t *p_vout )
     SelectObject( p_vout->p_sys->off_dc, p_vout->p_sys->off_bitmap );
     ReleaseDC( 0, window_dc );
 #endif
+}
+
+/*****************************************************************************
+ * Control: control facility for the vout
+ *****************************************************************************/
+static int Control( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    vlc_bool_t b_bool;
+
+    switch( i_query )
+    {
+    case VOUT_SET_FOCUS:
+        b_bool = va_arg( args, vlc_bool_t );
+#ifdef MODULE_NAME_IS_wingapi
+        if( b_bool ) GXResume();
+        else GXSuspend();
+#endif
+        return VLC_SUCCESS;
+
+    default:
+        return vout_vaControlDefault( p_vout, i_query, args );
+    }
 }
