@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: aout_alsa.c,v 1.18 2001/07/12 20:44:52 reno Exp $
+ * $Id: aout_alsa.c,v 1.19 2001/11/12 20:16:33 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -89,9 +89,11 @@ static int aout_Probe( probedata_t *p_data )
     int i_open_return, i_close_return;
     aout_sys_t local_sys;
 
+    printf("aout_probe\n");
     /* Open device */
-    i_open_return = snd_pcm_open( &(local_sys.p_alsa_handle), "plug:0,0",
+    i_open_return = snd_pcm_open( &(local_sys.p_alsa_handle), "default",
                                   SND_PCM_STREAM_PLAYBACK, 0 );
+    printf("grmbl\n");
     if( i_open_return )
     {
         intf_WarnMsg( 2, "aout info: could not probe ALSA device (%s)",
@@ -145,7 +147,7 @@ static int aout_Open( aout_thread_t *p_aout )
 
     /* Open device */
     if( ( i_open_returns = snd_pcm_open(&(p_aout->p_sys->p_alsa_handle),
-                                        "plug:0,0",
+                                        "default",
                                         SND_PCM_STREAM_PLAYBACK, 0) ) )
     {
         intf_ErrMsg( "aout error: could not open ALSA device (%s)",

@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: dvd.c,v 1.13 2001/08/07 02:48:25 sam Exp $
+ * $Id: dvd.c,v 1.14 2001/11/12 20:16:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -105,9 +105,9 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static void ProbeLibDVDCSS( void )
 {
-    char *pp_filelist[4] = { "libdvdcss.so.0",
-                             "./libdvdcss.so.0",
-                             "./lib/libdvdcss.so.0",
+    char *pp_filelist[4] = { "libdvdcss.so.1",
+                             "./libdvdcss.so.1",
+                             "./lib/libdvdcss.so.1",
                              NULL };
     char **pp_file = pp_filelist;
 
@@ -128,38 +128,27 @@ static void ProbeLibDVDCSS( void )
     /* If libdvdcss.so was found, check that it's valid */
     if( p_libdvdcss == NULL )
     {
-        intf_ErrMsg( "dvd warning: libdvdcss.so.0 not present" );
+        intf_ErrMsg( "dvd warning: libdvdcss.so.1 not present" );
     }
     else
     {
-        /* Check for libdvdcss 0.0.1 */
-        if( dlsym( p_libdvdcss, "dvdcss_crack" ) != NULL )
+        dvdcss_open = dlsym( p_libdvdcss, "dvdcss_open" );
+        dvdcss_close = dlsym( p_libdvdcss, "dvdcss_close" );
+        dvdcss_title = dlsym( p_libdvdcss, "dvdcss_title" );
+        dvdcss_seek = dlsym( p_libdvdcss, "dvdcss_seek" );
+        dvdcss_read = dlsym( p_libdvdcss, "dvdcss_read" );
+        dvdcss_readv = dlsym( p_libdvdcss, "dvdcss_readv" );
+        dvdcss_error = dlsym( p_libdvdcss, "dvdcss_error" );
+
+        if( dvdcss_open == NULL || dvdcss_close == NULL
+             || dvdcss_title == NULL || dvdcss_seek == NULL
+             || dvdcss_read == NULL || dvdcss_readv == NULL
+             || dvdcss_error == NULL )
         {
-            intf_ErrMsg( "dvd warning: libdvdcss.so.0 has deprecated symbol "
-                         "dvdcss_crack(), please upgrade" );
+            intf_ErrMsg( "dvd warning: missing symbols in libdvdcss.so.1, "
+                         "this shouldn't happen !" );
             dlclose( p_libdvdcss );
             p_libdvdcss = NULL;
-        }
-        else
-        {
-            dvdcss_open = dlsym( p_libdvdcss, "dvdcss_open" );
-            dvdcss_close = dlsym( p_libdvdcss, "dvdcss_close" );
-            dvdcss_title = dlsym( p_libdvdcss, "dvdcss_title" );
-            dvdcss_seek = dlsym( p_libdvdcss, "dvdcss_seek" );
-            dvdcss_read = dlsym( p_libdvdcss, "dvdcss_read" );
-            dvdcss_readv = dlsym( p_libdvdcss, "dvdcss_readv" );
-            dvdcss_error = dlsym( p_libdvdcss, "dvdcss_error" );
-
-            if( dvdcss_open == NULL || dvdcss_close == NULL
-                 || dvdcss_title == NULL || dvdcss_seek == NULL
-                 || dvdcss_read == NULL || dvdcss_readv == NULL
-                 || dvdcss_error == NULL )
-            {
-                intf_ErrMsg( "dvd warning: missing symbols in libdvdcss.so.0, "
-                             "please upgrade libdvdcss or vlc" );
-                dlclose( p_libdvdcss );
-                p_libdvdcss = NULL;
-            }
         }
     }
 

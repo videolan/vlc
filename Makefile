@@ -300,15 +300,19 @@ snapshot-common:
 		-type d -name CVS -o -name '.*' -o -name '*.[o]' | \
 			while read i ; do rm -Rf $$i ; done
 	# Copy misc files
-	cp vlc.spec AUTHORS COPYING TODO todo.pl ChangeLog* README* INSTALL* \
+	cp FAQ AUTHORS COPYING TODO todo.pl ChangeLog* README* INSTALL* \
 		Makefile Makefile.opts.in Makefile.dep Makefile.modules \
-		configure configure.in install-sh config.sub config.guess \
+		configure configure.in install-sh install-win32 vlc.spec \
+		config.sub config.guess \
 			tmp/vlc/
 	# Copy Debian control files
 	for file in debian/*dirs debian/*docs debian/*menu debian/*desktop \
 		debian/*copyright ; do cp $$file tmp/vlc/debian ; done
 	for file in control changelog rules ; do \
 		cp debian/$$file tmp/vlc/debian/ ; done
+	# Copy ipkg control files
+	for file in control rules ; do \
+		cp ipkg/$$file tmp/vlc/ipkg/ ; done
 	# Copy fonts and icons
 	for file in share/*png share/*xpm share/*psf ; do \
 		cp $$file tmp/vlc/share ; done
@@ -365,7 +369,7 @@ package-win32:
 		README README.libdvdcss FAQ TODO tmp/
 	for file in gtk-1.3.dll gdk-1.3.dll glib-1.3.dll gmodule-1.3.dll \
 		gnu-intl.dll SDL.dll README-SDL.txt ; \
-			do cp ../vlc-win32/$$file tmp/ ; done
+			do cp ../win32-libs/$$file tmp/ ; done
 	mkdir tmp/share
 	for file in default8x16.psf default8x9.psf ; \
 		do cp share/$$file tmp/share/ ; done
@@ -381,6 +385,7 @@ libdvdcss-snapshot: snapshot-common
 	rm -Rf tmp/vlc/src tmp/vlc/share tmp/vlc/plugins tmp/vlc/doc
 	rm -Rf tmp/vlc/extras/GNUgetopt tmp/vlc/extras/MacOSX
 	rm -Rf tmp/vlc/debian
+	rm -Rf tmp/vlc/ipkg
 	# Remove useless headers
 	rm -f tmp/vlc/include/*
 	for file in defs.h.in config.h.in common.h int_types.h ; \

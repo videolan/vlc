@@ -13,6 +13,10 @@
 ; . really remove the shortcuts.
 ; . added an exec command to display the program file folder. (grOovy)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;
+; General configuration ;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
 OutFile vlc-@VERSION@.exe
 Name "the VideoLAN Client"
 Caption "vlc @VERSION@ for Win32 Setup"
@@ -37,6 +41,10 @@ SetOverwrite ifnewer
 SetDatablockOptimize on
 SetDateSave off
 SetCompress auto
+
+;;;;;;;;;;;;;;;;;;;;
+; Install settings ;
+;;;;;;;;;;;;;;;;;;;;
 
 Section "Install"
 	SetOutPath $INSTDIR
@@ -75,6 +83,10 @@ Section "Install"
 	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "version" "@VERSION@"
 	Exec "explorer $SMPROGRAMS\VideoLAN\"
 SectionEnd
+
+;;;;;;;;;;;;;;;;;;;;;;
+; Uninstall settings ;
+;;;;;;;;;;;;;;;;;;;;;;
 
 Section "Uninstall"
 	Delete $SMPROGRAMS\VideoLAN\*

@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.95 2001/11/12 03:07:13 stef Exp $
+ * $Id: input_dvd.c,v 1.96 2001/11/12 20:16:33 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -310,7 +310,6 @@ static void DVDInit( input_thread_t * p_input )
 static void DVDOpen( struct input_thread_s *p_input )
 {
     dvdcss_handle dvdhandle;
-    int           i_flags;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -324,23 +323,15 @@ static void DVDOpen( struct input_thread_s *p_input )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    /* Error messages from libdvdcss only in verbose mode */
-    i_flags = p_main->i_warning_level ? DVDCSS_NOFLAGS : DVDCSS_INIT_QUIET;
-    
-    /* Debug message from libdvdcss selected from config.h #define */
-#ifdef TRACE_DVDCSS
-    i_flags |= DVDCSS_INIT_DEBUG;
-#endif
-
     /* XXX: put this shit in an access plugin */
     if( strlen( p_input->p_source ) > 4
          && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
-        dvdhandle = dvdcss_open( p_input->p_source + 4, i_flags );
+        dvdhandle = dvdcss_open( p_input->p_source + 4 );
     }
     else
     {
-        dvdhandle = dvdcss_open( p_input->p_source, i_flags );
+        dvdhandle = dvdcss_open( p_input->p_source );
     }
 
     if( dvdhandle == NULL )
@@ -488,11 +479,9 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
             return -1;
         }
         
-        /*
-         * Force libdvdcss to check its title key.
-         * It is only useful for title cracking method. Methods using the decrypted
-         * disc key are fast enough to check the key at each seek
-         */
+        /* Force libdvdcss to check its title key.
+         * It is only useful for title cracking method. Methods using the
+         * decrypted disc key are fast enough to check the key at each seek */
         if( dvdcss_seek( p_dvd->dvdhandle, p_dvd->i_start, DVDCSS_SEEK_INI ) < 0 )
         {
             intf_ErrMsg( "dvd error: %s", dvdcss_error( p_dvd->dvdhandle ) );

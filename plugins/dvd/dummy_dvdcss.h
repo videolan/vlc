@@ -2,7 +2,7 @@
  * dummy_dvdcss.h: Dummy libdvdcss header.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dummy_dvdcss.h,v 1.2 2001/10/23 23:41:00 sam Exp $
+ * $Id: dummy_dvdcss.h,v 1.3 2001/11/12 20:16:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,9 +31,6 @@ typedef struct dvdcss_s* dvdcss_handle;
  *****************************************************************************/
 #define DVDCSS_NOFLAGS         0
 
-#define DVDCSS_INIT_QUIET      (1 << 0)
-#define DVDCSS_INIT_DEBUG      (1 << 1)
-
 #define DVDCSS_READ_DECRYPT    (1 << 0)
 
 #define DVDCSS_SEEK_INI        (1 << 0)
@@ -51,7 +48,7 @@ typedef struct dvdcss_s* dvdcss_handle;
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-dvdcss_handle dummy_dvdcss_open  ( char *, int i_flags );
+dvdcss_handle dummy_dvdcss_open  ( char * );
 int           dummy_dvdcss_close ( dvdcss_handle );
 int           dummy_dvdcss_title ( dvdcss_handle, int );
 int           dummy_dvdcss_seek  ( dvdcss_handle, int, int );
@@ -63,7 +60,7 @@ char *        dummy_dvdcss_error ( dvdcss_handle );
  * Pointers which will be filled either with dummy_dvdcss functions or
  * with the dlopen()ed ones.
  *****************************************************************************/
-dvdcss_handle (* dvdcss_open )   ( char *, int i_flags );
+dvdcss_handle (* dvdcss_open )   ( char * );
 int           (* dvdcss_close )  ( dvdcss_handle );
 int           (* dvdcss_title )  ( dvdcss_handle, int );
 int           (* dvdcss_seek )   ( dvdcss_handle, int, int );

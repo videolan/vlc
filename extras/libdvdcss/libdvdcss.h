@@ -2,7 +2,7 @@
  * private.h: private DVD reading library data
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.h,v 1.8 2001/10/13 15:34:21 stef Exp $
+ * $Id: libdvdcss.h,v 1.9 2001/11/12 20:16:33 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -53,6 +53,13 @@ struct dvdcss_s
     int  i_readv_buf_size;
 #endif
 };
+
+/*****************************************************************************
+ * libdvdcss method: used like init flags
+ *****************************************************************************/
+#define DVDCSS_METHOD_KEY        0
+#define DVDCSS_METHOD_DISC       1
+#define DVDCSS_METHOD_TITLE      2
 
 /*****************************************************************************
  * Error management

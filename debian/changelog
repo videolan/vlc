@@ -1,3 +1,12 @@
+vlc (0.2.91-1) unstable; urgency=low
+
+  * New upstream release.
+  * vlc will dlopen() an installed libdvdcss if available, to play
+    encrypted DVDs (Closes: #89856).
+  * vlc is now in sync with the official libdvdcss (Closes: #118194).
+
+ -- Samuel Hocevar <sam@zoy.org>  Mon, 12 Nov 2001 17:14:29 +0100
+
 vlc (0.2.90-2) unstable; urgency=low
 
   * Various upstream bugfixes.

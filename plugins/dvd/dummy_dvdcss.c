@@ -2,7 +2,7 @@
  * dummy_dvdcss.c: Dummy libdvdcss with minimal DVD access.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dummy_dvdcss.c,v 1.2 2001/10/23 23:41:00 sam Exp $
+ * $Id: dummy_dvdcss.c,v 1.3 2001/11/12 20:16:33 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -60,7 +60,7 @@ struct dvdcss_s
 /*****************************************************************************
  * dvdcss_open: initialize library, open a DVD device, crack CSS key
  *****************************************************************************/
-extern dvdcss_handle dummy_dvdcss_open ( char *psz_target, int i_flags )
+extern dvdcss_handle dummy_dvdcss_open ( char *psz_target )
 {
     dvdcss_handle dvdcss;
     dvd_struct    dvd;

@@ -4,6 +4,33 @@
 
 HEAD
 
+  * Nothing yet.
+
+1.0.0
+Mon, 12 Nov 2001 17:14:29 +0100
+
+  * Removed the i_flags argument to dvdcss_open. Everything is done through
+    environment variables now.
+  * Fixed a buffer overflow in CSSAuth().
+  * libdvdcss port to OpenBSD.
+  * Fixed NetBSD (and probably OpenBSD) libdvdcss compilation.
+  * Fixed undefined KEY_SIZE compile bug mentioned by Dave Thorup.
+  * Fixed CSS ioctl for Darwin/OSX - still might need tweaking of 'dataLength'
+    fields.
+  * Added ReadTitleKey ioctl for Darwin/OSX.
+  * When using title cracking method in libdvdcss, the key is only checked at
+    title start, not before each chapter.
+  * Use of an environment variable to choose libdvdcss method.
+  * New features for libdvdcss: we have three ways now to decode a title key.
+  * 1) Crack the title key (the method that was here before). The only change
+    here is that we search the key for the exact chapter we are seeking with
+    DVDSetArea (in case the key has changed within a title). It is maybe not a
+    good idea.
+  * 2) Crack the disc key, which allows us to decode instantly all title keys.
+    I've used an algorithm from Frank Stevenson ; it eats much memory (64MB),
+    and takes about 15 s at launch time.
+  * 3) Decode the disc key with player keys (libcss method). However, you need
+    licensed player keys at build time for this to work.
   * Darwin ioctl, courtesy of ej0.
   * If we see 3000 unencrypted blocks assume that the title is unencrypted.
   * If we have not seen any encrypted block and then discover that the block

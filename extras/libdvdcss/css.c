@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.14 2001/11/11 04:51:10 jlj Exp $
+ * $Id: css.c,v 1.15 2001/11/12 20:16:32 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Håkan Hjort <d95hjort@dtek.chalmers.se>
@@ -61,7 +61,7 @@ static int  CSSGetASF    ( dvdcss_handle dvdcss );
 static void CSSCryptKey  ( int i_key_type, int i_varient,
                            u8 const * p_challenge, u8* p_key );
 static void CSSDecryptKey( u8* p_crypted, u8* p_key, u8 );
-static int  CSSDiscCrack ( u8 * p_disc_key );
+static int  CSSDiscCrack ( dvdcss_handle dvdcss, u8 * p_disc_key );
 static int  CSSTitleCrack( int i_start, unsigned char * p_crypted,
                            unsigned char * p_decrypted,
                            dvd_key_t * p_sector_key, dvd_key_t * p_key );
@@ -79,7 +79,8 @@ int CSSTest( dvdcss_handle dvdcss )
     {
         /* Since it's the first ioctl we try to issue, we add a notice */
         _dvdcss_error( dvdcss, "css error: ioctl_ReadCopyright failed, "
-                       "make sure DVD ioctls were compiled in" );
+                       "make sure there is a DVD in the drive, and that "
+                       "DVD ioctls were compiled in this libdvdcss version" );
 
         return i_ret;
     }
@@ -303,7 +304,7 @@ int CSSGetDiscKey( dvdcss_handle dvdcss )
 
     switch( dvdcss->i_method )
     {
-        case DVDCSS_KEY:
+        case DVDCSS_METHOD_KEY:
 #ifdef HAVE_CSSKEYS
             /* Decrypt disc key with player keys from csskeys.h */
             _dvdcss_debug( dvdcss, "decrypting disc key with player keys" );
@@ -331,13 +332,13 @@ int CSSGetDiscKey( dvdcss_handle dvdcss )
             memcpy( dvdcss->css.disc.p_disc_key, disc_key, KEY_SIZE );
             break;
 #else
-            dvdcss->i_method = DVDCSS_DISC;            
+            dvdcss->i_method = DVDCSS_METHOD_DISC;            
 #endif
-        case DVDCSS_DISC:
+        case DVDCSS_METHOD_DISC:
             /* Crack Disc key to be able to use it */
             _dvdcss_debug( dvdcss, "cracking disc key with key hash" );
             _dvdcss_debug( dvdcss, "building 64MB table ... this will take some time" );
-            CSSDiscCrack( dvdcss->css.disc.p_disc_key );
+            CSSDiscCrack( dvdcss, dvdcss->css.disc.p_disc_key );
             break;
 
         default:
@@ -356,7 +357,8 @@ int CSSGetTitleKey( dvdcss_handle dvdcss, int i_pos )
     dvd_key_t   p_key;
     int         i,j;
 
-    if( ( dvdcss->i_method == DVDCSS_TITLE ) || ( dvdcss->b_ioctls == 0 ) )
+    if( ( dvdcss->i_method == DVDCSS_METHOD_TITLE )
+        || ( dvdcss->b_ioctls == 0 ) )
     {
         /*
          * Title key cracking method from Ethan Hawke,
@@ -488,7 +490,7 @@ int CSSGetTitleKey( dvdcss_handle dvdcss, int i_pos )
         memcpy( dvdcss->css.p_title_key, p_key, sizeof(dvd_key_t) );
 
         return 0;
-    } // ( dvdcss->i_method == DVDCSS_TITLE ) || ( dvdcss->b_ioctls == 0 )
+    } // (dvdcss->i_method == DVDCSS_METHOD_TITLE) || (dvdcss->b_ioctls == 0)
 }
 
 /*****************************************************************************
@@ -866,7 +868,7 @@ static int investigate( unsigned char* hash, unsigned char *ckey )
     return memcmp( key, pkey, 5 );
 }
 
-static int CSSDiscCrack( u8 * p_disc_key )
+static int CSSDiscCrack( dvdcss_handle dvdcss, u8 * p_disc_key )
 {
     unsigned char B[5] = { 0,0,0,0,0 }; /* Second Stage of mangle cipher */
     unsigned char C[5] = { 0,0,0,0,0 }; /* Output Stage of mangle cipher
@@ -913,7 +915,7 @@ static int CSSDiscCrack( u8 * p_disc_key )
 /*
             if( tmp4 == K1TABLEWIDTH )
             {
-                fprintf( stderr, "Table disaster %d", tmp4 );
+                _dvdcss_debug( dvdcss, "Table disaster %d", tmp4 );
             }
 */
             if( tmp4 < K1TABLEWIDTH )
@@ -934,7 +936,7 @@ static int CSSDiscCrack( u8 * p_disc_key )
 
     tmp3 = 0;
 
-    fprintf( stderr, "initializing the big table" );
+    _dvdcss_debug( dvdcss, "initializing the big table" );
 
     for( i = 0 ; i < 16777216 ; i++ )
     {
@@ -958,7 +960,7 @@ static int CSSDiscCrack( u8 * p_disc_key )
         BigTable[j] = i;
     }
 
-//    printf( "\n" );
+/*    fprintf( stderr, "\n" ); */
 
     /*
      * We are done initing, now reverse hash

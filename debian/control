@@ -15,21 +15,21 @@ Description: a free MPEG and DVD player
  This is vlc, the VideoLAN Client. It plays MPEG and MPEG2 files,
  DVDs, or MPEG streams from a network source.
 
-Package: libdvdcss0.0.3
+Package: libdvdcss1
 Architecture: any
 Depends: ${shlibs:Depends}
-Conflicts: libdvdcss0.0.2
+Conflicts: libdvdcss0.0.1, libdvdcss0.0.2, libdvdcss0.0.3
 Description: a portable abstraction library for DVD decryption
  libdvdcss is a portable abstraction library for DVD decryption, it
  provides a simple API to access a DVD device as a block device.
  .
  This package contains the libdvdcss0 runtime library.
 
-Package: libdvdcss0.0.3-dev
+Package: libdvdcss1-dev
 Architecture: any
-Depends: libdvdcss0.0.3 (= ${Source-Version}), libc6-dev
-Conflicts: libdvdcss0.0.2-dev
-Description: development files for libdvdcss0
+Depends: libdvdcss1 (= ${Source-Version}), libc6-dev
+Conflicts: libdvdcss0.0.1-dev, libdvdcss0.0.2-dev, libdvdcss0.0.3-dev
+Description: development files for libdvdcss1
  libdvdcss is a portable abstraction library for DVD decryption, it
  provides a simple API to access a DVD device as a block device.
  .

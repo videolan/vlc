@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.41 2001/11/12 04:12:38 sam Exp $
+ * $Id: netutils.c,v 1.42 2001/11/12 20:16:33 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -258,7 +258,7 @@ int network_ChannelJoin( int i_channel )
 #if defined( SYS_LINUX ) || defined( WIN32 )
 
 #define VLCS_VERSION 12
-#define MESSAGE_LENGTH 80
+#define MESSAGE_LENGTH 256
 
     char psz_mess[ MESSAGE_LENGTH ];
     char psz_mac[ 40 ];

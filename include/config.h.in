@@ -60,7 +60,6 @@
  * useful to track a bug */
 //#define TRACE_INTF
 //#define TRACE_INPUT
-//#define TRACE_DVDCSS
 //#define TRACE_AUDIO
 #define TRACE_VOUT
 #define TRACE_VPAR
@@ -221,8 +220,6 @@
 #define INPUT_AUDIO_VAR                 "vlc_input_audio"
 #define INPUT_CHANNEL_VAR               "vlc_input_channel"
 #define INPUT_SUBTITLE_VAR              "vlc_input_subtitle"
-#define INPUT_DVDCSS_VAR                "dvdcss_method"
-#define INPUT_DVDCSS_DEFAULT            "title"
 
 /* VCD defaults */
 #define INPUT_VCD_DEVICE_VAR            "vlc_vcd_device"

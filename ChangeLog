@@ -6,6 +6,93 @@ HEAD
 
   * Nothing yet.
 
+0.2.91
+Mon, 12 Nov 2001 17:14:29 +0100
+
+  * Added FAQ.
+  * New --channelserver switch.
+  * Documentation updates.
+  * ipkg script for Familiar Linux 0.5 & bug fix in debian/rules.
+  * Disabled DirectX audio output for the time being.
+  * Added Oct's NSIS installer script. It will probably not work for you,
+    but I need it to build the Win32 auto installer.
+  * Automatic handling of the Channel Server's response in network mode.
+  * GetMACAddress takes the interface defined in the environment variable
+    vlc_iface instead of eth0.
+  * Fixed bug with MPEG audio in TS streams.
+  * Fixed compilation (and quite probably runtime) issues under IA64
+    due to mixed int/void* casts.
+  * Merged DVD netlist with input netlist to remove duplicated code.
+  * BSD/OS VCD patch, courtesy of Steven M. Schultz <sms@TO.GD-ES.COM>.
+  * Win32 network fix.
+  * imdctsse should now compile and work in plugin and under BeOS.
+  * Kludge to have less discontinuity after a zero scr in DVD.
+  * Fixed some win32 64-bit issues.
+  * Fixed some win32 compile issues.
+  * Don't use long long, use u64/s64 (int_types.h).
+  * Move function that translates language codes into country name in src/misc
+    so that every plugin can use it.
+  * Changed the name of a function in dvd_udf.c to fit with the forthcoming
+    libdvdread plugin.
+  * Corrected à long time bug (around 0.2.81 I think), that created a
+    corruption in ifo data. This was the reason why some DVDs that worked with
+    0.2.80 no longer worked with newer version of vlc. They should work again
+    now.
+  * New --enable-release config option.
+  * Removed deprecated code and structures.
+  * Maybe corrected aspect ratio issue in fullscreen xvideo.
+  * Fixed support for SPU and LPCM streams over network.
+  * Added a new drawer to the control window to support Title / Chapter
+    selection, Subtitle selection, Audiochannel/Language selection,
+    Angle selection.
+  * New --volume option (untested, like usual :).
+  * Reimported Intf_Controller, connected "File/Open/File" to
+    Intf_Controller::file:Open (OS X).
+  * The intf is no longer accessed indirectly from vout_Destroy.
+  * Made it possible to open a File after vlc was started (you can use vlc now
+    without starting it from the command line) under OS X.
+  * Cleaned up playlist handling in Intf_Vlc_Wrapper.
+  * Modified the pf_close kludge in input.c so that we don't segfault when
+    pf_init fails.
+  * Changed chapter selection buttons aspect to try and differentiate them
+    from title selection ones.
+  * Changes to the BeOS interface to remove unwanted volumes from the Disk
+    Menu.  Readonly filesystems like NTFS were being incorrectly added.
+  * Do not resample audio output if delta is short enough.
+  * Fixed a segfault on exit under Windows 2000.
+  * Enabled http button in gtk/gnome interface.
+  * Use memalign for aligned data (instead of a greek malloc).
+  * Some optimizations in imdct (all data are now aligned).
+  * SSE downmix now works for windows.
+  * SSE imdct is desactivated for windows (MINGW32 doesn't know how to aligned
+    data).
+  * Fixed '-' input.
+  * New interface for MacOS X, courtesy of Florian G. Pflug.
+  * BeOS interface changes to include menu for Title and chapter navigation.
+  * Improved more "BeOS" CD detection.
+  * VLC FAQ TBU.
+  * Synced dummy_dvdcss with Stef's changes to libdvdcss.
+  * configure now compiles the VCD plugin if linux/cdrom.h is present.
+  * Added VCD input plugin for Linux.
+  * Fixed ATTR_ALIGN configure test.
+  * Fixed compilation problems with OpenBSD.
+  * xvideo.so is now built in by default. Mixing PIC and non-PIC code was not
+    very nice.
+  * Fixed compilation errors in src/interface/main.c when the compiler did
+    not support SSE or 3DNow! inline assembly.
+  * Qt fix in vlc.spec courtesy of Christopher Johnson <cjohnson@mint.net>.  
+  * Fixed error reporting on an unknown argument parsing.
+  * Fixed a deadlock in the TS input.
+  * Resizing the video out window in BeOS now retains the scaling.  
+  * Tidied up the BeOS code to remove interface messages not required.  
+  * Fixed an error in the ts://server[:port][/broadcast] input parsing.
+  * Minor video parser optimization.
+  * SDL now displays an error message on 422 streams.
+  * Chroma 4:2:2 and 4:4:4 support in the decoder.
+  * Fixed bugs in the C YUV transform with 4:2:2 format.
+  * Fixed bugs in RPM spec files.
+  * Fixed a bug in configure where ix86 machines were improperly detected.
+
 0.2.90
 Wed, 10 Oct 2001 15:00:29 +0200
 

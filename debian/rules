@@ -16,8 +16,8 @@ export PIXDIR="usr/share/pixmaps"
 export GNOMEDIR="usr/share/gnome/apps/Multimedia"
 
 # Library options
-version=$(shell grep '^ *LIBDVDCSS_VERSION=' configure.in | cut -f2 -d=)
-major=$(shell echo $(version) | cut -f1 -d.)
+version=$(shell grep '^ *LIBDVDCSS_VERSION=[0-9]' configure.in | head -1 | cut -f2 -d=)
+major=$(shell echo "$(version)" | cut -f1 -d.)
 
 build: build-stamp
 build-stamp:
@@ -93,13 +93,13 @@ install: build
 
 # libdvdcss start
 	mv debian/vlc/usr/include/videolan/dvdcss.h \
-				debian/libdvdcss$(version)-dev/usr/include/videolan
+				debian/libdvdcss$(major)-dev/usr/include/videolan
 	rmdir debian/vlc/usr/include/videolan
 	rmdir debian/vlc/usr/include
-	mv debian/vlc/usr/lib/*.a debian/libdvdcss$(version)-dev/usr/lib
-	mv debian/vlc/usr/lib/*.so debian/libdvdcss$(version)-dev/usr/lib
-	mv debian/vlc/usr/lib/*.so.* debian/libdvdcss$(version)/usr/lib
-	ln -s libdvdcss$(version) debian/libdvdcss$(version)-dev/usr/share/doc/libdvdcss$(version)-dev
+	mv debian/vlc/usr/lib/*.a debian/libdvdcss$(major)-dev/usr/lib
+	mv debian/vlc/usr/lib/*.so debian/libdvdcss$(major)-dev/usr/lib
+	mv debian/vlc/usr/lib/*.so.* debian/libdvdcss$(major)/usr/lib
+	ln -s libdvdcss$(major) debian/libdvdcss$(major)-dev/usr/share/doc/libdvdcss$(major)-dev
 # libdvdcss stop
 
 # Build architecture-independent files here.

@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.18 2001/10/16 16:51:28 stef Exp $
+ * $Id: libdvdcss.c,v 1.19 2001/11/12 20:16:33 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -80,11 +80,12 @@ static int _win32_dvdcss_aread  ( int i_fd, void *p_data, int i_blocks );
 /*****************************************************************************
  * dvdcss_open: initialize library, open a DVD device, crack CSS key
  *****************************************************************************/
-extern dvdcss_handle dvdcss_open ( char *psz_target, int i_flags )
+extern dvdcss_handle dvdcss_open ( char *psz_target )
 {
     int i_ret;
 
-    char    psz_method[16] = "dvdcss_method";
+    char *psz_method = getenv( "DVDCSS_METHOD" );
+    char *psz_verbose = getenv( "DVDCSS_VERBOSE" );
 
     dvdcss_handle dvdcss;
 
@@ -92,37 +93,63 @@ extern dvdcss_handle dvdcss_open ( char *psz_target, int i_flags )
     dvdcss = malloc( sizeof( struct dvdcss_s ) );
     if( dvdcss == NULL )
     {
-        if( ! (i_flags & DVDCSS_INIT_QUIET) )
-        {
-            DVDCSS_ERROR( "could not initialize library" );
-        }
-
         return NULL;
     }
 
-    /* Initialize structure */
+    /* Initialize structure with default values */
     dvdcss->p_titles = NULL;
-    dvdcss->b_debug = i_flags & DVDCSS_INIT_DEBUG;
-    dvdcss->b_errors = !(i_flags & DVDCSS_INIT_QUIET);
     dvdcss->psz_error = "no error";
+    dvdcss->i_method = DVDCSS_METHOD_TITLE;
+    dvdcss->b_debug = 0;
+    dvdcss->b_errors = 1;
 
-
-
-    /* find method from DVDCSS_METHOD environment variable */
-    dvdcss->i_method = DVDCSS_TITLE;
-
-    if( getenv( psz_method ) )
+    /* Find method from DVDCSS_METHOD environment variable */
+    if( psz_method != NULL )
     {
-        if( !strncmp( getenv( psz_method ), "key", 3 ) )
+        if( !strncmp( psz_method, "key", 4 ) )
         {
-            dvdcss->i_method = DVDCSS_KEY;
+            dvdcss->i_method = DVDCSS_METHOD_KEY;
         }
-        else if( !strncmp( getenv( psz_method ), "disc", 4 ) )
+        else if( !strncmp( psz_method, "disc", 5 ) )
         {
-            dvdcss->i_method = DVDCSS_DISC;
+            dvdcss->i_method = DVDCSS_METHOD_DISC;
+        }
+        else if( !strncmp( psz_method, "title", 5 ) )
+        {
+            dvdcss->i_method = DVDCSS_METHOD_TITLE;
+        }
+        else
+        {
+            _dvdcss_error( dvdcss, "unknown decrypt method, please choose "
+                                   "from 'title', 'key' or 'disc'" );
+            free( dvdcss );
+            return NULL;
         }
     }
 
+    /* Find verbosity from DVDCSS_VERBOSE environment variable */
+    if( psz_verbose != NULL )
+    {
+        switch( atoi( psz_verbose ) )
+        {
+        case 0:
+            dvdcss->b_errors = 0;
+            break;
+        case 1:
+            break;
+        case 2:
+            dvdcss->b_debug = 1;
+            break;
+        default:
+            _dvdcss_error( dvdcss, "unknown verbose level, please choose "
+                                   "from '0', '1' or '2'" );
+            free( dvdcss );
+            return NULL;
+            break;
+        }
+    }
+
+    /* Open device */
     i_ret = _dvdcss_open( dvdcss, psz_target );
     if( i_ret < 0 )
     {
@@ -174,7 +201,8 @@ extern char * dvdcss_error ( dvdcss_handle dvdcss )
 extern int dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks, int i_flags )
 {
     /* title cracking method is too slow to be used at each seek */
-    if( ( ( i_flags & DVDCSS_SEEK_MPEG ) && ( dvdcss->i_method != DVDCSS_TITLE ) )
+    if( ( ( i_flags & DVDCSS_SEEK_MPEG )
+             && ( dvdcss->i_method != DVDCSS_METHOD_TITLE ) )
        || ( i_flags & DVDCSS_SEEK_INI ) )
     {
         /* check the title key */
