@@ -208,7 +208,7 @@ void VlcProc::manage()
         pTime->set( pos.f_float, false );
 
         // Get the status of the playlist
-        playlist_status_t status = getIntf()->p_sys->p_playlist->i_status;
+        playlist_status_t status = getIntf()->p_sys->p_playlist->status.i_status;
 
         pVarPlaying->set( status == PLAYLIST_RUNNING );
         pVarStopped->set( status == PLAYLIST_STOPPED );

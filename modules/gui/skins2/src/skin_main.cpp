@@ -234,6 +234,7 @@ static void Run( intf_thread_t *p_intf )
                                            FIND_ANYWHERE );
         if( p_playlist )
         {
+            p_playlist->status.i_view = -1;
             playlist_Play( p_playlist );
             vlc_object_release( p_playlist );
         }
