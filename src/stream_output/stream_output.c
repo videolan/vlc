@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.18 2003/03/11 20:53:28 sam Exp $
+ * $Id: stream_output.c,v 1.19 2003/03/11 21:52:05 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1155,7 +1155,7 @@ static int mrl_ParseOptions( mrl_option_t **pp_opt, char *psz_options )
 
 static int  mrl_Parse( mrl_t *p_mrl, char *psz_mrl )
 {
-    char * psz_dup = strdupa( psz_mrl );
+    char * psz_dup = strdup( psz_mrl );
     char * psz_parser = psz_dup;
     char * psz_access = "";
     char * psz_way = "";
@@ -1281,6 +1281,7 @@ static int  mrl_Parse( mrl_t *p_mrl, char *psz_mrl )
     p_mrl->psz_way    = strdup( psz_way );
     p_mrl->psz_name   = strdup( psz_name );
 
+    free( psz_dup );
     return( VLC_SUCCESS );
 }
 
