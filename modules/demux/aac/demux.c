@@ -2,7 +2,7 @@
  * demux.c : Raw aac Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demux.c,v 1.8 2003/05/05 22:23:34 gbazin Exp $
+ * $Id: demux.c,v 1.9 2003/05/14 14:58:35 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -44,7 +44,7 @@ static void Deactivate  ( vlc_object_t * );
  *****************************************************************************/
 vlc_module_begin();
     set_description( _("AAC stream demuxer" ) );
-    set_capability( "demux", 0 );
+    set_capability( "demux", 10 );
     set_callbacks( Activate, NULL );
     add_shortcut( "aac" );
 vlc_module_end();
@@ -371,14 +371,12 @@ static void ExtractConfiguration( demux_sys_t *p_aac )
     */
 }
 
+#if 0
 /****************************************************************************
  * CheckPS : check if this stream could be some ps, 
  *           yes it's ugly ...  but another idea ?
- *
  *           XXX it seems that aac stream always match ...
- *
  ****************************************************************************/
-
 static int CheckPS( input_thread_t *p_input )
 {
     uint8_t *p_peek;
@@ -392,10 +390,11 @@ static int CheckPS( input_thread_t *p_input )
             return( 1 ); /* Perhaps some ps stream */
         }
         p_peek++;
-       i_size--; 
+       i_size--;
     }
     return( 0 );
 }
+#endif
 
 /*****************************************************************************
  * Activate: initializes AAC demux structures
@@ -408,7 +407,26 @@ static int Activate( vlc_object_t * p_this )
     module_t * p_id3;
 
     int i_skip;
-    int b_forced;
+    int b_forced = VLC_FALSE;
+
+    if( *p_input->psz_demux != NULL && !strncmp( p_input->psz_demux, "aac", 3 ) )
+    {
+        b_force = VLC_TRUE;
+    }
+    else if( p_input->psz_name )
+    {
+        int  i_len = strlen( p_input->psz_name );
+
+        if( i_len > 4 && !strcasecmp( &p_input->psz_name[i_len - 4], ".aac" ) )
+        {
+            b_force = VLC_TRUE;
+        }
+    }
+
+    if( !b_forced )
+    {
+        return -1;
+    }
 
     /* Set the demux function */
     p_input->pf_demux = Demux;
@@ -418,15 +436,6 @@ static int Activate( vlc_object_t * p_this )
     {
     /* Improve speed. */
         p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
-    }
-
-    b_forced = ( ( *p_input->psz_demux )&&
-                 ( !strncmp( p_input->psz_demux, "aac", 10 ) ) ) ? 1 : 0;
-
-    /* check if it can be a ps stream */
-    if( !b_forced && CheckPS(  p_input ) )
-    {
-        return( -1 );
     }
 
     /* skip possible id3 header */
