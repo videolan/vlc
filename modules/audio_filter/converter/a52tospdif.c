@@ -2,7 +2,7 @@
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: a52tospdif.c,v 1.3 2002/08/12 22:48:18 massiot Exp $
+ * $Id: a52tospdif.c,v 1.4 2002/08/13 11:59:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -30,6 +30,11 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
 #include "audio_output.h"
 #include "aout_internal.h"
 

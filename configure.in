@@ -1331,7 +1331,7 @@ then
   fi
   if test "x${SDL_CONFIG}" != "xno"
   then
-    PLUGINS="${PLUGINS} video_output/sdl/sdl"
+    PLUGINS="${PLUGINS} video_output/sdl audio_output/sdl"
     sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} --cflags`"
     sdl_LDFLAGS="${sdl_LDFLAGS} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
     CPPFLAGS="${save_CPPFLAGS} ${sdl_CFLAGS}"
@@ -1396,7 +1396,7 @@ AC_ARG_ENABLE(fb,
     if test "x${enable_fb}" != "xno"
     then
       AC_CHECK_HEADERS(linux/fb.h, [
-        PLUGINS="${PLUGINS} video_output/fb/fb"
+        PLUGINS="${PLUGINS} video_output/fb"
       ])
     fi
 
@@ -1417,7 +1417,7 @@ AC_ARG_ENABLE(ggi,
   [  --enable-ggi            GGI support (default disabled)])
 if test "x${enable_ggi}" = "xyes"
 then
-  PLUGINS="${PLUGINS} video_output/ggi/ggi"
+  PLUGINS="${PLUGINS} video_output/ggi"
   ggi_LDFLAGS="${ggi_LDFLAGS} -lggi"
   AC_ARG_WITH(ggi,
     [    --with-ggi=PATH       path to libggi],
@@ -1435,7 +1435,7 @@ AC_ARG_ENABLE(glide,
   [  --enable-glide          Glide (3dfx) support (default disabled)])
 if test "x${enable_glide}" = "xyes"
 then
-  PLUGINS="${PLUGINS} video_output/glide/glide"
+  PLUGINS="${PLUGINS} video_output/glide"
   glide_LDFLAGS="${glide_LDFLAGS} -lglide2x -lm"
   glide_CFLAGS="${glide_CFLAGS} -I/usr/include/glide"
   AC_ARG_WITH(glide,
@@ -1457,7 +1457,7 @@ then
   AC_CHECK_HEADER(aalib.h,have_aa="true",have_aa="false")
   if test "x${have_aa}" = "xtrue"
   then
-    PLUGINS="${PLUGINS} video_output/aa/aa"
+    PLUGINS="${PLUGINS} video_output/aa"
     aa_LDFLAGS="${aa_LDFLAGS} -laa"
   fi
 fi

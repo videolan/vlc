@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.1 2002/08/07 21:36:55 massiot Exp $
+ * $Id: esd.c,v 1.2 2002/08/13 11:59:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -32,8 +32,11 @@
 
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
+#include "aout_internal.h"
 
 #include <esd.h>
+
+#define DEFAULT_FRAME_SIZE 2048*2
 
 /*****************************************************************************
  * aout_sys_t: esd audio output method descriptor
@@ -45,6 +48,7 @@ struct aout_sys_t
 {
     esd_format_t esd_format;
     int          i_fd;
+    vlc_bool_t   b_initialized;
 };
 
 /*****************************************************************************
@@ -53,15 +57,15 @@ struct aout_sys_t
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
-static int  SetFormat    ( aout_thread_t * );
-static int  GetBufInfo   ( aout_thread_t *, int );
-static void Play         ( aout_thread_t *, byte_t *, int );
+static int  SetFormat    ( aout_instance_t * );
+static void Play         ( aout_instance_t *, aout_buffer_t * );
+static int  ESDThread    ( aout_instance_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("EsounD audio module") ); 
+    set_description( _("EsounD audio module") );
     set_capability( "audio output", 50 );
     set_callbacks( Open, Close );
     add_shortcut( "esound" );
@@ -72,53 +76,30 @@ vlc_module_end();
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_thread_t *p_aout = (aout_thread_t *)p_this;
-
-    /* mpg123 does it this way */
-    int i_bits = ESD_BITS16;
-    int i_mode = ESD_STREAM;
-    int i_func = ESD_PLAY;
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    struct aout_sys_t * p_sys;
 
     /* Allocate structure */
-    p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
-    if( p_aout->p_sys == NULL )
+    p_sys = malloc( sizeof( aout_sys_t ) );
+    if( p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return( 1 );
+        return -1;
     }
 
-    /* Initialize some variables */
-    p_aout->i_rate = esd_audio_rate; /* We use actual esd rate value, not
-                                      * initial value */
+    p_aout->output.p_sys = p_sys;
 
-    i_bits = ESD_BITS16;
-    i_mode = ESD_STREAM;
-    i_func = ESD_PLAY;
-    p_aout->p_sys->esd_format = (i_bits | i_mode | i_func) & (~ESD_MASK_CHAN);
-
-    if( p_aout->i_channels == 1 )
+    /* Create ESD thread and wait for its readiness. */
+    p_sys->b_initialized = VLC_FALSE;
+    if( vlc_thread_create( p_aout, "aout", ESDThread, VLC_FALSE ) )
     {
-        p_aout->p_sys->esd_format |= ESD_MONO;
-    }
-    else
-    {
-        p_aout->p_sys->esd_format |= ESD_STEREO;
+        msg_Err( p_aout, "cannot create ESD thread (%s)", strerror(errno) );
+        free( p_sys );
+        return -1;
     }
 
-    /* open a socket for playing a stream
-     * and try to open /dev/dsp if there's no EsounD */
-    if ( (p_aout->p_sys->i_fd
-            = esd_play_stream_fallback(p_aout->p_sys->esd_format,
-                p_aout->i_rate, NULL, "vlc")) < 0 )
-    {
-        msg_Err( p_aout, "cannot open esound socket (format 0x%08x at %ld Hz)",
-                         p_aout->p_sys->esd_format, p_aout->i_rate );
-        return( -1 );
-    }
-
-    p_aout->pf_setformat = SetFormat;
-    p_aout->pf_getbufinfo = GetBufInfo;
-    p_aout->pf_play = Play;
+    p_aout->output.pf_setformat = SetFormat;
+    p_aout->output.pf_play = Play;
 
     return( 0 );
 }
@@ -126,27 +107,135 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * SetFormat: set the output format
  *****************************************************************************/
-static int SetFormat( aout_thread_t *p_aout )
+static int SetFormat( aout_instance_t *p_aout )
 {
-    int i_fd;
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    i_fd = esd_open_sound(NULL);
-    p_aout->i_latency = esd_get_latency(i_fd);
-   
-    msg_Dbg( p_aout, "aout_esd_latency: %d", p_aout->i_latency );
+    p_sys->b_initialized = VLC_FALSE;
 
-    return( 0 );
+    /* Initialize some variables */
+    p_sys->esd_format = ESD_BITS16 | ESD_STREAM | ESD_PLAY;
+    p_sys->esd_format &= ~ESD_MASK_CHAN;
+
+    switch( p_aout->output.output.i_channels )
+    {
+    case 1:
+        p_sys->esd_format |= ESD_MONO;
+        break;
+    case 2:
+        p_sys->esd_format |= ESD_STEREO;
+        break;
+    default:
+        return -1;
+    }
+
+    /* open a socket for playing a stream
+     * and try to open /dev/dsp if there's no EsounD */
+    p_sys->i_fd = esd_play_stream_fallback( p_sys->esd_format,
+                              p_aout->output.output.i_rate, NULL, "vlc" );
+    if( p_sys->i_fd < 0 )
+    {
+        msg_Err( p_aout, "cannot open esound socket (format 0x%08x at %ld Hz)",
+                         p_sys->esd_format, p_aout->output.output.i_rate );
+        return -1;
+    }
+
+    p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+    p_aout->output.i_nb_samples = DEFAULT_FRAME_SIZE;
+
+    p_sys->b_initialized = VLC_TRUE;
+
+    return 0;
 }
 
 /*****************************************************************************
- * GetBufInfo: buffer status query
+ * Play: queue a buffer for playing by ESDThread
  *****************************************************************************/
-static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
+static void Play( aout_instance_t *p_aout, aout_buffer_t * p_buffer )
 {
-    /* arbitrary value that should be changed */
-    return( i_buffer_limit );
+    aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
 }
 
+/*****************************************************************************
+ * Close: close the Esound socket
+ *****************************************************************************/
+static void Close( vlc_object_t *p_this )
+{
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    p_aout->b_die = 1;
+    vlc_thread_join( p_aout );
+
+    close( p_sys->i_fd );
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * ESDThread: asynchronous thread used to DMA the data to the device
+ *****************************************************************************/
+static int ESDThread( aout_instance_t * p_aout )
+{
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    while ( !p_aout->b_die )
+    {
+        aout_buffer_t * p_buffer;
+        mtime_t next_date = 0;
+        int i_tmp, i_size;
+        byte_t * p_bytes;
+
+        if( !p_sys->b_initialized )
+        {
+            msleep( THREAD_SLEEP );
+            continue;
+        }
+
+        if ( p_aout->output.output.i_format != AOUT_FMT_SPDIF )
+        {
+            /* Get the presentation date of the next write() operation. It
+             * is equal to the current date + esd latency */
+            /* FIXME: wtf ? it works better with a - here */
+            next_date = -(mtime_t)esd_get_latency(esd_open_sound(NULL))
+                      * 1000000
+                      / aout_FormatToByterate( &p_aout->output.output,
+                                               p_aout->output.output.i_rate );
+            next_date += mdate();
+        }
+
+        p_buffer = aout_OutputNextBuffer( p_aout, next_date );
+
+        if ( p_buffer != NULL )
+        {
+            p_bytes = p_buffer->p_buffer;
+            i_size = aout_FormatToSize( &p_aout->output.output,
+                                        p_buffer->i_nb_samples );
+        }
+        else
+        {
+            i_size = aout_FormatToSize( &p_aout->output.output,
+                                        DEFAULT_FRAME_SIZE );
+            p_bytes = alloca( i_size );
+            memset( p_bytes, 0, i_size );
+        }
+
+        i_tmp = write( p_sys->i_fd, p_bytes, i_size );
+
+        if( i_tmp < 0 )
+        {
+            msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+        }
+
+        if ( p_buffer != NULL )
+        {
+            aout_BufferFree( p_buffer );
+        }
+    }
+
+    return 0;
+}
+
+#if 0
 /*****************************************************************************
  * Play: play a sound samples buffer
  *****************************************************************************
@@ -155,40 +244,13 @@ static int GetBufInfo( aout_thread_t *p_aout, int i_buffer_limit )
 static void Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     int i_amount;
-    
-    if (p_aout->p_sys->esd_format & ESD_STEREO)
-    {
-        if (p_aout->p_sys->esd_format & ESD_BITS16)
-        {
-            i_amount = (44100 * (ESD_BUF_SIZE + 64)) / p_aout->i_rate;
-        }
-        else
-        {
-            i_amount = (44100 * (ESD_BUF_SIZE + 128)) / p_aout->i_rate;
-        }
-    }
-    else
-    {
-        if (p_aout->p_sys->esd_format & ESD_BITS16)
-        {
-            i_amount = (2 * 44100 * (ESD_BUF_SIZE + 128)) / p_aout->i_rate;
-        }
-        else
-        {
-            i_amount = (2 * 44100 * (ESD_BUF_SIZE + 256)) / p_aout->i_rate;
-        }
-    }
 
-    write( p_aout->p_sys->i_fd, buffer, i_size );
+    int m1 = p_aout->output.p_sys->esd_format & ESD_STEREO ? 1 : 2;
+    int m2 = p_aout->output.p_sys->esd_format & ESD_BITS16 ? 64 : 128;
+
+    i_amount = (m1 * 44100 * (ESD_BUF_SIZE + m1 * m2)) / p_aout->i_rate;
+
+    write( p_aout->output.p_sys->i_fd, buffer, i_size );
 }
-
-/*****************************************************************************
- * Close: close the Esound socket
- *****************************************************************************/
-static void Close( vlc_object_t *p_this )
-{
-    aout_thread_t *p_aout = (aout_thread_t *)p_this;
-
-    close( p_aout->p_sys->i_fd );
-}
+#endif
 

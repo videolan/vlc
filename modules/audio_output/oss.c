@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.7 2002/08/12 09:34:15 sam Exp $
+ * $Id: oss.c,v 1.8 2002/08/13 11:59:36 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -62,7 +62,6 @@
 struct aout_sys_t
 {
     int                   i_fd;
-    volatile vlc_bool_t   b_die;
     volatile vlc_bool_t   b_initialized;
 };
 
@@ -120,8 +119,7 @@ static int Open( vlc_object_t *p_this )
     /* Open the sound device */
     if( (p_sys->i_fd = open( psz_device, O_WRONLY )) < 0 )
     {
-        msg_Err( p_aout, "cannot open audio device (%s)",
-                          psz_device );
+        msg_Err( p_aout, "cannot open audio device (%s)", psz_device );
         free( psz_device );
         free( p_sys );
         return -1;
@@ -129,7 +127,6 @@ static int Open( vlc_object_t *p_this )
     free( psz_device );
 
     /* Create OSS thread and wait for its readiness. */
-    p_sys->b_die = 0;
     p_sys->b_initialized = VLC_FALSE;
     if( vlc_thread_create( p_aout, "aout", OSSThread, VLC_FALSE ) )
     {
@@ -255,7 +252,7 @@ static void Close( vlc_object_t * p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    p_sys->b_die = 1;
+    p_aout->b_die = 1;
     vlc_thread_join( p_aout );
 
     close( p_sys->i_fd );
@@ -291,7 +288,7 @@ static int OSSThread( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    while ( !p_sys->b_die )
+    while ( !p_aout->b_die )
     {
         aout_buffer_t * p_buffer;
         mtime_t next_date = 0;

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * vout_sdl.c: SDL video output display method
+ * sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout.c,v 1.1 2002/08/04 17:23:44 sam Exp $
+ * $Id: sdl.c,v 1.1 2002/08/13 11:59:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -85,6 +85,8 @@ struct picture_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+static int  Open      ( vlc_object_t * );
+static void Close     ( vlc_object_t * );
 static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
@@ -96,13 +98,22 @@ static int  NewPicture      ( vout_thread_t *, picture_t * );
 static void SetPalette      ( vout_thread_t *, u16 *, u16 *, u16 * );
 
 /*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin();
+    set_description( _("Simple DirectMedia Layer video module") );
+    set_capability( "video output", 40 );
+    set_callbacks( Open, Close );
+vlc_module_end();
+
+/*****************************************************************************
  * OpenVideo: allocate SDL video thread output method
  *****************************************************************************
  * This function allocate and initialize a SDL vout method. It uses some of the
  * vout properties to choose the correct mode, and change them according to the
  * mode actually used.
  *****************************************************************************/
-int E_(OpenVideo) ( vlc_object_t *p_this )                         
+static int Open ( vlc_object_t *p_this )                         
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;          
 
@@ -276,7 +287,7 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************
  * Terminate an output method created by vout_SDLCreate
  *****************************************************************************/
-void E_(CloseVideo) ( vlc_object_t *p_this )                         
+static void Close ( vlc_object_t *p_this )                         
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;          
 

@@ -1,18 +1,18 @@
 /*****************************************************************************
- * aout_sdl.c : audio sdl functions library
+ * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout.c,v 1.4 2002/08/12 22:12:51 massiot Exp $
+ * Copyright (C) 2000-2002 VideoLAN
+ * $Id: sdl.c,v 1.1 2002/08/13 11:59:36 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
- *
+ *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -38,47 +38,63 @@
 
 #include SDL_INCLUDE_FILE
 
-#define FRAME_SIZE 2048
+#define FRAME_SIZE 2048*2
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int     SetFormat   ( aout_instance_t * );
-static void    Play        ( aout_instance_t *, aout_buffer_t * );
+static int  Open        ( vlc_object_t * );
+static void Close       ( vlc_object_t * );
 
-static void    SDLCallback ( void *, Uint8 *, int );
+static int  SetFormat   ( aout_instance_t * );
+static void Play        ( aout_instance_t *, aout_buffer_t * );
+
+static void SDLCallback ( void *, Uint8 *, int );
 
 /*****************************************************************************
- * OpenAudio: open the audio device
+ * Module descriptor
  *****************************************************************************/
-int E_(OpenAudio) ( aout_instance_t *p_aout )
+vlc_module_begin();
+    set_description( _("Simple DirectMedia Layer audio module") );
+    set_capability( "audio output", 40 );
+    set_callbacks( Open, Close );
+vlc_module_end();
+
+/*****************************************************************************
+ * Open: open the audio device
+ *****************************************************************************/
+static int Open ( vlc_object_t *p_this )
 {
-    if( SDL_WasInit( SDL_INIT_AUDIO ) != 0 )
+    aout_instance_t *p_aout = (aout_instance_t *)p_this;
+
+    Uint32 i_flags = SDL_INIT_AUDIO;
+
+    if( SDL_WasInit( i_flags ) )
     {
-        return( 1 );
+        return 1;
     }
 
     p_aout->output.pf_setformat = SetFormat;
     p_aout->output.pf_play = Play;
 
-    /* Initialize library */
-    if( SDL_Init( SDL_INIT_AUDIO
 #ifndef WIN32
     /* Win32 SDL implementation doesn't support SDL_INIT_EVENTTHREAD yet*/
-                | SDL_INIT_EVENTTHREAD
+    i_flags |= SDL_INIT_EVENTTHREAD;
 #endif
 #ifdef DEBUG
     /* In debug mode you may want vlc to dump a core instead of staying
      * stuck */
-                | SDL_INIT_NOPARACHUTE
+    i_flags |= SDL_INIT_NOPARACHUTE;
 #endif
-                ) < 0 )
+
+    /* Initialize library */
+    if( SDL_Init( i_flags ) < 0 )
     {
         msg_Err( p_aout, "cannot initialize SDL (%s)", SDL_GetError() );
-        return( 1 );
+        return 1;
     }
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************
@@ -103,7 +119,7 @@ static int SetFormat( aout_instance_t *p_aout )
     }
 
     p_aout->output.output.i_format = AOUT_FMT_S16_NE;
-    p_aout->output.i_nb_samples = DEFAULT_FRAME_SIZE;
+    p_aout->output.i_nb_samples = FRAME_SIZE;
 
     SDL_PauseAudio( 0 );
 
@@ -123,14 +139,12 @@ static void Play( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 }
 
 /*****************************************************************************
- * CloseAudio: close the audio device
+ * Close: close the audio device
  *****************************************************************************/
-void E_(CloseAudio) ( aout_instance_t *p_aout )
+static void Close ( vlc_object_t *p_this )
 {
     SDL_PauseAudio( 1 );
-
     SDL_CloseAudio();
-
     SDL_QuitSubSystem( SDL_INIT_AUDIO );
 }
 

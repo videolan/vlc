@@ -214,3 +214,11 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<zBen_home> mais truc[tres_grand] sur la pile ca me parait idiot :)
+<tooney> zBen_home - ou mais c'est truc[tout_petit] donc ca va
+<zBen_home> ah vi alors ca va
+<zBen_home> parceque meuh donnait un example avec un entier assez costaud
+<tooney> c'est parce qu'il etait pas content
+
+  -- #videolan
+%

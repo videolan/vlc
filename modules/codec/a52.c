@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.2 2002/08/11 22:46:34 massiot Exp $
+ * $Id: a52.c,v 1.3 2002/08/13 11:59:36 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -37,6 +37,10 @@
 #   include <stdint.h>                                         /* int16_t .. */
 #elif HAVE_INTTYPES_H
 #   include <inttypes.h>                                       /* int16_t .. */
+#endif
+
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
 #endif
 
 #ifdef USE_A52DEC_TREE                                 /* liba52 header file */
