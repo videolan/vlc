@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.97.2.1 2002/06/02 10:55:53 sam Exp $
+ * $Id: mpeg_system.c,v 1.97.2.2 2002/09/25 23:11:54 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -333,17 +333,16 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             break;
         }
 
-        if( p_es->i_stream_id == 0xbd )
+        if ( p_es->i_type == A52B_AUDIO_ES )
         {
-            /* With private stream 1, the first byte of the payload
-             * is a stream_private_id, so skip it. */
-            i_pes_header_size++;
+            /* With A/52 audio, we need to skip the first 4 bytes */
+            i_pes_header_size += 4;           
         }
-
-        if( p_es->i_type == AC3_AUDIO_ES )
+        else if( p_es->i_type == LPCMB_AUDIO_ES
+                  || p_es->i_type == DVDB_SPU_ES )
         {
-            /* With ac3 audio, we need to skip first 3 bytes */
-            i_pes_header_size += 3;
+            /* With others, we need to skip the first byte */
+            i_pes_header_size += 1;
         }
 
         /* Now we've parsed the header, we just have to indicate in some
@@ -605,7 +604,9 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
             p_es->b_audio = ( p_es->i_type == MPEG1_AUDIO_ES
                               || p_es->i_type == MPEG2_AUDIO_ES
                               || p_es->i_type == AC3_AUDIO_ES
+                              || p_es->i_type == A52B_AUDIO_ES
                               || p_es->i_type == LPCM_AUDIO_ES
+                              || p_es->i_type == LPCMB_AUDIO_ES
                             );
 
             /* input_AddES has inserted the new element at the end. */
@@ -825,7 +826,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xF0FF) == 0x80BD )
                     {
                         /* AC3 audio (0x80->0x8F) */
-                        p_es->i_type = AC3_AUDIO_ES;
+                        p_es->i_type = A52B_AUDIO_ES;
                         p_es->b_audio = 1;
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
@@ -845,7 +846,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xE0FF) == 0x20BD )
                     {
                         /* Subtitles video (0x20->0x3F) */
-                        p_es->i_type = DVD_SPU_ES;
+                        p_es->i_type = DVDB_SPU_ES;
                         p_es->i_cat = SPU_ES;
 #ifdef AUTO_SPAWN
                         if( config_GetIntVariable( "spu-channel" )
@@ -859,7 +860,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xF0FF) == 0xA0BD )
                     {
                         /* LPCM audio (0xA0->0xAF) */
-                        p_es->i_type = LPCM_AUDIO_ES;
+                        p_es->i_type = LPCMB_AUDIO_ES;
                         p_es->b_audio = 1;
                         p_es->i_cat = AUDIO_ES;
                     }

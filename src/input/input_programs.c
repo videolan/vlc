@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.88 2002/05/17 00:58:14 sam Exp $
+ * $Id: input_programs.c,v 1.88.2.1 2002/09/25 23:11:54 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -664,9 +664,11 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     switch( p_es->i_type )
     {
     case AC3_AUDIO_ES:
+    case A52B_AUDIO_ES:
     case MPEG1_AUDIO_ES:
     case MPEG2_AUDIO_ES:
     case LPCM_AUDIO_ES:
+    case LPCMB_AUDIO_ES:
         if( p_main->b_audio )
         {
             /* Release the lock, not to block the input thread during
@@ -684,6 +686,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case MSMPEG4v2_VIDEO_ES:
     case MSMPEG4v3_VIDEO_ES:
     case DVD_SPU_ES:
+    case DVDB_SPU_ES:
         if( p_main->b_video )
         {
             /* Release the lock, not to block the input thread during

@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.31 2002/05/27 16:01:42 fenrir Exp $
+ * $Id: ac3_adec.c,v 1.31.2.1 2002/09/25 23:11:51 massiot Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -104,7 +104,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( u8 *pi_type )
 {
-    return ( *pi_type == AC3_AUDIO_ES ) ? 0 : -1;
+    return ( (*pi_type == AC3_AUDIO_ES || *pi_type == A52B_AUDIO_ES) ? 0 : -1 );
 }
 
 

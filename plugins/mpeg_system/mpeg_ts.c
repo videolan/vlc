@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.13.2.1 2002/06/03 23:14:49 sam Exp $
+ * $Id: mpeg_ts.c,v 1.13.2.2 2002/09/25 23:11:53 massiot Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -87,7 +87,15 @@ static void TS_DVBPSI_HandlePMT
 /*****************************************************************************
  * Build configuration tree.
  *****************************************************************************/
+#define VLS_BACKWARDS_COMPAT_TEXT N_("compatibility with pre-0.4 VLS")
+#define VLS_BACKWARDS_COMPAT_LONGTEXT N_( \
+    "The protocol for transmitting A/52 audio streams changed between VLC " \
+    "0.3.x and 0.4. By default VLC assumes you have the latest VLS. In case " \
+    "you're using an old version, select this option.")
+
 MODULE_CONFIG_START
+ADD_CATEGORY_HINT( N_("Input"), NULL )
+ADD_BOOL    ( "vls-backwards-compat", 0, NULL, VLS_BACKWARDS_COMPAT_TEXT, VLS_BACKWARDS_COMPAT_LONGTEXT )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
@@ -536,6 +544,7 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 
     pgrm_ts_data_t            * p_pgrm_data;
     es_ts_data_t              * p_demux_data;
+    boolean_t b_vls_compat = config_GetIntVariable( "vls-backwards-compat" );
 
     p_demux_data = (es_ts_data_t *)p_es->p_demux_data;
     p_pgrm_data = (pgrm_ts_data_t *)p_es->p_pgrm->p_demux_data;
@@ -616,13 +625,21 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                         case MPEG2_AUDIO_ES:
                             p_new_es->i_cat = AUDIO_ES;
                             break;
-                        case LPCM_AUDIO_ES :
                         case AC3_AUDIO_ES :
+                            if ( b_vls_compat )
+                                 p_new_es->i_type = A52B_AUDIO_ES;
+                            /* pass-through */
+                        case LPCM_AUDIO_ES :
+                        case A52B_AUDIO_ES :
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = AUDIO_ES;
                             break;
                         /* Not sure this one is fully specification-compliant */
                         case DVD_SPU_ES :
+                            if ( b_vls_compat )
+                                 p_new_es->i_type = DVDB_SPU_ES;
+                            /* pass-through */
+                        case DVDB_SPU_ES :
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = SPU_ES;
                             break;
@@ -800,6 +817,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
     pgrm_descriptor_t *     p_pgrm;
     es_descriptor_t *       p_new_es;
     pgrm_ts_data_t *        p_pgrm_demux;
+    boolean_t b_vls_compat = config_GetIntVariable( "vls-backwards-compat" );
    
     vlc_mutex_lock( &p_input->stream.stream_lock );
     
@@ -841,12 +859,20 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                 case MPEG2_AUDIO_ES:
                     p_new_es->i_cat = AUDIO_ES;
                     break;
-                case LPCM_AUDIO_ES:
                 case AC3_AUDIO_ES:
+                    if ( b_vls_compat )
+                        p_new_es->i_type = A52B_AUDIO_ES;
+                    /* pass-through */
+                case LPCM_AUDIO_ES:
+                case A52B_AUDIO_ES:
                     p_new_es->i_cat = AUDIO_ES;
                     p_new_es->i_stream_id = 0xBD;
                     break;
                 case DVD_SPU_ES:
+                    if ( b_vls_compat )
+                        p_new_es->i_type = DVDB_SPU_ES;
+                    /* pass-through */
+                case DVDB_SPU_ES:
                     p_new_es->i_cat = SPU_ES;
                     p_new_es->i_stream_id = 0xBD;
                     break;
@@ -894,6 +920,7 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                         strcat( p_new_es->psz_desc, " (lpcm)" );
                         break;
                     case AC3_AUDIO_ES:
+                    case A52B_AUDIO_ES:
                         strcat( p_new_es->psz_desc, " (ac3)" );
                         break;
                 }

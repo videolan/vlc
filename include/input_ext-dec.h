@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.59 2002/05/24 12:42:14 gbazin Exp $
+ * $Id: input_ext-dec.h,v 1.59.2.1 2002/09/25 23:11:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -28,9 +28,19 @@
 #define MPEG1_AUDIO_ES      0x03
 #define MPEG2_AUDIO_ES      0x04
 #define AC3_AUDIO_ES        0x81
-/* These ones might violate the norm : */
+/* These ones might violate the usage : */
 #define DVD_SPU_ES          0x82
 #define LPCM_AUDIO_ES       0x83
+/* These ones are only here to work around a bug in VLS - VLS doesn't
+ * skip the first bytes of the PES payload (stream private ID) when
+ * streaming. This is incompatible with all equipments. 'B' is for
+ * buggy. Please note that they are associated with FOURCCs '***b'.
+ * --Meuuh 2002-08-30
+ */
+#define A52B_AUDIO_ES       0x91
+#define DVDB_SPU_ES         0x92
+#define LPCMB_AUDIO_ES      0x93
+
 #define MSMPEG4v1_VIDEO_ES  0x40
 #define MSMPEG4v2_VIDEO_ES  0x41
 #define MSMPEG4v3_VIDEO_ES  0x42

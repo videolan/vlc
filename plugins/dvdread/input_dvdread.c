@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.38 2002/05/14 19:33:54 bozo Exp $
+ * $Id: input_dvdread.c,v 1.38.2.1 2002/09/25 23:11:53 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -680,7 +680,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     i_id = ( ( 0x80 + i_position ) << 8 ) | 0xbd;
                     p_es = input_AddES( p_input, NULL, i_id, 0 );
                     p_es->i_stream_id = 0xbd;
-                    p_es->i_type = AC3_AUDIO_ES;
+                    p_es->i_type = A52B_AUDIO_ES;
                     p_es->b_audio = 1;
                     p_es->i_cat = AUDIO_ES;
                     strcpy( p_es->psz_desc, DecodeLanguage(
@@ -706,7 +706,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                     i_id = ( ( 0xa0 + i_position ) << 8 ) | 0xbd;
                     p_es = input_AddES( p_input, NULL, i_id, 0 );
                     p_es->i_stream_id = i_id;
-                    p_es->i_type = LPCM_AUDIO_ES;
+                    p_es->i_type = LPCMB_AUDIO_ES;
                     p_es->b_audio = 1;
                     p_es->i_cat = AUDIO_ES;
                     strcpy( p_es->psz_desc, DecodeLanguage(
@@ -770,7 +770,7 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
                 i_id = ( ( 0x20 + i_position ) << 8 ) | 0xbd;
                 p_es = input_AddES( p_input, NULL, i_id, 0 );
                 p_es->i_stream_id = 0xbd;
-                p_es->i_type = DVD_SPU_ES;
+                p_es->i_type = DVDB_SPU_ES;
                 p_es->i_cat = SPU_ES;
                 strcpy( p_es->psz_desc, DecodeLanguage(
                     p_vts->vtsi_mat->vts_subp_attr[i-1].lang_code ) ); 
@@ -1229,12 +1229,12 @@ static void DvdReadLauchDecoders( input_thread_t * p_input )
             {
                 int     i_ac3 = i_audio;
                 while( ( p_input->stream.pp_es[i_ac3]->i_type !=
-                       AC3_AUDIO_ES ) && ( i_ac3 <=
+                       A52B_AUDIO_ES ) && ( i_ac3 <=
                        p_dvd->p_vts_file->vtsi_mat->nr_of_vts_audio_streams ) )
                 {
                     i_ac3++;
                 }
-                if( p_input->stream.pp_es[i_ac3]->i_type == AC3_AUDIO_ES )
+                if( p_input->stream.pp_es[i_ac3]->i_type == A52B_AUDIO_ES )
                 {
                     input_SelectES( p_input,
                                     p_input->stream.pp_es[i_ac3] );

@@ -2,7 +2,7 @@
  * lpcm_decoder_thread.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.15.2.1 2002/08/11 21:56:04 massiot Exp $
+ * $Id: lpcm_adec.c,v 1.15.2.2 2002/09/25 23:11:53 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -84,7 +84,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( u8 *pi_type )
 {
-    return ( *pi_type == LPCM_AUDIO_ES ) ? 0 : -1;
+    return ( (*pi_type == LPCM_AUDIO_ES || *pi_type == LPCMB_AUDIO_ES) ? 0 : -1 );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.24.2.3 2002/08/07 20:42:36 massiot Exp $
+ * $Id: spu_decoder.c,v 1.24.2.4 2002/09/25 23:11:54 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -96,7 +96,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( u8 *pi_type )
 {
-    return ( *pi_type == DVD_SPU_ES ) ? 0 : -1;
+    return ( (*pi_type == DVD_SPU_ES || *pi_type == DVDB_SPU_ES) ? 0 : -1 );
 }
 
 /*****************************************************************************
@@ -862,7 +862,6 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
 
     int i_x, i_y;
     int i_len, i_color, i_colprecomp, i_destalpha;
-    int i;
     u8  i_cnt;
 
     /* RGB-specific */

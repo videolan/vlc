@@ -2,7 +2,7 @@
  * mpeg_ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ps.c,v 1.14 2002/05/15 22:53:10 jobi Exp $
+ * $Id: mpeg_ps.c,v 1.14.2.1 2002/09/25 23:11:53 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -225,7 +225,7 @@ static int PSInit( input_thread_t * p_input )
                         }
                         break;
 
-                    case AC3_AUDIO_ES:
+                    case A52B_AUDIO_ES:
                         if( config_GetIntVariable( "audio-channel" )
                                 == ((p_es->i_id & 0xF00) >> 8) ||
                               ( config_GetIntVariable( "audio-channel" ) < 0
@@ -238,7 +238,7 @@ static int PSInit( input_thread_t * p_input )
                         }
                         break;
 
-                    case DVD_SPU_ES:
+                    case DVDB_SPU_ES:
                         if( config_GetIntVariable( "spu-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
@@ -246,7 +246,7 @@ static int PSInit( input_thread_t * p_input )
                         }
                         break;
 
-                    case LPCM_AUDIO_ES:
+                    case LPCMB_AUDIO_ES:
                         if( config_GetIntVariable( "audio-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) ||
                               ( config_GetIntVariable( "audio-channel" ) < 0

@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.14.2.2 2002/06/02 10:28:14 gbazin Exp $
+ * $Id: a52.c,v 1.14.2.3 2002/09/25 23:11:51 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -111,7 +111,7 @@ MODULE_DEACTIVATE_STOP
  *****************************************************************************/
 static int decoder_Probe( u8 *pi_type )
 {
-    return ( *pi_type == AC3_AUDIO_ES ? 0 : -1 );
+    return ( (*pi_type == AC3_AUDIO_ES || *pi_type == A52B_AUDIO_ES) ? 0 : -1 );
 }
 
 /*****************************************************************************

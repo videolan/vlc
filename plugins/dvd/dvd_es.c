@@ -1,7 +1,7 @@
 /* dvd_es.c: functions to find and select ES
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_es.c,v 1.11.2.1 2002/06/27 19:44:54 sam Exp $
+ * $Id: dvd_es.c,v 1.11.2.2 2002/09/25 23:11:52 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -141,7 +141,7 @@ void DVDReadAudio( input_thread_t * p_input )
             {
             case 0x00:              /* AC3 */
                 ADDES( 0xbd, 0x80 + audio_status.i_position,
-                       AC3_AUDIO_ES, AUDIO_ES, i_lang, 0 );
+                       A52B_AUDIO_ES, AUDIO_ES, i_lang, 0 );
                 p_es->b_audio = 1;
                 strcat( p_es->psz_desc, " (ac3)" );
 
@@ -156,7 +156,7 @@ void DVDReadAudio( input_thread_t * p_input )
                 break;
             case 0x04:              /* LPCM */
                 ADDES( 0xbd, 0xa0 + audio_status.i_position,
-                       LPCM_AUDIO_ES, AUDIO_ES, i_lang, 0 );
+                       LPCMB_AUDIO_ES, AUDIO_ES, i_lang, 0 );
                 p_es->b_audio = 1;
                 strcat( p_es->psz_desc, " (lpcm)" );
 
@@ -227,7 +227,7 @@ void DVDReadSPU( input_thread_t * p_input )
 
             if( vmg.title.pi_yuv_color )
             {
-                ADDES( 0xbd, 0x20 + i_id, DVD_SPU_ES, SPU_ES,
+                ADDES( 0xbd, 0x20 + i_id, DVDB_SPU_ES, SPU_ES,
                        vts.manager_inf.p_spu_attr[i-1].i_lang_code,
                        sizeof(int) + 16*sizeof(u32) );
                 *(int*)p_es->p_demux_data = 0xBeeF;
@@ -236,7 +236,7 @@ void DVDReadSPU( input_thread_t * p_input )
             }
             else
             {
-                ADDES( 0xbd, 0x20 + i_id, DVD_SPU_ES, SPU_ES,
+                ADDES( 0xbd, 0x20 + i_id, DVDB_SPU_ES, SPU_ES,
                    vts.manager_inf.p_spu_attr[i-1].i_lang_code, 0 );
             }
         }
@@ -280,12 +280,12 @@ void DVDLaunchDecoders( input_thread_t * p_input )
         {
             int     i_ac3 = i_audio;
             while( ( p_input->stream.pp_es[i_ac3]->i_type !=
-                     AC3_AUDIO_ES ) && ( i_ac3 <=
+                     A52B_AUDIO_ES ) && ( i_ac3 <=
                      p_dvd->p_ifo->vts.manager_inf.i_audio_nb ) )
             {
                 i_ac3++;
             }
-            if( p_input->stream.pp_es[i_ac3]->i_type == AC3_AUDIO_ES )
+            if( p_input->stream.pp_es[i_ac3]->i_type == A52B_AUDIO_ES )
             {
                 input_SelectES( p_input,
                                 p_input->stream.pp_es[i_ac3] );
@@ -312,7 +312,7 @@ void DVDLaunchDecoders( input_thread_t * p_input )
         {
 	  int i=0,j=0;
 	  for (i=0; i < p_input->stream.i_es_number; i++ ) {
-	    if ( p_input->stream.pp_es[i]->i_type == DVD_SPU_ES ) {
+	    if ( p_input->stream.pp_es[i]->i_type == DVDB_SPU_ES ) {
 	      j++;
 	      if ( i_spu == j ) break;
 	    }
