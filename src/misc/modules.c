@@ -358,6 +358,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
 
     int   i_shortcuts = 0;
     char *psz_shortcuts = NULL, *psz_var = NULL;
+    vlc_bool_t b_force_backup = p_this->b_force;
 
     msg_Dbg( p_this, "looking for %s module", psz_capability );
 
@@ -619,7 +620,7 @@ module_t * __module_Need( vlc_object_t *p_this, const char *psz_capability,
     }
 
     free( p_list );
-    p_this->b_force = VLC_FALSE;
+    p_this->b_force = b_force_backup;
 
     if( p_module != NULL )
     {
@@ -1557,18 +1558,14 @@ static void CacheLoad( vlc_object_t *p_this )
         msg_Err( p_this, "psz_homedir is null" );
         return;
     }
-    psz_filename =
-        (char *)malloc( sizeof("/" CONFIG_DIR "/" PLUGINSCACHE_DIR "/" ) +
-                        strlen(psz_homedir) + strlen(CacheName()) );
 
-    if( !psz_filename )
+    i_size = asprintf( &psz_filename, "%s/%s/%s/%s", psz_homedir, CONFIG_DIR,
+                       PLUGINSCACHE_DIR, CacheName() );
+    if( !i_size )
     {
         msg_Err( p_this, "out of memory" );
         return;
     }
-
-    sprintf( psz_filename, "%s/%s/%s/%s", psz_homedir, CONFIG_DIR,
-             PLUGINSCACHE_DIR, CacheName() );
 
     if( p_this->p_libvlc->p_module_bank->b_cache_delete )
     {
@@ -1652,7 +1649,7 @@ static void CacheLoad( vlc_object_t *p_this )
         pp_cache[i] = malloc( sizeof(module_cache_t) );
         p_this->p_libvlc->p_module_bank->i_loaded_cache++;
 
-        /* Save common info */
+        /* Load common info */
         LOAD_STRING( pp_cache[i]->psz_file );
         LOAD_IMMEDIATE( pp_cache[i]->i_time );
         LOAD_IMMEDIATE( pp_cache[i]->i_size );
@@ -1662,7 +1659,7 @@ static void CacheLoad( vlc_object_t *p_this )
 
         pp_cache[i]->p_module = vlc_object_create( p_this, VLC_OBJECT_MODULE );
 
-        /* Save additional infos */
+        /* Load additional infos */
         LOAD_STRING( pp_cache[i]->p_module->psz_object_name );
         LOAD_STRING( pp_cache[i]->p_module->psz_shortname );
         LOAD_STRING( pp_cache[i]->p_module->psz_longname );
@@ -1833,6 +1830,7 @@ static void CacheSave( vlc_object_t *p_this )
         "# This file is a cache directory tag created by VLC.\r\n"
         "# For information about cache directory tags, see:\r\n"
         "#   http://www.brynosaurus.com/cachedir/\r\n";
+
     char *psz_filename, *psz_homedir;
     FILE *file;
     int i, j, i_cache;
@@ -2028,7 +2026,7 @@ void CacheSaveConfig( module_t *p_module, FILE *file )
 /*****************************************************************************
  * CacheName: Return the cache file name for this platform.
  *****************************************************************************/
-static char * CacheName( void )
+static char *CacheName( void )
 {
     static char psz_cachename[32];
     static vlc_bool_t b_initialised = VLC_FALSE;
