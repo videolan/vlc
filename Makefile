@@ -550,7 +550,7 @@ endif
 #
 # Main application target
 #
-vlc: Makefile.opts Makefile.dep Makefile $(VLC_OBJ) $(BUILTIN_OBJ)
+vlc: Makefile.config Makefile.opts Makefile.dep Makefile $(VLC_OBJ) $(BUILTIN_OBJ)
 	$(CC) $(CFLAGS) -o $@ $(VLC_OBJ) $(BUILTIN_OBJ) $(LDFLAGS) $(vlc_LDFLAGS) $(builtins_LDFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc

@@ -1,7 +1,7 @@
 /* dvd_seek.c: functions to navigate through DVD.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_seek.c,v 1.8 2002/05/21 00:34:41 sam Exp $
+ * $Id: dvd_seek.c,v 1.9 2002/05/22 17:17:45 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -200,13 +200,15 @@ int LbMaxOnce( thread_dvd_data_t * p_dvd )
         p_dvd->i_map_cell++;
         p_dvd->i_angle_cell++;
 
-        if( ( p_dvd->i_prg_cell = NextCellPrg( p_dvd ) ) < 0 )
+        p_dvd->i_prg_cell = NextCellPrg( p_dvd );
+        if( p_dvd->i_prg_cell < 0 )
         {
             /* EOF */
             return 0;
         }
 
-        if( ( p_dvd->i_map_cell = CellPrg2Map( p_dvd ) ) < 0 )
+        p_dvd->i_map_cell = CellPrg2Map( p_dvd );
+        if( p_dvd->i_map_cell < 0 )
         {
             return 0;
         }
@@ -214,15 +216,16 @@ int LbMaxOnce( thread_dvd_data_t * p_dvd )
         p_dvd->i_vts_lb   = CellFirstSector( p_dvd );
         p_dvd->i_last_lb  = CellLastSector( p_dvd );
         
-        if( ( p_dvd->i_chapter = NextChapter( p_dvd ) ) < 0)
+        p_dvd->i_chapter = NextChapter( p_dvd );
+        if( p_dvd->i_chapter < 0 )
         {
             return 0;
         }
 
         /* Position the fd pointer on the right address */
-        if( ( dvdcss_seek( p_dvd->dvdhandle,
-                           p_dvd->i_vts_start + p_dvd->i_vts_lb,
-                           DVDCSS_SEEK_MPEG ) ) < 0 )
+        if( dvdcss_seek( p_dvd->dvdhandle,
+                         p_dvd->i_vts_start + p_dvd->i_vts_lb,
+                         DVDCSS_SEEK_MPEG ) < 0 )
         {
             intf_ErrMsg( "dvd error: %s",
                          dvdcss_error( p_dvd->dvdhandle ) );

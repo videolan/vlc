@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.5 2002/04/19 13:56:10 sam Exp $
+ * $Id: file.c,v 1.6 2002/05/22 17:17:45 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,8 +99,7 @@ static int FileOpen( input_thread_t * p_input )
 
     p_input->i_mtu = 0;
 
-    b_stdin = ( strlen( p_input->psz_name ) == 1 )
-                && *p_input->psz_name == '-';
+    b_stdin = psz_name[0] == '-' && psz_name[1] == '\0';
 
     if( !b_stdin && (i_stat = stat( psz_name, &stat_info )) == (-1) )
     {

@@ -2,7 +2,7 @@
  * modules_inner.h : Macros used from within a module.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_inner.h,v 1.20 2002/05/22 11:23:56 lool Exp $
+ * $Id: modules_inner.h,v 1.21 2002/05/22 17:17:45 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -92,7 +92,6 @@
 
 #define MODULE_INIT_STOP                                                      \
         } while( 0 );                                                         \
-        STORE_SYMBOLS;                                                        \
         p_module->pp_shortcuts[ i_shortcut ] = NULL;                          \
         p_module->i_config_items = 0;                                         \
         for( p_item = p_config;                                               \
@@ -152,7 +151,6 @@
         {                                                                     \
             return( -1 );                                                     \
         }                                                                     \
-        STORE_SYMBOLS;                                                        \
         config_SetCallbacks( p_module->p_config, p_config );                  \
         do {
 
