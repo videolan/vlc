@@ -188,7 +188,7 @@ ifneq (,$(findstring mingw32,$(SYS)))
 LIB += -lws2_32 -lnetapi32
 endif
 
-LIB += -L/usr/local/lib @LIB@
+LIB += @LIB@
 
 #
 # C compiler flags: mainstream compilation
@@ -266,7 +266,7 @@ LCFLAGS += -Wall
 ifneq ($(DEBUG),1)
 ifneq ($(GPROF),1)
 ifneq ($(CPROF),1)
-LCFLAGS += -s
+#LCFLAGS += -s
 endif
 endif
 endif
@@ -277,7 +277,7 @@ endif
 #
 # C compiler and linker flags: setting soname
 #
-SOFLAGS += @SOFLAGS@
+SOFLAGS = @SOFLAGS@
 
 #
 # C compiler flags: plugin compilation

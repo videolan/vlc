@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctaltivec.c,v 1.17 2001/09/28 14:17:16 massiot Exp $
+ * $Id: idctaltivec.c,v 1.18 2001/09/28 15:08:40 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -121,6 +121,8 @@ static void InitIDCT( void ** pp_idct_data )
  * IDCT in Altivec
  *****************************************************************************/
 
+#ifndef HAVE_C_ALTIVEC
+
 static int16_t constants[5][8] ATTR_ALIGN(16) = {
     {23170, 13573, 6518, 21895, -23170, -21895, 32, 31},
     {16384, 22725, 21407, 19266, 16384, 19266, 21407, 22725},
@@ -128,8 +130,6 @@ static int16_t constants[5][8] ATTR_ALIGN(16) = {
     {21407, 29692, 27969, 25172, 21407, 25172, 27969, 29692},
     {19266, 26722, 25172, 22654, 19266, 22654, 25172, 26722}
 };
-
-#ifndef HAVE_C_ALTIVEC
 
 /*
  * The asm code is generated with:
@@ -673,7 +673,7 @@ void idct_block_add_altivec (int16_t * block, uint8_t * dest, int stride)
     vx6 = vec_sra (vy6, shift);						\
     vx7 = vec_sra (vy7, shift);
 
-static vector_s16_t constants[5] = {
+static vector_s16_t constants[5] ATTR_ALIGN(16) = {
     (vector_s16_t)(23170, 13573, 6518, 21895, -23170, -21895, 32, 31),
     (vector_s16_t)(16384, 22725, 21407, 19266, 16384, 19266, 21407, 22725),
     (vector_s16_t)(22725, 31521, 29692, 26722, 22725, 26722, 29692, 31521),
