@@ -522,7 +522,6 @@ enum
     HTTP_ACCESS_OUT,
     MMSH_ACCESS_OUT,
     UDP_ACCESS_OUT,
-    RTP_ACCESS_OUT,
     ACCESS_OUT_NUM
 };
 
@@ -635,6 +634,9 @@ private:
     wxComboBox *audio_bitrate_combo;
     wxComboBox *audio_channels_combo;
     wxComboBox *video_scale_combo;
+
+    /* Misc controls */
+    wxCheckBox *sout_all_checkbox;
 };
 
 /* Subtitles File Dialog */

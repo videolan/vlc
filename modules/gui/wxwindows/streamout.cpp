@@ -72,7 +72,8 @@ enum
     AudioTranscEnable_Event, AudioTranscCodec_Event, AudioTranscBitrate_Event,
     AudioTranscChans_Event,
 
-    SAPMisc_Event, SLPMisc_Event, AnnounceGroup_Event, AnnounceAddr_Event
+    SAPMisc_Event, SLPMisc_Event, AnnounceGroup_Event, AnnounceAddr_Event,
+    SoutAll_Event
 };
 
 BEGIN_EVENT_TABLE(SoutDialog, wxDialog)
@@ -141,6 +142,7 @@ BEGIN_EVENT_TABLE(SoutDialog, wxDialog)
     EVT_CHECKBOX(SLPMisc_Event, SoutDialog::OnSLPMiscChange)
     EVT_TEXT(AnnounceGroup_Event, SoutDialog::OnAnnounceGroupChange)
     EVT_TEXT(AnnounceAddr_Event, SoutDialog::OnAnnounceAddrChange)
+    EVT_CHECKBOX(SoutAll_Event, SoutDialog::OnAnnounceGroupChange)
 
 END_EVENT_TABLE()
 
@@ -393,16 +395,6 @@ void SoutDialog::UpdateMRL()
 
         dup_opts += wxT("}");
     }
-    if( access_checkboxes[RTP_ACCESS_OUT]->IsChecked() )
-    {
-        if( !dup_opts.IsEmpty() ) dup_opts += wxT(",");
-        dup_opts += wxT("dst=std{access=rtp,mux=");
-        dup_opts += encapsulation + wxT(",url=");
-        dup_opts += net_addrs[RTP_ACCESS_OUT]->GetLineText(0);
-        dup_opts += wxString::Format( wxT(":%d"),
-                                      net_ports[RTP_ACCESS_OUT]->GetValue() );
-        dup_opts += wxT("}");
-    }
 
     wxString duplicate;
     if( !dup_opts.IsEmpty() )
@@ -411,8 +403,15 @@ void SoutDialog::UpdateMRL()
         duplicate += wxT("duplicate{") + dup_opts + wxT("}");
     }
 
+    wxString misc;
+    if( (!transcode.IsEmpty() || !duplicate.IsEmpty()) &&
+        sout_all_checkbox->IsChecked() )
+    {
+        misc = wxT(" :sout-all");
+    }
+
     if( !transcode.IsEmpty() || !duplicate.IsEmpty() )
-        mrl_combo->SetValue( wxT(":sout=#") + transcode + duplicate );
+        mrl_combo->SetValue( wxT(":sout=#") + transcode + duplicate + misc );
     else
         mrl_combo->SetValue( wxT("") );
 }
@@ -436,7 +435,6 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
         wxU(_("HTTP")),
         wxU(_("MMSH")),
         wxU(_("UDP")),
-        wxU(_("RTP"))
     };
 
     for( i=0; i < ACCESS_OUT_NUM; i++ )
@@ -585,7 +583,12 @@ wxPanel *SoutDialog::MiscPanel( wxWindow* parent )
 
     /* Stuff everything into the main panel */
     panel_sizer->Add( misc_subpanels[ANN_MISC_SOUT], 1,
-                      wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+                      wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxLEFT, 5 );
+
+    sout_all_checkbox = new wxCheckBox( panel, SoutAll_Event,
+                            wxU(_("Select all elementary streams")) );
+    panel_sizer->Add( sout_all_checkbox, 1,
+                      wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxLEFT, 5 );
 
     panel->SetSizerAndFit( panel_sizer );
 
@@ -871,7 +874,6 @@ void SoutDialog::OnAccessTypeChange( wxCommandEvent& event )
     case UDP_ACCESS_OUT:
         misc_subpanels[ANN_MISC_SOUT]->Enable( event.GetInt() );
 
-    case RTP_ACCESS_OUT:
         for( i = 1; i < ENCAPS_NUM; i++ )
         {
             encapsulation_radios[i]->Enable( !event.GetInt() );
