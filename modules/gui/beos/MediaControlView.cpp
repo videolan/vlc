@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.16 2003/04/22 16:36:16 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.17 2003/05/25 23:08:44 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -61,7 +61,7 @@ const rgb_color kSeekRed = (rgb_color){ 255, 0, 0, 255 };
 const rgb_color kSeekRedLight = (rgb_color){ 255, 152, 152, 255 };
 const rgb_color kSeekRedShadow = (rgb_color){ 178, 0, 0, 255 };
 
-const char* kDisabledSeekMessage = _("Drop files to play");
+#define DISABLED_SEEK_MESSAGE _("Drop files to play")
 
 enum
 {
@@ -695,7 +695,7 @@ SeekSlider::Draw(BRect updateRect)
 		SetHighColor(darkShadow);
 		SetLowColor(shadow);
 		// stripes
-		float width = floorf(StringWidth(kDisabledSeekMessage));
+		float width = floorf(StringWidth(DISABLED_SEEK_MESSAGE));
 		float textPos = r.left + r.Width() / 2.0 - width / 2.0;
 		pattern stripes = {{ 0xc7, 0x8f, 0x1f, 0x3e, 0x7c, 0xf8, 0xf1, 0xe3 }};
 		BRect stripesRect(r);
@@ -712,7 +712,7 @@ SeekSlider::Draw(BRect updateRect)
 		SetLowColor(darkShadow);
 		font_height fh;
 		GetFontHeight(&fh);
-		DrawString(kDisabledSeekMessage, BPoint(textPos, r.top + ceilf(fh.ascent) - 1.0));
+		DrawString(DISABLED_SEEK_MESSAGE, BPoint(textPos, r.top + ceilf(fh.ascent) - 1.0));
 	}
 }
 
@@ -763,7 +763,7 @@ SeekSlider::MouseUp(BPoint where)
 void
 SeekSlider::ResizeToPreferred()
 {
-	float width = 15.0 + StringWidth(kDisabledSeekMessage) + 15.0;
+	float width = 15.0 + StringWidth(DISABLED_SEEK_MESSAGE) + 15.0;
 	ResizeTo(width, 17.0);
 }
 
