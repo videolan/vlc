@@ -2,7 +2,7 @@
  * logo.c : logo video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: logo.c,v 1.8 2004/01/25 10:17:19 gbazin Exp $
+ * $Id: logo.c,v 1.9 2004/01/25 15:55:37 sigmunau Exp $
  *
  * Authors: Simon Latapie <garf@videolan.org>
  *
@@ -66,10 +66,10 @@ static int MouseEvent( vlc_object_t *, char const *,
 
 vlc_module_begin();
     add_category_hint( N_("logo"), NULL, VLC_FALSE );
-    add_file( "logo_file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
-    add_integer( "logo_x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( "logo_y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
-    add_integer_with_range( "logo_transparency", 255, 0, 255, NULL, TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
+    add_file( "logo-file", NULL, NULL, FILE_TEXT, FILE_LONGTEXT, VLC_FALSE );
+    add_integer( "logo-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
+    add_integer( "logo-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+    add_integer_with_range( "logo-transparency", 255, 0, 255, NULL, TRANS_TEXT, TRANS_LONGTEXT, VLC_FALSE );
     set_description( _("Logo video filter") );
     set_capability( "video filter", 0 );
     add_shortcut( "logo" );
@@ -150,7 +150,7 @@ static int Init( vout_thread_t *p_vout )
     int i_parity_height;
 
     /*  read png file  */
-    filename = config_GetPsz( p_vout, "logo_file" );
+    filename = config_GetPsz( p_vout, "logo-file" );
     fp = fopen( filename , "rb");
     png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL , NULL , NULL);
     info_ptr = png_create_info_struct(png_ptr);
@@ -279,9 +279,9 @@ static int Init( vout_thread_t *p_vout )
 
     ADD_PARENT_CALLBACKS( SendEventsToChild );
 
-    p_vout->p_sys->posx = config_GetInt( p_vout, "logo_x" );
-    p_vout->p_sys->posy = config_GetInt( p_vout, "logo_y" );
-    p_vout->p_sys->trans = config_GetInt( p_vout, "logo_transparency");
+    p_vout->p_sys->posx = config_GetInt( p_vout, "logo-x" );
+    p_vout->p_sys->posy = config_GetInt( p_vout, "logo-y" );
+    p_vout->p_sys->trans = config_GetInt( p_vout, "logo-transparency");
 
     return VLC_SUCCESS;
 }
@@ -307,8 +307,8 @@ static void End( vout_thread_t *p_vout )
     vlc_object_detach( p_vout->p_sys->p_vout );
     vout_Destroy( p_vout->p_sys->p_vout );
 
-    config_PutInt( p_vout, "logo_x", p_vout->p_sys->posx );
-    config_PutInt( p_vout, "logo_y", p_vout->p_sys->posy );
+    config_PutInt( p_vout, "logo-x", p_vout->p_sys->posx );
+    config_PutInt( p_vout, "logo-y", p_vout->p_sys->posy );
 
     if (p_vout->p_sys->error == 0)
     {
