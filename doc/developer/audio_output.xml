@@ -297,19 +297,77 @@ When the decoder dies, or the sample format changes, the input stream must be de
   <sect1> <title> API for the output module </title>
 
     <para>
-An output module must implement a constructor, an optional destructor, and a p_aout->output.pf_play function. The constructor is the function which will be called when the module is loaded.
+An output module must implement a constructor, an optional destructor, and a p_aout-&gt;output.pf_play function. The constructor is the function which will be called when the module is loaded, and returns 0 if, and only if the output device could be open. The function may perform specific allocation in p_aout-&gt;output.p_sys, provided the structure is deallocated in the destructor.
     </para>
-  
+
+    <para>
+In most cases, the p_aout-&gt;output.pf_play function does nothing (the only exception is when the samples can be processed immediately, without caring about dates, as in the file output). The job is then done by the IO callback which you are supposed to provide.
+    </para>
+
+    <para>
+On modern sound architectures (such as Mac OS X CoreAudio or SDL), when the audio buffer starves, the operating system automatically calls a function from your application. On outdated sound architectures (such as OSS), you have to emulate this behavior. Then your constructor must spawn a new audio IO thread, which periodically calls the IO callback to transfer the data.
+    </para>
+
+    <para>
+When it is called, the first job of the IO callback will be determine the date at which the next samples will be played. Again, on modern platforms this information is given by the operating system, whereas on others you have to deduce it from the state of the internal buffer. Then you call aout_OutputNextBuffer( p_aout, next_date, b_can_sleek ), which will return a pointer to the next buffer to write, or NULL if none was available. In the latter case, it is advised to write zeros to the DSP.
+    </para>
+
+    <para>
+The value of the last parameter (b_can_sleek) changes the behavior of the function. When it is set to 0, aout_OutputNextBuffer() will run an internal machinery to compensate for possible drift. For instance if the PTS of the next buffer is 40 ms earlier than the date you ask, it means we are very late. So it will ask the input stage to downsample the incoming buffers, so that we can come back in sync. No specific behavior is thus expected from your module.
+    </para>
+
+    <para>
+On the contrary, when b_can_sleek is set to 1, you tell the output layer not to take any actions to compensate a drift. You will typically use this when you've just played silence, and you can deal with buffers which are too early by inserting zeros (zeros in this case will not break the audio continuity, since you were playing nothing before). Another case of use is with S/PDIF output. S/PDIF packets cannot be resampled for obvious reasons, so you <emphasis> must </emphasis> use b_can_sleek = 1.
+    </para>
+
+    <para>
+Once you have a buffer, you just have to transfer it to the DSP, for instance : memcpy( dsp_buffer, p_buffer-&gt;p_buffer, p_buffer-&gt;i_nb_bytes ).
+    </para>
+
   </sect1>
   
-  <!--
   <sect1> <title> Writing an audio filter </title>
   
+    <para>
+An audio filter module is constituted of a constructor, a destructor, and a p_filter-&gt;pf_do_work function. The constructor is passed a p_filter structure, and it returns 0 if it is able to do the <emphasis> whole </emphasis> transformation between p_filter-&gt;input and p_filter-&gt;output. If you can do only part of the transformation, say you can't do it (if the aout core doesn't find a fitting filter, it will split the transformation and ask you again).
+    </para>
+
+    <note>
+      <para>
+Audio filters can be of three types :
+      </para>
+
+      <itemizedlist>
+        <listitem> <para> Converters : change i_format (for instance from float32 to s16). </para> </listitem>
+        <listitem> <para> Resamplers : change i_rate (for instance from 48 kHz to 44.1 kHz). </para> </listitem>
+        <listitem> <para> Channel mixers : change i_channels (for instance from 5.1 to stereo). </para> </listitem>
+      </itemizedlist>
+
+      <para>
+Audio filters can also combine any of these types. For instance you can have an audio filter which transforms A/52 5.1 to float32 stereo.
+      </para>
+    </note>
+
+    <para>
+The constructor must also set p_filter-&gt;b_in_place. If it's 0, the aout core will allocate a new buffer for the output. If it's 1, when you write a byte in the output buffer, it destroys the same byte in the input buffer (they share the same memory area). Some filters can work in place because they just do a linear transformation (like float32-&gt;s16), but most filters will want b_in_place = 0. The filter can allocate private data in p_filter-&gt;p_sys. Do not forget to deallocate it in the destructor.
+    </para>
+
+    <para>
+The p_filter-&gt;pf_do_work gets an input and an output buffer as arguments, and process them. At the end of the processing, do not forget to set p_out_buf-&gt;i_nb_samples and p_out_buf-&gt;i_nb_bytes, since they aren't inited by the aout core (their values can change between input and output and it's not quite predictible).
+    </para>
+
   </sect1>
   
   <sect1> <title> Writing an audio mixer </title>
   
+    <para>
+Writing an audio mixer is very similar to writing an audio filter. The only difference is that you have to deal with the input buffers yourself, and request for new buffers when you need to. Between two calls to pf_do_work, the position in the buffer is remembered in p_input-&gt;p_first_byte_to_mix (it isn't always the start of the buffer, since input and output buffers can be of different length). It is your job to set this pointer at the end of pf_do_work.
+    </para>
+
+    <para>
+For more details, please have a look at the float32 mixer. It's much more understandable than lines of documentation.
+    </para>
+
   </sect1>
-  -->
 
 </chapter>
