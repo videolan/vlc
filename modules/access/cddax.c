@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: cddax.c,v 1.6 2003/11/24 00:41:19 rocky Exp $
+ * $Id: cddax.c,v 1.7 2003/11/24 03:28:27 rocky Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -30,12 +30,14 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
+#include <vlc/intf.h>
 #include <vlc/input.h>
 #include <sys/types.h>
 #include <cdio/cdio.h>
 #include <cdio/cd_types.h>
 
 #include "codecs.h"
+#include "vlc_keys.h"
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
@@ -61,6 +63,7 @@ typedef struct cdda_data_s
     lsn_t *     p_sectors;                                  /* Track sectors */
     vlc_bool_t  b_end_of_track;           /* If the end of track was reached */
     int         i_debug;                  /* Debugging mask */
+    intf_thread_t *p_intf;
 
 } cdda_data_t;
 
@@ -74,21 +77,23 @@ struct demux_sys_t
  * Debugging 
  *****************************************************************************/
 #define INPUT_DBG_MRL         1 
-#define INPUT_DBG_EXT         2 /* Calls from external routines */
-#define INPUT_DBG_CALL        4 /* all calls */
-#define INPUT_DBG_LSN         8 /* LSN changes */
-#define INPUT_DBG_CDIO       16 /* Debugging from CDIO */
-#define INPUT_DBG_SEEK       32 /* Seeks to set location */
+#define INPUT_DBG_EVENT       2 /* Trace keyboard events */
+#define INPUT_DBG_EXT         4 /* Calls from external routines */
+#define INPUT_DBG_CALL        8 /* all calls */
+#define INPUT_DBG_LSN        16 /* LSN changes */
+#define INPUT_DBG_CDIO       32 /* Debugging from CDIO */
+#define INPUT_DBG_SEEK       64 /* Seeks to set location */
 
 #define DEBUG_TEXT N_("set debug mask for additional debugging.")
 #define DEBUG_LONGTEXT N_( \
     "This integer when viewed in binary is a debugging mask\n" \
     "MRL             1\n" \
-    "external call   2\n" \
-    "all calls       4\n" \
-    "LSN             8\n" \
-    "libcdio  (10)  16\n" \
-    "seeks    (20)  32\n" )
+    "events          2\n" \
+    "external call   4\n" \
+    "all calls       8\n" \
+    "LSN      (10)  16\n" \
+    "libcdio  (20)  32\n" \
+    "seeks    (40)  64\n" )
 
 #define DEV_TEXT N_("CD-ROM device name")
 #define DEV_LONGTEXT N_( \
@@ -105,6 +110,19 @@ struct demux_sys_t
 #endif
 
 /*****************************************************************************
+ * intf_sys_t: description and status of interface
+ *****************************************************************************/
+struct intf_sys_t
+{
+    input_thread_t    * p_input;
+    cdda_data_t       * p_cdda;
+    vlc_bool_t          b_click, b_move, b_key_pressed;
+};
+
+/* FIXME: This variable is a hack. Would be nice to eliminate. */
+static input_thread_t *p_cdda_input = NULL;
+
+/*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  CDDAOpen         ( vlc_object_t * );
@@ -112,18 +130,24 @@ static void CDDAClose        ( vlc_object_t * );
 static int  CDDARead         ( input_thread_t *, byte_t *, size_t );
 static void CDDASeek         ( input_thread_t *, off_t );
 static int  CDDASetArea      ( input_thread_t *, input_area_t * );
+static int  CDDAPlay         ( input_thread_t *, int );
 static int  CDDASetProgram   ( input_thread_t *, pgrm_descriptor_t * );
 
 static int  CDDAOpenDemux    ( vlc_object_t * );
 static void CDDACloseDemux   ( vlc_object_t * );
 static int  CDDADemux        ( input_thread_t * p_input );
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
+static int  CDDAOpenIntf     ( vlc_object_t * );
+static void CDDACloseIntf    ( vlc_object_t * );
 
-/* FIXME: This variable is a hack. Would be nice to eliminate. */
-static input_thread_t *p_cdda_input = NULL;
+
+static int  InitThread     ( intf_thread_t *p_intf );
+static int  MouseEvent     ( vlc_object_t *, char const *,
+                             vlc_value_t, vlc_value_t, void * );
+static int  KeyEvent       ( vlc_object_t *, char const *,
+                             vlc_value_t, vlc_value_t, void * );
+
+static void RunIntf          ( intf_thread_t *p_intf );
 
 static int debug_callback   ( vlc_object_t *p_this, const char *psz_name,
 			      vlc_value_t oldval, vlc_value_t val, 
@@ -156,6 +180,11 @@ vlc_module_begin();
         set_capability( "demux", 0 );
         set_callbacks( CDDAOpenDemux, CDDACloseDemux );
         add_shortcut( "cdda" );
+
+    add_submodule();
+        set_capability( "interface", 0 );
+        set_callbacks( E_(CDDAOpenIntf), E_(CDDACloseIntf) );
+
 vlc_module_end();
 
 /****************************************************************************
@@ -218,7 +247,6 @@ static int CDDAOpen( vlc_object_t *p_this )
     char *                  psz_source;
     cdda_data_t *           p_cdda;
     int                     i;
-    input_area_t *          p_area;
     int                     i_title = 1;
     cddev_t                 *p_cddev;
 
@@ -345,9 +373,7 @@ static int CDDAOpen( vlc_object_t *p_this )
     }
 #undef area
 
-    p_area = p_input->stream.pp_areas[i_title];
-
-    CDDASetArea( p_input, p_area );
+    CDDAPlay( p_input, i_title);
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
@@ -365,13 +391,32 @@ static int CDDAOpen( vlc_object_t *p_this )
     p_input->i_pts_delay = config_GetInt( p_input, 
 					  MODULE_STRING "-caching" ) * 1000;
 
+    p_cdda->p_intf = intf_Create( p_input, "cddax" );
+    intf_RunThread( p_cdda->p_intf );
+
     return 0;
+}
+
+/*****************************************************************************
+ * CDDAPlay: Arrange things play track
+ *****************************************************************************/
+static vlc_bool_t
+CDDAPlay( input_thread_t *p_input, int i_track )
+{
+  cdda_data_t *p_cdda = (cdda_data_t *) p_input->p_access_data;
+
+  if( i_track >= p_cdda->i_nb_tracks || i_track < 1 )
+    return VLC_FALSE;
+
+  CDDASetArea( p_input, p_input->stream.pp_areas[i_track] );
+  return VLC_TRUE;
 }
 
 /*****************************************************************************
  * CDDAClose: closes cdda
  *****************************************************************************/
-static void CDDAClose( vlc_object_t *p_this )
+static void 
+CDDAClose( vlc_object_t *p_this )
 {
     input_thread_t *   p_input = (input_thread_t *)p_this;
     cdda_data_t *p_cdda = (cdda_data_t *)p_input->p_access_data;
@@ -643,4 +688,283 @@ static int  CDDADemux( input_thread_t * p_input )
     p_demux->i_pts += ((mtime_t)90000) * i_read
                       / (mtime_t)44100 / 4 /* stereo 16 bits */;
     return 1;
+}
+
+
+/*****************************************************************************
+ * OpenIntf: initialize dummy interface
+ *****************************************************************************/
+int CDDAOpenIntf ( vlc_object_t *p_this )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
+    /* Allocate instance and initialize some members */
+    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    if( p_intf->p_sys == NULL )
+    {
+        return( 1 );
+    };
+
+    p_intf->pf_run = RunIntf;
+
+    var_AddCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * CloseIntf: destroy dummy interface
+ *****************************************************************************/
+void CDDACloseIntf ( vlc_object_t *p_this )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
+    /* Destroy structure */
+    free( p_intf->p_sys );
+}
+
+
+/*****************************************************************************
+ * RunIntf: main loop
+ *****************************************************************************/
+static void RunIntf( intf_thread_t *p_intf )
+{
+    vlc_object_t      * p_vout = NULL;
+    cdda_data_t       * p_cdda;
+    input_thread_t    * p_input;
+    
+    /* What you add to the last input number entry. It accumulates all of
+       the 10_ADD keypresses */
+    int number_addend = 0; 
+    
+    if( InitThread( p_intf ) < 0 )
+    {
+        msg_Err( p_intf, "can't initialize intf" );
+        return;
+    }
+
+    p_input = p_intf->p_sys->p_input;
+    p_cdda   = p_intf->p_sys->p_cdda = 
+      (cdda_data_t *) p_input->p_access_data;
+
+    dbg_print( INPUT_DBG_CALL, "intf initialized" );
+
+    /* Main loop */
+    while( !p_intf->b_die )
+    {
+      vlc_mutex_lock( &p_intf->change_lock );
+
+      /*
+       * keyboard event
+       */
+      if( p_vout && p_intf->p_sys->b_key_pressed )
+        {
+	  vlc_value_t val;
+	  int i, i_action = -1;
+	  struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
+
+	  p_intf->p_sys->b_key_pressed = VLC_FALSE;
+          
+	  /* Find action triggered by hotkey (if any) */
+	  var_Get( p_intf->p_vlc, "key-pressed", &val );
+
+	  dbg_print( INPUT_DBG_EVENT, "Key pressed %d", val.i_int );
+
+	  for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+            {
+	      if( p_hotkeys[i].i_key == val.i_int )
+                {
+		  i_action = p_hotkeys[i].i_action;
+                }
+            }
+	  
+	  if( i_action != -1) {
+	    switch (i_action) {
+	      
+	    case ACTIONID_NAV_LEFT: 
+	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_LEFT (%d)", 
+			 number_addend );
+	      do {
+		if ( CDDAPlay( p_input, p_cdda->i_track-1 ) ) {
+		  p_cdda->i_track--;
+		} else {
+		  break;
+		}
+	      }	while (number_addend-- > 0);
+	      break;
+
+	    case ACTIONID_NAV_RIGHT:
+	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_RIGHT (%d)",
+			 number_addend );
+	      do {
+		if ( CDDAPlay( p_input, p_cdda->i_track+1 ) ) {
+		  p_cdda->i_track++;
+		} else {
+		  break;
+		}
+	      } while (number_addend-- > 0);
+	      break;
+
+	    case ACTIONID_NAV_UP:
+	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_UP" );
+	      do {
+		;
+	      } while (number_addend-- > 0);
+	      break;
+
+	    case ACTIONID_NAV_DOWN:
+	      dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_DOWN"  );
+	      break;
+
+	    case ACTIONID_NAV_ACTIVATE: 
+	      {
+		dbg_print( INPUT_DBG_EVENT, "ACTIONID_NAV_ACTIVATE" );
+		if ( CDDAPlay( p_input, number_addend ) ) {
+		  p_cdda->i_track = number_addend;
+		} else {
+		  break;
+		}
+		break;
+	      }
+	    }
+	    number_addend = 0;
+	  } else {
+	    unsigned int digit_entered=0;
+
+	    switch (val.i_int) {
+	    case '9':
+	      digit_entered++;
+	    case '8':
+	      digit_entered++;
+	    case '7':
+	      digit_entered++;
+	    case '6':
+	      digit_entered++;
+	    case '5':
+	      digit_entered++;
+	    case '4':
+	      digit_entered++;
+	    case '3':
+	      digit_entered++;
+	    case '2':
+	      digit_entered++;
+	    case '1':
+	      digit_entered++;
+	    case '0':
+	      {
+		number_addend *= 10;
+		number_addend += digit_entered;
+		dbg_print( INPUT_DBG_EVENT, 
+			   "Added %d. Number is now: %d\n", 
+			   digit_entered, number_addend);
+		break;
+	      }
+	    }
+	  }
+        }
+
+      
+      vlc_mutex_unlock( &p_intf->change_lock );
+      
+      if( p_vout == NULL )
+        {
+	  p_vout = vlc_object_find( p_intf->p_sys->p_input,
+				    VLC_OBJECT_VOUT, FIND_ANYWHERE );
+	  if( p_vout )
+            {
+	      var_AddCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
+	      var_AddCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+	      var_AddCallback( p_vout, "key-pressed", KeyEvent, p_intf );
+            }
+        }
+      
+      
+      /* Wait a bit */
+      msleep( INTF_IDLE_SLEEP );
+    }
+
+    if( p_vout )
+    {
+        var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
+        var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+        vlc_object_release( p_vout );
+    }
+
+    vlc_object_release( p_intf->p_sys->p_input );
+}
+
+/*****************************************************************************
+ * InitThread:
+ *****************************************************************************/
+static int InitThread( intf_thread_t * p_intf )
+{
+    /* We might need some locking here */
+    if( !p_intf->b_die )
+    {
+        input_thread_t * p_input;
+
+        p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_PARENT );
+
+        /* Maybe the input just died */
+        if( p_input == NULL )
+        {
+            return VLC_EGENERIC;
+        }
+
+        vlc_mutex_lock( &p_intf->change_lock );
+
+        p_intf->p_sys->p_input = p_input;
+
+        p_intf->p_sys->b_move = VLC_FALSE;
+        p_intf->p_sys->b_click = VLC_FALSE;
+        p_intf->p_sys->b_key_pressed = VLC_FALSE;
+
+        vlc_mutex_unlock( &p_intf->change_lock );
+
+        return VLC_SUCCESS;
+    }
+    else
+    {
+        return VLC_EGENERIC;
+    }
+}
+
+/*****************************************************************************
+ * MouseEvent: callback for mouse events
+ *****************************************************************************/
+static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_data;
+
+    vlc_mutex_lock( &p_intf->change_lock );
+
+    if( psz_var[6] == 'c' ) /* "mouse-clicked" */
+    {
+        p_intf->p_sys->b_click = VLC_TRUE;
+    }
+    else if( psz_var[6] == 'm' ) /* "mouse-moved" */
+    {
+        p_intf->p_sys->b_move = VLC_TRUE;
+    }
+
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * KeyEvent: callback for keyboard events
+ *****************************************************************************/
+static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_data;
+    vlc_mutex_lock( &p_intf->change_lock );
+
+    p_intf->p_sys->b_key_pressed = VLC_TRUE;
+    
+    vlc_mutex_unlock( &p_intf->change_lock );
+
+    return VLC_SUCCESS;
 }
