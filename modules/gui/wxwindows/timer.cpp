@@ -81,6 +81,11 @@ Timer::~Timer()
         var_DelCallback( p_playlist, "intf-show", IntfShowCB, p_intf );
         vlc_object_release( p_playlist );
     }
+
+    vlc_mutex_lock( &p_intf->change_lock );
+    if( p_intf->p_sys->p_input ) vlc_object_release( p_intf->p_sys->p_input );
+    p_intf->p_sys->p_input = NULL;
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 /*****************************************************************************
