@@ -538,7 +538,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     VLC_VariableSet( p_plugin->i_vlc, "drawablet", valuet );
     VLC_VariableSet( p_plugin->i_vlc, "drawablel", valuel );
     VLC_VariableSet( p_plugin->i_vlc, "drawableb", valueb );
-    VLC_VarialbeSet( p_plugin->i_vlc, "drawabler", valuer );
+    VLC_VariableSet( p_plugin->i_vlc, "drawabler", valuer );
     VLC_VariableSet( p_plugin->i_vlc, "drawablex", valuex );
     VLC_VariableSet( p_plugin->i_vlc, "drawabley", valuey );
     VLC_VariableSet( p_plugin->i_vlc, "drawablew", valuew );
