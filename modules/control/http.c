@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.53 2004/02/09 23:30:37 garf Exp $
+ * $Id: http.c,v 1.54 2004/03/03 13:26:50 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -40,7 +40,7 @@
 #include <vlc/aout.h>
 #include <vlc/vout.h> /* for fullscreen */
 
-#include "httpd.h"
+#include "vlc_httpd.h"
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
@@ -114,10 +114,10 @@ static int DirectoryCheck( char *psz_dir )
     return VLC_SUCCESS;
 }
 
-
-static int  http_get( httpd_file_callback_args_t *p_args,
-                      uint8_t *p_request, int i_request,
-                      uint8_t **pp_data, int *pi_data );
+static int  HttpCallback( httpd_file_sys_t *p_args,
+                          httpd_file_t *,
+                          uint8_t *p_request,
+                          uint8_t **pp_data, int *pi_data );
 
 static char *uri_extract_value( char *psz_uri, char *psz_name,
                                 char *psz_value, int i_value_max );
@@ -146,27 +146,28 @@ typedef struct
     int  i_stack;
 } rpn_stack_t;
 
-struct httpd_file_callback_args_t
+struct httpd_file_sys_t
 {
-    intf_thread_t *p_intf;
-    httpd_file_t  *p_file;
+    intf_thread_t    *p_intf;
+    httpd_file_t     *p_file;
+    httpd_redirect_t *p_redir;
 
     char          *file;
     char          *name;
-    char          *mime;
+
+    vlc_bool_t    b_html;
 
     /* inited for each access */
-    rpn_stack_t       stack;
+    rpn_stack_t   stack;
     mvar_t        *vars;
 };
 
 struct intf_sys_t
 {
-    httpd_t             *p_httpd;
     httpd_host_t        *p_httpd_host;
 
-    int                         i_files;
-    httpd_file_callback_args_t  **pp_files;
+    int                 i_files;
+    httpd_file_sys_t    **pp_files;
 
     playlist_t          *p_playlist;
     input_thread_t      *p_input;
@@ -213,19 +214,10 @@ static int Activate( vlc_object_t *p_this )
     p_sys->p_playlist = NULL;
     p_sys->p_input    = NULL;
 
-    if( ( p_sys->p_httpd = httpd_Find( VLC_OBJECT(p_intf), VLC_TRUE ) ) == NULL )
-    {
-        msg_Err( p_intf, "cannot create/find httpd" );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-
-    if( ( p_sys->p_httpd_host =
-                p_sys->p_httpd->pf_register_host( p_sys->p_httpd,
-                                                  psz_address, i_port ) ) == NULL )
+    p_sys->p_httpd_host = httpd_HostNew( VLC_OBJECT(p_intf), psz_address, i_port );
+    if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_intf, "cannot listen on %s:%d", psz_address, i_port );
-        httpd_Release( p_sys->p_httpd );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -235,12 +227,8 @@ static int Activate( vlc_object_t *p_this )
         free( psz_host );
     }
 
-    p_sys->i_files = 0;
-    p_sys->pp_files = malloc( sizeof( httpd_file_callback_args_t *) );
-    if( !p_sys->pp_files )
-    {
-        return( VLC_ENOMEM );
-    }
+    p_sys->i_files  = 0;
+    p_sys->pp_files = NULL;
 
 #if defined(SYS_DARWIN) || defined(SYS_BEOS) || \
         ( defined(WIN32) && !defined(UNDER_CE ) )
@@ -250,7 +238,7 @@ static int Activate( vlc_object_t *p_this )
         psz_src = malloc( strlen(psz_vlcpath) + strlen("/share/http" ) + 1 );
         if( !psz_src )
         {
-            return( VLC_ENOMEM );
+            return VLC_ENOMEM;
         }
 #if defined(WIN32)
         sprintf( psz_src, "%s/http", psz_vlcpath);
@@ -302,10 +290,11 @@ static int Activate( vlc_object_t *p_this )
 
 failed:
     if( psz_src ) free( psz_src );
-    free( p_sys->pp_files );
-    p_sys->p_httpd->pf_unregister_host( p_sys->p_httpd,
-                                        p_sys->p_httpd_host );
-    httpd_Release( p_sys->p_httpd );
+    if( p_sys->pp_files )
+    {
+        free( p_sys->pp_files );
+    }
+    httpd_HostDelete( p_sys->p_httpd_host );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -322,17 +311,22 @@ void Close ( vlc_object_t *p_this )
 
     for( i = 0; i < p_sys->i_files; i++ )
     {
-       p_sys->p_httpd->pf_unregister_file( p_sys->p_httpd,
-                                           p_sys->pp_files[i]->p_file );
-       /* do not free mime */
+       httpd_FileDelete( p_sys->pp_files[i]->p_file );
+       if( p_sys->pp_files[i]->p_redir )
+       {
+           httpd_RedirectDelete( p_sys->pp_files[i]->p_redir );
+       }
+
        free( p_sys->pp_files[i]->file );
        free( p_sys->pp_files[i]->name );
        free( p_sys->pp_files[i] );
     }
-    free( p_sys->pp_files );
-    p_sys->p_httpd->pf_unregister_host( p_sys->p_httpd,
-                                        p_sys->p_httpd_host );
-    httpd_Release( p_sys->p_httpd );
+    if( p_sys->pp_files )
+    {
+        free( p_sys->pp_files );
+    }
+    httpd_HostDelete( p_sys->p_httpd_host );
+
     free( p_sys );
 }
 
@@ -443,63 +437,6 @@ static char *FileToUrl( char *name )
 }
 
 /****************************************************************************
- * FileToMime: XXX duplicated with modules/access_out/http.c
- ****************************************************************************/
-static struct
-{
-    char *psz_ext;
-    char *psz_mime;
-} http_mime[] =
-{
-    { ".htm",   "text/html" },
-    { ".html",  "text/html" },
-
-    { ".css",   "text/css" },
-
-    /* media mime */
-    { ".avi",   "video/avi" },
-    { ".asf",   "video/x-ms-asf" },
-    { ".m1a",   "audio/mpeg" },
-    { ".m2a",   "audio/mpeg" },
-    { ".m1v",   "video/mpeg" },
-    { ".m2v",   "video/mpeg" },
-    { ".mp2",   "audio/mpeg" },
-    { ".mp3",   "audio/mpeg" },
-    { ".mpa",   "audio/mpeg" },
-    { ".mpg",   "video/mpeg" },
-    { ".mpeg",  "video/mpeg" },
-    { ".mpe",   "video/mpeg" },
-    { ".mov",   "video/quicktime" },
-    { ".moov",  "video/quicktime" },
-    { ".ogg",   "application/ogg" },
-    { ".ogm",   "application/ogg" },
-    { ".wav",   "audio/wav" },
-
-    /* end */
-    { NULL,     NULL }
-};
-
-static char *FileToMime( char *psz_name )
-{
-    char *psz_ext;
-
-    psz_ext = strrchr( psz_name, '.' );
-    if( psz_ext )
-    {
-        int i;
-
-        for( i = 0; http_mime[i].psz_ext != NULL ; i++ )
-        {
-            if( !strcmp( http_mime[i].psz_ext, psz_ext ) )
-            {
-                return( http_mime[i].psz_mime );
-            }
-        }
-    }
-    return( "application/octet-stream" );
-}
-
-/****************************************************************************
  * ParseDirectory: parse recursively a directory, adding each file
  ****************************************************************************/
 static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
@@ -581,78 +518,44 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
         sprintf( dir, "%s/%s", psz_dir, p_dir_content->d_name );
         if( ParseDirectory( p_intf, psz_root, dir ) )
         {
-#define f p_sys->pp_files[p_sys->i_files]
-            f = malloc( sizeof( httpd_file_callback_args_t ) );
-            if( !f )
-            {
-                msg_Err( p_intf, "out of memory" );
-                closedir( p_dir );
-                return( VLC_ENOMEM );
-            }
+            httpd_file_sys_t *f = malloc( sizeof( httpd_file_sys_t ) );
+
             f->p_intf  = p_intf;
+            f->p_file = NULL;
+            f->p_redir = NULL;
             f->file = strdup( dir );
             f->name = FileToUrl( &dir[strlen( psz_root )] );
-            f->mime = FileToMime( &dir[strlen( psz_root )] );
+            f->b_html = strstr( &dir[strlen( psz_root )], ".htm" ) ? VLC_TRUE : VLC_FALSE;
 
-            if( !f->name || !f->mime )
+            if( !f->name )
             {
                 msg_Err( p_intf , "unable to parse directory" );
                 closedir( p_dir );
                 free( f );
                 return( VLC_ENOMEM );
             }
-            msg_Dbg( p_intf, "file=%s (url=%s mime=%s)",
-                     f->file, f->name, f->mime );
+            msg_Dbg( p_intf, "file=%s (url=%s)",
+                     f->file, f->name );
 
-            f->p_file =
-                p_sys->p_httpd->pf_register_file( p_sys->p_httpd,
-                                                  f->name, f->mime,
-                                                  user, password,
-                                                  http_get, http_get,
-                                                  f );
+            f->p_file = httpd_FileNew( p_sys->p_httpd_host,
+                                       f->name, f->b_html ? "text/html" : NULL,
+                                       user, password,
+                                       HttpCallback, f );
+
             if( f->p_file )
             {
-                p_sys->i_files++;
-                p_sys->pp_files = realloc( p_sys->pp_files,
-                  (p_sys->i_files+1) * sizeof( httpd_file_callback_args_t ) );
+                TAB_APPEND( p_sys->i_files, p_sys->pp_files, f );
             }
-#define fold p_sys->pp_files[p_sys->i_files-1]
-
-            /* FIXME for rep/ add rep (it would be better to do a redirection) */
-            if( p_sys->i_files && strlen(fold->name) > 1 &&
-                fold->name[strlen(fold->name) - 1] == '/' )
+            /* For rep/ add a redir from rep to rep/ */
+            if( f && f->name[strlen(f->name) - 1] == '/' )
             {
-                f = malloc( sizeof( httpd_file_callback_args_t ) );
-                if( !f )
-                {
-                    msg_Err( p_intf, "out of memory" );
-                    closedir( p_dir );
-                    return( VLC_ENOMEM );
-                }
-                f->p_intf  = p_intf;
-                f->file = strdup( fold->file );
-                f->name = strdup( fold->name );
-                f->mime = fold->mime;
+                char *psz_redir = strdup( f->name );
+                psz_redir[strlen( psz_redir ) - 1] = '\0';
 
-                f->name[strlen(f->name) - 1] = '\0';
-                msg_Dbg( p_intf, "file=%s (url=%s mime=%s)", f->file, f->name,
-                         f->mime );
-                f->p_file =
-                    p_sys->p_httpd->pf_register_file( p_sys->p_httpd,
-                                                      f->name, f->mime,
-                                                      user, password,
-                                                      http_get, http_get,
-                                                      f );
-                if( f->p_file )
-                {
-                    p_sys->i_files++;
-                    p_sys->pp_files =
-                        realloc( p_sys->pp_files, (p_sys->i_files+1) *
-                                 sizeof( httpd_file_callback_args_t ) );
-                }
+                msg_Dbg( p_intf, "redir=%s -> %s", psz_redir, f->name );
+                f->p_redir = httpd_RedirectNew( p_sys->p_httpd_host, f->name, psz_redir );
+                free( psz_redir );
             }
-#undef fold
-#undef f
         }
     }
 
@@ -991,7 +894,7 @@ static mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
 
     return s;
 }
-
+#if 0
 static mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
 {
     mvar_t       *s = mvar_New( name, "set" );
@@ -1032,6 +935,8 @@ static mvar_t *mvar_HttpdInfoSetNew( char *name, httpd_t *p_httpd, int i_type )
 
     return s;
 }
+#endif
+
 static mvar_t *mvar_FileSetNew( char *name, char *psz_dir )
 {
     mvar_t *s = mvar_New( name, "set" );
@@ -1431,7 +1336,7 @@ static int StrToMacroType( char *name )
     return MVLC_UNKNOWN;
 }
 
-static void MacroDo( httpd_file_callback_args_t *p_args,
+static void MacroDo( httpd_file_sys_t *p_args,
                      macro_t *m,
                      uint8_t *p_request, int i_request,
                      uint8_t **pp_data,  int *pi_data,
@@ -1902,10 +1807,12 @@ static void MacroDo( httpd_file_callback_args_t *p_args,
                     char id[512];
                     uri_extract_value( p_request, "id", id, 512 );
                     msg_Dbg( p_intf, "requested close id=%s", id );
+#if 0
                     if( p_sys->p_httpd->pf_control( p_sys->p_httpd, HTTPD_SET_CLOSE, id, NULL ) )
                     {
                         msg_Warn( p_intf, "close failed for id=%s", id );
                     }
+#endif
                     break;
                 }
                 case MVLC_SHUTDOWN:
@@ -2073,7 +1980,7 @@ static uint8_t *MacroSearch( uint8_t *src, uint8_t *end, int i_mvlc, vlc_bool_t 
     return NULL;
 }
 
-static void Execute( httpd_file_callback_args_t *p_args,
+static void Execute( httpd_file_sys_t *p_args,
                      uint8_t *p_request, int i_request,
                      uint8_t **pp_data, int *pi_data,
                      uint8_t **pp_dst,
@@ -2183,6 +2090,7 @@ static void Execute( httpd_file_callback_args_t *p_args,
                         {
                             index = mvar_InfoSetNew( m.param1, p_intf->p_sys->p_input );
                         }
+#if 0
                         else if( !strcmp( m.param2, "hosts" ) )
                         {
                             index = mvar_HttpdInfoSetNew( m.param1, p_intf->p_sys->p_httpd, HTTPD_GET_HOSTS );
@@ -2195,6 +2103,7 @@ static void Execute( httpd_file_callback_args_t *p_args,
                         {
                             index = mvar_HttpdInfoSetNew(m.param1, p_intf->p_sys->p_httpd, HTTPD_GET_CONNECTIONS);
                         }
+#endif
                         else if( ( v = mvar_GetVar( p_args->vars, m.param2 ) ) )
                         {
                             index = mvar_Duplicate( v );
@@ -2257,17 +2166,19 @@ static void Execute( httpd_file_callback_args_t *p_args,
 }
 
 /****************************************************************************
- * http_get:
+ * HttpCallback:
  ****************************************************************************
- * a file with mime == text/html is parsed and all "macro" replaced
+ * a file with b_html is parsed and all "macro" replaced
  * <vlc id="macro name" [param1="" [param2=""]] />
  * valid id are
  *
  ****************************************************************************/
-static int  http_get( httpd_file_callback_args_t *p_args,
-                      uint8_t *p_request, int i_request,
-                      uint8_t **pp_data, int *pi_data )
+static int  HttpCallback( httpd_file_sys_t *p_args,
+                          httpd_file_t *p_file,
+                          uint8_t *p_request,
+                          uint8_t **pp_data, int *pi_data )
 {
+    int i_request = p_request ? strlen( p_request ) : 0;
     char *p;
     FILE *f;
 
@@ -2294,7 +2205,7 @@ static int  http_get( httpd_file_callback_args_t *p_args,
         return VLC_SUCCESS;
     }
 
-    if( strcmp( p_args->mime, "text/html" ) )
+    if( !p_args->b_html )
     {
         FileLoad( f, pp_data, pi_data );
     }
