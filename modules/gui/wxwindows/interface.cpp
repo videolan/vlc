@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004, 2003 VideoLAN
- * $Id: interface.cpp,v 1.85 2004/01/25 03:29:01 hartman Exp $
+ * $Id: interface.cpp,v 1.86 2004/01/25 18:18:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -400,33 +400,33 @@ void Interface::CreateOurToolBar()
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
-    toolbar->AddTool( OpenFileSimple_Event, wxU(_("Quick Open File...")),
+    toolbar->AddTool( OpenFileSimple_Event, wxT(""),
                       wxBitmap( file_xpm ), wxU(_(HELP_SIMPLE)) );
 
     toolbar->AddSeparator();
-    toolbar->AddTool( OpenFile_Event, wxU(_("Open File...")), wxBitmap( file_xpm ),
+    toolbar->AddTool( OpenFile_Event, wxT(""), wxBitmap( file_xpm ),
                       wxU(_(HELP_FILE)) );
-    toolbar->AddTool( OpenDisc_Event, wxU(_("Open Disc...")), wxBitmap( disc_xpm ),
+    toolbar->AddTool( OpenDisc_Event, wxT(""), wxBitmap( disc_xpm ),
                       wxU(_(HELP_DISC)) );
-    toolbar->AddTool( OpenNet_Event, wxU(_("Open Network Stream...")), wxBitmap( net_xpm ),
+    toolbar->AddTool( OpenNet_Event, wxT(""), wxBitmap( net_xpm ),
                       wxU(_(HELP_NET)) );
     toolbar->AddSeparator();
 
-    toolbar->AddTool( StopStream_Event, wxU(_("Stop")), wxBitmap( stop_xpm ),
+    toolbar->AddTool( StopStream_Event, wxT(""), wxBitmap( stop_xpm ),
                       wxU(_(HELP_STOP)) );
-    toolbar->AddTool( PlayStream_Event, wxU(_("Play")), wxBitmap( play_xpm ),
+    toolbar->AddTool( PlayStream_Event, wxT(""), wxBitmap( play_xpm ),
                       wxU(_(HELP_PLAY)) );
 
     toolbar->AddSeparator();
-    toolbar->AddTool( Playlist_Event, wxU(_("Playlist")),
+    toolbar->AddTool( Playlist_Event, wxT(""),
                       wxBitmap( playlist_xpm ), wxU(_(HELP_PLO)) );
-    toolbar->AddTool( PrevStream_Event, wxU(_("Previous")),
+    toolbar->AddTool( PrevStream_Event, wxT(""),
                       wxBitmap( previous_xpm ), wxU(_(HELP_PLP)) );
-    toolbar->AddTool( NextStream_Event, wxU(_("Next")), wxBitmap( next_xpm ),
+    toolbar->AddTool( NextStream_Event, wxT(""), wxBitmap( next_xpm ),
                       wxU(_(HELP_PLN)) );
-    toolbar->AddTool( SlowStream_Event, wxU(_("Slower")), wxBitmap( slow_xpm ),
+    toolbar->AddTool( SlowStream_Event, wxT(""), wxBitmap( slow_xpm ),
                       wxU(_(HELP_SLOW)) );
-    toolbar->AddTool( FastStream_Event, wxU(_("Faster")), wxBitmap( fast_xpm ),
+    toolbar->AddTool( FastStream_Event, wxT(""), wxBitmap( fast_xpm ),
                       wxU(_(HELP_FAST)) );
 
     toolbar->Realize();
@@ -488,7 +488,6 @@ void Interface::CreateOurSlider()
 void Interface::CreateOurExtraPanel()
 {
     char *psz_filters;
-    vlc_value_t val;
 
     extra_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
     extra_frame->SetAutoLayout( TRUE );
