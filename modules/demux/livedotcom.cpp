@@ -42,6 +42,19 @@
 
 using namespace std;
 
+
+# ifdef __cplusplus
+extern "C" {
+#endif
+
+stream_t *__stream_DemuxNew( vlc_object_t *p_obj, char *psz_demux, es_out_t *out );
+void     stream_DemuxSend( stream_t *s, block_t *p_block );
+void     stream_DemuxDelete( stream_t *s );
+
+# ifdef __cplusplus
+}
+# endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -100,9 +113,12 @@ typedef struct
     input_thread_t *p_input;
 
     vlc_bool_t   b_quicktime;
+    vlc_bool_t   b_muxed;
 
     es_format_t  fmt;
     es_out_id_t  *p_es;
+
+    stream_t     *p_out_muxed;    /* for muxed stream */
 
     RTPSource    *rtpSource;
     FramedSource *readSource;
@@ -501,7 +517,10 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         tk->waiting = 0;
         tk->i_pts   = 0;
         tk->b_quicktime = VLC_FALSE;
+        tk->b_muxed     = VLC_FALSE;
         tk->b_rtcp_sync = VLC_FALSE;
+        tk->p_out_muxed = NULL;
+        tk->p_es        = NULL;
 
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
@@ -610,18 +629,24 @@ static int  DemuxOpen ( vlc_object_t *p_this )
             {
                 tk->b_quicktime = VLC_TRUE;
             }
+            else if( !strcmp( sub->codecName(), "MP2T" ) )
+            {
+                tk->b_muxed = VLC_TRUE;
+                tk->p_out_muxed = stream_DemuxNew( p_input, "ts2", p_input->p_es_out );
+            }
+            else if( !strcmp( sub->codecName(), "MP2P" ) || !strcmp( sub->codecName(), "MP1S" ) )   /* FIXME check MP1S */
+            {
+                tk->b_muxed = VLC_TRUE;
+                tk->p_out_muxed = stream_DemuxNew( p_input, "ps2", p_input->p_es_out );
+            }
         }
 
         if( tk->fmt.i_codec != VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
         {
             tk->p_es = es_out_Add( p_input->p_es_out, &tk->fmt );
         }
-        else
-        {
-            tk->p_es = NULL;
-        }
 
-        if( tk->p_es || tk->b_quicktime )
+        if( tk->p_es || tk->b_quicktime || tk->b_muxed )
         {
             TAB_APPEND( p_sys->i_track, p_sys->track, tk );
             tk->readSource = sub->readSource();
@@ -692,6 +717,11 @@ static void DemuxClose( vlc_object_t *p_this )
     for( i = 0; i < p_sys->i_track; i++ )
     {
         live_track_t *tk = p_sys->track[i];
+
+        if( tk->b_muxed )
+        {
+            stream_DemuxDelete( tk->p_out_muxed );
+        }
 
         free( tk );
     }
@@ -795,7 +825,7 @@ static int  Demux   ( input_thread_t *p_input )
     {
         live_track_t *tk = p_sys->track[i];
 
-        if( !tk->b_rtcp_sync && tk->rtpSource->hasBeenSynchronizedUsingRTCP() )
+        if( !tk->b_muxed && !tk->b_rtcp_sync && tk->rtpSource->hasBeenSynchronizedUsingRTCP() )
         {
             msg_Dbg( p_input, "tk->rtpSource->hasBeenSynchronizedUsingRTCP()" );
             p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_REINIT;
@@ -932,21 +962,23 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     memcpy( p_block->p_buffer, tk->buffer, i_size );
     //p_block->i_rate = p_input->stream.control.i_rate;
 
-    if( i_pts != tk->i_pts )
+    if( i_pts != tk->i_pts && !tk->b_muxed )
     {
         p_block->i_dts =
         p_block->i_pts = input_ClockGetTS( p_input,
                                          p_input->stream.p_selected_program,
                                          i_pts * 9 / 100 );
     }
-    else
-    {
-        p_block->i_dts = 0;
-        p_block->i_pts = 0;
-    }
     //fprintf( stderr, "tk -> dpts=%lld\n", i_pts - tk->i_pts );
 
-    es_out_Send( p_input->p_es_out, tk->p_es, p_block );
+    if( tk->b_muxed )
+    {
+        stream_DemuxSend( tk->p_out_muxed, p_block );
+    }
+    else
+    {
+        es_out_Send( p_input->p_es_out, tk->p_es, p_block );
+    }
 
     /* warm that's ok */
     p_sys->event = 0xff;
@@ -954,7 +986,7 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     /* we have read data */
     tk->waiting = 0;
 
-    if( i_pts > 0 )
+    if( i_pts > 0 && !tk->b_muxed )
     {
         tk->i_pts = i_pts;
     }
