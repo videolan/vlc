@@ -2,7 +2,7 @@
  * rawdv.c : raw dv input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rawdv.c,v 1.11 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: rawdv.c,v 1.12 2003/11/24 19:19:02 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -25,22 +25,30 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-#include <errno.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include <sys/types.h>
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
-#include <codecs.h>                        /* BITMAPINFOHEADER, WAVEFORMATEX */
+vlc_module_begin();
+    set_description( _("raw dv demuxer") );
+    set_capability( "demux", 2 );
+    set_callbacks( Open, Close );
+    add_shortcut( "rawdv" );
+vlc_module_end();
+
 
 /*****************************************************************************
  A little bit of background information (copied over from libdv glossary).
 
  - DIF block: A block of 80 bytes. This is the basic data framing unit of the
        DVC tape format, analogous to sectors of hard disc.
- 
+
  - Video Section: Each DIF sequence contains a video section, consisting of
        135 DIF blocks, which are further subdivided into Video Segments.
 
@@ -81,12 +89,11 @@ struct demux_sys_t
 {
     int    frame_size;
 
-    es_descriptor_t  *p_video_es;
-    es_descriptor_t  *p_audio_es;
+    es_out_id_t *p_es_video;
+    es_format_t  fmt_video;
 
-    /* codec specific stuff */
-    BITMAPINFOHEADER *p_bih;
-    WAVEFORMATEX *p_wf;
+    es_out_id_t *p_es_audio;
+    es_format_t  fmt_audio;
 
     double f_rate;
     int    i_bitrate;
@@ -98,29 +105,19 @@ struct demux_sys_t
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Activate  ( vlc_object_t * );
-static void Deactivate( vlc_object_t * );
 static int  Demux     ( input_thread_t * );
 
 /*****************************************************************************
- * Module descriptor
+ * Open: initializes raw dv demux structures
  *****************************************************************************/
-vlc_module_begin();
-    set_description( _("raw dv demuxer") );
-    set_capability( "demux", 2 );
-    set_callbacks( Activate, NULL );
-    add_shortcut( "rawdv" );
-vlc_module_end();
-
-/*****************************************************************************
- * Activate: initializes raw dv demux structures
- *****************************************************************************/
-static int Activate( vlc_object_t * p_this )
+static int Open( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
+    demux_sys_t    *p_sys;
+
     byte_t         *p_peek, *p_peek_backup;
+
     uint32_t       i_dword;
-    demux_sys_t    *p_rawdv;
     dv_header_t    dv_header;
     dv_id_t        dv_id;
     char           *psz_ext;
@@ -135,18 +132,14 @@ static int Activate( vlc_object_t * p_this )
     if( ( !psz_ext || strcasecmp( psz_ext, ".dv") )&&
         ( !p_input->psz_demux || strcmp(p_input->psz_demux, "rawdv") ) )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    p_input->pf_demux = Demux;
-    p_input->pf_demux_control = demux_vaControlDefault;
-
-    /* Have a peep at the show. */
-    if( input_Peek(p_input, &p_peek, DV_PAL_FRAME_SIZE) < DV_NTSC_FRAME_SIZE )
+    if( stream_Peek( p_input->s, &p_peek, DV_PAL_FRAME_SIZE ) < DV_NTSC_FRAME_SIZE )
     {
         /* Stream too short ... */
         msg_Err( p_input, "cannot peek()" );
-        return -1;
+        return VLC_EGENERIC;
     }
     p_peek_backup = p_peek;
 
@@ -164,7 +157,7 @@ static int Activate( vlc_object_t * p_this )
     if( dv_id.sct != 0 )
     {
         msg_Warn( p_input, "not a raw dv stream header" );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     /* fill in the dv_header_t structure */
@@ -173,7 +166,7 @@ static int Activate( vlc_object_t * p_this )
     if( i_dword >> (32 - 1) ) /* incorrect bit */
     {
         msg_Warn( p_input, "incorrect bit" );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     i_dword = GetDWBE( p_peek ); p_peek += 4;
@@ -195,45 +188,23 @@ static int Activate( vlc_object_t * p_this )
     p_peek += 72;                                  /* skip rest of DIF block */
 
 
-    /* Setup the structures for our demuxer */
-    if( !( p_rawdv = malloc( sizeof( demux_sys_t ) ) ) )
-    {
-        msg_Err( p_input, "out of memory" );
-        return -1;
-    }
-    memset( p_rawdv, 0, sizeof( demux_sys_t ) );
-    p_rawdv->p_bih = NULL;
-    p_rawdv->p_wf = NULL;
-    p_input->p_demux_data = p_rawdv;
+    /* Set p_input field */
+    p_input->pf_demux = Demux;
+    p_input->pf_demux_control = demux_vaControlDefault;
+    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
 
-    p_rawdv->p_bih = (BITMAPINFOHEADER *) malloc( sizeof(BITMAPINFOHEADER) );
-    if( !p_rawdv->p_bih )
-    {
-        msg_Err( p_input, "out of memory" );
-        goto error;
-    }
-    p_rawdv->p_bih->biSize = sizeof(BITMAPINFOHEADER);
-    p_rawdv->p_bih->biCompression = VLC_FOURCC( 'd','v','s','d' );
-    p_rawdv->p_bih->biSize = 40;
-    p_rawdv->p_bih->biWidth = 720;
-    p_rawdv->p_bih->biHeight = dv_header.dsf ? 576 : 480;
-    p_rawdv->p_bih->biPlanes = 1;
-    p_rawdv->p_bih->biBitCount = 24;
-    p_rawdv->p_bih->biSizeImage =
-        p_rawdv->p_bih->biWidth * p_rawdv->p_bih->biHeight
-          * (p_rawdv->p_bih->biBitCount >> 3);
+    p_sys->frame_size = dv_header.dsf ? 12 * 150 * 80 : 10 * 150 * 80;
+    p_sys->f_rate = dv_header.dsf ? 25 : 29.97;
 
-    /* Properties of our video */
-    if( dv_header.dsf )
-    {
-        p_rawdv->frame_size = 12 * 150 * 80;
-        p_rawdv->f_rate = 25;
-    }
-    else
-    {
-        p_rawdv->frame_size = 10 * 150 * 80;
-        p_rawdv->f_rate = 29.97;
-    }
+    p_sys->i_pcr = 0;
+    p_sys->p_es_video = NULL;
+    p_sys->p_es_audio = NULL;
+
+    p_sys->i_bitrate = 0;
+
+    es_format_Init( &p_sys->fmt_video, VIDEO_ES, VLC_FOURCC( 'd','v','s','d' ) );
+    p_sys->fmt_video.video.i_width = 720;
+    p_sys->fmt_video.video.i_height= dv_header.dsf ? 576 : 480;;
 
     /* Audio stuff */
 #if 0
@@ -245,87 +216,43 @@ static int Activate( vlc_object_t * p_this )
     }
 #endif
 
-    p_rawdv->p_wf = (WAVEFORMATEX *)malloc( sizeof(WAVEFORMATEX) );
-    if( !p_rawdv->p_wf )
-    {
-        msg_Err( p_input, "out of memory" );
-        goto error;
-    }
-
-    p_rawdv->p_wf->wFormatTag = 0;
-    p_rawdv->p_wf->nChannels = 2;
-    p_rawdv->p_wf->nSamplesPerSec = 44100; /* FIXME */
-    p_rawdv->p_wf->nAvgBytesPerSec = p_rawdv->f_rate * p_rawdv->frame_size;
-    p_rawdv->p_wf->nBlockAlign = p_rawdv->frame_size;
-    p_rawdv->p_wf->wBitsPerSample = 16;
-    p_rawdv->p_wf->cbSize = 0;
-
+    es_format_Init( &p_sys->fmt_audio, AUDIO_ES, VLC_FOURCC( 'd','v','a','u' ) );
+    p_sys->fmt_audio.audio.i_channels = 2;
+    p_sys->fmt_audio.audio.i_rate = 44100;  /* FIXME */
+    p_sys->fmt_audio.audio.i_bitspersample = 16;
+    p_sys->fmt_audio.audio.i_blockalign = p_sys->frame_size;    /* ??? */
+    p_sys->fmt_audio.i_bitrate = p_sys->f_rate * p_sys->frame_size; /* ??? */
 
     /* necessary because input_SplitBuffer() will only get
      * INPUT_DEFAULT_BUFSIZE bytes at a time. */
-    p_input->i_bufsize = p_rawdv->frame_size;
+    p_input->i_bufsize = p_sys->frame_size;
 
-    /* Create one program */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
-        goto error;
+        free( p_sys );
+        return VLC_EGENERIC;
     }
-    if( input_AddProgram( p_input, 0, 0) == NULL )
-    {
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-        msg_Err( p_input, "cannot add program" );
-        goto error;
-    }
-    p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    p_input->stream.i_mux_rate = p_rawdv->frame_size * p_rawdv->f_rate;
+    p_input->stream.i_mux_rate = p_sys->frame_size * p_sys->f_rate;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    /* Add video stream */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_rawdv->p_video_es = input_AddES( p_input,
-                                       p_input->stream.p_selected_program,
-                                       1, VIDEO_ES, NULL, 0 );
-    p_rawdv->p_video_es->i_stream_id = 0;
-    p_rawdv->p_video_es->i_fourcc = VLC_FOURCC( 'd','v','s','d' );
-    p_rawdv->p_video_es->p_bitmapinfoheader = (void *)p_rawdv->p_bih;
-    input_SelectES( p_input, p_rawdv->p_video_es );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    p_sys->p_es_video = es_out_Add( p_input->p_es_out, &p_sys->fmt_video );
+    p_sys->p_es_audio = es_out_Add( p_input->p_es_out, &p_sys->fmt_audio );
 
-    /* Add audio stream */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_rawdv->p_audio_es = input_AddES( p_input,
-                                       p_input->stream.p_selected_program,
-                                       2, AUDIO_ES, NULL, 0 );
-    p_rawdv->p_audio_es->i_stream_id = 1;
-    p_rawdv->p_audio_es->i_fourcc = VLC_FOURCC( 'd','v','a','u' );
-    p_rawdv->p_audio_es->p_waveformatex = (void *)p_rawdv->p_wf;
-    input_SelectES( p_input, p_rawdv->p_audio_es );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    /* Init pcr */
-    p_rawdv->i_pcr = 0;
-
-    return 0;
-
- error:
-    if( p_rawdv->p_bih ) free( p_rawdv->p_bih );
-    if( p_rawdv->p_wf ) free( p_rawdv->p_wf );
-    Deactivate( (vlc_object_t *)p_input );
-    return -1;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * Deactivate: frees unused data
+ * Close: frees unused data
  *****************************************************************************/
-static void Deactivate( vlc_object_t *p_this )
+static void Close( vlc_object_t *p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
-    demux_sys_t *p_rawdv = (demux_sys_t *)p_input->p_demux_data;
+    demux_sys_t    *p_sys = p_input->p_demux_data;
 
-    free( p_rawdv );
+    free( p_sys );
 }
 
 /*****************************************************************************
@@ -335,103 +262,75 @@ static void Deactivate( vlc_object_t *p_this )
  *****************************************************************************/
 static int Demux( input_thread_t * p_input )
 {
-    demux_sys_t    *p_rawdv = (demux_sys_t *)p_input->p_demux_data;
-    pes_packet_t   *p_pes = NULL;
-    pes_packet_t   *p_audio_pes = NULL;
-    data_packet_t  *p_data;
-    ssize_t        i_read;
+    demux_sys_t    *p_sys = p_input->p_demux_data;
+    block_t        *p_block;
+    vlc_bool_t     b_audio, b_video;
+
 
     if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
     {
-        off_t i_pos;
+        off_t i_pos = stream_Tell( p_input->s );
 
         msg_Warn( p_input, "synchro reinit" );
 
         /* If the user tried to seek in the stream, we need to make sure
          * the new position is at a DIF block boundary. */
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        i_pos= p_input->stream.p_selected_area->i_tell;
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-        if( (i_pos % p_rawdv->frame_size) &&
-            p_input->stream.b_seekable &&
-            p_input->stream.i_method == INPUT_METHOD_FILE )
+        if( i_pos % p_sys->frame_size > 0 )
         {
-            p_input->pf_seek( p_input, (i_pos / p_rawdv->frame_size)
-                              * p_rawdv->frame_size );
-            input_AccessReinit( p_input );
+            i_pos += p_sys->frame_size - i_pos % p_sys->frame_size;
+
+            if( stream_Seek( p_input->s, i_pos ) )
+            {
+                msg_Warn( p_input, "cannot resynch after seek (EOF?)" );
+                return -1;
+            }
         }
     }
 
     /* Call the pace control */
     input_ClockManageRef( p_input, p_input->stream.p_selected_program,
-                          p_rawdv->i_pcr );
+                          p_sys->i_pcr );
 
-    i_read = input_SplitBuffer( p_input, &p_data, p_rawdv->frame_size );
-    if( i_read <= 0 )
+    if( ( p_block = stream_Block( p_input->s, p_sys->frame_size ) ) == NULL )
     {
-        return i_read;
+        /* EOF */
+        return 0;
     }
 
-    /* Build video PES packet */
-    if( p_rawdv->p_video_es->p_dec )
+    es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT,
+                    p_sys->p_es_audio, &b_audio );
+    es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT,
+                    p_sys->p_es_video, &b_video );
+
+    p_block->i_dts =
+    p_block->i_pts = input_ClockGetTS( p_input,
+                                       p_input->stream.p_selected_program,
+                                       p_sys->i_pcr );
+    if( b_audio && b_video )
     {
-        p_pes = input_NewPES( p_input->p_method_data );
-        if( p_pes == NULL )
+        block_t *p_dup = block_Duplicate( p_block );
+
+        es_out_Send( p_input->p_es_out, p_sys->p_es_video, p_block );
+        if( p_dup )
         {
-            msg_Err( p_input, "out of memory" );
-            input_DeletePacket( p_input->p_method_data, p_data );
-            return -1;
+            es_out_Send( p_input->p_es_out, p_sys->p_es_video, p_dup );
         }
-
-        p_pes->i_rate = p_input->stream.control.i_rate;
-        p_pes->p_first = p_pes->p_last = p_data;
-        p_pes->i_pes_size = i_read;
-        p_pes->i_nb_data = 1;
-        p_pes->i_pts =
-            input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                              p_rawdv->i_pcr );
     }
-
-    /* Do the same for audio */
-    if( p_rawdv->p_audio_es->p_dec )
+    else if( b_audio )
     {
-        p_audio_pes = input_NewPES( p_input->p_method_data );
-        if( p_audio_pes == NULL )
-        {
-            msg_Err( p_input, "out of memory" );
-            input_DeletePacket( p_input->p_method_data, p_data );
-            return -1;
-        }
-        p_audio_pes->i_rate = p_input->stream.control.i_rate;
-
-        if( p_rawdv->p_video_es->p_dec )
-            p_audio_pes->p_first = p_audio_pes->p_last =
-                input_ShareBuffer( p_input->p_method_data, p_data->p_buffer );
-        else
-            p_audio_pes->p_first = p_audio_pes->p_last = p_data;
-
-        p_audio_pes->p_first->p_next = p_data->p_next;
-        p_audio_pes->p_first->p_payload_start = p_data->p_payload_start;
-        p_audio_pes->p_first->p_payload_end = p_data->p_payload_end;
-        p_audio_pes->i_pes_size = i_read;
-        p_audio_pes->i_nb_data = 1;
-        p_audio_pes->i_pts =
-            input_ClockGetTS( p_input, p_input->stream.p_selected_program,
-                              p_rawdv->i_pcr );
+        es_out_Send( p_input->p_es_out, p_sys->p_es_audio, p_block );
+    }
+    else if( b_video )
+    {
+        es_out_Send( p_input->p_es_out, p_sys->p_es_video, p_block );
+    }
+    else
+    {
+        block_Release( p_block );
     }
 
-    /* Decode PES packets if stream is selected */
-    if( p_rawdv->p_video_es->p_dec )
-        input_DecodePES( p_rawdv->p_video_es->p_dec, p_pes );
-    if( p_rawdv->p_audio_es->p_dec )
-        input_DecodePES( p_rawdv->p_audio_es->p_dec, p_audio_pes );
-
-    p_rawdv->i_pcr += ( 90000 / p_rawdv->f_rate );
-
-    if( !p_rawdv->p_video_es->p_dec &&
-        !p_rawdv->p_audio_es->p_dec )
-        input_DeletePacket( p_input->p_method_data, p_data );
+    p_sys->i_pcr += ( 90000 / p_sys->f_rate );
 
     return 1;
 }
+
