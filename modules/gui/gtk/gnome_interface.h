@@ -11,3 +11,4 @@ GtkWidget* create_intf_modules (void);
 GtkWidget* create_intf_playlist (void);
 GtkWidget* create_intf_jump (void);
 GtkWidget* create_intf_messages (void);
+GtkWidget* create_intf_sout (void);

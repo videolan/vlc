@@ -1,6 +1,7 @@
 COMMON_gtk = \
 	modules/gui/gtk/display.c \
 	modules/gui/gtk/open.c \
+	modules/gui/gtk/sout.c \
 	modules/gui/gtk/control.c \
 	modules/gui/gtk/menu.c \
 	modules/gui/gtk/playlist.c \

@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: open.c,v 1.10 2003/01/21 17:00:41 fenrir Exp $
+ * $Id: open.c,v 1.11 2003/01/26 14:49:09 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -453,6 +453,28 @@ GtkOpenSubtitleShow                    (GtkButton       *button,
     }
 }
 
+/*****************************************************************************
+ * Open sout callbacks
+ *****************************************************************************
+ * The following callbacks are related to the sout
+ *****************************************************************************/
+
+void GtkOpenSoutShow  ( GtkButton       *button,
+                        gpointer         user_data)
+{
+    intf_thread_t * p_intf = GtkGetIntf( button );
+
+    if( GTK_TOGGLE_BUTTON( button )->active )
+    {
+        gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "sout_settings" ) ), TRUE );
+    }
+    else
+    {
+        gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "sout_settings" ) ), FALSE );
+    }
+
+}
+
 /******************************
   ******************************/
 
@@ -538,6 +560,19 @@ static void GtkOpenShow( intf_thread_t *p_intf, int i_page )
     /* subtitle stuff */
     /* hide hbox_subtitle */
     gtk_widget_hide_all( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "hbox_subtitle" ) ) );
+    /* sout */
+    psz_var = config_GetPsz( p_intf, "sout" );
+    if( psz_var && *psz_var )
+    {
+        gtk_toggle_button_set_active(  gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "show_sout_settings" ), TRUE );
+        gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "sout_settings" ) ), TRUE );
+    }
+    else
+    {
+        gtk_toggle_button_set_active(  gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "show_sout_settings" ), FALSE );
+        gtk_widget_set_sensitive( GTK_WIDGET( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_open ), "sout_settings" ) ), FALSE );
+    }
+    if( psz_var ) free( psz_var );
 
     /* Set the right page */
 setpage:
@@ -600,6 +635,19 @@ void GtkOpenOk( GtkButton * button, gpointer user_data )
     else
     {
         config_PutPsz( p_intf, "sub-file", "" );
+    }
+    /* export sout */
+    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                           "show_sout_settings" ) )->active )
+    {
+        char    *psz_sout;
+
+        psz_sout = gtk_entry_get_text( GTK_ENTRY( lookup_widget( GTK_WIDGET( p_intf->p_sys->p_sout ), "sout_entry_target" ) ) );
+        config_PutPsz( p_intf, "sout", psz_sout );
+    }
+    else
+    {
+        config_PutPsz( p_intf, "sout", "" );
     }
 
     /* Enable the channel box when network channel is selected */

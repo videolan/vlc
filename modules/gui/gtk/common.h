@@ -2,7 +2,7 @@
  * gtk_common.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: common.h,v 1.6 2003/01/20 20:07:06 fenrir Exp $
+ * $Id: common.h,v 1.7 2003/01/26 14:49:09 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -66,6 +66,7 @@ struct intf_sys_t
     GtkWidget *         p_about;                             /* about window */
     GtkWidget *         p_open;                          /* multiopen window */
     GtkWidget *         p_jump;                               /* jump window */
+    GtkWidget *         p_sout;                             /* stream output */
 
     GtkTooltips *       p_tooltips;                              /* tooltips */
 

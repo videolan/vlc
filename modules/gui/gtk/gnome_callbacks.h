@@ -3,3 +3,12 @@
  *****************************************************************************/
 #include "gtk_callbacks.h"
 
+
+
+void
+GtkOpenSoutShow                        (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkSoutSettings                        (GtkButton       *button,
+                                        gpointer         user_data);

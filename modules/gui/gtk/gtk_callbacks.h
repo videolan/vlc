@@ -2,7 +2,7 @@
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.h,v 1.4 2003/01/21 12:36:11 fenrir Exp $
+ * $Id: gtk_callbacks.h,v 1.5 2003/01/26 14:49:09 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -178,3 +178,32 @@ GtkPopupDeinterlace                    (GtkRadioMenuItem *radiomenuitem,
 void
 GtkOpenSubtitleShow                    (GtkButton       *button,
                                         gpointer         user_data);
+
+void
+GtkSoutSettings                        (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkSoutSettingsCancel                  (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkSoutSettingsChanged                 (GtkWidget *button,
+                                        gpointer         user_data);
+
+void
+GtkSoutSettingsOk                      (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkSoutSettingsAccessFile              (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkSoutSettingsAccessUdp               (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+GtkOpenSoutShow                        (GtkButton       *button,
+                                        gpointer         user_data);
+

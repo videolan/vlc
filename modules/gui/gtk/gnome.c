@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.6 2003/01/20 20:07:06 fenrir Exp $
+ * $Id: gnome.c,v 1.7 2003/01/26 14:49:09 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -167,6 +167,8 @@ static void Run( intf_thread_t *p_intf )
         { "text/uri-list", 0, DROP_ACCEPT_TEXT_URI_LIST },
         { "text/plain",    0, DROP_ACCEPT_TEXT_PLAIN }
     };
+    char *psz_sout;
+    GString *       p_target;
 
     gdk_threads_enter();
 
@@ -176,6 +178,7 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_playwin = create_intf_playlist();
     p_intf->p_sys->p_messages = create_intf_messages();
     p_intf->p_sys->p_tooltips = gtk_tooltips_new();
+    p_intf->p_sys->p_sout = create_intf_sout();
 
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
@@ -253,6 +256,23 @@ static void Run( intf_thread_t *p_intf )
 
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_adj),
                          "p_intf", p_intf );
+
+    gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_sout ),
+                                     "p_intf", p_intf );
+
+    psz_sout = config_GetPsz( p_intf, "sout" );
+    p_target = g_string_new( psz_sout ? psz_sout : "" );
+    if( psz_sout ) free( psz_sout );
+
+    gtk_entry_set_text( gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_sout ), "sout_entry_target" ), p_target->str );
+    g_string_free( p_target, TRUE );
+
+    /* FIXME it's to be sure that only file entry is selected */
+    gtk_toggle_button_set_active(  gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_sout ),
+                                   "sout_access_udp" ), TRUE );
+
+    gtk_toggle_button_set_active(  gtk_object_get_data( GTK_OBJECT( p_intf->p_sys->p_sout ),
+                                   "sout_access_file" ), TRUE );
 
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );

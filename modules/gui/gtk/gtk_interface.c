@@ -73,6 +73,7 @@ create_intf_window (void)
   GtkWidget *menubar_about;
   GtkWidget *toolbar_handlebox;
   GtkWidget *toolbar;
+  GtkWidget *tmp_toolbar_icon;
   GtkWidget *toolbar_open;
   GtkWidget *toolbar_disc;
   GtkWidget *toolbar_network;
@@ -599,12 +600,13 @@ create_intf_window (void)
   gtk_toolbar_set_space_style (GTK_TOOLBAR (toolbar), GTK_TOOLBAR_SPACE_LINE);
   gtk_toolbar_set_button_relief (GTK_TOOLBAR (toolbar), GTK_RELIEF_NONE);
 
+  tmp_toolbar_icon = create_pixmap (intf_window, "file.xpm");
   toolbar_open = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("File"),
                                 _("Open a file"), NULL,
-                                NULL, NULL, NULL);
+                                tmp_toolbar_icon, NULL, NULL);
   gtk_widget_ref (toolbar_open);
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_open", toolbar_open,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1697,12 +1699,18 @@ create_intf_open (void)
   GtkWidget *label3;
   GtkObject *subtitle_fps_adj;
   GtkWidget *subtitle_fps;
+  GtkWidget *hbox30;
+  GtkWidget *show_sout_settings;
+  GtkWidget *sout_settings;
   GtkWidget *dialog_action_area6;
   GtkWidget *hbox18;
   GtkWidget *hbox19;
   GtkWidget *open_ok;
   GtkWidget *open_cancel;
   GtkAccelGroup *accel_group;
+  GtkTooltips *tooltips;
+
+  tooltips = gtk_tooltips_new ();
 
   accel_group = gtk_accel_group_new ();
 
@@ -1710,6 +1718,7 @@ create_intf_open (void)
   gtk_object_set_data (GTK_OBJECT (intf_open), "intf_open", intf_open);
   gtk_container_set_border_width (GTK_CONTAINER (intf_open), 5);
   gtk_window_set_title (GTK_WINDOW (intf_open), _("Open Target"));
+  gtk_window_set_policy (GTK_WINDOW (intf_open), FALSE, TRUE, TRUE);
 
   dialog_vbox7 = GTK_DIALOG (intf_open)->vbox;
   gtk_object_set_data (GTK_OBJECT (intf_open), "dialog_vbox7", dialog_vbox7);
@@ -2272,6 +2281,7 @@ create_intf_open (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (show_subtitle);
   gtk_box_pack_start (GTK_BOX (open_vbox), show_subtitle, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, show_subtitle, _("Use a subtitles file"), NULL);
 
   hbox_subtitle = gtk_hbox_new (FALSE, 5);
   gtk_widget_ref (hbox_subtitle);
@@ -2293,6 +2303,7 @@ create_intf_open (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "entry_subtitle", entry_subtitle,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (entry_subtitle);
+  gtk_tooltips_set_tip (tooltips, entry_subtitle, _("Select a subtitles file"), NULL);
 
   vbox14 = gtk_vbox_new (TRUE, 0);
   gtk_widget_ref (vbox14);
@@ -2322,6 +2333,7 @@ create_intf_open (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (subtitle_delay);
   gtk_box_pack_start (GTK_BOX (hbox_subtitle), subtitle_delay, TRUE, TRUE, 0);
+  gtk_tooltips_set_tip (tooltips, subtitle_delay, _("Set the delay (in seconds)"), NULL);
 
   label3 = gtk_label_new (_("fps"));
   gtk_widget_ref (label3);
@@ -2337,6 +2349,30 @@ create_intf_open (void)
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (subtitle_fps);
   gtk_box_pack_start (GTK_BOX (hbox_subtitle), subtitle_fps, TRUE, TRUE, 0);
+  gtk_tooltips_set_tip (tooltips, subtitle_fps, _("Set the number of Frames Per Second"), NULL);
+
+  hbox30 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (hbox30);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "hbox30", hbox30,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox30);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox7), hbox30, FALSE, FALSE, 3);
+
+  show_sout_settings = gtk_check_button_new_with_label (_("Stream output"));
+  gtk_widget_ref (show_sout_settings);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "show_sout_settings", show_sout_settings,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (show_sout_settings);
+  gtk_box_pack_start (GTK_BOX (hbox30), show_sout_settings, FALSE, FALSE, 0);
+  gtk_tooltips_set_tip (tooltips, show_sout_settings, _("Use stream output"), NULL);
+
+  sout_settings = gtk_button_new_with_label (_("Settings..."));
+  gtk_widget_ref (sout_settings);
+  gtk_object_set_data_full (GTK_OBJECT (intf_open), "sout_settings", sout_settings,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_settings);
+  gtk_box_pack_start (GTK_BOX (hbox30), sout_settings, FALSE, FALSE, 20);
+  gtk_tooltips_set_tip (tooltips, sout_settings, _("Stream output configuration "), NULL);
 
   dialog_action_area6 = GTK_DIALOG (intf_open)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_open), "dialog_action_area6", dialog_action_area6);
@@ -2461,12 +2497,20 @@ create_intf_open (void)
   gtk_signal_connect (GTK_OBJECT (subtitle_delay), "changed",
                       GTK_SIGNAL_FUNC (GtkOpenChanged),
                       NULL);
+  gtk_signal_connect (GTK_OBJECT (show_sout_settings), "clicked",
+                      GTK_SIGNAL_FUNC (GtkOpenSoutShow),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (sout_settings), "clicked",
+                      GTK_SIGNAL_FUNC (GtkSoutSettings),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (open_ok), "clicked",
                       GTK_SIGNAL_FUNC (GtkOpenOk),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (open_cancel), "clicked",
                       GTK_SIGNAL_FUNC (GtkOpenCancel),
                       NULL);
+
+  gtk_object_set_data (GTK_OBJECT (intf_open), "tooltips", tooltips);
 
   gtk_window_add_accel_group (GTK_WINDOW (intf_open), accel_group);
 
@@ -2955,5 +2999,311 @@ create_intf_messages (void)
 
   gtk_widget_grab_default (messages_ok);
   return intf_messages;
+}
+
+GtkWidget*
+create_intf_sout (void)
+{
+  GtkWidget *intf_sout;
+  GtkWidget *vbox15;
+  GtkWidget *vbox16;
+  GtkWidget *frame11;
+  GtkWidget *hbox28;
+  GtkWidget *label38;
+  GtkWidget *combo4;
+  GtkWidget *sout_entry_target;
+  GtkWidget *frame12;
+  GtkWidget *table6;
+  GSList *sout_access_group = NULL;
+  GtkWidget *sout_access_file;
+  GtkWidget *sout_access_udp;
+  GtkWidget *sout_access_rtp;
+  GtkWidget *sout_file_path_label;
+  GtkWidget *combo6;
+  GtkWidget *sout_file_path;
+  GtkWidget *sout_udp_address_label;
+  GtkWidget *sout_udp_address_combo;
+  GtkWidget *sout_udp_address;
+  GtkObject *sout_udp_port_adj;
+  GtkWidget *sout_udp_port;
+  GtkWidget *hbox29;
+  GSList *sout_mux_group = NULL;
+  GtkWidget *sout_mux_ts;
+  GtkWidget *sout_mux_ps;
+  GtkWidget *sout_mux_avi;
+  GtkWidget *sout_udp_port_label;
+  GtkWidget *hbox25;
+  GtkWidget *hbox26;
+  GtkWidget *button1;
+  GtkWidget *button2;
+
+  intf_sout = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_object_set_data (GTK_OBJECT (intf_sout), "intf_sout", intf_sout);
+  gtk_container_set_border_width (GTK_CONTAINER (intf_sout), 5);
+  gtk_window_set_title (GTK_WINDOW (intf_sout), _("Stream output"));
+  gtk_window_set_modal (GTK_WINDOW (intf_sout), TRUE);
+
+  vbox15 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_ref (vbox15);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "vbox15", vbox15,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (vbox15);
+  gtk_container_add (GTK_CONTAINER (intf_sout), vbox15);
+
+  vbox16 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_ref (vbox16);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "vbox16", vbox16,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (vbox16);
+  gtk_box_pack_start (GTK_BOX (vbox15), vbox16, TRUE, TRUE, 0);
+
+  frame11 = gtk_frame_new (_("Stream output (MRL)"));
+  gtk_widget_ref (frame11);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "frame11", frame11,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (frame11);
+  gtk_box_pack_start (GTK_BOX (vbox16), frame11, FALSE, TRUE, 0);
+
+  hbox28 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (hbox28);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "hbox28", hbox28,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox28);
+  gtk_container_add (GTK_CONTAINER (frame11), hbox28);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox28), 5);
+
+  label38 = gtk_label_new (_("Destination Target: "));
+  gtk_widget_ref (label38);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "label38", label38,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label38);
+  gtk_box_pack_start (GTK_BOX (hbox28), label38, FALSE, FALSE, 0);
+
+  combo4 = gtk_combo_new ();
+  gtk_widget_ref (combo4);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "combo4", combo4,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (combo4);
+  gtk_box_pack_start (GTK_BOX (hbox28), combo4, TRUE, TRUE, 0);
+
+  sout_entry_target = GTK_COMBO (combo4)->entry;
+  gtk_widget_ref (sout_entry_target);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_entry_target", sout_entry_target,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_entry_target);
+
+  frame12 = gtk_frame_new (NULL);
+  gtk_widget_ref (frame12);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "frame12", frame12,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (frame12);
+  gtk_box_pack_start (GTK_BOX (vbox16), frame12, TRUE, TRUE, 0);
+
+  table6 = gtk_table_new (3, 5, FALSE);
+  gtk_widget_ref (table6);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "table6", table6,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (table6);
+  gtk_container_add (GTK_CONTAINER (frame12), table6);
+  gtk_table_set_row_spacings (GTK_TABLE (table6), 5);
+  gtk_table_set_col_spacings (GTK_TABLE (table6), 5);
+
+  sout_access_file = gtk_radio_button_new_with_label (sout_access_group, _("File"));
+  sout_access_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sout_access_file));
+  gtk_widget_ref (sout_access_file);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_access_file", sout_access_file,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_access_file);
+  gtk_table_attach (GTK_TABLE (table6), sout_access_file, 0, 1, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  sout_access_udp = gtk_radio_button_new_with_label (sout_access_group, _("UDP"));
+  sout_access_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sout_access_udp));
+  gtk_widget_ref (sout_access_udp);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_access_udp", sout_access_udp,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_access_udp);
+  gtk_table_attach (GTK_TABLE (table6), sout_access_udp, 0, 1, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  sout_access_rtp = gtk_radio_button_new_with_label (sout_access_group, _("RTP"));
+  sout_access_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sout_access_rtp));
+  gtk_widget_ref (sout_access_rtp);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_access_rtp", sout_access_rtp,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_access_rtp);
+  gtk_table_attach (GTK_TABLE (table6), sout_access_rtp, 0, 1, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  sout_file_path_label = gtk_label_new (_("Path:"));
+  gtk_widget_ref (sout_file_path_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_file_path_label", sout_file_path_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_file_path_label);
+  gtk_table_attach (GTK_TABLE (table6), sout_file_path_label, 1, 2, 0, 1,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (sout_file_path_label), 0, 0.5);
+
+  combo6 = gtk_combo_new ();
+  gtk_widget_ref (combo6);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "combo6", combo6,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (combo6);
+  gtk_table_attach (GTK_TABLE (table6), combo6, 2, 5, 0, 1,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  sout_file_path = GTK_COMBO (combo6)->entry;
+  gtk_widget_ref (sout_file_path);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_file_path", sout_file_path,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_file_path);
+
+  sout_udp_address_label = gtk_label_new (_("Address:"));
+  gtk_widget_ref (sout_udp_address_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_udp_address_label", sout_udp_address_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_udp_address_label);
+  gtk_table_attach (GTK_TABLE (table6), sout_udp_address_label, 1, 2, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (sout_udp_address_label), 0, 0.5);
+
+  sout_udp_address_combo = gtk_combo_new ();
+  gtk_widget_ref (sout_udp_address_combo);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_udp_address_combo", sout_udp_address_combo,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_udp_address_combo);
+  gtk_table_attach (GTK_TABLE (table6), sout_udp_address_combo, 2, 3, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  sout_udp_address = GTK_COMBO (sout_udp_address_combo)->entry;
+  gtk_widget_ref (sout_udp_address);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_udp_address", sout_udp_address,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_udp_address);
+
+  sout_udp_port_adj = gtk_adjustment_new (1234, 0, 65535, 1, 10, 10);
+  sout_udp_port = gtk_spin_button_new (GTK_ADJUSTMENT (sout_udp_port_adj), 1, 0);
+  gtk_widget_ref (sout_udp_port);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_udp_port", sout_udp_port,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_udp_port);
+  gtk_table_attach (GTK_TABLE (table6), sout_udp_port, 4, 5, 1, 2,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+
+  hbox29 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (hbox29);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "hbox29", hbox29,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox29);
+  gtk_table_attach (GTK_TABLE (table6), hbox29, 4, 5, 2, 3,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (GTK_FILL), 0, 0);
+
+  sout_mux_ts = gtk_radio_button_new_with_label (sout_mux_group, _("TS"));
+  sout_mux_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sout_mux_ts));
+  gtk_widget_ref (sout_mux_ts);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_mux_ts", sout_mux_ts,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_mux_ts);
+  gtk_box_pack_start (GTK_BOX (hbox29), sout_mux_ts, FALSE, FALSE, 0);
+
+  sout_mux_ps = gtk_radio_button_new_with_label (sout_mux_group, _("PS"));
+  sout_mux_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sout_mux_ps));
+  gtk_widget_ref (sout_mux_ps);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_mux_ps", sout_mux_ps,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_mux_ps);
+  gtk_box_pack_start (GTK_BOX (hbox29), sout_mux_ps, FALSE, FALSE, 0);
+
+  sout_mux_avi = gtk_radio_button_new_with_label (sout_mux_group, _("AVI"));
+  sout_mux_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sout_mux_avi));
+  gtk_widget_ref (sout_mux_avi);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_mux_avi", sout_mux_avi,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_mux_avi);
+  gtk_box_pack_start (GTK_BOX (hbox29), sout_mux_avi, FALSE, FALSE, 0);
+
+  sout_udp_port_label = gtk_label_new (_("Port"));
+  gtk_widget_ref (sout_udp_port_label);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "sout_udp_port_label", sout_udp_port_label,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sout_udp_port_label);
+  gtk_table_attach (GTK_TABLE (table6), sout_udp_port_label, 3, 4, 1, 2,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (sout_udp_port_label), 0, 0.5);
+
+  hbox25 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (hbox25);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "hbox25", hbox25,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox25);
+  gtk_box_pack_end (GTK_BOX (vbox15), hbox25, FALSE, TRUE, 0);
+  gtk_container_set_border_width (GTK_CONTAINER (hbox25), 5);
+
+  hbox26 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (hbox26);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "hbox26", hbox26,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox26);
+  gtk_box_pack_end (GTK_BOX (hbox25), hbox26, TRUE, TRUE, 3);
+
+  button1 = gtk_button_new_with_label (_("OK"));
+  gtk_widget_ref (button1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "button1", button1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button1);
+  gtk_box_pack_start (GTK_BOX (hbox26), button1, TRUE, TRUE, 2);
+
+  button2 = gtk_button_new_with_label (_("Cancel"));
+  gtk_widget_ref (button2);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sout), "button2", button2,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (button2);
+  gtk_box_pack_start (GTK_BOX (hbox26), button2, TRUE, TRUE, 2);
+
+  gtk_signal_connect (GTK_OBJECT (sout_access_file), "toggled",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsAccessFile),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (sout_access_udp), "toggled",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsAccessUdp),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (sout_access_rtp), "toggled",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsAccessUdp),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (sout_file_path), "changed",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsChanged),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (sout_udp_address), "changed",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsChanged),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (sout_udp_port), "changed",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsChanged),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (sout_mux_ts), "toggled",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsChanged),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (sout_mux_ps), "toggled",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsChanged),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (sout_mux_avi), "toggled",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsChanged),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (button1), "clicked",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsOk),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (button2), "clicked",
+                      GTK_SIGNAL_FUNC (GtkSoutSettingsCancel),
+                      NULL);
+
+  return intf_sout;
 }
 

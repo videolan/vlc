@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.9 2003/01/21 12:36:11 fenrir Exp $
+ * $Id: gtk_callbacks.c,v 1.10 2003/01/26 14:49:09 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -687,4 +687,6 @@ GtkPopupDeinterlace                    (GtkRadioMenuItem *radiomenuitem,
     if( p_intf )
         msg_Dbg( p_intf, "GtkPopupDeinterlace" );
 }
+
+
 
