@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.38 2002/02/15 13:32:52 sam Exp $
+ * $Id: intf_beos.cpp,v 1.38.2.1 2002/07/13 11:33:11 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,16 +43,7 @@ extern "C"
 }
 
 #include "InterfaceWindow.h"
-
-/*****************************************************************************
- * intf_sys_t: description and status of FB interface
- *****************************************************************************/
-typedef struct intf_sys_s
-{
-    InterfaceWindow * p_window;
-    char              i_key;
-} intf_sys_t;
-
+#include "intf_vlc_wrapper.h"
 
 extern "C"
 {
@@ -108,7 +99,11 @@ static int intf_Open( intf_thread_t *p_intf )
         intf_ErrMsg( "error: cannot allocate memory for InterfaceWindow" );
         return( 1 );
     }
-
+    p_intf->p_sys->b_disabled_menus = 0;
+    p_intf->p_sys->i_saved_volume = VOLUME_DEFAULT;
+    p_intf->p_sys->b_loop = 0;
+    p_intf->p_sys->b_mute = 0;
+    
     return( 0 );
 }
 

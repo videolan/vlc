@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.7 2001/12/30 07:09:54 sam Exp $
+ * $Id: MediaControlView.cpp,v 1.7.2.1 2002/07/13 11:33:11 tcastley Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *
@@ -141,6 +141,7 @@ MediaControlView::~MediaControlView()
 
 void MediaControlView::MessageReceived(BMessage *message)
 {
+    BView::MessageReceived(message);
 }
 
 void MediaControlView::SetProgress(uint64 seek, uint64 size)

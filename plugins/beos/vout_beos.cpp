@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.58.2.3 2002/07/11 12:24:45 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.58.2.4 2002/07/13 11:33:11 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -191,6 +191,15 @@ void VideoWindow::MessageReceived( BMessage *p_message )
         break;
     case VERT_SYNC:
         vsync = !vsync;
+        break;
+    case WINDOW_FEEL:
+        {
+            int16 winFeel;
+            if (p_message->FindInt16("WinFeel", &winFeel) == B_OK)
+            {
+                SetFeel((window_feel)winFeel);
+            }
+        }
         break;
     default:
         BWindow::MessageReceived( p_message );
@@ -409,7 +418,6 @@ void VLCView::MouseDown(BPoint point)
     {
        if (mouseButtons & B_SECONDARY_MOUSE_BUTTON) 
        {
-           //if (!menu) delete menu;
            BPopUpMenu *menu = new BPopUpMenu("context menu");
            menu->SetRadioMode(false);
            // Toggle FullScreen
@@ -427,7 +435,27 @@ void VLCView::MouseDown(BPoint point)
            BMenuItem *vsyncItem = new BMenuItem("Vertical Sync", new BMessage(VERT_SYNC));
            vsyncItem->SetMarked(vWindow->vsync);
            menu->AddItem(vsyncItem);
-		
+           menu->AddSeparatorItem();
+
+		   // Windwo Feel Items
+		   BMessage *winNormFeel = new BMessage(WINDOW_FEEL);
+		   winNormFeel->AddInt16("WinFeel", (int16)B_NORMAL_WINDOW_FEEL);
+           BMenuItem *normWindItem = new BMenuItem("Normal Window", winNormFeel);
+           normWindItem->SetMarked(vWindow->Feel() == B_NORMAL_WINDOW_FEEL);
+           menu->AddItem(normWindItem);
+           
+		   BMessage *winFloatFeel = new BMessage(WINDOW_FEEL);
+		   winFloatFeel->AddInt16("WinFeel", (int16)B_FLOATING_APP_WINDOW_FEEL);
+           BMenuItem *onTopWindItem = new BMenuItem("App Top", winFloatFeel);
+           onTopWindItem->SetMarked(vWindow->Feel() == B_FLOATING_APP_WINDOW_FEEL);
+           menu->AddItem(onTopWindItem);
+           
+		   BMessage *winAllFeel = new BMessage(WINDOW_FEEL);
+		   winAllFeel->AddInt16("WinFeel", (int16)B_FLOATING_ALL_WINDOW_FEEL);
+           BMenuItem *allSpacesWindItem = new BMenuItem("On Top All Workspaces", winAllFeel);
+           allSpacesWindItem->SetMarked(vWindow->Feel() == B_FLOATING_ALL_WINDOW_FEEL);
+           menu->AddItem(allSpacesWindItem);
+		   
            menu->SetTargetForItems(this);
            ConvertToScreen(&where);
            menu->Go(where, true, false, true);

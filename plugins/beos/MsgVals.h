@@ -2,7 +2,7 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.9.2.1 2002/07/11 07:21:57 tcastley Exp $
+ * $Id: MsgVals.h,v 1.9.2.2 2002/07/13 11:33:11 tcastley Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *
@@ -48,4 +48,5 @@ const uint32 RESIZE_100     = 'RSOR';
 const uint32 RESIZE_200     = 'RSDB';
 const uint32 ASPECT_CORRECT = 'ASCO';
 const uint32 VERT_SYNC      = 'VSYN';
+const uint32 WINDOW_FEEL    = 'WFEL';
 
