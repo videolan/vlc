@@ -223,13 +223,13 @@ int Win32Manage( intf_thread_t *p_intf )
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
-    else if( p_intf->p_sys->b_playing && !p_intf->p_vlc->b_die )
+    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
     {
         p_intf->p_sys->p_window->ModeManage();
         p_intf->p_sys->b_playing = 0;
     }
 
-    if( p_intf->p_vlc->b_die )
+    if( p_intf->b_die )
     {
         vlc_mutex_unlock( &p_intf->change_lock );
 

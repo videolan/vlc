@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.20 2002/06/27 19:05:17 sam Exp $
+ * $Id: rc.c,v 1.21 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -290,7 +290,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
             case 'q':
             case 'Q':
-                p_intf->p_vlc->b_die = 1;
+                p_intf->p_vlc->b_die = VLC_TRUE;
                 break;
 
             case 'r':

@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.48 2002/07/11 19:28:13 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.49 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -94,10 +94,17 @@ gboolean GtkExit( GtkWidget       *widget,
     intf_thread_t *p_intf = GtkGetIntf( widget );
 
     vlc_mutex_lock( &p_intf->change_lock );
-    p_intf->p_vlc->b_die = 1;
+    p_intf->p_vlc->b_die = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->change_lock );
 
     return TRUE;
+}
+
+void GtkClose( GtkMenuItem     *menuitem,
+               gpointer         user_data )
+{
+    intf_thread_t *p_intf = GtkGetIntf( menuitem );
+    p_intf->b_die = VLC_TRUE;
 }
 
 gboolean GtkWindowDelete( GtkWidget       *widget,
@@ -571,3 +578,4 @@ GtkOpenNotebookChanged                 (GtkNotebook     *notebook,
 {
     GtkOpenChanged( GTK_WIDGET( notebook ), user_data );
 }
+

@@ -31,6 +31,7 @@ create_intf_window (void)
   GtkWidget *separator4;
   GtkWidget *menubar_eject;
   GtkWidget *separator14;
+  GtkWidget *menubar_close;
   GtkWidget *menubar_exit;
   GtkWidget *menubar_view;
   GtkWidget *menubar_view_menu;
@@ -220,6 +221,21 @@ create_intf_window (void)
   gtk_widget_show (separator14);
   gtk_container_add (GTK_CONTAINER (menubar_file_menu), separator14);
   gtk_widget_set_sensitive (separator14, FALSE);
+
+  menubar_close = gtk_menu_item_new_with_label ("");
+  tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_close)->child),
+                                   _("_Close"));
+  gtk_widget_add_accelerator (menubar_close, "activate_item", menubar_file_menu_accels,
+                              tmp_key, 0, 0);
+  gtk_widget_ref (menubar_close);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_close", menubar_close,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (menubar_close);
+  gtk_container_add (GTK_CONTAINER (menubar_file_menu), menubar_close);
+  gtk_tooltips_set_tip (tooltips, menubar_close, _("Close the window"), NULL);
+  gtk_widget_add_accelerator (menubar_close, "activate", accel_group,
+                              GDK_W, GDK_CONTROL_MASK,
+                              GTK_ACCEL_VISIBLE);
 
   menubar_exit = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_exit)->child),
@@ -833,6 +849,9 @@ create_intf_window (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (menubar_eject), "activate",
                       GTK_SIGNAL_FUNC (GtkDiscEject),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (menubar_close), "activate",
+                      GTK_SIGNAL_FUNC (GtkClose),
                       NULL);
   gtk_signal_connect (GTK_OBJECT (menubar_exit), "activate",
                       GTK_SIGNAL_FUNC (GtkExit),

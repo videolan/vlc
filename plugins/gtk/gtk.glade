@@ -156,6 +156,24 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
+	      <name>menubar_close</name>
+	      <tooltip>Close the window</tooltip>
+	      <accelerator>
+		<modifiers>GDK_CONTROL_MASK</modifiers>
+		<key>GDK_W</key>
+		<signal>activate</signal>
+	      </accelerator>
+	      <signal>
+		<name>activate</name>
+		<handler>GtkClose</handler>
+		<last_modification_time>Mon, 15 Jul 2002 08:55:26 GMT</last_modification_time>
+	      </signal>
+	      <label>_Close</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
 	      <name>menubar_exit</name>
 	      <tooltip>Exit the program</tooltip>
 	      <accelerator>

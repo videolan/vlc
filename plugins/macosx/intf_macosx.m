@@ -2,7 +2,7 @@
  * intf_macosx.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf_macosx.m,v 1.6 2002/07/15 01:54:03 jlj Exp $
+ * $Id: intf_macosx.m,v 1.7 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -165,7 +165,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
 - (void)terminate:(id)sender
 {
-    [self getIntf]->p_vlc->b_die = 1;
+    [self getIntf]->p_vlc->b_die = VLC_TRUE;
 }
 
 @end
@@ -268,7 +268,7 @@ static void intf_Run( intf_thread_t *p_intf )
     intf_thread_t * p_intf = [NSApp getIntf];
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
-    while( !p_intf->p_vlc->b_die )
+    while( !p_intf->b_die )
     {
         int i_start, i_stop;
 
@@ -312,7 +312,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
-        else if( p_intf->p_sys->b_playing && !p_intf->p_vlc->b_die )
+        else if( p_intf->p_sys->b_playing && !p_intf->b_die )
         {
             [self manageMode];
             p_intf->p_sys->b_playing = 0;

@@ -115,7 +115,7 @@ void __fastcall TMainFrameDlg::FormClose( TObject *Sender,
     intf_thread_t *p_intf = p_intfGlobal;
 
     vlc_mutex_lock( &p_intf->change_lock );
-    p_intf->p_vlc->b_die = 1;
+    p_intf->p_vlc->b_die = VLC_TRUE;
     vlc_mutex_unlock( &p_intf->change_lock );
 
     /* we don't destroy the form immediatly */

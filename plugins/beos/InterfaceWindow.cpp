@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.18 2002/06/01 12:31:58 sam Exp $
+ * $Id: InterfaceWindow.cpp,v 1.19 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -565,7 +565,7 @@ void InterfaceWindow::updateInterface()
  *****************************************************************************/
 bool InterfaceWindow::QuitRequested()
 {
-    p_intf->p_vlc->b_die = 1;
+    p_intf->p_vlc->b_die = VLC_TRUE;
 
     return( true );
 }

@@ -154,6 +154,17 @@
 
 	    <widget>
 	      <class>GtkPixmapMenuItem</class>
+	      <name>menubar_close</name>
+	      <signal>
+		<name>activate</name>
+		<handler>GtkClose</handler>
+		<last_modification_time>Mon, 15 Jul 2002 09:14:55 GMT</last_modification_time>
+	      </signal>
+	      <stock_item>GNOMEUIINFO_MENU_CLOSE_ITEM</stock_item>
+	    </widget>
+
+	    <widget>
+	      <class>GtkPixmapMenuItem</class>
 	      <name>menubar_exit</name>
 	      <signal>
 		<name>activate</name>

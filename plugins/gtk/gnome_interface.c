@@ -45,6 +45,7 @@ static GnomeUIInfo menubar_file_menu_uiinfo[] =
     0, (GdkModifierType) 0, NULL
   },
   GNOMEUIINFO_SEPARATOR,
+  GNOMEUIINFO_MENU_CLOSE_ITEM (GtkClose, NULL),
   GNOMEUIINFO_MENU_EXIT_ITEM (GtkExit, NULL),
   GNOMEUIINFO_END
 };
@@ -247,8 +248,13 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_file_menu_uiinfo[6].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_exit",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_close",
                             menubar_file_menu_uiinfo[6].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (menubar_file_menu_uiinfo[7].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_exit",
+                            menubar_file_menu_uiinfo[7].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_uiinfo[1].widget);

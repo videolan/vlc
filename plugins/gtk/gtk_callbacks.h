@@ -2,7 +2,7 @@
  * gtk_callbacks.h : Callbacks for the gtk plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.h,v 1.21 2002/07/11 19:28:13 sam Exp $
+ * $Id: gtk_callbacks.h,v 1.22 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -144,4 +144,8 @@ GtkFileOk                              (GtkButton       *button,
 
 void
 GtkFileCancel                          (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+GtkClose                               (GtkMenuItem     *menuitem,
                                         gpointer         user_data);

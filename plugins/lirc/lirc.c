@@ -2,7 +2,7 @@
  * lirc.c : lirc plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: lirc.c,v 1.12 2002/07/01 17:40:27 sam Exp $
+ * $Id: lirc.c,v 1.13 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -149,7 +149,7 @@ static void intf_Run( intf_thread_t *p_intf )
     playlist_t *p_playlist;
     input_thread_t *p_input;
 
-    while( !p_intf->p_vlc->b_die )
+    while( !p_intf->b_die )
     {
         /* Sleep a bit */
         msleep( INTF_IDLE_SLEEP );
@@ -177,13 +177,13 @@ static void intf_Run( intf_thread_t *p_intf )
             continue;
         }
 
-        while( !p_intf->p_vlc->b_die 
+        while( !p_intf->b_die 
                 && lirc_code2char( p_intf->p_sys->config, code, &c ) == 0
                 && c != NULL )
         {
             if( !strcmp( c, "QUIT" ) )
             {
-                p_intf->p_vlc->b_die = 1;
+                p_intf->p_vlc->b_die = VLC_TRUE;
                 continue;
             }
 

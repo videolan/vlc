@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ncurses.c,v 1.17 2002/06/01 18:04:49 sam Exp $
+ * $Id: ncurses.c,v 1.18 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -159,7 +159,7 @@ static void intf_Run( intf_thread_t *p_intf )
      */
     t_last_refresh = ( time( 0 ) - 1);
 
-    while( !p_intf->p_vlc->b_die )
+    while( !p_intf->b_die )
     {
         p_intf->pf_manage( p_intf );
 

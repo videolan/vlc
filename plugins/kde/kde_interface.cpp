@@ -176,7 +176,7 @@ void KInterface::slotFileClose()
 void KInterface::slotFileQuit()
 {
     slotStatusMsg(i18n("Exiting..."));
-    p_intf->p_vlc->b_die = 1;
+    p_intf->p_vlc->b_die = VLC_TRUE;
     slotStatusMsg(i18n("Ready."));
 }
 

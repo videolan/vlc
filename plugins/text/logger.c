@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.11 2002/06/01 18:04:49 sam Exp $
+ * $Id: logger.c,v 1.12 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -245,7 +245,7 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-    while( !p_intf->p_vlc->b_die )
+    while( !p_intf->b_die )
     {
         FlushQueue( p_intf->p_sys->p_sub, p_intf->p_sys->p_file,
                     p_intf->p_sys->i_mode );

@@ -2,7 +2,7 @@
  * intf_dummy.c: dummy interface plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: intf_dummy.c,v 1.19 2002/06/01 16:45:34 sam Exp $
+ * $Id: intf_dummy.c,v 1.20 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -96,7 +96,7 @@ static void intf_Close( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Run( intf_thread_t *p_intf )
 {
-    while( !p_intf->p_vlc->b_die )
+    while( !p_intf->b_die )
     {
         /* Wait a bit */
         msleep( INTF_IDLE_SLEEP );

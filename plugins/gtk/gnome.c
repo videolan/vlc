@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.29 2002/07/11 19:28:13 sam Exp $
+ * $Id: gnome.c,v 1.30 2002/07/15 20:09:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -500,13 +500,13 @@ static gint GnomeManage( gpointer p_data )
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
-    else if( p_intf->p_sys->b_playing && !p_intf->p_vlc->b_die )
+    else if( p_intf->p_sys->b_playing && !p_intf->b_die )
     {
         GtkModeManage( p_intf );
         p_intf->p_sys->b_playing = 0;
     }
 
-    if( p_intf->p_vlc->b_die )
+    if( p_intf->b_die )
     {
         vlc_mutex_unlock( &p_intf->change_lock );
 
