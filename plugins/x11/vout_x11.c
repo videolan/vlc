@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.27 2001/06/19 05:51:57 sam Exp $
+ * $Id: vout_x11.c,v 1.28 2001/06/25 11:34:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -262,7 +262,7 @@ static int vout_Init( vout_thread_t *p_vout )
 {
     int i_err;
 
-#ifdef SYS_DARWIN1_3
+#ifdef SYS_DARWIN
     /* FIXME : As of 2001-03-16, XFree4 for MacOS X does not support Xshm. */
     p_vout->p_sys->b_shm = 0;
 #endif

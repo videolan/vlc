@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.104 2001/06/14 20:21:04 sam Exp $
+ * $Id: main.c,v 1.105 2001/06/25 11:34:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -41,7 +41,7 @@
 #   include "GNUgetopt/getopt.h"
 #endif
 
-#ifdef SYS_DARWIN1_3
+#ifdef SYS_DARWIN
 #   include <mach/mach.h>                               /* Altivec detection */
 #   include <mach/mach_error.h>       /* some day the header files||compiler *
                                                        will define it for us */
@@ -84,7 +84,7 @@
 #   include "beos_specific.h"
 #endif
 
-#ifdef SYS_DARWIN1_3
+#ifdef SYS_DARWIN
 #   include "darwin_specific.h"
 #endif
 
@@ -273,7 +273,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * System specific initialization code
      */
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
     system_Init( &i_argc, ppsz_argv, ppsz_env );
 #endif
 
@@ -386,7 +386,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * System specific cleaning code
      */
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
     system_End();
 #endif
 
@@ -529,7 +529,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
         }
     }
 
-#ifdef SYS_DARWIN1_3
+#ifdef SYS_DARWIN
     /* When vlc.app is run by double clicking in Mac OS X, the 2nd arg
      * is the PSN - process serial number (a unique PID-ish thingie)
      * still ok for real Darwin & when run from command line */
@@ -959,7 +959,7 @@ static int CPUCapabilities( void )
 
     return( i_capabilities );
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     struct host_basic_info hi;
     kern_return_t          ret;
     host_name_port_t       host;

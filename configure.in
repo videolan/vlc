@@ -220,6 +220,18 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
 ])
 
 dnl
+dnl  Check the operating system
+dnl
+case ${host_os} in
+  darwin*)
+    SYS=darwin
+    ;;
+  *)
+    SYS=${host_os}
+    ;;
+esac
+
+dnl
 dnl  PentiumPro acceleration
 dnl
 AC_ARG_ENABLE(ppro,
@@ -347,10 +359,8 @@ AC_ARG_ENABLE(rc,
 if test x$enable_rc != xno; then
   BUILTINS="${BUILTINS} rc"; fi
 
-SYS=${host_os}
-
 dnl special case for BeOS
-if test x$host_os = xbeos; then
+if test x$SYS = xbeos; then
     BUILTINS="${BUILTINS} beos"
     LIB_BEOS="-lbe -lgame -lroot -ltracker"
     PLCFLAGS="${PLCFLAGS} -nostart"

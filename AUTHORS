@@ -111,7 +111,7 @@ D: DVD subtitles decoder
 N: Eugenio Jarosiewicz
 E: ej0@cise.ufl.edu
 C: ej
-D: MacOS X interface and fixes
+D: MacOS X interface, DVD ioctls, and various fixes
 
 N: Brieuc Jeunhomme
 E: bbp@via.ecp.fr

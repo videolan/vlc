@@ -2,7 +2,7 @@
  * ioctl.h: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.h,v 1.3 2001/06/20 07:43:48 sam Exp $
+ * $Id: ioctl.h,v 1.4 2001/06/25 11:34:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -48,7 +48,7 @@ int ioctl_SendKey2          ( int, int *, u8 * );
 /*****************************************************************************
  * Common macro, Darwin specific
  *****************************************************************************/
-#if defined( SYS_DARWIN1_3 )
+#if defined( SYS_DARWIN )
 #define INIT_DVDIOCTL( SIZE ) \
     dvdioctl_data_t dvdioctl; \
     u8 p_buffer[ (SIZE) ]; \

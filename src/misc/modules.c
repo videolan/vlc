@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.36 2001/06/14 02:47:45 sam Exp $
+ * $Id: modules.c,v 1.37 2001/06/25 11:34:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -55,7 +55,7 @@
 #   include "beos_specific.h"
 #endif
 
-#ifdef SYS_DARWIN1_3
+#ifdef SYS_DARWIN
 #   include "darwin_specific.h"
 #endif
 
@@ -125,7 +125,7 @@ void module_InitBank( void )
     char **         ppsz_path = path;
     char *          psz_fullpath;
     char *          psz_file;
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
     char *          psz_vlcpath = system_GetProgramPath();
     int             i_vlclen = strlen( psz_vlcpath );
     boolean_t       b_notinroot;
@@ -162,7 +162,7 @@ void module_InitBank( void )
         /* Store strlen(*ppsz_path) for later use. */
         int i_dirlen = strlen( *ppsz_path );
 
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
         b_notinroot = 0;
         /* Under BeOS, we need to add beos_GetProgramPath() to access
          * files under the current directory */
@@ -217,7 +217,7 @@ void module_InitBank( void )
             closedir( dir );
         }
 
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
         if( b_notinroot )
         {
             free( psz_fullpath );

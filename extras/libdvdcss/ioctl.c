@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.2 2001/06/14 02:47:44 sam Exp $
+ * $Id: ioctl.c,v 1.3 2001/06/25 11:34:08 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -56,7 +56,7 @@
 #include "config.h"
 #include "common.h"
 
-#ifdef SYS_DARWIN1_3
+#ifdef SYS_DARWIN
 #   include "DVDioctl/DVDioctl.h"
 #endif
 
@@ -114,7 +114,7 @@ int ioctl_ReadCopyright( int i_fd, int i_layer, int *pi_copyright )
 
     *pi_copyright = p_buffer[ 4 ];
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     _dvd_error( dvdcss, "DVD ioctls not fully functional yet, "
                            "assuming disc is encrypted" );
 
@@ -230,7 +230,7 @@ int ioctl_ReadKey( int i_fd, int *pi_agid, u8 *p_key )
 
     memcpy( p_key, p_buffer + 4, 2048 );
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     _dvd_error( dvdcss, "DVD ioctls not fully functional yet, "
                            "sending an empty key" );
 
@@ -323,7 +323,7 @@ int ioctl_ReportAgid( int i_fd, int *pi_agid )
 
     *pi_agid = p_buffer[ 7 ] >> 6;
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 8 );
 
     dvdioctl.i_keyformat = kCSSAGID;
@@ -400,7 +400,7 @@ int ioctl_ReportChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 
     memcpy( p_challenge, p_buffer + 4, 12 );
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 16 );
 
     dvdioctl.i_keyformat = kChallengeKey;
@@ -492,7 +492,7 @@ int ioctl_ReportASF( int i_fd, int *pi_agid, int *pi_asf )
 
     *pi_asf = p_buffer[ 7 ] & 1;
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 8 );
 
     dvdioctl.i_keyformat = kASF;
@@ -584,7 +584,7 @@ int ioctl_ReportKey1( int i_fd, int *pi_agid, u8 *p_key )
 
     memcpy( p_key, p_buffer + 4, 8 );
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 12 );
 
     dvdioctl.i_keyformat = kKey1;
@@ -666,7 +666,7 @@ int ioctl_InvalidateAgid( int i_fd, int *pi_agid )
 
     i_ret = ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 0 );
 
     dvdioctl.i_keyformat = kInvalidateAGID;
@@ -742,7 +742,7 @@ int ioctl_SendChallenge( int i_fd, int *pi_agid, u8 *p_challenge )
 
     return ioctl( i_fd, B_RAW_DEVICE_COMMAND, &rdc, sizeof(rdc) );
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 16 );
 
     dvdioctl.i_keyformat = kChallengeKey;
@@ -857,7 +857,7 @@ int ioctl_SendKey2( int i_fd, int *pi_agid, u8 *p_key )
         return WinSendSSC( i_fd, &ssc );
     }
 
-#elif defined( SYS_DARWIN1_3 )
+#elif defined( SYS_DARWIN )
     INIT_DVDIOCTL( 12 );
 
     dvdioctl.i_keyformat = kKey2;

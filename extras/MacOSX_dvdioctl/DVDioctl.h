@@ -2,9 +2,10 @@
  * DVDioctl.h: Linux-like DVD driver for Darwin and MacOS X
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: DVDioctl.h,v 1.3 2001/05/25 04:23:37 sam Exp $
+ * $Id: DVDioctl.h,v 1.4 2001/06/25 11:34:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
  *
  * The contents of this file constitute Original Code as defined in and
  * are subject to the Apple Public Source License Version 1.1 (the

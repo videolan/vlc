@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.c,v 1.28 2001/05/31 03:12:49 sam Exp $
+ * $Id: video_text.c,v 1.29 2001/06/25 11:34:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,7 +43,7 @@
 #   include "beos_specific.h"
 #endif
 
-#ifdef SYS_DARWIN1_3
+#ifdef SYS_DARWIN
 #   include "darwin_specific.h"
 #endif
 
@@ -227,7 +227,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
 
     char **             ppsz_path = path;
     char *              psz_file;
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
     char *              psz_vlcpath = system_GetProgramPath();
     int                 i_vlclen = strlen( psz_vlcpath );
 #endif
@@ -238,7 +238,7 @@ vout_font_t *vout_LoadFont( const char *psz_name )
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
-#if defined( SYS_BEOS ) || defined( SYS_DARWIN1_3 )
+#if defined( SYS_BEOS ) || defined( SYS_DARWIN )
         /* Under BeOS, we need to add beos_GetProgramPath() to access
          * files under the current directory */
         if( strncmp( *ppsz_path, "/", 1 ) )

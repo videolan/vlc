@@ -3,9 +3,10 @@
  *****************************************************************************
  * Copyright (C) 1998-2000 Apple Computer, Inc. All rights reserved.
  * Copyright (C) 2001 VideoLAN
- * $Id: DVDioctl.cpp,v 1.6 2001/05/25 04:23:37 sam Exp $
+ * $Id: DVDioctl.cpp,v 1.7 2001/06/25 11:34:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
+ *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
  *
  * The contents of this file constitute Original Code as defined in and
  * are subject to the Apple Public Source License Version 1.1 (the
@@ -52,6 +53,10 @@ extern "C"
 #include <IOKit/storage/IOMedia.h>
 #include <IOKit/storage/IODVDMedia.h>
 #include <IOKit/storage/IODVDBlockStorageDriver.h>
+
+#undef CONTROL //some include above #defines this and breaks the next include...grr.
+#include <IOKit/scsi-commands/IOSCSIMultimediaCommandsDevice.h>
+#include <IOKit/scsi-commands/IODVDServices.h>
 
 #include "DVDioctl.h"
 
@@ -108,6 +113,8 @@ static int i_major;
 static void *p_node;
 static IODVDMedia *p_dvd;
 static IODVDBlockStorageDriver *p_drive;
+static IODVDServices *p_services;
+static IOSCSIMultimediaCommandsDevice *p_scsi_mcd;
 
 /*****************************************************************************
  * DKR_GET_DEV: borrowed from IOMediaBSDClient.cpp
@@ -252,6 +259,8 @@ bool DVDioctl::init( OSDictionary *p_dict = 0 )
     p_node  = NULL;
     p_dvd   = NULL;
     p_drive = NULL;
+    p_services = NULL;
+    p_scsi_mcd = NULL;
     i_major = -1;
     b_inuse = false;
 
@@ -405,6 +414,10 @@ static int DVDOpen( dev_t dev, int flags, int devtype, struct proc * )
 
     p_drive = p_dvd->getProvider();
 
+    p_services = OSDynamicCast( IODVDServices, p_drive->getProvider() );
+
+    p_scsi_mcd = OSDynamicCast( IOSCSIMultimediaCommandsDevice, p_services->getProvider() );
+
     log( LOG_INFO, "DVD ioctl: IODVDMedia->open()\n" );
 
     return 0;
@@ -420,6 +433,8 @@ static int DVDClose( dev_t dev, int flags, int devtype, struct proc * )
 
     p_dvd   = NULL;
     p_drive = NULL;
+    p_services = NULL;
+    p_scsi_mcd = NULL;
     b_inuse = false;
 
     log( LOG_INFO, "DVD ioctl: IODVDMedia->close()\n" );
@@ -450,9 +465,15 @@ static void DVDStrategy( buf_t * bp )
 static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
                           struct proc *p )
 {
-    dvdioctl_data_t    *p_data = (dvdioctl_data_t *)addr;
-    IOMemoryDescriptor *p_mem;
+#define p_data (((dvdioctl_data_t *)addr))
+    IOReturn            i_ret = EINVAL;
+
+    /* Only needed for IODVD_READ_STRUCTURE */
+    SCSITask           *p_request;
+    SCSIServiceResponse response;
     
+    IOMemoryDescriptor *p_mem;
+
     p_mem = IOMemoryDescriptor::withAddress( p_data->p_buffer,
                                              p_data->i_size,
                                              kIODirectionOutIn );
@@ -463,9 +484,49 @@ static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
 
             log( LOG_INFO, "DVD ioctl: IODVD_READ_STRUCTURE\n" );
 
-            /* We don't do anything, since I don't know what to do */
+            i_ret = kIOReturnUnsupported;
+            response = kSCSIServiceResponse_SERVICE_DELIVERY_OR_TARGET_FAILURE;
 
-            return 0;
+/* HACK! - Make GetSCSITask and friends in /System/Library/Frameworks/Kernel.framework/Versions/A/Headers/IOKit/scsi-commands/IOSCSIPrimaryCommandsDevice.h public by moving public: from line 96 to line 79 (as root).  It's only a compile time check - not a link time thing, so it should be ok. */
+            p_request = p_scsi_mcd->GetSCSITask( );
+
+            if ( p_scsi_mcd->READ_DVD_STRUCTURE ( p_request,
+                                                  p_mem,
+                                                  p_data->i_lba,
+                                                  0,//?LAYER_NUMBER
+                                                  p_data->i_keyformat,
+                                                  p_mem->getLength(),//p_data->i_size ?
+                                                  p_data->i_agid,
+                                                  0x00 //?CONTROL
+                                                   ) == true )
+                {
+                    /* The command was successfully built, now send it */
+                    response = p_scsi_mcd->SendCommand( p_request );
+                }
+                else
+                {
+#if 0
+                    exit -1;
+                    PANIC_NOW(( "IOSCSIMultimediaCommandsDevice:: "
+                                "readDVDstruct malformed command" ));
+#endif
+                }
+
+                if( ( response == kSCSIServiceResponse_TASK_COMPLETE ) &&
+                    ( p_request->GetTaskStatus ( ) == kSCSITaskStatus_GOOD ) )
+                {
+                    i_ret = kIOReturnSuccess;
+                }
+                else
+                {
+                    i_ret = kIOReturnError;
+                }
+
+                p_scsi_mcd->ReleaseSCSITask( p_request );
+                        
+            }
+
+            break;
 
         case IODVD_SEND_KEY:
 
@@ -475,9 +536,11 @@ static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
                  (int)p_data->p_buffer, p_data->i_keyclass,
                  p_data->i_agid, p_data->i_keyformat );
 
-            return p_drive->sendKey( p_mem, (DVDKeyClass)p_data->i_keyclass,
-                                     p_data->i_agid,
-                                     (DVDKeyFormat)p_data->i_keyformat );
+            i_ret = p_drive->sendKey( p_mem, (DVDKeyClass)p_data->i_keyclass,
+                                      p_data->i_agid,
+                                      (DVDKeyFormat)p_data->i_keyformat );
+
+            break;
 
         case IODVD_REPORT_KEY:
 
@@ -487,16 +550,23 @@ static int DVDBlockIoctl( dev_t dev, u_long cmd, caddr_t addr, int flags,
                  (int)p_data->p_buffer, p_data->i_keyclass, p_data->i_lba,
                  p_data->i_agid, p_data->i_keyformat );
 
-            return p_drive->reportKey( p_mem, (DVDKeyClass)p_data->i_keyclass,
-                                       p_data->i_lba, p_data->i_agid,
-                                       (DVDKeyFormat)p_data->i_keyformat );
+            i_ret = p_drive->reportKey( p_mem, (DVDKeyClass)p_data->i_keyclass,
+                                        p_data->i_lba, p_data->i_agid,
+                                        (DVDKeyFormat)p_data->i_keyformat );
+
+            break;
 
         default:
 
             log( LOG_INFO, "DVD ioctl: unknown ioctl\n" );
 
-            return EINVAL;
+            i_ret = EINVAL;
+
+            break;
     }
+
+    return i_ret;
+#undef p_data
 }
 
 /*****************************************************************************

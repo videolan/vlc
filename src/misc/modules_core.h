@@ -2,7 +2,7 @@
  * modules_core.h : Module management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_core.h,v 1.2 2001/06/14 01:49:44 sam Exp $
+ * $Id: modules_core.h,v 1.3 2001/06/25 11:34:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -98,7 +98,7 @@ module_getsymbol( module_handle_t handle, char * psz_function )
         return( NULL );
     }
 
-#elif defined(SYS_DARWIN1_3)
+#elif defined( SYS_DARWIN )
     /* MacOS X dl library expects symbols to begin with "_". That's
      * really lame, but hey, what can we do ? */
     char *  psz_call = malloc( strlen( psz_function ) + 2 );
