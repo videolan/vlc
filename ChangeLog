@@ -1,3 +1,439 @@
+2004-03-01 Monday 20:36  gbazin
+
+ * modules/gui/skins2/Modules.am: oops, 1 file too much.
+
+2004-03-01 Monday 20:04  gbazin
+
+ * po/*: ./toolbox --update-po in preparation for the release.
+
+2004-03-01 Monday 19:58  gbazin
+
+ * modules/gui/skins2/src/skin_main.cpp: default skin is skins2/default/theme.xml.
+
+2004-03-01 Monday 19:41  gbazin
+
+ * modules/gui/skins2/Modules.am: include the default skins2 theme in the "make dist" rule.
+ * install-win32, Makefile.am: include the default skins2 theme in the win32 package.
+
+2004-03-01 Monday 19:36  asmax
+
+ * all: changed dtd version to 1.99 before the final dtd freeze
+
+2004-03-01 Monday 18:33  asmax
+
+ * parser/builder.cpp, parser/skin_parser.cpp: unique IDs are generated
+  in the xml parser instead of the builder: fixes nasty bugs related
+  to layout IDs
+ * theme/skin.dtd: "id" attribute is no longer required for window
+
+2004-03-01 Monday 18:31  gbazin
+
+ * modules/gui/wxwindows/*: make sure we re-use the streaming wizard so the user selection doesn't get lost each time it is opened.
+
+2004-03-01 Monday 17:36  gbazin
+
+ * modules/demux/mkv.cpp: fixed copy&paste bug.
+
+2004-03-01 Monday 12:50  gbazin
+
+ * include/vlc_threads.h:
+    + lower a bit the input thread priority on win32 (using THREAD_PRIORITY_ABOVE_NORMAL now).
+ * modules/access/file.c:
+    + s/config_GetInt()/var_Get() for file-caching.
+ * modules/access_output/udp.c:
+    + less verbose debug messages.
+    + increase thread priority on win32.
+
+2004-03-01 Monday 11:55  massiot
+
+ * Added two files in Modules.am
+
+2004-02-29 Sunday 23:08  murray
+
+ Shit, forgot to :wq before committing :) sorry guys
+
+2004-02-29 Sunday 22:59  jpsaman
+
+ Updated PDA interface.
+
+2004-02-29 Sunday 22:56  murray
+
+ Minor changes to the italian translation (thanks to Paolo Caravello)
+
+ Actually, we still got some (huge) untranslated strings in libvlc.h,
+ I'll care about them after the release.
+
+2004-02-29 Sunday 21:10  jpsaman
+
+ Updated version strings to 0.7.1 for upcoming release.
+
+2004-02-29 Sunday 21:09  jpsaman
+
+ Updated Dutch translation.
+
+2004-02-29 Sunday 19:28  gbazin
+
+ * configure.ac: fixed --with-dts-tree.
+
+2004-02-29 Sunday 19:12  gbazin
+
+ * NEWS: updated.
+
+2004-02-29 Sunday 19:01  gbazin
+
+ * modules/demux/rawdv.c: DV audio support was removed from libavcodec so reimplemented it here.
+
+2004-02-29 Sunday 17:36  asmax
+
+ * src/skin_main.cpp: do not delete the input a second time !
+
+2004-02-29 Sunday 16:49  asmax
+
+ * controls/*, src/generic_window.cpp, src/generic_layout.cpp: a visibiliy
+ variable is now owned by CtrlGeneric, and handled directly by the layout
+ and the window (at the moment only the slider control uses it)
+ * theme/skin.dtd, parser/builder.cpp, parser, skin_parser.cpp: added
+ the "color" attribute for control text
+
+2004-02-29 Sunday 14:35  gbazin
+
+ * INSTALL.win32: updated win32 build instructions.
+
+2004-02-29 Sunday 14:05  zorglub
+
+ Sanity check
+
+2004-02-29 Sunday 14:05  asmax
+
+ * src/skin_main.cpp: fixed a bug related to the destruction order ;)
+
+2004-02-29 Sunday 13:55  kuehne
+
+ Fixed breakage which has been introduced in the last commit
+
+2004-02-29 Sunday 13:49  kuehne
+
+ spelling fixes
+
+2004-02-29 Sunday 13:33  gbazin
+
+ * ipkg/Makefile.am: don't try to package files which have been removed.
+
+2004-02-29 Sunday 13:08  gbazin
+
+ * src/misc/variables.c: fixed memleak.
+ * include/vlc_common.h: use pragma to disable useless MSVC warnings.
+
+2004-02-29 Sunday 13:05  gbazin
+
+ * ALL: bumped revision number to 0.7.1
+ * modules/audio_filter/converter/dtstofloat32.c: update for libdts-0.0.2
+
+2004-02-29 Sunday 13:03  gbazin
+
+ * src/packages.mak: updated for libdts-0.0.2
+
+2004-02-28 Saturday 19:40  zorglub
+
+ Search on the author field too
+
+2004-02-28 Saturday 19:31  zorglub
+
+ Fix loop on end of search
+
+2004-02-28 Saturday 19:30  gbazin
+
+ * modules/gui/wxwindows/streamout.cpp: added mp4a to the list of audio transcoders.
+
+2004-02-28 Saturday 17:10  gbazin
+
+ * src/playlist/*: portability fixes, moved playlist_AddOption() to item-ext.c.
+
+2004-02-28 Saturday 13:53  titer
+
+  macosx/vout* : don't forget to exit fullscreen mode at EOF,
+                 fixed a segfault
+
+2004-02-27 Friday 22:33  kuehne
+
+ Updated german translation
+
+2004-02-27 Friday 15:07  gbazin
+
+ * src/skin_main.cpp: fixed bug related to the destruction order.
+ * parser/xmlparser.hpp: removed useless change.
+
+2004-02-27 Friday 14:22  fenrir
+
+  * avi.c: uses rv15 for 15 and 16 bits file. (I don't know if it's ok).
+
+2004-02-27 Friday 14:05  fenrir
+
+  * avi.c: added support for rgb 32 (24 won't work under linux as the vout
+  handle 24 and 32 the same way :(
+
+2004-02-27 Friday 14:02  fenrir
+
+  * rawvideo.c, ffmpeg/chroma.c: added YVU9.
+
+2004-02-27 Friday 14:01  fenrir
+
+  * vout_pictures.*: added YVU9.
+
+2004-02-27 Friday 13:24  gbazin
+
+ * modules/gui/skins2/*: portability fixes.
+
+2004-02-26 Thursday 19:11  murray
+
+ it.po: italian localization for VLC 0.7.1
+ fr.po: minor fixes
+
+2004-02-26 Thursday 17:07  hartman
+
+ * Don't crash during my demo to the university computer labs.
+   - don't crash when i_output < 0
+
+2004-02-26 Thursday 17:02  gbazin
+
+ * modules/audio_output/directx.c: don't use hardware buffers for <= 2 channels.
+    A few users have been reporting problems with the directx audio output and it might very well be the cause of their problems (ie. with buggy drivers).
+
+2004-02-26 Thursday 14:40  hartman
+
+ * another thing that wasn't committed yet.
+   - Fix Playlist Save. Can only do m3u atm.
+
+2004-02-26 Thursday 13:58  gbazin
+
+ * modules/video_output/directx/*: fixes uninitialized variables and memleaks.
+
+2004-02-26 Thursday 13:24  hartman
+
+ * don't break things...
+
+2004-02-26 Thursday 13:04  hartman
+
+ * Something I forgot
+   --macosx-stretch mode. Ignore aspect ratio and stretch video to fill window.
+
+2004-02-26 Thursday 12:04  gbazin
+
+ * modules/gui/wxwindows/wxwindows.cpp: include setlocale.h after the vlc headers.
+ * modules/gui/wxwindows/menus.cpp: fixed memory leaks.
+ * modules/gui/wxwindows/playlist.cpp: fixed deadlock.
+
+2004-02-26 Thursday 08:24  gbazin
+
+ * modules/gui/wxwindows/playlist.cpp: removed useless lock.
+
+2004-02-26 Thursday 00:23  gbazin
+
+ * modules/gui/wxwindows/*: a whole bunch of bug-fixes spotted by running the debug build of wxWindows.
+
+2004-02-25 Wednesday 23:28  hartman
+
+ * Disable libmad on OS X
+
+2004-02-25 Wednesday 22:42  ipkiss
+
+ Fixed an incorrect string
+
+2004-02-25 Wednesday 22:16  jpsaman
+
+ Added configuration for h3600 iPAQ PDA with small Flash sizes.
+ Removed unused files.
+
+2004-02-25 Wednesday 22:01  zorglub
+
+ Update of the french translation.
+
+ This file need reviewing, please help
+
+2004-02-25 Wednesday 19:27  titer
+
+  macosx/vout* : fixed OpenGL fullscreen (still needs some cleaning)
+
+2004-02-25 Wednesday 18:47  gbazin
+
+ * src/input/input_dec.c: compilation fix.
+
+2004-02-25 Wednesday 18:43  gbazin
+
+ * modules/packetizer/mpeg4audio.c, modules/packetizer/mpegvideo.c: compilation fix.
+
+2004-02-25 Wednesday 18:42  gbazin
+
+ * modules/gui/wxwindows/wxwindows.h: workaround/compilation fix for new wxWindows versions.
+
+2004-02-25 Wednesday 18:22  fenrir
+
+  * libmpeg2.c: lalala, compilation fix...
+
+2004-02-25 Wednesday 17:48  fenrir
+
+  * all: removed block_t->b_discontinuity,b_frame_* and added i_flags
+  field and a few BLOCK_FLAG_*.
+
+2004-02-25 Wednesday 14:02  zorglub
+
+ Update of the brazilian portuguese translation, thanks to
+ André de Barros Martins Ribeiro
+
+2004-02-25 Wednesday 12:38  fenrir
+
+  * all: fixed sout-audio/video options.
+
+2004-02-24 Tuesday 22:15  gbazin
+
+ * modules/gui/wxwindows/menus.cpp: try to display choices menus in a more clever way (hide useless things like empty menus).
+
+2004-02-24 Tuesday 19:23  gbazin
+
+ * modules/demux/dts.c: improved detection of wav dts files.
+
+2004-02-24 Tuesday 18:19  zorglub
+
+ Fix problem in playlist update code.
+
+ Strangely, the "AddPendingEvent" wxwindows call seems to hang, so
+ replace it bhy "ProcessEvent" (the playlist update is processed
+ immediately in the callback, but it is only the update of one item, so
+ it should not be a problem)
+
+2004-02-24 Tuesday 17:43  gbazin
+
+ * modules/access/cdda.c: added "cddasimple" shortcut.
+
+2004-02-24 Tuesday 17:42  gbazin
+
+ * modules/stream_out/transcode.c: compilation fixes for ffmpeg-0.4.8.
+
+2004-02-24 Tuesday 17:16  bigben
+
+ Do not send an event when clicking out of the search box
+
+2004-02-24 Tuesday 16:31  fenrir
+
+  * http.c: "Transfer-Encoding: chunked" support. (Tested with only one URL).
+
+2004-02-23 Monday 23:01  gbazin
+
+ * modules/demux/wav.c: more fixes for multichannel wav files support.
+ * include/codecs.h: ms speakers definitions.
+ * modules/codec/araw.c: added support for fl64 fourcc.
+
+2004-02-23 Monday 21:57  gbazin
+
+ * src/playlist/playlist.c: who said testing was useful ?
+
+2004-02-23 Monday 21:50  gbazin
+
+ * src/playlist/playlist.c: bug fix.
+
+2004-02-23 Monday 21:00  sigmunau
+
+ modules/misc/sap.c:
+  * fixed two memleaks, one of them rather large
+  * fix for http announces that don't start the filename part with '/'
+
+2004-02-23 Monday 20:55  kuehne
+
+ Enlarged some fields in the OpenTarget-Window to display the entire localizations
+
+2004-02-23 Monday 20:45  fenrir
+
+  * livedotcom.cpp: nULL -> UI64C(n).
+
+2004-02-23 Monday 20:35  fenrir
+
+  * livedotcom.cpp: a fix + a nasty hack that should fix playback of streams
+  using weird value after a synch with RTCP.
+
+2004-02-23 Monday 20:34  gbazin
+
+ * include/vlc_common.h: added the UI64C() macro for unsinged long long constants.
+
+2004-02-23 Monday 12:17  gbazin
+
+ *  modules/gui/wxwindows/playlist.cpp: don't update the GUI from different threads!
+ * src/playlist/playlist.c: vout/sout garbage collection improvements.
+
+2004-02-23 Monday 00:10  rocky
+
+ Change error reporting on memory error to be memory error.
+
+2004-02-22 Sunday 23:09  titer
+
+ ipv4.c : BeOS compile fix
+
+2004-02-22 Sunday 21:32  gbazin
+
+ * modules/access/cdda/access.c: fix to allow playing the last track and cd's with only 1 track.
+
+2004-02-22 Sunday 16:40  fenrir
+
+  * input_programs.c: a little memleak.
+
+2004-02-22 Sunday 16:08  fenrir
+
+  * all: changed the prototype of sout_InputNew.
+
+2004-02-22 Sunday 16:01  fenrir
+
+  * livedotcom.cpp: bug fix. (a bad memory allocation).
+
+2004-02-22 Sunday 15:59  fenrir
+
+  * sub.c: VobSub fix.
+
+2004-02-22 Sunday 15:57  fenrir
+
+  * all: compilation warning fixes (mainly missings headers).
+
+2004-02-22 Sunday 15:52  zorglub
+
+ Fix compilation warnings
+
+2004-02-22 Sunday 15:41  massiot
+
+ * Updated contrib build system
+ * src/misc/threads.c: fixed a Darwin-specific bug introduced recently
+
+2004-02-22 Sunday 15:03  gbazin
+
+ * configure.ac: added an --enable-utf8 option (default enabled on osx/beos/win32).
+ * src/libvlc.c, modules/gui/wxwindows/wxwindows.h: use #ifdef ENABLE_UTF8
+
+2004-02-22 Sunday 10:52  rocky
+
+ Fix valgrind-caught memory leak.
+
+2004-02-22 Sunday 10:30  rocky
+
+ Fix mem leak caught by valgrind.
+
+2004-02-22 Sunday 10:30  rocky
+
+ fix mem leak. (Caught by valgrind.)
+
+2004-02-22 Sunday 09:35  rocky
+
+ Make sure a couple of variables are initialized before
+ reading. (caught by valgrind).
+
+2004-02-22 Sunday 00:55  gbazin
+
+ * po/*: ./toolbox --update-po.
+
+2004-02-22 Sunday 00:33  gbazin
+
+ * modules/demux/playlist/Modules.am: don't forget playlist.h.
+
+2004-02-22 Sunday 00:15  gbazin
+
+ * ALL: preparation for 0.7.1-test2.
+
 2004-02-21 Saturday 23:50  gbazin
 
  * modules/stream_out/transcode.c: fixed memleak. Set aspect ratio info even for raw video input.
