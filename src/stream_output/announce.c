@@ -288,11 +288,11 @@ void sout_SAPDelete( sout_instance_t *p_sout, sap_session_t * p_sap )
     int i_ret;
 
 #if defined( UNDER_CE )
-    i_ret = CloseHandle( (HANDLE)p_sap->i_handle );
+    i_ret = CloseHandle( (HANDLE)p_sap->i_socket );
 #elif defined( WIN32 )
-    i_ret = closesocket( p_sap->i_handle );
+    i_ret = closesocket( p_sap->i_socket );
 #else
-    i_ret = close( p_sap->i_handle );
+    i_ret = close( p_sap->i_socket );
 #endif
 
     if( i_ret )
