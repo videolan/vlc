@@ -1,0 +1,63 @@
+$Id: THANKS,v 1.1 2003/01/31 22:34:07 sam Exp $
+
+VLC makes extensive use of the following persons' code:
+
+Aaron Holtzman <aholtzma@ess.engr.uvic.ca> - AC3 decoder, MPEG video decoder
+Michel Lespinasse <walken@zoy.org> - AC3 decoder, MPEG audio and video decoders
+
+
+The VideoLAN team would like to thank the following contributors:
+
+Andres Krapf <dae@via.ecp.fr> - FreeBSD port and tests, KDE interface
+Arkadiusz Lipiec <A.Lipiec@elka.pw.edu.pl> - Polish translation
+Arkadiusz Miskiewicz <misiek@pld.ORG.PL> - autoconf and Makefile patches
+Arnaud Gomes-do-Vale <arnaud@carrosse.frmug.org> - autoconf patches
+Benjamin Mironer <bmironer@noos.fr> - Mac OS X fixes
+Benoit Steiner <benny@via.ecp.fr> - MPEG system input, network input
+Bill Eldridge <bill@rfa.org> - documentation
+Brieuc Jeunhomme <bbp@via.ecp.fr> - bug fixes
+Bruno Vella <allevb@tin.it> - Italian localization
+Christopher Johnson <cjohnson@mint.net> - Qt fix in vlc.spec
+Colin Simmonds <colin_simmonds@Mac.lover.org> - compile fix for Mac OS X
+Damian Ivereigh <damian@cisco.com> - ac3dec uninitialized data structure fix
+David Kennedy <dkennedy@tinytoad.com> - X11 fullscreen patch
+David Weber <david_weber@gmx.de> - Mac OS X interface design & graphics
+Emmanuel Blindauer <manu@agat.net> - aRts audio output
+Espen Skoglund <esk@ira.uka.de> - FreeBSD autoconf and Makefile patches
+Ethan C. Baldridge <BaldridgeE@cadmus.com> - directory browsing code
+Felix Kühne <fk@aenneburghardt.de> - german translation
+Fumio Nakayama <endymion@ca2.so-net.ne.jp> - Japanese translation
+Hans-Peter Jansen <hpj@urpla.net> - patch for module options handling
+Jean-Philippe Grimaldi <jeanphi@via.ecp.fr> - bug fixes
+Jeffrey Baker <jwbaker@acm.org> - port of the ALSA plugin to the ALSA 1.0 API
+Joel Arvidsson <dogai@privat.utfors.se> - Swedish translation
+Joeri van Dooren <joeri@van.dooren.be> - OS X icon
+John Paul Lorenti <jpl31@columbia.edu> - ALSA device selection patch
+Julien Blache <jb@technologeek.org> - disc ejection code
+Mark Gritter <mgritter@kealia.com> - fix for netlist packet leak in demuxPSI
+Markus Kuespert <ltlBeBoy@beosmail.com> - BeOS CSS support
+Mathias Kretschmer <mathias@research.att.com> - IP Multicast support
+Matthieu Lochegnies <lochegm1@cti.ecp.fr> - MPEG audio emphasis fix
+Michael Mondragon <mammon@lokmail.net> - ncurses compilation fix
+Michel Lanners <mlan@cpu.lu> - fixed typos and AltiVec detection
+Nilmoni Deb <ndeb@ece.cmu.edu> - autoconf and Makefile fixes
+Olivier Pomel <pomel@via.ecp.fr> - original VLC code
+Øyvind Kolbu <oyvindk@world-online.no> - FreeBSD patches
+Paul Mackerras <paulus@linuxcare.com.au> - AltiVec IDCT and motion
+Régis Duchesne <regis@via.ecp.fr> - original VLC code
+Remco Poortinga <poortinga@telin.nl> - IPv6 multicast patch
+Rene Gollent <rgollent@u.arizona.edu> - BeOS interface fix
+Roine Gustafsson <roine@popstar.com> - spudec bug fixes
+Rudolf Cornelissen <rag.cornelissen@inter.nl.net> - BeOS fixes
+Steve Brown <sbrown@cortland.com> - fix for optional PES size bug
+Steven M. Schultz <sms@TO.GD-ES.COM> - BSD/OS port
+Thomas Graf <tgraf@europe.com> - gettext support, german translation
+Thomas L. Wood <twood@lucent.com> - fixed a bug in QuantMatrixExtension
+Valek Filippov <frob@df.ru> - russian translation
+Vladimir Chernyshov <greengrass@writeme.com> - MMX motion optimizations
+Wade Majors <guru@startrek.com> - BeOS icon integration, debugging and fixes
+Watanabe Go <go@dsl.gr.jp> - fix for non-ASCII filenames
+Xavier Maillard <zedek@fxgsproject.org> - audio converters
+Xavier Marchesini <xav@alarue.net> - Win32 fixes
+Yves Duret <yves@zarb.org> - RPM packages
+
