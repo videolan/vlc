@@ -52,9 +52,6 @@ static void Close( vlc_object_t *p_this );
     "Allows you to modify the default caching value for dvb streams. This " \
     "value should be set in millisecond units." )
 
-#define PROGRAM_TEXT N_("Program to decode")
-#define PROGRAM_LONGTEXT N_("This is a workaround for a bug in the input")
-
 #define ADAPTER_TEXT N_("Adapter card to tune")
 #define ADAPTER_LONGTEXT N_("Adapter cards have a device file in directory named /dev/dvb/adapter[n] with n>=0.")
 
