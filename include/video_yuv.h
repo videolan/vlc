@@ -9,9 +9,9 @@
 /*******************************************************************************
  * Prototypes
  *******************************************************************************/
-int             vout_InitTables      ( vout_thread_t *p_vout );
-int             vout_ResetTables     ( vout_thread_t *p_vout );
-void            vout_EndTables       ( vout_thread_t *p_vout );
+int             vout_InitYUV      ( vout_thread_t *p_vout );
+int             vout_ResetYUV     ( vout_thread_t *p_vout );
+void            vout_EndYUV       ( vout_thread_t *p_vout );
 
 /*******************************************************************************
  * External prototypes

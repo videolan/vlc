@@ -153,14 +153,10 @@ int vout_SysInit( vout_thread_t *p_vout )
         }
     }
 
-    /* Set bytes per line */
+    /* Set bytes per line and initialize buffers */
     p_vout->i_bytes_per_line = p_vout->p_sys->p_ximage[0]->bytes_per_line;    
-
-    /* Set and initialize buffers */
-    p_vout->p_buffer[0].p_data = p_vout->p_sys->p_ximage[ 0 ]->data;    
-    p_vout->p_buffer[1].p_data = p_vout->p_sys->p_ximage[ 1 ]->data;
-    vout_ClearBuffer( p_vout, &p_vout->p_buffer[0] );
-    vout_ClearBuffer( p_vout, &p_vout->p_buffer[1] );    
+    vout_SetBuffers( p_vout, p_vout->p_sys->p_ximage[ 0 ]->data, 
+                     p_vout->p_sys->p_ximage[ 1 ]->data );
     return( 0 );
 }
 
@@ -224,6 +220,10 @@ int vout_SysManage( vout_thread_t *p_vout )
             intf_ErrMsg("error: can't resize display\n");
             return( 1 );            
         }
+
+        /* Tell the video output thread that it will need to rebuild YUV
+         * tables. This is needed since convertion buffer size may have changed */
+        p_vout->i_changes |= VOUT_YUV_CHANGE;
         intf_Msg("Video display resized (%dx%d)\n", p_vout->i_width, p_vout->i_height);
     }
     

@@ -260,7 +260,6 @@
 
 /* Time during which the thread will sleep if it has nothing to 
  * display (in micro-seconds) */
-/* ?? this constant will probably evolve to a calculated value */
 #define VOUT_IDLE_SLEEP                 20000
 
 /* Maximum lap of time allowed between the beginning of rendering and
@@ -268,11 +267,10 @@
  * late, the thread will perform an idle loop. This time should be
  * at least VOUT_IDLE_SLEEP plus the time required to render a few
  * images, to avoid trashing of decoded images */
-/* ?? this constant will probably evolve to a calculated value */
 #define VOUT_DISPLAY_DELAY              500000
 
-/* Delay (in microseconds) between increments in idle levels */
-#define VOUT_IDLE_DELAY                 5000000000000
+/* Delay (in microseconds) before an idle screen is displayed */
+#define VOUT_IDLE_DELAY                 5000000
 
 /* Number of pictures required to computes the FPS rate */
 #define VOUT_FPS_SAMPLES                20

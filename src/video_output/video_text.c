@@ -369,9 +369,9 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
     }    
 
     /* Choose masks and copy font data to local variables */
-    i_char_mask =               (i_style & VOID_TEXT) ? 0 : 0xff;
-    i_border_mask =             (i_style & OUTLINED_TEXT) ? 0xff : 0;
-    i_bg_mask =                 (i_style & TRANSPARENT_TEXT) ? 0 : 0xff;
+    i_char_mask =               (i_style & VOID_TEXT) ?         0 : 0xff;
+    i_border_mask =             (i_style & OUTLINED_TEXT) ?     0xff : 0;
+    i_bg_mask =                 (i_style & OPAQUE_TEXT) ?       0xff : 0;
 
     i_font_bytes_per_line =     p_font->i_bytes_per_line;
     i_font_height =             p_font->i_height;

@@ -250,7 +250,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
         if( p_intf->p_vout != NULL )
         {
             vlc_mutex_lock( &p_intf->p_vout->change_lock );                        
-            p_intf->p_vout->b_scale     = !p_intf->p_vout->b_scale;                    
+            p_intf->p_vout->b_scale    = !p_intf->p_vout->b_scale;                    
             p_intf->p_vout->i_changes |= VOUT_SCALE_CHANGE;                        
             vlc_mutex_unlock( &p_intf->p_vout->change_lock );      
         }

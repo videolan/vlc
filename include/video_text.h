@@ -7,7 +7,7 @@
  * They may be ignored or interpreted by higher level functions */
 #define WIDE_TEXT                       1           /* interspacing is doubled */
 #define ITALIC_TEXT                     2                            /* italic */
-#define TRANSPARENT_TEXT                4                  /* transparent text */
+#define OPAQUE_TEXT                     4              /* text with background */
 #define OUTLINED_TEXT                   8             /* border around letters */
 #define VOID_TEXT                      16                     /* no foreground */
 

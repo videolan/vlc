@@ -258,16 +258,6 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display )
     }    
 #endif
 
-    /* Get font size */
-    if( ggiGetCharSize( p_vout->p_sys->p_display, &p_vout->p_sys->i_char_width,
-                        &p_vout->p_sys->i_char_height ) )
-    {
-        intf_ErrMsg("error: can't get font size\n");
-        ggiClose( p_vout->p_sys->p_display );        
-        ggiExit();
-        return( 1 );   
-    }
-
     /* Set graphic context colors */
     col_fg.r = col_fg.g = col_fg.b = -1;    
     col_bg.r = col_bg.g = col_bg.b = 0;    
@@ -323,10 +313,7 @@ static int GGIOpenDisplay( vout_thread_t *p_vout, char *psz_display )
     }
 
     /* Set and initialize buffers */
-    p_vout->p_buffer[0].p_data = p_vout->p_sys->p_buffer[ 0 ]->write;
-    p_vout->p_buffer[1].p_data = p_vout->p_sys->p_buffer[ 1 ]->write;
-    vout_ClearBuffer( p_vout, &p_vout->p_buffer[0] );
-    vout_ClearBuffer( p_vout, &p_vout->p_buffer[1] );    
+    vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer[ 0 ]->write, p_vout->p_sys->p_buffer[ 1 ]->write );
 
     return( 0 );    
 }

@@ -53,8 +53,6 @@ typedef struct vout_sys_s
  ******************************************************************************/
 static int     FBOpenDisplay   ( vout_thread_t *p_vout );
 static void    FBCloseDisplay  ( vout_thread_t *p_vout );
-static void    FBBlankDisplay  ( vout_thread_t *p_vout );
-
 
 /******************************************************************************
  * vout_SysCreate: allocates FB video thread output method
@@ -221,7 +219,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
         break;
 
     default:                                       /* unsupported screen depth */
-        intf_ErrMsg("vout error: screen depth %i is not supported\n",
+        intf_ErrMsg("vout error: screen depth %d is not supported\n",
 		                     p_vout->i_screen_depth);
         return( 1  );
         break;
@@ -242,16 +240,10 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
     }
 
     /* Set and initialize buffers */
-    p_vout->p_buffer[0].p_data = p_vout->p_sys->p_video;
-    p_vout->p_buffer[1].p_data = p_vout->p_sys->p_video + p_vout->p_sys->i_page_size;    
-    vout_ClearBuffer( p_vout, &p_vout->p_buffer[0] );
-    vout_ClearBuffer( p_vout, &p_vout->p_buffer[1] );    
-
+    vout_SetBuffers( p_vout, p_vout->p_sys->p_video, 
+                     p_vout->p_sys->p_video + p_vout->p_sys->i_page_size );
     intf_DbgMsg("framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d\n",
                 fix_info.type, fix_info.visual, fix_info.ypanstep, fix_info.ywrapstep, fix_info.accel );
-    intf_Msg("vout: framebuffer display initialized (%s), %dx%d depth=%d bpp\n",
-             fix_info.id, p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth );
-
     return( 0 );
 }    
 

@@ -35,17 +35,19 @@ static void     RunThread               ( vout_thread_t *p_vout );
 static void     ErrorThread             ( vout_thread_t *p_vout );
 static void     EndThread               ( vout_thread_t *p_vout );
 static void     DestroyThread           ( vout_thread_t *p_vout, int i_status );
-static void     Print                   ( vout_thread_t *p_vout, int i_x, int i_y, int i_halign, int i_valign, unsigned char *psz_text );
-
+static void     Print                   ( vout_thread_t *p_vout, int i_x, int i_y, 
+                                          int i_h_align, int i_v_align, unsigned char *psz_text );
 static void     SetBufferArea           ( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int i_h );
 static void     SetBufferPicture        ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic );
 static void     RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderSubPictureUnit    ( vout_thread_t *p_vout, spu_t *p_spu );
+static void     RenderSubPicture        ( vout_thread_t *p_vout, subpicture_t *p_subpic );
 static void     RenderInterface         ( vout_thread_t *p_vout );
-static void     RenderIdle              ( vout_thread_t *p_vout );
+static int      RenderIdle              ( vout_thread_t *p_vout );
 static void     RenderInfo              ( vout_thread_t *p_vout );
 static int      Manage                  ( vout_thread_t *p_vout );
+static int      Align                   ( vout_thread_t *p_vout, int *pi_x, int *pi_y, 
+                                          int i_width, int i_height, int i_h_align, int i_v_align );
 
 /******************************************************************************
  * vout_CreateThread: creates a new video output thread
@@ -81,6 +83,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
 
     /* Initialize some fields used by the system-dependant method - these fields will
      * probably be modified by the method, and are only preferences */
+    p_vout->i_changes           = 0;
     p_vout->i_width             = i_width;
     p_vout->i_height            = i_height;
     p_vout->i_bytes_per_line    = i_width * 2;    
@@ -98,28 +101,27 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                 p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
 
+    /* Initialize idle screen */
+    p_vout->last_display_date   = mdate();
+    p_vout->last_idle_date      = 0;
+
 #ifdef STATS
     /* Initialize statistics fields */
     p_vout->render_time         = 0;    
     p_vout->c_fps_samples       = 0;    
 #endif      
 
-    /* Initialize running properties */
-    p_vout->i_changes           = 0;
-    p_vout->last_picture_date   = 0;
-    p_vout->last_display_date   = 0;
-
     /* Initialize buffer index */
     p_vout->i_buffer_index      = 0;
 
-    /* Initialize pictures and spus - translation tables and functions
+    /* Initialize pictures and subpictures - translation tables and functions
      * will be initialized later in InitThread */    
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++)
     {
-        p_vout->p_picture[i_index].i_type   = EMPTY_PICTURE;
-        p_vout->p_picture[i_index].i_status = FREE_PICTURE;
-        p_vout->p_spu[i_index].i_type  = EMPTY_SPU;
-        p_vout->p_spu[i_index].i_status= FREE_SPU;
+        p_vout->p_picture[i_index].i_type   =   EMPTY_PICTURE;
+        p_vout->p_picture[i_index].i_status =   FREE_PICTURE;
+        p_vout->p_subpicture[i_index].i_type  = EMPTY_SUBPICTURE;
+        p_vout->p_subpicture[i_index].i_status= FREE_SUBPICTURE;
     }
    
     /* Create and initialize system-dependant method - this function issues its
@@ -153,7 +155,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
 
     /* Create thread and set locks */
     vlc_mutex_init( &p_vout->picture_lock );
-    vlc_mutex_init( &p_vout->spu_lock );    
+    vlc_mutex_init( &p_vout->subpicture_lock );    
     vlc_mutex_init( &p_vout->change_lock );    
     vlc_mutex_lock( &p_vout->change_lock );    
     if( vlc_thread_create( &p_vout->thread_id, "video output", (void *) RunThread, (void *) p_vout) )
@@ -217,13 +219,13 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
 }
 
 /******************************************************************************
- * vout_DisplaySubPictureUnit: display a sub picture unit
+ * vout_DisplaySubPicture: display a subpicture unit
  ******************************************************************************
- * Remove the reservation flag of an spu, which will cause it to be ready for
- * display. The picture does not need to be locked, since it is ignored by
+ * Remove the reservation flag of an subpicture, which will cause it to be ready 
+ * for display. The picture does not need to be locked, since it is ignored by
  * the output thread if is reserved.
  ******************************************************************************/
-void  vout_DisplaySubPictureUnit( vout_thread_t *p_vout, spu_t *p_spu )
+void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
 #ifdef DEBUG_VIDEO
     char        psz_begin_date[MSTRTIME_MAX_SIZE];  /* buffer for date string */
@@ -232,59 +234,62 @@ void  vout_DisplaySubPictureUnit( vout_thread_t *p_vout, spu_t *p_spu )
 
 #ifdef DEBUG
     /* Check if status is valid */
-    if( p_spu->i_status != RESERVED_SPU )
+    if( p_subpic->i_status != RESERVED_SUBPICTURE )
     {
-        intf_DbgMsg("error: spu %p has invalid status %d\n", p_spu, p_spu->i_status );       
+        intf_DbgMsg("error: subpicture %p has invalid status %d\n", p_subpic, 
+                    p_subpic->i_status );       
     }   
 #endif
 
     /* Remove reservation flag */
-    p_spu->i_status = READY_SPU;
+    p_subpic->i_status = READY_SUBPICTURE;
 
 #ifdef DEBUG_VIDEO
     /* Send subpicture informations */
-    intf_DbgMsg("spu %p: type=%d, begin date=%s, end date=%s\n", p_spu, p_spu->i_type, 
-                mstrtime( psz_begin_date, p_spu->begin_date ), 
-                mstrtime( psz_end_date, p_spu->end_date ) );    
+    intf_DbgMsg("subpicture %p: type=%d, begin date=%s, end date=%s\n", 
+                p_subpic, p_subpic->i_type, 
+                mstrtime( psz_begin_date, p_subpic->begin_date ), 
+                mstrtime( psz_end_date, p_subpic->end_date ) );    
 #endif
 }
 
 /******************************************************************************
- * vout_CreateSubPictureUnit: allocate an spu in the video output heap.
+ * vout_CreateSubPicture: allocate an subpicture in the video output heap.
  ******************************************************************************
- * This function create a reserved spu in the video output heap. 
+ * This function create a reserved subpicture in the video output heap. 
  * A null pointer is returned if the function fails. This method provides an
  * already allocated zone of memory in the spu data fields. It needs locking
  * since several pictures can be created by several producers threads. 
  ******************************************************************************/
-spu_t *vout_CreateSubPictureUnit( vout_thread_t *p_vout, int i_type, 
-                                 int i_size )
+subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type, 
+                                     int i_size )
 {
     //??
 }
 
 /******************************************************************************
- * vout_DestroySubPictureUnit: remove a permanent or reserved spu from the heap
+ * vout_DestroySubPicture: remove a subpicture from the heap
  ******************************************************************************
- * This function frees a previously reserved spu.
+ * This function frees a previously reserved subpicture.
  * It is meant to be used when the construction of a picture aborted.
- * This function does not need locking since reserved spus are ignored by
- * the output thread.
+ * This function does not need locking since reserved subpictures are ignored 
+ * by the output thread.
  ******************************************************************************/
-void vout_DestroySubPictureUnit( vout_thread_t *p_vout, spu_t *p_spu )
+void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
 #ifdef DEBUG
-   /* Check if spu status is valid */
-   if( p_spu->i_status != RESERVED_SPU )
+   /* Check if status is valid */
+   if( p_subpic->i_status != RESERVED_SUBPICTURE )
    {
-       intf_DbgMsg("error: spu %p has invalid status %d\n", p_spu, p_spu->i_status );       
+       intf_DbgMsg("error: subpicture %p has invalid status %d\n", 
+                   p_subpic, p_subpic->i_status );       
    }   
 #endif
 
-    p_spu->i_status = DESTROYED_SPU;
+    p_subpic->i_status = DESTROYED_SUBPICTURE;
 
 #ifdef DEBUG_VIDEO
-    intf_DbgMsg("spu %p\n", p_spu);    
+    intf_DbgMsg("subpicture %p\n", p_subpic);    
 #endif
 }
 
@@ -575,23 +580,34 @@ void vout_UnlinkPicture( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /******************************************************************************
- * vout_ClearBuffer: clear a whole buffer
+ * vout_SetBuffers: set buffers adresses
  ******************************************************************************
- * This function is called when a buffer is initialized. It clears the whole
- * buffer.
+ * This function is called by system drivers to set buffers video memory 
+ * adresses.
  ******************************************************************************/
-void vout_ClearBuffer( vout_thread_t *p_vout, vout_buffer_t *p_buffer )
+void vout_SetBuffers( vout_thread_t *p_vout, void *p_buf1, void *p_buf2 )
 {
     /* No picture previously */
-    p_buffer->i_pic_x =         0;
-    p_buffer->i_pic_y =         0;
-    p_buffer->i_pic_width =     0;
-    p_buffer->i_pic_height =    0;
+    p_vout->p_buffer[0].i_pic_x =         0;
+    p_vout->p_buffer[0].i_pic_y =         0;
+    p_vout->p_buffer[0].i_pic_width =     0;
+    p_vout->p_buffer[0].i_pic_height =    0;
+    p_vout->p_buffer[1].i_pic_x =         0;
+    p_vout->p_buffer[1].i_pic_y =         0;
+    p_vout->p_buffer[1].i_pic_width =     0;
+    p_vout->p_buffer[1].i_pic_height =    0;
 
     /* The first area covers all the screen */
-    p_buffer->i_areas =                 1;
-    p_buffer->pi_area_begin[0] =        0;
-    p_buffer->pi_area_end[0] =          p_vout->i_height - 1;
+    p_vout->p_buffer[0].i_areas =                 1;
+    p_vout->p_buffer[0].pi_area_begin[0] =        0;
+    p_vout->p_buffer[0].pi_area_end[0] =          p_vout->i_height - 1;
+    p_vout->p_buffer[1].i_areas =                 1;
+    p_vout->p_buffer[1].pi_area_begin[0] =        0;
+    p_vout->p_buffer[1].pi_area_end[0] =          p_vout->i_height - 1;
+
+    /* Set adresses */
+    p_vout->p_buffer[0].p_data = p_buf1;    
+    p_vout->p_buffer[1].p_data = p_buf2;    
 }
 
 /* following functions are local */
@@ -616,9 +632,9 @@ static int InitThread( vout_thread_t *p_vout )
     } 
 
     /* Initialize convertion tables and functions */
-    if( vout_InitTables( p_vout ) )
+    if( vout_InitYUV( p_vout ) )
     {
-        intf_ErrMsg("error: can't allocate translation tables\n");
+        intf_ErrMsg("error: can't allocate YUV translation tables\n");
         return( 1 );                
     }
     
@@ -643,7 +659,7 @@ static void RunThread( vout_thread_t *p_vout)
     mtime_t         display_date;                             /* display date */    
     boolean_t       b_display;                                /* display flag */    
     picture_t *     p_pic;                                 /* picture pointer */
-    spu_t *         p_spu;                              /* subpicture pointer */    
+    subpicture_t *  p_subpic;                           /* subpicture pointer */    
      
     /* 
      * Initialize thread
@@ -664,7 +680,7 @@ static void RunThread( vout_thread_t *p_vout)
     {
         /* Initialize loop variables */
         p_pic =         NULL;
-        p_spu =         NULL;
+        p_subpic =      NULL;
         display_date =  0;        
         current_date =  mdate();
 
@@ -712,18 +728,19 @@ static void RunThread( vout_thread_t *p_vout)
 
         /*
          * Find the subpicture to display - this operation does not need lock, since
-         * only READY_SPUs are handled. If no picture has been selected,
-         * display_date will depend on the spu
+         * only READY_SUBPICTURES are handled. If no picture has been selected,
+         * display_date will depend on the subpicture
          */
         //??
 
         /*
          * Perform rendering, sleep and display rendered picture
          */
-        if( p_pic )                            /* picture and perhaps spu */
+        if( p_pic )                          /* picture and perhaps subpicture */
         {
             b_display = p_vout->b_active;            
-
+            p_vout->last_display_date = display_date;
+            
             if( b_display )
             {                
                 /* Set picture dimensions and clear buffer */
@@ -743,35 +760,36 @@ static void RunThread( vout_thread_t *p_vout)
             p_pic->i_status = p_pic->i_refcount ? DISPLAYED_PICTURE : DESTROYED_PICTURE;
             vlc_mutex_unlock( &p_vout->picture_lock );                          
 
-            /* Render interface and spus */
+            /* Render interface and subpicture */
             if( b_display && p_vout->b_interface )
             {
                 RenderInterface( p_vout );                
             }
-            if( p_spu )
+            if( p_subpic )
             {
                 if( b_display )
                 {                    
-                    RenderSubPictureUnit( p_vout, p_spu );
+                    RenderSubPicture( p_vout, p_subpic );
                 }                
 
-                /* Remove spu from heap */
-                vlc_mutex_lock( &p_vout->spu_lock );
-                p_spu->i_status = DESTROYED_SPU;
-                vlc_mutex_unlock( &p_vout->spu_lock );                          
+                /* Remove subpicture from heap */
+                vlc_mutex_lock( &p_vout->subpicture_lock );
+                p_subpic->i_status = DESTROYED_SUBPICTURE;
+                vlc_mutex_unlock( &p_vout->subpicture_lock );                          
             }
 
         }
-        else if( p_spu )                                     /* spu alone */
+        else if( p_subpic )                                /* subpicture alone */
         {
             b_display = p_vout->b_active;
+            p_vout->last_display_date = display_date;            
 
             if( b_display )
             {                
                 /* Clear buffer */
                 SetBufferPicture( p_vout, NULL );
 
-                /* Render informations, interface and spu */
+                /* Render informations, interface and subpicture */
                 if( p_vout->b_info )
                 {
                     RenderInfo( p_vout );
@@ -780,19 +798,41 @@ static void RunThread( vout_thread_t *p_vout)
                 {
                     RenderInterface( p_vout );
                 }
-                RenderSubPictureUnit( p_vout, p_spu );            
+                RenderSubPicture( p_vout, p_subpic );            
             }            
 
-            /* Remove spu from heap */
-            vlc_mutex_lock( &p_vout->spu_lock );
-            p_spu->i_status = DESTROYED_SPU;
-            vlc_mutex_unlock( &p_vout->spu_lock );                          
+            /* Remove subpicture from heap */
+            vlc_mutex_lock( &p_vout->subpicture_lock );
+            p_subpic->i_status = DESTROYED_SUBPICTURE;
+            vlc_mutex_unlock( &p_vout->subpicture_lock );                          
         }
-        else                                              /* idle screen alone */
-        {            
-            //??? render on idle screen or interface change
-            b_display = 0;             //???
-        }
+        else if( p_vout->b_active )          /* idle or interface screen alone */
+        {
+            //?? clear: SetBufferPicture( p_vout, NULL );
+            if( p_vout->b_interface /* && ?? intf_change -> cause use of 100% CPU ! */ )
+            {
+                /* Interface has changed, so a new rendering is required - force
+                 * it by setting last idle date to 0 */
+                p_vout->last_idle_date = 0;                
+            }
+
+            /* Render idle screen and update idle date, then render interface if
+             * required */
+            b_display = RenderIdle( p_vout );
+            if( b_display )
+            {                
+                p_vout->last_idle_date = current_date;
+                if( p_vout->b_interface )
+                {
+                    RenderInterface( p_vout );                
+                }
+            }
+            
+        }       
+        else
+        {
+            b_display = 0;            
+        }        
 
         /*
          * Sleep, wake up and display rendered picture
@@ -820,7 +860,7 @@ static void RunThread( vout_thread_t *p_vout)
          * then swap buffers */
         vlc_mutex_lock( &p_vout->change_lock );        
 #ifdef DEBUG_VIDEO
-        intf_DbgMsg( "picture %p, spu %p\n", p_pic, p_spu );        
+        intf_DbgMsg( "picture %p, subpicture %p\n", p_pic, p_subpic );        
 #endif            
         if( b_display && !(p_vout->i_changes & VOUT_NODISPLAY_CHANGE) )
         {
@@ -886,21 +926,21 @@ static void EndThread( vout_thread_t *p_vout )
     intf_DbgMsg("\n");
     *p_vout->pi_status = THREAD_END;    
 
-    /* Destroy all remaining pictures and spus */
+    /* Destroy all remaining pictures and subpictures */
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )
     {
 	if( p_vout->p_picture[i_index].i_status != FREE_PICTURE )
 	{
             free( p_vout->p_picture[i_index].p_data );
         }
-        if( p_vout->p_spu[i_index].i_status != FREE_SPU )
+        if( p_vout->p_subpicture[i_index].i_status != FREE_SUBPICTURE )
         {
-            free( p_vout->p_spu[i_index].p_data );            
+            free( p_vout->p_subpicture[i_index].p_data );            
         }        
     }
 
     /* Destroy translation tables */
-    vout_EndTables( p_vout );  
+    vout_EndYUV( p_vout );  
     vout_SysEnd( p_vout );    
 }
 
@@ -932,46 +972,22 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
  * This function will print a simple text on the picture. It is designed to
  * print debugging or general informations.
  *******************************************************************************/
-void Print( vout_thread_t *p_vout, int i_x, int i_y, int i_halign, int i_valign, unsigned char *psz_text )
+void Print( vout_thread_t *p_vout, int i_x, int i_y, int i_h_align, int i_v_align, unsigned char *psz_text )
 {
     int                 i_text_height;                    /* total text height */
     int                 i_text_width;                      /* total text width */
 
     /* Update upper left coordinates according to alignment */
     vout_TextSize( p_vout->p_default_font, 0, psz_text, &i_text_width, &i_text_height );
-    switch( i_halign )
+    if( !Align( p_vout, &i_x, &i_y, i_text_width, i_text_height, i_h_align, i_v_align ) )
     {
-    case 0:                                                        /* centered */
-        i_x -= i_text_width / 2;
-        break;        
-    case 1:                                                   /* right aligned */
-        i_x -= i_text_width;
-        break;                
-    }
-    switch( i_valign )
-    {
-    case 0:                                                        /* centered */
-        i_y -= i_text_height / 2;
-        break;        
-    case 1:                                                   /* bottom aligned */
-        i_y -= i_text_height;
-        break;                
-    }
-
-    /* Check clipping */
-    if( (i_y < 0) || (i_y + i_text_height > p_vout->i_height) || 
-        (i_x < 0) || (i_x + i_text_width > p_vout->i_width) )
-    {
-        intf_DbgMsg("'%s' would print outside the screen\n", psz_text);        
-        return;        
+        /* Set area and print text */
+        SetBufferArea( p_vout, i_x, i_y, i_text_width, i_text_height );    
+        vout_Print( p_vout->p_default_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data + 
+                    i_y * p_vout->i_bytes_per_line + i_x * p_vout->i_bytes_per_pixel,
+                    p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line, 
+                    0xffffffff, 0x00000000, 0x00000000, 0, psz_text );
     }    
-
-    /* Set area and print text */
-    SetBufferArea( p_vout, i_x, i_y, i_text_width, i_text_height );    
-    vout_Print( p_vout->p_default_font, p_vout->p_buffer[ p_vout->i_buffer_index ].p_data + 
-                i_y * p_vout->i_bytes_per_line + i_x * p_vout->i_bytes_per_pixel,
-                p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line, 
-                0xffffffff, 0x00000000, 0x00000000, TRANSPARENT_TEXT, psz_text );
 }
 
 /*******************************************************************************
@@ -1074,7 +1090,7 @@ static void SetBufferArea( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int
                 {
                     p_buffer->i_areas++;                    
                 }
-                for( i_area_copy = p_buffer->i_areas - 1; i_area_copy > i_area; i_area_copy++ )
+                for( i_area_copy = p_buffer->i_areas - 1; i_area_copy > i_area; i_area_copy-- )
                 {
                     p_buffer->pi_area_begin[i_area_copy] = p_buffer->pi_area_begin[i_area_copy - 1];
                     p_buffer->pi_area_end[i_area_copy] =   p_buffer->pi_area_end[i_area_copy - 1];
@@ -1280,56 +1296,43 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
 static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_buffer_t *     p_buffer;                         /* rendering buffer */    
-    byte_t *            p_convert_dst;              /* convertion destination */
-    int                 i_width, i_height, i_eol, i_pic_eol, i_scale;        /* ?? tmp variables*/
+    byte_t *            p_pic_data;                 /* convertion destination */
     
     /* Get and set rendering informations */
-    p_buffer = &p_vout->p_buffer[ p_vout->i_buffer_index ];    
-    p_vout->last_picture_date = p_pic->date;
-    p_convert_dst = p_buffer->p_data + p_buffer->i_pic_x * p_vout->i_bytes_per_pixel +
+    p_buffer =          &p_vout->p_buffer[ p_vout->i_buffer_index ];    
+    p_pic_data =        p_buffer->p_data + 
+        p_buffer->i_pic_x * p_vout->i_bytes_per_pixel +
         p_buffer->i_pic_y * p_vout->i_bytes_per_line;
 
-    // ?? temporary section: rebuild aspect scale from size informations.
-    // ?? when definitive convertion prototype will be used, those info will
-    // ?? no longer be required
-    i_width = MIN( p_pic->i_width, p_buffer->i_pic_width );
-    i_eol = p_pic->i_width - i_width / 16 * 16;
-    i_pic_eol = p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - i_width;    
-    if( p_pic->i_height == p_buffer->i_pic_height )
-    {        
-        i_scale = 0;    
-    }    
-    else
-    {
-        i_scale = p_pic->i_height / (p_pic->i_height - p_buffer->i_pic_height);        
-    }    
-    i_eol = p_pic->i_width - p_buffer->i_pic_width;    
-    i_height = p_pic->i_height * i_width / p_pic->i_width;
-    // ?? end of temporary code
-
     /*
-     * Choose appropriate rendering function and render picture
+     * Choose appropriate rendering function and render picture 
      */
     switch( p_pic->i_type )
     {
     case YUV_420_PICTURE:
-        p_vout->p_ConvertYUV420( p_vout, p_convert_dst, 
-                                 p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                 i_width, i_height, i_eol, i_pic_eol, i_scale, 
-                                 p_pic->i_matrix_coefficients );
+        p_vout->yuv.p_Convert420( p_vout, p_pic_data, 
+                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                                  p_pic->i_width, p_pic->i_height, 0,
+                                  p_buffer->i_pic_width, p_buffer->i_pic_height, 
+                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - p_buffer->i_pic_width,
+                                  p_pic->i_matrix_coefficients );
         break;        
     case YUV_422_PICTURE:
-        p_vout->p_ConvertYUV422( p_vout, p_convert_dst, 
-                                 p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                 i_width, i_height, i_eol, i_pic_eol, i_scale, 
-                                 p_pic->i_matrix_coefficients );
+        p_vout->yuv.p_Convert422( p_vout, p_pic_data, 
+                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                                  p_pic->i_width, p_pic->i_height, 0,
+                                  p_buffer->i_pic_width, p_buffer->i_pic_height, 
+                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - p_buffer->i_pic_width,
+                                  p_pic->i_matrix_coefficients );
         break;        
     case YUV_444_PICTURE:
-        p_vout->p_ConvertYUV444( p_vout, p_convert_dst, 
-                                 p_pic->p_y, p_pic->p_u, p_pic->p_v,
-                                 i_width, i_height, i_eol, i_pic_eol, i_scale, 
-                                 p_pic->i_matrix_coefficients );
-        break;                
+        p_vout->yuv.p_Convert444( p_vout, p_pic_data, 
+                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
+                                  p_pic->i_width, p_pic->i_height, 0,
+                                  p_buffer->i_pic_width, p_buffer->i_pic_height, 
+                                  p_vout->i_bytes_per_line / p_vout->i_bytes_per_pixel - p_buffer->i_pic_width,
+                                  p_pic->i_matrix_coefficients );
+        break;        
 #ifdef DEBUG
     default:        
         intf_DbgMsg("error: unknown picture type %d\n", p_pic->i_type );
@@ -1359,7 +1362,7 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
         sprintf( psz_buffer, "%.2f fps", (double) VOUT_FPS_SAMPLES * 1000000 /
                  ( p_vout->p_fps_sample[ (p_vout->c_fps_samples - 1) % VOUT_FPS_SAMPLES ] -
                    p_vout->p_fps_sample[ p_vout->c_fps_samples % VOUT_FPS_SAMPLES ] ) );        
-        Print( p_vout, p_vout->i_width, 0, 1, -1, psz_buffer );
+        Print( p_vout, 0, 0, RIGHT_RALIGN, TOP_RALIGN, psz_buffer );
     }
 
     /* 
@@ -1367,7 +1370,7 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
      */
     sprintf( psz_buffer, "%ld frames   rendering: %ld us", 
              (long) p_vout->c_fps_samples, (long) p_vout->render_time );
-    Print( p_vout, 0, 0, -1, -1, psz_buffer );
+    Print( p_vout, 0, 0, LEFT_RALIGN, TOP_RALIGN, psz_buffer );
 #endif
 
 #ifdef DEBUG
@@ -1389,20 +1392,45 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
              p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_height,
              p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_x,
              p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_y );    
-    Print( p_vout, p_vout->i_width, p_vout->i_height, 1, 1, psz_buffer );
+    Print( p_vout, 0, 0, RIGHT_RALIGN, BOTTOM_RALIGN, psz_buffer );
 #endif
 }
 
 /******************************************************************************
  * RenderIdle: render idle picture
  ******************************************************************************
- * This function will print something on the screen.
+ * This function will print something on the screen. It will return 0 if 
+ * nothing has been rendered, or 1 if something has been changed on the screen.
+ * Note that if you absolutely want something to be printed, you will have
+ * to force it by setting the last idle date to 0.
  ******************************************************************************/
-static void RenderIdle( vout_thread_t *p_vout )
+static int RenderIdle( vout_thread_t *p_vout )
 {
-    //??
-    Print( p_vout, p_vout->i_width / 2, p_vout->i_height / 2, 0, 0, 
-           "no stream" );        //??
+    int         i_x = 0, i_y = 0;                            /* text position */    
+    int         i_width, i_height;                               /* text size */    
+    mtime_t     current_date;                                 /* current date */
+    const char *psz_text = "no stream";                    /* text to display */
+    
+    
+    current_date = mdate();    
+    if( (current_date - p_vout->last_display_date) > VOUT_IDLE_DELAY &&
+        (current_date - p_vout->last_idle_date) > VOUT_IDLE_DELAY )
+    {
+        vout_TextSize( p_vout->p_large_font, WIDE_TEXT | OUTLINED_TEXT, psz_text,
+                       &i_width, &i_height );
+        if( !Align( p_vout, &i_x, &i_y, i_width, i_height, CENTER_RALIGN, CENTER_RALIGN ) )
+        {       
+            vout_Print( p_vout->p_large_font, 
+                        p_vout->p_buffer[ p_vout->i_buffer_index ].p_data +
+                        i_x * p_vout->i_bytes_per_pixel + i_y * p_vout->i_bytes_per_line,
+                        p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
+                        0xffffffff, 0x33333333, 0,
+                        WIDE_TEXT | OUTLINED_TEXT, psz_text );        
+            SetBufferArea( p_vout, i_x, i_y, i_width, i_height );
+        }        
+        return( 1 );        
+    }
+    return( 0 );    
 }
 
 /******************************************************************************
@@ -1440,16 +1468,16 @@ static void RenderInfo( vout_thread_t *p_vout )
     }
     sprintf( psz_buffer, "pic: %d/%d/%d", 
              i_reserved_pic, i_ready_pic, VOUT_MAX_PICTURES );
-    Print( p_vout, 0, p_vout->i_height, -1, 1, psz_buffer );    
+    Print( p_vout, 0, 0, LEFT_RALIGN, BOTTOM_RALIGN, psz_buffer );    
 #endif
 }
 
 /*******************************************************************************
- * RenderSubPictureUnit: render an spu
+ * RenderSubPicture: render a subpicture
  *******************************************************************************
  * This function render a sub picture unit.
  *******************************************************************************/
-static void RenderSubPictureUnit( vout_thread_t *p_vout, spu_t *p_spu )
+static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
     //??
 }
@@ -1458,7 +1486,6 @@ static void RenderSubPictureUnit( vout_thread_t *p_vout, spu_t *p_spu )
  * RenderInterface: render the interface
  *******************************************************************************
  * This function render the interface, if any.
- * ?? this is obviously only a temporary interface !
  *******************************************************************************/
 static void RenderInterface( vout_thread_t *p_vout )
 {
@@ -1469,8 +1496,8 @@ static void RenderInterface( vout_thread_t *p_vout )
     const char *psz_text_2 = "[+/-] Volume    [m]ute   [s]caling   [Q]uit";    
 
     /* Get text size */
-    vout_TextSize( p_vout->p_large_font, OUTLINED_TEXT | TRANSPARENT_TEXT, psz_text_1, &i_width_1, &i_height );
-    vout_TextSize( p_vout->p_large_font, OUTLINED_TEXT | TRANSPARENT_TEXT, psz_text_2, &i_width_2, &i_text_height );
+    vout_TextSize( p_vout->p_large_font, OUTLINED_TEXT, psz_text_1, &i_width_1, &i_height );
+    vout_TextSize( p_vout->p_large_font, OUTLINED_TEXT, psz_text_2, &i_width_2, &i_text_height );
     i_height += i_text_height;
 
     /* Render background - effective background color will depend of the screen
@@ -1489,7 +1516,7 @@ static void RenderInterface( vout_thread_t *p_vout )
                     (p_vout->i_height - i_height) * p_vout->i_bytes_per_line,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                     0xffffffff, 0x00000000, 0x00000000,
-                    OUTLINED_TEXT | TRANSPARENT_TEXT, psz_text_1 );
+                    OUTLINED_TEXT, psz_text_1 );
     }
     if( i_width_2 < p_vout->i_width )
     {        
@@ -1497,7 +1524,7 @@ static void RenderInterface( vout_thread_t *p_vout )
                     (p_vout->i_height - i_height + i_text_height) * p_vout->i_bytes_per_line,
                     p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line,
                     0xffffffff, 0x00000000, 0x00000000,
-                    OUTLINED_TEXT | TRANSPARENT_TEXT, psz_text_2 );
+                    OUTLINED_TEXT, psz_text_2 );
     }    
 
     /* Activate modified area */
@@ -1520,14 +1547,21 @@ static int Manage( vout_thread_t *p_vout )
 #endif
 
     /* On gamma or grayscale change, rebuild tables */
-    if( p_vout->i_changes & (VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE) )
+    if( p_vout->i_changes & (VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE | 
+                             VOUT_YUV_CHANGE) )
     {
-        vout_ResetTables( p_vout );        
-    }    
+        if( vout_ResetYUV( p_vout ) )
+        {
+            intf_ErrMsg("error: can't rebuild convertion tables\n");            
+            return( 1 );            
+        }        
+    }
 
-    /* Clear changes flags which does not need management or have been handled */
-    p_vout->i_changes &= ~(VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE |
-                           VOUT_INFO_CHANGE | VOUT_INTF_CHANGE | VOUT_SCALE_CHANGE );
+    /* Clear changes flags which does not need management or have been
+     * handled */
+    p_vout->i_changes &= ~(VOUT_GAMMA_CHANGE | VOUT_GRAYSCALE_CHANGE | 
+                           VOUT_YUV_CHANGE   | VOUT_INFO_CHANGE | 
+                           VOUT_INTF_CHANGE  | VOUT_SCALE_CHANGE );
 
     /* Detect unauthorized changes */
     if( p_vout->i_changes )
@@ -1540,3 +1574,57 @@ static int Manage( vout_thread_t *p_vout )
     
     return( 0 );    
 }
+
+/******************************************************************************
+ * Align: align a subpicture in the screen
+ ******************************************************************************
+ * This function is used for rendering text or subpictures. It returns non 0
+ * it the final aera is not fully included in display area. Return coordinates
+ * are absolute.
+ ******************************************************************************/
+static int Align( vout_thread_t *p_vout, int *pi_x, int *pi_y, 
+                   int i_width, int i_height, int i_h_align, int i_v_align )
+{
+    /* Align horizontally */
+    switch( i_h_align )
+    {
+    case CENTER_ALIGN:
+        *pi_x -= i_width / 2;        
+        break;        
+    case CENTER_RALIGN:
+        *pi_x += (p_vout->i_width - i_width) / 2;        
+        break;        
+    case RIGHT_ALIGN:   
+        *pi_x -= i_width;        
+        break;        
+    case RIGHT_RALIGN:
+        *pi_x += p_vout->i_width - i_width;        
+        break;        
+    }
+
+    /* Align vertically */
+    switch( i_v_align )
+    {
+    case CENTER_ALIGN:
+        *pi_y -= i_height / 2;        
+        break;
+    case CENTER_RALIGN:
+        *pi_y += (p_vout->i_height - i_height) / 2;        
+        break;        
+    case BOTTOM_ALIGN:
+        *pi_y -= i_height;        
+        break;        
+    case BOTTOM_RALIGN:
+        *pi_y += p_vout->i_height - i_height;        
+        break;        
+    case SUBTITLE_RALIGN:
+        *pi_y += (p_vout->i_height + p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_y + 
+                  p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_height - i_height) / 2;        
+        break;        
+    }
+
+    /* Return non 0 if clipping failed */
+    return( (*pi_x < 0) || (*pi_y < 0) || 
+            (*pi_x + i_width > p_vout->i_width) || (*pi_y + i_height > p_vout->i_height) );    
+}
+
