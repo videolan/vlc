@@ -1173,7 +1173,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_pic->p_sys->p_image =
             CreateShmImage( p_vout, p_vout->p_sys->p_display,
 #   ifdef MODULE_NAME_IS_xvideo
-                            p_vout->p_sys->i_xvport, p_vout->output.i_chroma,
+                            p_vout->p_sys->i_xvport, 
+                            VLC2X11_FOURCC(p_vout->output.i_chroma),
 #   else
                             p_vout->p_sys->p_visual,
                             p_vout->p_sys->i_screen_depth,
@@ -1188,7 +1189,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_pic->p_sys->p_image =
             CreateImage( p_vout, p_vout->p_sys->p_display,
 #ifdef MODULE_NAME_IS_xvideo
-                         p_vout->p_sys->i_xvport, p_vout->output.i_chroma,
+                         p_vout->p_sys->i_xvport, 
+                         VLC2X11_FOURCC(p_vout->output.i_chroma),
                          p_pic->format.i_bits_per_pixel,
 #else
                          p_vout->p_sys->p_visual,
