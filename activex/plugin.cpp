@@ -484,7 +484,9 @@ void VLCPlugin::calcPositionChange(LPRECT lprPosRect, LPCRECT lprcClipRect)
     }
 };
 
-HRESULT VLCPlugin::onInitNew(void)
+#include <iostream>
+
+HRESULT VLCPlugin::onInit(BOOL isNew)
 {
     if( 0 == _i_vlc )
     {
@@ -519,11 +521,58 @@ HRESULT VLCPlugin::onInitNew(void)
             _i_vlc = 0;
             return E_FAIL;
         }
+
+        if( isNew )
+        {
+            /*
+            ** object has fully initialized,
+            ** try to activate in place if container is ready
+            */
+            LPOLECLIENTSITE pActiveSite;
+
+            if( SUCCEEDED(vlcOleObject->GetClientSite(&pActiveSite)) && (NULL != pActiveSite) )
+            {
+                vlcOleObject->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, pActiveSite, 0, NULL, NULL);
+                pActiveSite->Release();
+            }
+        }
         return S_OK;
     }
     return E_UNEXPECTED;
 };
-    
+
+HRESULT VLCPlugin::onLoad(void)
+{
+    /*
+    ** object has fully initialized,
+    ** try to activate in place if container is ready
+    */
+    LPOLECLIENTSITE pActiveSite;
+
+    if( SUCCEEDED(vlcOleObject->GetClientSite(&pActiveSite)) && (NULL != pActiveSite) )
+    {
+        vlcOleObject->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, pActiveSite, 0, NULL, NULL);
+        pActiveSite->Release();
+    }
+    return S_OK;
+};
+
+HRESULT VLCPlugin::onClientSiteChanged(LPOLECLIENTSITE pActiveSite)
+{
+    if( NULL != pActiveSite )
+    {
+        /*
+        ** object is embedded in container 
+        ** try to activate in place if it has initialized
+        */
+        if( _i_vlc )
+        {
+            vlcOleObject->DoVerb(OLEIVERB_INPLACEACTIVATE, NULL, pActiveSite, 0, NULL, NULL);
+        }
+    }
+    return S_OK;
+};
+
 HRESULT VLCPlugin::onClose(DWORD dwSaveOption)
 {
     if( _i_vlc )

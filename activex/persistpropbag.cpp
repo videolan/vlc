@@ -24,6 +24,7 @@
 #include "persistpropbag.h"
 
 #include "utils.h"
+#include "oleobject.h"
 
 using namespace std;
 
@@ -39,7 +40,7 @@ STDMETHODIMP VLCPersistPropertyBag::GetClassID(LPCLSID pClsID)
 
 STDMETHODIMP VLCPersistPropertyBag::InitNew(void)
 {
-    return _p_instance->onInitNew();
+    return _p_instance->onInit(TRUE);
 };
 
 STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErrorLog)
@@ -47,7 +48,7 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
     if( NULL == pPropBag )
         return E_POINTER;
 
-    HRESULT hr = _p_instance->onInitNew();
+    HRESULT hr = _p_instance->onInit(FALSE);
     if( FAILED(hr) )
         return hr;
 
@@ -112,7 +113,7 @@ STDMETHODIMP VLCPersistPropertyBag::Load(LPPROPERTYBAG pPropBag, LPERRORLOG pErr
         VariantClear(&value);
     }
 
-    return S_OK;
+    return _p_instance->onLoad();
 };
 
 STDMETHODIMP VLCPersistPropertyBag::Save(LPPROPERTYBAG pPropBag, BOOL fClearDiry, BOOL fSaveAllProperties)

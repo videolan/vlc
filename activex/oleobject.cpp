@@ -65,13 +65,7 @@ STDMETHODIMP VLCOleObject::DoVerb(LONG iVerb, LPMSG lpMsg, LPOLECLIENTSITE pActi
         case OLEIVERB_SHOW:
         case OLEIVERB_OPEN:
         case OLEIVERB_INPLACEACTIVATE:
-            if( NULL == hwndParent )
-                return OLEOBJ_S_INVALIDHWND;
-
-            if( SUCCEEDED(doInPlaceActivate(lpMsg, pActiveSite, hwndParent, lprcPosRect)) )
-                return S_OK;
-
-            return OLEOBJ_S_CANNOT_DOVERB_NOW;
+            return doInPlaceActivate(lpMsg, pActiveSite, hwndParent, lprcPosRect);
 
         case OLEIVERB_HIDE:
             _p_instance->setVisible(FALSE);
@@ -84,13 +78,7 @@ STDMETHODIMP VLCOleObject::DoVerb(LONG iVerb, LPMSG lpMsg, LPOLECLIENTSITE pActi
             return S_OK;
 
         default:
-            if( NULL == hwndParent )
-                return OLEOBJ_S_INVALIDHWND;
-
-            if( SUCCEEDED(doInPlaceActivate(lpMsg, pActiveSite, hwndParent, lprcPosRect)) )
-                return OLEOBJ_S_INVALIDVERB;
-
-            return OLEOBJ_S_CANNOT_DOVERB_NOW;
+            return OLEOBJ_S_INVALIDVERB;
     }
 };
 
@@ -116,7 +104,7 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
         if( SUCCEEDED(pActiveSite->QueryInterface(IID_IOleInPlaceSite, (void**)&p_inPlaceSite)) )
         {
             if( S_OK != p_inPlaceSite->CanInPlaceActivate() )
-                return E_FAIL;
+                return OLEOBJ_S_CANNOT_DOVERB_NOW;
 
             LPOLEINPLACEFRAME p_inPlaceFrame;
             LPOLEINPLACEUIWINDOW p_inPlaceUIWindow;
@@ -132,10 +120,22 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
                 if( NULL != p_inPlaceUIWindow )
                     p_inPlaceUIWindow->Release();
             }
+
+            if( (NULL == hwndParent) && FAILED(p_inPlaceSite->GetWindow(&hwndParent)) )
+            {
+                p_inPlaceSite->Release();
+                return OLEOBJ_S_INVALIDHWND;
+            }
         }
+        else if( NULL == hwndParent )
+            return OLEOBJ_S_INVALIDHWND;
 
         if( FAILED(_p_instance->onActivateInPlace(lpMsg, hwndParent, lprcPosRect, lprcClipRect)) )
-            return E_FAIL;
+        {
+            if( NULL != p_inPlaceSite )
+                p_inPlaceSite->Release();
+            return OLEOBJ_S_CANNOT_DOVERB_NOW;
+        }
 
         if( NULL != p_inPlaceSite )
             p_inPlaceSite->OnPosRectChange(lprcPosRect);
@@ -163,7 +163,7 @@ HRESULT VLCOleObject::doInPlaceActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite
         }
         return S_OK;
     }
-    return E_FAIL;
+    return OLEOBJ_S_CANNOT_DOVERB_NOW;
 };
 
 HRESULT VLCOleObject::doUIActivate(LPMSG lpMsg, LPOLECLIENTSITE pActiveSite, HWND hwndParent, LPCRECT lprcPosRect)
@@ -214,7 +214,7 @@ STDMETHODIMP VLCOleObject::GetClientSite(LPOLECLIENTSITE *ppClientSite)
     if( NULL != _p_clientsite )
         _p_clientsite->AddRef(); 
 
-    *ppClientSite= _p_clientsite;
+    *ppClientSite = _p_clientsite;
     return S_OK;
 };
 
@@ -302,8 +302,8 @@ STDMETHODIMP VLCOleObject::SetClientSite(LPOLECLIENTSITE pClientSite)
             VariantClear(&v);
         }
     }
-
     _p_clientsite = pClientSite;
+    _p_instance->onClientSiteChanged(pClientSite);
     return S_OK;
 };
 

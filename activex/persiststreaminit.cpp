@@ -37,7 +37,7 @@ STDMETHODIMP VLCPersistStreamInit::GetClassID(LPCLSID pClsID)
 
 STDMETHODIMP VLCPersistStreamInit::InitNew(void)
 {
-    return _p_instance->onInitNew();
+    return _p_instance->onInit(TRUE);
 };
 
 STDMETHODIMP VLCPersistStreamInit::Load(LPSTREAM pStm)
@@ -45,7 +45,7 @@ STDMETHODIMP VLCPersistStreamInit::Load(LPSTREAM pStm)
     if( NULL == pStm )
         return E_POINTER;
 
-    return _p_instance->onInitNew();
+    return _p_instance->onInit(TRUE);
 };
 
 STDMETHODIMP VLCPersistStreamInit::Save(LPSTREAM pStm, BOOL fClearDirty)

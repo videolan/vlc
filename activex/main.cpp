@@ -28,12 +28,14 @@
 
 using namespace std;
 
-#define THREADING_MODEL "Both"
 #define COMPANY_STR "VideoLAN"
 #define PROGRAM_STR "VLCPlugin"
 #define VERSION_MAJOR_STR "1"
 #define VERSION_MINOR_STR "0"
 #define DESCRIPTION "VideoLAN VLC ActiveX Plugin"
+
+#define THREADING_MODEL "Apartment"
+#define MISC_STATUS     "131473"
 
 #define PROGID_STR COMPANY_STR"."PROGRAM_STR
 #define VERS_PROGID_STR COMPANY_STR"."PROGRAM_STR"."VERSION_MAJOR_STR
@@ -193,7 +195,7 @@ STDAPI DllRegisterServer(VOID)
 
         // MiscStatus key value
         hSubKey = keyCreate(hClassKey, TEXT("MiscStatus\\1"));
-        RegSetValueEx(hSubKey, NULL, 0, REG_SZ, (const BYTE*)"131473", sizeof("131473"));
+        RegSetValueEx(hSubKey, NULL, 0, REG_SZ, (const BYTE*)MISC_STATUS, sizeof(MISC_STATUS));
         RegCloseKey(hSubKey);
 
         // Programmable key value

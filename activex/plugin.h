@@ -84,7 +84,9 @@ public:
     REFCLSID getClassID(void) { return (REFCLSID)CLSID_VLCPlugin; };
     REFIID getDispEventID(void) { return (REFIID)DIID_DVLCEvents; };
 
-    HRESULT onInitNew(void);
+    HRESULT onInit(BOOL isNew);
+    HRESULT onLoad(void);
+    HRESULT onClientSiteChanged(LPOLECLIENTSITE pActiveSite);
     HRESULT onClose(DWORD dwSaveOption);
 
     BOOL isInPlaceActive(void);
