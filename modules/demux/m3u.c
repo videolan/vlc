@@ -2,7 +2,7 @@
  * m3u.c: a meta demux to parse m3u and asx playlists
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: m3u.c,v 1.9 2002/11/26 18:58:33 sigmunau Exp $
+ * $Id: m3u.c,v 1.10 2002/12/14 01:05:53 babal Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -166,10 +166,154 @@ static void Deactivate( vlc_object_t *p_this )
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
+static void ProcessLine ( input_thread_t *p_input , demux_sys_t *p_m3u
+        , playlist_t *p_playlist , char psz_line[MAX_LINE] )
+{
+    char          *psz_bol, *psz_name;
+
+    psz_bol = psz_line;
+
+    /* Remove unnecessary tabs or spaces at the beginning of line */
+    while( *psz_bol == ' ' || *psz_bol == '\t' ||
+           *psz_bol == '\n' || *psz_bol == '\r' )
+        psz_bol++;
+
+    if( p_m3u->i_type == TYPE_M3U )
+    {
+        /* Check for comment line */
+        if( *psz_bol == '#' )
+            /*line is comment or extended info, ignored for now */
+            return;
+    }
+    else if ( p_m3u->i_type == TYPE_ASX )
+    {
+        /* We are dealing with ASX files.
+         * We are looking for "<ref href=" xml markups that
+         * begins with "mms://", "http://" or "file://" */
+        char *psz_eol;
+
+        while( *psz_bol &&
+               strncasecmp( psz_bol, "ref", sizeof("ref") - 1 ) )
+            psz_bol++;
+
+        if( !*psz_bol ) return;
+
+        while( *psz_bol &&
+               strncasecmp( psz_bol, "href", sizeof("href") - 1 ) )
+            psz_bol++;
+
+        if( !*psz_bol ) return;
+
+        while( *psz_bol &&
+               strncasecmp( psz_bol, "mms://",
+                            sizeof("mms://") - 1 ) &&
+               strncasecmp( psz_bol, "http://",
+                            sizeof("http://") - 1 ) &&
+               strncasecmp( psz_bol, "file://",
+                            sizeof("file://") - 1 ) )
+            psz_bol++;
+
+        if( !*psz_bol ) return;
+
+        psz_eol = strchr( psz_bol, '"');
+        if( !psz_eol )
+          return;
+
+        *psz_eol = '\0';
+    }
+    else
+    {
+        /* We are dealing with a html file with embedded
+         * video.  We are looking for "<param name="filename"
+         * value=" html markups that begin with "http://" */
+        char *psz_eol;
+
+        while( *psz_bol &&
+               strncasecmp( psz_bol, "param", sizeof("param") - 1 ) )
+            psz_bol++;
+
+        if( !*psz_bol ) return;
+
+        while( *psz_bol &&
+               strncasecmp( psz_bol, "filename", sizeof("filename") - 1 ) )
+            psz_bol++;
+
+        if( !*psz_bol ) return;
+
+        while( *psz_bol &&
+               strncasecmp( psz_bol, "http://",
+                            sizeof("http://") - 1 ) )
+            psz_bol++;
+
+        if( !*psz_bol ) return;
+
+        psz_eol = strchr( psz_bol, '"');
+        if( !psz_eol )
+          return;
+
+        *psz_eol = '\0';
+
+    }
+
+    /*
+     * From now on, we know we've got a meaningful line
+     */
+
+    /* Check if the line has an absolute or relative path */
+    psz_name = psz_bol;
+    while( *psz_name && strncmp( psz_name, "://", sizeof("://") - 1 ) )
+    {
+        psz_name++;
+    }
+#ifndef WIN32
+    if( !*psz_name && *psz_bol != '/' )
+#else
+    if( !*psz_name && (strlen(psz_bol) < 2 ||
+                ( *(psz_bol+1) != ':' &&
+                  strncmp( psz_bol, "\\\\", 2 ) ) ) )
+#endif
+    {
+        /* the line doesn't specify a protocol name.
+         * If this line doesn't begin with a '/' then assume the path
+         * is relative to the path of the m3u file. */
+        char *psz_path = strdup( p_input->psz_name );
+
+#ifndef WIN32
+        psz_name = strrchr( psz_path, '/' );
+#else
+        psz_name = strrchr( psz_path, '\\' );
+        if ( ! psz_name ) psz_name = strrchr( psz_path, '/' );
+#endif
+        if( psz_name ) *psz_name = '\0';
+        else *psz_path = '\0';
+#ifndef WIN32
+        psz_name = malloc( strlen(psz_path) + strlen(psz_bol) + 2 );
+        sprintf( psz_name, "%s/%s", psz_path, psz_bol );
+#else
+        if ( *psz_path != '\0' )
+        {
+            psz_name = malloc( strlen(psz_path) + strlen(psz_bol) + 2 );
+            sprintf( psz_name, "%s\\%s", psz_path, psz_bol );
+        }
+        else psz_name = strdup( psz_bol );
+#endif
+        free( psz_path );
+    }
+    else
+    {
+        psz_name = strdup( psz_bol );
+    }
+
+    playlist_Add( p_playlist, psz_name,
+                  PLAYLIST_APPEND, PLAYLIST_END );
+
+    free( psz_name );
+}
+
 static int Demux ( input_thread_t *p_input )
 {
     data_packet_t *p_data;
-    char          *p_buf, psz_line[MAX_LINE], *psz_bol, *psz_name, eol_tok;
+    char          *p_buf, psz_line[MAX_LINE], eol_tok;
     int           i_size, i_bufpos, i_linepos = 0;
     playlist_t    *p_playlist;
     vlc_bool_t    b_discard = VLC_FALSE;
@@ -190,7 +334,7 @@ static int Demux ( input_thread_t *p_input )
      * line token will be different */
     if( p_m3u->i_type == TYPE_ASX || p_m3u->i_type == TYPE_HTML )
         eol_tok = '>';
-    else  
+    else
         eol_tok = '\n';
 
     while( ( i_size = input_SplitBuffer( p_input, &p_data, MAX_LINE ) ) > 0 )
@@ -230,129 +374,18 @@ static int Demux ( input_thread_t *p_input )
             if( !i_linepos ) continue;
 
             psz_line[i_linepos] = '\0';
-            psz_bol = psz_line;
             i_linepos = 0;
-
-            /* Remove unnecessary tabs or spaces at the beginning of line */
-            while( *psz_bol == ' ' || *psz_bol == '\t' ||
-                   *psz_bol == '\n' || *psz_bol == '\r' )
-                psz_bol++;
-
-            if( p_m3u->i_type == TYPE_M3U )
-            {
-                /* Check for comment line */
-                if( *psz_bol == '#' )
-                    /*line is comment or extended info, ignored for now */
-                    continue;
-            }
-            else if ( p_m3u->i_type == TYPE_ASX )
-            {
-                /* We are dealing with ASX files.
-                 * We are looking for "<ref href=" xml markups that
-                 * begins with "mms://", "http://" or "file://" */
-                char *psz_eol;
-
-                while( *psz_bol &&
-                       strncasecmp( psz_bol, "ref", sizeof("ref") - 1 ) )
-                    psz_bol++;
-
-                if( !*psz_bol ) continue;
-
-                while( *psz_bol &&
-                       strncasecmp( psz_bol, "href", sizeof("href") - 1 ) )
-                    psz_bol++;
-
-                if( !*psz_bol ) continue;
-
-                while( *psz_bol &&
-                       strncasecmp( psz_bol, "mms://",
-                                    sizeof("mms://") - 1 ) &&
-                       strncasecmp( psz_bol, "http://",
-                                    sizeof("http://") - 1 ) &&
-                       strncasecmp( psz_bol, "file://",
-                                    sizeof("file://") - 1 ) )
-                    psz_bol++;
-
-                if( !*psz_bol ) continue;
-
-                psz_eol = strchr( psz_bol, '"');
-                if( !psz_eol )
-                  continue;
-
-                *psz_eol = '\0';
-            }
-            else
-            {
-                /* We are dealing with a html file with embedded
-                 * video.  We are looking for "<param name="filename"
-                 * value=" html markups that begin with "http://" */
-                char *psz_eol;
-
-                while( *psz_bol &&
-                       strncasecmp( psz_bol, "param", sizeof("param") - 1 ) )
-                    psz_bol++;
-
-                if( !*psz_bol ) continue;
-
-                while( *psz_bol &&
-                       strncasecmp( psz_bol, "filename", sizeof("filename") - 1 ) )
-                    psz_bol++;
-
-                if( !*psz_bol ) continue;
-
-                while( *psz_bol &&
-                       strncasecmp( psz_bol, "http://",
-                                    sizeof("http://") - 1 ) )
-                    psz_bol++;
-
-                if( !*psz_bol ) continue;
-
-                psz_eol = strchr( psz_bol, '"');
-                if( !psz_eol )
-                  continue;
-
-                *psz_eol = '\0';
-                
-            }
-
-            /*
-             * From now on, we know we've got a meaningful line
-             */
-
-	    /* Check if the line has an absolute or relative path */
-	    psz_name = psz_bol;
-            while( *psz_name && strncmp( psz_name, "://", sizeof("://") - 1 ) )
-	    {
-	        psz_name++;
-	    }
-	    if( !*psz_name && *psz_bol != '/' )
-	    {
- 	        /* the line doesn't specify a protocol name.
-		 * If this line doesn't begin with a '/' then assume the path
-		 * is relative to the path of the m3u file. */
-                char *psz_path = strdup( p_input->psz_name );
-                
-                psz_name = strrchr( psz_path, '/' );
-                if( psz_name ) *psz_name = '\0';
-                else *psz_path = '\0';
-                psz_name = malloc( strlen(psz_path) + strlen(psz_bol) + 2 );
-                sprintf( psz_name, "%s/%s", psz_path, psz_bol );
-                free( psz_path );
-	    }
-	    else
-	    {
-	        psz_name = strdup( psz_bol );
-	    }
-
-            playlist_Add( p_playlist, psz_name,
-                          PLAYLIST_APPEND, PLAYLIST_END );
-
-	    free( psz_name );
-
-            continue;
+            ProcessLine ( p_input, p_m3u , p_playlist , psz_line );
         }
 
         input_DeletePacket( p_input->p_method_data, p_data );
+    }
+
+    if ( i_linepos && b_discard != VLC_TRUE && eol_tok == '\n' )
+    {
+        psz_line[i_linepos] = '\0';
+        i_linepos = 0;
+        ProcessLine ( p_input, p_m3u , p_playlist , psz_line );
     }
 
     vlc_object_release( p_playlist );
