@@ -643,31 +643,11 @@ static int DecoderDecode( decoder_t *p_dec, block_t *p_block )
             while( p_sout_block )
             {
                 block_t       *p_next = p_sout_block->p_next;
-                sout_buffer_t *p_sout_buffer;
 
-                p_sout_buffer =
-                    sout_BufferNew( p_dec->p_owner->p_sout_input->p_sout,
-                                    p_sout_block->i_buffer );
-                if( p_sout_buffer == NULL )
-                {
-                    msg_Err( p_dec, "cannot get sout buffer" );
-                    break;
-                }
-
-                memcpy( p_sout_buffer->p_buffer, p_sout_block->p_buffer,
-                        p_sout_block->i_buffer );
-
-                p_sout_buffer->i_pts = p_sout_block->i_pts;
-                p_sout_buffer->i_dts = p_sout_block->i_dts;
-                p_sout_buffer->i_length = p_sout_block->i_length;
-                p_sout_buffer->i_flags =
-                    ( p_sout_block->i_flags << SOUT_BUFFER_FLAGS_BLOCK_SHIFT )
-                    & SOUT_BUFFER_FLAGS_BLOCK_MASK;
-
-                block_Release( p_sout_block );
+                p_sout_block->p_next = NULL;
 
                 sout_InputSendBuffer( p_dec->p_owner->p_sout_input,
-                                      p_sout_buffer );
+                                      p_sout_block );
 
                 p_sout_block = p_next;
             }
