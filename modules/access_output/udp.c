@@ -2,7 +2,7 @@
  * udp.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.23 2004/03/03 20:39:51 gbazin Exp $
+ * $Id: udp.c,v 1.24 2004/03/05 00:14:19 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -96,6 +96,7 @@ typedef struct sout_access_thread_t
     int         i_handle;
 
     int64_t     i_caching;
+    int64_t     i_late;
     int         i_group;
 
 } sout_access_thread_t;
@@ -226,6 +227,13 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->p_thread->i_group = atoi( psz_val );
     }
+
+    p_sys->p_thread->i_late = 0;
+    if( ( psz_val = sout_cfg_find_value( p_access->p_cfg, "late" ) ) )
+    {
+        p_sys->p_thread->i_late = atoll( psz_val ) * 1000;
+    }
+
 
     p_sys->i_mtu = socket_desc.i_mtu;
 
@@ -458,11 +466,13 @@ static void ThreadWrite( vlc_object_t *p_this )
         }
 
         i_sent = mdate();
-        if ( i_sent > i_date + 100000 )
+        if( p_thread->i_late > 0 && i_sent > i_date + p_thread->i_late )
         {
             if( !i_dropped_packets )
+            {
                 msg_Dbg( p_thread, "late packet to send (" I64Fd ") -> drop",
                          i_sent - i_date );
+            }
             sout_BufferDelete( p_sout, p_pk );
             i_date_last = i_date;
             i_dropped_packets++;
