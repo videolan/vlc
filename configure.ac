@@ -122,7 +122,7 @@ case "${target_os}" in
     CFLAGS_save="${CFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -no-cpp-precomp -D_INTL_REDIRECT_MACROS"; OBJCFLAGS="${OBJCFLAGS_save}"
-    VLC_ADD_LDFLAGS([vlc ffmpeg],[-all_load])
+    VLC_ADD_LDFLAGS([vlc ffmpeg ffmpegaltivec],[-all_load])
     VLC_ADD_LDFLAGS([mp4], [-framework IOKit -framework CoreFoundation])
     VLC_ADD_CFLAGS([libvlc],[-x objective-c])
     VLC_ADD_CFLAGS([vlc],[-x objective-c])
@@ -440,7 +440,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LDFLAGS([adjust distort a52tofloat32 dtstofloat32],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LDFLAGS([ffmpeg stream_out_transcode stream_out_transrate i420_rgb faad toolame equalizer vlc],[-lm])
+  VLC_ADD_LDFLAGS([ffmpeg ffmpegaltivec stream_out_transcode stream_out_transcodealtivec stream_out_transrate i420_rgb faad toolame equalizer vlc],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LDFLAGS([headphone_channel_mixer normvol],[-lm])
@@ -1896,6 +1896,52 @@ then
       VLC_ADD_LDFLAGS([stream_out_transcode],[-L${real_ffmpeg_tree}/libavcodec])
       VLC_ADD_CPPFLAGS([stream_out_transcode],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
     fi
+  fi
+fi
+
+dnl
+dnl  ffmpeg decoder/demuxer plugin
+dnl
+AC_ARG_ENABLE(ffmpegaltivec,
+[  --enable-ffmpegaltivec  ffmpegaltivec codec (DO NOT USE)])
+if test "${enable_ffmpegaltivec}" == "yes"
+then
+  if test "${with_ffmpeg_tree}" != "no" -a -n "${with_ffmpeg_tree}"; then
+    AC_MSG_CHECKING(for libavcodecaltivec.a in ${with_ffmpeg_tree})
+    real_ffmpeg_tree="`cd ${with_ffmpeg_tree} 2>/dev/null && pwd`"
+    if test -z "${real_ffmpeg_tree}"; then
+      dnl  The given directory can't be found
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot cd to ${with_ffmpeg_tree}])
+    fi
+    if ! test -f "${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a"; then
+      dnl  The given libavcodecaltivec wasn't built
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([cannot find ${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a, make sure you compiled libavcodecaltivec in ${with_ffmpeg_tree}])
+    fi
+    if ! fgrep -s "pp_get_context" "${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a"; then
+      dnl  The given libavcodecaltivec wasn't built with --enable-pp
+      AC_MSG_RESULT(no)
+      AC_MSG_ERROR([${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a was not compiled with postprocessing support, make sure you configured ffmpeg with --enable-pp])
+    fi
+    dnl  Use a custom libffmpeg
+    AC_MSG_RESULT(${real_ffmpeg_tree}/libavcodec/libavcodecaltivec.a)
+    VLC_ADD_BUILTINS([ffmpegaltivec stream_out_transcodealtivec])
+    VLC_ADD_LDFLAGS([ffmpegaltivec],[-L${real_ffmpeg_tree}/libavcodec -lavcodecaltivec])
+    VLC_ADD_CPPFLAGS([ffmpeg],[-DNO_ALTIVEC_IN_FFMPEG])
+    VLC_ADD_CPPFLAGS([ffmpegaltivec],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
+
+    if test -f "${real_ffmpeg_tree}/libavformat/libavformat.a"; then
+      AC_DEFINE(HAVE_LIBAVFORMAT, 1, [Define if you have ffmpeg's libavformat.])
+      VLC_ADD_LDFLAGS([ffmpegaltivec],[-L${real_ffmpeg_tree}/libavformat -lavformataltivec -lz])
+      VLC_ADD_CPPFLAGS([ffmpegaltivec],[-I${real_ffmpeg_tree}/libavformat])
+    fi
+
+    dnl  XXX: we don't link with -lavcodec a 2nd time because the OS X
+    dnl       linker would miserably barf on multiple definitions.
+    VLC_ADD_LDFLAGS([stream_out_transcodealtivec],[-L${real_ffmpeg_tree}/libavcodec])
+    VLC_ADD_CPPFLAGS([stream_out_transcode],[-DNO_ALTIVEC_IN_FFMPEG])
+    VLC_ADD_CPPFLAGS([stream_out_transcodealtivec],[-I${real_ffmpeg_tree}/libavcodec -I${real_ffmpeg_tree}/libavformat])
   fi
 fi
 

@@ -9,3 +9,14 @@ SOURCES_ffmpeg = \
 	demux.c \
 	$(NULL)
 
+SOURCES_ffmpegaltivec = \
+	ffmpeg.c \
+	ffmpeg.h \
+	video.c \
+	audio.c \
+	chroma.c \
+	encoder.c \
+	postprocess.c \
+	demux.c \
+	$(NULL)
+
