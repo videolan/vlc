@@ -2225,7 +2225,7 @@ static void httpd_HostThread( httpd_host_t *host )
                             p += sprintf( p, "<title>Error 404</title>\n" );
                             p += sprintf( p, "</head>\n" );
                             p += sprintf( p, "<body>\n" );
-                            p += sprintf( p, "<h1><center> 404 Ressource not found(%s)</center></h1>\n", query->psz_url );
+                            p += sprintf( p, "<h1><center> 404 Resource not found(%s)</center></h1>\n", query->psz_url );
                             p += sprintf( p, "<hr />\n" );
                             p += sprintf( p, "<a href=\"http://www.videolan.org\">VideoLAN</a>\n" );
                             p += sprintf( p, "</body>\n" );
