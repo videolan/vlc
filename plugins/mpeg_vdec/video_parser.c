@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.23 2002/06/02 09:03:54 sam Exp $
+ * $Id: video_parser.c,v 1.24 2002/06/05 18:01:31 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -310,25 +310,28 @@ static void EndThread( vpar_thread_t *p_vpar )
     times( &cpu_usage );
 #endif
 
-    /* Release used video buffers. */
-    if( p_vpar->sequence.p_forward != NULL )
+    if( p_vpar->p_vout != NULL )
     {
-        vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
-    }
-    if( p_vpar->sequence.p_backward != NULL )
-    {
-        vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
-                          vpar_SynchroDate( p_vpar ) );
-        vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
-    }
-    if( p_vpar->picture.p_picture != NULL )
-    {
-        vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
-    }
+        /* Release used video buffers. */
+        if( p_vpar->sequence.p_forward != NULL )
+        {
+            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+        }
+        if( p_vpar->sequence.p_backward != NULL )
+        {
+            vout_DatePicture( p_vpar->p_vout, p_vpar->sequence.p_backward,
+                              vpar_SynchroDate( p_vpar ) );
+            vout_UnlinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+        }
+        if( p_vpar->picture.p_picture != NULL )
+        {
+            vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
+        }
 
-    /* We are about to die. Reattach video output to p_vlc. */
-    vlc_object_detach( p_vpar->p_vout, p_vpar->p_fifo );
-    vlc_object_attach( p_vpar->p_vout, p_vpar->p_fifo->p_vlc );
+        /* We are about to die. Reattach video output to p_vlc. */
+        vlc_object_detach( p_vpar->p_vout, p_vpar->p_fifo );
+        vlc_object_attach( p_vpar->p_vout, p_vpar->p_fifo->p_vlc );
+    }
 
     msg_Dbg( p_vpar->p_fifo, "%d loops among %d sequence(s)",
              p_vpar->c_loops, p_vpar->c_sequences );
