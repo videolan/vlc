@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.6 2003/01/05 16:23:57 massiot Exp $
+ * $Id: controls.m,v 1.7 2003/01/15 11:27:29 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -240,15 +240,16 @@
     intf_thread_t * p_intf = [NSApp getIntf];
     aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
                                                 FIND_ANYWHERE );
+    audio_volume_t i_volume;
 
     if ( p_aout != NULL )
     {
-        aout_VolumeMute( p_aout, NULL );
+        aout_VolumeMute( p_aout, &i_volume );
         vlc_object_release( (vlc_object_t *)p_aout );
     }
 
     NSMenuItem * o_mi = (NSMenuItem *)sender;
-    p_intf->p_sys->b_mute = !p_intf->p_sys->b_mute;
+    p_intf->p_sys->b_mute = (i_volume == 0);
     [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
 }
 
