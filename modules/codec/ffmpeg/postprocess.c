@@ -2,7 +2,7 @@
  * postprocess.c: video postprocessing using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: postprocess.c,v 1.7 2004/01/25 18:20:12 bigben Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -41,6 +41,10 @@
 #   include <postproc/postprocess.h>
 #else
 #   include <libpostproc/postprocess.h>
+#endif
+
+#ifndef PP_CPU_CAPS_ALTIVEC
+#   define PP_CPU_CAPS_ALTIVEC 0
 #endif
 
 /*****************************************************************************
@@ -121,6 +125,7 @@ int E_(InitPostproc)( decoder_t *p_dec, void *p_data,
     int32_t i_cpu = p_dec->p_libvlc->i_cpu;
     int i_flags = 0;
 
+    /* Set CPU capabilities */
     if( i_cpu & CPU_CAPABILITY_MMX )
     {
         i_flags |= PP_CPU_CAPS_MMX;
@@ -132,6 +137,10 @@ int E_(InitPostproc)( decoder_t *p_dec, void *p_data,
     if( i_cpu & CPU_CAPABILITY_3DNOW )
     {
         i_flags |= PP_CPU_CAPS_3DNOW;
+    }
+    if( i_cpu & CPU_CAPABILITY_ALTIVEC )
+    {
+        i_flags |= PP_CPU_CAPS_ALTIVEC;
     }
 
     switch( pix_fmt )
