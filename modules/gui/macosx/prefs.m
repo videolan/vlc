@@ -1092,7 +1092,6 @@ static VLCTreeItem *o_root_item = nil;
 }
 
 - (int)numberOfChildren {
-    return 0;
     id i_tmp = [self children];
     return (i_tmp == IsALeafNode) ? (-1) : (int)[i_tmp count];
 }
