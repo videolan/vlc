@@ -2,30 +2,45 @@
 
 SOURCES_corba = corba.c mediacontrol-core.c mediacontrol-plugin.c
 
-EXTRA_DIST += MediaControl.so
-
 nodist_SOURCES_corba = \
 	MediaControl-common.c \
 	MediaControl-skels.c \
+	MediaControl-skelimpl.c \
+	MediaControl-stubs.c \
+	MediaControl-imodule.c \
 	MediaControl.h \
 	$(NULL)
 
-ORBITIDL = orbit-idl-2
+corbaidldir = $(datadir)/idl
+corbaidl_DATA = MediaControl.idl
 
-GENERATEDFILES=MediaControl-common.c MediaControl-skels.c MediaControl.h  MediaControl-imodule.c
+## orbittypelibdir = $(libdir)/orbit-2.0
+orbittypelibdir = $(libdir)/advene
+orbittypelib_DATA = MediaControl.so
 
-corba.c: MediaControl.h MediaControl-common.c
+EXTRA_DIST += $(corbaidl_DATA)
+
+ORBIT_IDL=$(shell pkg-config --variable=orbit_idl ORBit-2.0)
+
+GENERATEDFILES = MediaControl-common.c MediaControl-skels.c MediaControl.h
+BUILT_SOURCES += $(GENERATEDFILES) MediaControl-imodule.c
+
+corba.c: MediaControl.h
+
+## Needed for both MediaControl.so and libcorba_plugin compilation
+INCLUDES = $(LIBMEDIACONTROL_CFLAGS)
+
+## MediaControl.so rules
+MediaControl.so: MediaControl-imodule.c
+	$(CC) -fPIC -o MediaControl-imodule.o -c $< $(LIBMEDIACONTROL_CFLAGS)
+	$(CC) -shared -o $@ MediaControl-imodule.o $(LIBMEDIACONTROL_LIBS)
 
 $(GENERATEDFILES): MediaControl.idl
-	$(ORBITIDL) --skeleton-impl MediaControl.idl
+	$(ORBIT_IDL) --skeleton-impl $(corbaidl_DATA)
 
-MediaControl-imodule.c:
-	$(ORBITIDL) --imodule MediaControl.idl
-
-MediaControl.so: MediaControl-imodule.c
-	$(CC) -fPIC -o MediaControl-imodule.o -c MediaControl-imodule.c `pkg-config --cflags ORBit-2.0`
-	$(CC) -shared -o $@ MediaControl-imodule.o `pkg-config --libs ORBit-2.0`
+MediaControl-imodule.c: $(corbaidl_DATA)
+	$(ORBIT_IDL) --imodule $<
 
 clean:
 	$(RM) -f $(GENERATEDFILES)
-
+	$(RM) -f MediaControl-imodule.c

@@ -3547,36 +3547,23 @@ then
 	        )
 fi
 
-
 dnl
 dnl corba (ORBit) plugin
 dnl
 AC_ARG_ENABLE(corba,
   [  --enable-corba          corba interface support (default disabled)])
 if test "${enable_corba}" = "yes"; then
-  ORBIT_PATH="${PATH}"
-  AC_ARG_WITH(orbit-config-path,
-  [    --with-orbit-config-path=PATH orbit-config path (default search in \$PATH)])
-  if test "${with_orbit_config_path}" != "no"; then
-    ORBIT_PATH="${with_orbit_config_path}:${PATH}"
-  fi
-  # look for orbit2-config
-  AC_PATH_PROG(ORBIT_CONFIG, orbit2-config, no, ${ORBIT_PATH})
-  if test "${ORBIT_CONFIG}" != "no"; then
-    AX_ADD_CFLAGS(corba,[`${ORBIT_CONFIG} --cflags server`])
-    AX_ADD_LDFLAGS(corba,[`${ORBIT_CONFIG} --libs server | sed 's,-rdynamic,,'`])
-    # now look for the orbit.h header
-    CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_corba}"
-    ac_cv_corba_headers=yes
-    AC_CHECK_HEADERS(orbit/orbit.h, , [
-      ac_cv_corba_headers=no
-      AC_MSG_ERROR([Could not find corba development headers])
-    ])
-    if test "${ac_cv_corba_headers}" = "yes"; then
-      AX_ADD_PLUGINS([corba snapshot])
-    fi
-    CPPFLAGS="${CPPFLAGS_save}"
-  fi
+      GLIB_VERSION=2.3.2
+      PKG_CHECK_MODULES(LIBMEDIACONTROL, 
+	ORBit-2.0 >= 2.8.0 \
+	glib-2.0 >= $GLIB_VERSION \
+	gobject-2.0 >= $GLIB_VERSION \
+	gthread-2.0 >= $GLIB_VERSION,
+	[
+ 	  AX_ADD_LDFLAGS([corba],[$LIBMEDIACONTROL_LIBS])
+      	  AX_ADD_CFLAGS([corba],[$LIBMEDIACONTROL_CFLAGS])
+          AX_ADD_PLUGINS([corba snapshot]) ],
+        [AC_MSG_WARN(corba library not found)])
 fi
 
 AC_ARG_WITH(,[Misc options:])
