@@ -115,13 +115,13 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                     case MPEG2_VIDEO_ES:
                         /* Spawn video thread. */
 /* Les 2 pointeurs NULL ne doivent pas etre NULL sinon on segfault !!!! */
-//                        if( ((vdec_thread_t*)(p_input->p_es[i_es_loop].p_dec) =
-//                            vdec_CreateThread( NULL, p_input, NULL )) == NULL )
-//                        {
-//                            intf_ErrMsg("Could not start video decoder\n");
-//                            pthread_mutex_unlock( &p_input->es_lock );
-//                            return( -1 );
-//                        }
+                        if( ((vdec_thread_t*)(p_input->p_es[i_es_loop].p_dec) =
+                            vdec_CreateThread( p_input )) == NULL )
+                        {
+                            intf_ErrMsg("Could not start video decoder\n");
+                            pthread_mutex_unlock( &p_input->es_lock );
+                            return( -1 );
+                        }
                         break;
 
                     default:
@@ -199,7 +199,7 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
 
                     case MPEG1_VIDEO_ES:
                     case MPEG2_VIDEO_ES:
-                        vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_selected_es_loop]->p_dec), NULL );
+                        vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) /*, NULL */ );
                         break;
                 }
 

@@ -31,12 +31,14 @@ typedef struct vdec_thread_s
     /* Thread configuration */
     /* ?? */
  /*??*/
-    int *pi_status;
+//    int *pi_status;
     
 
     /* Input properties */
-    input_thread_t *    p_input;                               /* input thread */
     decoder_fifo_t      fifo;                                /* PES input fifo */
+
+    /* The bit stream structure handles the PES stream at the bit level */
+    bit_stream_t        bit_stream;
 
     /* Output properties */
     vout_thread_t *     p_vout;                         /* video output thread */
@@ -63,9 +65,9 @@ typedef struct vdec_thread_s
  *******************************************************************************/
 
 /* Thread management functions */
-vdec_thread_t * vdec_CreateThread       ( video_cfg_t *p_cfg, input_thread_t *p_input,
-                                          vout_thread_t *p_vout, int *pi_status );
-void             vdec_DestroyThread      ( vdec_thread_t *p_vdec, int *pi_status );
+vdec_thread_t * vdec_CreateThread       ( /* video_cfg_t *p_cfg, */ input_thread_t *p_input /*,
+                                          vout_thread_t *p_vout, int *pi_status */ );
+void             vdec_DestroyThread      ( vdec_thread_t *p_vdec /*, int *pi_status */ );
 
 /* Time management functions */
 /* ?? */

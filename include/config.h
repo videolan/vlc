@@ -36,7 +36,7 @@
  *******************************************************************************/
 
 /* General debugging support */
-//#define DEBUG
+#define DEBUG
 
 /* Modules specific debugging */
 #define DEBUG_INTF
@@ -57,7 +57,7 @@
  *******************************************************************************/
 
 /* Automagically spawn input, audio and video threads ? */
-//#define AUTO_SPAWN
+#define AUTO_SPAWN
 
 /* Startup script */
 #define INIT_SCRIPT	"vlc.init"
@@ -268,7 +268,7 @@
 
 /* Filename to log message
  * Note that messages are only logged when debugging */
-#define INTF_MSG_LOGFILE "vlc.log"
+//#define INTF_MSG_LOGFILE "vlc.log"
 
 /*
  * X11 console properties

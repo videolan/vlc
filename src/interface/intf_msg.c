@@ -306,9 +306,7 @@ static void QueueMsg(interface_msg_t *p_intf_msg, int i_type, char *psz_format, 
      */
     msg.i_type = i_type; 
     msg.psz_msg = psz_str;
-#ifdef DEBUG
     msg.date = mdate();
-#endif
     PrintMsg( &msg );                                         /* print message */
     free( psz_str );                                      /* free message data */    
 
@@ -373,7 +371,9 @@ static void QueueDbgMsg(interface_msg_t *p_intf_msg, char *psz_file, char *psz_f
     msg.psz_file =      psz_file;
     msg.psz_function =  psz_function;
     msg.i_line =        i_line;
-    msg.date =          mdate();
+#ifdef DEBUG
+//    msg.date =          mdate();
+#endif
     msg.psz_msg =       psz_str;
     PrintMsg( &msg );                                         /* print message */
     free( psz_str );                                      /* free message data */    
@@ -434,16 +434,18 @@ static void PrintMsg( interface_msg_message_t *p_msg )
         break;
 
     case INTF_MSG_INTF:                                  /* interface messages */
+    case INTF_MSG_DBG:
         asprintf( &psz_msg, p_msg->psz_msg );
         break;
-        
+#if 0        
     case INTF_MSG_DBG:                                       /* debug messages */
         asprintf( &psz_msg, "(%s) " INTF_MSG_DBG_FORMAT "%s", 
                   psz_date, p_msg->psz_file, p_msg->psz_function, p_msg->i_line, 
                   p_msg->psz_msg );            
         break;                
+#endif
     }
-    
+ 
     /* Check if formatting function suceeded */
     if( psz_msg == NULL )
     {
