@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: open.cpp,v 1.63 2004/01/25 03:29:01 hartman Exp $
+ * $Id: open.cpp,v 1.64 2004/01/25 07:48:04 rocky Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1065,7 +1065,7 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         */
 #ifdef HAVE_VCDX
         disc_title_label->SetLabel ( config_GetInt( p_intf, "vcdx-PBC"  )
-                                     ? wxU(_("PBC LID")_) : wxU(_("Entry")) );
+                                     ? wxT("Playback-control LID") : wxT("Entry") );
         disc_title->SetRange( 0, 999 );
         i_selection = 0;
 #else
