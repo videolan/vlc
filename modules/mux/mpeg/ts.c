@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.27 2003/08/14 11:47:32 gbazin Exp $
+ * $Id: ts.c,v 1.28 2003/08/14 23:37:54 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -59,6 +59,8 @@
  *  - check PCR frequency requirement
  *  - check PAT/PMT  "        "
  *  - check PCR/PCR "soft"
+ *  - check if "registration" descriptor : "AC-3" should be a program
+ *    descriptor or an es one. (xine want an es one)
  *
  *  - remove creation of PAT/PMT without dvbpsi
  *  - ?
@@ -173,7 +175,6 @@ struct sout_mux_sys_t
 
     int             i_stream_id_mpga;
     int             i_stream_id_mpgv;
-    int             i_stream_id_a52;
 
     int             i_audio_bound;
     int             i_video_bound;
@@ -241,7 +242,6 @@ static int Open( vlc_object_t *p_this )
     srand( (uint32_t)mdate() );
 
     p_sys->i_stream_id_mpga = 0xc0;
-    p_sys->i_stream_id_a52  = 0x80;
     p_sys->i_stream_id_mpgv = 0xe0;
 
     p_sys->i_audio_bound = 0;
@@ -424,8 +424,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     break;
                 case VLC_FOURCC( 'a', '5','2', ' ' ):
                     p_stream->i_stream_type = 0x81;
-                    p_stream->i_stream_id = p_sys->i_stream_id_a52;
-                    p_sys->i_stream_id_a52++;
+                    p_stream->i_stream_id = 0xbd;
                     break;
                 case VLC_FOURCC( 'm', 'p','4', 'a' ):
                     p_stream->i_stream_type = 0x11;
@@ -1294,6 +1293,11 @@ static void GetPMT( sout_mux_t *p_mux,
         bits_buffer_t bits;
         bits_buffer_t bits_fix_IOD;
 
+        /* Make valgrind happy : it works at byte level not bit one so
+         * bit_write confuse it (but DON'T CHANGE the way that bit_write is
+         * working (needed when fixing some bits) */
+        memset( iod, 0, 4096 );
+
         bits_initwrite( &bits, 4096, iod );
         // IOD_label
         bits_write( &bits, 8,   0x01 );
@@ -1412,47 +1416,41 @@ static void GetPMT( sout_mux_t *p_mux,
                                 p_stream->i_pid );
         if( p_stream->i_stream_id == 0xfa || p_stream->i_stream_id == 0xfb )
         {
-            uint8_t     data[512];
-            bits_buffer_t bits;
+            uint8_t     es_id[2];
 
             /* SL descriptor */
-            bits_initwrite( &bits, 512, data );
-            bits_write( &bits, 16, p_stream->i_es_id );
-
-            dvbpsi_PMTESAddDescriptor( p_es,
-                                       0x1f,
-                                       bits.i_data,
-                                       bits.p_data );
+            es_id[0] = (p_stream->i_es_id >> 8)&0xff;
+            es_id[1] = (p_stream->i_es_id)&0xff;
+            dvbpsi_PMTESAddDescriptor( p_es, 0x1f, 2, es_id );
         }
-        else if( p_stream->i_stream_id == 0xa0 )
+        else if( p_stream->i_stream_type == 0xa0 )
         {
             uint8_t     data[512];
-            uint8_t     fcc[4];
-            bits_buffer_t bits;
-
-            memcpy( fcc, &p_stream->i_bih_codec, 4 );
+            int         i_extra = __MIN( p_stream->i_decoder_specific_info,
+                                        502 );
 
             /* private DIV3 descripor */
-            bits_initwrite( &bits, 512, data );
-            bits_write( &bits, 8,  fcc[0]);
-            bits_write( &bits, 8,  fcc[1]);
-            bits_write( &bits, 8,  fcc[2]);
-            bits_write( &bits, 8,  fcc[3]);
-            bits_write( &bits, 16, p_stream->i_bih_width );
-            bits_write( &bits, 16, p_stream->i_bih_height );
-            bits_write( &bits, 16, p_stream->i_decoder_specific_info );
-            if( p_stream->i_decoder_specific_info > 0 )
+            memcpy( &data[0], &p_stream->i_bih_codec, 4 );
+            data[4] = ( p_stream->i_bih_width >> 8 )&&0xff;
+            data[5] = ( p_stream->i_bih_width      )&&0xff;
+            data[6] = ( p_stream->i_bih_height>> 8 )&&0xff;
+            data[7] = ( p_stream->i_bih_height     )&&0xff;
+            data[8] = ( i_extra >> 8 )&&0xff;
+            data[9] = ( i_extra      )&&0xff;
+            if( i_extra > 0 )
             {
-                int i;
-                for( i = 0; i < p_stream->i_decoder_specific_info; i++ )
-                {
-                    bits_write( &bits, 8, p_stream->p_decoder_specific_info[i] );
-                }
+                memcpy( &data[10], p_stream->p_decoder_specific_info, i_extra );
             }
-            dvbpsi_PMTESAddDescriptor( p_es,
-                                       0xa0,    // private
-                                       bits.i_data,
-                                       bits.p_data );
+
+            /* 0xa0 is private */
+            dvbpsi_PMTESAddDescriptor( p_es, 0xa0, i_extra  + 10, data );
+        }
+        else if( p_stream->i_stream_type == 0x81 )
+        {
+            uint8_t format[4] = { 0x41, 0x43, 0x2d, 0x33 };
+
+            /* "registration" descriptor : "AC-3" */
+            dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, format );
         }
     }
 
