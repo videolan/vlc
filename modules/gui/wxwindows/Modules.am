@@ -22,14 +22,11 @@ SOURCES_wxwindows = \
 	$(NULL)
 
 EXTRA_DIST += \
-	bitmaps/file.xpm \
-	bitmaps/disc.xpm \
-	bitmaps/net.xpm \
 	bitmaps/stop.xpm \
 	bitmaps/play.xpm \
 	bitmaps/pause.xpm \
-	bitmaps/playlist.xpm \
-	bitmaps/previous.xpm \
+	bitmaps/eject.xpm \
+	bitmaps/prev.xpm \
 	bitmaps/next.xpm \
 	bitmaps/slow.xpm \
 	bitmaps/fast.xpm

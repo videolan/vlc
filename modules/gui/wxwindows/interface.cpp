@@ -33,24 +33,17 @@
 #include "wxwindows.h"
 
 /* include the toolbar graphics */
-#include "bitmaps/file.xpm"
-
-#include "bitmaps/disc.xpm"
-#include "bitmaps/net.xpm"
-#if 0
- #include "bitmaps/sat.xpm"
-#endif
 #include "bitmaps/play.xpm"
 #include "bitmaps/pause.xpm"
 #include "bitmaps/stop.xpm"
-#include "bitmaps/previous.xpm"
+#include "bitmaps/prev.xpm"
 #include "bitmaps/next.xpm"
-#include "bitmaps/playlist.xpm"
-#include "bitmaps/fast.xpm"
+#include "bitmaps/eject.xpm"
 #include "bitmaps/slow.xpm"
+#include "bitmaps/fast.xpm"
 
-#define TOOLBAR_BMP_WIDTH 36
-#define TOOLBAR_BMP_HEIGHT 36
+#define TOOLBAR_BMP_WIDTH 16
+#define TOOLBAR_BMP_HEIGHT 16
 
 /* include the icon graphic */
 #include "../../../share/vlc32x32.xpm"
@@ -241,11 +234,6 @@ Interface::Interface( intf_thread_t *_p_intf ):
     /* Creation of the tool bar */
     CreateOurToolBar();
 
-    /* Creation of the slider sub-window */
-    CreateOurSlider();
-    frame_sizer->Add( slider_frame, 0, wxEXPAND , 0 );
-    frame_sizer->Hide( slider_frame );
-
     /* Create the extra panel */
     CreateOurExtendedPanel();
     frame_sizer->Add( extra_frame, 0, wxEXPAND , 0 );
@@ -259,15 +247,20 @@ Interface::Interface( intf_thread_t *_p_intf ):
     statusbar->SetStatusWidths( 3, i_status_width );
     statusbar->SetStatusText( wxString::Format(wxT("x%.2f"), 1.0), 1 );
 
-    /* Make sure we've got the right background colour */
-    SetBackgroundColour( slider_frame->GetBackgroundColour() );
-
     /* Video window */
     if( config_GetInt( p_intf, "wxwin-embed" ) )
     {
         VideoWindow( p_intf, this );
         frame_sizer->Add( p_intf->p_sys->p_video_sizer, 1, wxEXPAND , 0 );
     }
+
+    /* Creation of the slider sub-window */
+    CreateOurSlider();
+    frame_sizer->Add( slider_frame, 0, wxEXPAND , 0 );
+    frame_sizer->Hide( slider_frame );
+
+    /* Make sure we've got the right background colour */
+    SetBackgroundColour( slider_frame->GetBackgroundColour() );
 
     /* Layout everything */
     frame_sizer->Layout();
@@ -329,32 +322,33 @@ void Interface::CreateOurMenuBar()
 
     /* Create the "File" menu */
     wxMenu *file_menu = new wxMenu;
-    file_menu->Append( OpenFileSimple_Event, wxU(_("Quick &Open File...")),
+    file_menu->Append( OpenFileSimple_Event,
+                       wxU(_("Quick &Open File...\tCtrl-O")),
                        wxU(_(HELP_SIMPLE)) );
 
     file_menu->AppendSeparator();
-    file_menu->Append( OpenFile_Event, wxU(_("Open &File...")),
-                      wxU(_(HELP_FILE)));
-    file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...")),
-                      wxU(_(HELP_DISC)));
-    file_menu->Append( OpenNet_Event, wxU(_("Open &Network Stream...")),
-                      wxU(_(HELP_NET)));
+    file_menu->Append( OpenFile_Event, wxU(_("Open &File...\tCtrl-F")),
+                       wxU(_(HELP_FILE)));
+    file_menu->Append( OpenDisc_Event, wxU(_("Open &Disc...\tCtrl-D")),
+                       wxU(_(HELP_DISC)));
+    file_menu->Append( OpenNet_Event,
+                       wxU(_("Open &Network Stream...\tCtrl-N")),
+                       wxU(_(HELP_NET)));
 
-#if 0
-    file_menu->Append( OpenSat_Event, wxU(_("Open &Satellite Stream...")),
-                       wxU(_(HELP_NET)) );
-#endif
     file_menu->AppendSeparator();
-    file_menu->Append( StreamWizard_Event, wxU(_("Streaming Wizard...")),
+    file_menu->Append( StreamWizard_Event,
+                       wxU(_("Streaming &Wizard...\tCtrl-W")),
                        wxU(_(HELP_STREAMWIZARD)) );
     file_menu->AppendSeparator();
-    file_menu->Append( Exit_Event, wxU(_("E&xit")), wxU(_(HELP_EXIT)) );
+    file_menu->Append( Exit_Event, wxU(_("E&xit\tCtrl-X")),
+                       wxU(_(HELP_EXIT)) );
 
     /* Create the "View" menu */
     wxMenu *view_menu = new wxMenu;
-    view_menu->Append( Playlist_Event, wxU(_("&Playlist...")),
+    view_menu->Append( Playlist_Event, wxU(_("&Playlist...\tCtrl-P")),
                        wxU(_(HELP_PLAYLIST)) );
-    view_menu->Append( Logs_Event, wxU(_("&Messages...")), wxU(_(HELP_LOGS)) );
+    view_menu->Append( Logs_Event, wxU(_("&Messages...\tCtrl-M")),
+                       wxU(_(HELP_LOGS)) );
     view_menu->Append( FileInfo_Event, wxU(_("&Stream and Media info...")),
                        wxU(_(HELP_FILEINFO)) );
 
@@ -420,34 +414,26 @@ void Interface::CreateOurToolBar()
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
-    toolbar->AddTool( OpenFileSimple_Event, wxT(""),
-                      wxBitmap( file_xpm ), wxU(_(HELP_SIMPLE)) );
-
-    toolbar->AddSeparator();
-    toolbar->AddTool( OpenFile_Event, wxT(""), wxBitmap( file_xpm ),
-                      wxU(_(HELP_FILE)) );
-    toolbar->AddTool( OpenDisc_Event, wxT(""), wxBitmap( disc_xpm ),
-                      wxU(_(HELP_DISC)) );
-    toolbar->AddTool( OpenNet_Event, wxT(""), wxBitmap( net_xpm ),
-                      wxU(_(HELP_NET)) );
-    toolbar->AddSeparator();
-
-    toolbar->AddTool( StopStream_Event, wxT(""), wxBitmap( stop_xpm ),
-                      wxU(_(HELP_STOP)) );
     toolbar->AddTool( PlayStream_Event, wxT(""), wxBitmap( play_xpm ),
                       wxU(_(HELP_PLAY)) );
-
+#if 0
+    toolbar->AddTool( PlayStream_Event, wxT(""), wxBitmap( pause_xpm ),
+                      wxU(_(HELP_PAUSE)) );
+#endif
+    toolbar->AddTool( StopStream_Event, wxT(""), wxBitmap( stop_xpm ),
+                      wxU(_(HELP_STOP)) );
     toolbar->AddSeparator();
-    toolbar->AddTool( Playlist_Event, wxT(""),
-                      wxBitmap( playlist_xpm ), wxU(_(HELP_PLO)) );
     toolbar->AddTool( PrevStream_Event, wxT(""),
-                      wxBitmap( previous_xpm ), wxU(_(HELP_PLP)) );
+                      wxBitmap( prev_xpm ), wxU(_(HELP_PLP)) );
+    toolbar->AddTool( SlowStream_Event, wxT(""),
+                      wxBitmap( slow_xpm ), wxU(_(HELP_SLOW)) );
+    toolbar->AddTool( FastStream_Event, wxT(""),
+                      wxBitmap( fast_xpm ), wxU(_(HELP_FAST)) );
     toolbar->AddTool( NextStream_Event, wxT(""), wxBitmap( next_xpm ),
                       wxU(_(HELP_PLN)) );
-    toolbar->AddTool( SlowStream_Event, wxT(""), wxBitmap( slow_xpm ),
-                      wxU(_(HELP_SLOW)) );
-    toolbar->AddTool( FastStream_Event, wxT(""), wxBitmap( fast_xpm ),
-                      wxU(_(HELP_FAST)) );
+    toolbar->AddSeparator();
+    toolbar->AddTool( Playlist_Event, wxT(""), wxBitmap( eject_xpm ),
+                      wxU(_(HELP_PLO)) );
 
     toolbar->Realize();
 
@@ -457,11 +443,7 @@ void Interface::CreateOurToolBar()
     toolbar_sizer->Add( toolbar, 1, 0, 0 );
     toolbar_sizer->Layout();
 
-#ifndef WIN32
-    frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth(), -1 );
-#else /* That sucks but for some reason it works better */
-    frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth()*2/3, -1 );
-#endif
+    frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth()*2, -1 );
 
 #if !defined(__WXX11__)
     /* Associate drop targets with the toolbar */
@@ -1315,13 +1297,13 @@ void Interface::TogglePlayButton( int i_playing_status )
 
     if( i_playing_status == PLAYING_S )
     {
-        GetToolBar()->InsertTool( 8, PlayStream_Event, wxU(_("Pause")),
+        GetToolBar()->InsertTool( 0, PlayStream_Event, wxU(_("Pause")),
                                   wxBitmap( pause_xpm ), wxNullBitmap,
                                   wxITEM_NORMAL, wxU(_(HELP_PAUSE)) );
     }
     else
     {
-        GetToolBar()->InsertTool( 8, PlayStream_Event, wxU(_("Play")),
+        GetToolBar()->InsertTool( 0, PlayStream_Event, wxU(_("Play")),
                                   wxBitmap( play_xpm ), wxNullBitmap,
                                   wxITEM_NORMAL, wxU(_(HELP_PLAY)) );
     }
