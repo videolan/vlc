@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.15 2003/01/26 13:37:09 gbazin Exp $
+ * $Id: interface.cpp,v 1.16 2003/03/26 00:56:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -112,6 +112,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(Playlist_Event, Interface::OnPlaylist)
     EVT_MENU(Logs_Event, Interface::OnLogs)
     EVT_MENU(FileInfo_Event, Interface::OnFileInfo)
+    EVT_MENU(Prefs_Event, Interface::OnPreferences)
 
     /* Toolbar events */
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
@@ -136,7 +137,9 @@ Interface::Interface( intf_thread_t *_p_intf ):
 {
     /* Initializations */
     p_intf = _p_intf;
-    i_playing_status = PAUSE_S;
+    p_prefs_dialog = NULL;
+    p_fileinfo_window = NULL;
+    i_old_playing_status = PAUSE_S;
 
     /* Give our interface a nice little icon */
     SetIcon( *new wxIcon( vlc_xpm ) );
@@ -177,6 +180,8 @@ Interface::Interface( intf_thread_t *_p_intf ):
 
 Interface::~Interface()
 {
+    if( p_prefs_dialog ) p_prefs_dialog->Destroy();
+    if( p_fileinfo_window ) p_fileinfo_window->Destroy();
 }
 
 /*****************************************************************************
@@ -353,8 +358,7 @@ void Interface::Open( int i_access_method )
         playlist_Add( p_playlist, (char *)dialog.mrl.c_str(),
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
 
-        i_playing_status = PLAYING_S;
-        TogglePlayButton();
+        TogglePlayButton( PLAYING_S );
 
         /* Rebuild the playlist */
         p_intf->p_sys->p_playlist_window->Rebuild();
@@ -410,10 +414,28 @@ void Interface::OnLogs( wxCommandEvent& WXUNUSED(event) )
 void Interface::OnFileInfo( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the fileinfo window */
-    wxFrame *p_fileinfo_window = new FileInfo( p_intf, this );
+    if( p_fileinfo_window == NULL )
+    {
+        p_fileinfo_window = new FileInfo( p_intf, this );
+    }
+
     if( p_fileinfo_window )
     {
         p_fileinfo_window->Show( true );//! p_messages_window->IsShown() );
+    }
+}
+
+void Interface::OnPreferences( wxCommandEvent& WXUNUSED(event) )
+{
+    /* Show/hide the open dialog */
+    if( p_prefs_dialog == NULL )
+    {
+        p_prefs_dialog = new PrefsDialog( p_intf, this );
+    }
+
+    if( p_prefs_dialog )
+    {
+        p_prefs_dialog->Show( true );
     }
 }
 
@@ -445,11 +467,11 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
     {
+        /* If the playlist is empty, open a file requester instead */
         OnOpenFile( dummy );
         return;
     }
 
-    /* If the playlist is empty, open a file requester instead */
     vlc_mutex_lock( &p_playlist->object_lock );
     if( p_playlist->i_size )
     {
@@ -462,8 +484,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
         {
             /* No stream was playing, start one */
             playlist_Play( p_playlist );
-            i_playing_status = PLAYING_S;
-            TogglePlayButton();
+            TogglePlayButton( PLAYING_S );
             vlc_object_release( p_playlist );
             return;
         }
@@ -472,8 +493,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
         {
             /* A stream is being played, pause it */
             input_SetStatus( p_input, INPUT_STATUS_PAUSE );
-            i_playing_status = PAUSE_S;
-            TogglePlayButton();
+            TogglePlayButton( PAUSE_S );
             vlc_object_release( p_playlist );
             vlc_object_release( p_input );
             return;
@@ -481,8 +501,7 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
 
         /* Stream is paused, resume it */
         playlist_Play( p_playlist );
-        i_playing_status = PLAYING_S;
-        TogglePlayButton();
+        TogglePlayButton( PLAYING_S );
         vlc_object_release( p_input );
         vlc_object_release( p_playlist );
     }
@@ -505,8 +524,7 @@ void Interface::OnStopStream( wxCommandEvent& WXUNUSED(event) )
     }
 
     playlist_Stop( p_playlist );
-    i_playing_status = PAUSE_S;
-    TogglePlayButton();
+    TogglePlayButton( PAUSE_S );
     vlc_object_release( p_playlist );
 }
 
@@ -582,8 +600,11 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
     vlc_object_release( p_playlist );
 }
 
-void Interface::TogglePlayButton( )
+void Interface::TogglePlayButton( int i_playing_status )
 {
+    if( i_playing_status == i_old_playing_status )
+        return;
+
     GetToolBar()->DeleteTool( PlayStream_Event );
 
     if( i_playing_status == PLAYING_S )
@@ -598,6 +619,8 @@ void Interface::TogglePlayButton( )
     }
 
     GetToolBar()->Realize();
+
+    i_old_playing_status = i_playing_status;
 }
 
 #if !defined(__WXX11__)

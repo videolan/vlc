@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.10 2003/03/22 11:21:58 gbazin Exp $
+ * $Id: wxwindows.h,v 1.11 2003/03/26 00:56:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -101,6 +101,7 @@ public:
 private:
     intf_thread_t *p_intf;
     Interface *p_main_interface;
+    int i_old_playing_status;
 };
 
 /* Main Interface */
@@ -110,6 +111,7 @@ public:
     /* Constructor */
     Interface( intf_thread_t *p_intf );
     virtual ~Interface();
+    void TogglePlayButton( int i_playing_status );
 
     wxBoxSizer  *frame_sizer;
     wxStatusBar *statusbar;
@@ -135,6 +137,7 @@ private:
     void OnPlaylist( wxCommandEvent& event );
     void OnLogs( wxCommandEvent& event );
     void OnFileInfo( wxCommandEvent& event );
+    void OnPreferences( wxCommandEvent& event );
 
     void OnOpenFile( wxCommandEvent& event );
     void OnOpenDisc( wxCommandEvent& event );
@@ -147,13 +150,15 @@ private:
     void OnPrevStream( wxCommandEvent& event );
     void OnNextStream( wxCommandEvent& event );
 
-    void TogglePlayButton();
-
     DECLARE_EVENT_TABLE();
 
     Timer *timer;
     intf_thread_t *p_intf;
-    int i_playing_status;
+
+    wxDialog *p_prefs_dialog;
+    wxFrame  *p_fileinfo_window;
+
+    int i_old_playing_status;
 };
 
 /* Open Dialog */
@@ -291,6 +296,27 @@ private:
     wxRadioButton *encapsulation_radios[4];
     int i_encapsulation_type;
 
+};
+
+/* Preferences Dialog */
+class PrefsDialog: public wxDialog
+{
+public:
+    /* Constructor */
+    PrefsDialog( intf_thread_t *p_intf, Interface *p_main_interface );
+    virtual ~PrefsDialog();
+
+private:
+    wxPanel *PrefsPanel( wxWindow* parent );
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnOk( wxCommandEvent& event );
+    void OnCancel( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    Interface *p_main_interface;
 };
 
 /* Messages */

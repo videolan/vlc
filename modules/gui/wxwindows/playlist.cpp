@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.5 2002/12/08 19:56:04 gbazin Exp $
+ * $Id: playlist.cpp,v 1.6 2003/03/26 00:56:22 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -130,8 +130,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, Interface *_p_main_interface ):
      * themselves to the size of a listview, and with a wxDefaultSize the
      * playlist window is ridiculously small */
     listview = new wxListView( playlist_panel, ListView_Event,
-                               wxDefaultPosition,
-                               wxSize( 350, 300 ), wxLC_REPORT );
+                               wxDefaultPosition, wxSize( 350, 300 ),
+                               wxLC_REPORT | wxSUNKEN_BORDER );
     listview->InsertColumn( 0, _("Url") );
     listview->InsertColumn( 1, _("Duration") );
     listview->SetColumnWidth( 0, 250 );
@@ -323,4 +323,3 @@ void Playlist::OnKeyDown( wxListEvent& event )
         OnDeleteSelection( event );
     }
 }
-

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.49 2003/03/17 12:14:26 massiot Exp $
+ * $Id: libvlc.h,v 1.50 2003/03/26 00:56:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -54,6 +54,10 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define QUIET_TEXT N_("be quiet")
 #define QUIET_LONGTEXT N_( \
     "This options turns off all warning and information messages.")
+
+#define TRANSLATION_TEXT N_("translation")
+#define TRANSLATION_LONGTEXT N_( \
+    "This option allows you to enable the translation of the interface.")
 
 #define COLOR_TEXT N_("color messages")
 #define COLOR_LONGTEXT N_( \
@@ -449,6 +453,7 @@ vlc_module_begin();
     add_integer_with_short( "verbose", 'v', -1, NULL,
                             VERBOSE_TEXT, VERBOSE_LONGTEXT, VLC_FALSE );
     add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
+    add_bool( "translation", 1, NULL, TRANSLATION_TEXT, TRANSLATION_LONGTEXT, VLC_FALSE );
     add_bool( "color", 0, NULL, COLOR_TEXT, COLOR_LONGTEXT, VLC_TRUE );
     add_bool( "advanced", 0, NULL, ADVANCED_TEXT, ADVANCED_LONGTEXT, VLC_FALSE );
     add_string( "search-path", NULL, NULL, INTF_PATH_TEXT, INTF_PATH_LONGTEXT, VLC_TRUE );

@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.10 2003/01/28 21:08:29 sam Exp $
+ * $Id: timer.cpp,v 1.11 2003/03/26 00:56:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -56,6 +56,7 @@ Timer::Timer( intf_thread_t *_p_intf, Interface *_p_main_interface )
 {
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
+    i_old_playing_status = PAUSE_S;
 
     Start( 100 /*milliseconds*/, wxTIMER_CONTINUOUS );
 }
@@ -129,6 +130,9 @@ void Timer::Notify()
             p_main_interface->frame_sizer->Fit( p_main_interface );
             p_main_interface->statusbar->SetStatusText(
                 p_intf->p_sys->p_input->psz_source, 1 );
+
+            p_main_interface->TogglePlayButton( PLAYING_S );
+            i_old_playing_status = PLAYING_S;
         }
     }
     else if( p_intf->p_sys->p_input->b_dead )
@@ -141,6 +145,9 @@ void Timer::Notify()
                 p_main_interface->slider_frame );
             p_main_interface->frame_sizer->Layout();
             p_main_interface->frame_sizer->Fit( p_main_interface );
+
+            p_main_interface->TogglePlayButton( PAUSE_S );
+            i_old_playing_status = PAUSE_S;
         }
 
         p_main_interface->statusbar->SetStatusText( "", 1 );
@@ -158,12 +165,18 @@ void Timer::Notify()
         if( !p_input->b_die )
         {
             /* New input or stream map change */
+            p_intf->p_sys->b_playing = 1;
+#if 0
             if( p_input->stream.b_changed )
             {
                 wxModeManage( p_intf );
                 wxSetupMenus( p_intf );
                 p_intf->p_sys->b_playing = 1;
+
+                p_main_interface->TogglePlayButton( PLAYING_S );
+                i_old_playing_status = PLAYING_S;
             }
+#endif
 
             /* Manage the slider */
             if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
@@ -184,9 +197,9 @@ void Timer::Notify()
                     p_main_interface->slider->SetValue(
                         p_intf->p_sys->i_slider_pos );
 
-		    DisplayStreamDate( p_main_interface->slider_box,
-				       p_intf,
-				       p_intf->p_sys->i_slider_pos );
+                    DisplayStreamDate( p_main_interface->slider_box,
+                                       p_intf,
+                                       p_intf->p_sys->i_slider_pos );
                 }
             }
 
@@ -196,6 +209,20 @@ void Timer::Notify()
                 p_intf->p_sys->b_chapter_update = 1;
                 wxSetupMenus( p_intf );
             }
+
+            /* Manage Playing status */
+            if( i_old_playing_status != p_input->stream.control.i_status )
+            {
+                if( p_input->stream.control.i_status == PAUSE_S )
+                {
+                    p_main_interface->TogglePlayButton( PAUSE_S );
+                }
+                else
+                {
+                    p_main_interface->TogglePlayButton( PLAYING_S );
+                }
+                i_old_playing_status = p_input->stream.control.i_status;
+            }
         }
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
@@ -204,6 +231,8 @@ void Timer::Notify()
     {
         wxModeManage( p_intf );
         p_intf->p_sys->b_playing = 0;
+        p_main_interface->TogglePlayButton( PAUSE_S );
+        i_old_playing_status = PAUSE_S;
     }
 
     if( p_intf->b_die )

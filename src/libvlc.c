@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.70 2003/03/04 23:36:57 massiot Exp $
+ * $Id: libvlc.c,v 1.71 2003/03/26 00:56:22 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -319,6 +319,18 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         //module_EndBank( p_vlc );
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EEXIT;
+    }
+
+    /* Check for translation config option */
+    if( !config_GetInt( p_vlc, "translation" ) )
+    {
+        /* Reset the default domain */
+        SetLanguage( "C" );
+
+#if defined( ENABLE_NLS ) \
+     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
+        textdomain( "dummy" );
+#endif
     }
 
     /*
@@ -996,10 +1008,17 @@ static void SetLanguage ( char const *psz_lang )
     }
 #   endif
 
+    if( psz_lang && !*psz_lang )
+    {
 #   if defined( HAVE_LC_MESSAGES )
-    setlocale( LC_MESSAGES, psz_lang );
+        setlocale( LC_MESSAGES, psz_lang );
 #   endif
-    setlocale( LC_CTYPE, psz_lang );
+        setlocale( LC_CTYPE, psz_lang );
+    }
+    else
+    {
+        setlocale( LC_ALL, psz_lang );
+    }
 
     /* Specify where to find the locales for current domain */
 #if !defined( SYS_DARWIN ) && !defined( WIN32 )
@@ -1421,4 +1440,3 @@ static int ConsoleWidth( void )
 
     return i_width;
 }
-
