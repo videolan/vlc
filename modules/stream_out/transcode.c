@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.28 2003/07/30 02:00:58 fenrir Exp $
+ * $Id: transcode.c,v 1.29 2003/08/09 14:59:24 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -64,6 +64,8 @@ static int  transcode_video_ffmpeg_new    ( sout_stream_t *, sout_stream_id_t * 
 static void transcode_video_ffmpeg_close  ( sout_stream_t *, sout_stream_id_t * );
 static int  transcode_video_ffmpeg_process( sout_stream_t *, sout_stream_id_t *, sout_buffer_t *, sout_buffer_t ** );
 
+static int  transcode_video_ffmpeg_getframebuf( struct AVCodecContext *, AVFrame *);
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -88,6 +90,7 @@ struct sout_stream_sys_t
     int             i_vtolerance;
     int             i_width;
     int             i_height;
+    int             i_b_frames;
     int             i_key_int;
     int             i_qmin;
     int             i_qmax;
@@ -98,6 +101,12 @@ struct sout_stream_sys_t
     int             i_crop_bottom;
     int             i_crop_right;
     int             i_crop_left;
+
+    mtime_t         i_input_pts;
+    mtime_t         i_output_pts;
+    mtime_t         i_last_ref_pts;
+
+    mtime_t         i_buggy_pts_detect;
 };
 
 /*****************************************************************************
@@ -123,6 +132,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_width      = 0;
     p_sys->i_height     = 0;
     p_sys->i_key_int    = -1;
+    p_sys->i_b_frames   = 0;
     p_sys->i_qmin       = 2;
     p_sys->i_qmax       = 31;
 #if LIBAVCODEC_BUILD >= 4673
@@ -222,6 +232,10 @@ static int Open( vlc_object_t *p_this )
         {
             p_sys->i_key_int    = atoi( val );
         }
+        if( ( val = sout_cfg_find_value( p_stream->p_cfg, "bframes" ) ) )
+        {
+            p_sys->i_b_frames   = atoi( val );
+        }
 #if LIBAVCODEC_BUILD >= 4673
         if( ( val = sout_cfg_find_value( p_stream->p_cfg, "hq" ) ) )
         {
@@ -277,6 +291,9 @@ static int Open( vlc_object_t *p_this )
 
     avcodec_init();
     avcodec_register_all();
+
+    /* ffmpeg needs some padding at the end of each buffer */
+    p_stream->p_sout->i_padding += FF_INPUT_BUFFER_PADDING_SIZE;
 
     return VLC_SUCCESS;
 }
@@ -1154,10 +1171,8 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
         id->ff_dec_c->extradata     = id->f_src.p_extra_data;
         id->ff_dec_c->workaround_bugs = FF_BUG_AUTODETECT;
         id->ff_dec_c->error_resilience= -1;
-        if( id->ff_dec->capabilities & CODEC_CAP_TRUNCATED )
-        {
-            id->ff_dec_c->flags |= CODEC_FLAG_TRUNCATED;
-        }
+        id->ff_dec_c->get_buffer    = transcode_video_ffmpeg_getframebuf;
+        id->ff_dec_c->opaque        = p_sys;
 
         if( avcodec_open( id->ff_dec_c, id->ff_dec ) < 0 )
         {
@@ -1169,10 +1184,18 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
         {
             int b_gotpicture;
             AVFrame frame;
+            uint8_t *p_vol = malloc( id->ff_dec_c->extradata_size +
+                                     FF_INPUT_BUFFER_PADDING_SIZE );
 
-            avcodec_decode_video( id->ff_dec_c, &frame,
-                                  &b_gotpicture,
-                                  id->ff_dec_c->extradata, id->ff_dec_c->extradata_size );
+            memcpy( p_vol, id->ff_dec_c->extradata,
+                    id->ff_dec_c->extradata_size );
+            memset( p_vol + id->ff_dec_c->extradata_size, 0,
+                    FF_INPUT_BUFFER_PADDING_SIZE );
+
+            avcodec_decode_video( id->ff_dec_c, &frame, &b_gotpicture,
+                                  id->ff_dec_c->extradata,
+                                  id->ff_dec_c->extradata_size );
+            free( p_vol );
         }
     }
 
@@ -1196,13 +1219,28 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->ff_enc_c->width          = id->f_dst.i_width;
     id->ff_enc_c->height         = id->f_dst.i_height;
     id->ff_enc_c->bit_rate       = id->f_dst.i_bitrate;
+
+    if( id->ff_dec )
+    {
+        id->ff_enc_c->frame_rate     = id->ff_dec_c->frame_rate;
 #if LIBAVCODEC_BUILD >= 4662
-    id->ff_enc_c->frame_rate     = 25 ; /* FIXME as it break mpeg */
-    id->ff_enc_c->frame_rate_base= 1;
-#else
-    id->ff_enc_c->frame_rate     = 25 * FRAME_RATE_BASE;
+        id->ff_enc_c->frame_rate_base= id->ff_dec_c->frame_rate_base;
 #endif
+    }
+    else
+    {
+#if LIBAVCODEC_BUILD >= 4662
+        id->ff_enc_c->frame_rate     = 25 ; /* FIXME as it break mpeg */
+        id->ff_enc_c->frame_rate_base= 1;
+#else
+        id->ff_enc_c->frame_rate     = 25 * FRAME_RATE_BASE;
+#endif
+    }
+
     id->ff_enc_c->gop_size       = p_sys->i_key_int >= 0 ? p_sys->i_key_int : 50;
+    id->ff_enc_c->max_b_frames   = __MIN( p_sys->i_b_frames, FF_MAX_B_FRAMES );
+    id->ff_enc_c->b_frame_strategy = 0;
+    id->ff_enc_c->b_quant_factor = 2.0;
 
     if( p_sys->i_vtolerance >= 0 )
     {
@@ -1243,6 +1281,10 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     id->p_ff_pic_tmp1    = NULL;
     id->p_ff_pic_tmp2    = NULL;
     id->p_vresample      = NULL;
+
+    p_sys->i_last_ref_pts = 0;
+    p_sys->i_buggy_pts_detect = 0;
+
     return VLC_SUCCESS;
 }
 
@@ -1288,8 +1330,8 @@ static void transcode_video_ffmpeg_close ( sout_stream_t *p_stream, sout_stream_
     free( id->p_buffer );
 }
 
-static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_id_t *id,
-                                           sout_buffer_t *in, sout_buffer_t **out )
+static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
+               sout_stream_id_t *id, sout_buffer_t *in, sout_buffer_t **out )
 {
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
     int     i_used;
@@ -1309,6 +1351,7 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
     {
         /* decode frame */
         frame = id->p_ff_pic;
+        p_sys->i_input_pts = in->i_pts;
         if( id->ff_dec )
         {
             i_used = avcodec_decode_video( id->ff_dec_c, frame,
@@ -1324,6 +1367,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
                             id->ff_dec_c->width, id->ff_dec_c->height );
             i_used = i_data;
             b_gotpicture = 1;
+
+            /* Set PTS */
+            frame->pts = p_sys->i_input_pts;
         }
 
         if( i_used < 0 )
@@ -1337,6 +1383,13 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
         if( !b_gotpicture )
         {
             return VLC_SUCCESS;
+        }
+
+        /* Get the pts of the decoded frame if any, otherwise keep the
+         * interpolated one */
+        if( frame->pts > 0 )
+        {
+            p_sys->i_output_pts = frame->pts;
         }
 
         if( !id->b_enc_inited )
@@ -1450,12 +1503,28 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
                                             p_stream->p_sys->i_crop_right );
             }
 
-            img_resample( id->p_vresample, (AVPicture*)id->p_ff_pic_tmp2, (AVPicture*)frame );
+            img_resample( id->p_vresample, (AVPicture*)id->p_ff_pic_tmp2,
+                          (AVPicture*)frame );
 
             frame = id->p_ff_pic_tmp2;
         }
 
-        i_out = avcodec_encode_video( id->ff_enc_c, id->p_buffer, id->i_buffer, frame );
+        /* Set the pts of the frame being encoded */
+        frame->pts = p_sys->i_output_pts;
+
+        /* Interpolate the next PTS
+         * (needed by the mpeg video packetizer which can send pts <= 0 ) */
+        if( id->ff_dec_c && id->ff_dec_c->frame_rate > 0 )
+        {
+            p_sys->i_output_pts += I64C(1000000) * (2 + frame->repeat_pict) *
+              id->ff_dec_c->frame_rate_base / (2 * id->ff_dec_c->frame_rate);
+        }
+
+        /* Let ffmpeg select the frame type */
+        frame->pict_type = 0;
+
+        i_out = avcodec_encode_video( id->ff_enc_c, id->p_buffer,
+                                      id->i_buffer, frame );
         if( i_out > 0 )
         {
             sout_buffer_t *p_out;
@@ -1464,9 +1533,45 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
             memcpy( p_out->p_buffer, id->p_buffer, i_out );
 
             p_out->i_size   = i_out;
-            p_out->i_length = in->i_length;
-            p_out->i_dts    = in->i_dts;
-            p_out->i_pts    = in->i_dts; /* FIXME */
+
+            if( id->ff_enc_c->coded_frame->pts != 0 &&
+                p_sys->i_buggy_pts_detect != id->ff_enc_c->coded_frame->pts )
+            {
+                p_sys->i_buggy_pts_detect = id->ff_enc_c->coded_frame->pts;
+
+                /* FIXME, 3-2 pulldown is not handled correctly */
+                p_out->i_length = in->i_length;
+                p_out->i_pts    = id->ff_enc_c->coded_frame->pts;
+
+                if( !id->ff_enc_c->delay ||
+                    ( id->ff_enc_c->coded_frame->pict_type != FF_I_TYPE &&
+                      id->ff_enc_c->coded_frame->pict_type != FF_P_TYPE ) )
+                {
+                    p_out->i_dts    = p_out->i_pts;
+                }
+                else
+                {
+                    if( p_sys->i_last_ref_pts )
+                    {
+                        p_out->i_dts = p_sys->i_last_ref_pts;
+                    }
+                    else
+                    {
+                        /* Let's put something sensible */
+                        p_out->i_dts = p_out->i_pts;
+                    }
+
+                    p_sys->i_last_ref_pts = p_out->i_pts;
+                }
+            }
+            else
+            {
+                /* Buggy libavcodec which doesn't update coded_frame->pts
+                 * correctly */
+                p_out->i_length = in->i_length;
+                p_out->i_dts    = in->i_dts;
+                p_out->i_pts    = in->i_dts;
+            }
 
             sout_BufferChain( out, p_out );
         }
@@ -1478,4 +1583,21 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
     }
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * transcode_video_ffmpeg_getframebuf:
+ *
+ * Callback used by ffmpeg to get a frame buffer.
+ * We use it to get the right PTS for each decoded picture.
+ *****************************************************************************/
+static int transcode_video_ffmpeg_getframebuf(struct AVCodecContext *p_context,
+                                              AVFrame *p_frame)
+{
+    sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_context->opaque;
+
+    /* Set PTS */
+    p_frame->pts = p_sys->i_input_pts;
+
+    return avcodec_default_get_buffer( p_context, p_frame );
 }

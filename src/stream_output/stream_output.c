@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.32 2003/08/01 18:42:56 fenrir Exp $
+ * $Id: stream_output.c,v 1.33 2003/08/09 14:59:24 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -85,6 +85,7 @@ sout_instance_t * __sout_NewInstance ( vlc_object_t *p_parent,
     /* *** init descriptor *** */
     p_sout->psz_sout    = strdup( psz_dest );
     p_sout->i_preheader = 0;
+    p_sout->i_padding   = 0;
     p_sout->p_sys       = NULL;
 
     vlc_mutex_init( p_sout, &p_sout->lock );
@@ -504,7 +505,7 @@ sout_fifo_t *sout_FifoCreate( sout_instance_t *p_sout )
     return( p_fifo );
 }
 
-void       sout_FifoFree( sout_instance_t *p_sout, sout_fifo_t *p_fifo )
+void sout_FifoFree( sout_instance_t *p_sout, sout_fifo_t *p_fifo )
 {
     sout_buffer_t *p_buffer;
 
@@ -521,7 +522,7 @@ void       sout_FifoFree( sout_instance_t *p_sout, sout_fifo_t *p_fifo )
 
     return;
 }
-void       sout_FifoDestroy( sout_instance_t *p_sout, sout_fifo_t *p_fifo )
+void sout_FifoDestroy( sout_instance_t *p_sout, sout_fifo_t *p_fifo )
 {
     sout_FifoFree( p_sout, p_fifo );
     vlc_mutex_destroy( &p_fifo->lock );
@@ -530,7 +531,7 @@ void       sout_FifoDestroy( sout_instance_t *p_sout, sout_fifo_t *p_fifo )
     free( p_fifo );
 }
 
-void        sout_FifoPut( sout_fifo_t *p_fifo, sout_buffer_t *p_buffer )
+void sout_FifoPut( sout_fifo_t *p_fifo, sout_buffer_t *p_buffer )
 {
     vlc_mutex_lock( &p_fifo->lock );
 
@@ -597,26 +598,33 @@ sout_buffer_t *sout_FifoShow( sout_fifo_t *p_fifo )
 sout_buffer_t *sout_BufferNew( sout_instance_t *p_sout, size_t i_size )
 {
     sout_buffer_t *p_buffer;
-    size_t        i_preheader;
-
-#ifdef DEBUG_BUFFER
-    msg_Dbg( p_sout, "allocating an new buffer, size:%d", (uint32_t)i_size );
-#endif
+    size_t        i_preheader, i_padding;
 
     p_buffer = malloc( sizeof( sout_buffer_t ) );
     i_preheader = p_sout->i_preheader;
+    i_padding = p_sout->i_padding;
+
+#ifdef DEBUG_BUFFER
+    msg_Dbg( p_sout, "allocating an new buffer, size:%d, preheader:%d, "
+             "padding:%d", (uint32_t)i_size, i_preheader, i_padding );
+#endif
 
     if( i_size > 0 )
     {
-        p_buffer->p_allocated_buffer = malloc( i_size + i_preheader );
+        p_buffer->p_allocated_buffer =
+            malloc( i_size + i_preheader + i_padding );
         p_buffer->p_buffer = p_buffer->p_allocated_buffer + i_preheader;
+
+        if( p_buffer->p_allocated_buffer && i_padding )
+            memset( p_buffer->p_allocated_buffer + i_size + i_preheader, 0,
+                    i_padding );
     }
     else
     {
         p_buffer->p_allocated_buffer = NULL;
         p_buffer->p_buffer = NULL;
     }
-    p_buffer->i_allocated_size = i_size + i_preheader;
+    p_buffer->i_allocated_size = i_size + i_preheader + i_padding;
     p_buffer->i_buffer_size = i_size;
 
     p_buffer->i_size    = i_size;
@@ -629,20 +637,25 @@ sout_buffer_t *sout_BufferNew( sout_instance_t *p_sout, size_t i_size )
 
     return( p_buffer );
 }
-int sout_BufferRealloc( sout_instance_t *p_sout, sout_buffer_t *p_buffer, size_t i_size )
-{
-    size_t          i_preheader;
 
-#ifdef DEBUG_BUFFER
-    msg_Dbg( p_sout,
-             "realloc buffer old size:%d new size:%d",
-             (uint32_t)p_buffer->i_allocated_size,
-             (uint32_t)i_size );
-#endif
+int sout_BufferRealloc( sout_instance_t *p_sout, sout_buffer_t *p_buffer,
+                        size_t i_size )
+{
+    size_t i_preheader, i_padding;
 
     i_preheader = p_buffer->p_buffer - p_buffer->p_allocated_buffer;
+    i_padding =  p_buffer->i_allocated_size - p_buffer->i_buffer_size
+                 - i_preheader;
 
-    if( !( p_buffer->p_allocated_buffer = realloc( p_buffer->p_allocated_buffer, i_size + i_preheader ) ) )
+#ifdef DEBUG_BUFFER
+    msg_Dbg( p_sout, "realloc buffer old size:%d new size:%d, preheader:%d, "
+             "padding:%d", (uint32_t)p_buffer->i_allocated_size,
+             (uint32_t)i_size, i_preheader, i_padding );
+#endif
+
+    if( !( p_buffer->p_allocated_buffer =
+           realloc( p_buffer->p_allocated_buffer,
+                    i_size + i_preheader + i_padding ) ) )
     {
         msg_Err( p_sout, "realloc failed" );
         p_buffer->i_allocated_size = 0;
@@ -653,15 +666,20 @@ int sout_BufferRealloc( sout_instance_t *p_sout, sout_buffer_t *p_buffer, size_t
     }
     p_buffer->p_buffer = p_buffer->p_allocated_buffer + i_preheader;
 
-    p_buffer->i_allocated_size = i_size + i_preheader;
+    p_buffer->i_allocated_size = i_size + i_preheader + i_padding;
     p_buffer->i_buffer_size = i_size;
+
+    if( i_padding )
+        memset( p_buffer->p_allocated_buffer + i_size + i_preheader, 0,
+                i_padding );
 
     return( 0 );
 }
 
-int sout_BufferReallocFromPreHeader( sout_instance_t *p_sout, sout_buffer_t *p_buffer, size_t i_size )
+int sout_BufferReallocFromPreHeader( sout_instance_t *p_sout,
+                                     sout_buffer_t *p_buffer, size_t i_size )
 {
-    size_t  i_preheader;
+    size_t i_preheader;
 
     i_preheader = p_buffer->p_buffer - p_buffer->p_allocated_buffer;
 
