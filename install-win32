@@ -87,6 +87,10 @@ Section "Install"
 	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "InstallDir" $INSTDIR
 	WriteRegStr HKLM SOFTWARE\VideoLAN\VLC "Version" "${VERSION}"
 
+        WriteRegStr HKLM \
+            SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION} \
+            "Path" '"$INSTDIR\mozilla\npvlc.dll"'
+
 	Exec "explorer $SMPROGRAMS\VideoLAN\"
 SectionEnd
 
@@ -99,6 +103,9 @@ Section "Uninstall"
 	RMDir /r $SMPROGRAMS\VideoLAN
 	RMDir /r $INSTDIR
 	DeleteRegKey HKLM SOFTWARE\VideoLAN
+        DeleteRegKey HKLM \
+            SOFTWARE\MozillaPlugins\@videolan.org/vlc,version=${VERSION}
+
         DeleteRegKey HKLM \
             Software\Microsoft\Windows\CurrentVersion\Uninstall\VideoLAN
 SectionEnd
