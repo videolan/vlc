@@ -33,6 +33,10 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
+#ifdef STATS
+#   include <sys/times.h>
+#endif
+
 #include "config.h"
 #include "common.h"
 #include "threads.h"
@@ -1258,6 +1262,16 @@ static void EndThread( vout_thread_t *p_vout )
     /* Store status */
     intf_DbgMsg("\n");
     *p_vout->pi_status = THREAD_END;
+
+#ifdef STATS
+    {
+        struct tms cpu_usage;
+        times( &cpu_usage );
+
+        intf_Msg("vout stats: cpu usage (user: %d, system: %d)\n",
+                 cpu_usage.tms_utime, cpu_usage.tms_stime);
+    }
+#endif
 
     /* Destroy all remaining pictures and subpictures */
     for( i_index = 0; i_index < VOUT_MAX_PICTURES; i_index++ )

@@ -35,6 +35,10 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef STATS
+#   include <sys/times.h>
+#endif
+
 #include "config.h"
 #include "common.h"
 #include "threads.h"
@@ -292,6 +296,16 @@ static void EndThread( input_thread_t * p_input )
     /* Store status */
     pi_status = p_input->pi_status;
     *pi_status = THREAD_END;
+
+#ifdef STATS
+    {
+        struct tms cpu_usage;
+        times( &cpu_usage );
+
+        intf_Msg("input stats: cpu usage (user: %d, system: %d)\n",
+                 cpu_usage.tms_utime, cpu_usage.tms_stime);
+    }
+#endif
 
     /* Destroy all decoder threads */
     for( i_es_loop = 0;

@@ -35,6 +35,10 @@
 #include <errno.h>
 #include <string.h>
 
+#ifdef STATS
+#  include <sys/times.h>
+#endif
+
 #include "config.h"
 #include "common.h"
 #include "threads.h"
@@ -322,6 +326,15 @@ static void EndThread( vpar_thread_t *p_vpar )
 #ifdef STATS
     intf_Msg("vpar stats: %d loops among %d sequence(s)\n",
              p_vpar->c_loops, p_vpar->c_sequences);
+
+    {
+        struct tms cpu_usage;
+        times( &cpu_usage );
+
+        intf_Msg("vpar stats: cpu usage (user: %d, system: %d)\n",
+                 cpu_usage.tms_utime, cpu_usage.tms_stime);
+    }
+
     intf_Msg("vpar stats: Read %d frames/fields (I %d/P %d/B %d)\n",
              p_vpar->pc_pictures[I_CODING_TYPE]
              + p_vpar->pc_pictures[P_CODING_TYPE]
