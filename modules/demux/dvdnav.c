@@ -2,7 +2,7 @@
  * dvdnav.c: DVD module using the dvdnav library.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: dvdnav.c,v 1.4 2004/01/18 23:52:02 gbazin Exp $
+ * $Id: dvdnav.c,v 1.5 2004/01/19 00:08:25 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -998,7 +998,7 @@ static int EventThread( vlc_object_t *p_this )
         vlc_mutex_lock( &p_ev->lock );
         if( p_ev->b_still )
         {
-            if( b_activated ||
+            if( /* b_activated || // This breaks menus */
                 ( p_ev->i_still_end > 0 && p_ev->i_still_end < mdate() ))
             {
                 p_ev->b_still = VLC_FALSE;
