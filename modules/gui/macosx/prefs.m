@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.32 2003/06/21 22:30:21 hartman Exp $
+ * $Id: prefs.m,v 1.33 2003/08/08 16:41:04 massiot Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -167,7 +167,7 @@
 
 - (IBAction)resetAll: (id)sender
 {
-    NSBeginInformationalAlertSheet(_NS("Reset Preferences"), @"Cancel", @"Continue", 
+    NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"), _NS("Continue"), 
         nil, o_prefs_window, self, @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil,
         _NS("Beware this will reset your VLC Media Player config file.\n"
             "Are you sure you want to continue?") );
