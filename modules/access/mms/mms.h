@@ -2,7 +2,7 @@
  * mms.h: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.h,v 1.5 2002/11/25 15:08:34 fenrir Exp $
+ * $Id: mms.h,v 1.6 2002/12/06 13:05:22 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -29,7 +29,7 @@ typedef struct url_s
 
     char    *psz_bind_addr;
     int     i_bind_port;
-    
+
     char    *psz_path;
 
     /* private */
@@ -48,7 +48,7 @@ typedef struct url_s
 #define MMS_PACKET_HEADER       2
 #define MMS_PACKET_MEDIA        3
 #define MMS_PACKET_UDP_TIMING   4
-    
+
 
 #define MMS_STREAM_VIDEO    0x0001
 #define MMS_STREAM_AUDIO    0x0002
@@ -63,7 +63,7 @@ typedef struct mms_stream_s
     int i_cat;      /* MMS_STREAM_VIDEO, MMS_STREAM_AUDIO */
     int i_bitrate;  /* -1 if unknown */
     int i_selected;
-    
+
 } mms_stream_t;
 
 #define MMS_BUFFER_SIZE 100000
@@ -76,15 +76,15 @@ typedef struct access_s
     char                *psz_bind_addr; /* used by udp */
 
     url_t   url;                        /* connect to this server */
-    
+
     mms_stream_t        stream[128];    /* in asf never more than 1->127 streams */
-    
+
     off_t               i_pos;          /* position of next byte to be read */
-    
+
     /* */
     uint8_t             buffer_tcp[MMS_BUFFER_SIZE];
     int                 i_buffer_tcp;
-    
+
     uint8_t             buffer_udp[MMS_BUFFER_SIZE];
     int                 i_buffer_udp;
 
@@ -96,17 +96,17 @@ typedef struct access_s
     uint32_t    i_media_packet_id_type;
 
     int         i_packet_seq_num;
-    
+
     uint8_t     *p_cmd;     /* latest command read */
     int         i_cmd;      /* allocated at the begining */
 
     uint8_t     *p_header;  /* allocated by mms_ReadPacket */
     int         i_header;
-    
+
     uint8_t     *p_media;   /* allocated by mms_ReadPacket */
-    int         i_media;
-    int         i_media_used;
-    
+    size_t      i_media;
+    size_t      i_media_used;
+
     /* extracted informations */
     int         i_command;
     int         i_eos;
@@ -120,20 +120,20 @@ typedef struct access_s
     /* from 0x06 answer */
     uint32_t    i_flags_broadcast;
     uint32_t    i_media_length;
-    int         i_packet_length;
+    size_t      i_packet_length;
     uint32_t    i_packet_count;
     int         i_max_bit_rate;
-    int         i_header_size;
-    
+    size_t      i_header_size;
+
 } access_t;
 
 
-static inline uint16_t GetWLE( u8 *p_buff )
+static inline uint16_t GetWLE( uint8_t *p_buff )
 {
     return( (p_buff[0]) + ( p_buff[1] <<8 ) );
 }
 
-static inline uint32_t GetDWLE( u8 *p_buff )
+static inline uint32_t GetDWLE( uint8_t *p_buff )
 {
     return( p_buff[0] + ( p_buff[1] <<8 ) +
             ( p_buff[2] <<16 ) + ( p_buff[3] <<24 ) );

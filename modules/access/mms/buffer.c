@@ -2,7 +2,7 @@
  * buffer.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: buffer.c,v 1.2 2002/11/25 00:22:04 fenrir Exp $
+ * $Id: buffer.c,v 1.3 2002/12/06 13:05:22 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -49,7 +49,7 @@ int var_buffer_initwrite( var_buffer_t *p_buf, int i_default_size )
 int var_buffer_reinitwrite( var_buffer_t *p_buf, int i_default_size )
 {
     p_buf->i_data = 0;
-    if( p_buf->i_size < i_default_size ) 
+    if( p_buf->i_size < i_default_size )
     {
         p_buf->i_size = i_default_size;
         if( p_buf->p_data )
@@ -102,14 +102,14 @@ void var_buffer_add64( var_buffer_t *p_buf, uint64_t i_long )
 
 
 void var_buffer_addmemory( var_buffer_t *p_buf, void *p_mem, int i_mem )
-{    
+{
     /* check if there is enough data */
     if( p_buf->i_data + i_mem >= p_buf->i_size )
     {
         p_buf->i_size += i_mem + 1024;
         p_buf->p_data = realloc( p_buf->p_data, p_buf->i_size );
     }
-    
+
     memcpy( p_buf->p_data + p_buf->i_data,
             p_mem,
             i_mem );
@@ -118,7 +118,7 @@ void var_buffer_addmemory( var_buffer_t *p_buf, void *p_mem, int i_mem )
 
 void var_buffer_addUTF16( var_buffer_t *p_buf, char *p_str )
 {
-    int i;
+    unsigned int i;
     if( !p_str )
     {
         var_buffer_add16( p_buf, 0 );
@@ -165,7 +165,7 @@ uint8_t var_buffer_get8 ( var_buffer_t *p_buf )
 uint16_t var_buffer_get16( var_buffer_t *p_buf )
 {
     uint16_t i_b1, i_b2;
-    
+
     i_b1 = var_buffer_get8( p_buf );
     i_b2 = var_buffer_get8( p_buf );
 
@@ -176,7 +176,7 @@ uint16_t var_buffer_get16( var_buffer_t *p_buf )
 uint32_t var_buffer_get32( var_buffer_t *p_buf )
 {
     uint32_t i_w1, i_w2;
-    
+
     i_w1 = var_buffer_get16( p_buf );
     i_w2 = var_buffer_get16( p_buf );
 
@@ -186,7 +186,7 @@ uint32_t var_buffer_get32( var_buffer_t *p_buf )
 uint64_t var_buffer_get64( var_buffer_t *p_buf )
 {
     uint64_t i_dw1, i_dw2;
-    
+
     i_dw1 = var_buffer_get32( p_buf );
     i_dw2 = var_buffer_get32( p_buf );
 
@@ -219,7 +219,7 @@ int var_buffer_readempty( var_buffer_t *p_buf )
 void var_buffer_getguid( var_buffer_t *p_buf, guid_t *p_guid )
 {
     int i;
-    
+
     p_guid->v1 = var_buffer_get32( p_buf );
     p_guid->v2 = var_buffer_get16( p_buf );
     p_guid->v3 = var_buffer_get16( p_buf );
