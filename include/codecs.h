@@ -2,9 +2,9 @@
  * codecs.h: codec related structures needed by the demuxers and decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: codecs.h,v 1.8 2003/11/06 16:36:40 nitrox Exp $
+ * $Id: codecs.h,v 1.9 2004/01/04 04:50:24 sam Exp $
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,14 +90,14 @@ typedef struct
 #define WAVE_FORMAT_MPEGLAYER3          0x0055 /* ISO/MPEG Layer3 Format Tag */
 #define WAVE_FORMAT_DOLBY_AC3_SPDIF     0x0092 /* Sonic Foundry */
 
-#define WAVE_FORMAT_A52            	0x2000
-#define WAVE_FORMAT_WMA1            	0x0160
-#define WAVE_FORMAT_WMA2            	0x0161
-#define WAVE_FORMAT_WMA3            	0x0162
+#define WAVE_FORMAT_A52                 0x2000
+#define WAVE_FORMAT_WMA1                0x0160
+#define WAVE_FORMAT_WMA2                0x0161
+#define WAVE_FORMAT_WMA3                0x0162
 
 /* Need to check these */
-#define WAVE_FORMAT_DK3             	0x0061
-#define WAVE_FORMAT_DK4             	0x0062
+#define WAVE_FORMAT_DK3                 0x0061
+#define WAVE_FORMAT_DK4                 0x0062
 
 #if !defined(WAVE_FORMAT_EXTENSIBLE)
 #define  WAVE_FORMAT_EXTENSIBLE         0xFFFE /* Microsoft */

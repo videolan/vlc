@@ -2,7 +2,7 @@
  * caca.c: Color ASCII Art video output plugin using libcaca
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: caca.c,v 1.4 2003/12/04 16:49:43 sam Exp $
+ * $Id: caca.c,v 1.5 2004/01/04 04:50:24 sam Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *
@@ -50,25 +50,7 @@ static void Display   ( vout_thread_t *, picture_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define MODE_TEXT N_("dithering mode")
-#define MODE_LONGTEXT N_("Choose the libcaca dithering mode")
-
-static char *mode_list[] = { "none",
-                             "ordered2",
-                             "ordered4",
-                             "ordered8",
-                             "random" };
-static char *mode_list_text[] = { N_("No dithering"),
-                                  N_("2x2 ordered dithering"),
-                                  N_("4x4 ordered dithering"),
-                                  N_("8x8 ordered dithering"),
-                                  N_("Random dithering") };
-
 vlc_module_begin();
-    add_category_hint( N_("Dithering"), NULL, VLC_FALSE );
-    add_string( "caca-dithering", "ordered", NULL, MODE_TEXT,
-                MODE_LONGTEXT, VLC_FALSE );
-        change_string_list( mode_list, mode_list_text, 0 );
     set_description( _("colour ASCII art video output") );
     set_capability( "video output", 12 );
     set_callbacks( Create, Destroy );
@@ -93,8 +75,6 @@ struct vout_sys_t
 static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    enum caca_dithering dither = CACA_DITHERING_ORDERED4;
-    vlc_value_t val;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -110,30 +90,6 @@ static int Create( vlc_object_t *p_this )
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
-
-    var_Create( p_vout, "caca-dithering", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "caca-dithering", &val );
-    if( val.psz_string )
-    {
-        if( !strcmp( val.psz_string, "none" ) )
-        {
-            dither = CACA_DITHERING_NONE;
-        }
-        else if( !strcmp( val.psz_string, "ordered2" ) )
-        {
-            dither = CACA_DITHERING_ORDERED2;
-        }
-        else if( !strcmp( val.psz_string, "ordered4" ) )
-        {
-            dither = CACA_DITHERING_ORDERED4;
-        }
-        else if( !strcmp( val.psz_string, "random" ) )
-        {
-            dither = CACA_DITHERING_RANDOM;
-        }
-        free( val.psz_string );
-    }
-    caca_set_dithering( dither );
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -171,7 +127,8 @@ static int Init( vout_thread_t *p_vout )
                             4 * ((p_vout->output.i_width + 15) & ~15),
                             p_vout->output.i_rmask,
                             p_vout->output.i_gmask,
-                            p_vout->output.i_bmask );
+                            p_vout->output.i_bmask,
+                            0x00000000 );
     if( !p_vout->p_sys->p_bitmap )
     {
         msg_Err( p_vout, "could not create libcaca bitmap" );
@@ -257,9 +214,9 @@ static int Manage( vout_thread_t *p_vout )
             default:
                 continue;
             }
-        }
 
-        var_Set( p_vout->p_vlc, "key-pressed", val );
+            var_Set( p_vout->p_vlc, "key-pressed", val );
+        }
     }
 
     return VLC_SUCCESS;
