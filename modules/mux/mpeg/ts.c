@@ -79,8 +79,12 @@ static void    Close  ( vlc_object_t * );
   "PID will automatically be the video.")
 #define APID_TEXT N_("Audio PID")
 #define APID_LONGTEXT N_("Assigns a fixed PID to the audio stream.")
+#define SPUPID_TEXT N_("SPU PID")
+#define SPUPID_LONGTEXT N_("Assigns a fixed PID to the SPU.")
 #define PMTPID_TEXT N_("PMT PID")
 #define PMTPID_LONGTEXT N_("Assings a fixed PID to the PMT")
+#define TSID_TEXT N_("TS ID")
+#define TSID_LONGTEXT N_("Assigns a fixed Transport Stream ID.")
 
 #define SHAPING_TEXT N_("Shaping delay (ms)")
 #define SHAPING_LONGTEXT N_("If enabled, the TS muxer will cut the " \
@@ -124,8 +128,12 @@ vlc_module_begin();
                                   VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "pid-audio", 0, NULL, APID_TEXT,
                  APID_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "pid-spu", 0, NULL, SPUPID_TEXT,
+                 SPUPID_LONGTEXT, VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "pid-pmt", 0, NULL, PMTPID_TEXT,
                  PMTPID_LONGTEXT, VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "tsid", 0, NULL, TSID_TEXT,
+                 TSID_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "shaping", 200, NULL,SHAPING_TEXT,
                  SHAPING_LONGTEXT, VLC_TRUE );
@@ -133,6 +141,10 @@ vlc_module_begin();
               KEYF_LONGTEXT, VLC_TRUE );
 
     add_integer( SOUT_CFG_PREFIX "pcr", 30, NULL, PCR_TEXT, PCR_LONGTEXT,
+                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, PCR_TEXT, PCR_LONGTEXT,
+                 VLC_TRUE );
+    add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, PCR_TEXT, PCR_LONGTEXT,
                  VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT,
                  DTS_LONGTEXT, VLC_TRUE );
@@ -150,8 +162,9 @@ vlc_module_end();
  * Local data structures
  *****************************************************************************/
 static const char *ppsz_sout_options[] = {
-    "pid-video", "pid-audio", "pid-pmt", "shaping", "pcr",
-    "use-key-frames", "dts-delay", "csa-ck", "crypt-audio", NULL
+    "pid-video", "pid-audio", "pid-spu", "pid-pmt", "tsid", "shaping", "pcr",
+    "bmin", "bmax", "use-key-frames", "dts-delay", "csa-ck", "crypt-audio",
+    NULL
 };
 
 #define SOUT_BUFFER_FLAGS_PRIVATE_PCR  ( 1 << BLOCK_FLAG_PRIVATE_SHIFT )
@@ -257,8 +270,10 @@ struct sout_mux_sys_t
 
     int             i_pid_video;
     int             i_pid_audio;
+    int             i_pid_spu;
     int             i_pid_free; // first usable pid
 
+    int             i_tsid;
     int             i_pat_version_number;
     ts_stream_t     pat;
 
@@ -300,6 +315,11 @@ static int  AllocatePID( sout_mux_sys_t *p_sys, int i_cat )
     {
         i_pid = p_sys->i_pid_audio;
         p_sys->i_pid_audio = 0;
+    }
+    else if ( i_cat == SPU_ES && p_sys->i_pid_spu )
+    {
+        i_pid = p_sys->i_pid_spu;
+        p_sys->i_pid_spu = 0;
     }
     else
     {
@@ -357,6 +377,11 @@ static int Open( vlc_object_t *p_this )
     p_sys->pat.i_pid = 0;
     p_sys->pat.i_continuity_counter = 0;
 
+    var_Get( p_mux, SOUT_CFG_PREFIX "tsid", &val );
+    if ( val.i_int )
+        p_sys->i_tsid = val.i_int;
+    else
+        p_sys->i_tsid = rand() % 65536;
     p_sys->i_pmt_version_number = rand() % 32;
     p_sys->pmt.i_continuity_counter = 0;
 
@@ -386,6 +411,13 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_pid_free = p_sys->i_pid_audio + 1;
     }
 
+    var_Get( p_mux, SOUT_CFG_PREFIX "pid-spu", &val );
+    p_sys->i_pid_spu = val.i_int;
+    if ( p_sys->i_pid_spu > p_sys->i_pid_free )
+    {
+        p_sys->i_pid_free = p_sys->i_pid_spu + 1;
+    }
+
     p_sys->i_pcr_pid = 0x1fff;
     p_sys->p_pcr_input = NULL;
 
@@ -395,10 +427,10 @@ static int Open( vlc_object_t *p_this )
 
     /* Allow to create constrained stream */
     var_Get( p_mux, SOUT_CFG_PREFIX "bmin", &val );
-    p_sys->i_bitrate_min = 0;/*val.i_int;*/
+    p_sys->i_bitrate_min = val.i_int;
 
     var_Get( p_mux, SOUT_CFG_PREFIX "bmax", &val );
-    p_sys->i_bitrate_max = 0;/*val.i_int;*/
+    p_sys->i_bitrate_max = val.i_int;
 
     if( p_sys->i_bitrate_min > 0 && p_sys->i_bitrate_max > 0 &&
         p_sys->i_bitrate_min > p_sys->i_bitrate_max )
@@ -464,7 +496,7 @@ static int Open( vlc_object_t *p_this )
         }
         else
         {
-            uint64_t i_ck = strtoll( psz, NULL, 16 );
+            uint64_t i_ck = strtoull( psz, NULL, 16 );
             uint8_t  ck[8];
             int      i;
 
@@ -652,6 +684,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_stream->i_stream_type = 0x06;
                     p_stream->i_es_id = p_input->p_fmt->subs.dvb.i_id;
                     p_stream->i_stream_id = 0xbd;
+                    break;
+                case VLC_FOURCC('t','e','l','x'):
+                    p_stream->i_stream_type = 0x06;
+                    p_stream->i_stream_id = 0xbd; /* FIXME */
                     break;
                 default:
                     free( p_stream );
@@ -866,6 +902,16 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
             msg_Dbg( p_mux, "freeing audio PID %d", i_pid_audio );
         }
     }
+    var_Get( p_mux, SOUT_CFG_PREFIX "pid-spu", &val );
+    if( val.i_int > 0 )
+    {
+        int i_pid_spu = val.i_int;
+        if ( i_pid_spu == p_stream->i_pid )
+        {
+            p_sys->i_pid_spu = i_pid_spu;
+            msg_Dbg( p_mux, "freeing spu PID %d", i_pid_spu );
+        }
+    }
     free( p_stream );
 
     /* We only change PMT version (PAT isn't changed) */
@@ -952,8 +998,20 @@ static int Mux( sout_mux_t *p_mux )
                             i_spu_delay =
                                 p_spu->i_dts - p_pcr_stream->i_pes_dts;
 
-                            if( i_spu_delay > 100000 &&
-                                i_spu_delay < I64C(100000000) ) continue;
+                            if( i_spu_delay > i_shaping_delay &&
+                                i_spu_delay < I64C(100000000) )
+                                continue;
+
+                            if ( i_spu_delay >= I64C(100000000)
+                                  || i_spu_delay < 10000 )
+                            {
+                                BufferChainClean( p_mux->p_sout,
+                                                  &p_stream->chain_pes );
+                                p_stream->i_pes_dts = 0;
+                                p_stream->i_pes_used = 0;
+                                p_stream->i_pes_length = 0;
+                                continue;
+                            }
                         }
                     }
                     b_ok = VLC_FALSE;
@@ -965,14 +1023,16 @@ static int Mux( sout_mux_t *p_mux )
                         block_t *p_next = block_FifoShow( p_input->p_fifo );
                         p_data->i_length = p_next->i_dts - p_data->i_dts;
                     }
+                    else
+                        p_data->i_length = 1000;
 
                     if( ( p_pcr_stream->i_pes_dts > 0 &&
-                          p_data->i_dts - 2000000 > p_pcr_stream->i_pes_dts +
+                          p_data->i_dts - 10000000 > p_pcr_stream->i_pes_dts +
                           p_pcr_stream->i_pes_length ) ||
                         p_data->i_dts < p_stream->i_pes_dts ||
                         ( p_stream->i_pes_dts > 0 &&
                           p_input->p_fmt->i_cat != SPU_ES &&
-                          p_data->i_dts - 2000000 > p_stream->i_pes_dts +
+                          p_data->i_dts - 10000000 > p_stream->i_pes_dts +
                           p_stream->i_pes_length ) )
                     {
                         msg_Warn( p_mux, "packet with too strange dts "
@@ -998,6 +1058,8 @@ static int Mux( sout_mux_t *p_mux )
                     }
                     else
                     {
+                        int i_header_size = 0;
+                        int b_data_alignment = 0;
                         if( p_input->p_fmt->i_cat == SPU_ES )
                         {
                             if( p_input->p_fmt->i_codec ==
@@ -1033,12 +1095,18 @@ static int Mux( sout_mux_t *p_mux )
                                     p_spu->p_buffer[2] = ' ';
 
                                     E_(EStoPES)( p_mux->p_sout, &p_spu, p_spu,
-                                                 p_stream->i_stream_id, 1 );
+                                                 p_stream->i_stream_id, 1,
+                                                 0, 0 );
                                     p_data->p_next = p_spu;
                                 }
                             }
-
-                            p_data->i_length = i_spu_delay;
+                            else if( p_input->p_fmt->i_codec ==
+                                       VLC_FOURCC('t','e','l','x') )
+                            {
+                                /* EN 300 472 */
+                                i_header_size = 0x24;
+                                b_data_alignment = 1;
+                            }
                         }
                         else if( p_data->i_length < 0 ||
                                  p_data->i_length > 2000000 )
@@ -1063,13 +1131,15 @@ static int Mux( sout_mux_t *p_mux )
                             p_data->i_pts = p_data->i_dts;
                         }
                         E_( EStoPES )( p_mux->p_sout, &p_data, p_data,
-                                       p_stream->i_stream_id, 1 );
+                                       p_stream->i_stream_id, 1,
+                                       b_data_alignment, i_header_size );
 
                         BufferChainAppend( &p_stream->chain_pes, p_data );
 
                         if( p_sys->b_use_key_frames && p_stream == p_pcr_stream
-                            && (p_data->i_flags & BLOCK_FLAG_TYPE_I )
-                            && (p_stream->i_pes_length > 300000) )
+                            && (p_data->i_flags & BLOCK_FLAG_TYPE_I)
+                            && !(p_data->i_flags & BLOCK_FLAG_NO_KEYFRAME)
+                            && (p_stream->i_pes_length > 400000) )
                         {
                             i_shaping_delay = p_stream->i_pes_length;
                             p_stream->b_key_frame = 1;
@@ -1119,7 +1189,6 @@ static int Mux( sout_mux_t *p_mux )
         }
         /* add overhead for PCR (not really exact) */
         i_packet_count += (8 * i_pcr_length / p_sys->i_pcr_delay + 175) / 176;
-
 
         /* 3: mux PES into TS */
         BufferChainInit( &chain_ts );
@@ -1654,9 +1723,7 @@ static void GetPAT( sout_mux_t *p_mux,
     dvbpsi_pat_t         pat;
     dvbpsi_psi_section_t *p_section;
 
-    dvbpsi_InitPAT( &pat,
-                    0x01,    // i_ts_id
-                    p_sys->i_pat_version_number,
+    dvbpsi_InitPAT( &pat, p_sys->i_tsid, p_sys->i_pat_version_number,
                     1 );      // b_current_next
     /* add all program (only one) */
     dvbpsi_PATAddProgram( &pat,
@@ -1885,6 +1952,12 @@ static void GetPMT( sout_mux_t *p_mux,
             /* DTS format identifier, frame size 1024 - FIXME */
             uint8_t data[4] = { 0x44, 0x54, 0x53, 0x32 };
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, data );
+        }
+        else if( p_stream->i_codec == VLC_FOURCC('t','e','l','x') )
+        {
+            dvbpsi_PMTESAddDescriptor( p_es, 0x56,
+                                       p_stream->i_decoder_specific_info,
+                                       p_stream->p_decoder_specific_info );
         }
 #ifdef _DVBPSI_DR_59_H_
         else if( p_stream->i_codec == VLC_FOURCC('d','v','b','s') )
