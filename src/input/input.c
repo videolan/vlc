@@ -2442,3 +2442,104 @@ static void MRLSections( input_thread_t *p_input, char *psz_source,
              psz_source, *pi_title_start, *pi_chapter_start,
              *pi_title_end, *pi_chapter_end );
 }
+
+
+/***********************************************************************
+ * Info management functions
+ ***********************************************************************/
+char *vlc_input_item_GetInfo( input_item_t *p_i,
+                              const char *psz_cat,
+                              const char *psz_name )
+{
+    int i,j;
+
+    vlc_mutex_lock( &p_i->lock );
+
+    for( i = 0 ; i< p_i->i_categories  ; i++ )
+    {
+        info_category_t *p_cat = p_i->pp_categories[i];
+
+        if( !psz_cat || strcmp( p_cat->psz_name, psz_cat ) )
+            continue;
+
+        for( j = 0; j < p_cat->i_infos ; j++ )
+        {
+            if( !strcmp( p_cat->pp_infos[j]->psz_name, psz_name ) )
+            {
+                vlc_mutex_unlock( &p_i->lock );
+                return strdup( p_cat->pp_infos[j]->psz_value );
+            }
+        }
+    }
+    vlc_mutex_unlock( &p_i->lock );
+    return strdup( "" );
+}
+
+int vlc_input_item_AddInfo( input_item_t *p_i,
+                            const char *psz_cat,
+                            const char *psz_name,
+                            const char *psz_format, ... )
+{
+    va_list args;
+    int i;
+    info_t *p_info = NULL;
+    info_category_t *p_cat = NULL ;
+
+    vlc_mutex_lock( &p_i->lock );
+
+    for( i = 0 ; i < p_i->i_categories ; i ++ )
+    {
+        if( !strcmp( p_i->pp_categories[i]->psz_name, psz_cat ) )
+        {
+            p_cat = p_i->pp_categories[i];
+            break;
+        }
+    }
+    if( !p_cat )
+    {
+        if( ( p_cat = (info_category_t *)malloc(
+                                     sizeof( info_category_t ) ) )  == NULL )
+        {
+            vlc_mutex_unlock( &p_i->lock );
+            return VLC_EGENERIC;
+        }
+        p_cat->psz_name = strdup( psz_cat );
+        p_cat->i_infos = 0;
+        p_cat->pp_infos = 0;
+        INSERT_ELEM( p_i->pp_categories, p_i->i_categories, p_i->i_categories,
+                     p_cat );
+    }
+
+    for( i = 0; i< p_cat->i_infos; i++ )
+    {
+        if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
+        {
+            p_info = p_cat->pp_infos[i];
+            break;
+        }
+    }
+
+    if( !p_info )
+    {
+        if( ( p_info = (info_t *)malloc( sizeof( info_t ) ) ) == NULL )
+        {
+            vlc_mutex_unlock( &p_i->lock );
+            return VLC_EGENERIC;
+        }
+        INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos, p_cat->i_infos, p_info );
+        p_info->psz_name = strdup( psz_name );
+    }
+    else
+    {
+        if( p_info->psz_value ) free( p_info->psz_value );
+    }
+
+    va_start( args, psz_format );
+    vasprintf( &p_info->psz_value, psz_format, args);
+    va_end( args );
+
+    vlc_mutex_unlock( &p_i->lock );
+
+    return VLC_SUCCESS;
+}
+

@@ -517,7 +517,8 @@ void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
 
     wxString msg;
     wxString duration = wxU( "" );
-    char *psz_author = playlist_ItemGetInfo( p_item, _("Meta-information"),
+    char *psz_author = vlc_input_item_GetInfo( &p_item->input,
+                                                     _("Meta-information"),
                                                      _("Artist"));
     char psz_duration[MSTRTIME_MAX_SIZE];
     mtime_t dur = p_item->input.i_duration;
@@ -526,7 +527,7 @@ void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
     {
         secstotimestr( psz_duration, dur/1000000 );
         duration.Append( wxU( " ( " ) +  wxString( wxU( psz_duration ) ) +
-                         wxU( ")" ) );
+                         wxU( " )" ) );
     }
 
     if( !strcmp( psz_author, "" ) || p_item->input.b_fixed_name == VLC_TRUE )

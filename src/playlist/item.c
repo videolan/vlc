@@ -27,6 +27,7 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include "vlc_input.h"
 #include "vlc_playlist.h"
 
 static void GuessType( input_item_t *p_item);
@@ -86,8 +87,6 @@ playlist_item_t * playlist_ItemNewWithType( vlc_object_t *p_obj,
 
     if( p_item->input.i_type == ITEM_TYPE_UNKNOWN )
         GuessType( &p_item->input );
-
-    playlist_ItemCreateCategory( p_item, _("General") );
 
     return p_item;
 }
@@ -276,8 +275,8 @@ int playlist_ItemSetDuration( playlist_item_t *p_item, mtime_t i_duration )
         {
             memcpy( psz_buffer, "--:--:--", sizeof("--:--:--") );
         }
-        playlist_ItemAddInfo( p_item, _("General") , _("Duration"),
-                              "%s", psz_buffer );
+        vlc_input_item_AddInfo( &p_item->input, _("General") , _("Duration"),
+                                "%s", psz_buffer );
 
         return VLC_SUCCESS;
     }

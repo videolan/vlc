@@ -129,6 +129,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_ADD_INFO:
         {
+            /* FIXME : Impossible to use vlc_input_item_AddInfo because of
+             * the ... problem ? */
             char *psz_cat = (char *)va_arg( args, char * );
             char *psz_name = (char *)va_arg( args, char * );
             char *psz_format = (char *)va_arg( args, char * );
@@ -204,32 +206,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             int i;
             *ppsz_value = NULL;
 
-            vlc_mutex_lock( &p_input->input.p_item->lock );
-            for( i = 0; i < p_input->input.p_item->i_categories; i++ )
-            {
-                if( !strcmp( p_input->input.p_item->pp_categories[i]->psz_name,
-                             psz_cat ) ) break;
-            }
-
-            if( i != p_input->input.p_item->i_categories )
-            {
-                info_category_t *p_cat;
-                p_cat = p_input->input.p_item->pp_categories[i];
-
-                for( i = 0; i < p_cat->i_infos; i++ )
-                {
-                    if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
-                    {
-                        if( p_cat->pp_infos[i]->psz_value )
-                        {
-                            *ppsz_value =strdup(p_cat->pp_infos[i]->psz_value);
-                            i_ret = VLC_SUCCESS;
-                        }
-                        break;
-                    }
-                }
-            }
-            vlc_mutex_unlock( &p_input->input.p_item->lock );
+            *ppsz_value = vlc_input_item_GetInfo( p_input->input.p_item,
+                                                  psz_cat, psz_name );
             return i_ret;
         }
 
@@ -442,7 +420,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             int i;
 
             vlc_mutex_lock( &p_input->input.p_item->lock );
-            /* Check if option already exists */            
+            /* Check if option already exists */
             for( i = 0; i < p_input->input.p_item->i_options; i++ )
             {
                 if( !strncmp( p_input->input.p_item->ppsz_options[i],

@@ -801,7 +801,7 @@ CDDAFormatTitle( const access_t *p_access, track_t i_track )
 #define add_playlist_track_info_str(TITLE, FIELD)                        \
     if (FIELD && strlen(FIELD))                                          \
     {                                                                    \
-        playlist_ItemAddInfo( p_item, _("Track"), _(TITLE),              \
+        vlc_input_item_AddInfo( &p_item->input, _("Track"), _(TITLE),    \
                               "%s", FIELD);                              \
     }
 
@@ -844,14 +844,14 @@ CDDACreatePlaylistItem( const access_t *p_access, cdda_data_t *p_cdda,
 }
 
 int CDDAAddMetaToItem( access_t *p_access, cdda_data_t *p_cdda,
-                       playlist_item_t *p_item, int i_track, 
-		       vlc_bool_t b_single )
+                       playlist_item_t *p_item, int i_track,
+                       vlc_bool_t b_single )
 {
     vlc_mutex_lock( &p_item->input.lock );
 
     add_playlist_track_info_str("Source",  p_cdda->psz_source);
-    playlist_ItemAddInfo( p_item, _("Track"), _("Track Number"),
-                          "%d", i_track );
+    vlc_input_item_AddInfo( &p_item->input, _("Track"), _("Track Number"),
+                           "%d", i_track );
 
     if (p_cdda->p_cdtext[i_track])
     {

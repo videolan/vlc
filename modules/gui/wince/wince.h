@@ -253,9 +253,6 @@ protected:
     HWND name_label;
     HWND name_text;
 
-    HWND author_label;
-    HWND author_text;
-
     HWND checkbox_label;
     HWND enabled_checkbox;
 

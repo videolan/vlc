@@ -237,7 +237,7 @@ int playlist_NodeGroup( playlist_t * p_playlist , int i_view,
         }
         else if ( i_mode == SORT_AUTHOR )
         {
-            psz_search = playlist_ItemGetInfo( pp_items[i],
+            psz_search = vlc_input_item_GetInfo( &pp_items[i]->input,
                             _("Meta-information"), _( "Artist" ) );
         }
 

@@ -331,16 +331,6 @@ VLC_EXPORT( playlist_item_t *, playlist_ItemGetByInput, (playlist_t *,input_item
 VLC_EXPORT( playlist_item_t *, playlist_LockItemGetByInput, (playlist_t *,input_item_t * ) );
 VLC_EXPORT( int, playlist_GetPositionById, (playlist_t *,int ) );
 
-/* Info functions */
-VLC_EXPORT( char * , playlist_GetInfo, ( playlist_t * , int, const char *, const char *) );
-VLC_EXPORT( char * , playlist_ItemGetInfo, ( playlist_item_t * , const char *, const char *) );
-
-VLC_EXPORT( info_category_t*, playlist_ItemGetCategory, ( playlist_item_t *, const char *) );
-
-VLC_EXPORT( info_category_t*, playlist_ItemCreateCategory, ( playlist_item_t *, const char *) );
-
-VLC_EXPORT( int, playlist_AddInfo, (playlist_t *, int, const char * , const char *, const char *, ...) );
-VLC_EXPORT( int, playlist_ItemAddInfo, (playlist_item_t *, const char * , const char *, const char *, ...) );
 VLC_EXPORT( int, playlist_ItemAddOption, (playlist_item_t *, const char *) );
 
 /* Playlist sorting */

@@ -330,7 +330,6 @@ SOURCES_libvlc_common = \
 	src/playlist/view.c \
 	src/playlist/item.c \
 	src/playlist/item-ext.c \
-	src/playlist/info.c \
 	src/playlist/services_discovery.c \
 	src/input/access.c \
 	src/input/clock.c \

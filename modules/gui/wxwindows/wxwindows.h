@@ -940,7 +940,6 @@ private:
 
     wxTextCtrl *uri_text;
     wxTextCtrl *name_text;
-    wxTextCtrl *author_text;
 
     wxTreeCtrl *info_tree;
     wxTreeItemId info_root;

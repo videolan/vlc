@@ -132,18 +132,6 @@ LRESULT ItemInfoDialog::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
             70, 10 + 15 + 10 - 3, rcClient.right - 70 - 10, 15 + 6,
             hwnd, NULL, hInst, NULL);
 
-        /* Author Textbox */
-        author_label = CreateWindow( _T("STATIC"), _T("Author:"),
-                         WS_CHILD | WS_VISIBLE | SS_RIGHT ,
-                         0, 10 + 2*( 15 + 10 ), 60, 15,
-                         hwnd, NULL, hInst, NULL);
-
-        author_text = CreateWindow( _T("EDIT"),
-            _FROMMB(playlist_ItemGetInfo( p_item, _("General"), _("Author") )),
-            WS_CHILD | WS_VISIBLE | WS_BORDER | SS_LEFT | ES_AUTOHSCROLL,
-            70, 10 + 2*( 15 + 10 ) - 3, rcClient.right - 70 - 10, 15 + 6,
-            hwnd, NULL, hInst, NULL );
-
         /* CheckBox */
         checkbox_label = CreateWindow( _T("STATIC"), _T("Item Enabled:"),
             WS_CHILD | WS_VISIBLE | SS_RIGHT ,
@@ -289,10 +277,6 @@ void ItemInfoDialog::OnOk()
     Edit_GetText( uri_text, psz_uri, MAX_PATH );
     if( p_item->input.psz_uri ) free( p_item->input.psz_uri );
     p_item->input.psz_uri = strdup( _TOMB(psz_uri) );
-
-    TCHAR psz_author[MAX_PATH];
-    Edit_GetText( author_text, psz_author, MAX_PATH );
-    playlist_ItemAddInfo( p_item, "General", "Author", _TOMB(psz_author) );
 
     vlc_bool_t b_old_enabled = p_item->b_enabled;
 

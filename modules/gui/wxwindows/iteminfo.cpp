@@ -51,7 +51,6 @@ enum
 {
     Uri_Event,
     Name_Event,
-    Author_Event,
     Enabled_Event,
 };
 
@@ -155,19 +154,6 @@ wxPanel *ItemInfoDialog::InfoPanel( wxWindow* parent )
     sizer->Add( name_label, 0 , wxALIGN_LEFT |wxALL , 5  );
     sizer->Add( name_text, 1 , wxALIGN_RIGHT | wxALL , 5 );
 
-    /* Author Textbox */
-    wxStaticText *author_label =
-           new wxStaticText( info_panel, -1, wxU(_("Author")) );
-
-    author_text = new wxTextCtrl( info_panel, Uri_Event,
-                                   wxU( playlist_ItemGetInfo( p_item,
-                                          _("General"), _("Author") ) ),
-                                   wxDefaultPosition, wxSize( 300, -1 ),
-                                   wxTE_PROCESS_ENTER);
-
-    sizer->Add( author_label, 0 , wxALIGN_LEFT | wxALL , 5 );
-    sizer->Add( author_text, 1 , wxALIGN_RIGHT | wxALL , 5);
-
     /* Treeview */
     info_tree = new wxTreeCtrl( info_panel, -1, wxDefaultPosition,
                                 wxSize(220,200),
@@ -221,8 +207,6 @@ void ItemInfoDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
     vlc_mutex_lock( &p_item->input.lock );
     p_item->input.psz_name = strdup( name_text->GetLineText(0).mb_str() );
     p_item->input.psz_uri = strdup( uri_text->GetLineText(0).mb_str() );
-    playlist_ItemAddInfo( p_item,"General","Author",
-                            author_text->GetLineText(0).mb_str() );
     vlc_mutex_unlock( &p_item->input.lock );
     EndModal( wxID_OK );
 }

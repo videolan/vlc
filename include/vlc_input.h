@@ -158,6 +158,9 @@ static inline void vlc_input_item_Clean( input_item_t *p_i )
     vlc_mutex_destroy( &p_i->lock );
 }
 
+VLC_EXPORT( char *, vlc_input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
+VLC_EXPORT(int, vlc_input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) );
+
 /*****************************************************************************
  * Seek point: (generalisation of chapters)
  *****************************************************************************/
