@@ -213,6 +213,25 @@ void __fastcall TMainFrameDlg::FullscreenActionExecute( TObject *Sender )
     vlc_object_release( p_vout );
 }
 //---------------------------------------------------------------------------
+void __fastcall TMainFrameDlg::OnTopActionExecute( TObject *Sender )
+{
+    vlc_object_t *p_vout;
+    p_vout = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+                                              FIND_ANYWHERE );
+    if( p_vout != NULL )
+    {
+        vlc_value_t val;
+        if( var_Get( p_vout, "directx-on-top", &val ) >= 0 )
+        {
+            val.b_bool = ! val.b_bool;
+            var_Set( p_vout, "directx-on-top", val );
+            MenuOnTop->Checked = val.b_bool;
+            PopupOnTop->Checked = val.b_bool;
+        }
+        vlc_object_release( p_vout );
+    }
+}
+//---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::PlaylistActionExecute( TObject *Sender )
 {
     TPlaylistDlg *p_playwin = p_intf->p_sys->p_playwin;

@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.9 2002/11/26 22:20:18 gbazin Exp $
+ * $Id: directx.c,v 1.10 2003/01/26 02:22:59 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -32,7 +32,7 @@
  * surfaces that will be blitted onto the primary surface (display) to
  * effectively display the pictures. This fallback method also enables us to
  * display video in window mode.
- * 
+ *
  *****************************************************************************/
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
@@ -61,6 +61,8 @@ DEFINE_GUID( IID_IDirectDrawSurface2, 0x57805885,0x6eec,0x11cf,0x94,0x41,0xa8,0x
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+static void ToggleOnTop ();
+
 static int  OpenVideo  ( vlc_object_t * );
 static void CloseVideo ( vlc_object_t * );
 
@@ -88,6 +90,8 @@ static int  DirectXGetSurfaceDesc ( vout_thread_t *p_vout, picture_t *p_pic );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define ON_TOP_TEXT N_("always on top")
+#define ON_TOP_LONGTEXT N_("place the directx window on top of other windows")
 #define HW_YUV_TEXT N_("use hardware YUV->RGB conversions")
 #define HW_YUV_LONGTEXT N_( \
     "Try to use hardware acceleration for YUV->RGB conversions. " \
@@ -105,6 +109,7 @@ static int  DirectXGetSurfaceDesc ( vout_thread_t *p_vout, picture_t *p_pic );
 
 vlc_module_begin();
     add_category_hint( N_("Video"), NULL );
+    add_bool( "directx-on-top", 0, NULL, ON_TOP_TEXT, ON_TOP_LONGTEXT );
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT );
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT );
     add_integer( "directx-window", 0, NULL, WINDOW_TEXT, WINDOW_LONGTEXT );
@@ -130,6 +135,7 @@ vlc_module_end();
 static int OpenVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
+    vlc_value_t val;
 
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -211,6 +217,11 @@ static int OpenVideo( vlc_object_t *p_this )
         msg_Err( p_vout, "cannot initialize DirectDraw" );
         goto error;
     }
+
+    /* Add a variable to indicate if the window should be on top of others */
+    var_Create( p_vout, "directx-on-top", VLC_VAR_BOOL );
+    val.b_bool = config_GetInt( p_vout, "directx-on-top" );
+    var_Set( p_vout, "directx-on-top", val );
 
     return VLC_SUCCESS;
 
@@ -322,10 +333,12 @@ static void End( vout_thread_t *p_vout )
  * Terminate an output method created by Create
  *****************************************************************************/
 static void CloseVideo( vlc_object_t *p_this )
-{   
+{
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    
+
     msg_Dbg( p_vout, "CloseVideo" );
+
+    var_Destroy( p_vout, "directs-on-top" );
 
     DirectXCloseDisplay( p_vout );
     DirectXCloseDDraw( p_vout );
@@ -378,7 +391,7 @@ static int Manage( vout_thread_t *p_vout )
      * decided to isolate PeekMessage in another thread. */
 
     /*
-     * Scale Change 
+     * Scale Change
      */
     if( p_vout->i_changes & VOUT_SCALE_CHANGE
          || p_vout->p_sys->i_changes & VOUT_SCALE_CHANGE )
@@ -393,7 +406,7 @@ static int Manage( vout_thread_t *p_vout )
     }
 
     /*
-     * Size Change 
+     * Size Change
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE
         || p_vout->p_sys->i_changes & VOUT_SIZE_CHANGE )
@@ -452,6 +465,36 @@ static int Manage( vout_thread_t *p_vout )
         {
             p_vout->p_sys->b_cursor_hidden = VLC_TRUE;
             PostMessage( p_vout->p_sys->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
+        }
+    }
+
+    /*
+     * "Always on top" status change
+     */
+    HWND hwnd = p_vout->p_sys->hwnd;
+    HMENU hMenu = GetSystemMenu( hwnd , FALSE );
+    vlc_value_t val;
+    var_Get( p_vout, "directx-on-top", &val );
+    if( val.b_bool )
+    {
+        /* Set the window on top if necessary */
+        if( !( GetWindowLong( hwnd, GWL_EXSTYLE ) & WS_EX_TOPMOST ) )
+        {
+            CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
+                           MF_BYCOMMAND | MFS_CHECKED );
+            SetWindowPos( hwnd, HWND_TOPMOST, 0, 0, 0, 0,
+                           SWP_NOSIZE | SWP_NOMOVE );
+        }
+    }
+    else
+    {
+        /* The window shouldn't be on top */
+        if( GetWindowLong( hwnd, GWL_EXSTYLE ) & WS_EX_TOPMOST )
+        {
+            CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
+                           MF_BYCOMMAND | MFS_UNCHECKED );
+            SetWindowPos( hwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
+                          SWP_NOSIZE | SWP_NOMOVE );
         }
     }
 
@@ -586,8 +629,8 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
         msg_Warn( p_vout, "DirectXInitDDraw failed loading ddraw.dll" );
         goto error;
     }
-      
-    OurDirectDrawCreate = 
+
+    OurDirectDrawCreate =
       (void *)GetProcAddress(p_vout->p_sys->hddraw_dll, "DirectDrawCreate");
     if ( OurDirectDrawCreate == NULL )
     {
@@ -748,7 +791,7 @@ static int DirectXCreateClipper( vout_thread_t *p_vout )
         msg_Warn( p_vout, "cannot attach clipper to surface (error %i)",
                           dxresult );
         goto error;
-    }    
+    }
 
     return VLC_SUCCESS;
 
@@ -1206,7 +1249,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
 /*****************************************************************************
  * FreePicture: destroy a picture vector allocated with NewPictureVec
  *****************************************************************************
- * 
+ *
  *****************************************************************************/
 static void FreePictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                             int i_num_pics )

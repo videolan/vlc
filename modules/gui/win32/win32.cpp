@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: win32.cpp,v 1.12 2003/01/24 12:01:03 sam Exp $
+ * $Id: win32.cpp,v 1.13 2003/01/26 02:22:59 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -174,8 +174,8 @@ int Win32Manage( intf_thread_t *p_intf )
     {
         vlc_bool_t b_need_menus = VLC_FALSE;
         input_thread_t  * p_input = p_intf->p_sys->p_input;
-        aout_instance_t * p_aout = NULL;
-        vout_thread_t   * p_vout = NULL;
+        vlc_object_t * p_aout = NULL;
+        vlc_object_t * p_vout = NULL;
 
         vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -229,35 +229,41 @@ int Win32Manage( intf_thread_t *p_intf )
         }
 
         /* Does the audio output require to update the menus ? */
-        p_aout = (aout_instance_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                     FIND_ANYWHERE );
+        p_aout = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                  FIND_ANYWHERE );
         if( p_aout != NULL )
         {
             vlc_value_t val;
-            if( var_Get( (vlc_object_t *)p_aout, "intf-change", &val ) >= 0
+            if( var_Get( p_aout, "intf-change", &val ) >= 0
                 && val.b_bool )
             {
                 p_intf->p_sys->b_aout_update = 1;
                 b_need_menus = VLC_TRUE;
             }
 
-            vlc_object_release( (vlc_object_t *)p_aout );
+            vlc_object_release( p_aout );
         }
 
         /* Does the video output require to update the menus ? */
-        p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
+        p_vout = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                    FIND_ANYWHERE );
         if( p_vout != NULL )
         {
             vlc_value_t val;
-            if( var_Get( (vlc_object_t *)p_vout, "intf-change", &val ) >= 0
+            if( var_Get( p_vout, "intf-change", &val ) >= 0
                 && val.b_bool )
             {
                 p_intf->p_sys->b_vout_update = 1;
                 b_need_menus = VLC_TRUE;
             }
 
-            vlc_object_release( (vlc_object_t *)p_vout );
+            if( var_Get( p_vout, "directx-on-top", &val ) >= 0 )
+            {
+                p_intf->p_sys->p_window->MenuOnTop->Checked = val.b_bool;
+                p_intf->p_sys->p_window->PopupOnTop->Checked = val.b_bool;
+            }
+
+            vlc_object_release( p_vout );
         }
 
         if( b_need_menus )

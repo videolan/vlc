@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.8 2002/11/25 03:12:42 ipkiss Exp $
+ * $Id: events.c,v 1.9 2003/01/26 02:22:59 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -629,27 +629,15 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
                 return 0;                  /* this stops them from happening */
             case IDM_TOGGLE_ON_TOP:            /* toggle the "on top" status */
             {
-                HMENU hMenu = GetSystemMenu( hwnd , FALSE );
-
+                vlc_value_t val;
                 msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
 
-                // Check if the window is already on top
-                if( GetWindowLong( hwnd, GWL_EXSTYLE ) & WS_EX_TOPMOST )
-                {
-                    CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
-                                   MF_BYCOMMAND | MFS_UNCHECKED );
-                    SetWindowPos( hwnd, HWND_NOTOPMOST,
-                                  0, 0, 0, 0,
-                                  SWP_NOSIZE | SWP_NOMOVE );
-                }
-                else
-                {
-                    CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
-                                   MF_BYCOMMAND | MFS_CHECKED );
-                    SetWindowPos( hwnd, HWND_TOPMOST,
-                                  0, 0, 0, 0,
-                                  SWP_NOSIZE | SWP_NOMOVE );
-                }
+                /* Get the current value... */
+                if( var_Get( p_vout, "directx-on-top", &val ) < 0 )
+                    return 0;
+                /* ...and change it */
+                val.b_bool = !val.b_bool;
+                var_Set( p_vout, "directx-on-top", val );
                 return 0;
                 break;
             }

@@ -480,6 +480,14 @@ object MainFrameDlg: TMainFrameDlg
     object MenuView: TMenuItem
       Tag = 3
       Caption = '&View'
+      object MenuFullscreen: TMenuItem
+        Tag = 3
+        Action = FullscreenAction
+      end
+      object MenuOnTop: TMenuItem
+        Tag = 3
+        Action = OnTopAction
+      end
       object MenuHideinterface: TMenuItem
         Tag = 3
         Caption = '&Hide interface'
@@ -529,6 +537,7 @@ object MainFrameDlg: TMainFrameDlg
         Action = VolumeDownAction
       end
       object MenuMute: TMenuItem
+        Tag = 3
         Action = MuteAction
       end
       object MenuChannel: TMenuItem
@@ -537,17 +546,10 @@ object MainFrameDlg: TMainFrameDlg
         Enabled = False
         Hint = 'Select audio channel'
       end
-      object N2: TMenuItem
-        Caption = '-'
-      end
       object MenuVDevice: TMenuItem
         Tag = 3
         Caption = 'Sc&reen'
         Enabled = False
-      end
-      object MenuFullscreen: TMenuItem
-        Tag = 3
-        Action = FullscreenAction
       end
       object N11: TMenuItem
         Caption = '-'
@@ -2392,14 +2394,8 @@ object MainFrameDlg: TMainFrameDlg
       object PopupJump: TMenuItem
         Tag = 3
         Caption = '&Jump...'
+        Enabled = False
         OnClick = PopupJumpClick
-      end
-      object N6: TMenuItem
-        Caption = '-'
-      end
-      object PopupFullscreen: TMenuItem
-        Tag = 3
-        Action = FullscreenAction
       end
     end
     object PopupAudioSettings: TMenuItem
@@ -2428,9 +2424,22 @@ object MainFrameDlg: TMainFrameDlg
         Enabled = False
       end
     end
-    object PopupVDevice: TMenuItem
-      Caption = 'Screen'
-      Enabled = False
+    object Videosettings1: TMenuItem
+      Tag = 3
+      Caption = 'Video settings'
+      object PopupFullscreen: TMenuItem
+        Tag = 3
+        Action = FullscreenAction
+      end
+      object PopupOnTop: TMenuItem
+        Tag = 3
+        Action = OnTopAction
+      end
+      object PopupVDevice: TMenuItem
+        Tag = 3
+        Caption = 'Screen'
+        Enabled = False
+      end
     end
     object N1: TMenuItem
       Caption = '-'
@@ -2713,6 +2722,14 @@ object MainFrameDlg: TMainFrameDlg
       Caption = '&Mute'
       Hint = 'Toggle mute'
       OnExecute = MuteActionExecute
+    end
+    object OnTopAction: TAction
+      Tag = 3
+      Category = 'Menu'
+      Caption = 'Always on top...'
+      Hint = 'Set the window on top'
+      ShortCut = 16468
+      OnExecute = OnTopActionExecute
     end
   end
 end

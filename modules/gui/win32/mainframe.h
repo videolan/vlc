@@ -74,7 +74,6 @@ __published:	// IDE-managed Components
     TMenuItem *MenuExit;
     TMenuItem *MenuView;
     TMenuItem *MenuHideinterface;
-    TMenuItem *MenuFullscreen;
     TMenuItem *MenuTitle;
     TMenuItem *MenuChapter;
     TMenuItem *MenuAngle;
@@ -97,7 +96,6 @@ __published:	// IDE-managed Components
     TMenuItem *PopupSlow;
     TMenuItem *PopupFast;
     TMenuItem *PopupToggleInterface;
-    TMenuItem *PopupFullscreen;
     TMenuItem *PopupNext;
     TMenuItem *PopupPrev;
     TMenuItem *PopupJump;
@@ -168,7 +166,6 @@ __published:	// IDE-managed Components
     TAction *AddSubtitlesAction;
     TMenuItem *Control1;
     TMenuItem *N5;
-    TMenuItem *N6;
     TMenuItem *N10;
     TMenuItem *N11;
     TMenuItem *MenuChannel;
@@ -183,13 +180,18 @@ __published:	// IDE-managed Components
     TMenuItem *VolumeUp1;
     TMenuItem *Mute1;
     TMenuItem *MenuVDevice;
-    TMenuItem *N2;
     TMenuItem *N1;
     TMenuItem *PopupVDevice;
     TMenuItem *MenuStreamOuput;
     TMenuItem *MenuAddSubtitles;
     TMenuItem *N4;
     TMenuItem *MenuAddInterface;
+    TAction *OnTopAction;
+    TMenuItem *MenuFullscreen;
+    TMenuItem *MenuOnTop;
+    TMenuItem *PopupFullscreen;
+    TMenuItem *Videosettings1;
+    TMenuItem *PopupOnTop;
     void __fastcall TimerManageTimer( TObject *Sender );
     void __fastcall TrackBarChange( TObject *Sender );
     void __fastcall FormClose( TObject *Sender, TCloseAction &Action );
@@ -225,6 +227,7 @@ __published:	// IDE-managed Components
     void __fastcall PrevChapterActionExecute( TObject *Sender );
     void __fastcall NextChapterActionExecute( TObject *Sender );
     void __fastcall AddSubtitlesActionsExecute( TObject *Sender );
+    void __fastcall OnTopActionExecute( TObject *Sender );
 private:	// User declarations
     intf_thread_t *p_intf;
     /* drag and drop handling */
