@@ -2,7 +2,7 @@
  * callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: callbacks.c,v 1.1 2003/07/23 22:02:56 jpsaman Exp $
+ * $Id: callbacks.c,v 1.2 2003/11/07 13:01:51 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -425,7 +425,7 @@ on_comboURL_entry_changed              (GtkEditable     *editable,
 {
     intf_thread_t * p_intf = GtkGetIntf( GTK_WIDGET(editable) );
     gchar *       psz_url;
-    struct stat st;
+    struct stat   st;
     
     psz_url = gtk_entry_get_text(GTK_ENTRY(editable));
 /*    if( (strncmp("file://",(const char *) psz_url,7)==0) ||

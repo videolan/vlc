@@ -2,7 +2,7 @@
  * pda.c : PDA Gtk2 plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: pda.c,v 1.7 2003/11/07 09:24:58 jpsaman Exp $
+ * $Id: pda.c,v 1.8 2003/11/07 13:01:51 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *          Marc Ariberti <marcari@videolan.org>
@@ -147,14 +147,15 @@ static void Run( intf_thread_t *p_intf )
 #endif
     GtkCellRenderer   *renderer = NULL;
     GtkTreeViewColumn *column   = NULL;
+    GtkListStore      *filelist = NULL;
 
-    gtk_set_locale ();
 #ifndef NEED_GTK2_MAIN
+    gtk_set_locale ();
     msg_Dbg( p_intf, "Starting pda GTK2+ interface" );
     gtk_init( &i_args, &pp_args );
 #else
     /* Initialize Gtk+ */
-    msg_Dbg( p_intf, "Starting pda GTK+ interface thread" );
+    msg_Dbg( p_intf, "Starting pda GTK2+ interface thread" );
     gdk_threads_enter();
 #endif
 
@@ -182,9 +183,7 @@ static void Run( intf_thread_t *p_intf )
     /* Get the notebook object */
     p_intf->p_sys->p_notebook = GTK_NOTEBOOK( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
-    p_intf->p_sys->p_mediabook = GTK_NOTEBOOK( gtk_object_get_data(
-        GTK_OBJECT( p_intf->p_sys->p_window ), "mediabook" ) );
-
+    
     /* Get the slider object */
     p_intf->p_sys->p_slider = GTK_HSCALE( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "slider" ) );
@@ -247,16 +246,16 @@ static void Run( intf_thread_t *p_intf )
 
     /* Get new directory listing */
     msg_Dbg(p_intf, "Populating GtkTreeView FileList" );
-    p_intf->p_sys->p_filelist = gtk_list_store_new (5,
-                               G_TYPE_STRING, /* Filename */
-                               G_TYPE_STRING, /* permissions */
-                               G_TYPE_UINT64, /* File size */
-                               G_TYPE_STRING, /* Owner */
-                               G_TYPE_STRING);/* Group */
-    ReadDirectory(p_intf, p_intf->p_sys->p_filelist, ".");
+    filelist = gtk_list_store_new (5,
+                G_TYPE_STRING, /* Filename */
+                G_TYPE_STRING, /* permissions */
+                G_TYPE_UINT64, /* File size */
+                G_TYPE_STRING, /* Owner */
+                G_TYPE_STRING);/* Group */
+    ReadDirectory(filelist, ".");
     msg_Dbg(p_intf, "Showing GtkTreeView FileList" );
-    gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvfile), GTK_TREE_MODEL(p_intf->p_sys->p_filelist));
-    g_object_unref(p_intf->p_sys->p_filelist);     /* Model will be released by GtkTreeView */
+    gtk_tree_view_set_model(GTK_TREE_VIEW(p_intf->p_sys->p_tvfile), GTK_TREE_MODEL(filelist));
+    g_object_unref(filelist);     /* Model will be released by GtkTreeView */
     gtk_tree_selection_set_mode(gtk_tree_view_get_selection(GTK_TREE_VIEW(p_intf->p_sys->p_tvfile)),GTK_SELECTION_MULTIPLE);
 
     /* Column properties */
@@ -278,11 +277,13 @@ static void Run( intf_thread_t *p_intf )
     gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 0, _("Filename"), renderer, NULL);
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvplaylist, 0 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 0 );
+    gtk_tree_view_column_set_sort_column_id(column, 0);
     /* Column 2 */
     renderer = gtk_cell_renderer_text_new ();
     gtk_tree_view_insert_column_with_attributes(p_intf->p_sys->p_tvplaylist, 1, _("Time"), renderer, NULL);
     column = gtk_tree_view_get_column(p_intf->p_sys->p_tvplaylist, 1 );
     gtk_tree_view_column_add_attribute(column, renderer, "text", 1 );
+    gtk_tree_view_column_set_sort_column_id(column, 1);
 
     /* update the playlist */
     msg_Dbg(p_intf, "Populating GtkTreeView Playlist" );
@@ -305,15 +306,11 @@ static void Run( intf_thread_t *p_intf )
     p_intf->p_sys->p_mrlentry = GTK_ENTRY( gtk_object_get_data(
         GTK_OBJECT( p_intf->p_sys->p_window ), "mrl_entry" ) );
 
-#if 0
     /* Store p_intf to keep an eye on it */
     msg_Dbg( p_intf, "trying to store p_intf pointer ... " );
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),
                          "p_intf", p_intf );
-    gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_adj),
-                         "p_intf", p_intf );
     msg_Dbg( p_intf, "trying to store p_intf pointer ... done" );
-#endif
     
     /* Show the control window */
     gtk_widget_show( p_intf->p_sys->p_window );

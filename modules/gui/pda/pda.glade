@@ -32,45 +32,6 @@
 	  <property name="tooltips">True</property>
 
 	  <child>
-	    <widget class="button" id="tbOpen">
-	      <property name="width_request">22</property>
-	      <property name="height_request">22</property>
-	      <property name="visible">True</property>
-	      <property name="tooltip" translatable="yes">File</property>
-	      <property name="label" translatable="yes">Open</property>
-	      <property name="use_underline">True</property>
-	      <property name="icon">pda-openb16x16.xpm</property>
-	      <signal name="clicked" handler="onFileOpen" last_modification_time="Fri, 26 Sep 2003 12:26:11 GMT"/>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="button" id="tbPlaylist">
-	      <property name="width_request">22</property>
-	      <property name="height_request">22</property>
-	      <property name="visible">True</property>
-	      <property name="tooltip" translatable="yes">Playlist</property>
-	      <property name="label" translatable="yes">Playlist</property>
-	      <property name="use_underline">True</property>
-	      <property name="icon">pda-playlistb16x16.xpm</property>
-	      <signal name="clicked" handler="onPlaylist" last_modification_time="Fri, 26 Sep 2003 12:26:23 GMT"/>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="button" id="tbPreferences">
-	      <property name="width_request">22</property>
-	      <property name="height_request">22</property>
-	      <property name="visible">True</property>
-	      <property name="tooltip" translatable="yes">Preferences</property>
-	      <property name="label" translatable="yes">Preferences</property>
-	      <property name="use_underline">True</property>
-	      <property name="icon">pda-preferencesb16x16.xpm</property>
-	      <signal name="clicked" handler="onPreferences" last_modification_time="Fri, 26 Sep 2003 12:26:36 GMT"/>
-	    </widget>
-	  </child>
-
-	  <child>
 	    <widget class="button" id="tbRewind">
 	      <property name="width_request">22</property>
 	      <property name="height_request">22</property>
@@ -157,7 +118,7 @@
 	  <child>
 	    <widget class="GtkLabel" id="timeLabel">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">0:00:00</property>
+	      <property name="label" translatable="yes">00:00:00</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_CENTER</property>
