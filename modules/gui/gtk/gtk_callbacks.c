@@ -245,7 +245,7 @@ void GtkTitlePrev( GtkButton * button, gpointer user_data )
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
         input_ChangeArea( p_intf->p_sys->p_input, p_area );
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_intf->p_sys->p_input, PLAYING_S );
 
         p_intf->p_sys->b_title_update = VLC_TRUE;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
@@ -272,7 +272,7 @@ void GtkTitleNext( GtkButton * button, gpointer user_data )
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
         input_ChangeArea( p_intf->p_sys->p_input, p_area );
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_intf->p_sys->p_input, PLAYING_S );
 
         p_intf->p_sys->b_title_update = VLC_TRUE;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
@@ -298,7 +298,7 @@ void GtkChapterPrev( GtkButton * button, gpointer user_data )
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
         input_ChangeArea( p_intf->p_sys->p_input, p_area );
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_intf->p_sys->p_input, PLAYING_S );
 
         p_intf->p_sys->b_chapter_update = VLC_TRUE;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
@@ -324,7 +324,7 @@ void GtkChapterNext( GtkButton * button, gpointer user_data )
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
         input_ChangeArea( p_intf->p_sys->p_input, p_area );
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_intf->p_sys->p_input, PLAYING_S );
 
         p_intf->p_sys->b_chapter_update = VLC_TRUE;
         vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
@@ -405,9 +405,8 @@ void GtkJumpOk( GtkButton       *button,
     i_seconds = GET_VALUE( "jump_second_spinbutton" );
 #undef GET_VALUE
 
-    input_Seek( p_intf->p_sys->p_input,
-                i_seconds + 60 * i_minutes + 3600 * i_hours,
-                INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
+    var_SetTime( p_intf->p_sys->p_input, "time",
+                 (int64_t)(i_seconds+60*i_minutes+3600*i_hours)*I64C(1000000));
 
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }

@@ -2,7 +2,7 @@
  * control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: control.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -118,7 +118,7 @@ gboolean GtkControlPause( GtkWidget       *widget,
         return FALSE;
     }
 
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+    var_SetInteger( p_intf->p_sys->p_input, PAUSE_S );
 
     return TRUE;
 }
@@ -134,7 +134,7 @@ gboolean GtkControlSlow( GtkWidget       *widget,
         return FALSE;
     }
 
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
+    var_SetVoid( p_intf->p_sys->p_input, "rate-slower" );
 
     return TRUE;
 }
@@ -150,7 +150,7 @@ gboolean GtkControlFast( GtkWidget       *widget,
         return FALSE;
     }
 
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
+    var_SetVoid( p_intf->p_sys->p_input, "rate-faster" );
 
     return TRUE;
 }

@@ -476,11 +476,11 @@ static int Manage( intf_thread_t *p_intf )
                 {
                     if( newvalue >= 0. && newvalue < 100. )
                     {
-                        off_t i_seek = ( newvalue * p_area->i_size ) / 100;
+                        double f_fpos = (double)newvalue / 100.0;
 
                         /* release the lock to be able to seek */
                         vlc_mutex_unlock( &p_input->stream.stream_lock );
-                        input_Seek( p_input, i_seek, INPUT_SEEK_SET );
+                        var_SetFloat( p_input, "position", f_fpos );
                         vlc_mutex_lock( &p_input->stream.stream_lock );
                     }
 

@@ -370,9 +370,8 @@ void IntfWindow::Manage( void )
          * finished dragging the slider */
         else if( p_slider->b_free )
         {
-            off_t i_seek = ( i_value * p_area->i_size ) / SLIDER_MAX;
-
-            input_Seek( p_intf->p_sys->p_input, i_seek, INPUT_SEEK_SET );
+            double f_pos = (double)i_value / (double)SLIDER_MAX;
+            var_SetFloat( p_intf->p_sys->p_input, "position", f_pos );
 
             /* Update the old value */
             p_slider->setOldValue( i_value );
@@ -400,7 +399,7 @@ void IntfWindow::PlaybackPlay( void )
 {
     if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
     }
 }
 
@@ -411,7 +410,7 @@ void IntfWindow::PlaybackPause( void )
 {
     if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+        var_SetInteger( p_intf->p_sys->p_input, "state", PAUSE_S );
     }
 }
 
@@ -422,7 +421,7 @@ void IntfWindow::PlaybackSlow( void )
 {
     if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
+        var_SetVoid( p_intf->p_sys->p_input, "rate-slower" );
     }
 }
 
@@ -433,7 +432,7 @@ void IntfWindow::PlaybackFast( void )
 {
     if( p_intf->p_sys->p_input != NULL )
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
+        var_SetVoid( p_intf->p_sys->p_input, "rate-faster" );
     }
 }
 

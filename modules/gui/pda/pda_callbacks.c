@@ -356,7 +356,7 @@ void onRewind(GtkButton *button, gpointer user_data)
 
     if (p_intf->p_sys->p_input != NULL)
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
+        var_SetVoid( p_intf->p_sys->p_input, "rate-slower" );
     }
 }
 
@@ -367,7 +367,7 @@ void onPause(GtkButton *button, gpointer user_data)
 
     if (p_intf->p_sys->p_input != NULL)
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+        var_SetInteger( p_intf->p_sys->p_input, "state", PAUSE_S );
     }
 }
 
@@ -415,7 +415,7 @@ void onForward(GtkButton *button, gpointer user_data)
 
     if (p_intf->p_sys->p_input != NULL)
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
+        var_SetVoid( p_intf->p_sys->p_input, "rate-faster" );
     }
 }
 

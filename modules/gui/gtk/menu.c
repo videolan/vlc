@@ -2,7 +2,7 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.13 2003/12/22 14:32:56 sam Exp $
+ * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -186,7 +186,7 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
         GtkSetupMenus( p_intf );
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
 
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
     }
 }
 
@@ -210,7 +210,7 @@ void GtkPopupNavigationToggle( GtkCheckMenuItem * menuitem,
                                                                             \
         p_intf->p_sys->b_program_update = VLC_FALSE;                        \
                                                                             \
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );       \
+        var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );       \
     }
 
 void GtkMenubarProgramToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
@@ -250,7 +250,7 @@ void GtkMenubarTitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
         vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
         p_intf->p_sys->b_title_update = VLC_FALSE;
 
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
     }
 }
 
@@ -289,7 +289,7 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 
         p_intf->p_sys->b_chapter_update = VLC_FALSE;
 
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PLAY );
+        var_SetInteger( p_intf->p_sys->p_input, "state", PLAYING_S );
     }
 }
 

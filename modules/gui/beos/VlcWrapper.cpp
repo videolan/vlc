@@ -121,8 +121,7 @@ void VlcWrapper::InputSetRate( int rate )
     {
         return;
     }
-
-    input_SetRate( p_input, rate );
+    var_SetInteger( p_input, "rate", rate );
 }
 
 BList * VlcWrapper::GetChannels( int i_cat )
@@ -423,7 +422,7 @@ void VlcWrapper::PlaylistPause()
 {
     if( p_input )
     {
-        input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+        var_SetInteger( p_input, "state", PAUSE_S );
     }
 }
 
