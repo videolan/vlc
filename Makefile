@@ -28,6 +28,7 @@ PLUGINS_DIR :=	ac3_adec \
 		esd \
 		fb \
 		filter \
+		fx \
 		ggi \
 		glide \
 		gtk \
@@ -83,6 +84,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		filter/filter_invert \
 		filter/filter_distort \
 		filter/filter_wall \
+		fx/fx_scope \
 		ggi/ggi \
 		glide/glide \
 		gtk/gnome \

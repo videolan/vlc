@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.19 2002/02/24 21:36:20 jobi Exp $
+ * $Id: gtk_menu.c,v 1.20 2002/02/25 04:30:03 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -190,7 +190,7 @@ void GtkMenubarProgramToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 
     if( menuitem->active && !p_intf->p_sys->b_program_update )
     {
-        u16 i_program_id = (u16)user_data;
+        u16 i_program_id = (ptrdiff_t)user_data;
         
         input_ChangeProgram( p_input_bank->pp_input[0], i_program_id );
         
@@ -506,7 +506,7 @@ static gint GtkProgramMenu( gpointer          p_data,
         /* setup signal hanling */
         gtk_signal_connect( GTK_OBJECT( p_item ), "toggled",
                         GTK_SIGNAL_FUNC( pf_toggle ),
-                        (gpointer)( p_input_bank->pp_input[0]->
+                        (gpointer)(ptrdiff_t)( p_input_bank->pp_input[0]->
                         stream.pp_programs[i]->i_number ) );
 
         gtk_menu_append( GTK_MENU( p_menu ), p_item );
