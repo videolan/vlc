@@ -627,12 +627,15 @@ package-win32-base:
 	done
 
 	mkdir -p "$(srcdir)/vlc-${VERSION}/http/admin"
+	mkdir -p "$(srcdir)/vlc-${VERSION}/http/vlm"
 	cp $(srcdir)/share/http/*.html $(srcdir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/*.css $(srcdir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/admin/*.html \
            $(srcdir)/vlc-${VERSION}/http/admin/ ;
 	cp $(srcdir)/share/http/admin/.access \
            $(srcdir)/vlc-${VERSION}/http/admin/ ;
+	cp $(srcdir)/share/http/vlm/*.html \
+           $(srcdir)/vlc-${VERSION}/http/vlm/ ;
 
 	mkdir -p "$(srcdir)/vlc-${VERSION}/mozilla"
 if BUILD_MOZILLA
