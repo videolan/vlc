@@ -2,7 +2,7 @@
  * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.6.2.7 2002/10/02 21:41:50 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.6.2.8 2002/10/07 21:37:11 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -151,6 +151,8 @@ void ReadDirectory( GtkCList *clist, char *psz_dir )
         gchar *ppsz_text[2];
         int i;
 
+        if( p_intf->p_sys->p_clist == NULL )
+           intf_ErrMsg("ReadDirectory - ERROR p_intf->p_sys->p_clist == NULL");
         gtk_clist_freeze( p_intf->p_sys->p_clist );
         gtk_clist_clear( p_intf->p_sys->p_clist );
         for (i=0; i<n; i++)
@@ -461,7 +463,8 @@ on_clistmedia_select_row               (GtkCList        *clist,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
-    intf_thread_t *p_intf = GtkGetIntf( clist );
+//    intf_thread_t *p_intf = GtkGetIntf( clist );
+    intf_thread_t *p_intf = p_main->p_intf;
     gchar *text[2];
     gint ret;
     struct stat st;
@@ -473,8 +476,12 @@ on_clistmedia_select_row               (GtkCList        *clist,
         {
             if (S_ISDIR(st.st_mode))
                ReadDirectory(p_intf->p_sys->p_clist, text[0]);
-            else
+            else if( (S_ISLNK(st.st_mode)) || (S_ISCHR(st.st_mode)) ||
+                     (S_ISBLK(st.st_mode)) || (S_ISFIFO(st.st_mode))||
+                     (S_ISSOCK(st.st_mode))|| (S_ISREG(st.st_mode)) )
+            {
                MediaURLOpenChanged(GTK_WIDGET(p_intf->p_sys->p_clist), text[0]);
+            }
        }
     }
 }
@@ -493,32 +500,6 @@ on_familiar_delete_event               (GtkWidget       *widget,
 {
     GtkExit( GTK_WIDGET( widget ), user_data );
     return TRUE;
-}
-
-
-void
-on_clistmedia_start_selection          (GtkCList        *clist,
-                                        gpointer         user_data)
-{
-    g_print( ">>>>start_selection\n" );
-}
-
-
-void
-on_clistmedia_end_selection            (GtkCList        *clist,
-                                        gpointer         user_data)
-{
-    g_print( ">>>>end_selection\n" );
-}
-
-
-gboolean
-on_clistmedia_enter_notify_event       (GtkWidget       *widget,
-                                        GdkEventCrossing *event,
-                                        gpointer         user_data)
-{
-  g_print( ">>>>enter_notify_event\n" );
-  return FALSE;
 }
 
 
@@ -554,7 +535,7 @@ on_buttonCancel_clicked                (GtkButton       *button,
     GtkWidget *cbautoplay;
 
     cbautoplay = GTK_WIDGET( gtk_object_get_data(
-                   GTK_OBJECT( p_intf->p_sys->p_window ), "cbautoplay" ) );
+                 GTK_OBJECT( p_intf->p_sys->p_window ), "cbautoplay" ) );
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON(cbautoplay),p_intf->p_sys->b_autoplayfile);
 }
 

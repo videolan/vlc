@@ -25,7 +25,7 @@
   <class>GtkWindow</class>
   <name>familiar</name>
   <width>240</width>
-  <height>320</height>
+  <height>300</height>
   <signal>
     <name>delete_event</name>
     <handler>on_familiar_delete_event</handler>
@@ -48,6 +48,7 @@
     <widget>
       <class>GtkToolbar</class>
       <name>toolbar</name>
+      <border_width>2</border_width>
       <width>112</width>
       <height>16</height>
       <orientation>GTK_ORIENTATION_HORIZONTAL</orientation>
@@ -182,26 +183,6 @@
     </widget>
 
     <widget>
-      <class>GtkProgressBar</class>
-      <name>progress</name>
-      <value>0</value>
-      <lower>0</lower>
-      <upper>100</upper>
-      <bar_style>GTK_PROGRESS_CONTINUOUS</bar_style>
-      <orientation>GTK_PROGRESS_LEFT_TO_RIGHT</orientation>
-      <activity_mode>True</activity_mode>
-      <show_text>False</show_text>
-      <format>%P %%</format>
-      <text_xalign>0.5</text_xalign>
-      <text_yalign>0.5</text_yalign>
-      <child>
-	<padding>0</padding>
-	<expand>False</expand>
-	<fill>False</fill>
-      </child>
-    </widget>
-
-    <widget>
       <class>GtkNotebook</class>
       <name>notebook</name>
       <can_focus>True</can_focus>
@@ -239,42 +220,6 @@
 	</widget>
 
 	<widget>
-	  <class>GtkCombo</class>
-	  <name>comboURL</name>
-	  <x>40</x>
-	  <y>4</y>
-	  <width>185</width>
-	  <height>24</height>
-	  <value_in_list>False</value_in_list>
-	  <ok_if_empty>True</ok_if_empty>
-	  <case_sensitive>False</case_sensitive>
-	  <use_arrows>True</use_arrows>
-	  <use_arrows_always>False</use_arrows_always>
-	  <items>file://
-ftp://
-http://
-udp://:1234
-udpstream://@:1234
-</items>
-
-	  <widget>
-	    <class>GtkEntry</class>
-	    <child_name>GtkCombo:entry</child_name>
-	    <name>comboURL-entry</name>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>changed</name>
-	      <handler>on_comboURL-entry_changed</handler>
-	      <last_modification_time>Thu, 01 Aug 2002 19:37:06 GMT</last_modification_time>
-	    </signal>
-	    <editable>True</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>0</text_max_length>
-	    <text>file://</text>
-	  </widget>
-	</widget>
-
-	<widget>
 	  <class>GtkScrolledWindow</class>
 	  <name>scrolledwindow1</name>
 	  <x>0</x>
@@ -299,21 +244,6 @@ udpstream://@:1234
 	      <name>click_column</name>
 	      <handler>on_clistmedia_click_column</handler>
 	      <last_modification_time>Sun, 18 Aug 2002 19:41:06 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>start_selection</name>
-	      <handler>on_clistmedia_start_selection</handler>
-	      <last_modification_time>Tue, 01 Oct 2002 19:25:54 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>end_selection</name>
-	      <handler>on_clistmedia_end_selection</handler>
-	      <last_modification_time>Tue, 01 Oct 2002 19:26:13 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>enter_notify_event</name>
-	      <handler>on_clistmedia_enter_notify_event</handler>
-	      <last_modification_time>Tue, 01 Oct 2002 19:26:50 GMT</last_modification_time>
 	    </signal>
 	    <columns>5</columns>
 	    <column_widths>123,80,80,80,80</column_widths>
@@ -385,6 +315,43 @@ udpstream://@:1234
 	      <xpad>0</xpad>
 	      <ypad>0</ypad>
 	    </widget>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkCombo</class>
+	  <name>comboURL</name>
+	  <x>40</x>
+	  <y>4</y>
+	  <width>185</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items>/mnt
+file://
+ftp://
+http://
+udp://@:1234
+udpstream://@:1234
+</items>
+
+	  <widget>
+	    <class>GtkEntry</class>
+	    <child_name>GtkCombo:entry</child_name>
+	    <name>comboURL-entry</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>changed</name>
+	      <handler>on_comboURL-entry_changed</handler>
+	      <last_modification_time>Thu, 01 Aug 2002 19:37:06 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>0</text_max_length>
+	    <text>/mnt</text>
 	  </widget>
 	</widget>
       </widget>
