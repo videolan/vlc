@@ -148,14 +148,15 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
     mad_fixed_t const * p_right = p_pcm->samples[1];
     int                 i_samples = p_pcm->length;
     mad_fixed_t *       p_samples;
-    int                 i_channels = (p_pcm->channels == 2) ? AOUT_CHAN_STEREO :
-                                     AOUT_CHAN_MONO;
+    int                 i_channels = (p_pcm->channels == 2) ?
+                                     AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT :
+                                     AOUT_CHAN_CENTER;
 
     /* Creating the audio output fifo. Assume the samplerate and nr of channels
      * from the first decoded frame is right for the entire audio track. */
     if( (p_dec->p_aout_input != NULL) &&
         (p_dec->output_format.i_rate != p_pcm->samplerate
-           || p_dec->output_format.i_channels != i_channels) )
+           || p_dec->output_format.i_physical_channels != i_channels) )
     {
         /* Parameters changed - this should not happen. */
         aout_DecDelete( p_dec->p_aout, p_dec->p_aout_input );
@@ -166,7 +167,8 @@ enum mad_flow libmad_output( void *p_data, struct mad_header const *p_header,
     if( p_dec->p_aout_input == NULL )
     {
         p_dec->output_format.i_rate = p_pcm->samplerate;
-        p_dec->output_format.i_channels = i_channels;
+        p_dec->output_format.i_physical_channels = i_channels;
+        p_dec->output_format.i_original_channels = i_channels;
         aout_DateInit( &p_dec->end_date, p_pcm->samplerate );
         p_dec->p_aout_input = aout_DecNew( p_dec->p_fifo,
                                            &p_dec->p_aout,

@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.17 2002/10/28 22:23:23 gbazin Exp $
+ * $Id: a52.c,v 1.18 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -39,8 +39,6 @@
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
-
-#define A52_FRAME_NB 1536 
 
 /*****************************************************************************
  * dec_thread_t : A52 pass-through thread descriptor
@@ -142,7 +140,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     /* decoder thread's main loop */
     while ( !p_dec->p_fifo->b_die && !p_dec->p_fifo->b_error )
     {
-        int i_frame_size, i_channels, i_rate, i_bit_rate;
+        int i_frame_size, i_original_channels, i_rate, i_bit_rate;
         mtime_t pts;
         byte_t p_header[7];
         aout_buffer_t * p_buffer;
@@ -167,7 +165,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         if( p_dec->p_fifo->b_die ) break;
 
         /* Check if frame is valid and get frame info */
-        i_frame_size = SyncInfo( p_header, &i_channels, &i_rate,
+        i_frame_size = SyncInfo( p_header, &i_original_channels, &i_rate,
                                  &i_bit_rate );
 
         if( !i_frame_size )
@@ -178,7 +176,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
         if( (p_dec->p_aout_input != NULL) &&
             ( (p_dec->output_format.i_rate != i_rate)
-                || (p_dec->output_format.i_channels != i_channels)
+                || (p_dec->output_format.i_original_channels
+                      != i_original_channels)
                 || (p_dec->output_format.i_bytes_per_frame != i_frame_size) ) )
         {
             /* Parameters changed - this should not happen. */
@@ -190,7 +189,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         if( p_dec->p_aout_input == NULL )
         {
             p_dec->output_format.i_rate = i_rate;
-            p_dec->output_format.i_channels = i_channels;
+            p_dec->output_format.i_original_channels = i_original_channels;
+            p_dec->output_format.i_physical_channels
+                       = i_original_channels & AOUT_CHAN_PHYSMASK;
             p_dec->output_format.i_bytes_per_frame = i_frame_size;
             p_dec->output_format.i_frame_length = A52_FRAME_NB;
             aout_DateInit( &end_date, i_rate );
@@ -262,13 +263,13 @@ static void EndThread( dec_thread_t * p_dec )
     free( p_dec );
 }
 
-/****************************************************************************
+/*****************************************************************************
  * SyncInfo: parse A52 sync info
- ****************************************************************************
+ *****************************************************************************
  * This code is borrowed from liba52 by Aaron Holtzman & Michel Lespinasse,
  * since we don't want to oblige S/PDIF people to use liba52 just to get
  * their SyncInfo...
- ****************************************************************************/
+ *****************************************************************************/
 int SyncInfo( const byte_t * p_buf, int * pi_channels, int * pi_sample_rate,
               int * pi_bit_rate)
 {
@@ -293,20 +294,50 @@ int SyncInfo( const byte_t * p_buf, int * pi_channels, int * pi_sample_rate,
     acmod = p_buf[6] >> 5;
     if ( (p_buf[6] & 0xf8) == 0x50 )
     {
-        *pi_channels = AOUT_CHAN_DOLBY;
+        /* Dolby surround = stereo + Dolby */
+        *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                        | AOUT_CHAN_DOLBYSTEREO;
     }
     else switch ( acmod )
     {
-    case 0x0: *pi_channels = AOUT_CHAN_CHANNEL; break;
-    case 0x1: *pi_channels = AOUT_CHAN_MONO; break;
-    case 0x2: *pi_channels = AOUT_CHAN_STEREO; break;
-    case 0x3: *pi_channels = AOUT_CHAN_3F; break;
-    case 0x4: *pi_channels = AOUT_CHAN_2F1R; break;
-    case 0x5: *pi_channels = AOUT_CHAN_3F1R; break;
-    case 0x6: *pi_channels = AOUT_CHAN_2F2R; break;
-    case 0x7: *pi_channels = AOUT_CHAN_3F2R; break;
-    case 0x8: *pi_channels = AOUT_CHAN_CHANNEL1; break;
-    case 0x9: *pi_channels = AOUT_CHAN_CHANNEL2; break;
+    case 0x0:
+        /* Dual-mono = stereo + dual-mono */
+        *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                        | AOUT_CHAN_DUALMONO;
+        break;
+    case 0x1:
+        /* Mono */
+        *pi_channels = AOUT_CHAN_CENTER;
+        break;
+    case 0x2:
+        /* Stereo */
+        *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        break;
+    case 0x3:
+        /* 3F */
+        *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER;
+        break;
+    case 0x4:
+        /* 2F1R */
+        *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER;
+        break;
+    case 0x5:
+        /* 3F1R */
+        *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+                        | AOUT_CHAN_REARCENTER;
+        break;
+    case 0x6:
+        /* 2F2R */
+        *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                        | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        break;
+    case 0x7:
+        /* 3F2R */
+        *pi_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+                        | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
+        break;
+    default:
+        return 0;
     }
    
     if ( p_buf[6] & lfeon[acmod] ) *pi_channels |= AOUT_CHAN_LFE;

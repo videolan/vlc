@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.8 2002/11/13 20:51:04 sam Exp $
+ * $Id: common.c,v 1.9 2002/11/14 22:38:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -62,6 +62,13 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
 
     vlc_object_attach( p_aout, p_parent->p_vlc );
 
+    var_Create( p_aout, "physical-channels", VLC_VAR_INTEGER );
+    var_AddCallback( p_aout, "physical-channels", aout_ChannelsRestart,
+                     NULL );
+    var_Create( p_aout, "original-channels", VLC_VAR_INTEGER );
+    var_AddCallback( p_aout, "original-channels", aout_ChannelsRestart,
+                     NULL );
+
     return p_aout;
 }
 
@@ -70,6 +77,8 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
  *****************************************************************************/
 void aout_Delete( aout_instance_t * p_aout )
 {
+    var_Destroy( p_aout, "channels" );
+
     vlc_mutex_destroy( &p_aout->input_fifos_lock );
     vlc_mutex_destroy( &p_aout->mixer_lock );
     vlc_mutex_destroy( &p_aout->output_fifo_lock );
@@ -86,46 +95,20 @@ void aout_Delete( aout_instance_t * p_aout )
 /*****************************************************************************
  * aout_FormatNbChannels : return the number of channels
  *****************************************************************************/
-int aout_FormatNbChannels( audio_sample_format_t * p_format )
+int aout_FormatNbChannels( const audio_sample_format_t * p_format )
 {
-    int i_nb;
+    static const u32 pi_channels[] =
+        { AOUT_CHAN_CENTER, AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
+          AOUT_CHAN_REARCENTER, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+          AOUT_CHAN_LFE };
+    int i_nb = 0, i;
 
-    switch ( p_format->i_channels & AOUT_CHAN_MASK )
+    for ( i = 0; i < sizeof(pi_channels)/sizeof(u32); i++ )
     {
-    case AOUT_CHAN_CHANNEL1:
-    case AOUT_CHAN_CHANNEL2:
-    case AOUT_CHAN_MONO:
-        i_nb = 1;
-        break;
-
-    case AOUT_CHAN_CHANNEL:
-    case AOUT_CHAN_STEREO:
-    case AOUT_CHAN_DOLBY:
-        i_nb = 2;
-        break;
-
-    case AOUT_CHAN_3F:
-    case AOUT_CHAN_2F1R:
-        i_nb = 3;
-        break;
-
-    case AOUT_CHAN_3F1R:
-    case AOUT_CHAN_2F2R:
-        i_nb = 4;
-        break;
-
-    case AOUT_CHAN_3F2R:
-        i_nb = 5;
-        break;
-
-    default:
-        i_nb = 0;
+        if ( p_format->i_physical_channels & pi_channels[i] ) i_nb++;
     }
 
-    if ( p_format->i_channels & AOUT_CHAN_LFE )
-        return i_nb + 1;
-    else
-        return i_nb;
+    return i_nb;
 }
 
 /*****************************************************************************
@@ -168,34 +151,76 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
 }
 
 /*****************************************************************************
- * FormatPrintChannels : print a channel in a human-readable form
+ * aout_FormatPrintChannels : print a channel in a human-readable form
  *****************************************************************************/
-static const char * FormatPrintChannels( int i_channels )
+const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
 {
-    switch ( i_channels )
+    switch ( p_format->i_physical_channels & AOUT_CHAN_PHYSMASK )
     {
-    case AOUT_CHAN_CHANNEL: return "CHANNEL";
-    case AOUT_CHAN_CHANNEL1: return "CHANNEL1";
-    case AOUT_CHAN_CHANNEL2: return "CHANNEL2";
-    case AOUT_CHAN_MONO: return "MONO";
-    case AOUT_CHAN_STEREO: return "STEREO";
-    case AOUT_CHAN_3F: return "3F";
-    case AOUT_CHAN_2F1R: return "2F1R";
-    case AOUT_CHAN_3F1R: return "3F1R";
-    case AOUT_CHAN_2F2R: return "2F2R";
-    case AOUT_CHAN_3F2R: return "3F2R";
-    case AOUT_CHAN_DOLBY: return "DOLBY";
-    case AOUT_CHAN_CHANNEL | AOUT_CHAN_LFE: return "CHANNEL|LFE";
-    case AOUT_CHAN_CHANNEL1 | AOUT_CHAN_LFE: return "CHANNEL1|LFE";
-    case AOUT_CHAN_CHANNEL2 | AOUT_CHAN_LFE: return "CHANNEL2|LFE";
-    case AOUT_CHAN_MONO | AOUT_CHAN_LFE: return "MONO|LFE";
-    case AOUT_CHAN_STEREO | AOUT_CHAN_LFE: return "STEREO|LFE";
-    case AOUT_CHAN_3F | AOUT_CHAN_LFE: return "3F|LFE";
-    case AOUT_CHAN_2F1R | AOUT_CHAN_LFE: return "2F1R|LFE";
-    case AOUT_CHAN_3F1R | AOUT_CHAN_LFE: return "3F1R|LFE";
-    case AOUT_CHAN_2F2R | AOUT_CHAN_LFE: return "2F2R|LFE";
-    case AOUT_CHAN_3F2R | AOUT_CHAN_LFE: return "3F2R|LFE";
-    case AOUT_CHAN_DOLBY | AOUT_CHAN_LFE: return "DOLBY|LFE";
+    case AOUT_CHAN_CENTER:
+        if ( (p_format->i_original_channels & AOUT_CHAN_CENTER)
+              || (p_format->i_original_channels
+                   & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
+            return "Mono";
+        else if ( p_format->i_original_channels & AOUT_CHAN_LEFT )
+            return "Left";
+        return "Right";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT:
+        if ( p_format->i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+            return "Dolby";
+        else if ( p_format->i_original_channels & AOUT_CHAN_DUALMONO )
+            return "Dual-mono";
+        else if ( !(p_format->i_original_channels & AOUT_CHAN_RIGHT) )
+            return "Stereo/Left";
+        else if ( !(p_format->i_original_channels & AOUT_CHAN_LEFT) )
+            return "Stereo/Right";
+        return "Stereo";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER:
+        return "3F";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER:
+        return "2F1R";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_REARCENTER:
+        return "3F1R";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT:
+        return "2F2R";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT:
+        return "3F2R";
+
+    case AOUT_CHAN_CENTER | AOUT_CHAN_LFE:
+        if ( (p_format->i_original_channels & AOUT_CHAN_CENTER)
+              || (p_format->i_original_channels
+                   & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
+            return "Mono/LFE";
+        else if ( p_format->i_original_channels & AOUT_CHAN_LEFT )
+            return "Left/LFE";
+        return "Right/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_LFE:
+        if ( p_format->i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+            return "Dolby/LFE";
+        else if ( p_format->i_original_channels & AOUT_CHAN_DUALMONO )
+            return "Dual-mono/LFE";
+        else if ( !(p_format->i_original_channels & AOUT_CHAN_RIGHT) )
+            return "Stereo/Left/LFE";
+        else if ( !(p_format->i_original_channels & AOUT_CHAN_LEFT) )
+            return "Stereo/Right/LFE";
+         return "Stereo/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_LFE:
+        return "3F/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER
+          | AOUT_CHAN_LFE:
+        return "2F1R/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_REARCENTER | AOUT_CHAN_LFE:
+        return "3F1R/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE:
+        return "2F2R/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE:
+        return "3F2R/LFE";
     }
 
     return "ERROR";
@@ -209,7 +234,7 @@ void aout_FormatPrint( aout_instance_t * p_aout, const char * psz_text,
 {
     msg_Dbg( p_aout, "%s format='%4.4s' rate=%d channels=%s", psz_text,
              (char *)&p_format->i_format, p_format->i_rate,
-             FormatPrintChannels( p_format->i_channels ) );
+             aout_FormatPrintChannels( p_format ) );
 }
 
 /*****************************************************************************
@@ -223,8 +248,8 @@ void aout_FormatsPrint( aout_instance_t * p_aout, const char * psz_text,
              psz_text,
              (char *)&p_format1->i_format, (char *)&p_format2->i_format,
              p_format1->i_rate, p_format2->i_rate,
-             FormatPrintChannels( p_format1->i_channels ),
-             FormatPrintChannels( p_format2->i_channels ) );
+             aout_FormatPrintChannels( p_format1 ),
+             aout_FormatPrintChannels( p_format2 ) );
 }
 
 

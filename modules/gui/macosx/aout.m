@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.13 2002/10/21 20:00:09 massiot Exp $
+ * $Id: aout.m,v 1.14 2002/11/14 22:38:48 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -82,7 +82,6 @@ int E_(OpenAudio)( vlc_object_t * p_this )
     UInt32 i_param_size;
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
-    msg_Dbg(p_aout, "************************* ENTER OpenAudio ****************************");
     
     /* Allocate instance */
     p_sys = p_aout->output.p_sys = malloc( sizeof( struct aout_sys_t ) );

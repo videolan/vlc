@@ -2,7 +2,7 @@
  * vorbis.c: vorbis decoder module making use of libvorbis.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.4 2002/11/03 13:22:44 gbazin Exp $
+ * $Id: vorbis.c,v 1.5 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -73,6 +73,16 @@ typedef struct dec_thread_t
     audio_date_t            end_date;
 
 } dec_thread_t;
+
+static int pi_channels_maps[6] =
+{
+    0,
+    AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+};
 
 /*****************************************************************************
  * Local prototypes
@@ -174,7 +184,7 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
     vorbis_block_init( &p_dec->vd, &p_dec->vb );
 
     p_dec->output_format.i_format = VLC_FOURCC('f','l','3','2');
-    p_dec->output_format.i_channels = p_dec->vi.channels;
+    p_dec->output_format.i_channels = pi_channels_maps[p_dec->vi.channels];
     p_dec->output_format.i_rate = p_dec->vi.rate;
 
     aout_DateInit( &p_dec->end_date, p_dec->vi.rate );
@@ -311,16 +321,16 @@ static int GetOggPacket( dec_thread_t *p_dec, ogg_packet *p_oggpacket,
 /*****************************************************************************
  * Interleave: helper function to interleave channels
  *****************************************************************************/
-static void Interleave( float *p_out, const float **pp_in, int i_channels,
+static void Interleave( float *p_out, const float **pp_in, int i_nb_channels,
                         int i_samples )
 {
     int i, j;
 
     for ( j = 0; j < i_samples; j++ )
     {
-        for ( i = 0; i < i_channels; i++ )
+        for ( i = 0; i < i_nb_channels; i++ )
         {
-            p_out[j * i_channels + i] = pp_in[i][j];
+            p_out[j * i_nb_channels + i] = pp_in[i][j];
         }
     }
 }

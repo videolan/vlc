@@ -2,7 +2,7 @@
  * ugly.c : ugly resampler (changes pitch)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: ugly.c,v 1.5 2002/11/11 22:27:01 gbazin Exp $
+ * $Id: ugly.c,v 1.6 2002/11/14 22:38:46 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -58,7 +58,10 @@ static int Create( vlc_object_t *p_this )
 
     if ( p_filter->input.i_rate == p_filter->output.i_rate
           || p_filter->input.i_format != p_filter->output.i_format
-          || p_filter->input.i_channels != p_filter->output.i_channels
+          || p_filter->input.i_physical_channels
+              != p_filter->output.i_physical_channels
+          || p_filter->input.i_original_channels
+              != p_filter->output.i_original_channels
           || (p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
                && p_filter->input.i_format != VLC_FOURCC('f','i','3','2')) )
     {

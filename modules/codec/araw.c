@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.6 2002/11/08 14:23:49 gbazin Exp $
+ * $Id: araw.c,v 1.7 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -85,12 +85,15 @@ vlc_module_begin();
 vlc_module_end();
 
 
-static int i_channels_maps[6] =
+static int pi_channels_maps[6] =
 {
     0,
-    AOUT_CHAN_MONO,     AOUT_CHAN_STEREO,
-    AOUT_CHAN_3F,       AOUT_CHAN_2F2R,
-    AOUT_CHAN_3F2R
+    AOUT_CHAN_CENTER,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT 
 };
 
 /*****************************************************************************
@@ -249,8 +252,9 @@ static int InitThread( adec_thread_t * p_adec )
         return( -1 );
     }
 
-    p_adec->output_format.i_channels = 
-            i_channels_maps[p_adec->format.i_channels];
+    p_adec->output_format.i_physical_channels = 
+            p_adec->output_format.i_original_channels =
+            pi_channels_maps[p_adec->format.i_channels];
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
 

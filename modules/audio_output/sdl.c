@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.14 2002/10/16 23:12:45 massiot Exp $
+ * $Id: sdl.c,v 1.15 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -59,7 +59,7 @@ struct aout_sys_t
 static int  Open        ( vlc_object_t * );
 static void Close       ( vlc_object_t * );
 static void Play        ( aout_instance_t * );
-static void SDLCallback ( void *, Uint8 *, int );
+static void SDLCallback ( void *, byte_t *, int );
 
 /*****************************************************************************
  * Module descriptor
@@ -104,12 +104,31 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    if ( var_Type( p_aout, "audio-device" ) ==
+             (VLC_VAR_STRING | VLC_VAR_ISLIST) )
+    {
+        /* The user has selected an audio device. */
+        vlc_value_t val;
+        var_Get( p_aout, "audio-device", &val );
+        if ( !strcmp( val.psz_string, N_("Stereo") ) )
+        {
+            p_aout->output.output.i_physical_channels
+                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        }
+        else if ( !strcmp( val.psz_string, N_("Mono") ) )
+        {
+            p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+        }
+        free( val.psz_string );
+    }
+
     i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
     if ( i_nb_channels > 2 )
     {
         /* SDL doesn't support more than two channels. */
         i_nb_channels = 2;
-        p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
+        p_aout->output.output.i_physical_channels
+            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
     }
     desired.freq       = p_aout->output.output.i_rate;
     desired.format     = AUDIO_S16SYS;
@@ -147,10 +166,44 @@ static int Open ( vlc_object_t *p_this )
 
     if ( obtained.channels != i_nb_channels )
     {
-        p_aout->output.output.i_channels = (obtained.channels == 2 ?
-                                            AOUT_CHAN_STEREO :
-                                            AOUT_CHAN_MONO);
+        p_aout->output.output.i_physical_channels = (obtained.channels == 2 ?
+                                            AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT :
+                                            AOUT_CHAN_CENTER);
+
+        if ( var_Type( p_aout, "audio-device" ) < 0 )
+        {
+            vlc_value_t val;
+            var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_ISLIST );
+            val.psz_string = (obtained.channels == 2) ? N_("Stereo") :
+                              N_("Mono");
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+            var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
+                             NULL );
+        }
     }
+    else if ( var_Type( p_aout, "audio-device" ) < 0 )
+    {
+        /* First launch. */
+        vlc_value_t val;
+        var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_ISLIST );
+        val.psz_string = N_("Stereo");
+        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+        val.psz_string = N_("Mono");
+        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+        if ( i_nb_channels == 2 )
+        {
+            val.psz_string = N_("Stereo");
+        }
+        else
+        {
+            val.psz_string = N_("Mono");
+        }
+        var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val );
+
+        var_AddCallback( p_aout, "audio-device", aout_ChannelsRestart,
+                         NULL );
+    }
+
     p_aout->output.output.i_rate = obtained.freq;
     p_aout->output.i_nb_samples = obtained.samples;
     p_aout->output.pf_play = Play;

@@ -3,7 +3,7 @@
  *
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: decoder.h,v 1.4 2002/10/27 18:06:33 fenrir Exp $
+ * $Id: decoder.h,v 1.5 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -27,7 +27,7 @@
 typedef struct waveformatex_s
 {
     u16 i_formattag;
-    u16 i_channels;
+    u16 i_nb_channels;
     u32 i_samplespersec;
     u32 i_avgbytespersec;
     u16 i_blockalign;
@@ -69,14 +69,4 @@ typedef struct adec_thread_s
     mtime_t             pts;
 
 } adec_thread_t;
-
-
-static int i_channels_maps[6] = 
-{
-    0,
-    AOUT_CHAN_MONO,     AOUT_CHAN_STEREO,
-    AOUT_CHAN_3F,       AOUT_CHAN_2F2R,
-    AOUT_CHAN_3F2R
-};
-
 

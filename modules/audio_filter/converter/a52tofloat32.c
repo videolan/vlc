@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52tofloat32.c,v 1.5 2002/10/22 23:08:00 massiot Exp $
+ * $Id: a52tofloat32.c,v 1.6 2002/11/14 22:38:46 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -119,25 +119,78 @@ static int Create( vlc_object_t * _p_filter )
 
     /* We'll do our own downmixing, thanks. */
     p_sys->i_nb_channels = aout_FormatNbChannels( &p_filter->output );
-    switch ( p_filter->output.i_channels & AOUT_CHAN_MASK )
+    switch ( (p_filter->output.i_physical_channels & AOUT_CHAN_PHYSMASK)
+              & ~AOUT_CHAN_LFE )
     {
-    case AOUT_CHAN_CHANNEL: p_sys->i_flags = A52_CHANNEL; break;
-    case AOUT_CHAN_CHANNEL1: p_sys->i_flags = A52_CHANNEL1; break;
-    case AOUT_CHAN_CHANNEL2: p_sys->i_flags = A52_CHANNEL2; break;
-    case AOUT_CHAN_MONO: p_sys->i_flags = A52_MONO; break;
-    case AOUT_CHAN_STEREO: p_sys->i_flags = A52_STEREO; break;
-    case AOUT_CHAN_DOLBY: p_sys->i_flags = A52_DOLBY; break;
-    case AOUT_CHAN_3F: p_sys->i_flags = A52_3F; break;
-    case AOUT_CHAN_2F1R: p_sys->i_flags = A52_2F1R; break;
-    case AOUT_CHAN_3F1R: p_sys->i_flags = A52_3F1R; break;
-    case AOUT_CHAN_2F2R: p_sys->i_flags = A52_2F2R; break;
-    case AOUT_CHAN_3F2R: p_sys->i_flags = A52_3F2R; break;
+    case AOUT_CHAN_CENTER:
+        if ( (p_filter->output.i_original_channels & AOUT_CHAN_CENTER)
+              || (p_filter->output.i_original_channels
+                   & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
+        {
+            p_sys->i_flags = A52_MONO;
+        }
+        else if ( p_filter->output.i_original_channels & AOUT_CHAN_LEFT )
+        {
+            p_sys->i_flags = A52_CHANNEL1;
+        }
+        else
+        {
+            p_sys->i_flags = A52_CHANNEL2;
+        }
+        break;
+
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT:
+        if ( p_filter->output.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+        {
+            p_sys->i_flags = A52_DOLBY;
+        }
+        else if ( p_filter->input.i_original_channels & AOUT_CHAN_DUALMONO )
+        {
+            p_sys->i_flags = A52_CHANNEL;
+        }
+        else if ( !(p_filter->output.i_original_channels & AOUT_CHAN_RIGHT) )
+        {
+            p_sys->i_flags = A52_CHANNEL1;
+        }
+        else if ( !(p_filter->output.i_original_channels & AOUT_CHAN_LEFT) )
+        {
+            p_sys->i_flags = A52_CHANNEL2;
+        }
+        else
+        {
+            p_sys->i_flags = A52_STEREO;
+        }
+        break;
+
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER:
+        p_sys->i_flags = A52_3F;
+        break;
+
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER:
+        p_sys->i_flags = A52_2F1R;
+        break;
+
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_REARCENTER:
+        p_sys->i_flags = A52_3F1R;
+        break;
+
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT:
+        p_sys->i_flags = A52_2F2R;
+        break;
+
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT:
+        p_sys->i_flags = A52_3F2R;
+        break;
+
     default:
         msg_Err( p_filter, "unknow sample format !" );
         free( p_sys );
         return -1;
     }
-    if ( p_filter->output.i_channels & AOUT_CHAN_LFE )
+    if ( p_filter->output.i_physical_channels & AOUT_CHAN_LFE )
     {
         p_sys->i_flags |= A52_LFE;
     }
@@ -160,16 +213,31 @@ static int Create( vlc_object_t * _p_filter )
 /*****************************************************************************
  * Interleave: helper function to interleave channels
  *****************************************************************************/
-static void Interleave( float * p_out, const float * p_in, int i_channels )
+static void Interleave( float * p_out, const float * p_in, int i_nb_channels )
 {
     int i, j;
 
-    for ( j = 0; j < i_channels; j++ )
+    for ( j = 0; j < i_nb_channels; j++ )
     {
         for ( i = 0; i < 256; i++ )
         {
-            p_out[i * i_channels + j] = p_in[j * 256 + i];
+            p_out[i * i_nb_channels + j] = p_in[j * 256 + i];
         }
+    }
+}
+
+/*****************************************************************************
+ * Duplicate: helper function to duplicate a unique channel
+ *****************************************************************************/
+static void Duplicate( float * p_out, const float * p_in )
+{
+    int i;
+
+    for ( i = 256; i--; )
+    {
+        *p_out++ = *p_in;
+        *p_out++ = *p_in;
+        p_in++;
     }
 }
 
@@ -221,9 +289,20 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
         p_samples = a52_samples( p_sys->p_liba52 );
 
-        /* Interleave the *$£%ù samples. */
-        Interleave( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
-                    p_samples, p_sys->i_nb_channels );
+        if ( ((p_sys->i_flags & A52_CHANNEL1) || (p_sys->i_flags & A52_CHANNEL2)
+               || (p_sys->i_flags & A52_MONO))
+              && (p_filter->output.i_physical_channels 
+                   & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
+        {
+            Duplicate( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
+                       p_samples );
+        }
+        else
+        {
+            /* Interleave the *$£%ù samples. */
+            Interleave( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
+                        p_samples, p_sys->i_nb_channels );
+        }
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;

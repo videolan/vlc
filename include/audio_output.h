@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.70 2002/11/11 14:39:11 sam Exp $
+ * $Id: audio_output.h,v 1.71 2002/11/14 22:38:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,12 +28,17 @@
  *****************************************************************************/
 struct audio_sample_format_t
 {
-    int                 i_format;
-    int                 i_rate;
-    int                 i_channels;
+    vlc_fourcc_t        i_format;
+    unsigned int        i_rate;
+    /* Describes the channels configuration of the samples (ie. number of
+     * channels which are available in the buffer, and positions). */
+    u32                 i_physical_channels;
+    /* Describes from which original channels, before downmixing, the
+     * buffer is derived. */
+    u32                 i_original_channels;
     /* Optional - for A52, SPDIF and DTS types */
-    int                 i_bytes_per_frame;
-    int                 i_frame_length;
+    unsigned int        i_bytes_per_frame;
+    unsigned int        i_frame_length;
     /* Please note that it may be completely arbitrary - buffers are not
      * obliged to contain a integral number of so-called "frames". It's
      * just here for the division :
@@ -43,14 +48,14 @@ struct audio_sample_format_t
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \
     ((p_first)->i_format == (p_second)->i_format)                           \
       && ((p_first)->i_rate == (p_second)->i_rate)                          \
-      && ((p_first)->i_channels == (p_second)->i_channels                   \
-           || (p_first)->i_channels == -1 || (p_second)->i_channels == -1) )
+      && ((p_first)->i_physical_channels == (p_second)->i_physical_channels)\
+      && ((p_first)->i_original_channels == (p_second)->i_original_channels) )
 
 /* Check if i_rate == i_rate and i_channels == i_channels */
 #define AOUT_FMTS_SIMILAR( p_first, p_second ) (                            \
     ((p_first)->i_rate == (p_second)->i_rate)                               \
-      && ((p_first)->i_channels == (p_second)->i_channels                   \
-           || (p_first)->i_channels == -1 || (p_second)->i_channels == -1) )
+      && ((p_first)->i_physical_channels == (p_second)->i_physical_channels)\
+      && ((p_first)->i_original_channels == (p_second)->i_original_channels) )
 
 #ifdef WORDS_BIGENDIAN
 #   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','b')
@@ -92,33 +97,24 @@ typedef int32_t vlc_fixed_t;
 #define FIXED32_ONE ((vlc_fixed_t) 0x10000000)
 
 
-/* Dual mono. Two independant mono channels */
-#define AOUT_CHAN_CHANNEL   0x0000000B
-#define AOUT_CHAN_MONO      0x00000001
-#define AOUT_CHAN_STEREO    0x00000002
-/* 3 front channels (left, center, right) */
-#define AOUT_CHAN_3F        0x00000003
-/* 2 front, 1 rear surround channels (L, R, S) */
-#define AOUT_CHAN_2F1R      0x00000004
-/* 3 front, 1 rear surround channels (L, C, R, S) */
-#define AOUT_CHAN_3F1R      0x00000005
-/* 2 front, 2 rear surround channels (L, R, LS, RS) */
-#define AOUT_CHAN_2F2R      0x00000006
-/* 3 front, 2 rear surround channels (L, C, R, LS, RS) */
-#define AOUT_CHAN_3F2R      0x00000007
-/* First of two mono channels */
-#define AOUT_CHAN_CHANNEL1  0x00000008
-/* Second of two mono channels */
-#define AOUT_CHAN_CHANNEL2  0x00000009
-/* Dolby surround compatible stereo */
-#define AOUT_CHAN_DOLBY     0x0000000A
+/*
+ * Channels descriptions
+ */
 
-#define AOUT_CHAN_MASK      0x0000000F
+/* Values available for physical and original channels */
+#define AOUT_CHAN_CENTER            0x1
+#define AOUT_CHAN_LEFT              0x2
+#define AOUT_CHAN_RIGHT             0x4
+#define AOUT_CHAN_REARCENTER        0x10
+#define AOUT_CHAN_REARLEFT          0x20
+#define AOUT_CHAN_REARRIGHT         0x40
+#define AOUT_CHAN_LFE               0x100
 
-/* Low frequency effects channel. Normally used to connect a subwoofer.
- * Can be combined with any of the above channels. For example :
- * AOUT_CHAN_3F2R | AOUT_CHAN_LFE -> 3 front, 2 rear, 1 LFE (5.1) */
-#define AOUT_CHAN_LFE       0x00000010
+/* Values available for original channels only */
+#define AOUT_CHAN_DOLBYSTEREO       0x10000
+#define AOUT_CHAN_DUALMONO          0x20000
+
+#define AOUT_CHAN_PHYSMASK          0xFFFF
 
 
 /*****************************************************************************
@@ -139,6 +135,9 @@ struct aout_buffer_t
 
 /* Size of a frame for S/PDIF output. */
 #define AOUT_SPDIF_SIZE 6144
+
+/* Number of samples in an A/52 frame. */
+#define A52_FRAME_NB 1536 
 
 /*****************************************************************************
  * audio_date_t : date incrementation without long-term rounding errors
@@ -179,4 +178,5 @@ VLC_EXPORT( int, aout_VolumeUp, ( aout_instance_t *, int, audio_volume_t * ) );
 VLC_EXPORT( int, aout_VolumeDown, ( aout_instance_t *, int, audio_volume_t * ) );
 VLC_EXPORT( int, aout_Restart, ( aout_instance_t * p_aout ) );
 VLC_EXPORT( void, aout_FindAndRestart, ( vlc_object_t * p_this ) );
+VLC_EXPORT( int, aout_ChannelsRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 

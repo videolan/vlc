@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.2 2002/10/29 10:22:32 gbazin Exp $
+ * $Id: audio.c,v 1.3 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -57,12 +57,14 @@ int      E_( InitThread_Audio )   ( adec_thread_t * );
 void     E_( EndThread_Audio )    ( adec_thread_t * );
 void     E_( DecodeThread_Audio ) ( adec_thread_t * );
 
-static int i_channels_maps[6] =
+static int pi_channels_maps[6] =
 {
     0,
-    AOUT_CHAN_MONO,     AOUT_CHAN_STEREO,
-    AOUT_CHAN_3F,       AOUT_CHAN_2F2R,
-    AOUT_CHAN_3F2R
+    AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
 };  
 
 /*****************************************************************************
@@ -73,7 +75,7 @@ static void ffmpeg_GetWaveFormatEx( waveformatex_t *p_wh,
                                     u8 *p_data )
 {
     p_wh->i_formattag     = GetWLE( p_data );
-    p_wh->i_channels      = GetWLE( p_data + 2 );
+    p_wh->i_nb_channels   = GetWLE( p_data + 2 );
     p_wh->i_samplespersec = GetDWLE( p_data + 4 );
     p_wh->i_avgbytespersec= GetDWLE( p_data + 8 );
     p_wh->i_blockalign    = GetWLE( p_data + 12 );
@@ -121,7 +123,7 @@ int E_( InitThread_Audio )( adec_thread_t *p_adec )
 
     /* ***** Fill p_context with init values ***** */
     p_adec->p_context->sample_rate = p_adec->format.i_samplespersec;
-    p_adec->p_context->channels = p_adec->format.i_channels;
+    p_adec->p_context->channels = p_adec->format.i_nb_channels;
 #if LIBAVCODEC_BUILD >= 4618
     p_adec->p_context->block_align = p_adec->format.i_blockalign;
 #endif
@@ -157,7 +159,9 @@ int E_( InitThread_Audio )( adec_thread_t *p_adec )
 
     p_adec->output_format.i_format = AOUT_FMT_S16_NE;
     p_adec->output_format.i_rate = p_adec->format.i_samplespersec;
-    p_adec->output_format.i_channels = p_adec->format.i_channels;
+    p_adec->output_format.i_physical_channels
+        = p_adec->output_format.i_original_channels
+        = p_adec->format.i_nb_channels;
     
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
@@ -234,21 +238,23 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
     }
 
     /* **** Now we can output these samples **** */
-    i_samplesperchannel = i_output_size / 2 /  p_adec->output_format.i_channels;
+    i_samplesperchannel = i_output_size / 2
+                           / aout_FormatNbChannels( &p_adec->output_format );
     /* **** First check if we have a valid output **** */
-    if( ( !p_adec->p_aout_input )||
-        ( p_adec->output_format.i_channels != 
-                    p_adec->p_context->channels ) )
+    if( ( p_adec->p_aout_input == NULL )||
+        ( p_adec->output_format.i_original_channels != 
+                    pi_channels_maps[p_adec->p_context->channels] ) )
     {
-        if( p_adec->p_aout_input )
+        if( p_adec->p_aout_input != NULL )
         {
             /* **** Delete the old **** */
             aout_DecDelete( p_adec->p_aout, p_adec->p_aout_input );
         }
 
         /* **** Create a new audio output **** */
-        p_adec->output_format.i_channels = 
-                i_channels_maps[p_adec->p_context->channels];
+        p_adec->output_format.i_physical_channels = 
+            p_adec->output_format.i_original_channels = 
+                pi_channels_maps[p_adec->p_context->channels];
 
         aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
         p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,

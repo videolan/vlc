@@ -2,7 +2,7 @@
  * intf.c : audio output API towards the interface modules
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.7 2002/11/14 14:08:01 gbazin Exp $
+ * $Id: intf.c,v 1.8 2002/11/14 22:38:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -103,7 +103,7 @@ int aout_VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 }
 
 /*****************************************************************************
- * aout_VolumeInfos : get the boundaries pi_low_soft and pi_high_soft
+ * aout_VolumeInfos : get the boundary pi_soft
  *****************************************************************************/
 int aout_VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
 {
@@ -323,6 +323,7 @@ int aout_Restart( aout_instance_t * p_aout )
 
     /* Re-open the output plug-in. */
     aout_OutputDelete( p_aout );
+
     if ( aout_OutputNew( p_aout, &p_aout->pp_inputs[0]->input ) == -1 )
     {
         /* Release all locks and report the error. */
@@ -361,6 +362,10 @@ int aout_Restart( aout_instance_t * p_aout )
 
 /*****************************************************************************
  * aout_FindAndRestart : find the audio output instance and restart
+ *****************************************************************************
+ * This is used for callbacks of the configuration variables, and we believe
+ * that when those are changed, it is a significant change which implies
+ * rebuilding the audio-device and audio-channels variables.
  *****************************************************************************/
 void aout_FindAndRestart( vlc_object_t * p_this )
 {
@@ -369,6 +374,37 @@ void aout_FindAndRestart( vlc_object_t * p_this )
 
     if ( p_aout == NULL ) return;
 
+    if ( var_Type( p_aout, "audio-device" ) >= 0 )
+    {
+        var_Destroy( p_aout, "audio-device" );
+    }
+    if ( var_Type( p_aout, "audio-channels" ) >= 0 )
+    {
+        var_Destroy( p_aout, "audio-channels" );
+    }
+
     aout_Restart( p_aout );
     vlc_object_release( p_aout );
+}
+
+/*****************************************************************************
+ * aout_ChannelsRestart : change the audio device or channels and restart
+ *****************************************************************************/
+int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
+                          vlc_value_t old_value, vlc_value_t new_value,
+                          void * unused )
+{
+    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+
+    if ( !strcmp( psz_variable, "audio-device" ) )
+    {
+        /* This is supposed to be a significant change and supposes
+         * rebuilding the channel choices. */
+        if ( var_Type( p_aout, "audio-channels" ) >= 0 )
+        {
+            var_Destroy( p_aout, "audio-channels" );
+        }
+    }
+    aout_Restart( p_aout );
+    return 0;
 }

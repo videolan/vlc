@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.11 2002/11/10 02:47:27 fenrir Exp $
+ * $Id: decoder.c,v 1.12 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *      
@@ -120,8 +120,17 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     return( 0 );
 }
 
+static int pi_channels_maps[6] =
+{
+    0,
+    AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_CENTER | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+};
 
-#define FREE( p ) if( p ) free( p ); p = NULL
+#define FREE( p ) if( p != NULL ) free( p ); p = NULL
 #define GetWLE( p ) \
     ( *(u8*)(p) + ( *((u8*)(p)+1) << 8 ) )
 
@@ -134,7 +143,7 @@ static void faac_GetWaveFormatEx( waveformatex_t *p_wh,
 {
 
     p_wh->i_formattag     = GetWLE( p_data );
-    p_wh->i_channels      = GetWLE( p_data + 2 );
+    p_wh->i_nb_channels   = GetWLE( p_data + 2 );
     p_wh->i_samplespersec = GetDWLE( p_data + 4 );
     p_wh->i_avgbytespersec= GetDWLE( p_data + 8 );
     p_wh->i_blockalign    = GetWLE( p_data + 12 );
@@ -188,7 +197,7 @@ static int InitThread( adec_thread_t * p_adec )
 {
     int i_status;
     unsigned long i_rate;
-    unsigned char i_channels;
+    unsigned char i_nb_channels;
             
     faacDecConfiguration *p_faad_config;
 
@@ -215,7 +224,7 @@ static int InitThread( adec_thread_t * p_adec )
         return( -1 );
     }
     
-    if( !p_adec->format.p_data )
+    if( p_adec->format.p_data == NULL )
     {
         int i_frame_size;
         pes_packet_t *p_pes;
@@ -254,7 +263,7 @@ static int InitThread( adec_thread_t * p_adec )
                                 p_adec->p_buffer,
                                 i_frame_size,
                                 &i_rate,
-                                &i_channels );
+                                &i_nb_channels );
     }
     else
     {
@@ -262,7 +271,7 @@ static int InitThread( adec_thread_t * p_adec )
                                  p_adec->format.p_data,
                                  p_adec->format.i_size,
                                  &i_rate,
-                                 &i_channels );
+                                 &i_nb_channels );
     }
 
     if( i_status < 0 )
@@ -275,7 +284,7 @@ static int InitThread( adec_thread_t * p_adec )
     msg_Dbg( p_adec->p_fifo,
              "faad intitialized, samplerate:%dHz channels:%d",
              i_rate, 
-             i_channels );
+             i_nb_channels );
 
 
     /* set default configuration */
@@ -287,7 +296,7 @@ static int InitThread( adec_thread_t * p_adec )
     /* Initialize the thread properties */
     p_adec->output_format.i_format = VLC_FOURCC('f','l','3','2');
     p_adec->output_format.i_rate = i_rate;
-    p_adec->output_format.i_channels = i_channels;
+    p_adec->output_format.i_channels = pi_channels_maps[i_nb_channels];
     p_adec->p_aout = NULL;
     p_adec->p_aout_input = NULL;
 
@@ -380,7 +389,8 @@ static void DecodeThread( adec_thread_t *p_adec )
     
     /* **** First check if we have a valid output **** */
     if( ( !p_adec->p_aout_input )||
-        ( p_adec->output_format.i_channels != faad_frame.channels ) )
+        ( p_adec->output_format.i_channels !=
+             pi_channels_maps[faad_frame.channels] ) )
     {
         if( p_adec->p_aout_input )
         {
@@ -390,7 +400,7 @@ static void DecodeThread( adec_thread_t *p_adec )
 
         /* **** Create a new audio output **** */
         p_adec->output_format.i_channels = 
-                i_channels_maps[faad_frame.channels];
+                pi_channels_maps[faad_frame.channels];
         aout_DateInit( &p_adec->date, p_adec->output_format.i_rate );
         p_adec->p_aout_input = aout_DecNew( p_adec->p_fifo,
                                             &p_adec->p_aout,

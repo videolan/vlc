@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.9 2002/10/14 16:46:55 sam Exp $
+ * $Id: rc.c,v 1.10 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -60,6 +60,9 @@ static void Run          ( intf_thread_t *p_intf );
 static int  Playlist     ( vlc_object_t *, char *, char * );
 static int  Quit         ( vlc_object_t *, char *, char * );
 static int  Intf         ( vlc_object_t *, char *, char * );
+static int  Volume       ( vlc_object_t *, char *, char * );
+static int  VolumeMove   ( vlc_object_t *, char *, char * );
+static int  AudioConfig  ( vlc_object_t *, char *, char * );
 
 /*****************************************************************************
  * Module descriptor
@@ -149,6 +152,17 @@ static void Run( intf_thread_t *p_intf )
     var_Set( p_intf, "prev", (vlc_value_t)(void*)Playlist );
     var_Create( p_intf, "next", VLC_VAR_COMMAND );
     var_Set( p_intf, "next", (vlc_value_t)(void*)Playlist );
+
+    var_Create( p_intf, "volume", VLC_VAR_COMMAND );
+    var_Set( p_intf, "volume", (vlc_value_t)(void*)Volume );
+    var_Create( p_intf, "volup", VLC_VAR_COMMAND );
+    var_Set( p_intf, "volup", (vlc_value_t)(void*)VolumeMove );
+    var_Create( p_intf, "voldown", VLC_VAR_COMMAND );
+    var_Set( p_intf, "voldown", (vlc_value_t)(void*)VolumeMove );
+    var_Create( p_intf, "adev", VLC_VAR_COMMAND );
+    var_Set( p_intf, "adev", (vlc_value_t)(void*)AudioConfig );
+    var_Create( p_intf, "achan", VLC_VAR_COMMAND );
+    var_Set( p_intf, "achan", (vlc_value_t)(void*)AudioConfig );
 
     while( !p_intf->b_die )
     {
@@ -378,6 +392,12 @@ static void Run( intf_thread_t *p_intf )
                 printf("| f  . . . . . . . . . . . . . . toggle fullscreen\n");
                 printf("| info . . .  information about the current stream\n");
                 printf("| \n");
+                printf("| volume [X] . . . . . . . .  set/get audio volume\n");
+                printf("| volup [X]  . . . . .  raise audio volume X steps\n");
+                printf("| voldown [X]  . . . .  lower audio volume X steps\n");
+                printf("| adev [X] . . . . . . . . .  set/get audio device\n");
+                printf("| achan [X]. . . . . . . .  set/get audio channels\n");
+                printf("| \n");
                 printf("| help . . . . . . . . . . . . . this help message\n");
                 printf("| quit . . . . . . . . . . . . . . . . .  quit vlc\n");
                 printf("| \n");
@@ -495,4 +515,145 @@ static int Signal( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
     return VLC_SUCCESS;
 }
 
+static int Volume( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
+{
+    aout_instance_t * p_aout;
+    int i_error;
+    p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    if ( p_aout == NULL ) return VLC_ENOOBJ;
+
+    if ( *psz_arg )
+    {
+        /* Set. */
+        audio_volume_t i_volume = atoi( psz_arg );
+        if ( i_volume > AOUT_VOLUME_MAX )
+        {
+            printf( "Volume must be in the range %d-%d\n", AOUT_VOLUME_MIN,
+                    AOUT_VOLUME_MAX );
+            i_error = VLC_EBADVAR;
+        }
+        else i_error = aout_VolumeSet( p_aout, i_volume );
+    }
+    else
+    {
+        /* Get. */
+        audio_volume_t i_volume;
+        if ( aout_VolumeGet( p_aout, &i_volume ) < 0 )
+        {
+            i_error = VLC_EGENERIC;
+        }
+        else
+        {
+            printf( "Volume is %d\n", i_volume );
+            i_error = VLC_SUCCESS;
+        }
+    }
+    vlc_object_release( (vlc_object_t *)p_aout );
+
+    return i_error;
+}
+
+static int VolumeMove( vlc_object_t * p_this, char * psz_cmd, char * psz_arg )
+{
+    aout_instance_t * p_aout;
+    audio_volume_t i_volume;
+    int i_nb_steps = atoi(psz_arg);
+    int i_error = VLC_SUCCESS;
+
+    if ( i_nb_steps <= 0 || i_nb_steps > (AOUT_VOLUME_MAX/AOUT_VOLUME_STEP) )
+    {
+        i_nb_steps = 1;
+    }
+
+    p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    if ( p_aout == NULL ) return VLC_ENOOBJ;
+
+    if ( !strcmp(psz_cmd, "volup") )
+    {
+        if ( aout_VolumeUp( p_aout, i_nb_steps, &i_volume ) < 0 )
+            i_error = VLC_EGENERIC;
+    }
+    else
+    {
+        if ( aout_VolumeDown( p_aout, i_nb_steps, &i_volume ) < 0 )
+            i_error = VLC_EGENERIC;
+    }
+    vlc_object_release( (vlc_object_t *)p_aout );
+
+    if ( !i_error ) printf( "Volume is %d\n", i_volume );
+    return i_error;
+}
+
+static int AudioConfig( vlc_object_t * p_this, char * psz_cmd, char * psz_arg )
+{
+    aout_instance_t * p_aout;
+    const char * psz_variable;
+    const char * psz_name;
+    int i_error;
+
+    p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    if ( p_aout == NULL ) return VLC_ENOOBJ;
+
+    if ( !strcmp( psz_cmd, "adev" ) )
+    {
+        psz_variable = "audio-device";
+        psz_name = "audio devices";
+    }
+    else
+    {
+        psz_variable = "audio-channels";
+        psz_name = "audio channels";
+    }
+
+    if ( !*psz_arg )
+    {
+        /* Retrieve all registered ***. */
+        vlc_value_t val;
+        int i, i_vals;
+        vlc_value_t * p_vals;
+        char * psz_value;
+
+        if ( var_Get( (vlc_object_t *)p_aout, psz_variable, &val ) < 0 )
+        {
+            vlc_object_release( (vlc_object_t *)p_aout );
+            return VLC_EGENERIC;
+        }
+        psz_value = val.psz_string;
+
+        if ( var_Change( (vlc_object_t *)p_aout, psz_variable,
+                         VLC_VAR_GETLIST, &val ) < 0 )
+        {
+            free( psz_value );
+            vlc_object_release( (vlc_object_t *)p_aout );
+            return VLC_EGENERIC;
+        }
+
+        printf( "+----[ %s ]\n", psz_name );
+        i_vals = ((vlc_value_t *)val.p_address)[0].i_int;
+        p_vals = &((vlc_value_t *)val.p_address)[1]; /* Starts at index 1 */
+        for ( i = 0; i < i_vals; i++ )
+        {
+            if ( !strcmp( psz_value, p_vals[i].psz_string ) )
+                printf( "| %s *\n", p_vals[i].psz_string );
+            else
+                printf( "| %s\n", p_vals[i].psz_string );
+        }
+        var_Change( (vlc_object_t *)p_aout, psz_variable, VLC_VAR_FREELIST,
+                    &val );
+        printf( "+----[ end of %s ]\n", psz_name );
+
+        free( psz_value );
+        i_error = VLC_SUCCESS;
+    }
+    else
+    {
+        vlc_value_t val;
+        val.psz_string = psz_arg;
+
+        i_error = var_Set( (vlc_object_t *)p_aout, psz_variable, val );
+    }
+    vlc_object_release( (vlc_object_t *)p_aout );
+
+    return i_error;
+}
 

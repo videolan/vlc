@@ -2,7 +2,7 @@
  * float32.c : precise float32 audio mixer implementation
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32.c,v 1.6 2002/10/15 23:10:54 massiot Exp $
+ * $Id: float32.c,v 1.7 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -49,7 +49,7 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
- * Create: allocate trivial mixer
+ * Create: allocate mixer
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {

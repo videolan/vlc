@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.32 2002/10/25 15:21:42 gbazin Exp $
+ * $Id: oss.c,v 1.33 2002/11/14 22:38:47 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -70,7 +70,6 @@ struct aout_sys_t
 /* This must be a power of 2. */
 #define FRAME_SIZE 1024
 #define FRAME_COUNT 4
-#define A52_FRAME_NB 1536
 
 /*****************************************************************************
  * Local prototypes
@@ -104,6 +103,111 @@ vlc_module_begin();
 vlc_module_end();
 
 /*****************************************************************************
+ * Probe: probe the audio device for available formats and channels
+ *****************************************************************************/
+static void Probe( aout_instance_t * p_aout )
+{
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    vlc_value_t val;
+    int i_format, i_nb_channels;
+
+    var_Create( p_aout, "audio-device", VLC_VAR_STRING | VLC_VAR_ISLIST );
+
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
+    {
+        msg_Err( p_aout, "cannot reset OSS audio device" );
+        var_Destroy( p_aout, "audio-device" );
+        return;
+    }
+
+    if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
+    {
+        i_format = AFMT_AC3;
+
+        if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) >= 0
+             && i_format == AFMT_AC3 )
+        {
+            val.psz_string = N_("S/PDIF");
+            var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+        }
+    }
+
+    /* Go to PCM mode. */
+    i_format = AFMT_S16_NE;
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 ||
+        ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
+    {
+        return;
+    }
+
+#ifdef SNDCTL_DSP_GETCHANNELMASK
+    if ( aout_FormatNbChannels( &p_aout->output.output ) > 2 )
+    {
+        /* Check that the device supports this. */
+
+        int i_chanmask;
+        if ( ioctl( p_sys->i_fd, SNDCTL_DSP_GETCHANNELMASK,
+                    &i_chanmask ) == 0 )
+        {
+            if ( !(i_chanmask & DSP_BIND_FRONT) )
+            {
+                msg_Err( p_aout, "No front channels ! (%x)",
+                         i_chanmask );
+                return;
+            }
+
+            if ( (i_chanmask & (DSP_BIND_SURR | DSP_BIND_CENTER_LFE))
+                  && (p_aout->output.output.i_physical_channels ==
+                       (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+                         | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                         | AOUT_CHAN_LFE)) )
+            {
+                val.psz_string = N_("5.1");
+                var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+            }
+
+            if ( (i_chanmask & DSP_BIND_SURR)
+                  && (p_aout->output.output.i_physical_channels &
+                       (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                         | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT)) )
+            {
+                val.psz_string = N_("2 Front 2 Rear");
+                var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+            }
+        }
+    }
+#endif
+
+    /* Test for stereo. */
+    i_nb_channels = 2;
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_CHANNELS, &i_nb_channels ) >= 0
+         && i_nb_channels == 2 )
+    {
+        val.psz_string = N_("Stereo");
+        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );
+    }
+
+    /* Reset all. */
+    i_format = AFMT_S16_NE;
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 ||
+        ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0 )
+    {
+        msg_Err( p_aout, "cannot reset OSS audio device" );
+        var_Destroy( p_aout, "audio-device" );
+        return;
+    }
+
+    /* Test for mono. */
+    i_nb_channels = 1;
+    if( ioctl( p_sys->i_fd, SNDCTL_DSP_CHANNELS, &i_nb_channels ) >= 0  
+         && i_nb_channels == 1 )
+    {
+        val.psz_string = N_("Mono");
+        var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val );        
+    }
+}
+
+/*****************************************************************************
  * Open: open the audio device (the digital sound processor)
  *****************************************************************************
  * This function opens the dsp as a usual non-blocking write-only file, and
@@ -114,6 +218,7 @@ static int Open( vlc_object_t *p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
     char * psz_device;
+    vlc_value_t val;
 
     /* Allocate structure */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
@@ -143,6 +248,50 @@ static int Open( vlc_object_t *p_this )
 
     p_aout->output.pf_play = Play;
 
+    if ( var_Type( p_aout, "audio-device" ) < 0 )
+    {
+        Probe( p_aout );
+    }
+
+    if ( var_Get( p_aout, "audio-device", &val ) < 0 )
+    {
+        /* Probe() has failed. */
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
+
+    if ( !strcmp( val.psz_string, N_("S/PDIF") ) )
+    {
+        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+    }
+    else if ( !strcmp( val.psz_string, N_("5.1") ) )
+    {
+        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+        p_aout->output.output.i_physical_channels
+            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT
+               | AOUT_CHAN_LFE;
+    }
+    else if ( !strcmp( val.psz_string, N_("2 Front 2 Rear") ) )
+    {
+        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+        p_aout->output.output.i_physical_channels
+            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARLEFT;
+    }
+    else if ( !strcmp( val.psz_string, "Stereo" ) )
+    {
+        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+        p_aout->output.output.i_physical_channels
+            = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+    }
+    else if ( !strcmp( val.psz_string, "Mono" ) )
+    {
+        p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+        p_aout->output.output.i_physical_channels = AOUT_CHAN_CENTER;
+    }
+    free( val.psz_string );
+
     /* Reset the DSP device */
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_RESET, NULL ) < 0 )
     {
@@ -151,7 +300,7 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    
+
     /* Set the output format */
     if ( AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
     {
@@ -160,17 +309,18 @@ static int Open( vlc_object_t *p_this )
         if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0
              || i_format != AFMT_AC3 )
         {
-            p_aout->output.output.i_format = AOUT_FMT_S16_NE;
+            msg_Err( p_aout, "cannot reset OSS audio device" );
+            close( p_sys->i_fd );
+            free( p_sys );
+            return VLC_EGENERIC;
         }
-        else
-        {
-            p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
-            p_aout->output.i_nb_samples = A52_FRAME_NB;
-            p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
-            p_aout->output.output.i_frame_length = A52_FRAME_NB;
 
-            aout_VolumeNoneInit( p_aout );
-        }
+        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
+        p_aout->output.i_nb_samples = A52_FRAME_NB;
+        p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
+        p_aout->output.output.i_frame_length = A52_FRAME_NB;
+
+        aout_VolumeNoneInit( p_aout );
     }
 
     if ( !AOUT_FMT_NON_LINEAR( &p_aout->output.output ) )
@@ -217,98 +367,17 @@ static int Open( vlc_object_t *p_this )
             return VLC_EGENERIC;
         }
 
-        /* These cases are desperate because of the OSS API and A/52 spec. */
-        switch ( p_aout->output.output.i_channels )
-        {
-            case AOUT_CHAN_3F:
-            case AOUT_CHAN_2F1R:
-            case AOUT_CHAN_3F1R:
-            case AOUT_CHAN_STEREO | AOUT_CHAN_LFE:
-            case AOUT_CHAN_2F1R | AOUT_CHAN_LFE:
-            case AOUT_CHAN_3F1R | AOUT_CHAN_LFE:
-            case AOUT_CHAN_DOLBY | AOUT_CHAN_LFE:
-                p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
-                break;
-            case AOUT_CHAN_CHANNEL | AOUT_CHAN_LFE:
-            case AOUT_CHAN_CHANNEL1 | AOUT_CHAN_LFE:
-            case AOUT_CHAN_CHANNEL2 | AOUT_CHAN_LFE:
-            case AOUT_CHAN_MONO | AOUT_CHAN_LFE:
-            case AOUT_CHAN_2F2R | AOUT_CHAN_LFE:
-                p_aout->output.output.i_channels &= ~AOUT_CHAN_LFE;
-                break;
-            case AOUT_CHAN_3F2R:
-                p_aout->output.output.i_channels = AOUT_CHAN_2F2R;
-                break;
-        }
-        /* In a nutshell, possible types : AOUT_CHAN_STEREO (and al.),
-           AOUT_CHAN_2F2R, AOUT_CHAN_3F1R | AOUT_CHAN_LFE. */
-
         i_nb_channels = aout_FormatNbChannels( &p_aout->output.output );
 
-        if ( i_nb_channels > 2 )
-        {
-            /* Check that the device supports this. */
-
-#ifdef SNDCTL_DSP_GETCHANNELMASK
-            int i_chanmask;
-            if ( ioctl( p_sys->i_fd, SNDCTL_DSP_GETCHANNELMASK,
-                        &i_chanmask ) == 0 )
-            {
-                if ( !(i_chanmask & DSP_BIND_FRONT) )
-                {
-                    msg_Err( p_aout, "No front channels ! (%x)",
-                             i_chanmask );
-                    close( p_sys->i_fd );
-                    free( p_sys );
-                    return VLC_EGENERIC;
-                }
-
-                if ( !(i_chanmask & DSP_BIND_SURR) )
-                {
-                    p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
-                    i_nb_channels = 2;
-                }
- 
-                if ( p_aout->output.output.i_channels ==
-                         (AOUT_CHAN_3F2R | AOUT_CHAN_LFE)
-                      && !(i_chanmask & DSP_BIND_CENTER_LFE) )
-                {
-                    p_aout->output.output.i_channels = AOUT_CHAN_2F2R;
-                    i_nb_channels = 4;
-                }
-            }
-            else
-#endif
-            {
-                /* The driver doesn't support this call, assume it is stereo. */
-                p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
-                i_nb_channels = 2;
-            }
-        }
-
         /* Set the number of channels */
-        if( ioctl( p_sys->i_fd, SNDCTL_DSP_CHANNELS, &i_nb_channels ) < 0 )
+        if( ioctl( p_sys->i_fd, SNDCTL_DSP_CHANNELS, &i_nb_channels ) < 0 ||
+            i_nb_channels != aout_FormatNbChannels( &p_aout->output.output ) )
         {
-            msg_Err( p_aout, "cannot set number of audio channels (%i)",
-                              p_aout->output.output.i_channels );
+            msg_Err( p_aout, "cannot set number of audio channels (%x)",
+                     aout_FormatPrintChannels( &p_aout->output.output) );
             close( p_sys->i_fd );
             free( p_sys );
             return VLC_EGENERIC;
-        }
-
-        if ( i_nb_channels != aout_FormatNbChannels( &p_aout->output.output ) )
-        {
-            switch ( i_nb_channels )
-            {
-            case 1: p_aout->output.output.i_channels = AOUT_CHAN_MONO; break;
-            case 2: p_aout->output.output.i_channels = AOUT_CHAN_STEREO; break;
-            case 4: p_aout->output.output.i_channels = AOUT_CHAN_2F2R; break;
-            default:
-                msg_Err( p_aout, "Unsupported downmixing (%d)", i_nb_channels );
-                close( p_sys->i_fd );
-                free( p_sys );
-                return VLC_EGENERIC;
-            }
         }
 
         /* Set the output rate */
@@ -346,7 +415,7 @@ static int Open( vlc_object_t *p_this )
 
         if( ioctl( p_sys->i_fd, SNDCTL_DSP_GETOSPACE, &audio_buf ) < 0 )
         {
-            msg_Warn( p_aout, "cannot get fragment size" );
+            msg_Err( p_aout, "cannot get fragment size" );
             close( p_sys->i_fd );
             free( p_sys );
             return VLC_EGENERIC;
@@ -370,6 +439,9 @@ static int Open( vlc_object_t *p_this )
         aout_VolumeSoftInit( p_aout );
     }
 
+    p_aout->output.p_sys->b_workaround_buggy_driver =
+        config_GetInt( p_aout, "oss-buggy" );
+
     /* Create OSS thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", OSSThread,
                            VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
@@ -379,9 +451,6 @@ static int Open( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ETHREAD;
     }
-
-    p_aout->output.p_sys->b_workaround_buggy_driver =
-        config_GetInt( p_aout, "oss-buggy" );
 
     return VLC_SUCCESS;
 }

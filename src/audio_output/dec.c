@@ -2,7 +2,7 @@
  * dec.c : audio output API towards decoders
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dec.c,v 1.1 2002/09/26 22:40:25 massiot Exp $
+ * $Id: dec.c,v 1.2 2002/11/14 22:38:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -79,6 +79,15 @@ static aout_input_t * DecNew( aout_instance_t * p_aout,
     if ( p_aout->mixer.b_error )
     {
         int i;
+
+        if ( var_Type( p_aout, "audio-device" ) >= 0 )
+        {
+            var_Destroy( p_aout, "audio-device" );
+        }
+        if ( var_Type( p_aout, "audio-channels" ) >= 0 )
+        {
+            var_Destroy( p_aout, "audio-channels" );
+        }
 
         /* Recreate the output using the new format. */
         if ( aout_OutputNew( p_aout, p_format ) < 0 )

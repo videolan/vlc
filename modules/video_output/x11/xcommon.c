@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.6 2002/10/17 16:48:41 sam Exp $
+ * $Id: xcommon.c,v 1.7 2002/11/14 22:38:48 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -145,7 +145,7 @@ int E_(Activate) ( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    /* Open display, unsing the "display" config variable or the DISPLAY
+    /* Open display, using the "display" config variable or the DISPLAY
      * environment variable */
     psz_display = config_GetPsz( p_vout, MODULE_STRING "-display" );
 

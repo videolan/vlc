@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.23 2002/11/10 14:31:46 gbazin Exp $
+ * $Id: output.c,v 1.24 2002/11/14 22:38:48 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,29 +43,10 @@ int aout_OutputNew( aout_instance_t * p_aout,
     /* Retrieve user defaults. */
     char * psz_name = config_GetPsz( p_aout, "aout" );
     int i_rate = config_GetInt( p_aout, "aout-rate" );
-    int i_channels = config_GetInt( p_aout, "aout-channels" );
 
     memcpy( &p_aout->output.output, p_format, sizeof(audio_sample_format_t) );
-    if ( i_rate != -1 ) p_aout->output.output.i_rate = i_rate;
-    if ( i_channels != -1 ) p_aout->output.output.i_channels = i_channels;
-    if ( AOUT_FMT_NON_LINEAR(&p_aout->output.output) )
-    {
-        p_aout->output.output.i_format = VLC_FOURCC('s','p','d','i');
-    }
-    else
-    {
-        /* Non-S/PDIF mixer only deals with float32 or fixed32. */
-        p_aout->output.output.i_format
-                     = (p_aout->p_libvlc->i_cpu & CPU_CAPABILITY_FPU) ?
-                        VLC_FOURCC('f','l','3','2') :
-                        VLC_FOURCC('f','i','3','2');
-
-        if ( p_aout->output.output.i_channels == AOUT_CHAN_DOLBY )
-        {
-            /* Do not do Dolby surround unless the user requests it. */
-            p_aout->output.output.i_channels = AOUT_CHAN_STEREO;
-        }
-    }
+    if ( i_rate != -1 )
+        p_aout->output.output.i_rate = i_rate;
     aout_FormatPrepare( &p_aout->output.output );
 
     vlc_mutex_lock( &p_aout->output_fifo_lock );
@@ -80,6 +61,80 @@ int aout_OutputNew( aout_instance_t * p_aout,
         vlc_mutex_unlock( &p_aout->output_fifo_lock );
         return -1;
     }
+
+    if ( var_Type( p_aout, "audio-channels" ) ==
+             (VLC_VAR_STRING | VLC_VAR_ISLIST) )
+    {
+        /* The user may have selected a different channels configuration. */
+        vlc_value_t val;
+        var_Get( p_aout, "audio-channels", &val );
+
+        if ( !strcmp( val.psz_string, N_("Both") ) )
+        {
+            p_aout->output.output.i_original_channels =
+                AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
+        }
+        else if ( !strcmp( val.psz_string, N_("Left") ) )
+        {
+            p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
+        }
+        else if ( !strcmp( val.psz_string, N_("Right") ) )
+        {
+            p_aout->output.output.i_original_channels = AOUT_CHAN_RIGHT;
+        }
+        else if ( !strcmp( val.psz_string, N_("Dolby Surround") ) )
+        {
+            p_aout->output.output.i_original_channels
+                = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_DOLBYSTEREO;
+        }
+        free( val.psz_string );
+    }
+    else if ( p_aout->output.output.i_physical_channels == AOUT_CHAN_CENTER )
+    {
+        /* Mono - create the audio-channels variable. */
+        vlc_value_t val;
+        var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_ISLIST );
+        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DUALMONO )
+        {
+            /* Go directly to the left channel. */
+            p_aout->output.output.i_original_channels = AOUT_CHAN_LEFT;
+        }
+        else
+        {
+            val.psz_string = N_("Both");
+            var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        }
+        val.psz_string = N_("Left");
+        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        val.psz_string = N_("Right");
+        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
+                         NULL );
+    }
+    else if ( p_aout->output.output.i_physical_channels == 
+                 (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)
+              && p_aout->output.output.i_original_channels == 
+                 (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
+    {
+        /* Stereo - create the audio-channels variable. */
+        vlc_value_t val;
+        var_Create( p_aout, "audio-channels", VLC_VAR_STRING | VLC_VAR_ISLIST );
+        val.psz_string = N_("Both");
+        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        val.psz_string = N_("Left");
+        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        val.psz_string = N_("Right");
+        var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        if ( p_aout->output.output.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+        {
+            val.psz_string = N_("Dolby Surround");
+            var_Change( p_aout, "audio-channels", VLC_VAR_ADDCHOICE, &val );
+        }
+        p_aout->output.output.i_original_channels &= ~AOUT_CHAN_DOLBYSTEREO;
+        var_AddCallback( p_aout, "audio-channels", aout_ChannelsRestart,
+                         NULL );
+    }
+
     aout_FormatPrepare( &p_aout->output.output );
 
     /* Prepare FIFO. */

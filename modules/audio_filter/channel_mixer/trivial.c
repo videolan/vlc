@@ -2,7 +2,7 @@
  * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.5 2002/10/16 23:12:46 massiot Exp $
+ * $Id: trivial.c,v 1.6 2002/11/14 22:38:46 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -56,7 +56,10 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_channels == p_filter->output.i_channels
+    if ( (p_filter->input.i_physical_channels
+           == p_filter->output.i_physical_channels
+           && p_filter->input.i_original_channels
+               == p_filter->output.i_original_channels)
           || p_filter->input.i_format != p_filter->output.i_format
           || p_filter->input.i_rate != p_filter->output.i_rate
           || (p_filter->input.i_format != VLC_FOURCC('f','l','3','2')
@@ -66,7 +69,8 @@ static int Create( vlc_object_t *p_this )
     }
 
     p_filter->pf_do_work = DoWork;
-    if ( p_filter->input.i_channels > p_filter->output.i_channels )
+    if ( aout_FormatNbChannels( &p_filter->input )
+           > aout_FormatNbChannels( &p_filter->output ) )
     {
         /* Downmixing */
     	p_filter->b_in_place = 1;
@@ -109,11 +113,43 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i_output_nb = aout_FormatNbChannels( &p_filter->output );
     s32 * p_dest = (s32 *)p_out_buf->p_buffer;
     s32 * p_src = (s32 *)p_in_buf->p_buffer;
-    if ( p_filter->output.i_channels == AOUT_CHAN_CHANNEL2 )
-        p_src++;
 
-    SparseCopy( p_dest, p_src, p_in_buf->i_nb_samples, i_output_nb,
-                i_input_nb );
+    if ( p_filter->output.i_original_channels & AOUT_CHAN_DUALMONO )
+    { 
+        int i;
+        /* This is a bit special. */
+        if ( !(p_filter->output.i_original_channels & AOUT_CHAN_LEFT) )
+        {
+            p_src++;
+        }
+        if ( p_filter->output.i_physical_channels == AOUT_CHAN_CENTER )
+        {
+            /* Mono mode */
+            for ( i = p_in_buf->i_nb_samples; i--; )
+            {
+                *p_dest = *p_src;
+                p_dest++;
+                p_src += 2;
+            }
+        }
+        else
+        {
+            /* Fake-stereo mode */
+            for ( i = p_in_buf->i_nb_samples; i--; )
+            {
+                *p_dest = *p_src;
+                p_dest++;
+                *p_dest = *p_src;
+                p_dest++;
+                p_src += 2;
+            }
+        }
+    }
+    else
+    {
+        SparseCopy( p_dest, p_src, p_in_buf->i_nb_samples, i_output_nb,
+                    i_input_nb );
+    }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;

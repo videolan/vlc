@@ -1755,7 +1755,7 @@ if test "x${enable_oss}" != "xno" &&
   (test "x${SYS}" != "xmingw32" || test "x${enable_oss}" = "xyes")
 then
   AC_CHECK_HEADERS(soundcard.h sys/soundcard.h machine/soundcard.h, [
-    PLUGINS="${PLUGINS} oss"
+    #PLUGINS="${PLUGINS} oss"
     AC_CHECK_LIB(ossaudio,main,LDFLAGS_oss="${LDFLAGS_oss} -lossaudio")
   ])
 fi
@@ -1770,7 +1770,7 @@ AC_ARG_ENABLE(esd,
      AC_PATH_PROG(ESD_CONFIG, esd-config, no)
      if test "x${ESD_CONFIG}" != "xno"
      then
-       PLUGINS="${PLUGINS} esd"
+       #PLUGINS="${PLUGINS} esd"
        CFLAGS_esd="${CFLAGS_esd} `${ESD_CONFIG} --cflags`"
        LDFLAGS_esd="${LDFLAGS_esd} `${ESD_CONFIG} --libs`"
      fi
@@ -1786,7 +1786,7 @@ AC_ARG_ENABLE(arts,
      AC_PATH_PROG(ARTS_CONFIG, artsc-config, no)
      if test "x${ARTS_CONFIG}" != "xno"
      then
-       PLUGINS="${PLUGINS} arts"
+       #PLUGINS="${PLUGINS} arts"
        CFLAGS_arts="${CFLAGS_arts} `${ARTS_CONFIG} --cflags`"
        LDFLAGS_arts="${LDFLAGS_arts} `${ARTS_CONFIG} --libs `"
      fi
@@ -1802,7 +1802,7 @@ AC_ARG_ENABLE(alsa,
      AC_CHECK_HEADER(alsa/asoundlib.h, AC_CHECK_LIB(asound, main, have_alsa="true", have_alsa="false"),have_alsa="false")
      if test "x${have_alsa}" = "xtrue"
      then
-       PLUGINS="${PLUGINS} alsa"
+       #PLUGINS="${PLUGINS} alsa"
        LDFLAGS_alsa="${LDFLAGS_alsa} -lasound -lm -ldl"
      fi
    fi])
@@ -1814,7 +1814,7 @@ AC_ARG_ENABLE(waveout,
   [  --enable-waveout        Win32 waveOut module (default enabled on Win32)])
 if test "x${enable_waveout}" != "xno"; then
   if test "x${SYS}" = "xmingw32" -o "x${SYS}" = "xcygwin"; then
-    PLUGINS="${PLUGINS} waveout"
+    #PLUGINS="${PLUGINS} waveout"
     LDFLAGS_waveout="-lwinmm"
   fi
 fi
