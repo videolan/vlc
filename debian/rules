@@ -98,7 +98,7 @@ install: build
 		debian/vlc-qt/usr/share/pixmaps/
 
 	mkdir -p debian/vlc/usr/share/man/man1/
-	gzip < doc/vlc.1 >| debian/vlc/usr/share/man/man1/vlc.1.gz
+	gzip -9 < doc/vlc.1 >| debian/vlc/usr/share/man/man1/vlc.1.gz
 	mkdir -p debian/vlc-gtk/usr/share/man/man1/
 	ln -s vlc.1.gz debian/vlc-gtk/usr/share/man/man1/gvlc.1.gz
 	mkdir -p debian/vlc-gnome/usr/share/man/man1/

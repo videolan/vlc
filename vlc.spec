@@ -1,16 +1,19 @@
 Name: vlc
-Version: 0.2.70
+Version: 0.2.71
 Release: 1
 Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
-Source0: http://www.videolan.org/packages/0.2.70/vlc-0.2.70.tar.gz
+Source0: http://www.videolan.org/packages/0.2.71/vlc-0.2.71.tar.gz
 Packager: Samuel Hocevar <sam@zoy.org>
 
 Buildroot: /tmp/vlc-build
 Summary: VideoLAN Client.
 
 %changelog
+* Fri Apr 13 2001 Samuel Hocevar <sam@zoy.org>
+New upstream release (0.2.71)
+
 * Sun Apr 8 2001 Christophe Massiot <massiot@via.ecp.fr>
 New upstream release (0.2.70)
 
