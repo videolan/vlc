@@ -2,7 +2,7 @@
  * cdrom_tools.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom_tools.c,v 1.4 2002/04/27 02:20:32 jobi Exp $
+ * $Id: cdrom_tools.c,v 1.4.2.1 2002/10/16 23:13:00 massiot Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *         Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -342,7 +342,7 @@ CDTOC *getTOC( const char *psz_dev )
     CDTOC *pTOC = NULL;
     io_iterator_t iterator;
     io_registry_entry_t service;
-    CFDictionaryRef properties;
+    CFMutableDictionaryRef properties;
     CFDataRef data;
 
     if( psz_dev == NULL )
