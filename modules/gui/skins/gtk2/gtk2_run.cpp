@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.6 2003/04/15 17:55:49 ipkiss Exp $
+ * $Id: gtk2_run.cpp,v 1.7 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -69,25 +69,25 @@ int  SkinManage( intf_thread_t *p_intf );
 void GTK2Proc( GdkEvent *event, gpointer data )
 {
     // Get pointer to thread info
-    intf_thread_t *p_intf = (intf_thread_t *)data;
-    VlcProc *Proc = new VlcProc( p_intf );
+    unsigned int msg;
+    VlcProc *proc = (VlcProc *)data;
+    intf_thread_t *p_intf = proc->GetpIntf();
 
     list<Window *>::const_iterator win;
     GdkWindow *gwnd = ((GdkEventAny *)event)->window;
 
-    fprintf( stderr, "------ %li\n", (long int)gwnd );
-
-    // If doesn't exist, treat windows message normally
-//    if( p_intf == NULL )
-//        return DefWindowProc( hwnd, uMsg, wParam, lParam );
+    if( event->type == GDK_CLIENT_EVENT )
+        msg = ( (GdkEventClient *)event )->data.l[0];
+    else
+        msg = event->type;
 
     // Create event to dispatch in windows
     Event *evt = (Event *)new OSEvent( p_intf, ((GdkEventAny *)event)->window,
-                                       event->type, 0, (long)event );
+                                       msg, 0, (long)event );
 
-    if( IsVLCEvent( event->type ) )
+    if( IsVLCEvent( msg ) )
     {
-        if( !Proc->EventProc( evt ) )
+        if( !proc->EventProc( evt ) )
             return;      // Exit VLC !
     }
     else if( gwnd == NULL )
@@ -122,7 +122,6 @@ void GTK2Proc( GdkEvent *event, gpointer data )
     }
 
     delete (OSEvent *)evt;
-    delete Proc;
 
 #if 0
     // If Window is parent window
@@ -166,7 +165,10 @@ void GTK2Proc( GdkEvent *event, gpointer data )
 //---------------------------------------------------------------------------
 void OSRun( intf_thread_t *p_intf )
 {
-    gdk_event_handler_set( GTK2Proc, (gpointer)p_intf, NULL );
+    // Create VLC event object processing
+    VlcProc *proc = new VlcProc( p_intf );
+
+    gdk_event_handler_set( GTK2Proc, (gpointer)proc, NULL );
 
     // Main event loop
     GMainLoop *loop = g_main_loop_new( NULL, TRUE );

@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.14 2003/04/15 17:55:49 ipkiss Exp $
+ * $Id: gtk2_window.cpp,v 1.15 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -64,13 +64,15 @@ SLWA SetLayeredWindowAttributes =
 //---------------------------------------------------------------------------
 GTK2Window::GTK2Window( intf_thread_t *p_intf, GdkWindow *gwnd, int x, int y,
     bool visible, int transition, int normalalpha, int movealpha,
-    bool dragdrop )
+    bool dragdrop, string name )
     : Window( p_intf, x, y, visible, transition, normalalpha, movealpha,
               dragdrop )
 {
     // Set handles
     gWnd           = gwnd;
     gc = gdk_gc_new( gwnd );
+
+    Name        = name;
 
     LButtonDown = false;
     RButtonDown = false;
@@ -168,7 +170,6 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
             RefreshFromImage( 0, 0, Width, Height );
             return true;
 
-
         case GDK_MOTION_NOTIFY:
             if( LButtonDown )
                 MouseMove( (int)( (GdkEventButton *)p2 )->x,
@@ -231,14 +232,6 @@ bool GTK2Window::ProcessOSEvent( Event *evt )
             OSAPI_PostMessage( this, WINDOW_LEAVE, 0, 0 );
             return true;
 /*
-        case WM_RBUTTONDOWN:
-            MouseDown( LOWORD( p2 ), HIWORD( p2 ), 2 );
-            return true;
-
-        case WM_RBUTTONUP:
-            MouseUp( LOWORD( p2 ), HIWORD( p2 ), 2 );
-            return true;
-
         case WM_LBUTTONDBLCLK:
             MouseDblClick( LOWORD( p2 ), HIWORD( p2 ), 1 );
             return true;
@@ -285,7 +278,6 @@ void GTK2Window::WindowManualMove()
     p_intf->p_sys->p_theme->MoveSkinMagnet( this,
         WindowX + x - CursorX, WindowY + y - CursorY );
 
-    fprintf( stderr, "---------\n" );
 }
 //---------------------------------------------------------------------------
 void GTK2Window::WindowManualMoveInit()

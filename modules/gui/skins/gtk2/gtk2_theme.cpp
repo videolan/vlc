@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.11 2003/04/15 16:42:02 karibu Exp $
+ * $Id: gtk2_theme.cpp,v 1.12 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -242,15 +242,16 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
         fadetime, alpha, movealpha, dragdrop ) ) ;*/
 
     GdkWindowAttr attr;
+    attr.title = (gchar *)name.c_str();
     attr.event_mask = GDK_ALL_EVENTS_MASK;
     attr.width = 0;
     attr.height = 0;
     attr.window_type = GDK_WINDOW_TOPLEVEL;
     attr.wclass = GDK_INPUT_OUTPUT;
     attr.override_redirect = TRUE;
-    
+
     gint mask = GDK_WA_NOREDIR;
-    
+
     // Create the window
     GdkWindow *gwnd = gdk_window_new( NULL, &attr, mask );
     if( !gwnd )
@@ -258,11 +259,11 @@ void GTK2Theme::AddWindow( string name, int x, int y, bool visible,
         msg_Err( p_intf, "CreateWindow failed" );
         return;
     }
-    
+
     gdk_window_show( gwnd );
-    
+
     WindowList.push_back( (Window *)new OSWindow( p_intf, gwnd, x, y, visible,
-        fadetime, alpha, movealpha, dragdrop ) ) ;
+        fadetime, alpha, movealpha, dragdrop, name ) ) ;
 
 }
 //---------------------------------------------------------------------------

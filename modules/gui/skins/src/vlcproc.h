@@ -2,7 +2,7 @@
  * vlcproc.h: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.h,v 1.3 2003/04/14 10:00:39 karibu Exp $
+ * $Id: vlcproc.h,v 1.4 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -69,6 +69,9 @@ class VlcProc
         bool EventProc( Event *evt );
         bool EventProcEnd();
         bool IsClosing();
+
+        // Getters
+        intf_thread_t *GetpIntf() { return p_intf; };
 };
 //---------------------------------------------------------------------------
 

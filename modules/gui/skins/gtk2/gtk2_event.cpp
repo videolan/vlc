@@ -2,7 +2,7 @@
  * gtk2_event.cpp: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_event.cpp,v 1.5 2003/04/15 17:55:49 ipkiss Exp $
+ * $Id: gtk2_event.cpp,v 1.6 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -68,7 +68,6 @@ GTK2Event::~GTK2Event()
 //---------------------------------------------------------------------------
 bool GTK2Event::SendEvent()
 {
-    fprintf( stderr, "++++++++++++++++ %i\n", Message );
     if( Message != VLC_NOTHING )
     {
         // Find window matching with gwnd
@@ -120,11 +119,13 @@ GdkWindow *GTK2Event::GetWindowFromName( string name )
 {
     GTK2Window *win = (GTK2Window *)
         p_intf->p_sys->p_theme->GetWindow( name );
-    if( win == NULL ) 
+
+    if( win == NULL )
     {
         return NULL;
     }
-    else {
+    else
+    {
         return win->GetHandle();
     }
 }

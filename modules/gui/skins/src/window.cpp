@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.10 2003/04/15 16:42:02 karibu Exp $
+ * $Id: window.cpp,v 1.11 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -309,9 +309,6 @@ void Window::RefreshAll()
 void Window::MouseDown( int x, int y, int button )
 {
     // Checking event in controls
-
-    fprintf( stderr, "  -> mousedown\n" );
-
     for( int i = ControlList.size() - 1; i >= 0 ; i-- )
     {
         if( ControlList[i]->MouseDown( x, y, button ) )
@@ -319,6 +316,7 @@ void Window::MouseDown( int x, int y, int button )
             return;
         }
     }
+
 }
 //---------------------------------------------------------------------------
 void Window::MouseMove( int x, int y, int button  )
@@ -383,8 +381,6 @@ void Window::MouseUp( int x, int y, int button )
 
         WindowMoving = false;
     }
-
-    fprintf( stderr, "  -> mouseup\n" );
 
     // Checking event in controls
     for( i = ControlList.size() - 1; i >= 0 ; i-- )

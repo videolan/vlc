@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.5 2003/04/11 21:19:49 videolan Exp $
+ * $Id: button.cpp,v 1.6 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -170,6 +170,7 @@ bool ControlButton::MouseDown( int x, int y, int button )
             ParentWindow->Refresh( Left, Top, Width, Height );
             return true;
         }
+        fprintf( stderr, "button\n" );
     }
 
     return false;

@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.8 2003/04/15 01:19:11 ipkiss Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.9 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -172,12 +172,30 @@ void GTK2Bitmap::DrawBitmap( int x, int y, int w, int h, int xRef, int yRef,
 //---------------------------------------------------------------------------
 bool GTK2Bitmap::Hit( int x, int y)
 {
-/*    unsigned int c = GetPixel( bmpDC, x, y );
-    if( c == AlphaColor || c == CLR_INVALID )
+    if( x < 0 || x >= Width || y < 0 || y >= Height )
+        return false;
+
+    guchar *pixels;
+    int rowstride, offset;
+    gboolean has_alpha;
+
+    rowstride = gdk_pixbuf_get_rowstride( Bmp );
+    pixels    = gdk_pixbuf_get_pixels( Bmp );
+    has_alpha = gdk_pixbuf_get_has_alpha( Bmp );
+
+    offset = y * rowstride + ( x * (has_alpha ? 4 : 3) );
+
+    int r = pixels [offset];
+    int g = pixels [offset + 1];
+    int b = pixels [offset + 2];
+    unsigned int c = r + g * 256 + b * 65536;
+    /* If has_alpha == TRUE, then the alpha component is in
+       pixels [offset + 3] */
+
+    if( c == AlphaColor )
         return false;
     else
         return true;
-*/
 }
 //---------------------------------------------------------------------------
 int GTK2Bitmap::GetBmpPixel( int x, int y )

@@ -2,7 +2,7 @@
  * gtk2_api.cpp: Various gtk2-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_api.cpp,v 1.6 2003/04/15 17:55:49 ipkiss Exp $
+ * $Id: gtk2_api.cpp,v 1.7 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Cyril Deguet  <asmax@videolan.org>
  *
@@ -65,7 +65,10 @@ void OSAPI_PostMessage( Window *win, unsigned int message, unsigned int param1,
     event->data.l[1] = param1;
     event->data.l[2] = param2;
 
-    fprintf( stderr, "======= message %i\n", message );
+    if( message == VLC_HIDE )
+    {
+        fprintf( stderr, "======= message %i\n", message );
+    }
 
     gdk_event_put( (GdkEvent *)event );
 
@@ -127,14 +130,7 @@ void OSAPI_GetMousePos( int &x, int &y )
 //---------------------------------------------------------------------------
 string OSAPI_GetWindowTitle( Window *win )
 {
-//    char *buffer = new char[MAX_PARAM_SIZE];
-//    GetWindowText( ((GTK2Window *)win)->GetHandle(), buffer, MAX_PARAM_SIZE );
-//    string Title = buffer;
-/* FIXME */
-string Title = "";
-//    delete buffer;
-
-    return Title;
+    return ( (GTK2Window *)win )->GetName();
 }
 //---------------------------------------------------------------------------
 bool OSAPI_RmDir( string path )

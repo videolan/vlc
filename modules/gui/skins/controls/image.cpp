@@ -2,7 +2,7 @@
  * image.cpp: Image control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: image.cpp,v 1.3 2003/04/13 22:55:15 asmax Exp $
+ * $Id: image.cpp,v 1.4 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -84,7 +84,7 @@ void ControlImage::Draw( int x, int y, int w, int h, Graphics *dest )
 {
     if( !Visible )
         return;
-       
+
     int xI, yI, wI, hI;
     if( GetIntersectRgn(x, y, w, h, Left, Top, Width, Height, xI, yI, wI, hI ) )
         Img[0]->DrawBitmap( xI-Left, yI-Top, wI, hI, xI-x, yI-y, dest );

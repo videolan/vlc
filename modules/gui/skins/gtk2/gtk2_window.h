@@ -2,7 +2,7 @@
  * gtk2_window.h: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.h,v 1.4 2003/04/15 01:19:11 ipkiss Exp $
+ * $Id: gtk2_window.h,v 1.5 2003/04/15 20:33:58 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -44,6 +44,7 @@ class GTK2Window : public Window
         int CursorY;
         int WindowX;
         int WindowY;
+        string Name;
 
         // Tooltip texts
         GdkWindow *ToolTipWindow;
@@ -60,7 +61,7 @@ class GTK2Window : public Window
         // Cosntructors
         GTK2Window( intf_thread_t *_p_intf, GdkWindow *gwnd, int x, int y,
             bool visible, int transition, int normalalpha, int movealpha,
-            bool dragdrop );
+            bool dragdrop, string name );
 
         // Destructors
         virtual ~GTK2Window();
@@ -84,6 +85,9 @@ class GTK2Window : public Window
 
         // Tooltip texts
         virtual void ChangeToolTipText( string text );
+
+        // Getters
+        string GetName() { return Name; }
 };
 //---------------------------------------------------------------------------
 
