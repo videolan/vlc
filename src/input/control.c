@@ -66,7 +66,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 {
     int     i_ret;
     seekpoint_t *p_bkmk, ***ppp_bkmk;
-    int i_bkmk, *pi_bkmk;
+    int i_bkmk = 0;
+    int *pi_bkmk;
     int i, *pi;
     vlc_value_t val, text;
     char *psz_option, *psz_value;
@@ -283,6 +284,29 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             i_ret = VLC_SUCCESS;
             break;
+
+        case INPUT_CHANGE_BOOKMARK:
+             p_bkmk = (seekpoint_t *)va_arg( args, seekpoint_t * );
+             i_bkmk = (int)va_arg( args, int );
+
+             if( i_bkmk < p_input->i_bookmarks )
+             {
+                 p_input->pp_bookmarks[i_bkmk] = p_bkmk;
+
+                 /* Reflect the changes on the object var */
+                 var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
+                 for( i = 0; i < p_input->i_bookmarks; i++ )
+                 {
+                     val.i_int = i;
+                     text.psz_string = p_input->pp_bookmarks[i]->psz_name;
+                     var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
+                                 &val, &text );
+                 }
+             }
+             UpdateBookmarksOption( p_input );
+
+             i_ret = VLC_SUCCESS;
+             break;
 
         case INPUT_DEL_BOOKMARK:
             i_bkmk = (int)va_arg( args, int );

@@ -269,14 +269,14 @@ void DialogsProvider::OnStreamWizardDialog( wxCommandEvent& WXUNUSED(event) )
 
 void DialogsProvider::OnWizardDialog( wxCommandEvent& WXUNUSED(event) )
 {
-    p_wizard_dialog = new WizardDialog( p_intf, this );
+    p_wizard_dialog = new WizardDialog( p_intf, this, NULL, 0, 0 );
 
     if( p_wizard_dialog )
     {
         p_wizard_dialog->Run();
+        delete p_wizard_dialog;
     }
 
-    delete p_wizard_dialog;
     p_wizard_dialog = NULL;
 }
 

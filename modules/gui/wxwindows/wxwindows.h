@@ -574,7 +574,7 @@ class WizardDialog : public wxWizard
 {
 public:
     /* Constructor */
-    WizardDialog( intf_thread_t *p_intf, wxWindow *p_parent );
+    WizardDialog( intf_thread_t *p_intf, wxWindow *p_parent,char *, int, int );
     virtual ~WizardDialog();
     void SetTranscode( char *vcodec, int vb, char *acodec,int ab);
     void SetMrl( const char *mrl );

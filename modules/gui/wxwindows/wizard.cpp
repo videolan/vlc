@@ -217,6 +217,8 @@ class wizInputPage : public wxWizardPage
         void SetTranscodePage( wxWizardPage *page);
         void SetAction( int i_action );
         void SetPintf( intf_thread_t *p_intf );
+        void SetUri( char *psz_uri );
+        void SetPartial( int i_from, int i_to );
     protected:
         bool b_chosen;
         intf_thread_t *p_intf;
@@ -753,6 +755,23 @@ void wizInputPage::SetAction( int i_action )
 void wizInputPage::SetPintf( intf_thread_t *p_intf )
 {
     this->p_intf = p_intf;
+}
+
+void wizInputPage::SetUri( char *psz_uri )
+{
+    mrl_text->SetValue( wxU( psz_uri ) );
+}
+
+void wizInputPage::SetPartial( int i_from, int i_to )
+{
+   wxString msg;
+   msg.Printf( wxString( wxT( "%i") ), i_from );
+   from_text->Enable( TRUE );
+   from_text->SetValue( msg );
+   msg.Printf( wxString( wxT( "%i") ), i_to );
+   to_text->Enable( TRUE );
+   to_text->SetValue( msg );
+   enable_checkbox->SetValue( TRUE );
 }
 
 /***************************************************
@@ -1344,7 +1363,8 @@ wizTranscodeExtraPage *tr_page2 ;
 wizStreamingExtraPage *st_page2;
 wizEncapPage *encap_page;
 
-WizardDialog::WizardDialog(intf_thread_t *_p_intf, wxWindow *_p_parent ) :
+WizardDialog::WizardDialog(intf_thread_t *_p_intf, wxWindow *_p_parent,
+                           char *psz_uri, int _i_from, int _i_to  ) :
 wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding Wizard")), wxNullBitmap, wxDefaultPosition)
 {
     /* Initializations */
@@ -1353,8 +1373,8 @@ wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding Wizard")), wxNullBitmap, w
 
     /* Initialize structure */
     i_action = 0;
-    i_from = 0;
-    i_to = 0;
+    i_from = _i_from;
+    i_to = _i_to;
     i_ttl = 1;
     vb = 0;
     ab = 0;
@@ -1363,6 +1383,16 @@ wxWizard( _p_parent, -1, wxU(_("Streaming/Transcoding Wizard")), wxNullBitmap, w
 
     page1 = new wizHelloPage(this);
     page2 = new wizInputPage(this, page1, p_intf);
+
+    if( psz_uri )
+    {
+        page2->SetUri( psz_uri );
+    }
+    if( i_from != 0 || i_to != 0 )
+    {
+        page2->SetPartial( i_from, i_to );
+    }
+
     encap_page = new wizEncapPage(this );
     tr_page1 = new wizTranscodeCodecPage(this, encap_page );
     st_page1 = new wizStreamingMethodPage(this, encap_page);
@@ -1474,6 +1504,7 @@ int WizardDialog::GetAction()
 
 void WizardDialog::Run()
 {
+    fprintf(stderr, "p_intf %p %p", p_intf, this->p_intf);
     msg_Dbg( p_intf,"starting wizard");
     if( RunWizard(page1) )
     {
