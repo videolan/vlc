@@ -83,7 +83,7 @@ int ReadDir( input_thread_t *p_input, char *psz_name , int i_mode );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define RECURSIVE_TEXT N_("Includes subdirectories?")
+#define RECURSIVE_TEXT N_("Subdirectory behaviour")
 #define RECURSIVE_LONGTEXT N_( \
         "Select whether subdirectories must be expanded.\n" \
         "none: subdirectories do not appear in the playlist.\n" \
@@ -167,13 +167,7 @@ static int Open( vlc_object_t *p_this )
     p_access_data->i_pos = 0;
 
     psz_mode = config_GetPsz( p_input , "recursive" );
-    if( !psz_mode )
-    {
-        msg_Err( p_input, "Unable to get configuration" );
-        return VLC_EGENERIC;
-    }
-
-    if( !strncmp( psz_mode, "none" , 4 )  )
+    if( !psz_mode || !strncmp( psz_mode, "none" , 4 )  )
     {
         i_mode = MODE_NONE;
     }
@@ -185,6 +179,7 @@ static int Open( vlc_object_t *p_this )
     {
         i_mode = MODE_EXPAND;
     }
+
     if( ReadDir( p_input, psz_name , i_mode ) != VLC_SUCCESS )
     {
         free( p_access_data );
@@ -293,25 +288,25 @@ int ReadDir( input_thread_t *p_input, char *psz_name , int i_mode )
             strcmp( p_dir_content->d_name, ".." ) &&
             p_access_data->i_pos + i_size_entry < MAX_DIR_SIZE )
         {
-#if defined( DT_DIR )
-            if( p_dir_content->d_type == DT_DIR )
-#elif defined( S_ISDIR )
+#if defined( S_ISDIR )
             struct stat stat_data;
             stat( psz_entry, &stat_data );
             if( S_ISDIR(stat_data.st_mode) )
+#elif defined( DT_DIR )
+            if( p_dir_content->d_type == DT_DIR )
 #else
             if( 0 )
 #endif
             {
                 if( i_mode == MODE_NONE )
                 {
-                    msg_Dbg( p_input, "Skipping subdirectory %s",psz_entry );
+                    msg_Dbg( p_input, "Skipping subdirectory %s", psz_entry );
                     p_dir_content = readdir( p_current_dir );
                     continue;
                 }
                 else if(i_mode == MODE_EXPAND )
                 {
-                    msg_Dbg(p_input, "Reading subdirectory %s",psz_entry );
+                    msg_Dbg(p_input, "Reading subdirectory %s", psz_entry );
                     if( ReadDir( p_input, psz_entry , MODE_EXPAND )
                                  != VLC_SUCCESS )
                     {
@@ -320,6 +315,7 @@ int ReadDir( input_thread_t *p_input, char *psz_name , int i_mode )
                 }
                 else
                 {
+                    msg_Dbg(p_input, "Adding subdirectory %s", psz_entry );
                     sprintf( &p_access_data->p_dir_buffer[p_access_data->i_pos],
                              "%s", psz_entry );
                     p_access_data->i_pos += i_size_entry -1 ;
