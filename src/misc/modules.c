@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.115 2003/03/03 16:49:14 gbazin Exp $
+ * $Id: modules.c,v 1.116 2003/03/12 05:26:46 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -586,9 +586,9 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         /* Under BeOS, we need to add beos_GetProgramPath() to access
          * files under the current directory */
 #ifdef WIN32
-        if( i_dirlen < 3 || ppsz_path[3] != '\\' )
+        if( i_dirlen < 3 || (*ppsz_path)[3] != '\\' )
 #else
-        if( ppsz_path[0] != '/' )
+        if( (*ppsz_path)[0] != '/' )
 #endif
         {
             i_dirlen += i_vlclen + 2;

@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.80 2003/03/03 14:21:08 gbazin Exp $
+ * $Id: netutils.c,v 1.81 2003/03/12 05:26:46 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -243,7 +243,7 @@ int __network_ChannelJoin( vlc_object_t *p_this, int i_channel )
 
     /* Build the message */
     sprintf( psz_mess, "%d %u %lu %s \n", i_channel, VLCS_VERSION,
-                       (unsigned long)(mdate() / (u64)1000000),
+                       (unsigned long)(mdate() / (uint64_t)1000000),
                        psz_mac );
 
     /* Send the message */

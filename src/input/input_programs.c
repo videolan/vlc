@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.102 2003/03/11 23:56:54 gbazin Exp $
+ * $Id: input_programs.c,v 1.103 2003/03/12 05:26:46 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -753,7 +753,7 @@ static int ProgramCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( ( newval.i_int > 0 ) )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        input_ChangeProgram( p_input, newval.i_int );
+        input_ChangeProgram( p_input, (uint16_t)newval.i_int );
         input_SetStatus( p_input, INPUT_STATUS_PLAY );
         vlc_mutex_lock( &p_input->stream.stream_lock );
     }

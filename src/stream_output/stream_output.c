@@ -2,7 +2,7 @@
  * stream_output.c : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.19 2003/03/11 21:52:05 fenrir Exp $
+ * $Id: stream_output.c,v 1.20 2003/03/12 05:26:46 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -1183,8 +1183,8 @@ static int  mrl_Parse( mrl_t *p_mrl, char *psz_mrl )
 #if defined( WIN32 ) || defined( UNDER_CE )
     if( psz_parser - psz_dup == 1 )
     {
-        msg_Warn( p_sout, "drive letter %c: found in source string",
-                          *psz_dup ) ;
+        /* msg_Warn( p_sout, "drive letter %c: found in source string",
+                          *psz_dup ) ; */
         psz_parser = "";
     }
 #endif
