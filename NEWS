@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.30 2003/03/06 23:52:31 sigmunau Exp $
+$Id: NEWS,v 1.31 2003/03/09 19:44:16 gbazin Exp $
 
 Changes between 0.5.1a and 0.5.2:
 --------------------------------
@@ -14,6 +14,9 @@ Codecs:
  * support for DV audio through the ffmpeg library.
  * new but basic MPEG video decoder based on libmpeg2.
  * fixed a major bug in LPCM code ( fixes a problem with iDVD disks )
+
+DVD support:
+ * fixed quite a few problems with the dvd menu support.
 
 UNIX ports:
  * fixed the GNU-pth support.

@@ -818,7 +818,7 @@ PLUGINS="${PLUGINS} sap httpd"
 dnl
 dnl Some plugins aren't useful on some platforms
 dnl
-if test "x${SYS}" != "xmingw32"
+if test "x${SYS}" != "xmingw32"; then
     PLUGINS="${PLUGINS} screensaver"
 fi
 
