@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.1 2001/10/26 16:23:06 massiot Exp $
+$Id: FAQ,v 1.2 2001/11/12 11:37:30 massiot Exp $
 
 1. Using VLC
 
@@ -121,3 +121,10 @@ This is a known problem.
 Currently it doesn't. We'd be glad to support them, but we lack technical
 information on them.
 
+3.2 Win32 port
+
+3.2.2 When moving the focus to another window, VLC network input stops
+working properly !
+---------------------------------------------------------------------------
+This is a known problem with Win 95-class systems. Upgrade to an NT-class
+system.
