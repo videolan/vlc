@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.55 2001/07/17 09:48:08 massiot Exp $
+ * $Id: mpeg_system.c,v 1.56 2001/07/18 15:21:51 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -829,6 +829,12 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
                     /* mux_rate */
                     i_mux_rate = ((u32)U16_AT(p_header + 10) << 6)
                                    | (p_header[12] >> 2);
+                    /* FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME
+                     * This is the biggest kludge ever !
+                     * I don't know what's wrong with mux_rate calculation
+                     * but this heuristic work well : */
+                    i_mux_rate <<= 1;
+                    i_mux_rate /= 3;
                 }
                 else
                 {

@@ -57,6 +57,11 @@ HEAD
     leakage).
   * Added IDEALX developer documentation in doc/.
   * Removed the outdated generic decoder.
+  * Rewrote the video decoder so that it can use multiple processors (--smp).
+  * Fixed a bug in the video decoder initialization.
+  * Grayscale mode now turns off chroma IDCT decoding.
+  * Kludged so that times displayed in the scrollbar are finally correct
+    for MPEG-2 streams.
 
 0.2.80
 Tue,  5 Jun 2001 04:41:06 +0200
