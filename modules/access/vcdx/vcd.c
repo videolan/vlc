@@ -45,6 +45,10 @@ int  E_(DebugCallback) ( vlc_object_t *p_this, const char *psz_name,
                          vlc_value_t oldval, vlc_value_t val,
                          void *p_data );
 
+int  E_(BlocksPerReadCallback) ( vlc_object_t *p_this, const char *psz_name,
+				 vlc_value_t oldval, vlc_value_t val,
+				 void *p_data );
+
 /*****************************************************************************
  * Option help text
  *****************************************************************************/
@@ -102,6 +106,12 @@ vlc_module_begin();
                   N_("If nonzero, this gives additional debug information."),
                   DEBUG_LONGTEXT, VLC_TRUE );
 
+    add_integer ( MODULE_STRING "-blocks-per-read", 20, 
+		  E_(BlocksPerReadCallback),
+                  N_("Number of CD blocks to get in a single read."),
+                  N_("Number of CD blocks to get in a single read."),
+		  VLC_TRUE );
+
     add_bool( MODULE_STRING "-PBC", 0, NULL,
               N_("Use playback control?"),
               N_("If VCD is authored with playback control, use it. "
@@ -115,10 +125,10 @@ vlc_module_begin();
                 VCD_TITLE_FMT_LONGTEXT, VLC_TRUE );
 
     add_string( MODULE_STRING "-title-format",
-                "%I %N%L%S - %M %A %v - disc %c of %C %F",
+                "%I %N %L%S - %M %A %v - disc %c of %C %F",
                 NULL,
                 N_("Format to use in playlist \"title\" field"),
-                VCD_TITLE_FMT_LONGTEXT, VLC_TRUE );
+                VCD_TITLE_FMT_LONGTEXT, VLC_FALSE );
 
 #ifdef FIXED
     add_submodule();

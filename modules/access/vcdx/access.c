@@ -47,9 +47,6 @@
 
 #define FREE_AND_NULL(ptr) if (NULL != ptr) free(ptr); ptr = NULL;
 
-/* how many blocks VCDRead will read in each loop */
-#define VCD_BLOCKS_ONCE 20
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -153,7 +150,7 @@ VCDReadBlock( access_t * p_access )
 {
     vcdplayer_t *p_vcd= (vcdplayer_t *)p_access->p_sys;
     block_t     *p_block;
-    int         i_blocks = VCD_BLOCKS_ONCE;
+    const int   i_blocks = p_vcd->i_blocks_per_read;
     int         i_read;
     byte_t      p_last_sector[ M2F2_SECTOR_SIZE ];
 
@@ -163,10 +160,6 @@ VCDReadBlock( access_t * p_access )
     dbg_print( (INPUT_DBG_CALL), "lsn: %lu", 
 	       (long unsigned int) p_vcd->i_lsn );
 #endif
-
-    /* Compute the number of blocks we have to read */
-
-    i_blocks = VCD_BLOCKS_ONCE ;
 
     /* Allocate a block for the reading */
     if( !( p_block = block_New( p_access, i_blocks * M2F2_SECTOR_SIZE ) ) )
@@ -834,6 +827,10 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
   
   unsigned int i_title = i_track - 1; /* For now */
 
+  dbg_print( (INPUT_DBG_CALL|INPUT_DBG_LSN),
+             "i_lsn: %lu, track: %d", (long unsigned int) i_lsn, 
+	     i_track );
+
   p_vcd->i_lsn      = i_lsn;
   p_vcd->i_track    = i_track;
   p_vcd->track_lsn  = vcdinfo_get_track_lsn(p_vcd->vcd, i_track);
@@ -849,10 +846,6 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
                              * M2F2_SECTOR_SIZE;
   p_access->info.i_update   |= INPUT_UPDATE_TITLE|INPUT_UPDATE_SIZE
                             |  INPUT_UPDATE_SEEKPOINT;
-
-  dbg_print( (INPUT_DBG_CALL|INPUT_DBG_LSN),
-             "i_lsn: %lu, track: %d", (long unsigned int) i_lsn, 
-	     i_track );
 
   if (p_itemid->type == VCDINFO_ITEM_TYPE_ENTRY) {
     VCDUpdateVar( p_access, p_itemid->num, VLC_VAR_SETVALUE,
@@ -1009,6 +1002,25 @@ E_(DebugCallback)   ( vlc_object_t *p_this, const char *psz_name,
   return VLC_SUCCESS;
 }
 
+int
+E_(BlocksPerReadCallback)   ( vlc_object_t *p_this, const char *psz_name,
+			      vlc_value_t oldval, vlc_value_t val, 
+			      void *p_data )
+{
+  vcdplayer_t *p_vcd;
+
+  if (NULL == p_vcd_access) return VLC_EGENERIC;
+
+  p_vcd = (vcdplayer_t *)p_vcd_access->p_sys;
+
+  if (p_vcd->i_debug & (INPUT_DBG_CALL|INPUT_DBG_EXT)) {
+    msg_Dbg( p_vcd_access, "Old debug (x%0x) %d, new debug (x%0x) %d",
+             p_vcd->i_debug, p_vcd->i_debug, val.i_int, val.i_int);
+  }
+  p_vcd->i_debug = val.i_int;
+  return VLC_SUCCESS;
+}
+
 
 /*****************************************************************************
   VCDOpen: open VCD.
@@ -1067,15 +1079,18 @@ E_(VCDOpen) ( vlc_object_t *p_this )
     dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT), "source: %s: mrl: %s",
                psz_source, p_access->psz_path );
 
-    p_vcd->psz_source      = strdup(psz_source);
-    p_vcd->i_debug         = config_GetInt( p_this, MODULE_STRING "-debug" );
-    p_vcd->in_still        = VLC_FALSE;
-    p_vcd->play_item.type  = VCDINFO_ITEM_TYPE_NOTFOUND;
-    p_vcd->p_input         = vlc_object_find( p_access, VLC_OBJECT_INPUT, 
+    p_vcd->psz_source        = strdup(psz_source);
+    p_vcd->i_debug           = config_GetInt( p_this, 
+					      MODULE_STRING "-debug" );
+    p_vcd->i_blocks_per_read = config_GetInt( p_this, MODULE_STRING 
+					      "-blocks-per-read" );
+    p_vcd->in_still          = VLC_FALSE;
+    p_vcd->play_item.type    = VCDINFO_ITEM_TYPE_NOTFOUND;
+    p_vcd->p_input           = vlc_object_find( p_access, VLC_OBJECT_INPUT, 
 					      FIND_PARENT );
-    p_vcd->p_meta          = vlc_meta_New();
-    p_vcd->p_segments      = NULL;
-    p_vcd->p_entries       = NULL;
+    p_vcd->p_meta            = vlc_meta_New();
+    p_vcd->p_segments        = NULL;
+    p_vcd->p_entries         = NULL;
 
     /* set up input  */
 
@@ -1224,7 +1239,7 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_MTU:
             pi_int = (int*)va_arg( args, int * );
-            *pi_int = (VCD_BLOCKS_ONCE * M2F2_SECTOR_SIZE);
+            *pi_int = (p_vcd->i_blocks_per_read * M2F2_SECTOR_SIZE);
 	    dbg_print( INPUT_DBG_EVENT, "GET MTU: %d", *pi_int );
             break;
 
@@ -1314,7 +1329,7 @@ static int VCDControl( access_t *p_access, int i_query, va_list args )
             input_title_t *t = p_vcd->p_title[p_access->info.i_title];
             i = (int)va_arg( args, int );
 
-	    dbg_print( INPUT_DBG_EVENT, "set seekpoint" );
+	    dbg_print( INPUT_DBG_EVENT, "set seekpoint %d", i );
             if( t->i_seekpoint > 0 )
             {
 		track_t i_track = p_access->info.i_title+1;

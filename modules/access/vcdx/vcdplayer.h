@@ -78,8 +78,11 @@ typedef struct thread_vcd_data_s
 {
   vcdinfo_obj_t *vcd;                   /* CD device descriptor */
 
+  /* User-settable options */
+  unsigned int i_debug;                 /* Debugging mask */
+  unsigned int i_blocks_per_read;       /* number of blocks per read */
+
   /* Current State: position */
-  int          i_debug;                 /* Debugging mask */
   vlc_bool_t   in_still;                /* true if in still */
   int          i_lid;                   /* LID that play item is in. Implies 
                                            PBC is on. VCDPLAYER_BAD_ENTRY if 
