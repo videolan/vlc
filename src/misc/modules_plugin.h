@@ -182,6 +182,8 @@ static const char * module_error( char *psz_buffer )
     (p_symbols)->aout_OutputNextBuffer_inner = aout_OutputNextBuffer; \
     (p_symbols)->aout_FormatNbChannels_inner = aout_FormatNbChannels; \
     (p_symbols)->aout_FifoPop_inner = aout_FifoPop; \
+    (p_symbols)->aout_VolumeSoftInit_inner = aout_VolumeSoftInit; \
+    (p_symbols)->aout_VolumeNoneInit_inner = aout_VolumeNoneInit; \
     (p_symbols)->__aout_NewInstance_inner = __aout_NewInstance; \
     (p_symbols)->aout_DeleteInstance_inner = aout_DeleteInstance; \
     (p_symbols)->aout_BufferNew_inner = aout_BufferNew; \
@@ -194,6 +196,11 @@ static const char * module_error( char *psz_buffer )
     (p_symbols)->aout_DateIncrement_inner = aout_DateIncrement; \
     (p_symbols)->__aout_InputNew_inner = __aout_InputNew; \
     (p_symbols)->aout_InputDelete_inner = aout_InputDelete; \
+    (p_symbols)->aout_VolumeGet_inner = aout_VolumeGet; \
+    (p_symbols)->aout_VolumeSet_inner = aout_VolumeSet; \
+    (p_symbols)->aout_VolumeInfos_inner = aout_VolumeInfos; \
+    (p_symbols)->aout_VolumeUp_inner = aout_VolumeUp; \
+    (p_symbols)->aout_VolumeDown_inner = aout_VolumeDown; \
     (p_symbols)->__config_GetInt_inner = __config_GetInt; \
     (p_symbols)->__config_PutInt_inner = __config_PutInt; \
     (p_symbols)->__config_GetFloat_inner = __config_GetFloat; \

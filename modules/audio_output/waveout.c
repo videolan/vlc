@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.6 2002/08/30 23:27:06 massiot Exp $
+ * $Id: waveout.c,v 1.7 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -101,6 +101,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_aout->output.pf_play = Play;
+    aout_VolumeSoftInit( p_aout );
 
     /* calculate the frame size in bytes */
     p_aout->output.p_sys->i_buffer_size = FRAME_SIZE * sizeof(s16)

@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.c,v 1.8 2002/08/30 23:27:06 massiot Exp $
+ * $Id: aout.c,v 1.9 2002/09/18 21:21:24 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -48,6 +48,7 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
 
     p_aout->output.pf_play = Play;
+    aout_VolumeSoftInit( p_aout );
 
     if ( p_aout->output.output.i_format == AOUT_FMT_SPDIF )
     {

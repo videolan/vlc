@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.10 2002/08/30 23:27:06 massiot Exp $
+ * $Id: alsa.c,v 1.11 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -150,10 +150,14 @@ static int Open( vlc_object_t *p_this )
                      "iec958:AES0=0x%x,AES1=0x%x,AES2=0x%x,AES3=0x%x",
                      s[0], s[1], s[2], s[3] );
             psz_device = psz_alsadev;
+
+            aout_VolumeNoneInit( p_aout );
         }
         else
         {
             psz_device = "default";
+
+            aout_VolumeSoftInit( p_aout );
         }
     }
 

@@ -2,7 +2,7 @@
  * arts.c : aRts module
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: arts.c,v 1.10 2002/08/30 23:27:06 massiot Exp $
+ * $Id: arts.c,v 1.11 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Emmanuel Blindauer <manu@agat.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -97,6 +97,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_aout->output.pf_play = Play;
+    aout_VolumeSoftInit( p_aout );
 
     p_sys->stream = NULL;
 

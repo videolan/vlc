@@ -2,7 +2,7 @@
  * sdl.c : SDL audio output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: sdl.c,v 1.11 2002/09/02 23:17:05 massiot Exp $
+ * $Id: sdl.c,v 1.12 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -86,6 +86,7 @@ static int Open ( vlc_object_t *p_this )
 
     p_aout->output.pf_play = Play;
 
+    aout_VolumeSoftInit( p_aout );
 #ifndef WIN32
     /* Win32 SDL implementation doesn't support SDL_INIT_EVENTTHREAD yet*/
     i_flags |= SDL_INIT_EVENTTHREAD;

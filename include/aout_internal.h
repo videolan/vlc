@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.17 2002/09/16 20:46:37 massiot Exp $
+ * $Id: aout_internal.h,v 1.18 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -210,9 +210,11 @@ struct aout_instance_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+/* From input.c : */
 void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                      aout_buffer_t * p_buffer );
 
+/* From filters.c : */
 int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
                                 aout_filter_t ** pp_filters,
                                 int * pi_nb_filters,
@@ -228,18 +230,21 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
                        aout_filter_t ** pp_filters,
                        int i_nb_filters, aout_buffer_t ** pp_input_buffer );
 
+/* From mixer.c : */
 int aout_MixerNew( aout_instance_t * p_aout );
 void aout_MixerDelete( aout_instance_t * p_aout );
 void aout_MixerRun( aout_instance_t * p_aout );
 int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier );
 int aout_MixerMultiplierGet( aout_instance_t * p_aout, float * pf_multiplier );
 
+/* From output.c : */
 int aout_OutputNew( aout_instance_t * p_aout,
                     audio_sample_format_t * p_format );
 void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer );
 void aout_OutputDelete( aout_instance_t * p_aout );
 VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, vlc_bool_t ) );
 
+/* From audio_output.c : */
 VLC_EXPORT( int, aout_FormatNbChannels, ( audio_sample_format_t * p_format ) );
 void aout_FormatPrepare( audio_sample_format_t * p_format );
 void aout_FifoInit( aout_instance_t *, aout_fifo_t *, u32 );
@@ -249,4 +254,14 @@ void aout_FifoSet( aout_instance_t *, aout_fifo_t *, mtime_t );
 void aout_FifoMoveDates( aout_instance_t *, aout_fifo_t *, mtime_t );
 VLC_EXPORT( aout_buffer_t *, aout_FifoPop, ( aout_instance_t * p_aout, aout_fifo_t * p_fifo ) );
 void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo );
+
+/* From intf.c :*/
+VLC_EXPORT( void, aout_VolumeSoftInit, ( aout_instance_t * ) );
+int aout_VolumeSoftGet( aout_instance_t *, audio_volume_t * );
+int aout_VolumeSoftSet( aout_instance_t *, audio_volume_t );
+int aout_VolumeSoftInfos( aout_instance_t *, audio_volume_t *, audio_volume_t * );
+VLC_EXPORT( void, aout_VolumeNoneInit, ( aout_instance_t * ) );
+int aout_VolumeNoneGet( aout_instance_t *, audio_volume_t * );
+int aout_VolumeNoneSet( aout_instance_t *, audio_volume_t );
+int aout_VolumeNoneInfos( aout_instance_t *, audio_volume_t *, audio_volume_t * );
 

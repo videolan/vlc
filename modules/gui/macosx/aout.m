@@ -2,7 +2,7 @@
  * aout.m: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout.m,v 1.9 2002/09/02 23:17:05 massiot Exp $
+ * $Id: aout.m,v 1.10 2002/09/18 21:21:24 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -99,6 +99,7 @@ int E_(OpenAudio)( vlc_object_t * p_this )
     }
 
     p_aout->output.pf_play = Play;
+    aout_VolumeSoftInit( p_aout );
 
     /* Get a description of the data format used by the device */
     i_param_size = sizeof( p_sys->stream_format ); 

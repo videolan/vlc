@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.26 2002/08/30 22:22:24 massiot Exp $
+ * $Id: vlc_common.h,v 1.27 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -113,6 +113,9 @@ typedef s16                 dctelem_t;
 
 /* Video buffer types */
 typedef u8                  yuv_data_t;
+
+/* Audio volume */
+typedef u16                 audio_volume_t;
 
 /*****************************************************************************
  * mtime_t: high precision date or time interval

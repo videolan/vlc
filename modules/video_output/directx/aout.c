@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout.c,v 1.9 2002/08/30 23:27:06 massiot Exp $
+ * $Id: aout.c,v 1.10 2002/09/18 21:21:24 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -129,6 +129,7 @@ int E_(OpenAudio) ( vlc_object_t *p_this )
     vlc_mutex_init( p_aout, &p_aout->output.p_sys->buffer_lock );
 
     p_aout->output.pf_play = Play;
+    aout_VolumeSoftInit( p_aout );
 
     /* Initialise DirectSound */
     if( DirectxInitDSound( p_aout ) )

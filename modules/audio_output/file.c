@@ -2,7 +2,7 @@
  * file.c : audio output which writes the samples to a file
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: file.c,v 1.10 2002/08/30 23:27:06 massiot Exp $
+ * $Id: file.c,v 1.11 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -92,6 +92,7 @@ static int Open( vlc_object_t * p_this )
     if ( p_file == NULL ) return -1;
 
     p_aout->output.pf_play = Play;
+    aout_VolumeSoftInit( p_aout );
 
     while ( *ppsz_compare != NULL )
     {

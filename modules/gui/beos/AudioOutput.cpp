@@ -2,7 +2,7 @@
  * aout.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: AudioOutput.cpp,v 1.7 2002/08/30 23:27:06 massiot Exp $
+ * $Id: AudioOutput.cpp,v 1.8 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -110,6 +110,7 @@ int E_(OpenAudio) ( vlc_object_t * p_this )
     }
     
     p_aout->output.pf_play = Play;
+    aout_VolumeSoftInit( p_aout );
 
     return 0;
 }

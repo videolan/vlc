@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.25 2002/09/14 20:51:11 stef Exp $
+ * $Id: oss.c,v 1.26 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -164,11 +164,15 @@ static int Open( vlc_object_t *p_this )
         p_aout->output.i_nb_samples = A52_FRAME_NB;
         p_aout->output.output.i_bytes_per_frame = AOUT_SPDIF_SIZE;
         p_aout->output.output.i_frame_length = A52_FRAME_NB;
+
+        aout_VolumeNoneInit( p_aout );
     }
     else
     {
         p_aout->output.output.i_format = i_format = AOUT_FMT_S16_NE;
         p_aout->output.i_nb_samples = FRAME_SIZE;
+
+        aout_VolumeSoftInit( p_aout );
     }
 
     if( ioctl( p_sys->i_fd, SNDCTL_DSP_SETFMT, &i_format ) < 0

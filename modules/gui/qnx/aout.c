@@ -106,6 +106,7 @@ int E_(OpenAudio)( vlc_object_t *p_this )
 
     p_aout->output.p_sys->p_silent_buffer = malloc( DEFAULT_FRAME_SIZE * 4 );
     p_aout->output.pf_play = Play;
+    aout_VolumeSoftInit( p_aout );
 
     memset( &pi, 0, sizeof(pi) );
     memset( &pp, 0, sizeof(pp) );

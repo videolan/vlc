@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.12 2002/08/30 23:27:06 massiot Exp $
+ * $Id: esd.c,v 1.13 2002/09/18 21:21:23 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -87,6 +87,7 @@ static int Open( vlc_object_t *p_this )
     p_aout->output.p_sys = p_sys;
 
     p_aout->output.pf_play = Play;
+    aout_VolumeSoftInit( p_aout );
 
     /* Initialize some variables */
     p_sys->esd_format = ESD_BITS16 | ESD_STREAM | ESD_PLAY;

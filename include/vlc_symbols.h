@@ -38,6 +38,11 @@ struct module_symbols_t
     int (* __vlc_threads_end_inner) ( vlc_object_t * ) ;
     int (* __vlc_threads_init_inner) ( vlc_object_t * ) ;
     int (* aout_FormatNbChannels_inner) ( audio_sample_format_t * p_format ) ;
+    int (* aout_VolumeDown_inner) ( aout_instance_t *, int, audio_volume_t * ) ;
+    int (* aout_VolumeGet_inner) ( aout_instance_t *, audio_volume_t * ) ;
+    int (* aout_VolumeInfos_inner) ( aout_instance_t *, audio_volume_t *, audio_volume_t * ) ;
+    int (* aout_VolumeSet_inner) ( aout_instance_t *, audio_volume_t ) ;
+    int (* aout_VolumeUp_inner) ( aout_instance_t *, int, audio_volume_t * ) ;
     int (* input_AccessInit_inner) ( input_thread_t * ) ;
     int (* input_AddInfo_inner) ( input_info_category_t *, char *, char *, ... ) ;
     int (* input_ChangeArea_inner) ( input_thread_t *, input_area_t * ) ;
@@ -112,6 +117,8 @@ struct module_symbols_t
     void (* aout_DateSet_inner) ( audio_date_t *, mtime_t ) ;
     void (* aout_DeleteInstance_inner) ( aout_instance_t * ) ;
     void (* aout_InputDelete_inner) ( aout_instance_t *, aout_input_t * ) ;
+    void (* aout_VolumeNoneInit_inner) ( aout_instance_t * ) ;
+    void (* aout_VolumeSoftInit_inner) ( aout_instance_t * ) ;
     void (* config_Duplicate_inner) ( module_t *, module_config_t * ) ;
     void (* config_SetCallbacks_inner) ( module_config_t *, module_config_t * ) ;
     void (* config_UnsetCallbacks_inner) ( module_config_t * ) ;
@@ -228,6 +235,13 @@ struct module_symbols_t
 #   define aout_FormatNbChannels p_symbols->aout_FormatNbChannels_inner
 #   define aout_InputDelete p_symbols->aout_InputDelete_inner
 #   define aout_OutputNextBuffer p_symbols->aout_OutputNextBuffer_inner
+#   define aout_VolumeDown p_symbols->aout_VolumeDown_inner
+#   define aout_VolumeGet p_symbols->aout_VolumeGet_inner
+#   define aout_VolumeInfos p_symbols->aout_VolumeInfos_inner
+#   define aout_VolumeNoneInit p_symbols->aout_VolumeNoneInit_inner
+#   define aout_VolumeSet p_symbols->aout_VolumeSet_inner
+#   define aout_VolumeSoftInit p_symbols->aout_VolumeSoftInit_inner
+#   define aout_VolumeUp p_symbols->aout_VolumeUp_inner
 #   define config_Duplicate p_symbols->config_Duplicate_inner
 #   define config_FindConfig p_symbols->config_FindConfig_inner
 #   define config_GetHomeDir p_symbols->config_GetHomeDir_inner
