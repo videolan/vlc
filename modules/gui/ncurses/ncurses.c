@@ -2,7 +2,7 @@
  * ncurses.c : NCurses plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: ncurses.c,v 1.12 2004/01/11 14:55:32 garf Exp $
+ * $Id: ncurses.c,v 1.13 2004/01/11 19:48:45 garf Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -393,12 +393,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 ManageSlider ( p_intf );
                 return 1;
             case KEY_UP:
-                p_sys->f_slider += 20.0;
+                p_sys->f_slider += 5.0;
                 if( p_sys->f_slider >= 99.0 ) p_sys->f_slider = 99.0;
                 ManageSlider ( p_intf );
                 return 1;
             case KEY_DOWN:
-                p_sys->f_slider -= 20.0;
+                p_sys->f_slider -= 5.0;
                 if( p_sys->f_slider < 0.0 ) p_sys->f_slider = 0.0;
                 ManageSlider ( p_intf );
                 return 1;
@@ -782,7 +782,7 @@ static void Redraw ( intf_thread_t *p_intf, time_t *t_last_refresh )
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Player]" );
-        MainBoxWrite( p_intf, l++, 1, "  <up>,<down>    Seek +/-20%%" );
+        MainBoxWrite( p_intf, l++, 1, "  <up>,<down>    Seek +/-5%%" );
         MainBoxWrite( p_intf, l++, 1, "" );
 
         MainBoxWrite( p_intf, l++, 1, "[Miscellaneous]" );
