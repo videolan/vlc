@@ -516,6 +516,15 @@ void spu_RenderSubpictures( spu_t *p_spu, video_format_t *p_fmt,
             p_spu->p_text->p_module =
                 module_Need( p_spu->p_text, "text renderer", 0, 0 );
         }
+        else if( p_region )
+        {
+            p_spu->p_text->fmt_out.video.i_width =
+                p_spu->p_text->fmt_out.video.i_visible_width =
+                    p_fmt->i_width;
+            p_spu->p_text->fmt_out.video.i_height =
+                p_spu->p_text->fmt_out.video.i_visible_height =
+                    p_fmt->i_height;
+        }
 
         i_scale_width = i_scale_width_orig;
         i_scale_height = i_scale_height_orig;
