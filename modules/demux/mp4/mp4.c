@@ -1146,7 +1146,9 @@ static int  TrackCreateES   ( input_thread_t   *p_input,
             p_track->fmt.video.i_height = p_track->i_height;
 
         /* Find out apect ratio from display size */
-        if( p_track->i_width > 0 && p_track->i_height > 0 )
+        if( p_track->i_width > 0 && p_track->i_height > 0 &&
+            /* Work-around buggy muxed files */
+            p_sample->data.p_sample_vide->i_width != p_track->i_width )
             p_track->fmt.video.i_aspect =
                 VOUT_ASPECT_FACTOR * p_track->i_width / p_track->i_height;
 
