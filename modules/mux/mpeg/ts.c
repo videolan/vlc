@@ -2,7 +2,7 @@
  * ts.c: MPEG-II TS Muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.29 2003/08/18 17:25:51 fenrir Exp $
+ * $Id: ts.c,v 1.30 2003/08/26 00:52:38 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -700,15 +700,15 @@ static int TSFill( sout_mux_t *p_mux, sout_input_t *p_input )
 
     ts_stream_t     *p_pcr_stream = (ts_stream_t*)p_sys->p_pcr_input->p_sys;
     ts_stream_t     *p_stream = (ts_stream_t*)p_input->p_sys;
-    mtime_t         i_dts, i_length;
-    sout_buffer_t   *p_data;
+    mtime_t         i_dts, i_dts_next,i_length;
+    sout_buffer_t   *p_data, *p_next;
     vlc_bool_t      b_pcr = VLC_FALSE;
     vlc_bool_t      b_pcr_soft = VLC_FALSE;
 
 
     for( ;; )
     {
-        if( p_input->p_fifo->i_depth <= 0 )
+        if( p_input->p_fifo->i_depth <= 1 )
         {
             if( p_input->p_fmt->i_cat == AUDIO_ES ||
                 p_input->p_fmt->i_cat == VIDEO_ES )
@@ -725,9 +725,19 @@ static int TSFill( sout_mux_t *p_mux, sout_input_t *p_input )
         i_dts    = p_data->i_dts;
         i_length = p_data->i_length;
 
+        p_next = sout_FifoShow( p_input->p_fifo );
+        i_dts_next = p_next->i_dts;
+
         if(  p_stream->i_pid == p_pcr_stream->i_pid &&
              p_stream->chain_ts.p_first == NULL )
         {
+            /* I need that length == dts_next - dts, but be carefull if
+             * some dts are broken length >= 0.5s are suspicious */
+            if( i_dts_next > i_dts &&
+                i_dts_next - i_dts < (mtime_t)500000 )
+            {
+                i_length = i_dts_next - i_dts;
+            }
             p_sys->i_length+= i_length;
             if( p_sys->chain_ts.p_first == NULL )
             {
