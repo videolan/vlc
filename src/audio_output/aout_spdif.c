@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.12 2001/06/09 17:01:22 stef Exp $
+ * $Id: aout_spdif.c,v 1.13 2001/06/12 18:16:49 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -63,7 +63,6 @@ void aout_SpdifThread( aout_thread_t * p_aout )
     int         i_blank;
     mtime_t     mplay;
     mtime_t     mdelta;
-    mtime_t     mlast = 0;
 
     /* get a blank frame ready */
     memset( pi_blank, 0, sizeof(pi_blank) );
@@ -105,14 +104,8 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                                 l_start_frame];
                     mdelta = mplay - mdate();
 
-                    if( mdelta < ( 3 * SLEEP_TIME ) )
+                    if( mdelta < ( 2 * SLEEP_TIME ) )
                     {
-                        intf_WarnMsg( 12, "spdif out (%d):"
-                                          "playing frame %lld (%lld)",
-                                           i_fifo,
-                                           mdelta,
-                                           mplay-mlast );
-                        mlast = mplay;
                         /* play spdif frame to the external decoder */
                         p_aout->pf_play( p_aout,
                                      ( (byte_t *)p_aout->fifo[i_fifo].buffer
@@ -123,7 +116,12 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                         p_aout->fifo[i_fifo].l_start_frame = 
                             (p_aout->fifo[i_fifo].l_start_frame + 1 )
                             & AOUT_FIFO_SIZE;
-                        
+
+                        intf_WarnMsg( 12, "spdif out (%d):"
+                                          "playing frame %lld",
+                                           i_fifo,
+                                           mdelta );
+                       
                         i_frame++;
                         i_blank = 0;
                     }
@@ -143,16 +141,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
 
         if( i_frame )
         {
-            if( mdelta > 0 )
-            {
-                /* we leave some time for aout fifo to fill and not to stress
-                 * the external decoder too much */
-                msleep( mdelta + SLEEP_TIME );
-            }
-            else if( mdelta > -SLEEP_TIME )
-            {
-                msleep( SLEEP_TIME );
-            }
+            mwait( mplay );
         }
         else
         {

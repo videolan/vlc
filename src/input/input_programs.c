@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.57 2001/05/23 17:47:34 stef Exp $
+ * $Id: input_programs.c,v 1.58 2001/06/12 18:16:49 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -631,6 +631,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         {
             decoder.pf_create_thread = adec_CreateThread;
             p_config = (void *)GetAdecConfig( p_input, p_es );
+            p_main->b_ac3 = 0;
 
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */
@@ -668,6 +669,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
             }
 
             p_config = (void *)GetAdecConfig( p_input, p_es );
+            p_main->b_ac3 = 1;
 
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */
@@ -681,6 +683,7 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
         {
             decoder.pf_create_thread = lpcmdec_CreateThread;
             p_config = (void *)GetAdecConfig( p_input, p_es );
+            p_main->b_ac3 = 0;
 
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */

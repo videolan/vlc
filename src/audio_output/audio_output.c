@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: audio_output.c,v 1.63 2001/05/31 01:37:08 sam Exp $
+ * $Id: audio_output.c,v 1.64 2001/06/12 18:16:49 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -150,9 +150,10 @@ aout_thread_t *aout_CreateThread( int *pi_status )
     }
 
     /* special setting for ac3 pass-through mode */
-    if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) )
+    if( main_GetIntVariable( AOUT_SPDIF_VAR, 0 ) && p_main->b_ac3 )
     {
-        p_aout->i_format   = AOUT_FMT_AC3;
+        intf_WarnMsg( 4, "aout info: setting ac3 spdif" );
+        p_aout->i_format = AOUT_FMT_AC3;
         p_aout->l_rate = 48000;
     }
 

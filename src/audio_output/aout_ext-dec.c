@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.4 2001/05/07 03:14:09 stef Exp $
+ * $Id: aout_ext-dec.c,v 1.5 2001/06/12 18:16:49 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -69,6 +69,26 @@ aout_fifo_t * aout_CreateFifo( int i_type, int i_channels, long l_rate,
 
         p_aout_bank->pp_aout[ p_aout_bank->i_count ] = p_aout;
         p_aout_bank->i_count++;
+    }
+    /* temporary hack to switch output type (mainly for spdif)
+     * FIXME: to be adapted when several output are available */
+    else if( p_aout_bank->pp_aout[0]->fifo[0].i_type != i_type )
+    {
+        intf_WarnMsg( 1, "aout: changing aout type" );
+
+        aout_DestroyThread( p_aout_bank->pp_aout[0], NULL );
+
+        p_aout = aout_CreateThread( NULL );
+
+        /* Everything failed */
+        if( p_aout == NULL )
+        {
+            vlc_mutex_unlock( &p_aout_bank->lock );
+            return NULL;
+        }
+
+        p_aout_bank->pp_aout[0] = p_aout;
+
     }
     else
     {

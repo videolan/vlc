@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.4 2001/06/07 22:25:42 sam Exp $
+ * $Id: dvd_summary.c,v 1.5 2001/06/12 18:16:49 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -259,13 +259,11 @@ char * IfoLanguage( u16 i_code )
  ****************************************************************************/
 void IfoPrintTitle( thread_dvd_data_t * p_dvd )
 {
-    intf_WarnMsg( 5, "***************************************************" );
     intf_WarnMsg( 5, "dvd info: title: %d", p_dvd->i_title );
     intf_WarnMsg( 5, "    vobstart at: %lld", p_dvd->i_start );
     intf_WarnMsg( 5, "    stream size: %lld", p_dvd->i_size );
     intf_WarnMsg( 5, "    number of chapters: %d", p_dvd->i_chapter_nb );
     intf_WarnMsg( 5, "    number of angles: %d", p_dvd->i_angle_nb );
-    intf_WarnMsg( 5, "***************************************************\n" );
 }
 
 /****************************************************************************
@@ -304,7 +302,6 @@ void IfoPrintVideo( thread_dvd_data_t * p_dvd )
         break;
     }
 
-    intf_WarnMsg( 5, "***********************************************" );
     intf_WarnMsg( 5, "dvd info: video" );
     intf_WarnMsg( 5, "    compression: mpeg-%d", video.i_compression+1 );
     intf_WarnMsg( 5, "    tv system: %s Hz",
@@ -322,7 +319,6 @@ void IfoPrintVideo( thread_dvd_data_t * p_dvd )
                      video.i_letterboxed ? "yes" : "no" );
     intf_WarnMsg( 5, "    mode: %s",
                      video.i_mode ? "film (625/50 only)" : "camera");
-    intf_WarnMsg( 5, "***********************************************\n" );
 }
 #undef video
 
@@ -345,7 +341,6 @@ void IfoPrintAudio( thread_dvd_data_t * p_dvd, int i )
         char    ppsz_quant[4][10] =
                 { "16 bits", "20 bits", "24 bits", "drc" };
     
-        intf_WarnMsg( 5, "***********************************************" );
         intf_WarnMsg( 5, "dvd info: audio %d" , i );
         intf_WarnMsg( 5, "    language: %s", 
                          IfoLanguage( hton16( audio.i_lang_code ) ) );
@@ -374,7 +369,6 @@ void IfoPrintAudio( thread_dvd_data_t * p_dvd, int i )
                          ppsz_quant[audio.i_quantization & 0x3] );
     
         intf_WarnMsg( 5, "    status: %x", audio_status.i_position );
-        intf_WarnMsg( 5, "***********************************************\n" );
     }
 
 
@@ -393,7 +387,6 @@ void IfoPrintSpu( thread_dvd_data_t * p_dvd, int i )
 {
     if( spu_status.i_available )
     {
-        intf_WarnMsg( 5, "***********************************************" );
         intf_WarnMsg( 5, "dvd info: spu %d", i );
         intf_WarnMsg( 5, "    caption: %d", spu.i_caption );
         intf_WarnMsg( 5, "    language: %s",
@@ -405,7 +398,6 @@ void IfoPrintSpu( thread_dvd_data_t * p_dvd, int i )
             spu_status.i_position_wide,
             spu_status.i_position_letter,
             spu_status.i_position_pan );
-        intf_WarnMsg( 5, "***********************************************\n" );
     }
 
 }

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.119 2001/06/07 01:10:33 sam Exp $
+ * $Id: input.c,v 1.120 2001/06/12 18:16:49 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -269,7 +269,23 @@ static void RunThread( input_thread_t *p_input )
 
         if( p_input->stream.p_new_area )
         {
-            p_input->pf_set_area( p_input, p_input->stream.p_new_area );
+            if( p_input->stream.b_seekable && p_input->pf_set_area != NULL )
+            {
+
+                p_input->pf_set_area( p_input, p_input->stream.p_new_area );
+
+                for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
+                {
+                    pgrm_descriptor_t * p_pgrm
+                                            = p_input->stream.pp_programs[i];
+                    /* Escape all decoders for the stream discontinuity they
+                     * will encounter. */
+                    input_EscapeDiscontinuity( p_input, p_pgrm );
+
+                    /* Reinitialize synchro. */
+                    p_pgrm->i_synchro_state = SYNCHRO_REINIT;
+                }
+            }
             p_input->stream.p_new_area = NULL;
         }
 
