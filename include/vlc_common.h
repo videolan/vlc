@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.107 2004/01/29 14:39:08 sigmunau Exp $
+ * $Id: vlc_common.h,v 1.108 2004/02/06 20:06:55 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -546,6 +546,29 @@ static inline uint64_t GetQWLE( void const * _p )
 #define GetDWBE( p )    U32_AT( p )
 #define GetQWBE( p )    U64_AT( p )
 
+/* Helper writer functions */
+
+#define SetWLE( p, v ) _SetWLE( (uint8_t*)p, v)
+static inline void _SetWLE( uint8_t *p, uint16_t i_dw )
+{
+    p[1] = ( i_dw >>  8 )&0xff;
+    p[0] = ( i_dw       )&0xff;
+}
+
+#define SetDWLE( p, v ) _SetDWLE( (uint8_t*)p, v)
+static inline void _SetDWLE( uint8_t *p, uint32_t i_dw )
+{
+    p[3] = ( i_dw >> 24 )&0xff;
+    p[2] = ( i_dw >> 16 )&0xff;
+    p[1] = ( i_dw >>  8 )&0xff;
+    p[0] = ( i_dw       )&0xff;
+}
+#define SetQWLE( p, v ) _SetQWLE( (uint8_t*)p, v)
+static inline void _SetQWLE( uint8_t *p, uint64_t i_qw )
+{
+    SetDWLE( p,   i_qw&0xffffffff );
+    SetDWLE( p+4, ( i_qw >> 32)&0xffffffff );
+}
 
 #if WORDS_BIGENDIAN
 #   define hton16(i)   ( i )
