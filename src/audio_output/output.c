@@ -307,10 +307,8 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
 
     /* Here we suppose that all buffers have the same duration - this is
      * generally true, and anyway if it's wrong it won't be a disaster.
-     * start_date may be null with some screwed ALSA driver; then do not
-     * try to play silences or resample.
      */
-    if ( start_date && p_buffer->start_date > start_date
+    if ( p_buffer->start_date > start_date
                          + (p_buffer->end_date - p_buffer->start_date) )
     /*
      *                   + AOUT_PTS_TOLERANCE )
@@ -329,7 +327,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
 
     p_aout->output.b_starving = 0;
 
-    if ( !b_can_sleek && start_date &&
+    if ( !b_can_sleek &&
           ( (p_buffer->start_date - start_date > AOUT_PTS_TOLERANCE)
              || (start_date - p_buffer->start_date > AOUT_PTS_TOLERANCE) ) )
     {

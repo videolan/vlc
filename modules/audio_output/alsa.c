@@ -758,13 +758,26 @@ static void ALSAFill( aout_instance_t * p_aout )
 
             snd_pcm_status_get_tstamp( p_status, &ts_next );
             next_date = (mtime_t)ts_next.tv_sec * 1000000 + ts_next.tv_usec;
-            /* With screwed drivers the timestamp is always zero; then we
-             * pass a null next_date to aout_OutputNextBuffer to ignore
-             * resampling */
             if( next_date )
             {
                 next_date += (mtime_t)snd_pcm_status_get_delay(p_status)
-                    * 1000000 / p_aout->output.output.i_rate;
+                        * 1000000 / p_aout->output.output.i_rate;
+            }
+            else
+            {
+                /* With screwed ALSA drivers the timestamp is always zero;
+                 * use another method then */
+                snd_pcm_sframes_t delay;
+                ssize_t i_bytes = 0;
+
+                if( !snd_pcm_delay( p_sys->p_snd_pcm, &delay ) )
+                {
+                    i_bytes = snd_pcm_frames_to_bytes(p_sys->p_snd_pcm, delay);
+                }
+                next_date = mdate() + (mtime_t)i_bytes * 1000000
+                        / p_aout->output.output.i_bytes_per_frame
+                        / p_aout->output.output.i_rate
+                        * p_aout->output.output.i_frame_length;
             }
         }
 
