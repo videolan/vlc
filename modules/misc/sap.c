@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.17 2003/07/02 18:44:27 zorglub Exp $
+ * $Id: sap.c,v 1.18 2003/07/05 15:00:28 zorglub Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *          Clément Stenac <zorglub@via.ecp.fr>
@@ -754,7 +754,8 @@ static int ismult( char *psz_uri )
     /* IPv6 */
     if( psz_uri[0] == '[') 
     {
-        if( strncasecmp( &psz_uri[1], "FF0" , 3) )
+      if( strncasecmp( &psz_uri[1], "FF0" , 3) || 
+          strncasecmp( &psz_uri[2], "FF0" , 3))
             return( VLC_TRUE );
         else
             return( VLC_FALSE ); 

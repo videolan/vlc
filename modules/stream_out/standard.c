@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.6 2003/06/23 13:45:30 zorglub Exp $
+ * $Id: standard.c,v 1.7 2003/07/05 15:00:28 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -81,8 +81,6 @@ static int Open( vlc_object_t *p_this )
     
     char                *psz_sap = NULL;
 
-    char                *psz_port = "1234";
-    
     sap_session_t       *p_sap = NULL;
     
     sout_access_out_t *p_access;
@@ -142,7 +140,7 @@ static int Open( vlc_object_t *p_this )
     if(p_sys->b_sap)
     {        
         msg_Dbg( p_sout , "Creating SAP with IPv%i",atoi(psz_ipv) );
-        p_sap = sout_SAPNew( p_sout , psz_url , psz_port , psz_sap, atoi(psz_ipv), psz_v6_scope );
+        p_sap = sout_SAPNew( p_sout , psz_url , psz_sap, atoi(psz_ipv), psz_v6_scope );
         if(!p_sap)
         {
                 msg_Err( p_sout,"Unable to initialize SAP. SAP disabled");

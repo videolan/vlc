@@ -2,7 +2,7 @@
  * announce.h : Session announcement
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: announce.h,v 1.5 2003/06/25 21:03:16 zorglub Exp $
+ * $Id: announce.h,v 1.6 2003/07/05 15:00:28 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -61,6 +61,6 @@ struct sap_session_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( sap_session_t *,            sout_SAPNew,         ( sout_instance_t *,char * , char * , char * ,int , char *) );
+VLC_EXPORT( sap_session_t *,            sout_SAPNew,         ( sout_instance_t *,char * , char * , int , char *) );
 VLC_EXPORT( void,            sout_SAPSend,        ( sout_instance_t *,sap_session_t *) );
 VLC_EXPORT( void,            sout_SAPDelete,      ( sout_instance_t *,sap_session_t * ) );

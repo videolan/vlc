@@ -46,71 +46,75 @@
 #define SAP_IPV6_ADDR_1 "FF0"
 #define SAP_IPV6_ADDR_2 "::2:7FFE"
 
+#define DEFAULT_PORT "1234"
+
 /****************************************************************************
  *  Split : split a string into two parts: the one which is before the delim
  *               and the one which is after.
  *               NULL is returned if delim is not found
  ****************************************************************************/
 
-static char * split( char *p_in, char *p_out1, char *p_out2, char delim)
+static char * split( char *psz_in, char *psz_out1, char *psz_out2, char delim)
 {
-    unsigned int i_count=0; /*pos in input string*/
-    unsigned int i_pos1=0; /*pos in out2 string */
-    unsigned int i_pos2=0; 
-    char *p_cur; /*store the pos of the first delim found */
+    unsigned int i_count = 0; /*pos in input string*/
+    unsigned int i_pos1  = 0; /*pos in out2 string */
+    unsigned int i_pos2  = 0; 
+    char *psz_cur; /*store the pos of the first delim found */
     
     /*skip spaces at the beginning*/
-    while(p_in[i_count] == ' ' && i_count < strlen(p_in))
+    while(psz_in[i_count] == ' ' && i_count < strlen(psz_in))
     {
         i_count++;
     }
-    if(i_count == strlen(p_in))
+    if(i_count == strlen(psz_in))
         return NULL;
     
     /*Look for delim*/
-    while(p_in[i_count] != delim && i_count < strlen(p_in))
+    while(psz_in[i_count] != delim && i_count < strlen(psz_in))
     {
-        p_out1[i_pos1] = p_in[i_count];
+        psz_out1[i_pos1] = psz_in[i_count];
         i_count++;
         i_pos1++;
     }
     /* Mark the end of out1 */
-    p_out1[i_pos1] = 0;
+    psz_out1[i_pos1] = 0;
     
-    if(i_count == strlen(p_in))
+    if(i_count == strlen(psz_in))
         return NULL;
     
     /*store pos of the first delim*/
-    p_cur = &p_in[i_count];
+    psz_cur = &psz_in[i_count];
     
     
     
     /*skip all delim and all spaces*/
-    while((p_in[i_count] == ' ' || p_in[i_count] == delim) && i_count < strlen(p_in))
+    while( (psz_in[i_count] == ' ' || 
+            psz_in[i_count] == delim) 
+           && i_count < strlen(psz_in))
     {
         i_count++;
     }
     
-    if(i_count == strlen(p_in))
-        return p_cur;
+    if(i_count == strlen(psz_in))
+        return psz_cur;
     
     /*Store the second string*/
-    while(i_count < strlen(p_in))
+    while(i_count < strlen(psz_in))
     {
-        p_out2[i_pos2] = p_in[i_count];
+        psz_out2[i_pos2] = psz_in[i_count];
         i_pos2++;
         i_count++;
     }
-    p_out2[i_pos2] = 0;
+    psz_out2[i_pos2] = 0;
     
-    return p_cur;
+    return psz_cur;
 }
 
 /*****************************************************************************
  * sout_SAPNew: Creates a SAP Session
  *****************************************************************************/
 sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
-                char * psz_url_arg , char *psz_port_arg ,
+                char * psz_url_arg,
                 char * psz_name_arg, int ip_version,
                 char * psz_v6_scope )
 {
@@ -119,7 +123,9 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
     network_socket_t    socket_desc; /* Socket descriptor */
     char                psz_network[6]; /* IPv4 or IPv6 */
     char                *sap_ipv6_addr=NULL; /* IPv6 built address */
-
+    char                *psz_eol; /* Used to parse IPv6 URIs */
+    int                 i_port; /* Port in numerical format */
+    
     /* Allocate the SAP structure */
     p_new = (sap_session_t *)malloc( sizeof ( sap_session_t ) ) ;
     if ( !p_new )
@@ -129,12 +135,55 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
     }
     
     /* Fill the information in the structure */
-    split(psz_url_arg,p_new->psz_url,p_new->psz_port,':');   
-    // sprintf ( p_new->psz_url , "%s" , psz_url_arg );
-    sprintf ( p_new->psz_name , "%s" , psz_name_arg );
+    if( strstr( psz_url_arg , "[" ) )
+    {      /* We have an IPv6 address. Do not use ':' as the port separator */
+        psz_eol = strchr( psz_url_arg, ']' );
+        if( !psz_eol ) /* No matching ] ! Aborting */
+        {
+            msg_Warn( p_sout , "No matching ]. Unable to parse URI");
+            return NULL;
+        }
+        if(!psz_eol++)
+        {
+              sprintf (p_new->psz_url, "%s", psz_url_arg);
+              sprintf (p_new->psz_port, "%s", DEFAULT_PORT);
+        }
+        else
+        {
+            *psz_eol = '\0';
+            sprintf (p_new->psz_url, "%s", psz_url_arg);
+            psz_eol++;
+            if(psz_eol)
+            {
+                  sprintf (p_new->psz_port, "%s", psz_eol);
+            }
+        }    
+    }
+    else
+    {
+        split(psz_url_arg,p_new->psz_url,p_new->psz_port,':');   
+    }
+  
+    /* Check if we have a port */
+    if( !strlen(p_new->psz_port) )
+    {
+        sprintf (p_new->psz_port, "%s", DEFAULT_PORT);
+    }
+  
+    /* Make sure our port is valid and atoi it*/
+    i_port = atoi( p_new->psz_port );
+    
+    if( !i_port )
+    {
+        sprintf (p_new->psz_port, "%s", DEFAULT_PORT);
+    }
+    else
+    {
+       sprintf (p_new->psz_port, "%i", i_port); 
+    }
 
-    /* Port is not implemented in sout */
-    //sprintf ( p_new->psz_port, "%s" , psz_port_arg );
+    /* The name that we send */ 
+    sprintf ( p_new->psz_name , "%s" , psz_name_arg );
 
     p_new->i_ip_version = ip_version;
 
@@ -226,7 +275,7 @@ sap_session_t * sout_SAPNew ( sout_instance_t *p_sout ,
  *****************************************************************************/
 void sout_SAPDelete( sout_instance_t *p_sout , sap_session_t * p_this )
 {
-    if( close(p_this->socket) )
+    if( close( p_this->socket ) )
     {
         msg_Err ( p_sout, "Unable to close SAP socket");
     }
@@ -287,7 +336,6 @@ void sout_SAPSend( sout_instance_t *p_sout, sap_session_t * p_this)
                           "a=type:test\n",
                  p_this->psz_name , p_this->psz_port , p_this->psz_url );
         
-        fprintf(stderr,"Sending : <%s>\n",sap_msg);
         i_msg_size = strlen( sap_msg );
         i_size = i_msg_size + i_header_size;
 
