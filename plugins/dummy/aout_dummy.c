@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.13 2001/06/14 01:49:44 sam Exp $
+ * $Id: aout_dummy.c,v 1.14 2001/07/12 20:44:52 reno Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -114,6 +114,8 @@ static int aout_Open( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
+    p_aout->i_latency = 0;
+
     return( 0 );
 }
 

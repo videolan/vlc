@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_dsp.c,v 1.13 2001/05/30 17:03:12 sam Exp $
+ * $Id: aout_dsp.c,v 1.14 2001/07/12 20:44:52 reno Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -239,6 +239,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
         p_aout->l_rate = l_rate;
     }
 
+    p_aout->i_latency = 0;
+    
     return( 0 );
 }
 

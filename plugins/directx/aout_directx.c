@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_directx.c,v 1.4 2001/07/08 17:45:52 gbazin Exp $
+ * $Id: aout_directx.c,v 1.5 2001/07/12 20:44:52 reno Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -257,6 +257,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
         intf_WarnMsg( 3, "aout: DirectX aout_SetFormat cannot create buffer");
         return( 1 );
     }
+
+    p_aout->i_latency = 0;
   
     return( 0 );
 }

@@ -2,7 +2,7 @@
  * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_beos.cpp,v 1.14 2001/05/31 03:57:54 sam Exp $
+ * $Id: aout_beos.cpp,v 1.15 2001/07/12 20:44:52 reno Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -180,6 +180,8 @@ static int aout_Open( aout_thread_t *p_aout )
  *****************************************************************************/
 static int aout_SetFormat( aout_thread_t *p_aout )
 {
+    p_aout->i_latency = 0;
+
     return( 0 );
 }
 

@@ -2,7 +2,7 @@
  * aout_alsa.c : Alsa functions library
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: aout_alsa.c,v 1.17 2001/07/11 02:01:03 sam Exp $
+ * $Id: aout_alsa.c,v 1.18 2001/07/12 20:44:52 reno Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -284,6 +284,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
         return( -1 );
     }
 
+    p_aout->i_latency = 0;
+    
     return( 0 );
 }
 

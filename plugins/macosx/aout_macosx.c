@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.2 2001/05/07 03:14:09 stef Exp $
+ * $Id: aout_macosx.c,v 1.3 2001/07/12 20:44:52 reno Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -336,6 +336,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
             }
         }
     }
+
+    p_aout->i_latency = 0;
 
     /* add callback */
     err = AudioDeviceAddIOProc( p_aout->p_sys->device, 
