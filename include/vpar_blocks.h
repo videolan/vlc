@@ -81,9 +81,9 @@ typedef struct
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void vpar_CodedPattern420( struct vpar_thread_s* p_vpar );
-void vpar_CodedPattern422( struct vpar_thread_s* p_vpar );
-void vpar_CodedPattern444( struct vpar_thread_s* p_vpar );
+int vpar_CodedPattern420( struct vpar_thread_s* p_vpar );
+int vpar_CodedPattern422( struct vpar_thread_s* p_vpar );
+int vpar_CodedPattern444( struct vpar_thread_s* p_vpar );
 int  vpar_IMBType( struct vpar_thread_s* p_vpar );
 int  vpar_PMBType( struct vpar_thread_s* p_vpar );
 int  vpar_BMBType( struct vpar_thread_s* p_vpar );

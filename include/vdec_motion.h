@@ -23,3 +23,5 @@ typedef void (*f_chroma_motion_t)( struct macroblock_s* );
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+void vdec_MotionField( struct macroblock_s* );
+void vdec_MotionFrame( struct macroblock_s* );

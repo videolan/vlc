@@ -543,6 +543,7 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     else if( p_vpar->picture.i_current_structure == FRAME_STRUCTURE )
     {
         /* Frame completely parsed. */
+        P_picture.i_deccount = p_vpar->sequence.i_mb_size;
         for( i_mb = 0; i_mb < p_vpar->sequence.i_mb_size; i_mb++ )
         {
             vpar_DecodeMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );

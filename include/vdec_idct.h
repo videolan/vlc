@@ -23,3 +23,6 @@ typedef void (*f_idct_t)( elem_t*, int );
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+void vdec_DummyIDCT( elem_t*, int );
+void vdec_SparseIDCT( elem_t*, int );
+void vdec_IDCT( elem_t*, int );

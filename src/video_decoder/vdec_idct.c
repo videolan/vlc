@@ -28,11 +28,15 @@
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
-#include "video_parser.h"
 
-#include "undec_picture.h"
-#include "video_fifo.h"
+#include "vdec_idct.h"
 #include "video_decoder.h"
+#include "vdec_motion.h"
+
+#include "vpar_blocks.h"
+#include "vpar_headers.h"
+#include "video_fifo.h"
+#include "video_parser.h"
 
 /*
  * Local prototypes

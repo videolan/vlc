@@ -28,10 +28,15 @@
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
-#include "video_parser.h"
 
-#include "video_fifo.h"
+#include "vdec_idct.h"
 #include "video_decoder.h"
+#include "vdec_motion.h"
+
+#include "vpar_blocks.h"
+#include "vpar_headers.h"
+#include "video_fifo.h"
+#include "video_parser.h"
 
 /*
  * Local prototypes
@@ -41,8 +46,12 @@ static __inline__ void InitMacroblock( vpar_thread_t * p_vpar,
 static __inline__ int MacroblockAddressIncrement( vpar_thread_t * p_vpar );
 static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
                                         macroblock_t * p_mb );
+static void vpar_DecodeMPEG1Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
+static void vpar_DecodeMPEG1Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
+static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
+static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b );
 
-typedef (void *)    f_decode_block_t( vpar_thread_t *, macroblock_t *, int );
+typedef void      (*f_decode_block_t)( vpar_thread_t *, macroblock_t *, int );
 
 /*****************************************************************************
  * vpar_ParseMacroblock : Parse the next macroblock
@@ -66,8 +75,8 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
                                 vdec_MotionField, vdec_MotionFrame};
 
         /* Reset DC predictors (7.2.1). */
-        p_vpar->slice.pi_dct_pred[0] = p_vpar->slice.pi_dct_pred[1]
-            = p_vpar->slice.pi_dct_pred[2]
+        p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
+            = p_vpar->slice.pi_dc_dct_pred[2]
             = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
 
         if( p_vpar->picture.i_coding_type == P_CODING_TYPE )
@@ -79,7 +88,7 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
         if( (p_mb = p_vpar->picture.pp_mb[i_mb_base + i_mb] =
              vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
         {
-            p_vpar->picture.b_error = TRUE;
+            p_vpar->picture.b_error = 1;
             intf_ErrMsg("vpar error: macroblock list is empty !");
             return;
         }
@@ -104,7 +113,7 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
     if( (p_mb = p_vpar->picture.pp_mb[i_mb_base + *pi_mb_address] =
          vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
     {
-        p_vpar->picture.b_error = TRUE;
+        p_vpar->picture.b_error = 1;
         intf_ErrMsg("vpar error: macroblock list is empty !");
         return;
     }
@@ -196,7 +205,7 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
             /* Calculate block coordinates. */
             p_mb->p_data[i_b] = pi_data[i_b] + pi_pos[i_b >> 2]
                     + pi_y[i_b]*pi_width[i_b >> 2]
-                    + (p_vpar->mb.b_dct_type & ((i_b & 2) >> 1))
+                    + (p_vpar->mb.b_dct_type & ((i_b & 2) >> 1));
                     /* INACHEVÉ parce que trop pourri ! */
         }
         else
@@ -212,8 +221,8 @@ void vpar_ParseMacroblock( vpar_thread_t * p_vpar, int * pi_mb_address,
         static int          pi_dc_dct_reinit[4] = {128,256,512,1024};
 
         /* Reset DC predictors (7.2.1). */
-        p_vpar->slice.pi_dct_pred[0] = p_vpar->slice.pi_dct_pred[1]
-            = p_vpar->slice.pi_dct_pred[2]
+        p_vpar->slice.pi_dc_dct_pred[0] = p_vpar->slice.pi_dc_dct_pred[1]
+            = p_vpar->slice.pi_dc_dct_pred[2]
             = pi_dc_dct_reinit[p_vpar->picture.i_intra_dc_precision];
     }
     else if( !p_vpar->picture.b_concealment_mv )
@@ -271,14 +280,14 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
     static int          ppi_mv_format[2][4] = { {0, 1, 1, 1}, {0, 1, 2, 1} };
 
     /* Get macroblock_type. */
-    p_vpar->mb.i_mb_type = (*p_vpar->picture.pf_macroblock_type)
+    p_vpar->mb.i_mb_type = (p_vpar->picture.pf_macroblock_type)
                                   ( vpar_thread_t * p_vpar );
 
     /* SCALABILITY : warning, we don't know if spatial_temporal_weight_code
      * has to be dropped, take care if you use scalable streams. */
     /* DumpBits( &p_vpar->bit_stream, 2 ); */
     
-    if( !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD | MB_MOTION_BACKWARD))
+    if( !(p_vpar->mb.i_mb_type & (MB_MOTION_FORWARD || MB_MOTION_BACKWARD))
         || p_vpar->picture.b_frame_pred_frame_dct )
     {
         /* If mb_type has neither MOTION_FORWARD nor MOTION_BACKWARD, this
@@ -290,7 +299,7 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
         p_vpar->mb.i_motion_type = GetBits( &p_vpar->bit_stream, 2 );
     }
 
-    p_mb->f_motion = pf_motion[p_vpar->picture.b_frame_structure]
+    p_mb->pf_motion = pf_motion[p_vpar->picture.b_frame_structure]
                               [p_vpar->mb.i_motion_type];
     p_vpar->mb.i_mv_count = ppi_mv_count[p_vpar->picture.b_frame_structure]
                                         [p_vpar->mb.i_motion_type];
@@ -299,7 +308,7 @@ static __inline__ void MacroblockModes( vpar_thread_t * p_vpar,
 
     if( (p_vpar->picture.i_structure == FRAME_STRUCTURE) &&
         (!p_vpar->picture.b_frame_pred_frame_dct) &&
-        (p_var->mb.i_mb_type & (MB_PATTERN|MB_INTRA)) )
+        (p_vpar->mb.i_mb_type & (MB_PATTERN|MB_INTRA)) )
     {
         p_vpar->mb.b_dct_type = GetBits( &p_vpar->bit_stream, 1 );
     }
@@ -368,7 +377,7 @@ int vpar_CodedPattern444( vpar_thread_t * p_vpar )
 /*****************************************************************************
  * vpar_DecodeMPEG1Non : decode MPEG-1 non-intra blocks
  *****************************************************************************/
-void vpar_DecodeMPEG1Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
+static void vpar_DecodeMPEG1Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 {
     /* À pomper dans Berkeley. Pour toutes ces fonctions, il faut mettre
        p_mb->pf_idct[i_b] à :
@@ -381,14 +390,14 @@ void vpar_DecodeMPEG1Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
     {
         /* Remove end_of_macroblock (always 1, prevents startcode emulation)
          * ISO/IEC 11172-2 section 2.4.2.7 and 2.4.3.6 */
-        DumpBits( &p_vpar->fifo, 1 );
+        DumpBits( &p_vpar->bit_stream, 1 );
     }
 }
 
 /*****************************************************************************
  * vpar_DecodeMPEG1Intra : decode MPEG-1 intra blocks
  *****************************************************************************/
-void vpar_DecodeMPEG1Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
+static void vpar_DecodeMPEG1Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 {
     /* À pomper dans Berkeley. */
 
@@ -396,14 +405,14 @@ void vpar_DecodeMPEG1Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b
     {
         /* Remove end_of_macroblock (always 1, prevents startcode emulation)
          * ISO/IEC 11172-2 section 2.4.2.7 and 2.4.3.6 */
-        DumpBits( &p_vpar->fifo, 1 );
+        DumpBits( &p_vpar->bit_stream, 1 );
     }
 }
 
 /*****************************************************************************
  * vpar_DecodeMPEG2Non : decode MPEG-2 non-intra blocks
  *****************************************************************************/
-void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
+static void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 {
     /* À pomper dans Berkeley. Bien sûr les matrices seront différentes... */
 }
@@ -411,7 +420,7 @@ void vpar_DecodeMPEG2Non( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 /*****************************************************************************
  * vpar_DecodeMPEG2Intra : decode MPEG-2 intra blocks
  *****************************************************************************/
-void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
+static void vpar_DecodeMPEG2Intra( vpar_thread_t * p_vpar, macroblock_t * p_mb, int i_b )
 {
     /* À pomper dans Berkeley. */
 }

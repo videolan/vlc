@@ -30,11 +30,15 @@
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
-#include "video_parser.h"
 
-#include "undec_picture.h"
-#include "video_fifo.h"
+#include "vdec_idct.h"
 #include "video_decoder.h"
+#include "vdec_motion.h"
+
+#include "vpar_blocks.h"
+#include "vpar_headers.h"
+#include "video_fifo.h"
+#include "video_parser.h"
 
 /*
  * Local prototypes
@@ -167,7 +171,7 @@ static void RunThread( vdec_thread_t *p_vdec )
     {
         macroblock_t *          p_mb;
         
-        if( (p_mb = GetMacroblock( &p_vdec->p_vpar.vfifo )) != NULL )
+        if( (p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo )) != NULL )
         {
             DecodeMacroblock( p_vdec, p_mb );
         }
@@ -195,13 +199,13 @@ static void RunThread( vdec_thread_t *p_vdec )
  *******************************************************************************/
 static void ErrorThread( vdec_thread_t *p_vdec )
 {
-    undec_picture_t *       p_undec_p;
+    macroblock_t *       p_mb;
 
     /* Wait until a `die' order */
     while( !p_vdec->b_die )
     {
-        p_undec_p = GetPicture( p_vdec->p_vpar.vfifo );
-        DestroyPicture( p_vdec->p_vpar.vfifo, p_undec_p );
+        p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo );
+        vpar_DestroyMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
 
         /* Sleep a while */
         msleep( VDEC_IDLE_SLEEP );                
@@ -237,12 +241,12 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
         /*
          * Inverse DCT (ISO/IEC 13818-2 section Annex A)
          */
-        (*p_mb->pf_idct[i_b])( p_mb, p_mb->ppi_blocks[i_b], p_mb->pi_sparse_pos[i_b] );
+        (p_mb->pf_idct[i_b])( p_mb->ppi_blocks[i_b], p_mb->pi_sparse_pos[i_b] );
 
         /*
          * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
          */
-        (*p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
+        (p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
                                p_mb->p_data[i_b], p_mb->i_lum_incr );
     }
 
@@ -252,12 +256,12 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
         /*
          * Inverse DCT (ISO/IEC 13818-2 section Annex A)
          */
-        (*p_mb->pf_idct[i_b])( p_mb, p_mb->ppi_blocks[i_b], p_mb->pi_sparse_pos[i_b] );
+        (p_mb->pf_idct[i_b])( p_mb->ppi_blocks[i_b], p_mb->pi_sparse_pos[i_b] );
 
         /*
          * Adding prediction and coefficient data (ISO/IEC 13818-2 section 7.6.8)
          */
-        (*p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
+        (p_mb->pf_addb[i_b])( p_mb->ppi_blocks[i_b],
                                p_mb->p_data[i_b], p_mb->i_chroma_incr );
     }
 
@@ -265,7 +269,7 @@ static void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
      * Decoding is finished, release the macroblock and free
      * unneeded memory.
      */
-    vpar_ReleaseMacroblock( &p_vdec->p_vpar.vfifo, p_mb );
+    vpar_ReleaseMacroblock( &p_vdec->p_vpar->vfifo, p_mb );
 }
 
 /*******************************************************************************
