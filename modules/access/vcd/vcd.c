@@ -44,7 +44,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("VCD input") );
-    set_capability( "access2", 10 );
+    set_capability( "access2", 60 );
     set_callbacks( Open, Close );
 
     add_usage_hint( N_("[vcd:][device][@[title][,[chapter]]]") );

@@ -1455,7 +1455,7 @@ static int InputSourceInit( input_thread_t *p_input,
         psz_demux = psz_forced_demux;
 
     /* Try access_demux if no demux given */
-    if( *psz_access && *psz_demux == '\0' )
+    if( *psz_demux == '\0' )
     {
         in->p_demux = demux2_New( p_input, psz_access, psz_demux, psz_path,
                                   NULL, p_input->p_es_out );

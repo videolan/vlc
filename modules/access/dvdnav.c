@@ -29,6 +29,16 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#ifdef HAVE_SYS_TYPES_H
+#   include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
+
 #include "vlc_keys.h"
 #include "iso_lang.h"
 
@@ -51,7 +61,7 @@ vlc_module_begin();
     set_description( _("DVDnav Input") );
     add_integer( "dvdnav-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    set_capability( "access_demux", 0 );
+    set_capability( "access_demux", 5 );
     add_shortcut( "dvd" );
     add_shortcut( "dvdnav" );
     add_shortcut( "dvdnavsimple" );
@@ -121,6 +131,8 @@ static void DemuxTitles( demux_t *p_demux );
 static void ESSubtitleUpdate( demux_t * );
 static void ButtonUpdate( demux_t * );
 
+static int ProbeDVD( demux_t *, char * );
+
 /*****************************************************************************
  * DemuxOpen:
  *****************************************************************************/
@@ -138,6 +150,16 @@ static int Open( vlc_object_t *p_this )
     {
         return VLC_EGENERIC;
     }
+
+    /* Try some simple probing to avoid going through dvdnav_open too often */
+    if( ProbeDVD( p_demux, psz_name ) != VLC_SUCCESS )
+    {
+        free( psz_name );
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg( p_this, "dvdroot=%s title=%d chapter=%d angle=%d",
+             psz_name, i_title, i_chapter, i_angle );
 
     /* Open dvdnav */
     if( dvdnav_open( &p_dvdnav, psz_name ) != DVDNAV_STATUS_OK )
@@ -779,9 +801,6 @@ static char *ParseCL( vlc_object_t *p_this, char *psz_name, vlc_bool_t b_force,
     }
 #endif
 
-    msg_Dbg( p_this, "dvdroot=%s title=%d chapter=%d angle=%d",
-             psz_source, *i_title, *i_chapter, *i_angle );
-
     return psz_source;
 }
 
@@ -1316,4 +1335,53 @@ static int EventKey( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_unlock( &p_ev->lock );
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * ProbeDVD: very weak probing that avoids going too often into a dvdnav_open()
+ *****************************************************************************/
+static int ProbeDVD( demux_t *p_demux, char *psz_name )
+{
+#ifdef HAVE_SYS_STAT_H
+    struct stat stat_info;
+    uint8_t pi_anchor[2];
+    uint16_t i_tag_id = 0;
+    int i_fd, i_ret;
+
+    if( stat( psz_name, &stat_info ) || !S_ISREG( stat_info.st_mode ) )
+    {
+        /* Let dvdnav_open() do the probing */
+        return VLC_SUCCESS;
+    }
+
+    if( (i_fd = open( psz_name, O_RDONLY )) == -1 )
+    {
+        /* Let dvdnav_open() do the probing */
+        return VLC_SUCCESS;
+    }
+
+    /* Try to find the anchor (2 bytes at LBA 256) */
+    i_ret = VLC_SUCCESS;
+    if( lseek( i_fd, 256 * DVD_VIDEO_LB_LEN, SEEK_SET ) == -1 )
+    {
+        i_ret = VLC_EGENERIC;
+    }
+
+    if( read( i_fd, pi_anchor, 2 ) == 2 )
+    {
+        i_tag_id = GetWLE(pi_anchor);
+        if( i_tag_id != 2 ) i_ret = VLC_EGENERIC; /* Not an anchor */
+    }
+    else
+    {
+        i_ret = VLC_EGENERIC;
+    }
+
+    close( i_fd );
+
+    return i_ret;
+#else
+
+    return VLC_SUCCESS;
+#endif
 }
