@@ -2,7 +2,7 @@
  * open.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.h,v 1.3 2002/12/08 23:38:02 massiot Exp $
+ * $Id: open.h,v 1.4 2002/12/30 23:45:21 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -33,6 +33,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_panel;
 
     IBOutlet id o_mrl;
+    IBOutlet id o_mrl_lbl;
     IBOutlet id o_tabview;
 
     IBOutlet id o_btn_ok;
@@ -40,9 +41,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
     IBOutlet id o_file_path;
     IBOutlet id o_file_btn_browse;
+    IBOutlet id o_file_stream;
 
     IBOutlet id o_disc_type;
-    IBOutlet id o_disc_type_lbl;
     IBOutlet id o_disc_device;
     IBOutlet id o_disc_device_lbl;
     IBOutlet id o_disc_title;
@@ -51,6 +52,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_disc_chapter;
     IBOutlet id o_disc_chapter_lbl;
     IBOutlet id o_disc_chapter_stp;
+    IBOutlet id o_disc_videots_folder;
+    IBOutlet id o_disc_videots_btn_browse;
 
     IBOutlet id o_net_mode;
     IBOutlet id o_net_udp_port;
@@ -74,13 +77,15 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi;
 
 - (IBAction)openFileGeneric:(id)sender;
-- (IBAction)openFile:(id)sender;
 - (void)openFilePathChanged:(NSNotification *)o_notification;
+- (IBAction)openFileBrowse:(id)sender;
+- (IBAction)openFileStreamChanged:(id)sender;
 
 - (IBAction)openDisc:(id)sender;
 - (IBAction)openDiscTypeChanged:(id)sender;
 - (IBAction)openDiscStepperChanged:(id)sender;
 - (void)openDiscInfoChanged:(NSNotification *)o_notification;
+- (IBAction)openVTSBrowse:(id)sender;
 
 - (IBAction)openNet:(id)sender;
 - (IBAction)openNetModeChanged:(id)sender;
@@ -89,5 +94,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
 - (IBAction)panelCancel:(id)sender;
 - (IBAction)panelOk:(id)sender;
+
+- (IBAction)openFile:(id)sender;
 
 @end

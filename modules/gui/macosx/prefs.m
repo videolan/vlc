@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.4 2002/12/29 01:16:28 massiot Exp $
+ * $Id: prefs.m,v 1.5 2002/12/30 23:45:21 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -545,6 +545,7 @@
 
     s_rc.origin.x -= s_rc.size.width;
     DEF_PANEL_BUTTON( 1, _NS("Cancel"), clickedCancelOK: );
+    [o_button setKeyEquivalent: @"\E"];
 
     s_rc.origin.x -= s_rc.size.width;
     DEF_PANEL_BUTTON( 2, _NS("Apply"), clickedApply: );

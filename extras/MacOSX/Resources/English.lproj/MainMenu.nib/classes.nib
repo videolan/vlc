@@ -101,10 +101,13 @@
                 openDiscStepperChanged = id; 
                 openDiscTypeChanged = id; 
                 openFile = id; 
+                openFileBrowse = id; 
                 openFileGeneric = id; 
+                openFileStreamChanged = id; 
                 openNet = id; 
                 openNetModeChanged = id; 
                 openNetStepperChanged = id; 
+                openVTSBrowse = id; 
                 panelCancel = id; 
                 panelOk = id; 
             }; 
@@ -122,10 +125,13 @@
                 "o_disc_title_lbl" = id; 
                 "o_disc_title_stp" = id; 
                 "o_disc_type" = id; 
-                "o_disc_type_lbl" = id; 
+                "o_disc_videots_btn_browse" = id; 
+                "o_disc_videots_folder" = id; 
                 "o_file_btn_browse" = id; 
                 "o_file_path" = id; 
+                "o_file_stream" = id; 
                 "o_mrl" = id; 
+                "o_mrl_lbl" = id; 
                 "o_net_cs_addr" = id; 
                 "o_net_cs_addr_lbl" = id; 
                 "o_net_cs_port" = id; 

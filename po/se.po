@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2002-12-26 00:35+0100\n"
+"POT-Creation-Date: 2002-12-31 00:38+0100\n"
 "PO-Revision-Date: 2002-07-23 23:00+0200\n"
 "Last-Translator: Joel Arvidsson <dogai@privat.utfors.se>\n"
 "Language-Team: \n"
@@ -14,49 +14,49 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libvlc.c:232
+#: src/libvlc.c:252
 msgid "C"
 msgstr "se"
 
 #. Usage
-#: src/libvlc.c:282 src/libvlc.c:1243
+#: src/libvlc.c:282 src/libvlc.c:1256
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr ""
 
-#: src/libvlc.c:1100 src/misc/configuration.c:880
+#: src/libvlc.c:1113 src/misc/configuration.c:880
 msgid "string"
 msgstr ""
 
-#: src/libvlc.c:1118 src/misc/configuration.c:865
+#: src/libvlc.c:1131 src/misc/configuration.c:865
 msgid "integer"
 msgstr ""
 
-#: src/libvlc.c:1121 src/misc/configuration.c:872
+#: src/libvlc.c:1134 src/misc/configuration.c:872
 msgid "float"
 msgstr ""
 
-#: src/libvlc.c:1127
+#: src/libvlc.c:1140
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:1128
+#: src/libvlc.c:1141
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:1218 src/libvlc.c:1273 src/libvlc.c:1297
+#: src/libvlc.c:1231 src/libvlc.c:1286 src/libvlc.c:1310
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
 msgstr ""
 
-#: src/libvlc.c:1246
+#: src/libvlc.c:1259
 msgid "[module]              [description]\n"
 msgstr ""
 
-#: src/libvlc.c:1291
+#: src/libvlc.c:1304
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -863,8 +863,7 @@ msgstr ""
 #. ****************************************************************************
 #. * Module descriptor
 #. ****************************************************************************
-#: modules/access/file.c:63 modules/access/http.c:79 modules/access/rtp.c:72
-#: modules/access/udp.c:65
+#: modules/access/file.c:63 modules/access/http.c:79 modules/access/udp.c:70
 msgid "caching value in ms"
 msgstr ""
 
@@ -911,31 +910,17 @@ msgstr ""
 msgid "HTTP access module"
 msgstr ""
 
-#: modules/access/rtp.c:74
-msgid ""
-"Allows you to modify the default caching value for rtp streams. This value "
-"should be set in miliseconds units."
-msgstr ""
-
-#: modules/access/rtp.c:78
-msgid "RTP access module"
-msgstr ""
-
-#: modules/access/rtp.c:79
-msgid "rtp"
-msgstr ""
-
-#: modules/access/udp.c:67
+#: modules/access/udp.c:72
 msgid ""
 "Allows you to modify the default caching value for udp streams. This value "
 "should be set in miliseconds units."
 msgstr ""
 
-#: modules/access/udp.c:71
+#: modules/access/udp.c:76
 msgid "raw UDP access module"
 msgstr ""
 
-#: modules/access/udp.c:72
+#: modules/access/udp.c:77
 msgid "udp"
 msgstr ""
 
@@ -1260,7 +1245,7 @@ msgstr ""
 msgid "MMXEXT Post Processing module"
 msgstr ""
 
-#: modules/codec/lpcm.c:82
+#: modules/codec/lpcm.c:98
 msgid "linear PCM audio parser"
 msgstr ""
 
@@ -1487,7 +1472,8 @@ msgstr ""
 msgid "vlc (familiar)"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:93
+#: modules/gui/familiar/interface.c:93 modules/gui/macosx/open.m:559
+#: modules/gui/macosx/open.m:578 modules/gui/macosx/open.m:595
 #, fuzzy
 msgid "Open"
 msgstr "Öppna fil"
@@ -1513,7 +1499,7 @@ msgstr ""
 #: modules/gui/familiar/interface.c:134 modules/gui/gtk/gnome_interface.c:471
 #: modules/gui/gtk/gnome_interface.c:845 modules/gui/gtk/gtk_interface.c:589
 #: modules/gui/gtk/gtk_interface.c:1008 modules/gui/macosx/intf.m:218
-#: modules/gui/macosx/intf.m:244 modules/gui/macosx/controls.m:441
+#: modules/gui/macosx/intf.m:244 modules/gui/macosx/controls.m:440
 msgid "Pause"
 msgstr "Paus"
 
@@ -1537,7 +1523,7 @@ msgstr "Spela upp"
 #: modules/gui/familiar/interface.c:160 modules/gui/gtk/gnome_interface.c:435
 #: modules/gui/gtk/gnome_interface.c:852 modules/gui/gtk/gtk_interface.c:556
 #: modules/gui/gtk/gtk_interface.c:1016 modules/gui/macosx/intf.m:219
-#: modules/gui/macosx/intf.m:245 modules/gui/macosx/controls.m:458
+#: modules/gui/macosx/intf.m:245 modules/gui/macosx/controls.m:457
 msgid "Stop"
 msgstr "Stopp"
 
@@ -1616,14 +1602,14 @@ msgid "Save"
 msgstr ""
 
 #: modules/gui/familiar/interface.c:347 modules/gui/gtk/preferences.c:561
-#: modules/gui/macosx/prefs.m:550
+#: modules/gui/macosx/prefs.m:551
 msgid "Apply"
 msgstr ""
 
 #: modules/gui/familiar/interface.c:357 modules/gui/gtk/gtk_interface.c:2084
 #: modules/gui/gtk/gtk_interface.c:2312 modules/gui/gtk/gtk_interface.c:2543
 #: modules/gui/gtk/preferences.c:569 modules/gui/macosx/prefs.m:547
-#: modules/gui/macosx/open.m:140
+#: modules/gui/macosx/open.m:144
 msgid "Cancel"
 msgstr "Avbryt"
 
@@ -1833,7 +1819,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1973 modules/gui/gtk/gtk_interface.c:498
 #: modules/gui/gtk/gtk_interface.c:1615 modules/gui/gtk/gtk_interface.c:2400
 #: modules/gui/gtk/gtk_interface.c:2517 modules/gui/macosx/intf.m:197
-#: modules/gui/macosx/open.m:142 modules/gui/macosx/open.m:226
+#: modules/gui/macosx/open.m:146 modules/gui/macosx/open.m:250
 msgid "File"
 msgstr "Arkiv"
 
@@ -1841,8 +1827,8 @@ msgstr "Arkiv"
 #: modules/gui/gtk/gnome_interface.c:1438
 #: modules/gui/gtk/gnome_interface.c:1966 modules/gui/gtk/gtk_interface.c:509
 #: modules/gui/gtk/gtk_interface.c:696 modules/gui/gtk/gtk_interface.c:1726
-#: modules/gui/gtk/gtk_interface.c:2393 modules/gui/macosx/open.m:143
-#: modules/gui/macosx/open.m:230
+#: modules/gui/gtk/gtk_interface.c:2393 modules/gui/macosx/open.m:147
+#: modules/gui/macosx/open.m:254
 msgid "Disc"
 msgstr "Skiva"
 
@@ -1908,7 +1894,7 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:524 modules/gui/gtk/gnome_interface.c:903
 #: modules/gui/gtk/gtk_interface.c:638 modules/gui/gtk/gtk_interface.c:724
 #: modules/gui/gtk/gtk_interface.c:768 modules/gui/gtk/gtk_interface.c:1092
-#: modules/gui/macosx/intf.m:222 modules/gui/macosx/controls.m:462
+#: modules/gui/macosx/intf.m:222 modules/gui/macosx/controls.m:461
 msgid "Prev"
 msgstr "Föregående objekt"
 
@@ -1919,7 +1905,7 @@ msgstr "Föregående fil"
 #: modules/gui/gtk/gnome_interface.c:536 modules/gui/gtk/gnome_interface.c:896
 #: modules/gui/gtk/gtk_interface.c:649 modules/gui/gtk/gtk_interface.c:732
 #: modules/gui/gtk/gtk_interface.c:776 modules/gui/gtk/gtk_interface.c:1085
-#: modules/gui/macosx/intf.m:223 modules/gui/macosx/controls.m:463
+#: modules/gui/macosx/intf.m:223 modules/gui/macosx/controls.m:462
 msgid "Next"
 msgstr "Nästa objekt"
 
@@ -2013,6 +1999,7 @@ msgid "Open Stream"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1234 modules/gui/gtk/gtk_interface.c:1522
+#: modules/gui/macosx/open.m:141
 msgid "Media Resource Locator (MRL)"
 msgstr ""
 
@@ -2027,39 +2014,43 @@ msgid ""
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1320 modules/gui/gtk/gtk_interface.c:1608
-#: modules/gui/macosx/open.m:146
+#: modules/gui/macosx/open.m:150 modules/gui/macosx/open.m:156
 msgid "Browse..."
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1344 modules/gui/gtk/gtk_interface.c:1632
 #: modules/gui/gtk/menu.c:905 modules/gui/gtk/menu.c:926
 #: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:233
-#: modules/gui/macosx/open.m:150
+#: modules/gui/macosx/open.m:154
 msgid "Title"
 msgstr "Titel"
 
 #: modules/gui/gtk/gnome_interface.c:1354 modules/gui/gtk/gtk_interface.c:1642
 #: modules/gui/gtk/menu.c:800 modules/gui/gtk/menu.c:935
 #: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:234
-#: modules/gui/macosx/open.m:151
+#: modules/gui/macosx/open.m:155
 msgid "Chapter"
 msgstr "Kapitel"
 
 #: modules/gui/gtk/gnome_interface.c:1374 modules/gui/gtk/gtk_interface.c:1662
-#: modules/gui/macosx/open.m:148
 msgid "Disc type"
 msgstr "Skiva typ"
 
 #: modules/gui/gtk/gnome_interface.c:1393 modules/gui/gtk/gtk_interface.c:1681
+#: modules/gui/macosx/open.m:158 modules/gui/macosx/open.m:325
+#: modules/gui/macosx/open.m:334 modules/gui/macosx/open.m:412
+#: modules/gui/macosx/open.m:423
 msgid "DVD"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1401 modules/gui/gtk/gtk_interface.c:1689
+#: modules/gui/macosx/open.m:160 modules/gui/macosx/open.m:319
+#: modules/gui/macosx/open.m:404
 msgid "VCD"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1409 modules/gui/gtk/gtk_interface.c:1697
-#: modules/gui/macosx/open.m:149
+#: modules/gui/macosx/open.m:153
 msgid "Device name"
 msgstr ""
 
@@ -2083,27 +2074,27 @@ msgstr ""
 #: modules/gui/gtk/gnome_interface.c:1570
 #: modules/gui/gtk/gnome_interface.c:1581 modules/gui/gtk/gtk_interface.c:1783
 #: modules/gui/gtk/gtk_interface.c:1858 modules/gui/gtk/gtk_interface.c:1869
-#: modules/gui/macosx/open.m:153 modules/gui/macosx/open.m:155
-#: modules/gui/macosx/open.m:157
+#: modules/gui/macosx/open.m:163 modules/gui/macosx/open.m:165
+#: modules/gui/macosx/open.m:167
 msgid "Port"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1505
 #: modules/gui/gtk/gnome_interface.c:1517 modules/gui/gtk/gtk_interface.c:1793
-#: modules/gui/gtk/gtk_interface.c:1805 modules/gui/macosx/open.m:154
-#: modules/gui/macosx/open.m:156
+#: modules/gui/gtk/gtk_interface.c:1805 modules/gui/macosx/open.m:164
+#: modules/gui/macosx/open.m:166
 msgid "Address"
 msgstr "Adress"
 
 #: modules/gui/gtk/gnome_interface.c:1527 modules/gui/gtk/gtk_interface.c:1815
-#: modules/gui/macosx/open.m:158
+#: modules/gui/macosx/open.m:168
 msgid "URL"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1637
 #: modules/gui/gtk/gnome_interface.c:1980 modules/gui/gtk/gtk_interface.c:1925
-#: modules/gui/gtk/gtk_interface.c:2407 modules/gui/macosx/open.m:144
-#: modules/gui/macosx/open.m:234
+#: modules/gui/gtk/gtk_interface.c:2407 modules/gui/macosx/open.m:148
+#: modules/gui/macosx/open.m:258
 msgid "Network"
 msgstr "Nätverk"
 
@@ -2135,7 +2126,8 @@ msgstr ""
 msgid "Satellite"
 msgstr ""
 
-#: modules/gui/gtk/gnome_interface.c:1878
+#: modules/gui/gtk/gnome_interface.c:1878 modules/gui/macosx/open.m:558
+#: modules/gui/macosx/open.m:594
 msgid "Open File"
 msgstr "Öppna fil"
 
@@ -2307,12 +2299,12 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1405 modules/gui/gtk/gtk_interface.c:2077
 #: modules/gui/gtk/gtk_interface.c:2305 modules/gui/gtk/gtk_interface.c:2536
 #: modules/gui/gtk/gtk_interface.c:2643 modules/gui/gtk/preferences.c:557
-#: modules/gui/macosx/prefs.m:543 modules/gui/macosx/prefs.m:757
-#: modules/gui/macosx/open.m:139
+#: modules/gui/macosx/prefs.m:543 modules/gui/macosx/prefs.m:758
+#: modules/gui/macosx/open.m:143
 msgid "OK"
 msgstr ""
 
-#: modules/gui/gtk/gtk_interface.c:1509 modules/gui/macosx/open.m:137
+#: modules/gui/gtk/gtk_interface.c:1509 modules/gui/macosx/open.m:140
 msgid "Open Target"
 msgstr ""
 
@@ -2346,8 +2338,8 @@ msgstr ""
 
 #. special case for "off" item
 #: modules/gui/gtk/menu.c:518 modules/gui/macosx/prefs.m:382
-#: modules/gui/macosx/prefs.m:411 modules/gui/macosx/prefs.m:633
-#: modules/gui/macosx/prefs.m:662
+#: modules/gui/macosx/prefs.m:411 modules/gui/macosx/prefs.m:634
+#: modules/gui/macosx/prefs.m:663
 msgid "None"
 msgstr ""
 
@@ -2455,7 +2447,7 @@ msgid "Open Recent"
 msgstr "Öppna nätverk"
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:203 modules/gui/macosx/intf.m:930
+#: modules/gui/macosx/intf.m:203 modules/gui/macosx/intf.m:939
 #, fuzzy
 msgid "Clear Menu"
 msgstr "Radera"
@@ -2492,12 +2484,12 @@ msgstr ""
 msgid "Controls"
 msgstr "Kontroller"
 
-#: modules/gui/macosx/intf.m:220 modules/gui/macosx/controls.m:442
+#: modules/gui/macosx/intf.m:220 modules/gui/macosx/controls.m:441
 #, fuzzy
 msgid "Faster"
 msgstr "Spola framåt"
 
-#: modules/gui/macosx/intf.m:221 modules/gui/macosx/controls.m:443
+#: modules/gui/macosx/intf.m:221 modules/gui/macosx/controls.m:442
 msgid "Slower"
 msgstr "Slow Motion"
 
@@ -2514,7 +2506,7 @@ msgstr ""
 msgid "Softer"
 msgstr "Slow Motion"
 
-#: modules/gui/macosx/intf.m:227 modules/gui/macosx/controls.m:485
+#: modules/gui/macosx/intf.m:227 modules/gui/macosx/controls.m:484
 msgid "Mute"
 msgstr "Stäng av ljudet"
 
@@ -2523,7 +2515,7 @@ msgstr "Stäng av ljudet"
 msgid "Channels"
 msgstr "Kanal:"
 
-#: modules/gui/macosx/intf.m:229 modules/gui/macosx/controls.m:517
+#: modules/gui/macosx/intf.m:229 modules/gui/macosx/controls.m:516
 msgid "Fullscreen"
 msgstr "Helskärm"
 
@@ -2532,7 +2524,7 @@ msgstr "Helskärm"
 msgid "Screen"
 msgstr "Helskärm"
 
-#: modules/gui/macosx/intf.m:231 modules/gui/macosx/controls.m:532
+#: modules/gui/macosx/intf.m:231 modules/gui/macosx/controls.m:531
 msgid "Deinterlace"
 msgstr ""
 
@@ -2553,11 +2545,50 @@ msgstr "Minimera"
 msgid "Bring All to Front"
 msgstr "Lägg alla överst"
 
-#: modules/gui/macosx/controls.m:480
+#: modules/gui/macosx/open.m:151
+msgid "Treat as a pipe rather than as a file"
+msgstr ""
+
+#: modules/gui/macosx/open.m:159 modules/gui/macosx/open.m:420
+msgid "DVD with menus"
+msgstr ""
+
+#: modules/gui/macosx/open.m:161 modules/gui/macosx/open.m:308
+msgid "VIDEO_TS folder"
+msgstr ""
+
+#: modules/gui/macosx/open.m:170 modules/gui/macosx/open.m:495
+msgid "UDP/RTP"
+msgstr ""
+
+#: modules/gui/macosx/open.m:171 modules/gui/macosx/open.m:507
+msgid "UDP/RTP Multicast"
+msgstr ""
+
+#: modules/gui/macosx/open.m:172 modules/gui/macosx/open.m:492
+#: modules/gui/macosx/open.m:520
+#, fuzzy
+msgid "Channel server"
+msgstr "Kanalserver"
+
+#: modules/gui/macosx/open.m:173 modules/gui/macosx/open.m:539
+msgid "HTTP/FTP/MMS"
+msgstr ""
+
+#: modules/gui/macosx/open.m:358 modules/gui/macosx/open.m:407
+#: modules/gui/macosx/open.m:415 modules/gui/macosx/open.m:423
+msgid "No %@s found"
+msgstr ""
+
+#: modules/gui/macosx/open.m:577
+msgid "Open VIDEO_TS Directory"
+msgstr ""
+
+#: modules/gui/macosx/controls.m:479
 msgid "Volume Up"
 msgstr ""
 
-#: modules/gui/macosx/controls.m:481
+#: modules/gui/macosx/controls.m:480
 msgid "Volume Down"
 msgstr ""
 

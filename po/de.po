@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.73.3\n"
-"POT-Creation-Date: 2002-12-26 00:35+0100\n"
+"POT-Creation-Date: 2002-12-31 00:38+0100\n"
 "PO-Revision-Date: 2002-04-18 23:38+0100\n"
 "Last-Translator: Thomas Graf <tgr@reeler.org>\n"
 "Language-Team: \n"
@@ -14,39 +14,39 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/libvlc.c:232
+#: src/libvlc.c:252
 msgid "C"
 msgstr "de"
 
 #. Usage
-#: src/libvlc.c:282 src/libvlc.c:1243
+#: src/libvlc.c:282 src/libvlc.c:1256
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
 "\n"
 msgstr "Usage: %s [Optionen] [Date]...\n"
 
-#: src/libvlc.c:1100 src/misc/configuration.c:880
+#: src/libvlc.c:1113 src/misc/configuration.c:880
 msgid "string"
 msgstr "text"
 
-#: src/libvlc.c:1118 src/misc/configuration.c:865
+#: src/libvlc.c:1131 src/misc/configuration.c:865
 msgid "integer"
 msgstr "zahl"
 
-#: src/libvlc.c:1121 src/misc/configuration.c:872
+#: src/libvlc.c:1134 src/misc/configuration.c:872
 msgid "float"
 msgstr "gleitpunktzahl"
 
-#: src/libvlc.c:1127
+#: src/libvlc.c:1140
 msgid " (default enabled)"
 msgstr ""
 
-#: src/libvlc.c:1128
+#: src/libvlc.c:1141
 msgid " (default disabled)"
 msgstr ""
 
-#: src/libvlc.c:1218 src/libvlc.c:1273 src/libvlc.c:1297
+#: src/libvlc.c:1231 src/libvlc.c:1286 src/libvlc.c:1310
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -54,11 +54,11 @@ msgstr ""
 "\n"
 "Drück die Eingabetaste um weiterzufahren...\n"
 
-#: src/libvlc.c:1246
+#: src/libvlc.c:1259
 msgid "[module]              [description]\n"
 msgstr "[Modul]               [Beschreibung]\n"
 
-#: src/libvlc.c:1291
+#: src/libvlc.c:1304
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -80,9 +80,7 @@ msgstr "Oberfläche Modul"
 msgid ""
 "This option allows you to select the interface used by vlc. The default "
 "behavior is to automatically select the best module available."
-msgstr ""
-"Diese Option erlaubt Dir die Standard Oberfläche festzulegen. Merke Dir, "
-"standardmässig wird die beste Methode verwendet."
+msgstr "Diese Option erlaubt Dir die Standard Oberfläche festzulegen. Merke Dir, standardmässig wird die beste Methode verwendet."
 
 #: src/libvlc.h:40
 msgid "verbosity (0,1,2)"
@@ -121,8 +119,7 @@ msgstr "Standard Suchpfad"
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
-msgstr ""
-"Diese Option erlaubt Dir den Standard Suchpfad für Dateien festzulegen."
+msgstr "Diese Option erlaubt Dir den Standard Suchpfad für Dateien festzulegen."
 
 #: src/libvlc.h:59
 msgid "plugin search path"
@@ -133,8 +130,7 @@ msgstr ""
 msgid ""
 "This option allows you to specify an additional path for vlc to lookfor its "
 "plugins."
-msgstr ""
-"Diese Option erlaubt Dir den Standard Suchpfad für Dateien festzulegen."
+msgstr "Diese Option erlaubt Dir den Standard Suchpfad für Dateien festzulegen."
 
 #: src/libvlc.h:64
 msgid "audio output module"
@@ -235,9 +231,7 @@ msgstr "Audio Desynchronisation ausgleichen (in ms)"
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
 "notice a lag between the video and the audio."
-msgstr ""
-"Diese Option erlaubt Dir die Audio Ausgabe zu verzögern. Dies kann hilfreich "
-"sein wenn du eine Verzögerung zwischen Video und Audio feststellst."
+msgstr "Diese Option erlaubt Dir die Audio Ausgabe zu verzögern. Dies kann hilfreich sein wenn du eine Verzögerung zwischen Video und Audio feststellst."
 
 #: src/libvlc.h:111
 msgid "headphone virtual spatialization effect"
@@ -270,9 +264,7 @@ msgstr "Video Ausgabe Modul"
 msgid ""
 "This option allows you to select the video output method used by vlc. The "
 "default behavior is to automatically select the best method available."
-msgstr ""
-"Diese Option erlaubt Dir den standard Video Ausgabemodus festzulegen. Merke "
-"Dir, standardmässig wird die beste Methode ausgewählt."
+msgstr "Diese Option erlaubt Dir den standard Video Ausgabemodus festzulegen. Merke Dir, standardmässig wird die beste Methode ausgewählt."
 
 #: src/libvlc.h:131
 msgid "enable video"
@@ -355,9 +347,7 @@ msgstr "Overlay Videoausgabe"
 msgid ""
 "If enabled, vlc will try to take advantage of the overlay capabilities of "
 "your graphic card."
-msgstr ""
-"Standardmässig wird vlc versuchen die Vorteile (Overlay Erweiterungen) "
-"deiner Grafikkarte zu nutzen."
+msgstr "Standardmässig wird vlc versuchen die Vorteile (Overlay Erweiterungen) deiner Grafikkarte zu nutzen."
 
 #: src/libvlc.h:170
 msgid "force SPU position"
@@ -593,8 +583,7 @@ msgstr ""
 #, fuzzy
 msgid ""
 "This allows you to select the order in which vlc will choose its packetizers."
-msgstr ""
-"Diese Option erlaubt Dir den Standard Suchpfad für Dateien festzulegen."
+msgstr "Diese Option erlaubt Dir den Standard Suchpfad für Dateien festzulegen."
 
 #: src/libvlc.h:302
 #, fuzzy
@@ -923,8 +912,7 @@ msgstr "Video4Linux Eingabe Modul"
 #. ****************************************************************************
 #. * Module descriptor
 #. ****************************************************************************
-#: modules/access/file.c:63 modules/access/http.c:79 modules/access/rtp.c:72
-#: modules/access/udp.c:65
+#: modules/access/file.c:63 modules/access/http.c:79 modules/access/udp.c:70
 msgid "caching value in ms"
 msgstr ""
 
@@ -972,33 +960,18 @@ msgstr ""
 msgid "HTTP access module"
 msgstr "Oberfläche Modul"
 
-#: modules/access/rtp.c:74
-msgid ""
-"Allows you to modify the default caching value for rtp streams. This value "
-"should be set in miliseconds units."
-msgstr ""
-
-#: modules/access/rtp.c:78
-#, fuzzy
-msgid "RTP access module"
-msgstr "Oberfläche Modul"
-
-#: modules/access/rtp.c:79
-msgid "rtp"
-msgstr ""
-
-#: modules/access/udp.c:67
+#: modules/access/udp.c:72
 msgid ""
 "Allows you to modify the default caching value for udp streams. This value "
 "should be set in miliseconds units."
 msgstr ""
 
-#: modules/access/udp.c:71
+#: modules/access/udp.c:76
 #, fuzzy
 msgid "raw UDP access module"
 msgstr "Oberfläche Modul"
 
-#: modules/access/udp.c:72
+#: modules/access/udp.c:77
 msgid "udp"
 msgstr ""
 
@@ -1348,7 +1321,7 @@ msgstr "MMX Motion Compensation Modul"
 msgid "MMXEXT Post Processing module"
 msgstr "MMXEXT Motion Compensation Modul"
 
-#: modules/codec/lpcm.c:82
+#: modules/codec/lpcm.c:98
 #, fuzzy
 msgid "linear PCM audio parser"
 msgstr "linearer PCM Audio Dekoder"
@@ -1591,7 +1564,8 @@ msgstr "Gtk+ Oberfläche Modul"
 msgid "vlc (familiar)"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:93
+#: modules/gui/familiar/interface.c:93 modules/gui/macosx/open.m:559
+#: modules/gui/macosx/open.m:578 modules/gui/macosx/open.m:595
 #, fuzzy
 msgid "Open"
 msgstr "Datei öffnen"
@@ -1619,7 +1593,7 @@ msgstr "Stream öffnen"
 #: modules/gui/familiar/interface.c:134 modules/gui/gtk/gnome_interface.c:471
 #: modules/gui/gtk/gnome_interface.c:845 modules/gui/gtk/gtk_interface.c:589
 #: modules/gui/gtk/gtk_interface.c:1008 modules/gui/macosx/intf.m:218
-#: modules/gui/macosx/intf.m:244 modules/gui/macosx/controls.m:441
+#: modules/gui/macosx/intf.m:244 modules/gui/macosx/controls.m:440
 msgid "Pause"
 msgstr "Pause"
 
@@ -1643,7 +1617,7 @@ msgstr "Stream abspielen"
 #: modules/gui/familiar/interface.c:160 modules/gui/gtk/gnome_interface.c:435
 #: modules/gui/gtk/gnome_interface.c:852 modules/gui/gtk/gtk_interface.c:556
 #: modules/gui/gtk/gtk_interface.c:1016 modules/gui/macosx/intf.m:219
-#: modules/gui/macosx/intf.m:245 modules/gui/macosx/controls.m:458
+#: modules/gui/macosx/intf.m:245 modules/gui/macosx/controls.m:457
 msgid "Stop"
 msgstr "Stop"
 
@@ -1723,14 +1697,14 @@ msgid "Save"
 msgstr "Speichern"
 
 #: modules/gui/familiar/interface.c:347 modules/gui/gtk/preferences.c:561
-#: modules/gui/macosx/prefs.m:550
+#: modules/gui/macosx/prefs.m:551
 msgid "Apply"
 msgstr "Übernehmen"
 
 #: modules/gui/familiar/interface.c:357 modules/gui/gtk/gtk_interface.c:2084
 #: modules/gui/gtk/gtk_interface.c:2312 modules/gui/gtk/gtk_interface.c:2543
 #: modules/gui/gtk/preferences.c:569 modules/gui/macosx/prefs.m:547
-#: modules/gui/macosx/open.m:140
+#: modules/gui/macosx/open.m:144
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -1946,7 +1920,7 @@ msgstr "VideoLAN Client"
 #: modules/gui/gtk/gnome_interface.c:1973 modules/gui/gtk/gtk_interface.c:498
 #: modules/gui/gtk/gtk_interface.c:1615 modules/gui/gtk/gtk_interface.c:2400
 #: modules/gui/gtk/gtk_interface.c:2517 modules/gui/macosx/intf.m:197
-#: modules/gui/macosx/open.m:142 modules/gui/macosx/open.m:226
+#: modules/gui/macosx/open.m:146 modules/gui/macosx/open.m:250
 msgid "File"
 msgstr "Datei"
 
@@ -1954,8 +1928,8 @@ msgstr "Datei"
 #: modules/gui/gtk/gnome_interface.c:1438
 #: modules/gui/gtk/gnome_interface.c:1966 modules/gui/gtk/gtk_interface.c:509
 #: modules/gui/gtk/gtk_interface.c:696 modules/gui/gtk/gtk_interface.c:1726
-#: modules/gui/gtk/gtk_interface.c:2393 modules/gui/macosx/open.m:143
-#: modules/gui/macosx/open.m:230
+#: modules/gui/gtk/gtk_interface.c:2393 modules/gui/macosx/open.m:147
+#: modules/gui/macosx/open.m:254
 msgid "Disc"
 msgstr "DVD/VCD"
 
@@ -2021,7 +1995,7 @@ msgstr "Abspielliste öffnen"
 #: modules/gui/gtk/gnome_interface.c:524 modules/gui/gtk/gnome_interface.c:903
 #: modules/gui/gtk/gtk_interface.c:638 modules/gui/gtk/gtk_interface.c:724
 #: modules/gui/gtk/gtk_interface.c:768 modules/gui/gtk/gtk_interface.c:1092
-#: modules/gui/macosx/intf.m:222 modules/gui/macosx/controls.m:462
+#: modules/gui/macosx/intf.m:222 modules/gui/macosx/controls.m:461
 msgid "Prev"
 msgstr "Vorher"
 
@@ -2032,7 +2006,7 @@ msgstr "Vorherige Datei"
 #: modules/gui/gtk/gnome_interface.c:536 modules/gui/gtk/gnome_interface.c:896
 #: modules/gui/gtk/gtk_interface.c:649 modules/gui/gtk/gtk_interface.c:732
 #: modules/gui/gtk/gtk_interface.c:776 modules/gui/gtk/gtk_interface.c:1085
-#: modules/gui/macosx/intf.m:223 modules/gui/macosx/controls.m:463
+#: modules/gui/macosx/intf.m:223 modules/gui/macosx/controls.m:462
 msgid "Next"
 msgstr "Nächstes"
 
@@ -2128,6 +2102,7 @@ msgid "Open Stream"
 msgstr "Stream öffnen"
 
 #: modules/gui/gtk/gnome_interface.c:1234 modules/gui/gtk/gtk_interface.c:1522
+#: modules/gui/macosx/open.m:141
 msgid "Media Resource Locator (MRL)"
 msgstr ""
 
@@ -2143,39 +2118,43 @@ msgid ""
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1320 modules/gui/gtk/gtk_interface.c:1608
-#: modules/gui/macosx/open.m:146
+#: modules/gui/macosx/open.m:150 modules/gui/macosx/open.m:156
 msgid "Browse..."
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1344 modules/gui/gtk/gtk_interface.c:1632
 #: modules/gui/gtk/menu.c:905 modules/gui/gtk/menu.c:926
 #: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:233
-#: modules/gui/macosx/open.m:150
+#: modules/gui/macosx/open.m:154
 msgid "Title"
 msgstr "Titel"
 
 #: modules/gui/gtk/gnome_interface.c:1354 modules/gui/gtk/gtk_interface.c:1642
 #: modules/gui/gtk/menu.c:800 modules/gui/gtk/menu.c:935
 #: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:234
-#: modules/gui/macosx/open.m:151
+#: modules/gui/macosx/open.m:155
 msgid "Chapter"
 msgstr "Kapitel"
 
 #: modules/gui/gtk/gnome_interface.c:1374 modules/gui/gtk/gtk_interface.c:1662
-#: modules/gui/macosx/open.m:148
 msgid "Disc type"
 msgstr "DVD/VCD Typ"
 
 #: modules/gui/gtk/gnome_interface.c:1393 modules/gui/gtk/gtk_interface.c:1681
+#: modules/gui/macosx/open.m:158 modules/gui/macosx/open.m:325
+#: modules/gui/macosx/open.m:334 modules/gui/macosx/open.m:412
+#: modules/gui/macosx/open.m:423
 msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/gtk/gnome_interface.c:1401 modules/gui/gtk/gtk_interface.c:1689
+#: modules/gui/macosx/open.m:160 modules/gui/macosx/open.m:319
+#: modules/gui/macosx/open.m:404
 msgid "VCD"
 msgstr "VCD"
 
 #: modules/gui/gtk/gnome_interface.c:1409 modules/gui/gtk/gtk_interface.c:1697
-#: modules/gui/macosx/open.m:149
+#: modules/gui/macosx/open.m:153
 msgid "Device name"
 msgstr "Gerätename"
 
@@ -2200,27 +2179,27 @@ msgstr "HTTP"
 #: modules/gui/gtk/gnome_interface.c:1570
 #: modules/gui/gtk/gnome_interface.c:1581 modules/gui/gtk/gtk_interface.c:1783
 #: modules/gui/gtk/gtk_interface.c:1858 modules/gui/gtk/gtk_interface.c:1869
-#: modules/gui/macosx/open.m:153 modules/gui/macosx/open.m:155
-#: modules/gui/macosx/open.m:157
+#: modules/gui/macosx/open.m:163 modules/gui/macosx/open.m:165
+#: modules/gui/macosx/open.m:167
 msgid "Port"
 msgstr "Port"
 
 #: modules/gui/gtk/gnome_interface.c:1505
 #: modules/gui/gtk/gnome_interface.c:1517 modules/gui/gtk/gtk_interface.c:1793
-#: modules/gui/gtk/gtk_interface.c:1805 modules/gui/macosx/open.m:154
-#: modules/gui/macosx/open.m:156
+#: modules/gui/gtk/gtk_interface.c:1805 modules/gui/macosx/open.m:164
+#: modules/gui/macosx/open.m:166
 msgid "Address"
 msgstr "Adresse"
 
 #: modules/gui/gtk/gnome_interface.c:1527 modules/gui/gtk/gtk_interface.c:1815
-#: modules/gui/macosx/open.m:158
+#: modules/gui/macosx/open.m:168
 msgid "URL"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1637
 #: modules/gui/gtk/gnome_interface.c:1980 modules/gui/gtk/gtk_interface.c:1925
-#: modules/gui/gtk/gtk_interface.c:2407 modules/gui/macosx/open.m:144
-#: modules/gui/macosx/open.m:234
+#: modules/gui/gtk/gtk_interface.c:2407 modules/gui/macosx/open.m:148
+#: modules/gui/macosx/open.m:258
 msgid "Network"
 msgstr "Netzwerk"
 
@@ -2253,7 +2232,8 @@ msgstr "Horizontal"
 msgid "Satellite"
 msgstr "Satelliten Karte öffnen"
 
-#: modules/gui/gtk/gnome_interface.c:1878
+#: modules/gui/gtk/gnome_interface.c:1878 modules/gui/macosx/open.m:558
+#: modules/gui/macosx/open.m:594
 msgid "Open File"
 msgstr "Datei öffnen"
 
@@ -2265,9 +2245,7 @@ msgstr "Module"
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr ""
-"Der Module Manager ist noch nicht implementiert. Versuch es in einer "
-"späteren Version nochmals."
+msgstr "Der Module Manager ist noch nicht implementiert. Versuch es in einer späteren Version nochmals."
 
 #: modules/gui/gtk/gnome_interface.c:1987
 #: modules/gui/gtk/gnome_interface.c:2128 modules/gui/gtk/gtk_interface.c:2414
@@ -2428,12 +2406,12 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1405 modules/gui/gtk/gtk_interface.c:2077
 #: modules/gui/gtk/gtk_interface.c:2305 modules/gui/gtk/gtk_interface.c:2536
 #: modules/gui/gtk/gtk_interface.c:2643 modules/gui/gtk/preferences.c:557
-#: modules/gui/macosx/prefs.m:543 modules/gui/macosx/prefs.m:757
-#: modules/gui/macosx/open.m:139
+#: modules/gui/macosx/prefs.m:543 modules/gui/macosx/prefs.m:758
+#: modules/gui/macosx/open.m:143
 msgid "OK"
 msgstr "OK"
 
-#: modules/gui/gtk/gtk_interface.c:1509 modules/gui/macosx/open.m:137
+#: modules/gui/gtk/gtk_interface.c:1509 modules/gui/macosx/open.m:140
 #, fuzzy
 msgid "Open Target"
 msgstr "Stream öffnen"
@@ -2468,8 +2446,8 @@ msgstr "_Festlegen"
 
 #. special case for "off" item
 #: modules/gui/gtk/menu.c:518 modules/gui/macosx/prefs.m:382
-#: modules/gui/macosx/prefs.m:411 modules/gui/macosx/prefs.m:633
-#: modules/gui/macosx/prefs.m:662
+#: modules/gui/macosx/prefs.m:411 modules/gui/macosx/prefs.m:634
+#: modules/gui/macosx/prefs.m:663
 msgid "None"
 msgstr ""
 
@@ -2580,7 +2558,7 @@ msgid "Open Recent"
 msgstr "Stream öffnen"
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:203 modules/gui/macosx/intf.m:930
+#: modules/gui/macosx/intf.m:203 modules/gui/macosx/intf.m:939
 msgid "Clear Menu"
 msgstr ""
 
@@ -2621,12 +2599,12 @@ msgstr "_Ansicht"
 msgid "Controls"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:220 modules/gui/macosx/controls.m:442
+#: modules/gui/macosx/intf.m:220 modules/gui/macosx/controls.m:441
 #, fuzzy
 msgid "Faster"
 msgstr "Schnell"
 
-#: modules/gui/macosx/intf.m:221 modules/gui/macosx/controls.m:443
+#: modules/gui/macosx/intf.m:221 modules/gui/macosx/controls.m:442
 #, fuzzy
 msgid "Slower"
 msgstr "Langsam"
@@ -2644,7 +2622,7 @@ msgstr ""
 msgid "Softer"
 msgstr "Langsam"
 
-#: modules/gui/macosx/intf.m:227 modules/gui/macosx/controls.m:485
+#: modules/gui/macosx/intf.m:227 modules/gui/macosx/controls.m:484
 msgid "Mute"
 msgstr ""
 
@@ -2652,7 +2630,7 @@ msgstr ""
 msgid "Channels"
 msgstr "Kanäle"
 
-#: modules/gui/macosx/intf.m:229 modules/gui/macosx/controls.m:517
+#: modules/gui/macosx/intf.m:229 modules/gui/macosx/controls.m:516
 #, fuzzy
 msgid "Fullscreen"
 msgstr "_Vollbild"
@@ -2662,7 +2640,7 @@ msgstr "_Vollbild"
 msgid "Screen"
 msgstr "_Vollbild"
 
-#: modules/gui/macosx/intf.m:231 modules/gui/macosx/controls.m:532
+#: modules/gui/macosx/intf.m:231 modules/gui/macosx/controls.m:531
 #, fuzzy
 msgid "Deinterlace"
 msgstr "Oberfläche Modul"
@@ -2683,11 +2661,49 @@ msgstr ""
 msgid "Bring All to Front"
 msgstr ""
 
-#: modules/gui/macosx/controls.m:480
+#: modules/gui/macosx/open.m:151
+msgid "Treat as a pipe rather than as a file"
+msgstr ""
+
+#: modules/gui/macosx/open.m:159 modules/gui/macosx/open.m:420
+msgid "DVD with menus"
+msgstr ""
+
+#: modules/gui/macosx/open.m:161 modules/gui/macosx/open.m:308
+msgid "VIDEO_TS folder"
+msgstr ""
+
+#: modules/gui/macosx/open.m:170 modules/gui/macosx/open.m:495
+msgid "UDP/RTP"
+msgstr ""
+
+#: modules/gui/macosx/open.m:171 modules/gui/macosx/open.m:507
+msgid "UDP/RTP Multicast"
+msgstr ""
+
+#: modules/gui/macosx/open.m:172 modules/gui/macosx/open.m:492
+#: modules/gui/macosx/open.m:520
+msgid "Channel server"
+msgstr "Kanal Server"
+
+#: modules/gui/macosx/open.m:173 modules/gui/macosx/open.m:539
+msgid "HTTP/FTP/MMS"
+msgstr ""
+
+#: modules/gui/macosx/open.m:358 modules/gui/macosx/open.m:407
+#: modules/gui/macosx/open.m:415 modules/gui/macosx/open.m:423
+msgid "No %@s found"
+msgstr ""
+
+#: modules/gui/macosx/open.m:577
+msgid "Open VIDEO_TS Directory"
+msgstr ""
+
+#: modules/gui/macosx/controls.m:479
 msgid "Volume Up"
 msgstr ""
 
-#: modules/gui/macosx/controls.m:481
+#: modules/gui/macosx/controls.m:480
 msgid "Volume Down"
 msgstr ""
 
@@ -3069,11 +3085,8 @@ msgid ""
 msgstr ""
 "Es gibt zwei Methoden um den Vollbildmodus zu implementieren, leider hat "
 "jeder von ihnen Nachteile.\n"
-"1) Der Window Manager soll das Vollbild Fenster verwalten (Standard). But "
-"Sachen wie die Taskbar werden wahrscheinlich über dem Ausgabefenster "
-"angezeigt.\n"
-"2) Den Window Manager nicht beachten, damit wird es jedoch unmöglich andere "
-"Fenster über dem Ausgabefenster zu haben."
+"1) Der Window Manager soll das Vollbild Fenster verwalten (Standard). But Sachen wie die Taskbar werden wahrscheinlich über dem Ausgabefenster angezeigt.\n"
+"2) Den Window Manager nicht beachten, damit wird es jedoch unmöglich andere Fenster über dem Ausgabefenster zu haben."
 
 #: modules/video_output/mga/xmga.c:100 modules/video_output/x11/x11.c:54
 #: modules/video_output/x11/xvideo.c:60
@@ -3164,10 +3177,7 @@ msgstr "XVideo Adapter Nummer"
 msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
 "choose which one will be used (you shouldn't have to change this)."
-msgstr ""
-"Diese Option erlaubt dir den Adapter zu wählen, falls deine Grafikkarte "
-"mehrere Adapter eingebaut hat (du solltest das eigentlich nicht ändern "
-"müssen)."
+msgstr "Diese Option erlaubt dir den Adapter zu wählen, falls deine Grafikkarte mehrere Adapter eingebaut hat (du solltest das eigentlich nicht ändern müssen)."
 
 #: modules/video_output/x11/xvideo.c:63
 msgid "XVimage chroma format"
@@ -3240,6 +3250,10 @@ msgstr "QNX RTOS Modul"
 #, fuzzy
 msgid "xosd interface module"
 msgstr "Oberfläche Modul"
+
+#, fuzzy
+#~ msgid "RTP access module"
+#~ msgstr "Oberfläche Modul"
 
 #~ msgid "(no language)"
 #~ msgstr "de"
@@ -3327,9 +3341,6 @@ msgstr "Oberfläche Modul"
 #~ msgid "Broadcast"
 #~ msgstr "Broadcast"
 
-#~ msgid "Channel server"
-#~ msgstr "Kanal Server"
-
 #~ msgid "Open Satellite Card"
 #~ msgstr "Satelliten Karte öffnen"
 
@@ -3351,9 +3362,7 @@ msgstr "Oberfläche Modul"
 #~ msgid ""
 #~ "Enabling the stats mode will flood your log console with various "
 #~ "statistics messages."
-#~ msgstr ""
-#~ "Aktivieren des Statusmodus wird deine Logkonsole mit verschiedenene "
-#~ "Statistikmeldungen überfluten."
+#~ msgstr "Aktivieren des Statusmodus wird deine Logkonsole mit verschiedenene Statistikmeldungen überfluten."
 
 #~ msgid "warning level (or use -v, -vv, etc...)"
 #~ msgstr "Warnstufe (oder benutz -v, -vv, usw...)"
@@ -3361,9 +3370,7 @@ msgstr "Oberfläche Modul"
 #~ msgid ""
 #~ "Increasing the warning level will allow you to see more debug messages "
 #~ "and can sometimes help you to troubleshoot a problem."
-#~ msgstr ""
-#~ "Erhöhen der Warnstufe erlaubt es Dir Debug-Meldungen zu sehen welche Dir "
-#~ "helfen können ein Problem zu lösen."
+#~ msgstr "Erhöhen der Warnstufe erlaubt es Dir Debug-Meldungen zu sehen welche Dir helfen können ein Problem zu lösen."
 
 #, fuzzy
 #~ msgid ""
@@ -3378,8 +3385,7 @@ msgstr "Oberfläche Modul"
 #~ msgid ""
 #~ "This option allows you to set the VCD device that vlc will try to use by "
 #~ "default."
-#~ msgstr ""
-#~ "Diese Option erlaubt Dir den Standard Suchpfad für Dateien festzulegen."
+#~ msgstr "Diese Option erlaubt Dir den Standard Suchpfad für Dateien festzulegen."
 
 #~ msgid "TS"
 #~ msgstr "TS"

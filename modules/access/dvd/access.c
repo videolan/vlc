@@ -8,7 +8,7 @@
  *  -udf.* to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: access.c,v 1.6 2002/12/06 16:34:04 sam Exp $
+ * $Id: access.c,v 1.7 2002/12/30 23:45:21 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -267,6 +267,13 @@ void E_(DVDClose) ( vlc_object_t *p_this )
 {
     input_thread_t * p_input = (input_thread_t *)p_this;
     thread_dvd_data_t *p_dvd = (thread_dvd_data_t*)p_input->p_access_data;
+
+    /* This is a very nasty side-effect in the DVD plug-in : language
+     * selection here influences language selection of other streams. So
+     * unset those variables (may not be what the user wants).
+     * FIXME FIXME FIXME FIXME FIXME FIXME FIXME --Meuuh */
+    config_PutInt( p_input, "audio-channel", -1 );
+    config_PutInt( p_input, "spu-channel", -1 );
 
     IfoDestroy( p_dvd->p_ifo );
     dvdcss_close( p_dvd->dvdhandle );

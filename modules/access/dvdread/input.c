@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input.c,v 1.9 2002/11/13 20:23:21 fenrir Exp $
+ * $Id: input.c,v 1.10 2002/12/30 23:45:21 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -434,6 +434,13 @@ void E_(CloseDVD) ( vlc_object_t *p_this )
 {
     input_thread_t *    p_input = (input_thread_t *)p_this;
     thread_dvd_data_t * p_dvd = (thread_dvd_data_t *)p_input->p_access_data;
+
+    /* This is a very nasty side-effect in the DVD plug-in : language
+     * selection here influences language selection of other streams. So
+     * unset those variables (may not be what the user wants).
+     * FIXME FIXME FIXME FIXME FIXME FIXME FIXME --Meuuh */
+    config_PutInt( p_input, "audio-channel", -1 );
+    config_PutInt( p_input, "spu-channel", -1 );
 
     /* close libdvdread */
     DVDCloseFile( p_dvd->p_title );

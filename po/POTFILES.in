@@ -9,7 +9,6 @@ modules/access/dvd/dvd.c
 modules/access/v4l/v4l.c
 modules/access/file.c
 modules/access/http.c
-modules/access/rtp.c
 modules/access/udp.c
 modules/access/dvdread/dvdread.c
 modules/access/satellite/satellite.c

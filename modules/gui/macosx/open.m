@@ -2,9 +2,10 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.4 2002/12/08 23:38:02 massiot Exp $
+ * $Id: open.m,v 1.5 2002/12/30 23:45:21 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
+ *          Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -134,7 +135,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
 - (void)awakeFromNib
 {
+    intf_thread_t * p_intf = [NSApp getIntf];
+
     [o_panel setTitle: _NS("Open Target")];
+    [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
 
     [o_btn_ok setTitle: _NS("OK")];
     [o_btn_cancel setTitle: _NS("Cancel")];
@@ -144,11 +148,17 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [[o_tabview tabViewItemAtIndex: 2] setLabel: _NS("Network")];
 
     [o_file_btn_browse setTitle: _NS("Browse...")];
+    [o_file_stream setTitle: _NS("Treat as a pipe rather than as a file")];
 
-    [o_disc_type_lbl setStringValue: _NS("Disc type")];
     [o_disc_device_lbl setStringValue: _NS("Device name")];
     [o_disc_title_lbl setStringValue: _NS("Title")];
     [o_disc_chapter_lbl setStringValue: _NS("Chapter")];
+    [o_disc_videots_btn_browse setStringValue: _NS("Browse...")];
+
+    [[o_disc_type cellAtRow:0 column:0] setTitle: _NS("DVD")];
+    [[o_disc_type cellAtRow:1 column:0] setTitle: _NS("DVD with menus")];
+    [[o_disc_type cellAtRow:2 column:0] setTitle: _NS("VCD")];
+    [[o_disc_type cellAtRow:3 column:0] setTitle: _NS("VIDEO_TS folder")];
 
     [o_net_udp_port_lbl setStringValue: _NS("Port")];
     [o_net_udpm_addr_lbl setStringValue: _NS("Address")];
@@ -156,6 +166,16 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_net_cs_addr_lbl setStringValue: _NS("Address")];
     [o_net_cs_port_lbl setStringValue: _NS("Port")];
     [o_net_http_url_lbl setStringValue: _NS("URL")];
+
+    [[o_net_mode cellAtRow:0 column:0] setTitle: _NS("UDP/RTP")];
+    [[o_net_mode cellAtRow:1 column:0] setTitle: _NS("UDP/RTP Multicast")];
+    [[o_net_mode cellAtRow:2 column:0] setTitle: _NS("Channel server")];
+    [[o_net_mode cellAtRow:3 column:0] setTitle: _NS("HTTP/FTP/MMS")];
+
+    [o_net_udp_port setIntValue: config_GetInt( p_intf, "server-port" )];
+    [o_net_udp_port_stp setIntValue: config_GetInt( p_intf, "server-port" )];
+    [o_net_cs_port setIntValue: config_GetInt( p_intf, "channel-port" )];
+    [o_net_cs_port_stp setIntValue: config_GetInt( p_intf, "channel-port" )];
 
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openFilePathChanged:)
@@ -174,6 +194,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         selector: @selector(openDiscInfoChanged:)
         name: NSControlTextDidChangeNotification
         object: o_disc_chapter];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openDiscInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_disc_videots_folder];
 
     [[NSNotificationCenter defaultCenter] addObserver: self
         selector: @selector(openNetInfoChanged:)
@@ -259,53 +283,90 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 {
     NSString *o_mrl_string;
     NSString *o_filename = [o_file_path stringValue];
+    vlc_bool_t b_stream = [o_file_stream state];
 
-    o_mrl_string = [NSString stringWithFormat: @"file://%@", o_filename];
+    o_mrl_string = [NSString stringWithFormat: @"%s://%@",
+                    b_stream ? "stream" : "file",
+                    o_filename];
     [o_mrl setStringValue: o_mrl_string]; 
+}
+
+- (IBAction)openFileStreamChanged:(id)sender
+{
+    [self openFilePathChanged: nil];
 }
 
 - (IBAction)openDiscTypeChanged:(id)sender
 {
     NSString *o_type;
-    NSArray *o_devices;
-    const char *psz_class = NULL;
+    vlc_bool_t b_vts, b_device, b_title_chapter;
     
     [o_disc_device removeAllItems];
     
     o_type = [[o_disc_type selectedCell] title];
 
-    if( [o_type isEqualToString: @"VCD"] )
+    if ( [o_type isEqualToString: _NS("VIDEO_TS folder")] )
     {
-        psz_class = kIOCDMediaClass;
+        b_vts = 1; b_device = b_title_chapter = 0;
     }
     else
     {
-        psz_class = kIODVDMediaClass;
-    }
+        NSArray *o_devices;
+        NSString *o_disc;
+        const char *psz_class = NULL;
+        b_vts = 0; b_device = 1;
+
+        if ( [o_type isEqualToString: _NS("VCD")] )
+        {
+            psz_class = kIOCDMediaClass;
+            o_disc = o_type;
+            b_title_chapter = 1;
+        }
+        else if ( [o_type isEqualToString: _NS("DVD")] )
+        {
+            psz_class = kIODVDMediaClass;
+            o_disc = o_type;
+            b_title_chapter = 1;
+        }
+        else /* DVD with menus */
+        {
+            psz_class = kIODVDMediaClass;
+            o_disc = _NS("DVD");
+            b_title_chapter = 0;
+        }
     
-    o_devices = GetEjectableMediaOfClass( psz_class );
-    if( o_devices != nil )
-    {
-        int i_devices = [o_devices count];
-        
-        if( i_devices )
+        o_devices = GetEjectableMediaOfClass( psz_class );
+        if ( o_devices != nil )
         {
-            int i;
+            int i_devices = [o_devices count];
         
-            for( i = 0; i < i_devices; i++ )
+            if ( i_devices )
             {
-                [o_disc_device 
-                    addItemWithObjectValue: [o_devices objectAtIndex: i]];
+                int i;
+        
+                for( i = 0; i < i_devices; i++ )
+                {
+                    [o_disc_device 
+                        addItemWithObjectValue: [o_devices objectAtIndex: i]];
+                }
+
+                [o_disc_device selectItemAtIndex: 0];
             }
-            
-            [o_disc_device selectItemAtIndex: 0];
-        }
-        else
-        {
-            [o_disc_device setStringValue: 
-                [NSString stringWithFormat: @"No %@ found", o_type]];
+            else
+            {
+                [o_disc_device setStringValue: 
+                    [NSString stringWithFormat: _NS("No %@s found"), o_disc]];
+            }
         }
     }
+
+    [o_disc_device setEnabled: b_device];
+    [o_disc_title setEnabled: b_title_chapter];
+    [o_disc_title_stp setEnabled: b_title_chapter];
+    [o_disc_chapter setEnabled: b_title_chapter];
+    [o_disc_chapter_stp setEnabled: b_title_chapter];
+    [o_disc_videots_folder setEnabled: b_vts];
+    [o_disc_videots_btn_browse setEnabled: b_vts];
 
     [self openDiscInfoChanged: nil];
 }
@@ -330,6 +391,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 {
     NSString *o_type;
     NSString *o_device;
+    NSString *o_videots;
     NSString *o_mrl_string;
     int i_title, i_chapter;
 
@@ -337,22 +399,35 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     o_device = [o_disc_device stringValue];
     i_title = [o_disc_title intValue];
     i_chapter = [o_disc_chapter intValue];
-    if( [o_type isEqualToString: @"VCD"] )
-    {
-        o_type = [NSString stringWithCString: "vcd"];
-    }
-    else if ( [o_type isEqualToString: @"DVD"] )
-    {
-        o_type = [NSString stringWithCString: "dvdold"];
-    }
-    else
-    {
-        o_type = [NSString stringWithCString: "dvdplay"];
-    }
+    o_videots = [o_disc_videots_folder stringValue];
 
-    
-    o_mrl_string = [NSString stringWithFormat: @"%@://%@@%i,%i",
-        o_type, o_device, i_title, i_chapter]; 
+    if ( [o_type isEqualToString: _NS("VCD")] )
+    {
+        if ( [o_device isEqualToString:
+                [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
+            o_device = @"";
+        o_mrl_string = [NSString stringWithFormat: @"vcd://%@@%i,%i",
+                        o_device, i_title, i_chapter]; 
+    }
+    else if ( [o_type isEqualToString: _NS("DVD")] )
+    {
+        if ( [o_device isEqualToString:
+                [NSString stringWithFormat: _NS("No %@s found"), o_type]] )
+            o_device = @"";
+        o_mrl_string = [NSString stringWithFormat: @"dvdold://%@@%i,%i",
+                        o_device, i_title, i_chapter]; 
+    }
+    else if ( [o_type isEqualToString: _NS("DVD with menus")] )
+    {
+        if ( [o_device isEqualToString:
+                [NSString stringWithFormat: _NS("No %@s found"), _NS("DVD")]] )
+            o_device = @"";
+        o_mrl_string = [NSString stringWithFormat: @"dvdplay://%@", o_device]; 
+    }
+    else /* VIDEO_TS folder */
+    {
+        o_mrl_string = [NSString stringWithFormat: @"dvdread://%@", o_videots]; 
+    }
 
     [o_mrl setStringValue: o_mrl_string]; 
 }
@@ -367,10 +442,10 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     o_mode = [[o_net_mode selectedCell] title];
 
-    if( [o_mode isEqualToString: @"UDP"] ) b_udp = TRUE;   
-    else if( [o_mode isEqualToString: @"UDP Multicast"] ) b_udpm = TRUE;
+    if( [o_mode isEqualToString: @"UDP/RTP"] ) b_udp = TRUE;   
+    else if( [o_mode isEqualToString: @"UDP/RTP Multicast"] ) b_udpm = TRUE;
     else if( [o_mode isEqualToString: @"Channel server"] ) b_cs = TRUE;
-    else if( [o_mode isEqualToString: @"HTTP"] ) b_http = TRUE;
+    else if( [o_mode isEqualToString: @"HTTP/FTP/MMS"] ) b_http = TRUE;
 
     [o_net_udp_port setEnabled: b_udp];
     [o_net_udp_port_stp setEnabled: b_udp];
@@ -414,35 +489,35 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     o_mode = [[o_net_mode selectedCell] title];
 
-    b_channel = (vlc_bool_t)[o_mode isEqualToString: @"Channel server"]; 
+    b_channel = (vlc_bool_t)[o_mode isEqualToString: _NS("Channel server")]; 
     config_PutInt( p_intf, "network-channel", b_channel );
 
-    if( [o_mode isEqualToString: @"UDP"] )
+    if( [o_mode isEqualToString: _NS("UDP/RTP")] )
     {
         int i_port = [o_net_udp_port intValue];
 
         o_mrl_string = [NSString stringWithString: @"udp://"]; 
 
-        if( i_port != 1234 )
+        if( i_port != config_GetInt( p_intf, "server-port" ) )
         {
             o_mrl_string = 
                 [o_mrl_string stringByAppendingFormat: @"@:%i", i_port]; 
         } 
     }
-    else if( [o_mode isEqualToString: @"UDP Multicast"] ) 
+    else if( [o_mode isEqualToString: _NS("UDP/RTP Multicast")] ) 
     {
         NSString *o_addr = [o_net_udpm_addr stringValue];
         int i_port = [o_net_udpm_port intValue];
 
         o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr]; 
 
-        if( i_port != 1234 )
+        if( i_port != config_GetInt( p_intf, "server-port" ) )
         {
             o_mrl_string = 
                 [o_mrl_string stringByAppendingFormat: @":%i", i_port]; 
         } 
     }
-    else if( [o_mode isEqualToString: @"Channel server"] )
+    else if( [o_mode isEqualToString: _NS("Channel server")] )
     {
         NSString *o_addr = [o_net_cs_addr stringValue];
         int i_port = [o_net_cs_port intValue];
@@ -461,11 +536,15 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
         /* FIXME: we should use a playlist server instead */
         o_mrl_string = [NSString stringWithString: @"udp://"];
     }
-    else if( [o_mode isEqualToString: @"HTTP"] )
+    else if( [o_mode isEqualToString: _NS("HTTP/FTP/MMS")] )
     {
         NSString *o_url = [o_net_http_url stringValue];
 
-        o_mrl_string = [NSString stringWithFormat: @"http://%@", o_url];
+        if ( ![o_url hasPrefix:@"http:"] && ![o_url hasPrefix:@"ftp:"]
+              && ![o_url hasPrefix:@"mms"] )
+            o_mrl_string = [NSString stringWithFormat: @"http://%@", o_url];
+        else
+            o_mrl_string = o_url;
     }
 
     [o_mrl setStringValue: o_mrl_string];
@@ -476,6 +555,8 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
     
     [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setTitle: _NS("Open File")];
+    [o_open_panel setPrompt: _NS("Open")];
 
     if( [o_open_panel runModalForDirectory: nil 
             file: nil types: nil] == NSOKButton )
@@ -486,11 +567,32 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     }
 }
 
+- (IBAction)openVTSBrowse:(id)sender
+{
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+
+    [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setCanChooseFiles: NO];
+    [o_open_panel setCanChooseDirectories: YES];
+    [o_open_panel setTitle: _NS("Open VIDEO_TS Directory")];
+    [o_open_panel setPrompt: _NS("Open")];
+
+    if( [o_open_panel runModalForDirectory: nil
+            file: nil types: nil] == NSOKButton )
+    {
+        NSString *o_dirname = [[o_open_panel filenames] objectAtIndex: 0];
+        [o_disc_videots_folder setStringValue: o_dirname];
+        [self openDiscInfoChanged: nil];
+    }
+}
+
 - (IBAction)openFile:(id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
 
     [o_open_panel setAllowsMultipleSelection: NO];
+    [o_open_panel setTitle: _NS("Open File")];
+    [o_open_panel setPrompt: _NS("Open")];
 
     if( [o_open_panel runModalForDirectory: nil
             file: nil types: nil] == NSOKButton )

@@ -270,7 +270,7 @@
  *****************************************************************************/
 
 /* Maximal size of a message to be stored in the mesage queue,
- * it is needed when vasprintf is not avalaible */
+ * it is needed when vasprintf is not available */
 #define INTF_MAX_MSG_SIZE               512
 
 /* Maximal size of the message queue - in case of overflow, all messages in the

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2002-12-26 00:35+0100\n"
+"POT-Creation-Date: 2002-12-31 00:38+0100\n"
 "PO-Revision-Date: 2001-12-10 13:32+0100\n"
 "Last-Translator: Samuel Hocevar <sam@zoy.org>\n"
 "Language-Team: \n"
@@ -13,12 +13,12 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
-#: src/libvlc.c:232
+#: src/libvlc.c:252
 msgid "C"
 msgstr "fr"
 
 #. Usage
-#: src/libvlc.c:282 src/libvlc.c:1243
+#: src/libvlc.c:282 src/libvlc.c:1256
 #, c-format
 msgid ""
 "Usage: %s [options] [items]...\n"
@@ -27,27 +27,27 @@ msgstr ""
 "Utilisation: %s [options] [fichier]...\n"
 "\n"
 
-#: src/libvlc.c:1100 src/misc/configuration.c:880
+#: src/libvlc.c:1113 src/misc/configuration.c:880
 msgid "string"
 msgstr "chaîne"
 
-#: src/libvlc.c:1118 src/misc/configuration.c:865
+#: src/libvlc.c:1131 src/misc/configuration.c:865
 msgid "integer"
 msgstr "entier"
 
-#: src/libvlc.c:1121 src/misc/configuration.c:872
+#: src/libvlc.c:1134 src/misc/configuration.c:872
 msgid "float"
 msgstr "flottant"
 
-#: src/libvlc.c:1127
+#: src/libvlc.c:1140
 msgid " (default enabled)"
 msgstr " (activé par défaut)"
 
-#: src/libvlc.c:1128
+#: src/libvlc.c:1141
 msgid " (default disabled)"
 msgstr " (désactivé par défaut)"
 
-#: src/libvlc.c:1218 src/libvlc.c:1273 src/libvlc.c:1297
+#: src/libvlc.c:1231 src/libvlc.c:1286 src/libvlc.c:1310
 msgid ""
 "\n"
 "Press the RETURN key to continue...\n"
@@ -55,11 +55,11 @@ msgstr ""
 "\n"
 "Appuyez sur ENTRÉE pour continuer...\n"
 
-#: src/libvlc.c:1246
+#: src/libvlc.c:1259
 msgid "[module]              [description]\n"
 msgstr "[module]              [description]\n"
 
-#: src/libvlc.c:1291
+#: src/libvlc.c:1304
 msgid ""
 "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute it under the terms of the GNU General Public License;\n"
@@ -86,9 +86,7 @@ msgstr "module d'interface"
 msgid ""
 "This option allows you to select the interface used by vlc. The default "
 "behavior is to automatically select the best module available."
-msgstr ""
-"Cette option permet de choisir l'interface utilisée par vlc. Le comportement "
-"par défaut est de choisir automatiquement le meilleur module disponible."
+msgstr "Cette option permet de choisir l'interface utilisée par vlc. Le comportement par défaut est de choisir automatiquement le meilleur module disponible."
 
 #: src/libvlc.h:40
 msgid "verbosity (0,1,2)"
@@ -106,8 +104,7 @@ msgstr "moins de messages"
 
 #: src/libvlc.h:47
 msgid "This options turns off all warning and information messages."
-msgstr ""
-"Cette option désactive tous les messages d'avertissement et d'information."
+msgstr "Cette option désactive tous les messages d'avertissement et d'information."
 
 #: src/libvlc.h:49
 msgid "color messages"
@@ -117,22 +114,17 @@ msgstr "messages en couleur"
 msgid ""
 "When this option is turned on, the messages sent to the console will be "
 "colorized. Your terminal needs Linux color support for this to work."
-msgstr ""
-"Lorsque cette option est activée, les messages envoyés dans la console sont "
-"en couleurs. Vous devez avoir un terminal avec le support des couleurs Linux "
-"pour profiter de cette option."
+msgstr "Lorsque cette option est activée, les messages envoyés dans la console sont en couleurs. Vous devez avoir un terminal avec le support des couleurs Linux pour profiter de cette option."
 
 #: src/libvlc.h:54
 msgid "interface default search path"
-msgstr "chemin de recherche par défaut de l'interface"
+msgstr "chemin de rech. par défaut de l'interface"
 
 #: src/libvlc.h:56
 msgid ""
 "This option allows you to set the default path that the interface will open "
 "when looking for a file."
-msgstr ""
-"Cette option permet de choisir le chemin par défaut que l'interface "
-"utilisera pour ouvrir un fichier."
+msgstr "Cette option permet de choisir le chemin par défaut que l'interface utilisera pour ouvrir un fichier."
 
 #: src/libvlc.h:59
 msgid "plugin search path"
@@ -142,9 +134,7 @@ msgstr ""
 msgid ""
 "This option allows you to specify an additional path for vlc to lookfor its "
 "plugins."
-msgstr ""
-"Cette option permet de choisir un chemin supplémentaire pour les plugins que "
-"vlc va rechercher."
+msgstr "Cette option permet de choisir un chemin supplémentaire pour les plugins que vlc va rechercher."
 
 #: src/libvlc.h:64
 msgid "audio output module"
@@ -154,10 +144,7 @@ msgstr "module de sortie audio"
 msgid ""
 "This option allows you to select the audio output method used by vlc. The "
 "default behavior is to automatically select the best method available."
-msgstr ""
-"Cette option permet de choisir le module de sortie audio utilisée par vlc. "
-"Le comportement par défaut est de choisir automatiquement le meilleur module "
-"disponible."
+msgstr "Cette option permet de choisir le module de sortie audio utilisée par vlc. Le comportement par défaut est de choisir automatiquement le meilleur module disponible."
 
 #: src/libvlc.h:70
 msgid "enable audio"
@@ -167,9 +154,7 @@ msgstr "activer l'audio"
 msgid ""
 "You can completely disable the audio output. In this case the audio decoding "
 "stage won't be done, and it will save some processing power."
-msgstr ""
-"Cette option désactive complètement la sortie audio. Le décodage des pistes "
-"audio ne sera pas effectué, afin d'économiser du temps processeur."
+msgstr "Cette option désactive complètement la sortie audio. Le décodage des pistes audio ne sera pas effectué, afin d'économiser du temps processeur."
 
 #: src/libvlc.h:75
 msgid "force mono audio"
@@ -224,9 +209,7 @@ msgstr "fréquence de la sortie audio (Hz)"
 msgid ""
 "You can force the audio output frequency here. Common values are 48000, "
 "44100, 32000, 22050, 16000, 11025, 8000."
-msgstr ""
-"Vous pouvez forcer la fréquence de sortie audio. Des valeurs courantes sont "
-"48000, 44100, 32000, 22050, 16000, 11025, 8000."
+msgstr "Vous pouvez forcer la fréquence de sortie audio. Des valeurs courantes sont 48000, 44100, 32000, 22050, 16000, 11025, 8000."
 
 #: src/libvlc.h:101
 msgid "number of channels of audio output"
@@ -246,9 +229,7 @@ msgstr "compenser la désynchronisation de l'audio (en ms)"
 msgid ""
 "This option allows you to delay the audio output. This can be handy if you "
 "notice a lag between the video and the audio."
-msgstr ""
-"Cette option permet de retarder la sortie audio. Cela peut être utile si "
-"vous remarquez un décalage entre l'audio et la vidéo."
+msgstr "Cette option permet de retarder la sortie audio. Cela peut être utile si vous remarquez un décalage entre l'audio et la vidéo."
 
 #: src/libvlc.h:111
 msgid "headphone virtual spatialization effect"
@@ -281,10 +262,7 @@ msgstr "module de sortie vidéo"
 msgid ""
 "This option allows you to select the video output method used by vlc. The "
 "default behavior is to automatically select the best method available."
-msgstr ""
-"Cette option permet de choisir le module de sortie vidéo utilisée par vlc. "
-"Le comportement par défaut est de choisir automatiquement le meilleur module "
-"disponible."
+msgstr "Cette option permet de choisir le module de sortie vidéo utilisée par vlc. Le comportement par défaut est de choisir automatiquement le meilleur module disponible."
 
 #: src/libvlc.h:131
 msgid "enable video"
@@ -294,9 +272,7 @@ msgstr "activer la vidéo"
 msgid ""
 "You can completely disable the video output. In this case the video decoding "
 "stage won't be done, which will save some processing power."
-msgstr ""
-"Cette option désactive complètement la sortie vidéo. Le décodage des pistes "
-"vidéo ne sera pas effectué, afin d'économiser du temps processeur."
+msgstr "Cette option désactive complètement la sortie vidéo. Le décodage des pistes vidéo ne sera pas effectué, afin d'économiser du temps processeur."
 
 #: src/libvlc.h:136
 msgid "display identifier"
@@ -316,9 +292,7 @@ msgstr "largeur de la sortie vidéo"
 msgid ""
 "You can enforce the video width here. By default vlc will adapt to the video "
 "characteristics."
-msgstr ""
-"Vous pouvez forcer la largeur de l'image ici. Par défaut vlc s'adaptera aux "
-"propriétés de la vidéo."
+msgstr "Vous pouvez forcer la largeur de l'image ici. Par défaut vlc s'adaptera aux propriétés de la vidéo."
 
 #: src/libvlc.h:146
 msgid "video height"
@@ -328,9 +302,7 @@ msgstr "hauteur de la sortie vidéo"
 msgid ""
 "You can enforce the video height here. By default vlc will adapt to the "
 "video characteristics."
-msgstr ""
-"Vous pouvez forcer la hauteur de l'image ici. Par défaut vlc s'adaptera aux "
-"propriétés de la vidéo."
+msgstr "Vous pouvez forcer la hauteur de l'image ici. Par défaut vlc s'adaptera aux propriétés de la vidéo."
 
 #: src/libvlc.h:151
 msgid "zoom video"
@@ -348,9 +320,7 @@ msgstr "sortie vidéo en niveaux de gris"
 msgid ""
 "When enabled, the color information from the video won't be decoded (this "
 "can also allow you to save some processing power)."
-msgstr ""
-"En activant cette option, vlc ne décodera pas l'information de couleur "
-"présente dans la vidéo, ce qui permet d'économiser du temps processeur."
+msgstr "En activant cette option, vlc ne décodera pas l'information de couleur présente dans la vidéo, ce qui permet d'économiser du temps processeur."
 
 #: src/libvlc.h:160
 msgid "fullscreen video output"
@@ -359,9 +329,7 @@ msgstr "sortie vidéo en plein écran"
 #: src/libvlc.h:162
 msgid ""
 "If this option is enabled, vlc will always start a video in fullscreen mode."
-msgstr ""
-"Lorsque cette option est activée, vlc lancera toujours la vidéo en mode "
-"plein écran."
+msgstr "Lorsque cette option est activée, vlc lancera toujours la vidéo en mode plein écran."
 
 #: src/libvlc.h:165
 msgid "overlay video output"
@@ -372,9 +340,7 @@ msgstr "sortie vidéo en overlay"
 msgid ""
 "If enabled, vlc will try to take advantage of the overlay capabilities of "
 "your graphic card."
-msgstr ""
-"Par défaut vlc tentera d'utiliser les capacités d'overlay de votre carte "
-"vidéo."
+msgstr "Par défaut vlc tentera d'utiliser les capacités d'overlay de votre carte vidéo."
 
 #: src/libvlc.h:170
 msgid "force SPU position"
@@ -608,9 +574,7 @@ msgstr ""
 #, fuzzy
 msgid ""
 "This allows you to select the order in which vlc will choose its packetizers."
-msgstr ""
-"Cette option permet de choisir le chemin par défaut que l'interface "
-"utilisera pour ouvrir un fichier."
+msgstr "Cette option permet de choisir le chemin par défaut que l'interface utilisera pour ouvrir un fichier."
 
 #: src/libvlc.h:302
 #, fuzzy
@@ -753,10 +717,7 @@ msgid ""
 "On Windows NT/2K/XP we use a slow mutex implementation but which allows us "
 "to correctely implement condition variables. You can also use the faster "
 "Win9x implementation but you might experience problems with it."
-msgstr ""
-"Sous Windows NT/2K/XP vlc utilise une implémentation lente mais fidèle des "
-"mutex. Vous pouvez utiliser cette implémentation qui est plus rapide mais "
-"avec laquelle vous pouvez rencontrer des problèmes."
+msgstr "Sous Windows NT/2K/XP vlc utilise une implémentation lente mais fidèle des mutex. Vous pouvez utiliser cette implémentation qui est plus rapide mais avec laquelle vous pouvez rencontrer des problèmes."
 
 #: src/libvlc.h:375
 msgid "Condition variables implementation for Win9x (developers only)"
@@ -937,8 +898,7 @@ msgstr "module d'entrée Video4Linux"
 #. ****************************************************************************
 #. * Module descriptor
 #. ****************************************************************************
-#: modules/access/file.c:63 modules/access/http.c:79 modules/access/rtp.c:72
-#: modules/access/udp.c:65
+#: modules/access/file.c:63 modules/access/http.c:79 modules/access/udp.c:70
 msgid "caching value in ms"
 msgstr ""
 
@@ -985,31 +945,17 @@ msgstr ""
 msgid "HTTP access module"
 msgstr "module d'accès HTTP"
 
-#: modules/access/rtp.c:74
-msgid ""
-"Allows you to modify the default caching value for rtp streams. This value "
-"should be set in miliseconds units."
-msgstr ""
-
-#: modules/access/rtp.c:78
-msgid "RTP access module"
-msgstr "module d'accès RTP"
-
-#: modules/access/rtp.c:79
-msgid "rtp"
-msgstr ""
-
-#: modules/access/udp.c:67
+#: modules/access/udp.c:72
 msgid ""
 "Allows you to modify the default caching value for udp streams. This value "
 "should be set in miliseconds units."
 msgstr ""
 
-#: modules/access/udp.c:71
+#: modules/access/udp.c:76
 msgid "raw UDP access module"
 msgstr "module d'accès UDP"
 
-#: modules/access/udp.c:72
+#: modules/access/udp.c:77
 msgid "udp"
 msgstr ""
 
@@ -1336,7 +1282,7 @@ msgstr "module de post-traitement optimisé MMX"
 msgid "MMXEXT Post Processing module"
 msgstr "module de post-traitement optimisé MMXEXT"
 
-#: modules/codec/lpcm.c:82
+#: modules/codec/lpcm.c:98
 #, fuzzy
 msgid "linear PCM audio parser"
 msgstr "décodeur audio pour PCM linéaire"
@@ -1402,20 +1348,14 @@ msgstr "module de compensation de mouvement optimisé MMX EXT"
 msgid ""
 "This option allows you to select the IDCT module used by this video decoder. "
 "The default behavior is to automatically select the best module available."
-msgstr ""
-"Cette option permet de choisir le module IDCT utilisé par ce décodeur vidéo. "
-"Le comportement par défaut est de choisir automatiquement le meilleur module "
-"disponible."
+msgstr "Cette option permet de choisir le module IDCT utilisé par ce décodeur vidéo. Le comportement par défaut est de choisir automatiquement le meilleur module disponible."
 
 #: modules/codec/mpeg_video/parser.c:67
 msgid ""
 "This option allows you to select the motion compensation module used by this "
 "video decoder. The default behavior is to automatically select the best "
 "module available."
-msgstr ""
-"Cette option permet de choisir le module de compensation de mouvement "
-"utilisépar ce décodeur vidéo. Le comportement par défaut est de choisir "
-"automatiquement le meilleur module disponible."
+msgstr "Cette option permet de choisir le module de compensation de mouvement utilisépar ce décodeur vidéo. Le comportement par défaut est de choisir automatiquement le meilleur module disponible."
 
 #: modules/codec/mpeg_video/parser.c:71
 msgid "use additional processors"
@@ -1571,7 +1511,8 @@ msgstr "module d'interface Gtk+ Familiar Linux"
 msgid "vlc (familiar)"
 msgstr ""
 
-#: modules/gui/familiar/interface.c:93
+#: modules/gui/familiar/interface.c:93 modules/gui/macosx/open.m:559
+#: modules/gui/macosx/open.m:578 modules/gui/macosx/open.m:595
 msgid "Open"
 msgstr "Ouvrir"
 
@@ -1596,7 +1537,7 @@ msgstr "Ouvrir un flux"
 #: modules/gui/familiar/interface.c:134 modules/gui/gtk/gnome_interface.c:471
 #: modules/gui/gtk/gnome_interface.c:845 modules/gui/gtk/gtk_interface.c:589
 #: modules/gui/gtk/gtk_interface.c:1008 modules/gui/macosx/intf.m:218
-#: modules/gui/macosx/intf.m:244 modules/gui/macosx/controls.m:441
+#: modules/gui/macosx/intf.m:244 modules/gui/macosx/controls.m:440
 msgid "Pause"
 msgstr "Pause"
 
@@ -1618,7 +1559,7 @@ msgstr "Jouer le flux"
 #: modules/gui/familiar/interface.c:160 modules/gui/gtk/gnome_interface.c:435
 #: modules/gui/gtk/gnome_interface.c:852 modules/gui/gtk/gtk_interface.c:556
 #: modules/gui/gtk/gtk_interface.c:1016 modules/gui/macosx/intf.m:219
-#: modules/gui/macosx/intf.m:245 modules/gui/macosx/controls.m:458
+#: modules/gui/macosx/intf.m:245 modules/gui/macosx/controls.m:457
 msgid "Stop"
 msgstr "Stop"
 
@@ -1694,14 +1635,14 @@ msgid "Save"
 msgstr "Enregistrer"
 
 #: modules/gui/familiar/interface.c:347 modules/gui/gtk/preferences.c:561
-#: modules/gui/macosx/prefs.m:550
+#: modules/gui/macosx/prefs.m:551
 msgid "Apply"
 msgstr "Appliquer"
 
 #: modules/gui/familiar/interface.c:357 modules/gui/gtk/gtk_interface.c:2084
 #: modules/gui/gtk/gtk_interface.c:2312 modules/gui/gtk/gtk_interface.c:2543
 #: modules/gui/gtk/preferences.c:569 modules/gui/macosx/prefs.m:547
-#: modules/gui/macosx/open.m:140
+#: modules/gui/macosx/open.m:144
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -1773,9 +1714,7 @@ msgstr "hauteur maximale des fenêtres de configuration"
 msgid ""
 "You can set the maximum height that the configuration windows in the "
 "preferences menu will occupy."
-msgstr ""
-"Vous pouvez spécifier la hauteur maximale qu'occuperont les fenêtres de "
-"configuration dans le menu préférences."
+msgstr "Vous pouvez spécifier la hauteur maximale qu'occuperont les fenêtres de configuration dans le menu préférences."
 
 #: modules/gui/gtk/gnome.c:72
 msgid "GNOME"
@@ -1915,7 +1854,7 @@ msgstr "Client VideoLAN"
 #: modules/gui/gtk/gnome_interface.c:1973 modules/gui/gtk/gtk_interface.c:498
 #: modules/gui/gtk/gtk_interface.c:1615 modules/gui/gtk/gtk_interface.c:2400
 #: modules/gui/gtk/gtk_interface.c:2517 modules/gui/macosx/intf.m:197
-#: modules/gui/macosx/open.m:142 modules/gui/macosx/open.m:226
+#: modules/gui/macosx/open.m:146 modules/gui/macosx/open.m:250
 msgid "File"
 msgstr "Fichier"
 
@@ -1923,8 +1862,8 @@ msgstr "Fichier"
 #: modules/gui/gtk/gnome_interface.c:1438
 #: modules/gui/gtk/gnome_interface.c:1966 modules/gui/gtk/gtk_interface.c:509
 #: modules/gui/gtk/gtk_interface.c:696 modules/gui/gtk/gtk_interface.c:1726
-#: modules/gui/gtk/gtk_interface.c:2393 modules/gui/macosx/open.m:143
-#: modules/gui/macosx/open.m:230
+#: modules/gui/gtk/gtk_interface.c:2393 modules/gui/macosx/open.m:147
+#: modules/gui/macosx/open.m:254
 msgid "Disc"
 msgstr "Disque"
 
@@ -1990,7 +1929,7 @@ msgstr "Ouvre la playlist"
 #: modules/gui/gtk/gnome_interface.c:524 modules/gui/gtk/gnome_interface.c:903
 #: modules/gui/gtk/gtk_interface.c:638 modules/gui/gtk/gtk_interface.c:724
 #: modules/gui/gtk/gtk_interface.c:768 modules/gui/gtk/gtk_interface.c:1092
-#: modules/gui/macosx/intf.m:222 modules/gui/macosx/controls.m:462
+#: modules/gui/macosx/intf.m:222 modules/gui/macosx/controls.m:461
 msgid "Prev"
 msgstr "Préc."
 
@@ -2001,7 +1940,7 @@ msgstr "Fichier précédent"
 #: modules/gui/gtk/gnome_interface.c:536 modules/gui/gtk/gnome_interface.c:896
 #: modules/gui/gtk/gtk_interface.c:649 modules/gui/gtk/gtk_interface.c:732
 #: modules/gui/gtk/gtk_interface.c:776 modules/gui/gtk/gtk_interface.c:1085
-#: modules/gui/macosx/intf.m:223 modules/gui/macosx/controls.m:463
+#: modules/gui/macosx/intf.m:223 modules/gui/macosx/controls.m:462
 msgid "Next"
 msgstr "Suiv."
 
@@ -2088,15 +2027,14 @@ msgstr "(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - l'équipe VideoLAN"
 msgid ""
 "This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and "
 "MPEG 2 files from a file or from a network source."
-msgstr ""
-"Ceci est le client VideoLAN, un lecteur de DVD et de MPEG. Il peut jouer des "
-"fichiers MPEG et MPEG2 à partir d'un fichier ou d'une source réseau."
+msgstr "Ceci est le client VideoLAN, un lecteur de DVD et de MPEG. Il peut jouer des fichiers MPEG et MPEG2 à partir d'un fichier ou d'une source réseau."
 
 #: modules/gui/gtk/gnome_interface.c:1217
 msgid "Open Stream"
 msgstr "Ouvrir un flux"
 
 #: modules/gui/gtk/gnome_interface.c:1234 modules/gui/gtk/gtk_interface.c:1522
+#: modules/gui/macosx/open.m:141
 msgid "Media Resource Locator (MRL)"
 msgstr ""
 
@@ -2111,39 +2049,43 @@ msgid ""
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1320 modules/gui/gtk/gtk_interface.c:1608
-#: modules/gui/macosx/open.m:146
+#: modules/gui/macosx/open.m:150 modules/gui/macosx/open.m:156
 msgid "Browse..."
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1344 modules/gui/gtk/gtk_interface.c:1632
 #: modules/gui/gtk/menu.c:905 modules/gui/gtk/menu.c:926
 #: modules/gui/kde/interface.cpp:145 modules/gui/macosx/intf.m:233
-#: modules/gui/macosx/open.m:150
+#: modules/gui/macosx/open.m:154
 msgid "Title"
 msgstr "Titre"
 
 #: modules/gui/gtk/gnome_interface.c:1354 modules/gui/gtk/gtk_interface.c:1642
 #: modules/gui/gtk/menu.c:800 modules/gui/gtk/menu.c:935
 #: modules/gui/kde/interface.cpp:147 modules/gui/macosx/intf.m:234
-#: modules/gui/macosx/open.m:151
+#: modules/gui/macosx/open.m:155
 msgid "Chapter"
 msgstr "Chapitre"
 
 #: modules/gui/gtk/gnome_interface.c:1374 modules/gui/gtk/gtk_interface.c:1662
-#: modules/gui/macosx/open.m:148
 msgid "Disc type"
 msgstr "Type de disque"
 
 #: modules/gui/gtk/gnome_interface.c:1393 modules/gui/gtk/gtk_interface.c:1681
+#: modules/gui/macosx/open.m:158 modules/gui/macosx/open.m:325
+#: modules/gui/macosx/open.m:334 modules/gui/macosx/open.m:412
+#: modules/gui/macosx/open.m:423
 msgid "DVD"
 msgstr "DVD"
 
 #: modules/gui/gtk/gnome_interface.c:1401 modules/gui/gtk/gtk_interface.c:1689
+#: modules/gui/macosx/open.m:160 modules/gui/macosx/open.m:319
+#: modules/gui/macosx/open.m:404
 msgid "VCD"
 msgstr "VCD"
 
 #: modules/gui/gtk/gnome_interface.c:1409 modules/gui/gtk/gtk_interface.c:1697
-#: modules/gui/macosx/open.m:149
+#: modules/gui/macosx/open.m:153
 msgid "Device name"
 msgstr "Nom du périphérique"
 
@@ -2167,27 +2109,27 @@ msgstr "HTTP"
 #: modules/gui/gtk/gnome_interface.c:1570
 #: modules/gui/gtk/gnome_interface.c:1581 modules/gui/gtk/gtk_interface.c:1783
 #: modules/gui/gtk/gtk_interface.c:1858 modules/gui/gtk/gtk_interface.c:1869
-#: modules/gui/macosx/open.m:153 modules/gui/macosx/open.m:155
-#: modules/gui/macosx/open.m:157
+#: modules/gui/macosx/open.m:163 modules/gui/macosx/open.m:165
+#: modules/gui/macosx/open.m:167
 msgid "Port"
 msgstr "Port"
 
 #: modules/gui/gtk/gnome_interface.c:1505
 #: modules/gui/gtk/gnome_interface.c:1517 modules/gui/gtk/gtk_interface.c:1793
-#: modules/gui/gtk/gtk_interface.c:1805 modules/gui/macosx/open.m:154
-#: modules/gui/macosx/open.m:156
+#: modules/gui/gtk/gtk_interface.c:1805 modules/gui/macosx/open.m:164
+#: modules/gui/macosx/open.m:166
 msgid "Address"
 msgstr "Adresse"
 
 #: modules/gui/gtk/gnome_interface.c:1527 modules/gui/gtk/gtk_interface.c:1815
-#: modules/gui/macosx/open.m:158
+#: modules/gui/macosx/open.m:168
 msgid "URL"
 msgstr ""
 
 #: modules/gui/gtk/gnome_interface.c:1637
 #: modules/gui/gtk/gnome_interface.c:1980 modules/gui/gtk/gtk_interface.c:1925
-#: modules/gui/gtk/gtk_interface.c:2407 modules/gui/macosx/open.m:144
-#: modules/gui/macosx/open.m:234
+#: modules/gui/gtk/gtk_interface.c:2407 modules/gui/macosx/open.m:148
+#: modules/gui/macosx/open.m:258
 msgid "Network"
 msgstr "Réseau"
 
@@ -2219,7 +2161,8 @@ msgstr "Horizontale"
 msgid "Satellite"
 msgstr "Satellite"
 
-#: modules/gui/gtk/gnome_interface.c:1878
+#: modules/gui/gtk/gnome_interface.c:1878 modules/gui/macosx/open.m:558
+#: modules/gui/macosx/open.m:594
 msgid "Open File"
 msgstr "Ouvrir un fichier"
 
@@ -2231,9 +2174,7 @@ msgstr "Modules"
 msgid ""
 "Sorry, the module manager isn't functional yet. Please retry in a later "
 "version."
-msgstr ""
-"Désolé, le gestionnaire de modules ne fonctionne pas encore. Veuillez "
-"réessayer dans une prochaine version"
+msgstr "Désolé, le gestionnaire de modules ne fonctionne pas encore. Veuillez réessayer dans une prochaine version"
 
 #: modules/gui/gtk/gnome_interface.c:1987
 #: modules/gui/gtk/gnome_interface.c:2128 modules/gui/gtk/gtk_interface.c:2414
@@ -2395,12 +2336,12 @@ msgstr ""
 #: modules/gui/gtk/gtk_interface.c:1405 modules/gui/gtk/gtk_interface.c:2077
 #: modules/gui/gtk/gtk_interface.c:2305 modules/gui/gtk/gtk_interface.c:2536
 #: modules/gui/gtk/gtk_interface.c:2643 modules/gui/gtk/preferences.c:557
-#: modules/gui/macosx/prefs.m:543 modules/gui/macosx/prefs.m:757
-#: modules/gui/macosx/open.m:139
+#: modules/gui/macosx/prefs.m:543 modules/gui/macosx/prefs.m:758
+#: modules/gui/macosx/open.m:143
 msgid "OK"
-msgstr "Valider"
+msgstr ""
 
-#: modules/gui/gtk/gtk_interface.c:1509 modules/gui/macosx/open.m:137
+#: modules/gui/gtk/gtk_interface.c:1509 modules/gui/macosx/open.m:140
 msgid "Open Target"
 msgstr "Ouvrir un flux"
 
@@ -2434,8 +2375,8 @@ msgstr "_Sélectionner"
 
 #. special case for "off" item
 #: modules/gui/gtk/menu.c:518 modules/gui/macosx/prefs.m:382
-#: modules/gui/macosx/prefs.m:411 modules/gui/macosx/prefs.m:633
-#: modules/gui/macosx/prefs.m:662
+#: modules/gui/macosx/prefs.m:411 modules/gui/macosx/prefs.m:634
+#: modules/gui/macosx/prefs.m:663
 msgid "None"
 msgstr "Aucun"
 
@@ -2545,7 +2486,7 @@ msgid "Open Recent"
 msgstr "Ouvrir un flux"
 
 #. Recent Items Menu
-#: modules/gui/macosx/intf.m:203 modules/gui/macosx/intf.m:930
+#: modules/gui/macosx/intf.m:203 modules/gui/macosx/intf.m:939
 msgid "Clear Menu"
 msgstr ""
 
@@ -2586,12 +2527,12 @@ msgstr "_Vue"
 msgid "Controls"
 msgstr ""
 
-#: modules/gui/macosx/intf.m:220 modules/gui/macosx/controls.m:442
+#: modules/gui/macosx/intf.m:220 modules/gui/macosx/controls.m:441
 #, fuzzy
 msgid "Faster"
 msgstr "Accéléré"
 
-#: modules/gui/macosx/intf.m:221 modules/gui/macosx/controls.m:443
+#: modules/gui/macosx/intf.m:221 modules/gui/macosx/controls.m:442
 #, fuzzy
 msgid "Slower"
 msgstr "Ralenti"
@@ -2609,7 +2550,7 @@ msgstr ""
 msgid "Softer"
 msgstr "Ralenti"
 
-#: modules/gui/macosx/intf.m:227 modules/gui/macosx/controls.m:485
+#: modules/gui/macosx/intf.m:227 modules/gui/macosx/controls.m:484
 msgid "Mute"
 msgstr ""
 
@@ -2617,7 +2558,7 @@ msgstr ""
 msgid "Channels"
 msgstr "Canaux"
 
-#: modules/gui/macosx/intf.m:229 modules/gui/macosx/controls.m:517
+#: modules/gui/macosx/intf.m:229 modules/gui/macosx/controls.m:516
 #, fuzzy
 msgid "Fullscreen"
 msgstr "Plein écran"
@@ -2627,7 +2568,7 @@ msgstr "Plein écran"
 msgid "Screen"
 msgstr "Plein écran"
 
-#: modules/gui/macosx/intf.m:231 modules/gui/macosx/controls.m:532
+#: modules/gui/macosx/intf.m:231 modules/gui/macosx/controls.m:531
 #, fuzzy
 msgid "Deinterlace"
 msgstr "mode de désentrelacement"
@@ -2648,11 +2589,49 @@ msgstr ""
 msgid "Bring All to Front"
 msgstr ""
 
-#: modules/gui/macosx/controls.m:480
+#: modules/gui/macosx/open.m:151
+msgid "Treat as a pipe rather than as a file"
+msgstr ""
+
+#: modules/gui/macosx/open.m:159 modules/gui/macosx/open.m:420
+msgid "DVD with menus"
+msgstr ""
+
+#: modules/gui/macosx/open.m:161 modules/gui/macosx/open.m:308
+msgid "VIDEO_TS folder"
+msgstr ""
+
+#: modules/gui/macosx/open.m:170 modules/gui/macosx/open.m:495
+msgid "UDP/RTP"
+msgstr ""
+
+#: modules/gui/macosx/open.m:171 modules/gui/macosx/open.m:507
+msgid "UDP/RTP Multicast"
+msgstr ""
+
+#: modules/gui/macosx/open.m:172 modules/gui/macosx/open.m:492
+#: modules/gui/macosx/open.m:520
+msgid "Channel server"
+msgstr "Serveur de canaux"
+
+#: modules/gui/macosx/open.m:173 modules/gui/macosx/open.m:539
+msgid "HTTP/FTP/MMS"
+msgstr ""
+
+#: modules/gui/macosx/open.m:358 modules/gui/macosx/open.m:407
+#: modules/gui/macosx/open.m:415 modules/gui/macosx/open.m:423
+msgid "No %@s found"
+msgstr ""
+
+#: modules/gui/macosx/open.m:577
+msgid "Open VIDEO_TS Directory"
+msgstr ""
+
+#: modules/gui/macosx/controls.m:479
 msgid "Volume Up"
 msgstr ""
 
-#: modules/gui/macosx/controls.m:481
+#: modules/gui/macosx/controls.m:480
 msgid "Volume Down"
 msgstr ""
 
@@ -3025,22 +3004,16 @@ msgid ""
 "2) Completly bypass the window manager, but then nothing will be able to "
 "show on top of the video."
 msgstr ""
-"Il y a deus méthodes pour passer en plein écran, chacune aves ses "
-"inconvénients :\n"
-"1) Laisser le gestionnaire de fenêtre gérer la fenêtre plein écran (mode par "
-"défaut). Mais les objetcs comme les barres des tâches seront probablement au-"
-"dessus de la vidéo.\n"
-"2) Ne pas utiliser du tout le gestionnaire de fenêtres, mais plus rien ne "
-"sera affichable au-dessus de la vidéo."
+"Il y a deus méthodes pour passer en plein écran, chacune aves ses inconvénients :\n"
+"1) Laisser le gestionnaire de fenêtre gérer la fenêtre plein écran (mode par défaut). Mais les objetcs comme les barres des tâches seront probablement au-dessus de la vidéo.\n"
+"2) Ne pas utiliser du tout le gestionnaire de fenêtres, mais plus rien ne sera affichable au-dessus de la vidéo."
 
 #: modules/video_output/mga/xmga.c:100 modules/video_output/x11/x11.c:54
 #: modules/video_output/x11/xvideo.c:60
 msgid ""
 "Specify the X11 hardware display you want to use. By default vlc will use "
 "the value of the DISPLAY environment variable."
-msgstr ""
-"Spécifier le display X11 que vous désirez utiliser. Par défaut vlc utilisera "
-"la valeur de la variable d'environnement DISPLAY."
+msgstr "Spécifier le display X11 que vous désirez utiliser. Par défaut vlc utilisera la valeur de la variable d'environnement DISPLAY."
 
 #: modules/video_output/mga/xmga.c:107
 msgid "X11 MGA module"
@@ -3055,9 +3028,7 @@ msgstr "nom du display Qt Embedded"
 msgid ""
 "Specify the Qt Embedded hardware display you want to use. By default vlc "
 "will use the value of the DISPLAY environment variable."
-msgstr ""
-"Spécifier le display X11 que vous désirez utiliser. Par défaut vlc utilisera "
-"la valeur de la variable d'environnement DISPLAY."
+msgstr "Spécifier le display X11 que vous désirez utiliser. Par défaut vlc utilisera la valeur de la variable d'environnement DISPLAY."
 
 #: modules/video_output/qte/qte.cpp:92
 msgid "QT Embedded drawable"
@@ -3101,8 +3072,7 @@ msgstr "utilise la mémoire partagée"
 
 #: modules/video_output/x11/x11.c:64 modules/video_output/x11/xvideo.c:75
 msgid "Use shared memory to communicate between vlc and the X server."
-msgstr ""
-"Utiliser la mémoire partagée pour communiquer entre vlc et le serveur X."
+msgstr "Utiliser la mémoire partagée pour communiquer entre vlc et le serveur X."
 
 #: modules/video_output/x11/x11.c:67
 msgid "X11"
@@ -3123,10 +3093,7 @@ msgstr "numéro de l'adaptateur XVideo"
 msgid ""
 "If you graphics card provides several adaptors, this option allows you to "
 "choose which one will be used (you shouldn't have to change this)."
-msgstr ""
-"Si votre carte graphique a plusieurs adaptateurs, cette option vous permet "
-"de choisir celui qui sera utilisé (vous ne devriez pas avoir à modifier "
-"cette valeur)."
+msgstr "Si votre carte graphique a plusieurs adaptateurs, cette option vous permet de choisir celui qui sera utilisé (vous ne devriez pas avoir à modifier cette valeur)."
 
 #: modules/video_output/x11/xvideo.c:63
 msgid "XVimage chroma format"
@@ -3193,6 +3160,9 @@ msgstr "module XOSD"
 msgid "xosd interface module"
 msgstr "module d'interface xosd"
 
+#~ msgid "RTP access module"
+#~ msgstr "module d'accès RTP"
+
 #~ msgid "MacOS X interface, sound and video module"
 #~ msgstr "module MacOS X de son, vidéo et d'interface"
 
@@ -3218,16 +3188,12 @@ msgstr "module d'interface xosd"
 #~ msgid ""
 #~ "This allows you to select the MPEG audio decoder you want to use. Common "
 #~ "choices are builtin and mad."
-#~ msgstr ""
-#~ "Cette option permet de choisir le module de décodage MPEG audio utilisé "
-#~ "par vlc. Les choix habituels sont builtin et mad."
+#~ msgstr "Cette option permet de choisir le module de décodage MPEG audio utilisé par vlc. Les choix habituels sont builtin et mad."
 
 #~ msgid ""
 #~ "This allows you to select the AC3/A52 audio decoder you want to use. "
 #~ "Common choices are builtin and a52."
-#~ msgstr ""
-#~ "Cette option permet de choisir le module de décodage AC3 audio utilisé "
-#~ "par vlc. Les choix habituels sont builtin et a52."
+#~ msgstr "Cette option permet de choisir le module de décodage AC3 audio utilisé par vlc. Les choix habituels sont builtin et a52."
 
 #~ msgid "print build information"
 #~ msgstr "afficher les informations de compilation du logiciel"
@@ -3264,9 +3230,7 @@ msgstr "module d'interface xosd"
 #~ msgid ""
 #~ "Specify the mad audio downscale routine you want to use. By default the "
 #~ "mad plugin will use the fastest routine."
-#~ msgstr ""
-#~ "Spécifier la routine de downscale audio que mad utilisera. Par défaut le "
-#~ "module mad utilisera la routine la plus rapide."
+#~ msgstr "Spécifier la routine de downscale audio que mad utilisera. Par défaut le module mad utilisera la routine la plus rapide."
 
 #~ msgid "Transponder settings"
 #~ msgstr "Paramètres du transpondeur"
@@ -3288,9 +3252,6 @@ msgstr "module d'interface xosd"
 
 #~ msgid "Broadcast"
 #~ msgstr "Broadcast"
-
-#~ msgid "Channel server"
-#~ msgstr "Serveur de canaux"
 
 #~ msgid "Open Satellite Card"
 #~ msgstr "Ouvrir une carte satellite"
@@ -3317,9 +3278,7 @@ msgstr "module d'interface xosd"
 #~ msgid ""
 #~ "Increasing the warning level will allow you to see more debug messages "
 #~ "and can sometimes help you to troubleshoot a problem."
-#~ msgstr ""
-#~ "En augmentant le niveau de messages, plus d'informations seront affichées "
-#~ "et pourront éventuellement servir à résoudre des problèmes."
+#~ msgstr "En augmentant le niveau de messages, plus d'informations seront affichées et pourront éventuellement servir à résoudre des problèmes."
 
 #, fuzzy
 #~ msgid ""
@@ -3327,18 +3286,14 @@ msgstr "module d'interface xosd"
 #~ "use.\n"
 #~ "Note that by default no video filter is used."
 #~ msgstr ""
-#~ "Cette option permet de choisir le module de sortie audio utilisée par "
-#~ "vlc.\n"
-#~ "Le comportement par défaut est de choisir automatiquement le meilleur "
-#~ "module disponible."
+#~ "Cette option permet de choisir le module de sortie audio utilisée par vlc.\n"
+#~ "Le comportement par défaut est de choisir automatiquement le meilleur module disponible."
 
 #, fuzzy
 #~ msgid ""
 #~ "This option allows you to set the VCD device that vlc will try to use by "
 #~ "default."
-#~ msgstr ""
-#~ "Cette option permet de choisir le chemin par défaut que l'interface "
-#~ "utilisera pour ouvrir un fichier."
+#~ msgstr "Cette option permet de choisir le chemin par défaut que l'interface utilisera pour ouvrir un fichier."
 
 #~ msgid "TS"
 #~ msgstr "TS"
