@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.13 2003/05/27 20:43:20 gbazin Exp $
+ * $Id: cdrom.c,v 1.14 2003/08/09 19:14:16 gbazin Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -680,7 +680,7 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             /* Initialize CDROM_RAW_READ structure */
             cdrom_raw.DiskOffset.QuadPart = CD_SECTOR_SIZE * i_sector;
             cdrom_raw.SectorCount = i_nb;
-            cdrom_raw.TrackMode =  i_type == VCD_TYPE ? YellowMode2 : CDDA;
+            cdrom_raw.TrackMode =  i_type == VCD_TYPE ? XAForm2 : CDDA;
 
             if( DeviceIoControl( p_vcddev->h_device_handle,
                                  IOCTL_CDROM_RAW_READ, &cdrom_raw,
@@ -688,8 +688,21 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
                                  VCD_SECTOR_SIZE * i_nb, &dwBytesReturned,
                                  NULL ) == 0 )
             {
-                if( i_type == VCD_TYPE ) free( p_block );
-                return -1;
+                if( i_type == VCD_TYPE )
+                {
+                    /* Retry in YellowMode2 */
+                    cdrom_raw.TrackMode = YellowMode2;
+                    if( DeviceIoControl( p_vcddev->h_device_handle,
+                                 IOCTL_CDROM_RAW_READ, &cdrom_raw,
+                                 sizeof(RAW_READ_INFO), p_block,
+                                 VCD_SECTOR_SIZE * i_nb, &dwBytesReturned,
+                                 NULL ) == 0 )
+                    {
+                        free( p_block );
+                        return -1;
+                    }
+                }
+                else return -1;
             }
         }
 
