@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.52 2004/02/09 23:03:12 garf Exp $
+ * $Id: http.c,v 1.53 2004/02/09 23:30:37 garf Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -2709,11 +2709,23 @@ static void  EvaluateRPN( mvar_t  *vars, rpn_stack_t *st, char *exp )
         {
             int n = SSPopN( st, vars );
             int m = SSPopN( st, vars );
+            int i_len;
             char *s = SSPop( st );
-            char *str = malloc( n - m + 2 );
+            char *str;
 
-            memcpy( str, s + m - 1, n - m + 1 );
-            str[ n - m + 1 ] = '\0';
+            if( n >= m )
+            {
+                i_len = n - m + 1;
+            }
+            else
+            {
+                i_len = 0;
+            }
+
+            str = malloc( i_len + 1 );
+
+            memcpy( str, s + m - 1, i_len );
+            str[ i_len ] = '\0';
 
             SSPush( st, str );
             free( s );
