@@ -303,6 +303,10 @@ static void Destroy( vlc_object_t *p_this )
 static int Render( filter_t *p_filter, subpicture_region_t *p_region,
                    line_desc_t *p_line, int i_width, int i_height )
 {
+    static uint8_t pi_gamma[16] =
+        {0x00, 0x41, 0x52, 0x63, 0x84, 0x85, 0x96, 0xa7, 0xb8, 0xc9,
+         0xca, 0xdb, 0xdc, 0xed, 0xee, 0xff};
+
     uint8_t *p_dst;
     video_format_t fmt;
     int i, x, y, i_pitch;
@@ -314,8 +318,8 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('Y','U','V','P');
     fmt.i_aspect = VOUT_ASPECT_FACTOR;
-    fmt.i_width = fmt.i_visible_width = i_width + 2;
-    fmt.i_height = fmt.i_visible_height = i_height + 2;
+    fmt.i_width = fmt.i_visible_width = i_width + 4;
+    fmt.i_height = fmt.i_visible_height = i_height + 4;
     fmt.i_x_offset = fmt.i_y_offset = 0;
     p_region_tmp = spu_CreateRegion( p_filter, &fmt );
     if( !p_region_tmp )
@@ -337,17 +341,16 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
                       18 * p_line->i_blue + 128) >> 8) + 128;
 
     /* Build palette */
-    fmt.p_palette->i_entries = 256;
+    fmt.p_palette->i_entries = 16;
     for( i = 0; i < fmt.p_palette->i_entries; i++ )
     {
-        fmt.p_palette->palette[i][0] = i * i_y / 256;
+        fmt.p_palette->palette[i][0] = i * 16 * i_y / 256;
         fmt.p_palette->palette[i][1] = i_u;
         fmt.p_palette->palette[i][2] = i_v;
-        fmt.p_palette->palette[i][3] = i + (255 - i) / 16;
+        fmt.p_palette->palette[i][3] = pi_gamma[i];
         fmt.p_palette->palette[i][3] =
             (int)fmt.p_palette->palette[i][3] * (255 - p_line->i_alpha) / 255;
     }
-    fmt.p_palette->palette[0][3] = 0;
 
     p_dst = p_region->picture.Y_PIXELS;
     i_pitch = p_region->picture.Y_PITCH;
@@ -376,54 +379,51 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
                 i_align_offset = ( i_width - p_line->i_width ) / 2;
             }
         }
+
         for( i = 0; p_line->pp_glyphs[i] != NULL; i++ )
         {
             FT_BitmapGlyph p_glyph = p_line->pp_glyphs[ i ];
 
             i_offset = ( p_line->p_glyph_pos[ i ].y +
-                i_glyph_tmax - p_glyph->top + 1 ) *
-                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 1 +
+                i_glyph_tmax - p_glyph->top + 2 ) *
+                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 2 +
                 i_align_offset;
 
             for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
             {
                 for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
                 {
-                    if( !p_glyph->bitmap.buffer[i_bitmap_offset] )
-                        continue;
-
-                    i_offset -= i_pitch;
-                    p_dst[i_offset + x] = ((uint16_t)p_dst[i_offset + x]*2 +
-                      p_glyph->bitmap.buffer[i_bitmap_offset])/3;
-                    i_offset += i_pitch; x--;
-                    p_dst[i_offset + x] = ((uint16_t)p_dst[i_offset + x]*2 +
-                      p_glyph->bitmap.buffer[i_bitmap_offset])/3;
-                    x += 2;
-                    p_dst[i_offset + x] = ((uint16_t)p_dst[i_offset + x]*2 +
-                      p_glyph->bitmap.buffer[i_bitmap_offset])/3;
-                    i_offset += i_pitch; x--;
-                    p_dst[i_offset + x] = ((uint16_t)p_dst[i_offset + x]*2 +
-                      p_glyph->bitmap.buffer[i_bitmap_offset])/3;
-                    i_offset -= i_pitch;
+                    if( p_glyph->bitmap.buffer[i_bitmap_offset] )
+                        p_dst[i_offset+x] =
+                         ((int)p_glyph->bitmap.buffer[i_bitmap_offset] + 8)/16;
                 }
                 i_offset += i_pitch;
             }
+        }
+    }
 
-            i_offset = ( p_line->p_glyph_pos[ i ].y +
-                i_glyph_tmax - p_glyph->top + 1 ) *
-                i_pitch + p_line->p_glyph_pos[ i ].x + p_glyph->left + 1 +
-                i_align_offset;
+    /* Outlining (find something better than nearest neighbour filtering ?) */
+    if( 1 )
+    {
+        uint8_t *p_dst = p_region->picture.Y_PIXELS;
+        uint8_t *p_top = p_dst; /* Use 1st line as a cache */
+        uint8_t left, current;
 
-            for( y = 0, i_bitmap_offset = 0; y < p_glyph->bitmap.rows; y++ )
+        for( y = 1; y < (int)fmt.i_height - 1; y++ )
+        {
+            memcpy( p_top, p_dst, fmt.i_width );
+            p_dst += p_region->picture.Y_PITCH;
+            left = 0;
+
+            for( x = 1; x < (int)fmt.i_width - 1; x++ )
             {
-               for( x = 0; x < p_glyph->bitmap.width; x++, i_bitmap_offset++ )
-               {
-                 if( p_glyph->bitmap.buffer[i_bitmap_offset] > 16 )
-                   p_dst[i_offset+x] = p_glyph->bitmap.buffer[i_bitmap_offset];
-               }
-               i_offset += i_pitch;
+                current = p_dst[x];
+                p_dst[x] = ( 4 * (int)p_dst[x] + left + p_top[x] + p_dst[x+1] +
+                             p_dst[x + p_region->picture.Y_PITCH]) / 8;
+                left = current;
             }
         }
+        memset( p_top, 0, fmt.i_width );
     }
 
     return VLC_SUCCESS;
