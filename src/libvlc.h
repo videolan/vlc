@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.22 2002/11/28 14:34:39 sam Exp $
+ * $Id: libvlc.h,v 1.23 2002/11/29 23:08:34 ipkiss Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -40,7 +40,7 @@
 #define VERBOSE_TEXT N_("verbosity (0,1,2)")
 #define VERBOSE_LONGTEXT N_( \
     "This options sets the verbosity level (0=only errors and " \
-    "standard messages, 1=warnings, 2=debug.")
+    "standard messages, 1=warnings, 2=debug).")
 
 #define QUIET_TEXT N_("be quiet")
 #define QUIET_LONGTEXT N_( \
@@ -151,7 +151,7 @@
 #define OVERLAY_TEXT N_("overlay video output")
 #define OVERLAY_LONGTEXT N_( \
     "If enabled, vlc will try to take advantage of the overlay capabilities " \
-    "of you graphics card.")
+    "of your graphic card.")
 
 #define SPUMARGIN_TEXT N_("force SPU position")
 #define SPUMARGIN_LONGTEXT N_( \
@@ -257,7 +257,7 @@
     "If you check this box, IPv4 will be used by default for all UDP and " \
     "HTTP connections.")
 
-#define CODEC_TEXT N_("choose preferred codec list")
+#define CODEC_TEXT N_("choose prefered codec list")
 #define CODEC_LONGTEXT N_( \
     "This allows you to select the order in which vlc will choose its " \
     "codecs. For instance, 'a52old,a52,any' will try the old a52 codec " \
@@ -288,7 +288,7 @@
 #define SSE_TEXT N_("enable CPU SSE support")
 #define SSE_LONGTEXT N_( \
     "If your processor supports the SSE instructions set, vlc can take " \
-    "can take advantage of them.")
+    "advantage of them.")
 
 #define ALTIVEC_TEXT N_("enable CPU AltiVec support")
 #define ALTIVEC_LONGTEXT N_( \
@@ -316,8 +316,8 @@
 
 #define MEMCPY_TEXT N_("memory copy module")
 #define MEMCPY_LONGTEXT N_( \
-    "You can select wich memory copy module you want to use. By default vlc " \
-    "will select the fastest one supported by your hardware.")
+    "You can select which memory copy module you want to use. By default" \
+    "vlc will select the fastest one supported by your hardware.")
 
 #define ACCESS_TEXT N_("access module")
 #define ACCESS_LONGTEXT N_( \
@@ -335,7 +335,7 @@
     "experience problems with it.")
 
 #define WIN9X_CV_TEXT N_("Condition variables implementation for Win9x " \
-    "(developpers only)")
+    "(developers only)")
 #define WIN9X_CV_LONGTEXT N_( \
     "On Windows 9x/Me we use a fast but not correct condition variables " \
     "implementation (more precisely there is a possibility for a race " \
