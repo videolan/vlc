@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.41 2002/06/27 19:01:28 sam Exp $
+ * $Id: xcommon.c,v 1.42 2002/07/02 19:14:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -69,6 +69,9 @@
 
 #include "netutils.h"                                 /* network_ChannelJoin */
 
+/*****************************************************************************
+ * Defines
+ *****************************************************************************/
 #ifdef MODULE_NAME_IS_xvideo
 #   define IMAGE_TYPE     XvImage
 #   define EXTRA_ARGS     int i_xvport, int i_chroma
@@ -83,6 +86,9 @@
 #   define IMAGE_FREE     XDestroyImage
 #endif
 
+struct x11_window_s;
+typedef struct x11_window_s x11_window_t;
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -96,8 +102,8 @@ static void vout_End       ( vout_thread_t * );
 
 static int  InitDisplay    ( vout_thread_t * );
 
-static int  CreateWindow   ( vout_thread_t * );
-static void DestroyWindow  ( vout_thread_t * );
+static int  CreateWindow   ( vout_thread_t *, x11_window_t * );
+static void DestroyWindow  ( vout_thread_t *, x11_window_t * );
 
 static int  NewPicture     ( vout_thread_t *, picture_t * );
 static void FreePicture    ( vout_thread_t *, picture_t * );
@@ -128,6 +134,22 @@ static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
 #endif
 
 /*****************************************************************************
+ * x11_window_t: X11 window descriptor
+ *****************************************************************************
+ * This structure contains all the data necessary to describe an X11 window.
+ *****************************************************************************/
+struct x11_window_s
+{
+    Window              base_window;                          /* base window */
+    Window              video_window;     /* sub-window for displaying video */
+    GC                  gc;              /* graphic context instance handler */
+    int                 i_width;                     /* width of main window */
+    int                 i_height;                   /* height of main window */
+    Atom                wm_protocols;
+    Atom                wm_delete_window;
+};
+
+/*****************************************************************************
  * vout_sys_t: video output method descriptor
  *****************************************************************************
  * This structure is part of the video output thread descriptor.
@@ -140,11 +162,17 @@ struct vout_sys_s
 
     Visual *            p_visual;                          /* visual pointer */
     int                 i_screen;                           /* screen number */
-    GC                  gc;              /* graphic context instance handler */
-    Window              window;                               /* root window */
-    vlc_bool_t          b_createwindow;       /* are we the window's owner ? */
-    Window              video_window;     /* sub-window for displaying video */
 
+    /* Our current window */
+    x11_window_t *      p_win;
+
+    /* Our two windows */
+    x11_window_t        original_window;
+    x11_window_t        fullscreen_window;
+
+    /* X11 generic properties */
+    vlc_bool_t          b_altfullscreen;          /* which fullscreen method */
+    vlc_bool_t          b_createwindow;  /* are we the base window's owner ? */
 #ifdef HAVE_SYS_SHM_H
     vlc_bool_t          b_shm;               /* shared memory extension flag */
 #endif
@@ -158,24 +186,6 @@ struct vout_sys_s
     int                 i_bytes_per_pixel;
     int                 i_bytes_per_line;
 #endif
-
-    /* X11 generic properties */
-    Atom                wm_protocols;
-    Atom                wm_delete_window;
-
-    int                 i_width;                     /* width of main window */
-    int                 i_height;                   /* height of main window */
-    vlc_bool_t          b_altfullscreen;          /* which fullscreen method */
-
-    /* Backup of window position and size before fullscreen switch */
-    int                 i_width_backup;
-    int                 i_height_backup;
-    int                 i_xpos_backup;
-    int                 i_ypos_backup;
-    int                 i_width_backup_2;
-    int                 i_height_backup_2;
-    int                 i_xpos_backup_2;
-    int                 i_ypos_backup_2;
 
     /* Screen saver properties */
     int                 i_ss_timeout;                             /* timeout */
@@ -290,6 +300,7 @@ static int vout_Create( vout_thread_t *p_vout )
     }
     if( psz_display ) free( psz_display );
 
+    /* Get a screen ID matching the XOpenDisplay return value */
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
 #ifdef MODULE_NAME_IS_xvideo
@@ -360,9 +371,13 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->b_mouse_pointer_visible = 1;
     CreateCursor( p_vout );
 
+    /* Set main window's size */
+    p_vout->p_sys->original_window.i_width = p_vout->i_window_width;
+    p_vout->p_sys->original_window.i_height = p_vout->i_window_height;
+
     /* Spawn base window - this window will include the video output window,
      * but also command buttons, subtitles and other indicators */
-    if( CreateWindow( p_vout ) )
+    if( CreateWindow( p_vout, &p_vout->p_sys->original_window ) )
     {
         msg_Err( p_vout, "cannot create X11 window" );
         DestroyCursor( p_vout );
@@ -376,7 +391,7 @@ static int vout_Create( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "cannot initialize X11 display" );
         DestroyCursor( p_vout );
-        DestroyWindow( p_vout );
+        DestroyWindow( p_vout, &p_vout->p_sys->original_window );
         XCloseDisplay( p_vout->p_sys->p_display );
         free( p_vout->p_sys );
         return( 1 );
@@ -399,6 +414,12 @@ static int vout_Create( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Destroy( vout_thread_t *p_vout )
 {
+    /* If the fullscreen window is still open, close it */
+    if( p_vout->b_fullscreen )
+    {
+        ToggleFullScreen( p_vout );
+    }
+
     /* Restore cursor if it was blanked */
     if( !p_vout->p_sys->b_mouse_pointer_visible )
     {
@@ -417,7 +438,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
 
     DestroyCursor( p_vout );
     EnableXScreenSaver( p_vout );
-    DestroyWindow( p_vout );
+    DestroyWindow( p_vout, &p_vout->p_sys->original_window );
 
     XCloseDisplay( p_vout->p_sys->p_display );
 
@@ -481,8 +502,8 @@ static int vout_Init( vout_thread_t *p_vout )
             return( 0 );
     }
 
-    vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
-                       p_vout->p_sys->i_height,
+    vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
+                       p_vout->p_sys->p_win->i_height,
                        &i_index, &i_index,
                        &p_vout->output.i_width, &p_vout->output.i_height );
 
@@ -541,7 +562,8 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int i_width, i_height, i_x, i_y;
 
-    vout_PlacePicture( p_vout, p_vout->p_sys->i_width, p_vout->p_sys->i_height,
+    vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
+                       p_vout->p_sys->p_win->i_height,
                        &i_x, &i_y, &i_width, &i_height );
 
 #ifdef HAVE_SYS_SHM_H
@@ -550,14 +572,16 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         /* Display rendered image using shared memory extension */
 #   ifdef MODULE_NAME_IS_xvideo
         XvShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport,
-                       p_vout->p_sys->video_window, p_vout->p_sys->gc,
-                       p_pic->p_sys->p_image, 0 /*src_x*/, 0 /*src_y*/,
+                       p_vout->p_sys->p_win->video_window,
+                       p_vout->p_sys->p_win->gc, p_pic->p_sys->p_image,
+                       0 /*src_x*/, 0 /*src_y*/,
                        p_vout->output.i_width, p_vout->output.i_height,
                        0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height,
                        False /* Don't put True here or you'll waste your CPU */ );
 #   else
-        XShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
-                      p_vout->p_sys->gc, p_pic->p_sys->p_image,
+        XShmPutImage( p_vout->p_sys->p_display,
+                      p_vout->p_sys->p_win->video_window,
+                      p_vout->p_sys->p_win->gc, p_pic->p_sys->p_image,
                       0 /*src_x*/, 0 /*src_y*/, 0 /*dest_x*/, 0 /*dest_y*/,
                       p_vout->output.i_width, p_vout->output.i_height,
                       False /* Don't put True here ! */ );
@@ -569,13 +593,15 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
         /* Use standard XPutImage -- this is gonna be slow ! */
 #ifdef MODULE_NAME_IS_xvideo
         XvPutImage( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport,
-                    p_vout->p_sys->video_window, p_vout->p_sys->gc,
-                    p_pic->p_sys->p_image, 0 /*src_x*/, 0 /*src_y*/,
+                    p_vout->p_sys->p_win->video_window,
+                    p_vout->p_sys->p_win->gc, p_pic->p_sys->p_image,
+                    0 /*src_x*/, 0 /*src_y*/,
                     p_vout->output.i_width, p_vout->output.i_height,
                     0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height );
 #else
-        XPutImage( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
-                   p_vout->p_sys->gc, p_pic->p_sys->p_image,
+        XPutImage( p_vout->p_sys->p_display,
+                   p_vout->p_sys->p_win->video_window,
+                   p_vout->p_sys->p_win->gc, p_pic->p_sys->p_image,
                    0 /*src_x*/, 0 /*src_y*/, 0 /*dest_x*/, 0 /*dest_y*/,
                    p_vout->output.i_width, p_vout->output.i_height );
 #endif
@@ -603,7 +629,8 @@ static int vout_Manage( vout_thread_t *p_vout )
      * window is mapped (and if the display is useful), and ClientMessages
      * to intercept window destruction requests */
 
-    while( XCheckWindowEvent( p_vout->p_sys->p_display, p_vout->p_sys->window,
+    while( XCheckWindowEvent( p_vout->p_sys->p_display,
+                              p_vout->p_sys->p_win->base_window,
                               StructureNotifyMask | KeyPressMask |
                               ButtonPressMask | ButtonReleaseMask | 
                               PointerMotionMask | Button1MotionMask , &xevent )
@@ -612,13 +639,13 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* ConfigureNotify event: prepare  */
         if( xevent.type == ConfigureNotify )
         {
-            if( (xevent.xconfigure.width != p_vout->p_sys->i_width)
-                 || (xevent.xconfigure.height != p_vout->p_sys->i_height) )
+            if( (xevent.xconfigure.width != p_vout->p_sys->p_win->i_width)
+              || (xevent.xconfigure.height != p_vout->p_sys->p_win->i_height) )
             {
                 /* Update dimensions */
                 p_vout->i_changes |= VOUT_SIZE_CHANGE;
-                p_vout->p_sys->i_width = xevent.xconfigure.width;
-                p_vout->p_sys->i_height = xevent.xconfigure.height;
+                p_vout->p_sys->p_win->i_width = xevent.xconfigure.width;
+                p_vout->p_sys->p_win->i_height = xevent.xconfigure.height;
             }
         }
         /* Keyboard event */
@@ -723,9 +750,9 @@ static int vout_Manage( vout_thread_t *p_vout )
         else if( xevent.type == ButtonPress )
         {
             p_vout->i_mouse_x = (int)( (float)xevent.xmotion.x
-                / p_vout->p_sys->i_width * p_vout->render.i_width );
+                / p_vout->p_sys->p_win->i_width * p_vout->render.i_width );
             p_vout->i_mouse_y = (int)( (float)xevent.xmotion.y
-                / p_vout->p_sys->i_height * p_vout->render.i_height );
+                / p_vout->p_sys->p_win->i_height * p_vout->render.i_height );
             p_vout->i_mouse_button = 1;
 
             switch( ((XButtonEvent *)&xevent)->button )
@@ -783,9 +810,9 @@ static int vout_Manage( vout_thread_t *p_vout )
             }
             
             p_vout->i_mouse_x = (int)( (float)xevent.xmotion.x
-                / p_vout->p_sys->i_width * p_vout->render.i_width );
+                / p_vout->p_sys->p_win->i_width * p_vout->render.i_width );
             p_vout->i_mouse_y = (int)( (float)xevent.xmotion.y
-                / p_vout->p_sys->i_height * p_vout->render.i_height );
+                / p_vout->p_sys->p_win->i_height * p_vout->render.i_height );
         }
         /* Reparent move -- XXX: why are we getting this ? */
         else if( xevent.type == ReparentNotify )
@@ -801,7 +828,7 @@ static int vout_Manage( vout_thread_t *p_vout )
 
     /* Handle events for video output sub-window */
     while( XCheckWindowEvent( p_vout->p_sys->p_display,
-                              p_vout->p_sys->video_window,
+                              p_vout->p_sys->p_win->video_window,
                               ExposureMask, &xevent ) == True )
     {
         /* Window exposed (only handled if stream playback is paused) */
@@ -830,8 +857,9 @@ static int vout_Manage( vout_thread_t *p_vout )
     while( XCheckTypedEvent( p_vout->p_sys->p_display,
                              ClientMessage, &xevent ) )
     {
-        if( (xevent.xclient.message_type == p_vout->p_sys->wm_protocols)
-            && (xevent.xclient.data.l[0] == p_vout->p_sys->wm_delete_window ) )
+        if( (xevent.xclient.message_type == p_vout->p_sys->p_win->wm_protocols)
+               && (xevent.xclient.data.l[0]
+                     == p_vout->p_sys->p_win->wm_delete_window ) )
         {
             p_vout->p_vlc->b_die = 1;
         }
@@ -844,7 +872,6 @@ static int vout_Manage( vout_thread_t *p_vout )
     {
         ToggleFullScreen( p_vout );
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
-
     }
 
     /*
@@ -860,7 +887,8 @@ static int vout_Manage( vout_thread_t *p_vout )
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         msg_Dbg( p_vout, "video display resized (%dx%d)",
-                         p_vout->p_sys->i_width, p_vout->p_sys->i_height );
+                         p_vout->p_sys->p_win->i_width,
+                         p_vout->p_sys->p_win->i_height );
  
 #ifdef MODULE_NAME_IS_x11
         /* We need to signal the vout thread about the size change because it
@@ -868,15 +896,15 @@ static int vout_Manage( vout_thread_t *p_vout )
         p_vout->i_changes |= VOUT_SIZE_CHANGE;
 #endif
 
-        vout_PlacePicture( p_vout, p_vout->p_sys->i_width,
-                           p_vout->p_sys->i_height,
+        vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
+                           p_vout->p_sys->p_win->i_height,
                            &i_x, &i_y, &i_width, &i_height );
 
-        XResizeWindow( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
-                       i_width, i_height );
+        XResizeWindow( p_vout->p_sys->p_display,
+                       p_vout->p_sys->p_win->video_window, i_width, i_height );
         
-        XMoveWindow( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
-                     i_x, i_y );
+        XMoveWindow( p_vout->p_sys->p_display,
+                     p_vout->p_sys->p_win->video_window, i_x, i_y );
     }
 
     /* Autohide Cursour */
@@ -915,7 +943,7 @@ static void vout_End( vout_thread_t *p_vout )
 /*****************************************************************************
  * CreateWindow: open and set-up X11 main window
  *****************************************************************************/
-static int CreateWindow( vout_thread_t *p_vout )
+static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 {
     XSizeHints              xsize_hints;
     XSetWindowAttributes    xwindow_attributes;
@@ -928,18 +956,14 @@ static int CreateWindow( vout_thread_t *p_vout )
 
     long long int           i_drawable;
 
-    /* Set main window's size */
-    p_vout->p_sys->i_width = p_vout->i_window_width;
-    p_vout->p_sys->i_height = p_vout->i_window_height;
-
     /* Prepare window manager hints and properties */
-    xsize_hints.base_width          = p_vout->p_sys->i_width;
-    xsize_hints.base_height         = p_vout->p_sys->i_height;
+    xsize_hints.base_width          = p_win->i_width;
+    xsize_hints.base_height         = p_win->i_height;
     xsize_hints.flags               = PSize;
-    p_vout->p_sys->wm_protocols     = XInternAtom( p_vout->p_sys->p_display,
-                                                   "WM_PROTOCOLS", True );
-    p_vout->p_sys->wm_delete_window = XInternAtom( p_vout->p_sys->p_display,
-                                                   "WM_DELETE_WINDOW", True );
+    p_win->wm_protocols =
+             XInternAtom( p_vout->p_sys->p_display, "WM_PROTOCOLS", True );
+    p_win->wm_delete_window =
+             XInternAtom( p_vout->p_sys->p_display, "WM_DELETE_WINDOW", True );
 
     /* Prepare window attributes */
     xwindow_attributes.backing_store = Always;       /* save the hidden part */
@@ -947,8 +971,9 @@ static int CreateWindow( vout_thread_t *p_vout )
                                                      p_vout->p_sys->i_screen);
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
 
-    /* Check whether someone provided us with a window */
-    i_drawable = config_GetInt( p_vout, MODULE_STRING "-drawable");
+    /* Check whether someone provided us with a window ID */
+    i_drawable = p_vout->b_fullscreen ?
+                    -1 : config_GetInt( p_vout, MODULE_STRING "-drawable");
 
     if( i_drawable == -1 )
     {
@@ -958,47 +983,49 @@ static int CreateWindow( vout_thread_t *p_vout )
          * ConfigureNotify events, and until it is displayed, Expose and
          * MapNotify events. */
 
-        p_vout->p_sys->window =
+        p_win->base_window =
             XCreateWindow( p_vout->p_sys->p_display,
                            DefaultRootWindow( p_vout->p_sys->p_display ),
                            0, 0,
-                           p_vout->p_sys->i_width,
-                           p_vout->p_sys->i_height,
+                           p_win->i_width, p_win->i_height,
                            0,
                            0, InputOutput, 0,
                            CWBackingStore | CWBackPixel | CWEventMask,
                            &xwindow_attributes );
 
-        /* Set window manager hints and properties: size hints, command,
-         * window's name, and accepted protocols */
-        XSetWMNormalHints( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                           &xsize_hints );
-        XSetCommand( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                     p_vout->p_vlc->ppsz_argv, p_vout->p_vlc->i_argc );
+        if( !p_vout->b_fullscreen )
+        {
+            /* Set window manager hints and properties: size hints, command,
+             * window's name, and accepted protocols */
+            XSetWMNormalHints( p_vout->p_sys->p_display,
+                               p_win->base_window, &xsize_hints );
+            XSetCommand( p_vout->p_sys->p_display, p_win->base_window,
+                         p_vout->p_vlc->ppsz_argv, p_vout->p_vlc->i_argc );
 
-        XStoreName( p_vout->p_sys->p_display, p_vout->p_sys->window,
+            XStoreName( p_vout->p_sys->p_display, p_win->base_window,
 #ifdef MODULE_NAME_IS_x11
-                    VOUT_TITLE " (X11 output)"
+                        VOUT_TITLE " (X11 output)"
 #else
-                    VOUT_TITLE " (XVideo output)"
+                        VOUT_TITLE " (XVideo output)"
 #endif
-                  );
+                      );
+        }
     }
     else
     {
         p_vout->p_sys->b_createwindow = 0;
-        p_vout->p_sys->window = i_drawable;
+        p_win->base_window = i_drawable;
 
         XChangeWindowAttributes( p_vout->p_sys->p_display,
-                                 p_vout->p_sys->window,
+                                 p_win->base_window,
                                  CWBackingStore | CWBackPixel | CWEventMask,
                                  &xwindow_attributes );
     }
 
-    if( (p_vout->p_sys->wm_protocols == None)        /* use WM_DELETE_WINDOW */
-        || (p_vout->p_sys->wm_delete_window == None)
-        || !XSetWMProtocols( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                             &p_vout->p_sys->wm_delete_window, 1 ) )
+    if( (p_win->wm_protocols == None)        /* use WM_DELETE_WINDOW */
+        || (p_win->wm_delete_window == None)
+        || !XSetWMProtocols( p_vout->p_sys->p_display, p_win->base_window,
+                             &p_win->wm_delete_window, 1 ) )
     {
         /* WM_DELETE_WINDOW is not supported by window manager */
         msg_Warn( p_vout, "missing or bad window manager" );
@@ -1007,9 +1034,9 @@ static int CreateWindow( vout_thread_t *p_vout )
     /* Creation of a graphic context that doesn't generate a GraphicsExpose
      * event when using functions like XCopyArea */
     xgcvalues.graphics_exposures = False;
-    p_vout->p_sys->gc = XCreateGC( p_vout->p_sys->p_display,
-                                   p_vout->p_sys->window,
-                                   GCGraphicsExposures, &xgcvalues);
+    p_win->gc = XCreateGC( p_vout->p_sys->p_display,
+                           p_win->base_window,
+                           GCGraphicsExposures, &xgcvalues );
 
     if( p_vout->p_sys->b_createwindow )
     {
@@ -1021,26 +1048,26 @@ static int CreateWindow( vout_thread_t *p_vout )
         b_expose = 0;
         b_configure_notify = 0;
         b_map_notify = 0;
-        XMapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
+        XMapWindow( p_vout->p_sys->p_display, p_win->base_window );
         do
         {
             XNextEvent( p_vout->p_sys->p_display, &xevent);
             if( (xevent.type == Expose)
-                && (xevent.xexpose.window == p_vout->p_sys->window) )
+                && (xevent.xexpose.window == p_win->base_window) )
             {
                 b_expose = 1;
             }
             else if( (xevent.type == MapNotify)
-                     && (xevent.xmap.window == p_vout->p_sys->window) )
+                     && (xevent.xmap.window == p_win->base_window) )
             {
                 b_map_notify = 1;
             }
             else if( (xevent.type == ConfigureNotify)
-                     && (xevent.xconfigure.window == p_vout->p_sys->window) )
+                     && (xevent.xconfigure.window == p_win->base_window) )
             {
                 b_configure_notify = 1;
-                p_vout->p_sys->i_width = xevent.xconfigure.width;
-                p_vout->p_sys->i_height = xevent.xconfigure.height;
+                p_win->i_width = xevent.xconfigure.width;
+                p_win->i_height = xevent.xconfigure.height;
             }
         } while( !( b_expose && b_configure_notify && b_map_notify ) );
     }
@@ -1049,13 +1076,14 @@ static int CreateWindow( vout_thread_t *p_vout )
         /* Get the window's geometry information */
         Window dummy1;
         unsigned int dummy2, dummy3;
-        XGetGeometry( p_vout->p_sys->p_display, p_vout->p_sys->window,
+        XGetGeometry( p_vout->p_sys->p_display, p_win->base_window,
                       &dummy1, &dummy2, &dummy3,
-                      &p_vout->p_sys->i_width, &p_vout->p_sys->i_height,
+                      &p_win->i_width,
+                      &p_win->i_height,
                       &dummy2, &dummy3 );
     }
 
-    XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->window,
+    XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
                   StructureNotifyMask | KeyPressMask |
                   ButtonPressMask | ButtonReleaseMask | 
                   PointerMotionMask );
@@ -1073,31 +1101,28 @@ static int CreateWindow( vout_thread_t *p_vout )
                              AllocAll );
 
         xwindow_attributes.colormap = p_vout->p_sys->colormap;
-        XChangeWindowAttributes( p_vout->p_sys->p_display,
-                                 p_vout->p_sys->window,
+        XChangeWindowAttributes( p_vout->p_sys->p_display, p_win->base_window,
                                  CWColormap, &xwindow_attributes );
     }
 #endif
 
     /* Create video output sub-window. */
-    p_vout->p_sys->video_window =  XCreateSimpleWindow(
+    p_win->video_window =  XCreateSimpleWindow(
                                       p_vout->p_sys->p_display,
-                                      p_vout->p_sys->window, 0, 0,
-                                      p_vout->p_sys->i_width,
-                                      p_vout->p_sys->i_height,
+                                      p_win->base_window, 0, 0,
+                                      p_win->i_width, p_win->i_height,
                                       0,
                                       BlackPixel( p_vout->p_sys->p_display,
                                                   p_vout->p_sys->i_screen ),
                                       WhitePixel( p_vout->p_sys->p_display,
                                                   p_vout->p_sys->i_screen ) );
 
-    XSetWindowBackground( p_vout->p_sys->p_display,
-                          p_vout->p_sys->video_window,
+    XSetWindowBackground( p_vout->p_sys->p_display, p_win->video_window,
                           BlackPixel( p_vout->p_sys->p_display,
                                       p_vout->p_sys->i_screen ) );
     
-    XMapWindow( p_vout->p_sys->p_display, p_vout->p_sys->video_window );
-    XSelectInput( p_vout->p_sys->p_display, p_vout->p_sys->video_window,
+    XMapWindow( p_vout->p_sys->p_display, p_win->video_window );
+    XSelectInput( p_vout->p_sys->p_display, p_win->video_window,
                   ExposureMask );
 
     /* make sure the video window will be centered in the next vout_Manage() */
@@ -1115,6 +1140,7 @@ static int CreateWindow( vout_thread_t *p_vout )
 
     /* At this stage, the window is open, displayed, and ready to
      * receive data */
+    p_vout->p_sys->p_win = p_win;
 
     return( 0 );
 }
@@ -1124,15 +1150,15 @@ static int CreateWindow( vout_thread_t *p_vout )
  *****************************************************************************
  *
  *****************************************************************************/
-static void DestroyWindow( vout_thread_t *p_vout )
+static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 {
     /* Do NOT use XFlush here ! */
     XSync( p_vout->p_sys->p_display, False );
 
-    XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->video_window );
-    XUnmapWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
-    XFreeGC( p_vout->p_sys->p_display, p_vout->p_sys->gc );
-    XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
+    XDestroyWindow( p_vout->p_sys->p_display, p_win->video_window );
+    XUnmapWindow( p_vout->p_sys->p_display, p_win->base_window );
+    XFreeGC( p_vout->p_sys->p_display, p_win->gc );
+    XDestroyWindow( p_vout->p_sys->p_display, p_win->base_window );
 }
 
 /*****************************************************************************
@@ -1424,217 +1450,87 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
 {
     Atom prop;
     mwmhints_t mwmhints;
-    int i_xpos, i_ypos, i_width, i_height;
     XSetWindowAttributes attributes;
 
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
     if( p_vout->b_fullscreen )
     {
-        Window next_parent, parent, *p_dummy, dummy1;
-        unsigned int dummy2, dummy3;
-
         msg_Dbg( p_vout, "entering fullscreen mode" );
+        p_vout->p_sys->p_win = &p_vout->p_sys->fullscreen_window;
 
         /* Only check the fullscreen method when we actually go fullscreen,
          * because to go back to window mode we need to know in which
-         * fullscreen mode we where */
+         * fullscreen mode we were */
         p_vout->p_sys->b_altfullscreen =
             config_GetInt( p_vout, MODULE_STRING "-altfullscreen" );
 
-        /* Save current window coordinates so they can be restored when
-         * we exit from fullscreen mode. This is the tricky part because
-         * this heavily depends on the behaviour of the window manager.
-         * When you use XMoveWindow some window managers will adjust the top
-         * of the window to the coordinates you gave, but others will instead
-         * adjust the top of the client area to the coordinates
-         * (don't forget windows have decorations). */
+        /* fullscreen window size and position */
+        p_vout->p_sys->p_win->i_width =
+            DisplayWidth( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
+        p_vout->p_sys->p_win->i_height =
+            DisplayHeight( p_vout->p_sys->p_display, p_vout->p_sys->i_screen );
 
-        /* First, get the position and size of the client area */
-        XGetGeometry( p_vout->p_sys->p_display,
-                      p_vout->p_sys->window,
-                      &dummy1,
-                      &dummy2,
-                      &dummy3,
-                      &p_vout->p_sys->i_width_backup_2,
-                      &p_vout->p_sys->i_height_backup_2,
-                      &dummy2, &dummy3 );
-        XTranslateCoordinates( p_vout->p_sys->p_display,
-                               p_vout->p_sys->window,
-                               DefaultRootWindow( p_vout->p_sys->p_display ),
-                               0,
-                               0,
-                               &p_vout->p_sys->i_xpos_backup_2,
-                               &p_vout->p_sys->i_ypos_backup_2,
-                               &dummy1 );
+        CreateWindow( p_vout, p_vout->p_sys->p_win );
 
-        /* Then try to get the position and size of the whole window */
-
-        /* find the real parent of our window (created by the window manager),
-         * the one which is a direct child of the root window */
-        next_parent = parent = p_vout->p_sys->window;
-        while( next_parent != DefaultRootWindow( p_vout->p_sys->p_display ) )
+        /* To my knowledge there are two ways to create a borderless window.
+         * There's the generic way which is to tell x to bypass the window
+         * manager, but this creates problems with the focus of other
+         * applications.
+         * The other way is to use the motif property "_MOTIF_WM_HINTS" which
+         * luckily seems to be supported by most window managers. */
+        if( !p_vout->p_sys->b_altfullscreen )
         {
-            parent = next_parent;
-            XQueryTree( p_vout->p_sys->p_display,
-                        parent,
-                        &dummy1,
-                        &next_parent,
-                        &p_dummy,
-                        &dummy2 );
-            XFree((void *)p_dummy);
+            mwmhints.flags = MWM_HINTS_DECORATIONS;
+            mwmhints.decorations = !p_vout->b_fullscreen;
+
+            prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
+                                False );
+            XChangeProperty( p_vout->p_sys->p_display,
+                             p_vout->p_sys->p_win->base_window,
+                             prop, prop, 32, PropModeReplace,
+                             (unsigned char *)&mwmhints,
+                             PROP_MWM_HINTS_ELEMENTS );
+        }
+        else
+        {
+            /* brute force way to remove decorations */
+            attributes.override_redirect = p_vout->b_fullscreen;
+            XChangeWindowAttributes( p_vout->p_sys->p_display,
+                                     p_vout->p_sys->p_win->base_window,
+                                     CWOverrideRedirect,
+                                     &attributes);
         }
 
-        XGetGeometry( p_vout->p_sys->p_display,
-                      p_vout->p_sys->window,
-                      &dummy1,
-                      &dummy2,
-                      &dummy3,
-                      &p_vout->p_sys->i_width_backup,
-                      &p_vout->p_sys->i_height_backup,
-                      &dummy2, &dummy3 );
-
-        XTranslateCoordinates( p_vout->p_sys->p_display,
-                               parent,
-                               DefaultRootWindow( p_vout->p_sys->p_display ),
-                               0,
-                               0,
-                               &p_vout->p_sys->i_xpos_backup,
-                               &p_vout->p_sys->i_ypos_backup,
-                               &dummy1 );
-
-        /* fullscreen window size and position */
-        i_xpos = 0;
-        i_ypos = 0;
-        i_width = DisplayWidth( p_vout->p_sys->p_display,
-                                p_vout->p_sys->i_screen );
-        i_height = DisplayHeight( p_vout->p_sys->p_display,
-                                  p_vout->p_sys->i_screen );
-
+        XReparentWindow( p_vout->p_sys->p_display,
+                         p_vout->p_sys->p_win->base_window,
+                         DefaultRootWindow( p_vout->p_sys->p_display ),
+                         0, 0 );
+        XMoveResizeWindow( p_vout->p_sys->p_display,
+                           p_vout->p_sys->p_win->base_window,
+                           0, 0,
+                           p_vout->p_sys->p_win->i_width,
+                           p_vout->p_sys->p_win->i_height );
     }
     else
     {
         msg_Dbg( p_vout, "leaving fullscreen mode" );
-
-        i_xpos = p_vout->p_sys->i_xpos_backup;
-        i_ypos = p_vout->p_sys->i_ypos_backup;
-        i_width = p_vout->p_sys->i_width_backup;
-        i_height = p_vout->p_sys->i_height_backup;
+        DestroyWindow( p_vout, &p_vout->p_sys->fullscreen_window );
+        p_vout->p_sys->p_win = &p_vout->p_sys->original_window;
     }
 
-    /* To my knowledge there are two ways to create a borderless window.
-     * There's the generic way which is to tell x to bypass the window manager,
-     * but this creates problems with the focus of other applications.
-     * The other way is to use the motif property "_MOTIF_WM_HINTS" which
-     * luckily seems to be supported by most window managers.
-     */
-    if( !p_vout->p_sys->b_altfullscreen )
-    {
-        mwmhints.flags = MWM_HINTS_DECORATIONS;
-        mwmhints.decorations = !p_vout->b_fullscreen;
-
-        prop = XInternAtom( p_vout->p_sys->p_display, "_MOTIF_WM_HINTS",
-                            False );
-        XChangeProperty( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                         prop, prop, 32, PropModeReplace,
-                         (unsigned char *)&mwmhints,
-                         PROP_MWM_HINTS_ELEMENTS );
-    }
-    else
-    {
-        /* brute force way to remove decorations */
-        attributes.override_redirect = p_vout->b_fullscreen;
-        XChangeWindowAttributes( p_vout->p_sys->p_display,
-                                 p_vout->p_sys->window,
-                                 CWOverrideRedirect,
-                                 &attributes);
-    }
-
-    /* We need to reparent the window if we want the window 
-     * manager to take our changes into effect. We also resize the window
-     * twice to avoid an annoying flickering. */
-    if( !p_vout->b_fullscreen )
-        XMoveResizeWindow( p_vout->p_sys->p_display,
-                           p_vout->p_sys->window,
-                           i_xpos,
-                           i_ypos,
-                           i_width,
-                           i_height );
-    XReparentWindow( p_vout->p_sys->p_display,
-                     p_vout->p_sys->window,
-                     DefaultRootWindow( p_vout->p_sys->p_display ),
-                     0, 0 );
-    XMoveResizeWindow( p_vout->p_sys->p_display,
-                       p_vout->p_sys->window,
-                       i_xpos,
-                       i_ypos,
-                       i_width,
-                       i_height );
     XSync( p_vout->p_sys->p_display, True );
 
-    /* We need to check that the window was really restored where we wanted */
-    if( !p_vout->b_fullscreen )
+    if( !p_vout->b_fullscreen || p_vout->p_sys->b_altfullscreen )
     {
-        Window dummy1;
-        unsigned int dummy2, dummy3, dummy4, dummy5;
-
-        /* Check the position */
-        XTranslateCoordinates( p_vout->p_sys->p_display,
-                               p_vout->p_sys->window,
-                               DefaultRootWindow( p_vout->p_sys->p_display ),
-                               0,
-                               0,
-                               &dummy2,
-                               &dummy3,
-                               &dummy1 );
-        if( dummy2 != p_vout->p_sys->i_xpos_backup_2 ||
-            dummy3 != p_vout->p_sys->i_ypos_backup_2 )
-        {
-            /* Ok it didn't work... second try */
-
-            XMoveWindow( p_vout->p_sys->p_display,
-                         p_vout->p_sys->window,
-                         p_vout->p_sys->i_xpos_backup_2,
-                         p_vout->p_sys->i_ypos_backup_2 );
-
-            XSync( p_vout->p_sys->p_display, True );
-        }
-
-        /* Check the size */
-        XGetGeometry( p_vout->p_sys->p_display,
-                      p_vout->p_sys->window,
-                      &dummy1,
-                      &dummy2,
-                      &dummy3,
-                      &dummy4,
-                      &dummy5,
-                      &dummy2, &dummy3 );
-
-        if( dummy4 != p_vout->p_sys->i_width_backup_2 ||
-            dummy5 != p_vout->p_sys->i_height_backup_2 )
-        {
-            /* Ok it didn't work... third try */
-
-            XResizeWindow( p_vout->p_sys->p_display,
-                         p_vout->p_sys->window,
-                         p_vout->p_sys->i_width_backup_2,
-                         p_vout->p_sys->i_height_backup_2 );
-
-            XSync( p_vout->p_sys->p_display, True );
-        }
-    }
-
-    if( p_vout->p_sys->b_altfullscreen && p_vout->b_fullscreen )
         XSetInputFocus(p_vout->p_sys->p_display,
-                       p_vout->p_sys->window,
+                       p_vout->p_sys->p_win->base_window,
                        RevertToParent,
                        CurrentTime);
+    }
 
     /* signal that the size needs to be updated */
-    p_vout->p_sys->i_width = i_width;
-    p_vout->p_sys->i_height = i_height;
     p_vout->i_changes |= VOUT_SIZE_CHANGE;
-
 }
 
 /*****************************************************************************
@@ -1752,13 +1648,14 @@ static void ToggleCursor( vout_thread_t *p_vout )
     if( p_vout->p_sys->b_mouse_pointer_visible )
     {
         XDefineCursor( p_vout->p_sys->p_display,
-                       p_vout->p_sys->window,
+                       p_vout->p_sys->p_win->base_window,
                        p_vout->p_sys->blank_cursor );
         p_vout->p_sys->b_mouse_pointer_visible = 0;
     }
     else
     {
-        XUndefineCursor( p_vout->p_sys->p_display, p_vout->p_sys->window );
+        XUndefineCursor( p_vout->p_sys->p_display,
+                         p_vout->p_sys->p_win->base_window );
         p_vout->p_sys->b_mouse_pointer_visible = 1;
     }
 }
@@ -1989,18 +1886,31 @@ static int InitDisplay( vout_thread_t *p_vout )
 #endif
 
 #ifdef HAVE_SYS_SHM_H
-#   ifdef SYS_DARWIN
-    /* FIXME : As of 2001-03-16, XFree4 for MacOS X does not support Xshm. */
     p_vout->p_sys->b_shm = 0;
-#   else
-    p_vout->p_sys->b_shm = ( XShmQueryExtension( p_vout->p_sys->p_display )
-                              == True );
-#   endif
-    if( !p_vout->p_sys->b_shm )
-#endif
+
+    if( config_GetInt( p_vout, MODULE_STRING "-shm" ) )
     {
-        msg_Warn( p_vout, "XShm video extension is unavailable" );
+#   ifdef SYS_DARWIN
+        /* FIXME: As of 2001-03-16, XFree4 for MacOS X does not support Xshm */
+#   else
+        p_vout->p_sys->b_shm =
+                  ( XShmQueryExtension( p_vout->p_sys->p_display ) == True );
+#   endif
+
+        if( !p_vout->p_sys->b_shm )
+        {
+            msg_Warn( p_vout, "XShm video extension is unavailable" );
+        }
     }
+    else
+    {
+        msg_Dbg( p_vout, "disabling XShm video extension" );
+    }
+
+#else
+    msg_Warn( p_vout, "XShm video extension is unavailable" );
+
+#endif
 
 #ifdef MODULE_NAME_IS_xvideo
     /* XXX The brightness and contrast values should be read from environment

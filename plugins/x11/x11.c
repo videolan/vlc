@@ -2,7 +2,7 @@
  * x11.c : X11 plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: x11.c,v 1.19 2002/06/27 19:01:28 sam Exp $
+ * $Id: x11.c,v 1.20 2002/07/02 19:14:59 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -56,11 +56,18 @@
     "Specify a X11 drawable to use instead of opening a new window. This " \
     "option is DANGEROUS, use with care.")
 
+#define SHM_TEXT N_("use shared memory")
+#define SHM_LONGTEXT N_( \
+    "Use shared memory to communicate between vlc and the X server.")
+
 MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
 ADD_STRING  ( "x11-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT )
 ADD_BOOL    ( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT )
 ADD_INTEGER ( "x11-drawable", -1, NULL, DRAWABLE_TEXT, DRAWABLE_LONGTEXT )
+#ifdef HAVE_SYS_SHM_H
+ADD_BOOL    ( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT )
+#endif
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
