@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.5.2.1 2001/12/13 23:56:18 sam Exp $
+ * $Id: spu_decoder.c,v 1.5.2.2 2001/12/30 06:06:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -62,7 +62,6 @@
 static int spu_dec_Probe         ( probedata_t * );
 static int  spu_dec_Run          ( decoder_config_t * );
 static int  spu_dec_Init         ( spudec_thread_t * );
-static void spu_dec_ErrorThread  ( spudec_thread_t * );
 static void spu_dec_EndThread    ( spudec_thread_t * );
 
 static int  SyncPacket           ( spudec_thread_t * );
@@ -129,6 +128,7 @@ static int spu_dec_Run( decoder_config_t * p_config )
     {
         intf_ErrMsg( "spudec error: not enough memory "
                      "for spudec_CreateThread() to create the new thread" );
+        DecoderError( p_config->p_decoder_fifo );
         return( -1 );
     }
     
@@ -161,7 +161,7 @@ static int spu_dec_Run( decoder_config_t * p_config )
      */
     if( p_spudec->p_fifo->b_error )
     {
-        spu_dec_ErrorThread( p_spudec );
+        DecoderError( p_spudec->p_fifo );
     }
 
     /* End of thread */
@@ -217,39 +217,6 @@ static int spu_dec_Init( spudec_thread_t *p_spudec )
 
     /* Mark thread as running and return */
     return( 0 );
-}
-
-/*****************************************************************************
- * spu_dec_ErrorThread: spu_dec_Run() error loop
- *****************************************************************************
- * This function is called when an error occured during thread main's loop. The
- * thread can still receive feed, but must be ready to terminate as soon as
- * possible.
- *****************************************************************************/
-static void spu_dec_ErrorThread( spudec_thread_t *p_spudec )
-{
-    /* We take the lock, because we are going to read/write the start/end
-     * indexes of the decoder fifo */
-    vlc_mutex_lock( &p_spudec->p_fifo->data_lock );
-
-    /* Wait until a `die' order is sent */
-    while( !p_spudec->p_fifo->b_die )
-    {
-        /* Trash all received PES packets */
-        while( !DECODER_FIFO_ISEMPTY(*p_spudec->p_fifo) )
-        {
-            p_spudec->p_fifo->pf_delete_pes( p_spudec->p_fifo->p_packets_mgt,
-                    DECODER_FIFO_START(*p_spudec->p_fifo) );
-            DECODER_FIFO_INCSTART( *p_spudec->p_fifo );
-        }
-
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait( &p_spudec->p_fifo->data_wait,
-                       &p_spudec->p_fifo->data_lock );
-    }
-
-    /* We can release the lock before leaving */
-    vlc_mutex_unlock( &p_spudec->p_fifo->data_lock );
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.5 2001/12/04 13:47:46 massiot Exp $
+ * $Id: mpeg_adec.c,v 1.5.2.1 2001/12/30 06:06:00 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -57,11 +57,10 @@
 /*****************************************************************************
  * Local Prototypes
  *****************************************************************************/
-static int          adec_Probe( probedata_t * );
-static int          adec_RunThread   ( decoder_config_t * );
-static void         adec_EndThread ( adec_thread_t * );
-static void         adec_ErrorThread ( adec_thread_t * );
-static void         adec_Decode( adec_thread_t * );
+static int   decoder_Probe ( probedata_t * );
+static int   decoder_Run   ( decoder_config_t * );
+static void  EndThread     ( adec_thread_t * );
+static void  DecodeThread  ( adec_thread_t * );
 
 
 /*****************************************************************************
@@ -69,8 +68,8 @@ static void         adec_Decode( adec_thread_t * );
  *****************************************************************************/
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = adec_Probe;
-    p_function_list->functions.dec.pf_run = adec_RunThread;
+    p_function_list->pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run = decoder_Run;
 }
 
 /*****************************************************************************
@@ -94,9 +93,9 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 /*****************************************************************************
- * adec_Probe: probe the decoder and return score
+ * decoder_Probe: probe the decoder and return score
  *****************************************************************************/
-static int adec_Probe( probedata_t *p_data )
+static int decoder_Probe( probedata_t *p_data )
 {
     if( p_data->i_type == MPEG1_AUDIO_ES || p_data->i_type == MPEG2_AUDIO_ES )
     {
@@ -115,9 +114,9 @@ static int adec_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * adec_RunThread: initialize, go inside main loop, detroy
+ * decoder_Run: initialize, go inside main loop, detroy
  *****************************************************************************/
-static int adec_RunThread ( decoder_config_t * p_config )
+static int decoder_Run ( decoder_config_t * p_config )
 {
     adec_thread_t   * p_adec;
     
@@ -128,6 +127,7 @@ static int adec_RunThread ( decoder_config_t * p_config )
     {
         intf_ErrMsg ( "adec error: not enough memory for"
                       " adec_CreateThread() to create the new thread" );
+        DecoderError( p_config->p_decoder_fifo );
         return 0;
     }
     
@@ -167,17 +167,17 @@ static int adec_RunThread ( decoder_config_t * p_config )
     /* Audio decoder thread's main loop */
     while( (!p_adec->p_fifo->b_die) && (!p_adec->p_fifo->b_error) )
     {
-        adec_Decode( p_adec );
+        DecodeThread( p_adec );
     }
     
     /* If b_error is set, the audio decoder thread enters the error loop */
     if( p_adec->p_fifo->b_error ) 
     {
-        adec_ErrorThread( p_adec );
+        DecoderError( p_adec->p_fifo );
     }
 
     /* End of the audio decoder thread */
-    adec_EndThread( p_adec );
+    EndThread( p_adec );
 
     return( 0 );
 }
@@ -187,9 +187,9 @@ static int adec_RunThread ( decoder_config_t * p_config )
  */
 
 /*****************************************************************************
- * adec_Decode: decodes a mpeg frame
+ * DecodeThread: decodes a mpeg frame
  *****************************************************************************/
-static void adec_Decode( adec_thread_t * p_adec )
+static void DecodeThread( adec_thread_t * p_adec )
 {
     s16 * buffer;
     adec_sync_info_t sync_info;
@@ -233,45 +233,12 @@ static void adec_Decode( adec_thread_t * p_adec )
 }
 
 /*****************************************************************************
- * adec_ErrorThread : audio decoder's RunThread() error loop
- *****************************************************************************
- * This function is called when an error occured during thread main's loop. The
- * thread can still receive feed, but must be ready to terminate as soon as
- * possible.
- *****************************************************************************/
-static void adec_ErrorThread ( adec_thread_t *p_adec )
-{
-    /* We take the lock, because we are going to read/write the start/end
-     * indexes of the decoder fifo */
-    vlc_mutex_lock ( &p_adec->p_fifo->data_lock );
-
-    /* Wait until a `die' order is sent */
-    while ( !p_adec->p_fifo->b_die ) 
-    {
-        /* Trash all received PES packets */
-        while ( !DECODER_FIFO_ISEMPTY(*p_adec->p_fifo) ) 
-        {
-            p_adec->p_fifo->pf_delete_pes ( p_adec->p_fifo->p_packets_mgt,
-                                   DECODER_FIFO_START(*p_adec->p_fifo) );
-            DECODER_FIFO_INCSTART ( *p_adec->p_fifo );
-        }
-
-        /* Waiting for the input thread to put new PES packets in the fifo */
-        vlc_cond_wait ( &p_adec->p_fifo->data_wait, &p_adec->p_fifo->data_lock );
-    }
-
-    /* We can release the lock before leaving */
-    vlc_mutex_unlock ( &p_adec->p_fifo->data_lock );
-}
-
-
-/*****************************************************************************
- * adec_EndThread : audio decoder thread destruction
+ * EndThread : audio decoder thread destruction
  *****************************************************************************
  * This function is called when the thread ends after a sucessful
  * initialization.
  *****************************************************************************/
-static void adec_EndThread ( adec_thread_t *p_adec )
+static void EndThread ( adec_thread_t *p_adec )
 {
     intf_DbgMsg ( "adec debug: destroying audio decoder thread %p", p_adec );
 

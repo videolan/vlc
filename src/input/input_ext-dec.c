@@ -2,7 +2,7 @@
  * input_ext-dec.c: services to the decoders
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-dec.c,v 1.21 2001/11/28 15:08:06 massiot Exp $
+ * $Id: input_ext-dec.c,v 1.21.2.1 2001/12/30 06:06:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -85,6 +85,34 @@ void InitBitstream( bit_stream_t * p_bit_stream, decoder_fifo_t * p_fifo,
          * sizeof(WORD_TYPE) - 1 empty bytes in the bit buffer. */
         AlignWord( p_bit_stream );
     }
+}
+
+/*****************************************************************************
+ * DecoderError : an error occured, use this function to empty the fifo
+ *****************************************************************************/
+void DecoderError( decoder_fifo_t * p_fifo )
+{
+    /* We take the lock, because we are going to read/write the start/end
+     * indexes of the decoder fifo */
+    vlc_mutex_lock( &p_fifo->data_lock );
+
+    /* Wait until a `die' order is sent */
+    while( !p_fifo->b_die )
+    {
+        /* Trash all received PES packets */
+        while( !DECODER_FIFO_ISEMPTY(*p_fifo) )
+        {
+            p_fifo->pf_delete_pes( p_fifo->p_packets_mgt,
+                                   DECODER_FIFO_START(*p_fifo) );
+            DECODER_FIFO_INCSTART( *p_fifo );
+        }
+
+        /* Waiting for the input thread to put new PES packets in the fifo */
+        vlc_cond_wait( &p_fifo->data_wait, &p_fifo->data_lock );
+    }
+
+    /* We can release the lock before leaving */
+    vlc_mutex_unlock( &p_fifo->data_lock );
 }
 
 /*****************************************************************************

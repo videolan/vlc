@@ -66,6 +66,7 @@
     (p_symbols)->input_AddArea = input_AddArea; \
     (p_symbols)->input_DelArea = input_DelArea; \
     (p_symbols)->InitBitstream = InitBitstream; \
+    (p_symbols)->DecoderError = DecoderError; \
     (p_symbols)->input_InitStream = input_InitStream; \
     (p_symbols)->input_EndStream = input_EndStream; \
     (p_symbols)->input_ParsePES = input_ParsePES; \
@@ -173,6 +174,7 @@
 #   define input_DelArea p_symbols->input_DelArea
 
 #   define InitBitstream p_symbols->InitBitstream
+#   define DecoderError p_symbols->DecoderError
 #   define input_InitStream p_symbols->input_InitStream
 #   define input_EndStream p_symbols->input_EndStream
 

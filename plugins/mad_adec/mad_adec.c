@@ -58,19 +58,18 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int      mad_adec_Probe       ( probedata_t * );
-static int      mad_adec_Run         ( decoder_config_t * );
-static int      mad_adec_Init        (mad_adec_thread_t * p_mad_adec);
-static void     mad_adec_ErrorThread (mad_adec_thread_t * p_mad_adec);
-static void     mad_adec_EndThread   (mad_adec_thread_t * p_mad_adec);
+static int  decoder_Probe  ( probedata_t * );
+static int  decoder_Run    ( decoder_config_t * );
+static int  InitThread     ( mad_adec_thread_t * p_mad_adec );
+static void EndThread      ( mad_adec_thread_t * p_mad_adec );
 
 /*****************************************************************************
  * Capabilities
  *****************************************************************************/
 void _M( adec_getfunctions )( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = mad_adec_Probe;
-    p_function_list->functions.dec.pf_run = mad_adec_Run;
+    p_function_list->pf_probe = decoder_Probe;
+    p_function_list->functions.dec.pf_run = decoder_Run;
 }
 
 /*****************************************************************************
@@ -94,12 +93,12 @@ MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
 
 /*****************************************************************************
- * mad_adec_Probe: probe the decoder and return score
+ * decoder_Probe: probe the decoder and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able
  * to chose.
  *****************************************************************************/
-static int mad_adec_Probe( probedata_t *p_data )
+static int decoder_Probe( probedata_t *p_data )
 {
     if( p_data->i_type == MPEG1_AUDIO_ES || p_data->i_type == MPEG2_AUDIO_ES )
     {
@@ -116,9 +115,9 @@ static int mad_adec_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * mad_adec_Run: this function is called just after the thread is created
+ * decoder_Run: this function is called just after the thread is created
  *****************************************************************************/
-static int mad_adec_Run ( decoder_config_t * p_config )
+static int decoder_Run ( decoder_config_t * p_config )
 {
     mad_adec_thread_t *   p_mad_adec;
 
@@ -130,7 +129,8 @@ static int mad_adec_Run ( decoder_config_t * p_config )
     if (p_mad_adec == NULL)
     {
         intf_ErrMsg ( "mad_adec error: not enough memory "
-                      "for mad_adec_Run() to allocate p_mad_adec" );
+                      "for decoder_Run() to allocate p_mad_adec" );
+        DecoderError( p_config->p_decoder_fifo );
         return( -1 );
     }
 
@@ -139,9 +139,11 @@ static int mad_adec_Run ( decoder_config_t * p_config )
      */
     p_mad_adec->p_config = p_config;
     p_mad_adec->p_fifo = p_mad_adec->p_config->p_decoder_fifo;
-    if( mad_adec_Init( p_mad_adec ) )
+    if( InitThread( p_mad_adec ) )
     {
         intf_ErrMsg( "mad_adec error: could not initialize thread" );
+        DecoderError( p_config->p_decoder_fifo );
+        free( p_mad_adec );
         return( -1 );
     }
 
@@ -152,7 +154,8 @@ static int mad_adec_Run ( decoder_config_t * p_config )
 	if (mad_decoder_run(p_mad_adec->libmad_decoder, MAD_DECODER_MODE_SYNC)==-1)
 	{
 	  intf_ErrMsg( "mad_adec error: libmad decoder returns abnormally");
-	  mad_adec_EndThread(p_mad_adec);
+          DecoderError( p_mad_adec->p_fifo );
+	  EndThread(p_mad_adec);
       	  return( -1 );
 	}
     }
@@ -160,19 +163,19 @@ static int mad_adec_Run ( decoder_config_t * p_config )
     /* If b_error is set, the mad decoder thread enters the error loop */
     if (p_mad_adec->p_fifo->b_error)
     {
-        mad_adec_ErrorThread (p_mad_adec);
+        DecoderError( p_mad_adec->p_fifo );
     }
 
     /* End of the ac3 decoder thread */
-    mad_adec_EndThread (p_mad_adec);
+    EndThread (p_mad_adec);
 
     return( 0 );
 }
 
 /*****************************************************************************
- * mad_adec_Init: initialize data before entering main loop
+ * InitThread: initialize data before entering main loop
  *****************************************************************************/
-static int mad_adec_Init( mad_adec_thread_t * p_mad_adec )
+static int InitThread( mad_adec_thread_t * p_mad_adec )
 {
     /*
      * Properties of audio for libmad

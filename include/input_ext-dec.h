@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.41 2001/12/07 18:33:07 sam Exp $
+ * $Id: input_ext-dec.h,v 1.41.2.1 2001/12/30 06:06:00 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -212,7 +212,7 @@ typedef struct bit_stream_s
 #endif
 
 /*****************************************************************************
- * Protoypes from input_ext-dec.c
+ * Prototypes from input_ext-dec.c
  *****************************************************************************/
 #ifndef PLUGIN
 u32  UnalignedShowBits( struct bit_stream_s *, unsigned int );
@@ -531,4 +531,13 @@ typedef struct decoder_config_s
                                                  boolean_t ),
                                                  void * );
 } decoder_config_t;
+
+/*****************************************************************************
+ * Prototypes from input_dec.c
+ *****************************************************************************/
+#ifndef PLUGIN
+void DecoderError      ( struct decoder_fifo_s * p_fifo );
+#else
+#   define DecoderError p_symbols->DecoderError
+#endif
 
