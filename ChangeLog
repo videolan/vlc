@@ -4,10 +4,18 @@
 
 HEAD
 
+  * Nothing yet.
+
+0.4.1
+Mon,  3 Jun 2002 23:43:35 +0200
+
   * ./src/misc/configuration.c: fixed the --nofoo option handling.
   * ./src/interface/main.c: fixed two compilation warnings under Solaris.
   * ./plugins/avi/avi.c, ./plugins/mpeg_system/mpeg_audio.c: ES will be
     selected only once.
+  * ./plugins/win32/waveout.c: waveOutUnprepareHeader() was never being
+    called. This should fix the memory leak some people reported when using
+    the waveout plugin.
   * ./src/misc/netutils.c: factored code common to the interfaces into the
     network_ChannelJoin function.
   * ./plugins/mga/xmga.c, ./plugins/x11/xcommon.c, ./plugins/sdl/vout_sdl.c,

@@ -4,7 +4,7 @@ AC_CONFIG_HEADER(include/defs.h)
 AC_CANONICAL_SYSTEM
 
 PACKAGE="vlc"
-VERSION="0.4.0"
+VERSION="0.4.1"
 CODENAME=Ourumov
 
 dnl Save CFLAGS and LDFLAGS
@@ -188,7 +188,7 @@ AC_EGREP_HEADER(strncasecmp,strings.h,[
             Define if <strings.h> defines strncasecmp.)])
 
 dnl Check for headers
-AC_CHECK_HEADERS(getopt.h strings.h)
+AC_CHECK_HEADERS(stdint.h getopt.h strings.h inttypes.h sys/int_types.h)
 AC_CHECK_HEADERS(sys/sockio.h fcntl.h sys/types.h sys/time.h sys/times.h)
 AC_CHECK_HEADERS(dlfcn.h image.h)
 AC_CHECK_HEADERS(arpa/inet.h net/if.h netinet/in.h sys/socket.h)
@@ -422,7 +422,7 @@ dnl
 dnl  default modules
 dnl
 BUILTINS="${BUILTINS} idct idctclassic motion imdct downmix chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga mpeg_adec ac3_adec mpeg_vdec"
-PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_ps mpeg_ts mpeg_audio file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone fx_scope"
+PLUGINS="${PLUGINS} dummy null rc logger mpeg_es mpeg_ps mpeg_ts mpeg_audio file udp http ipv4 memcpy lpcm_adec ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort filter_clone filter_crop fx_scope"
 
 dnl
 dnl  Accelerated modules
