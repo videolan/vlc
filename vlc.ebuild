@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.14 2003/07/18 20:16:53 hartman Exp $
+# $Id: vlc.ebuild,v 1.15 2003/07/19 00:02:35 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -25,7 +25,7 @@
 # Thanks to the Gentoo Team for supporting us.
 ###############################################################################
 
-IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l xvid lirc wxwindows imlib matroska dvb pvr mozilla mad"
+IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l lirc wxwindows imlib matroska dvb pvr mozilla mad debug"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
@@ -76,7 +76,7 @@ DEPEND="X? ( virtual/x11 )
 	truetype? ( >=media-libs/freetype-2.1.4 )
 	wxwindows? ( >=x11-libs/wxGTK-2.4.1 )
 	>=media-sound/lame-3.93.1
-        >=media-libs/libdvbpsi-0.1.2
+	>=media-libs/libdvbpsi-0.1.2
 	>=media-libs/faad2-1.1
 	>=media-libs/a52dec-0.7.4
 	>=media-libs/flac-1.1.0"
@@ -161,17 +161,17 @@ src_compile(){
 
 	use ggi && myconf="${myconf} --enable-ggi"
 
-        use 3dfx && myconf="${myconf} --enable-glide"
+	use 3dfx && myconf="${myconf} --enable-glide"
 
-        use matrox && myconf="${myconf} --enable-mga"
+	use matrox && myconf="${myconf} --enable-mga"
 
-        use svga && myconf="${myconf} --enable-svgalib"
+	use svga && myconf="${myconf} --enable-svgalib"
 
 	use sdl || myconf="${myconf} --disable-sdl"
 
-        use fbcon || myconf="${myconf} --disable-fb"
+	use fbcon || myconf="${myconf} --disable-fb"
 
-        use aalib && myconf="${myconf} --enable-aa"
+	use aalib && myconf="${myconf} --enable-aa"
 
 	use dvd \
 		&& myconf="${myconf} --enable-dvdread" \
@@ -183,7 +183,7 @@ src_compile(){
 
 	use alsa && myconf="${myconf} --enable-alsa"
 
-        use oss || myconf="${myconf} --disable-oss"
+	use oss || myconf="${myconf} --disable-oss"
 
 	use esd && myconf="${myconf} --enable-esd"
 
@@ -231,13 +231,17 @@ src_compile(){
 	use dvb && myconf="${myconf} --enable-satellite"
 
 	# pvr is a local USE var, see /usr/portage/profiles/use.local.desc for more details
-        use pvr && myconf="${myconf} --enable-pvr"
+	use pvr && myconf="${myconf} --enable-pvr"
 
 	if [ "`use mozilla`" ]; then
 	  myconf="${myconf} --enable-mozilla \
 	    MOZILLA_CONFIG=/usr/lib/mozilla/mozilla-config \
 	    XPIDL=/usr/bin/xpidl"
 	fi
+
+	use debug \
+		&& myconf="${myconf} --enable-debug" \
+		|| myconf="${myconf} --enable-release"
 
 	# vlc uses its own ultraoptimizaed CXXFLAGS
 	# and forcing custom ones generally fails building
@@ -253,10 +257,10 @@ src_compile(){
 	touch config.h.in
 	touch `find . -name Makefile.in`
 
-	myconf="${myconf} --enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} --with-ffmpeg-mp3lame \
+	myconf="${myconf} --enable-ffmpeg --with-ffmpeg-tree=${SFFMPEG} \
+		--with-ffmpeg-mp3lame \
 		--enable-libmpeg2 --with-libmpeg2-tree=${SLIBMPEG2} \
 		--enable-dvbpsi \
-		--enable-release \
 		--enable-faad \
 		--enable-flac \
 		--enable-a52"

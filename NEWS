@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.55 2003/07/11 23:36:01 gbazin Exp $
+$Id: NEWS,v 1.56 2003/07/19 00:02:35 hartman Exp $
 
 Changes between 0.6.0 and 0.6.1:
 ---------------------------------
@@ -7,17 +7,21 @@ Stream output:
  * Added vorbis audio support in Ogg streaming.
  * Added vorbis audio transcoding support.
  * Added mp3 audio transcoding support (when ffmpeg is compiled with mp3lame).
+ * PS muxer can create mpeg1 files now and produce streams with system headers.
+ * You can transcode a52 with more than two channels to mpga now.
 
 Win32 port:
  * Fixed DVD support which was partly broken due to a bug in libdvdcss
  * Fixed 5.1 audio support for the sblive/audigy soundcards.
+ * Fixed sound on Windows NT.
 
 UNIX ports:
  * Fixed/improved alsa support and enabled multi-channel audio output.
 
 Interfaces:
  * Small updates/fixes to the wxWindows interface.
- * Improved HTTP remote control interface.
+ * Improved HTTP remote control interface. You can now create your own HTML pages.
+ * A new CORBA control plugin.
 
 Input demux:
  * Improved support for the Matroska container format.
@@ -26,6 +30,9 @@ Miscellaneous:
  * Improved build system.
  * New video filter plugin to overlay logos.
  * Added support for Winamp 3 B4S files.
+ * New subtitle module which uses freetype2 to render arbitrary fonts in any size.
+   Should also work with languages like russion for instance.
+
 
 Changes between 0.5.3 and 0.6.0:
 ---------------------------------
