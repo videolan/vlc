@@ -15,8 +15,6 @@ Codecs:
  * Packetizer interfaced between demux and codec when needed
    (allows using ffmpeg plugin to decode MPEG streams and better aac decoding).
 
-Playlist:
-
 Input:
  * mmsh streaming fixes.
  * subviewer and subviewer v2 subtitles support.
@@ -30,7 +28,8 @@ Stream output:
  * Improved session announcement system.
  * Minimize threads useage by default.
  * Added faster than realtime stream output (limited by CPU) for file output.
- * Improved mov/mp4 muxer.
+ * Improved MOV/MP4 muxer.
+ * Improved MPEG TS muxer.
  * Meta info options used by the muxers.
  * Better audio channels downmixing when transcoding.
 
@@ -45,10 +44,8 @@ Interfaces:
     - Ability to embed video output.
     - Support for bitmap fonts.
     - Lots of improvements.
-
  * wxWindows
     - New design and set of icons.
-    - New streaming wizard.
     - Ability to embed video output.
 
 Win32 port:
