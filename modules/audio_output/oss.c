@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.56 2003/04/02 21:21:57 sigmunau Exp $
+ * $Id: oss.c,v 1.57 2003/04/20 21:19:41 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -274,7 +274,11 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* Open the sound device */
+    /* Open the sound device in non-blocking mode, because ALSA's OSS
+     * emulation and some broken OSS drivers would make a blocking call
+     * wait forever until the device is available. Since this breaks the
+     * OSS spec, we immediately put it back to blocking mode if the
+     * operation was successful. */
     p_sys->i_fd = open( psz_device, O_WRONLY | O_NDELAY );
     if( p_sys->i_fd < 0 )
     {
