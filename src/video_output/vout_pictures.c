@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout_pictures.c : picture management functions
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.43 2003/10/24 21:27:07 gbazin Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: vout_pictures.c,v 1.44 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

@@ -3,8 +3,8 @@
  * This library provides basic functions for threads to interact with user
  * interface, such as command line.
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.108 2003/10/14 23:09:03 gbazin Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: interface.c,v 1.109 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * configuration.c management of the modules configuration
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.71 2003/11/11 21:23:56 hartman Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: configuration.c,v 1.72 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
- * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.38 2003/11/24 03:30:38 fenrir Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: input_ext-plugins.c,v 1.39 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *

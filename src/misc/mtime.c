@@ -2,8 +2,8 @@
  * mtime.c: high resolution time management functions
  * Functions are prototyped in mtime.h.
  *****************************************************************************
- * Copyright (C) 1998-2001, 2003 VideoLAN
- * $Id: mtime.c,v 1.41 2003/12/11 10:44:32 gbazin Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: mtime.c,v 1.42 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

@@ -4,8 +4,8 @@
  * It includes functions allowing to open a new thread, send pictures to a
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.242 2003/12/11 23:12:46 gbazin Exp $
+ * Copyright (C) 2000-2004 VideoLAN
+ * $Id: video_output.c,v 1.243 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.83 2003/12/24 09:46:08 gbazin Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: input_dec.c,v 1.84 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>

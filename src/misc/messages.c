@@ -3,8 +3,8 @@
  * This library provides an interface to the message queue to be used by other
  * modules, especially intf modules. See config.h for output configuration.
  *****************************************************************************
- * Copyright (C) 1998-2002 VideoLAN
- * $Id: messages.c,v 1.37 2003/12/04 17:15:59 gbazin Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: messages.c,v 1.38 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
- * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.127 2003/12/22 02:24:50 sam Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: input_programs.c,v 1.128 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *

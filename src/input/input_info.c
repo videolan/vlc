@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_info.c,v 1.11 2003/06/24 13:33:48 sam Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: input_info.c,v 1.12 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * common.c : audio output management of common data structures
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.18 2003/11/16 21:07:31 gbazin Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: common.c,v 1.19 2004/01/06 12:02:05 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *

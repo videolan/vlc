@@ -1,8 +1,8 @@
 /*****************************************************************************
  * stream.c
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: stream.c,v 1.8 2004/01/03 00:23:04 gbazin Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: stream.c,v 1.9 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *

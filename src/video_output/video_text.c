@@ -1,8 +1,8 @@
 /*****************************************************************************
  * video_text.c : text manipulation functions
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_text.c,v 1.49 2003/12/22 14:32:57 sam Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: video_text.c,v 1.50 2004/01/06 12:02:06 zorglub Exp $
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vlc.c: the vlc player
  *****************************************************************************
- * Copyright (C) 1998-2001 VideoLAN
- * $Id: vlc.c,v 1.19 2002/12/25 23:39:01 sam Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: vlc.c,v 1.20 2004/01/06 12:02:05 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

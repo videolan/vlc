@@ -1,8 +1,8 @@
 /*****************************************************************************
  * objects.c: vlc_object_t handling
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.43 2003/11/24 00:39:02 fenrir Exp $
+ * Copyright (C) 2004 VideoLAN
+ * $Id: objects.c,v 1.44 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

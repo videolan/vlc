@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout_synchro.c : frame dropping routines
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: vout_synchro.c,v 1.5 2003/11/04 17:46:18 gbazin Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: vout_synchro.c,v 1.6 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -12,7 +12,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * cpu.c: CPU detection code
  *****************************************************************************
- * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.11 2003/05/22 12:00:57 gbazin Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: cpu.c,v 1.12 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * error.c: error handling routine
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: error.c,v 1.2 2002/10/17 13:15:31 sam Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: error.c,v 1.3 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

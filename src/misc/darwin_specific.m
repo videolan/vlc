@@ -1,8 +1,8 @@
 /*****************************************************************************
  * darwin_specific.m: Darwin specific features
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.17 2003/12/22 14:32:56 sam Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: darwin_specific.m,v 1.18 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
- * Copyright (C) 1999, 2000, 2001, 2002, 2003 VideoLAN
- * $Id: threads.c,v 1.44 2003/11/22 00:41:07 titer Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: threads.c,v 1.45 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

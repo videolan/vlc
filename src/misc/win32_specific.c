@@ -1,8 +1,8 @@
 /*****************************************************************************
  * win32_specific.c: Win32 specific features
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: win32_specific.c,v 1.29 2004/01/06 08:50:20 zorglub Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: win32_specific.c,v 1.30 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>

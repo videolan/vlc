@@ -1,8 +1,8 @@
 /*****************************************************************************
  * es_out.c: Es Out handler for input.
  *****************************************************************************
- * Copyright (C) 2003 VideoLAN
- * $Id: es_out.c,v 1.13 2004/01/05 13:00:20 zorglub Exp $
+ * Copyright (C) 2003-2004 VideoLAN
+ * $Id: es_out.c,v 1.14 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *

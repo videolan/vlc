@@ -1,8 +1,8 @@
 /*****************************************************************************
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.142 2004/01/05 14:10:58 fenrir Exp $
+ * Copyright (C) 2001-2004 VideoLAN
+ * $Id: modules.c,v 1.143 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>

@@ -3,8 +3,8 @@
  * Read a stream, demultiplex and parse it before sending it to
  * decoders.
  *****************************************************************************
- * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.272 2004/01/05 12:59:43 zorglub Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: input.c,v 1.273 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *

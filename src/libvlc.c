@@ -1,8 +1,8 @@
 /*****************************************************************************
  * libvlc.c: main libvlc source
  *****************************************************************************
- * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.108 2004/01/06 08:50:20 zorglub Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: libvlc.c,v 1.109 2004/01/06 12:02:05 zorglub Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>

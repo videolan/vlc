@@ -1,8 +1,8 @@
 /*****************************************************************************
  * beos_init.cpp: Initialization for BeOS specific features
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.35 2003/12/14 16:26:21 titer Exp $
+ * Copyright (C) 1999-2004 VideoLAN
+ * $Id: beos_specific.cpp,v 1.36 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *

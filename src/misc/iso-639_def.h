@@ -1,8 +1,8 @@
 /*****************************************************************************
  * iso_lang.h: languages codes and abbreviations
  *****************************************************************************
- * Copyright (C) 1998-2003 VideoLAN
- * $Id: iso-639_def.h,v 1.2 2003/12/22 14:23:14 sam Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: iso-639_def.h,v 1.3 2004/01/06 12:02:06 zorglub Exp $
  *
  * This is used in iso_lang.cpp and is taken from the GNU glibc 2.2.5
  * tarball. It has been partially completed with native language names.

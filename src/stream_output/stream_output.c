@@ -1,8 +1,8 @@
 /*****************************************************************************
  * stream_output.c : stream output module
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.c,v 1.36 2003/12/07 17:09:33 gbazin Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: stream_output.c,v 1.37 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * input_ext-intf.c: services to the interface
  *****************************************************************************
- * Copyright (C) 1998-2001,2003 VideoLAN
- * $Id: input_ext-intf.c,v 1.54 2003/12/22 14:32:56 sam Exp $
+ * Copyright (C) 1998-2004 VideoLAN
+ * $Id: input_ext-intf.c,v 1.55 2004/01/06 12:02:06 zorglub Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *

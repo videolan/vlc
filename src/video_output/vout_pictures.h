@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vout_pictures.h : picture management definitions
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: vout_pictures.h,v 1.4 2003/04/27 17:53:21 gbazin Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: vout_pictures.h,v 1.5 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

@@ -1,8 +1,8 @@
 /*****************************************************************************
  * variables.c: routines for object variables handling
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.34 2003/11/05 17:57:29 gbazin Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id: variables.c,v 1.35 2004/01/06 12:02:06 zorglub Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
