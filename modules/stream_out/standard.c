@@ -259,7 +259,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    /* fix or warm of incompatible couple */
+    /* fix or warn of incompatible couple */
     if( psz_mux && psz_access )
     {
         if( !strncmp( psz_access, "mmsh", 4 ) &&
