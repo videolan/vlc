@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.39 2003/01/30 00:39:41 massiot Exp $
+ * $Id: intf.m,v 1.40 2003/01/30 15:39:38 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -427,6 +427,7 @@ static void Run( intf_thread_t *p_intf )
             [self displayTime];
             [self manageMode];
             p_intf->p_sys->b_playing = 0;
+            p_intf->p_sys->b_stopping = 1;
         }
 
         /* update the log window */
