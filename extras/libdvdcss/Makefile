@@ -47,8 +47,8 @@ install:
 	mkdir -p $(DESTDIR)$(includedir)/videolan
 	$(INSTALL) -m 644 videolan/dvdcss.h $(DESTDIR)$(includedir)/videolan
 	mkdir -p $(DESTDIR)$(libdir)
-	$(INSTALL) -m 644 ../../lib/$(BASE_A) $(DESTDIR)$(libdir)
-	$(INSTALL) -m 644 ../../lib/$(FULL_SO) $(DESTDIR)$(libdir)
+	-$(INSTALL) -m 644 ../../lib/$(BASE_A) $(DESTDIR)$(libdir)
+	-$(INSTALL) -m 644 ../../lib/$(FULL_SO) $(DESTDIR)$(libdir)
 	rm -f $(DESTDIR)$(libdir)/$(BASE_SO) && ln -s $(FULL_SO) $(DESTDIR)$(libdir)/$(BASE_SO)
 	rm -f $(DESTDIR)$(libdir)/$(MAJOR_SO) && ln -s $(FULL_SO) $(DESTDIR)$(libdir)/$(MAJOR_SO)
 
