@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.13 2003/01/11 18:10:49 fenrir Exp $
+ * $Id: libavi.c,v 1.14 2003/01/20 13:01:53 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -359,7 +359,7 @@ static int AVI_ChunkRead_list( input_thread_t *p_input,
 
     if( AVI_SkipBytes( p_input, 12 ) )
     {
-        msg_Err( p_input, "cannot enter chunk" );
+        msg_Warn( p_input, "cannot enter chunk" );
         return VLC_EGENERIC;
     }
 #ifdef AVI_DEBUG

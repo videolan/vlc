@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.26 2003/01/19 16:57:32 massiot Exp $
+ * $Id: avi.c,v 1.27 2003/01/20 13:01:53 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1046,7 +1046,7 @@ static int AVIInit( vlc_object_t * p_this )
 #endif
                 break;
             default:
-                msg_Err( p_input, "stream[%d] unknown type", i );
+                msg_Warn( p_input, "stream[%d] unknown type", i );
                 p_info->i_cat = UNKNOWN_ES;
                 i_init_size = 0;
                 p_init_data = NULL;
@@ -1297,7 +1297,7 @@ static int AVI_StreamChunkFind( input_thread_t *p_input,
 
         if( AVI_PacketGetHeader( p_input, &avi_pk ) )
         {
-            msg_Err( p_input, "cannot get packet header" );
+            msg_Warn( p_input, "cannot get packet header" );
             return VLC_EGENERIC;
         }
         if( avi_pk.i_stream >= p_avi->i_streams ||
@@ -1534,7 +1534,7 @@ static int    AVISeek   ( input_thread_t *p_input,
 
             if( i_percent >= 100 )
             {
-                msg_Err( p_input, "cannot seek so far !" );
+                msg_Warn( p_input, "cannot seek so far !" );
                 return( -1 );
             }
             i_percent = __MAX( i_percent, 0 );
@@ -1555,7 +1555,7 @@ static int    AVISeek   ( input_thread_t *p_input,
             }
             if( !p_stream || !p_stream->b_activated )
             {
-                msg_Err( p_input, "cannot find any selected stream" );
+                msg_Warn( p_input, "cannot find any selected stream" );
                 return( -1 );
             }
 
@@ -1564,7 +1564,7 @@ static int    AVISeek   ( input_thread_t *p_input,
                                     i_stream,
                                     0 ) )
             {
-                msg_Err( p_input, "cannot seek" );
+                msg_Warn( p_input, "cannot seek" );
                 return( -1 );
             }
 
@@ -1575,7 +1575,7 @@ static int    AVISeek   ( input_thread_t *p_input,
                 if( AVI_SetStreamChunk( p_input,
                                         i_stream, p_stream->i_idxposc + 1 ) )
                 {
-                    msg_Err( p_input, "cannot seek" );
+                    msg_Warn( p_input, "cannot seek" );
                     return( -1 );
                 }
             }
@@ -1723,7 +1723,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
     if( i_stream_count <= 0 )
     {
-        msg_Err( p_input, "no track selected, exiting..." );
+        msg_Warn( p_input, "no track selected, exiting..." );
         return( 0 );
     }
 
@@ -1877,7 +1877,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
                 if( AVI_PacketGetHeader( p_input, &avi_pk ) )
                 {
-                    msg_Err( p_input,
+                    msg_Warn( p_input,
                              "cannot get packet header, track disabled" );
                     return( AVI_StreamStopFinishedStreams( p_input, p_avi ) ? 0 : 1 );
                 }
@@ -1970,7 +1970,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
 
         if( input_ReadInPES( p_input, &p_pes, __EVEN( i_size ) ) < 0 )
         {
-            msg_Err( p_input, "failled reading data" );
+            msg_Warn( p_input, "failled reading data" );
             toread[i_stream].b_ok = VLC_FALSE;
             continue;
         }
@@ -2090,7 +2090,7 @@ static int AVIDemux_UnSeekable( input_thread_t *p_input )
     }
     if( !p_stream_master )
     {
-        msg_Err( p_input, "no more stream selected" );
+        msg_Warn( p_input, "no more stream selected" );
         return( 0 );
     }
 
