@@ -53,10 +53,11 @@ static int  CreateVout   ( vlc_object_t * );
 static void DestroyVout  ( vlc_object_t * );
 static int  Init         ( vout_thread_t * );
 static void End          ( vout_thread_t * );
-static void Render       ( vout_thread_t *p_vout, picture_t *p_pic );
+static int  Manage       ( vout_thread_t * );
+static void Render       ( vout_thread_t *, picture_t * );
 static void DisplayVideo ( vout_thread_t *, picture_t * );
 
-static inline int GetAlignedSize( int i_size );
+static inline int GetAlignedSize( int );
 
 /*****************************************************************************
  * Module descriptor
@@ -85,7 +86,6 @@ struct vout_sys_t
     GLuint      texture;
 
     int         i_effect; //XXX
-
 };
 
 /*****************************************************************************
@@ -126,6 +126,10 @@ static int CreateVout( vlc_object_t *p_this )
     p_sys->p_vout->i_window_width = p_vout->i_window_width;
     p_sys->p_vout->i_window_height = p_vout->i_window_height;
     p_sys->p_vout->b_fullscreen = p_vout->b_fullscreen;
+    p_sys->p_vout->render.i_width = p_vout->render.i_width;
+    p_sys->p_vout->render.i_height = p_vout->render.i_height;
+    p_sys->p_vout->render.i_aspect = p_vout->render.i_aspect;
+    p_sys->p_vout->i_window_height = p_vout->i_window_height;
 
     p_sys->p_vout->p_module =
         module_Need( p_sys->p_vout, "opengl provider", NULL, 0 );
@@ -139,6 +143,7 @@ static int CreateVout( vlc_object_t *p_this )
 
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
     p_vout->pf_render = Render;
     p_vout->pf_display = DisplayVideo;
 
@@ -258,6 +263,18 @@ static void DestroyVout( vlc_object_t *p_this )
     if( p_sys->p_buffer ) free( p_sys->p_buffer );
 
     free( p_sys );
+}
+
+/*****************************************************************************
+ * Manage: handle Sys events
+ *****************************************************************************
+ * This function should be called regularly by video output thread. It returns
+ * a non null value if an error occured.
+ *****************************************************************************/
+static int Manage( vout_thread_t *p_vout )
+{
+    vout_sys_t *p_sys = p_vout->p_sys;
+    return p_sys->p_vout->pf_manage( p_sys->p_vout );
 }
 
 /*****************************************************************************

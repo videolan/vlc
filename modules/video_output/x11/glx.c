@@ -171,6 +171,7 @@ static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
     if( !p_display )
     {
         msg_Err( p_this, "Cannot open display" );
+        XCloseDisplay( p_display );
         return VLC_EGENERIC;
     }
 
@@ -178,11 +179,13 @@ static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
     if( !XQueryExtension( p_display, "GLX", &i_opcode, &i_evt, &i_err ) )
     {
         msg_Err( p_this, "GLX extension not supported" );
+        XCloseDisplay( p_display );
         return VLC_EGENERIC;
     }
     if( !glXQueryExtension( p_display, &i_err, &i_evt ) )
     {
         msg_Err( p_this, "glXQueryExtension failed" );
+        XCloseDisplay( p_display );
         return VLC_EGENERIC;
     }
 
@@ -190,6 +193,7 @@ static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
     if (!glXQueryVersion( p_display, &i_maj, &i_min ) )
     {
         msg_Err( p_this, "glXQueryVersion failed" );
+        XCloseDisplay( p_display );
         return VLC_EGENERIC;
     }
     if( i_maj <= 0 || ((i_maj == 1) && (i_min < 3)) )
@@ -203,6 +207,7 @@ static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
         msg_Dbg( p_this, "Using GLX 1.3 API" );
     }
 
+    XCloseDisplay( p_display );
     return VLC_SUCCESS;
 }
 
