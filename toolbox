@@ -372,7 +372,7 @@ then
   echo "" >> po/POTFILES.in
   echo "# modules" >> po/POTFILES.in
   find modules -name '*.[chm]' -o -name '*.[ch]pp' \
-    | grep -v '\(gui/win32/\|\.moc\.\|gui/gtk2/\)' \
+    | grep -v '\(gui/wxwindows/wizard\|\.moc\.\|gui/gtk2/\)' \
     | sort >> po/POTFILES.in
   # clean old potfiles
   cd po
