@@ -132,6 +132,11 @@ E: regis@via.ecp.fr
 C: regis
 S: USA, California
 
+N: Yves Duret
+E: yves.duret@mandrakesoft.com
+D: RPM package
+S: Paris, France
+
 N: Bill Eldridge
 E: bill@rfa.org
 D: Documentation
@@ -142,7 +147,7 @@ C: henri
 D: ALSA audio output
 D: MPEG TS input
 D: Decoder modularization
-S: France
+S: USA
 
 N: Valek Filippov
 E: frob@df.ru
