@@ -95,9 +95,11 @@ static inline void vlc_input_item_CopyOptions( input_item_t *p_parent,
     for( i = 0 ; i< p_parent->i_options; i++ )
     {
         char *psz_option= strdup( p_parent->ppsz_options[i] );
-        INSERT_ELEM( p_child->ppsz_options,
-                     p_child->i_options, p_child->i_options,
-                     psz_option );
+        p_child->i_options++;
+        p_child->ppsz_options = (char **)realloc( p_child->ppsz_options,
+                                                  p_child->i_options *
+                                                  sizeof( char * ) );
+        p_child->ppsz_options[p_child->i_options-1] = psz_option;
     }
 }
 
