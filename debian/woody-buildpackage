@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# $Id: woody-buildpackage,v 1.4 2003/02/03 02:26:28 sam Exp $
+# $Id: woody-buildpackage,v 1.5 2003/02/03 19:45:29 sam Exp $
 # Build VLC for a Woody Debian system
 
 if test ! -d debian
@@ -45,7 +45,7 @@ pva="${package}_${sversion}_${arch}"
 chg=../"$pva.changes"
 
 # Do the real work
-#dpkg-checkbuilddeps -B debian/control.woody || exit 1
+dpkg-checkbuilddeps -B debian/control.woody || exit 1
 fakeroot debian/rules.woody clean
 cd ..; dpkg-source -l"$dirn"/debian/changelog.woody -b "$dirn"; cd "$dirn"
 debian/rules.woody build
