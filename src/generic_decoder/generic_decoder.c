@@ -1,7 +1,7 @@
-/*******************************************************************************
+/******************************************************************************
  * generic_decoder.c : generic decoder thread
  * (c)1999 VideoLAN
- *******************************************************************************
+ ******************************************************************************
  * This decoder provides a way to parse packets which do not belong to any 
  * known stream type, or to redirect packets to files. It can extract PES files 
  * from a multiplexed stream, identify automatically ES in a stream missing 
@@ -10,11 +10,11 @@
  * mode.
  * A single generic decoder is able to handle several ES, therefore it can be
  * used as a 'default' decoder by the input thread.
- *******************************************************************************/
+ ******************************************************************************/
 
-/*******************************************************************************
+/******************************************************************************
  * Preamble
- *******************************************************************************/
+ ******************************************************************************/
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -56,20 +56,20 @@ static void     IdentifyPES         ( gdec_thread_t *p_gdec, pes_packet_t *p_pes
                                       int i_stream_id );
 static void     PrintPES            ( pes_packet_t *p_pes, int i_stream_id );
 
-/*******************************************************************************
+/******************************************************************************
  * gdec_CreateThread: create a generic decoder thread
- *******************************************************************************
+ ******************************************************************************
  * This function creates a new generic decoder thread, and returns a pointer
  * to its description. On error, it returns NULL.
  * Following configuration properties are used:
  *  GDEC_CFG_ACTIONS    (required)
  * ??
- *******************************************************************************/
+ ******************************************************************************/
 gdec_thread_t * gdec_CreateThread( gdec_cfg_t *p_cfg, input_thread_t *p_input,
                                    int *pi_status )
 {
-    gdec_thread_t * p_gdec;                               /* thread descriptor */
-    int             i_status;                                 /* thread status */
+    gdec_thread_t * p_gdec;                              /* thread descriptor */
+    int             i_status;                                /* thread status */
     
     /*
      * Check configuration 
@@ -81,7 +81,7 @@ gdec_thread_t * gdec_CreateThread( gdec_cfg_t *p_cfg, input_thread_t *p_input,
 
     /* Allocate descriptor and initialize flags */
     p_gdec = (gdec_thread_t *) malloc( sizeof(gdec_thread_t) );
-    if( p_gdec == NULL )                                              /* error */
+    if( p_gdec == NULL )                                             /* error */
     {
         return( NULL );
     }
@@ -127,16 +127,16 @@ gdec_thread_t * gdec_CreateThread( gdec_cfg_t *p_cfg, input_thread_t *p_input,
     return( p_gdec );
 }
 
-/*******************************************************************************
+/******************************************************************************
  * gdec_DestroyThread: destroy a generic decoder thread
- *******************************************************************************
+ ******************************************************************************
  * Destroy a terminated thread. This function will return 0 if the thread could
  * be destroyed, and non 0 else. The last case probably means that the thread
  * was still active, and another try may succeed.
- *******************************************************************************/
+ ******************************************************************************/
 void gdec_DestroyThread( gdec_thread_t *p_gdec, int *pi_status )
 {
-    int     i_status;                                         /* thread status */
+    int     i_status;                                        /* thread status */
 
     /* Set status */
     p_gdec->pi_status = (pi_status != NULL) ? pi_status : &i_status;
@@ -164,12 +164,12 @@ void gdec_DestroyThread( gdec_thread_t *p_gdec, int *pi_status )
 
 /* following functions are local */
 
-/*******************************************************************************
+/******************************************************************************
  * CheckConfiguration: check gdec_CreateThread() configuration
- *******************************************************************************
+ ******************************************************************************
  * Set default parameters where required. In DEBUG mode, check if configuration
  * is valid.
- *******************************************************************************/
+ ******************************************************************************/
 static int CheckConfiguration( gdec_cfg_t *p_cfg )
 {
 #ifdef DEBUG
@@ -183,13 +183,13 @@ static int CheckConfiguration( gdec_cfg_t *p_cfg )
     return( 0 );
 }
 
-/*******************************************************************************
+/******************************************************************************
  * InitThread: initialize gdec thread
- *******************************************************************************
+ ******************************************************************************
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success. Note that the thread's flag are not
  * modified inside this function.
- *******************************************************************************/
+ ******************************************************************************/
 static int InitThread( gdec_thread_t *p_gdec )
 {
     /* ?? */
@@ -210,16 +210,16 @@ static int InitThread( gdec_thread_t *p_gdec )
     return(0);    
 }
 
-/*******************************************************************************
+/******************************************************************************
  * RunThread: generic decoder thread
- *******************************************************************************
+ ******************************************************************************
  * Generic decoder thread. This function does only returns when the thread is
  * terminated. 
- *******************************************************************************/
+ ******************************************************************************/
 static void RunThread( gdec_thread_t *p_gdec )
 {
-    pes_packet_t *  p_pes;                                   /* current packet */
-    int             i_stream_id;                              /* PES stream id */
+    pes_packet_t *  p_pes;                                  /* current packet */
+    int             i_stream_id;                             /* PES stream id */
     
     /* 
      * Initialize thread and free configuration 
@@ -227,7 +227,7 @@ static void RunThread( gdec_thread_t *p_gdec )
     p_gdec->b_error = InitThread( p_gdec );
     if( p_gdec->b_error )
     {
-        free( p_gdec );                                  /* destroy descriptor */
+        free( p_gdec );                                 /* destroy descriptor */
         return;
     }
 
@@ -299,16 +299,16 @@ static void RunThread( gdec_thread_t *p_gdec )
     EndThread( p_gdec );
 }
 
-/*******************************************************************************
+/******************************************************************************
  * ErrorThread: RunThread() error loop
- *******************************************************************************
+ ******************************************************************************
  * This function is called when an error occured during thread main's loop. The
  * thread can still receive feed, but must be ready to terminate as soon as
  * possible.
- *******************************************************************************/
+ ******************************************************************************/
 static void ErrorThread( gdec_thread_t *p_gdec )
 {
-    pes_packet_t *  p_pes;                                       /* pes packet */
+    pes_packet_t *  p_pes;                                      /* pes packet */
     
     /* Wait until a `die' order */
     while( !p_gdec->b_die )
@@ -326,15 +326,15 @@ static void ErrorThread( gdec_thread_t *p_gdec )
     }
 }
 
-/*******************************************************************************
+/******************************************************************************
  * EndThread: thread destruction
- *******************************************************************************
+ ******************************************************************************
  * This function is called when the thread ends after a sucessfull 
  * initialization.
- *******************************************************************************/
+ ******************************************************************************/
 static void EndThread( gdec_thread_t *p_gdec )
 {
-    int *   pi_status;                                        /* thread status */    
+    int *   pi_status;                                       /* thread status */    
     
     /* Store status */
     pi_status = p_gdec->pi_status;    
@@ -346,27 +346,27 @@ static void EndThread( gdec_thread_t *p_gdec )
 #endif
 
     /* Destroy thread structures allocated by InitThread */
-    free( p_gdec );                                      /* destroy descriptor */
+    free( p_gdec );                                     /* destroy descriptor */
 
     *pi_status = THREAD_OVER;    
     intf_DbgMsg("%p\n", p_gdec);
 }
 
-/*******************************************************************************
+/******************************************************************************
  * IdentifyPES: identify a PES packet
- *******************************************************************************
+ ******************************************************************************
  * Update ES tables in the input thread according to the stream_id value. See
  * ISO 13818-1, table 2-18.
- *******************************************************************************/
+ ******************************************************************************/
 static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_stream_id )
 {
-    int i_id;                                         /* stream id in es table */
-    int i_type;            /* stream type according ISO/IEC 13818-1 table 2-29 */
+    int i_id;                                        /* stream id in es table */
+    int i_type;           /* stream type according ISO/IEC 13818-1 table 2-29 */
     
     /* Search where the elementary stream id does come from */
     switch( p_gdec->p_input->i_method )
     {
-    case INPUT_METHOD_TS_FILE:                     /* TS methods: id is TS PID */
+    case INPUT_METHOD_TS_FILE:                    /* TS methods: id is TS PID */
     case INPUT_METHOD_TS_UCAST:
     case INPUT_METHOD_TS_BCAST:
     case INPUT_METHOD_TS_VLAN_BCAST:
@@ -377,7 +377,7 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
         break;        
 
 #ifdef DEBUG
-    default:                                              /* unknown id origin */
+    default:                                             /* unknown id origin */
         intf_DbgMsg("unable to identify PES using input method %d\n", 
                     p_gdec->p_input->i_method );
         break;        
@@ -385,14 +385,20 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
     }
     
     /* Try to identify PES stream_id - see ISO 13818-1 table 2-18 */
-    if( (i_stream_id & 0xe0) == 0xc0 ) 
+    if( i_stream_id == 0xbd )
+    {
+        /* Dolby AC-3 stream - might be specific to DVD PS streams */
+        i_type = AC3_AUDIO_ES;
+        intf_DbgMsg("PES %p identified as AC3\n", p_pes);
+    }
+    else if( (i_stream_id & 0xe0) == 0xc0 ) 
     {
         /* ISO/IEC 13818-3 or ISO/IEC 11172-3 audio stream - since there is no
          * way to make the difference between the two possibilities, and since
          * an ISO/IEC 13818-3 is capable of decoding an ISO/IEC 11172-3 stream,
          * the first one is used */
         i_type = MPEG2_AUDIO_ES;
-        intf_DbgMsg("PES %p identified as AUDIO\n", p_pes);        
+        intf_DbgMsg("PES %p identified as AUDIO\n", p_pes);
     }
     else if( (i_stream_id & 0xf0) == 0xe0 )
     {
@@ -401,7 +407,7 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
          * an ISO/IEC 13818-2 is capable of decoding an ISO/IEC 11172-2 stream,
          * the first one is used */        
         i_type = MPEG2_VIDEO_ES;
-        intf_DbgMsg("PES %p identified as VIDEO\n", p_pes);        
+        intf_DbgMsg("PES %p identified as VIDEO\n", p_pes);
     }
     else
     {
@@ -414,17 +420,17 @@ static void IdentifyPES( gdec_thread_t *p_gdec, pes_packet_t *p_pes, int i_strea
     /* ?? */
 }
 
-/*******************************************************************************
+/******************************************************************************
  * PrintPES: print informations about a PES packet
- *******************************************************************************
+ ******************************************************************************
  * This function will print information about a received PES packet. It is
  * probably usefull only for debugging purposes, or before demultiplexing a
  * stream. It has two different formats, depending of the presence of the DEBUG 
  * symbol.
- *******************************************************************************/
+ ******************************************************************************/
 static void PrintPES( pes_packet_t *p_pes, int i_stream_id )
 {
-    char psz_pes[128];                                    /* descriptor buffer */
+    char psz_pes[128];                                   /* descriptor buffer */
  
 #ifdef DEBUG
     /* PES informations, long (DEBUG) format - this string is maximum 70 bytes
