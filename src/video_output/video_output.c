@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.177 2002/05/19 23:51:37 massiot Exp $
+ * $Id: video_output.c,v 1.178 2002/05/23 22:21:14 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -253,16 +253,11 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
 
     /* Request thread destruction */
     p_vout->b_die = 1;
+    /* only if pi_status is NULL */
+    vlc_thread_join( p_vout->thread_id );
 
-    /* If status is NULL, wait until thread has been destroyed */
-    if( pi_status == NULL )
-    {
-        do
-        {
-            msleep( THREAD_SLEEP );
-        } while( (i_status != THREAD_OVER) && (i_status != THREAD_ERROR)
-                 && (i_status != THREAD_FATAL) );
-    }
+    /* Free structure */
+    free( p_vout );
 }
 
 /*****************************************************************************
@@ -831,8 +826,6 @@ static void DestroyThread( vout_thread_t *p_vout, int i_status )
     /* Release the module */
     module_Unneed( p_vout->p_module );
 
-    /* Free structure */
-    free( p_vout );
     *pi_status = i_status;
 }
 
