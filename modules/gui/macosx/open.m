@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.2 2002/08/06 23:43:58 jlj Exp $
+ * $Id: open.m,v 1.3 2002/10/05 00:10:17 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -134,49 +134,134 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
 - (void)awakeFromNib
 {
-    [o_disc_panel setTitle: _NS("Open Disc")];
-    [o_disc_btn_ok setTitle: _NS("OK")];
-    [o_disc_btn_cancel setTitle: _NS("Cancel")];
-    [o_disc_lbl_type setTitle: _NS("Disc type")];
-    [o_disc_lbl_sp setTitle: _NS("Starting position")];
-    [o_disc_title setTitle: _NS("Title")];
-    [o_disc_chapter setTitle: _NS("Chapter")];
+    [o_panel setTitle: _NS("Open Target")];
 
-    [o_net_panel setTitle: _NS("Open Network")];
-    [o_net_box_mode setTitle: _NS("Network mode")];
-    [o_net_box_addr setTitle: _NS("Address")];
-    [o_net_port_lbl setStringValue: _NS("Port")];
+    [o_btn_ok setTitle: _NS("OK")];
+    [o_btn_cancel setTitle: _NS("Cancel")];
 
-    [o_quickly_panel setTitle: _NS("Open Quickly")];
-    [o_quickly_btn_ok setTitle: _NS("OK")];
-    [o_quickly_btn_cancel setTitle: _NS("Cancel")];
+    [[o_tabview tabViewItemAtIndex: 0] setLabel: _NS("File")];
+    [[o_tabview tabViewItemAtIndex: 1] setLabel: _NS("Disc")];
+    [[o_tabview tabViewItemAtIndex: 2] setLabel: _NS("Network")];
+
+    [o_file_btn_browse setTitle: _NS("Browse...")];
+
+    [o_disc_type_lbl setStringValue: _NS("Disc type")];
+    [o_disc_device_lbl setStringValue: _NS("Device name")];
+    [o_disc_title_lbl setStringValue: _NS("Title")];
+    [o_disc_chapter_lbl setStringValue: _NS("Chapter")];
+
+    [o_net_udp_port_lbl setStringValue: _NS("Port")];
+    [o_net_udpm_addr_lbl setStringValue: _NS("Address")];
+    [o_net_udpm_port_lbl setStringValue: _NS("Port")];
+    [o_net_cs_addr_lbl setStringValue: _NS("Address")];
+    [o_net_cs_port_lbl setStringValue: _NS("Port")];
+    [o_net_http_url_lbl setStringValue: _NS("URL")];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openFilePathChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_file_path];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openDiscInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_disc_device];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openDiscInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_disc_title];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openDiscInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_disc_chapter];
+
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openNetInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_net_udp_port];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openNetInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_net_udpm_addr];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openNetInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_net_udpm_port];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openNetInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_net_cs_addr];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openNetInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_net_cs_port];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+        selector: @selector(openNetInfoChanged:)
+        name: NSControlTextDidChangeNotification
+        object: o_net_http_url];
 }
 
-- (IBAction)openDisc:(id)sender
+- (void)openTarget:(int)i_type
 {
     int i_result;
 
-    [self openDiscTypeChanged: nil];
-    
-    [o_disc_panel makeKeyAndOrderFront: self];
-    i_result = [NSApp runModalForWindow: o_disc_panel];
-    [o_disc_panel close];
+    [o_tabview selectTabViewItemAtIndex: i_type];
+
+    i_result = [NSApp runModalForWindow: o_panel];
+    [o_panel close];
 
     if( i_result )
     {
-        NSString *o_source;
-
-        NSString *o_type = [[o_disc_type selectedCell] title];
-        NSString *o_device = [o_disc_device stringValue];
-        int i_title = [o_disc_title intValue];
-        int i_chapter = [o_disc_chapter intValue];
-
-        o_source = [NSString stringWithFormat: @"%@:%@@%d,%d",
-            [o_type lowercaseString], o_device, i_title, i_chapter];
+        NSString *o_source = [o_mrl stringValue];
 
         [o_playlist appendArray: 
             [NSArray arrayWithObject: o_source] atPos: -1];
     }
+}
+
+- (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi
+{
+    NSString *o_label = [o_tvi label];
+
+    if( [o_label isEqualToString: _NS("File")] )
+    {
+        [self openFilePathChanged: nil];
+    }
+    else if( [o_label isEqualToString: _NS("Disc")] )
+    {
+        [self openDiscTypeChanged: nil];
+    }
+    else if( [o_label isEqualToString: _NS("Network")] )
+    {
+        [self openNetModeChanged: nil];
+    }  
+}
+
+- (IBAction)openFile:(id)sender
+{
+    [self openFilePathChanged: nil];
+    [self openTarget: 0];
+}
+
+- (IBAction)openDisc:(id)sender
+{
+    [self openDiscTypeChanged: nil];
+    [self openTarget: 1];
+}
+
+- (IBAction)openNet:(id)sender
+{
+    [self openNetModeChanged: nil];
+    [self openTarget: 2];
+}
+
+- (void)openFilePathChanged:(NSNotification *)o_notification
+{
+    NSString *o_mrl_string;
+    NSString *o_filename = [o_file_path stringValue];
+
+    o_mrl_string = [NSString stringWithFormat: @"file://%@", o_filename];
+    [o_mrl setStringValue: o_mrl_string]; 
 }
 
 - (IBAction)openDiscTypeChanged:(id)sender
@@ -214,158 +299,177 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
             }
             
             [o_disc_device selectItemAtIndex: 0];
-            [o_disc_btn_ok setEnabled: TRUE];
         }
         else
         {
             [o_disc_device setStringValue: 
                 [NSString stringWithFormat: @"No %@s found", o_type]];
-            [o_disc_btn_ok setEnabled: FALSE];
         }
     }
+
+    [self openDiscInfoChanged: nil];
 }
 
-- (IBAction)openFile:(id)sender
+- (IBAction)openDiscStepperChanged:(id)sender
 {
-    NSOpenPanel *o_panel = [NSOpenPanel openPanel];
+    int i_tag = [sender tag];
+
+    if( i_tag == 0 )
+    {
+        [o_disc_title setIntValue: [o_disc_title_stp intValue]];
+    }
+    else if( i_tag == 1 )
+    {
+        [o_disc_chapter setIntValue: [o_disc_chapter_stp intValue]];
+    }
+
+    [self openDiscInfoChanged: nil];
+}
+
+- (void)openDiscInfoChanged:(NSNotification *)o_notification
+{
+    NSString *o_type;
+    NSString *o_device;
+    NSString *o_mrl_string;
+    int i_title, i_chapter;
+
+    o_type = [[o_disc_type selectedCell] title];
+    o_device = [o_disc_device stringValue];
+    i_title = [o_disc_title intValue];
+    i_chapter = [o_disc_chapter intValue];
     
-    [o_panel setAllowsMultipleSelection: YES];
+    o_mrl_string = [NSString stringWithFormat: @"%@://%@@%i,%i",
+        [o_type lowercaseString], o_device, i_title, i_chapter]; 
 
-    if( [o_panel runModalForDirectory: nil 
-            file: nil types: nil] == NSOKButton )
-    {
-        [o_playlist appendArray: [o_panel filenames] atPos: -1];
-    }
-}
-
-- (IBAction)openNet:(id)sender
-{
-    int i_result;
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-    [o_net_panel makeKeyAndOrderFront: self];
-    i_result = [NSApp runModalForWindow: o_net_panel];
-    [o_net_panel close];
-
-    if( i_result )
-    {
-        NSString * o_source = nil;
-        UInt32 i_port = [o_net_port intValue];
-        NSString * o_addr = [o_net_address stringValue];
-        NSString * o_mode = [[o_net_mode selectedCell] title];
-
-        if( i_port > 65536 )
-        {
-            NSBeep();
-            return;
-        }
-
-        if( [o_mode isEqualToString: @"UDP"] )
-        {
-            o_source = [NSString 
-                stringWithFormat: @"udp:@:%i", i_port];
-        } 
-        else if( [o_mode isEqualToString: @"UDP Multicase"] )
-        {
-            o_source = [NSString 
-                stringWithFormat: @"udp:@%@:%i", o_addr, i_port];
-        }
-        else if( [o_mode isEqualToString: @"Channel server"] )
-        {
-            if( p_intf->p_vlc->p_channel == NULL )
-            {
-                network_ChannelCreate( p_intf );
-            }
-
-            config_PutPsz( p_intf, "channel-server", 
-                           (char *)[o_addr lossyCString] );
-            config_PutInt( p_intf, "channel-port", i_port );
-
-            p_intf->p_sys->b_playing = 1;
-        }
-        else if( [o_mode isEqualToString: @"HTTP"] )
-        {
-            o_source = o_addr;
-        }
-
-        if( o_source != nil )
-        {
-            [o_playlist appendArray:
-                [NSArray arrayWithObject: o_source] atPos: -1];
-        }
-    }
+    [o_mrl setStringValue: o_mrl_string]; 
 }
 
 - (IBAction)openNetModeChanged:(id)sender
 {
-    NSString * o_mode;
-    SInt32 i_port = 1234;
-    NSString * o_addr = nil;
+    NSString *o_mode;
+    BOOL b_udp = FALSE;
+    BOOL b_udpm = FALSE;
+    BOOL b_cs = FALSE;
+    BOOL b_http = FALSE;
 
     o_mode = [[o_net_mode selectedCell] title];
 
-    if( [o_mode isEqualToString: @"UDP Multicast"] )
+    if( [o_mode isEqualToString: @"UDP"] ) b_udp = TRUE;   
+    else if( [o_mode isEqualToString: @"UDP Multicast"] ) b_udpm = TRUE;
+    else if( [o_mode isEqualToString: @"Channel server"] ) b_cs = TRUE;
+    else if( [o_mode isEqualToString: @"HTTP"] ) b_http = TRUE;
+
+    [o_net_udp_port setEnabled: b_udp];
+    [o_net_udp_port_stp setEnabled: b_udp];
+    [o_net_udpm_addr setEnabled: b_udpm];
+    [o_net_udpm_port setEnabled: b_udpm];
+    [o_net_udpm_port_stp setEnabled: b_udpm];
+    [o_net_cs_addr setEnabled: b_cs];
+    [o_net_cs_port setEnabled: b_cs]; 
+    [o_net_cs_port_stp setEnabled: b_cs]; 
+    [o_net_http_url setEnabled: b_http];
+
+    [self openNetInfoChanged: nil];
+}
+
+- (IBAction)openNetStepperChanged:(id)sender
+{
+    int i_tag = [sender tag];
+
+    if( i_tag == 0 )
     {
-        o_addr = @"";
+        [o_net_udp_port setIntValue: [o_net_udp_port_stp intValue]];
+    }
+    else if( i_tag == 1 )
+    {
+        [o_net_udpm_port setIntValue: [o_net_udpm_port_stp intValue]];
+    }
+    else if( i_tag == 2 )
+    {
+        [o_net_cs_port setIntValue: [o_net_cs_port_stp intValue]];
+    }
+
+    [self openNetInfoChanged: nil];
+}
+
+- (void)openNetInfoChanged:(NSNotification *)o_notification
+{
+    NSString *o_mode;
+    vlc_bool_t b_channel;
+    NSString *o_mrl_string = [NSString string];
+    intf_thread_t * p_intf = [NSApp getIntf];
+
+    o_mode = [[o_net_mode selectedCell] title];
+
+    b_channel = (vlc_bool_t)[o_mode isEqualToString: @"Channel server"]; 
+    config_PutInt( p_intf, "network-channel", b_channel );
+
+    if( [o_mode isEqualToString: @"UDP"] )
+    {
+        int i_port = [o_net_udp_port intValue];
+
+        o_mrl_string = [NSString stringWithString: @"udp://"]; 
+
+        if( i_port != 1234 )
+        {
+            o_mrl_string = 
+                [o_mrl_string stringByAppendingFormat: @"@:%i", i_port]; 
+        } 
+    }
+    else if( [o_mode isEqualToString: @"UDP Multicast"] ) 
+    {
+        NSString *o_addr = [o_net_udpm_addr stringValue];
+        int i_port = [o_net_udpm_port intValue];
+
+        o_mrl_string = [NSString stringWithFormat: @"udp://@%@", o_addr]; 
+
+        if( i_port != 1234 )
+        {
+            o_mrl_string = 
+                [o_mrl_string stringByAppendingFormat: @":%i", i_port]; 
+        } 
     }
     else if( [o_mode isEqualToString: @"Channel server"] )
     {
-        o_addr = @"localhost";
-        i_port = 6010;
+        NSString *o_addr = [o_net_cs_addr stringValue];
+        int i_port = [o_net_cs_port intValue];
+
+        if( p_intf->p_vlc->p_channel == NULL )
+        {
+            network_ChannelCreate( p_intf );
+        } 
+
+        config_PutPsz( p_intf, "channel-server", [o_addr lossyCString] ); 
+        if( i_port < 65536 )
+        {
+            config_PutInt( p_intf, "channel-port", i_port );
+        }
+
+        /* FIXME: we should use a playlist server instead */
+        o_mrl_string = [NSString stringWithString: @"udp://"];
     }
     else if( [o_mode isEqualToString: @"HTTP"] )
     {
-        o_addr = @"http://";
-        i_port = -1;
+        NSString *o_url = [o_net_http_url stringValue];
+
+        o_mrl_string = [NSString stringWithFormat: @"http://%@", o_url];
     }
 
-    if( o_addr != nil )
-    {
-        [o_net_address setEnabled: TRUE];
-        [o_net_address setStringValue: o_addr];
-    }
-    else
-    {
-        [o_net_address setEnabled: FALSE];
-    }
-
-    if( i_port > -1 )
-    {
-        [o_net_port setEnabled: TRUE];
-        [o_net_port_stp setEnabled: TRUE];
-        [o_net_port setIntValue: i_port];
-    }
-    else
-    {
-        [o_net_port setEnabled: FALSE];
-        [o_net_port_stp setEnabled: FALSE];
-    }
+    [o_mrl setStringValue: o_mrl_string];
 }
 
-- (IBAction)openQuickly:(id)sender
+- (IBAction)openFileBrowse:(id)sender
 {
-    int i_result;
+    NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
+    
+    [o_open_panel setAllowsMultipleSelection: NO];
 
-    [o_quickly_source setStringValue: @""];
-    [o_quickly_panel makeKeyAndOrderFront: self];
-    i_result = [NSApp runModalForWindow: o_quickly_panel];
-    [o_quickly_panel close];
-
-    if( i_result )
+    if( [o_open_panel runModalForDirectory: nil 
+            file: nil types: nil] == NSOKButton )
     {
-        NSString * o_source;
-
-        o_source = [o_quickly_source stringValue];
-
-        if( [o_source length] > 0 )
-        {
-            [o_playlist appendArray: 
-                [NSArray arrayWithObject: o_source] atPos: -1];
-        }
-        else
-        {
-            NSBeep();
-        }
+        NSString *o_filename = [[o_open_panel filenames] objectAtIndex: 0];
+        [o_file_path setStringValue: o_filename];
+        [self openFilePathChanged: nil];
     }
 }
 
@@ -376,7 +480,14 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
 - (IBAction)panelOk:(id)sender
 {
-    [NSApp stopModalWithCode: 1];
+    if( [[o_mrl stringValue] length] )
+    {
+        [NSApp stopModalWithCode: 1];
+    }
+    else
+    {
+        NSBeep();
+    }
 }
 
 @end
