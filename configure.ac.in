@@ -255,14 +255,9 @@ need_libc=false
 AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2 atoll getenv putenv setenv)
 
 dnl Check for usual libc functions
-AC_CHECK_FUNCS(strdup,,[need_libc=:])
-AC_CHECK_FUNCS(strndup,,[need_libc=:])
-AC_CHECK_FUNCS(atof,,[need_libc=:])
-AC_CHECK_FUNCS(lseek,,[need_libc=:])
-AC_CHECK_FUNCS(strcasecmp,,[AC_CHECK_FUNCS(stricmp,,[need_libc=:])])
-AC_CHECK_FUNCS(strncasecmp,,[AC_CHECK_FUNCS(strnicmp,,[need_libc=:])])
-
-AM_CONDITIONAL(BUILD_LIBC, ${need_libc})
+AC_CHECK_FUNCS(strdup strndup atof lseek)
+AC_CHECK_FUNC(strcasecmp,,[AC_CHECK_FUNC(stricmp)])
+AC_CHECK_FUNC(strncasecmp,,[AC_CHECK_FUNC(strnicmp)])
 
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,

@@ -2,7 +2,7 @@
  * libc.c: Extra libc function for some systems.
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: libc.c,v 1.4 2002/11/20 08:58:24 sam Exp $
+ * $Id: libc.c,v 1.5 2002/12/27 15:31:56 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Samuel Hocevar <sam@zoy.org>
@@ -11,7 +11,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -29,7 +29,7 @@
 /*****************************************************************************
  * getenv: just in case, but it should never be called
  *****************************************************************************/
-#ifndef HAVE_GETENV
+#if !defined( HAVE_GETENV )
 char *vlc_getenv( const char *name )
 {
     return NULL;
@@ -37,9 +37,9 @@ char *vlc_getenv( const char *name )
 #endif
 
 /*****************************************************************************
- * strdup: returns a malloc'd copy of a string 
+ * strdup: returns a malloc'd copy of a string
  *****************************************************************************/
-#ifndef HAVE_STRDUP
+#if !defined( HAVE_STRDUP )
 char *vlc_strdup( const char *string )
 {
     return strndup( string, strlen( string ) );
@@ -47,16 +47,16 @@ char *vlc_strdup( const char *string )
 #endif
 
 /*****************************************************************************
- * strndup: returns a malloc'd copy of at most n bytes of string 
+ * strndup: returns a malloc'd copy of at most n bytes of string
  * Does anyone know whether or not it will be present in Jaguar?
  *****************************************************************************/
-#ifndef HAVE_STRNDUP
+#if !defined( HAVE_STRNDUP )
 char *vlc_strndup( const char *string, size_t n )
 {
     char *psz;
     size_t len = strlen( string );
 
-    len = __MIN( len, n ); 
+    len = __MIN( len, n );
     psz = (char*)malloc( len + 1 );
 
     if( psz != NULL )
@@ -126,13 +126,13 @@ int vlc_strncasecmp( const char *s1, const char *s2, size_t n )
 /*****************************************************************************
  * atof: convert a string to a double.
  *****************************************************************************/
-#ifndef HAVE_ATOF
+#if !defined( HAVE_ATOF )
 double vlc_atof( const char *nptr )
-{ 
+{
     double f_result;
     wchar_t *psz_tmp;
     int i_len = strlen( nptr ) + 1;
-  
+
     psz_tmp = malloc( i_len * sizeof(wchar_t) );
     MultiByteToWideChar( CP_ACP, 0, nptr, -1, psz_tmp, i_len );
     f_result = wcstod( psz_tmp, NULL );
@@ -153,4 +153,17 @@ off_t vlc_lseek( int fildes, off_t offset, int whence )
     return SetFilePointer( (HANDLE)fildes, (long)offset, NULL, whence );
 }
 #endif
+
+/*****************************************************************************
+ * dgettext: gettext for plugins.
+ *****************************************************************************/
+char *vlc_dgettext( const char *package, const char *msgid )
+{
+#if defined( ENABLE_NLS ) \
+     && ( defined(HAVE_GETTEXT) || defined(HAVE_INCLUDED_GETTEXT) )
+    return dgettext( package, msgid );
+#else
+    return (char *)msgid;
+#endif
+}
 

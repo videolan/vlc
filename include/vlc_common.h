@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.45 2002/12/18 11:47:35 sam Exp $
+ * $Id: vlc_common.h,v 1.46 2002/12/27 15:31:55 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -635,19 +635,21 @@ typedef __int64 off_t;
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-#if defined( ENABLE_NLS ) \
-     && ( defined(HAVE_GETTEXT) || defined(HAVE_INCLUDED_GETTEXT) )
+VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
+
+#if defined( ENABLE_NLS ) && defined( HAVE_INCLUDED_GETTEXT )
+#   include "libintl.h"
+#   undef _
+#   define _(String) vlc_dgettext (PACKAGE, String)
+#   define N_(String) ((char*)(String))
+#elif defined( ENABLE_NLS ) && defined( HAVE_GETTEXT )
 #   include <libintl.h>
 #   undef _
 #   define _(String) dgettext (PACKAGE, String)
-#   ifdef gettext_noop
-#       define N_(String) gettext_noop (String)
-#   else
-#       define N_(String) (String)
-#   endif
+#   define N_(String) ((char*)(String))
 #elif !defined( NEED_GNOMESUPPORT_H )
-#   define _(String) (String)
-#   define N_(String) (String)
+#   define _(String) ((char*)(String))
+#   define N_(String) ((char*)(String))
 #endif
 
 /*****************************************************************************
