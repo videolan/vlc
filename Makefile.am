@@ -158,6 +158,15 @@ EXTRA_DIST += \
 	extras/MacOSX/Resources/English.lproj/MainMenu.nib/classes.nib \
 	extras/MacOSX/Resources/English.lproj/MainMenu.nib/info.nib \
 	extras/MacOSX/Resources/English.lproj/MainMenu.nib/objects.nib \
+	extras/MacOSX/Resources/English.lproj/About.nib/classes.nib \
+	extras/MacOSX/Resources/English.lproj/About.nib/info.nib \
+	extras/MacOSX/Resources/English.lproj/About.nib/objects.nib \
+	extras/MacOSX/Resources/English.lproj/Open.nib/classes.nib \
+	extras/MacOSX/Resources/English.lproj/Open.nib/info.nib \
+	extras/MacOSX/Resources/English.lproj/Open.nib/objects.nib \
+	extras/MacOSX/Resources/English.lproj/Preferences.nib/classes.nib \
+	extras/MacOSX/Resources/English.lproj/Preferences.nib/info.nib \
+	extras/MacOSX/Resources/English.lproj/Preferences.nib/objects.nib \
 	extras/MacOSX/Resources/English.lproj/InfoPlist.strings \
 	extras/MacOSX/Resources/English.lproj/vlc.scriptTerminology \
 	extras/MacOSX/Resources/a52.icns \
