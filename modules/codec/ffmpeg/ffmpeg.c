@@ -87,8 +87,6 @@ vlc_module_begin();
         VLC_FALSE );
     add_bool( "ffmpeg-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT,
         VLC_FALSE );
-    add_integer( "ffmpeg-truncated", 0, NULL, TRUNC_TEXT, TRUNC_LONGTEXT,
-        VLC_FALSE );
 
 #ifdef LIBAVCODEC_PP
     add_integer( "ffmpeg-pp-q", 0, NULL, PP_Q_TEXT, PP_Q_LONGTEXT, VLC_FALSE );

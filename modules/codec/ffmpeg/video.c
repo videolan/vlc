@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.68 2004/03/01 22:35:55 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -232,11 +232,6 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     var_Get( p_dec, "grayscale", &val );
     if( val.b_bool ) p_sys->p_context->flags |= CODEC_FLAG_GRAY;
 
-    /* Decide if we set CODEC_FLAG_TRUNCATED */
-    var_Create( p_dec, "ffmpeg-truncated", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "ffmpeg-truncated", &val );
-    if( val.i_int > 0 ) p_sys->p_context->flags |= CODEC_FLAG_TRUNCATED;
-
     /* ***** ffmpeg frame skipping ***** */
     var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-hurry-up", &val );
@@ -295,7 +290,8 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
             memcpy( &p[12], p_dec->fmt_in.p_extra, i_size );
 
             /* Now remove all atoms before the SMI one */
-            if( p_sys->p_context->extradata_size > 0x5a && strncmp( &p[0x56], "SMI ", 4 ) )
+            if( p_sys->p_context->extradata_size > 0x5a &&
+                strncmp( &p[0x56], "SMI ", 4 ) )
             {
                 uint8_t *psz = &p[0x52];
 
@@ -309,7 +305,8 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
                     }
                     if( !strncmp( &psz[4], "SMI ", 4 ) )
                     {
-                        memmove( &p[0x52], psz, &p[p_sys->p_context->extradata_size] - psz );
+                        memmove( &p[0x52], psz,
+                                 &p[p_sys->p_context->extradata_size] - psz );
                         break;
                     }
 
@@ -331,7 +328,8 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
                         p_dec->fmt_in.i_extra );
                 p_sys->p_context->sub_id= ((uint32_t*)p_dec->fmt_in.p_extra)[1];
 
-                msg_Warn( p_dec, "using extra data for RV codec sub_id=%08x", p_sys->p_context->sub_id );
+                msg_Warn( p_dec, "using extra data for RV codec sub_id=%08x",
+                          p_sys->p_context->sub_id );
             }
         }
         else
@@ -396,7 +394,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
 
-    if( p_block->i_flags&BLOCK_FLAG_DISCONTINUITY )
+    if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
     {
         p_sys->i_buffer = 0;
         p_sys->i_pts = 0; /* To make sure we recover properly */
@@ -704,7 +702,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         /* Some demuxers only set the dts so let's try to find a useful
          * timestamp from this */
         if( !p_context->has_b_frames || !p_sys->b_has_b_frames ||
-            !p_ff_pic->reference )
+            !p_ff_pic->reference || !p_sys->i_pts )
         {
             p_ff_pic->pts = p_sys->input_dts;
         }
@@ -712,7 +710,11 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     }
     else p_ff_pic->pts = 0;
 
-    p_sys->input_pts = p_sys->input_dts = 0;
+    if( p_sys->i_pts ) /* make sure 1st frame has a pts > 0 */
+    {
+        p_sys->input_pts = p_sys->input_dts = 0;
+    }
+
     p_ff_pic->opaque = 0;
 
     /* Not much to do in indirect rendering mode */

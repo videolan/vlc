@@ -102,10 +102,6 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "when there is not enough time. It's useful with low CPU power " \
     "but it can produce distorted pictures.")
 
-#define TRUNC_TEXT N_("Truncated stream")
-#define TRUNC_LONGTEXT N_("Truncated stream "\
-    "-1: auto, 0: disable, 1: enable")
-
 #define PP_Q_TEXT N_("Post processing quality")
 #define PP_Q_LONGTEXT N_( \
     "Quality of post processing. Valid range is 0 to 6\n" \
