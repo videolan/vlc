@@ -58,8 +58,10 @@ typedef struct vout_sys_s
     SDL_Overlay *   p_overlay;                             /* overlay device */
     boolean_t   b_fullscreen;
     boolean_t   b_overlay;
+    boolean_t   b_cursor;
     boolean_t   b_reopen_display;
     boolean_t   b_toggle_fullscreen;
+    boolean_t   b_hide_cursor;
     Uint8   *   p_buffer[2];
                                                      /* Buffers informations */
 }   vout_sys_t;
@@ -70,7 +72,7 @@ typedef struct vout_sys_s
 static int     SDLOpenDisplay       ( vout_thread_t *p_vout );
 static void    SDLCloseDisplay      ( vout_thread_t *p_vout );
 static void    SDLToggleFullScreen  ( vout_thread_t *p_vout );
-
+static void    SDLHideCursor        ( vout_thread_t *p_vout );
 /*****************************************************************************
  * vout_SDLCreate: allocate SDL video thread output method
  *****************************************************************************
@@ -115,6 +117,8 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     p_vout->p_sys->i_height = main_GetIntVariable( VOUT_HEIGHT_VAR,
                                 VOUT_HEIGHT_DEFAULT );
 
+    p_vout->p_sys->b_cursor = 0 ;   // TODO should be done with a main_GetInt..
+    
     if( SDLOpenDisplay(p_vout) )
     {
       intf_ErrMsg( "error: can't initialize SDL library: %s",
@@ -123,7 +127,7 @@ int vout_SDLCreate( vout_thread_t *p_vout, char *psz_display,
     }
 
     p_vout->p_sys->b_toggle_fullscreen = 0;
-
+    p_vout->p_sys->b_hide_cursor = 0;
     return( 0 );
 }
 
@@ -183,7 +187,13 @@ int vout_SDLManage( vout_thread_t *p_vout )
     {
         SDLToggleFullScreen(p_vout);
     }
-
+    
+    /* if pointer has to be hidden/shown we do so */
+    if( p_vout->p_sys->b_hide_cursor )
+    {
+        SDLHideCursor(p_vout);
+    }
+    
     return( 0 );
 }
 
@@ -341,8 +351,8 @@ static int SDLOpenDisplay( vout_thread_t *p_vout )
         SDL_ShowCursor( 1 );
 
     SDL_WM_SetCaption( VOUT_TITLE , VOUT_TITLE );
-    SDL_EventState(SDL_KEYUP , SDL_IGNORE); /* ignore keys up */
-
+    SDL_EventState(SDL_KEYUP , SDL_IGNORE);                 /* ignore keys up */
+    SDL_EventState(SDL_MOUSEBUTTONUP, SDL_IGNORE);          
     if( p_vout->b_need_render )
     {
         p_vout->p_sys->p_buffer[ 0 ] = p_vout->p_sys->p_display->pixels;
@@ -422,16 +432,40 @@ static void SDLCloseDisplay( vout_thread_t *p_vout )
  * SDLToggleFullScreen: toggle fullscreen
  *****************************************************************************
  * This function toggles the fullscreen state of the surface.
+ * And  - hide the pointer if switching to fullscreen
+ *      - show the pointer if leaving fullscreen state
  *****************************************************************************/
 static void SDLToggleFullScreen( vout_thread_t *p_vout )
 {
     SDL_WM_ToggleFullScreen(p_vout->p_sys->p_display);
 
     if( p_vout->p_sys->b_fullscreen )
-        SDL_ShowCursor( 0 );
+    {
+        p_vout->p_sys->b_cursor=1;
+    }
     else
-        SDL_ShowCursor( 1 );
-
+    {
+        p_vout->p_sys->b_cursor=0;
+    }
+    
     p_vout->p_sys->b_toggle_fullscreen = 0;
+    SDLHideCursor(p_vout);
 }
 
+/*****************************************************************************
+ * SDLHideCursor: Hide/Show mouse pointer
+ *****************************************************************************
+ * This function hides/shows the mouse pointer inside the main window.
+ *****************************************************************************/
+static void SDLHideCursor( vout_thread_t *p_vout )
+{
+    if( p_vout->p_sys->b_cursor==1 )
+    {
+        SDL_ShowCursor( 0 );
+    }
+    else
+    {
+        SDL_ShowCursor( 1 );
+    }
+    p_vout->p_sys->b_hide_cursor = 0;
+}
