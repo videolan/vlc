@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.4 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.5 2003/04/06 17:57:11 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -152,7 +152,15 @@ static void Run( intf_thread_t *p_intf )
     if( skin_last == NULL || ! Loader->Load( skin_last ) )
     {
         // Too bad, it failed. Let's try with the default theme
+#if 0
         if( ! Loader->Load( DEFAULT_SKIN_FILE ) )
+#else
+        string default_dir = (string)p_intf->p_libvlc->psz_vlcpath +
+                             DIRECTORY_SEPARATOR + "skins" +
+                             DIRECTORY_SEPARATOR + "default" +
+                             DIRECTORY_SEPARATOR + "theme.xml";
+        if( ! Loader->Load( default_dir ) )
+#endif
         {
             // Last chance: the user can  select a new theme file
 
