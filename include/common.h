@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.45 2001/11/07 22:58:13 jlj Exp $
+ * $Id: common.h,v 1.46 2001/11/08 01:48:09 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -226,12 +226,14 @@ struct pgrm_descriptor_s;
 #   define S_ISCHR(m)      (0)
 #   define S_ISFIFO(m)     (((m)&_S_IFMT) == _S_IFIFO)
 #   define S_ISREG(m)      (((m)&_S_IFMT) == _S_IFREG)
-#   define I64C(x)         x
+#   define I64C(x)         x##i64
 #else
 #   define I64C(x)         x##LL
 #endif
 
 #if defined( WIN32 )
+#   define off_t __int64
+#   define stat _stati64
 #   ifndef snprintf
 #       define snprintf _snprintf  /* snprintf not defined in mingw32 (bug?) */
 #   endif

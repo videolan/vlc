@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.29 2001/09/05 16:07:49 massiot Exp $
+ * $Id: modules.h,v 1.30 2001/11/08 01:48:09 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -20,10 +20,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
-
-#ifdef WIN32
-#include <sys/types.h>                                              /* off_t */
-#endif
 
 /*****************************************************************************
  * module_bank_t, p_module_bank (global variable)
