@@ -2,7 +2,7 @@
  * wall.c : Wall video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: wall.c,v 1.10 2002/01/09 02:01:14 sam Exp $
+ * $Id: wall.c,v 1.11 2002/01/30 00:09:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -74,6 +74,7 @@ typedef struct vout_sys_s
     int    i_vout;
     struct vout_list_s
     {
+        boolean_t b_active;
         int i_width;
         int i_height;
         struct vout_thread_s *p_vout;
@@ -126,6 +127,9 @@ static int vout_Probe( probedata_t *p_data )
  *****************************************************************************/
 static int vout_Create( vout_thread_t *p_vout )
 {
+    char *psz_method, *psz_tmp;
+    int i_vout;
+
     /* Allocate structure */
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -134,8 +138,73 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
-    p_vout->p_sys->i_col = 6;
-    p_vout->p_sys->i_row = 6;
+    /* Look what method was requested */
+    psz_method = main_GetPszVariable( VOUT_FILTER_VAR, "" );
+
+    while( *psz_method && *psz_method != ':' )
+    {
+        psz_method++;
+    }
+
+    if( *psz_method )
+    {
+        psz_method++;
+        psz_tmp = psz_method;
+
+        while( *psz_tmp && *psz_tmp != 'x' && *psz_tmp != ':' )
+        {
+            psz_tmp++;
+        }
+
+        if( *psz_tmp == 'x' )
+        {
+           *psz_tmp = '\0';
+           p_vout->p_sys->i_col = atoi( psz_method );
+
+           psz_tmp++;
+           psz_method = psz_tmp;
+
+           while(  *psz_tmp && *psz_tmp != ':' )
+           {
+              psz_tmp++;
+           }
+
+           if( *psz_tmp )
+           {
+               *psz_tmp = '\0';
+               p_vout->p_sys->i_row = atoi( psz_method );
+               psz_method = psz_tmp + 1;
+           }
+           else
+           {
+               p_vout->p_sys->i_row = atoi( psz_method );
+               psz_method = NULL;
+           }
+        }
+        else if( *psz_tmp == ':' )
+        { 
+            p_vout->p_sys->i_col = p_vout->p_sys->i_row = atoi( psz_method );
+            psz_method = psz_tmp + 1;
+        }
+        else
+        { 
+            p_vout->p_sys->i_col = p_vout->p_sys->i_row = atoi( psz_method );
+            psz_method = NULL;
+        }
+    }
+    else
+    {
+        intf_ErrMsg( "filter error: no valid wall size provided, "
+                     "using wall:3x3" );
+        p_vout->p_sys->i_col = 3;
+        p_vout->p_sys->i_row = 3;
+    }
+
+    p_vout->p_sys->i_col = MAX( 1, MIN( 15, p_vout->p_sys->i_col ) );
+    p_vout->p_sys->i_row = MAX( 1, MIN( 15, p_vout->p_sys->i_row ) );
+
+    intf_WarnMsg( 3, "filter info: opening a %i x %i wall",
+                  p_vout->p_sys->i_col, p_vout->p_sys->i_row );
 
     p_vout->p_sys->pp_vout = malloc( p_vout->p_sys->i_row *
                                      p_vout->p_sys->i_col *
@@ -147,6 +216,51 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     }
 
+    /* If no trailing vout are specified, take them all */
+    if( psz_method == NULL )
+    {
+        for( i_vout = p_vout->p_sys->i_row * p_vout->p_sys->i_col;
+             i_vout--; )
+        {
+            p_vout->p_sys->pp_vout[i_vout].b_active = 1;
+        }
+    }
+    /* If trailing vout are specified, activate only the requested ones */
+    else
+    {
+        for( i_vout = p_vout->p_sys->i_row * p_vout->p_sys->i_col;
+             i_vout--; )
+        {
+            p_vout->p_sys->pp_vout[i_vout].b_active = 0;
+        }
+
+        while( *psz_method )
+        {
+            psz_tmp = psz_method;
+            while( *psz_tmp && *psz_tmp != ',' )
+            {
+                psz_tmp++;
+            }
+
+            if( *psz_tmp )
+            {
+                *psz_tmp = '\0';
+                i_vout = atoi( psz_method );
+                psz_method = psz_tmp + 1;
+            }
+            else
+            {
+                i_vout = atoi( psz_method );
+                psz_method = psz_tmp;
+            }
+
+            if( i_vout >= 0 &&
+                i_vout < p_vout->p_sys->i_row * p_vout->p_sys->i_col )
+            {
+                p_vout->p_sys->pp_vout[i_vout].b_active = 1;
+            }
+        }
+    }
 
     return( 0 );
 }
@@ -203,6 +317,15 @@ static int vout_Init( vout_thread_t *p_vout )
                 i_height = p_vout->render.i_height
                             - ( ( p_vout->render.i_height
                                    / p_vout->p_sys->i_row ) & ~0x3 ) * i_row;
+            }
+
+            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_width = i_width;
+            p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].i_height = i_height;
+
+            if( !p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active )
+            {
+                p_vout->p_sys->i_vout++;
+                continue;
             }
 
             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout =
@@ -298,6 +421,18 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         for( i_col = 0; i_col < p_vout->p_sys->i_col; i_col++ )
         {
+            if( !p_vout->p_sys->pp_vout[ i_vout ].b_active )
+            {
+                for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
+                {
+                    pi_left_skip[i_plane] +=
+                        p_vout->p_sys->pp_vout[ i_vout ].i_width
+                         * p_pic->p[i_plane].i_pitch / p_vout->output.i_width;
+                }
+                i_vout++;
+                continue;
+            }
+
             while( ( p_outpic =
                 vout_CreatePicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
                                     0, 0, 0 )
@@ -339,7 +474,7 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
                     p_out += i_out_pitch;
                 }
 
-                pi_left_skip[i_plane] += p_outpic->p[i_plane].i_pitch;
+                pi_left_skip[i_plane] += i_out_pitch;
             }
 
             vout_UnlinkPicture( p_vout->p_sys->pp_vout[ i_vout ].p_vout,
@@ -352,7 +487,9 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 
         for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
         {
-            pi_top_skip[i_plane] += p_outpic->p[i_plane].i_lines
+            pi_top_skip[i_plane] += p_vout->p_sys->pp_vout[ i_vout ].i_height
+                                     * p_pic->p[i_plane].i_lines
+                                     / p_vout->output.i_height
                                      * p_pic->p[i_plane].i_pitch;
         }
     }
@@ -370,13 +507,19 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     ;
 }
 
+/*****************************************************************************
+ * RemoveAllVout: destroy all the child video output threads
+ *****************************************************************************/
 static void RemoveAllVout( vout_thread_t *p_vout )
 {
     while( p_vout->p_sys->i_vout )
     {
          --p_vout->p_sys->i_vout;
-         vout_DestroyThread(
-             p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout, NULL );
+         if( p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].b_active )
+         {
+             vout_DestroyThread(
+               p_vout->p_sys->pp_vout[ p_vout->p_sys->i_vout ].p_vout, NULL );
+         }
     }
 }
 
