@@ -171,6 +171,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_threads = 0;
     p_sys->b_trellis = 0;
     p_sys->b_input_has_b_frames = VLC_FALSE;
+    p_sys->i_output_pts = 0;
 
     if( ( codec = sout_cfg_find_value( p_stream->p_cfg, "acodec" ) ) )
     {
@@ -1780,7 +1781,7 @@ static int transcode_video_ffmpeg_getframebuf(struct AVCodecContext *p_context,
         /* Some demuxers/packetizers only set the dts so let's try to find a
          * useful timestamp from this */
         if( !p_context->has_b_frames || !p_sys->b_input_has_b_frames ||
-            !p_frame->reference )
+            !p_frame->reference || !p_sys->i_output_pts )
         {
             p_frame->pts = p_sys->i_input_dts;
         }
