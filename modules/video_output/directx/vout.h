@@ -149,14 +149,6 @@ void DirectXUpdateRects ( vout_thread_t *p_vout, vlc_bool_t b_force );
 #define DX_POSITION_CHANGE 0x1000
 #define DX_WALLPAPER_CHANGE 0x2000
 
-#ifndef _T
-#   ifdef UNICODE
-#       define _T(q) L##q
-#   else
-#       define _T(q) q
-#   endif
-#endif
-
 /*****************************************************************************
  * WinCE helpers
  *****************************************************************************/

@@ -942,6 +942,13 @@ typedef __int64 off_t;
 #       define vsnprintf _vsnprintf
 #   endif
 
+#   ifndef _T
+#       ifdef UNICODE
+#           define _T(q) L##q
+#       else
+#           define _T(q) q
+#       endif
+#   endif
 #endif
 
 /* lseek (defined in src/extras/libc.c) */
