@@ -230,7 +230,7 @@
 	      <name>menubar_subtitle</name>
 	      <sensitive>False</sensitive>
 	      <tooltip>Select subtitle unit</tooltip>
-	      <label>_Subtitle</label>
+	      <label>_Subtitles</label>
 	      <right_justify>False</right_justify>
 	    </widget>
 
@@ -681,7 +681,7 @@
 	      <last_modification_time>Tue, 03 Apr 2001 03:46:25 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_PREV</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -699,7 +699,7 @@
 	      <last_modification_time>Tue, 03 Apr 2001 03:47:01 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_NEXT</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -764,7 +764,7 @@
 	      <last_modification_time>Tue, 03 Apr 2001 00:53:47 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_PREV</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -783,7 +783,7 @@
 	      <last_modification_time>Tue, 03 Apr 2001 00:53:40 GMT</last_modification_time>
 	    </signal>
 	    <stock_button>GNOME_STOCK_BUTTON_NEXT</stock_button>
-	    <relief>GTK_RELIEF_NONE</relief>
+	    <relief>GTK_RELIEF_NORMAL</relief>
 	    <child>
 	      <padding>0</padding>
 	      <expand>False</expand>
@@ -1014,7 +1014,7 @@
     <name>popup_subtitle</name>
     <sensitive>False</sensitive>
     <tooltip>Select subtitle channel</tooltip>
-    <label>_Subtitle</label>
+    <label>_Subtitles</label>
     <right_justify>False</right_justify>
   </widget>
 

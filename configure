@@ -1894,7 +1894,7 @@ EOF
  LIB=${LIB}" -lgnugetopt"
 else
   echo "$ac_t""no" 1>&6
-GETOPT="extras/GNUgetopt/getopt.o extras/GNUgetopt/getopt1.o"
+GETOPT=1
 fi
 
 fi
@@ -3085,7 +3085,8 @@ EOF
 fi
 
 
-PLUGINS=${PLUGINS}"ps ts yuv idct idctclassic motion "
+#PLUGINS=${PLUGINS}"ps ts yuv idct idctclassic motion "
+BUILTINS=${BUILTINS}"ps ts yuv idct idctclassic motion "
 if test x$host_os = xbeos; then
     ACCEL_PLUGINS="yuvmmx idctmmx motionmmx "
 else
@@ -3096,17 +3097,17 @@ for ac_hdr in sys/ioctl.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3100: checking for $ac_hdr" >&5
+echo "configure:3101: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3105 "configure"
+#line 3106 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3110: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3111: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3126,22 +3127,23 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   cat >> confdefs.h <<EOF
 #define $ac_tr_hdr 1
 EOF
- PLUGINS=${PLUGINS}"dvd "
+ #PLUGINS=${PLUGINS}"dvd "
+   BUILTINS=${BUILTINS}"dvd "
    for ac_hdr in linux/cdrom.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3135: checking for $ac_hdr" >&5
+echo "configure:3137: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3140 "configure"
+#line 3142 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3145: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3147: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3168,7 +3170,7 @@ fi
 done
 
    cat > conftest.$ac_ext <<EOF
-#line 3172 "configure"
+#line 3174 "configure"
 #include "confdefs.h"
 #include <linux/cdrom.h>
 EOF
@@ -3195,14 +3197,18 @@ if test "${enable_dummy+set}" = set; then
   :
 fi
 
-if test x$enable_dummy != xno; then PLUGINS=${PLUGINS}"dummy "; fi
+if test x$enable_dummy != xno; then
+  #PLUGINS=${PLUGINS}"dummy ";
+  BUILTINS=${BUILTINS}"dummy "; fi
 # Check whether --enable-null or --disable-null was given.
 if test "${enable_null+set}" = set; then
   enableval="$enable_null"
   :
 fi
 
-if test x$enable_null != xno; then PLUGINS=${PLUGINS}"null "; fi
+if test x$enable_null != xno; then
+  #PLUGINS=${PLUGINS}"null ";
+  BUILTINS=${BUILTINS}"null "; fi
 # Check whether --enable-ppro or --disable-ppro was given.
 if test "${enable_ppro+set}" = set; then
   enableval="$enable_ppro"
@@ -3214,15 +3220,21 @@ fi
 # Check whether --enable-mmx or --disable-mmx was given.
 if test "${enable_mmx+set}" = set; then
   enableval="$enable_mmx"
-   if test x$enableval = xyes; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}${ACCEL_PLUGINS}; fi 
+   if test x$enableval = xyes; then ARCH=${ARCH}" mmx";
+  #PLUGINS=${PLUGINS}${ACCEL_PLUGINS};
+  BUILTINS=${BUILTINS}}${ACCEL_PLUGINS}; fi 
 else
-   if test x${host_cpu} = xi686 -o x${host_cpu} = xi586 -o x${host_cpu} = xx86; then ARCH=${ARCH}" mmx"; PLUGINS=${PLUGINS}${ACCEL_PLUGINS}; fi 
+   if test x${host_cpu} = xi686 -o x${host_cpu} = xi586 -o x${host_cpu} = xx86; then ARCH=${ARCH}" mmx";
+  #PLUGINS=${PLUGINS}${ACCEL_PLUGINS};
+  BUILTINS=${BUILTINS}${ACCEL_PLUGINS}; fi 
 fi
 
 # Check whether --enable-altivec or --disable-altivec was given.
 if test "${enable_altivec+set}" = set; then
   enableval="$enable_altivec"
-   if test x$enableval = xyes; then ARCH=${ARCH}" altivec"; PLUGINS=${PLUGINS}"idctaltivec "; fi 
+   if test x$enableval = xyes; then ARCH=${ARCH}" altivec";
+  #PLUGINS=${PLUGINS}"idctaltivec ";
+  BUILTINS=${BUILTINS}"idctaltivec "; fi 
 fi
 
 #[ if test -d /System/Library/Frameworks/vecLib.framework; then ARCH=${ARCH}" altivec"; PLUGINS=${PLUGINS}"idctaltivec "; fi ])
@@ -3299,17 +3311,17 @@ else
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3303: checking for $ac_hdr" >&5
+echo "configure:3315: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3308 "configure"
+#line 3320 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3313: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3325: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3373,17 +3385,17 @@ if test "${with_sdl+set}" = set; then
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3377: checking for $ac_hdr" >&5
+echo "configure:3389: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3382 "configure"
+#line 3394 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3387: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3399: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3421,17 +3433,17 @@ fi
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3425: checking for $ac_hdr" >&5
+echo "configure:3437: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3430 "configure"
+#line 3442 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3435: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3447: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3520,17 +3532,17 @@ if test x$enable_x11 != xno; then
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:3524: checking for $ac_hdr" >&5
+echo "configure:3536: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3529 "configure"
+#line 3541 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3534: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3546: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3569,17 +3581,17 @@ if test "${enable_alsa+set}" = set; then
   enableval="$enable_alsa"
   if test x$enable_alsa = xyes; then ac_safe=`echo "sys/asoundlib.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for sys/asoundlib.h""... $ac_c" 1>&6
-echo "configure:3573: checking for sys/asoundlib.h" >&5
+echo "configure:3585: checking for sys/asoundlib.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 3578 "configure"
+#line 3590 "configure"
 #include "confdefs.h"
 #include <sys/asoundlib.h>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:3583: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:3595: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
@@ -3596,7 +3608,7 @@ fi
 if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   echo $ac_n "checking for main in -lasound""... $ac_c" 1>&6
-echo "configure:3600: checking for main in -lasound" >&5
+echo "configure:3612: checking for main in -lasound" >&5
 ac_lib_var=`echo asound'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -3604,14 +3616,14 @@ else
   ac_save_LIBS="$LIBS"
 LIBS="-lasound  $LIBS"
 cat > conftest.$ac_ext <<EOF
-#line 3608 "configure"
+#line 3620 "configure"
 #include "confdefs.h"
 
 int main() {
 main()
 ; return 0; }
 EOF
-if { (eval echo configure:3615: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
+if { (eval echo configure:3627: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   eval "ac_cv_lib_$ac_lib_var=yes"
 else
@@ -3641,6 +3653,7 @@ fi
 
 
 fi
+
 
 
 
@@ -3760,7 +3773,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile include/config.h include/defs.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile.opts Makefile.modules include/config.h include/defs.h" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -3809,6 +3822,7 @@ s%@GETOPT@%$GETOPT%g
 s%@SYS@%$SYS%g
 s%@ARCH@%$ARCH%g
 s%@PLUGINS@%$PLUGINS%g
+s%@BUILTINS@%$BUILTINS%g
 s%@ALIASES@%$ALIASES%g
 s%@INCLUDE@%$INCLUDE%g
 s%@DEBUG@%$DEBUG%g
@@ -3861,7 +3875,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile include/config.h"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile.opts Makefile.modules include/config.h"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then
@@ -4050,7 +4064,10 @@ debug mode            : ${DEBUG}
 statistics            : ${STATS}
 optimizations         : ${OPTIMS}
 CSS decryption        : ${CSS}
-plugins               : ${PLUGINS}
+need builtin getopt   : ${GETOPT}
+plugin modules        : ${PLUGINS}
+built-in modules      : ${BUILTINS}
 vlc aliases           : ${ALIASES}
-"
+
+You may now tune Makefile.opts at your convenience."
 

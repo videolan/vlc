@@ -4,7 +4,8 @@
 
 HEAD
 
-  * Got rid of the sleep() hack in beos_specific.cpp
+  * Beginning of the built-in modules support.
+  * Got rid of the sleep() hack in beos_specific.cpp.
   * Fixed a segfault when launched without argument under Darwin.
   * Fix for Darwin program path handling.
 

@@ -1,0 +1,35 @@
+###############################################################################
+# vlc (VideoLAN Client) plugins Makefile
+# (c)1998 VideoLAN
+###############################################################################
+
+#
+# C headers directories
+#
+CFLAGS += -I../../include -I../../extras
+
+#
+# C compiler flags: plugin compilation
+#
+PCFLAGS += -fPIC
+
+#
+# C compiler flags: plugin linking
+#
+ifneq (,$(findstring darwin,$(SYS)))
+PLCFLAGS += -bundle -undefined suppress
+else
+ifeq ($(SYS),beos)
+PLCFLAGS += -nostart plugins/_APP_
+else
+PLCFLAGS += -shared
+endif
+endif
+
+#
+# Libraries for special cases
+#
+LIB_GGI = @LIB_GGI@
+LIB_GLIDE = @LIB_GLIDE@
+LIB_SDL = @LIB_SDL@
+

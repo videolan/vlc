@@ -4,8 +4,26 @@
 ################################################################################
 # This Makefile is dedicated to build of .d files. It should not be called
 # directly by user, but only through main Makefile.
-# See notes at the end of the main makefile for explanations.
 ################################################################################
+
+###############################################################################
+# Note on generic rules and dependancies
+###############################################################################
+
+# Note on dependancies: each .c file is associated with a .d file, which
+# depends of it. The .o file associated with a .c file depends of the .d, of the
+# .c itself, and of Makefile. The .d files are stored in a separate .dep/
+# directory.
+# The dep directory should be ignored by CVS.
+
+# Note on inclusions: depending of the target, the dependancies files must
+# or must not be included. The problem is that if we ask make to include a file,
+# and this file does not exist, it is made before it can be included. In a
+# general way, a .d file should be included if and only if the corresponding .o
+# needs to be re-made.
+
+# The object Makefile knows how to make a .o from a .c, and includes
+# dependancies for the target, but only those required.
 
 # All settings and options are passed through main Makefile
 

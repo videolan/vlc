@@ -49,6 +49,9 @@ install: build
 
 	DESTDIR=`pwd`/debian/vlc/ $(MAKE) install prefix=/usr
 
+	# remove the yuvmmx plugin, it doesn't like -fPIC
+	rm debian/vlc/usr/lib/videolan/vlc/yuvmmx.so
+
 	# make symlinks for packages
 	aliases="ggi gtk gnome esd sdl alsa qt" ; \
 	if [ $(DEB_BUILD_ARCH) = i386 ]; then aliases=$$aliases" glide" ; fi ; \

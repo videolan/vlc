@@ -2,7 +2,7 @@
  * idct_common.c : common IDCT functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct_common.c,v 1.4 2001/04/06 09:15:47 sam Exp $
+ * $Id: idct_common.c,v 1.5 2001/04/15 04:19:57 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -20,6 +20,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+/* MODULE_NAME defined in Makefile together with -DBUILTIN */
+#ifdef BUILTIN
+#   include "modules_inner.h"
+#else
+#   define _M( foo ) foo
+#endif
 
 /*****************************************************************************
  * Preamble
@@ -45,7 +52,7 @@
 /*****************************************************************************
  * vdec_InitIDCT : initialize datas for vdec_SparseIDCT
  *****************************************************************************/
-void vdec_InitIDCT (vdec_thread_t * p_vdec)
+void _M( vdec_InitIDCT ) (vdec_thread_t * p_vdec)
 {
     int i;
 
@@ -55,7 +62,7 @@ void vdec_InitIDCT (vdec_thread_t * p_vdec)
     for( i=0 ; i < 64 ; i++ )
     {
         p_pre[i*64+i] = 1 << SPARSE_SCALE_FACTOR;
-        vdec_IDCT( p_vdec, &p_pre[i*64], 0) ;
+        _M( vdec_IDCT )( p_vdec, &p_pre[i*64], 0) ;
     }
     return;
 }
@@ -63,8 +70,8 @@ void vdec_InitIDCT (vdec_thread_t * p_vdec)
 /*****************************************************************************
  * vdec_SparseIDCT : IDCT function for sparse matrices
  *****************************************************************************/
-void vdec_SparseIDCT (vdec_thread_t * p_vdec, dctelem_t * p_block,
-                      int i_sparse_pos)
+void _M( vdec_SparseIDCT ) ( vdec_thread_t * p_vdec, dctelem_t * p_block,
+                             int i_sparse_pos)
 {
     short int val;
     int * dp;

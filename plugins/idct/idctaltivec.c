@@ -2,7 +2,7 @@
  * idctaltivec.c : Altivec IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctaltivec.c,v 1.3 2001/03/26 19:06:18 sam Exp $
+ * $Id: idctaltivec.c,v 1.4 2001/04/15 04:19:57 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -129,9 +129,9 @@ MODULE_DEACTIVATE
 static void idct_getfunctions( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = idct_Probe;
-    p_function_list->functions.idct.pf_init = vdec_InitIDCT;
-    p_function_list->functions.idct.pf_sparse_idct = vdec_SparseIDCT;
-    p_function_list->functions.idct.pf_idct = vdec_IDCT;
+    p_function_list->functions.idct.pf_init = _M( vdec_InitIDCT );
+    p_function_list->functions.idct.pf_sparse_idct = _M( vdec_SparseIDCT );
+    p_function_list->functions.idct.pf_idct = _M( vdec_IDCT );
     p_function_list->functions.idct.pf_norm_scan = vdec_NormScan;
 }
 
@@ -168,7 +168,7 @@ static void vdec_NormScan( u8 ppi_scan[2][64] )
 /*****************************************************************************
  * vdec_IDCT :
  *****************************************************************************/
-void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block,
+void _M( vdec_IDCT )( vdec_thread_t * p_vdec, dctelem_t * p_block,
                 int i_idontcare )
 {
     IDCT( p_block, p_block );

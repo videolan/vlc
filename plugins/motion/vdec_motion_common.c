@@ -2,7 +2,7 @@
  * vdec_motion_common.c : common motion compensation routines common
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_common.c,v 1.5 2001/02/20 15:03:00 massiot Exp $
+ * $Id: vdec_motion_common.c,v 1.6 2001/04/15 04:19:57 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -23,6 +23,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/* MODULE_NAME defined in Makefile together with -DBUILTIN */
+#ifdef BUILTIN
+#   include "modules_inner.h"
+#else
+#   define _M( foo ) foo
+#endif
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -41,7 +48,7 @@
 #include "vdec_motion.h"
 #include "vpar_blocks.h"
 
-extern int motion_Probe( probedata_t *p_data );
+extern int _M( motion_Probe )( probedata_t *p_data );
 
 static void vdec_MotionFieldField420  ( macroblock_t * p_mb );
 static void vdec_MotionFieldField422  ( macroblock_t * p_mb );
@@ -68,7 +75,7 @@ static void vdec_MotionFrameDMV444    ( macroblock_t * p_mb );
  *****************************************************************************/
 void motion_getfunctions( function_list_t * p_function_list )
 {
-    p_function_list->pf_probe = motion_Probe;
+    p_function_list->pf_probe = _M( motion_Probe );
 
 #define list p_function_list->functions.motion
 #define motion_functions( yuv ) \

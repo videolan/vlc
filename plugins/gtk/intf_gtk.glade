@@ -247,7 +247,7 @@
 	      <name>menubar_subpictures</name>
 	      <sensitive>False</sensitive>
 	      <tooltip>Select sub-title</tooltip>
-	      <label>Sub _Pictures</label>
+	      <label>_Subtitles</label>
 	      <right_justify>False</right_justify>
 	    </widget>
 
@@ -691,7 +691,7 @@
     <class>GtkMenuItem</class>
     <name>popup_subpictures</name>
     <sensitive>False</sensitive>
-    <label>_Subpictures</label>
+    <label>_Subtitles</label>
     <right_justify>False</right_justify>
   </widget>
 

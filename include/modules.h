@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.19 2001/03/21 13:42:33 sam Exp $
+ * $Id: modules.h,v 1.20 2001/04/15 04:19:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -234,8 +234,22 @@ typedef struct module_s
 {
     boolean_t           b_builtin;  /* Set to true if the module is built in */
 
-    module_handle_t     handle;      /* Unique handle to refer to the module */
-    char *              psz_filename;                     /* Module filename */
+    union
+    {
+        struct
+        {
+            module_handle_t     handle;                     /* Unique handle */
+            char *              psz_filename;             /* Module filename */
+
+        } plugin;
+
+        struct
+        {
+            int ( *pf_deactivate ) ( struct module_s * );
+
+        } builtin;
+
+    } is;
 
     char *              psz_name;                    /* Module _unique_ name */
     char *              psz_longname;             /* Module descriptive name */

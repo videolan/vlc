@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.97 2001/04/12 02:40:09 stef Exp $
+ * $Id: input.c,v 1.98 2001/04/15 04:19:58 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -273,7 +273,7 @@ static void RunThread( input_thread_t *p_input )
             {
                 /* End of file - we do not set b_die because only the
                  * interface is allowed to do so. */
-                intf_WarnMsg( 1, "End of file reached" );
+                intf_WarnMsg( 1, "input: EOF reached" );
                 p_input->b_eof = 1;
             }
             else
@@ -292,7 +292,7 @@ static void RunThread( input_thread_t *p_input )
 
     DestroyThread( p_input );
 
-    intf_DbgMsg("Thread end");
+    intf_DbgMsg("input: Thread end");
 }
 
 /*****************************************************************************
@@ -519,6 +519,7 @@ void input_FileOpen( input_thread_t * p_input )
  *****************************************************************************/
 void input_FileClose( input_thread_t * p_input )
 {
+    intf_Msg( "input: closing %s", p_input->p_source );
     close( p_input->i_handle );
 
     return;

@@ -5,7 +5,7 @@
  * case by optimized functions.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_common.h,v 1.3 2001/03/21 13:42:34 sam Exp $
+ * $Id: video_common.h,v 1.4 2001/04/15 04:19:58 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -68,44 +68,43 @@ int i_matrix_coefficients
  * Extern prototypes
  *****************************************************************************/
 
-void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
-                boolean_t *pb_h_scaling, int *pi_v_scaling,
-                int *p_offset, boolean_t b_double );
+void _M( SetOffset )( int i_width, int i_height, int i_pic_width,
+                      int i_pic_height, boolean_t *pb_h_scaling,
+                      int *pi_v_scaling, int *p_offset, boolean_t b_double );
 
-void ConvertY4Gray8       ( YUV_ARGS_8BPP );
-void ConvertYUV420RGB8    ( YUV_ARGS_8BPP );
-void ConvertYUV422RGB8    ( YUV_ARGS_8BPP );
-void ConvertYUV444RGB8    ( YUV_ARGS_8BPP );
+void _M( ConvertY4Gray8 )     ( YUV_ARGS_8BPP );
+void _M( ConvertYUV420RGB8 )  ( YUV_ARGS_8BPP );
+void _M( ConvertYUV422RGB8 )  ( YUV_ARGS_8BPP );
+void _M( ConvertYUV444RGB8 )  ( YUV_ARGS_8BPP );
 
-void ConvertY4Gray16      ( YUV_ARGS_16BPP );
-void ConvertYUV420RGB16   ( YUV_ARGS_16BPP );
-void ConvertYUV422RGB16   ( YUV_ARGS_16BPP );
-void ConvertYUV444RGB16   ( YUV_ARGS_16BPP );
+void _M( ConvertY4Gray16 )    ( YUV_ARGS_16BPP );
+void _M( ConvertYUV420RGB16 ) ( YUV_ARGS_16BPP );
+void _M( ConvertYUV422RGB16 ) ( YUV_ARGS_16BPP );
+void _M( ConvertYUV444RGB16 ) ( YUV_ARGS_16BPP );
 
-void ConvertY4Gray24      ( YUV_ARGS_24BPP );
-void ConvertYUV420RGB24   ( YUV_ARGS_24BPP );
-void ConvertYUV422RGB24   ( YUV_ARGS_24BPP );
-void ConvertYUV444RGB24   ( YUV_ARGS_24BPP );
+void _M( ConvertY4Gray24 )    ( YUV_ARGS_24BPP );
+void _M( ConvertYUV420RGB24 ) ( YUV_ARGS_24BPP );
+void _M( ConvertYUV422RGB24 ) ( YUV_ARGS_24BPP );
+void _M( ConvertYUV444RGB24 ) ( YUV_ARGS_24BPP );
 
-void ConvertY4Gray32      ( YUV_ARGS_32BPP );
-void ConvertYUV420RGB32   ( YUV_ARGS_32BPP );
-void ConvertYUV422RGB32   ( YUV_ARGS_32BPP );
-void ConvertYUV444RGB32   ( YUV_ARGS_32BPP );
+void _M( ConvertY4Gray32 )    ( YUV_ARGS_32BPP );
+void _M( ConvertYUV420RGB32 ) ( YUV_ARGS_32BPP );
+void _M( ConvertYUV422RGB32 ) ( YUV_ARGS_32BPP );
+void _M( ConvertYUV444RGB32 ) ( YUV_ARGS_32BPP );
 
-void ConvertYUV420YCbr8    ( YUV_ARGS_8BPP );
-void ConvertYUV422YCbr8    ( YUV_ARGS_8BPP );
-void ConvertYUV444YCbr8    ( YUV_ARGS_8BPP );
+void _M( ConvertYUV420YCbr8 )  ( YUV_ARGS_8BPP );
+void _M( ConvertYUV422YCbr8 )  ( YUV_ARGS_8BPP );
+void _M( ConvertYUV444YCbr8 )  ( YUV_ARGS_8BPP );
 
-void ConvertYUV420YCbr16    ( YUV_ARGS_16BPP );
-void ConvertYUV422YCbr16    ( YUV_ARGS_16BPP );
-void ConvertYUV444YCbr16    ( YUV_ARGS_16BPP );
+void _M( ConvertYUV420YCbr16 )  ( YUV_ARGS_16BPP );
+void _M( ConvertYUV422YCbr16 )  ( YUV_ARGS_16BPP );
+void _M( ConvertYUV444YCbr16 )  ( YUV_ARGS_16BPP );
 
-void ConvertYUV420YCbr24    ( YUV_ARGS_24BPP );
-void ConvertYUV422YCbr24    ( YUV_ARGS_24BPP );
-void ConvertYUV444YCbr24    ( YUV_ARGS_24BPP );
+void _M( ConvertYUV420YCbr24 )  ( YUV_ARGS_24BPP );
+void _M( ConvertYUV422YCbr24 )  ( YUV_ARGS_24BPP );
+void _M( ConvertYUV444YCbr24 )  ( YUV_ARGS_24BPP );
 
-void ConvertYUV420YCbr32    ( YUV_ARGS_32BPP );
-void ConvertYUV422YCbr32    ( YUV_ARGS_32BPP );
-void ConvertYUV444YCbr32    ( YUV_ARGS_32BPP );
-
+void _M( ConvertYUV420YCbr32 )  ( YUV_ARGS_32BPP );
+void _M( ConvertYUV422YCbr32 )  ( YUV_ARGS_32BPP );
+void _M( ConvertYUV444YCbr32 )  ( YUV_ARGS_32BPP );
 

@@ -1,0 +1,176 @@
+###############################################################################
+# vlc (VideoLAN Client) options Makefile
+# (c)1998 VideoLAN
+###############################################################################
+
+###############################################################################
+# Configuration
+###############################################################################
+
+# Debugging mode on or off (set to 1 to activate)
+DEBUG=@DEBUG@
+STATS=@STATS@
+OPTIMS=@OPTIMS@
+GETOPT=@GETOPT@
+
+PLUGINS:=@PLUGINS@
+BUILTINS:=@BUILTINS@
+
+SYS=@SYS@
+ALIASES=@ALIASES@
+INSTALL=@INSTALL@
+ARCH=@ARCH@
+
+exec_prefix=@exec_prefix@
+prefix=@prefix@
+bindir=@bindir@
+datadir=@datadir@
+libdir=@libdir@
+
+CC=@CC@
+SHELL=@SHELL@
+
+###############################################################################
+# Configuration pre-processing
+###############################################################################
+
+# PROGRAM_OPTIONS is an identification string of the compilation options
+PROGRAM_OPTIONS = $(SYS) $(ARCH)
+ifeq ($(DEBUG),1)
+PROGRAM_OPTIONS += DEBUG
+DEFINE += -DDEBUG
+endif
+ifeq ($(STATS),1)
+PROGRAM_OPTIONS += DEBUG
+DEFINE += -DSTATS
+endif
+
+# PROGRAM_BUILD is a complete identification of the build
+# (we can't use fancy options with date since OSes like Solaris
+# or FreeBSD have strange date implementations)
+ifeq ($(SYS),beos)
+# XXX: beos does not support hostname (how lame...)
+PROGRAM_BUILD = `date` $(USER)
+else
+PROGRAM_BUILD = `date` $(USER)@`hostname`
+endif
+
+# PROGRAM_VERSION is the current vlc version
+PROGRAM_VERSION=@VLC_VERSION@
+
+# DEFINE will contain some of the constants definitions decided in Makefile, 
+# including SYS_xx. It will be passed to C compiler.
+DEFINE += -DSYS_$(shell echo $(SYS) | sed 's/-.*//' | tr '[a-z].' '[A-Z]_')
+
+# On Linux activate 64-bit off_t (by default under BSD)
+ifneq (,$(findstring linux,$(SYS)))
+DEFINE += -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98
+endif
+
+###############################################################################
+# Tuning and other variables - do not change anything except if you know
+# exactly what you are doing
+###############################################################################
+
+#
+# C headers directories
+#
+INCLUDE += @INCLUDE@
+INCLUDE += -Iinclude -Iextras -I/usr/local/include
+
+#
+# Libraries
+#
+LIB = @LIB@ -L/usr/local/lib
+
+ifeq ($(SYS),beos)
+LIB += -lbe -lroot -lgame
+else
+LIB += -lm
+endif
+
+#
+# C compiler flags: mainstream compilation
+#
+CFLAGS += $(DEFINE) $(INCLUDE)
+CFLAGS += -Wall -Winline
+CFLAGS += -D_REENTRANT
+CFLAGS += -D_GNU_SOURCE
+
+# flags needed for clean beos compilation
+ifeq ($(SYS),beos)
+CFLAGS += -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual
+endif
+
+ifneq (,$(findstring darwin,$(SYS)))
+CFLAGS += -traditional-cpp
+endif
+
+# Optimizations : don't compile debug versions with them
+ifeq ($(OPTIMS),1)
+CFLAGS += -O3
+CFLAGS += -ffast-math -funroll-loops
+CFLAGS += -fomit-frame-pointer
+
+# Optimizations for x86 familiy
+ifneq (,$(findstring 86,$(ARCH)))
+# Optional Pentium Pro optimizations
+ifneq (,$(findstring ppro,$(ARCH)))
+CFLAGS += -march=pentiumpro -mcpu=pentiumpro
+else
+CFLAGS += -march=pentium -mcpu=pentium
+endif
+endif
+
+# Optimizations for PowerPC
+ifneq (,$(findstring powerpc,$(ARCH)))
+CFLAGS += -mmultiple -mhard-float -mstring
+endif
+
+# Optimizations for Sparc
+ifneq (,$(findstring sparc,$(ARCH)))
+CFLAGS += -mhard-float
+endif
+
+#end of optimisations
+endif
+
+# Optional MMX optimizations for x86
+ifneq (,$(findstring mmx,$(ARCH)))
+CFLAGS += -DHAVE_MMX
+endif
+
+#
+# C compiler flags: dependancies
+#
+DCFLAGS += $(INCLUDE)
+DCFLAGS += -MM
+
+#
+# C compiler flags: linking
+#
+LCFLAGS += @LCFLAGS@ $(LIB)
+LCFLAGS += -Wall
+#LCFLAGS += -s
+
+ifeq ($(SYS),beos)
+LCFLAGS += -Xlinker -soname=_APP_
+else
+ifneq (,$(findstring qnx,$(SYS)))
+LCFLAGS += -Xlinker -export-dynamic
+else
+ifneq (,$(findstring darwin,$(SYS)))
+LCFLAGS += -dyn
+else
+LCFLAGS += --export-dynamic
+endif
+endif
+endif
+
+#
+# Debugging and profiling support (unless optimisations are active)
+#
+ifneq ($(OPTIMS),1)
+CFLAGS += -g
+endif
+

@@ -3,7 +3,7 @@
  * Provides functions to perform the YUV conversion.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_yuvmmx.c,v 1.7 2001/03/21 13:42:34 sam Exp $
+ * $Id: video_yuvmmx.c,v 1.8 2001/04/15 04:19:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -329,29 +329,31 @@ static void SetYUV( vout_thread_t *p_vout )
     {
         switch( p_vout->i_bytes_per_pixel)
         {
+#define _X( foo ) (vout_yuv_convert_t *) _M( foo )
         case 1:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420YCbr8;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422YCbr8;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444YCbr8;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420YCbr8 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertYUV422YCbr8 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertYUV444YCbr8 );
             break;
         
         case 2:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420YCbr16;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422YCbr16;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444YCbr16;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420YCbr16 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertYUV422YCbr16 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertYUV444YCbr16 );
             break;
         
         case 3:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420YCbr24;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422YCbr24;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444YCbr24;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420YCbr24 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertYUV422YCbr24 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertYUV444YCbr24 );
             break;
         
         case 4:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420YCbr32;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422YCbr32;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444YCbr32;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420YCbr32 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertYUV422YCbr32 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertYUV444YCbr32 );
             break;
+#undef _X
         }
     }    
     else if( p_vout->b_grayscale )
@@ -359,26 +361,28 @@ static void SetYUV( vout_thread_t *p_vout )
         /* Grayscale */
         switch( p_vout->i_bytes_per_pixel )
         {
+#define _X( foo ) (vout_yuv_convert_t *) _M( foo )
         case 1:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertY4Gray8;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertY4Gray8;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertY4Gray8;
+            p_vout->yuv.pf_yuv420 = _X( ConvertY4Gray8 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertY4Gray8 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertY4Gray8 );
             break;
         case 2:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertY4Gray16;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertY4Gray16;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertY4Gray16;
+            p_vout->yuv.pf_yuv420 = _X( ConvertY4Gray16 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertY4Gray16 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertY4Gray16 );
             break;
         case 3:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB24;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertY4Gray24;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertY4Gray24;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420RGB24 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertY4Gray24 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertY4Gray24 );
             break;
         case 4:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB32;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertY4Gray32;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertY4Gray32;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420RGB32 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertY4Gray32 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertY4Gray32 );
             break;
+#undef _X
         }
     }
     else
@@ -386,26 +390,28 @@ static void SetYUV( vout_thread_t *p_vout )
         /* Color */
         switch( p_vout->i_bytes_per_pixel )
         {
+#define _X( foo ) (vout_yuv_convert_t *) _M( foo )
         case 1:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB8;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422RGB8;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444RGB8;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420RGB8 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertYUV422RGB8 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertYUV444RGB8 );
             break;
         case 2:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB16;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422RGB16;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444RGB16;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420RGB16 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertYUV422RGB16 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertYUV444RGB16 );
             break;
         case 3:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB24;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422RGB24;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444RGB24;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420RGB24 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertYUV422RGB24 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertYUV444RGB24 );
             break;
         case 4:
-            p_vout->yuv.pf_yuv420 = (vout_yuv_convert_t *) ConvertYUV420RGB32;
-            p_vout->yuv.pf_yuv422 = (vout_yuv_convert_t *) ConvertYUV422RGB32;
-            p_vout->yuv.pf_yuv444 = (vout_yuv_convert_t *) ConvertYUV444RGB32;
+            p_vout->yuv.pf_yuv420 = _X( ConvertYUV420RGB32 );
+            p_vout->yuv.pf_yuv422 = _X( ConvertYUV422RGB32 );
+            p_vout->yuv.pf_yuv444 = _X( ConvertYUV444RGB32 );
             break;
+#undef _X
         }
     }
 }
@@ -417,9 +423,9 @@ static void SetYUV( vout_thread_t *p_vout )
  * It will also set horizontal and vertical scaling indicators. If b_double
  * is set, the p_offset structure has interleaved Y and U/V offsets.
  *****************************************************************************/
-void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
-                boolean_t *pb_h_scaling, int *pi_v_scaling,
-                int *p_offset, boolean_t b_double )
+void _M( SetOffset )( int i_width, int i_height, int i_pic_width,
+                      int i_pic_height, boolean_t *pb_h_scaling,
+                      int *pi_v_scaling, int *p_offset, boolean_t b_double )
 {
     int i_x;                                    /* x position in destination */
     int i_scale_count;                                     /* modulo counter */

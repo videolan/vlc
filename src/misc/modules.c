@@ -1,8 +1,8 @@
 /*****************************************************************************
- * modules.c : Built-in and dynamic modules management functions
+ * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.22 2001/04/12 01:52:45 sam Exp $
+ * $Id: modules.c,v 1.23 2001/04/15 04:19:58 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -38,13 +38,12 @@
 
 #if defined(HAVE_DLFCN_H)                                /* Linux, BSD, Hurd */
 #   include <dlfcn.h>                        /* dlopen(), dlsym(), dlclose() */
-
+#   define HAVE_DYNAMIC_PLUGINS
 #elif defined(HAVE_IMAGE_H)                                          /* BeOS */
 #   include <image.h>
-
+#   define HAVE_DYNAMIC_PLUGINS
 #else
-    /* FIXME: this isn't supposed to be an error */
-#   error no dynamic plugins available on your system !
+#   undef HAVE_DYNAMIC_PLUGINS
 #endif
 
 #ifdef SYS_BEOS
@@ -60,15 +59,24 @@
 
 #include "intf_msg.h"
 #include "modules.h"
+#include "modules_builtin.h"
 #include "modules_core.h"
 
 /* Local prototypes */
-static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename );
-static int HideModule( module_t * p_module );
-static int FreeModule( module_bank_t * p_bank, module_t * p_module );
-static int LockModule( module_t * p_module );
-static int UnlockModule( module_t * p_module );
-static int CallSymbol( module_t * p_module, char * psz_name );
+#ifdef HAVE_DYNAMIC_PLUGINS
+static int AllocatePluginModule ( module_bank_t *, char * );
+#endif
+static int AllocateBuiltinModule( module_bank_t *,
+                                  int ( * ) ( module_t * ),
+                                  int ( * ) ( module_t * ),
+                                  int ( * ) ( module_t * ) );
+static int FreeModule   ( module_bank_t * p_bank, module_t * );
+static int LockModule   ( module_t * );
+static int UnlockModule ( module_t * );
+#ifdef HAVE_DYNAMIC_PLUGINS
+static int HideModule   ( module_t * );
+static int CallSymbol   ( module_t *, char * );
+#endif
 
 /*****************************************************************************
  * module_CreateBank: create the module bank.
@@ -88,10 +96,11 @@ module_bank_t * module_CreateBank( void )
  * module_InitBank: create the module bank.
  *****************************************************************************
  * This function creates a module bank structure and fills it with the
- * built-in modules, as well as all the dynamic modules it can find.
+ * built-in modules, as well as all the plugin modules it can find.
  *****************************************************************************/
 void module_InitBank( module_bank_t * p_bank )
 {
+#ifdef HAVE_DYNAMIC_PLUGINS
     static char * path[] = { ".", "lib", PLUGIN_PATH, NULL, NULL };
 
     char **         ppsz_path = path;
@@ -104,11 +113,19 @@ void module_InitBank( module_bank_t * p_bank )
 #endif
     DIR *           dir;
     struct dirent * file;
+#endif /* HAVE_DYNAMIC_PLUGINS */
 
     p_bank->first = NULL;
     vlc_mutex_init( &p_bank->lock );
 
     intf_WarnMsg( 1, "module: module bank initialized" );
+
+    intf_WarnMsg( 2, "module: checking built-in modules" );
+
+    ALLOCATE_ALL_BUILTINS();
+
+#ifdef HAVE_DYNAMIC_PLUGINS
+    intf_WarnMsg( 2, "module: checking plugin modules" );
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
@@ -137,7 +154,7 @@ void module_InitBank( module_bank_t * p_bank )
             psz_fullpath = *ppsz_path;
         }
 
-        intf_WarnMsgImm( 2, "module: browsing %s", psz_fullpath );
+        intf_WarnMsgImm( 3, "module: browsing `%s'", psz_fullpath );
 
         if( (dir = opendir( psz_fullpath )) )
         {
@@ -158,8 +175,8 @@ void module_InitBank( module_bank_t * p_bank )
                     sprintf( psz_file, "%s/%s", psz_fullpath, file->d_name );
 
                     /* We created a nice filename -- now we just try to load
-                     * it as a dynamic module. */
-                    AllocateDynModule( p_bank, psz_file );
+                     * it as a plugin module. */
+                    AllocatePluginModule( p_bank, psz_file );
 
                     /* We don't care if the allocation succeeded */
                     free( psz_file );
@@ -177,6 +194,7 @@ void module_InitBank( module_bank_t * p_bank )
         }
 #endif
     }
+#endif /* HAVE_DYNAMIC_PLUGINS */
 
     return;
 }
@@ -184,7 +202,7 @@ void module_InitBank( module_bank_t * p_bank )
 /*****************************************************************************
  * module_DestroyBank: destroy the module bank.
  *****************************************************************************
- * This function unloads all unused dynamic modules and removes the module
+ * This function unloads all unused plugin modules and removes the module
  * bank in case of success.
  *****************************************************************************/
 void module_DestroyBank( module_bank_t * p_bank )
@@ -218,7 +236,7 @@ void module_DestroyBank( module_bank_t * p_bank )
 /*****************************************************************************
  * module_ResetBank: reset the module bank.
  *****************************************************************************
- * This function resets the module bank by unloading all unused dynamic
+ * This function resets the module bank by unloading all unused plugin
  * modules.
  *****************************************************************************/
 void module_ResetBank( module_bank_t * p_bank )
@@ -235,6 +253,7 @@ void module_ResetBank( module_bank_t * p_bank )
  *****************************************************************************/
 void module_ManageBank( module_bank_t * p_bank )
 {
+#ifdef HAVE_DYNAMIC_PLUGINS
     module_t * p_module;
 
     /* We take the global lock */
@@ -245,7 +264,7 @@ void module_ManageBank( module_bank_t * p_bank )
          p_module != NULL ;
          p_module = p_module->next )
     {
-        /* If the module is unused and if it is a dynamic module... */
+        /* If the module is unused and if it is a plugin module... */
         if( p_module->i_usage == 0 && !p_module->b_builtin )
         {
             if( p_module->i_unused_delay < MODULE_HIDE_DELAY )
@@ -254,7 +273,7 @@ void module_ManageBank( module_bank_t * p_bank )
             }
             else
             {
-                intf_WarnMsg( 1, "module: hiding unused module `%s'",
+                intf_WarnMsg( 3, "module: hiding unused module `%s'",
                               p_module->psz_name );
                 HideModule( p_module );
             }
@@ -263,6 +282,7 @@ void module_ManageBank( module_bank_t * p_bank )
 
     /* We release the global lock */
     vlc_mutex_unlock( &p_bank->lock );
+#endif /* HAVE_DYNAMIC_PLUGINS */
 
     return;
 }
@@ -335,12 +355,12 @@ module_t * module_Need( module_bank_t *p_bank,
         }
     }
 
-    /* We release the global lock */
+    /* We can release the global lock, module refcount was incremented */
     vlc_mutex_unlock( &p_bank->lock );
 
     if( p_bestmodule != NULL )
     {
-        intf_WarnMsg( 1, "module: locking module `%s'",
+        intf_WarnMsg( 3, "module: locking module `%s'",
                       p_bestmodule->psz_name );
     }
 
@@ -363,7 +383,7 @@ void module_Unneed( module_bank_t * p_bank, module_t * p_module )
      * so there is no need to check the return value. */
     UnlockModule( p_module );
 
-    intf_WarnMsg( 1, "module: unlocking module `%s'", p_module->psz_name );
+    intf_WarnMsg( 3, "module: unlocking module `%s'", p_module->psz_name );
 
     /* We release the global lock */
     vlc_mutex_unlock( &p_bank->lock );
@@ -375,14 +395,15 @@ void module_Unneed( module_bank_t * p_bank, module_t * p_module )
  * Following functions are local.
  *****************************************************************************/
 
+#ifdef HAVE_DYNAMIC_PLUGINS
 /*****************************************************************************
- * AllocateDynModule: load a module into memory and initialize it.
+ * AllocatePluginModule: load a module into memory and initialize it.
  *****************************************************************************
  * This function loads a dynamically loadable module and allocates a structure
  * for its information data. The module can then be handled by module_Need,
  * module_Unneed and HideModule. It can be removed by FreeModule.
  *****************************************************************************/
-static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
+static int AllocatePluginModule( module_bank_t * p_bank, char * psz_filename )
 {
     module_t * p_module, * p_othermodule;
     module_handle_t handle;
@@ -390,8 +411,8 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     /* Try to dynamically load the module. */
     if( module_load( psz_filename, &handle ) )
     {
-        /* The dynamic module couldn't be opened */
-        intf_WarnMsgImm( 1, "module warning: cannot open %s (%s)",
+        /* The plugin module couldn't be opened */
+        intf_WarnMsgImm( 3, "module warning: cannot open %s (%s)",
                          psz_filename, module_error() );
         return( -1 );
     }
@@ -407,8 +428,8 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     }
 
     /* We need to fill these since they may be needed by CallSymbol() */
-    p_module->psz_filename = psz_filename;
-    p_module->handle = handle;
+    p_module->is.plugin.psz_filename = psz_filename;
+    p_module->is.plugin.handle = handle;
 
     /* Initialize the module : fill p_module->psz_name, etc. */
     if( CallSymbol( p_module, "InitModule" ) != 0 )
@@ -451,17 +472,18 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
 
     /* We strdup() these entries so that they are still valid when the
      * module is unloaded. */
-    p_module->psz_filename = strdup( p_module->psz_filename );
+    p_module->is.plugin.psz_filename =
+            strdup( p_module->is.plugin.psz_filename );
     p_module->psz_name = strdup( p_module->psz_name );
     p_module->psz_longname = strdup( p_module->psz_longname );
     p_module->psz_version = strdup( p_module->psz_version );
-    if( p_module->psz_filename == NULL 
+    if( p_module->is.plugin.psz_filename == NULL 
             || p_module->psz_name == NULL
             || p_module->psz_longname == NULL
             || p_module->psz_version == NULL )
     {
         intf_ErrMsg( "module error: can't duplicate strings" );
-        free( p_module->psz_filename );
+        free( p_module->is.plugin.psz_filename );
         free( p_module->psz_name );
         free( p_module->psz_longname );
         free( p_module->psz_version );
@@ -486,12 +508,284 @@ static int AllocateDynModule( module_bank_t * p_bank, char * psz_filename )
     p_bank->first = p_module;
 
     /* Immediate message so that a slow module doesn't make the user wait */
-    intf_WarnMsgImm( 1, "module: dynamic module `%s', %s",
+    intf_WarnMsgImm( 2, "module: plugin module `%s', %s",
+                     p_module->psz_name, p_module->psz_longname );
+
+    return( 0 );
+}
+#endif /* HAVE_DYNAMIC_PLUGINS */
+
+/*****************************************************************************
+ * AllocateBuiltinModule: initialize a built-in module.
+ *****************************************************************************
+ * This function registers a built-in module and allocates a structure
+ * for its information data. The module can then be handled by module_Need,
+ * module_Unneed and HideModule. It can be removed by FreeModule.
+ *****************************************************************************/
+static int AllocateBuiltinModule( module_bank_t * p_bank,
+                                  int ( *pf_init ) ( module_t * ),
+                                  int ( *pf_activate ) ( module_t * ),
+                                  int ( *pf_deactivate ) ( module_t * ) )
+{
+    module_t * p_module, * p_othermodule;
+
+    /* Now that we have successfully loaded the module, we can
+     * allocate a structure for it */ 
+    p_module = malloc( sizeof( module_t ) );
+    if( p_module == NULL )
+    {
+        intf_ErrMsg( "module error: can't allocate p_module" );
+        return( -1 );
+    }
+
+    /* Initialize the module : fill p_module->psz_name, etc. */
+    if( pf_init( p_module ) != 0 )
+    {
+        /* With a well-written module we shouldn't have to print an
+         * additional error message here, but just make sure. */
+        intf_ErrMsg( "module error: failed calling init in builtin module" );
+        free( p_module );
+        return( -1 );
+    }
+
+    /* Check that version numbers match */
+    if( strcmp( VERSION, p_module->psz_version ) )
+    {
+        free( p_module );
+        return( -1 );
+    }
+
+    /* Check that we don't already have a module with this name */
+    for( p_othermodule = p_bank->first ;
+         p_othermodule != NULL ;
+         p_othermodule = p_othermodule->next )
+    {
+        if( !strcmp( p_othermodule->psz_name, p_module->psz_name ) )
+        {
+            free( p_module );
+            return( -1 );
+        }
+    }
+
+    if( pf_activate( p_module ) != 0 )
+    {
+        /* With a well-written module we shouldn't have to print an
+         * additional error message here, but just make sure. */
+        intf_ErrMsg( "module error: failed calling activate "
+                     "in builtin module" );
+        free( p_module );
+        return( -1 );
+    }
+
+    /* We strdup() these entries so that they are still valid when the
+     * module is unloaded. */
+    p_module->psz_name = strdup( p_module->psz_name );
+    p_module->psz_longname = strdup( p_module->psz_longname );
+    p_module->psz_version = strdup( p_module->psz_version );
+    if( p_module->psz_name == NULL 
+            || p_module->psz_longname == NULL
+            || p_module->psz_version == NULL )
+    {
+        intf_ErrMsg( "module error: can't duplicate strings" );
+        free( p_module->psz_name );
+        free( p_module->psz_longname );
+        free( p_module->psz_version );
+        free( p_module );
+        return( -1 );
+    }
+
+    /* Everything worked fine ! The module is ready to be added to the list. */
+    p_module->i_usage = 0;
+    p_module->i_unused_delay = 0;
+
+    p_module->b_builtin = 1;
+    p_module->is.builtin.pf_deactivate = pf_deactivate;
+
+    /* Link module into the linked list */
+    if( p_bank->first != NULL )
+    {
+        p_bank->first->prev = p_module;
+    }
+    p_module->next = p_bank->first;
+    p_module->prev = NULL;
+    p_bank->first = p_module;
+
+    /* Immediate message so that a slow module doesn't make the user wait */
+    intf_WarnMsgImm( 2, "module: builtin module `%s', %s",
                      p_module->psz_name, p_module->psz_longname );
 
     return( 0 );
 }
 
+/*****************************************************************************
+ * FreeModule: delete a module and its structure.
+ *****************************************************************************
+ * This function can only be called if i_usage <= 0.
+ *****************************************************************************/
+static int FreeModule( module_bank_t * p_bank, module_t * p_module )
+{
+    /* If the module is not in use but is still in memory, we first have
+     * to hide it and remove it from memory before we can free the
+     * data structure. */
+    if( p_module->b_builtin )
+    {
+        if( p_module->i_usage != 0 )
+        {
+            intf_ErrMsg( "module error: trying to free builtin module `%s' with"
+                         " usage %i", p_module->psz_name, p_module->i_usage );
+            return( -1 );
+        }
+        else
+        {
+            /* We deactivate the module now. */
+            p_module->is.builtin.pf_deactivate( p_module );
+        }
+    }
+#ifdef HAVE_DYNAMIC_PLUGINS
+    else
+    {
+        if( p_module->i_usage >= 1 )
+        {
+            intf_ErrMsg( "module error: trying to free module `%s' which is"
+                         " still in use", p_module->psz_name );
+            return( -1 );
+        }
+
+        /* Two possibilities here: i_usage == -1 and the module is already
+         * unloaded, we can continue, or i_usage == 0, and we have to hide
+         * the module before going on. */
+        if( p_module->i_usage == 0 )
+        {
+            if( HideModule( p_module ) != 0 )
+            {
+                return( -1 );
+            }
+        }
+    }
+#endif
+
+    /* Unlink the module from the linked list. */
+    if( p_module == p_bank->first )
+    {
+        p_bank->first = p_module->next;
+    }
+
+    if( p_module->prev != NULL )
+    {
+        p_module->prev->next = p_module->next;
+    }
+
+    if( p_module->next != NULL )
+    {
+        p_module->next->prev = p_module->prev;
+    }
+
+    /* We free the structures that we strdup()ed in Allocate*Module(). */
+#ifdef HAVE_DYNAMIC_PLUGINS
+    if( !p_module->b_builtin )
+    {
+        free( p_module->is.plugin.psz_filename );
+    }
+#endif
+    free( p_module->psz_name );
+    free( p_module->psz_longname );
+    free( p_module->psz_version );
+
+    free( p_module );
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * LockModule: increase the usage count of a module and load it if needed.
+ *****************************************************************************
+ * This function has to be called before a thread starts using a module. If
+ * the module is already loaded, we just increase its usage count. If it isn't
+ * loaded, we have to dynamically open it and initialize it.
+ * If you successfully call LockModule() at any moment, be careful to call
+ * UnlockModule() when you don't need it anymore.
+ *****************************************************************************/
+static int LockModule( module_t * p_module )
+{
+    if( p_module->i_usage >= 0 )
+    {
+        /* This module is already loaded and activated, we can return */
+        p_module->i_usage++;
+        return( 0 );
+    }
+
+    if( p_module->b_builtin )
+    {
+        /* A built-in module should always have a refcount >= 0 ! */
+        intf_ErrMsg( "module error: built-in module `%s' has refcount %i",
+                     p_module->psz_name, p_module->i_usage );
+        return( -1 );
+    }
+
+#ifdef HAVE_DYNAMIC_PLUGINS
+    if( p_module->i_usage != -1 )
+    {
+        /* This shouldn't happen. Ever. We have serious problems here. */
+        intf_ErrMsg( "module error: plugin module `%s' has refcount %i",
+                     p_module->psz_name, p_module->i_usage );
+        return( -1 );
+    }
+
+    /* i_usage == -1, which means that the module isn't in memory */
+    if( module_load( p_module->is.plugin.psz_filename,
+                     &p_module->is.plugin.handle ) )
+    {
+        /* The plugin module couldn't be opened */
+        intf_ErrMsg( "module error: cannot open %s (%s)",
+                     p_module->is.plugin.psz_filename, module_error() );
+        return( -1 );
+    }
+
+    /* FIXME: what to do if the guy modified the plugin while it was
+     * unloaded ? It makes XMMS crash nastily, perhaps we should try
+     * to be a bit more clever here. */
+
+    /* Activate the module : fill the capability structure, etc. */
+    if( CallSymbol( p_module, "ActivateModule" ) != 0 )
+    {
+        /* We couldn't call ActivateModule() -- looks nasty, but
+         * we can't do much about it. Just try to unload module. */
+        module_unload( p_module->is.plugin.handle );
+        p_module->i_usage = -1;
+        return( -1 );
+    }
+
+    /* Everything worked fine ! The module is ready to be used */
+    p_module->i_usage = 1;
+#endif /* HAVE_DYNAMIC_PLUGINS */
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * UnlockModule: decrease the usage count of a module.
+ *****************************************************************************
+ * We decrease the usage count of a module so that we know when a module
+ * becomes unused and can be hidden.
+ *****************************************************************************/
+static int UnlockModule( module_t * p_module )
+{
+    if( p_module->i_usage <= 0 )
+    {
+        /* This shouldn't happen. Ever. We have serious problems here. */
+        intf_ErrMsg( "module error: trying to call module_Unneed() on `%s'"
+                     " which isn't even in use", p_module->psz_name );
+        return( -1 );
+    }
+
+    /* This module is still in use, we can return */
+    p_module->i_usage--;
+    p_module->i_unused_delay = 0;
+
+    return( 0 );
+}
+
+#ifdef HAVE_DYNAMIC_PLUGINS
 /*****************************************************************************
  * HideModule: remove a module from memory but keep its structure.
  *****************************************************************************
@@ -528,167 +822,14 @@ static int HideModule( module_t * p_module )
     {
         /* We couldn't call DeactivateModule() -- looks nasty, but
          * we can't do much about it. Just try to unload module anyway. */
-        module_unload( p_module->handle );
+        module_unload( p_module->is.plugin.handle );
         p_module->i_usage = -1;
         return( -1 );
     }
 
     /* Everything worked fine, we can safely unload the module. */
-    module_unload( p_module->handle );
+    module_unload( p_module->is.plugin.handle );
     p_module->i_usage = -1;
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * FreeModule: delete a module and its structure.
- *****************************************************************************
- * This function can only be called if i_usage <= 0.
- *****************************************************************************/
-static int FreeModule( module_bank_t * p_bank, module_t * p_module )
-{
-    /* If the module is not in use but is still in memory, we first have
-     * to hide it and remove it from memory before we can free the
-     * data structure. */
-    if( p_module->b_builtin )
-    {
-        if( p_module->i_usage != 0 )
-        {
-            intf_ErrMsg( "module error: trying to free builtin module `%s' with"
-                         " usage %i", p_module->psz_name, p_module->i_usage );
-            return( -1 );
-        }
-    }
-    else
-    {
-        if( p_module->i_usage >= 1 )
-        {
-            intf_ErrMsg( "module error: trying to free module `%s' which is"
-                         " still in use", p_module->psz_name );
-            return( -1 );
-        }
-
-        /* Two possibilities here: i_usage == -1 and the module is already
-         * unloaded, we can continue, or i_usage == 0, and we have to hide
-         * the module before going on. */
-        if( p_module->i_usage == 0 )
-        {
-            if( HideModule( p_module ) != 0 )
-            {
-                return( -1 );
-            }
-        }
-    }
-
-    /* Unlink the module from the linked list. */
-    if( p_module == p_bank->first )
-    {
-        p_bank->first = p_module->next;
-    }
-
-    if( p_module->prev != NULL )
-    {
-        p_module->prev->next = p_module->next;
-    }
-
-    if( p_module->next != NULL )
-    {
-        p_module->next->prev = p_module->prev;
-    }
-
-    /* We free the structures that we strdup()ed in Allocate*Module(). */
-    free( p_module->psz_filename );
-    free( p_module->psz_name );
-    free( p_module->psz_longname );
-    free( p_module->psz_version );
-
-    free( p_module );
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * LockModule: increase the usage count of a module and load it if needed.
- *****************************************************************************
- * This function has to be called before a thread starts using a module. If
- * the module is already loaded, we just increase its usage count. If it isn't
- * loaded, we have to dynamically open it and initialize it.
- * If you successfully call LockModule() at any moment, be careful to call
- * UnlockModule() when you don't need it anymore.
- *****************************************************************************/
-static int LockModule( module_t * p_module )
-{
-    if( p_module->i_usage >= 0 )
-    {
-        /* This module is already loaded and activated, we can return */
-        p_module->i_usage++;
-        return( 0 );
-    }
-
-    if( p_module->b_builtin )
-    {
-        /* A built-in module should always have a refcount >= 0 ! */
-        intf_ErrMsg( "module error: built-in module `%s' has refcount %i",
-                     p_module->psz_name, p_module->i_usage );
-        return( -1 );
-    }
-
-    if( p_module->i_usage != -1 )
-    {
-        /* This shouldn't happen. Ever. We have serious problems here. */
-        intf_ErrMsg( "module error: dynamic module `%s' has refcount %i",
-                     p_module->psz_name, p_module->i_usage );
-        return( -1 );
-    }
-
-    /* i_usage == -1, which means that the module isn't in memory */
-    if( module_load( p_module->psz_filename, &p_module->handle ) )
-    {
-        /* The dynamic module couldn't be opened */
-        intf_ErrMsg( "module error: cannot open %s (%s)",
-                     p_module->psz_filename, module_error() );
-        return( -1 );
-    }
-
-    /* FIXME: what to do if the guy modified the plugin while it was
-     * unloaded ? It makes XMMS crash nastily, perhaps we should try
-     * to be a bit more clever here. */
-
-    /* Activate the module : fill the capability structure, etc. */
-    if( CallSymbol( p_module, "ActivateModule" ) != 0 )
-    {
-        /* We couldn't call ActivateModule() -- looks nasty, but
-         * we can't do much about it. Just try to unload module. */
-        module_unload( p_module->handle );
-        p_module->i_usage = -1;
-        return( -1 );
-    }
-
-    /* Everything worked fine ! The module is ready to be used */
-    p_module->i_usage = 1;
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * UnlockModule: decrease the usage count of a module.
- *****************************************************************************
- * We decrease the usage count of a module so that we know when a module
- * becomes unused and can be hidden.
- *****************************************************************************/
-static int UnlockModule( module_t * p_module )
-{
-    if( p_module->i_usage <= 0 )
-    {
-        /* This shouldn't happen. Ever. We have serious problems here. */
-        intf_ErrMsg( "module error: trying to call module_Unneed() on `%s'"
-                     " which isn't even in use", p_module->psz_name );
-        return( -1 );
-    }
-
-    /* This module is still in use, we can return */
-    p_module->i_usage--;
-    p_module->i_unused_delay = 0;
 
     return( 0 );
 }
@@ -706,14 +847,15 @@ static int CallSymbol( module_t * p_module, char * psz_name )
     symbol_t * p_symbol;
 
     /* Try to resolve the symbol */
-    p_symbol = module_getsymbol( p_module->handle, psz_name );
+    p_symbol = module_getsymbol( p_module->is.plugin.handle, psz_name );
 
     if( !p_symbol )
     {
         /* We couldn't load the symbol */
-        intf_WarnMsg( 1, "module warning: "
+        intf_WarnMsg( 3, "module warning: "
                          "cannot find symbol %s in module %s (%s)",
-                         psz_name, p_module->psz_filename, module_error() );
+                         psz_name, p_module->is.plugin.psz_filename,
+                         module_error() );
         return( -1 );
     }
 
@@ -723,11 +865,12 @@ static int CallSymbol( module_t * p_module, char * psz_name )
         /* With a well-written module we shouldn't have to print an
          * additional error message here, but just make sure. */
         intf_ErrMsg( "module error: failed calling symbol %s in module %s",
-                     psz_name, p_module->psz_filename );
+                     psz_name, p_module->is.plugin.psz_filename );
         return( -1 );
     }
 
     /* Everything worked fine, we can return */
     return( 0 );
 }
+#endif /* HAVE_DYNAMIC_PLUGINS */
 

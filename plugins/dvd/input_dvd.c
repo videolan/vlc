@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.45 2001/04/13 05:36:12 stef Exp $
+ * $Id: input_dvd.c,v 1.46 2001/04/15 04:19:57 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -35,9 +35,9 @@
 #include "defs.h"
 
 #ifdef HAVE_CSS
-#define MODULE_NAME dvd-css
+#define MODULE_NAME dvd
 #else /* HAVE_CSS */
-#define MODULE_NAME dvd-nocss
+#define MODULE_NAME dvdnocss
 #endif /* HAVE_CSS */
 #include "modules_inner.h"
 

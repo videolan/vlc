@@ -2,7 +2,7 @@
  * idct.c : IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct.c,v 1.7 2001/02/20 07:49:13 sam Exp $
+ * $Id: idct.c,v 1.8 2001/04/15 04:19:57 sam Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -128,9 +128,9 @@ MODULE_DEACTIVATE
 static void idct_getfunctions( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = idct_Probe;
-    p_function_list->functions.idct.pf_init = vdec_InitIDCT;
-    p_function_list->functions.idct.pf_sparse_idct = vdec_SparseIDCT;
-    p_function_list->functions.idct.pf_idct = vdec_IDCT;
+    p_function_list->functions.idct.pf_init = _M( vdec_InitIDCT );
+    p_function_list->functions.idct.pf_sparse_idct = _M( vdec_SparseIDCT );
+    p_function_list->functions.idct.pf_idct = _M( vdec_IDCT );
     p_function_list->functions.idct.pf_norm_scan = vdec_NormScan;
 }
 
@@ -158,7 +158,7 @@ static void vdec_NormScan( u8 ppi_scan[2][64] )
 /*****************************************************************************
  * vdec_IDCT : IDCT function for normal matrices
  *****************************************************************************/
-void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block,
+void _M( vdec_IDCT )( vdec_thread_t * p_vdec, dctelem_t * p_block,
                 int i_idontcare )
 {
     s32 tmp0, tmp1, tmp2, tmp3;

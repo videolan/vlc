@@ -309,7 +309,7 @@ create_intf_window (void)
 
   menubar_subpictures = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (menubar_subpictures)->child),
-                                   _("Sub _Pictures"));
+                                   _("_Subtitles"));
   gtk_widget_add_accelerator (menubar_subpictures, "activate_item", menubar_settings_menu_accels,
                               tmp_key, 0, 0);
   gtk_widget_ref (menubar_subpictures);
@@ -770,7 +770,7 @@ create_intf_popup (void)
 
   popup_subpictures = gtk_menu_item_new_with_label ("");
   tmp_key = gtk_label_parse_uline (GTK_LABEL (GTK_BIN (popup_subpictures)->child),
-                                   _("_Subpictures"));
+                                   _("_Subtitles"));
   gtk_widget_add_accelerator (popup_subpictures, "activate_item", intf_popup_accels,
                               tmp_key, 0, 0);
   gtk_widget_ref (popup_subpictures);

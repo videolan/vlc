@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: dvd.c,v 1.6 2001/03/21 13:42:33 sam Exp $
+ * $Id: dvd.c,v 1.7 2001/04/15 04:19:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,9 +27,9 @@
 #include "defs.h"
 
 #ifdef HAVE_CSS
-#define MODULE_NAME dvd-css
-#else /* HAVE_CSS */
 #define MODULE_NAME dvd
+#else /* HAVE_CSS */
+#define MODULE_NAME dvdnocss
 #endif /* HAVE_CSS */
 #include "modules_inner.h"
 

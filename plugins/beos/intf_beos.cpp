@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.24 2001/04/12 11:10:16 tcastley Exp $
+ * $Id: intf_beos.cpp,v 1.25 2001/04/15 04:19:57 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -125,11 +125,11 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name , intf_thread_t 
 
 	menu_bar->AddItem( m = new BMenu("File") );
 	menu_bar->ResizeToPreferred();
-	m->AddItem( new BMenuItem("Open File...", new BMessage(OPEN_FILE), 'O'));
+	m->AddItem( new BMenuItem("Open File" B_UTF8_ELLIPSIS, new BMessage(OPEN_FILE), 'O'));
 	cd_menu = new CDMenu("Open Disc");
 	m->AddItem(cd_menu);
 	m->AddSeparatorItem();
-	m->AddItem( new BMenuItem("About...", new BMessage(B_ABOUT_REQUESTED), 'A'));
+	m->AddItem( new BMenuItem("About" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED), 'A'));
 	m->AddItem( new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED), 'Q'));
 
 	menu_bar->AddItem (am = new BMenu("Audio") );
