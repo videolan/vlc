@@ -568,22 +568,13 @@ package-macosx:
 ###############################################################################
 # Stamp rules
 ###############################################################################
-clean: clean-stamps
+clean: clean-stamp
 clean-stamp:
-	rm -f stamp-builtin stamp-pic
+	rm -f stamp-builtin
 
 stamp-builtin: FORCE
 	@for dep in "" `$(VLC_CONFIG) --target builtin`; do \
 	  if test "$${dep}" -nt "$(top_builddir)/vlc$(EXEEXT)"; then \
-	    rm -f $@; \
-	    break; \
-	  fi; \
-	done
-	@if test ! -f $@; then printf "" > $@; fi
-
-stamp-pic: FORCE
-	@for dep in "" `$(VLC_CONFIG) --target builtin pic`; do \
-	  if test "$${dep}" -nt "$(LIBRARIES_mozilla)"; then \
 	    rm -f $@; \
 	    break; \
 	  fi; \

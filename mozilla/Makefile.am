@@ -55,7 +55,7 @@ $(SOURCES_mozilla): vlcintf.h
 plugin_DATA = $(LIBRARIES_mozilla)
 plugindir = $(libdir)/mozilla/plugins
 $(LIBRARIES_mozilla): $(libplugin_a_OBJECTS) \
-	              $(libplugin_a_DEPENDENCIES) $(top_builddir)/stamp-pic
+	              $(libplugin_a_DEPENDENCIES) stamp-pic
 	$(CXXLINK) $(libplugin_a_OBJECTS) $(DATA_npvlc_rc) \
 	  $(top_builddir)/lib/libvlc_pic.a -shared \
 	  `$(VLC_CONFIG) --libs vlc mozilla builtin pic`
