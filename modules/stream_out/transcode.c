@@ -291,7 +291,7 @@ struct sout_stream_sys_t
     spu_t           *p_spu;
 
     /* Sync */
-    vlc_bool_t      b_audio_sync;
+    vlc_bool_t      b_master_sync;
     mtime_t         i_master_drift;
 };
 
@@ -473,8 +473,8 @@ static int Open( vlc_object_t *p_this )
     if( val.psz_string ) free( val.psz_string );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "audio-sync", &val );
-    p_sys->b_audio_sync = val.b_bool;
-    if( p_sys->f_fps > 0 ) p_sys->b_audio_sync = VLC_TRUE;
+    p_sys->b_master_sync = val.b_bool;
+    if( p_sys->f_fps > 0 ) p_sys->b_master_sync = VLC_TRUE;
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
@@ -780,6 +780,28 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if( !id->b_transcode && id->id )
     {
+        if( p_sys->b_master_sync && p_sys->i_master_drift )
+        {
+            if( p_buffer->i_dts > 0 )
+            {
+                p_buffer->i_dts -= p_sys->i_master_drift;
+                if( p_buffer->i_dts < 0 )
+                {
+                    block_Release( p_buffer );
+                    return VLC_EGENERIC;
+                }
+            }
+            if( p_buffer->i_pts > 0 )
+            {
+                p_buffer->i_pts -= p_sys->i_master_drift;
+                if( p_buffer->i_pts < 0 )
+                {
+                    block_Release( p_buffer );
+                    return VLC_EGENERIC;
+                }
+            }
+        }
+
         return p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
     }
     else if( !id->b_transcode )
@@ -1046,7 +1068,7 @@ static int transcode_audio_process( sout_stream_t *p_stream,
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
                                                           &in )) )
     {
-        if( p_sys->b_audio_sync )
+        if( p_sys->b_master_sync )
         {
             mtime_t i_dts = date_Get( &id->interpolated_pts ) + 1;
             p_sys->i_master_drift = p_audio_buf->start_date - i_dts;
@@ -1412,7 +1434,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
     {
         subpicture_t *p_subpic = 0;
 
-        if( p_sys->b_audio_sync )
+        if( p_sys->b_master_sync )
         {
             mtime_t i_video_drift;
             mtime_t i_master_drift = p_sys->i_master_drift;
@@ -1606,10 +1628,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
             p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
             block_ChainAppend( out, p_block );
 
-            if( p_sys->b_audio_sync )
+            if( p_sys->b_master_sync )
                 date_Increment( &id->interpolated_pts, 1 );
 
-            if( p_sys->b_audio_sync && i_duplicate > 1 )
+            if( p_sys->b_master_sync && i_duplicate > 1 )
             {
                 mtime_t i_pts = date_Get( &id->interpolated_pts ) + 1;
                 date_Increment( &id->interpolated_pts, 1 );
@@ -1875,7 +1897,7 @@ static int transcode_spu_process( sout_stream_t *p_stream,
     p_subpic = id->p_decoder->pf_decode_sub( id->p_decoder, &in );
     if( !p_subpic ) return VLC_EGENERIC;
 
-    if( p_sys->b_audio_sync && p_sys->i_master_drift )
+    if( p_sys->b_master_sync && p_sys->i_master_drift )
     {
         p_subpic->i_start -= p_sys->i_master_drift;
         if( p_subpic->i_stop ) p_subpic->i_stop -= p_sys->i_master_drift;
