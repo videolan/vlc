@@ -62,6 +62,8 @@ static void ShowDeviceProperties( vlc_object_t *, ICaptureGraphBuilder2 *,
                                   IBaseFilter *, vlc_bool_t );
 static void ShowTunerProperties( vlc_object_t *, ICaptureGraphBuilder2 *, 
                                  IBaseFilter *, vlc_bool_t );
+static void ConfigTuner( vlc_object_t *, ICaptureGraphBuilder2 *,
+                         IBaseFilter * );
 
 /*****************************************************************************
  * Module descriptor
@@ -70,6 +72,9 @@ static char *ppsz_vdev[] = { "", "none" };
 static char *ppsz_vdev_text[] = { N_("Default"), N_("None") };
 static char *ppsz_adev[] = { "", "none" };
 static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
+static int  pi_tuner_input[] = { 0, 1, 2 };
+static char *ppsz_tuner_input_text[] =
+    {N_("Default"), N_("Cable"), N_("Antenna")};
 
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
@@ -101,6 +106,17 @@ static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
 #define TUNER_TEXT N_("Tuner properties")
 #define TUNER_LONGTEXT N_( \
     "Show the tuner properties [channel selection] page." )
+#define CHANNEL_TEXT N_("Tuner TV Channel")
+#define CHANNEL_LONGTEXT N_( \
+    "Allows you to set the TV channel the tuner will set to " \
+    "(0 means default)." )
+#define COUNTRY_TEXT N_("Tuner country code")
+#define COUNTRY_LONGTEXT N_( \
+    "Allows you to set the tuner country code that establishes the current " \
+    "channel-to-frequency mapping (0 means default)." )
+#define TUNER_INPUT_TEXT N_("Tuner input type")
+#define TUNER_INPUT_LONGTEXT N_( \
+    "Allows you to select the tuner input type (Cable/Antenna)." )
 
 static int  CommonOpen ( vlc_object_t *, access_sys_t *, vlc_bool_t );
 static void CommonClose( vlc_object_t *, access_sys_t * );
@@ -137,6 +153,16 @@ vlc_module_begin();
 
     add_bool( "dshow-tuner", VLC_FALSE, NULL, TUNER_TEXT, TUNER_LONGTEXT,
               VLC_FALSE );
+
+    add_integer( "dshow-tuner-channel", 0, NULL, CHANNEL_TEXT,
+                 CHANNEL_LONGTEXT, VLC_TRUE );
+
+    add_integer( "dshow-tuner-country", 0, NULL, COUNTRY_TEXT,
+                 COUNTRY_LONGTEXT, VLC_TRUE );
+
+    add_integer( "dshow-tuner-input", 0, NULL, TUNER_INPUT_TEXT,
+                 TUNER_INPUT_LONGTEXT, VLC_TRUE );
+        change_integer_list( pi_tuner_input, ppsz_tuner_input_text, 0 );
 
     add_shortcut( "dshow" );
     set_capability( "access_demux", 0 );
@@ -298,6 +324,13 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                                val.psz_string[2], val.psz_string[3] );
     }
     if( val.psz_string ) free( val.psz_string );
+
+    var_Create( p_this, "dshow-tuner-channel",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "dshow-tuner-country",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_this, "dshow-tuner-input",
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     var_Create( p_this, "dshow-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
@@ -925,6 +958,9 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
             ShowTunerProperties( p_this, p_sys->p_capture_graph_builder2,
                                  p_device_filter, b_audio );
         }
+
+        ConfigTuner( p_this, p_sys->p_capture_graph_builder2,
+                     p_device_filter );
 
         dshow_stream.mt =
             p_capture_filter->CustomGetPin()->CustomGetMediaType();
@@ -1732,4 +1768,56 @@ static void ShowTunerProperties( vlc_object_t *p_this,
             p_TV->Release();
         }
     }
+}
+
+static void ConfigTuner( vlc_object_t *p_this,
+                         ICaptureGraphBuilder2 *p_capture_graph,
+                         IBaseFilter *p_device_filter )
+{
+    int i_channel, i_country, i_input;
+    long l_modes = 0;
+    IAMTVTuner *p_TV;
+    HRESULT hr;
+
+    if( !p_capture_graph ) return;
+
+    i_channel = var_GetInteger( p_this, "dshow-tuner-channel" );
+    i_country = var_GetInteger( p_this, "dshow-tuner-country" );
+    i_input = var_GetInteger( p_this, "dshow-tuner-input" );
+
+    if( !i_channel && !i_country && !i_input ) return; /* Nothing to do */
+
+    msg_Dbg( p_this, "tuner config: channel %i, country %i, input type %i",
+             i_channel, i_country, i_input );
+
+    hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                         &MEDIATYPE_Interleaved,
+                                         p_device_filter,
+                                         IID_IAMTVTuner, (void **)&p_TV );
+    if( FAILED(hr) )
+    {
+        hr = p_capture_graph->FindInterface( &PIN_CATEGORY_CAPTURE,
+                                             &MEDIATYPE_Video, p_device_filter,
+                                             IID_IAMTVTuner, (void **)&p_TV );
+    }
+
+    if( FAILED(hr) )
+    {
+        msg_Dbg( p_this, "couldn't find tuner interface" );
+        return;
+    }
+
+    hr = p_TV->GetAvailableModes( &l_modes );
+    if( SUCCEEDED(hr) && (l_modes & AMTUNER_MODE_TV) )
+    {
+        hr = p_TV->put_Mode( AMTUNER_MODE_TV );
+    }
+
+    if( i_input == 1 ) p_TV->put_InputType( 0, TunerInputCable );
+    else if( i_input == 2 ) p_TV->put_InputType( 0, TunerInputAntenna );
+
+    p_TV->put_CountryCode( i_country );
+    p_TV->put_Channel( i_channel, AMTUNER_SUBCHAN_NO_TUNE,
+                       AMTUNER_SUBCHAN_NO_TUNE );
+    p_TV->Release();
 }
