@@ -2,7 +2,7 @@
  * gtk_menu.h: prototypes for menu functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_menu.h,v 1.3 2001/05/19 00:39:30 stef Exp $
+ * $Id: gtk_menu.h,v 1.4 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -25,4 +25,16 @@
 struct intf_thread_s;
 
 gint GtkSetupMenus( struct intf_thread_s * );
+
+/*****************************************************************************
+ * String sizes
+ *****************************************************************************/
+#define GTK_MENU_LABEL_SIZE 64
+
+/*****************************************************************************
+ * Convert user_data structures to title and chapter information
+ *****************************************************************************/
+#define DATA2TITLE( user_data )    ( (gint)(user_data) >> 16 )
+#define DATA2CHAPTER( user_data )  ( (gint)(user_data) & 0xffff )
+#define POS2DATA( title, chapter ) ( ((title) << 16) | ((chapter) & 0xffff) )
 

@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.12 2001/05/31 01:37:08 sam Exp $
+ * $Id: aout_dummy.c,v 1.13 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,9 +50,9 @@
  *****************************************************************************/
 typedef struct aout_sys_s
 {
-#if defined( _MSC_VER )
+    /* Prevent malloc(0) */
     int i_dummy;
-#endif
+
 } aout_sys_t;
 
 /*****************************************************************************

@@ -11,109 +11,43 @@
 # 
 # All possible plugin directories, needed for make clean
 #
-PLUGINS_DIR :=	alsa beos darwin directx dsp dummy \
-		dvd esd fb ggi glide gtk \
-		downmix idct imdct \
-		macosx mga \
-		motion \
-		mpeg qt sdl \
-		text x11 yuv
+PLUGINS_DIR :=	alsa beos darwin directx dsp dummy dvd esd fb ggi glide gtk downmix idct imdct macosx mga motion mpeg qt sdl text x11 yuv
 
 #
 # All possible plugin objects
 #
-PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx \
-		dsp/dsp dummy/dummy dummy/null dvd/dvd esd/esd fb/fb \
-		ggi/ggi glide/glide gtk/gnome gtk/gtk \
-		downmix/downmix downmix/downmixsse downmix/downmix3dn \
-		idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext \
-		imdct/imdct imdct/imdct3dn imdct/imdctsse \
-		macosx/macosx mga/mga \
-		motion/motion motion/motionmmx motion/motionmmxext \
-		mpeg/es mpeg/ps mpeg/ts qt/qt sdl/sdl \
-		text/ncurses text/rc x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
+PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx dsp/dsp dummy/dummy dummy/null dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gtk/gnome gtk/gtk downmix/downmix downmix/downmixsse downmix/downmix3dn idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext imdct/imdct imdct/imdct3dn imdct/imdctsse macosx/macosx mga/mga motion/motion motion/motionmmx motion/motionmmxext mpeg/es mpeg/ps mpeg/ts qt/qt sdl/sdl text/ncurses text/rc x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
 
 #
 # C Objects
 # 
-INTERFACE :=	src/interface/main.o \
-		src/interface/interface.o \
-		src/interface/intf_msg.o \
-		src/interface/intf_playlist.o \
-		src/interface/intf_channels.o
+INTERFACE := main interface intf_msg intf_playlist intf_channels
+INPUT := input input_ext-dec input_ext-intf input_dec input_programs input_netlist input_clock mpeg_system
+VIDEO_OUTPUT := video_output video_text video_spu video_yuv
+AUDIO_OUTPUT := audio_output aout_ext-dec aout_u8 aout_s8 aout_u16 aout_s16 aout_spdif
+AC3_DECODER := ac3_decoder_thread ac3_decoder ac3_parse ac3_exponent ac3_bit_allocate ac3_mantissa ac3_rematrix ac3_imdct
+AC3_SPDIF := ac3_spdif ac3_iec958
+LPCM_DECODER := lpcm_decoder_thread
+AUDIO_DECODER := audio_decoder adec_generic adec_layer1 adec_layer2 adec_math
+SPU_DECODER := spu_decoder
+#GEN_DECODER := generic_decoder
+VIDEO_PARSER := video_parser vpar_headers vpar_blocks vpar_synchro video_fifo
+VIDEO_DECODER := video_decoder
+MISC := mtime tests modules netutils
 
-INPUT :=	src/input/input.o \
-		src/input/input_ext-dec.o \
-		src/input/input_ext-intf.o \
-		src/input/input_dec.o \
-		src/input/input_programs.o \
-		src/input/input_netlist.o \
-		src/input/input_clock.o \
-		src/input/mpeg_system.o
-
-AUDIO_OUTPUT :=	src/audio_output/audio_output.o \
-		src/audio_output/aout_ext-dec.o \
-		src/audio_output/aout_u8.o \
-		src/audio_output/aout_s8.o \
-		src/audio_output/aout_u16.o \
-		src/audio_output/aout_s16.o \
-	        src/audio_output/aout_spdif.o
-
-VIDEO_OUTPUT :=	src/video_output/video_output.o \
-		src/video_output/video_text.o \
-		src/video_output/video_spu.o \
-		src/video_output/video_yuv.o
-
-AC3_DECODER :=	src/ac3_decoder/ac3_decoder_thread.o \
-		src/ac3_decoder/ac3_decoder.o \
-		src/ac3_decoder/ac3_parse.o \
-		src/ac3_decoder/ac3_exponent.o \
-		src/ac3_decoder/ac3_bit_allocate.o \
-		src/ac3_decoder/ac3_mantissa.o \
-		src/ac3_decoder/ac3_rematrix.o \
-		src/ac3_decoder/ac3_imdct.o
-
-AC3_SPDIF :=	src/ac3_spdif/ac3_spdif.o \
-		src/ac3_spdif/ac3_iec958.o
-
-LPCM_DECODER :=	src/lpcm_decoder/lpcm_decoder_thread.o \
-
-AUDIO_DECODER :=	src/audio_decoder/audio_decoder.o \
-			src/audio_decoder/adec_generic.o \
-			src/audio_decoder/adec_layer1.o \
-			src/audio_decoder/adec_layer2.o \
-			src/audio_decoder/adec_math.o
-
-SPU_DECODER :=	src/spu_decoder/spu_decoder.o
-
-#GEN_DECODER :=	src/generic_decoder/generic_decoder.o
-
-VIDEO_PARSER :=	src/video_parser/video_parser.o \
-		src/video_parser/vpar_headers.o \
-		src/video_parser/vpar_blocks.o \
-		src/video_parser/vpar_synchro.o \
-		src/video_parser/video_fifo.o
-
-VIDEO_DECODER :=	src/video_decoder/video_decoder.o
-
-MISC :=		src/misc/mtime.o \
-		src/misc/tests.o \
-		src/misc/modules.o \
-		src/misc/netutils.o
-
-C_OBJ :=	$(INTERFACE) \
-		$(INPUT) \
-		$(VIDEO_OUTPUT) \
-		$(AUDIO_OUTPUT) \
-		$(AC3_DECODER) \
-		$(AC3_SPDIF) \
-		$(LPCM_DECODER) \
-		$(AUDIO_DECODER) \
-		$(SPU_DECODER) \
-		$(GEN_DECODER) \
-		$(VIDEO_PARSER) \
-		$(VIDEO_DECODER) \
-		$(MISC)
+C_OBJ :=	$(INTERFACE:%=src/interface/%.o) \
+		$(INPUT:%=src/input/%.o) \
+		$(VIDEO_OUTPUT:%=src/video_output/%.o) \
+		$(AUDIO_OUTPUT:%=src/audio_output/%.o) \
+		$(AC3_DECODER:%=src/ac3_decoder/%.o) \
+		$(AC3_SPDIF:%=src/ac3_spdif/%.o) \
+		$(LPCM_DECODER:%=src/lpcm_decoder/%.o) \
+		$(AUDIO_DECODER:%=src/audio_decoder/%.o) \
+		$(SPU_DECODER:%=src/spu_decoder/%.o) \
+		$(GEN_DECODER:%=src/generic_decoder/%.o) \
+		$(VIDEO_PARSER:%=src/video_parser/%.o) \
+		$(VIDEO_DECODER:%=src/video_decoder/%.o) \
+		$(MISC:%=src/misc/%.o)
 
 #
 # Misc Objects
@@ -163,13 +97,21 @@ export
 #
 all: vlc ${ALIASES} plugins vlc.app
 
-clean:
+clean: libdvdcss-clean plugins-clean vlc-clean
+	rm -f src/*/*.o extras/*/*.o
+	rm -f lib/*.so lib/*.so.* lib/*.a
+
+libdvdcss-clean:
+	cd extras/libdvdcss && $(MAKE) clean
+
+plugins-clean:
 	for dir in $(PLUGINS_DIR) ; do \
 		( cd plugins/$${dir} && $(MAKE) clean ) ; done
 	rm -f plugins/*/*.o plugins/*/*.moc plugins/*/*.bak
+
+vlc-clean:
 	rm -f $(C_OBJ) $(CPP_OBJ)
-	rm -f src/*/*.o extras/*/*.o
-	rm -f lib/*.so lib/*.a vlc gnome-vlc gvlc kvlc qvlc
+	rm -f vlc gnome-vlc gvlc kvlc qvlc
 	rm -Rf vlc.app
 
 distclean: clean
@@ -182,20 +124,27 @@ distclean: clean
 	rm -Rf .dep
 	rm -f .gdb_history
 
-install:
+install: libdvdcss-install vlc-install plugins-install
+
+vlc-install:
 	mkdir -p $(DESTDIR)$(bindir)
 	$(INSTALL) vlc $(DESTDIR)$(bindir)
 ifneq (,$(ALIASES))
 	for alias in $(ALIASES) ; do if test $$alias ; then rm -f $(DESTDIR)$(bindir)/$$alias && ln -s vlc $(DESTDIR)$(bindir)/$$alias ; fi ; done
 endif
-	mkdir -p $(DESTDIR)$(libdir)/videolan/vlc
-ifneq (,$(PLUGINS))
-	$(INSTALL) -m 644 $(PLUGINS:%=lib/%.so) $(DESTDIR)$(libdir)/videolan/vlc
-endif
 	mkdir -p $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.psf $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.png $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.xpm $(DESTDIR)$(datadir)/videolan
+
+plugins-install:
+	mkdir -p $(DESTDIR)$(libdir)/videolan/vlc
+ifneq (,$(PLUGINS))
+	$(INSTALL) -m 644 $(PLUGINS:%=lib/%.so) $(DESTDIR)$(libdir)/videolan/vlc
+endif
+
+libdvdcss-install:
+	cd extras/libdvdcss && $(MAKE) install
 
 show:
 	@echo CC: $(CC)

@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.9 2001/06/02 01:09:03 sam Exp $
+ * $Id: gtk_menu.c,v 1.10 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -92,7 +92,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf );
  * user_data to transmit intf_* and we need to refresh the other menu.
  ****************************************************************************/
 
-#define GtkLangToggle( intf, window, menu, type, callback, b_update )   \
+#define GTKLANGTOGGLE( intf, window, menu, type, callback, b_update )   \
     intf_thread_t *         p_intf;                                     \
     GtkWidget *             p_menu;                                     \
     es_descriptor_t *       p_es;                                       \
@@ -123,13 +123,13 @@ gint GtkSetupMenus( intf_thread_t * p_intf );
 
 void GtkMenubarAudioToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkLangToggle( "intf_window", p_popup, "popup_audio", AUDIO_ES,
+    GTKLANGTOGGLE( "intf_window", p_popup, "popup_audio", AUDIO_ES,
                    GtkPopupAudioToggle, b_audio_update );
 }
 
 void GtkPopupAudioToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkLangToggle( "intf_popup", p_window, "menubar_audio", AUDIO_ES,
+    GTKLANGTOGGLE( "intf_popup", p_window, "menubar_audio", AUDIO_ES,
                    GtkMenubarAudioToggle, b_audio_update );
 }
 
@@ -139,17 +139,17 @@ void GtkPopupAudioToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 
 void GtkMenubarSubtitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkLangToggle( "intf_window", p_popup, "popup_subpictures", SPU_ES,
+    GTKLANGTOGGLE( "intf_window", p_popup, "popup_subpictures", SPU_ES,
                    GtkPopupSubtitleToggle, b_spu_update );
 }
 
 void GtkPopupSubtitleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkLangToggle( "intf_popup", p_window, "menubar_subpictures", SPU_ES,
+    GTKLANGTOGGLE( "intf_popup", p_window, "menubar_subpictures", SPU_ES,
                    GtkMenubarSubtitleToggle, b_spu_update );
 }
 
-#undef GtkLangToggle
+#undef GTKLANGTOGGLE
 
 /*
  * Navigation
@@ -259,7 +259,7 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
  * Angle
  */
 
-#define GtkAngleToggle( intf, window, menu, callback )                      \
+#define GTKANGLETOGGLE( intf, window, menu, callback )                      \
     intf_thread_t * p_intf;                                                 \
     GtkWidget *     p_menu;                                                 \
     input_area_t *  p_area;                                                 \
@@ -285,17 +285,17 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 
 void GtkMenubarAngleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkAngleToggle( "intf_window", p_popup, "popup_angle",
+    GTKANGLETOGGLE( "intf_window", p_popup, "popup_angle",
                     GtkPopupAngleToggle );
 }
 
 void GtkPopupAngleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GtkAngleToggle( "intf_popup", p_window, "menubar_angle",
+    GTKANGLETOGGLE( "intf_popup", p_window, "menubar_angle",
                     GtkMenubarAngleToggle );
 }
 
-#undef GtkAngleToggle
+#undef GTKANGLETOGGLE
 
 /****************************************************************************
  * Functions to generate menus

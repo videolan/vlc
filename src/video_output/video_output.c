@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.131 2001/05/31 03:57:54 sam Exp $
+ * $Id: video_output.c,v 1.132 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -979,6 +979,7 @@ static void RunThread( vout_thread_t *p_vout)
     while( (!p_vout->b_die) && (!p_vout->b_error) )
     {
         /* Initialize loop variables */
+        p_vout->p_rendered_pic = NULL;
         p_pic =         NULL;
         p_subpic =      NULL;
         p_ephemer =     NULL;

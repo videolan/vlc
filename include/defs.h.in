@@ -37,6 +37,9 @@
 /* Define if you have the setenv function.  */
 #undef HAVE_SETENV
 
+/* Define if you have the sigrelse function.  */
+#undef HAVE_SIGRELSE
+
 /* Define if you have the strerror function.  */
 #undef HAVE_STRERROR
 
@@ -72,6 +75,9 @@
 
 /* Define if you have the <cthreads.h> header file.  */
 #undef HAVE_CTHREADS_H
+
+/* Define if you have the <directx.h> header file.  */
+#undef HAVE_DIRECTX_H
 
 /* Define if you have the <dlfcn.h> header file.  */
 #undef HAVE_DLFCN_H
@@ -139,6 +145,12 @@
 /* Define if you have the <unistd.h> header file.  */
 #undef HAVE_UNISTD_H
 
+/* Define if you have the <videolan/dvdcss.h> header file.  */
+#undef HAVE_VIDEOLAN_DVDCSS_H
+
+/* Define if you have the pth library (-lpth).  */
+#undef HAVE_LIBPTH
+
 /* long getopt support */
 #undef HAVE_GETOPT_LONG
 
@@ -171,6 +183,9 @@
 
 /* Define if <linux/cdrom.h> defines DVD_STRUCT. */
 #undef DVD_STRUCT_IN_LINUX_CDROM_H
+
+/* Define if <pth.h> defines pth_init */
+#undef PTH_INIT_IN_PTH_H
 
 /* Define if you want DVD CSS decryption. */
 #undef HAVE_CSS

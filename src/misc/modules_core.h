@@ -2,7 +2,7 @@
  * modules_core.h : Module management functions used by the core application.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules_core.h,v 1.1 2001/06/02 01:09:03 sam Exp $
+ * $Id: modules_core.h,v 1.2 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -116,6 +116,7 @@ module_getsymbol( module_handle_t handle, char * psz_function )
 
 #else
     return( dlsym( handle, psz_function ) );
+
 #endif
 }
 

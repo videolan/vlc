@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_directx.c,v 1.2 2001/06/03 12:47:21 sam Exp $
+ * $Id: aout_directx.c,v 1.3 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -24,7 +24,7 @@
 #define MODULE_NAME directx
 #include "modules_inner.h"
 
-/* The most important this to do for now is to fix the audio bug we've got
+/* The most important thing to do for now is to fix the audio bug we've got
  * on startup: the audio will start later than the video (sometimes) and
  * is trying to catching up with it.
  * At first sight it seems to be a scheduling problem
@@ -77,6 +77,8 @@ typedef struct aout_sys_s
                                        * takes care of mixing all the
                                        * secondary buffers into the primary) */
 
+    HINSTANCE           hdsound_dll;      /* handle of the opened dsound dll */
+
     long l_buffer_size;                       /* secondary sound buffer size */
     long l_write_position;             /* next write position for the buffer */
 
@@ -96,7 +98,8 @@ static void    aout_Play        ( aout_thread_t *p_aout,
 static void    aout_Close       ( aout_thread_t *p_aout );
 
 /* local function */
-static int windx_CreateSecondaryBuffer( aout_thread_t *p_aout );
+static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout );
+static int DirectxInitDSound( aout_thread_t *p_aout );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -135,11 +138,11 @@ static int aout_Probe( probedata_t *p_data )
  *****************************************************************************/
 static int aout_Open( aout_thread_t *p_aout )
 {
-#if 0
     HRESULT dsresult;
     DSBUFFERDESC dsbuffer_desc;
     WAVEFORMATEX waveformat;
-#endif
+
+    intf_WarnMsg( 3, "aout: DirectX aout_Open ");
 
    /* Allocate structure */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
@@ -162,32 +165,13 @@ static int aout_Open( aout_thread_t *p_aout )
     p_aout->l_rate     = main_GetIntVariable( AOUT_RATE_VAR,
                                               AOUT_RATE_DEFAULT );
 
-    /* Create the direct sound object */
-    if( DirectSoundCreate(NULL, &p_aout->p_sys->p_dsobject, NULL) != DS_OK )
+    /* Initialise DirectSound */
+    if( DirectxInitDSound( p_aout ) )
     {
-        intf_WarnMsg( 3, "aout: can't create a direct sound device ");
-        p_aout->p_sys->p_dsobject = NULL;
+        intf_WarnMsg( 3, "aout: can't initialise DirectSound ");
         return( 1 );
     }
 
-    /* Set DirectSound Cooperative level, ie what control we want over Windows
-     * sound device. In our case, DSSCL_EXCLUSIVE means that we can modify the
-     * settings of the primary buffer, but also that only the sound of our
-     * application will be hearable when it will have the focus.
-     * !!! (this is not really working as intended yet because to set the
-     * cooperative level you need the window handle of your application, and
-     * I don't know of any easy way to get it. Especially since we might play
-     * sound without any video, and so what window handle should we use ???
-     * The hack for now is to use the Desktop window handle - it seems to be
-     * working */
-    if( IDirectSound_SetCooperativeLevel(p_aout->p_sys->p_dsobject,
-                                         GetDesktopWindow(),
-                                         DSSCL_EXCLUSIVE) )
-    {
-        intf_WarnMsg( 3, "aout: can't set direct sound cooperative level ");
-    }
-
-#if 0
     /* Obtain (not create) Direct Sound primary buffer */
     memset( &dsbuffer_desc, 0, sizeof(DSBUFFERDESC) );
     dsbuffer_desc.dwSize = sizeof(DSBUFFERDESC);
@@ -240,21 +224,6 @@ static int aout_Open( aout_thread_t *p_aout )
         p_aout->p_sys->p_dsbuffer_primary = NULL;
         return( 1 );
     }
-#endif
-
-    /* Now create the buffer that we'll actually use: the secondary buffer */
-    if( windx_CreateSecondaryBuffer( p_aout ) )
-    {
-        intf_WarnMsg( 3, "aout: can't create direct sound secondary buffer ");
-#if 0
-        IDirectSound_Release( p_aout->p_sys->p_dsbuffer_primary );
-#endif
-        IDirectSound_Release( p_aout->p_sys->p_dsobject );
-        p_aout->p_sys->p_dsobject = NULL;
-        p_aout->p_sys->p_dsbuffer_primary = NULL;
-        p_aout->p_sys->p_dsbuffer = NULL;
-        return( 1 );
-    }
 
     return( 0 );
 }
@@ -270,6 +239,8 @@ static int aout_SetFormat( aout_thread_t *p_aout )
 {
     HRESULT dsresult;
 
+    intf_WarnMsg( 3, "aout: DirectX aout_SetFormat ");
+
     /* first release the current secondary buffer */
     if( p_aout->p_sys->p_dsbuffer != NULL )
     {
@@ -278,10 +249,10 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     }
 
     /* then create a new secondary buffer */
-    dsresult = windx_CreateSecondaryBuffer( p_aout );    
+    dsresult = DirectxCreateSecondaryBuffer( p_aout );    
     if( dsresult != DS_OK )
     {
-        intf_WarnMsg( 3, "aout: WinDX aout_SetFormat cannot create buffer");
+        intf_WarnMsg( 3, "aout: DirectX aout_SetFormat cannot create buffer");
         return( 1 );
     }
   
@@ -311,16 +282,25 @@ static long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
     }
     if( dsresult != DS_OK )
     {
-        intf_WarnMsg( 3, "aout: WinDX aout_GetBufInfo cannot get current pos");
+        intf_WarnMsg(3,"aout: DirectX aout_GetBufInfo cannot get current pos");
         return( l_buffer_limit );
     }
 
-    l_result = ((p_aout->p_sys->l_write_position >= l_play_position) ?
-                (p_aout->p_sys->l_write_position - l_play_position)/2
-                : (p_aout->p_sys->l_buffer_size - l_play_position
-                    + p_aout->p_sys->l_write_position)/2 );
+    /* temporary hack. When you start playing a new file, the play position
+     * doesn't start changing immediatly, even though sound is already
+     * playing from the sound card */
+    if( l_play_position == 0 )
+    { 
+       intf_WarnMsg( 5, "aout: DirectX aout_GetBufInfo: %li", l_buffer_limit);
+       return( l_buffer_limit );
+    }
 
-    intf_WarnMsg( 5, "aout: WinDX aout_GetBufInfo: %li", l_result);
+    l_result = (p_aout->p_sys->l_write_position >= l_play_position) ?
+      (p_aout->p_sys->l_write_position - l_play_position) /2
+               : (p_aout->p_sys->l_buffer_size - l_play_position
+                  + p_aout->p_sys->l_write_position) /2 ;
+
+    intf_WarnMsg( 5, "aout: DirectX aout_GetBufInfo: %li", l_result);
     return l_result;
 }
 
@@ -336,7 +316,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     long            l_play_position, l_notused, l_buffer_free_length;
     HRESULT         dsresult;
 
-    /* We want to copy data to the circular sound buffer, so first we need to
+    /* We want to copy data to the circular sound buffer, so we first need to
      * find out were in the buffer we can write our data */
     dsresult = IDirectSoundBuffer_GetCurrentPosition(p_aout->p_sys->p_dsbuffer,
                                                      &l_play_position,
@@ -351,20 +331,31 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     }
     if( dsresult != DS_OK )
     {
-        intf_WarnMsg( 3, "aout: WinDX aout_Play can'get buffer position");
+        intf_WarnMsg( 3, "aout: DirectX aout_Play can'get buffer position");
     }
 
     /* check that we are not overflowing the circular buffer (everything should
      * be alright but just in case) */
     l_buffer_free_length =  l_play_position - p_aout->p_sys->l_write_position;
     if( l_buffer_free_length <= 0 )
-        l_buffer_free_length += p_aout->p_sys->l_buffer_size  ;
+        l_buffer_free_length += p_aout->p_sys->l_buffer_size;
 
     if( i_size > l_buffer_free_length )
     {
-        intf_WarnMsg( 3, "aout: WinDX aout_Play buffer overflow: size %i, free %i !!!", i_size, l_buffer_free_length);
-        intf_WarnMsg( 3, "aout: WinDX aout_Play buffer overflow: writepos %i, readpos %i !!!", l_play_position, p_aout->p_sys->l_write_position);
+        intf_WarnMsg( 3, "aout: DirectX aout_Play buffer overflow: size %i, free %i !!!", i_size, l_buffer_free_length);
+        intf_WarnMsg( 3, "aout: DirectX aout_Play buffer overflow: writepos %i, readpos %i !!!", p_aout->p_sys->l_write_position, l_play_position);
         /*i_size = l_buffer_free_length;*/
+
+        /* Update the write pointer */
+        p_aout->p_sys->l_write_position = l_notused;
+
+    }
+    else
+    {
+        intf_WarnMsg( 4, "aout: DirectX aout_Play buffer: size %i, free %i !!!"
+                      , i_size, l_buffer_free_length);
+        intf_WarnMsg( 4, "aout: DirectX aout_Play buffer: writepos %i, readpos %i !!!", p_aout->p_sys->l_write_position, l_play_position);
+
     }
 
     /* Before copying anything, we have to lock the buffer */
@@ -391,7 +382,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     }
     if( dsresult != DS_OK )
     {
-        intf_WarnMsg( 3, "aout: WinDX aout_Play can't lock buffer");
+        intf_WarnMsg( 3, "aout: DirectX aout_Play can't lock buffer");
         return;
     }
 
@@ -423,7 +414,7 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
     }
     if( dsresult != DS_OK )
     {
-        intf_WarnMsg( 3, "aout: WinDX aout_Play can't play buffer");
+        intf_WarnMsg( 3, "aout: DirectX aout_Play can't play buffer");
         return;
     }
 
@@ -434,6 +425,9 @@ static void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
  *****************************************************************************/
 static void aout_Close( aout_thread_t *p_aout )
 {
+
+    intf_WarnMsg( 3, "aout: DirectX aout_Close ");
+
     /* make sure the buffer isn't playing */
     if( p_aout->p_sys->p_dsbuffer != NULL )
     {
@@ -461,6 +455,13 @@ static void aout_Close( aout_thread_t *p_aout )
         p_aout->p_sys->p_dsobject = NULL;
     }  
     
+    /* free DSOUND.DLL */
+    if( p_aout->p_sys->hdsound_dll != NULL )
+    {
+       FreeLibrary( p_aout->p_sys->hdsound_dll );
+       p_aout->p_sys->hdsound_dll = NULL;
+    }
+
     /* Close the Output. */
     if ( p_aout->p_sys != NULL )
     { 
@@ -470,7 +471,63 @@ static void aout_Close( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * windx_CreateSecondaryBuffer
+ * DirectxInitDSound
+ *****************************************************************************
+ *****************************************************************************/
+static int DirectxInitDSound( aout_thread_t *p_aout )
+{
+    HRESULT (WINAPI *OurDirectSoundCreate)(LPGUID, LPDIRECTSOUND *, LPUNKNOWN);
+
+    p_aout->p_sys->hdsound_dll = LoadLibrary("DSOUND.DLL");
+    if( p_aout->p_sys->hdsound_dll == NULL )
+    {
+      intf_WarnMsg( 3, "aout: can't open DSOUND.DLL ");
+      return( 1 );
+    }
+
+    OurDirectSoundCreate = (void *)GetProcAddress( p_aout->p_sys->hdsound_dll,
+                                                   "DirectSoundCreate" );
+
+    if( OurDirectSoundCreate == NULL )
+    {
+      intf_WarnMsg( 3, "aout: GetProcAddress FAILED ");
+      FreeLibrary( p_aout->p_sys->hdsound_dll );
+      p_aout->p_sys->hdsound_dll = NULL;
+      return( 1 );
+    }
+
+    /* Create the direct sound object */
+    if( OurDirectSoundCreate(NULL, &p_aout->p_sys->p_dsobject, NULL) != DS_OK )
+    {
+        intf_WarnMsg( 3, "aout: can't create a direct sound device ");
+        p_aout->p_sys->p_dsobject = NULL;
+        FreeLibrary( p_aout->p_sys->hdsound_dll );
+        p_aout->p_sys->hdsound_dll = NULL;
+        return( 1 );
+    }
+
+    /* Set DirectSound Cooperative level, ie what control we want over Windows
+     * sound device. In our case, DSSCL_EXCLUSIVE means that we can modify the
+     * settings of the primary buffer, but also that only the sound of our
+     * application will be hearable when it will have the focus.
+     * !!! (this is not really working as intended yet because to set the
+     * cooperative level you need the window handle of your application, and
+     * I don't know of any easy way to get it. Especially since we might play
+     * sound without any video, and so what window handle should we use ???
+     * The hack for now is to use the Desktop window handle - it seems to be
+     * working */
+    if( IDirectSound_SetCooperativeLevel(p_aout->p_sys->p_dsobject,
+                                         GetDesktopWindow(),
+                                         DSSCL_EXCLUSIVE) )
+    {
+        intf_WarnMsg( 3, "aout: can't set direct sound cooperative level ");
+    }
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * DirectxCreateSecondaryBuffer
  *****************************************************************************
  * This function creates the buffer we'll use to play audio.
  * In DirectSound there are two kinds of buffers:
@@ -481,7 +538,7 @@ static void aout_Close( aout_thread_t *p_aout )
  * Once you create a secondary buffer, you cannot change its format anymore so
  * you have to release the current and create another one.
  *****************************************************************************/
-static int windx_CreateSecondaryBuffer( aout_thread_t *p_aout )
+static int DirectxCreateSecondaryBuffer( aout_thread_t *p_aout )
 {
     WAVEFORMATEX waveformat;
     DSBUFFERDESC dsbdesc;
@@ -504,10 +561,6 @@ static int windx_CreateSecondaryBuffer( aout_thread_t *p_aout )
     dsbdesc.dwSize = sizeof(DSBUFFERDESC); 
     dsbdesc.dwFlags = DSBCAPS_GETCURRENTPOSITION2/* Better position accuracy */
                     | DSBCAPS_GLOBALFOCUS;      /* Allows background playing */
-    /*              | DSBCAPS_CTRLPAN
-                    | DSBCAPS_CTRLVOLUME
-                    | DSBCAPS_CTRLFREQUENCY;
-    */
     dsbdesc.dwBufferBytes = waveformat.nAvgBytesPerSec * 4; /* 4 sec buffer */
     dsbdesc.lpwfxFormat = &waveformat; 
  
@@ -523,32 +576,12 @@ static int windx_CreateSecondaryBuffer( aout_thread_t *p_aout )
 
     /* backup the size of the secondary sound buffer */
     memset(&dsbcaps, 0, sizeof(DSBCAPS)); 
-    dsbcaps.dwSize = sizeof(DSBCAPS); 
+    dsbcaps.dwSize = sizeof(DSBCAPS);
     IDirectSoundBuffer_GetCaps( p_aout->p_sys->p_dsbuffer, &dsbcaps  );
     p_aout->p_sys->l_buffer_size = dsbcaps.dwBufferBytes;
     p_aout->p_sys->l_write_position = 0;
-    intf_WarnMsg( 3, "aout: WinDX WinDX_CreateSecondaryBuffer: %li",
+    intf_WarnMsg( 3, "aout: DirectX DirectxCreateSecondaryBuffer: %li",
                   p_aout->p_sys->l_buffer_size);
-
-    /* make sure the buffer isn't playing */
-    IDirectSoundBuffer_Stop( p_aout->p_sys->p_dsbuffer );
-
-    /* reset play position, just to be sure (and after some tests it seems
-     * indeed necessary */
-    dsresult = IDirectSoundBuffer_SetCurrentPosition(p_aout->p_sys->p_dsbuffer,
-                                                     0 );
-    if( dsresult == DSERR_BUFFERLOST )
-    {
-        IDirectSoundBuffer_Restore( p_aout->p_sys->p_dsbuffer );
-        dsresult = IDirectSoundBuffer_SetCurrentPosition(
-                                                 p_aout->p_sys->p_dsbuffer,
-                                                 0 );
-    }
-    if( dsresult != DS_OK )
-    {
-        intf_WarnMsg( 3, "aout: WinDX CreateSecondary cannot wet current pos");
-    }
 
     return( 0 );
 }
-

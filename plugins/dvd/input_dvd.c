@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.72 2001/06/13 00:03:08 stef Exp $
+ * $Id: input_dvd.c,v 1.73 2001/06/14 01:49:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -215,7 +215,6 @@ static void DVDInit( input_thread_t * p_input )
     input_area_t *       p_area;
     int                  i_title;
     int                  i_chapter;
-    int                  i_ret;
     int                  i;
 
     p_dvd = malloc( sizeof(thread_dvd_data_t) );
@@ -229,29 +228,21 @@ static void DVDInit( input_thread_t * p_input )
     p_input->p_plugin_data = (void *)p_dvd;
     p_input->p_method_data = NULL;
 
-    p_dvd->dvdhandle = dvdcss_init( DVDCSS_INIT_QUIET );
-
-    if( p_dvd->dvdhandle == NULL )
-    {
-        free( p_dvd );
-        p_input->b_error = 1;
-        return;
-    }
-
     /* XXX: put this shit in an access plugin */
     if( strlen( p_input->p_source ) > 4
          && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
-        i_ret = dvdcss_open( p_dvd->dvdhandle, p_input->p_source + 4 );
+        p_dvd->dvdhandle = dvdcss_open( p_input->p_source + 4,
+                                        DVDCSS_INIT_QUIET );
     }
     else
     {
-        i_ret = dvdcss_open( p_dvd->dvdhandle, p_input->p_source );
+        p_dvd->dvdhandle = dvdcss_open( p_input->p_source,
+                                        DVDCSS_INIT_QUIET );
     }
 
-    if( i_ret < 0 )
+    if( p_dvd->dvdhandle == NULL )
     {
-        dvdcss_end( p_dvd->dvdhandle );
         free( p_dvd );
         p_input->b_error = 1;
         return;
@@ -276,7 +267,6 @@ static void DVDInit( input_thread_t * p_input )
     {
         intf_ErrMsg( "dvd error: allcation error in ifo" );
         dvdcss_close( p_dvd->dvdhandle );
-        dvdcss_end( p_dvd->dvdhandle );
         free( p_dvd );
         p_input->b_error = 1;
         return;
@@ -287,7 +277,6 @@ static void DVDInit( input_thread_t * p_input )
         intf_ErrMsg( "dvd error: fatal failure in ifo" );
         IfoDestroy( p_dvd->p_ifo );
         dvdcss_close( p_dvd->dvdhandle );
-        dvdcss_end( p_dvd->dvdhandle );
         free( p_dvd );
         p_input->b_error = 1;
         return;
@@ -378,7 +367,6 @@ static void DVDEnd( input_thread_t * p_input )
 
     /* Clean up libdvdcss */
     dvdcss_close( p_dvd->dvdhandle );
-    dvdcss_end( p_dvd->dvdhandle );
 
     free( p_dvd );
 
@@ -441,10 +429,8 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_title_id =
             vts.title_inf.p_title_start[i_vts_title-1].i_title_id;
 
-        intf_WarnMsg( 3, "dvd: title %d vts_title %d pgc %d",
-                        p_dvd->i_title,
-                        i_vts_title,
-                        p_dvd->i_title_id );
+        intf_WarnMsgImm( 3, "dvd: title %d vts_title %d pgc %d",
+                         p_dvd->i_title, i_vts_title, p_dvd->i_title_id );
 
         /*
          * CSS cracking has to be done again
@@ -473,7 +459,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
 
         /* last video cell */
         p_dvd->i_cell = 0;
-	intf_FlushMsg();
         p_dvd->i_prg_cell = -1 +
             vts.title_unit.p_title[p_dvd->i_title_id-1].title.i_cell_nb;
 

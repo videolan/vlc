@@ -55,6 +55,7 @@ prefix = @prefix@
 bindir = @bindir@
 datadir = @datadir@
 libdir = @libdir@
+includedir = @includedir@
 
 #
 # Libraries for special cases
@@ -86,6 +87,11 @@ CFLAGS_DVD = @CFLAGS_DVD@
 CFLAGS_GTK = @CFLAGS_GTK@
 CFLAGS_SDL = @CFLAGS_SDL@
 CFLAGS_X11 = @CFLAGS_X11@
+
+#
+# Other special cases
+#
+LOCAL_LIBDVDCSS = @LOCAL_LIBDVDCSS@
 
 ###############################################################################
 # Configuration pre-processing
@@ -141,21 +147,27 @@ INCLUDE += @INCLUDE@
 INCLUDE += -Iinclude -Iextras -I/usr/local/include
 
 #
-# Libraries
-#
-LIB += @LIB@ -L/usr/local/lib
-
-ifneq (,$(findstring mingw32,$(SYS)))
-LIB += -lws2_32 -lnetapi32
-endif
-
-#
 # Libraries needed by built-in modules
 #
 ifneq (,$(BUILTINS))
 LIB_BUILTINS := $(shell for i in ${BUILTINS} ; do echo $$i | tr '[a-z]' '[A-Z]' | sed -e 's/.*/$$LIB_&/' ; done)
 LIB += $(LIB_BUILTINS)
 endif
+
+#
+# Libraries
+#
+ifeq (1,$(LOCAL_LIBDVDCSS))
+ifneq (,$(findstring dvd,$(BUILTINS)))
+LIB += lib/libdvdcss.a
+endif
+endif
+
+ifneq (,$(findstring mingw32,$(SYS)))
+LIB += -lws2_32 -lnetapi32
+endif
+
+LIB += -L/usr/local/lib @LIB@
 
 #
 # C compiler flags: mainstream compilation

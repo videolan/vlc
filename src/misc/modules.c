@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.34 2001/06/03 12:47:22 sam Exp $
+ * $Id: modules.c,v 1.35 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -515,10 +515,27 @@ static int AllocatePluginModule( char * psz_filename )
             || p_module->psz_version == NULL )
     {
         intf_ErrMsg( "module error: can't duplicate strings" );
-        free( p_module->is.plugin.psz_filename );
-        free( p_module->psz_name );
-        free( p_module->psz_longname );
-        free( p_module->psz_version );
+
+        if( p_module->is.plugin.psz_filename != NULL )
+        {
+            free( p_module->is.plugin.psz_filename );
+        }
+
+        if( p_module->psz_name != NULL )
+        {
+            free( p_module->psz_name );
+        }
+
+        if( p_module->psz_longname != NULL )
+        {
+            free( p_module->psz_longname );
+        }
+
+        if( p_module->psz_version != NULL )
+        {
+            free( p_module->psz_version );
+        }
+
         free( p_module );
         module_unload( handle );
         return( -1 );
@@ -619,9 +636,22 @@ static int AllocateBuiltinModule( int ( *pf_init ) ( module_t * ),
             || p_module->psz_version == NULL )
     {
         intf_ErrMsg( "module error: can't duplicate strings" );
-        free( p_module->psz_name );
-        free( p_module->psz_longname );
-        free( p_module->psz_version );
+
+        if( p_module->psz_name != NULL )
+        {
+            free( p_module->psz_name );
+        }
+
+        if( p_module->psz_longname != NULL )
+        {
+            free( p_module->psz_longname );
+        }
+
+        if( p_module->psz_version != NULL )
+        {
+            free( p_module->psz_version );
+        }
+
         free( p_module );
         return( -1 );
     }

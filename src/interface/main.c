@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.102 2001/06/12 22:14:44 sam Exp $
+ * $Id: main.c,v 1.103 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -252,6 +252,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_vout_bank   = &vout_bank;
 
     /*
+     * Initialize threads
+     */
+#if defined( PTH_INIT_IN_PTH_H )
+    pth_init( );
+#endif
+
+    /*
      * Test if our code is likely to run on this CPU 
      */
     p_main->i_cpu_capabilities = CPUCapabilities();
@@ -385,11 +392,16 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     system_End();
 #endif
 
+
     /*
      * Terminate messages interface and program
      */
     intf_Msg( "intf: program terminated" );
     intf_MsgDestroy();
+
+#if defined( PTH_INIT_IN_PTH_H )
+    pth_kill( );
+#endif
 
     return 0;
 }
@@ -926,7 +938,9 @@ static void InstructionSignalHandler( int i_signal )
 
     i_illegal = 1;
     
+#ifdef HAVE_SIGRELSE
     sigrelse( i_signal );
+#endif
     longjmp( env, 1 );
 }
 
@@ -980,7 +994,7 @@ static int CPUCapabilities( void )
     volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
     volatile boolean_t     b_amd;
 
-    signal( SIGILL,  InstructionSignalHandler );
+    signal( SIGILL, InstructionSignalHandler );
     
     /* test for a 486 CPU */
     asm volatile ( "pushfl\n\t"

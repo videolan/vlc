@@ -2,7 +2,7 @@
  * intf_gtk.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.h,v 1.6 2001/05/23 23:08:20 stef Exp $
+ * $Id: intf_gtk.h,v 1.7 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -26,18 +26,6 @@
  *****************************************************************************/
 #define DROP_ACCEPT_TEXT_URI_LIST  0
 #define DROP_ACCEPT_TEXT_PLAIN     1
-
-/*****************************************************************************
- * String sizes
- *****************************************************************************/
-#define GTK_MENU_LABEL_SIZE 64
-
-/*****************************************************************************
- * Convert user_data structures to title and chapter information
- *****************************************************************************/
-#define DATA2TITLE( user_data )    ( (gint)(user_data) >> 16 )
-#define DATA2CHAPTER( user_data )  ( (gint)(user_data) & 0xffff )
-#define POS2DATA( title, chapter ) ( ((title) << 16) | ((chapter) & 0xffff) )
 
 /*****************************************************************************
  * Useful inline function

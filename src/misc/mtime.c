@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mtime.c,v 1.21 2001/05/31 12:45:39 sam Exp $
+ * $Id: mtime.c,v 1.22 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -33,6 +33,10 @@
 #include "defs.h"
 
 #include <stdio.h>                                              /* sprintf() */
+
+#if defined( PTH_INIT_IN_PTH_H )                                  /* GNU Pth */
+#   include <pth.h>
+#endif
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>                                           /* select() */
@@ -198,14 +202,18 @@ void mwait( mtime_t date )
         return;
     }
 
-#   ifdef HAVE_USLEEP
+#   if defined( PTH_INIT_IN_PTH_H )
+    pth_usleep( delay );
+
+#   elif defined( HAVE_USLEEP )
     usleep( delay );
+
 #   else
     tv_delay.tv_sec = delay / 1000000;
     tv_delay.tv_usec = delay % 1000000;
-
     /* see msleep() about select() errors */
     select( 0, NULL, NULL, NULL, &tv_delay );
+
 #   endif
 
 #endif
@@ -223,6 +231,12 @@ void msleep( mtime_t delay )
 
 #elif defined( HAVE_USLEEP ) || defined( WIN32 )
     usleep( delay );
+
+#elif defined( PTH_INIT_IN_PTH_H )
+    struct timeval tv_delay;
+    tv_delay.tv_sec = delay / 1000000;
+    tv_delay.tv_usec = delay % 1000000;
+    pth_select( 0, NULL, NULL, NULL, &tv_delay );
 
 #else
     struct timeval tv_delay;

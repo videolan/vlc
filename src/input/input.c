@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.120 2001/06/12 18:16:49 stef Exp $
+ * $Id: input.c,v 1.121 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -145,7 +145,8 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.pp_areas = NULL;
     p_input->stream.p_selected_area = NULL;
     p_input->stream.p_new_area = NULL;
-    /* By default there is one areas in a stream */
+
+    /* By default there is one area in a stream */
     input_AddArea( p_input );
     p_input->stream.p_selected_area = p_input->stream.pp_areas[0];
 
@@ -163,10 +164,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->pf_network_close = NetworkClose;
 #endif
 
-    /* Create thread and set locks. */
-    vlc_mutex_init( &p_input->stream.stream_lock );
-    vlc_cond_init( &p_input->stream.stream_wait );
-    vlc_mutex_init( &p_input->stream.control.control_lock );
+    /* Create thread. */
     if( vlc_thread_create( &p_input->thread_id, "input", (void *) RunThread,
                            (void *) p_input ) )
     {
@@ -242,6 +240,7 @@ static void RunThread( input_thread_t *p_input )
         p_input->b_error = 1;
         ErrorThread( p_input );
         DestroyThread( p_input );
+        free( p_input );
         return;
     }
 
@@ -377,6 +376,11 @@ static int InitThread( input_thread_t * p_input )
     p_input->c_packets_read             = 0;
     p_input->c_packets_trashed          = 0;
 #endif
+
+    /* Set locks. */
+    vlc_mutex_init( &p_input->stream.stream_lock );
+    vlc_cond_init( &p_input->stream.stream_wait );
+    vlc_mutex_init( &p_input->stream.control.control_lock );
 
     /* Default, might get overwritten */
     p_input->pf_open = p_input->pf_file_open;

@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_directx.c,v 1.3 2001/06/08 20:03:15 sam Exp $
+ * $Id: vout_directx.c,v 1.4 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -82,10 +82,11 @@
 typedef struct vout_sys_s
 {
 
-    LPDIRECTDRAW         p_ddobject;                    /* DirectDraw object */
-    LPDIRECTDRAWSURFACE  p_display;                        /* display device */
-    LPDIRECTDRAWSURFACE  p_overlay;                        /* overlay device */
-    LPDIRECTDRAWCLIPPER  p_clipper;                               /* clipper */
+    LPDIRECTDRAW2        p_ddobject;                    /* DirectDraw object */
+    LPDIRECTDRAWSURFACE3 p_display;                        /* Display device */
+    LPDIRECTDRAWSURFACE3 p_surface;    /* surface where we display the video */
+    LPDIRECTDRAWCLIPPER  p_clipper;             /* clipper used for blitting */
+    HINSTANCE            hddraw_dll;       /* handle of the opened ddraw dll */
     HBRUSH               hbrush;           /* window backgound brush (color) */
     HWND                 hwnd;                  /* Handle of the main window */
 
@@ -103,7 +104,7 @@ typedef struct vout_sys_s
     boolean_t   b_cursor_autohidden;
     mtime_t     i_lastmoved;
 
-    char       *p_windx_buf[2];                        /* Buffer information */
+    char       *p_directx_buf[2];                      /* Buffer information */
 
 } vout_sys_t;
 
@@ -120,15 +121,16 @@ static void vout_Display   ( struct vout_thread_s * );
 static void vout_SetPalette( p_vout_thread_t p_vout, u16 *red, u16 *green,
                              u16 *blue, u16 *transp );
 
-static int  WinDXCreateWindow     ( vout_thread_t *p_vout );
-static int  WinDXInitDDraw        ( vout_thread_t *p_vout );
-static int  WinDXCreateDisplay    ( vout_thread_t *p_vout );
-static int  WinDXCreateYUVOverlay ( vout_thread_t *p_vout );
-static int  WinDXUpdateOverlay    ( vout_thread_t *p_vout );
-static void WinDXCloseDDraw       ( vout_thread_t *p_vout );
-static void WinDXCloseWindow      ( vout_thread_t *p_vout );
-static void WinDXCloseDisplay     ( vout_thread_t *p_vout );
-static void WinDXCloseYUVOverlay  ( vout_thread_t *p_vout );
+static int  DirectXCreateWindow   ( vout_thread_t *p_vout );
+static int  DirectXInitDDraw      ( vout_thread_t *p_vout );
+static int  DirectXCreateDisplay  ( vout_thread_t *p_vout );
+static int  DirectXCreateSurface  ( vout_thread_t *p_vout );
+static int  DirectXCreateClipper  ( vout_thread_t *p_vout );
+static int  DirectXUpdateOverlay  ( vout_thread_t *p_vout );
+static void DirectXCloseDDraw     ( vout_thread_t *p_vout );
+static void DirectXCloseWindow    ( vout_thread_t *p_vout );
+static void DirectXCloseDisplay   ( vout_thread_t *p_vout );
+static void DirectXCloseSurface   ( vout_thread_t *p_vout );
 
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
@@ -154,10 +156,14 @@ void _M( vout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int vout_Probe( probedata_t *p_data )
 {
+
     if( TestMethod( VOUT_METHOD_VAR, "directx" ) )
     {
         return( 999 );
     }
+
+    /* Check that at least DirectX5 is installed on the computer */
+    /* Fixme */
 
     return( 400 );
 }
@@ -180,15 +186,16 @@ static int vout_Create( vout_thread_t *p_vout )
     /* Initialisations */
     p_vout->p_sys->p_ddobject = NULL;
     p_vout->p_sys->p_display = NULL;
-    p_vout->p_sys->p_overlay = NULL;
+    p_vout->p_sys->p_surface = NULL;
     p_vout->p_sys->p_clipper = NULL;
-    p_vout->p_sys->hbrush = INVALID_HANDLE_VALUE;
-    p_vout->p_sys->hwnd = INVALID_HANDLE_VALUE;
+    p_vout->p_sys->hbrush = NULL;
+    p_vout->p_sys->hwnd = NULL;
+    p_vout->p_sys->b_display_enabled = 0;
+    p_vout->b_need_render = 0;      /* by default try an YUV overlay display */
 
     p_vout->p_sys->b_cursor = 1; /* TODO should be done with a main_GetInt.. */
 
     p_vout->p_sys->b_cursor_autohidden = 0;
-    p_vout->p_sys->b_display_enabled = 0;
     p_vout->p_sys->i_lastmoved = mdate();
 
     p_vout->b_fullscreen = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
@@ -207,7 +214,7 @@ static int vout_Create( vout_thread_t *p_vout )
     /* Create a window for the video */
     /* Creating a window under Windows also initializes the thread's event
      * message qeue */
-    if( WinDXCreateWindow( p_vout ) )
+    if( DirectXCreateWindow( p_vout ) )
     {
         intf_ErrMsg( "vout error: can't create window" );
         free( p_vout->p_sys );
@@ -215,20 +222,20 @@ static int vout_Create( vout_thread_t *p_vout )
     }
 
     /* Initialise DirectDraw */
-    if( WinDXInitDDraw( p_vout ) )
+    if( DirectXInitDDraw( p_vout ) )
     {
         intf_ErrMsg( "vout error: can't initialise DirectDraw" );
-        WinDXCloseWindow( p_vout );
+        DirectXCloseWindow( p_vout );
         free( p_vout->p_sys );
         return ( 1 );
     }
 
-    /* create the directx display */
-    if( WinDXCreateDisplay( p_vout ) )
+    /* Create the directx display */
+    if( DirectXCreateDisplay( p_vout ) )
     {
         intf_ErrMsg( "vout error: can't initialise DirectDraw" );
-        WinDXCloseDDraw( p_vout );
-        WinDXCloseWindow( p_vout );
+        DirectXCloseDDraw( p_vout );
+        DirectXCloseWindow( p_vout );
         free( p_vout->p_sys );
         return ( 1 );
     }
@@ -265,9 +272,9 @@ static void vout_End( vout_thread_t *p_vout )
 static void vout_Destroy( vout_thread_t *p_vout )
 {
     intf_WarnMsg( 3, "vout: vout_Destroy" );
-    WinDXCloseDisplay( p_vout );
-    WinDXCloseDDraw( p_vout );
-    WinDXCloseWindow( p_vout );
+    DirectXCloseDisplay( p_vout );
+    DirectXCloseDDraw( p_vout );
+    DirectXCloseWindow( p_vout );
 
     if( p_vout->p_sys != NULL )
     {
@@ -297,17 +304,17 @@ static int vout_Manage( vout_thread_t *p_vout )
             {
 
                 case WM_CLOSE:
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_CLOSE" );
+                    intf_WarnMsg( 4, "vout: vout_Manage WM_CLOSE" );
                     p_vout->b_die = 1;
                     break;
 
                 case WM_QUIT:
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_QUIT" );
+                    intf_WarnMsg( 4, "vout: vout_Manage WM_QUIT" );
                     p_main->p_intf->b_die = 1;
                     break;
 
                 case WM_MOVE:
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_MOVE" );
+                    intf_WarnMsg( 3, "vout: vout_Manage WM_MOVE" );
                     if( !p_vout->b_need_render )
                     {
                         p_vout->i_changes |= VOUT_SIZE_CHANGE;
@@ -317,7 +324,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                     break;
 
                 case WM_APP:
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_APP" );
+                    intf_WarnMsg( 3, "vout: vout_Manage WM_APP" );
                     if( !p_vout->b_need_render )
                     {
                         p_vout->i_changes |= VOUT_SIZE_CHANGE;
@@ -327,18 +334,18 @@ static int vout_Manage( vout_thread_t *p_vout )
                     break;
 
                 case WM_PAINT:
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_PAINT" );
+                    intf_WarnMsg( 4, "vout: vout_Manage WM_PAINT" );
                     break;
 
                 case WM_ERASEBKGND:
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_ERASEBKGND" );
+                    intf_WarnMsg( 4, "vout: vout_Manage WM_ERASEBKGND" );
                     break;
 
                 case WM_MOUSEMOVE:
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_MOUSEMOVE" );
+                    intf_WarnMsg( 4, "vout: vout_Manage WM_MOUSEMOVE" );
                     if( p_vout->p_sys->b_cursor )
                     {
-                    if( p_vout->p_sys->b_cursor_autohidden )
+                        if( p_vout->p_sys->b_cursor_autohidden )
                         {
                             p_vout->p_sys->b_cursor_autohidden = 0;
                             p_vout->p_sys->i_lastmoved = mdate();
@@ -355,7 +362,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                     /* the key events are first processed here. The next
                      * message processed by this main message loop will be the
                      * char translation of the key event */
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_KEYDOWN" );
+                    intf_WarnMsg( 3, "vout: vout_Manage WM_KEYDOWN" );
                     switch( msg.wParam )
                     {
                         case VK_ESCAPE:
@@ -368,7 +375,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                     break;
 
                 case WM_CHAR:
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM_CHAR" );
+                    intf_WarnMsg( 3, "vout: vout_Manage WM_CHAR" );
                     switch( msg.wParam )
                     {
                         case 'q':
@@ -376,9 +383,37 @@ static int vout_Manage( vout_thread_t *p_vout )
                             p_main->p_intf->b_die = 1;
                             break;
 
-                        case 'f':
+                        case 'f':                    /* switch to fullscreen */
                         case 'F':
                             p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                            break;
+
+                        case 'y':                      /* switch to hard YUV */
+                        case 'Y':
+                            p_vout->i_changes |= VOUT_YUV_CHANGE;
+                            break;
+                          
+                        case 'c':                        /* toggle grayscale */
+                        case 'C':
+                            p_vout->b_grayscale = ! p_vout->b_grayscale;
+                            p_vout->i_changes |= VOUT_GRAYSCALE_CHANGE;
+                            break;
+                          
+                        case 'i':                             /* toggle info */
+                        case 'I':
+                            p_vout->b_info = ! p_vout->b_info;
+                            p_vout->i_changes |= VOUT_INFO_CHANGE;
+                            break;
+
+                        case 's':                          /* toggle scaling */
+                        case 'S':
+                            p_vout->b_scale = ! p_vout->b_scale;
+                            p_vout->i_changes |= VOUT_SCALE_CHANGE;
+                            break;
+
+                        case ' ':                        /* toggle interface */
+                            p_vout->b_interface = ! p_vout->b_interface;
+                            p_vout->i_changes |= VOUT_INTF_CHANGE;
                             break;
 
                         case '0': network_ChannelJoin( 0 ); break;
@@ -403,7 +438,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                     }
 
                 default:
-                    intf_WarnMsg( 3, "vout: WinDX vout_Manage WM Default %i",
+                    intf_WarnMsg( 4, "vout: vout_Manage WM Default %i",
                                   msg.message );
                 break;
             }
@@ -426,13 +461,49 @@ static int vout_Manage( vout_thread_t *p_vout )
 
 
     /*
+     * Scale Change 
+     */
+    if( p_vout->i_changes & VOUT_SCALE_CHANGE )
+    {
+        intf_WarnMsg( 3, "vout: vout_Manage Scale Change" );
+        DirectXUpdateOverlay( p_vout );
+        p_vout->i_changes &= ~VOUT_SCALE_CHANGE;
+    }
+
+    /*
      * Size Change 
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_WarnMsg( 3, "vout: WinDX vout_Manage Size Change" );
-        WinDXUpdateOverlay( p_vout );
+        intf_WarnMsg( 3, "vout: vout_Manage Size Change" );
+        DirectXUpdateOverlay( p_vout );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
+    }
+
+    /*
+     * YUV Change 
+     */
+    if( p_vout->i_changes & VOUT_YUV_CHANGE )
+    {
+        p_vout->b_need_render = ! p_vout->b_need_render;
+        
+        /* Need to reopen display */
+        DirectXCloseSurface( p_vout );
+        if( DirectXCreateSurface( p_vout ) )
+        {
+          intf_ErrMsg( "error: can't reopen display after YUV change" );
+          return( 1 );
+        }
+
+        /* Repaint the window background (needed by the overlay surface) */
+        if( !p_vout->b_need_render )
+	{
+            InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
+            p_vout->p_sys->b_display_enabled = 1;
+            DirectXUpdateOverlay( p_vout );
+	}
+
+        p_vout->i_changes &= ~VOUT_YUV_CHANGE;
     }
 
     /*
@@ -463,7 +534,6 @@ static int vout_Manage( vout_thread_t *p_vout )
         }
 
         SetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
-        /*WinDXUpdateOverlay( p_vout );*/
 
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
@@ -472,7 +542,7 @@ static int vout_Manage( vout_thread_t *p_vout )
      * Pointer change
      */
     if( ! p_vout->p_sys->b_cursor_autohidden &&
-        ( mdate() - p_vout->p_sys->i_lastmoved > 2000000 ) )
+        ( mdate() - p_vout->p_sys->i_lastmoved > 5000000 ) )
     {
         /* Hide the mouse automatically */
         p_vout->p_sys->b_cursor_autohidden = 1;
@@ -517,22 +587,86 @@ static void vout_Display( vout_thread_t *p_vout )
     DDSURFACEDESC ddsd;
     HRESULT       dxresult;
     int           i;
-    int           i_image_width  = p_vout->p_rendered_pic->i_width;
-    int           i_image_height = p_vout->p_rendered_pic->i_height;
+    int           i_image_width;
+    int           i_image_height;
 
+
+    intf_WarnMsg( 5, "vout: vout_Display" );
 
     if( (p_vout->p_sys->p_display == NULL) )
     {
-        intf_WarnMsg( 3, "vout error: WinDX no display!!" );
+        intf_WarnMsg( 3, "vout error: vout_Display no display!!" );
         return;
     }
 
     /* The first time this function is called it enables the display */
     p_vout->p_sys->b_display_enabled = 1;
 
+    /* if the size of the decoded pictures has changed then we close the
+     * video surface (which doesn't have the right size anymore). */
+    i_image_width = ( p_vout->p_rendered_pic ) ?
+      p_vout->p_rendered_pic->i_width : p_vout->p_sys->i_image_width;
+    i_image_height = ( p_vout->p_rendered_pic ) ?
+      p_vout->p_rendered_pic->i_height : p_vout->p_sys->i_image_height;
+
+    if( p_vout->p_sys->i_image_width != i_image_width
+        || p_vout->p_sys->i_image_height != i_image_height )
+    {
+        intf_WarnMsg( 3, "vout: video surface size changed" );
+        p_vout->p_sys->i_image_width = i_image_width;
+        p_vout->p_sys->i_image_height = i_image_height;
+        DirectXCloseSurface( p_vout );
+    }
+
     if( p_vout->b_need_render )
     {
+        RECT  rect_window;
+        POINT point_window;
+  
         /* Nothing yet */
+        if( p_vout->p_sys->p_surface == NULL )
+        {
+            intf_WarnMsg( 3, "vout: no video surface, open one..." );
+            if( DirectXCreateSurface( p_vout ) )
+            {
+                intf_WarnMsg( 3, "vout: cannot open a new video surface !!" );
+                return;
+            }
+            /* Display the surface */
+            p_vout->p_sys->b_display_enabled = 1;
+        }
+
+        /* Now get the coordinates of the window. We don't actually want the
+         * window coordinates but these of the usable surface inside the window
+         * By specification GetClientRect will always set rect_window.left and
+         * rect_window.top to 0 because the Client area is always relative to
+         * the container window */
+        GetClientRect(p_vout->p_sys->hwnd, &rect_window);
+        
+        point_window.x = 0;
+        point_window.y = 0;
+        ClientToScreen(p_vout->p_sys->hwnd, &point_window);
+        rect_window.left = point_window.x;
+        rect_window.top = point_window.y;
+        
+        point_window.x = rect_window.right;
+        point_window.y = rect_window.bottom;
+        ClientToScreen(p_vout->p_sys->hwnd, &point_window);
+        rect_window.right = point_window.x;
+        rect_window.bottom = point_window.y;
+
+        /* Blit video surface to display */
+        dxresult = IDirectDrawSurface3_Blt(p_vout->p_sys->p_display,
+                                           &rect_window,
+                                           p_vout->p_sys->p_surface,
+                                           NULL,
+                                           0, NULL );
+        if( dxresult != DD_OK )
+        {
+            intf_WarnMsg( 3, "vout: could not Blit the surface" );
+            return;
+        }
+
     }
     else
     {
@@ -542,47 +676,36 @@ static void vout_Display( vout_thread_t *p_vout )
          */
         /* TODO: support for streams other than 4:2:0 */
 
-        /* if the size of the decoded pictures has changed then we close the
-         * YUVOverlay (which doesn't have the right size anymore). */
-        if( p_vout->p_sys->i_image_width != i_image_width
-            || p_vout->p_sys->i_image_height != i_image_height )
+        if( p_vout->p_sys->p_surface == NULL )
         {
-            intf_WarnMsg( 3, "vout: WinDX overlay size changed" );
-            p_vout->p_sys->i_image_width = i_image_width;
-            p_vout->p_sys->i_image_height = i_image_height;
-            WinDXCloseYUVOverlay( p_vout );
-        }
-
-        if( p_vout->p_sys->p_overlay == NULL )
-        {
-            intf_WarnMsg( 3, "vout: WinDX no overlay, open one..." );
-            if( WinDXCreateYUVOverlay( p_vout ) )
+            intf_WarnMsg( 3, "vout: no video surface, open one..." );
+            if( DirectXCreateSurface( p_vout ) )
             {
-                intf_WarnMsg( 3, "vout: WinDX cannot open a new overlay !!" );
+                intf_WarnMsg( 3, "vout: cannot open a new video surface !!" );
                 return;
             }
             /* Display the Overlay */
             p_vout->p_sys->b_display_enabled = 1;
-            WinDXUpdateOverlay( p_vout );
+            DirectXUpdateOverlay( p_vout );
         }
 
         /* Lock the overlay surface */
         memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
         ddsd.dwSize = sizeof(DDSURFACEDESC);
-        dxresult = IDirectDrawSurface_Lock(p_vout->p_sys->p_overlay, NULL,
-                                           &ddsd, DDLOCK_NOSYSLOCK, NULL);
+        dxresult = IDirectDrawSurface3_Lock(p_vout->p_sys->p_surface, NULL,
+                                            &ddsd, DDLOCK_NOSYSLOCK, NULL);
         if ( dxresult == DDERR_SURFACELOST )
         {
             /* Your surface can be lost (thanks to windows) so be sure
              * to check this and restore it if needed */
-            dxresult = IDirectDrawSurface_Restore( p_vout->p_sys->p_overlay );
-            dxresult = IDirectDrawSurface_Lock( p_vout->p_sys->p_overlay,
-                                                NULL, &ddsd, DDLOCK_NOSYSLOCK
-                                                | DDLOCK_WAIT, NULL);
+            dxresult = IDirectDrawSurface3_Restore( p_vout->p_sys->p_surface );
+            dxresult = IDirectDrawSurface3_Lock( p_vout->p_sys->p_surface,
+                                                 NULL, &ddsd, DDLOCK_NOSYSLOCK
+                                                 | DDLOCK_WAIT, NULL);
         }
         if( dxresult != DD_OK )
         {
-            intf_WarnMsg( 3, "vout: WinDX could not lock the surface" );
+            intf_WarnMsg( 3, "vout: could not lock the surface" );
             return;
         }
 
@@ -634,8 +757,8 @@ static void vout_Display( vout_thread_t *p_vout )
         }
 
         /* Unlock the Surface */
-        dxresult = IDirectDrawSurface_Unlock(p_vout->p_sys->p_overlay,
-                                             ddsd.lpSurface );
+        dxresult = IDirectDrawSurface3_Unlock(p_vout->p_sys->p_surface,
+                                              ddsd.lpSurface );
 
     }
 
@@ -646,7 +769,7 @@ static void vout_Display( vout_thread_t *p_vout )
 
 
 /*****************************************************************************
- * WinDXEventProc: This is the window event processing function.
+ * DirectXEventProc: This is the window event processing function.
  *****************************************************************************
  * On Windows, when you create a window you have to attach an event processing
  * function to it. The aim of this function is to manage "Queued Messages" and
@@ -656,28 +779,30 @@ static void vout_Display( vout_thread_t *p_vout )
  * Nonqueued Messages are those that Windows will send directly to this
  * function (like WM_DESTROY, WM_WINDOWPOSCHANGED...)
  *****************************************************************************/
-long FAR PASCAL WinDXEventProc( HWND hwnd, UINT message,
-                                WPARAM wParam, LPARAM lParam )
+long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
+                                  WPARAM wParam, LPARAM lParam )
 {
     switch( message )
     {
 
+#if 0
     case WM_ACTIVATE:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_ACTIVED" );
+        intf_WarnMsg( 4, "vout: WinProc WM_ACTIVED" );
         break;
 
     case WM_CREATE:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_CREATE" );
+        intf_WarnMsg( 4, "vout: WinProc WM_CREATE" );
         break;
 
     /* the user wants to close the window */
     case WM_CLOSE:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_CLOSE" );
+        intf_WarnMsg( 4, "vout: WinProc WM_CLOSE" );
         break;
+#endif
 
     /* the window has been closed so shut down everything now */
     case WM_DESTROY:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_DESTROY" );
+        intf_WarnMsg( 4, "vout: WinProc WM_DESTROY" );
         PostQuitMessage( 0 );
         break;
 
@@ -686,60 +811,64 @@ long FAR PASCAL WinDXEventProc( HWND hwnd, UINT message,
         {
             case SC_SCREENSAVE:                     /* catch the screensaver */
             case SC_MONITORPOWER:              /* catch the monitor turn-off */
-            intf_WarnMsg( 3, "vout: WinDX WinProc WM_SYSCOMMAND" );
+            intf_WarnMsg( 3, "vout: WinProc WM_SYSCOMMAND" );
             return 0;                      /* this stops them from happening */
         }
         break;
 
+#if 0
     case WM_MOVE:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_MOVE" );
+        intf_WarnMsg( 4, "vout: WinProc WM_MOVE" );
         break;
 
     case WM_SIZE:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_SIZE" );
+        intf_WarnMsg( 4, "vout: WinProc WM_SIZE" );
         break;
 
     case WM_MOVING:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_MOVING" );
+        intf_WarnMsg( 4, "vout: WinProc WM_MOVING" );
         break;
 
     case WM_SIZING:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_SIZING" );
+        intf_WarnMsg( 4, "vout: WinProc WM_SIZING" );
         break;
+#endif
 
     case WM_WINDOWPOSCHANGED:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_WINDOWPOSCHANGED" );
+        intf_WarnMsg( 3, "vout: WinProc WM_WINDOWPOSCHANGED" );
         PostMessage( NULL, WM_APP, 0, 0);
         break;
 
+#if 0
     case WM_WINDOWPOSCHANGING:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_WINDOWPOSCHANGING" );
+        intf_WarnMsg( 3, "vout: WinProc WM_WINDOWPOSCHANGING" );
         break;
 
     case WM_PAINT:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_PAINT" );
+        intf_WarnMsg( 4, "vout: WinProc WM_PAINT" );
         break;
 
     case WM_ERASEBKGND:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM_ERASEBKGND" );
+        intf_WarnMsg( 4, "vout: WinProc WM_ERASEBKGND" );
         break;
 
     default:
-        intf_WarnMsg( 3, "vout: WinDX WinProc WM Default %i", message );
+        intf_WarnMsg( 4, "vout: WinProc WM Default %i", message );
         break;
+#endif
     }
 
     return DefWindowProc(hwnd, message, wParam, lParam);
 }
 
 /*****************************************************************************
- * WinDXCreateWindow: create a windows window where the video will play.
+ * DirectXCreateWindow: create a windows window where the video will play.
  *****************************************************************************
  * Before creating a direct draw surface, we need to create a window in which
  * the video will be displayed. This window will also allow us to capture the
  * events.
  *****************************************************************************/
-static int WinDXCreateWindow( vout_thread_t *p_vout )
+static int DirectXCreateWindow( vout_thread_t *p_vout )
 {
     HINSTANCE hInstance;
     WNDCLASS  wc;                                 /* window class components */
@@ -770,7 +899,7 @@ static int WinDXCreateWindow( vout_thread_t *p_vout )
         if( colorkey == GetNearestColor( hdc, colorkey ) )
           break;
     }
-    intf_WarnMsg( 3, "vout: WinDXCreateWindow background color:%i", colorkey );
+    intf_WarnMsg(3,"vout: DirectXCreateWindow background color:%i", colorkey);
     ReleaseDC( p_vout->p_sys->hwnd, hdc );
 
     /* create the actual brush */  
@@ -779,7 +908,7 @@ static int WinDXCreateWindow( vout_thread_t *p_vout )
 
     /* fill in the window class structure */
     wc.style         = 0;                               /* no special styles */
-    wc.lpfnWndProc   = (WNDPROC)WinDXEventProc;             /* event handler */
+    wc.lpfnWndProc   = (WNDPROC)DirectXEventProc;           /* event handler */
     wc.cbClsExtra    = 0;                             /* no extra class data */
     wc.cbWndExtra    = 0;                            /* no extra window data */
     wc.hInstance     = hInstance;                                /* instance */
@@ -791,7 +920,7 @@ static int WinDXCreateWindow( vout_thread_t *p_vout )
 
     /* register the window class */
     if (!RegisterClass(&wc)) {
-        intf_WarnMsg( 3, "vout: WinDX register window FAILED" );
+        intf_WarnMsg( 3, "vout: DirectXCreateWindow register window FAILED" );
         return (1);
     }
 
@@ -820,7 +949,7 @@ static int WinDXCreateWindow( vout_thread_t *p_vout )
                     NULL);                        /* no additional arguments */
 
     if (p_vout->p_sys->hwnd == NULL) {
-        intf_WarnMsg( 3, "vout: WinDX create window FAILED" );
+        intf_WarnMsg( 3, "vout: DirectXCreateWindow create window FAILED" );
         return (1);
     }
 
@@ -831,72 +960,107 @@ static int WinDXCreateWindow( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * WinDXInitDDraw: Takes care of all the DirectDraw initialisations
+ * DirectXInitDDraw: Takes care of all the DirectDraw initialisations
  *****************************************************************************
  * This function initialise and allocate resources for DirectDraw.
  *****************************************************************************/
-static int WinDXInitDDraw( vout_thread_t *p_vout )
+static int DirectXInitDDraw( vout_thread_t *p_vout )
 {
-    HRESULT     dxresult;
-    DWORD       flags;
+    HRESULT    dxresult;
+    HRESULT    (WINAPI *OurDirectDrawCreate)(GUID *,LPDIRECTDRAW *,IUnknown *);
+    LPDIRECTDRAW  p_ddobject;
 
-    intf_WarnMsg( 3, "vout: WinDX WinDXInitDDraw" );
+    intf_WarnMsg( 3, "vout: DirectXInitDDraw" );
 
-    /* Initialize DirectDraw */
-    dxresult = DirectDrawCreate( NULL, &p_vout->p_sys->p_ddobject, NULL );
+    /* load direct draw DLL */
+    p_vout->p_sys->hddraw_dll = LoadLibrary("DDRAW.DLL");
+    if( p_vout->p_sys->hddraw_dll == NULL )
+    {
+        intf_WarnMsg( 3, "vout: DirectXInitDDraw failed loading ddraw.dll" );
+        return( 1 );
+    }
+      
+    OurDirectDrawCreate = 
+      (void *)GetProcAddress(p_vout->p_sys->hddraw_dll, "DirectDrawCreate");
+    if ( OurDirectDrawCreate == NULL )
+    {
+        intf_ErrMsg( "vout error: DirectXInitDDraw failed GetProcAddress" );
+        FreeLibrary( p_vout->p_sys->hddraw_dll );
+        p_vout->p_sys->hddraw_dll = NULL;
+        return( 1 );    
+    }
+
+    /* Initialize DirectDraw now */
+    dxresult = OurDirectDrawCreate( NULL, &p_ddobject, NULL );
     if( dxresult != DD_OK )
     {
-        intf_ErrMsg( "vout error: can't initialize Direct Draw" );
+        intf_ErrMsg( "vout error: DirectXInitDDraw can't initialize DDraw" );
+        p_vout->p_sys->p_ddobject = NULL;
+        FreeLibrary( p_vout->p_sys->hddraw_dll );
+        p_vout->p_sys->hddraw_dll = NULL;
         return( 1 );
     }
 
     /* Set DirectDraw Cooperative level, ie what control we want over Windows
-       display */
-    if( p_vout->b_fullscreen )
-    {
-        flags = DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN;
-    }
-    else
-    {
-        flags = DDSCL_NORMAL;
-    }
-
-    dxresult = IDirectDraw_SetCooperativeLevel( p_vout->p_sys->p_ddobject,
-                                                p_vout->p_sys->hwnd, flags );
+     * display */
+    dxresult = IDirectDraw_SetCooperativeLevel( p_ddobject,
+                                           p_vout->p_sys->hwnd, DDSCL_NORMAL );
     if( dxresult != DD_OK )
     {
         intf_ErrMsg( "vout error: can't set direct draw cooperative level." );
-        IDirectDraw_Release(p_vout->p_sys->p_ddobject);
+        IDirectDraw_Release( p_ddobject );
         p_vout->p_sys->p_ddobject = NULL;
+        FreeLibrary( p_vout->p_sys->hddraw_dll );
+        p_vout->p_sys->hddraw_dll = NULL;
         return( 1 );
+    }
+
+    /* Get the IDirectDraw2 interface */
+    dxresult = IDirectDraw_QueryInterface( p_ddobject, &IID_IDirectDraw2,
+                                        (LPVOID *)&p_vout->p_sys->p_ddobject );
+    if( dxresult != DD_OK )
+    {
+        intf_ErrMsg( "vout error: can't get IDirectDraw2 interface." );
+        IDirectDraw_Release( p_ddobject );
+        p_vout->p_sys->p_ddobject = NULL;
+        FreeLibrary( p_vout->p_sys->hddraw_dll );
+        p_vout->p_sys->hddraw_dll = NULL;
+        return( 1 );
+    }
+    else
+    {
+        /* Release the unused interface */
+        IDirectDraw_Release( p_ddobject );
     }
 
     return( 0 );
 }
 
 /*****************************************************************************
- * WinDXCreateDisplay: create the DirectDraw display.
+ * DirectXCreateDisplay: create the DirectDraw display.
  *****************************************************************************
  * Create and initialize display according to preferences specified in the vout
  * thread fields.
  *****************************************************************************/
-static int WinDXCreateDisplay( vout_thread_t *p_vout )
+static int DirectXCreateDisplay( vout_thread_t *p_vout )
 {
-    DDCAPS        ddcaps;
-    HRESULT       dxresult;
-    DDSURFACEDESC ddsd;
-    BOOL          bHasOverlay, bHasColorKey, bCanStretch;
+    HRESULT              dxresult;
+    DDSURFACEDESC        ddsd;
+    LPDIRECTDRAWSURFACE  p_display;
+    DDPIXELFORMAT        ddpfPixelFormat;
 
-    /* Now create the primary surface. This surface is the displayed surface */
-    /* The following two steps are important! */
+    intf_WarnMsg( 3, "vout: DirectXCreateDisplay" );
+
+    /* Now create the primary surface. This surface is what you actually see
+     * on your screen */
     memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
     ddsd.dwSize = sizeof(DDSURFACEDESC);
     ddsd.dwFlags = DDSD_CAPS;
     ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
 
-    dxresult = IDirectDraw_CreateSurface( p_vout->p_sys->p_ddobject,
-                                          &ddsd,
-                                          &p_vout->p_sys->p_display, NULL );
+    dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
+                                           &ddsd,
+                                           &p_display, NULL );
     if( dxresult != DD_OK )
     {
         intf_ErrMsg( "vout error: can't create direct draw primary surface." );
@@ -904,57 +1068,97 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         return( 1 );
     }
 
-#if 0
-    /* Now create a clipper for our window.
-     * This clipper prevents us to modify by mistake anything on the screen
-     * (primary surface) which doesn't belong to our window */
-    dxresult = IDirectDraw_CreateClipper(p_vout->p_sys->p_ddobject, 0,
-                                         &p_vout->p_sys->p_clipper, NULL);
-    if( dxresult != DD_OK )
+    dxresult = IDirectDrawSurface_QueryInterface( p_display,
+                                         &IID_IDirectDrawSurface3,
+                                         (LPVOID *)&p_vout->p_sys->p_display );
+    if ( dxresult != DD_OK )
     {
-        intf_ErrMsg( "vout error: can't create clipper." );
-        IDirectDrawSurface_Release( p_vout->p_sys->p_display );
+        intf_ErrMsg( "vout error: can't get IDirectDrawSurface3 interface." );
+        IDirectDrawSurface_Release( p_display );
         p_vout->p_sys->p_display = NULL;
         return( 1 );
-    }
-
-    dxresult = IDirectDrawClipper_SetHWnd(p_vout->p_sys->p_clipper, 0,
-                                              p_vout->p_sys->hwnd);
-    if( dxresult != DD_OK )
-    {
-        intf_ErrMsg( "vout error: can't attach clipper to window." );
-        IDirectDrawSurface_Release( p_vout->p_sys->p_display );
-        p_vout->p_sys->p_display = NULL;
-        return( 1 );
-    }
-
-    dxresult = IDirectDrawSurface_SetClipper(p_vout->p_sys->p_display,
-                                              p_vout->p_sys->p_clipper);
-    if( dxresult != DD_OK )
-    {
-        intf_ErrMsg( "vout error: can't attach clipper to surface." );
-        IDirectDrawSurface_Release( p_vout->p_sys->p_display );
-        p_vout->p_sys->p_display = NULL;
-        return( 1 );
-    }
-#endif
-
-    /* Probe the capabilities of the hardware */
-    /* This is just an indication of whever or not we'll support overlay,
-     * but with this test we don't know if we support YUV overlay */
-    memset( &ddcaps, 0, sizeof( DDCAPS ));
-    ddcaps.dwSize = sizeof(DDCAPS);
-    dxresult = IDirectDraw_GetCaps( p_vout->p_sys->p_ddobject,
-                                    &ddcaps, NULL );
-    if(dxresult != DD_OK )
-    {
-        intf_ErrMsg( "vout error: can't get caps." );
-        bHasOverlay  = FALSE;
-        bHasColorKey = FALSE;
-        bCanStretch  = FALSE;
     }
     else
     {
+        /* Release the old interface */
+        IDirectDrawSurface_Release( p_display );
+    }
+
+
+    /* We need to fill in some information for the video output thread.
+     * We do this here because it must be done before the video_output
+     * thread enters its main loop - and DirectXCreateSurface can be called
+     * after that ! */
+    ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+    IDirectDrawSurface3_GetPixelFormat( p_vout->p_sys->p_display,
+                                        &ddpfPixelFormat );
+#ifdef NONAMELESSUNION
+    p_vout->i_screen_depth =    ddpfPixelFormat.u1.dwRGBBitCount;
+    p_vout->i_bytes_per_pixel = ddpfPixelFormat.u1.dwRGBBitCount/8;
+    
+    p_vout->i_red_mask =        ddpfPixelFormat.u2.dwRBitMask;
+    p_vout->i_green_mask =      ddpfPixelFormat.u3.dwGBitMask;
+    p_vout->i_blue_mask =       ddpfPixelFormat.u4.dwBBitMask;
+#else
+    p_vout->i_screen_depth =    ddpfPixelFormat.dwRGBBitCount;
+    p_vout->i_bytes_per_pixel = ddpfPixelFormat.dwRGBBitCount/8;
+
+    p_vout->i_red_mask =        ddpfPixelFormat.dwRBitMask;
+    p_vout->i_green_mask =      ddpfPixelFormat.dwGBitMask;
+    p_vout->i_blue_mask =       ddpfPixelFormat.dwBBitMask;
+#endif /* NONAMELESSUNION */
+
+    /* Create a video surface. This function will try to create an
+     * YUV overlay first and if it can't it will create a simple RGB surface */
+    if( DirectXCreateSurface( p_vout ) )
+    {
+        intf_ErrMsg( "vout error: can't create a video surface." );
+        IDirectDrawSurface3_Release( p_vout->p_sys->p_display );
+        p_vout->p_sys->p_display = NULL;
+        return( 1 );
+    }
+      
+    return( 0 );
+}
+
+/*****************************************************************************
+ * DirectXCreateSurface: create an YUV overlay or RGB surface for the video.
+ *****************************************************************************
+ * The best method of display is with an YUV overlay because the YUV->RGB
+ * conversion is done in hardware, so we'll try to create this surface first.
+ * If we fail, we'll try to create a plain RGB surface.
+ * ( Maybe we could also try an RGB overlay surface, which could have hardware
+ * scaling and which would also be faster in window mode because you don't
+ * need to do any blitting to the main display...)
+ *****************************************************************************/
+static int DirectXCreateSurface( vout_thread_t *p_vout )
+{
+    HRESULT dxresult;
+    DDSURFACEDESC ddsd;
+    LPDIRECTDRAWSURFACE p_surface;
+    DDCAPS ddcaps;
+
+    intf_WarnMsg( 3, "vout: DirectXCreateSurface" );
+
+    /* Disable display */
+    p_vout->p_sys->b_display_enabled = 0;
+
+#if 1
+    /* Probe the capabilities of the hardware */
+    /* This is just an indication of whether or not we'll support overlay,
+     * but with this test we don't know if we support YUV overlay */
+    memset( &ddcaps, 0, sizeof( DDCAPS ));
+    ddcaps.dwSize = sizeof(DDCAPS);
+    dxresult = IDirectDraw2_GetCaps( p_vout->p_sys->p_ddobject,
+                                     &ddcaps, NULL );
+    if(dxresult != DD_OK )
+    {
+        intf_WarnMsg( 3,"vout error: can't get caps." );
+    }
+    else
+    {
+        BOOL bHasOverlay, bHasColorKey, bCanStretch;
+
         /* Determine if the hardware supports overlay surfaces */
         bHasOverlay = ((ddcaps.dwCaps & DDCAPS_OVERLAY) ==
                        DDCAPS_OVERLAY) ? TRUE : FALSE;
@@ -964,59 +1168,158 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         /* Determine if the hardware supports scaling of the overlay surface */
         bCanStretch = ((ddcaps.dwCaps & DDCAPS_OVERLAYSTRETCH) ==
                        DDCAPS_OVERLAYSTRETCH) ? TRUE : FALSE;
-        intf_WarnMsg( 3, "vout: WinDX Caps: overlay=%i colorkey=%i stretch=%i",
+        intf_WarnMsg( 3, "vout: Dx Caps: overlay=%i colorkey=%i stretch=%i",
                          bHasOverlay, bHasColorKey, bCanStretch );
+
+        if( !bHasOverlay ) p_vout->b_need_render = 1;
     }
+#endif
 
-    p_vout->p_sys->p_overlay = NULL;
-    if( bHasOverlay && bHasColorKey && bCanStretch )
+
+    /* Create the video surface */
+    if( !p_vout->b_need_render )
     {
-        if( !WinDXCreateYUVOverlay( p_vout ) )
-        {
-           /* Overlay created successfully */
-           p_vout->b_need_render = 0;
-        }
-    }
+        /* Now try to create the YUV overlay surface.
+         * This overlay will be displayed on top of the primary surface.
+         * A color key is used to determine whether or not the overlay will be
+         * displayed, ie the overlay will be displayed in place of the primary
+         * surface wherever the primary surface will have this color.
+         * The video window has been created with a background of this color so
+         * the overlay will be only displayed on top of this window */
 
-
-    /* Now do some initialisation for video_output */
-    if( p_vout->b_need_render )
-    {
-        /* if we want a valid pointer to the surface memory, we must lock
-         * the surface */
         memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
         ddsd.dwSize = sizeof(DDSURFACEDESC);
-        dxresult = IDirectDrawSurface_Lock(p_vout->p_sys->p_display,
-                                           NULL, &ddsd,
-                                           DDLOCK_NOSYSLOCK, NULL);
-        if ( dxresult == DDERR_SURFACELOST )
+        ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+        ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
+        ddsd.ddpfPixelFormat.dwFourCC = mmioFOURCC('Y','V','1','2');
+#ifdef NONAMELESSUNION
+        ddsd.ddpfPixelFormat.u1.dwYUVBitCount = 16;
+#else
+        ddsd.ddpfPixelFormat.dwYUVBitCount = 16;
+#endif
+        ddsd.dwFlags = DDSD_CAPS |
+                       DDSD_HEIGHT |
+                       DDSD_WIDTH |
+                       DDSD_PIXELFORMAT;
+        ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY | DDSCAPS_VIDEOMEMORY;
+        ddsd.dwHeight =  p_vout->p_sys->i_image_height;
+        ddsd.dwWidth =  p_vout->p_sys->i_image_width;
+
+        dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
+                                               &ddsd, &p_surface, NULL );
+        if( dxresult == DD_OK )
         {
-            /* Your surface can be lost so be sure
-             * to check this and restore it if needed */
-            dxresult = IDirectDrawSurface_Restore( p_vout->p_sys->p_display );
-            dxresult = IDirectDrawSurface_Lock( p_vout->p_sys->p_display,
-                                                NULL, &ddsd, DDLOCK_NOSYSLOCK
-                                                | DDLOCK_WAIT, NULL);
+            intf_WarnMsg( 3,"vout: DirectX YUV overlay created successfully" );
         }
-        if( dxresult != DD_OK )
+        else
         {
-            intf_WarnMsg( 3, "vout: WinDX could not lock the surface" );
+            intf_ErrMsg( "vout error: can't create YUV overlay surface." );
+            p_vout->b_need_render = 1;
+        }
+    }
+
+    if( p_vout->b_need_render )
+    {
+        /* Now try to create a plain RGB surface. */
+        memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
+        ddsd.dwSize = sizeof(DDSURFACEDESC);
+        ddsd.dwFlags = DDSD_HEIGHT |
+                       DDSD_WIDTH |
+                       DDSD_CAPS;
+        ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
+        ddsd.dwHeight =  p_vout->p_sys->i_image_height;
+        ddsd.dwWidth =  p_vout->p_sys->i_image_width;
+
+        dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
+                                               &ddsd, &p_surface, NULL );
+        if( dxresult == DD_OK )
+        {
+            intf_WarnMsg( 3,"vout: DirectX RGB surface created successfully" );
+        }
+        else
+        {
+            intf_ErrMsg( "vout error: can't create RGB surface." );
+            p_vout->p_sys->p_surface = NULL;
             return( 1 );
         }
+    }
+      
+    /* Now that the surface is created, try to get a newer DirectX interface */
+    dxresult = IDirectDrawSurface_QueryInterface( p_surface,
+                                         &IID_IDirectDrawSurface3,
+                                         (LPVOID *)&p_vout->p_sys->p_surface );
+    if ( dxresult != DD_OK )
+    {
+        intf_ErrMsg( "vout error: can't get IDirectDrawSurface3 interface." );
+        IDirectDrawSurface_Release( p_surface );
+        p_vout->p_sys->p_surface = NULL;
+        return( 1 );
+    }
+    else
+    {
+        /* Release the old interface */
+        IDirectDrawSurface_Release( p_surface );
+    }
 
-        /* Set the pointer to the surface memory */
-        p_vout->p_sys->p_windx_buf[ 0 ] = ddsd.lpSurface;
-        /* back buffer, none for now */
-        p_vout->p_sys->p_windx_buf[ 1 ] = ddsd.lpSurface;
+    if( !p_vout->b_need_render )
+    {
+        /* Hide the overlay for now */
+        IDirectDrawSurface3_UpdateOverlay(p_vout->p_sys->p_surface,
+                                          NULL,
+                                          p_vout->p_sys->p_display,
+                                          NULL,
+                                          DDOVER_HIDE,
+                                          NULL);
+    }
+    else
+    {
+         DirectXCreateClipper( p_vout );
+    }
 
 
-        /* Set thread information */
-        p_vout->i_width =           ddsd.dwWidth;
-        p_vout->i_height =          ddsd.dwHeight;
+    /* From now on, do some initialisation for video_output */
 
+    /* if we want a valid pointer to the surface memory, we must lock
+     * the surface */
+
+    memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
+    ddsd.dwSize = sizeof(DDSURFACEDESC);
+    dxresult = IDirectDrawSurface3_Lock( p_vout->p_sys->p_surface, NULL, &ddsd,
+                                         DDLOCK_NOSYSLOCK | DDLOCK_WAIT, NULL);
+    if ( dxresult == DDERR_SURFACELOST )
+    {
+        /* Your surface can be lost so be sure
+         * to check this and restore it if needed */
+        dxresult = IDirectDrawSurface3_Restore( p_vout->p_sys->p_surface );
+        dxresult = IDirectDrawSurface3_Lock( p_vout->p_sys->p_surface,
+                                             NULL, &ddsd, DDLOCK_NOSYSLOCK
+                                             | DDLOCK_WAIT, NULL);
+    }
+    if( dxresult != DD_OK )
+    {
+        intf_ErrMsg( "vout: DirectXCreateDisplay could not lock the surface" );
+        return( 1 );
+    }
+
+    /* Set the pointer to the surface memory */
+    p_vout->p_sys->p_directx_buf[ 0 ] = ddsd.lpSurface;
+    /* back buffer, none for now */
+    p_vout->p_sys->p_directx_buf[ 1 ] = ddsd.lpSurface;
+
+    /* Set thread information */
+    p_vout->i_width =  ddsd.dwWidth;
+    p_vout->i_height = ddsd.dwHeight;
 #ifdef NONAMELESSUNION
-        p_vout->i_bytes_per_line =  ddsd.u1.lPitch;
+    p_vout->i_bytes_per_line =  ddsd.u1.lPitch;
+#else
+    p_vout->i_bytes_per_line =  ddsd.lPitch;
+#endif /* NONAMELESSUNION */
 
+
+    if( p_vout->b_need_render )
+    {
+        /* For an RGB surface we need to fill in some more info */
+#ifdef NONAMELESSUNION
         p_vout->i_screen_depth =    ddsd.ddpfPixelFormat.u1.dwRGBBitCount;
         p_vout->i_bytes_per_pixel = ddsd.ddpfPixelFormat.u1.dwRGBBitCount/8;
 
@@ -1024,8 +1327,6 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         p_vout->i_green_mask =      ddsd.ddpfPixelFormat.u3.dwGBitMask;
         p_vout->i_blue_mask =       ddsd.ddpfPixelFormat.u4.dwBBitMask;
 #else
-        p_vout->i_bytes_per_line =  ddsd.lPitch;
-
         p_vout->i_screen_depth =    ddsd.ddpfPixelFormat.dwRGBBitCount;
         p_vout->i_bytes_per_pixel = ddsd.ddpfPixelFormat.dwRGBBitCount/8;
 
@@ -1034,144 +1335,95 @@ static int WinDXCreateDisplay( vout_thread_t *p_vout )
         p_vout->i_blue_mask =       ddsd.ddpfPixelFormat.dwBBitMask;
 
 #endif /* NONAMELESSUNION */
-
-        /* Unlock the Surface */
-        dxresult = IDirectDrawSurface_Unlock(p_vout->p_sys->p_display,
-                                             ddsd.lpSurface );
-        /* FIXME: palette in 8bpp ?? */
-        /* Set and initialize buffers */
-        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_windx_buf[ 0 ],
-                                 p_vout->p_sys->p_windx_buf[ 1 ] );
-    }
-    else
-    {
-        /* Lock the surface */
-        memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
-        ddsd.dwSize = sizeof(DDSURFACEDESC);
-        dxresult = IDirectDrawSurface_Lock(p_vout->p_sys->p_overlay,
-                                          NULL, &ddsd, DDLOCK_NOSYSLOCK, NULL);
-        if ( dxresult == DDERR_SURFACELOST )
-        {
-            /* Your surface can be lost (thanks to windows) so be sure
-             * to check this every time you want to do something with
-             * it */
-            dxresult = IDirectDrawSurface_Restore(
-                                           p_vout->p_sys->p_overlay );
-            dxresult = IDirectDrawSurface_Lock( p_vout->p_sys->p_overlay
-                        , NULL, &ddsd,DDLOCK_NOSYSLOCK| DDLOCK_WAIT, NULL);
-        }
-        if( dxresult != DD_OK )
-        {
-            intf_WarnMsg( 3, "vout: WinDX could not lock the surface" );
-            return( 1 );
-        }
-
-        p_vout->p_sys->p_windx_buf[ 0 ] = ddsd.lpSurface;
-        p_vout->p_sys->p_windx_buf[ 1 ] = ddsd.lpSurface;
-
-        /* Set thread information */
-        p_vout->i_width =           ddsd.dwWidth;
-        p_vout->i_height =          ddsd.dwHeight;
-#ifdef NONAMELESSUNION
-        p_vout->i_bytes_per_line =  ddsd.u1.lPitch;
-#else
-        p_vout->i_bytes_per_line =  ddsd.lPitch;
-#endif /* NONAMELESSUNION */
-
-        /* Unlock the Surface */
-        dxresult = IDirectDrawSurface_Unlock(p_vout->p_sys->p_overlay,
-                                             ddsd.lpSurface );
-
-        p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_windx_buf[ 0 ],
-                                 p_vout->p_sys->p_windx_buf[ 1 ] );
     }
 
-    return( 0 );
-}
+    /* Unlock the Surface */
+    dxresult = IDirectDrawSurface3_Unlock(p_vout->p_sys->p_surface,
+                                          ddsd.lpSurface );
 
-/*****************************************************************************
- * WinDXCreateYUVOveraly: create an YUV overlay surface for the video.
- *****************************************************************************
- * The best method of display is with an YUV overlay because the YUV->RGB
- * conversion is done in hardware.
- * This function will try to create an YUV overlay.
- *****************************************************************************/
-static int WinDXCreateYUVOverlay( vout_thread_t *p_vout )
-{
-    HRESULT dxresult;
-    DDSURFACEDESC ddsd;
+    /* Set and initialize buffers */
+    p_vout->pf_setbuffers( p_vout, p_vout->p_sys->p_directx_buf[ 0 ],
+                           p_vout->p_sys->p_directx_buf[ 1 ] );
 
-    /* Now create the overlay surface. This overlay will be displayed on
-     * top of the primary surface.
-     * A color key is used to determine whether or not the overlay will be
-     * displayed, ie the overlay will be displayed in place of the primary
-     * surface wherever the primary surface will have this color.
-     * The video window has been created with a background of this color so
-     * the overlay will be only displayed on top of this window */
-
-    memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
-    ddsd.dwSize = sizeof(DDSURFACEDESC);
-    ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
-    ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
-    ddsd.ddpfPixelFormat.dwFourCC = mmioFOURCC('Y','V','1','2');
-#ifdef NONAMELESSUNION
-    ddsd.ddpfPixelFormat.u1.dwYUVBitCount = 16;
-#else
-    ddsd.ddpfPixelFormat.dwYUVBitCount = 16;
-#endif
-
-    ddsd.dwSize = sizeof(DDSURFACEDESC);
-    ddsd.dwFlags = DDSD_CAPS |
-                   DDSD_HEIGHT |
-                   DDSD_WIDTH |
-                   DDSD_PIXELFORMAT;
-    ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY | DDSCAPS_VIDEOMEMORY;
-    ddsd.dwHeight =  p_vout->p_sys->i_image_height;
-    ddsd.dwWidth =  p_vout->p_sys->i_image_width;
-
-    dxresult = IDirectDraw_CreateSurface( p_vout->p_sys->p_ddobject,
-                                          &ddsd,
-                                          &p_vout->p_sys->p_overlay, NULL );
-    if( dxresult != DD_OK )
-    {
-        intf_ErrMsg( "vout error: can't create overlay surface." );
-        p_vout->p_sys->p_overlay = NULL;
-    }
-    else
-    {
-        intf_WarnMsg( 3, "vout: WinDX YUV overlay created successfully" );
-    }
-    /* Hide the overlay for now */
-    IDirectDrawSurface_UpdateOverlay(p_vout->p_sys->p_overlay,
-                                     NULL,
-                                     p_vout->p_sys->p_display,
-                                     NULL,
-                                     DDOVER_HIDE,
-                                     NULL);
 
     return ( 0 );
 }
 
+
 /*****************************************************************************
- * WinDXUpdateOverlay: Move or resize overlay surface on video display.
+ * DirectXCreateClipper: Create a clipper that will be used when blitting the
+ *                       RGB surface to the main display.
+ *****************************************************************************
+ * This clipper prevents us to modify by mistake anything on the screen
+ * which doesn't belong to our window. For example when a part of our video
+ * window is hidden by another window.
+ *****************************************************************************/
+static int DirectXCreateClipper( vout_thread_t *p_vout )
+{
+    HRESULT dxresult;
+
+    intf_WarnMsg( 3, "vout: DirectXCreateClipper" );
+
+    /* Create the clipper */
+    dxresult = IDirectDraw2_CreateClipper( p_vout->p_sys->p_ddobject, 0,
+                                           &p_vout->p_sys->p_clipper, NULL );
+    if( dxresult != DD_OK )
+    {
+        intf_WarnMsg( 3, "vout: DirectXCreateClipper can't create clipper." );
+        IDirectDrawSurface_Release( p_vout->p_sys->p_clipper );
+        p_vout->p_sys->p_clipper = NULL;
+        return( 1 );
+    }
+    
+    /* associate the clipper to the window */
+    dxresult = IDirectDrawClipper_SetHWnd(p_vout->p_sys->p_clipper, 0,
+                                          p_vout->p_sys->hwnd);
+    if( dxresult != DD_OK )
+    {
+        intf_WarnMsg( 3,
+            "vout: DirectXCreateClipper can't attach clipper to window." );
+        IDirectDrawSurface_Release( p_vout->p_sys->p_clipper );
+        p_vout->p_sys->p_clipper = NULL;
+        return( 1 );
+    }
+    
+    /* associate the clipper with the surface */
+    dxresult = IDirectDrawSurface_SetClipper(p_vout->p_sys->p_display,
+                                             p_vout->p_sys->p_clipper);
+    if( dxresult != DD_OK )
+    {
+        intf_WarnMsg( 3,
+            "vout: DirectXCreateClipper can't attach clipper to surface." );
+        IDirectDrawSurface_Release( p_vout->p_sys->p_clipper );
+        p_vout->p_sys->p_clipper = NULL;
+        return( 1 );
+    }    
+     
+    return( 0 );
+}
+
+
+/*****************************************************************************
+ * DirectXUpdateOverlay: Move or resize overlay surface on video display.
  *****************************************************************************
  * This function is used to move or resize an overlay surface on the screen.
  * Ususally the overlay is moved by the user and thus, by a move or resize
  * event (in vout_Manage).
  *****************************************************************************/
-static int WinDXUpdateOverlay( vout_thread_t *p_vout )
+static int DirectXUpdateOverlay( vout_thread_t *p_vout )
 {
     DDOVERLAYFX     ddofx;
-    RECT            rect_window, rect_image;
+    RECT            rect_window, rect_window_backup, rect_image;
     POINT           point_window;
     DWORD           dwFlags;
     HRESULT         dxresult;
     DWORD           dw_colorkey;
     DDPIXELFORMAT   pixel_format;
+    DDSURFACEDESC   ddsd;
 
-    if( p_vout->p_sys->p_overlay == NULL || p_vout->b_need_render)
+    if( p_vout->p_sys->p_surface == NULL || p_vout->b_need_render )
     {
-        intf_WarnMsg( 3, "vout: WinDX no overlay !!" );
+        intf_WarnMsg( 3, "vout: DirectXUpdateOverlay no overlay !!" );
         return( 0 );
     }
 
@@ -1292,16 +1544,65 @@ static int WinDXUpdateOverlay( vout_thread_t *p_vout )
 
     /* It seems we can't feed the UpdateOverlay directdraw function with
      * negative values so we have to clip the computed rectangles */
-    /* FIXME */
+    memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
+    ddsd.dwSize = sizeof(DDSURFACEDESC);
+    ddsd.dwFlags = DDSD_HEIGHT | DDSD_WIDTH;
+    IDirectDraw2_GetDisplayMode( p_vout->p_sys->p_ddobject, &ddsd );
 
+    rect_window_backup = rect_window;
+
+    /* Clip the destination window */
+    rect_window.left = (rect_window.left < 0) ? 0 : rect_window.left;
+    rect_window.right = (rect_window.right < 0) ? 0 : rect_window.right;
+    rect_window.top = (rect_window.top < 0) ? 0 : rect_window.top;
+    rect_window.bottom = (rect_window.bottom < 0) ? 0 : rect_window.bottom;
+
+    rect_window.left = (rect_window.left > ddsd.dwWidth) ? ddsd.dwWidth
+      : rect_window.left;
+    rect_window.right = (rect_window.right > ddsd.dwWidth) ? ddsd.dwWidth
+      : rect_window.right;
+    rect_window.top = (rect_window.top > ddsd.dwHeight) ? ddsd.dwHeight
+      : rect_window.top;
+    rect_window.bottom = (rect_window.bottom > ddsd.dwHeight) ? ddsd.dwHeight
+      : rect_window.bottom;
+
+    intf_WarnMsg( 3, "vout: DirectXUpdateOverlay window coords: %i,%i,%i,%i",
+                  rect_window.left, rect_window.top,
+                  rect_window.right, rect_window.bottom);
+
+    /* Clip the source image */
+    rect_image.left = ( rect_window.left == rect_window_backup.left ) ? 0
+      : labs(rect_window_backup.left - rect_window.left) *
+      p_vout->p_rendered_pic->i_width /
+      (rect_window_backup.right - rect_window_backup.left);
+    rect_image.right = ( rect_window.right == rect_window_backup.right ) ?
+      p_vout->p_rendered_pic->i_width
+      : p_vout->p_rendered_pic->i_width -
+      labs(rect_window_backup.right - rect_window.right) *
+      p_vout->p_rendered_pic->i_width /
+      (rect_window_backup.right - rect_window_backup.left);
+    rect_image.top = ( rect_window.top == rect_window_backup.top ) ? 0
+      : labs(rect_window_backup.top - rect_window.top) *
+      p_vout->p_rendered_pic->i_height /
+      (rect_window_backup.bottom - rect_window_backup.top);
+    rect_image.bottom = ( rect_window.bottom == rect_window_backup.bottom ) ?
+      p_vout->p_rendered_pic->i_height
+      : p_vout->p_rendered_pic->i_height -
+      labs(rect_window_backup.bottom - rect_window.bottom) *
+      p_vout->p_rendered_pic->i_height /
+      (rect_window_backup.bottom - rect_window_backup.top);
+
+    intf_WarnMsg( 3, "vout: DirectXUpdateOverlay image coords: %i,%i,%i,%i",
+                  rect_image.left, rect_image.top,
+                  rect_image.right, rect_image.bottom);
 
     /* compute the colorkey pixel value from the RGB value we've got */
     memset( &pixel_format, 0, sizeof( DDPIXELFORMAT ));
     pixel_format.dwSize = sizeof( DDPIXELFORMAT );
-    dxresult = IDirectDrawSurface_GetPixelFormat( p_vout->p_sys->p_display,
-                                                  &pixel_format );
+    dxresult = IDirectDrawSurface3_GetPixelFormat( p_vout->p_sys->p_display,
+                                                   &pixel_format );
     if( dxresult != DD_OK )
-        intf_WarnMsg( 3, "vout: WinDX GetPixelFormat failed !!" );
+        intf_WarnMsg( 3, "vout: DirectXUpdateOverlay GetPixelFormat failed" );
     dw_colorkey = (DWORD)p_vout->p_sys->i_colorkey;
 #ifdef NONAMELESSUNION
     dw_colorkey = (DWORD)((( dw_colorkey * pixel_format.u2.dwRBitMask) / 255)
@@ -1319,34 +1620,35 @@ static int WinDXUpdateOverlay( vout_thread_t *p_vout )
 
     dwFlags = DDOVER_KEYDESTOVERRIDE | DDOVER_SHOW;
 
-    dxresult = IDirectDrawSurface_UpdateOverlay(p_vout->p_sys->p_overlay,
-                                                NULL,    /*&rect_image,*/
-                                                p_vout->p_sys->p_display,
-                                                &rect_window,
-                                                dwFlags,
-                                                &ddofx);
+    dxresult = IDirectDrawSurface3_UpdateOverlay(p_vout->p_sys->p_surface,
+                                                 &rect_image,
+                                                 p_vout->p_sys->p_display,
+                                                 &rect_window,
+                                                 dwFlags,
+                                                 &ddofx);
     if(dxresult != DD_OK)
     {
-        intf_WarnMsg( 3, "vout: WinDX can't move or resize overlay" );
+        intf_WarnMsg( 3,
+          "vout: DirectXUpdateOverlay can't move or resize overlay" );
     }
 
     return ( 0 );
 }
 
 /*****************************************************************************
- * WinDXCloseWindow: close the window created by WinDXCreateWindow
+ * DirectXCloseWindow: close the window created by DirectXCreateWindow
  *****************************************************************************
- * This function returns all resources allocated by WinDXCreateWindow.
+ * This function returns all resources allocated by DirectXCreateWindow.
  *****************************************************************************/
-static void WinDXCloseWindow( vout_thread_t *p_vout )
+static void DirectXCloseWindow( vout_thread_t *p_vout )
 {
     HINSTANCE hInstance;
 
-    intf_WarnMsg( 3, "vout: WinDXCloseWindow" );
-    if( p_vout->p_sys->hwnd != INVALID_HANDLE_VALUE )
+    intf_WarnMsg( 3, "vout: DirectXCloseWindow" );
+    if( p_vout->p_sys->hwnd != NULL )
     {
         DestroyWindow( p_vout->p_sys->hwnd);
-        p_vout->p_sys->hwnd = INVALID_HANDLE_VALUE;
+        p_vout->p_sys->hwnd = NULL;
     }
 
     hInstance = GetModuleHandle(NULL);
@@ -1354,74 +1656,77 @@ static void WinDXCloseWindow( vout_thread_t *p_vout )
                      hInstance );          /* handle to application instance */
 
     /* free window background brush */
-    if( p_vout->p_sys->hwnd != INVALID_HANDLE_VALUE )
+    if( p_vout->p_sys->hwnd != NULL )
     {
         DeleteObject( p_vout->p_sys->hbrush );
-        p_vout->p_sys->hbrush = INVALID_HANDLE_VALUE;
+        p_vout->p_sys->hbrush = NULL;
     }
 }
 
 /*****************************************************************************
- * WinDXCloseDDraw: Release the DDraw object allocated by WinDXInitDDraw
+ * DirectXCloseDDraw: Release the DDraw object allocated by DirectXInitDDraw
  *****************************************************************************
- * This function returns all resources allocated by WinDXInitDDraw.
+ * This function returns all resources allocated by DirectXInitDDraw.
  *****************************************************************************/
-static void WinDXCloseDDraw( vout_thread_t *p_vout )
+static void DirectXCloseDDraw( vout_thread_t *p_vout )
 {
-    intf_WarnMsg(3, "vout: WinDXCloseDDraw" );
+    intf_WarnMsg(3, "vout: DirectXCloseDDraw" );
     if( p_vout->p_sys->p_ddobject != NULL )
     {
-        IDirectDraw_Release(p_vout->p_sys->p_ddobject);
+        IDirectDraw2_Release(p_vout->p_sys->p_ddobject);
         p_vout->p_sys->p_ddobject = NULL;
+    }
+
+    if( p_vout->p_sys->hddraw_dll != NULL )
+    {
+        FreeLibrary( p_vout->p_sys->hddraw_dll );
+        p_vout->p_sys->hddraw_dll = NULL;
     }
 }
 
 /*****************************************************************************
- * WinDXCloseDisplay: close and reset DirectX device
+ * DirectXCloseDisplay: close and reset the DirectX display device
  *****************************************************************************
- * This function returns all resources allocated by WinDXCreateDisplay and
- * restore the original state of the device.
+ * This function returns all resources allocated by DirectXCreateDisplay.
  *****************************************************************************/
-static void WinDXCloseDisplay( vout_thread_t *p_vout )
+static void DirectXCloseDisplay( vout_thread_t *p_vout )
 {
-    intf_WarnMsg( 3, "vout: WinDXCloseDisplay" );
+    intf_WarnMsg( 3, "vout: DirectXCloseDisplay" );
     if( p_vout->p_sys->p_display != NULL )
     {
-        if( p_vout->p_sys->p_overlay != NULL )
-        {
-            intf_WarnMsg( 3, "vout: WinDXCloseDisplay overlay" );
-            IDirectDraw_Release( p_vout->p_sys->p_overlay );
-            p_vout->p_sys->p_overlay = NULL;
-        }
+        DirectXCloseSurface( p_vout );
 
-        if( p_vout->p_sys->p_clipper != NULL )
-        {
-            intf_WarnMsg( 3, "vout: WinDXCloseDisplay clipper" );
-            IDirectDraw_Release( p_vout->p_sys->p_clipper );
-            p_vout->p_sys->p_clipper = NULL;
-        }
-
-        intf_WarnMsg( 3, "vout: WinDXCloseDisplay display" );
-        IDirectDraw_Release( p_vout->p_sys->p_display );
+        intf_WarnMsg( 3, "vout: DirectXCloseDisplay display" );
+        IDirectDraw2_Release( p_vout->p_sys->p_display );
         p_vout->p_sys->p_display = NULL;
     }
 }
 
 /*****************************************************************************
- * WinDXCloseYUVOverlay: close the overlay surface
+ * DirectXCloseSurface: close the YUV overlay or RGB surface.
  *****************************************************************************
- * This function returns all resources allocated by the overlay surface.
+ * This function returns all resources allocated by the surface.
  * We also call this function when the decoded picture change its dimensions
  * (in that case we close the overlay surface and reopen another with the
  * right dimensions).
  *****************************************************************************/
-static void WinDXCloseYUVOverlay( vout_thread_t *p_vout )
+static void DirectXCloseSurface( vout_thread_t *p_vout )
 {
-    intf_WarnMsg( 3, "vout: WinDXCloseYUVOverlay" );
-    if( p_vout->p_sys->p_overlay != NULL )
+    intf_WarnMsg( 3, "vout: DirectXCloseSurface" );
+    if( p_vout->p_sys->p_surface != NULL )
     {
-        IDirectDraw_Release( p_vout->p_sys->p_overlay );
-        p_vout->p_sys->p_overlay = NULL;
+        intf_WarnMsg( 3, "vout: DirectXCloseSurface surface" );
+        IDirectDraw2_Release( p_vout->p_sys->p_surface );
+        p_vout->p_sys->p_surface = NULL;
     }
+
+    if( p_vout->p_sys->p_clipper != NULL )
+    {
+        intf_WarnMsg( 3, "vout: DirectXCloseSurface clipper" );
+        IDirectDraw2_Release( p_vout->p_sys->p_clipper );
+        p_vout->p_sys->p_clipper = NULL;
+    }
+
+    /* Disable any display */
     p_vout->p_sys->b_display_enabled = 0;
 }

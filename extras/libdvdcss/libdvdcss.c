@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.1 2001/06/12 22:14:44 sam Exp $
+ * $Id: libdvdcss.c,v 1.2 2001/06/14 01:49:44 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -57,10 +57,12 @@ static int _dvdcss_read  ( dvdcss_handle, void *p_buffer, int i_blocks );
 static int _dvdcss_readv ( dvdcss_handle, struct iovec *p_iovec, int i_blocks );
 
 /*****************************************************************************
- * dvdcss_init: initialize libdvdcss
+ * dvdcss_open: initialize library, open a DVD device, crack CSS key
  *****************************************************************************/
-extern dvdcss_handle dvdcss_init ( int i_flags )
+extern dvdcss_handle dvdcss_open ( char *psz_target, int i_flags )
 {
+    int i_ret;
+
     dvdcss_handle dvdcss;
 
     /* Allocate the library structure */
@@ -76,15 +78,40 @@ extern dvdcss_handle dvdcss_init ( int i_flags )
     }
 
     /* Initialize structure */
-    dvdcss->i_status = DVDCSS_STATUS_NONE;
-
     dvdcss->b_debug = i_flags & DVDCSS_INIT_DEBUG;
     dvdcss->b_errors = !(i_flags & DVDCSS_INIT_QUIET);
     dvdcss->psz_error = "no error";
 
-    /* XXX: additional initialization stuff might come here */
+    i_ret = _dvdcss_open( dvdcss, psz_target );
+    if( i_ret < 0 )
+    {
+        free( dvdcss );
+        return NULL;
+    }
 
-    dvdcss->i_status |= DVDCSS_STATUS_INIT;
+    i_ret = CSSTest( dvdcss );
+    if( i_ret < 0 )
+    {
+        _dvdcss_error( dvdcss, "css test failed" );
+        _dvdcss_close( dvdcss );
+        free( dvdcss );
+        return NULL;
+    }
+
+    dvdcss->b_encrypted = i_ret;
+
+    /* If drive is encrypted, crack its key */
+    if( dvdcss->b_encrypted )
+    {
+        i_ret = CSSInit( dvdcss );
+
+        if( i_ret < 0 )
+        {
+            _dvdcss_close( dvdcss );
+            free( dvdcss );
+            return NULL;
+        }
+    }
 
     return dvdcss;
 }
@@ -98,68 +125,10 @@ extern char * dvdcss_error ( dvdcss_handle dvdcss )
 }
 
 /*****************************************************************************
- * dvdcss_open: open a DVD device, crack CSS key if disc is encrypted
- *****************************************************************************/
-extern int dvdcss_open ( dvdcss_handle dvdcss, char *psz_target )
-{
-    int i_ret;
-
-    if( ! (dvdcss->i_status & DVDCSS_STATUS_INIT) )
-    {
-        _dvdcss_error( dvdcss, "library not initialized" );
-        return -1;
-    }
-
-    if( dvdcss->i_status & DVDCSS_STATUS_OPEN )
-    {
-        _dvdcss_error( dvdcss, "a device is already opened" );
-        return -1;
-    }
-
-    i_ret = _dvdcss_open( dvdcss, psz_target );
-    if( i_ret < 0 )
-    {
-        return i_ret;
-    }
-
-    i_ret = CSSTest( dvdcss );
-    if( i_ret < 0 )
-    {
-        _dvdcss_error( dvdcss, "css test failed" );
-        _dvdcss_close( dvdcss );
-        return i_ret;
-    }
-
-    dvdcss->b_encrypted = i_ret;
-
-    /* If drive is encrypted, crack its key */
-    if( dvdcss->b_encrypted )
-    {
-        i_ret = CSSInit( dvdcss );
-
-        if( i_ret < 0 )
-        {
-            _dvdcss_close( dvdcss );
-            return i_ret;
-        }
-    }
-
-    dvdcss->i_status |= DVDCSS_STATUS_OPEN;
-
-    return 0;
-}
-
-/*****************************************************************************
  * dvdcss_seek: seek into the device
  *****************************************************************************/
 extern int dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
 {
-    if( ! (dvdcss->i_status & DVDCSS_STATUS_OPEN) )
-    {
-        _dvdcss_error( dvdcss, "no device opened" );
-        return -1;
-    }
-
     return _dvdcss_seek( dvdcss, i_blocks );
 }
 
@@ -169,12 +138,6 @@ extern int dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
 extern int dvdcss_crack ( dvdcss_handle dvdcss, int i_title, int i_block )
 {
     int i_ret;
-
-    if( ! (dvdcss->i_status & DVDCSS_STATUS_OPEN) )
-    {
-        _dvdcss_error( dvdcss, "no device opened" );
-        return -1;
-    }
 
     if( ! dvdcss->b_encrypted )
     {
@@ -210,12 +173,6 @@ extern int dvdcss_read ( dvdcss_handle dvdcss, void *p_buffer,
 {
     int i_ret;
 
-    if( ! (dvdcss->i_status & DVDCSS_STATUS_OPEN) )
-    {
-        _dvdcss_error( dvdcss, "no device opened" );
-        return -1;
-    }
-
     i_ret = _dvdcss_read( dvdcss, p_buffer, i_blocks );
 
     if( i_ret != i_blocks
@@ -247,12 +204,6 @@ extern int dvdcss_readv ( dvdcss_handle dvdcss, void *p_iovec,
     int i_ret;
     void *iov_base;
     size_t iov_len;
-
-    if( ! (dvdcss->i_status & DVDCSS_STATUS_OPEN) )
-    {
-        _dvdcss_error( dvdcss, "no device opened" );
-        return -1;
-    }
 
     i_ret = _dvdcss_readv( dvdcss, P_IOVEC, i_blocks );
 
@@ -296,39 +247,17 @@ extern int dvdcss_readv ( dvdcss_handle dvdcss, void *p_iovec,
 }
 
 /*****************************************************************************
- * dvdcss_close: close the DVD device
+ * dvdcss_close: close the DVD device and clean up the library
  *****************************************************************************/
 extern int dvdcss_close ( dvdcss_handle dvdcss )
 {
     int i_ret;
-
-    if( ! (dvdcss->i_status & DVDCSS_STATUS_OPEN) )
-    {
-        _dvdcss_error( dvdcss, "no device opened" );
-        return -1;
-    }
 
     i_ret = _dvdcss_close( dvdcss );
 
     if( i_ret < 0 )
     {
         return i_ret;
-    }
-
-    dvdcss->i_status &= ~DVDCSS_STATUS_OPEN;
-
-    return 0;
-}
-
-/*****************************************************************************
- * dvdcss_end: clean up the library
- *****************************************************************************/
-extern int dvdcss_end ( dvdcss_handle dvdcss )
-{
-    if( dvdcss->i_status & DVDCSS_STATUS_OPEN )
-    {
-        _dvdcss_error( dvdcss, "a device is still open" );
-        return -1;
     }
 
     free( dvdcss );
