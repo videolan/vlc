@@ -297,7 +297,7 @@ enum mad_flow libmad_output(void *data, struct mad_header const *p_libmad_header
 
     	if ( p_mad_adec->p_aout_fifo == NULL )
     	{
-        	return( -1 );
+        	return MAD_FLOW_BREAK;
     	}
 
         msg_Dbg( p_mad_adec->p_fifo, "aout fifo created");
