@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.12 2003/04/15 22:16:05 asmax Exp $
+ * $Id: window.cpp,v 1.13 2003/04/16 15:34:36 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -271,6 +271,7 @@ void Window::RefreshImage( int x, int y, int w, int h )
 {
     unsigned int i;
 
+fprintf(stderr, "refr %d %d %d %d\n", x,y,w,h);
     // Create Bitmap Buffer
     Graphics *Buffer = (Graphics *)new OSGraphics( w, h, this );
 
