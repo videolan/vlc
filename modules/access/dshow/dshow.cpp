@@ -38,7 +38,7 @@
 /*****************************************************************************
  * Access: local prototypes
  *****************************************************************************/
-static int ReadCompressed( access_t *, byte_t *, int );
+static block_t *ReadCompressed( access_t * );
 static int AccessControl ( access_t *, int, va_list );
 
 static int Demux       ( demux_t * );
@@ -533,8 +533,8 @@ static int AccessOpen( vlc_object_t *p_this )
     }
 
     /* Setup Access */
-    p_access->pf_read = ReadCompressed;
-    p_access->pf_block = NULL;
+    p_access->pf_read = NULL;
+    p_access->pf_block = ReadCompressed;
     p_access->pf_control = AccessControl;
     p_access->pf_seek = NULL;
     p_access->info.i_update = 0;
@@ -1255,13 +1255,11 @@ static size_t EnumDeviceCaps( vlc_object_t *p_this, IBaseFilter *p_filter,
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * bytes.
  *****************************************************************************/
-static int ReadCompressed( access_t *p_access, uint8_t *p_buffer, int i_len )
+static block_t *ReadCompressed( access_t *p_access )
 {
     access_sys_t   *p_sys = p_access->p_sys;
     dshow_stream_t *p_stream = NULL;
-    VLCMediaSample  sample;
-    int             i_data_size;
-    uint8_t         *p_data;
+    VLCMediaSample sample;
 
     /* Read 1 DV/MPEG frame (they contain the video and audio data) */
 
@@ -1290,20 +1288,22 @@ static int ReadCompressed( access_t *p_access, uint8_t *p_buffer, int i_len )
         /*
          * We got our sample
          */
-        i_data_size = sample.p_sample->GetActualDataLength();
+        block_t *p_block;
+        uint8_t *p_data;
+        int i_data_size = sample.p_sample->GetActualDataLength();
+
+        if( !i_data_size || !(p_block = block_New( p_access, i_data_size )) )
+        {
+            sample.p_sample->Release();
+            continue;
+        }
+
         sample.p_sample->GetPointer( &p_data );
-
-#if 0
-        msg_Info( p_access, "access read %i data_size %i", i_len, i_data_size );
-#endif
-        i_data_size = __MIN( i_data_size, (int)i_len );
-
-        p_access->p_vlc->pf_memcpy( p_buffer, p_data, i_data_size );
-
+        p_access->p_vlc->pf_memcpy( p_block->p_buffer, p_data, i_data_size );
         sample.p_sample->Release();
 
         /* The caller got what he wanted */
-        return i_data_size;
+        return p_block;
     }
 
     return 0; /* never reached */
