@@ -16,10 +16,6 @@
 #include <sys/uio.h>                                               
 #include <string.h>
 
-#include <X11/Xlib.h>
-#include <X11/extensions/XShm.h>
-#include <sys/soundcard.h>
-
 #include <stdlib.h>                            
 #include <stdio.h>
 #include <sys/ioctl.h>                                            

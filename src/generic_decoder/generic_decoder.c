@@ -23,8 +23,6 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <sys/uio.h>
-#include <X11/Xlib.h>
-#include <X11/extensions/XShm.h>
 
 #include "config.h"
 #include "common.h"

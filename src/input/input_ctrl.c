@@ -20,9 +20,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include <X11/Xlib.h>
-#include <X11/extensions/XShm.h>
-#include <sys/soundcard.h>
 #include <netinet/in.h>                                              /* ntohs */
 
 #include "common.h"

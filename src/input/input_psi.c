@@ -21,8 +21,6 @@
 #include <string.h>
 #include <netinet/in.h>                                             
 #include <sys/soundcard.h>
-#include <X11/Xlib.h>
-#include <X11/extensions/XShm.h>
 
 #include "common.h"
 #include "config.h"

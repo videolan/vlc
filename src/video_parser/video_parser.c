@@ -14,8 +14,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/uio.h>
-#include <X11/Xlib.h>
-#include <X11/extensions/XShm.h>
 
 #include "config.h"
 #include "common.h"
@@ -235,7 +233,13 @@ static int InitThread( vpar_thread_t *p_vpar )
     /*
      * Initialize the synchro properties
      */
+    /* the fifo */
+    p_vpar->synchro.i_fifo_start = 0;
+    p_vpar->synchro.i_fifo_stop = 0;
+    /* the counter */
     p_vpar->synchro.modulo = 0;
+    /* mean decoding time - at least 100 ms */
+    p_vpar->synchro.decode_time = 500000;
     /* assume there were about 3 P and 6 B images between I's */
     p_vpar->synchro.current_p_count = 1;
     p_vpar->synchro.p_count_predict = 3;

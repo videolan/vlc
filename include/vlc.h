@@ -33,11 +33,13 @@
 #include <sys/soundcard.h>
 #include <sys/uio.h>
 
+#ifdef VIDEO_X11
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/xf86dga.h>
+#endif
 
 
 
