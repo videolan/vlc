@@ -760,6 +760,8 @@ static int InitThread( adec_thread_t * p_adec )
             return( -1 );
     }
 
+    aout_fifo.l_frame_size = AOUT_FRAME_SIZE;
+
     /* Creating the audio output fifo */
     if ( (p_adec->p_aout_fifo = aout_CreateFifo(p_adec->p_aout, &aout_fifo)) == NULL )
     {

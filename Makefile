@@ -42,6 +42,7 @@ CCFLAGS += -D_GNU_SOURCE
 # Optimizations : don't compile debug versions with them
 CCFLAGS += -O6
 CCFLAGS += -ffast-math -funroll-loops -fargument-noalias-global
+CCFLAGS += -fomit-frame-pointer
 #CCFLAGS += -fomit-frame-pointer -s
 #LCFLAGS += -s
 

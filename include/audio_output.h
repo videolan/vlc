@@ -39,7 +39,9 @@
 /* Number of audio samples (s16 integers) contained in an audio output frame...
  * - Layer I        : a decoded frame contains 384 samples
  * - Layer II & III : a decoded frame contains 1152 = 3*384 samples */
+/*
 #define AOUT_FRAME_SIZE         384
+*/
 
 /* Number of audio output frames contained in an audio output fifo.
  * (AOUT_FIFO_SIZE + 1) must be a power of 2, in order to optimise the
@@ -117,7 +119,7 @@ typedef struct
 /******************************************************************************
  * aout_frame_t
  ******************************************************************************/
-typedef s16 aout_frame_t[ AOUT_FRAME_SIZE ];
+/*typedef s16 aout_frame_t[ AOUT_FRAME_SIZE ];*/
 
 /******************************************************************************
  * aout_fifo_t
@@ -134,6 +136,7 @@ typedef struct
     vlc_mutex_t         data_lock;
     vlc_cond_t          data_wait;
 
+    long                l_frame_size;
     void *              buffer;
     mtime_t *           date;
     /* The start frame is the first frame in the buffer that contains decoded

@@ -325,11 +325,12 @@ aout_fifo_t * aout_CreateFifo( aout_thread_t * p_aout, aout_fifo_t * p_fifo )
             p_aout->fifo[i_fifo].b_stereo = p_fifo->b_stereo;
             p_aout->fifo[i_fifo].l_rate = p_fifo->l_rate;
 
+	    p_aout->fifo[i_fifo].l_frame_size = p_fifo->l_frame_size;
             /* Allocate the memory needed to store the audio frames. As the
              * fifo is a rotative fifo, we must be able to find out whether the
              * fifo is full or empty, that's why we must in fact allocate memory
              * for (AOUT_FIFO_SIZE+1) audio frames. */
-	    if ( (p_aout->fifo[i_fifo].buffer = malloc( sizeof(s16)*(AOUT_FIFO_SIZE+1)*AOUT_FRAME_SIZE )) == NULL )
+	    if ( (p_aout->fifo[i_fifo].buffer = malloc( sizeof(s16)*(AOUT_FIFO_SIZE+1)*p_fifo->l_frame_size )) == NULL )
 	    {
                 intf_ErrMsg("aout error: not enough memory to create the frames buffer\n");
                 p_aout->fifo[i_fifo].i_type = AOUT_EMPTY_FIFO;
@@ -469,10 +470,12 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
             if ( aout_date < p_fifo->date[p_fifo->l_next_frame] )
             {
 */
+/*
             if ( p_fifo->date[p_fifo->l_next_frame] - p_fifo->date[p_fifo->l_start_frame] > 1000000 )
             {
                 p_fifo->date[p_fifo->l_start_frame] = p_fifo->date[p_fifo->l_next_frame] - ((1000000 * AOUT_FRAME_SIZE * ((mtime_t)((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE)) >> p_fifo->b_stereo) / ((mtime_t)p_fifo->l_rate));
             }
+*/
             p_fifo->b_next_frame = 1;
             break;
 /*
@@ -500,8 +503,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
         return( -1 );
     }
 
-    l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE)
-        * (AOUT_FRAME_SIZE >> p_fifo->b_stereo);
+    l_units = ((p_fifo->l_next_frame - p_fifo->l_start_frame) & AOUT_FIFO_SIZE) * (p_fifo->l_frame_size >> p_fifo->b_stereo);
 
     l_rate = (long)( ((mtime_t)l_units * 1000000)
         / (p_fifo->date[p_fifo->l_next_frame] - p_fifo->date[p_fifo->l_start_frame]) );
@@ -509,7 +511,7 @@ static __inline__ int NextFrame( aout_thread_t * p_aout, aout_fifo_t * p_fifo/*,
     InitializeIncrement( &p_fifo->unit_increment, l_rate, p_aout->dsp.l_rate );
 
     p_fifo->l_units = (((l_units - (p_fifo->l_unit -
-        (p_fifo->l_start_frame * (AOUT_FRAME_SIZE >> p_fifo->b_stereo))))
+        (p_fifo->l_start_frame * (p_fifo->l_frame_size >> p_fifo->b_stereo))))
         * p_aout->dsp.l_rate) / l_rate) + 1;
 
     /* We release the lock before leaving */
@@ -644,10 +646,10 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
 
                                 UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
                                 if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 0 */
-                                     ((AOUT_FIFO_SIZE + 1) * (AOUT_FRAME_SIZE >> 0)) )
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 0)) )
                                 {
                                     p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 0 */
-                                        ((AOUT_FIFO_SIZE + 1) * (AOUT_FRAME_SIZE >> 0));
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 0));
                                 }
                             }
                             p_aout->fifo[i_fifo].l_units -= l_units;
@@ -666,10 +668,10 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
 
                                 UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
                                 if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 0 */
-                                     ((AOUT_FIFO_SIZE + 1) * (AOUT_FRAME_SIZE >> 0)) )
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 0)) )
                                 {
                                     p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 0 */
-                                        ((AOUT_FIFO_SIZE + 1) * (AOUT_FRAME_SIZE >> 0));
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 0));
                                 }
                             }
                             l_units -= p_aout->fifo[i_fifo].l_units;
@@ -712,10 +714,10 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
 
                                 UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
                                 if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 1 */
-                                     ((AOUT_FIFO_SIZE + 1) * (AOUT_FRAME_SIZE >> 1)) )
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1)) )
                                 {
                                     p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 1 */
-                                        ((AOUT_FIFO_SIZE + 1) * (AOUT_FRAME_SIZE >> 1));
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1));
                                 }
                             }
                             p_aout->fifo[i_fifo].l_units -= l_units;
@@ -734,10 +736,10 @@ void aout_Thread_S16_Stereo( aout_thread_t * p_aout )
 
                                 UPDATE_INCREMENT( p_aout->fifo[i_fifo].unit_increment, p_aout->fifo[i_fifo].l_unit )
                                 if ( p_aout->fifo[i_fifo].l_unit >= /* p_aout->fifo[i_fifo].b_stereo == 1 */
-                                     ((AOUT_FIFO_SIZE + 1) * (AOUT_FRAME_SIZE >> 1)) )
+                                     ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1)) )
                                 {
                                     p_aout->fifo[i_fifo].l_unit -= /* p_aout->fifo[i_fifo].b_stereo == 1 */
-                                        ((AOUT_FIFO_SIZE + 1) * (AOUT_FRAME_SIZE >> 1));
+                                        ((AOUT_FIFO_SIZE + 1) * (p_aout->fifo[i_fifo].l_frame_size >> 1));
                                 }
                             }
                             l_units -= p_aout->fifo[i_fifo].l_units;
