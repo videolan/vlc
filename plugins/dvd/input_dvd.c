@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.26 2001/03/03 11:01:07 sam Exp $
+ * $Id: input_dvd.c,v 1.27 2001/03/04 03:12:00 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -601,7 +601,8 @@ static int DVDSetArea( input_thread_t * p_input,
                 break;
             default:
                 i_id = 0;
-                intf_ErrMsg( "dvd error: unkown audio" );
+                intf_ErrMsg( "dvd error: unknown audio type %.2x",
+                         p_method->ifo.vts.mat.p_audio_atrt[i].i_coding_mode );
             }
         
             intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",

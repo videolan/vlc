@@ -2,7 +2,7 @@
  * gtk_sys.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_sys.h,v 1.1 2001/02/21 11:49:18 sam Exp $
+ * $Id: gtk_sys.h,v 1.2 2001/03/04 03:12:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,6 +50,7 @@ typedef struct intf_sys_s
     GtkWidget *         p_modules;                         /* module manager */
     GtkWidget *         p_about;                             /* about window */
     GtkWidget *         p_fileopen;                      /* file open window */
+    GtkWidget *         p_disc;                     /* disc selection window */
 
     /* XXX: ugly kludge */
     void             ( *pf_gtk_callback ) ( void );

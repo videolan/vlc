@@ -20,6 +20,13 @@
 static GnomeUIInfo menubar_file_menu_uiinfo[] =
 {
   GNOMEUIINFO_MENU_OPEN_ITEM (on_menubar_open_activate, NULL),
+  {
+    GNOME_APP_UI_ITEM, N_("Open _disc..."),
+    N_("Open a DVD or VCD"),
+    (gpointer) on_menubar_disc_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CDROM,
+    0, (GdkModifierType) 0, NULL
+  },
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_MENU_EXIT_ITEM (on_menubar_exit_activate, NULL),
   GNOMEUIINFO_END
@@ -88,6 +95,7 @@ create_intf_window (void)
   GtkWidget *toolbar;
   GtkWidget *tmp_toolbar_icon;
   GtkWidget *toolbar_open;
+  GtkWidget *toolbar_disc;
   GtkWidget *toolbar_back;
   GtkWidget *toolbar_stop;
   GtkWidget *toolbar_play;
@@ -126,13 +134,18 @@ create_intf_window (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_file_menu_uiinfo[1].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator1",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_disc",
                             menubar_file_menu_uiinfo[1].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_file_menu_uiinfo[2].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_exit",
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "separator1",
                             menubar_file_menu_uiinfo[2].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (menubar_file_menu_uiinfo[3].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "menubar_exit",
+                            menubar_file_menu_uiinfo[3].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (menubar_uiinfo[1].widget);
@@ -212,6 +225,18 @@ create_intf_window (void)
   gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_open", toolbar_open,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_open);
+
+  tmp_toolbar_icon = gnome_stock_pixmap_widget (intf_window, GNOME_STOCK_PIXMAP_CDROM);
+  toolbar_disc = gtk_toolbar_append_element (GTK_TOOLBAR (toolbar),
+                                GTK_TOOLBAR_CHILD_BUTTON,
+                                NULL,
+                                _("Disc"),
+                                NULL, NULL,
+                                tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_ref (toolbar_disc);
+  gtk_object_set_data_full (GTK_OBJECT (intf_window), "toolbar_disc", toolbar_disc,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (toolbar_disc);
 
   gtk_toolbar_append_space (GTK_TOOLBAR (toolbar));
 
@@ -387,6 +412,9 @@ create_intf_window (void)
   gtk_signal_connect (GTK_OBJECT (toolbar_open), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_open_clicked),
                       NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_disc), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_disc_clicked),
+                      NULL);
   gtk_signal_connect (GTK_OBJECT (toolbar_back), "clicked",
                       GTK_SIGNAL_FUNC (on_toolbar_back_clicked),
                       NULL);
@@ -468,6 +496,13 @@ static GnomeUIInfo intf_popup_uiinfo[] =
   },
   GNOMEUIINFO_SEPARATOR,
   GNOMEUIINFO_MENU_OPEN_ITEM (on_popup_open_activate, NULL),
+  {
+    GNOME_APP_UI_ITEM, N_("Open _disc..."),
+    N_("Open DVD or VCD"),
+    (gpointer) on_popup_disc_activate, NULL, NULL,
+    GNOME_APP_PIXMAP_STOCK, GNOME_STOCK_MENU_CDROM,
+    0, (GdkModifierType) 0, NULL
+  },
   GNOMEUIINFO_SEPARATOR,
   {
     GNOME_APP_UI_SUBTREE, N_("_Title"),
@@ -537,13 +572,18 @@ create_intf_popup (void)
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[6].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator3",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_disc",
                             intf_popup_uiinfo[6].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[7].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_title",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator3",
                             intf_popup_uiinfo[7].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (intf_popup_uiinfo[8].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_title",
+                            intf_popup_uiinfo[8].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (popup_title_menu_uiinfo[0].widget);
@@ -551,29 +591,29 @@ create_intf_popup (void)
                             popup_title_menu_uiinfo[0].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
-  gtk_widget_ref (intf_popup_uiinfo[8].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio",
-                            intf_popup_uiinfo[8].widget,
-                            (GtkDestroyNotify) gtk_widget_unref);
-
   gtk_widget_ref (intf_popup_uiinfo[9].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_subtitle",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_audio",
                             intf_popup_uiinfo[9].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[10].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator4",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_subtitle",
                             intf_popup_uiinfo[10].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[11].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_about",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "separator4",
                             intf_popup_uiinfo[11].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   gtk_widget_ref (intf_popup_uiinfo[12].widget);
-  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_exit",
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_about",
                             intf_popup_uiinfo[12].widget,
+                            (GtkDestroyNotify) gtk_widget_unref);
+
+  gtk_widget_ref (intf_popup_uiinfo[13].widget);
+  gtk_object_set_data_full (GTK_OBJECT (intf_popup), "popup_exit",
+                            intf_popup_uiinfo[13].widget,
                             (GtkDestroyNotify) gtk_widget_unref);
 
   return intf_popup;
@@ -810,5 +850,120 @@ create_intf_playlist (void)
                       NULL);
 
   return intf_playlist;
+}
+
+GtkWidget*
+create_intf_disc (void)
+{
+  GtkWidget *intf_disc;
+  GtkWidget *dialog_vbox4;
+  GtkWidget *frame1;
+  GtkWidget *vbox4;
+  GSList *disc_group = NULL;
+  GtkWidget *disc_dvd;
+  GtkWidget *disc_vcd;
+  GtkWidget *hbox1;
+  GtkWidget *label14;
+  GtkWidget *disc_name;
+  GtkWidget *dialog_action_area4;
+  GtkWidget *disc_ok;
+  GtkWidget *disc_cancel;
+
+  intf_disc = gnome_dialog_new (_("Open disc"), NULL);
+  gtk_object_set_data (GTK_OBJECT (intf_disc), "intf_disc", intf_disc);
+  gtk_window_set_policy (GTK_WINDOW (intf_disc), FALSE, FALSE, FALSE);
+
+  dialog_vbox4 = GNOME_DIALOG (intf_disc)->vbox;
+  gtk_object_set_data (GTK_OBJECT (intf_disc), "dialog_vbox4", dialog_vbox4);
+  gtk_widget_show (dialog_vbox4);
+
+  frame1 = gtk_frame_new (_("Disc type"));
+  gtk_widget_ref (frame1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "frame1", frame1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (frame1);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox4), frame1, TRUE, TRUE, 0);
+
+  vbox4 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_ref (vbox4);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "vbox4", vbox4,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (vbox4);
+  gtk_container_add (GTK_CONTAINER (frame1), vbox4);
+
+  disc_dvd = gtk_radio_button_new_with_label (disc_group, _("DVD"));
+  disc_group = gtk_radio_button_group (GTK_RADIO_BUTTON (disc_dvd));
+  gtk_widget_ref (disc_dvd);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "disc_dvd", disc_dvd,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_dvd);
+  gtk_box_pack_start (GTK_BOX (vbox4), disc_dvd, FALSE, FALSE, 0);
+
+  disc_vcd = gtk_radio_button_new_with_label (disc_group, _("VCD (unsupported yet)"));
+  disc_group = gtk_radio_button_group (GTK_RADIO_BUTTON (disc_vcd));
+  gtk_widget_ref (disc_vcd);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "disc_vcd", disc_vcd,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_vcd);
+  gtk_box_pack_start (GTK_BOX (vbox4), disc_vcd, FALSE, FALSE, 0);
+
+  hbox1 = gtk_hbox_new (FALSE, 0);
+  gtk_widget_ref (hbox1);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "hbox1", hbox1,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (hbox1);
+  gtk_box_pack_start (GTK_BOX (dialog_vbox4), hbox1, TRUE, TRUE, 0);
+
+  label14 = gtk_label_new (_("Device name (eg. /dev/cdrom or /dev/dvd): "));
+  gtk_widget_ref (label14);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "label14", label14,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label14);
+  gtk_box_pack_start (GTK_BOX (hbox1), label14, FALSE, FALSE, 0);
+
+  disc_name = gtk_entry_new ();
+  gtk_widget_ref (disc_name);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "disc_name", disc_name,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_name);
+  gtk_box_pack_start (GTK_BOX (hbox1), disc_name, TRUE, TRUE, 0);
+  gtk_entry_set_text (GTK_ENTRY (disc_name), _("/dev/dvd"));
+
+  dialog_action_area4 = GNOME_DIALOG (intf_disc)->action_area;
+  gtk_object_set_data (GTK_OBJECT (intf_disc), "dialog_action_area4", dialog_action_area4);
+  gtk_widget_show (dialog_action_area4);
+  gtk_button_box_set_layout (GTK_BUTTON_BOX (dialog_action_area4), GTK_BUTTONBOX_END);
+  gtk_button_box_set_spacing (GTK_BUTTON_BOX (dialog_action_area4), 8);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_disc), GNOME_STOCK_BUTTON_OK);
+  disc_ok = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_disc)->buttons)->data);
+  gtk_widget_ref (disc_ok);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "disc_ok", disc_ok,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_ok);
+  GTK_WIDGET_SET_FLAGS (disc_ok, GTK_CAN_DEFAULT);
+
+  gnome_dialog_append_button (GNOME_DIALOG (intf_disc), GNOME_STOCK_BUTTON_CANCEL);
+  disc_cancel = GTK_WIDGET (g_list_last (GNOME_DIALOG (intf_disc)->buttons)->data);
+  gtk_widget_ref (disc_cancel);
+  gtk_object_set_data_full (GTK_OBJECT (intf_disc), "disc_cancel", disc_cancel,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (disc_cancel);
+  GTK_WIDGET_SET_FLAGS (disc_cancel, GTK_CAN_DEFAULT);
+
+  gtk_signal_connect (GTK_OBJECT (disc_dvd), "toggled",
+                      GTK_SIGNAL_FUNC (on_disc_dvd_toggled),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (disc_vcd), "toggled",
+                      GTK_SIGNAL_FUNC (on_disc_vcd_toggled),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (disc_ok), "clicked",
+                      GTK_SIGNAL_FUNC (on_disc_ok_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (disc_cancel), "clicked",
+                      GTK_SIGNAL_FUNC (on_disc_cancel_clicked),
+                      NULL);
+
+  return intf_disc;
 }
 

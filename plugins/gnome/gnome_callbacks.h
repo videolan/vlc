@@ -221,3 +221,31 @@ on_popup_audio_activate                (GtkMenuItem     *menuitem,
 void
 on_popup_subtitle_activate             (GtkMenuItem     *menuitem,
                                         gpointer         user_data);
+
+void
+on_menubar_disc_activate               (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);
+
+void
+on_toolbar_disc_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_disc_ok_clicked                     (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_disc_cancel_clicked                 (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_disc_dvd_toggled                    (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+on_disc_vcd_toggled                    (GtkToggleButton *togglebutton,
+                                        gpointer         user_data);
+
+void
+on_popup_disc_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data);

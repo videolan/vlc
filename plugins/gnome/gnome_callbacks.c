@@ -632,3 +632,131 @@ on_popup_subtitle_activate             (GtkMenuItem     *menuitem,
 
 }
 
+
+void
+on_menubar_disc_activate               (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
+
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_disc ) )
+    {
+        p_intf->p_sys->p_disc = create_intf_disc();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_disc ),
+                             "p_intf", p_intf );
+    }
+    gtk_widget_show( p_intf->p_sys->p_disc );
+    gdk_window_raise( p_intf->p_sys->p_disc->window );
+}
+
+
+void
+on_toolbar_disc_clicked                (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_window" );
+
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_disc ) )
+    {
+        p_intf->p_sys->p_disc = create_intf_disc();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_disc ),
+                             "p_intf", p_intf );
+    }
+    gtk_widget_show( p_intf->p_sys->p_disc );
+    gdk_window_raise( p_intf->p_sys->p_disc->window );
+}
+
+
+void
+on_disc_ok_clicked                     (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_disc" );
+    char *psz_device, *psz_source, *psz_method;
+
+    psz_device = gtk_entry_get_text( GTK_ENTRY( lookup_widget(
+                                         GTK_WIDGET(button), "disc_name" ) ) );
+
+    /* "dvd:foo" has size 5 + strlen(foo) */
+    psz_source = malloc( 5 + strlen( psz_device ) );
+    if( psz_source == NULL )
+    {
+        return;
+    }
+
+    /* Check which method was activated */
+    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                          "disc_dvd" ) )->active )
+    {
+        psz_method = "dvd";
+    }
+    else if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
+                                               "disc_vcd" ) )->active )
+    {
+        psz_method = "vcd";
+    }
+    else
+    {
+        intf_ErrMsg( "intf error: unknown toggle button configuration" );
+        free( psz_source );
+        return;
+    }
+    
+    /* Build source name and add it to playlist */
+    sprintf( psz_source, "%s:%s", psz_method, psz_device );
+    intf_PlstAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
+
+    gtk_widget_hide( p_intf->p_sys->p_disc );
+}
+
+
+void
+on_disc_cancel_clicked                 (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(button), "intf_disc" );
+
+    gtk_widget_hide( p_intf->p_sys->p_disc );
+}
+
+
+void
+on_disc_dvd_toggled                    (GtkToggleButton *togglebutton,
+                                        gpointer         user_data)
+{
+    if( togglebutton->active )
+    {
+        gtk_entry_set_text( GTK_ENTRY( lookup_widget(
+            GTK_WIDGET(togglebutton), "disc_name" ) ), "/dev/dvd" );
+    }
+}
+
+
+void
+on_disc_vcd_toggled                    (GtkToggleButton *togglebutton,
+                                        gpointer         user_data)
+{
+    if( togglebutton->active )
+    {
+        gtk_entry_set_text( GTK_ENTRY( lookup_widget(
+            GTK_WIDGET(togglebutton), "disc_name" ) ), "/dev/cdrom" );
+    }
+}
+
+
+void
+on_popup_disc_activate                 (GtkMenuItem     *menuitem,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_popup" );
+
+    if( !GTK_IS_WIDGET( p_intf->p_sys->p_disc ) )
+    {
+        p_intf->p_sys->p_disc = create_intf_disc();
+        gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_disc ),
+                             "p_intf", p_intf );
+    }
+    gtk_widget_show( p_intf->p_sys->p_disc );
+    gdk_window_raise( p_intf->p_sys->p_disc->window );
+}
+

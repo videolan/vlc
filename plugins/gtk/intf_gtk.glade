@@ -95,6 +95,19 @@
 
 	    <widget>
 	      <class>GtkMenuItem</class>
+	      <name>menubar_disc</name>
+	      <tooltip>Open a DVD or VCD</tooltip>
+	      <signal>
+		<name>activate</name>
+		<handler>on_menubar_disc_activate</handler>
+		<last_modification_time>Sun, 04 Mar 2001 02:53:25 GMT</last_modification_time>
+	      </signal>
+	      <label>Open _disc...</label>
+	      <right_justify>False</right_justify>
+	    </widget>
+
+	    <widget>
+	      <class>GtkMenuItem</class>
 	      <name>separator4</name>
 	      <right_justify>False</right_justify>
 	    </widget>
@@ -246,6 +259,19 @@
 	    <last_modification_time>Sun, 11 Feb 2001 17:06:24 GMT</last_modification_time>
 	  </signal>
 	  <label>Open</label>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <child_name>Toolbar:button</child_name>
+	  <name>toolbar_disc</name>
+	  <tooltip>Open File</tooltip>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_toolbar_disc_clicked</handler>
+	    <last_modification_time>Sun, 04 Mar 2001 02:55:35 GMT</last_modification_time>
+	  </signal>
+	  <label>Disc</label>
 	</widget>
 
 	<widget>
@@ -541,6 +567,19 @@
 
   <widget>
     <class>GtkMenuItem</class>
+    <name>popup_disc</name>
+    <tooltip>Open DVD or VCD</tooltip>
+    <signal>
+      <name>activate</name>
+      <handler>on_popup_disc_activate</handler>
+      <last_modification_time>Sun, 04 Mar 2001 03:04:11 GMT</last_modification_time>
+    </signal>
+    <label>Open _disc...</label>
+    <right_justify>False</right_justify>
+  </widget>
+
+  <widget>
+    <class>GtkMenuItem</class>
     <name>separator5</name>
     <right_justify>False</right_justify>
   </widget>
@@ -593,7 +632,6 @@
       <class>GtkHBox</class>
       <child_name>Dialog:action_area</child_name>
       <name>dialog-action_area</name>
-      <border_width>10</border_width>
       <homogeneous>True</homogeneous>
       <spacing>5</spacing>
       <child>
@@ -777,6 +815,208 @@ Henri Fallon &lt;henri@via.ecp.fr&gt;</label>
     </signal>
     <label>Cancel</label>
     <relief>GTK_RELIEF_NORMAL</relief>
+  </widget>
+</widget>
+
+<widget>
+  <class>GtkDialog</class>
+  <name>intf_disc</name>
+  <title>Open disc</title>
+  <type>GTK_WINDOW_TOPLEVEL</type>
+  <position>GTK_WIN_POS_NONE</position>
+  <modal>False</modal>
+  <allow_shrink>False</allow_shrink>
+  <allow_grow>False</allow_grow>
+  <auto_shrink>False</auto_shrink>
+
+  <widget>
+    <class>GtkVBox</class>
+    <child_name>Dialog:vbox</child_name>
+    <name>dialog-vbox2</name>
+    <border_width>10</border_width>
+    <homogeneous>False</homogeneous>
+    <spacing>0</spacing>
+
+    <widget>
+      <class>GtkHBox</class>
+      <child_name>Dialog:action_area</child_name>
+      <name>dialog-action_area1</name>
+      <homogeneous>True</homogeneous>
+      <spacing>5</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>False</expand>
+	<fill>True</fill>
+	<pack>GTK_PACK_END</pack>
+      </child>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>hbox1</name>
+	<border_width>10</border_width>
+	<homogeneous>True</homogeneous>
+	<spacing>5</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>False</expand>
+	  <fill>True</fill>
+	  <pack>GTK_PACK_END</pack>
+	</child>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>disc_ok</name>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_disc_ok_clicked</handler>
+	    <last_modification_time>Sun, 04 Mar 2001 02:45:24 GMT</last_modification_time>
+	  </signal>
+	  <label>OK</label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkButton</class>
+	  <name>disc_cancel</name>
+	  <can_focus>True</can_focus>
+	  <signal>
+	    <name>clicked</name>
+	    <handler>on_disc_cancel_clicked</handler>
+	    <last_modification_time>Sun, 04 Mar 2001 02:45:45 GMT</last_modification_time>
+	  </signal>
+	  <label>Cancel</label>
+	  <relief>GTK_RELIEF_NORMAL</relief>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkVBox</class>
+      <name>vbox4</name>
+      <border_width>5</border_width>
+      <homogeneous>False</homogeneous>
+      <spacing>5</spacing>
+      <child>
+	<padding>0</padding>
+	<expand>True</expand>
+	<fill>True</fill>
+      </child>
+
+      <widget>
+	<class>GtkFrame</class>
+	<name>frame2</name>
+	<label>Disc type</label>
+	<label_xalign>0</label_xalign>
+	<shadow_type>GTK_SHADOW_ETCHED_IN</shadow_type>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
+
+	<widget>
+	  <class>GtkVBox</class>
+	  <name>vbox5</name>
+	  <homogeneous>False</homogeneous>
+	  <spacing>0</spacing>
+
+	  <widget>
+	    <class>GtkRadioButton</class>
+	    <name>disc_dvd</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>toggled</name>
+	      <handler>on_disc_dvd_toggled</handler>
+	      <last_modification_time>Sun, 04 Mar 2001 02:50:56 GMT</last_modification_time>
+	    </signal>
+	    <label>DVD</label>
+	    <active>False</active>
+	    <draw_indicator>True</draw_indicator>
+	    <group>disc</group>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkRadioButton</class>
+	    <name>disc_vcd</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>toggled</name>
+	      <handler>on_disc_vcd_toggled</handler>
+	      <last_modification_time>Sun, 04 Mar 2001 02:51:00 GMT</last_modification_time>
+	    </signal>
+	    <label>VCD (unsupported yet)</label>
+	    <active>False</active>
+	    <draw_indicator>True</draw_indicator>
+	    <group>disc</group>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+	</widget>
+      </widget>
+
+      <widget>
+	<class>GtkHBox</class>
+	<name>hbox2</name>
+	<homogeneous>False</homogeneous>
+	<spacing>5</spacing>
+	<child>
+	  <padding>0</padding>
+	  <expand>True</expand>
+	  <fill>True</fill>
+	</child>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label19</name>
+	  <label>Device name (eg. /dev/cdrom or /dev/dvd):</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	  <child>
+	    <padding>0</padding>
+	    <expand>False</expand>
+	    <fill>False</fill>
+	  </child>
+	</widget>
+
+	<widget>
+	  <class>GtkEntry</class>
+	  <name>entry2</name>
+	  <can_focus>True</can_focus>
+	  <editable>True</editable>
+	  <text_visible>True</text_visible>
+	  <text_max_length>0</text_max_length>
+	  <text>/dev/dvd</text>
+	  <child>
+	    <padding>0</padding>
+	    <expand>True</expand>
+	    <fill>True</fill>
+	  </child>
+	</widget>
+      </widget>
+    </widget>
   </widget>
 </widget>
 

@@ -6,3 +6,4 @@ GtkWidget* create_intf_window (void);
 GtkWidget* create_intf_popup (void);
 GtkWidget* create_intf_about (void);
 GtkWidget* create_intf_fileopen (void);
+GtkWidget* create_intf_disc (void);
