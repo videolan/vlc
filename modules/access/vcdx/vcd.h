@@ -3,7 +3,7 @@
  *          using libcdio, libvcd and libvcdinfo
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vcd.h,v 1.3 2003/11/26 01:28:52 rocky Exp $
+ * $Id: vcd.h,v 1.4 2003/11/26 02:41:02 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *
@@ -23,11 +23,6 @@
  *****************************************************************************/
 
 #include <libvcd/info.h>
-
-/*****************************************************************************
- * dvd_data_t: structure for communication between dvdplay access, demux
- * and intf.
- *****************************************************************************/
 
 /*****************************************************************************
  * vcd_data_t: structure for communication between access and intf.
