@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.22 2002/05/30 08:17:04 gbazin Exp $
+ * $Id: gnome.c,v 1.23 2002/05/30 13:39:43 asmax Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -76,7 +76,7 @@ MODULE_CONFIG_START
 ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
 ADD_BOOL   ( "gnome-tooltips", 1, GtkHideTooltips, TOOLTIPS_TEXT,
              TOOLTIPS_LONGTEXT )
-ADD_BOOL   ( "gnome-toolbartext", GtkHideToolbarText, TOOLBAR_TEXT,
+ADD_BOOL   ( "gnome-toolbartext", 1, GtkHideToolbarText, TOOLBAR_TEXT,
              TOOLBAR_LONGTEXT )
 ADD_INTEGER( "gnome-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT,
              PREFS_MAXH_LONGTEXT )
