@@ -16,8 +16,6 @@ disable the GUI. You will end-up with a vlc.log file in your current directory.
 If you want to play a DVD, run vlc and click on the Disc option in the
 interface. You then have to type your drive letter in the 'Device name'
 box (eg. 'D' if this is the letter for your dvdrom drive).
-( !WARNING: you have to be in administrator mode (for now) on Win2k/XP or the
-  DVD won't play. )
 
 Building VideoLAN Client from the source code
 =============================================
@@ -62,6 +60,19 @@ http://prdownloads.sourceforge.net/mingw/MinGW-1.1.tar.gz
 You must also not forget to install the extra development packages if you want
 to build the DirectX, GTK and SDL plugins.
 (http://www.videolan.org/vlc/windows.html)
+
+- compiling natively on Windoze with cygwin:
+You will need to download and run the setup.exe app from cygwin's web site
+(www.cygwin.com).
+I'm personnaly running the experimental distribution (and gcc-3.2) with the
+exception of the autoconf tool for which I'm using the autoconf-devel-2.52-4
+package (I had problems with 2.53a-1). You will need to make sure you install
+at least the gcc-mingw, mingw-runtime and w32api packages.
+
+Also note that currently, even when using the -mno-cygwin option, the final
+executable requires cygwin1.dll even if none of the objects linked to form the
+executable does depend on cygwin1.dll itself. I don't know yet why the linker
+plays this trick...
 
 
 NOTE: by default, the GTK package is configured to be installed in
@@ -132,7 +143,7 @@ something like this:
 If you want to use the emulation layer, then just omit the CC="gcc -mno-cygwin"
 line.
 
-Note: when using the --with-dvdcss-tree you need to compile the tree
+Note: when using the --with-dvdcss-tree you need to compile the libdvdcss tree
 beforehand.
 
 Building VideoLAN Client
