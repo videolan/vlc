@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.60 2004/01/09 02:28:30 hartman Exp $
+ * $Id: video.c,v 1.61 2004/01/18 21:30:25 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -487,7 +487,14 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         p_sys->p_buffer += i_used;
 
         /* Nothing to display */
-        if( !b_gotpicture ) continue;
+        if( !b_gotpicture )
+        {
+            if( i_used == 0 )
+            {
+                break;
+            }
+            continue;
+        }
 
         /* Update frame late count*/
         if( p_sys->i_pts && p_sys->i_pts <= mdate() )
