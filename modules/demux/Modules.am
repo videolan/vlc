@@ -19,3 +19,4 @@ SOURCES_ps2 = ps.c ps.h
 SOURCES_dvdnav = dvdnav.c
 SOURCES_mod = mod.c
 SOURCES_pva = pva.c
+SOURCES_aiff = aiff.c
