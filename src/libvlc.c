@@ -1339,12 +1339,14 @@ int VLC_TimeSet( int i_object, int i_seconds, vlc_bool_t b_relative )
 
     if( b_relative )
     {
-        val.i_time = i_seconds * 1000000;
+        val.i_time = i_seconds;
+        val.i_time = val.i_time * 1000000L;
         var_Set( p_input, "time-offset", val );
     }
     else
     {
-        val.i_time = i_seconds * 1000000;
+        val.i_time = i_seconds;
+        val.i_time = val.i_time * 1000000L;
         var_Set( p_input, "time", val );
     }
     vlc_object_release( p_input );
@@ -1386,7 +1388,7 @@ int VLC_LengthGet( int i_object )
     vlc_object_release( p_input );
 
     if( i_object ) vlc_object_release( p_vlc );
-    return val.i_time  / 1000000;
+    return val.i_time  / 1000000L;
 }
 
 /**
