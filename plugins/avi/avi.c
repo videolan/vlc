@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.5 2002/04/26 14:29:26 fenrir Exp $
+ * $Id: avi.c,v 1.6 2002/04/27 16:13:23 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -204,7 +204,7 @@ static int __AVI_ParseStreamHeader( u32 i_id, int *i_number, u16 *i_type )
         return( -1 );
     }
     *i_number = (c1 - '0') * 10 + (c2 - '0' );
-    *i_type = ( c3 << 8) + c4;
+    *i_type = ( c4 << 8) + c3;
     return( 0 );
 }   
 
@@ -214,7 +214,7 @@ static void __AVI_AddEntryIndex( AVIStreamInfo_t *p_info,
     AVIIndexEntry_t *p_tmp;
     if( p_info->p_index == NULL )
     {
-        p_info->i_idxmax = 4096;
+        p_info->i_idxmax = 16384;
         p_info->i_idxnb = 0;
         p_info->p_index = calloc( p_info->i_idxmax, 
                                   sizeof( AVIIndexEntry_t ) );
@@ -222,13 +222,13 @@ static void __AVI_AddEntryIndex( AVIStreamInfo_t *p_info,
     }
     if( p_info->i_idxnb >= p_info->i_idxmax )
     {
-        p_info->i_idxmax += 4096;
+        p_info->i_idxmax += 16384;
         p_tmp = realloc( (void*)p_info->p_index,
                            p_info->i_idxmax * 
                            sizeof( AVIIndexEntry_t ) );
         if( p_tmp == NULL ) 
         { 
-            p_info->i_idxmax -= 4096;
+            p_info->i_idxmax -= 16384;
             return; 
         }
         p_info->p_index = p_tmp;
@@ -321,7 +321,7 @@ static int __AVI_SeekToChunk( input_thread_t *p_input, AVIStreamInfo_t *p_info )
         return( 0 );
     }
     /* no index can't arrive but ...*/
-    intf_WarnMsg( 1, "CAN'T SEEK");
+    intf_WarnMsg( 1, "input error: can't seek");
     return( -1 );
 }
 
@@ -422,7 +422,14 @@ static int AVIInit( input_thread_t *p_input )
     es_descriptor_t *p_es_audio;
 
     int i;
-    
+
+    /* we need to seek to be able to readcorrectly */
+    if( !p_input->stream.b_seekable ) 
+    {
+        intf_ErrMsg( "input error: need the ability to seek in stream" );
+        return( -1 );
+    }
+
     p_input->p_demux_data = 
                 p_avi_demux = malloc( sizeof(demux_data_avi_file_t) );
     if( p_avi_demux == NULL )
@@ -643,17 +650,16 @@ static int AVIInit( input_thread_t *p_input )
     p_avi_demux->p_movi = p_movi;
     
     /* get index  XXX need to have p_movi */
-    
-    if( (p_input->stream.b_seekable)
-         &&((p_avi_demux->avih.i_flags&AVIF_HASINDEX) != 0) )
+    if( (p_avi_demux->avih.i_flags&AVIF_HASINDEX) != 0 )
     {
+        /* get index */
         __AVI_GetIndex( p_input ); 
         /* try to get i_idxoffset for each stream  */
         __AVI_GetIndexOffset( p_input );
     }
     else
     {
-        intf_WarnMsg( 1, "input init: cannot get index" );
+        intf_WarnMsg( 1, "input init: no index !" );
     }
 
     
@@ -815,7 +821,7 @@ static void AVIEnd( input_thread_t *p_input )
 
 static mtime_t __AVI_GetPTS( AVIStreamInfo_t *p_info )
 {
-    /* XXX you need to had p_info->i_date to have correct pts */
+    /* XXX you need to add p_info->i_date to have correct pts */
     /* p_info->p_index[p_info->i_idxpos] need to be valid !! */
     mtime_t i_pts;
 
@@ -846,9 +852,11 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
     AVIIndexEntry_t index;
     riffchunk_t     *p_chunk;
     demux_data_avi_file_t *p_avi_demux;
-
+    AVIStreamInfo_t *p_info_tmp;
+    int             i;
+    int             i_idxpos;
+    int             b_inc = 0;
     p_avi_demux = (demux_data_avi_file_t*)p_input->p_demux_data;
-        
 
     p_info->i_idxpos++;
 
@@ -856,35 +864,90 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
     {
         return( 0 );
     }
+    p_info->i_idxpos--;
     /* create entry on the fly */
     /* TODO: when parsing for a stream take care of the other to not do 
        the same things two time */
-    p_info->i_idxpos--;
-    __AVI_SeekToChunk( p_input, p_info );
+    /* search for the less advance stream and parse from it for all streams*/
+    p_info_tmp = p_info;
+    
+    for( i = 0; i < p_avi_demux->i_streams; i++ )
+    {
+#define p_info_i p_avi_demux->pp_info[i]
+        if( p_info_i->p_index[p_info_i->i_idxnb - 1].i_offset + 
+                        p_info_i->i_idxoffset < 
+            p_info_tmp->p_index[p_info_tmp->i_idxnb - 1].i_offset +
+                        p_info_tmp->i_idxoffset )
+        {
+            p_info_tmp = p_info_i;
+        }
+#undef  p_info_i
+    }
+    /* go to last defined entry */
+    i_idxpos = p_info_tmp->i_idxpos; /* save p_info_tmp->i_idxpos */
+    p_info_tmp->i_idxpos = p_info_tmp->i_idxnb - 1;
+    __AVI_SeekToChunk( p_input, p_info_tmp );
+    p_info_tmp->i_idxpos = i_idxpos;
+
     if( RIFF_NextChunk( p_input, p_avi_demux->p_movi ) != 0 )
     {
+        __AVI_SeekToChunk( p_input, p_info );
         return( -1 );
     }
-    /* FIXME */
-    /* p_info->p_input[0].i_id may not always be true for video 
-        because of db and dc */
-    if( (RIFF_FindChunk( p_input, p_info->p_index[0].i_id, 
-                                    p_avi_demux->p_movi ) == 0)
-        &&( (p_chunk = RIFF_ReadChunk( p_input )) != NULL) )
+    /* save idxpos of p_info */
+    /* now parse for all stream and stop when reach next chunk for p_info */
+    for( i = 0; (i < 20)||(!b_inc); i++)
     {
+        int i_number;
+        u16 i_type;
+        if( (p_chunk = RIFF_ReadChunk( p_input )) == NULL )
+        {
+            if( i > 0)
+            {
+                return( 0 );
+            }
+            else
+            {
+                return( -1 );
+            }
+        }
+
         index.i_id = p_chunk->i_id;
         index.i_flags = AVIIF_KEYFRAME;
         index.i_offset = p_chunk->i_pos;
         index.i_length = p_chunk->i_size;
-        __AVI_AddEntryIndex( p_info, &index );
-        p_info->i_idxpos++;
-    }
-    else
-    {
-        __AVI_SeekToChunk( p_input, p_info ); /* if readchunk failed */
-        return( -1 );
-    }
-    return( 0 );    
+        RIFF_DeleteChunk( p_input, p_chunk );
+
+#define p_info_i    p_avi_demux->pp_info[i_number]
+       if( (__AVI_ParseStreamHeader( index.i_id, &i_number, &i_type ) == 0)
+             &&( i_number < p_avi_demux->i_streams )
+             && (p_info_i->p_index[p_info_i->i_idxnb - 1].i_offset + 
+                     p_info_i->p_index[p_info_i->i_idxnb - 1].i_length <= 
+                        index.i_offset ) )
+        {
+            /* do we need to check i_type ? */
+            __AVI_AddEntryIndex( p_info_i, &index );
+            if( (p_info_i == p_info)&&(!b_inc) )
+            {
+                p_info->i_idxpos++;
+                b_inc = 1;
+            }
+        }
+#undef  p_info_i
+        if( RIFF_NextChunk( p_input, p_avi_demux->p_movi ) != 0 )
+        {
+            if( i > 0)
+            {
+                return( 0 );
+            }
+            else
+            {
+                return( -1 );
+            }
+        }
+    } 
+    return( 0 );
+    intf_WarnMsg( 1, "input demux: added index entry(%d)",i );
 }
 
 static int __AVI_ReAlign( input_thread_t *p_input, 
@@ -1045,7 +1108,6 @@ static int AVIDemux( input_thread_t *p_input )
         intf_ErrMsg( "input error: no video ouput selected" );
         return( -1 );
     }
-
     if( (input_ClockManageControl( p_input, p_input->stream.p_selected_program,
                             (mtime_t)0) == PAUSE_S) )
     {   

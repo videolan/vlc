@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.2 2002/04/25 03:01:03 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.3 2002/04/27 16:13:23 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -454,10 +454,10 @@ static void EndThread( videodec_thread_t *p_vdec )
 
 static void  DecodeThread( videodec_thread_t *p_vdec )
 {
-    int i_len;
-    int b_gotpicture;
-    int b_convert;
-   
+    int     i_len;
+    int     b_gotpicture;
+    int     b_convert;
+    mtime_t i_pts; 
     pes_packet_t  *p_pes;
     AVPicture avpicture;  /* ffmpeg picture */
     u32 i_chroma;
@@ -475,7 +475,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
      int linesize[3];
  } AVPicture;
  */
-    p_pes = NULL;
+    i_pts = -1 ;
     do
     {
         __PACKET_FILL( p_vdec );
@@ -483,13 +483,15 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
         {
             return;
         }
-        /* save p_pes for pts */
-        if( p_pes == NULL ) {p_pes = __PES_GET( p_vdec->p_fifo );}
+        /* save pts */
+        if( i_pts < 0 ) {i_pts =  __PES_GET( p_vdec->p_fifo )->i_pts;}
+
         i_len = avcodec_decode_video( p_vdec->p_context,
                                       &avpicture,
                                       &b_gotpicture,
                                       p_vdec->p_buff,
                                       p_vdec->i_data_size);
+                                      
         if( i_len < 0 )
         {
             intf_WarnMsg( 1, "vdec error: cannot decode one frame (%d bytes)",
@@ -603,7 +605,7 @@ static void  DecodeThread( videodec_thread_t *p_vdec )
         __ConvertAVPictureToPicture( &avpicture, p_picture );
     }
 
-    vout_DatePicture( p_vdec->p_vout, p_picture, p_pes->i_pts );
+    vout_DatePicture( p_vdec->p_vout, p_picture, i_pts );
     vout_DisplayPicture( p_vdec->p_vout, p_picture );
     
     return;
