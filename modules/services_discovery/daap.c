@@ -511,6 +511,7 @@ static int EnumerateCallback( DAAP_SClient *p_client,
         p_vlchost->p_host = p_host;
         p_vlchost->psz_name = psz_buffer;
         p_vlchost->b_new = VLC_TRUE;
+        p_vlchost->b_updated = VLC_TRUE;
         INSERT_ELEM( p_sys->p_db->pp_hosts, p_sys->p_db->i_hosts,
                      p_sys->p_db->i_hosts, p_vlchost );
     }
@@ -565,6 +566,7 @@ static void ProcessHost( services_discovery_t *p_sd, host_t *p_host )
     DAAP_ClientHost_Database *p_database = malloc( i_dbsize );
     DAAP_ClientHost_GetDatabases( p_host->p_host, p_database, &i_db, i_dbsize );
 
+
     if( !i_db || !p_database )
     {
         msg_Warn( p_sd, "no database on DAAP host %s", p_host->psz_name );
@@ -601,9 +603,9 @@ static void ProcessHost( services_discovery_t *p_sd, host_t *p_host )
                                                    p_host->p_songs[i].id );
         p_item = playlist_ItemNew( p_sd, psz_buff,
                                          p_host->p_songs[i].itemname );
-        vlc_input_item_AddInfo( &p_item->input, _("Meta-Information"),
+        vlc_input_item_AddInfo( &p_item->input, _("Meta-information"),
                                 _("Artist"), p_host->p_songs[i].songartist );
-        vlc_input_item_AddInfo( &p_item->input, _("Meta-Information"),
+        vlc_input_item_AddInfo( &p_item->input, _("Meta-information"),
                                 _("Album"), p_host->p_songs[i].songalbum );
 
         playlist_NodeAddItem( p_playlist, p_item, VIEW_CATEGORY,

@@ -623,7 +623,6 @@ int playlist_Replace( playlist_t *p_playlist, playlist_item_t *p_olditem,
  */
 int playlist_Delete( playlist_t * p_playlist, int i_id )
 {
-    vlc_value_t     val;
     int             i;
 
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
@@ -682,7 +681,6 @@ int playlist_LockDelete( playlist_t * p_playlist, int i_id )
 int playlist_Clear( playlist_t * p_playlist )
 {
     int i;
-    playlist_view_t *p_view;
     for( i = p_playlist->i_size; i > 0 ; i-- )
     {
         playlist_Delete( p_playlist, p_playlist->pp_items[0]->input.i_id );

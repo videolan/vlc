@@ -689,7 +689,7 @@ static void RunThread ( playlist_t *p_playlist )
 /* Queue for items to preparse */
 static void RunPreparse ( playlist_preparse_t *p_obj )
 {
-    playlist_t *p_playlist = p_obj->p_parent;
+    playlist_t *p_playlist = (playlist_t *)p_obj->p_parent;
     vlc_bool_t b_sleep;
 
     /* Tell above that we're ready */
@@ -1075,7 +1075,6 @@ static int ItemChange( vlc_object_t *p_obj, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *param )
 {
     playlist_t *p_playlist = (playlist_t *)param;
-    int i_index;
 
     //p_playlist->b_need_update = VLC_TRUE;
     var_SetInteger( p_playlist, "item-change", newval.i_int );
