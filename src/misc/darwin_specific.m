@@ -2,7 +2,7 @@
  * darwin_specific.m: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.m,v 1.4 2003/01/02 23:09:30 massiot Exp $
+ * $Id: darwin_specific.m,v 1.5 2003/01/03 00:03:13 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -137,11 +137,9 @@ void system_Init( vlc_t *p_this, int *pi_argc, char *ppsz_argv[] )
                     b_found = 1;
                 }
             }
-
-//            [o_lang release];
         }
 
-//        [o_defs release];
+        [o_languages release];
         [o_pool release];
     }
 }
