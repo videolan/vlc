@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.29 2002/05/17 15:14:47 lool Exp $
+ * $Id: mtime.c,v 1.30 2002/05/17 16:38:41 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -50,6 +50,18 @@
 #   include <windows.h>
 #else
 #   include <sys/time.h>
+#endif
+
+#if defined(HAVE_NANOSLEEP) && !defined(HAVE_STRUCT_TIMESPEC)
+struct timespec
+{
+    time_t tv_sec;
+    long tv_sec;
+};
+#endif
+
+#if defined(HAVE_NANOSLEEP) && !defined(HAVE_DECL_NANOSLEEP)
+int nanosleep(struct timespec *, struct timespec *);
 #endif
 
 /*****************************************************************************
@@ -141,7 +153,7 @@ void mwait( mtime_t date )
 
 #else
 
-    struct timeval tv_date, tv_delay;
+    struct timeval tv_date;
     mtime_t        delay;          /* delay in msec, signed to detect errors */
 
     /* see mdate() about gettimeofday() possible errors */
@@ -166,10 +178,22 @@ void mwait( mtime_t date )
     st_usleep( delay );
 
 #   else
-    tv_delay.tv_sec = delay / 1000000;
-    tv_delay.tv_usec = delay % 1000000;
+
+#       if defined( HAVE_NANOSLEEP )
+    {
+        struct timespec ts_delay;
+        ts_delay.tv_sec = delay / 1000000;
+        ts_delay.tv_nsec = (delay % 1000000) * 1000;
+
+        nanosleep( &ts_delay, NULL );
+    }
+
+#       else
+    tv_date.tv_sec = delay / 1000000;
+    tv_date.tv_usec = delay % 1000000;
     /* see msleep() about select() errors */
-    select( 0, NULL, NULL, NULL, &tv_delay );
+    select( 0, NULL, NULL, NULL, &tv_date );
+#       endif
 
 #   endif
 
@@ -195,15 +219,24 @@ void msleep( mtime_t delay )
 #elif defined( WIN32 )
     Sleep( (int) (delay / 1000) );
 
+#elif defined( HAVE_NANOSLEEP )
+    struct timespec ts_delay;
+
+    ts_delay.tv_sec = delay / 1000000;
+    ts_delay.tv_nsec = (delay % 1000000) * 1000;
+
+    nanosleep( &ts_delay, NULL );
+
 #else
     struct timeval tv_delay;
 
     tv_delay.tv_sec = delay / 1000000;
     tv_delay.tv_usec = delay % 1000000;
+
     /* select() return value should be tested, since several possible errors
      * can occur. However, they should only happen in very particular occasions
      * (i.e. when a signal is sent to the thread, or when memory is full), and
-     * can be ingnored. */
+     * can be ignored. */
     select( 0, NULL, NULL, NULL, &tv_delay );
 
 #endif

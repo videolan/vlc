@@ -41,7 +41,7 @@
 
 /* When creating or destroying threads in blocking mode, delay to poll thread
  * status */
-#define THREAD_SLEEP                    ((int)(0.010*CLOCK_FREQ))
+#define THREAD_SLEEP                    ((mtime_t)(0.010*CLOCK_FREQ))
 
 /* When a thread waits on a condition in debug mode, delay to wait before
  * outputting an error message (in second) */
@@ -62,7 +62,7 @@
  *****************************************************************************/
 
 /* Base delay in micro second for interface sleeps */
-#define INTF_IDLE_SLEEP                 ((int)(0.050*CLOCK_FREQ))
+#define INTF_IDLE_SLEEP                 ((mtime_t)(0.050*CLOCK_FREQ))
 
 /* Step for changing gamma, and minimum and maximum values */
 #define INTF_GAMMA_STEP                 .1
@@ -73,7 +73,7 @@
  *****************************************************************************/
 
 /* XXX?? */
-#define INPUT_IDLE_SLEEP                ((int)(0.100*CLOCK_FREQ))
+#define INPUT_IDLE_SLEEP                ((mtime_t)(0.100*CLOCK_FREQ))
 
 /*
  * General limitations
@@ -204,13 +204,13 @@
 #define VOUT_FPS_SAMPLES                20
 
 /* Better be in advance when awakening than late... */
-#define VOUT_MWAIT_TOLERANCE            ((int)(0.020*CLOCK_FREQ))
+#define VOUT_MWAIT_TOLERANCE            ((mtime_t)(0.020*CLOCK_FREQ))
 
 /* Time to sleep when waiting for a buffer (from vout or the video fifo).
  * It should be approximately the time needed to perform a complete picture
  * loop. Since it only happens when the video heap is full, it does not need
  * to be too low, even if it blocks the decoder. */
-#define VOUT_OUTMEM_SLEEP               ((int)(0.020*CLOCK_FREQ))
+#define VOUT_OUTMEM_SLEEP               ((mtime_t)(0.020*CLOCK_FREQ))
 
 /* The default video output window title */
 #define VOUT_TITLE                      "VideoLAN Client " VERSION
@@ -219,7 +219,7 @@
  * Video parser configuration
  *****************************************************************************/
 
-#define VPAR_IDLE_SLEEP                 ((int)(0.010*CLOCK_FREQ))
+#define VPAR_IDLE_SLEEP                 ((mtime_t)(0.010*CLOCK_FREQ))
 
 /* Optimization level, from 0 to 2 - 1 is generally a good compromise. Remember
  * that raising this level dramatically lengthens the compilation time. */
@@ -236,7 +236,7 @@
  * Video decoder configuration
  *****************************************************************************/
 
-#define VDEC_IDLE_SLEEP                 ((int)(0.100*CLOCK_FREQ))
+#define VDEC_IDLE_SLEEP                 ((mtime_t)(0.100*CLOCK_FREQ))
 
 /* Maximum range of values out of the IDCT + motion compensation. */
 #define VDEC_CROPRANGE                  2048

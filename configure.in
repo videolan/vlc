@@ -111,7 +111,7 @@ dnl The -DSYS_FOO flag
 save_CFLAGS="${save_CFLAGS} -DSYS_`echo ${SYS} | sed -e 's/-.*//' | tr 'abcdefghijklmnopqrstuvwxyz.' 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_'`"
 
 dnl Check for system libs needed
-AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty usleep vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2)
+AC_CHECK_FUNCS(gettimeofday select strerror strtod strtol isatty vasprintf swab sigrelse getpwuid memalign posix_memalign gethostbyname2)
 
 AC_CHECK_FUNC(connect,,[
   AC_CHECK_LIB(socket,connect,
@@ -124,10 +124,12 @@ AC_CHECK_FUNC(gethostbyname,,[
 AC_CHECK_FUNC(gethostbyname,,[
   AC_CHECK_LIB(bind,gethostbyname,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind")
 ])
-AC_CHECK_FUNC(nanosleep,,[
-  AC_CHECK_LIB(rt,nanosleep,vlc_LDFLAGS="${vlc_LDFLAGS} -lrt",[
-    AC_CHECK_LIB(posix4,nanosleep,vlc_LDFLAGS="${vlc_LDFLAGS} -lposix4")
-  ])
+AC_CHECK_FUNCS(nanosleep,,[
+  AC_CHECK_LIB(rt,nanosleep,
+    [vlc_LDFLAGS="${vlc_LDFLAGS} -lrt"],
+    [AC_CHECK_LIB(posix4,nanosleep,
+        [vlc_LDFLAGS="${vlc_LDFLAGS} -lposix4"])]
+  )
 ])
 AC_CHECK_FUNC(inet_aton,,[
   AC_CHECK_LIB(resolv,inet_aton,ipv4_LDFLAGS="${ipv4_LDFLAGS} -lresolv")
@@ -192,6 +194,14 @@ AC_CHECK_HEADERS(machine/param.h sys/shm.h)
 AC_CHECK_HEADERS(linux/version.h)
 
 AC_HEADER_TIME
+
+dnl Mac OS X and other OSes don't have declaration for nanosleep
+dnl This only works with autoconf 2.52
+AC_CHECK_DECLS(nanosleep)
+
+dnl Make sure we have timespecs
+dnl This only works with autoconf 2.52
+AC_CHECK_TYPES(struct timespec)
 
 dnl Check for threads library
 AC_CHECK_HEADERS(cthreads.h pthread.h kernel/scheduler.h kernel/OS.h)
