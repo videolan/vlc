@@ -63,6 +63,8 @@ $Id$
 
  * beos: Audio output, video output and interface module for BeOS.
 
+ * blend: a picture filter that blends two pictures
+
  * caca: color ASCII art video output using libcaca
 
  * cdda: input module to read audio CDs
@@ -87,17 +89,15 @@ $Id$
 
  * deinterlace: naive deinterlacing filter.
 
- * demux2: demux compatibility layer
-
  * demuxdump: Pseudo-demuxer that dumps the stream
 
  * demuxstream: MPEG TS demuxer which also sends the stream to the network
 
- * demuxsub: Text subtitles demuxer
-
  * directory : input module to read files in a directory
 
  * distort: miscellaneous image effects filter.
+
+ * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
 
  * dshow: DirectShow access plugin for encoding cards under Windows
 
@@ -121,9 +121,9 @@ $Id$
 
  * dvdnav: access module for DVDs with libdvdnav
 
- * dvdplay: access module for accessing DVDs using libdvdplay
-
  * dvdread: input module for accessing DVDs, uses libdvdread.
+
+ * equalizer: a equalizer audio filter
 
  * es: input module for MPEG ES decapsulation.
 
@@ -159,11 +159,17 @@ $Id$
 
  * ftp : FTP input module
 
+ * galaktos: a visualization module that outputs OpenGL
+
  * gestures: mouse gestures control plugin
 
  * ggi: video output module using the GGI API.
 
  * glide: video output module using the Glide API.
+
+ * glwin32: a opengl provider using DirectX OpenGL
+
+ * glx: a opengl provider using X11 OpenGL
 
  * gnome2: interface using the GNOME2 widget set
  
@@ -274,8 +280,6 @@ $Id$
 
  * mpeg_audio: MPEG audio parser/packetizer
 
- * mpeg_system: helper module for TS, PS and PES management
-
  * mpga: MPEG-I/II Audio demuxer
 
  * mpgatofixed32: MPEG-1 & 2 audio layer I,II,III audio decoder using MAD
@@ -290,20 +294,30 @@ $Id$
  
  * mux_mp4: MP4 muxer
 
+ * mux_mpjpeg: a multipart MIME MJPEG muxer
+
  * mux_ogg: OGG muxer
  
  * mux_ps: MPEG program stream muxer
  
  * mux_ts: MPEG transport stream muxer
 
+ * mux_wav: a WAV muxer
+
  * ncurses: interface module using the ncurses library.
+
+ * netsync: synchronizes the clock of 1 or more VLCs with a server for synchronous playback
+
+ * normvol: a audio filter for volume normalization. 
 
  * nsv: NullSoft Video demuxer
 
  * ntservice: run VLC as a NT service
 
  * ogg: input module for OGG decapsulation.
-
+ 
+ * opengl: a opengl video output that uses opengl provider modules
+ 
  * opie: interface for Opie using QT/Embedded library.
 
  * oss: audio output module using the OSS /dev/dsp interface.
@@ -339,6 +353,8 @@ $Id$
  * qt: interface module using the Qt widget set.
 
  * qte: video output module for Qt Embedded.
+
+ * qte_main: a QT Embedded GUI wrapper module.
  
  * quicktime: Quicktime decoder that uses the QT library
 
@@ -362,6 +378,8 @@ $Id$
 
  * satellite: Satellite cards access module
 
+ * screen: a input module that takes screenshots of the primary monitor
+
  * screensaver: screensaver disabling module
 
  * sgimb: SGIMB referrer files parser
@@ -372,11 +390,13 @@ $Id$
 
  * slp: input module to access SLP registered sessions
 
+ * snapshot: a output module to save pictures from the vout.
+
  * spdif_mixer: dummy audio mixer for the S/PDIF output
 
  * speex: a speex audio decoder/packetizer using the libspeex library.
 
- * spudec: DVD subtitles decoder.
+ * spudec: RLE DVD subtitles decoder.
 
  * stream_out_display: displays a stream output chain 
 
@@ -396,9 +416,13 @@ $Id$
 
  * stream_out_transrate: audio & video transrater using ffmpeg
 
- * subsdec: Another SPU decoder for text subtitles
+ * subsdec: a codec to output textual subtitles
+ 
+ * subtitle: a demuxer for subtitle files
 
  * svcdsub: SVCD subtitles decoder
+
+ * svg: a svg renderer module
 
  * svgalib: SGVAlib output plugin
 
@@ -415,6 +439,8 @@ $Id$
  * test4: Stress test module
 
  * theora: a theora video decoder/packetizer/encoder using the libtheora library.
+
+ * toolame: a mp1 mp2 audio encoder based on toolame
 
  * transform: filter for horizontal and vertical image flips and
                      90° rotations.
