@@ -2,7 +2,7 @@
  * mpegvideo.c: parse and packetize an MPEG1/2 video stream
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mpegvideo.c,v 1.31 2004/03/03 11:09:30 massiot Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -211,12 +211,14 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( (*pp_block)->i_flags&BLOCK_FLAG_DISCONTINUITY )
+    if( (*pp_block)->i_flags & BLOCK_FLAG_DISCONTINUITY )
     {
         p_sys->i_state = STATE_NOSYNC;
         if( p_sys->p_frame ) block_ChainRelease( p_sys->p_frame );
         p_sys->p_frame = NULL;
         p_sys->b_frame_slice = VLC_FALSE;
+        block_Release( *pp_block );
+        return NULL;
     }
 
     block_BytestreamPush( &p_sys->bytestream, *pp_block );
