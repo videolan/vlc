@@ -104,7 +104,8 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
 {
     input_thread_t *p_input;                        /* thread descriptor */
-    int             i;
+    vlc_value_t val;
+    int i;
 
     /* Allocate descriptor */
     p_input = vlc_object_create( p_parent, VLC_OBJECT_INPUT );
@@ -168,7 +169,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
     input_ControlVarInit( p_input );
     p_input->input.i_cr_average = var_GetInteger( p_input, "cr-average" );
 
-#if 0
     /* TODO */
     var_Get( p_input, "bookmarks", &val );
     if( val.psz_string )
@@ -216,7 +216,6 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
         }
         free( val.psz_string );
     }
-#endif
 
     /* Now we can attach our new input */
     vlc_object_attach( p_input, p_parent );
