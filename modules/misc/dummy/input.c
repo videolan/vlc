@@ -201,6 +201,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     playlist_t *p_playlist;
+    vlc_bool_t b_eof = VLC_FALSE;
 
     p_playlist = vlc_object_find( p_demux, VLC_OBJECT_PLAYLIST, FIND_PARENT );
 
@@ -213,8 +214,8 @@ static int Demux( demux_t *p_demux )
     switch( p_sys->i_command )
     {
         case COMMAND_QUIT:
-            p_demux->p_vlc->b_die = 1;
-            return 0;
+            b_eof = p_demux->p_vlc->b_die = VLC_TRUE;
+            break;
 
         case COMMAND_LOOP:
             playlist_Goto( p_playlist, 0 );
@@ -222,20 +223,19 @@ static int Demux( demux_t *p_demux )
 
         case COMMAND_PAUSE:
             if( mdate() >= p_sys->expiration )
-            {
-                return 0;
-            }
-            msleep( 10000 );
+                b_eof = VLC_TRUE;
+            else
+                msleep( 10000 );
             break;
 
         case COMMAND_NOP:
         default:
-            return 0;
+            b_eof = VLC_TRUE;
+            break;
     }
 
     vlc_object_release( p_playlist );
-
-    return 1;
+    return b_eof ? 0 : 1;
 }
 
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
