@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.12 2001/04/05 14:00:28 asmax Exp $
+ * $Id: input_ps.c,v 1.13 2001/04/05 16:37:15 asmax Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -143,7 +143,6 @@ static int PSProbe( probedata_t *p_data )
 static void PSInit( input_thread_t * p_input )
 {
     thread_ps_data_t *  p_method;
-    packet_cache_t * 	p_packet_cache;
 
     if( (p_method =
          (thread_ps_data_t *)malloc( sizeof(thread_ps_data_t) )) == NULL )
@@ -152,62 +151,10 @@ static void PSInit( input_thread_t * p_input )
         p_input->b_error = 1;
         return;
     }
+
     p_input->p_plugin_data = (void *)p_method;
-    
-    /* creates the packet cache structure */
-    p_packet_cache = malloc( sizeof(packet_cache_t) );
-    if ( p_packet_cache == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_input->p_method_data = (void *)p_packet_cache;
-    
-    /* allocates the data cache */
-    p_packet_cache->data.p_stack = malloc( DATA_CACHE_SIZE * 
-        sizeof(data_packet_t*) );
-    if ( p_packet_cache->data.p_stack == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-    	p_input->b_error = 1;
-    	return;
-    }
-    p_packet_cache->data.l_index = 0;
-    
-    /* allocates the PES cache */
-    p_packet_cache->pes.p_stack = malloc( PES_CACHE_SIZE * 
-        sizeof(pes_packet_t*) );
-    if ( p_packet_cache->pes.p_stack == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_packet_cache->pes.l_index = 0;
-    
-    /* allocates the small buffer cache */
-    p_packet_cache->small.p_stack = malloc( SMALL_CACHE_SIZE * 
-        sizeof(packet_buffer_t) );
-    if ( p_packet_cache->small.p_stack == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_packet_cache->small.l_index = 0;
-    
-    /* allocates the large buffer cache */
-    p_packet_cache->large.p_stack = malloc( LARGE_CACHE_SIZE * 
-        sizeof(packet_buffer_t) );
-    if ( p_packet_cache->large.p_stack == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        p_input->b_error = 1;
-        return;
-    }
-    p_packet_cache->large.l_index = 0;
-    
+    p_input->p_method_data = NULL;
+
     /* Re-open the socket as a buffered FILE stream */
     if( (p_method->stream = fdopen( p_input->i_handle, "r" )) == NULL )
     {
@@ -474,8 +421,7 @@ static int PSRead( input_thread_t * p_input,
         }
 
         /* Fetch a packet of the appropriate size. */
-        if( (p_data = NewPacket( p_input->p_method_data, i_packet_size + 6 )) 
-            == NULL )
+        if( (p_data = NewPacket( p_input, i_packet_size + 6 )) == NULL )
         {
             intf_ErrMsg( "Out of memory" );
             return( -1 );
@@ -508,7 +454,6 @@ static int PSRead( input_thread_t * p_input,
 
         /* Give the packet to the other input stages. */
         pp_packets[i_packet] = p_data;
-//fprintf(stderr, "read2 %li %li\n", p_data, p_data->l_size);
     }
 
     return( 0 );
@@ -537,282 +482,92 @@ static void PSSeek( input_thread_t * p_input, off_t i_position )
 /*****************************************************************************
  * NewPacket: allocates a data packet
  *****************************************************************************/
-static struct data_packet_s * NewPacket( void * p_packet_cache,
-                                         size_t l_size )
-{ 
-    packet_cache_t *   p_cache;
-    data_packet_t *    p_data;
-    long               l_index;
+static struct data_packet_s * NewPacket( void * p_garbage,
+                                         size_t i_size )
+{
+    data_packet_t * p_data;
 
-    if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
-    {
-        intf_ErrMsg( "PPacket cache not initialized" );
-        return NULL;
-    }
     /* Safety check */
-    if( l_size > INPUT_MAX_PACKET_SIZE )
+    if( i_size > INPUT_MAX_PACKET_SIZE )
     {
-        intf_ErrMsg( "Packet too big (%d)", l_size );
+        intf_ErrMsg( "Packet too big (%d)", i_size );
         return NULL;
     }
 
-    /* Checks whether the data cache is empty */
-    if( p_cache->data.l_index == 0 )
+    if( (p_data = (data_packet_t *)malloc( sizeof(data_packet_t) )) == NULL )
     {
-        /* Allocates a new packet */
-        if ( (p_data = malloc( sizeof(data_packet_t) )) == NULL )
-        {
-            intf_DbgMsg( "Out of memory" );
-            return NULL;
-        }
+        intf_DbgMsg( "Out of memory" );
+        return NULL;
     }
-    else
+
+    if( (p_data->p_buffer = (byte_t *)malloc( i_size )) == NULL )
     {
-        /* Takes the packet out from the cache */
-        if( (p_data = p_cache->data.p_stack[ -- p_cache->data.l_index ]) 
-            == NULL )
-        {
-            intf_DbgMsg( "NULL packet in the data cache" );
-            return NULL;
-        }
-    }
-    
-    if( l_size < MAX_SMALL_SIZE )
-    {
-        /* Small buffer */  
-   
-        /* Checks whether the buffer cache is empty */
-        if( p_cache->small.l_index == 0 )
-        {
-    	    /* Allocates a new packet */
-            if ( (p_data->p_buffer = malloc( l_size )) == NULL )
-            {
-                intf_DbgMsg( "Out of memory" );
-                free( p_data );
-                return NULL;
-            }
-            p_data->l_size = l_size;
-        }
-        else
-        {
-            /* Takes the packet out from the cache */
-            l_index = -- p_cache->small.l_index;    
-            if( (p_data->p_buffer = p_cache->small.p_stack[l_index].p_data)
-                == NULL )
-            {
-                intf_DbgMsg( "NULL packet in the small buffer cache" );
-                free( p_data );
-                return NULL;
-            }
-	        /* Reallocates the packet if it is too small or too large */
-            if( p_cache->small.p_stack[l_index].l_size < l_size ||
-                p_cache->small.p_stack[l_index].l_size > 2*l_size )
-            {
-                p_data->p_buffer = realloc( p_data->p_buffer, l_size );
-                p_data->l_size = l_size;
-            }
-            else
-            {
-                p_data->l_size = p_cache->small.p_stack[l_index].l_size;
-            }
-        }
-    }
-    else
-    {
-        /* Large buffer */  
-   
-        /* Checks whether the buffer cache is empty */
-        if( p_cache->large.l_index == 0 )
-        {
-    	    /* Allocates a new packet */
-            if ( (p_data->p_buffer = malloc( l_size )) == NULL )
-            {
-                intf_DbgMsg( "Out of memory" );
-                free( p_data );
-                return NULL;
-            }
-            p_data->l_size = l_size;
-        }
-        else
-        {
-            /* Takes the packet out from the cache */
-            l_index = -- p_cache->large.l_index;    
-            if( (p_data->p_buffer = p_cache->large.p_stack[l_index].p_data)
-                == NULL )
-            {
-                intf_DbgMsg( "NULL packet in the small buffer cache" );
-                free( p_data );
-                return NULL;
-            }
-	        /* Reallocates the packet if it is too small or too large */
-            if( p_cache->large.p_stack[l_index].l_size < l_size ||
-                p_cache->large.p_stack[l_index].l_size > 2*l_size )
-            {
-                p_data->p_buffer = realloc( p_data->p_buffer, l_size );
-                p_data->l_size = l_size;
-            }
-            else
-            {
-                p_data->l_size = p_cache->large.p_stack[l_index].l_size;
-            }
-	    }
+        intf_DbgMsg( "Out of memory" );
+        free( p_data );
+        return NULL;
     }
 
     /* Initialize data */
     p_data->p_next = NULL;
     p_data->b_discard_payload = 0;
+
     p_data->p_payload_start = p_data->p_buffer;
-    p_data->p_payload_end = p_data->p_buffer + l_size;
+    p_data->p_payload_end = p_data->p_buffer + i_size;
 
-//fprintf(stderr, "addr: %li %li buf %li\n", p_data, p_data->l_size, p_data->p_buffer);
     return( p_data );
-	
 }
-
 
 /*****************************************************************************
  * NewPES: allocates a pes packet
  *****************************************************************************/
-static pes_packet_t * NewPES( void * p_packet_cache )
+static pes_packet_t * NewPES( void * p_garbage )
 {
-    packet_cache_t *   p_cache;
-    pes_packet_t *     p_pes;
+    pes_packet_t * p_pes;
 
-    if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
+    if( (p_pes = (pes_packet_t *)malloc( sizeof(pes_packet_t) )) == NULL )
     {
-        intf_ErrMsg( "Packet cache not initialized" );
+        intf_DbgMsg( "Out of memory" );
         return NULL;
     }
-    /* Checks whether the PES cache is empty */
-    if( p_cache->pes.l_index == 0 )
-    {
-        /* Allocates a new packet */
-        if ( (p_pes = malloc( sizeof(pes_packet_t) )) == NULL )
-        {
-            intf_DbgMsg( "Out of memory" );
-            return NULL;
-        }
-    }
-    else
-    {
-        /* Takes the packet out from the cache */
-        if( (p_pes = p_cache->pes.p_stack[ -- p_cache->pes.l_index ]) 
-            == NULL )
-        {
-            intf_DbgMsg( "NULL packet in the data cache" );
-            return NULL;
-        }
-    }
-	
+
     p_pes->b_data_alignment = p_pes->b_discontinuity =
         p_pes->i_pts = p_pes->i_dts = 0;
     p_pes->i_pes_size = 0;
     p_pes->p_first = NULL;
 
     return( p_pes );
-    
 }
 
 /*****************************************************************************
  * DeletePacket: deletes a data packet
  *****************************************************************************/
-static void DeletePacket( void * p_packet_cache,
+static void DeletePacket( void * p_garbage,
                           data_packet_t * p_data )
 {
-    packet_cache_t *   p_cache;
-	
-    if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
-    {
-        intf_ErrMsg( "Packet cache not initialized" );
-        return;
-    }
-
-	ASSERT( p_data );
-
-    /* Checks whether the data cache is full */
-    if ( p_cache->data.l_index < DATA_CACHE_SIZE )
-    {
-        /* Cache not full: store the packet in it */
-        p_cache->data.p_stack[ p_cache->data.l_index ++ ] = p_data;
-        /* Small buffer or large buffer? */
-        if ( p_data->l_size < MAX_SMALL_SIZE )
-        {
-            /* Checks whether the small buffer cache is full */
-            if ( p_cache->small.l_index < SMALL_CACHE_SIZE )
-            {
-                p_cache->small.p_stack[ p_cache->small.l_index ].l_size = 
-                    p_data->l_size;
-                p_cache->small.p_stack[ p_cache->small.l_index ++ ].p_data = 
-                    p_data->p_buffer;
-            }
-            else
-            {
-                ASSERT( p_data->p_buffer );
-                free( p_data->p_buffer );
-            }
-        }
-    	else
-        {
-            /* Checks whether the large buffer cache is full */
-            if ( p_cache->large.l_index < LARGE_CACHE_SIZE )
-            {
-                p_cache->large.p_stack[ p_cache->large.l_index ].l_size = 
-                    p_data->l_size;
-                p_cache->large.p_stack[ p_cache->large.l_index ++ ].p_data = 
-                    p_data->p_buffer;
-            }
-            else
-            {
-                ASSERT( p_data->p_buffer );
-                free( p_data->p_buffer );
-            }
-        }
-    }
-    else
-    {
-        /* Cache full: the packet must be freed */
-        free( p_data->p_buffer );
-    	free( p_data );
-    }
-
+    ASSERT(p_data);
+    ASSERT(p_data->p_buffer);
+    free( p_data->p_buffer );
+    free( p_data );
 }
 
 /*****************************************************************************
  * DeletePES: deletes a PES packet and associated data packets
  *****************************************************************************/
-static void DeletePES( void * p_packet_cache, pes_packet_t * p_pes )
+static void DeletePES( void * p_garbage, pes_packet_t * p_pes )
 {
-    packet_cache_t *    p_cache;
     data_packet_t *     p_data;
     data_packet_t *     p_next;
-
-    if ( (p_cache = (packet_cache_t *)p_packet_cache) == NULL )
-    {
-        intf_ErrMsg( "Packet cache not initialized" );
-        return;
-    }
-
-    ASSERT( p_pes);
 
     p_data = p_pes->p_first;
 
     while( p_data != NULL )
     {
         p_next = p_data->p_next;
-        DeletePacket( p_cache, p_data );
+        free( p_data->p_buffer );
+        free( p_data );
         p_data = p_next;
     }
 
-    /* Checks whether the PES cache is full */
-    if ( p_cache->pes.l_index < PES_CACHE_SIZE )
-    {
-    	/* Cache not full: store the packet in it */
-        p_cache->pes.p_stack[ p_cache->pes.l_index ++ ] = p_pes;
-    }
-    else
-    {
-        /* Cache full: the packet must be freed */
-        free( p_pes );
-    }
+    free( p_pes );
 }
 
