@@ -953,13 +953,16 @@ static void RunThread( vout_thread_t *p_vout)
                 p_vout->pf_display( p_vout, p_directbuffer );
             }
 
-            /* Reinitialize idle loop count */
-            i_idle_loops = 0;
-
             /* Tell the vout this was the last picture and that it does not
              * need to be forced anymore. */
             p_last_picture = p_picture;
             p_last_picture->b_force = 0;
+        }
+
+        if( p_picture != NULL )
+        {
+            /* Reinitialize idle loop count */
+            i_idle_loops = 0;
         }
 
         /*

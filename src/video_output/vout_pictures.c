@@ -337,12 +337,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
 
         if( PP_OUTPUTPICTURE[0]->pf_lock )
             if( PP_OUTPUTPICTURE[0]->pf_lock( p_vout, PP_OUTPUTPICTURE[0] ) )
-            {
-                if( PP_OUTPUTPICTURE[0]->pf_unlock )
-                PP_OUTPUTPICTURE[0]->pf_unlock( p_vout, PP_OUTPUTPICTURE[0] );
-
                 return NULL;
-            }
 
         vout_CopyPicture( p_vout, PP_OUTPUTPICTURE[0], p_pic );
         vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_pic, p_subpic );
