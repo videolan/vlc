@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: mkv.cpp,v 1.55 2004/01/25 20:05:28 hartman Exp $
+ * $Id: mkv.cpp,v 1.56 2004/01/30 14:27:48 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -261,8 +261,6 @@ static void IndexAppendCluster  ( input_thread_t *p_input, KaxCluster *cluster )
 static char *UTF8ToStr          ( const UTFstring &u );
 static void LoadCues            ( input_thread_t *);
 static void InformationsCreate  ( input_thread_t *p_input );
-
-static char *LanguageGetName    ( const char *psz_code );
 
 /*****************************************************************************
  * Open: initializes matroska demux structures
@@ -615,11 +613,10 @@ static int Open( vlc_object_t * p_this )
                             KaxTrackLanguage &lang = *(KaxTrackLanguage*)el3;
                             lang.ReadData( p_sys->es->I_O() );
 
-                            tk.fmt.psz_language =
-                                LanguageGetName( string( lang ).c_str() );
+                            tk.fmt.psz_language = strdup( string( lang ).c_str() );
                             msg_Dbg( p_input,
-                                     "|   |   |   + Track Language=`%s'(%s) ",
-                                     tk.fmt.psz_language, string( lang ).c_str() );
+                                     "|   |   |   + Track Language=`%s'",
+                                     tk.fmt.psz_language );
                         }
                         else  if( EbmlId( *el3 ) == KaxCodecID::ClassInfos.GlobalId )
                         {
@@ -2306,40 +2303,5 @@ static char * UTF8ToStr( const UTFstring &u )
     *p++= '\0';
 
     return dst;
-}
-
-static char *LanguageGetName    ( const char *psz_code )
-{
-    const iso639_lang_t *pl;
-
-    if( strlen( psz_code ) == 2 )
-    {
-        pl = GetLang_1( psz_code );
-    }
-    else if( strlen( psz_code ) == 3 )
-    {
-        pl = GetLang_2B( psz_code );
-        if( !strcmp( pl->psz_iso639_1, "??" ) )
-        {
-            pl = GetLang_2T( psz_code );
-        }
-    }
-    else
-    {
-        return strdup( psz_code );
-    }
-
-    if( !strcmp( pl->psz_iso639_1, "??" ) )
-    {
-       return strdup( psz_code );
-    }
-    else
-    {
-        if( *pl->psz_native_name )
-        {
-            return strdup( pl->psz_native_name );
-        }
-        return strdup( pl->psz_eng_name );
-    }
 }
 

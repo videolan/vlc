@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: mp4.c,v 1.57 2004/01/25 20:05:28 hartman Exp $
+ * $Id: mp4.c,v 1.58 2004/01/30 14:27:48 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -127,8 +127,6 @@ static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
 {
     return (int64_t)1000000 * p_sys->i_time / p_sys->i_timescale;
 }
-
-static char *LanguageGetName( const char *psz_code );
 
 #define FREE( p ) if( p ) { free( p ); (p) = NULL;}
 
@@ -1461,7 +1459,7 @@ static void MP4_TrackCreate( input_thread_t *p_input,
     /* Set language */
     if( strcmp( language, "```" ) && strcmp( language, "und" ) )
     {
-        p_track->fmt.psz_language = LanguageGetName( language );
+        p_track->fmt.psz_language = strdup( language );
     }
 
     /* fxi i_timescale for AUDIO_ES with i_qt_version == 0 */
@@ -1831,27 +1829,5 @@ static void MP4_TrackSetELST( input_thread_t *p_input, mp4_track_t *tk, int64_t 
     {
         msg_Warn( p_input, "elst old=%d new=%d", i_elst_last, tk->i_elst );
     }
-}
-
-static char *LanguageGetName( const char *psz_code )
-{
-    const iso639_lang_t *pl;
-
-    pl = GetLang_2B( psz_code );
-    if( !strcmp( pl->psz_iso639_1, "??" ) )
-    {
-        pl = GetLang_2T( psz_code );
-    }
-
-    if( !strcmp( pl->psz_iso639_1, "??" ) )
-    {
-       return strdup( psz_code );
-    }
-
-    if( *pl->psz_native_name )
-    {
-        return strdup( pl->psz_native_name );
-    }
-    return strdup( pl->psz_eng_name );
 }
 

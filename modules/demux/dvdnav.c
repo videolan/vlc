@@ -2,7 +2,7 @@
  * dvdnav.c: DVD module using the dvdnav library.
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: dvdnav.c,v 1.9 2004/01/30 01:38:53 fenrir Exp $
+ * $Id: dvdnav.c,v 1.10 2004/01/30 14:27:48 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -304,7 +304,6 @@ static int DemuxOpen( vlc_object_t *p_this )
     vlc_value_t val, text;
     int         i_title, i_titles, i_chapter, i_chapters, i_angle, i;
     char        *psz_name;
-    char        psz_lang[3] = "en";
 
     if( strncmp( p_demux->psz_access, "dvdnav", 6 ) ||
         strncmp( p_demux->psz_demux,  "dvdnav", 6 ) )
@@ -782,8 +781,16 @@ static void ESSubtitleUpdate( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int         i_spu = dvdnav_get_active_spu_stream( p_sys->dvdnav );
+    int32_t i_title, i_part;
 
     ButtonUpdate( p_demux );
+
+    dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
+    msg_Err( p_demux, "title=%d part=%d", i_title, i_part );
+    if( i_title > 0 )
+    {
+        return;
+    }
 
     if( i_spu >= 0 && i_spu <= 0x1f )
     {
@@ -897,31 +904,6 @@ static int DemuxBlock( demux_t *p_demux, uint8_t *pkt, int i_pkt )
     return VLC_SUCCESS;
 }
 
-static char *LangCode2String( uint16_t i_lang )
-{
-    const iso639_lang_t *pl;
-    char  lang[3];
-
-    if( i_lang == 0xffff )
-    {
-        return NULL;
-    }
-    lang[0] = (i_lang >> 8)&0xff;
-    lang[1] = (i_lang     )&0xff;
-    lang[2] = 0;
-
-    pl =  GetLang_1( lang );
-    if( !strcmp( pl->psz_iso639_1, "??" ) )
-    {
-        return strdup( lang );
-    }
-    else if( *pl->psz_native_name )
-    {
-        return strdup( pl->psz_native_name );
-    }
-    return strdup( pl->psz_eng_name );
-}
-
 static void ESNew( demux_t *p_demux, int i_id )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -970,8 +952,14 @@ static void ESNew( demux_t *p_demux, int i_id )
         }
         if( i_audio >= 0 )
         {
-            tk->fmt.psz_language =
-                LangCode2String( dvdnav_audio_stream_to_lang( p_sys->dvdnav, i_audio ) );
+            int i_lang = dvdnav_audio_stream_to_lang( p_sys->dvdnav, i_audio );
+            if( i_lang != 0xffff )
+            {
+                tk->fmt.psz_language = malloc( 3 );
+                tk->fmt.psz_language[0] = (i_lang >> 8)&0xff;
+                tk->fmt.psz_language[1] = (i_lang     )&0xff;
+                tk->fmt.psz_language[2] = 0;
+            }
             if( dvdnav_get_active_audio_stream( p_sys->dvdnav ) == i_audio )
             {
                 b_select = VLC_TRUE;
@@ -980,11 +968,26 @@ static void ESNew( demux_t *p_demux, int i_id )
     }
     else if( tk->fmt.i_cat == SPU_ES )
     {
-        tk->fmt.psz_language =
-            LangCode2String( dvdnav_spu_stream_to_lang( p_sys->dvdnav, i_id&0x1f ) );
+        int32_t i_title, i_part;
+        int i_lang = dvdnav_spu_stream_to_lang( p_sys->dvdnav, i_id&0x1f );
+        if( i_lang != 0xffff )
+        {
+            tk->fmt.psz_language = malloc( 3 );
+            tk->fmt.psz_language[0] = (i_lang >> 8)&0xff;
+            tk->fmt.psz_language[1] = (i_lang     )&0xff;
+            tk->fmt.psz_language[2] = 0;
+        }
         /* palette */
         tk->fmt.subs.spu.palette[0] = 0xBeef;
         memcpy( &tk->fmt.subs.spu.palette[1], p_sys->clut, 16 * sizeof( uint32_t ) );
+
+        /* We select only when we are not in the menu */
+        dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
+        if( i_title > 0 &&
+            dvdnav_get_active_spu_stream( p_sys->dvdnav ) == (i_id&0x1f) )
+        {
+            b_select = VLC_TRUE;
+        }
     }
 
     tk->es = es_out_Add( p_demux->out, &tk->fmt );
