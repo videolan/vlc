@@ -1,5 +1,5 @@
 dnl  Macros needed for VLC
-dnl  $Id: vlc.m4,v 1.5 2003/07/01 14:25:47 sam Exp $
+dnl  $Id: vlc.m4,v 1.6 2003/07/17 15:49:37 sam Exp $
 
 dnl  Add plugins or builtins
 AC_DEFUN([AX_ADD_BUILTINS], [
@@ -88,25 +88,25 @@ AC_DEFUN([AX_OUTPUT_VLC_CONFIG_IN], [
   for x in `echo ${am_all_modules}`
   do [
     echo "    ${x})" >> vlc-config.in
-    if test -n "`eval echo '$'CPPFLAGS_${x}`"; then
+    if test "`eval echo @'$'CPPFLAGS_${x}@`" != "@@"; then
       echo "      cppflags=\"\${cppflags} `eval echo '$'CPPFLAGS_${x}`\"" >> vlc-config.in
     fi
-    if test -n "`eval echo '$'CFLAGS_${x}`"; then
+    if test "`eval echo @'$'CFLAGS_${x}@`" != "@@"; then
       echo "      cflags=\"\${cflags} `eval echo '$'CFLAGS_${x}`\"" >> vlc-config.in
     fi
-    if test -n "`eval echo '$'CXXFLAGS_${x}`"; then
+    if test "`eval echo @'$'CXXFLAGS_${x}@`" != "@@"; then
       echo "      cxxflags=\"\${cxxflags} `eval echo '$'CXXFLAGS_${x}`\"" >> vlc-config.in
-      if test "${x}" != "plugins" -a "${x}" != "builtins"; then
+      if test "${x}" != "plugin" -a "${x}" != "builtin"; then
         echo "      linkage=\"c++\"" >> vlc-config.in
       fi
     fi
-    if test -n "`eval echo '$'OBJCFLAGS_${x}`"; then
+    if test "`eval echo @'$'OBJCFLAGS_${x}@`" != "@@"; then
       echo "      objcflags=\"\${objcflags} `eval echo '$'OBJCFLAGS_${x}`\"" >> vlc-config.in
-      if test "${x}" != "plugins" -a "${x}" != "builtins"; then
+      if test "${x}" != "plugin" -a "${x}" != "builtin"; then
         echo "      if test \"\${linkage}\" = \"c\"; then linkage=\"objc\"; fi" >> vlc-config.in
       fi
     fi
-    if test -n "`eval echo '$'LDFLAGS_${x}`"; then
+    if test "`eval echo @'$'LDFLAGS_${x}@`" != "@@"; then
       echo "      ldflags=\"\${ldflags} `eval echo '$'LDFLAGS_${x}`\"" >> vlc-config.in
     fi
     echo "    ;;" >> vlc-config.in
