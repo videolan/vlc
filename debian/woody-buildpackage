@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# $Id: woody-buildpackage,v 1.6 2003/02/09 12:21:05 sam Exp $
+# $Id: woody-buildpackage,v 1.7 2003/02/17 07:22:05 sam Exp $
 # Build VLC for a Woody Debian system
 
 if test ! -d debian
@@ -30,6 +30,7 @@ sed -e 's/liba52-[^-]*-dev/a52dec-dev (>=0.7.3)/' \
 # rules: remove wxwindows stuff
 #        change changelog path
 sed -e '/# Package: wxvlc/,/^ *$/d' \
+    -e 's,^ARCH_EXCLUDE =,& -Nwxvlc,' \
     -e 's,--enable-wxwindows,--disable-wxwindows,' \
     -e 's, debian/changelog , debian/changelog.woody ,' \
     -e 's,dh_gencontrol[^#]*,& -- -ldebian/changelog.woody,' \

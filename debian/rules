@@ -12,6 +12,8 @@ export DH_COMPAT=3
 # Compilation options
 #
 
+ARCH_EXCLUDE =
+
 CONFIG_FLAGS = --enable-release --prefix=/usr
 CONFIG_FLAGS += \
 	--enable-gnome \
@@ -51,7 +53,7 @@ CONFIG_FLAGS += --enable-faad --with-faad-tree=extras/faad
 ifeq ($(DEB_BUILD_ARCH),i386)
 CONFIG_FLAGS += --enable-glide
 else
-ARCH_EXCLUDE = -Nvlc-plugin-glide
+ARCH_EXCLUDE += -Nvlc-plugin-glide -Nvlc-glide
 endif
 
 # Remove --without-dvdcss in non-totalitarian countries
