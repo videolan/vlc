@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.111 2003/05/15 21:31:53 gbazin Exp $
+ * $Id: input_programs.c,v 1.112 2003/05/15 23:05:59 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -356,7 +356,7 @@ input_area_t * input_AddArea( input_thread_t * p_input,
     val.psz_string = malloc( sizeof("title ") + 5 );
     if( val.psz_string )
     {
-        vlc_value_t val2;
+        vlc_value_t val2, text, text2;
 
         sprintf( val.psz_string, "title %2i", i_area_id );
         var_Destroy( p_input, val.psz_string );
@@ -365,14 +365,28 @@ input_area_t * input_AddArea( input_thread_t * p_input,
         var_AddCallback( p_input, val.psz_string, NavigationCallback,
                          (void *)(int)i_area_id );
 
-        var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val, NULL );
+        text.psz_string = malloc( strlen( _("Title %i") ) + 20 );
+        if( text.psz_string )
+            sprintf( text.psz_string, _("Title %i"), i_area_id );
+
+        var_Change( p_input, "navigation", VLC_VAR_ADDCHOICE, &val, &text );
+
+        if( text.psz_string ) free( text.psz_string );
+
+        text2.psz_string = malloc( strlen( _("Chapter %i") ) + 20 );
 
         for( i = 1; i <= i_part_nb; i++ )
         {
             val2.i_int = i;
+
+            if( text2.psz_string )
+                sprintf( text2.psz_string, _("Chapter %i"), i );
+
             var_Change( p_input, val.psz_string,
-                        VLC_VAR_ADDCHOICE, &val2, NULL );
+                        VLC_VAR_ADDCHOICE, &val2, &text2 );
         }
+
+        if( text2.psz_string ) free( text2.psz_string );
     }
 
     return p_area;
@@ -1060,7 +1074,7 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
           p_input->stream.pp_areas[i_area_id]->i_part_nb ) )
     {
         input_area_t *p_area = p_input->stream.pp_areas[i_area_id];
-        p_input->stream.p_selected_area->i_part = newval.i_int;
+        p_area->i_part = newval.i_int;
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         input_ChangeArea( p_input, p_area );
         input_SetStatus( p_input, INPUT_STATUS_PLAY );
