@@ -161,7 +161,49 @@ void CtrlList::handleEvent( EvtGeneric &rEvent )
 {
     if( rEvent.getAsString().find( "key:down" ) != string::npos )
     {
-        char key = ((EvtKey&)rEvent).getKey();
+        int key = ((EvtKey&)rEvent).getKey();
+        VarList::Iterator it = m_rList.begin();
+        bool previousWasSelected = false;
+        while( it != m_rList.end() )
+        {
+            VarList::Iterator next = it;
+            ++next;
+            if( key == KEY_UP )
+            {
+                // Scroll up one item
+                if( it != m_rList.begin() || &*it != m_pLastSelected )
+                {
+                    bool nextWasSelected = ( &*next == m_pLastSelected );
+                    (*it).m_selected = nextWasSelected;
+                    if( nextWasSelected )
+                    {
+                        m_pLastSelected = &*it;
+                    }
+                }
+            }
+            else if( key == KEY_DOWN )
+            {
+                // Scroll down one item
+                if( next != m_rList.end() || &*it != m_pLastSelected )
+                {
+                    (*it).m_selected = previousWasSelected;
+                }
+                if( previousWasSelected )
+                {
+                    m_pLastSelected = &*it;
+                    previousWasSelected = false;
+                }
+                else
+                {
+                    previousWasSelected = ( &*it == m_pLastSelected );
+                }
+            }
+            it = next;
+        }
+
+        // Redraw the control
+        makeImage();
+        notifyLayout();
     }
 
     else if( rEvent.getAsString().find( "mouse:left" ) != string::npos )
