@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.22 2003/09/20 13:52:23 gbazin Exp $
+ * $Id: vlcshell.cpp,v 1.23 2003/09/20 22:52:27 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -238,33 +238,11 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
                  char* argn[], char* argv[], NPSavedData* saved )
 {
     int i;
+
 #if USE_LIBVLC
     vlc_value_t value;
     int i_ret;
-    char * home_user;
-    char * plugin_path;
-    char * directory;
 
-#ifdef XP_MACOSX
-    home_user = strdup( getenv("HOME") );
-    directory = strdup( "/Library/Internet Plug-Ins/VLC Plugin.plugin/Contents/MacOS/modules" );
-    plugin_path = malloc( strlen( directory ) + strlen( home_user ) );
-    memcpy( plugin_path , home_user , strlen(home_user) );
-    memcpy( plugin_path + strlen( home_user ) , directory , strlen( directory ) );
-
-    char *ppsz_foo[] =
-    {
-        "vlc"
-        /* , "--plugin-path", "/Library/Internet Plug-Ins/VLC Plugin.plugin/Contents/MacOS/modules" */
-        , "--plugin-path", plugin_path
-    };
-#else
-    char *ppsz_foo[] =
-    {
-        "vlc"
-        /*, "--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins"*/
-    };
-#endif
 #endif
 
     if( instance == NULL )
@@ -306,7 +284,65 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         return NPERR_GENERIC_ERROR;
     }
 
-    i_ret = VLC_Init( p_plugin->i_vlc, sizeof(ppsz_foo)/sizeof(char*), ppsz_foo );
+    {
+#ifdef XP_MACOSX
+        char *home_user;
+        char *directory;
+        char *plugin_path;
+        char *ppsz_argv[] = { "vlc", "--plugin-path", NULL };
+
+        home_user = strdup( getenv("HOME") );
+        directory = strdup( "/Library/Internet Plug-Ins/VLC Plugin.plugin/"
+                            "Contents/MacOS/modules" );
+        plugin_path = malloc( strlen( directory ) + strlen( home_user ) );
+        memcpy( plugin_path , home_user , strlen(home_user) );
+        memcpy( plugin_path + strlen( home_user ) , directory ,
+                strlen( directory ) );
+
+        ppsz_argv[2] = plugin_path;
+
+#elif defined(XP_WIN)
+        char *ppsz_argv[] = { "vlc", "--plugin-path", NULL };
+        HKEY h_key;
+        DWORD i_type, i_data;
+        char p_data[MAX_PATH + 1];
+
+        if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\\VideoLAN\\VLC",
+                          0, KEY_READ, &h_key ) == ERROR_SUCCESS )
+        {
+             if( RegQueryValueEx( h_key, "InstallDir", 0, &i_type,
+                                  (LPBYTE)p_data, &i_data ) == ERROR_SUCCESS )
+             {
+                 if( i_type == REG_SZ )
+                 {
+                     strcat( p_data, "\\plugins" );
+                     ppsz_argv[2] = p_data;
+                 }
+             }
+             RegCloseKey( h_key );
+        }
+
+        if( !ppsz_argv[2] ) ppsz_argv[2] = ".";
+
+#else
+        char *ppsz_argv[] =
+        {
+            "vlc"
+            /*, "--plugin-path", "/home/sam/videolan/vlc_MAIN/plugins"*/
+        };
+
+#endif
+
+        i_ret = VLC_Init( p_plugin->i_vlc, sizeof(ppsz_argv)/sizeof(char*),
+                          ppsz_argv );
+
+#ifdef XP_MACOSX
+        free( home_user );
+        free( directory );
+        free( plugin_path );
+#endif
+    }
+
     if( i_ret )
     {
         VLC_Destroy( p_plugin->i_vlc );
@@ -315,12 +351,6 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         p_plugin = NULL;
         return NPERR_GENERIC_ERROR;
     }
-
-#ifdef XP_MACOSX
-    free(home_user);
-    free(directory);
-    free(plugin_path);
-#endif
 
     value.psz_string = "dummy";
     VLC_Set( p_plugin->i_vlc, "conf::intf", value );
