@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.19.2.3 2002/07/11 07:21:57 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.19.2.4 2002/07/11 12:24:45 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -56,6 +56,7 @@ public:
 	
 	void MouseDown(BPoint point);
 	void Draw(BRect updateRect);
+	
 };
 
 

@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.58.2.2 2002/07/11 07:21:57 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.58.2.3 2002/07/11 12:24:45 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,6 +65,7 @@ typedef struct vout_sys_s
     s32 i_height;
 
 //    u8 *pp_buffer[3];
+    u32 source_chroma;
     int i_index;
 
 } vout_sys_t;
@@ -132,6 +133,10 @@ VideoWindow::VideoWindow( int v_width, int v_height,
     { 
         vsync = true; 
     } 
+    else
+    {
+        vsync = false;
+    }
     delete screen;
     
     mode = SelectDrawingMode(v_width, v_height);
@@ -173,16 +178,14 @@ void VideoWindow::MessageReceived( BMessage *p_message )
     case RESIZE_100:
         if (is_zoomed)
         {
-            MoveTo(winSize.left, winSize.top);
-            be_app->ShowCursor();
+           ((BWindow *)this)->Zoom();
         }
         ResizeTo(i_width, i_height);
         break;
     case RESIZE_200:
         if (is_zoomed)
         {
-            MoveTo(winSize.left, winSize.top);
-            be_app->ShowCursor();
+           ((BWindow *)this)->Zoom();
         }
         ResizeTo(i_width * 2, i_height * 2);
         break;
@@ -391,43 +394,44 @@ void VLCView::MouseDown(BPoint point)
 {
     BMessage* msg = Window()->CurrentMessage();
     int32 clicks = msg->FindInt32("clicks");
-    VideoWindow *vWindow = (VideoWindow *)Window();
 
-    if (clicks > 1)
+    VideoWindow *vWindow = (VideoWindow *)Window();
+    uint32 mouseButtons;
+    BPoint where;
+    GetMouse(&where, &mouseButtons, true);
+
+    if ((mouseButtons & B_PRIMARY_MOUSE_BUTTON) && (clicks == 2))
     {
        Window()->Zoom();
        return;
     }
-    uint32 mouseButtons;
-    BPoint where;
-	GetMouse(&where, &mouseButtons, true);
-	// bring up pop-up menu
-	if (mouseButtons & B_SECONDARY_MOUSE_BUTTON) {
-		BPopUpMenu *menu = new BPopUpMenu("context menu");
-		// Toggle FullScreen
-		BMenuItem *zoomItem = new BMenuItem("Fullscreen", new BMessage(TOGGLE_FULL_SCREEN));
-		zoomItem->SetMarked(vWindow->is_zoomed);
-		menu->AddItem(zoomItem);
-		// Resize to 100%
-		BMenuItem *origItem = new BMenuItem("100%", new BMessage(RESIZE_100));
-		menu->AddItem(origItem);
-		// Resize to 200%
-		BMenuItem *doubleItem = new BMenuItem("200%", new BMessage(RESIZE_200));
-		menu->AddItem(doubleItem);
-		menu->AddSeparatorItem();
-//		// Toggle the Aspect Ratio Correction
-//		BMenuItem *aspectItem = new BMenuItem("Aspect Correction", 
-//		                                       new BMessage(ASPECT_CORRECT));
-//		aspectItem->SetMarked(vWindow->is_zoomed);
-//		menu->AddItem(aspectItem);
-		// Toggle vSync
-		BMenuItem *vsyncItem = new BMenuItem("Vertical Sync", new BMessage(VERT_SYNC));
-		vsyncItem->SetMarked(vWindow->vsync);
-		menu->AddItem(vsyncItem);
+    else
+    {
+       if (mouseButtons & B_SECONDARY_MOUSE_BUTTON) 
+       {
+           //if (!menu) delete menu;
+           BPopUpMenu *menu = new BPopUpMenu("context menu");
+           menu->SetRadioMode(false);
+           // Toggle FullScreen
+           BMenuItem *zoomItem = new BMenuItem("Fullscreen", new BMessage(TOGGLE_FULL_SCREEN));
+           zoomItem->SetMarked(vWindow->is_zoomed);
+           menu->AddItem(zoomItem);
+           // Resize to 100%
+           BMenuItem *origItem = new BMenuItem("100%", new BMessage(RESIZE_100));
+           menu->AddItem(origItem);
+           // Resize to 200%
+           BMenuItem *doubleItem = new BMenuItem("200%", new BMessage(RESIZE_200));
+           menu->AddItem(doubleItem);
+           menu->AddSeparatorItem();
+           // Toggle vSync
+           BMenuItem *vsyncItem = new BMenuItem("Vertical Sync", new BMessage(VERT_SYNC));
+           vsyncItem->SetMarked(vWindow->vsync);
+           menu->AddItem(vsyncItem);
 		
-		menu->SetTargetForItems(this);
-		ConvertToScreen(&where);
-		menu->Go(where, true, false, true);
+           menu->SetTargetForItems(this);
+           ConvertToScreen(&where);
+           menu->Go(where, true, false, true);
+        }
 	} 
 }
 
@@ -490,6 +494,7 @@ int vout_Create( vout_thread_t *p_vout )
     }
     p_vout->p_sys->i_width = p_vout->render.i_width;
     p_vout->p_sys->i_height = p_vout->render.i_height;
+    p_vout->p_sys->source_chroma = p_vout->render.i_chroma;
 
     return( 0 );
 }
