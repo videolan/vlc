@@ -1,8 +1,8 @@
 /*****************************************************************************
  * dshow.cpp : DirectShow access module for vlc
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: dshow.cpp,v 1.21 2003/12/15 00:47:18 gbazin Exp $
+ * Copyright (C) 2002, 2003 VideoLAN
+ * $Id: dshow.cpp,v 1.22 2003/12/20 11:55:12 rocky Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -105,7 +105,7 @@ static char *ppsz_adev_text[] = { N_("Default"), N_("None") };
 #define CACHING_TEXT N_("Caching value in ms")
 #define CACHING_LONGTEXT N_( \
     "Allows you to modify the default caching value for directshow streams. " \
-    "This value should be set in miliseconds units." )
+    "This value should be set in milliseconds units." )
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \
     "You can specify the name of the video device that will be used by the " \
