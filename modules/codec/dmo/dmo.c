@@ -755,7 +755,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_in = CMediaBufferCreate( p_block, p_block->i_buffer, VLC_TRUE );
 
         i_result = p_sys->p_dmo->vt->ProcessInput( p_sys->p_dmo, 0,
-                       (IMediaBuffer *)p_in, DMO_INPUT_DATA_BUFFER_SYNCPOINT,
+                       (IMediaBuffer *)p_in, DMO_INPUT_DATA_BUFFERF_SYNCPOINT,
                        0, 0 );
 
         p_in->vt->Release( (IUnknown *)p_in );
@@ -1504,6 +1504,14 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
             msg_Dbg( p_enc, "ProcessOutput(): length: "I64Fd,
                      p_block_out->i_length );
 #endif
+        }
+
+        if( p_enc->fmt_out.i_cat == VIDEO_ES )
+        {
+            if( db.dwStatus & DMO_OUTPUT_DATA_BUFFERF_SYNCPOINT )
+                p_block_out->i_flags |= BLOCK_FLAG_TYPE_I;
+            else
+                p_block_out->i_flags |= BLOCK_FLAG_TYPE_P;
         }
 
         p_block_out->i_dts = p_block_out->i_pts = i_pts;
