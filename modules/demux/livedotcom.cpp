@@ -465,6 +465,10 @@ static int  Open ( vlc_object_t *p_this )
             {
                 tk->fmt.i_codec = VLC_FOURCC( 'M', 'J', 'P', 'G' );
             }
+            else if( !strcmp( sub->codecName(), "X-SV3V-ES" ) )
+            {
+                tk->fmt.i_codec = VLC_FOURCC( 'S', 'V', 'Q', '3' );
+            }
             else if( !strcmp( sub->codecName(), "MP4V-ES" ) )
             {
                 unsigned int i_extra;
