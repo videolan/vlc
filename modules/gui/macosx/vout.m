@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.78 2004/02/09 13:28:32 titer Exp $
+ * $Id: vout.m,v 1.79 2004/02/09 14:02:25 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -1427,17 +1427,17 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     glBegin( GL_QUADS );
         /* Top left */
         glTexCoord2f( 0.0, 0.0 );
-        glVertex3f( - 1.0, 1.0, 1.0 );
+        glVertex2f( - f_x, f_y );
         /* Bottom left */
         glTexCoord2f( 0.0, (float) p_vout->output.i_height );
-        glVertex3f( - 1.0, - 1.0, 1.0 );
+        glVertex2f( - f_x, - f_y );
         /* Bottom right */
         glTexCoord2f( (float) p_vout->output.i_width,
                       (float) p_vout->output.i_height );
-        glVertex3f( 1.0, - 1.0, 1.0 );
+        glVertex2f( f_x, - f_y );
         /* Top right */
         glTexCoord2f( (float) p_vout->output.i_width, 0.0 );
-        glVertex3f( 1.0, 1.0, 1.0 );
+        glVertex2f( f_x, f_y );
     glEnd();
 }
 
