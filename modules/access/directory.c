@@ -338,6 +338,10 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
                                    i_query, args );
 }
 
+static int Filter( struct direct *foo )
+{
+    return VLC_TRUE;
+}
 /*****************************************************************************
  * ReadDir: read a directory and add its content to the list
  *****************************************************************************/
@@ -347,33 +351,23 @@ static int ReadDir( playlist_t *p_playlist,
 {
     DIR *                       p_current_dir;
     struct dirent *             p_dir_content;
+    struct dirent **            pp_dir_content;
+    int                         i_dir_content;
     playlist_item_t *p_node;
+    int i = 0;
 
    /* Change the item to a node */
    if( p_parent->i_children == -1)
    {
         playlist_ItemToNode( p_playlist,p_parent );
    }
-    /* Open the dir */
-    p_current_dir = opendir( psz_name );
-
-    if( p_current_dir == NULL )
-    {
-        /* something went bad, get out of here ! */
-#   ifdef HAVE_ERRNO_H
-        msg_Warn( p_playlist, "cannot open directory `%s' (%s)",
-                  psz_name, strerror(errno));
-#   else
-        msg_Warn( p_playlist, "cannot open directory `%s'", psz_name );
-#   endif
-        return VLC_EGENERIC;
-    }
 
     /* get the first directory entry */
-    p_dir_content = readdir( p_current_dir );
+    i_dir_content = scandir( psz_name, &pp_dir_content, Filter, alphasort );
+    p_dir_content = pp_dir_content[0];
 
     /* while we still have entries in the directory */
-    while( p_dir_content != NULL )
+    while( i < i_dir_content )
     {
         int i_size_entry = strlen( psz_name ) +
                            strlen( p_dir_content->d_name ) + 2;
@@ -446,9 +440,10 @@ static int ReadDir( playlist_t *p_playlist,
             }
         }
         free( psz_uri );
-        p_dir_content = readdir( p_current_dir );
+        i++;
+        p_dir_content = pp_dir_content[i];
     }
-    closedir( p_current_dir );
+    free( pp_dir_content );
     return VLC_SUCCESS;
 }
 
