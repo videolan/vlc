@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.7 2004/01/27 03:22:03 titer Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -165,38 +165,7 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-#if !defined (MODULE_NAME_IS_i420_yuy2_altivec)
-    const int i_source_margin = p_source->p->i_pitch
-                                 - p_source->p->i_visible_pitch;
-    const int i_dest_margin = p_dest->p->i_pitch
-                               - p_dest->p->i_visible_pitch;
-
-    for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
-    {
-        p_line1 = p_line2;
-        p_line2 += p_dest->p->i_pitch;
-
-        p_y1 = p_y2;
-        p_y2 += p_source->p[Y_PLANE].i_pitch;
-
-        for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
-        {
-#if defined (MODULE_NAME_IS_i420_yuy2)
-            C_YUV420_YUYV( );
-            C_YUV420_YUYV( );
-            C_YUV420_YUYV( );
-            C_YUV420_YUYV( );
-#else
-            MMX_CALL( MMX_YUV420_YUYV );
-#endif
-        }
-
-        p_y1 += i_source_margin;
-        p_y2 += i_source_margin;
-        p_line1 += i_dest_margin;
-        p_line2 += i_dest_margin;
-    }
-#else
+#if defined (MODULE_NAME_IS_i420_yuy2_altivec)
 #define VEC_NEXT_LINES( ) \
     p_line1  = p_line2; \
     p_line2 += p_dest->p->i_pitch; \
@@ -221,7 +190,8 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
     vector unsigned char uv_vec;
     vector unsigned char y_vec;
 
-    if( !( p_vout->render.i_width % 32 ) )
+    if( !( ( p_vout->render.i_width % 32 ) |
+           ( p_vout->render.i_height % 2 ) ) )
     {
         /* Width is a multiple of 32, we take 2 lines at a time */
         for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
@@ -235,7 +205,8 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             }
         }
     }
-    else
+    else if( !( ( p_vout->render.i_width % 16 ) |
+                ( p_vout->render.i_height % 4 ) ) )
     {
         /* Width is only a multiple of 16, we take 4 lines at a time */
         for( i_y = p_vout->render.i_height / 4 ; i_y-- ; )
@@ -266,9 +237,47 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
             }
         }
     }
+    else
+    {
+        /* Crap, use the C version */
 #undef VEC_NEXT_LINES
 #undef VEC_LOAD_UV
 #undef VEC_MERGE
+#endif
+
+    const int i_source_margin = p_source->p->i_pitch
+                                 - p_source->p->i_visible_pitch;
+    const int i_dest_margin = p_dest->p->i_pitch
+                               - p_dest->p->i_visible_pitch;
+
+    for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
+    {
+        p_line1 = p_line2;
+        p_line2 += p_dest->p->i_pitch;
+
+        p_y1 = p_y2;
+        p_y2 += p_source->p[Y_PLANE].i_pitch;
+
+        for( i_x = p_vout->render.i_width / 8 ; i_x-- ; )
+        {
+#if !defined (MODULE_NAME_IS_i420_yuy2_mmx)
+            C_YUV420_YUYV( );
+            C_YUV420_YUYV( );
+            C_YUV420_YUYV( );
+            C_YUV420_YUYV( );
+#else
+            MMX_CALL( MMX_YUV420_YUYV );
+#endif
+        }
+
+        p_y1 += i_source_margin;
+        p_y2 += i_source_margin;
+        p_line1 += i_dest_margin;
+        p_line2 += i_dest_margin;
+    }
+
+#if defined (MODULE_NAME_IS_i420_yuy2_altivec)
+    }
 #endif
 }
 
