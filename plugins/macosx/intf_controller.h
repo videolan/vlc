@@ -2,7 +2,7 @@
  * intf_controller.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.h,v 1.4 2002/03/19 03:33:52 jlj Exp $
+ * $Id: intf_controller.h,v 1.5 2002/04/23 03:21:21 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *
@@ -54,8 +54,7 @@
     IBOutlet NSButton       *o_stepr;
     IBOutlet NSButton       *o_stepf;
     IBOutlet NSSlider       *o_timeslider;
-    IBOutlet NSTextField    *o_currenttime;
-    IBOutlet NSMenuItem     *o_menu_fs;
+    IBOutlet NSTextField    *o_time;
 
     IBOutlet Intf_PlaylistDS *o_playlistds;
 }
@@ -67,13 +66,14 @@
 - (void)terminate;
 
 /* Functions atteched to user interface */
-- (IBAction)openFile:(id)sender;
 - (IBAction)pause:(id)sender;
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;
-- (IBAction)timeslider_update:(id)slider;
-- (IBAction)speedslider_update:(id)slider;
-- (IBAction)fullscreen_toggle:(id)sender;
+- (IBAction)faster:(id)sender;
+- (IBAction)slower:(id)sender;
+- (IBAction)prev:(id)sender;
+- (IBAction)next:(id)sender;
+- (IBAction)timesliderUpdate:(id)slider;
 - (IBAction)quit:(id)sender;
 
 @end

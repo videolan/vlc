@@ -79,6 +79,8 @@
 				F679974A020DCC2A01A80112,
 				F6EA76F5024171E201A80112,
 				F6EA76F6024171E201A80112,
+				F66B34EC0271A5AF01A80112,
+				F66B34ED0271A5AF01A80112,
 			);
 			isa = PBXGroup;
 			name = Files;
@@ -338,6 +340,18 @@
 //F62
 //F63
 //F64
+		F66B34EC0271A5AF01A80112 = {
+			isa = PBXFileReference;
+			name = intf_open.c;
+			path = plugins/macosx/intf_open.c;
+			refType = 4;
+		};
+		F66B34ED0271A5AF01A80112 = {
+			isa = PBXFileReference;
+			name = intf_open.h;
+			path = plugins/macosx/intf_open.h;
+			refType = 4;
+		};
 		F6799746020DCC2A01A80112 = {
 			isa = PBXFileReference;
 			name = intf_macosx.c;

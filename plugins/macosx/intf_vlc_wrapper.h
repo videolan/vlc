@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.h,v 1.4 2002/03/19 03:33:52 jlj Exp $
+ * $Id: intf_vlc_wrapper.h,v 1.5 2002/04/23 03:21:21 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -22,45 +22,50 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-typedef enum intf_speed_e
-{
-    SPEED_SLOW = 0,
-    SPEED_NORMAL,
-    SPEED_FAST
-} intf_speed_t;
-
 /* Intf_VLCWrapper is a singleton class
     (only one instance at any time) */
 
 @interface Intf_VLCWrapper : NSObject
-{    
-    intf_speed_t e_speed;
+{
+
 }
 
-/* Initialization */
+/* initialization */
 + (Intf_VLCWrapper *)instance;
 
 - (bool)manage;
 - (void)quit;
 
-/* Playback control */
-- (void)setSpeed:(intf_speed_t)e_speed;
+/* playback control */
+- (bool)playlistPlay;
+- (void)playlistPause;
+- (void)playlistStop;
+- (void)playlistNext;
+- (void)playlistPrev;
+
+- (void)playSlower;
+- (void)playFaster;
+
+/* playback info */
 - (NSString *)getTimeAsString;
 - (float)getTimeAsFloat;
 - (void)setTimeAsFloat:(float)i_offset;
 
-/* Playlist control */
+- (bool)playlistPlaying;
 - (NSArray *)playlistAsArray;
+
+/*
 - (int)playlistLength;
 - (NSString *)playlistItem:(int)i_pos;
-- (bool)playlistPlayCurrent;
-- (void)playlistPause;
-- (void)playlistStop;
-- (void)playlistPlayNext;
-- (void)playlistPlayPrev;
 - (void)playlistPlayItem:(int)i_item;
 - (void)playlistAdd:(NSString *)o_filename;
 - (void)clearPlaylist;
-- (bool)playlistPlaying;
+*/
+
+/* open file/disc/network */
+- (void)openFiles:(NSArray*)o_files;
+- (void)openDisc:(NSString*)o_type device:(NSString*)o_device title:(int)i_title chapter:(int)i_chapter;
+- (void)openNet:(NSString*)o_protocol addr:(NSString*)o_addr port:(int)i_port baddr:(NSString*)o_baddr;
+- (void)openNetChannel:(NSString*)o_addr port:(int)i_port;
 
 @end

@@ -3,28 +3,64 @@
         {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
         {
             ACTIONS = {
-                fullscreen_toggle = id; 
-                openFile = id; 
+                faster = id; 
+                next = id; 
                 pause = id; 
                 play = id; 
+                prev = id; 
                 quit = id; 
-                speedslider_update = id; 
+                slower = id; 
                 stop = id; 
-                timeslider_update = id; 
+                timesliderUpdate = id; 
             }; 
             CLASS = Intf_Controller; 
             LANGUAGE = ObjC; 
             OUTLETS = {
-                o_currenttime = id; 
-                o_menu_fullscreen = id; 
                 o_pause = id; 
                 o_play = id; 
                 o_playlistds = id; 
                 o_stepf = id; 
                 o_stepr = id; 
                 o_stop = id; 
+                o_time = id; 
                 o_timeslider = id; 
                 o_window = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {
+                openDisc = id; 
+                openDiscTypeChanged = id; 
+                openFile = id; 
+                openNet = id; 
+                openNetBroadcast = id; 
+                openNetChannel = id; 
+                panelCancel = id; 
+                panelOk = id; 
+            }; 
+            CLASS = Intf_Open; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                o_disc_chapter = id; 
+                o_disc_device = id; 
+                o_disc_panel = id; 
+                o_disc_title = id; 
+                o_disc_type = id; 
+                o_net_channel_addr = id; 
+                o_net_channel_checkbox = id; 
+                o_net_channel_port = id; 
+                o_net_channel_port_label = id; 
+                o_net_channel_pstepper = id; 
+                o_net_panel = id; 
+                o_net_protocol = id; 
+                o_net_server_addr = id; 
+                o_net_server_addr_label = id; 
+                o_net_server_baddr = id; 
+                o_net_server_bcheckbox = id; 
+                o_net_server_port = id; 
+                o_net_server_port_label = id; 
+                o_net_server_pstepper = id; 
             }; 
             SUPERCLASS = NSObject; 
         }, 

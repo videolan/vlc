@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.c,v 1.9 2002/03/19 03:33:52 jlj Exp $
+ * $Id: intf_vlc_wrapper.c,v 1.10 2002/04/23 03:21:21 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -37,23 +37,16 @@
 #include "input_ext-intf.h"
 
 #include "macosx.h"
+#include "intf_open.h"
 #include "intf_vlc_wrapper.h"
+
+#include "netutils.h"
 
 @implementation Intf_VLCWrapper
 
 static Intf_VLCWrapper *o_intf = nil;
 
 /* Initialization */
-
-- (id)init
-{
-    if( [super init] == nil )
-        return( nil );
-
-    e_speed = SPEED_NORMAL;
-
-    return( self );
-}
 
 + (Intf_VLCWrapper *)instance
 {
@@ -94,12 +87,115 @@ static Intf_VLCWrapper *o_intf = nil;
     p_main->p_intf->b_die = 1;
 }
 
-/* Playback control */
-- (void)setSpeed:(intf_speed_t)_e_speed
+/* playlist control */
+    
+- (bool)playlistPlay
 {
-    e_speed = _e_speed;
-    [self playlistPlayCurrent];
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
+        p_main->p_playlist->b_stopped = 0;
+    }
+    else
+    {
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+
+        if( p_main->p_playlist->b_stopped )
+        {
+            if( p_main->p_playlist->i_size )
+            {
+                vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+                intf_PlaylistJumpto( p_main->p_playlist,
+                                     p_main->p_playlist->i_index );
+            }
+            else
+            {
+                vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+                [[Intf_Open instance] openFile: nil];
+            }
+        }
+        else
+        {
+            vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+        }
+    }
+
+    return( TRUE );
 }
+
+- (void)playlistPause
+{
+    if ( p_input_bank->pp_input[0] != NULL )
+    {
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
+
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+        p_main->p_playlist->b_stopped = 0;
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+    }
+}
+    
+- (void)playlistStop
+{
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        /* end playing item */
+        p_input_bank->pp_input[0]->b_eof = 1;
+
+        /* update playlist */
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+
+        p_main->p_playlist->i_index--;
+        p_main->p_playlist->b_stopped = 1;
+
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+    }
+}
+
+- (void)playlistNext
+{
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        p_input_bank->pp_input[0]->b_eof = 1;
+    }
+}
+
+- (void)playlistPrev
+{
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        /* FIXME: temporary hack */
+        intf_PlaylistPrev( p_main->p_playlist );
+        intf_PlaylistPrev( p_main->p_playlist );
+        p_input_bank->pp_input[0]->b_eof = 1;
+    }
+}
+
+- (void)playSlower
+{
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_SLOWER );
+
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+        p_main->p_playlist->b_stopped = 0;
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+    }
+}
+
+- (void)playFaster
+{
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_FASTER );
+
+        vlc_mutex_lock( &p_main->p_playlist->change_lock );
+        p_main->p_playlist->b_stopped = 0;
+        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
+    }
+}
+
+/* playback info */
 
 #define p_area p_input_bank->pp_input[0]->stream.p_selected_area
 
@@ -148,7 +244,10 @@ static Intf_VLCWrapper *o_intf = nil;
 
 #undef p_area
 
-/* Playlist control */
+- (bool)playlistPlaying
+{
+    return( !p_main->p_playlist->b_stopped );
+}
 
 - (NSArray *)playlistAsArray
 {
@@ -169,6 +268,7 @@ static Intf_VLCWrapper *o_intf = nil;
     return( [NSArray arrayWithArray: p_list] );
 }
 
+/*
 - (int)playlistLength
 {
     return( p_main->p_playlist->i_size );
@@ -189,97 +289,6 @@ static Intf_VLCWrapper *o_intf = nil;
     vlc_mutex_unlock( &p_main->p_playlist->change_lock );
 
     return( o_item );
-}
-    
-- (bool)playlistPlayCurrent
-{
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        switch (e_speed)
-        {
-            case SPEED_SLOW:
-                input_SetStatus( p_input_bank->pp_input[0], 
-                                 INPUT_STATUS_SLOWER );
-            break;
-
-            case SPEED_NORMAL:
-                input_SetStatus( p_input_bank->pp_input[0], 
-                                 INPUT_STATUS_PLAY );
-            break;
-
-            case SPEED_FAST:
-                input_SetStatus( p_input_bank->pp_input[0], 
-                                 INPUT_STATUS_FASTER );
-            break;
-        }
-
-        p_main->p_playlist->b_stopped = 0;
-    }
-    else if( p_main->p_playlist->b_stopped )
-    {
-        if( p_main->p_playlist->i_size )
-        {
-            intf_PlaylistJumpto( p_main->p_playlist, 
-                                 p_main->p_playlist->i_index );
-        }
-        else
-        {
-            return FALSE;
-        }
-    }
-        
-    return TRUE;
-}
-
-- (void)playlistPause
-{
-    if ( p_input_bank->pp_input[0] != NULL )
-    {
-        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
-
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-        p_main->p_playlist->b_stopped = 0;
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-    }
-}
-    
-- (void)playlistStop
-{
-    if( p_input_bank->pp_input[0] != NULL )
-    {
-        /* end playing item */
-        p_input_bank->pp_input[0]->b_eof = 1;
-
-        /* update playlist */
-        vlc_mutex_lock( &p_main->p_playlist->change_lock );
-
-        p_main->p_playlist->i_index--;
-        p_main->p_playlist->b_stopped = 1;
-
-        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-    }
-}
-
-- (void)playlistPlayNext
-{
-    [self playlistStop];
-
-    vlc_mutex_lock( &p_main->p_playlist->change_lock );
-    p_main->p_playlist->i_index++;
-    vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-
-    [self playlistPlayCurrent];
-}
-
-- (void)playlistPlayPrev
-{
-    [self playlistStop];
-
-    vlc_mutex_lock( &p_main->p_playlist->change_lock );
-    p_main->p_playlist->i_index--;
-    vlc_mutex_unlock( &p_main->p_playlist->change_lock );
-
-    [self playlistPlayCurrent];    
 }
 
 - (void)playlistPlayItem:(int)i_item
@@ -317,10 +326,96 @@ static Intf_VLCWrapper *o_intf = nil;
 
     vlc_mutex_unlock( &p_main->p_playlist->change_lock );        
 }
+*/
 
-- (bool)playlistPlaying
+/* open file/disc/network */
+
+- (void)openFiles:(NSArray*)o_files
 {
-    return( !p_main->p_playlist->b_stopped );
+    NSString *o_file;
+    int i_end = p_main->p_playlist->i_size;
+    NSEnumerator *o_enum = [o_files objectEnumerator];
+
+    while( ( o_file = (NSString *)[o_enum nextObject] ) )
+    {
+        intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, 
+                          [o_file lossyCString] );
+    }
+
+    /* end current item, select first added item */
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        p_input_bank->pp_input[0]->b_eof = 1;
+    }
+
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+}
+
+- (void)openDisc:(NSString*)o_type device:(NSString*)o_device title:(int)i_title chapter:(int)i_chapter
+{
+    NSString *o_source;
+    int i_end = p_main->p_playlist->i_size;
+
+    o_source = [NSString stringWithFormat: @"%@:%@@%d,%d", 
+                    o_type, o_device, i_title, i_chapter];
+
+    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END,
+                      [o_source lossyCString] );
+
+    /* stop current item, select added item */
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        p_input_bank->pp_input[0]->b_eof = 1;
+    }
+
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+}
+
+- (void)openNet:(NSString*)o_protocol addr:(NSString*)o_addr port:(int)i_port baddr:(NSString*)o_baddr
+{
+    NSString *o_source;
+    int i_end = p_main->p_playlist->i_size;
+
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        p_input_bank->pp_input[0]->b_eof = 1;
+    }
+
+    config_PutIntVariable( "network_channel", 0 );
+
+    if( o_baddr != nil )
+    {
+        o_source = [NSString stringWithFormat: @"%@://%@@:%i/%@",
+                        o_protocol, o_addr, i_port, o_baddr];
+    }
+    else
+    {
+        o_source = [NSString stringWithFormat: @"%@://%@@:%i",
+                        o_protocol, o_addr, i_port];
+    }
+
+    intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END,
+                      [o_source lossyCString] );
+
+    intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
+}
+
+- (void)openNetChannel:(NSString*)o_addr port:(int)i_port
+{
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+        p_input_bank->pp_input[0]->b_eof = 1;
+    }
+
+    config_PutIntVariable( "network_channel", 1 );
+
+    if( p_main->p_channel == NULL )
+    {
+        network_ChannelCreate();
+    }
+
+    config_PutPszVariable( "channel_server", (char*)[o_addr lossyCString] );
+    config_PutIntVariable( "channel_port", i_port ); 
 }
 
 @end

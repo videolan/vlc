@@ -2,7 +2,7 @@
  * intf_controller.c: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.c,v 1.5 2002/04/16 23:00:54 massiot Exp $
+ * $Id: intf_controller.c,v 1.6 2002/04/23 03:21:21 jlj Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -67,7 +67,7 @@
     {
         if( [o_intf playlistPlaying] )
         { 
-            [o_currenttime setStringValue: [o_intf getTimeAsString]];
+            [o_time setStringValue: [o_intf getTimeAsString]];
 
             if( f_slider == f_slider_old )
             {
@@ -120,27 +120,6 @@
 
 /* Functions attached to user interface */
  
-- (IBAction)openFile:(id)sender
-{
-    NSOpenPanel *o_panel = [NSOpenPanel openPanel];
-    
-    [o_panel setAllowsMultipleSelection: YES];
-
-    if( [o_panel runModalForDirectory: NSHomeDirectory() 
-            file: nil types: nil] == NSOKButton )
-    {
-        NSString *o_file;
-        NSEnumerator *o_files = [[o_panel filenames] objectEnumerator];
-
-        while( ( o_file = (NSString *)[o_files nextObject] ) )
-        {
-            [o_intf playlistAdd: o_file];
-        }
-        
-        [o_intf playlistPlayCurrent];
-    }
-}
-    
 - (IBAction)pause:(id)sender
 {
     [o_intf playlistPause];
@@ -148,7 +127,7 @@
 
 - (IBAction)play:(id)sender
 {
-    [o_intf playlistPlayCurrent];
+    [o_intf playlistPlay];
 }
 
 - (IBAction)stop:(id)sender
@@ -156,7 +135,27 @@
     [o_intf playlistStop];
 }
 
-- (IBAction)timeslider_update:(id)slider
+- (IBAction)faster:(id)sender
+{
+    [o_intf playFaster];
+}
+
+- (IBAction)slower:(id)sender
+{
+    [o_intf playSlower];
+}
+
+- (IBAction)prev:(id)sender
+{
+    [o_intf playlistPrev];
+}
+
+- (IBAction)next:(id)sender
+{
+    [o_intf playlistNext];
+}
+
+- (IBAction)timesliderUpdate:(id)slider
 {
     switch( [[NSApp currentEvent] type] )
     {
@@ -172,16 +171,6 @@
         default:
             break;
     }
-}
-
-- (IBAction)speedslider_update:(id)slider
-{
-    [o_intf setSpeed: (intf_speed_t)[slider intValue]];
-}
-  
-- (IBAction)fullscreen_toggle:(id)sender
-{
-
 }
 
 - (IBAction)quit:(id)sender
