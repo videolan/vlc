@@ -2,7 +2,7 @@
  * vlc.h: global header for vlc
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc.h,v 1.3 2002/06/07 14:30:40 sam Exp $
+ * $Id: vlc.h,v 1.4 2002/07/03 19:40:49 sam Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,10 +27,21 @@ extern "C" {
 # endif
 
 /*****************************************************************************
+ * Our custom types
+ *****************************************************************************/
+#define VLC_DECLARE_STRUCT( name ) \
+    struct name##_s;         \
+    typedef struct name##_s name##_t;
+VLC_DECLARE_STRUCT(vlc)
+VLC_DECLARE_STRUCT(vlc_object)
+
+typedef signed int vlc_error_t;
+typedef int        vlc_bool_t;
+typedef int        vlc_status_t;
+
+/*****************************************************************************
  * Error values
  *****************************************************************************/
-typedef signed int vlc_error_t;
-
 #define VLC_SUCCESS         -0                                   /* No error */
 #define VLC_EGENERIC        -1                              /* Generic error */
 #define VLC_ENOMEM          -2                          /* Not enough memory */
@@ -40,29 +51,45 @@ typedef signed int vlc_error_t;
 /*****************************************************************************
  * Booleans
  *****************************************************************************/
-typedef int vlc_bool_t;
-
 #define VLC_FALSE 0
 #define VLC_TRUE  1
 
 /*****************************************************************************
  * Main structure status
  *****************************************************************************/
-typedef int vlc_status_t;
-
 #define VLC_STATUS_NONE     0x00000000
 #define VLC_STATUS_CREATED  0x02020202
 #define VLC_STATUS_STOPPED  0x12121212
 #define VLC_STATUS_RUNNING  0x42424242
 
 /*****************************************************************************
- * Structure types
+ * Playlist
  *****************************************************************************/
-#define VLC_DECLARE_STRUCT( name ) \
-    struct name##_s;         \
-    typedef struct name##_s name##_t;
-VLC_DECLARE_STRUCT(vlc)
-VLC_DECLARE_STRUCT(vlc_object)
+
+/* Used by playlist_Add */
+#define PLAYLIST_INSERT      0x0001
+#define PLAYLIST_REPLACE     0x0002
+#define PLAYLIST_APPEND      0x0004
+#define PLAYLIST_GO          0x0008
+
+#define PLAYLIST_END           -666
+
+/* Playlist parsing mode */
+#define PLAYLIST_REPEAT_CURRENT   0             /* Keep playing current item */
+#define PLAYLIST_FORWARD          1              /* Parse playlist until end */
+#define PLAYLIST_BACKWARD        -1                       /* Parse backwards */
+#define PLAYLIST_FORWARD_LOOP     2               /* Parse playlist and loop */
+#define PLAYLIST_BACKWARD_LOOP   -2              /* Parse backwards and loop */
+#define PLAYLIST_RANDOM           3                          /* Shuffle play */
+#define PLAYLIST_REVERSE_RANDOM  -3                  /* Reverse shuffle play */
+
+/* Playlist commands */
+#define PLAYLIST_PLAY   1                         /* Starts playing. No arg. */
+#define PLAYLIST_PAUSE  2                 /* Toggles playlist pause. No arg. */
+#define PLAYLIST_STOP   3                          /* Stops playing. No arg. */
+#define PLAYLIST_SKIP   4                          /* Skip X items and play. */
+#define PLAYLIST_GOTO   5                                  /* Goto Xth item. */
+#define PLAYLIST_MODE   6                          /* Set playlist mode. ??? */
 
 /*****************************************************************************
  * Required internal headers
@@ -90,8 +117,8 @@ vlc_error_t     vlc_stop       ( vlc_t * );
 vlc_error_t     vlc_end        ( vlc_t * );
 vlc_error_t     vlc_destroy    ( vlc_t * );
 
-vlc_error_t     vlc_add_intf   ( vlc_t *, char *, vlc_bool_t );
-vlc_error_t     vlc_add_target ( vlc_t *, char *, int, int );
+vlc_error_t     vlc_add_intf   ( vlc_t *, const char *, vlc_bool_t );
+vlc_error_t     vlc_add_target ( vlc_t *, const char *, int, int );
 
 vlc_status_t    vlc_status     ( vlc_t * );
 

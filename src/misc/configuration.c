@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.31 2002/06/11 09:44:22 gbazin Exp $
+ * $Id: configuration.c,v 1.32 2002/07/03 19:40:49 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -151,7 +151,7 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
  * and CONFIG_ITEM_MODULE).
  *****************************************************************************/
 void __config_PutPsz( vlc_object_t *p_this, 
-                      const char *psz_name, char *psz_value )
+                      const char *psz_name, const char *psz_value )
 {
     module_config_t *p_config;
 

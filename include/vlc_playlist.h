@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.1 2002/06/07 23:53:44 sam Exp $
+ * $Id: vlc_playlist.h,v 1.2 2002/07/03 19:40:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -50,31 +50,6 @@ struct playlist_s
 
     input_thread_t *      p_input;
 };
-
-/* Used by playlist_Add */
-#define PLAYLIST_INSERT      0x0001
-#define PLAYLIST_REPLACE     0x0002
-#define PLAYLIST_APPEND      0x0004
-#define PLAYLIST_GO          0x0008
-
-#define PLAYLIST_END           -666
-
-/* Playlist parsing mode */
-#define PLAYLIST_REPEAT_CURRENT   0             /* Keep playing current item */
-#define PLAYLIST_FORWARD          1              /* Parse playlist until end */
-#define PLAYLIST_BACKWARD        -1                       /* Parse backwards */
-#define PLAYLIST_FORWARD_LOOP     2               /* Parse playlist and loop */
-#define PLAYLIST_BACKWARD_LOOP   -2              /* Parse backwards and loop */
-#define PLAYLIST_RANDOM           3                          /* Shuffle play */
-#define PLAYLIST_REVERSE_RANDOM  -3                  /* Reverse shuffle play */
-
-/* Playlist commands */
-#define PLAYLIST_PLAY   1                         /* Starts playing. No arg. */
-#define PLAYLIST_PAUSE  2                 /* Toggles playlist pause. No arg. */
-#define PLAYLIST_STOP   3                          /* Stops playing. No arg. */
-#define PLAYLIST_SKIP   4                          /* Skip X items and play. */
-#define PLAYLIST_GOTO   5                                  /* Goto Xth item. */
-#define PLAYLIST_MODE   6                          /* Set playlist mode. ??? */
 
 /*****************************************************************************
  * Prototypes

@@ -47,7 +47,7 @@ struct module_symbols_s
     int (* vlc_threads_end_inner) ( void ) ;
     int (* vout_ChromaCmp_inner) ( u32, u32 ) ;
     module_config_t * (* config_FindConfig_inner) ( vlc_object_t *, const char *psz_name ) ;
-    module_t * (* __module_Need_inner) ( vlc_object_t *, int, char *, void * ) ;
+    module_t * (* __module_Need_inner) ( vlc_object_t *, int, const char *, void * ) ;
     msg_subscription_t* (* __msg_Subscribe_inner) ( vlc_object_t * ) ;
     mtime_t (* input_ClockGetTS_inner) ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) ;
     mtime_t (* mdate_inner) ( void ) ;
@@ -73,7 +73,7 @@ struct module_symbols_s
     void (* UnalignedRemoveBits_inner) ( bit_stream_t * ) ;
     void (* __config_PutFloat_inner) (vlc_object_t *, const char *, float) ;
     void (* __config_PutInt_inner) (vlc_object_t *, const char *, int) ;
-    void (* __config_PutPsz_inner) (vlc_object_t *, const char *, char *) ;
+    void (* __config_PutPsz_inner) (vlc_object_t *, const char *, const char *) ;
     void (* __input_Seek_inner) ( vlc_object_t *, off_t, int ) ;
     void (* __input_SetStatus_inner) ( vlc_object_t *, int ) ;
     void (* __input_Tell_inner) ( vlc_object_t *, stream_position_t * ) ;

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.69 2002/06/27 19:05:17 sam Exp $
+ * $Id: modules.c,v 1.70 2002/07/03 19:40:49 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -260,24 +260,27 @@ void __module_ManageBank( vlc_object_t *p_this )
  *****************************************************************************
  * This function returns the module that best fits the asked capabilities.
  *****************************************************************************/
-module_t * __module_Need( vlc_object_t *p_this,
-                          int i_capability, char *psz_name, void *p_data )
+module_t * __module_Need( vlc_object_t *p_this, int i_capability,
+                          const char *psz_name, void *p_data )
 {
     typedef struct module_list_s module_list_t;
 
     struct module_list_s
     {
         module_t *p_module;
+        int i_score;
         module_list_t *p_next;
     };
 
     module_list_t *p_list, *p_first, *p_tmp;
 
     int i_ret, i_index = 0;
-    vlc_bool_t b_intf = 0;
+    vlc_bool_t b_intf = VLC_FALSE;
 
     module_t *p_module;
-    char     *psz_realname = NULL;
+
+    int   i_shortcuts = 1;
+    char *psz_shortcuts = NULL;
 
     msg_Dbg( p_this, "looking for %s module",
                      MODULE_CAPABILITY( i_capability ) );
@@ -285,19 +288,19 @@ module_t * __module_Need( vlc_object_t *p_this,
     /* We take the global lock */
     vlc_mutex_lock( &p_this->p_vlc->module_bank.lock );
 
-    if( psz_name != NULL && *psz_name )
+    if( psz_name && *psz_name )
     {
-        /* A module name was requested. */
-        psz_realname = strdup( psz_name );
-        if( psz_realname )
+        char *psz_parser;
+
+        psz_shortcuts = strdup( psz_name );
+
+        for( psz_parser = psz_shortcuts; *psz_parser; psz_parser++ )
         {
-            char *p;
-            p = strchr( psz_realname, ':' );
-            if( p )
+            if( *psz_parser == ',' )
             {
-                *p = '\0';
+                 *psz_parser = '\0';
+                 i_shortcuts++;
             }
-            psz_name = psz_realname;
         }
     }
 
@@ -311,6 +314,8 @@ module_t * __module_Need( vlc_object_t *p_this,
          p_module != NULL ;
          p_module = p_module->next )
     {
+        int i_shortcut_bonus = 0;
+
         /* Test that this module can do everything we need */
         if( !(p_module->i_capabilities & ( 1 << i_capability )) )
         {
@@ -326,16 +331,33 @@ module_t * __module_Need( vlc_object_t *p_this,
         }
 
         /* If we required a shortcut, check this plugin provides it. */
-        if( psz_name != NULL && *psz_name )
+        if( psz_shortcuts )
         {
-            vlc_bool_t b_trash = 1;
-            int i_dummy;
+            vlc_bool_t b_trash = VLC_TRUE;
+            int i_dummy, i_short = i_shortcuts;
+            char *psz_name = psz_shortcuts;
 
-            for( i_dummy = 0;
-                 b_trash && p_module->pp_shortcuts[i_dummy];
-                 i_dummy++ )
+            while( i_short )
             {
-                b_trash = strcmp( psz_name, p_module->pp_shortcuts[i_dummy] );
+                for( i_dummy = 0;
+                     b_trash && p_module->pp_shortcuts[i_dummy];
+                     i_dummy++ )
+                {
+                    b_trash = strcmp( psz_name, p_module->pp_shortcuts[i_dummy] );
+                }
+
+                if( !b_trash )
+                {
+                    i_shortcut_bonus = i_short * 10000;
+                    break;
+                }
+
+                while( *psz_name )
+                {
+                    psz_name++;
+                }
+                psz_name++;
+                i_short--;
             }
 
             if( b_trash )
@@ -360,7 +382,7 @@ module_t * __module_Need( vlc_object_t *p_this,
                 {
                     /* Remove previous non-matching plugins */
                     i_index = 0;
-                    b_intf = 1;
+                    b_intf = VLC_TRUE;
                 }
             }
             else
@@ -375,6 +397,8 @@ module_t * __module_Need( vlc_object_t *p_this,
 
         /* Store this new module */
         p_list[ i_index ].p_module = p_module;
+        p_list[ i_index ].i_score = p_module->pi_score[i_capability]
+                                     + i_shortcut_bonus;
 
         /* Add it to the modules-to-probe list */
         if( i_index == 0 )
@@ -389,17 +413,15 @@ module_t * __module_Need( vlc_object_t *p_this,
              * thousands of items. Here we have barely 50. */
             module_list_t *p_newlist = p_first;
 
-            if( p_first->p_module->pi_score[i_capability]
-                 < p_module->pi_score[i_capability] )
+            if( p_first->i_score < p_list[ i_index ].i_score )
             {
                 p_list[ i_index ].p_next = p_first;
                 p_first = &p_list[ i_index ];
             }
             else
             {
-                while( p_newlist->p_next != NULL
-                        && p_newlist->p_next->p_module->pi_score[i_capability]
-                            >= p_module->pi_score[i_capability] )
+                while( p_newlist->p_next != NULL &&
+                    p_newlist->p_next->i_score >= p_list[ i_index ].i_score )
                 {
                     p_newlist = p_newlist->p_next;
                 }
@@ -527,18 +549,18 @@ module_t * __module_Need( vlc_object_t *p_this,
     }
     else if( p_first == NULL )
     {
-        msg_Err( p_this, "no %s module named `%s'",
+        msg_Err( p_this, "no available %s module matched `%s'",
                  MODULE_CAPABILITY( i_capability ), psz_name );
     }
     else if( psz_name != NULL && *psz_name )
     {
-        msg_Err( p_this, "could not load %s module `%s'",
+        msg_Err( p_this, "could not load any %s module matching `%s'",
                  MODULE_CAPABILITY( i_capability ), psz_name );
     }
 
-    if( psz_realname )
+    if( psz_shortcuts )
     {
-        free( psz_realname );
+        free( psz_shortcuts );
     }
 
     /* Don't forget that the module is still locked */
@@ -602,13 +624,13 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
         int i_dirlen = strlen( *ppsz_path );
 
 #if defined( SYS_BEOS ) || defined( SYS_DARWIN )
-        b_notinroot = 0;
+        b_notinroot = VLC_FALSE;
         /* Under BeOS, we need to add beos_GetProgramPath() to access
          * files under the current directory */
         if( ( i_dirlen > 1 ) && strncmp( *ppsz_path, "/", 1 ) )
         {
             i_dirlen += i_vlclen + 2;
-            b_notinroot = 1;
+            b_notinroot = VLC_TRUE;
 
             psz_fullpath = malloc( i_dirlen );
             if( psz_fullpath == NULL )
@@ -779,7 +801,7 @@ static int AllocatePluginModule( vlc_object_t * p_this, char * psz_filename )
     p_module->i_usage = 0;
     p_module->i_unused_delay = 0;
 
-    p_module->b_builtin = 0;
+    p_module->b_builtin = VLC_FALSE;
 
     /* Link module into the linked list */
     if( p_this->p_vlc->module_bank.first != NULL )
@@ -864,7 +886,7 @@ static int AllocateBuiltinModule( vlc_object_t * p_this,
     p_module->i_usage = 0;
     p_module->i_unused_delay = 0;
 
-    p_module->b_builtin = 1;
+    p_module->b_builtin = VLC_TRUE;
     p_module->is.builtin.pf_deactivate = pf_deactivate;
 
     /* Link module into the linked list */

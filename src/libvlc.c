@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.11 2002/06/27 19:05:17 sam Exp $
+ * $Id: libvlc.c,v 1.12 2002/07/03 19:40:49 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -536,7 +536,8 @@ vlc_error_t vlc_run( vlc_t *p_vlc )
  * separate thread. If b_block is set to 1, vlc_add_intf will continue until
  * user requests to quit.
  *****************************************************************************/
-vlc_error_t vlc_add_intf( vlc_t *p_vlc, char *psz_module, vlc_bool_t b_block )
+vlc_error_t vlc_add_intf( vlc_t *p_vlc, const char *psz_module,
+                                        vlc_bool_t b_block )
 {
     vlc_error_t err;
     intf_thread_t *p_intf;
@@ -788,7 +789,7 @@ vlc_status_t vlc_status( vlc_t *p_vlc )
     return p_vlc->i_status;
 }
 
-vlc_error_t vlc_add_target( vlc_t *p_vlc, char *psz_target,
+vlc_error_t vlc_add_target( vlc_t *p_vlc, const char *psz_target,
                                           int i_mode, int i_pos )
 {
     vlc_error_t err;
