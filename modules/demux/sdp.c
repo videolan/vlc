@@ -2,7 +2,7 @@
  * sdp.c: SDP parser and builtin UDP/RTP/RTSP
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sdp.c,v 1.5 2003/08/05 01:27:45 fenrir Exp $
+ * $Id: sdp.c,v 1.6 2003/09/08 07:36:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -29,302 +29,190 @@
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
-#include <ninput.h>
+#include "codecs.h"
 
-#ifdef HAVE_SYS_TIME_H
-#    include <sys/time.h>
-#endif
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
-#if defined( UNDER_CE )
-#   include <winsock.h>
-#elif defined( WIN32 )
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   ifndef IN_MULTICAST
-#       define IN_MULTICAST(a) IN_CLASSD(a)
-#   endif
-#else
-#   include <sys/socket.h>
-#endif
-
-
-#include "network.h"
+#include "/usr/src/libmtools/mc.h"
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open  ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int  DescribeOpen ( vlc_object_t * );
+static void DescribeClose( vlc_object_t * );
+
+static int  SDPOpen ( vlc_object_t * );
+static void SDPClose( vlc_object_t * );
 
 vlc_module_begin();
-    set_description( _("SDP demuxer + UDP/RTP/RTSP") );
+    set_description( _("SDP demuxer/reader") );
     set_capability( "demux", 100 );
-    add_category_hint( "Stream", NULL, VLC_FALSE );
-        add_integer( "sdp-session", 0, NULL,
-                     "Session", "Session", VLC_TRUE );
-
-    set_callbacks( Open, Close );
+    set_callbacks( SDPOpen, SDPClose );
     add_shortcut( "sdp" );
+
+    add_submodule();
+        set_description( _("RTSP/RTP describe") );
+        add_shortcut( "rtp" );
+        add_shortcut( "rtsp" );
+        set_capability( "access", 0 );
+        set_callbacks( DescribeOpen, DescribeClose );
 vlc_module_end();
 
+static ssize_t  DescribeRead( input_thread_t *, byte_t *, size_t );
+static int      SDPDemux( input_thread_t * );
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Demux ( input_thread_t * );
-
-#define FREE( p ) if( p ) { free( p ) ; (p) = NULL; }
-
-#define TAB_APPEND( count, tab, p )             \
-    if( (count) > 0 )                           \
-    {                                           \
-        (tab) = realloc( (tab), sizeof( void ** ) * ( (count) + 1 ) ); \
-    }                                           \
-    else                                        \
-    {                                           \
-        (tab) = malloc( sizeof( void ** ) );    \
-    }                                           \
-    (void**)(tab)[(count)] = (void*)(p);        \
-    (count)++
-
-#define TAB_FIND( count, tab, p, index )        \
-    {                                           \
-        int _i_;                                \
-        (index) = -1;                           \
-        for( _i_ = 0; _i_ < (count); _i_++ )    \
-        {                                       \
-            if((void**)(tab)[_i_]==(void*)(p))  \
-            {                                   \
-                (index) = _i_;                  \
-                break;                          \
-            }                                   \
-        }                                       \
-    }
-
-#define TAB_REMOVE( count, tab, p )             \
-    {                                           \
-        int i_index;                            \
-        TAB_FIND( count, tab, p, i_index );     \
-        if( i_index >= 0 )                      \
-        {                                       \
-            if( count > 1 )                     \
-            {                                   \
-                memmove( ((void**)tab + i_index),    \
-                         ((void**)tab + i_index+1),  \
-                         ( (count) - i_index - 1 ) * sizeof( void* ) );\
-            }                                   \
-            else                                \
-            {                                   \
-                free( tab );                    \
-                (tab) = NULL;                   \
-            }                                   \
-            (count)--;                          \
-        }                                       \
-    }
-
-/*
- * SDP definitions
- */
-typedef struct
+struct access_sys_t
 {
-    char *psz_name;
-    char *psz_value;
-
-} sdp_attribute_t;
-
-typedef struct
-{
-    char    *psz_media;
-    char    *psz_description;
-    char    *psz_connection;
-    char    *psz_bandwith;
-    char    *psz_key;
-
-    int             i_attribute;
-    sdp_attribute_t *attribute;
-
-} sdp_media_t;
-
-typedef struct
-{
-    char    *psz_origin;
-    char    *psz_session;
-    char    *psz_description;
-    char    *psz_uri;
-    char    *psz_email;
-    char    *psz_phone;
-    char    *psz_connection;
-    char    *psz_bandwith;
-    char    *psz_key;
-    char    *psz_timezone;
-
-    int             i_attribute;
-    sdp_attribute_t *attribute;
-
-    int         i_media;
-    sdp_media_t *media;
-
-} sdp_session_t;
-
-typedef struct
-{
-    int           i_session;
-    sdp_session_t *session;
-
-} sdp_t;
-
-
-static sdp_t *sdp_Parse     ( char * );
-static void   sdp_Dump      ( input_thread_t *, sdp_t * );
-static void   sdp_Release   ( sdp_t * );
-
-#define RTP_PAYLOAD_MAX 10
-typedef struct
-{
-    int     i_cat;          /* AUDIO_ES, VIDEO_ES */
-
-    char    *psz_control;   /* If any, eg rtsp://blabla/... */
-
-    int     i_port;         /* base port */
-    int     i_port_count;   /* for hierachical stream */
-
-    int     i_address_count;/* for hierachical stream */
-    int     i_address_ttl;
-    char    *psz_address;
-
-    char    *psz_transport; /* RTP/AVP, udp, ... */
-
-    int     i_payload_count;
-    struct
-    {
-        int     i_type;
-        char    *psz_rtpmap;
-        char    *psz_fmtp;
-    } payload[RTP_PAYLOAD_MAX];
-
-} sdp_track_t;
-
-static sdp_track_t *sdp_TrackCreate ( sdp_t *, int , int , char * );
-static void         sdp_TrackRelease( sdp_track_t * );
-
-static int  NetOpenUDP( vlc_object_t *, char *, int , char *, int );
-static void NetClose  ( vlc_object_t *, int );
-
-
-/*
- * RTP handler
- */
-typedef struct rtp_stream_sys_t rtp_stream_sys_t;
-typedef struct rtp_stream_t rtp_stream_t;
-
-typedef int  (*rtp_pf_payload_parse)( rtp_stream_t * );
-
-struct rtp_stream_t
-{
-    struct
-    {
-        int          i_cat;     /* AUDIO_ES/VIDEO_ES */
-        vlc_fourcc_t i_codec;
-
-        struct
-        {
-            int i_width;
-            int i_height;
-        } video;
-
-        struct
-        {
-            int i_channels;
-            int i_samplerate;
-            int i_samplesize;
-        } audio;
-
-        int  i_extra_data;
-        void *p_extra_data;
-    } es;
-
-    struct
-    {
-        int  i_data;
-        void *p_data;
-
-        int  i_payload;
-        void *p_payload;
-
-        /* Do not touch that */
-        rtp_pf_payload_parse pf_payload_parse;
-    } frame;
-
-    int i_clock_rate;
-
-    /* User private */
-    rtp_stream_sys_t *p_sys;
-
-};
-
-typedef struct
-{
-    vlc_bool_t   b_data;
-    rtp_stream_t stream;
-
-    int i_handle;
-} rtp_source_t;
-
-typedef struct
-{
-    VLC_COMMON_MEMBERS
-
-    int          i_rtp;
-    rtp_source_t **rtp;
-
-} rtp_t;
-
-static rtp_t *rtp_New( input_thread_t *p_input );
-static int    rtp_Add( rtp_t *rtp, sdp_track_t *tk, rtp_stream_t **pp_stream );
-static int    rtp_Read( rtp_t *rtp, rtp_stream_t **pp_stream );
-static int    rtp_Control( rtp_t *rtp, int i_query );
-static void   rtp_Release( rtp_t *rtp );
-
-/*
- * Module specific
- */
-
-struct rtp_stream_sys_t
-{
-    es_descriptor_t *p_es;
+    int  i_sdp;
+    int  i_sdp_pos;
+    char *psz_sdp;
 };
 
 struct demux_sys_t
 {
-    stream_t *s;
+    stream_t       *s;
 
-    int      i_session;
-    sdp_t    *p_sdp;
-
-    rtp_t    *rtp;
+    media_client_t *mc;
 };
 
+struct media_client_sys_t
+{
+    es_descriptor_t *es;
+
+    int64_t         i_timestamp;
+    vlc_bool_t      b_complete;
+    pes_packet_t    *p_pes;
+};
+
+static void CodecFourcc( char *psz_name, uint8_t *pi_cat,vlc_fourcc_t *pi_fcc);
+
+static void EsDecoderCreate( input_thread_t * p_input, media_client_es_t *p_es );
+static int  EsDecoderSend  ( input_thread_t * p_input,
+                             media_client_es_t *p_es, media_client_frame_t *p_frame );
+
+
 /*****************************************************************************
- * Open:
+ * DescribeOpen : create a SDP from an URL
+ *****************************************************************************
+ *
  *****************************************************************************/
-static int Open( vlc_object_t * p_this )
+static int  DescribeOpen( vlc_object_t *p_this )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    access_sys_t   *p_sys;
+    char           *psz_uri;
+
+    if( p_input->psz_access == NULL ||
+        ( strcmp( p_input->psz_access, "rtsp" ) &&
+          strcmp( p_input->psz_access, "rtp" ) ) )
+    {
+        msg_Dbg( p_input, "invalid access name" );
+        return VLC_EGENERIC;
+    }
+
+    /* We cannot directly use p_input->psz_source as we cannot accept
+     * something like rtsp/<demuxer>:// */
+    psz_uri = malloc( strlen( p_input->psz_access ) +
+                      strlen( p_input->psz_name ) + 4 );
+    sprintf( psz_uri, "%s://%s", p_input->psz_access, p_input->psz_name );
+
+    msg_Dbg( p_input, "describing %s", psz_uri );
+
+    p_sys = p_input->p_access_data = malloc( sizeof( access_sys_t ) );
+    p_sys->i_sdp    = 0;
+    p_sys->i_sdp_pos= 0;
+    p_sys->psz_sdp  = media_client_describe_url( psz_uri );
+
+    if( p_sys->psz_sdp == NULL )
+    {
+        msg_Err( p_input, "cannot describe %s", psz_uri );
+        free( psz_uri );
+        return VLC_EGENERIC;
+    }
+    free( psz_uri );
+    p_sys->i_sdp = strlen( p_sys->psz_sdp );
+
+    p_input->i_mtu = 0;
+
+    /* Set exported functions */
+    p_input->pf_read = DescribeRead;
+    p_input->pf_seek = NULL;
+    p_input->pf_set_program = input_SetProgram;
+    p_input->pf_set_area = NULL;
+    p_input->p_private = NULL;
+
+    /* Finished to set some variable */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    p_input->stream.b_pace_control = VLC_FALSE;
+    p_input->stream.p_selected_area->i_tell = 0;
+    p_input->stream.b_seekable = 0;
+    p_input->stream.p_selected_area->i_size = 0;
+    p_input->stream.i_method = INPUT_METHOD_NETWORK;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    /* Update default_pts to a suitable value for RTSP access */
+    p_input->i_pts_delay = 4 * DEFAULT_PTS_DELAY;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * DescribeClose
+ *****************************************************************************
+ *
+ *****************************************************************************/
+static void DescribeClose( vlc_object_t * p_this )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    access_sys_t   *p_sys   = p_input->p_access_data;
+
+    free( p_sys->psz_sdp );
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * DescribeRead
+ *****************************************************************************
+ *
+ *****************************************************************************/
+static ssize_t DescribeRead( input_thread_t * p_input,
+                             byte_t * p_buffer, size_t i_len)
+{
+    access_sys_t   *p_sys   = p_input->p_access_data;
+    int            i_copy = __MIN( (int)i_len,
+                                   p_sys->i_sdp - p_sys->i_sdp_pos );
+    if( i_copy > 0 )
+    {
+        memcpy( p_buffer, &p_sys->psz_sdp[p_sys->i_sdp_pos], i_copy );
+        p_sys->i_sdp_pos += i_copy;
+    }
+
+    return i_copy;
+}
+
+/*****************************************************************************
+ * SDPOpen:
+ *****************************************************************************
+ *
+ *****************************************************************************/
+static int SDPOpen( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys;
+
+    int            b_tcp = 0;   /* TODO */
+
     uint8_t        *p_peek;
 
     int            i_sdp;
     int            i_sdp_max;
     char           *psz_sdp;
 
-    vlc_value_t    val;
+    int               i_es;
+    media_client_es_t **pp_es;
+    int               i;
 
-    int            i;
-    sdp_session_t  *p_session;
+    char            *psz_uri;
 
     /* See if it looks like a SDP
        v, o, s fields are mandatory and in this order */
@@ -333,20 +221,18 @@ static int Open( vlc_object_t * p_this )
         msg_Err( p_input, "cannot peek" );
         return VLC_EGENERIC;
     }
-    if( strncmp( p_peek, "v=0\r\no=", 7 ) &&
-        strncmp( p_peek, "v=0\no=", 6 ) )
+    if( strncmp( p_peek, "v=0\r\n", 5 ) &&
+        strncmp( p_peek, "v=0\n", 4 ) )
     {
         msg_Err( p_input, "SDP module discarded" );
         return VLC_EGENERIC;
     }
 
-    /* Set input_thread_t fields */
-    p_input->pf_demux = Demux;
-    p_input->p_demux_data = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_input->pf_demux = SDPDemux;
+    p_input->pf_demux_control = demux_vaControlDefault;
 
-    /* Init private data */
-    p_sys->i_session= 0;
-    p_sys->p_sdp    = NULL;
+    p_sys = p_input->p_demux_data = malloc( sizeof( demux_sys_t ) );
+    p_sys->mc = media_client_create( b_tcp );
     if( ( p_sys->s = stream_OpenInput( p_input ) ) == NULL )
     {
         msg_Err( p_input, "cannot create stream" );
@@ -376,30 +262,36 @@ static int Open( vlc_object_t * p_this )
     }
     psz_sdp[i_sdp] = '\0';
 
-    if( strlen( psz_sdp ) <= 0 )
+    if( i_sdp == 0 )
     {
         msg_Err( p_input, "cannot read SDP file" );
-        goto error;
-
-    }
-
-    /* Parse this SDP */
-    if( ( p_sys->p_sdp = sdp_Parse( psz_sdp ) ) == NULL )
-    {
-        msg_Err( p_input, "cannot parse SDP" );
+        free( psz_sdp );
         goto error;
     }
-    sdp_Dump( p_input, p_sys->p_sdp );
+    msg_Dbg( p_input, "------sdp file-----\n%s", psz_sdp );
+    msg_Dbg( p_input, "-------------------" );
 
-    /* Get the selected session */
-    var_Create( p_input, "sdp-session", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_input, "sdp-session", &val );
-    p_sys->i_session = val.i_int;
-    if( p_sys->i_session >= p_sys->p_sdp->i_session )
+    /* We cannot directly use p_input->psz_source as we cannot accept
+     * something like rtsp/<demuxer>:// */
+    psz_uri = malloc( strlen( p_input->psz_access ) +
+                      strlen( p_input->psz_name ) + 4 );
+    sprintf( psz_uri, "%s://%s", p_input->psz_access, p_input->psz_name );
+
+    if( media_client_add_sdp( p_sys->mc, psz_sdp, psz_uri ) )
     {
-        p_sys->i_session = 0;
+        msg_Err( p_input, "cannot add this description" );
+        free( psz_sdp );
+        goto error;
     }
-    p_session = &p_sys->p_sdp->session[p_sys->i_session];
+    free( psz_sdp );
+
+    media_client_es( p_sys->mc, &pp_es, &i_es );
+    for( i = 0; i < i_es; i++ )
+    {
+        msg_Dbg( p_input, "es[%d] cat=%s codec=%s",
+                 i, pp_es[i]->psz_cat, pp_es[i]->psz_codec );
+    }
+
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
     if( input_InitStream( p_input, 0 ) == -1)
@@ -416,83 +308,16 @@ static int Open( vlc_object_t * p_this )
     }
     p_input->stream.pp_programs[0]->b_is_ok = 0;
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-
     p_input->stream.i_mux_rate = 0 / 50;
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-
-    /* Create a RTP handler */
-    p_sys->rtp = rtp_New( p_input );
-
-    /* Now create a track for each media */
-    for( i = 0; i < p_session->i_media; i++ )
-    {
-        sdp_track_t     *tk;
-        rtp_stream_t    *rs;
-        int j;
-
-        tk = sdp_TrackCreate( p_sys->p_sdp, p_sys->i_session, i,
-                              p_input->psz_source );
-        if( tk == NULL )
-        {
-            msg_Warn( p_input, "media[%d] invalid", i );
-            continue;
-        }
-
-        msg_Dbg( p_input, "media[%d] :", i );
-        msg_Dbg( p_input, "    - cat : %s",
-                 tk->i_cat == AUDIO_ES ? "audio" :
-                                ( tk->i_cat == VIDEO_ES ? "video":"unknown") );
-        msg_Dbg( p_input, "    - control : %s", tk->psz_control );
-        msg_Dbg( p_input, "    - address : %s ttl : %d count : %d",
-                 tk->psz_address, tk->i_address_ttl, tk->i_address_count );
-        msg_Dbg( p_input, "    - port : %d count : %d",
-                 tk->i_port, tk->i_port_count );
-        msg_Dbg( p_input, "    - transport : %s", tk->psz_transport );
-        for( j = 0; j < tk->i_payload_count; j++ )
-        {
-            msg_Dbg( p_input,
-                     "    - payload[%d] : type : %d rtpmap : %s fmtp : %s",
-                     j, tk->payload[j].i_type,
-                     tk->payload[j].psz_rtpmap,
-                     tk->payload[j].psz_fmtp );
-        }
-
-        if( tk->psz_control )
-        {
-            msg_Err( p_input, " -> Need control : Unsuported" );
-            sdp_TrackRelease( tk );
-            continue;
-        }
-
-        if( rtp_Add( p_sys->rtp, tk, &rs ) )
-        {
-            msg_Err( p_input, "cannot add media[%d]", i );
-            sdp_TrackRelease( tk );
-            continue;
-        }
-
-        rs->p_sys = malloc( sizeof( rtp_stream_sys_t ) );
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        rs->p_sys->p_es = input_AddES( p_input,
-                                       p_input->stream.p_selected_program,
-                                       1 , AUDIO_ES, NULL, 0 );
-        rs->p_sys->p_es->i_stream_id = 1;
-        rs->p_sys->p_es->i_fourcc = VLC_FOURCC( 'u', 'n', 'd', 'f' );
-        input_SelectES( p_input, rs->p_sys->p_es );
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-        sdp_TrackRelease( tk );
-    }
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
 
     return VLC_SUCCESS;
 
 error:
+    media_client_release( p_sys->mc );
+
     if( p_sys->s )
     {
         stream_Release( p_sys->s );
@@ -502,1164 +327,272 @@ error:
 }
 
 /*****************************************************************************
- * Close: frees unused data
+ * SDPClose:
+ *****************************************************************************
+ *
  *****************************************************************************/
-static void Close( vlc_object_t *p_this )
+static void SDPClose( vlc_object_t * p_this )
 {
     input_thread_t *p_input = (input_thread_t *)p_this;
     demux_sys_t    *p_sys = p_input->p_demux_data;
 
-    rtp_Release( p_sys->rtp );
-    sdp_Release( p_sys->p_sdp );
+    int               i_es;
+    media_client_es_t **pp_es;
+    int               i;
+
+    media_client_es( p_sys->mc, &pp_es, &i_es );
+    for( i = 0; i < i_es; i++ )
+    {
+        msg_Dbg( p_input, "es[%d] cat=%s codec=%s",
+                 i, pp_es[i]->psz_cat, pp_es[i]->psz_codec );
+
+        if( pp_es[i]->p_sys )
+        {
+            free( pp_es[i]->p_sys );
+        }
+    }
+
+    media_client_release( p_sys->mc );
+    stream_Release( p_sys->s );
     free( p_sys );
 }
 
 /*****************************************************************************
- * Demux: reads and demuxes data packets
+ * SDPDemux:
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, 1 otherwise
  *****************************************************************************/
-static int Demux ( input_thread_t *p_input )
+static int SDPDemux( input_thread_t * p_input )
 {
-    demux_sys_t    *p_sys = p_input->p_demux_data;
-    int i;
+    demux_sys_t  *p_sys = p_input->p_demux_data;
 
-    for( i = 0; i < 10; i++ )
+    media_client_es_t    *p_es;
+    media_client_frame_t *p_frame;
+
+
+    while( !p_input->b_die && !p_input->b_error )
     {
-        rtp_stream_t *rs;
-
-        pes_packet_t  *p_pes;
-        data_packet_t *p_data;
-
-        if( rtp_Read( p_sys->rtp, &rs ) )
+        if( media_client_read( p_sys->mc, &p_es, &p_frame, 500 ) )
         {
-            /* FIXME */
+            msg_Dbg( p_input, "no data" );
             return 1;
         }
-        if( !rs )
+
+        if( p_es == NULL )
         {
             continue;
         }
 
-        msg_Dbg( p_input, "rs[%p] frame.size=%d frame.payload=%d",
-                 rs, rs->frame.i_data, rs->frame.i_payload );
-
-        if( rs->p_sys->p_es->p_decoder_fifo == NULL )
+        if( p_es->p_sys == NULL )
         {
-            return 1;
+            EsDecoderCreate( p_input, p_es );
         }
 
-        /* Put the complete data in a PES */
-        if( ( p_pes = input_NewPES( p_input->p_method_data ) ) == NULL )
+        if( p_es->p_sys->es && p_es->p_sys->es->p_decoder_fifo &&
+            p_frame->i_data > 0 )
         {
-            return 0;
+            EsDecoderSend( p_input, p_es, p_frame );
         }
-        p_data = input_NewPacket( p_input->p_method_data, rs->frame.i_payload );
-        if( p_data == NULL )
-        {
-            input_DeletePES( p_input->p_method_data, p_pes );
-            return 0;
-        }
-        p_data->p_payload_end = p_data->p_payload_start + rs->frame.i_payload;
-
-        p_pes->i_rate = p_input->stream.control.i_rate;
-        p_pes->p_first = p_pes->p_last = p_data;
-        p_pes->i_nb_data = 1;
-        p_pes->i_dts = mdate() + p_input->i_pts_delay;
-        p_pes->i_pes_size = rs->frame.i_payload;
-
-        memcpy( p_pes->p_first->p_payload_start,
-                rs->frame.p_payload, rs->frame.i_payload );
-
-        input_DecodePES( rs->p_sys->p_es->p_decoder_fifo, p_pes );
+        return 1;
     }
 
-    return 1;
-}
-
-/*****************************************************************************
- *
- *****************************************************************************/
-
-/*****************************************************************************
- *  SDP Parser
- *****************************************************************************/
-/* TODO:
- * - implement parsing of all fields
- * - ?
- */
-static int   sdp_GetLine( char **ppsz_sdp, char *p_com, char **pp_arg )
-{
-    char *p = *ppsz_sdp;
-    char *p_end;
-    int  i_size;
-
-    if( p[0] < 'a' || p[0] > 'z' || p[1] != '=' )
-    {
-        return VLC_EGENERIC;
-    }
-
-    *p_com = p[0];
-
-    if( ( p_end = strstr( p, "\n" ) ) == NULL )
-    {
-        p_end = p + strlen( p );
-    }
-    else
-    {
-        while( *p_end == '\n' || *p_end == '\r' )
-        {
-            p_end--;
-        }
-        p_end++;
-    }
-
-    i_size = p_end - &p[2];
-    *pp_arg = malloc( i_size + 1 );
-    memcpy(  *pp_arg, &p[2], i_size );
-    (*pp_arg)[i_size] = '\0';
-
-    while( *p_end == '\r' || *p_end == '\n' )
-    {
-        p_end++;
-    }
-    *ppsz_sdp = p_end;
-    return VLC_SUCCESS;
-}
-
-static sdp_t *sdp_Parse  ( char *psz_sdp )
-{
-    sdp_t *sdp = malloc( sizeof( sdp_t ) );
-
-    sdp->i_session = -1;
-    sdp->session   = NULL;
-
-    for( ;; )
-    {
-#define p_session (&sdp->session[sdp->i_session])
-#define p_media   (&p_session->media[p_session->i_media])
-        char com, *psz;
-
-        if( sdp_GetLine( &psz_sdp, &com, &psz ) )
-        {
-            break;
-        }
-        fprintf( stderr, "com=%c arg=%s\n", com, psz );
-        if( sdp->i_session < 0 && ( com !='v' || strcmp( psz, "0" ) ) )
-        {
-            break;
-        }
-        switch( com )
-        {
-            case 'v':
-                fprintf( stderr, "New session added\n" );
-                if( sdp->i_session != -1 )
-                {
-                    p_session->i_media++;
-                }
-                /* Add a new session */
-                sdp->i_session++;
-                sdp->session =
-                    realloc( sdp->session,
-                             (sdp->i_session + 1)*sizeof(sdp_session_t) );
-                p_session->psz_origin     = NULL;
-                p_session->psz_session    = NULL;
-                p_session->psz_description= NULL;
-                p_session->psz_uri        = NULL;
-                p_session->psz_email      = NULL;
-                p_session->psz_phone      = NULL;
-                p_session->psz_connection = NULL;
-                p_session->psz_bandwith   = NULL;
-                p_session->psz_key        = NULL;
-                p_session->psz_timezone   = NULL;
-                p_session->i_media        = -1;
-                p_session->media          = NULL;
-                p_session->i_attribute    = 0;
-                p_session->attribute      = NULL;
-
-                break;
-            case 'm':
-                fprintf( stderr, "New media added\n" );
-                p_session->i_media++;
-                p_session->media =
-                    realloc( p_session->media,
-                             (p_session->i_media + 1)*sizeof( sdp_media_t ) );
-                p_media->psz_media      = strdup( psz );
-                p_media->psz_description= NULL;
-                p_media->psz_connection = NULL;
-                p_media->psz_bandwith   = NULL;
-                p_media->psz_key        = NULL;
-                p_media->i_attribute    = 0;
-                p_media->attribute      = NULL;
-                break;
-            case 'o':
-                p_session->psz_origin = strdup( psz );
-                break;
-            case 's':
-                p_session->psz_session = strdup( psz );
-                break;
-            case 'i':
-                if( p_session->i_media != -1 )
-                {
-                    p_media->psz_description = strdup( psz );
-                }
-                else
-                {
-                    p_session->psz_description = strdup( psz );
-                }
-                break;
-            case 'u':
-                p_session->psz_uri = strdup( psz );
-                break;
-            case 'e':
-                p_session->psz_email = strdup( psz );
-                break;
-            case 'p':
-                p_session->psz_phone = strdup( psz );
-                break;
-            case 'c':
-                if( p_session->i_media != -1 )
-                {
-                    p_media->psz_connection = strdup( psz );
-                }
-                else
-                {
-                    /* FIXME could be multiple addresses ( but only at session
-                     * level FIXME */
-                    /* For instance
-                           c=IN IP4 224.2.1.1/127
-                           c=IN IP4 224.2.1.2/127
-                           c=IN IP4 224.2.1.3/127
-                        is valid */
-                    p_session->psz_connection = strdup( psz );
-                }
-                break;
-            case 'b':
-                if( p_session->i_media != -1 )
-                {
-                    p_media->psz_bandwith = strdup( psz );
-                }
-                else
-                {
-                    p_session->psz_bandwith = strdup( psz );
-                }
-                break;
-            case 'k':
-                if( p_session->i_media != -1 )
-                {
-                    p_media->psz_key = strdup( psz );
-                }
-                else
-                {
-                    p_session->psz_key = strdup( psz );
-                }
-                break;
-            case 'z':
-                p_session->psz_timezone   = strdup( psz );
-                break;
-            case 'a':
-            {
-                char *p = strchr( psz, ':' );
-                char *name = NULL;
-                char *value= NULL;
-
-                if( p )
-                {
-                    *p++ = '\0';
-                    while( *p == ' ' )
-                    {
-                        p++;
-                    }
-                    value= strdup( p);
-                }
-                name = strdup( psz );
-
-                if( p_session->i_media != -1 )
-                {
-                    p_media->attribute
-                        = realloc( p_media->attribute,
-                                   ( p_media->i_attribute + 1 ) *
-                                        sizeof( sdp_attribute_t ) );
-                    p_media->attribute[p_media->i_attribute].psz_name = name;
-                    p_media->attribute[p_media->i_attribute].psz_value = value;
-                    p_media->i_attribute++;
-                }
-                else
-                {
-                    p_session->psz_key = strdup( psz );
-                    p_session->attribute
-                        = realloc( p_session->attribute,
-                                   ( p_session->i_attribute + 1 ) *
-                                        sizeof( sdp_attribute_t ) );
-                    p_session->attribute[p_session->i_attribute].psz_name = name;
-                    p_session->attribute[p_session->i_attribute].psz_value = value;
-                    p_session->i_attribute++;
-                }
-                break;
-            }
-
-            default:
-                fprintf( stderr, "unhandled com=%c\n", com );
-                break;
-        }
-#undef p_media
-#undef p_session
-    }
-
-    if( sdp->i_session < 0 )
-    {
-        free( sdp );
-        return NULL;
-    }
-    sdp->session[sdp->i_session].i_media++;
-    sdp->i_session++;
-
-    return sdp;
-}
-static void   sdp_Release( sdp_t *p_sdp )
-{
-    int i, j, i_attr;
-    for( i = 0; i < p_sdp->i_session; i++ )
-    {
-        FREE( p_sdp->session[i].psz_origin );
-        FREE( p_sdp->session[i].psz_session );
-        FREE( p_sdp->session[i].psz_description );
-        FREE( p_sdp->session[i].psz_uri );
-        FREE( p_sdp->session[i].psz_email );
-        FREE( p_sdp->session[i].psz_phone );
-        FREE( p_sdp->session[i].psz_connection );
-        FREE( p_sdp->session[i].psz_bandwith );
-        FREE( p_sdp->session[i].psz_key );
-        FREE( p_sdp->session[i].psz_timezone );
-        for( i_attr = 0; i_attr < p_sdp->session[i].i_attribute; i_attr++ )
-        {
-            FREE( p_sdp->session[i].attribute[i].psz_name );
-            FREE( p_sdp->session[i].attribute[i].psz_value );
-        }
-        FREE( p_sdp->session[i].attribute );
-
-        for( j = 0; j < p_sdp->session[i].i_media; j++ )
-        {
-            FREE( p_sdp->session[i].media[j].psz_media );
-            FREE( p_sdp->session[i].media[j].psz_description );
-            FREE( p_sdp->session[i].media[j].psz_connection );
-            FREE( p_sdp->session[i].media[j].psz_bandwith );
-            FREE( p_sdp->session[i].media[j].psz_key );
-            for( i_attr = 0; i_attr < p_sdp->session[i].i_attribute; i_attr++ )
-            {
-                FREE( p_sdp->session[i].media[j].attribute[i_attr].psz_name );
-                FREE( p_sdp->session[i].media[j].attribute[i_attr].psz_value );
-            }
-            FREE( p_sdp->session[i].media[j].attribute );
-        }
-        FREE( p_sdp->session[i].media);
-    }
-    FREE( p_sdp->session );
-    free( p_sdp );
-}
-
-static void  sdp_Dump   ( input_thread_t *p_input, sdp_t *p_sdp )
-{
-    int i, j, i_attr;
-#define PRINTS( var, fmt ) \
-    if( var ) { msg_Dbg( p_input, "    - " fmt " : %s", var ); }
-#define PRINTM( var, fmt ) \
-    if( var ) { msg_Dbg( p_input, "        - " fmt " : %s", var ); }
-
-    for( i = 0; i < p_sdp->i_session; i++ )
-    {
-        msg_Dbg( p_input, "session[%d]", i );
-        PRINTS( p_sdp->session[i].psz_origin, "Origin" );
-        PRINTS( p_sdp->session[i].psz_session, "Session" );
-        PRINTS( p_sdp->session[i].psz_description, "Description" );
-        PRINTS( p_sdp->session[i].psz_uri, "URI" );
-        PRINTS( p_sdp->session[i].psz_email, "e-mail" );
-        PRINTS( p_sdp->session[i].psz_phone, "Phone" );
-        PRINTS( p_sdp->session[i].psz_connection, "Connection" );
-        PRINTS( p_sdp->session[i].psz_bandwith, "Bandwith" );
-        PRINTS( p_sdp->session[i].psz_key, "Key" );
-        PRINTS( p_sdp->session[i].psz_timezone, "TimeZone" );
-        for( i_attr = 0; i_attr < p_sdp->session[i].i_attribute; i_attr++ )
-        {
-            msg_Dbg( p_input, "    - attribute[%d] name:'%s' value:'%s'",
-                    i_attr,
-                    p_sdp->session[i].attribute[i_attr].psz_name,
-                    p_sdp->session[i].attribute[i_attr].psz_value );
-        }
-
-        for( j = 0; j < p_sdp->session[i].i_media; j++ )
-        {
-            msg_Dbg( p_input, "    - media[%d]", j );
-            PRINTM( p_sdp->session[i].media[j].psz_media, "Name" );
-            PRINTM( p_sdp->session[i].media[j].psz_description, "Description" );
-            PRINTM( p_sdp->session[i].media[j].psz_connection, "Connection" );
-            PRINTM( p_sdp->session[i].media[j].psz_bandwith, "Bandwith" );
-            PRINTM( p_sdp->session[i].media[j].psz_key, "Key" );
-
-            for( i_attr = 0; i_attr < p_sdp->session[i].media[j].i_attribute; i_attr++ )
-            {
-                msg_Dbg( p_input, "        - attribute[%d] name:'%s' value:'%s'",
-                        i_attr,
-                        p_sdp->session[i].media[j].attribute[i_attr].psz_name,
-                        p_sdp->session[i].media[j].attribute[i_attr].psz_value );
-            }
-        }
-    }
-#undef PRINTS
-}
-
-static char * sdp_AttributeValue( int i_attribute, sdp_attribute_t *attribute,
-                                  char *name )
-{
-    int i;
-
-    for( i = 0; i < i_attribute; i++ )
-    {
-        if( !strcmp( attribute[i].psz_name, name ) )
-        {
-            return attribute[i].psz_value;
-        }
-    }
-    return NULL;
-}
-
-/*
- * Create a track from an SDP session/media
- */
-static sdp_track_t *sdp_TrackCreate( sdp_t *p_sdp, int i_session, int i_media,
-                                     char *psz_url_base )
-{
-    sdp_track_t   *tk = malloc( sizeof( sdp_track_t ) );
-    sdp_session_t *p_session = &p_sdp->session[i_session];
-    sdp_media_t   *p_media = &p_session->media[i_media];
-
-    char *psz_url = NULL;
-    char *p;
-    char *psz;
-
-    /* Be sure there is a terminating '/' */
-    if( psz_url_base && *psz_url_base != '\0' )
-    {
-        psz_url = malloc( strlen( psz_url_base ) + 2);
-        strcpy( psz_url, psz_url_base );
-        if( psz_url[strlen( psz_url ) -1] != '/' )
-        {
-            strcat( psz_url, "/" );
-        }
-    }
-
-    /* Get track type */
-    if( !strncmp( p_media->psz_media, "audio", 5 ) )
-    {
-        tk->i_cat = AUDIO_ES;
-    }
-    else if( !strncmp( p_media->psz_media, "video", 5 ) )
-    {
-        tk->i_cat = VIDEO_ES;
-    }
-    else
-    {
-        free( tk );
-        return NULL;
-    }
-    p = &p_media->psz_media[5];
-
-    /* Get track port base and count */
-    tk->i_port = strtol( p, &p, 0 );
-
-    if( *p == '/' )
-    {
-        p++;
-        tk->i_port_count = strtol( p, &p, 0 );
-    }
-    else
-    {
-        tk->i_port_count = 0;
-    }
-
-    while( *p == ' ' )
-    {
-        p++;
-    }
-
-    /* Get transport */
-    tk->psz_transport = strdup( p );
-    if( ( psz = strchr( tk->psz_transport, ' ' ) ) )
-    {
-        *psz = '\0';
-    }
-    while( *p && *p != ' ' )
-    {
-        p++;
-    }
-
-    /* Get payload type+fmt */
-    tk->i_payload_count = 0;
-    for( ;; )
-    {
-        int i;
-
-        tk->payload[tk->i_payload_count].i_type     = strtol( p, &p, 0 );
-        tk->payload[tk->i_payload_count].psz_rtpmap = NULL;
-        tk->payload[tk->i_payload_count].psz_fmtp   = NULL;
-
-        for( i = 0; i < p_media->i_attribute; i++ )
-        {
-            if( !strcmp( p_media->attribute[i].psz_name, "rtpmap" ) &&
-                p_media->attribute[i].psz_value )
-            {
-                char *p = p_media->attribute[i].psz_value;
-                int i_type = strtol( p, &p, 0 );
-
-                if( i_type == tk->payload[tk->i_payload_count].i_type )
-                {
-                    while( *p == ' ' )
-                    {
-                        p++;
-                    }
-                    tk->payload[tk->i_payload_count].psz_rtpmap = strdup( p );
-                }
-            }
-            else if( !strcmp( p_media->attribute[i].psz_name, "fmtp" ) &&
-                     p_media->attribute[i].psz_value )
-            {
-                char *p = p_media->attribute[i].psz_value;
-                int i_type = strtol( p, &p, 0 );
-
-                if( i_type == tk->payload[tk->i_payload_count].i_type )
-                {
-                    while( *p == ' ' )
-                    {
-                        p++;
-                    }
-                    tk->payload[tk->i_payload_count].psz_fmtp = strdup( p );
-                }
-            }
-        }
-        tk->i_payload_count++;
-        if( *p == '\0' || tk->i_payload_count >= RTP_PAYLOAD_MAX )
-        {
-            break;
-        }
-    }
-
-    /* Get control */
-    psz = sdp_AttributeValue( p_media->i_attribute, p_media->attribute,
-                              "control" );
-    if( !psz || *psz == '\0' )
-    {
-        psz = sdp_AttributeValue( p_session->i_attribute, p_session->attribute,
-                                  "control" );
-    }
-
-    if( psz && *psz != '\0')
-    {
-        if( strstr( psz, "://" ) || psz_url == NULL )
-        {
-            tk->psz_control = strdup( psz );
-        }
-        else
-        {
-            tk->psz_control = malloc( strlen( psz_url ) + strlen( psz ) + 1 );
-            strcpy( tk->psz_control, psz_url );
-            strcat( tk->psz_control, psz );
-        }
-    }
-    else
-    {
-        tk->psz_control = NULL;
-    }
-
-    /* Get address */
-    psz = p_media->psz_connection;
-    if( psz == NULL )
-    {
-        psz = p_session->psz_connection;
-    }
-    if( psz && *psz != '\0' )
-    {
-        tk->i_address_count = 0;
-        tk->i_address_ttl   = 0;
-        tk->psz_address     = NULL;
-
-        if( ( p = strstr( psz, "IP4" ) ) == NULL )
-        {
-            p = strstr( psz, "IP6" );   /* FIXME No idea if it exists ... */
-        }
-        if( p )
-        {
-            p += 3;
-            while( *p == ' ' )
-            {
-                p++;
-            }
-
-            tk->psz_address = p = strdup( p );
-            p = strchr( p, '/' );
-            if(p )
-            {
-                *p++ = '\0';
-
-                tk->i_address_ttl= strtol( p, &p, 0 );
-                if( p )
-                {
-                    tk->i_address_count = strtol( p, &p, 0 );
-                }
-            }
-        }
-    }
-    else
-    {
-        tk->i_address_count = 0;
-        tk->i_address_ttl   = 0;
-        tk->psz_address     = NULL;
-    }
-
-    return tk;
+    return 0;
 }
 
 
-static void         sdp_TrackRelease( sdp_track_t *tk )
+
+static struct
 {
-    int i;
+    char *psz_codec;
 
-    FREE( tk->psz_control );
-    FREE( tk->psz_address );
-    FREE( tk->psz_transport );
-    for( i = 0; i < tk->i_payload_count; i++ )
-    {
-        FREE( tk->payload[i].psz_rtpmap );
-        FREE( tk->payload[i].psz_fmtp );
-    }
-    free( tk );
-}
+    int          i_cat;
+    vlc_fourcc_t i_fcc;
 
-/*****************************************************************************
- * RTP/RTCP/RTSP handler
- *****************************************************************************/
-
-static int  rtp_MPAPayloadParse( rtp_stream_t * );
-
-static int rtp_PayloadToInfos( int i_type,
-                               char **ppsz_name, vlc_fourcc_t *p_fcc,
-                               int  *pi_clock_rate, int *pi_channels,
-                               int  *pi_samplesize );
-
-static rtp_pf_payload_parse rtp_PayloadToFunction( char * );
-
-static int rtp_PacketParse( rtp_t *, rtp_stream_t * );
-
-static rtp_t *rtp_New( input_thread_t *p_input )
+} rtp_codec_map[] =
 {
-    rtp_t *rtp = vlc_object_create( p_input, sizeof( rtp_t ) );
-
-    rtp->i_rtp = 0;
-    rtp->rtp   = NULL;
-
-    return rtp;
-}
-
-static int    rtp_Add( rtp_t *rtp, sdp_track_t *tk, rtp_stream_t **pp_stream )
-{
-    rtp_source_t *rs = malloc( sizeof( rtp_source_t ) );
-
-    *pp_stream = NULL;
-
-    if( tk->psz_control )
-    {
-        msg_Err( rtp, "RTP using control unsupported" );
-        free( rs );
-        return VLC_EGENERIC;
-    }
-
-    /* no data unread */
-    rs->b_data = VLC_FALSE;
-
-    /* Clock rate */
-    rs->stream.i_clock_rate = 0;
-
-    /* Init stream properties */
-    rs->stream.es.i_cat   = tk->i_cat;
-    rs->stream.es.i_codec = VLC_FOURCC( 'u', 'n', 'd', 'f' );
-    rs->stream.es.audio.i_channels = 0;
-    rs->stream.es.audio.i_samplerate = 0;
-    rs->stream.es.audio.i_samplesize = 0;
-    rs->stream.es.video.i_width = 0;
-    rs->stream.es.video.i_height = 0;
-    rs->stream.es.i_extra_data = 0;
-    rs->stream.es.p_extra_data = NULL;
-    rs->stream.frame.i_data = 0;
-    rs->stream.frame.p_data = malloc( 65535 );  /* Max size of a UDP packet */
-    rs->stream.frame.pf_payload_parse = NULL;
-    rs->stream.p_sys = NULL;
-    if( tk->payload[0].i_type < 33 )
-    {
-        char *psz_name;
-        int  i_ret;
-
-        i_ret  = rtp_PayloadToInfos( tk->payload[0].i_type,
-                                     &psz_name,
-                                     &rs->stream.es.i_codec,
-                                     &rs->stream.i_clock_rate,
-                                     &rs->stream.es.audio.i_channels,
-                                     &rs->stream.es.audio.i_samplesize );
-        if( i_ret )
-        {
-            msg_Err( rtp, "unknown/unhandled payload type" );
-            free( rs );
-            return VLC_EGENERIC;
-        }
-        msg_Dbg( rtp, "payload type=%d name=%s",
-                 tk->payload[0].i_type, psz_name );
-
-        if( rs->stream.es.i_cat == AUDIO_ES )
-        {
-            rs->stream.es.audio.i_samplerate = rs->stream.i_clock_rate;
-        }
-        rs->stream.frame.pf_payload_parse = rtp_PayloadToFunction( psz_name );
-    }
-    else if( tk->payload[0].i_type >= 34 && tk->payload[0].i_type < 96 )
-    {
-        msg_Err( rtp, "invalid payload type" );
-        free( rs );
-        return VLC_EGENERIC;
-    }
-    else if( tk->payload[0].psz_rtpmap && *tk->payload[0].psz_rtpmap != '\0' )
-    {
-        char *psz_payload = strdup( tk->payload[0].psz_rtpmap );
-        char *p;
-        int  i_clock_rate = 0;
-        int  i_ret;
-
-        p = strchr( psz_payload, '/' );
-        if( p )
-        {
-            *p++ = '\0';
-            i_clock_rate = strtol( p, &p, 0 );
-            if( tk->i_cat == AUDIO_ES )
-            {
-                rs->stream.es.audio.i_samplerate = rs->stream.i_clock_rate;
-                if( *p  == '/' )
-                {
-                    rs->stream.es.audio.i_channels = strtol( p + 1, &p, 0 );
-                }
-            }
-        }
-
-        msg_Dbg( rtp, "dynamique payload type (type=%s, clock_rate=%d)",
-                 psz_payload, i_clock_rate );
-
-        i_ret  = rtp_PayloadToInfos( -1,
-                                     &psz_payload,
-                                     &rs->stream.es.i_codec,
-                                     &rs->stream.i_clock_rate,
-                                     &rs->stream.es.audio.i_channels,
-                                     &rs->stream.es.audio.i_samplesize );
-        if( i_ret )
-        {
-            msg_Dbg( rtp, "no assigned payload name" );
-            if( !strcmp( psz_payload, "MP4V-ES" ) )
-            {
-                rs->stream.es.i_codec = VLC_FOURCC( 'm', 'p', '4', 'v' );
-
-                /* TODO */
-                /* Parse fmtp, extract config and put it into p_extra_data (VOL) */
-            }
-#if 0
-            else if( !strcmp( psz_payload, "MP4A-LATM" ) )
-            {
-                /* for mpeg4 audio rfc=3016 */
-            }
-
-            else if( !strcmp( psz_payload, "mpeg4-generic" ) )
-            {
-                /* for AAC and ??? */
-                msg_Err( rtp, "what's that : mpeg4-generic" );
-            }
-#endif
-            else
-            {
-                msg_Err( rtp, "what's that : %s", psz_payload );
-                free( rs );
-                return VLC_EGENERIC;
-            }
-        }
-        else
-        {
-            rs->stream.frame.pf_payload_parse = rtp_PayloadToFunction( psz_payload );
-        }
-
-        if( i_clock_rate > 0 )
-        {
-            rs->stream.i_clock_rate = i_clock_rate;
-        }
-    }
-    else
-    {
-        msg_Err( rtp, "dynamique payload type without rtpmap" );
-        free( rs );
-        return VLC_EGENERIC;
-    }
-
-    if( rs->stream.i_clock_rate == 0 )
-    {
-        if( rs->stream.es.i_cat == AUDIO_ES )
-        {
-            rs->stream.i_clock_rate = rs->stream.es.audio.i_samplerate;
-        }
-        else if( rs->stream.es.i_cat == VIDEO_ES )
-        {
-            rs->stream.i_clock_rate = 90000;
-        }
-    }
-
-    /* Open the handle */
-    rs->i_handle = NetOpenUDP( VLC_OBJECT( rtp ),
-                               tk->psz_address, tk->i_port,
-                               "", 0 );
-
-    if( rs->i_handle < 0 )
-    {
-        msg_Err( rtp, "cannot connect at %s:%d", tk->psz_address, tk->i_port );
-        free( rs );
-    }
-
-    TAB_APPEND( rtp->i_rtp, rtp->rtp, rs );
-
-    *pp_stream = &rs->stream;
-    return VLC_SUCCESS;
-}
-
-static int    rtp_Read( rtp_t *rtp, rtp_stream_t **pp_stream )
-{
-    int             i;
-    struct timeval  timeout;
-    fd_set          fds_read;
-    int             i_handle_max = 0;
-    int             i_ret;
-
-    *pp_stream = NULL;
-
-    /* return already buffered data */
-    for( i = 0; i < rtp->i_rtp; i++ )
-    {
-        if( rtp->rtp[i]->b_data && rtp->rtp[i]->stream.frame.i_data > 0 )
-        {
-            rtp->rtp[i]->b_data = VLC_FALSE;
-            *pp_stream = &rtp->rtp[i]->stream;
-            return VLC_SUCCESS;
-        }
-    }
-
-    /* aquire new data */
-    FD_ZERO( &fds_read );
-    for( i = 0; i < rtp->i_rtp; i++ )
-    {
-        if( rtp->rtp[i]->i_handle > 0 )
-        {
-            FD_SET( rtp->rtp[i]->i_handle, &fds_read );
-            i_handle_max = __MAX( i_handle_max, rtp->rtp[i]->i_handle );
-        }
-    }
-
-    /* we will wait 0.5s */
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 500*1000;
-
-    i_ret = select( i_handle_max + 1, &fds_read, NULL, NULL, &timeout );
-    if( i_ret == -1 && errno != EINTR )
-    {
-        msg_Warn( rtp, "cannot select sockets" );
-        msleep( 1000 );
-        return VLC_EGENERIC;
-    }
-    if( i_ret <= 0 )
-    {
-        return VLC_EGENERIC;
-    }
-
-    for( i = 0; i < rtp->i_rtp; i++ )
-    {
-        if( rtp->rtp[i]->i_handle > 0 && FD_ISSET( rtp->rtp[i]->i_handle, &fds_read ) )
-        {
-            int         i_recv;
-            i_recv = recv( rtp->rtp[i]->i_handle,
-                           rtp->rtp[i]->stream.frame.p_data,
-                           65535,
-                           0 );
-#if defined( WIN32 ) || defined( UNDER_CE )
-            if( ( i_recv < 0 && WSAGetLastError() != WSAEWOULDBLOCK )||( i_recv == 0 ) )
-#else
-            if( ( i_recv < 0 && errno != EAGAIN && errno != EINTR )||( i_recv == 0 ) )
-#endif
-            {
-                msg_Warn( rtp, "error reading con[%d] -> closed", i );
-                NetClose( VLC_OBJECT( rtp ), rtp->rtp[i]->i_handle );
-                rtp->rtp[i]->i_handle = -1;
-                continue;
-            }
-            rtp->rtp[i]->stream.frame.i_data = i_recv;
-
-            msg_Dbg( rtp, "con[%d] read %d bytes", i, i_recv );
-
-#if 0
-            /* Now parse generic header header */
-            rtp->rtp[i]->stream.frame.i_payload = rtp->rtp[i]->stream.frame.i_data;
-            rtp->rtp[i]->stream.frame.p_payload = rtp->rtp[i]->stream.frame.p_data;
-#endif
-
-            if( !rtp_PacketParse( rtp, &rtp->rtp[i]->stream ) )
-            {
-                rtp->rtp[i]->b_data = VLC_TRUE;
-            }
-        }
-    }
-
-    /* return buffered data */
-    for( i = 0; i < rtp->i_rtp; i++ )
-    {
-        if( rtp->rtp[i]->b_data && rtp->rtp[i]->stream.frame.i_data > 0 )
-        {
-            rtp->rtp[i]->b_data = VLC_FALSE;
-            *pp_stream = &rtp->rtp[i]->stream;
-            return VLC_SUCCESS;
-        }
-    }
-
-    return VLC_EGENERIC;
-}
-
-static int    rtp_Control( rtp_t *rtp, int i_query )
-{
-    return VLC_EGENERIC;
-}
-
-static void   rtp_Release( rtp_t *rtp )
-{
-    int i;
-
-    for( i = 0; i < rtp->i_rtp; i++ )
-    {
-        if( rtp->rtp[i]->i_handle > 0 )
-        {
-            msg_Dbg( rtp, "closing connection[%d]", i );
-            NetClose( VLC_OBJECT( rtp ), rtp->rtp[i]->i_handle );
-        }
-    }
-    vlc_object_destroy( rtp );
-}
-
-/* RTP helpers */
-struct
-{
-    int          i_type;
-    char         *psz_name;
-    vlc_fourcc_t i_fourcc;
-    int          i_clock_rate;
-    int          i_channels;
-    int          i_samplesize;
-} rtp_payload_name_fcc[] =
-{
-    {  0, "PCMU",   VLC_FOURCC( 'u', 'l', 'a', 'w' ),  8000, 1, 8 },
-    {  1, "1016",   VLC_FOURCC( '1', '0', '1', '6' ),  8000, 1, 0 },
-    {  2, "G721",   VLC_FOURCC( 'g', '7', '2', '1' ),  8000, 1, 0 },
-    {  3, "GSM",    VLC_FOURCC( 'g', 's', 'm', ' ' ),  8000, 1, 0 },
-    /* FIXME ID4 == ima4 ? FIXME */
-    {  5, "ID4",    VLC_FOURCC( 'i', 'm', 'a', '4' ),  8000, 1, 0 },
-    {  6, "ID4",    VLC_FOURCC( 'i', 'm', 'a', '4' ), 16000, 1, 0 },
-    {  7, "LPC",    VLC_FOURCC( 'l', 'p', 'c', ' ' ),  8000, 1, 0 },
-    {  8, "PCMA",   VLC_FOURCC( 'a', 'l', 'a', 'w' ),  8000, 1, 8 },
-    {  9, "G722",   VLC_FOURCC( 'g', '7', '2', '2' ),  8000, 1, 0 },
-    { 10, "L16",    VLC_FOURCC( 't', 'w', 'o', 's' ), 44100, 2, 16 },
-    { 11, "L16",    VLC_FOURCC( 't', 'w', 'o', 's' ), 44100, 1, 16 },
-    { 14, "MPA",    VLC_FOURCC( 'm', 'p', 'g', 'a' ), 90000, 0, 0 },
-    { 15, "G728",   VLC_FOURCC( 'g', '7', '2', '8' ),  8000, 1, 0 },
-    { 25, "CelB",   VLC_FOURCC( 'C', 'e', 'l', 'B' ), 90000, 0, 0 },
-    { 26, "JPEG",   VLC_FOURCC( 'J', 'P', 'E', 'G' ), 90000, 0, 0 },
-    { 26, "nv",     VLC_FOURCC( 'n', 'v', ' ', ' ' ), 90000, 0, 0 },
-    { 31, "H261",   VLC_FOURCC( 'h', '2', '6', '1' ), 90000, 0, 0 },
-    { 32, "MPV",    VLC_FOURCC( 'm', 'p', 'g', 'a' ), 90000, 0, 0 },
-    { 33, "TS",     VLC_FOURCC( 't', 's', ' ', ' ' ), 90000, 0, 0 },
-
-    /* Unassigned : 4, 12, 13, 16-24, 27, 29, 30 */
-
-    { -1, NULL,     VLC_FOURCC( 0, 0, 0, 0 ), 0, 0, 0 }
+    { "L16",        AUDIO_ES,   VLC_FOURCC( 't', 'w', 'o', 's' ) },
+    { "MPA",        AUDIO_ES,   VLC_FOURCC( 'm', 'p', 'g', 'a' ) },
+    { "MP4V-ES",    VIDEO_ES,   VLC_FOURCC( 'm', 'p', '4', 'v' ) },
+    { "MP4A-ES",    AUDIO_ES,   VLC_FOURCC( 'm', 'p', '4', 'a' ) },
+/*  { "H263-1998",  VIDEO_ES,   VLC_FOURCC( 'h', '2', '6', '3' ) }, */
+    { NULL,         UNKNOWN_ES, 0 }
 };
 
-static int rtp_PayloadToInfos( int i_type,
-                               char **ppsz_name, vlc_fourcc_t *p_fcc,
-                               int  *pi_clock_rate, int *pi_channels,
-                               int  *pi_samplesize )
+static void CodecFourcc( char *psz_name, uint8_t *pi_cat, vlc_fourcc_t *pi_fcc)
 {
     int i;
-
-    for( i = 0; rtp_payload_name_fcc[i].psz_name != NULL; i++ )
+    for( i = 0; rtp_codec_map[i].psz_codec != NULL; i++ )
     {
-        if( ( i_type >= 0 && i_type == rtp_payload_name_fcc[i].i_type ) ||
-            !strcasecmp( *ppsz_name, rtp_payload_name_fcc[i].psz_name ) )
+        if( !strcasecmp( psz_name, rtp_codec_map[i].psz_codec ) )
         {
-            if( i_type >= 0 )
+            break;
+        }
+    }
+    *pi_cat = rtp_codec_map[i].i_cat;
+    *pi_fcc = rtp_codec_map[i].i_fcc;
+}
+
+static void EsDecoderCreate( input_thread_t * p_input, media_client_es_t *p_es )
+{
+    msg_Dbg( p_input, "adding es cat=%s codec=%s",
+             p_es->psz_cat, p_es->psz_codec );
+
+    p_es->p_sys = malloc( sizeof( media_client_sys_t ) );
+    p_es->p_sys->p_pes = NULL;
+    p_es->p_sys->b_complete = VLC_FALSE;
+    p_es->p_sys->i_timestamp = 0;
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( !strcmp( p_es->psz_cat, "audio" ) )
+    {
+        p_es->p_sys->es =
+            input_AddES( p_input,
+                         p_input->stream.p_selected_program,
+                         1 , AUDIO_ES, NULL, 0 );
+    }
+    else if( !strcmp( p_es->psz_cat, "video" ) )
+    {
+        p_es->p_sys->es =
+            input_AddES( p_input,
+                         p_input->stream.p_selected_program,
+                         1 , VIDEO_ES, NULL, 0 );
+    }
+    else
+    {
+        msg_Warn( p_input, "cat unsuported" );
+        p_es->p_sys->es = NULL;
+    }
+    if( p_es->p_sys->es )
+    {
+        CodecFourcc( p_es->psz_codec,
+                     &p_es->p_sys->es->i_cat,
+                     &p_es->p_sys->es->i_fourcc );
+        msg_Dbg( p_input, "cat=%d fcc=%4.4s",
+                 p_es->p_sys->es->i_cat,
+                 (char*)&p_es->p_sys->es->i_fourcc );
+        if( p_es->p_sys->es->i_cat == AUDIO_ES )
+        {
+            WAVEFORMATEX *p_wf;
+            int          i_size = sizeof( WAVEFORMATEX ) +
+                                  p_es->i_extra_data;
+            p_wf = malloc( i_size );
+            p_wf->wFormatTag     = 0;
+            p_wf->nChannels      = p_es->audio.i_channels;
+            p_wf->nSamplesPerSec = p_es->audio.i_samplerate;
+            p_wf->nBlockAlign    = 0;
+            p_wf->wBitsPerSample = 0;
+            if( !strcmp( p_es->psz_codec, "L16" ) )
             {
-                *ppsz_name     = rtp_payload_name_fcc[i].psz_name;
+                p_wf->wBitsPerSample = 16;
             }
-            *p_fcc         = rtp_payload_name_fcc[i].i_fourcc;
-            *pi_clock_rate = rtp_payload_name_fcc[i].i_clock_rate;
-            *pi_channels   = rtp_payload_name_fcc[i].i_channels;
-            *pi_samplesize = rtp_payload_name_fcc[i].i_samplesize;
-            return VLC_SUCCESS;
+
+            p_wf->cbSize         = p_es->i_extra_data;
+            if( p_es->i_extra_data > 0 )
+            {
+                memcpy( &p_wf[1], p_es->p_extra_data,
+                        p_es->i_extra_data );
+            }
+            p_es->p_sys->es->p_waveformatex = (void*)p_wf;
+            p_es->p_sys->es->p_bitmapinfoheader = NULL;
         }
-    }
-    return VLC_EGENERIC;
-}
-
-struct
-{
-    char                 *psz_name;
-    rtp_pf_payload_parse pf_function;
-} rtp_payload_function[] =
-{
-    {  "MPA",   rtp_MPAPayloadParse },
-    {  NULL,    NULL },
-};
-
-static rtp_pf_payload_parse rtp_PayloadToFunction( char *psz_name )
-{
-    int i;
-
-    for( i = 0; rtp_payload_function[i].psz_name != NULL; i++ )
-    {
-        if( !strcasecmp( psz_name, rtp_payload_function[i].psz_name ) )
+        else if( p_es->p_sys->es->i_cat == VIDEO_ES )
         {
-            return rtp_payload_function[i].pf_function;
+            BITMAPINFOHEADER *p_bih;
+            int              i_size = sizeof( BITMAPINFOHEADER ) +
+                                      p_es->i_extra_data;
+            p_bih = malloc( i_size );
+            p_bih->biSize       = i_size;
+            p_bih->biWidth      = p_es->video.i_width;
+            p_bih->biHeight     = p_es->video.i_height;
+            p_bih->biPlanes     = 1;
+            p_bih->biBitCount   = 24;
+            p_bih->biCompression= 0;
+            p_bih->biSizeImage  = 0;
+            p_bih->biXPelsPerMeter = 0;
+            p_bih->biYPelsPerMeter = 0;
+            p_bih->biClrUsed       = 0;
+            p_bih->biClrImportant  = 0;
+
+            if( p_es->i_extra_data > 0 )
+            {
+                memcpy( &p_bih[1], p_es->p_extra_data,
+                        p_es->i_extra_data );
+            }
+            p_es->p_sys->es->p_waveformatex = NULL;
+            p_es->p_sys->es->p_bitmapinfoheader = (void*)p_bih;
         }
+        input_SelectES( p_input, p_es->p_sys->es );
     }
-    return NULL;
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
-static int rtp_PacketParse( rtp_t *rtp, rtp_stream_t *rs )
+static int  EsDecoderSend  ( input_thread_t * p_input,
+                             media_client_es_t *p_es, media_client_frame_t *p_frame )
 {
-    int        i_data = rs->frame.i_data;
-    uint8_t    *p     = rs->frame.p_data;
-    int        i_header;
-    vlc_bool_t b_padding;
-    vlc_bool_t b_extention;
-    int        i_csrc;
-    vlc_bool_t b_marker;
-    int        i_payload;
-    int        i_sequence;
-    uint32_t   i_timestamp;
-    uint32_t   i_ssrc;
+    media_client_sys_t *tk = p_es->p_sys;
+    data_packet_t *p_data;
 
-    if( i_data < 12 )
+    if( tk->p_pes && tk->b_complete )
     {
-        msg_Warn( rtp, "invalid packet size" );
-        return VLC_EGENERIC;
-    }
-    if( ( p[0]&0xc0 ) != 0x80 )
-    {
-        msg_Warn( rtp, "invalid packet size" );
-        return VLC_EGENERIC;
-    }
+        tk->p_pes->i_dts = 0;
+        tk->p_pes->i_pts = 0;
 
-    b_padding   = p[0]&0x20;
-    b_extention = p[0]&0x10;
-    i_csrc      = p[0]&0x0f;
+        if( tk->i_timestamp > 0 )
+        {
+            input_ClockManageRef( p_input,
+                                  p_input->stream.p_selected_program,
+                                  tk->i_timestamp * 9 / 100 );
+            tk->p_pes->i_pts =
+            tk->p_pes->i_dts =
+                input_ClockGetTS( p_input,
+                                  p_input->stream.p_selected_program,
+                                  tk->i_timestamp * 9 / 100 );
+        }
 
-    b_marker    = p[1]&0x80;
-    i_payload   = p[1]&0x7f;
+        msg_Dbg( p_input, "codec=%s frame pts=%lld dts=%lld",
+                 p_es->psz_codec,
+                 tk->p_pes->i_pts, tk->p_pes->i_dts );
 
-    i_sequence  = ( p[2] << 8 )|p[3];
-    i_timestamp = ( p[4] << 24 )|( p[5] << 16 )|( p[6] << 8 )|p[7];
 
-    i_ssrc      = ( p[8] << 24 )|( p[9] << 16 )|( p[10] << 8 )|p[11];
-
-    i_header = 12 + i_csrc * 4;
-
-    if( i_data < i_header + ( b_extention ? 4 : 0 ) )
-    {
-        msg_Warn( rtp, "invalid packet size" );
-        return VLC_EGENERIC;
-    }
-    if( b_extention )
-    {
-        i_header += 4 + ( (p[i_header + 2] << 8)|p[i_header + 3] );
+        input_DecodePES( tk->es->p_decoder_fifo, tk->p_pes );
+        tk->p_pes = NULL;
     }
 
-    rs->frame.p_payload = (void*)&p[i_header];
-    rs->frame.i_payload = i_data - i_header - ( b_padding ? p[i_data -1] : 0 );
-
-    if( rs->frame.i_payload <= 0 )
+    if( tk->p_pes == NULL )
     {
-        return VLC_EGENERIC;
+        tk->b_complete = VLC_FALSE;
+        tk->i_timestamp = p_frame->i_pts;
+        tk->p_pes = input_NewPES( p_input->p_method_data );
+        if( tk->p_pes == NULL )
+        {
+            msg_Err( p_input, "cannot allocate pes" );
+            return -1;
+        }
+        tk->p_pes->i_rate = p_input->stream.control.i_rate;
+        tk->p_pes->i_nb_data  = 0;
+        tk->p_pes->i_pes_size = 0;
     }
 
-    if( rs->frame.pf_payload_parse )
+    if( ( p_data = input_NewPacket( p_input->p_method_data,
+                                    p_frame->i_data ) ) == NULL )
     {
-        return rs->frame.pf_payload_parse( rs );
-    }
-    return VLC_SUCCESS;
-}
-
-static int rtp_MPAPayloadParse( rtp_stream_t *rs )
-{
-    if( rs->frame.i_payload > 4 )
-    {
-        rs->frame.i_payload -= 4;
-        ((uint8_t*)rs->frame.p_payload) += 4;
-        return VLC_SUCCESS;
-    }
-    return VLC_EGENERIC;
-}
-
-/****************************************************************************
- *
- ****************************************************************************/
-static int  NetOpenUDP( vlc_object_t *p_this,
-                        char *psz_local, int i_local_port,
-                        char *psz_server, int i_server_port )
-{
-    char             *psz_network;
-    module_t         *p_network;
-    network_socket_t socket_desc;
-
-    psz_network = "";
-    if( config_GetInt( p_this, "ipv4" ) )
-    {
-        psz_network = "ipv4";
-    }
-    else if( config_GetInt( p_this, "ipv6" ) )
-    {
-        psz_network = "ipv6";
-    }
-
-    msg_Dbg( p_this, "waiting for connection..." );
-
-    socket_desc.i_type = NETWORK_UDP;
-    socket_desc.psz_server_addr = psz_server;
-    socket_desc.i_server_port   = i_server_port;
-    socket_desc.psz_bind_addr   = psz_local;
-    socket_desc.i_bind_port     = i_local_port;
-    socket_desc.i_ttl           = 0;
-    p_this->p_private = (void*)&socket_desc;
-    if( !( p_network = module_Need( p_this, "network", psz_network ) ) )
-    {
-        msg_Err( p_this, "failed to connect with server" );
+        msg_Err( p_input, "cannot allocate data" );
         return -1;
     }
-    module_Unneed( p_this, p_network );
+    p_data->p_payload_end = p_data->p_payload_start + p_frame->i_data;
+    memcpy( p_data->p_payload_start, p_frame->p_data, p_frame->i_data);
 
-    return socket_desc.i_handle;
+    if( tk->p_pes->p_first == NULL )
+    {
+        tk->p_pes->p_first = p_data;
+    }
+    else
+    {
+        tk->p_pes->p_last->p_next = p_data;
+    }
+    tk->p_pes->p_last = p_data;
+    tk->p_pes->i_pes_size += p_frame->i_data;
+    tk->p_pes->i_nb_data++;
+
+    tk->b_complete = p_frame->b_completed;
 }
-
-
-static void NetClose( vlc_object_t *p_this, int i_handle )
-{
-#if defined( WIN32 ) || defined( UNDER_CE )
-    closesocket( i_handle );
-#else
-    close( i_handle );
-#endif
-}
-
-
 
