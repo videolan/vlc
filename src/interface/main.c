@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.173 2002/03/29 00:14:19 massiot Exp $
+ * $Id: main.c,v 1.174 2002/04/02 21:56:19 ipkiss Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -769,7 +769,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         /*
          * Go back into channel 0 which is the network
          */
-        if( config_GetIntVariable( "network_channel" ) )
+        if( config_GetIntVariable( "network_channel" ) && p_main->p_channel )
         {
             network_ChannelJoin( COMMON_CHANNEL );
         }
