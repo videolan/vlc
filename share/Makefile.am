@@ -5,6 +5,7 @@ EXTRA_DIST = $(DIST_rsrc) $(DIST_fonts)
 pkgdatadir = $(datadir)/vlc
 
 dist_pkgdata_DATA = \
+	$(DIST_pda) \
 	$(DIST_familiar) \
 	$(DIST_icons16) \
 	$(DIST_icons32) \
@@ -34,6 +35,17 @@ DIST_familiar = \
 	familiar-rewindb16x16.xpm \
 	familiar-stopb16x16.xpm \
 	$(NULL)
+
+DIST_pda = \
+        pda-forwardb16x16.xpm \
+        pda-openb16x16.xpm \
+        pda-pauseb16x16.xpm \
+        pda-playb16x16.xpm \
+        pda-playlistb16x16.xpm \
+        pda-preferencesb16x16.xpm \
+        pda-rewindb16x16.xpm \
+        pda-stopb16x16.xpm \
+        $(NULL)
 
 DIST_icons16 = \
 	gnome-vlc16x16.png \
