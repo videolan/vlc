@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# debian/rules for the VideoLAN Client - uses debhelper.
+# debian/rules for the VLC media player - uses debhelper.
 # $Id$
 # based on Joey Hess's one.
 
@@ -195,6 +195,9 @@ install: build
 	#cp doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc
 	#strfile doc/fortunes.txt debian/vlc/usr/share/games/fortunes/vlc.dat
 
+	rm -Rf debian/vlc/usr/share/vlc/skins
+	ln -s vlc.1.gz debian/vlc/usr/share/man/man1/svlc.1.gz
+
 	# Package: libvlc0-dev
 	mv debian/vlc/usr/bin/vlc-config debian/libvlc0-dev/usr/bin/
 	mv debian/vlc/usr/lib/*.a debian/libvlc0-dev/usr/lib/
@@ -331,16 +334,10 @@ endif
 
 	# Package: wxvlc
 	mv debian/vlc/usr/bin/wxvlc debian/wxvlc/usr/bin/
-	mv debian/vlc/usr/bin/svlc debian/wxvlc/usr/bin/
 	ln -s vlc debian/wxvlc/usr/share/doc/wxvlc
 	mv debian/vlc/usr/lib/vlc/gui/libwxwindows_plugin.so \
 	  debian/wxvlc/usr/lib/vlc/gui/
-	mv debian/vlc/usr/lib/vlc/gui/libskins2_plugin.so \
-	  debian/wxvlc/usr/lib/vlc/gui/
-	mv debian/vlc/usr/share/vlc/skins \
-	  debian/wxvlc/usr/share/vlc/
 	ln -s vlc.1.gz debian/wxvlc/usr/share/man/man1/wxvlc.1.gz
-	ln -s vlc.1.gz debian/wxvlc/usr/share/man/man1/svlc.1.gz
 
 	# Clean up
 	rm -f debian/vlc/$(VIDDIR)/*.png

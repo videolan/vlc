@@ -1,6 +1,16 @@
-vlc (0.7.1+cvs20040426-1) unstable; urgency=low
+vlc (0.7.2-test1-2) unstable; urgency=low
+
+  * debian/control:
+    + Build-depend on libxml2-dev.
+  * extras/ffmpeg/libavcodec/ppc/dsputil_altivec.c:
+    + Syntax fixes for powerpc.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Wed, 28 Apr 2004 12:49:18 +0200
+
+vlc (0.7.2-test1-1) unstable; urgency=low
 
   * New SVN snapshot.
+  * The skinned interface is now the default one (Closes: #245210).
   * debian/control:
     + Removed the libdv2-dev build-dependency.
     + Set the liblivemedia-dev build-dependency to (>= 2004.04.23-1).
@@ -14,6 +24,8 @@ vlc (0.7.1+cvs20040426-1) unstable; urgency=low
     + Activated MOD support.
   * configure.ac:
     + Re-enabled i420_yuy2_altivec.
+  * src/interface/interface.c:
+    + Disable unavailable interfaces from the switch menu (Closes: #245209).
 
  -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Mon, 26 Apr 2004 16:30:25 +0200
 

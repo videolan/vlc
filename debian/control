@@ -2,14 +2,14 @@ Source: vlc
 Section: graphics
 Priority: optional
 Maintainer: Sam Hocevar (Debian packages) <sam+deb@zoy.org>
-Build-Depends: debhelper (>= 4.0), gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7-5), libqt3-mt-dev, libqt3-compat-headers, libasound2-dev (>= 0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi2-dev, mozilla-dev, libidl0, libglib2.0-0, kdelibs4-dev, libxosd-dev (>= 2.2.4-1.3), svgalibg1-dev (>= 1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev (>= 2.4.2.4), libdvdplay0-dev (>= 1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>= 1.1.0), libimlib2-dev, libmatroska-dev (>= 0.7.0), libfreetype6-dev, libspeex-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.04.23-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libmodplug-dev
+Build-Depends: debhelper (>= 4.0), gettext, libx11-dev, libxext-dev, libxt-dev, libxv-dev, xlibs-static-pic, libgnome-dev, libggi2-dev, libglide2-dev [i386], libesd0-dev, libaudiofile-dev, libsdl1.2-dev (>= 1.2.7-5), libqt3-mt-dev, libqt3-compat-headers, libasound2-dev (>= 0.9.0beta10a), libarts1-dev, libmad0-dev, liblircclient-dev, liba52-0.7.4-dev, aalib1-dev, libdvbpsi2-dev, mozilla-dev, libidl0, libglib2.0-0, kdelibs4-dev, libxosd-dev (>= 2.2.4-1.3), svgalibg1-dev (>= 1.4.0) [i386], libogg-dev, libvorbis-dev, libwxgtk2.4-dev (>= 2.4.2.4), libdvdplay0-dev (>= 1.0.1-2), libdvdread3-dev, libslp-dev, libflac-dev (>= 1.1.0), libimlib2-dev, libmatroska-dev (>= 0.7.0), libfreetype6-dev, libspeex-dev, linux-kernel-headers (>= 2.5.999-test7-bk-7), libcaca-dev (>= 0.9), liblivemedia-dev (>= 2004.04.23-1), libmpeg2-4-dev, zlib1g-dev, libdts-dev, libfribidi-dev, libcdio-dev, libmodplug-dev, libxml2-dev
 Standards-Version: 3.6.1.0
 
 Package: vlc
 Section: graphics
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ttf-freefont
-Recommends: gnome-vlc | wxvlc, ttf-thryomanes
+Recommends: wxvlc, ttf-thryomanes
 Replaces: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
 Conflicts: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
 Provides: mp3-decoder
@@ -44,7 +44,6 @@ Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Recommends: vlc-plugin-esd
 Conflicts: vlc-gnome (<< 0.5.0)
 Replaces: vlc-gnome (<< 0.5.0)
-Provides: vlc-gui
 Description: GNOME frontend for VLC
  This plugin adds a GNOME interface to the VLC media player. To activate
  it, use the `--intf gnome' flag or run the `gnome-vlc' program.
@@ -58,7 +57,6 @@ Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
 Replaces: vlc-gnome (<= 0.2.63-2), vlc-gtk (<< 0.5.0)
-Provides: vlc-gui
 Description: GTK+ frontend for VLC
  This plugin adds a GTK+ interface to the VLC media player. To activate
  it, use the `--intf gtk' flag or run the `gvlc' program.
@@ -143,7 +141,6 @@ Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
 Conflicts: vlc-qt (<< 0.5.0)
 Replaces: vlc-qt (<< 0.5.0)
-Provides: vlc-gui
 Description: Qt frontend for VLC
  This plugin adds a Qt interface to the VLC media player. To activate it,
  use the `--intf qt' flag or run the `qvlc' program.
@@ -187,7 +184,6 @@ Depends: vlc (= ${Source-Version}), kdelibs4 (>= 4:3.1.5-1), ${misc:Depends}
 Recommends: vlc-plugin-arts
 Conflicts: vlc-kde (<< 0.5.0)
 Replaces: vlc-kde (<< 0.5.0)
-Provides: vlc-gui
 Description: KDE frontend for VLC
  This plugin adds a KDE interface to the VLC media player. To activate it,
  use the `--intf kde' flag or run the `kvlc' program.
@@ -212,12 +208,9 @@ Description: SVGAlib video output plugin for VLC
 Package: wxvlc
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
-Provides: vlc-gui
-Description: wxWindows and skins frontends for VLC
- This plugin adds a wxWindow interface and a skinnable interface to the
- VLC media player. To activate the wxWindow GUI, use the `--intf wxwin'
- flag or run the `wxvlc' program. To activate the skinnable GUI, use the
- `--intf skins' flag.
+Description: wxWindows frontend for VLC
+ This plugin adds a wxWindow interface to the VLC media player. To activate
+ the wxWindow GUI, use the `--intf wxwin' flag or run the `wxvlc' program.
  .
  VLC is the VideoLAN project's media player. It plays MPEG, MPEG2, MPEG4,
  DivX, MOV, WMV, QuickTime, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia
