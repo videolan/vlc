@@ -120,6 +120,8 @@ typedef struct {
 } BITMAPINFO, *LPBITMAPINFO;
 #endif
 
+#ifndef _RECT32_
+#define _RECT32_
 typedef struct
 #ifdef HAVE_ATTRIBUTE_PACKED
     __attribute__((__packed__))
@@ -127,9 +129,15 @@ typedef struct
 {
     int left, top, right, bottom;
 } RECT32;
+#endif
 
+#ifndef _REFERENCE_TIME_
+#define _REFERENCE_TIME_
 typedef int64_t REFERENCE_TIME;
+#endif
 
+#ifndef _VIDEOINFOHEADER_
+#define _VIDEOINFOHEADER_
 typedef struct
 #ifdef HAVE_ATTRIBUTE_PACKED
     __attribute__((__packed__))
@@ -143,6 +151,7 @@ typedef struct
     BITMAPINFOHEADER  bmiHeader;
     //int               reserved[3];
 } VIDEOINFOHEADER;
+#endif
 
 /* WAVE format wFormatTag IDs */
 #define WAVE_FORMAT_UNKNOWN             0x0000 /* Microsoft Corporation */
