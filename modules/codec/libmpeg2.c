@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.8 2003/04/07 17:35:01 gbazin Exp $
+ * $Id: libmpeg2.c,v 1.9 2003/04/14 22:22:32 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -34,6 +34,8 @@
 
 #include <mpeg2dec/mpeg2.h>
 
+#include "vout_synchro.h"
+
 /* Aspect ratio (ISO/IEC 13818-2 section 6.3.3, table 6-3) */
 #define AR_SQUARE_PICTURE       1                           /* square pixels */
 #define AR_3_4_PICTURE          2                        /* 3:4 picture (TV) */
@@ -60,11 +62,14 @@ typedef struct dec_thread_t
     mtime_t          i_previous_pts;
     mtime_t          i_current_pts;
     mtime_t          i_period_remainder;
+    int              i_current_rate;
+    picture_t *      p_picture_to_destroy;
 
     /*
      * Output properties
      */
     vout_thread_t *p_vout;
+    vout_synchro_t *p_synchro;
 
 } dec_thread_t;
 
@@ -102,6 +107,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_fifo->pf_run = RunDecoder;
     return VLC_SUCCESS;
 }
+
 /*****************************************************************************
  * RunDecoder: the libmpeg2 decoder
  *****************************************************************************/
@@ -132,6 +138,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
     p_dec->i_current_pts  = 0;
     p_dec->i_previous_pts = 0;
     p_dec->i_period_remainder = 0;
+    p_dec->p_picture_to_destroy = NULL;
 
     /* Initialize decoder */
     p_dec->p_mpeg2dec = mpeg2_init();
@@ -163,6 +170,14 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                     break;
                 }
 
+                if( p_dec->p_pes->b_discontinuity )
+                {
+                    vout_SynchroReset( p_dec->p_synchro );
+                    if ( p_dec->p_info->current_fbuf != NULL )
+                        p_dec->p_picture_to_destroy
+                            = p_dec->p_info->current_fbuf->id;
+                }
+
                 if( p_dec->p_pes->i_pts )
                 {
                     mpeg2_pts( p_dec->p_mpeg2dec,
@@ -170,6 +185,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
                     p_dec->i_previous_pts = p_dec->i_current_pts;
                     p_dec->i_current_pts = p_dec->p_pes->i_pts;
                 }
+
+                p_dec->i_current_rate = p_dec->p_pes->i_rate;
                 p_data = p_dec->p_pes->p_first;
             }
 
@@ -187,6 +204,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         {
             /* Initialize video output */
             uint8_t *buf[3];
+            buf[0] = buf[1] = buf[2] = NULL;
 
             /* Check whether the input gives a particular aspect ratio */
             if( p_dec->p_fifo->p_demux_data
@@ -231,74 +249,84 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
             mpeg2_custom_fbuf( p_dec->p_mpeg2dec, 1 );
 
             /* Set the first 2 reference frames */
-            if( (p_pic = GetNewPicture( p_dec, buf )) == NULL ) break;
-            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
-            if( (p_pic = GetNewPicture( p_dec, buf )) == NULL ) break;
-            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
+            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
+            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
+
+            p_dec->p_synchro = vout_SynchroInit( p_dec->p_fifo, p_dec->p_vout,
+                1000000 * 27 / p_dec->p_info->sequence->frame_period * 1001 );
         }
         break;
 
         case STATE_PICTURE:
         {
             uint8_t *buf[3];
+            buf[0] = buf[1] = buf[2] = NULL;
 
-            if( (p_pic = GetNewPicture( p_dec, buf )) == NULL ) break;
-            mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
+            vout_SynchroNewPicture( p_dec->p_synchro,
+                p_dec->p_info->current_picture->flags & PIC_MASK_CODING_TYPE,
+                p_dec->p_info->current_picture->nb_fields,
+                (p_dec->p_info->current_picture->flags & PIC_FLAG_PTS) ?
+                    ( (p_dec->p_info->current_picture->pts ==
+                                (uint32_t)p_dec->i_current_pts) ?
+                              p_dec->i_current_pts : p_dec->i_previous_pts ) : 0,
+                0,
+                p_dec->i_current_rate );
 
-            /* Store the date for the picture */
-            if( p_dec->p_info->current_picture->flags & PIC_FLAG_PTS )
+            if ( !vout_SynchroChoose( p_dec->p_synchro,
+                p_dec->p_info->current_picture->flags & PIC_MASK_CODING_TYPE ) )
             {
-                p_pic->date = ( p_dec->p_info->current_picture->pts ==
-                                (uint32_t)p_dec->i_current_pts ) ?
-                              p_dec->i_current_pts : p_dec->i_previous_pts;
+                mpeg2_skip( p_dec->p_mpeg2dec, 1 );
+                vout_SynchroTrash( p_dec->p_synchro );
+                mpeg2_set_buf( p_dec->p_mpeg2dec, buf, NULL );
+            }
+            else
+            {
+                mpeg2_skip( p_dec->p_mpeg2dec, 0 );
+                vout_SynchroDecode( p_dec->p_synchro );
+                if( (p_pic = GetNewPicture( p_dec, buf )) == NULL ) break;
+                mpeg2_set_buf( p_dec->p_mpeg2dec, buf, p_pic );
             }
         }
-        break;
+        /* pass-through */
 
         case STATE_END:
-        case STATE_SLICE:
             if( p_dec->p_info->display_fbuf
                 && p_dec->p_info->display_fbuf->id )
             {
                 p_pic = (picture_t *)p_dec->p_info->display_fbuf->id;
 
-                /* Date the new picture */
-                if( p_dec->p_info->display_picture->flags & PIC_FLAG_PTS )
+                if ( p_pic != NULL )
                 {
-                    p_dec->i_pts = p_pic->date;
-                    p_dec->i_period_remainder = 0;
+                    if ( p_dec->p_picture_to_destroy != p_pic )
+                    {
+                        vout_SynchroEnd( p_dec->p_synchro,
+                            p_dec->p_info->display_picture->flags
+                             & PIC_MASK_CODING_TYPE,
+                            0 );
+                        vout_DatePicture( p_dec->p_vout, p_pic,
+                            vout_SynchroDate( p_dec->p_synchro ) );
+                        vout_DisplayPicture( p_dec->p_vout, p_pic );
+                    }
+                    else
+                    {
+                        p_dec->p_picture_to_destroy = NULL;
+                        vout_SynchroEnd( p_dec->p_synchro,
+                            p_dec->p_info->display_picture->flags
+                             & PIC_MASK_CODING_TYPE,
+                            1 );
+                        vout_DestroyPicture( p_dec->p_vout, p_pic );
+                    }
                 }
-                else
+                if( p_dec->p_info->discard_fbuf &&
+                    p_dec->p_info->discard_fbuf->id )
                 {
-                    p_dec->i_pts += ( (p_dec->p_info->sequence->frame_period +
-                                       p_dec->i_period_remainder) / 27 );
-                    p_dec->i_period_remainder =
-                        p_dec->p_info->sequence->frame_period +
-                        p_dec->i_period_remainder -
-                        ( p_dec->p_info->sequence->frame_period +
-                          p_dec->i_period_remainder ) / 27 * 27;
-                }
-                vout_DatePicture( p_dec->p_vout, p_pic, p_dec->i_pts );
-
-                vout_DisplayPicture( p_dec->p_vout, p_pic );
-
-                /* Handle pulldown by adding some delay to the pts of the next
-                 * picture. */
-                if( p_dec->p_info->display_picture->nb_fields > 2 )
-                {
-                    int i_repeat_fields =
-                        p_dec->p_info->display_picture->nb_fields - 2;
-
-                    p_dec->i_pts += ( (p_dec->p_info->sequence->frame_period +
-                                       p_dec->i_period_remainder)
-                                      / 27 / 2 * i_repeat_fields );
-                    p_dec->i_period_remainder =
-                        p_dec->p_info->sequence->frame_period +
-                        p_dec->i_period_remainder -
-                        ( p_dec->p_info->sequence->frame_period +
-                          p_dec->i_period_remainder ) / 27 / 2 * 27 * 2;
+                    vout_UnlinkPicture( p_dec->p_vout, p_pic );
                 }
             }
+            break;
+
+        case STATE_INVALID:
+            msg_Warn( p_dec->p_fifo, "Received STATE_INVALID" );
             break;
 
         default:
@@ -357,6 +385,9 @@ static void CloseDecoder( dec_thread_t * p_dec )
             vout_Request( p_dec->p_fifo, p_dec->p_vout, 0, 0, 0, 0 );
         }
 
+        if( p_dec->p_synchro )
+            vout_SynchroRelease( p_dec->p_synchro );
+
         if( p_dec->p_mpeg2dec ) mpeg2_close( p_dec->p_mpeg2dec );
 
         free( p_dec );
@@ -380,6 +411,7 @@ static picture_t *GetNewPicture( dec_thread_t *p_dec, uint8_t **pp_buf )
     }
     if( p_pic == NULL )
         return NULL;
+    vout_LinkPicture( p_dec->p_vout, p_pic );
 
     pp_buf[0] = p_pic->p[0].p_pixels;
     pp_buf[1] = p_pic->p[1].p_pixels;

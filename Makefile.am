@@ -203,6 +203,7 @@ HEADERS_include = \
 	include/vlc_playlist.h \
 	include/vlc_threads.h \
 	include/vlc_threads_funcs.h \
+	include/vout_synchro.h \
 	include/win32_specific.h \
 	include/osd.h \
 	$(NULL)
@@ -387,6 +388,7 @@ SOURCES_libvlc_common = \
 	src/video_output/video_text.c \
 	src/video_output/video_text.h \
 	src/video_output/vout_subpictures.c \
+	src/video_output/vout_synchro.c \
 	src/audio_output/common.c \
 	src/audio_output/dec.c \
 	src/audio_output/filters.c \
