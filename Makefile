@@ -22,7 +22,7 @@ VIDEO=X11
 
 # Target architecture and optimization
 #ARCH=
-ARCH=MMX
+#ARCH=MMX
 #ARCH=PPC
 
 # Decoder choice - ?? old decoder will be removed soon
@@ -64,6 +64,7 @@ endif
 # Libraries
 #
 LIB += -lpthread
+LIB += -lm
 
 ifeq ($(VIDEO),X11)
 LIB += -L/usr/X11R6/lib
@@ -211,7 +212,7 @@ misc_obj =			misc/mtime.o \
 
 ifeq ($(ARCH),MMX)
 ASM_OBJ = 			video_decoder_ref/idctmmx.o \
-						video_output/yuv_mmx.o
+						video_output/video_yuv_mmx.o
 endif
 
 C_OBJ = $(interface_obj) \

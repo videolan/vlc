@@ -34,9 +34,11 @@ typedef struct vout_thread_s
     int                 i_bytes_per_pixel;                /* real screen depth */
     float               f_x_ratio;                 /* horizontal display ratio */
     float               f_y_ratio;                   /* vertical display ratio */
+    float               f_gamma;                                      /* gamma */    
 
-    /* New size for resizeable windows - they may be ignored or handled by
-     * vout_SysManage */
+    /* Changed properties values - some of them are treated directly by the
+     * thread, the over may be ignored or handled by vout_SysManage */
+    boolean_t           b_gamma_change;              /* gamma change indicator */    
     int                 i_new_width;                              /* new width */    
     int                 i_new_height;                            /* new height */    
 
@@ -59,15 +61,16 @@ typedef struct vout_thread_s
     /* Video heap */
     picture_t           p_picture[VOUT_MAX_PICTURES];              /* pictures */
 
-    /* YUV translation tables, for 15,16 and 24/32 bpp displays. 16 bits and 32
-     * bits pointers points on the same data.
-     * CAUTION: these tables are translated: their origin is -384 */
-    u16 *               pi_trans16_red;
-    u16 *               pi_trans16_green;
-    u16 *               pi_trans16_blue;
-    u32 *               pi_trans32_red;
-    u32 *               pi_trans32_green;
-    u32 *               pi_trans32_blue;          
+    /* YUV translation tables - they have to be casted to the appropriate width 
+     * on use. All tables are allocated in the same memory block, based at
+     * p_trans_base, and shifted depending of the output thread configuration */
+    byte_t *            p_trans_base;       /* base for all translation tables */    
+    void *              p_trans_red;
+    void *              p_trans_green;
+    void *              p_trans_blue;
+    void *              p_trans_gray;    
+
+    /* YUV translation tables, for optimized C YUV transform ?? */
 } vout_thread_t;
 
 /*******************************************************************************

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * yuv_mmx.S: YUV transformation, optimized for MMX processors
+ * video_yuv_mmx.S: YUV transformation, optimized for MMX processors
  * (c)1999 VideoLAN
  *******************************************************************************
  * Following functions are defined:     

@@ -275,7 +275,7 @@ void vout_SysDisplay( vout_thread_t *p_vout )
  *******************************************************************************
  * This function returns the address of the current display buffer.
  *******************************************************************************/
-byte_t * vout_SysGetPicture( vout_thread_t *p_vout )
+void * vout_SysGetPicture( vout_thread_t *p_vout )
 {
     return( p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->data );        
 }
@@ -406,10 +406,6 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
         XCloseDisplay( p_vout->p_sys->p_display );        
         return( 1 );
     }
-
-    /* Store additionnal vout informations */
-    p_vout->i_new_width =       p_vout->i_width;
-    p_vout->i_new_height =      p_vout->i_height;    
 
     /* Get font information */
     if( X11GetFont( p_vout ) )

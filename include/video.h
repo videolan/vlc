@@ -57,7 +57,7 @@ typedef struct
      * (the pointer) should NEVER be modified. In YUV format, the p_y, p_u and
      * p_v data pointers refers to different areas of p_data, and should not
      * be freed */   
-    byte_t *        p_data;                                    /* picture data */
+    void *          p_data;                                    /* picture data */
     yuv_data_t *    p_y;          /* pointer to beginning of Y image in p_data */
     yuv_data_t *    p_u;          /* pointer to beginning of U image in p_data */
     yuv_data_t *    p_v;          /* pointer to beginning of V image in p_data */

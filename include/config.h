@@ -119,6 +119,11 @@
 /* Base delay in micro second for interface sleeps */
 #define INTF_IDLE_SLEEP                 100000
 
+/* Factor for changing gamma, and minimum and maximum values */
+#define INTF_GAMMA_FACTOR               1.1
+#define INTF_GAMMA_MIN                  0.1
+#define INTF_GAMMA_MAX                  10
+
 /*
  * X11 settings
  */
@@ -240,6 +245,9 @@
 /* Environment variable for grayscale output mode, and default value */
 #define VOUT_GRAYSCALE_VAR              "vlc_grayscale"
 #define VOUT_GRAYSCALE_DEFAULT          0
+
+/* Default gamma */
+#define VOUT_GAMMA                      1.
 
 /*
  * Time settings

@@ -166,7 +166,7 @@ void vout_SysDisplay( vout_thread_t *p_vout )
  *******************************************************************************
  * This function returns the address of the current display buffer.
  *******************************************************************************/
-byte_t * vout_SysGetPicture( vout_thread_t *p_vout )
+void * vout_SysGetPicture( vout_thread_t *p_vout )
 {    
     return( p_vout->p_sys->p_buffer[ p_vout->p_sys->i_buffer_index ]->write );        
 }
