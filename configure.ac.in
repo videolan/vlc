@@ -428,6 +428,8 @@ then
       AC_DEFINE(DPMSINFO_IN_DPMS_H, 1,
                 Define if <X11/extensions/dpms.h> defines DPMSInfo.)
     ])
+  ],,[
+    #include <X11/Xlib.h>
   ])
   CPPFLAGS="${CPPFLAGS_save}"
 fi
