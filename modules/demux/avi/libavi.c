@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.10 2002/12/16 13:04:36 fenrir Exp $
+ * $Id: libavi.c,v 1.11 2002/12/18 15:52:06 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -530,6 +530,13 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
             if( p_chk->strf.auds.p_wf->wFormatTag != WAVE_FORMAT_PCM )
             {
                 AVI_READ2BYTES( p_chk->strf.auds.p_wf->cbSize );
+                /* prevent segfault */
+                if( p_chk->strf.auds.p_wf->cbSize >
+                        p_chk->common.i_chunk_size - sizeof( WAVEFORMATEX ) )
+                {
+                    p_chk->strf.auds.p_wf->cbSize =
+                        p_chk->common.i_chunk_size - sizeof( WAVEFORMATEX );
+                }
             }
             else
             {
@@ -537,9 +544,9 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
             }
             if( p_chk->strf.auds.p_wf->cbSize > 0 )
             {
-                memcpy( &p_chk->strf.auds.p_wf[1] , 
-                        p_buff + sizeof( WAVEFORMATEX ), 
-                        p_chk->common.i_chunk_size - sizeof( WAVEFORMATEX ));
+                memcpy( &p_chk->strf.auds.p_wf[1] ,
+                        p_buff + sizeof( WAVEFORMATEX ),
+                        p_chk->strf.auds.p_wf->cbSize );
             }
 #ifdef AVI_DEBUG
             msg_Dbg( p_input, 
@@ -565,9 +572,18 @@ static int AVI_ChunkRead_strf( input_thread_t *p_input,
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biYPelsPerMeter );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biClrUsed );
             AVI_READ4BYTES( p_chk->strf.vids.p_bih->biClrImportant );
-            memcpy( &p_chk->strf.vids.p_bih[1],
-                    p_buff + sizeof(BITMAPINFOHEADER),
-                    p_chk->common.i_chunk_size - sizeof(BITMAPINFOHEADER) );
+            if( p_chk->strf.vids.p_bih->biSize >
+                        p_chk->common.i_chunk_size )
+            {
+                p_chk->strf.vids.p_bih->biSize = p_chk->common.i_chunk_size;
+            }
+            if( p_chk->strf.vids.p_bih->biSize - sizeof(BITMAPINFOHEADER) > 0 )
+            {
+                memcpy( &p_chk->strf.vids.p_bih[1],
+                        p_buff + sizeof(BITMAPINFOHEADER),
+                        p_chk->strf.vids.p_bih->biSize -
+                                                    sizeof(BITMAPINFOHEADER) );
+            }
 #ifdef AVI_DEBUG
             msg_Dbg( p_input,
                      "strf: video:%c%c%c%c %dx%d planes:%d %dbpp",
