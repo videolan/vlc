@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.15 2004/02/22 16:01:42 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.16 2004/02/23 20:35:42 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -106,6 +106,7 @@ typedef struct
 
     RTPSource    *rtpSource;
     FramedSource *readSource;
+    vlc_bool_t   b_rtcp_sync;
 
     uint8_t      buffer[65536];
 
@@ -500,6 +501,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         tk->waiting = 0;
         tk->i_pts   = 0;
         tk->b_quicktime = VLC_FALSE;
+        tk->b_rtcp_sync = VLC_FALSE;
 
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
@@ -788,6 +790,25 @@ static int  Demux   ( input_thread_t *p_input )
     /* remove the task */
     p_sys->scheduler->unscheduleDelayedTask( task );
 
+    /* Check for gap in pts value */
+    for( i = 0; i < p_sys->i_track; i++ )
+    {
+        live_track_t *tk = p_sys->track[i];
+
+        if( !tk->b_rtcp_sync && tk->rtpSource->hasBeenSynchronizedUsingRTCP() )
+        {
+            msg_Dbg( p_input, "tk->rtpSource->hasBeenSynchronizedUsingRTCP()" );
+            p_input->stream.p_selected_program->i_synchro_state = SYNCHRO_REINIT;
+            tk->b_rtcp_sync = VLC_TRUE;
+
+            /* reset PCR and PCR start, mmh won't work well for multi-stream I fear */
+            tk->i_pts = 0;
+            p_sys->i_pcr_start = 0;
+            p_sys->i_pcr = 0;
+            i_pcr = 0;
+        }
+    }
+
     return p_input->b_error ? 0 : 1;
 }
 
@@ -867,7 +888,10 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     demux_sys_t    *p_sys = p_input->p_demux_data;
     block_t        *p_block;
 
-    mtime_t i_pts = (mtime_t)pts.tv_sec * 1000000LL + (mtime_t)pts.tv_usec;
+    mtime_t i_pts = (uint64_t)pts.tv_sec * 1000000ULL + (uint64_t)pts.tv_usec;
+
+    /* XXX Beurk beurk beurk Avoid having negative value XXX */
+    i_pts &= 0x00ffffffffffffffULL;
 
     if( tk->b_quicktime && tk->p_es == NULL )
     {
