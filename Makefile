@@ -188,6 +188,8 @@ ac3_decoder_obj =		ac3_decoder/ac3_decoder.o \
 audio_decoder_obj =		audio_decoder/audio_decoder.o \
 						audio_decoder/audio_math.o
 
+subtitle_decoder_obj =		subtitle_decoder/subtitle_decoder.o
+
 #??generic_decoder_obj =		generic_decoder/generic_decoder.o
 # remeber to add it to OBJ 
 
@@ -231,6 +233,7 @@ C_OBJ = $(interface_obj) \
 		$(video_output_obj) \
 		$(ac3_decoder_obj) \
 		$(audio_decoder_obj) \
+		$(subtitle_decoder_obj) \
 		$(generic_decoder_obj) \
 		$(video_parser_obj) \
 		$(video_decoder_obj) \

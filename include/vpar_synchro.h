@@ -22,7 +22,6 @@ typedef struct video_synchro_tab_s
 {
     double mean;
     double deviation;
-    int count;
     
 } video_synchro_tab_t;
 

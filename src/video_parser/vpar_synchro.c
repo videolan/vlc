@@ -50,14 +50,9 @@
  *****************************************************************************/
 double vpar_SynchroUpdateTab( video_synchro_tab_t * tab, int count )
 {
-    if( tab->count < MAX_COUNT)
-        tab->count++;
-
-    tab->mean = ( (tab->count-1) * tab->mean + count )
-                    / tab->count;
-
-    tab->deviation = ( (tab->count-1) * tab->deviation
-                    + abs (tab->mean - count) ) / tab->count;
+	
+    tab->mean = ( tab->mean + 3 * count ) / 4;
+    tab->deviation = ( tab->deviation + 3 * abs (tab->mean - count) ) / 4;
 
     return tab->deviation;
 }
@@ -155,6 +150,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
     intf_DbgMsg("vpar debug: synchro image %i - modulo is %i\n", i_coding_type, p_vpar->synchro.modulo);
     intf_DbgMsg("vpar debug: synchro predict P %e - predict B %e\n", p_vpar->synchro.p_count_predict, p_vpar->synchro.b_count_predict);
 
+    return(0);
     return( i_coding_type == I_CODING_TYPE );
 }
 
