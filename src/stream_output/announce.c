@@ -2,7 +2,7 @@
  * announce.c : announce handler
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: stream_output.c 7307 2004-04-07 23:13:03Z zorglub $
+ * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -277,8 +277,8 @@ int announce_Register( announce_handler_t *p_announce,
         /* Do we already have a SAP announce handler ? */
         if( !p_announce->p_sap )
         {
-            msg_Dbg( p_announce, "creating SAP announce handler");
             sap_handler_t *p_sap = announce_SAPHandlerCreate( p_announce );
+            msg_Dbg( p_announce, "creating SAP announce handler");
             if( !p_sap )
             {
                 msg_Err( p_announce, "SAP handler creation failed" );

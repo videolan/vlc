@@ -1268,7 +1268,7 @@ static void httpd_ClientInit( httpd_client_t *cl )
 {
     cl->i_state = HTTPD_CLIENT_RECEIVING;
     cl->i_activity_date = mdate();
-    cl->i_activity_timeout = 50000000LL;
+    cl->i_activity_timeout = 50000000;
     cl->i_buffer_size = 10000;
     cl->i_buffer = 0;
     cl->p_buffer = malloc( cl->i_buffer_size );
@@ -1933,11 +1933,13 @@ static void httpd_HostThread( httpd_host_t *host )
                                 if( answer && ( *url->psz_user || *url->psz_password ) )
                                 {
                                     /* create the headers */
-                                    char id[strlen(url->psz_user)+strlen(url->psz_password) + 2];
                                     char *b64 = httpd_MsgGet( query, "Authorization" ); /* BASIC id */
-                                    char auth[strlen(b64) +1];
+                                    char *auth;
+                                    char *id;
 
-                                    sprintf( id, "%s:%s", url->psz_user, url->psz_password );
+                                    asprintf( &id, "%s:%s", url->psz_user, url->psz_password );
+                                    auth = malloc( strlen(b64) + 1 );
+
                                     if( !strncasecmp( b64, "BASIC", 5 ) )
                                     {
                                         b64 += 5;
@@ -1956,8 +1958,13 @@ static void httpd_HostThread( httpd_host_t *host )
                                         httpd_MsgAdd( answer, "WWW-Authenticate", "Basic realm=\"%s\"", url->psz_user );
                                         /* We fail for all url */
                                         b_auth_failed = VLC_TRUE;
+                                        free( id );
+                                        free( auth );
                                         break;
                                     }
+
+                                    free( id );
+                                    free( auth );
                                 }
 
                                 if( !url->catch[i_msg].cb( url->catch[i_msg].p_sys, cl, answer, query ) )
