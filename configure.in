@@ -1171,16 +1171,12 @@ then
   # now look for the gtk.h header
   saved_CPPFLAGS=$CPPFLAGS
   CPPFLAGS="$CPPFLAGS $CFLAGS_GTK"
-  FOUND=
-  AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, ,
-  [
-    FOUND=no
-	echo "Cannot find gtk development headers."
-  ])
-  if test -z $FOUND; then
+  AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, [
     PLUGINS="${PLUGINS} gtk"
     ALIASES="${ALIASES} gvlc"
-  fi
+  ],[
+       echo "Cannot find gtk development headers."
+  ])
   CPPFLAGS=$saved_CPPFLAGS
 fi
 
