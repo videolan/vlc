@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.6 2000/12/21 13:54:15 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.7 2000/12/21 15:01:08 massiot Exp $
  *
  * Authors:
  *
@@ -206,7 +206,8 @@ typedef struct input_thread_s
     i_p_config_t            i_p_config;              /* plugin configuration */
 
     int                     i_handle;           /* socket or file descriptor */
-    void *                  p_method_data;
+    void *                  p_method_data;     /* data of the packet manager */
+    void *                  p_plugin_data;             /* data of the plugin */
 
     /* General stream description */
     stream_descriptor_t     stream;                            /* PAT tables */

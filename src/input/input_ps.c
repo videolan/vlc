@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.9 2000/12/21 14:18:15 massiot Exp $
+ * $Id: input_ps.c,v 1.10 2000/12/21 15:01:08 massiot Exp $
  *
  * Authors: 
  *
@@ -90,7 +90,7 @@ static void PSInit( input_thread_t * p_input )
         return;
     }
 
-    p_input->p_method_data = (void *)p_method;
+    p_input->p_plugin_data = (void *)p_method;
 
     /* Re-open the socket as a buffered FILE stream */
     if( (p_method->stream = fdopen( p_input->i_handle, "r" )) == NULL )
@@ -158,7 +158,7 @@ static void PSInit( input_thread_t * p_input )
 static void PSEnd( input_thread_t * p_input )
 {
     free( p_input->stream.p_demux_data );
-    free( p_input->p_method_data );
+    free( p_input->p_plugin_data );
 }
 
 /*****************************************************************************
@@ -170,7 +170,7 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
     thread_ps_data_t *  p_method;
     int                 i_error;
 
-    p_method = (thread_ps_data_t *)p_input->p_method_data;
+    p_method = (thread_ps_data_t *)p_input->p_plugin_data;
     while( fread( p_buffer, i_len, 1, p_method->stream ) != 1 )
     {
         if( feof( p_method->stream ) )
@@ -191,7 +191,7 @@ static __inline__ int SafeRead( input_thread_t * p_input, byte_t * p_buffer,
 }
 
 /*****************************************************************************
- * PSRead: reads a data packet
+ * PSRead: reads data packets
  *****************************************************************************
  * Returns -1 in case of error, 0 if everything went well, and 1 in case of
  * EOF.
@@ -205,7 +205,7 @@ static int PSRead( input_thread_t * p_input,
     int                 i_packet, i_error;
     thread_ps_data_t *  p_method;
 
-    p_method = (thread_ps_data_t *)p_input->p_method_data;
+    p_method = (thread_ps_data_t *)p_input->p_plugin_data;
 
     memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
     for( i_packet = 0; i_packet < INPUT_READ_ONCE; i_packet++ )
@@ -416,6 +416,7 @@ input_capabilities_t * PSKludge( void )
     input_capabilities_t *  p_plugin;
 
     p_plugin = (input_capabilities_t *)malloc( sizeof(input_capabilities_t) );
+    p_plugin->pf_probe = PSProbe;
     p_plugin->pf_init = PSInit;
     p_plugin->pf_end = PSEnd;
     p_plugin->pf_read = PSRead;
