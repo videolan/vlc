@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.17 2001/11/28 15:08:06 massiot Exp $
+ * $Id: input_dec.c,v 1.18 2001/11/30 22:52:40 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -275,7 +275,6 @@ static decoder_config_t * CreateDecoderConfig( input_thread_t * p_input,
 static void DeleteDecoderConfig( decoder_config_t * p_config )
 {
     /* Free all packets still in the decoder fifo. */
-#if 0
     while( !DECODER_FIFO_ISEMPTY( *p_config->p_decoder_fifo ) )
     {
         p_config->p_decoder_fifo->pf_delete_pes(
@@ -283,7 +282,6 @@ static void DeleteDecoderConfig( decoder_config_t * p_config )
                             DECODER_FIFO_START( *p_config->p_decoder_fifo ) );
         DECODER_FIFO_INCSTART( *p_config->p_decoder_fifo );
     }
-#endif
 
     /* Destroy the lock and cond */
     vlc_cond_destroy( &p_config->p_decoder_fifo->data_wait );
