@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.1 2002/10/28 17:18:18 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.2 2002/11/23 15:00:54 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -26,9 +26,13 @@
 
 #include <Window.h>
 
-#define PREFS_OK      'prok'
-#define PREFS_CANCEL  'prca'
-#define SLIDER_UPDATE 'slup'
+#define PREFS_WINDOW_WIDTH   400
+#define PREFS_WINDOW_HEIGHT  280
+
+#define PREFS_OK       'prok'
+#define PREFS_CANCEL   'prca'
+#define PREFS_DEFAULTS 'prde'
+#define SLIDER_UPDATE  'slup'
 
 class PreferencesWindow : public BWindow
 {
@@ -37,19 +41,26 @@ class PreferencesWindow : public BWindow
                                             const char* name,
                                             intf_thread_t *p_interface );
         virtual          ~PreferencesWindow();
-        virtual bool     QuitRequested();
         virtual void     MessageReceived(BMessage *message);
-        virtual void     FrameResized(float width, float height);
         void             ReallyQuit();
 
     private:
-        void             CancelChanges();
+        void             SetDefaults();
         void             ApplyChanges();
-        intf_thread_t *  p_intf;
-        BView *          p_preferences_view;
+        BView *          p_prefs_view;
+        BTabView *       p_tabview;
+        BView *          p_ffmpeg_view;
+        BView *          p_adjust_view;
+        BTab *           p_ffmpeg_tab;
+        BTab *           p_adjust_tab;
         BSlider *        p_pp_slider;
-        BSlider *        p_lum_slider;
+        BSlider *        p_contrast_slider;
+        BSlider *        p_brightness_slider;
+        BSlider *        p_hue_slider;
+        BSlider *        p_saturation_slider;
         BStringView *    p_restart_string;
+
+        intf_thread_t *  p_intf;
 };
 
 #endif	// BEOS_PREFERENCES_WINDOW_H

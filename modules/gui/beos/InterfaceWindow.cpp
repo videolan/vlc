@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.7 2002/10/30 06:12:27 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.8 2002/11/23 15:00:54 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -77,7 +77,15 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	  									  p_playlist,
 	  									  this,
 	  									  p_intf );
-	fPreferencesWindow = new PreferencesWindow( BRect( 100, 400, 500, 595 ),
+    BScreen *p_screen = new BScreen();
+    BRect screen_rect = p_screen->Frame();
+    delete p_screen;
+    BRect window_rect;
+    window_rect.Set( ( screen_rect.right - PREFS_WINDOW_WIDTH ) / 2,
+                     ( screen_rect.bottom - PREFS_WINDOW_HEIGHT ) / 2,
+                     ( screen_rect.right + PREFS_WINDOW_WIDTH ) / 2,
+                     ( screen_rect.bottom + PREFS_WINDOW_HEIGHT ) / 2 );
+	fPreferencesWindow = new PreferencesWindow( window_rect,
 	                                            "Preferences",
 	                                            p_intf );
     

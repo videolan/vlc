@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.1 2002/10/28 17:18:18 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.2 2002/11/23 15:00:54 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -40,57 +40,112 @@
 PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
 								intf_thread_t *p_interface )
 	:	BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-				 B_NOT_ZOOMABLE | B_NOT_RESIZABLE )
+				 B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_NOT_CLOSABLE )
 {
 	p_intf = p_interface;
+    BRect rect;
 
-    BRect rect = Bounds();
-    p_preferences_view = new BView( rect, "preferences view",
-                                    B_FOLLOW_ALL, B_WILL_DRAW );
-    p_preferences_view->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+    /* "background" view */
+    p_prefs_view = new BView( Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW );
+    p_prefs_view->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+    AddChild( p_prefs_view );
+
+    /* add the tabs */
+    rect = Bounds();
+    rect.top += 10;
+    rect.bottom -= 65;
+    p_tabview = new BTabView( rect, "preferences view" );
+    p_tabview->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
     
-    /* Create the "OK" button */
-    rect.Set( 320, 160, 390, 185);
-    BButton *p_button = new BButton( rect, NULL, "OK", new BMessage( PREFS_OK ) );
-    p_preferences_view->AddChild( p_button );
+    p_ffmpeg_view = new BView( p_tabview->Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW );
+    p_ffmpeg_view->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
+    p_adjust_view = new BView( p_tabview->Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW );
+    p_adjust_view->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
     
-    /* Create the "Cancel" button */
-    rect.OffsetBy( -80, 0 );
-    p_button = new BButton( rect, NULL, "Cancel", new BMessage( PREFS_CANCEL ) );
-    p_preferences_view->AddChild( p_button );
+    p_ffmpeg_tab = new BTab();
+    p_tabview->AddTab( p_ffmpeg_view, p_ffmpeg_tab );
+    p_ffmpeg_tab->SetLabel( "Ffmpeg" );
     
-    /* Create the box */
-    rect.Set( 10, 10, 390, 150 );
-    BBox *p_box = new BBox( rect, "preferences box", B_FOLLOW_ALL );
+    p_adjust_tab = new BTab();
+    p_tabview->AddTab( p_adjust_view, p_adjust_tab );
+    p_adjust_tab->SetLabel( "Adjust" );
     
-    /* Create the post-processing slider */
-    rect.Set( 10, 10, 370, 50 );
+    /* fills the tabs */
+    /* ffmpeg tab */
+    rect = p_ffmpeg_view->Bounds();
+    rect.InsetBy( 10, 10 );
+    rect.bottom = rect.top + 30;
     p_pp_slider = new BSlider( rect, "post-processing", "MPEG4 post-processing level",
-                              new BMessage( SLIDER_UPDATE ),
-                              0, 6, B_TRIANGLE_THUMB, B_FOLLOW_LEFT, B_WILL_DRAW );
+                               new BMessage( SLIDER_UPDATE ),
+                               0, 6, B_TRIANGLE_THUMB,
+                               B_FOLLOW_LEFT, B_WILL_DRAW ); 
     p_pp_slider->SetHashMarks(B_HASH_MARKS_BOTTOM);
     p_pp_slider->SetHashMarkCount( 7 );
-    p_pp_slider->SetLimitLabels("None","Maximum");
-    p_pp_slider->SetValue( config_GetInt( p_intf, "ffmpeg-pp-q" ) );
-    p_box->AddChild( p_pp_slider );
+    p_pp_slider->SetLimitLabels( "None", "Maximum" );
+    p_ffmpeg_view->AddChild( p_pp_slider );
     
-    /* Create the luminence slider */
-    rect.Set( 10, 65, 370, 90 );
-    p_lum_slider = new BSlider( rect, "luminence", "Luminence",
-                          new BMessage( SLIDER_UPDATE ),
-                          0, 255, B_TRIANGLE_THUMB, B_FOLLOW_LEFT, B_WILL_DRAW );
-    p_lum_slider->SetValue( config_GetInt( p_intf, "Y plan" ) );
-    p_box->AddChild( p_lum_slider );
     
-    rect.Set( 55, 110, 370, 120 );
-    p_restart_string = new BStringView( rect, "restart", "",
-                                        B_FOLLOW_ALL, B_WILL_DRAW);
-    p_box->AddChild( p_restart_string );
+    /* adjust tab */
+    rect = p_adjust_view->Bounds();
+    rect.InsetBy( 10, 10 );
+    rect.bottom = rect.top + 30;
+    p_brightness_slider = new BSlider( rect, "brightness", "Brightness",
+                                       new BMessage( SLIDER_UPDATE ),
+                                       0, 200, B_TRIANGLE_THUMB,
+                                       B_FOLLOW_LEFT, B_WILL_DRAW );
+    p_brightness_slider->SetValue( 100 * config_GetFloat( p_intf, "Brightness" ) );
+    rect.OffsetBy( 0, 40 );
+    p_contrast_slider = new BSlider( rect, "contrast", "Contrast",
+                                     new BMessage( SLIDER_UPDATE ),
+                                     0, 200, B_TRIANGLE_THUMB,
+                                     B_FOLLOW_LEFT, B_WILL_DRAW );
+    p_contrast_slider->SetValue( 100 * config_GetFloat( p_intf, "Contrast" ) );
+    rect.OffsetBy( 0, 40 );
+    p_hue_slider = new BSlider( rect, "hue", "Hue",
+                                new BMessage( SLIDER_UPDATE ),
+                                0, 360, B_TRIANGLE_THUMB,
+                                B_FOLLOW_LEFT, B_WILL_DRAW );
+    p_hue_slider->SetValue( config_GetInt( p_intf, "Hue" ) );
+    rect.OffsetBy( 0, 40 );
+    p_saturation_slider = new BSlider( rect, "saturation", "Saturation",
+                                       new BMessage( SLIDER_UPDATE ),
+                                       0, 200, B_TRIANGLE_THUMB,
+                                       B_FOLLOW_LEFT, B_WILL_DRAW );
+    p_saturation_slider->SetValue( 100 * config_GetFloat( p_intf, "Saturation" ) );
+    p_adjust_view->AddChild( p_brightness_slider );
+    p_adjust_view->AddChild( p_contrast_slider );
+    p_adjust_view->AddChild( p_hue_slider );
+    p_adjust_view->AddChild( p_saturation_slider );
     
-    p_preferences_view-> AddChild( p_box );
-    
-    AddChild( p_preferences_view );
+    p_prefs_view->AddChild( p_tabview );
 
+    /* restart message */
+    rect = p_prefs_view->Bounds();
+    rect.bottom -= 43;
+    rect.top = rect.bottom - 10;
+    p_restart_string = new BStringView( rect, NULL, "" );
+    rgb_color redColor = {255, 0, 0, 255};
+    p_restart_string->SetHighColor(redColor);
+    p_restart_string->SetAlignment( B_ALIGN_CENTER );
+    p_prefs_view->AddChild( p_restart_string );
+
+    /* buttons */
+    BButton *p_button;
+    rect = Bounds();
+    rect.InsetBy( 10, 10 );
+    rect.top = rect.bottom - 25;
+    rect.left = rect.right - 80;
+    p_button = new BButton( rect, NULL, "OK", new BMessage( PREFS_OK ) );
+    p_prefs_view->AddChild( p_button );
+    
+    rect.OffsetBy( -90, 0 );
+    p_button = new BButton( rect, NULL, "Cancel", new BMessage( PREFS_CANCEL ) );
+    p_prefs_view->AddChild( p_button );
+    
+    rect.OffsetBy( -90, 0 );
+    p_button = new BButton( rect, NULL, "Defaults", new BMessage( PREFS_DEFAULTS ) );
+    p_prefs_view->AddChild( p_button );
+    
 	// start window thread in hidden state
 	Hide();
 	Show();
@@ -104,16 +159,6 @@ PreferencesWindow::~PreferencesWindow()
 }
 
 /*****************************************************************************
- * PreferencesWindow::QuitRequested
- *****************************************************************************/
-bool PreferencesWindow::QuitRequested()
-{
-    CancelChanges();
-	Hide();
-	return false;
-}
-
-/*****************************************************************************
  * PreferencesWindow::MessageReceived
  *****************************************************************************/
 void PreferencesWindow::MessageReceived( BMessage * p_message )
@@ -122,31 +167,25 @@ void PreferencesWindow::MessageReceived( BMessage * p_message )
 	{
 	    case SLIDER_UPDATE:
 	    {
-	        p_restart_string->SetText( "Changes will take effect when you restart playback" );
+	        ApplyChanges();
 	        break;
 	    }
-	    case PREFS_CANCEL:
+	    case PREFS_DEFAULTS:
 	    {
-	        CancelChanges();
-	        Hide();
+	        SetDefaults();
 	        break;
 	    }
 	    case PREFS_OK:
 	    {
-	        ApplyChanges();
-	        Hide();
+	        config_PutInt( p_intf, "ffmpeg-pp-q", p_pp_slider->Value() );
+            config_PutPsz( p_intf, "filter", "adjust" );
+            ApplyChanges();
+            Hide();
 	    }
 		default:
 			BWindow::MessageReceived( p_message );
 			break;
 	}
-}
-
-/*****************************************************************************
- * PreferencesWindow::FrameResized
- *****************************************************************************/
-void PreferencesWindow::FrameResized(float width, float height)
-{
 }
 
 /*****************************************************************************
@@ -159,13 +198,23 @@ void PreferencesWindow::ReallyQuit()
 }
 
 /*****************************************************************************
- * PreferencesWindow::CancelChanges
+ * PreferencesWindow::SetDefaults
  *****************************************************************************/
-void PreferencesWindow::CancelChanges()
+void PreferencesWindow::SetDefaults()
 {
     p_pp_slider->SetValue( 0 );
-    p_lum_slider->SetValue( 255 );
-    p_restart_string->SetText( "" );
+    p_brightness_slider->SetValue( 100 );
+    p_contrast_slider->SetValue( 100 );
+    p_hue_slider->SetValue( 0 );
+    p_saturation_slider->SetValue( 100 );
+
+    p_restart_string->SetText( config_GetInt( p_intf, "ffmpeg-pp-q" ) ?
+        "Changes will take effect after you restart playback" : "" );
+    
+    config_PutPsz( p_intf, "filter", NULL );
+    config_PutInt( p_intf, "ffmpeg-pp-q", 0 );
+    
+    ApplyChanges();
 }
 
 /*****************************************************************************
@@ -173,15 +222,33 @@ void PreferencesWindow::CancelChanges()
  *****************************************************************************/
 void PreferencesWindow::ApplyChanges()
 {
-    config_PutInt( p_intf, "ffmpeg-pp-q", p_pp_slider->Value() );
-    config_PutInt( p_intf, "Y plan", p_lum_slider->Value() );
-    if( p_lum_slider->Value() < 255 )
+    bool b_restart_needed = false;
+
+    if( ( !config_GetPsz( p_intf, "filter" ) ||
+          strncmp( config_GetPsz( p_intf, "filter" ), "adjust", 6 ) ) &&
+        ( p_brightness_slider->Value() != 100 ||
+          p_contrast_slider->Value() != 100 ||
+          p_hue_slider->Value() ||
+          p_saturation_slider->Value() != 100 ) )
     {
-        config_PutPsz( p_intf, "filter", "yuv" );
+        b_restart_needed = true;
     }
-    else
+
+    if( p_pp_slider->Value() != config_GetInt( p_intf, "ffmpeg-pp-q" ) )
     {
-        config_PutPsz( p_intf, "filter", NULL );
+        b_restart_needed = true;
     }
-    p_restart_string->SetText( "" );
+    
+    config_PutFloat( p_intf, "Brightness",
+                     (float)p_brightness_slider->Value() / 100 );
+    config_PutFloat( p_intf, "Contrast",
+                     (float)p_contrast_slider->Value() / 100 );
+    config_PutInt( p_intf, "Hue", p_hue_slider->Value() );
+    config_PutFloat( p_intf, "Saturation",
+                     (float)p_saturation_slider->Value() / 100 );
+    
+    p_restart_string->LockLooper();
+    p_restart_string->SetText( b_restart_needed ?
+        "Changes will take effect after you restart playback" : "" );
+    p_restart_string->UnlockLooper();
 }
