@@ -121,7 +121,7 @@ vlc_module_begin();
                 SAP_SCOPE_TEXT, SAP_SCOPE_LONGTEXT, VLC_TRUE);
     add_integer( "sap-timeout", 1800, NULL,
                  SAP_TIMEOUT_TEXT, SAP_TIMEOUT_LONGTEXT, VLC_TRUE);
-    add_bool( "sap-parse", 0 , NULL,
+    add_bool( "sap-parse", 1 , NULL,
                SAP_PARSE_TEXT,SAP_PARSE_LONGTEXT, VLC_TRUE);
 
     set_capability( "interface", 0 );
