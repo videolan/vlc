@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: input.c,v 1.289 2004/02/11 19:17:14 fenrir Exp $
+ * $Id: input.c,v 1.290 2004/02/16 17:14:15 zorglub Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -833,6 +833,15 @@ static int InitThread( input_thread_t * p_input )
             for( i = 0; i < meta->i_meta; i++ )
             {
                 msg_Dbg( p_input, "  - '%s' = '%s'", _(meta->name[i]), meta->value[i] );
+                if( !strcmp( meta->name[i], VLC_META_TITLE ) )
+                {
+                    playlist_ItemSetName( p_item, meta->value[i] );
+                }
+                if( !strcmp( meta->name[i], VLC_META_AUTHOR ) )
+                {
+                    playlist_ItemAddInfo( p_item, _("General"), _("Author"),
+                                            meta->value[i] );
+                }
                 input_AddInfo( p_cat, _(meta->name[i]), "%s", meta->value[i] );
                 if( p_item )
                 {
