@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.7.2.2 2002/09/03 12:00:24 tcastley Exp $
+ * $Id: MediaControlView.cpp,v 1.7.2.3 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -172,7 +172,7 @@ MediaControlView::MediaControlView(BRect frame)
     // Volume Slider
 	fVolumeSlider = new VolumeSlider(BRect(0.0, 0.0, VOLUME_MIN_WIDTH,
 										   kVolumeSliderBitmapHeight - 1.0),
-									 "volume slider", 0, VOLUME_MAX,
+									 "volume slider", 1, VOLUME_MAX,
 									 new BMessage(VOLUME_CHG));
 	fVolumeSlider->SetValue(VOLUME_DEFAULT);
 	AddChild( fVolumeSlider );
@@ -257,10 +257,10 @@ MediaControlView::MessageReceived(BMessage* message)
 		case MSG_FORWARD:
 			break;
 		case MSG_SKIP_BACKWARDS:
-			Window()->PostMessage(PREV_CHAPTER);
+			Window()->PostMessage(NAVIGATE_PREV);
 			break;
 		case MSG_SKIP_FORWARD:
-			Window()->PostMessage(NEXT_CHAPTER);
+			Window()->PostMessage(NAVIGATE_NEXT);
 			break;
 		default:
 		    BBox::MessageReceived(message);
@@ -331,6 +331,14 @@ MediaControlView::SetEnabled(bool enabled)
 	fSeekSlider->SetEnabled(enabled);
 	fRewind->SetEnabled(enabled);
 	fForward->SetEnabled(enabled);
+}
+
+// SetAudioEnabled
+void
+MediaControlView::SetAudioEnabled(bool enabled)
+{
+	fMute->SetEnabled(enabled);
+	fVolumeSlider->SetEnabled(enabled);
 }
 
 // GetSeekTo

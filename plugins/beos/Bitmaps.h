@@ -2,7 +2,7 @@
  * Bitmaps.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: Bitmaps.h,v 1.4.4.1 2002/09/03 12:00:24 tcastley Exp $
+ * $Id: Bitmaps.h,v 1.4.4.2 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>

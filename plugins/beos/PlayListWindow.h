@@ -2,11 +2,12 @@
  * PlayListWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.h,v 1.1.4.2 2002/09/03 12:00:25 tcastley Exp $
+ * $Id: PlayListWindow.h,v 1.1.4.3 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,27 +29,36 @@
 
 #include <Window.h>
 
-class BFilePanel;
 class BListView;
 class CDMenu;
+class InterfaceWindow;
+class PlaylistView;
 
 class PlayListWindow : public BWindow
 {
-public:
-    static PlayListWindow *getPlayList(BRect frame, const char *name, 
-                                      playlist_t *p_pl);
-    ~PlayListWindow();
-    bool QuitRequested();
-    void ReallyQuit();
+ public:
+								PlayListWindow(BRect frame,
+											   const char* name,
+											   playlist_t* playlist,
+											   InterfaceWindow* mainWindow );
+	virtual						~PlayListWindow();
 
-    // standard window member
-    virtual void    MessageReceived(BMessage *message);
-    
-private:	
-    PlayListWindow( BRect frame, const char *name, playlist_t *p_pl);
-    playlist_t  *p_playlist;
-    BListView  *p_listview;
-    BFilePanel *file_panel;
+								// BWindow
+	virtual	bool				QuitRequested();
+	virtual	void				MessageReceived(BMessage *message);
+	virtual	void				FrameResized(float width, float height);
+
+								// PlayListWindow
+			void				ReallyQuit();
+			void				UpdatePlaylist( bool rebuild = false );
+
+ private:	
+
+			playlist_t*			fPlaylist;
+			PlaylistView*		fListView;
+			BView*				fBackgroundView;
+			BMenuBar*			fMenuBar;
+			InterfaceWindow*	fMainWindow;
 };
 
 #endif	// BEOS_PLAY_LIST_WINDOW_H

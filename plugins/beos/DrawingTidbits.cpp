@@ -2,7 +2,7 @@
  * DrawingTidbits.cpp
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: DrawingTidbits.cpp,v 1.2.4.1 2002/09/03 12:00:24 tcastley Exp $
+ * $Id: DrawingTidbits.cpp,v 1.2.4.2 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -21,6 +21,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#include <math.h>
 
 #include <Bitmap.h>
 #include <Debug.h>
@@ -111,61 +113,247 @@ ReplaceTransparentColor(BBitmap *bitmap, rgb_color with)
 			bits[index] = withIndex;
 }
 
+// ycrcb_to_rgb
+inline void
+ycbcr_to_rgb( uint8 y, uint8 cb, uint8 cr,
+			  uint8& r, uint8& g, uint8& b)
+{
+	r = (uint8)max_c( 0, min_c( 255, 1.164 * ( y - 16 ) + 1.596 * ( cr - 128 ) ) );
+	g = (uint8)max_c( 0, min_c( 255, 1.164 * ( y - 16 ) - 0.813 * ( cr - 128 )
+								- 0.391 * ( cb - 128 ) ) );
+	b = (uint8)max_c( 0, min_c( 255, 1.164 * ( y - 16 ) + 2.018 * ( cb - 128 ) ) );
+}
+
+// this function will not produce visually pleasing results!
+// we'd have to convert to Lab colorspace, do the mixing
+// and convert back to RGB - in an ideal world...
+//
+// mix_colors
+inline void
+mix_colors( uint8 ra, uint8 ga, uint8 ba,
+			uint8 rb, uint8 gb, uint8 bb,
+			uint8& r, uint8& g, uint8& b, float mixLevel )
+{
+	float mixA = ( 1.0 - mixLevel );
+	float mixB = mixLevel;
+	r = (uint8)(mixA * ra + mixB * rb);
+	g = (uint8)(mixA * ga + mixB * gb);
+	b = (uint8)(mixA * ba + mixB * bb);
+}
+
+// the algorithm used is probably pretty slow, but it should be easy
+// to understand what's going on...
+//
+// scale_bitmap
+status_t
+scale_bitmap( BBitmap* bitmap, uint32 fromWidth, uint32 fromHeight )
+{
+	status_t status = B_BAD_VALUE;
+	
+	if ( bitmap && bitmap->IsValid()
+		 && ( bitmap->ColorSpace() == B_RGB32 || bitmap->ColorSpace() == B_RGBA32 ) )
+	{
+		status = B_MISMATCHED_VALUES;
+		// we only support upscaling as of now
+		uint32 destWidth = bitmap->Bounds().IntegerWidth() + 1;
+		uint32 destHeight = bitmap->Bounds().IntegerHeight() + 1;
+		if ( fromWidth <= destWidth && fromHeight <= destHeight )
+		{
+			status = B_OK;
+			uint32 bpr = bitmap->BytesPerRow();
+			if ( fromWidth < destWidth )
+			{
+				// scale horizontally
+				uint8* src = (uint8*)bitmap->Bits();
+				uint8* p = new uint8[fromWidth * 4];	// temp buffer
+				for ( uint32 y = 0; y < fromHeight; y++ )
+				{
+					// copy valid pixels into temp buffer
+					memcpy( p, src, fromWidth * 4 );
+					for ( uint32 x = 0; x < destWidth; x++ )
+					{
+						// mix colors of left and right pixels and write it back
+						// into the bitmap
+						float xPos = ( (float)x / (float)destWidth ) * (float)fromWidth;
+						uint32 leftIndex = (uint32)floorf( xPos ) * 4;
+						uint32 rightIndex = (uint32)ceilf( xPos ) * 4;
+						rgb_color left;
+						left.red = p[leftIndex + 2];
+						left.green = p[leftIndex + 1];
+						left.blue = p[leftIndex + 0];
+						rgb_color right;
+						right.red = p[rightIndex + 2];
+						right.green = p[rightIndex + 1];
+						right.blue = p[rightIndex + 0];
+						rgb_color mix;
+						mix_colors( left.red, left.green, left.blue,
+									right.red, right.green, right.blue,
+									mix.red, mix.green, mix.blue, xPos - floorf( xPos ) );
+						uint32 destIndex = x * 4;
+						src[destIndex + 2] = mix.red;
+						src[destIndex + 1] = mix.green;
+						src[destIndex + 0] = mix.blue;
+					}
+					src += bpr;
+				}
+				delete[] p;
+			}
+			if ( fromHeight < destHeight )
+			{
+				// scale vertically
+				uint8* src = (uint8*)bitmap->Bits();
+				uint8* p = new uint8[fromHeight * 3];	// temp buffer
+				for ( uint32 x = 0; x < destWidth; x++ )
+				{
+					// copy valid pixels into temp buffer
+					for ( uint32 y = 0; y < fromHeight; y++ )
+					{
+						uint32 destIndex = y * 3;
+						uint32 srcIndex = x * 4 + y * bpr;
+						p[destIndex + 0] = src[srcIndex + 0];
+						p[destIndex + 1] = src[srcIndex + 1];
+						p[destIndex + 2] = src[srcIndex + 2];
+					}
+					// do the scaling
+					for ( uint32 y = 0; y < destHeight; y++ )
+					{
+						// mix colors of upper and lower pixels and write it back
+						// into the bitmap
+						float yPos = ( (float)y / (float)destHeight ) * (float)fromHeight;
+						uint32 upperIndex = (uint32)floorf( yPos ) * 3;
+						uint32 lowerIndex = (uint32)ceilf( yPos ) * 3;
+						rgb_color upper;
+						upper.red = p[upperIndex + 2];
+						upper.green = p[upperIndex + 1];
+						upper.blue = p[upperIndex + 0];
+						rgb_color lower;
+						lower.red = p[lowerIndex + 2];
+						lower.green = p[lowerIndex + 1];
+						lower.blue = p[lowerIndex + 0];
+						rgb_color mix;
+						mix_colors( upper.red, upper.green, upper.blue,
+									lower.red, lower.green, lower.blue,
+									mix.red, mix.green, mix.blue, yPos - floorf( yPos ) );
+						uint32 destIndex = x * 4 + y * bpr;
+						src[destIndex + 2] = mix.red;
+						src[destIndex + 1] = mix.green;
+						src[destIndex + 0] = mix.blue;
+					}
+				}
+				delete[] p;
+			}
+		}
+	}
+	return status;
+}
 
 // convert_bitmap
 status_t
-convert_bitmap(BBitmap* inBitmap, BBitmap* outBitmap)
+convert_bitmap( BBitmap* inBitmap, BBitmap* outBitmap )
 {
 	status_t status = B_BAD_VALUE;
-/*	// see that we got valid bitmaps
-	if (inBitmap && inBitmap->IsValid()
-		&& outBitmap && outBitmap->IsValid())
+	// see that we got valid bitmaps
+	if ( inBitmap && inBitmap->IsValid()
+		 && outBitmap && outBitmap->IsValid() )
 	{
 		status = B_MISMATCHED_VALUES;
 		// see that bitmaps are compatible and that we support the conversion
-		if (inBitmap->Bounds().Width() == outBitmap->Bounds().Width()
-			&& inBitmap->Bounds().Height() == outBitmap->Bounds().Height()
-			&& (outBitmap->ColorSpace() == B_RGB32
-				|| outBitmap->ColorSpace() == B_RGBA32))
+		if ( inBitmap->Bounds().Width() <= outBitmap->Bounds().Width()
+			 && inBitmap->Bounds().Height() <= outBitmap->Bounds().Height()
+			 && ( outBitmap->ColorSpace() == B_RGB32
+				  || outBitmap->ColorSpace() == B_RGBA32) )
 		{
 			int32 width = inBitmap->Bounds().IntegerWidth() + 1;
 			int32 height = inBitmap->Bounds().IntegerHeight() + 1;
 			int32 srcBpr = inBitmap->BytesPerRow();
 			int32 dstBpr = outBitmap->BytesPerRow();
-			uint8* srcbits = (uint8*)inbitmap->bits();
-			uint8* dstbits = (uint8*)outbitmap->bits();
+			uint8* srcBits = (uint8*)inBitmap->Bits();
+			uint8* dstBits = (uint8*)outBitmap->Bits();
 			switch (inBitmap->ColorSpace())
 			{
 				case B_YCbCr422:
-					for (int32 y = 0; y < height; y ++)
+					// Y0[7:0]  Cb0[7:0]  Y1[7:0]  Cr0[7:0]
+					// Y2[7:0]  Cb2[7:0]  Y3[7:0]  Cr2[7:0]
+					for ( int32 y = 0; y < height; y++ )
 					{
-						for (int32 x = 0; x < width; x += 2)
+						for ( int32 x = 0; x < width; x += 2 )
 						{
-							uint8 y = 
-							uint8 cb = 
-							uint8 cr = 
+							int32 srcOffset = x * 2;
+							int32 dstOffset = x * 4;
+							ycbcr_to_rgb( srcBits[srcOffset + 0],
+										  srcBits[srcOffset + 1],
+										  srcBits[srcOffset + 3],
+										  dstBits[dstOffset + 2],
+										  dstBits[dstOffset + 1],
+										  dstBits[dstOffset + 0] );
+							ycbcr_to_rgb( srcBits[srcOffset + 2],
+										  srcBits[srcOffset + 1],
+										  srcBits[srcOffset + 3],
+										  dstBits[dstOffset + 6],
+										  dstBits[dstOffset + 5],
+										  dstBits[dstOffset + 4] );
+							// take care of alpha
+							dstBits[x * 4 + 3] = 255;
+							dstBits[x * 4 + 7] = 255;
 						}
-						srcbits += srcBpr;
-						dstbits += dstBpr;
+						srcBits += srcBpr;
+						dstBits += dstBpr;
 					}
 					status = B_OK;
 					break;
 				case B_YCbCr420:
-					status = B_OK;
+					// Non-interlaced only!
+					// Cb0  Y0  Y1  Cb2 Y2  Y3  on even scan lines ...
+					// Cr0  Y0  Y1  Cr2 Y2  Y3  on odd scan lines
+					status = B_ERROR;
 					break;
 				case B_YUV422:
-					status = B_OK;
+					// U0[7:0]  Y0[7:0]   V0[7:0]  Y1[7:0] 
+					// U2[7:0]  Y2[7:0]   V2[7:0]  Y3[7:0]
+					status = B_ERROR;
 					break;
 				case B_RGB32:
-					memcpy(dstBits, srcBits, inBitmap->BitsLength());
+				case B_RGBA32:
+					memcpy( dstBits, srcBits, inBitmap->BitsLength() );
+					status = B_OK;
+					break;
+				case B_RGB16:
+					// G[2:0],B[4:0]  R[4:0],G[5:3]
+					for ( int32 y = 0; y < height; y ++ )
+					{
+						for ( int32 x = 0; x < width; x++ )
+						{
+							int32 srcOffset = x * 2;
+							int32 dstOffset = x * 4;
+							uint8 blue = srcBits[srcOffset + 0] & 0x1f;
+							uint8 green = ( srcBits[srcOffset + 0] >> 5 )
+										  | ( ( srcBits[srcOffset + 1] & 0x07 ) << 3 );
+							uint8 red = srcBits[srcOffset + 1] & 0xf8;
+							// homogeneously scale each component to 8 bit
+							dstBits[dstOffset + 0] = (blue << 3) | (blue >> 2);
+							dstBits[dstOffset + 1] = (green << 2) | (green >> 4);
+							dstBits[dstOffset + 2] = red | (red >> 5);
+						}
+						srcBits += srcBpr;
+						dstBits += dstBpr;
+					}
 					status = B_OK;
 					break;
 				default:
+//printf("unkown colorspace: %ld\n", inBitmap->ColorSpace());
 					status = B_MISMATCHED_VALUES;
 					break;
 			}
+			if ( status == B_OK )
+			{
+				if ( width < outBitmap->Bounds().IntegerWidth() + 1
+					 || height < outBitmap->Bounds().IntegerHeight() + 1 )
+				{
+					scale_bitmap( outBitmap, width, height );
+				}
+			}
 		}
-	}*/
+	}
 	return status;
 }
 

@@ -2,12 +2,13 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.5.2.1 2002/06/01 10:12:10 tcastley Exp $
+ * $Id: PlayListWindow.cpp,v 1.5.2.2 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
  *          Tony Castley <tony@castley.net>
  *          Richard Shepherd <richard@rshepherd.demon.co.uk>
+ *          Stephan Aßmus <stippi@yellowbites.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,128 +43,214 @@ extern "C"
 }
 
 /* BeOS interface headers */
+#include "intf_vlc_wrapper.h"
 #include "InterfaceWindow.h"
+#include "ListViews.h"
 #include "MsgVals.h"
 #include "PlayListWindow.h"
 
-/*****************************************************************************
- * PlayListWindow
- *****************************************************************************/
-PlayListWindow *PlayListWindow::getPlayList( BRect frame, const char *name,
-                                  playlist_t *p_pl)
+enum
 {
-    static PlayListWindow *one_playlist;
-    if (one_playlist == NULL)
-    {
-       one_playlist = new PlayListWindow(frame, name, p_pl);
-    }
-    return one_playlist;
-}
+	MSG_SELECT_ALL		= 'sall',
+	MSG_SELECT_NONE		= 'none',
+	MSG_RANDOMIZE		= 'rndm',
+	MSG_SORT_NAME		= 'srtn',
+	MSG_SORT_PATH		= 'srtp',
+	MSG_REMOVE			= 'rmov',
+	MSG_REMOVE_ALL		= 'rmal',
+};
 
-PlayListWindow::PlayListWindow( BRect frame, const char *name,
-                                  playlist_t *p_pl)
-    : BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-                B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS )
+
+/*****************************************************************************
+ * PlayListWindow::PlayListWindow
+ *****************************************************************************/
+PlayListWindow::PlayListWindow( BRect frame, const char* name,
+								playlist_t *playlist,
+								InterfaceWindow* mainWindow )
+	:	BWindow( frame, name, B_FLOATING_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+				 B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS ),
+		fPlaylist( playlist ),
+		fMainWindow( mainWindow )
 {
     SetName( "playlist" );
-    SetTitle(name);
-    p_playlist = p_pl;
 
-    /* set up the main menu */
-    BMenuBar *menu_bar;
-    menu_bar = new BMenuBar(BRect(0,0,0,0), "main menu");
-    AddChild( menu_bar );
+    // set up the main menu bar
+	fMenuBar = new BMenuBar( BRect(0.0, 0.0, frame.Width(), 15.0), "main menu",
+							 B_FOLLOW_NONE, B_ITEMS_IN_ROW, false );
 
-    BMenu *mFile;
-    /* Add the file Menu */
-    BMenuItem *mItem;
-    menu_bar->AddItem( mFile = new BMenu( "File" ) );
-    menu_bar->ResizeToPreferred();
-    mFile->AddItem( mItem = new BMenuItem( "Open File" B_UTF8_ELLIPSIS,
-                                           new BMessage(OPEN_FILE), 'O') );
-    
-    CDMenu *cd_menu = new CDMenu( "Open Disc" );
-    mFile->AddItem( cd_menu );
-    
-    BRect rect = Bounds();
-    rect.top += menu_bar->Bounds().IntegerHeight() + 1;
-    BView *p_view = new BView(rect, NULL, B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
-    
-    p_listview = new BListView(rect, "PlayList", 
-                                    B_MULTIPLE_SELECTION_LIST);
-    for (int i=0; i < p_playlist->i_size; i++)
-    {
-        p_listview->AddItem(new BStringItem(p_playlist->p_item[i].psz_name)); 
-    }
-    p_view->AddChild(new BScrollView("scroll_playlist", p_listview,
-             B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true)); 
-             
-    AddChild(p_view);
+    AddChild( fMenuBar );
+
+	// Add the File menu
+	BMenu *fileMenu = new BMenu( "File" );
+	fMenuBar->AddItem( fileMenu );
+	BMenuItem* item = new BMenuItem( "Open File" B_UTF8_ELLIPSIS,
+									 new BMessage( OPEN_FILE ), 'O' );
+	item->SetTarget( fMainWindow );
+	fileMenu->AddItem( item );
+
+	CDMenu* cd_menu = new CDMenu( "Open Disc" );
+	fileMenu->AddItem( cd_menu );
+
+	fileMenu->AddSeparatorItem();
+	item = new BMenuItem( "Close",
+						  new BMessage( B_QUIT_REQUESTED ), 'W' );
+	fileMenu->AddItem( item );
+
+	// Add the Edit menu
+	BMenu *editMenu = new BMenu( "Edit" );
+	fMenuBar->AddItem( editMenu );
+	item = new BMenuItem( "Select All",
+						  new BMessage( MSG_SELECT_ALL ), 'A' );
+	editMenu->AddItem( item );
+	item = new BMenuItem( "Select None",
+						  new BMessage( MSG_SELECT_NONE ), 'A', B_SHIFT_KEY );
+	editMenu->AddItem( item );
+
+	editMenu->AddSeparatorItem();
+	item = new BMenuItem( "Sort by Name",
+						  new BMessage( MSG_SORT_NAME ), 'N' );
+	editMenu->AddItem( item );
+	item = new BMenuItem( "Sort by Path",
+						  new BMessage( MSG_SORT_PATH ), 'P' );
+	editMenu->AddItem( item );
+	item = new BMenuItem( "Randomize",
+						  new BMessage( MSG_RANDOMIZE ), 'R' );
+	editMenu->AddItem( item );
+	editMenu->AddSeparatorItem();
+	item = new BMenuItem( "Remove",
+						  new BMessage( MSG_REMOVE ) );
+	editMenu->AddItem( item );
+	item = new BMenuItem( "Remove All",
+						  new BMessage( MSG_REMOVE_ALL ) );
+	editMenu->AddItem( item );
+
+editMenu->SetEnabled( false );
+
+	// make menu bar resize to correct height
+	float menuWidth, menuHeight;
+	fMenuBar->GetPreferredSize( &menuWidth, &menuHeight );
+	// don't change next line! it's a workarround!
+	fMenuBar->ResizeTo( frame.Width(), menuHeight );
+
+	frame = Bounds();
+	frame.top += fMenuBar->Bounds().IntegerHeight() + 1;
+	frame.right -= B_V_SCROLL_BAR_WIDTH;
+
+	fListView = new PlaylistView( frame, fMainWindow );
+	fBackgroundView = new BScrollView( "playlist scrollview",
+									   fListView, B_FOLLOW_ALL_SIDES,
+									   0, false, true,
+									   B_NO_BORDER );
+
+	AddChild( fBackgroundView );
+
+	// be up to date
+	UpdatePlaylist();
+	FrameResized( Bounds().Width(), Bounds().Height() );
+	SetSizeLimits( menuWidth * 2.0, menuWidth * 6.0,
+				   menuHeight * 5.0, menuHeight * 25.0 );
+
+	UpdatePlaylist( true );
+	// start window thread in hidden state
+	Hide();
+	Show();
 }
 
+/*****************************************************************************
+ * PlayListWindow::~PlayListWindow
+ *****************************************************************************/
 PlayListWindow::~PlayListWindow()
 {
 }
 
 /*****************************************************************************
+ * PlayListWindow::QuitRequested
+ *****************************************************************************/
+bool
+PlayListWindow::QuitRequested()
+{
+	Hide(); 
+	return false;
+}
+
+/*****************************************************************************
  * PlayListWindow::MessageReceived
  *****************************************************************************/
-void PlayListWindow::MessageReceived( BMessage * p_message )
+void
+PlayListWindow::MessageReceived( BMessage * p_message )
 {
-    Activate();
-
-    switch( p_message->what )
-    {
-    case OPEN_FILE:
-        if( file_panel )
-        {
-            file_panel->Show();
-            break;
-        }
-        file_panel = new BFilePanel();
-        file_panel->SetTarget( this );
-        file_panel->Show();
-        break;
-
-    case OPEN_DVD:
-        const char *psz_device;
-        char psz_source[ B_FILE_NAME_LENGTH + 4 ];
-        if( p_message->FindString("device", &psz_device) != B_ERROR )
-        {
-            snprintf( psz_source, B_FILE_NAME_LENGTH + 4,
-                      "dvd:%s", psz_device );
-            psz_source[ strlen(psz_source) ] = '\0';
-            intf_PlaylistAdd( p_playlist, PLAYLIST_END, (char*)psz_source );
-            p_listview->AddItem(new BStringItem((char*)psz_source));
-        }
-    case B_REFS_RECEIVED:
-    case B_SIMPLE_DATA:
-        {
-            entry_ref ref;
-            if( p_message->FindRef( "refs", &ref ) == B_OK )
-            {
-                BPath path( &ref );
-                intf_PlaylistAdd( p_playlist,
-                                  PLAYLIST_END, (char*)path.Path() );
-                p_listview->AddItem(new BStringItem((char*)path.Path()));
-            }
-        }
-        break;
-    default:
-        BWindow::MessageReceived( p_message );
-        break;
-    }
+	switch ( p_message->what )
+	{
+		case OPEN_DVD:
+		case B_REFS_RECEIVED:
+		case B_SIMPLE_DATA:
+			// forward to interface window
+			fMainWindow->PostMessage( p_message );
+			break;
+		case MSG_SELECT_ALL:
+			break;
+		case MSG_SELECT_NONE:
+			break;
+		case MSG_RANDOMIZE:
+			break;
+		case MSG_SORT_NAME:
+			break;
+		case MSG_SORT_PATH:
+			break;
+		case MSG_REMOVE:
+			break;
+		case MSG_REMOVE_ALL:
+			break;
+		default:
+			BWindow::MessageReceived( p_message );
+			break;
+	}
 }
 
-bool PlayListWindow::QuitRequested()
+/*****************************************************************************
+ * PlayListWindow::FrameResized
+ *****************************************************************************/
+void
+PlayListWindow::FrameResized(float width, float height)
 {
-    Hide(); 
-    return false;
+	BRect r(Bounds());
+	fMenuBar->MoveTo(r.LeftTop());
+	fMenuBar->ResizeTo(r.Width(), fMenuBar->Bounds().Height());
+	r.top += fMenuBar->Bounds().Height() + 1.0;
+	fBackgroundView->MoveTo(r.LeftTop());
+	// the "+ 1.0" is to make the scrollbar
+	// be partly covered by the window border
+	fBackgroundView->ResizeTo(r.Width() + 1.0, r.Height() + 1.0);
 }
 
-void PlayListWindow::ReallyQuit()
+/*****************************************************************************
+ * PlayListWindow::ReallyQuit
+ *****************************************************************************/
+void
+PlayListWindow::ReallyQuit()
 {
-    Hide(); 
     Lock();
+    Hide(); 
     Quit();
+}
+
+/*****************************************************************************
+ * PlayListWindow::UpdatePlaylist
+ *****************************************************************************/
+void
+PlayListWindow::UpdatePlaylist( bool rebuild )
+{
+	if ( rebuild )
+	{
+		// remove all items
+		int32 count = fListView->CountItems();
+		while ( BListItem* item = fListView->RemoveItem( --count ) )
+			delete item;
+	
+		// rebuild listview from VLC's playlist
+		for ( int i = 0; i < fPlaylist->i_size; i++ )
+			fListView->AddItem( new PlaylistItem( fPlaylist->p_item[i].psz_name ) );
+	}
+	fListView->SetCurrent( fPlaylist->i_index );
+	fListView->SetPlaying( Intf_VLCWrapper::is_playing() );
 }

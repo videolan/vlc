@@ -2,7 +2,7 @@
  * DrawingTidbits.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: DrawingTidbits.h,v 1.2.4.1 2002/09/03 12:00:25 tcastley Exp $
+ * $Id: DrawingTidbits.h,v 1.2.4.2 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -52,13 +52,23 @@ const float kDimLevel = 0.6;
 
 void ReplaceColor(BBitmap *bitmap, rgb_color from, rgb_color to);
 void ReplaceTransparentColor(BBitmap *bitmap, rgb_color with);
+
+// function can be used to scale the upper left part of
+// a bitmap to fill the entire bitmap, ie fromWidth
+// and fromHeight must be smaller or equal to the bitmaps size!
+// only supported colorspaces are B_RGB32 and B_RGBA32
+status_t scale_bitmap( BBitmap* bitmap,
+					   uint32 fromWidth, uint32 fromHeight );
+
 // bitmaps need to be the same size, or this function will fail
 // currently supported conversions:
 //   B_YCbCr422	-> B_RGB32
+//   B_RGB32	-> B_RGB32
+//   B_RGB16	-> B_RGB32
+// not yet implemented conversions:
 //   B_YCbCr420	-> B_RGB32
 //   B_YUV422	-> B_RGB32
-//   B_RGB32	-> B_RGB32
-//status_t convert_bitmap(BBitmap* inBitmap, BBitmap* outBitmap);
+status_t convert_bitmap(BBitmap* inBitmap, BBitmap* outBitmap);
 
 // dims bitmap (in place) by finding the distance of
 // the color at each pixel to the provided "center" color

@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.12.2.3 2002/09/03 12:00:25 tcastley Exp $
+ * $Id: InterfaceWindow.h,v 1.12.2.4 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -38,42 +38,62 @@ class BFilePanel;
 class CDMenu : public BMenu
 {
  public:
-							CDMenu(const char* name);
+							CDMenu( const char* name );
 	virtual					~CDMenu();
 
-	virtual	void			AttachedToWindow(void);
+	virtual	void			AttachedToWindow();
 
  private:
-	int						GetCD(const char* directory);
+	int						GetCD( const char* directory );
 };
 
 class LanguageMenu : public BMenu
 {
  public:
-							LanguageMenu(const char* name,
-										 int menu_kind,
-										 intf_thread_t* p_interface);
+							LanguageMenu( const char* name,
+										  int menu_kind,
+										  intf_thread_t* p_interface );
 	virtual					~LanguageMenu();
 
-	virtual	void			AttachedToWindow(void);
+	virtual	void			AttachedToWindow();
 
  private:
+			void			_GetChannels();
+
 	intf_thread_t*			p_intf;
 	int						kind;
-	int						GetChannels();
 };
+
+class TitleMenu : public BMenu
+{
+ public:
+							TitleMenu( const char* name );
+	virtual					~TitleMenu();
+
+	virtual	void			AttachedToWindow();
+};
+
+class ChapterMenu : public BMenu
+{
+ public:
+							ChapterMenu( const char* name );
+	virtual					~ChapterMenu();
+
+	virtual	void			AttachedToWindow();
+};
+
 
 class InterfaceWindow : public BWindow
 {
  public:
-							InterfaceWindow(BRect frame,
-											const char* name,
-											intf_thread_t* p_interface);
+							InterfaceWindow( BRect frame,
+											 const char* name,
+											 intf_thread_t* p_interface );
 	virtual					~InterfaceWindow();
 
-							// standard window member
-	virtual	void			FrameResized(float width, float height);
-	virtual	void			MessageReceived(BMessage* message);
+							// BWindow
+	virtual	void			FrameResized( float width, float height );
+	virtual	void			MessageReceived( BMessage* message );
 	virtual	bool			QuitRequested();
 
 							// InterfaceWindow
@@ -83,28 +103,48 @@ class InterfaceWindow : public BWindow
 	MediaControlView*		p_mediaControl;
 
  private:	
-	void					_SetMenusEnabled(bool hasFile,
-											 bool hasChapters = false,
-											 bool hasTitles = false);
+			void			_UpdatePlaylist();
+			void			_SetMenusEnabled( bool hasFile,
+											  bool hasChapters = false,
+											  bool hasTitles = false );
+			void			_UpdateSpeedMenu( int rate );
+			void			_InputStreamChanged();
+			status_t		_LoadSettings( BMessage* message,
+										   const char* fileName,
+										   const char* subFolder = NULL );
+			status_t		_SaveSettings( BMessage* message,
+										   const char* fileName,
+										   const char* subFolder = NULL );
+			void			_RestoreSettings();
+			void			_StoreSettings();
 
 	intf_thread_t*			p_intf;
-	bool					b_empty_playlist;
-	BFilePanel*				file_panel;
-	PlayListWindow*			playlist_window;
-	BMenuItem*				miOnTop;
 	es_descriptor_t*		p_audio_es;
 	es_descriptor_t*		p_spu_es;
+	input_thread_s*			fInputThread;
+
+	bool					fPlaylistIsEmpty;
+	BFilePanel*				fFilePanel;
+	PlayListWindow*			fPlaylistWindow;
 	BMenuBar*				fMenuBar;
 	BMenuItem*				fNextTitleMI;
 	BMenuItem*				fPrevTitleMI;
 	BMenuItem*				fNextChapterMI;
 	BMenuItem*				fPrevChapterMI;
+	BMenuItem*				fOnTopMI;
+	BMenuItem*				fSlowerMI;
+	BMenuItem*				fNormalMI;
+	BMenuItem*				fFasterMI;
 	BMenu*					fAudioMenu;
 	BMenu*					fNavigationMenu;
+	BMenu*					fTitleMenu;
+	BMenu*					fChapterMenu;
 	BMenu*					fLanguageMenu;
 	BMenu*					fSubtitlesMenu;
 	BMenu*					fSpeedMenu;
 	bigtime_t				fLastUpdateTime;
+	BMessage*				fSettings;	// we keep the message arround
+										// for forward compatibility
 };
 
 #endif	// BEOS_INTERFACE_WINDOW_H

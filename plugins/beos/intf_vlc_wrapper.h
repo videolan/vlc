@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_vlc_wrapper.h,v 1.1.2.2 2002/09/03 12:00:25 tcastley Exp $
+ * $Id: intf_vlc_wrapper.h,v 1.1.2.3 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -53,6 +53,17 @@ public:
     static void playlistStop();
     static void playlistNext();
     static void playlistPrev();
+    static void playlistJumpTo( int pos );
+    static int playlistCurrentPos();
+    static int playlistSize();
+	static void playlistLock();
+	static void playlistUnlock();
+
+    static void getNavCapabilities( bool* canSkipPrev,
+    								bool* canSkipNext );
+	static void	navigatePrev();
+	static void	navigateNext();
+
 //    static void channelNext();
 //    static void channelPrev();
     static void loop();
@@ -65,30 +76,33 @@ public:
     static void set_volume(int value);
     static void toggle_mute();
     static bool is_muted();
+    static bool is_playing();
     static void maxvolume();
+    static bool has_audio();
 //    static void fullscreen();
     static void eject();
 
     /* playback info */
     static BString* getTimeAsString();
     static float  getTimeAsFloat();
-    static void   setTimeAsFloat(float i_offset);
+    static void   setTimeAsFloat( float i_offset );
     static bool   playlistPlaying();
     static BList* playlistAsArray();
 
     /* open file/disc/network */
-    static void openFiles(BList *o_files);
-    static void openDisc(BString o_type, BString o_device, int i_title, int i_chapter);
-    static void openNet(BString o_addr, int i_port);
-    static void openNetChannel(BString o_addr, int i_port);
-    static void openNetHTTP(BString o_addr);
+    static void openFiles( BList *o_files, bool replace = true );
+    static void openDisc( BString o_type, BString o_device,
+    					  int i_title, int i_chapter );
+    static void openNet( BString o_addr, int i_port );
+    static void openNetChannel( BString o_addr, int i_port );
+    static void openNetHTTP( BString o_addr );
 
     /* menus management */
-    static void toggleProgram(int i_program);
-    static void toggleTitle(int i_title);
-    static void toggleChapter(int i_chapter);
-    static void toggleLanguage(int i_language);
-    static void toggleSubtitle(int i_subtitle);
+    static void toggleProgram( int i_program );
+    static void toggleTitle( int i_title );
+    static void toggleChapter( int i_chapter );
+    static void toggleLanguage( int i_language );
+    static void toggleSubtitle( int i_subtitle );
     static void setupMenus();
 };
 

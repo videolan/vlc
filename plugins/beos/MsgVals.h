@@ -2,7 +2,7 @@
  * MsgVals.h
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: MsgVals.h,v 1.9.2.3 2002/09/03 12:00:25 tcastley Exp $
+ * $Id: MsgVals.h,v 1.9.2.4 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Tony Castley <tcastley@mail.powerup.com.au>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -44,16 +44,24 @@ const uint32 SELECT_CHANNEL		= 'chan';
 const uint32 SELECT_SUBTITLE	= 'subt';
 const uint32 PREV_TITLE			= 'prti';
 const uint32 NEXT_TITLE			= 'nxti';
+const uint32 TOGGLE_TITLE		= 'tgti';
 const uint32 PREV_CHAPTER		= 'prch';
 const uint32 NEXT_CHAPTER		= 'nxch';
+const uint32 TOGGLE_CHAPTER		= 'tgch';
+const uint32 PREV_FILE			= 'prfl';
+const uint32 NEXT_FILE			= 'nxfl';
+const uint32 NAVIGATE_PREV		= 'navp';	// could be chapter, title or file
+const uint32 NAVIGATE_NEXT		= 'navn';	// could be chapter, title or file
 const uint32 TOGGLE_ON_TOP		= 'ontp';
 const uint32 TOGGLE_FULL_SCREEN	= 'tgfs';
+const uint32 RESIZE_50			= 'rshl';
 const uint32 RESIZE_100			= 'rsor';
 const uint32 RESIZE_200			= 'rsdb';
 const uint32 RESIZE_TRUE		= 'rstr';
 const uint32 ASPECT_CORRECT		= 'asco';
 const uint32 VERT_SYNC			= 'vsyn';
 const uint32 WINDOW_FEEL		= 'wfel';
+const uint32 SCREEN_SHOT		= 'scrn';
 const uint32 INTERFACE_CREATED	= 'ifcr';  /* see VlcApplication::MessageReceived()
                                             * in src/misc/beos_specific.cpp */
 

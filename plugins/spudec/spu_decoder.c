@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.24.2.4 2002/09/25 23:11:54 massiot Exp $
+ * $Id: spu_decoder.c,v 1.24.2.5 2002/09/29 12:04:28 titer Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -1146,12 +1146,14 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
     case FOURCC_YUY2:
 
     p_dest = p_pic->p->p_pixels +
-              (p_spu->i_x + p_spu->i_width +
-               p_vout->output.i_width * ( p_spu->i_y + p_spu->i_height )) * 2;
+        + ( p_spu->i_y + p_spu->i_height ) * p_pic->p->i_pitch 
+                                                // * bytes per line
+        + ( p_spu->i_x + p_spu->i_width ) * 2;  // * bytes per pixel
+    
     /* Draw until we reach the bottom of the subtitle */
-    for( i_y = p_spu->i_height * p_vout->output.i_width;
+    for( i_y = p_spu->i_height * p_pic->p->i_pitch / 2;
          i_y ;
-         i_y -= p_vout->output.i_width )
+         i_y -= p_pic->p->i_pitch / 2 )
     {
         /* Draw until we reach the end of the line */
         for( i_x = p_spu->i_width ; i_x ; )

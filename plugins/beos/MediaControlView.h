@@ -2,7 +2,7 @@
  * MediaControlView.h: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.h,v 1.2.4.1 2002/09/03 12:00:25 tcastley Exp $
+ * $Id: MediaControlView.h,v 1.2.4.2 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -52,6 +52,7 @@ class MediaControlView : public BBox
 
 			void				SetStatus(int status, int rate); 
 			void				SetEnabled(bool enable);
+			void				SetAudioEnabled(bool enable);
 			uint32				GetSeekTo() const;
 			uint32				GetVolume() const;
 			void				SetSkippable(bool backward,

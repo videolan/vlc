@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.19.2.5 2002/09/03 12:00:25 tcastley Exp $
+ * $Id: VideoWindow.h,v 1.19.2.6 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -74,6 +74,7 @@ class VLCView : public BView
 			bigtime_t		fLastMouseMovedTime;
 			bool			fCursorHidden;
 			bool			fCursorInside;
+			bool			fIgnoreDoubleClick;
 };
 
 
@@ -129,6 +130,20 @@ private:
 			void			_FreeBuffers();
 			void			_BlankBitmap(BBitmap* bitmap) const;
 			void			_SetVideoSize(uint32 mode);
+
+			void			_SaveScreenShot( BBitmap* bitmap,
+											 char* path,
+											 uint32 translatorID ) const;
+	static	int32			_save_screen_shot( void* cookie );
+
+	struct screen_shot_info
+	{
+		BBitmap*	bitmap;
+		char*		path;
+		uint32		translatorID;
+		int32		width;
+		int32		height;
+	};
 
     struct vout_thread_s   *p_vout;
 

@@ -93,7 +93,7 @@ case x"${target_os}" in
     save_CFLAGS="${save_CFLAGS} -Wno-multichar -Wno-ctor-dtor-privacy -Woverloaded-virtual"
     vlc_LDFLAGS="${vlc_LDFLAGS} -lbe"
     plugins_LDFLAGS="${plugins_LDFLAGS} -nostart"
-    beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker -lstdc++.r4"
+    beos_LDFLAGS="${beos_LDFLAGS} -lbe -lgame -lroot -ltracker -ltranslation -lstdc++.r4"
     ipv4_LDFLAGS="${ipv4_LDFLAGS} -lbind"
     ;;
   x*)

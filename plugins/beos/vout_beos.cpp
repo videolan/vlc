@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.58.2.5 2002/09/03 12:00:24 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.58.2.6 2002/09/29 12:04:27 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -32,10 +32,16 @@
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>
 #include <string.h>                                            /* strerror() */
-#include <InterfaceKit.h>
-#include <DirectWindow.h>
+
 #include <Application.h>
+#include <BitmapStream.h>
 #include <Bitmap.h>
+#include <DirectWindow.h>
+#include <File.h>
+#include <InterfaceKit.h>
+#include <NodeInfo.h>
+#include <String.h>
+#include <TranslatorRoster.h>
 
 extern "C"
 {
@@ -73,6 +79,8 @@ typedef struct vout_sys_s
 
 #define MOUSE_IDLE_TIMEOUT 2000000	// two seconds
 #define MIN_AUTO_VSYNC_REFRESH 61	// Hz
+#define DEFAULT_SCREEN_SHOT_FORMAT 'PNG '
+#define DEFAULT_SCREEN_SHOT_PATH "/boot/home/vlc screenshot"
 
 /*****************************************************************************
  * beos_GetAppWindow : retrieve a BWindow pointer from the window name
@@ -220,6 +228,7 @@ VideoWindow::MessageReceived( BMessage *p_message )
 		case TOGGLE_FULL_SCREEN:
 			BWindow::Zoom();
 			break;
+		case RESIZE_50:
 		case RESIZE_100:
 		case RESIZE_200:
 			if (is_zoomed)
@@ -241,6 +250,41 @@ VideoWindow::MessageReceived( BMessage *p_message )
 			break;
 		case ASPECT_CORRECT:
 			SetCorrectAspectRatio(!fCorrectAspect);
+			break;
+		case SCREEN_SHOT:
+			// save a screen shot
+			if ( BBitmap* current = bitmap[i_buffer] )
+			{
+// the following line might be tempting, but does not work for some overlay bitmaps!!!
+//				BBitmap* temp = new BBitmap( current );
+// so we clone the bitmap ourselves
+// however, we need to take care of potentially different padding!
+// memcpy() is slow when reading from grafix memory, but what the heck...
+				BBitmap* temp = new BBitmap( current->Bounds(), current->ColorSpace() );
+				if ( temp && temp->IsValid() )
+				{
+					int32 height = current->Bounds().Height();
+					uint8* dst = (uint8*)temp->Bits();
+					uint8* src = (uint8*)current->Bits();
+					int32 dstBpr = temp->BytesPerRow();
+					int32 srcBpr = current->BytesPerRow();
+					int32 validBytes = dstBpr > srcBpr ? srcBpr : dstBpr;
+					for ( int32 y = 0; y < height; y++ )
+					{
+						memcpy( dst, src, validBytes );
+						dst += dstBpr;
+						src += srcBpr;
+					}
+					_SaveScreenShot( temp,
+									 strdup( DEFAULT_SCREEN_SHOT_PATH ),
+									 DEFAULT_SCREEN_SHOT_FORMAT );
+				}
+				else
+				{
+					delete temp;
+					fprintf( stderr, "error copying bitmaps\n" );
+				}
+			}
 			break;
 		default:
 			BWindow::MessageReceived( p_message );
@@ -481,12 +525,16 @@ VideoWindow::_AllocateBuffers(int width, int height, int* mode)
 
     if (*mode == BITMAP)
 	{
-        // fallback to RGB32
-        colspace_index = DEFAULT_COL;
-        SetTitle(VOUT_TITLE " (Bitmap)");
-        bitmap[0] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace);
-        bitmap[1] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace);
-        bitmap[2] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace);
+        // fallback to RGB
+        colspace_index = DEFAULT_COL;	// B_RGB16
+// FIXME: an error in the YUV->RGB32 module prevents this from being used!
+/*        BScreen screen( B_MAIN_SCREEN_ID );
+        if ( screen.ColorSpace() == B_RGB32 )
+        	colspace_index = 3;			// B_RGB32 (faster on 32 bit screen)*/
+        SetTitle( VOUT_TITLE " (Bitmap)" );
+        bitmap[0] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );
+        bitmap[1] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );
+        bitmap[2] = new BBitmap( bitmapFrame, colspace[colspace_index].colspace );
     }
     // see if everything went well
     status_t status = B_ERROR;
@@ -609,6 +657,10 @@ VideoWindow::_SetVideoSize(uint32 mode)
 	int32 height = fCorrectAspect ? i_height : fTrueHeight;
 	switch (mode)
 	{
+		case RESIZE_50:
+			width /= 2;
+			height /= 2;
+			break;
 		case RESIZE_200:
 			width *= 2;
 			height *= 2;
@@ -621,6 +673,187 @@ VideoWindow::_SetVideoSize(uint32 mode)
 	is_zoomed = false;
 }
 
+/*****************************************************************************
+ * VideoWindow::_SaveScreenShot
+ *****************************************************************************/
+void
+VideoWindow::_SaveScreenShot( BBitmap* bitmap, char* path,
+						  uint32 translatorID ) const
+{
+	// make the info object from the parameters
+	screen_shot_info* info = new screen_shot_info;
+	info->bitmap = bitmap;
+	info->path = path;
+	info->translatorID = translatorID;
+	info->width = fCorrectAspect ? i_width : fTrueWidth;
+	info->height = fCorrectAspect ? i_height : fTrueHeight;
+	// spawn a new thread to take care of the actual saving to disk
+	thread_id thread = spawn_thread( _save_screen_shot,
+									 "screen shot saver",
+									 B_LOW_PRIORITY, (void*)info );
+	// start thread or do the job ourself if something went wrong
+	if ( thread < B_OK || resume_thread( thread ) < B_OK )
+		_save_screen_shot( (void*)info );
+}
+
+/*****************************************************************************
+ * VideoWindow::_save_screen_shot
+ *****************************************************************************/
+int32
+VideoWindow::_save_screen_shot( void* cookie )
+{
+	screen_shot_info* info = (screen_shot_info*)cookie;
+	if ( info && info->bitmap && info->bitmap->IsValid() && info->path )
+	{
+		// try to be as quick as possible creating the file (the user might have
+		// taken the next screen shot already!)
+		// make sure we have a unique name for the screen shot
+		BString path( info->path );
+		BEntry entry( path.String() );
+		int32 appendedNumber = 0;
+		if ( entry.Exists() && !entry.IsSymLink() )
+		{
+			// we would clobber an existing entry
+			bool foundUniqueName = false;
+			appendedNumber = 1;
+			while ( !foundUniqueName ) {
+				BString newName( info->path );
+				newName << " " << appendedNumber;
+				BEntry possiblyClobberedEntry( newName.String() );
+				if ( possiblyClobberedEntry.Exists()
+					&& !possiblyClobberedEntry.IsSymLink() )
+					appendedNumber++;
+				else
+					foundUniqueName = true;
+			}
+		}
+		if ( appendedNumber > 0 )
+			path << " " << appendedNumber;
+		// there is still a slight chance to clobber an existing
+		// file (if it was created in the "meantime"), but we take it...
+		BFile outFile( path.String(),
+					   B_CREATE_FILE | B_WRITE_ONLY | B_ERASE_FILE );
+
+		// make colorspace converted copy of bitmap
+		BBitmap* converted = new BBitmap( BRect( 0.0, 0.0, info->width, info->height ),
+										  B_RGB32 );
+//		if ( converted->IsValid() )
+//			memset( converted->Bits(), 0, converted->BitsLength() );
+		status_t status = convert_bitmap( info->bitmap, converted );
+		if ( status == B_OK )
+		{
+			BTranslatorRoster* roster = BTranslatorRoster::Default();
+			uint32 imageFormat = 0;
+			translator_id translator = 0;
+			bool found = false;
+
+			// find suitable translator
+			translator_id* ids = NULL;
+			int32 count = 0;
+		
+			status = roster->GetAllTranslators( &ids, &count );
+			if ( status >= B_OK )
+			{
+				for ( int tix = 0; tix < count; tix++ )
+				{ 
+					const translation_format *formats = NULL; 
+					int32 num_formats = 0; 
+					bool ok = false; 
+					status = roster->GetInputFormats( ids[tix],
+													  &formats, &num_formats );
+					if (status >= B_OK)
+					{
+						for ( int iix = 0; iix < num_formats; iix++ )
+						{ 
+							if ( formats[iix].type == B_TRANSLATOR_BITMAP )
+							{ 
+								ok = true; 
+								break; 
+							}
+						}
+					}
+					if ( !ok )
+						continue; 
+					status = roster->GetOutputFormats( ids[tix],
+													   &formats, &num_formats); 
+					if ( status >= B_OK )
+					{
+						for ( int32 oix = 0; oix < num_formats; oix++ )
+						{
+				 			if ( formats[oix].type != B_TRANSLATOR_BITMAP )
+				 			{
+			 					if ( formats[oix].type == info->translatorID )
+			 					{
+			 						found = true;
+				 					imageFormat = formats[oix].type;
+				 					translator = ids[tix];
+					 				break;
+				 				}
+				 			}
+						}
+					}
+				}
+			}
+			delete[] ids;
+			if ( found )
+			{
+				// make bitmap stream
+				BBitmapStream outStream( converted );
+
+				status = outFile.InitCheck();
+				if (status == B_OK) {
+					status = roster->Translate( &outStream, NULL, NULL,
+												&outFile, imageFormat );
+					if ( status == B_OK )
+					{
+						BNodeInfo nodeInfo( &outFile );
+						if ( nodeInfo.InitCheck() == B_OK )
+						{
+							translation_format* formats; 
+							int32 count;
+							status = roster->GetOutputFormats( translator,
+															   (const translation_format **) &formats,
+															   &count);
+							if ( status >= B_OK )
+							{
+								const char * mime = NULL; 
+								for ( int ix = 0; ix < count; ix++ ) {
+									if ( formats[ix].type == imageFormat ) {
+										mime = formats[ix].MIME;
+										break;
+									}
+								} 
+								if ( mime )
+									nodeInfo.SetType( mime );
+							}
+						}
+					} else {
+						fprintf( stderr, "  failed to write bitmap: %s\n",
+								 strerror( status ) );
+					}
+				} else {
+					fprintf( stderr, "  failed to create output file: %s\n",
+							 strerror( status ) );
+				}
+				outStream.DetachBitmap( &converted );
+				outFile.Unset();
+			}
+			else
+				fprintf( stderr, "  failed to find translator\n");
+		}
+		else
+				fprintf( stderr, "  failed to convert colorspace: %s\n",
+						 strerror( status ) );
+		delete converted;
+	}
+	if ( info )
+	{
+		delete info->bitmap;
+		delete[] info->path;
+	}
+	delete info;
+	return B_OK;
+}
 
 
 /*****************************************************************************
@@ -630,7 +863,8 @@ VLCView::VLCView(BRect bounds)
 	: BView(bounds, "video view", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED),
 	  fLastMouseMovedTime(system_time()),
 	  fCursorHidden(false),
-	  fCursorInside(false)
+	  fCursorInside(false),
+	  fIgnoreDoubleClick(false)
 {
     SetViewColor(B_TRANSPARENT_32_BIT);
 }
@@ -671,27 +905,36 @@ VLCView::MouseDown(BPoint where)
 	{
 		if (buttons & B_PRIMARY_MOUSE_BUTTON)
 		{
-			if (clicks == 2)
+			if (clicks == 2 && !fIgnoreDoubleClick)
 				Window()->Zoom();
 			else
 				videoWindow->ToggleInterfaceShowing();
+			fIgnoreDoubleClick = false;
 		}
 	    else
 	    {
 			if (buttons & B_SECONDARY_MOUSE_BUTTON) 
 			{
+				// clicks will be 2 next time (if interval short enough)
+				// even if the first click and the second
+				// have not been made with the same mouse button
+				fIgnoreDoubleClick = true;
+				// launch popup menu
 				BPopUpMenu *menu = new BPopUpMenu("context menu");
 				menu->SetRadioMode(false);
-				// Toggle FullScreen
-				BMenuItem *zoomItem = new BMenuItem("Fullscreen", new BMessage(TOGGLE_FULL_SCREEN));
-				zoomItem->SetMarked(videoWindow->is_zoomed);
-				menu->AddItem(zoomItem);
+				// Resize to 50%
+				BMenuItem *halfItem = new BMenuItem("50%", new BMessage(RESIZE_50));
+				menu->AddItem(halfItem);
 				// Resize to 100%
 				BMenuItem *origItem = new BMenuItem("100%", new BMessage(RESIZE_100));
 				menu->AddItem(origItem);
 				// Resize to 200%
 				BMenuItem *doubleItem = new BMenuItem("200%", new BMessage(RESIZE_200));
 				menu->AddItem(doubleItem);
+				// Toggle FullScreen
+				BMenuItem *zoomItem = new BMenuItem("Fullscreen", new BMessage(TOGGLE_FULL_SCREEN));
+				zoomItem->SetMarked(videoWindow->is_zoomed);
+				menu->AddItem(zoomItem);
 	
 				menu->AddSeparatorItem();
 	
@@ -707,7 +950,7 @@ VLCView::MouseDown(BPoint where)
 				menu->AddSeparatorItem();
 	
 				// Windwo Feel Items
-				BMessage *winNormFeel = new BMessage(WINDOW_FEEL);
+/*				BMessage *winNormFeel = new BMessage(WINDOW_FEEL);
 				winNormFeel->AddInt32("WinFeel", (int32)B_NORMAL_WINDOW_FEEL);
 				BMenuItem *normWindItem = new BMenuItem("Normal Window", winNormFeel);
 				normWindItem->SetMarked(videoWindow->Feel() == B_NORMAL_WINDOW_FEEL);
@@ -723,11 +966,25 @@ VLCView::MouseDown(BPoint where)
 				winAllFeel->AddInt32("WinFeel", (int32)B_FLOATING_ALL_WINDOW_FEEL);
 				BMenuItem *allSpacesWindItem = new BMenuItem("On Top All Workspaces", winAllFeel);
 				allSpacesWindItem->SetMarked(videoWindow->Feel() == B_FLOATING_ALL_WINDOW_FEEL);
-				menu->AddItem(allSpacesWindItem);
-			   
-				menu->SetTargetForItems(this);
-				ConvertToScreen(&where);
-				menu->Go(where, true, false, true);
+				menu->AddItem(allSpacesWindItem);*/
+
+				BMessage *windowFeelMsg = new BMessage( WINDOW_FEEL );
+				bool onTop = videoWindow->Feel() == B_FLOATING_ALL_WINDOW_FEEL;
+				window_feel feel = onTop ? B_NORMAL_WINDOW_FEEL : B_FLOATING_ALL_WINDOW_FEEL;
+				windowFeelMsg->AddInt32( "WinFeel", (int32)feel );
+				BMenuItem *windowFeelItem = new BMenuItem( "Stay On Top", windowFeelMsg );
+				windowFeelItem->SetMarked( onTop );
+				menu->AddItem( windowFeelItem );
+
+				menu->AddSeparatorItem();
+
+				BMenuItem* screenShotItem = new BMenuItem( "Take Screen Shot",
+														   new BMessage( SCREEN_SHOT ) );
+				menu->AddItem( screenShotItem );
+
+				menu->SetTargetForItems( this );
+				ConvertToScreen( &where );
+				menu->Go( where, true, false, true );
 	        }
 		}
 	}
@@ -755,14 +1012,17 @@ VLCView::Pulse()
 	// We are getting the pulse messages no matter if the mouse is over
 	// this view. If we are in full screen mode, we want to hide the cursor
 	// even if it is not.
-	if (!fCursorHidden) {
-	    VideoWindow *videoWindow = dynamic_cast<VideoWindow*>(Window());
+	if (!fCursorHidden)
+	{
 		if (fCursorInside
-			&& system_time() - fLastMouseMovedTime > MOUSE_IDLE_TIMEOUT) {
+			&& system_time() - fLastMouseMovedTime > MOUSE_IDLE_TIMEOUT)
+		{
 			be_app->ObscureCursor();
 			fCursorHidden = true;
-			// hide the interface window as well
-			videoWindow->SetInterfaceShowing(false);
+			VideoWindow *videoWindow = dynamic_cast<VideoWindow*>(Window());
+			// hide the interface window as well if full screen
+			if (videoWindow && videoWindow->is_zoomed)
+				videoWindow->SetInterfaceShowing(false);
 		}
 	}
 }
@@ -799,10 +1059,10 @@ VLCView::KeyDown(const char *bytes, int32 numBytes)
 				{
 					if (mods & B_SHIFT_KEY)
 						// next title
-						interfaceWindow->PostMessage(NEXT_CHAPTER);
+						interfaceWindow->PostMessage(NEXT_TITLE);
 					else
 						// next chapter
-						interfaceWindow->PostMessage(NEXT_TITLE);
+						interfaceWindow->PostMessage(NEXT_CHAPTER);
 				}
 				break;
 			case B_LEFT_ARROW:
@@ -810,17 +1070,24 @@ VLCView::KeyDown(const char *bytes, int32 numBytes)
 				{
 					if (mods & B_SHIFT_KEY)
 						// previous title
-						interfaceWindow->PostMessage(PREV_CHAPTER);
+						interfaceWindow->PostMessage(PREV_TITLE);
 					else
 						// previous chapter
-						interfaceWindow->PostMessage(PREV_TITLE);
+						interfaceWindow->PostMessage(PREV_CHAPTER);
 				}
 				break;
 			case B_UP_ARROW:
-				// previous file in playlist?
+				// previous file in playlist
+				interfaceWindow->PostMessage(PREV_FILE);
 				break;
 			case B_DOWN_ARROW:
-				// next file in playlist?
+				// next file in playlist
+				interfaceWindow->PostMessage(NEXT_FILE);
+				break;
+			case B_PRINT_KEY:
+			case 's':
+			case 'S':
+				videoWindow->PostMessage( SCREEN_SHOT );
 				break;
 			default:
 				BView::KeyDown(bytes, numBytes);
@@ -835,9 +1102,9 @@ VLCView::KeyDown(const char *bytes, int32 numBytes)
 void
 VLCView::Draw(BRect updateRect) 
 {
-    VideoWindow *win = (VideoWindow *) Window();
-    if (win->mode == BITMAP)
-      FillRect(updateRect);
+	VideoWindow* window = dynamic_cast<VideoWindow*>( Window() );
+	if ( window && window->mode == BITMAP )
+		FillRect( updateRect );
 }
 
 
@@ -1026,10 +1293,10 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     if (!p_win->teardownwindow)
     { 
        p_win->drawBuffer(p_vout->p_sys->i_index);
+	    /* change buffer */
+	    p_vout->p_sys->i_index = ++p_vout->p_sys->i_index % 3;
+	    p_pic->p->p_pixels = (u8*)p_win->bitmap[p_vout->p_sys->i_index]->Bits();
     }
-    /* change buffer */
-    p_vout->p_sys->i_index = ++p_vout->p_sys->i_index % 3;
-    p_pic->p->p_pixels = (u8*)p_vout->p_sys->p_window->bitmap[p_vout->p_sys->i_index]->Bits();
 }
 
 /* following functions are local */
