@@ -102,6 +102,7 @@ HEADERS_include = \
 	include/vlc_config_cat.h \
 	include/vlc_httpd.h \
 	include/vlc_tls.h \
+	include/vlc_image.h \
 	include/vlc_input.h \
 	include/vlc_interface.h \
 	include/vlc_keys.h \
@@ -370,6 +371,7 @@ SOURCES_libvlc_common = \
 	src/misc/threads.c \
 	src/misc/cpu.c \
 	src/misc/configuration.c \
+	src/misc/image.c \
 	src/misc/iso_lang.c \
 	src/misc/iso-639_def.h \
 	src/misc/messages.c \
