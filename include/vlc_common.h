@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.67 2003/06/05 11:52:19 gbazin Exp $
+ * $Id: vlc_common.h,v 1.68 2003/07/14 20:36:55 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -243,6 +243,8 @@ typedef struct picture_heap_t picture_heap_t;
 typedef struct subpicture_t subpicture_t;
 typedef struct subpicture_sys_t subpicture_sys_t;
 typedef struct vout_synchro_t vout_synchro_t;
+typedef struct text_renderer_sys_t text_renderer_sys_t;
+typedef struct text_style_t text_style_t;
 
 /* Stream output */
 typedef struct sout_instance_t sout_instance_t;
@@ -305,6 +307,10 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 
 /* VLC_COMMON_MEMBERS : members common to all basic vlc objects */
 #define VLC_COMMON_MEMBERS                                                  \
+/** \name VLC_COMMON_MEMBERS                                                \
+ * these members are common for all vlc objects                             \
+ */                                                                         \
+/**@{*/                                                                     \
     int   i_object_id;                                                      \
     int   i_object_type;                                                    \
     char *psz_object_type;                                                  \
@@ -319,10 +325,10 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     vlc_cond_t   object_wait;                                               \
                                                                             \
     /* Object properties */                                                 \
-    volatile vlc_bool_t b_error;                    /* set by the object */ \
-    volatile vlc_bool_t b_die;                     /* set by the outside */ \
-    volatile vlc_bool_t b_dead;                     /* set by the object */ \
-    volatile vlc_bool_t b_attached;                 /* set by the object */ \
+    volatile vlc_bool_t b_error;                  /**< set by the object */ \
+    volatile vlc_bool_t b_die;                   /**< set by the outside */ \
+    volatile vlc_bool_t b_dead;                   /**< set by the object */ \
+    volatile vlc_bool_t b_attached;               /**< set by the object */ \
                                                                             \
     /* Object variables */                                                  \
     vlc_mutex_t     var_lock;                                               \
@@ -330,19 +336,20 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     variable_t *    p_vars;                                                 \
                                                                             \
     /* Stuff related to the libvlc structure */                             \
-    libvlc_t *      p_libvlc;                        /* root of all evil */ \
-    vlc_t *         p_vlc;                     /* (root of all evil) - 1 */ \
+    libvlc_t *      p_libvlc;                      /**< root of all evil */ \
+    vlc_t *         p_vlc;                   /**< (root of all evil) - 1 */ \
                                                                             \
-    volatile int    i_refcount;                           /* usage count */ \
-    vlc_object_t *  p_parent;                              /* our parent */ \
-    vlc_object_t ** pp_children;                         /* our children */ \
+    volatile int    i_refcount;                         /**< usage count */ \
+    vlc_object_t *  p_parent;                            /**< our parent */ \
+    vlc_object_t ** pp_children;                       /**< our children */ \
     volatile int    i_children;                                             \
                                                                             \
     /* Private data */                                                      \
     void *          p_private;                                              \
                                                                             \
-    /* Just a reminder so that people don't cast garbage */                 \
+    /** Just a reminder so that people don't cast garbage */                \
     int be_sure_to_add_VLC_COMMON_MEMBERS_to_struct;                        \
+/**@}*/                                                                     \
 
 /* VLC_OBJECT: attempt at doing a clever cast */
 #define VLC_OBJECT( x ) \

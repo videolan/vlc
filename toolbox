@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.40 2003/07/08 16:21:00 sam Exp $
+##  $Id: toolbox,v 1.41 2003/07/14 20:36:55 sigmunau Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -81,6 +81,9 @@ case "$1" in
   --make-woody)
     action=woody
     ;;
+  --add-include)
+    action=include
+    ;;
   --help)
     help
     ;;
@@ -90,6 +93,19 @@ case "$1" in
     ;;
 esac
 shift
+
+##
+##  Add includes to help doxygen
+##
+if test "${action}" = "include"
+then
+  case "$1" in
+    */vlc_common.h|*/include/vlc/*);;
+    */include/*.h) echo "#include <vlc_common.h>" ;;
+  esac
+  cat $1
+  exit 0
+fi
 
 ##
 ##  Update the CVS changelog
