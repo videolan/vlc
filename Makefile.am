@@ -370,8 +370,8 @@ endif
 # Install the modules and the symlinks
 install-exec-local:
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do if test -n "$$i" ; then \
-	  echo $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | cut -f2 -d/`" ; \
-	  $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | cut -f2 -d/`" ; \
+	  echo $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | sed -e 's,.*modules/\([^/]*\).*,\1,'`" ; \
+	  $(INSTALL) -m 755 "$$i$(LIBEXT)" "$(DESTDIR)$(libdir)/vlc/`echo $$i | sed -e 's,.*modules/\([^/]*\).*,\1,'`" ; \
 	fi ; done
 	for i in "" `$(VLC_CONFIG) --target builtin` ; do if test -n "$$i" ; then \
 	  echo $(INSTALL) -m 644 "$$i" "$(DESTDIR)$(libdir)/vlc" ; \
