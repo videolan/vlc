@@ -1,7 +1,7 @@
 /*****************************************************************************
  * format.c : PCM format converter
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -33,9 +33,11 @@
 #include "vlc_filter.h"
 
 #ifdef WORDS_BIGENDIAN
+#   define AOUT_FMT_S24_IE VLC_FOURCC('s','2','4','l')
 #   define AOUT_FMT_S16_IE VLC_FOURCC('s','1','6','l')
 #   define AOUT_FMT_U16_IE VLC_FOURCC('u','1','6','l')
 #else
+#   define AOUT_FMT_S24_IE VLC_FOURCC('s','2','4','b')
 #   define AOUT_FMT_S16_IE VLC_FOURCC('s','1','6','b')
 #   define AOUT_FMT_U16_IE VLC_FOURCC('u','1','6','b')
 #endif
@@ -46,46 +48,60 @@
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 
+static block_t *Float32toS24( filter_t *, block_t * );
 static block_t *Float32toS16( filter_t *, block_t * );
 static block_t *Float32toU16( filter_t *, block_t * );
 static block_t *Float32toS8 ( filter_t *, block_t * );
 static block_t *Float32toU8 ( filter_t *, block_t * );
 
-static block_t *S16toFloat32( filter_t *, block_t * );
-static block_t *S16toS8     ( filter_t *p_filter, block_t *p_block );
-static block_t *S16toU8     ( filter_t *p_filter, block_t *p_block );
-static block_t *S16toU16    ( filter_t *p_filter, block_t *p_block );
+static block_t *S24toFloat32  ( filter_t *, block_t * );
+static block_t *S24toS16      ( filter_t *, block_t * );
+static block_t *S24toS16Invert( filter_t *, block_t * );
+
+static block_t *S16toFloat32  ( filter_t *, block_t * );
+static block_t *S16toS24      ( filter_t *, block_t * );
+static block_t *S16toS24Invert( filter_t *, block_t * );
+static block_t *S16toS8       ( filter_t *, block_t * );
+static block_t *S16toU8       ( filter_t *, block_t * );
+static block_t *S16toU16      ( filter_t *, block_t * );
 
 static block_t *U16toFloat32( filter_t *, block_t * );
-static block_t *U16toS8     ( filter_t *p_filter, block_t *p_block );
-static block_t *U16toU8     ( filter_t *p_filter, block_t *p_block );
-static block_t *U16toS16    ( filter_t *p_filter, block_t *p_block );
+static block_t *U16toS8     ( filter_t *, block_t * );
+static block_t *U16toU8     ( filter_t *, block_t * );
+static block_t *U16toS16    ( filter_t *, block_t * );
 
+static block_t *Float32toS24Invert( filter_t *, block_t * );
 static block_t *Float32toS16Invert( filter_t *, block_t * );
 static block_t *Float32toU16Invert( filter_t *, block_t * );
 
-static block_t *S16InverttoFloat32( filter_t *, block_t * );
-static block_t *S16InverttoS8( filter_t *p_filter, block_t *p_block );
-static block_t *S16InverttoU8( filter_t *p_filter, block_t *p_block );
-static block_t *S16InverttoU16( filter_t *p_filter, block_t *p_block );
+static block_t *S24InverttoFloat32  ( filter_t *, block_t * );
+static block_t *S24InverttoS16      ( filter_t *, block_t * );
+static block_t *S24InverttoS16Invert( filter_t *, block_t * );
+
+static block_t *S16InverttoFloat32  ( filter_t *, block_t * );
+static block_t *S16InverttoS24      ( filter_t *, block_t * );
+static block_t *S16InverttoS24Invert( filter_t *, block_t * );
+static block_t *S16InverttoS8       ( filter_t *, block_t * );
+static block_t *S16InverttoU8       ( filter_t *, block_t * );
+static block_t *S16InverttoU16      ( filter_t *, block_t * );
 
 static block_t *U16InverttoFloat32( filter_t *, block_t * );
-static block_t *U16InverttoS8( filter_t *p_filter, block_t *p_block );
-static block_t *U16InverttoU8( filter_t *p_filter, block_t *p_block );
-static block_t *U16InverttoS16( filter_t *p_filter, block_t *p_block );
+static block_t *U16InverttoS8     ( filter_t *, block_t * );
+static block_t *U16InverttoU8     ( filter_t *, block_t * );
+static block_t *U16InverttoS16    ( filter_t *, block_t * );
 
-static block_t *S8toFloat32( filter_t *, block_t * );
-static block_t *S8toS16( filter_t *, block_t * );
-static block_t *S8toU16( filter_t *, block_t * );
-static block_t *S8toU8( filter_t *, block_t * );
+static block_t *S8toFloat32  ( filter_t *, block_t * );
+static block_t *S8toS16      ( filter_t *, block_t * );
+static block_t *S8toU16      ( filter_t *, block_t * );
+static block_t *S8toU8       ( filter_t *, block_t * );
 static block_t *S8toS16Invert( filter_t *, block_t * );
 static block_t *S8toU16Invert( filter_t *, block_t * );
 
-static block_t *U8toFloat32( filter_t *, block_t * );
-static block_t *U8toFloat32( filter_t *, block_t * );
-static block_t *U8toS16( filter_t *, block_t * );
-static block_t *U8toU16( filter_t *, block_t * );
-static block_t *U8toS8( filter_t *, block_t * );
+static block_t *U8toFloat32  ( filter_t *, block_t * );
+static block_t *U8toFloat32  ( filter_t *, block_t * );
+static block_t *U8toS16      ( filter_t *, block_t * );
+static block_t *U8toU16      ( filter_t *, block_t * );
+static block_t *U8toS8       ( filter_t *, block_t * );
 static block_t *U8toS16Invert( filter_t *, block_t * );
 static block_t *U8toU16Invert( filter_t *, block_t * );
 
@@ -94,7 +110,8 @@ static block_t *U8toS8( filter_t *, block_t * );
 static block_t *S8toU8( filter_t *, block_t * );
 
 
-static block_t *Swap16   ( filter_t *, block_t * );
+static block_t *Swap16( filter_t *, block_t * );
+static block_t *Swap24( filter_t *, block_t * );
 
 static struct
 {
@@ -104,24 +121,34 @@ static struct
 } ConvertTable[] =
 {
     /* From fl32 */
+    { VLC_FOURCC('f','l','3','2'), AOUT_FMT_S24_NE, Float32toS24 },
     { VLC_FOURCC('f','l','3','2'), AOUT_FMT_S16_NE, Float32toS16 },
     { VLC_FOURCC('f','l','3','2'), AOUT_FMT_U16_NE, Float32toU16 },
+    { VLC_FOURCC('f','l','3','2'), AOUT_FMT_S24_IE, Float32toS24Invert },
     { VLC_FOURCC('f','l','3','2'), AOUT_FMT_S16_IE, Float32toS16Invert },
     { VLC_FOURCC('f','l','3','2'), AOUT_FMT_U16_IE, Float32toU16Invert },
     { VLC_FOURCC('f','l','3','2'), VLC_FOURCC('s','8',' ',' '), Float32toS8 },
     { VLC_FOURCC('f','l','3','2'), VLC_FOURCC('u','8',' ',' '), Float32toU8 },
 
+    /* From s24 invert */
+    { AOUT_FMT_S24_NE, VLC_FOURCC('f','l','3','2'), S24toFloat32 },
+    { AOUT_FMT_S24_NE, AOUT_FMT_S24_IE,             Swap24 },
+    { AOUT_FMT_S24_NE, AOUT_FMT_S16_NE,             S24toS16 },
+    { AOUT_FMT_S24_NE, AOUT_FMT_S16_IE,             S24toS16Invert },
+
     /* From s16 */
     { AOUT_FMT_S16_NE, VLC_FOURCC('f','l','3','2'), S16toFloat32 },
-    { AOUT_FMT_S16_NE, AOUT_FMT_S16_IE,            Swap16 },
-    { AOUT_FMT_S16_NE, AOUT_FMT_U16_IE,            S16toU16 },
+    { AOUT_FMT_S16_NE, AOUT_FMT_S24_NE,             S16toS24 },
+    { AOUT_FMT_S16_NE, AOUT_FMT_S24_IE,             S16toS24Invert },
+    { AOUT_FMT_S16_NE, AOUT_FMT_S16_IE,             Swap16 },
+    { AOUT_FMT_S16_NE, AOUT_FMT_U16_IE,             S16toU16 },
     { AOUT_FMT_S16_NE, VLC_FOURCC('s','8',' ',' '), S16toS8 },
     { AOUT_FMT_S16_NE, VLC_FOURCC('u','8',' ',' '), S16toU8 },
 
     /* From u16 */
     { AOUT_FMT_U16_NE, VLC_FOURCC('f','l','3','2'), U16toFloat32 },
-    { AOUT_FMT_U16_NE, AOUT_FMT_U16_IE,            Swap16 },
-    { AOUT_FMT_U16_NE, AOUT_FMT_S16_IE,            U16toS16 },
+    { AOUT_FMT_U16_NE, AOUT_FMT_U16_IE,             Swap16 },
+    { AOUT_FMT_U16_NE, AOUT_FMT_S16_IE,             U16toS16 },
     { AOUT_FMT_U16_NE, VLC_FOURCC('s','8',' ',' '), U16toS8 },
     { AOUT_FMT_U16_NE, VLC_FOURCC('u','8',' ',' '), U16toU8 },
 
@@ -141,17 +168,25 @@ static struct
     { VLC_FOURCC('u','8',' ',' '), AOUT_FMT_U16_IE,             U8toU16Invert },
     { VLC_FOURCC('u','8',' ',' '), VLC_FOURCC('s','8',' ',' '), U8toS8 },
 
+    /* From s24 invert */
+    { AOUT_FMT_S24_IE, VLC_FOURCC('f','l','3','2'), S24InverttoFloat32 },
+    { AOUT_FMT_S24_IE, AOUT_FMT_S24_NE,             Swap24 },
+    { AOUT_FMT_S24_IE, AOUT_FMT_S16_NE,             S24InverttoS16 },
+    { AOUT_FMT_S24_IE, AOUT_FMT_S16_IE,             S24InverttoS16Invert },
+
     /* From s16 invert */
     { AOUT_FMT_S16_IE, VLC_FOURCC('f','l','3','2'), S16InverttoFloat32 },
-    { AOUT_FMT_S16_IE, AOUT_FMT_S16_NE,            Swap16 },
-    { AOUT_FMT_S16_IE, AOUT_FMT_U16_NE,            S16InverttoU16 },
+    { AOUT_FMT_S16_IE, AOUT_FMT_S24_NE,             S16InverttoS24 },
+    { AOUT_FMT_S16_IE, AOUT_FMT_S24_IE,             S16InverttoS24Invert },
+    { AOUT_FMT_S16_IE, AOUT_FMT_S16_NE,             Swap16 },
+    { AOUT_FMT_S16_IE, AOUT_FMT_U16_NE,             S16InverttoU16 },
     { AOUT_FMT_S16_IE, VLC_FOURCC('s','8',' ',' '), S16InverttoS8 },
     { AOUT_FMT_S16_IE, VLC_FOURCC('u','8',' ',' '), S16InverttoU8 },
 
     /* From u16 invert */
     { AOUT_FMT_U16_IE, VLC_FOURCC('f','l','3','2'), U16InverttoFloat32 },
-    { AOUT_FMT_U16_IE, AOUT_FMT_U16_NE,            Swap16 },
-    { AOUT_FMT_U16_IE, AOUT_FMT_S16_NE,            U16InverttoS16 },
+    { AOUT_FMT_U16_IE, AOUT_FMT_U16_NE,             Swap16 },
+    { AOUT_FMT_U16_IE, AOUT_FMT_S16_NE,             U16InverttoS16 },
     { AOUT_FMT_U16_IE, VLC_FOURCC('s','8',' ',' '), U16InverttoS8 },
     { AOUT_FMT_U16_IE, VLC_FOURCC('u','8',' ',' '), U16InverttoU8 },
 
@@ -199,6 +234,34 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Convert a buffer
  *****************************************************************************/
+static block_t *Float32toS24( filter_t *p_filter, block_t *p_block )
+{
+    int i;
+    float *p_in = (float *)p_block->p_buffer;
+    uint8_t *p_out = (uint8_t *)p_in;
+    int32_t out;
+
+    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    {
+        if ( *p_in >= 1.0 ) out = 8388607;
+        else if ( *p_in < -1.0 ) out = -8388608;
+        else out = *p_in * 8388608.0;
+
+#ifdef WORDS_BIGENDIAN
+	*((int16_t *)p_out) = out >> 8;
+	p_out[2] = out & 0xFF;
+#else
+	*((int16_t *)(p_out+1)) = out >> 8;
+	p_out[0] = out & 0xFF;
+#endif
+
+        p_in++; p_out += 3;
+    }
+
+    p_block->i_buffer = p_block->i_buffer * 3 / 4;
+    return p_block;
+}
+
 static block_t *Float32toS16( filter_t *p_filter, block_t *p_block )
 {
     int i;
@@ -242,6 +305,69 @@ static block_t *Float32toU16( filter_t *p_filter, block_t *p_block )
     }
 
     p_block->i_buffer /= 2;
+    return p_block;
+}
+
+static block_t *S24toFloat32( filter_t *p_filter, block_t *p_block )
+{
+    block_t *p_block_out;
+    uint8_t *p_in;
+    float *p_out;
+    int i;
+
+    p_block_out =
+        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*4/3 );
+    if( !p_block_out )
+    {
+        msg_Warn( p_filter, "can't get output buffer" );
+        return NULL;
+    }
+
+    p_in = p_block->p_buffer;
+    p_out = (float *)p_block_out->p_buffer;
+
+    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    {
+#ifdef WORDS_BIGENDIAN
+        *p_out = ((float)( (((int32_t)*(int16_t *)(p_in)) << 8) + p_in[2]))
+#else
+        *p_out = ((float)( (((int32_t)*(int16_t *)(p_in+1)) << 8) + p_in[0]))
+#endif
+            / 8388608.0;
+
+        p_in += 3; p_out++;
+    }
+
+    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_dts = p_block->i_dts;
+    p_block_out->i_pts = p_block->i_pts;
+    p_block_out->i_length = p_block->i_length;
+    p_block_out->i_rate = p_block->i_rate;
+
+    p_block->pf_release( p_block );
+    return p_block_out;
+}
+
+static block_t *S24toS16( filter_t *p_filter, block_t *p_block )
+{
+    int i;
+    uint8_t *p_in = (uint8_t *)p_block->p_buffer;
+    uint8_t *p_out = (uint8_t *)p_in;
+
+    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    {
+#ifdef WORDS_BIGENDIAN
+        *p_out++ = *p_in++;
+        *p_out++ = *p_in++;
+        p_in++;
+#else
+        p_in++;
+        *p_out++ = *p_in++;
+        *p_out++ = *p_in++;
+#endif
+    }
+
+    p_block->i_buffer = p_block->i_buffer * 2 / 3;
     return p_block;
 }
 
@@ -311,6 +437,46 @@ static block_t *U16toFloat32( filter_t *p_filter, block_t *p_block )
     for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
     {
         *p_out++ = (float)(*p_in++ - 32768) / 32768.0;
+    }
+
+    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_dts = p_block->i_dts;
+    p_block_out->i_pts = p_block->i_pts;
+    p_block_out->i_length = p_block->i_length;
+    p_block_out->i_rate = p_block->i_rate;
+
+    p_block->pf_release( p_block );
+    return p_block_out;
+}
+
+static block_t *S16toS24( filter_t *p_filter, block_t *p_block )
+{
+    block_t *p_block_out;
+    uint8_t *p_in, *p_out;
+    int i;
+
+    p_block_out =
+        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*3/2 );
+    if( !p_block_out )
+    {
+        msg_Warn( p_filter, "can't get output buffer" );
+        return NULL;
+    }
+
+    p_in = (uint8_t *)p_block->p_buffer;
+    p_out = (uint8_t *)p_block_out->p_buffer;
+
+    for( i = p_block->i_buffer*8/p_filter->fmt_in.audio.i_bitspersample; i--; )
+    {
+#ifdef WORDS_BIGENDIAN
+        *p_out++ = *p_in++;
+        *p_out++ = *p_in++;
+        *p_out++ = 0;
+#else
+        *p_out++ = 0;
+        *p_out++ = *p_in++;
+        *p_out++ = *p_in++;
+#endif
     }
 
     p_block_out->i_samples = p_block->i_samples;
@@ -545,7 +711,7 @@ static block_t *U8toU16( filter_t *p_filter, block_t *p_block )
 }
 
 /*****************************************************************************
- * Swap a buffer of word
+ * Swap a buffer of words
  *****************************************************************************/
 static block_t *Swap16( filter_t *p_filter, block_t *p_block )
 {
@@ -564,32 +730,58 @@ static block_t *Swap16( filter_t *p_filter, block_t *p_block )
     return p_block;
 }
 
-#define CONVERT_NN( func, f_in, f_out, b_pre_invert, b_post_invert ) \
+static block_t *Swap24( filter_t *p_filter, block_t *p_block )
+{
+    int i;
+    uint8_t *p_in = (uint8_t *)p_block->p_buffer;
+    uint8_t tmp;
+
+    for( i = 0; i < p_block->i_buffer / 3; i++ )
+    {
+        tmp = p_in[0];
+        p_in[0] = p_in[2];
+        p_in[2] = tmp;
+        p_in += 3;
+    }
+
+    return p_block;
+}
+
+#define CONVERT_NN( func, f_in, f_out, b_pre_invert, b_post_invert, swapa, swapb ) \
 static block_t *func( filter_t *p_filter, block_t *p_block ) \
 {                                                   \
     if( b_pre_invert )                              \
-        Swap16( p_filter, p_block );                \
+        swapa( p_filter, p_block );                  \
                                                     \
     p_block = f_in##to##f_out( p_filter, p_block ); \
                                                     \
     if( b_post_invert )                             \
-        Swap16( p_filter, p_block );                \
+        swapb( p_filter, p_block );                  \
                                                     \
     return p_block;                                 \
 }
 
-CONVERT_NN( Float32toS16Invert, Float32, S16, 0, 1 )
-CONVERT_NN( Float32toU16Invert, Float32, U16, 0, 1 )
+CONVERT_NN( Float32toS24Invert, Float32, S24, 0, 1, Swap24, Swap24 )
+CONVERT_NN( Float32toS16Invert, Float32, S16, 0, 1, Swap16, Swap16 )
+CONVERT_NN( Float32toU16Invert, Float32, U16, 0, 1, Swap16, Swap16 )
 
-CONVERT_NN( S16InverttoFloat32, S16, Float32, 1, 0 )
-CONVERT_NN( S16InverttoS8,      S16, S8,      1, 0 )
-CONVERT_NN( S16InverttoU8,      S16, U8,      1, 0 )
-CONVERT_NN( S16InverttoU16,     S16, U16,     1, 0 )
+CONVERT_NN( S24InverttoFloat32, S24, Float32, 1, 0, Swap24, Swap24 )
+CONVERT_NN( S24InverttoS16,     S24, S16,     1, 0, Swap24, Swap16 )
+CONVERT_NN( S24InverttoS16Invert, S24, S16,   1, 1, Swap24, Swap16 )
+CONVERT_NN( S24toS16Invert,     S24, S16,     0, 1, Swap24, Swap16 )
 
-CONVERT_NN( U16InverttoFloat32, U16, Float32, 1, 0 )
-CONVERT_NN( U16InverttoS8,      U16, S8,      1, 0 )
-CONVERT_NN( U16InverttoU8,      U16, U8,      1, 0 )
-CONVERT_NN( U16InverttoS16,     U16, S16,     1, 0 )
+CONVERT_NN( S16InverttoFloat32, S16, Float32, 1, 0, Swap16, Swap16 )
+CONVERT_NN( S16InverttoS24,     S16, S24,     1, 0, Swap16, Swap24 )
+CONVERT_NN( S16toS24Invert,     S16, S24,     0, 1, Swap16, Swap24 )
+CONVERT_NN( S16InverttoS24Invert, S16, S24,   1, 1, Swap16, Swap24 )
+CONVERT_NN( S16InverttoS8,      S16, S8,      1, 0, Swap16, Swap16 )
+CONVERT_NN( S16InverttoU8,      S16, U8,      1, 0, Swap16, Swap16 )
+CONVERT_NN( S16InverttoU16,     S16, U16,     1, 0, Swap16, Swap16 )
+
+CONVERT_NN( U16InverttoFloat32, U16, Float32, 1, 0, Swap16, Swap16 )
+CONVERT_NN( U16InverttoS8,      U16, S8,      1, 0, Swap16, Swap16 )
+CONVERT_NN( U16InverttoU8,      U16, U8,      1, 0, Swap16, Swap16 )
+CONVERT_NN( U16InverttoS16,     U16, S16,     1, 0, Swap16, Swap16 )
 
 #undef CONVERT_NN
 
@@ -615,6 +807,3 @@ CONVERT_INDIRECT( U8toU16Invert, U8,      U16, U16Invert )
 CONVERT_INDIRECT( S8toS16Invert, S8,      S16, S16Invert )
 
 #undef CONVERT_INDIRECT
-
-
-

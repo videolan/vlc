@@ -1,7 +1,7 @@
 /*****************************************************************************
  * audio_output.h : audio output interface
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -40,9 +40,11 @@
 #ifdef WORDS_BIGENDIAN
 #   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','b')
 #   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','b')
+#   define AOUT_FMT_S24_NE VLC_FOURCC('s','2','4','b')
 #else
 #   define AOUT_FMT_S16_NE VLC_FOURCC('s','1','6','l')
 #   define AOUT_FMT_U16_NE VLC_FOURCC('u','1','6','l')
+#   define AOUT_FMT_S24_NE VLC_FOURCC('s','2','4','l')
 #endif
 
 #define AOUT_FMT_NON_LINEAR( p_format )                                    \

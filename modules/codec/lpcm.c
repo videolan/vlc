@@ -1,13 +1,13 @@
 /*****************************************************************************
  * lpcm.c: lpcm decoder/packetizer module
  *****************************************************************************
- * Copyright (C) 1999-2003 VideoLAN
+ * Copyright (C) 1999-2005 VideoLAN
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -118,7 +118,16 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
-    p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
+
+    if( p_dec->fmt_out.audio.i_bitspersample == 24 )
+    {
+        p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','b');
+    }
+    else
+    {
+        p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
+        p_dec->fmt_out.audio.i_bitspersample = 16;
+    }
 
     /* Set callback */
     p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
@@ -154,7 +163,7 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t       *p_block;
     unsigned int  i_rate = 0, i_original_channels = 0, i_channels = 0;
-    int           i_frame_length;
+    int           i_frame_length, i_bitspersample;
     uint8_t       i_header;
 
     if( !pp_block || !*pp_block ) return NULL;
@@ -242,6 +251,26 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         break;
     }
 
+    switch ( (i_header >> 6) & 0x3 )
+    {
+    case 2:
+        p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','b');
+        p_dec->fmt_out.audio.i_bitspersample = 24;
+        i_bitspersample = 24;
+        break;
+    case 1:
+        p_dec->fmt_out.i_codec = VLC_FOURCC('s','2','4','b');
+        p_dec->fmt_out.audio.i_bitspersample = 24;
+        i_bitspersample = 20;
+        break;
+    case 0:
+    default:
+        p_dec->fmt_out.i_codec = VLC_FOURCC('s','1','6','b');
+        p_dec->fmt_out.audio.i_bitspersample = 16;
+        i_bitspersample = 16;
+        break;
+    }
+
     /* Check frame sync and drop it. */
     if( p_block->p_buffer[5] != 0x80 )
     {
@@ -263,10 +292,11 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         = i_original_channels & AOUT_CHAN_PHYSMASK;
 
     i_frame_length = (p_block->i_buffer - LPCM_HEADER_LEN) /
-        ( p_dec->fmt_out.audio.i_channels * 2 );
+        p_dec->fmt_out.audio.i_channels * 8 / i_bitspersample;
 
     if( p_sys->b_packetizer )
     {
+        p_dec->fmt_out.i_codec = VLC_FOURCC('l','p','c','m');
         p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
         p_block->i_length =
             aout_DateIncrement( &p_sys->end_date, i_frame_length ) -
@@ -285,9 +315,71 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         p_aout_buffer->end_date =
             aout_DateIncrement( &p_sys->end_date, i_frame_length );
 
-        memcpy( p_aout_buffer->p_buffer,
-                p_block->p_buffer + LPCM_HEADER_LEN,
-                p_block->i_buffer - LPCM_HEADER_LEN );
+        p_block->p_buffer += LPCM_HEADER_LEN;
+        p_block->i_buffer -= LPCM_HEADER_LEN;
+
+        /* 20/24 bits LPCM use special packing */
+        if( i_bitspersample == 24 )
+        {
+            uint8_t *p_out = p_aout_buffer->p_buffer;
+
+            while( p_block->i_buffer / 12 )
+            {
+                /* Sample 1 */
+                p_out[0] = p_block->p_buffer[0];
+                p_out[1] = p_block->p_buffer[1];
+                p_out[2] = p_block->p_buffer[8];
+                /* Sample 2 */
+                p_out[3] = p_block->p_buffer[2];
+                p_out[4] = p_block->p_buffer[3];
+                p_out[5] = p_block->p_buffer[9];
+                /* Sample 3 */
+                p_out[6] = p_block->p_buffer[4];
+                p_out[7] = p_block->p_buffer[5];
+                p_out[8] = p_block->p_buffer[10];
+                /* Sample 4 */
+                p_out[9] = p_block->p_buffer[6];
+                p_out[10] = p_block->p_buffer[7];
+                p_out[11] = p_block->p_buffer[11];
+
+                p_block->i_buffer -= 12;
+                p_block->p_buffer += 12;
+                p_out += 12;
+            }
+        }
+        else if( i_bitspersample == 20 )
+        {
+            uint8_t *p_out = p_aout_buffer->p_buffer;
+
+            while( p_block->i_buffer / 10 )
+            {
+                /* Sample 1 */
+                p_out[0] = p_block->p_buffer[0];
+                p_out[1] = p_block->p_buffer[1];
+                p_out[2] = p_block->p_buffer[8] & 0xF0;
+                /* Sample 2 */
+                p_out[3] = p_block->p_buffer[2];
+                p_out[4] = p_block->p_buffer[3];
+                p_out[5] = p_block->p_buffer[8] << 4;
+                /* Sample 3 */
+                p_out[6] = p_block->p_buffer[4];
+                p_out[7] = p_block->p_buffer[5];
+                p_out[8] = p_block->p_buffer[9] & 0xF0;
+                /* Sample 4 */
+                p_out[9] = p_block->p_buffer[6];
+                p_out[10] = p_block->p_buffer[7];
+                p_out[11] = p_block->p_buffer[9] << 4;
+
+                p_block->i_buffer -= 10;
+                p_block->p_buffer += 10;
+                p_out += 12;
+            }
+        }
+        else
+        {
+            memcpy( p_aout_buffer->p_buffer,
+                    p_block->p_buffer, p_block->i_buffer );
+        }
 
         block_Release( p_block );
         return p_aout_buffer;

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * common.c : audio output management of common data structures
  *****************************************************************************
- * Copyright (C) 2002-2004 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -127,6 +127,13 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
     case VLC_FOURCC('u','1','6','b'):
     case VLC_FOURCC('s','1','6','b'):
         i_result = 2;
+        break;
+
+    case VLC_FOURCC('u','2','4','l'):
+    case VLC_FOURCC('s','2','4','l'):
+    case VLC_FOURCC('u','2','4','b'):
+    case VLC_FOURCC('s','2','4','b'):
+        i_result = 3;
         break;
 
     case VLC_FOURCC('f','l','3','2'):

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * s16tofloat32.c : converter from signed 16 bits integer to float32
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
+ * Copyright (C) 2002-2005 VideoLAN
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -38,6 +38,8 @@ static int  Create    ( vlc_object_t * );
 
 static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
                         aout_buffer_t * );
+static void DoWork24  ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
+                        aout_buffer_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -59,7 +61,8 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != AOUT_FMT_S16_NE
+    if ( ( p_filter->input.i_format != AOUT_FMT_S16_NE &&
+           p_filter->input.i_format != AOUT_FMT_S24_NE )
           || p_filter->output.i_format != VLC_FOURCC('f','l','3','2') )
     {
         return -1;
@@ -70,7 +73,11 @@ static int Create( vlc_object_t *p_this )
         return -1;
     }
 
-    p_filter->pf_do_work = DoWork;
+    if( p_filter->input.i_format == AOUT_FMT_S24_NE )
+        p_filter->pf_do_work = DoWork24;
+    else
+        p_filter->pf_do_work = DoWork;
+
     p_filter->b_in_place = VLC_TRUE;
 
     return 0;
@@ -109,3 +116,27 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 2;
 }
 
+static void DoWork24( aout_instance_t * p_aout, aout_filter_t * p_filter,
+                      aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+{
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+
+    /* We start from the end because b_in_place is true */
+    uint8_t * p_in = (uint8_t *)p_in_buf->p_buffer + (i - 1) * 3;
+    float * p_out = (float *)p_out_buf->p_buffer + i - 1;
+
+    while( i-- )
+    {
+#ifdef WORDS_BIGENDIAN
+        *p_out = ((float)( (((int32_t)*(int16_t *)(p_in)) << 8) + p_in[2]))
+#else
+        *p_out = ((float)( (((int32_t)*(int16_t *)(p_in+1)) << 8) + p_in[0]))
+#endif
+            / 8388608.0;
+
+        p_in -= 3; p_out--;
+    }
+
+    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 3;
+}
