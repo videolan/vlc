@@ -41,6 +41,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/stat.h>                        /* on BSD, fstat() needs stat.h */
 #include <sys/uio.h>                                            /* "input.h" */
@@ -50,9 +52,9 @@
 #include <fcntl.h>                                                 /* open() */
 
 /* Common headers */
-#include "threads.h"
 #include "config.h"
 #include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "debug.h"
 #include "plugins.h"

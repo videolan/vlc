@@ -26,6 +26,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <errno.h>                                                  /* errno */
 #include <fcntl.h>                     /* O_CREAT, O_TRUNC, O_WRONLY, O_SYNC */
 #include <stdio.h>                                               /* required */
@@ -34,9 +36,9 @@
 #include <string.h>                                            /* strerror() */
 #include <unistd.h>                                      /* close(), write() */
 
-#include "threads.h"
 #include "config.h"
 #include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
 #include "intf_msg.h"

@@ -27,14 +27,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <errno.h>                                                  /* errno */
 #include <stdio.h>                                                   /* FILE */
 #include <stdlib.h>                                    /* strtod(), strtol() */
 #include <string.h>                                            /* strerror() */
 
-#include "threads.h"
 #include "config.h"
 #include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
 

@@ -25,14 +25,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
 #include <stdlib.h>                              /* atoi(), malloc(), free() */
 #include <netinet/in.h>                                           /* ntohl() */
 
-#include "threads.h"
 #include "config.h"
 #include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "debug.h"
 #include "input.h"

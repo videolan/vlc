@@ -24,14 +24,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <errno.h>                                                  /* errno */
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 #include <fcntl.h>                                                 /* open() */
 #include <unistd.h>                                       /* read(), close() */
 
-#include "common.h"
 #include "config.h"
+#include "common.h"
 #include "video_text.h"
 
 #include "intf_msg.h"

@@ -27,14 +27,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                          /* for input.h */
 #include <unistd.h>                                              /* getpid() */
 
-#include "threads.h"
 #include "config.h"
 #include "common.h"
+#include "threads.h"
 #include "mtime.h"
 
 #include "intf_msg.h"

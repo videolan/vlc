@@ -27,14 +27,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                            /* strerror() */
 
-#include "threads.h"
-#include "common.h"
 #include "config.h"
+#include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
 #include "video.h"

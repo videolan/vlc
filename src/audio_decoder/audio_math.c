@@ -24,14 +24,16 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
 
-#include "threads.h"
 #include "config.h"
 #include "common.h"
+#include "threads.h"
 #include "mtime.h"                                                /* mtime_t */
 #include "plugins.h"
 

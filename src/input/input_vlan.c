@@ -24,6 +24,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */
 #include <unistd.h>                                               /* close() */
@@ -44,9 +46,9 @@
 #include <net/if.h>                            /* interface (arch-dependent) */
 #endif
 
-#include "threads.h"
 #include "config.h"
 #include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "netutils.h"
 #include "input_vlan.h"

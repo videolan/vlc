@@ -339,6 +339,7 @@ clean:
 
 distclean: clean
 	rm -f **/*.o **/*.so **/*~ *.log
+	rm -f Makefile include/defs.h config.cache config.log
 	rm -f vlc gmon.out core
 	rm -rf .dep
 

@@ -20,6 +20,7 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  *****************************************************************************/
+#include "defs.h"
 
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
@@ -42,12 +43,8 @@ int RequestPlugin ( plugin_id_t * p_plugin, char * psz_mask, char * psz_name )
     char * psz_plugin;
     char * psz_plugin_path[ PLUGIN_PATH_COUNT ] =
     {
-        ".",
-        PLUGIN_PATH,
-        /* these ones should disappear */
-        "./audio_output",
-        "./video_output",
-        "./interface"
+        ".", PLUGIN_PATH,
+        "plugins/aout", "plugins/vout", "plugins/intf" /* these ones should disappear */
     };
 
     i_length = strlen( psz_mask ) + strlen( psz_name );

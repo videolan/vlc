@@ -25,6 +25,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
 #include <string.h>                                            /* strerror() */
@@ -39,9 +41,9 @@
 #include <netdb.h>     /* servent, getservbyname(), hostent, gethostbyname() */
 #include <netinet/in.h>                     /* sockaddr_in, htons(), htonl() */
 
-#include "threads.h"
-#include "common.h"
 #include "config.h"
+#include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "netutils.h"
 

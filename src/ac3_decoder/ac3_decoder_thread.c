@@ -33,6 +33,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <unistd.h>                                              /* getpid() */
 
 #include <stdio.h>                                           /* "intf_msg.h" */
@@ -40,9 +42,9 @@
 #include <sys/types.h>                        /* on BSD, uio.h needs types.h */
 #include <sys/uio.h>                                            /* "input.h" */
 
-#include "threads.h"
-#include "common.h"
 #include "config.h"
+#include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
 #include "debug.h"                                      /* "input_netlist.h" */

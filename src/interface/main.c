@@ -26,6 +26,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <signal.h>                               /* SIGHUP, SIGINT, SIGKILL */
 #include <getopt.h>                                              /* getopt() */
 #include <stdio.h>                                              /* sprintf() */
@@ -34,9 +36,9 @@
 #include <stdlib.h>                                  /* getenv(), strtol(),  */
 #include <string.h>                                            /* strerror() */
 
-#include "threads.h"
 #include "config.h"
 #include "common.h"
+#include "threads.h"
 #include "mtime.h"
 #include "plugins.h"
 #include "input_vlan.h"

@@ -30,6 +30,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#include "defs.h"
+
 #include <stdio.h>                                              /* sprintf() */
 #include <unistd.h>                                              /* select() */
 #include <sys/time.h>
@@ -38,6 +40,7 @@
 #include <kernel/OS.h>
 #endif
 
+#include "config.h"
 #include "common.h"
 #include "mtime.h"
 
