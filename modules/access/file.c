@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.16 2003/04/02 15:20:12 massiot Exp $
+ * $Id: file.c,v 1.17 2003/04/02 23:16:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -78,6 +78,7 @@ vlc_module_begin();
     set_capability( "access", 50 );
     add_shortcut( "file" );
     add_shortcut( "stream" );
+    add_shortcut( "kfir" );
     set_callbacks( Open, Close );
 vlc_module_end();
  
@@ -90,6 +91,7 @@ typedef struct _input_socket_s
     input_socket_t      _socket;
 
     unsigned int        i_nb_reads;
+    vlc_bool_t          b_kfir;
 } _input_socket_t;
 
 /*****************************************************************************
@@ -104,7 +106,7 @@ static int Open( vlc_object_t *p_this )
     struct stat         stat_info;
 #endif
     _input_socket_t *   p_access_data;
-    vlc_bool_t          b_stdin;
+    vlc_bool_t          b_stdin, b_kfir = 0;
 
     p_input->i_mtu = 0;
 
@@ -136,6 +138,15 @@ static int Open( vlc_object_t *p_this )
         p_input->stream.b_pace_control = 0;
         p_input->stream.b_seekable = 0;
         p_input->stream.p_selected_area->i_size = 0;
+    }
+    else if( *p_input->psz_access &&
+             !strncmp( p_input->psz_access, "kfir", 7 ) )
+    {
+        /* stream:%s */
+        p_input->stream.b_pace_control = 0;
+        p_input->stream.b_seekable = 0;
+        p_input->stream.p_selected_area->i_size = 0;
+        b_kfir = 1;
     }
     else
     {
@@ -192,6 +203,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_access_data->i_nb_reads = 0;
+    p_access_data->b_kfir = b_kfir;
     if( b_stdin )
     {
         p_access_data->_socket.i_handle = 0;
@@ -280,46 +292,64 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         i_ret = -1;
     }
 #else
-#   ifndef WIN32
+#ifndef WIN32
     if ( !p_input->stream.b_pace_control )
     {
-        /* Find if some data is available. This won't work under Windows. */
-        struct timeval  timeout;
-        fd_set          fds;
-
-        /* Initialize file descriptor set */
-        FD_ZERO( &fds );
-        FD_SET( p_access_data->_socket.i_handle, &fds );
-
-        /* We'll wait 0.5 second if nothing happens */
-        timeout.tv_sec = 0;
-        timeout.tv_usec = 500000;
-
-        /* Find if some data is available */
-        while( (i_ret = select( p_access_data->_socket.i_handle + 1, &fds,
-                                NULL, NULL, &timeout )) == 0
-                || (i_ret < 0 && errno == EINTR) )
+        if ( !p_access_data->b_kfir )
         {
+            /* Find if some data is available. This won't work under Windows. */
+            struct timeval  timeout;
+            fd_set          fds;
+
+            /* Initialize file descriptor set */
             FD_ZERO( &fds );
             FD_SET( p_access_data->_socket.i_handle, &fds );
+
+            /* We'll wait 0.5 second if nothing happens */
             timeout.tv_sec = 0;
             timeout.tv_usec = 500000;
 
-            if( p_input->b_die || p_input->b_error )
+            /* Find if some data is available */
+            while( (i_ret = select( p_access_data->_socket.i_handle + 1, &fds,
+                                    NULL, NULL, &timeout )) == 0
+                    || (i_ret < 0 && errno == EINTR) )
             {
-                return 0;
+                FD_ZERO( &fds );
+                FD_SET( p_access_data->_socket.i_handle, &fds );
+                timeout.tv_sec = 0;
+                timeout.tv_usec = 500000;
+
+                if( p_input->b_die || p_input->b_error )
+                {
+                    return 0;
+                }
+            }
+
+            if( i_ret < 0 )
+            {
+                msg_Err( p_input, "select error (%s)", strerror(errno) );
+                return -1;
+            }
+
+            i_ret = read( p_access_data->_socket.i_handle, p_buffer, i_len );
+        }
+        else
+        {
+            /* b_kfir ; work around a buggy poll() driver implementation */
+            while ( (i_ret = read( p_access_data->_socket.i_handle, p_buffer,
+                                   i_len )) == 0 &&
+                      !p_input->b_die && !p_input->b_error )
+            {
+                msleep(INPUT_ERROR_SLEEP);
             }
         }
-
-        if( i_ret < 0 )
-        {
-            msg_Err( p_input, "network select error (%s)", strerror(errno) );
-            return -1;
-        }
     }
+    else
 #   endif
-
-    i_ret = read( p_access_data->_socket.i_handle, p_buffer, i_len );
+    {
+        /* b_pace_control || WIN32 */
+        i_ret = read( p_access_data->_socket.i_handle, p_buffer, i_len );
+    }
 #endif
 
     if( i_ret < 0 )
