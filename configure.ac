@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.56 2003/08/12 08:19:20 sam Exp $
+dnl $Id: configure.ac,v 1.57 2003/08/13 14:17:25 zorglub Exp $
 
 AC_INIT(vlc,0.6.2)
 
@@ -2829,11 +2829,12 @@ then
   [    --with-slp=PATH       libslp headers and libraries])
   if test -z "${with_slp}"
   then
-    AC_CHECK_HEADER(slp.h, have_slp="true", have_slp="false")
+    AC_CHECK_HEADERS(slp.h, have_slp="true", have_slp="false")
     if test "${have_slp}" = "true"
     then
       AX_ADD_PLUGINS([slp])
       AX_ADD_LDFLAGS([slp],[-lslp])
+      AX_ADD_LDFLAGS([vlc],[-lslp])
     fi
   else
     AC_MSG_CHECKING(for slp headers in ${with_slp})
@@ -2843,7 +2844,9 @@ then
       AC_MSG_RESULT(yes)
       AX_ADD_PLUGINS([slp])
       AX_ADD_LDFLAGS([slp],[-L${with_slp} -lslp])
+      AX_ADD_LDFLAGS([vlc],[-L${with_slp} -lslp])
       AX_ADD_CPPFLAGS([slp],[-I${with_slp}])
+      AC_DEFINE(HAVE_SLP_H)
     else
       dnl  No libslp could be found, sorry
       AC_MSG_RESULT(no)

@@ -2,7 +2,7 @@
  * standard.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: standard.c,v 1.8 2003/07/07 15:50:43 gbazin Exp $
+ * $Id: standard.c,v 1.9 2003/08/13 14:17:26 zorglub Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -58,6 +58,7 @@ vlc_module_end();
 struct sout_stream_sys_t
 {
     sout_mux_t           *p_mux;
+    slp_session_t        *p_slp;
     sap_session_t        *p_sap;
 };
 
@@ -75,8 +76,10 @@ static int Open( vlc_object_t *p_this )
     char *psz_url      = sout_cfg_find_value( p_stream->p_cfg, "url" );
     char *psz_ipv      = sout_cfg_find_value( p_stream->p_cfg, "sap_ipv" );
     char *psz_v6_scope = sout_cfg_find_value( p_stream->p_cfg, "sap_v6scope" );
+    
     sout_cfg_t *p_sap_cfg = sout_cfg_find( p_stream->p_cfg, "sap" );
-
+    sout_cfg_t *p_slp_cfg = sout_cfg_find( p_stream->p_cfg, "slp" );
+    
     sout_access_out_t   *p_access;
     sout_mux_t          *p_mux;    
 
@@ -128,6 +131,33 @@ static int Open( vlc_object_t *p_this )
             msg_Err( p_sout,"Unable to initialize SAP. SAP disabled");
     }   
 
+    /* *** Register with slp *** */
+    #ifdef HAVE_SLP_H
+    if( p_slp_cfg && ( strstr( psz_access, "udp" ) ||
+                       strstr( psz_access ,  "rtp" ) ) )
+    {
+        p_sys->p_slp = NULL ;
+        msg_Info( p_this, "SLP Enabled");
+        if( sout_SLPReg( p_sout, psz_url, 
+            p_slp_cfg->psz_value ? p_slp_cfg->psz_value : psz_url) )
+        {
+           msg_Warn( p_sout, "SLP Registering failed");
+        }
+        else
+        {
+            p_sys->p_slp = (slp_session_t*)malloc(sizeof(slp_session_t));
+            if(!p_sys->p_slp)
+            {
+                msg_Warn(p_sout,"Out of memory");
+                return -1;        
+            }
+            p_sys->p_slp->psz_url= strdup(psz_url);
+            p_sys->p_slp->psz_name = strdup(
+                    p_slp_cfg->psz_value ? p_slp_cfg->psz_value : psz_url);
+        }
+    }        
+    #endif
+    
     /* XXX beurk */
     p_sout->i_preheader = __MAX( p_sout->i_preheader, p_mux->i_preheader );
 
@@ -155,6 +185,17 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->p_sap )
         sout_SAPDelete( (sout_instance_t *)p_this , p_sys->p_sap ); 
 
+    #ifdef HAVE_SLP_H
+    if( p_sys->p_slp )
+    {
+            sout_SLPDereg( (sout_instance_t *)p_this, 
+                        p_sys->p_slp->psz_url,
+                        p_sys->p_slp->psz_name);
+            free( p_sys->p_slp);
+    }
+    #endif
+    
+    
     sout_MuxDelete( p_sys->p_mux );
     sout_AccessOutDelete( p_access );
 
