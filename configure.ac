@@ -279,9 +279,9 @@ VLC_LIBRARY_SUFFIX
 
 case "${SYS}" in
   mingw32|cygwin)
-    VLC_ADD_CFLAGS([pic plugin mozilla],[${CFLAGS_mingw32_special}])
-    VLC_ADD_CXXFLAGS([pic plugin mozilla],[${CFLAGS_mingw32_special} ${CXXFLAGS_mingw32_special}])
-    VLC_ADD_OBJCFLAGS([pic plugin mozilla],[${CFLAGS_mingw32_special}])
+    VLC_ADD_CFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special}])
+    VLC_ADD_CXXFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special} ${CXXFLAGS_mingw32_special}])
+    VLC_ADD_OBJCFLAGS([pic plugin mozilla activex],[${CFLAGS_mingw32_special}])
     ;;
   *)
     VLC_ADD_CFLAGS([pic plugin mozilla],[-fpic -fPIC])
@@ -3916,6 +3916,30 @@ then
 fi
 
 dnl
+dnl  Microsoft ActiveX support
+dnl
+AC_ARG_VAR(MIDL, [Microsoft IDL compiler (Win32 platform only)])
+AC_ARG_ENABLE(activex,
+  [  --enable-activex        build a vlc-based ActiveX control (default enabled on Win32)])
+if test "${enable_activex}" != "no"
+then
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
+  then
+    AC_CHECK_PROG(MIDL, midl, :)
+    AM_CONDITIONAL(HAS_MIDL_COMPILER, test -n "${MIDL}")
+    AC_CHECK_HEADERS(ole2.h olectl.h,
+      [ VLC_ADD_CXXFLAGS([activex],[-fno-exceptions])
+        VLC_ADD_LDFLAGS([activex],[-lole32 -loleaut32 -luuid]) 
+        AC_CHECK_HEADERS(objsafe.h,
+          VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER])
+        )
+      ],
+      [ AC_MSG_ERROR([required OLE headers are missing from your system]) ]
+    )
+  fi
+fi
+
+dnl
 dnl  Mozilla plugin
 dnl
 mozilla=false
@@ -4145,6 +4169,7 @@ VLC_OUTPUT_VLC_CONFIG_IN
 
 AC_CONFIG_FILES([
   Makefile
+  activex/Makefile
   debian/Makefile
   doc/Makefile
   intl/Makefile

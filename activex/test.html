@@ -1,0 +1,57 @@
+<HTML>
+<TITLE>VLC ActiveX plugin test page</TITLE>
+<BODY>
+<SCRIPT LANGUAGE="JScript">
+<!--
+function go(targetURL)
+{
+	var options = new Array(":input-repeat");
+	document.vlc.addTarget(targetURL, options, 4+8, -666);
+};
+//-->
+</SCRIPT>
+<TABLE>
+<TR><TD>
+MRL:
+<INPUT size="80" name="targetTextField" value="">
+<INPUT type=submit value="Go" onClick="go(targetTextField.value);">
+</TD></TR>
+<TR><TD>
+<OBJECT classid="clsid:E23FE9C6-778E-49D4-B537-38FCDE4887D8"
+        width="640" height="480" id="vlc" events="True">
+<param name="Src" value="" />
+<param name="ShowDisplay" value="True" />
+<param name="Loop" value="False" />
+<param name="AutoPlay" value="False" />
+</OBJECT>
+<SCRIPT LANGUAGE="JScript">
+<!--
+function vlc::OnPlay()
+{
+	alert("Playing");
+};
+function vlc::OnPause()
+{
+	alert("Paused");
+};
+function vlc::OnStop()
+{
+	alert("Stopped");
+};
+//-->
+</SCRIPT>
+</TD></TR>
+<TR><TD>
+<INPUT type=submit value="Play" onClick='document.vlc.play();'>
+<INPUT type=submit value="Pause" onClick='document.vlc.pause();'>
+<INPUT type=submit value="Stop" onClick='document.vlc.stop();'>
+<INPUT type=submit value=" << " onClick='document.vlc.playSlower();'>
+<INPUT type=submit value=" >> " onClick='document.vlc.playFaster();'>
+<INPUT type=submit value="Mute" onClick='document.vlc.toggleMute();'>
+<INPUT type=submit value="Show" onClick='document.vlc.Visible = true;'>
+<INPUT type=submit value="Hide" onClick='document.vlc.Visible = false;'>
+<INPUT type=submit value="Version" onClick='alert(document.vlc.VersionInfo);'>
+</TD></TR>
+</TABLE>
+</BODY>
+</HTML>

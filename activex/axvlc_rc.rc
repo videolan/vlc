@@ -1,0 +1,36 @@
+#ifndef VERSION_NUMBER
+#define VERSION_NUMBER 0,0,0,0
+#endif
+#ifndef VERSION
+#define VERSION 0.0.0
+#endif
+
+#define STRINGIFY( z ) UGLY_KLUDGE( z )
+#define UGLY_KLUDGE( z ) #z
+
+1 VERSIONINFO
+FILETYPE 1
+FILEOS 4
+PRODUCTVERSION VERSION_NUMBER
+FILEVERSION VERSION_NUMBER
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName", "VideoLAN Team"
+      VALUE "FileVersion", STRINGIFY( VERSION )
+      VALUE "FileDescription", "VLC media player"
+      VALUE "LegalCopyright", "(c) 1996-2003 VideoLAN"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x409, 1200
+  END
+END
+
+INPLACE-PICT BITMAP DISCARDABLE "inplace.bmp"
+
+1 TYPELIB "axvlc.tlb"
+
