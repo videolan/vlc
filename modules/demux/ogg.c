@@ -2,7 +2,7 @@
  * ogg.c : ogg stream demux module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: ogg.c,v 1.54 2004/02/06 23:43:32 gbazin Exp $
+ * $Id: ogg.c,v 1.55 2004/02/07 00:16:34 gbazin Exp $
  *
  * Author: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1110,6 +1110,8 @@ static void Ogg_EndOfStream( input_thread_t *p_input, demux_sys_t *p_ogg )
         }
         if( p_ogg->pp_stream[i_stream]->p_packets_backup)
             free( p_ogg->pp_stream[i_stream]->p_packets_backup );
+
+        es_format_Free( &p_stream->fmt );
 
         free( p_ogg->pp_stream[i_stream] );
     }

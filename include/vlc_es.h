@@ -2,7 +2,7 @@
  * vlc_es.h: Elementary stream formats descriptions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vlc_es.h,v 1.8 2004/01/30 15:17:39 fenrir Exp $
+ * $Id: vlc_es.h,v 1.9 2004/02/07 00:16:34 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -179,8 +179,10 @@ static inline void es_format_Init( es_format_t *fmt,
 static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
 {
     memcpy( dst, src, sizeof( es_format_t ) );
-    if( src->psz_language )     dst->psz_language = strdup( src->psz_language );
-    if( src->psz_description )  dst->psz_description = strdup( src->psz_description );
+    if( src->psz_language )
+         dst->psz_language = strdup( src->psz_language );
+    if( src->psz_description )
+        dst->psz_description = strdup( src->psz_description );
     if( src->i_extra > 0 )
     {
         dst->p_extra = malloc( src->i_extra );
@@ -192,6 +194,14 @@ static inline void es_format_Copy( es_format_t *dst, es_format_t *src )
         dst->i_extra = 0;
         dst->p_extra = NULL;
     }
+}
+
+static inline void es_format_Free( es_format_t *fmt )
+{
+    if( fmt->psz_language ) free( fmt->psz_language );
+    if( fmt->psz_description ) free( fmt->psz_description );
+    if( fmt->i_extra > 0 ) free( fmt->p_extra );
+    if( fmt->video.p_palette ) free( fmt->video.p_palette );
 }
 
 #endif

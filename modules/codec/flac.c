@@ -2,7 +2,7 @@
  * flac.c: flac decoder/packetizer/encoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flac.c,v 1.7 2004/01/25 18:20:12 bigben Exp $
+ * $Id: flac.c,v 1.8 2004/02/07 00:16:34 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -424,6 +424,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 
         block_Release( p_sys->p_block );
+        p_sys->p_block = NULL;
     }
 
     return p_sys->p_aout_buffer;
@@ -439,6 +440,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 
     FLAC__stream_decoder_finish( p_sys->p_flac );
     FLAC__stream_decoder_delete( p_sys->p_flac );
+    if( p_sys->p_block ) free( p_sys->p_block );
     free( p_sys );
 }
     
