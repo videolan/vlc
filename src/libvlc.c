@@ -649,6 +649,10 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         return VLC_EGENERIC;
     }
 
+    /* Add service discovery modules */
+    playlist_AddSDModules( p_playlist,
+                           config_GetPsz( p_playlist, "services-discovery" ) );
+
     /*
      * Load background interfaces
      */

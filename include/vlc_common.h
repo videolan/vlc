@@ -221,6 +221,8 @@ typedef struct playlist_t playlist_t;
 typedef struct playlist_item_t playlist_item_t;
 typedef struct playlist_view_t playlist_view_t;
 typedef struct playlist_export_t playlist_export_t;
+typedef struct services_discovery_t services_discovery_t;
+typedef struct services_discovery_sys_t services_discovery_sys_t;
 
 /* Modules */
 typedef struct module_bank_t module_bank_t;

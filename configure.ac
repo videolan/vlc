@@ -678,8 +678,9 @@ fi
 dnl Check for hal
 PKG_CHECK_MODULES(HAL, hal >= 0.2.97,
   [AC_DEFINE(HAVE_HAL, [], [Define if you have the HAL library])
-   VLC_ADD_LDFLAGS([vlc],[$HAL_LIBS])
-   VLC_ADD_CFLAGS([vlc],[$HAL_CFLAGS])],
+   VLC_ADD_PLUGINS([hal])
+   VLC_ADD_LDFLAGS([vlc hal],[$HAL_LIBS])
+   VLC_ADD_CFLAGS([vlc hal],[$HAL_CFLAGS])],
   [AC_MSG_WARN(HAL library not found)])
 
 dnl Build the gtk_main plugins?
@@ -4216,6 +4217,7 @@ AC_CONFIG_FILES([
   modules/mux/Makefile
   modules/mux/mpeg/Makefile
   modules/packetizer/Makefile
+  modules/services_discovery/Makefile
   modules/stream_out/Makefile
   modules/stream_out/transrate/Makefile
   modules/video_chroma/Makefile

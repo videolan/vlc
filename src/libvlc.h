@@ -545,6 +545,11 @@ static char *ppsz_align_descriptions[] =
      "These options define the behavior of the playlist. Some " \
      "of them can be overridden in the playlist dialog box." )
 
+#define SD_TEXT N_( "Services discovery modules")
+#define SD_LONGTEXT N_( \
+     "Specifies the services discovery modules to load, separated by commas." \
+     "Typical values are sap, hal, ..." )
+
 #define RANDOM_TEXT N_("Play files randomly forever")
 #define RANDOM_LONGTEXT N_( \
     "When selected, VLC will randomly play files in the playlist until " \
@@ -994,6 +999,8 @@ vlc_module_begin();
 
     /* Playlist options */
     add_category_hint( N_("Playlist"), PLAYLIST_CAT_LONGTEXT , VLC_FALSE );
+    add_string( "services-discovery", 0, NULL,
+                SD_TEXT, SD_LONGTEXT, VLC_FALSE );
     add_bool( "random", 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT, VLC_FALSE );
         change_short('Z');
     add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT, VLC_FALSE );

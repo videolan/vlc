@@ -62,7 +62,7 @@
 vlc_module_begin();
     set_description( _("HAL device detection") );
 
-    set_capability( "interface", 0 );
+    set_capability( "services_discovery", 0 );
     set_callbacks( Open, Close );
 
 vlc_module_end();
@@ -72,10 +72,10 @@ vlc_module_end();
  * Local structures
  *****************************************************************************/
 
-struct intf_sys_t
+struct services_discovery_sys_t
 {
     LibHalContext *p_ctx;
-    
+
     /* playlist node */
     playlist_item_t *p_node;
 
@@ -86,42 +86,42 @@ struct intf_sys_t
  *****************************************************************************/
 
 /* Main functions */
-    static void Run    ( intf_thread_t *p_intf );
+    static void Run    ( services_discovery_t *p_intf );
 
 /*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = ( intf_thread_t* )p_this;
-    intf_sys_t    *p_sys  = malloc( sizeof( intf_sys_t ) );
+    services_discovery_t *p_sd = ( services_discovery_t* )p_this;
+    services_discovery_sys_t *p_sys  = malloc(
+                                    sizeof( services_discovery_sys_t ) );
 
     playlist_t          *p_playlist;
     playlist_view_t     *p_view;
 
-    p_intf->pf_run = Run;
-    p_intf->p_sys  = p_sys;
+    p_sd->pf_run = Run;
+    p_sd->p_sys  = p_sys;
 
     if( !( p_sys->p_ctx = hal_initialize( NULL, FALSE ) ) )
     {
         free( p_sys );
-        msg_Err( p_intf, "hal not available" );
+        msg_Err( p_sd, "hal not available" );
         return VLC_EGENERIC;
     }
 
     /* Create our playlist node */
-    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    p_playlist = (playlist_t *)vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
     if( !p_playlist )
     {
-        msg_Warn( p_intf, "unable to find playlist, cancelling HAL listening");
+        msg_Warn( p_sd, "unable to find playlist, cancelling HAL listening");
         return VLC_EGENERIC;
     }
 
     p_view = playlist_ViewFind( p_playlist, VIEW_CATEGORY );
     p_sys->p_node = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
                                          _("Devices"), p_view->p_root );
-
     vlc_object_release( p_playlist );
 
     return VLC_SUCCESS;
@@ -132,27 +132,27 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = ( intf_thread_t* )p_this;
-    intf_sys_t    *p_sys  = p_intf->p_sys;
-
+    services_discovery_t *p_sd = ( services_discovery_t* )p_sd;
+    services_discovery_sys_t *p_sys  = malloc(
+                                         sizeof( services_discovery_sys_t ) );
     free( p_sys );
 }
 
-static void AddDvd( intf_thread_t *p_intf, char *psz_device )
+static void AddDvd( services_discovery_t *p_sd, char *psz_device )
 {
     char *psz_name;
     char *psz_uri;
     char *psz_blockdevice;
-    intf_sys_t    *p_sys  = p_intf->p_sys;
+    services_discovery_sys_t    *p_sys  = p_sd->p_sys;
     playlist_t          *p_playlist;
     playlist_item_t     *p_item;
-    psz_name = hal_device_get_property_string( p_intf->p_sys->p_ctx,
+    psz_name = hal_device_get_property_string( p_sd->p_sys->p_ctx,
                                                psz_device, "volume.label" );
-    psz_blockdevice = hal_device_get_property_string( p_intf->p_sys->p_ctx,
+    psz_blockdevice = hal_device_get_property_string( p_sd->p_sys->p_ctx,
                                                  psz_device, "block.device" );
     asprintf( &psz_uri, "dvd://%s", psz_blockdevice );
     /* Create the playlist item here */
-    p_item = playlist_ItemNew( p_intf, psz_uri,
+    p_item = playlist_ItemNew( p_sd, psz_uri,
                                psz_name );
     free( psz_uri );
     hal_free_string( psz_device );
@@ -161,11 +161,11 @@ static void AddDvd( intf_thread_t *p_intf, char *psz_device )
         return;
     }
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    p_playlist = (playlist_t *)vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
     if( !p_playlist )
     {
-        msg_Err( p_intf, "playlist not found" );
+        msg_Err( p_sd, "playlist not found" );
         return;
     }
 
@@ -173,22 +173,21 @@ static void AddDvd( intf_thread_t *p_intf, char *psz_device )
                           PLAYLIST_APPEND, PLAYLIST_END );
 
     vlc_object_release( p_playlist );
-
-    
 }
-static void AddCdda( intf_thread_t *p_intf, char *psz_device )
+
+static void AddCdda( services_discovery_t *p_sd, char *psz_device )
 {
     char *psz_name = "Audio CD";
     char *psz_uri;
     char *psz_blockdevice;
-    intf_sys_t    *p_sys  = p_intf->p_sys;
+    services_discovery_sys_t    *p_sys  = p_sd->p_sys;
     playlist_t          *p_playlist;
     playlist_item_t     *p_item;
-    psz_blockdevice = hal_device_get_property_string( p_intf->p_sys->p_ctx,
+    psz_blockdevice = hal_device_get_property_string( p_sd->p_sys->p_ctx,
                                                  psz_device, "block.device" );
     asprintf( &psz_uri, "cdda://%s", psz_blockdevice );
     /* Create the playlist item here */
-    p_item = playlist_ItemNew( p_intf, psz_uri,
+    p_item = playlist_ItemNew( p_sd, psz_uri,
                                psz_name );
     free( psz_uri );
     hal_free_string( psz_device );
@@ -197,11 +196,11 @@ static void AddCdda( intf_thread_t *p_intf, char *psz_device )
         return;
     }
     p_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-    p_playlist = (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+    p_playlist = (playlist_t *)vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
                                                 FIND_ANYWHERE );
     if( !p_playlist )
     {
-        msg_Err( p_intf, "playlist not found" );
+        msg_Err( p_sd, "playlist not found" );
         return;
     }
 
@@ -210,13 +209,12 @@ static void AddCdda( intf_thread_t *p_intf, char *psz_device )
 
     vlc_object_release( p_playlist );
 
-    
 }
 
-static void ParseDevice( intf_thread_t *p_intf, char *psz_device )
+static void ParseDevice( services_discovery_t *p_sd, char *psz_device )
 {
     char *psz_disc_type;
-    intf_sys_t    *p_sys  = p_intf->p_sys;
+    services_discovery_sys_t    *p_sys  = p_sd->p_sys;
     if( hal_device_property_exists( p_sys->p_ctx, psz_device,
                                     "volume.disc.type" ) )
     {
@@ -225,40 +223,39 @@ static void ParseDevice( intf_thread_t *p_intf, char *psz_device )
                                                         "volume.disc.type" );
         if( !strcmp( psz_disc_type, "dvd_rom" ) )
         {
-            AddDvd( p_intf, psz_device );
+            AddDvd( p_sd, psz_device );
         }
         else if( !strcmp( psz_disc_type, "cd_rom" ) )
         {
             if( hal_device_get_property_bool( p_sys->p_ctx, psz_device, "volume.disc.has_audio" ) )
             {
-                AddCdda( p_intf, psz_device );
+                AddCdda( p_sd, psz_device );
             }
         }
         hal_free_string( psz_disc_type );
     }
-    
 }
 
 /*****************************************************************************
  * Run: main HAL thread
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static void Run( services_discovery_t *p_sd )
 {
     int i, i_devices;
     char **devices;
-    intf_sys_t    *p_sys  = p_intf->p_sys;
+    services_discovery_sys_t    *p_sys  = p_sd->p_sys;
 
     /* parse existing devices first */
     if( ( devices = hal_get_all_devices( p_sys->p_ctx, &i_devices ) ) )
     {
         for( i = 0; i < i_devices; i++ )
         {
-            ParseDevice( p_intf, devices[ i ] );
+            ParseDevice( p_sd, devices[ i ] );
         }
     }
 
-    while( !p_intf->b_die )
+    while( !p_sd->b_die )
     {
-        msleep( 1000 );
+        msleep( 100000 );
     }
 }

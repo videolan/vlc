@@ -134,7 +134,6 @@ playlist_t * __playlist_Create ( vlc_object_t *p_parent )
     p_playlist->i_sort = SORT_ID;
     p_playlist->i_order = ORDER_NORMAL;
 
-
     /* Finally, launch the thread ! */
     if( vlc_thread_create( p_playlist, "playlist", RunThread,
                            VLC_THREAD_PRIORITY_LOW, VLC_TRUE ) )
@@ -160,6 +159,12 @@ void playlist_Destroy( playlist_t * p_playlist )
 {
     int i;
     p_playlist->b_die = 1;
+
+    for( i = 0 ; i< p_playlist->i_sds ; i++ )
+    {
+        playlist_ServicesDiscoveryRemove( p_playlist,
+                                          p_playlist->pp_sds[i]->psz_module );
+    }
 
     vlc_thread_join( p_playlist );
 

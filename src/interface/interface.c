@@ -359,8 +359,6 @@ static void RunInterface( intf_thread_t *p_intf )
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "logger"; text.psz_string = "Debug logging";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
-    val.psz_string = "sap"; text.psz_string = "SAP Playlist";
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
     val.psz_string = "gestures"; text.psz_string = "Mouse Gestures";
     var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
 

@@ -126,6 +126,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
             i_size = sizeof(playlist_t);
             psz_type = "playlist";
             break;
+        case VLC_OBJECT_SD:
+            i_size = sizeof(services_discovery_t);
+            psz_type = "services discovery";
+            break;
         case VLC_OBJECT_INPUT:
             i_size = sizeof(input_thread_t);
             psz_type = "input";

@@ -112,6 +112,19 @@ struct playlist_view_t
  */
 typedef enum { PLAYLIST_STOPPED,PLAYLIST_RUNNING,PLAYLIST_PAUSED } playlist_status_t;
 
+
+struct services_discovery_t
+{
+    VLC_COMMON_MEMBERS
+    const char *psz_module;
+
+    module_t *p_module;
+
+    services_discovery_sys_t *p_sys;
+    void (*pf_run) ( services_discovery_t *);
+};
+
+
 /**
  * Structure containing information about the playlist
  */
@@ -145,6 +158,9 @@ struct playlist_t
 
     playlist_item_t *    p_general; /**< Keep a pointer on the "general"
                                         category */
+
+    services_discovery_t **pp_sds;
+    int                   i_sds;
 
     vlc_bool_t          b_go_next; /*< Go further than the parent node ? */
 
@@ -209,6 +225,12 @@ VLC_EXPORT( int, playlist_Control, ( playlist_t *, int, ...  ) );
 
 VLC_EXPORT( int,  playlist_Clear, ( playlist_t * ) );
 
+
+/* Services discovery */
+
+VLC_EXPORT( int, playlist_ServicesDiscoveryAdd, (playlist_t *, const char *));
+VLC_EXPORT( void, playlist_ServicesDiscoveryRemove, (playlist_t *, const char *));
+VLC_EXPORT( int, playlist_AddSDModules, (playlist_t *, char *));
 
 /* Item management functions (act on items) */
 #define playlist_AddItem(p,pi,i1,i2) playlist_ItemAdd(p,pi,i1,i2)
