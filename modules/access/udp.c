@@ -2,7 +2,7 @@
  * udp.c: raw UDP & RTP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.8 2002/12/30 08:56:19 massiot Exp $
+ * $Id: udp.c,v 1.9 2002/12/30 11:49:32 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Tristan Leteurtre <tooney@via.ecp.fr>
@@ -81,6 +81,9 @@ vlc_module_begin();
     add_shortcut( "udpstream" );
     add_shortcut( "udp4" );
     add_shortcut( "udp6" );
+    add_shortcut( "rtp" );
+    add_shortcut( "rtp4" );
+    add_shortcut( "rtp6" );
     set_callbacks( Open, Close );
 vlc_module_end();
 
