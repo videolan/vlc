@@ -676,6 +676,8 @@ static void PictureHeader( vpar_thread_t * p_vpar )
         P_picture->date = vpar_SynchroDecode( p_vpar,
                                               p_vpar->picture.i_coding_type,
                                               i_structure );
+        P_picture->i_aspect_ratio = p_vpar->sequence.i_aspect_ratio;
+        P_picture->i_matrix_coefficients = p_vpar->sequence.i_matrix_coefficients;
         p_vpar->picture.i_l_stride = - 8 + ( p_vpar->sequence.i_width
                     << ( 1 - p_vpar->picture.b_frame_structure ) );
         p_vpar->picture.i_c_stride = - 8 + ( p_vpar->sequence.i_chroma_width
@@ -924,8 +926,9 @@ static void SequenceDisplayExtension( vpar_thread_t * p_vpar )
     RemoveBits( &p_vpar->bit_stream, 3 );
     if( GetBits( &p_vpar->bit_stream, 1 ) )
     {
-        /* Three bytes for color_desciption */
-        RemoveBits( &p_vpar->bit_stream, 24 );
+        /* Two bytes for color_desciption */
+        RemoveBits( &p_vpar->bit_stream, 16 );
+        p_vpar->sequence.i_matrix_coefficients = GetBits( &p_vpar->bit_stream, 8 );
     }
     /* display_horizontal and vertical_size and a marker_bit */
     RemoveBits( &p_vpar->bit_stream, 29 );
