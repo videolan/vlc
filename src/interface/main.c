@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.147 2002/02/05 21:46:41 gbazin Exp $
+ * $Id: main.c,v 1.148 2002/02/06 20:44:23 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1002,7 +1002,7 @@ static void Usage( int i_fashion )
           "\n      --channelserver <host>     \tchannel server address"
           "\n"
           "\n      --mpeg_adec <builtin|mad>  \tchoose MPEG audio decoder"
-          "\n      --ac3_adec <builtin|liba52>  \tchoose AC3 audio decoder"
+          "\n      --ac3_adec <builtin|a52>   \tchoose AC3 audio decoder"
           "\n"
           "\n      --nommx                    \tdisable CPU's MMX support"
           "\n      --no3dnow                  \tdisable CPU's 3D Now! support"
@@ -1083,7 +1083,7 @@ static void Usage( int i_fashion )
     /* Decoder parameters */
     intf_MsgImm( "\nDecoder parameters:"
         "\n  " ADEC_MPEG_VAR "=<builtin|mad>          \tMPEG audio decoder"
-        "\n  " ADEC_AC3_VAR "=<builtin|liba52>        \tAC3 audio decoder" );
+        "\n  " ADEC_AC3_VAR "=<builtin|a52>           \tAC3 audio decoder" );
 }
 
 /*****************************************************************************

@@ -67,7 +67,7 @@ ac_help="$ac_help
 ac_help="$ac_help
   --disable-qnx           QNX RTOS support (default enabled on QNX RTOS)"
 ac_help="$ac_help
-  --disable-liba52        AC3 support with liba52 (default enabled)"
+  --disable-a52           AC3 support with liba52 (default enabled)"
 ac_help="$ac_help
   --enable-fb             Linux framebuffer support (default disabled)"
 ac_help="$ac_help
@@ -6925,9 +6925,9 @@ done
 
     fi
 
-# Check whether --enable-liba52 or --disable-liba52 was given.
-if test "${enable_liba52+set}" = set; then
-  enableval="$enable_liba52"
+# Check whether --enable-a52 or --disable-a52 was given.
+if test "${enable_a52+set}" = set; then
+  enableval="$enable_a52"
   :
 fi
 
@@ -6968,8 +6968,8 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
 #define $ac_tr_hdr 1
 EOF
  
-      BUILTINS="${BUILTINS} liba52_adec"
-      LIB_LIBA52_ADEC="${LIB_LIBA52_ADEC} -la52"
+      BUILTINS="${BUILTINS} a52"
+      LIB_A52="${LIB_A52} -la52"
      
 else
   echo "$ac_t""no" 1>&6
@@ -8316,7 +8316,7 @@ s%@LIB_IMDCT@%$LIB_IMDCT%g
 s%@LIB_IMDCT3DN@%$LIB_IMDCT3DN%g
 s%@LIB_IMDCTSSE@%$LIB_IMDCTSSE%g
 s%@LIB_KDE@%$LIB_KDE%g
-s%@LIB_LIBA52_ADEC@%$LIB_LIBA52_ADEC%g
+s%@LIB_A52@%$LIB_A52%g
 s%@LIB_LIBDVDCSS@%$LIB_LIBDVDCSS%g
 s%@LIB_LIBDVDREAD@%$LIB_LIBDVDREAD%g
 s%@LIB_LIRC@%$LIB_LIRC%g

@@ -34,7 +34,7 @@ PLUGINS_DIR :=	ac3_adec \
 		idct \
 		imdct \
 		kde \
-		liba52_adec \
+		a52 \
 		lirc \
 		lpcm_adec \
 		macosx \
@@ -95,7 +95,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		imdct/imdct3dn \
 		imdct/imdctsse \
 		kde/kde \
-		liba52_adec/liba52_adec \
+		a52/a52 \
 		lirc/lirc \
 		lpcm_adec/lpcm_adec \
 		macosx/macosx \

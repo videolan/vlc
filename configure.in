@@ -1061,15 +1061,15 @@ AC_ARG_ENABLE(qnx,
     fi
 
 dnl
-dnl  Liba52 AC3 decoder plugin
+dnl  a52 AC3 decoder plugin
 dnl
-AC_ARG_ENABLE(liba52,
-  [  --disable-liba52        AC3 support with liba52 (default enabled)])
+AC_ARG_ENABLE(a52,
+  [  --disable-a52           AC3 support with liba52 (default enabled)])
 if ((test "x$enableval" != "xno") && (test x$SYS != xmingw32))
   then
     AC_CHECK_HEADERS(a52dec/a52.h, [
-      BUILTINS="${BUILTINS} liba52_adec"
-      LIB_LIBA52_ADEC="${LIB_LIBA52_ADEC} -la52"
+      BUILTINS="${BUILTINS} a52"
+      LIB_A52="${LIB_A52} -la52"
      ],[])
 fi
 
@@ -1526,7 +1526,7 @@ AC_SUBST(LIB_IMDCT)
 AC_SUBST(LIB_IMDCT3DN)
 AC_SUBST(LIB_IMDCTSSE)
 AC_SUBST(LIB_KDE)
-AC_SUBST(LIB_LIBA52_ADEC)
+AC_SUBST(LIB_A52)
 AC_SUBST(LIB_LIBDVDCSS)
 AC_SUBST(LIB_LIBDVDREAD)
 AC_SUBST(LIB_LIRC)
