@@ -123,7 +123,7 @@ rm -fr %buildroot
 
 %files
 %defattr(-,root,root,-)
-%doc README COPYING
+%doc README COPYING FAQ AUTHORS
 %{_bindir}/vlc
 
 %{_libdir}/videolan/vlc/dsp.so
