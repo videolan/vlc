@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.20 2002/04/23 14:16:20 sam Exp $
+ * $Id: gtk_display.c,v 1.21 2002/05/04 02:05:03 lool Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -64,7 +64,7 @@
 void GtkDisplayDate( GtkAdjustment *p_adj )
 {
     intf_thread_t *p_intf;
-   
+
     p_intf = gtk_object_get_data( GTK_OBJECT( p_adj ), "p_intf" );
 
     if( p_input_bank->pp_input[0] != NULL )
@@ -167,7 +167,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
                                     p_input_bank->pp_input[0]->psz_source );
                 break;
         }
-    
+
         /* initialize and show slider for seekable streams */
         if( p_input_bank->pp_input[0]->stream.b_seekable )
         {
@@ -176,7 +176,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
                                      "value_changed" );
             gtk_widget_show( GTK_WIDGET( p_slider ) );
         }
-    
+
         /* control buttons for free pace streams */
         b_control = p_input_bank->pp_input[0]->stream.b_pace_control;
 
@@ -187,7 +187,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
         p_intf->p_sys->b_audio_update = 1;
         p_intf->p_sys->b_spu_update = 1;
         p_intf->p_sys->i_part = 0;
-    
+
         p_input_bank->pp_input[0]->stream.b_changed = 0;
         intf_WarnMsg( 3, "intf: stream has changed, refreshing interface" );
     }
@@ -241,3 +241,39 @@ gint GtkModeManage( intf_thread_t * p_intf )
 #undef GETWIDGET
     return TRUE;
 }
+
+/*****************************************************************************
+ * GtkHideTooltips: show or hide the tooltips depending on the configuration
+ *                  option gnome-notooltips
+ *****************************************************************************
+ * FIXME: we should get the intf as parameter
+ *****************************************************************************/
+void GtkHideTooltips( void )
+{
+    if( config_GetIntVariable( "gnome-notooltips" ) )
+        gtk_tooltips_disable( p_main->p_intf->p_sys->p_tooltips );
+    else gtk_tooltips_enable( p_main->p_intf->p_sys->p_tooltips );
+}
+
+#ifdef MODULE_NAME_IS_gnome
+/*****************************************************************************
+ * GtkHideToolbartext: show or hide the tooltips depending on the
+ *                     configuration option gnome-notoolbartext
+ *****************************************************************************
+ * FIXME: we should get the intf as parameter
+ * FIXME: GNOME only because of missing icons in gtk interface
+ *****************************************************************************/
+void GtkHideToolbarText( void )
+{
+    GtkToolbarStyle style;
+    GtkToolbar * p_toolbar;
+
+    style = config_GetIntVariable( "gnome-notoolbartext" )
+            ? GTK_TOOLBAR_ICONS
+            : GTK_TOOLBAR_BOTH;
+
+    p_toolbar = GTK_TOOLBAR(lookup_widget( p_main->p_intf->p_sys->p_window,
+                            "toolbar" ));
+    gtk_toolbar_set_style( p_toolbar, style );
+}
+#endif

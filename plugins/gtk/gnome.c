@@ -2,10 +2,10 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.19 2002/05/03 17:37:09 lool Exp $
+ * $Id: gnome.c,v 1.20 2002/05/04 02:05:03 lool Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -73,9 +73,9 @@ static gint GnomeManage      ( gpointer p_data );
 
 MODULE_CONFIG_START
     ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-    ADD_BOOL    ( "gnome-notooltips", NULL, TOOLTIPS_TEXT,
+    ADD_BOOL    ( "gnome-notooltips", GtkHideTooltips, TOOLTIPS_TEXT,
                   TOOLTIPS_LONGTEXT )
-    ADD_BOOL    ( "gnome-notoolbartext", NULL, TOOLBAR_TEXT,
+    ADD_BOOL    ( "gnome-notoolbartext", GtkHideToolbarText, TOOLBAR_TEXT,
                   TOOLBAR_LONGTEXT )
     ADD_INTEGER ( "gnome-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT,
                   PREFS_MAXH_LONGTEXT )
@@ -395,7 +395,7 @@ static gint GnomeManage( gpointer p_data )
     }
 
     /* Update the playlist */
-    GtkPlayListManage( p_intf ); 
+    GtkPlayListManage( p_intf );
 
     if( p_input_bank->pp_input[0] != NULL && !p_intf->b_die )
     {
@@ -417,7 +417,7 @@ static gint GnomeManage( gpointer p_data )
             {
                 float           newvalue;
                 newvalue = p_intf->p_sys->p_adj->value;
-    
+
 #define p_area p_input_bank->pp_input[0]->stream.p_selected_area
                 /* If the user hasn't touched the slider since the last time,
                  * then the input can safely change it */
@@ -426,7 +426,7 @@ static gint GnomeManage( gpointer p_data )
                     /* Update the value */
                     p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue =
                         ( 100. * p_area->i_tell ) / p_area->i_size;
-    
+
                     gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
                                              "value_changed" );
                 }
@@ -435,11 +435,11 @@ static gint GnomeManage( gpointer p_data )
                 else if( p_intf->p_sys->b_slider_free )
                 {
                     off_t i_seek = ( newvalue * p_area->i_size ) / 100;
-        
+
                     vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
                     input_Seek( p_input_bank->pp_input[0], i_seek );
                     vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
-    
+
                     /* Update the old value */
                     p_intf->p_sys->f_adj_oldvalue = newvalue;
                 }

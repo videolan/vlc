@@ -2,7 +2,7 @@
  * gtk_dsiplay.h: Gtk+ tools for main interface.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.h,v 1.1 2001/05/23 23:08:20 stef Exp $
+ * $Id: gtk_display.h,v 1.2 2002/05/04 02:05:03 lool Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -26,7 +26,8 @@
  * Prototypes
  *****************************************************************************/
 
-gint GtkModeManage   ( intf_thread_t * p_intf );
-void GtkDisplayDate  ( GtkAdjustment *p_adj );
-
+gint GtkModeManage      ( intf_thread_t * p_intf );
+void GtkDisplayDate     ( GtkAdjustment *p_adj );
+void GtkHideTooltips    ( void );
+void GtkHideToolbarText ( void );
 

@@ -2,7 +2,7 @@
  * gtk.c : Gtk+ plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: gtk.c,v 1.20 2002/04/23 14:16:20 sam Exp $
+ * $Id: gtk.c,v 1.21 2002/05/04 02:05:03 lool Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -72,7 +72,8 @@ static gint GtkManage         ( gpointer p_data );
 
 MODULE_CONFIG_START
     ADD_CATEGORY_HINT( N_("Miscellaneous"), NULL )
-    ADD_BOOL    ( "gtk-notooltips", NULL, TOOLTIPS_TEXT, TOOLTIPS_LONGTEXT )
+    ADD_BOOL    ( "gtk-notooltips", GtkHideTooltips, TOOLTIPS_TEXT,
+                  TOOLTIPS_LONGTEXT )
     ADD_INTEGER ( "gtk-prefs-maxh", 480, NULL, PREFS_MAXH_TEXT,
                   PREFS_MAXH_LONGTEXT )
 MODULE_CONFIG_STOP
