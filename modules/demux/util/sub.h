@@ -2,7 +2,7 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: sub.h,v 1.16 2004/01/26 22:42:50 hartman Exp $
+ * $Id: sub.h,v 1.17 2004/01/27 07:05:10 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -20,6 +20,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#include "../ps.h"
 
 #define SUB_TYPE_MICRODVD   0x00
 #define SUB_TYPE_SUBRIP     0x01
@@ -65,6 +67,7 @@ typedef struct subtitle_demux_s
     es_out_id_t         *p_es;
     int                 i_previously_selected; /* to make pf_seek */
     FILE                *p_vobsub_file;
+    ps_track_t          *tk[PS_TK_COUNT];
 
 } subtitle_demux_t;
 

@@ -2,7 +2,7 @@
  * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sub.c,v 1.44 2004/01/26 22:32:51 hartman Exp $
+ * $Id: sub.c,v 1.45 2004/01/27 07:05:10 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -40,6 +40,8 @@
 #if (!defined( WIN32 ) || defined(__MINGW32__))
 #    include <dirent.h>
 #endif
+
+#define DVD_VIDEO_LB_LEN 2048
 
 static int  Open ( vlc_object_t *p_this );
 
@@ -94,6 +96,8 @@ static int Open ( vlc_object_t *p_this )
     p_sub->pf_demux = sub_demux;
     p_sub->pf_seek  = sub_seek;
     p_sub->pf_close = sub_close;
+    
+    ps_track_init( p_sub->tk );
 
     /* Initialize the variables */
     var_Create( p_this, "sub-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
@@ -209,6 +213,8 @@ static int  sub_SSARead     ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *
 static int  sub_Vplayer     ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_Sami        ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
 static int  sub_VobSub      ( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subtitle, mtime_t i_microsecperframe );
+
+static int  DemuxVobSub     ( subtitle_demux_t *p_sub, uint8_t *pkt, int i_pkt );
 
 static struct
 {
@@ -507,20 +513,47 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
         p_sub->i_previously_selected = 0;
         return VLC_SUCCESS;
     }
+    
+    if( p_sub->i_sub_type == SUB_TYPE_VOBSUB )
+    {
+        off_t filepos = (off_t)p_sub->subtitle[p_sub->i_subtitle].i_vobsub_location;
+        if( fseeko( p_sub->p_vobsub_file, filepos, SEEK_SET ) )
+        {
+            msg_Dbg( p_sub, "Could not seek to vobsublocation: %d", (int)filepos);
+        }
+    }
 
     while( p_sub->i_subtitle < p_sub->i_subtitles &&
            p_sub->subtitle[p_sub->i_subtitle].i_start < i_maxdate )
     {
         block_t *p_block;
-        int i_len;
+        uint8_t packet[DVD_VIDEO_LB_LEN];
+        int i_len = 0;
 
-        i_len = strlen( p_sub->subtitle[p_sub->i_subtitle].psz_text ) + 1;
-
-        if( i_len <= 1 )
+        if( p_sub->i_sub_type != SUB_TYPE_VOBSUB )
         {
-            /* empty subtitle */
-            p_sub->i_subtitle++;
-            continue;
+            i_len = strlen( p_sub->subtitle[p_sub->i_subtitle].psz_text ) + 1;
+            if( i_len <= 1 )
+            {
+                /* empty subtitle */
+                p_sub->i_subtitle++;
+                continue;
+            }
+        }
+        else
+        {
+            int i_err = fread( packet, DVD_VIDEO_LB_LEN, 1, p_sub->p_vobsub_file );
+            if( i_err < 1 )
+            {
+                msg_Dbg( p_sub, "could not read vobsub at location: %i", p_sub->subtitle[p_sub->i_subtitle].i_vobsub_location);
+                p_sub->i_subtitle++;
+                continue;
+            }
+            i_len = ps_pkt_size( packet, DVD_VIDEO_LB_LEN );
+            if( fseeko( p_sub->p_vobsub_file, i_len, SEEK_CUR ) )
+            {
+                msg_Dbg( p_sub, "could not seek to next vobsublocation" );
+            }
         }
 
         if( !( p_block = block_New( p_sub->p_input, i_len ) ) )
@@ -548,19 +581,31 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             p_block->i_dts = 0;
         }
 
-        memcpy( p_block->p_buffer,
+        if( p_sub->i_sub_type != SUB_TYPE_VOBSUB )
+        {
+            memcpy( p_block->p_buffer,
                 p_sub->subtitle[p_sub->i_subtitle].psz_text, i_len );
 
-        if( p_block->i_pts > 0 )
+            if( p_block->i_pts > 0 )
+            {
+                es_out_Send( p_input->p_es_out, p_sub->p_es, p_block );
+            }
+            else
+            {
+                block_Release( p_block );
+            }
+            p_sub->i_subtitle++;
+        }
+        else if( i_len > 1 )
         {
-            es_out_Send( p_input->p_es_out, p_sub->p_es, p_block );
+            memcpy( p_block->p_buffer, packet, i_len );
+            DemuxVobSub( p_sub, packet, i_len );
         }
         else
         {
             block_Release( p_block );
+            p_sub->i_subtitle++;
         }
-
-        p_sub->i_subtitle++;
     }
     return VLC_SUCCESS;
 }
@@ -1074,214 +1119,69 @@ static int  sub_VobSub( subtitle_demux_t *p_sub, text_t *txt, subtitle_t *p_subt
     fprintf( stderr, "time: %x, location: %x\n", i_start, i_location );
     return( 0 );
 }
-/*
 
-#define mpeg_read(buf, num) _mpeg_read(srcbuf, size, srcpos, buf, num)
-static unsigned int _mpeg_read(unsigned char *srcbufunsigned int, unsigned int size,
-                           unsigned int &srcpos, unsigned char *dstbuf,
-                           unsigned int num) {
-  unsigned int real_num;
+static int DemuxVobSub( subtitle_demux_t *p_demux, uint8_t *pkt, int i_pkt )
+{
+    uint8_t     *p = pkt;
 
-  if ((srcpos + num) >= size)
-    real_num = size - srcpos;
-  else
-    real_num = num;
-  memcpy(dstbuf, &srcbuf[srcpos], real_num);
-  srcpos += real_num;
+    while( p < &pkt[i_pkt] )
+    {
+        int i_size = ps_pkt_size( p, &pkt[i_pkt] - p );
+        block_t *p_pkt;
+        if( i_size <= 0 )
+        {
+            break;
+        }
 
-  return real_num;
-}
+        /* Create a block */
+        p_pkt = block_New( p_demux, i_size );
+        memcpy( p_pkt->p_buffer, p, i_size);
 
-#define mpeg_getc() _mpeg_getch(srcbuf, size, srcpos)
-static int _mpeg_getch(unsigned char *srcbuf, unsigned int size,
-                       unsigned int &srcpos) {
-  unsigned char c;
+        /* Parse it and send it */
+        switch( 0x100 | p[3] )
+        {
+        case 0x1b9:
+        case 0x1bb:
+        case 0x1bc:
+            msg_Dbg( p_demux, "we don't need these ps packets" );
+            block_Release( p_pkt );
+            break;
 
-  if (mpeg_read(&c, 1) != 1)
-    return -1;
-  return (int)c;
-}
+        case 0x1ba:
+        {
+            msg_Dbg( p_demux, "pack: we don't need the info" );
+            block_Release( p_pkt );
+            break;
+        }
+        default:
+        {
+            int i_id = ps_pkt_id( p_pkt );
+            msg_Dbg( p_demux, "do we have a spu pes ? that would be so cool" );
+            if( i_id >= 0xc0 )
+            {
+                ps_track_t *tk = &p_demux->tk[PS_ID_TO_TK(i_id)];
 
-#define mpeg_seek(b, w) _mpeg_seek(size, srcpos, b, w)
-static int _mpeg_seek(unsigned int size, unsigned int &srcpos, unsigned int num,
-                      int whence) {
-  unsigned int new_pos;
-
-  if (whence == SEEK_SET)
-    new_pos = num;
-  else if (whence == SEEK_CUR)
-    new_pos = srcpos + num;
-  else
-    abort();
-
-  if (new_pos >= size) {
-    srcpos = size;
-    return 1;
-  }
-
-  srcpos = new_pos;
-  return 0;
-}
-
-#define mpeg_tell() srcpos
-*/
-/*
-static int mpeg_run(demuxer_t *demuxer, unsigned char *srcbuf, unsigned int size) {
-  unsigned int len, idx, version, srcpos, packet_size;
-  int c, aid;
-  float pts;*/
-  /* Goto start of a packet, it starts with 0x000001?? */
-  /*const unsigned char wanted[] = { 0, 0, 1 };
-  unsigned char buf[5];
-  demux_packet_t *dp;
-  demux_stream_t *ds;
-  mkv_demuxer_t *mkv_d;
-
-  mkv_d = (mkv_demuxer_t *)demuxer->priv;
-  ds = demuxer->sub;
-
-  srcpos = 0;
-  packet_size = 0;
-  while (1) {
-    if (mpeg_read(buf, 4) != 4)
-      return -1;
-    while (memcmp(buf, wanted, sizeof(wanted)) != 0) {
-      c = mpeg_getc();
-      if (c < 0)
-        return -1;
-      memmove(buf, buf + 1, 3);
-      buf[3] = c;
+                if( p_demux->p_es &&
+                    !ps_pkt_parse_pes( p_pkt, tk->i_skip ) )
+                {
+                    msg_Dbg( p_demux, "do we pass it along?" );
+                    es_out_Send( p_demux->p_input->p_es_out, p_demux->p_es, p_pkt );
+                }
+                else
+                {
+                    block_Release( p_pkt );
+                }
+            }
+            else
+            {
+                block_Release( p_pkt );
+            }
+            break;
+        }
+        }
+        p += i_size;
     }
-    switch (buf[3]) {
-      case 0xb9:	*/		/* System End Code */
-   /*     return 0;
-        break;
 
-      case 0xba:                    */  /* Packet start code */
- /*       c = mpeg_getc();
-        if (c < 0)
-          return -1;
-        if ((c & 0xc0) == 0x40)
-          version = 4;
-        else if ((c & 0xf0) == 0x20)
-          version = 2;
-        else {
-          mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] VobSub: Unsupported MPEG "
-                 "version: 0x%02x\n", c);
-          return -1;
-        }
-
-        if (version == 4) {
-          if (mpeg_seek(9, SEEK_CUR))
-            return -1;
-        } else if (version == 2) {
-          if (mpeg_seek(7, SEEK_CUR))
-            return -1;
-        } else
-          abort();
-        break;
-
-      case 0xbd:	*/		/* packet */
-/*        if (mpeg_read(buf, 2) != 2)
-          return -1;
-        len = buf[0] << 8 | buf[1];
-        idx = mpeg_tell();
-        c = mpeg_getc();
-        if (c < 0)
-          return -1;
-        if ((c & 0xC0) == 0x40) {*/ /* skip STD scale & size */
-/*          if (mpeg_getc() < 0)
-            return -1;
-          c = mpeg_getc();
-          if (c < 0)
-            return -1;
-        }
-        if ((c & 0xf0) == 0x20) { */ /* System-1 stream timestamp */
-          /* Do we need this? */
-/*          abort();
-        } else if ((c & 0xf0) == 0x30) {
-  */        /* Do we need this? */
-/*          abort();
-        } else if ((c & 0xc0) == 0x80) {*/ /* System-2 (.VOB) stream */
-/*          unsigned int pts_flags, hdrlen, dataidx;
-          c = mpeg_getc();
-          if (c < 0)
-            return -1;
-          pts_flags = c;
-          c = mpeg_getc();
-          if (c < 0)
-            return -1;
-          hdrlen = c;
-          dataidx = mpeg_tell() + hdrlen;
-          if (dataidx > idx + len) {
-            mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] VobSub: Invalid header "
-                   "length: %d (total length: %d, idx: %d, dataidx: %d)\n",
-                   hdrlen, len, idx, dataidx);
-            return -1;
-          }
-          if ((pts_flags & 0xc0) == 0x80) {
-            if (mpeg_read(buf, 5) != 5)
-              return -1;
-            if (!(((buf[0] & 0xf0) == 0x20) && (buf[0] & 1) && (buf[2] & 1) &&
-                  (buf[4] & 1))) {
-              mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] VobSub PTS error: 0x%02x "
-                     "%02x%02x %02x%02x \n",
-                     buf[0], buf[1], buf[2], buf[3], buf[4]);
-              pts = 0;
-            } else
-              pts = ((buf[0] & 0x0e) << 29 | buf[1] << 22 |
-                     (buf[2] & 0xfe) << 14 | buf[3] << 7 | (buf[4] >> 1));
-          } else*/ /* if ((pts_flags & 0xc0) == 0xc0) */// {
-            /* what's this? */
-            /* abort(); */
-    /*      }
-          mpeg_seek(dataidx, SEEK_SET);
-          aid = mpeg_getc();
-          if (aid < 0) {
-            mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] VobSub: Bogus aid %d\n", aid);
-            return -1;
-          }
-          packet_size = len - ((unsigned int)mpeg_tell() - idx);
-          
-          dp = new_demux_packet(packet_size);
-          dp->flags = 1;
-          dp->pts = mkv_d->last_pts;
-          if (mpeg_read(dp->buffer, packet_size) != packet_size) {
-            mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] VobSub: mpeg_read failure");
-            packet_size = 0;
-            return -1;
-          }
-          ds_add_packet(ds, dp);
-          idx = len;
-        }
-        break;
-
-      case 0xbe:		*/	/* Padding */
- /*       if (mpeg_read(buf, 2) != 2)
-          return -1;
-        len = buf[0] << 8 | buf[1];
-        if ((len > 0) && mpeg_seek(len, SEEK_CUR))
-          return -1;
-        break;
-
-      default:
-        if ((0xc0 <= buf[3]) && (buf[3] < 0xf0)) {
-  */        /* MPEG audio or video */
-  /*        if (mpeg_read(buf, 2) != 2)
-            return -1;
-          len = (buf[0] << 8) | buf[1];
-          if ((len > 0) && mpeg_seek(len, SEEK_CUR))
-            return -1;
-
-        }
-        else {
-          mp_msg(MSGT_DEMUX, MSGL_ERR, "[mkv] VobSub: unknown header "
-                 "0x%02X%02X%02X%02X\n", buf[0], buf[1], buf[2], buf[3]);
-          return -1;
-        }
-    }
-  }
-  return 0;
+    return VLC_SUCCESS;
 }
 
-*/
