@@ -2,11 +2,11 @@
  * a52.c: parse A/52 audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.34 2004/02/25 17:48:52 fenrir Exp $
+ * $Id$
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -129,6 +129,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.i_codec = VLC_FOURCC('a','5','2',' ');
+    p_dec->fmt_out.audio.i_rate = 0; /* So end_date gets initialized */
 
     /* Set callback */
     p_dec->pf_decode_audio = (aout_buffer_t *(*)(decoder_t *, block_t **))
