@@ -678,6 +678,13 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
                       "same PTS (" I64Fd ")", frame.pts );
             return NULL;
         }
+        else if ( p_sys->i_last_pts > frame.pts )
+        {
+            msg_Warn( p_enc, "almost fed libavcodec with a frame in the "
+                      "past (current: " I64Fd ", last: "I64Fd")",
+                      frame.pts, p_sys->i_last_pts );
+            return NULL;
+        }
         else
         {
             p_sys->i_last_pts = frame.pts;
