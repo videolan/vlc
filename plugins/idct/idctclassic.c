@@ -2,7 +2,7 @@
  * idctclassic.c : Classic IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctclassic.c,v 1.15 2001/09/05 16:07:49 massiot Exp $
+ * $Id: idctclassic.c,v 1.16 2001/09/06 10:19:18 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -30,6 +30,7 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "config.h"
 #include "common.h"

@@ -2,7 +2,7 @@
  * idctmmx.c : MMX IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmx.c,v 1.17 2001/09/05 16:07:49 massiot Exp $
+ * $Id: idctmmx.c,v 1.18 2001/09/06 10:19:18 massiot Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Michel Lespinasse <walken@zoy.org>
@@ -34,6 +34,7 @@
 #include "defs.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "config.h"
 #include "common.h"
