@@ -566,8 +566,9 @@ private:
     void OnNetChange( wxCommandEvent& event );
 
     /* Event specific to the announce address */
+    void OnAnnounceGroupChange( wxCommandEvent& event );
     void OnAnnounceAddrChange( wxCommandEvent& event );
-
+    
     /* Event handlers for the encapsulation panel */
     void OnEncapsulationChange( wxCommandEvent& event );
 
@@ -603,6 +604,7 @@ private:
     wxPanel *misc_subpanels[MISC_SOUT_NUM];
     wxCheckBox *sap_checkbox;
     wxCheckBox *slp_checkbox;
+    wxTextCtrl *announce_group;
     wxTextCtrl *announce_addr;
 
     /* Controls for the encapsulation */
