@@ -2,7 +2,7 @@
  * stream.c
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: stream.c,v 1.15 2004/02/02 13:00:53 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -253,8 +253,7 @@ static int IStreamControl( stream_t *s, int i_query, va_list args )
 static int IStreamRead( stream_t *s, void *p_data, int i_data )
 {
     input_thread_t *p_input = s->p_sys->p_input;
-    uint8_t       *p = (uint8_t*)p_data;
-    data_packet_t *p_packet;
+    uint8_t *p = (uint8_t*)p_data;
 
     int i_read = 0;
 
@@ -274,33 +273,37 @@ static int IStreamRead( stream_t *s, void *p_data, int i_data )
 
     while( i_data > 0 && !p_input->b_die )
     {
-        int i_count;
-
-        i_count = input_SplitBuffer( p_input, &p_packet,
-                      __MIN( i_data, (int)p_input->i_bufsize ) );
+        ssize_t i_count = p_input->p_last_data - p_input->p_current_data;
 
         if( i_count <= 0 )
         {
-            if( i_count == 0 )
-                input_DeletePacket( p_input->p_method_data, p_packet );
+            /* Go to the next buffer */
+            i_count = input_FillBuffer( p_input );
 
-            return i_read;
+            if( i_count < 0 ) return -1;
+            else if( i_count == 0 )
+            {
+                /* We reached the EOF */
+                break;
+            }
         }
 
-        if( p )
-        {
-            memcpy( p, p_packet->p_payload_start, i_count );
-            p += i_count;
-        }
-
-        input_DeletePacket( p_input->p_method_data, p_packet );
-
+        i_count = __MIN( i_data, i_count );
+        memcpy( p, p_input->p_current_data, i_count );
+        p_input->p_current_data += i_count;
+        p += i_count;
         i_data -= i_count;
         i_read += i_count;
+
+        /* Update stream position */
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        p_input->stream.p_selected_area->i_tell += i_count;
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
 
     return i_read;
 }
+
 /****************************************************************************
  * IStreamPeek:
  ****************************************************************************/

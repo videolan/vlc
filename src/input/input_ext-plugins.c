@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: input_ext-plugins.c,v 1.40 2004/01/25 17:16:06 zorglub Exp $
+ * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -536,9 +536,12 @@ ssize_t input_FillBuffer( input_thread_t * p_input )
  *             (min. i_size bytes)
  * Returns the number of bytes read, or -1 in case of error
  *****************************************************************************/
-ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte, size_t i_size )
+ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte,
+                    size_t i_size )
 {
-    if( p_input->p_last_data - p_input->p_current_data < (ptrdiff_t)i_size )
+    ssize_t i_data = p_input->p_last_data - p_input->p_current_data;
+
+    while( i_data < (ssize_t)i_size )
     {
         /* Go to the next buffer */
         ssize_t i_ret = input_FillBuffer( p_input );
@@ -548,11 +551,16 @@ ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte, size_t i_size )
             return -1;
         }
 
-        if( i_ret < (ssize_t)i_size )
+        if( i_ret == i_data )
         {
-            i_size = i_ret;
+            /* We didn't get anymore data, must be the EOF */
+            i_size = i_data;
+            break;
         }
+
+        i_data = i_ret;
     }
+
     *pp_byte = p_input->p_current_data;
     return i_size;
 }
@@ -564,7 +572,9 @@ ssize_t input_Peek( input_thread_t * p_input, byte_t ** pp_byte, size_t i_size )
 ssize_t input_SplitBuffer( input_thread_t * p_input,
                            data_packet_t ** pp_data, size_t i_size )
 {
-    if( p_input->p_last_data - p_input->p_current_data < (ptrdiff_t)i_size )
+    ssize_t i_data = p_input->p_last_data - p_input->p_current_data;
+
+    while( i_data < (ssize_t)i_size )
     {
         /* Go to the next buffer */
         ssize_t i_ret = input_FillBuffer( p_input );
@@ -574,13 +584,17 @@ ssize_t input_SplitBuffer( input_thread_t * p_input,
             return -1;
         }
 
-        if( i_ret < (ssize_t)i_size )
+        if( i_ret == i_data )
         {
-            i_size = i_ret;
+            /* We didn't get anymore data, must be the EOF */
+            i_size = i_data;
+            break;
         }
+
+        i_data = i_ret;
     }
 
-    if ( i_size < 0)
+    if( i_size < 0)
     {
         return 0;
     }
