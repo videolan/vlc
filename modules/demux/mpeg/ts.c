@@ -106,7 +106,7 @@ static void TSDemuxPSI ( input_thread_t *, data_packet_t *,
 static void TSDecodePAT( input_thread_t *, es_descriptor_t *);
 static void TSDecodePMT( input_thread_t *, es_descriptor_t *);
 #define PSI_CALLBACK TSDemuxPSI
-#elif defined MODULE_NAME_IS_ts_olddvbpsi
+#elif defined MODULE_NAME_IS_ts_old_dvbpsi
 static void TS_DVBPSI_DemuxPSI  ( input_thread_t *, data_packet_t *,
                                   es_descriptor_t *, vlc_bool_t );
 static void TS_DVBPSI_HandlePAT ( input_thread_t *, dvbpsi_pat_t * );
@@ -170,8 +170,8 @@ static int Activate( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    if( *p_input->psz_demux && ( !strncmp( p_input->psz_demux, "ts", 3 )
-         || !strncmp( p_input->psz_demux, "ts_dvbpsi", 10 ) ) )
+    if( *p_input->psz_demux && ( !strncmp( p_input->psz_demux, "ts_old", 3 )
+         || !strncmp( p_input->psz_demux, "ts_old_dvbpsi", 10 ) ) )
         b_force = VLC_TRUE;
 
     /* In a TS_PACKET_SIZE buffer we should find a sync byte */
