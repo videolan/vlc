@@ -53,9 +53,9 @@ static int PutPixel ( spu_t *p_spu, int len, u8 color );
 #define GET_NIBBLE( i ) \
     if( b_aligned ) \
     { \
-        i_next = *p_dest[i_id]; \
+        i_next = *p_from[i_id]; \
         /*printf("%.1x", i_next >> 4);*/ \
-        p_dest[ i_id ]++; \
+        p_from[ i_id ]++; \
         b_aligned = 0; \
         i = i_next >> 4; \
     } \
@@ -70,9 +70,9 @@ static int PutPixel ( spu_t *p_spu, int len, u8 color );
 #define ADD_NIBBLE( i, j ) \
     if( b_aligned ) \
     { \
-        i_next = *p_dest[i_id]; \
+        i_next = *p_from[i_id]; \
         /*printf("%.1x", i_next >> 4);*/ \
-        p_dest[ i_id ]++; \
+        p_from[ i_id ]++; \
         b_aligned = 0; \
         i = (j) + (i_next >> 4); \
     } \
@@ -88,26 +88,27 @@ static int PutPixel ( spu_t *p_spu, int len, u8 color );
  *****************************************************************************
  * 
  *****************************************************************************/
-void vout_RenderSPU( byte_t *p_data, int p_offset[2], byte_t *p_pic,
+void vout_RenderSPU( byte_t *p_data, int p_offset[2],
+                     int i_x, int i_y, byte_t *p_pic,
                      int i_bytes_per_pixel, int i_bytes_per_line )
 {
     int i_code = 0x00;
     int i_next = 0;
     int i_id = 0;
     boolean_t b_aligned = 1;
-    byte_t *p_dest[2];
+    byte_t *p_from[2];
     spu_t spu;
 
-    p_dest[0] = p_data + p_offset[0];
-    p_dest[1] = p_data + p_offset[1];
+    p_from[1] = p_data + p_offset[1];
+    p_from[0] = p_data + p_offset[0];
 
     spu.x = 0;
     spu.y = 0;
     spu.width = 720;
     spu.height = 576;
-    spu.p_data = p_pic;
+    spu.p_data = p_pic + i_x * i_bytes_per_pixel + i_y * i_bytes_per_line;
 
-    while( p_dest[0] < p_data + p_offset[1] + 2 )
+    while( p_from[0] < p_data + p_offset[1] + 2 )
     {
         GET_NIBBLE( i_code );
 
@@ -149,7 +150,7 @@ void vout_RenderSPU( byte_t *p_data, int p_offset[2], byte_t *p_pic,
         {
             intf_DbgMsg( "video_spu: unknown code 0x%x "
                          "(dest %x side %x, x=%d, y=%d)\n",
-                         i_code, p_dest[i_id], i_id, spu.x, spu.y );
+                         i_code, p_from[i_id], i_id, spu.x, spu.y );
             if( NewLine( &spu, &i_id ) < 0 )
                 return;
             continue;
@@ -175,7 +176,7 @@ static int NewLine( spu_t *p_spu, int *i_id )
 static int PutPixel ( spu_t *p_spu, int i_len, u8 i_color )
 {
     //static int p_palette[4] = { 0x0000, 0xfef8, 0x7777, 0xffff };
-    static int p_palette[4] = { 0x0000, 0xffff, 0x0000, 0xffff };
+    static int p_palette[4] = { 0x0000, 0xffff, 0x5555, 0x0000 };
 
     if( (i_len + p_spu->x + p_spu->y * p_spu->width)
             > p_spu->height * p_spu->width )

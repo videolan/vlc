@@ -298,9 +298,15 @@ static void RunThread( spudec_thread_t *p_spudec )
                                 break;
                             case 0x05:
                                 /* 05xxxyyyxxxyyy (coordinates) */
-                                GetWord( i_word );
-                                GetWord( i_word );
-                                GetWord( i_word );
+                                i_word = GetByte( &p_spudec->bit_stream );
+                                p_spu->type.spu.i_x1 = (i_word << 4) | GetBits( &p_spudec->bit_stream, 4 );
+                                i_word = GetBits( &p_spudec->bit_stream, 4 );
+                                p_spu->type.spu.i_x2 = (i_word << 8) | GetByte( &p_spudec->bit_stream );
+                                i_word = GetByte( &p_spudec->bit_stream );
+                                p_spu->type.spu.i_y1 = (i_word << 4) | GetBits( &p_spudec->bit_stream, 4 );
+                                i_word = GetBits( &p_spudec->bit_stream, 4 );
+                                p_spu->type.spu.i_y2 = (i_word << 8) | GetByte( &p_spudec->bit_stream );
+				i_index += 6;
                                 break;
                             case 0x06:
                                 /* 06xxxxyyyy (byte offsets) */

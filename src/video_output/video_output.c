@@ -1009,9 +1009,10 @@ last_display_date = display_date;
 #endif
                 if( display_date > current_date + VOUT_DISPLAY_DELAY )
             {
-                /* A picture is ready to be rendered, but its rendering date is
-                 * far from the current one so the thread will perform an empty loop
-                 * as if no picture were found. The picture state is unchanged */
+                /* A picture is ready to be rendered, but its rendering date
+                 * is far from the current one so the thread will perform an
+                 * empty loop as if no picture were found. The picture state
+                 * is unchanged */
                 p_pic =         NULL;
                 display_date =  0;
             }
@@ -1092,6 +1093,7 @@ last_display_date = display_date;
             }
 
         }
+#if 0
         else if( p_subpic )                              /* subpicture alone */
         {
             b_display = p_vout->b_active;
@@ -1119,6 +1121,7 @@ last_display_date = display_date;
             p_subpic->i_status = DESTROYED_SUBPICTURE;
             vlc_mutex_unlock( &p_vout->subpicture_lock );*/
         }
+#endif
         else if( p_vout->b_active )        /* idle or interface screen alone */
         {
             if( p_vout->b_interface && 0 /* && XXX?? intf_change */ )
@@ -1829,6 +1832,7 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
     {
     case DVD_SUBPICTURE:                              /* DVD subpicture unit */
         vout_RenderSPU( p_subpic->p_data, p_subpic->type.spu.i_offset,
+                        p_subpic->type.spu.i_x1, p_subpic->type.spu.i_y1,
                         p_vout->p_buffer[ p_vout->i_buffer_index ].p_data,
                         p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
         break;
