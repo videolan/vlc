@@ -1,3 +1,13 @@
+vlc (0.6.2-2) unstable; urgency=low
+
+  * debian/control:
+    + Set libmatroska-dev build-dependency to (>= 0.5.0-3) because previous
+      versions were broken on platforms where PIC/non-PIC cannot be mixed in
+      objects (Closes: #208383).
+    + Set policy to 3.6.1.0.
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Fri,  5 Sep 2003 02:32:54 +0200
+
 vlc (0.6.2-1) unstable; urgency=low
 
   * New upstream release.
