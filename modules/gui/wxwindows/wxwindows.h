@@ -52,12 +52,6 @@
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_DIALOG, 0 );
 DECLARE_LOCAL_EVENT_TYPE( wxEVT_INTF, 1 );
 
-class OpenDialog;
-class Playlist;
-class Messages;
-class FileInfo;
-class VideoWindow;
-
 #define SLIDER_MAX_POS 10000
 
 /* wxU is used to convert ansi/utf8 strings to unicode strings (wchar_t) */
@@ -97,7 +91,9 @@ class VideoWindow;
 #define MODE_AUTHOR 2
 #define MODE_TITLE 3
 
-wxArrayString SeparateEntries( wxString );
+class PrefsTreeCtrl;
+class AutoBuiltPanel;
+class VideoWindow;
 
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface
@@ -139,12 +135,28 @@ struct intf_sys_t
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+wxArrayString SeparateEntries( wxString );
+wxWindow *VideoWindow( intf_thread_t *p_intf, wxWindow *p_parent );
+
+namespace wxvlc
+{
+class Interface;
+class OpenDialog;
+class V4LDialog;
+class SoutDialog;
+class SubsFileDialog;
+class Playlist;
+class Messages;
+class FileInfo;
+class StreamDialog;
+class BookmarksDialog;
+class ItemInfoDialog;
+class NewGroup;
+class ExportPlaylist;
 
 /*****************************************************************************
  * Classes declarations.
  *****************************************************************************/
-class Interface;
-
 /* Timer */
 class Timer: public wxTimer
 {
@@ -171,7 +183,6 @@ public:
     virtual ~Interface();
     void TogglePlayButton( int i_playing_status );
 
-//    wxFlexGridSizer *frame_sizer;
     wxBoxSizer  *frame_sizer;
     wxStatusBar *statusbar;
 
@@ -261,9 +272,6 @@ private:
     vlc_bool_t b_navig_menu;
 };
 
-class StreamDialog;
-class BookmarksDialog;
-
 /* Dialogs Provider */
 class DialogsProvider: public wxFrame
 {
@@ -315,11 +323,7 @@ public:
 };
 
 /* Open Dialog */
-class AutoBuiltPanel;
 WX_DEFINE_ARRAY(AutoBuiltPanel *, ArrayOfAutoBuiltPanel);
-class V4LDialog;
-class SoutDialog;
-class SubsFileDialog;
 class OpenDialog: public wxFrame
 {
 public:
@@ -700,7 +704,6 @@ private:
 
 
 /* Preferences Dialog */
-class PrefsTreeCtrl;
 class PrefsDialog: public wxFrame
 {
 public:
@@ -756,9 +759,6 @@ private:
 };
 
 /* Playlist */
-class ItemInfoDialog;
-class NewGroup;
-class ExportPlaylist;
 class Playlist: public wxFrame
 {
 public:
@@ -837,7 +837,6 @@ private:
     int i_group_sorted;
     int i_duration_sorted;
 };
-
 
 class NewGroup: public wxDialog
 {
@@ -948,6 +947,7 @@ private:
     vlc_bool_t b_enqueue;
 };
 #endif
+} // end of wxvlc namespace
 
 /* Menus */
 void PopupMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
@@ -957,6 +957,8 @@ wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 
+namespace wxvlc
+{
 class MenuEvtHandler : public wxEvtHandler
 {
 public:
@@ -999,8 +1001,6 @@ private:
     int  i_item_id;
 };
 
-wxWindow *VideoWindow( intf_thread_t *p_intf, wxWindow *p_parent );
-
 class BookmarksDialog: public wxFrame
 {
 public:
@@ -1029,6 +1029,9 @@ private:
 
     wxListView *list_ctrl;
 };
+
+} // end of wxvlc namespace
+using namespace wxvlc;
 
 static inline int ConvertHotkeyModifiers( int i_hotkey )
 {
