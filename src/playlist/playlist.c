@@ -239,6 +239,8 @@ void playlist_Command( playlist_t * p_playlist, playlist_command_t i_command,
         {
             input_StopThread( p_playlist->p_input );
         }
+        val.b_bool = VLC_TRUE;
+        var_Set( p_playlist, "prevent-skip", val );
         p_playlist->i_status = PLAYLIST_RUNNING;
         break;
 
@@ -363,9 +365,16 @@ static void RunThread ( playlist_t *p_playlist )
                     p_playlist->i_status = PLAYLIST_RUNNING;
                 }
 
-                /* Select the next playlist item */
+                /* Select the next playlist item if necessary */
                 vlc_mutex_lock( &p_playlist->object_lock );
-                SkipItem( p_playlist, 1 );
+                var_Get( p_playlist, "prevent-skip", &val );
+                if( val.b_bool == VLC_FALSE )
+                {
+                    SkipItem( p_playlist, 1 );
+                }
+                /* Reset forced status */
+                val.b_bool = VLC_FALSE;
+                var_Set( p_playlist, "prevent-skip", val );
                 vlc_mutex_unlock( &p_playlist->object_lock );
 
                 continue;
