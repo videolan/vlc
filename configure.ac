@@ -3931,6 +3931,7 @@ then
         AC_CHECK_HEADERS(objsafe.h,
           VLC_ADD_CXXFLAGS([activex],[-DHAVE_OBJSAFE_HEADER])
         )
+        activex=:
       ],
       [ AC_MSG_ERROR([required OLE headers are missing from your system]) ]
     )
@@ -3938,6 +3939,7 @@ then
 fi
 AC_ARG_VAR(MIDL, [Microsoft IDL compiler (Win32 platform only)])
 AM_CONDITIONAL(HAS_MIDL_COMPILER, test -n "${MIDL}")
+AM_CONDITIONAL(BUILD_ACTIVEX,${activex})
 
 dnl
 dnl  Mozilla plugin

@@ -56,6 +56,8 @@ DIST_misc = \
 
 LIBRARIES_libvlc = $(top_builddir)/lib/libvlc.a
 
+if BUILD_ACTIVEX
+
 noinst_LIBRARIES_activex = libaxvlc.a
 axvlc_DATA = axvlc$(LIBEXT)
 axvlcdir = $(libdir)
@@ -96,6 +98,12 @@ noinst_axvlc_rc_DATA = axvlc_rc.$(OBJEXT)
 noinst_axvlc_rcdir = $(libdir)
 axvlc_rc.$(OBJEXT): axvlc_rc.rc inplace.bmp $(axvlc_tlb_DATA)
 	$(WINDRES) -DVERSION=$(VERSION) -DVERSION_NUMBER=`echo $(VERSION).0.0.0 | sed 's/\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\)[^.]*\.*\([0-9]*\).*/\1,\2,\3,\4/'` --include-dir $(srcdir) -i $< -o $@
+
+else
+
+clean-tlb:
+
+endif
 
 ###############################################################################
 # Stamp rules
