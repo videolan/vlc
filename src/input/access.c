@@ -55,9 +55,9 @@ static access_t *access2_InternalNew( vlc_object_t *p_obj,
     {
         msg_Dbg( p_obj, "creating access '%s' path='%s'",
                  psz_access, psz_path );
-        p_access->psz_access = b_quick ? strdup( "file" ) : strdup( psz_access );
-        p_access->psz_path   = strdup( psz_path );
     }
+    p_access->psz_access = b_quick ? strdup( "file" ) : strdup( psz_access );
+    p_access->psz_path   = strdup( psz_path );
     p_access->psz_demux  = strdup( "" );
 
     p_access->pf_read    = NULL;
