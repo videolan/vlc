@@ -2,7 +2,7 @@
  * render.c : Philips OGT and CVD (VCD Subtitle) blending routines
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: render.c,v 1.19 2004/01/22 04:46:19 rocky Exp $
+ * $Id: render.c,v 1.20 2004/01/22 13:33:39 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -334,7 +334,7 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
   uint8_t *p_pixel_base;
   ogt_yuvt_t *p_source = (ogt_yuvt_t *) p_spu->p_sys->p_data;;
 
-#ifdef EXTRA_CHECKING
+#if 1
   ogt_yuvt_t *p_source_end = (ogt_yuvt_t *)p_spu->p_sys->p_data + 
     (p_spu->i_width * p_spu->i_height);
 #endif
@@ -389,7 +389,7 @@ static void BlendYUY2( vout_thread_t *p_vout, picture_t *p_pic,
 	{
           uint16_t i_avg_tr; /* transparancy sort of averaged over 2 pixels*/
 
-#if EXTRA_CHECKING
+#if 1
           if (p_source > p_source_end-1) {
             msg_Err( p_vout, "Trying to access beyond subtitle x: %d y: %d",
                      i_x, i_y);
@@ -1186,7 +1186,30 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
     /* Crop-specific */
     int i_x_start, i_y_start, i_x_end, i_y_end;
 
+    /* 4 entry colormap */
+    uint8_t cmap[NUM_SUBTITLE_COLORS];
+    int i_cmap;
+
     struct subpicture_sys_t *p_sys = p_spu->p_sys;
+
+    
+    /* Find a corresponding colormap entries for our palette entries. */
+    for( i_cmap = 0; i_cmap < NUM_SUBTITLE_COLORS; i_cmap++ )
+    {
+      uint8_t Y = p_sys->p_palette[i_cmap].s.y;
+
+      /* FIXME: when we have a way to look at colormap entries we can
+         do better.  For now we have to use 0xff for white 0x00 for
+         black and 0x44 for something in between. To do this we use
+         only the Y component.
+      */
+      if (Y > 0x70) 
+        cmap[i_cmap] = 0xff; /* Use white. */
+      else if (Y < 0x10) 
+        cmap[i_cmap] = 0x00; /* Use black. */
+      else 
+        cmap[i_cmap] = 0x44; /* Use something else. */
+    }
 
     i_xscale = ( p_vout->output.i_width << ASCALE ) / p_vout->render.i_width;
     i_yscale = ( p_vout->output.i_height << ASCALE ) / p_vout->render.i_height;
@@ -1265,17 +1288,13 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
               
               if ( (p_yuvt.s.t) == 0 ) {
                 /* Completely transparent. Don't change pixel. */
-
+                ;
 #if 0
                 printf(" "); /*++++*/
 #endif
               } else {
                 uint8_t *p_dest = p_pixel_base_y + ((i_x*i_xscale) >> 7);
-                /* We don't have a way to find the closest color in the
-                   colormap. So for now use the greyscale Y component as a 
-                   index. 
-                 */
-                *p_dest++ = p_yuvt.s.y;
+                *p_dest++ = cmap[*p_source & 0x3];
 #if 0
                 printf("%1d", *p_source); /*++++*/
 #endif
@@ -1293,6 +1312,8 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
            /* Draw until we reach the end of the line */
            for( ; i_x < p_spu->i_width; i_x ++, p_source++ )
              {
+              ogt_yuvt_t p_yuvt = p_sys->p_palette[*p_source & 0x3];
+
               if( b_crop ) {
                 
                 /* FIXME: y cropping should be dealt with outside of this 
@@ -1312,15 +1333,19 @@ BlendRGB2( vout_thread_t *p_vout, picture_t *p_pic,
                 return;
               }
               
-              if (*p_source != 0) {
-                printf("_"); /*++++*/
+              if ( (p_yuvt.s.t) == 0 ) {
+                /* Completely transparent. Don't change pixel. */
+                ;
+#if 0
+                printf(" "); /*++++*/
+#endif
               } else {
                 printf("%1d", *p_source); /*++++*/
                 for( i_ytmp = i_yreal ; i_ytmp < i_ynext ;
                      i_ytmp += p_pic->p->i_pitch ) {
                   uint8_t *p_dest = p_pixel_base + i_ytmp 
                     + i_x * BYTES_PER_PIXEL;
-                  *p_dest++ = 0xff;
+                  *p_dest++ = cmap[*p_source & 0x3];
                 }
               }
             }
