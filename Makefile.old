@@ -434,10 +434,10 @@ endif
 	@echo "" >> $@ ;
 
 $(C_DEP): %.d: FORCE
-	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
+	@$(MAKE) -s --no-print-directory -f Makefile.dep $@ CFLAGS="$(CFLAGS) $(vlc_CFLAGS)"
 
 $(CPP_DEP): %.dpp: FORCE
-	@$(MAKE) -s --no-print-directory -f Makefile.dep $@
+	@$(MAKE) -s --no-print-directory -f Makefile.dep $@ CFLAGS="$(CFLAGS) $(vlc_CFLAGS)"
 
 $(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(C_OBJ): %.o: $(H_OBJ)
