@@ -1411,7 +1411,6 @@ static int transcode_video_process( sout_stream_t *p_stream,
     while( (p_pic = id->p_decoder->pf_decode_video( id->p_decoder, &in )) )
     {
         subpicture_t *p_subpic = 0;
-        mtime_t i_pic_date = p_pic->date;
 
         if( p_sys->b_audio_sync )
         {
@@ -1555,7 +1554,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
         /* Check if we have a subpicture to overlay */
         if( p_sys->p_spu )
         {
-            p_subpic = spu_SortSubpictures( p_sys->p_spu, i_pic_date );
+            p_subpic = spu_SortSubpictures( p_sys->p_spu, p_pic->date );
             /* TODO: get another pic */
         }
 
@@ -1874,12 +1873,19 @@ static int transcode_spu_process( sout_stream_t *p_stream,
     *out = NULL;
 
     p_subpic = id->p_decoder->pf_decode_sub( id->p_decoder, &in );
-    if( p_subpic && p_sys->b_soverlay )
+    if( !p_subpic ) return VLC_EGENERIC;
+
+    if( p_sys->b_audio_sync && p_sys->i_master_drift )
+    {
+        p_subpic->i_start -= p_sys->i_master_drift;
+        if( p_subpic->i_stop ) p_subpic->i_stop -= p_sys->i_master_drift;
+    }
+
+    if( p_sys->b_soverlay )
     {
         spu_DisplaySubpicture( p_sys->p_spu, p_subpic );
     }
-
-    if( p_subpic && !p_sys->b_soverlay )
+    else
     {
         block_t *p_block;
 
