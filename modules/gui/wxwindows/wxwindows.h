@@ -93,9 +93,6 @@ class DialogsProvider;
 class PrefsTreeCtrl;
 class AutoBuiltPanel;
 class VideoWindow;
-#ifdef wxHAS_TASK_BAR_ICON
-class Systray;
-#endif
 
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface
@@ -284,6 +281,28 @@ private:
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
+};
+#endif
+
+/* Systray integration */
+#ifdef wxHAS_TASK_BAR_ICON
+class Systray: public wxTaskBarIcon
+{
+public:
+    Systray( Interface* p_main_interface );
+    virtual ~Systray() {};
+    wxMenu* CreatePopupMenu();
+    void UpdateTooltip( const wxChar* tooltip );
+
+private:
+    void OnLeftClick( wxTaskBarIconEvent& event );
+    void OnPlayStream ( wxCommandEvent& event );
+    void OnStopStream ( wxCommandEvent& event );
+    void OnPrevStream ( wxCommandEvent& event );
+    void OnNextStream ( wxCommandEvent& event );
+    void OnExit(  wxCommandEvent& event );
+    Interface* p_main_interface;
+    DECLARE_EVENT_TABLE()
 };
 #endif
 

@@ -137,6 +137,12 @@ void Timer::Notify()
                 wxU(p_intf->p_sys->p_input->input.p_item->psz_name), 2 );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
+#ifdef wxHAS_TASK_BAR_ICON
+            if( p_main_interface->p_systray )
+            {
+                p_main_interface->p_systray->UpdateTooltip( wxU(p_intf->p_sys->p_input->input.p_item->psz_name) + wxString(wxT(" - ")) + wxU(_("Playing")));
+            }
+#endif
             i_old_playing_status = PLAYING_S;
         }
     }
@@ -161,6 +167,12 @@ void Timer::Notify()
         p_main_interface->statusbar->SetStatusText( wxT(""), 0 );
         p_main_interface->statusbar->SetStatusText( wxT(""), 2 );
 
+#ifdef wxHAS_TASK_BAR_ICON
+        if( p_main_interface->p_systray )
+        {
+            p_main_interface->p_systray->UpdateTooltip( wxString(wxT("VLC media player - ")) + wxU(_("Stopped")) );
+        }
+#endif
         vlc_object_release( p_intf->p_sys->p_input );
         p_intf->p_sys->p_input = NULL;
     }
@@ -347,6 +359,19 @@ void Timer::Notify()
                 {
                     p_main_interface->TogglePlayButton( PLAYING_S );
                 }
+#ifdef wxHAS_TASK_BAR_ICON
+                if( p_main_interface->p_systray )
+                {
+                    if( val.i_int == PAUSE_S )
+                    {
+                        p_main_interface->p_systray->UpdateTooltip( wxU(p_intf->p_sys->p_input->input.p_item->psz_name) + wxString(wxT(" - ")) + wxU(_("Paused")));
+                    }
+                    else
+                    {
+                        p_main_interface->p_systray->UpdateTooltip( wxU(p_intf->p_sys->p_input->input.p_item->psz_name) + wxString(wxT(" - ")) + wxU(_("Playing")));
+                    }
+                }
+#endif
                 i_old_playing_status = val.i_int;
             }
 

@@ -101,27 +101,6 @@ BEGIN_EVENT_TABLE(wxVolCtrl, wxWindow)
     EVT_MOTION(wxVolCtrl::OnChange)
 END_EVENT_TABLE()
 
-/* Systray integration */
-#ifdef wxHAS_TASK_BAR_ICON
-class Systray: public wxTaskBarIcon
-{
-public:
-    Systray( Interface* p_main_interface );
-    virtual ~Systray() {};
-    wxMenu* CreatePopupMenu();
-
-private:
-    void OnLeftClick( wxTaskBarIconEvent& event );
-    void OnPlayStream ( wxCommandEvent& event );
-    void OnStopStream ( wxCommandEvent& event );
-    void OnPrevStream ( wxCommandEvent& event );
-    void OnNextStream ( wxCommandEvent& event );
-    void OnExit(  wxCommandEvent& event );
-    Interface* p_main_interface;
-    DECLARE_EVENT_TABLE()
-};
-#endif
-
 /*****************************************************************************
  * Event Table.
  *****************************************************************************/
@@ -227,20 +206,6 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_COMMAND(1, wxEVT_INTF, Interface::OnControlEvent)
 
 END_EVENT_TABLE()
-
-#ifdef wxHAS_TASK_BAR_ICON
-BEGIN_EVENT_TABLE(Systray, wxTaskBarIcon)
-    /* Mouse events */
-    EVT_TASKBAR_LEFT_DOWN(Systray::OnLeftClick)
-    /* Menu events */
-    EVT_MENU(Iconize_Event, Systray::OnLeftClick)
-    EVT_MENU(Exit_Event, Systray::OnExit)
-    EVT_MENU(PlayStream_Event, Systray::OnPlayStream)
-    EVT_MENU(NextStream_Event, Systray::OnNextStream)
-    EVT_MENU(PrevStream_Event, Systray::OnPrevStream)
-    EVT_MENU(StopStream_Event, Systray::OnStopStream)
-END_EVENT_TABLE()
-#endif
 
 /*****************************************************************************
  * Constructor.
@@ -1305,10 +1270,27 @@ void wxVolCtrl::UpdateVolume()
 }
 
 /*****************************************************************************
- * Definition of Systray class.
+ * Systray class.
  *****************************************************************************/
 
 #ifdef wxHAS_TASK_BAR_ICON
+
+BEGIN_EVENT_TABLE(Systray, wxTaskBarIcon)
+    /* Mouse events */
+#ifdef WIN32
+    EVT_TASKBAR_LEFT_DCLICK(Systray::OnLeftClick)
+#else
+    EVT_TASKBAR_LEFT_DOWN(Systray::OnLeftClick)
+#endif
+    /* Menu events */
+    EVT_MENU(Iconize_Event, Systray::OnLeftClick)
+    EVT_MENU(Exit_Event, Systray::OnExit)
+    EVT_MENU(PlayStream_Event, Systray::OnPlayStream)
+    EVT_MENU(NextStream_Event, Systray::OnNextStream)
+    EVT_MENU(PrevStream_Event, Systray::OnPrevStream)
+    EVT_MENU(StopStream_Event, Systray::OnStopStream)
+END_EVENT_TABLE()
+
 Systray::Systray( Interface *_p_main_interface )
 {
     p_main_interface = _p_main_interface;
@@ -1318,6 +1300,7 @@ Systray::Systray( Interface *_p_main_interface )
 void Systray::OnLeftClick( wxTaskBarIconEvent& event )
 {
     p_main_interface->Show( ! p_main_interface->IsShown() );
+    if ( p_main_interface->IsShown() ) p_main_interface->Raise();
 }
 
 void Systray::OnExit( wxCommandEvent& event )
@@ -1358,6 +1341,11 @@ wxMenu* Systray::CreatePopupMenu()
     systray_menu->AppendSeparator();
     systray_menu->Append( Iconize_Event, wxU(_("Show/Hide interface")) );
     return systray_menu;
+}
+
+void Systray::UpdateTooltip( const wxChar* tooltip )
+{
+    SetIcon( wxIcon( vlc16x16_xpm ), tooltip );
 }
 #endif
 
