@@ -188,22 +188,30 @@ static __inline__ void DumpBits32( bit_stream_t * p_bit_stream )
 void PeekNextPacket( bit_stream_t * p_bit_stream );
 
 //(stolen from the kernel)
-#if __BYTE_ORDER == __BIG_ENDIAN
-#   define swab32(x) (x)
+// XXX: The macro swab32 for little endian machine does
+//      not seem to work correctly
+
+#if defined(SYS_BEOS)
+#       define swab32(x) B_BENDIAN_TO_HOST_INT32(x)
 #else
-#   if defined (__i386__)
-#       define swab32(x) __i386_swab32(x)
+#    if __BYTE_ORDER == __BIG_ENDIAN
+#        define swab32(x) (x)
+#    else
+#        if defined (__i386__)
+#           define swab32(x) __i386_swab32(x)
 static inline const u32 __i386_swab32(u32 x)
 {
     __asm__("bswap %0" : "=r" (x) : "0" (x));
     return x;
 }
-#   else
-#       define swab32(x)\
-            ((((u8*)&x)[0] << 24) | (((u8*)&x)[1] << 16) |  \
-            (((u8*)&x)[2] << 8)  | (((u8*)&x)[3]))
-#   endif
+#        else
+#           define swab32(x)\
+            ( ( (u32)(((u8*)&x)[0]) << 24 ) | ( (u32)(((u8*)&x)[1]) << 16 ) |  \
+              ( (u32)(((u8*)&x)[2]) << 8 )  | ( (u32)(((u8*)&x)[3])) )
+#        endif
+#    endif
 #endif
+
 
 static __inline__ WORD_TYPE GetWord( bit_stream_t * p_bit_stream )
 {

@@ -450,10 +450,10 @@ int vout_BeManage( vout_thread_t *p_vout )
         p_vout->p_sys->p_window->ResizeTo( p_vout->i_width, p_vout->i_height );
 
         /* Destroy XImages to change their size */
-        vout_SysEnd( p_vout );
+        vout_BeEnd( p_vout );
 
         /* Recreate XImages. If SysInit failed, the thread can't go on. */
-        if( vout_SysInit( p_vout ) )
+        if( vout_BeInit( p_vout ) )
         {
             intf_ErrMsg("error: can't resize display\n");
             return( 1 );

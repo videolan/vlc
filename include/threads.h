@@ -35,6 +35,7 @@
 #undef MIN
 #include <kernel/OS.h>
 #include <kernel/scheduler.h>
+#include <byteorder.h>
 #else
 #error no threads available on your system !
 #endif
@@ -201,25 +202,6 @@ static __inline__ void vlc_thread_join( vlc_thread_t thread )
 #endif
 }
 
-#if defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
-/* lazy_init_mutex */
-static __inline__ void lazy_init_mutex(vlc_mutex_t* p_mutex)
-{
-    int32 v = atomic_or( &p_mutex->init, 1 );
-    if( 2000 == v ) /* we're the first, so do the init */
-    {
-        vlc_mutex_init( p_mutex );
-    }
-    else /* we're not the first, so wait until the init is finished */
-    {
-        while( p_mutex->init != 9999 )
-        {
-            snooze( 10000 );
-        }
-    }
-}
-#endif
-
 /*****************************************************************************
  * vlc_mutex_init: initialize a mutex
  *****************************************************************************/
@@ -246,6 +228,25 @@ static __inline__ int vlc_mutex_init( vlc_mutex_t *p_mutex )
 
 #endif
 }
+
+#if defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+/* lazy_init_mutex */
+static __inline__ void lazy_init_mutex(vlc_mutex_t* p_mutex)
+{
+    int32 v = atomic_or( &p_mutex->init, 1 );
+    if( 2000 == v ) /* we're the first, so do the init */
+    {
+        vlc_mutex_init( p_mutex );
+    }
+    else /* we're not the first, so wait until the init is finished */
+    {
+        while( p_mutex->init != 9999 )
+        {
+            snooze( 10000 );
+        }
+    }
+}
+#endif
 
 /*****************************************************************************
  * vlc_mutex_lock: lock a mutex
@@ -307,25 +308,6 @@ static __inline__ int vlc_mutex_unlock( vlc_mutex_t *p_mutex )
 #endif
 }
 
-#if defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
-/* lazy_init_cond */
-static __inline__ void lazy_init_cond( vlc_cond_t* p_condvar )
-{
-    int32 v = atomic_or( &p_condvar->init, 1 );
-    if( 2000 == v ) /* we're the first, so do the init */
-    {
-        vlc_cond_init( p_condvar );
-    }
-    else /* we're not the first, so wait until the init is finished */
-    {
-        while( p_condvar->init != 9999 )
-        {
-            snooze( 10000 );
-        }
-    }
-}
-#endif
-
 /*****************************************************************************
  * vlc_cond_init: initialize a condition
  *****************************************************************************/
@@ -359,6 +341,26 @@ static __inline__ int vlc_cond_init( vlc_cond_t *p_condvar )
 
 #endif
 }
+
+
+#if defined(HAVE_KERNEL_SCHEDULER_H) && defined(HAVE_KERNEL_OS_H)
+/* lazy_init_cond */
+static __inline__ void lazy_init_cond( vlc_cond_t* p_condvar )
+{
+    int32 v = atomic_or( &p_condvar->init, 1 );
+    if( 2000 == v ) /* we're the first, so do the init */
+    {
+        vlc_cond_init( p_condvar );
+    }
+    else /* we're not the first, so wait until the init is finished */
+    {
+        while( p_condvar->init != 9999 )
+        {
+            snooze( 10000 );
+        }
+    }
+}
+#endif
 
 /*****************************************************************************
  * vlc_cond_signal: start a thread on condition completion
@@ -466,3 +468,4 @@ static __inline__ int vlc_cond_wait( vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex
 
 #endif
 }
+
