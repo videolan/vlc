@@ -592,13 +592,7 @@ void vout_InitFormat( video_frame_format_t *p_format, vlc_fourcc_t i_chroma,
             p_format->i_bits_per_pixel = 32;
             break;
         case FOURCC_RV24:
-            /* FIXME: Should be 24 here but x11 and our chroma conversion
-             * routines assume 32. */
-#ifdef WIN32
             p_format->i_bits_per_pixel = 24;
-#else
-            p_format->i_bits_per_pixel = 32;
-#endif
             break;
         case FOURCC_RV15:
         case FOURCC_RV16:
