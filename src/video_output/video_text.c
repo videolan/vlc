@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: video_text.c,v 1.52 2004/02/17 03:12:00 hartman Exp $
+ * $Id$
  *
  * Author: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -67,19 +67,21 @@ subpicture_t *vout_ShowTextRelative( vout_thread_t *p_vout, char *psz_string,
  *               if this is 0 the string will be shown untill the next string
  *               is about to be shown
  */
-void vout_ShowTextAbsolute( vout_thread_t *p_vout, char *psz_string,
-                              text_style_t *p_style, int i_flags,
-                              int i_hmargin, int i_vmargin, mtime_t i_start,
-                              mtime_t i_stop )
+int vout_ShowTextAbsolute( vout_thread_t *p_vout, char *psz_string,
+                           text_style_t *p_style, int i_flags,
+                           int i_hmargin, int i_vmargin, mtime_t i_start,
+                           mtime_t i_stop )
 {
     if ( p_vout->pf_add_string )
     {
-        p_vout->pf_add_string( p_vout, psz_string, p_style, i_flags, i_hmargin,
-                               i_vmargin, i_start, i_stop );
+        p_vout->pf_add_string( p_vout, psz_string, p_style, i_flags,
+                               i_hmargin, i_vmargin, i_start, i_stop );
+        return VLC_SUCCESS;
     }
     else
     {
         msg_Warn( p_vout, "No text renderer found" );
+        return VLC_EGENERIC;
     }
 }
 
