@@ -1,7 +1,7 @@
 /*****************************************************************************
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2004 VideoLAN
+ * Copyright (C) 2000-2005 VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -695,7 +695,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
     {
         wxU(_("UDP/RTP")),
         wxU(_("UDP/RTP Multicast")),
-        wxU(_("HTTP/FTP/MMS")),
+        wxU(_("HTTP/HTTPS/FTP/MMS")),
         wxU(_("RTSP"))
     };
 
