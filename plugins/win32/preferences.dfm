@@ -242,6 +242,7 @@ object PreferencesDlg: TPreferencesDlg
     01FFFFFF0000FFFF01FFFFFF0000FFFF81FFFFFF0000FFFFC3FFFFFF0000FFFF
     FFFFFFFF0000FFFFFFFFFFFF0000FFFFFFFFFFFF0000FFFFFFFFFFFF0000}
   OldCreateOrder = False
+  Position = poDefaultPosOnly
   OnClose = FormClose
   OnHide = FormHide
   OnShow = FormShow

@@ -68,6 +68,13 @@ __fastcall TMainFrameDlg::TMainFrameDlg( TComponent* Owner )
 
     /* default height */
     ClientHeight = 37 + ToolBar->Height;
+
+    StringListPref = new TStringList();
+}
+//---------------------------------------------------------------------------
+__fastcall TMainFrameDlg::~TMainFrameDlg()
+{
+    delete StringListPref;
 }
 //---------------------------------------------------------------------------
 
@@ -210,17 +217,7 @@ void __fastcall TMainFrameDlg::MenuMessagesClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::MenuPreferencesClick( TObject *Sender )
 {
-    TPreferencesDlg *p_preferences = p_intfGlobal->p_sys->p_preferences;
-    if( p_preferences == NULL )
-    {
-        p_preferences = new TPreferencesDlg( this );
-        p_preferences->CreateConfigDialog( "main" );
-        p_intfGlobal->p_sys->p_preferences = p_preferences;
-    }
-    else
-    {
-        p_preferences->Show();
-    }
+    CreatePreferences( "main" );
 }
 //---------------------------------------------------------------------------
 void __fastcall TMainFrameDlg::MenuAboutClick( TObject *Sender )
@@ -689,4 +686,42 @@ void __fastcall TMainFrameDlg::ModeManage()
     PopupFast->Enabled = b_control;
 }
 //---------------------------------------------------------------------------
+
+
+/*****************************************************************************
+ * CreateConfig: create a configuration dialog and save it for further use
+ *****************************************************************************
+ * Check if the dialog box is already opened, if so this will save us
+ * quite a bit of work. (the interface will be destroyed when you actually
+ * close the main window, but remember that it is only hidden if you
+ * clicked on the action buttons). This trick also allows us not to
+ * duplicate identical dialog windows.
+ *****************************************************************************/
+void __fastcall TMainFrameDlg::CreatePreferences( AnsiString Name )
+{
+    TPreferencesDlg *Preferences;
+    int i_index, i_pos;
+
+    i_index = StringListPref->IndexOf( Name );
+    if( i_index != -1 )
+    {
+        /* config dialog already exists */
+        Preferences = (TPreferencesDlg *)StringListPref->Objects[i_index];
+    }
+    else
+    {
+        /* create the config dialog */
+        Preferences = new TPreferencesDlg( this );
+        Preferences->CreateConfigDialog( Name.c_str() );
+
+        /* save it */
+        i_pos = StringListPref->Add( Name );
+        StringListPref->Objects[i_pos] = Preferences;
+    }
+
+    /* display the dialog */
+    Preferences->Show();
+}
+//---------------------------------------------------------------------------
+
 

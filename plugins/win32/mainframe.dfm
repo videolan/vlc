@@ -1,8 +1,8 @@
 object MainFrameDlg: TMainFrameDlg
-  Left = 304
-  Top = 245
-  Width = 534
-  Height = 307
+  Left = 314
+  Top = 198
+  Width = 535
+  Height = 306
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'VideoLAN Client (win32 interface)'
   Color = clBtnFace
@@ -140,7 +140,7 @@ object MainFrameDlg: TMainFrameDlg
   object ToolBar: TToolBar
     Left = 0
     Top = 0
-    Width = 526
+    Width = 527
     Height = 60
     ButtonHeight = 52
     ButtonWidth = 39
@@ -276,8 +276,8 @@ object MainFrameDlg: TMainFrameDlg
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 242
-    Width = 526
+    Top = 241
+    Width = 527
     Height = 19
     Panels = <>
     ParentShowHint = False
@@ -287,7 +287,7 @@ object MainFrameDlg: TMainFrameDlg
   object GroupBoxFile: TGroupBox
     Left = 0
     Top = 100
-    Width = 526
+    Width = 527
     Height = 32
     Align = alTop
     TabOrder = 2
@@ -295,7 +295,7 @@ object MainFrameDlg: TMainFrameDlg
     object LabelFileName: TLabel
       Left = 2
       Top = 15
-      Width = 522
+      Width = 523
       Height = 15
       Align = alClient
       Alignment = taCenter
@@ -305,7 +305,7 @@ object MainFrameDlg: TMainFrameDlg
   object GroupBoxNetwork: TGroupBox
     Left = 0
     Top = 164
-    Width = 526
+    Width = 527
     Height = 40
     Align = alTop
     TabOrder = 3
@@ -357,7 +357,7 @@ object MainFrameDlg: TMainFrameDlg
   object GroupBoxDisc: TGroupBox
     Left = 0
     Top = 132
-    Width = 526
+    Width = 527
     Height = 32
     Align = alTop
     TabOrder = 4
@@ -441,7 +441,7 @@ object MainFrameDlg: TMainFrameDlg
   object GroupBoxSlider: TGroupBox
     Left = 0
     Top = 60
-    Width = 526
+    Width = 527
     Height = 40
     Align = alTop
     Caption = '0:00:00'
@@ -450,7 +450,7 @@ object MainFrameDlg: TMainFrameDlg
     object TrackBar: TTrackBar
       Left = 2
       Top = 15
-      Width = 522
+      Width = 523
       Height = 21
       Align = alTop
       Orientation = trHorizontal

@@ -185,9 +185,12 @@ __published:	// IDE-managed Components
     void __fastcall ButtonGoClick( TObject *Sender );
 private:	// User declarations
 public:		// User declarations
+    TStringList *StringListPref;                   /* stores config dialogs */
     __fastcall TMainFrameDlg( TComponent* Owner );
+    virtual __fastcall ~TMainFrameDlg();
     void __fastcall DisplayHint( TObject *Sender );
     void __fastcall ModeManage();
+    void __fastcall CreatePreferences( AnsiString Name );
     void __fastcall MenuProgramClick( TObject *Sender );
     void __fastcall MenuAudioClick( TObject *Sender );
     void __fastcall MenuSubtitleClick( TObject *Sender );

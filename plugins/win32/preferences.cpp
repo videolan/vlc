@@ -158,6 +158,7 @@ __fastcall TGroupBoxPlugin::TGroupBoxPlugin( TComponent* Owner,
     /* init configure button */
     ButtonConfig = CreateButton( this, 16, 70, 192, 25, "Configure" );
     ButtonConfig->Enabled = false;
+    ButtonConfig->OnClick = ButtonConfigClick;
 
     /* init select button */
     ButtonSelect = CreateButton( this, 110, 70, 192, 25, "Select" );
@@ -210,7 +211,7 @@ void __fastcall TGroupBoxPlugin::ButtonSelectClick( TObject *Sender )
 //---------------------------------------------------------------------------
 void __fastcall TGroupBoxPlugin::ButtonConfigClick( TObject *Sender )
 {
-    /* FIXME: TODO */
+    p_intfGlobal->p_sys->p_window->CreatePreferences( ModuleSelected->psz_name );
 }
 //---------------------------------------------------------------------------
 void __fastcall TGroupBoxPlugin::UpdateChanges()
@@ -326,14 +327,18 @@ void __fastcall TPreferencesDlg::FormClose( TObject *Sender,
 //---------------------------------------------------------------------------
 void __fastcall TPreferencesDlg::FormShow( TObject *Sender )
 {
+/*
     p_intfGlobal->p_sys->p_window->MenuPreferences->Checked = true;
     p_intfGlobal->p_sys->p_window->PopupPreferences->Checked = true;
+*/
 }
 //---------------------------------------------------------------------------
 void __fastcall TPreferencesDlg::FormHide( TObject *Sender )
 {
+/*
     p_intfGlobal->p_sys->p_window->MenuPreferences->Checked = false;
     p_intfGlobal->p_sys->p_window->PopupPreferences->Checked = false;
+*/
 }
 
 
@@ -352,7 +357,6 @@ void __fastcall TPreferencesDlg::FormHide( TObject *Sender )
 
 void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 {
-    bool                config_dialog;
     module_t           *p_module;
     module_t           *p_module_plugins;
     unsigned int        i;
@@ -367,28 +371,10 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     TGroupBoxBool      *GroupBoxBool;
     TListItem          *ListItem;
 
-    /* Check if the dialog box is already opened, if so this will save us
-     * quite a bit of work. (the interface will be destroyed when you actually
-     * close the main window, but remember that it is only hidden if you
-     * clicked on the action buttons). This trick also allows us not to
-     * duplicate identical dialog windows. */
-
-    /* FIXME: we must find a way of really checking whether the dialog
-     * box is already opened */
-    config_dialog = false;
-
-    if( config_dialog )
-    {
-        /* Yeah it was open */
-        Show();
-        return;
-    }
-
     /* Look for the selected module */
     for( p_module = p_module_bank->first ; p_module != NULL ;
          p_module = p_module->next )
     {
-
         if( psz_module_name && !strcmp( psz_module_name, p_module->psz_name ) )
             break;
     }
@@ -498,14 +484,6 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
      * FIXME: i don't know why, but both lines are necessary */
     PageControlPref->ActivePageIndex = 1;
     PageControlPref->ActivePageIndex = 0;
-
-    /* Ok, job done successfully. Let's keep a reference to the dialog box*/
-    /* FIXME: TODO */
-
-    /* we want this ref to be destroyed if the object is destroyed */
-    /* FIXME: TODO */
-    
-    Show();
 }
 #undef ADD_PANEL
 //---------------------------------------------------------------------------
