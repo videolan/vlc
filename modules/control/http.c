@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: http.c,v 1.47 2004/01/17 16:24:14 gbazin Exp $
+ * $Id: http.c,v 1.48 2004/01/17 16:51:54 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -599,6 +599,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
             {
                 msg_Err( p_intf , "Unable to parse directory" );
                 closedir( p_dir );
+                free( f );
                 return( VLC_ENOMEM );
             }
             msg_Dbg( p_intf, "file=%s (url=%s mime=%s)",
