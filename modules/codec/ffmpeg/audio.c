@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.16 2003/04/20 11:57:13 gbazin Exp $
+ * $Id: audio.c,v 1.17 2003/04/25 17:35:52 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -167,6 +167,8 @@ void  E_( DecodeThread_Audio )( adec_thread_t *p_adec )
     int     i_frame_size;
     int     i_used;
 
+    uint8_t *p;
+
     do
     {
         input_ExtractPES( p_adec->p_fifo, &p_pes );
@@ -296,24 +298,37 @@ usenextdata:
         return;
     }
 
-    p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
-                                       p_adec->p_aout_input,
-                                       i_samplesperchannel );
-    if( !p_aout_buffer )
+    p = &p_adec->p_output[0];
+    while( i_samplesperchannel > 0 )
     {
-        msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
-        p_adec->p_fifo->b_error = 1;
-        return;
+        int i_samples;
+
+        i_samples = __MIN( 1000, i_samplesperchannel );
+
+        p_aout_buffer = aout_DecNewBuffer( p_adec->p_aout,
+                                           p_adec->p_aout_input,
+                                           i_samples );
+        if( !p_aout_buffer )
+        {
+            msg_Err( p_adec->p_fifo, "cannot get aout buffer" );
+            p_adec->p_fifo->b_error = 1;
+            return;
+        }
+
+        p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
+        p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
+                                                      i_samples );
+        memcpy( p_aout_buffer->p_buffer,
+                p,
+                p_aout_buffer->i_nb_bytes );
+
+        aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
+
+        p += i_samples * 2 * aout_FormatNbChannels( &p_adec->output_format );
+        i_samplesperchannel -= i_samples;
+
+//        msg_Dbg( p_adec->p_fifo, "p_aout_buffer->i_nb_bytes=%d c*2*i_samples=%d", p_aout_buffer->i_nb_bytes, i_samples * 2 * aout_FormatNbChannels( &p_adec->output_format ) );
     }
-
-    p_aout_buffer->start_date = aout_DateGet( &p_adec->date );
-    p_aout_buffer->end_date = aout_DateIncrement( &p_adec->date,
-                                                  i_samplesperchannel );
-    memcpy( p_aout_buffer->p_buffer,
-            p_adec->p_output,
-            p_aout_buffer->i_nb_bytes );
-
-    aout_DecPlay( p_adec->p_aout, p_adec->p_aout_input, p_aout_buffer );
 
     if( i_frame_size > 0 )
     {
