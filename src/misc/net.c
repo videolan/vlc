@@ -62,7 +62,7 @@
  *****************************************************************************
  * Open a TCP connection and return a handle
  *****************************************************************************/
-int __net_OpenTCP( vlc_object_t *p_this, char *psz_host, int i_port )
+int __net_OpenTCP( vlc_object_t *p_this, const char *psz_host, int i_port )
 {
     vlc_value_t      val;
     void            *private;
