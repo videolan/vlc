@@ -227,7 +227,7 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
 			       int i_width, int i_height )
 {
     int         i_picture;                                    /* picture index */
-    int         i_chroma_width;                                /* chroma width */    
+    int         i_chroma_width = 0;                            /* chroma width */    
     picture_t * p_free_picture = NULL;                   /* first free picture */    
     picture_t * p_destroyed_picture = NULL;         /* first destroyed picture */    
 
@@ -294,25 +294,25 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout, int i_type,
         switch( i_type )
         {
         case YUV_420_PICTURE:          /* YUV 420: 1,1/4,1/4 samples per pixel */
-            i_chroma_width = i_width / 4;            
-            p_free_picture->p_data = malloc( i_height * i_chroma_width * 6 * sizeof( yuv_data_t ) );
+            i_chroma_width = i_width / 2;            
+            p_free_picture->p_data = malloc( i_height * i_chroma_width * 3 * sizeof( yuv_data_t ) );
             p_free_picture->p_y = (yuv_data_t *)p_free_picture->p_data;
-            p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 4;
-            p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 5;
+            p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*4/2;
+            p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*5/2;
             break;
         case YUV_422_PICTURE:          /* YUV 422: 1,1/2,1/2 samples per pixel */
             i_chroma_width = i_width / 2;            
             p_free_picture->p_data = malloc( i_height * i_chroma_width * 4 * sizeof( yuv_data_t ) );
             p_free_picture->p_y = (yuv_data_t *)p_free_picture->p_data;
-            p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 2;
-            p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 3;
+            p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*2;
+            p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*3;
             break;
         case YUV_444_PICTURE:              /* YUV 444: 1,1,1 samples per pixel */
             i_chroma_width = i_width;            
             p_free_picture->p_data = malloc( i_height * i_chroma_width * 3 * sizeof( yuv_data_t ) );
             p_free_picture->p_y = (yuv_data_t *)p_free_picture->p_data;
-            p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width;
-            p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data + i_height * i_chroma_width * 2;
+            p_free_picture->p_u = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width;
+            p_free_picture->p_v = (yuv_data_t *)p_free_picture->p_data +i_height*i_chroma_width*2;
             break;                
 #ifdef DEBUG
         default:
@@ -743,7 +743,7 @@ static void RenderPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_vout->p_ConvertYUV420( p_vout, vout_SysGetPicture( p_vout ),
                                  p_pic->p_y, p_pic->p_u, p_pic->p_v,
                                  p_pic->i_width, p_pic->i_height, 0, 0,
-                                 4 );
+                                 4, p_pic->i_matrix_coefficients );
         break;        
     case YUV_422_PICTURE:
 /*     ???   p_vout->p_convert_yuv_420( p_vout, 

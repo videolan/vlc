@@ -52,29 +52,29 @@ static void     MaskToShift       ( int *pi_right, int *pi_left, u32 i_mask );
 static void     SetTables         ( vout_thread_t *p_vout );
 
 static void     ConvertY4Gray16   ( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
 static void     ConvertY4Gray24   ( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
 static void     ConvertY4Gray32   ( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
 static void     ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
-static void     ConvertYUV422RGB16( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
-static void     ConvertYUV444RGB16( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
+static void     ConvertYUV422RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
+static void     ConvertYUV444RGB16( p_vout_thread_t p_vout, u16 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
 static void     ConvertYUV420RGB24( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
 static void     ConvertYUV422RGB24( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
 static void     ConvertYUV444RGB24( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
-static void     ConvertYUV420RGB32( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
-static void     ConvertYUV422RGB32( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
-static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, void *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
-                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale );
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
+static void     ConvertYUV420RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
+static void     ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
+static void     ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic, yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
+                                    int i_width, int i_height, int i_eol, int i_pic_eol, int i_scale, int i_matrix_coefficients );
 static void     Scale16           ( p_vout_thread_t p_vout, void *p_pic, void *p_buffer, 
                                     int i_width, int i_height, int i_eol, int i_pic_eol, float f_alpha, float f_beta );
 static void     Scale24           ( p_vout_thread_t p_vout, void *p_pic, void *p_buffer, 
@@ -130,13 +130,6 @@ for( i_x = 0; i_x < i_width; i_x+=16 )                                  \
  *      p_gray                  gray translation table
  *******************************************************************************/
 #define CONVERT_YUV_GRAY                                                \
-/* Set scale factor to be ignored if it is 0 */                         \
-if( !i_scale )                                                          \
-{                                                                       \
-    i_scale = i_height;                                                 \
-}                                                                       \
-                                                                        \
-/* Main loop */                                                         \
 for (i_y = 0; i_y < i_height ; i_y++)                                   \
 {                                                                       \
     for (i_x = 0; i_x < i_width; i_x += 16)                             \
@@ -161,7 +154,7 @@ for (i_y = 0; i_y < i_height ; i_y++)                                   \
     }                                                                   \
                                                                         \
     /* Handle scale factor */                                           \
-    if( ! (i_y % i_scale) )                                             \
+    if( i_scale && ! (i_y % i_scale) )                                  \
     {                                                                   \
         if( i_scale < 0 )                                               \
         {                                                               \
@@ -187,29 +180,23 @@ for (i_y = 0; i_y < i_height ; i_y++)                                   \
  * CONVERT_YUV_RGB: color YUV convertion
  *******************************************************************************
  * Parameters
- *      CHROMA                  420, 422 or 444
+ *      CHROMA                          420, 422 or 444
  * Variables:
  *      ...see vout_convert_t
- *      i_x, i_y                coordinates
- *      i_uval, i_yval, i_vval  samples
- *      p_pic_src               same type as p_pic
- *      i_chroma_width          chroma width
- *      i_chroma_eol            chroma eol
- *      p_red                   red translation table
- *      p_green                 green translation table
- *      p_blue                  blue translation table
+ *      i_x, i_y                        coordinates
+ *      i_uval, i_yval, i_vval          samples
+ *      p_pic_src                       same type as p_pic
+ *      i_chroma_width                  chroma width
+ *      i_chroma_eol                    chroma eol
+ *      p_red                           red translation table
+ *      p_green                         green translation table
+ *      p_blue                          blue translation table
+ *      i_crv, i_cgu, i_cgv, i_cbu      matrix coefficients
  *******************************************************************************/
-#define CONVERT_YUV_RGB                                                 \
-/* Set scale factor to be ignored if it is 0 */                         \
-if( !i_scale )                                                          \
-{                                                                       \
-    i_scale = i_height;                                                 \
-}                                                                       \
-                                                                        \
-/* Main loop */                                                         \
+#define CONVERT_YUV_RGB( CHROMA )                                       \
 for (i_y = 0; i_y < i_height ; i_y++)                                   \
 {                                                                       \
-    for (i_x=0; i_x < i_width; i_x += 2 )                               \
+    for (i_x = 0; i_x < i_width; i_x += 2 )                             \
     {                                                                   \
         /* First sample (complete) */                                   \
         i_yval = 76309 * *p_y++ - 1188177;                              \
@@ -232,20 +219,15 @@ for (i_y = 0; i_y < i_height ; i_y++)                                   \
             p_blue [(i_yval+i_cbu*i_uval)                >>16];         \
     }                                                                   \
                                                                         \
-    /* Handle scale factor */                                           \
-    if( ! (i_y % i_scale) )                                             \
+    /* Handle scale factor and rewind in 4:2:0 */                       \
+    if( i_scale && ! (i_y % i_scale) )                                  \
     {                                                                   \
         if( i_scale < 0 )                                               \
         {                                                               \
-            /* Copy previous line */                                    \
+            /* Copy previous line, rewind if required */                \
             p_pic_src = p_pic - i_width;                                \
             p_pic += i_pic_eol;                                         \
             LINE_COPY                                                   \
-        }                                                               \
-        else                                                            \
-        {                                                               \
-            /* Ignore next line, rewind if in 4:2:0 */                  \
-            p_y += i_eol + i_width;                                     \
             if( (CHROMA == 420) && !(i_y & 0x1) )                       \
             {                                                           \
                 p_u -= i_chroma_width;                                  \
@@ -256,12 +238,17 @@ for (i_y = 0; i_y < i_height ; i_y++)                                   \
                 p_u += i_chroma_eol;                                    \
                 p_v += i_chroma_eol;                                    \
             }                                                           \
+        }                                                               \
+        else                                                            \
+        {                                                               \
+            /* Ignore next line */                                      \
+            p_y += i_eol + i_width;                                     \
+            p_u += i_chroma_eol;                                        \
+            p_v += i_chroma_eol;                                        \
             i_y++;                                                      \
         }                                                               \
     }                                                                   \
-                                                                        \
-    /* Rewind u and v values in 4:2:0, or skip until next line */       \
-    if( (CHROMA == 420) && !(i_y & 0x1) )                               \
+    else if( (CHROMA == 420) && !(i_y & 0x1) )                          \
     {                                                                   \
         p_u -= i_chroma_width;                                          \
         p_v -= i_chroma_width;                                          \
@@ -277,6 +264,7 @@ for (i_y = 0; i_y < i_height ; i_y++)                                   \
     p_y   += i_eol;                                                     \
 }
 
+
 /*******************************************************************************
  * vout_InitTables: allocate and initialize translations tables
  *******************************************************************************
@@ -285,10 +273,14 @@ for (i_y = 0; i_y < i_height ; i_y++)                                   \
  *******************************************************************************/
 int vout_InitTables( vout_thread_t *p_vout )
 {
-    /* Allocate memory and set pointers */
-    p_vout->tables.p_base = malloc( ( 3 * 1024 ) *   
-                                    ( p_vout->i_bytes_per_pixel != 3 ? 
-                                      p_vout->i_bytes_per_pixel : 4 ));
+    size_t      tables_size;                          /* tables size, in bytes */
+    
+    /* Computes tables size */
+    //??
+    tables_size = 4 * 4 * 1024;    
+    
+    /* Allocate memory */
+    p_vout->tables.p_base = malloc( tables_size );
     if( p_vout->tables.p_base == NULL )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
@@ -560,7 +552,7 @@ static void SetTables( vout_thread_t *p_vout )
 static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic,
                              yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                              int i_width, int i_height, int i_eol, int i_pic_eol,
-                             int i_scale )
+                             int i_scale, int i_matrix_coefficients )
 {
     u16 *       p_pic_src;                   /* source pointer in case of copy */
     u16 *       p_gray;                                          /* gray table */    
@@ -576,7 +568,7 @@ static void ConvertY4Gray16( p_vout_thread_t p_vout, u16 *p_pic,
 static void ConvertY4Gray24( p_vout_thread_t p_vout, void *p_pic,
                              yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                              int i_width, int i_height, int i_eol, int i_pic_eol,
-                             int i_scale )
+                             int i_scale, int i_matrix_coefficients )
 {
     //??
 }
@@ -587,7 +579,7 @@ static void ConvertY4Gray24( p_vout_thread_t p_vout, void *p_pic,
 static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic,
                              yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                              int i_width, int i_height, int i_eol, int i_pic_eol,
-                             int i_scale )
+                             int i_scale, int i_matrix_coefficients )
 {
     u32 *       p_pic_src;                   /* source pointer in case of copy */
     u32 *       p_gray;                                          /* gray table */    
@@ -603,7 +595,7 @@ static void ConvertY4Gray32( p_vout_thread_t p_vout, u32 *p_pic,
 static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic,
                                 yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
-                                int i_scale )
+                                int i_scale, int i_matrix_coefficients )
 {
     u16 *       p_pic_src;                   /* source pointer in case of copy */
     u16 *       p_red;                                            /* red table */
@@ -612,36 +604,76 @@ static void ConvertYUV420RGB16( p_vout_thread_t p_vout, u16 *p_pic,
     int         i_uval, i_yval, i_vval;                             /* samples */   
     int         i_x, i_y;                               /* picture coordinates */
     int         i_chroma_width, i_chroma_eol;      /* width and eol for chroma */
-    int         i_crv;
-    
-/*    p_red   = p_vout->tables.yuv.rgb16.p_red;
+    int         i_crv, i_cbu, i_cgu, i_cgv;     /* transformation coefficients */
+
+    i_crv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][0];
+    i_cbu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][1];
+    i_cgu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][2];
+    i_cgv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][3];
+    p_red   = p_vout->tables.yuv.rgb16.p_red;
     p_green = p_vout->tables.yuv.rgb16.p_green;
     p_blue  = p_vout->tables.yuv.rgb16.p_blue;
-    i_chroma_width =    i_width / 4;
-    i_chroma_eol =      i_eol / 4;
-    CONVERT_YUV_RGB*/
+    i_chroma_width =    i_width / 2;
+    i_chroma_eol =      i_eol / 2;
+    CONVERT_YUV_RGB( 420 )
 }
 
 /*******************************************************************************
  * ConvertYUV422RGB16: color YUV 4:2:2 to RGB 15 or 16 bpp
  *******************************************************************************/
-static void ConvertYUV422RGB16( p_vout_thread_t p_vout, void *p_pic,
+static void ConvertYUV422RGB16( p_vout_thread_t p_vout, u16 *p_pic,
                                 yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
-                                int i_scale )
+                                int i_scale, int i_matrix_coefficients )
 {
-    //??
+    u16 *       p_pic_src;                   /* source pointer in case of copy */
+    u16 *       p_red;                                            /* red table */
+    u16 *       p_green;                                        /* green table */
+    u16 *       p_blue;                                          /* blue table */
+    int         i_uval, i_yval, i_vval;                             /* samples */   
+    int         i_x, i_y;                               /* picture coordinates */
+    int         i_chroma_width, i_chroma_eol;      /* width and eol for chroma */
+    int         i_crv, i_cbu, i_cgu, i_cgv;     /* transformation coefficients */
+
+    i_crv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][0];
+    i_cbu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][1];
+    i_cgu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][2];
+    i_cgv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][3];
+    p_red   = p_vout->tables.yuv.rgb16.p_red;
+    p_green = p_vout->tables.yuv.rgb16.p_green;
+    p_blue  = p_vout->tables.yuv.rgb16.p_blue;
+    i_chroma_width =    i_width / 2;
+    i_chroma_eol =      i_eol / 2;
+    CONVERT_YUV_RGB( 422 )
 }
 
 /*******************************************************************************
  * ConvertYUV444RGB16: color YUV 4:4:4 to RGB 15 or 16 bpp
  *******************************************************************************/
-static void ConvertYUV444RGB16( p_vout_thread_t p_vout, void *p_pic,
+static void ConvertYUV444RGB16( p_vout_thread_t p_vout, u16 *p_pic,
                                 yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
-                                int i_scale )
+                                int i_scale, int i_matrix_coefficients )
 {
-    //??
+    u16 *       p_pic_src;                   /* source pointer in case of copy */
+    u16 *       p_red;                                            /* red table */
+    u16 *       p_green;                                        /* green table */
+    u16 *       p_blue;                                          /* blue table */
+    int         i_uval, i_yval, i_vval;                             /* samples */   
+    int         i_x, i_y;                               /* picture coordinates */
+    int         i_chroma_width, i_chroma_eol;      /* width and eol for chroma */
+    int         i_crv, i_cbu, i_cgu, i_cgv;     /* transformation coefficients */
+
+    i_crv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][0];
+    i_cbu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][1];
+    i_cgu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][2];
+    i_cgv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][3];
+    p_red   = p_vout->tables.yuv.rgb16.p_red;
+    p_green = p_vout->tables.yuv.rgb16.p_green;
+    p_blue  = p_vout->tables.yuv.rgb16.p_blue;
+    i_chroma_width =    i_width;
+    i_chroma_eol =      i_eol;
+    CONVERT_YUV_RGB( 444 )
 }
 
 /*******************************************************************************
@@ -650,7 +682,7 @@ static void ConvertYUV444RGB16( p_vout_thread_t p_vout, void *p_pic,
 static void ConvertYUV420RGB24( p_vout_thread_t p_vout, void *p_pic,
                                 yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
-                                int i_scale )
+                                int i_scale, int i_matrix_coefficients )
 {
     //???
 }
@@ -661,7 +693,7 @@ static void ConvertYUV420RGB24( p_vout_thread_t p_vout, void *p_pic,
 static void ConvertYUV422RGB24( p_vout_thread_t p_vout, void *p_pic,
                                 yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
-                                int i_scale )
+                                int i_scale, int i_matrix_coefficients )
 {
     //???
 }
@@ -672,7 +704,7 @@ static void ConvertYUV422RGB24( p_vout_thread_t p_vout, void *p_pic,
 static void ConvertYUV444RGB24( p_vout_thread_t p_vout, void *p_pic,
                                 yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
-                                int i_scale )
+                                int i_scale, int i_matrix_coefficients )
 {    
     //???
 }
@@ -680,34 +712,88 @@ static void ConvertYUV444RGB24( p_vout_thread_t p_vout, void *p_pic,
 /*******************************************************************************
  * ConvertYUV420RGB32: color YUV 4:2:0 to RGB 32 bpp
  *******************************************************************************/
-static void ConvertYUV420RGB32( p_vout_thread_t p_vout, void *p_pic,
+static void ConvertYUV420RGB32( p_vout_thread_t p_vout, u32 *p_pic,
                                 yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
-                                int i_scale )
+                                int i_scale, int i_matrix_coefficients )
 {
-    //???
+    u32 *       p_pic_src;                   /* source pointer in case of copy */
+    u32 *       p_red;                                            /* red table */
+    u32 *       p_green;                                        /* green table */
+    u32 *       p_blue;                                          /* blue table */
+    int         i_uval, i_yval, i_vval;                             /* samples */   
+    int         i_x, i_y;                               /* picture coordinates */
+    int         i_chroma_width, i_chroma_eol;      /* width and eol for chroma */
+    int         i_crv, i_cbu, i_cgu, i_cgv;     /* transformation coefficients */
+
+    i_crv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][0];
+    i_cbu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][1];
+    i_cgu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][2];
+    i_cgv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][3];
+    p_red   = p_vout->tables.yuv.rgb32.p_red;
+    p_green = p_vout->tables.yuv.rgb32.p_green;
+    p_blue  = p_vout->tables.yuv.rgb32.p_blue;
+    i_chroma_width =    i_width / 2;
+    i_chroma_eol =      i_eol / 2;
+    CONVERT_YUV_RGB( 420 )
 }
 
 /*******************************************************************************
  * ConvertYUV422RGB32: color YUV 4:2:2 to RGB 32 bpp
  *******************************************************************************/
-static void ConvertYUV422RGB32( p_vout_thread_t p_vout, void *p_pic,
+static void ConvertYUV422RGB32( p_vout_thread_t p_vout, u32 *p_pic,
                                 yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
-                                int i_scale )
+                                int i_scale, int i_matrix_coefficients )
 {
-    //???
+    u32 *       p_pic_src;                   /* source pointer in case of copy */
+    u32 *       p_red;                                            /* red table */
+    u32 *       p_green;                                        /* green table */
+    u32 *       p_blue;                                          /* blue table */
+    int         i_uval, i_yval, i_vval;                             /* samples */   
+    int         i_x, i_y;                               /* picture coordinates */
+    int         i_chroma_width, i_chroma_eol;      /* width and eol for chroma */
+    int         i_crv, i_cbu, i_cgu, i_cgv;     /* transformation coefficients */
+
+    i_crv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][0];
+    i_cbu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][1];
+    i_cgu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][2];
+    i_cgv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][3];
+    p_red   = p_vout->tables.yuv.rgb32.p_red;
+    p_green = p_vout->tables.yuv.rgb32.p_green;
+    p_blue  = p_vout->tables.yuv.rgb32.p_blue;
+    i_chroma_width =    i_width / 2;
+    i_chroma_eol =      i_eol / 2;
+    CONVERT_YUV_RGB( 422 )
 }
 
 /*******************************************************************************
  * ConvertYUV444RGB32: color YUV 4:4:4 to RGB 32 bpp
  *******************************************************************************/
-static void ConvertYUV444RGB32( p_vout_thread_t p_vout, void *p_pic,
+static void ConvertYUV444RGB32( p_vout_thread_t p_vout, u32 *p_pic,
                                 yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                 int i_width, int i_height, int i_eol, int i_pic_eol,
-                                int i_scale )
+                                int i_scale, int i_matrix_coefficients )
 {
-    //???
+    u32 *       p_pic_src;                   /* source pointer in case of copy */
+    u32 *       p_red;                                            /* red table */
+    u32 *       p_green;                                        /* green table */
+    u32 *       p_blue;                                          /* blue table */
+    int         i_uval, i_yval, i_vval;                             /* samples */   
+    int         i_x, i_y;                               /* picture coordinates */
+    int         i_chroma_width, i_chroma_eol;      /* width and eol for chroma */
+    int         i_crv, i_cbu, i_cgu, i_cgv;     /* transformation coefficients */
+
+    i_crv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][0];
+    i_cbu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][1];
+    i_cgu = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][2];
+    i_cgv = MATRIX_COEFFICIENTS_TABLE[i_matrix_coefficients][3];
+    p_red   = p_vout->tables.yuv.rgb32.p_red;
+    p_green = p_vout->tables.yuv.rgb32.p_green;
+    p_blue  = p_vout->tables.yuv.rgb32.p_blue;
+    i_chroma_width =    i_width;
+    i_chroma_eol =      i_eol;
+    CONVERT_YUV_RGB( 444 )
 }
 
 /*******************************************************************************

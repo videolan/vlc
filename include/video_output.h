@@ -22,7 +22,6 @@ typedef struct vout_tables_s
         struct { u16 *p_gray; }                   gray16;   /* gray 15, 16 bpp */
         struct { u32 *p_gray; }                   gray32;   /* gray 24, 32 bpp */
     } yuv;    
-    void *              p_trans_optimized;     /* optimized (all colors) */      
 } vout_tables_t;
 
 /*******************************************************************************
@@ -39,6 +38,7 @@ typedef struct vout_tables_s
  *      i_eol                   number of Y samples to reach the next line 
  *      i_pic_eol               number or pixels to reach the next line
  *      i_scale                 if non 0, vertical scaling is 1 - 1/i_scale
+ *      i_matrix_coefficients   matrix coefficients
  * Conditions:
  *      start x + i_width                        <  picture width
  *      start y + i_height * (scaling factor)    <  picture height
@@ -47,7 +47,7 @@ typedef struct vout_tables_s
 typedef void (vout_convert_t)( p_vout_thread_t p_vout, void *p_pic,
                                yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                int i_width, int i_height, int i_eol, int i_pic_eol,
-                               int i_scale );
+                               int i_scale, int i_matrix_coefficients );
 
 /*******************************************************************************
  * vout_scale_t: scaling function
