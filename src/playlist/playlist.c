@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.34 2003/03/18 00:49:14 gbazin Exp $
+ * $Id: playlist.c,v 1.35 2003/05/12 17:33:20 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -32,11 +32,6 @@
 #include "vlc_playlist.h"
 
 #define PLAYLIST_FILE_HEADER_0_5  "# vlc playlist file version 0.5"
-#ifdef WIN32
-#   define PLAYLIST_FILE_EOL "\r\n"
-#else
-#   define PLAYLIST_FILE_EOL "\n"
-#endif
 
 /*****************************************************************************
  * Local prototypes
@@ -747,12 +742,12 @@ int playlist_SaveFile( playlist_t * p_playlist, const char * psz_filename )
         return -1;
     }
 
-    fprintf( file , PLAYLIST_FILE_HEADER_0_5 PLAYLIST_FILE_EOL );
+    fprintf( file , PLAYLIST_FILE_HEADER_0_5 "\n" );
 
     for ( i = 0 ; i < p_playlist->i_size ; i++ )
     {
         fprintf( file , p_playlist->pp_items[i]->psz_uri );
-        fprintf( file , PLAYLIST_FILE_EOL );
+        fprintf( file , "\n" );
     }
 
     fclose( file );

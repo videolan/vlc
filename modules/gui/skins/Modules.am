@@ -107,7 +107,7 @@ SOURCES_skins = \
 	modules/gui/skins/x11/x11_window.cpp \
 	modules/gui/skins/x11/x11_window.h \
 	\
-	modules/gui/skins/src/wxdialogs.h \
+	modules/gui/wxwindows/wxwindows.h \
 	modules/gui/wxwindows/fileinfo.cpp \
 	modules/gui/wxwindows/messages.cpp \
 	modules/gui/wxwindows/open.cpp \

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.26 2003/05/11 15:55:51 gbazin Exp $
+ * $Id: interface.cpp,v 1.27 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -404,9 +404,6 @@ void Interface::Open( int i_access_method )
 
         TogglePlayButton( PLAYING_S );
 
-        /* Rebuild the playlist */
-        p_intf->p_sys->p_playlist_window->Rebuild();
-
         vlc_object_release( p_playlist );
     }
 }
@@ -524,10 +521,10 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
 void Interface::OnPlaylist( wxCommandEvent& WXUNUSED(event) )
 {
     /* Show/hide the playlist window */
-    wxFrame *p_playlist_window = p_intf->p_sys->p_playlist_window;
+    Playlist *p_playlist_window = p_intf->p_sys->p_playlist_window;
     if( p_playlist_window )
     {
-        p_playlist_window->Show( ! p_playlist_window->IsShown() );
+        p_playlist_window->ShowPlaylist( ! p_playlist_window->IsShown() );
     }
 }
 
@@ -776,9 +773,6 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
     for( i = 0; i < filenames.GetCount(); i++ )
         playlist_Add( p_playlist, (const char *)filenames[i].mb_str(),
                       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-
-    /* Rebuild the playlist */
-    p_intf->p_sys->p_playlist_window->Rebuild();
 
     vlc_object_release( p_playlist );
 

@@ -2,7 +2,7 @@
  * fileinfo.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: fileinfo.cpp,v 1.13 2003/05/11 13:45:21 gbazin Exp $
+ * $Id: fileinfo.cpp,v 1.14 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -47,11 +47,9 @@
 
 #if defined MODULE_NAME_IS_skins
 #   include "../skins/src/skin_common.h"
-#   include "../skins/src/wxdialogs.h"
-#else
-#   include "wxwindows.h"
 #endif
 
+#include "wxwindows.h"
 
 /*****************************************************************************
  * Event Table.

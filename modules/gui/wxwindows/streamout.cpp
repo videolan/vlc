@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.8 2003/05/11 13:22:23 gbazin Exp $
+ * $Id: streamout.cpp,v 1.9 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -51,11 +51,9 @@
 
 #if defined MODULE_NAME_IS_skins
 #   include "../skins/src/skin_common.h"
-#   include "../skins/src/wxdialogs.h"
-#else
-#   include "wxwindows.h"
 #endif
 
+#include "wxwindows.h"
 
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
@@ -131,13 +129,13 @@ END_EVENT_TABLE()
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-SoutDialog::SoutDialog( intf_thread_t *_p_intf, Interface *_p_main_interface ):
-    wxDialog( _p_main_interface, -1, wxU(_("Stream output")),
+SoutDialog::SoutDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
+    wxDialog( _p_parent, -1, wxU(_("Stream output")),
              wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
-    p_main_interface = _p_main_interface;
+    p_parent = _p_parent;
     SetIcon( *p_intf->p_sys->p_icon );
 
     /* Create a panel to put everything in */

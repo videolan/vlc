@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.22 2003/05/11 13:22:23 gbazin Exp $
+ * $Id: wxwindows.h,v 1.23 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -41,6 +41,7 @@ class FileInfo;
 #   define wxU(ansi) ansi
 #endif
 
+#if !defined(MODULE_NAME_IS_skins)
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface
  *****************************************************************************/
@@ -89,6 +90,7 @@ struct intf_sys_t
     /* The window labels for DVD mode */
     unsigned int        i_part;                           /* current chapter */
 };
+#endif /* !defined(MODULE_NAME_IS_skins) */
 
 /*****************************************************************************
  * Prototypes
@@ -190,11 +192,9 @@ class OpenDialog: public wxDialog
 {
 public:
     /* Constructor */
-    OpenDialog( intf_thread_t *p_intf, Interface *p_main_interface,
+    OpenDialog( intf_thread_t *p_intf, wxWindow *p_parent,
                 int i_access_method );
     virtual ~OpenDialog();
-    void Rebuild();
-    void Manage();
 
     wxString mrl;
 
@@ -237,7 +237,7 @@ private:
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
-    Interface *p_main_interface;
+    wxWindow *p_parent;
     int i_current_access_method;
 
     wxComboBox *mrl_combo;
@@ -282,7 +282,7 @@ class SoutDialog: public wxDialog
 {
 public:
     /* Constructor */
-    SoutDialog( intf_thread_t *p_intf, Interface *p_main_interface );
+    SoutDialog( intf_thread_t *p_intf, wxWindow *p_parent );
     virtual ~SoutDialog();
 
     wxString mrl;
@@ -312,7 +312,7 @@ private:
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
-    Interface *p_main_interface;
+    wxWindow *p_parent;
 
     wxComboBox *mrl_combo;
     wxPanel *access_panel;
@@ -350,6 +350,7 @@ private:
     void OnOk( wxCommandEvent& event );
     void OnCancel( wxCommandEvent& event );
     void OnSave( wxCommandEvent& event );
+    void OnResetAll( wxCommandEvent& event );
 
     DECLARE_EVENT_TABLE();
 
@@ -393,28 +394,34 @@ public:
     /* Constructor */
     Playlist( intf_thread_t *p_intf, Interface *p_main_interface );
     virtual ~Playlist();
-    void Rebuild();
-    void Manage();
+
+    void UpdatePlaylist();
+    void ShowPlaylist( bool show );
+
+    bool b_need_update;
+    vlc_mutex_t lock;
 
 private:
     void DeleteItem( int item );
 
     /* Event handlers (these functions should _not_ be virtual) */
-    void OnAddUrl( wxCommandEvent& event );
-    void OnAddDirectory( wxCommandEvent& event );
+    void OnAddMRL( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );
+    void OnOpen( wxCommandEvent& event );
+    void OnSave( wxCommandEvent& event );
     void OnInvertSelection( wxCommandEvent& event );
     void OnDeleteSelection( wxCommandEvent& event );
     void OnSelectAll( wxCommandEvent& event );
     void OnActivateItem( wxListEvent& event );
     void OnKeyDown( wxListEvent& event );
+    void Rebuild();
 
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
     Interface *p_main_interface;
     wxListView *listview;
-    wxButton *ok_button;
+    int i_update_counter;
 };
 
 /* File Info */

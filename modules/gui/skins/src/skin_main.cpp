@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.25 2003/05/05 12:15:25 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.26 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -50,7 +50,7 @@
 #include "vlcproc.h"
 #include "skin_common.h"
 #ifndef BASIC_SKINS
-#include "wxdialogs.h"
+#include "../../wxwindows/wxwindows.h"
 #endif
 
 #ifdef X11_SKINS

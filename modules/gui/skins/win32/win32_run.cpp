@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.15 2003/05/05 12:15:25 gbazin Exp $
+ * $Id: win32_run.cpp,v 1.16 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -55,7 +55,7 @@
 #include "../src/vlcproc.h"
 
 #ifndef BASIC_SKINS
-#include "../src/wxdialogs.h"
+#include "../../wxwindows/wxwindows.h"
 #include "share/vlc32x32.xpm"       // include the graphic icon
 #endif
 

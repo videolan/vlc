@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.23 2003/05/01 13:51:03 ipkiss Exp $
+ * $Id: gtk2_run.cpp,v 1.24 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -50,7 +50,7 @@
 #include "../src/vlcproc.h"
 
 #ifndef BASIC_SKINS
-#include "../src/wxdialogs.h"
+#include "../../wxwindows/wxwindows.h"
 #include "share/vlc32x32.xpm"           // include the icon graphic
 #endif
 

@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.26 2003/03/30 14:24:20 gbazin Exp $
+ * $Id: configuration.h,v 1.27 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -70,7 +70,12 @@ struct module_config_t
 
     vlc_mutex_t *p_lock;            /* Lock to use when modifying the config */
     vlc_bool_t   b_dirty;          /* Dirty flag to indicate a config change */
-    vlc_bool_t b_advanced;            /* Flag to indicate an advanced option */
+    vlc_bool_t   b_advanced;          /* Flag to indicate an advanced option */
+
+    /* Original option values */
+    char        *psz_value_orig;
+    int          i_value_orig;
+    float        f_value_orig;
 };
 
 /*****************************************************************************
@@ -88,6 +93,8 @@ VLC_EXPORT( int,    __config_LoadCmdLine,  ( vlc_object_t *, int *, char *[], vl
 VLC_EXPORT( char *,   config_GetHomeDir,     ( void ) );
 VLC_EXPORT( int,    __config_LoadConfigFile, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( int,    __config_SaveConfigFile, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
+
 VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char *psz_name ) );
 
 VLC_EXPORT( void, config_Duplicate, ( module_t *, module_config_t * ) );
@@ -106,6 +113,7 @@ VLC_EXPORT( void, config_UnsetCallbacks, ( module_config_t * ) );
 #define config_LoadCmdLine(a,b,c,d) __config_LoadCmdLine(VLC_OBJECT(a),b,c,d)
 #define config_LoadConfigFile(a,b) __config_LoadConfigFile(VLC_OBJECT(a),b)
 #define config_SaveConfigFile(a,b) __config_SaveConfigFile(VLC_OBJECT(a),b)
+#define config_ResetAll(a) __config_ResetAll(VLC_OBJECT(a))
 
 /*****************************************************************************
  * Macros used to build the configuration structure.

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.55 2003/05/09 00:58:25 titer Exp $
+ * $Id: configuration.c,v 1.56 2003/05/12 17:33:20 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -387,9 +387,11 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
         p_module->p_config[i].i_type = p_orig[i].i_type;
         p_module->p_config[i].i_short = p_orig[i].i_short;
         p_module->p_config[i].i_value = p_orig[i].i_value;
+        p_module->p_config[i].i_value_orig = p_orig[i].i_value;
         p_module->p_config[i].i_min = p_orig[i].i_min;
         p_module->p_config[i].i_max = p_orig[i].i_max;
         p_module->p_config[i].f_value = p_orig[i].f_value;
+        p_module->p_config[i].f_value_orig = p_orig[i].f_value;
         p_module->p_config[i].f_min = p_orig[i].f_min;
         p_module->p_config[i].f_max = p_orig[i].f_max;
         p_module->p_config[i].b_dirty = p_orig[i].b_dirty;
@@ -404,6 +406,8 @@ void config_Duplicate( module_t *p_module, module_config_t *p_orig )
         p_module->p_config[i].psz_longtext = p_orig[i].psz_longtext ?
                                    strdup( _(p_orig[i].psz_longtext) ) : NULL;
         p_module->p_config[i].psz_value = p_orig[i].psz_value ?
+                                   strdup( p_orig[i].psz_value ) : NULL;
+        p_module->p_config[i].psz_value_orig = p_orig[i].psz_value ?
                                    strdup( p_orig[i].psz_value ) : NULL;
 
         p_module->p_config[i].p_lock = &p_module->object_lock;
@@ -459,6 +463,9 @@ void config_Free( module_t *p_module )
         if( p_item->psz_value )
             free( p_item->psz_value );
 
+        if( p_item->psz_value_orig )
+            free( p_item->psz_value_orig );
+
         if( p_item->ppsz_list )
         {
             for( i = 0; p_item->ppsz_list[i]; i++ )
@@ -500,6 +507,41 @@ void config_UnsetCallbacks( module_config_t *p_new )
         p_new->pf_callback = NULL;
         p_new++;
     }
+}
+
+/*****************************************************************************
+ * config_ResetAll: reset the configuration data for all the modules.
+ *****************************************************************************/
+void __config_ResetAll( vlc_object_t *p_this )
+{
+    int i_index, i;
+    vlc_list_t *p_list;
+    module_t *p_module;
+
+    /* Acquire config file lock */
+    vlc_mutex_lock( &p_this->p_vlc->config_lock );
+
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+
+    for( i_index = 0; i_index < p_list->i_count; i_index++ )
+    {
+        p_module = (module_t *)p_list->p_values[i_index].p_object ;
+        if( p_module->b_submodule ) continue;
+
+        for( i = 0; p_module->p_config[i].i_type != CONFIG_HINT_END; i++ )
+        {
+            p_module->p_config[i].i_value = p_module->p_config[i].i_value_orig;
+            p_module->p_config[i].f_value = p_module->p_config[i].f_value_orig;
+            if( p_module->p_config[i].psz_value )
+                free( p_module->p_config[i].psz_value );
+            p_module->p_config[i].psz_value =
+                p_module->p_config[i].psz_value_orig ?
+                strdup( p_module->p_config[i].psz_value_orig ) : NULL;
+        }
+    }
+
+    vlc_list_release( p_list );
+    vlc_mutex_unlock( &p_this->p_vlc->config_lock );
 }
 
 /*****************************************************************************

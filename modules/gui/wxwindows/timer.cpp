@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.16 2003/05/11 13:22:23 gbazin Exp $
+ * $Id: timer.cpp,v 1.17 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -115,7 +115,7 @@ void Timer::Notify()
     p_intf->p_sys->p_messages_window->UpdateLog();
 
     /* Update the playlist */
-    p_intf->p_sys->p_playlist_window->Manage();
+    p_intf->p_sys->p_playlist_window->UpdatePlaylist();
 
     /* Update the fileinfo windows */
     p_intf->p_sys->p_fileinfo_window->UpdateFileInfo();

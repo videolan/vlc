@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.12 2003/05/11 13:22:23 gbazin Exp $
+ * $Id: preferences.cpp,v 1.13 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -55,11 +55,9 @@
 
 #if defined MODULE_NAME_IS_skins
 #   include "../skins/src/skin_common.h"
-#   include "../skins/src/wxdialogs.h"
-#else
-#   include "wxwindows.h"
 #endif
 
+#include "wxwindows.h"
 
 #ifndef wxRB_SINGLE
 #   define wxRB_SINGLE 0
@@ -184,7 +182,7 @@ enum
 {
     Notebook_Event = wxID_HIGHEST,
     MRL_Event,
-    Reset_Event,
+    ResetAll_Event,
     Advanced_Event,
 };
 
@@ -193,6 +191,7 @@ BEGIN_EVENT_TABLE(PrefsDialog, wxFrame)
     EVT_BUTTON(wxID_OK, PrefsDialog::OnOk)
     EVT_BUTTON(wxID_CANCEL, PrefsDialog::OnCancel)
     EVT_BUTTON(wxID_SAVE, PrefsDialog::OnSave)
+    EVT_BUTTON(ResetAll_Event, PrefsDialog::OnResetAll)
 
     /* Don't destroy the window when the user closes it */
     EVT_CLOSE(PrefsDialog::OnCancel)
@@ -251,14 +250,15 @@ PrefsDialog::PrefsDialog( intf_thread_t *_p_intf, Interface *_p_main_interface)
     wxButton *cancel_button = new wxButton( panel, wxID_CANCEL,
                                             wxU(_("Cancel")) );
     wxButton *save_button = new wxButton( panel, wxID_SAVE, wxU(_("Save")) );
-    //wxButton *reset_button = new wxButton( panel, Reset_Event, _("Reset") );
+    wxButton *reset_button = new wxButton( panel, ResetAll_Event,
+                                           wxU(_("Reset All")) );
 
     /* Place everything in sizers */
     wxBoxSizer *button_sizer = new wxBoxSizer( wxHORIZONTAL );
     button_sizer->Add( ok_button, 0, wxALL, 5 );
     button_sizer->Add( cancel_button, 0, wxALL, 5 );
     button_sizer->Add( save_button, 0, wxALL, 5 );
-    //button_sizer->Add( reset_button, 0, wxALL, 5 );
+    button_sizer->Add( reset_button, 0, wxALL, 5 );
     button_sizer->Layout();
 
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
@@ -303,6 +303,21 @@ void PrefsDialog::OnSave( wxCommandEvent& WXUNUSED(event) )
     prefs_tree->ApplyChanges();
 
     config_SaveConfigFile( p_intf, NULL );
+}
+
+void PrefsDialog::OnResetAll( wxCommandEvent& WXUNUSED(event) )
+{
+    wxMessageDialog dlg( this,
+        wxU(_("Beware this will reset your VLC Media Player config file.\n"
+              "Are you sure you want to continue?")),
+        wxU(_("Reset config file")), wxYES_NO|wxNO_DEFAULT|wxCENTRE );
+
+    if ( dlg.ShowModal() == wxID_YES )
+    {
+        /* TODO: need to reset all the controls */
+        config_ResetAll( p_intf );
+        config_SaveConfigFile( p_intf, NULL );
+    }
 }
 
 /*****************************************************************************

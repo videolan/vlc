@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.13 2003/05/05 16:09:37 gbazin Exp $
+ * $Id: events.c,v 1.14 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -62,7 +62,7 @@ static long FAR PASCAL DirectXEventProc ( HWND hwnd, UINT message,
 void DirectXEventThread( event_thread_t *p_event )
 {
     MSG msg;
-    POINT old_mouse_pos;
+    POINT old_mouse_pos = {0,0};
     vlc_value_t val;
     int i_width, i_height, i_x, i_y;
 

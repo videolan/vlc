@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.21 2003/05/05 16:29:57 gbazin Exp $
+ * $Id: vlcproc.cpp,v 1.22 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -51,7 +51,7 @@
 #include "skin_common.h"
 
 #ifndef BASIC_SKINS
-#include "wxdialogs.h"
+#include "../../wxwindows/wxwindows.h"
 #endif
 
 

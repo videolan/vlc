@@ -2,7 +2,7 @@
  * x11_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_run.cpp,v 1.1 2003/04/28 14:32:57 asmax Exp $
+ * $Id: x11_run.cpp,v 1.2 2003/05/12 17:33:19 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -44,7 +44,7 @@
 #include "../os_theme.h"
 #include "../src/skin_common.h"
 #include "../src/vlcproc.h"
-#include "../src/wxdialogs.h"
+#include "../../wxwindows/wxwindows.h"
 
 // include the icon graphic
 #include "share/vlc32x32.xpm"
