@@ -4,7 +4,7 @@
  * Copyright (C) 2005 VideoLAN
  * $Id$
  *
- * Authors: Remi Denis-Courmont <fenrir@via.ecp.fr>
+ * Authors: Remi Denis-Courmont <rem # via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
