@@ -45,12 +45,18 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+#ifdef WIN32
+#   define SCREEN_FPS 1
+#else
+#   define SCREEN_FPS 5
+#endif
+
 vlc_module_begin();
     set_description( _("Screen Input") );
 
     add_integer( "screen-caching", DEFAULT_PTS_DELAY / 1000, NULL,
         CACHING_TEXT, CACHING_LONGTEXT, VLC_TRUE );
-    add_float( "screen-fps", 5, NULL, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
+    add_float( "screen-fps", SCREEN_FPS, 0, FPS_TEXT, FPS_LONGTEXT, VLC_TRUE );
 
     set_capability( "access_demux", 0 );
     add_shortcut( "screen" );

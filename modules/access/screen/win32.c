@@ -31,13 +31,16 @@
 
 #include "screen.h"
 
+#ifndef CAPTUREBLT
+#   define CAPTUREBLT (DWORD)0x40000000 /* Include layered windows */
+#endif
+
 struct screen_data_t
 {
     HDC hdc_src;
     HDC hdc_dst;
-    HBITMAP hbmp;
+    BITMAPINFO bmi;
     HGDIOBJ hgdi_backup;
-    uint8_t *p_buffer;
 };
 
 int screen_InitCapture( demux_t *p_demux )
@@ -45,8 +48,6 @@ int screen_InitCapture( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data;
     int i_chroma, i_bits_per_pixel;
-
-    BITMAPINFO bmi;
 
     p_sys->p_data = p_data = malloc( sizeof( screen_data_t ) );
 
@@ -98,36 +99,17 @@ int screen_InitCapture( demux_t *p_demux )
     p_sys->fmt.video.i_bits_per_pixel = i_bits_per_pixel;
 
     /* Create the bitmap info header */
-    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmi.bmiHeader.biWidth = p_sys->fmt.video.i_width;
-    bmi.bmiHeader.biHeight = - p_sys->fmt.video.i_height;
-    bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biBitCount = p_sys->fmt.video.i_bits_per_pixel;
-    bmi.bmiHeader.biCompression = BI_RGB;
-    bmi.bmiHeader.biSizeImage = 0;
-    bmi.bmiHeader.biXPelsPerMeter =
-        bmi.bmiHeader.biYPelsPerMeter = 0;
-    bmi.bmiHeader.biClrUsed = 0;
-    bmi.bmiHeader.biClrImportant = 0;
-
-    /* Create the bitmap storage space */
-    p_data->hbmp = CreateDIBSection( p_data->hdc_dst, (BITMAPINFO *)&bmi,
-        DIB_RGB_COLORS, (void **)&p_data->p_buffer, NULL, 0 );
-    if( !p_data->hbmp || !p_data->p_buffer )
-    {
-        msg_Err( p_demux, "cannot create bitmap" );
-        if( p_data->hbmp ) DeleteObject( p_data->hbmp );
-        ReleaseDC( 0, p_data->hdc_src );
-        DeleteDC( p_data->hdc_dst );
-        return VLC_EGENERIC;
-    }
-
-    /* Select the bitmap into the compatible DC */
-    p_data->hgdi_backup = SelectObject( p_data->hdc_dst, p_data->hbmp );
-    if( !p_data->hgdi_backup )
-    {
-        msg_Err( p_demux, "cannot select bitmap" );
-    }
+    p_data->bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    p_data->bmi.bmiHeader.biWidth = p_sys->fmt.video.i_width;
+    p_data->bmi.bmiHeader.biHeight = - p_sys->fmt.video.i_height;
+    p_data->bmi.bmiHeader.biPlanes = 1;
+    p_data->bmi.bmiHeader.biBitCount = p_sys->fmt.video.i_bits_per_pixel;
+    p_data->bmi.bmiHeader.biCompression = BI_RGB;
+    p_data->bmi.bmiHeader.biSizeImage = 0;
+    p_data->bmi.bmiHeader.biXPelsPerMeter =
+        p_data->bmi.bmiHeader.biYPelsPerMeter = 0;
+    p_data->bmi.bmiHeader.biClrUsed = 0;
+    p_data->bmi.bmiHeader.biClrImportant = 0;
 
     return VLC_SUCCESS;
 }
@@ -137,8 +119,9 @@ int screen_CloseCapture( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data = p_sys->p_data;
 
-    SelectObject( p_data->hdc_dst, p_data->hgdi_backup );
-    DeleteObject( p_data->hbmp );
+    if( p_data->hgdi_backup)
+        SelectObject( p_data->hdc_dst, p_data->hgdi_backup );
+
     DeleteDC( p_data->hdc_dst );
     ReleaseDC( 0, p_data->hdc_src );
     free( p_data );
@@ -146,32 +129,90 @@ int screen_CloseCapture( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
-block_t *screen_Capture( demux_t *p_demux )
+struct block_sys_t
+{
+    HBITMAP hbmp;
+};
+
+static void CaptureBlockRelease( block_t *p_block )
+{
+    DeleteObject( p_block->p_sys->hbmp );
+    free( p_block );
+}
+
+static block_t *CaptureBlockNew( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     screen_data_t *p_data = p_sys->p_data;
     block_t *p_block;
-    int i_size;
+    void *p_buffer;
+    int i_buffer;
+    HBITMAP hbmp;
 
-    if( !BitBlt( p_data->hdc_dst, 0, 0,
-                 p_sys->fmt.video.i_width, p_sys->fmt.video.i_height,
-                 p_data->hdc_src, 0, 0, SRCCOPY ) )
+    /* Create the bitmap storage space */
+    hbmp = CreateDIBSection( p_data->hdc_dst, &p_data->bmi, DIB_RGB_COLORS,
+                             &p_buffer, NULL, 0 );
+    if( !hbmp || !p_buffer )
     {
-        msg_Err( p_demux, "error during BitBlt()" );
+        msg_Err( p_demux, "cannot create bitmap" );
+        if( hbmp ) DeleteObject( hbmp );
         return NULL;
     }
 
-    i_size = (p_sys->fmt.video.i_bits_per_pixel + 7) / 8 *
-        p_sys->fmt.video.i_width * p_sys->fmt.video.i_height;
+    /* Select the bitmap into the compatible DC */
+    if( !p_data->hgdi_backup )
+        p_data->hgdi_backup = SelectObject( p_data->hdc_dst, hbmp );
+    else
+        SelectObject( p_data->hdc_dst, hbmp );
 
-    if( !( p_block = block_New( p_demux, i_size ) ) )
+    if( !p_data->hgdi_backup )
+    {
+        msg_Err( p_demux, "cannot select bitmap" );
+        DeleteObject( hbmp );
+        return NULL;
+    }
+
+    if( !BitBlt( p_data->hdc_dst, 0, 0,
+                 p_sys->fmt.video.i_width, p_sys->fmt.video.i_height,
+                 p_data->hdc_src, 0, 0,
+                 IS_WINNT ? SRCCOPY | CAPTUREBLT : SRCCOPY ) )
+    {
+        msg_Err( p_demux, "error during BitBlt()" );
+        DeleteObject( hbmp );
+        return NULL;
+    }
+
+    /* Build block */
+    if( !(p_block = malloc( sizeof( block_t ) + sizeof( block_sys_t ) )) )
+    {
+        DeleteObject( hbmp );
+        return NULL;
+    }
+    memset( p_block, 0, sizeof( block_t ) );
+    p_block->p_sys = (block_sys_t *)( (uint8_t *)p_block + sizeof( block_t ) );
+
+    /* Fill all fields */
+    i_buffer = (p_sys->fmt.video.i_bits_per_pixel + 7) / 8 *
+        p_sys->fmt.video.i_width * p_sys->fmt.video.i_height;
+    p_block->p_next         = NULL;
+    p_block->i_buffer       = i_buffer;
+    p_block->p_buffer       = p_buffer;
+    p_block->pf_release     = CaptureBlockRelease;
+    p_block->p_manager      = VLC_OBJECT( p_demux->p_vlc );
+    p_block->p_sys->hbmp    = hbmp;
+
+    return p_block;
+}
+
+block_t *screen_Capture( demux_t *p_demux )
+{
+    block_t *p_block;
+
+    if( !( p_block = CaptureBlockNew( p_demux ) ) )
     {
         msg_Warn( p_demux, "cannot get block" );
         return 0;
     }
 
-    memcpy( p_block->p_buffer, p_data->p_buffer, i_size );
-
     return p_block;
 }
-
