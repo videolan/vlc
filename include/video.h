@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.57 2002/11/06 18:07:57 sam Exp $
+ * $Id: video.h,v 1.58 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -28,7 +28,7 @@
  *****************************************************************************/
 typedef struct plane_t
 {
-    u8 *p_pixels;                               /* Start of the plane's data */
+    uint8_t *p_pixels;                          /* Start of the plane's data */
 
     /* Variables used for fast memcpy operations */
     int i_lines;                                          /* Number of lines */
@@ -55,7 +55,7 @@ struct picture_t
     /* Picture data - data can always be freely modified, but p_data may
      * NEVER be modified. A direct buffer can be handled as the plugin
      * wishes, it can even swap p_pixels buffers. */
-    u8             *p_data;
+    uint8_t        *p_data;
     void           *p_data_orig;                  /* pointer before memalign */
     plane_t         p[ VOUT_MAX_PLANES ];       /* description of the planes */
     int             i_planes;                  /* number of allocated planes */
@@ -109,14 +109,17 @@ struct picture_heap_t
     int i_bmask, i_rbshift, i_lbshift;
 
     /* Stuff used for palettized RGB planes */
-    void (* pf_setpalette) ( vout_thread_t *, u16 *, u16 *, u16 * );
+    void (* pf_setpalette) ( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 };
 
-/* RGB2PIXEL: assemble RGB components to a pixel value, returns a u32 */
-#define RGB2PIXEL( p_vout, i_r, i_g, i_b )                                    \
-    (((((u32)i_r) >> p_vout->output.i_rrshift) << p_vout->output.i_lrshift) | \
-     ((((u32)i_g) >> p_vout->output.i_rgshift) << p_vout->output.i_lgshift) | \
-     ((((u32)i_b) >> p_vout->output.i_rbshift) << p_vout->output.i_lbshift))
+/* RGB2PIXEL: assemble RGB components to a pixel value, returns a uint32_t */
+#define RGB2PIXEL( p_vout, i_r, i_g, i_b )          \
+    (((((uint32_t)i_r) >> p_vout->output.i_rrshift) \
+                       << p_vout->output.i_lrshift) \
+   | ((((uint32_t)i_g) >> p_vout->output.i_rgshift) \
+                       << p_vout->output.i_lgshift) \
+   | ((((uint32_t)i_b) >> p_vout->output.i_rbshift) \
+                       << p_vout->output.i_lbshift))
 
 /*****************************************************************************
  * Flags used to describe the status of a picture
@@ -191,9 +194,9 @@ struct subpicture_t
         {
             vout_font_t *       p_font;            /* font, NULL for default */
             int                 i_style;                       /* text style */
-            u32                 i_char_color;             /* character color */
-            u32                 i_border_color;              /* border color */
-            u32                 i_bg_color;              /* background color */
+            uint32_t            i_char_color;             /* character color */
+            uint32_t            i_border_color;              /* border color */
+            uint32_t            i_bg_color;              /* background color */
         } text;
     } type;
 #endif

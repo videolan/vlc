@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.76 2002/11/09 16:34:52 sam Exp $
+ * $Id: input_ext-dec.h,v 1.77 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -102,7 +102,7 @@ struct decoder_fifo_t
     input_buffers_t    *p_packets_mgt;   /* packets management services data */
 
     /* Standard pointers given to the decoders as a toolbox. */
-    u16                 i_id;
+    uint16_t            i_id;
     vlc_fourcc_t        i_fourcc;
     es_sys_t *          p_demux_data;
     stream_ctrl_t *     p_stream_ctrl;
@@ -119,7 +119,7 @@ struct decoder_fifo_t
  * This type describes a bit fifo used to store bits while working with the
  * input stream at the bit level.
  *****************************************************************************/
-typedef u32         WORD_TYPE;
+typedef uint32_t    WORD_TYPE;
 
 typedef struct bit_fifo_t
 {
@@ -196,12 +196,12 @@ struct bit_stream_t
  * results will be returned. Use RealignBits() if unsure.
  */
 
-#if (WORD_TYPE == u32)
+#if (WORD_TYPE == uint32_t)
 #   define WORD_AT      U32_AT
-#   define WORD_SIGNED  s32
-#elif (WORD_TYPE == u64)
+#   define WORD_SIGNED  int32_t
+#elif (WORD_TYPE == uint64_t)
 #   define WORD_AT      U64_AT
-#   define WORD_SIGNED  s64
+#   define WORD_SIGNED  int64_t
 #else
 #   error Unsupported WORD_TYPE
 #endif
@@ -212,9 +212,9 @@ struct bit_stream_t
 VLC_EXPORT( int, InitBitstream, ( bit_stream_t *, decoder_fifo_t *, void ( * )( bit_stream_t *, vlc_bool_t ), void * p_callback_arg ) );
 VLC_EXPORT( vlc_bool_t, NextDataPacket,    ( decoder_fifo_t *, bit_stream_t * ) );
 VLC_EXPORT( void, BitstreamNextDataPacket, ( bit_stream_t * ) );
-VLC_EXPORT( u32,  UnalignedShowBits,       ( bit_stream_t *, unsigned int ) );
+VLC_EXPORT( uint32_t, UnalignedShowBits,   ( bit_stream_t *, unsigned int ) );
 VLC_EXPORT( void, UnalignedRemoveBits,     ( bit_stream_t * ) );
-VLC_EXPORT( u32,  UnalignedGetBits,        ( bit_stream_t *, unsigned int ) );
+VLC_EXPORT( uint32_t, UnalignedGetBits,    ( bit_stream_t *, unsigned int ) );
 VLC_EXPORT( void, CloseBitstream,          ( bit_stream_t * ) );
 VLC_EXPORT( void, CurrentPTS,              ( bit_stream_t *, mtime_t *, mtime_t * ) );
 VLC_EXPORT( void, NextPTS,                 ( bit_stream_t *, mtime_t *, mtime_t * ) );
@@ -250,7 +250,8 @@ static inline void AlignWord( bit_stream_t * p_bit_stream )
 /*****************************************************************************
  * ShowBits : return i_bits bits from the bit stream
  *****************************************************************************/
-static inline u32 ShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
+static inline uint32_t ShowBits( bit_stream_t * p_bit_stream,
+                                 unsigned int i_bits )
 {
     if( (unsigned int)p_bit_stream->fifo.i_available >= i_bits )
     {
@@ -272,8 +273,8 @@ static inline u32 ShowBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
  * ShowSignedBits : return i_bits bits from the bit stream, using signed
  *                  arithmetic
  *****************************************************************************/
-static inline s32 ShowSignedBits( bit_stream_t * p_bit_stream,
-                                  unsigned int i_bits )
+static inline int32_t ShowSignedBits( bit_stream_t * p_bit_stream,
+                                      unsigned int i_bits )
 {
     if( (unsigned int)p_bit_stream->fifo.i_available >= i_bits )
     {
@@ -318,7 +319,7 @@ static inline void RemoveBits( bit_stream_t * p_bit_stream,
  * RemoveBits32 : removes 32 bits from the bit buffer (and as a side effect,
  *                refill it)
  *****************************************************************************/
-#if (WORD_TYPE == u32)
+#if (WORD_TYPE == uint32_t)
 static inline void RemoveBits32( bit_stream_t * p_bit_stream )
 {
     if( p_bit_stream->p_byte <= p_bit_stream->p_end - sizeof(WORD_TYPE) )
@@ -348,9 +349,10 @@ static inline void RemoveBits32( bit_stream_t * p_bit_stream )
  * GetBits : returns i_bits bits from the bit stream and removes them
  *           XXX: do not use for 32 bits, see GetBits32
  *****************************************************************************/
-static inline u32 GetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
+static inline uint32_t GetBits( bit_stream_t * p_bit_stream,
+                                unsigned int i_bits )
 {
-    u32             i_result;
+    uint32_t        i_result;
 
     p_bit_stream->fifo.i_available -= i_bits;
 
@@ -385,12 +387,12 @@ static inline u32 GetBits( bit_stream_t * p_bit_stream, unsigned int i_bits )
  *                 using signed arithmetic
  *                 XXX: do not use for 32 bits
  *****************************************************************************/
-static inline s32 GetSignedBits( bit_stream_t * p_bit_stream,
-                                 unsigned int i_bits )
+static inline int32_t GetSignedBits( bit_stream_t * p_bit_stream,
+                                     unsigned int i_bits )
 {
     if( (unsigned int)p_bit_stream->fifo.i_available >= i_bits )
     {
-        s32             i_result;
+        int32_t         i_result;
 
         p_bit_stream->fifo.i_available -= i_bits;
         i_result = (WORD_SIGNED)p_bit_stream->fifo.buffer
@@ -407,10 +409,10 @@ static inline s32 GetSignedBits( bit_stream_t * p_bit_stream,
 /*****************************************************************************
  * GetBits32 : returns 32 bits from the bit stream and removes them
  *****************************************************************************/
-#if (WORD_TYPE == u32)
-static inline u32 GetBits32( bit_stream_t * p_bit_stream )
+#if (WORD_TYPE == uint32_t)
+static inline uint32_t GetBits32( bit_stream_t * p_bit_stream )
 {
-    u32             i_result;
+    uint32_t        i_result;
 
     if( p_bit_stream->fifo.i_available == 32 )
     {

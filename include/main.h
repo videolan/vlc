@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.50 2002/11/10 18:04:22 sam Exp $
+ * $Id: main.h,v 1.51 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -37,7 +37,7 @@ struct libvlc_t
     vlc_bool_t             b_ready;
 
     /* CPU extensions */
-    u32                    i_cpu;
+    uint32_t               i_cpu;
 
     /* Generic settings */
     int                    i_verbose;                       /* info messages */
@@ -83,7 +83,7 @@ struct vlc_t
 
     /* Fast memcpy plugin used */
     module_t *             p_memcpy_module;
-#if defined( WIN32 )
+#if defined( UNDER_CE )
     void* ( __cdecl *pf_memcpy ) ( void *, const void *, size_t );
     void* ( __cdecl *pf_memset ) ( void *, int, size_t );
 #else

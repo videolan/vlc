@@ -50,7 +50,7 @@
 /* The configuration file and directory */
 #ifdef SYS_BEOS
 #  define CONFIG_DIR                    "config/settings"
-#elif defined( WIN32 )
+#elif defined( WIN32 ) || defined( UNDER_CE )
 #  define CONFIG_DIR			"vlc"
 #else
 #  define CONFIG_DIR                    ".vlc"
@@ -108,7 +108,7 @@
 #define DEFAULT_PTS_DELAY               (mtime_t)(.3*CLOCK_FREQ)
 
 /* DVD and VCD devices */
-#ifndef WIN32
+#if !defined( WIN32 ) && !defined( UNDER_CE )
 #   define DVD_DEVICE "/dev/dvd"
 #   define VCD_DEVICE "/dev/cdrom"
 #else

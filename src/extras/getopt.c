@@ -81,7 +81,7 @@
 #endif
 #endif
 
-#if defined (WIN32) && !defined (__CYGWIN32__)
+#if defined (WIN32) && !defined (__CYGWIN32__) || defined(UNDER_CE)
 /* It's not Unix, really.  See?  Capital letters.  */
 #include <windows.h>
 #define getpid() GetCurrentProcessId()

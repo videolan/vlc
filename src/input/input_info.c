@@ -2,7 +2,7 @@
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_info.c,v 1.8 2002/11/10 18:04:23 sam Exp $
+ * $Id: input_info.c,v 1.9 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -28,10 +28,6 @@
 #include <string.h>
 
 #include <vlc/vlc.h>
-
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>                                           /* off_t */
-#endif
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

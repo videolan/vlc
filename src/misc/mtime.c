@@ -3,7 +3,7 @@
  * Functions are prototyped in mtime.h.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mtime.c,v 1.34 2002/08/08 00:35:11 sam Exp $
+ * $Id: mtime.c,v 1.35 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -46,7 +46,7 @@
 #   include <kernel/OS.h>
 #endif
 
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( UNDER_CE )
 #   include <windows.h>
 #else
 #   include <sys/time.h>
@@ -95,7 +95,7 @@ mtime_t mdate( void )
 #if defined( HAVE_KERNEL_OS_H )
     return( real_time_clock_usecs() );
 
-#elif defined( WIN32 )
+#elif defined( WIN32 ) || defined( UNDER_CE )
     /* We don't get the real date, just the value of a high precision timer.
      * this is because the usual time functions have at best only a milisecond
      * resolution */
@@ -142,7 +142,7 @@ void mwait( mtime_t date )
     }
     snooze( delay );
 
-#elif defined( WIN32 )
+#elif defined( WIN32 ) || defined( UNDER_CE )
     mtime_t usec_time, delay;
 
     usec_time = mdate();
@@ -218,7 +218,7 @@ void msleep( mtime_t delay )
 #elif defined( ST_INIT_IN_ST_H )
     st_usleep( delay );
 
-#elif defined( WIN32 )
+#elif defined( WIN32 ) || defined( UNDER_CE )
     Sleep( (int) (delay / 1000) );
 
 #elif defined( HAVE_NANOSLEEP )

@@ -9,9 +9,9 @@
  * Significantly revised and rewinddir, seekdir and telldir added by Colin
  * Peters <colin@fu.is.saga-u.ac.jp>
  *	
- * $Revision: 1.4 $
+ * $Revision: 1.5 $
  * $Author: sam $
- * $Date: 2002/11/10 23:41:53 $
+ * $Date: 2002/11/11 14:39:12 $
  *
  */
 
@@ -94,7 +94,7 @@ opendir (const CHAR *szPath)
     }
   else
     {
-      /* FIXME: if I wasn't lazy, I'dcheck for overflows here. */
+      /* FIXME: if I wasn't lazy, I'd check for overflows here. */
       sprintf (szFullPath, MAX_PATH, "\\%s", szPath );
     }
 #else

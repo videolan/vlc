@@ -9,7 +9,7 @@
  * Functions prototyped are implemented in interface/mtime.c.
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: mtime.h,v 1.12 2002/06/01 12:31:57 sam Exp $
+ * $Id: mtime.h,v 1.13 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -36,7 +36,7 @@
  * returning the date of the first image to be displayed. It can be used in
  * comparaison with other values: all existing dates will be earlier.
  *****************************************************************************/
-#define LAST_MDATE ((mtime_t)((u64)(-1)/2))
+#define LAST_MDATE ((mtime_t)((uint64_t)(-1)/2))
 
 /*****************************************************************************
  * MSTRTIME_MAX_SIZE: maximum possible size of mstrtime

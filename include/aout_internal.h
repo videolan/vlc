@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.30 2002/11/10 14:31:46 gbazin Exp $
+ * $Id: aout_internal.h,v 1.31 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -54,7 +54,7 @@ typedef struct aout_alloc_t
     else                                                                    \
     {                                                                       \
         int i_alloc_size;                                                   \
-        i_alloc_size = (u64)(p_alloc)->i_bytes_per_sec                      \
+        i_alloc_size = (uint64_t)(p_alloc)->i_bytes_per_sec                 \
                                             * (i_nb_usec) / 1000000 + 1;    \
         ALLOCA_TEST( p_alloc, p_new_buffer )                                \
         {                                                                   \
@@ -278,7 +278,7 @@ VLC_EXPORT( int, aout_FormatNbChannels, ( audio_sample_format_t * p_format ) );
 VLC_EXPORT( void, aout_FormatPrepare, ( audio_sample_format_t * p_format ) );
 VLC_EXPORT( void, aout_FormatPrint, ( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format ) );
 VLC_EXPORT( void, aout_FormatsPrint, ( aout_instance_t * p_aout, const char * psz_text, const audio_sample_format_t * p_format1, const audio_sample_format_t * p_format2 ) );
-void aout_FifoInit( aout_instance_t *, aout_fifo_t *, u32 );
+void aout_FifoInit( aout_instance_t *, aout_fifo_t *, uint32_t );
 mtime_t aout_FifoNextStart( aout_instance_t *, aout_fifo_t * );
 void aout_FifoPush( aout_instance_t *, aout_fifo_t *, aout_buffer_t * );
 void aout_FifoSet( aout_instance_t *, aout_fifo_t *, mtime_t );

@@ -2,7 +2,7 @@
  * cpu.h: CPU type detection
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlc_cpu.h,v 1.4 2002/10/03 13:21:54 sam Exp $
+ * $Id: vlc_cpu.h,v 1.5 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,5 +21,5 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-u32 CPUCapabilities( void );
+uint32_t CPUCapabilities( void );
 

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.36 2002/11/10 23:41:53 sam Exp $
+ * $Id: vlc_common.h,v 1.37 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -74,7 +74,9 @@
     typedef signed short        int16_t;
     typedef unsigned int        uint32_t;
     typedef signed int          int32_t;
-#   if defined( _MSC_VER ) || ( defined( WIN32 ) && !defined( __MINGW32__ ) )
+#   if defined( _MSC_VER ) \
+      || defined( UNDER_CE ) \
+      || ( defined( WIN32 ) && !defined( __MINGW32__ ) )
     typedef unsigned __int64    uint64_t;
     typedef signed __int64      int64_t;
 #   else
@@ -97,7 +99,7 @@ typedef int                 ptrdiff_t;
 #   endif
 #endif
 
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( UNDER_CE )
 typedef int                 ssize_t;
 #endif
 
@@ -272,7 +274,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 /*****************************************************************************
  * OS-specific headers and thread types
  *****************************************************************************/
-#if defined( WIN32 )
+#if defined( WIN32 ) || defined( UNDER_CE )
 #   define WIN32_LEAN_AND_MEAN
 #   include <windows.h>
 #endif
@@ -334,7 +336,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #ifdef NTOHL_IN_SYS_PARAM_H
 #   include <sys/param.h>
 
-#elif !defined(WIN32) /* NTOHL_IN_SYS_PARAM_H || WIN32 */
+#elif !defined(WIN32) && !defined( UNDER_CE )
 #   include <netinet/in.h>
 
 #endif /* NTOHL_IN_SYS_PARAM_H || WIN32 */
@@ -503,7 +505,7 @@ static inline uint64_t U64_AT( void * _p )
 #endif
 
 /* Format type specifiers for 64 bits numbers */
-#if !defined(WIN32)
+#if !defined(WIN32) && !defined(UNDER_CE)
 #   define I64Fd "%lld"
 #   define I64Fi "%lli"
 #   define I64Fo "%llo"
@@ -517,16 +519,16 @@ static inline uint64_t U64_AT( void * _p )
 #   define I64Fu "%I64u"
 #   define I64Fx "%I64x"
 #   define I64FX "%I64X"
-#endif /* defined(WIN32) */
+#endif /* defined(WIN32)||defined(UNDER_CE) */
 
 /* 64 bits integer constant suffix */
-#if !defined(WIN32)
+#if !defined(WIN32) && !defined(UNDER_CE)
 #   define I64C(x)         x##LL
 #else
 #   define I64C(x)         x##i64
-#endif /* defined(WIN32) */
+#endif /* defined(WIN32)||defined(UNDER_CE) */
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(UNDER_CE)
 /* win32, cl and icl support */
 #   if defined( _MSC_VER ) || !defined( __MINGW32__ )
 #       define __attribute__(x)

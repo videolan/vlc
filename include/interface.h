@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.36 2002/10/11 22:32:55 sam Exp $
+ * $Id: interface.h,v 1.37 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -62,7 +62,7 @@ VLC_EXPORT( void,              intf_Destroy,    ( intf_thread_t * ) );
 /*****************************************************************************
  * Macros
  *****************************************************************************/
-#ifdef WIN32
+#if defined( WIN32 ) && !defined( UNDER_CE )
 #    define CONSOLE_INTRO_MSG \
          AllocConsole(); \
          freopen( "CONOUT$", "w", stdout ); \

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.44 2002/11/10 23:41:53 sam Exp $
+ * $Id: configuration.c,v 1.45 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1216,7 +1216,7 @@ char *config_GetHomeDir( void )
     struct passwd *p_pw = NULL;
 #endif
 
-#ifdef WIN32
+#if defined(WIN32) || defined(UNDER_CE)
     typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
                                                LPTSTR );
 #   define CSIDL_FLAG_CREATE 0x8000

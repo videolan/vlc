@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.97 2002/11/10 18:04:23 sam Exp $
+ * $Id: input_programs.c,v 1.98 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -28,10 +28,6 @@
 #include <string.h>                                    /* memcpy(), memset() */
 
 #include <vlc/vlc.h>
-
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>                                           /* off_t */
-#endif
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -637,7 +633,7 @@ int input_UnselectES( input_thread_t * p_input, es_descriptor_t * p_es )
             i_index++;
         }
 
-        /* XXX: no need to memmove, we have unordered data */
+        /* XXX: no need to memmove, we have unsorted data */
         REMOVE_ELEM( p_input->stream.pp_selected_es,
                      p_input->stream.i_selected_es_number,
                      i_index );

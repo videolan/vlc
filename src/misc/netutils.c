@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.75 2002/11/10 18:04:24 sam Exp $
+ * $Id: netutils.c,v 1.76 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -50,7 +50,7 @@
 #endif
 
 #if defined( UNDER_CE )
-    /* No real network support */
+    /* No real network support (FIXME: use winsock1?) */
 #elif defined( WIN32 )
 #   include <winsock2.h>
 #else

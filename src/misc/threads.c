@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.25 2002/11/10 23:41:53 sam Exp $
+ * $Id: threads.c,v 1.26 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -39,6 +39,7 @@ static volatile int i_initializations = 0;
 
 #if defined( PTH_INIT_IN_PTH_H )
 #elif defined( ST_INIT_IN_ST_H )
+#elif defined( UNDER_CE )
 #elif defined( WIN32 )
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     static pthread_mutex_t once_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -151,6 +152,8 @@ int __vlc_threads_init( vlc_object_t *p_this )
     while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
 #elif defined( ST_INIT_IN_ST_H )
     while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
+#elif defined( UNDER_CE )
+    while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
 #elif defined( WIN32 )
     while( i_status == VLC_THREADS_PENDING ) msleep( THREAD_SLEEP );
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -187,6 +190,9 @@ int __vlc_threads_end( vlc_object_t *p_this )
 #elif defined( ST_INIT_IN_ST_H )
     i_initializations--;
 
+#elif defined( UNDER_CE )
+    i_initializations--;
+
 #elif defined( WIN32 )
     i_initializations--;
 
@@ -212,7 +218,7 @@ int __vlc_threads_end( vlc_object_t *p_this )
 /* Wrapper function for profiling */
 static void *      vlc_thread_wrapper ( void *p_wrapper );
 
-#   ifdef WIN32
+#   if defined( WIN32 ) && !defined( UNDER_CE )
 
 #       define ITIMER_REAL 1
 #       define ITIMER_PROF 2
@@ -224,7 +230,7 @@ struct itimerval
 };  
 
 int setitimer(int kind, const struct itimerval* itnew, struct itimerval* itold);
-#   endif /* WIN32 */
+#   endif /* WIN32 && !UNDER_CE */
 
 typedef struct wrapper_t
 {
@@ -257,12 +263,15 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
     p_mutex->mutex = st_mutex_new();
     return ( p_mutex->mutex == NULL ) ? errno : 0;
 
+#elif defined( UNDER_CE )
+    InitializeCriticalSection( &p_mutex->csection );
+    return 0;
+
 #elif defined( WIN32 )
     /* We use mutexes on WinNT/2K/XP because we can use the SignalObjectAndWait
      * function and have a 100% correct vlc_cond_wait() implementation.
      * As this function is not available on Win9x, we can use the faster
      * CriticalSections */
-#   if !defined( UNDER_CE )
     if( p_this->p_libvlc->SignalObjectAndWait &&
         !p_this->p_libvlc->b_fast_mutex )
     {
@@ -271,7 +280,6 @@ int __vlc_mutex_init( vlc_object_t *p_this, vlc_mutex_t *p_mutex )
         return ( p_mutex->mutex != NULL ? 0 : 1 );
     }
     else
-#   endif
     {
         p_mutex->mutex = NULL;
         InitializeCriticalSection( &p_mutex->csection );
@@ -338,6 +346,10 @@ int __vlc_mutex_destroy( char * psz_file, int i_line, vlc_mutex_t *p_mutex )
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_mutex_destroy( p_mutex->mutex );
 
+#elif defined( UNDER_CE )
+    DeleteCriticalSection( &p_mutex->csection );
+    return 0;
+
 #elif defined( WIN32 )
     if( p_mutex->mutex )
     {
@@ -393,11 +405,21 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     p_condvar->cond = st_cond_new();
     return ( p_condvar->cond == NULL ) ? errno : 0;
 
+#elif defined( UNDER_CE )
+    /* Initialize counter */
+    p_condvar->i_waiting_threads = 0;
+
+    /* Create an auto-reset event. */
+    p_condvar->event = CreateEvent( NULL,   /* no security */
+                                    FALSE,  /* auto-reset event */
+                                    FALSE,  /* start non-signaled */
+                                    NULL ); /* unnamed */
+    return !p_condvar->event;
+
 #elif defined( WIN32 )
     /* Initialize counter */
     p_condvar->i_waiting_threads = 0;
 
-#   if !defined( UNDER_CE )
     /* Misc init */
     p_condvar->i_win9x_cv = p_this->p_libvlc->i_win9x_cv;
     p_condvar->SignalObjectAndWait = p_this->p_libvlc->SignalObjectAndWait;
@@ -405,7 +427,6 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
     if( (p_condvar->SignalObjectAndWait && !p_this->p_libvlc->b_fast_mutex)
         || p_condvar->i_win9x_cv == 0 )
     {
-#   endif
         /* Create an auto-reset event. */
         p_condvar->event = CreateEvent( NULL,   /* no security */
                                         FALSE,  /* auto-reset event */
@@ -414,7 +435,6 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
 
         p_condvar->semaphore = NULL;
         return !p_condvar->event;
-#   if !defined( UNDER_CE )
     }
     else
     {
@@ -434,7 +454,6 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
 
         return !p_condvar->semaphore || !p_condvar->event;
     }
-#   endif
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
     return pthread_cond_init( &p_condvar->cond, NULL );
@@ -480,6 +499,9 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
 
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_cond_destroy( p_condvar->cond );
+
+#elif defined( UNDER_CE )
+    i_result = !CloseHandle( p_condvar->event );
 
 #elif defined( WIN32 )
     if( !p_condvar->semaphore )
@@ -552,7 +574,7 @@ int __vlc_thread_create( vlc_object_t *p_this, char * psz_file, int i_line,
     p_this->thread_id = st_thread_create( func, (void *)p_this, 1, 0 );
     i_ret = 0;
     
-#elif defined( WIN32 )
+#elif defined( WIN32 ) || defined( UNDER_CE )
     {
         unsigned threadID;
         /* When using the MSVCRT C library you have to use the _beginthreadex
@@ -671,6 +693,9 @@ void __vlc_thread_join( vlc_object_t *p_this, char * psz_file, int i_line )
 #elif defined( ST_INIT_IN_ST_H )
     i_ret = st_thread_join( p_this->thread_id, NULL );
     
+#elif defined( UNDER_CE )
+    WaitForSingleObject( p_this->thread_id, INFINITE );
+
 #elif defined( WIN32 )
     WaitForSingleObject( p_this->thread_id, INFINITE );
 

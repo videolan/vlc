@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.69 2002/10/20 12:23:47 massiot Exp $
+ * $Id: audio_output.h,v 1.70 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -85,7 +85,7 @@ struct audio_sample_format_t
  * integers, but multiplication requires shifting the 64-bit result
  * from 56 fractional bits back to 28 (and rounding.)
  */
-typedef s32 vlc_fixed_t;
+typedef int32_t vlc_fixed_t;
 #define FIXED32_FRACBITS 28
 #define FIXED32_MIN ((vlc_fixed_t) -0x80000000L)
 #define FIXED32_MAX ((vlc_fixed_t) +0x7fffffffL)
@@ -145,9 +145,9 @@ struct aout_buffer_t
  *****************************************************************************/
 struct audio_date_t
 {
-    mtime_t date;
-    u32     i_divider;
-    u32     i_remainder;
+    mtime_t  date;
+    uint32_t i_divider;
+    uint32_t i_remainder;
 };
 
 /*****************************************************************************
@@ -157,11 +157,11 @@ struct audio_date_t
 #define aout_New(a) __aout_New(VLC_OBJECT(a))
 VLC_EXPORT( aout_instance_t *, __aout_New, ( vlc_object_t * ) );
 VLC_EXPORT( void, aout_Delete, ( aout_instance_t * ) );
-VLC_EXPORT( void, aout_DateInit, ( audio_date_t *, u32 ) );
+VLC_EXPORT( void, aout_DateInit, ( audio_date_t *, uint32_t ) );
 VLC_EXPORT( void, aout_DateSet, ( audio_date_t *, mtime_t ) );
 VLC_EXPORT( void, aout_DateMove, ( audio_date_t *, mtime_t ) );
 VLC_EXPORT( mtime_t, aout_DateGet, ( const audio_date_t * ) );
-VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, u32 ) );
+VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, uint32_t ) );
 
 /* From dec.c : */
 #define aout_DecNew(a, b, c) __aout_DecNew(VLC_OBJECT(a), b, c)

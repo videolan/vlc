@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.77 2002/08/18 13:16:51 sigmunau Exp $
+ * $Id: input_ext-intf.h,v 1.78 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -45,10 +45,10 @@
  *****************************************************************************/
 struct es_descriptor_t
 {
-    u16                     i_id;            /* stream ID for PS, PID for TS */
-    u8                      i_stream_id;     /* stream ID defined in the PES */
+    uint16_t                i_id;            /* stream ID for PS, PID for TS */
+    uint8_t                 i_stream_id;     /* stream ID defined in the PES */
     vlc_fourcc_t            i_fourcc;                         /* stream type */
-    u8                      i_cat;    /* stream category (audio, video, spu) */
+    uint8_t                 i_cat;    /* stream category (audio, video, spu) */
     int                     i_demux_fd;   /* used to store demux device
                                              file handle */
     char                    psz_desc[20]; /* description of ES: audio language
@@ -93,12 +93,12 @@ struct es_descriptor_t
 struct pgrm_descriptor_t
 {
     /* Program characteristics */
-    u16                     i_number;                      /* program number */
-    u8                      i_version;                     /* version number */
+    uint16_t                i_number;                      /* program number */
+    uint8_t                 i_version;                     /* version number */
     vlc_bool_t              b_is_ok;      /* Is the description up to date ? */
 
     /* Service Descriptor (program name) - DVB extension */
-    u8                      i_srv_type;
+    uint8_t                 i_srv_type;
     char *                  psz_srv_name;
 
     /* Synchronization information */
@@ -208,7 +208,7 @@ struct input_info_category_t {
  *****************************************************************************/
 struct stream_descriptor_t
 {
-    u16                     i_stream_id;                        /* stream id */
+    uint16_t                i_stream_id;                        /* stream id */
     vlc_bool_t              b_changed;    /* if stream has been changed,
                                              we have to inform the interface */
     vlc_mutex_t             stream_lock;  /* to be taken every time you read
@@ -228,7 +228,7 @@ struct stream_descriptor_t
     input_area_t *          p_new_area;  /* Newly selected area from
                                           * the interface */
 
-    u32                     i_mux_rate; /* the rate we read the stream (in
+    uint32_t                i_mux_rate; /* the rate we read the stream (in
                                          * units of 50 bytes/s) ; 0 if undef */
 
     /* New status and rate requested by the interface */
@@ -279,7 +279,7 @@ struct stream_position_t
     off_t    i_tell;     /* actual location in the area (in arbitrary units) */
     off_t    i_size;          /* total size of the area (in arbitrary units) */
 
-    u32      i_mux_rate;                /* the rate we read the stream (in
+    uint32_t i_mux_rate;                /* the rate we read the stream (in
                                          * units of 50 bytes/s) ; 0 if undef */
 };
 
@@ -386,7 +386,7 @@ VLC_EXPORT( void, input_DumpStream, ( input_thread_t * ) );
 VLC_EXPORT( char *, input_OffsetToTime, ( input_thread_t *, char *, off_t ) );
 VLC_EXPORT( int, input_ToggleES, ( input_thread_t *, es_descriptor_t *, vlc_bool_t ) );
 VLC_EXPORT( int, input_ChangeArea, ( input_thread_t *, input_area_t * ) );
-VLC_EXPORT( int, input_ChangeProgram, ( input_thread_t *, u16 ) );
+VLC_EXPORT( int, input_ChangeProgram, ( input_thread_t *, uint16_t ) );
 
 int    input_ToggleGrayscale( input_thread_t * );
 int    input_ToggleMute     ( input_thread_t * );

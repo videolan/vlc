@@ -2,7 +2,7 @@
  * cpu.c: CPU detection code
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: cpu.c,v 1.8 2002/11/10 18:04:24 sam Exp $
+ * $Id: cpu.c,v 1.9 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -65,9 +65,9 @@ static char   *psz_capability;
  *****************************************************************************
  * This function is called to list extensions the CPU may have.
  *****************************************************************************/
-u32 CPUCapabilities( void )
+uint32_t CPUCapabilities( void )
 {
-    volatile u32 i_capabilities = CPU_CAPABILITY_NONE;
+    volatile uint32_t i_capabilities = CPU_CAPABILITY_NONE;
 
 #if defined( SYS_DARWIN )
     struct host_basic_info hi;

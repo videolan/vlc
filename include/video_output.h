@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.85 2002/11/06 18:07:57 sam Exp $
+ * $Id: video_output.h,v 1.86 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -68,7 +68,7 @@ struct vout_thread_t
     vout_sys_t *        p_sys;                       /* system output method */
 
     /* Current display properties */
-    u16                 i_changes;             /* changes made to the thread */
+    uint16_t            i_changes;             /* changes made to the thread */
     float               f_gamma;                                    /* gamma */
     vlc_bool_t          b_grayscale;           /* color or grayscale display */
     vlc_bool_t          b_info;              /* print additional information */
@@ -142,13 +142,13 @@ struct vout_thread_t
  * Prototypes
  *****************************************************************************/
 #define vout_CreateThread(a,b,c,d,e) __vout_CreateThread(VLC_OBJECT(a),b,c,d,e)
-VLC_EXPORT( vout_thread_t *, __vout_CreateThread,   ( vlc_object_t *, int, int, u32, int ) );
+VLC_EXPORT( vout_thread_t *, __vout_CreateThread,   ( vlc_object_t *, int, int, uint32_t, int ) );
 VLC_EXPORT( void,              vout_DestroyThread,  ( vout_thread_t * ) );
 
-VLC_EXPORT( int,             vout_ChromaCmp,      ( u32, u32 ) );
+VLC_EXPORT( int,             vout_ChromaCmp,      ( uint32_t, uint32_t ) );
 
 VLC_EXPORT( picture_t *,     vout_CreatePicture,  ( vout_thread_t *, vlc_bool_t, vlc_bool_t, vlc_bool_t ) );
-VLC_EXPORT( void,            vout_AllocatePicture,( vout_thread_t *, picture_t *, int, int, u32 ) );
+VLC_EXPORT( void,            vout_AllocatePicture,( vout_thread_t *, picture_t *, int, int, uint32_t ) );
 VLC_EXPORT( void,            vout_DestroyPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_DisplayPicture, ( vout_thread_t *, picture_t * ) );
 VLC_EXPORT( void,            vout_DatePicture,    ( vout_thread_t *, picture_t *, mtime_t ) );

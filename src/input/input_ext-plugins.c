@@ -2,7 +2,7 @@
  * input_ext-plugins.c: useful functions for access and demux plug-ins
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: input_ext-plugins.c,v 1.21 2002/11/10 23:41:53 sam Exp $
+ * $Id: input_ext-plugins.c,v 1.22 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -52,7 +52,7 @@
 #endif
 
 #ifdef UNDER_CE
-    /* No network support */
+    /* No network support (FIXME: use winsock1?) */
 #elif defined( WIN32 )
 #   include <winsock2.h>
 #   include <ws2tcpip.h>

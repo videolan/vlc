@@ -2,7 +2,7 @@
  * os_specific.h: OS specific features
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: os_specific.h,v 1.9 2002/06/02 14:26:15 gbazin Exp $
+ * $Id: os_specific.h,v 1.10 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -30,7 +30,7 @@
 #   include "beos_specific.h"
 #elif defined( SYS_DARWIN )
 #   include "darwin_specific.h"
-#elif defined( WIN32 )
+#elif defined( WIN32 ) || defined( UNDER_CE )
 #   include "win32_specific.h"
 #else
 #   undef _NEED_OS_SPECIFIC_H

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.61 2002/08/21 17:31:58 sam Exp $
+ * $Id: modules.h,v 1.62 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -67,9 +67,9 @@ struct module_t
 
     char *pp_shortcuts[ MODULE_SHORTCUT_MAX ];    /* Shortcuts to the module */
 
-    char *psz_capability;                                      /* Capability */
-    int   i_score;                              /* Score for each capability */
-    u32   i_cpu;                                /* Required CPU capabilities */
+    char    *psz_capability;                                   /* Capability */
+    int      i_score;                           /* Score for each capability */
+    uint32_t i_cpu;                             /* Required CPU capabilities */
 
     vlc_bool_t b_unloadable;                          /* Can we be dlclosed? */
     vlc_bool_t b_reentrant;                             /* Are we reentrant? */

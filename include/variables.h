@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.7 2002/10/28 20:57:01 sam Exp $
+ * $Id: variables.h,v 1.8 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -34,7 +34,7 @@ struct variable_t
 
     /* The variable unique name, (almost) unique hashed value, and type */
     char *       psz_name;
-    u32          i_hash;
+    uint32_t     i_hash;
     int          i_type;
 
     /* A pointer to a comparison function, a duplication function, and

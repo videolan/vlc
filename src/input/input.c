@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.214 2002/11/10 18:04:23 sam Exp $
+ * $Id: input.c,v 1.215 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -29,16 +29,6 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
-#endif
 
 #include <string.h>
 
@@ -388,11 +378,11 @@ static int InitThread( input_thread_t * p_input )
     {
         psz_parser++;
     }
-#ifdef WIN32
+#if defined( WIN32 ) || defined( UNDER_CE )
     if( psz_parser - p_input->psz_source == 1 )
     {
         msg_Warn( p_input, "drive letter %c: found in source string",
-                           p_input->psz_source ) ;
+                           p_input->psz_source[0] ) ;
         psz_parser = "";
     }
 #endif

@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.102 2002/11/10 18:04:24 sam Exp $
+ * $Id: modules.c,v 1.103 2002/11/11 14:39:12 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -56,6 +56,8 @@
 #   define HAVE_DYNAMIC_PLUGINS
 #elif defined(HAVE_IMAGE_H)                                          /* BeOS */
 #   include <image.h>
+#   define HAVE_DYNAMIC_PLUGINS
+#elif defined(UNDER_CE)
 #   define HAVE_DYNAMIC_PLUGINS
 #elif defined(WIN32)
 #   define HAVE_DYNAMIC_PLUGINS

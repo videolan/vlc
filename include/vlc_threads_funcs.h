@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2002 VideoLAN
- * $Id: vlc_threads_funcs.h,v 1.8 2002/11/10 18:04:22 sam Exp $
+ * $Id: vlc_threads_funcs.h,v 1.9 2002/11/11 14:39:11 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -76,6 +76,10 @@ static inline int __vlc_mutex_lock( char * psz_file, int i_line,
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_mutex_lock( p_mutex->mutex );
 
+#elif defined( UNDER_CE )
+    EnterCriticalSection( &p_mutex->csection );
+    return 0;
+
 #elif defined( WIN32 )
     if( p_mutex->mutex )
     {
@@ -142,6 +146,10 @@ static inline int __vlc_mutex_unlock( char * psz_file, int i_line,
 
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_mutex_unlock( p_mutex->mutex );
+
+#elif defined( UNDER_CE )
+    LeaveCriticalSection( &p_mutex->csection );
+    return 0;
 
 #elif defined( WIN32 )
     if( p_mutex->mutex )
@@ -224,6 +232,10 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_cond_signal( p_condvar->cond );
 
+#elif defined( UNDER_CE )
+    PulseEvent( p_condvar->event );
+    return 0;
+
 #elif defined( WIN32 )
     /* Release one waiting thread if one is available. */
     /* For this trick to work properly, the vlc_cond_signal must be surrounded
@@ -232,7 +244,6 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
     {
         PulseEvent( p_condvar->event );
     }
-#   ifndef UNDER_CE
     else if( p_condvar->i_win9x_cv == 1 )
     {
         /* Wait for the gate to be open */
@@ -264,7 +275,6 @@ static inline int __vlc_cond_signal( char * psz_file, int i_line,
             WaitForSingleObject( p_condvar->event, INFINITE );
         }
     }
-#   endif
     return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -357,6 +367,16 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
 #elif defined( ST_INIT_IN_ST_H )
     i_result = st_cond_broadcast( p_condvar->cond );
 
+#elif defined( UNDER_CE )
+    int i;
+
+    /* Release all waiting threads. */
+    for( i = p_condvar->i_waiting_threads; i > 0; i-- )
+    {
+        PulseEvent( p_condvar->event );
+    }
+    return 0;
+
 #elif defined( WIN32 )
     int i;
 
@@ -368,7 +388,6 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
             PulseEvent( p_condvar->event );
         }
     }
-#   ifndef UNDER_CE
     else if( p_condvar->i_win9x_cv == 1 )
     {
         /* Wait for the gate to be open */
@@ -402,7 +421,6 @@ static inline int __vlc_cond_broadcast( char * psz_file, int i_line,
             WaitForSingleObject( p_condvar->event, INFINITE );
         }
     }
-#   endif
     return 0;
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -490,6 +508,17 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
     st_mutex_unlock( p_mutex->mutex );
     i_result = st_cond_wait( p_condvar->cond );
     st_mutex_lock( p_mutex->mutex );
+
+#elif defined( UNDER_CE )
+    p_condvar->i_waiting_threads++;
+    LeaveCriticalSection( &p_mutex->csection );
+    WaitForSingleObject( p_condvar->event, INFINITE );
+    p_condvar->i_waiting_threads--;
+
+    /* Reacquire the mutex before returning. */
+    vlc_mutex_lock( p_mutex );
+
+    return 0;
 
 #elif defined( WIN32 )
     if( !p_condvar->semaphore )
