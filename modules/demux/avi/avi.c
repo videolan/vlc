@@ -740,7 +740,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
                         if( !(i_loop_count % (1024 * 10)) )
                             msg_Warn( p_demux,
-                                      "doesn't seem to find any data..." );
+                                      "don't seem to find any data..." );
                     }
                     continue;
                 }
@@ -1046,10 +1046,8 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
 
     demux_sys_t *p_sys = p_demux->p_sys;
     unsigned int i_stream;
-    msg_Dbg( p_demux,
-             "seek requested: "I64Fd" secondes %d%%",
-             i_date / 1000000,
-             i_percent );
+    msg_Dbg( p_demux, "seek requested: "I64Fd" secondes %d%%",
+             i_date / 1000000, i_percent );
 
     if( p_sys->b_seekable )
     {
@@ -1059,8 +1057,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             int64_t i_pos;
 
             /* use i_percent to create a true i_date */
-            msg_Warn( p_demux,
-                      "mmh, seeking without index at %d%%"
+            msg_Warn( p_demux, "mmh, seeking without index at %d%%"
                       " work only for interleaved file", i_percent );
             if( i_percent >= 100 )
             {
@@ -1070,8 +1067,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             i_percent = __MAX( i_percent, 0 );
 
             /* try to find chunk that is at i_percent or the file */
-            i_pos = __MAX( i_percent *
-                           stream_Size( p_demux->s ) / 100,
+            i_pos = __MAX( i_percent * stream_Size( p_demux->s ) / 100,
                            p_sys->i_movi_begin );
             /* search first selected stream */
             for( i_stream = 0, p_stream = NULL;
@@ -1090,9 +1086,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
             }
 
             /* be sure that the index exist */
-            if( AVI_StreamChunkSet( p_demux,
-                                    i_stream,
-                                    0 ) )
+            if( AVI_StreamChunkSet( p_demux, i_stream, 0 ) )
             {
                 msg_Warn( p_demux, "cannot seek" );
                 return( -1 );
@@ -1109,6 +1103,7 @@ static int Seek( demux_t *p_demux, mtime_t i_date, int i_percent )
                     return( -1 );
                 }
             }
+
             i_date = AVI_GetPTS( p_stream );
             /* TODO better support for i_samplesize != 0 */
             msg_Dbg( p_demux, "estimate date "I64Fd, i_date );
@@ -1343,11 +1338,11 @@ static mtime_t AVI_GetPTS( avi_track_t *tk )
     }
 }
 
-static int AVI_StreamChunkFind( demux_t *p_demux,
-                                unsigned int i_stream )
+static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     avi_packet_t avi_pk;
+    int i_loop_count = 0;
 
     /* find first chunk of i_stream that isn't in index */
 
@@ -1366,10 +1361,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux,
 
     for( ;; )
     {
-        if( p_demux->b_die )
-        {
-            return VLC_EGENERIC;
-        }
+        if( p_demux->b_die ) return VLC_EGENERIC;
 
         if( AVI_PacketGetHeader( p_demux, &avi_pk ) )
         {
@@ -1382,6 +1374,18 @@ static int AVI_StreamChunkFind( demux_t *p_demux,
             if( AVI_PacketNext( p_demux ) )
             {
                 return VLC_EGENERIC;
+            }
+
+            /* Prevents from eating all the CPU with broken files.
+             * This value should be low enough so that it doesn't
+             * affect the reading speed too much. */
+            if( !(++i_loop_count % 1024) )
+            {
+                if( p_demux->b_die ) return VLC_EGENERIC;
+                msleep( 10000 );
+
+                if( !(i_loop_count % (1024 * 10)) )
+                    msg_Warn( p_demux, "don't seem to find any data..." );
             }
         }
         else
@@ -1412,8 +1416,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux,
 
 
 /* be sure that i_ck will be a valid index entry */
-static int AVI_StreamChunkSet( demux_t    *p_demux,
-                               unsigned int i_stream,
+static int AVI_StreamChunkSet( demux_t *p_demux, unsigned int i_stream,
                                unsigned int i_ck )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
