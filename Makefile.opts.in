@@ -199,6 +199,10 @@ ifneq (,$(findstring mingw32,$(SYS)))
 CFLAGS += -fnative-struct -D_OFF_T_ -D_off_t=long
 endif
 
+ifneq (,$(findstring bsd,$(SYS)))
+CFLAGS += -pthread
+endif
+
 # Optimizations : don't compile debug versions with them
 ifeq ($(OPTIMS),1)
 CFLAGS += -O3

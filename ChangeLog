@@ -62,6 +62,7 @@ HEAD
   * Grayscale mode now turns off chroma IDCT decoding.
   * Kludged so that times displayed in the scrollbar are finally correct
     for MPEG-2 streams.
+  * FreeBSD compilation fix by Øyvind Kolbu.
 
 0.2.80
 Tue,  5 Jun 2001 04:41:06 +0200

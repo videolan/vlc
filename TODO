@@ -39,7 +39,7 @@ Urgency: Critical
 Description: Fix the FreeBSD port
  The FreeBSD port of vlc doesn't run, probably because of a pthread
  issue. This should be investigated.
-Status: Todo
+Status: Done 19 Jul 2001 (Øyvind Kolbu <oyvindk@world-online.no>)
 
 Task: 0x5a
 Difficulty: Hard
