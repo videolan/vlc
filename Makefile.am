@@ -352,10 +352,13 @@ vlc_SOURCES = src/vlc.c $(SOURCES_libgetopt)
 # but we don't write it directly, otherwise automake will go amok and eat all
 # the memory because of its 2^N crap algorithm. So we fool him. Nuahaha.
 vlc_LDADD = lib/libvlc.a $(LDFLAGS_vlc) $(DATA_win32_rc) @AUTOMAKE_SUCKS@
-vlc_DEPENDENCIES = lib/libvlc.a $(L_builtin)
 vlc_CFLAGS = $(CPPFLAGS_default) $(CFLAGS_default)
 
-vlc$(EXEEXT): $(vlc_OBJECTS) $(vlc_DEPENDENCIES)
+# We use DEPENDENCIES_vlc instead of vlc_DEPENDENCIES because of an
+# old automake-1.5 bug (automake/279).
+DEPENDENCIES_vlc = lib/libvlc.a $(L_builtin)
+
+vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc)
 	@rm -f vlc$(EXEEXT)
 	$(LINK) $(vlc_LDFLAGS) $(vlc_OBJECTS) $(vlc_LDADD) $(LIBS)
 if HAVE_BEOS
