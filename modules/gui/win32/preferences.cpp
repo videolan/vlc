@@ -394,7 +394,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
 
     /* Enumerate config options and add corresponding config boxes */
     p_item = p_module->p_config;
-    do
+    if( p_item ) do
     {
         switch( p_item->i_type )
         {
@@ -438,7 +438,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
                 }
             }
 
-            vlc_list_release( p_intfGlobal, p_list );
+            vlc_list_release( p_list );
 
             break;
 

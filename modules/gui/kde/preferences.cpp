@@ -2,7 +2,7 @@
  * preferences.cpp: preferences window for the kde gui
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: preferences.cpp,v 1.3 2002/08/14 17:06:53 sam Exp $
+ * $Id: preferences.cpp,v 1.4 2002/08/15 12:11:15 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no> Mon Aug 12 2002
  *
@@ -51,7 +51,6 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
     KDialogBase ( Tabbed, caption, Ok| Apply|Cancel|User1, Ok, parent,
                   "vlc preferences", true, false, "Save")
 {
-    module_t *p_module;
     module_t **pp_parser;
     vlc_list_t *p_list;
     module_config_t *p_item;
@@ -60,17 +59,30 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
 
     this->p_intf = p_intf;
 
+    /* List all modules */
+    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+
     /* Look for the selected module */
-    for( p_module = p_intf->p_vlc->p_module_bank->first ; p_module != NULL ;
-         p_module = p_module->next )
+    for( pp_parser = (module_t **)p_list->pp_objects ;
+         *pp_parser ;
+         pp_parser++ )
     {
 
-        if( psz_module_name && !strcmp( psz_module_name, p_module->psz_object_name ) )
+        if( psz_module_name
+             && !strcmp( psz_module_name, (*pp_parser)->psz_object_name ) )
+        {
             break;
+        }
     }
-    if( !p_module ) return;
-    p_item = p_module->p_config;
-    do
+
+    if( !(*pp_parser) )
+    {
+        vlc_list_release( p_list );
+        return;
+    }
+
+    p_item = (*pp_parser)->p_config;
+    if( p_item ) do
     {
         switch( p_item->i_type )
         {
@@ -118,11 +130,9 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
 
                 
                 /* build a list of available plugins */
-                p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE,
-                                                FIND_ANYWHERE );
-                pp_parser = (module_t **)p_list->pp_objects;
-
-                for( ; *pp_parser ; pp_parser++ )
+                for( pp_parser = (module_t **)p_list->pp_objects ;
+                     *pp_parser ;
+                     pp_parser++ )
                 {
                     if( !strcmp( (*pp_parser)->psz_capability,
                                  p_item->psz_type ) )
@@ -132,7 +142,6 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
                                           (*pp_parser)->psz_longname);
                     }
                 }
-                vlc_list_release( p_intf, p_list );
 
                 vlc_mutex_unlock( p_item->p_lock );
             }
@@ -221,8 +230,10 @@ KPreferences::KPreferences(intf_thread_t *p_intf, const char *psz_module_name,
         p_item++;
     }
     while( p_item->i_type != CONFIG_HINT_END );
+
+    vlc_list_release( p_list );
+
     exec();
-    
 }
 
 /*
@@ -237,16 +248,25 @@ KPreferences::~KPreferences()
 */
 bool KPreferences::isConfigureable(QString module)
 {
-    module_t *p_module;
-    for( p_module = p_intf->p_vlc->p_module_bank->first ;
-         p_module != NULL ;
-         p_module = p_module->next ) {
-        if( !module.compare( p_module->psz_object_name ) ) {
-            return p_module->i_config_items != 0;
+    module_t **pp_parser;
+    vlc_list_t *p_list;
+
+    p_list = vlc_list_find( this->p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+
+    for( pp_parser = (module_t **)p_list->pp_objects ;
+         *pp_parser ;
+         pp_parser++ )
+    {
+        if( !module.compare( (*pp_parser)->psz_object_name ) )
+        {
+            bool ret = (*pp_parser)->i_config_items != 0;
+            vlc_list_release( p_list );
+            return ret;
         }
     }
-    return false;
 
+    vlc_list_release( p_list );
+    return false;
 }
 
 /*

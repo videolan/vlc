@@ -304,7 +304,7 @@ static const char * module_error( char *psz_buffer )
     (p_symbols)->__vlc_object_yield_inner = __vlc_object_yield; \
     (p_symbols)->__vlc_object_release_inner = __vlc_object_release; \
     (p_symbols)->__vlc_list_find_inner = __vlc_list_find; \
-    (p_symbols)->__vlc_list_release_inner = __vlc_list_release; \
+    (p_symbols)->vlc_list_release_inner = vlc_list_release; \
     (p_symbols)->__vlc_liststructure_inner = __vlc_liststructure; \
     (p_symbols)->__vlc_dumpstructure_inner = __vlc_dumpstructure; \
     (p_symbols)->playlist_Command_inner = playlist_Command; \

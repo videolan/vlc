@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.59 2002/07/31 20:56:50 sam Exp $
+ * $Id: modules.h,v 1.60 2002/08/15 12:11:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -45,11 +45,6 @@ struct module_bank_t
 {
     VLC_COMMON_MEMBERS
 
-    module_t *   first;                          /* First module in the bank */
-    int          i_count;                     /* Number of allocated modules */
-
-    vlc_mutex_t  lock;         /* Global lock -- you can't imagine how awful *
-                                    it is to design thread-safe linked lists */
     module_symbols_t symbols;
 };
 
@@ -98,12 +93,6 @@ struct module_t
 
     vlc_bool_t          b_builtin;  /* Set to true if the module is built in */
 
-    int   i_usage;                                      /* Reference counter */
-    int   i_unused_delay;                  /* Delay until module is unloaded */
-
-    module_t *next;                                           /* Next module */
-    module_t *prev;                                       /* Previous module */
-
     /*
      * Symbol table we send to the module so that it can access vlc symbols
      */
@@ -125,8 +114,6 @@ void  __module_LoadPlugins     ( vlc_object_t * );
 void  __module_EndBank         ( vlc_object_t * );
 #define module_ResetBank(a)    __module_ResetBank(VLC_OBJECT(a))
 void  __module_ResetBank       ( vlc_object_t * );
-#define module_ManageBank(a)   __module_ManageBank(VLC_OBJECT(a))
-void  __module_ManageBank      ( vlc_object_t * );
 
 #define module_Need(a,b,c) __module_Need(VLC_OBJECT(a),b,c)
 VLC_EXPORT( module_t *, __module_Need, ( vlc_object_t *, const char *, const char * ) );

@@ -93,7 +93,6 @@ struct module_symbols_t
     void (* __msg_Unsubscribe_inner) ( vlc_object_t *, msg_subscription_t * ) ;
     void (* __msg_Warn_inner) ( void *, const char *, ... ) ;
     void (* __vlc_dumpstructure_inner) ( vlc_object_t * ) ;
-    void (* __vlc_list_release_inner) ( vlc_object_t *, vlc_list_t * ) ;
     void (* __vlc_liststructure_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_attach_inner) ( vlc_object_t *, vlc_object_t * ) ;
     void (* __vlc_object_destroy_inner) ( vlc_object_t * ) ;
@@ -129,6 +128,7 @@ struct module_symbols_t
     void (* mwait_inner) ( mtime_t date ) ;
     void (* playlist_Command_inner) ( playlist_t *, int, int ) ;
     void (* sout_DeleteInstance_inner) ( sout_instance_t * ) ;
+    void (* vlc_list_release_inner) ( vlc_list_t * ) ;
     void (* vout_AllocatePicture_inner) ( vout_thread_t *, picture_t *, int, int, u32 ) ;
     void (* vout_DatePicture_inner) ( vout_thread_t *, picture_t *, mtime_t ) ;
     void (* vout_DestroyPicture_inner) ( vout_thread_t *, picture_t * ) ;
@@ -191,7 +191,6 @@ struct module_symbols_t
 #   define __vlc_cond_init p_symbols->__vlc_cond_init_inner
 #   define __vlc_dumpstructure p_symbols->__vlc_dumpstructure_inner
 #   define __vlc_list_find p_symbols->__vlc_list_find_inner
-#   define __vlc_list_release p_symbols->__vlc_list_release_inner
 #   define __vlc_liststructure p_symbols->__vlc_liststructure_inner
 #   define __vlc_mutex_destroy p_symbols->__vlc_mutex_destroy_inner
 #   define __vlc_mutex_init p_symbols->__vlc_mutex_init_inner
@@ -272,6 +271,7 @@ struct module_symbols_t
 #   define playlist_Command p_symbols->playlist_Command_inner
 #   define playlist_Delete p_symbols->playlist_Delete_inner
 #   define sout_DeleteInstance p_symbols->sout_DeleteInstance_inner
+#   define vlc_list_release p_symbols->vlc_list_release_inner
 #   define vout_AllocatePicture p_symbols->vout_AllocatePicture_inner
 #   define vout_ChromaCmp p_symbols->vout_ChromaCmp_inner
 #   define vout_CreatePicture p_symbols->vout_CreatePicture_inner

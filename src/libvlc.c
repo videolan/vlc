@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.25 2002/08/12 09:34:15 sam Exp $
+ * $Id: libvlc.c,v 1.26 2002/08/15 12:11:15 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -272,13 +272,12 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     }
     p_help_module->psz_object_name = "help";
     config_Duplicate( p_help_module, p_help_config );
-    p_help_module->next = p_vlc->p_module_bank->first;
-    p_vlc->p_module_bank->first = p_help_module;
+    vlc_object_attach( p_help_module, p_vlc->p_module_bank );
     /* End hack */
 
     if( config_LoadCmdLine( p_vlc, &i_argc, ppsz_argv, VLC_TRUE ) )
     {
-        p_vlc->p_module_bank->first = p_help_module->next;
+        vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -294,7 +293,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
 
         Usage( p_vlc, "help" );
         Usage( p_vlc, "main" );
-        p_vlc->p_module_bank->first = p_help_module->next;
+        vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -306,7 +305,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_vlc, "version" ) )
     {
         Version();
-        p_vlc->p_module_bank->first = p_help_module->next;
+        vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -315,7 +314,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     }
 
     /* Hack: remove the help module here */
-    p_vlc->p_module_bank->first = p_help_module->next;
+    vlc_object_detach( p_help_module );
     /* End hack */
 
     /*
@@ -327,11 +326,10 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     module_LoadBuiltins( p_vlc );
     module_LoadPlugins( p_vlc );
     msg_Dbg( p_vlc, "module bank initialized, found %i modules",
-                    p_vlc->p_module_bank->i_count );
+                    p_vlc->p_module_bank->i_children );
 
     /* Hack: insert the help module here */
-    p_help_module->next = p_vlc->p_module_bank->first;
-    p_vlc->p_module_bank->first = p_help_module;
+    vlc_object_attach( p_help_module, p_vlc->p_module_bank );
     /* End hack */
 
     /* Check for help on modules */
@@ -339,7 +337,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     {
         Usage( p_vlc, p_tmp );
         free( p_tmp );
-        p_vlc->p_module_bank->first = p_help_module->next;
+        vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -351,7 +349,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_vlc, "longhelp" ) )
     {
         Usage( p_vlc, NULL );
-        p_vlc->p_module_bank->first = p_help_module->next;
+        vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -363,7 +361,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     if( config_GetInt( p_vlc, "list" ) )
     {
         ListModules( p_vlc );
-        p_vlc->p_module_bank->first = p_help_module->next;
+        vlc_object_detach( p_help_module );
         config_Free( p_help_module );
         vlc_object_destroy( p_help_module );
         module_EndBank( p_vlc );
@@ -372,7 +370,7 @@ vlc_error_t vlc_init_r( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
     }
 
     /* Hack: remove the help module here */
-    p_vlc->p_module_bank->first = p_help_module->next;
+    vlc_object_detach( p_help_module );
     config_Free( p_help_module );
     vlc_object_destroy( p_help_module );
     /* End hack */
@@ -902,7 +900,8 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
      */
 #define LINE_START 8
 #define PADDING_SPACES 25
-    module_t *p_module;
+    vlc_list_t *p_list;
+    module_t **pp_parser;
     module_config_t *p_item;
     char psz_spaces[PADDING_SPACES+LINE_START+1];
     char psz_format[sizeof(FORMAT_STRING)];
@@ -916,30 +915,34 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
     ShowConsole();
 #endif
 
+    /* List all modules */
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+
     /* Enumerate the config for each module */
-    for( p_module = p_this->p_vlc->p_module_bank->first ;
-         p_module != NULL ;
-         p_module = p_module->next )
+    for( pp_parser = (module_t **)p_list->pp_objects ;
+         *pp_parser ;
+         pp_parser++ )
     {
-        vlc_bool_t b_help_module = !strcmp( "help", p_module->psz_object_name );
+        vlc_bool_t b_help_module =
+                       !strcmp( "help", (*pp_parser)->psz_object_name );
 
         if( psz_module_name && strcmp( psz_module_name,
-                                       p_module->psz_object_name ) )
+                                       (*pp_parser)->psz_object_name ) )
         {
             continue;
         }
 
         /* Ignore modules without config options */
-        if( !p_module->i_config_items )
+        if( !(*pp_parser)->i_config_items )
         {
             continue;
         }
 
         /* Print module name */
         fprintf( stderr, _("%s module options:\n\n"),
-                         p_module->psz_object_name );
+                         (*pp_parser)->psz_object_name );
 
-        for( p_item = p_module->p_config;
+        for( p_item = (*pp_parser)->p_config;
              p_item->i_type != CONFIG_HINT_END;
              p_item++ )
         {
@@ -1072,6 +1075,9 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
 
     }
 
+    /* Release the module list */
+    vlc_list_release( p_list );
+
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */
         fprintf( stderr, _("\nPress the RETURN key to continue...\n") );
         getchar();
@@ -1086,7 +1092,8 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
  *****************************************************************************/
 static void ListModules( vlc_t *p_this )
 {
-    module_t *p_module;
+    vlc_list_t *p_list;
+    module_t **pp_parser;
     char psz_spaces[22];
 
     memset( psz_spaces, ' ', 22 );
@@ -1101,24 +1108,26 @@ static void ListModules( vlc_t *p_this )
 
     fprintf( stderr, _("[module]              [description]\n") );
 
+    /* List all modules */
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+
     /* Enumerate each module */
-    for( p_module = p_this->p_vlc->p_module_bank->first ;
-         p_module != NULL ;
-         p_module = p_module->next )
+    for( pp_parser = (module_t **)p_list->pp_objects ;
+         *pp_parser ;
+         pp_parser++ )
     {
         int i;
 
         /* Nasty hack, but right now I'm too tired to think about a nice
          * solution */
-        i = 22 - strlen( p_module->psz_object_name ) - 1;
+        i = 22 - strlen( (*pp_parser)->psz_object_name ) - 1;
         if( i < 0 ) i = 0;
         psz_spaces[i] = 0;
 
-        fprintf( stderr, "  %s%s %s\n", p_module->psz_object_name, psz_spaces,
-                  p_module->psz_longname );
+        fprintf( stderr, "  %s%s %s\n", (*pp_parser)->psz_object_name,
+                         psz_spaces, (*pp_parser)->psz_longname );
 
         psz_spaces[i] = ' ';
-
     }
 
 #ifdef WIN32        /* Pause the console because it's destroyed when we exit */

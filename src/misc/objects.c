@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.18 2002/08/14 17:06:53 sam Exp $
+ * $Id: objects.c,v 1.19 2002/08/15 12:11:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -410,9 +410,8 @@ vlc_list_t * __vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
 /*****************************************************************************
  * vlc_liststructure: print the current vlc objects
  *****************************************************************************
- * This function prints an ASCII tree showing the connections between vlc
- * objects, and additional information such as their refcount, thread ID,
- * address, etc.
+ * This function prints alist of vlc objects, and additional information such
+ * as their refcount, thread ID, etc.
  *****************************************************************************/
 void __vlc_liststructure( vlc_object_t *p_this )
 {
@@ -444,8 +443,7 @@ void __vlc_liststructure( vlc_object_t *p_this )
  * vlc_dumpstructure: print the current vlc structure
  *****************************************************************************
  * This function prints an ASCII tree showing the connections between vlc
- * objects, and additional information such as their refcount, thread ID,
- * address, etc.
+ * objects, and additional information such as their refcount, thread ID, etc.
  *****************************************************************************/
 void __vlc_dumpstructure( vlc_object_t *p_this )
 {
@@ -463,19 +461,23 @@ void __vlc_dumpstructure( vlc_object_t *p_this )
  * This function decreases the refcount of all objects in the list and
  * frees the list.
  *****************************************************************************/
-void __vlc_list_release( vlc_object_t *p_this, vlc_list_t *p_list )
+void vlc_list_release( vlc_list_t *p_list )
 {
-    vlc_object_t **p_current = p_list->pp_objects;
-
-    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-
-    while( p_current[0] )
+    if( p_list->i_count )
     {
-        p_current[0]->i_refcount--;
-        p_current++;
-    }
+        vlc_t *         p_vlc = p_list->pp_objects[0]->p_vlc;
+        vlc_object_t ** pp_current = p_list->pp_objects;
 
-    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+        vlc_mutex_lock( &p_vlc->structure_lock );
+
+        while( pp_current[0] )
+        {
+            pp_current[0]->i_refcount--;
+            pp_current++;
+        }
+
+        vlc_mutex_unlock( &p_vlc->structure_lock );
+    }
 
     free( p_list );
 }
