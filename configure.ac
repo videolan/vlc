@@ -688,17 +688,6 @@ if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
     AC_DEFINE(NTOHL_IN_SYS_PARAM_H, 1, Define if <sys/param.h> defines ntohl.)
 fi
 
-dnl Check for inline function size limit
-AC_CACHE_CHECK([if \$CC accepts -finline-limit],
-    [ac_cv_c_inline_limit],
-    [CFLAGS="${CFLAGS_save} -finline-limit-30000"
-     AC_TRY_COMPILE([],,ac_cv_c_inline_limit=yes, ac_cv_c_inline_limit=no)])
-if test "${ac_cv_c_inline_limit}" != "no"; then
-    CFLAGS_save="${CFLAGS_save} -finline-limit-30000"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="${CXXFLAGS_save} -finline-limit-30000"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="${OBJCFLAGS_save} -finline-limit-30000"; OBJCFLAGS="${OBJCFLAGS_save}"
-fi
-
 # XXX: do this with an M4 macro?
 #dnl Check for various -W flags
 #for flag in "" all unreachable-code conversion sign-compare disabled-optimization
