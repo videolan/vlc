@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.31 2003/06/16 20:49:12 gbazin Exp $
+ * $Id: video.c,v 1.32 2003/06/19 21:09:27 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -313,6 +313,9 @@ int E_( InitThread_Video )( vdec_thread_t *p_vdec )
         msg_Dbg( p_vdec->p_fifo, "no postproc" );
     }
 #endif
+
+    /* ffmpeg doesn't properly release old pictures when frames are skipped */
+    if( p_vdec->b_hurry_up ) p_vdec->b_direct_rendering = 0;
 
     if( p_vdec->b_direct_rendering )
     {
