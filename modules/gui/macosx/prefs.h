@@ -2,7 +2,7 @@
  * prefs.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.h,v 1.9 2003/05/26 14:59:37 hartman Exp $
+ * $Id: prefs.h,v 1.10 2003/06/06 00:38:41 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *
@@ -64,6 +64,7 @@
 - (IBAction)savePrefs: (id)sender;
 - (IBAction)closePrefs: (id)sender;
 - (IBAction)resetAll: (id)sender;
+- (void)sheetDidEnd:(NSWindow *)o_sheet returnCode:(int)i_return contextInfo:(void *)o_context;
 - (IBAction)advancedToggle: (id)sender;
 - (void)showViewForID: (int) i_id andName:(NSString *)o_item_name;
 - (void)configChanged:(id)o_unknown;

@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: prefs.m,v 1.30 2003/05/26 14:59:37 hartman Exp $
+ * $Id: prefs.m,v 1.31 2003/06/06 00:38:41 hartman Exp $
  *
  * Authors:	Jon Lech Johansen <jon-vl@nanocrew.net>
  *		Derk-Jan Hartman <thedj at users.sf.net>
@@ -98,7 +98,20 @@
 
 - (IBAction)resetAll: (id)sender
 {
-    config_ResetAll( p_intf );
+    NSBeginInformationalAlertSheet(_NS("Reset Preferences"), @"Cancel", @"Continue", 
+        nil, o_prefs_window, self, @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil,
+        _NS("Beware this will reset your VLC Media Player config file.\n"
+            "Are you sure you want to continue?") );
+}
+
+- (void)sheetDidEnd:(NSWindow *)o_sheet returnCode:(int)i_return contextInfo:(void *)o_context
+{
+    if( i_return == NSAlertAlternateReturn )
+    {
+        config_ResetAll( p_intf );
+        [self showViewForID: [[o_tree itemAtRow:[o_tree selectedRow]] getObjectID]
+            andName: [[o_tree itemAtRow:[o_tree selectedRow]] getName]];
+    }
 }
 
 - (IBAction)advancedToggle: (id)sender
@@ -345,7 +358,7 @@
                 }
                 [o_view addSubview: [o_modules autorelease]];
 
-                [o_modules addItemWithTitle: _NS("None")];
+                [o_modules addItemWithTitle: _NS("Default")];
                 [[o_modules lastItem] setTag: -1];
                 [o_modules selectItem: [o_modules lastItem]];
 
