@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.26 2003/01/27 23:48:14 massiot Exp $
+ * $Id: mixer.c,v 1.27 2003/01/31 10:14:13 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -268,7 +268,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                      + mixer_nb_bytes)) )
             {
                 msg_Warn( p_aout,
-                          "mixer start isn't output start ("I64Fd,
+                          "mixer start isn't output start ("I64Fd")",
                           i_nb_bytes - mixer_nb_bytes );
 
                 /* Round to the nearest multiple */
