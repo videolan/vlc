@@ -24,7 +24,6 @@ EXTRA_DIST = \
 	src/extras/COPYING \
 	toolbox \
 	vlc-config.in.in \
-	vlc.ebuild \
 	vlc.spec \
 	vlc.spec.mdk \
 	vlc.win32.nsi \
@@ -254,7 +253,6 @@ EXTRA_DIST += \
 	$(NULL)
 
 dist-hook:
-	cp $(distdir)/vlc.ebuild $(distdir)/vlc-${VERSION}.ebuild
 	cd $(distdir) && srcdir=$(srcdir) $(srcdir)/toolbox --update-vc
 	distdir=$(distdir) srcdir=$(srcdir) $(srcdir)/toolbox --dist-contrib
 
