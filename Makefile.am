@@ -408,7 +408,7 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
 	esac
 
 if HAVE_BEOS
-noinst_lib_DATA = vlc-bundle
+vlc_app_DATA = vlc-bundle
 vlc-bundle: vlc
 	rm -Rf $(top_builddir)/vlc-bundle ; mkdir -p $(top_builddir)/vlc-bundle
 	cp $(top_builddir)/vlc $(top_builddir)/vlc-bundle/
