@@ -37,6 +37,7 @@
 #endif
 
 #include "iso_lang.h"
+#include "vlc_meta.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -375,6 +376,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         case VLC_FOURCC( 'm', 'j', 'p', 'b' ):
         case VLC_FOURCC( 'S', 'V', 'Q', '1' ):
         case VLC_FOURCC( 'S', 'V', 'Q', '3' ):
+        case VLC_FOURCC( 'h', '2', '6', '4' ):
             break;
         default:
             msg_Err( p_mux, "unsupported codec %4.4s in mp4",
@@ -703,6 +705,7 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     bo_t *udta = box_new( "udta" );
+    vlc_meta_t *p_meta = p_mux->p_sout->p_meta;
     int i_track;
 
     /* Requirements */
@@ -735,6 +738,40 @@ static bo_t *GetUdtaTag( sout_mux_t *p_mux )
                     PACKAGE_STRING " stream output" );
         box_fix( box );
         box_gather( udta, box );
+    }
+    if( p_meta )
+    {
+        int i;
+        for( i = 0; i < p_meta->i_meta; i++ )
+        {
+            bo_t *box = NULL;
+
+            if( !strcmp( p_meta->name[i], VLC_META_TITLE ) )
+            {
+                box = box_new( "\251nam" );
+            }
+            else if( !strcmp( p_meta->name[i], VLC_META_AUTHOR ) )
+            {
+                box = box_new( "\251aut" );
+            }
+            else if( !strcmp( p_meta->name[i], VLC_META_ARTIST ) )
+            {
+                box = box_new( "\251ART" );
+            }
+            else if( !strcmp( p_meta->name[i], VLC_META_COPYRIGHT ) )
+            {
+                box = box_new( "\251cpy" );
+            }
+
+            if( box )
+            {
+                bo_add_16be( box, strlen( p_meta->value[i] ) );
+                bo_add_16be( box, 0 );
+                bo_add_mem( box, strlen( p_meta->value[i] ), p_meta->value[i] );
+                box_fix( box );
+                box_gather( udta, box );
+            }
+        }
     }
 
     box_fix( udta );
