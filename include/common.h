@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.89 2002/03/25 23:36:57 ipkiss Exp $
+ * $Id: common.h,v 1.90 2002/04/01 21:54:26 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -287,6 +287,10 @@ struct intf_subscription_s;
                     __r.__l[1] = __bswap_32 (__w.__l[0]);                     \
                   }                                                           \
                 __r.__ll; }))
+#   else
+#       define __bswap_64(i) \
+            (u64)((__bswap_32((i) & 0xffffffff) << 32) |                      \
+            __bswap_32(((i) >> 32) & 0xffffffff ))
 #   endif
 
 #else /* NTOHL_IN_SYS_PARAM_H || WIN32 */
@@ -394,11 +398,12 @@ struct intf_subscription_s;
 #       define __inline__      __inline
 #       define strncasecmp     strnicmp
 #       define strcasecmp      stricmp
+#       define S_IFBLK         0x3000  /* Block */
 #       define S_ISBLK(m)      (0)
 #       define S_ISCHR(m)      (0)
 #       define S_ISFIFO(m)     (((m)&_S_IFMT) == _S_IFIFO)
 #       define S_ISREG(m)      (((m)&_S_IFMT) == _S_IFREG)
-#       undef I64C(x)
+#       undef I64C
 #       define I64C(x)         x##i64
 #   endif
 
@@ -420,7 +425,6 @@ typedef __int64 off_t;
 #       else
 #           define off_t __int64
 #       endif
-#       define stat _stati64
 #   endif
 
 #   if defined( __BORLANDC__ )
