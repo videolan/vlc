@@ -2,7 +2,7 @@
  * mmsh.h:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.h,v 1.4 2003/08/26 00:51:19 fenrir Exp $
+ * $Id: mmsh.h,v 1.5 2004/01/21 16:56:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,14 +36,12 @@ typedef struct
 
 } chunk_t;
 
-static int chunk_parse( chunk_t *, uint8_t *, int );
-
 #define BUFFER_SIZE 150000
 struct access_sys_t
 {
     int             i_proto;
 
-    input_socket_t  *p_socket;
+    int             fd;
     url_t           *p_url;
 
     int             i_request_context;
@@ -68,14 +66,6 @@ struct access_sys_t
     guid_t          guid;
 };
 
-static input_socket_t * NetOpenTCP  ( input_thread_t *, url_t * );
-static ssize_t          NetRead     ( input_thread_t *, input_socket_t *, byte_t *, size_t );
-static ssize_t          NetWrite    ( input_thread_t *, input_socket_t *, byte_t *, size_t );
-static void             NetClose    ( input_thread_t *, input_socket_t * );
-
-
-static ssize_t NetFill( input_thread_t *, access_sys_t *, int );
-
 typedef struct http_field_s
 {
     char *psz_name;
@@ -98,10 +88,4 @@ typedef struct
 
 } http_answer_t;
 
-static http_answer_t    *http_answer_parse  ( uint8_t *, int );
-static void              http_answer_free   ( http_answer_t * );
-/* static char             *http_field_get_value   ( http_answer_t *, char * ); */
-static http_field_t     *http_field_find    ( http_field_t *, char * );
 
-static int  mmsh_start( input_thread_t *, off_t );
-static void mmsh_stop ( input_thread_t * );

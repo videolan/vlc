@@ -2,7 +2,7 @@
  * mms.c: MMS over tcp, udp and http access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.34 2003/05/15 22:27:36 massiot Exp $
+ * $Id: mms.c,v 1.35 2004/01/21 16:56:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -69,11 +69,6 @@ vlc_module_begin();
         add_bool( "mms-all", 0, NULL,
                   "force selection of all streams",
                   "force selection of all streams", VLC_TRUE );
-#if 0
-        add_string( "mms-stream", NULL, NULL,
-                    "streams selection",
-                    "force this stream selection", VLC_TRUE );
-#endif
         add_integer( "mms-maxbitrate", 0, NULL,
                      "max bitrate",
                      "set max bitrate for auto streams selections", VLC_FALSE );
@@ -89,9 +84,14 @@ static int Open( vlc_object_t *p_this )
 {
     input_thread_t  *p_input = (input_thread_t*)p_this;
 
-    int i_err;
+    /* First set ipv4/ipv6 */
+    var_Create( p_input, "ipv4", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_input, "ipv6", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
+    /* mms-caching */
+    var_Create( p_input, "mms-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
+    /* use specified method */
     if( *p_input->psz_access )
     {
         if( !strncmp( p_input->psz_access, "mmsu", 4 ) )
@@ -108,15 +108,12 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-
-    i_err = E_( MMSTUOpen )( p_input );
-
-    if( i_err )
+    if( E_( MMSTUOpen )( p_input ) )
     {
-        i_err = E_( MMSHOpen )( p_input );
+        /* try mmsh if mmstu failed */
+        return E_( MMSHOpen )( p_input );
     }
-
-    return i_err;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

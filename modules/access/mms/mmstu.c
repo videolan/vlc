@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmstu.c,v 1.6 2003/07/31 23:44:49 fenrir Exp $
+ * $Id: mmstu.c,v 1.7 2004/01/21 16:56:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -81,7 +81,7 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
                              size_t i_len );
 static void    Seek        ( input_thread_t *, off_t );
 
-static int    MMSOpen( input_thread_t  *, url_t *, int, char * );
+static int    MMSOpen( input_thread_t  *, url_t *, int );
 
 static int    MMSStart  ( input_thread_t  *, uint32_t );
 static int    MMSStop  ( input_thread_t  *p_input );
@@ -95,9 +95,6 @@ static int     mms_CommandSend( input_thread_t *, int, uint32_t, uint32_t, uint8
 static int     mms_HeaderMediaRead( input_thread_t *, int );
 
 static int     mms_ReceivePacket( input_thread_t * );
-
-//static void mms_ParseURL( url_t *p_url, char *psz_url );
-
 
 
 /*
@@ -119,10 +116,10 @@ static int     mms_ReceivePacket( input_thread_t * );
 
 int  E_( MMSTUOpen )  ( input_thread_t *p_input )
 {
-    access_sys_t    *p_sys;
-    int         i_proto;
-    char        *psz_network;
-    int         i_status;
+    access_sys_t   *p_sys;
+    int             i_proto;
+    int             i_status;
+    vlc_value_t val;
 
     /* *** allocate p_sys_data *** */
     p_input->p_access_data = p_sys = malloc( sizeof( access_sys_t ) );
@@ -130,28 +127,21 @@ int  E_( MMSTUOpen )  ( input_thread_t *p_input )
 
 
     /* *** Parse URL and get server addr/port and path *** */
-    //mms_ParseURL( &p_sys->url, p_input->psz_name );
     p_sys->p_url = E_( url_new )( p_input->psz_name );
 
     if( *p_sys->p_url->psz_host == '\0' )
     {
         E_( url_free )( p_sys->p_url );
         msg_Err( p_input, "invalid server name" );
-        return( -1 );
+        return VLC_EGENERIC;
     }
     if( p_sys->p_url->i_port <= 0 )
     {
         p_sys->p_url->i_port = 1755;
     }
-#if 0
-    if( p_sys->url.i_bind_port == 0 )
-    {
-        p_sys->url.i_bind_port = 7000;   /* default port */
-    }
-#endif
 
     /* *** connect to this server *** */
-    /* 1: look at  requested protocol (udp/tcp) */
+    /* look at  requested protocol (udp/tcp) */
     i_proto = MMS_PROTO_AUTO;
     if( *p_input->psz_access )
     {
@@ -164,42 +154,28 @@ int  E_( MMSTUOpen )  ( input_thread_t *p_input )
             i_proto = MMS_PROTO_TCP;
         }
     }
-    /* 2: look at ip version ipv4/ipv6 */
-    psz_network = "";
-    if( config_GetInt( p_input, "ipv4" ) )
-    {
-        psz_network = "ipv4";
-    }
-    else if( config_GetInt( p_input, "ipv6" ) )
-    {
-        psz_network = "ipv6";
-    }
-    /* 3: connect */
+
+    /* connect */
     if( i_proto == MMS_PROTO_AUTO )
     {   /* first try with TCP */
-        i_status =
-            MMSOpen( p_input, p_sys->p_url, MMS_PROTO_TCP, psz_network );
-        if( i_status < 0 )
+        if( ( i_status = MMSOpen( p_input, p_sys->p_url, MMS_PROTO_TCP ) ) )
         {   /* then with UDP */
-            i_status =
-             MMSOpen( p_input, p_sys->p_url, MMS_PROTO_UDP, psz_network );
+            i_status = MMSOpen( p_input, p_sys->p_url, MMS_PROTO_UDP );
         }
     }
     else
     {
-
-        i_status =
-            MMSOpen( p_input, p_sys->p_url, i_proto, psz_network );
+        i_status = MMSOpen( p_input, p_sys->p_url, i_proto );
     }
 
-    if( i_status < 0 )
+    if( i_status )
     {
         msg_Err( p_input, "cannot connect to server" );
         E_( url_free )( p_sys->p_url );
-        return( -1 );
+        return VLC_EGENERIC;
     }
-    msg_Dbg( p_input, "connected to %s:%d", p_sys->p_url->psz_host, p_sys->p_url->i_port );
 
+    msg_Dbg( p_input, "connected to %s:%d", p_sys->p_url->psz_host, p_sys->p_url->i_port );
 
     /* *** set exported functions *** */
     p_input->pf_read = Read;
@@ -241,13 +217,14 @@ int  E_( MMSTUOpen )  ( input_thread_t *p_input )
         msg_Err( p_input, "cannot start stream" );
         MMSClose( p_input );
         E_( url_free )( p_sys->p_url );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 
     /* Update default_pts to a suitable value for mms access */
-    p_input->i_pts_delay = config_GetInt( p_input, "mms-caching" ) * 1000;
+    var_Get( p_input, "mms-caching", &val );
+    p_input->i_pts_delay = val.i_int * 1000;
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -419,16 +396,10 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
 /****************************************************************************
  * MMSOpen : Open a connection with the server over mmst or mmsu
  ****************************************************************************/
-static int MMSOpen( input_thread_t  *p_input,
-                    url_t *p_url,
-                    int  i_proto,
-                    char *psz_network ) /* "", "ipv4", "ipv6" */
+static int MMSOpen( input_thread_t  *p_input, url_t *p_url, int  i_proto )
 {
-    module_t    *p_network;
     access_sys_t    *p_sys = p_input->p_access_data;
-
-    network_socket_t    socket_desc;
-    int b_udp = ( i_proto == MMS_PROTO_UDP ) ? 1 : 0;
+    int             b_udp = ( i_proto == MMS_PROTO_UDP ) ? 1 : 0;
 
     var_buffer_t buffer;
     char         tmp[4096];
@@ -444,21 +415,13 @@ static int MMSOpen( input_thread_t  *p_input,
 
     /* *** Open a TCP connection with server *** */
     msg_Dbg( p_input, "waiting for connection..." );
-    socket_desc.i_type = NETWORK_TCP;
-    socket_desc.psz_server_addr = p_url->psz_host;
-    socket_desc.i_server_port   = p_url->i_port;
-    socket_desc.psz_bind_addr   = "";
-    socket_desc.i_bind_port     = 0;
-    socket_desc.i_ttl           = 0;
-    p_input->p_private = (void*)&socket_desc;
-    if( !( p_network = module_Need( p_input, "network", psz_network ) ) )
+    p_sys->socket_tcp.i_handle = net_OpenTCP( p_input, p_url->psz_host, p_url->i_port );
+    if( p_sys->socket_tcp.i_handle < 0 )
     {
         msg_Err( p_input, "failed to open a connection (tcp)" );
-        return( -1 );
+        return VLC_EGENERIC;
     }
-    module_Unneed( p_input, p_network );
-    p_sys->socket_tcp.i_handle = socket_desc.i_handle;
-    p_input->i_mtu    = 0; /*socket_desc.i_mtu;*/
+    p_input->i_mtu = 0;
     msg_Dbg( p_input,
              "connection(tcp) with \"%s:%d\" successful",
              p_url->psz_host,
@@ -475,44 +438,21 @@ static int MMSOpen( input_thread_t  *p_input,
         {
 
             msg_Err( p_input, "for udp you have to provide bind address (mms://<server_addr>@<bind_addr/<path> (FIXME)" );
-#if defined( UNDER_CE )
-            CloseHandle( (HANDLE)p_sys->socket_tcp.i_handle );
-#elif defined( WIN32 )
-            closesocket( p_sys->socket_tcp.i_handle );
-#else
-            close( p_sys->socket_tcp.i_handle );
-#endif
-            return( -1 );
+            net_Close( p_sys->socket_tcp.i_handle );
+            return VLC_EGENERIC;
         }
         p_sys->psz_bind_addr = inet_ntoa( name.sin_addr );
 
-        socket_desc.i_type = NETWORK_UDP;
-        socket_desc.psz_server_addr = "";
-        socket_desc.i_server_port   = 0;
-        socket_desc.psz_bind_addr   = p_sys->psz_bind_addr;
-        socket_desc.i_bind_port     = 7000; //p_url->i_bind_port; FIXME
-        socket_desc.i_ttl           = 0;
-        p_input->p_private = (void*)&socket_desc;
-        if( !( p_network = module_Need( p_input, "network", psz_network ) ) )
+        p_sys->socket_udp.i_handle = net_OpenUDP( p_input, p_sys->psz_bind_addr, 7000, "", 0 );
+        if( p_sys->socket_udp.i_handle < 0 )
         {
             msg_Err( p_input, "failed to open a connection (udp)" );
-#if defined( UNDER_CE )
-            CloseHandle( (HANDLE)p_sys->socket_tcp.i_handle );
-#elif defined( WIN32 )
-            closesocket( p_sys->socket_tcp.i_handle );
-#else
-            close( p_sys->socket_tcp.i_handle );
-#endif
-            return( -1 );
+            net_Close( p_sys->socket_tcp.i_handle );
+            return VLC_EGENERIC;
         }
-        module_Unneed( p_input, p_network );
-        p_sys->socket_udp.i_handle = socket_desc.i_handle;
-        p_input->i_mtu    = 0;/*socket_desc.i_mtu;  FIXME */
-
         msg_Dbg( p_input,
                  "connection(udp) at \"%s:%d\" successful",
-                 p_sys->psz_bind_addr,
-                 7000 );
+                 p_sys->psz_bind_addr, 7000 );
     }
     else
     {
@@ -564,7 +504,7 @@ static int MMSOpen( input_thread_t  *p_input,
     {
         var_buffer_free( &buffer );
         MMSClose( p_input );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 
     i_server_version = GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE + 32 );
@@ -631,7 +571,7 @@ static int MMSOpen( input_thread_t  *p_input,
                  "%s protocol selection failed", b_udp ? "UDP" : "TCP" );
         var_buffer_free( &buffer );
         MMSClose( p_input );
-        return( -1 );
+        return VLC_EGENERIC;
     }
     else if( p_sys->i_command != 0x02 )
     {
@@ -660,7 +600,7 @@ static int MMSOpen( input_thread_t  *p_input,
         /*  FIXME */
         var_buffer_free( &buffer );
         MMSClose( p_input );
-        return( -1 );
+        return VLC_EGENERIC;
     }
     if( p_sys->i_command != 0x06 )
     {
@@ -687,7 +627,7 @@ static int MMSOpen( input_thread_t  *p_input,
                  GetDWLE( p_sys->p_cmd + MMS_CMD_HEADERSIZE ) );
         var_buffer_free( &buffer );
         MMSClose( p_input );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 
     p_sys->i_flags_broadcast =
@@ -756,7 +696,7 @@ static int MMSOpen( input_thread_t  *p_input,
             msg_Err( p_input, "cannot receive header" );
             var_buffer_free( &buffer );
             MMSClose( p_input );
-            return( -1 );
+            return VLC_EGENERIC;
         }
         if( p_sys->i_header >= p_sys->i_header_size )
         {
@@ -834,7 +774,7 @@ static int MMSOpen( input_thread_t  *p_input,
         msg_Err( p_input, "cannot find any stream" );
         var_buffer_free( &buffer );
         MMSClose( p_input );
-        return( -1 );
+        return VLC_EGENERIC;
     }
     mms_CommandSend( p_input, 0x33,
                      i_streams,
@@ -849,7 +789,7 @@ static int MMSOpen( input_thread_t  *p_input,
                  p_sys->i_command );
         var_buffer_free( &buffer );
         MMSClose( p_input );
-        return( -1 );
+        return VLC_EGENERIC;
     }
 
 
@@ -857,7 +797,7 @@ static int MMSOpen( input_thread_t  *p_input,
 
     msg_Info( p_input, "connection sucessful" );
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /****************************************************************************
@@ -933,24 +873,12 @@ static int MMSClose  ( input_thread_t  *p_input )
                      p_sys->i_command_level,
                      0x00000001,
                      NULL, 0 );
-    /* *** close sockets *** */
-#if defined( UNDER_CE )
-    CloseHandle( (HANDLE)p_sys->socket_tcp.i_handle );
-#elif defined( WIN32 )
-    closesocket( p_sys->socket_tcp.i_handle );
-#else
-    close( p_sys->socket_tcp.i_handle );
-#endif
 
+    /* *** close sockets *** */
+    net_Close( p_sys->socket_tcp.i_handle );
     if( p_sys->i_proto == MMS_PROTO_UDP )
     {
-#if defined( UNDER_CE )
-        CloseHandle( (HANDLE)p_sys->socket_udp.i_handle );
-#elif defined( WIN32 )
-        closesocket( p_sys->socket_udp.i_handle );
-#else
-        close( p_sys->socket_udp.i_handle );
-#endif
+        net_Close( p_sys->socket_udp.i_handle );
     }
 
     FREE( p_sys->p_cmd );
