@@ -100,7 +100,7 @@ MASH_URL=$(SF)/openmash/mash-src-$(MASH_VERSION).tar.gz
 CDDB_VERSION=0.9.4
 CDDB_URL=$(SF)/libcddb/libcddb-$(CDDB_VERSION).tar.gz
 VCDIMAGER_VERSION=0.7.20
-VCDIMAGER_URL=$(GNU)/vcdimager/vcdimager-$(VCDIMAGER_VERSION).tar.gz
+VCDIMAGER_URL=$(VIDEOLAN)/testing/contrib/vcdimager-$(VCDIMAGER_VERSION).tar.gz
 CDIO_VERSION=0.69
 CDIO_URL=$(GNU)/libcdio/libcdio-$(CDIO_VERSION).tar.gz
 
