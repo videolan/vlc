@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.134 2003/12/14 16:08:32 titer Exp $
+dnl $Id: configure.ac,v 1.135 2003/12/15 21:07:55 jpsaman Exp $
 
 AC_INIT(vlc,0.7.0-test2)
 
@@ -2438,7 +2438,7 @@ then
   fi
   AX_ADD_PLUGINS([qte])
   NEED_QTE_MAIN=yes
-  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_qte}"
+  CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_qte}"
   AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
     AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
   ] )
@@ -2993,7 +2993,7 @@ AC_ARG_ENABLE(opie,
        AX_ADD_LDFLAGS([qte],[-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'`])
        AX_ADD_CXXFLAGS([qte],[-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'`])
      fi
-     CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_qte}"
+     CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_qte}"
      AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
        AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
      ] )
