@@ -370,6 +370,17 @@ void Interface::CreateOurMenuBar()
     /* Attach the menu bar to the frame */
     SetMenuBar( menubar );
 
+    /* Find out size of menu bar */
+    int i_size = 0;
+    for( int i = 0; i < menubar->GetMenuCount(); i++ )
+    {
+        int i_width, i_height;
+        menubar->GetTextExtent( menubar->GetLabelTop(i), &i_width, &i_height );
+        i_size += i_width + 4 /* approximate margin */;
+    }
+
+    frame_sizer->SetMinSize( i_size, -1 );
+
     /* Intercept all menu events in our custom event handler */
     PushEventHandler( new MenuEvtHandler( p_intf, this ) );
 
@@ -460,9 +471,6 @@ void Interface::CreateOurToolBar()
     toolbar->AddControl( sound_control );
 
     toolbar->Realize();
-
-    // '7' is the number of buttons on the toolbar, '3' is arbitrary :)
-    frame_sizer->SetMinSize( TOOLBAR_BMP_WIDTH * 7 * 3, -1 );
 
 #if !defined(__WXX11__)
     /* Associate drop targets with the toolbar */
