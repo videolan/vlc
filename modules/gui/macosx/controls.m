@@ -2,10 +2,11 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.7 2003/01/15 11:27:29 massiot Exp $
+ * $Id: controls.m,v 1.8 2003/01/16 13:49:44 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,13 +46,16 @@
 @interface VLCControls : NSObject
 {
     IBOutlet id o_open;
+    IBOutlet id o_mi_mute;
+    IBOutlet id o_volumeslider;
+    int i_ff;
 }
 
 - (IBAction)play:(id)sender;
-- (IBAction)pause:(id)sender;
 - (IBAction)stop:(id)sender;
 - (IBAction)faster:(id)sender;
 - (IBAction)slower:(id)sender;
+- (IBAction)fastForward:(id)sender;
 
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;
@@ -60,6 +64,7 @@
 - (IBAction)volumeUp:(id)sender;
 - (IBAction)volumeDown:(id)sender;
 - (IBAction)mute:(id)sender;
+- (IBAction)volumeSliderUpdate:(id)sender;
 - (IBAction)fullscreen:(id)sender;
 - (IBAction)deinterlace:(id)sender;
 
@@ -68,6 +73,8 @@
 - (IBAction)toggleChapter:(id)sender;
 - (IBAction)toggleLanguage:(id)sender;
 - (IBAction)toggleVar:(id)sender;
+
+- (void)setVolumeSlider;
 
 @end
 
@@ -86,33 +93,28 @@
         return;
     }
 
-    /* If the playlist is empty, open a file requester instead */
-    vlc_mutex_lock( &p_playlist->object_lock );
-    if( p_playlist->i_size )
+    if ( p_intf->p_sys->p_input != NULL && p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S)
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        playlist_Play( p_playlist );
-        vlc_object_release( p_playlist );
+        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
     }
     else
     {
-        vlc_mutex_unlock( &p_playlist->object_lock );
-        vlc_object_release( p_playlist );
+        /* If the playlist is empty, open a file requester instead */
+        vlc_mutex_lock( &p_playlist->object_lock );
+        if( p_playlist->i_size )
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            playlist_Play( p_playlist );
+            vlc_object_release( p_playlist );
+        }
+        else
+        {
+            vlc_mutex_unlock( &p_playlist->object_lock );
+            vlc_object_release( p_playlist );
 
-        [o_open openFile: nil];
+            [o_open openFile: nil];
+        }
     }
-}
-
-- (IBAction)pause:(id)sender
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-    if( p_intf->p_sys->p_input == NULL )
-    {
-        return;
-    }
-
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
 }
 
 - (IBAction)stop:(id)sender
@@ -152,6 +154,51 @@
     }
 
     input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
+}
+
+- (IBAction)fastForward:(id)sender
+{
+    playlist_t * p_playlist = vlc_object_find( [NSApp getIntf], VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+                                                       
+    i_ff++;
+    switch( [[NSApp currentEvent] type] )
+    {
+        /* A button does not send a NSLeftMouseDown unfortunately.
+         * Therefore we need to count. I know, it is ugly. We could have used
+         * a bool as well, but now we can also accellerate after a certain period.
+         * Currently this method is called every second if the button is pressed.
+         * You can set this value in intf.m
+         */
+        case NSPeriodic:
+            if (i_ff == 1)
+            {
+                [self faster:self];
+            }
+            else if ( i_ff == 5 )
+            {
+                [self faster:self];
+            }
+            else if ( i_ff == 15 )
+            {
+                [self faster:self];
+            }
+            break;
+
+        case NSLeftMouseUp:
+            i_ff = 0;
+            vlc_mutex_lock( &p_playlist->object_lock );
+            if( p_playlist->i_size )
+            {
+                vlc_mutex_unlock( &p_playlist->object_lock );
+                playlist_Play( p_playlist );
+                vlc_object_release( p_playlist );
+            }
+            break;
+
+        default:
+            break;
+    }
 }
 
 - (IBAction)prev:(id)sender
@@ -217,9 +264,14 @@
 
     if ( p_aout != NULL )
     {
+        if (p_intf->p_sys->b_mute)
+        {
+            [self mute:o_mi_mute];
+        }
         aout_VolumeUp( p_aout, 1, NULL );
         vlc_object_release( (vlc_object_t *)p_aout );
     }
+    [self setVolumeSlider];
 }
 
 - (IBAction)volumeDown:(id)sender
@@ -230,9 +282,14 @@
 
     if ( p_aout != NULL )
     {
+        if (p_intf->p_sys->b_mute)
+        {
+            [self mute:o_mi_mute];
+        }
         aout_VolumeDown( p_aout, 1, NULL );
         vlc_object_release( (vlc_object_t *)p_aout );
     }
+    [self setVolumeSlider];
 }
 
 - (IBAction)mute:(id)sender
@@ -248,9 +305,54 @@
         vlc_object_release( (vlc_object_t *)p_aout );
     }
 
-    NSMenuItem * o_mi = (NSMenuItem *)sender;
     p_intf->p_sys->b_mute = (i_volume == 0);
-    [o_mi setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
+    [o_mi_mute setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
+    [self setVolumeSlider];
+}
+
+- (IBAction)volumeSliderUpdate:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+    audio_volume_t i_volume;
+
+    switch( [[NSApp currentEvent] type] )
+    {
+        case NSLeftMouseDragged:
+            if ( p_aout != NULL )
+            {
+                i_volume = (int) [sender floatValue];
+                aout_VolumeSet( p_aout, i_volume * AOUT_VOLUME_STEP);
+                vlc_object_release( (vlc_object_t *)p_aout );
+                
+                p_intf->p_sys->b_mute = (i_volume == 0);
+                [o_mi_mute setState: p_intf->p_sys->b_mute ? NSOnState : NSOffState];
+            }
+            break;
+
+        default:
+            break;
+    }
+}
+
+- (void)setVolumeSlider
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+    audio_volume_t i_volume;
+    
+    if ( p_aout != NULL )
+    {
+        aout_VolumeGet( p_aout, &i_volume );
+        vlc_object_release( (vlc_object_t *)p_aout );
+        [o_volumeslider setFloatValue: (float) (i_volume / AOUT_VOLUME_STEP)]; 
+    }
+    else
+    {
+        [o_volumeslider setFloatValue: config_GetInt( p_intf, "volume" )];
+    }
 }
 
 - (IBAction)fullscreen:(id)sender
@@ -407,8 +509,7 @@
     NSMenu * o_menu = [o_mi menu];
     intf_thread_t * p_intf = [NSApp getIntf];
 
-    if( [[o_mi title] isEqualToString: _NS("Pause")] ||
-        [[o_mi title] isEqualToString: _NS("Faster")] ||
+    if( [[o_mi title] isEqualToString: _NS("Faster")] ||
         [[o_mi title] isEqualToString: _NS("Slower")] )
     {
         if( p_intf->p_sys->p_input != NULL )
@@ -444,22 +545,6 @@
             bEnabled = p_playlist->i_size > 1;
             vlc_mutex_unlock( &p_playlist->object_lock );
             vlc_object_release( p_playlist );
-        }
-    }
-    else if( [[o_mi title] isEqualToString: _NS("Volume Up")] ||
-             [[o_mi title] isEqualToString: _NS("Volume Down")] ||
-             [[o_mi title] isEqualToString: _NS("Mute")] )
-    {
-        aout_instance_t * p_aout = vlc_object_find( p_intf, VLC_OBJECT_AOUT,
-                                                    FIND_ANYWHERE );
- 
-        if ( p_aout != NULL )
-        { 
-            vlc_object_release( (vlc_object_t *)p_aout );
-        }
-        else
-        {
-            bEnabled = FALSE;
         }
     }
     else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] )    

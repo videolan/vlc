@@ -2,11 +2,12 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.12 2003/01/15 00:49:49 jlj Exp $
+ * $Id: vout.m,v 1.13 2003/01/16 13:49:44 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -819,30 +820,6 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch( key )
     {
-        case (unichar)0xf700: /* up-arrow */
-        { 
-            aout_instance_t * p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
-                                                        FIND_ANYWHERE );
-            if ( p_aout != NULL ) 
-            {
-                aout_VolumeUp( p_aout, 1, NULL );
-                vlc_object_release( (vlc_object_t *)p_aout );
-            }
-        } 
-        break;
-
-        case (unichar)0xf701: /* down-arrow */
-        {
-            aout_instance_t * p_aout = vlc_object_find( p_vout, VLC_OBJECT_AOUT,
-                                                        FIND_ANYWHERE );
-            if ( p_aout != NULL ) 
-            {
-                aout_VolumeDown( p_aout, 1, NULL );
-                vlc_object_release( (vlc_object_t *)p_aout );
-            }
-        }
-        break;
-
         case 'f': case 'F':
             [self toggleFullscreen];
             break;
@@ -856,10 +833,6 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
         case 'q': case 'Q':
             p_vout->p_vlc->b_die = VLC_TRUE;
-            break;
-
-        case ' ':
-            input_SetStatus( p_vout, INPUT_STATUS_PAUSE );
             break;
 
         default:
@@ -999,7 +972,12 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     VLCView * o_view;
     NSScreen * o_screen;
     vout_thread_t * p_vout;
+    id o_title;
 
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                               FIND_ANYWHERE );
+    
     p_vout = (vout_thread_t *)[o_value pointerValue];
 
     p_vout->p_sys->o_window = [VLCWindow alloc];
@@ -1071,9 +1049,30 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_vout->p_sys->p_qdport = [o_view qdPort];
     [o_view unlockFocus];
 
-    [p_vout->p_sys->o_window setTitle:
-        [NSString stringWithCString: VOUT_TITLE " (QuickTime)"]];
-    [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    o_title = [NSString stringWithUTF8String: 
+        p_playlist->pp_items[p_playlist->i_index]->psz_name]; 
+    vlc_mutex_unlock( &p_playlist->object_lock ); 
+
+    vlc_object_release( p_playlist );
+
+    if (o_title)
+    {
+        [p_vout->p_sys->o_window setTitle: o_title];
+        [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
+    }
+    else
+    {
+        [p_vout->p_sys->o_window setTitle:
+            [NSString stringWithCString: VOUT_TITLE " (QuickTime)"]];
+        [p_vout->p_sys->o_window makeKeyAndOrderFront: nil];
+    }
 }
 
 - (void)destroyWindow:(NSValue *)o_value

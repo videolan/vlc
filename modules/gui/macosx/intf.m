@@ -2,10 +2,11 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.25 2003/01/15 23:55:22 massiot Exp $
+ * $Id: intf.m,v 1.26 2003/01/16 13:49:44 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -186,8 +187,8 @@ static void Run( intf_thread_t *p_intf )
 
 - (void)awakeFromNib
 {
-    NSString * pTitle = [NSString
-        stringWithCString: VOUT_TITLE " (Cocoa)"];
+    NSString * pTitle;
+    pTitle = _NS("VLC - Controller");
 
     [o_window setTitle: pTitle];
 
@@ -196,12 +197,14 @@ static void Run( intf_thread_t *p_intf )
     [o_btn_prev setToolTip: _NS("Previous")];
     [o_btn_slower setToolTip: _NS("Slower")];
     [o_btn_play setToolTip: _NS("Play")];
-    [o_btn_pause setToolTip: _NS("Pause")];
     [o_btn_stop setToolTip: _NS("Stop")];
-    [o_btn_faster setToolTip: _NS("Faster")];
+    [o_btn_fastforward setToolTip: _NS("Fast Forward")];
+    [o_btn_fastforward setPeriodicDelay: 0.0 interval: 1];
     [o_btn_next setToolTip: _NS("Next")];
     [o_btn_prefs setToolTip: _NS("Preferences")];
-
+    [o_volumeslider setToolTip: _NS("Volume")];
+    [o_timeslider setToolTip: _NS("Position")];
+    
     /* messages panel */ 
     [o_msgs_panel setTitle: _NS("Messages")];
     [o_msgs_btn_ok setTitle: _NS("Close")];
@@ -229,41 +232,43 @@ static void Run( intf_thread_t *p_intf )
     [o_mi_clear setTitle: _NS("Clear")];
     [o_mi_select_all setTitle: _NS("Select All")];
 
-    [o_mu_view setTitle: _NS("View")];
-    [o_mi_playlist setTitle: _NS("Playlist")];
-    [o_mi_messages setTitle: _NS("Messages")];
-
     [o_mu_controls setTitle: _NS("Controls")];
-    [o_mi_play setTitle: _NS("Play")];
-    [o_mi_pause setTitle: _NS("Pause")];
+    [o_mi_play setTitle: _NS("Play/Pause")];
     [o_mi_stop setTitle: _NS("Stop")];
     [o_mi_faster setTitle: _NS("Faster")];
     [o_mi_slower setTitle: _NS("Slower")];
     [o_mi_previous setTitle: _NS("Previous")];
     [o_mi_next setTitle: _NS("Next")];
     [o_mi_loop setTitle: _NS("Loop")];
-    [o_mi_vol_up setTitle: _NS("Volume Up")];
-    [o_mi_vol_down setTitle: _NS("Volume Down")];
-    [o_mi_mute setTitle: _NS("Mute")];
-    [o_mi_channels setTitle: _NS("Channels")];
-    [o_mi_device setTitle: _NS("Device")];
-    [o_mi_fullscreen setTitle: _NS("Fullscreen")];
-    [o_mi_screen setTitle: _NS("Screen")];
-    [o_mi_deinterlace setTitle: _NS("Deinterlace")];
     [o_mi_program setTitle: _NS("Program")];
     [o_mi_title setTitle: _NS("Title")];
     [o_mi_chapter setTitle: _NS("Chapter")];
     [o_mi_language setTitle: _NS("Language")];
     [o_mi_subtitle setTitle: _NS("Subtitles")];
+    
+    [o_mu_audio setTitle: _NS("Audio")];
+    [o_mi_vol_up setTitle: _NS("Volume Up")];
+    [o_mi_vol_down setTitle: _NS("Volume Down")];
+    [o_mi_mute setTitle: _NS("Mute")];
+    [o_mi_channels setTitle: _NS("Channels")];
+    [o_mi_device setTitle: _NS("Device")];
+    
+    [o_mu_video setTitle: _NS("Video")];
+    [o_mi_fullscreen setTitle: _NS("Fullscreen")];
+    [o_mi_screen setTitle: _NS("Screen")];
+    [o_mi_deinterlace setTitle: _NS("Deinterlace")];
 
     [o_mu_window setTitle: _NS("Window")];
     [o_mi_minimize setTitle: _NS("Minimize Window")];
     [o_mi_close_window setTitle: _NS("Close Window")];
+    [o_mi_controller setTitle: _NS("Controller")];
+    [o_mi_playlist setTitle: _NS("Playlist")];
+    [o_mi_messages setTitle: _NS("Messages")];
+
     [o_mi_bring_atf setTitle: _NS("Bring All to Front")];
 
     /* dock menu */
-    [o_dmi_play setTitle: _NS("Play")];
-    [o_dmi_pause setTitle: _NS("Pause")];
+    [o_dmi_play setTitle: _NS("Play/Pause")];
     [o_dmi_stop setTitle: _NS("Stop")];
 
     /* error panel */
@@ -317,6 +322,11 @@ static void Run( intf_thread_t *p_intf )
         {
             p_intf->p_sys->p_input = vlc_object_find( p_intf, VLC_OBJECT_INPUT,
                                                               FIND_ANYWHERE );
+            [o_btn_play setState: NSOffState];
+            [o_btn_stop setEnabled: NO];
+            [o_btn_slower setEnabled: NO];
+            [o_btn_fastforward setEnabled: NO];
+            [o_timeslider setEnabled: NO];
         }
         else if( p_intf->p_sys->p_input->b_dead )
         {
@@ -337,6 +347,11 @@ static void Run( intf_thread_t *p_intf )
                 }
 
                 p_intf->p_sys->b_stopping = 0;
+                [o_btn_play setState: NSOffState];
+                [o_btn_stop setEnabled: NO];
+                [o_btn_fastforward setEnabled: NO];
+                [o_btn_slower setEnabled: NO];
+                [o_timeslider setEnabled: NO];
             }
 
             [self displayTime];
@@ -401,12 +416,22 @@ static void Run( intf_thread_t *p_intf )
             if ( b_need_menus )
                 [self setupMenus];
 
+            if ( p_intf->p_sys->p_input != NULL && p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S)
+            {
+                [o_btn_play setState: NSOnState];
+            }
+            else
+            {
+                [o_btn_play setState: NSOffState];
+            }
+            
             vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
         else if( p_intf->p_sys->b_playing && !p_intf->b_die )
         {
             [self displayTime];
             [self manageMode];
+            [o_btn_play setState: NSOffState];
             p_intf->p_sys->b_playing = 0;
         }
 
@@ -612,11 +637,11 @@ static void Run( intf_thread_t *p_intf )
 
     /* set control items */
     [o_btn_stop setEnabled: b_input];
-    [o_btn_pause setEnabled: b_control];
-    [o_btn_faster setEnabled: b_control];
+    [o_btn_fastforward setEnabled: b_control];
     [o_btn_slower setEnabled: b_control];
     [o_btn_prev setEnabled: b_plmul];
     [o_btn_next setEnabled: b_plmul];
+    [o_controls setVolumeSlider];
 
     if ( (p_intf->p_sys->b_loop = config_GetInt( p_intf, "loop" )) )
     {

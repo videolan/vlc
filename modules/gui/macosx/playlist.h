@@ -2,9 +2,10 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.h,v 1.2 2003/01/05 03:21:50 jlj Exp $
+ * $Id: playlist.h,v 1.3 2003/01/16 13:49:44 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
+ *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,6 +44,9 @@
     IBOutlet id o_mi_play;
     IBOutlet id o_mi_delete;
     IBOutlet id o_mi_selectall;
+    
+    IBOutlet id o_btn_add;
+    IBOutlet id o_btn_remove;
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event;

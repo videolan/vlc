@@ -2,10 +2,11 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.12 2003/01/06 22:07:47 massiot Exp $
+ * $Id: intf.h,v 1.13 2003/01/16 13:49:44 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
+ *          Derk-Jan Hartman <thedj@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -93,14 +94,14 @@ struct intf_sys_t
     NSLock * o_slider_lock;     /* slider lock    */
     float f_slider;             /* slider value   */
     float f_slider_old;         /* old slider val */ 
+    IBOutlet id o_volumeslider; /* volume slider  */
 
     IBOutlet id o_btn_playlist; /* btn playlist   */
     IBOutlet id o_btn_prev;     /* btn previous   */
     IBOutlet id o_btn_slower;   /* btn slower     */
     IBOutlet id o_btn_play;     /* btn play       */
-    IBOutlet id o_btn_pause;    /* btn pause      */
     IBOutlet id o_btn_stop;     /* btn stop       */
-    IBOutlet id o_btn_faster;   /* btn faster     */
+    IBOutlet id o_btn_fastforward;   /* btn fastforward     */
     IBOutlet id o_btn_next;     /* btn next       */
     IBOutlet id o_btn_prefs;    /* btn prefs      */
 
@@ -142,41 +143,42 @@ struct intf_sys_t
     IBOutlet id o_mi_clear;
     IBOutlet id o_mi_select_all;
 
-    IBOutlet id o_mu_view;
-    IBOutlet id o_mi_playlist;
-    IBOutlet id o_mi_messages;
-
     IBOutlet id o_mu_controls;
     IBOutlet id o_mi_play;
-    IBOutlet id o_mi_pause;
     IBOutlet id o_mi_stop;
     IBOutlet id o_mi_faster;
     IBOutlet id o_mi_slower;
     IBOutlet id o_mi_previous;
     IBOutlet id o_mi_next;
     IBOutlet id o_mi_loop;
-    IBOutlet id o_mi_vol_up;
-    IBOutlet id o_mi_vol_down;
-    IBOutlet id o_mi_mute;
-    IBOutlet id o_mi_channels;
-    IBOutlet id o_mi_device;
-    IBOutlet id o_mi_fullscreen;
-    IBOutlet id o_mi_screen;
-    IBOutlet id o_mi_deinterlace;
     IBOutlet id o_mi_program;
     IBOutlet id o_mi_title;
     IBOutlet id o_mi_chapter;
     IBOutlet id o_mi_language;
     IBOutlet id o_mi_subtitle;
 
+    IBOutlet id o_mu_audio;
+    IBOutlet id o_mi_vol_up;
+    IBOutlet id o_mi_vol_down;
+    IBOutlet id o_mi_mute;
+    IBOutlet id o_mi_channels;
+    IBOutlet id o_mi_device;
+
+    IBOutlet id o_mu_video;
+    IBOutlet id o_mi_fullscreen;
+    IBOutlet id o_mi_screen;
+    IBOutlet id o_mi_deinterlace;
+
     IBOutlet id o_mu_window;
     IBOutlet id o_mi_minimize;
     IBOutlet id o_mi_close_window;
+    IBOutlet id o_mi_controller;
+    IBOutlet id o_mi_playlist;
+    IBOutlet id o_mi_messages;
     IBOutlet id o_mi_bring_atf;
 
     /* dock menu */
     IBOutlet id o_dmi_play;
-    IBOutlet id o_dmi_pause;
     IBOutlet id o_dmi_stop;
 }
 
