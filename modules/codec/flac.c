@@ -2,7 +2,7 @@
  * flac.c: flac decoder/packetizer/encoder module making use of libflac
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: flac.c,v 1.3 2003/11/21 20:49:13 gbazin Exp $
+ * $Id: flac.c,v 1.4 2003/11/22 12:41:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -186,6 +186,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     aout_DateSet( &p_sys->end_date, 0 );
     p_sys->b_packetizer = VLC_FALSE;
     p_sys->i_state = STATE_NOSYNC;
+    p_sys->b_stream_info = VLC_FALSE;
 
     p_sys->bytestream = block_BytestreamInit( p_dec );
 
@@ -217,7 +218,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->pf_decode_audio = DecodeBlock;
     p_dec->pf_packetize    = PacketizeBlock;
 
-
     /* Decode STREAMINFO */
     msg_Dbg( p_dec, "decode STREAMINFO" );
     p_sys->p_block = block_New( p_dec, p_dec->fmt_in.i_extra );
@@ -235,11 +235,11 @@ static int OpenPacketizer( vlc_object_t *p_this )
 
     int i_ret = OpenDecoder( p_this );
 
-    if( i_ret == VLC_SUCCESS )
-    {
-        p_dec->p_sys->b_packetizer = VLC_TRUE;
-        es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
-    }
+    if( i_ret != VLC_SUCCESS ) return i_ret;
+
+    p_dec->p_sys->b_packetizer = VLC_TRUE;
+
+    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
 
     return i_ret;
 }
@@ -321,6 +321,12 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 p_sys->i_state = STATE_NOSYNC;
                 break;
             }
+            if( p_sys->i_rate != p_dec->fmt_out.audio.i_rate )
+            {
+                p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
+                aout_DateInit( &p_sys->end_date, p_sys->i_rate );
+                p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
+            }
             p_sys->i_state = STATE_NEXT_SYNC;
             p_sys->i_frame_size = 1;
 
@@ -378,7 +384,8 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_state = STATE_NOSYNC;
 
             /* Date management */
-            p_sout_block->i_pts = aout_DateGet( &p_sys->end_date );
+            p_sout_block->i_pts =
+                p_sout_block->i_dts = aout_DateGet( &p_sys->end_date );
             p_sout_block->i_length =
                 aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length );
 
