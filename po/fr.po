@@ -4894,9 +4894,8 @@ msgid "headphone channel mixer with virtual spatialization effect"
 msgstr "Effet de spatialisation virtuelle pour casque stéréo"
 
 #: modules/audio_filter/channel_mixer/simple.c:46
-#, fuzzy
 msgid "audio filter for simple channel mixing"
-msgstr "Filtre audio trivial de mixage de canaux"
+msgstr "Filtre audio de mixage simple de canaux"
 
 #: modules/audio_filter/channel_mixer/trivial.c:46
 msgid "audio filter for trivial channel mixing"
@@ -10724,16 +10723,15 @@ msgstr "PID audio"
 
 #: modules/mux/mpeg/ts.c:81
 msgid "Assigns a fixed PID to the audio stream."
-msgstr "Affect un PID déterminé au flux audio."
+msgstr "Affecte un PID déterminé au flux audio."
 
 #: modules/mux/mpeg/ts.c:82
 msgid "PMT PID"
-msgstr ""
+msgstr "PID de la PMT"
 
 #: modules/mux/mpeg/ts.c:83
-#, fuzzy
 msgid "Assings a fixed PID to the PMT"
-msgstr "Affect un PID déterminé au flux audio."
+msgstr "Affecte un PID déterminé à la PMT."
 
 #: modules/mux/mpeg/ts.c:85
 msgid "Shaping delay (ms)"
