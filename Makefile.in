@@ -112,7 +112,6 @@ CFLAGS += -fomit-frame-pointer
 
 # Optimizations for x86 familiy
 ifneq (,$(findstring 86,$(ARCH)))
-CFLAGS += -malign-double
 # Optional Pentium Pro optimizations
 ifneq (,$(findstring ppro,$(ARCH)))
 CFLAGS += -march=pentiumpro -mcpu=pentiumpro
