@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.134 2001/12/10 04:53:11 sam Exp $
+ * $Id: main.c,v 1.135 2001/12/10 13:17:35 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -298,7 +298,6 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     textdomain( PACKAGE );
-    printf("main: %s\n", gettext("Net"));
 #endif
         
     /*

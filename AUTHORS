@@ -92,8 +92,12 @@ N: Henri Fallon
 E: henri@via.ecp.fr
 C: henri
 D: ALSA audio output
-D: MPEG TS input, input netlist.
+D: MPEG TS input, input netlist
 D: Decoder modularization
+
+N: Valek Filippov
+E: frob@df.ru
+D: Russian translation
 
 N: Arnaud Gomes-do-Vale
 E: arnaud@carrosse.frmug.org

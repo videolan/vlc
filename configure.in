@@ -34,7 +34,7 @@ AC_PROG_CPP
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 
 dnl Gettext stuff
-ALL_LINGUAS="de fr"
+ALL_LINGUAS="de fr ru"
 PACKAGE="vlc"
 VERSION="$VLC_VERSION"
 
