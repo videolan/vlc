@@ -151,9 +151,8 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
 
     p_row_pointers = malloc( sizeof(png_bytep) * i_height );
     for( i = 0; i < (int)i_height; i++ )
-    {
         p_row_pointers[i] = malloc( 4 * ( i_bit_depth + 7 ) / 8 * i_width );
-    }
+
     png_read_image( p_png, p_row_pointers );
     png_read_end( p_png, p_end_info );
 
@@ -166,6 +165,7 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
                               i_width, i_height, VOUT_ASPECT_FACTOR ) !=
         VLC_SUCCESS )
     {
+        for( i = 0; i < (int)i_height; i++ ) free( p_row_pointers[i] );
         free( p_row_pointers );
         return 0;
     }
@@ -195,6 +195,7 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
         }
     }
 
+    for( i = 0; i < (int)i_height; i++ ) free( p_row_pointers[i] );
     free( p_row_pointers );
     return p_pic;
 }
