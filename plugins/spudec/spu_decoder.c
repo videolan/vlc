@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.24.2.1 2002/06/02 13:41:55 sam Exp $
+ * $Id: spu_decoder.c,v 1.24.2.2 2002/06/27 19:44:54 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -156,13 +156,19 @@ static int decoder_Run( decoder_config_t * p_config )
     {
         boolean_t b_error = p_spudec->p_fifo->b_error;
 
-        /* End of thread */
-        EndThread( p_spudec );
+	/* End of thread */
 
+	/* 
+	 * EndThread will free the 'b_error' variable, so
+	 * we'll test it before                           
+	 */
         if( b_error )
         {
-            return( -1 );
+	    EndThread( p_spudec );
+	    return( -1 );
         }
+
+	EndThread( p_spudec );
     }
    
     return( 0 );
@@ -393,7 +399,7 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
     u8  i_command;
     int i_date;
 
-    int i;
+    int i, i_alpha0, i_alpha1, i_alpha2, i_alpha3;
 
     /* XXX: temporary variables */
     boolean_t b_force_display = 0;
@@ -459,9 +465,15 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                                         p_demux_data + sizeof(int)))[
                                           GetBits(&p_spudec->bit_stream, 4) ];
 
+#ifndef WORDS_BIGENDIAN
                             p_spu->p_sys->pi_yuv[3-i][0] = (i_color>>16) & 0xff;
                             p_spu->p_sys->pi_yuv[3-i][1] = (i_color>>0) & 0xff;
                             p_spu->p_sys->pi_yuv[3-i][2] = (i_color>>8) & 0xff;
+#else
+                            p_spu->p_sys->pi_yuv[3-i][0] = (i_color>>8) & 0xff;
+                            p_spu->p_sys->pi_yuv[3-i][1] = (i_color>>24) & 0xff;
+                            p_spu->p_sys->pi_yuv[3-i][2] = (i_color>>16) & 0xff;
+#endif
                         }
                     }
                     else
@@ -475,11 +487,21 @@ static int ParseControlSequences( spudec_thread_t *p_spudec,
                 case SPU_CMD_SET_ALPHACHANNEL:
  
                     /* 04xxxx (alpha channel) */
-                    for( i = 0; i < 4 ; i++ )
-                    {
-                        p_spu->p_sys->pi_alpha[3-i]
-                                       = GetBits( &p_spudec->bit_stream, 4 );
-                    }
+		    i_alpha3 = GetBits( &p_spudec->bit_stream, 4 );
+		    i_alpha2 = GetBits( &p_spudec->bit_stream, 4 );
+		    i_alpha1 = GetBits( &p_spudec->bit_stream, 4 );
+		    i_alpha0 = GetBits( &p_spudec->bit_stream, 4 );
+
+		    // Ignore blank alpha palette. Sometimes spurious blank alphapalettes
+		    // are present - dunno why.
+		    if ( i_alpha0 + i_alpha1 + i_alpha2 + i_alpha3 ) {
+		        p_spu->p_sys->pi_alpha[0] = i_alpha0;
+			p_spu->p_sys->pi_alpha[1] = i_alpha1;
+			p_spu->p_sys->pi_alpha[2] = i_alpha2;
+			p_spu->p_sys->pi_alpha[3] = i_alpha3;
+		    } else
+		        intf_WarnMsg( 2, "spudec warning: ignoring blank alpha palette" );
+
                     i_index += 2;
  
                     break;
@@ -841,10 +863,12 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
     u16  p_clut16[4];
     u32  p_clut32[4];
     u8  *p_dest;
+    u8  *p_destptr = (u8 *)p_dest;
     u16 *p_source = (u16 *)p_spu->p_sys->p_data;
 
     int i_x, i_y;
-    int i_len, i_color;
+    int i_len, i_color, i_colprecomp, i_destalpha;
+    int i;
     u8  i_cnt;
 
     /* RGB-specific */
@@ -870,28 +894,30 @@ static void RenderSPU( const vout_thread_t *p_vout, picture_t *p_pic,
         {
             /* Get the RLE part, then draw the line */
             i_color = *p_source & 0x3;
+	    i_len = *p_source++ >> 2;
 
             switch( p_spu->p_sys->pi_alpha[ i_color ] )
             {
                 case 0x00:
-                    i_x -= *p_source++ >> 2;
                     break;
 
                 case 0x0f:
-                    i_len = *p_source++ >> 2;
                     memset( p_dest - i_x - i_y,
                             p_spu->p_sys->pi_yuv[i_color][0], i_len );
-                    i_x -= i_len;
                     break;
 
                 default:
-                    /* FIXME: we should do transparency */
-                    i_len = *p_source++ >> 2;
-                    memset( p_dest - i_x - i_y,
-                            p_spu->p_sys->pi_yuv[i_color][0], i_len );
-                    i_x -= i_len;
-                    break;
+		    // To be able to divide by 16 (>>4) we add 1 to the alpha. This means Alpha 0 won't
+		    // be completely transparent, but that's handled in a special case above anyway.
+		    i_colprecomp = p_spu->p_sys->pi_yuv[i_color][0] * (p_spu->p_sys->pi_alpha[ i_color ]+1);
+		    i_destalpha = 15 - p_spu->p_sys->pi_alpha[ i_color ];
+
+		    for ( p_destptr = p_dest - i_x - i_y;  p_destptr < p_dest - i_x - i_y +i_len; p_destptr++ )
+		        *p_destptr = ( i_colprecomp + *p_destptr * i_destalpha ) >> 4;
+		    break;
+
             }
+	    i_x -= i_len;
         }
     }
 

@@ -9,6 +9,11 @@ HEAD
 0.4.2
 Mon, 20 Jun 2002 00:41:26 +0200
 
+  * ./plugins/dvd/dvd_es.c: error in selecting SPU stream.
+  * ./plugins/spudec/spu_decoder.c: endianness fix for subtitles colour.
+  * ./plugins/spudec/spu_decoder.c: little hack for preventing blank alpha
+    palette.
+  * ./plugins/spudec/spu_decoder.c: subtitle transparency support.
   * ./plugins/macosx: new controls for audio output, and deinterlacing
     support.
   * ./plugins/macosx: fixed a bug with language and subtitle menus.
