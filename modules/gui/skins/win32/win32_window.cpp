@@ -2,7 +2,7 @@
  * win32_window.cpp: Win32 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_window.cpp,v 1.8 2003/04/20 15:06:07 karibu Exp $
+ * $Id: win32_window.cpp,v 1.9 2003/04/20 16:45:44 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -202,10 +202,12 @@ bool Win32Window::ProcessOSEvent( Event *evt )
             return true;
 
         case WM_MOUSEWHEEL:
-            if( HIWORD( p1 ) > 0 )
-                MouseScroll( LOWORD( p2 ), HIWORD( p2 ), MOUSE_SCROLL_UP );
-            else if( HIWORD( p1 ) < 0 )
-                MouseScroll( LOWORD( p2 ), HIWORD( p2 ), MOUSE_SCROLL_DOWN );
+            if( GET_WHEEL_DELTA_WPARAM( p1 ) > 0 )
+                MouseScroll( LOWORD( p2 ) - Left, HIWORD( p2 ) - Top,
+                    MOUSE_SCROLL_UP );
+            else if( GET_WHEEL_DELTA_WPARAM( p1 ) < 0 )
+                MouseScroll( LOWORD( p2 ) - Left, HIWORD( p2 ) - Top,
+                    MOUSE_SCROLL_DOWN );
             return true;
 
         default:
