@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.48 2001/04/08 07:24:47 stef Exp $
+ * $Id: mpeg_system.c,v 1.49 2001/04/12 03:26:53 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1445,6 +1445,8 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 
         p_pgrm_data->i_pmt_version = p_psi->i_version_number;
 
+        /* inform interface that stream has changed */
+        p_input->stream.b_changed = 1;
     }
     
 #undef p_psi

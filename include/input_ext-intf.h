@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.31 2001/04/10 17:47:05 stef Exp $
+ * $Id: input_ext-intf.h,v 1.32 2001/04/12 03:26:53 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -181,6 +181,8 @@ typedef struct input_area_s
 typedef struct stream_descriptor_s
 {
     u16                     i_stream_id;                        /* stream id */
+    boolean_t               b_changed;    /* if stream has been changed,
+                                             we have to inform the interface */
     vlc_mutex_t             stream_lock;  /* to be taken every time you read
                                            * or modify stream, pgrm or es    */
 
