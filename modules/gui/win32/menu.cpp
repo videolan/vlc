@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.8 2003/01/23 03:33:34 ipkiss Exp $
+ * $Id: menu.cpp,v 1.9 2003/01/24 12:01:03 sam Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -170,7 +170,7 @@ void __fastcall TMenusGen::MenuTitleClick( TObject *Sender )
     TMenuItem     * Item = (TMenuItem *)Sender;
     TMenuItem     * ItemTitle;
     input_area_t  * p_area;
-    int             i_title = Item->Tag;
+    unsigned int    i_title = Item->Tag;
 
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     i_title = __MIN( i_title,
@@ -197,8 +197,8 @@ void __fastcall TMenusGen::MenuChapterClick( TObject *Sender )
     TMenuItem     * Item = (TMenuItem *)Sender;
     TMenuItem     * ItemTitle;
     input_area_t  * p_area;
-    int             i_title;
-    int             i_chapter = Item->Tag;
+    unsigned int    i_title;
+    unsigned int    i_chapter = Item->Tag;
 
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     p_area = p_intf->p_sys->p_input->stream.p_selected_area;
@@ -228,8 +228,8 @@ void __fastcall TMenusGen::PopupNavigationClick( TObject *Sender )
     TMenuItem     * Item = (TMenuItem *)Sender;
     TMenuItem     * ItemTitle;
     input_area_t  * p_area;
-    int             i_title   = Data2Title( Item->Tag );
-    int             i_chapter = Data2Chapter( Item->Tag );
+    unsigned int    i_title   = Data2Title( Item->Tag );
+    unsigned int    i_chapter = Data2Chapter( Item->Tag );
 
     vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
     i_title = __MIN( i_title,

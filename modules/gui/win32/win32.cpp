@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: win32.cpp,v 1.11 2003/01/23 03:33:34 ipkiss Exp $
+ * $Id: win32.cpp,v 1.12 2003/01/24 12:01:03 sam Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -172,7 +172,7 @@ int Win32Manage( intf_thread_t *p_intf )
 
     if( p_intf->p_sys->p_input != NULL && !p_intf->p_sys->p_input->b_die )
     {
-        vlc_bool_t b_need_menus = 0;
+        vlc_bool_t b_need_menus = VLC_FALSE;
         input_thread_t  * p_input = p_intf->p_sys->p_input;
         aout_instance_t * p_aout = NULL;
         vout_thread_t   * p_vout = NULL;
@@ -183,7 +183,7 @@ int Win32Manage( intf_thread_t *p_intf )
         if( p_input->stream.b_changed )
         {
             p_intf->p_sys->p_window->ModeManage();
-            b_need_menus = 1;
+            b_need_menus = VLC_TRUE;
             p_intf->p_sys->b_playing = 1;
         }
 
@@ -225,7 +225,7 @@ int Win32Manage( intf_thread_t *p_intf )
         if( p_intf->p_sys->i_part != p_input->stream.p_selected_area->i_part )
         {
             p_intf->p_sys->b_chapter_update = 1;
-            b_need_menus = 1;
+            b_need_menus = VLC_TRUE;
         }
 
         /* Does the audio output require to update the menus ? */
@@ -238,7 +238,7 @@ int Win32Manage( intf_thread_t *p_intf )
                 && val.b_bool )
             {
                 p_intf->p_sys->b_aout_update = 1;
-                b_need_menus = 1;
+                b_need_menus = VLC_TRUE;
             }
 
             vlc_object_release( (vlc_object_t *)p_aout );
@@ -254,14 +254,16 @@ int Win32Manage( intf_thread_t *p_intf )
                 && val.b_bool )
             {
                 p_intf->p_sys->b_vout_update = 1;
-                b_need_menus = 1;
+                b_need_menus = VLC_TRUE;
             }
 
             vlc_object_release( (vlc_object_t *)p_vout );
         }
 
-//        if( b_need_menus )
-//            p_intf->p_sys->p_menus->SetupMenus();
+        if( b_need_menus )
+        {
+            //p_intf->p_sys->p_menus->SetupMenus();
+        }
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }

@@ -160,18 +160,13 @@ Building Win32 interface with bcc32 (Borland's compiler)
 (This stage is only necessary if you want to use the Win32 native interface.
  If you are happy with the GTK interface, then you can skip this section)
 
-1) Compile vlc as usual.
+1) Install Borland C++ Builder, you will need bpr2mak and make.
 
-2) From the plugin\win32 directory, use Borland C++ command-line tools
-as follows:
-bpr2mak intfwin.bpr -s \
-  | sed 's#^LIBPATH = .*#&;$$(RELEASELIBPATH)# ; s#^USERDEFINES = .*#& -DWIN32 -D__PLUGIN__ -DMODULE_NAME_IS_intfwin -DMODULE_NAME=intfwin#' \
-  > intfwin.mak	        // Create a makefile from intfwin.bpr
-make -fintfwin 		// It's Borland's make utility !
+2) Make sure you have the bpr2mak and bcmake (NOT make!) commands in $PATH,
+they can be symlinks to the Borland bpr2mak and make utilities, or wrappers
+that call them through Wine if you are cross-compiling from Linux.
 
-3) This should create a intfwin.so
-You can remove any other generated file.
-
+3) Configure vlc as usual with the --enable-intfwin flag and build it.
 
 Well done, now you're ready to use vlc!
 =======================================
