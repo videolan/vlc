@@ -40,9 +40,10 @@ BuildRoot:	%_tmppath/%name-%version-%release-root
 #Buildrequires:	db1-devel
 #This is for RedHat :
 Buildrequires: ncurses-devel
-Buildrequires: qt2-devel
+Buildrequires: qt-devel
 Buildrequires: gtk+-devel
-Buildrequires:	gnome-libs-devel
+Buildrequires: gnome-libs-devel
+Buildrequires: SDL-devel
 Buildrequires: db1
 
 %description
@@ -109,8 +110,8 @@ install vlc-ncurses
 	   --enable-fb \
 	   --enable-xvideo \
 	   --enable-sdl 
-export QTDIR=%{_libdir}/qt2 
-%make
+export QTDIR=%{_libdir}/qt-2.3.0/
+make
 
 %install
 %makeinstall

@@ -66,7 +66,7 @@ the %{name} library.
 
 %build
 %configure
-%make
+make libdvdcss
 
 %install
 %makeinstall

@@ -491,7 +491,7 @@ AC_ARG_WITH(tuning,
 if test "x$withval" != "x"; then
     TUNING=$withval
 else
-    if test x${target_cpu} = xi686; then TUNING="pentiumpro"
+    if test x${target_cpu} = xi686 -o x${target_cpu} = xi586 -o x${target_cpu} = xi486 -o x${target_cpu} = xi386; then TUNING="pentiumpro"
     else
         if test x${target_cpu} = xpowerpc; then TUNING="750"; fi
     fi
