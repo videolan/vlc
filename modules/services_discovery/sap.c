@@ -32,6 +32,7 @@
 #include <vlc/input.h>
 
 #include "network.h"
+#include "charset.h"
 
 #include <errno.h>                                                 /* ENOMEM */
 
@@ -201,6 +202,9 @@ struct services_discovery_sys_t
     /* playlist node */
     playlist_item_t *p_node;
 
+    /* charset conversion */
+    vlc_iconv_t iconvHandle;
+
     /* Table of announces */
     int i_announces;
     struct sap_announce_t **pp_announces;
@@ -240,6 +244,8 @@ struct demux_sys_t
 /* Helper functions */
    static char *GetAttribute( sdp_t *p_sdp, const char *psz_search );
    static vlc_bool_t IsSameSession( sdp_t *p_sdp1, sdp_t *p_sdp2 );
+   static char *convert_from_utf8( struct services_discovery_t *p_sd,
+                                   char *psz_unicode );
    static int InitSocket( services_discovery_t *p_sd, char *psz_address, int i_port );
 #ifdef HAVE_ZLIB_H
    static int Decompress( unsigned char *psz_src, unsigned char **_dst, int i_len );
@@ -262,10 +268,18 @@ static int Open( vlc_object_t *p_this )
 
     playlist_t          *p_playlist;
     playlist_view_t     *p_view;
-    char                *psz_addr;
+    char                *psz_addr, *psz_charset;
     vlc_value_t         val;
 
     p_sys->i_timeout = config_GetInt( p_sd,"sap-timeout" );
+
+    vlc_current_charset( &psz_charset );
+    p_sys->iconvHandle = vlc_iconv_open( psz_charset, "UTF-8");
+    free( psz_charset );
+    if( p_sys->iconvHandle == (vlc_iconv_t)(-1) )
+    {
+        msg_Warn( p_sd, "Unable to do requested conversion" );
+    }
 
     p_sd->pf_run = Run;
     p_sd->p_sys  = p_sys;
@@ -470,6 +484,9 @@ static void Close( vlc_object_t *p_this )
         playlist_NodeDelete( p_playlist, p_sys->p_node, VLC_TRUE );
         vlc_object_release( p_playlist );
     }
+
+    if( p_sys->iconvHandle != (vlc_iconv_t)(-1) )
+        vlc_iconv_close( p_sys->iconvHandle );
 
     free( p_sys );
 }
@@ -807,8 +824,9 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
     p_sap->p_item = NULL;
 
     /* Create the playlist item here */
-    p_item = playlist_ItemNew( p_sd, p_sap->p_sdp->psz_uri,
-                               p_sap->p_sdp->psz_sessionname );
+    psz_value = convert_from_utf8( p_sd, p_sap->p_sdp->psz_sessionname );
+    p_item = playlist_ItemNew( p_sd, p_sap->p_sdp->psz_uri, psz_value );
+    FREE( psz_value );
 
     if( !p_item )
     {
@@ -834,14 +852,17 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint16_t i_hash,
 
     if( psz_value != NULL )
     {
-        p_child = playlist_ChildSearchName( p_sd->p_sys->p_node, psz_value );
+        char *psz_grp = convert_from_utf8( p_sd, psz_value );
+        free( psz_value );
+
+        p_child = playlist_ChildSearchName( p_sd->p_sys->p_node, psz_grp );
 
         if( p_child == NULL )
         {
             p_child = playlist_NodeCreate( p_playlist, VIEW_CATEGORY,
-                                           psz_value, p_sd->p_sys->p_node );
+                                           psz_grp, p_sd->p_sys->p_node );
         }
-	free( psz_value );
+        free( psz_grp );
     }
     else
     {
@@ -1237,6 +1258,38 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
     }
 
     return p_sdp;
+}
+
+
+static char *convert_from_utf8( struct services_discovery_t *p_sd,
+                                char *psz_unicode )
+{
+    char *psz_local, *psz_in, *psz_out;
+    size_t ret, i_in, i_out;
+
+    if( psz_unicode == NULL )
+        return NULL;
+    if ( p_sd->p_sys->iconvHandle == (vlc_iconv_t)(-1) )
+        return strdup( psz_unicode );
+
+    psz_in = psz_unicode;
+    i_in = strlen( psz_unicode );
+
+    i_out = 2 * i_in;
+    psz_local = malloc( i_out + 1 );
+    if( psz_local == NULL )
+        return strdup( psz_unicode );
+    psz_out = psz_local;
+
+    ret = vlc_iconv( p_sd->p_sys->iconvHandle,
+                     &psz_in, &i_in, &psz_out, &i_out);
+    if( ret == (size_t)(-1) || i_in )
+    {
+        msg_Warn( p_sd, "Failed to convert \"%s\" from UTF-8", psz_unicode );
+        return strdup( psz_unicode );
+    }
+    *psz_out = '\0';
+    return psz_local;
 }
 
 
