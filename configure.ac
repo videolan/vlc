@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.133 2003/12/13 11:56:36 gbazin Exp $
+dnl $Id: configure.ac,v 1.134 2003/12/14 16:08:32 titer Exp $
 
 AC_INIT(vlc,0.7.0-test2)
 
@@ -162,6 +162,7 @@ case "${target_os}" in
     SYS=beos
     CFLAGS_save="${CFLAGS_save} -Wno-multichar"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
+    AX_ADD_CXXFLAGS([beos],[])
     AX_ADD_LDFLAGS([vlc beos],[-lbe])
     AX_ADD_LDFLAGS([beos],[-lmedia -ltranslation -ltracker -lgame])
 
