@@ -597,7 +597,9 @@ struct httpd_stream_t
     int64_t     i_buffer_last_pos;  /* a new connection will start with that */
 };
 
-static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl, httpd_message_t *answer, httpd_message_t *query )
+static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
+                                 httpd_client_t *cl, httpd_message_t *answer,
+                                 httpd_message_t *query )
 {
     httpd_stream_t *stream = (httpd_stream_t*)p_sys;
 
@@ -610,14 +612,18 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl
         int64_t i_write;
         int     i_pos;
 
-        /* fprintf( stderr, "httpd_StreamCallBack i_body_offset=%lld\n", answer->i_body_offset ); */
+#if 0
+        fprintf( stderr, "httpd_StreamCallBack i_body_offset=%lld\n",
+                 answer->i_body_offset );
+#endif
 
         if( answer->i_body_offset >= stream->i_buffer_pos )
         {
             /* fprintf( stderr, "httpd_StreamCallBack: no data\n" ); */
             return VLC_EGENERIC;    /* wait, no data available */
         }
-        if( answer->i_body_offset + stream->i_buffer_size < stream->i_buffer_pos )
+        if( answer->i_body_offset + stream->i_buffer_size <
+            stream->i_buffer_pos )
         {
             /* this client isn't fast enough */
             fprintf( stderr, "fixing i_body_offset (old=%lld new=%lld)\n",
@@ -635,6 +641,9 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl
         {
             return VLC_EGENERIC;    /* wait, no data available */
         }
+
+        /* Don't go past the end of the circular buffer */
+        i_write = __MIN( i_write, stream->i_buffer_size - i_pos );
 
         /* using HTTPD_MSG_ANSWER -> data available */
         answer->i_proto  = HTTPD_PROTO_HTTP;
