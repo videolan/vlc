@@ -66,6 +66,7 @@ LIB_ALSA = @LIB_ALSA@
 LIB_BEOS = @LIB_BEOS@
 LIB_DARWIN = @LIB_DARWIN@
 LIB_DVD = @LIB_DVD@
+LIB_DVD_PLUGIN = @LIB_DVD_PLUGIN@
 LIB_ESD = @LIB_ESD@
 LIB_GGI = @LIB_GGI@
 LIB_GLIDE = @LIB_GLIDE@
@@ -166,12 +167,6 @@ endif
 #
 # Libraries
 #
-ifeq (1,$(LOCAL_LIBDVDCSS))
-ifneq (,$(findstring dvd,$(BUILTINS)))
-LIB += lib/libdvdcss.a
-endif
-endif
-
 ifneq (,$(findstring mingw32,$(SYS)))
 LIB += -lws2_32 -lnetapi32
 endif

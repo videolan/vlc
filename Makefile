@@ -329,7 +329,7 @@ endif
 # Main application target
 #
 vlc: Makefile.opts Makefile.dep Makefile $(H_OBJ) $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ)
-	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ) $(LCFLAGS) $(LIB)
+	$(CC) $(CFLAGS) -o $@ $(C_OBJ) $(CPP_OBJ) $(BUILTIN_OBJ) $(RESOURCE_OBJ) $(LCFLAGS)
 ifeq ($(SYS),beos)
 	xres -o $@ ./share/vlc_beos.rsrc
 	mimeset -f $@

@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: dvd.c,v 1.10 2001/05/31 03:57:54 sam Exp $
+ * $Id: dvd.c,v 1.11 2001/07/27 01:05:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,17 +21,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME dvd
+#include "modules_inner.h"
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include "defs.h"
-
-#ifdef HAVE_CSS
-#define MODULE_NAME dvd
-#else /* HAVE_CSS */
-#define MODULE_NAME dvdnocss
-#endif /* HAVE_CSS */
-#include "modules_inner.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>                                              /* strdup() */
@@ -60,11 +56,7 @@ MODULE_CONFIG_STOP
 MODULE_INIT_START
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
                                 | MODULE_CAPABILITY_INPUT;
-#ifdef HAVE_CSS
-    p_module->psz_longname = "full DVD input module with CSS decryption";
-#else /* HAVE_CSS */
-    p_module->psz_longname = "DVD input module, CSS decryption disabled";
-#endif /* HAVE_CSS */
+    p_module->psz_longname = "DVD input module, uses libdvdcss";
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -73,24 +65,4 @@ MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
 MODULE_DEACTIVATE_STOP
-
-#ifdef HAVE_CSS
-#else /* HAVE_CSS */
-#ifdef BUILTIN
-int module_dvd_InitModule( module_t *p_module )
-{
-    return module_dvdnocss_InitModule( p_module );
-}
-
-int module_dvd_ActivateModule( module_t *p_module )
-{
-    return module_dvdnocss_ActivateModule( p_module );
-}
-
-int module_dvd_DeactivateModule( module_t *p_module )
-{
-    return module_dvdnocss_DeactivateModule( p_module );
-}
-#endif /* BUILTIN */
-#endif /* HAVE_CSS */
 

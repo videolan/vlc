@@ -20,11 +20,11 @@ include ../../Makefile.modules
 
 $(PLUGIN_DVD): %.o: .dep/%.d
 $(PLUGIN_DVD): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) $(CFLAGS_DVD) -DPLUGIN -c -o $@ $<
+	$(CC) $(CFLAGS_DVD) $(CFLAGS) $(PCFLAGS) -DPLUGIN -c -o $@ $<
 
 $(BUILTIN_DVD): BUILTIN_%.o: .dep/%.d
 $(BUILTIN_DVD): BUILTIN_%.o: %.c
-	$(CC) $(CFLAGS) $(CFLAGS_DVD) -DBUILTIN -c -o $@ $<
+	$(CC) $(CFLAGS_DVD) $(CFLAGS) -DBUILTIN -c -o $@ $<
 
 #
 # Real targets
@@ -32,14 +32,14 @@ $(BUILTIN_DVD): BUILTIN_%.o: %.c
 
 ifeq (1,$(LOCAL_LIBDVDCSS))
 ../../plugins/dvd.so: libdvdcss $(PLUGIN_DVD)
-	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) ../../lib/libdvdcss.a $(LIB_DVD)
+	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
 
 ../../plugins/dvd.a: libdvdcss $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)
 	$(RANLIB) $@
 else
 ../../plugins/dvd.so: $(PLUGIN_DVD)
-	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD)
+	$(CC) $(PCFLAGS) -o $@ $(PLUGIN_DVD) $(PLCFLAGS) $(LIB_DVD_PLUGIN)
 
 ../../plugins/dvd.a: $(BUILTIN_DVD)
 	ar r $@ $(BUILTIN_DVD)

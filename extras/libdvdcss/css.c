@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.6 2001/07/26 03:13:30 sam Exp $
+ * $Id: css.c,v 1.7 2001/07/27 01:05:17 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -285,7 +285,7 @@ int CSSInit( dvdcss_handle dvdcss )
     }
 
 #else /* HAVE_CSS */
-    _dvdcss_error( dvdcss, "CSS decryption is disabled in this module" );
+    _dvdcss_error( dvdcss, "CSS decryption is disabled in this library" );
 
 #endif /* HAVE_CSS */
     return -1;

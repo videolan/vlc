@@ -5,7 +5,7 @@
  * contains the basic udf handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_udf.c,v 1.11 2001/06/12 22:14:44 sam Exp $
+ * $Id: dvd_udf.c,v 1.12 2001/07/27 01:05:17 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -28,18 +28,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*
- * Preamble
- */
-#include "defs.h"
-
-#ifdef HAVE_CSS
-#   define MODULE_NAME dvd
-#else /* HAVE_CSS */
-#   define MODULE_NAME dvdnocss
-#endif /* HAVE_CSS */
-
+#define MODULE_NAME dvd
 #include "modules_inner.h"
+
+/*****************************************************************************
+ * Preamble
+ *****************************************************************************/
+#include "defs.h"
 
 #include <stdio.h>
 #include <string.h>

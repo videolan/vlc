@@ -2,7 +2,7 @@
  * libdvdcss.c: DVD reading library.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libdvdcss.c,v 1.9 2001/07/25 08:41:21 gbazin Exp $
+ * $Id: libdvdcss.c,v 1.10 2001/07/27 01:05:17 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -150,9 +150,9 @@ extern int dvdcss_seek ( dvdcss_handle dvdcss, int i_blocks )
 }
 
 /*****************************************************************************
- * dvdcss_crack: crack the current title key
+ * dvdcss_title: crack the current title key if needed
  *****************************************************************************/
-extern int dvdcss_crack ( dvdcss_handle dvdcss, int i_block )
+extern int dvdcss_title ( dvdcss_handle dvdcss, int i_block )
 {
     dvd_title_t *p_title;
     dvd_key_t p_key;

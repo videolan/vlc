@@ -22,7 +22,7 @@ $(LIBDVDCSS_O): %.o: %.c
 	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $<
 
 ../../lib/libdvdcss.so.$(LIBDVDCSS_VERSION): $(LIBDVDCSS_O)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS)
+	$(CC) $(PCFLAGS) -Wl,-soname -Wl,libdvdcss.so.$(LIBDVDCSS_MAJOR) -o $@ $^ $(PLCFLAGS)
 	rm -f ../../lib/libdvdcss.so && ln -s libdvdcss.so.$(LIBDVDCSS_VERSION) ../../lib/libdvdcss.so
 	rm -f ../../lib/libdvdcss.so.$(LIBDVDCSS_MAJOR) && ln -s libdvdcss.so.$(LIBDVDCSS_VERSION) ../../lib/libdvdcss.so.$(LIBDVDCSS_MAJOR)
 

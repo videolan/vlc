@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.6 2001/06/12 22:14:44 sam Exp $
+ * $Id: dvd_summary.c,v 1.7 2001/07/27 01:05:17 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -22,17 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME dvd
+#include "modules_inner.h"
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
 #include "defs.h"
-
-#ifdef HAVE_CSS
-#define MODULE_NAME dvd
-#else /* HAVE_CSS */
-#define MODULE_NAME dvdnocss
-#endif /* HAVE_CSS */
-#include "modules_inner.h"
 
 #include <stdio.h>
 #include <stdlib.h>
