@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.38 2003/05/05 13:03:23 hartman Exp $
+$Id: NEWS,v 1.39 2003/05/05 13:15:06 titer Exp $
 
 Changes between 0.5.3 and 0.5.4:
 ---------------------------------
@@ -37,6 +37,12 @@ Mac OS X port:
 
 Win32 port:
  *
+
+BeOS port:
+ * Interface localization
+ * Screensaver disabled if playing in fullscreen
+ * A few new keyboard shortcuts
+ * New full-featured Preferences window
 
 iPAQ familiar Linux port:
  *
