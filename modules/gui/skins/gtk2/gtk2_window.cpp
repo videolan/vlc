@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.25 2003/04/21 14:26:59 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.26 2003/04/21 18:39:38 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -131,8 +131,11 @@ GTK2Window::~GTK2Window()
         DropTarget->Release();
         // Uninitialize the OLE library
         OleUninitialize();
+    }*/
+    if( gWnd )
+    {
+        gdk_window_destroy( gWnd );
     }
-*/
 }
 //---------------------------------------------------------------------------
 void GTK2Window::OSShow( bool show )
@@ -140,6 +143,7 @@ void GTK2Window::OSShow( bool show )
     if( show )
     {
         gdk_window_show( gWnd );
+        gdk_window_move( gWnd, Left, Top );
     }
     else
     {
@@ -289,24 +293,28 @@ void GTK2Window::RefreshFromImage( int x, int y, int w, int h )
     GdkRegion *region = gdk_region_new();
     for( int line = 0; line < Height; line++ )
     {
-        int start = 0;
-        while( gdk_image_get_pixel( image, start, line ) == 0 && start < Width-1)
+        int start = 0, end = 0;
+        while( start < Width )
         {
-            start++;
-        } 
-        int end = Width - 1;
-        while( end >=0 && gdk_image_get_pixel( image, end, line ) == 0)
-        {
-            end--;
+            while( start < Width && gdk_image_get_pixel( image, start, line ) == 0 )
+            {
+                start++;
+            } 
+            end = start;
+            while( end < Width && gdk_image_get_pixel( image, end, line ) != 0)
+            {
+                end++;
+            }
+            GdkRectangle rect;
+            rect.x = start;
+            rect.y = line;
+            rect.width = end - start + 1;
+            rect.height = 1;
+            GdkRegion *rectReg = gdk_region_rectangle( &rect );
+            gdk_region_union( region, rectReg );
+            gdk_region_destroy( rectReg );
+            start = end + 1;
         }
-        GdkRectangle rect;
-        rect.x = start;
-        rect.y = line;
-        rect.width = end - start + 1;
-        rect.height = 1;
-        GdkRegion *rectReg = gdk_region_rectangle( &rect );
-        gdk_region_union( region, rectReg );
-        gdk_region_destroy( rectReg );
     }
     gdk_window_shape_combine_region( gWnd, region, 0, 0 );
     gdk_region_destroy( region );

@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.15 2003/04/21 14:26:59 asmax Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.16 2003/04/21 18:39:38 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -47,6 +47,8 @@
 GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
     : Bitmap( p_intf, FileName, AColor )
 {
+    AlphaColor = AColor;
+
     // Load the bitmap image
     Bmp = gdk_pixbuf_new_from_file( FileName.c_str(), NULL );
     if( Bmp == NULL )
@@ -57,11 +59,35 @@ GTK2Bitmap::GTK2Bitmap( intf_thread_t *p_intf, string FileName, int AColor )
         Height = 0;
     }
     else
-    {
-        Bmp = gdk_pixbuf_add_alpha( Bmp, TRUE, AColor & 0xff, (AColor>>8) & 0xff, 
-                (AColor>>16) & 0xff );
+    {    
         Width = gdk_pixbuf_get_width( Bmp );
         Height = gdk_pixbuf_get_height( Bmp );
+
+        if( AColor != 0 )
+        {
+            // Change black pixels to another color to avoid transparency
+            int rowstride = gdk_pixbuf_get_rowstride( Bmp );
+            guchar *pixel = gdk_pixbuf_get_pixels( Bmp ); 
+            int pix_size = ( gdk_pixbuf_get_has_alpha( Bmp ) ? 4 : 3 );
+            
+            for( int y = 0; y < Height; y++ )
+            {
+                for( int x = 0; x < Width; x++ )
+                {   
+                    guint32 r = pixel[0];
+                    guint32 g = pixel[1]<<8;
+                    guint32 b = pixel[2]<<16;
+                    if( r+g+b == 0 )
+                    {
+                        pixel[2] = 10; // slight blue
+                    }
+                    pixel += pix_size;
+                }
+            }
+        }
+
+        Bmp = gdk_pixbuf_add_alpha( Bmp, TRUE, AColor & 0xff, (AColor>>8) & 0xff, 
+                (AColor>>16) & 0xff );
     }
 }
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.15 2003/04/21 02:50:49 asmax Exp $
+ * $Id: skin_main.cpp,v 1.16 2003/04/21 18:39:39 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -105,6 +105,15 @@ static int Open ( vlc_object_t *p_this )
     p_intf->p_sys->p_playlist = (playlist_t *)vlc_object_find( p_intf,
         VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
+#if !defined WIN32
+    // Initialize GDK
+    int    i_args   = 1;
+    char  *p_args[] = { "", NULL };
+    char **pp_args  = p_args;
+
+    gdk_init( &i_args, &pp_args );
+#endif
+
     // Initialize conditions
     vlc_mutex_init( p_intf, &p_intf->p_sys->init_lock);
     vlc_cond_init( p_intf, &p_intf->p_sys->init_cond);
@@ -152,16 +161,6 @@ static void Close ( vlc_object_t *p_this )
 //---------------------------------------------------------------------------
 static void Run( intf_thread_t *p_intf )
 {
-
-#if !defined WIN32
-/* FIXME: should be elsewhere ? */
-    // Initialize GDK
-    int    i_args   = 1;
-    char  *p_args[] = { "", NULL };
-    char **pp_args  = p_args;
-
-    gdk_init( &i_args, &pp_args );
-#endif
 
     int a = OSAPI_GetTime();
 

@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.11 2003/04/19 12:39:14 karibu Exp $
+ * $Id: gtk2_font.cpp,v 1.12 2003/04/21 18:39:38 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -67,13 +67,18 @@ GTK2Font::GTK2Font( intf_thread_t *_p_intf, string fontname, int size,
 
     pango_font_description_set_weight( FontDesc, (PangoWeight)weight );
 
-    /* FIXME: underline parameter */
-
-    // Set attributes
-    //PangoFont* font = pango_context_load_font( Context, FontDesc );
-
     //pango_context_set_font_description( Context, FontDesc );
     pango_layout_set_font_description( Layout, FontDesc );
+
+    // Set attributes
+    PangoAttrList *attrs = pango_attr_list_new();
+    /* FIXME: doesn't work */
+    if( underline )
+    {
+        pango_attr_list_insert( attrs, 
+            pango_attr_underline_new( PANGO_UNDERLINE_SINGLE ) );
+    }
+    pango_layout_set_attributes( Layout, attrs );
 }
 //---------------------------------------------------------------------------
 GTK2Font::~GTK2Font()
@@ -113,6 +118,9 @@ void GTK2Font::GenericPrint( Graphics *dest, string text, int x, int y,
 
     // Set attributes
     pango_layout_set_alignment( Layout, (PangoAlignment)align );
+    
+    // Avoid transârency for black text
+    if( color == 0 ) color = 10;
     gdk_rgb_gc_set_foreground( gc, color );
 
     // Render text on buffer
