@@ -2,7 +2,7 @@
  * aout_darwin.c : Darwin audio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_darwin.c,v 1.4 2001/04/05 03:50:38 sam Exp $
+ * $Id: aout_macosx.c,v 1.1 2001/04/06 18:18:10 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *
@@ -34,7 +34,7 @@
  * Find 8 bits files and adapt output
  */
  
-#define MODULE_NAME darwin
+#define MODULE_NAME macosx
 #include "modules_inner.h"
 
 /*****************************************************************************
@@ -128,12 +128,12 @@ void _M( aout_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int aout_Probe( probedata_t *p_data )
 {
-    if( TestMethod( AOUT_METHOD_VAR, "darwin" ) )
+    if( TestMethod( AOUT_METHOD_VAR, "macosx" ) )
     {
         return( 999 );
     }
 
-    /* The Darwin plugin always works under Darwin or MacOS X */
+    /* This plugin always works under OS X */
     return( 100 );
 }
 
@@ -219,7 +219,7 @@ static int aout_Open( aout_thread_t *p_aout )
     if( p_aout->p_sys->p_Data == nil ) return paramErr;
 
 #if WRITE_AUDIO_OUTPUT_TO_FILE
-    p_aout->p_sys->fd = open( "/Users/bofh/audio-darwin.pcm", O_RDWR|O_CREAT );
+    p_aout->p_sys->fd = open( "audio-darwin.pcm", O_RDWR|O_CREAT );
     intf_WarnMsg( 1, "open(...) -> %d", p_aout->p_sys->fd );
 #endif
 
@@ -247,7 +247,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
     if( err != noErr )
     {
         /* We have to tell the decoder to use audio device's buffer size  */
-        intf_ErrMsg( "AudioDeviceSetProperty failed ( buffersize = %d ) -> %d",
+        intf_ErrMsg( "aout : AudioDeviceSetProperty failed ( buffersize = %d ) -> %d",
                      ui_bufferSize, err );
         return( -1 );
     }
@@ -328,7 +328,7 @@ static int aout_SetFormat( aout_thread_t *p_aout )
                                           ui_paramSize, &format);
             if( err != noErr )
             {
-                intf_ErrMsg( "AudioDeviceSetProperty( mFormatFlags = %x, " 
+                intf_ErrMsg( "aout : AudioDeviceSetProperty( mFormatFlags = %x, " 
                              "mSampleRate = %f, mChannelsPerFrame = %d ) -> %d", 
                              format.mFormatFlags, format.mSampleRate, 
                              format.mChannelsPerFrame, err );

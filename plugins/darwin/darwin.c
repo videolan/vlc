@@ -2,7 +2,7 @@
  * darwin.c : Darwin plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin.c,v 1.3 2001/03/21 13:42:33 sam Exp $
+ * $Id: darwin.c,v 1.4 2001/04/06 18:18:10 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -24,6 +24,12 @@
 
 #define MODULE_NAME darwin
 #include "modules_inner.h"
+
+/* CD (2001/04/06):
+ * This module was written to handle audio output when we thought that 
+ * CoreAudio was in Darwin. It currently does nothing.
+ * All the audio output code has been moved to the macosx plugin.
+ */
 
 /*****************************************************************************
  * Preamble
@@ -50,7 +56,7 @@ MODULE_CONFIG_END
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void _M( aout_getfunctions )( function_list_t * p_function_list );
+// void _M( aout_getfunctions )( function_list_t * p_function_list );
 
 /*****************************************************************************
  * InitModule: get the module structure and configuration.
@@ -63,11 +69,10 @@ void _M( aout_getfunctions )( function_list_t * p_function_list );
 MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "Darwin HAL sound support module";
+    p_module->psz_longname = "Darwin support module";
     p_module->psz_version = VERSION;
 
-    p_module->i_capabilities = MODULE_CAPABILITY_NULL
-                                | MODULE_CAPABILITY_AOUT;
+    p_module->i_capabilities = MODULE_CAPABILITY_NULL;
 
     return( 0 );
 }
@@ -88,7 +93,7 @@ MODULE_ACTIVATE
         return( -1 );
     }
 
-    _M( aout_getfunctions )( &p_module->p_functions->aout );
+    // _M( aout_getfunctions )( &p_module->p_functions->aout );
 
     p_module->p_config = p_config;
 

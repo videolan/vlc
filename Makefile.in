@@ -48,9 +48,12 @@ endif
 # PROGRAM_BUILD is a complete identification of the build
 # (we can't use fancy options with date since OSes like Solaris
 # or FreeBSD have strange date implementations)
-PROGRAM_BUILD = `date` $(USER)
+ifeq ($(SYS),beos)
 # XXX: beos does not support hostname (how lame...)
-#PROGRAM_BUILD = `date` $(USER)@`hostname`
+PROGRAM_BUILD = `date` $(USER)
+else
+PROGRAM_BUILD = `date` $(USER)@`hostname`
+endif
 
 # DEFINE will contain some of the constants definitions decided in Makefile, 
 # including SYS_xx. It will be passed to C compiler.
@@ -306,8 +309,7 @@ PLUGIN_BEOS =	plugins/beos/beos.o \
 		plugins/beos/DrawingTidbits.o \
 		plugins/beos/TransportButton.o
 
-PLUGIN_DARWIN =	plugins/darwin/darwin.o \
-		plugins/darwin/aout_darwin.o
+PLUGIN_DARWIN =	plugins/darwin/darwin.o
 
 PLUGIN_DSP =	plugins/dsp/dsp.o \
 		plugins/dsp/aout_dsp.o
@@ -429,7 +431,6 @@ STD_PLUGIN_OBJ = \
 		$(PLUGIN_IDCTMMX) \
 		$(PLUGIN_IDCTMMXEXT) \
 		$(PLUGIN_IDCTCOMMON) \
-		$(PLUGIN_MACOSX) \
 		$(PLUGIN_MGA) \
 		$(PLUGIN_MOTION) \
 		$(PLUGIN_MOTIONMMX) \
@@ -449,6 +450,7 @@ NONSTD_PLUGIN_OBJ = \
 		$(PLUGIN_GLIDE) \
 		$(PLUGIN_GTK) \
 		$(PLUGIN_GNOME) \
+		$(PLUGIN_MACOSX) \
 		$(PLUGIN_IDCTALTIVEC)
 
 NONSTD_CPP_PLUGIN_OBJ = \
@@ -499,6 +501,19 @@ install:
 	$(INSTALL) -m 644 share/*.psf $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.png $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.xpm $(DESTDIR)$(datadir)/videolan
+
+ifneq (,$(findstring darwin,$(SYS)))
+# XXX this should only be for MacOS X
+#should the following be "$(DESTDIR)$(bindir)vlc.app/" or "$(DESTDIR)vlc.app/" ?
+    mkdir -p $(DESTDIR)$(bindir)vlc.app/Contents/MacOS
+    mkdir -p $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/lib
+    mkdir -p $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/share
+    $(INSTALL) -m 644 extras/MacOSX_app/Contents/Info.plist $(DESTDIR)$(bindir)vlc.app/Contents/
+    $(INSTALL) -m 644 extras/MacOSX_app/Contents/PkgInfo $(DESTDIR)$(bindir)vlc.app/Contents/
+    $(INSTALL) vlc $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/
+    $(INSTALL) $(PLUGINS:%=lib/%.so) $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/lib
+    $(INSTALL) -m 644 share/*.psf $(DESTDIR)$(bindir)vlc.app/Contents/MacOS/share
+endif
 
 show:
 	@echo CC: $(CC)
@@ -573,7 +588,12 @@ $(cppdependancies): %.dpp: FORCE
 $(C_OBJ): %.o: Makefile.dep
 $(C_OBJ): %.o: .dep/%.d
 $(C_OBJ): %.o: %.c
+ifneq (,$(findstring darwin,$(SYS)))
+#this is uglier of all
+	@if test "src/ac3_decoder/ac3_imdct.c" = "$<"; then $(CC) `echo $(CFLAGS) | sed -e 's/-O3/-O/'` -c -o $@ $<; echo "(CC) `echo $(CFLAGS) | sed -e 's/-O3/-O/'` -c -o $@ $<"; else $(CC) $(CFLAGS) -c -o $@ $<; echo "$(CC) $(CFLAGS) -c -o $@ $<"; fi
+else
 	$(CC) $(CFLAGS) -c -o $@ $<
+endif
 
 $(CPP_OBJ): %.o: Makefile.dep
 $(CPP_OBJ): %.o: .dep/%.dpp
@@ -634,7 +654,12 @@ $(PLUGIN_BEOS): %.o: %.cpp
 $(PLUGIN_IDCTALTIVEC): %.o: Makefile.dep
 $(PLUGIN_IDCTALTIVEC): %.o: .dep/%.d
 $(PLUGIN_IDCTALTIVEC): %.o: %.c
-	$(CC) $(CFLAGS) $(PCFLAGS) -c -o $@ $< -faltivec
+	$(CC) $(CFLAGS) $(PCFLAGS) -faltivec -c -o $@ $<
+
+$(PLUGIN_MACOSX): %.o: Makefile.dep
+$(PLUGIN_MACOSX): %.o: .dep/%.d
+$(PLUGIN_MACOSX): %.o: %.c
+	$(CC) $(CFLAGS) $(PCFLAGS) -fpascal-strings -c -o $@ $<
 
 #
 # Main application target
@@ -645,6 +670,18 @@ vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
 ifeq ($(SYS),beos)
 	rm -f ./plugins/_APP_
 	ln -s ../vlc ./plugins/_APP_
+endif
+
+vlc.app: all
+ifneq (,$(findstring darwin,$(SYS)))
+    mkdir -p vlc.app/Contents/MacOS
+    mkdir -p vlc.app/Contents/MacOS/lib
+    mkdir -p vlc.app/Contents/MacOS/share
+    $(INSTALL) -m 644 extras/MacOSX_app/Contents/Info.plist vlc.app/Contents/
+    $(INSTALL) -m 644 extras/MacOSX_app/Contents/PkgInfo vlc.app/Contents/
+    $(INSTALL) vlc vlc.app/Contents/MacOS/
+    $(INSTALL) $(PLUGINS:%=lib/%.so) vlc.app/Contents/MacOS/lib
+    $(INSTALL) -m 644 share/*.psf vlc.app/Contents/MacOS/share
 endif
 
 #
@@ -710,7 +747,7 @@ lib/kde.so: $(PLUGIN_KDE)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lkdeui -lkdecore -lqt -ldl
 
 lib/macosx.so: $(PLUGIN_MACOSX)
-	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework CoreAudio -framework Carbon -framework AGL
 
 lib/mga.so: $(PLUGIN_MGA)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -L/usr/X11R6/lib -lX11 -lXext
@@ -737,10 +774,14 @@ lib/qt.so: $(PLUGIN_QT)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -lqt -L${QTDIR}/lib
 
 lib/sdl.so: $(PLUGIN_SDL)
+ifneq (,$(findstring darwin,$(SYS)))
+	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) @LIB_SDL@ -framework Carbon -framework AGL
+else
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) @LIB_SDL@
+endif
 
 lib/ts.so: $(PLUGIN_TS)
-ifeq ($(SYS),darwin)
+ifneq (,$(findstring darwin,$(SYS)))
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) -framework AGL -framework Carbon
 else
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 

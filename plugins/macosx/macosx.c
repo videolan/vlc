@@ -2,9 +2,10 @@
  * macosx.c : MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: macosx.c,v 1.3 2001/03/21 13:42:34 sam Exp $
+ * $Id: macosx.c,v 1.4 2001/04/06 18:18:10 massiot Exp $
  *
- * Authors: 
+ * Authors: Colin Delacroix <colin@zoy.org>
+ *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +50,7 @@ MODULE_CONFIG_END
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
+void _M( aout_getfunctions )( function_list_t * p_function_list );
 void _M( vout_getfunctions )( function_list_t * p_function_list );
 void _M( intf_getfunctions )( function_list_t * p_function_list );
 
@@ -63,11 +65,12 @@ void _M( intf_getfunctions )( function_list_t * p_function_list );
 MODULE_INIT
 {
     p_module->psz_name = MODULE_STRING;
-    p_module->psz_longname = "MacOS X interface and video module";
+    p_module->psz_longname = "MacOS X interface, sound and video module";
     p_module->psz_version = VERSION;
 
     p_module->i_capabilities = MODULE_CAPABILITY_NULL
                                 | MODULE_CAPABILITY_VOUT
+                                | MODULE_CAPABILITY_AOUT
                                 | MODULE_CAPABILITY_INTF;
 
     return( 0 );
@@ -90,6 +93,7 @@ MODULE_ACTIVATE
     }
 
     _M( vout_getfunctions )( &p_module->p_functions->vout );
+    _M( aout_getfunctions )( &p_module->p_functions->aout );
     _M( intf_getfunctions )( &p_module->p_functions->intf );
 
     p_module->p_config = p_config;

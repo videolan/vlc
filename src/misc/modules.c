@@ -2,7 +2,7 @@
  * modules.c : Built-in and dynamic modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.19 2001/03/21 13:42:34 sam Exp $
+ * $Id: modules.c,v 1.20 2001/04/06 18:18:10 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -54,6 +54,12 @@
 #include "common.h"
 #include "threads.h"
 
+#ifdef SYS_DARWIN1_3
+#include <sys/param.h>                                    /* for MAXPATHLEN */
+#include "main.h"
+extern main_t *p_main;
+#endif
+
 #include "intf_msg.h"
 #include "modules.h"
 #include "modules_core.h"
@@ -88,7 +94,7 @@ module_bank_t * module_CreateBank( void )
  *****************************************************************************/
 void module_InitBank( module_bank_t * p_bank )
 {
-    static char * path[] = { ".", "lib", PLUGIN_PATH, NULL };
+    static char * path[] = { ".", "lib", PLUGIN_PATH, NULL, NULL };
 
     char **         ppsz_path = path;
     char *          psz_fullpath;
@@ -97,6 +103,11 @@ void module_InitBank( module_bank_t * p_bank )
     char *          psz_vlcpath = beos_GetProgramPath();
     int             i_vlclen = strlen( psz_vlcpath );
     boolean_t       b_notinroot;
+#elif defined SYS_DARWIN1_3
+    static char     once = 0;
+    static char     app_path[ MAXPATHLEN ];
+    // HACK TO CUT OUT trailing 'vlc'
+    int             i_pathlen = strlen( p_main->ppsz_argv[0] ) - 3;
 #endif
     DIR *           dir;
     struct dirent * file;
@@ -105,6 +116,18 @@ void module_InitBank( module_bank_t * p_bank )
     vlc_mutex_init( &p_bank->lock );
 
     intf_WarnMsg( 1, "module: module bank initialized" );
+
+#ifdef SYS_DARWIN1_3
+    if ( !once )
+    {
+        once = 1;
+        strncpy( app_path, p_main->ppsz_argv[ 0 ], i_pathlen );
+        intf_ErrMsg( "%s", p_main->ppsz_argv[ 0 ] );
+        strcat( app_path, "lib" );
+        path[ 3 ] = app_path ;
+        intf_ErrMsg( "%s", path[ 3 ] );
+    }
+#endif
 
     for( ; *ppsz_path != NULL ; ppsz_path++ )
     {
