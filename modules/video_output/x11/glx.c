@@ -176,13 +176,13 @@ static void DestroyOpenGL( vlc_object_t *p_this )
  *****************************************************************************/
 static int CheckGLX( vlc_object_t *p_this, vlc_bool_t *b_glx13 )
 {
-    Display *p_display;
-    int i_opcode, i_evt, i_err;
-    int i_maj, i_min;
+    Display *p_display = NULL;
+    int i_opcode, i_evt, i_err = 0;
+    int i_maj, i_min = 0;
 
     /* Open the display */
     p_display = XOpenDisplay( NULL );
-    if( !p_display )
+    if( p_display == NULL )
     {
         msg_Err( p_this, "Cannot open display" );
         return VLC_EGENERIC;
