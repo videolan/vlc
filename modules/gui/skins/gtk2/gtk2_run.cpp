@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.13 2003/04/20 22:52:50 asmax Exp $
+ * $Id: gtk2_run.cpp,v 1.14 2003/04/20 23:09:31 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -127,7 +127,7 @@ void GTK2Proc( GdkEvent *event, gpointer data )
         if( !proc->EventProc( evt ) )
         {
             fprintf( stderr, "Quit\n" );
-            g_main_loop_quit( obj->Loop );
+            wxExit();
             return;      // Exit VLC !
         }
     }
