@@ -2,9 +2,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD  XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml10/DTD/xhtml10transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
  <head>
     <title>VLC media player</title>
-    <link href="/style.css" title="Default" rel="stylesheet" />
+    <link href="/style.css" title="Default" rel="stylesheet" type="text/css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 
     <vlc id="if" param1="url_param"/>
         <meta http-equiv="refresh" content="0;URL=/" />
@@ -13,7 +15,10 @@
     <vlc id="control" param1="stop,pause,previous,next,add,sout,play,delete,empty,seek,fullscreen,keep,volume,sort,move" />
     <vlc id="set" param1="sout" param2="string" />
  </head>
+
  <body>
+
+    <!-- left menu -->
     <div class="left">
       <div class="sectitle">Playback control</div>
       <div class="section-controls">
@@ -22,13 +27,13 @@
             <input type="submit" name="control" value="stop" />
             <input type="submit" name="control" value="pause" />
             <br />
-              <input type="submit" name="control" value="previous" />
-              <input type="submit" name="control" value="next" />
-	  </p>
+            <input type="submit" name="control" value="previous" />
+            <input type="submit" name="control" value="next" />
+          </p>
             <input type="submit" name="seek_value" value="-1min"/><input type="hidden" name="control" value="seek"/>
             <input type="submit" name="seek_value" value="+1min"/><input type="hidden" name="control" value="seek"/>
-	    <br />
-              <input type="text" name="seek_value" size="14"/><input type="hidden" name="control" value="seek"/>
+            <br />
+            <input type="text" name="seek_value" size="14"/><input type="hidden" name="control" value="seek"/>
           </form>
         <br />
           <span class="small">( Seek Textbox: for example "+12min 42sec", "01:13:43", "-12%" etc... )</span>
@@ -38,11 +43,11 @@
       <div class="section-controls">
         <form method="get" action="">
                <input type="hidden" name="control" value="volume" />
-	  Vol: <input type="text" name="value" size="5"/>
-               <input type="submit" value="Set" /><br /> (0 -&gt;1024)<br />
+          Vol: <input type="text" name="value" size="5"/>
+               <input type="submit" value="Set" /><br /> (0 - 1024)<br /><span class="small">(for exemple: "536", "-12", "+42", "36%")</span>
         </form>
-	<br />
-	<form method="get" action="">
+        <br />
+        <form method="get" action="">
           <input type="submit" name="control" value="fullscreen" />
         </form>
       </div>
@@ -51,19 +56,21 @@
       <div class="section">
         State: <vlc id="value" param1="stream_state" /><br />
         Length: <span id="length"><vlc id="value" param1="stream_length" /> s
-	      </span><br />
+                </span><br />
         Time: <span id="time"><vlc id="value" param1="stream_time" /> s</span><br />
         Volume: <span id="volume"><vlc id="value" param1="volume" /></span>
         <br /><a href="info.html">Information</a>  
       </div>
-    
-      <div><a href="/admin/">Administration Page</a></div>
 
-    </div> <!-- End left -->
+      <div class="section"><a href="/admin/">Administration Page</a></div>
 
+    </div>
+    <!-- end left -->
+
+    <!-- main content -->
     <div class ="right">
-      <h2><a href="http://www.videolan.org/">VLC media player
-          <vlc id="value" param1="version" /></a> (http interface)
+      <h2 class="title"><a href="http://www.videolan.org/">VLC media player
+        <vlc id="value" param1="version" /></a> (http interface)
       </h2>
 
       <div class="sectitle">Add</div>
@@ -87,7 +94,7 @@
             <tr>
               <td>
                 <table>
-		  <tr>
+                  <tr>
                     <td>
                       <form method="get" action="">
                         <input type="submit" name="control" value="sort" /> by
@@ -101,27 +108,27 @@
                           <option value="0">normal order</option>
                           <option value="1">reverse order</option>
                         </select>
-		      </form>
+                      </form>
                     </td>
                     <td>
                       <form method="get" action="">
                          Move the item number
-		        <input type="text" name="psz_pos" size="5" /> to 
-		        <input type="text" name="psz_newpos" size="5" /> 
-		        <input type="submit" name="control" value="move" />
+                        <input type="text" name="psz_pos" size="5" /> to 
+                        <input type="text" name="psz_newpos" size="5" /> 
+                        <input type="submit" name="control" value="move" />
                       </form>
                     </td>
                   </tr>
-		</table>
+                </table>
               </td>
             </tr>
-	    <tr>
+            <tr>
               <td>
                <form method="get" action="">
                 <table>
                   <vlc id="rpn" param1="0"/>
                   <vlc id="foreach" param1="pl" param2="playlist" />
-                  <tr class="<vlc id="if" param1="pl.index 2 % 0 =" />ligne1<vlc id="else" />ligne2<vlc id="end" />">
+                  <tr class="<vlc id="if" param1="pl.index 2 % 0 =" />line1<vlc id="else" />line2<vlc id="end" />">
                     <td>
                       <input type="checkbox" name="item" value="<vlc id="value" param1="pl.index" />"/>
                       <vlc id="if" param1="pl.current" />
@@ -150,7 +157,8 @@
         </table>
       </div>
     </div>
-    <hr/>
+    <!-- end main content -->
+    
     <p style="text-align:center;font-size:1.2em;"> <vlc id="value" param1="copyright" /> </p>
 
     <script language="javascript" type="text/javascript">
