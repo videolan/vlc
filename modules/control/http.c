@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.20 2003/07/31 21:46:37 gbazin Exp $
+ * $Id: http.c,v 1.21 2003/08/01 17:30:33 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -428,6 +428,8 @@ static struct
 {
     { ".htm",   "text/html" },
     { ".html",  "text/html" },
+
+    { ".css",   "text/css" },
 
     /* media mime */
     { ".avi",   "video/avi" },
