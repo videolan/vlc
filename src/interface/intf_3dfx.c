@@ -14,6 +14,7 @@
 #include <termios.h>
 #include <unistd.h>                                                /* close() */
 #include <sys/uio.h>                                           /* for input.h */
+#include <linutil.h>                             /* Glide kbhit() and getch() */
 
 #include <sys/types.h>              /* open() */
 #include <sys/stat.h>
@@ -93,6 +94,15 @@ void intf_SysDestroy( intf_thread_t *p_intf )
  ******************************************************************************/
 void intf_SysManage( intf_thread_t *p_intf )
 {
-    ;
+    unsigned int buf;
+
+    /* very Linux specific - see tlib.c in Glide for other versions */
+    while( kbhit() )
+    {
+        if( intf_ProcessKey(p_intf, (int)buf = getch()) )
+        {
+            printf("unhandled key '%c' (%i)\n", (char) buf, buf );
+        }
+    }
 }
 

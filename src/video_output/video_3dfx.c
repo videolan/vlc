@@ -44,9 +44,7 @@
  ******************************************************************************/
 typedef struct vout_sys_s
 {
-    GrBuffer_t                  p_buffer;                   /* current buffer */
-    GrLfbInfo_t                 p_backbufinfo;            /* back buffer info */
-    GrLfbInfo_t                 p_frontbufinfo;          /* front buffer info */
+    GrLfbInfo_t                 p_buffer_info;            /* back buffer info */
 
     /* Dummy video memory */
     byte_t *                    p_video;                       /* base adress */    
@@ -132,14 +130,16 @@ int vout_SysManage( vout_thread_t *p_vout )
  ******************************************************************************/
 void vout_SysDisplay( vout_thread_t *p_vout )
 {
-    //grRenderBuffer( GR_BUFFER_FRONTBUFFER );
+    grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER );
 
-    /* swap the buffers */
-/*    grBufferSwap( 1 );
+    grBufferSwap( 0 );
 
-    p_vout->p_sys->p_buffer
-        = ( p_vout->p_sys->p_buffer == GR_BUFFER_FRONTBUFFER ) ?
-            GR_BUFFER_BACKBUFFER : GR_BUFFER_FRONTBUFFER;*/
+    if ( grLfbLock(GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER,
+                   GR_LFBWRITEMODE_565, GR_ORIGIN_UPPER_LEFT, FXFALSE,
+                   &p_vout->p_sys->p_buffer_info) == FXFALSE )
+    {
+        intf_ErrMsg( "vout error: can't take 3dfx back buffer lock\n" );
+    }
 }
 
 /* following functions are local */
@@ -153,6 +153,7 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
     static char version[80];
     GrHwConfiguration hwconfig;
     GrScreenResolution_t resolution = GR_RESOLUTION_640x480;
+    GrLfbInfo_t p_front_buffer_info;                    /* front buffer info */
 
     p_vout->i_width =                   WIDTH;
     p_vout->i_height =                  HEIGHT;
@@ -192,7 +193,7 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
     }
 
     /* disable dithering */
-    grDitherMode( GR_DITHER_DISABLE );
+    //grDitherMode( GR_DITHER_DISABLE );
 
     /* clear both buffers */
     grRenderBuffer( GR_BUFFER_BACKBUFFER );
@@ -201,34 +202,34 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
     grBufferClear( 0, 0, 0 );
     grRenderBuffer( GR_BUFFER_BACKBUFFER );
 
-    p_vout->p_sys->p_backbufinfo.size = sizeof( GrLfbInfo_t );
-    p_vout->p_sys->p_frontbufinfo.size = sizeof( GrLfbInfo_t );
+    p_vout->p_sys->p_buffer_info.size = sizeof( GrLfbInfo_t );
+    p_front_buffer_info.size          = sizeof( GrLfbInfo_t );
 
-    /* lock the buffers */
+    /* lock the buffers to find their adresses */
     if ( grLfbLock(GR_LFB_WRITE_ONLY, GR_BUFFER_FRONTBUFFER,
                    GR_LFBWRITEMODE_565, GR_ORIGIN_UPPER_LEFT, FXFALSE,
-                   &p_vout->p_sys->p_frontbufinfo) == FXFALSE )
+                   &p_front_buffer_info) == FXFALSE )
     {
         intf_ErrMsg( "vout error: can't take 3dfx front buffer lock\n" );
         grGlideShutdown();
         return( 1 );
     }
+    grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_FRONTBUFFER );
 
-/*    if ( grLfbLock(GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER,
+    if ( grLfbLock(GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER,
                    GR_LFBWRITEMODE_565, GR_ORIGIN_UPPER_LEFT, FXFALSE,
-                   &p_vout->p_sys->p_backbufinfo) == FXFALSE )
+                   &p_vout->p_sys->p_buffer_info) == FXFALSE )
     {
         intf_ErrMsg( "vout error: can't take 3dfx back buffer lock\n" );
         grGlideShutdown();
         return( 1 );
-    }*/
+    }
 
-    p_vout->p_sys->p_buffer = GR_BUFFER_BACKBUFFER;
     grBufferClear( 0, 0, 0 );
 
     /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_frontbufinfo.lfbPtr, 
-                     p_vout->p_sys->p_frontbufinfo.lfbPtr );
+    vout_SetBuffers( p_vout, p_vout->p_sys->p_buffer_info.lfbPtr, 
+                     p_front_buffer_info.lfbPtr );
    
     return( 0 );
 }    
@@ -242,8 +243,7 @@ static int GlideOpenDisplay( vout_thread_t *p_vout )
 static void GlideCloseDisplay( vout_thread_t *p_vout )
 {
     /* unlock the hidden buffer */
-    //grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER );
-    grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_FRONTBUFFER );
+    grLfbUnlock( GR_LFB_WRITE_ONLY, GR_BUFFER_BACKBUFFER );
 
     /* shutdown Glide */
     grGlideShutdown();

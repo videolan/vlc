@@ -84,23 +84,23 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     /* Initialize thread properties - thread id and locks will be initialized 
      * later */
     p_vout->b_die               = 0;
-    p_vout->b_error             = 0;    
+    p_vout->b_error             = 0;
     p_vout->b_active            = 0;
     p_vout->pi_status           = (pi_status != NULL) ? pi_status : &i_status;
-    *p_vout->pi_status          = THREAD_CREATE;    
+    *p_vout->pi_status          = THREAD_CREATE;
 
     /* Initialize some fields used by the system-dependant method - these fields will
      * probably be modified by the method, and are only preferences */
     p_vout->i_changes           = 0;
     p_vout->i_width             = i_width;
     p_vout->i_height            = i_height;
-    p_vout->i_bytes_per_line    = i_width * 2;    
+    p_vout->i_bytes_per_line    = i_width * 2;
     p_vout->i_screen_depth      = 15;
     p_vout->i_bytes_per_pixel   = 2;
-    p_vout->f_gamma             = VOUT_GAMMA;    
+    p_vout->f_gamma             = VOUT_GAMMA;
 
     p_vout->b_grayscale         = main_GetIntVariable( VOUT_GRAYSCALE_VAR, VOUT_GRAYSCALE_DEFAULT );
-    p_vout->b_info              = 0;    
+    p_vout->b_info              = 0;
     p_vout->b_interface         = 0;
     p_vout->b_scale             = 0;
 
@@ -151,11 +151,11 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     MaskToShift( &p_vout->i_blue_lshift,  &p_vout->i_blue_rshift,  p_vout->i_blue_mask );
 
     /* Set some useful colors */
-/*    p_vout->i_white_pixel = RGB2PIXEL( p_vout, 255, 255, 255 );
+    p_vout->i_white_pixel = RGB2PIXEL( p_vout, 255, 255, 255 );
     p_vout->i_black_pixel = RGB2PIXEL( p_vout, 0, 0, 0 );
     p_vout->i_gray_pixel  = RGB2PIXEL( p_vout, 128, 128, 128 );
     p_vout->i_blue_pixel  = RGB2PIXEL( p_vout, 0, 0, 50 );    
-*/
+
     /* Load fonts - fonts must be initialized after the systme method since
      * they may be dependant of screen depth and other thread properties */
     p_vout->p_default_font      = vout_LoadFont( VOUT_DEFAULT_FONT );    
