@@ -903,7 +903,7 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
                              (mtime_t)(header[10] << 22)|
                             ((mtime_t)(header[11]&0xfe) << 14)|
                              (mtime_t)(header[12] << 7)|
-                             (mtime_t)(header[12] >> 1);
+                             (mtime_t)(header[13] >> 1);
 
                     if( header[7]&0x40 )    /* has dts */
                     {
@@ -935,19 +935,19 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
 
                 if(  header[i_skip]&0x20 )
                 {
-                     p_pes->i_pts = ((mtime_t)(header[i_skip]&0x0e ) << 29)|
-                                     (mtime_t)(header[i_skip+1] << 22)|
-                                    ((mtime_t)(header[i_skip+2]&0xfe) << 14)|
-                                     (mtime_t)(header[i_skip+3] << 7)|
-                                     (mtime_t)(header[i_skip+4] >> 1);
+                     i_pts = ((mtime_t)(header[i_skip]&0x0e ) << 29)|
+                              (mtime_t)(header[i_skip+1] << 22)|
+                             ((mtime_t)(header[i_skip+2]&0xfe) << 14)|
+                              (mtime_t)(header[i_skip+3] << 7)|
+                              (mtime_t)(header[i_skip+4] >> 1);
 
                     if( header[i_skip]&0x10 )    /* has dts */
                     {
-                         p_pes->i_dts = ((mtime_t)(header[i_skip+5]&0x0e ) << 29)|
-                                         (mtime_t)(header[i_skip+6] << 22)|
-                                        ((mtime_t)(header[i_skip+7]&0xfe) << 14)|
-                                         (mtime_t)(header[i_skip+8] << 7)|
-                                         (mtime_t)(header[i_skip+9] >> 1);
+                         i_dts = ((mtime_t)(header[i_skip+5]&0x0e ) << 29)|
+                                  (mtime_t)(header[i_skip+6] << 22)|
+                                 ((mtime_t)(header[i_skip+7]&0xfe) << 14)|
+                                  (mtime_t)(header[i_skip+8] << 7)|
+                                  (mtime_t)(header[i_skip+9] >> 1);
                          i_skip += 10;
                     }
                     else
@@ -1008,7 +1008,7 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
             p_pes->i_pts = i_pts * 100 / 9;
         }
 
-        if( pid->es->b_gather )
+        if( 1 ) //pid->es->b_gather )
         {
             /* For mpeg4/mscodec we first gather the packet.
              * This will make ffmpeg a lot happier */
