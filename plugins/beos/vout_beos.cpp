@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.54 2002/05/16 11:38:42 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.55 2002/05/16 12:47:59 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -185,9 +185,9 @@ VideoWindow::~VideoWindow()
 
     teardownwindow = true;
     wait_for_thread(fDrawThreadID, &result);
-    if (mode == OVERLAY) delete bitmap[2];
     delete bitmap[0];
     delete bitmap[1];
+    delete bitmap[2];
 }
 
 void VideoWindow::drawBuffer(int bufferIndex)
