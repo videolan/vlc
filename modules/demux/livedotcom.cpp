@@ -416,7 +416,9 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         sprintf( psz_url, "rtsp://%s", p_demux->psz_path );
 
         psz_options = p_sys->rtsp->sendOptionsCmd( psz_url );
-        /* FIXME psz_options -> delete or free */
+        if( psz_options )
+            delete [] psz_options;
+
         free( psz_url );
     }
     if( ( p_sys->ms = MediaSession::createNew(*p_sys->env, p_sys->p_sdp ) ) == NULL )
@@ -612,7 +614,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
                 tk->b_muxed = VLC_TRUE;
                 tk->p_out_muxed = stream_DemuxNew( p_demux, "ts2", p_demux->out );
             }
-            else if( !strcmp( sub->codecName(), "MP2P" ) || !strcmp( sub->codecName(), "MP1S" ) )   /* FIXME check MP1S */
+            else if( !strcmp( sub->codecName(), "MP2P" ) || !strcmp( sub->codecName(), "MP1S" ) )
             {
                 tk->b_muxed = VLC_TRUE;
                 tk->p_out_muxed = stream_DemuxNew( p_demux, "ps2", p_demux->out );
