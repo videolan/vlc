@@ -2,7 +2,7 @@
  * geatures.c: control vlc with mouse gestures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gestures.c,v 1.2 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: gestures.c,v 1.3 2003/03/08 01:55:28 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -185,13 +185,16 @@ static void RunIntf( intf_thread_t *p_intf )
                 playlist_Next( p_playlist );
                 vlc_object_release( p_playlist );
                 break;
-
-            case DOWN:
-                if (p_intf->p_sys->p_vout
-                    && ((vout_thread_t *)p_intf->p_sys->p_vout)->b_fullscreen )
+            case GESTURE(UP,RIGHT,NONE,NONE):
+                if (p_intf->p_sys->p_vout )
                 {
-                    ((vout_thread_t *)p_intf->p_sys->p_vout)->i_changes |= VOUT_FULLSCREEN_CHANGE;
+                    ((vout_thread_t *)p_intf->p_sys->p_vout)->i_changes |=
+                        VOUT_FULLSCREEN_CHANGE;
                 }
+                break;
+            case GESTURE(DOWN,RIGHT,NONE,NONE):
+                p_intf->p_vlc->b_die = VLC_TRUE;
+                msg_Dbg(p_intf, "Should close the vout!" );
                 break;
             case GESTURE(DOWN,LEFT,UP,RIGHT):
                 msg_Dbg(p_intf, "A square!" );
