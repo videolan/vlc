@@ -74,7 +74,7 @@ static int Open( vlc_object_t *p_this )
     }
     else return VLC_EGENERIC;
     
-    msg_Err( p_this, "%4.4s->%4.4s, bits per sample: %i",
+    msg_Dbg( p_this, "%4.4s->%4.4s, bits per sample: %i",
              (char *)&p_filter->fmt_in.i_codec,
              (char *)&p_filter->fmt_out.i_codec,
              p_filter->fmt_in.audio.i_bitspersample );

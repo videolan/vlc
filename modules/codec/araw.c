@@ -405,28 +405,29 @@ static int EncoderOpen( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
 
-    if( p_enc->fmt_in.i_codec != VLC_FOURCC( 's', '1', '6', 'b' ) &&
-        p_enc->fmt_in.i_codec != VLC_FOURCC( 's', '1', '6', 'l' ) )
+    if( (p_enc->fmt_out.i_codec == VLC_FOURCC('u','8',' ',' ') ||
+         p_enc->fmt_out.i_codec == VLC_FOURCC('s','8',' ',' ') ||
+         p_enc->fmt_out.i_codec == VLC_FOURCC('s','1','6','l') ||
+         p_enc->fmt_out.i_codec == VLC_FOURCC('s','1','6','b')) &&
+        (p_enc->fmt_in.i_codec == VLC_FOURCC( 's', '1', '6', 'b' ) ||
+         p_enc->fmt_in.i_codec == VLC_FOURCC( 's', '1', '6', 'l' )) )
     {
-        msg_Warn( p_enc, "unhandled input format" );
-        return VLC_EGENERIC;
+        ;
     }
-
-    switch( p_enc->fmt_out.i_codec )
+    else if( p_enc->fmt_out.i_codec == VLC_FOURCC('f','l','3','2') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('f','l','6','4') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('u','8',' ',' ') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('s','8',' ',' ') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('s','1','6','l') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('s','1','6','b') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('s','2','4','l') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('s','2','4','b') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('s','3','2','l') ||
+             p_enc->fmt_out.i_codec == VLC_FOURCC('s','3','2','b') )
     {
-        case VLC_FOURCC( 's', '1', '6', 'b' ):
-        case VLC_FOURCC( 's', '1', '6', 'l' ):
-        case VLC_FOURCC( 'u', '8', ' ', ' ' ):
-        case VLC_FOURCC( 's', '8', ' ', ' ' ):
-#if 0
-        -> could be easyly done with table look up
-        case VLC_FOURCC( 'a', 'l', 'a', 'w' ):
-        case VLC_FOURCC( 'u', 'l', 'a', 'w' ):
-#endif
-            break;
-        default:
-            return VLC_EGENERIC;
+            p_enc->fmt_in.i_codec = p_enc->fmt_out.i_codec;
     }
+    else return VLC_EGENERIC;
 
     p_enc->p_sys = NULL;
     p_enc->pf_encode_audio = EncoderEncode;
