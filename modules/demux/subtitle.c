@@ -87,7 +87,6 @@ enum
     SUB_TYPE_VPLAYER,
     SUB_TYPE_SAMI,
     SUB_TYPE_SUBVIEWER,
-    NULL
 };
 
 typedef struct
