@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.30 2002/12/13 16:26:35 babal Exp $
+ * $Id: playlist.c,v 1.31 2003/01/29 11:34:11 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,9 +30,6 @@
 #include "input_ext-intf.h"
 
 #include "vlc_playlist.h"
-
-#define PLAYLIST_STOPPED 0
-#define PLAYLIST_RUNNING 1
 
 #define PLAYLIST_FILE_HEADER_0_5  "# vlc playlist file version 0.5"
 #ifdef WIN32
@@ -306,9 +303,17 @@ void playlist_Command( playlist_t * p_playlist, int i_command, int i_arg )
 
     case PLAYLIST_PLAY:
         p_playlist->i_status = PLAYLIST_RUNNING;
-        if ( p_playlist->p_input )
+        if( p_playlist->p_input )
         {
             input_SetStatus( p_playlist->p_input, INPUT_STATUS_PLAY );
+        }
+        break;
+
+    case PLAYLIST_PAUSE:
+        p_playlist->i_status = PLAYLIST_PAUSED;
+        if( p_playlist->p_input )
+        {
+            input_SetStatus( p_playlist->p_input, INPUT_STATUS_PAUSE );
         }
         break;
 

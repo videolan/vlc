@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.37 2003/01/28 01:50:52 hartman Exp $
+ * $Id: intf.m,v 1.38 2003/01/29 11:34:11 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -663,15 +663,6 @@ static void Run( intf_thread_t *p_intf )
     [o_controls setVolumeSlider];
     [o_timeslider setEnabled: b_input];
     
-    if ( (p_intf->p_sys->b_loop = config_GetInt( p_intf, "loop" )) )
-    {
-        [o_mi_loop setState: NSOnState];
-    }
-    else
-    {
-        [o_mi_loop setState: NSOffState];
-    }
-
     if ( p_intf->p_sys->p_input != NULL &&
                 p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S)
     {

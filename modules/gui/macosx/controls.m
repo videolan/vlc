@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.16 2003/01/28 16:47:46 hartman Exp $
+ * $Id: controls.m,v 1.17 2003/01/29 11:34:11 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -36,7 +36,6 @@
 #include <vlc/input.h>
 
 #include <Cocoa/Cocoa.h> 
-#include <CoreAudio/AudioHardware.h>
 
 #include "intf.h"
 #include "vout.h"
@@ -50,15 +49,12 @@
     IBOutlet id o_main;
     IBOutlet id o_mi_mute;
     IBOutlet id o_volumeslider;
-    int i_ff;
 }
 
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;
 - (IBAction)faster:(id)sender;
 - (IBAction)slower:(id)sender;
-- (IBAction)slowMotion:(id)sender;
-- (IBAction)fastForward:(id)sender;
 
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;
@@ -89,6 +85,7 @@
 - (IBAction)play:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
+
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -96,26 +93,24 @@
         return;
     }
 
-    if ( p_intf->p_sys->p_input != NULL && p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S)
+    if( playlist_IsPlaying( p_playlist ) )
     {
-        input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+        playlist_Pause( p_playlist );
         vlc_object_release( p_playlist );
     }
     else
     {
-        /* If the playlist is empty, open a file requester instead */
-        vlc_mutex_lock( &p_playlist->object_lock );
-        if( p_playlist->i_size )
+        vlc_bool_t b_empty;
+
+        b_empty = playlist_IsEmpty( p_playlist );
+        vlc_object_release( p_playlist );
+
+        if( !b_empty )
         {
-            vlc_mutex_unlock( &p_playlist->object_lock );
             playlist_Play( p_playlist );
-            vlc_object_release( p_playlist );
         }
         else
         {
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            vlc_object_release( p_playlist );
-
             [o_open openFile: nil];
         }
     }
@@ -124,6 +119,7 @@
 - (IBAction)stop:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
+
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -133,6 +129,7 @@
 
     playlist_Stop( p_playlist );
     vlc_object_release( p_playlist );
+
     p_intf->p_sys->b_stopping = 1;
 }
 
@@ -140,177 +137,6 @@
 {
     intf_thread_t * p_intf = [NSApp getIntf];
 
-    if( p_intf->p_sys->p_input == NULL )
-    {
-        return;
-    }
-
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
-}
-
-- (IBAction)slower:(id)sender
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-
-    if( p_intf->p_sys->p_input == NULL )
-    {
-        return;
-    }
-
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
-}
-
-- (IBAction)slowMotion:(id)sender
-{
-    i_ff++;
-    switch( [[NSApp currentEvent] type] )
-    {
-        case NSPeriodic:
-            if ( i_ff == 1 )
-            {
-                [self slower:sender];
-            }
-            break;
-    
-        case NSLeftMouseUp:
-            if ( i_ff > 1 )
-            {
-                intf_thread_t * p_intf = [NSApp getIntf];
-                
-                [self faster:sender];
-                if ( p_intf->p_sys->p_input != NULL &&
-                            p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S)
-                {
-                    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
-                }
-            }
-            i_ff = 0;
-            break;
-
-        default:
-            break;
-    }
-}
-
-- (IBAction)fastForward:(id)sender
-{
-    playlist_t * p_playlist = vlc_object_find( [NSApp getIntf], VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-                                                       
-    i_ff++;
-    switch( [[NSApp currentEvent] type] )
-    {
-        /* A button does not send a NSLeftMouseDown unfortunately.
-         * Therefore we need to count. I know, it is ugly. We could have used
-         * a bool as well, but now we can also accellerate after a certain period.
-         * Currently this method is called every second if the button is pressed.
-         * You can set this value in intf.m (hartman)
-         */
-        case NSPeriodic:
-            if ( i_ff == 1 )
-            {
-                [self faster:self];
-            }
-            else if ( i_ff == 5 )
-            {
-                [self faster:self];
-            }
-            else if ( i_ff == 15 )
-            {
-                [self faster:self];
-            }
-            break;
-
-        case NSLeftMouseUp:
-            i_ff = 0;
-            
-            vlc_mutex_lock( &p_playlist->object_lock );
-            int i_playlist_size =  p_playlist->i_size ;
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            if( i_playlist_size )
-            {
-                playlist_Play( p_playlist );
-            }
-            break;
-
-        default:
-            break;
-    }
-    vlc_object_release( p_playlist );
-}
-
-- (IBAction)prev:(id)sender
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-    input_area_t *  p_area;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-
-    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
-
-    /* check if this is the first chapter and whether there are any chapters at all */
-    if( p_area->i_part > 1 && p_area->i_part_nb > 1 )
-    {
-        p_area->i_part--;
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        input_ChangeArea( p_intf->p_sys->p_input, p_area );
-
-        p_intf->p_sys->b_chapter_update = VLC_TRUE;
-    }
-    else if( p_playlist != NULL )
-    {
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-        playlist_Prev( p_playlist );
-    }
-    else
-    {
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-    }
-    
-    if ( p_playlist != NULL )
-        vlc_object_release( p_playlist );
-}
-
-- (IBAction)next:(id)sender
-{
-    intf_thread_t * p_intf = [NSApp getIntf];
-    input_area_t *  p_area;
-    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                                       FIND_ANYWHERE );
-
-    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
-    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
-
-    /* check if this is the last chapter and whether there are any chapters at all */
-    if( p_area->i_part_nb > 1 && p_area->i_part < p_area->i_part_nb )
-    {
-        p_area->i_part++;
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-
-        input_ChangeArea( p_intf->p_sys->p_input, p_area );
-
-        p_intf->p_sys->b_chapter_update = VLC_TRUE;
-    }
-    else if( p_playlist != NULL )
-    {
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-        playlist_Next( p_playlist );
-    }
-    else
-    {
-        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
-    }
-    
-    if ( p_playlist != NULL )
-        vlc_object_release( p_playlist );
-}
-
-- (IBAction)loop:(id)sender
-{
-    NSMenuItem * o_mi = (NSMenuItem *)sender;
-    intf_thread_t * p_intf = [NSApp getIntf];
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
     if( p_playlist == NULL )
@@ -318,18 +144,142 @@
         return;
     }
 
-    if( p_intf->p_sys->b_loop )
+    vlc_mutex_lock( &p_playlist->object_lock );
+    if( p_playlist->p_input != NULL )
     {
-        [o_mi setState: NSOffState];
-        config_PutInt( p_playlist, "loop", 0 );
+        input_SetStatus( p_playlist->p_input, INPUT_STATUS_FASTER );
+    } 
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)slower:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    if( p_playlist->p_input != NULL )
+    {
+        input_SetStatus( p_playlist->p_input, INPUT_STATUS_SLOWER );
+    }
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)prev:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    if( p_playlist->p_input == NULL )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );  
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
+
+#define p_area p_playlist->p_input->stream.p_selected_area
+
+    if( p_area->i_part_nb > 1 && p_area->i_part > 1 )
+    {
+        p_area->i_part--;
+
+        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+        input_ChangeArea( p_playlist->p_input, p_area );
+        vlc_mutex_unlock( &p_playlist->object_lock );
+
+        p_intf->p_sys->b_chapter_update = VLC_TRUE;
     }
     else
     {
-        [o_mi setState: NSOnState];
-        config_PutInt( p_playlist, "loop", 1 );
+        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        playlist_Prev( p_playlist );
     }
 
-    p_intf->p_sys->b_loop = !p_intf->p_sys->b_loop;
+#undef p_area
+
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)next:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+
+    if( p_playlist->p_input == NULL )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );  
+        return;
+    }
+
+    vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
+
+#define p_area p_playlist->p_input->stream.p_selected_area
+
+    if( p_area->i_part_nb > 1 && p_area->i_part + 1 < p_area->i_part_nb )
+    {
+        p_area->i_part++;
+
+        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+        input_ChangeArea( p_playlist->p_input, p_area );
+        vlc_mutex_unlock( &p_playlist->object_lock );
+
+        p_intf->p_sys->b_chapter_update = VLC_TRUE;
+    }
+    else
+    {
+        vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        playlist_Next( p_playlist );
+    }
+
+#undef p_area
+
+    vlc_object_release( p_playlist );
+}
+
+- (IBAction)loop:(id)sender
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    config_PutInt( p_playlist, "loop",
+                   !config_GetInt( p_playlist, "loop" ) );
 
     vlc_object_release( p_playlist );
 }
@@ -667,16 +617,22 @@
     NSMenu * o_menu = [o_mi menu];
     intf_thread_t * p_intf = [NSApp getIntf];
 
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+
+    if( p_playlist != NULL )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+    }
+
     if( [[o_mi title] isEqualToString: _NS("Faster")] ||
         [[o_mi title] isEqualToString: _NS("Slower")] )
     {
-        if( p_intf->p_sys->p_input != NULL )
+        if( p_playlist != NULL && p_playlist->p_input != NULL )
         {
-#define p_input p_intf->p_sys->p_input
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            bEnabled = p_input->stream.b_pace_control;
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-#undef p_input
+            vlc_mutex_lock( &p_playlist->p_input->stream.stream_lock );
+            bEnabled = p_playlist->p_input->stream.b_pace_control;
+            vlc_mutex_unlock( &p_playlist->p_input->stream.stream_lock );
         }
         else
         {
@@ -685,25 +641,29 @@
     }
     else if( [[o_mi title] isEqualToString: _NS("Stop")] )
     {
-        bEnabled = p_intf->p_sys->p_input != NULL;
+        if( p_playlist == NULL || p_playlist->p_input == NULL )
+        {
+            bEnabled = FALSE;
+        }
     }
     else if( [[o_mi title] isEqualToString: _NS("Previous")] ||
              [[o_mi title] isEqualToString: _NS("Next")] )
     {
-        playlist_t * p_playlist = vlc_object_find( p_intf, 
-                                                   VLC_OBJECT_PLAYLIST,
-                                                   FIND_ANYWHERE );
         if( p_playlist == NULL )
         {
             bEnabled = FALSE;
         }
         else
         {
-            vlc_mutex_lock( &p_playlist->object_lock );
             bEnabled = p_playlist->i_size > 1;
-            vlc_mutex_unlock( &p_playlist->object_lock );
-            vlc_object_release( p_playlist );
         }
+    }
+    else if( [[o_mi title] isEqualToString: _NS("Loop")] )
+    {
+        int i_state = config_GetInt( p_playlist, "loop" ) ?
+                      NSOnState : NSOffState;
+
+        [o_mi setState: i_state];
     }
     else if( [[o_mi title] isEqualToString: _NS("Fullscreen")] )    
     {
@@ -751,6 +711,12 @@
             [o_mi setState: NSOffState];
         }
     } 
+
+    if( p_playlist != NULL )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );
+    }
 
     return( bEnabled );
 }

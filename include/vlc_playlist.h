@@ -2,7 +2,7 @@
  * vlc_playlist.h : Playlist functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: vlc_playlist.h,v 1.7 2002/12/13 16:26:34 babal Exp $
+ * $Id: vlc_playlist.h,v 1.8 2003/01/29 11:34:11 jlj Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -54,6 +54,13 @@ struct playlist_t
 };
 
 /*****************************************************************************
+ * Playlist status
+ *****************************************************************************/
+#define PLAYLIST_STOPPED 0
+#define PLAYLIST_RUNNING 1
+#define PLAYLIST_PAUSED  2
+
+/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 #define playlist_Create(a) __playlist_Create(VLC_OBJECT(a))
@@ -74,3 +81,25 @@ VLC_EXPORT( int,  playlist_AddItem, ( playlist_t *, playlist_item_t *, int, int 
 VLC_EXPORT( int,  playlist_Delete, ( playlist_t *, int ) );
 VLC_EXPORT( int,  playlist_LoadFile, ( playlist_t *, const char * ) );
 VLC_EXPORT( int,  playlist_SaveFile, ( playlist_t *, const char * ) );
+
+static inline vlc_bool_t playlist_IsPlaying( playlist_t * p_playlist )
+{
+    vlc_bool_t b_playing;
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    b_playing = p_playlist->i_status == PLAYLIST_RUNNING; 
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    return( b_playing );
+}
+
+static inline vlc_bool_t playlist_IsEmpty( playlist_t * p_playlist )
+{
+    vlc_bool_t b_empty;
+
+    vlc_mutex_lock( &p_playlist->object_lock );
+    b_empty = p_playlist->i_size == 0;
+    vlc_mutex_unlock( &p_playlist->object_lock );
+
+    return( b_empty );
+}

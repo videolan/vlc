@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.18 2003/01/27 00:08:31 jlj Exp $
+ * $Id: intf.h,v 1.19 2003/01/29 11:34:11 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -57,7 +57,6 @@ struct intf_sys_t
     NSPort * o_sendport;
 
     /* special actions */
-    vlc_bool_t b_loop;
     vlc_bool_t b_playing;
     vlc_bool_t b_stopping;
     vlc_bool_t b_mute;

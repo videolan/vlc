@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.5 2003/01/24 02:31:53 hartman Exp $
+ * $Id: playlist.m,v 1.6 2003/01/29 11:34:11 jlj Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -232,11 +232,6 @@
         return;
     }
 
-    if( p_intf->p_sys->b_loop )
-    {
-        playlist_Delete( p_playlist, p_playlist->i_size - 1 );
-    }
-
     i_items = 0;
     o_enum = [o_array objectEnumerator];
     while( ( o_value = [o_enum nextObject] ) )
@@ -259,12 +254,6 @@
         }
 
         i_items++;
-    }
-
-    if( p_intf->p_sys->b_loop )
-    {
-        playlist_Add( p_playlist, "vlc:loop",
-                      PLAYLIST_APPEND, PLAYLIST_END );
     }
 
     vlc_object_release( p_playlist );
