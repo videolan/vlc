@@ -531,21 +531,6 @@ AC_CHECK_HEADERS(sys/ioctl.h,[
 
 
 dnl
-dnl  Check the operating system
-dnl
-case ${target_os} in
-  bsdi*)
-    SYS=bsdi
-    ;;
-  darwin*)
-    SYS=darwin
-    ;;
-  *)
-    SYS=${target_os}
-    ;;
-esac
-
-dnl
 dnl  Special arch tuning
 dnl
 AC_ARG_WITH(tuning,
