@@ -1,4 +1,4 @@
-$Id: NEWS,v 1.29 2003/03/06 12:05:05 hartman Exp $
+$Id: NEWS,v 1.30 2003/03/06 23:52:31 sigmunau Exp $
 
 Changes between 0.5.1a and 0.5.2:
 --------------------------------
@@ -7,7 +7,8 @@ Core support:
  * advanced config options are now hidden by default.
  * new --spdif option to use the S/PDIF audio output by default.
  * fixed a 'clicking' sound when switching between streams.
- * new bandlimited resampler that should improve audio quality on primarily Mac OS X. 
+ * new bandlimited resampler that should improve audio quality on primarily Mac OS X.
+ * fixed a problem with audio over http that caused some web radios to not work.
 
 Codecs:
  * support for DV audio through the ffmpeg library.
@@ -35,6 +36,7 @@ Miscellaneous:
  * improved ID3 tag detection.
  * changed several errors into warnings. the frequently reported "this is not a PS stream, continuing" is one of these.
  * mouse gestures work on windows and osx, but there still isn't any useful gestures
+ * some support for .pls playlists used by shoutcast
 
 Changes between 0.5.1 and 0.5.1a:
 --------------------------------
