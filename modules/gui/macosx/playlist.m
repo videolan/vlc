@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: playlist.m,v 1.35 2003/11/06 16:28:28 hartman Exp $
+ * $Id: playlist.m,v 1.36 2003/11/12 01:22:40 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <thedj@users.sourceforge.net>
@@ -35,21 +35,10 @@
 #include "playlist.h"
 #include "controls.h"
 
-int MacVersion102 = -1;
-
 /*****************************************************************************
  * VLCPlaylistView implementation 
  *****************************************************************************/
 @implementation VLCPlaylistView
-
-- (void)dealloc
-{
-    if( o_striped_row_color != nil )
-    {
-        [o_striped_row_color release];
-    }
-    [super dealloc];
-}
 
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
@@ -114,48 +103,6 @@ int MacVersion102 = -1;
     }
 }
 
-- (void)highlightSelectionInClipRect:(NSRect)o_rect {
-    NSRect o_new_rect;
-    float f_height = [self rowHeight] + [self intercellSpacing].height;
-    float f_origin_y = NSMaxY( o_rect );
-    int i_row = o_rect.origin.y / f_height;
-    
-    if ( i_row % 2 == 0 )
-    {
-        i_row++;
-    }
-    
-    o_new_rect.size.width = o_rect.size.width;
-    o_new_rect.size.height = f_height;
-    o_new_rect.origin.x = o_rect.origin.x;
-    o_new_rect.origin.y = i_row * f_height;
-   
-    if( ( MacVersion102 < 0 ) && ( floor( NSAppKitVersionNumber ) > NSAppKitVersionNumber10_1 ) )
-    {
-        MacVersion102 = 102;
-    }
- 
-    if ( MacVersion102 == 102 && o_striped_row_color == nil )
-    {
-        o_striped_row_color = [[[NSColor alternateSelectedControlColor]
-                                highlightWithLevel: 0.90] retain];
-        
-    }
-    else if ( o_striped_row_color == nil )
-    {
-        /* OSX 10.1 and before ain't that smart ;) */
-        o_striped_row_color = [[NSColor whiteColor] retain];
-    }
-
-    [o_striped_row_color set];
-    
-    while ( o_new_rect.origin.y < f_origin_y ) {
-        NSRectFill( o_new_rect );
-        o_new_rect.origin.y += f_height * 2.0;
-    }
-    [super highlightSelectionInClipRect:o_rect];
-}
-
 @end
 
 /*****************************************************************************
@@ -184,13 +131,13 @@ int MacVersion102 = -1;
     [o_table_view registerForDraggedTypes: 
         [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 
+    [o_window setTitle: _NS("Playlist")];
     [o_mi_save_playlist setTitle: _NS("Save Playlist...")];
     [o_mi_play setTitle: _NS("Play")];
     [o_mi_delete setTitle: _NS("Delete")];
     [o_mi_selectall setTitle: _NS("Select All")];
-    
-    [o_btn_add setToolTip: _NS("Add")];
-    [o_btn_remove setToolTip: _NS("Delete")];
+    [[o_tc_name headerCell] setStringValue:_NS("Name")];
+    [[o_tc_author headerCell] setStringValue:_NS("Author")];
 }
 
 - (BOOL)tableView:(NSTableView *)o_tv 
@@ -217,6 +164,18 @@ int MacVersion102 = -1;
     [o_mi_selectall setEnabled: b_rows];
 
     return( o_ctx_menu );
+}
+
+- (IBAction)toggleWindow:(id)sender
+{
+    if( [o_window isVisible] )
+    {
+        [o_window orderOut:sender];
+    }
+    else
+    {
+        [o_window makeKeyAndOrderFront:sender];
+    }
 }
 
 - (IBAction)savePlaylist:(id)sender
@@ -429,7 +388,7 @@ int MacVersion102 = -1;
         vlc_mutex_unlock( &p_playlist->object_lock );
         vlc_object_release( p_playlist );
     }
-
+    [o_status_field setStringValue: [NSString stringWithFormat:_NS("%i items in playlist"), i_count]];
     return( i_count );
 }
 
@@ -447,10 +406,24 @@ int MacVersion102 = -1;
         return( nil );
     }
 
-    vlc_mutex_lock( &p_playlist->object_lock );
-    o_value = [[NSString stringWithUTF8String: 
-        p_playlist->pp_items[i_row]->psz_name] lastPathComponent]; 
-    vlc_mutex_unlock( &p_playlist->object_lock ); 
+    if( [[o_tc identifier] isEqualToString:@"0"] )
+    {
+        o_value = [NSString stringWithFormat:@"%i", i_row + 1];
+    }
+    else if( [[o_tc identifier] isEqualToString:@"1"] )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+        o_value = [[NSString stringWithUTF8String: 
+            p_playlist->pp_items[i_row]->psz_name] lastPathComponent]; 
+        vlc_mutex_unlock( &p_playlist->object_lock );
+    }
+    else if( [[o_tc identifier] isEqualToString:@"2"] )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+        o_value = [NSString stringWithUTF8String: 
+            p_playlist->pp_items[i_row]->psz_author]; 
+        vlc_mutex_unlock( &p_playlist->object_lock );
+    }
 
     vlc_object_release( p_playlist );
 
