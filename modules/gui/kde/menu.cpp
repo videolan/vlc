@@ -32,7 +32,9 @@ void KTitleMenu::regenerateSlot()
     int i_item = 0;
     vlc_mutex_lock( &fInterfaceThread->p_sys->p_input->stream.stream_lock );
 
-    for( int i = 0 ; i < fInterfaceThread->p_sys->p_input->stream.i_es_number ; i++ )
+    for( unsigned int i = 0 ;
+         i < fInterfaceThread->p_sys->p_input->stream.i_es_number ;
+         i++ )
     {
         if( fInterfaceThread->p_sys->p_input->stream.pp_es[i]->i_cat /* == i_cat */ )
         {

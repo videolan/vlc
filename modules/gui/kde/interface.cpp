@@ -387,7 +387,7 @@ void KInterface::slotUpdateLanguages()
     p_audio_es = NULL;
     p_spu_es = NULL;
 
-    for( int i = 0 ;
+    for( unsigned int i = 0 ;
          i < p_intf->p_sys->p_input->stream.i_selected_es_number ;
          i++
         )
@@ -440,7 +440,9 @@ void KInterface::languageMenus(KActionMenu *root, es_descriptor_t *p_es,
     
 #define ES p_intf->p_sys->p_input->stream.pp_es[i]
     /* create a set of language buttons and append them to the container */
-    for( int i = 0 ; i < p_intf->p_sys->p_input->stream.i_es_number ; i++ )
+    for( unsigned int i = 0 ;
+         i < p_intf->p_sys->p_input->stream.i_es_number ;
+         i++ )
     {
         if( ( ES->i_cat == i_cat ) &&
             ( !ES->p_pgrm ||
