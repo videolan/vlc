@@ -2,7 +2,7 @@
  * encoder.c: video and audio encoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: encoder.c,v 1.24 2004/03/03 11:29:26 massiot Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -563,16 +563,15 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     }
     else
     {
-        frame.pts = AV_NOPTS_VALUE;
+        frame.pts = 0;
     }
 
-    if ( frame.pts != AV_NOPTS_VALUE )
+    if ( frame.pts != AV_NOPTS_VALUE && frame.pts != 0 )
     {
         if ( p_sys->i_last_pts == frame.pts )
         {
-            msg_Warn( p_enc,
-                      "almost fed libavcodec with two frames with the same PTS (" I64Fd ")",
-                      frame.pts );
+            msg_Warn( p_enc, "almost fed libavcodec with two frames with the "
+                      "same PTS (" I64Fd ")", frame.pts );
             return NULL;
         }
         else
@@ -590,6 +589,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
 
         if( p_sys->p_context->coded_frame->pts != AV_NOPTS_VALUE &&
+            p_sys->p_context->coded_frame->pts != 0 &&
             p_sys->i_buggy_pts_detect != p_sys->p_context->coded_frame->pts )
         {
             p_sys->i_buggy_pts_detect = p_sys->p_context->coded_frame->pts;
