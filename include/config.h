@@ -105,15 +105,15 @@
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */
-#define DEFAULT_PTS_DELAY               (mtime_t)(.45*CLOCK_FREQ)
+#define DEFAULT_PTS_DELAY               (mtime_t)(.2*CLOCK_FREQ)
 
 /* DVD and VCD devices */
 #ifndef WIN32
-#  define DVD_DEVICE "/dev/dvd"
-#  define VCD_DEVICE "/dev/cdrom"
+#   define DVD_DEVICE "/dev/dvd"
+#   define VCD_DEVICE "/dev/cdrom"
 #else
-#  define DVD_DEVICE "D"
-#  define VCD_DEVICE "D"
+#   define DVD_DEVICE "D"
+#   define VCD_DEVICE "D"
 #endif
 
 /*****************************************************************************
@@ -139,9 +139,13 @@
  * will cause the calling thread to sleep */
 #define AOUT_MAX_PREPARE_TIME           (mtime_t)(.5*CLOCK_FREQ)
 
+/* Buffers which arrive after pts - AOUT_MIN_PREPARE_TIME will be trashed
+ * to avoid too heavy resampling */
+#define AOUT_MIN_PREPARE_TIME           (mtime_t)(.04*CLOCK_FREQ)
+
 /* Max acceptable delay between the coded PTS and the actual presentation
  * time, without resampling */
-#define AOUT_PTS_TOLERANCE              (mtime_t)(.03*CLOCK_FREQ)
+#define AOUT_PTS_TOLERANCE              (mtime_t)(.02*CLOCK_FREQ)
 
 /*****************************************************************************
  * Video configuration

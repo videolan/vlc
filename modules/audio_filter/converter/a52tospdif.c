@@ -2,7 +2,7 @@
  * a52tospdif.c : encapsulates A/52 frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: a52tospdif.c,v 1.8 2002/08/17 13:26:57 tcastley Exp $
+ * $Id: a52tospdif.c,v 1.9 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -50,7 +50,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("aout filter for A/52->S/PDIF encapsulation") );
+    set_description( _("audio filter for A/52->S/PDIF encapsulation") );
     set_capability( "audio filter", 10 );
     set_callbacks( Create, NULL );
 vlc_module_end();
@@ -82,11 +82,13 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-u16 i;
 #ifdef WORDS_BIGENDIAN
     static const u8 p_sync[6] = { 0xF8, 0x72, 0x4E, 0x1F, 0x00, 0x01 };
 #else
     static const u8 p_sync[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x01, 0x00 };
+#   ifndef HAVE_SWAB
+    u16 i;
+#   endif
 #endif
     u16 i_length = p_in_buf->i_nb_samples;
     u16 * pi_length;

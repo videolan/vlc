@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.7 2002/08/19 23:12:57 massiot Exp $
+ * $Id: aout_internal.h,v 1.8 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -82,94 +82,10 @@ typedef struct aout_alloc_t
  *****************************************************************************/
 typedef struct aout_fifo_t
 {
-    struct aout_buffer_t *  p_first;
-    struct aout_buffer_t ** pp_last;
-    mtime_t                 end_date;
+    aout_buffer_t *         p_first;
+    aout_buffer_t **        pp_last;
+    audio_date_t            end_date;
 } aout_fifo_t;
-
-static inline void aout_FifoInit( struct aout_instance_t * p_aout,
-                                  aout_fifo_t * p_fifo )
-{
-    p_fifo->p_first = NULL;
-    p_fifo->pp_last = &p_fifo->p_first;
-    p_fifo->end_date = 0;
-}
-
-static inline void aout_FifoPush( struct aout_instance_t * p_aout,
-                                  aout_fifo_t * p_fifo,
-                                  aout_buffer_t * p_buffer )
-{
-    *p_fifo->pp_last = p_buffer;
-    p_fifo->pp_last = &p_buffer->p_next;
-    *p_fifo->pp_last = NULL;
-    /* Enforce continuity of the stream. */
-    if ( p_fifo->end_date )
-    {
-        mtime_t duration = p_buffer->end_date - p_buffer->start_date;
-
-        p_buffer->start_date = p_fifo->end_date;
-        p_buffer->end_date = p_fifo->end_date =
-                             p_buffer->start_date + duration;
-    }
-    else
-    {
-        p_fifo->end_date = p_buffer->end_date;
-    }
-}
-
-static inline mtime_t aout_FifoNextStart( struct aout_instance_t * p_aout,
-                                          aout_fifo_t * p_fifo )
-{
-    return p_fifo->end_date;
-}
-
-/* Reinit the end_date (for instance after a pause). */
-static inline void aout_FifoSet( struct aout_instance_t * p_aout,
-                                 aout_fifo_t * p_fifo, mtime_t date )
-{
-    aout_buffer_t * p_buffer;
-    p_fifo->end_date = date;
-
-    /* Remove all buffers. */
-    p_buffer = p_fifo->p_first;
-    while ( p_buffer != NULL )
-    {
-        aout_buffer_t * p_next = p_buffer->p_next;
-        aout_BufferFree( p_buffer );
-        p_buffer = p_next;
-    }
-    p_fifo->p_first = NULL;
-    p_fifo->pp_last = &p_fifo->p_first;
-}
-
-/* This function supposes there is at least one buffer in p_fifo. */
-static inline aout_buffer_t * aout_FifoPop( struct aout_instance_t * p_aout,
-                                            aout_fifo_t * p_fifo )
-{
-    aout_buffer_t * p_buffer;
-    p_buffer = p_fifo->p_first;
-    p_fifo->p_first = p_buffer->p_next;
-    if ( p_fifo->p_first == NULL )
-    {
-        p_fifo->pp_last = &p_fifo->p_first;
-    }
-
-    return p_buffer;
-}
-
-static inline void aout_FifoDestroy( struct aout_instance_t * p_aout,
-                                     aout_fifo_t * p_fifo )
-{
-    aout_buffer_t * p_buffer;
-
-    p_buffer = p_fifo->p_first;
-    while ( p_buffer != NULL )
-    {
-        aout_buffer_t * p_next = p_buffer->p_next;
-        aout_BufferFree( p_buffer );
-        p_buffer = p_next;
-    }
-}
 
 /*****************************************************************************
  * aout_filter_t : audio output filter
@@ -296,4 +212,13 @@ int aout_OutputNew( aout_instance_t * p_aout,
 void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer );
 void aout_OutputDelete( aout_instance_t * p_aout );
 VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, vlc_bool_t ) );
+
+void aout_FormatPrepare( audio_sample_format_t * p_format );
+void aout_FifoInit( aout_instance_t *, aout_fifo_t *, u32 );
+mtime_t aout_FifoNextStart( aout_instance_t *, aout_fifo_t * );
+void aout_FifoPush( aout_instance_t *, aout_fifo_t *, aout_buffer_t * );
+void aout_FifoSet( aout_instance_t *, aout_fifo_t *, mtime_t );
+void aout_FifoMoveDates( aout_instance_t *, aout_fifo_t *, mtime_t );
+aout_buffer_t * aout_FifoPop( aout_instance_t * p_aout, aout_fifo_t * p_fifo );
+void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo );
 

@@ -2,7 +2,7 @@
  * float32tos16.c : converter from float32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tos16.c,v 1.8 2002/08/19 21:31:11 massiot Exp $
+ * $Id: float32tos16.c,v 1.9 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,15 +44,13 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("aout filter for float32->s16 conversion") );
+    set_description( _("audio filter for float32->s16 conversion") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();
 
 /*****************************************************************************
  * Create: allocate trivial mixer
- *****************************************************************************
- * This function allocates and initializes a Crop vout method.
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
@@ -88,7 +86,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     for ( i = p_in_buf->i_nb_samples * p_filter->input.i_channels ; i-- ; )
     {
 #if 0
-        /* Slow version */
+        /* Slow version. */
         if ( *p_in >= 1.0 ) *p_out = 32767;
         else if ( *p_in < -1.0 ) *p_out = -32768;
         else *p_out = *p_in * 32768.0;

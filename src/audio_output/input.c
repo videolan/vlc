@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.6 2002/08/19 23:12:57 massiot Exp $
+ * $Id: input.c,v 1.7 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -63,7 +63,7 @@ static aout_input_t * InputNew( aout_instance_t * p_aout,
     aout_FormatPrepare( &p_input->input );
 
     /* Prepare FIFO. */
-    aout_FifoInit( p_aout, &p_input->fifo );
+    aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
     p_input->p_first_byte_to_mix = NULL;
 
     /* Create filters. */
@@ -220,8 +220,8 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     vlc_mutex_unlock( &p_aout->input_lock );
 
     /* We don't care if someone changes the start date behind our back after
-     * aout_FifoNextStart. aout_FifoPush will deal with that, and we will
-     * compensate with the next incoming buffer. */
+     * this. We'll deal with that when pushing the buffer, and compensate
+     * with the next incoming buffer. */
     start_date = aout_FifoNextStart( p_aout, &p_input->fifo );
 
     if ( start_date != 0 && start_date < mdate() )
@@ -237,7 +237,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = 0;
     } 
 
-    if ( p_buffer->start_date < mdate() )
+    if ( p_buffer->start_date < mdate() - AOUT_MIN_PREPARE_TIME )
     {
         /* The decoder gives us f*cked up PTS. It's its business, but we
          * can't present it anyway, so drop the buffer. */
@@ -268,6 +268,7 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         int i_ratio, i_nb_filters;
         mtime_t old_duration;
         aout_filter_t * pp_filters[AOUT_MAX_FILTERS];
+        aout_buffer_t * p_new_buffer;
         aout_alloc_t dummy_alloc;
         mtime_t drift = p_buffer->start_date - start_date;
 
@@ -280,15 +281,15 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         duration = p_buffer->end_date - start_date;
         i_ratio = duration * 100 / old_duration;
         /* If the ratio is too != 100, the sound quality will be awful. */
-        if ( i_ratio < 90 /* % */ )
+        if ( i_ratio < 66 /* % */ )
         {
-            duration = old_duration * 90 / 100;
+            duration = old_duration * 66 / 100;
         }
-        if ( i_ratio > 110 /* % */ )
+        if ( i_ratio > 150 /* % */ )
         {
-            duration = old_duration * 110 / 100;
+            duration = old_duration * 150 / 100;
         }
-        new_output.i_rate = new_output.i_rate * old_duration / duration;
+        new_output.i_rate = new_output.i_rate * duration / old_duration;
 
         if ( aout_FiltersCreatePipeline( p_aout, pp_filters,
                                          &i_nb_filters, &p_input->input,
@@ -311,6 +312,20 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         dummy_alloc.i_bytes_per_sec = -1;
         aout_FiltersHintBuffers( p_aout, pp_filters, i_nb_filters,
                                  &dummy_alloc );
+        dummy_alloc.i_bytes_per_sec = __MAX(
+                                    dummy_alloc.i_bytes_per_sec,
+                                    p_input->input.i_bytes_per_frame
+                                     * p_input->input.i_rate
+                                     / p_input->input.i_frame_length );
+        dummy_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
+
+        aout_BufferAlloc( &dummy_alloc, old_duration, NULL, p_new_buffer );
+        memcpy( p_new_buffer->p_buffer, p_buffer->p_buffer,
+                p_buffer->i_nb_bytes );
+        p_new_buffer->i_nb_samples = p_buffer->i_nb_samples;
+        p_new_buffer->i_nb_bytes = p_buffer->i_nb_bytes;
+        aout_BufferFree( p_buffer );
+        p_buffer = p_new_buffer;
 
         aout_FiltersPlay( p_aout, pp_filters, i_nb_filters,
                           &p_buffer );
@@ -327,10 +342,10 @@ void aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                           &p_buffer );
     }
 
+    vlc_mutex_lock( &p_aout->mixer_lock );
     /* Adding the start date will be managed by aout_FifoPush(). */
     p_buffer->start_date = start_date;
     p_buffer->end_date = start_date + duration;
-    vlc_mutex_lock( &p_aout->mixer_lock );
     aout_FifoPush( p_aout, &p_input->fifo, p_buffer );
     vlc_mutex_unlock( &p_aout->mixer_lock );
 

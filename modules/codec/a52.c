@@ -4,7 +4,7 @@
  *   (http://liba52.sf.net/).
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: a52.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
+ * $Id: a52.c,v 1.6 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -77,7 +77,7 @@ typedef struct a52_thread_s
     aout_instance_t *   p_aout; /* opaque */
     aout_input_t *      p_aout_input; /* opaque */
     audio_sample_format_t output_format;
-    mtime_t             last_date;
+    audio_date_t        end_date;
 } a52_thread_t;
 
 /*****************************************************************************
@@ -195,6 +195,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         {
             p_dec->output_format.i_rate = i_rate;
             /* p_dec->output_format.i_channels = i_channels; */
+            aout_DateInit( &p_dec->end_date, i_rate );
             p_dec->p_aout_input = aout_InputNew( p_dec->p_fifo,
                                                  &p_dec->p_aout,
                                                  &p_dec->output_format );
@@ -208,9 +209,9 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
 
         /* Set the Presentation Time Stamp */
         CurrentPTS( &p_dec->bit_stream, &pts, NULL );
-        if ( pts != 0 )
+        if ( pts != 0 && pts != aout_DateGet( &p_dec->end_date ) )
         {
-            p_dec->last_date = pts;
+            aout_DateSet( &p_dec->end_date, pts );
         }
 
         /* Get the complete frame */
@@ -248,7 +249,6 @@ static int InitThread( a52_thread_t * p_dec, decoder_fifo_t * p_fifo )
     p_dec->p_fifo = p_fifo;
     p_dec->output_format.i_format = AOUT_FMT_FLOAT32;
     p_dec->output_format.i_channels = 2; /* FIXME ! */
-    p_dec->last_date = 0;
 
     /* Initialize liba52 */
     p_dec->p_a52_state = a52_init( 0 );
@@ -294,7 +294,7 @@ static int DecodeFrame( a52_thread_t * p_dec, byte_t * p_frame_buffer )
     int             i_bytes_per_block = 256 * p_dec->output_format.i_channels
                       * sizeof(float);
 
-    if( !p_dec->last_date )
+    if( !aout_DateGet( &p_dec->end_date ) )
     {
         /* We've just started the stream, wait for the first PTS. */
         return 0;
@@ -303,10 +303,9 @@ static int DecodeFrame( a52_thread_t * p_dec, byte_t * p_frame_buffer )
     p_buffer = aout_BufferNew( p_dec->p_aout, p_dec->p_aout_input,
                                A52_FRAME_NB );
     if ( p_buffer == NULL ) return -1;
-    p_buffer->start_date = p_dec->last_date;
-    p_dec->last_date += (mtime_t)A52_FRAME_NB * 1000000
-                          / p_dec->output_format.i_rate;
-    p_buffer->end_date = p_dec->last_date;
+    p_buffer->start_date = aout_DateGet( &p_dec->end_date );
+    p_buffer->end_date = aout_DateIncrement( &p_dec->end_date,
+                                             A52_FRAME_NB );
 
     /* FIXME */
     i_flags = A52_STEREO | A52_ADJUST_LEVEL;

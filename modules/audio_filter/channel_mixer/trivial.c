@@ -1,16 +1,16 @@
 /*****************************************************************************
- * float32tou8.c : converter from float32 to unsigned 8 bits integer
+ * trivial.c : trivial channel mixer plug-in (drops unwanted channels)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: float32tou8.c,v 1.4 2002/08/21 22:41:59 massiot Exp $
+ * $Id: trivial.c,v 1.1 2002/08/21 22:41:59 massiot Exp $
  *
- * Authors: Xavier Maillard <zedek@fxgsproject.org>
+ * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -44,35 +44,59 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("audio filter for float32->u8 conversion") );
+    set_description( _("audio filter for trivial channel mixing") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();
 
 /*****************************************************************************
- * Create: allocate trivial mixer
- *****************************************************************************
- * This function allocates and initializes a Crop vout method.
+ * Create: allocate trivial channel mixer
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != AOUT_FMT_FLOAT32
-          || p_filter->output.i_format != AOUT_FMT_U8 )
-    {
-        return -1;
-    }
-
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( p_filter->input.i_channels == p_filter->output.i_channels
+          || p_filter->input.i_format != p_filter->output.i_format
+          || p_filter->input.i_rate != p_filter->output.i_rate
+          || (p_filter->input.i_format != AOUT_FMT_FLOAT32
+               && p_filter->input.i_format != AOUT_FMT_FIXED32) )
     {
         return -1;
     }
 
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = 1;
+    if ( p_filter->input.i_channels > p_filter->output.i_channels )
+    {
+        /* Downmixing */
+    	p_filter->b_in_place = 1;
+    }
+    else
+    {
+        /* Upmixing */
+    	p_filter->b_in_place = 0;
+    }
 
     return 0;
+}
+
+/*****************************************************************************
+ * SparseCopy: trivially downmix or upmix a buffer
+ *****************************************************************************/
+static void SparseCopy( s32 * p_dest, const s32 * p_src, size_t i_len,
+                        int i_output_stride, int i_input_stride )
+{
+    int i;
+    for ( i = 0; i < i_len; i++ )
+    {
+        int j;
+        for ( j = 0; j < i_output_stride; j++ )
+        {
+            p_dest[j] = p_src[j];
+        }
+        p_src += i_input_stride;
+        p_dest += i_output_stride;
+    }
 }
 
 /*****************************************************************************
@@ -81,19 +105,12 @@ static int Create( vlc_object_t *p_this )
 static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    int i;
-    float * p_in = (float *)p_in_buf->p_buffer;
-    u8 * p_out = (u8 *)p_out_buf->p_buffer;
-
-    for ( i = 0; i < p_in_buf->i_nb_samples * p_filter->input.i_channels; i++ )
-    {
-        if ( *p_in >= 1.0 ) *p_out = 255;
-        else if ( *p_in < -1.0 ) *p_out = 0;
-        else *p_out = (u8)(128 + *p_in * 128);
-        p_in++; p_out++;
-    }
+    SparseCopy( (s32 *)p_out_buf->p_buffer, (s32 *)p_in_buf->p_buffer,
+                p_in_buf->i_nb_samples, p_filter->output.i_channels,
+                p_filter->input.i_channels );
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes / 4;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * p_filter->output.i_channels
+                             / p_filter->input.i_channels;
 }
 

@@ -2,7 +2,7 @@
  * trivial.c : trivial resampler (skips samples or pads with zeroes)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.3 2002/08/12 22:12:50 massiot Exp $
+ * $Id: trivial.c,v 1.4 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -44,22 +44,23 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("aout filter for trivial resampling") );
+    set_description( _("audio filter for trivial resampling") );
     set_capability( "audio filter", 1 );
     set_callbacks( Create, NULL );
 vlc_module_end();
 
 /*****************************************************************************
  * Create: allocate trivial resampler
- *****************************************************************************
- * This function allocates and initializes a Crop vout method.
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
     if ( p_filter->input.i_rate == p_filter->output.i_rate
-          || p_filter->input.i_format != p_filter->output.i_format )
+          || p_filter->input.i_format != p_filter->output.i_format
+          || p_filter->input.i_channels != p_filter->output.i_channels
+          || (p_filter->input.i_format != AOUT_FMT_FLOAT32
+               && p_filter->input.i_format != AOUT_FMT_FIXED32) )
     {
         return -1;
     }
@@ -83,7 +84,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if ( p_out_buf != p_in_buf )
     {
         /* For whatever reason the buffer allocator decided to allocate
-         * a new buffer. */
+         * a new buffer. Currently, this never happens. */
         p_aout->p_vlc->pf_memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer,
                                   __MIN(i_out_nb, i_in_nb) );
     }
@@ -95,5 +96,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = i_out_nb;
+    p_out_buf->i_nb_bytes = i_out_nb * sizeof(s32);
 }
 

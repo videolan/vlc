@@ -2,7 +2,7 @@
  * fixed32float32.c : converter from fixed32 to float32 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: fixed32tofloat32.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
+ * $Id: fixed32tofloat32.c,v 1.6 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -44,7 +44,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("aout filter for fixed32->float32 conversion") );
+    set_description( _("audio filter for fixed32->float32 conversion") );
     set_capability( "audio filter", 10 );
     set_callbacks( Create, NULL );
 vlc_module_end();
@@ -105,6 +105,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #endif
 
         /* combined conversion */
+        /* This has absolutely no chance of working. *p_in is s32, gcc
+         * doesn't know anything of vlc_fixed_t... --Meuuh */
         if ( *p_in >= 8 ) *p_out = (float) 1.0;
         else if ( *p_in < -8 ) *p_out = (float) -1.0;
         else *p_out =(float) (*p_in/8.0);
@@ -113,5 +115,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
 }
 

@@ -1,8 +1,8 @@
 /*****************************************************************************
- * audio_output.c : audio output instance
+ * audio_output.c : audio output instance miscellaneous functions
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.98 2002/08/19 23:12:57 massiot Exp $
+ * $Id: audio_output.c,v 1.99 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -35,6 +35,10 @@
 
 #include "audio_output.h"
 #include "aout_internal.h"
+
+/*
+ * Instances management (see also input.c:aout_InputNew())
+ */
 
 /*****************************************************************************
  * aout_NewInstance: initialize aout structure
@@ -76,6 +80,11 @@ void aout_DeleteInstance( aout_instance_t * p_aout )
     /* Free structure. */
     vlc_object_destroy( p_aout );
 }
+
+
+/*
+ * Buffer management (interface to the decoders)
+ */
 
 /*****************************************************************************
  * aout_BufferNew : ask for a new empty buffer
@@ -142,6 +151,11 @@ void aout_BufferPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     aout_MixerRun( p_aout );
 }
 
+
+/*
+ * Formats management (internal)
+ */
+
 /*****************************************************************************
  * aout_FormatPrepare : compute the number of bytes per frame & frame length
  *****************************************************************************/
@@ -181,5 +195,183 @@ void aout_FormatPrepare( audio_sample_format_t * p_format )
 
     p_format->i_bytes_per_frame = i_result * p_format->i_channels;
     p_format->i_frame_length = 1;
+}
+
+
+/*
+ * FIFO management (internal) - please understand that solving race conditions
+ * is _your_ job, ie. in the audio output you should own the mixer lock
+ * before calling any of these functions.
+ */
+
+/*****************************************************************************
+ * aout_FifoInit : initialize the members of a FIFO
+ *****************************************************************************/
+void aout_FifoInit( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
+                    u32 i_rate )
+{
+    p_fifo->p_first = NULL;
+    p_fifo->pp_last = &p_fifo->p_first;
+    aout_DateInit( &p_fifo->end_date, i_rate );
+}
+
+/*****************************************************************************
+ * aout_FifoPush : push a packet into the FIFO
+ *****************************************************************************/
+void aout_FifoPush( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
+                    aout_buffer_t * p_buffer )
+{
+    *p_fifo->pp_last = p_buffer;
+    p_fifo->pp_last = &p_buffer->p_next;
+    *p_fifo->pp_last = NULL;
+    /* Enforce the continuity of the stream. */
+    if ( aout_DateGet( &p_fifo->end_date ) )
+    {
+        p_buffer->start_date = aout_DateGet( &p_fifo->end_date );
+        p_buffer->end_date = aout_DateIncrement( &p_fifo->end_date,
+                                                 p_buffer->i_nb_samples ); 
+    }
+    else
+    {
+        aout_DateSet( &p_fifo->end_date, p_buffer->end_date );
+    }
+}
+
+/*****************************************************************************
+ * aout_FifoSet : set end_date and trash all buffers (because they aren't
+ * properly dated)
+ *****************************************************************************/
+void aout_FifoSet( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
+                   mtime_t date )
+{
+    aout_buffer_t * p_buffer;
+
+    aout_DateSet( &p_fifo->end_date, date );
+    p_buffer = p_fifo->p_first;
+    while ( p_buffer != NULL )
+    {
+        aout_buffer_t * p_next = p_buffer->p_next;
+        aout_BufferFree( p_buffer );
+        p_buffer = p_next;
+    }
+    p_fifo->p_first = NULL;
+    p_fifo->pp_last = &p_fifo->p_first;
+}
+
+/*****************************************************************************
+ * aout_FifoMoveDates : Move forwards or backwards all dates in the FIFO
+ *****************************************************************************/
+void aout_FifoMoveDates( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
+                         mtime_t difference )
+{
+    aout_buffer_t * p_buffer;
+
+    aout_DateMove( &p_fifo->end_date, difference );
+    p_buffer = p_fifo->p_first;
+    while ( p_buffer != NULL )
+    {
+        p_buffer->start_date += difference;
+        p_buffer->end_date += difference;
+        p_buffer = p_buffer->p_next;
+    }
+}
+
+/*****************************************************************************
+ * aout_FifoNextStart : return the current end_date
+ *****************************************************************************/
+mtime_t aout_FifoNextStart( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
+{
+    return aout_DateGet( &p_fifo->end_date );
+}
+
+/*****************************************************************************
+ * aout_FifoPop : get the next buffer out of the FIFO
+ *****************************************************************************/
+aout_buffer_t * aout_FifoPop( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
+{
+    aout_buffer_t * p_buffer;
+    p_buffer = p_fifo->p_first;
+    if ( p_buffer == NULL ) return NULL;
+    p_fifo->p_first = p_buffer->p_next;
+    if ( p_fifo->p_first == NULL )
+    {
+        p_fifo->pp_last = &p_fifo->p_first;
+    }
+
+    return p_buffer;
+}
+
+/*****************************************************************************
+ * aout_FifoDestroy : destroy a FIFO and its buffers
+ *****************************************************************************/
+void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
+{
+    aout_buffer_t * p_buffer;
+
+    p_buffer = p_fifo->p_first;
+    while ( p_buffer != NULL )
+    {
+        aout_buffer_t * p_next = p_buffer->p_next;
+        aout_BufferFree( p_buffer );
+        p_buffer = p_next;
+    }
+}
+
+
+/*
+ * Date management (internal and external)
+ */
+
+/*****************************************************************************
+ * aout_DateInit : set the divider of an audio_date_t
+ *****************************************************************************/
+void aout_DateInit( audio_date_t * p_date, u32 i_divider )
+{
+    p_date->date = 0;
+    p_date->i_divider = i_divider;
+    p_date->i_remainder = 0;
+}
+
+/*****************************************************************************
+ * aout_DateSet : set the date of an audio_date_t
+ *****************************************************************************/
+void aout_DateSet( audio_date_t * p_date, mtime_t new_date )
+{
+    p_date->date = new_date;
+    p_date->i_remainder = 0;
+}
+
+/*****************************************************************************
+ * aout_DateMove : move forwards or backwards the date of an audio_date_t
+ *****************************************************************************/
+void aout_DateMove( audio_date_t * p_date, mtime_t difference )
+{
+    p_date->date += difference;
+}
+
+/*****************************************************************************
+ * aout_DateGet : get the date of an audio_date_t
+ *****************************************************************************/
+mtime_t aout_DateGet( const audio_date_t * p_date )
+{
+    return p_date->date;
+}
+
+/*****************************************************************************
+ * aout_DateIncrement : increment the date and return the result, taking
+ * into account rounding errors
+ *****************************************************************************/
+mtime_t aout_DateIncrement( audio_date_t * p_date, u32 i_nb_samples )
+{
+    mtime_t i_dividend = (mtime_t)i_nb_samples * 1000000;
+    p_date->date += i_dividend / p_date->i_divider;
+    p_date->i_remainder += i_dividend % p_date->i_divider;
+    if ( p_date->i_remainder >= p_date->i_divider )
+    {
+        /* This is Bresenham algorithm. */
+        p_date->date++;
+        p_date->i_remainder -= p_date->i_divider;
+    }
+    return p_date->date;
 }
 

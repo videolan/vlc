@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.60 2002/08/19 21:31:11 massiot Exp $
+ * $Id: audio_output.h,v 1.61 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -127,6 +127,16 @@ struct aout_buffer_t
 #define AOUT_SPDIF_SIZE 6144
 
 /*****************************************************************************
+ * audio_date_t : date incrementation without long-term rounding errors
+ *****************************************************************************/
+struct audio_date_t
+{
+    mtime_t date;
+    u32     i_divider;
+    u32     i_remainder;
+};
+
+/*****************************************************************************
  * Prototypes
  *****************************************************************************/
 /* From audio_output.c : */
@@ -136,7 +146,11 @@ VLC_EXPORT( void,              aout_DeleteInstance, ( aout_instance_t * ) );
 VLC_EXPORT( aout_buffer_t *, aout_BufferNew, ( aout_instance_t *, aout_input_t *, size_t ) );
 VLC_EXPORT( void, aout_BufferDelete, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
 VLC_EXPORT( void, aout_BufferPlay, ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) );
-VLC_EXPORT( void, aout_FormatPrepare, ( audio_sample_format_t * p_format ) );
+VLC_EXPORT( void, aout_DateInit, ( audio_date_t *, u32 ) );
+VLC_EXPORT( void, aout_DateSet, ( audio_date_t *, mtime_t ) );
+VLC_EXPORT( void, aout_DateMove, ( audio_date_t *, mtime_t ) );
+VLC_EXPORT( mtime_t, aout_DateGet, ( const audio_date_t * ) );
+VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, u32 ) );
 
 /* From input.c : */
 #define aout_InputNew(a,b,c) __aout_InputNew(VLC_OBJECT(a),b,c)

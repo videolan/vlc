@@ -2,7 +2,7 @@
  * trivial.c : trivial mixer plug-in (1 input, no downmixing)
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: trivial.c,v 1.5 2002/08/19 21:31:11 massiot Exp $
+ * $Id: trivial.c,v 1.6 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,9 +43,8 @@ static void DoWork    ( aout_instance_t *, aout_buffer_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("trivial aout mixer module") );
+    set_description( _("trivial audio mixer module") );
     set_capability( "audio mixer", 1 );
-    add_shortcut( "trivial" );
     set_callbacks( Create, NULL );
 vlc_module_end();
 
@@ -67,34 +66,13 @@ static int Create( vlc_object_t *p_this )
     return 0;
 }
 
-#if 0
-/*****************************************************************************
- * SparseCopy: trivially downmix or upmix a buffer
- *****************************************************************************/
-static void SparseCopy( u32 * p_dest, const u32 * p_src, size_t i_len,
-                        int i_output_stride, int i_input_stride )
-{
-    int i;
-    for ( i = 0; i < i_len; i++ )
-    {
-        int j;
-        for ( j = 0; j < i_output_stride; j++ )
-        {
-            p_dest[j] = p_src[j];
-        }
-        p_src += i_input_stride;
-        p_dest += i_output_stride;
-    }
-}
-#endif
-
 /*****************************************************************************
  * DoWork: mix a new output buffer
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
     aout_input_t * p_input = p_aout->pp_inputs[0];
-    int i_nb_bytes = p_buffer->i_nb_samples * sizeof(u32)
+    int i_nb_bytes = p_buffer->i_nb_samples * sizeof(s32)
                       * p_aout->mixer.mixer.i_channels;
     byte_t * p_in = p_input->p_first_byte_to_mix;
     byte_t * p_out = p_buffer->p_buffer;
@@ -104,7 +82,7 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         ptrdiff_t i_available_bytes = (p_input->fifo.p_first->p_buffer
                                         - p_in)
                                         + p_input->fifo.p_first->i_nb_samples
-                                           * sizeof(u32)
+                                           * sizeof(s32)
                                            * p_aout->mixer.mixer.i_channels;
 
         if ( i_available_bytes < i_nb_bytes )

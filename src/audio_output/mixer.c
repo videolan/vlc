@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.8 2002/08/19 23:12:57 massiot Exp $
+ * $Id: mixer.c,v 1.9 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -66,10 +66,15 @@ static int MixBuffer( aout_instance_t * p_aout )
     int             i;
     aout_buffer_t * p_output_buffer;
     mtime_t start_date, end_date;
+    audio_date_t exact_start_date;
+
+    vlc_mutex_lock( &p_aout->mixer_lock );
 
     /* Retrieve the date of the next buffer. */
-    vlc_mutex_lock( &p_aout->mixer_lock );
-    start_date = aout_FifoNextStart( p_aout, &p_aout->output.fifo );
+    memcpy( &exact_start_date, &p_aout->output.fifo.end_date,
+            sizeof(audio_date_t) );
+    start_date = aout_DateGet( &exact_start_date );
+
     if ( start_date != 0 && start_date < mdate() )
     {
         /* The output is _very_ late. This can only happen if the user
@@ -77,7 +82,9 @@ static int MixBuffer( aout_instance_t * p_aout )
          * happen :). */
         msg_Warn( p_aout, "Output PTS is out of range (%lld), clearing out",
                   start_date );
-        start_date = p_aout->output.fifo.end_date = 0;
+        aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
+        aout_DateSet( &exact_start_date, 0 );
+        start_date = 0;
     } 
 
     /* See if we have enough data to prepare a new buffer for the audio
@@ -99,6 +106,7 @@ static int MixBuffer( aout_instance_t * p_aout )
 
             if ( !start_date || start_date < p_buffer->start_date )
             {
+                aout_DateSet( &exact_start_date, p_buffer->start_date );
                 start_date = p_buffer->start_date;
             }
         }
@@ -110,8 +118,8 @@ static int MixBuffer( aout_instance_t * p_aout )
             return -1;
         }
     }
-    end_date = start_date + (mtime_t)p_aout->output.i_nb_samples * 1000000
-                             / p_aout->output.output.i_rate;
+    aout_DateIncrement( &exact_start_date, p_aout->output.i_nb_samples );
+    end_date = aout_DateGet( &exact_start_date );
 
     /* Check that start_date and end_date are available for all input
      * streams. */
@@ -163,13 +171,13 @@ static int MixBuffer( aout_instance_t * p_aout )
             mixer_nb_bytes = p_input->p_first_byte_to_mix
                               - p_buffer->p_buffer;
 
-            if ( i_nb_bytes + p_aout->mixer.mixer.i_bytes_per_frame
-                  < mixer_nb_bytes ||
-                 i_nb_bytes - p_aout->mixer.mixer.i_bytes_per_frame
-                  > mixer_nb_bytes )
+            if ( !((i_nb_bytes + p_aout->mixer.mixer.i_bytes_per_frame
+                     > mixer_nb_bytes) &&
+                   (i_nb_bytes < p_aout->mixer.mixer.i_bytes_per_frame
+                     + mixer_nb_bytes)) )
             {
                 msg_Warn( p_aout,
-                          "mixer start isn't output start (%ld)",
+                          "mixer start isn't output start (%d)",
                           i_nb_bytes - mixer_nb_bytes );
 
                 /* Round to the nearest multiple */

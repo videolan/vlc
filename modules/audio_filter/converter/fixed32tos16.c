@@ -2,7 +2,7 @@
  * fixed32tos16.c : converter from fixed32 to signed 16 bits integer
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: fixed32tos16.c,v 1.4 2002/08/19 21:31:11 massiot Exp $
+ * $Id: fixed32tos16.c,v 1.5 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -44,7 +44,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin();
-    set_description( _("aout filter for fixed32->s16 conversion") );
+    set_description( _("audio filter for fixed32->s16 conversion") );
     set_capability( "audio filter", 10 );
     set_callbacks( Create, NULL );
 vlc_module_end();
@@ -216,4 +216,5 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 //        p_in++; p_out++;
     }
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes / 2;
 }

@@ -185,7 +185,11 @@ static const char * module_error( char *psz_buffer )
     (p_symbols)->aout_BufferNew_inner = aout_BufferNew; \
     (p_symbols)->aout_BufferDelete_inner = aout_BufferDelete; \
     (p_symbols)->aout_BufferPlay_inner = aout_BufferPlay; \
-    (p_symbols)->aout_FormatPrepare_inner = aout_FormatPrepare; \
+    (p_symbols)->aout_DateInit_inner = aout_DateInit; \
+    (p_symbols)->aout_DateSet_inner = aout_DateSet; \
+    (p_symbols)->aout_DateMove_inner = aout_DateMove; \
+    (p_symbols)->aout_DateGet_inner = aout_DateGet; \
+    (p_symbols)->aout_DateIncrement_inner = aout_DateIncrement; \
     (p_symbols)->__aout_InputNew_inner = __aout_InputNew; \
     (p_symbols)->aout_InputDelete_inner = aout_InputDelete; \
     (p_symbols)->__config_GetInt_inner = __config_GetInt; \

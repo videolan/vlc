@@ -53,6 +53,8 @@ struct module_symbols_t
     module_config_t * (* config_FindConfig_inner) ( vlc_object_t *, const char *psz_name ) ;
     module_t * (* __module_Need_inner) ( vlc_object_t *, const char *, const char * ) ;
     msg_subscription_t* (* __msg_Subscribe_inner) ( vlc_object_t * ) ;
+    mtime_t (* aout_DateGet_inner) ( const audio_date_t * ) ;
+    mtime_t (* aout_DateIncrement_inner) ( audio_date_t *, u32 ) ;
     mtime_t (* input_ClockGetTS_inner) ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) ;
     mtime_t (* mdate_inner) ( void ) ;
     pes_packet_t * (* input_NewPES_inner) ( input_buffers_t * ) ;
@@ -102,8 +104,10 @@ struct module_symbols_t
     void (* __vlc_thread_ready_inner) ( vlc_object_t * ) ;
     void (* aout_BufferDelete_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
     void (* aout_BufferPlay_inner) ( aout_instance_t *, aout_input_t *, aout_buffer_t * ) ;
+    void (* aout_DateInit_inner) ( audio_date_t *, u32 ) ;
+    void (* aout_DateMove_inner) ( audio_date_t *, mtime_t ) ;
+    void (* aout_DateSet_inner) ( audio_date_t *, mtime_t ) ;
     void (* aout_DeleteInstance_inner) ( aout_instance_t * ) ;
-    void (* aout_FormatPrepare_inner) ( audio_sample_format_t * p_format ) ;
     void (* aout_InputDelete_inner) ( aout_instance_t *, aout_input_t * ) ;
     void (* config_Duplicate_inner) ( module_t *, module_config_t * ) ;
     void (* config_SetCallbacks_inner) ( module_config_t *, module_config_t * ) ;
@@ -210,8 +214,12 @@ struct module_symbols_t
 #   define aout_BufferDelete p_symbols->aout_BufferDelete_inner
 #   define aout_BufferNew p_symbols->aout_BufferNew_inner
 #   define aout_BufferPlay p_symbols->aout_BufferPlay_inner
+#   define aout_DateGet p_symbols->aout_DateGet_inner
+#   define aout_DateIncrement p_symbols->aout_DateIncrement_inner
+#   define aout_DateInit p_symbols->aout_DateInit_inner
+#   define aout_DateMove p_symbols->aout_DateMove_inner
+#   define aout_DateSet p_symbols->aout_DateSet_inner
 #   define aout_DeleteInstance p_symbols->aout_DeleteInstance_inner
-#   define aout_FormatPrepare p_symbols->aout_FormatPrepare_inner
 #   define aout_InputDelete p_symbols->aout_InputDelete_inner
 #   define aout_OutputNextBuffer p_symbols->aout_OutputNextBuffer_inner
 #   define config_Duplicate p_symbols->config_Duplicate_inner

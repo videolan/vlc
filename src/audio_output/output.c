@@ -2,7 +2,7 @@
  * output.c : internal management of output streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: output.c,v 1.8 2002/08/19 23:12:57 massiot Exp $
+ * $Id: output.c,v 1.9 2002/08/21 22:41:59 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -42,9 +42,6 @@ int aout_OutputNew( aout_instance_t * p_aout,
     int i_rate = config_GetInt( p_aout, "aout-rate" );
     int i_channels = config_GetInt( p_aout, "aout-channels" );
 
-    /* Prepare FIFO. */
-    aout_FifoInit( p_aout, &p_aout->output.fifo );
-
     p_aout->output.p_module = module_Need( p_aout, "audio output",
                                            psz_name );
     if ( psz_name != NULL ) free( psz_name );
@@ -78,6 +75,9 @@ int aout_OutputNew( aout_instance_t * p_aout,
         return -1;
     }
     aout_FormatPrepare( &p_aout->output.output );
+
+    /* Prepare FIFO. */
+    aout_FifoInit( p_aout, &p_aout->output.fifo, p_aout->output.output.i_rate );
 
     msg_Dbg( p_aout, "output format=%d rate=%d channels=%d",
              p_aout->output.output.i_format, p_aout->output.output.i_rate,
@@ -149,10 +149,10 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                       p_aout->output.i_nb_filters,
                       &p_buffer );
 
-    /* Please remember that we have the mixer_lock in this function. */
+    vlc_mutex_lock( &p_aout->mixer_lock );
     aout_FifoPush( p_aout, &p_aout->output.fifo, p_buffer );
-
     p_aout->output.pf_play( p_aout );
+    vlc_mutex_unlock( &p_aout->mixer_lock );
 }
 
 /*****************************************************************************
@@ -160,7 +160,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
  *****************************************************************************
  * If b_can_sleek is 1, the aout core functions won't try to resample
  * new buffers to catch up - that is we suppose that the output plug-in can
- * do it by itself. S/PDIF outputs should always set b_can_sleek = 1.
+ * compensate it by itself. S/PDIF outputs should always set b_can_sleek = 1.
  *****************************************************************************/
 aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
                                        mtime_t start_date ,
@@ -171,10 +171,10 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     vlc_mutex_lock( &p_aout->mixer_lock );
     p_buffer = p_aout->output.fifo.p_first;
 
-    while ( p_buffer != NULL && p_buffer->end_date < start_date )
+    while ( p_buffer != NULL && p_buffer->start_date < start_date )
     {
         msg_Dbg( p_aout, "audio output is too slow (%lld)",
-                 start_date - p_buffer->end_date );
+                 start_date - p_buffer->start_date );
         p_buffer = p_buffer->p_next;
     }
 
@@ -183,7 +183,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     {
         p_aout->output.fifo.pp_last = &p_aout->output.fifo.p_first;
         /* Set date to 0, to allow the mixer to send a new buffer ASAP */
-        p_aout->output.fifo.end_date = 0;
+        aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
         vlc_mutex_unlock( &p_aout->mixer_lock );
         msg_Dbg( p_aout, "audio output is starving" );
         return NULL;
@@ -200,22 +200,26 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         return NULL;
     }
 
-#if 0
-    if ( !b_can_sleek )
+    if ( !b_can_sleek &&
+          ( (p_buffer->start_date - start_date > AOUT_PTS_TOLERANCE)
+             || (start_date - p_buffer->start_date > AOUT_PTS_TOLERANCE) ) )
     {
         /* Try to compensate the drift by doing some resampling. */
         int i;
+        mtime_t difference = p_buffer->start_date - start_date;
+        msg_Warn( p_aout, "output date isn't PTS date, resampling (%lld)",
+                  difference );
 
-        /* Take the mixer lock because no input can be removed when the
-         * the mixer lock is taken. */
-        vlc_mutex_lock( &p_aout->output.fifo.lock );
-        for ( i = 0; i < p_input->i_nb_inputs; i++ )
+        /* Remember that we still own the mixer lock. */
+        for ( i = 0; i < p_aout->i_nb_inputs; i++ )
         {
-            aout_input_t * p_input = p_aout->pp_inputs[i];
+            aout_fifo_t * p_fifo = &p_aout->pp_inputs[i]->fifo;
+
+            aout_FifoMoveDates( p_aout, p_fifo, difference );
         }
-        vlc_mutex_lock( &p_aout->output.fifo.lock );
+
+        aout_FifoMoveDates( p_aout, &p_aout->output.fifo, difference );
     }
-#endif
 
     p_aout->output.fifo.p_first = p_buffer->p_next;
     if ( p_buffer->p_next == NULL )
