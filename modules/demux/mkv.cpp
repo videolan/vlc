@@ -570,7 +570,7 @@ public:
 
 protected:
     std::vector<matroska_segment_t*> linked_segments;
-    std::vector<const KaxSegmentUID> linked_uids;
+    std::vector<KaxSegmentUID>       linked_uids;
     size_t                           i_current_segment;
 
     void                             AppendUID( const EbmlBinary & UID );
@@ -820,7 +820,6 @@ static void Close( vlc_object_t *p_this )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
-    matroska_segment_t *p_segment = p_sys->p_current_segment->Segment();
     int64_t     *pi64;
     double      *pf, f;
     int         i_skp;
@@ -3669,8 +3668,9 @@ void matroska_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
 
 void virtual_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
 {
+    size_t i;
     // find the best matching segment
-    for ( size_t i=0; i<linked_segments.size(); i++ )
+    for ( i=0; i<linked_segments.size(); i++ )
     {
         if ( i_date < linked_segments[i]->f_start_time * 1000.0 )
             break;
