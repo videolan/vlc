@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.18 2002/12/19 16:59:31 sigmunau Exp $
+ * $Id: avi.c,v 1.19 2002/12/27 15:40:52 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1029,10 +1029,10 @@ static int AVIInit( vlc_object_t * p_this )
                 i_init_size = 0;
                 p_init_data = NULL;
                 {
-                    char *hepp;
+                    char psz_cat[32]; /* We'll clip i just in case */
                     input_info_category_t *p_cat;
-                    asprintf(&hepp, "stream %d", i);
-                    p_cat = input_InfoCategory( p_input, hepp);
+                    sprintf( psz_cat, "stream %d", __MIN( i, 100000 ) );
+                    p_cat = input_InfoCategory( p_input, psz_cat );
                     input_AddInfo( p_cat, "Type", "unknown" );
                 }
                 break;
