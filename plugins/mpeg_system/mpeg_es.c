@@ -2,7 +2,7 @@
  * mpeg_es.c : Elementary Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_es.c,v 1.9 2002/06/01 12:32:00 sam Exp $
+ * $Id: mpeg_es.c,v 1.10 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -143,7 +143,7 @@ static int ESInit( input_thread_t * p_input )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xE0, 0 );
     p_es->i_stream_id = 0xE0;
-    p_es->i_type = MPEG1_VIDEO_ES;
+    p_es->i_fourcc = VLC_FOURCC('m','p','g','v');
     p_es->i_cat = VIDEO_ES;
     input_SelectES( p_input, p_es );
     p_input->stream.p_selected_area->i_tell = 0;

@@ -2,7 +2,7 @@
  * vout_macosx.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout_macosx.m,v 1.13 2002/07/20 18:01:42 sam Exp $
+ * $Id: vout_macosx.m,v 1.14 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -145,13 +145,13 @@ static int vout_Create( vout_thread_t *p_vout )
         return( 1 );
     } 
 
-    if( vout_ChromaCmp( p_vout->render.i_chroma, FOURCC_I420 ) )
+    if( vout_ChromaCmp( p_vout->render.i_chroma, VLC_FOURCC('I','4','2','0') ) )
     {
         err = FindCodec( kYUV420CodecType, bestSpeedCodec,
                          nil, &p_vout->p_sys->img_dc );
         if( err == noErr && p_vout->p_sys->img_dc != 0 )
         {
-            p_vout->output.i_chroma = FOURCC_I420;
+            p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
             p_vout->p_sys->i_codec = kYUV420CodecType;
         }
         else
@@ -620,7 +620,7 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch( p_vout->output.i_chroma )
     {
-        case FOURCC_I420:
+        case VLC_FOURCC('I','4','2','0'):
 
             p_pic->p_sys->p_info = (void *)&p_pic->p_sys->pixmap_i420;
             p_pic->p_sys->i_size = sizeof(PlanarPixmapInfoYUV420);
@@ -633,22 +633,22 @@ static int QTNewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->Y_PIXELS = p_pic->p_data; 
             p_pic->p[Y_PLANE].i_lines = i_height;
             p_pic->p[Y_PLANE].i_pitch = i_width;
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
+            p_pic->p[Y_PLANE].i_visible_pitch = i_width;
 
             /* U buffer */
             p_pic->U_PIXELS = p_pic->Y_PIXELS + i_height * i_width;
             p_pic->p[U_PLANE].i_lines = i_height / 2;
             p_pic->p[U_PLANE].i_pitch = i_width / 2;
-            p_pic->p[U_PLANE].i_pixel_bytes = 1;
-            p_pic->p[U_PLANE].b_margin = 0;
+            p_pic->p[U_PLANE].i_pixel_pitch = 1;
+            p_pic->p[U_PLANE].i_visible_pitch = i_width / 2;
 
             /* V buffer */
             p_pic->V_PIXELS = p_pic->U_PIXELS + i_height * i_width / 4;
             p_pic->p[V_PLANE].i_lines = i_height / 2;
             p_pic->p[V_PLANE].i_pitch = i_width / 2;
-            p_pic->p[V_PLANE].i_pixel_bytes = 1;
-            p_pic->p[V_PLANE].b_margin = 0;
+            p_pic->p[V_PLANE].i_pixel_pitch = 1;
+            p_pic->p[V_PLANE].i_visible_pitch = i_width / 2;
 
             /* We allocated 3 planes */
             p_pic->i_planes = 3;
@@ -687,7 +687,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
     switch( p_vout->output.i_chroma )
     {
-        case FOURCC_I420:
+        case VLC_FOURCC('I','4','2','0'):
             free( p_pic->p_data_orig );
             break;
     }

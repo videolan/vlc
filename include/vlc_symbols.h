@@ -37,7 +37,6 @@ struct module_symbols_t
     int (* input_AccessInit_inner) ( input_thread_t * ) ;
     int (* input_AddInfo_inner) ( input_info_category_t *, char *, char *, ... ) ;
     int (* input_ChangeArea_inner) ( input_thread_t *, input_area_t * ) ;
-    int (* input_ChangeES_inner) ( input_thread_t *, es_descriptor_t *, u8 ) ;
     int (* input_ChangeProgram_inner) ( input_thread_t *, u16 ) ;
     int (* input_ClockManageControl_inner) ( input_thread_t *, pgrm_descriptor_t *, mtime_t ) ;
     int (* input_InitStream_inner) ( input_thread_t *, size_t ) ;
@@ -213,7 +212,6 @@ struct module_symbols_t
 #   define input_AddProgram p_symbols->input_AddProgram_inner
 #   define input_BuffersEnd p_symbols->input_BuffersEnd_inner
 #   define input_ChangeArea p_symbols->input_ChangeArea_inner
-#   define input_ChangeES p_symbols->input_ChangeES_inner
 #   define input_ChangeProgram p_symbols->input_ChangeProgram_inner
 #   define input_ClockGetTS p_symbols->input_ClockGetTS_inner
 #   define input_ClockManageControl p_symbols->input_ClockManageControl_inner

@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.6 2002/07/19 21:14:13 massiot Exp $
+ * $Id: libvlc.h,v 1.7 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -220,15 +220,13 @@
     "If you check this box, IPv4 will be used by default for all UDP and " \
     "HTTP connections.")
 
-#define ADEC_MPEG_TEXT N_("choose MPEG audio decoder")
-#define ADEC_MPEG_LONGTEXT N_( \
-    "This allows you to select the MPEG audio decoder you want to use. " \
-    "Common choices are builtin and mad.")
-
-#define ADEC_AC3_TEXT N_("choose AC3 audio decoder")
-#define ADEC_AC3_LONGTEXT N_( \
-    "This allows you to select the AC3/A52 audio decoder you want to use. " \
-    "Common choices are builtin and a52.")
+#define CODEC_TEXT N_("choose preferred codec list")
+#define CODEC_LONGTEXT N_( \
+    "This allows you to select the order in which vlc will choose its " \
+    "codecs. For instance, 'a52,ac3,any' will try the a52 codec before " \
+    "the ac3 one. Please be aware that vlc does not make any difference " \
+    "between audio or video codecs, so you should always specify 'any' at " \
+    "the end of the list to make sure there is a fallback for all types.")
 
 #define MMX_TEXT N_("enable CPU MMX support")
 #define MMX_LONGTEXT N_( \
@@ -375,8 +373,7 @@ ADD_BOOL_WITH_SHORT ( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT )
 
 /* Decoder options */
 ADD_CATEGORY_HINT( N_("Decoders"), NULL )
-ADD_MODULE  ( "mpeg-adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_MPEG_TEXT, ADEC_MPEG_LONGTEXT )
-ADD_MODULE  ( "ac3-adec", MODULE_CAPABILITY_DECODER, NULL, NULL, ADEC_AC3_TEXT, ADEC_AC3_LONGTEXT )
+ADD_MODULE  ( "codec", MODULE_CAPABILITY_DECODER, NULL, NULL, CODEC_TEXT, CODEC_LONGTEXT )
 
 /* CPU options */
 ADD_CATEGORY_HINT( N_("CPU"), NULL )

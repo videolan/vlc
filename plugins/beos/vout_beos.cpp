@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.62 2002/07/22 11:39:56 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.63 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -565,22 +565,10 @@ int vout_Init( vout_thread_t *p_vout )
        p_pic->p->p_pixels = (u8*)p_vout->p_sys->p_window->bitmap[buffer_index]->Bits();
        p_pic->p->i_lines = p_vout->p_sys->i_height;
 
-       p_pic->p->i_pixel_bytes = colspace[p_vout->p_sys->p_window->colspace_index].pixel_bytes;
+       p_pic->p->i_pixel_pitch = colspace[p_vout->p_sys->p_window->colspace_index].pixel_bytes;
        p_pic->i_planes = colspace[p_vout->p_sys->p_window->colspace_index].planes;
        p_pic->p->i_pitch = p_vout->p_sys->p_window->bitmap[buffer_index]->BytesPerRow(); 
-
-       if (p_vout->p_sys->p_window->mode == OVERLAY)
-       {
-          p_pic->p->i_visible_bytes = (p_vout->p_sys->p_window->bitmap[buffer_index]->Bounds().IntegerWidth()+1) 
-                                     * p_pic->p->i_pixel_bytes; 
-          p_pic->p->b_margin = 1;
-          p_pic->p->b_hidden = 0;
-       }
-       else
-       {
-          p_pic->p->b_margin = 0;
-          p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
-       }
+       p_pic->p->i_visible_pitch = p_pic->p->i_pixel_pitch * ( p_vout->p_sys->p_window->bitmap[buffer_index]->Bounds().IntegerWidth() + 1 );
 
        p_pic->i_status = DESTROYED_PICTURE;
        p_pic->i_type   = DIRECT_PICTURE;

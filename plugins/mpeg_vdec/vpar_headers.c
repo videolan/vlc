@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vpar_headers.c,v 1.27 2002/06/07 14:30:41 sam Exp $
+ * $Id: vpar_headers.c,v 1.28 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -212,13 +212,13 @@ static inline u64 ChromaToFourCC( int i_chroma )
     switch( i_chroma )
     {
         case CHROMA_420:
-            return FOURCC_I420;
+            return VLC_FOURCC('I','4','2','0');
 
         case CHROMA_422:
-            return FOURCC_I422;
+            return VLC_FOURCC('I','4','2','2');
 
         case CHROMA_444:
-            return FOURCC_I444;
+            return VLC_FOURCC('I','4','4','4');
 
         default:
             /* This can't happen */

@@ -2,7 +2,7 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.20 2002/07/20 18:01:42 sam Exp $
+ * $Id: fb.c,v 1.21 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -254,15 +254,15 @@ static int vout_Init( vout_thread_t *p_vout )
     switch( p_vout->p_sys->var_info.bits_per_pixel )
     {
         case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = FOURCC_RGB2; break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2'); break;
         case 15:
-            p_vout->output.i_chroma = FOURCC_RV15; break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5'); break;
         case 16:
-            p_vout->output.i_chroma = FOURCC_RV16; break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6'); break;
         case 24:
-            p_vout->output.i_chroma = FOURCC_RV24; break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4'); break;
         case 32:
-            p_vout->output.i_chroma = FOURCC_RV32; break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2'); break;
         default:
             msg_Err( p_vout, "unknown screen depth %i",
                      p_vout->p_sys->var_info.bits_per_pixel );
@@ -309,24 +309,22 @@ static int vout_Init( vout_thread_t *p_vout )
     /* We know the chroma, allocate a buffer which will be used
      * directly by the decoder */
     p_pic->p->p_pixels = p_vout->p_sys->p_video;
-    p_pic->p->i_pixel_bytes = p_vout->p_sys->i_bytes_per_pixel;
+    p_pic->p->i_pixel_pitch = p_vout->p_sys->i_bytes_per_pixel;
     p_pic->p->i_lines = p_vout->p_sys->var_info.yres;
 
     if( p_vout->p_sys->var_info.xres_virtual )
     {
-        p_pic->p->b_margin = 1;
-        p_pic->p->b_hidden = 1;
         p_pic->p->i_pitch = p_vout->p_sys->var_info.xres_virtual
                              * p_vout->p_sys->i_bytes_per_pixel;
-        p_pic->p->i_visible_bytes = p_vout->p_sys->var_info.xres
-                                     * p_vout->p_sys->i_bytes_per_pixel;
     }
     else
     {
-        p_pic->p->b_margin = 0;
         p_pic->p->i_pitch = p_vout->p_sys->var_info.xres
                              * p_vout->p_sys->i_bytes_per_pixel;
     }
+
+    p_pic->p->i_visible_pitch = p_vout->p_sys->var_info.xres
+                                 * p_vout->p_sys->i_bytes_per_pixel;
 
     p_pic->i_planes = 1;
 
@@ -337,7 +335,7 @@ static int vout_Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES++;
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************

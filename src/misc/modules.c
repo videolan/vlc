@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.73 2002/07/22 22:19:49 sam Exp $
+ * $Id: modules.c,v 1.74 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -479,7 +479,7 @@ module_t * __module_Need( vlc_object_t *p_this, int i_capability,
 
             case MODULE_CAPABILITY_DECODER:
                 i_ret = p_tmp->p_module->p_functions->dec.functions.
-                              dec.pf_probe( (u8 *)p_data );
+                              dec.pf_probe( (vlc_fourcc_t *)p_data );
                 break;
 
             case MODULE_CAPABILITY_INTF:

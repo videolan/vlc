@@ -80,6 +80,7 @@ install: build
 	# install development files
 	mv debian/vlc/usr/bin/vlc-config debian/libvlc0-dev/usr/bin/
 	mv debian/vlc/usr/lib/*.a debian/libvlc0-dev/usr/lib/
+#	mv debian/vlc/usr/lib/vlc/*.a debian/libvlc0-dev/usr/lib/vlc/
 	mv debian/vlc/usr/include/vlc/* debian/libvlc0-dev/usr/include/vlc/
 	ln -s vlc debian/libvlc0-dev/usr/share/doc/libvlc0-dev
 

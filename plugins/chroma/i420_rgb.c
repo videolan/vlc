@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.9 2002/06/01 12:31:58 sam Exp $
+ * $Id: i420_rgb.c,v 1.10 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -105,26 +105,26 @@ static int chroma_Init( vout_thread_t *p_vout )
 
     switch( p_vout->render.i_chroma )
     {
-        case FOURCC_YV12:
-        case FOURCC_I420:
-        case FOURCC_IYUV:
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
             switch( p_vout->output.i_chroma )
             {
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
-                case FOURCC_RGB2:
+                case VLC_FOURCC('R','G','B','2'):
                     p_vout->chroma.pf_convert = _M( I420_RGB8 );
                     break;
 #endif
-                case FOURCC_RV15:
+                case VLC_FOURCC('R','V','1','5'):
                     p_vout->chroma.pf_convert = _M( I420_RGB15 );
                     break;
 
-                case FOURCC_RV16:
+                case VLC_FOURCC('R','V','1','6'):
                     p_vout->chroma.pf_convert = _M( I420_RGB16 );
                     break;
 
-                case FOURCC_RV24:
-                case FOURCC_RV32:
+                case VLC_FOURCC('R','V','2','4'):
+                case VLC_FOURCC('R','V','3','2'):
                     p_vout->chroma.pf_convert = _M( I420_RGB32 );
                     break;
 
@@ -146,18 +146,18 @@ static int chroma_Init( vout_thread_t *p_vout )
     switch( p_vout->output.i_chroma )
     {
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
-        case FOURCC_RGB2:
+        case VLC_FOURCC('R','G','B','2'):
             p_vout->chroma.p_sys->p_buffer = malloc( VOUT_MAX_WIDTH );
             break;
 #endif
 
-        case FOURCC_RV15:
-        case FOURCC_RV16:
+        case VLC_FOURCC('R','V','1','5'):
+        case VLC_FOURCC('R','V','1','6'):
             p_vout->chroma.p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 2 );
             break;
 
-        case FOURCC_RV24:
-        case FOURCC_RV32:
+        case VLC_FOURCC('R','V','2','4'):
+        case VLC_FOURCC('R','V','3','2'):
             p_vout->chroma.p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 4 );
             break;
 
@@ -173,7 +173,8 @@ static int chroma_Init( vout_thread_t *p_vout )
     }
 
     p_vout->chroma.p_sys->p_offset = malloc( p_vout->output.i_width
-                    * ( ( p_vout->output.i_chroma == FOURCC_RGB2 ) ? 2 : 1 )
+                    * ( ( p_vout->output.i_chroma
+                           == VLC_FOURCC('R','G','B','2') ) ? 2 : 1 )
                     * sizeof( int ) );
     if( p_vout->chroma.p_sys->p_offset == NULL )
     {
@@ -185,11 +186,11 @@ static int chroma_Init( vout_thread_t *p_vout )
 #if defined (MODULE_NAME_IS_chroma_i420_rgb)
     switch( p_vout->output.i_chroma )
     {
-    case FOURCC_RGB2:
+    case VLC_FOURCC('R','G','B','2'):
         i_tables_size = sizeof( u8 ) * PALETTE_TABLE_SIZE;
         break;
-    case FOURCC_RV15:
-    case FOURCC_RV16:
+    case VLC_FOURCC('R','V','1','5'):
+    case VLC_FOURCC('R','V','1','6'):
         i_tables_size = sizeof( u16 ) * RGB_TABLE_SIZE;
         break;
     default: /* RV24, RV32 */
@@ -265,13 +266,13 @@ static void SetYUV( vout_thread_t *p_vout )
     /* Color: build red, green and blue tables */
     switch( p_vout->output.i_chroma )
     {
-    case FOURCC_RGB2:
+    case VLC_FOURCC('R','G','B','2'):
         p_vout->chroma.p_sys->p_rgb8 = (u8 *)p_vout->chroma.p_sys->p_base;
         Set8bppPalette( p_vout, p_vout->chroma.p_sys->p_rgb8 );
         break;
 
-    case FOURCC_RV15:
-    case FOURCC_RV16:
+    case VLC_FOURCC('R','V','1','5'):
+    case VLC_FOURCC('R','V','1','6'):
         p_vout->chroma.p_sys->p_rgb16 = (u16 *)p_vout->chroma.p_sys->p_base;
         for( i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
@@ -296,8 +297,8 @@ static void SetYUV( vout_thread_t *p_vout )
         }
         break;
 
-    case FOURCC_RV24:
-    case FOURCC_RV32:
+    case VLC_FOURCC('R','V','2','4'):
+    case VLC_FOURCC('R','V','3','2'):
         p_vout->chroma.p_sys->p_rgb32 = (u32 *)p_vout->chroma.p_sys->p_base;
         for( i_index = 0; i_index < RED_MARGIN; i_index++ )
         {

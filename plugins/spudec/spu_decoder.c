@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.29 2002/06/27 19:46:32 sam Exp $
+ * $Id: spu_decoder.c,v 1.30 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -45,7 +45,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe ( u8 * );
+static int  decoder_Probe ( vlc_fourcc_t * );
 static int  decoder_Run   ( decoder_fifo_t * );
 static int  InitThread    ( spudec_thread_t * );
 static void EndThread     ( spudec_thread_t * );
@@ -90,9 +90,9 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( u8 *pi_type )
+static int decoder_Probe( vlc_fourcc_t *pi_type )
 {
-    return ( *pi_type == DVD_SPU_ES ) ? 0 : -1;
+    return ( *pi_type == VLC_FOURCC('s','p','u',' ') ) ? 0 : -1;
 }
 
 /*****************************************************************************
@@ -862,9 +862,9 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
     switch( p_vout->output.i_chroma )
     {
     /* I420 target, no scaling */
-    case FOURCC_I420:
-    case FOURCC_IYUV:
-    case FOURCC_YV12:
+    case VLC_FOURCC('I','4','2','0'):
+    case VLC_FOURCC('I','Y','U','V'):
+    case VLC_FOURCC('Y','V','1','2'):
 
     p_dest = p_pic->Y_PIXELS + p_spu->i_x + p_spu->i_width
               + p_pic->Y_PITCH * ( p_spu->i_y + p_spu->i_height );
@@ -916,7 +916,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
     break;
 
     /* RV16 target, scaling */
-    case FOURCC_RV16:
+    case VLC_FOURCC('R','V','1','6'):
 
     /* XXX: this is a COMPLETE HACK, memcpy is unable to do u16s anyway */
     /* FIXME: get this from the DVD */
@@ -1030,8 +1030,8 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
     break;
 
     /* RV32 target, scaling */
-    case FOURCC_RV24:
-    case FOURCC_RV32:
+    case VLC_FOURCC('R','V','2','4'):
+    case VLC_FOURCC('R','V','3','2'):
 
     /* XXX: this is a COMPLETE HACK, memcpy is unable to do u32s anyway */
     /* FIXME: get this from the DVD */
@@ -1143,7 +1143,7 @@ static void RenderSPU( vout_thread_t *p_vout, picture_t *p_pic,
     break;
 
     /* NVidia overlay, no scaling */
-    case FOURCC_YUY2:
+    case VLC_FOURCC('Y','U','Y','2'):
 
     p_dest = p_pic->p->p_pixels +
               (p_spu->i_x + p_spu->i_width +

@@ -1787,7 +1787,7 @@ dnl
 dnl  Create the vlc-config script
 dnl
 libvlc_LDFLAGS="${vlc_LDFLAGS} ${builtins_LDFLAGS}"
-for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} `eval echo '$'{${i}_LDFLAGS}`" ; done
+for i in ${BUILTINS} ; do libvlc_LDFLAGS="${libvlc_LDFLAGS} @libdir@/${i}.a `eval echo '$'{${i}_LDFLAGS}`" ; done
 AC_SUBST(libvlc_LDFLAGS)
 
 dnl 

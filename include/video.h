@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.55 2002/07/20 18:01:41 sam Exp $
+ * $Id: video.h,v 1.56 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -35,14 +35,10 @@ typedef struct plane_t
     int i_pitch;             /* Number of bytes in a line, including margins */
 
     /* Size of a macropixel, defaults to 1 */
-    int i_pixel_bytes;
-
-    /* Is there a margin ? defaults to no */
-    vlc_bool_t b_margin;
+    int i_pixel_pitch;
 
     /* Variables used for pictures with margins */
-    int i_visible_bytes;                 /* How many real pixels are there ? */
-    vlc_bool_t b_hidden;          /* Are we allowed to write to the margin ? */
+    int i_visible_pitch;              /* How many visible pixels are there ? */
 
 } plane_t;
 
@@ -99,10 +95,10 @@ struct picture_heap_t
 
     /* Picture static properties - those properties are fixed at initialization
      * and should NOT be modified */
-    int i_width;                                            /* picture width */
-    int i_height;                                          /* picture height */
-    u32 i_chroma;                                          /* picture chroma */
-    int i_aspect;                                            /* aspect ratio */
+    int          i_width;                                   /* picture width */
+    int          i_height;                                 /* picture height */
+    vlc_fourcc_t i_chroma;                                 /* picture chroma */
+    int          i_aspect;                                   /* aspect ratio */
 
     /* Real pictures */
     picture_t*      pp_picture[VOUT_MAX_PICTURES];               /* pictures */
@@ -139,152 +135,6 @@ struct picture_heap_t
 #define READY_PICTURE           4                       /* ready for display */
 #define DISPLAYED_PICTURE       5            /* been displayed but is linked */
 #define DESTROYED_PICTURE       6              /* allocated but no more used */
-
-/*****************************************************************************
- * Codes used to describe picture format - see http://www.webartz.com/fourcc/
- *****************************************************************************/
-#define VLC_FOURCC( a, b, c, d ) \
-    ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
-
-#define VLC_TWOCC( a, b ) \
-    ( (u16)(a) | ( (u16)(b) << 8 ) )
-
-/* AVI stuff */
-#define FOURCC_RIFF         VLC_FOURCC('R','I','F','F')
-#define FOURCC_LIST         VLC_FOURCC('L','I','S','T')
-#define FOURCC_JUNK         VLC_FOURCC('J','U','N','K')
-#define FOURCC_AVI          VLC_FOURCC('A','V','I',' ')
-#define FOURCC_WAVE         VLC_FOURCC('W','A','V','E')
-
-#define FOURCC_avih         VLC_FOURCC('a','v','i','h')
-#define FOURCC_hdrl         VLC_FOURCC('h','d','r','l')
-#define FOURCC_movi         VLC_FOURCC('m','o','v','i')
-#define FOURCC_idx1         VLC_FOURCC('i','d','x','1')
-
-#define FOURCC_strl         VLC_FOURCC('s','t','r','l')
-#define FOURCC_strh         VLC_FOURCC('s','t','r','h')
-#define FOURCC_strf         VLC_FOURCC('s','t','r','f')
-#define FOURCC_strd         VLC_FOURCC('s','t','r','d')
-
-#define FOURCC_rec          VLC_FOURCC('r','e','c',' ')
-#define FOURCC_auds         VLC_FOURCC('a','u','d','s')
-#define FOURCC_vids         VLC_FOURCC('v','i','d','s')
-
-#define TWOCC_wb            VLC_TWOCC('w','b')
-#define TWOCC_db            VLC_TWOCC('d','b')
-#define TWOCC_dc            VLC_TWOCC('d','c')
-#define TWOCC_pc            VLC_TWOCC('p','c')
-
-/* MPEG4 codec */
-#define FOURCC_DIVX         VLC_FOURCC('D','I','V','X')
-#define FOURCC_divx         VLC_FOURCC('d','i','v','x')
-#define FOURCC_DIV1         VLC_FOURCC('D','I','V','1')
-#define FOURCC_div1         VLC_FOURCC('d','i','v','1')
-#define FOURCC_MP4S         VLC_FOURCC('M','P','4','S')
-#define FOURCC_mp4s         VLC_FOURCC('m','p','4','s')
-#define FOURCC_M4S2         VLC_FOURCC('M','4','S','2')
-#define FOURCC_m4s2         VLC_FOURCC('m','4','s','2')
-#define FOURCC_xvid         VLC_FOURCC('x','v','i','d')
-#define FOURCC_XVID         VLC_FOURCC('X','V','I','D')
-#define FOURCC_XviD         VLC_FOURCC('X','v','i','D')
-#define FOURCC_DX50         VLC_FOURCC('D','X','5','0')
-#define FOURCC_mp4v         VLC_FOURCC('m','p','4','v')
-#define FOURCC_4            VLC_FOURCC( 4,  0,  0,  0 )
- 
-/* MSMPEG4 v2 */
-#define FOURCC_MPG4         VLC_FOURCC('M','P','G','4')
-#define FOURCC_mpg4         VLC_FOURCC('m','p','g','4')
-#define FOURCC_DIV2         VLC_FOURCC('D','I','V','2')
-#define FOURCC_div2         VLC_FOURCC('d','i','v','2')
-#define FOURCC_MP42         VLC_FOURCC('M','P','4','2')
-#define FOURCC_mp42         VLC_FOURCC('m','p','4','2')
-
-/* MSMPEG4 v3 / M$ mpeg4 v3 */
-#define FOURCC_MPG3         VLC_FOURCC('M','P','G','3')
-#define FOURCC_mpg3         VLC_FOURCC('m','p','g','3')
-#define FOURCC_div3         VLC_FOURCC('d','i','v','3')
-#define FOURCC_MP43         VLC_FOURCC('M','P','4','3')
-#define FOURCC_mp43         VLC_FOURCC('m','p','4','3')
-
-/* DivX 3.20 */
-#define FOURCC_DIV3         VLC_FOURCC('D','I','V','3')
-#define FOURCC_DIV4         VLC_FOURCC('D','I','V','4')
-#define FOURCC_div4         VLC_FOURCC('d','i','v','4')
-#define FOURCC_DIV5         VLC_FOURCC('D','I','V','5')
-#define FOURCC_div5         VLC_FOURCC('d','i','v','5')
-#define FOURCC_DIV6         VLC_FOURCC('D','I','V','6')
-#define FOURCC_div6         VLC_FOURCC('d','i','v','6')
-
-/* AngelPotion stuff */
-#define FOURCC_AP41         VLC_FOURCC('A','P','4','1')
-
-/* ?? */
-#define FOURCC_3IV1         VLC_FOURCC('3','I','V','1')
-/* H263 and H263i */
-#define FOURCC_H263         VLC_FOURCC('H','2','6','3')
-#define FOURCC_h263         VLC_FOURCC('h','2','6','3')
-#define FOURCC_U263         VLC_FOURCC('U','2','6','3')
-#define FOURCC_I263         VLC_FOURCC('I','2','6','3')
-#define FOURCC_i263         VLC_FOURCC('i','2','6','3')
-
-
-/* Packed RGB for 8bpp */
-#define FOURCC_BI_RGB       VLC_FOURCC( 0 , 0 , 0 , 0 )
-#define FOURCC_RGB2         VLC_FOURCC('R','G','B','2')
-
-/* Packed RGB for 16, 24, 32bpp */
-#define FOURCC_BI_BITFIELDS VLC_FOURCC( 0 , 0 , 0 , 3 )
-
-/* Packed RGB 15bpp, 0x1f, 0x7e0, 0xf800 */
-#define FOURCC_RV15         VLC_FOURCC('R','V','1','5')
-
-/* Packed RGB 16bpp, 0x1f, 0x3e0, 0x7c00 */
-#define FOURCC_RV16         VLC_FOURCC('R','V','1','6')
-
-/* Packed RGB 24bpp, 0xff, 0xff00, 0xff0000 */
-#define FOURCC_RV24         VLC_FOURCC('R','V','2','4')
-
-/* Packed RGB 32bpp, 0xff, 0xff00, 0xff0000 */
-#define FOURCC_RV32         VLC_FOURCC('R','V','3','2')
-
-/* Planar YUV 4:2:0, Y:U:V */
-#define FOURCC_I420         VLC_FOURCC('I','4','2','0')
-#define FOURCC_IYUV         VLC_FOURCC('I','Y','U','V')
-
-/* Planar YUV 4:2:0, Y:V:U */
-#define FOURCC_YV12         VLC_FOURCC('Y','V','1','2')
-
-/* Packed YUV 4:2:2, U:Y:V:Y, interlaced */
-#define FOURCC_IUYV         VLC_FOURCC('I','U','Y','V')
-
-/* Packed YUV 4:2:2, U:Y:V:Y */
-#define FOURCC_UYVY         VLC_FOURCC('U','Y','V','Y')
-#define FOURCC_UYNV         VLC_FOURCC('U','Y','N','V')
-#define FOURCC_Y422         VLC_FOURCC('Y','4','2','2')
-
-/* Packed YUV 4:2:2, U:Y:V:Y, reverted */
-#define FOURCC_cyuv         VLC_FOURCC('c','y','u','v')
-
-/* Packed YUV 4:2:2, Y:U:Y:V */
-#define FOURCC_YUY2         VLC_FOURCC('Y','U','Y','2')
-#define FOURCC_YUNV         VLC_FOURCC('Y','U','N','V')
-
-/* Packed YUV 4:2:2, Y:V:Y:U */
-#define FOURCC_YVYU         VLC_FOURCC('Y','V','Y','U')
-
-/* Packed YUV 2:1:1, Y:U:Y:V */
-#define FOURCC_Y211         VLC_FOURCC('Y','2','1','1')
-
-/* Custom formats which we use but which don't exist in the fourcc database */
-
-/* Planar Y, packed UV, from Matrox */
-#define FOURCC_YMGA         VLC_FOURCC('Y','M','G','A')
-
-/* Planar 4:2:2, Y:U:V */
-#define FOURCC_I422         VLC_FOURCC('I','4','2','2')
-
-/* Planar 4:4:4, Y:U:V */
-#define FOURCC_I444         VLC_FOURCC('I','4','4','4')
 
 /*****************************************************************************
  * Shortcuts to access image components

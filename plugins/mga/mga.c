@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.19 2002/07/20 18:01:43 sam Exp $
+ * $Id: mga.c,v 1.20 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -207,7 +207,7 @@ static int vout_Init( vout_thread_t *p_vout )
 
     /* Assume we only do YMGA for the moment. XXX: mga_vid calls this
      * YV12, but it's actually some strange format with packed UV. */
-    p_vout->output.i_chroma = FOURCC_YMGA;
+    p_vout->output.i_chroma = VLC_FOURCC('Y','M','G','A');
     p_vout->p_sys->mga.format = MGA_VID_FORMAT_YV12;
     
     if( ioctl(p_vout->p_sys->i_fd, MGA_VID_CONFIG, &p_vout->p_sys->mga) )
@@ -359,29 +359,20 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic->Y_PIXELS = p_pic->p_data;
     p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
     p_pic->p[Y_PLANE].i_pitch = CEIL32( p_vout->output.i_width );
-    p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-
-    if( p_pic->p[Y_PLANE].i_pitch == p_vout->output.i_width )
-    {
-        p_pic->p[Y_PLANE].b_margin = 0;
-    }
-    else
-    {
-        /* FIXME: do something here */
-        p_pic->p[Y_PLANE].b_margin = 0;
-    }
+    p_pic->p[Y_PLANE].i_pixel_pitch = 1;
+    p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width;
 
     p_pic->U_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 2/4;
     p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
     p_pic->p[U_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
-    p_pic->p[U_PLANE].i_pixel_bytes = 1;
-    p_pic->p[U_PLANE].b_margin = 0;
+    p_pic->p[U_PLANE].i_pixel_pitch = 1;
+    p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
     p_pic->V_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 3/4;
     p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
     p_pic->p[V_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
-    p_pic->p[V_PLANE].i_pixel_bytes = 1;
-    p_pic->p[V_PLANE].b_margin = 0;
+    p_pic->p[V_PLANE].i_pixel_pitch = 1;
+    p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
 
     p_pic->p_sys->i_frame = I_OUTPUTPICTURES;
 

@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.57 2002/07/20 18:01:41 sam Exp $
+ * $Id: modules.h,v 1.58 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -283,7 +283,7 @@ typedef struct function_list_t
         /* Decoder plugins */
         struct
         {
-            int  ( * pf_probe)( u8 * p_es );
+            int  ( * pf_probe)( vlc_fourcc_t * p_es );
             int  ( * pf_run ) ( decoder_fifo_t * p_fifo );
         } dec;
 

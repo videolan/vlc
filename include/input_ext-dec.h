@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_ext-dec.h,v 1.63 2002/07/21 15:18:29 fenrir Exp $
+ * $Id: input_ext-dec.h,v 1.64 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -25,7 +25,9 @@
 #ifndef _VLC_INPUT_EXT_DEC_H
 #define _VLC_INPUT_EXT_DEC_H 1
 
-/* ES streams types - see ISO/IEC 13818-1 table 2-29 numbers */
+/* ES streams types - see ISO/IEC 13818-1 table 2-29 numbers.
+ * these values are used in src/input/mpeg_system.c, and in
+ * the following plugins: mpeg_ts, mpeg_ts_dvbpsi, input_satellite. */
 #define MPEG1_VIDEO_ES      0x01
 #define MPEG2_VIDEO_ES      0x02
 #define MPEG1_AUDIO_ES      0x03
@@ -34,16 +36,6 @@
 /* These ones might violate the norm : */
 #define DVD_SPU_ES          0x82
 #define LPCM_AUDIO_ES       0x83
-#define MSMPEG4v1_VIDEO_ES  0x40
-#define MSMPEG4v2_VIDEO_ES  0x41
-#define MSMPEG4v3_VIDEO_ES  0x42
-#define MPEG4_VIDEO_ES      0x50
-#define H263_VIDEO_ES       0x60
-#define I263_VIDEO_ES       0x61
-#define SVQ1_VIDEO_ES       0x62
-#define CINEPAK_VIDEO_ES       0x65
-
-#define UNKNOWN_ES          0xFF
 
 /* Structures exported to the decoders */
 
@@ -123,7 +115,7 @@ struct decoder_fifo_t
 
     /* Standard pointers given to the decoders as a toolbox. */
     u16                 i_id;
-    u8                  i_type;
+    vlc_fourcc_t        i_fourcc;
     void *              p_demux_data;
     stream_ctrl_t *     p_stream_ctrl;
 };

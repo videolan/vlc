@@ -2,7 +2,7 @@
  * avi.h : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.h,v 1.9 2002/07/15 19:33:02 fenrir Exp $
+ * $Id: avi.h,v 1.10 2002/07/23 00:39:16 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -39,6 +39,84 @@
 #define AVIIF_FIXKEYFRAME   0x00001000L /* invented; used to say that 
                                            the keyframe flag isn't a true flag
                                            but have to be verified */
+
+/* AVI stuff */
+#define FOURCC_RIFF         VLC_FOURCC('R','I','F','F')
+#define FOURCC_LIST         VLC_FOURCC('L','I','S','T')
+#define FOURCC_JUNK         VLC_FOURCC('J','U','N','K')
+#define FOURCC_AVI          VLC_FOURCC('A','V','I',' ')
+#define FOURCC_WAVE         VLC_FOURCC('W','A','V','E')
+
+#define FOURCC_avih         VLC_FOURCC('a','v','i','h')
+#define FOURCC_hdrl         VLC_FOURCC('h','d','r','l')
+#define FOURCC_movi         VLC_FOURCC('m','o','v','i')
+#define FOURCC_idx1         VLC_FOURCC('i','d','x','1')
+
+#define FOURCC_strl         VLC_FOURCC('s','t','r','l')
+#define FOURCC_strh         VLC_FOURCC('s','t','r','h')
+#define FOURCC_strf         VLC_FOURCC('s','t','r','f')
+#define FOURCC_strd         VLC_FOURCC('s','t','r','d')
+
+#define FOURCC_rec          VLC_FOURCC('r','e','c',' ')
+#define FOURCC_auds         VLC_FOURCC('a','u','d','s')
+#define FOURCC_vids         VLC_FOURCC('v','i','d','s')
+
+#define TWOCC_wb            VLC_TWOCC('w','b')
+#define TWOCC_db            VLC_TWOCC('d','b')
+#define TWOCC_dc            VLC_TWOCC('d','c')
+#define TWOCC_pc            VLC_TWOCC('p','c')
+
+/* MPEG4 video */
+#define FOURCC_DIVX         VLC_FOURCC('D','I','V','X')
+#define FOURCC_divx         VLC_FOURCC('d','i','v','x')
+#define FOURCC_DIV1         VLC_FOURCC('D','I','V','1')
+#define FOURCC_div1         VLC_FOURCC('d','i','v','1')
+#define FOURCC_MP4S         VLC_FOURCC('M','P','4','S')
+#define FOURCC_mp4s         VLC_FOURCC('m','p','4','s')
+#define FOURCC_M4S2         VLC_FOURCC('M','4','S','2')
+#define FOURCC_m4s2         VLC_FOURCC('m','4','s','2')
+#define FOURCC_xvid         VLC_FOURCC('x','v','i','d')
+#define FOURCC_XVID         VLC_FOURCC('X','V','I','D')
+#define FOURCC_XviD         VLC_FOURCC('X','v','i','D')
+#define FOURCC_DX50         VLC_FOURCC('D','X','5','0')
+#define FOURCC_mp4v         VLC_FOURCC('m','p','4','v')
+#define FOURCC_4            VLC_FOURCC( 4,  0,  0,  0 )
+
+/* MSMPEG4 v2 */
+#define FOURCC_MPG4         VLC_FOURCC('M','P','G','4')
+#define FOURCC_mpg4         VLC_FOURCC('m','p','g','4')
+#define FOURCC_DIV2         VLC_FOURCC('D','I','V','2')
+#define FOURCC_div2         VLC_FOURCC('d','i','v','2')
+#define FOURCC_MP42         VLC_FOURCC('M','P','4','2')
+#define FOURCC_mp42         VLC_FOURCC('m','p','4','2')
+
+/* MSMPEG4 v3 / M$ mpeg4 v3 */
+#define FOURCC_MPG3         VLC_FOURCC('M','P','G','3')
+#define FOURCC_mpg3         VLC_FOURCC('m','p','g','3')
+#define FOURCC_div3         VLC_FOURCC('d','i','v','3')
+#define FOURCC_MP43         VLC_FOURCC('M','P','4','3')
+#define FOURCC_mp43         VLC_FOURCC('m','p','4','3')
+
+/* DivX 3.20 */
+#define FOURCC_DIV3         VLC_FOURCC('D','I','V','3')
+#define FOURCC_DIV4         VLC_FOURCC('D','I','V','4')
+#define FOURCC_div4         VLC_FOURCC('d','i','v','4')
+#define FOURCC_DIV5         VLC_FOURCC('D','I','V','5')
+#define FOURCC_div5         VLC_FOURCC('d','i','v','5')
+#define FOURCC_DIV6         VLC_FOURCC('D','I','V','6')
+#define FOURCC_div6         VLC_FOURCC('d','i','v','6')
+
+/* AngelPotion stuff */
+#define FOURCC_AP41         VLC_FOURCC('A','P','4','1')
+
+/* ?? */
+#define FOURCC_3IV1         VLC_FOURCC('3','I','V','1')
+/* H263 and H263i */        
+#define FOURCC_H263         VLC_FOURCC('H','2','6','3')
+#define FOURCC_h263         VLC_FOURCC('h','2','6','3')
+#define FOURCC_U263         VLC_FOURCC('U','2','6','3')
+#define FOURCC_I263         VLC_FOURCC('I','2','6','3')
+#define FOURCC_i263         VLC_FOURCC('i','2','6','3')
 
 /* Sound formats */
 #define WAVE_FORMAT_UNKNOWN         0x0000
@@ -182,82 +260,4 @@ typedef struct demux_data_avi_file_s
     AVIStreamInfo_t *p_info_audio;
 
 } demux_data_avi_file_t;
-
-/* current codec */
-static struct
-{
-    int i_fourcc;
-    int i_vlc_codec;
-    char *psz_name;
-
-} AVI_VideoCodecs [] = {
-    { FOURCC_DIV1,  MSMPEG4v1_VIDEO_ES, "MS MPEG-4 v1" },
-    { FOURCC_div1,  MSMPEG4v1_VIDEO_ES, "MS MPEG-4 v1" },
-    { FOURCC_MPG4,  MSMPEG4v1_VIDEO_ES, "MS MPEG-4 v1" },
-    { FOURCC_mpg4,  MSMPEG4v1_VIDEO_ES, "MS MPEG-4 v1" },
-
-    { FOURCC_DIV2,  MSMPEG4v2_VIDEO_ES, "MS MPEG-4 v2" },
-    { FOURCC_div2,  MSMPEG4v2_VIDEO_ES, "MS MPEG-4 v2" },
-    { FOURCC_MP42,  MSMPEG4v2_VIDEO_ES, "MS MPEG-4 v2" },
-    { FOURCC_mp42,  MSMPEG4v2_VIDEO_ES, "MS MPEG-4 v2" },
-    
-    { FOURCC_MPG3,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_mpg3,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_div3,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_MP43,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_mp43,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_DIV3,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_DIV4,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_div4,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_DIV5,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_div5,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_DIV6,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_div6,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_AP41,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" },
-    { FOURCC_3IV1,  MSMPEG4v3_VIDEO_ES, "MS MPEG-4 v3" }, /* wrong */
-
-    { FOURCC_DIVX,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_divx,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_MP4S,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_mp4s,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_M4S2,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_m4s2,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_xvid,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_XVID,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_XviD,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_DX50,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_mp4v,  MPEG4_VIDEO_ES, "MPEG-4" },
-    { FOURCC_4,     MPEG4_VIDEO_ES, "MPEG-4" },
-    
-    { FOURCC_H263,  H263_VIDEO_ES, "H263" },
-    { FOURCC_h263,  H263_VIDEO_ES, "H263" },
-    { FOURCC_U263,  H263_VIDEO_ES, "H263" },
-
-    { FOURCC_I263,  I263_VIDEO_ES, "H263.I" },
-    { FOURCC_i263,  I263_VIDEO_ES, "H263.I" },
-
-    { 0,            UNKNOWN_ES,     "Unknown" }
-};
-
-static int AVI_GetVideoCodec( int i_fourcc,
-                              int *pi_vlc_codec,
-                              char **ppsz_name )
-{
-    int i_codec;
-
-    for( i_codec = 0; ; i_codec++ )
-    {
-        if( ( AVI_VideoCodecs[i_codec].i_fourcc == i_fourcc )||
-            ( AVI_VideoCodecs[i_codec].i_fourcc == 0 ) )
-        {
-            break;
-        }
-    }
-    if( pi_vlc_codec )
-        *pi_vlc_codec = AVI_VideoCodecs[i_codec].i_vlc_codec;
-    if( ppsz_name )
-        *ppsz_name = AVI_VideoCodecs[i_codec].psz_name;
-
-    return( AVI_VideoCodecs[i_codec].i_fourcc == 0 ? 0 : 1 );
-}                        
 

@@ -2,7 +2,7 @@
  * libioRIFF.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libioRIFF.c,v 1.12 2002/07/02 17:54:49 fenrir Exp $
+ * $Id: libioRIFF.c,v 1.13 2002/07/23 00:39:16 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -355,7 +355,8 @@ int   RIFF_TestFileHeader( input_thread_t * p_input, riffchunk_t ** pp_riff, u32
     {
         return( -1 );
     }
-    if( ( (*pp_riff)->i_id != FOURCC_RIFF )||( (*pp_riff)->i_type != i_type ) )
+    if( (*pp_riff)->i_id != VLC_FOURCC('R','I','F','F')
+         || (*pp_riff)->i_type != i_type )
     {
         free( *pp_riff );
         return( -1 );
@@ -414,7 +415,8 @@ int   RIFF_FindListChunk( input_thread_t *p_input, riffchunk_t **pp_riff, riffch
         {
             free( *pp_riff );
         }
-        if( RIFF_FindChunk( p_input, FOURCC_LIST, p_rifffather) != 0 )
+        if( RIFF_FindChunk( p_input,
+                            VLC_FOURCC('L','I','S','T'), p_rifffather ) != 0 )
         {
             return( -1 );
         }

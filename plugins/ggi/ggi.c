@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.23 2002/07/20 18:01:42 sam Exp $
+ * $Id: ggi.c,v 1.24 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -163,17 +163,17 @@ int vout_Init( vout_thread_t *p_vout )
     switch( p_vout->p_sys->i_bits_per_pixel )
     {
         case 8:
-            p_vout->output.i_chroma = FOURCC_RGB2;
+            p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
             p_vout->output.pf_setpalette = SetPalette;
             break;
         case 15:
-            p_vout->output.i_chroma = FOURCC_RV15; break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5'); break;
         case 16:
-            p_vout->output.i_chroma = FOURCC_RV16; break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6'); break;
         case 24:
-            p_vout->output.i_chroma = FOURCC_RV24; break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4'); break;
         case 32:
-            p_vout->output.i_chroma = FOURCC_RV32; break;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2'); break;
         default:
             msg_Err( p_vout, "unknown screen depth %i",
                      p_vout->p_sys->i_bits_per_pixel );
@@ -206,23 +206,21 @@ int vout_Init( vout_thread_t *p_vout )
      * directly by the decoder */
     p_vout->p_sys->i_index = 0;
     p_pic->p->p_pixels = p_b[ 0 ]->write;
-    p_pic->p->i_pixel_bytes = p_b[ 0 ]->buffer.plb.pixelformat->size / 8;
+    p_pic->p->i_pixel_pitch = p_b[ 0 ]->buffer.plb.pixelformat->size / 8;
     p_pic->p->i_lines = p_vout->p_sys->mode.visible.y;
+
+    p_pic->p->i_pitch = p_b[ 0 ]->buffer.plb.stride;
 
     if( p_b[ 0 ]->buffer.plb.pixelformat->size / 8
          * p_vout->p_sys->mode.visible.x
         != p_b[ 0 ]->buffer.plb.stride )
     {
-        p_pic->p->b_margin = 1;
-        p_pic->p->b_hidden = 1;
-        p_pic->p->i_pitch = p_b[ 0 ]->buffer.plb.stride;
-        p_pic->p->i_visible_bytes = p_b[ 0 ]->buffer.plb.pixelformat->size
+        p_pic->p->i_visible_pitch = p_b[ 0 ]->buffer.plb.pixelformat->size
                                      / 8 * p_vout->p_sys->mode.visible.x;
     }
     else
     {
-        p_pic->p->b_margin = 0;
-        p_pic->p->i_pitch = p_b[ 0 ]->buffer.plb.stride;
+        p_pic->p->i_visible_pitch = p_b[ 0 ]->buffer.plb.stride;
     }
 
     p_pic->i_planes = 1;

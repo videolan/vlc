@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.18 2002/07/21 15:07:39 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.19 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -49,7 +49,7 @@
 /*
  * Local prototypes
  */
-static int      decoder_Probe   ( u8 * );
+static int      decoder_Probe   ( vlc_fourcc_t * );
 static int      decoder_Run     ( decoder_fifo_t * );
 static int      InitThread      ( videodec_thread_t * );
 static void     EndThread       ( videodec_thread_t * );
@@ -113,7 +113,7 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( u8 *pi_type )
+static int decoder_Probe( vlc_fourcc_t *pi_type )
 {
     return( ffmpeg_GetFfmpegCodec( *pi_type, NULL, NULL ) ? 0 : -1 );
 }
@@ -290,9 +290,9 @@ static int i_ffmpeg_PixFmtToChroma[] =
    PIX_FMT_RGB24, PIX_FMT_BGR24, PIX_FMT_YUV422P, 
    PIX_FMT_YUV444P, PIX_FMT_YUV410P */
 
-    0, FOURCC_I420, FOURCC_I420, 
-    FOURCC_RV24, 0, FOURCC_Y422, 
-    FOURCC_I444, 0 
+    0, VLC_FOURCC('I','4','2','0'), VLC_FOURCC('I','4','2','0'), 
+    VLC_FOURCC('R','V','2','4'), 0, VLC_FOURCC('Y','4','2','2'), 
+    VLC_FOURCC('I','4','4','4'), 0 
 };
 
 static inline u32 ffmpeg_PixFmtToChroma( int i_ffmpegchroma )
@@ -335,7 +335,8 @@ static int ffmpeg_CheckVout( vout_thread_t *p_vout,
     }
     if( !i_chroma )
     {
-        i_chroma = FOURCC_I420; /* we will try to make conversion */
+        /* we will try to make conversion */
+        i_chroma = VLC_FOURCC('I','4','2','0');
     } 
     
     if( ( p_vout->render.i_width != i_width )||
@@ -369,7 +370,8 @@ static vout_thread_t *ffmpeg_CreateVout( videodec_thread_t *p_vdec,
 
     if( !i_chroma )
     {
-        i_chroma = FOURCC_I420; /* we make conversion if possible*/
+        /* we make conversion if possible*/
+        i_chroma = VLC_FOURCC('I','4','2','0');
         msg_Warn( p_vdec->p_fifo, "Internal chroma conversion (FIXME)");
         /* It's mainly for I410 -> I420 conversion that I've made,
            it's buggy and very slow */
@@ -697,7 +699,7 @@ static int InitThread( videodec_thread_t *p_vdec )
     {
         msg_Dbg( p_vdec->p_fifo, "library ffmpeg already initialized" );
     }
-    ffmpeg_GetFfmpegCodec( p_vdec->p_fifo->i_type,
+    ffmpeg_GetFfmpegCodec( p_vdec->p_fifo->i_fourcc,
                            &i_ffmpeg_codec,
                            &p_vdec->psz_namecodec );
     p_vdec->p_codec = 

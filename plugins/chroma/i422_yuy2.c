@@ -2,7 +2,7 @@
  * i422_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i422_yuy2.c,v 1.6 2002/06/01 12:31:58 sam Exp $
+ * $Id: i422_yuy2.c,v 1.7 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -105,34 +105,34 @@ static int chroma_Init( vout_thread_t *p_vout )
 
     switch( p_vout->render.i_chroma )
     {
-        case FOURCC_I422:
+        case VLC_FOURCC('I','4','2','2'):
             switch( p_vout->output.i_chroma )
             {
-                case FOURCC_YUY2:
-                case FOURCC_YUNV:
+                case VLC_FOURCC('Y','U','Y','2'):
+                case VLC_FOURCC('Y','U','N','V'):
                     p_vout->chroma.pf_convert = I422_YUY2;
                     break;
 
-                case FOURCC_YVYU:
+                case VLC_FOURCC('Y','V','Y','U'):
                     p_vout->chroma.pf_convert = I422_YVYU;
                     break;
 
-                case FOURCC_UYVY:
-                case FOURCC_UYNV:
-                case FOURCC_Y422:
+                case VLC_FOURCC('U','Y','V','Y'):
+                case VLC_FOURCC('U','Y','N','V'):
+                case VLC_FOURCC('Y','4','2','2'):
                     p_vout->chroma.pf_convert = I422_UYVY;
                     break;
 
-                case FOURCC_IUYV:
+                case VLC_FOURCC('I','U','Y','V'):
                     p_vout->chroma.pf_convert = I422_IUYV;
                     break;
 
-                case FOURCC_cyuv:
+                case VLC_FOURCC('c','y','u','v'):
                     p_vout->chroma.pf_convert = I422_cyuv;
                     break;
 
 #if defined (MODULE_NAME_IS_chroma_i422_yuy2)
-                case FOURCC_Y211:
+                case VLC_FOURCC('Y','2','1','1'):
                     p_vout->chroma.pf_convert = I422_Y211;
                     break;
 #endif

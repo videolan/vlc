@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.9 2002/06/01 16:45:34 sam Exp $
+ * $Id: i420_yuy2.c,v 1.10 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -114,36 +114,36 @@ static int chroma_Init( vout_thread_t *p_vout )
 
     switch( p_vout->render.i_chroma )
     {
-        case FOURCC_YV12:
-        case FOURCC_I420:
-        case FOURCC_IYUV:
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
             switch( p_vout->output.i_chroma )
             {
-                case FOURCC_YUY2:
-                case FOURCC_YUNV:
+                case VLC_FOURCC('Y','U','Y','2'):
+                case VLC_FOURCC('Y','U','N','V'):
                     p_vout->chroma.pf_convert = I420_YUY2;
                     break;
 
-                case FOURCC_YVYU:
+                case VLC_FOURCC('Y','V','Y','U'):
                     p_vout->chroma.pf_convert = I420_YVYU;
                     break;
 
-                case FOURCC_UYVY:
-                case FOURCC_UYNV:
-                case FOURCC_Y422:
+                case VLC_FOURCC('U','Y','V','Y'):
+                case VLC_FOURCC('U','Y','N','V'):
+                case VLC_FOURCC('Y','4','2','2'):
                     p_vout->chroma.pf_convert = I420_UYVY;
                     break;
 
-                case FOURCC_IUYV:
+                case VLC_FOURCC('I','U','Y','V'):
                     p_vout->chroma.pf_convert = I420_IUYV;
                     break;
 
-                case FOURCC_cyuv:
+                case VLC_FOURCC('c','y','u','v'):
                     p_vout->chroma.pf_convert = I420_cyuv;
                     break;
 
 #if defined (MODULE_NAME_IS_chroma_i420_yuy2)
-                case FOURCC_Y211:
+                case VLC_FOURCC('Y','2','1','1'):
                     p_vout->chroma.pf_convert = I420_Y211;
                     break;
 #endif
@@ -185,10 +185,10 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    const int i_source_margin = p_source->p->b_margin ?
-        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
-    const int i_dest_margin = p_dest->p->b_margin ?
-        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
+    const int i_source_margin = p_source->p->i_pitch
+                                 - p_source->p->i_visible_pitch;
+    const int i_dest_margin = p_dest->p->i_pitch
+                               - p_dest->p->i_visible_pitch;
 
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
@@ -230,10 +230,10 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    const int i_source_margin = p_source->p->b_margin ?
-        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
-    const int i_dest_margin = p_dest->p->b_margin ?
-        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
+    const int i_source_margin = p_source->p->i_pitch
+                                 - p_source->p->i_visible_pitch;
+    const int i_dest_margin = p_dest->p->i_pitch
+                               - p_dest->p->i_visible_pitch;
 
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
@@ -275,10 +275,10 @@ static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    const int i_source_margin = p_source->p->b_margin ?
-        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
-    const int i_dest_margin = p_dest->p->b_margin ?
-        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
+    const int i_source_margin = p_source->p->i_pitch
+                                 - p_source->p->i_visible_pitch;
+    const int i_dest_margin = p_dest->p->i_pitch
+                               - p_dest->p->i_visible_pitch;
 
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
@@ -332,10 +332,10 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    const int i_source_margin = p_source->p->b_margin ?
-        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
-    const int i_dest_margin = p_dest->p->b_margin ?
-        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
+    const int i_source_margin = p_source->p->i_pitch
+                                 - p_source->p->i_visible_pitch;
+    const int i_dest_margin = p_dest->p->i_pitch
+                               - p_dest->p->i_visible_pitch;
 
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {
@@ -378,10 +378,10 @@ static void I420_Y211( vout_thread_t *p_vout, picture_t *p_source,
 
     int i_x, i_y;
 
-    const int i_source_margin = p_source->p->b_margin ?
-        p_source->p->i_pitch - p_source->p->i_visible_bytes : 0;
-    const int i_dest_margin = p_dest->p->b_margin ?
-        p_dest->p->i_pitch - p_dest->p->i_visible_bytes : 0;
+    const int i_source_margin = p_source->p->i_pitch
+                                 - p_source->p->i_visible_pitch;
+    const int i_dest_margin = p_dest->p->i_pitch
+                               - p_dest->p->i_visible_pitch;
 
     for( i_y = p_vout->render.i_height / 2 ; i_y-- ; )
     {

@@ -2,7 +2,7 @@
  * crop.c : Crop video plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: crop.c,v 1.4 2002/07/20 18:01:42 sam Exp $
+ * $Id: crop.c,v 1.5 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -419,7 +419,7 @@ static void UpdateStats( vout_thread_t *p_vout, picture_t *p_pic )
     /* Determine where black borders are */
     switch( p_vout->output.i_chroma )
     {
-    case FOURCC_I420:
+    case VLC_FOURCC('I','4','2','0'):
         /* XXX: Do not laugh ! I know this is very naive. But it's just a
          *      proof of concept code snippet... */
         for( i = i_lines ; i-- ; )

@@ -2,7 +2,7 @@
  * cinepak.c: cinepak video decoder 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: cinepak.c,v 1.2 2002/07/21 18:47:22 fenrir Exp $
+ * $Id: cinepak.c,v 1.3 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -48,7 +48,7 @@
 /*
  * Local prototypes
  */
-static int      decoder_Probe   ( u8 * );
+static int      decoder_Probe   ( vlc_fourcc_t * );
 static int      decoder_Run     ( decoder_fifo_t * );
 static int      InitThread      ( videodec_thread_t * );
 static void     EndThread       ( videodec_thread_t * );
@@ -90,9 +90,9 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( u8 *pi_type )
+static int decoder_Probe( vlc_fourcc_t *pi_type )
 {
-    return( ( *pi_type == CINEPAK_VIDEO_ES ) ? 0 : -1 );
+    return( ( *pi_type == VLC_FOURCC('c','v','i','d') ) ? 0 : -1 );
 }
 
 /*****************************************************************************
@@ -273,7 +273,7 @@ static int cinepak_CheckVout( vout_thread_t *p_vout,
     
     if( ( p_vout->render.i_width != i_width )||
         ( p_vout->render.i_height != i_height )||
-        ( p_vout->render.i_chroma != FOURCC_I420 )||
+        ( p_vout->render.i_chroma != VLC_FOURCC('I','4','2','0') )||
         ( p_vout->render.i_aspect != VOUT_ASPECT_FACTOR * i_width / i_height) )
     {
         return( 0 );
@@ -333,7 +333,7 @@ static vout_thread_t *cinepak_CreateVout( videodec_thread_t *p_vdec,
         p_vout = vout_CreateThread( p_vdec->p_fifo,
                                     i_width,
                                     i_height,
-                                    FOURCC_I420,
+                                    VLC_FOURCC('I','4','2','0'),
                                     VOUT_ASPECT_FACTOR * i_width / i_height );
     }
 

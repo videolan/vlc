@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.39 2002/06/08 14:08:46 sam Exp $
+ * $Id: input_dec.c,v 1.40 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -45,25 +45,16 @@ static void             DeleteDecoderFifo( decoder_fifo_t * );
 decoder_fifo_t * input_RunDecoder( input_thread_t * p_input,
                                    es_descriptor_t * p_es )
 {
-    char * psz_plugin = NULL;
-
-    if( p_es->i_type == MPEG1_AUDIO_ES || p_es->i_type == MPEG2_AUDIO_ES )
-    {
-        psz_plugin = config_GetPsz( p_input, "mpeg-adec" );
-    }
-    if( p_es->i_type == AC3_AUDIO_ES )
-    {
-        psz_plugin = config_GetPsz( p_input, "ac3-adec" );
-    }
+    char * psz_plugin = config_GetPsz( p_input, "codec" );
 
     /* Get a suitable module */
     p_es->p_module = module_Need( p_input, MODULE_CAPABILITY_DECODER,
-                                  psz_plugin, (void *)&p_es->i_type );
+                                  psz_plugin, (void *)&p_es->i_fourcc );
     if( psz_plugin ) free( psz_plugin );
     if( p_es->p_module == NULL )
     {
-        msg_Err( p_input, "no suitable decoder module for type 0x%x",
-                          p_es->i_type );
+        msg_Err( p_input, "no suitable decoder module for fourcc `%4.4s'",
+                          (char*)&p_es->i_fourcc );
         return NULL;
     }
 
@@ -185,7 +176,7 @@ void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
     {
         es_descriptor_t * p_es = p_input->stream.pp_selected_es[i_es];
 
-        if( p_es->p_decoder_fifo != NULL && p_es->b_audio )
+        if( p_es->p_decoder_fifo != NULL && p_es->i_cat == AUDIO_ES )
         {
             for( i = 0; i < PADDING_PACKET_NUMBER; i++ )
             {
@@ -233,7 +224,7 @@ static decoder_fifo_t * CreateDecoderFifo( input_thread_t * p_input,
     p_es->p_decoder_fifo = p_fifo;
 
     p_fifo->i_id = p_es->i_id;
-    p_fifo->i_type = p_es->i_type;
+    p_fifo->i_fourcc = p_es->i_fourcc;
     p_fifo->p_demux_data = p_es->p_demux_data;
     
     p_fifo->p_stream_ctrl = &p_input->stream.control;
@@ -256,8 +247,8 @@ static void DeleteDecoderFifo( decoder_fifo_t * p_fifo )
 {
     vlc_object_detach_all( p_fifo );
 
-    msg_Dbg( p_fifo, "killing decoder for 0x%x, type 0x%x, %d PES in FIFO",
-                     p_fifo->i_id, p_fifo->i_type, p_fifo->i_depth );
+    msg_Dbg( p_fifo, "killing decoder for 0x%x, fourcc `%4.4s', %d PES in FIFO",
+                     p_fifo->i_id, (char*)&p_fifo->i_fourcc, p_fifo->i_depth );
 
     /* Free all packets still in the decoder fifo. */
     input_DeletePES( p_fifo->p_packets_mgt,

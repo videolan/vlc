@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999-2002 VideoLAN
- * $Id: input_programs.c,v 1.92 2002/07/21 15:18:29 fenrir Exp $
+ * $Id: input_programs.c,v 1.93 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -352,7 +352,7 @@ int input_SetProgram( input_thread_t * p_input, pgrm_descriptor_t * p_new_prg )
         i_required_spu_es = 0;
     }
 
-    for (i_es_index = 0 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
+    for( i_es_index = 0 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
     {
         switch( p_new_prg->pp_es[i_es_index]->i_cat )
         {
@@ -500,7 +500,6 @@ es_descriptor_t * input_AddES( input_thread_t * p_input,
     p_es->psz_desc[0] = '\0';
     p_es->p_pes = NULL;
     p_es->p_decoder_fifo = NULL;
-    p_es->b_audio = 0;
     p_es->i_cat = UNKNOWN_ES;
     p_es->i_demux_fd = 0;
     p_es->c_packets = 0;
@@ -652,6 +651,8 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
  *****************************************************************************/
 int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
+    decoder_fifo_t *p_fifo;
+
     if( p_es == NULL )
     {
         msg_Err( p_input, "nothing to do in input_SelectES" );
@@ -663,60 +664,23 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( p_es->p_decoder_fifo != NULL )
     {
         msg_Err( p_input, "ES 0x%x is already selected", p_es->i_id );
-        return( -1 );
+        return -1;
     }
 
-    p_es->p_decoder_fifo = NULL;
+    /* Release the lock, not to block the input thread during
+     * the creation of the thread. */
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+    p_fifo = input_RunDecoder( p_input, p_es );
+    vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    switch( p_es->i_type )
+    if( p_fifo == NULL )
     {
-    case AC3_AUDIO_ES:
-    case MPEG1_AUDIO_ES:
-    case MPEG2_AUDIO_ES:
-    case LPCM_AUDIO_ES:
-        if( config_GetInt( p_input, "audio" ) )
-        {
-            /* Release the lock, not to block the input thread during
-             * the creation of the thread. */
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->p_decoder_fifo = input_RunDecoder( p_input, p_es );
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-        }
-        break;
-
-    case MPEG1_VIDEO_ES:
-    case MPEG2_VIDEO_ES:
-    case MPEG4_VIDEO_ES:
-    case MSMPEG4v1_VIDEO_ES:
-    case MSMPEG4v2_VIDEO_ES:
-    case MSMPEG4v3_VIDEO_ES:
-    case SVQ1_VIDEO_ES:
-    case H263_VIDEO_ES:
-    case I263_VIDEO_ES:
-    case CINEPAK_VIDEO_ES:
-    case DVD_SPU_ES:
-        if( config_GetInt( p_input, "video" ) )
-        {
-            /* Release the lock, not to block the input thread during
-             * the creation of the thread. */
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->p_decoder_fifo = input_RunDecoder( p_input, p_es );
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-        }
-        break;
-
-    default:
-        msg_Err( p_input, "unknown stream type 0x%x", p_es->i_type );
-        return( -1 );
-        break;
+        return -1;
     }
 
-    if( p_es->p_decoder_fifo == NULL )
-    {
-        return( -1 );
-    }
+    p_es->p_decoder_fifo = p_fifo;
 
-    return( 0 );
+    return 0;
 }
 
 /*****************************************************************************

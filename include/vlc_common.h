@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.11 2002/07/21 19:26:13 sigmunau Exp $
+ * $Id: vlc_common.h,v 1.12 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -116,6 +116,19 @@ typedef u8                  yuv_data_t;
  * arithmetic operators, and that no special functions are required.
  *****************************************************************************/
 typedef s64 mtime_t;
+
+/*****************************************************************************
+ * The vlc_fourcc_t type.
+ *****************************************************************************
+ * See http://www.webartz.com/fourcc/ for a very detailed list.
+ *****************************************************************************/
+typedef u32 vlc_fourcc_t;
+
+#define VLC_FOURCC( a, b, c, d ) \
+    ( ((u32)a) | ( ((u32)b) << 8 ) | ( ((u32)c) << 16 ) | ( ((u32)d) << 24 ) )
+
+#define VLC_TWOCC( a, b ) \
+    ( (u16)(a) | ( (u16)(b) << 8 ) )
 
 /*****************************************************************************
  * Classes declaration

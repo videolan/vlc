@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.19 2002/07/15 20:09:31 sam Exp $
+ * $Id: InterfaceWindow.cpp,v 1.20 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -411,31 +411,41 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         break;
 
     case SELECT_CHANNEL:
-        {
-            int32 i = p_message->FindInt32( "channel" );
-            if ( i == -1 )
-            {
-                input_ChangeES( p_input_bank->pp_input[0], NULL, AUDIO_ES );
-            }
-            else
-            {
-                input_ChangeES( p_input_bank->pp_input[0],
-                        p_input_bank->pp_input[0]->stream.pp_es[i], AUDIO_ES );
-            }
-        }
-        break;
-
     case SELECT_SUBTITLE:
         {
-            int32 i = p_message->FindInt32( "subtitle" );
-            if ( i == -1 )
+            int32 i_new, i_old = -1;
+            if( p_message->what == SELECT_CHANNEL )
             {
-                input_ChangeES( p_input_bank->pp_input[0], NULL, SPU_ES);
+                i_new = p_message->FindInt32( "channel" );
+                i_cat = AUDIO_ES;
             }
             else
             {
-                input_ChangeES( p_input_bank->pp_input[0],
-                        p_input_bank->pp_input[0]->stream.pp_es[i], SPU_ES );
+                i_new = p_message->FindInt32( "subtitle" );
+                i_cat = AUDIO_ES;
+            }
+
+            vlc_mutex_lock( &p_input->stream.stream_lock );
+            for( int i = 0; i < p_input->stream.i_selected_es_number ; i++ )
+            {
+                if( p_input->stream.pp_selected_es[i]->i_cat == i_cat )
+                {
+                    i_old = i;
+                    break;
+                }
+            }
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+            if( i_new != -1 )
+            {
+                input_ToggleES( p_input, p_input->stream.pp_selected_es[i_new],
+                                VLC_TRUE );
+            }
+
+            if( i_old != -1 )
+            {
+                input_ToggleES( p_input, p_input->stream.pp_selected_es[i_old],
+                                VLC_FALSE );
             }
         }
         break;

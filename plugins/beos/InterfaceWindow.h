@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.13 2002/06/01 09:20:16 tcastley Exp $
+ * $Id: InterfaceWindow.h,v 1.14 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -68,8 +68,5 @@ private:
 	BFilePanel *file_panel;
 	PlayListWindow* playlist_window;
     BMenuItem      *miOnTop;
-	es_descriptor_t *  p_audio_es;
-    es_descriptor_t *  p_spu_es;
-
 };
 

@@ -352,6 +352,15 @@ endif
 plugins-uninstall:
 	rm -f $(DESTDIR)$(libdir)/vlc/*.so
 
+builtins-install:
+	mkdir -p $(DESTDIR)$(libdir)/vlc
+ifneq (,$(BUILTINS))
+	$(INSTALL) $(BUILTINS:%=plugins/%.a) $(DESTDIR)$(libdir)/vlc
+endif
+
+builtins-uninstall:
+	rm -f $(DESTDIR)$(libdir)/vlc/*.a
+
 libvlc-install:
 	mkdir -p $(DESTDIR)$(bindir)
 	$(INSTALL) vlc-config $(DESTDIR)$(bindir)

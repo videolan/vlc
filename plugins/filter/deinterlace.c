@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: deinterlace.c,v 1.18 2002/07/20 18:01:42 sam Exp $
+ * $Id: deinterlace.c,v 1.19 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -206,10 +206,10 @@ static int vout_Init( vout_thread_t *p_vout )
      * the decoder to output directly to our structures. */
     switch( p_vout->render.i_chroma )
     {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
-        case FOURCC_I422:
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','4','2','2'):
             p_vout->output.i_chroma = p_vout->render.i_chroma;
             p_vout->output.i_width  = p_vout->render.i_width;
             p_vout->output.i_height = p_vout->render.i_height;
@@ -226,9 +226,9 @@ static int vout_Init( vout_thread_t *p_vout )
 
     switch( p_vout->render.i_chroma )
     {
-    case FOURCC_I420:
-    case FOURCC_IYUV:
-    case FOURCC_YV12:
+    case VLC_FOURCC('I','4','2','0'):
+    case VLC_FOURCC('I','Y','U','V'):
+    case VLC_FOURCC('Y','V','1','2'):
         switch( p_vout->p_sys->i_mode )
         {
         case DEINTERLACE_BOB:
@@ -250,11 +250,11 @@ static int vout_Init( vout_thread_t *p_vout )
         }
         break;
 
-    case FOURCC_I422:
+    case VLC_FOURCC('I','4','2','2'):
         p_vout->p_sys->p_vout =
             vout_CreateThread( p_vout,
                        p_vout->output.i_width, p_vout->output.i_height,
-                       FOURCC_I420, p_vout->output.i_aspect );
+                       VLC_FOURCC('I','4','2','0'), p_vout->output.i_aspect );
         break;
 
     default:
@@ -432,9 +432,9 @@ static void RenderBob( vout_thread_t *p_vout,
 
         switch( p_vout->render.i_chroma )
         {
-        case FOURCC_I420:
-        case FOURCC_IYUV:
-        case FOURCC_YV12:
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
+        case VLC_FOURCC('Y','V','1','2'):
 
             for( ; p_out < p_out_end ; )
             {
@@ -446,7 +446,7 @@ static void RenderBob( vout_thread_t *p_vout,
             }
             break;
 
-        case FOURCC_I422:
+        case VLC_FOURCC('I','4','2','2'):
 
             i_increment = 2 * p_pic->p[i_plane].i_pitch;
 

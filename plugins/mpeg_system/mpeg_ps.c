@@ -2,7 +2,7 @@
  * mpeg_ps.c : Program Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ps.c,v 1.15 2002/06/01 12:32:00 sam Exp $
+ * $Id: mpeg_ps.c,v 1.16 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -199,15 +199,13 @@ static int PSInit( input_thread_t * p_input )
                  i_es++ )
             {
 #define p_es p_input->stream.pp_programs[0]->pp_es[i_es]
-                switch( p_es->i_type )
+                switch( p_es->i_fourcc )
                 {
-                    case MPEG1_VIDEO_ES:
-                    case MPEG2_VIDEO_ES:
+                    case VLC_FOURCC('m','p','g','v'):
                         input_SelectES( p_input, p_es );
                         break;
 
-                    case MPEG1_AUDIO_ES:
-                    case MPEG2_AUDIO_ES:
+                    case VLC_FOURCC('m','p','g','a'):
                         if( config_GetInt( p_input, "audio-channel" )
                                 == (p_es->i_id & 0x1F) ||
                            ( config_GetInt( p_input, "audio-channel" ) < 0
@@ -220,7 +218,7 @@ static int PSInit( input_thread_t * p_input )
                         }
                         break;
 
-                    case AC3_AUDIO_ES:
+                    case VLC_FOURCC('a','5','2',' '):
                         if( config_GetInt( p_input, "audio-channel" )
                                 == ((p_es->i_id & 0xF00) >> 8) ||
                            ( config_GetInt( p_input, "audio-channel" ) < 0
@@ -233,7 +231,7 @@ static int PSInit( input_thread_t * p_input )
                         }
                         break;
 
-                    case DVD_SPU_ES:
+                    case VLC_FOURCC('s','p','u',' '):
                         if( config_GetInt( p_input, "spu-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) )
                         {
@@ -241,7 +239,7 @@ static int PSInit( input_thread_t * p_input )
                         }
                         break;
 
-                    case LPCM_AUDIO_ES:
+                    case VLC_FOURCC('l','p','c','m'):
                         if( config_GetInt( p_input, "audio-channel" )
                                 == ((p_es->i_id & 0x1F00) >> 8) ||
                            ( config_GetInt( p_input, "audio-channel" ) < 0

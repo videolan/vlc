@@ -2,7 +2,7 @@
  * mp4.h : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.h,v 1.4 2002/07/21 19:57:22 fenrir Exp $
+ * $Id: mp4.h,v 1.5 2002/07/23 00:39:17 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -199,58 +199,4 @@ static inline mtime_t MP4_GetMoviePTS(demux_data_mp4_t *p_demux )
                 (mtime_t)p_demux->i_timescale )
           );
 }
-    
-static struct
-{
-    u32 i_fourcc;
-    int i_codec;
-    char *psz_name;
-} MP4_Codecs [] = {
-    /* Video codec */
-    { FOURCC_vide,  UNKNOWN_ES,     "Generic VisualSampleEntry" },
-    { FOURCC_DIVX,  MPEG4_VIDEO_ES, "DIVX SampleEntry (MPEG-4)" },
-    { FOURCC_h263,  H263_VIDEO_ES,  "H263 SampleEntry" },
-    { FOURCC_SVQ1,  SVQ1_VIDEO_ES,  "SVQ1 SampleEntry (Sorenson Video v1" },
-    { FOURCC_mp4v,  MPEG4_VIDEO_ES, "MP4VisualSampleEntry (MPEG-4)" },
-    { FOURCC_3IV1,  UNKNOWN_ES,     "3IV1 SampleEntry" },
-    { FOURCC_cvid,  CINEPAK_VIDEO_ES,"cvid SampleEntry (Cinepak Video Codec)" },
-    { FOURCC_mjpa,  UNKNOWN_ES,     "MJPEG-A SampleEntry (Motion JPEG)" },
-    { FOURCC_mjpb,  UNKNOWN_ES,     "MJPEG-A SampleEntry (Motion JPEG)" },
-    { FOURCC_jpeg,  UNKNOWN_ES,     "JPEG (ISO) SampleEntry" },
 
-    /* Audio codec */
-    { FOURCC_soun,  UNKNOWN_ES,     "Generic AudioSampleEntry" },
-    /* The things with mp4a is that we could have aac audio but
-       also mpeg audio, depend on objectTypeIndication,
-       it would be probe later */
-    { FOURCC_mp4a,  MPEG2_AUDIO_ES, "MP4AudioSampleEntry (MPEGAUDIO-AAC)" },
-    { FOURCC__mp3,  MPEG2_AUDIO_ES, ".mp3 SampleEntry (MPEG-I/II layer 3)" },
-    
-    /* Last entry with fourcc == 0 */
-    { 0,            UNKNOWN_ES,     "Unknown SampleEntry" }
-};
-
-static int MP4_GetCodec( u32  i_fourcc,
-                         int  *pi_codec,
-                         char **ppsz_name )
-{
-   int i;
-
-    for( i = 0; ; i++ )
-    {
-        if( ( MP4_Codecs[i].i_fourcc == i_fourcc )||
-            ( MP4_Codecs[i].i_fourcc == 0) )
-        {
-            break;
-        }
-    }
-
-    if( pi_codec )
-        *pi_codec = MP4_Codecs[i].i_codec;
-    
-    if( ppsz_name )
-        *ppsz_name = MP4_Codecs[i].psz_name;
-
-    return( MP4_Codecs[i].i_codec == UNKNOWN_ES ? 0 : 1 );
-}
-                        

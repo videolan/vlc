@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.12 2002/07/21 18:57:02 sigmunau Exp $
+ * $Id: mpeg_audio.c,v 1.13 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
@@ -519,9 +519,9 @@ static int MPEGAudioInit( input_thread_t * p_input )
         return( -1 );
     }
     p_es->i_stream_id = 1;
-    p_es->i_type = !mpeg.i_layer ? MPEG1_AUDIO_ES : MPEG2_AUDIO_ES;
+    p_es->i_fourcc = !mpeg.i_layer ? VLC_FOURCC('m','p','g','a') /* layer 1 */
+                                   : VLC_FOURCC('m','p','g','a'); /* layer 2 */
     p_es->i_cat = AUDIO_ES;
-    p_es->b_audio = 1;
     input_SelectES( p_input, p_es );
 
     p_input->stream.p_selected_program->b_is_ok = 1;

@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.25 2002/06/01 18:04:49 sam Exp $
+ * $Id: mpeg_adec.c,v 1.26 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -42,7 +42,7 @@
 /*****************************************************************************
  * Local Prototypes
  *****************************************************************************/
-static int   decoder_Probe ( u8 * );
+static int   decoder_Probe ( vlc_fourcc_t * );
 static int   decoder_Run   ( decoder_fifo_t * );
 static void  EndThread     ( adec_thread_t * );
 static void  DecodeThread  ( adec_thread_t * );
@@ -79,10 +79,9 @@ MODULE_DEACTIVATE_STOP
 /*****************************************************************************
  * decoder_Probe: probe the decoder and return score
  *****************************************************************************/
-static int decoder_Probe( u8 *pi_type )
+static int decoder_Probe( vlc_fourcc_t *pi_type )
 {
-    return( ( *pi_type == MPEG1_AUDIO_ES
-               || *pi_type == MPEG2_AUDIO_ES ) ? 0 : -1 );
+    return *pi_type == VLC_FOURCC('m','p','g','a') ? 0 : -1;
 }
 
 /*****************************************************************************

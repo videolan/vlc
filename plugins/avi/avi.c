@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.31 2002/07/15 19:33:02 fenrir Exp $
+ * $Id: avi.c,v 1.32 2002/07/23 00:39:16 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -180,28 +180,31 @@ static inline int AVI_GetESTypeFromTwoCC( u16 i_type )
     }
 }
 
-static int AVI_AudioGetType( u32 i_type )
+static vlc_fourcc_t AVI_AudioGetType( u32 i_type )
 {
     switch( i_type )
     {
 /*        case( WAVE_FORMAT_PCM ):
-            return( WAVE_AUDIO_ES ); */
+            return VLC_FOURCC('l','p','c','m'); */
         case( WAVE_FORMAT_AC3 ):
-            return( AC3_AUDIO_ES );
+            return VLC_FOURCC('a','5','2',' ');
         case( WAVE_FORMAT_MPEG):
         case( WAVE_FORMAT_MPEGLAYER3):
-            return( MPEG2_AUDIO_ES ); /* 2 for mpeg-2 layer 1 2 ou 3 */
+            return VLC_FOURCC('m','p','g','a'); /* for mpeg2 layer 1 2 ou 3 */
         default:
-            return( 0 );
+            return 0;
     }
 }
 
 /* Test if it seems that it's a key frame */
-static int AVI_GetKeyFlag( int i_type, u8 *p_byte )
+static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, u8 *p_byte )
 {
-    switch( i_type )
+    switch( i_fourcc )
     {
-        case( MSMPEG4v1_VIDEO_ES ):
+        case FOURCC_DIV1:
+        case FOURCC_div1:
+        case FOURCC_MPG4:
+        case FOURCC_mpg4:
             if( GetDWBE( p_byte ) != 0x00000100 ) 
             /* startcode perhaps swapped, I haven't tested */
             {
@@ -213,11 +216,38 @@ static int AVI_GetKeyFlag( int i_type, u8 *p_byte )
             {
                 return( (*(p_byte+4))&0x06 ? 0 : AVIIF_KEYFRAME);
             }
-        case( MSMPEG4v2_VIDEO_ES ):
-        case( MSMPEG4v3_VIDEO_ES ):
+        case FOURCC_DIV2:
+        case FOURCC_div2:
+        case FOURCC_MP42:
+        case FOURCC_mp42:
+        case FOURCC_MPG3:
+        case FOURCC_mpg3:
+        case FOURCC_div3:
+        case FOURCC_MP43:
+        case FOURCC_mp43:
+        case FOURCC_DIV3:
+        case FOURCC_DIV4:
+        case FOURCC_div4:
+        case FOURCC_DIV5:
+        case FOURCC_div5:
+        case FOURCC_DIV6:
+        case FOURCC_div6:
+        case FOURCC_AP41:
+        case FOURCC_3IV1:
 //            printf( "\n Is a Key Frame %s", (*p_byte)&0xC0 ? "no" : "yes!!" );
             return( (*p_byte)&0xC0 ? 0 : AVIIF_KEYFRAME );
-        case( MPEG4_VIDEO_ES ):
+        case FOURCC_DIVX:
+        case FOURCC_divx:
+        case FOURCC_MP4S:
+        case FOURCC_mp4s:
+        case FOURCC_M4S2:
+        case FOURCC_m4s2:
+        case FOURCC_xvid:
+        case FOURCC_XVID:
+        case FOURCC_XviD:
+        case FOURCC_DX50:
+        case FOURCC_mp4v:
+        case FOURCC_4:
             if( GetDWBE( p_byte ) != 0x000001b6 )
             {
                 /* not true , need to find the first VOP header
@@ -557,8 +587,7 @@ static int AVIInit( input_thread_t *p_input )
     riffchunk_t *p_strl,*p_strh,*p_strf;
     demux_data_avi_file_t *p_avi_demux;
     es_descriptor_t *p_es = NULL; /* for not warning */
-    char *name;
-    int i, i_codec;
+    int i;
 
     if( !( p_input->p_demux_data = 
                     p_avi_demux = malloc( sizeof(demux_data_avi_file_t) ) ) )
@@ -717,15 +746,8 @@ static int AVIInit( input_thread_t *p_input )
                 p_es->i_cat = AUDIO_ES;
                 AVI_Parse_WaveFormatEx( &p_info->audio_format,
                                    p_strf->p_data->p_payload_start ); 
-                p_es->b_audio = 1;
-                p_es->i_type = 
-                    AVI_AudioGetType( p_info->audio_format.i_formattag );
-                if( !p_es->i_type )
-                {
-                    msg_Warn( p_input, "stream(%d,0x%x) not supported", i,
-                                       p_info->audio_format.i_formattag );
-                    p_es->i_cat = UNKNOWN_ES;
-                }
+                p_es->i_fourcc = AVI_AudioGetType(
+                                     p_info->audio_format.i_formattag );
                 break;
                 
             case( FOURCC_vids ):
@@ -736,17 +758,7 @@ static int AVIInit( input_thread_t *p_input )
                 /* XXX quick hack for playing ffmpeg video, I don't know 
                     who is doing something wrong */
                 p_info->header.i_samplesize = 0;
-                p_es->b_audio = 0;
-                if( !AVI_GetVideoCodec( p_info->video_format.i_compression,
-                                   &i_codec,
-                                   &name ) )
-                {
-                    msg_Warn( p_input, "stream(%d,%4.4s) not supported", i,
-                              (char*)&p_info->video_format.i_compression);
-                    p_es->i_cat = UNKNOWN_ES;
-                }
-
-                p_es->i_type = i_codec;
+                p_es->i_fourcc = p_info->video_format.i_compression;
                 break;
             default:
                 msg_Err( p_input, "unknown stream(%d) type", i );
@@ -1319,7 +1331,7 @@ static int __AVI_GetChunk( input_thread_t  *p_input,
                 AVIIndexEntry_t index;
 
                 index.i_id = p_ck->i_id;
-                index.i_flags = AVI_GetKeyFlag( p_info_i->p_es->i_type,
+                index.i_flags = AVI_GetKeyFlag( p_info_i->p_es->i_fourcc,
                                                 (u8*)&p_ck->i_8bytes);
                 index.i_pos = p_ck->i_pos;
                 index.i_length = p_ck->i_size;

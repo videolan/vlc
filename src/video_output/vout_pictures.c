@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.27 2002/06/01 12:32:02 sam Exp $
+ * $Id: vout_pictures.c,v 1.28 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -35,10 +35,12 @@
 #include "video.h"
 #include "video_output.h"
 
+#include "vout_pictures.h"
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void vout_CopyPicture( vout_thread_t *, picture_t *, picture_t * );
+static void CopyPicture( vout_thread_t *, picture_t *, picture_t * );
 
 /*****************************************************************************
  * vout_DisplayPicture: display a picture
@@ -305,7 +307,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                 /* We have subtitles. First copy the picture to
                  * the spare direct buffer, then render the
                  * subtitles. */
-                vout_CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
+                CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
 
                 vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
 
@@ -333,7 +335,7 @@ picture_t * vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
         /* Picture is not in a direct buffer, but is exactly the
          * same size as the direct buffers. A memcpy() is enough,
          * then render the subtitles. */
-        vout_CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
+        CopyPicture( p_vout, p_pic, PP_OUTPUTPICTURE[0] );
 
         vout_RenderSubPictures( p_vout, PP_OUTPUTPICTURE[0], p_subpic );
 
@@ -414,7 +416,7 @@ void vout_PlacePicture( vout_thread_t *p_vout, int i_width, int i_height,
  * how it gets displayed.
  *****************************************************************************/
 void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
-                           int i_width, int i_height, u32 i_chroma )
+                           int i_width, int i_height, vlc_fourcc_t i_chroma )
 {
     int i_bytes, i_index;
 
@@ -422,75 +424,87 @@ void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
     for( i_index = 0; i_index < VOUT_MAX_PLANES; i_index++ )
     {
         p_pic->p[i_index].p_pixels = NULL;
-        p_pic->p[i_index].b_margin = 0;
-        p_pic->p[i_index].i_pixel_bytes = 1;
+        p_pic->p[i_index].i_pixel_pitch = 1;
     }
 
     /* Calculate coordinates */
     switch( i_chroma )
     {
+        case FOURCC_I410:
+            p_pic->p[ Y_PLANE ].i_lines = i_height;
+            p_pic->p[ Y_PLANE ].i_pitch = i_width;
+            p_pic->p[ Y_PLANE ].i_visible_pitch = p_pic->p[ Y_PLANE ].i_pitch;
+            p_pic->p[ U_PLANE ].i_lines = i_height / 4;
+            p_pic->p[ U_PLANE ].i_pitch = i_width / 4;
+            p_pic->p[ U_PLANE ].i_visible_pitch = p_pic->p[ U_PLANE ].i_pitch;
+            p_pic->p[ V_PLANE ].i_lines = i_height / 4;
+            p_pic->p[ V_PLANE ].i_pitch = i_width / 4;
+            p_pic->p[ V_PLANE ].i_visible_pitch = p_pic->p[ V_PLANE ].i_pitch;
+            p_pic->i_planes = 3;
+            break;
+
         case FOURCC_YV12:
         case FOURCC_I420:
         case FOURCC_IYUV:
             p_pic->p[ Y_PLANE ].i_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width;
-            p_pic->p[ Y_PLANE ].i_visible_bytes = p_pic->p[ Y_PLANE ].i_pitch;
+            p_pic->p[ Y_PLANE ].i_visible_pitch = p_pic->p[ Y_PLANE ].i_pitch;
             p_pic->p[ U_PLANE ].i_lines = i_height / 2;
             p_pic->p[ U_PLANE ].i_pitch = i_width / 2;
-            p_pic->p[ U_PLANE ].i_visible_bytes = p_pic->p[ U_PLANE ].i_pitch;
+            p_pic->p[ U_PLANE ].i_visible_pitch = p_pic->p[ U_PLANE ].i_pitch;
             p_pic->p[ V_PLANE ].i_lines = i_height / 2;
             p_pic->p[ V_PLANE ].i_pitch = i_width / 2;
-            p_pic->p[ V_PLANE ].i_visible_bytes = p_pic->p[ V_PLANE ].i_pitch;
+            p_pic->p[ V_PLANE ].i_visible_pitch = p_pic->p[ V_PLANE ].i_pitch;
             p_pic->i_planes = 3;
             break;
 
         case FOURCC_I422:
             p_pic->p[ Y_PLANE ].i_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width;
-            p_pic->p[ Y_PLANE ].i_visible_bytes = p_pic->p[ Y_PLANE ].i_pitch;
+            p_pic->p[ Y_PLANE ].i_visible_pitch = p_pic->p[ Y_PLANE ].i_pitch;
             p_pic->p[ U_PLANE ].i_lines = i_height;
             p_pic->p[ U_PLANE ].i_pitch = i_width / 2;
-            p_pic->p[ U_PLANE ].i_visible_bytes = p_pic->p[ U_PLANE ].i_pitch;
+            p_pic->p[ U_PLANE ].i_visible_pitch = p_pic->p[ U_PLANE ].i_pitch;
             p_pic->p[ V_PLANE ].i_lines = i_height;
             p_pic->p[ V_PLANE ].i_pitch = i_width / 2;
-            p_pic->p[ V_PLANE ].i_visible_bytes = p_pic->p[ V_PLANE ].i_pitch;
+            p_pic->p[ V_PLANE ].i_visible_pitch = p_pic->p[ V_PLANE ].i_pitch;
             p_pic->i_planes = 3;
             break;
 
         case FOURCC_I444:
             p_pic->p[ Y_PLANE ].i_lines = i_height;
             p_pic->p[ Y_PLANE ].i_pitch = i_width;
-            p_pic->p[ Y_PLANE ].i_visible_bytes = p_pic->p[ Y_PLANE ].i_pitch;
+            p_pic->p[ Y_PLANE ].i_visible_pitch = p_pic->p[ Y_PLANE ].i_pitch;
             p_pic->p[ U_PLANE ].i_lines = i_height;
             p_pic->p[ U_PLANE ].i_pitch = i_width;
-            p_pic->p[ U_PLANE ].i_visible_bytes = p_pic->p[ U_PLANE ].i_pitch;
+            p_pic->p[ U_PLANE ].i_visible_pitch = p_pic->p[ U_PLANE ].i_pitch;
             p_pic->p[ V_PLANE ].i_lines = i_height;
             p_pic->p[ V_PLANE ].i_pitch = i_width;
-            p_pic->p[ V_PLANE ].i_visible_bytes = p_pic->p[ V_PLANE ].i_pitch;
+            p_pic->p[ V_PLANE ].i_visible_pitch = p_pic->p[ V_PLANE ].i_pitch;
             p_pic->i_planes = 3;
             break;
 
         case FOURCC_Y211:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width;
-            p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
-            p_pic->p->i_pixel_bytes = 4;
+            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_pixel_pitch = 4;
             p_pic->i_planes = 1;
             break;
 
         case FOURCC_YUY2:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 2;
-            p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
-            p_pic->p->i_pixel_bytes = 4;
+            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_pixel_pitch = 4;
             p_pic->i_planes = 1;
             break;
 
         case FOURCC_RV15:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 2;
-            p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
-            p_pic->p->i_pixel_bytes = 2;
+            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_pixel_pitch = 2;
 /* FIXME: p_heap isn't always reachable
             p_pic->p_heap->i_rmask = 0x001f;
             p_pic->p_heap->i_gmask = 0x03e0;
@@ -501,8 +515,8 @@ void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
         case FOURCC_RV16:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 2;
-            p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
-            p_pic->p->i_pixel_bytes = 2;
+            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_pixel_pitch = 2;
 /* FIXME: p_heap isn't always reachable
             p_pic->p_heap->i_rmask = 0x001f;
             p_pic->p_heap->i_gmask = 0x07e0;
@@ -513,8 +527,8 @@ void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
         case FOURCC_RV32:
             p_pic->p->i_lines = i_height;
             p_pic->p->i_pitch = i_width * 4;
-            p_pic->p->i_visible_bytes = p_pic->p->i_pitch;
-            p_pic->p->i_pixel_bytes = 4;
+            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
+            p_pic->p->i_pixel_pitch = 4;
 /* FIXME: p_heap isn't always reachable
             p_pic->p_heap->i_rmask = 0xff0000;
             p_pic->p_heap->i_gmask = 0x00ff00;
@@ -554,17 +568,79 @@ void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
     }
 }
 
+/*****************************************************************************
+ * vout_ChromaCmp: compare two chroma values
+ *****************************************************************************
+ * This function returns 1 if the two fourcc values given as argument are
+ * the same format (eg. UYVY / UYNV) or almost the same format (eg. I420/YV12)
+ *****************************************************************************/
+int vout_ChromaCmp( vlc_fourcc_t i_chroma, vlc_fourcc_t i_amorhc )
+{
+    /* If they are the same, they are the same ! */
+    if( i_chroma == i_amorhc )
+    {
+        return 1;
+    }
+
+    /* Check for equivalence classes */
+    switch( i_chroma )
+    {
+        case FOURCC_I420:
+        case FOURCC_IYUV:
+        case FOURCC_YV12:
+            switch( i_amorhc )
+            {
+                case FOURCC_I420:
+                case FOURCC_IYUV:
+                case FOURCC_YV12:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        case FOURCC_UYVY:
+        case FOURCC_UYNV:
+        case FOURCC_Y422:
+            switch( i_amorhc )
+            {
+                case FOURCC_UYVY:
+                case FOURCC_UYNV:
+                case FOURCC_Y422:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        case FOURCC_YUY2:
+        case FOURCC_YUNV:
+            switch( i_amorhc )
+            {
+                case FOURCC_YUY2:
+                case FOURCC_YUNV:
+                    return 1;
+
+                default:
+                    return 0;
+            }
+
+        default:
+            return 0;
+    }
+}
+
 /* Following functions are local */
 
 /*****************************************************************************
- * vout_CopyPicture: copy a picture to another one
+ * CopyPicture: copy a picture to another one
  *****************************************************************************
  * This function takes advantage of the image format, and reduces the
  * number of calls to memcpy() to the minimum. Source and destination
- * images must have same width, height, and chroma.
+ * images must have same width (hence i_visible_pitch), height, and chroma.
  *****************************************************************************/
-static void vout_CopyPicture( vout_thread_t * p_vout,
-                              picture_t *p_src, picture_t *p_dest )
+static void CopyPicture( vout_thread_t * p_vout,
+                         picture_t *p_src, picture_t *p_dest )
 {
     int i;
 
@@ -572,45 +648,21 @@ static void vout_CopyPicture( vout_thread_t * p_vout,
     {
         if( p_src->p[i].i_pitch == p_dest->p[i].i_pitch )
         {
-            if( p_src->p[i].b_margin )
-            {
-                /* If p_src->b_margin is set, p_dest->b_margin must be set */
-                if( p_dest->p[i].b_hidden )
-                {
-                    /* There are margins, but they are hidden : perfect ! */
-                    p_vout->p_vlc->pf_memcpy(
-                                 p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
-                                 p_src->p[i].i_pitch * p_src->p[i].i_lines );
-                    continue;
-                }
-                else
-                {
-                    /* We can't directly copy the margin. Too bad. */
-                }
-            }
-            else
-            {
-                /* Same pitch, no margins : perfect ! */
-                p_vout->p_vlc->pf_memcpy(
-                                 p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
-                                 p_src->p[i].i_pitch * p_src->p[i].i_lines );
-                continue;
-            }
+            /* There are margins, but with the same width : perfect ! */
+            p_vout->p_vlc->pf_memcpy(
+                         p_dest->p[i].p_pixels, p_src->p[i].p_pixels,
+                         p_src->p[i].i_pitch * p_src->p[i].i_lines );
         }
         else
         {
-            /* Pitch values are different */
-        }
-
-        /* We need to proceed line by line */
-        {
+            /* We need to proceed line by line */
             u8 *p_in = p_src->p[i].p_pixels, *p_out = p_dest->p[i].p_pixels;
             int i_line;
 
             for( i_line = p_src->p[i].i_lines; i_line--; )
             {
                 p_vout->p_vlc->pf_memcpy( p_out, p_in,
-                                          p_src->p[i].i_visible_bytes );
+                                          p_src->p[i].i_visible_pitch );
                 p_in += p_src->p[i].i_pitch;
                 p_out += p_dest->p[i].i_pitch;
             }

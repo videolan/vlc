@@ -2,7 +2,7 @@
  * a52_system.c : A52 input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52_system.c,v 1.1 2002/06/02 23:43:38 bozo Exp $
+ * $Id: a52_system.c,v 1.2 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>
  *
@@ -131,7 +131,7 @@ static int Init( input_thread_t * p_input )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_es = input_AddES( p_input, p_input->stream.p_selected_program, 0xBD, 0 );
     p_es->i_stream_id = 0xBD;
-    p_es->i_type = AC3_AUDIO_ES;
+    p_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
     p_es->i_cat = AUDIO_ES;
     input_SelectES( p_input, p_es );
     p_input->stream.p_selected_area->i_tell = 0;

@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.96 2002/07/20 18:01:43 sam Exp $
+ * $Id: vout_sdl.c,v 1.97 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -602,21 +602,21 @@ static int OpenDisplay( vout_thread_t *p_vout )
     /* Choose the chroma we will try first. */
     switch( p_vout->render.i_chroma )
     {
-        case FOURCC_YUY2:
-        case FOURCC_YUNV:
+        case VLC_FOURCC('Y','U','Y','2'):
+        case VLC_FOURCC('Y','U','N','V'):
             p_vout->output.i_chroma = SDL_YUY2_OVERLAY;
             break;
-        case FOURCC_UYVY:
-        case FOURCC_UYNV:
-        case FOURCC_Y422:
+        case VLC_FOURCC('U','Y','V','Y'):
+        case VLC_FOURCC('U','Y','N','V'):
+        case VLC_FOURCC('Y','4','2','2'):
             p_vout->output.i_chroma = SDL_UYVY_OVERLAY;
             break;
-        case FOURCC_YVYU:
+        case VLC_FOURCC('Y','V','Y','U'):
             p_vout->output.i_chroma = SDL_YVYU_OVERLAY;
             break;
-        case FOURCC_YV12:
-        case FOURCC_I420:
-        case FOURCC_IYUV:
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
         default:
             p_vout->output.i_chroma = SDL_YV12_OVERLAY;
             break;
@@ -661,20 +661,20 @@ static int OpenDisplay( vout_thread_t *p_vout )
         switch( p_vout->p_sys->p_display->format->BitsPerPixel )
         {
             case 8:
-                p_vout->output.i_chroma = FOURCC_RGB2;
+                p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
                 p_vout->output.pf_setpalette = SetPalette;
                 break;
             case 15:
-                p_vout->output.i_chroma = FOURCC_RV15;
+                p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
                 break;
             case 16:
-                p_vout->output.i_chroma = FOURCC_RV16;
+                p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
                 break;
             case 24:
-                p_vout->output.i_chroma = FOURCC_RV24;
+                p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
                 break;
             case 32:
-                p_vout->output.i_chroma = FOURCC_RV32;
+                p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
                 break;
             default:
                 msg_Err( p_vout, "unknown screen depth %i",
@@ -752,15 +752,15 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         switch( p_vout->p_sys->p_display->format->BitsPerPixel )
         {
             case 8:
-                p_pic->p->i_pixel_bytes = 1;
+                p_pic->p->i_pixel_pitch = 1;
                 break;
             case 15:
             case 16:
-                p_pic->p->i_pixel_bytes = 2;
+                p_pic->p->i_pixel_pitch = 2;
                 break;
             case 24:
             case 32:
-                p_pic->p->i_pixel_bytes = 4;
+                p_pic->p->i_pixel_pitch = 4;
                 break;
             default:
                 return( -1 );
@@ -769,19 +769,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_pic->p->p_pixels = p_vout->p_sys->p_display->pixels;
         p_pic->p->i_lines = p_vout->p_sys->p_display->h;
         p_pic->p->i_pitch = p_vout->p_sys->p_display->pitch;
-
-        if( p_pic->p->i_pitch ==
-                p_pic->p->i_pixel_bytes * p_vout->p_sys->p_display->w )
-        {
-            p_pic->p->b_margin = 0;
-        }
-        else
-        {
-            p_pic->p->b_margin = 1;
-            p_pic->p->b_hidden = 1;
-            p_pic->p->i_visible_bytes =
-                p_pic->p->i_pixel_bytes * p_vout->p_sys->p_display->w;
-        }
+        p_pic->p->i_visible_pitch =
+            p_pic->p->i_pixel_pitch * p_vout->p_sys->p_display->w;
 
         p_vout->p_sys->i_surfaces++;
 
@@ -816,46 +805,46 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         switch( p_vout->output.i_chroma )
         {
         case SDL_YV12_OVERLAY:
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
 
             p_pic->U_PIXELS = p_pic->p_sys->p_overlay->pixels[2];
             p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[2];
-            p_pic->p[U_PLANE].i_pixel_bytes = 1;
-            p_pic->p[U_PLANE].b_margin = 0;
+            p_pic->p[U_PLANE].i_pixel_pitch = 1;
+            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_overlay->pixels[1];
             p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[1];
-            p_pic->p[V_PLANE].i_pixel_bytes = 1;
-            p_pic->p[V_PLANE].b_margin = 0;
+            p_pic->p[V_PLANE].i_pixel_pitch = 1;
+            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
 
             p_pic->i_planes = 3;
             break;
 
         case SDL_IYUV_OVERLAY:
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
 
             p_pic->U_PIXELS = p_pic->p_sys->p_overlay->pixels[1];
             p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[1];
-            p_pic->p[U_PLANE].i_pixel_bytes = 1;
-            p_pic->p[U_PLANE].b_margin = 0;
+            p_pic->p[U_PLANE].i_pixel_pitch = 1;
+            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
             p_pic->V_PIXELS = p_pic->p_sys->p_overlay->pixels[2];
             p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_overlay->h / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_overlay->pitches[2];
-            p_pic->p[V_PLANE].i_pixel_bytes = 1;
-            p_pic->p[V_PLANE].b_margin = 0;
+            p_pic->p[V_PLANE].i_pixel_pitch = 1;
+            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
 
             p_pic->i_planes = 3;
             break;
 
         default:
-            p_pic->p[Y_PLANE].i_pixel_bytes = 2;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[Y_PLANE].i_pixel_pitch = 2;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
 
             p_pic->i_planes = 1;
             break;

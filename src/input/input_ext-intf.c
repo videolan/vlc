@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ext-intf.c,v 1.38 2002/06/04 00:11:12 sam Exp $
+ * $Id: input_ext-intf.c,v 1.39 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -301,80 +301,13 @@ void input_DumpStream( input_thread_t * p_input )
         {
 #define ES  p_input->stream.pp_programs[i]->pp_es[j]
             msg_Dbg( p_input,
-                     "ES 0x%x, stream 0x%x, type 0x%x, %s [OK:%d/ERR:%d]",
-                     ES->i_id, ES->i_stream_id, ES->i_type,
+                     "ES 0x%x, stream 0x%x, fourcc `%4.4s', %s [OK:%d/ERR:%d]",
+                     ES->i_id, ES->i_stream_id, (char*)&ES->i_fourcc,
                      ES->p_decoder_fifo != NULL ? "selected" : "not selected",
                      ES->c_packets, ES->c_invalid_packets );
 #undef ES
         }
     }
-}
-
-/*****************************************************************************
- * input_ChangeES: answers to a user request with calls to (Un)SelectES
- *****************************************************************************
- * Useful since the interface plugins know p_es
- * This functon is deprecated, use input_ToggleEs instead.
- *****************************************************************************/
-int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
-                    u8 i_cat )
-{
-    int                     i_index;
-    int                     i;
-
-    i_index = -1;
-
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-    for( i = 0 ; i < p_input->stream.i_selected_es_number ; i++ )
-    {
-        if( p_input->stream.pp_selected_es[i]->i_cat == i_cat )
-        {
-            i_index = i;
-            break;
-        }
-    }
-
-
-    if( p_es != NULL )
-    {
-
-    
-        if( i_index != -1 )
-        {
-            
-            if( p_input->stream.pp_selected_es[i_index] != p_es )
-            {
-                input_UnselectES( p_input,
-                                  p_input->stream.pp_selected_es[i_index] );
-                input_SelectES( p_input, p_es );
-                msg_Dbg( p_input, "es selected -> %s (0x%x)",
-                                  p_es->psz_desc, p_es->i_id );
-            }
-        }
-        else
-        {
-            input_SelectES( p_input, p_es );
-            msg_Dbg( p_input, "es selected -> %s (0x%x)",
-                              p_es->psz_desc, p_es->i_id );
-        }
-    }
-    else
-    {
-        if( i_index != -1 )
-        {
-            msg_Dbg( p_input, "es unselected -> %s (0x%x)",
-                     p_input->stream.pp_selected_es[i_index]->psz_desc,
-                     p_input->stream.pp_selected_es[i_index]->i_id );
-
-            input_UnselectES( p_input,
-                              p_input->stream.pp_selected_es[i_index] );
-        }
-    }
-
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    return 0;
 }
 
 /*****************************************************************************

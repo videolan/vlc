@@ -2,7 +2,7 @@
  * i420_rgb8.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb8.c,v 1.6 2002/06/01 12:31:58 sam Exp $
+ * $Id: i420_rgb8.c,v 1.7 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -78,14 +78,7 @@ void _M( I420_RGB8 )( vout_thread_t *p_vout, picture_t *p_src,
                p_vout->output.i_width, p_vout->output.i_height,
                &b_hscale, &i_vscale, p_offset_start );
 
-    if( p_dest->p->b_margin )
-    {
-        i_right_margin = (p_dest->p->i_pitch - p_dest->p->i_visible_bytes);
-    }
-    else
-    {
-        i_right_margin = 0;
-    }
+    i_right_margin = p_dest->p->i_pitch - p_dest->p->i_visible_pitch;
 
     /*
      * Perform conversion

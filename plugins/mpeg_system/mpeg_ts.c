@@ -2,7 +2,7 @@
  * mpeg_ts.c : Transport Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: mpeg_ts.c,v 1.15 2002/06/04 00:11:12 sam Exp $
+ * $Id: mpeg_ts.c,v 1.16 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Henri Fallon <henri@via.ecp.fr>
  *          Johan Bilien <jobi@via.ecp.fr>
@@ -593,9 +593,6 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                 p_new_es = input_AddES( p_input, p_es->p_pgrm, 
                                         (u16)i_pid, sizeof( es_ts_data_t ) );
 
-                /* Tell the decoders what kind of stream it is */
-                p_new_es->i_type = i_stream_type;
-
                 /* Tell the interface what kind of stream it is and select 
                  * the required ones */
                 {
@@ -603,23 +600,32 @@ static void TSDecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                     {
                         case MPEG1_VIDEO_ES:
                         case MPEG2_VIDEO_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('m','p','g','v');
                             p_new_es->i_cat = VIDEO_ES;
                             break;
                         case MPEG1_AUDIO_ES:
                         case MPEG2_AUDIO_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('m','p','g','a');
                             p_new_es->i_cat = AUDIO_ES;
                             break;
-                        case LPCM_AUDIO_ES :
-                        case AC3_AUDIO_ES :
+                        case LPCM_AUDIO_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('l','p','c','m');
+                            p_new_es->i_stream_id = 0xBD;
+                            p_new_es->i_cat = AUDIO_ES;
+                            break;
+                        case AC3_AUDIO_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = AUDIO_ES;
                             break;
                         /* Not sure this one is fully specification-compliant */
-                        case DVD_SPU_ES :
+                        case DVD_SPU_ES:
+                            p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
                             p_new_es->i_stream_id = 0xBD;
                             p_new_es->i_cat = SPU_ES;
                             break;
                         default :
+                            p_new_es->i_fourcc = 0;
                             p_new_es->i_cat = UNKNOWN_ES;
                             break;
                     }
@@ -823,27 +829,35 @@ void TS_DVBPSI_HandlePMT( input_thread_t * p_input, dvbpsi_pmt_t * p_new_pmt )
                 return;
             }
 
-            p_new_es->i_type = p_es->i_type;
             switch( p_es->i_type )
             {
                 case MPEG1_VIDEO_ES:
                 case MPEG2_VIDEO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('m','p','g','v');
                     p_new_es->i_cat = VIDEO_ES;
                     break;
                 case MPEG1_AUDIO_ES:
                 case MPEG2_AUDIO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('m','p','g','a');
                     p_new_es->i_cat = AUDIO_ES;
                     break;
                 case LPCM_AUDIO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('l','p','c','m');
+                    p_new_es->i_cat = AUDIO_ES;
+                    p_new_es->i_stream_id = 0xBD;
+                    break;
                 case AC3_AUDIO_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
                     p_new_es->i_cat = AUDIO_ES;
                     p_new_es->i_stream_id = 0xBD;
                     break;
                 case DVD_SPU_ES:
+                    p_new_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
                     p_new_es->i_cat = SPU_ES;
                     p_new_es->i_stream_id = 0xBD;
                     break;
                 default:
+                    p_new_es->i_fourcc = 0;
                     p_new_es->i_cat = UNKNOWN_ES;
             }
 

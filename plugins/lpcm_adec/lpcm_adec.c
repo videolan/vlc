@@ -2,7 +2,7 @@
  * lpcm_adec.c: lpcm decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm_adec.c,v 1.18 2002/07/17 21:24:06 stef Exp $
+ * $Id: lpcm_adec.c,v 1.19 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -41,7 +41,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe  ( u8 * );
+static int  decoder_Probe  ( vlc_fourcc_t * );
 static int  decoder_Run    ( decoder_fifo_t * );
        void DecodeFrame    ( lpcmdec_thread_t * );
 static int  InitThread     ( lpcmdec_thread_t * );
@@ -78,9 +78,9 @@ MODULE_DEACTIVATE_STOP
 /*****************************************************************************
  * decoder_Probe: probe the decoder and return score
  *****************************************************************************/
-static int decoder_Probe( u8 *pi_type )
+static int decoder_Probe( vlc_fourcc_t *pi_type )
 {
-    return ( *pi_type == LPCM_AUDIO_ES ) ? 0 : -1;
+    return ( *pi_type == VLC_FOURCC('l','p','c','m') ) ? 0 : -1;
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ac3_adec.c,v 1.33 2002/06/01 18:04:48 sam Exp $
+ * $Id: ac3_adec.c,v 1.34 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -44,7 +44,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe     ( u8 * );
+static int  decoder_Probe     ( vlc_fourcc_t * );
 static int  decoder_Run       ( decoder_fifo_t * );
 static int  InitThread        ( ac3dec_t * p_adec );
 static void EndThread         ( ac3dec_t * p_adec );
@@ -96,9 +96,9 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( u8 *pi_type )
+static int decoder_Probe( vlc_fourcc_t *pi_type )
 {
-    return ( *pi_type == AC3_AUDIO_ES ) ? 0 : -1;
+    return *pi_type == VLC_FOURCC('a','5','2',' ') ? 0 : -1;
 }
 
 /*****************************************************************************

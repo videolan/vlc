@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.99 2002/06/02 11:59:46 sam Exp $
+ * $Id: mpeg_system.c,v 1.100 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -337,7 +337,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
             i_pes_header_size++;
         }
 
-        if( p_es->i_type == AC3_AUDIO_ES )
+        if( p_es->i_fourcc == VLC_FOURCC('a','5','2',' ') )
         {
             /* With ac3 audio, we need to skip first 3 bytes */
             i_pes_header_size += 3;
@@ -573,12 +573,15 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
                     == i_stream_id )
             {
                 p_es = p_input->stream.pp_programs[0]->pp_es[i];
+                /* FIXME: do something below */
+#if 0
                 if( p_es->i_type != p_byte[0] )
                 {
                     input_DelES( p_input, p_es );
                     p_es = NULL;
                 }
                 else
+#endif
                 {
                     /* Move the ES to the beginning. */
                     p_input->stream.pp_programs[0]->pp_es[i]
@@ -598,12 +601,34 @@ static void DecodePSM( input_thread_t * p_input, data_packet_t * p_data )
         {
             p_es = input_AddES( p_input, p_input->stream.pp_programs[0],
                                 i_stream_id, 0 );
-            p_es->i_type = p_byte[0];
-            p_es->b_audio = ( p_es->i_type == MPEG1_AUDIO_ES
-                              || p_es->i_type == MPEG2_AUDIO_ES
-                              || p_es->i_type == AC3_AUDIO_ES
-                              || p_es->i_type == LPCM_AUDIO_ES
-                            );
+            switch( p_byte[0] )
+            {
+            case MPEG1_VIDEO_ES:
+            case MPEG2_VIDEO_ES:
+                p_es->i_fourcc = VLC_FOURCC('m','p','g','v');
+                p_es->i_cat = VIDEO_ES;
+                break;
+            case DVD_SPU_ES:
+                p_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
+                p_es->i_cat = SPU_ES;
+                break;
+            case MPEG1_AUDIO_ES:
+            case MPEG2_AUDIO_ES:
+                p_es->i_fourcc = VLC_FOURCC('m','p','g','a');
+                p_es->i_cat = AUDIO_ES;
+                break;
+            case AC3_AUDIO_ES:
+                p_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
+                p_es->i_cat = AUDIO_ES;
+                break;
+            case LPCM_AUDIO_ES:
+                p_es->i_fourcc = VLC_FOURCC('l','p','c','m');
+                p_es->i_cat = AUDIO_ES;
+                break;
+            default:
+                p_es->i_fourcc = 0;
+                break;
+            }
 
             /* input_AddES has inserted the new element at the end. */
             p_input->stream.pp_programs[0]->pp_es[
@@ -789,7 +814,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     if( (i_id & 0xF0) == 0xE0 )
                     {
                         /* MPEG video */
-                        p_es->i_type = MPEG2_VIDEO_ES;
+                        p_es->i_fourcc = VLC_FOURCC('m','p','g','v');
                         p_es->i_cat = VIDEO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
@@ -799,8 +824,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xE0) == 0xC0 )
                     {
                         /* MPEG audio */
-                        p_es->i_type = MPEG2_AUDIO_ES;
-                        p_es->b_audio = 1;
+                        p_es->i_fourcc = VLC_FOURCC('m','p','g','a');
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
@@ -819,8 +843,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xF0FF) == 0x80BD )
                     {
                         /* AC3 audio (0x80->0x8F) */
-                        p_es->i_type = AC3_AUDIO_ES;
-                        p_es->b_audio = 1;
+                        p_es->i_fourcc = VLC_FOURCC('a','5','2',' ');
                         p_es->i_cat = AUDIO_ES;
 #ifdef AUTO_SPAWN
                         if( !p_input->stream.b_seekable )
@@ -839,7 +862,7 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xE0FF) == 0x20BD )
                     {
                         /* Subtitles video (0x20->0x3F) */
-                        p_es->i_type = DVD_SPU_ES;
+                        p_es->i_fourcc = VLC_FOURCC('s','p','u',' ');
                         p_es->i_cat = SPU_ES;
 #ifdef AUTO_SPAWN
                         if( config_GetInt( p_input, "spu-channel" )
@@ -853,13 +876,12 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                     else if( (i_id & 0xF0FF) == 0xA0BD )
                     {
                         /* LPCM audio (0xA0->0xAF) */
-                        p_es->i_type = LPCM_AUDIO_ES;
-                        p_es->b_audio = 1;
+                        p_es->i_fourcc = VLC_FOURCC('l','p','c','m');
                         p_es->i_cat = AUDIO_ES;
                     }
                     else
                     {
-                        p_es->i_type = UNKNOWN_ES;
+                        p_es->i_fourcc = 0;
                     }
                 }
 
@@ -994,7 +1016,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
 
         vlc_mutex_lock( &p_input->stream.control.control_lock );
         if( p_es != NULL && p_es->p_decoder_fifo != NULL
-             && (!p_es->b_audio || !p_input->stream.control.b_mute) )
+             && (p_es->i_cat != AUDIO_ES || !p_input->stream.control.b_mute) )
         {
             vlc_mutex_unlock( &p_input->stream.control.control_lock );
             p_es->c_packets++;
@@ -1133,7 +1155,8 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     }
 
     vlc_mutex_lock( &p_input->stream.control.control_lock );
-    if( ( p_es == NULL ) || (p_es->b_audio && p_input->stream.control.b_mute) )
+    if( ( p_es == NULL ) || (p_es->i_cat == AUDIO_ES
+                              && p_input->stream.control.b_mute) )
     {
         /* Not selected. Just read the adaptation field for a PCR. */
         b_trash = 1;

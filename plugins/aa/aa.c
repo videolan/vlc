@@ -2,7 +2,7 @@
  * vout_aa.c: Aa video output display method for testing purposes
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aa.c,v 1.7 2002/07/20 18:01:42 sam Exp $
+ * $Id: aa.c,v 1.8 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -145,7 +145,7 @@ static int vout_Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 0;
 
-    p_vout->output.i_chroma = FOURCC_RGB2;
+    p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
     p_vout->output.i_width = p_vout->p_sys->i_width;
     p_vout->output.i_height = p_vout->p_sys->i_height;
     p_vout->output.i_aspect = p_vout->p_sys->i_width
@@ -169,10 +169,10 @@ static int vout_Init( vout_thread_t *p_vout )
 
     /* Allocate the picture */
     p_pic->p->p_pixels = aa_image( p_vout->p_sys->aa_context );
-    p_pic->p->i_pixel_bytes = 1;
     p_pic->p->i_lines = p_vout->p_sys->i_height;
     p_pic->p->i_pitch = p_vout->p_sys->i_width;
-    p_pic->p->b_margin = 0;
+    p_pic->p->i_pixel_pitch = 1;
+    p_pic->p->i_visible_pitch = p_vout->p_sys->i_width;
     p_pic->i_planes = 1;
 
     p_pic->i_status = DESTROYED_PICTURE;

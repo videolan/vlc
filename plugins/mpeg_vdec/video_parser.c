@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video_parser.c,v 1.25 2002/07/16 21:25:43 sam Exp $
+ * $Id: video_parser.c,v 1.26 2002/07/23 00:39:17 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -50,7 +50,7 @@
 /*
  * Local prototypes
  */
-static int      decoder_Probe     ( u8 * );
+static int      decoder_Probe     ( vlc_fourcc_t * );
 static int      decoder_Run       ( decoder_fifo_t * );
 static int      InitThread        ( vpar_thread_t * );
 static void     EndThread         ( vpar_thread_t * );
@@ -122,10 +122,9 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able 
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( u8 *pi_type )
+static int decoder_Probe( vlc_fourcc_t *pi_type )
 {
-    return( ( *pi_type == MPEG1_VIDEO_ES
-               || *pi_type == MPEG2_VIDEO_ES ) ? 0 : -1 );
+    return *pi_type == VLC_FOURCC('m','p','g','v') ? 0 : -1;
 }
 
 /*****************************************************************************

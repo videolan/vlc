@@ -628,13 +628,13 @@ static int QNXInitDisplay( vout_thread_t * p_vout )
     switch( p_vout->p_sys->i_screen_depth )
     {
         case 8:
-            p_vout->output.i_chroma = FOURCC_RGB2;
+            p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
             p_vout->p_sys->i_bytes_per_pixel = 1;
             p_vout->output.pf_setpalette = SetPalette;
             break;
 
         case 15:
-            p_vout->output.i_chroma = FOURCC_RV15;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
             p_vout->p_sys->i_bytes_per_pixel = 2;
             p_vout->output.i_rmask = 0x7c00;
             p_vout->output.i_gmask = 0x03e0;
@@ -642,7 +642,7 @@ static int QNXInitDisplay( vout_thread_t * p_vout )
             break;
 
         case 16:
-            p_vout->output.i_chroma = FOURCC_RV16;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
             p_vout->p_sys->i_bytes_per_pixel = 2;
             p_vout->output.i_rmask = 0xf800;
             p_vout->output.i_gmask = 0x07e0;
@@ -650,7 +650,7 @@ static int QNXInitDisplay( vout_thread_t * p_vout )
             break;
 
         case 24:
-            p_vout->output.i_chroma = FOURCC_RV24;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
             p_vout->p_sys->i_bytes_per_pixel = 3;
             p_vout->output.i_rmask = 0xff0000;
             p_vout->output.i_gmask = 0x00ff00;
@@ -659,7 +659,7 @@ static int QNXInitDisplay( vout_thread_t * p_vout )
 
         case 32:
         default:
-            p_vout->output.i_chroma = FOURCC_RV32;
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
             p_vout->p_sys->i_bytes_per_pixel = 4;
             p_vout->output.i_rmask = 0xff0000;
             p_vout->output.i_gmask = 0x00ff00;
@@ -788,19 +788,9 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
         p_pic->p->p_pixels = p_pic->p_sys->p_image->image;
         p_pic->p->i_lines = p_pic->p_sys->p_image->size.h;
         p_pic->p->i_pitch = p_pic->p_sys->p_image->bpl;
-        p_pic->p->i_pixel_bytes = p_vout->p_sys->i_bytes_per_pixel;
-
-        if( p_pic->p->i_pitch == p_vout->p_sys->i_bytes_per_pixel * p_pic->p_sys->p_image->size.w )
-        {
-            p_pic->p->b_margin = 0;
-        }
-        else
-        {
-            p_pic->p->b_margin = 1;
-            p_pic->p->b_hidden = 1;
-            p_pic->p->i_visible_bytes = p_vout->p_sys->i_bytes_per_pixel * p_pic->p_sys->p_image->size.w;
-        }
-
+        p_pic->p->i_pixel_pitch = p_vout->p_sys->i_bytes_per_pixel;
+        p_pic->p->i_visible_pitch = p_vout->p_sys->i_bytes_per_pixel
+                                     * p_pic->p_sys->p_image->size.w;
         p_pic->i_planes = 1;
         break;
 
@@ -833,19 +823,9 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
         p_pic->p->p_pixels = p_pic->p_sys->p_buf[0];
         p_pic->p->i_lines = p_pic->p_sys->p_ctx[0]->dim.h;
         p_pic->p->i_pitch = p_pic->p_sys->p_ctx[0]->pitch;
-        p_pic->p->i_pixel_bytes = p_vout->p_sys->i_bytes_per_pixel;
-
-        if( p_pic->p->i_pitch == p_vout->p_sys->i_bytes_per_pixel * p_pic->p_sys->p_ctx[0]->dim.w )
-        {
-            p_pic->p->b_margin = 0;
-        }
-        else
-        {
-            p_pic->p->b_margin = 1;
-            p_pic->p->b_hidden = 1;
-            p_pic->p->i_visible_bytes = p_vout->p_sys->i_bytes_per_pixel * p_pic->p_sys->p_ctx[0]->dim.w;
-        }
-
+        p_pic->p->i_pixel_pitch = p_vout->p_sys->i_bytes_per_pixel;
+        p_pic->p->i_visible_pitch = p_vout->p_sys->i_bytes_per_pixel
+                                     * p_pic->p_sys->p_ctx[0]->dim.w;
         p_pic->i_planes = 1;
         break;
 
@@ -873,7 +853,7 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
         switch (p_vout->p_sys->i_vc_format)
         {
             case Pg_VIDEO_FORMAT_YUV420:
-                p_vout->output.i_chroma = FOURCC_I420;
+                p_vout->output.i_chroma = VLC_FOURCC('I','4','2','0');
 
                 p_pic->p_sys->p_buf[U_PLANE] = PdGetOffscreenContextPtr( p_pic->p_sys->p_ctx[U_PLANE] );
                 p_pic->p_sys->p_buf[V_PLANE] = PdGetOffscreenContextPtr( p_pic->p_sys->p_ctx[V_PLANE] );
@@ -888,26 +868,26 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 p_pic->Y_PIXELS = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p[Y_PLANE].i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
-                p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-                p_pic->p[Y_PLANE].b_margin = 0;
+                p_pic->p[Y_PLANE].i_pixel_pitch = 1;
+                p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
 
                 p_pic->U_PIXELS = p_pic->p_sys->p_buf[U_PLANE];
                 p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_ctx[U_PLANE]->dim.h;
                 p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_ctx[U_PLANE]->pitch;
-                p_pic->p[U_PLANE].i_pixel_bytes = 1;
-                p_pic->p[U_PLANE].b_margin = 0;
+                p_pic->p[U_PLANE].i_pixel_pitch = 1;
+                p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
                 p_pic->V_PIXELS = p_pic->p_sys->p_buf[V_PLANE];
                 p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_ctx[V_PLANE]->dim.h;
                 p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_ctx[V_PLANE]->pitch;
-                p_pic->p[V_PLANE].i_pixel_bytes = 1;
-                p_pic->p[V_PLANE].b_margin = 0;
+                p_pic->p[V_PLANE].i_pixel_pitch = 1;
+                p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
 
                 p_pic->i_planes = 3;
                 break;
 
             case Pg_VIDEO_FORMAT_YV12:
-                p_vout->output.i_chroma = FOURCC_YV12;
+                p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
 
                 p_pic->p_sys->p_buf[U_PLANE] = PdGetOffscreenContextPtr( p_pic->p_sys->p_ctx[U_PLANE] );
                 p_pic->p_sys->p_buf[V_PLANE] = PdGetOffscreenContextPtr( p_pic->p_sys->p_ctx[V_PLANE] );
@@ -922,20 +902,20 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 p_pic->Y_PIXELS = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p[Y_PLANE].i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
-                p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-                p_pic->p[Y_PLANE].b_margin = 0;
+                p_pic->p[Y_PLANE].i_pixel_pitch = 1;
+                p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
 
                 p_pic->U_PIXELS = p_pic->p_sys->p_buf[U_PLANE];
                 p_pic->p[U_PLANE].i_lines = p_pic->p_sys->p_ctx[U_PLANE]->dim.h;
                 p_pic->p[U_PLANE].i_pitch = p_pic->p_sys->p_ctx[U_PLANE]->pitch;
-                p_pic->p[U_PLANE].i_pixel_bytes = 1;
-                p_pic->p[U_PLANE].b_margin = 0;
+                p_pic->p[U_PLANE].i_pixel_pitch = 1;
+                p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
                 p_pic->V_PIXELS = p_pic->p_sys->p_buf[V_PLANE];
                 p_pic->p[V_PLANE].i_lines = p_pic->p_sys->p_ctx[V_PLANE]->dim.h;
                 p_pic->p[V_PLANE].i_pitch = p_pic->p_sys->p_ctx[V_PLANE]->pitch;
-                p_pic->p[V_PLANE].i_pixel_bytes = 1;
-                p_pic->p[V_PLANE].b_margin = 0;
+                p_pic->p[V_PLANE].i_pixel_pitch = 1;
+                p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
 
                 p_pic->i_planes = 3;
                 break;
@@ -944,24 +924,24 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
             case Pg_VIDEO_FORMAT_YUY2:
                 if (p_vout->p_sys->i_vc_format == Pg_VIDEO_FORMAT_UYVY)
                 {
-                    p_vout->output.i_chroma = FOURCC_UYVY;
+                    p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
                 }
                 else
                 {
-                    p_vout->output.i_chroma = FOURCC_YUY2;
+                    p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
                 }
 
                 p_pic->p->p_pixels = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p->i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p->i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
-                p_pic->p->i_pixel_bytes = 4;
-                p_pic->p->b_margin = 0;
+                p_pic->p->i_pixel_pitch = 4;
+                p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
 
                 p_pic->i_planes = 1;
                 break;
 
             case Pg_VIDEO_FORMAT_RGB555:
-                p_vout->output.i_chroma = FOURCC_RV15;
+                p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
                 p_vout->output.i_rmask = 0x001f;
                 p_vout->output.i_gmask = 0x03e0;
                 p_vout->output.i_bmask = 0x7c00;
@@ -969,24 +949,14 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 p_pic->p->p_pixels = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p->i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p->i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
-                p_pic->p->i_pixel_bytes = 2;
-
-                if( p_pic->p->i_pitch == 2 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w )
-                {
-                    p_pic->p->b_margin = 0;
-                }
-                else
-                {
-                    p_pic->p->b_margin = 1;
-                    p_pic->p->b_hidden = 1;
-                    p_pic->p->i_visible_bytes = 2 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w;
-                }
+                p_pic->p->i_pixel_pitch = 2;
+                p_pic->p->i_visible_pitch = 2 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w;
 
                 p_pic->i_planes = 1;
                 break;
 
             case Pg_VIDEO_FORMAT_RGB565:
-                p_vout->output.i_chroma = FOURCC_RV16;
+                p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
                 p_vout->output.i_rmask = 0x001f;
                 p_vout->output.i_gmask = 0x07e0;
                 p_vout->output.i_bmask = 0xf800;
@@ -994,24 +964,14 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 p_pic->p->p_pixels = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p->i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p->i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
-                p_pic->p->i_pixel_bytes = 4;
-
-                if( p_pic->p->i_pitch == 4 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w )
-                {
-                    p_pic->p->b_margin = 0;
-                }
-                else
-                {
-                    p_pic->p->b_margin = 1;
-                    p_pic->p->b_hidden = 1;
-                    p_pic->p->i_visible_bytes = 4 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w;
-                }
+                p_pic->p->i_pixel_pitch = 4;
+                p_pic->p->i_visible_pitch = 4 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w;
 
                 p_pic->i_planes = 1;
                 break;
 
             case Pg_VIDEO_FORMAT_RGB8888:
-                p_vout->output.i_chroma = FOURCC_RV32;
+                p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
                 p_vout->output.i_rmask = 0x000000ff;
                 p_vout->output.i_gmask = 0x0000ff00;
                 p_vout->output.i_bmask = 0x00ff0000;
@@ -1019,18 +979,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
                 p_pic->p->p_pixels = p_pic->p_sys->p_buf[Y_PLANE];
                 p_pic->p->i_lines = p_pic->p_sys->p_ctx[Y_PLANE]->dim.h;
                 p_pic->p->i_pitch = p_pic->p_sys->p_ctx[Y_PLANE]->pitch;
-                p_pic->p->i_pixel_bytes = 4;
-
-                if( p_pic->p->i_pitch == 4 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w )
-                {
-                    p_pic->p->b_margin = 0;
-                }
-                else
-                {
-                    p_pic->p->b_margin = 1;
-                    p_pic->p->b_hidden = 1;
-                    p_pic->p->i_visible_bytes = 4 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w;
-                }
+                p_pic->p->i_pixel_pitch = 4;
+                p_pic->p->i_visible_pitch = 4 * p_pic->p_sys->p_ctx[Y_PLANE]->dim.w;
 
                 p_pic->i_planes = 1;
                 break;
@@ -1040,15 +990,15 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic, int index )
     switch( p_vout->output.i_chroma )
     {
 #ifdef MODULE_NAME_IS_xvideo
-        case FOURCC_Y211:
+        case VLC_FOURCC('Y','2','1','1'):
 
             p_pic->p->p_pixels = p_pic->p_sys->p_image->data
                                   + p_pic->p_sys->p_image->offsets[0];
             p_pic->p->i_lines = p_vout->output.i_height;
             /* XXX: this just looks so plain wrong... check it out ! */
             p_pic->p->i_pitch = p_pic->p_sys->p_image->pitches[0] / 4;
-            p_pic->p->i_pixel_bytes = 4;
-            p_pic->p->b_margin = 0;
+            p_pic->p->i_pixel_pitch = 4;
+            p_pic->p->i_visible_pitch = p_pic->p->i_pitch;
 
             p_pic->i_planes = 1;
             break;

@@ -2,7 +2,7 @@
  * i420_ymga.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_ymga.c,v 1.6 2002/06/01 12:31:58 sam Exp $
+ * $Id: i420_ymga.c,v 1.7 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -92,12 +92,12 @@ static int chroma_Init( vout_thread_t *p_vout )
 
     switch( p_vout->render.i_chroma )
     {
-        case FOURCC_YV12:
-        case FOURCC_I420:
-        case FOURCC_IYUV:
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
             switch( p_vout->output.i_chroma )
             {
-                case FOURCC_YMGA:
+                case VLC_FOURCC('Y','M','G','A'):
                     p_vout->chroma.pf_convert = I420_YMGA;
                     break;
 

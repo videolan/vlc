@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.39 2002/06/02 09:03:54 sam Exp $
+ * $Id: vout_directx.c,v 1.40 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -734,9 +734,12 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
 
     if( !b_overlay )
     {
-        vlc_bool_t b_rgb_surface = ( i_chroma == FOURCC_RGB2 ) ||
-            ( i_chroma == FOURCC_RV15 ) || ( i_chroma == FOURCC_RV16 ) ||
-            ( i_chroma == FOURCC_RV24 ) || ( i_chroma == FOURCC_RV32 );
+        vlc_bool_t b_rgb_surface =
+            ( i_chroma == VLC_FOURCC('R','G','B','2') )
+          || ( i_chroma == VLC_FOURCC('R','V','1','5') )
+           || ( i_chroma == VLC_FOURCC('R','V','1','6') )
+            || ( i_chroma == VLC_FOURCC('R','V','2','4') )
+             || ( i_chroma == VLC_FOURCC('R','V','3','2') );
 
         memset( &ddsd, 0, sizeof( DDSURFACEDESC ) );
         ddsd.dwSize = sizeof(DDSURFACEDESC);
@@ -909,20 +912,20 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
     /* Choose the chroma we will try first. */
     switch( p_vout->render.i_chroma )
     {
-        case FOURCC_YUY2:
-        case FOURCC_YUNV:
-            p_vout->output.i_chroma = FOURCC_YUY2;
+        case VLC_FOURCC('Y','U','Y','2'):
+        case VLC_FOURCC('Y','U','N','V'):
+            p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
             break;
-        case FOURCC_UYVY:
-        case FOURCC_UYNV:
-        case FOURCC_Y422:
-            p_vout->output.i_chroma = FOURCC_UYVY;
+        case VLC_FOURCC('U','Y','V','Y'):
+        case VLC_FOURCC('U','Y','N','V'):
+        case VLC_FOURCC('Y','4','2','2'):
+            p_vout->output.i_chroma = VLC_FOURCC('U','Y','V','Y');
             break;
-        case FOURCC_YVYU:
-            p_vout->output.i_chroma = FOURCC_YVYU;
+        case VLC_FOURCC('Y','V','Y','U'):
+            p_vout->output.i_chroma = VLC_FOURCC('Y','V','Y','U');
             break;
         default:
-            p_vout->output.i_chroma = FOURCC_YV12;
+            p_vout->output.i_chroma = VLC_FOURCC('Y','V','1','2');
             break;
     }
 
@@ -993,7 +996,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 for( j = 0; j < front_pic.i_planes; j++ )
                     memset( front_pic.p[j].p_pixels, 127,
                             front_pic.p[j].i_lines * front_pic.p[j].i_pitch
-                            * front_pic.p[j].i_pixel_bytes );
+                            * front_pic.p[j].i_pixel_pitch );
             }
 
             DirectXUpdateOverlay( p_vout );
@@ -1036,15 +1039,20 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
                 switch( ddpfPixelFormat.dwRGBBitCount )
                 {
                 case 8: /* FIXME: set the palette */
-                    p_vout->output.i_chroma = FOURCC_RGB2; break;
+                    p_vout->output.i_chroma = VLC_FOURCC('R','G','B','2');
+                    break;
                 case 15:
-                    p_vout->output.i_chroma = FOURCC_RV15; break;
+                    p_vout->output.i_chroma = VLC_FOURCC('R','V','1','5');
+                    break;
                 case 16:
-                    p_vout->output.i_chroma = FOURCC_RV16; break;
+                    p_vout->output.i_chroma = VLC_FOURCC('R','V','1','6');
+                    break;
                 case 24:
-                    p_vout->output.i_chroma = FOURCC_RV24; break;
+                    p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
+                    break;
                 case 32:
-                    p_vout->output.i_chroma = FOURCC_RV32; break;
+                    p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
+                    break;
                 default:
                     msg_Err( p_vout, "unknown screen depth" );
                     return( 0 );
@@ -1147,81 +1155,80 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
 
     switch( p_vout->output.i_chroma )
     {
-
-        case FOURCC_RGB2:
-        case FOURCC_RV15:
-        case FOURCC_RV16:
-        case FOURCC_RV24:
-        case FOURCC_RV32:
+        case VLC_FOURCC('R','G','B','2'):
+        case VLC_FOURCC('R','V','1','5'):
+        case VLC_FOURCC('R','V','1','6'):
+        case VLC_FOURCC('R','V','2','4'):
+        case VLC_FOURCC('R','V','3','2'):
             p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
             p_pic->p->i_lines = p_vout->output.i_height;
             p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
-            p_pic->p->b_margin = 0;
-            p_pic->i_planes = 1;
             switch( p_vout->output.i_chroma )
             {
-                case FOURCC_RGB2:
-                    p_pic->p->i_pixel_bytes = 1;
+                case VLC_FOURCC('R','G','B','2'):
+                    p_pic->p->i_pixel_pitch = 1;
                     break;
-                case FOURCC_RV15:
-                case FOURCC_RV16:
-                    p_pic->p->i_pixel_bytes = 2;
+                case VLC_FOURCC('R','V','1','5'):
+                case VLC_FOURCC('R','V','1','6'):
+                    p_pic->p->i_pixel_pitch = 2;
                     break;
-                case FOURCC_RV24:
-                case FOURCC_RV32:
-                    p_pic->p->i_pixel_bytes = 4;
+                case VLC_FOURCC('R','V','2','4'):
+                case VLC_FOURCC('R','V','3','2'):
+                    p_pic->p->i_pixel_pitch = 4;
                     break;
                 default:
                     return( -1 );
             }
+            p_pic->p->i_visible_pitch = p_pic->p_sys->ddsd.lPitch;
+            p_pic->i_planes = 1;
             break;
 
-        case FOURCC_YV12:
+        case VLC_FOURCC('Y','V','1','2'):
 
             p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
             p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
             p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
 
             p_pic->V_PIXELS =  p_pic->Y_PIXELS
               + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[V_PLANE].i_pixel_bytes = 1;
-            p_pic->p[V_PLANE].b_margin = 0;
+            p_pic->p[V_PLANE].i_pixel_pitch = 1;
+            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
 
             p_pic->U_PIXELS = p_pic->V_PIXELS
               + p_pic->p[V_PLANE].i_lines * p_pic->p[V_PLANE].i_pitch;
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[U_PLANE].i_pixel_bytes = 1;
-            p_pic->p[U_PLANE].b_margin = 0;
+            p_pic->p[U_PLANE].i_pixel_pitch = 1;
+            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
             p_pic->i_planes = 3;
             break;
 
-        case FOURCC_IYUV:
+        case VLC_FOURCC('I','Y','U','V'):
 
             p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
             p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
             p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
-            p_pic->p[Y_PLANE].i_pixel_bytes = 1;
-            p_pic->p[Y_PLANE].b_margin = 0;
+            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
+            p_pic->p[Y_PLANE].i_visible_pitch = p_pic->p[Y_PLANE].i_pitch;
 
             p_pic->U_PIXELS = p_pic->Y_PIXELS
               + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
             p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[U_PLANE].i_pixel_bytes = 1;
-            p_pic->p[U_PLANE].b_margin = 0;
+            p_pic->p[U_PLANE].i_pixel_pitch = 1;
+            p_pic->p[U_PLANE].i_visible_pitch = p_pic->p[U_PLANE].i_pitch;
 
             p_pic->V_PIXELS =  p_pic->U_PIXELS
               + p_pic->p[U_PLANE].i_lines * p_pic->p[U_PLANE].i_pitch;
             p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
             p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[V_PLANE].i_pixel_bytes = 1;
-            p_pic->p[V_PLANE].b_margin = 0;
+            p_pic->p[V_PLANE].i_pixel_pitch = 1;
+            p_pic->p[V_PLANE].i_visible_pitch = p_pic->p[V_PLANE].i_pitch;
 
             p_pic->i_planes = 3;
             break;

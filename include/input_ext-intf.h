@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.71 2002/07/21 19:26:13 sigmunau Exp $
+ * $Id: input_ext-intf.h,v 1.72 2002/07/23 00:39:16 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -47,12 +47,8 @@ struct es_descriptor_t
 {
     u16                     i_id;            /* stream ID for PS, PID for TS */
     u8                      i_stream_id;     /* stream ID defined in the PES */
-    u8                      i_type;                           /* stream type */
-    vlc_bool_t              b_audio;      /* is the stream an audio stream that
-                                           * will need to be discarded with
-                                           * fast forward and slow motion ?  */
-    u8                      i_cat;        /* stream category: video, audio,
-                                           * spu, other */
+    vlc_fourcc_t            i_fourcc;                         /* stream type */
+    u8                      i_cat;    /* stream category (audio, video, spu) */
     int                     i_demux_fd;   /* used to store demux device
                                              file handle */
     char                    psz_desc[20]; /* description of ES: audio language
@@ -86,11 +82,11 @@ struct es_descriptor_t
  
 
 /* ES Categories to be used by interface plugins */
-#define VIDEO_ES        0x00
-#define AUDIO_ES        0x01
-#define SPU_ES          0x02
-#define NAV_ES          0x03
-#define UNKNOWN_ES      0xFF
+#define UNKNOWN_ES      0x00
+#define VIDEO_ES        0x01
+#define AUDIO_ES        0x02
+#define SPU_ES          0x03
+#define NAV_ES          0x04
 
 /*****************************************************************************
  * pgrm_descriptor_t
@@ -368,7 +364,6 @@ VLC_EXPORT( void, __input_Tell, ( vlc_object_t *, stream_position_t * ) );
 
 VLC_EXPORT( void, input_DumpStream, ( input_thread_t * ) );
 VLC_EXPORT( char *, input_OffsetToTime, ( input_thread_t *, char *, off_t ) );
-VLC_EXPORT( int, input_ChangeES, ( input_thread_t *, es_descriptor_t *, u8 ) );
 VLC_EXPORT( int, input_ToggleES, ( input_thread_t *, es_descriptor_t *, vlc_bool_t ) );
 VLC_EXPORT( int, input_ChangeArea, ( input_thread_t *, input_area_t * ) );
 VLC_EXPORT( int, input_ChangeProgram, ( input_thread_t *, u16 ) );

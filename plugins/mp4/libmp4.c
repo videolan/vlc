@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.3 2002/07/21 18:47:22 fenrir Exp $
+ * $Id: libmp4.c,v 1.4 2002/07/23 00:39:17 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -2154,7 +2154,7 @@ int MP4_ReadBoxRoot( input_thread_t *p_input, MP4_Box_t *p_root )
     
     MP4_SeekAbsolute( p_input, 0 );     /* Go to the begining */
     p_root->i_pos = 0;
-    p_root->i_type = MP4_FOURCC( 'r', 'o', 'o', 't' );
+    p_root->i_type = VLC_FOURCC( 'r', 'o', 'o', 't' );
     p_root->i_shortsize = 1;
     p_root->i_size = p_input->stream.p_selected_area->i_size;
     CreateUUID( &p_root->i_uuid, p_root->i_type );

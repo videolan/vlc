@@ -208,7 +208,6 @@ static inline const char * module_error( char *psz_buffer )
     (p_symbols)->__input_Tell_inner = __input_Tell; \
     (p_symbols)->input_DumpStream_inner = input_DumpStream; \
     (p_symbols)->input_OffsetToTime_inner = input_OffsetToTime; \
-    (p_symbols)->input_ChangeES_inner = input_ChangeES; \
     (p_symbols)->input_ToggleES_inner = input_ToggleES; \
     (p_symbols)->input_ChangeArea_inner = input_ChangeArea; \
     (p_symbols)->input_ChangeProgram_inner = input_ChangeProgram; \

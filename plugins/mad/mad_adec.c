@@ -40,7 +40,7 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  decoder_Probe  ( u8 * );
+static int  decoder_Probe  ( vlc_fourcc_t * );
 static int  decoder_Run    ( decoder_fifo_t * );
 static int  InitThread     ( mad_adec_thread_t * p_mad_adec );
 static void EndThread      ( mad_adec_thread_t * p_mad_adec );
@@ -85,14 +85,9 @@ MODULE_DEACTIVATE_STOP
  * Tries to launch a decoder and return score so that the interface is able
  * to chose.
  *****************************************************************************/
-static int decoder_Probe( u8 *pi_type )
+static int decoder_Probe( vlc_fourcc_t *pi_type )
 {
-    if( *pi_type == MPEG1_AUDIO_ES || *pi_type == MPEG2_AUDIO_ES )
-    {
-        return 0;
-    }
-
-    return -1;
+    return *pi_type == VLC_FOURCC('m','p','g','a') ? 0 : -1;
 }
 
 /*****************************************************************************
