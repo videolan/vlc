@@ -1717,7 +1717,7 @@ AC_SUBST(waveout_LDFLAGS)
 AC_SUBST(x11_LDFLAGS)
 AC_SUBST(xvideo_LDFLAGS)
 
-AC_OUTPUT([Makefile.opts po/Makefile.in])
+AC_OUTPUT([Makefile.config Makefile.opts po/Makefile.in])
 
 echo "
 vlc configuration

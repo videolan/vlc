@@ -1,0 +1,19 @@
+###############################################################################
+# vlc (VideoLAN Client) options Makefile
+# (c)1998 VideoLAN
+###############################################################################
+
+# 
+# Plugins to build
+# WARNING: if you do not have a dynamic loader on your platform, remove
+# the plugins in this line and put them as built-ins, otherwise your
+# application won't be able to load them.
+# 
+PLUGINS :=@PLUGINS@
+
+# 
+# Built-in modules to build
+# WARNING: do NOT put gtk and gnome together in this rule.
+# 
+BUILTINS :=@BUILTINS@
+

@@ -3,6 +3,7 @@
 ###############################################################################
 
 ifeq ($(shell [ ! -r Makefile.opts ] && echo 1),)
+    include Makefile.config
     include Makefile.opts
 endif
 
@@ -366,7 +367,7 @@ dist:
 	# Copy misc files
 	cp FAQ AUTHORS COPYING TODO todo.pl ChangeLog* README* INSTALL* \
 		ABOUT-NLS BUGS MODULES vlc.spec \
-		Makefile Makefile.opts.in Makefile.dep Makefile.modules \
+		Makefile Makefile.*.in Makefile.dep Makefile.modules \
 		configure configure.in install-sh install-win32 macosx-dmg \
 		config.sub config.guess aclocal.m4 mkinstalldirs \
 			tmp/vlc/
