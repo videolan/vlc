@@ -1,15 +1,17 @@
 #! /bin/sh
 
 ##  bootstrap file for vlc, the VideoLAN Client
-##  $Id: bootstrap,v 1.28 2002/11/18 11:50:42 sam Exp $
+##  $Id: bootstrap,v 1.29 2002/11/19 17:38:06 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
 ###
-###  get a sane environment
+###  Get a sane environment, just in case
 ###
 LANG=C
 export LANG
+CYGWIN=binmode
+export CYGWIN
 
 ##
 ##  Give help
@@ -72,6 +74,8 @@ then
     exit 1
   fi
 
+  echo "generating Visual Studio files..."
+
   #  The evil ^M
   M=''
 
@@ -83,14 +87,11 @@ then
   # libvlc files
   for target in evc/libvlc.vcp msvc/libvlc.dsp
   do
+    echo "${target}"
     rm -f ${target}
     #  Top of the project file
-    cat ${target}.in > ${target}
+    perl -pe 'if(/§SOURCES§/){last;}' < ${target}.in > ${target}
     #  The source files
-    cat >> ${target} << EOF
-# Begin Group "Source Files"${M}
-# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"${M}
-EOF
     for file in `for i in ${LIBVLC_SOURCES} ; do echo $i ; done | grep -v "/.*/"`
     do
       cat >> ${target} << EOF
@@ -166,14 +167,8 @@ EOF
 # End Group${M}
 EOF
     done
-    cat >> ${target} << EOF
-# End Group${M}
-EOF
     #  The headers
-    cat >> ${target} << EOF
-# Begin Group "Header Files"${M}
-# PROP Default_Filter "h;hpp;hxx;hm;inl"${M}
-EOF
+    perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){if(/§HEADERS§/){last;}print $_}' < ${target}.in >> ${target}
     for file in ${LIBVLC_HEADERS}
     do
       cat >> ${target} << EOF
@@ -195,64 +190,72 @@ EOF
     done
     cat >> ${target} << EOF
 # End Group${M}
-# End Group${M}
-# End Target${M}
-# End Project${M}
 EOF
+    perl -e 'while(<>){if(/§HEADERS§/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
   done
 
   # plugins files
-  for target in evc/plugins.vcp msvc/plugins.dsp
+  for dir in evc msvc
   do
-    rm -f ${target}
-    #  Top of the project file
-    cat ${target}.in > ${target}
-    #  The source files
-    cat >> ${target} << EOF
-# Begin Group "Source Files"${M}
-# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"${M}
-# End Group${M}
+    test "${dir}" = "evc" && suf="vcp" || suf="dsp"
+    for plugin in dummy
+    do
+      makefile="`grep '^L_'${plugin}'_pic =' Modules.am | sed -e 's@.* modules@modules@' -e 's@/[^/]*$@/Modules.am@'`"
+      source="${dir}/plugins.${suf}.in"
+      target="${dir}/plugin_${plugin}.${suf}"
+      echo "${target}"
+      rm -f ${target}
+      perl -pe 'if(/§SOURCES§/){last;} s/§PLUGIN§/'${plugin}'/g' < ${source} > ${target}
+      # this is an attempt at getting a list of plugin sources
+      sed -ne 's/^SOURCES_'${plugin}'.*=//; t foo; /^[a-zA-Z]/q; :foo p' < ${makefile} | tr '\\ ' '\n\n' | sed -ne 's,/,\\\\,g; s/.*modules/modules/p' | while read source
+      do
+        cat >> ${target} << EOF
+# Begin Source File${M}
+SOURCE="..\\${source}"${M}
+# End Source File${M}
 EOF
-    #  The headers
-    cat >> ${target} << EOF
-# Begin Group "Header Files"${M}
-# PROP Default_Filter "h;hpp;hxx;hm;inl"${M}
-# End Group${M}
-# End Target${M}
-# End Project${M}
-EOF
+      done
+      # sed is really nicer for this... unfortunately it's broken under cygwin
+      # sed -ne '1,/§SOURCES§/d; /§HEADERS§/,$d; p' < ${source} >> ${target}
+      perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){if(/§HEADERS§/){last;}print $_}' < ${source} >> ${target}
+### header generation disabled
+##      cat >> ${target} << EOF
+### Begin Source File${M}
+##SOURCE="..\\test.h"${M}
+### End Source File${M}
+##EOF
+      # sed -ne '1,/§HEADERS§/d; p' < ${source} >> ${target}
+      perl -e 'while(<>){if(/§HEADERS§/){last;}}while(<>){print $_}' < ${source} >> ${target}
+    done
   done
 
   # vlc files
   for target in evc/vlc.vcp msvc/vlc.dsp
   do
+    echo "${target}"
     rm -f ${target}
     #  Top of the project file
-    cat ${target}.in > ${target}
+    perl -pe 'if(/§SOURCES§/){last;}' < ${target}.in > ${target}
     #  The source files
-    cat >> ${target} << EOF
-# Begin Group "Source Files"${M}
-# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"${M}
-# Begin Source File${M}
-EOF
     if test "${target}" = "evc/vlc.vcp"
     then
       cat >> ${target} << EOF
+# Begin Source File${M}
 SOURCE="..\\evc\\vlc.c"${M}
+# End Source File${M}
 EOF
     else
       cat >> ${target} << EOF
+# Begin Source File${M}
 SOURCE="..\\src\\vlc.c"${M}
+# End Source File${M}
 EOF
     fi
-    cat >> ${target} << EOF
-# End Source File${M}
-# End Group${M}
-EOF
     #  Bottom of the project file - handles resource files too
-    cat ${target}.out >> ${target}
+    perl -e 'while(<>){if(/§SOURCES§/){last;}}while(<>){print $_}' < ${target}.in >> ${target}
   done
 
+  echo "done."
   exit 0
 fi
 
@@ -262,7 +265,7 @@ fi
 if test "$do_po" = "yes"
 then
   cd po
-  make update-po 2>&1 | grep '^[^:]*:$' | cut -f1 -d: | tr '\n' ' ' | sed 's/ $//'
+  make update-po #2>&1 | grep '^[^:]*:$' | cut -f1 -d: | tr '\n' ' ' | sed 's/ $//'
   cd ..
 
   exit 0

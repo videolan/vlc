@@ -84,3 +84,30 @@ LINK32=link.exe
 # Name "vlc - Win32 Release"
 # Name "vlc - Win32 Debug"
 
+# Begin Group "Source Files"
+# PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+§SOURCES§
+# End Group
+
+# Begin Group "Resource Files"
+
+# PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# Begin Source File
+
+SOURCE=..\share\vlc_win32_rc.rc
+
+!IF  "$(CFG)" == "vlc - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "vlc - Win32 Debug"
+
+# ADD BASE RSC /l 0x40c /i "\vlc-win32\share" /i "\vlc-win\share"
+# SUBTRACT BASE RSC /i "../"
+# ADD RSC /l 0x40c /i "\vlc-win32\share" /i "\vlc-win\share" /i "../../"
+# SUBTRACT RSC /i "../"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# End Target
+# End Project

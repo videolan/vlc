@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.106 2002/11/18 18:37:23 gbazin Exp $
+ * $Id: modules.c,v 1.107 2002/11/19 17:38:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -559,7 +559,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this )
 #endif
 
 #if defined( UNDER_CE )
-    wchar_t   psz_dir[MAX_PATH];
+    wchar_t         psz_dir[MAX_PATH];
 #endif
 
     /* If the user provided a plugin path, we add it to the list */
@@ -735,6 +735,14 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     module_t * p_module;
     module_handle_t handle;
 
+#ifdef UNDER_CE
+    char psz_filename[MAX_PATH];
+    WideCharToMultiByte( CP_ACP, WC_DEFAULTCHAR, psz_file, -1,
+                         psz_filename, MAX_PATH, NULL, NULL );
+#else
+    char * psz_filename = psz_file;
+#endif
+
     /* Try to dynamically load the module. */
     if( module_load( psz_file, &handle ) )
     {
@@ -742,7 +750,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
 
         /* The plugin module couldn't be opened */
         msg_Warn( p_this, "cannot open `%s' (%s)",
-                  psz_file, module_error( psz_buffer ) );
+                  psz_filename, module_error( psz_buffer ) );
         return -1;
     }
 
@@ -757,8 +765,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     }
 
     /* We need to fill these since they may be needed by CallEntry() */
-    /* FIXME: this is not unicode-compliant */
-    p_module->psz_filename = (char *)psz_file;
+    p_module->psz_filename = psz_filename;
     p_module->handle = handle;
     p_module->p_symbols = &p_this->p_libvlc->p_module_bank->symbols;
 
