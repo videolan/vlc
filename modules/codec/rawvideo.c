@@ -2,7 +2,7 @@
  * rawvideo.c: Pseudo video decoder/packetizer for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.10 2003/12/22 02:24:51 sam Exp $
+ * $Id: rawvideo.c,v 1.11 2004/01/07 19:20:29 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -178,7 +178,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     p_block = *pp_block;
 
-    if( !p_sys->i_pts && !p_block->i_pts )
+    if( !p_sys->i_pts && !p_block->i_pts && !p_block->i_dts )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
@@ -186,9 +186,10 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
 
     /* Date management */
-    if( p_block->i_pts > 0 && p_block->i_pts != p_sys->i_pts )
+    if( p_block->i_pts > 0 || p_block->i_dts > 0 )
     {
-        p_sys->i_pts = p_block->i_pts;
+        if( p_block->i_pts > 0 ) p_sys->i_pts = p_block->i_pts;
+        else if( p_block->i_dts > 0 ) p_sys->i_pts = p_block->i_dts;
     }
 
     if( p_block->i_buffer < p_sys->i_raw_size )

@@ -2,7 +2,7 @@
  * info.c : Playlist info management
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: info.c,v 1.2 2004/01/06 08:50:20 zorglub Exp $
+ * $Id: info.c,v 1.3 2004/01/07 19:20:30 gbazin Exp $
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *
@@ -241,7 +241,7 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
                       const char * psz_format, ...)
 {
     va_list args;
-    int i;
+    int i, i_ret;
     int i_new = VLC_TRUE;
     playlist_item_t *p_item;
     char *psz_value;
@@ -272,8 +272,7 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
 #if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
     vasprintf( &psz_value, psz_format, args );
 #else
-    psz_value =
-              (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
+    psz_value = (char*)malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
     if( psz_value == NULL )
     {
        msg_Err( p_playlist, "out of memory" );
@@ -284,7 +283,10 @@ int playlist_AddInfo( playlist_t *p_playlist, int i_item,
 
     va_end( args );
 
-    return playlist_AddItemInfo( p_item , psz_cat , psz_name , psz_value );
+    i_ret = playlist_AddItemInfo( p_item , psz_cat , psz_name , psz_value );
+
+    free( psz_value );
+    return i_ret;
 }
 
 
@@ -340,11 +342,11 @@ int playlist_AddItemInfo( playlist_item_t *p_item,
 
     va_start( args, psz_format );
 
-     /* Convert our message to a string */
+    /* Convert our message to a string */
 #if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
-     vasprintf( &p_info->psz_value, psz_format, args );
+    vasprintf( &p_info->psz_value, psz_format, args );
 #else
-     p_info->psz_value =
+    p_info->psz_value =
              (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
     if( p_info->psz_value == NULL )
     {
@@ -471,11 +473,11 @@ int playlist_AddItemOption( playlist_item_t *p_item,
 
     va_start( args, psz_format );
 
-     /* Convert our message to a string */
+    /* Convert our message to a string */
 #if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
-     vasprintf( &p_info->psz_value, psz_format, args );
+    vasprintf( &p_info->psz_value, psz_format, args );
 #else
-     p_info->psz_value =
+    p_info->psz_value =
              (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
     if( p_info->psz_value == NULL )
     {

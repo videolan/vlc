@@ -2,7 +2,7 @@
  * item-ext.c : Exported playlist item functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.4 2004/01/06 08:50:20 zorglub Exp $
+ * $Id: item-ext.c,v 1.5 2004/01/07 19:20:30 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -332,12 +332,16 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
                     }
                     free( p_item->pp_categories[i]->pp_infos[j] );
                 }
+                if( p_item->pp_categories[i]->i_infos )
+                    free( p_item->pp_categories[i]->pp_infos );
+
                 if( p_item->pp_categories[i]->psz_name)
                 {
                     free( p_item->pp_categories[i]->psz_name );
                 }
                 free( p_item->pp_categories[i] );
             }
+            free( p_item->pp_categories );
         }
 
         /* XXX: what if the item is still in use? */
