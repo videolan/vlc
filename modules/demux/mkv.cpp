@@ -1986,6 +1986,7 @@ static void LoadCues( input_thread_t *p_input )
     if( cues == NULL )
     {
         msg_Err( p_input, "cannot load cues (broken seekhead or file)" );
+        p_sys->in->setFilePointer( i_sav_position, seek_beginning );
         return;
     }
 
