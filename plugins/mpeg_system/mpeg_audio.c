@@ -2,7 +2,7 @@
  * mpeg_audio.c : mpeg_audio Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_audio.c,v 1.5 2002/05/14 14:10:17 fenrir Exp $
+ * $Id: mpeg_audio.c,v 1.6 2002/05/14 14:13:00 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -285,7 +285,7 @@ static int MPEGAudio_FindFrame( input_thread_t *p_input,
     int i_pos = 0;
     int i_size = input_Peek( p_input, &p_buff, i_posmax+MPEGAUDIO_MAXFRAMESIZE);
 
-    while( i_pos + 4 <= __MIN( i_posmax, i_size ) )
+    while( i_pos <= __MIN( i_posmax, i_size - 4) )
     {
         i_header = __GetDWBE( p_buff );
         if( MPEGAudio_CheckHeader( i_header ) )
