@@ -30,6 +30,10 @@
 #include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>
 
+#ifdef UNDER_CE
+#   define _IONBF 0x0004
+#endif
+
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 

@@ -27,20 +27,24 @@
  *****************************************************************************/
 #include <stdlib.h>
 #include <vlc/vlc.h>
-
-#ifdef HAVE_SYS_TIME_H
-#   include <sys/time.h>
-#endif
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <string.h>
-#include <errno.h>
-#include <fcntl.h>
-
 #include <vlc/input.h>
+#include <errno.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
+#endif
+#ifdef HAVE_FCNTL_H
+#   include <fcntl.h>
+#endif
+#ifdef HAVE_SYS_TIME_H
+#   include <sys/time.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H 
+#   include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
 #endif
 
 #ifdef WIN32

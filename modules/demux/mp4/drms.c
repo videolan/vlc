@@ -75,6 +75,7 @@
 #include "drms.h"
 #include "drmstables.h"
 
+#if !defined( UNDER_CE )
 /*****************************************************************************
  * aes_s: AES keys structure
  *****************************************************************************
@@ -2052,3 +2053,11 @@ static int GetiPodID( int64_t *p_ipod_id )
     return i_ret;
 }
 
+#else /* !defined( UNDER_CE ) */
+
+void *drms_alloc( char *psz_homedir ){ return 0; }
+void drms_free( void *a ){}
+void drms_decrypt( void *a, uint32_t *b, uint32_t c  ){}
+int drms_init( void *a, uint32_t b, uint8_t *c, uint32_t d ){ return -1; }
+
+#endif /* defined( UNDER_CE ) */
