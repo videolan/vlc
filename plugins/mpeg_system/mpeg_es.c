@@ -2,7 +2,7 @@
  * mpeg_es.c : Elementary Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mpeg_es.c,v 1.11 2002/07/24 15:21:47 sam Exp $
+ * $Id: mpeg_es.c,v 1.12 2002/07/24 16:21:46 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -199,9 +199,6 @@ static int ESDemux( input_thread_t * p_input )
     p_pes->i_nb_data = 1;
 
     vlc_mutex_lock( &p_fifo->data_lock );
-
-    /* If the decoder is waiting for us, wake him up */
-    vlc_cond_signal( &p_fifo->data_wait );
 
     if( p_fifo->i_depth >= MAX_PACKETS_IN_FIFO )
     {
