@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fastmemcpy.h : fast memcpy routines
  *****************************************************************************
- * $Id: fastmemcpy.h,v 1.3 2002/04/03 22:36:50 massiot Exp $
+ * $Id: fastmemcpy.h,v 1.3.2.1 2002/07/21 23:41:44 sam Exp $
  *
  * Authors: various Linux kernel hackers
  *          various MPlayer hackers
@@ -275,6 +275,7 @@ void * _M( fast_memcpy )(void * to, const void * from, size_t len)
 
 //	printf(" %d %d\n", (int)from&1023, (int)to&1023);
 	// Pure Assembly cuz gcc is a bit unpredictable ;)
+#if 0
 	if(i>=BLOCK_SIZE/64)
 		asm volatile(
 			"xorl %%eax, %%eax	\n\t"
@@ -334,6 +335,7 @@ void * _M( fast_memcpy )(void * to, const void * from, size_t len)
 				: "r" (BLOCK_SIZE), "i" (BLOCK_SIZE/64), "i" (CONFUSION_FACTOR)
 				: "%eax", "%ebx"
 		);
+#endif
 
 	for(; i>0; i--)
 	{
