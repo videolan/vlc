@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.37 2003/02/27 16:38:39 gbazin Exp $
+ * $Id: avi.c,v 1.38 2003/02/28 17:23:35 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1120,6 +1120,53 @@ static int AVIInit( vlc_object_t * p_this )
                           (mtime_t)1000000 )
     {
         msg_Warn( p_input, "broken or missing index, 'seek' will be axproximative or will have strange behavour" );
+    }
+
+    /* fix some BeOS MediaKit generated file */
+    for( i = 0 ; i < p_avi->i_streams; i++ )
+    {
+        avi_chunk_list_t    *p_avi_strl;
+        avi_chunk_strh_t    *p_avi_strh;
+        avi_chunk_strf_auds_t    *p_avi_strf_auds;
+#define p_stream  p_avi->pp_info[i]
+
+        if( p_stream->i_cat != AUDIO_ES )
+        {
+            continue;
+        }
+        if( p_stream->i_idxnb < 1 ||
+            p_stream->i_scale != 1 ||
+            p_stream->i_samplesize != 0 )
+        {
+            continue;
+        }
+        p_avi_strl = (avi_chunk_list_t*)AVI_ChunkFind( p_hdrl,
+                                                       AVIFOURCC_strl, i );
+        p_avi_strh = (avi_chunk_strh_t*)AVI_ChunkFind( p_avi_strl,
+                                                       AVIFOURCC_strh, 0 );
+        p_avi_strf_auds =
+            (avi_chunk_strf_auds_t*)AVI_ChunkFind( p_avi_strl,
+                                                   AVIFOURCC_strf, 0 );
+
+        if( p_avi_strf_auds->p_wf->wFormatTag != WAVE_FORMAT_PCM &&
+            (unsigned int)p_stream->i_rate == p_avi_strf_auds->p_wf->nSamplesPerSec )
+        {
+            int64_t i_track_length =
+                p_stream->p_index[p_stream->i_idxnb-1].i_length +
+                p_stream->p_index[p_stream->i_idxnb-1].i_lengthtotal;
+            mtime_t i_length = (mtime_t)p_avih->i_totalframes *
+                               (mtime_t)p_avih->i_microsecperframe;
+
+            if( i_length == 0 )
+            {
+                msg_Warn( p_input, "track[%d] cannot be fixed (BeOS MediaKit generated)", i );
+                continue;
+            }
+            p_stream->i_samplesize = 1;
+            p_stream->i_rate       = i_track_length  * (int64_t)1000000/ i_length;
+            msg_Warn( p_input, "track[%d] fixed with rate=%d scale=%d (BeOS MediaKit generated)", i, p_stream->i_rate, p_stream->i_scale );
+        }
+#undef p_stream
     }
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
