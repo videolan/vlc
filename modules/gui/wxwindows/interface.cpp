@@ -495,24 +495,15 @@ void Interface::CreateOurSlider()
     /* Create a new frame and sizer containing the slider */
     slider_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
     slider_frame->SetAutoLayout( TRUE );
-    wxBoxSizer *frame_sizer =
-        new wxBoxSizer( wxHORIZONTAL );
-
-    /* Create static box to surround the slider */
-    slider_box = new wxStaticBox( slider_frame, -1, wxT("") );
-
-    /* Create sizer for slider frame */
-    wxStaticBoxSizer *slider_sizer =
-        new wxStaticBoxSizer( slider_box, wxHORIZONTAL );
-    slider_sizer->SetMinSize( -1, 50 );
+    wxBoxSizer *frame_sizer = new wxBoxSizer( wxHORIZONTAL );
+    //frame_sizer->SetMinSize( -1, 50 );
 
     /* Create slider */
     slider = new wxSlider( slider_frame, SliderScroll_Event, 0, 0,
                            SLIDER_MAX_POS, wxDefaultPosition, wxDefaultSize );
-    slider_sizer->Add( slider, 1, wxEXPAND | wxALL, 5 );
 
     /* Add everything to the frame */
-    frame_sizer->Add( slider_sizer, 1, wxEXPAND | wxBOTTOM, 5 );
+    frame_sizer->Add( slider, 1, wxEXPAND | wxALL, 5 );
     slider_frame->SetSizer( frame_sizer );
     frame_sizer->Layout();
     frame_sizer->SetSizeHints(slider_frame);
@@ -1221,13 +1212,19 @@ void Interface::OnSliderUpdate( wxScrollEvent& event )
         {
             /* Update stream date */
 #define p_area p_intf->p_sys->p_input->stream.p_selected_area
-            char psz_time[ MSTRTIME_MAX_SIZE ];
+            char psz_time[ MSTRTIME_MAX_SIZE ], psz_total[ MSTRTIME_MAX_SIZE ];
+            mtime_t i_seconds;
+            vlc_value_t val;
 
-            slider_box->SetLabel(
+            var_Get( p_intf->p_sys->p_input, "length",  &val );
+            i_seconds = val.i_time / 1000000;
+            secstotimestr ( psz_total, i_seconds );
+
+            statusbar->SetStatusText(
                 wxU(input_OffsetToTime( p_intf->p_sys->p_input,
-                                        psz_time,
-                                        p_area->i_size * event.GetPosition()
-                                        / SLIDER_MAX_POS )) );
+                    psz_time, p_area->i_size * event.GetPosition()
+                        / SLIDER_MAX_POS )) + wxString(wxT(" / ")) +
+                        wxU(psz_total), 0 );
 #undef p_area
         }
     }

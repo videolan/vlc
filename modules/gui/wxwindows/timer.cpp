@@ -2,9 +2,9 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: timer.cpp,v 1.36 2003/12/03 13:27:51 rocky Exp $
+ * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -147,6 +147,7 @@ void Timer::Notify()
             i_old_playing_status = PAUSE_S;
         }
 
+        p_main_interface->statusbar->SetStatusText( wxT(""), 0 );
         p_main_interface->statusbar->SetStatusText( wxT(""), 2 );
 
         vlc_object_release( p_intf->p_sys->p_input );
@@ -185,6 +186,7 @@ void Timer::Notify()
                 {
                     vlc_value_t pos;
                     char psz_time[ MSTRTIME_MAX_SIZE ];
+                    char psz_total[ MSTRTIME_MAX_SIZE ];
                     vlc_value_t time;
                     mtime_t i_seconds;
 
@@ -200,10 +202,15 @@ void Timer::Notify()
 
                         var_Get( p_intf->p_sys->p_input, "time", &time );
                         i_seconds = time.i_time / 1000000;
-
                         secstotimestr ( psz_time, i_seconds );
 
-                        p_main_interface->slider_box->SetLabel( wxU(psz_time) );
+                        var_Get( p_intf->p_sys->p_input, "length",  &time );
+                        i_seconds = time.i_time / 1000000;
+                        secstotimestr ( psz_total, i_seconds );
+
+                        p_main_interface->statusbar->SetStatusText(
+                            wxU(psz_time) + wxString(wxT(" / ")) +
+                            wxU(psz_total), 0 );
                     }
                 }
             }

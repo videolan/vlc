@@ -112,6 +112,7 @@ BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf, wxWindow *p_parent )
 {
     /* Initializations */
     p_intf = _p_intf;
+    SetIcon( *p_intf->p_sys->p_icon );
 
     wxPanel *main_panel = new wxPanel( this, -1 );
     wxBoxSizer *main_sizer = new wxBoxSizer( wxHORIZONTAL );
