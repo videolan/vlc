@@ -1369,7 +1369,7 @@ then
     [    --with-ffmpeg=PATH    path to ffmpeg installation],[],[])
   if test "x${with_ffmpeg}" != "xno" -a "x${with_ffmpeg}" != "x"
   then
-    CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${with_ffmpeg}/include/libffmpeg"
+    CPPFLAGS_ffmpeg="${CPPFLAGS_ffmpeg} -I${with_ffmpeg}/include/ffmpeg"
     LDFLAGS_ffmpeg="${LDFLAGS_ffmpeg} -L${with_ffmpeg}/lib"
   fi
 
