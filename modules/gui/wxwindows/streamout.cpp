@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.3 2003/03/29 11:15:14 gbazin Exp $
+ * $Id: streamout.cpp,v 1.4 2003/04/01 00:18:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -126,7 +126,7 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 SoutDialog::SoutDialog( intf_thread_t *_p_intf, Interface *_p_main_interface ):
-    wxDialog( _p_main_interface, -1, _("Stream Output"), wxDefaultPosition,
+    wxDialog( _p_main_interface, -1, _("Stream output"), wxDefaultPosition,
              wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
@@ -140,7 +140,7 @@ SoutDialog::SoutDialog( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     /* Create MRL combobox */
     wxBoxSizer *mrl_sizer_sizer = new wxBoxSizer( wxHORIZONTAL );
     wxStaticBox *mrl_box = new wxStaticBox( panel, -1,
-                               _("Stream Output MRL") );
+                               _("Stream output MRL") );
     wxStaticBoxSizer *mrl_sizer = new wxStaticBoxSizer( mrl_box,
                                                         wxHORIZONTAL );
     wxStaticText *mrl_label = new wxStaticText( panel, -1,
@@ -302,7 +302,7 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
     int val = config_GetInt( p_intf, "server-port" );
     label = new wxStaticText( access_subpanels[2], -1, _("Port") );
     net_port = new wxSpinCtrl( access_subpanels[2], NetPort_Event,
-                               wxString::Format(_("%d"), val),
+                               wxString::Format("%d", val),
                                wxDefaultPosition, wxDefaultSize,
                                wxSP_ARROW_KEYS,
                                0, 16000, val );

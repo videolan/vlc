@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.8 2003/03/30 16:26:42 gbazin Exp $
+ * $Id: preferences.cpp,v 1.9 2003/04/01 00:18:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -662,7 +662,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         case CONFIG_ITEM_INTEGER:
             label = new wxStaticText(panel, -1, p_item->psz_text);
             spin = new wxSpinCtrl( panel, -1,
-                                   wxString::Format(_("%d"), p_item->i_value),
+                                   wxString::Format("%d", p_item->i_value),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, p_item->i_value);
@@ -677,7 +677,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         case CONFIG_ITEM_FLOAT:
             label = new wxStaticText(panel, -1, p_item->psz_text);
             spin = new wxSpinCtrl( panel, -1,
-                                   wxString::Format(_("%d"), p_item->i_value),
+                                   wxString::Format("%d", p_item->i_value),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, p_item->i_value);

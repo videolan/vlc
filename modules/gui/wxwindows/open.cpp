@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.10 2003/03/30 16:26:42 gbazin Exp $
+ * $Id: open.cpp,v 1.11 2003/04/01 00:18:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -173,7 +173,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
     /* Create Stream Output checkox */
     wxFlexGridSizer *sout_sizer = new wxFlexGridSizer( 2, 1, 20 );
     sout_checkbox = new wxCheckBox( panel, SoutEnable_Event,
-                                           _("Stream Output") );
+                                           _("Stream output") );
     sout_checkbox->SetToolTip( _("Use VLC has a stream server") );
     sout_sizer->Add( sout_checkbox, 0,
                      wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
@@ -319,7 +319,7 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
                                 WXSIZEOF(disc_type_array), wxRA_SPECIFY_COLS );
     sizer_row->Add( disc_type, 0, wxEXPAND | wxALL, 5 );
 
-    wxStaticText *label = new wxStaticText( panel, -1, _("Device Name") );
+    wxStaticText *label = new wxStaticText( panel, -1, _("Device name") );
     disc_device = new wxTextCtrl( panel, DiscDevice_Event, "",
                                   wxDefaultPosition, wxDefaultSize,
                                   wxTE_PROCESS_ENTER);
@@ -378,7 +378,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
     subpanel_sizer = new wxFlexGridSizer( 2, 1, 20 );
     label = new wxStaticText( net_subpanels[0], -1, _("Port") );
     net_ports[0] = new wxSpinCtrl( net_subpanels[0], NetPort1_Event,
-                                   wxString::Format(_("%d"), val),
+                                   wxString::Format("%d", val),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, val);
@@ -401,7 +401,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
 
     label = new wxStaticText( net_subpanels[1], -1, _("Port") );
     net_ports[1] = new wxSpinCtrl( net_subpanels[1], NetPort2_Event,
-                                   wxString::Format(_("%d"), val),
+                                   wxString::Format("%d", val),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, val);
@@ -423,7 +423,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
 
     label = new wxStaticText( net_subpanels[2], -1, _("Port") );
     net_ports[2] = new wxSpinCtrl( net_subpanels[2], NetPort3_Event,
-                                   wxString::Format(_("%d"), val),
+                                   wxString::Format("%d", val),
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, val);

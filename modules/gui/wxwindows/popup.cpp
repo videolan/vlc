@@ -2,7 +2,7 @@
  * popup.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: popup.cpp,v 1.4 2003/03/11 23:56:54 gbazin Exp $
+ * $Id: popup.cpp,v 1.5 2003/04/01 00:18:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -258,7 +258,7 @@ wxMenu *PopupMenu::CreateSubMenu( char *psz_var, vlc_object_t *p_object )
         case VLC_VAR_INTEGER:
           menuitem =
               new wxMenuItemExt( this, i_item_id++,
-                                 wxString::Format(_("%d"),
+                                 wxString::Format("%d",
                                  val_list.p_list->p_values[i].i_int),
                                  "", wxITEM_RADIO, strdup(psz_var),
                                  p_object->i_object_id,

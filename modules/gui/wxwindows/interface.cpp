@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.17 2003/03/30 19:56:11 gbazin Exp $
+ * $Id: interface.cpp,v 1.18 2003/04/01 00:18:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -391,7 +391,7 @@ void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
           "\nIt can play MPEG and MPEG2 files from a file or from a "
           "network source.")) );
 
-    wxMessageBox( msg, wxString(_("About ")) + VOUT_TITLE,
+    wxMessageBox( msg, wxString::Format(_("About %s"), VOUT_TITLE),
                   wxOK | wxICON_INFORMATION, this );
 }
 
