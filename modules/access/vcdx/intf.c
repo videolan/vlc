@@ -1,8 +1,8 @@
 /*****************************************************************************
  * intf.c: Video CD interface to handle user interaction and still time
  *****************************************************************************
- * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.5 2003/11/23 04:56:08 rocky Exp $
+ * Copyright (C) 2002,2003 VideoLAN
+ * $Id: intf.c,v 1.6 2003/11/25 03:55:12 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com>
  *   from DVD code by Stéphane Borel <stef@via.ecp.fr>
@@ -278,6 +278,7 @@ static void RunIntf( intf_thread_t *p_intf )
     {
         var_DelCallback( p_vout, "mouse-moved", MouseEvent, p_intf );
         var_DelCallback( p_vout, "mouse-clicked", MouseEvent, p_intf );
+        var_DelCallback( p_vout, "key-pressed", KeyEvent, p_intf );
         vlc_object_release( p_vout );
     }
 
