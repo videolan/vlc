@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.14 2001/11/13 12:09:18 henri Exp $
+ * $Id: input_dec.c,v 1.15 2001/11/15 17:39:13 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -43,40 +43,57 @@
 
 #include "modules.h"
 
+static decoder_config_t * CreateDecoderConfig( input_thread_t * p_input,
+                                               es_descriptor_t * p_es );
+static void DeleteDecoderConfig( decoder_config_t * p_config );
+
 /*****************************************************************************
  * input_RunDecoder: spawns a new decoder thread
  *****************************************************************************/
-vlc_thread_t input_RunDecoder( void * p_data )
+vlc_thread_t input_RunDecoder( input_thread_t * p_input,
+                               es_descriptor_t * p_es )
 {
-    decoder_config_t *  p_config;
-    probedata_t         probedata;
+    probedata_t probedata;
+    vlc_thread_t thread_id;
 
-    p_config = (decoder_config_t *)p_data;
-    
-    probedata.i_type = p_config->i_type;
-    p_config->p_dec_module = module_Need( 
-            MODULE_CAPABILITY_DEC, &probedata);
-    if( p_config->p_dec_module == NULL )
+    /* Get a suitable module */
+    probedata.i_type = p_es->i_type;
+
+    p_es->p_module = module_Need( MODULE_CAPABILITY_DEC, &probedata );
+    if( p_es->p_module == NULL )
     {
-        intf_ErrMsg( "dec error: no suitable dec module for type 0x%x",
-                      p_config->i_type );
+        intf_ErrMsg( "input error: no suitable decoder module for type 0x%x",
+                      p_es->i_type );
+        return( 0 );
+    }
+
+    /* Create the decoder configuration structure */
+    p_es->p_config = CreateDecoderConfig( p_input, p_es );
+
+    if( p_es->p_config == NULL )
+    {
+        intf_ErrMsg( "input error: could not create decoder config" );
+        module_Unneed( p_es->p_module );
         return( 0 );
     }
 
     /* Spawn the decoder thread */
-    if ( vlc_thread_create(&p_config->thread_id, 
-         "decoder", (vlc_thread_func_t)p_config->p_dec_module->
-            p_functions->dec.functions.dec.pf_RunThread, (void *)p_config) ) 
+    if ( vlc_thread_create( &thread_id, "decoder",
+         (vlc_thread_func_t)p_es->p_module->
+             p_functions->dec.functions.dec.pf_RunThread,
+         (void *)p_es->p_config) ) 
     {
-        intf_ErrMsg( "dec error: can't spawn decoder thread \"%s\"",
-                     p_config->p_dec_module->psz_name );
+        intf_ErrMsg( "input error: can't spawn decoder thread \"%s\"",
+                     p_es->p_module->psz_name );
+        free( p_es->p_config );
+        module_Unneed( p_es->p_module );
         return( 0 );
     }
 
-    intf_DbgMsg( "dec debug: decoder \"%s\"thread (%p) created", 
-                 p_config->p_dec_module->psz_name, p_dec );
+    intf_DbgMsg( "input debug: decoder \"%s\"thread created", 
+                 p_es->p_module->psz_name );
     
-    return p_config->thread_id;
+    return thread_id;
 }
 
 
@@ -108,24 +125,11 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
     vlc_thread_join( p_es->thread_id );
 //    vlc_mutex_lock( &p_input->stream.stream_lock );
 
-    /* Unneed module*/
-    module_Unneed( p_es->p_dec_config->p_dec_module );
+    /* Delete decoder configuration */
+    DeleteDecoderConfig( p_es->p_config );
 
-    /* Freeing all packets still in the decoder fifo. */
-    while( !DECODER_FIFO_ISEMPTY( *p_es->p_decoder_fifo ) )
-    {
-        p_es->p_decoder_fifo->pf_delete_pes(
-                            p_es->p_decoder_fifo->p_packets_mgt,
-                            DECODER_FIFO_START( *p_es->p_decoder_fifo ) );
-        DECODER_FIFO_INCSTART( *p_es->p_decoder_fifo );
-    }
-
-    /* Destroy the lock and cond */
-    vlc_cond_destroy( &p_es->p_decoder_fifo->data_wait );
-    vlc_mutex_destroy( &p_es->p_decoder_fifo->data_lock );
-
-    free( p_es->p_decoder_fifo );
-    p_es->p_decoder_fifo = NULL;
+    /* Unneed module */
+    module_Unneed( p_es->p_module );
 }
 
 /*****************************************************************************
@@ -201,5 +205,88 @@ void input_EscapeAudioDiscontinuity( input_thread_t * p_input )
             }
         }
     }
+}
+
+/*****************************************************************************
+ * CreateDecoderConfig: create a decoder_config_t
+ *****************************************************************************/
+static decoder_config_t * CreateDecoderConfig( input_thread_t * p_input,
+                                               es_descriptor_t * p_es )
+{
+    decoder_config_t * p_config;
+
+    p_config = (decoder_config_t *)malloc( sizeof(decoder_config_t) );
+    if( p_config == NULL )
+    {
+        intf_ErrMsg( "Unable to allocate memory in CreateDecoderConfig" );
+        return NULL;
+    }
+
+    /* Decoder FIFO */
+    if( (p_config->p_decoder_fifo =
+            (decoder_fifo_t *)malloc( sizeof(decoder_fifo_t) )) == NULL )
+    {
+        intf_ErrMsg( "Out of memory" );
+        free( p_config );
+        return NULL;
+    }
+
+    /* Select a new ES */
+    p_input->stream.i_selected_es_number++;
+    p_input->stream.pp_selected_es = realloc(
+                                       p_input->stream.pp_selected_es,
+                                       p_input->stream.i_selected_es_number
+                                        * sizeof(es_descriptor_t *) );
+    if( p_input->stream.pp_selected_es == NULL )
+    {
+        intf_ErrMsg( "Unable to realloc memory" );
+        free( p_config->p_decoder_fifo );
+        free( p_config );
+        return NULL;
+    }
+    p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number - 1]
+            = p_es;
+
+    /* Initialize the p_config structure */
+    vlc_mutex_init(&p_config->p_decoder_fifo->data_lock);
+    vlc_cond_init(&p_config->p_decoder_fifo->data_wait);
+    p_es->p_decoder_fifo = p_config->p_decoder_fifo;
+
+    p_config->pf_init_bit_stream = p_input->pf_init_bit_stream;
+
+    p_config->i_id = p_es->i_id;
+    p_config->i_type = p_es->i_type;
+    p_config->p_stream_ctrl = &p_input->stream.control;
+
+    p_config->p_decoder_fifo->i_start = p_config->p_decoder_fifo->i_end = 0;
+    p_config->p_decoder_fifo->b_die = p_config->p_decoder_fifo->b_error = 0;
+    p_config->p_decoder_fifo->p_packets_mgt = p_input->p_method_data;
+    p_config->p_decoder_fifo->pf_delete_pes = p_input->pf_delete_pes;
+
+    return p_config;
+}
+
+/*****************************************************************************
+ * DeleteDecoderConfig: create a decoder_config_t
+ *****************************************************************************/
+static void DeleteDecoderConfig( decoder_config_t * p_config )
+{
+    /* Free all packets still in the decoder fifo. */
+    while( !DECODER_FIFO_ISEMPTY( *p_config->p_decoder_fifo ) )
+    {
+        p_config->p_decoder_fifo->pf_delete_pes(
+                            p_config->p_decoder_fifo->p_packets_mgt,
+                            DECODER_FIFO_START( *p_config->p_decoder_fifo ) );
+        DECODER_FIFO_INCSTART( *p_config->p_decoder_fifo );
+    }
+
+    /* Destroy the lock and cond */
+    vlc_cond_destroy( &p_config->p_decoder_fifo->data_wait );
+    vlc_mutex_destroy( &p_config->p_decoder_fifo->data_lock );
+
+    free( p_config->p_decoder_fifo );
+    p_config->p_decoder_fifo = NULL;
+
+    free( p_config );
 }
 

@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.64 2001/11/13 12:09:18 henri Exp $
+ * $Id: input_programs.c,v 1.65 2001/11/15 17:39:13 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -507,94 +507,13 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
 }
 
 /*****************************************************************************
- * InitDecConfig: initializes a decoder_config_t
- *****************************************************************************/
-static int InitDecConfig( input_thread_t * p_input, es_descriptor_t * p_es,
-                          decoder_config_t * p_config )
-{
-    p_config->i_id = p_es->i_id;
-    p_config->i_type = p_es->i_type;
-    p_config->p_stream_ctrl =
-        &p_input->stream.control;
-
-    /* Decoder FIFO */
-    if( (p_config->p_decoder_fifo =
-            (decoder_fifo_t *)malloc( sizeof(decoder_fifo_t) )) == NULL )
-    {
-        intf_ErrMsg( "Out of memory" );
-        return( -1 );
-    }
-
-    vlc_mutex_init(&p_config->p_decoder_fifo->data_lock);
-    vlc_cond_init(&p_config->p_decoder_fifo->data_wait);
-    p_config->p_decoder_fifo->i_start = p_config->p_decoder_fifo->i_end = 0;
-    p_config->p_decoder_fifo->b_die = p_config->p_decoder_fifo->b_error = 0;
-    p_config->p_decoder_fifo->p_packets_mgt = p_input->p_method_data;
-    p_config->p_decoder_fifo->pf_delete_pes = p_input->pf_delete_pes;
-    p_es->p_decoder_fifo = p_config->p_decoder_fifo;
-
-    p_config->pf_init_bit_stream = p_input->pf_init_bit_stream;
-
-    p_input->stream.i_selected_es_number++;
-
-    p_input->stream.pp_selected_es = realloc(
-                                       p_input->stream.pp_selected_es,
-                                       p_input->stream.i_selected_es_number
-                                        * sizeof(es_descriptor_t *) );
-    if( p_input->stream.pp_selected_es == NULL )
-    {
-        intf_ErrMsg( "Unable to realloc memory in input_SelectES" );
-        return(-1);
-    }
-    p_input->stream.pp_selected_es[p_input->stream.i_selected_es_number - 1]
-            = p_es;
-
-    return( 0 );
-}
-
-/*****************************************************************************
- * GetDecConfig: returns a valid decoder_config_t
- *****************************************************************************/
-static decoder_config_t * GetDecConfig( input_thread_t * p_input,
-                                      es_descriptor_t * p_es )
-{
-    decoder_config_t *     p_config;
-
-    p_config = (decoder_config_t *)malloc( sizeof(decoder_config_t) );
-    if( p_config == NULL )
-    {
-        intf_ErrMsg( "Unable to allocate memory in GetDecConfig" );
-        return( NULL );
-    }
-    if( InitDecConfig( p_input, p_es, p_config ) == -1 )
-    {
-        free( p_config );
-        return( NULL );
-    }
-
-    return( p_config );
-}
-
-/*****************************************************************************
  * input_SelectES: selects an ES and spawns the associated decoder
  *****************************************************************************
  * Remember we are still supposed to have stream_lock when entering this
  * function ?
  *****************************************************************************/
-/* FIXME */
-vlc_thread_t adec_CreateThread( void * );
-vlc_thread_t ac3dec_CreateThread( void * );
-vlc_thread_t ac3spdif_CreateThread( void * );
-vlc_thread_t spdif_CreateThread( void * );
-vlc_thread_t vpar_CreateThread( void * );
-vlc_thread_t spudec_CreateThread( void * );
-vlc_thread_t lpcmdec_CreateThread( void * );
-
 int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
 {
-    /* FIXME ! */
-    void *                  p_config;
-
     if( p_es == NULL )
     {
         intf_ErrMsg( "Nothing to do in input_SelectES" );
@@ -619,20 +538,13 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case LPCM_AUDIO_ES:
         if( p_main->b_audio )
         {
-            decoder_config_t * p_dec_config;
-            
-            p_dec_config = GetDecConfig( p_input, p_es );            
-            p_config =(void *)p_dec_config;
-            p_dec_config->i_type = p_es->i_type;
-            
+            /* This kludge should be removed */
             p_main->b_ac3 = ( p_es->i_type == AC3_AUDIO_ES );
-            /* Useful to Unned decoder module */
-            p_es->p_dec_config = p_dec_config;
 
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->thread_id = input_RunDecoder( p_config );
+            p_es->thread_id = input_RunDecoder( p_input, p_es );
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;
@@ -642,18 +554,10 @@ int input_SelectES( input_thread_t * p_input, es_descriptor_t * p_es )
     case DVD_SPU_ES:
         if( p_main->b_video )
         {
-            decoder_config_t * p_dec_config;
-
-            p_dec_config = GetDecConfig( p_input, p_es );
-            p_config = (void *)p_dec_config;
-            p_dec_config->i_type = p_es->i_type;
-            /* Useful to Unned decoder module */
-            p_es->p_dec_config = p_dec_config;
-
             /* Release the lock, not to block the input thread during
              * the creation of the thread. */
             vlc_mutex_unlock( &p_input->stream.stream_lock );
-            p_es->thread_id = input_RunDecoder( p_config );
+            p_es->thread_id = input_RunDecoder( p_input, p_es );
             vlc_mutex_lock( &p_input->stream.stream_lock );
         }
         break;

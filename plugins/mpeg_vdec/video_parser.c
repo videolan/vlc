@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.1 2001/11/13 12:09:18 henri Exp $
+ * $Id: video_parser.c,v 1.2 2001/11/15 17:39:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -409,8 +409,6 @@ static void mpeg_vdec_EndThread( vpar_thread_t *p_vpar )
     }
 
     vpar_EndPool( p_vpar );
-
-    free( p_vpar->p_config );
 
     module_Unneed( p_vpar->p_idct_module );
     module_Unneed( p_vpar->p_motion_module );

@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.2 2001/11/13 15:08:25 sam Exp $
+ * $Id: spu_decoder.c,v 1.3 2001/11/15 17:39:13 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -265,7 +265,6 @@ static void spu_dec_ErrorThread( spudec_thread_t *p_spudec )
  *****************************************************************************/
 static void spu_dec_EndThread( spudec_thread_t *p_spudec )
 {
-    free( p_spudec->p_config );
     free( p_spudec );
 }
 

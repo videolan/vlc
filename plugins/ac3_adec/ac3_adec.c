@@ -2,7 +2,7 @@
  * ac3_adec.c: ac3 decoder module main file
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_adec.c,v 1.2 2001/11/13 18:10:38 sam Exp $
+ * $Id: ac3_adec.c,v 1.3 2001/11/15 17:39:12 sam Exp $
  *
  * Authors: Michel Lespinasse <walken@zoy.org>
  *
@@ -133,9 +133,8 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
 
     if( p_ac3thread == NULL )
     {
-        intf_ErrMsg ( "ac3dec error: not enough memory "
+        intf_ErrMsg ( "ac3_adec error: not enough memory "
                       "for ac3_adec_Run() to allocate p_ac3thread" );
-        free( p_ac3thread->p_config );
         return( -1 );
     }
    
@@ -145,8 +144,7 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
     p_ac3thread->p_config = p_config;
     if( ac3_adec_Init( p_ac3thread ) )
     {
-        intf_ErrMsg( "ac3_adec error : could not initialize thread" );
-        free( p_ac3thread->p_config );
+        intf_ErrMsg( "ac3_adec error: could not initialize thread" );
         free( p_ac3thread );
         return( -1 );
     }
@@ -228,7 +226,6 @@ static int ac3_adec_Run ( decoder_config_t * p_config )
     /* End of the ac3 decoder thread */
     ac3_adec_EndThread (p_ac3thread);
 
-    free( p_ac3thread->p_config );
     free( p_ac3thread );
 
     return( 0 );
@@ -244,7 +241,7 @@ static int ac3_adec_Init( ac3dec_thread_t * p_ac3thread )
      * Thread properties 
      */
     p_ac3thread->p_fifo = p_ac3thread->p_config->p_decoder_fifo;
-    p_ac3thread->ac3_decoder = memalign(16, sizeof(ac3dec_t));
+    p_ac3thread->ac3_decoder = memalign( 16, sizeof(ac3dec_t) );
 
     /*
      * Choose the best downmix module
@@ -367,8 +364,13 @@ static int ac3_adec_Init( ac3dec_thread_t * p_ac3thread )
 #else
         free( p_ac3thread->ac3_decoder->samples );
 #endif
+
+        module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
+        module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
+
         free( p_ac3thread->ac3_decoder->imdct );
         free( p_ac3thread->ac3_decoder );
+
         return( -1 );
     }
 
@@ -426,11 +428,7 @@ static void ac3_adec_EndThread (ac3dec_thread_t * p_ac3thread)
         vlc_mutex_unlock (&(p_ac3thread->p_aout_fifo->data_lock));
     }
 
-    /* Unlock the modules */
-    module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
-    module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
-
-    /* Destroy descriptor */
+    /* Free allocated structures */
 #define IMDCT p_ac3thread->ac3_decoder->imdct
     free( IMDCT->w_1 );
     free( IMDCT->w_64 );
@@ -454,6 +452,12 @@ static void ac3_adec_EndThread (ac3dec_thread_t * p_ac3thread)
 #else
     free( p_ac3thread->ac3_decoder->samples );
 #endif
+
+    /* Unlock the modules */
+    module_Unneed( p_ac3thread->ac3_decoder->downmix.p_module );
+    module_Unneed( p_ac3thread->ac3_decoder->imdct->p_module );
+
+    /* Free what's left of the decoder */
     free( p_ac3thread->ac3_decoder->imdct );
     free( p_ac3thread->ac3_decoder );
 

@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.47 2001/11/13 12:09:17 henri Exp $
+ * $Id: input_ext-intf.h,v 1.48 2001/11/15 17:39:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -76,7 +76,10 @@ typedef struct es_descriptor_s
     count_t                 c_packets;                 /* total packets read */
     count_t                 c_invalid_packets;       /* invalid packets read */
 
-    struct decoder_config_s * p_dec_config;
+    /* Module properties */
+    struct module_s *         p_module;
+    struct decoder_config_s * p_config;
+
 } es_descriptor_t;
 
 /* Special PID values - note that the PID is only on 13 bits, and that values

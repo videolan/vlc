@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.38 2001/11/15 16:15:59 massiot Exp $
+ * $Id: input_ext-dec.h,v 1.39 2001/11/15 17:39:12 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -530,11 +530,5 @@ typedef struct decoder_config_s
                  void (* pf_bitstream_callback)( struct bit_stream_s *,
                                                  boolean_t ),
                                                  void * );
-    /* Decoder thread */
-    vlc_thread_t        thread_id;
-
-    /* Plugin/Builtin properties */
-    struct module_s *   p_dec_module;
-
 } decoder_config_t;
 

@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.2 2001/11/14 03:38:11 stef Exp $
+ * $Id: ac3_spdif.c,v 1.3 2001/11/15 17:39:12 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -352,7 +352,6 @@ static void ac3_spdif_EndThread( ac3_spdif_thread_t * p_spdif )
     }
 
     /* Destroy descriptor */
-    free( p_spdif->p_config );
     free( p_spdif->p_ac3 );
     free( p_spdif );
     
