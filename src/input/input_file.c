@@ -741,8 +741,6 @@ ssize_t ps_read( options_t *p_options, ps_t * p_ps, void *ts )
             if(readbytes == 0)
             {
                 input_file.b_die = 1;
-                vlc_cond_signal( &input_file.in_data.notfull );
-                vlc_thread_join( input_file.disk_thread );
                 return -1;
             }
             p_ps->ps_data = p_ps->ps_buffer;
