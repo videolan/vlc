@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.43 2001/12/30 07:09:55 sam Exp $
+ * $Id: dvd_ifo.c,v 1.44 2002/03/06 01:20:56 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          German Tischler <tanis@gaspode.franken.de>
@@ -50,7 +50,7 @@
 #   include <videolan/dvdcss.h>
 #endif
 
-#include "input_dvd.h"
+#include "dvd.h"
 #include "dvd_ifo.h"
 #include "dvd_udf.h"
 

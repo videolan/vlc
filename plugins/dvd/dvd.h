@@ -1,8 +1,8 @@
 /*****************************************************************************
- * input_dvd.h: thread structure of the DVD plugin
+ * dvd.h: thread structure of the DVD plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dvd.h,v 1.25 2002/03/01 01:12:28 stef Exp $
+ * $Id: dvd.h,v 1.1 2002/03/06 01:20:56 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -36,6 +36,9 @@ typedef struct thread_dvd_data_s
 {
     dvdcss_handle           dvdhandle;                   /* libdvdcss handle */
 
+    int                     i_audio_nb;
+    int                     i_spu_nb;
+
     /* Navigation information */
     int                     i_title;
     int                     i_title_id;
@@ -56,9 +59,6 @@ typedef struct thread_dvd_data_s
     int                     i_title_start;
     int                     i_start;
     int                     i_size;
-
-    /* Scrambling Information */
-    struct css_s *          p_css;
 
     /* Structure that contains all information of the DVD */
     struct ifo_s *          p_ifo;

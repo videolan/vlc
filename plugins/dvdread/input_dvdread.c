@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_dvdread.c,v 1.29 2002/03/05 17:46:33 stef Exp $
+ * $Id: input_dvdread.c,v 1.30 2002/03/06 01:20:56 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -609,14 +609,14 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
             /* We don't use input_EndStream here since
              * we keep area structures */
 
-            for( i = 0 ; i < p_input->stream.i_es_number ; i++ )
+            while( p_input->stream.i_es_number )
             {
-                input_DelES( p_input, p_input->stream.pp_es[i] );
+                input_DelES( p_input, p_input->stream.pp_es[0] );
             }
 
-            for( i = 0 ; i < p_input->stream.i_pgrm_number ; i++ )
+            while( p_input->stream.i_pgrm_number )
             {
-                input_DelProgram( p_input, p_input->stream.pp_programs[i] );
+                input_DelProgram( p_input, p_input->stream.pp_programs[0] );
             }
 
             if( p_input->stream.pp_selected_es )

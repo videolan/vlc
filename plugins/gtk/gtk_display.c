@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.17 2002/03/05 17:46:33 stef Exp $
+ * $Id: gtk_display.c,v 1.18 2002/03/06 01:20:56 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -216,13 +216,11 @@ gint GtkModeManage( intf_thread_t * p_intf )
             gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_title"), FALSE );
             gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_chapter"),
                                       FALSE );
-            gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_angle"), FALSE );
             gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_audio"), FALSE );
             gtk_widget_set_sensitive( GETWIDGET(p_window,"menubar_subpictures"),
                                       FALSE );
             gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_navigation"),
                                       FALSE );
-            gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_angle"), FALSE );
             gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_audio"), FALSE );
             gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_subpictures"),
                                       FALSE );

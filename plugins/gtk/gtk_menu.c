@@ -2,7 +2,7 @@
  * gtk_menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_menu.c,v 1.21 2002/03/05 17:46:33 stef Exp $
+ * $Id: gtk_menu.c,v 1.22 2002/03/06 01:20:56 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -70,8 +70,6 @@ static gint GtkTitleMenu( gpointer, GtkWidget *,
 static gint GtkRadioMenu( intf_thread_t *, GtkWidget *, GSList *,
                           char *, int, int,
                    void( *pf_toggle )( GtkCheckMenuItem *, gpointer ) );
-void GtkMenubarAngleToggle( GtkCheckMenuItem *, gpointer );
-void GtkPopupAngleToggle( GtkCheckMenuItem *, gpointer );
 
 gint GtkSetupMenus( intf_thread_t * p_intf );
 
@@ -279,49 +277,6 @@ void GtkMenubarChapterToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 }
 
 
-/*
- * Angle
- */
-
-#if 0
-#define GTKANGLETOGGLE( intf, window, menu, callback )                      \
-    intf_thread_t * p_intf;                                                 \
-    GtkWidget *     p_menu;                                                 \
-    input_area_t *  p_area;                                                 \
-                                                                            \
-    p_intf    = GetIntf( GTK_WIDGET(menuitem), (intf) );                    \
-                                                                            \
-    if( menuitem->active && !p_intf->p_sys->b_angle_update )                \
-    {                                                                       \
-        p_menu    = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(            \
-                                p_intf->p_sys->window ), (menu) ) );        \
-        p_area    = p_input_bank->pp_input[0]->stream.p_selected_area;                \
-        p_area->i_angle = (gint)((long)user_data);                          \
-                                                                            \
-        input_ChangeArea( p_input_bank->pp_input[0], (input_area_t*)p_area );         \
-                                                                            \
-        p_intf->p_sys->b_angle_update = 1;                                  \
-        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );             \
-        GtkRadioMenu( p_intf, p_menu, NULL, "Angle",                        \
-                      p_area->i_angle_nb, p_area->i_angle, (callback) );    \
-        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );           \
-        p_intf->p_sys->b_angle_update = 0;                                  \
-    }
-
-void GtkMenubarAngleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
-{
-    GTKANGLETOGGLE( "intf_window", p_popup, "popup_angle",
-                    GtkPopupAngleToggle );
-}
-
-void GtkPopupAngleToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
-{
-    GTKANGLETOGGLE( "intf_popup", p_window, "menubar_angle",
-                    GtkMenubarAngleToggle );
-}
-
-#undef GTKANGLETOGGLE
-#endif
 /****************************************************************************
  * Functions to generate menus
  ****************************************************************************/
@@ -539,10 +494,10 @@ static gint GtkProgramMenu( gpointer            p_data,
  * function, the interface lock has to be taken
  *****************************************************************************/
 static gint GtkLanguageMenus( gpointer          p_data,
-                                GtkWidget *       p_root,
-                                es_descriptor_t * p_es,
-                                gint              i_cat,
-                          void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
+                              GtkWidget *       p_root,
+                              es_descriptor_t * p_es,
+                              gint              i_cat,
+                        void(*pf_toggle )( GtkCheckMenuItem *, gpointer ) )
 {
     intf_thread_t *     p_intf;
     GtkWidget *         p_menu;

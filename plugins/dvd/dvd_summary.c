@@ -3,7 +3,7 @@
  * found in .ifo.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: dvd_summary.c,v 1.13 2002/03/05 17:46:33 stef Exp $
+ * $Id: dvd_summary.c,v 1.14 2002/03/06 01:20:56 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -53,7 +53,7 @@
 #   include <videolan/dvdcss.h>
 #endif
 
-#include "input_dvd.h"
+#include "dvd.h"
 #include "dvd_ifo.h"
 #include "iso_lang.h"
 

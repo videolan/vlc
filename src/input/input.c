@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.186 2002/03/05 06:48:33 gbazin Exp $
+ * $Id: input.c,v 1.187 2002/03/06 01:20:56 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Alexis Guillard <alexis.guillard@bt.com>
@@ -188,7 +188,7 @@ input_thread_t *input_CreateThread ( playlist_item_t *p_item, int *pi_status )
     p_input->stream.control.i_rate = DEFAULT_RATE;
     p_input->stream.control.b_mute = 0;
     p_input->stream.control.b_grayscale = config_GetIntVariable(
-			                      VOUT_GRAYSCALE_VAR );
+                                                  VOUT_GRAYSCALE_VAR );
     p_input->stream.control.i_smp = config_GetIntVariable( VDEC_SMP_VAR );
 
     intf_WarnMsg( 1, "input: playlist item `%s'", p_input->psz_source );
@@ -444,7 +444,7 @@ static int InitThread( input_thread_t * p_input )
     {
         intf_WarnMsg( 2, "Drive letter %c: specified in source string",
                       p_input->psz_source ) ;
-	psz_parser = "";
+        psz_parser = "";
     }
 #endif
 
@@ -462,7 +462,7 @@ static int InitThread( input_thread_t * p_input )
         /* Come back to parse the access and demux plug-ins */
         psz_parser = p_input->psz_source;
 
-	if( !*psz_parser )
+        if( !*psz_parser )
         {
             /* No access */
             p_input->psz_access = NULL;
