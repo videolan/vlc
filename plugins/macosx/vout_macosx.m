@@ -2,7 +2,7 @@
  * vout_macosx.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: vout_macosx.m,v 1.15 2002/07/25 21:51:12 massiot Exp $
+ * $Id: vout_macosx.m,v 1.16 2002/07/25 22:48:56 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -365,6 +365,10 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
                     codecFlagUseImageBuffer, &flags, nil ) != noErr ) )
     {
         msg_Err( p_vout, "DecompressSequenceFrameS failed: %d", err );
+    }
+    else
+    {
+        QDFlushPortBuffer( p_vout->p_sys->p_qdport, nil );
     }
 }
 
