@@ -907,8 +907,16 @@ AC_ARG_ENABLE(directx,
       PLUGINS="${PLUGINS} directx"
       if test "x$enableval" = "xyes"
       then
-        AC_CHECK_HEADERS(directx.h, [LIB_DIRECTX="-lgdi32 -ldxguid"], 
+	AC_ARG_WITH(directx, 
+	[--with-directx=[name] Windows DirectX support (default enabled)])
+	if test "x$withval" = "x"
+	then
+          AC_CHECK_HEADERS(directx.h, [LIB_DIRECTX="-lgdi32 -ldxguid"], 
           AC_MSG_ERROR([Cannot find DirectX headers !]))
+	else
+        LIB_DIRECTX="${LIB_DIRECTX} -L"$withval"/lib -lgdi32 -ldxguid"
+        INCLUDE="${INCLUDE} -I"$withval"/include"
+	fi
       else
         AC_MSG_CHECKING(for directX headers in ${enableval})
         if test -f ${enableval}/include/directx.h
