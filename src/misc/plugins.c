@@ -178,7 +178,7 @@ char * TestPlugin ( plugin_id_t *p_plugin_id, char * psz_name )
 #ifndef SYS_BEOS
         else
         {
-            intf_DbgMsg( "%s\n", dlerror() );
+            intf_WarnMsg( 1, "dlerror: %s\n", dlerror() );
         }
 #endif
 

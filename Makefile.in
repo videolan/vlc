@@ -167,10 +167,8 @@ LCFLAGS += -Wall
 #
 # Debugging and profiling support (unless optimisations are active)
 #
-ifeq ($(DEBUG),1)
 ifneq ($(OPTIMS),1)
 CFLAGS += -g
-endif
 endif
 
 #################################################################################
@@ -479,7 +477,7 @@ ifeq ($(SYS),beos)
 	rm -f ./plugins/_APP_
 	ln -s ../vlc ./plugins/_APP_
 else
-	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic  -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
+	$(CC) $(CFLAGS) $(LCFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
 
 lib/beos.so: $(PLUGIN_BEOS)
