@@ -2,7 +2,7 @@
  * vout_directx.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_directx.c,v 1.42 2002/07/31 20:56:51 sam Exp $
+ * $Id: vout_directx.c,v 1.43 2002/07/31 22:37:28 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -60,6 +60,9 @@ DEFINE_GUID( IID_IDirectDrawSurface2, 0x57805885,0x6eec,0x11cf,0x94,0x41,0xa8,0x
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+int  E_(OpenVideo)    ( vlc_object_t * );
+void E_(CloseVideo)   ( vlc_object_t * );
+
 static int  Init      ( vout_thread_t * );
 static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
@@ -172,7 +175,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     return 0;
 
  error:
-    Destroy( p_vout );
+    E_(CloseVideo)( VLC_OBJECT(p_vout) );
     return 1;
 
 }

@@ -190,7 +190,7 @@ void __fastcall TGroupBoxPlugin::ListViewSelectItem( TObject *Sender,
     if( Name != "" )
     {
         /* look for module 'Name' */
-        for( p_module = p_intfGlobal->p_vlc->module_bank.first ;
+        for( p_module = p_intfGlobal->p_vlc->p_module_bank->first ;
              p_module != NULL ;
              p_module = p_module->next )
         {
@@ -374,7 +374,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
     TListItem          *ListItem;
 
     /* Look for the selected module */
-    for( p_module = p_intfGlobal->p_vlc->module_bank.first ; p_module != NULL ;
+    for( p_module = p_intfGlobal->p_vlc->p_module_bank->first ; p_module != NULL ;
          p_module = p_module->next )
     {
         if( psz_module_name
@@ -422,8 +422,9 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
             /* add panel as separator */
             ADD_PANEL;
 
+#if 0 /* FIXME */
             /* build a list of available plugins */
-            for( p_module_plugins = p_intfGlobal->p_vlc->module_bank.first ;
+            for( p_module_plugins = p_intfGlobal->p_vlc->p_module_bank->first ;
                  p_module_plugins != NULL ;
                  p_module_plugins = p_module_plugins->next )
             {
@@ -434,6 +435,7 @@ void __fastcall TPreferencesDlg::CreateConfigDialog( char *psz_module_name )
                     ListItem->Caption = p_module_plugins->psz_object_name;
                 }
             }
+#endif
 
             break;
 

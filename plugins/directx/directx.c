@@ -2,7 +2,7 @@
  * directx.c : Windows DirectX plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.12 2002/07/31 20:56:51 sam Exp $
+ * $Id: directx.c,v 1.13 2002/07/31 22:37:28 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -56,7 +56,7 @@ vlc_module_begin();
     add_category_hint( N_("Video"), NULL );
     add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT );
     add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT );
-    set_description( _("DirectX extension module") )
+    set_description( _("DirectX extension module") );
     add_submodule();
         set_capability( "video output", 150 );
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );
