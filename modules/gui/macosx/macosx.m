@@ -2,7 +2,7 @@
  * macosx.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.8 2003/05/01 01:11:17 hartman Exp $
+ * $Id: macosx.m,v 1.9 2003/05/09 01:19:43 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -65,7 +65,7 @@ vlc_module_begin();
         set_callbacks( E_(OpenVideo), E_(CloseVideo) );
         add_category_hint( N_("Video"), NULL, VLC_FALSE );
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_TEXT, VLC_FALSE );
-        add_float( "macosx-opaqueness", 1, NULL, OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_FALSE );
+        add_float( "macosx-opaqueness", 1, NULL, OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
         add_bool( "macosx-float", 0, NULL, FLOAT_TEXT, FLOAT_LONGTEXT, VLC_FALSE );
 vlc_module_end();
 
