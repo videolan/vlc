@@ -7,6 +7,75 @@
 #
 # Urgency values: Wishlist, Normal, Important, Critical
 
+Task: 0x28
+Difficulty: Guru
+Urgency: Wishlist
+Description: Support for RTP
+ RTP is a transport protocol for realtime applications. MPEG1 and MPEG2
+ versions of RTP are described in RFCs 2038 and 2250. RFCs 1889 (RTP)
+ and 2508 (compressed RTP) can be interesting as well.
+Status: Todo
+
+Task: 0x27
+Difficulty: Medium
+Urgency: Wishlist
+Description: Draw a font / support color fonts
+ The vlc currently uses an ugly font to display its data on the output
+ window, and we have a slow hack to make it outlined. Writing our own
+ font, or adding support for color fonts, would make us gain some time.
+Status: Todo
+
+Task: 0x26
+Difficulty: Medium
+Urgency: Important
+Description: Layer 2 mono support
+ The vlc doesn't play layer 2 mono yet. We need it since a few of our
+ streams are in this audio format.
+Status: Todo
+
+Task: 0x25
+Difficulty: Hard
+Urgency: Wishlist
+Description: MP3 support
+ The vlc cannot play MPEG1/2 layer 3 yet. It might be nice to fix that.
+Status: Todo
+
+Task: 0x24
+Difficulty: Hard
+Urgency: Normal
+Description: Support for unencapsulated streams
+ Some streams are not encapsulated in PES/PS or TS packets, which the
+ vlc currently requires to properly decode a stream. Adding support for
+ this would require to rewrite the input code, and probably make it a
+ plugin.
+Status: Todo
+
+Task: 0x24
+Difficulty: Guru
+Urgency: Wishlist
+Description: Ogg/Vorbis audio decoder support
+ The Ogg/Vorbis audio format is a free alternative to the patent-encumbered
+ MP3 format. The system packets are quite different than the MPEG ones, so
+ adding support for it would require a lot of code rewrite.
+Status: Todo
+
+Task: 0x23
+Difficulty: Hard
+Urgency: Normal
+Description: Xv video output support
+ XFree 4.0 provides the Xv interface which can do hardware YUV on supported
+ hardware.
+Status: Todo
+
+Task: 0x22
+Difficulty: Medium
+Urgency: Normal
+Description: SDL video output support
+ The Simple DirectMedia Layer library is a generic API that provides
+ YUV acceleration on some platforms. More information can be found
+ on http://www.devolution.com/~slouken/SDL/
+Status: Todo
+
 Task: 0x21
 Difficulty: Medium
 Urgency: Normal
