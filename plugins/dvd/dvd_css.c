@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.21 2001/04/06 09:15:47 sam Exp $
+ * $Id: dvd_css.c,v 1.22 2001/04/08 16:57:47 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -75,6 +75,10 @@ int CSSTest( int i_fd )
 
     if( i_ret < 0 )
     {
+        /* Since it's the first ioctl we try to issue, we add a notice */
+        intf_ErrMsg( "css error: ioctl_ReadCopyright failed, "
+                     "make sure DVD ioctls were compiled in" );
+
         return i_ret;
     }
 
@@ -125,7 +129,7 @@ int CSSInit( css_t * p_css )
             break;
         }
 
-        intf_ErrMsg( "css error: AGID N/A, invalidating" );
+        intf_ErrMsg( "css error: ioctl_LUSendAgid failed, invalidating" );
 
         p_css->i_agid = 0;
         ioctl_InvalidateAgid( p_css );
@@ -134,7 +138,7 @@ int CSSInit( css_t * p_css )
     /* Unable to authenticate without AGID */
     if( i_ret == -1 )
     {
-        intf_ErrMsg( "css error: could not get AGID" );
+        intf_ErrMsg( "css error: ioctl_LUSendAgid failed, fatal" );
         return -1;
     }
 
@@ -152,14 +156,14 @@ int CSSInit( css_t * p_css )
     /* Send challenge to LU */
     if( ioctl_HostSendChallenge( p_css, p_buffer ) < 0 )
     {
-        intf_ErrMsg( "css error: failed sending challenge to LU" );
+        intf_ErrMsg( "css error: ioctl_HostSendChallenge failed" );
         return -1;
     }
 
     /* Get key1 from LU */
     if( ioctl_LUSendKey1( p_css, p_buffer ) < 0)
     {
-        intf_ErrMsg( "css error: failed getting key1 from LU" );
+        intf_ErrMsg( "css error: ioctl_LUSendKey1 failed" );
         return -1;
     }
 
@@ -192,7 +196,7 @@ int CSSInit( css_t * p_css )
     /* Get challenge from LU */
     if( ioctl_LUSendChallenge( p_css, p_buffer ) < 0 )
     {
-        intf_ErrMsg( "css error: failed getting challenge from LU" );
+        intf_ErrMsg( "css error: ioctl_LUSendKeyChallenge failed" );
         return -1;
     }
 
@@ -214,7 +218,7 @@ int CSSInit( css_t * p_css )
     /* Send key2 to LU */
     if( ioctl_HostSendKey2( p_css, p_buffer ) < 0 )
     {
-        intf_ErrMsg( "css error: failed sending key2 to LU" );
+        intf_ErrMsg( "css error: ioctl_HostSendKey2 failed" );
         return -1;
     }
 
@@ -249,7 +253,7 @@ int CSSInit( css_t * p_css )
     /* Get encrypted disc key */
     if( ioctl_ReadKey( p_css, p_buffer ) < 0 )
     {
-        intf_ErrMsg( "css error: could not read Disc Key" );
+        intf_ErrMsg( "css error: ioctl_ReadKey failed" );
         return -1;
     }
 
@@ -280,18 +284,6 @@ int CSSInit( css_t * p_css )
 #endif /* HAVE_CSS */
     return -1;
 
-}
-
-/*****************************************************************************
- * CSSEnd : frees css structure
- *****************************************************************************/
-void CSSEnd( css_t * p_css )
-{
-#ifdef HAVE_CSS
-    free( p_css );
-#else /* HAVE_CSS */
-    ;
-#endif /* HAVE_CSS */
 }
 
 /*****************************************************************************

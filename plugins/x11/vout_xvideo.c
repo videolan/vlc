@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.3 2001/04/04 16:33:07 sam Exp $
+ * $Id: vout_xvideo.c,v 1.4 2001/04/08 16:57:47 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -610,7 +610,7 @@ static int XVideoCreateWindow( vout_thread_t *p_vout )
 
     /* Prepare window attributes */
     xwindow_attributes.backing_store = Always;       /* save the hidden part */
-    xwindow_attributes.background_pixel = WhitePixel( p_vout->p_sys->p_display,
+    xwindow_attributes.background_pixel = BlackPixel( p_vout->p_sys->p_display,
                                                       p_vout->p_sys->i_screen );
 
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;

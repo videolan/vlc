@@ -1,4 +1,5 @@
-vlc changelog:
+ChangeLog for vlc
+=================
 
 0.2.70:
 
@@ -96,6 +97,10 @@ vlc changelog:
     interface (courtesy of Eugenio Jarosiewicz & Colin Delacroix) ;
   * Cleaning code and a small fix to make quit work on OSX
   * Disable x11 plugin if X11 headers are not found.
+  * Misc fixes in the DVD input.
+  * Fixed CSS authentication under Linux.
+  * Playlist now refreshes when a file is opened.
+  * XVideo plugin background is now black instead of white.
 
 0.2.63:
 

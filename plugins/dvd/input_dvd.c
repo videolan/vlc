@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.39 2001/04/08 09:04:33 stef Exp $
+ * $Id: input_dvd.c,v 1.40 2001/04/08 16:57:47 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -890,7 +890,6 @@ static void DVDEnd( input_thread_t * p_input )
 
     if( p_dvd->b_encrypted )
     {
-        CSSEnd( p_dvd->p_css );
         free( p_dvd->p_css );
     }
 
