@@ -754,7 +754,7 @@ PLUGINS="${PLUGINS} i420_rgb i420_yuy2 i422_yuy2 i420_ymga"
 PLUGINS="${PLUGINS} id3 m3u"
 PLUGINS="${PLUGINS} wav araw demuxdump demuxsub adpcm a52sys"
 PLUGINS="${PLUGINS} access_udp access_http ipv4 access_mms access_ftp"
-PLUGINS="${PLUGINS} sap"
+PLUGINS="${PLUGINS} sap screensaver"
 
 dnl
 dnl  Accelerated modules

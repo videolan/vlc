@@ -1,4 +1,5 @@
 SOURCES_gtk_main = modules/misc/gtk_main.c
 SOURCES_gnome_main = modules/misc/gtk_main.c
 SOURCES_sap = modules/misc/sap.c
+SOURCES_screensaver = modules/misc/screensaver.c
 SOURCES_qte_main = modules/misc/qte_main.cpp
