@@ -1333,8 +1333,13 @@ then
         GTK_PATH=$withval:$PATH
       fi ])
   # look for gtk-config
-  AC_PATH_PROG(GTK_CONFIG, gtk-config, no, $GTK_PATH)
-  if test -x ${GTK_CONFIG}
+  AC_PATH_PROG(GTK12_CONFIG, gtk12-config, no, $GTK_PATH)
+  GTK_CONFIG=${GTK12_CONFIG}
+  if test x${GTK_CONFIG} = xno
+  then
+    AC_PATH_PROG(GTK_CONFIG, gtk-config, no, $GTK_PATH)
+  fi
+  if test x${GTK_CONFIG} != xno
   then
     if expr 1.2.0 \> `$GTK_CONFIG --version` >/dev/null
     then
@@ -1342,21 +1347,21 @@ then
     fi
     CFLAGS_GTK="${CFLAGS_GTK} `${GTK_CONFIG} --cflags gtk`"
     LIB_GTK="${LIB_GTK} `${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`"
+    # now look for the gtk.h header
+    saved_CPPFLAGS=$CPPFLAGS
+    CPPFLAGS="$CPPFLAGS $CFLAGS_GTK"
+    ac_cv_gtk_headers=yes
+    AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
+      ac_cv_gtk_headers=no
+      echo "Cannot find gtk development headers."
+    ])
+    if test "x$ac_cv_gtk_headers" = xyes
+    then
+      PLUGINS="${PLUGINS} gtk"
+      ALIASES="${ALIASES} gvlc"
+    fi
+    CPPFLAGS=$saved_CPPFLAGS
   fi
-  # now look for the gtk.h header
-  saved_CPPFLAGS=$CPPFLAGS
-  CPPFLAGS="$CPPFLAGS $CFLAGS_GTK"
-  ac_cv_gtk_headers=yes
-  AC_CHECK_HEADERS(gtk/gtk.h glib.h gdk/gdk.h, , [
-    ac_cv_gtk_headers=no
-    echo "Cannot find gtk development headers."
-  ])
-  if test "x$ac_cv_gtk_headers" = xyes
-  then
-    PLUGINS="${PLUGINS} gtk"
-    ALIASES="${ALIASES} gvlc"
-  fi
-  CPPFLAGS=$saved_CPPFLAGS
 fi
 
 dnl
