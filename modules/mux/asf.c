@@ -739,8 +739,8 @@ static const guid_t asf_object_codec_comment_reserved_guid =
 {0x86D15241, 0x311D, 0x11D0, {0xA3, 0xA4, 0x00, 0xA0, 0xC9, 0x03, 0x48, 0xF6}};
 static const guid_t asf_object_content_description_guid =
 {0x75B22633, 0x668E, 0x11CF, {0xa6, 0xd9, 0x00, 0xaa, 0x00, 0x62, 0xce, 0x6c}};
-static const guid_t asf_object_index =
-{0xb35b7d8c, 0x7af1, 0x4f66, {0x94, 0x9a, 0x89, 0x03, 0x8e, 0x82, 0xc7, 0x48}};
+static const guid_t asf_object_index_guid =
+{0x33000890, 0xE5B1, 0x11CF, {0x89, 0xF4, 0x00, 0xA0, 0xC9, 0x03, 0x49, 0xCB}};
 
 /****************************************************************************
  * Misc
@@ -961,12 +961,14 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
         /* add payload (header size = 17) */
         i_payload = __MIN( i_data - i_pos,
                            p_sys->i_packet_size - p_sys->i_pk_used - 17 );
-        bo_add_u8   ( &bo, 0x80 | tk->i_id );
+        bo_add_u8   ( &bo, !(data->i_flags & BLOCK_FLAG_TYPE_P ||
+                      data->i_flags & BLOCK_FLAG_TYPE_B) ?
+                      0x80 | tk->i_id : tk->i_id );
         bo_add_u8   ( &bo, tk->i_sequence );
         bo_addle_u32( &bo, i_pos );
         bo_add_u8   ( &bo, 0x08 );  /* flags */
         bo_addle_u32( &bo, i_data );
-        bo_addle_u32( &bo, (data->i_dts - p_sys->i_dts_first) / 1000 -
+        bo_addle_u32( &bo, (data->i_dts - p_sys->i_dts_first) / 1000 +
                       p_sys->i_preroll_time );
         bo_addle_u16( &bo, i_payload );
         bo_add_mem  ( &bo, &p_data[i_pos], i_payload );
@@ -992,7 +994,7 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
             bo_add_u8( &bo, 0x11 );
             bo_add_u8( &bo, 0x5d );
             bo_addle_u16( &bo, i_pad );
-            bo_addle_u32( &bo, (p_sys->i_pk_dts - p_sys->i_dts_first) / 1000 -
+            bo_addle_u32( &bo, (p_sys->i_pk_dts - p_sys->i_dts_first) / 1000 +
                           p_sys->i_preroll_time );
             bo_addle_u16( &bo, 0 * data->i_length / 1000 );
             bo_add_u8( &bo, 0x80 | p_sys->i_pk_frame );
@@ -1025,6 +1027,18 @@ static block_t *asf_stream_end_create( sout_mux_t *p_mux )
         out = block_New( p_mux, 12 );
         bo_init( &bo, out->p_buffer, 12 );
         asf_chunk_add( &bo, 0x4524, 0, 0x00, p_sys->i_seq++ );
+    }
+    else
+    {
+        /* Create index */
+        out = block_New( p_mux, 56 );
+        bo_init( &bo, out->p_buffer, 56 );
+        bo_add_guid ( &bo, &asf_object_index_guid );
+        bo_addle_u64( &bo, 56 );
+        bo_add_guid ( &bo, &p_sys->fid );
+        bo_addle_u64( &bo, 10000000 );
+        bo_addle_u32( &bo, 5 );
+        bo_addle_u32( &bo, 0 );
     }
 
     return out;
