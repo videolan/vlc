@@ -8,4 +8,5 @@ SOURCES_qte_main = qte_main.cpp
 SOURCES_freetype = freetype.c
 SOURCES_logger = logger.c
 SOURCES_vod_rtsp = rtsp.c
+SOURCES_gnutls = gnutls.c
 SOURCES_svg = svg.c
