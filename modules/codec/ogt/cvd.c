@@ -2,7 +2,7 @@
  * cvd.c : CVD Subtitle decoder thread
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd.c,v 1.2 2003/12/28 11:26:52 rocky Exp $
+ * $Id: cvd.c,v 1.3 2003/12/29 04:47:44 rocky Exp $
  *
  * Authors: Rocky Bernstein
  *   based on code from:
@@ -230,6 +230,9 @@ Reassemble( decoder_t *p_dec, block_t **pp_block )
 	       p_buffer[1], p_buffer[2], p_buffer[3], p_buffer[4],
 	       p_buffer[5], p_buffer[6],
 	       p_block->i_buffer);
+
+    if( config_GetInt( p_dec, "spu-channel" ) != p_buffer[0] )
+      return NULL;
 
     /* There is little data on the format, but it does not seem to have a
        good way to detect the first packet in the subtitle.  It seems,

@@ -2,7 +2,7 @@
  * Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: ogt_parse.c,v 1.2 2003/12/28 11:26:52 rocky Exp $
+ * $Id: ogt_parse.c,v 1.3 2003/12/29 04:47:44 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -107,10 +107,11 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
     p_sys->pi_palette[i].s.y = *p++;
     p_sys->pi_palette[i].s.u = *p++;
     p_sys->pi_palette[i].s.v = *p++;
-    /* Note alpha is 8 bits. DVD's use only 4 bits. Our rendering routine
-       will use an 8-bit transparancy.
+    /* OGT has 8-bit resolution for alpha, but DVD's and CVDS use 4-bits.
+       Since we want to use the same render routine, rather than scale up
+       CVD (and DVD) subtitles, we'll scale down ours. 
     */
-    p_sys->pi_palette[i].s.t = *p++;
+    p_sys->pi_palette[i].s.t = (*p++) >> 4;
   }
   p_sys->i_cmd = *p++;
       /* We do not really know this, FIXME */
@@ -259,8 +260,8 @@ ExtractField(uint8_t *p, unsigned int i_remaining)
  the end.
 
  However we'll transform this so that that the RLE is expanded and
- interlacing will also be removed. On output each pixel entry will by 
- an 8-bit alpha, y, u, and v entry.
+ interlacing will also be removed. On output each pixel entry will by
+ an 4-bit alpha (filling 8 bits), and 8-bit y, u, and v entry.
 
  *****************************************************************************/
 static int 
@@ -282,7 +283,7 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
     uint8_t i_remaining;           /* number of 2-bit pixels remaining 
 				      in byte of *p */
     uint8_t i_pending_zero = 0;    /* number of pixels to fill with 
-				      color zero 0..4 */
+				      color zero 0..3 */
     ogt_color_t i_color;           /* current pixel color: 0..3 */
     uint8_t *p = p_sys->subtitle_data  + p_sys->comp_image_offset;
     uint8_t *maxp = p + p_sys->comp_image_length;
@@ -299,6 +300,8 @@ ParseImage( decoder_t *p_dec, subpicture_t * p_spu )
 	for ( i_column=0; i_column<i_width; i_column++ ) {
 
 	  if ( i_pending_zero ) {
+	    /* We are in the middle of a RLE expansion, just decrement and 
+	       fall through with current color value */
 	    i_pending_zero--;
 	    i_color = 0;
 	  } else {

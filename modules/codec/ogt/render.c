@@ -2,7 +2,7 @@
  * render.c : Philips OGT (SVCD Subtitle) renderer
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: render.c,v 1.4 2003/12/28 04:51:52 rocky Exp $
+ * $Id: render.c,v 1.5 2003/12/29 04:47:44 rocky Exp $
  *
  * Author: Rocky Bernstein 
  *   based on code from: 
@@ -35,8 +35,11 @@
 #include "subtitle.h"
 #include "render.h"
 
-/* We use 8 bits for an alpha value: 0..255. Note: For DVDs; 0.15. */
-#define ALPHA_BITS (8)
+/* We use 4 bits for an alpha value: 0..15, 15 is completely transparent and
+   0 completely opaque. Note that SVCD allow 8-bits, it should be 
+   scaled down to use these routines.
+*/
+#define ALPHA_BITS (4)
 #define MAX_ALPHA  ((1<<ALPHA_BITS) - 1) 
 
 /* Horrible hack to get dbg_print to do the right thing */
