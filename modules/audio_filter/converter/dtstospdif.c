@@ -2,7 +2,7 @@
  * dtstospdif.c : encapsulates DTS frames into S/PDIF packets
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dtstospdif.c,v 1.5 2004/02/07 15:01:07 sigmunau Exp $
+ * $Id: dtstospdif.c,v 1.6 2004/02/08 00:04:16 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -151,10 +151,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     for( i_frame = 0; i_frame < 3; i_frame++ )
     {
-#ifndef HAVE_SWAB
-        uint16_t i;
-        byte_t * p_tmp;
-#endif
         byte_t * p_out = p_out_buf->p_buffer + (i_frame * i_fz);
         byte_t * p_in = p_filter->p_sys->p_buf + (i_frame * i_length);
 
@@ -171,17 +167,29 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         *(p_out + 6) = (i_length * 8) & 0xff;
         *(p_out + 7) = (i_length * 8) >> 8;
 
-#ifdef HAVE_SWAB
-        swab( p_in, p_out + 8, i_length );
-#else
-        p_tmp = p_out + 8;
-        for( i = i_length / 2 ; i-- ; )
+        if( p_in[0] == 0x1f || p_in[0] == 0x7f )
         {
-            p_tmp[0] = p_in[1];
-            p_tmp[1] = p_in[0];
-            p_tmp += 2; p_in += 2;
-        }
+            /* We are dealing with a big endian bitstream.
+             * Convert to little endian */
+#ifdef HAVE_SWAB
+            swab( p_in, p_out + 8, i_length );
+#else
+            uint16_t i;
+            byte_t * p_tmp;
+            p_tmp = p_out + 8;
+            for( i = i_length / 2 ; i-- ; )
+            {
+                p_tmp[0] = p_in[1];
+                p_tmp[1] = p_in[0];
+                p_tmp += 2; p_in += 2;
+            }
 #endif
+        }
+        else
+        {
+            /* Little endian */
+            memcpy( p_in, p_out + 8, i_length );
+        }
 
         if( i_fz > i_length + 8 )
         {
