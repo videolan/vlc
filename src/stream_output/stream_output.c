@@ -147,6 +147,7 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, char * psz_dest )
         FREE( p_sout->psz_sout );
         FREE( p_sout->psz_chain );
 
+        vlc_object_detach( p_sout );
         vlc_object_destroy( p_sout );
         return NULL;
     }
@@ -303,6 +304,7 @@ sout_access_out_t *sout_AccessOutNew( sout_instance_t *p_sout,
     {
         free( p_access->psz_access );
         free( p_access->psz_name );
+        vlc_object_detach( p_access );
         vlc_object_destroy( p_access );
         return( NULL );
     }
@@ -396,6 +398,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
     {
         FREE( p_mux->psz_mux );
 
+        vlc_object_detach( p_mux );
         vlc_object_destroy( p_mux );
         return NULL;
     }
