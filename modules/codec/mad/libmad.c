@@ -44,7 +44,7 @@ static void PrintFrameInfo(struct mad_header *Header);
 enum mad_flow libmad_input( void *p_data, struct mad_stream *p_stream )
 {
     mad_adec_thread_t * p_dec = (mad_adec_thread_t *) p_data;
-    size_t   i_wanted, i_left;
+    size_t   i_wanted, i_left, i_current;
 
     if ( p_dec->p_fifo->b_die )
     {
@@ -73,7 +73,8 @@ enum mad_flow libmad_input( void *p_data, struct mad_stream *p_stream )
         * (448000*(1152/32000))/8 */
         if( p_stream->next_frame )
         {
-            i_left = p_stream->bufend - p_stream->next_frame;
+            i_left    = p_stream->bufend - p_stream->next_frame;
+            i_current = p_stream->next_frame - p_dec->buffer;
             if( p_dec->buffer != p_stream->next_frame )
             {
                 memcpy( p_dec->buffer, p_stream->next_frame, i_left );
@@ -81,7 +82,17 @@ enum mad_flow libmad_input( void *p_data, struct mad_stream *p_stream )
             i_wanted = MAD_BUFFER_MDLEN - i_left;
 
             /* Store timestamp for next frame */
-            p_dec->i_next_pts = p_dec->bit_stream.p_pes->i_pts;
+            if ( ( p_stream->next_frame == p_dec->buffer ) ||
+                 ( i_current >= i_left * ( ( i_current / ( MAD_BUFFER_MDLEN - i_current ) ) + 1 ) )
+               )
+            {
+                p_dec->i_next_pts = p_dec->bit_stream.p_pes->i_pts;
+            }
+            else
+            {
+                /* p_dec->bit_stream.p_pes->i_pts != p_dec->i_next_pts */
+                p_dec->i_next_pts = 0;
+            }
         }
         else
         {
