@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.9 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: theme.cpp,v 1.10 2003/04/21 02:12:06 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -31,8 +31,6 @@
 #include "../os_api.h"
 #include "window.h"
 #include "../os_window.h"
-#include "dialog.h"
-#include "../os_dialog.h"
 #include "banks.h"
 #include "anchor.h"
 #include "event.h"

@@ -2,7 +2,7 @@
  * gtk2_theme.cpp: GTK2 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_theme.cpp,v 1.20 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: gtk2_theme.cpp,v 1.21 2003/04/21 02:12:06 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -40,8 +40,6 @@
 #include "../os_event.h"
 #include "../src/theme.h"
 #include "../os_theme.h"
-#include "../src/dialog.h"
-#include "../os_dialog.h"
 #include "../src/vlcproc.h"
 #include "../src/skin_common.h"
 

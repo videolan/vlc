@@ -1,7 +1,6 @@
 SOURCES_skins = \
 	modules/gui/skins/os_api.h \
 	modules/gui/skins/os_bitmap.h \
-	modules/gui/skins/os_dialog.h \
 	modules/gui/skins/os_event.h \
 	modules/gui/skins/os_font.h \
 	modules/gui/skins/os_graphics.h \
@@ -40,8 +39,6 @@ SOURCES_skins = \
 	modules/gui/skins/src/bezier.h \
 	modules/gui/skins/src/bitmap.cpp \
 	modules/gui/skins/src/bitmap.h \
-	modules/gui/skins/src/dialog.cpp \
-	modules/gui/skins/src/dialog.h \
 	modules/gui/skins/src/event.cpp \
 	modules/gui/skins/src/event.h \
 	modules/gui/skins/src/font.cpp \
@@ -63,8 +60,6 @@ SOURCES_skins = \
 	modules/gui/skins/win32/win32_api.cpp \
 	modules/gui/skins/win32/win32_bitmap.cpp \
 	modules/gui/skins/win32/win32_bitmap.h \
-	modules/gui/skins/win32/win32_dialog.cpp \
-	modules/gui/skins/win32/win32_dialog.h \
 	modules/gui/skins/win32/win32_dragdrop.cpp \
 	modules/gui/skins/win32/win32_dragdrop.h \
 	modules/gui/skins/win32/win32_event.cpp \
@@ -82,8 +77,6 @@ SOURCES_skins = \
 	modules/gui/skins/gtk2/gtk2_api.cpp \
 	modules/gui/skins/gtk2/gtk2_bitmap.cpp \
 	modules/gui/skins/gtk2/gtk2_bitmap.h \
-	modules/gui/skins/gtk2/gtk2_dialog.cpp \
-	modules/gui/skins/gtk2/gtk2_dialog.h \
 	modules/gui/skins/gtk2/gtk2_dragdrop.cpp \
 	modules/gui/skins/gtk2/gtk2_dragdrop.h \
 	modules/gui/skins/gtk2/gtk2_event.cpp \

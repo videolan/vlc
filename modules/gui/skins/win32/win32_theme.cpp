@@ -2,7 +2,7 @@
  * win32_theme.cpp: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.cpp,v 1.4 2003/04/20 20:28:39 ipkiss Exp $
+ * $Id: win32_theme.cpp,v 1.5 2003/04/21 02:12:06 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -44,8 +44,6 @@
 #include "../os_event.h"
 #include "../src/theme.h"
 #include "../os_theme.h"
-#include "../src/dialog.h"
-#include "../os_dialog.h"
 #include "../src/vlcproc.h"
 #include "../src/skin_common.h"
 

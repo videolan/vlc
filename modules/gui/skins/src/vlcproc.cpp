@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.12 2003/04/21 00:54:26 ipkiss Exp $
+ * $Id: vlcproc.cpp,v 1.13 2003/04/21 02:12:06 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,8 +34,6 @@
 
 //--- SKIN ------------------------------------------------------------------
 #include "../os_api.h"
-#include "dialog.h"
-#include "../os_dialog.h"
 #include "event.h"
 #include "banks.h"
 #include "theme.h"
@@ -329,29 +327,21 @@ void VlcProc::LoadSkin()
 {
     if( p_intf->p_sys->p_new_theme_file == NULL )
     {
-        // Initialize file structure
-        OpenFileDialog *OpenFile;
-        OpenFile = (OpenFileDialog *)new OSOpenFileDialog( p_intf,
-            _("Change skin - Open new file"), false );
-        OpenFile->AddFilter( _("Skin files"), "*.vlt" );
-        OpenFile->AddFilter( _("Skin files"), "*.xml" );
-        OpenFile->AddFilter( _("All files"), "*.*" );
+        wxFileDialog dialog( NULL, _("Open a skin file"), "", "",
+            "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|All files|*.*",
+            wxOPEN );
 
-        // Open dialog box
-        if( OpenFile->Open() )
+        if( dialog.ShowModal() == wxID_OK )
         {
             p_intf->p_sys->p_new_theme_file =
-                new char[OpenFile->FileList.front().length()];
+                new char[dialog.GetPath().Length()];
 
             strcpy( p_intf->p_sys->p_new_theme_file,
-                    OpenFile->FileList.front().c_str() );
+                    dialog.GetPath().c_str() );
 
             // Tell vlc to change skin after hiding interface
             OSAPI_PostMessage( NULL, VLC_HIDE, VLC_LOAD_SKIN, 0 );
         }
-
-        // Free memory
-        delete OpenFile;
     }
     else
     {

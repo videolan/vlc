@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.13 2003/04/21 00:54:26 ipkiss Exp $
+ * $Id: skin_main.cpp,v 1.14 2003/04/21 02:12:06 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -34,8 +34,6 @@
 //--- SKIN ------------------------------------------------------------------
 #include "../os_api.h"
 #include "event.h"
-#include "dialog.h"
-#include "../os_dialog.h"
 #include "banks.h"
 #include "window.h"
 #include "theme.h"
@@ -184,35 +182,25 @@ static void Run( intf_thread_t *p_intf )
 #endif
         {
             // Last chance: the user can  select a new theme file
+            wxFileDialog dialog( NULL, _("Open a skin file"), "", "",
+                "Skin files (*.vlt)|*.vlt|Skin files (*.xml)|*.xml|"
+                    "All files|*.*", wxOPEN );
 
-            // Initialize file structure
-            OpenFileDialog *OpenFile;
-            OpenFile = (OpenFileDialog *)new OSOpenFileDialog( NULL,
-                _("Open skin"), false );
-            OpenFile->AddFilter( _("Skin files"), "*.vlt" );
-            OpenFile->AddFilter( _("Skin files"), "*.xml" );
-            OpenFile->AddFilter( _("All files"), "*.*" );
-
-            // Open dialog box
-            if( OpenFile->Open() )
+            if( dialog.ShowModal() == wxID_OK )
             {
                 // try to load selected file
-                if( ! Loader->Load( OpenFile->FileList.front() ) )
+                if( ! Loader->Load( dialog.GetPath().c_str() ) )
                 {
                     // He, he, what the hell is he doing ?
-                    delete OpenFile;
                     delete Loader;
                     return;
                 }
             }
             else
             {
-                delete OpenFile;
                 delete Loader;
                 return;
             }
-
-            delete OpenFile;
         }
     }
 
