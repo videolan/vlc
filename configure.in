@@ -911,19 +911,18 @@ AC_ARG_ENABLE(vcd,
 if test x$enable_vcd != xno
 then
   AC_EGREP_HEADER(cdrom_msf0,linux/cdrom.h,[
-    #BUILTINS="${BUILTINS} vcd"
+    BUILTINS="${BUILTINS} vcd"
   ])
 fi
 
 if test x$enable_vcd != xno -a "${SYS}" = "bsdi"
 then
-  #BUILTINS="${BUILTINS} vcd"
-true #delete me
+  BUILTINS="${BUILTINS} vcd"
 fi
 
 if test x$enable_vcd != xno -a "${SYS}" = "darwin"
 then
-  #BUILTINS="${BUILTINS} vcd"
+  BUILTINS="${BUILTINS} vcd"
   LIB_VCD="${LIB_VCD} -framework IOKit" 
 fi
 

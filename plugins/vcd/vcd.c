@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.5 2002/02/15 13:32:53 sam Exp $
+ * $Id: vcd.c,v 1.6 2002/03/05 23:29:36 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -32,7 +32,8 @@
 /*****************************************************************************
  * Capabilities defined in the other files.
  *****************************************************************************/
-void _M( input_getfunctions )( function_list_t * p_function_list );
+void _M( access_getfunctions )( function_list_t * p_function_list );
+void _M( demux_getfunctions )( function_list_t * p_function_list );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -42,12 +43,14 @@ MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( "VCD input module" )
-    ADD_CAPABILITY( INPUT, 180 )
+    ADD_CAPABILITY( DEMUX, 205 )
+    ADD_CAPABILITY( ACCESS, 105 )
     ADD_SHORTCUT( "vcd" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
-    _M( input_getfunctions )( &p_module->p_functions->input );
+    _M( access_getfunctions )( &p_module->p_functions->access );
+    _M( demux_getfunctions )( &p_module->p_functions->demux );
 MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
