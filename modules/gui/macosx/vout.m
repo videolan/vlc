@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.74 2004/01/28 21:31:15 titer Exp $
+ * $Id: vout.m,v 1.75 2004/01/29 02:01:49 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -291,8 +291,7 @@ static int vout_Init( vout_thread_t *p_vout )
     }
 
     /* Try to initialize up to QT_MAX_DIRECTBUFFERS direct buffers */
-    while( I_OUTPUTPICTURES <
-           ( p_vout->p_sys->i_opengl ? 3 : QT_MAX_DIRECTBUFFERS ) )
+    while( I_OUTPUTPICTURES < QT_MAX_DIRECTBUFFERS )
     {
         p_pic = NULL;
 
@@ -321,6 +320,8 @@ static int vout_Init( vout_thread_t *p_vout )
         }
         else
         {
+            /* Nothing special to do, we just need a basic allocated
+               picture_t */
             vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_chroma,
                     p_vout->output.i_width, p_vout->output.i_height,
                     p_vout->output.i_aspect );
@@ -336,8 +337,9 @@ static int vout_Init( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->i_opengl )
     {
-        p_vout->p_sys->o_glview->i_index = -1;
-        p_vout->p_sys->o_glview->i_init_done = 1;
+        /* Do this now instead of initWithFrame because we need a
+           first buffer for the glTexImage2D call */
+        [p_vout->p_sys->o_glview initTexture];
     }
 
     return( 0 );
@@ -474,11 +476,8 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     }
     else
     {
-        p_vout->p_sys->o_glview->i_index++; 
-        p_vout->p_sys->o_glview->i_index %= 3;
-        [p_vout->p_sys->o_glview setNeedsDisplay: YES];
-        p_pic->p->p_pixels =
-            PP_OUTPUTPICTURE[(p_vout->p_sys->o_glview->i_index+1)%3]->p_data;
+        /* Update the texture with our new picture */
+        [p_vout->p_sys->o_glview reloadTexture: p_pic->p->p_pixels];
     }
 }
 
@@ -1272,7 +1271,6 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
         NSOpenGLPFAAccelerated,
         NSOpenGLPFANoRecovery,
         NSOpenGLPFADoubleBuffer,
-        NSOpenGLPFAWindow,
         0
     };
 
@@ -1294,8 +1292,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
     glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE );
     glClearColor( 0.0, 0.0, 0.0, 0.0 );
 
-    i_init_done       = 0;
-    i_textures_loaded = 0;
+    i_init_done = 0;
 
     return self;
 }
@@ -1308,77 +1305,96 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
                 (GLint) bounds.size.height );
 }
 
-- (void)drawRect:(NSRect)rect
+- (void) initTexture
 {
     vout_thread_t * p_vout;
     id o_window = [self window];
     p_vout = (vout_thread_t *)[o_window getVout];
 
-    /* Make this current context */
+    [self lockFocus];
+
     [[self openGLContext] makeCurrentContext];
 
-    /* http://developer.apple.com/documentation/GraphicsImaging/
+    /* Swap buffers only during the vertical retrace of the monitor.
+       http://developer.apple.com/documentation/GraphicsImaging/
        Conceptual/OpenGL/chap5/chapter_5_section_44.html */
     long params[] = { 1 };
     CGLSetParameter( CGLGetCurrentContext(), kCGLCPSwapInterval,
                      params );
 
+    /* Create the texture */
+    glGenTextures( 1, &i_texture );
+    glEnable( GL_TEXTURE_RECTANGLE_EXT );
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
+
+    /* Turn on AGP transferts */
+    glTexParameterf( GL_TEXTURE_RECTANGLE_EXT,
+                     GL_TEXTURE_PRIORITY, 0.0 );
+
+    /* Use AGP texturing */
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE );
+
+    /* Tell the driver not to make a copy of the texture but to use
+       our buffer */
+    glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
+
+    /* Linear interpolation */
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+    /* I have no idea what this exactly does, but it seems to be
+       necessary for scaling */
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE );
+    glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
+            GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
+
+    glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
+            p_vout->output.i_width, p_vout->output.i_height, 0,
+            GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
+            PP_OUTPUTPICTURE[0]->p_data );
+
+    i_init_done = 1;
+    
+    [self unlockFocus];
+}
+
+- (void) reloadTexture: (uint8_t *) buffer
+{
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+    
+    [self lockFocus];
+
+    [[self openGLContext] makeCurrentContext];
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
+
+    /* glTexSubImage2D is usually faster than glTexImage2D */
+    glTexSubImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, 0, 0,
+            p_vout->output.i_width, p_vout->output.i_height,
+            GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
+            buffer );
+    [self drawRect: [self bounds]];
+
+    [self unlockFocus];
+}
+
+- (void) drawRect: (NSRect) rect
+{
+    vout_thread_t * p_vout;
+    id o_window = [self window];
+    p_vout = (vout_thread_t *)[o_window getVout];
+
     /* Black background */
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     if( !i_init_done )
-    {
         return;
-    }
-
-    if( !i_textures_loaded )
-    {
-        glGenTextures( 1, &i_texture );
-        glEnable( GL_TEXTURE_RECTANGLE_EXT );
-        glBindTexture(GL_TEXTURE_RECTANGLE_EXT, i_texture);
-        glTexImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, GL_RGBA,
-                p_vout->output.i_width, p_vout->output.i_height, 0,
-                GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
-                PP_OUTPUTPICTURE[i_index]->p_data );
-
-        /* Turn on AGP transferts */
-        glTexParameterf( GL_TEXTURE_RECTANGLE_EXT,
-                         GL_TEXTURE_PRIORITY, 0.0 );
-
-        /* Use AGP texturing */
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_STORAGE_HINT_APPLE, GL_STORAGE_CACHED_APPLE );
-
-        /* Tell the driver not to make a copy of the texture but to use
-           our buffer */
-        glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
-
-        /* Linear interpolation */
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-
-        /* I have no idea what this exactly does, but it seems to be
-           necessary for scaling */
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE );
-        glTexParameteri( GL_TEXTURE_RECTANGLE_EXT,
-                GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
-        
-        i_textures_loaded = 1;
-    }
-    else 
-    {
-        /* glTexSubImage2D is supposed to be faster than glTexImage2D,
-           so we use it starting from the second frame */
-        glBindTexture(GL_TEXTURE_RECTANGLE_EXT, i_texture);
-        glTexSubImage2D( GL_TEXTURE_RECTANGLE_EXT, 0, 0, 0,
-                p_vout->output.i_width, p_vout->output.i_height,
-                GL_YCBCR_422_APPLE, GL_UNSIGNED_SHORT_8_8_APPLE,
-                PP_OUTPUTPICTURE[i_index]->p_data );
-    }
 
     /* Draw a quad with our texture on it. Quad size is set in order
        to preserve the aspect ratio */
@@ -1398,6 +1414,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_vout->output.i_aspect / bounds.size.height;
     }
 
+    glBindTexture( GL_TEXTURE_RECTANGLE_EXT, i_texture );
     glBegin( GL_QUADS );
         /* Top left */
         glTexCoord2f( 0.0f, 0.0f );

@@ -2,7 +2,7 @@
  * vout.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.h,v 1.19 2004/01/28 21:31:15 titer Exp $
+ * $Id: vout.h,v 1.20 2004/01/29 02:01:49 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -58,12 +58,12 @@
  *****************************************************************************/
 @interface VLCGLView : NSOpenGLView
 {
-    @public
     int           i_init_done;
-    int           i_textures_loaded;
-    int           i_index;
     unsigned long i_texture;
 }
+
+- (void) initTexture;
+- (void) reloadTexture: (uint8_t *) buffer;
 
 @end
 
@@ -89,7 +89,6 @@ struct vout_sys_t
     NSRect s_rect;
     int b_pos_saved;
     VLCWindow * o_window;
-    VLCGLView * o_glview;
 
     vlc_bool_t b_mouse_moved;
     mtime_t i_time_mouse_last_moved;
@@ -103,4 +102,6 @@ struct vout_sys_t
     ImageDescriptionHandle h_img_descr;
     Ptr p_fullscreen_state;
 #endif
+
+    VLCGLView * o_glview;
 };
