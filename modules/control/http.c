@@ -1,7 +1,7 @@
 /*****************************************************************************
  * http.c :  http mini-server ;)
  *****************************************************************************
- * Copyright (C) 2001-2004 VideoLAN
+ * Copyright (C) 2001-2005 VideoLAN
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
@@ -195,6 +195,7 @@ struct intf_sys_t
     playlist_t          *p_playlist;
     input_thread_t      *p_input;
     vlm_t               *p_vlm;
+    char                *psz_html_type;
 };
 
 
@@ -236,6 +237,24 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_input    = NULL;
     p_sys->p_vlm      = NULL;
 
+    /* determine Content-Type value for HTML pages */
+    vlc_current_charset(&psz_src);
+    if( psz_src == NULL )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
+    p_sys->psz_html_type = malloc( 20 + strlen( psz_src ) );
+    if( p_sys->psz_html_type == NULL )
+    {
+        free( p_sys );
+        free( psz_src );
+        return VLC_ENOMEM ;
+    }
+    sprintf( p_sys->psz_html_type, "text/html; charset=%s", psz_src );
+    free( psz_src );
+
+    /* determine SSL configuration */
     psz_cert = config_GetPsz( p_intf, "http-intf-cert" );
     if ( psz_cert != NULL )
     {
@@ -249,6 +268,7 @@ static int Open( vlc_object_t *p_this )
         if ( p_tls == NULL )
         {
             msg_Err( p_intf, "TLS initialization error" );
+            free( p_sys->psz_html_type );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -258,6 +278,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_intf, "TLS CA error" );
             tls_ServerDelete( p_tls );
+            free( p_sys->psz_html_type );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -267,6 +288,7 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_intf, "TLS CRL error" );
             tls_ServerDelete( p_tls );
+            free( p_sys->psz_html_type );
             free( p_sys );
             return VLC_EGENERIC;
         }
@@ -290,6 +312,8 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_intf, "cannot listen on %s:%d", psz_address, i_port );
         if ( p_tls != NULL )
             tls_ServerDelete( p_tls );
+
+        free( p_sys->psz_html_type );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -363,6 +387,7 @@ failed:
         free( p_sys->pp_files );
     }
     httpd_HostDelete( p_sys->p_httpd_host );
+    free( p_sys->psz_html_type );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -399,6 +424,7 @@ void Close ( vlc_object_t *p_this )
     }
     httpd_HostDelete( p_sys->p_httpd_host );
 
+    free( p_sys->psz_html_type );
     free( p_sys );
 }
 
@@ -614,7 +640,8 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                      f->file, f->name );
 
             f->p_file = httpd_FileNew( p_sys->p_httpd_host,
-                                       f->name, f->b_html ? "text/html" : NULL,
+                                       f->name,
+                                       f->b_html ? p_sys->psz_html_type : NULL,
                                        user, password,
                                        HttpCallback, f );
 
@@ -945,7 +972,6 @@ void PlaylistListNode( playlist_t *p_pl, playlist_item_t *p_node,
             char value[512];
             int i_child;
             mvar_t *itm = mvar_New( name, "set" );
-            mvar_t *itm_end = mvar_New( name, "set" );
 
             mvar_AppendNewVar( itm, "name", p_node->input.psz_name );
             mvar_AppendNewVar( itm, "uri", p_node->input.psz_name );
