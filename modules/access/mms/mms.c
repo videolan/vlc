@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mms.c,v 1.4 2002/11/13 21:18:40 fenrir Exp $
+ * $Id: mms.c,v 1.5 2002/11/14 16:32:43 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -236,7 +236,7 @@ static int Open( vlc_object_t *p_this )
     /* *** finished to set some variable *** */
     vlc_mutex_lock( &p_input->stream.stream_lock );
     /* those data could be different for UDP/TCP */
-    p_input->stream.b_pace_control = 0;
+    p_input->stream.b_pace_control = 1;
     p_input->stream.p_selected_area->i_tell = 0;
     if( p_access->i_packet_count <= 0 )
     {
@@ -546,6 +546,7 @@ static void mms_StreamSelect( input_thread_t * p_input,
     /* XXX FIXME use mututal eclusion information */
     int i;
     int i_audio, i_video;
+    int b_audio, b_video;
     int i_bitrate_total;
     int i_bitrate_max;
     char *psz_stream;
@@ -554,7 +555,8 @@ static void mms_StreamSelect( input_thread_t * p_input,
     i_video = 0;
     i_bitrate_total = 0;
     i_bitrate_max = config_GetInt( p_input, "mms-maxbitrate" );
-    
+    b_audio = config_GetInt( p_input, "audio" );
+    b_video = config_GetInt( p_input, "video" );
     if( config_GetInt( p_input, "mms-all" ) )
     {
         /* select all valid stream */
@@ -625,10 +627,11 @@ static void mms_StreamSelect( input_thread_t * p_input,
         {
             continue;
         }
-        else if( stream[i].i_cat == MMS_STREAM_AUDIO && 
+        else if( stream[i].i_cat == MMS_STREAM_AUDIO && b_audio &&
                  ( i_audio <= 0 || 
                     ( ( ( stream[i].i_bitrate > stream[i_audio].i_bitrate && 
-                          ( i_bitrate_total < i_bitrate_max || !i_bitrate_max) ) ||
+                          ( i_bitrate_total + stream[i].i_bitrate - stream[i_audio].i_bitrate 
+                                            < i_bitrate_max || !i_bitrate_max) ) ||
                         ( stream[i].i_bitrate < stream[i_audio].i_bitrate && 
                               i_bitrate_max != 0 && i_bitrate_total > i_bitrate_max )
                       ) )  ) )
@@ -650,11 +653,12 @@ static void mms_StreamSelect( input_thread_t * p_input,
             }
             i_audio = i;
         }
-        else if( stream[i].i_cat == MMS_STREAM_VIDEO && 
+        else if( stream[i].i_cat == MMS_STREAM_VIDEO && b_video &&
                  ( i_video <= 0 || 
                     (
                         ( ( stream[i].i_bitrate > stream[i_video].i_bitrate && 
-                            ( i_bitrate_total < i_bitrate_max || !i_bitrate_max) ) ||
+                            ( i_bitrate_total + stream[i].i_bitrate - stream[i_video].i_bitrate 
+                                            < i_bitrate_max || !i_bitrate_max) ) ||
                           ( stream[i].i_bitrate < stream[i_video].i_bitrate && 
                             i_bitrate_max != 0 && i_bitrate_total > i_bitrate_max )
                         ) ) )  )
@@ -675,6 +679,18 @@ static void mms_StreamSelect( input_thread_t * p_input,
             i_video = i;
         }
 
+    }
+    if( i_bitrate_max > 0 )
+    {
+        msg_Dbg( p_input, 
+                 "requested bitrate:%d real bitrate:%d", 
+                 i_bitrate_max, i_bitrate_total );
+    }
+    else
+    {
+        msg_Dbg( p_input, 
+                 "total bitrate:%d", 
+                 i_bitrate_total );
     }
 }
 
