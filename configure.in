@@ -1091,7 +1091,7 @@ if test x$enable_xvideo != xno &&
       AC_CHECK_LIB(Xv,XvPutImage,
         # We don't have Xv_pic, but we have Xv, let's make xvideo.a as builtin
         PLUGINS="${PLUGINS} xvideo"
-        xvideo_LDFLAGS="${xvideo_LDFLAGS} -L$x_libraries -lX11 -lXext -lXv_pic"
+        xvideo_LDFLAGS="${xvideo_LDFLAGS} -L$x_libraries -lX11 -lXext -lXv"
         xvideo_CFLAGS="${xvideo_CFLAGS} -I$x_includes",
         # Otherwise... well, do nothing.
       )
