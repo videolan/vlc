@@ -128,23 +128,6 @@ void NextDataPacket( bit_stream_t * p_bit_stream )
     }
 }
 
-void OldKludge( bit_stream_t * p_bit_stream )
-{
-    WORD_TYPE           buffer_left;
-    ptrdiff_t           i_bytes_left;
-
-    /* Put the remaining bytes (not aligned on a word boundary) in a
-     * temporary buffer. */
-    i_bytes_left = p_bit_stream->p_end - p_bit_stream->p_byte;
-    buffer_left = *((WORD_TYPE *)p_bit_stream->p_end - 1);
-
-    p_bit_stream->pf_next_data_packet( p_bit_stream );
-
-    /* Copy remaining bits of the previous packet */
-    *((WORD_TYPE *)p_bit_stream->p_byte - 1) = buffer_left;
-    p_bit_stream->p_byte -= i_bytes_left;
-}
-
 /*****************************************************************************
  * UnalignedShowBits : return i_bits bits from the bit stream, even when
  * not aligned on a word boundary
