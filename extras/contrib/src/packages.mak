@@ -2,7 +2,7 @@
 # src/packages.mak : Archive locations
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: packages.mak,v 1.12 2004/01/24 21:06:52 hartman Exp $
+# $Id: packages.mak,v 1.13 2004/02/09 12:54:47 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -47,8 +47,8 @@ MPEG2DEC_CVSROOT=:pserver:anonymous@cvs.libmpeg2.sourceforge.net:/cvsroot/libmpe
 MPEG2DEC_SNAPSHOT=http://libmpeg2.sourceforge.net/files/mpeg2dec-snapshot.tar.gz
 LIBID3TAG_VERSION=0.15.0b
 LIBID3TAG_URL=ftp://ftp.mars.org/pub/mpeg/libid3tag-$(LIBID3TAG_VERSION).tar.gz
-LIBMAD_VERSION=0.14.2b
-LIBMAD_URL=ftp://ftp.mars.org/pub/mpeg/mad-$(LIBMAD_VERSION).tar.gz
+LIBMAD_VERSION=0.15.0b
+LIBMAD_URL=ftp://ftp.mars.org/pub/mpeg/libmad-$(LIBMAD_VERSION).tar.gz
 OGG_VERSION=1.1
 OGG_URL=http://www.vorbis.com/files/1.0.1/unix/libogg-$(OGG_VERSION).tar.gz
 OGG_CVSROOT=:pserver:anoncvs@xiph.org:/usr/local/cvsroot
@@ -90,4 +90,6 @@ LIVEDOTCOM_URL=http://download.videolan.org/pub/testing/contrib/live.$(LIVEDOTCO
 GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
 LIBCACA_VERSION=0.8
 LIBCACA_URL=http://sam.zoy.org/projects/libcaca/libcaca-$(LIBCACA_VERSION).tar.gz
+DTSDEC_VERSION=0.0.1
+DTSDEC_URL=http://download.videolan.org/pub/videolan/dtsdec/$(DTSDEC_VERSION)/dtsdec-$(DTSDEC_VERSION).tar.gz
 

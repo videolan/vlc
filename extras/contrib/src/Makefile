@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003, 2004 VideoLAN
-# $Id: Makefile,v 1.14 2004/01/24 21:06:52 hartman Exp $
+# $Id: Makefile,v 1.15 2004/02/09 12:54:47 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #          Derk-Jan Hartman <hartman at videolan dot org>
@@ -43,7 +43,7 @@ export LDFLAGS = -L$(PREFIX)/lib
 all: .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdplay .dvdnav .dvbpsi .live .goom .caca
+	.dvdcss .dvdread .dvdplay .dvdnav .dvbpsi .live .goom .caca .dts
 FORCE:
 
 # ***************************************************************************
@@ -300,20 +300,20 @@ DISTCLEAN_PKG += libid3tag-$(LIBID3TAG_VERSION).tar.gz
 # libmad
 # ***************************************************************************
 
-mad-$(LIBMAD_VERSION).tar.gz:
+libmad-$(LIBMAD_VERSION).tar.gz:
 	$(WGET) $(LIBMAD_URL)
 
-mad: mad-$(LIBMAD_VERSION).tar.gz
+libmad: libmad-$(LIBMAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.mad: mad
+.mad: libmad
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .mad
-CLEAN_PKG += mad
-DISTCLEAN_PKG += mad-$(LIBMAD_VERSION).tar.gz
+CLEAN_PKG += libmad
+DISTCLEAN_PKG += libmad-$(LIBMAD_VERSION).tar.gz
 
 # ***************************************************************************
 # ogg
@@ -516,21 +516,21 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 # ffmpeg
 # ***************************************************************************
 
-#ffmpeg:
-#	cvs -d $(FFMPEG_CVSROOT) login
-#	cvs -d $(FFMPEG_CVSROOT) co ffmpeg
-#	patch -p 0 < Patches/ffmpeg.patch.cvs
+ffmpeg:
+	cvs -d $(FFMPEG_CVSROOT) login
+	cvs -d $(FFMPEG_CVSROOT) co ffmpeg
+	patch -p 0 < Patches/ffmpeg.patch.cvs
 #	(cd $@; ./bootstrap)
 
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
 	$(WGET) $(FFMPEG_URL)
 
-ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	patch -p 0 < Patches/ffmpeg.patch
+#ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
+#	$(EXTRACT_GZ)
+#	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg
-	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-mp3lame --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
+	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-mp3lame --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame --disable-zlib && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
@@ -705,6 +705,24 @@ libcaca: libcaca-$(LIBCACA_VERSION).tar.gz
 CLEAN_FILE += .caca
 CLEAN_PKG += libcaca
 DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
+
+# ***************************************************************************
+# libdts
+# ***************************************************************************
+
+dtsdec-$(DTSDEC_VERSION).tar.gz:
+	$(WGET) $(DTSDEC_URL)
+
+dtsdec: dtsdec-$(DTSDEC_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.dts: dtsdec
+	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	touch $@
+
+CLEAN_FILE += .dts
+CLEAN_PKG += dtsdec
+DISTCLEAN_PKG += dtsdec-$(DTSDEC_VERSION).tar.gz
 
 # ***************************************************************************
 # Some cleansing
