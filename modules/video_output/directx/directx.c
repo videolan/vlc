@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001-2004 VideoLAN
- * $Id: directx.c,v 1.31 2004/01/02 22:17:57 gbazin Exp $
+ * $Id: directx.c,v 1.32 2004/01/05 22:06:15 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -96,6 +96,8 @@ static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t i_color );
 /* Object variables callbacks */
 static int OnTopCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
+static int FindDevicesCallback( vlc_object_t *, char const *,
+                                vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -114,12 +116,28 @@ static int OnTopCallback( vlc_object_t *, char const *,
 #define TRIPLEBUF_LONGTEXT N_( \
     "Try to use triple bufferring when using YUV overlays. That results in " \
     "much better video quality (no flickering)." )
+#define DEVICE_TEXT N_("Name of desired display device")
+#define DEVICE_LONGTEXT N_("In a multimonitor configuration, you can specify "\
+    "the Windows device name of the display that you want the video window " \
+    "to open on. For example, \"\\\\.\\DISPLAY1\" or \"\\\\.\\DISPLAY2\"." )
+
+static char *ppsz_dev[] = { "" };
+static char *ppsz_dev_text[] = { N_("Default") };
 
 vlc_module_begin();
     add_category_hint( N_("Video"), NULL, VLC_FALSE );
-    add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT, VLC_TRUE );
-    add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT, VLC_TRUE );
-    add_bool( "directx-3buffering", 1, NULL, TRIPLEBUF_TEXT, TRIPLEBUF_LONGTEXT, VLC_TRUE );
+
+    add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
+              VLC_TRUE );
+    add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
+              VLC_TRUE );
+    add_bool( "directx-3buffering", 1, NULL, TRIPLEBUF_TEXT,
+              TRIPLEBUF_LONGTEXT, VLC_TRUE );
+
+    add_string( "directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
+                VLC_TRUE );
+        change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback );
+
     set_description( _("DirectX video output") );
     set_capability( "video output", 100 );
     add_shortcut( "directx" );
@@ -185,6 +203,7 @@ static int OpenVideo( vlc_object_t *p_this )
     var_Create( p_vout, "directx-use-sysmem", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     var_Create( p_vout, "directx-hw-yuv", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "directx-3buffering", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     p_vout->p_sys->b_cursor_hidden = 0;
     p_vout->p_sys->i_lastmoved = mdate();
@@ -641,10 +660,25 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
                                  HMONITOR hmon )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_context;
+    vlc_value_t device;
+
+    var_Get( p_vout, "directx-device", &device );
+
     msg_Dbg( p_vout, "DirectXEnumCallback: %s, %s", psz_desc, psz_drivername );
 
-    if( hmon && hmon == p_vout->p_sys->hmonitor )
+    if( hmon )
     {
+        if( ( !device.psz_string || !device.psz_string ) &&
+            hmon == p_vout->p_sys->hmonitor )
+        {
+            ;
+        }
+        else if( strcmp( psz_drivername, device.psz_string ) == 0 )
+        {
+            p_vout->p_sys->hmonitor = hmon;
+        }
+        else return TRUE; /* Keep enumerating */
+
         msg_Dbg( p_vout, "selecting %s, %s", psz_desc, psz_drivername );
         p_vout->p_sys->p_display_driver = malloc( sizeof(GUID) );
         if( p_vout->p_sys->p_display_driver )
@@ -691,6 +725,11 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
 
     if( OurDirectDrawEnumerateEx && p_vout->p_sys->MonitorFromWindow )
     {
+        vlc_value_t device;
+
+        var_Get( p_vout, "directx-device", &device );
+        msg_Dbg( p_vout, "directx-device: %s", device.psz_string );
+
         p_vout->p_sys->hmonitor =
             p_vout->p_sys->MonitorFromWindow( p_vout->p_sys->hwnd,
                                               MONITOR_DEFAULTTONEAREST );
@@ -1696,5 +1735,77 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     p_vout->p_sys->b_on_top_change = VLC_TRUE;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * config variable callback
+ *****************************************************************************/
+BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
+                                  LPTSTR psz_drivername, VOID* p_context,
+                                  HMONITOR hmon )
+{
+    module_config_t *p_item = (module_config_t *)p_context;
+
+    p_item->ppsz_list =
+        (char **)realloc( p_item->ppsz_list,
+                          (p_item->i_list+2) * sizeof(char *) );
+    p_item->ppsz_list_text =
+        (char **)realloc( p_item->ppsz_list_text,
+                          (p_item->i_list+2) * sizeof(char *) );
+
+    p_item->ppsz_list[p_item->i_list] = strdup( psz_drivername );
+    p_item->ppsz_list_text[p_item->i_list] = NULL;
+    p_item->i_list++;
+    p_item->ppsz_list[p_item->i_list] = NULL;
+    p_item->ppsz_list_text[p_item->i_list] = NULL;
+
+    return TRUE; /* Keep enumerating */
+}
+
+static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
+                               vlc_value_t newval, vlc_value_t oldval, void *d)
+{
+    HRESULT (WINAPI *OurDirectDrawEnumerateEx)( LPDDENUMCALLBACKEXA, LPVOID,
+                                                DWORD );
+    HINSTANCE hddraw_dll;
+
+    module_config_t *p_item;
+    int i;
+
+    p_item = config_FindConfig( p_this, psz_name );
+    if( !p_item ) return VLC_SUCCESS;
+
+    /* Clear-up the current list */
+    if( p_item->i_list )
+    {
+        /* Keep the first entry */
+        for( i = 1; i < p_item->i_list; i++ )
+        {
+            free( p_item->ppsz_list[i] );
+            free( p_item->ppsz_list_text[i] );
+        }
+        /* TODO: Remove when no more needed */
+        p_item->ppsz_list[i] = NULL;
+        p_item->ppsz_list_text[i] = NULL;
+    }
+    p_item->i_list = 1;
+
+    /* Load direct draw DLL */
+    hddraw_dll = LoadLibrary("DDRAW.DLL");
+    if( hddraw_dll == NULL ) return VLC_SUCCESS;
+
+    OurDirectDrawEnumerateEx =
+      (void *)GetProcAddress( hddraw_dll, "DirectDrawEnumerateExA" );
+
+    if( OurDirectDrawEnumerateEx )
+    {
+        /* Enumerate displays */
+        OurDirectDrawEnumerateEx( DirectXEnumCallback2, p_item,
+                                  DDENUM_ATTACHEDSECONDARYDEVICES );
+    }
+
+    FreeLibrary( hddraw_dll );
+
     return VLC_SUCCESS;
 }
