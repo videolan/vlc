@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.28 2003/12/13 14:01:51 gbazin Exp $
+ * $Id: directx.c,v 1.29 2003/12/15 20:21:45 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -755,9 +755,11 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
         p_vout->p_sys->rect_display.bottom = GetSystemMetrics(SM_CYSCREEN);
     }
 
-    msg_Dbg( p_vout, "screen dimensions %ix%i",
-                      p_vout->p_sys->rect_display.right,
-                      p_vout->p_sys->rect_display.bottom );
+    msg_Dbg( p_vout, "screen dimensions (%ix%i,%ix%i)",
+             p_vout->p_sys->rect_display.left,
+             p_vout->p_sys->rect_display.top,
+             p_vout->p_sys->rect_display.right,
+             p_vout->p_sys->rect_display.bottom );
 
     /* Probe the capabilities of the hardware */
     DirectXGetDDrawCaps( p_vout );
