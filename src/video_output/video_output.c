@@ -2112,13 +2112,11 @@ static int Manage( vout_thread_t *p_vout )
                              VOUT_YUV_CHANGE) )
     {
         /* Change vdec_DecodeMacroblock when switching between BW and C */
-        if( (!p_vout->b_grayscale) 
-                && (VOUT_GRAYSCALE_CHANGE) )            
+        if( !p_vout->b_grayscale ) 
         {
             p_vout->vdec_DecodeMacroblock = vdec_DecodeMacroblockC;
         }
-        else if( (p_vout->b_grayscale)
-                && (VOUT_GRAYSCALE_CHANGE) )
+        else if( p_vout->b_grayscale)
         {
             p_vout->vdec_DecodeMacroblock = vdec_DecodeMacroblockBW;
         }  
