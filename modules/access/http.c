@@ -639,7 +639,7 @@ static int ReadICYMeta( access_t *p_access )
     if( i_read != buffer[0] * 16 )
         return VLC_EGENERIC;
 
-    psz_meta[buffer[0]*16 + 1] = '\0'; /* Just in case */
+    psz_meta[buffer[0]*16] = '\0'; /* Just in case */
 
     msg_Dbg( p_access, "icy-meta=%s", psz_meta );
 
