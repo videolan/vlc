@@ -384,7 +384,7 @@ int E_(Open) ( vlc_object_t *p_this )
          ((u_srate) < frontend_info.symbol_rate_min) )
     {
         msg_Warn( p_input, "invalid symbol rate, using default one" );
-        u_srate = config_GetInt( p_input, "symbol-rate"s );
+        u_srate = config_GetInt( p_input, "symbol-rate" );
         if ( ((u_srate) > frontend_info.symbol_rate_max) ||
              ((u_srate) < frontend_info.symbol_rate_min) )
         {

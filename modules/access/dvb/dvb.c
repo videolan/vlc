@@ -443,7 +443,7 @@ int ioctl_SetQAMFrontend (input_thread_t * p_input, struct dvb_frontend_paramete
     {
         close(front);
 #   ifdef HAVE_ERRNO_H
-        msg_Err(p_input, "DVB-C: tuning channel failed (frontend returned %d:%s)", ret, strerrror(errno));
+        msg_Err(p_input, "DVB-C: tuning channel failed (frontend returned %d:%s)", ret, strerror(errno));
 #   else
         msg_Err(p_input, "DVB-C: tuning channel failed (frontend returned %d)", ret);
 #   endif
