@@ -1,0 +1,46 @@
+/*****************************************************************************
+ * evt_special.cpp
+ *****************************************************************************
+ * Copyright (C) 2003 VideoLAN
+ * $Id: evt_special.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ *
+ * Authors: Cyril Deguet     <asmax@via.ecp.fr>
+ *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+#include "evt_special.hpp"
+
+
+const string EvtSpecial::getAsString() const
+{
+    string event = "special";
+
+    // Add the action
+    if( m_action == kShow )
+        event += ":show";
+    else if( m_action == kHide )
+        event += ":hide";
+    else if( m_action == kEnable )
+        event += ":enable";
+    else if( m_action == kDisable )
+        event += ":disable";
+    else
+        msg_Warn( getIntf(), "Unknown action type" );
+
+    return event;
+}
+

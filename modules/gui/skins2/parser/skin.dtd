@@ -1,0 +1,204 @@
+<!--
+-->
+
+
+<!ELEMENT Theme (ThemeInfo,(Bitmap|Font|Window|Event)*)>
+    <!ATTLIST Theme
+        version     CDATA   "1.0"
+        magnet      CDATA   "15"
+        alpha       CDATA   "255"
+        movealpha   CDATA   "255"
+        fadetime    CDATA   "400"
+    >
+
+<!-- main elements -->
+<!ELEMENT Bitmap EMPTY>
+    <!ATTLIST Bitmap
+        id          CDATA   #REQUIRED
+        file        CDATA   #REQUIRED
+        alphacolor  CDATA   #REQUIRED
+    >
+<!ELEMENT Event EMPTY>
+    <!ATTLIST Event
+        id          CDATA   #REQUIRED
+        event       CDATA   #REQUIRED
+        key         CDATA   "none"
+    >
+<!ELEMENT Font EMPTY>
+    <!ATTLIST Font
+        id          CDATA   #REQUIRED
+        font        CDATA   "arial"
+        size        CDATA   "12"
+        color       CDATA   "#000000"
+        italic      CDATA   "false"
+        underline   CDATA   "false"
+    >
+<!ELEMENT ThemeInfo EMPTY>
+    <!ATTLIST ThemeInfo
+        name        CDATA   #IMPLIED
+        author      CDATA   #IMPLIED
+        email       CDATA   #IMPLIED
+        webpage     CDATA   #IMPLIED
+    >
+<!ELEMENT Window (Layout)+>
+    <!ATTLIST Window
+        id          CDATA   #REQUIRED
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        dragdrop    CDATA   "true"
+        playondrop  CDATA   "true"
+    >
+
+<!ELEMENT Layout (Group)>
+    <!ATTLIST Layout
+        id          CDATA   "none"
+        width       CDATA   #REQUIRED
+        height      CDATA   #REQUIRED
+        minwidth    CDATA   "-1"
+        maxwidth    CDATA   "-1"
+        minheight   CDATA   "-1"
+        maxheight   CDATA   "-1"
+    >
+<!ELEMENT Group (Group|Image|Button|Playlist|Slider|RadialSlider|Text|CheckBox|
+                 Rectangle|Anchor)+>
+    <!ATTLIST Group
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+    >
+
+<!-- Anchors -->
+<!ELEMENT Anchor EMPTY>
+    <!ATTLIST Anchor
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        priority    CDATA   #REQUIRED
+        range       CDATA   "10"
+    >
+
+<!-- Controls -->
+<!ELEMENT Image EMPTY>
+    <!ATTLIST Image
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        lefttop     CDATA   "lefttop"
+        rightbottom CDATA   "lefttop"
+        image       CDATA   #REQUIRED
+        onclick     CDATA   "none"
+        help        CDATA   "\0"
+    >
+<!ELEMENT Rectangle EMPTY>
+    <!ATTLIST Rectangle
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        w           CDATA   "50"
+        h           CDATA   "50"
+        color       CDATA   "#C0C0C0"
+        onclick     CDATA   "none"
+        help        CDATA   "\0"
+    >
+<!ELEMENT Button EMPTY>
+    <!ATTLIST Button
+        id          CDATA   "none"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        lefttop     CDATA   "lefttop"
+        rightbottom CDATA   "lefttop"
+        up          CDATA   #REQUIRED
+        down        CDATA   "none"
+        over        CDATA   "none"
+        action      CDATA   "none"
+        tooltiptext CDATA   "\0"
+        help        CDATA   "\0"
+    >
+<!ELEMENT CheckBox EMPTY>
+    <!ATTLIST CheckBox
+        id           CDATA   "none"
+        x            CDATA   "\0"
+        y            CDATA   "\0"
+        lefttop      CDATA   "lefttop"
+        rightbottom  CDATA   "lefttop"
+        up1          CDATA   #REQUIRED
+        down1        CDATA   "none"
+        over1        CDATA   "none"
+        up2          CDATA   #REQUIRED
+        down2        CDATA   "none"
+        over2        CDATA   "none"
+        state        CDATA   #REQUIRED
+        action1      CDATA   "none"
+        action2      CDATA   "none"
+        tooltiptext1 CDATA   "\0"
+        tooltiptext2 CDATA   "\0"
+        help         CDATA   "\0"
+    >
+<!ELEMENT Slider EMPTY>
+    <!ATTLIST Slider
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        lefttop     CDATA   "lefttop"
+        rightbottom CDATA   "lefttop"
+        up          CDATA   #REQUIRED
+        down        CDATA   "none"
+        over        CDATA   "none"
+        points      CDATA   #REQUIRED
+        thickness   CDATA   "10"
+        value       CDATA   "none"
+        tooltiptext CDATA   "\0"
+        help        CDATA   "\0"
+    >
+<!ELEMENT RadialSlider EMPTY>
+    <!ATTLIST RadialSlider
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        lefttop     CDATA   "lefttop"
+        rightbottom CDATA   "lefttop"
+        sequence    CDATA   #REQUIRED
+        nbimages    CDATA   #REQUIRED
+        minangle    CDATA   "\0"
+        maxangle    CDATA   "360"
+        value       CDATA   "none"
+        tooltiptext CDATA   "\0"
+        help        CDATA   "\0"
+    >
+<!ELEMENT Text EMPTY>
+    <!ATTLIST Text
+        id          CDATA   "none"
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        text        CDATA   ""
+        font        CDATA   #REQUIRED
+        align       CDATA   "left"
+        width       CDATA   "\0"
+        display     CDATA   "none"
+        scroll      CDATA   "true"
+        scrollspace CDATA   "20"
+        help        CDATA   "\0"
+    >
+<!ELEMENT Playlist Slider>
+    <!ATTLIST Playlist
+        id          CDATA   #REQUIRED
+        visible     CDATA   "true"
+        x           CDATA   "\0"
+        y           CDATA   "\0"
+        width       CDATA   "\0"
+        height      CDATA   "\0"
+        lefttop     CDATA   "lefttop"
+        rightbottom CDATA   "lefttop"
+        font        CDATA   #REQUIRED
+        var         CDATA   "playlist"
+        fgcolor     CDATA   "#000000"
+        playcolor   CDATA   "#FF0000"
+        bgcolor1    CDATA   "#FFFFFF"
+        bgcolor2    CDATA   "#FFFFFF"
+        selcolor    CDATA   "#0000FF"
+        help        CDATA   "\0"
+    >

@@ -1,0 +1,122 @@
+/*****************************************************************************
+ * generic_layout.hpp
+ *****************************************************************************
+ * Copyright (C) 2003 VideoLAN
+ * $Id: generic_layout.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ *
+ * Authors: Cyril Deguet     <asmax@via.ecp.fr>
+ *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+#ifndef GENERIC_LAYOUT_HPP
+#define GENERIC_LAYOUT_HPP
+
+#include "skin_common.hpp"
+#include "../utils/pointer.hpp"
+#include "../utils/position.hpp"
+
+#include <list>
+
+class GenericWindow;
+class OSGraphics;
+class CtrlGeneric;
+
+
+/// Control and its associated layer
+struct LayeredControl
+{
+    LayeredControl( CtrlGeneric *pControl, int layer ):
+        m_pControl( pControl ), m_layer( layer ) {}
+
+    /// Pointer on the control
+    CtrlGeneric *m_pControl;
+    /// Layer number
+    int m_layer;
+};
+
+
+/// Base class for layouts
+class GenericLayout: public SkinObject, public Box
+{
+    public:
+        GenericLayout( intf_thread_t *pIntf, int width, int height,
+                       int minWidth, int maxWidth, int minHeight,
+                       int maxHeight );
+
+        virtual ~GenericLayout();
+
+        /// Attach the layout to a window
+        virtual void setWindow( GenericWindow *pWindow );
+
+        /// Get the associated window, if any
+        virtual GenericWindow *getWindow() const { return m_pWindow; }
+
+        /// Called by a control which wants to capture the mouse
+        virtual void onControlCapture( const CtrlGeneric &rCtrl );
+
+        /// Called by a control which wants to release the mouse
+        virtual void onControlRelease( const CtrlGeneric &rCtrl );
+
+        /// Refresh the window
+        virtual void refreshAll();
+
+        /// Get the image of the layout
+        virtual OSGraphics *getImage() const { return m_pImage; }
+
+        /// Get the size of the layout
+        virtual int getWidth() const { return m_width; }
+        virtual int getHeight() const { return m_height; }
+
+        /// Get the minimum and maximum size of the layout
+        virtual int getMinWidth() const { return m_minWidth; }
+        virtual int getMaxWidth() const { return m_maxWidth; }
+        virtual int getMinHeight() const { return m_minHeight; }
+        virtual int getMaxHeight() const { return m_maxHeight; }
+
+        /// Resize the layout
+        virtual void resize( int width, int height );
+
+        /// Add a control in the layout at the given position, and
+        /// the optional given layer
+        virtual void addControl( CtrlGeneric *pControl,
+                                 const Position &rPosition,
+                                 int layer );
+
+        /// Get the list of the controls in this layout, by layer order
+        virtual const list<LayeredControl> &getControlList() const;
+
+        /// Called by a control when its image has changed
+        virtual void onControlUpdate( const CtrlGeneric &rCtrl );
+
+    private:
+        /// Parent window of the layout
+        GenericWindow *m_pWindow;
+        /// Layout size
+        int m_width, m_height;
+        int m_minWidth, m_maxWidth;
+        int m_minHeight, m_maxHeight;
+        /// Image of the layout
+        OSGraphics *m_pImage;
+        /// List of the controls in the layout
+        list<LayeredControl> m_controlList;
+};
+
+
+typedef CountedPtr<GenericLayout> GenericLayoutPtr;
+
+
+#endif

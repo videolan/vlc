@@ -1,0 +1,58 @@
+/*****************************************************************************
+ * evt_refresh.hpp
+ *****************************************************************************
+ * Copyright (C) 2003 VideoLAN
+ * $Id: evt_refresh.hpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ *
+ * Authors: Cyril Deguet     <asmax@via.ecp.fr>
+ *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+#ifndef EVT_REFRESH_HPP
+#define EVT_REFRESH_HPP
+
+#include "evt_generic.hpp"
+
+
+/// Refresh window event
+class EvtRefresh: public EvtGeneric
+{
+    public:
+        /// Constructor with the coordinates of the area to refresh
+        EvtRefresh( intf_thread_t *pIntf, int xStart, int yStart, int width,
+                    int height ):
+            EvtGeneric( pIntf ), m_xStart( xStart ), m_yStart( yStart ),
+            m_width( width ), m_height( height ) {}
+
+        virtual ~EvtRefresh() {}
+
+        /// Return the type of event
+        virtual const string getAsString() const { return "refresh"; }
+
+        /// Getters
+        int getXStart() const { return m_xStart; }
+        int getYStart() const { return m_yStart; }
+        int getWidth()  const { return m_width; }
+        int getHeight() const { return m_height; }
+
+    private:
+        /// Coordinates and size of the area to refresh
+        int m_xStart, m_yStart, m_width, m_height;
+};
+
+
+#endif

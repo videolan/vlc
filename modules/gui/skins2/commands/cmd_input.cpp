@@ -1,0 +1,70 @@
+/*****************************************************************************
+ * cmd_input.cpp
+ *****************************************************************************
+ * Copyright (C) 2003 VideoLAN
+ * $Id: cmd_input.cpp,v 1.1 2004/01/03 23:31:33 asmax Exp $
+ *
+ * Authors: Cyril Deguet     <asmax@via.ecp.fr>
+ *          Olivier Teulière <ipkiss@via.ecp.fr>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
+ *****************************************************************************/
+
+#include "cmd_input.hpp"
+
+
+void CmdStop::execute()
+{
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    if( pPlaylist == NULL )
+    {
+        return;
+    }
+
+    playlist_Stop( pPlaylist );
+}
+
+
+void CmdSlower::execute()
+{
+    input_thread_t *pInput =
+        (input_thread_t *)vlc_object_find( getIntf(), VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( pInput )
+    {
+        vlc_value_t val;
+        val.b_bool = VLC_TRUE;
+
+        var_Set( pInput, "rate-slower", val );
+        vlc_object_release( pInput );
+    }
+}
+
+
+void CmdFaster::execute()
+{
+    input_thread_t *pInput =
+        (input_thread_t *)vlc_object_find( getIntf(), VLC_OBJECT_INPUT,
+                                           FIND_ANYWHERE );
+    if( pInput )
+    {
+        vlc_value_t val;
+        val.b_bool = VLC_TRUE;
+
+        var_Set( pInput, "rate-faster", val );
+        vlc_object_release( pInput );
+    }
+}
+
