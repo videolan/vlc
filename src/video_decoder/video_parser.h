@@ -2,7 +2,7 @@
  * video_parser.h : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.h,v 1.3 2001/01/13 12:57:20 sam Exp $
+ * $Id: video_parser.h,v 1.4 2001/01/15 13:25:09 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -95,8 +95,6 @@ typedef struct vpar_thread_s
     decoder_fifo_t *    p_fifo;                            /* PES input fifo */
     bit_stream_t        bit_stream;
     vdec_config_t *     p_config;
-    /* Bitstream context */
-    mtime_t             next_pts, next_dts;
 
     /* Output properties */
     vout_thread_t *     p_vout;                       /* video output thread */

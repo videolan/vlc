@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.71 2001/01/13 12:57:21 sam Exp $
+ * $Id: vpar_synchro.c,v 1.72 2001/01/15 13:25:09 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -421,7 +421,6 @@ mtime_t vpar_SynchroDate( vpar_thread_t * p_vpar )
 void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
                              boolean_t b_repeat_field )
 {
-    pes_packet_t *  p_pes;
     mtime_t         period = 1000000 / (p_vpar->sequence.i_frame_rate) * 1001;
 
     switch( i_coding_type )
@@ -470,9 +469,6 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
         break;
     }
 
-    /* FIXME: use decoder_fifo callback */
-    p_pes = DECODER_FIFO_START( *p_vpar->bit_stream.p_decoder_fifo );
-
     if( b_repeat_field )
     {
         /* MPEG-2 repeat_first_field */
@@ -487,30 +483,36 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
 
     if( i_coding_type == B_CODING_TYPE )
     {
-        if( p_pes->i_pts )
+        if( p_vpar->sequence.next_pts )
         {
-            if( p_pes->i_pts - p_vpar->synchro.current_pts > PTS_THRESHOLD
-                 || p_vpar->synchro.current_pts - p_pes->i_pts > PTS_THRESHOLD )
+            if( p_vpar->sequence.next_pts - p_vpar->synchro.current_pts
+                    > PTS_THRESHOLD
+                 || p_vpar->synchro.current_pts - p_vpar->sequence.next_pts
+                    > PTS_THRESHOLD )
             {
                 intf_WarnMsg( 2,
                         "vpar synchro warning: pts != current_date (%lld)",
-                        p_vpar->synchro.current_pts - p_pes->i_pts );
+                        p_vpar->synchro.current_pts
+                            - p_vpar->sequence.next_pts );
             }
-            p_vpar->synchro.current_pts = p_pes->i_pts;
-            p_pes->i_pts = 0;
+            p_vpar->synchro.current_pts = p_vpar->sequence.next_pts;
+            p_vpar->sequence.next_pts = 0;
         }
     }
     else
     {
         if( p_vpar->synchro.backward_pts )
         {
-            if( p_pes->i_dts && 
-                (p_pes->i_dts - p_vpar->synchro.backward_pts > PTS_THRESHOLD
-              || p_vpar->synchro.backward_pts - p_pes->i_dts > PTS_THRESHOLD) )
+            if( p_vpar->sequence.next_dts && 
+                (p_vpar->sequence.next_dts - p_vpar->synchro.backward_pts
+                    > PTS_THRESHOLD
+              || p_vpar->synchro.backward_pts - p_vpar->sequence.next_dts
+                    > PTS_THRESHOLD) )
             {
                 intf_WarnMsg( 2,
                         "vpar synchro warning: backward_pts != dts (%lld)",
-                        p_vpar->synchro.backward_pts - p_pes->i_dts );
+                        p_vpar->synchro.backward_pts
+                            - p_vpar->sequence.next_dts );
             }
 
             if( p_vpar->synchro.backward_pts - p_vpar->synchro.current_pts
@@ -525,43 +527,28 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
             p_vpar->synchro.current_pts = p_vpar->synchro.backward_pts;
             p_vpar->synchro.backward_pts = 0;
         }
-        else if( p_pes->i_dts )
+        else if( p_vpar->sequence.next_dts )
         {
-            if( p_pes->i_dts - p_vpar->synchro.current_pts > PTS_THRESHOLD
-                 || p_vpar->synchro.current_pts - p_pes->i_dts > PTS_THRESHOLD )
+            if( p_vpar->sequence.next_dts - p_vpar->synchro.current_pts
+                    > PTS_THRESHOLD
+                 || p_vpar->synchro.current_pts - p_vpar->sequence.next_dts
+                    > PTS_THRESHOLD )
             {
                 intf_WarnMsg( 2,
                         "vpar synchro warning: dts != current_pts (%lld)",
-                        p_vpar->synchro.current_pts - p_pes->i_dts );
+                        p_vpar->synchro.current_pts
+                            - p_vpar->sequence.next_dts );
             }
             /* By definition of a DTS. */
-            p_vpar->synchro.current_pts = p_pes->i_dts;
-            p_pes->i_dts = 0;
+            p_vpar->synchro.current_pts = p_vpar->sequence.next_dts;
+            p_vpar->sequence.next_dts = 0;
         }
 
-        if( p_pes->i_pts )
+        if( p_vpar->sequence.next_pts )
         {
-#if 0
-            int     i_n_b;
-#endif
-
             /* Store the PTS for the next time we have to date an I picture. */
-            p_vpar->synchro.backward_pts = p_pes->i_pts;
-            p_pes->i_pts = 0;
-            /* FIXME : disabled because it conflicts with streams having
-             * b_repeat_first_field */
-#if 0
-            i_n_b = (p_vpar->synchro.backward_pts
-                        - p_vpar->synchro.current_pts) / period - 1;
-            if( i_n_b != p_vpar->synchro.i_n_b )
-            {
-                intf_WarnMsg( 1,
-                        "Anticipating a stream periodicity change from"
-                        " B[%d] to B[%d]",
-                              p_vpar->synchro.i_n_b, i_n_b );
-                p_vpar->synchro.i_n_b = i_n_b;
-            }
-#endif
+            p_vpar->synchro.backward_pts = p_vpar->sequence.next_pts;
+            p_vpar->sequence.next_pts = 0;
         }
     }
 

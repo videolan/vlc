@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.66 2001/01/13 12:57:21 sam Exp $
+ * $Id: video_parser.c,v 1.67 2001/01/15 13:25:09 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -70,7 +70,8 @@ static int      InitThread          ( vpar_thread_t *p_vpar );
 static void     RunThread           ( vpar_thread_t *p_vpar );
 static void     ErrorThread         ( vpar_thread_t *p_vpar );
 static void     EndThread           ( vpar_thread_t *p_vpar );
-static void     BitstreamCallback   ( bit_stream_t *p_bit_stream );
+static void     BitstreamCallback   ( bit_stream_t *p_bit_stream,
+                                      boolean_t b_new_pes );
 
 /*****************************************************************************
  * vpar_CreateThread: create a generic parser thread
@@ -150,6 +151,8 @@ static int InitThread( vpar_thread_t *p_vpar )
 
     p_vpar->p_config->decoder_config.pf_init_bit_stream( &p_vpar->bit_stream,
         p_vpar->p_config->decoder_config.p_decoder_fifo );
+    p_vpar->bit_stream.pf_bitstream_callback = BitstreamCallback;
+    p_vpar->bit_stream.p_callback_arg = (void *)p_vpar;
 
     /* Initialize parsing data */
     p_vpar->sequence.p_forward = NULL;
@@ -158,7 +161,8 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->sequence.nonintra_quant.b_allocated = 0;
     p_vpar->sequence.chroma_intra_quant.b_allocated = 0;
     p_vpar->sequence.chroma_nonintra_quant.b_allocated = 0;
-    /* FIXME : initialize matrix_coefficients, but to what value ? */
+    p_vpar->sequence.i_matrix_coefficients = 1;
+    p_vpar->sequence.next_pts = p_vpar->sequence.next_dts = 0;
 
     /* Initialize copyright information */
     p_vpar->sequence.b_copyright_flag = 0;
@@ -205,12 +209,14 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->pp_vdec[0]->b_error = 0;
     p_vpar->pp_vdec[0]->p_vpar = p_vpar;
 
+#   if VDEC_NICE
     /* Re-nice ourself */
     if( nice(VDEC_NICE) == -1 )
     {
         intf_WarnMsg( 2, "vpar warning : couldn't nice() (%s)",
                       strerror(errno) );
     }
+#   endif
 #endif
 
     /* Initialize lookup tables */
@@ -436,7 +442,18 @@ static void EndThread( vpar_thread_t *p_vpar )
 /*****************************************************************************
  * BitstreamCallback: Import parameters from the new data/PES packet
  *****************************************************************************
- * This function is called when the thread ends after a sucessful
- * initialization.
+ * This function is called by input's NextDataPacket.
  *****************************************************************************/
-static void     BitstreamCallback   ( bit_stream_t *p_bit_stream );
+static void BitstreamCallback ( bit_stream_t * p_bit_stream,
+                                boolean_t b_new_pes )
+{
+    vpar_thread_t * p_vpar = (vpar_thread_t *)p_bit_stream->p_callback_arg;
+
+    if( b_new_pes )
+    {
+        p_vpar->sequence.next_pts =
+            DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_pts;
+        p_vpar->sequence.next_dts =
+            DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_dts;
+    }
+}
