@@ -461,6 +461,9 @@ static struct
       VIDEO_ES, "h264" },
     { VLC_FOURCC('H','2','6','4'), CODEC_ID_H264,
       VIDEO_ES, "h264" },
+    /* avc1: special case h264 */
+    { VLC_FOURCC('a','v','c','1'), CODEC_ID_H264,
+      VIDEO_ES, "h264" },
 
 /* H263 and H263i */
 /* H263(+) is also known as Real Video 1.0 */
