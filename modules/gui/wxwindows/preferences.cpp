@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2004 VideoLAN
- * $Id: preferences.cpp,v 1.48 2004/02/26 00:23:04 gbazin Exp $
+ * $Id$
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -769,7 +769,7 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         /* Now put all the config options into a scrolled window */
         config_sizer = new wxBoxSizer( wxVERTICAL );
         config_window = new wxScrolledWindow( this, -1, wxDefaultPosition,
-            wxDefaultSize, wxSTATIC_BORDER | wxHSCROLL | wxVSCROLL );
+            wxDefaultSize, wxBORDER_NONE | wxHSCROLL | wxVSCROLL );
         config_window->SetAutoLayout( TRUE );
         config_window->SetScrollRate( 5, 5 );
 
