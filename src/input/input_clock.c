@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.13 2001/04/29 14:52:42 stef Exp $
+ * $Id: input_clock.c,v 1.14 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -167,7 +167,7 @@ void input_ClockManageRef( input_thread_t * p_input,
             /* Stream discontinuity, for which we haven't received a
              * warning from the stream control facilities (dd-edited
              * stream ?). */
-            intf_WarnMsg( 3, "Clock gap, unexpected stream discontinuity" );
+            intf_WarnMsg( 1, "Clock gap, unexpected stream discontinuity" );
             input_ClockInit( p_pgrm );
             p_pgrm->i_synchro_state = SYNCHRO_START;
             input_EscapeDiscontinuity( p_input, p_pgrm );

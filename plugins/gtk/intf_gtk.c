@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gtk.c,v 1.16 2001/05/06 18:32:30 stef Exp $
+ * $Id: intf_gtk.c,v 1.17 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -325,7 +325,7 @@ static gint GtkManage( gpointer p_data )
         {
             p_intf->p_sys->b_menus_update = 1;
             p_intf->p_input->stream.b_changed = 0;
-            intf_WarnMsg( 2, 
+            intf_WarnMsg( 3, 
                           "Interface menus refreshed as stream has changed" );
         }
 

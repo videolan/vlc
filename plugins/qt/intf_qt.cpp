@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.5 2001/04/27 16:08:26 sam Exp $
+ * $Id: intf_qt.cpp,v 1.6 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -127,7 +127,7 @@ private slots:
     void DateDisplay  ( int );
     void About ( void );
 
-    void Unimplemented( void ) { intf_WarnMsg( 3, "intf warning: "
+    void Unimplemented( void ) { intf_WarnMsg( 1, "intf warning: "
                                  "unimplemented function" ); };
 
 private:

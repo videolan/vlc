@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: interface.c,v 1.76 2001/05/06 04:32:02 sam Exp $
+ * $Id: interface.c,v 1.77 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -124,7 +124,7 @@ intf_thread_t* intf_Create( void )
     intf_LoadChannels( p_intf, main_GetPszVariable( INTF_CHANNELS_VAR,
                                                     INTF_CHANNELS_DEFAULT ));
 
-    intf_Msg("intf: interface initialized");
+    intf_WarnMsg( 1, "intf: interface initialized");
     return( p_intf );
 }
 

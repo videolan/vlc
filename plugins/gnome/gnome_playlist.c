@@ -2,7 +2,7 @@
  * gnome_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gnome_playlist.c,v 1.1 2001/05/06 18:41:52 stef Exp $
+ * $Id: gnome_playlist.c,v 1.2 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *      
@@ -455,7 +455,7 @@ void GnomeDropDataReceived( intf_thread_t * p_intf,
             p_protocol = strncpy( p_protocol, p_string,
                                   strstr( p_string, ":/" ) + 1 - p_string );
 
-            intf_WarnMsg( 1, "Protocol dropped is %s", p_protocol );
+            intf_WarnMsg( 4, "Protocol dropped is %s", p_protocol );
             p_string += strlen( p_protocol );
 
             /* Allowed things are proto: or proto:// */
@@ -464,7 +464,7 @@ void GnomeDropDataReceived( intf_thread_t * p_intf,
                 /* eat one '/' */
                 p_string++;
             }
-            intf_WarnMsg( 1, " Dropped %s", p_string );
+            intf_WarnMsg( 4, " Dropped %s", p_string );
         } 
         else 
         {
@@ -496,7 +496,7 @@ void GnomeDropDataReceived( intf_thread_t * p_intf,
         /* lock the interface */
         vlc_mutex_lock( &p_intf->change_lock );
 
-        intf_WarnMsg( 1, "List has %d elements", g_list_length( p_files ) ); 
+        intf_WarnMsg( 4, "List has %d elements", g_list_length( p_files ) ); 
         GnomeAppendList( p_playlist, i_position, p_files );
 
         /* get the CList  and rebuild it. */
@@ -572,7 +572,7 @@ GList * GnomeReadFiles( gchar * psz_fsname )
     {
         if( GnomeHasValidExtension( psz_fsname ) )
         {
-            intf_WarnMsg( 3, "%s is a valid file. Stacking on the playlist",
+            intf_WarnMsg( 2, "%s is a valid file. Stacking on the playlist",
                           psz_fsname );
             return g_list_append( NULL, g_strdup( psz_fsname ) );
         } 
@@ -588,7 +588,7 @@ GList * GnomeReadFiles( gchar * psz_fsname )
         DIR *           p_current_dir = opendir( psz_fsname );
         struct dirent * p_dir_content; 
         
-        intf_WarnMsg( 3, "%s is a folder.", psz_fsname );
+        intf_WarnMsg( 2, "%s is a folder.", psz_fsname );
         
         if( p_current_dir == NULL )
         {

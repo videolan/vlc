@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: main.c,v 1.92 2001/05/06 04:32:02 sam Exp $
+ * $Id: main.c,v 1.93 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -474,7 +474,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
     p_main->b_video     = 1;
     p_main->b_channels  = 0;
 
-    p_main->i_warning_level = 4;
+    p_main->i_warning_level = 0;
 
     /* Get the executable name (similar to the basename command) */
     p_main->psz_arg0 = p_tmp = ppsz_argv[ 0 ];
@@ -531,7 +531,7 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             return( -1 );
             break;
         case 'v':                                           /* -v, --verbose */
-            p_main->i_warning_level--;
+            p_main->i_warning_level++;
             break;
 
         /* Interface warning messages level */

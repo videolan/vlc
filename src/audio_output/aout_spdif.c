@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.3 2001/05/06 18:32:30 stef Exp $
+ * $Id: aout_spdif.c,v 1.4 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -65,7 +65,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
     memset( pi_blank, 0, sizeof(pi_blank) );
     memcpy( pi_blank, pi_spdif_blank, sizeof(pi_spdif_blank) );
    
-    intf_WarnMsg( 1, "aout info: starting spdif output loop" );
+    intf_WarnMsg( 3, "aout info: starting spdif output loop" );
 
     /* variable used to compute the nnumber of blank frames since the
      * last significant frame */
@@ -131,7 +131,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
         }
     }
     
-    intf_WarnMsg( 2, "aout info: exiting spdif loop" );
+    intf_WarnMsg( 3, "aout info: exiting spdif loop" );
 
     return;
 }

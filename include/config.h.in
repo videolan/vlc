@@ -145,6 +145,7 @@
 
 /* Default search path for interface file browser */
 #define INTF_PATH_VAR                   "vlc_search_path"
+#define INTF_PATH_DEFAULT               ""
 
 /*****************************************************************************
  * Input thread configuration
@@ -228,7 +229,7 @@
 #define INPUT_SUBTITLE_VAR              "vlc_input_subtitle"
 
 /* VCD defaults */
-#define INPUT_VVC_DEVICE_VAR            "vlc_vcd_device"
+#define INPUT_VCD_DEVICE_VAR            "vlc_vcd_device"
 #define INPUT_VCD_DEVICE_DEFAULT        "/dev/cdrom"
 
 /*****************************************************************************
@@ -476,7 +477,7 @@
 
 /* Interface warnig message level */
 #define INTF_WARNING_VAR                "vlc_warning_level"
-#define INTF_WARNING_DEFAULT            12
+#define INTF_WARNING_DEFAULT            0
 
 /* Define to enable messages queues - disabling messages queue can be useful
  * when debugging, since it allows messages which would not be printed
@@ -512,7 +513,7 @@
 
 /* Enqueue drag'n dropped item */
 #define PLAYLIST_ENQUEUE_VAR            "vlc_playlist_enqueue"
-#define PLAYLIST_ENQUEUE_DZFAULT        0
+#define PLAYLIST_ENQUEUE_DEFAULT        0
 
 /* Loop on playlist end */
 #define PLAYLIST_LOOP_VAR               "vlc_playlist_loop"

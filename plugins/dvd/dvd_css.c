@@ -2,7 +2,7 @@
  * dvd_css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_css.c,v 1.27 2001/05/02 20:01:44 sam Exp $
+ * $Id: dvd_css.c,v 1.28 2001/05/07 03:14:09 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -108,17 +108,17 @@ int CSSInit( int i_fd, css_t * p_css )
             return -1;
 
         case 1:
-            intf_WarnMsg( 3, "css info: already authenticated" );
+            intf_WarnMsg( 2, "css info: already authenticated" );
             return 0;
 
         case 0:
-            intf_WarnMsg( 3, "css info: need to authenticate" );
+            intf_WarnMsg( 2, "css info: need to authenticate" );
     }
 
     /* Init sequence, request AGID */
     for( i = 1; i < 4 ; ++i )
     {
-        intf_WarnMsg( 3, "css info: requesting AGID %d", i );
+        intf_WarnMsg( 2, "css info: requesting AGID %d", i );
 
         i_ret = ioctl_ReportAgid( i_fd, &i_agid );
 
@@ -180,7 +180,7 @@ int CSSInit( int i_fd, css_t * p_css )
         if( memcmp( p_css->disc.pi_key_check,
                     p_css->disc.pi_key1, KEY_SIZE ) == 0 )
         {
-            intf_WarnMsg( 3, "css info: drive authentic, using variant %d", i);
+            intf_WarnMsg( 2, "css info: drive authentic, using variant %d", i);
             p_css->disc.i_varient = i;
             break;
         }
@@ -221,7 +221,7 @@ int CSSInit( int i_fd, css_t * p_css )
         return -1;
     }
 
-    intf_WarnMsg( 3, "css info: authentication established" );
+    intf_WarnMsg( 2, "css info: authentication established" );
 
     memcpy( p_css->disc.pi_challenge, p_css->disc.pi_key1, KEY_SIZE );
     memcpy( p_css->disc.pi_challenge+KEY_SIZE, p_css->disc.pi_key2, KEY_SIZE );
@@ -229,7 +229,7 @@ int CSSInit( int i_fd, css_t * p_css )
     CSSCryptKey( 2, p_css->disc.i_varient, p_css->disc.pi_challenge,
                                            p_css->disc.pi_key_check );
 
-    intf_WarnMsg( 1, "css info: received session key" );
+    intf_WarnMsg( 2, "css info: received session key" );
 
     if( i_agid < 0 )
     {
@@ -243,11 +243,11 @@ int CSSInit( int i_fd, css_t * p_css )
             return -1;
 
         case 1:
-            intf_WarnMsg( 3, "css info: already authenticated" );
+            intf_WarnMsg( 2, "css info: already authenticated" );
             return 0;
 
         case 0:
-            intf_WarnMsg( 3, "css info: need to get disc key" );
+            intf_WarnMsg( 2, "css info: need to get disc key" );
     }
 
     /* Get encrypted disc key */
@@ -277,7 +277,7 @@ int CSSInit( int i_fd, css_t * p_css )
             return -1;
 
         case 1:
-            intf_WarnMsg( 3, "css info: successfully authenticated" );
+            intf_WarnMsg( 2, "css info: successfully authenticated" );
             return 0;
 
         case 0:
@@ -374,7 +374,7 @@ int CSSGetKey( int i_fd, css_t * p_css )
 
     if( !b_encrypted )
     {
-        intf_WarnMsg( 3, "css warning: this file was _NOT_ encrypted!" );
+        intf_WarnMsg( 2, "css warning: this file was _NOT_ encrypted!" );
         return 0;
     }
 

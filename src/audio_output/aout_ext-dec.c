@@ -2,7 +2,7 @@
  * aout_ext-dec.c : exported fifo management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: aout_ext-dec.c,v 1.3 2001/05/06 18:32:30 stef Exp $
+ * $Id: aout_ext-dec.c,v 1.4 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -56,7 +56,7 @@ aout_fifo_t * aout_CreateFifo( int i_type, int i_channels, long l_rate,
 
     if( p_aout_bank->i_count == 0 )
     {
-        intf_Msg( "aout: no aout present, spawning one" );
+        intf_WarnMsg( 1, "aout: no aout present, spawning one" );
 
         p_aout = aout_CreateThread( NULL );
 

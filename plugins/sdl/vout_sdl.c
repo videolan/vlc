@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_sdl.c,v 1.49 2001/05/06 18:32:30 stef Exp $
+ * $Id: vout_sdl.c,v 1.50 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -239,7 +239,7 @@ static int vout_Init( vout_thread_t *p_vout )
            main_GetIntVariable( VOUT_HEIGHT_VAR,VOUT_HEIGHT_DEFAULT ),
                                       SDL_YV12_OVERLAY, 
                                       p_vout->p_sys->p_display );
-    intf_Msg( "vout: YUV acceleration %s",
+    intf_WarnMsg( 2, "vout: YUV acceleration %s",
               p_overlay->hw_overlay ? "activated" : "unavailable !" ); 
     p_vout->b_need_render = !p_overlay->hw_overlay;
 
@@ -551,8 +551,8 @@ static void vout_Display( vout_thread_t *p_vout )
                                              SDL_YV12_OVERLAY, 
                                              p_vout->p_sys->p_display
                                            );
-                intf_Msg("vout: YUV acceleration %s",
-                            p_vout->p_sys->p_overlay->hw_overlay
+                intf_WarnMsg( 2, "vout: YUV acceleration %s",
+                              p_vout->p_sys->p_overlay->hw_overlay
                             ? "activated" : "unavailable !" ); 
             }
 

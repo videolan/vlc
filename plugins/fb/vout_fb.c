@@ -2,7 +2,7 @@
  * vout_fb.c: framebuffer video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_fb.c,v 1.11 2001/05/06 04:32:02 sam Exp $
+ * $Id: vout_fb.c,v 1.12 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -334,7 +334,7 @@ static int vout_Manage( vout_thread_t *p_vout )
      */
     if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {
-        intf_WarnMsg( 1, "vout: reinitializing framebuffer screen" );
+        intf_WarnMsg( 3, "vout: reinitializing framebuffer screen" );
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
 
         /* Destroy XImages to change their size */
@@ -459,7 +459,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
 
     /* FIXME: if the image is full-size, it gets cropped on the left
      * because of the xres / xres_virtual slight difference */
-    intf_WarnMsg( 1, "vout: %ix%i (virtual %ix%i)",
+    intf_WarnMsg( 3, "vout: %ix%i (virtual %ix%i)",
                   p_vout->p_sys->var_info.xres,
                   p_vout->p_sys->var_info.yres,
                   p_vout->p_sys->var_info.xres_virtual,
@@ -573,7 +573,7 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
                                  p_vout->p_sys->p_video );
     }
     
-    intf_WarnMsg( 1, "framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d",
+    intf_WarnMsg( 3, "framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d",
                   fix_info.type, fix_info.visual, fix_info.ypanstep, fix_info.ywrapstep, fix_info.accel );
     return( 0 );
 }

@@ -2,7 +2,7 @@
  * ac3_decoder.c: core ac3 decoder
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: ac3_decoder.c,v 1.31 2001/05/06 04:32:02 sam Exp $
+ * $Id: ac3_decoder.c,v 1.32 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@zoy.org>
@@ -69,7 +69,7 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
     
     if (parse_bsi (p_ac3dec))
     {
-        intf_WarnMsg (1,"Error during ac3parsing");
+        intf_WarnMsg (3,"Error during ac3parsing");
         parse_auxdata (p_ac3dec);
         return 1;
     }
@@ -102,7 +102,7 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
  
         if (parse_audblk (p_ac3dec, i))
         {
-            intf_WarnMsg (1,"Error during ac3audioblock");
+            intf_WarnMsg (3,"Error during ac3audioblock");
             parse_auxdata (p_ac3dec);
             return 1;
         }
@@ -114,7 +114,7 @@ int ac3_decode_frame (ac3dec_t * p_ac3dec, s16 * buffer)
 
         if (exponent_unpack (p_ac3dec))
         {
-            intf_WarnMsg (1,"Error during ac3unpack");
+            intf_WarnMsg (3,"Error during ac3unpack");
             parse_auxdata (p_ac3dec);
             return 1;
         }

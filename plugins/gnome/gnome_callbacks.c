@@ -2,7 +2,7 @@
  * gnome_callbacks.c : Callbacks for the Gnome plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gnome_callbacks.c,v 1.26 2001/05/06 18:32:30 stef Exp $
+ * $Id: gnome_callbacks.c,v 1.27 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -129,7 +129,7 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
         /* get rid of ' ' at the end */
         *( psz_text + i_len - 1 ) = 0;
 
-        intf_WarnMsg( 1, "intf: dropped text/uri-list data `%s'", psz_text );
+        intf_WarnMsg( 3, "intf: dropped text/uri-list data `%s'", psz_text );
         intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_text );
 
         break;
@@ -144,7 +144,7 @@ on_intf_window_drag_data_received      (GtkWidget       *widget,
         /* get rid of \r\n at the end */
         *( psz_text + i_len - 2 ) = 0;
 
-        intf_WarnMsg( 1, "intf: dropped text/uri-list data `%s'", psz_text );
+        intf_WarnMsg( 3, "intf: dropped text/uri-list data `%s'", psz_text );
         intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_text );
         break;
 
@@ -279,6 +279,10 @@ on_menubar_open_activate               (GtkMenuItem     *menuitem,
         p_intf->p_sys->p_fileopen = create_intf_fileopen();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
                              "p_intf", p_intf );
+
+            gtk_file_selection_set_filename ( GTK_FILE_SELECTION(
+                p_intf->p_sys->p_fileopen ),
+                main_GetPszVariable( INTF_PATH_VAR, INTF_PATH_DEFAULT ) );
     }
 
     gtk_widget_show( p_intf->p_sys->p_fileopen );
@@ -513,6 +517,119 @@ on_menubar_preferences_activate        (GtkMenuItem     *menuitem,
         p_intf->p_sys->p_preferences = create_intf_preferences();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_preferences ),
                              "p_intf", p_intf );
+#if 1
+#define ASSIGN_PSZ_ENTRY( var, default, name )                               \
+    gtk_entry_set_text( GTK_ENTRY( gtk_object_get_data( GTK_OBJECT(          \
+        p_intf->p_sys->p_preferences ), name ) ),                            \
+                        main_GetPszVariable( var, default ) )
+
+#define ASSIGN_INT_VALUE( var, default, name )                                        \
+    gtk_spin_button_set_value( GTK_SPIN_BUTTON( gtk_object_get_data(         \
+        GTK_OBJECT( p_intf->p_sys->p_preferences ), name ) ),                \
+                               main_GetIntVariable( var, default ) )
+
+#define ASSIGN_INT_TOGGLE( var, default, name )                                       \
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( gtk_object_get_data(    \
+        GTK_OBJECT( p_intf->p_sys->p_preferences ), name ) ),                \
+                               main_GetIntVariable( var, default ) )
+
+        /* Default path */
+        ASSIGN_PSZ_ENTRY( INTF_PATH_VAR, INTF_PATH_DEFAULT,
+                          "preferences_file_entry" );
+    
+        /* Default DVD */
+        ASSIGN_PSZ_ENTRY( INPUT_DVD_DEVICE_VAR,INPUT_DVD_DEVICE_DEFAULT,
+                          "preferences_disc_dvd_entry" );
+    
+        /* Default VCD */
+        ASSIGN_PSZ_ENTRY( INPUT_VCD_DEVICE_VAR, INPUT_VCD_DEVICE_DEFAULT,
+                          "preferences_disc_vcd_entry" );
+    
+        /* Default server */
+        ASSIGN_PSZ_ENTRY( INPUT_SERVER_VAR, INPUT_SERVER_DEFAULT,
+                          "preferences_network_server_entry" );
+    
+        /* Default port */
+        ASSIGN_INT_VALUE( INPUT_PORT_VAR, INPUT_PORT_DEFAULT,
+                          "preferences_network_port_spinbutton" );
+    
+        /* Broadcast address */
+        ASSIGN_PSZ_ENTRY( INPUT_BCAST_ADRR_VAR, INPUT_BCAST_ADDR_DEFAULT,
+                          "preferences_network_broadcast_entry" );
+    
+        /* Broadcast stream by default ? */
+        ASSIGN_INT_TOGGLE( INPUT_BROADCAST_VAR, INPUT_BROADCAST_DEFAULT,
+                           "preferences_network_broadcast_checkbutton" );
+    
+        /* XXX Protocol */
+    
+        /* Default interface */
+        ASSIGN_PSZ_ENTRY( INTF_METHOD_VAR, INTF_METHOD_DEFAULT,
+                          "preferences_interface_entry" );
+    
+        /* Default video output */
+        ASSIGN_PSZ_ENTRY( VOUT_METHOD_VAR, VOUT_METHOD_DEFAULT,
+                          "preferences_video_output_entry" );
+    
+        /* Default output width */
+        ASSIGN_INT_VALUE( VOUT_WIDTH_VAR, VOUT_WIDTH_DEFAULT,
+                          "preferences_video_width_spinbutton" );
+    
+        /* Default output height */
+        ASSIGN_INT_VALUE( VOUT_HEIGHT_VAR, VOUT_HEIGHT_DEFAULT,
+                          "preferences_video_height_spinbutton" );
+    
+        /* XXX Default screen depth */
+    
+        /* XXX Default fullscreen depth */
+    
+        /* XXX Default gamma */
+        
+        /* Fullscreen on play */
+        ASSIGN_INT_TOGGLE( VOUT_FULLSCREEN_VAR, VOUT_FULLSCREEN_DEFAULT,
+                           "preferences_video_fullscreen_checkbutton" );
+    
+        /* Grayscale display */
+        ASSIGN_INT_TOGGLE( VOUT_GRAYSCALE_VAR, VOUT_GRAYSCALE_DEFAULT,
+                           "preferences_video_grayscale_checkbutton" );
+    
+        /* Default audio output */
+        ASSIGN_PSZ_ENTRY( AOUT_METHOD_VAR, AOUT_METHOD_DEFAULT,
+                          "preferences_audio_output_entry" );
+    
+        /* Default audio device */
+        ASSIGN_PSZ_ENTRY( AOUT_DSP_VAR, AOUT_DSP_DEFAULT,
+                          "preferences_audio_device_entry" );
+    
+        /* XXX Default frequency */
+    
+        /* XXX Default quality */
+    
+        /* XXX Default number of channels */
+    
+        /* Use spdif output ? */
+        ASSIGN_INT_TOGGLE( AOUT_SPDIF_VAR, AOUT_SPDIF_DEFAULT,
+                           "preferences_audio_spdif_checkbutton" );
+    
+        /* Launch playlist on startup */
+        ASSIGN_INT_TOGGLE( PLAYLIST_STARTUP_VAR, PLAYLIST_STARTUP_DEFAULT,
+                        "preferences_playlist_launch_on_startup_checkbutton" );
+    
+        /* Enqueue drag'n dropped item as default */
+        ASSIGN_INT_TOGGLE( PLAYLIST_ENQUEUE_VAR, PLAYLIST_ENQUEUE_DEFAULT,
+                           "preferences_playlist_enqueue_as_default_checkbutton" );
+    
+        /* Loop on playlist end */
+        ASSIGN_INT_TOGGLE( PLAYLIST_LOOP_VAR, PLAYLIST_LOOP_DEFAULT,
+                           "preferences_playlist_loop_checkbutton" );
+    
+        /* Verbosity of warning messages */
+        ASSIGN_INT_VALUE( INTF_WARNING_VAR, INTF_WARNING_DEFAULT,
+                          "preferences_misc_messages_spinbutton" );
+#undef ASSIGN_PSZ_ENTRY
+#undef ASSIGN_INT_VALUE
+#undef ASSIGN_INT_TOGGLE
+#endif
     }
 
     gtk_widget_show( p_intf->p_sys->p_preferences );
@@ -555,6 +672,13 @@ on_toolbar_open_clicked                (GtkButton       *button,
         p_intf->p_sys->p_fileopen = create_intf_fileopen();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
                              "p_intf", p_intf );
+
+        if( main_GetPszVariable( INTF_PATH_VAR, INTF_PATH_DEFAULT ) != NULL )
+        {
+            gtk_file_selection_set_filename( GTK_FILE_SELECTION(
+                p_intf->p_sys->p_fileopen ),
+                main_GetPszVariable( INTF_PATH_VAR, INTF_PATH_DEFAULT ) );
+        }
     }
 
     gtk_widget_show( p_intf->p_sys->p_fileopen );
@@ -921,6 +1045,13 @@ on_popup_open_activate                 (GtkMenuItem     *menuitem,
         p_intf->p_sys->p_fileopen = create_intf_fileopen();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_fileopen ),
                              "p_intf", p_intf );
+
+        if( main_GetPszVariable( INTF_PATH_VAR, INTF_PATH_DEFAULT ) != NULL )
+        {
+            gtk_file_selection_set_filename( GTK_FILE_SELECTION(
+                p_intf->p_sys->p_fileopen ),
+                main_GetPszVariable( INTF_PATH_VAR, INTF_PATH_DEFAULT ) );
+        }
     }
 
     gtk_widget_show( p_intf->p_sys->p_fileopen );
@@ -1377,6 +1508,7 @@ void
 on_jump_ok_clicked                     (GtkButton       *button,
                                         gpointer         user_data)
 {
+    on_jump_apply_clicked( button, user_data );
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
@@ -1385,7 +1517,38 @@ void
 on_jump_apply_clicked                  (GtkButton       *button,
                                         gpointer         user_data)
 {
+#if 1
+    intf_thread_t * p_intf;
+    off_t           i_seek;
+    off_t           i_size;
+    int             i_hours;
+    int             i_minutes;
+    int             i_seconds;
 
+    p_intf = GetIntf( GTK_WIDGET( button ), "intf_jump" );
+
+#define GET_VALUE( name )                                                   \
+    gtk_spin_button_get_value_as_int( GTK_SPIN_BUTTON( gtk_object_get_data( \
+        GTK_OBJECT( p_intf->p_sys->p_jump ), name ) ) )
+
+    i_hours   = GET_VALUE( "jump_hour_spinbutton" );
+    i_minutes = GET_VALUE( "jump_minute_spinbutton" );
+    i_seconds = GET_VALUE( "jump_second_spinbutton" );
+
+#undef GET_VALUE
+
+    i_seconds += 60 *i_minutes + 3600* i_hours;
+
+    vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
+    i_seek = i_seconds * 50 * p_intf->p_input->stream.i_mux_rate;
+    i_size = p_intf->p_input->stream.p_selected_area->i_size;
+    vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
+
+    if( i_seek < i_size )
+    {
+        input_Seek( p_intf->p_input, i_seek );
+    }
+#endif
 }
 
 
@@ -1404,6 +1567,7 @@ void
 on_preferences_ok_clicked              (GtkButton       *button,
                                         gpointer         user_data)
 {
+    on_preferences_apply_clicked( button, user_data );
     gtk_widget_hide( gtk_widget_get_toplevel( GTK_WIDGET (button) ) );
 }
 
@@ -1412,7 +1576,111 @@ void
 on_preferences_apply_clicked           (GtkButton       *button,
                                         gpointer         user_data)
 {
+#if 1
+    GtkWidget *     p_preferences;
 
+    /* get preferences window */
+    p_preferences = gtk_widget_get_toplevel( GTK_WIDGET( button ) );
+
+#define ASSIGN_PSZ_ENTRY( var, name )                                        \
+    main_PutPszVariable( var, gtk_entry_get_text(                            \
+    GTK_ENTRY( gtk_object_get_data( GTK_OBJECT( p_preferences ), name ) ) ) )
+
+#define ASSIGN_INT_VALUE( var, name )                                        \
+    main_PutIntVariable( var, gtk_spin_button_get_value_as_int(              \
+        GTK_SPIN_BUTTON( gtk_object_get_data( GTK_OBJECT( p_preferences ),   \
+        name ) ) ) )
+
+#define ASSIGN_INT_TOGGLE( var, name )                                       \
+    main_PutIntVariable( var, gtk_toggle_button_get_active(                  \
+        GTK_TOGGLE_BUTTON( gtk_object_get_data( GTK_OBJECT( p_preferences ), \
+        name ) ) ) )
+
+    /* Default path */
+    ASSIGN_PSZ_ENTRY( INTF_PATH_VAR, "preferences_file_entry" );
+
+    /* Default DVD */
+    ASSIGN_PSZ_ENTRY( INPUT_DVD_DEVICE_VAR, "preferences_disc_dvd_entry" );
+
+    /* Default VCD */
+    ASSIGN_PSZ_ENTRY( INPUT_VCD_DEVICE_VAR, "preferences_disc_vcd_entry" );
+
+    /* Default server */
+    ASSIGN_PSZ_ENTRY( INPUT_SERVER_VAR, "preferences_network_server_entry" );
+
+    /* Default port */
+    ASSIGN_INT_VALUE( INPUT_PORT_VAR, "preferences_network_port_spinbutton" );
+
+    /* Broadcast address */
+    ASSIGN_PSZ_ENTRY( INPUT_BCAST_ADRR_VAR,
+                      "preferences_network_broadcast_entry" );
+
+    /* Broadcast stream by default ? */
+    ASSIGN_INT_TOGGLE( INPUT_BROADCAST_VAR,
+                       "preferences_network_broadcast_checkbutton" );
+
+    /* XXX Protocol */
+
+    /* Default interface */
+    ASSIGN_PSZ_ENTRY( INTF_METHOD_VAR, "preferences_interface_entry" );
+
+    /* Default video output */
+    ASSIGN_PSZ_ENTRY( VOUT_METHOD_VAR, "preferences_video_output_entry" );
+
+    /* Default output width */
+    ASSIGN_INT_VALUE( VOUT_WIDTH_VAR, "preferences_video_width_spinbutton" );
+
+    /* Default output height */
+    ASSIGN_INT_VALUE( VOUT_HEIGHT_VAR, "preferences_video_height_spinbutton" );
+
+    /* XXX Default screen depth */
+
+    /* XXX Default fullscreen depth */
+
+    /* XXX Default gamma */
+    
+    /* Fullscreen on play */
+    ASSIGN_INT_TOGGLE( VOUT_FULLSCREEN_VAR,
+                       "preferences_video_fullscreen_checkbutton" );
+
+    /* Grayscale display */
+    ASSIGN_INT_TOGGLE( VOUT_GRAYSCALE_VAR,
+                       "preferences_video_grayscale_checkbutton" );
+
+    /* Default audio output */
+    ASSIGN_PSZ_ENTRY( AOUT_METHOD_VAR, "preferences_audio_output_entry" );
+
+    /* Default audio device */
+    ASSIGN_PSZ_ENTRY( AOUT_DSP_VAR, "preferences_audio_device_entry" );
+
+    /* XXX Default frequency */
+
+    /* XXX Default quality */
+
+    /* XXX Default number of channels */
+
+    /* Use spdif output ? */
+    ASSIGN_INT_TOGGLE( AOUT_SPDIF_VAR, "preferences_audio_spdif_checkbutton" );
+
+    /* Launch playlist on startup */
+    ASSIGN_INT_TOGGLE( PLAYLIST_STARTUP_VAR,
+                       "preferences_playlist_launch_on_startup_checkbutton" );
+
+    /* Enqueue drag'n dropped item as default */
+    ASSIGN_INT_TOGGLE( PLAYLIST_ENQUEUE_VAR,
+                       "preferences_playlist_enqueue_as_default_checkbutton" );
+
+    /* Loop on playlist end */
+    ASSIGN_INT_TOGGLE( PLAYLIST_LOOP_VAR,
+                       "preferences_playlist_loop_checkbutton" );
+
+    /* Verbosity of warning messages */
+    ASSIGN_INT_VALUE( INTF_WARNING_VAR,
+                      "preferences_misc_messages_spinbutton" );
+#undef ASSIGN_PSZ_ENTRY
+#undef ASSIGN_INT_VALUE
+#undef ASSIGN_INT_TOGGLE
+#endif
 }
 
 

@@ -2,7 +2,7 @@
  * intf_playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_playlist.c,v 1.3 2001/04/08 07:24:47 stef Exp $
+ * $Id: intf_playlist.c,v 1.4 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -86,7 +86,7 @@ void intf_PlaylistInit ( playlist_t * p_playlist )
     /* The playlist is empty */
     p_playlist->p_item = NULL;
 
-    intf_WarnMsg( 1, "intf: playlist initialized" );
+    intf_WarnMsg( 3, "intf: playlist initialized" );
 }
 
 /*****************************************************************************
@@ -132,7 +132,7 @@ int intf_PlaylistAdd( playlist_t * p_playlist, int i_pos,
     p_item->i_status = 0;
     p_item->psz_name = strdup( psz_item );
 
-    intf_WarnMsg( 1, "intf: added `%s' to playlist", psz_item );
+    intf_WarnMsg( 3, "intf: added `%s' to playlist", psz_item );
 
     vlc_mutex_unlock( &p_playlist->change_lock );
 
@@ -208,7 +208,7 @@ int intf_PlaylistDelete( playlist_t * p_playlist, int i_pos )
     p_playlist->p_item = realloc( p_playlist->p_item,
                     p_playlist->i_size * sizeof( playlist_item_t ) );
 
-    intf_WarnMsg( 1, "intf: removed `%s' from playlist", psz_name );
+    intf_WarnMsg( 3, "intf: removed `%s' from playlist", psz_name );
     
 
     /* Delete the item */
@@ -242,7 +242,7 @@ void intf_PlaylistDestroy( playlist_t * p_playlist )
 
     free( p_playlist );
 
-    intf_WarnMsg( 1, "intf: playlist destroyed" );
+    intf_WarnMsg( 3, "intf: playlist destroyed" );
 }
 
 /*****************************************************************************

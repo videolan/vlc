@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.55 2001/05/06 18:32:30 stef Exp $
+ * $Id: input_dvd.c,v 1.56 2001/05/07 03:14:09 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -600,7 +600,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         p_dvd->i_title_id =
           vts.title_inf.p_title_start[p_dvd->i_vts_title-1].i_title_id;
 
-        intf_WarnMsg( 1, "dvd: title %d vts_title %d pgc %d",
+        intf_WarnMsg( 3, "dvd: title %d vts_title %d pgc %d",
                         p_dvd->i_title,
                         p_dvd->i_vts_title,
                         p_dvd->i_title_id );
@@ -747,7 +747,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
         for( i = 1 ; i <= vts.manager_inf.i_audio_nb ; i++ )
         {
 
-        intf_WarnMsg( 1, "Audio %d: %x %x %x %x %x %x %x %x %x %x %x %x", i,
+        intf_WarnMsg( 5, "dvd info: audio %d: %x %x %x %x %x %x %x %x %x %x %x %x", i,
             vts.manager_inf.p_audio_attr[i-1].i_num_channels,
             vts.manager_inf.p_audio_attr[i-1].i_coding_mode,
             vts.manager_inf.p_audio_attr[i-1].i_multichannel_extension,
@@ -775,7 +775,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                     vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
                 strcat( p_es->psz_desc, " (ac3)" );
 
-                intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",
+                intf_WarnMsg( 3, "dvd info: audio stream %d %s\t(0x%x)",
                               i, p_es->psz_desc, i_id );
 
                 break;
@@ -792,7 +792,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                     vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
                 strcat( p_es->psz_desc, " (mpeg)" );
 
-                intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",
+                intf_WarnMsg( 3, "dvd info: audio stream %d %s\t(0x%x)",
                               i, p_es->psz_desc, i_id );
 
                 break;
@@ -809,7 +809,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                     vts.manager_inf.p_audio_attr[i-1].i_lang_code ) ) ); 
                 strcat( p_es->psz_desc, " (lpcm)" );
 
-                intf_WarnMsg( 1, "dvd info: audio stream %d %s\t(0x%x)",
+                intf_WarnMsg( 3, "dvd info: audio stream %d %s\t(0x%x)",
                               i, p_es->psz_desc, i_id );
 #else
                 i_id = 0;
@@ -845,7 +845,7 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
                 p_es->i_cat = SPU_ES;
                 strcpy( p_es->psz_desc, Language( hton16(
                     vts.manager_inf.p_spu_attr[i-1].i_lang_code ) ) ); 
-                intf_WarnMsg( 1, "dvd info: spu stream %d %s\t(0x%x)",
+                intf_WarnMsg( 3, "dvd info: spu stream %d %s\t(0x%x)",
                               i, p_es->psz_desc, i_id );
     
                 /* The before the last spu has a 0x0 prefix */
@@ -1277,7 +1277,7 @@ static void DVDSeek( input_thread_t * p_input, off_t i_off )
                        (off_t)( p_dvd->i_sector ) *DVD_LB_SIZE, SEEK_SET ) -
                 p_input->stream.p_selected_area->i_start;
 /*
-    intf_WarnMsg( 1, "Program Cell: %d Cell: %d Chapter: %d",
+    intf_WarnMsg( 3, "Program Cell: %d Cell: %d Chapter: %d",
                      p_dvd->i_prg_cell, p_dvd->i_cell, p_dvd->i_chapter );
 */
 
@@ -1312,7 +1312,7 @@ static int DVDFindCell( thread_dvd_data_t * p_dvd )
     }
 
 /*
-intf_WarnMsg( 1, "FindCell: i_cell %d i_index %d found %d nb %d",
+intf_WarnMsg( 3, "FindCell: i_cell %d i_index %d found %d nb %d",
                     p_dvd->i_cell,
                     p_dvd->i_prg_cell,
                     i_cell,
@@ -1363,7 +1363,7 @@ static int DVDFindSector( thread_dvd_data_t * p_dvd )
 #endif
 
 /*
-    intf_WarnMsg( 1, "cell: %d sector1: 0x%x end1: 0x%x\n"
+    intf_WarnMsg( 3, "cell: %d sector1: 0x%x end1: 0x%x\n"
                    "index: %d sector2: 0x%x end2: 0x%x\n"
                    "category: 0x%x ilvu end: 0x%x vobu start 0x%x", 
         p_dvd->i_cell,
@@ -1425,7 +1425,7 @@ static int DVDChooseAngle( thread_dvd_data_t * p_dvd )
         case 0x5:
             p_dvd->i_prg_cell += p_dvd->i_angle - 1;
             p_dvd->i_angle_cell = 0;
-//            intf_WarnMsg( 1, "dvd info: choosing angle %d", p_dvd->i_angle );
+//            intf_WarnMsg( 3, "dvd info: choosing angle %d", p_dvd->i_angle );
             break;
         /* we exit a multi-angle section */
         case 0x9:

@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.10 2001/04/28 03:36:25 sam Exp $
+ * $Id: gtk_playlist.c,v 1.11 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *      
@@ -365,7 +365,7 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
                             sizeof(char));
             protocol = strncpy( protocol, string, strstr( string, ":/") + 1 - string );
 
-            intf_WarnMsg(1,"Protocol dropped is %s",protocol);
+            intf_WarnMsg(4,"Protocol dropped is %s",protocol);
             string += strlen(protocol) ;
 
             /* Allowed things are proto: or proto:// */
@@ -374,7 +374,7 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
                 /* eat one '/' */
                 string++;
             }
-            intf_WarnMsg(1,"Dropped %s",string);
+            intf_WarnMsg(4,"Dropped %s",string);
 
         } 
         else 
@@ -404,7 +404,7 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
     {
         /* lock the interface */
         vlc_mutex_lock( &p_intf->change_lock );
-        intf_WarnMsg( 1, "List has %d elements",g_list_length( files ) ); 
+        intf_WarnMsg( 4, "List has %d elements",g_list_length( files ) ); 
         intf_AppendList( p_playlist, position, files );
 
         /* get the CList  and rebuild it. */
@@ -449,7 +449,7 @@ intf_readFiles( gchar * fsname )
     {
         if( hasValidExtension(fsname) )
         {
-            intf_WarnMsg( 3, "%s is a valid file. Stacking on the playlist", fsname );
+            intf_WarnMsg( 2, "%s is a valid file. Stacking on the playlist", fsname );
             return g_list_append( NULL, g_strdup(fsname) );
         } 
         else
@@ -464,7 +464,7 @@ intf_readFiles( gchar * fsname )
         DIR * currentDir = opendir( fsname );
         struct dirent * dirContent; 
         
-        intf_WarnMsg( 3, "%s is a folder.", fsname );
+        intf_WarnMsg( 2, "%s is a folder.", fsname );
         
         if( currentDir == NULL )
         {

@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000, 2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.14 2001/05/06 18:32:30 stef Exp $
+ * $Id: vout_xvideo.c,v 1.15 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -480,7 +480,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Other event */
         else
         {
-            intf_WarnMsg( 1, "%p -> unhandled event type %d received",
+            intf_WarnMsg( 3, "%p -> unhandled event type %d received",
                          p_vout, xevent.type );
         }
     }

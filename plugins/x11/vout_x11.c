@@ -2,7 +2,7 @@
  * vout_x11.c: X11 video output display method
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vout_x11.c,v 1.23 2001/05/06 18:32:30 stef Exp $
+ * $Id: vout_x11.c,v 1.24 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -530,7 +530,7 @@ static int vout_Manage( vout_thread_t *p_vout )
         /* Other event */
         else
         {
-            intf_WarnMsg( 1, "vout: unhandled event %d received", xevent.type );
+            intf_WarnMsg( 3, "vout: unhandled event %d received", xevent.type );
         }
     }
 

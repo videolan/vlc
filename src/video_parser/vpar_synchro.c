@@ -2,7 +2,7 @@
  * vpar_synchro.c : frame dropping routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.c,v 1.89 2001/05/06 04:32:03 sam Exp $
+ * $Id: vpar_synchro.c,v 1.90 2001/05/07 03:14:10 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -265,7 +265,7 @@ boolean_t vpar_SynchroChoose( vpar_thread_t * p_vpar, int i_coding_type,
                 b_decode = (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA);
             }
             if( !b_decode )
-                intf_WarnMsg( 3, "vpar synchro warning: trashing I (%lld)",
+                intf_WarnMsg( 1, "vpar synchro warning: trashing I (%lld)",
                              pts - now);
             break;
 
@@ -460,7 +460,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
         if( p_vpar->synchro.i_eta_p
                 && p_vpar->synchro.i_eta_p != p_vpar->synchro.i_n_p )
         {
-            intf_WarnMsg( 1, "Stream periodicity changed from P[%d] to P[%d]",
+            intf_WarnMsg( 3, "Stream periodicity changed from P[%d] to P[%d]",
                           p_vpar->synchro.i_n_p, p_vpar->synchro.i_eta_p );
             p_vpar->synchro.i_n_p = p_vpar->synchro.i_eta_p;
         }
@@ -489,7 +489,7 @@ void vpar_SynchroNewPicture( vpar_thread_t * p_vpar, int i_coding_type,
         if( p_vpar->synchro.i_eta_b
                 && p_vpar->synchro.i_eta_b != p_vpar->synchro.i_n_b )
         {
-            intf_WarnMsg( 1, "Stream periodicity changed from B[%d] to B[%d]",
+            intf_WarnMsg( 3, "Stream periodicity changed from B[%d] to B[%d]",
                           p_vpar->synchro.i_n_b, p_vpar->synchro.i_eta_b );
             p_vpar->synchro.i_n_b = p_vpar->synchro.i_eta_b;
         }

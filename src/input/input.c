@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.106 2001/05/06 18:32:30 stef Exp $
+ * $Id: input.c,v 1.107 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -277,7 +277,7 @@ static void RunThread( input_thread_t *p_input )
             {
                 /* End of file - we do not set b_die because only the
                  * interface is allowed to do so. */
-                intf_WarnMsg( 1, "input: EOF reached" );
+                intf_WarnMsg( 3, "input: EOF reached" );
                 p_input->b_eof = 1;
             }
             else
@@ -506,7 +506,7 @@ void input_FileOpen( input_thread_t * p_input )
     p_input->stream.p_selected_area->i_tell = 0;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    intf_Msg( "input: opening file `%s'", p_input->p_source );
+    intf_WarnMsg( 1, "input: opening file `%s'", p_input->p_source );
 #ifndef WIN32
     if( (p_input->i_handle = open( psz_name,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
@@ -527,7 +527,7 @@ void input_FileOpen( input_thread_t * p_input )
  *****************************************************************************/
 void input_FileClose( input_thread_t * p_input )
 {
-    intf_Msg( "input: closing file `%s'", p_input->p_source );
+    intf_WarnMsg( 1, "input: closing file `%s'", p_input->p_source );
     close( p_input->i_handle );
 
     return;

@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.36 2001/05/06 18:32:30 stef Exp $
+ * $Id: intf_gnome.c,v 1.37 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -1143,7 +1143,7 @@ static gint GnomeModeManage( intf_thread_t * p_intf )
 
     p_intf->p_input->stream.b_changed = 0;
     p_intf->p_sys->b_mode_changed = 0;
-    intf_WarnMsg( 2, 
+    intf_WarnMsg( 3, 
                   "intf info: menus refreshed as stream has changed" );
 
 #undef GETWIDGET

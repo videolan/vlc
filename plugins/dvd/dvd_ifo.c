@@ -2,7 +2,7 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.24 2001/04/22 00:08:25 stef Exp $
+ * $Id: dvd_ifo.c,v 1.25 2001/05/07 03:14:09 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -493,7 +493,7 @@ DumpBits( p_ifo, pi_buffer, &p_current, 2 );
 
     p_ifo->vts.b_initialized = 0;
 
-    intf_WarnMsg( 1, "ifo info: vmg initialized" );
+    intf_WarnMsg( 2, "ifo info: vmg initialized" );
 
     return 0;
 }

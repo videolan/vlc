@@ -2,7 +2,7 @@
  * input_ext-intf.c: services to the interface
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ext-intf.c,v 1.22 2001/04/28 03:36:25 sam Exp $
+ * $Id: input_ext-intf.c,v 1.23 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -152,7 +152,7 @@ void input_Seek( input_thread_t * p_input, off_t i_position )
     vlc_mutex_lock( &p_input->stream.stream_lock );
     p_input->stream.p_selected_area->i_seek = i_position;
 
-    intf_WarnMsg( 1, "input: seeking position %lld/%lld (%s/%s)", i_position,
+    intf_WarnMsg( 3, "input: seeking position %lld/%lld (%s/%s)", i_position,
                   p_input->stream.p_selected_area->i_size,
                   input_OffsetToTime( p_input, psz_time1, i_position ),
                   input_OffsetToTime( p_input, psz_time2,
@@ -271,14 +271,14 @@ int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
                 input_UnselectES( p_input,
                                   p_input->stream.pp_selected_es[i_index] );
                 input_SelectES( p_input, p_es );
-                intf_WarnMsg( 1, "input info: es selected -> %s (0x%x)",
+                intf_WarnMsg( 3, "input info: es selected -> %s (0x%x)",
                                                 p_es->psz_desc, p_es->i_id );
             }
         }
         else
         {
             input_SelectES( p_input, p_es );
-            intf_WarnMsg( 1, "input info: es selected -> %s (0x%x)",
+            intf_WarnMsg( 3, "input info: es selected -> %s (0x%x)",
                           p_es->psz_desc, p_es->i_id );
         }
     }
@@ -286,7 +286,7 @@ int input_ChangeES( input_thread_t * p_input, es_descriptor_t * p_es,
     {
         if( i_index != -1 )
         {
-            intf_WarnMsg( 1, "input info: es unselected -> %s (0x%x)",
+            intf_WarnMsg( 3, "input info: es unselected -> %s (0x%x)",
                           p_input->stream.pp_selected_es[i_index]->psz_desc,
                           p_input->stream.pp_selected_es[i_index]->i_id );
 

@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: intf_msg.c,v 1.33 2001/04/30 15:01:00 massiot Exp $
+ * $Id: intf_msg.c,v 1.34 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -227,7 +227,7 @@ void intf_WarnMsg( int i_level, char *psz_format, ... )
 {
     va_list ap;
     
-    if( i_level >= p_main->i_warning_level )
+    if( i_level <= p_main->i_warning_level )
     {
         va_start( ap, psz_format );
         QueueMsg( p_main->p_msg, INTF_MSG_WARN, psz_format, ap );
@@ -299,7 +299,7 @@ void intf_WarnMsgImm( int i_level, char *psz_format, ... )
 {
     va_list ap;
 
-    if( i_level >= p_main->i_warning_level )
+    if( i_level <= p_main->i_warning_level )
     {
         va_start( ap, psz_format );
         QueueMsg( p_main->p_msg, INTF_MSG_WARN, psz_format, ap );

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.53 2001/05/02 13:30:30 henri Exp $
+ * $Id: mpeg_system.c,v 1.54 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -142,7 +142,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( MoveChunk( p_header, &p_data, &p_byte, PES_HEADER_SIZE )
             != PES_HEADER_SIZE )
     {
-        intf_WarnMsg( 3, "PES packet too short to have a header" );
+        intf_WarnMsg( 1, "PES packet too short to have a header" );
         p_input->pf_delete_pes( p_input->p_method_data, p_pes );
         p_pes = NULL;
         return;
@@ -171,7 +171,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
         {
             /* PES_packet_length is set and != total received payload */
             /* Warn the decoder that the data may be corrupt. */
-            intf_WarnMsg( 3, "PES sizes do not match : packet corrupted" );
+            intf_WarnMsg( 1, "PES sizes do not match : packet corrupted" );
         }
 
         switch( p_es->i_stream_id )
@@ -202,7 +202,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 i_max_len = MoveChunk( p_full_header, &p_data, &p_byte, 12 );
                 if( i_max_len < 2 )
                 {
-                    intf_WarnMsg( 3,
+                    intf_WarnMsg( 1,
                             "PES packet too short to have a MPEG-2 header" );
                     p_input->pf_delete_pes( p_input->p_method_data,
                                             p_pes );
@@ -219,7 +219,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                 {
                     if( i_max_len < 7 )
                     {
-                        intf_WarnMsg( 3,
+                        intf_WarnMsg( 1,
                             "PES packet too short to have a MPEG-2 header" );
                         p_input->pf_delete_pes( p_input->p_method_data,
                                                 p_pes );
@@ -237,7 +237,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     {
                         if( i_max_len < 12 )
                         {
-                            intf_WarnMsg( 3,
+                            intf_WarnMsg( 1,
                               "PES packet too short to have a MPEG-2 header" );
                             p_input->pf_delete_pes( p_input->p_method_data,
                                                     p_pes );
@@ -268,7 +268,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     i_pes_header_size++;
                     if( MoveChunk( NULL, &p_data, &p_byte, 1 ) != 1 )
                     {
-                        intf_WarnMsg( 3,
+                        intf_WarnMsg( 1,
                             "PES packet too short to have a MPEG-1 header" );
                         p_input->pf_delete_pes( p_input->p_method_data, p_pes );
                         p_pes = NULL;
@@ -292,7 +292,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     i_pes_header_size += 2;
                     if( MoveChunk( NULL, &p_data, &p_byte, 2 ) != 2 )
                     {
-                        intf_WarnMsg( 3,
+                        intf_WarnMsg( 1,
                             "PES packet too short to have a MPEG-1 header" );
                         p_input->pf_delete_pes( p_input->p_method_data, p_pes );
                         p_pes = NULL;
@@ -312,7 +312,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                     i_pes_header_size += 4;
                     if( MoveChunk( p_ts, &p_data, &p_byte, 5 ) != 5 )
                     {
-                        intf_WarnMsg( 3,
+                        intf_WarnMsg( 1,
                             "PES packet too short to have a MPEG-1 header" );
                         p_input->pf_delete_pes( p_input->p_method_data, p_pes );
                         p_pes = NULL;
@@ -330,7 +330,7 @@ void input_ParsePES( input_thread_t * p_input, es_descriptor_t * p_es )
                         i_pes_header_size += 5;
                         if( MoveChunk( p_ts, &p_data, &p_byte, 5 ) != 5 )
                         {
-                            intf_WarnMsg( 3,
+                            intf_WarnMsg( 1,
                               "PES packet too short to have a MPEG-1 header" );
                             p_input->pf_delete_pes( p_input->p_method_data,
                                                     p_pes );
@@ -816,7 +816,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
 
                     if( MoveChunk( p_header, &p_data, &p_byte, 14 ) != 14 )
                     {
-                        intf_WarnMsg( 3, "Packet too short to have a header" );
+                        intf_WarnMsg( 1, "Packet too short to have a header" );
                         b_trash = 1;
                         break;
                     }
@@ -841,7 +841,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
 
                     if( MoveChunk( p_header, &p_data, &p_byte, 12 ) != 12 )
                     {
-                        intf_WarnMsg( 3, "Packet too short to have a header" );
+                        intf_WarnMsg( 1, "Packet too short to have a header" );
                         b_trash = 1;
                         break;
                     }
@@ -886,7 +886,7 @@ void input_DemuxPS( input_thread_t * p_input, data_packet_t * p_data )
         default:
             /* This should not happen */
             b_trash = 1;
-            intf_WarnMsg( 1, "Unwanted packet received with start code 0x%.8x",
+            intf_WarnMsg( 3, "Unwanted packet received with start code 0x%.8x",
                           i_code );
         }
     }
@@ -1083,7 +1083,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                  * draft. As there is nothing interesting in this packet
                  * (except PCR that have already been handled), we can trash
                  * the packet. */
-                intf_WarnMsg( 1,
+                intf_WarnMsg( 3,
                               "Packet without payload received by TS demux" );
                 b_trash = 1;
             }
@@ -1091,7 +1091,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
             {
                 /* FIXME: this can never happen, can it ? --Meuuh */
                 /* Duplicate packet: mark it as being to be trashed. */
-                intf_WarnMsg( 1, "Duplicate packet received by TS demux" );
+                intf_WarnMsg( 3, "Duplicate packet received by TS demux" );
                 b_trash = 1;
             }
             else if( p_es_demux->i_continuity_counter == 0xFF )

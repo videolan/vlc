@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: video_output.c,v 1.124 2001/05/06 18:32:30 stef Exp $
+ * $Id: video_output.c,v 1.125 2001/05/07 03:14:10 stef Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -194,7 +194,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
     p_vout->b_fullscreen          = main_GetIntVariable( VOUT_FULLSCREEN_VAR,
                                                      VOUT_FULLSCREEN_DEFAULT );
 
-    intf_WarnMsg( 1, "wished configuration: %dx%d, %d/%d bpp (%d Bpl)",
+    intf_WarnMsg( 3, "wished configuration: %dx%d, %d/%d bpp (%d Bpl)",
                   p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                   p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line );
 
@@ -232,7 +232,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
         free( p_vout );
         return( NULL );
     }
-    intf_WarnMsg( 1, "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
+    intf_WarnMsg( 3, "actual configuration: %dx%d, %d/%d bpp (%d Bpl), "
                   "masks: 0x%x/0x%x/0x%x",
                   p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                   p_vout->i_bytes_per_pixel * 8, p_vout->i_bytes_per_line,
@@ -283,7 +283,7 @@ vout_thread_t * vout_CreateThread   ( int *pi_status )
         return( NULL );
     }
 
-    intf_Msg( "vout: video display initialized (%dx%d, %d/%d bpp)",
+    intf_WarnMsg( 1, "vout: video display initialized (%dx%d, %d/%d bpp)",
               p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
               p_vout->i_bytes_per_pixel * 8 );
 
@@ -1049,7 +1049,7 @@ static void RunThread( vout_thread_t *p_vout)
                     p_pic->i_status = DESTROYED_PICTURE;
                     p_vout->i_pictures--;
                 }
-                intf_WarnMsg( 3,
+                intf_WarnMsg( 1,
                         "warning: late picture skipped (%p)", p_pic );
                 vlc_mutex_unlock( &p_vout->picture_lock );
 

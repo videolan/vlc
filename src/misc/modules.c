@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.29 2001/05/06 04:32:02 sam Exp $
+ * $Id: modules.c,v 1.30 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -145,7 +145,7 @@ void module_InitBank( void )
             psz_fullpath = *ppsz_path;
         }
 
-        intf_WarnMsgImm( 3, "module: browsing `%s'", psz_fullpath );
+        intf_WarnMsgImm( 1, "module: browsing `%s'", psz_fullpath );
 
         if( (dir = opendir( psz_fullpath )) )
         {
@@ -187,7 +187,7 @@ void module_InitBank( void )
     }
 #endif /* HAVE_DYNAMIC_PLUGINS */
 
-    intf_WarnMsg( 1, "module: module bank initialized" );
+    intf_WarnMsg( 3, "module: module bank initialized" );
 
     return;
 }
@@ -263,7 +263,7 @@ void module_ManageBank( void )
             }
             else
             {
-                intf_WarnMsg( 3, "module: hiding unused plugin module `%s'",
+                intf_WarnMsg( 1, "module: hiding unused plugin module `%s'",
                               p_module->psz_name );
                 HideModule( p_module );
 
@@ -352,7 +352,7 @@ module_t * module_Need( int i_capabilities, void *p_data )
 
     if( p_bestmodule != NULL )
     {
-        intf_WarnMsg( 3, "module: locking module `%s'",
+        intf_WarnMsg( 1, "module: locking module `%s'",
                       p_bestmodule->psz_name );
     }
 
@@ -375,7 +375,7 @@ void module_Unneed( module_t * p_module )
      * so there is no need to check the return value. */
     UnlockModule( p_module );
 
-    intf_WarnMsg( 3, "module: unlocking module `%s'", p_module->psz_name );
+    intf_WarnMsg( 1, "module: unlocking module `%s'", p_module->psz_name );
 
     /* We release the global lock */
     vlc_mutex_unlock( &p_module_bank->lock );
@@ -404,7 +404,7 @@ static int AllocatePluginModule( char * psz_filename )
     if( module_load( psz_filename, &handle ) )
     {
         /* The plugin module couldn't be opened */
-        intf_WarnMsgImm( 3, "module warning: cannot open %s (%s)",
+        intf_WarnMsgImm( 1, "module warning: cannot open %s (%s)",
                          psz_filename, module_error() );
         return( -1 );
     }
@@ -843,7 +843,7 @@ static int CallSymbol( module_t * p_module, char * psz_name )
     if( !p_symbol )
     {
         /* We couldn't load the symbol */
-        intf_WarnMsg( 3, "module warning: "
+        intf_WarnMsg( 1, "module warning: "
                          "cannot find symbol %s in module %s (%s)",
                          psz_name, p_module->is.plugin.psz_filename,
                          module_error() );

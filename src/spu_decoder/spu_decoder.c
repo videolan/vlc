@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: spu_decoder.c,v 1.40 2001/05/06 04:32:02 sam Exp $
+ * $Id: spu_decoder.c,v 1.41 2001/05/07 03:14:09 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -159,7 +159,7 @@ static int InitThread( spudec_thread_t *p_spudec )
  *****************************************************************************/
 static void RunThread( spudec_thread_t *p_spudec )
 {
-    intf_WarnMsg( 1, "spudec: spu decoder thread %i spawned", getpid() );
+    intf_WarnMsg( 3, "spudec: spu decoder thread %i spawned", getpid() );
 
     /*
      * Initialize thread and free configuration
@@ -187,7 +187,7 @@ static void RunThread( spudec_thread_t *p_spudec )
     }
 
     /* End of thread */
-    intf_WarnMsg( 1, "spudec: destroying spu decoder thread %i", getpid() );
+    intf_WarnMsg( 3, "spudec: destroying spu decoder thread %i", getpid() );
     EndThread( p_spudec );
 }
 
@@ -333,7 +333,7 @@ static void ParsePacket( spudec_thread_t *p_spudec )
         return;
     }
 
-    intf_WarnMsg( 1, "spudec: got a valid %ix%i subtitle at (%i,%i), "
+    intf_WarnMsg( 3, "spudec: got a valid %ix%i subtitle at (%i,%i), "
                      "RLE offsets: 0x%x 0x%x",
                   p_spu->i_width, p_spu->i_height, p_spu->i_x, p_spu->i_y,
                   p_spu->type.spu.i_offset[0], p_spu->type.spu.i_offset[1] );
