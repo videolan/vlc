@@ -2,7 +2,7 @@
  * gtk_main.c : Gtk+ wrapper for gtk_main
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: gtk_main.c,v 1.10 2002/10/15 08:35:24 sam Exp $
+ * $Id: gtk_main.c,v 1.11 2003/01/15 13:16:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the

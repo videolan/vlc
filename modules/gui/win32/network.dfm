@@ -356,7 +356,7 @@ object NetworkDlg: TNetworkDlg
       Top = 80
       Width = 113
       Height = 17
-      Caption = 'Channel Server'
+      Caption = 'Channel server'
       TabOrder = 2
       OnEnter = RadioButtonCSEnter
     end

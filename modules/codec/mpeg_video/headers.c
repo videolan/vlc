@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: headers.c,v 1.6 2002/11/28 17:35:00 sam Exp $
+ * $Id: headers.c,v 1.7 2003/01/15 13:16:39 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -1092,6 +1092,7 @@ static void PictureDisplayExtension( vpar_thread_t * p_vpar )
     int i_nb, i_dummy;
     /* I am not sure it works but it should
         (fewer tests than shown in §6.3.12) */
+    /* FIXME: is VLC_TRUE always 1 ? */
     i_nb = p_vpar->sequence.b_progressive ? p_vpar->sequence.b_progressive +
                                             p_vpar->picture.b_repeat_first_field +
                                             p_vpar->picture.b_top_field_first

@@ -48,5 +48,8 @@ BORLAND_win32 = \
 	modules/gui/win32/playlist.h \
 	modules/gui/win32/preferences.h \
 	modules/gui/win32/win32_common.h \
-	modules/gui/win32/misc.h
+	modules/gui/win32/misc.h \
+	\
+	modules/gui/win32/strings.cpp \
+	$(NULL)
 

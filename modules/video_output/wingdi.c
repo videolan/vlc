@@ -2,7 +2,7 @@
  * wingdi.c : Win32 / WinCE GDI video output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: wingdi.c,v 1.4 2002/11/23 02:40:30 sam Exp $
+ * $Id: wingdi.c,v 1.5 2003/01/15 13:16:39 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -46,7 +46,7 @@ static void End       ( vout_thread_t * );
 static int  Manage    ( vout_thread_t * );
 static void Render    ( vout_thread_t *, picture_t * );
 static void Display   ( vout_thread_t *, picture_t * );
-static void SetPalette( vout_thread_t *, u16 *, u16 *, u16 * );
+static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 static void EventThread        ( vlc_object_t * );
 static long FAR PASCAL WndProc ( HWND, UINT, WPARAM, LPARAM );
@@ -288,7 +288,8 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 /*****************************************************************************
  * SetPalette: sets an 8 bpp palette
  *****************************************************************************/
-static void SetPalette( vout_thread_t *p_vout, u16 *red, u16 *green, u16 *blue )
+static void SetPalette( vout_thread_t *p_vout,
+                        uint16_t *red, uint16_t *green, uint16_t *blue )
 {
     msg_Err( p_vout, "FIXME: SetPalette unimplemented" );
 }

@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.32 2002/11/20 13:37:36 sam Exp $
+ * $Id: vout_pictures.c,v 1.33 2003/01/15 13:16:40 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -661,7 +661,8 @@ static void CopyPicture( vout_thread_t * p_vout,
         else
         {
             /* We need to proceed line by line */
-            u8 *p_in = p_src->p[i].p_pixels, *p_out = p_dest->p[i].p_pixels;
+            uint8_t *p_in = p_src->p[i].p_pixels;
+            uint8_t *p_out = p_dest->p[i].p_pixels;
             int i_line;
 
             for( i_line = p_src->p[i].i_lines; i_line--; )

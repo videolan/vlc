@@ -265,7 +265,7 @@ object AboutDlg: TAboutDlg
     Top = 64
     Width = 267
     Height = 13
-    Caption = '(C) Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002'
+    Caption = '(C) 1996-2003 - the VideoLAN Team'
   end
   object Label4: TLabel
     Tag = 3
@@ -275,8 +275,7 @@ object AboutDlg: TAboutDlg
     Height = 39
     Caption = 
       'This is the VideoLAN Client, a DVD, MPEG and DivX player. It can' +
-      ' play MPEG and MPEG 2 files from a file or from a network source' +
-      '.'
+      ' play MPEG and MPEG2 files from a file or from a network source.'
     WordWrap = True
   end
   object Label3: TLabel

@@ -4,7 +4,7 @@ object MainFrameDlg: TMainFrameDlg
   Width = 541
   Height = 306
   BorderIcons = [biSystemMenu, biMinimize]
-  Caption = 'VideoLAN Client (win32 interface)'
+  Caption = 'VideoLAN Client'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -306,7 +306,7 @@ object MainFrameDlg: TMainFrameDlg
       Top = 16
       Width = 49
       Height = 13
-      Caption = 'No server!'
+      Caption = 'No server'
     end
     object ButtonGo: TButton
       Tag = 3
@@ -539,19 +539,19 @@ object MainFrameDlg: TMainFrameDlg
         Tag = 3
         Caption = '&Program'
         Enabled = False
-        Hint = 'Select program'
+        Hint = 'Choose the program'
       end
       object MenuTitle: TMenuItem
         Tag = 3
         Caption = '&Title'
         Enabled = False
-        Hint = 'Select title'
+        Hint = 'Choose title'
       end
       object MenuChapter: TMenuItem
         Tag = 3
         Caption = '&Chapter'
         Enabled = False
-        Hint = 'Select chapter'
+        Hint = 'Choose chapter'
       end
       object MenuAngle: TMenuItem
         Tag = 3
@@ -563,13 +563,13 @@ object MainFrameDlg: TMainFrameDlg
         Tag = 3
         Caption = '&Language'
         Enabled = False
-        Hint = 'Select audio language'
+        Hint = 'Select audio channel'
       end
       object MenuSubtitles: TMenuItem
         Tag = 3
         Caption = '&Subtitles'
         Enabled = False
-        Hint = 'Select subtitles language'
+        Hint = 'Select subtitles channel'
       end
     end
     object MenuHelp: TMenuItem
@@ -2336,7 +2336,7 @@ object MainFrameDlg: TMainFrameDlg
     end
     object Control1: TMenuItem
       Tag = 3
-      Caption = 'Control'
+      Caption = 'Controls'
       object PopupBack: TMenuItem
         Tag = 3
         Action = BackAction
@@ -2606,7 +2606,7 @@ object MainFrameDlg: TMainFrameDlg
       Tag = 3
       Category = 'Control'
       Caption = '&Fullscreen'
-      Hint = 'Toggle fullscreen'
+      Hint = 'Toggle fullscreen mode'
       ShortCut = 70
       OnExecute = FullscreenActionExecute
     end
@@ -2636,28 +2636,28 @@ object MainFrameDlg: TMainFrameDlg
       Tag = 3
       Category = 'Control'
       Caption = 'Prev'
-      Hint = 'Jump to previous title'
+      Hint = 'Select previous title'
       OnExecute = PrevTitleActionExecute
     end
     object NextTitleAction: TAction
       Tag = 3
       Category = 'Control'
       Caption = 'Next'
-      Hint = 'Jump to next title'
+      Hint = 'Select next title'
       OnExecute = NextTitleActionExecute
     end
     object PrevChapterAction: TAction
       Tag = 3
       Category = 'Control'
       Caption = 'Prev'
-      Hint = 'Jump to previous chapter'
+      Hint = 'Select previous chapter'
       OnExecute = PrevChapterActionExecute
     end
     object NextChapterAction: TAction
       Tag = 3
       Category = 'Control'
       Caption = 'Next'
-      Hint = 'Jump to next chapter'
+      Hint = 'Select next chapter'
       OnExecute = NextChapterActionExecute
     end
     object VolumeUpAction: TAction

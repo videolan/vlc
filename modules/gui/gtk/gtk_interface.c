@@ -1361,7 +1361,7 @@ create_intf_about (void)
   gtk_box_pack_start (GTK_BOX (vbox3), label14, TRUE, TRUE, 0);
   gtk_misc_set_padding (GTK_MISC (label14), 0, 10);
 
-  label18 = gtk_label_new (_("(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"));
+  label18 = gtk_label_new (_("(C) 1996-2003 - the VideoLAN Team"));
   gtk_widget_ref (label18);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label18", label18,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1387,7 +1387,7 @@ create_intf_about (void)
   gtk_misc_set_alignment (GTK_MISC (label16), 0.5, 0);
   gtk_misc_set_padding (GTK_MISC (label16), 5, 5);
 
-  label17 = gtk_label_new (_("This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source."));
+  label17 = gtk_label_new (_("This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source."));
   gtk_widget_ref (label17);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label17", label17,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1760,7 +1760,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  network_channel = gtk_radio_button_new_with_label (table4_group, _("Channel server "));
+  network_channel = gtk_radio_button_new_with_label (table4_group, _("Channel server"));
   table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_channel));
   gtk_widget_ref (network_channel);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "network_channel", network_channel,

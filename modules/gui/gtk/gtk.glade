@@ -1378,7 +1378,7 @@
       <widget>
 	<class>GtkLabel</class>
 	<name>label18</name>
-	<label>(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team</label>
+	<label>(C) 1996-2003 - the VideoLAN Team</label>
 	<justify>GTK_JUSTIFY_LEFT</justify>
 	<wrap>False</wrap>
 	<xalign>0.5</xalign>
@@ -1421,7 +1421,7 @@ http://www.videolan.org/</label>
       <widget>
 	<class>GtkLabel</class>
 	<name>label17</name>
-	<label>This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source.</label>
+	<label>This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source.</label>
 	<justify>GTK_JUSTIFY_LEFT</justify>
 	<wrap>True</wrap>
 	<xalign>0.5</xalign>
@@ -2129,7 +2129,7 @@ http://www.videolan.org/</label>
 	      <handler>GtkNetworkOpenChannel</handler>
 	      <last_modification_time>Thu, 16 May 2002 01:44:15 GMT</last_modification_time>
 	    </signal>
-	    <label>Channel server </label>
+	    <label>Channel server</label>
 	    <active>False</active>
 	    <draw_indicator>True</draw_indicator>
 	    <child>

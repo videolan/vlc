@@ -1125,9 +1125,9 @@ create_intf_about (void)
   GtkWidget *intf_about;
 
   intf_about = gnome_about_new ("VideoLAN Client", VERSION,
-                        _("(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"),
+                        _("(C) 1996-2003 - the VideoLAN Team"),
                         authors,
-                        _("This is the VideoLAN client, a DVD and MPEG player. It can play MPEG and MPEG 2 files from a file or from a network source."),
+                        _("This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source."),
                         NULL);
   gtk_object_set_data (GTK_OBJECT (intf_about), "intf_about", intf_about);
 
@@ -1472,7 +1472,7 @@ create_intf_open (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  network_channel = gtk_radio_button_new_with_label (table4_group, _("Channel server "));
+  network_channel = gtk_radio_button_new_with_label (table4_group, _("Channel server"));
   table4_group = gtk_radio_button_group (GTK_RADIO_BUTTON (network_channel));
   gtk_widget_ref (network_channel);
   gtk_object_set_data_full (GTK_OBJECT (intf_open), "network_channel", network_channel,
