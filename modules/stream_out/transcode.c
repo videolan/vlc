@@ -2,7 +2,7 @@
  * transcode.c: transcoding stream output module
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: transcode.c,v 1.79 2004/02/21 23:50:52 gbazin Exp $
+ * $Id: transcode.c,v 1.80 2004/02/24 17:42:07 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -1448,7 +1448,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                                    id->ff_dec_c->pix_fmt,
                                    id->ff_dec_c->width, id->ff_dec_c->height );
 
+#if LIBAVCODEC_BUILD >= 4685
             id->p_ff_pic_tmp0->interlaced_frame = 0;
+#endif
             id->p_ff_pic_tmp0->repeat_pict = frame->repeat_pict;
             frame = id->p_ff_pic_tmp0;
         }
@@ -1476,9 +1478,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
                          (AVPicture*)frame, id->ff_dec_c->pix_fmt,
                          id->ff_dec_c->width, id->ff_dec_c->height );
 
-            id->p_ff_pic_tmp1->interlaced_frame = frame->interlaced_frame;
             id->p_ff_pic_tmp1->repeat_pict = frame->repeat_pict;
-#if LIBAVCODEC_BUILD >= 4684
+#if LIBAVCODEC_BUILD >= 4685
+            id->p_ff_pic_tmp1->interlaced_frame = frame->interlaced_frame;
             id->p_ff_pic_tmp1->top_field_first = frame->top_field_first;
 #endif
             frame = id->p_ff_pic_tmp1;
@@ -1518,9 +1520,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
             img_resample( id->p_vresample, (AVPicture*)id->p_ff_pic_tmp2,
                           (AVPicture*)frame );
 
-            id->p_ff_pic_tmp2->interlaced_frame = frame->interlaced_frame;
             id->p_ff_pic_tmp2->repeat_pict = frame->repeat_pict;
-#if LIBAVCODEC_BUILD >= 4684
+#if LIBAVCODEC_BUILD >= 4685
+            id->p_ff_pic_tmp2->interlaced_frame = frame->interlaced_frame;
             id->p_ff_pic_tmp2->top_field_first = frame->top_field_first;
 #endif
             frame = id->p_ff_pic_tmp2;
@@ -1554,9 +1556,9 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream,
         /* Set the pts of the frame being encoded */
         p_pic->date = p_sys->i_output_pts;
 
-        p_pic->b_progressive = !frame->interlaced_frame;
         p_pic->i_nb_fields = frame->repeat_pict;
-#if LIBAVCODEC_BUILD >= 4684
+#if LIBAVCODEC_BUILD >= 4685
+        p_pic->b_progressive = !frame->interlaced_frame;
         p_pic->b_top_field_first = frame->top_field_first;
 #endif
 
