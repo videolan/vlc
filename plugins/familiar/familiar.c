@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.3 2002/07/22 20:52:42 jpsaman Exp $
+ * $Id: familiar.c,v 1.4 2002/07/22 21:04:55 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -38,6 +38,54 @@
 #include "familiar_interface.h"
 #include "familiar_support.h"
 #include "familiar.h"
+
+/*****************************************************************************
+ * Local variables (mutex-protected).
+ *****************************************************************************/
+static void ** pp_global_data = NULL;
+
+/*****************************************************************************
+ * g_atexit: kludge to avoid the Gtk+ thread to segfault at exit
+ *****************************************************************************
+ * gtk_init() makes several calls to g_atexit() which calls atexit() to
+ * register tidying callbacks to be called at program exit. Since the Gtk+
+ * plugin is likely to be unloaded at program exit, we have to export this
+ * symbol to intercept the g_atexit() calls. Talk about crude hack.
+ *****************************************************************************/
+void g_atexit( GVoidFunc func )
+{
+    intf_thread_t *p_intf;
+
+    int i_dummy;
+
+    if( pp_global_data == NULL )
+    {
+        atexit( func );
+        return;
+    }
+
+    p_intf = (intf_thread_t *)*pp_global_data;
+    if( p_intf == NULL )
+    {
+        return;
+    }
+
+    for( i_dummy = 0;
+         i_dummy < MAX_ATEXIT && p_intf->p_sys->pf_callback[i_dummy] != NULL;
+         i_dummy++ )
+    {
+        ;
+    }
+
+    if( i_dummy >= MAX_ATEXIT - 1 )
+    {
+        msg_Err( p_intf, "too many atexit() callbacks to register" );
+        return;
+    }
+
+    p_intf->p_sys->pf_callback[i_dummy]     = func;
+    p_intf->p_sys->pf_callback[i_dummy + 1] = NULL;
+}
 
 /*****************************************************************************
  * Local prototypes.

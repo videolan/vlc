@@ -2,7 +2,7 @@
  * familiar.h: private Gtk+ interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: familiar.h,v 1.2 2002/07/22 19:49:40 jpsaman Exp $
+ * $Id: familiar.h,v 1.3 2002/07/22 21:04:55 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -21,6 +21,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MAX_ATEXIT                 10
+
 /*****************************************************************************
  * intf_sys_t: description and status of Gtk+ interface
  *****************************************************************************/
@@ -31,5 +33,8 @@ struct intf_sys_t
 
     /* The input thread */
     input_thread_t *    p_input;
+
+    /* XXX: Ugly kludge, see gtk.c */
+    void             ( *pf_callback[MAX_ATEXIT] ) ( void );
 };
 
