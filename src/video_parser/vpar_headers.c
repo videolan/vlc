@@ -518,9 +518,12 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                                                   vpar_BMBType, vpar_DMBType};
 
     int                 i_structure;
-    int                 i_mb_address, i_mb_base, i_mb;
+    int                 i_mb_address, i_mb_base;
     boolean_t           b_parsable;
     u32                 i_dummy;
+#ifdef VDEC_SMP
+    int                 i_mb;
+#endif
     
     RemoveBits( &p_vpar->bit_stream, 10 ); /* temporal_reference */
     p_vpar->picture.i_coding_type = GetBits( &p_vpar->bit_stream, 3 );
@@ -609,11 +612,13 @@ static void PictureHeader( vpar_thread_t * p_vpar )
                       p_vpar->picture.i_coding_type,
                       NULL );
 
+#ifdef VDEC_SMP
             for( i_mb = 0; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
             {
                 vpar_DestroyMacroblock( &p_vpar->vfifo,
                                         p_vpar->picture.pp_mb[i_mb] );
             }
+#endif
             vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
         }
         
@@ -701,18 +706,34 @@ static void PictureHeader( vpar_thread_t * p_vpar )
 
         P_picture->i_deccount = p_vpar->sequence.i_mb_size;
         vlc_mutex_init( &p_vpar->picture.p_picture->lock_deccount );
-        memset( p_vpar->picture.pp_mb, 0, MAX_MB );
+#ifdef VDEC_SMP
+        memset( p_vpar->picture.pp_mb, 0, MAX_MB*sizeof(macroblock_t *) );
+#endif
 /* FIXME ! remove asap */
 //memset( P_picture->p_data, 0, (p_vpar->sequence.i_mb_size*384));
 
         /* Update the reference pointers. */
         ReferenceUpdate( p_vpar, p_vpar->picture.i_coding_type, P_picture );
+
+#ifdef VDEC_SMP
+        /* Link referenced pictures for the decoder 
+         * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
+        if( p_vpar->picture.i_coding_type == P_CODING_TYPE ||
+            p_vpar->picture.i_coding_type == B_CODING_TYPE )
+        {
+            vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
+        }
+        if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
+        {
+            vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
+        } 
+#endif
     }
     p_vpar->picture.i_current_structure |= i_structure;
     p_vpar->picture.i_structure = i_structure;
 
     /* Initialize picture data for decoding. */
-    if( p_vpar->picture.b_motion_field = (i_structure == BOTTOM_FIELD) )
+    if( (p_vpar->picture.b_motion_field = (i_structure == BOTTOM_FIELD)) )
     {
         i_mb_base = p_vpar->sequence.i_mb_size >> 1;
         p_vpar->mb.i_l_y = 1;
@@ -752,11 +773,17 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     {
         /* Trash picture. */
 //fprintf(stderr, "Image trashee\n");
-        for( i_mb = 1; p_vpar->picture.pp_mb[i_mb]; i_mb++ )
+#ifdef VDEC_SMP
+        for( i_mb = 1; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
         {
             vpar_DestroyMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
         }
-        vout_DestroyPicture( p_vpar->p_vout, p_vpar->picture.p_picture );
+#endif
+
+        if( P_picture->i_deccount != 1 )
+        {
+            vout_DestroyPicture( p_vpar->p_vout, P_picture );
+        }
 
         ReferenceReplace( p_vpar, p_vpar->picture.i_coding_type, NULL );
 
@@ -769,28 +796,18 @@ static void PictureHeader( vpar_thread_t * p_vpar )
     {
 //fprintf(stderr, "Image parsee (%d)\n", p_vpar->picture.i_coding_type);
         /* Frame completely parsed. */
+#ifdef VDEC_SMP
         for( i_mb = 1; p_vpar->picture.pp_mb[i_mb] != NULL; i_mb++ )
         {
             vpar_DecodeMacroblock( &p_vpar->vfifo, p_vpar->picture.pp_mb[i_mb] );
         }
 
-        /* Link referenced pictures for the decoder 
-         * They are unlinked in vpar_ReleaseMacroblock() & vpar_DestroyMacroblock() */
-        if( p_vpar->picture.i_coding_type == P_CODING_TYPE ||
-            p_vpar->picture.i_coding_type == B_CODING_TYPE )
-        {
-            vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_forward );
-        }
-        if( p_vpar->picture.i_coding_type == B_CODING_TYPE )
-        {
-            vout_LinkPicture( p_vpar->p_vout, p_vpar->sequence.p_backward );
-        } 
-
         /* Send signal to the video_decoder. */
         vlc_mutex_lock( &p_vpar->vfifo.lock );
         vlc_cond_signal( &p_vpar->vfifo.wait );
         vlc_mutex_unlock( &p_vpar->vfifo.lock );
-        
+#endif
+
         /* Prepare context for the next picture. */
         P_picture = NULL;
         p_vpar->picture.i_current_structure = 0;

@@ -15,6 +15,7 @@
  * Macros
  *****************************************************************************/
 
+#ifdef VDEC_SMP
 /* ?? move to inline functions */
 #define VIDEO_FIFO_ISEMPTY( fifo )    ( (fifo).i_start == (fifo).i_end )
 #define VIDEO_FIFO_ISFULL( fifo )     ( ( ( (fifo).i_end + 1 - (fifo).i_start ) \
@@ -25,12 +26,14 @@
 #define VIDEO_FIFO_END( fifo )        ( (fifo).buffer[ (fifo).i_end ] )
 #define VIDEO_FIFO_INCEND( fifo )     ( (fifo).i_end = ((fifo).i_end + 1) \
                                                          & VFIFO_SIZE )
+#endif
 
 /*****************************************************************************
  * vpar_GetMacroblock : return a macroblock to be decoded
  *****************************************************************************/
 static __inline__ macroblock_t * vpar_GetMacroblock( video_fifo_t * p_fifo )
 {
+#ifdef VDEC_SMP
     macroblock_t *      p_mb;
 
     vlc_mutex_lock( &p_fifo->lock );
@@ -50,6 +53,10 @@ static __inline__ macroblock_t * vpar_GetMacroblock( video_fifo_t * p_fifo )
     vlc_mutex_unlock( &p_fifo->lock );
     
     return( p_mb );
+#else
+    /* Shouldn't normally be used without SMP. */
+    return NULL;
+#endif
 }
 
 /*****************************************************************************
@@ -57,6 +64,7 @@ static __inline__ macroblock_t * vpar_GetMacroblock( video_fifo_t * p_fifo )
  *****************************************************************************/
 static __inline__ macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
 {
+#ifdef VDEC_SMP
     macroblock_t *      p_mb;
 
 #define P_buffer p_fifo->p_vpar->vbuffer
@@ -75,6 +83,9 @@ static __inline__ macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
     vlc_mutex_unlock( &P_buffer.lock );
 #undef P_buffer
     return( p_mb );
+#else
+    return( &p_fifo->buffer );
+#endif
 }
 
 /*****************************************************************************
@@ -83,6 +94,7 @@ static __inline__ macroblock_t * vpar_NewMacroblock( video_fifo_t * p_fifo )
 static __inline__ void vpar_DecodeMacroblock( video_fifo_t * p_fifo,
                                               macroblock_t * p_mb )
 {
+#ifdef VDEC_SMP
     /* Place picture in the video FIFO */
     vlc_mutex_lock( &p_fifo->lock );
         
@@ -91,6 +103,8 @@ static __inline__ void vpar_DecodeMacroblock( video_fifo_t * p_fifo,
     VIDEO_FIFO_INCEND( *p_fifo );
 
     vlc_mutex_unlock( &p_fifo->lock );
+#endif
+    /* Shouldn't normally be used without SMP. */
 }
 
 /*****************************************************************************
@@ -100,6 +114,7 @@ static __inline__ void vpar_DecodeMacroblock( video_fifo_t * p_fifo,
 static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
                                                macroblock_t * p_mb )
 {
+#ifdef VDEC_SMP
     boolean_t      b_finished;
 
     /* Unlink picture buffer */
@@ -135,6 +150,18 @@ static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
     P_buffer.pp_mb_free[ ++P_buffer.i_index ] = p_mb;
     vlc_mutex_unlock( &P_buffer.lock );
 #undef P_buffer
+
+#else
+    p_mb->p_picture->i_deccount--;
+    if( p_mb->p_picture->i_deccount == 1 )
+    {
+        /* Mark the picture to be displayed */
+        vout_DisplayPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
+
+        /* Warn Synchro for its records. */
+        vpar_SynchroEnd( p_fifo->p_vpar );
+    }
+#endif
 }
 
 /*****************************************************************************
@@ -143,19 +170,20 @@ static __inline__ void vpar_ReleaseMacroblock( video_fifo_t * p_fifo,
 static __inline__ void vpar_DestroyMacroblock( video_fifo_t * p_fifo,
                                                macroblock_t * p_mb )
 {
+#ifdef VDEC_SMP
     boolean_t       b_finished;
 
     /* Unlink picture buffer */
     vlc_mutex_lock( &p_mb->p_picture->lock_deccount );
     p_mb->p_picture->i_deccount--;
-    b_finished = (p_mb->p_picture->i_deccount == 0);
+    b_finished = (p_mb->p_picture->i_deccount == 1);
     vlc_mutex_unlock( &p_mb->p_picture->lock_deccount );
 
     /* Test if it was the last block of the picture */
     if( b_finished )
     {
 fprintf(stderr, "Image trashee\n");
-        /* Mark the picture to be displayed */
+        /* Mark the picture to be trashed */
         vout_DestroyPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
 
         /* Warn Synchro for its records. */
@@ -178,6 +206,18 @@ fprintf(stderr, "Image trashee\n");
     P_buffer.pp_mb_free[ ++P_buffer.i_index ] = p_mb;
     vlc_mutex_unlock( &P_buffer.lock );
 #undef P_buffer
+
+#else
+    p_mb->p_picture->i_deccount--;
+    if( p_mb->p_picture->i_deccount == 1 )
+    {
+        /* Mark the picture to be trashed */
+        vout_DestroyPicture( p_fifo->p_vpar->p_vout, p_mb->p_picture );
+
+        /* Warn Synchro for its records. */
+        vpar_SynchroEnd( p_fifo->p_vpar );
+    }
+#endif
 }
 
 /*****************************************************************************

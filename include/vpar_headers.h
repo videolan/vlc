@@ -93,7 +93,9 @@ typedef struct picture_parsing_s
     int                 i_current_structure;
 
     picture_t *         p_picture;
+#ifdef VDEC_SMP
     macroblock_t *      pp_mb[MAX_MB];
+#endif
 
     /* Relative to the current field */
     int                 i_coding_type, i_structure;

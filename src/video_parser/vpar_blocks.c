@@ -37,7 +37,6 @@
 #include "video_parser.h"
 #include "video_fifo.h"
 
-
 /*
  * Local prototypes
  */
@@ -790,13 +789,15 @@ i_count++;
             memset( p_vpar->slice.pppi_pmv, 0, 8*sizeof(int) );
         }
 
-        if( (p_mb = p_vpar->picture.pp_mb[i_mb_base + i_mb] =
-             vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
+        if( (p_mb = vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
         {
             p_vpar->picture.b_error = 1;
             intf_ErrMsg("vpar error: macroblock list is empty !\n");
             return;
         }
+#ifdef VDEC_SMP
+        p_vpar->picture.pp_mb[i_mb_base + i_mb] = p_mb;
+#endif
 
         InitMacroblock( p_vpar, p_mb );
        
@@ -810,16 +811,23 @@ i_count++;
         /* Set the field we use for motion compensation */
         p_mb->ppi_field_select[0][0] = p_mb->ppi_field_select[0][1]
                                      = ( p_vpar->picture.i_current_structure == BOTTOM_FIELD );
+
+#ifndef VDEC_SMP
+        /* Decode the macroblock NOW ! */
+        vdec_DecodeMacroblock( p_vpar->pp_vdec[0], p_mb );
+#endif
     }
 
     /* Get a macroblock structure. */
-    if( (p_mb = p_vpar->picture.pp_mb[i_mb_base + *pi_mb_address] =
-         vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
+    if( (p_mb = vpar_NewMacroblock( &p_vpar->vfifo )) == NULL )
     {
         p_vpar->picture.b_error = 1;
         intf_ErrMsg("vpar error: macroblock list is empty !\n");
         return;
     }
+#ifdef VDEC_SMP
+        p_vpar->picture.pp_mb[i_mb_base + *pi_mb_address] = p_mb;
+#endif
 
     InitMacroblock( p_vpar, p_mb );
 
@@ -953,6 +961,12 @@ if( 0 )
     {
         p_mb->i_mb_type |= MB_MOTION_FORWARD;
     }
+
+#ifndef VDEC_SMP
+    /* Decode the macroblock NOW ! */
+    vdec_DecodeMacroblock( p_vpar->pp_vdec[0], p_mb );
+#endif
+
 /*
 if(  p_vpar->picture.i_coding_type != I_CODING_TYPE )//!(p_mb->b_P_coding_type & MB_INTRA) )
 {
@@ -1260,7 +1274,7 @@ if( i_parse >= 64 )
         p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
     }
 fprintf( stderr, "Non intra MPEG2 end (%d)\n", i_b );
-//p_vpar->picture.b_error = 1;
+p_vpar->picture.b_error = 1;
 }
 
 /*****************************************************************************
@@ -1500,5 +1514,5 @@ if( i_parse >= 64 )
     }
     
 fprintf( stderr, "MPEG2 end (%d)\n", i_b );
-//p_vpar->b_error = 1;
+p_vpar->picture.b_error = 1;
 }

@@ -79,6 +79,7 @@ typedef struct vdec_thread_s
  *****************************************************************************/
 #ifndef OLD_DECODER
 struct vpar_thread_s;
+struct macroblock_s;
 #endif
 
 /* Thread management functions */
@@ -87,6 +88,10 @@ p_vdec_thread_t  vdec_CreateThread       ( /* video_cfg_t *p_cfg, */ input_threa
                                           vout_thread_t *p_vout, int *pi_status */ );
 void             vdec_DestroyThread      ( vdec_thread_t *p_vdec /*, int *pi_status */ );
 #else
+#ifndef VDEC_SMP
+int             vdec_InitThread         ( struct vdec_thread_s *p_vdec );
+void            vdec_DecodeMacroblock   ( struct vdec_thread_s *p_vdec, struct macroblock_s *p_mb );
+#endif
 vdec_thread_t * vdec_CreateThread       ( struct vpar_thread_s *p_vpar /*, int *pi_status */ );
 void vdec_DestroyThread      ( vdec_thread_t *p_vdec /*, int *pi_status */ );
 #endif

@@ -206,18 +206,30 @@ static int InitThread( vpar_thread_t *p_vpar )
 
     /* Initialize video FIFO */
     vpar_InitFIFO( p_vpar );
-  
-    bzero( p_vpar->p_vdec, NB_VDEC*sizeof(vdec_thread_t *) );
-    
+
+    memset( p_vpar->pp_vdec, 0, NB_VDEC*sizeof(vdec_thread_t *) );
+
+#ifdef VDEC_SMP
     /* Spawn video_decoder threads */
     /* ??? modify the number of vdecs at runtime ? */
     for( i_dummy = 0; i_dummy < NB_VDEC; i_dummy++ )
     {
-        if( (p_vpar->p_vdec[i_dummy] = vdec_CreateThread( p_vpar )) == NULL )
+        if( (p_vpar->pp_vdec[i_dummy] = vdec_CreateThread( p_vpar )) == NULL )
         {
             return( 1 );
         }
     }
+#else
+    /* Fake a video_decoder thread */
+    if( (p_vpar->pp_vdec[0] = (vdec_thread_t *)malloc(sizeof( vdec_thread_t ))) == NULL
+        || vdec_InitThread( p_vpar->pp_vdec[0] ) )
+    {
+        return( 1 );
+    }
+    p_vpar->pp_vdec[0]->b_die = 0;
+    p_vpar->pp_vdec[0]->b_error = 0;
+    p_vpar->pp_vdec[0]->p_vpar = p_vpar;
+#endif
 
     /* Initialize lookup tables */
 #if defined(MPEG2_COMPLIANT) && !defined(VDEC_DFT)
@@ -354,7 +366,9 @@ static void ErrorThread( vpar_thread_t *p_vpar )
  *******************************************************************************/
 static void EndThread( vpar_thread_t *p_vpar )
 {
+#ifdef VDEC_SMP
     int i_dummy;
+#endif
 
     intf_DbgMsg("vpar debug: destroying video parser thread %p\n", p_vpar);
 
@@ -385,14 +399,18 @@ static void EndThread( vpar_thread_t *p_vpar )
         free( p_vpar->sequence.chroma_nonintra_quant.pi_matrix );
     }
 
+#ifdef VDEC_SMP
     /* Destroy vdec threads */
     for( i_dummy = 0; i_dummy < NB_VDEC; i_dummy++ )
     {
-        if( p_vpar->p_vdec[i_dummy] != NULL )
-            vdec_DestroyThread( p_vpar->p_vdec[i_dummy] );
+        if( p_vpar->pp_vdec[i_dummy] != NULL )
+            vdec_DestroyThread( p_vpar->pp_vdec[i_dummy] );
         else
             break;
     }
+#else
+    free( p_vpar->pp_vdec[0] );
+#endif
 
     intf_DbgMsg("vpar debug: EndThread(%p)\n", p_vpar);
 }

@@ -42,8 +42,13 @@
  *****************************************************************************/
 void vpar_InitFIFO( vpar_thread_t * p_vpar )
 {
+#ifdef VDEC_SMP
     int                 i_dummy;
-    
+#endif
+
+    p_vpar->vfifo.p_vpar = p_vpar;
+
+#ifdef VDEC_SMP
     /* Initialize mutex and cond */
     vlc_mutex_init( &p_vpar->vfifo.lock );
     vlc_cond_init( &p_vpar->vfifo.wait );
@@ -51,7 +56,6 @@ void vpar_InitFIFO( vpar_thread_t * p_vpar )
     
     /* Initialize FIFO properties */
     p_vpar->vfifo.i_start = p_vpar->vfifo.i_end = 0;
-    p_vpar->vfifo.p_vpar = p_vpar;
     
     /* Initialize buffer properties */
     p_vpar->vbuffer.i_index = VFIFO_SIZE; /* all structures are available */
@@ -60,4 +64,5 @@ void vpar_InitFIFO( vpar_thread_t * p_vpar )
         p_vpar->vbuffer.pp_mb_free[i_dummy] = p_vpar->vbuffer.p_macroblocks
                                                + i_dummy;
     }
+#endif
 }

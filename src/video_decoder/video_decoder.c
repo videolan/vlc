@@ -44,12 +44,14 @@
 /*
  * Local prototypes
  */
-static int      InitThread          ( vdec_thread_t *p_vdec );
+#ifdef VDEC_SMP
+static int      vdec_InitThread     ( vdec_thread_t *p_vdec );
+static void     vdec_DecodeMacroblock( vdec_thread_t *p_vdec,
+                                       macroblock_t * p_mb );
+#endif
 static void     RunThread           ( vdec_thread_t *p_vdec );
 static void     ErrorThread         ( vdec_thread_t *p_vdec );
 static void     EndThread           ( vdec_thread_t *p_vdec );
-static void     DecodeMacroblock    ( vdec_thread_t *p_vdec,
-                                      macroblock_t * p_mb );
 
 /*******************************************************************************
  * vdec_CreateThread: create a video decoder thread
@@ -109,11 +111,13 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
 
     /* Ask thread to kill itself */
     p_vdec->b_die = 1;
-    /* Make sure the parser thread leaves the GetByte() function */
+
+#ifdef VDEC_SMP
+    /* Make sure the decoder thread leaves the vpar_GetMacroblock() function */
     vlc_mutex_lock( &(p_vdec->p_vpar->vfifo.lock) );
     vlc_cond_signal( &(p_vdec->p_vpar->vfifo.wait) );
     vlc_mutex_unlock( &(p_vdec->p_vpar->vfifo.lock) );
-
+#endif
 
     /* Waiting for the decoder thread to exit */
     /* Remove this as soon as the "status" flag is implemented */
@@ -123,13 +127,17 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
 /* following functions are local */
 
 /*******************************************************************************
- * InitThread: initialize video decoder thread
+ * vdec_InitThread: initialize video decoder thread
  *******************************************************************************
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success. Note that the thread's flag are not
  * modified inside this function.
  *******************************************************************************/
-static int InitThread( vdec_thread_t *p_vdec )
+#ifdef VDEC_SMP
+static int vdec_InitThread( vdec_thread_t *p_vdec )
+#else
+int vdec_InitThread( vdec_thread_t *p_vdec )
+#endif
 {
     int i_dummy;
 
@@ -233,7 +241,7 @@ static __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
 }
 
 /*******************************************************************************
- * DecodeMacroblock : decode a macroblock of a picture
+ * vdec_DecodeMacroblock : decode a macroblock of a picture
  *******************************************************************************/
 #define DECODEBLOCKS( OPBLOCK )                                         \
 {                                                                       \
@@ -283,7 +291,11 @@ static __inline__ void CopyBlock( vdec_thread_t * p_vdec, dctelem_t * p_block,
     }                                                                   \
 }
 
-static __inline__ void DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
+#ifdef VDEC_SMP
+static __inline__ void vdec_DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
+#else
+void vdec_DecodeMacroblock( vdec_thread_t *p_vdec, macroblock_t * p_mb )
+#endif
 {
     if( !(p_mb->i_mb_type & MB_INTRA) )
     {
@@ -321,7 +333,7 @@ static void RunThread( vdec_thread_t *p_vdec )
     /* 
      * Initialize thread and free configuration 
      */
-    p_vdec->b_error = InitThread( p_vdec );
+    p_vdec->b_error = vdec_InitThread( p_vdec );
     if( p_vdec->b_error )
     {
         return;
@@ -338,7 +350,7 @@ static void RunThread( vdec_thread_t *p_vdec )
 
         if( (p_mb = vpar_GetMacroblock( &p_vdec->p_vpar->vfifo )) != NULL )
         {
-            DecodeMacroblock( p_vdec, p_mb );
+            vdec_DecodeMacroblock( p_vdec, p_mb );
         }
     } 
 

@@ -25,13 +25,17 @@ struct vpar_thread_s;
 
 typedef struct video_fifo_s
 {
+#ifdef VDEC_SMP
     vlc_mutex_t         lock;                              /* fifo data lock */
     vlc_cond_t          wait;              /* fifo data conditional variable */
 
     /* buffer is an array of undec_picture_t pointers */
-    macroblock_t *              buffer[VFIFO_SIZE + 1];
-    int                         i_start;
-    int                         i_end;
+    macroblock_t *      buffer[VFIFO_SIZE + 1];
+    int                 i_start;
+    int                 i_end;
+#else
+    macroblock_t        buffer;
+#endif
 
     struct vpar_thread_s *      p_vpar;
 } video_fifo_t;
@@ -42,6 +46,7 @@ typedef struct video_fifo_s
  * This structure enables the parser to maintain a list of free
  * macroblock_t structures
  *****************************************************************************/
+#ifdef VDEC_SMP
 typedef struct video_buffer_s
 {
     vlc_mutex_t         lock;                            /* buffer data lock */
@@ -50,6 +55,7 @@ typedef struct video_buffer_s
     macroblock_t *      pp_mb_free[VFIFO_SIZE+1];          /* this is a LIFO */
     int                 i_index;
 } video_buffer_t;
+#endif
 
 /*****************************************************************************
  * vpar_thread_t: video parser thread descriptor
@@ -79,12 +85,13 @@ typedef struct vpar_thread_s
 
     /* Output properties */
     vout_thread_t *     p_vout;                       /* video output thread */
-    int                 i_stream;                         /* video stream id */
     
     /* Decoder properties */
-    struct vdec_thread_s *      p_vdec[NB_VDEC];
+    struct vdec_thread_s *      pp_vdec[NB_VDEC];
     video_fifo_t                vfifo;
+#ifdef VDEC_SMP
     video_buffer_t              vbuffer;
+#endif
 
     /* Parser properties */
     sequence_t              sequence;

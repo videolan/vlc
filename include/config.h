@@ -285,8 +285,11 @@
 
 #define VPAR_IDLE_SLEEP                 100000
 
+/* Time to sleep when waiting for a buffer (from vout or the video fifo). */
 #define VPAR_OUTMEM_SLEEP               50000
-                                        
+
+/* The following directives only apply if you define VDEC_SMP below. */
+
 /* Number of macroblock buffers available. It should be always greater than
  * twice the number of macroblocks in a picture. VFIFO_SIZE + 1 should also
  * be a power of two. */
@@ -299,15 +302,16 @@
  * Video decoder configuration
  *******************************************************************************/
 
+//#define VDEC_SMP
+
 #define VDEC_IDLE_SLEEP                 100000
 
 /* Number of video_decoder threads to launch on startup of the video_parser.
  * It should always be less than half the number of macroblocks of a
- * picture. */
+ * picture. Only available if you defined VDEC_SMP above. */
 #define NB_VDEC                         1
 
-/* Maximum range of values out of the IDCT + motion compensation. Only
- * used if you define MPEG2_COMPLIANT above. */
+/* Maximum range of values out of the IDCT + motion compensation. */
 #define VDEC_CROPRANGE                  2048
 
 /*******************************************************************************
