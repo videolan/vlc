@@ -82,7 +82,7 @@ vlc_module_begin();
     add_shortcut("volnorm");
     add_integer("norm-buff-size" , 20 , NULL , BUFF_TEXT, BUFF_LONGTEXT,
                 VLC_TRUE);
-    add_float("norm-max-level",2.0,NULL,"pouet","pouetpouet",VLC_TRUE);
+    add_float("norm-max-level",2.0,NULL,LEVEL_TEXT,LEVEL_LONGTEXT,VLC_TRUE);
     set_capability( "audio filter", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
