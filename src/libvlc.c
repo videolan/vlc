@@ -6,7 +6,7 @@
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *          Derk-Jan Hartman <hartman at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -352,7 +352,17 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
 #ifndef WIN32
     if( config_GetInt( p_vlc, "daemon" ) )
     {
-        pid_t i_pid = 0;
+#if HAVE_DAEMON
+        if( daemon( 0, 0) != 0 )
+        {
+            msg_Err( p_vlc, "Unable to fork vlc to daemon mode" );
+            b_exit = VLC_TRUE;
+        }
+
+        p_vlc->p_libvlc->b_daemon = VLC_TRUE;
+
+#else
+        pid_t i_pid;
 
         if( ( i_pid = fork() ) < 0 )
         {
@@ -369,12 +379,13 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         {
             /* We are the child */
             msg_Dbg( p_vlc, "daemon spawned" );
-            close( 0 );
-            close( 1 );
-            close( 2 );
+            close( STDIN_FILENO );
+            close( STDOUT_FILENO );
+            close( STDERR_FILENO );
 
             p_vlc->p_libvlc->b_daemon = VLC_TRUE;
         }
+#endif
     }
 #endif
 

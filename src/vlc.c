@@ -6,7 +6,7 @@
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
- *          Gildas Bazin <gbazin@netcourrier.com>
+ *          Gildas Bazin <gbazin@videolan.org>
  *          Derk-Jan Hartman <hartman at videolan dot org>
  *          Lots of other people, see the libvlc AUTHORS file
  *
@@ -51,7 +51,6 @@ static void SigHandler  ( int i_signal );
 int main( int i_argc, char *ppsz_argv[] )
 {
     int i_ret;
-    int b_cli = VLC_FALSE ;
 
 #ifndef SYS_DARWIN
     /* This clutters OSX GUI error logs */
@@ -156,4 +155,3 @@ static void SigHandler( int i_signal )
     }
 }
 #endif
-
