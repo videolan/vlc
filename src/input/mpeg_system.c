@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.59 2001/10/01 16:18:48 massiot Exp $
+ * $Id: mpeg_system.c,v 1.60 2001/10/21 23:17:03 lool Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1550,10 +1550,9 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
 
         /* inform interface that stream has changed */
         p_input->stream.b_changed = 1;
+        /*  Remove lock */
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
     
 #undef p_psi
-
-    /*  Remove lock */
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
