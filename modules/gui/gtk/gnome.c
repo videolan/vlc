@@ -2,7 +2,7 @@
  * gnome.c : Gnome plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: gnome.c,v 1.9 2003/01/31 09:51:57 sam Exp $
+ * $Id: gnome.c,v 1.10 2003/02/05 22:11:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -252,6 +252,12 @@ static void Run( intf_thread_t *p_intf )
 
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_popup),
                          "p_intf", p_intf );
+    gtk_object_set_data( GTK_OBJECT( gtk_object_get_data(
+                             GTK_OBJECT(p_intf->p_sys->p_popup),
+                             "popup_audio" ) ), "p_intf", p_intf );
+    gtk_object_set_data( GTK_OBJECT( gtk_object_get_data(
+                             GTK_OBJECT(p_intf->p_sys->p_popup),
+                             "popup_video" ) ), "p_intf", p_intf );
 
     gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playwin ),
                          "p_intf", p_intf );

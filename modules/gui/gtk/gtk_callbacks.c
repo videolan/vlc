@@ -2,7 +2,7 @@
  * gtk_callbacks.c : Callbacks for the Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_callbacks.c,v 1.11 2003/01/31 10:54:07 sam Exp $
+ * $Id: gtk_callbacks.c,v 1.12 2003/02/05 22:11:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -72,11 +72,15 @@ void * E_(__GtkGetIntf)( GtkWidget * widget )
 
         /* Otherwise, the parent widget has it */
         widget = gtk_menu_get_attach_widget( GTK_MENU( widget ) );
+        p_data = gtk_object_get_data( GTK_OBJECT( widget ), "p_intf" );
+        if( p_data )
+        {
+            return p_data;
+        }
     }
 
     /* We look for the top widget */
     widget = gtk_widget_get_toplevel( GTK_WIDGET( widget ) );
-
     p_data = gtk_object_get_data( GTK_OBJECT( widget ), "p_intf" );
 
     return p_data;

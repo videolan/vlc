@@ -2,7 +2,7 @@
  * display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: display.c,v 1.8 2003/01/27 17:41:01 ipkiss Exp $
+ * $Id: display.c,v 1.9 2003/02/05 22:11:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -214,7 +214,7 @@ gint E_(GtkModeManage)( intf_thread_t * p_intf )
                                   FALSE );
         gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_navigation"),
                                   FALSE );
-        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_audio"), FALSE );
+        gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_language"), FALSE );
         gtk_widget_set_sensitive( GETWIDGET(p_popup,"popup_subpictures"),
                                   FALSE );
     }

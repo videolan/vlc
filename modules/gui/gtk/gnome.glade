@@ -1259,17 +1259,17 @@
 
   <widget>
     <class>GtkMenuItem</class>
-    <name>audio1</name>
+    <name>popup_audio</name>
     <label>Audio</label>
     <right_justify>False</right_justify>
 
     <widget>
       <class>GtkMenu</class>
-      <name>audio1_menu</name>
+      <name>popup_audio_menu</name>
 
       <widget>
 	<class>GtkPixmapMenuItem</class>
-	<name>popup_audio</name>
+	<name>popup_language</name>
 	<sensitive>False</sensitive>
 	<tooltip>Select audio channel</tooltip>
 	<label>_Language</label>
@@ -1343,13 +1343,13 @@
 
   <widget>
     <class>GtkMenuItem</class>
-    <name>video1</name>
+    <name>popup_video</name>
     <label>Video</label>
     <right_justify>False</right_justify>
 
     <widget>
       <class>GtkMenu</class>
-      <name>video1_menu</name>
+      <name>popup_video_menu</name>
 
       <widget>
 	<class>GtkPixmapMenuItem</class>

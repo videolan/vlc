@@ -2,7 +2,7 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.7 2003/01/28 12:30:44 gbazin Exp $
+ * $Id: menu.c,v 1.8 2003/02/05 22:11:52 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -113,7 +113,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf );
 
 void GtkMenubarAudioToggle( GtkCheckMenuItem * menuitem, gpointer user_data )
 {
-    GTKLANGTOGGLE( p_popup, "popup_audio", AUDIO_ES,
+    GTKLANGTOGGLE( p_popup, "popup_language", AUDIO_ES,
                    GtkPopupAudioToggle, b_audio_update );
 }
 
@@ -1416,7 +1416,7 @@ gint GtkSetupMenus( intf_thread_t * p_intf )
                              p_intf->p_sys->p_window ), "menubar_audio" ) );
 
         p_popup_menu = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
-                     p_intf->p_sys->p_popup ), "popup_audio" ) );
+                     p_intf->p_sys->p_popup ), "popup_language" ) );
 
         p_intf->p_sys->b_audio_update = VLC_TRUE;
         GtkLanguageMenus( p_intf, p_menubar_menu, p_audio_es, AUDIO_ES,
