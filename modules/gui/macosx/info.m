@@ -104,6 +104,7 @@
         [self createInfoView: p_cat];
     }
     vlc_mutex_unlock( &p_input->p_item->lock );
+    vlc_object_release( p_input );
 
     i_select = [o_selector indexOfItemWithTitle:o_selectedPane];
     if ( i_select < 0 )
