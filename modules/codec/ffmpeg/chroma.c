@@ -2,7 +2,7 @@
  * chroma.c: chroma conversion using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: chroma.c,v 1.5 2003/11/26 22:12:48 gbazin Exp $
+ * $Id: chroma.c,v 1.6 2003/11/26 22:18:29 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -197,7 +197,7 @@ static void ChromaConversion( vout_thread_t *p_vout,
  *****************************************************************************
  * This function frees the previously allocated chroma function
  *****************************************************************************/
-static void E_(CloseChroma)( vlc_object_t *p_this )
+void E_(CloseChroma)( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
