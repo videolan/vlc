@@ -41,7 +41,7 @@ Description: GNOME frontend for VLC
 
 Package: vlc-gnome
 Architecture: any
-Depends: gnome-vlc
+Depends: vlc, gnome-vlc
 Description: legacy package that you should remove
  This package is now called gnome-vlc.
 
@@ -57,7 +57,7 @@ Description: Gtk+ frontend for VLC
 
 Package: vlc-gtk
 Architecture: any
-Depends: gvlc
+Depends: vlc, gvlc
 Description: legacy package that you should remove
  This package is now called gvlc.
 
@@ -73,7 +73,7 @@ Description: Esound audio output plugin for VLC
 
 Package: vlc-esd
 Architecture: any
-Depends: vlc-plugin-esd
+Depends: vlc, vlc-plugin-esd
 Description: legacy package that you should remove
  This package is now called vlc-plugin-esd.
 
@@ -89,7 +89,7 @@ Description: ALSA audio output plugin for VLC
 
 Package: vlc-alsa
 Architecture: any
-Depends: vlc-plugin-alsa
+Depends: vlc, vlc-plugin-alsa
 Description: legacy package that you should remove
  This package is now called vlc-plugin-alsa.
 
@@ -106,7 +106,7 @@ Description: SDL video and audio output plugin for VLC
 
 Package: vlc-sdl
 Architecture: any
-Depends: vlc-plugin-sdl
+Depends: vlc, vlc-plugin-sdl
 Description: legacy package that you should remove
  This package is now called vlc-plugin-sdl.
 
@@ -122,7 +122,7 @@ Description: GGI video output plugin for VLC
 
 Package: vlc-ggi
 Architecture: any
-Depends: vlc-plugin-ggi
+Depends: vlc, vlc-plugin-ggi
 Description: legacy package that you should remove
  This package is now called vlc-plugin-ggi.
 
@@ -138,7 +138,7 @@ Description: Glide video output plugin for VLC
 
 Package: vlc-glide
 Architecture: i386
-Depends: vlc-plugin-glide
+Depends: vlc, vlc-plugin-glide
 Description: legacy package that you should remove
  This package is now called vlc-plugin-glide.
 
@@ -154,7 +154,7 @@ Description: Qt frontend for VLC
 
 Package: vlc-qt
 Architecture: any
-Depends: qvlc
+Depends: vlc, qvlc
 Description: legacy package that you should remove
  This package is now called qvlc.
 

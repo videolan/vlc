@@ -1,3 +1,10 @@
+vlc (0.5.2-3) unstable; urgency=low
+
+  * Added explicit dependencies on vlc to legacy packages to make linda and
+    lintian happier.
+
+ -- Samuel Hocevar <sam@zoy.org>  Tue, 25 Mar 2003 23:21:51 +0100
+
 vlc (0.5.2-2) unstable; urgency=low
 
   * Bumped up standards version to 0.5.9.0.
