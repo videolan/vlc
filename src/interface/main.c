@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.132.2.2 2001/12/17 03:48:12 sam Exp $
+ * $Id: main.c,v 1.132.2.3 2001/12/29 03:45:30 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -344,7 +344,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         PRINT_CAPABILITY( CPU_CAPABILITY_MMXEXT, "MMXEXT" );
         PRINT_CAPABILITY( CPU_CAPABILITY_SSE, "SSE" );
         PRINT_CAPABILITY( CPU_CAPABILITY_ALTIVEC, "Altivec" );
-        intf_StatMsg("info: CPU has capabilities %s", p_capabilities );
+        PRINT_CAPABILITY( CPU_CAPABILITY_FPU, "FPU" );
+        intf_StatMsg("info: CPU has capabilities : %s", p_capabilities );
     }
 
     /*
