@@ -2,7 +2,7 @@
  * dts.c: parse DTS audio sync info and packetize the stream
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dts.c,v 1.14 2004/02/03 23:32:45 gbazin Exp $
+ * $Id: dts.c,v 1.15 2004/02/04 23:55:03 gbazin Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -334,8 +334,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
 
     p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
     p_dec->fmt_out.audio.i_channels = p_sys->i_channels;
-    /* Hack for DTS S/PDIF filter which needs to send 3 frames at a time */
-    p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size * 3;
+    p_dec->fmt_out.audio.i_bytes_per_frame = p_sys->i_frame_size;
     p_dec->fmt_out.audio.i_frame_length = p_sys->i_frame_length;
 
     p_dec->fmt_out.audio.i_original_channels = p_sys->i_channels_conf;
@@ -368,8 +367,11 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     aout_buffer_t *p_buf;
 
-    p_buf = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_frame_length );
+    /* Hack for DTS S/PDIF filter which needs to send 3 frames at a time */
+    p_buf = p_dec->pf_aout_buffer_new( p_dec, p_sys->i_frame_length * 3 );
     if( p_buf == NULL ) return NULL;
+    p_buf->i_nb_samples = p_sys->i_frame_length;
+    p_buf->i_nb_bytes = p_sys->i_frame_size;
 
     p_buf->start_date = aout_DateGet( &p_sys->end_date );
     p_buf->end_date =
