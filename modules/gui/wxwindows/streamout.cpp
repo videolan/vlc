@@ -65,7 +65,7 @@ enum
     EncapsulationRadio3_Event, EncapsulationRadio4_Event,
     EncapsulationRadio5_Event, EncapsulationRadio6_Event,
     EncapsulationRadio7_Event, EncapsulationRadio8_Event,
-    EncapsulationRadio9_Event,
+    EncapsulationRadio9_Event, EncapsulationRadio10_Event,
 
     VideoTranscEnable_Event, VideoTranscCodec_Event, VideoTranscBitrate_Event,
     VideoTranscScale_Event,
@@ -296,6 +296,9 @@ void SoutDialog::UpdateMRL()
         break;
     case ASF_ENCAPSULATION:
         encapsulation = wxT("asf");
+        break;
+    case WAV_ENCAPSULATION:
+        encapsulation = wxT("wav");
         break;
     case TS_ENCAPSULATION:
     default:
@@ -588,15 +591,15 @@ wxPanel *SoutDialog::EncapsulationPanel( wxWindow* parent )
         wxT("MPEG PS"),
         wxT("MPEG 1"),
         wxT("Ogg"),
-        wxT("Raw"),
         wxT("ASF"),
-        wxT("AVI"),
         wxT("MP4"),
-        wxT("MOV")
+        wxT("MOV"),
+        wxT("WAV"),
+        wxT("Raw")
     };
 
     /* Stuff everything into the main panel */
-    for( i=0; i < ENCAPS_NUM; i++ )
+    for( i = 0; i < WXSIZEOF(encapsulation_array); i++ )
     {
         encapsulation_radios[i] =
             new wxRadioButton( panel, EncapsulationRadio1_Event + i,
@@ -604,6 +607,13 @@ wxPanel *SoutDialog::EncapsulationPanel( wxWindow* parent )
         panel_sizer->Add( encapsulation_radios[i], 0,
                           wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL |
                           wxALL, 4 );
+    }
+    /* Hide avi one */
+    for( i = WXSIZEOF(encapsulation_array); i < ENCAPS_NUM; i++ )
+    {
+        encapsulation_radios[i] =
+            new wxRadioButton( panel, EncapsulationRadio1_Event + i, wxT("") );
+        encapsulation_radios[i]->Hide();
     }
 
     panel->SetSizerAndFit( panel_sizer );
@@ -710,12 +720,15 @@ wxPanel *SoutDialog::TranscodingPanel( wxWindow* parent )
     static const wxString wxacodecs_array[] =
     {
         wxT("mpga"),
+        wxT("mp2a"),
         wxT("mp3"),
         wxT("mp4a"),
         wxT("a52"),
         wxT("vorb"),
         wxT("flac"),
-        wxT("spx")
+        wxT("spx"),
+        wxT("s16l"),
+        wxT("fl32")
     };
     static const wxString achannels_array[] =
     {
