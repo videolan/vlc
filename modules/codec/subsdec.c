@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.14 2003/12/14 23:14:20 hartman Exp $
+ * $Id: subsdec.c,v 1.15 2004/01/07 16:54:47 hartman Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -197,14 +197,15 @@ static void DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
     /* Here we are dealing with text subtitles */
     p_vout = vlc_object_find( p_dec, VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( !p_vout )
+    if( p_vout )
+    {
+        ParseText( p_dec, *pp_block, p_vout );
+        vlc_object_release( p_vout );
+    }
+    else
     {
         msg_Warn( p_dec, "couldn't find a video output, trashing subtitle" );
-        return;
     }
-
-    ParseText( p_dec, *pp_block, p_vout );
-    vlc_object_release( p_vout );
 
     block_Release( *pp_block );
     *pp_block = NULL;
