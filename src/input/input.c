@@ -52,179 +52,174 @@
 /******************************************************************************
  * Local prototypes
  ******************************************************************************/
-static void input_Thread( input_thread_t *p_input );
-static void ErrorThread( input_thread_t *p_input );
-static void EndThread( input_thread_t *p_input );
-static __inline__ int input_ReadPacket( input_thread_t *p_input );
-static __inline__ void input_SortPacket( input_thread_t *p_input,
-                                         ts_packet_t *ts_packet );
-static __inline__ void input_DemuxTS( input_thread_t *p_input,
-                                      ts_packet_t *ts_packet,
-                                      es_descriptor_t *es_descriptor );
-static __inline__ void input_DemuxPES( input_thread_t *p_input,
+static void RunThread   ( input_thread_t *p_input );
+static void ErrorThread ( input_thread_t *p_input );
+static void EndThread   ( input_thread_t *p_input );
+
+static __inline__ int   input_ReadPacket( input_thread_t *p_input );
+static __inline__ void  input_SortPacket( input_thread_t *p_input,
+                                          ts_packet_t *ts_packet );
+static __inline__ void  input_DemuxTS( input_thread_t *p_input,
                                        ts_packet_t *ts_packet,
-                                       es_descriptor_t *p_es_descriptor,
-                                       boolean_t b_unit_start, boolean_t b_packet_lost );
-static __inline__ void input_DemuxPSI( input_thread_t *p_input,
-                                       ts_packet_t *ts_packet,
-                                       es_descriptor_t *p_es_descriptor,
-                                       boolean_t b_unit_start, boolean_t b_packet_lost );
+                                       es_descriptor_t *es_descriptor );
+static __inline__ void  input_DemuxPES( input_thread_t *p_input,
+                                        ts_packet_t *ts_packet,
+                                        es_descriptor_t *p_es_descriptor,
+                                        boolean_t b_unit_start, boolean_t b_packet_lost );
+static __inline__ void  input_DemuxPSI( input_thread_t *p_input,
+                                        ts_packet_t *ts_packet,
+                                        es_descriptor_t *p_es_descriptor,
+                                        boolean_t b_unit_start, boolean_t b_packet_lost );
 
 /*******************************************************************************
- * input_CreateThread: initialize and spawn an input thread
+ * input_CreateThread: creates a new input thread
  *******************************************************************************
- * This function initializes and spawns an input thread. It returns NULL on
- * failure. If you want a better understanding of the input thread, don't start
- * by reading this function :-).
+ * This function creates a new input, and returns a pointer
+ * to its description. On error, it returns NULL.
+ * If pi_status is NULL, then the function will block until the thread is ready.
+ * If not, it will be updated using one of the THREAD_* constants.
  *******************************************************************************/
-input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
+input_thread_t *input_CreateThread ( int i_method, char *psz_source, int i_port, int i_vlan,
+                                     p_vout_thread_t p_vout, p_aout_thread_t p_aout, int *pi_status )
 {
-    input_thread_t *    p_input;
-    int i_index;
+    input_thread_t *    p_input;                          /* thread descriptor */
+    int                 i_status;                             /* thread status */    
+    int                 i_index;            /* index for tables initialization */    
     
-    intf_DbgMsg("input debug 1-1: creating thread (cfg : %p)\n", p_cfg );
-
-    /* Allocate input_thread_t structure. */
-    if( !( p_input = (input_thread_t *)malloc(sizeof(input_thread_t)) ) )
+    /* Allocate descriptor */
+    intf_DbgMsg("\n");
+    p_input = (input_thread_t *)malloc( sizeof(input_thread_t) );
+    if( p_input == NULL )
     {
-        intf_ErrMsg("input error: can't allocate input thread structure (%s)\n",
-                    strerror(errno));
+        intf_ErrMsg("error: %s\n", strerror(ENOMEM));
         return( NULL );
     }
-    /* Init it */
-    bzero( p_input, sizeof(input_thread_t));
+
+    /* Initialize thread properties */
+    p_input->b_die              = 0;
+    p_input->b_error            = 0;
+    p_input->pi_status          = (pi_status != NULL) ? pi_status : &i_status;
+    *p_input->pi_status         = THREAD_CREATE;
+
+    /* Initialize input method description */
+    p_input->i_method           = i_method;
+    p_input->psz_source         = psz_source;
+    p_input->i_port             = i_port;
+    p_input->i_vlan             = i_vlan;
+    switch( i_method )
+    {
+    case INPUT_METHOD_TS_FILE:                                 /* file methods */
+        p_input->p_Open =   input_FileOpen;
+        p_input->p_Read =   input_FileRead;
+        p_input->p_Close =  input_FileClose;
+        break;
+    case INPUT_METHOD_TS_VLAN_BCAST:                    /* vlan network method */        
+        if( !p_main->b_vlans )
+        {
+            intf_ErrMsg("error: vlans are not activated\n");
+            free( p_input );
+            return( NULL );            
+        }        
+        /* ... pass through */
+    case INPUT_METHOD_TS_UCAST:                             /* network methods */
+    case INPUT_METHOD_TS_MCAST:
+    case INPUT_METHOD_TS_BCAST:
+        p_input->p_Open =   input_NetworkOpen;
+        p_input->p_Read =   input_NetworkRead;
+        p_input->p_Close =  input_NetworkClose;
+        break;
+    default:
+        intf_ErrMsg("error: unknow input method\n");
+        free( p_input );
+        return( NULL );  
+        break;            
+    }
+
+    /* Initialize stream description */
     for( i_index = 0; i_index < INPUT_MAX_ES; i_index++ )
     {
         p_input->p_es[i_index].i_id = EMPTY_PID;
     }
-
-    /* Find out which method we are gonna use and retrieve pointers. */
-    if( !((p_cfg->i_properties) & INPUT_CFG_METHOD) )
-    {
-        /* i_method is not set. */
-        intf_DbgMsg("input debug: using default method (%d)\n",
-                    INPUT_DEFAULT_METHOD);
-        p_cfg->i_method = INPUT_DEFAULT_METHOD;
-        p_cfg->i_properties |= INPUT_CFG_METHOD;
-    }
-    p_input->i_method = p_cfg->i_method;
-    switch( p_cfg->i_method )
-    {
-        /* File methods */
-        case INPUT_METHOD_TS_FILE:
-#ifdef OLD_DECODER
-            p_input->p_open = &input_FileCreateMethod;
-            p_input->p_read = &input_FileRead;
-            p_input->p_clean = &input_FileDestroyMethod;
-#else
-            p_input->p_open = input_FileCreateMethod;
-            p_input->p_read = input_FileRead;
-            p_input->p_clean = input_FileDestroyMethod;
-#endif
-            break;
-
-        /* Network methods */
-        case INPUT_METHOD_TS_UCAST:
-        case INPUT_METHOD_TS_MCAST:
-        case INPUT_METHOD_TS_BCAST:
-        case INPUT_METHOD_TS_VLAN_BCAST:
-#ifdef OLD_DECODER
-            p_input->p_open = &input_NetworkCreateMethod;
-            p_input->p_read = &input_NetworkRead;
-            p_input->p_clean = &input_NetworkDestroyMethod;
-#else
-            p_input->p_open = input_NetworkCreateMethod;
-            p_input->p_read = input_NetworkRead;
-            p_input->p_clean = input_NetworkDestroyMethod;
-#endif
-            break;
-
-        case INPUT_METHOD_NONE:
-        default:
-#ifdef DEBUG
-            /* Internal error, which should never happen */
-            intf_DbgMsg("input debug: unknow method type %d\n",
-                            p_cfg->i_method);
-            return( NULL );
-#endif
-            break;
-    }
-
-    /* Initialize PSI decoder. */
-    intf_DbgMsg("Initializing PSI decoder\n");
-    if( input_PsiInit( p_input ) == -1 )
-    {
-        free( p_input );
-        return( NULL );
-    }
-
-    /* Initialize PCR decoder. */
-    intf_DbgMsg("Initializing PCR decoder\n");
-    if( input_PcrInit( p_input ) == -1 )
-    {
-        input_PsiClean( p_input );
-        free( p_input );
-        return( NULL );
-    }
-
-    /* Initialize netlists. */
-    if( input_NetlistOpen( p_input ) )
-    {
-        input_PsiClean( p_input );
-        input_PcrClean( p_input );
-        free( p_input );
-        return( NULL );
-    }
+    
+    /* Initialize default settings for spawned decoders */
+    p_input->p_aout                     = p_aout;
+    p_input->p_vout                     = p_vout; 
 
 #ifdef STATS
-    /* Initialize counters. */
-    p_input->c_bytes = 0;
-    p_input->c_payload_bytes = 0;
-    p_input->c_ts_packets_read = 0;
-    p_input->c_ts_packets_trashed = 0;
-#ifdef DEBUG
-    p_input->c_loops = 0;
-#endif
+    /* Initialize statistics */
+    p_input->c_loops                    = 0;    
+    p_input->c_bytes                    = 0;
+    p_input->c_payload_bytes            = 0;
+    p_input->c_packets_read             = 0;
+    p_input->c_packets_trashed          = 0;
 #endif
 
-    /* Let the appropriate method open the socket. */
-    if( (*(p_input->p_open))( p_input, p_cfg ) == -1 )
+    /* Initialize PSI and PCR decoders */
+    if( input_PsiInit( p_input ) )
     {
-        input_NetlistClean( p_input );
-        input_PsiClean( p_input );
-        input_PcrClean( p_input );
         free( p_input );
         return( NULL );
     }
 
-    intf_DbgMsg("input debug: method %d properly initialized the socket\n",
-                p_input->i_method);
+    if( input_PcrInit( p_input ) )
+    {
+        input_PsiEnd( p_input );
+        free( p_input );
+        return( NULL );
+    }
+
+    /* Initialize netlists */
+    if( input_NetlistInit( p_input ) )
+    {
+        input_PsiEnd( p_input );
+        input_PcrEnd( p_input );
+        free( p_input );
+        return( NULL );
+    }
+
+    intf_DbgMsg("configuration: method=%d, source=%s, port=%d, vlan=%d\n", 
+                i_method, psz_source, i_port, i_vlan );    
+
+    /* Let the appropriate method open the socket. */
+    if( p_input->p_Open( p_input ) )
+    {
+        input_NetlistEnd( p_input );
+        input_PsiEnd( p_input );
+        input_PcrEnd( p_input );
+        free( p_input );
+        return( NULL );
+    }
 
     /* Create thread and set locks. */
-    p_input->b_die = 0;
     vlc_mutex_init( &p_input->netlist.lock );
     vlc_mutex_init( &p_input->programs_lock );
     vlc_mutex_init( &p_input->es_lock );
-#ifdef NO_THREAD
-    input_Thread( p_input );
-#else
-    if( vlc_thread_create(&p_input->thread_id, "input", (vlc_thread_func_t)input_Thread, 
-                       (void *) p_input) )
+    if( vlc_thread_create(&p_input->thread_id, "input", (void *) RunThread, (void *) p_input) )
     {
-        intf_ErrMsg("input error: can't spawn input thread (%s)\n", 
-                    strerror(errno) );
-        (*p_input->p_clean)( p_input );
-        input_NetlistClean( p_input );;
-        input_PsiClean( p_input );
-        input_PcrClean( p_input );
+        intf_ErrMsg("error: %s\n", strerror(errno) );
+        p_input->p_Close( p_input );
+        input_NetlistEnd( p_input );;
+        input_PsiEnd( p_input );
+        input_PcrEnd( p_input );
         free( p_input );
         return( NULL );
     }
-#endif
-
-    /* Default setting for new decoders */
-    p_input->p_aout = p_cfg->p_aout;
-
+ 
+    intf_Msg("Input initialized\n");
+ 
+    /* If status is NULL, wait until the thread is created */
+    if( pi_status == NULL )
+    {
+        do
+        {            
+            msleep( THREAD_SLEEP );
+        }while( (i_status != THREAD_READY) && (i_status != THREAD_ERROR) 
+                && (i_status != THREAD_FATAL) );
+        if( i_status != THREAD_READY )
+        {
+            return( NULL );            
+        }        
+    }
     return( p_input );
 }
 
@@ -233,13 +228,26 @@ input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
  ******************************************************************************
  * This function should not return until the thread is effectively cancelled.
  ******************************************************************************/
-void input_DestroyThread( input_thread_t *p_input )
+void input_DestroyThread( input_thread_t *p_input, int *pi_status )
 {
-    intf_DbgMsg("input debug: requesting termination of input thread\n");
-    p_input->b_die = 1;                          /* ask thread to kill itself */
+    int         i_status;                                    /* thread status */
 
-    /* Remove this as soon as the "status" flag is implemented */
-    vlc_thread_join( p_input->thread_id );            /* wait until it's done */
+    /* Set status */
+    p_input->pi_status = (pi_status != NULL) ? pi_status : &i_status;
+    *p_input->pi_status = THREAD_DESTROY;    
+     
+    /* Request thread destruction */
+    p_input->b_die = 1;
+
+    /* If status is NULL, wait until thread has been destroyed */
+    if( pi_status == NULL )
+    {
+        do
+        {
+            msleep( THREAD_SLEEP );
+        }while( (i_status != THREAD_OVER) && (i_status != THREAD_ERROR) 
+                && (i_status != THREAD_FATAL) );   
+    }
 }
 
 #if 0
@@ -289,13 +297,42 @@ void input_CloseVideoStream( input_thread_t *p_input, int i_id )
 /* following functions are local */
 
 /*******************************************************************************
- * input_Thread: input thread
+ * InitThread: initialize input thread
+ *******************************************************************************
+ * This function is called from RunThread and performs the second step of the
+ * initialization. It returns 0 on success. Note that the thread's flag are not
+ * modified inside this function.
+ *******************************************************************************/
+static int InitThread( input_thread_t *p_input )
+{
+    /* Mark thread as running and return */
+    intf_DbgMsg("\n");
+    *p_input->pi_status =        THREAD_READY;    
+    intf_DbgMsg("thread ready\n");    
+    return( 0 );    
+}
+
+/*******************************************************************************
+ * RunThread: main thread loop
  *******************************************************************************
  * Thread in charge of processing the network packets and demultiplexing.
  *******************************************************************************/
-static void input_Thread( input_thread_t *p_input )
+static void RunThread( input_thread_t *p_input )
 {
-    intf_DbgMsg("input debug 11-1: thread %p is active\n", p_input);
+    /* 
+     * Initialize thread and free configuration 
+     */
+    p_input->b_error = InitThread( p_input );
+    if( p_input->b_error )
+    {
+        free( p_input );                                 /* destroy descriptor */
+        return;        
+    }
+
+    /*
+     * Main loop
+     */
+    intf_DbgMsg("\n");
     while( !p_input->b_die && !p_input->b_error )
     {
         /* Scatter read the UDP packet from the network or the file. */
@@ -311,27 +348,33 @@ static void input_Thread( input_thread_t *p_input )
 #endif
     }
 
+    /*
+     * Error loop
+     */
     if( p_input->b_error )
     {
         ErrorThread( p_input );
     }
 
-    /* Ohoh, we have to die as soon as possible. */
+    /* End of thread */
     EndThread( p_input );
-
-    intf_DbgMsg("input debug: thread %p destroyed\n", p_input);
-    vlc_thread_exit();
+    intf_DbgMsg("thread end\n");
 }
 
 
 /******************************************************************************
  * ErrorThread: RunThread() error loop
+ *******************************************************************************
+ * This function is called when an error occured during thread main's loop. 
  ******************************************************************************/
 static void ErrorThread( input_thread_t *p_input )
 {
+    /* Wait until a `die' order */
+    intf_DbgMsg("\n");
     while( !p_input->b_die )
     {
-        msleep( INPUT_IDLE_SLEEP );
+        /* Sleep a while */
+        msleep( VOUT_IDLE_SLEEP );
     }
 }
 
@@ -340,52 +383,54 @@ static void ErrorThread( input_thread_t *p_input )
  *******************************************************************************/
 static void EndThread( input_thread_t * p_input )
 {
-    int i_es_loop;
+    int *       pi_status;                                    /* threas status */
+    int         i_es_loop;                                         /* es index */
 
-    (*p_input->p_clean)( p_input );           /* close input method */
+    /* Store status */
+    intf_DbgMsg("\n");
+    pi_status = p_input->pi_status;    
+    *pi_status = THREAD_END;  
 
-    /* Destroy all decoder threads. */
-    for( i_es_loop = 0; i_es_loop < INPUT_MAX_ES; i_es_loop++ )
+    /* Close input method */
+    p_input->p_Close( p_input );
+
+    /* Destroy all decoder threads */
+    for( i_es_loop = 0; 
+         (i_es_loop < INPUT_MAX_ES) && (p_input->pp_selected_es[i_es_loop] != NULL) ; 
+         i_es_loop++ )
     {
-        if( p_input->pp_selected_es[i_es_loop] )
+        switch( p_input->pp_selected_es[i_es_loop]->i_type )
         {
-            switch( p_input->pp_selected_es[i_es_loop]->i_type )
-            {
-                case MPEG1_VIDEO_ES:
-                case MPEG2_VIDEO_ES:
+        case MPEG1_VIDEO_ES:
+        case MPEG2_VIDEO_ES:
 #ifdef OLD_DECODER
-                    vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
+            vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
 #else
-                    vpar_DestroyThread( (vpar_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
+            vpar_DestroyThread( (vpar_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
 #endif
-                    break;
-
-                case MPEG1_AUDIO_ES:
-                case MPEG2_AUDIO_ES:
-                    adec_DestroyThread( (adec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) );
-                    break;
-
-                case AC3_AUDIO_ES:
-                    ac3dec_DestroyThread( (ac3dec_thread_t *)(p_input->pp_selected_es[i_es_loop]->p_dec) );
-                    break;
-
-                default:
-                    break;
-            }
-        }
-        else
-        {
-            /* pp_selected_es should not contain any hole. */
+            break;            
+        case MPEG1_AUDIO_ES:
+        case MPEG2_AUDIO_ES:
+            adec_DestroyThread( (adec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) );
             break;
+        case AC3_AUDIO_ES:
+            ac3dec_DestroyThread( (ac3dec_thread_t *)(p_input->pp_selected_es[i_es_loop]->p_dec) );
+            break;
+#ifdef DEBUG
+        default:
+            intf_DbgMsg("error: unknown decoder type %d\n", p_input->pp_selected_es[i_es_loop]->i_type );
+            break;                
+#endif
         }
     }
 
-    input_NetlistClean( p_input );                           /* clean netlist */
-    input_PsiClean( p_input );                       /* clean PSI information */
-    input_PcrClean( p_input );                       /* clean PCR information */
-    free( p_input );                           /* free input_thread structure */
+    input_NetlistEnd( p_input );                              /* clean netlist */
+    input_PsiEnd( p_input );                          /* clean PSI information */
+    input_PcrEnd( p_input );                          /* clean PCR information */
+    free( p_input );                            /* free input_thread structure */
 
-    intf_DbgMsg("input debug: EndThread(%p)\n", p_input);
+    /* Update status */
+    *pi_status = THREAD_OVER;    
 }
 
 /*******************************************************************************
@@ -438,7 +483,7 @@ static __inline__ int input_ReadPacket( input_thread_t *p_input )
 #endif /* FIFO netlist */
 
     /* Scatter read the buffer. */
-    i_packet_size = (*p_input->p_read)( p_input,
+    i_packet_size = (*p_input->p_Read)( p_input,
                            &p_input->netlist.p_ts_free[i_base_index],
                            INPUT_TS_READ_ONCE );
     if( i_packet_size == (-1) )
@@ -530,10 +575,10 @@ static __inline__ int input_ReadPacket( input_thread_t *p_input )
 #endif
 
 #ifdef STATS
-    p_input->c_ts_packets_read += i_current_index - i_base_index;
+    p_input->c_packets_read += i_current_index - i_base_index;
     p_input->c_bytes += (i_current_index - i_base_index) * TS_PACKET_SIZE;
 #endif
-	return( 0 );
+    return( 0 );
 }
 
 /*******************************************************************************
@@ -600,7 +645,7 @@ static __inline__ void input_SortPacket( input_thread_t *p_input,
 //                     U16_AT(&p_ts_packet->buffer[1]) & 0x1fff);
     input_NetlistFreeTS( p_input, p_ts_packet );
 #ifdef STATS
-    p_input->c_ts_packets_trashed++;
+    p_input->c_packets_trashed++;
 #endif
 }
 
@@ -758,7 +803,7 @@ static __inline__ void input_DemuxTS( input_thread_t *p_input,
     {
         input_NetlistFreeTS( p_input, p_ts_packet );
 #ifdef STATS
-        p_input->c_ts_packets_trashed++;
+        p_input->c_packets_trashed++;
 #endif
     }
     else
@@ -1035,7 +1080,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
                 {
                     /* The FIFO is full !!! This should not happen. */
 #ifdef STATS
-                    p_input->c_ts_packets_trashed += p_pes->i_ts_packets;
+                    p_input->c_packets_trashed += p_pes->i_ts_packets;
                     p_es_descriptor->c_invalid_packets += p_pes->i_ts_packets;
 #endif
                     input_NetlistFreePES( p_input, p_pes );
@@ -1058,7 +1103,7 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
             {
                 intf_DbgMsg("No fifo to receive PES %p: trash\n", p_pes);
 #ifdef STATS
-                p_input->c_ts_packets_trashed += p_pes->i_ts_packets;
+                p_input->c_packets_trashed += p_pes->i_ts_packets;
                 p_es_descriptor->c_invalid_packets += p_pes->i_ts_packets;
 #endif
                 input_NetlistFreePES( p_input, p_pes );

@@ -458,15 +458,15 @@ static int SelectPID( int i_argc, intf_arg_t *p_argv )
 /******************************************************************************
  * SpawnInput: spawn an input thread                                     (ok ?)
  ******************************************************************************
- * Spawn an input thread with the correct p_cfg parameters.
+ * Spawn an input thread
  ******************************************************************************/
 static int SpawnInput( int i_argc, intf_arg_t *p_argv )
 {
-    input_cfg_t         cfg;
     int                 i_arg;
-    
-    /* Erase p_cfg. */
-    bzero( &cfg, sizeof( cfg ) );
+    int                 i_method = 0;                     /* method parameter */
+    char *              psz_source = NULL;                /* source parameter */
+    int                 i_port = 0;                         /* port parameter */
+    int                 i_vlan = 0;                         /* vlan parameter */
 
     /* Parse parameters - see command list above */
     for ( i_arg = 1; i_arg < i_argc; i_arg++ )
@@ -474,62 +474,31 @@ static int SpawnInput( int i_argc, intf_arg_t *p_argv )
         switch( p_argv[i_arg].i_index )
         {
         case 0:                                                     /* method */
-            cfg.i_method = p_argv[i_arg].i_num;
+            i_method = p_argv[i_arg].i_num;
             break;
-        case 1:                                                   /* filename */
-            cfg.psz_filename = p_argv[i_arg].psz_str;
-            break;
-        case 2:                                                   /* hostname */
-            cfg.psz_hostname = p_argv[i_arg].psz_str;
-            break;
-        case 3:                                                         /* ip */
-            cfg.psz_ip = p_argv[i_arg].psz_str;
+        case 1:                                     /* filename, hostname, ip */
+        case 2:
+        case 3:            
+            psz_source = p_argv[i_arg].psz_str;
             break;
         case 4:                                                       /* port */
-            cfg.i_port = p_argv[i_arg].i_num;
+            i_port = p_argv[i_arg].i_num;
             break;
         case 5:                                                       /* VLAN */
-            cfg.i_vlan = p_argv[i_arg].i_num;
+            i_vlan = p_argv[i_arg].i_num;
             break;
         }
     }
 
-    /* Setting i_properties to indicate which parameters are set. */
-    if( cfg.i_method )
-    {
-        cfg.i_properties |= INPUT_CFG_METHOD;
-    }
-    if( cfg.psz_filename )
-    {
-        cfg.i_properties |= INPUT_CFG_FILENAME;
-    }
-    if( cfg.psz_hostname )
-    {
-        cfg.i_properties |= INPUT_CFG_HOSTNAME;
-    }
-    if( cfg.psz_ip )
-    {
-        cfg.i_properties |= INPUT_CFG_IP;
-    }
-    if( cfg.i_port )
-    {
-        cfg.i_properties |= INPUT_CFG_PORT;
-    }
-    if( cfg.i_vlan )
-    {
-        cfg.i_properties |= INPUT_CFG_VLAN;
-    }
-
-    /* Default settings for the decoder threads */
-    cfg.p_aout = p_main->p_aout;
-
-    /* Create the input thread */
+    /* Destroy current input, if any */
     if( p_main->p_intf->p_input != NULL )
     {        
-        input_DestroyThread( p_main->p_intf->p_input /*??, NULL*/ );
+        input_DestroyThread( p_main->p_intf->p_input, NULL );
     }
 
-    p_main->p_intf->p_input = input_CreateThread( &cfg /*??,NULL*/ );
+    p_main->p_intf->p_input = input_CreateThread( i_method, psz_source, i_port, i_vlan,
+                                                  p_main->p_intf->p_vout, p_main->p_aout, 
+                                                  NULL );
     return( INTF_NO_ERROR );
 }
 
@@ -583,18 +552,8 @@ static int Vlan( int i_argc, intf_arg_t *p_argv  )
         ;        
     }
     
-    /* Command is 'synchro' */
-    if( !strcmp(p_argv[i_command].psz_str, "synchro") )
-    {
-        input_VlanSynchronize();
-    }
-    /* Command is 'request' */
-    else if( !strcmp(p_argv[i_command].psz_str, "request") )
-    {
-        /* ?? */
-    }
     /* Command is 'join' */
-    else if( !strcmp(p_argv[i_command].psz_str, "join") )
+    if( !strcmp(p_argv[i_command].psz_str, "join") )
     {
         /* ?? */
     }    

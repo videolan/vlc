@@ -32,42 +32,6 @@
 #include "intf_sys.h"
 
 /*******************************************************************************
- * Constants
- *******************************************************************************/
-
-/* INTF_INPUT_CFG: pre-configured inputs */
-#define INTF_MAX_INPUT_CFG              10
-static const input_cfg_t INTF_INPUT_CFG[] = 
-{
-    /*  properties                              method  
-     *  file    host    ip              port    vlan */
-    
-    /* Local input (unicast) */
-    {   INPUT_CFG_METHOD | INPUT_CFG_IP,        INPUT_METHOD_TS_UCAST,     
-        NULL,   NULL,   "127.0.0.1",    0,      0       },
-
-    /* Broadcasts */
-    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
-       NULL,    NULL,   NULL,           0,      0       },
-    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
-       NULL,    NULL,   NULL,           0,      1       },
-    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
-       NULL,    NULL,   NULL,           0,      2       },
-    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
-       NULL,    NULL,   NULL,           0,      3       },
-    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
-       NULL,    NULL,   NULL,           0,      4       },
-    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
-       NULL,    NULL,   NULL,           0,      5       },
-    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
-       NULL,    NULL,   NULL,           0,      6       },
-    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
-       NULL,    NULL,   NULL,           0,      7       },
-    {  INPUT_CFG_METHOD | INPUT_CFG_VLAN,       INPUT_METHOD_TS_VLAN_BCAST,
-       NULL,    NULL,   NULL,           0,      8       }
-};
-
-/*******************************************************************************
  * intf_Create: prepare interface before main loop
  *******************************************************************************
  * This function opens output devices and create specific interfaces. It send
@@ -141,7 +105,7 @@ void intf_Run( intf_thread_t *p_intf )
         }    
         if( (p_intf->p_input != NULL) && p_intf->p_input->b_error )
         {
-            input_DestroyThread( p_intf->p_input /*, NULL */ );            
+            input_DestroyThread( p_intf->p_input, NULL );            
             p_intf->p_input = NULL;            
             intf_DbgMsg("Input thread destroyed\n");            
         }
@@ -175,23 +139,18 @@ void intf_Destroy( intf_thread_t *p_intf )
  *******************************************************************************/
 int intf_SelectInput( intf_thread_t * p_intf, int i_index )
 {
-    intf_DbgMsg("0x%x\n", p_intf );
+    intf_DbgMsg("\n");
     
     /* Kill existing input, if any */
     if( p_intf->p_input != NULL )
     {        
-        input_DestroyThread( p_intf->p_input /*??, NULL*/ );
+        input_DestroyThread( p_intf->p_input, NULL );
     }
 
-    /* Check that input index is valid */
-    if( (i_index < 0)  || (INTF_MAX_INPUT_CFG < i_index) )
-    {        
-        p_intf->p_input = NULL;     
-        return( 1 );        
-    }    
-    
     /* Open a new input */
-    p_intf->p_input = input_CreateThread( &INTF_INPUT_CFG[ i_index ] /*??, NULL*/ );        
+    intf_Msg("Switching to channel %d\n", i_index );    
+    p_intf->p_input = input_CreateThread( INPUT_METHOD_TS_VLAN_BCAST, NULL, 0, i_index, 
+                                          p_intf->p_vout, p_main->p_aout, NULL );        
     return( p_intf->p_input == NULL );    
 }
 
@@ -207,7 +166,7 @@ int intf_ProcessKey( intf_thread_t *p_intf, int i_key )
     {
     case 'Q':                                                    /* quit order */
     case 'q':
-    case 27:
+    case 27: /* escape key */
         p_intf->b_die = 1;
         break;  
     case '0':                                                 /* source change */

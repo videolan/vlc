@@ -55,6 +55,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     int             i_status;                                 /* thread status */
 
     /* Allocate descriptor */
+    intf_DbgMsg("\n");    
     p_vout = (vout_thread_t *) malloc( sizeof(vout_thread_t) );
     if( p_vout == NULL )
     {
@@ -123,7 +124,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
         return( NULL );
     }   
 
-    intf_Msg("Video: display initialized (%dx%d, %d bpp)\n", 
+    intf_Msg("Video display initialized (%dx%d, %d bpp)\n", 
              p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth );    
 
     /* If status is NULL, wait until the thread is created */
@@ -155,6 +156,7 @@ void vout_DestroyThread( vout_thread_t *p_vout, int *pi_status )
     int     i_status;                                         /* thread status */
 
     /* Set status */
+    intf_DbgMsg("\n");
     p_vout->pi_status = (pi_status != NULL) ? pi_status : &i_status;
     *p_vout->pi_status = THREAD_DESTROY;    
      
@@ -544,6 +546,7 @@ static int InitThread( vout_thread_t *p_vout )
     int     i_index;                                          /* generic index */    
 
     /* Update status */
+    intf_DbgMsg("\n");
     *p_vout->pi_status = THREAD_START;    
 
     /* Initialize output method - this function issues its own error messages */
@@ -600,6 +603,7 @@ static void RunThread( vout_thread_t *p_vout)
         free( p_vout );                                  /* destroy descriptor */
         return;        
     }    
+    intf_DbgMsg("\n");
 
     /*
      * Main loop - it is not executed if an error occured during
@@ -752,6 +756,7 @@ static void RunThread( vout_thread_t *p_vout)
 static void ErrorThread( vout_thread_t *p_vout )
 {
     /* Wait until a `die' order */
+    intf_DbgMsg("\n");
     while( !p_vout->b_die )
     {
         /* Sleep a while */
@@ -771,6 +776,7 @@ static void EndThread( vout_thread_t *p_vout )
     int     i_picture;
         
     /* Store status */
+    intf_DbgMsg("\n");
     pi_status = p_vout->pi_status;    
     *pi_status = THREAD_END;    
 

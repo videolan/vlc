@@ -129,9 +129,9 @@ void input_PcrDecode( input_thread_t *p_input, es_descriptor_t *p_es,
 }
 
 /******************************************************************************
- * input_PcrClean : Clean PCR structures before dying
+ * input_PcrEnd : Clean PCR structures before dying
  ******************************************************************************/
-void input_PcrClean( input_thread_t *p_input )
+void input_PcrEnd( input_thread_t *p_input )
 {
     ASSERT( p_input );
 

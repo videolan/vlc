@@ -1,5 +1,5 @@
 /*******************************************************************************
- * file.c: functions to read from a file 
+ * input_file.c: functions to read from a file 
  * (c)1999 VideoLAN
  *******************************************************************************/
 
@@ -18,12 +18,12 @@
 #include "input_file.h"
 
 /******************************************************************************
- * input_FileCreateMethod : open a file descriptor
+ * input_FileOpen : open a file descriptor
  ******************************************************************************/
-int input_FileCreateMethod( input_thread_t *p_input ,
-                            input_cfg_t *p_cfg )
+int input_FileOpen( input_thread_t *p_input )
 {
-  return( -1 );
+    //??
+    return( 1 );
 }
 
 /******************************************************************************
@@ -32,12 +32,14 @@ int input_FileCreateMethod( input_thread_t *p_input ,
 int input_FileRead( input_thread_t *p_input, const struct iovec *p_vector,
                     size_t i_count )
 {
-  return( -1 );
+    //??
+    return( -1 );
 }
 
 /******************************************************************************
- * input_FileDestroyMethod : close a file descriptor
+ * input_FileClose : close a file descriptor
  ******************************************************************************/
-void input_FileDestroyMethod( input_thread_t *p_input )
+void input_FileClose( input_thread_t *p_input )
 {
+    //??
 }

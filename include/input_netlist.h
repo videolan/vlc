@@ -10,17 +10,14 @@
 /******************************************************************************
  * Prototypes
  ******************************************************************************/
-int input_NetlistOpen( input_thread_t *p_input );
-void input_NetlistClean( input_thread_t *p_input );
-/* ?? implement also a "normal" (non inline, non static) function in input_netlist.c,
-   which will be used when inline is disabled */
-/* ?? test */ static __inline__ void input_NetlistFreePES( input_thread_t *p_input,
-                                  pes_packet_t *p_pes_packet );
-static __inline__ void input_NetlistFreeTS( input_thread_t *p_input,
-                                 ts_packet_t *p_ts_packet );
+int     input_NetlistInit       ( input_thread_t *p_input );
+void    input_NetlistEnd        ( input_thread_t *p_input );
+
+static __inline__ void input_NetlistFreePES( input_thread_t *p_input, pes_packet_t *p_pes_packet );
+static __inline__ void input_NetlistFreeTS( input_thread_t *p_input, ts_packet_t *p_ts_packet );
 static __inline__ pes_packet_t* input_NetlistGetPES( input_thread_t *p_input );
 
-/*******************************************************************************
+/******************************************************************************
  * input_NetlistFreePES: add a PES packet to the netlist
  *******************************************************************************
  * Add a PES packet to the PES netlist, so that the packet can immediately be

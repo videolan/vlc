@@ -47,11 +47,11 @@ typedef struct intf_msg_s *             p_intf_msg_t;
 
 /* Input */
 struct input_thread_s;
-struct input_vlan_method_s;
+struct input_vlan_s;
 struct input_cfg_s;
 
 typedef struct input_thread_s *         p_input_thread_t;
-typedef struct input_vlan_method_s *    p_input_vlan_method_t;
+typedef struct input_vlan_s *           p_input_vlan_t;
 typedef struct input_cfg_s *            p_input_cfg_t;
 
 /* Audio */

@@ -23,4 +23,4 @@
 int            input_PcrInit        ( input_thread_t *p_input );
 void           input_PcrDecode      ( input_thread_t *p_input, es_descriptor_t* p_es, 
                                        u8* p_pcr_data );
-void           input_PcrClean       ( input_thread_t *p_input );
+void           input_PcrEnd         ( input_thread_t *p_input );

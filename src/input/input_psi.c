@@ -138,7 +138,7 @@ int input_PsiInit( input_thread_t *p_input )
 /******************************************************************************
  * input_PsiClean: Clean PSI structures before dying
  ******************************************************************************/
-int input_PsiClean( input_thread_t *p_input )
+int input_PsiEnd( input_thread_t *p_input )
 {
   ASSERT(p_input);
 

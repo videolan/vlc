@@ -34,7 +34,7 @@ typedef struct
     /* Shared data - these structures are accessed directly from p_main by
      * several modules */
     p_intf_msg_t           p_msg;                   /* messages interface data */
-    p_input_vlan_method_t  p_input_vlan;                  /* vlan input method */
+    p_input_vlan_t         p_vlan;                        /* vlan library data */
 } main_t;
 
 extern main_t *p_main;

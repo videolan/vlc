@@ -423,7 +423,9 @@ static void Usage( void )
 
     /* Vlan parameters */
     intf_Msg("VLANs (Virtual Local Aera Networks) parameters:\n" \
-	     "  vlan_server=<host>[:<port>]     VLANs server address and port\n" \
+	     "  " INPUT_IFACE_VAR "=<interface>          network interface\n" \
+             "  " INPUT_VLAN_SERVER_VAR "=<hostname>     vlan server\n" \
+             "  " INPUT_VLAN_PORT_VAR "=<port>           vlan server port\n" \
 	     );
 
     /* Interfaces keys */

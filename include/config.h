@@ -181,18 +181,18 @@
 /* Use a LIFO or FIFO for PES netlist ? */
 #undef INPUT_LIFO_PES_NETLIST
 
-/* Maximum length of a hostname */
-#define INPUT_MAX_HOSTNAME_LENGTH       100
+/* Maximum length of a hostname or source name */
+#define INPUT_MAX_SOURCE_LENGTH       100
 
 
 /* Default input method */
 #define INPUT_DEFAULT_METHOD            INPUT_METHOD_TS_UCAST
 
 /* Default remote server */
-#define VIDEOLAN_DEFAULT_SERVER         "vod.via.ecp.fr"
+#define INPUT_DEFAULT_SERVER            "138.195.143.220"
 
-/* Default videolan port */
-#define VIDEOLAN_DEFAULT_PORT           1234
+/* Default input port */
+#define INPUT_DEFAULT_PORT           1234
 
 /* Default videolan VLAN */
 #define VIDEOLAN_DEFAULT_VLAN           3
@@ -201,9 +201,15 @@
  * Vlan method 
  */ 
 
-/* Default VLAN server */
-#define VLAN_DEFAULT_SERVER             "vlanserver.via.ecp.fr"
-#define VLAN_DEFAULT_SERVER_PORT        6010
+/* Default network interface and environment variable */
+#define INPUT_IFACE_VAR                 "vlc_iface"
+#define INPUT_IFACE_DEFAULT             "eth0"
+
+/* Default server and port */
+#define INPUT_VLAN_SERVER_VAR           "vlc_vlan_server"
+#define INPUT_VLAN_SERVER_DEFAULT       "138.195.140.31"
+#define INPUT_VLAN_PORT_VAR             "vlc_vlan_port"
+#define INPUT_VLAN_PORT_DEFAULT         6010
 
 /*******************************************************************************
  * Audio configuration

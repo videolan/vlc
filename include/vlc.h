@@ -22,12 +22,11 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <arpa/inet.h>
 
 #include <net/if.h>
+
+#include <netinet/in.h>
 
 #include <sys/ioctl.h>
 #include <sys/shm.h>
@@ -70,6 +69,7 @@
 /* Video */
 #include "video.h"
 #include "video_output.h"
+#include "vdec_idct.h"
 
 #ifdef OLD_DECODER
 #include "video_decoder.h"
@@ -87,10 +87,14 @@
 /* Interface */
 #include "intf_cmd.h"
 #include "intf_ctrl.h"
+
 #ifndef OLD_DECODER
 #include "intf_sys.h"
 #include "intf_console.h"
 #endif
+
 #include "interface.h"
 
 #include "main.h"
+
+

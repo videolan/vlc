@@ -136,7 +136,7 @@ int vout_SysInit( vout_thread_t *p_vout )
         }
         if( i_err )                                        /* an error occured */
         {                        
-            intf_Msg("Video: XShm extension desactivated\n" );
+            intf_Msg("XShm video sextension desactivated\n" );
             p_vout->p_sys->b_shm = 0;
         }
     }
@@ -229,7 +229,7 @@ int vout_SysManage( vout_thread_t *p_vout )
             intf_ErrMsg("error: can't resize display\n");
             return( 1 );            
         }
-        intf_Msg("Video: display resized to %dx%d\n", p_vout->i_width, p_vout->i_height);            
+        intf_Msg("Video display resized to %dx%d\n", p_vout->i_width, p_vout->i_height);            
     }
     
     return 0;
@@ -388,7 +388,7 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
     p_vout->p_sys->i_screen     = DefaultScreen( p_vout->p_sys->p_display );
     if( !p_vout->p_sys->b_shm )
     {        
-        intf_Msg("Video: XShm extension is not available\n");    
+        intf_Msg("XShm video extension is not available\n");    
     }    
 
     /* Get the screen depth */

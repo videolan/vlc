@@ -3,21 +3,6 @@
  * (c)1999 VideoLAN
  ******************************************************************************/
 
-/* needs : "netlist.h", "config.h", "mtime.h" */
-
-/* ?? missing: 
- *              tables version control */
-
-/******************************************************************************
- * External structures
- ******************************************************************************
- * These structures, required here only as pointers destinations, are declared 
- * in other headers.
- ******************************************************************************/
-struct video_cfg_s;                         /* video configuration descriptor */
-struct vout_thread_s;                                  /* video output thread */
-struct stream_descriptor_s;                                     /* PSI tables */
-
 /******************************************************************************
  * Constants related to input
  ******************************************************************************/
@@ -30,7 +15,7 @@ struct stream_descriptor_s;                                     /* PSI tables */
  ******************************************************************************
  * Describe a TS packet.
  ******************************************************************************/
-typedef struct ts_packet_struct
+typedef struct ts_packet_s
 {
     /* Nothing before this line, the code relies on that */
     byte_t                  buffer[TS_PACKET_SIZE];     /* raw TS data packet */
@@ -41,10 +26,9 @@ typedef struct ts_packet_struct
     unsigned int            i_payload_end;                     /* guess ? :-) */
 
     /* Used to chain the TS packets that carry data for a same PES or PSI */
-    struct ts_packet_struct *  p_prev_ts;
-    struct ts_packet_struct *  p_next_ts;
+    struct ts_packet_s      *  p_prev_ts;
+    struct ts_packet_s      *  p_next_ts;
 } ts_packet_t;
-
 
 /******************************************************************************
  * pes_packet_t
@@ -52,7 +36,7 @@ typedef struct ts_packet_struct
  * Describes an PES packet, with its properties, and pointers to the TS packets
  * containing it.
  ******************************************************************************/
-typedef struct
+typedef struct pes_packet_s
 {
     /* PES properties */
     boolean_t               b_data_loss;   /* The previous (at least) PES packet
@@ -82,14 +66,13 @@ typedef struct
                                         * (used by the demultiplexer). */
 } pes_packet_t;
 
-
 /******************************************************************************
  * psi_section_t
  ******************************************************************************
  * Describes a PSI section. Beware, it doesn't contain pointers to the TS
  * packets that contain it as for a PES, but the data themselves
  ******************************************************************************/
-typedef struct
+typedef struct psi_section_s
 {
     byte_t        buffer[PSI_SECTION_SIZE];
   
@@ -106,7 +89,7 @@ typedef struct
  * Describes an elementary stream, and includes fields required to handle and
  * demultiplex this elementary stream.
  ******************************************************************************/
-typedef struct
+typedef struct es_descriptor_t
 {   
     u16                     i_id;            /* stream ID, PID for TS streams */
     u8                      i_type;                            /* stream type */
@@ -293,6 +276,8 @@ typedef struct
 #endif
 } input_netlist_t;
 
+
+
 /******************************************************************************
  * input_thread_t
  ******************************************************************************
@@ -302,30 +287,32 @@ typedef struct
  * update all reference to it each time the table would be reallocated 
  ******************************************************************************/
 
-/* function pointers */
-struct input_thread_s;
-struct input_cfg_s;
-typedef int (*f_open_t)( struct input_thread_s *, struct input_cfg_s *);
-typedef int (*f_read_t)( struct input_thread_s *, const struct iovec *,
-                         size_t );
-typedef void (*f_clean_t)( struct input_thread_s * );
+/* Function pointers used in structure */
+typedef int  (input_open_t)     ( p_input_thread_t p_input );
+typedef int  (input_read_t)     ( p_input_thread_t p_input, const struct iovec *p_vector,
+                                   size_t i_count );
+typedef void (input_close_t)    ( p_input_thread_t p_input );
 
+/* Structure */
 typedef struct input_thread_s
 {
     /* Thread properties and locks */
-    boolean_t               b_die;                              /* 'die' flag */
-    boolean_t               b_error;                              /* deadlock */
-    vlc_thread_t            thread_id;             /* id for thread functions */
-    vlc_mutex_t             programs_lock;      /* programs modification lock */
-    vlc_mutex_t             es_lock;                  /* es modification lock */
+    boolean_t                   b_die;                          /* 'die' flag */
+    boolean_t                   b_error;                          /* deadlock */
+    vlc_thread_t                thread_id;         /* id for thread functions */
+    vlc_mutex_t                 programs_lock;  /* programs modification lock */
+    vlc_mutex_t                 es_lock;              /* es modification lock */
+    int *                       pi_status;           /* temporary status flag */
 
     /* Input method description */
-    int                     i_method;                         /* input method */
-    int                     i_handle;               /* file/socket descriptor */
-    int                     i_vlan_id;                  /* id for vlan method */
-    f_open_t                p_open;    /* pointer to the opener of the method */
-    f_read_t                p_read;        /* pointer to the reading function */
-    f_clean_t               p_clean;    /* pointer to the destroying function */
+    int                         i_method;                     /* input method */
+    int                         i_handle;           /* file/socket descriptor */    
+    char *                      psz_source;                         /* source */
+    int                         i_port;                     /* port number */
+    int                         i_vlan;                 /* id for vlan method */
+    input_open_t *              p_Open;               /* opener of the method */
+    input_read_t *              p_Read;                   /* reading function */
+    input_close_t *             p_Close;               /* destroying function */
 
     /* General stream description */
     stream_descriptor_t *   p_stream;                           /* PAT tables */
@@ -338,17 +325,17 @@ typedef struct input_thread_s
     /* Netlists */
     input_netlist_t         netlist;                             /* see above */
 
-    /* ?? default settings for new decoders */
-    struct aout_thread_s *      p_aout;      /* audio output thread structure */
+    /* Default settings for spawned decoders */
+    p_aout_thread_t             p_aout;      /* audio output thread structure */
+    p_vout_thread_t             p_vout;                /* video output thread */    
 
 #ifdef STATS
-    /* Stats */
-    count_t                 c_loops;                       /* number of loops */
-    count_t                 c_bytes;                   /* total of bytes read */
-    count_t                 c_payload_bytes; /* total of payload useful bytes */
-    count_t                 c_ts_packets_read;       /* total of packets read */
-    count_t                 c_ts_packets_trashed; /* total of trashed packets */
-    /* ?? ... other stats */
+    /* Statistics */
+    count_t                     c_loops;                   /* number of loops */
+    count_t                     c_bytes;                        /* bytes read */
+    count_t                     c_payload_bytes;      /* payload useful bytes */
+    count_t                     c_packets_read;               /* packets read */
+    count_t                     c_packets_trashed;         /* trashed packets */
 #endif
 } input_thread_t;
 
@@ -360,52 +347,16 @@ typedef struct input_thread_s
 #define INPUT_METHOD_TS_BCAST      22                     /* TS UDP broadcast */
 #define INPUT_METHOD_TS_VLAN_BCAST 32          /* TS UDP broadcast with VLANs */
 
-/******************************************************************************
- * input_cfg_t: input thread configuration structure
- ******************************************************************************
- * This structure is passed as a parameter to input_CreateTtread(). It includes
- * several fields describing potential properties of a new object. 
- * The 'i_properties' field allow to set only a subset of the required 
- * properties, asking the called function to use default settings for
- * the other ones.
- ******************************************************************************/
-typedef struct input_cfg_s
-{
-    u64     i_properties;
-
-    /* Input method properties */
-    int     i_method;                                         /* input method */
-    char *  psz_filename;                                         /* filename */
-    char *  psz_hostname;                                  /* server hostname */
-    char *  psz_ip;                                              /* server IP */
-    int     i_port;                                                   /* port */
-    int     i_vlan;                                            /* vlan number */
-
-    /* ??... default settings for new decoders */
-    struct aout_thread_s *      p_aout;      /* audio output thread structure */
-
-} input_cfg_t;
-
-/* Properties flags */
-#define INPUT_CFG_METHOD    (1 << 0)
-#define INPUT_CFG_FILENAME  (1 << 4)
-#define INPUT_CFG_HOSTNAME  (1 << 8)
-#define INPUT_CFG_IP        (1 << 9)
-#define INPUT_CFG_PORT      (1 << 10)
-#define INPUT_CFG_VLAN      (1 << 11)
-
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-input_thread_t *input_CreateThread      ( input_cfg_t *p_cfg );
-void            input_DestroyThread     ( input_thread_t *p_input );
+input_thread_t *input_CreateThread      ( int i_method, char *psz_source, int i_port, 
+                                          int i_vlan, p_vout_thread_t p_vout, 
+                                          p_aout_thread_t p_aout, int *pi_status );
+void            input_DestroyThread     ( input_thread_t *p_input, int *pi_status );
 
-int             input_OpenAudioStream   ( input_thread_t *p_input, int i_pid
-                                          /* ?? , struct audio_cfg_s * p_cfg */ );
+
+int             input_OpenAudioStream   ( input_thread_t *p_input, int i_pid );
 void            input_CloseAudioStream  ( input_thread_t *p_input, int i_pid );
-int             input_OpenVideoStream   ( input_thread_t *p_input, 
-                                          struct vout_thread_s *p_vout, struct video_cfg_s * p_cfg );
+int             input_OpenVideoStream   ( input_thread_t *p_input, int i_pid );
 void            input_CloseVideoStream  ( input_thread_t *p_input, int i_pid );
-
-/* ?? settings functions */
-/* ?? info functions */

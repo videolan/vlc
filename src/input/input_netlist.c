@@ -31,7 +31,7 @@
 /******************************************************************************
  * input_NetlistOpen: initialize the netlists buffers
  ******************************************************************************/
-int input_NetlistOpen( input_thread_t *p_input )
+int input_NetlistInit( input_thread_t *p_input )
 {
     int                 i_base, i_packets, i_iovec;
 
@@ -119,7 +119,7 @@ int input_NetlistOpen( input_thread_t *p_input )
 /******************************************************************************
  * input_NetlistClean: clean the netlists buffers
  ******************************************************************************/
-void input_NetlistClean( input_thread_t *p_input )
+void input_NetlistEnd( input_thread_t *p_input )
 {
     int i;
 
