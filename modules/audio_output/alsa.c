@@ -2,7 +2,7 @@
  * alsa.c : alsa plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: alsa.c,v 1.40 2004/02/20 19:21:23 gbazin Exp $
+ * $Id$
  *
  * Authors: Henri Fallon <henri@videolan.org> - Original Author
  *          Jeffrey Baker <jwbaker@acm.org> - Port to ALSA 1.0 API
@@ -274,6 +274,7 @@ static int Open( vlc_object_t *p_this )
     snd_pcm_sw_params_t *p_sw;
 
     int i_snd_rc = -1;
+    int i_old_rate;
 
     /* Allocate structures */
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
@@ -491,18 +492,21 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Set rate. */
+    i_old_rate = p_aout->output.output.i_rate;
 #ifdef HAVE_ALSA_NEW_API
-    if ( ( i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
-                                &p_aout->output.output.i_rate, NULL ) ) < 0 )
+    i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
+                                                &p_aout->output.output.i_rate,
+                                                NULL );
 #else
-    if ( ( i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
-                                p_aout->output.output.i_rate, NULL ) ) < 0 )
+    i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
+                                                p_aout->output.output.i_rate,
+                                                NULL );
 #endif
+    if( i_snd_rc < 0 || p_aout->output.output.i_rate != i_old_rate )
     {
         msg_Warn( p_aout, "The rate %d Hz is not supported by your hardware. "
-                  "Using %d Hz instead.\n", p_aout->output.output.i_rate,
-                  i_snd_rc );
-        p_aout->output.output.i_rate = i_snd_rc;
+                  "Using %d Hz instead.\n", i_old_rate,
+                  p_aout->output.output.i_rate );
     }
 
     /* Set buffer size. */
