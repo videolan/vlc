@@ -901,6 +901,10 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     p_win->wm_delete_window =
              XInternAtom( p_vout->p_sys->p_display, "WM_DELETE_WINDOW", True );
 
+    /* Never have a 0-pixel-wide window */
+    xsize_hints.min_width = 2;
+    xsize_hints.min_height = 1;
+
     /* Prepare window attributes */
     xwindow_attributes.backing_store = Always;       /* save the hidden part */
     xwindow_attributes.background_pixel = BlackPixel(p_vout->p_sys->p_display,
@@ -915,7 +919,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
         xsize_hints.base_width  = xsize_hints.width = p_win->i_width;
         xsize_hints.base_height = xsize_hints.height = p_win->i_height;
-        xsize_hints.flags       = PSize;
+        xsize_hints.flags       = PSize | PMinSize;
 
         if( p_win->i_x >=0 || p_win->i_y >= 0 )
         {
