@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.50 2003/03/26 00:56:22 gbazin Exp $
+ * $Id: libvlc.h,v 1.51 2003/03/29 12:22:15 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -125,11 +125,6 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "more comfortable and less tiring when listening to music for " \
     "long periods of time.\nIt works with any source format from mono " \
     "to 5.1.")
-
-#define HEADPHONE_DIM_TEXT N_("characteristic dimension")
-#define HEADPHONE_DIM_LONGTEXT N_( \
-     "Headphone virtual spatialization effect parameter: "\
-     "distance between front left speaker and listener in meters.")
 
 #define VOUT_TEXT N_("video output module")
 #define VOUT_LONGTEXT N_( \
@@ -475,8 +470,6 @@ vlc_module_begin();
     add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT, VLC_TRUE );
     add_bool( "spdif", 0, NULL, SPDIF_TEXT, SPDIF_LONGTEXT, VLC_FALSE );
     add_bool( "headphone", 0, NULL, HEADPHONE_TEXT, HEADPHONE_LONGTEXT, VLC_FALSE );
-    add_integer( "headphone-dim", 5, NULL, HEADPHONE_DIM_TEXT,
-                 HEADPHONE_DIM_LONGTEXT, VLC_TRUE );
 
     /* Video options */
     add_category_hint( N_("Video"), NULL, VLC_FALSE );
@@ -554,15 +547,15 @@ vlc_module_begin();
                 ACCESS_OUTPUT_TEXT, ACCESS_OUTPUT_LONGTEXT, VLC_TRUE );
 
     /* CPU options */
-    add_category_hint( N_("CPU"), NULL, VLC_FALSE );
+    add_category_hint( N_("CPU"), NULL, VLC_TRUE );
 #if defined( __i386__ )
-    add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, VLC_FALSE );
-    add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, VLC_FALSE );
-    add_bool( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT, VLC_FALSE );
-    add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT, VLC_FALSE );
+    add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, VLC_TRUE );
+    add_bool( "3dn", 1, NULL, THREE_DN_TEXT, THREE_DN_LONGTEXT, VLC_TRUE );
+    add_bool( "mmxext", 1, NULL, MMXEXT_TEXT, MMXEXT_LONGTEXT, VLC_TRUE );
+    add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT, VLC_TRUE );
 #endif
 #if defined( __powerpc__ ) || defined( SYS_DARWIN )
-    add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, VLC_FALSE );
+    add_bool( "altivec", 1, NULL, ALTIVEC_TEXT, ALTIVEC_LONGTEXT, VLC_TRUE );
 #endif
 
     /* Playlist options */

@@ -2,7 +2,7 @@
  * demuxdump.c : Pseudo demux module for vlc (dump raw stream)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: demuxdump.c,v 1.5 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: demuxdump.c,v 1.6 2003/03/29 12:22:15 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -45,13 +45,16 @@ static void Desactivate ( vlc_object_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define FILE_TEXT N_("dump file name")
+#define FILE_LONGTEXT N_( \
+    "specify a file name to which the raw stream will be dumped." )
+
 vlc_module_begin();
     set_description( _("Dump Demux input") );
     set_capability( "demux", 0 );
     add_category_hint( "File", NULL, VLC_FALSE );
-        add_string( "demuxdump-file", NULL, NULL, 
-                    "dump file name", 
-                    "file name for dumping raw stream read by demux", VLC_FALSE );
+        add_string( "demuxdump-file", "stream-demux.dump", NULL, FILE_TEXT, 
+                    FILE_LONGTEXT, VLC_FALSE );
     set_callbacks( Activate, Desactivate );
     add_shortcut( "dump" );
 vlc_module_end();
@@ -92,7 +95,8 @@ static int Activate( vlc_object_t * p_this )
     psz_name = config_GetPsz( p_input, "demuxdump-file" );
     if( !psz_name || !*psz_name )
     {
-        psz_name = strdup( "stream-demux.dump" );
+        msg_Warn( p_input, "no dump file name given" );
+        return VLC_EGENERIC;
     }
 
     p_demux = malloc( sizeof( demux_sys_t ) );
@@ -111,7 +115,7 @@ static int Activate( vlc_object_t * p_this )
                  "cannot create `%s' for writing", 
                  psz_name );
         free( p_demux );
-        return( -1 );
+        return VLC_EGENERIC;
     }
     else
     {
@@ -137,7 +141,7 @@ static int Activate( vlc_object_t * p_this )
             if( p_demux->p_file != stdout )
                 fclose( p_demux->p_file );
             free( p_demux );
-            return( -1 );
+            return VLC_EGENERIC;
         }
         input_AddProgram( p_input, 0, 0 );
         p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
@@ -153,7 +157,7 @@ static int Activate( vlc_object_t * p_this )
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
     
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -239,4 +243,3 @@ static int Demux( input_thread_t * p_input )
 
     return( 1 );
 }
-

@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.71 2003/03/26 00:56:22 gbazin Exp $
+ * $Id: libvlc.c,v 1.72 2003/03/29 12:22:15 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -519,7 +519,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
     psz_parser = psz_modules;
     while ( psz_parser && *psz_parser )
     {
-        char *psz_module;
+        char *psz_module, *psz_temp;
         psz_module = psz_parser;
         psz_parser = strchr( psz_module, ',' );
         if ( psz_parser )
@@ -527,7 +527,13 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
             *psz_parser = '\0';
             psz_parser++;
         }
-        VLC_AddIntf( 0, psz_module, VLC_FALSE );
+        psz_temp = (char *)malloc( strlen(psz_module) + sizeof(",none") );
+        if( psz_temp )
+        {
+            sprintf( psz_temp, "%s,none", psz_module );
+            VLC_AddIntf( 0, psz_temp, VLC_FALSE );
+            free( psz_temp );
+        }
     }
     if ( psz_modules )
     {
@@ -574,7 +580,7 @@ int VLC_AddIntf( int i_object, char const *psz_module, vlc_bool_t b_block )
 
     if( p_intf == NULL )
     {
-        msg_Err( p_vlc, "interface initialization failed" );
+        msg_Err( p_vlc, "interface \"%s\" initialization failed", psz_module );
         if( i_object ) vlc_object_release( p_vlc );
         return VLC_EGENERIC;
     }
