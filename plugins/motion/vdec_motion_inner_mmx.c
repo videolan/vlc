@@ -3,7 +3,7 @@
  *                           MMX
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_inner_mmx.c,v 1.2 2001/06/07 15:27:44 sam Exp $
+ * $Id: vdec_motion_inner_mmx.c,v 1.3 2001/06/07 22:14:55 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>, largerly inspired by the
  *          work done by the livid project <http://www.linuxvideo.org/>
@@ -23,6 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME motionmmx
 #include "modules_inner.h"
 
 /*****************************************************************************

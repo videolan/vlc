@@ -2,7 +2,7 @@
  * vdec_motion_inner.c : motion compensation inner routines
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_inner.c,v 1.2 2001/06/07 15:27:44 sam Exp $
+ * $Id: vdec_motion_inner.c,v 1.3 2001/06/07 22:14:55 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -23,6 +23,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME motion
 #include "modules_inner.h"
 
 /*****************************************************************************
