@@ -65,6 +65,15 @@ static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
 static block_t *Convert( filter_t *, block_t * );
 
+/* liba52 channel order */
+static const uint32_t pi_channels_in[] =
+{ AOUT_CHAN_LFE, AOUT_CHAN_LEFT, AOUT_CHAN_CENTER, AOUT_CHAN_RIGHT,
+  AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, 0 };
+/* our internal channel order (WG-4 order) */
+static const uint32_t pi_channels_out[] =
+{ AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+  AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
+
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
@@ -75,6 +84,8 @@ struct filter_sys_t
     int i_flags; /* liba52 flags, see a52dec/doc/liba52.txt */
     vlc_bool_t b_dontwarn;
     int i_nb_channels; /* number of float32 per sample */
+
+    int pi_chan_table[AOUT_CHAN_MAX]; /* channel reordering */
 };
 
 /*****************************************************************************
@@ -142,7 +153,7 @@ static int Create( vlc_object_t *p_this )
  * Open: 
  *****************************************************************************/
 static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
-		 audio_format_t input, audio_format_t output )
+                 audio_format_t input, audio_format_t output )
 {
     p_sys->b_dynrng = config_GetInt( p_this, "a52-dynrng" );
     p_sys->b_dontwarn = 0;
@@ -239,52 +250,28 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
         return VLC_EGENERIC;
     }
 
+    aout_CheckChannelReorder( pi_channels_in, pi_channels_out,
+                              output.i_physical_channels & AOUT_CHAN_PHYSMASK,
+                              p_sys->i_nb_channels,
+                              p_sys->pi_chan_table );
+
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * Interleave: helper function to interleave channels
  *****************************************************************************/
-static void Interleave( float * p_out, const float * p_in, int i_nb_channels )
+static void Interleave( float * p_out, const float * p_in, int i_nb_channels,
+                        int *pi_chan_table )
 {
-    /* We do not only have to interleave, but also reorder the channels
-     * Channel reordering according to number of output channels of libA52
-     * The reordering needs to be different for different channel configurations
-     * (3F2R, 1F2R etc), so this is only temporary.
-     * The WG-4 order is appropriate for stereo, quadrophonia, and 5.1 surround.
-     *
-     * 6 channel mode
-     * channel  liba52 order    WG-4 order
-     * 0        LFE             // L
-     * 1        L               // R
-     * 2        C               // LS
-     * 3        R               // RS
-     * 4        LS              // C
-     * 5        RS              // LFE
-     *
-     * The liba52 moves channels to the front if there are unused spaces, so
-     * there is no gap between channels. The translation table says which
-     * channel of the new stream is taken from which original channel [use
-     * the new channel as the array index, use the number you get from the
-     * array to address the original channel].
-     */
-
-    static const int translation[7][6] =
-    {{ 0, 0, 0, 0, 0, 0 },      /* 0 channels (rarely used) */
-    { 0, 0, 0, 0, 0, 0 },       /* 1 ch */
-    { 0, 1, 0, 0, 0, 0 },       /* 2 */
-    { 1, 2, 0, 0, 0, 0 },       /* 3 */
-    { 1, 3, 2, 0, 0, 0 },       /* 4 */
-    { 1, 3, 4, 2, 0, 0 },       /* 5 */
-    { 1, 3, 4, 5, 2, 0 }};      /* 6 */
+    /* We do not only have to interleave, but also reorder the channels */
 
     int i, j;
     for ( j = 0; j < i_nb_channels; j++ )
     {
         for ( i = 0; i < 256; i++ )
         {
-            p_out[i * i_nb_channels + j] = p_in[translation[i_nb_channels][j]
-                                                 * 256 + i];
+            p_out[i * i_nb_channels + pi_chan_table[j]] = p_in[j * 256 + i];
         }
     }
 }
@@ -383,7 +370,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         {
             /* Interleave the *$£%ù samples. */
             Interleave( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
-                        p_samples, p_sys->i_nb_channels );
+                        p_samples, p_sys->i_nb_channels, p_sys->pi_chan_table);
         }
     }
 
