@@ -2,7 +2,7 @@
  * deinterlace.c : deinterlacer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2002, 2003 VideoLAN
- * $Id: deinterlace.c,v 1.23 2004/02/07 13:25:50 fenrir Exp $
+ * $Id: deinterlace.c,v 1.24 2004/02/13 10:42:24 titer Exp $
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *
@@ -160,6 +160,7 @@ static int Create( vlc_object_t *p_this )
         p_vout->p_sys->pf_merge = MergeAltivec;
         p_vout->p_sys->pf_end_merge = NULL;
     }
+    else
 #endif
 #if defined(CAN_COMPILE_SSE)
     if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_SSE2 )
