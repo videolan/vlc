@@ -1,9 +1,9 @@
 /*
- * This file was created automatically by glade and fixed by bootstrap
+ * Created by glade, fixed by bootstrap
  */
 
 #ifdef HAVE_CONFIG_H
-#  include <config.h>
+#  include <vlc/vlc.h>
 #endif
 
 #include <gtk/gtk.h>
@@ -11,7 +11,7 @@
 /*
  * Standard gettext macros.
  */
-#if defined( ENABLE_NLS ) && defined ( HAVE_GETTEXT )
+#if 0 /* Disabled by bootstrap */
 #  include <libintl.h>
 #  undef _
 #  define _(String) dgettext (PACKAGE, String)
@@ -20,7 +20,7 @@
 #  else
 #    define N_(String) (String)
 #  endif
-#else
+/* #else */
 #  define textdomain(String) (String)
 #  define gettext(String) (String)
 #  define dgettext(Domain,Message) (Message)

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.51 2003/01/28 12:30:44 gbazin Exp $
+ * $Id: vlc_common.h,v 1.52 2003/01/28 17:11:38 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -648,9 +648,8 @@ typedef __int64 off_t;
 VLC_EXPORT( char *, vlc_dgettext, ( const char *package, const char *msgid ) );
 
 #if defined( ENABLE_NLS ) && \
-     (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gtk) \
-      ||defined(MODULE_NAME_IS_familiar))
-    /* Declare nothing: gtk.h will do it for us */
+     (defined(MODULE_NAME_IS_gnome)||defined(MODULE_NAME_IS_gnome_main))
+    /* Declare nothing: gnome.h will do it for us */
 #elif defined( ENABLE_NLS ) && defined( HAVE_INCLUDED_GETTEXT )
 #   include "libintl.h"
 #   undef _
