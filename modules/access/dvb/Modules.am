@@ -1,0 +1,6 @@
+SOURCES_dvb = \
+	qpsk.c \
+	access.c \
+	dvb.c \
+	dvb.h \
+	$(NULL)
