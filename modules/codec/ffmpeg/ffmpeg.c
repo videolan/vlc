@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.45 2003/07/10 01:33:41 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.46 2003/07/18 19:26:22 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -564,6 +564,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t i_fourcc,
         case FOURCC_dvhd:
         case FOURCC_dvc:
         case FOURCC_dvp:
+        case FOURCC_CDVC:
             i_cat = VIDEO_ES;
             i_codec = CODEC_ID_DVVIDEO;
             psz_name = "DV video";
