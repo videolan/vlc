@@ -173,7 +173,7 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
         m_keysList = new wxString[i_keys];
         for( unsigned int i = 0; i < i_keys; i++ )
         {
-            m_keysList[i] = wxT(vlc_keys[i].psz_key_string);
+            m_keysList[i] = wxU(vlc_keys[i].psz_key_string);
         }
     }
 
