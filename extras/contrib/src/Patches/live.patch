@@ -1,0 +1,24 @@
+diff -ru live/groupsock/Groupsock.cpp live-patched/groupsock/Groupsock.cpp
+--- live/groupsock/Groupsock.cpp	Thu Nov  6 03:53:15 2003
++++ live-patched/groupsock/Groupsock.cpp	Sun Dec  7 21:30:15 2003
+@@ -26,7 +26,7 @@
+ #if defined(__WIN32__) || defined(_WIN32)
+ #include <strstrea.h>
+ #else
+-#include <strstream.h>
++#include <strstream>
+ #endif
+ #include <stdio.h>
+ 
+diff -ru live/groupsock/NetInterface.cpp live-patched/groupsock/NetInterface.cpp
+--- live/groupsock/NetInterface.cpp	Thu Nov  6 03:53:15 2003
++++ live-patched/groupsock/NetInterface.cpp	Sun Dec  7 21:30:30 2003
+@@ -24,7 +24,7 @@
+ #if defined(__WIN32__) || defined(_WIN32)
+ #include <strstrea.h>
+ #else
+-#include <strstream.h>
++#include <strstream>
+ #endif
+ 
+ ////////// NetInterface //////////

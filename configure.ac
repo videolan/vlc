@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.128 2003/12/06 22:45:02 jpsaman Exp $
+dnl $Id: configure.ac,v 1.129 2003/12/07 20:47:19 hartman Exp $
 
 AC_INIT(vlc,0.7.0-test1)
 
@@ -83,6 +83,8 @@ if test -d ${topdir}/extras/contrib/lib; then
   fi
   LDFLAGS="${LDFLAGS} -L${topdir}/extras/contrib/lib"
   LDFLAGS_save="${LDFLAGS_save} -L${topdir}/extras/contrib/lib"
+  with_livedotcom_tree=${topdir}/extras/contrib/src/live
+  with_goom_tree=${topdir}/extras/contrib/src/goom
 fi
 
 dnl

@@ -2,7 +2,7 @@
 # src/Makefile : Dearchive and compile all files necessary
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN
-# $Id: Makefile,v 1.6 2003/11/23 13:06:43 massiot Exp $
+# $Id: Makefile,v 1.7 2003/12/07 20:47:19 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -42,7 +42,7 @@ export LDFLAGS = -L$(PREFIX)/lib
 all: .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .lame .ebml .matroska .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdplay .dvbpsi
+	.dvdcss .dvdread .dvdplay .dvbpsi .live .goom
 FORCE:
 
 # ***************************************************************************
@@ -515,18 +515,18 @@ DISTCLEAN_PKG += libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 # ffmpeg
 # ***************************************************************************
 
-#ffmpeg:
-#	cvs -d $(FFMPEG_CVSROOT) login
-#	cvs -d $(FFMPEG_CVSROOT) co ffmpeg
-#	patch -p 0 < Patches/ffmpeg.patch.cvs
-#	(cd $@; ./bootstrap)
+ffmpeg:
+	cvs -d $(FFMPEG_CVSROOT) login
+	cvs -d $(FFMPEG_CVSROOT) co ffmpeg
+	patch -p 0 < Patches/ffmpeg.patch.cvs
+	(cd $@; ./bootstrap)
 
-ffmpeg-$(FFMPEG_VERSION).tar.gz:
-	$(WGET) $(FFMPEG_URL)
-
-ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	patch -p 0 < Patches/ffmpeg.patch
+#ffmpeg-$(FFMPEG_VERSION).tar.gz:
+#	$(WGET) $(FFMPEG_URL)
+#
+#ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
+#	$(EXTRACT_GZ)
+#	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg
 	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS)" --extra-ldflags="$(LDFLAGS)" --enable-mp3lame --enable-pp --disable-vhook --disable-vorbis --disable-faad --disable-a52 --enable-mp3lame && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
@@ -630,6 +630,43 @@ libdvbpsi: libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
 CLEAN_FILE += .dvbpsi
 CLEAN_PKG += libdvbpsi
 DISTCLEAN_PKG += libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
+
+# ***************************************************************************
+# live
+# ***************************************************************************
+
+live.$(LIVEDOTCOM_VERSION).tar.gz:
+	$(WGET) $(LIVEDOTCOM_URL)
+
+live: live.$(LIVEDOTCOM_VERSION).tar.gz
+	$(EXTRACT_GZ)
+	patch -p 0 < Patches/live.patch
+
+.live: live
+	(cd $<; ./genmakefiles macosx && make )
+	touch $@
+
+CLEAN_FILE += .live
+CLEAN_PKG += live
+DISTCLEAN_PKG += live.$(LIVEDOTCOM_VERSION).tar.gz
+
+# ***************************************************************************
+# goom
+# ***************************************************************************
+
+goom-dj.tar.gz:
+	$(WGET) $(GOOMDJ_URL)
+
+goom: goom-dj.tar.gz
+	$(EXTRACT_GZ)
+
+.goom: goom
+	(cd $<;)
+	touch $@
+
+CLEAN_FILE += .goom
+CLEAN_PKG += goom
+DISTCLEAN_PKG += goom-dj.tar.gz
 
 # ***************************************************************************
 # Some cleansing

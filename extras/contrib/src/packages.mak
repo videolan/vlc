@@ -2,7 +2,7 @@
 # src/packages.mak : Archives locations
 # ***************************************************************************
 # Copyright (C) 2003 VideoLAN   
-# $Id: packages.mak,v 1.3 2003/11/17 13:14:25 hartman Exp $
+# $Id: packages.mak,v 1.4 2003/12/07 20:47:19 hartman Exp $
 #
 # Authors: Christophe Massiot <massiot@via.ecp.fr>
 #
@@ -69,7 +69,7 @@ LIBMATROSKA_VERSION=0.6.1
 LIBMATROSKA_URL=http://matroska.free.fr/downloads/libmatroska/libmatroska-$(LIBMATROSKA_VERSION).tar.gz
 FFMPEG_VERSION=0.4.8
 FFMPEG_URL=$(SF)/ffmpeg/ffmpeg-$(FFMPEG_VERSION).tar.gz
-FFMPEG_CVSOOT=:pserver:anonymous@mplayerhq.hu:/cvsroot/ffmpeg
+FFMPEG_CVSROOT=:pserver:anonymous@mplayerhq.hu:/cvsroot/ffmpeg
 OPENSLP_VERSION=1.0.11
 OPENSLP_URL=$(SF)/openslp/openslp-$(OPENSLP_VERSION).tar.gz
 LIBDVDCSS_VERSION=1.2.8
@@ -80,4 +80,7 @@ LIBDVDPLAY_VERSION=1.0.1
 LIBDVDPLAY_URL=http://www.videolan.org/pub/libdvdplay/$(LIBDVDPLAY_VERSION)/libdvdplay-$(LIBDVDPLAY_VERSION).tar.gz
 LIBDVBPSI_VERSION=0.1.3
 LIBDVBPSI_URL=http://www.videolan.org/pub/libdvbpsi/$(LIBDVBPSI_VERSION)/libdvbpsi-$(LIBDVBPSI_VERSION).tar.gz
+LIVEDOTCOM_VERSION=2003.11.06
+LIVEDOTCOM_URL=http://www.videolan.org/pub/testing/contrib/live.$(LIVEDOTCOM_VERSION).tar.gz
+GOOMDJ_URL=http://sidekick.student.utwente.nl/videolan/goom-dj.tar.gz
 
