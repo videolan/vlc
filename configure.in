@@ -970,10 +970,10 @@ then
 fi
 
 dnl 
-dnl MP4 plugin
+dnl MP4 module 
 dnl 
 AC_ARG_ENABLE(mp4,
-  [  --enable-mp4            MP4 support (default disabled)])
+  [  --enable-mp4            MP4 demux module (default disabled)])
 if test "x${enable_mp4}" = "xyes"
 then
     AC_CHECK_HEADER(zlib.h,
