@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2004 VideoLAN
- * $Id: libvlc.c,v 1.111 2004/01/25 11:32:32 gbazin Exp $
+ * $Id: libvlc.c,v 1.112 2004/01/25 11:48:17 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -302,6 +302,7 @@ int VLC_Init( int i_object, int i_argc, char *ppsz_argv[] )
         return VLC_EGENERIC;
     }
     p_help_module->psz_object_name = "help";
+    p_help_module->psz_longname = N_("Help options");
     config_Duplicate( p_help_module, p_help_config );
     vlc_object_attach( p_help_module, libvlc.p_module_bank );
     /* End hack */
@@ -1333,6 +1334,7 @@ static void Usage( vlc_t *p_this, char const *psz_module_name )
         }
 
         /* Print name of module */
+        if( strcmp( "main", p_parser->psz_object_name ) )
         fprintf( stdout, "\n %s\n", p_parser->psz_longname );
 
         b_help_module = !strcmp( "help", p_parser->psz_object_name );
