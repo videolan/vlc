@@ -1,3 +1,17 @@
+vlc (0.1.99i) unstable; urgency=low
+
+  * fixed the support for field pictures, which involved a few dozens
+    bugs in the video parser and video decoder.
+  * renamed an inconsistent variable in src/input/input_file.c.
+  * added support for I+ synchro (all Is and the first P).
+  * fixed a motion compensation bug which generated some distortion
+    on B images.
+  * fixed a motion compensation bug for skipped macroblocks.
+  * fixed a synchro bug for field images.
+  * fixed the --server option which didn't work if a ~/.vlcrc existed.
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Mon, 28 Aug 2000 02:34:18 +0200
+
 vlc (0.1.99h) unstable; urgency=low
 
   * added support for the SDL vout : the --display fullscreen allows
