@@ -1776,17 +1776,19 @@ then
   if test "x${SDL_CONFIG}" != "xno"
   then
     PLUGINS="${PLUGINS} vout_sdl aout_sdl"
-    CFLAGS_vout_sdl="${CFLAGS_vout_sdl} `${SDL_CONFIG} --cflags | sed 's,SDL,,'`"
+    CFLAGS_vout_sdl="${CFLAGS_vout_sdl} `${SDL_CONFIG} --cflags`"
     LDFLAGS_vout_sdl="${LDFLAGS_vout_sdl} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
-    CFLAGS_aout_sdl="${CFLAGS_aout_sdl} `${SDL_CONFIG} --cflags | sed 's,SDL,,'`"
+    CFLAGS_aout_sdl="${CFLAGS_aout_sdl} `${SDL_CONFIG} --cflags`"
     LDFLAGS_aout_sdl="${LDFLAGS_aout_sdl} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
     CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_vout_sdl}"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
       <${SDL_HEADER}>, Indicate whether we should use SDL/SDL.h or SDL11/SDL.h),
+      [ AC_CHECK_HEADERS(SDL.h, AC_DEFINE(SDL_INCLUDE_FILE, <SDL.h>,
+          As a last resort we also test for SDL.h presence),
       [ AC_MSG_ERROR([The development package for SDL is not installed.
 Please install it and try again. Alternatively you can also configure with
 --disable-sdl.])
-      ])
+      ])])
     CPPFLAGS="${CPPFLAGS_save}"
     if expr 1.1.5 \> `${SDL_CONFIG} --version` >/dev/null
     then
