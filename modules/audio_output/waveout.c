@@ -2,7 +2,7 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.17 2003/02/17 22:19:24 gbazin Exp $
+ * $Id: waveout.c,v 1.18 2003/02/19 22:08:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *      
@@ -472,6 +472,8 @@ static int OpenWaveOut( aout_instance_t *p_aout, int i_format,
     {
     case VLC_FOURCC('s','p','d','i'):
         i_nb_channels = 2;
+        /* To prevent channel re-ordering */
+        waveformat.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT;
         waveformat.Format.wBitsPerSample = 16;
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;

@@ -2,7 +2,7 @@
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.12 2003/02/17 22:19:24 gbazin Exp $
+ * $Id: directx.c,v 1.13 2003/02/19 22:08:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -186,8 +186,8 @@ static void DirectSoundThread ( notification_thread_t * );
 static int  FillBuffer        ( aout_instance_t *, int, aout_buffer_t * );
 
 static void CheckReordering   ( aout_instance_t *, int );
-static void InterleaveFloat32 ( float *, int *, int );
-static void InterleaveS16     ( int16_t *, int *, int );
+static void InterleaveFloat32 ( float *, float *, int *, int );
+static void InterleaveS16     ( int16_t *, int16_t *, int *, int );
 
 /*****************************************************************************
  * Module descriptor
@@ -630,6 +630,8 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
     {
     case VLC_FOURCC('s','p','d','i'):
         i_nb_channels = 2;
+        /* To prevent channel re-ordering */
+        waveformat.dwChannelMask = SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT;
         waveformat.Format.wBitsPerSample = 16;
         waveformat.Samples.wValidBitsPerSample =
             waveformat.Format.wBitsPerSample;
@@ -847,14 +849,31 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
         return VLC_EGENERIC;
     }
 
-    if ( p_buffer != NULL )
+    if( p_buffer == NULL )
+    {
+        memset( p_write_position, 0, l_bytes1 );
+    }
+    else if( p_aout->output.p_sys->b_chan_reorder )
+    {
+        /* Do the channel reordering here */
+
+        if( p_aout->output.output.i_format ==  VLC_FOURCC('s','1','6','l') )
+          InterleaveS16( (int16_t *)p_buffer->p_buffer,
+                         (int16_t *)p_write_position,
+                         p_aout->output.p_sys->pi_chan_table,
+                         aout_FormatNbChannels( &p_aout->output.output ) );
+        else
+          InterleaveFloat32( (float *)p_buffer->p_buffer,
+                             (float *)p_write_position,
+                             p_aout->output.p_sys->pi_chan_table,
+                             aout_FormatNbChannels( &p_aout->output.output ) );
+    }
+    else
     {
         p_aout->p_vlc->pf_memcpy( p_write_position, p_buffer->p_buffer,
                                   l_bytes1 );
         aout_BufferFree( p_buffer );
     }
-    else
-        memset( p_write_position, 0, l_bytes1 );
 
     /* Now the data has been copied, unlock the buffer */
     IDirectSoundBuffer_Unlock( p_aout->output.p_sys->p_dsbuffer,
@@ -1062,38 +1081,32 @@ static void CheckReordering( aout_instance_t *p_aout, int i_nb_channels )
 /*****************************************************************************
  * InterleaveFloat32/S16: change the channel order to the Microsoft one.
  *****************************************************************************/
-static void InterleaveFloat32( float *p_buf, int *pi_chan_table,
-                               int i_nb_channels )
+static void InterleaveFloat32( float *p_buf, float *p_buf_out,
+                               int *pi_chan_table, int i_nb_channels )
 {
     int i, j;
-    float p_tmp[10];
 
     for( i = 0; i < FRAME_SIZE; i++ )
     {
         for( j = 0; j < i_nb_channels; j++ )
         {
-            p_tmp[pi_chan_table[j]] = p_buf[i*i_nb_channels + j];
+            p_buf_out[i*i_nb_channels + pi_chan_table[j]] =
+                p_buf[i*i_nb_channels + j];
         }
-
-        memcpy( &p_buf[i*i_nb_channels], p_tmp,
-                i_nb_channels * sizeof(float) );
     }
 }
 
-static void InterleaveS16( int16_t *p_buf, int *pi_chan_table,
-                           int i_nb_channels )
+static void InterleaveS16( int16_t *p_buf, int16_t *p_buf_out,
+                           int *pi_chan_table, int i_nb_channels )
 {
     int i, j;
-    int16_t p_tmp[10];
 
     for( i = 0; i < FRAME_SIZE; i++ )
     {
         for( j = 0; j < i_nb_channels; j++ )
         {
-            p_tmp[pi_chan_table[j]] = p_buf[i*i_nb_channels + j];
+            p_buf_out[ i*i_nb_channels + pi_chan_table[j]] =
+                p_buf[i*i_nb_channels + j];
         }
-
-        memcpy( &p_buf[i*i_nb_channels], p_tmp,
-                i_nb_channels * sizeof(int16_t) );
     }
 }
