@@ -2950,7 +2950,7 @@ if test "${enable_skins2}" = "yes" || (test "${SYS}" != "darwin" && test "${SYS}
     LDFLAGS="${LDFLAGS_save} ${LDFLAGS_skins2}"
     AC_CHECK_LIB(xml2,xmlTextReaderConstName,[],[
       skins2_missing_lib="yes"
-      AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version])
+      AC_MSG_WARN([libxml2 missing the xmlTextReader extension, you should update your version; maybe you are missing libpng.])
       if test "${enable_skins2}" = "yes"; then
         AC_MSG_ERROR([libxml2 missing the xmlTextReader extension (required for skins2)])
       fi])
