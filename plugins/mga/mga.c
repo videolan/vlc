@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.11 2002/01/05 15:17:12 sam Exp $
+ * $Id: mga.c,v 1.12 2002/01/05 16:09:49 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -89,6 +89,7 @@ MODULE_DEACTIVATE_STOP
 #   define MGA_VID_CONFIG _IOR('J', 1, mga_vid_config_t)
 #   define MGA_VID_ON     _IO ('J', 2)
 #   define MGA_VID_OFF    _IO ('J', 3)
+#   define MGA_VID_FSEL   _IOR('J', 4, int)
 #   define MGA_G200 0x1234
 #   define MGA_G400 0x5678
 
@@ -99,6 +100,8 @@ MODULE_DEACTIVATE_STOP
 #   define MGA_VID_FORMAT_UYVY (('U'<<24)|('Y'<<16)|('V'<<8)|'Y')
 
 #   define MGA_VID_VERSION     0x0201
+
+#   define MGA_NUM_FRAMES      1
 
 typedef struct mga_vid_config_s
 {
@@ -132,6 +135,8 @@ typedef struct vout_sys_s
 
 typedef struct picture_sys_s
 {
+    int     i_frame;
+
     /* For buggy g200s which don't do I420 properly */
     u8 *    p_chroma;
     u8 *    p_tmp;
@@ -225,7 +230,7 @@ static int vout_Init( vout_thread_t *p_vout )
 
     /* Initialize a video buffer */
     p_vout->p_sys->mga.colkey_on = 0;
-    p_vout->p_sys->mga.num_frames = 1;
+    p_vout->p_sys->mga.num_frames = MGA_NUM_FRAMES;
     p_vout->p_sys->mga.frame_size = CEIL32(p_vout->output.i_width)
                                      * p_vout->output.i_height * 2;
     p_vout->p_sys->mga.version = MGA_VID_VERSION;
@@ -260,12 +265,12 @@ static int vout_Init( vout_thread_t *p_vout )
     }
 
     p_vout->p_sys->p_video = mmap( 0, p_vout->p_sys->mga.frame_size
-                                       * p_vout->p_sys->mga.num_frames,
+                                       * MGA_NUM_FRAMES,
                                    PROT_WRITE, MAP_SHARED,
                                    p_vout->p_sys->i_fd, 0 );
 
-    /* Try to initialize up to num_frames direct buffers */
-    while( I_OUTPUTPICTURES < p_vout->p_sys->mga.num_frames )
+    /* Try to initialize up to MGA_NUM_FRAMES direct buffers */
+    while( I_OUTPUTPICTURES < MGA_NUM_FRAMES )
     {
         p_pic = NULL;
 
@@ -383,7 +388,7 @@ static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    ;
+    ioctl( p_vout->p_sys->i_fd, MGA_VID_FSEL, &p_pic->p_sys->i_frame );
 }
 
 /* Following functions are local */
@@ -415,18 +420,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_pic->p[Y_PLANE].b_margin = 0;
     }
 
-    p_pic->U_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 2 / 4;
-    p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
-    p_pic->p[U_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
-    p_pic->p[U_PLANE].i_pixel_bytes = 1;
-    p_pic->p[U_PLANE].b_margin = 0;
-
-    p_pic->V_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 3 / 4;
-    p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
-    p_pic->p[V_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
-    p_pic->p[V_PLANE].i_pixel_bytes = 1;
-    p_pic->p[V_PLANE].b_margin = 0;
-
     if( p_vout->p_sys->b_420bug )
     {
         /* We need to store the chroma somewhere else */
@@ -438,12 +431,37 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             return -1;
         }
 
-        p_pic->p_sys->p_chroma = p_pic->U_PIXELS;
+        p_pic->p_sys->p_chroma =
+              p_pic->p_data + p_vout->p_sys->mga.frame_size / 2;
         p_pic->p_sys->p_tmp = (u8*)p_pic->p_sys + sizeof( picture_sys_t );
         p_pic->U_PIXELS = p_pic->p_sys->p_tmp;
         p_pic->V_PIXELS = p_pic->p_sys->p_tmp
                            + p_vout->p_sys->mga.frame_size / 4;
     }
+    else
+    {
+        p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
+
+        if( p_pic->p_sys == NULL )
+        {
+            return -1;
+        }
+
+        p_pic->U_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 2/4;
+        p_pic->V_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 3/4;
+    }
+
+    p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
+    p_pic->p[U_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
+    p_pic->p[U_PLANE].i_pixel_bytes = 1;
+    p_pic->p[U_PLANE].b_margin = 0;
+
+    p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
+    p_pic->p[V_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
+    p_pic->p[V_PLANE].i_pixel_bytes = 1;
+    p_pic->p[V_PLANE].b_margin = 0;
+
+    p_pic->p_sys->i_frame = I_OUTPUTPICTURES;
 
     p_pic->i_planes = 3;
 
