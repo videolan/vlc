@@ -756,6 +756,23 @@ static struct
 #endif
 
     /*
+     *  Image codecs
+     */
+
+#if LIBAVCODEC_BUILD >= 4731
+    { VLC_FOURCC('p','n','g',' '), CODEC_ID_PNG,
+      VIDEO_ES, "PNG Image" },
+    { VLC_FOURCC('p','p','m',' '), CODEC_ID_PPM,
+      VIDEO_ES, "PPM Image" },
+    { VLC_FOURCC('p','g','m',' '), CODEC_ID_PGM,
+      VIDEO_ES, "PGM Image" },
+    { VLC_FOURCC('p','g','m','y'), CODEC_ID_PGMYUV,
+      VIDEO_ES, "PGM YUV Image" },
+    { VLC_FOURCC('p','a','m',' '), CODEC_ID_PAM,
+      VIDEO_ES, "PAM Image" },
+#endif
+
+    /*
      *  Audio Codecs
      */
 
