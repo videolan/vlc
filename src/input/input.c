@@ -112,9 +112,15 @@ input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
     {
         /* File methods */
         case INPUT_METHOD_TS_FILE:
+#ifdef OLD_DECODER
             p_input->p_open = &input_FileCreateMethod;
             p_input->p_read = &input_FileRead;
             p_input->p_clean = &input_FileDestroyMethod;
+#else
+            p_input->p_open = input_FileCreateMethod;
+            p_input->p_read = input_FileRead;
+            p_input->p_clean = input_FileDestroyMethod;
+#endif
             break;
 
         /* Network methods */
@@ -122,9 +128,15 @@ input_thread_t *input_CreateThread( input_cfg_t *p_cfg )
         case INPUT_METHOD_TS_MCAST:
         case INPUT_METHOD_TS_BCAST:
         case INPUT_METHOD_TS_VLAN_BCAST:
+#ifdef OLD_DECODER
             p_input->p_open = &input_NetworkCreateMethod;
             p_input->p_read = &input_NetworkRead;
             p_input->p_clean = &input_NetworkDestroyMethod;
+#else
+            p_input->p_open = input_NetworkCreateMethod;
+            p_input->p_read = input_NetworkRead;
+            p_input->p_clean = input_NetworkDestroyMethod;
+#endif
             break;
 
         case INPUT_METHOD_NONE:
@@ -341,7 +353,11 @@ static void EndThread( input_thread_t * p_input )
             {
                 case MPEG1_VIDEO_ES:
                 case MPEG2_VIDEO_ES:
+#ifdef OLD_DECODER
                     vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
+#else
+                    vpar_DestroyThread( (vpar_thread_t*)(p_input->pp_selected_es[i_es_loop]->p_dec) /*, NULL */ );
+#endif
                     break;
 
                 case MPEG1_AUDIO_ES:
@@ -986,7 +1002,11 @@ static __inline__ void input_DemuxPES( input_thread_t *p_input,
             {
                 case MPEG1_VIDEO_ES:
                 case MPEG2_VIDEO_ES:
+#ifdef OLD_DECODER
                     p_fifo = &(((vdec_thread_t*)(p_es_descriptor->p_dec))->fifo);
+#else
+                    p_fifo = &(((vpar_thread_t*)(p_es_descriptor->p_dec))->fifo);
+#endif
                     break;
 
                 case MPEG1_AUDIO_ES:

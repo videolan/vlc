@@ -9,12 +9,13 @@
 /*******************************************************************************
  * Preamble
  *******************************************************************************/
+
 #include "vlc.h"
 
-/*
+#if 0
 #include <errno.h>
-#include <sys/uio.h>                                                
-#include <stdlib.h>                             
+#include <sys/uio.h>                                                 /* iovec */
+#include <stdlib.h>                               /* atoi(), malloc(), free() */
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -22,7 +23,7 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/XShm.h>
 #include <sys/soundcard.h>
-#include <netinet/in.h>                                             
+#include <netinet/in.h>                                              /* ntohs */
 
 #include "common.h"
 #include "config.h"
@@ -42,7 +43,9 @@
 
 #include "video.h"
 #include "video_output.h"
-#include "video_decoder.h" */
+#include "video_decoder.h"
+
+#endif
 
 /******************************************************************************
  * input_AddPgrmElem: Start the extraction and the decoding of a program element
@@ -128,10 +131,19 @@ int input_AddPgrmElem( input_thread_t *p_input, int i_current_id )
                     case MPEG2_VIDEO_ES:
                         /* Spawn video thread. */
 /* Les 2 pointeurs NULL ne doivent pas etre NULL sinon on segfault !!!! */
+#ifdef OLD_DECODER
                         if( ((vdec_thread_t*)(p_input->p_es[i_es_loop].p_dec) =
                             vdec_CreateThread( p_input )) == NULL )
+#else
+                        if( ((vpar_thread_t*)(p_input->p_es[i_es_loop].p_dec) =
+                            vpar_CreateThread( p_input )) == NULL )
+#endif
                         {
+#ifdef OLD_DECODER
                             intf_ErrMsg("Could not start video decoder\n");
+#else
+                            intf_ErrMsg("Could not start video parser\n");
+#endif
                             vlc_mutex_unlock( &p_input->es_lock );
                             return( -1 );
                         }
@@ -216,7 +228,11 @@ int input_DelPgrmElem( input_thread_t *p_input, int i_current_id )
 
                     case MPEG1_VIDEO_ES:
                     case MPEG2_VIDEO_ES:
+#ifdef OLD_DECODER
                         vdec_DestroyThread( (vdec_thread_t*)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) /*, NULL */ );
+#else
+                        vpar_DestroyThread( (vpar_thread_t*)(p_input->pp_selected_es[i_selected_es_loop]->p_dec) /*, NULL */ );
+#endif
                         break;
                 }
 

@@ -70,11 +70,27 @@
 /* Video */
 #include "video.h"
 #include "video_output.h"
+
+#ifdef OLD_DECODER
 #include "video_decoder.h"
+#else
+#include "vdec_idct.h"
+#include "video_decoder.h"
+#include "vdec_motion.h"
+#include "vpar_blocks.h"
+#include "vpar_headers.h"
+#include "video_fifo.h"
+#include "vpar_synchro.h"
+#include "video_parser.h"
+#endif
 
 /* Interface */
 #include "intf_cmd.h"
 #include "intf_ctrl.h"
+#ifndef OLD_DECODER
+#include "intf_sys.h"
+#include "intf_console.h"
+#endif
 #include "interface.h"
 
 #include "main.h"

@@ -28,6 +28,8 @@ ARCH=MMX
 # Decoder choice - ?? old decoder will be removed soon
 #DECODER=old
 DECODER=new
+# !!! don't forget to run this command after changing decoder type !!!
+# touch input/input.c input/input_ctrl.c include/vlc.h include/video_decoder.h
 
 #----------------- do not change anything below this line ----------------------
 
@@ -194,6 +196,7 @@ subtitle_decoder_obj =		subtitle_decoder/subtitle_decoder.o
 # remeber to add it to OBJ 
 
 ifeq ($(DECODER),old)
+CFLAGS += -DOLD_DECODER
 video_decoder_obj =		video_decoder_ref/video_decoder.o \
 						video_decoder_ref/display.o \
 						video_decoder_ref/getblk.o \
