@@ -8970,7 +8970,7 @@ msgstr "Activer"
 
 #: modules/gui/wxwindows/interface.cpp:552
 msgid "Restore Defaults"
-msgstr "Réinitialise"
+msgstr "Réinitialiser"
 
 #: modules/gui/wxwindows/interface.cpp:555
 msgid "Hue"

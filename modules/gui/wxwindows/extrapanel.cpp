@@ -472,7 +472,7 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
     top_sizer->Add( 0, 0, 1, wxALL, 2 );
 
     top_sizer->Add( new wxButton( panel, EqRestore_Event,
-                                  wxU( _("Restore defaults") ) ),
+                                  wxU( _("Restore Defaults") ) ),
 		    0, wxALL, 2 );
     top_sizer->Add( 0, 0, 1, wxALL, 2 );
 
