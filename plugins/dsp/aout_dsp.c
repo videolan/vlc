@@ -101,10 +101,10 @@ void aout_getfunctions( function_list_t * p_function_list )
 }
 
 /*****************************************************************************
- * aout_Probe: probes the audio device and return a score
+ * aout_Probe: probe the audio device and return a score
  *****************************************************************************
- * This function tries to open the dps and returns a score to the plugin
- * manager so that it can 
+ * This function tries to open the DSP and returns a score to the plugin
+ * manager so that it can choose the most appropriate one.
  *****************************************************************************/
 static int aout_Probe( probedata_t *p_data )
 {

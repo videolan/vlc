@@ -1,8 +1,8 @@
 /*****************************************************************************
- * aout_beos.cpp: beos interface
+ * aout_beos.cpp: BeOS audio output
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: aout_beos.cpp,v 1.8 2001/01/07 16:17:58 sam Exp $
+ * $Id: aout_beos.cpp,v 1.9 2001/01/12 13:15:42 sam Exp $
  *
  * Authors:
  * Samuel Hocevar <sam@via.ecp.fr>
@@ -50,15 +50,16 @@ extern "C"
 #include "audio_output.h"
 
 #include "intf_msg.h"
-
 #include "main.h"
+
+#include "modules.h"
 }
 
 /*****************************************************************************
- * aout_sys_t: esd audio output method descriptor
+ * aout_sys_t: BeOS audio output method descriptor
  *****************************************************************************
  * This structure is part of the audio output thread descriptor.
- * It describes some esd specific variables.
+ * It describes some BeOS specific variables.
  *****************************************************************************/
 typedef struct aout_sys_s
 {
@@ -74,9 +75,44 @@ extern "C"
 {
 
 /*****************************************************************************
- * aout_BeOpen: opens a BPushGameSound
+ * Local prototypes.
  *****************************************************************************/
-int aout_BeOpen( aout_thread_t *p_aout )
+static int     aout_Probe       ( probedata_t *p_data );
+static int     aout_Open        ( aout_thread_t *p_aout );
+static int     aout_SetFormat   ( aout_thread_t *p_aout );
+static long    aout_GetBufInfo  ( aout_thread_t *p_aout, long l_buffer_info );
+static void    aout_Play        ( aout_thread_t *p_aout,
+                                  byte_t *buffer, int i_size );
+static void    aout_Close       ( aout_thread_t *p_aout );
+
+/*****************************************************************************
+ * Functions exported as capabilities. They are declared as static so that
+ * we don't pollute the namespace too much.
+ *****************************************************************************/
+void aout_getfunctions( function_list_t * p_function_list )
+{
+    p_function_list->p_probe = aout_Probe;
+    p_function_list->functions.aout.p_open = aout_Open;
+    p_function_list->functions.aout.p_setformat = aout_SetFormat;
+    p_function_list->functions.aout.p_getbufinfo = aout_GetBufInfo;
+    p_function_list->functions.aout.p_play = aout_Play;
+    p_function_list->functions.aout.p_close = aout_Close;
+}
+
+/*****************************************************************************
+ * aout_Probe: probe the audio device and return a score
+ *****************************************************************************/
+int aout_Probe( aout_thread_t *p_aout )
+{
+    /* We don't test anything since I don't know what to test. However
+     * if the module could be loaded it is quite likely to work. */
+    return( 100 );
+}
+
+/*****************************************************************************
+ * aout_Open: opens a BPushGameSound
+ *****************************************************************************/
+int aout_Open( aout_thread_t *p_aout )
 {
     /* Allocate structure */
     p_aout->p_sys = (aout_sys_t*) malloc( sizeof( aout_sys_t ) );
@@ -137,17 +173,17 @@ int aout_BeOpen( aout_thread_t *p_aout )
 }
 
 /*****************************************************************************
- * aout_BeSetFormat: sets the dsp output format
+ * aout_SetFormat: sets the dsp output format
  *****************************************************************************/
-int aout_BeSetFormat( aout_thread_t *p_aout )
+int aout_SetFormat( aout_thread_t *p_aout )
 {
     return( 0 );
 }
 
 /*****************************************************************************
- * aout_BeGetBufInfo: buffer status query
+ * aout_GetBufInfo: buffer status query
  *****************************************************************************/
-long aout_BeGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
+long aout_GetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 {
     /* Each value is 4 bytes long (stereo signed 16 bits) */
     long i_hard_pos = 4 * p_aout->p_sys->p_sound->CurrentPosition();
@@ -162,11 +198,11 @@ long aout_BeGetBufInfo( aout_thread_t *p_aout, long l_buffer_limit )
 }
 
 /*****************************************************************************
- * aout_BePlay: plays a sound samples buffer
+ * aout_Play: plays a sound samples buffer
  *****************************************************************************
  * This function writes a buffer of i_length bytes in the dsp
  *****************************************************************************/
-void aout_BePlay( aout_thread_t *p_aout, byte_t *buffer, int i_size )
+void aout_Play( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 {
     long i_newbuf_pos;
 
@@ -196,9 +232,9 @@ void aout_BePlay( aout_thread_t *p_aout, byte_t *buffer, int i_size )
 }
 
 /*****************************************************************************
- * aout_BeClose: closes the dsp audio device
+ * aout_Close: closes the dsp audio device
  *****************************************************************************/
-void aout_BeClose( aout_thread_t *p_aout )
+void aout_Close( aout_thread_t *p_aout )
 {
     p_aout->p_sys->p_sound->UnlockCyclic();
     p_aout->p_sys->p_sound->StopPlaying( );

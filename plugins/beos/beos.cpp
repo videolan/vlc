@@ -20,6 +20,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+#define MODULE_NAME beos
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -40,23 +42,86 @@ extern "C"
 #include "video.h"
 #include "video_output.h"
 
+#include "modules.h"
+#include "modules_inner.h"
+
+/*****************************************************************************
+ * Build configuration tree.
+ *****************************************************************************/
+MODULE_CONFIG_START
+ADD_WINDOW( "Configuration for BeOS module" )
+    ADD_COMMENT( "Ha, ha -- nothing to configure yet" )
+MODULE_CONFIG_END
+
+/*****************************************************************************
+ * Capabilities defined in the other files.
+ *****************************************************************************/
+extern void aout_getfunctions( function_list_t * p_function_list );
+
+/*****************************************************************************
+ * InitModule: get the module structure and configuration.
+ *****************************************************************************
+ * We have to fill psz_name, psz_longname and psz_version. These variables
+ * will be strdup()ed later by the main application because the module can
+ * be unloaded later to save memory, and we want to be able to access this
+ * data even after the module has been unloaded.
+ *****************************************************************************/
+int InitModule( module_t * p_module )
+{
+    p_module->psz_name = MODULE_STRING;
+    p_module->psz_longname = "BeOS standard API module";
+    p_module->psz_version = VERSION;
+
+    p_module->i_capabilities = MODULE_CAPABILITY_NULL
+                                | MODULE_CAPABILITY_AOUT;
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * ActivateModule: set the module to an usable state.
+ *****************************************************************************
+ * This function fills the capability functions and the configuration
+ * structure. Once ActivateModule() has been called, the i_usage can
+ * be set to 0 and calls to NeedModule() be made to increment it. To unload
+ * the module, one has to wait until i_usage == 0 and call DeactivateModule().
+ *****************************************************************************/
+int ActivateModule( module_t * p_module )
+{
+    p_module->p_functions = malloc( sizeof( module_functions_t ) );
+    if( p_module->p_functions == NULL )
+    {
+        return( -1 );
+    }
+
+    aout_getfunctions( &p_module->p_functions->aout );
+
+    p_module->p_config = p_config;
+
+    return( 0 );
+}
+
+/*****************************************************************************
+ * DeactivateModule: make sure the module can be unloaded.
+ *****************************************************************************
+ * This function must only be called when i_usage == 0. If it successfully
+ * returns, i_usage can be set to -1 and the module unloaded. Be careful to
+ * lock usage_lock during the whole process.
+ *****************************************************************************/
+int DeactivateModule( module_t * p_module )
+{
+    free( p_module->p_functions );
+
+    return( 0 );
+}
+
+/* OLD MODULE STRUCTURE -- soon to be removed */
+
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static void aout_GetPlugin( p_aout_thread_t p_aout );
 static void vout_GetPlugin( p_vout_thread_t p_vout );
 static void intf_GetPlugin( p_intf_thread_t p_intf );
-
-/* Audio output */
-int     aout_BeOpen         ( aout_thread_t *p_aout );
-int     aout_BeReset        ( aout_thread_t *p_aout );
-int     aout_BeSetFormat    ( aout_thread_t *p_aout );
-int     aout_BeSetChannels  ( aout_thread_t *p_aout );
-int     aout_BeSetRate      ( aout_thread_t *p_aout );
-long    aout_BeGetBufInfo   ( aout_thread_t *p_aout, long l_buffer_info );
-void    aout_BePlay         ( aout_thread_t *p_aout, byte_t *buffer,
-                              int i_size );
-void    aout_BeClose        ( aout_thread_t *p_aout );
 
 /* Video output */
 int     vout_BeCreate       ( vout_thread_t *p_vout, char *psz_display,
@@ -85,7 +150,7 @@ plugin_info_t * GetConfig( void )
     p_info->psz_version = VERSION;
     p_info->psz_author  = "the VideoLAN team <vlc@videolan.org>";
 
-    p_info->aout_GetPlugin = aout_GetPlugin;
+    p_info->aout_GetPlugin = NULL;
     p_info->vout_GetPlugin = vout_GetPlugin;
     p_info->intf_GetPlugin = intf_GetPlugin;
     p_info->yuv_GetPlugin = NULL;
@@ -99,15 +164,6 @@ plugin_info_t * GetConfig( void )
 /*****************************************************************************
  * Following functions are only called through the p_info structure
  *****************************************************************************/
-
-static void aout_GetPlugin( p_aout_thread_t p_aout )
-{
-    p_aout->p_open        = aout_BeOpen;
-    p_aout->p_setformat   = aout_BeSetFormat;
-    p_aout->p_getbufinfo  = aout_BeGetBufInfo;
-    p_aout->p_play        = aout_BePlay;
-    p_aout->p_close       = aout_BeClose;
-}
 
 static void vout_GetPlugin( p_vout_thread_t p_vout )
 {
