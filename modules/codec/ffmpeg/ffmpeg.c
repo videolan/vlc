@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.71 2004/01/08 15:11:35 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.72 2004/01/08 21:48:43 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -461,6 +461,9 @@ static struct
     { VLC_FOURCC( 'm', 'j', 'p', 'b' ), CODEC_ID_MJPEGB, /* for mov file */
       VIDEO_ES, "Motion JPEG B Video" },
 
+    { VLC_FOURCC( 'S', 'P', '5', 'X' ), CODEC_ID_SP5X,
+      VIDEO_ES, "Sunplus Motion JPEG Video" },
+
     /* DV */
     { VLC_FOURCC('d','v','s','l'), CODEC_ID_DVVIDEO,
       VIDEO_ES, "DV Video" },
@@ -575,6 +578,15 @@ static struct
       VIDEO_ES, "Cinepak Video" },
 #endif
 
+    /* 4X Technologies */
+    { VLC_FOURCC('4','x','m','v'), CODEC_ID_4XM,
+      VIDEO_ES, "4X Technologies Video" },
+
+    /* Duck TrueMotion */
+    { VLC_FOURCC('D','U','C','K'), CODEC_ID_TRUEMOTION1,
+      VIDEO_ES, "Duck TrueMotion v1 Video" },
+
+
     /*
      *  Audio Codecs
      */
@@ -627,7 +639,10 @@ static struct
     { VLC_FOURCC('m','p','4','a'), CODEC_ID_AAC,
       AUDIO_ES, "MPEG AAC Audio" },
 
-#if 0
+    /* 4X Technologies */
+    { VLC_FOURCC('4','x','m','a'), CODEC_ID_ADPCM_4XM,
+      AUDIO_ES, "4X Technologies Audio" },
+
     /* PCM */
     { VLC_FOURCC('s','8',' ',' '), CODEC_ID_PCM_S8,
       AUDIO_ES, "PCM S8" },
@@ -645,7 +660,6 @@ static struct
       AUDIO_ES, "PCM ALAW" },
     { VLC_FOURCC('u','l','a','w'), CODEC_ID_PCM_MULAW,
       AUDIO_ES, "PCM ULAW" },
-#endif
 
     {0}
 };
