@@ -1067,19 +1067,6 @@ static void RunThread( vout_thread_t *p_vout)
                 }
             }
 
-            /* Remove picture from heap */
-            vlc_mutex_lock( &p_vout->picture_lock );
-            if( p_pic->i_refcount )
-            {
-                p_pic->i_status = DISPLAYED_PICTURE;
-            }
-            else
-            {
-                p_pic->i_status = DESTROYED_PICTURE;
-                p_vout->i_pictures--;
-            }
-            vlc_mutex_unlock( &p_vout->picture_lock );
-
             /* Render interface and subpicture */
             if( b_display && p_vout->b_interface )
             {
@@ -1176,6 +1163,23 @@ static void RunThread( vout_thread_t *p_vout)
             p_vout->i_buffer_index = ++p_vout->i_buffer_index & 1;
 #endif
         }
+
+        if( p_pic )
+        {
+            /* Remove picture from heap */
+            vlc_mutex_lock( &p_vout->picture_lock );
+            if( p_pic->i_refcount )
+            {
+                p_pic->i_status = DISPLAYED_PICTURE;
+            }
+            else
+            {
+                p_pic->i_status = DESTROYED_PICTURE;
+                p_vout->i_pictures--;
+            }
+            vlc_mutex_unlock( &p_vout->picture_lock );
+        }
+
 
         /*
          * Check events and manage thread
