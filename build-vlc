@@ -1,0 +1,69 @@
+#!/bin/sh
+
+FEATURES="
+GNOME gnome
+GTK gtk
+DVDOLD dvd
+DVDREAD dvdread
+DVDPLAY dvdplay
+VCD vcd
+V4L v4l
+SAT satellite
+X11 x11
+XVIDEO xvideo
+SDL sdl
+FB fb
+OSS oss
+ESD esd
+A52 a52
+MAD mad
+FFMPEG ffmpeg
+"
+PATHS="
+FFMPEG_TREE ffmpeg-tree
+"
+if [ ! -e .config ]
+then
+   ./menuconfig
+fi
+
+echo -n "./configure " > .cmd
+source .config
+
+check_features () {
+while [ -n "$1" ]
+do
+   eval x="\$CONFIG_$1"
+   if [ "$x" == "y" ]
+   then
+      echo -n "--enable-$2 " >> .cmd
+   else
+      echo -n "--disable-$2 " >> .cmd
+   fi
+   shift; shift
+done
+}
+
+check_paths () {
+while [ -n "$1" ]
+do
+   if [ -n $1 ]
+   then
+      eval x="\$CONFIG_$1"
+      echo -n "--with-$2=$x" >> .cmd
+   fi
+   shift; shift
+done
+}
+
+check_features $FEATURES
+check_paths $PATHS
+
+if [ ! -e configure ]
+then
+   ./bootstrap
+fi
+
+source .cmd
+make
+rm -f .cmd

@@ -1,0 +1,57 @@
+#
+# For a description of the syntax of this configuration file,
+# see Documentation/kbuild/config-language.txt.
+#
+mainmenu_name "VLC Configuration"
+
+choice 'Operating System' \
+   "Linux		CONFIG_LINUX \
+    Win32		CONFIG_WIN32" Linux
+
+mainmenu_option next_comment
+comment 'Graphical User Interfaces'
+bool 'Gnome interface' CONFIG_GNOME
+bool 'GTK interface' CONFIG_GTK
+endmenu
+
+mainmenu_option next_comment
+comment 'Inputs'
+bool 'DVD support' CONFIG_DVD
+if [ "$CONFIG_DVD" = "y" ]; then
+   bool '    standard DVD input' CONFIG_DVDOLD
+   bool '    libdvdread' CONFIG_DVDREAD
+   bool '    libdvdplay' CONFIG_DVDPLAY
+fi
+bool 'VCD support' CONFIG_VCD
+bool 'Video for Linux (V4L) support' CONFIG_V4L
+bool 'Satellite support' CONFIG_SAT
+endmenu
+
+mainmenu_option next_comment
+comment 'Video outputs'
+if [ "$CONFIG_LINUX" = "y" ]; then
+   bool 'X11 output' CONFIG_X11
+   bool 'XVideo output' CONFIG_XVIDEO
+   bool 'Framebuffer output' CONFIG_FB
+fi
+bool 'SDL video output' CONFIG_SDL
+endmenu
+
+mainmenu_option next_comment
+comment 'Audio outputs'
+if [ "$CONFIG_LINUX" = "y" ]; then
+   bool 'Open Sound System (OSS)' CONFIG_OSS
+   bool 'Enlightenment Sound Daemon (ESD)' CONFIG_ESD
+fi
+endmenu
+
+mainmenu_option next_comment
+comment 'Codecs'
+bool 'A52 support' CONFIG_A52
+bool 'MAD support' CONFIG_MAD
+bool 'FFMPEG' CONFIG_FFMPEG
+if [ "$CONFIG_FFMPEG" = "y" ]; then
+   string "ffmpeg tree" CONFIG_FFMPEG_TREE /home/videolan/ffmpeg
+fi
+endmenu
+
