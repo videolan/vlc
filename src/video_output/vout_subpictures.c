@@ -2,7 +2,7 @@
  * vout_subpictures.c : subpicture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_subpictures.c,v 1.15 2002/10/17 08:24:12 sam Exp $
+ * $Id: vout_subpictures.c,v 1.16 2002/11/06 18:07:56 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -77,12 +77,10 @@ void  vout_DisplaySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
  * already allocated zone of memory in the spu data fields. It needs locking
  * since several pictures can be created by several producers threads.
  *****************************************************************************/
-subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
-                                     int i_size )
+subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type )
 {
     int                 i_subpic;                        /* subpicture index */
-    subpicture_t *      p_free_subpic = NULL;       /* first free subpicture */
-    subpicture_t *      p_destroyed_subpic = NULL; /* first destroyed subpic */
+    subpicture_t *      p_subpic = NULL;            /* first free subpicture */
 
     /* Get lock */
     vlc_mutex_lock( &p_vout->subpicture_lock );
@@ -92,78 +90,39 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
      */
     for( i_subpic = 0; i_subpic < VOUT_MAX_SUBPICTURES; i_subpic++ )
     {
-        if( p_vout->p_subpicture[i_subpic].i_status == DESTROYED_SUBPICTURE )
-        {
-            /* Subpicture is marked for destruction, but is still allocated */
-            if( (p_vout->p_subpicture[i_subpic].i_type  == i_type)   &&
-                (p_vout->p_subpicture[i_subpic].i_size  >= i_size) )
-            {
-                /* Memory size do match or is smaller : memory will not be
-                 * reallocated, and function can end immediately - this is
-                 * the best possible case, since no memory allocation needs
-                 * to be done */
-                p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
-                vlc_mutex_unlock( &p_vout->subpicture_lock );
-                return &p_vout->p_subpicture[i_subpic];
-            }
-            else if( p_destroyed_subpic == NULL )
-            {
-                /* Memory size do not match, but subpicture index will be kept
-                 * in case we find no other place */
-                p_destroyed_subpic = &p_vout->p_subpicture[i_subpic];
-            }
-        }
-        else if( (p_free_subpic == NULL) &&
-                 (p_vout->p_subpicture[i_subpic].i_status == FREE_SUBPICTURE ))
+        if( p_vout->p_subpicture[i_subpic].i_status == FREE_SUBPICTURE )
         {
             /* Subpicture is empty and ready for allocation */
-            p_free_subpic = &p_vout->p_subpicture[i_subpic];
+            p_subpic = &p_vout->p_subpicture[i_subpic];
+            p_vout->p_subpicture[i_subpic].i_status = RESERVED_SUBPICTURE;
+            break;
         }
     }
 
-    /* If no free subpictures are available, use a destroyed subpicture */
-    if( (p_free_subpic == NULL) && (p_destroyed_subpic != NULL ) )
-    {
-        /* No free subpicture or matching destroyed subpictures have been
-         * found, but a destroyed subpicture is still available */
-        free( p_destroyed_subpic->p_sys_orig );
-        p_free_subpic = p_destroyed_subpic;
-    }
-
-    /* If no free or destroyed subpicture could be found */
-    if( p_free_subpic == NULL )
+    /* If no free subpicture could be found */
+    if( p_subpic == NULL )
     {
         msg_Err( p_vout, "subpicture heap is full" );
         vlc_mutex_unlock( &p_vout->subpicture_lock );
         return NULL;
     }
 
-    p_free_subpic->p_sys =
-        vlc_memalign( &p_free_subpic->p_sys_orig, 16, i_size );
+    /* Copy subpicture information, set some default values */
+    p_subpic->i_type    = i_type;
+    p_subpic->i_status  = RESERVED_SUBPICTURE;
 
-    if( p_free_subpic->p_sys != NULL )
-    {
-        /* Copy subpicture information, set some default values */
-        p_free_subpic->i_type   = i_type;
-        p_free_subpic->i_status = RESERVED_SUBPICTURE;
-        p_free_subpic->i_size   = i_size;
-        p_free_subpic->i_x      = 0;
-        p_free_subpic->i_y      = 0;
-        p_free_subpic->i_width  = 0;
-        p_free_subpic->i_height = 0;
-    }
-    else
-    {
-        /* Memory allocation failed : set subpicture as empty */
-        msg_Err( p_vout, "out of memory" );
-        p_free_subpic->i_type   = EMPTY_SUBPICTURE;
-        p_free_subpic->i_status = FREE_SUBPICTURE;
-        p_free_subpic           = NULL;
-    }
+    p_subpic->i_start   = 0;
+    p_subpic->i_stop    = 0;
+    p_subpic->b_ephemer = VLC_FALSE;
+
+    p_subpic->i_x       = 0;
+    p_subpic->i_y       = 0;
+    p_subpic->i_width   = 0;
+    p_subpic->i_height  = 0;
 
     vlc_mutex_unlock( &p_vout->subpicture_lock );
 
-    return p_free_subpic;
+    return p_subpic;
 }
 
 /*****************************************************************************
@@ -176,15 +135,20 @@ subpicture_t *vout_CreateSubPicture( vout_thread_t *p_vout, int i_type,
  *****************************************************************************/
 void vout_DestroySubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
 {
-   /* Check if status is valid */
-   if( ( p_subpic->i_status != RESERVED_SUBPICTURE )
-          && ( p_subpic->i_status != READY_SUBPICTURE ) )
-   {
-       msg_Err( p_vout, "subpicture %p has invalid status %d",
-                        p_subpic, p_subpic->i_status );
-   }
+    /* Check if status is valid */
+    if( ( p_subpic->i_status != RESERVED_SUBPICTURE )
+           && ( p_subpic->i_status != READY_SUBPICTURE ) )
+    {
+        msg_Err( p_vout, "subpicture %p has invalid status %d",
+                         p_subpic, p_subpic->i_status );
+    }
 
-    p_subpic->i_status = DESTROYED_SUBPICTURE;
+    if( p_subpic->pf_destroy )
+    {
+        p_subpic->pf_destroy( p_subpic );
+    }
+
+    p_subpic->i_status = FREE_SUBPICTURE;
 }
 
 /*****************************************************************************

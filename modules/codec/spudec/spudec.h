@@ -2,7 +2,7 @@
  * spudec.h : sub picture unit decoder thread interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: spudec.h,v 1.2 2002/08/16 03:07:56 sam Exp $
+ * $Id: spudec.h,v 1.3 2002/11/06 18:07:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,6 +21,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+typedef struct spudec_thread_t spudec_thread_t;
+
 struct subpicture_sys_t
 {
     mtime_t i_pts;                                 /* presentation timestamp */
@@ -30,14 +32,22 @@ struct subpicture_sys_t
 
     /* Color information */
     vlc_bool_t b_palette;
-    u8    pi_alpha[4];
-    u8    pi_yuv[4][3];
+    uint8_t    pi_alpha[4];
+    uint8_t    pi_yuv[4][3];
+
+    /* Link to our input */
+    vlc_object_t * p_input;
+
+    /* Cropping properties */
+    vlc_mutex_t  lock;
+    vlc_bool_t   b_crop;
+    int          i_x_start, i_y_start, i_x_end, i_y_end;
 };
 
 /*****************************************************************************
  * spudec_thread_t : sub picture unit decoder thread descriptor
  *****************************************************************************/
-typedef struct spudec_thread_t
+struct spudec_thread_t
 {
     /*
      * Thread properties and locks
@@ -61,8 +71,7 @@ typedef struct spudec_thread_t
      */
     int                 i_spu_size;            /* size of current SPU packet */
     int                 i_rle_size;                  /* size of the RLE part */
-
-} spudec_thread_t;
+};
 
 /*****************************************************************************
  * Amount of bytes we GetChunk() in one go

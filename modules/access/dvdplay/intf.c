@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.2 2002/10/17 16:03:18 sam Exp $
+ * $Id: intf.c,v 1.3 2002/11/06 18:07:57 sam Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -33,6 +33,7 @@
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
+#include "input_ext-dec.h"
 
 #include "dvd.h"
 
@@ -190,10 +191,6 @@ static void RunIntf( intf_thread_t *p_intf )
                 p_intf->p_sys->b_move = VLC_FALSE;
             }
 
-            msg_Dbg( p_intf, "send button coordinates: %dx%d",
-                             p_intf->p_sys->control.mouse.i_x,
-                             p_intf->p_sys->control.mouse.i_y );
-
             /* we can safely interact with libdvdplay
              * with the stream lock */
             vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
@@ -343,7 +340,6 @@ int dvdIntfStillTime( intf_thread_t *p_intf, int i_sec )
 #endif
     vlc_mutex_unlock( &p_intf->change_lock );
 
-    return 0;
+    return VLC_SUCCESS;
 }
-
 

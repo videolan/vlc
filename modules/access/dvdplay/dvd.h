@@ -2,7 +2,7 @@
  * dvd.h: structure of the dvdplay plugin
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd.h,v 1.1 2002/08/04 17:23:42 sam Exp $
+ * $Id: dvd.h,v 1.2 2002/11/06 18:07:57 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -56,6 +56,7 @@ typedef struct
 
     dvdplay_event_t         event;
     dvdplay_ctrl_t          control;   
+    dvdplay_highlight_t     hli;
 
 } dvd_data_t;
 

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.56 2002/07/23 00:39:16 sam Exp $
+ * $Id: video.h,v 1.57 2002/11/06 18:07:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -166,7 +166,6 @@ struct subpicture_t
     /* Type and flags - should NOT be modified except by the vout thread */
     int             i_type;                                          /* type */
     int             i_status;                                       /* flags */
-    int             i_size;                                     /* data size */
     subpicture_t *  p_next;                 /* next subtitle to be displayed */
 
     /* Date properties */
@@ -199,13 +198,13 @@ struct subpicture_t
     } type;
 #endif
 
-    /* The subpicture rendering routine */
-    void ( *pf_render ) ( vout_thread_t *, picture_t *, const subpicture_t * );
+    /* The subpicture rendering and destruction routines */
+    void ( *pf_render )  ( vout_thread_t *, picture_t *, const subpicture_t * );
+    void ( *pf_destroy ) ( subpicture_t * );
 
     /* Private data - the subtitle plugin might want to put stuff here to
      * keep track of the subpicture */
     subpicture_sys_t *p_sys;                              /* subpicture data */
-    void             *p_sys_orig;                 /* pointer before memalign */
 };
 
 /* Subpicture type */
@@ -216,5 +215,4 @@ struct subpicture_t
 #define FREE_SUBPICTURE        0                   /* free and not allocated */
 #define RESERVED_SUBPICTURE    1                   /* allocated and reserved */
 #define READY_SUBPICTURE       2                        /* ready for display */
-#define DESTROYED_SUBPICTURE   3           /* allocated but not used anymore */
 

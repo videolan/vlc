@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.4 2002/10/26 15:24:19 gbazin Exp $
+ * $Id: access.c,v 1.5 2002/11/06 18:07:57 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -87,7 +87,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
     p_dvd = malloc( sizeof(dvd_data_t) );
     if( p_dvd == NULL )
     {
-        msg_Err( p_input, "dvdplay error: out of memory" );
+        msg_Err( p_input, "out of memory" );
         return -1;
     }
 
@@ -114,7 +114,7 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
 
     if( p_dvd->vmg == NULL )
     {
-        msg_Err( p_input, "dvdplay error: can't open source" );
+        msg_Err( p_input, "cannot open %s", psz_source );
         free( p_dvd );
         return -1;
     }
@@ -184,6 +184,18 @@ int E_(OpenDVD) ( vlc_object_t *p_this )
 
     p_input->psz_demux = "dvdplay";
 
+    /* FIXME: we might lose variables here */
+    var_Create( p_input, "x-start", VLC_VAR_INTEGER );
+    var_Create( p_input, "y-start", VLC_VAR_INTEGER );
+    var_Create( p_input, "x-end", VLC_VAR_INTEGER );
+    var_Create( p_input, "y-end", VLC_VAR_INTEGER );
+
+    var_Create( p_input, "color", VLC_VAR_ADDRESS );
+    var_Create( p_input, "contrast", VLC_VAR_ADDRESS );
+
+    var_Create( p_input, "highlight", VLC_VAR_BOOL );
+    var_Create( p_input, "highlight-mutex", VLC_VAR_MUTEX );
+
     return 0;
 }
 
@@ -194,6 +206,17 @@ void E_(CloseDVD) ( vlc_object_t *p_this )
 {
     input_thread_t * p_input = (input_thread_t *)p_this;
     dvd_data_t *     p_dvd = (dvd_data_t *)p_input->p_access_data;
+
+    var_Destroy( p_input, "highlight-mutex" );
+    var_Destroy( p_input, "highlight" );
+
+    var_Destroy( p_input, "x-start" );
+    var_Destroy( p_input, "x-end" );
+    var_Destroy( p_input, "y-start" );
+    var_Destroy( p_input, "y-end" );
+
+    var_Destroy( p_input, "color" );
+    var_Destroy( p_input, "contrast" );
 
     /* close libdvdplay */
     dvdplay_close( p_dvd->vmg );
@@ -350,6 +373,7 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
 {
     input_thread_t *    p_input;
     dvd_data_t *        p_dvd;
+    vlc_value_t         val;
     int                 i;
 
     p_input = (input_thread_t*)p_args;
@@ -407,11 +431,38 @@ static void pf_vmg_callback( void* p_args, dvdplay_event_t event )
     case COMPLETE_VIDEO:
         break;
     case NEW_HIGHLIGHT:
-        
+        if( var_Get( p_input, "highlight-mutex", &val ) == VLC_SUCCESS )
+        {
+            vlc_mutex_t *p_mutex = val.p_address;
+            vlc_mutex_lock( p_mutex );
+
+            /* Retrieve the highlight from dvdplay */
+            dvdplay_highlight( p_dvd->vmg, &p_dvd->hli );
+
+            /* Fill our internal variables with this data */
+            val.i_int = p_dvd->hli.i_x_start;
+            var_Set( p_input, "x-start", val );
+            val.i_int = p_dvd->hli.i_y_start;
+            var_Set( p_input, "y-start", val );
+            val.i_int = p_dvd->hli.i_x_end;
+            var_Set( p_input, "x-end", val );
+            val.i_int = p_dvd->hli.i_y_end;
+            var_Set( p_input, "y-end", val );
+
+            val.p_address = (void *)p_dvd->hli.pi_color;
+            var_Set( p_input, "color", val );
+            val.p_address = (void *)p_dvd->hli.pi_contrast;
+            var_Set( p_input, "contrast", val );
+
+            /* Tell the SPU decoder that there's a new highlight */
+            val.b_bool = VLC_TRUE;
+            var_Set( p_input, "highlight", val );
+
+            vlc_mutex_unlock( p_mutex );
+        }
         break;
     default:
-        msg_Err( p_input, "unknown event from libdvdplay (%d)",
-                      event );
+        msg_Err( p_input, "unknown event from libdvdplay (%d)", event );
     }
 
     return;
@@ -494,3 +545,4 @@ static int dvdNewPGC( input_thread_t * p_input )
 
     return 0;
 }
+

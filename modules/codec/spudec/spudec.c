@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.6 2002/10/31 09:40:26 gbazin Exp $
+ * $Id: spudec.c,v 1.7 2002/11/06 18:07:57 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -68,14 +68,15 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_fifo_t *p_fifo = (decoder_fifo_t*) p_this;
 
-    if( p_fifo->i_fourcc == VLC_FOURCC('s','p','u',' ')
-         || p_fifo->i_fourcc == VLC_FOURCC('s','p','u','b') )
+    if( p_fifo->i_fourcc != VLC_FOURCC('s','p','u',' ')
+         && p_fifo->i_fourcc != VLC_FOURCC('s','p','u','b') )
     {   
-        p_fifo->pf_run = RunDecoder;
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
     }
     
-    return VLC_EGENERIC;
+    p_fifo->pf_run = RunDecoder;
+
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -84,7 +85,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 static int RunDecoder( decoder_fifo_t * p_fifo )
 {
     spudec_thread_t *     p_spudec;
-   
+
     /* Allocate the memory needed to store the thread's structure */
     p_spudec = (spudec_thread_t *)malloc( sizeof(spudec_thread_t) );
 
@@ -112,10 +113,12 @@ static int RunDecoder( decoder_fifo_t * p_fifo )
      */
     while( (!p_spudec->p_fifo->b_die) && (!p_spudec->p_fifo->b_error) )
     {
-        if( !E_(SyncPacket)( p_spudec ) )
+        if( E_(SyncPacket)( p_spudec ) )
         {
-            E_(ParsePacket)( p_spudec );
+            continue;
         }
+
+        E_(ParsePacket)( p_spudec );
     }
 
     /*
@@ -183,7 +186,7 @@ static int InitThread( spudec_thread_t *p_spudec )
 static void EndThread( spudec_thread_t *p_spudec )
 {
     if( p_spudec->p_vout != NULL 
-     && p_spudec->p_vout->p_subpicture != NULL )
+         && p_spudec->p_vout->p_subpicture != NULL )
     {
         subpicture_t *  p_subpic;
         int             i_subpic;

@@ -5,7 +5,7 @@
  * thread, and destroy a previously opened video output thread.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_output.h,v 1.84 2002/10/17 16:03:18 sam Exp $
+ * $Id: video_output.h,v 1.85 2002/11/06 18:07:57 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -158,7 +158,7 @@ VLC_EXPORT( void,            vout_PlacePicture,   ( vout_thread_t *, int, int, i
 picture_t *     vout_RenderPicture  ( vout_thread_t *, picture_t *,
                                                        subpicture_t * );
 
-VLC_EXPORT( subpicture_t *,  vout_CreateSubPicture,   ( vout_thread_t *, int, int ) );
+VLC_EXPORT( subpicture_t *,  vout_CreateSubPicture,   ( vout_thread_t *, int ) );
 VLC_EXPORT( void,            vout_DestroySubPicture,  ( vout_thread_t *, subpicture_t * ) );
 VLC_EXPORT( void,            vout_DisplaySubPicture,  ( vout_thread_t *, subpicture_t * ) );
 
