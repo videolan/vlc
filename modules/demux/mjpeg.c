@@ -255,9 +255,9 @@ static int SendBlock( demux_t *p_demux, int i )
         return 0;
     }
 
-    if( 0 == p_sys->i_frame_length )
+    if( !p_sys->i_frame_length || !p_sys->i_time )
     {
-        p_block->i_dts = p_block->i_pts = mdate() + 1;
+        p_sys->i_time = p_block->i_dts = p_block->i_pts = mdate();
     }
     else
     {
@@ -285,7 +285,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     p_sys->p_es         = NULL;
-    p_sys->i_time       = 1;
+    p_sys->i_time       = 0;
 
     var_Create( p_demux, "mjpeg-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Get( p_demux, "mjpeg-fps", &val );
@@ -473,7 +473,5 @@ static void Close ( vlc_object_t * p_this )
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     return demux2_vaControlHelper( p_demux->s, 0, 0, 0, 0, i_query, args );
 }
