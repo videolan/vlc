@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.11 2003/03/03 16:49:14 gbazin Exp $
+##  $Id: toolbox,v 1.12 2003/03/10 19:30:35 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -20,9 +20,10 @@ help()
 {
   cat << EOF
 recognized flags are:
-  --update-vc     update Microsoft Visual Studio files
-  --update-po     update translation files
-  --update-glade  generate and fix Glade code
+  --update-changelog  update the CVS changelog
+  --update-vc         update Microsoft Visual Studio files
+  --update-po         update translation files
+  --update-glade      generate and fix Glade code
 EOF
   exit 1
 }
@@ -30,28 +31,37 @@ EOF
 ###
 ###  argument check
 ###
-do_help=yes
+do_help=no
+do_changelog=no
 do_po=no
 do_vc=no
 do_glade=no
+
+if test "$1" = ""
+then
+  do_help=yes
+fi
+
 while test $# -gt 0; do
   case "$1" in
+    --update-changelog)
+      do_changelog=yes
+      ;;
     --update-vc)
-      do_help=no
       do_vc=yes
       ;;
     --update-po)
-      do_help=no
       do_po=yes
       ;;
     --update-glade|--fix-glade)
-      do_help=no
       do_glade=yes
+      ;;
+    --help)
+      do_help=yes
       ;;
     *)
       echo "$0: unknown option $1"
       do_help=yes
-      help
       ;;
   esac
   shift
@@ -63,6 +73,17 @@ done
 if test "$do_help" = "yes"
 then
   help
+fi
+
+##
+##  Update the CVS changelog
+##
+if test "$do_changelog" = "yes"
+then
+  cvs2cl --help >/dev/null 2>&1 || exit 1
+  cvs2cl --hide-filenames --no-wrap -w --stdout | \
+    sed -e 's/^[^0-9]/ /' -e 's/^  *$//' | \
+    uniq >| ChangeLog
 fi
 
 ##
