@@ -117,25 +117,25 @@ vlc_module_begin();
                  ENC_KEYINT_LONGTEXT, VLC_FALSE );
     add_integer( ENC_CFG_PREFIX "bframes", 0, NULL, ENC_BFRAMES_TEXT,
                  ENC_BFRAMES_LONGTEXT, VLC_FALSE );
-    add_bool( ENC_CFG_PREFIX "hurry_up", 0, NULL, ENC_HURRYUP_TEXT,
+    add_bool( ENC_CFG_PREFIX "hurry-up", 0, NULL, ENC_HURRYUP_TEXT,
               ENC_HURRYUP_LONGTEXT, VLC_FALSE );
     add_bool( ENC_CFG_PREFIX "interlace", 0, NULL, ENC_INTERLACE_TEXT,
               ENC_INTERLACE_LONGTEXT, VLC_TRUE );
     add_integer( ENC_CFG_PREFIX "vt", 0, NULL, ENC_VT_TEXT,
                  ENC_VT_LONGTEXT, VLC_TRUE );
-    add_bool( ENC_CFG_PREFIX "pre_me", 0, NULL, ENC_PRE_ME_TEXT,
+    add_bool( ENC_CFG_PREFIX "pre-me", 0, NULL, ENC_PRE_ME_TEXT,
               ENC_PRE_ME_LONGTEXT, VLC_TRUE );
-    add_bool( ENC_CFG_PREFIX "strict_rc", 0, NULL, ENC_RC_STRICT_TEXT,
+    add_bool( ENC_CFG_PREFIX "strict-rc", 0, NULL, ENC_RC_STRICT_TEXT,
               ENC_RC_STRICT_LONGTEXT, VLC_TRUE );
-    add_integer( ENC_CFG_PREFIX "rc_buffer_size", 224*1024*8 * 3/2, NULL,
+    add_integer( ENC_CFG_PREFIX "rc-buffer-size", 224*1024*8 * 3/2, NULL,
                  ENC_RC_BUF_TEXT, ENC_RC_BUF_LONGTEXT, VLC_TRUE );
-    add_float( ENC_CFG_PREFIX "rc_buffer_aggressivity", 0.1, NULL,
+    add_float( ENC_CFG_PREFIX "rc-buffer-aggressivity", 0.1, NULL,
                ENC_RC_BUF_AGGR_TEXT, ENC_RC_BUF_AGGR_LONGTEXT, VLC_TRUE );
-    add_float( ENC_CFG_PREFIX "i_quant_factor", 0, NULL,
+    add_float( ENC_CFG_PREFIX "i-quant-factor", 0, NULL,
                ENC_QUANT_FACTOR_TEXT, ENC_QUANT_FACTOR_LONGTEXT, VLC_TRUE );
-    add_integer( ENC_CFG_PREFIX "noise_reduction", 0, NULL,
+    add_integer( ENC_CFG_PREFIX "noise-reduction", 0, NULL,
                  ENC_NOISE_RED_TEXT, ENC_NOISE_RED_LONGTEXT, VLC_TRUE );
-    add_bool( ENC_CFG_PREFIX "mpeg4_matrix", 0, NULL,
+    add_bool( ENC_CFG_PREFIX "mpeg4-matrix", 0, NULL,
               ENC_MPEG4_MATRIX_TEXT, ENC_MPEG4_MATRIX_LONGTEXT, VLC_TRUE );
     add_integer( ENC_CFG_PREFIX "qmin", 0, NULL,
                  ENC_QMIN_TEXT, ENC_QMIN_LONGTEXT, VLC_TRUE );

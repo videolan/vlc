@@ -138,8 +138,8 @@ struct encoder_sys_t
 
 static const char *ppsz_enc_options[] = {
     "keyint", "bframes", "vt", "qmin", "qmax", "hq", "strict_rc",
-    "rc_buffer_size", "rc_buffer_aggressivity", "pre_me", "hurry_up",
-    "interlace", "i_quant_factor", "noise_reduction", "mpeg4_matrix",
+    "rc-buffer-size", "rc-buffer-aggressivity", "pre-me", "hurry-up",
+    "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", NULL
 };
 
@@ -247,10 +247,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     var_Get( p_enc, ENC_CFG_PREFIX "interlace", &val );
     p_sys->b_interlace = val.b_bool;
 
-    var_Get( p_enc, ENC_CFG_PREFIX "pre_me", &val );
+    var_Get( p_enc, ENC_CFG_PREFIX "pre-me", &val );
     p_sys->b_pre_me = val.b_bool;
 
-    var_Get( p_enc, ENC_CFG_PREFIX "hurry_up", &val );
+    var_Get( p_enc, ENC_CFG_PREFIX "hurry-up", &val );
     p_sys->b_hurry_up = val.b_bool;
     if( p_sys->b_hurry_up )
     {
@@ -258,20 +258,20 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_sys->i_noise_reduction = 1;
     }
 
-    var_Get( p_enc, ENC_CFG_PREFIX "strict_rc", &val );
+    var_Get( p_enc, ENC_CFG_PREFIX "strict-rc", &val );
     p_sys->b_strict_rc = val.b_bool;
-    var_Get( p_enc, ENC_CFG_PREFIX "rc_buffer_size", &val );
+    var_Get( p_enc, ENC_CFG_PREFIX "rc-buffer-size", &val );
     p_sys->i_rc_buffer_size = val.i_int;
-    var_Get( p_enc, ENC_CFG_PREFIX "rc_buffer_aggressivity", &val );
+    var_Get( p_enc, ENC_CFG_PREFIX "rc-buffer-aggressivity", &val );
     p_sys->f_rc_buffer_aggressivity = val.f_float;
 
-    var_Get( p_enc, ENC_CFG_PREFIX "i_quant_factor", &val );
+    var_Get( p_enc, ENC_CFG_PREFIX "i-quant-factor", &val );
     p_sys->f_i_quant_factor = val.f_float;
 
-    var_Get( p_enc, ENC_CFG_PREFIX "noise_reduction", &val );
+    var_Get( p_enc, ENC_CFG_PREFIX "noise-reduction", &val );
     p_sys->i_noise_reduction = val.i_int;
 
-    var_Get( p_enc, ENC_CFG_PREFIX "mpeg4_matrix", &val );
+    var_Get( p_enc, ENC_CFG_PREFIX "mpeg4-matrix", &val );
     p_sys->b_mpeg4_matrix = val.b_bool;
 
     var_Get( p_enc, ENC_CFG_PREFIX "hq", &val );
@@ -319,7 +319,8 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->i_quant_offset = 0.0;
         p_context->i_quant_factor = -0.8;
 
-        p_context->gop_size = p_sys->i_key_int > 0 ? p_sys->i_key_int : 50;
+        if( p_sys->i_key_int > 0 )
+            p_context->gop_size = p_sys->i_key_int;
         p_context->max_b_frames =
             __MIN( p_sys->i_b_frames, FF_MAX_B_FRAMES );
         p_context->b_frame_strategy = 0;
