@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc.h: main libvlc header
  *****************************************************************************
- * Copyright (C) 1998-2002 VideoLAN
+ * Copyright (C) 1998-2005 VideoLAN
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
@@ -276,6 +276,11 @@ static char *ppsz_align_descriptions[] =
 #define SKIP_FRAMES_TEXT N_("Skip frames")
 #define SKIP_FRAMES_LONGTEXT N_( \
     "Disable this option to disable frame drops on MPEG-2 streams.")
+
+#define QUIET_SYNCHRO_TEXT N_("Quiet synchro")
+#define QUIET_SYNCHRO_LONGTEXT N_( \
+    "Enable this option to avoid flooding the message log with debug " \
+    "output from the video output synchro.")
 
 #define INPUT_CAT_LONGTEXT N_( \
     "These options allow you to modify the behavior of the input " \
@@ -925,6 +930,8 @@ vlc_module_begin();
         change_short('f');
     add_bool( "skip-frames", 1, NULL, SKIP_FRAMES_TEXT,
               SKIP_FRAMES_LONGTEXT, VLC_TRUE );
+    add_bool( "quiet-synchro", 0, NULL, QUIET_SYNCHRO_TEXT,
+              QUIET_SYNCHRO_LONGTEXT, VLC_TRUE );
 #ifndef SYS_DARWIN
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
 #endif

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_synchro.h: frame-dropping structures
  *****************************************************************************
- * Copyright (C) 1999-2003 VideoLAN
+ * Copyright (C) 1999-2005 VideoLAN
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -37,6 +37,7 @@ struct vout_synchro_t
     int             i_frame_rate;
     int             i_current_rate;
     vlc_bool_t      b_no_skip;
+    vlc_bool_t      b_quiet;
 
     /* date of the beginning of the decoding of the current picture */
     mtime_t         decoding_start;
