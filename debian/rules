@@ -246,36 +246,10 @@ endif
 	mkdir -p debian/vlc-qt/usr/share/doc/
 	ln -s vlc debian/vlc-qt/usr/share/doc/vlc-qt
 
-	# Package: vlc-mad
-	mkdir -p debian/vlc-mad/usr/share/doc/
-	ln -s vlc debian/vlc-mad/usr/share/doc/vlc-mad
-
 	# Package: vlc-plugin-arts
 	ln -s vlc debian/vlc-plugin-arts/usr/share/doc/vlc-plugin-arts
 	mv debian/vlc/usr/lib/vlc/audio_output/libarts_plugin.so \
 		debian/vlc-plugin-arts/usr/lib/vlc/audio_output/
-
-	# Package: vlc-arts
-	mkdir -p debian/vlc-arts/usr/share/doc/
-	ln -s vlc debian/vlc-arts/usr/share/doc/vlc-arts
-
-	# Package: vlc-plugin-lirc
-	ln -s vlc debian/vlc-plugin-lirc/usr/share/doc/vlc-plugin-lirc
-	mv debian/vlc/usr/lib/vlc/control/liblirc_plugin.so \
-		debian/vlc-plugin-lirc/usr/lib/vlc/control/
-
-	# Package: vlc-lirc
-	mkdir -p debian/vlc-lirc/usr/share/doc/
-	ln -s vlc debian/vlc-lirc/usr/share/doc/vlc-lirc
-
-	# Package: vlc-plugin-aa
-	ln -s vlc debian/vlc-plugin-aa/usr/share/doc/vlc-plugin-aa
-	mv debian/vlc/usr/lib/vlc/video_output/libaa_plugin.so \
-		debian/vlc-plugin-aa/usr/lib/vlc/video_output/
-
-	# Package: vlc-aa
-	mkdir -p debian/vlc-aa/usr/share/doc/
-	ln -s vlc debian/vlc-aa/usr/share/doc/vlc-aa
 
 	# Package: mozilla-plugin-vlc
 	ln -s vlc debian/mozilla-plugin-vlc/usr/share/doc/mozilla-plugin-vlc

@@ -11,6 +11,8 @@ Architecture: any
 Depends: ${shlibs:Depends}
 Recommends: vlc-gui
 Suggests: gnome-vlc
+Replaces: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
+Conflicts: vlc-plugin-dvb (<< 0.5.2-2), vlc-plugin-xosd (<< 0.5.2-2), vlc-plugin-dv (<< 0.5.2-2), vlc-plugin-mad (<< 0.5.2-2), vlc-mad (<< 0.5.0), vlc-plugin-a52 (<< 0.5.2-2), vlc-plugin-ogg (<< 0.5.2-2), vlc-plugin-lirc (<< 0.5.2-2), vlc-lirc (<< 0.5.0), vlc-plugin-aa (<< 0.5.2-2), vlc-aa (<< 0.5.0)
 Description: a complete multimedia player
  This is the VideoLAN project's VLC media player. It plays MPEG, MPEG2,
  MPEG4, DivX, mp3, Ogg/Vorbis files, DVDs, VCDs, and multimedia streams
@@ -155,12 +157,6 @@ Depends: qvlc
 Description: legacy package that you should remove
  This package is now called qvlc.
 
-Package: vlc-mad
-Architecture: any
-Depends: vlc
-Description: legacy package that you should remove
- This package is now included in vlc.
-
 Package: vlc-plugin-arts
 Architecture: any
 Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
@@ -170,44 +166,6 @@ Description: aRts audio output plugin for VLC
  This plugin adds support for the aRts Sound System to the VLC media
  player. To activate it, use the `--aout arts' flag or select the `arts'
  audio output plugin from the preferences menu.
-
-Package: vlc-arts
-Architecture: any
-Depends: vlc-plugin-arts
-Description: legacy package that you should remove
- This package is now called vlc-plugin-arts.
-
-Package: vlc-plugin-lirc
-Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Conflicts: vlc-lirc (<< 0.5.0)
-Replaces: vlc-lirc (<< 0.5.0)
-Description: lirc (infrared remote control) interface plugin for VLC
- This plugin is an infrared lirc interface for the VLC media player. To
- activate it, use the `--extraintf lirc' flag or select the `lirc' extra
- interface plugin from the preferences menu.
-
-Package: vlc-lirc
-Architecture: any
-Depends: vlc-plugin-lirc
-Description: legacy package that you should remove
- This package is now called vlc-plugin-lirc.
-
-Package: vlc-plugin-aa
-Architecture: any
-Depends: vlc (= ${Source-Version}), ${shlibs:Depends}
-Conflicts: vlc-aa (<< 0.5.0)
-Replaces: vlc-aa (<< 0.5.0)
-Description: ASCII art video output plugin for VLC
- This is an ASCII art video output plugin for the VLC media player. To
- activate it, use the `--vout aa' flag or select the `aa' video output
- plugin from the preferences menu.
-
-Package: vlc-aa
-Architecture: any
-Depends: vlc-plugin-aa
-Description: legacy package that you should remove
- This package is now called vlc-plugin-aa.
 
 Package: mozilla-plugin-vlc
 Architecture: any
