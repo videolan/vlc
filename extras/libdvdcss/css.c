@@ -2,7 +2,7 @@
  * css.c: Functions for DVD authentification and unscrambling
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: css.c,v 1.13 2001/10/16 16:51:28 stef Exp $
+ * $Id: css.c,v 1.14 2001/11/11 04:51:10 jlj Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *         Håkan Hjort <d95hjort@dtek.chalmers.se>
@@ -98,7 +98,7 @@ int CSSAuth( dvdcss_handle dvdcss )
 {
     /* structures defined in cdrom.h or dvdio.h */
     unsigned char p_buffer[10];
-    char psz_warning[32];
+    char psz_warning[48];
     int  i_ret = -1;
     int  i;
 
@@ -122,7 +122,7 @@ int CSSAuth( dvdcss_handle dvdcss )
     /* Init sequence, request AGID */
     for( i = 1; i < 4 ; ++i )
     {
-        sprintf( psz_warning, "requesting AGID %d", i );
+        snprintf( psz_warning, sizeof(psz_warning), "requesting AGID %d", i );
         _dvdcss_debug( dvdcss, psz_warning );
 
         i_ret = ioctl_ReportAgid( dvdcss->i_fd, &dvdcss->css.i_agid );
@@ -185,7 +185,8 @@ int CSSAuth( dvdcss_handle dvdcss )
         if( memcmp( dvdcss->css.disc.p_key_check,
                     dvdcss->css.disc.p_key1, KEY_SIZE ) == 0 )
         {
-            sprintf( psz_warning, "drive authentic, using variant %d", i );
+            snprintf( psz_warning, sizeof(psz_warning),
+                      "drive authentic, using variant %d", i );
             _dvdcss_debug( dvdcss, psz_warning );
             dvdcss->css.disc.i_varient = i;
             break;
