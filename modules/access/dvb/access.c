@@ -5,7 +5,6 @@
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Jean-Paul Saman <saman@natlab.research.philips.com>
- *          Christopher Ross <ross@natlab.research.philips.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,8 +39,11 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
-#include <string.h>
-#include <errno.h>
+
+#ifdef HAVE_ERRNO_H
+#    include <string.h>
+#    include <errno.h>
+#endif
 
 #ifdef STRNCASECMP_IN_STRINGS_H
 #   include <strings.h>
@@ -84,7 +86,7 @@ int E_(Open) ( vlc_object_t *p_this )
     int                 i_fec = 0;
     fe_code_rate_t      fe_fec = FEC_NONE;
     vlc_bool_t          b_diseqc;
-    vlc_bool_t					b_no_probe;
+    vlc_bool_t					b_probe;
     int                 i_lnb_lof1;
     int                 i_lnb_lof2;
     int                 i_lnb_slof;
@@ -100,20 +102,15 @@ int E_(Open) ( vlc_object_t *p_this )
         return( -1 );
     }
 
-    p_input->pf_read = SatelliteRead;
-    p_input->pf_set_program = SatelliteSetProgram;
-    p_input->pf_set_area = SatelliteSetArea;
-    p_input->pf_seek = SatelliteSeek;
-
     // Get adapter and device number to use for this dvb card
     u_adapter = config_GetInt( p_input, "adapter" );
     u_device  = config_GetInt( p_input, "device" );
 
     /* Determine frontend device information and capabilities */
-    b_no_probe = config_GetInt( p_input, "no-probe" );
-    if (!b_no_probe)
+    b_probe = config_GetInt( p_input, "probe" );
+    if (b_probe)
 	  {
-        if ( ioctl_InfoFrontend(&frontend_info, u_adapter, u_device) < 0 )
+        if ( ioctl_InfoFrontend(p_input, &frontend_info, u_adapter, u_device) < 0 )
         {
           	msg_Err( p_input, "(access) cannot determine frontend info" );
             return -1;
@@ -128,14 +125,14 @@ int E_(Open) ( vlc_object_t *p_this )
 		{
 			  int i_len;
 			  
-			  msg_Dbg( p_input, "Using default values for frontend info" );
+			  msg_Dbg( p_input, "using default values for frontend info" );
 	   	  i_len = sizeof(FRONTEND);
      		if (snprintf(frontend, sizeof(FRONTEND), FRONTEND, u_adapter, u_device) >= i_len)
      		{
-     		  printf( "error: snprintf() truncated string for FRONTEND" );
+     		  msg_Err( p_input, "snprintf() truncated string for FRONTEND" );
      			frontend[sizeof(FRONTEND)] = '\0';
         }
-			  frontend_info.name = frontend;
+			  strncpy(frontend_info.name, frontend, 128);
 			  frontend_info.type = FE_QPSK;
     	  frontend_info.frequency_max = 12999;
         frontend_info.frequency_min = 10000;
@@ -144,7 +141,13 @@ int E_(Open) ( vlc_object_t *p_this )
 				/* b_polarisation */
     }
 
-    u_freq = (int)strtol( psz_parser, &psz_next, 10 );
+    /* Register Callback functions */
+    p_input->pf_read = SatelliteRead;
+    p_input->pf_set_program = SatelliteSetProgram;
+    p_input->pf_set_area = SatelliteSetArea;
+    p_input->pf_seek = SatelliteSeek;
+
+    u_freq = (unsigned int)strtol( psz_parser, &psz_next, 10 );
     if( *psz_next )
     {
         psz_parser = psz_next + 1;
@@ -156,7 +159,7 @@ int E_(Open) ( vlc_object_t *p_this )
             if( *psz_next )
             {
                 psz_parser = psz_next + 1;
-                u_srate = (int)strtol( psz_parser, &psz_next, 10 );
+                u_srate = (unsigned int)strtol( psz_parser, &psz_next, 10 );
             }
         }
     }
@@ -187,7 +190,7 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
-    if( b_polarisation && b_polarisation != 1 )
+    if( b_polarisation && (b_polarisation != 1) )
     {
         msg_Warn( p_input, "invalid polarization, using default one" );
         b_polarisation = config_GetInt( p_input, "polarization" );
@@ -198,11 +201,11 @@ int E_(Open) ( vlc_object_t *p_this )
         }
     }
 
-    if( (i_fec > 7) || (i_fec < 1) )
+    if( (i_fec > 9) || (i_fec < 1) )
     {
         msg_Warn( p_input, "invalid FEC, using default one" );
         i_fec = config_GetInt( p_input, "fec" );
-        if( (i_fec > 7) || (i_fec < 1) )
+        if( (i_fec > 9) || (i_fec < 1) )
         {
             msg_Err( p_input, "invalid default FEC" );
             return -1;
@@ -241,6 +244,7 @@ int E_(Open) ( vlc_object_t *p_this )
         default:
             /* cannot happen */
             fe_fec = FEC_NONE;
+            msg_Err( p_input, "invalid FEC (unknown)" );
             break;
     }
 
@@ -279,7 +283,7 @@ int E_(Open) ( vlc_object_t *p_this )
 	  i_len = sizeof(DVR);
 		if (snprintf(dvr, sizeof(DVR), DVR, u_adapter, u_device) >= i_len)
 		{
-		  msg_Err( p_input, "error: snprintf() truncated string for DVR" );
+		  msg_Err( p_input, "snprintf() truncated string for DVR" );
 			dvr[sizeof(DVR)] = '\0';
     }
     msg_Dbg( p_input, "opening DVR device '%s'", dvr );
@@ -287,7 +291,11 @@ int E_(Open) ( vlc_object_t *p_this )
     if( (p_satellite->i_handle = open( dvr,
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
+#   ifdef HAVE_ERRNO_H
         msg_Warn( p_input, "cannot open `%s' (%s)", dvr, strerror(errno) );
+#   else
+        msg_Warn( p_input, "cannot open `%s'", dvr );
+#   endif
         free( p_satellite );
         return -1;
     }
@@ -299,13 +307,10 @@ int E_(Open) ( vlc_object_t *p_this )
     i_lnb_slof = config_GetInt( p_input, "lnb-slof" );
 
     /* Initialize the Satellite Card */
-    msg_Dbg( p_input, "initializing Sat Card with Freq: %d, Pol: %d, "
-                      "FEC: %d, Srate: %d", u_freq, b_polarisation, fe_fec, u_srate );
+    msg_Dbg( p_input, "initializing Sat Card with Freq: %u, Pol: %d, "
+                      "FEC: %d, Srate: %u", u_freq, b_polarisation, fe_fec, u_srate );
 
-    msg_Dbg( p_input, "initializing frontend device" );
-//    switch (ioctl_SetQPSKFrontend ( u_freq * 1000, i_srate* 1000, fe_fec,
-//                i_lnb_lof1 * 1000, i_lnb_lof2 * 1000, i_lnb_slof * 1000))
-    switch (ioctl_SetQPSKFrontend ( fep, b_polarisation, u_adapter, u_device ))
+    switch (ioctl_SetQPSKFrontend (p_input, fep, b_polarisation, u_adapter, u_device ))
     {
         case -2:
             msg_Err( p_input, "frontend returned an unexpected event" );
@@ -336,17 +341,19 @@ int E_(Open) ( vlc_object_t *p_this )
             break;
     }
 
-    msg_Dbg( p_input, "setting filter on PAT\n" );
+    msg_Dbg( p_input, "setting filter on PAT" );
 
-    if ( ioctl_SetDMXFilter( 0, &i_fd, 3, u_adapter, u_device ) < 0 )
+    if ( ioctl_SetDMXFilter(p_input, 0, &i_fd, 3, u_adapter, u_device ) < 0 )
     {
+#   ifdef HAVE_ERRNO_H
+        msg_Err( p_input, "an error occured when setting filter on PAT (%s)", strerror(errno) );
+#   else
         msg_Err( p_input, "an error occured when setting filter on PAT" );
+#   endif        
         close( p_satellite->i_handle );
         free( p_satellite );
         return -1;
     }
-
-    msg_Dbg( p_input, "@@@ Initialising input stream\n" );
 
     if( input_InitStream( p_input, sizeof( stream_ts_data_t ) ) == -1 )
     {
@@ -367,7 +374,6 @@ int E_(Open) ( vlc_object_t *p_this )
     p_input->i_mtu = SATELLITE_READ_ONCE * TS_PACKET_SIZE;
     p_input->stream.i_method = INPUT_METHOD_SATELLITE;
 
-    msg_Dbg( p_input, "@@@ Leaving E_(Open)\n" );
     return 0;
 }
 
@@ -389,7 +395,7 @@ void E_(Close) ( vlc_object_t *p_this )
 #define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
             if ( p_es->p_decoder_fifo )
             {
-                ioctl_UnsetDMXFilter( p_es->i_demux_fd );
+                ioctl_UnsetDMXFilter(p_input, p_es->i_demux_fd );
             }
 #undef p_es
         }
@@ -409,10 +415,7 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
     ssize_t i_ret;
 		unsigned int				u_adapter = 1;
 		unsigned int			  u_device = 0;
- 
     unsigned int i;
-
-    msg_Dbg( p_input, "@@@ SatelliteRead seeking for %d program\n", p_input->stream.i_pgrm_number );
 
     // Get adapter and device number to use for this dvb card
     u_adapter = config_GetInt( p_input, "adapter" );
@@ -421,15 +424,9 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
     /* if not set, set filters to the PMTs */
     for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
     {
-        msg_Dbg( p_input, "@@@ trying to set filter on pmt pid %d",
-                     p_input->stream.pp_programs[i]->pp_es[0]->i_id );
-
         if ( p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd == 0 )
         {
-            msg_Dbg( p_input, "setting filter on pmt pid %d",
-                     p_input->stream.pp_programs[i]->pp_es[0]->i_id );
-
-            ioctl_SetDMXFilter( p_input->stream.pp_programs[i]->pp_es[0]->i_id,
+            ioctl_SetDMXFilter(p_input, p_input->stream.pp_programs[i]->pp_es[0]->i_id,
                        &p_input->stream.pp_programs[i]->pp_es[0]->i_demux_fd,
                        3, u_adapter, u_device );
         }
@@ -446,8 +443,6 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
 #   endif
     }
 
-    msg_Dbg( p_input, "@@@ Searched all, returning %d\n", i_ret );
- 
     return i_ret;
 }
 
@@ -471,8 +466,6 @@ int SatelliteSetProgram( input_thread_t    * p_input,
 		unsigned int u_adapter = 1;
 		unsigned int u_device = 0;
 
-    msg_Dbg( p_input, "@@@ SatelliteSetProgram enter\n" );
-
     // Get adapter and device number to use for this dvb card
     u_adapter = config_GetInt( p_input, "adapter" );
     u_device  = config_GetInt( p_input, "device" );
@@ -490,7 +483,7 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             }
             if ( p_es->i_demux_fd )
             {
-                ioctl_UnsetDMXFilter( p_es->i_demux_fd );
+                ioctl_UnsetDMXFilter(p_input, p_es->i_demux_fd );
                 p_es->i_demux_fd = 0;
             }
 #undef p_es
@@ -506,19 +499,19 @@ int SatelliteSetProgram( input_thread_t    * p_input,
             case MPEG2_VIDEO_ES:
                 if ( input_SelectES( p_input , p_es ) == 0 )
                 {
-                    ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 1, u_adapter, u_device);
+                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 1, u_adapter, u_device);
                 }
                 break;
             case MPEG1_AUDIO_ES:
             case MPEG2_AUDIO_ES:
                 if ( input_SelectES( p_input , p_es ) == 0 )
                 {
-                    ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 2, u_adapter, u_device);
+                    ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 2, u_adapter, u_device);
                     input_SelectES( p_input , p_es );
                 }
                 break;
             default:
-                ioctl_SetDMXFilter( p_es->i_id, &p_es->i_demux_fd, 3, u_adapter, u_device);
+                ioctl_SetDMXFilter(p_input, p_es->i_id, &p_es->i_demux_fd, 3, u_adapter, u_device);
                 input_SelectES( p_input , p_es );
                 break;
 #undef p_es
@@ -527,7 +520,6 @@ int SatelliteSetProgram( input_thread_t    * p_input,
 
     p_input->stream.p_selected_program = p_new_prg;
 
-    msg_Dbg( p_input, "@@@ SatelliteSetProgram exit\n" );
     return 0;
 }
 

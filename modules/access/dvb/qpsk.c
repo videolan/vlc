@@ -70,8 +70,8 @@ void E_(Close)   ( vlc_object_t * );
 #define LNB_SLOF_TEXT N_("antenna lnb_slof (kHz)")
 #define LNB_SLOF_LONGTEXT ""
 
-#define NO_PROBE_TEXT	N_("do not probe the dvb card for capabilities")
-#define NO_PROBE_LONGTEXT N_("some dvb cards do not like to be probed for their capabilities")
+#define PROBE_TEXT	N_("probe the dvb card for capabilities (default disabled)")
+#define PROBE_LONGTEXT N_("some dvb cards do not like to be probed for their capabilities")
 
 vlc_module_begin();
     add_category_hint( N_("Input"), NULL, VLC_FALSE );
@@ -88,10 +88,9 @@ vlc_module_begin();
                      LNB_LOF2_TEXT, LNB_LOF2_LONGTEXT, VLC_FALSE );
         add_integer( "lnb-slof", 11700, NULL,
                      LNB_SLOF_TEXT, LNB_SLOF_LONGTEXT, VLC_FALSE );
-			  add_bool( "no-probe", 1, NULL, NO_PROBE_TEXT, NO_PROBE_LONGTEXT, VLC_FALSE );
+			  add_bool( "probe", 0, NULL, PROBE_TEXT, PROBE_LONGTEXT, VLC_FALSE );
     set_description( _("DVB input module with v4l2 support") );
     set_capability( "access", 0 );
-//    add_shortcut( "satellite" );
 		add_shortcut( "qpsk" );
 //    add_shortcut( "cable" );
 //    add_shortcut( "terrestrial" );

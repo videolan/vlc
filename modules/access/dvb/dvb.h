@@ -26,11 +26,6 @@
 /*****************************************************************************
  * Devices location
  *****************************************************************************/
-/*
-#define DMX      "/dev/dvb/adapter1/demux0"
-#define FRONTEND "/dev/dvb/adapter1/frontend0"
-#define DVR      "/dev/dvb/adapter1/dvr0"
-*/
 #define DMX      "/dev/dvb/adapter%d/demux%d"
 #define FRONTEND "/dev/dvb/adapter%d/frontend%d"
 #define DVR      "/dev/dvb/adapter%d/dvr%d"
@@ -38,8 +33,9 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-int ioctl_FrontendControl( int freq, int pol, int lnb_slof, int diseqc, unsigned int u_adapter, unsigned int u_device );
-int ioctl_SetQPSKFrontend ( struct dvb_frontend_parameters fep, int b_polarisation, unsigned int u_adapter, unsigned int u_device );
-int ioctl_SetDMXFilter( int i_pid, int *pi_fd, int i_type, unsigned int u_adapter, unsigned int u_device );
-int ioctl_UnsetDMXFilter( int );
-int ioctl_InfoFrontend(struct dvb_frontend_info *info, unsigned int u_adapter, unsigned int u_device );
+int ioctl_FrontendControl(input_thread_t *p_input, int freq, int pol, int lnb_slof, int diseqc, unsigned int u_adapter, unsigned int u_device );
+int ioctl_SetQPSKFrontend (input_thread_t * p_input, struct dvb_frontend_parameters fep, int b_polarisation, unsigned int u_adapter, unsigned int u_device );
+int ioctl_SetDMXFilter(input_thread_t * p_input, int i_pid, int *pi_fd, int i_type, unsigned int u_adapter, unsigned int u_device );
+int ioctl_UnsetDMXFilter(input_thread_t * p_input, int );
+int ioctl_InfoFrontend(input_thread_t * p_input, struct dvb_frontend_info *info, unsigned int u_adapter, unsigned int u_device );
+
