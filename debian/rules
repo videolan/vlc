@@ -351,6 +351,7 @@ binary-arch: build install
 	dh_installdocs -p vlc
 #	dh_installexamples
 	dh_installmenu
+	dh_installmime
 	dh_installman doc/vlc.1 -p vlc
 	dh_installman doc/vlc-config.1 -p libvlc0-dev
 #	dh_installchangelogs ChangeLog -p vlc
