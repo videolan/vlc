@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: playlist.m,v 1.4 2003/01/20 03:45:06 hartman Exp $
+ * $Id: playlist.m,v 1.5 2003/01/24 02:31:53 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -44,6 +44,28 @@
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
     return( [[self delegate] menuForEvent: o_event] );
+}
+
+- (void)keyDown:(NSEvent *)o_event
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    unichar key = 0;
+
+    if( [[o_event characters] length] )
+    {
+        key = [[o_event characters] characterAtIndex: 0];
+    }
+
+    switch( key )
+    {
+        case ' ':
+            input_SetStatus(  p_intf->p_sys->p_input , INPUT_STATUS_PAUSE );
+            break;
+
+        default:
+            [super keyDown: o_event];
+            break;
+    }
 }
 
 @end
