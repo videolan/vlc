@@ -41,7 +41,7 @@
 #include "mtime.h"
 #include "plugins.h"
 #include "input_vlan.h"
-#include "input_file.h"
+#include "input_ps.h"
 
 #include "intf_msg.h"
 #include "interface.h"

@@ -44,6 +44,7 @@
 #include "main.h"
 
 #include "input.h"
+#include "input_ps.h"
 #include "input_file.h"
 
 #define BUF_SIZE (797*3)
@@ -57,11 +58,6 @@
 #define MAX_AUDIO_CHANNEL 15
 #define MAX_SUBTITLES_CHANNEL 31
 #define NO_SUBTITLES 255
-
-#define REQUESTED_AC3          0
-#define REQUESTED_MPEG         1
-#define REQUESTED_LPCM         2
-#define REQUESTED_NOAUDIO    255
 
 #define PS_BUFFER_SIZE 16384
 #define NO_PES 0
