@@ -2,7 +2,7 @@
  * wingdi.c : Win32 / WinCE GDI video output plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: wingdi.c,v 1.7 2003/10/25 00:42:31 sam Exp $
+ * $Id: wingdi.c,v 1.8 2003/12/04 14:48:24 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -155,6 +155,12 @@ static int Init( vout_thread_t *p_vout )
             p_vout->output.pf_setpalette = SetPalette;
             break;
         case 24:
+            p_vout->output.i_chroma = VLC_FOURCC('R','V','2','4');
+            p_vout->output.i_rmask  = 0x00ff0000;
+            p_vout->output.i_gmask  = 0x0000ff00;
+            p_vout->output.i_bmask  = 0x000000ff;
+            break;
+        case 32:
             p_vout->output.i_chroma = VLC_FOURCC('R','V','3','2');
             p_vout->output.i_rmask  = 0x00ff0000;
             p_vout->output.i_gmask  = 0x0000ff00;
@@ -460,20 +466,25 @@ static void InitBuffers( vout_thread_t *p_vout )
     memset( p_info, 0, sizeof( BITMAPINFO ) + 3 * sizeof( RGBQUAD ) );
 
     p_header->biSize = sizeof( BITMAPINFOHEADER );
+    p_header->biSizeImage = 0;
     p_header->biPlanes = 1;
     switch( p_vout->p_sys->i_depth )
     {
         case 8:
             p_header->biBitCount = 8;
-            p_header->biSizeImage = i_pixels;
             p_header->biCompression = BI_RGB;
             /* FIXME: we need a palette here */
             break;
         case 24:
+            p_header->biBitCount = 24;
+            p_header->biCompression = BI_RGB;
+            ((DWORD*)p_info->bmiColors)[0] = 0x00ff0000;
+            ((DWORD*)p_info->bmiColors)[1] = 0x0000ff00;
+            ((DWORD*)p_info->bmiColors)[2] = 0x000000ff;
+            break;
         case 32:
             p_header->biBitCount = 32;
-            p_header->biSizeImage = i_pixels * 4;
-            p_header->biCompression = BI_BITFIELDS;
+            p_header->biCompression = BI_RGB;
             ((DWORD*)p_info->bmiColors)[0] = 0x00ff0000;
             ((DWORD*)p_info->bmiColors)[1] = 0x0000ff00;
             ((DWORD*)p_info->bmiColors)[2] = 0x000000ff;
@@ -481,8 +492,7 @@ static void InitBuffers( vout_thread_t *p_vout )
         case 16:
         default:
             p_header->biBitCount = 16;
-            p_header->biSizeImage = i_pixels * 2;
-            p_header->biCompression = BI_BITFIELDS;
+            p_header->biCompression = BI_RGB;
             ((DWORD*)p_info->bmiColors)[0] = 0x00007c00;
             ((DWORD*)p_info->bmiColors)[1] = 0x000003e0;
             ((DWORD*)p_info->bmiColors)[2] = 0x0000001f;
