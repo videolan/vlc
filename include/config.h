@@ -239,6 +239,10 @@
 /* Default gamma */
 #define VOUT_GAMMA                      0.
 
+/* Default fonts */
+#define VOUT_DEFAULT_FONT               "Resources/default8x9.psf"
+#define VOUT_LARGE_FONT                 "Resources/default8x16.psf"
+
 /*
  * Time settings
  */
@@ -269,15 +273,6 @@
 /* Environment variable for framebuffer device, and default value */
 #define VOUT_FB_DEV_VAR                 "vlc_fb_dev"
 #define VOUT_FB_DEV_DEFAULT             "/dev/fb0"
-
-/*
- * X11 settings 
- */
-
-/* Font maximum and minimum characters - characters outside this range are not
- * printed - maximum range is 1-256 */
-#define VOUT_MIN_CHAR                   1
-#define VOUT_MAX_CHAR                   128
 
 /*******************************************************************************
  * Video parser configuration

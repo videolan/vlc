@@ -47,12 +47,6 @@ typedef struct vout_sys_s
     Window              window;                     /* window instance handler */
     GC                  gc;                /* graphic context instance handler */    
 
-    /* Font information */
-    int                 i_char_bytes_per_line;      /* character width (bytes) */
-    int                 i_char_height;             /* character height (lines) */
-    int                 i_char_interspacing; /* space between centers (pixels) */
-    byte_t *            pi_font;                       /* pointer to font data */
-
     /* Display buffers and shared memory information */
     int                 i_buffer_index;                        /* buffer index */
     XImage *            p_ximage[2];                         /* XImage pointer */   
@@ -64,7 +58,6 @@ typedef struct vout_sys_s
  *******************************************************************************/
 static int  X11OpenDisplay      ( vout_thread_t *p_vout, char *psz_display, Window root_window );
 static void X11CloseDisplay     ( vout_thread_t *p_vout );
-static int  X11GetFont          ( vout_thread_t *p_vout );
 static int  X11CreateWindow     ( vout_thread_t *p_vout );
 static void X11DestroyWindow    ( vout_thread_t *p_vout );
 static int  X11CreateImage      ( vout_thread_t *p_vout, XImage **pp_ximage );
@@ -211,7 +204,7 @@ void vout_SysDestroy( vout_thread_t *p_vout )
  *******************************************************************************/
 int vout_SysManage( vout_thread_t *p_vout )
 {
-    if( p_vout->i_changes & VOUT_SIZE_CHANGE ) 
+    if( p_vout->i_changes & VOUT_SIZE_CHANGE )
     {        
         intf_DbgMsg("resizing window\n");      
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;       
@@ -281,89 +274,6 @@ void * vout_SysGetPicture( vout_thread_t *p_vout )
     return( p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->data );        
 }
 
-/*******************************************************************************
- * vout_SysPrint: print simple text on a picture
- *******************************************************************************
- * This function will print a simple text on the picture. It is designed to
- * print debugging or general informations, not to render subtitles.
- * Since there is no way to print text on an Ximage directly, this function
- * copy directly the pixels from a font.
- *******************************************************************************/
-void vout_SysPrint( vout_thread_t *p_vout, int i_x, int i_y, int i_halign, 
-                    int i_valign, unsigned char *psz_text )
-{
-    int                 i_line;                    /* line in character matrix */
-    int                 i_byte;               /* byte offset in character line */    
-    int                 i_height;                          /* character height */    
-    int                 i_char_bytes_per_line;         /* total bytes per line */
-    int                 i_text_width;                      /* total text width */
-    byte_t *            pi_pic;                                /* picture data */
-    byte_t *            pi_char;                             /* character data */
-
-    /* Update upper left coordinates according to alignment */
-    i_text_width = p_vout->p_sys->i_char_interspacing * strlen( psz_text );    
-    switch( i_halign )
-    {
-    case 0:                                                        /* centered */
-        i_x -= i_text_width / 2;
-        break;        
-    case 1:                                                   /* right aligned */
-        i_x -= i_text_width;
-        break;                
-    }
-    switch( i_valign )
-    {
-    case 0:                                                        /* centered */
-        i_y -= p_vout->p_sys->i_char_height / 2;
-        break;        
-    case 1:                                                   /* bottom aligned */
-        i_y -= p_vout->p_sys->i_char_height;
-        break;                
-    }
-
-    /* Copy used variables to local */
-    i_height =                  p_vout->p_sys->i_char_height;
-    i_char_bytes_per_line =     p_vout->p_sys->i_char_bytes_per_line;    
-
-    /* Check that the text is in the screen vertically and horizontally */
-    if( (i_y < 0) || (i_y + i_height > p_vout->i_height) || (i_x < 0) ||
-        (i_x + i_text_width > p_vout->i_width) )
-    {
-        intf_DbgMsg("text '%s' would print outside the screen\n", psz_text);        
-        return;        
-    }    
-
-    /* Print text */
-    for( ; *psz_text != '\0'; psz_text++ )
-    {
-        /* Check that the character is valid and in the screen horizontally */
-        if( (*psz_text >= VOUT_MIN_CHAR) && (*psz_text < VOUT_MAX_CHAR) )
-        {       
-            /* Select character */
-            pi_char =   p_vout->p_sys->pi_font + (*psz_text - VOUT_MIN_CHAR) * 
-                i_height * i_char_bytes_per_line;
-            pi_pic =    p_vout->p_sys->p_ximage[ p_vout->p_sys->i_buffer_index ]->data +
-                i_y * p_vout->i_bytes_per_line + i_x * p_vout->i_bytes_per_pixel;
-
-            /* Copy character */
-            for( i_line = 0; i_line < i_height; i_line++ )
-            {
-                /* Copy line */
-                for( i_byte = 0; i_byte < i_char_bytes_per_line; i_byte++ )
-                {
-                    pi_pic[ i_byte  ] = *pi_char++;                                
-                }
-                
-                /* Go to next line */
-                pi_pic += p_vout->i_bytes_per_line;
-            }
-        }
-
-        /* Jump to next character */
-        i_x += p_vout->p_sys->i_char_interspacing;
-    }
-}
-
 /* following functions are local */
 
 /*******************************************************************************
@@ -421,16 +331,6 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
         XCloseDisplay( p_vout->p_sys->p_display );        
         return( 1 );
     }
-
-    /* Get font information */
-    if( X11GetFont( p_vout ) )
-    {
-        intf_ErrMsg("error: can't read default font\n");
-        X11DestroyWindow( p_vout );
-        XCloseDisplay( p_vout->p_sys->p_display );
-        return( 1 );        
-    }
-
     return( 0 );    
 }
 
@@ -442,99 +342,9 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
  *******************************************************************************/
 static void X11CloseDisplay( vout_thread_t *p_vout )
 {
-    // Free font info
-    free( p_vout->p_sys->pi_font );    
-
-    // Destroy window and close display
+    /* Destroy window and close display */
     X11DestroyWindow( p_vout );
     XCloseDisplay( p_vout->p_sys->p_display );    
-}
-
-/*******************************************************************************
- * X11GetFont: get default font bitmap informations
- *******************************************************************************
- * This function will convert a font into a bitmap for later use by the 
- * vout_SysPrint function.
- *******************************************************************************/
-static int X11GetFont( vout_thread_t *p_vout )
-{
-    XFontStruct *       p_font_info;             /* font information structure */
-    Pixmap              pixmap;              /* pixmap used to draw characters */
-    GC                  gc;                                 /* graphic context */        
-    XGCValues           gc_values;               /* graphic context properties */    
-    XImage *            p_ximage;                      /* ximage for character */    
-    unsigned char       i_char;                             /* character index */    
-    int                 i_char_width;              /* character width (pixels) */
-    int                 i_char_bytes;                  /* total character size */        
-    
-    /* Load font */
-    p_font_info = XLoadQueryFont( p_vout->p_sys->p_display, "fixed" );
-    if( p_font_info == NULL )
-    {
-        intf_ErrMsg("error: can't load 'fixed' font\n");
-        return( 1 );        
-    }
-    
-    /* Get character size */
-    i_char_width =                              p_font_info->max_bounds.lbearing + 
-        p_font_info->max_bounds.rbearing;
-    p_vout->p_sys->i_char_bytes_per_line =      i_char_width * p_vout->i_bytes_per_pixel;    
-    p_vout->p_sys->i_char_height =              p_font_info->max_bounds.ascent + 
-        p_font_info->max_bounds.descent;
-    i_char_bytes =                              p_vout->p_sys->i_char_bytes_per_line *
-        p_vout->p_sys->i_char_height;    
-    p_vout->p_sys->i_char_interspacing =        p_font_info->max_bounds.width;    
-
-    /* Allocate font descriptor */
-    p_vout->p_sys->pi_font = malloc( i_char_bytes * ( VOUT_MAX_CHAR - VOUT_MIN_CHAR ) );
-    if( p_vout->p_sys->pi_font == NULL )
-    {
-        intf_ErrMsg("error: %s\n", strerror( ENOMEM ) );
-        XFreeFont( p_vout->p_sys->p_display, p_font_info );
-        return( 1 );        
-    }   
-
-    /* Create drawable and graphic context */
-    gc_values.foreground =      XBlackPixel( p_vout->p_sys->p_display, 
-                                             p_vout->p_sys->i_screen );
-    gc_values.background =      XBlackPixel( p_vout->p_sys->p_display, 
-                                             p_vout->p_sys->i_screen );
-    gc_values.font =            p_font_info->fid;    
-    pixmap = XCreatePixmap( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                            i_char_width,
-                            p_vout->p_sys->i_char_height *(VOUT_MAX_CHAR-VOUT_MIN_CHAR),
-                            p_vout->i_screen_depth );    
-    gc = XCreateGC( p_vout->p_sys->p_display, pixmap, 
-                    GCForeground | GCBackground | GCFont, &gc_values );
-
-    /* Clear pixmap and invert graphic context */
-    XFillRectangle( p_vout->p_sys->p_display, pixmap, gc, 0, 0, i_char_width, 
-                    p_vout->p_sys->i_char_height*(VOUT_MAX_CHAR-VOUT_MIN_CHAR) );    
-    XSetForeground( p_vout->p_sys->p_display, gc, 
-                    XWhitePixel( p_vout->p_sys->p_display, p_vout->p_sys->i_screen ) );
-    XSetBackground( p_vout->p_sys->p_display, gc, 
-                    XBlackPixel( p_vout->p_sys->p_display, p_vout->p_sys->i_screen ) );
-
-    /* Copy characters bitmaps to font descriptor */
-    for( i_char = VOUT_MIN_CHAR; i_char < VOUT_MAX_CHAR; i_char++ )
-    {    
-        XDrawString( p_vout->p_sys->p_display, pixmap, gc, 0,
-                     p_font_info->max_bounds.ascent + 
-                     (i_char-VOUT_MIN_CHAR) * p_vout->p_sys->i_char_height,
-                     &i_char, 1 );
-    }
-    p_ximage = XGetImage( p_vout->p_sys->p_display, pixmap, 0, 0, i_char_width,
-                          p_vout->p_sys->i_char_height*(VOUT_MAX_CHAR-VOUT_MIN_CHAR),
-                          -1, ZPixmap );        
-    memcpy( p_vout->p_sys->pi_font, p_ximage->data, 
-            i_char_bytes*(VOUT_MAX_CHAR-VOUT_MIN_CHAR));        
-
-    /* Free resources, unload font and return */        
-    XDestroyImage( p_ximage ); 
-    XFreeGC( p_vout->p_sys->p_display, gc );
-    XFreePixmap( p_vout->p_sys->p_display, pixmap );
-    XFreeFont( p_vout->p_sys->p_display, p_font_info );
-    return( 0 );    
 }
 
 /*******************************************************************************

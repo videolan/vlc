@@ -21,6 +21,7 @@
 #include "vlc_thread.h"
 #include "video.h"
 #include "video_output.h"
+#include "video_text.h"
 #include "video_sys.h"
 #include "video_yuv.h"
 #include "intf_msg.h"
@@ -33,6 +34,7 @@ static int      InitThread              ( vout_thread_t *p_vout );
 static void     RunThread               ( vout_thread_t *p_vout );
 static void     ErrorThread             ( vout_thread_t *p_vout );
 static void     EndThread               ( vout_thread_t *p_vout );
+static void     Print                   ( vout_thread_t *p_vout, int i_x, int i_y, int i_halign, int i_valign, unsigned char *psz_text );
 static void     RenderBlank             ( vout_thread_t *p_vout );
 static int      RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank );
 static int      RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic, boolean_t b_blank );
@@ -99,6 +101,23 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     intf_DbgMsg("actual configuration: %dx%d,%d (%d bytes/pixel, %d bytes/line)\n",
                 p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
                 p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line );
+
+    /* Load fonts */
+    p_vout->p_default_font      = vout_LoadFont( VOUT_DEFAULT_FONT );    
+    if( p_vout->p_default_font == NULL )
+    {
+        vout_SysDestroy( p_vout );        
+        free( p_vout );        
+        return( NULL );        
+    }    
+    p_vout->p_large_font        = vout_LoadFont( VOUT_LARGE_FONT );        
+    if( p_vout->p_large_font == NULL )
+    {
+        vout_UnloadFont( p_vout->p_default_font );        
+        vout_SysDestroy( p_vout );        
+        free( p_vout );        
+        return( NULL );        
+    }    
  
 #ifdef STATS
     /* Initialize statistics fields */
@@ -119,6 +138,8 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
     if( vlc_thread_create( &p_vout->thread_id, "video output", (void *) RunThread, (void *) p_vout) )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
+        vout_UnloadFont( p_vout->p_default_font );
+        vout_UnloadFont( p_vout->p_large_font );        
 	vout_SysDestroy( p_vout );
         free( p_vout );
         return( NULL );
@@ -600,6 +621,7 @@ static void RunThread( vout_thread_t *p_vout)
     p_vout->b_error = InitThread( p_vout );
     if( p_vout->b_error )
     {
+        //??
         free( p_vout );                                 /* destroy descriptor */
         return;        
     }    
@@ -792,13 +814,62 @@ static void EndThread( vout_thread_t *p_vout )
     /* Destroy translation tables */
     vout_EndTables( p_vout );
     
-    /* Destroy thread structures allocated by InitThread */
+    /* Destroy thread structures allocated by Create and InitThread */
     vout_SysEnd( p_vout );
+    vout_UnloadFont( p_vout->p_default_font );
+    vout_UnloadFont( p_vout->p_large_font ); 
     vout_SysDestroy( p_vout );
     free( p_vout );
 
     /* Update status */
     *pi_status = THREAD_OVER;    
+}
+
+/*******************************************************************************
+ * Print: print simple text on a picture
+ *******************************************************************************
+ * This function will print a simple text on the picture. It is designed to
+ * print debugging or general informations.
+ *******************************************************************************/
+void Print( vout_thread_t *p_vout, int i_x, int i_y, int i_halign, int i_valign, unsigned char *psz_text )
+{
+    int                 i_text_height;                    /* total text height */
+    int                 i_text_width;                      /* total text width */
+
+    /* Update upper left coordinates according to alignment */
+    vout_TextSize( p_vout->p_default_font, 0, psz_text, &i_text_width, &i_text_height );
+    switch( i_halign )
+    {
+    case 0:                                                        /* centered */
+        i_x -= i_text_width / 2;
+        break;        
+    case 1:                                                   /* right aligned */
+        i_x -= i_text_width;
+        break;                
+    }
+    switch( i_valign )
+    {
+    case 0:                                                        /* centered */
+        i_y -= i_text_height / 2;
+        break;        
+    case 1:                                                   /* bottom aligned */
+        i_y -= i_text_height;
+        break;                
+    }
+
+    /* Check clipping */
+    if( (i_y < 0) || (i_y + i_text_height > p_vout->i_height) || 
+        (i_x < 0) || (i_x + i_text_width > p_vout->i_width) )
+    {
+        intf_DbgMsg("'%s' would print outside the screen\n", psz_text);        
+        return;        
+    }    
+
+    /* Print text */
+    vout_Print( p_vout->p_default_font, vout_SysGetPicture( p_vout ) + 
+                i_y * p_vout->i_bytes_per_line + i_x * p_vout->i_bytes_per_pixel,
+                p_vout->i_bytes_per_pixel, p_vout->i_bytes_per_line, 
+                0xffffffff, 0x00000000, 0x00000000, 0, psz_text );
 }
 
 /******************************************************************************
@@ -972,7 +1043,7 @@ static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t
         sprintf( psz_buffer, "%.2f fps", (double) VOUT_FPS_SAMPLES * 1000000 /
                  ( p_vout->fps_sample[ (p_vout->c_fps_samples - 1) % VOUT_FPS_SAMPLES ] -
                    p_vout->fps_sample[ p_vout->c_fps_samples % VOUT_FPS_SAMPLES ] ) );        
-        vout_SysPrint( p_vout, p_vout->i_width, 0, 1, -1, psz_buffer );
+        Print( p_vout, p_vout->i_width, 0, 1, -1, psz_buffer );
     }
 
     /* 
@@ -980,7 +1051,7 @@ static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t
      */
     sprintf( psz_buffer, "%ld frames   render time: %lu us", 
              p_vout->c_fps_samples, (long unsigned) p_vout->render_time );
-    vout_SysPrint( p_vout, 0, 0, -1, -1, psz_buffer );    
+    Print( p_vout, 0, 0, -1, -1, psz_buffer );    
 #endif
 
 #ifdef DEBUG
@@ -998,7 +1069,7 @@ static int RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic, boolean_t
              ((p_pic->i_aspect_ratio == AR_3_4_PICTURE) ? "4:3" :
               ((p_pic->i_aspect_ratio == AR_16_9_PICTURE) ? "16:9" :
                ((p_pic->i_aspect_ratio == AR_221_1_PICTURE) ? "2.21:1" : "ukn-ar" ))));    
-    vout_SysPrint( p_vout, p_vout->i_width, p_vout->i_height, 1, 1, psz_buffer );
+    Print( p_vout, p_vout->i_width, p_vout->i_height, 1, 1, psz_buffer );
 #endif
     
     return( 0 );    
@@ -1018,8 +1089,8 @@ static int RenderIdle( vout_thread_t *p_vout, boolean_t b_blank )
     {        
         RenderBlank( p_vout );
         p_vout->last_display_date = mdate();        
-        vout_SysPrint( p_vout, p_vout->i_width / 2, p_vout->i_height / 2, 0, 0,
-                       "no stream" );        
+        Print( p_vout, p_vout->i_width / 2, p_vout->i_height / 2, 0, 0, 
+               "no stream" );        //??
         return( 1 );        
     }
 
@@ -1063,9 +1134,10 @@ static int RenderInfo( vout_thread_t *p_vout, boolean_t b_blank )
              p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth, 
              p_vout->f_gamma, i_reserved_pic, i_ready_pic,
              VOUT_MAX_PICTURES );
-    vout_SysPrint( p_vout, 0, p_vout->i_height, -1, 1, psz_buffer );    
+    Print( p_vout, 0, p_vout->i_height, -1, 1, psz_buffer );    
 #endif
-    return( 0 );    
+
+   return( 0 );    
 }
 
 /******************************************************************************

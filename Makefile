@@ -35,7 +35,7 @@ SYS=LINUX
 #DECODER=old
 DECODER=new
 
-# Debugging mode on or off
+# Debugging mode on or off (set to 1 to activate)
 DEBUG=1
 
 #----------------- do not change anything below this line ----------------------
@@ -49,7 +49,7 @@ PROGRAM_VERSION = 1.0-dev
 
 # PROGRAM_OPTIONS is an identification string of the compilation options
 PROGRAM_OPTIONS = $(VIDEO) $(ARCH) $(SYS)
-ifneq ($(DEBUG),)
+ifeq ($(DEBUG),1)
 PROGRAM_OPTIONS += DEBUG
 endif
 
@@ -64,7 +64,7 @@ DEFINE += -DSYS_$(SYS)
 DEFINE += -DPROGRAM_VERSION="\"$(PROGRAM_VERSION)\""
 DEFINE += -DPROGRAM_OPTIONS="\"$(PROGRAM_OPTIONS)\""
 DEFINE += -DPROGRAM_BUILD="\"$(PROGRAM_BUILD)\""
-ifneq ($(DEBUG),)
+ifeq ($(DEBUG),1)
 DEFINE += -DDEBUG
 endif
 
@@ -163,7 +163,7 @@ endif
 #
 
 # Debugging support
-ifneq ($(DEBUG),)
+ifeq ($(DEBUG),1)
 CFLAGS += -g
 #CFLAGS += -pg
 endif
@@ -198,6 +198,7 @@ audio_output_obj = 		audio_output/audio_output.o \
 
 video_output_obj = 		video_output/video_output.o \
 						video_output/video_$(video).o \
+						video_output/video_text.o \
 						video_output/video_yuv.o
 
 ac3_decoder_obj =		ac3_decoder/ac3_decoder.o \

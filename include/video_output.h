@@ -101,6 +101,10 @@ typedef struct vout_thread_s
     vout_convert_t *    p_ConvertYUV420;                /* YUV 4:2:0 converter */
     vout_convert_t *    p_ConvertYUV422;                /* YUV 4:2:2 converter */
     vout_convert_t *    p_ConvertYUV444;                /* YUV 4:4:4 converter */
+
+    /* Bitmap fonts */
+    p_vout_font_t       p_default_font;                        /* default font */    
+    p_vout_font_t       p_large_font;                            /* large font */    
 } vout_thread_t;
 
 /* Flags for changes - these flags are set in the i_changes field when another
@@ -128,13 +132,6 @@ void            vout_UnlinkPicture      ( vout_thread_t *p_vout, picture_t *p_pi
 subtitle_t *    vout_CreateSubtitle     ( vout_thread_t *p_vout, int i_type, int i_size );
 void            vout_DestroySubtitle    ( vout_thread_t *p_vout, subtitle_t *p_sub );
 void            vout_DisplaySubtitle    ( vout_thread_t *p_vout, subtitle_t *p_sub );
-
-
-
-
-
-
-
 
 
 

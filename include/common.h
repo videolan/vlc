@@ -61,12 +61,14 @@ typedef struct aout_thread_s *          p_aout_thread_t;
 
 /* Video */
 struct vout_thread_s;
+struct vout_font_s;
 struct vout_sys_s;
 struct vdec_thread_s;
 struct vpar_thread_s;
 struct video_parser_s;
 
 typedef struct vout_thread_s *          p_vout_thread_t;
+typedef struct vout_font_s *            p_vout_font_t;
 typedef struct vout_sys_s *             p_vout_sys_t;
 typedef struct vdec_thread_s *          p_vdec_thread_t;
 typedef struct vpar_thread_s *          p_vpar_thread_t;
