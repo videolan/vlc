@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.22 2003/06/05 21:22:28 gbazin Exp $
+ * $Id: timer.cpp,v 1.23 2003/06/12 21:28:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -30,6 +30,7 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
+#include <vlc/aout.h>
 
 #ifdef WIN32                                                 /* mingw32 hack */
 #undef Yield
@@ -143,6 +144,12 @@ void Timer::Notify()
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;
+
+            /* Take care of the volume */
+            audio_volume_t i_volume;
+            aout_VolumeGet( p_intf, &i_volume );
+            p_main_interface->volctrl->SetValue( i_volume * 200 /
+                                                 AOUT_VOLUME_MAX );
         }
 
         /* control buttons for free pace streams */

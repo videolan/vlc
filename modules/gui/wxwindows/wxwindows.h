@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.35 2003/06/05 21:22:28 gbazin Exp $
+ * $Id: wxwindows.h,v 1.36 2003/06/12 21:28:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -27,6 +27,7 @@
 #include <wx/spinctrl.h>
 #include <wx/dnd.h>
 #include <wx/treectrl.h>
+#include <wx/gauge.h>
 
 class Playlist;
 class Messages;
@@ -122,6 +123,8 @@ public:
     wxSlider    *slider;
     wxWindow    *slider_frame;
     wxStaticBox *slider_box;
+
+    wxGauge     *volctrl;
 
     /* So we don't recreate the open dialog box each time
      * (and keep the last settings) */

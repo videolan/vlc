@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.37 2003/06/05 21:22:27 gbazin Exp $
+ * $Id: interface.cpp,v 1.38 2003/06/12 21:28:39 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -30,6 +30,7 @@
 #include <stdio.h>
 
 #include <vlc/vlc.h>
+#include <vlc/aout.h>
 
 #ifdef WIN32                                                 /* mingw32 hack */
 #undef Yield
@@ -91,6 +92,28 @@ public:
 private:
 
 };
+
+class wxVolCtrl: public wxGauge
+{
+public:
+    /* Constructor */
+    wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id );
+    virtual ~wxVolCtrl() {};
+
+    void Change( int i_volume );
+
+    void OnChange( wxMouseEvent& event );
+
+private:
+    intf_thread_t *p_intf;
+
+    DECLARE_EVENT_TABLE();
+};
+
+BEGIN_EVENT_TABLE(wxVolCtrl, wxWindow)
+    /* Mouse events */
+    EVT_LEFT_DOWN(wxVolCtrl::OnChange)
+END_EVENT_TABLE()
 
 /*****************************************************************************
  * Event Table.
@@ -219,6 +242,7 @@ Interface::~Interface()
     /* Clean up */
     if( p_open_dialog ) delete p_open_dialog;
     if( p_prefs_dialog ) p_prefs_dialog->Destroy();
+    if( p_intf->p_sys->p_icon ) delete p_intf->p_sys->p_icon;
 }
 
 /*****************************************************************************
@@ -381,9 +405,11 @@ void Interface::CreateOurToolBar()
 
 void Interface::CreateOurSlider()
 {
-    /* Create a new frame containing the slider */
+    /* Create a new frame and sizer containing the slider */
     slider_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
     slider_frame->SetAutoLayout( TRUE );
+    wxBoxSizer *frame_sizer =
+        new wxBoxSizer( wxHORIZONTAL );
 
     /* Create static box to surround the slider */
     slider_box = new wxStaticBox( slider_frame, -1, wxT("") );
@@ -391,15 +417,22 @@ void Interface::CreateOurSlider()
     /* Create sizer for slider frame */
     wxStaticBoxSizer *slider_sizer =
         new wxStaticBoxSizer( slider_box, wxHORIZONTAL );
-    slider_frame->SetSizer( slider_sizer );
     slider_sizer->SetMinSize( -1, 50 );
 
     /* Create slider */
     slider = new wxSlider( slider_frame, SliderScroll_Event, 0, 0,
                            SLIDER_MAX_POS, wxDefaultPosition, wxDefaultSize );
-    slider_sizer->Add( slider, 1, wxGROW | wxALL, 5 );
-    slider_sizer->Layout();
-    slider_sizer->SetSizeHints(slider_frame);
+    slider_sizer->Add( slider, 1, wxEXPAND | wxALL, 5 );
+
+
+    volctrl = new wxVolCtrl( p_intf, slider_frame, -1 );
+
+    /* Add everything to the frame */
+    frame_sizer->Add( slider_sizer, 1, wxEXPAND | wxBOTTOM, 5 );
+    frame_sizer->Add( volctrl, 0, wxEXPAND | wxALL, 5 );
+    slider_frame->SetSizer( frame_sizer );
+    frame_sizer->Layout();
+    frame_sizer->SetSizeHints(slider_frame);
 
     /* Hide the slider by default */
     slider_frame->Hide();
@@ -851,3 +884,25 @@ bool DragAndDrop::OnDropFiles( wxCoord, wxCoord,
     return TRUE;
 }
 #endif
+
+/*****************************************************************************
+ * Definition of wxVolCtrl class.
+ *****************************************************************************/
+wxVolCtrl::wxVolCtrl( intf_thread_t *_p_intf, wxWindow* parent, wxWindowID id )
+  : wxGauge( parent, id, 200, wxDefaultPosition, wxDefaultSize, wxGA_VERTICAL )
+{
+    p_intf = _p_intf;
+}
+
+void wxVolCtrl::OnChange( wxMouseEvent& event )
+{
+    int i_volume = (GetRect().height - event.GetY()) * 200 / GetRect().height;
+    Change( i_volume );
+}
+
+void wxVolCtrl::Change( int i_volume )
+{
+    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 );
+    SetValue( i_volume );
+    SetToolTip( wxString::Format(wxU(_("Volume")) + wxT(" %d"), i_volume ) );
+}
