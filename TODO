@@ -71,7 +71,7 @@ Urgency: Normal
 Description: Full DVD navigation
  Once the core DVD navigation features are ready (see item 0x52), port the
  interface and video output modules so that they can handle it.
-Status: Todo
+Status: In the works (stef)
 
 Task: 0x56
 Difficulty: Hard
@@ -111,7 +111,7 @@ Urgency: Normal
 Description: DVD navigation core features
  We need an interpreter for the DVD virtual machine to make it easier to
  browse DVDs later.
-Status: Todo
+Status: In the works (stef)
 
 Task: 0x51
 Difficulty: Easy
@@ -478,7 +478,7 @@ Description: Ogg/Vorbis audio decoder support
  The Ogg/Vorbis audio format is a free alternative to the patent-encumbered
  MP3 format. The system packets are quite different than the MPEG ones, so
  adding support for it would require a lot of code rewrite.
-Status: Todo
+Status: In the works (Xavier Maillard)
 
 Task: 0x23
 Difficulty: Guru
@@ -639,7 +639,7 @@ Urgency: Normal
 Description: Optimize YUV scaling
  The YUV scaling method does not seem very efficient. Perhaps
  some CPU cycles can be gained by saving some buffers.
-Status: Todo
+Status: Done (sam) because of vout 4
 
 Task: 0x10
 Difficulty: Easy
