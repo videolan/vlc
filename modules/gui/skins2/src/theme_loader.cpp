@@ -27,6 +27,7 @@
 #include "../parser/builder.hpp"
 #include "../parser/skin_parser.hpp"
 #include "../src/os_factory.hpp"
+#include "../src/vlcproc.hpp"
 #include "../src/window_manager.hpp"
 
 #ifdef HAVE_FCNTL_H
@@ -98,6 +99,9 @@ bool ThemeLoader::load( const string &fileName )
         pNewTheme->getWindowManager().showAll();
     }
     if( skin_last ) free( skin_last );
+
+    // The new theme cannot embed a video output yet
+    getIntf()->p_sys->p_vlcProc->setVoutUnused();
 
     return true;
 }
