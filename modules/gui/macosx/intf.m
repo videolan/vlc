@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.36 2003/01/27 00:08:31 jlj Exp $
+ * $Id: intf.m,v 1.37 2003/01/28 01:50:52 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -627,8 +627,10 @@ static void Run( intf_thread_t *p_intf )
 - (void)setControlItems {
     intf_thread_t * p_intf = [NSApp getIntf];
     vlc_bool_t b_input;
-    vlc_bool_t b_plmul = 0;
-    vlc_bool_t b_control = 0;
+    vlc_bool_t b_plmul = NO;
+    vlc_bool_t b_control = NO;
+    vlc_bool_t b_chapters = NO;
+    input_area_t *  p_area;
     playlist_t * p_playlist = NULL;
     NSImage *playImage = [NSImage imageNamed:@"play"];
     NSImage *pauseImage = [NSImage imageNamed:@"pause"];
@@ -643,18 +645,21 @@ static void Run( intf_thread_t *p_intf )
         vlc_object_release( p_playlist );
     }
     
-    if( ( b_input = ( p_intf->p_sys->p_input != NULL ) ) )
+    if ( b_input = ( p_intf->p_sys->p_input != NULL ) )
     {
         /* control buttons for free pace streams */
         b_control = p_intf->p_sys->p_input->stream.b_pace_control;
+        p_area = p_intf->p_sys->p_input->stream.p_selected_area;
+        if ( p_area->i_part_nb > 1 )
+            b_chapters = YES;
     }
     
     /* set control items */
     [o_btn_stop setEnabled: b_input];
     [o_btn_fastforward setEnabled: b_control];
     [o_btn_slowmotion setEnabled: b_control];
-    [o_btn_prev setEnabled: b_plmul];
-    [o_btn_next setEnabled: b_plmul];
+    [o_btn_prev setEnabled: (b_plmul || b_chapters) ];
+    [o_btn_next setEnabled: (b_plmul || b_chapters) ];
     [o_controls setVolumeSlider];
     [o_timeslider setEnabled: b_input];
     

@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.14 2003/01/24 16:19:15 hartman Exp $
+ * $Id: controls.m,v 1.15 2003/01/28 01:50:52 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -241,29 +241,69 @@
 - (IBAction)prev:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
+    input_area_t *  p_area;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
 
-    playlist_Prev( p_playlist );
-    vlc_object_release( p_playlist );
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
+
+    /* check if this is the first chapter and whether there are any chapters at all */
+    if( p_area->i_part > 1 && p_area->i_part_nb > 1 )
+    {
+        p_area->i_part--;
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+
+        input_ChangeArea( p_intf->p_sys->p_input, p_area );
+
+        p_intf->p_sys->b_chapter_update = VLC_TRUE;
+    }
+    else if( p_playlist != NULL )
+    {
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+        playlist_Prev( p_playlist );
+    }
+    else
+    {
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+    }
+    
+    if ( p_playlist != NULL )
+        vlc_object_release( p_playlist );
 }
 
 - (IBAction)next:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
+    input_area_t *  p_area;
     playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                                        FIND_ANYWHERE );
-    if( p_playlist == NULL )
-    {
-        return;
-    }
 
-    playlist_Next( p_playlist );
-    vlc_object_release( p_playlist );
+    vlc_mutex_lock( &p_intf->p_sys->p_input->stream.stream_lock );
+    p_area = p_intf->p_sys->p_input->stream.p_selected_area;
+
+    /* check if this is the last chapter and whether there are any chapters at all */
+    if( p_area->i_part_nb > 1 && p_area->i_part < p_area->i_part_nb )
+    {
+        p_area->i_part++;
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+
+        input_ChangeArea( p_intf->p_sys->p_input, p_area );
+
+        p_intf->p_sys->b_chapter_update = VLC_TRUE;
+    }
+    else if( p_playlist != NULL )
+    {
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+        playlist_Next( p_playlist );
+    }
+    else
+    {
+        vlc_mutex_unlock( &p_intf->p_sys->p_input->stream.stream_lock );
+    }
+    
+    if ( p_playlist != NULL )
+        vlc_object_release( p_playlist );
 }
 
 - (IBAction)loop:(id)sender
