@@ -1,0 +1,2 @@
+SOURCES_sap = sap.c
+SOURCES_hal = hal.c
