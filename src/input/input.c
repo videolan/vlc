@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.253 2003/11/13 12:28:34 fenrir Exp $
+ * $Id: input.c,v 1.254 2003/11/13 13:31:12 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -745,12 +745,14 @@ static int InitThread( input_thread_t * p_input )
     {
         if( ( p_sub = subtitle_New( p_input, strdup(val.psz_string), i_microsecondperframe, 0 ) ) )
         {
+            /* Select this ES by default */
+            es_out_Control( p_input->p_es_out, ES_OUT_SET_SELECT, p_sub->p_es, VLC_TRUE );
+
             TAB_APPEND( p_input->p_sys->i_sub, p_input->p_sys->sub, p_sub );
-            subtitle_Select( p_sub );
         }
     }
     if( val.psz_string ) free( val.psz_string );
-    
+
     var_Get( p_input, "sub-autodetect-file", &val );
     if( val.b_bool )
     {
@@ -1111,6 +1113,22 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             id->p_es->p_bitmapinfoheader = p_bih;
             break;
         }
+        case SPU_ES:
+        {
+            subtitle_data_t *p_sub = malloc( sizeof( subtitle_data_t ) );
+            memset( p_sub, 0, sizeof( subtitle_data_t ) );
+            if( fmt->i_extra > 0 )
+            {
+                if( fmt->i_extra_type == ES_EXTRA_TYPE_SUBHEADER )
+                {
+                    p_sub->psz_header = malloc( fmt->i_extra  );
+                    memcpy( p_sub->psz_header, fmt->p_extra , fmt->i_extra );
+                }
+            }
+            /* FIXME beuuuuuurk */
+            id->p_es->p_demux_data = p_sub;
+            break;
+        }
         default:
             break;
     }
@@ -1238,19 +1256,21 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
     switch( i_query )
     {
         case ES_OUT_SET_SELECT:
+            vlc_mutex_lock( &p_sys->p_input->stream.stream_lock );
             id = (es_out_id_t*) va_arg( args, es_out_id_t * );
             b = (vlc_bool_t) va_arg( args, vlc_bool_t );
             if( b && id->p_es->p_decoder_fifo == NULL )
             {
                 input_SelectES( p_sys->p_input, id->p_es );
+                vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
                 return id->p_es->p_decoder_fifo ? VLC_SUCCESS : VLC_EGENERIC;
             }
             else if( !b && id->p_es->p_decoder_fifo )
             {
                 input_UnselectES( p_sys->p_input, id->p_es );
+                vlc_mutex_unlock( &p_sys->p_input->stream.stream_lock );
+                return VLC_SUCCESS;
             }
-            return VLC_SUCCESS;
-
         case ES_OUT_GET_SELECT:
             id = (es_out_id_t*) va_arg( args, es_out_id_t * );
             pb = (vlc_bool_t*) va_arg( args, vlc_bool_t * );

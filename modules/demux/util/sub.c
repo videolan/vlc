@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: sub.c,v 1.35 2003/11/05 00:39:16 gbazin Exp $
+ * $Id: sub.c,v 1.36 2003/11/13 13:31:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -237,18 +237,18 @@ static char * local_stristr( char *psz_big, char *psz_little)
 
     while (*p_pos)
     {
-	if (toupper(*p_pos) == toupper(*psz_little))
+        if (toupper(*p_pos) == toupper(*psz_little))
         {
-	    char * psz_cur1 = p_pos + 1;
-	    char * psz_cur2 = psz_little + 1;
-	    while (*psz_cur1 && *psz_cur2 && toupper(*psz_cur1) == toupper(*psz_cur2))
+            char * psz_cur1 = p_pos + 1;
+            char * psz_cur2 = psz_little + 1;
+            while (*psz_cur1 && *psz_cur2 && toupper(*psz_cur1) == toupper(*psz_cur2))
             {
-		psz_cur1++;
-		psz_cur2++;
-	    }
-	    if (!*psz_cur2) return p_pos;
-	}
-	p_pos++;
+                psz_cur1++;
+                psz_cur2++;
+            }
+            if (!*psz_cur2) return p_pos;
+        }
+        p_pos++;
     }
     return NULL;
 }
@@ -264,6 +264,7 @@ static int  sub_open ( subtitle_demux_t *p_sub,
 {
     text_t  txt;
     vlc_value_t val;
+    es_format_t  fmt;
 
     int     i;
     int     i_sub_type;
@@ -469,35 +470,26 @@ static int  sub_open ( subtitle_demux_t *p_sub,
     }
 
     /* *** add subtitle ES *** */
-    vlc_mutex_lock( &p_input->stream.stream_lock );
-    p_sub->p_es = input_AddES( p_input, p_input->stream.p_selected_program,
-                               0xff - i_track_id,    /* FIXME */
-                               SPU_ES, NULL, 0 );
-    vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    p_sub->p_es->i_stream_id = 0xff - i_track_id;    /* FIXME */
-    
-    if( p_sub->psz_header != NULL )
-    {
-        p_sub->p_es->p_demux_data = malloc( sizeof( subtitle_data_t ) );
-        p_sub->p_es->p_demux_data->psz_header = strdup( p_sub->psz_header );
-        free( p_sub->psz_header );
-    }
-
     if( p_sub->i_sub_type == SUB_TYPE_VOBSUB )
     {
-        p_sub->p_es->i_fourcc    = VLC_FOURCC( 's','p','u',' ' );
-        /* open vobsub file */
+        es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','p','u',' ' ) );
     }
     else if( p_sub->i_sub_type == SUB_TYPE_SSA1 ||
              p_sub->i_sub_type == SUB_TYPE_SSA2_4 )
     {
-        p_sub->p_es->i_fourcc    = VLC_FOURCC( 's','s','a',' ' );
+        es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','s','a',' ' ) );
     }
     else
     {
-        p_sub->p_es->i_fourcc    = VLC_FOURCC( 's','u','b','t' );
+        es_format_Init( &fmt, SPU_ES, VLC_FOURCC( 's','u','b','t' ) );
     }
+    if( p_sub->psz_header != NULL )
+    {
+        fmt.i_extra_type = ES_EXTRA_TYPE_SUBHEADER;
+        fmt.i_extra = strlen( p_sub->psz_header ) + 1;
+        fmt.p_extra = strdup( p_sub->psz_header );
+    }
+    p_sub->p_es = es_out_Add( p_input->p_es_out, &fmt );
 
     p_sub->i_previously_selected = 0;
     return VLC_SUCCESS;
@@ -508,13 +500,17 @@ static int  sub_open ( subtitle_demux_t *p_sub,
  *****************************************************************************/
 static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
 {
-    if( p_sub->p_es->p_decoder_fifo && !p_sub->i_previously_selected )
+    input_thread_t *p_input = p_sub->p_input;
+    vlc_bool_t     b;
+
+    es_out_Control( p_input->p_es_out, ES_OUT_GET_SELECT, p_sub->p_es, &b );
+    if( b && !p_sub->i_previously_selected )
     {
         p_sub->i_previously_selected = 1;
         p_sub->pf_seek( p_sub, i_maxdate );
         return VLC_SUCCESS;
     }
-    else if( !p_sub->p_es->p_decoder_fifo && p_sub->i_previously_selected )
+    else if( !b && p_sub->i_previously_selected )
     {
         p_sub->i_previously_selected = 0;
         return VLC_SUCCESS;
@@ -572,16 +568,16 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
 
         p_pes->i_nb_data = 1;
         p_pes->p_first =
-            p_pes->p_last = p_data;
+        p_pes->p_last = p_data;
         p_pes->i_pes_size = i_len;
 
         memcpy( p_data->p_payload_start,
                 p_sub->subtitle[p_sub->i_subtitle].psz_text,
                 i_len );
-        if( p_sub->p_es->p_decoder_fifo && p_pes->i_pts > 0 )
-        {
 
-            input_DecodePES( p_sub->p_es->p_decoder_fifo, p_pes );
+        if( p_pes->i_pts > 0 )
+        {
+            es_out_Send( p_input->p_es_out, p_sub->p_es, p_pes );
         }
         else
         {
@@ -590,7 +586,7 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
 
         p_sub->i_subtitle++;
     }
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -605,7 +601,6 @@ static int  sub_seek ( subtitle_demux_t *p_sub, mtime_t i_date )
     {
         p_sub->i_subtitle++;
     }
-
     return( 0 );
 }
 

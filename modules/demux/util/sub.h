@@ -2,15 +2,15 @@
  * sub.h
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: sub.h,v 1.10 2003/11/05 00:17:50 hartman Exp $
+ * $Id: sub.h,v 1.11 2003/11/13 13:31:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -40,7 +40,8 @@ typedef struct subtitle_s
 
 } subtitle_t;
 
-typedef struct subtitle_track_s
+#if 0
+typedef struct
 {
     int             i_track_id;
     char            *psz_header;
@@ -51,24 +52,24 @@ typedef struct subtitle_track_s
 
     int             i_previously_selected; /* to make pf_seek */
     es_descriptor_t *p_es;
-    
+
 } subtitle_track_t;
+#endif
 
 typedef struct subtitle_demux_s
 {
     VLC_COMMON_MEMBERS
-    
+
     module_t        *p_module;
-    
-    int     (*pf_open) ( struct subtitle_demux_s *p_sub, 
-                         input_thread_t*p_input, 
+
+    int     (*pf_open) ( struct subtitle_demux_s *p_sub,
+                         input_thread_t*p_input,
                          char *psz_name,
                          mtime_t i_microsecperframe,
                          int i_track_id );
     int     (*pf_demux)( struct subtitle_demux_s *p_sub, mtime_t i_maxdate );
     int     (*pf_seek) ( struct subtitle_demux_s *p_sub, mtime_t i_date );
     void    (*pf_close)( struct subtitle_demux_s *p_sub );
-    
 
     /* *** private *** */
     input_thread_t      *p_input;
@@ -78,27 +79,17 @@ typedef struct subtitle_demux_s
     int                 i_subtitle;
     int                 i_subtitles;
     subtitle_t          *subtitle;
-    es_descriptor_t     *p_es;
+    es_out_id_t         *p_es;
     int                 i_previously_selected; /* to make pf_seek */
 
-    /*unsigned int	i_tracks;
-    subtitle_track_t	*p_tracks
+    /*unsigned int i_tracks;
+    subtitle_track_t *p_tracks
     */
-    
 
 } subtitle_demux_t;
 
 /*****************************************************************************
- *
- * I made somes wrappers : So use them !
- *  I think you shouldn't need access to subtitle_demux_t members else said
- *  it to me.
- *
- *****************************************************************************/
-
-
-/*****************************************************************************
- * subtitle_New: Start a new subtitle demux instance (but subtitle ES isn't 
+ * subtitle_New: Start a new subtitle demux instance (but subtitle ES isn't
  *               selected by default.
  *****************************************************************************
  * Return: NULL if failed, else a pointer on a new subtitle_demux_t.
@@ -112,46 +103,7 @@ typedef struct subtitle_demux_s
 static inline subtitle_demux_t *subtitle_New( input_thread_t *p_input,
                                               char *psz_name,
                                               mtime_t i_microsecperframe,
-                                              int i_track_id );
-/*****************************************************************************
- * subtitle_Select: Select the related subtitle ES.
- *****************************************************************************/
-static inline void subtitle_Select( subtitle_demux_t *p_sub );
-
-/*****************************************************************************
- * subtitle_Unselect: Unselect the related subtitle ES.
- *****************************************************************************/
-static inline void subtitle_Unselect( subtitle_demux_t *p_sub );
-
-/*****************************************************************************
- * subtitle_Demux: send subtitle to decoder from last date to i_max
- *****************************************************************************/
-static inline int  subtitle_Demux( subtitle_demux_t *p_sub, mtime_t i_max );
-
-/*****************************************************************************
- * subtitle_Seek: Seek to i_date
- *****************************************************************************/
-static inline int  subtitle_Seek( subtitle_demux_t *p_sub, mtime_t i_date );
-
-/*****************************************************************************
- * subtitle_Close: Stop ES decoder and free all memory included p_sub.
- *****************************************************************************/
-static inline void subtitle_Close( subtitle_demux_t *p_sub );
-
-
-
-
-
-/*****************************************************************************/
-/*****************************************************************************/
-/*****************************************************************************/
-
-
-static inline 
-    subtitle_demux_t *subtitle_New( input_thread_t *p_input,
-                                    char *psz_name,
-                                    mtime_t i_microsecperframe,
-                                    int i_track_id )
+                                              int i_track_id )
 {
     subtitle_demux_t *p_sub;
 
@@ -185,37 +137,25 @@ static inline
     return( p_sub );
 }
 
-static inline void subtitle_Select( subtitle_demux_t *p_sub )
-{
-    if( p_sub && p_sub->p_es )
-    {
-        vlc_mutex_lock( &p_sub->p_input->stream.stream_lock );
-        input_SelectES( p_sub->p_input, p_sub->p_es );
-        vlc_mutex_unlock( &p_sub->p_input->stream.stream_lock );
-        p_sub->i_previously_selected = 0;
-    }
-}
-static inline void subtitle_Unselect( subtitle_demux_t *p_sub )
-{
-    if( p_sub && p_sub->p_es )
-    {
-        vlc_mutex_lock( &p_sub->p_input->stream.stream_lock );
-        input_UnselectES( p_sub->p_input, p_sub->p_es );
-        vlc_mutex_unlock( &p_sub->p_input->stream.stream_lock );
-        p_sub->i_previously_selected = 0;
-    }
-}
-
+/*****************************************************************************
+ * subtitle_Demux: send subtitle to decoder from last date to i_max
+ *****************************************************************************/
 static inline int subtitle_Demux( subtitle_demux_t *p_sub, mtime_t i_max )
 {
     return( p_sub->pf_demux( p_sub, i_max ) );
 }
 
+/*****************************************************************************
+ * subtitle_Seek: Seek to i_date
+ *****************************************************************************/
 static inline int subtitle_Seek( subtitle_demux_t *p_sub, mtime_t i_date )
 {
-    return( p_sub->pf_demux( p_sub, i_date ) );
+    return( p_sub->pf_seek( p_sub, i_date ) );
 }
 
+/*****************************************************************************
+ * subtitle_Close: Stop ES decoder and free all memory included p_sub.
+ *****************************************************************************/
 static inline void subtitle_Close( subtitle_demux_t *p_sub )
 {
     msg_Info( p_sub, "subtitle stopped" );
@@ -229,3 +169,4 @@ static inline void subtitle_Close( subtitle_demux_t *p_sub )
         vlc_object_destroy( p_sub );
     }
 }
+
