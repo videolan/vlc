@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.68 2003/05/21 13:10:05 sigmunau Exp $
+ * $Id: libvlc.h,v 1.69 2003/05/21 13:19:32 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -147,11 +147,6 @@ static char *ppsz_language[] = { "auto", "de", "en_GB", "fr", "it",
 #define VIDEO_LONGTEXT N_( \
     "You can completely disable the video output. In this case the video " \
     "decoding stage won't be done, which will save some processing power.")
-
-#define DISPLAY_TEXT N_("Display identifier")
-#define DISPLAY_LONGTEXT N_( \
-    "This is the local display port that will be used for X11 drawing. " \
-    "For instance :0.1.")
 
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
