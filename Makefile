@@ -34,6 +34,7 @@ PLUGINS_DIR :=	ac3_adec \
 		kde \
 		lpcm_adec \
 		macosx \
+		mad_adec \
 		memcpy \
 		mga \
 		motion \
@@ -79,6 +80,7 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		kde/kde \
 		lpcm_adec/lpcm_adec \
 		macosx/macosx \
+		mad_adec/mad_adec \
 		memcpy/memcpy \
 		memcpy/memcpymmx \
 		memcpy/memcpymmxext \

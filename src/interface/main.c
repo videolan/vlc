@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.128 2001/12/03 16:18:37 sam Exp $
+ * $Id: main.c,v 1.129 2001/12/04 13:47:46 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -145,6 +145,8 @@
 #define OPT_STDOUT              193
 #define OPT_STATS               194
 
+#define OPT_MPEG_ADEC           200
+
 /* Usage fashion */
 #define USAGE                     0
 #define SHORT_HELP                1
@@ -220,6 +222,10 @@ static const struct option longopts[] =
     /* Misc options */
     {   "synchro",          1,          0,      OPT_SYNCHRO },
     {   "memcpy",           1,          0,      OPT_MEMCPY },
+
+    /* Decoder options */
+    {   "mpeg_adec",        1,          0,      OPT_MPEG_ADEC },
+
     {   0,                  0,          0,      0 }
 };
 
@@ -823,6 +829,11 @@ static int GetConfiguration( int *pi_argc, char *ppsz_argv[], char *ppsz_env[] )
             main_PutPszVariable( MEMCPY_METHOD_VAR, optarg );
             break;
             
+        /* Decoder options */
+        case OPT_MPEG_ADEC:
+            main_PutPszVariable( ADEC_MPEG_VAR, optarg );
+            break;
+
         /* Internal error: unknown option */
         case '?':
         default:
@@ -933,6 +944,8 @@ static void Usage( int i_fashion )
           "\n      --channels                 \tenable channels"
           "\n      --channelserver <host>     \tchannel server address"
           "\n"
+          "\n      --mpeg_adec <builtin|mad>  \tchoose audio decoder"
+          "\n"
           "\n  -h, --help                     \tprint help and exit"
           "\n  -H, --longhelp                 \tprint long help and exit"
           "\n      --version                  \toutput version information and exit" );
@@ -992,6 +1005,9 @@ static void Usage( int i_fashion )
         "\n  " INPUT_CHANNEL_SERVER_VAR "=<hostname>  \tchannel server"
         "\n  " INPUT_CHANNEL_PORT_VAR "=<port>        \tchannel server port" );
 
+    /* Decoder parameters */
+    intf_MsgImm( "\nDecoder parameters:"
+        "\n  " ADEC_MPEG_VAR "=<builtin|mad>          \taudio decoder" );
 }
 
 /*****************************************************************************
@@ -1099,7 +1115,8 @@ static int CPUCapabilities( void )
     volatile int i_capabilities = CPU_CAPABILITY_NONE;
 
 #if defined( SYS_BEOS )
-    i_capabilities |= CPU_CAPABILITY_486
+    i_capabilities |= CPU_CAPABILITY_FPU
+                      | CPU_CAPABILITY_486
                       | CPU_CAPABILITY_586
                       | CPU_CAPABILITY_MMX;
 
@@ -1112,6 +1129,8 @@ static int CPUCapabilities( void )
 
     int i_size;
     char *psz_name, *psz_subname;
+
+    i_capabilities |= CPU_CAPABILITY_FPU;
 
     /* Should 'never' fail? */
     host = mach_host_self();
@@ -1138,6 +1157,8 @@ static int CPUCapabilities( void )
 #elif defined( __i386__ )
     volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
     volatile boolean_t     b_amd;
+
+    i_capabilities |= CPU_CAPABILITY_FPU;
 
     signal( SIGILL, InstructionSignalHandler );
     
@@ -1257,6 +1278,8 @@ static int CPUCapabilities( void )
     return( i_capabilities );
 
 #elif defined( __powerpc__ )
+
+    i_capabilities |= CPU_CAPABILITY_FPU;
 
     /* Test for Altivec */
     signal( SIGILL, InstructionSignalHandler );

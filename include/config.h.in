@@ -175,21 +175,22 @@
 #define INPUT_NETWORK_PROTOCOL_VAR      "vlc_network_protocol"
 #define INPUT_NETWORK_PROTOCOL_DEFAULT  "ts"
 
-/* Default remote server */
-#define INPUT_SERVER_VAR                "vlc_server"
-#define INPUT_SERVER_DEFAULT            "138.195.143.220"
-
 /* Default input port */
 #define INPUT_PORT_VAR                  "vlc_server_port"
 #define INPUT_PORT_DEFAULT              1234
 
-/* Default broadcast address */
-#define INPUT_BCAST_ADDR_VAR            "vlc_broadcast_addr"
-#define INPUT_BCAST_ADDR_DEFAULT        "138.195.143.255"
+/* FIXME : Delete those ! */
+/* Default remote server */
+#define INPUT_SERVER_VAR                "vlc_server"
+#define INPUT_SERVER_DEFAULT            "138.195.143.220"
 
 /* Broadcast mode */
 #define INPUT_BROADCAST_VAR             "vlc_broadcast"
 #define INPUT_BROADCAST_DEFAULT         0
+
+/* Default broadcast address */
+#define INPUT_BCAST_ADDR_VAR            "vlc_broadcast_addr"
+#define INPUT_BCAST_ADDR_DEFAULT        "138.195.143.255"
 
 /* Channels mode */
 #define INPUT_NETWORK_CHANNEL_VAR       "vlc_channel"
@@ -299,6 +300,9 @@
  * - long, in order to perform the buffer calculations as few as possible */
 #define AOUT_BUFFER_DURATION            100000
 
+/* Environment variable for MPEG audio decoder */
+#define ADEC_MPEG_VAR                   "vlc_mpeg_adec"
+
 /*****************************************************************************
  * Video configuration
  *****************************************************************************/
@@ -334,8 +338,6 @@
 #define VOUT_HEIGHT_DEFAULT             576
 #define VOUT_DEPTH_VAR                  "vlc_depth"
 #define VOUT_DEPTH_DEFAULT              15
-#define VOUT_FULLSCREEN_DEPTH_VAR       "vlc_fullscreen_depth"
-#define VOUT_FULLSCREEN_DEPTH_DEFAULT   32
 
 /* Maximum width of a scaled source picture - this should be relatively high,
  * since higher stream values will result in no display at all. */

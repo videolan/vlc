@@ -2,7 +2,7 @@
  * tests.h: several test functions needed by the plugins
  *****************************************************************************
  * Copyright (C) 1996, 1997, 1998, 1999, 2000 VideoLAN
- * $Id: tests.h,v 1.11 2001/05/30 17:03:11 sam Exp $
+ * $Id: tests.h,v 1.12 2001/12/04 13:47:46 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -30,6 +30,7 @@
 #define CPU_CAPABILITY_MMXEXT  1<<5
 #define CPU_CAPABILITY_SSE     1<<6
 #define CPU_CAPABILITY_ALTIVEC 1<<16
+#define CPU_CAPABILITY_FPU     1<<31
 
 /*****************************************************************************
  * TestVersion: tests if the given string equals the current version

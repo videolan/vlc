@@ -2,7 +2,7 @@
  * mpeg_adec.c: MPEG audio decoder thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: mpeg_adec.c,v 1.4 2001/12/03 16:18:37 sam Exp $
+ * $Id: mpeg_adec.c,v 1.5 2001/12/04 13:47:46 massiot Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -39,6 +39,7 @@
 #include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
+#include "tests.h"
 
 #include "audio_output.h"               /* aout_fifo_t (for audio_decoder.h) */
 
@@ -98,9 +99,19 @@ MODULE_DEACTIVATE_STOP
 static int adec_Probe( probedata_t *p_data )
 {
     if( p_data->i_type == MPEG1_AUDIO_ES || p_data->i_type == MPEG2_AUDIO_ES )
+    {
+        if( !TestCPU( CPU_CAPABILITY_FPU ) )
+        {
+            /* This can work but we'd really prefer libmad to take over. */
+            return( 1 );
+        }
+        if( TestMethod( ADEC_MPEG_VAR, "builtin" ) )
+        {
+            return( 999 );
+        }
         return( 100 );
-    else
-        return( 0 );
+    }
+    return( 0 );
 }
 
 /*****************************************************************************

@@ -1,0 +1,61 @@
+File:	Plugin mad for vlc is based upon libmad from the mad distribution.
+Author: Jean-Paul Saman <jpsaman@wxs.nl>
+
+Directories:
+============
+vlc/			: adapted config.in and Makefile
+			: added libtool, ltmain.sh and ltconfig
+vlc/extras/libmad	: libmad from the original mad distribution
+vlc/plugins/mad_adec	: mad audio decoder plugin for vlc
+
+Interface functions to implement in mad plugin are:
+=========
+adec_mad_Probe
+adec_mad_Run
+adec_mad_Init
+adec_mad_ErrorThread
+adec_mad_EndThread
+
+libmad_input
+libmad_output
+libmad_header
+libmad_messages
+
+Design: (ASCII art)
+=======
+It represents the function call flow viewed from the vlc main program. The main program is in charge of allocating decoders,
+initializing, starting and stopping them.
+
+      ---------------	
+      |  <library>  |
+      |   libmad    |
+      ---------------
+            ^
+            |
+      ---------------		
+      |   <plugin>  |
+      |   mad_adec  |
+      _______________
+            ^
+            |
+      ________________________
+      |  <decoder interface> |
+      | vlc plugin interface |
+      ________________________
+
+
+Interface view:
+===============
+			   	  [mad_adec decoder plugin]
+ 				   ----------------------
+	vlc decoder interface -> | mad_adec 	mad_libmad | -> libmad
+                            	   -----------------------
+
+Rationel:
+Keeping libmad as a separate library, either dynamic or statically linked in, makes maintenance so much simpeler.
+Merging with a new libmad version should be straight forward as long as the interface stays stable.
+There is another benefit: Disk (actually flash ROM) resources and memory are very limited on a iPaq.
+Other programs or utilities like madplay and BBplay can make use of the same libmad version we do. In this way
+limiting the needed storage place on disk (flash ROM). Also this is only possible when the interface stays the same.
+
+

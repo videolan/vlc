@@ -4,6 +4,8 @@
 
 HEAD
 
+  * New libmad plug-in, courtesy of Jean-Paul Saman. We now have sound on
+    iPAQ Familiar Linux.
   * Borrowed MPlayer's fast memcpy() routines. Best is autodetected, choose
     "--memcpy <whatever>" to choose one from c, mmx, mmxext or 3dn.
   * Added versioned build-dep to libasound2-dev (Closes Debian bug #121057).

@@ -209,6 +209,11 @@ N: Olivier Pomel
 E: pomel@via.ecp.fr
 C: pomel
 
+N: Jean-Paul Saman
+E: jpsaman@wxs.nl
+D: libmad plug-in
+D: iPAQ port
+
 N: Steven M. Schultz
 E: sms@TO.GD-ES.COM
 D: BSD/OS port
