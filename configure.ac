@@ -3562,16 +3562,16 @@ AC_ARG_ENABLE(corba,
   [  --enable-corba          corba interface support (default disabled)])
 if test "${enable_corba}" = "yes"; then
       GLIB_VERSION=2.3.2
-      PKG_CHECK_MODULES(LIBMEDIACONTROL, 
+      PKG_CHECK_MODULES(CORBA, 
 	ORBit-2.0 >= 2.8.0 \
 	glib-2.0 >= $GLIB_VERSION \
 	gobject-2.0 >= $GLIB_VERSION \
 	gthread-2.0 >= $GLIB_VERSION,
 	[
- 	  AX_ADD_LDFLAGS([corba],[$LIBMEDIACONTROL_LIBS])
-      	  AX_ADD_CFLAGS([corba],[$LIBMEDIACONTROL_CFLAGS])
+ 	  AX_ADD_LDFLAGS([corba],[$CORBA_LIBS])
+      	  AX_ADD_CFLAGS([corba],[$CORBA_CFLAGS])
           AX_ADD_PLUGINS([corba snapshot]) ],
-        [AC_MSG_WARN(corba library not found)])
+        [ AC_MSG_WARN(corba library not found) ])
 fi
 
 AC_ARG_WITH(,[Misc options:])
