@@ -316,6 +316,12 @@ snapshot:
 	mv /tmp/${SNAPSHOTDIR}.tar.gz ..
 	@echo "Sources are in ../${SNAPSHOTDIR}.tar.gz"
 
+deb:
+	dpkg-buildpackage -rfakeroot -us -uc
+
+rpm:
+	rpm -ba vlc.spec
+
 FORCE:
 
 #

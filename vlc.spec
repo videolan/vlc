@@ -4,7 +4,7 @@ Release: 1
 Copyright: GPL
 Url: http://www.videolan.org/
 Group: X11/Applications/Graphics
-Source0: http://www.videolan.org/packages/vlc-0.1.99.tar.gz
+Source0: http://www.videolan.org/packages/vlc-0.1.99c.tar.gz
 Packager: Eric Doutreleau <Eric.doutreleau@int-evry.fr>
 
 Buildroot: /tmp/vlc-build
@@ -25,7 +25,7 @@ a free network-aware MPEG and DVD player
 %setup 
 
 %build
-./configure --prefix=/usr
+./configure --prefix=/usr --enable-ppro --enable-mmx --enable-gnome
 make
 %install
 mkdir -p $RPM_BUILD_ROOT/usr/lib
@@ -36,7 +36,7 @@ make install prefix=$RPM_BUILD_ROOT/usr
 /usr/bin/vlc
 /usr/share/videolan/vlc
 /usr/lib/videolan
-%doc AUTHORS COPYING INSTALL NEWS README WARNING_THIS_IS_A_BETA_VERSION doc
+%doc AUTHORS COPYING INSTALL NEWS README doc
 %clean
 rm -rf $RPM_BUILD_ROOT
 

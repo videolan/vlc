@@ -99,8 +99,8 @@ SYS=${host_os}
 
 # special cases
 if test x$host_os = xbeos; then
-    VOUT=beos
-    AOUT=beos
+    VOUT="dummy beos"
+    AOUT="dummy beos"
 fi
 
 AC_SUBST(SYS)

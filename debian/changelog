@@ -1,3 +1,13 @@
+vlc (0.1.99c) unstable; urgency=low
+
+  * Caught Delete Window event in Gnome and X11 modes
+  * Fixed manpage
+  * GGI output now works
+  * Fixed a segfault on exit for the Gnome plugin
+  * Sound support almost works under BeOS
+
+ -- Samuel Hocevar <sam@via.ecp.fr>  Tue, 20 Jun 2000 03:01:12 +0200
+
 vlc (0.1.99b) unstable; urgency=low
 
   * Added a ChangeLog file
