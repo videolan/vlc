@@ -28,7 +28,8 @@ AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_CPP
 AC_PROG_CXX
-if test "${ac_cv_prog_CXX}" != ""; then
+"${CXX}" --version >/dev/null 2>&1 || CXX=""
+if test "${CXX}" != ""; then
   AC_PROG_CXXCPP
 fi
 AC_PROG_MAKE_SET
@@ -40,7 +41,7 @@ AC_EGREP_CPP(foo,foo)
 
 dnl AC_PROG_OBJC doesn't seem to exist, this is the KDE workaround
 AC_MSG_CHECKING(for an Objective-C compiler)
-OBJC="${ac_cv_prog_CXX}"
+OBJC="${CXX}"
 AC_SUBST(OBJC)
 OBJCFLAGS="${CXXFLAGS} -fgnu-runtime -fconstant-string-class=NSConstantString"
 AC_SUBST(OBJCFLAGS)
@@ -259,7 +260,7 @@ then
 fi
 
 dnl Check for fvtable-thunks support for mingw32
-if test "${SYS}" = "mingw32" -a "${ac_cv_prog_CXX}" != ""
+if test "${SYS}" = "mingw32" -a "${CXX}" != ""
 then
 AC_LANG_PUSH(C++)
     AC_CACHE_CHECK([if \$CXX accepts -fvtable-thunks],
@@ -1236,7 +1237,7 @@ if test "${enable_livedotcom}" = "yes"; then
   dnl
   dnl test for --with-livedotcom-tree
   dnl
-  if test -z "${with_livedotcom_tree}" -a "${ac_cv_prog_CXX}" != ""; then
+  if test -z "${with_livedotcom_tree}" -a "${CXX}" != ""; then
     AC_LANG_PUSH(C++)
     CPPFLAGS_save="${CPPFLAGS}"
     CPPFLAGS_livedotcom="-I/usr/include/liveMedia -I/usr/include/groupsock -I/usr/include/BasicUsageEnvironment -I/usr/include/UsageEnvironment"
@@ -1752,7 +1753,7 @@ dnl  matroska demux plugin
 dnl
 AC_ARG_ENABLE(mkv,
   [  --enable-mkv            Matroska demux support (default enabled)])
-if test "${enable_mkv}" != "no" -a "${ac_cv_prog_CXX}" != ""; then
+if test "${enable_mkv}" != "no" -a "${CXX}" != ""; then
   AC_LANG_PUSH(C++)
   AC_CHECK_HEADERS(ebml/EbmlVersion.h, [
     AC_CHECK_HEADERS(matroska/KaxVersion.h, [
@@ -2937,7 +2938,7 @@ dnl Roku HD1000 Video output module
 dnl
 AC_ARG_ENABLE(hd1000v,
   [  --enable-hd1000v        HD1000 Video Output module (default enabled on HD1000)])
-if test "${enable_hd1000v}" != "no" -a "${ac_cv_prog_CXX}" != "" &&
+if test "${enable_hd1000v}" != "no" -a "${CXX}" != "" &&
   (test "${SYS}" != "mingw32" || test "${enable_hd1000v}" = "yes")
 then
   AC_LANG_PUSH([C++])
@@ -3244,7 +3245,7 @@ dnl  Roku HD1000 audio
 dnl
 AC_ARG_ENABLE(hd1000a,
   [  --enable-hd1000a        HD1000 audio module (default enabled on HD1000)])
-if test "${enable_hd1000a}" != "no" -a "${ac_cv_prog_CXX}" != "" &&
+if test "${enable_hd1000a}" != "no" -a "${CXX}" != "" &&
   (test "${SYS}" != "mingw32" || test "${enable_hd1000a}" = "yes")
 then
   AC_LANG_PUSH([C++])
@@ -3457,7 +3458,7 @@ then
       fi ])
   # look for wx-config
   AC_PATH_PROG(WX_CONFIG, wx-config, no, ${WXWINDOWS_PATH})
-  if test "${WX_CONFIG}" != "no" -a "${ac_cv_prog_CXX}" != ""
+  if test "${WX_CONFIG}" != "no" -a "${CXX}" != ""
   then
     if expr 2.3.0 \> `${WX_CONFIG} --version` >/dev/null
     then
