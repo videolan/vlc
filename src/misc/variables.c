@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.30 2003/09/07 22:51:11 fenrir Exp $
+ * $Id: variables.c,v 1.31 2003/09/29 15:45:19 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -132,13 +132,18 @@ static void     CheckValue  ( variable_t *, vlc_value_t * );
 static int      InheritValue( vlc_object_t *, const char *, vlc_value_t *,
                               int );
 
-/*****************************************************************************
- * var_Create: initialize a vlc variable
- *****************************************************************************
+/**
+ * Initialize a vlc variable
+ *
  * We hash the given string and insert it into the sorted list. The insertion
  * may require slow memory copies, but think about what we gain in the log(n)
  * lookup phase when setting/getting the variable value!
- *****************************************************************************/
+ *
+ * \param p_this The object in which to create the variable
+ * \param psz_name The name of the variable
+ * \param i_type The variables type. Must be one of \ref var_type combined with
+ *               zero or more \ref var_flags
+ */
 int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 {
     int i_new;
@@ -278,12 +283,15 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * var_Destroy: destroy a vlc variable
- *****************************************************************************
+/**
+ * Destroy a vlc variable
+ *
  * Look for the variable and destroy it if it is found. As in var_Create we
  * do a call to memmove() but we have performance counterparts elsewhere.
- *****************************************************************************/
+ *
+ * \param p_this The object that holds the variable
+ * \param psz_name The name of the variable
+ */
 int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 {
     int i_var, i;
@@ -349,11 +357,15 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * var_Change: perform an action on a variable
- *****************************************************************************
+/**
+ * Perform an action on a variable
  *
- *****************************************************************************/
+ * \param p_this The object that holds the variable
+ * \param psz_name The name of the variable
+ * \param i_action The action to perform. Must be one of \ref var_action
+ * \param p_val First action parameter
+ * \param p_val2 Second action parameter
+ */
 int __var_Change( vlc_object_t *p_this, const char *psz_name,
                   int i_action, vlc_value_t *p_val, vlc_value_t *p_val2 )
 {
@@ -600,12 +612,13 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * var_Type: request a variable's type
- *****************************************************************************
- * This function returns the variable type if it exists, or 0 if the
+/**
+ * Request a variable's type
+ *
+ * \return The variable type if it exists, or 0 if the
  * variable could not be found.
- *****************************************************************************/
+ * \see \ref var_type
+ */
 int __var_Type( vlc_object_t *p_this, const char *psz_name )
 {
     int i_var, i_type;
@@ -627,11 +640,13 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
     return i_type;
 }
 
-/*****************************************************************************
- * var_Set: set a variable's value
- *****************************************************************************
+/**
+ * Set a variable's value
  *
- *****************************************************************************/
+ * \param p_this The object that hold the variable
+ * \param psz_name The name of the variable
+ * \param val the value to set
+ */
 int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
 {
     int i_var;
@@ -701,11 +716,14 @@ int __var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * var_Get: get a variable's value
- *****************************************************************************
+/**
+ * Get a variable's value
  *
- *****************************************************************************/
+ * \param p_this The object that holds the variable
+ * \param psz_name The name of the variable
+ * \param p_val Pointer to a vlc_value_t that will hold the variable's value
+ *              after the function is finished
+ */
 int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 {
     int i_var;
@@ -734,13 +752,22 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * var_AddCallback: register a callback in a variable
- *****************************************************************************
- * We store a function pointer pf_callback that will be called upon variable
- * modification. p_data is a generic pointer that will be passed as additional
- * argument to the callback function.
- *****************************************************************************/
+/**
+ * Register a callback in a variable
+ *
+ * We store a function pointer that will be called upon variable
+ * modification.
+ *
+ * \param p_this The object that holds the variable
+ * \param psz_name The name of the variable
+ * \param pf_callback The function pointer
+ * \param p_data A generic pointer that will be passed as the last
+ *               argument to the callback function.
+ *
+ * \warning The callback function is run in the thread that calls var_Set on
+ *          the variable. Use proper locking. This thread may not have much
+ *          time to spare, so keep callback functions short.
+ */
 int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
                        vlc_callback_t pf_callback, void *p_data )
 {
@@ -772,12 +799,12 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * var_DelCallback: remove a callback from a variable
- *****************************************************************************
+/**
+ * Remove a callback from a variable
+ *
  * pf_callback and p_data have to be given again, because different objects
  * might have registered the same callback function.
- *****************************************************************************/
+ */
 int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
                        vlc_callback_t pf_callback, void *p_data )
 {

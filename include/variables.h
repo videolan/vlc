@@ -2,7 +2,7 @@
  * variables.h: variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.h,v 1.16 2003/09/07 22:45:16 fenrir Exp $
+ * $Id: variables.h,v 1.17 2003/09/29 15:45:19 sigmunau Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,47 +21,62 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/**
+ * \defgroup variables Variables
+ *
+ * Functions for using the object variables in vlc.
+ *
+ * Vlc have a very powerful "object variable" infrastructure useful
+ * for many things.
+ *
+ * @{
+ */
+
 typedef struct callback_entry_t callback_entry_t;
 
-/*****************************************************************************
- * vlc_value_t is the common union for variable values; variable_t is the
- * structure describing a variable. 
- *****************************************************************************/
+/**
+ * The structure describing a variable. 
+ * \note vlc_value_t is the common union for variable values  
+ */
 struct variable_t
 {
-    /* The variable's exported value */
+    /** The variable's exported value */
     vlc_value_t  val;
 
-    /* The variable unique name, (almost) unique hashed value, and type */
-    char *       psz_name;
-    uint32_t     i_hash;
-    int          i_type;
+    char *       psz_name; /**< The variable unique name */
+    uint32_t     i_hash;   /**< (almost) unique hashed value */
+    int          i_type;   /**< The type of the variable */
 
-    /* The variable display name, mainly for use by the interfaces */
+    /** The variable display name, mainly for use by the interfaces */
     char *       psz_text;
 
-    /* A pointer to a comparison function, a duplication function, and
-     * a deallocation function */
+    /** A pointer to a comparison function */
     int      ( * pf_cmp ) ( vlc_value_t, vlc_value_t );
+    /** A pointer to a duplication function */
     void     ( * pf_dup ) ( vlc_value_t * );
+    /** A pointer to a deallocation function */
     void     ( * pf_free ) ( vlc_value_t * );
 
-    /* Creation count: we only destroy the variable if it reaches 0 */
+    /** Creation count: we only destroy the variable if it reaches 0 */
     int          i_usage;
 
-    /* If the variable has min/max/step values */
+    /** If the variable has min/max/step values */
     vlc_value_t  min, max, step;
 
-    /* If the variable is to be chosen in a list */
+    /** Index of the default choice, if the variable is to be chosen in
+     * a list */
     int          i_default;
+    /** List of choices */
     vlc_list_t   choices;
+    /** List of friendly names for the choices */
     vlc_list_t   choices_text;
 
-    /* Set to TRUE if the variable is in a callback */
+    /** Set to TRUE if the variable is in a callback */
     vlc_bool_t   b_incallback;
 
-    /* Registered callbacks */
+    /** Number of registered callbacks */
     int                i_entries;
+    /** Array of registered callbacks */
     callback_entry_t * p_entries;
 };
 
@@ -71,7 +86,11 @@ struct variable_t
 #define VLC_VAR_TYPE      0x00ff
 #define VLC_VAR_FLAGS     0xff00
 
-/* Different types */
+/**
+ * \defgroup var_type Variable types
+ * These are the different types a vlc variable can have.
+ * @{
+ */
 #define VLC_VAR_VOID      0x0010
 #define VLC_VAR_BOOL      0x0020
 #define VLC_VAR_INTEGER   0x0030
@@ -85,8 +104,12 @@ struct variable_t
 #define VLC_VAR_ADDRESS   0x0070
 #define VLC_VAR_MUTEX     0x0080
 #define VLC_VAR_LIST      0x0090
-
-/* Additive flags */
+/**@}*/
+/** \defgroup var_flags Additive flags
+ * These flags are added to the type field of the variable. Most as a result of
+ * a __var_Change() call, but some may be added at creation time
+ * @{
+ */
 #define VLC_VAR_HASCHOICE 0x0100
 #define VLC_VAR_HASMIN    0x0200
 #define VLC_VAR_HASMAX    0x0400
@@ -96,16 +119,37 @@ struct variable_t
 #define VLC_VAR_ISCOMMAND 0x2000
 #define VLC_VAR_ISCONFIG  0x2000
 
-/* Creation flag */
+/** Creation flag */
 #define VLC_VAR_DOINHERIT 0x8000
+/**@}*/
 
-/*****************************************************************************
- * Variable actions
- *****************************************************************************/
+/**
+ * \defgroup var_action Variable actions
+ * These are the different actions that can be used with __var_Change().
+ * The parameters given are the meaning of the two last parameters of
+ * __var_Change() when this action is being used.
+ * @{
+ */
+
+/**
+ * Set the minimum value of this variable
+ * \param p_val The new minimum value
+ * \param p_val2 Unused
+ */
 #define VLC_VAR_SETMIN        0x0010
+/**
+ * Set the maximum value of this variable
+ * \param p_val The new maximum value
+ * \param p_val2 Unused
+ */
 #define VLC_VAR_SETMAX        0x0011
 #define VLC_VAR_SETSTEP       0x0012
 
+/**
+ * Set the value of this variable without triggering any callbacks
+ * \param p_val The new value
+ * \param p_val2 Unused
+ */
 #define VLC_VAR_SETVALUE      0x0013
 
 #define VLC_VAR_SETTEXT       0x0014
@@ -122,6 +166,7 @@ struct variable_t
 #define VLC_VAR_CHOICESCOUNT  0x0028
 
 #define VLC_VAR_INHERITVALUE  0x0030
+/**@}*/
 
 /*****************************************************************************
  * Prototypes
@@ -135,13 +180,31 @@ VLC_EXPORT( int, __var_Type, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( int, __var_Set, ( vlc_object_t *, const char *, vlc_value_t ) );
 VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 
+/**
+ * __var_Create() with automatic casting.
+ */
 #define var_Create(a,b,c) __var_Create( VLC_OBJECT(a), b, c )
+/**
+ * __var_Destroy() with automatic casting
+ */
 #define var_Destroy(a,b) __var_Destroy( VLC_OBJECT(a), b )
 
+/**
+ * __var_Change() with automatic casting
+ */
 #define var_Change(a,b,c,d,e) __var_Change( VLC_OBJECT(a), b, c, d, e )
 
+/**
+ * __var_Type() with automatic casting
+ */
 #define var_Type(a,b) __var_Type( VLC_OBJECT(a), b )
+/**
+ * __var_Set() with automatic casting
+ */
 #define var_Set(a,b,c) __var_Set( VLC_OBJECT(a), b, c )
+/**
+ * __var_Get() with automatic casting
+ */
 #define var_Get(a,b,c) __var_Get( VLC_OBJECT(a), b, c )
 
 /*****************************************************************************
@@ -156,32 +219,68 @@ VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 VLC_EXPORT( int, __var_AddCallback, ( vlc_object_t *, const char *, vlc_callback_t, void * ) );
 VLC_EXPORT( int, __var_DelCallback, ( vlc_object_t *, const char *, vlc_callback_t, void * ) );
 
+/**
+ * __var_AddCallback() with automatic casting
+ */
 #define var_AddCallback(a,b,c,d) __var_AddCallback( VLC_OBJECT(a), b, c, d )
+
+/**
+ * __var_DelCallback() with automatic casting
+ */
 #define var_DelCallback(a,b,c,d) __var_DelCallback( VLC_OBJECT(a), b, c, d )
 
 /*****************************************************************************
  * helpers functions
- *****************************************************************************
- *
  *****************************************************************************/
+
+/**
+ * Set the value of an integer variable
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ * \param i The new integer value of this variable
+ */
 static inline int __var_SetInteger( vlc_object_t *p_obj, const char *psz_name, int i )
 {
     vlc_value_t val;
     val.i_int = i;
     return __var_Set( p_obj, psz_name, val );
 }
+
+/**
+ * Set the value of a time variable
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ * \param i The new time value of this variable
+ */
 static inline int __var_SetTime( vlc_object_t *p_obj, const char *psz_name, signed long long i )
 {
     vlc_value_t val;
     val.i_time = i;
     return __var_Set( p_obj, psz_name, val );
 }
+
+/**
+ * Set the value of a float variable
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ * \param f The new float value of this variable
+ */
 static inline int __var_SetFloat( vlc_object_t *p_obj, const char *psz_name, float f )
 {
     vlc_value_t val;
     val.f_float = f;
     return __var_Set( p_obj, psz_name, val );
 }
+
+/**
+ * Trigger the callbacks on a void variable
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
 static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
@@ -189,8 +288,24 @@ static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
     return __var_Set( p_obj, psz_name, val );
 }
 
+/**
+ * __var_SetInteger() with automatic casting
+ */
 #define var_SetInteger(a,b,c)   __var_SetInteger( VLC_OBJECT(a),b,c)
+/**
+ * __var_SetTime() with automatic casting
+ */
 #define var_SetTime(a,b,c)      __var_SetTime( VLC_OBJECT(a),b,c)
+/**
+ * __var_SetFloat() with automatic casting
+ */
 #define var_SetFloat(a,b,c)     __var_SetFloat( VLC_OBJECT(a),b,c)
+/**
+ * __var_SetVoid() with automatic casting
+ */
 #define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
+
+/**
+ * @}
+ */
 
