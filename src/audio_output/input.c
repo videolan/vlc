@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.15 2002/10/04 18:07:22 sam Exp $
+ * $Id: input.c,v 1.16 2002/10/09 22:54:22 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -63,37 +63,46 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         return -1;
     }
 
-    /* Create resamplers. */
-    intermediate_format.i_rate = (p_input->input.i_rate
-                             * (100 + AOUT_MAX_RESAMPLING)) / 100;
-    if ( intermediate_format.i_rate == p_aout->mixer.mixer.i_rate )
-    {
-        /* Just in case... */
-        intermediate_format.i_rate++;
-    }
-    if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_resamplers,
-                                     &p_input->i_nb_resamplers,
-                                     &intermediate_format,
-                                     &p_aout->mixer.mixer ) < 0 )
-    {
-        msg_Err( p_aout, "couldn't set a resampler pipeline" );
-
-        aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
-                                     p_input->i_nb_filters );
-        aout_FifoDestroy( p_aout, &p_input->fifo );
-        p_input->b_error = 1;
-
-        return -1;
-    }
-
     /* Prepare hints for the buffer allocator. */
     p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
     p_input->input_alloc.i_bytes_per_sec = -1;
 
-    aout_FiltersHintBuffers( p_aout, p_input->pp_resamplers,
-                             p_input->i_nb_resamplers,
-                             &p_input->input_alloc );
+    if ( AOUT_FMT_NON_LINEAR( &p_aout->mixer.mixer ) )
+    {
+        p_input->i_nb_resamplers = 0;
+    }
+    else
+    {
+        /* Create resamplers. */
+        intermediate_format.i_rate = (p_input->input.i_rate
+                                 * (100 + AOUT_MAX_RESAMPLING)) / 100;
+        if ( intermediate_format.i_rate == p_aout->mixer.mixer.i_rate )
+        {
+            /* Just in case... */
+            intermediate_format.i_rate++;
+        }
+        if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_resamplers,
+                                         &p_input->i_nb_resamplers,
+                                         &intermediate_format,
+                                         &p_aout->mixer.mixer ) < 0 )
+        {
+            msg_Err( p_aout, "couldn't set a resampler pipeline" );
 
+            aout_FiltersDestroyPipeline( p_aout, p_input->pp_filters,
+                                         p_input->i_nb_filters );
+            aout_FifoDestroy( p_aout, &p_input->fifo );
+            p_input->b_error = 1;
+
+            return -1;
+        }
+
+        aout_FiltersHintBuffers( p_aout, p_input->pp_resamplers,
+                                 p_input->i_nb_resamplers,
+                                 &p_input->input_alloc );
+    }
+
+    p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
+    p_input->input_alloc.i_bytes_per_sec = -1;
     aout_FiltersHintBuffers( p_aout, p_input->pp_filters,
                              p_input->i_nb_filters,
                              &p_input->input_alloc );
@@ -154,9 +163,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          * happen :). */
         msg_Warn( p_aout, "computed PTS is out of range (%lld), clearing out",
                   start_date );
-        vlc_mutex_lock( &p_aout->mixer_lock );
+        vlc_mutex_lock( &p_aout->input_fifos_lock );
         aout_FifoSet( p_aout, &p_input->fifo, 0 );
-        vlc_mutex_unlock( &p_aout->mixer_lock );
+        vlc_mutex_unlock( &p_aout->input_fifos_lock );
         start_date = 0;
     } 
 
