@@ -619,8 +619,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
     }
     else if( p_sys->i_box_type == BOX_OPEN && p_sys->psz_open_chain )
     {
-        int i_chain_len;
-        i_chain_len = strlen( p_sys->psz_open_chain );
+        int i_chain_len = strlen( p_sys->psz_open_chain );
         playlist_t *p_playlist = p_sys->p_playlist;
 
         switch( i_key )
@@ -1558,21 +1557,24 @@ static void ReadDir( intf_thread_t *p_intf )
         /* while we still have entries in the directory */
         while( p_dir_content != NULL )
         {
+#if defined( S_ISDIR )
+            struct stat stat_data;
+#endif
             struct dir_entry_t *p_dir_entry;
             int i_size_entry = strlen( p_sys->psz_current_dir ) +
                                strlen( p_dir_content->d_name ) + 2;
             char *psz_uri = (char *)malloc( sizeof(char)*i_size_entry);
 
-            sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir, p_dir_content->d_name );
+            sprintf( psz_uri, "%s/%s", p_sys->psz_current_dir,
+                     p_dir_content->d_name );
 
-            if( ( p_dir_entry = malloc( sizeof( struct dir_entry_t) ) ) == NULL )
+            if( !( p_dir_entry = malloc( sizeof( struct dir_entry_t) ) ) )
             {
                 free( psz_uri);
                 return;
             }
 
 #if defined( S_ISDIR )
-            struct stat stat_data;
             stat( psz_uri, &stat_data );
             if( S_ISDIR(stat_data.st_mode) )
 #elif defined( DT_DIR )
@@ -1593,6 +1595,7 @@ static void ReadDir( intf_thread_t *p_intf )
                 INSERT_ELEM( p_sys->pp_dir_entries, p_sys->i_dir_entries,
                      p_sys->i_dir_entries, p_dir_entry );
             }
+
             free( psz_uri );
             /* Read next entry */
             p_dir_content = readdir( p_current_dir );

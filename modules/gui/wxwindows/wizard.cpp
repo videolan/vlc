@@ -219,6 +219,7 @@ class wizInputPage : public wxWizardPage
         void SetPintf( intf_thread_t *p_intf );
         void SetUri( char *psz_uri );
         void SetPartial( int i_from, int i_to );
+
     protected:
         bool b_chosen;
         intf_thread_t *p_intf;
@@ -242,10 +243,11 @@ class wizInputPage : public wxWizardPage
         wxWizardPage *p_prev;
         wxWizardPage *p_streaming_page;
         wxWizardPage *p_transcode_page;
+
         DECLARE_EVENT_TABLE()
 };
 
-BEGIN_EVENT_TABLE(wizInputPage, wxWizardPageSimple)
+BEGIN_EVENT_TABLE(wizInputPage, wxWizardPage)
     EVT_RADIOBUTTON( InputRadio0_Event, wizInputPage::OnInputChange)
     EVT_RADIOBUTTON( InputRadio1_Event, wizInputPage::OnInputChange)
     EVT_BUTTON( Choose_Event, wizInputPage::OnChoose)
@@ -291,7 +293,7 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
-BEGIN_EVENT_TABLE(wizTranscodeCodecPage, wxWizardPageSimple)
+BEGIN_EVENT_TABLE(wizTranscodeCodecPage, wxWizardPage)
    EVT_CHECKBOX( VideoEnable_Event, wizTranscodeCodecPage::OnEnableVideo)
    EVT_CHECKBOX( AudioEnable_Event, wizTranscodeCodecPage::OnEnableAudio)
    EVT_COMBOBOX( VideoCodec_Event, wizTranscodeCodecPage::OnVideoCodecChange)
@@ -321,7 +323,7 @@ protected:
     wxWizardPage *p_next;
 };
 
-BEGIN_EVENT_TABLE(wizStreamingMethodPage, wxWizardPageSimple)
+BEGIN_EVENT_TABLE(wizStreamingMethodPage, wxWizardPage)
     EVT_RADIOBUTTON( MethodRadio0_Event, wizStreamingMethodPage::OnMethodChange)
     EVT_RADIOBUTTON( MethodRadio1_Event, wizStreamingMethodPage::OnMethodChange)
     EVT_RADIOBUTTON( MethodRadio2_Event, wizStreamingMethodPage::OnMethodChange)
@@ -356,7 +358,7 @@ protected:
     wxWizardPage *p_transcode_page;
 };
 
-BEGIN_EVENT_TABLE(wizEncapPage, wxWizardPageSimple)
+BEGIN_EVENT_TABLE(wizEncapPage, wxWizardPage)
     EVT_WIZARD_PAGE_CHANGING(-1, wizEncapPage::OnWizardPageChanging)
     EVT_RADIOBUTTON( EncapRadio0_Event, wizEncapPage::OnEncapChange)
     EVT_RADIOBUTTON( EncapRadio1_Event, wizEncapPage::OnEncapChange)
