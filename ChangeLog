@@ -1,3 +1,4 @@
+  * fixe a 100% cpu usage bug, in the dummy aout
   * Added a 'f' shortcut to switch between Windowed and Fullscreened
     mode.
 
