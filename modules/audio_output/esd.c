@@ -2,7 +2,7 @@
  * esd.c : EsounD module
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: esd.c,v 1.16 2003/01/28 03:46:22 sam Exp $
+ * $Id: esd.c,v 1.17 2003/01/28 22:52:30 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -47,7 +47,7 @@ struct aout_sys_t
     esd_format_t esd_format;
     int          i_fd;
 
-    mtime_t      latency;
+    mtime_t      latency;       /* unused, but we might do something with it */
 };
 
 /*****************************************************************************
@@ -56,8 +56,6 @@ struct aout_sys_t
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static void Play         ( aout_instance_t * );
-static int  ESDThread    ( aout_instance_t * );
-static void ESDLoop      ( aout_instance_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -83,7 +81,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
     {
         msg_Err( p_aout, "out of memory" );
-        return -1;
+        return VLC_ENOMEM;
     }
 
     p_aout->output.p_sys = p_sys;
@@ -124,7 +122,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "cannot open esound socket (format 0x%08x at %d Hz)",
                          p_sys->esd_format, p_aout->output.output.i_rate );
         free( p_sys );
-        return -1;
+        return VLC_EGENERIC;
     }
 
     p_aout->output.i_nb_samples = ESD_BUF_SIZE * 2;
@@ -140,17 +138,7 @@ static int Open( vlc_object_t *p_this )
       / p_aout->output.output.i_bytes_per_frame
       / p_aout->output.output.i_rate;
 
-    /* Create ESD thread and wait for its readiness. */
-    if( vlc_thread_create( p_aout, "aout", ESDThread,
-                           VLC_THREAD_PRIORITY_OUTPUT, VLC_FALSE ) )
-    {
-        msg_Err( p_aout, "cannot create ESD thread (%s)", strerror(errno) );
-        close( p_sys->i_fd );
-        free( p_sys );
-        return -1;
-    }
-
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -158,6 +146,23 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
+    struct aout_sys_t * p_sys = p_aout->output.p_sys;
+    aout_buffer_t * p_buffer;
+    int i_tmp;
+
+    p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
+
+    if ( p_buffer != NULL )
+    {
+        i_tmp = write( p_sys->i_fd, p_buffer->p_buffer, p_buffer->i_nb_bytes );
+
+        if( i_tmp < 0 )
+        {
+            msg_Err( p_aout, "write failed (%s)", strerror(errno) );
+        }
+
+        aout_BufferFree( p_buffer );
+    }
 }
 
 /*****************************************************************************
@@ -168,70 +173,8 @@ static void Close( vlc_object_t *p_this )
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
-    p_aout->b_die = 1;
-    vlc_thread_join( p_aout );
-
     close( p_sys->i_fd );
     free( p_sys );
-}
-
-/*****************************************************************************
- * ESDThread: asynchronous thread used to DMA the data to the device
- *****************************************************************************/
-static int ESDThread( aout_instance_t * p_aout )
-{
-    while ( !p_aout->b_die )
-    {
-        ESDLoop( p_aout );
-    }
-
-    return 0;
-}
-
-/*****************************************************************************
- * ESDLoop: ESDThread's inner loop
- *****************************************************************************
- * This is a separate function because it makes use of alloca() which makes
- * use of the caller's stack frame, which means we need to return after each
- * iteration.
- *****************************************************************************/
-static void ESDLoop( aout_instance_t * p_aout )
-{
-    struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    aout_buffer_t * p_buffer;
-    int i_tmp, i_size;
-    byte_t * p_bytes = NULL;
-
-    /* Get the presentation date of the next write() operation. It
-     * is equal to the current date + buffered samples + esd latency */
-    p_buffer = aout_OutputNextBuffer( p_aout, mdate() + p_sys->latency,
-                                              VLC_FALSE );
-
-    if ( p_buffer != NULL )
-    {
-        p_bytes = p_buffer->p_buffer;
-        i_size = p_buffer->i_nb_bytes;
-    }
-    else
-    {
-        i_size = ESD_BUF_SIZE * 2
-                  / p_aout->output.output.i_frame_length
-                  * p_aout->output.output.i_bytes_per_frame;
-        p_bytes = alloca( i_size );
-        memset( p_bytes, 0, i_size );
-    }
-
-    i_tmp = write( p_sys->i_fd, p_bytes, i_size );
-
-    if( i_tmp < 0 )
-    {
-        msg_Err( p_aout, "write failed (%s)", strerror(errno) );
-    }
-
-    if ( p_buffer != NULL )
-    {
-        aout_BufferFree( p_buffer );
-    }
 }
 
 #if 0
