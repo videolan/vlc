@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.92 2002/04/25 02:10:33 jobi Exp $
+ * $Id: mpeg_system.c,v 1.93 2002/05/14 16:45:33 jobi Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1091,6 +1091,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
     boolean_t           b_trash = 0;             /* Is the packet unuseful ? */
     boolean_t           b_lost = 0;             /* Was there a packet loss ? */
     boolean_t           b_psi = 0;                        /* Is this a PSI ? */
+    boolean_t           b_pcr = 0;                   /* Does it have a PCR ? */
     es_descriptor_t *   p_es = NULL;
     es_ts_data_t *      p_es_demux = NULL;
     pgrm_ts_data_t *    p_pgrm_demux = NULL;
@@ -1104,7 +1105,17 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
 
     /* Find out the elementary stream. */
     vlc_mutex_lock( &p_input->stream.stream_lock );
-        
+    
+    for( i_dummy = 0; i_dummy < p_input->stream.i_pgrm_number; i_dummy ++ )
+    {
+        if( (( pgrm_ts_data_t * ) p_input->stream.pp_programs[i_dummy]->
+                    p_demux_data)->i_pcr_pid == i_pid )
+        {
+            b_pcr = 1;
+            break;
+        }
+    }
+            
     p_es= input_FindES( p_input, i_pid );
     
     if( (p_es != NULL) && (p_es->p_demux_data != NULL) )
@@ -1140,8 +1151,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
      * may still be null. Who said it was ugly ?
      * I have written worse. --Meuuh */
     if( ( p_es != NULL ) && 
-        ((p_es->p_decoder_fifo != NULL) || b_psi 
-                                   || (p_pgrm_demux->i_pcr_pid == i_pid) ) )
+        ((p_es->p_decoder_fifo != NULL) || b_psi || b_pcr ) )
     {
         p_es->c_packets++;
 
@@ -1203,8 +1213,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                     /* If this is a PCR_PID, and this TS packet contains a
                      * PCR, we pass it along to the PCR decoder. */
 
-                    if( !b_psi && (p_pgrm_demux->i_pcr_pid == i_pid)
-                        && (p[5] & 0x10) )
+                    if( !b_psi && b_pcr && (p[5] & 0x10) )
                     {
                         /* There should be a PCR field in the packet, check
                          * if the adaptation field is long enough to carry
@@ -1219,8 +1228,20 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                                        ( (mtime_t)p[9] << 1 ) |
                                        ( (mtime_t)p[10] >> 7 );
                             /* Call the pace control. */
-                            input_ClockManageRef( p_input, p_es->p_pgrm,
-                                                  pcr_time );
+                            for( i_dummy = 0; 
+                                    i_dummy < p_input->stream.i_pgrm_number; 
+                                    i_dummy ++ )
+                            {
+                                if( ( ( pgrm_ts_data_t * )
+                                    p_input->stream.pp_programs[i_dummy]->
+                                    p_demux_data )->i_pcr_pid == i_pid )
+                                {
+                                    input_ClockManageRef( p_input,
+                                        p_input->stream.pp_programs[i_dummy],
+                                        pcr_time );
+                                }
+                            }
+
                         }
                     } /* PCR ? */
                 } /* valid TS adaptation field ? */
