@@ -3,7 +3,7 @@
  *                              in MMX EXT
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_inner_mmxext.c,v 1.1 2001/01/18 05:13:22 sam Exp $
+ * $Id: vdec_motion_inner_mmxext.c,v 1.2 2001/06/07 15:27:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>, largerly inspired by the
  *          work done by the livid project <http://www.linuxvideo.org/>
@@ -22,6 +22,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+
+#include "modules_inner.h"
 
 /*****************************************************************************
  * Preamble
@@ -50,7 +52,7 @@ static mmx_t mask_one = {0x0101010101010101LL};
 #define pavg_m2r(src,dest)      pavgb_m2r (src, dest);
 
 #define __MotionComponent_x_y_copy(width,height)                            \
-void MotionComponent_x_y_copy_##width##_##height(yuv_data_t * p_src,        \
+void _M(MotionComponent_x_y_copy_##width##_##height)(yuv_data_t * p_src,    \
                                                  yuv_data_t * p_dest,       \
                                                  int i_stride)              \
 {                                                                           \
@@ -80,7 +82,7 @@ void MotionComponent_x_y_copy_##width##_##height(yuv_data_t * p_src,        \
 }
 
 #define __MotionComponent_X_y_copy(width,height)                            \
-void MotionComponent_X_y_copy_##width##_##height(yuv_data_t * p_src,        \
+void _M(MotionComponent_X_y_copy_##width##_##height)(yuv_data_t * p_src,    \
                                                  yuv_data_t * p_dest,       \
                                                  int i_stride)              \
 {                                                                           \
@@ -103,7 +105,7 @@ void MotionComponent_X_y_copy_##width##_##height(yuv_data_t * p_src,        \
 }
 
 #define __MotionComponent_x_Y_copy(width,height)                            \
-void MotionComponent_x_Y_copy_##width##_##height(yuv_data_t * p_src,        \
+void _M(MotionComponent_x_Y_copy_##width##_##height)(yuv_data_t * p_src,    \
                                                  yuv_data_t * p_dest,       \
                                                  int i_stride)              \
 {                                                                           \
@@ -128,7 +130,7 @@ void MotionComponent_x_Y_copy_##width##_##height(yuv_data_t * p_src,        \
 }
 
 #define __MotionComponent_X_Y_copy(width,height)                            \
-void MotionComponent_X_Y_copy_##width##_##height(yuv_data_t * p_src,        \
+void _M(MotionComponent_X_Y_copy_##width##_##height)(yuv_data_t * p_src,    \
                                                  yuv_data_t * p_dest,       \
                                                  int i_stride)              \
 {                                                                           \
@@ -212,7 +214,7 @@ void MotionComponent_X_Y_copy_##width##_##height(yuv_data_t * p_src,        \
 }
 
 #define __MotionComponent_x_y_avg(width,height)                             \
-void MotionComponent_x_y_avg_##width##_##height(yuv_data_t * p_src,         \
+void _M(MotionComponent_x_y_avg_##width##_##height)(yuv_data_t * p_src,     \
                                                 yuv_data_t * p_dest,        \
                                                 int i_stride)               \
 {                                                                           \
@@ -235,7 +237,7 @@ void MotionComponent_x_y_avg_##width##_##height(yuv_data_t * p_src,         \
 }
 
 #define __MotionComponent_X_y_avg(width,height)                             \
-void MotionComponent_X_y_avg_##width##_##height(yuv_data_t * p_src,         \
+void _M(MotionComponent_X_y_avg_##width##_##height)(yuv_data_t * p_src,     \
                                                 yuv_data_t * p_dest,        \
                                                 int i_stride)               \
 {                                                                           \
@@ -261,7 +263,7 @@ void MotionComponent_X_y_avg_##width##_##height(yuv_data_t * p_src,         \
 }
 
 #define __MotionComponent_x_Y_avg(width,height)                             \
-void MotionComponent_x_Y_avg_##width##_##height(yuv_data_t * p_src,         \
+void _M(MotionComponent_x_Y_avg_##width##_##height)(yuv_data_t * p_src,     \
                                                 yuv_data_t * p_dest,        \
                                                 int i_stride)               \
 {                                                                           \
@@ -289,7 +291,7 @@ void MotionComponent_x_Y_avg_##width##_##height(yuv_data_t * p_src,         \
 }
 
 #define __MotionComponent_X_Y_avg(width,height)                             \
-void MotionComponent_X_Y_avg_##width##_##height(yuv_data_t * p_src,         \
+void _M(MotionComponent_X_Y_avg_##width##_##height)(yuv_data_t * p_src,     \
                                                 yuv_data_t * p_dest,        \
                                                 int i_stride)               \
 {                                                                           \

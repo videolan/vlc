@@ -2,7 +2,7 @@
  * vdec_motion_common.c : common motion compensation routines common
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_motion_common.c,v 1.7 2001/06/03 12:47:21 sam Exp $
+ * $Id: vdec_motion_common.c,v 1.8 2001/06/07 15:27:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -75,7 +75,7 @@ static void vdec_MotionFrameDMV444    ( macroblock_t * p_mb );
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
  *****************************************************************************/
-void motion_getfunctions( function_list_t * p_function_list )
+void _M( motion_getfunctions )( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = _M( motion_Probe );
 
@@ -97,14 +97,14 @@ void motion_getfunctions( function_list_t * p_function_list )
 }
 
 #define __MotionComponents(width,height)                \
-void MotionComponent_x_y_copy_##width##_##height ();    \
-void MotionComponent_X_y_copy_##width##_##height ();    \
-void MotionComponent_x_Y_copy_##width##_##height ();    \
-void MotionComponent_X_Y_copy_##width##_##height ();    \
-void MotionComponent_x_y_avg_##width##_##height ();     \
-void MotionComponent_X_y_avg_##width##_##height ();     \
-void MotionComponent_x_Y_avg_##width##_##height ();     \
-void MotionComponent_X_Y_avg_##width##_##height ();
+void _M( MotionComponent_x_y_copy_##width##_##height )();    \
+void _M( MotionComponent_X_y_copy_##width##_##height )();    \
+void _M( MotionComponent_x_Y_copy_##width##_##height )();    \
+void _M( MotionComponent_X_Y_copy_##width##_##height )();    \
+void _M( MotionComponent_x_y_avg_##width##_##height )();     \
+void _M( MotionComponent_X_y_avg_##width##_##height )();     \
+void _M( MotionComponent_x_Y_avg_##width##_##height )();     \
+void _M( MotionComponent_X_Y_avg_##width##_##height )();
 
 __MotionComponents (16,16)       /* 444, 422, 420 */
 __MotionComponents (16,8)        /* 444, 422, 420 */
@@ -122,20 +122,20 @@ __MotionComponents (8,16)        /* 422 */
             switch (i_select)                                                \
             {                                                                \
             case 0:                                                          \
-                MotionComponent_x_y_copy_##width##_##height (p_src, p_dest,  \
-                                                             i_stride);      \
+                _M( MotionComponent_x_y_copy_##width##_##height )(p_src,     \
+                                                          p_dest, i_stride); \
                 break;                                                       \
             case 1:                                                          \
-                MotionComponent_X_y_copy_##width##_##height (p_src, p_dest,  \
-                                                             i_stride);      \
+                _M( MotionComponent_X_y_copy_##width##_##height )(p_src,     \
+                                                          p_dest, i_stride); \
                 break;                                                       \
             case 2:                                                          \
-                MotionComponent_x_Y_copy_##width##_##height (p_src, p_dest,  \
-                                                             i_stride);      \
+                _M( MotionComponent_x_Y_copy_##width##_##height )(p_src,     \
+                                                          p_dest, i_stride); \
                 break;                                                       \
             case 3:                                                          \
-                MotionComponent_X_Y_copy_##width##_##height (p_src, p_dest,  \
-                                                             i_stride);      \
+                _M( MotionComponent_X_Y_copy_##width##_##height )(p_src,     \
+                                                          p_dest, i_stride); \
                 break;                                                       \
             }                                                                \
         }                                                                    \
@@ -144,20 +144,20 @@ __MotionComponents (8,16)        /* 422 */
             switch (i_select)                                                \
             {                                                                \
             case 0:                                                          \
-                MotionComponent_x_y_avg_##width##_##height (p_src, p_dest,   \
-                                                            i_stride);       \
+                _M( MotionComponent_x_y_avg_##width##_##height )(p_src,      \
+                                                          p_dest, i_stride); \
                 break;                                                       \
             case 1:                                                          \
-                MotionComponent_X_y_avg_##width##_##height (p_src, p_dest,   \
-                                                            i_stride);       \
+                _M( MotionComponent_X_y_avg_##width##_##height )(p_src,      \
+                                                          p_dest, i_stride); \
                 break;                                                       \
             case 2:                                                          \
-                MotionComponent_x_Y_avg_##width##_##height (p_src, p_dest,   \
-                                                            i_stride);       \
+                _M( MotionComponent_x_Y_avg_##width##_##height )(p_src,      \
+                                                          p_dest, i_stride); \
                 break;                                                       \
             case 3:                                                          \
-                MotionComponent_X_Y_avg_##width##_##height (p_src, p_dest,   \
-                                                            i_stride);       \
+                _M( MotionComponent_X_Y_avg_##width##_##height )(p_src,      \
+                                                          p_dest, i_stride); \
                 break;                                                       \
             }                                                                \
         }                                                                    \

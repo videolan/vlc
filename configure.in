@@ -148,31 +148,31 @@ ARCH=${host_cpu}
 dnl
 dnl  default modules
 dnl
-BUILTINS="${BUILTINS} es ps ts"
-PLUGINS="${PLUGINS} yuv idct idctclassic motion imdct downmix"
+BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion imdct downmix"
+PLUGINS="${PLUGINS}"
 
 dnl
 dnl  Accelerated modules
 dnl
 case x$host_os in
   xmingw32msvc)
-    MMX_PLUGINS="idctmmx motionmmx"
-    MMXEXT_PLUGINS="idctmmxext motionmmxext imdct3dn"
+    MMX_MODULES="idctmmx motionmmx"
+    MMXEXT_MODULES="idctmmxext motionmmxext imdct3dn"
     ;;
   *)
-    MMX_PLUGINS="yuvmmx idctmmx motionmmx"
-    MMXEXT_PLUGINS="idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
+    MMX_MODULES="yuvmmx idctmmx motionmmx"
+    MMXEXT_MODULES="idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
     ;;
 esac
 
 AC_MSG_CHECKING([if \$CC groks MMX inline assembly])
 AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,
-  ACCEL_PLUGINS="${ACCEL_PLUGINS} ${MMX_PLUGINS}"
+  ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 AC_MSG_CHECKING([if \$CC groks MMX EXT or SSE inline assembly])
 AC_TRY_COMPILE([void quux(){void *p;asm("maskmovq %%mm1,%%mm2"::"r"(p));}],,
-  ACCEL_PLUGINS="${ACCEL_PLUGINS} ${MMXEXT_PLUGINS}"
+  ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
   AC_MSG_RESULT(yes), AC_MSG_RESULT(no))
 
 dnl
@@ -249,9 +249,9 @@ dnl
 AC_ARG_ENABLE(mmx,
 [  --disable-mmx           Disable MMX optimizations (default enabled for x86)],
 [ if test x$enableval = xyes; then ARCH="${ARCH} mmx";
-  PLUGINS="${PLUGINS} ${ACCEL_PLUGINS}"; fi ],
+  BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ],
 [ if test x${host_cpu} = xi686 -o x${host_cpu} = xi586 -o x${host_cpu} = xx86 -o x${host_cpu} = xi386; then ARCH="${ARCH} mmx";
-  PLUGINS="${PLUGINS} ${ACCEL_PLUGINS}"; fi ])
+  BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi ])
 
 dnl
 dnl  AltiVec acceleration
@@ -259,7 +259,7 @@ dnl
 AC_ARG_ENABLE(altivec,
 [  --enable-altivec        Enable altivec optimizations (default disabled since it is broken)],
 [ if test x$enableval = xyes; then ARCH="${ARCH} altivec";
-    PLUGINS="${PLUGINS} idctaltivec"
+    BUILTINS="${BUILTINS} idctaltivec"
     LIB_IDCTALTIVEC="-framework vecLib"
   fi ])
 #[ if test -d /System/Library/Frameworks/vecLib.framework; then ARCH="${ARCH} altivec"; PLUGINS="${PLUGINS} idctaltivec"; fi ])

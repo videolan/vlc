@@ -3263,17 +3263,17 @@ fi
 
 ARCH=${host_cpu}
 
-BUILTINS="${BUILTINS} es ps ts"
-PLUGINS="${PLUGINS} yuv idct idctclassic motion imdct downmix"
+BUILTINS="${BUILTINS} es ps ts yuv idct idctclassic motion imdct downmix"
+PLUGINS="${PLUGINS}"
 
 case x$host_os in
   xmingw32msvc)
-    MMX_PLUGINS="idctmmx motionmmx"
-    MMXEXT_PLUGINS="idctmmxext motionmmxext imdct3dn"
+    MMX_MODULES="idctmmx motionmmx"
+    MMXEXT_MODULES="idctmmxext motionmmxext imdct3dn"
     ;;
   *)
-    MMX_PLUGINS="yuvmmx idctmmx motionmmx"
-    MMXEXT_PLUGINS="idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
+    MMX_MODULES="yuvmmx idctmmx motionmmx"
+    MMXEXT_MODULES="idctmmxext motionmmxext imdct3dn imdctsse downmix3dn downmixsse"
     ;;
 esac
 
@@ -3289,7 +3289,7 @@ int main() {
 EOF
 if { (eval echo configure:3291: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
-  ACCEL_PLUGINS="${ACCEL_PLUGINS} ${MMX_PLUGINS}"
+  ACCEL_MODULES="${ACCEL_MODULES} ${MMX_MODULES}"
   echo "$ac_t""yes" 1>&6
 else
   echo "configure: failed program was:" >&5
@@ -3311,7 +3311,7 @@ int main() {
 EOF
 if { (eval echo configure:3313: \"$ac_compile\") 1>&5; (eval $ac_compile) 2>&5; }; then
   rm -rf conftest*
-  ACCEL_PLUGINS="${ACCEL_PLUGINS} ${MMXEXT_PLUGINS}"
+  ACCEL_MODULES="${ACCEL_MODULES} ${MMXEXT_MODULES}"
   echo "$ac_t""yes" 1>&6
 else
   echo "configure: failed program was:" >&5
@@ -3504,10 +3504,10 @@ fi
 if test "${enable_mmx+set}" = set; then
   enableval="$enable_mmx"
    if test x$enableval = xyes; then ARCH="${ARCH} mmx";
-  PLUGINS="${PLUGINS} ${ACCEL_PLUGINS}"; fi 
+  BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi 
 else
    if test x${host_cpu} = xi686 -o x${host_cpu} = xi586 -o x${host_cpu} = xx86 -o x${host_cpu} = xi386; then ARCH="${ARCH} mmx";
-  PLUGINS="${PLUGINS} ${ACCEL_PLUGINS}"; fi 
+  BUILTINS="${BUILTINS} ${ACCEL_MODULES}"; fi 
 fi
 
 
@@ -3515,7 +3515,7 @@ fi
 if test "${enable_altivec+set}" = set; then
   enableval="$enable_altivec"
    if test x$enableval = xyes; then ARCH="${ARCH} altivec";
-    PLUGINS="${PLUGINS} idctaltivec"
+    BUILTINS="${BUILTINS} idctaltivec"
     LIB_IDCTALTIVEC="-framework vecLib"
   fi 
 fi

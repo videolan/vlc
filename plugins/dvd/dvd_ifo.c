@@ -2,9 +2,10 @@
  * dvd_ifo.c: Functions for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.c,v 1.30 2001/06/03 12:47:21 sam Exp $
+ * $Id: dvd_ifo.c,v 1.31 2001/06/07 15:27:44 sam Exp $
  *
- * Author: Stéphane Borel <stef@via.ecp.fr>
+ * Authors: Stéphane Borel <stef@via.ecp.fr>
+ *          German Tischler <tanis@gaspode.franken.de>
  *
  * based on:
  *  - libifo by Thomas Mirlacher <dent@cosy.sbg.ac.at>
@@ -84,12 +85,65 @@ static __inline__ u8* FillBuffer( ifo_t* p_ifo, u8* pi_buffer, off_t i_pos )
 #endif
 
     memset( pi_buffer, 0, DVD_LB_SIZE );
-#if !defined( WIN32 )
+
+#if defined( WIN32 )
+    p_ifo->i_pos = SetFilePointer( (HANDLE) p_ifo->i_fd, i_pos,
+                                   NULL, FILE_BEGIN );
+    ReadFile( (HANDLE) p_ifo->i_fd, pi_buffer, DVD_LB_SIZE, &tmp, NULL );
+
+#elif defined(__FreeBSD__)
+    if ( i_pos & ( DVD_LB_SIZE - 1 ) )
+    {
+        off_t i_relpos = i_pos & ( DVD_LB_SIZE - 1 );
+        off_t i_newpos = i_pos & ~( DVD_LB_SIZE - 1 );
+
+        if ( lseek(p_ifo->i_fd, i_newpos, SEEK_SET) == -1 )
+        {
+            intf_WarnMsg( 2, "input warning: seek failure" );
+            p_ifo->i_pos = -1;
+            return pi_buffer;
+        }
+
+        if ( read(p_ifo->i_fd, p_ifo->p_remap, DVD_LB_SIZE) == -1 )
+        {
+            intf_WarnMsg( 2, "input warning: first chunk read failure" );
+            p_ifo->i_pos = -1;
+            return pi_buffer;
+        }
+      
+        if ( lseek(p_ifo->i_fd, i_newpos + DVD_LB_SIZE, SEEK_SET) == -1 )
+        {
+            intf_WarnMsg( 2, "input warning: seek failure" );
+            p_ifo->i_pos = -1;
+            return pi_buffer;
+        }
+
+        if ( read(p_ifo->i_fd, (p_ifo->p_remap + DVD_LB_SIZE),
+                  DVD_LB_SIZE) == -1 )
+        {
+            intf_WarnMsg( 2, "input warning: second chunk read failure" );
+            p_ifo->i_pos = -1;
+            return pi_buffer;
+        }
+      
+        memcpy( pi_buffer, p_ifo->p_remap + i_relpos,
+                ( DVD_LB_SIZE - i_relpos ) );
+
+        memcpy( pi_buffer + ( DVD_LB_SIZE - i_relpos ),
+                ( p_ifo->p_remap + DVD_LB_SIZE ), i_relpos );
+      
+        p_ifo->i_pos = i_pos;
+    }
+    else
+    {
+        p_ifo->i_pos = lseek( p_ifo->i_fd, i_pos, SEEK_SET );
+        read( p_ifo->i_fd, pi_buffer, DVD_LB_SIZE );
+    }
+
+#else
     p_ifo->i_pos = lseek( p_ifo->i_fd, i_pos, SEEK_SET );
     read( p_ifo->i_fd, pi_buffer, DVD_LB_SIZE );
-#else
-    p_ifo->i_pos = SetFilePointer( (HANDLE) p_ifo->i_fd, i_pos, NULL, FILE_BEGIN );
-    ReadFile( (HANDLE) p_ifo->i_fd, pi_buffer, DVD_LB_SIZE, &tmp, NULL );
+
 #endif
 
     return pi_buffer;

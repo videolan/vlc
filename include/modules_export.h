@@ -41,6 +41,7 @@ typedef struct module_symbols_s
     void ( * intf_Msg )     ( char *, ... );
     void ( * intf_ErrMsg )  ( char *, ... );
     void ( * intf_WarnMsg ) ( int, char *, ... );
+    void ( * intf_FlushMsg )( void );
 
     int  ( * intf_PlaylistAdd )     ( struct playlist_s *, int, const char* );
     int  ( * intf_PlaylistDelete )  ( struct playlist_s *, int );
@@ -134,6 +135,7 @@ typedef struct module_symbols_s
     (p_symbols)->intf_Msg = intf_Msg; \
     (p_symbols)->intf_ErrMsg = intf_ErrMsg; \
     (p_symbols)->intf_WarnMsg = intf_WarnMsg; \
+    (p_symbols)->intf_FlushMsg = intf_FlushMsg; \
     (p_symbols)->intf_PlaylistAdd = intf_PlaylistAdd; \
     (p_symbols)->intf_PlaylistDelete = intf_PlaylistDelete; \
     (p_symbols)->intf_PlaylistNext = intf_PlaylistNext; \
@@ -198,9 +200,10 @@ extern module_symbols_t* p_symbols;
 #   define intf_AssignKey(a,b,c,d) p_symbols->intf_AssignKey(a,b,c,d)
 #   define intf_ProcessKey(a,b) p_symbols->intf_ProcessKey(a,b)
 
-#   define intf_Msg(a,b...) p_symbols->intf_Msg(a, ## b)
-#   define intf_ErrMsg(a,b...) p_symbols->intf_ErrMsg(a, ## b)
-#   define intf_WarnMsg(a,b,c...) p_symbols->intf_WarnMsg(a,b, ## c)
+#   define intf_Msg p_symbols->intf_Msg
+#   define intf_ErrMsg p_symbols->intf_ErrMsg
+#   define intf_WarnMsg p_symbols->intf_WarnMsg
+#   define intf_FlushMsg p_symbols->intf_FlushMsg
 
 #   define intf_PlaylistAdd(a,b,c) p_symbols->intf_PlaylistAdd(a,b,c)
 #   define intf_PlaylistDelete(a,b) p_symbols->intf_PlaylistDelete(a,b)

@@ -191,3 +191,7 @@ N: Peter Surda
 E: shurdeek@panorama.sth.ac.at
 D: rc plugin for vlc control through /dev/stdin
 
+N: German Tischler
+E: tanis@gaspode.franken.de
+D: FreeBSD DVD input patch
+

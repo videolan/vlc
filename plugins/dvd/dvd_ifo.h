@@ -2,7 +2,7 @@
  * dvd_ifo.h: Structures for ifo parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ifo.h,v 1.15 2001/05/19 00:39:30 stef Exp $
+ * $Id: dvd_ifo.h,v 1.16 2001/06/07 15:27:44 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -545,6 +545,11 @@ typedef struct ifo_s
     vmg_t           vmg;            /* Structure described in video_ts */
     int             i_title;        /* Current title number */
     vts_t           vts;            /* Vts ifo for current title set */
+    
+    #if defined(__FreeBSD__)
+    uint8_t         p_remap[ 2 * DVD_LB_SIZE ]; 
+                                    /* Remap buffer for unaligned reads */
+    #endif
 } ifo_t;
 
 

@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.5 2001/05/31 03:12:49 sam Exp $
+ * $Id: input_es.c,v 1.6 2001/06/07 15:27:44 sam Exp $
  *
  * Authors: 
  *
@@ -120,7 +120,7 @@ static int ESProbe( probedata_t *p_data )
 
     char * psz_name = p_input->p_source;
     int i_handle;
-    int i_score = 10;
+    int i_score = 5;
 
     if( TestMethod( INPUT_METHOD_VAR, "es" ) )
     {

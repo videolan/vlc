@@ -2,7 +2,7 @@
  * motionmmxext.c : MMX EXT motion compensation module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: motionmmxext.c,v 1.7 2001/06/03 12:47:21 sam Exp $
+ * $Id: motionmmxext.c,v 1.8 2001/06/07 15:27:44 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -45,7 +45,7 @@
 /*****************************************************************************
  * Local and extern prototypes.
  *****************************************************************************/
-void motion_getfunctions( function_list_t * p_function_list );
+void _M( motion_getfunctions )( function_list_t * p_function_list );
 
 /*****************************************************************************
  * Build configuration tree.
@@ -62,7 +62,7 @@ MODULE_INIT_START
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
-    motion_getfunctions( &p_module->p_functions->motion );
+    _M( motion_getfunctions )( &p_module->p_functions->motion );
 MODULE_ACTIVATE_STOP
 
 MODULE_DEACTIVATE_START
