@@ -2,7 +2,7 @@
  * cvd.h : CVD subtitles decoder thread interface
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: cvd.h,v 1.1 2003/12/28 04:51:52 rocky Exp $
+ * $Id: cvd.h,v 1.2 2004/01/04 04:56:21 rocky Exp $
  *
  * Author: Rocky Bernstein
  *
@@ -27,4 +27,4 @@
  *****************************************************************************/
 void E_(ParseHeader)( decoder_t *, uint8_t *, block_t *  );
 void E_(ParsePacket)( decoder_t * );
-
+void E_(ParseMetaInfo)( decoder_t *p_dec  );

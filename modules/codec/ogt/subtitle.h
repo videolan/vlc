@@ -2,7 +2,7 @@
  * subtitle.h : Common SVCD and CVD subtitles header
  *****************************************************************************
  * Copyright (C) 2003,2004 VideoLAN
- * $Id: subtitle.h,v 1.3 2004/01/03 12:54:56 rocky Exp $
+ * $Id: subtitle.h,v 1.4 2004/01/04 04:56:21 rocky Exp $
  *
  * Author: Rocky Bernstein
  *   based on code from:
@@ -76,8 +76,8 @@ typedef union {
   uint8_t plane[4];
   struct {
     uint8_t y;
-    uint8_t u;
     uint8_t v;
+    uint8_t u;
     uint8_t t;
   } s;
 } ogt_yuvt_t;

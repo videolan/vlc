@@ -2,7 +2,7 @@
  * parse.c: Philips OGT (SVCD subtitle) packet parser
  *****************************************************************************
  * Copyright (C) 2003, 2004 VideoLAN
- * $Id: cvd_parse.c,v 1.5 2004/01/03 12:54:56 rocky Exp $
+ * $Id: cvd_parse.c,v 1.6 2004/01/04 04:56:21 rocky Exp $
  *
  * Authors: Rocky Bernstein 
  *   based on code from: 
@@ -108,6 +108,160 @@ void E_(ParseHeader)( decoder_t *p_dec, uint8_t *p_buffer, block_t *p_block )
 
 }
 
+void E_(ParseMetaInfo)( decoder_t *p_dec  )
+{
+  /* last packet in subtitle block. */
+  
+  decoder_sys_t *p_sys = p_dec->p_sys;
+  uint8_t       *p     = p_sys->subtitle_data + p_sys->metadata_offset;
+  uint8_t       *p_end = p + p_sys->metadata_length;
+  
+  dbg_print( (DECODE_DBG_PACKET),
+	     "subtitle packet complete, size=%d", p_sys->i_spu );
+  
+  p_sys->state = SUBTITLE_BLOCK_COMPLETE;
+  p_sys->i_image++;
+  
+  for ( ; p < p_end; p += 4 ) {
+    
+    switch ( p[0] ) {
+      
+    case 0x04:	/* Display duration in 1/90000ths of a second */
+      
+      p_sys->i_duration = (p[1]<<16) + (p[2]<<8) + p[3];
+      
+      dbg_print( DECODE_DBG_PACKET, 
+		 "subtitle display duration %u", p_sys->i_duration);
+      break;
+      
+    case 0x0c:	/* Unknown */
+      dbg_print( DECODE_DBG_PACKET, 
+		 "subtitle command unknown 0x%0x 0x%0x 0x%0x 0x%0x\n",
+		 p[0], p[1], p[2], p[3]);
+      break;
+      
+    case 0x17:	/* Position */
+      p_sys->i_x_start = ((p[1]&0x0f)<<6) + (p[2]>>2);
+      p_sys->i_y_start = ((p[2]&0x03)<<8) + p[3];
+      dbg_print( DECODE_DBG_PACKET, 
+		 "start position (%d,%d): %.2x %.2x %.2x", 
+		 p_sys->i_x_start, p_sys->i_y_start,
+		 p[1], p[2], p[3] );
+      break;
+      
+    case 0x1f:	/* Coordinates of the image bottom right */
+      {
+	int lastx = ((p[1]&0x0f)<<6) + (p[2]>>2);
+	int lasty = ((p[2]&0x03)<<8) + p[3];
+	p_sys->i_width  = lastx - p_sys->i_x_start + 1;
+	p_sys->i_height = lasty - p_sys->i_y_start + 1;
+	dbg_print( DECODE_DBG_PACKET, 
+		   "end position: (%d,%d): %.2x %.2x %.2x, w x h: %dx%d",
+		   lastx, lasty, p[1], p[2], p[3], 
+		   p_sys->i_width, p_sys->i_height );
+	break;
+      }
+      
+      
+    case 0x24:
+    case 0x25:
+    case 0x26:
+    case 0x27: 
+      {
+	uint8_t v = p[0]-0x24;
+	
+	/* Primary Palette */
+	dbg_print( DECODE_DBG_PACKET,
+		   "primary palette %d (y,u,v): (0x%0x,0x%0x,0x%0x)",
+		   v, p[1], p[2], p[3]);
+	
+	p_sys->p_palette[v].s.y = p[1];
+	p_sys->p_palette[v].s.u = p[2];
+	p_sys->p_palette[v].s.v = p[3];
+	break;
+      }
+      
+      
+    case 0x2c:
+    case 0x2d:
+    case 0x2e:
+    case 0x2f:
+      {
+	uint8_t v = p[0]-0x2c;
+	
+	dbg_print( DECODE_DBG_PACKET,
+		   "highlight palette %d (y,u,v): (0x%0x,0x%0x,0x%0x)",
+		   v, p[1], p[2], p[3]);
+	
+	/* Highlight Palette */
+	p_sys->p_palette_highlight[v].s.y = p[1];
+	p_sys->p_palette_highlight[v].s.u = p[2];
+	p_sys->p_palette_highlight[v].s.v = p[3];
+	break;
+      }
+      
+    case 0x37:
+      /* transparency for primary palette */
+      p_sys->p_palette[0].s.t = p[3] & 0x0f;
+      p_sys->p_palette[1].s.t = p[3] >> 4;
+      p_sys->p_palette[2].s.t = p[2] & 0x0f;
+      p_sys->p_palette[3].s.t = p[2] >> 4;
+      
+      dbg_print( DECODE_DBG_PACKET,
+		 "transparancy for primary palette 0..3: "
+		 "0x%0x 0x%0x 0x%0x 0x%0x",
+		 p_sys->p_palette[0].s.t,
+		 p_sys->p_palette[1].s.t,
+		 p_sys->p_palette[2].s.t,
+		 p_sys->p_palette[3].s.t );
+      
+      break;
+      
+    case 0x3f:
+      /* transparency for highlight palette */
+      p_sys->p_palette_highlight[0].s.t = p[2] & 0x0f;
+      p_sys->p_palette_highlight[1].s.t = p[2] >> 4;
+      p_sys->p_palette_highlight[2].s.t = p[1] & 0x0f;
+      p_sys->p_palette_highlight[3].s.t = p[1] >> 4;
+      
+      dbg_print( DECODE_DBG_PACKET,
+		 "transparancy for primary palette 0..3: "
+		 "0x%0x 0x%0x 0x%0x 0x%0x",
+		 p_sys->p_palette_highlight[0].s.t,
+		 p_sys->p_palette_highlight[1].s.t,
+		 p_sys->p_palette_highlight[2].s.t,
+		 p_sys->p_palette_highlight[3].s.t );
+      
+      break;
+      
+    case 0x47:
+      /* offset to first field data, we correct to make it relative
+	 to comp_image_offset (usually 4) */
+      p_sys->first_field_offset =
+	(p[2] << 8) + p[3] - p_sys->comp_image_offset;
+      dbg_print( DECODE_DBG_PACKET, 
+		 "first_field_offset %d", p_sys->first_field_offset);
+      break;
+      
+    case 0x4f:
+      /* offset to second field data, we correct to make it relative to
+	 comp_image_offset (usually 4) */
+      p_sys->second_field_offset =
+	(p[2] << 8) + p[3] - p_sys->comp_image_offset;
+      dbg_print( DECODE_DBG_PACKET, 
+		 "second_field_offset %d", p_sys->second_field_offset);
+      break;
+      
+    default:
+      msg_Warn( p_dec, 
+		"unknown sequence in control header " 
+		"0x%0x 0x%0x 0x%0x 0x%0x",
+		p[0], p[1], p[2], p[3]);
+      
+      p_sys->subtitle_data_pos = 0;
+    }
+  }
+}
 
 /*****************************************************************************
  * ParsePacket: parse an SPU packet and send it to the video output
