@@ -2,7 +2,7 @@
  * streamout.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: streamout.cpp,v 1.2 2003/03/22 11:21:58 gbazin Exp $
+ * $Id: streamout.cpp,v 1.3 2003/03/29 11:15:14 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -229,15 +229,13 @@ void SoutDialog::UpdateMRL()
         break;
 
     case UDP_ACCESS_OUT:
-        mrl = "udp" + encapsulation + ":"
-              + net_addr->GetLineText(0)
-              + wxString::Format( ":%d", net_port->GetValue() );
-        break;
-
     case RTP_ACCESS_OUT:
-        mrl = "rtp" + encapsulation + ":"
-              + net_addr->GetLineText(0)
-              + wxString::Format( ":%d", net_port->GetValue() );
+        mrl = ( i_access_type == UDP_ACCESS_OUT ) ? "udp" : "rtp";
+	mrl += encapsulation + ":" + net_addr->GetLineText(0);
+	if( net_port->GetValue() != config_GetInt( p_intf, "server-port" ) )
+	{
+	    mrl += wxString::Format( ":%d", net_port->GetValue() );
+	}
         break;
     }
 
@@ -301,12 +299,13 @@ wxPanel *SoutDialog::AccessPanel( wxWindow* parent )
     subpanel_sizer->Add( net_addr, 1,
                          wxEXPAND | wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
 
+    int val = config_GetInt( p_intf, "server-port" );
     label = new wxStaticText( access_subpanels[2], -1, _("Port") );
     net_port = new wxSpinCtrl( access_subpanels[2], NetPort_Event,
-                               wxString::Format(_("%d"), 0/*val*/),
+                               wxString::Format(_("%d"), val),
                                wxDefaultPosition, wxDefaultSize,
                                wxSP_ARROW_KEYS,
-                               0, 16000, 0/*val*/);
+                               0, 16000, val );
 
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
     subpanel_sizer->Add( net_port, 0,
@@ -357,7 +356,7 @@ wxPanel *SoutDialog::EncapsulationPanel( wxWindow* parent )
             new wxRadioButton( panel, EncapsulationRadio1_Event + i,
                                encapsulation_array[i] );
         panel_sizer->Add( encapsulation_radios[i], 0,
-                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
+                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, 5 );
     }
 
     panel->SetSizerAndFit( panel_sizer );
