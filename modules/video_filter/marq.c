@@ -52,11 +52,13 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
 struct filter_sys_t
 {
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
+    int i_pos; /* permit relative positioning (top, bottom, left, right, center) */
     int i_timeout;
 
     char *psz_marquee;    /* marquee string */
 
     time_t last_time;
+    vlc_bool_t b_absolute; /* position control, relative vs. absolute */
 
     vlc_bool_t b_need_update;
 };
@@ -71,6 +73,16 @@ struct filter_sys_t
 #define TIMEOUT_LONGTEXT N_("Defines the time the marquee must remain " \
                             "displayed, in milliseconds. Default value is " \
                             "0 (remain forever).")
+#define POS_TEXT N_("Marquee position")
+#define POS_LONGTEXT N_( \
+  "You can enforce the marquee position on the video " \
+  "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
+  "also use combinations of these values by adding them).")
+
+static int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
+static char *ppsz_pos_descriptions[] =
+{ N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
+  N_("Top-Left"), N_("Top-Right"), N_("Bottom-Left"), N_("Bottom-Right") };
 
 /*****************************************************************************
  * Module descriptor
@@ -82,10 +94,13 @@ vlc_module_begin();
     set_category( CAT_VIDEO );
     set_subcategory( SUBCAT_VIDEO_SUBPIC );
     add_string( "marq-marquee", "Marquee", NULL, MSG_TEXT, MSG_LONGTEXT, VLC_FALSE );
-    add_integer( "marq-x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
-    add_integer( "marq-y", 0, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
+    add_integer( "marq-x", -1, NULL, POSX_TEXT, POSX_LONGTEXT, VLC_FALSE );
+    add_integer( "marq-y", -1, NULL, POSY_TEXT, POSY_LONGTEXT, VLC_FALSE );
     add_integer( "marq-timeout", 0, NULL, TIMEOUT_TEXT, TIMEOUT_LONGTEXT,
                  VLC_FALSE );
+    add_integer( "marq-position", 5, NULL, POS_TEXT, POS_LONGTEXT, VLC_TRUE );
+    /* 5 sets the default to top [1] left [4] */
+    change_integer_list( pi_pos_values, ppsz_pos_descriptions, 0 );
     set_description( _("Marquee display sub filter") );
     add_shortcut( "marq" );
 vlc_module_end();
@@ -117,14 +132,23 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->i_xoff = var_CreateGetInteger( p_input->p_libvlc , "marq-x" );
     p_sys->i_yoff = var_CreateGetInteger( p_input->p_libvlc , "marq-y" );
     p_sys->i_timeout = var_CreateGetInteger( p_input->p_libvlc , "marq-timeout" );
+    p_sys->i_pos = var_CreateGetInteger( p_input->p_libvlc , "marq-position" );
     p_sys->psz_marquee =  var_CreateGetString( p_input->p_libvlc, "marq-marquee" );
 
     var_AddCallback( p_input->p_libvlc, "marq-x", MarqueeCallback, p_sys );
     var_AddCallback( p_input->p_libvlc, "marq-y", MarqueeCallback, p_sys );
     var_AddCallback( p_input->p_libvlc, "marq-marquee", MarqueeCallback, p_sys );
     var_AddCallback( p_input->p_libvlc, "marq-timeout", MarqueeCallback, p_sys );
+    var_AddCallback( p_input->p_libvlc, "marq-position", MarqueeCallback, p_sys );
 
     vlc_object_release( p_input );
+
+    p_sys->b_absolute = VLC_TRUE;
+    if( p_sys->i_xoff < 0 || p_sys->i_yoff < 0 )
+    {
+        p_sys->b_absolute = VLC_FALSE;
+        p_sys->i_xoff = 0; p_sys->i_yoff = 0;
+    }
 
     /* Misc init */
     p_filter->pf_sub_filter = Filter;
@@ -155,6 +179,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     var_Destroy( p_input->p_libvlc , "marq-x" );
     var_Destroy( p_input->p_libvlc , "marq-y" );
     var_Destroy( p_input->p_libvlc , "marq-timeout" );
+    var_Destroy( p_input->p_libvlc , "marq-position" );
     vlc_object_release( p_input );
 }
 
@@ -183,6 +208,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
 
+    p_spu->b_absolute = p_sys->b_absolute;
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
     fmt.i_aspect = 0;
@@ -203,11 +229,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_start = date;
     p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout * 1000;
     p_spu->b_ephemer = VLC_TRUE;
-    p_spu->b_absolute = VLC_FALSE;
     p_spu->i_x = p_sys->i_xoff;
     p_spu->i_y = p_sys->i_yoff;
 
-    p_spu->i_flags = OSD_ALIGN_LEFT|OSD_ALIGN_TOP ;
+    p_spu->i_flags = p_sys->i_pos;
 
     p_sys->b_need_update = VLC_FALSE;
     return p_spu;
@@ -238,6 +263,11 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     else if ( !strncmp( psz_var, "marq-timeout", 12 ) )
     {
         p_sys->i_timeout = newval.i_int;
+    }
+    else if ( !strncmp( psz_var, "marq-position", 8 ) )
+    /* willing to accept a match against marq-pos */
+    {
+        p_sys->i_pos = newval.i_int;
     }
     p_sys->b_need_update = VLC_TRUE;
     return VLC_SUCCESS;
