@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.20 2003/01/07 21:49:01 fenrir Exp $
+ * $Id: avi.c,v 1.21 2003/01/09 18:23:43 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1216,7 +1216,7 @@ static mtime_t AVI_GetPTS( avi_stream_t *p_info )
     if( p_info->i_samplesize )
     {
         /* we need a valid entry we will emulate one */
-        int i_len;
+        int64_t i_len;
         if( p_info->i_idxposc == p_info->i_idxnb )
         {
             if( p_info->i_idxposc )
@@ -1694,7 +1694,7 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
                           p_avi->i_pcr );
 
 
-    p_avi->i_time += 100*1000;  /* read 100ms */
+    p_avi->i_time += 25*1000;  /* read 25ms */
 
 #ifdef __AVI_SUBTITLE__
     if( p_avi->p_sub )
@@ -1871,8 +1871,9 @@ static int AVIDemux_Seekable( input_thread_t *p_input )
         {
             i_size = __MIN( p_stream->p_index[p_stream->i_idxposc].i_length -
                                 p_stream->i_idxposb,
-                                100 * 1024 ); // 10Ko max
-//                            toread[i_stream].i_toread );
+//                                100 * 1024 ); // 10Ko max
+                            __MAX( toread[i_stream].i_toread, 128 ) );
+                            // 128 is to avoid infinit loop
         }
         else
         {
@@ -2072,8 +2073,9 @@ static int AVIDemux_UnSeekable( input_thread_t *p_input )
                     {
                         return( -1 );
                     }
-                    p_pes->i_pts =
-                        input_ClockGetTS( p_input,
+                    p_pes->i_dts =
+                        p_pes->i_pts =
+                            input_ClockGetTS( p_input,
                                           p_input->stream.p_selected_program,
                                           AVI_GetPTS( p_stream ) * 9/100);
                     input_DecodePES( p_stream->p_es->p_decoder_fifo, p_pes );
