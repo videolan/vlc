@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.12 2002/12/21 11:20:30 sigmunau Exp $
+ * $Id: interface.cpp,v 1.13 2003/01/23 23:57:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -43,6 +43,7 @@
 #include <wx/wx.h>
 
 #include <vlc/intf.h>
+#include "stream_control.h"
 
 #include "wxwindows.h"
 
@@ -77,7 +78,7 @@
 enum
 {
     /* menu items */
-    Exit_Event = 1,
+    Exit_Event = wxID_HIGHEST,
     OpenFile_Event,
     OpenDisc_Event,
     OpenNet_Event,
@@ -95,7 +96,6 @@ enum
     SliderScroll_Event,
     StopStream_Event,
     PlayStream_Event,
-    PauseStream_Event,
     PrevStream_Event,
     NextStream_Event,
 
@@ -112,12 +112,14 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(Playlist_Event, Interface::OnPlaylist)
     EVT_MENU(Logs_Event, Interface::OnLogs)
     EVT_MENU(FileInfo_Event, Interface::OnFileInfo)
-    EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
+
     /* Toolbar events */
     EVT_MENU(OpenFile_Event, Interface::OnOpenFile)
+    EVT_MENU(OpenDisc_Event, Interface::OnOpenDisc)
+    EVT_MENU(OpenNet_Event, Interface::OnOpenNet)
+    EVT_MENU(OpenSat_Event, Interface::OnOpenSat)
     EVT_MENU(StopStream_Event, Interface::OnStopStream)
     EVT_MENU(PlayStream_Event, Interface::OnPlayStream)
-    EVT_MENU(PauseStream_Event, Interface::OnPauseStream)
     EVT_MENU(PrevStream_Event, Interface::OnPrevStream)
     EVT_MENU(NextStream_Event, Interface::OnNextStream)
     /* Slider events */
@@ -128,11 +130,12 @@ END_EVENT_TABLE()
  * Constructor.
  *****************************************************************************/
 Interface::Interface( intf_thread_t *_p_intf ):
-    wxFrame( NULL, -1, "title", wxDefaultPosition, wxDefaultSize,
-             wxDEFAULT_FRAME_STYLE )
+    wxFrame( NULL, -1, VOUT_TITLE,
+             wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE )
 {
     /* Initializations */
     p_intf = _p_intf;
+    i_playing_status = PAUSE_S;
 
     /* Give our interface a nice little icon */
     SetIcon( *new wxIcon( vlc_xpm ) );
@@ -156,8 +159,6 @@ Interface::Interface( intf_thread_t *_p_intf ):
     int i_status_width[2] = {-2,-3};
     statusbar = CreateStatusBar( 2 );                            /* 2 fields */
     statusbar->SetStatusWidths( 2, i_status_width );
-
-    SetTitle( COPYRIGHT_MESSAGE );
 
     /* Make sure we've got the right background colour */
     SetBackgroundColour( slider_frame->GetBackgroundColour() );
@@ -254,36 +255,36 @@ void Interface::CreateOurToolBar()
 #define HELP_PLP N_("Previous playlist item")
 #define HELP_PLN N_("Next playlist item")
 
-    wxBitmap *p_bmp_file     = new wxBitmap( file_xpm );
-    wxBitmap *p_bmp_disc     = new wxBitmap( disc_xpm );
-    wxBitmap *p_bmp_net      = new wxBitmap( net_xpm );
-    wxBitmap *p_bmp_play     = new wxBitmap( play_xpm );
-    wxBitmap *p_bmp_stop     = new wxBitmap( stop_xpm );
-    wxBitmap *p_bmp_pause    = new wxBitmap( pause_xpm );
-    wxBitmap *p_bmp_prev     = new wxBitmap( previous_xpm );
-    wxBitmap *p_bmp_next     = new wxBitmap( next_xpm );
-    wxBitmap *p_bmp_playlist = new wxBitmap( playlist_xpm );
+    wxLogNull LogDummy; /* Hack to suppress annoying log message on the win32
+                         * version because we don't include wx.rc */
 
     wxToolBar *toolbar = CreateToolBar(
         wxTB_HORIZONTAL | wxTB_TEXT | wxTB_FLAT | wxTB_DOCKABLE );
 
     toolbar->SetToolBitmapSize( wxSize(TOOLBAR_BMP_WIDTH,TOOLBAR_BMP_HEIGHT) );
 
-    toolbar->AddTool( OpenFile_Event, _("File"), *p_bmp_file, HELP_FILE );
-    toolbar->AddTool( OpenFile_Event, _("Disc"), *p_bmp_disc, HELP_DISC );
-    toolbar->AddTool( OpenFile_Event, _("Net"), *p_bmp_net, HELP_NET );
+    toolbar->AddTool( OpenFile_Event, _("File"), wxBitmap( file_xpm ),
+                      HELP_FILE );
+    toolbar->AddTool( OpenDisc_Event, _("Disc"), wxBitmap( disc_xpm ),
+                      HELP_DISC );
+    toolbar->AddTool( OpenNet_Event, _("Net"), wxBitmap( net_xpm ),
+                      HELP_NET );
 #if 0
-    toolbar->AddTool( OpenFile_Event, _("Sat"), *p_bmp_net, HELP_SAT );
+    toolbar->AddTool( OpenSat_Event, _("Sat"), wxBitmap( sat_xpm ),
+                      HELP_SAT );
 #endif
     toolbar->AddSeparator();
-    toolbar->AddTool( StopStream_Event, _("Stop"), *p_bmp_stop, HELP_STOP );
-    toolbar->AddTool( PlayStream_Event, _("Play"), *p_bmp_play, HELP_PLAY );
-    toolbar->AddTool( PauseStream_Event, _("Pause"), *p_bmp_pause, HELP_PAUSE);
+    toolbar->AddTool( StopStream_Event, _("Stop"), wxBitmap( stop_xpm ),
+                      HELP_STOP );
+    toolbar->AddTool( PlayStream_Event, _("Play"), wxBitmap( play_xpm ),
+                      HELP_PLAY );
     toolbar->AddSeparator();
-    toolbar->AddTool( Playlist_Event, _("Playlist"), *p_bmp_playlist,
+    toolbar->AddTool( Playlist_Event, _("Playlist"), wxBitmap( playlist_xpm ),
                       HELP_PLO );
-    toolbar->AddTool( PrevStream_Event, _("Prev"), *p_bmp_prev, HELP_PLP );
-    toolbar->AddTool( NextStream_Event, _("Next"), *p_bmp_next, HELP_PLN );
+    toolbar->AddTool( PrevStream_Event, _("Prev"), wxBitmap( previous_xpm ),
+                      HELP_PLP );
+    toolbar->AddTool( NextStream_Event, _("Next"), wxBitmap( next_xpm ),
+                      HELP_PLN );
 
     toolbar->Realize();
 
@@ -292,7 +293,13 @@ void Interface::CreateOurToolBar()
     wxBoxSizer *toolbar_sizer = new wxBoxSizer( wxHORIZONTAL );
     toolbar_sizer->Add( toolbar, 0, 0, 0 );
     toolbar_sizer->Layout();
+
+#ifndef WIN32
     frame_sizer->SetMinSize( toolbar_sizer->GetMinSize().GetWidth(), -1 );
+#else
+    frame_sizer->SetMinSize( toolbar->GetToolSize().GetWidth() *
+                             toolbar->GetToolsCount(), -1 );
+#endif
 
 #if !defined(__WXX11__)
     /* Associate drop targets with the toolbar */
@@ -324,6 +331,37 @@ void Interface::CreateOurSlider()
     slider_sizer->SetSizeHints(slider_frame);
 }
 
+void Interface::Open( int i_access_method )
+{
+    /* Show/hide the open dialog */
+    OpenDialog dialog( p_intf, this, i_access_method );
+
+    if( dialog.ShowModal() == wxID_OK )
+    {
+        /* Update the playlist */
+        playlist_t *p_playlist =
+            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist == NULL )
+        {
+            return;
+        }
+
+        msg_Err( p_intf, "%s", (char *)dialog.mrl.c_str() );
+
+        playlist_Add( p_playlist, (char *)dialog.mrl.c_str(),
+                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+
+        i_playing_status = PLAYING_S;
+        TogglePlayButton();
+
+        /* Rebuild the playlist */
+        p_intf->p_sys->p_playlist_window->Rebuild();
+
+        vlc_object_release( p_playlist );
+    }
+}
+
 /*****************************************************************************
  * Event Handlers.
  *****************************************************************************/
@@ -336,9 +374,15 @@ void Interface::OnExit( wxCommandEvent& WXUNUSED(event) )
 void Interface::OnAbout( wxCommandEvent& WXUNUSED(event) )
 {
     wxString msg;
-    msg.Printf( _("This is the about dialog of the VideoLAN Client.\n") );
+    msg.Printf( VOUT_TITLE + wxString(_(" (wxWindows interface)\n\n")) +
+        wxString(_("(C) 1996-2003 - the VideoLAN Team\n\n")) +
+        wxString(_("The VideoLAN team <videolan@videolan.org>\n"
+                   "http://www.videolan.org/\n\n")) +
+        wxString(_("This is the VideoLAN Client, a DVD, MPEG and DivX player."
+          "\nIt can play MPEG and MPEG2 files from a file or from a "
+          "network source.")) );
 
-    wxMessageBox( msg, _("About VideoLAN Client"),
+    wxMessageBox( msg, wxString(_("About ")) + VOUT_TITLE,
                   wxOK | wxICON_INFORMATION, this );
 }
 
@@ -374,27 +418,22 @@ void Interface::OnFileInfo( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::OnOpenFile( wxCommandEvent& WXUNUSED(event) )
 {
-    wxFileDialog dialog( this, _("Open file"), _(""), _(""), _("*.*") );
+    Open( FILE_ACCESS );
+}
 
-    if( dialog.ShowModal() == wxID_OK )
-    {
-        /* Update the playlist */
-        playlist_t *p_playlist =
-            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
-                                           FIND_ANYWHERE );
-        if( p_playlist == NULL )
-        {
-            return;
-        }
+void Interface::OnOpenDisc( wxCommandEvent& WXUNUSED(event) )
+{
+    Open( DISC_ACCESS );
+}
 
-        playlist_Add( p_playlist, (char *)dialog.GetPath().c_str(),
-                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+void Interface::OnOpenNet( wxCommandEvent& WXUNUSED(event) )
+{
+    Open( NET_ACCESS );
+}
 
-        /* Rebuild the playlist */
-        p_intf->p_sys->p_playlist_window->Rebuild();
-
-        vlc_object_release( p_playlist );
-    }
+void Interface::OnOpenSat( wxCommandEvent& WXUNUSED(event) )
+{
+    Open( SAT_ACCESS );
 }
 
 void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
@@ -414,7 +453,36 @@ void Interface::OnPlayStream( wxCommandEvent& WXUNUSED(event) )
     if( p_playlist->i_size )
     {
         vlc_mutex_unlock( &p_playlist->object_lock );
+
+        input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_intf,
+                                                       VLC_OBJECT_INPUT,
+                                                       FIND_ANYWHERE );
+        if( p_input == NULL )
+        {
+            /* No stream was playing, start one */
+            playlist_Play( p_playlist );
+            i_playing_status = PLAYING_S;
+            TogglePlayButton();
+            vlc_object_release( p_playlist );
+            return;
+        }
+
+        if( p_input->stream.control.i_status != PAUSE_S )
+        {
+            /* A stream is being played, pause it */
+            input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+            i_playing_status = PAUSE_S;
+            TogglePlayButton();
+            vlc_object_release( p_playlist );
+            vlc_object_release( p_input );
+            return;
+        }
+
+        /* Stream is paused, resume it */
         playlist_Play( p_playlist );
+        i_playing_status = PLAYING_S;
+        TogglePlayButton();
+        vlc_object_release( p_input );
         vlc_object_release( p_playlist );
     }
     else
@@ -436,17 +504,9 @@ void Interface::OnStopStream( wxCommandEvent& WXUNUSED(event) )
     }
 
     playlist_Stop( p_playlist );
+    i_playing_status = PAUSE_S;
+    TogglePlayButton();
     vlc_object_release( p_playlist );
-}
-
-void Interface::OnPauseStream( wxCommandEvent& WXUNUSED(event) )
-{
-    if( p_intf->p_sys->p_input == NULL )
-    {
-        return;
-    }
-
-    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
 }
 
 void Interface::OnSliderUpdate( wxScrollEvent& event )
@@ -480,6 +540,24 @@ void Interface::OnNextStream( wxCommandEvent& WXUNUSED(event) )
 
     playlist_Next( p_playlist );
     vlc_object_release( p_playlist );
+}
+
+void Interface::TogglePlayButton( )
+{
+    GetToolBar()->DeleteTool( PlayStream_Event );
+
+    if( i_playing_status == PLAYING_S )
+    {
+        GetToolBar()->InsertTool( 5, PlayStream_Event, _("Pause"),
+                                  wxBitmap( pause_xpm ) );
+    }
+    else
+    {
+        GetToolBar()->InsertTool( 5, PlayStream_Event, _("Play"),
+                                  wxBitmap( play_xpm ) );
+    }
+
+    GetToolBar()->Realize();
 }
 
 #if !defined(__WXX11__)

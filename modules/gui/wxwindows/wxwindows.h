@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.7 2002/12/21 11:20:30 sigmunau Exp $
+ * $Id: wxwindows.h,v 1.8 2003/01/23 23:57:50 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -23,6 +23,8 @@
 
 #include <wx/listctrl.h>
 #include <wx/textctrl.h>
+#include <wx/notebook.h>
+#include <wx/spinctrl.h>
 #include <wx/dnd.h>
 
 class Playlist;
@@ -116,10 +118,15 @@ public:
     wxWindow    *slider_frame;
     wxStaticBox *slider_box;
 
+    wxMenu      *p_popup_menu;
+
+    wxArrayString mrl_history;
+
 private:
     void CreateOurMenuBar();
     void CreateOurToolBar();
     void CreateOurSlider();
+    void Open( int i_access_method );
 
     /* Event handlers (these functions should _not_ be virtual) */
     void OnExit( wxCommandEvent& event );
@@ -128,18 +135,98 @@ private:
     void OnPlaylist( wxCommandEvent& event );
     void OnLogs( wxCommandEvent& event );
     void OnFileInfo( wxCommandEvent& event );
+
     void OnOpenFile( wxCommandEvent& event );
+    void OnOpenDisc( wxCommandEvent& event );
+    void OnOpenNet( wxCommandEvent& event );
+    void OnOpenSat( wxCommandEvent& event );
+
     void OnPlayStream( wxCommandEvent& event );
     void OnStopStream( wxCommandEvent& event );
-    void OnPauseStream( wxCommandEvent& event );
     void OnSliderUpdate( wxScrollEvent& event );
     void OnPrevStream( wxCommandEvent& event );
     void OnNextStream( wxCommandEvent& event );
+
+    void TogglePlayButton();
 
     DECLARE_EVENT_TABLE();
 
     Timer *timer;
     intf_thread_t *p_intf;
+    int i_playing_status;
+};
+
+/* Open Dialog */
+class OpenDialog: public wxDialog
+{
+public:
+    /* Constructor */
+    OpenDialog( intf_thread_t *p_intf, Interface *p_main_interface,
+                int i_access_method );
+    virtual ~OpenDialog();
+    void Rebuild();
+    void Manage();
+
+    wxString mrl;
+
+private:
+    wxPanel *FilePanel( wxWindow* parent );
+    wxPanel *DiscPanel( wxWindow* parent );
+    wxPanel *NetPanel( wxWindow* parent );
+    wxPanel *SatPanel( wxWindow* parent );
+
+    void OpenDialog::UpdateMRL( int i_access_method );
+
+    /* Event handlers (these functions should _not_ be virtual) */
+    void OnOk( wxCommandEvent& event );
+    void OnCancel( wxCommandEvent& event );
+
+    void OnPageChange( wxNotebookEvent& event );
+    void OnMRLChange( wxCommandEvent& event );
+
+    /* Event handlers for the disc page */
+    void OnFilePanelChange( wxCommandEvent& event );
+    void OnFileBrowse( wxCommandEvent& event );
+
+    /* Event handlers for the disc page */
+    void OnDiscPanelChange( wxCommandEvent& event );
+    void OnDiscTypeChange( wxCommandEvent& event );
+
+    /* Event handlers for the net page */
+    void OnNetPanelChange( wxCommandEvent& event );
+    void OnNetTypeChange( wxCommandEvent& event );
+
+    DECLARE_EVENT_TABLE();
+
+    intf_thread_t *p_intf;
+    Interface *p_main_interface;
+
+    wxComboBox *mrl_combo;
+
+    /* Controls for the file panel */
+    wxComboBox *file_combo;
+
+    /* Controls for the disc panel */
+    wxRadioBox *disc_type;
+    wxTextCtrl *disc_device;
+    wxSpinCtrl *disc_title;
+    wxSpinCtrl *disc_chapter;
+
+    /* Controls for the net panel */
+    wxRadioBox *net_type;
+    int i_net_type;
+    wxPanel *net_subpanels[4];
+    wxRadioButton *net_radios[4];
+    wxSpinCtrl *net_ports[4];
+    wxTextCtrl *net_addrs[4];
+};
+
+enum
+{
+    FILE_ACCESS = 0,
+    DISC_ACCESS,
+    NET_ACCESS,
+    SAT_ACCESS
 };
 
 /* Messages */
@@ -241,9 +328,56 @@ private:
     void OnEntrySelected( wxCommandEvent& event );
 
     wxMenu *PopupMenu::CreateDummyMenu();
+    void   PopupMenu::CreateMenuEntry( char *, vlc_object_t * );
+    wxMenu *PopupMenu::CreateSubMenu( char *, vlc_object_t * );
 
     DECLARE_EVENT_TABLE();
 
     intf_thread_t *p_intf;
     Interface *p_main_interface;
+
+    int  i_item_id;
+};
+
+class PopupEvtHandler : public wxEvtHandler
+{
+public:
+    PopupEvtHandler( intf_thread_t *p_intf, Interface *p_main_interface );
+    virtual ~PopupEvtHandler();
+
+    void PopupEvtHandler::OnMenuEvent( wxCommandEvent& event );
+
+private:
+
+    DECLARE_EVENT_TABLE()
+
+    intf_thread_t *p_intf;
+    Interface *p_main_interface;
+};
+
+class wxMenuItemExt: public wxMenuItem
+{
+public:
+    /* Constructor */
+    wxMenuItemExt( wxMenu* parentMenu, int id,
+                   const wxString& text,
+                   const wxString& helpString,
+                   wxItemKind kind,
+                   char *_psz_var, int _i_object_id, vlc_value_t _val ):
+        wxMenuItem( parentMenu, id, text, helpString, kind )
+    {
+        /* Initializations */
+        psz_var = _psz_var;
+        i_object_id = _i_object_id;
+        val = _val;
+    };
+
+    virtual ~wxMenuItemExt() { if( psz_var ) free( psz_var ); };
+
+    char *psz_var;
+    int  i_object_id;
+    vlc_value_t val;
+
+private:
+
 };
