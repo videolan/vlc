@@ -23,7 +23,14 @@
 
 #include <stdio.h>                                           /* "intf_msg.h" */
 
-#include "int_types.h"
+#include "config.h"
+#include "common.h"
+#include "threads.h"
+#include "mtime.h"
+#include "plugins.h"
+
+#include "intf_msg.h"
+
 #include "ac3_decoder.h"
 #include "ac3_bit_stream.h"
 #include "ac3_internal.h"

@@ -324,7 +324,8 @@ FORCE:
 vlc: $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
 ifeq ($(SYS),beos)
 	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) -Xlinker -soname=_APP_ -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
-#	ln -s ../vlc ./plugins/_APP_
+	rm -f ./plugins/_APP_
+	ln -s ../vlc ./plugins/_APP_
 else
 	$(CC) $(CCFLAGS) $(LCFLAGS) $(CFLAGS) --export-dynamic -rdynamic -o $@ $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)	
 endif
@@ -367,6 +368,9 @@ else
 	$(CC) $(CCFLAGS) $(CFLAGS) -laudiofile -lesd -shared -o $@ $<
 endif
 
+plugins/aout/aout_beos.so: %.so: %.cpp
+	$(CC) $(LCFLAGS) $(CCFLAGS) $(CFLAGS) -nostart -Xlinker -soname=$@ -o $@ $< plugins/_APP_
+		
 # video plugins
 plugins/intf/intf_dummy.so plugins/vout/vout_dummy.so \
 	plugins/intf/intf_fb.so plugins/vout/vout_fb.so: %.so: %.c

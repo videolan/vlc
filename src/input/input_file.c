@@ -298,7 +298,7 @@ int file_next( options_t *options )
         fprintf( stderr, "Playing file %s\n",
                  options->playlist[options->i_list_index] );
         return ( options->in = open( options->playlist[options->i_list_index],
-                                     O_RDONLY | O_NDELAY ) );
+                                     O_RDONLY | O_NONBLOCK ) );
     }
 }
 
