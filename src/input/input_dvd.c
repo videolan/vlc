@@ -2,7 +2,7 @@
  * input_dvd.c: DVD reading
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.8 2001/01/29 06:28:19 stef Exp $
+ * $Id: input_dvd.c,v 1.9 2001/01/30 05:48:23 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -249,21 +249,27 @@ static void DVDInit( input_thread_t * p_input )
 
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
-                                == REQUESTED_MPEG 
-                            && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == (p_es->i_id & 0x1F) )
+                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
                         {
+                        case 0:
+                            main_PutIntVariable( INPUT_DVD_AUDIO_VAR,
+                                                 REQUESTED_MPEG );
+                        case REQUESTED_MPEG:
                             input_SelectES( p_input, p_es );
                         }
                         break;
 
                     case AC3_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
-                                == REQUESTED_AC3
-                            && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == ((p_es->i_id & 0xF00) >> 8) )
+                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
                         {
+                        case 0:
+                            main_PutIntVariable( INPUT_DVD_AUDIO_VAR,
+                                                 REQUESTED_AC3 );
+                        case REQUESTED_AC3:
                             input_SelectES( p_input, p_es );
                         }
                         break;
@@ -398,7 +404,6 @@ static int DVDRead( input_thread_t * p_input,
             while( (i_startcode & 0xFFFFFF00) != 0x100L )
             {
                 i_startcode <<= 8;
-fprintf( stderr, "sprotch\n" );
                 if( (i_nb = SafeRead( p_input, &i_dummy, 1 )) != 0 )
                 {
                     i_startcode |= i_dummy;

@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.27 2001/01/24 19:05:55 massiot Exp $
+ * $Id: mpeg_system.c,v 1.28 2001/01/30 05:48:23 sam Exp $
  *
  * Authors: 
  *
@@ -834,13 +834,16 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_type = MPEG2_AUDIO_ES;
                         p_es->b_audio = 1;
 #ifdef AUTO_SPAWN
-                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
-                                == REQUESTED_MPEG
-                          && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( !p_input->stream.b_seekable )
+                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == (p_es->i_id & 0x1F) )
+                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
                         {
-                            if( !p_input->stream.b_seekable )
-                                input_SelectES( p_input, p_es );
+                        case 0:
+                            main_PutIntVariable( INPUT_DVD_CHANNEL_VAR,
+                                                 REQUESTED_MPEG );
+                        case REQUESTED_MPEG:
+                            input_SelectES( p_input, p_es );
                         }
 #endif
                     }
@@ -850,13 +853,16 @@ es_descriptor_t * input_ParsePS( input_thread_t * p_input,
                         p_es->i_type = AC3_AUDIO_ES;
                         p_es->b_audio = 1;
 #ifdef AUTO_SPAWN
-                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
-                                == REQUESTED_AC3
-                         && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( !p_input->stream.b_seekable )
+                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == ((p_es->i_id & 0xF00) >> 8) )
+                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
                         {
-                            if( !p_input->stream.b_seekable )
-                                input_SelectES( p_input, p_es );
+                        case 0:
+                            main_PutIntVariable( INPUT_DVD_CHANNEL_VAR,
+                                                 REQUESTED_AC3 );
+                        case REQUESTED_AC3:
+                            input_SelectES( p_input, p_es );
                         }
 #endif
                     }

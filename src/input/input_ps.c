@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ps.c,v 1.20 2001/01/10 19:22:11 massiot Exp $
+ * $Id: input_ps.c,v 1.21 2001/01/30 05:48:23 sam Exp $
  *
  * Authors: 
  *
@@ -179,21 +179,27 @@ static void PSInit( input_thread_t * p_input )
 
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
-                                == REQUESTED_MPEG 
-                            && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == (p_es->i_id & 0x1F) )
+                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
                         {
+                        case 0:
+                            main_PutIntVariable( INPUT_DVD_AUDIO_VAR,
+                                                 REQUESTED_MPEG );
+                        case REQUESTED_MPEG:
                             input_SelectES( p_input, p_es );
                         }
                         break;
 
                     case AC3_AUDIO_ES:
-                        if( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 )
-                                == REQUESTED_AC3
-                            && main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
+                        if( main_GetIntVariable( INPUT_DVD_CHANNEL_VAR, 0 )
                                 == ((p_es->i_id & 0xF00) >> 8) )
+                        switch( main_GetIntVariable( INPUT_DVD_AUDIO_VAR, 0 ) )
                         {
+                        case 0:
+                            main_PutIntVariable( INPUT_DVD_AUDIO_VAR,
+                                                 REQUESTED_AC3 );
+                        case REQUESTED_AC3:
                             input_SelectES( p_input, p_es );
                         }
                         break;

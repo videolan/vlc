@@ -587,10 +587,10 @@ static int GetConfiguration( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
                 main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_AC3 );
             else if ( ! strcmp(optarg, "lpcm") )
                 main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_LPCM );
-            else if ( ! strcmp(optarg, "off") )
-                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_NOAUDIO );
-            else
+            else if ( ! strcmp(optarg, "mpeg") )
                 main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_MPEG );
+            else
+                main_PutIntVariable( INPUT_DVD_AUDIO_VAR, REQUESTED_NOAUDIO );
             break;
         case 'c':
             main_PutIntVariable( INPUT_DVD_CHANNEL_VAR, atoi(optarg) );
