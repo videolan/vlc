@@ -22,7 +22,7 @@ EXTRA_DIST = \
 	vlc-config.in.in \
 	vlc.ebuild \
 	vlc.spec \
-	vlc.spec.redhat \
+	vlc.spec.mdk \
 	$(NULL)
 
 BUILT_SOURCES =
