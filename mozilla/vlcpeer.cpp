@@ -2,7 +2,7 @@
  * vlcpeer.cpp: scriptable peer descriptor
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcpeer.cpp,v 1.6 2003/07/23 01:13:48 gbazin Exp $
+ * $Id: vlcpeer.cpp,v 1.7 2003/08/19 14:07:51 garf Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -104,7 +104,10 @@ NS_IMETHODIMP VlcPeer::Fullscreen()
 {
     if( p_plugin )
     {
+#ifdef XP_MACOSX
+#else
         VLC_FullScreen( p_plugin->i_vlc );
+#endif
     }
     return NS_OK;
 }

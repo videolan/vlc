@@ -386,6 +386,7 @@ void 		Private_Shutdown(void);
 NPError		Private_New(NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc, char* argn[], char* argv[], NPSavedData* saved);
 NPError 	Private_Destroy(NPP instance, NPSavedData** save);
 NPError		Private_SetWindow(NPP instance, NPWindow* window);
+NPError 	Private_GetValue( NPP instance, NPPVariable variable, void *value );
 NPError		Private_NewStream(NPP instance, NPMIMEType type, NPStream* stream, NPBool seekable, uint16* stype);
 NPError		Private_DestroyStream(NPP instance, NPStream* stream, NPError reason);
 int32		Private_WriteReady(NPP instance, NPStream* stream);
@@ -446,6 +447,16 @@ NPError Private_SetWindow(NPP instance, NPWindow* window)
 	EnterCodeResource();
 	PLUGINDEBUGSTR("\pSetWindow;g;");
 	err = NPP_SetWindow(instance, window);
+	ExitCodeResource();
+	return err;
+}
+
+NPError Private_GetValue( NPP instance, NPPVariable variable, void *value )
+{
+	NPError err;
+	EnterCodeResource();
+	PLUGINDEBUGSTR("\pGetValue;g;");
+	err = NPP_GetValue( instance, variable, value);
 	ExitCodeResource();
 	return err;
 }
@@ -746,6 +757,7 @@ DEFINE_API_C(NPError) main(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs,
 		pluginFuncs->write          = NewNPP_WriteProc(PLUGIN_TO_HOST_GLUE(write, Private_Write));
 		pluginFuncs->print          = NewNPP_PrintProc(PLUGIN_TO_HOST_GLUE(print, Private_Print));
 		pluginFuncs->event          = NewNPP_HandleEventProc(PLUGIN_TO_HOST_GLUE(event, Private_HandleEvent));	
+		pluginFuncs->getvalue       = NewNPP_GetValueProc(PLUGIN_TO_HOST_GLUE(getvalue, Private_GetValue));	
 		if( navMinorVers >= NPVERS_HAS_NOTIFICATION )
 		{	
 			pluginFuncs->urlnotify = NewNPP_URLNotifyProc(PLUGIN_TO_HOST_GLUE(urlnotify, Private_URLNotify));			

@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.17 2003/08/14 13:32:12 garf Exp $
+ * $Id: vlcshell.cpp,v 1.18 2003/08/19 14:07:51 garf Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -130,6 +130,7 @@ char * NPP_GetMIMEDescription( void )
 
 NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
 {
+
     static nsIID nsid = VLCINTF_IID;
     static char psz_desc[1000];
 

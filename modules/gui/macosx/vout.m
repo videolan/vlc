@@ -2,7 +2,7 @@
 /* vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.51 2003/08/14 12:38:03 garf Exp $
+ * $Id: vout.m,v 1.52 2003/08/19 14:07:51 garf Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -147,6 +147,11 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     if( value_drawable.i_int != 0 )
     {
         p_vout->p_sys->mask = NewRgn();
+        p_vout->p_sys->rect.left = 0 ;
+        p_vout->p_sys->rect.right = 0 ;
+        p_vout->p_sys->rect.top = 0 ;
+        p_vout->p_sys->rect.bottom = 0 ;
+
         p_vout->p_sys->isplugin = 1 ;
     
     } else
@@ -466,16 +471,23 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     OSErr err;
     CodecFlags flags;
+    Rect oldrect;
+    RgnHandle oldClip;
 
     if( p_vout->p_sys->isplugin )
     {
+        oldClip = NewRgn();
 
         /* In mozilla plugin, mozilla browser also draws things in
          * the windows. So we have to update the port/Origin for each
          * picture. FIXME : the vout should lock something ! */
         GetPort( &p_vout->p_sys->p_qdportold );
+	GetPortBounds( p_vout->p_sys->p_qdportold, &oldrect );
+        GetClip( oldClip );
+
         SetPort( p_vout->p_sys->p_qdport );
         SetOrigin( p_vout->p_sys->portx , p_vout->p_sys->porty );
+        ClipRect( &p_vout->p_sys->rect );
     
         if( ( err = DecompressSequenceFrameS( 
                         p_vout->p_sys->i_seq,
@@ -490,6 +502,8 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
             QDFlushPortBuffer( p_vout->p_sys->p_qdport, nil );
         }
     
+	SetOrigin( oldrect.left , oldrect.top );
+        SetClip( oldClip );
         SetPort( p_vout->p_sys->p_qdportold );
     }
     else
@@ -680,6 +694,10 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
         i_height = valh.i_int;
 
         SetRectRgn( p_vout->p_sys->mask , 0 , 0 , valr.i_int - vall.i_int , valb.i_int - valt.i_int );
+        p_vout->p_sys->rect.top = 0;
+        p_vout->p_sys->rect.left = 0;
+        p_vout->p_sys->rect.bottom = valb.i_int - valt.i_int;
+        p_vout->p_sys->rect.right = valr.i_int - vall.i_int;
     }
 
     if( i_height * p_vout->output.i_aspect < i_width * VOUT_ASPECT_FACTOR )
