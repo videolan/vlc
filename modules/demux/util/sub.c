@@ -2,7 +2,7 @@
  * sub.c
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: sub.c,v 1.10 2003/03/16 23:35:39 fenrir Exp $
+ * $Id: sub.c,v 1.11 2003/03/30 14:24:20 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -67,8 +67,8 @@ vlc_module_begin();
     set_description( _("text subtitle demux") );
     set_capability( "subtitle demux", 12 );
     add_category_hint( "subtitle", NULL, VLC_TRUE );
-        add_string( "sub-file", NULL, NULL,
-                    "subtitle file name", "subtitle file name", VLC_TRUE );
+        add_file( "sub-file", NULL, NULL,
+                  "subtitle file name", "subtitle file name", VLC_TRUE );
         add_float( "sub-fps", 0.0, NULL,
                    "override frames per second",
                    SUB_FPS_LONGTEXT, VLC_TRUE );

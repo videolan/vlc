@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.51 2003/03/29 12:22:15 gbazin Exp $
+ * $Id: libvlc.h,v 1.52 2003/03/30 14:24:20 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -519,8 +519,8 @@ vlc_module_begin();
     add_integer( "spu-channel", -1, NULL,
                  INPUT_SUBT_TEXT, INPUT_SUBT_LONGTEXT, VLC_TRUE );
 
-    add_string( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT, VLC_FALSE );
-    add_string( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT, VLC_FALSE );
+    add_file( "dvd", DVD_DEVICE, NULL, DVD_DEV_TEXT, DVD_DEV_LONGTEXT, VLC_FALSE );
+    add_file( "vcd", VCD_DEVICE, NULL, VCD_DEV_TEXT, VCD_DEV_LONGTEXT, VLC_FALSE );
 
     add_bool_with_short( "ipv6", '6', 0, NULL, IPV6_TEXT, IPV6_LONGTEXT, VLC_FALSE );
     add_bool_with_short( "ipv4", '4', 0, NULL, IPV4_TEXT, IPV4_LONGTEXT, VLC_FALSE );

@@ -2,7 +2,7 @@
  * logger.c : file logging plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: logger.c,v 1.5 2003/03/30 11:54:29 sigmunau Exp $
+ * $Id: logger.c,v 1.6 2003/03/30 14:24:20 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -86,7 +86,7 @@ static char *mode_list[] = { "text", "html", NULL };
 #define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are \"text\" (default) and \"html\"")
 vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL, VLC_FALSE );
-    add_string( "logfile", NULL, NULL, N_("log filename"), N_("Specify the log filename."), VLC_FALSE );
+    add_file( "logfile", NULL, NULL, N_("log filename"), N_("Specify the log filename."), VLC_FALSE );
     add_string_from_list( "logmode", "text", mode_list, NULL, LOGMODE_TEXT, LOGMODE_LONGTEXT, VLC_FALSE );
     set_description( _("file logging interface module") );
     set_capability( "interface", 0 );

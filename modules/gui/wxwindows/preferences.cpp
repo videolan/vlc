@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.5 2003/03/30 13:23:27 gbazin Exp $
+ * $Id: preferences.cpp,v 1.6 2003/03/30 14:24:20 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -92,11 +92,12 @@ struct ConfigData
 {
     ConfigData( wxPanel *_panel, int _i_conf_type,
                 vlc_bool_t _b_advanced, char *psz_name )
-    { panel = _panel; b_advanced = _b_advanced;
+    { panel = _panel; b_advanced = _b_advanced; b_config_list = VLC_FALSE;
       i_config_type = _i_conf_type; option_name = psz_name; }
 
     vlc_bool_t b_advanced;
     int i_config_type;
+    vlc_bool_t b_config_list;
 
     union control
     {
@@ -609,13 +610,35 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
         case CONFIG_ITEM_FILE:
         case CONFIG_ITEM_DIRECTORY:
             label = new wxStaticText(panel, -1, p_item->psz_text);
-            textctrl = new wxTextCtrl( panel, -1, p_item->psz_value,
-                                       wxDefaultPosition, wxDefaultSize,
-                                       wxTE_PROCESS_ENTER);
-            textctrl->SetToolTip( p_item->psz_longtext );
-            config_data->control.textctrl = textctrl;
-            panel_sizer->Add( label, 0, wxALL, 5 );
-            panel_sizer->Add( textctrl, 1, wxALL, 5 );
+            panel_sizer->Add( label, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
+
+            if( !p_item->ppsz_list )
+            {
+                textctrl = new wxTextCtrl( panel, -1, p_item->psz_value,
+                                           wxDefaultPosition, wxDefaultSize,
+                                           wxTE_PROCESS_ENTER);
+                textctrl->SetToolTip( p_item->psz_longtext );
+                config_data->control.textctrl = textctrl;
+                panel_sizer->Add( textctrl, 1, wxALL, 5 );
+            }
+            else
+            {
+                combo = new wxComboBox( panel, -1, p_item->psz_value,
+                                        wxDefaultPosition, wxDefaultSize,
+                                        0, NULL, wxCB_READONLY | wxCB_SORT );
+
+                /* build a list of available options */
+                for( int i_index = 0; p_item->ppsz_list[i_index]; i_index++ )
+                {
+                    combo->Append( p_item->ppsz_list[i_index] );
+                }
+
+                combo->SetToolTip( p_item->psz_longtext );
+                config_data->control.combobox = combo;
+                config_data->b_config_list = VLC_TRUE;
+                panel_sizer->Add( combo, 1, wxALL, 5 );
+            }
+
             if( p_item->i_type == CONFIG_ITEM_FILE )
             {
                 button = new wxButton( panel, -1, _("Browse...") );
@@ -729,8 +752,12 @@ void PrefsPanel::ApplyChanges()
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
         case CONFIG_ITEM_DIRECTORY:
-            config_PutPsz( p_intf, config_data->option_name.c_str(),
-                           config_data->control.textctrl->GetValue() );
+            if( !config_data->b_config_list )
+                config_PutPsz( p_intf, config_data->option_name.c_str(),
+                               config_data->control.textctrl->GetValue() );
+            else
+                config_PutPsz( p_intf, config_data->option_name.c_str(),
+                               config_data->control.combobox->GetValue() );
             break;
         case CONFIG_ITEM_BOOL:
             config_PutInt( p_intf, config_data->option_name.c_str(),
