@@ -82,7 +82,7 @@ static int Open( vlc_object_t * p_this )
         p_demux->p_private = NULL;
         module_Unneed( p_demux, p_id3 );
     }
-    
+
     /* Have a peep at the show. */
     if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
     {
@@ -150,6 +150,10 @@ static int Open( vlc_object_t * p_this )
         module_Need( p_sys->p_packetizer, "packetizer", NULL, 0 );
     if( !p_sys->p_packetizer->p_module )
     {
+        if( p_sys->p_packetizer->fmt_in.p_extra )
+            free( p_sys->p_packetizer->fmt_in.p_extra );
+        vlc_object_destroy( p_sys->p_packetizer );
+
         msg_Err( p_demux, "cannot find flac packetizer" );
         goto error;
     }
@@ -159,12 +163,6 @@ static int Open( vlc_object_t * p_this )
     return VLC_SUCCESS;
 
 error:
-    if( p_sys != NULL && p_sys->p_packetizer )
-    {
-        if( p_sys->p_packetizer->fmt_in.p_extra )
-            free( p_sys->p_packetizer->fmt_in.p_extra );
-        vlc_object_destroy( p_sys->p_packetizer );
-    }
     if( p_meta )
     {
         int b_seekable;
