@@ -1976,9 +1976,11 @@ if test "x${enable_x11}" != "xno" &&
     LDFLAGS_x11="${LDFLAGS_x11} -L${x_libraries} -lX11 -lXext"
     CPPFLAGS_x11="${CPPFLAGS_x11} -I${x_includes}"
     AC_CHECK_HEADERS(X11/extensions/Xinerama.h, [
+      CFLAGS="${CFLAGS_save} -L${x_libraries} -lX11 -lXext"
       AC_CHECK_LIB(Xinerama, XineramaQueryExtension,
         AC_DEFINE(HAVE_XINERAMA,1,[Define this if you have libXinerama installed])
         LDFLAGS_x11="${LDFLAGS_x11} -lXinerama")
+      CFLAGS="${CFLAGS_save}"
     ])
   ])
   CPPFLAGS="${CPPFLAGS_save}"

@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.17 2003/05/25 19:24:53 gbazin Exp $
+ * $Id: xcommon.c,v 1.18 2003/05/25 20:16:26 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1338,7 +1338,10 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     XEvent xevent;
     mwmhints_t mwmhints;
     XSetWindowAttributes attributes;
+
+#ifdef HAVE_XINERAMA
     int i_d1, i_d2;
+#endif
 
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
 
