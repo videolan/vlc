@@ -185,7 +185,7 @@ static picture_t *LoadPNG( vlc_object_t *p_this )
             p_pic->p[V_PLANE].p_pixels[i_offset] =
                 (p[0] * 439L - p[1] * 368 - p[2] * 71)/1000 + 128;
             p_pic->p[A_PLANE].p_pixels[i_offset] =
-                b_alpha ? (p[3] * i_trans) / 255 : 255;
+                b_alpha ? (p[3] * i_trans) / 255 : i_trans;
 
             p += (b_alpha ? 4 : 3);
         }
