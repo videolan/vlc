@@ -410,7 +410,7 @@ src/misc/modules_builtin.h: Makefile.opts Makefile Makefile.config
 	@rm -f $@ && cp $@.in $@
 ifneq (,$(BUILTINS))
 	@for i in $(BUILTINS) ; do \
-		echo "int vlc_entry__modules_"`echo $$i | sed -e 'y@/@_@ ; s@\..*@@'`"( module_t* );" >>$@; \
+		echo "int vlc_entry__modules_"`echo $$i | sed -e 'y@/@_@' -e 's@\..*@@'`"( module_t* );" >>$@; \
 	done
 	@echo "" >> $@ ;
 endif
@@ -419,7 +419,7 @@ endif
 	@echo "    { \\" >> $@ ;
 ifneq (,$(BUILTINS))
 	@for i in $(BUILTINS) ; do \
-		echo "        ALLOCATE_BUILTIN(modules_"`echo $$i | sed -e 'y@/@_@ ; s@\..*@@'`"); \\" >> $@ ; \
+		echo "        ALLOCATE_BUILTIN(modules_"`echo $$i | sed -e 'y@/@_@' -e 's@\..*@@'`"); \\" >> $@ ; \
 	done
 endif
 	@echo "    } while( 0 );" >> $@ ;
@@ -484,7 +484,7 @@ builtins: Makefile.modules Makefile.opts Makefile.dep Makefile $(BUILTIN_OBJ)
 plugins: Makefile.modules Makefile.opts Makefile.dep Makefile $(PLUGIN_OBJ)
 
 modules/%.a modules/%.so: $(H_OBJ) FORCE
-	cd $(shell echo $@ | sed -e 's@\(.*\)/.*@\1@') && $(MAKE) -f $(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@')/Makefile.modules $(shell echo $@ | sed -e 's@.*/@@') PARENT=$(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@') MODULE_PATH=$(shell echo $@ | sed -e 'y@/@_@ ; s@\..*@@')
+	cd $(shell echo $@ | sed -e 's@\(.*\)/.*@\1@') && $(MAKE) -f $(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@')/Makefile.modules $(shell echo $@ | sed -e 's@.*/@@') PARENT=$(shell echo $@ | sed -e 's@[^/]*/@../@g' -e 's@\(.*\)/.*@\1@') MODULE_PATH=$(shell echo $@ | sed -e 'y@/@_@' -e 's@\..*@@')
 
 #
 # Mozilla plugin target
