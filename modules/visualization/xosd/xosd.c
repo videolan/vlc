@@ -2,7 +2,7 @@
  * xosd.c : X On Screen Display interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: xosd.c,v 1.5 2003/01/22 19:37:50 lool Exp $
+ * $Id: xosd.c,v 1.6 2003/01/28 16:52:36 sam Exp $
  *
  * Authors: Loïc Minier <lool@videolan.org>
  *
@@ -108,7 +108,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Initialize library */
     p_intf->p_sys->p_osd =
-#ifdef HAVE_OLD_XOSD_H
+#ifdef HAVE_XOSD_VERSION_0
         xosd_init( config_GetPsz( p_intf, "xosd-font" ),
                    "LawnGreen", 3, XOSD_top, 0, 1 );
 #else
@@ -190,8 +190,15 @@ static void Run( intf_thread_t *p_intf )
                 /* Set user preferences */
                 xosd_set_font( p_intf->p_sys->p_osd,
                                config_GetPsz( p_intf, "xosd-font" ) );
+#ifdef HAVE_XOSD_VERSION_2
+                xosd_set_horizontal_offset( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-text-offset" ) );
+                xosd_set_vertical_offset( p_intf->p_sys->p_osd,
+                    config_GetInt( p_intf, "xosd-text-offset" ) );
+#else
                 xosd_set_offset( p_intf->p_sys->p_osd,
                     config_GetInt( p_intf, "xosd-text-offset" ) );
+#endif
                 xosd_set_shadow_offset( p_intf->p_sys->p_osd,
                     config_GetInt( p_intf, "xosd-shadow-offset" ));
                 xosd_set_pos( p_intf->p_sys->p_osd,
