@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.26 2003/04/25 21:47:25 fenrir Exp $
+ * $Id: mp4.c,v 1.27 2003/04/30 21:45:52 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1488,6 +1488,24 @@ static void MP4_TrackCreate( input_thread_t *p_input,
         return;
     }
 
+    /* fxi i_timescale for AUDIO_ES with i_qt_version == 0 */
+    if( p_track->i_cat == AUDIO_ES ) //&& p_track->i_sample_size == 1 )
+    {
+        MP4_Box_t *p_sample;
+
+        p_sample = MP4_BoxGet(  p_track->p_stsd, "[0]" );
+        if( p_sample )
+        {
+            MP4_Box_data_sample_soun_t *p_soun = p_sample->data.p_sample_soun;
+            if( p_soun->i_qt_version == 0 && p_track->i_timescale != p_soun->i_sampleratehi )
+            {
+                msg_Warn( p_input, "i_timescale != i_sampleratehi with qt_version == 0\nMaking both equal ? (report any problem)" );
+                p_track->i_timescale = p_soun->i_sampleratehi;
+            }
+        }
+    }
+
+
     /* Create chunk  index table */
     if( TrackCreateChunksIndex( p_input,p_track  ) )
     {
@@ -1667,7 +1685,7 @@ static int  MP4_TrackSeek   ( input_thread_t    *p_input,
  * 3 types: for audio
  * 
  */
-
+#define QT_V0_MAX_SAMPLES    1500
 static int  MP4_TrackSampleSize( track_data_mp4_t   *p_track )
 {
     int i_size;
@@ -1697,10 +1715,14 @@ static int  MP4_TrackSampleSize( track_data_mp4_t   *p_track )
     }
     else
     {
-        //msg_Warn( p_input, "i_qt_version == 0" );
         /* FIXME */
-
-        i_size = p_track->chunk[p_track->i_chunk].i_sample_count * p_soun->i_channelcount * p_soun->i_samplesize / 8;
+        int i_samples = p_track->chunk[p_track->i_chunk].i_sample_count -
+                ( p_track->i_sample - p_track->chunk[p_track->i_chunk].i_sample_first );
+        if( i_samples > QT_V0_MAX_SAMPLES )
+        {
+            i_samples = QT_V0_MAX_SAMPLES;
+        }
+        i_size = i_samples * p_soun->i_channelcount * p_soun->i_samplesize / 8;
     }
 
     //fprintf( stderr, "size=%d\n", i_size );
@@ -1718,13 +1740,18 @@ static uint64_t MP4_GetTrackPos( track_data_mp4_t *p_track )
 
     if( p_track->i_sample_size )
     {
-#if 0
-        i_pos += ( p_track->i_sample -
-                        p_track->chunk[p_track->i_chunk].i_sample_first ) *
-                                MP4_TrackSampleSize( p_track );
-#endif
-        /* we read chunk by chunk */
-        i_pos += 0;
+        MP4_Box_data_sample_soun_t *p_soun = p_track->p_sample->data.p_sample_soun;
+
+        if( p_soun->i_qt_version == 0 )
+        {
+            i_pos += ( p_track->i_sample - p_track->chunk[p_track->i_chunk].i_sample_first ) *
+                        p_soun->i_channelcount * p_soun->i_samplesize / 8;
+        }
+        else
+        {
+            /* we read chunk by chunk */
+            i_pos += 0;
+        }
     }
     else
     {
@@ -1759,9 +1786,13 @@ static int  MP4_TrackNextSample( input_thread_t     *p_input,
         else
         {
             /* FIXME */
-            p_track->i_sample =
-                p_track->chunk[p_track->i_chunk].i_sample_first +
-                p_track->chunk[p_track->i_chunk].i_sample_count;
+            p_track->i_sample += QT_V0_MAX_SAMPLES;
+            if( p_track->i_sample > p_track->chunk[p_track->i_chunk].i_sample_first + p_track->chunk[p_track->i_chunk].i_sample_count )
+            {
+                p_track->i_sample =
+                    p_track->chunk[p_track->i_chunk].i_sample_first +
+                    p_track->chunk[p_track->i_chunk].i_sample_count;
+            }
         }
     }
     else
