@@ -2,7 +2,7 @@
  * theme_loader.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme_loader.cpp,v 1.1 2004/01/03 23:31:34 asmax Exp $
+ * $Id: theme_loader.cpp,v 1.2 2004/01/10 23:22:21 anil Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -476,6 +476,9 @@ int makedir( char *newdir )
     return 1;
 }
 
+#endif
+
+#ifdef HAVE_ZLIB_H
 int gzopen_frontend( char *pathname, int oflags, int mode )
 {
     char *gzflags;
@@ -504,5 +507,4 @@ int gzopen_frontend( char *pathname, int oflags, int mode )
 
     return (int)gzf;
 }
-
 #endif
