@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.13 2003/11/05 18:59:01 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.14 2003/11/09 13:20:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -228,12 +228,12 @@ KeyConfigControl::KeyConfigControl( vlc_object_t *p_this,
                             wxCB_READONLY );
     for( unsigned int i = 0; i < WXSIZEOF(KeysList); i++ )
     {
-        combo->SetClientData( i, (void*)keys[i].i_key_code );
-        if( keys[i].i_key_code ==
+        combo->SetClientData( i, (void*)vlc_keys[i].i_key_code );
+        if( vlc_keys[i].i_key_code ==
             ( ((unsigned int)p_item->i_value) & ~KEY_MODIFIER ) )
         {
             combo->SetSelection( i );
-            combo->SetValue( wxU(_(keys[i].psz_key_string)) );
+            combo->SetValue( wxU(_(vlc_keys[i].psz_key_string)) );
         }
     }
 
