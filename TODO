@@ -14,6 +14,7 @@ Description: Rewrite the font display routines
  The current font display routines aren't powerful enough. There
  should be a way to display a big String at once, without needing
  to compute the size of the string and its coordinates beforehand.
+Status: Todo
 
 Task: 0x38
 Difficulty: Medium
@@ -47,7 +48,6 @@ Urgency: Normal
        what key ("control-C", what action (INTF...))
     - extend the interface by a specific struct (meta+modifier+ascii)
     - implement an interface specific getKey function.
-
 Status: Todo
 
 Task: 0x35
