@@ -587,7 +587,10 @@ package-beos:
 	mv tmp/vlc-${VERSION}-BeOS.zip .
 
 # Create package without debug symbols
-	strip tmp/vlc-${VERSION}/vlc tmp/vlc-${VERSION}/plugins/lib*_plugin.so
+	strip tmp/vlc-${VERSION}/vlc
+	if [ -d tmp/vlc-${VERSION}/plugins ]; then \
+		strip tmp/vlc-${VERSION}/plugins/lib*_plugin.so; \
+	fi
 	xres -o tmp/vlc-${VERSION}/vlc share/vlc_beos.rsrc
 	mimeset -f tmp/vlc-${VERSION}/* tmp/vlc-${VERSION}/*/*
 	(cd tmp ; zip -9 -r vlc-${VERSION}-BeOS-stripped.zip vlc-${VERSION} )
