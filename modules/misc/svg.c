@@ -316,7 +316,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
  
 #define INDEX_IN( x, y ) ( y * rowstride_in + x * channels_in )
 #define INDEX_OUT( x, y ) ( y * i_pitch + x * p_pic->p[Y_PLANE].i_pixel_pitch )
-#define UV_INDEX_OUT( x, y ) ( ( y / 2 ) * i_u_pitch + ( x / 2 ) * p_pic->p[U_PLANE].i_pixel_pitch )
   
     for( y = 0; y < i_height; y++ )
     {
@@ -324,7 +323,6 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
         {
             guchar *p_in;
             int i_out;
-            int i_uv_out;
  
             p_in = &pixels_in[INDEX_IN( x, y )];
             
@@ -343,16 +341,10 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
                 
                 p_pic->Y_PIXELS[i_out] = .299 * R( p_in ) + .587 * G( p_in ) + .114 * B( p_in );
                 
+		p_pic->U_PIXELS[i_out] = -.1687 * R( p_in ) - .3313 * G( p_in ) + .5 * B( p_in ) + 128;
+		p_pic->V_PIXELS[i_out] = .5 * R( p_in ) - .4187 * G( p_in ) - .0813 * B( p_in ) + 128;
+
 		p_pic->A_PIXELS[i_out] = ALPHA( p_in );
-                
-                if( ( x % 2 == 0 ) && ( y % 2 == 0 ) ) {
-
-                    i_uv_out = UV_INDEX_OUT( x, y );
-
-                    
-                    p_pic->U_PIXELS[i_uv_out] = -.1687 * R( p_in ) - .3313 * G( p_in ) + .5 * B( p_in ) + 128;
-                    p_pic->V_PIXELS[i_uv_out] = .5 * R( p_in ) - .4187 * G( p_in ) - .0813 * B( p_in ) + 128;
-                }
             }
         }
     }
