@@ -2,7 +2,7 @@
  * vout_glide.c: 3dfx video output display method for 3dfx cards
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_glide.c,v 1.8 2001/11/28 15:08:05 massiot Exp $
+ * $Id: vout_glide.c,v 1.9 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -39,7 +39,6 @@
 #include <glide.h>
 #include <linutil.h>                            /* Glide kbhit() and getch() */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -50,8 +49,6 @@
 #include "video_output.h"
 
 #include "interface.h"
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.8 2001/11/28 15:08:05 massiot Exp $
+ * $Id: gtk_display.c,v 1.9 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -42,7 +42,6 @@
 #undef gtk
 #undef gnome
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -65,8 +64,6 @@
 #include "gtk_menu.h"
 #include "gtk_display.h"
 #include "intf_gtk.h"
-
-#include "main.h"
 
 #include "modules_export.h"
 

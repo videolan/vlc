@@ -2,7 +2,7 @@
  * input_ext-dec.h: structures exported to the VideoLAN decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-dec.h,v 1.40 2001/12/03 16:18:37 sam Exp $
+ * $Id: input_ext-dec.h,v 1.41 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Kaempf <maxx@via.ecp.fr>
@@ -479,14 +479,14 @@ static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
     if( (i_available = p_bit_stream->p_end - p_bit_stream->p_byte)
             >= i_buf_len )
     {
-        pf_fast_memcpy( p_buffer, p_bit_stream->p_byte, i_buf_len );
+        p_main->fast_memcpy( p_buffer, p_bit_stream->p_byte, i_buf_len );
         p_bit_stream->p_byte += i_buf_len;
     }
     else
     {
         do
         {
-            pf_fast_memcpy( p_buffer, p_bit_stream->p_byte, i_available );
+            p_main->fast_memcpy( p_buffer, p_bit_stream->p_byte, i_available );
             p_bit_stream->p_byte = p_bit_stream->p_end;
             p_buffer += i_available;
             i_buf_len -= i_available;
@@ -497,7 +497,7 @@ static __inline__ void GetChunk( bit_stream_t * p_bit_stream,
 
         if( i_buf_len )
         {
-            pf_fast_memcpy( p_buffer, p_bit_stream->p_byte, i_buf_len );
+            p_main->fast_memcpy( p_buffer, p_bit_stream->p_byte, i_buf_len );
             p_bit_stream->p_byte += i_buf_len;
         }
     }

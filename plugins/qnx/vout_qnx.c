@@ -37,7 +37,6 @@
 #include <photon/PtLabel.h>
 #include <photon/PdDirect.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -48,7 +47,6 @@
 #include "video_output.h"
 
 #include "interface.h"
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

@@ -2,7 +2,7 @@
  * aout_dummy.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: aout_dummy.c,v 1.15 2001/11/28 15:08:05 massiot Exp $
+ * $Id: aout_dummy.c,v 1.16 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,7 +31,6 @@
 
 #include <string.h>
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"
 #include "threads.h"
@@ -39,8 +38,6 @@
 #include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.66 2001/12/03 16:18:37 sam Exp $
+ * $Id: vout_sdl.c,v 1.67 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -42,7 +42,6 @@
 
 #include SDL_INCLUDE_FILE
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -55,7 +54,6 @@
 #include "interface.h"
 /* FIXME: get rid of this */
 #include "keystrokes.h"
-#include "main.h"
 #include "netutils.h"
 
 #include "modules.h"
@@ -594,20 +592,20 @@ static void vout_Display( vout_thread_t *p_vout )
                 SDL_LockYUVOverlay( p_vout->p_sys->p_overlay );
                 /* copy the data into video buffers */
                 /* Y first */
-                pf_fast_memcpy( p_vout->p_sys->p_overlay->pixels[0],
-                                p_vout->p_rendered_pic->p_y,
-                                p_vout->p_sys->p_overlay->h *
-                                p_vout->p_sys->p_overlay->pitches[0] );
+                p_main->fast_memcpy( p_vout->p_sys->p_overlay->pixels[0],
+                                     p_vout->p_rendered_pic->p_y,
+                                     p_vout->p_sys->p_overlay->h *
+                                     p_vout->p_sys->p_overlay->pitches[0] );
                 /* then V */
-                pf_fast_memcpy( p_vout->p_sys->p_overlay->pixels[1],
-                                p_vout->p_rendered_pic->p_v,
-                                p_vout->p_sys->p_overlay->h *
-                                p_vout->p_sys->p_overlay->pitches[1] / 2 );
+                p_main->fast_memcpy( p_vout->p_sys->p_overlay->pixels[1],
+                                     p_vout->p_rendered_pic->p_v,
+                                     p_vout->p_sys->p_overlay->h *
+                                     p_vout->p_sys->p_overlay->pitches[1] / 2 );
                 /* and U */
-                pf_fast_memcpy( p_vout->p_sys->p_overlay->pixels[2],
-                                p_vout->p_rendered_pic->p_u,
-                                p_vout->p_sys->p_overlay->h *
-                                p_vout->p_sys->p_overlay->pitches[2] / 2 );
+                p_main->fast_memcpy( p_vout->p_sys->p_overlay->pixels[2],
+                                     p_vout->p_rendered_pic->p_u,
+                                     p_vout->p_sys->p_overlay->h *
+                                     p_vout->p_sys->p_overlay->pitches[2] / 2 );
 
                 OutputCoords( p_vout->p_rendered_pic, 1,
                               p_vout->p_sys->i_width,

@@ -2,7 +2,7 @@
  * memcpymmx.c : MMX memcpy module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: memcpymmx.c,v 1.1 2001/12/03 16:18:37 sam Exp $
+ * $Id: memcpymmx.c,v 1.2 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -32,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -87,7 +86,7 @@ static void memcpy_getfunctions( function_list_t * p_function_list )
 {
     p_function_list->pf_probe = memcpy_Probe;
 #define F p_function_list->functions.memcpy
-    F.pf_fast_memcpy = _M( fast_memcpy );
+    F.fast_memcpy = _M( fast_memcpy );
 #undef F
 }
 

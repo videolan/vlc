@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_clock.c,v 1.26 2001/12/06 10:53:42 massiot Exp $
+ * $Id: input_clock.c,v 1.27 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -29,7 +29,6 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -39,8 +38,6 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
-
-#include "main.h"
 
 /*
  * DISCUSSION : SYNCHRONIZATION METHOD

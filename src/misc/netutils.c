@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.52 2001/11/28 15:08:06 massiot Exp $
+ * $Id: netutils.c,v 1.53 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -77,12 +77,10 @@
 #include <sys/sockio.h>
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "mtime.h"
 #include "intf_msg.h"
 #include "threads.h"
-#include "main.h"
 
 #include "intf_playlist.h"
 

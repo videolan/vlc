@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.43 2001/11/28 15:08:06 massiot Exp $
+ * $Id: modules.c,v 1.44 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -22,8 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 #include "defs.h"
-
-#include "config.h"
 
 /* Some faulty libcs have a broken struct dirent when _FILE_OFFSET_BITS
  * is set to 64. Don't try to be cleverer. */
@@ -87,8 +85,6 @@
 #endif
 #include "modules_builtin.h"
 #include "modules_export.h"
-
-#include "main.h"
 
 /*****************************************************************************
  * Local prototypes

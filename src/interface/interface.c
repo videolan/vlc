@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.81 2001/11/28 15:08:06 massiot Exp $
+ * $Id: interface.c,v 1.82 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -34,7 +34,6 @@
 #include <string.h>                                            /* strerror() */
 #include <sys/types.h>                                              /* off_t */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -53,8 +52,6 @@
 
 #include "video.h"
 #include "video_output.h"
-
-#include "main.h"
 
 /*****************************************************************************
  * Local prototypes

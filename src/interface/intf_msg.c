@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.39 2001/11/28 15:08:06 massiot Exp $
+ * $Id: intf_msg.c,v 1.40 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -39,15 +39,12 @@
 #include <unistd.h>                                      /* close(), write() */
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 
 #include "interface.h"
-
-#include "main.h"
 
 /*****************************************************************************
  * intf_msg_item_t

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.162 2001/12/07 16:47:47 jobi Exp $
+ * $Id: input.c,v 1.163 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -62,7 +62,6 @@
 #   include <sys/times.h>
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -79,8 +78,6 @@
 #include "input_ext-plugins.h"
 
 #include "interface.h"
-
-#include "main.h"
 
 /*****************************************************************************
  * Local prototypes

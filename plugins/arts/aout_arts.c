@@ -38,7 +38,6 @@
 
 #include <artsc.h>
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"
 #include "threads.h"
@@ -46,8 +45,6 @@
 #include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

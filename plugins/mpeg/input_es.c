@@ -2,7 +2,7 @@
  * input_es.c: Elementary Stream demux and packet management
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: input_es.c,v 1.15 2001/12/07 16:47:47 jobi Exp $
+ * $Id: input_es.c,v 1.16 2001/12/07 18:33:07 sam Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -48,7 +48,6 @@
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -58,8 +57,6 @@
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

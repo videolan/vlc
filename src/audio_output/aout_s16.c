@@ -29,7 +29,6 @@
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
@@ -37,8 +36,6 @@
 
 #include "audio_output.h"
 #include "aout_common.h"
-
-#include "main.h"
 
 /*****************************************************************************
  * Local prototypes

@@ -50,8 +50,6 @@
 #   include <sys/uio.h>                                      /* struct iovec */
 #endif
 
-
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -61,8 +59,6 @@
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
-
-#include "main.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
@@ -598,8 +594,8 @@ static int VCDRead( input_thread_t * p_input,
     
             if( U32_AT(p_buffer) != 0x1B9 )
             {
-                pf_fast_memcpy( p_data->p_buffer, p_buffer + i_index,
-                                6 + i_packet_size );
+                p_main->fast_memcpy( p_data->p_buffer, p_buffer + i_index,
+                                     6 + i_packet_size );
                 i_index += ( 6 + i_packet_size );
     
             }

@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.131 2001/12/06 10:53:42 massiot Exp $
+ * $Id: main.c,v 1.132 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -64,7 +64,6 @@
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <sys/stat.h>                                             /* S_IREAD */
 
-#include "config.h"
 #include "common.h"
 #include "debug.h"
 #include "intf_msg.h"
@@ -97,8 +96,6 @@
 #endif
 
 #include "netutils.h"                                 /* network_ChannelJoin */
-
-#include "main.h"
 
 /*****************************************************************************
  * Command line options constants. If something is changed here, be sure that
@@ -241,7 +238,6 @@ main_t        *p_main;
 module_bank_t *p_module_bank;
 aout_bank_t   *p_aout_bank;
 vout_bank_t   *p_vout_bank;
-void*       ( *pf_fast_memcpy ) ( void *, const void *, size_t );
 
 /*****************************************************************************
  * Local prototypes
@@ -394,12 +390,12 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     {
         intf_ErrMsg( "intf error: no suitable memcpy module, "
                      "using libc default" );
-        pf_fast_memcpy = memcpy;
+        p_main->fast_memcpy = memcpy;
     }
     else
     {
 #define f p_main->p_memcpy_module->p_functions->memcpy.functions.memcpy
-        pf_fast_memcpy = f.pf_fast_memcpy;
+        p_main->fast_memcpy = f.fast_memcpy;
 #undef f
     }
 

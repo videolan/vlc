@@ -3,7 +3,7 @@
  * Functions are prototyped in tests.h.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: tests.c,v 1.8 2001/11/28 15:08:06 massiot Exp $
+ * $Id: tests.c,v 1.9 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *
@@ -29,13 +29,9 @@
 
 #include <string.h>                                    /* memcpy(), memset() */
 
-#include "config.h"
 #include "common.h"
-
 #include "intf_msg.h"
 #include "tests.h"
-
-#include "main.h"
 
 /*****************************************************************************
  * TestProgram: tests if the given string equals the program name

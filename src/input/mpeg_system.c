@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.68 2001/12/05 03:31:04 jobi Exp $
+ * $Id: mpeg_system.c,v 1.69 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -34,7 +34,6 @@
 #include <string.h>                                    /* memcpy(), memset() */
 #include <sys/types.h>                                              /* off_t */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -44,8 +43,6 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 #include "input_ext-plugins.h"
-
-#include "main.h"                   /* AC3/MPEG channel, SPU channel, b_stat */
 
 /*****************************************************************************
  * Local prototypes

@@ -45,7 +45,6 @@
     (p_symbols)->intf_PlaylistDestroy = intf_PlaylistDestroy; \
     (p_symbols)->intf_PlaylistJumpto = intf_PlaylistJumpto; \
     (p_symbols)->intf_UrlDecode = intf_UrlDecode; \
-    (p_symbols)->pf_fast_memcpy = pf_fast_memcpy; \
     (p_symbols)->msleep = msleep; \
     (p_symbols)->mdate = mdate; \
     (p_symbols)->network_ChannelCreate = network_ChannelCreate; \
@@ -149,8 +148,6 @@
 #   define intf_PlaylistDestroy(a) p_symbols->intf_PlaylistDestroy(a)
 #   define intf_PlaylistJumpto(a,b) p_symbols->intf_PlaylistJumpto(a,b)
 #   define intf_UrlDecode(a) p_symbols->intf_UrlDecode(a)
-
-#   define pf_fast_memcpy p_symbols->pf_fast_memcpy
 
 #   define msleep(a) p_symbols->msleep(a)
 #   define mdate() p_symbols->mdate()

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.52 2001/12/03 16:18:37 sam Exp $
+ * $Id: common.h,v 1.53 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -24,15 +24,15 @@
  *****************************************************************************/
 
 /*****************************************************************************
- * required headers:
- *  config.h
+ * Required headers
  *****************************************************************************/
+
+#include "config.h"
+#include "int_types.h"
 
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
-
-#include "int_types.h"
 
 typedef u8                  byte_t;
 
@@ -237,9 +237,6 @@ struct decoder_fifo_s;
 
 #define I64C(x)         x##LL
 
-/* Pointer to the fast memcpy plugin function */
-extern void* ( * pf_fast_memcpy ) ( void *, const void *, size_t );
-
 /* The win32 specific stuff was getting really big so it has been moved */
 #if defined( WIN32 )
 #   include "common_win32.h"
@@ -283,8 +280,6 @@ typedef struct module_symbols_s
     void ( * intf_PlaylistDestroy ) ( struct playlist_s * );
     void ( * intf_PlaylistJumpto )  ( struct playlist_s *, int );
     void ( * intf_UrlDecode )       ( char * );
-
-    void*   ( * pf_fast_memcpy ) ( void *, const void *, size_t );
 
     void    ( * msleep )         ( mtime_t );
     mtime_t ( * mdate )          ( void );
@@ -401,3 +396,10 @@ typedef struct module_symbols_s
 #ifdef PLUGIN
 extern module_symbols_t* p_symbols;
 #endif
+
+/*****************************************************************************
+ * Global headers
+ *****************************************************************************/
+
+#include "main.h"
+

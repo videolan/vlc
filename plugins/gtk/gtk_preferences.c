@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_preferences.c,v 1.7 2001/11/28 15:08:05 massiot Exp $
+ * $Id: gtk_preferences.c,v 1.8 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -41,7 +41,6 @@
 
 #include <string.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -58,8 +57,6 @@
 #include "gtk_support.h"
 #include "gtk_playlist.h"
 #include "intf_gtk.h"
-
-#include "main.h"
 
 #include "modules_export.h"
 

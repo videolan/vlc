@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.34 2001/12/07 16:47:47 jobi Exp $
+ * $Id: modules.h,v 1.35 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -228,7 +228,7 @@ typedef struct function_list_s
         /* memcpy plugins */
         struct
         {
-            void* ( * pf_fast_memcpy ) ( void *, const void *, size_t );
+            void* ( * fast_memcpy ) ( void *, const void *, size_t );
         } memcpy;
 
     } functions;

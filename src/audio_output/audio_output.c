@@ -2,7 +2,7 @@
  * audio_output.c : audio output thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio_output.c,v 1.67 2001/12/06 10:53:42 massiot Exp $
+ * $Id: audio_output.c,v 1.68 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *
@@ -38,7 +38,6 @@
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 #include <string.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
@@ -47,8 +46,6 @@
 
 #include "audio_output.h"
 #include "aout_common.h"
-
-#include "main.h"
 
 /*****************************************************************************
  * Local prototypes

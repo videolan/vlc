@@ -2,7 +2,7 @@
  * intf_gtk.c: Gtk+ interface
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: intf_gtk.c,v 1.28 2001/11/28 15:08:05 massiot Exp $
+ * $Id: intf_gtk.c,v 1.29 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -37,7 +37,6 @@
 
 #include <gtk/gtk.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -59,8 +58,6 @@
 #include "gtk_menu.h"
 #include "gtk_display.h"
 #include "intf_gtk.h"
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

@@ -51,7 +51,6 @@
 
 #include <sys/ioctl.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -61,8 +60,6 @@
 #if defined( WIN32 )
 #   include "input_iovec.h"
 #endif
-
-#include "main.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"

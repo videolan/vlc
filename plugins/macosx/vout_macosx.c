@@ -33,7 +33,6 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -46,7 +45,6 @@
 #include "video_output.h"
 
 #include "modules.h"
-#include "main.h"
 
 #include "macosx.h"
 

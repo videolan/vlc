@@ -2,7 +2,7 @@
  * vout_ggi.c: GGI video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_ggi.c,v 1.12 2001/11/28 15:08:05 massiot Exp $
+ * $Id: vout_ggi.c,v 1.13 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -36,7 +36,6 @@
 
 #include <ggi/ggi.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -49,8 +48,6 @@
 
 #include "intf_msg.h"
 #include "interface.h"
-
-#include "main.h"
 
 #include "modules_export.h"
 

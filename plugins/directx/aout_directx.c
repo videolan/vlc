@@ -2,7 +2,7 @@
  * aout_directx.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_directx.c,v 1.12 2001/11/28 15:08:05 massiot Exp $
+ * $Id: aout_directx.c,v 1.13 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -37,7 +37,6 @@
 #include <stdio.h>                                           /* "intf_msg.h" */
 #include <stdlib.h>                            /* calloc(), malloc(), free() */
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
@@ -51,8 +50,6 @@
 #endif
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

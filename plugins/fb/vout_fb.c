@@ -2,7 +2,7 @@
  * vout_fb.c: framebuffer video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_fb.c,v 1.14 2001/11/28 15:08:05 massiot Exp $
+ * $Id: vout_fb.c,v 1.15 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -44,7 +44,6 @@
 #include <linux/vt.h>                                                /* VT_* */
 #include <linux/kd.h>                                                 /* KD* */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -54,8 +53,6 @@
 
 #include "video.h"
 #include "video_output.h"
-
-#include "main.h"
 
 #include "modules_export.h"
 

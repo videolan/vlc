@@ -2,7 +2,7 @@
  * input_ps.c: PS demux and packet management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_ps.c,v 1.43 2001/12/07 16:47:47 jobi Exp $
+ * $Id: input_ps.c,v 1.44 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Cyril Deguet <asmax@via.ecp.fr>
@@ -50,14 +50,11 @@
 
 #include <fcntl.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
 #include "mtime.h"
 #include "tests.h"
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

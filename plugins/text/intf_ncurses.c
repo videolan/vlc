@@ -2,7 +2,7 @@
  * intf_ncurses.c: ncurses interface
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_ncurses.c,v 1.6 2001/11/28 15:08:06 massiot Exp $
+ * $Id: intf_ncurses.c,v 1.7 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -36,7 +36,6 @@
 
 #include <curses.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -49,8 +48,6 @@
 #include "interface.h"
 
 #include "modules.h"
-#include "main.h"
-
 #include "modules_export.h"
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * intf_channels.c: channel handling functions
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_channels.c,v 1.4 2001/11/28 15:08:06 massiot Exp $
+ * $Id: intf_channels.c,v 1.5 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -31,7 +31,6 @@
 #include <stdio.h>                                                   /* FILE */
 #include <string.h>                                            /* strerror() */
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -39,8 +38,6 @@
 
 #include "intf_channels.h"
 #include "interface.h"
-
-#include "main.h"
 
 /*****************************************************************************
  * Local prototypes

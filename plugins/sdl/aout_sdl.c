@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_sdl.c,v 1.19 2001/11/28 15:08:05 massiot Exp $
+ * $Id: aout_sdl.c,v 1.20 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -40,7 +40,6 @@
 
 #include SDL_INCLUDE_FILE
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
@@ -48,8 +47,6 @@
 #include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

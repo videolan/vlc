@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.8 2001/11/28 15:08:05 massiot Exp $
+ * $Id: intf_qt.cpp,v 1.9 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -37,7 +37,6 @@ extern "C"
 #include <string.h>                                            /* strerror() */
 #include <stdio.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -49,8 +48,6 @@ extern "C"
 
 #include "intf_playlist.h"
 #include "interface.h"
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

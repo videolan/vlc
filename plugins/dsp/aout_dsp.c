@@ -2,7 +2,7 @@
  * aout_dsp.c : dsp functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout_dsp.c,v 1.16 2001/11/28 15:08:05 massiot Exp $
+ * $Id: aout_dsp.c,v 1.17 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -54,7 +54,6 @@
                    SNDCTL_DSP_STEREO, SNDCTL_DSP_SPEED, SNDCTL_DSP_GETOSPACE */
 #endif
 
-#include "config.h"
 #include "common.h"                                     /* boolean_t, byte_t */
 #include "intf_msg.h"                        /* intf_DbgMsg(), intf_ErrMsg() */
 #include "threads.h"
@@ -62,8 +61,6 @@
 #include "tests.h"
 
 #include "audio_output.h"                                   /* aout_thread_t */
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

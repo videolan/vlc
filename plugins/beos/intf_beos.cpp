@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.33 2001/11/28 15:08:05 massiot Exp $
+ * $Id: intf_beos.cpp,v 1.34 2001/12/07 18:33:07 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -39,7 +39,6 @@
 
 extern "C"
 {
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -48,7 +47,6 @@ extern "C"
 #include "stream_control.h"
 #include "interface.h"
 #include "input_ext-intf.h"
-#include "main.h"
 #include "modules.h"
 #include "modules_export.h"
 }

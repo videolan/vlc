@@ -2,7 +2,7 @@
  * vout_xvideo.c: Xvideo video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_xvideo.c,v 1.35 2001/12/06 10:53:42 massiot Exp $
+ * $Id: vout_xvideo.c,v 1.36 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -56,7 +56,6 @@
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/dpms.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -69,8 +68,6 @@
 #include "interface.h"
 
 #include "netutils.h"                                 /* network_ChannelJoin */
-
-#include "main.h"
 
 #include "stream_control.h"                 /* needed by input_ext-intf.h... */
 #include "input_ext-intf.h"
@@ -680,12 +677,13 @@ static void vout_Display( vout_thread_t *p_vout )
         break;
 
     case YUV_420_PICTURE:
-        pf_fast_memcpy( p_vout->p_sys->p_xvimage->data,
-                        p_vout->p_rendered_pic->p_y, i_size );
-        pf_fast_memcpy( p_vout->p_sys->p_xvimage->data + ( i_size ),
-                        p_vout->p_rendered_pic->p_v, i_size / 4 );
-        pf_fast_memcpy( p_vout->p_sys->p_xvimage->data + ( i_size ) + ( i_size / 4 ),
-                        p_vout->p_rendered_pic->p_u, i_size / 4 );
+        p_main->fast_memcpy( p_vout->p_sys->p_xvimage->data,
+                             p_vout->p_rendered_pic->p_y, i_size );
+        p_main->fast_memcpy( p_vout->p_sys->p_xvimage->data + ( i_size ),
+                             p_vout->p_rendered_pic->p_v, i_size / 4 );
+        p_main->fast_memcpy( p_vout->p_sys->p_xvimage->data
+                                 + ( i_size ) + ( i_size / 4 ),
+                             p_vout->p_rendered_pic->p_u, i_size / 4 );
         break;
     }
 

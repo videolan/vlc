@@ -36,6 +36,10 @@
  *
  */
 
+#ifdef HAVE_CONFIG_H
+#else
+#define HAVE_CONFIG_H
+
 /*****************************************************************************
  * Program information
  *****************************************************************************/
@@ -514,3 +518,4 @@
 #define PLAYLIST_LOOP_VAR               "vlc_playlist_loop"
 #define PLAYLIST_LOOP_DEFAULT           0
 
+#endif

@@ -19,7 +19,6 @@ extern "C"
 #include <string.h>
 #include <stdio.h>
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -31,8 +30,6 @@ extern "C"
 
 #include "intf_playlist.h"
 #include "interface.h"
-
-#include "main.h"
 
 #include "modules.h"
 #include "modules_export.h"

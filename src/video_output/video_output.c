@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.144 2001/11/28 15:08:06 massiot Exp $
+ * $Id: video_output.c,v 1.145 2001/12/07 18:33:08 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -38,7 +38,6 @@
 #   include <sys/times.h>
 #endif
 
-#include "config.h"
 #include "common.h"
 #include "intf_msg.h"
 #include "threads.h"
@@ -50,8 +49,6 @@
 #include "video_text.h"
 #include "video_spu.h"
 #include "video_yuv.h"
-
-#include "main.h"
 
 /*****************************************************************************
  * Local prototypes
