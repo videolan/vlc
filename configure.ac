@@ -1211,74 +1211,6 @@ if test "${enable_livedotcom}" = "yes"; then
   fi
 fi
 
-
-
-dnl dnl
-dnl dnl  DVD module: optionally check for installed libdvdcss
-dnl dnl
-dnl AC_ARG_ENABLE(dvd,
-dnl [  --enable-dvd            DVD input module (default enabled)])
-dnl if test "${enable_dvd}" != "no"
-dnl then
-dnl   AC_ARG_WITH(dvdcss,
-dnl   [    --with-dvdcss=PATH    libdvdcss headers and libraries])
-dnl   AC_ARG_WITH(dvdcss-tree,
-dnl   [    --with-dvdcss-tree=PATH libdvdcss tree for static linking])
-dnl   case "${with_dvdcss}" in
-dnl   ""|yes)
-dnl     if test -z "${with_dvdcss_tree}"
-dnl     then
-dnl       AC_CHECK_HEADERS(dvdcss/dvdcss.h,
-dnl         [ AX_ADD_PLUGINS([dvd])
-dnl           AX_ADD_LDFLAGS([dvd dvdcss],[-ldvdcss])],
-dnl         [ AC_MSG_WARN([libdvdcss is no longer provided with vlc; please get libdvdcss from http://www.videolan.org/libdvdcss/ and build it. Then either use --with-dvdcss=<path/where/libdvdcss/was/installed> for dynamic linking (recommended under Unix) or --with-dvdcss-tree=<path/where/libdvdcss/was/built> for static linking (recommended under BeOS, Windows, MacOS X). Alternatively you can use --disable-dvd to disable the DVD plugin.])
-dnl           AC_MSG_ERROR([cannot find libdvdcss headers]) ])
-dnl     else
-dnl       AC_MSG_CHECKING(for libdvdcss.a in ${with_dvdcss_tree})
-dnl       real_dvdcss_tree="`cd ${with_dvdcss_tree} 2>/dev/null && pwd`"
-dnl       if test -z "${real_dvdcss_tree}"
-dnl       then
-dnl         dnl  The given directory can't be found
-dnl         AC_MSG_RESULT(no)
-dnl         AC_MSG_ERROR([cannot cd to ${with_dvdcss_tree}])
-dnl       fi
-dnl       if test -f "${real_dvdcss_tree}/src/.libs/libdvdcss.a"
-dnl       then
-dnl         dnl  Use a custom libdvdcss
-dnl         AC_MSG_RESULT(${real_dvdcss_tree}/src/.libs/libdvdcss.a)
-dnl         AX_ADD_BUILTINS([dvd])
-dnl         AX_ADD_LDFLAGS([dvd dvdcss],[-L${real_dvdcss_tree}/src/.libs -ldvdcss])
-dnl         AX_ADD_CPPFLAGS([dvd],[-I${real_dvdcss_tree}/src])
-dnl       else
-dnl         dnl  The given libdvdcss wasn't built
-dnl         AC_MSG_RESULT(no)
-dnl         AC_MSG_ERROR([cannot find ${real_dvdcss_tree}/src/.libs/libdvdcss.a, make sure you compiled libdvdcss in ${with_dvdcss_tree}])
-dnl       fi
-dnl     fi
-dnl   ;;
-dnl   no)
-dnl     dnl  Compile without dvdcss (dlopen version, works only under Linux)
-dnl     AX_ADD_PLUGINS([dvd])
-dnl     AX_ADD_CPPFLAGS([dvd],[-DGOD_DAMN_DMCA])
-dnl     AX_ADD_LDFLAGS([dvd],[-ldl])
-dnl   ;;
-dnl   *)
-dnl     AC_MSG_CHECKING(for dvdcss headers in ${with_dvdcss})
-dnl     if test -f ${with_dvdcss}/include/dvdcss/dvdcss.h
-dnl     then
-dnl       dnl  Use ${with_dvdcss}/include/dvdcss/dvdcss.h
-dnl       AC_MSG_RESULT(yes)
-dnl       AX_ADD_PLUGINS([dvd])
-dnl       AX_ADD_LDFLAGS([dvd dvdcss],[-L${with_dvdcss}/lib -ldvdcss])
-dnl       AX_ADD_CPPFLAGS([dvd],[-I${with_dvdcss}/include])
-dnl     else
-dnl       dnl  No libdvdcss could be found, sorry
-dnl       AC_MSG_RESULT(no)
-dnl       AC_MSG_ERROR([cannot find ${with_dvdcss}/include/dvdcss/dvdcss.h])
-dnl     fi
-dnl   ;;
-dnl   esac
-dnl fi
 dnl 
 dnl dnl
 dnl dnl dvdread module: check for libdvdread
@@ -1344,70 +1276,6 @@ dnl     fi
 dnl   fi
 dnl fi
 dnl 
-dnl dnl
-dnl dnl dvdplay module: check for libdvdplay
-dnl dnl
-dnl AC_ARG_ENABLE(dvdplay,
-dnl [  --enable-dvdplay        dvdplay input module (default enabled)])
-dnl if test "${enable_dvdplay}" != "no"
-dnl then
-dnl   AC_ARG_WITH(dvdplay,
-dnl   [    --with-dvdplay=PATH    libdvdplay headers and libraries])
-dnl   AC_ARG_WITH(dvdplay-tree,
-dnl   [    --with-dvdplay-tree=PATH libdvdplay tree for static linking])
-dnl   if test -z "${with_dvdplay}"
-dnl   then
-dnl     if test -z "${with_dvdplay_tree}"
-dnl     then
-dnl       AC_CHECK_HEADERS(dvdplay/dvdplay.h,[
-dnl           AX_ADD_PLUGINS([dvdplay])
-dnl           AX_ADD_LDFLAGS([dvdplay],[-ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
-dnl           AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread}])
-dnl         ],[
-dnl           if test -n "${enable_dvdplay}"
-dnl           then
-dnl             AC_MSG_WARN([Please get libdvdplay from http://www.videolan.org/.])
-dnl             AC_MSG_ERROR([cannot find libdvdplay headers])
-dnl           fi
-dnl         ])
-dnl     else
-dnl       AC_MSG_CHECKING(for libdvdplay.a in ${with_dvdplay_tree})
-dnl       real_dvdplay_tree="`cd ${with_dvdplay_tree} 2>/dev/null && pwd`"
-dnl       if test -z "${real_dvdplay_tree}"
-dnl       then
-dnl         dnl  The given directory can't be found
-dnl         AC_MSG_RESULT(no)
-dnl         AC_MSG_ERROR([cannot cd to ${with_dvdplay_tree}])
-dnl       fi
-dnl       if test -f "${real_dvdplay_tree}/src/.libs/libdvdplay.a"
-dnl       then
-dnl         dnl  Use a custom libdvdplay
-dnl         AC_MSG_RESULT(${real_dvdplay_tree}/src/.libs/libdvdplay.a)
-dnl         AX_ADD_BUILTINS([dvdplay])
-dnl         AX_ADD_LDFLAGS([dvdplay],[-L${real_dvdplay_tree}/src/.libs -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
-dnl         AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread} -I${real_dvdplay_tree}/src])
-dnl       else
-dnl         dnl  The given libdvdplay wasn't built
-dnl         AC_MSG_RESULT(no)
-dnl         AC_MSG_ERROR([cannot find ${real_dvdplay_tree}/src/.libs/libdvdplay.a, make sure you compiled libdvdplay in ${with_dvdplay_tree}])
-dnl       fi
-dnl     fi
-dnl   else
-dnl     AC_MSG_CHECKING(for dvdplay headers in ${with_dvdplay})
-dnl     if test -f "${with_dvdplay}/include/dvdplay/dvdplay.h"
-dnl     then
-dnl       dnl  Use ${with_dvdplay}/include/dvdplay/dvdplay.h
-dnl       AC_MSG_RESULT(yes)
-dnl       AX_ADD_PLUGINS([dvdplay])
-dnl       AX_ADD_LDFLAGS([dvdplay],[-L${with_dvdplay}/lib -ldvdplay ${LDFLAGS_dvdread} ${LDFLAGS_dvdcss}])
-dnl       AX_ADD_CPPFLAGS([dvdplay],[${CPPFLAGS_dvdread} -I${with_dvdplay}/include])
-dnl     else
-dnl       dnl  No libdvdplay could be found, sorry
-dnl       AC_MSG_RESULT(no)
-dnl       AC_MSG_ERROR([cannot find ${with_dvdplay}/include/dvdplay/dvdplay.h])
-dnl     fi
-dnl   fi
-dnl fi
 
 dnl
 dnl  libdvdnav plugin
@@ -3904,8 +3772,6 @@ AC_CONFIG_FILES([
   modules/access/Makefile
   modules/access/dshow/Makefile
   modules/access/dvb/Makefile
-  modules/access/dvd/Makefile
-  modules/access/dvdplay/Makefile
   modules/access/dvdread/Makefile
   modules/access/mms/Makefile
   modules/access/pvr/Makefile
