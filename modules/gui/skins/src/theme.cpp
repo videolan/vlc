@@ -2,7 +2,7 @@
  * theme.cpp: Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: theme.cpp,v 1.7 2003/04/13 19:09:59 asmax Exp $
+ * $Id: theme.cpp,v 1.8 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,16 +28,16 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
+#include "../os_api.h"
 #include "window.h"
-#include "os_window.h"
+#include "../os_window.h"
 #include "dialog.h"
-#include "os_dialog.h"
+#include "../os_dialog.h"
 #include "banks.h"
 #include "anchor.h"
 #include "event.h"
-#include "os_event.h"
-#include "generic.h"
+#include "../os_event.h"
+#include "../controls/generic.h"
 #include "theme.h"
 #include "vlcproc.h"
 #include "skin_common.h"

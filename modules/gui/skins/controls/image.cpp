@@ -2,7 +2,7 @@
  * image.cpp: Image control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: image.cpp,v 1.4 2003/04/15 20:33:58 karibu Exp $
+ * $Id: image.cpp,v 1.5 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,14 +28,14 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "bitmap.h"
-#include "banks.h"
+#include "../src/bitmap.h"
+#include "../src/banks.h"
 #include "generic.h"
 #include "image.h"
-#include "event.h"
-#include "theme.h"
-#include "window.h"
-#include "skin_common.h"
+#include "../src/event.h"
+#include "../src/theme.h"
+#include "../src/window.h"
+#include "../src/skin_common.h"
 
 
 

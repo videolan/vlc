@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.9 2003/04/14 10:18:25 asmax Exp $
+ * $Id: skin_main.cpp,v 1.10 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -30,14 +30,14 @@
 #include <vlc/aout.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
+#include "../os_api.h"
 #include "event.h"
 #include "dialog.h"
-#include "os_dialog.h"
+#include "../os_dialog.h"
 #include "banks.h"
 #include "window.h"
 #include "theme.h"
-#include "os_theme.h"
+#include "../os_theme.h"
 #include "themeloader.h"
 #include "vlcproc.h"
 #include "skin_common.h"

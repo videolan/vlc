@@ -2,7 +2,7 @@
  * win32_bitmap.cpp: Win32 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_bitmap.cpp,v 1.3 2003/04/16 19:22:53 karibu Exp $
+ * $Id: win32_bitmap.cpp,v 1.4 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -33,12 +33,12 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
-#include "graphics.h"
+#include "../os_api.h"
+#include "../src/graphics.h"
 #include "win32_graphics.h"
-#include "bitmap.h"
+#include "../src/bitmap.h"
 #include "win32_bitmap.h"
-#include "skin_common.h"
+#include "../src/skin_common.h"
 
 
 

@@ -2,7 +2,7 @@
  * gtk2_dialog.cpp: GTK2 implementation of some dialog boxes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_dialog.cpp,v 1.3 2003/04/13 19:09:59 asmax Exp $
+ * $Id: gtk2_dialog.cpp,v 1.4 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -36,16 +36,16 @@ extern intf_thread_t *g_pIntf;
 //#include <richedit.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "banks.h"
-#include "dialog.h"
-#include "os_dialog.h"
-#include "skin_common.h"
-#include "window.h"
-#include "os_window.h"
-#include "theme.h"
-#include "os_theme.h"
-#include "event.h"
-#include "os_api.h"
+#include "../src/banks.h"
+#include "../src/dialog.h"
+#include "../os_dialog.h"
+#include "../src/skin_common.h"
+#include "../src/window.h"
+#include "../os_window.h"
+#include "../src/theme.h"
+#include "../os_theme.h"
+#include "../src/event.h"
+#include "../os_api.h"
 
 
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * slider.cpp: Slider control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: slider.cpp,v 1.3 2003/04/12 21:43:27 asmax Exp $
+ * $Id: slider.cpp,v 1.4 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -32,18 +32,18 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
-#include "bitmap.h"
-#include "bezier.h"
-#include "banks.h"
-#include "graphics.h"
-#include "os_graphics.h"
+#include "../os_api.h"
+#include "../src/bitmap.h"
+#include "../src/bezier.h"
+#include "../src/banks.h"
+#include "../src/graphics.h"
+#include "../os_graphics.h"
 #include "generic.h"
 #include "slider.h"
-#include "event.h"
-#include "theme.h"
-#include "window.h"
-#include "skin_common.h"
+#include "../src/event.h"
+#include "../src/theme.h"
+#include "../src/window.h"
+#include "../src/skin_common.h"
 
 
 
@@ -90,7 +90,7 @@ void ControlSlider::Init()
 {
     int i;
     // Get bitmap from list
-    Img    = new (Bitmap*)[2];
+    Img    = new (::Bitmap*)[2];
     Img[0] = p_intf->p_sys->p_theme->BmpBank->Get( cursorUp );
     Img[1] = p_intf->p_sys->p_theme->BmpBank->Get( cursorDown );
 

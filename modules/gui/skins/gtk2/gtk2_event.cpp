@@ -2,7 +2,7 @@
  * gtk2_event.cpp: GTK2 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_event.cpp,v 1.8 2003/04/16 19:22:53 karibu Exp $
+ * $Id: gtk2_event.cpp,v 1.9 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -31,14 +31,14 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
-#include "event.h"
-#include "os_event.h"
-#include "window.h"
-#include "os_window.h"
-#include "theme.h"
-#include "os_theme.h"
-#include "skin_common.h"
+#include "../os_api.h"
+#include "../src/event.h"
+#include "../os_event.h"
+#include "../src/window.h"
+#include "../os_window.h"
+#include "../src/theme.h"
+#include "../os_theme.h"
+#include "../src/skin_common.h"
 
 
 //---------------------------------------------------------------------------

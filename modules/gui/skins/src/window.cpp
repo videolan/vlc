@@ -2,7 +2,7 @@
  * window.cpp: Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: window.cpp,v 1.15 2003/04/16 21:39:00 karibu Exp $
+ * $Id: window.cpp,v 1.16 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -29,12 +29,12 @@
 
 //--- SKIN ------------------------------------------------------------------
 #include "anchor.h"
-#include "generic.h"
+#include "../controls/generic.h"
 #include "window.h"
 #include "event.h"
-#include "os_api.h"
+#include "../os_api.h"
 #include "graphics.h"
-#include "os_graphics.h"
+#include "../os_graphics.h"
 #include "banks.h"
 #include "theme.h"
 #include "skin_common.h"

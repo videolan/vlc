@@ -2,7 +2,7 @@
  * checkbox.cpp: Checkbox control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: checkbox.cpp,v 1.3 2003/04/11 21:19:49 videolan Exp $
+ * $Id: checkbox.cpp,v 1.4 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,18 +28,18 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "bitmap.h"
-#include "banks.h"
+#include "../src/bitmap.h"
+#include "../src/banks.h"
 #include "generic.h"
 #include "checkbox.h"
-#include "event.h"
-#include "theme.h"
-#include "window.h"
-#include "skin_common.h"
+#include "../src/event.h"
+#include "../src/theme.h"
+#include "../src/window.h"
+#include "../src/skin_common.h"
 
 
-#include "os_event.h"
-#include "os_window.h"
+#include "../os_event.h"
+#include "../os_window.h"
 
 //---------------------------------------------------------------------------
 // Checkbox Button

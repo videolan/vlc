@@ -2,7 +2,7 @@
  * playlist.cpp: Playlist control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: playlist.cpp,v 1.2 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -31,21 +31,21 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
-#include "bitmap.h"
-#include "banks.h"
-#include "bezier.h"
-#include "graphics.h"
-#include "os_graphics.h"
-#include "font.h"
-#include "os_font.h"
+#include "../os_api.h"
+#include "../src/bitmap.h"
+#include "../src/banks.h"
+#include "../src/bezier.h"
+#include "../src/graphics.h"
+#include "../os_graphics.h"
+#include "../src/font.h"
+#include "../os_font.h"
 #include "generic.h"
 #include "slider.h"
 #include "playlist.h"
-#include "event.h"
-#include "theme.h"
-#include "window.h"
-#include "skin_common.h"
+#include "../src/event.h"
+#include "../src/theme.h"
+#include "../src/window.h"
+#include "../src/skin_common.h"
 
 
 

@@ -2,7 +2,7 @@
  * rectangle.cpp: Rectanglee control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: rectangle.cpp,v 1.2 2003/03/18 04:08:45 ipkiss Exp $
+ * $Id: rectangle.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,16 +28,16 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
-#include "graphics.h"
-#include "bitmap.h"
-#include "banks.h"
+#include "../os_api.h"
+#include "../src/graphics.h"
+#include "../src/bitmap.h"
+#include "../src/banks.h"
 #include "generic.h"
 #include "rectangle.h"
-#include "event.h"
-#include "theme.h"
-#include "window.h"
-#include "skin_common.h"
+#include "../src/event.h"
+#include "../src/theme.h"
+#include "../src/window.h"
+#include "../src/skin_common.h"
 
 
 

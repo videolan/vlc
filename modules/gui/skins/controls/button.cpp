@@ -2,7 +2,7 @@
  * button.cpp: Button control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: button.cpp,v 1.8 2003/04/16 21:39:00 karibu Exp $
+ * $Id: button.cpp,v 1.9 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,14 +28,14 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "bitmap.h"
-#include "banks.h"
+#include "../src/bitmap.h"
+#include "../src/banks.h"
 #include "generic.h"
 #include "button.h"
-#include "event.h"
-#include "theme.h"
-#include "window.h"
-#include "skin_common.h"
+#include "../src/event.h"
+#include "../src/theme.h"
+#include "../src/window.h"
+#include "../src/skin_common.h"
 
 //---------------------------------------------------------------------------
 // Control Button

@@ -2,7 +2,7 @@
  * banks.cpp: Bitmap bank, Event, bank, Font bank and OffSet bank
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: banks.cpp,v 1.2 2003/04/14 10:00:38 karibu Exp $
+ * $Id: banks.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -29,11 +29,11 @@
 
 //--- SKIN ------------------------------------------------------------------
 #include "bitmap.h"
-#include "os_bitmap.h"
+#include "../os_bitmap.h"
 #include "event.h"
-#include "os_event.h"
+#include "../os_event.h"
 #include "font.h"
-#include "os_font.h"
+#include "../os_font.h"
 #include "banks.h"
 #include "skin_common.h"
 

@@ -2,7 +2,7 @@
  * win32_api.cpp: Various win32-specific functions
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_api.cpp,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: win32_api.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -29,10 +29,10 @@
 #include <windows.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "window.h"
-#include "os_window.h"
-#include "os_api.h"
-#include "event.h"         // for MAX_PARAM_SIZE
+#include "../src/window.h"
+#include "../os_window.h"
+#include "../os_api.h"
+#include "../src/event.h"         // for MAX_PARAM_SIZE
 
 
 

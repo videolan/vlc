@@ -2,7 +2,7 @@
  * themeloader.cpp: ThemeLoader class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: themeloader.cpp,v 1.5 2003/04/13 17:46:23 asmax Exp $
+ * $Id: themeloader.cpp,v 1.6 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,7 +28,9 @@
 #include <string>
 #include <fcntl.h>
 #if !defined WIN32
-#include <unistd.h>
+#   include <unistd.h>
+#else
+#   include <direct.h>
 #endif
 
 //--- VLC -------------------------------------------------------------------
@@ -41,9 +43,9 @@
 #endif
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
+#include "../os_api.h"
 #include "theme.h"
-#include "os_theme.h"
+#include "../os_theme.h"
 #include "themeloader.h"
 #include "skin_common.h"
 

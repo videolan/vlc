@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.8 2003/04/16 14:38:04 asmax Exp $
+ * $Id: gtk2_graphics.cpp,v 1.9 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -28,9 +28,9 @@
 #include <gdk/gdk.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "graphics.h"
-#include "window.h"
-#include "os_window.h"
+#include "../src/graphics.h"
+#include "../src/window.h"
+#include "../os_window.h"
 #include "gtk2_graphics.h"
 
 #include <stdio.h>

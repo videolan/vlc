@@ -2,7 +2,7 @@
  * font.cpp: Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: font.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: font.cpp,v 1.2 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,7 +28,7 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
+#include "../os_api.h"
 #include "font.h"
 
 

@@ -2,7 +2,7 @@
  * win32_theme.cpp: Win32 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_theme.cpp,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: win32_theme.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -25,6 +25,10 @@
 
 #ifdef WIN32
 
+#ifdef _MSC_VER
+#   define _WIN32_WINNT 0x0500
+#endif
+
 //--- WIN32 -----------------------------------------------------------------
 #include <windows.h>
 
@@ -32,18 +36,18 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
-#include "banks.h"
-#include "window.h"
-#include "os_window.h"
-#include "event.h"
-#include "os_event.h"
-#include "theme.h"
-#include "os_theme.h"
-#include "dialog.h"
-#include "os_dialog.h"
-#include "vlcproc.h"
-#include "skin_common.h"
+#include "../os_api.h"
+#include "../src/banks.h"
+#include "../src/window.h"
+#include "../os_window.h"
+#include "../src/event.h"
+#include "../os_event.h"
+#include "../src/theme.h"
+#include "../os_theme.h"
+#include "../src/dialog.h"
+#include "../os_dialog.h"
+#include "../src/vlcproc.h"
+#include "../src/skin_common.h"
 
 
 //---------------------------------------------------------------------------

@@ -2,7 +2,7 @@
  * os_font.h: Wrapper for the OSFont class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: os_font.h,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: os_font.h,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -25,9 +25,9 @@
 
 
 #if defined( WIN32 )
-    #include "win32_font.h"
+    #include "win32/win32_font.h"
     #define OSFont Win32Font
 #else    
-    #include "gtk2_font.h"
+    #include "gtk2/gtk2_font.h"
     #define OSFont GTK2Font
 #endif

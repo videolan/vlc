@@ -2,7 +2,7 @@
  * event.cpp: Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: event.cpp,v 1.10 2003/04/16 19:22:53 karibu Exp $
+ * $Id: event.cpp,v 1.11 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -28,14 +28,14 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
+#include "../os_api.h"
 #include "skin_common.h"
 #include "banks.h"
-#include "generic.h"
+#include "../controls/generic.h"
 #include "window.h"
 #include "theme.h"
 #include "event.h"
-#include "os_event.h"
+#include "../os_event.h"
 
 
 

@@ -2,7 +2,7 @@
  * gtk2_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_run.cpp,v 1.10 2003/04/16 21:30:56 karibu Exp $
+ * $Id: gtk2_run.cpp,v 1.11 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -32,16 +32,16 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
-#include "event.h"
-#include "os_event.h"
-#include "banks.h"
-#include "window.h"
-#include "os_window.h"
-#include "theme.h"
-#include "os_theme.h"
-#include "skin_common.h"
-#include "vlcproc.h"
+#include "../os_api.h"
+#include "../src/event.h"
+#include "../os_event.h"
+#include "../src/banks.h"
+#include "../src/window.h"
+#include "../os_window.h"
+#include "../src/theme.h"
+#include "../os_theme.h"
+#include "../src/skin_common.h"
+#include "../src/vlcproc.h"
 
 
 //---------------------------------------------------------------------------

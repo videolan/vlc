@@ -2,7 +2,7 @@
  * gtk2_window.cpp: GTK2 implementation of the Window class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_window.cpp,v 1.17 2003/04/16 15:34:36 asmax Exp $
+ * $Id: gtk2_window.cpp,v 1.18 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -35,17 +35,17 @@
 #include <glib.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
-#include "anchor.h"
-#include "generic.h"
-#include "window.h"
-#include "os_window.h"
-#include "event.h"
-#include "os_event.h"
-#include "graphics.h"
-#include "os_graphics.h"
-#include "skin_common.h"
-#include "theme.h"
+#include "../os_api.h"
+#include "../src/anchor.h"
+#include "../controls/generic.h"
+#include "../src/window.h"
+#include "../os_window.h"
+#include "../src/event.h"
+#include "../os_event.h"
+#include "../src/graphics.h"
+#include "../os_graphics.h"
+#include "../src/skin_common.h"
+#include "../src/theme.h"
 
 
 //---------------------------------------------------------------------------

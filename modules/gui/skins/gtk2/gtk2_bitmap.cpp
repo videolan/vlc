@@ -2,7 +2,7 @@
  * gtk2_bitmap.cpp: GTK2 implementation of the Bitmap class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_bitmap.cpp,v 1.12 2003/04/16 19:22:53 karibu Exp $
+ * $Id: gtk2_bitmap.cpp,v 1.13 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -32,12 +32,12 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
-#include "graphics.h"
+#include "../os_api.h"
+#include "../src/graphics.h"
 #include "gtk2_graphics.h"
-#include "bitmap.h"
+#include "../src/bitmap.h"
 #include "gtk2_bitmap.h"
-#include "skin_common.h"
+#include "../src/skin_common.h"
 
 
 //---------------------------------------------------------------------------

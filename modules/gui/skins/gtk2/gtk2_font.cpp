@@ -2,7 +2,7 @@
  * gtk2_font.cpp: GTK2 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_font.cpp,v 1.4 2003/04/13 19:09:59 asmax Exp $
+ * $Id: gtk2_font.cpp,v 1.5 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -31,9 +31,9 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "graphics.h"
+#include "../src/graphics.h"
 #include "gtk2_graphics.h"
-#include "font.h"
+#include "../src/font.h"
 #include "gtk2_font.h"
 
 

@@ -2,7 +2,7 @@
  * vlcproc.cpp: VlcProc class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlcproc.cpp,v 1.6 2003/04/14 10:00:38 karibu Exp $
+ * $Id: vlcproc.cpp,v 1.7 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -32,13 +32,13 @@
 #include <netutils.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "os_api.h"
+#include "../os_api.h"
 #include "dialog.h"
-#include "os_dialog.h"
+#include "../os_dialog.h"
 #include "event.h"
 #include "banks.h"
 #include "theme.h"
-#include "os_theme.h"
+#include "../os_theme.h"
 #include "themeloader.h"
 #include "window.h"
 #include "vlcproc.h"

@@ -2,7 +2,7 @@
  * win32_font.cpp: Win32 implementation of the Font class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_font.cpp,v 1.2 2003/04/12 21:43:27 asmax Exp $
+ * $Id: win32_font.cpp,v 1.3 2003/04/16 21:40:07 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -32,9 +32,9 @@
 #include <vlc/intf.h>
 
 //--- SKIN ------------------------------------------------------------------
-#include "graphics.h"
+#include "../src/graphics.h"
 #include "win32_graphics.h"
-#include "font.h"
+#include "../src/font.h"
 #include "win32_font.h"
 
 
