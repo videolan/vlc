@@ -25,7 +25,7 @@
 typedef void (vout_yuv_convert_t)( p_vout_thread_t p_vout, void *p_pic,
                                    yuv_data_t *p_y, yuv_data_t *p_u, yuv_data_t *p_v,
                                    int i_width, int i_height,
-                                   int i_pic_width, int i_pic_height, int i_pic_skip,
+                                   int i_pic_width, int i_pic_height, int i_pic_line_width,
                                    int i_matrix_coefficients );
 
 /*******************************************************************************
