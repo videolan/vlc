@@ -602,9 +602,9 @@ host_os=`echo $host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 echo "$ac_t""$host" 1>&6
 
 
-VLC_VERSION=0.1.99i
+VLC_VERSION=0.2.5
 
-VLC_CODENAME=Onatopp
+VLC_CODENAME=Urumov
 
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6

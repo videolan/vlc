@@ -15,9 +15,8 @@ build-stamp:
 	./configure --prefix=/usr \
 		--mandir=\$${prefix}/share/man \
 		--infodir=\$${prefix}/share/info \
-		--enable-gnome --enable-fb \
-		--with-ggi --enable-esd --with-glide \
-		--with-sdl
+		--enable-gnome --enable-fb --with-glide --with-ggi \
+		--with-sdl --enable-esd --enable-alsa
 	$(MAKE)
 
 	touch build-stamp
@@ -37,15 +36,26 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	$(MAKE) install prefix=`pwd`/debian/tmp/usr
+	$(MAKE) install prefix=`pwd`/debian/vlc/usr
 
 	# make symlinks for packages
-	for alias in ggi gnome fb glide esd sdl ; do \
-		ln -s vlc debian/tmp/usr/share/doc/vlc-$$alias ; done
-	ln -s vlc.1.gz debian/tmp/usr/share/man/man1/fbvlc.1.gz
-	ln -s vlc.1.gz debian/tmp/usr/share/man/man1/gvlc.1.gz
+	for alias in ggi gnome glide esd sdl alsa ; do \
+		mkdir -p debian/vlc-$$alias/usr/share/doc/ ; \
+		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \
+		mkdir -p debian/vlc-$$alias/usr/lib/videolan/vlc/ ; \
+		mv debian/vlc/usr/lib/videolan/vlc/$$alias.so \
+			debian/vlc-$$alias/usr/lib/videolan/vlc/ ; \
+	done
 
-	dh_movefiles
+	mkdir -p debian/vlc-gnome/usr/bin/
+	mv debian/vlc/usr/bin/gvlc debian/vlc-gnome/usr/bin/
+	mkdir -p debian/vlc-gnome/usr/share/videolan/
+	mv debian/vlc/usr/share/videolan/gvlc.png \
+		debian/vlc-gnome/usr/share/videolan/
+	mkdir -p debian/vlc-gnome/usr/share/man/man1/
+	ln -s vlc.1.gz debian/vlc-gnome/usr/share/man/man1/gvlc.1.gz
+
+	ln -s vlc.1.gz debian/vlc/usr/share/man/man1/fbvlc.1.gz
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -64,16 +74,14 @@ binary-arch: build install
 #	dh_installpam
 #	dh_installinit
 	dh_installcron
-	dh_installmanpages -Nvlc-gnome -Nvlc-fb -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl
+	dh_installmanpages -Nvlc-gnome -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
 	dh_installinfo
 #	dh_undocumented
-	dh_installchangelogs -Nvlc-gnome -Nvlc-fb -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl
+	dh_installchangelogs -Nvlc-gnome -Nvlc-ggi -Nvlc-glide -Nvlc-esd -Nvlc-sdl -Nvlc-alsa
 	dh_link
 	dh_strip
 	dh_compress
 	dh_fixperms
-	# You may want to make some executables suid here.
-	dh_suidregister
 #	dh_makeshlibs
 	dh_installdeb
 #	dh_perl

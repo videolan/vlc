@@ -1,5 +1,5 @@
 Name: vlc
-Version: 0.1.99i
+Version: 0.2.5
 Release: 1
 Copyright: GPL
 Url: http://www.videolan.org/
