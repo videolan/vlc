@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.12 2003/08/09 14:59:24 gbazin Exp $
+ * $Id: stream_output.h,v 1.13 2003/08/14 17:50:43 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -187,9 +187,11 @@ struct  sout_mux_t
     /* mux private */
     sout_mux_sys_t          *p_sys;
 
-//    /* creater private */
-//    void                    *p_sys_owner;
-
+#if 0
+    /* creater private */
+    void                    *p_sys_owner;
+#endif
+    
     /* XXX private to stream_output.c */
     /* if muxer doesn't support adding stream at any time then we first wait
      *  for stream then we refuse all stream and start muxing */
