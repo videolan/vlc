@@ -314,9 +314,12 @@ static void End( vout_thread_t *p_vout )
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-x", MouseEvent, p_vout);
     var_DelCallback( p_vout->p_sys->p_vout, "mouse-y", MouseEvent, p_vout);
 
-    DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
-    vlc_object_detach( p_vout->p_sys->p_vout );
-    vout_Destroy( p_vout->p_sys->p_vout );
+    if( p_vout->p_sys->p_vout )
+    {
+        DEL_CALLBACKS( p_vout->p_sys->p_vout, SendEvents );
+        vlc_object_detach( p_vout->p_sys->p_vout );
+        vout_Destroy( p_vout->p_sys->p_vout );
+    }
 
     config_PutInt( p_vout, "logo-x", p_vout->p_sys->posx );
     config_PutInt( p_vout, "logo-y", p_vout->p_sys->posy );
