@@ -1,6 +1,9 @@
 #! /bin/sh
 # Piggy list consistency checker
 
+LANG=C
+export LANG
+
 TEMPFILE=/tmp/list.tmp
 LISTFILE=LIST
 LISTFILE2=/tmp/list2.tmp
@@ -21,7 +24,7 @@ do
  for module in `grep "SOURCES_" $modfile|awk '{print $1}'|awk 'BEGIN {FS="SOURCES_"};{print $2}'`
  do
   echo $module >> $TEMPFILE
-  if [ `grep " \* $module:" $LISTFILE |wc -l` == 0 ]
+  if [ `grep " \* $module:" $LISTFILE |wc -l` = 0 ]
   then
    echo "$module exists in $modfile, but not listed"
    i=1
@@ -29,7 +32,7 @@ do
  done
 done
 
-if [ $i == 0 ]
+if [ $i = 0 ]
 then
   echo "OK"
 fi
@@ -43,14 +46,14 @@ echo "--------------------------------------"
 
 for module in `grep " \* " $LISTFILE|awk '{print $2}'|sed s,':',,g `
 do
- if [`grep $module $TEMPFILE|wc -l` == 0 ]
+ if [ `grep $module $TEMPFILE|wc -l` = 0 ]
  then
   i=1
   echo "$module is listed but does not exist"
  fi
 done
 
-if [ $i == 0 ]
+if [ $i = 0 ]
 then
   echo "OK"
 fi
@@ -70,9 +73,9 @@ grep " \* " $LISTFILE  >> $LISTFILE2
 sort -n $LISTFILE2 >> $LISTFILE3
 
 i=`diff $LISTFILE2 $LISTFILE3|wc -l`
-diff $LISTFILE2 $LISTFILE3
+diff -u $LISTFILE2 $LISTFILE3
 
-if [ $i == 0 ]
+if [ $i = 0 ]
 then 
   echo "OK"
 fi
