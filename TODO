@@ -25,7 +25,7 @@ Description: Win32 port
 Status: Todo
 
 Task: 0x5c
-Difficulty: Normal
+Difficulty: Medium
 Urgency: Wishlist
 Description: Infrared support
  Write a plugin which listens to the infrared port and sends appropriate
@@ -59,7 +59,7 @@ Description: Cope with vls/vlc clock jitter
 Status: Todo
 
 Task: 0x58
-Difficulty: Normal
+Difficulty: Medium
 Urgency: Critical
 Description: Language and subtitles selection in network input
  The vls will probably have to be modified as well.
@@ -67,7 +67,7 @@ Status: Todo
 
 Task: 0x57
 Difficulty: Guru
-Urgency: Low
+Urgency: Normal
 Description: Full DVD navigation
  Once the core DVD navigation features are ready (see item 0x52), port the
  interface and video output modules so that they can handle it.
@@ -98,7 +98,7 @@ Description: Hardware AC3 decoding
 Status: Todo
 
 Task: 0x53
-Difficulty: Normal
+Difficulty: Medium
 Urgency: Critical
 Description: Fix AC3 decoder
  The AC3 decoder still has a few quality issues; fix them, and try to add
@@ -107,7 +107,7 @@ Status: Todo
 
 Task: 0x52
 Difficulty: Guru
-Urgency: Low
+Urgency: Normal
 Description: DVD navigation core features
  We need an interpreter for the DVD virtual machine to make it easier to
  browse DVDs later.
@@ -165,7 +165,7 @@ Status: Todo
 
 Task: 0x4b
 Difficulty: Guru
-Urgency: Low
+Urgency: Normal
 Description: Write AVI input plugin
  .avi files can use MPEG codec, if this is the case it shouldn't be
  hard to read those files -> Meuuh
@@ -188,7 +188,7 @@ Description: Write a new buffer allocator
 Status: Todo
 
 Task: 0x48
-Difficulty: Medium
+Difficulty: Hard
 Urgency: Critical
 Description: Fix audio synchro
  With some audio plugins, the audio stream is late because of buffer

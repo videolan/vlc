@@ -4,7 +4,17 @@
 
 HEAD
 
-  * MacOS X icon is now correctly added to the app 
+  * Fixed build process when no plugins or no builtins were chosen.
+  * Makefile changes to get around MacOS X's brain-damaged gcc.
+  * FreeBSD configure and Makefile patches, courtesy of Espen
+    Skoglund <esk@ira.uka.de>.
+  * Cosmetic change in css decryption.
+  * Added basic angle support.
+  * Corrected some bugs in gnome interface: language menu are now
+    synchronized and menus have less chances to change when opened.
+  * Network channel change is now available again.
+  * Fixed optional PES size bug, courtesy of Steve Brown <sbrown@cortland.com>.
+  * MacOS X icon is now correctly added to the app.
   * Fixed a compilation issue in the DVDioctl driver.
   * Added a call to ranlib after a built-in module compilation.
 

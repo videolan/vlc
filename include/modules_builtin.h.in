@@ -26,3 +26,4 @@
                                    module_ ## NAME ## _DeactivateModule );
 
 /* Add stuff here */
+

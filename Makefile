@@ -144,8 +144,12 @@ CPP_DEP := $(CPP_OBJ:%.o=.dep/%.dpp)
 #
 # Translate plugin names
 #
-PLUGIN_OBJ := $(shell for i in : $(PLUGINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@lib/\1.so@' -e 's@^ .*@@' ; done)
-BUILTIN_OBJ := $(shell for i in : $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@lib/\1.a@' -e 's@^ .*@@' ; done)
+ifneq (,$(PLUGINS))
+PLUGIN_OBJ := $(shell for i in $(PLUGINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@lib/\1.so@' -e 's@^ .*@@' ; done)
+endif
+ifneq (,$(BUILTINS))
+BUILTIN_OBJ := $(shell for i in $(BUILTINS) ; do echo " "$(PLUGINS_TARGETS)" " | sed -e 's@.*/\('$$i'\) .*@lib/\1.a@' -e 's@^ .*@@' ; done)
+endif
 
 # All symbols must be exported
 export
@@ -166,7 +170,7 @@ clean:
 	rm -f $(C_OBJ) $(CPP_OBJ)
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so lib/*.a vlc gnome-vlc gvlc kvlc qvlc
-	rm -rf vlc.app
+	rm -Rf vlc.app
 
 distclean: clean
 	rm -f **/*.o **/*~ *.log
@@ -180,10 +184,13 @@ distclean: clean
 install:
 	mkdir -p $(DESTDIR)$(bindir)
 	$(INSTALL) vlc $(DESTDIR)$(bindir)
-# ugly
-	for alias in "" ${ALIASES} ; do if test $$alias ; then rm -f $(DESTDIR)$(bindir)/$$alias && ln -s vlc $(DESTDIR)$(bindir)/$$alias ; fi ; done
+ifneq (,$(ALIASES))
+	for alias in $(ALIASES) ; do if test $$alias ; then rm -f $(DESTDIR)$(bindir)/$$alias && ln -s vlc $(DESTDIR)$(bindir)/$$alias ; fi ; done
+endif
 	mkdir -p $(DESTDIR)$(libdir)/videolan/vlc
+ifneq (,$(PLUGINS))
 	$(INSTALL) -m 644 $(PLUGINS:%=lib/%.so) $(DESTDIR)$(libdir)/videolan/vlc
+endif
 	mkdir -p $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.psf $(DESTDIR)$(datadir)/videolan
 	$(INSTALL) -m 644 share/*.png $(DESTDIR)$(datadir)/videolan
@@ -255,7 +262,7 @@ snapshot: Makefile.opts
 .PHONY: vlc.app
 vlc.app:
 ifneq (,$(findstring darwin,$(SYS)))
-	rm -rf vlc.app
+	rm -Rf vlc.app
 	mkdir -p vlc.app/Contents/Resources
 	mkdir -p vlc.app/Contents/MacOS/lib
 	mkdir -p vlc.app/Contents/MacOS/share
@@ -263,7 +270,9 @@ ifneq (,$(findstring darwin,$(SYS)))
 	$(INSTALL) -m 644 extras/MacOSX_app/Contents/PkgInfo vlc.app/Contents/
 	$(INSTALL) vlc vlc.app/Contents/MacOS/
 	$(INSTALL) share/vlc.icns vlc.app/Contents/Resources/
+ifneq (,$(PLUGINS))
 	$(INSTALL) $(PLUGINS:%=lib/%.so) vlc.app/Contents/MacOS/lib
+endif
 	$(INSTALL) -m 644 share/*.psf vlc.app/Contents/MacOS/share
 endif
 
@@ -287,17 +296,22 @@ $(CPP_DEP): %.dpp: FORCE
 
 $(H_OBJ): Makefile.opts Makefile.dep Makefile
 	rm -f $@ && cp $@.in $@
+ifneq (,$(BUILTINS))
 	for i in $(BUILTINS) ; do \
-	echo "int module_"$$i"_InitModule (module_t *);" >> $@ ; \
-	echo "int module_"$$i"_ActivateModule (module_t *);" >> $@ ; \
-	echo "int module_"$$i"_DeactivateModule (module_t *);" >> $@ ; \
+		echo "int module_"$$i"_InitModule( module_t* );" >> $@ ; \
+		echo "int module_"$$i"_ActivateModule( module_t* );" >> $@ ; \
+		echo "int module_"$$i"_DeactivateModule( module_t* );" >> $@ ; \
 	done
-	echo "#define ALLOCATE_ALL_BUILTINS() \\" >> $@ ;
-	echo "{ \\" >> $@ ;
+endif
+	echo "" >> $@ ;
+	printf "#define ALLOCATE_ALL_BUILTINS() do { " >> $@ ;
+ifneq (,$(BUILTINS))
 	for i in $(BUILTINS) ; do \
-	echo "    ALLOCATE_BUILTIN("$$i"); \\" >> $@ ; \
+		printf "ALLOCATE_BUILTIN("$$i"); " >> $@ ; \
 	done
-	echo "};" >> $@ ;
+endif
+	echo "} while( 0 );" >> $@ ;
+	echo "" >> $@ ;
 
 $(C_OBJ): %.o: Makefile.opts Makefile.dep Makefile
 $(C_OBJ): %.o: .dep/%.d

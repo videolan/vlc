@@ -2,7 +2,7 @@
  * modules.c : Built-in and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.25 2001/04/16 07:40:11 sam Exp $
+ * $Id: modules.c,v 1.26 2001/04/20 11:06:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -59,8 +59,10 @@
 
 #include "intf_msg.h"
 #include "modules.h"
-#include "modules_builtin.h"
+#ifdef HAVE_DYNAMIC_PLUGINS
 #include "modules_core.h"
+#endif
+#include "modules_builtin.h"
 
 /* Local prototypes */
 #ifdef HAVE_DYNAMIC_PLUGINS

@@ -7,6 +7,28 @@
 # Configuration
 ###############################################################################
 
+# 
+# Plugins to build
+# WARNING: if you do not have a dynamic loader on your platform, remove
+# the plugins in this line and put them as built-ins, otherwise your
+# application won't be able to load them.
+# 
+PLUGINS := @PLUGINS@
+
+# 
+# Built-in modules to build
+# WARNING: do NOT put gtk and gnome together in this rule.
+# 
+BUILTINS := @BUILTINS@
+
+# 
+# Additional build options
+# 
+SYS = @SYS@
+ALIASES =@ALIASES@
+INSTALL = @INSTALL@
+ARCH = @ARCH@
+
 #
 # Compilation options
 #
@@ -14,14 +36,6 @@ DEBUG = @DEBUG@
 STATS = @STATS@
 OPTIMS = @OPTIMS@
 GETOPT = @GETOPT@
-
-PLUGINS := @PLUGINS@
-BUILTINS := @BUILTINS@
-
-SYS = @SYS@
-ALIASES =@ALIASES@
-INSTALL = @INSTALL@
-ARCH = @ARCH@
 
 # 
 # Build environment
@@ -58,6 +72,12 @@ LIB_SDL = @LIB_SDL@
 LIB_X11 = @LIB_X11@
 LIB_XVIDEO = @LIB_XVIDEO@
 LIB_YUV = @LIB_YUV@
+
+#
+# CFLAGS for special cases
+#
+CFLAGS_GTK = @CFLAGS_GTK@
+CFLAGS_X11 = @CFLAGS_X11@
 
 ###############################################################################
 # Configuration pre-processing
@@ -115,11 +135,14 @@ LIB += @LIB@ -L/usr/local/lib
 #
 # Libraries needed by built-in modules
 #
+ifneq (,$(BUILTINS))
 LIB += $(shell for i in ${BUILTINS} ; do echo $$i | tr '[a-z]' '[A-Z]' | sed -e 's/.*/$$LIB_&/' ; done)
+endif
 
 #
 # C compiler flags: mainstream compilation
 #
+DEFINE += @DEFINE@
 CFLAGS += $(DEFINE) $(INCLUDE)
 CFLAGS += -Wall -Winline
 CFLAGS += -D_REENTRANT

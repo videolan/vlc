@@ -11,12 +11,8 @@ AC_SUBST(VLC_CODENAME)
 
 dnl Check for tools
 AC_PROG_MAKE_SET
-if test -z "$CC"; then
-  AC_PROG_CC
-fi
-if test -z "$CPP"; then
-  AC_PROG_CPP
-fi
+AC_PROG_CC
+AC_PROG_CPP
 
 dnl AM_PROG_LIBTOOL
 AC_PROG_INSTALL
@@ -46,7 +42,15 @@ AC_FUNC_MMAP
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(dl,dlopen,LIB=${LIB}" -ldl")
 AC_CHECK_LIB(m,pow,LIB_YUV=${LIB_YUV}" -lm")
-AC_CHECK_LIB(pthread,pthread_create,LIB=${LIB}" -lpthread")
+AC_MSG_CHECKING(for old style FreeBSD -pthread flag)
+AC_EGREP_CPP(yes,
+	[#if defined(__FreeBSD_cc_version) && __FreeBSD_cc_version <= 500001
+	  yes
+	#endif
+	], AC_MSG_RESULT(yes)
+	DEFINE="${DEFINE} -D_THREAD_SAFE" LIB="${LIB} -pthread",
+	AC_MSG_RESULT(no)
+	AC_CHECK_LIB(pthread,pthread_create,LIB=${LIB}" -lpthread"))
 AC_CHECK_LIB(threads,thread_create,LIB=${LIB}" -lthreads")
 
 CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
@@ -226,8 +230,11 @@ dnl
 AC_ARG_ENABLE(esd,
   [  --enable-esd            Esound library support (default disabled)],
   [if test x$enable_esd = xyes; then
-     PLUGINS=${PLUGINS}"esd "
-     LIB_ESD="`esd-config --libs`"
+     AC_PATH_PROG(ESD_CONFIG, esd-config, no)
+     if test x${ESD_CONFIG} != xno; then
+       PLUGINS=${PLUGINS}"esd "
+       LIB_ESD="`${ESD_CONFIG} --libs`"
+     fi
    fi])
 
 dnl
@@ -366,10 +373,12 @@ dnl
 AC_ARG_ENABLE(gtk,
   [  --disable-gtk           Gtk+ support (default enabled)])
 if test x$enable_gtk != xno; then
-  if which gtk-config; then
+  AC_PATH_PROG(GTK_CONFIG, gtk-config, no)
+  if test x${GTK_CONFIG} != xno; then
     PLUGINS=${PLUGINS}"gtk "
     ALIASES=${ALIASES}"gvlc "
-    LIB_GTK="`gtk-config --libs gtk | sed 's,-rdynamic,,'`"
+    CFLAGS_GTK="`${GTK_CONFIG} --cflags gtk`"
+    LIB_GTK="`${GTK_CONFIG} --libs gtk | sed 's,-rdynamic,,'`"
   fi
 fi
 
@@ -379,10 +388,20 @@ dnl
 AC_ARG_ENABLE(x11,
   [  --disable-x11           X11 support (default enabled)])
 if test x$enable_x11 != xno; then
+  if test x$x_includes = xNONE; then
+    x_includes=/usr/X11R6/include
+  fi
+  if test x$x_libraries = xNONE; then
+    x_libraries=/usr/X11R6/lib
+  fi
+  saved_CPPFLAGS=$CPPFLAGS
+  CPPFLAGS="$CPPFLAGS -I$x_includes"
   AC_CHECK_HEADERS(X11/Xlib.h, [
     PLUGINS=${PLUGINS}"x11 "
-    LIB_X11="-L/usr/X11R6/lib -lX11 -lXext"
-  ])
+    LIB_X11="-L$x_libraries -lX11 -lXext"
+    CFLAGS_X11="-I$x_includes"
+  ]
+  CPPFLAGS=$saved_CPPFLAGS)
 fi
 
 dnl
@@ -416,6 +435,7 @@ AC_SUBST(ARCH)
 AC_SUBST(PLUGINS)
 AC_SUBST(BUILTINS)
 AC_SUBST(ALIASES)
+AC_SUBST(DEFINE)
 AC_SUBST(INCLUDE)
 AC_SUBST(DEBUG)
 AC_SUBST(STATS)
@@ -442,6 +462,9 @@ AC_SUBST(LIB_SDL)
 AC_SUBST(LIB_X11)
 AC_SUBST(LIB_XVIDEO)
 AC_SUBST(LIB_YUV)
+
+AC_SUBST(CFLAGS_GTK)
+AC_SUBST(CFLAGS_X11)
 
 AC_OUTPUT([Makefile.opts include/config.h])
 

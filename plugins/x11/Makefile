@@ -18,6 +18,12 @@ BUILTIN_C = $(BUILTIN_X11) $(BUILTIN_XVIDEO)
 ALL_OBJ = $(PLUGIN_C) $(BUILTIN_C)
 
 #
+# Special plugin modifications
+#
+
+CFLAGS += $(CFLAGS_X11)
+
+#
 # Virtual targets
 #
 
