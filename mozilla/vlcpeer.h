@@ -33,7 +33,7 @@ public:
     NS_DECL_VLCINTF
 
     // These flags are used by the DOM and security systems to signal that
-    // JavaScript callers are allowed to call this object's scritable methods.
+    // JavaScript callers are allowed to call this object's scriptable methods.
     NS_IMETHOD GetFlags(PRUint32 *aFlags)
     {
         *aFlags = nsIClassInfo::PLUGIN_OBJECT | nsIClassInfo::DOM_OBJECT;
