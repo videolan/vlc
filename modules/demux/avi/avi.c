@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.17 2002/12/06 16:34:06 sam Exp $
+ * $Id: avi.c,v 1.18 2002/12/19 16:59:31 sigmunau Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -893,7 +893,16 @@ static int AVIInit( vlc_object_t * p_this )
              p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
              p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
              p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
-
+    {
+        input_info_category_t *p_cat = input_InfoCategory( p_input, "Avi" );
+        input_AddInfo( p_cat, "Number of streams", "%d", p_avi->i_streams );
+        input_AddInfo( p_cat, "Flags", "%s%s%s%s",
+                       p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
+                       p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
+                       p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
+                       p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
+    }
+        
     /* now read info on each stream and create ES */
     p_avi->pp_info = calloc( p_avi->i_streams,
                             sizeof( avi_stream_t* ) );
@@ -949,6 +958,25 @@ static int AVIInit( vlc_object_t * p_this )
                         p_avi_strf_auds->p_wf->nChannels,
                         p_avi_strf_auds->p_wf->nSamplesPerSec,
                         p_avi_strf_auds->p_wf->wBitsPerSample );
+                {
+                    char hepp[sizeof("Stream") + 10];
+                    input_info_category_t *p_cat;
+                    sprintf(hepp, "Stream %d", i);
+                    p_cat = input_InfoCategory( p_input, hepp);
+                    input_AddInfo( p_cat, "Type", "audio(0x%x)",
+                                   p_avi_strf_auds->p_wf->wFormatTag );
+                    input_AddInfo( p_cat, "Codec", "%4.4s",
+                                   (const char*)&(p_info->i_codec) );
+                    input_AddInfo( p_cat, "Channels", "%d",
+                                   p_avi_strf_auds->p_wf->nChannels );
+                    input_AddInfo( p_cat, "Samplerate", "%d",
+                                   p_avi_strf_auds->p_wf->nSamplesPerSec );
+                    input_AddInfo( p_cat, "Bits Per Sample", "%d",
+                                   p_avi_strf_auds->p_wf->wBitsPerSample );
+                }
+                                   
+                                   
+                    
                 break;
 
             case( AVIFOURCC_vids ):
@@ -969,6 +997,23 @@ static int AVIInit( vlc_object_t * p_this )
                          p_avi_strf_vids->p_bih->biBitCount,
                          (float)p_info->i_rate /
                              (float)p_info->i_scale );
+                {
+                    char hepp[sizeof("Stream") + 10];
+                    input_info_category_t *p_cat;
+                    sprintf(hepp, "stream %d", i);
+                    p_cat = input_InfoCategory( p_input, hepp);
+                    input_AddInfo( p_cat, "Type", "video" );
+                    input_AddInfo( p_cat, "Codec", "%4.4s",
+                                   (const char*)&(p_info->i_codec) );
+                    input_AddInfo( p_cat, "Resolution", "%dx%d",
+                                   p_avi_strf_vids->p_bih->biWidth,
+                                   p_avi_strf_vids->p_bih->biHeight );
+                    input_AddInfo( p_cat, "Frame Rate", "%f",
+                                   (float)p_info->i_rate /
+                                       (float)p_info->i_scale );
+                    input_AddInfo( p_cat, "Bits Per Pixel", "%d",
+                                   p_avi_strf_vids->p_bih->biBitCount );
+                }
 #ifdef __AVI_SUBTITLE__
                 if( i_microsecperframe == 0 )
                 {
@@ -983,6 +1028,13 @@ static int AVIInit( vlc_object_t * p_this )
                 p_info->i_cat = UNKNOWN_ES;
                 i_init_size = 0;
                 p_init_data = NULL;
+                {
+                    char *hepp;
+                    input_info_category_t *p_cat;
+                    asprintf(&hepp, "stream %d", i);
+                    p_cat = input_InfoCategory( p_input, hepp);
+                    input_AddInfo( p_cat, "Type", "unknown" );
+                }
                 break;
         }
         p_info->b_activated = VLC_FALSE;
