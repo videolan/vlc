@@ -237,7 +237,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_picture[0].p->p_pixels = p_sys->p_buffer;
     p_vout->p_picture[0].p->i_lines = p_vout->output.i_height;
     p_vout->p_picture[0].p->i_pixel_pitch = i_pixel_pitch;
-    p_vout->p_picture[0].p->i_pitch = p_sys->i_tex_width *
+    p_vout->p_picture[0].p->i_pitch = p_vout->output.i_width *
         p_vout->p_picture[0].p->i_pixel_pitch;
     p_vout->p_picture[0].p->i_visible_pitch = p_vout->output.i_width *
         p_vout->p_picture[0].p->i_pixel_pitch;
@@ -258,6 +258,11 @@ static int Init( vout_thread_t *p_vout )
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
     glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+
+    /* Allocate the OpenGL texture */
+    glTexImage2D( GL_TEXTURE_2D, 0, 3,
+                  p_sys->i_tex_width, p_sys->i_tex_height , 0,
+                  VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, NULL );
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
@@ -362,9 +367,10 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 
     glClear( GL_COLOR_BUFFER_BIT );
 
-    glTexImage2D( GL_TEXTURE_2D, 0, 3,
-                  p_sys->i_tex_width, p_sys->i_tex_height , 0,
-                  VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->p_buffer );
+    /* Update the texture */
+    glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0,
+                     p_vout->render.i_width, p_vout->render.i_height,
+                     VLCGL_RGB_FORMAT, VLCGL_RGB_TYPE, p_sys->p_buffer );
 
     if( p_sys->i_effect == OPENGL_EFFECT_NONE )
     {
