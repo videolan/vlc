@@ -145,6 +145,10 @@ vlc_module_begin();
                  ENC_QMAX_TEXT, ENC_QMAX_LONGTEXT, VLC_TRUE );
     add_bool( ENC_CFG_PREFIX "trellis", 0, NULL,
               ENC_TRELLIS_TEXT, ENC_TRELLIS_LONGTEXT, VLC_TRUE );
+    add_float( ENC_CFG_PREFIX "qscale", 0, NULL,
+               ENC_QSCALE_TEXT, ENC_QSCALE_LONGTEXT, VLC_TRUE );
+    add_integer( ENC_CFG_PREFIX "strict", 0, NULL,
+                 ENC_STRICT_TEXT, ENC_STRICT_LONGTEXT, VLC_TRUE );
 
     /* demux submodule */
     add_submodule();
@@ -670,6 +674,12 @@ static struct
       VIDEO_ES, "Sierra VMD Video" },
 #endif
 
+#if LIBAVCODEC_BUILD >= 4718
+    /* FFMPEG's SNOW wavelet codec */
+    { VLC_FOURCC('S','N','O','W'), CODEC_ID_SNOW,
+      VIDEO_ES, "FFMpeg SNOW wavelet Video" },
+#endif
+
     /*
      *  Audio Codecs
      */
@@ -717,6 +727,12 @@ static struct
       AUDIO_ES, "A52 Audio (aka AC3)" },
     { VLC_FOURCC('a','5','2','b'), CODEC_ID_AC3, /* VLC specific hack */
       AUDIO_ES, "A52 Audio (aka AC3)" },
+
+#if LIBAVCODEC_BUILD >= 4718
+    /* DTS Audio */
+    { VLC_FOURCC('d','t','s',' '), CODEC_ID_DTS,
+      AUDIO_ES, "DTS Audio" },
+#endif
 
     /* AAC audio */
     { VLC_FOURCC('m','p','4','a'), CODEC_ID_AAC,

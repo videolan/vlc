@@ -134,13 +134,14 @@ struct encoder_sys_t
     int        i_noise_reduction;
     vlc_bool_t b_mpeg4_matrix;
     vlc_bool_t b_trellis;
+    int        i_quality; /* for VBR */
 };
 
 static const char *ppsz_enc_options[] = {
     "keyint", "bframes", "vt", "qmin", "qmax", "hq", "strict_rc",
     "rc-buffer-size", "rc-buffer-aggressivity", "pre-me", "hurry-up",
     "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
-    "trellis", NULL
+    "trellis", "qscale", "strict", NULL
 };
 
 /*****************************************************************************
@@ -274,6 +275,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     var_Get( p_enc, ENC_CFG_PREFIX "mpeg4-matrix", &val );
     p_sys->b_mpeg4_matrix = val.b_bool;
 
+    var_Get( p_enc, ENC_CFG_PREFIX "qscale", &val );
+    if( val.f_float < 0.01 || val.f_float > 255.0 ) val.f_float = 0;
+    p_sys->i_quality = (int)(FF_QP2LAMBDA * val.f_float + 0.5);
+
     var_Get( p_enc, ENC_CFG_PREFIX "hq", &val );
     if( val.psz_string && *val.psz_string )
     {
@@ -294,6 +299,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
     p_sys->i_qmax = val.i_int;
     var_Get( p_enc, ENC_CFG_PREFIX "trellis", &val );
     p_sys->b_trellis = val.b_bool;
+
+    var_Get( p_enc, ENC_CFG_PREFIX "strict", &val );
+    if( val.i_int < - 1 || val.i_int > 1 ) val.i_int = 0;
+    p_context->strict_std_compliance = val.i_int;
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
@@ -327,10 +336,10 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
 
 #if LIBAVCODEC_BUILD >= 4687
         av_reduce( &p_context->sample_aspect_ratio.num,
-		   &p_context->sample_aspect_ratio.den,
-		   p_enc->fmt_in.video.i_aspect *
-		   (int64_t)p_context->height / p_context->width,
-		   VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
+                   &p_context->sample_aspect_ratio.den,
+                   p_enc->fmt_in.video.i_aspect *
+                   (int64_t)p_context->height / p_context->width,
+                   VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
 #else
         p_context->aspect_ratio = ((float)p_enc->fmt_in.video.i_aspect) /
             VOUT_ASPECT_FACTOR;
@@ -392,6 +401,14 @@ int E_(OpenEncoder)( vlc_object_t *p_this )
         p_context->max_qdiff = 3;
 
         p_context->mb_decision = p_sys->i_hq;
+
+        if( p_sys->i_quality )
+        {
+            p_context->flags |= CODEC_FLAG_QSCALE;
+#if LIBAVCODEC_BUILD >= 4668
+            p_context->global_quality = p_sys->i_quality;
+#endif
+        }
     }
     else if( p_enc->fmt_in.i_cat == AUDIO_ES )
     {
@@ -661,6 +678,8 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
             p_sys->i_last_pts = frame.pts;
         }
     }
+
+    frame.quality = p_sys->i_quality;
 
     i_out = avcodec_encode_video( p_sys->p_context, p_sys->p_buffer_out,
                                   AVCODEC_MAX_VIDEO_FRAME_SIZE, &frame );

@@ -230,3 +230,11 @@ void E_(ClosePostproc)( decoder_t *, void * );
 #define ENC_TRELLIS_TEXT N_( "Enable trellis quantization" )
 #define ENC_TRELLIS_LONGTEXT N_( "Allows you to enable trellis " \
   "quantization (rate distortion for block coefficients)." )
+
+#define ENC_QSCALE_TEXT N_( "Use fixed video quantizer scale" )
+#define ENC_QSCALE_LONGTEXT N_( "Allows you to specify a fixed video " \
+  "quantizer scale for VBR encoding (accepted values: 0.01 to 255.0)." )
+
+#define ENC_STRICT_TEXT N_( "Strict standard compliance" )
+#define ENC_STRICT_LONGTEXT N_( "Allows you to force a strict standard " \
+  "compliance when encoding (accepted values: -1, 0, 1)." )
