@@ -1,2 +1,3 @@
 SOURCES_visual = visual.c \
-		 effects.c
+		 effects.c \
+		 fft.c

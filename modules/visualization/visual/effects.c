@@ -2,7 +2,7 @@
  * effects.c : Effects for the visualization system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: effects.c,v 1.1 2003/08/19 21:20:00 zorglub Exp $
+ * $Id: effects.c,v 1.2 2003/08/29 16:56:43 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -27,7 +27,9 @@
 #include "visual.h"
 #include <math.h>
 
+#include "fft.h"
 
+#define PEAK_SPEED 1
 /*****************************************************************************
  * Argument list parsers                                                     *
  *****************************************************************************/
@@ -37,21 +39,28 @@ int args_getint(char *psz_parse, char * name,const int defaut)
     int i_value;
     if( psz_parse != NULL )
     {
-        if(!strncmp( psz_parse, name, strlen(name) ) )
+        while(1)
         {
-            psz_parse += strlen( name );
-            psz_eof = strchr( psz_parse , ',' );
-            if( !psz_eof)
-                psz_eof = psz_parse + strlen(psz_parse);
-            if( psz_eof )
+            if(!strncmp( psz_parse, name, strlen(name) ) )
             {
-                *psz_eof = '\0' ;
+                psz_parse += strlen( name );
+                psz_eof = strchr( psz_parse , ',' );
+                if( !psz_eof)
+                    psz_eof = psz_parse + strlen(psz_parse);
+                if( psz_eof )
+                {
+                    *psz_eof = '\0' ;
+                }
+                i_value = atoi(++psz_parse);
+                psz_parse= psz_eof;
+                psz_parse++;
+                return i_value;
             }
-            i_value = atoi(++psz_parse);
-            psz_parse= psz_eof;
-            psz_parse++;
-            return i_value;
-        }
+            if( *psz_parse )
+                psz_parse ++;
+            else
+                break;
+        } 
     }
     return defaut;
 }
@@ -63,23 +72,30 @@ char * args_getpsz(char *psz_parse, char * name,const char * defaut)
     char *psz_value;
     if( psz_parse != NULL )
     {
-        if(!strncmp( psz_parse, name, strlen(name) ) )                            
+        while(1)
         {
-            psz_parse += strlen( name );
-            psz_eof = strchr( psz_parse , ',' );
-            if( !psz_eof)
-                psz_eof = psz_parse + strlen(psz_parse);
-            if( psz_eof )
+            if(!strncmp( psz_parse, name, strlen(name) ) )                            
             {
-                *psz_eof = '\0' ;
+                psz_parse += strlen( name );
+                psz_eof = strchr( psz_parse , ',' );
+                if( !psz_eof)
+                    psz_eof = psz_parse + strlen(psz_parse);
+                if( psz_eof )
+                {
+                    *psz_eof = '\0' ;
+                }
+                psz_value = strdup(++psz_parse);
+                psz_parse= psz_eof;
+                psz_parse++;
+                return psz_value;
             }
-            psz_value = strdup(++psz_parse);
-            psz_parse= psz_eof;
-            psz_parse++;
-            return psz_value;
+            if( *psz_parse )
+                psz_parse ++;
+            else
+                break;
         }
     }
-        return strdup(defaut);
+    return strdup(defaut);
 }
 
 
@@ -98,7 +114,287 @@ int dummy_Run( visual_effect_t * p_effect, aout_instance_t *p_aout,
 int spectrum_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                  aout_buffer_t * p_buffer , picture_t * p_picture)
 {
-        return 0;
+    float p_output[FFT_BUFFER_SIZE];  /* Raw FFT Result  */
+    int *height;                      /* Bar heights */
+    int *peaks;                       /* Peaks */
+    int i_nb_bands;                   /* number of bands */
+    int i_band_width;                 /* width of bands */
+    int i_separ;                      /* Should we let blanks ? */
+    int i_amp;                        /* Vertical amplification */
+    int i_peak;                       /* Should we draw peaks ? */
+    char *psz_parse = NULL;           /* Args line */
+    
+    /* Horizontal scale for 20-band equalizer */
+    const int xscale1[]={0,1,2,3,4,5,6,7,8,11,15,20,27,
+                        36,47,62,82,107,141,184,255};
+                        
+    /* Horizontal scale for 80-band equalizer */
+    const int xscale2[] = 
+    {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,
+     19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,
+     35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,
+     52,53,54,55,56,57,58,59,61,63,67,72,77,82,87,93,99,105,
+     110,115,121,130,141,152,163,174,185,255};
+    const int *xscale;
+    const double y_scale =  3.60673760222;  /* (log 256) */
+    
+    fft_state *p_state;                 /* internal FFT data */
+    
+    int i , j , y , k;
+    int i_line;
+    s16 p_dest[FFT_BUFFER_SIZE];          /* Adapted FFT result */
+    s16 p_buffer1[FFT_BUFFER_SIZE];       /* Buffer on which we perform
+                                             the FFT (first channel) */
+
+    float *p_buffl =                     /* Original buffer */
+            (float*)p_buffer->p_buffer;
+
+    s16  *p_buffs;                        /* s16 converted buffer */
+    s16  *p_s16_buff = NULL;                    /* s16 converted buffer */
+    
+    p_s16_buff = (s16*)malloc( 
+              p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(s16));
+
+    if( !p_s16_buff )
+    {
+        msg_Err(p_aout,"Out of memory");
+        return -1;
+    }
+    
+    p_buffs = p_s16_buff;
+    if( p_effect->psz_args )
+    {
+        psz_parse  = strdup( p_effect->psz_args );
+        i_nb_bands = args_getint ( psz_parse , "nb" , 80 );
+        psz_parse  = strdup( p_effect->psz_args );
+        i_separ    = args_getint ( psz_parse , "separ", 1 );
+        psz_parse  = strdup( p_effect->psz_args );
+        i_amp     = args_getint ( psz_parse , "amp", 3 );
+        psz_parse  = strdup( p_effect->psz_args );
+        i_peak     = args_getint ( psz_parse , "peaks", 1 );
+    }
+    else
+    {
+       i_nb_bands = 80;
+       i_separ = 1;
+       i_amp = 3;
+       i_peak = 1;
+    }
+
+    if( i_nb_bands == 20)
+    {
+        xscale = xscale1;
+    }
+    else
+    {
+        i_nb_bands = 80;
+        xscale = xscale2;
+    }
+    
+    if( !p_effect->p_data )
+    {
+        p_effect->p_data=(void *)malloc(i_nb_bands * sizeof(int) );
+        if( !p_effect->p_data)
+        {
+            msg_Err(p_aout,"Out of memory");
+            return -1;
+        }
+        peaks = (int *)p_effect->p_data;
+        for( i = 0 ; i < i_nb_bands ; i++)
+        {
+           peaks[i] = 0;
+        }
+                      
+    }
+    else
+    {
+        peaks =(int *)p_effect->p_data;
+    }
+   
+    
+    height = (int *)malloc( i_nb_bands * sizeof(int) );
+    if( !height)
+    {
+        msg_Err(p_aout,"Out of memory");
+        return -1;
+    }
+    /* Convert the buffer to s16  */
+    /* Pasted from float32tos16.c */
+    for (i = p_buffer->i_nb_samples * p_effect->i_nb_chans; i--; )
+    {
+        float f_in = *p_buffl + 384.0;
+        s32 i_in;
+        i_in = *(s32 *)&f_in;
+        if(i_in >  0x43c07fff ) * p_buffs = 32767;
+        else if ( i_in < 0x43bf8000 ) *p_buffs = -32768;
+        else *p_buffs = i_in - 0x43c00000;
+      
+        p_buffl++ ; p_buffs++ ;
+    }
+    p_state  = fft_init();
+    if( !p_state)
+    {
+        msg_Err(p_aout,"Unable to initialize FFT transform");
+        return -1;
+    }
+    p_buffs = p_s16_buff;
+    for ( i = 0 ; i < FFT_BUFFER_SIZE ; i++)
+    {
+        p_output[i]    = 0;
+        p_buffer1[i] = *p_buffs;
+        p_buffs      = p_buffs + p_effect->i_nb_chans;
+    } 
+    fft_perform( p_buffer1, p_output, p_state);
+    for(i= 0; i< FFT_BUFFER_SIZE ; i++ )
+        p_dest[i] = ( (int) sqrt( p_output [ i + 1 ] ) ) >> 8;
+                
+    for ( i = 0 ; i< i_nb_bands ;i++)
+    {
+        /* We search the maximum on one scale */
+        for( j = xscale[i] , y=0 ; j< xscale[ i + 1 ] ; j++ )
+        {
+            if ( p_dest[j] > y )
+                 y = p_dest[j];
+        }
+        /* Calculate the height of the bar */
+        y >>=5; /* remove some noise */
+        if( y != 0)
+        {
+            height[i] = (int)log(y)* y_scale;
+               if(height[i] > 150)
+                  height[i] = 150;
+        }
+        else
+        {
+            height[i] = 0 ;
+        }
+             
+        /* Draw the bar now */
+        i_band_width = floor( p_effect->i_width / i_nb_bands) ;
+
+        if( i_amp * height[i] > peaks[i])
+        {
+            peaks[i] = i_amp * height[i];
+        }
+        else if (peaks[i] > 0 )
+        {
+            peaks[i] -= PEAK_SPEED;
+            if( peaks[i] < i_amp * height[i] )
+            {
+                peaks[i] = i_amp * height[i];
+            }
+            if( peaks[i] < 0 )
+            {
+                peaks[i] = 0;
+            }
+        }
+
+        if( peaks[i] > 0 && i_peak )
+        {
+            if( peaks[i] >= p_effect->i_height ) 
+                peaks[i] = p_effect->i_height - 2;
+            i_line = peaks[i];
+            
+            for( j = 0 ; j< i_band_width - i_separ; j++)
+            {
+               for( k = 0 ; k< 3 ; k ++)
+               {
+                   /* Draw the peak */
+                     *(p_picture->p[0].p_pixels + 
+                    (p_picture->p[0].i_lines - i_line -1 -k ) * 
+                     p_picture->p[0].i_pitch + (i_band_width*i +j) ) 
+                                    = 0xff;
+
+                    *(p_picture->p[1].p_pixels +
+                     (p_picture->p[1].i_lines - i_line /2 -1 -k/2 ) *
+                     p_picture->p[1].i_pitch + 
+                    ( ( i_band_width * i + j ) /2  ) )
+                                    = 0x00;
+  
+                   if( 0x04 * (i_line + k ) - 0x0f > 0 )
+                   {
+                       if ( 0x04 * (i_line + k ) -0x0f < 0xff)
+                           *(p_picture->p[2].p_pixels  +
+                            (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
+                             p_picture->p[2].i_pitch + 
+                             ( ( i_band_width * i + j ) /2  ) ) 
+                                    = ( 0x04 * ( i_line + k ) ) -0x0f ;
+                       else
+                           *(p_picture->p[2].p_pixels  +
+                            (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
+                             p_picture->p[2].i_pitch + 
+                             ( ( i_band_width * i + j ) /2  ) ) 
+                                    = 0xff; 
+                   }
+                   else
+                   {
+                        *(p_picture->p[2].p_pixels  +
+                         (p_picture->p[2].i_lines - i_line /2 - 1 -k/2 ) *
+                         p_picture->p[2].i_pitch + 
+                         ( ( i_band_width * i + j ) /2  ) ) 
+                               = 0x10 ;
+                   }
+               }
+            } 
+        }
+    
+        if(height[i] * i_amp > p_effect->i_height)
+            height[i] = floor(p_effect->i_height / i_amp );
+
+        for(i_line = 0 ; i_line < i_amp * height[i]; i_line ++ )
+        {
+            for( j = 0 ; j< i_band_width - i_separ ; j++)
+            {
+               *(p_picture->p[0].p_pixels + 
+                 (p_picture->p[0].i_lines - i_line -1) * 
+                  p_picture->p[0].i_pitch + (i_band_width*i +j) ) = 0xff;
+
+                *(p_picture->p[1].p_pixels +
+                 (p_picture->p[1].i_lines - i_line /2 -1) *
+                 p_picture->p[1].i_pitch + 
+                 ( ( i_band_width * i + j ) /2  ) ) = 0x00;
+
+               
+               if( 0x04 * i_line - 0x0f > 0 )
+               {
+                    if( 0x04 * i_line - 0x0f < 0xff )
+                         *(p_picture->p[2].p_pixels  +
+                          (p_picture->p[2].i_lines - i_line /2 - 1) *
+                           p_picture->p[2].i_pitch + 
+                           ( ( i_band_width * i + j ) /2  ) ) = 
+                               ( 0x04 * i_line) -0x0f ;
+                    else
+                         *(p_picture->p[2].p_pixels  +
+                          (p_picture->p[2].i_lines - i_line /2 - 1) *
+                           p_picture->p[2].i_pitch + 
+                           ( ( i_band_width * i + j ) /2  ) ) = 
+                                       0xff;
+               }
+               else
+               {
+                    *(p_picture->p[2].p_pixels  +
+                     (p_picture->p[2].i_lines - i_line /2 - 1) *
+                     p_picture->p[2].i_pitch + 
+                     ( ( i_band_width * i + j ) /2  ) ) = 
+                            0x10 ;
+               }
+            }
+        }
+    }
+       
+    fft_close( p_state );
+   
+    if( p_s16_buff != NULL ) 
+    {
+        free( p_s16_buff );
+        p_s16_buff = NULL;
+    }
+   
+    if(height) free(height);
+   
+    if(psz_parse) free(psz_parse);
+    
+    return 0;
 }
 
         
@@ -172,15 +468,7 @@ int random_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     if( p_effect->psz_args )
     {
         psz_parse = strdup( p_effect->psz_args );
-        while(1)
-        {
-            i_nb_plots = args_getint ( psz_parse , "nb" , 200 );
-            if(i_nb_plots) break;
-            if( *psz_parse )
-                 psz_parse ++;
-            else
-                break;
-        }
+        i_nb_plots = args_getint ( psz_parse , "nb" , 200 );
     }
     else
     {
@@ -194,6 +482,61 @@ int random_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         i_u = rand() % 256;
         i_v = rand() % 256;
         *(p_picture->p[0].p_pixels + i_position )= i_u;
+        *(p_picture->p[1].p_pixels + i_position/4) = i_v;
+        *(p_picture->p[2].p_pixels + i_position/4) = i_y;
     }
     return 0;
 }
+
+/*****************************************************************************
+ * blur_Run:  blur effect
+ *****************************************************************************/
+#if 0 
+  /* This code is totally crappy */
+int blur_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
+              aout_buffer_t * p_buffer , picture_t * p_picture)
+{
+    uint8_t * p_pictures;
+    int i,j; 
+    int i_size;   /* Total size of one image */
+    
+    i_size = (p_picture->p[0].i_pitch * p_picture->p[0].i_lines +
+              p_picture->p[1].i_pitch * p_picture->p[1].i_lines +
+              p_picture->p[2].i_pitch * p_picture->p[2].i_lines );
+    
+    if( !p_effect->p_data )
+    {
+        p_effect->p_data=(void *)malloc( 5 * i_size *sizeof(uint8_t));
+        
+        if( !p_effect->p_data)
+        {
+            msg_Err(p_aout,"Out of memory");
+            return -1;
+        }
+        p_pictures = (uint8_t *)p_effect->p_data;
+    }
+    else
+    {
+        p_pictures =(uint8_t *)p_effect->p_data;
+    }
+
+    for( i = 0 ; i < 5 ; i++)
+    {
+        for ( j = 0 ; j< p_picture->p[0].i_pitch * p_picture->p[0].i_lines; i++)
+            p_picture->p[0].p_pixels[j] = 
+                    p_pictures[i * i_size + j] * (100 - 20 * i) /100 ;
+        for ( j = 0 ; j< p_picture->p[1].i_pitch * p_picture->p[1].i_lines; i++)
+            p_picture->p[1].p_pixels[j] = 
+                    p_pictures[i * i_size +
+                    p_picture->p[0].i_pitch * p_picture->p[0].i_lines + j ];
+        for ( j = 0 ; j< p_picture->p[2].i_pitch * p_picture->p[2].i_lines; i++)
+            p_picture->p[2].p_pixels[j] = 
+                    p_pictures[i * i_size +
+                    p_picture->p[0].i_pitch * p_picture->p[0].i_lines +
+                    p_picture->p[1].i_pitch * p_picture->p[1].i_lines 
+                    + j ];
+    }
+
+    memcpy ( &p_pictures[ i_size ] , &p_pictures[0] , 4 * i_size * sizeof(uint8_t) );
+}
+#endif

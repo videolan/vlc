@@ -1,5 +1,5 @@
 List of vlc plugins (221)
-$Id: LIST,v 1.10 2003/08/10 12:45:52 zorglub Exp $
+$Id: LIST,v 1.11 2003/08/29 16:56:43 zorglub Exp $
 
  * a52: A/52 basic parser
 
@@ -91,6 +91,8 @@ $Id: LIST,v 1.10 2003/08/10 12:45:52 zorglub Exp $
 
  * downmixsse: SSE accelerated version of downmix.
 
+ * dshow: DirectShow access plugin for encoding cards under Windows
+
  * dts: DTS basic parser
 
  * dtstospdif: Audio converter that encapsulates DTS into S/PDIF
@@ -156,6 +158,8 @@ $Id: LIST,v 1.10 2003/08/10 12:45:52 zorglub Exp $
  * gnome: interface using the GNOME widget set.
  
  * gnome_main: Gtk+ wrapper for gtk_main
+
+ * goom: visualisation plugin based on goom
 
  * gtk2: interface using the Gtk2 widget set.
 
@@ -290,6 +294,8 @@ $Id: LIST,v 1.10 2003/08/10 12:45:52 zorglub Exp $
 
  * ncurses: interface module using the ncurses library.
 
+ * ntservice: run VLC as a NT service
+
  * ogg: input module for OGG decapsulation.
 
  * oss: audio output module using the OSS /dev/dsp interface.
@@ -413,6 +419,8 @@ $Id: LIST,v 1.10 2003/08/10 12:45:52 zorglub Exp $
 
  * vcd: input module for accessing Video CDs.
 
+ * visual: visualisation system
+
  * vorbis: a vorbis audio decoder using the libvorbis library.
 
  * vout_directx: video output module using the DirectX API.
@@ -433,8 +441,6 @@ $Id: LIST,v 1.10 2003/08/10 12:45:52 zorglub Exp $
 
  * x11: video output module using the X11 API.
 
- * xmga: X11 MGA video_output plugin
- 
  * xosd: X On Screen Display interface
 
  * xvid: Decoder for the Xvid codec, using libxvidcore

@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.1 2003/08/19 21:20:00 zorglub Exp $
+ * $Id: visual.c,v 1.2 2003/08/29 16:56:43 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -97,7 +97,18 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_filter->p_sys->i_height = config_GetInt( p_filter , "effect-height");
-    p_filter->p_sys->i_width = config_GetInt( p_filter , "effect-width");
+    p_filter->p_sys->i_width  = config_GetInt( p_filter , "effect-width");
+
+    if ( p_filter->p_sys->i_height < 20 ) 
+        p_filter->p_sys->i_height =  20;
+    if ( p_filter->p_sys->i_width < 20 ) 
+        p_filter->p_sys->i_width =  20;
+    
+    if( (p_filter->p_sys->i_height % 2 ) != 0 )
+        p_filter->p_sys->i_height --;
+   
+    if( (p_filter->p_sys->i_width % 2 ) != 0 )
+        p_filter->p_sys->i_width --;
     
     /* Parse the effect list */
     psz_effects = config_GetPsz( p_filter, "effect-list" );
@@ -113,40 +124,6 @@ static int Open( vlc_object_t *p_this )
 
     p_current_effect = p_filter->p_sys->p_first_effect;
     p_current_effect->p_next = NULL;
-    
-#define SEARCH(name , function )                                              \
-    if(!strncmp( psz_effects , name, strlen(name) ) )                         \
-    {                                                                         \
-        p_current_effect->p_next =                                            \
-                (visual_effect_t *)malloc( sizeof( visual_effect_t ) );       \
-        if( !p_current_effect )                                               \
-        {                                                                     \
-            msg_Err( p_filter, "Out of memory" );                             \
-        }                                                                     \
-        p_current_effect = p_current_effect -> p_next;                        \
-        p_current_effect->pf_run = NULL;                                      \
-        p_current_effect->p_next = NULL;                                      \
-        p_current_effect->i_width = p_filter->p_sys->i_width;                 \
-        p_current_effect->i_height = p_filter->p_sys->i_height;               \
-        p_current_effect->pf_run = function ;                                 \
-        p_current_effect->psz_args  = NULL;                                   \
-        psz_boa = strchr( psz_effects, '{' );                                 \
-        if( psz_boa )                                                         \
-        {                                                                     \
-            psz_eoa = strchr( psz_effects, '}');                              \
-            if( ! psz_eoa )                                                   \
-            {                                                                 \
-               msg_Err( p_filter, "Unable to parse effect list. Aborting");   \
-               return -1;                                                     \
-            }                                                                 \
-            *psz_eoa = '\0';                                                  \
-            p_current_effect->psz_args = strdup(++psz_boa);                   \
-            psz_effects = psz_eoa;                                            \
-        }                                                                     \
-        msg_Dbg(p_filter, "Adding filter: %s ( %s )",name,                    \
-                        p_current_effect->psz_args);                          \
-    }
-    
     while(1)
     {
         psz_eof = strchr( psz_effects , ';'  );
@@ -159,26 +136,62 @@ static int Open( vlc_object_t *p_this )
         {
             *psz_eof = '\0';
         }
-    
 
-        SEARCH("dummy",dummy_Run);
-        SEARCH("scope",scope_Run);
-        SEARCH("random",random_Run);
-        SEARCH("spectrum",spectrum_Run);
-        
+        p_current_effect->p_next =
+                (visual_effect_t *)malloc( sizeof( visual_effect_t ) );
+        if( !p_current_effect )
+        {
+            msg_Err( p_filter, "Out of memory" );
+        }
+        p_current_effect = p_current_effect -> p_next;
+        p_current_effect->pf_run = NULL;
+        p_current_effect->p_next = NULL;
+        p_current_effect->i_width = p_filter->p_sys->i_width;
+        p_current_effect->i_height = p_filter->p_sys->i_height;
+        p_current_effect->p_data = NULL;
+
+        if(! strncasecmp(psz_effects,"dummy",5))
+            p_current_effect->pf_run = dummy_Run;
+        else if(! strncasecmp(psz_effects,"scope",5) )
+            p_current_effect->pf_run = scope_Run;
+        else if(! strncasecmp(psz_effects,"spectrum",8) )
+            p_current_effect->pf_run = spectrum_Run;
+        else if(! strncasecmp(psz_effects,"random",6) )
+            p_current_effect->pf_run = random_Run;
+#if 0
+        else if(! strncasecmp(psz_effects,"blur",4) )
+            p_current_effect->pf_run = blur_Run;
+#endif
+        p_current_effect->psz_args  = NULL;
+        p_current_effect->i_nb_chans =
+                aout_FormatNbChannels( &p_filter->input);
+        psz_boa = strchr( psz_effects, '{' );
+        if( psz_boa )
+        {
+            psz_eoa = strchr( psz_effects, '}');
+            if( ! psz_eoa )
+            {
+               msg_Err( p_filter, "Unable to parse effect list. Aborting");
+               return -1;
+            }
+            *psz_eoa = '\0';
+            p_current_effect->psz_args = strdup(++psz_boa);
+            psz_effects = psz_eoa;
+        }
         psz_effects =  psz_eof;
         psz_effects ++;
 
-        if( !* psz_effects || b_end == VLC_TRUE )
+        if( b_end == VLC_TRUE )
             break;
     }
                 
     p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place= 0;
+    p_filter->b_in_place= 1;
 
     /* Open the video output */
     p_filter->p_sys->p_vout =
-         vout_Create( p_filter, p_filter->p_sys->i_width, 
+         vout_Request( p_filter, NULL,
+                         p_filter->p_sys->i_width, 
                          p_filter->p_sys->i_height,
                   VLC_FOURCC('I','4','2','0'), 
                   VOUT_ASPECT_FACTOR * p_filter->p_sys->i_width/
@@ -315,6 +328,8 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
 
     while( p_current_effect )  
     {
+
+#if 1
         /* FIXME: Find why it segfaults when we directly call
          * p_current_effect->pf_run(....)
          *  (segfault in errno()  ) */
@@ -334,7 +349,15 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
         {
             spectrum_Run(p_current_effect, p_aout, p_out_buf , p_outpic );
         }
-            
+#if 0
+        else if (p_current_effect->pf_run == blur_Run )
+        {
+            blur_Run(p_current_effect, p_aout, p_out_buf , p_outpic );
+        }
+#endif
+#else
+        p_current_effect->pf_run(p_current_effect, p_aout, p_out_buf , p_outpic );
+#endif
         p_current_effect = p_current_effect->p_next;
     }
    
@@ -343,7 +366,6 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     
     vout_DisplayPicture ( p_filter->p_sys->p_vout, p_outpic );
 
-    
 }
 
 /*****************************************************************************
@@ -353,12 +375,23 @@ static void Close( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
+    visual_effect_t *p_old;
+    visual_effect_t *p_cur = p_filter->p_sys->p_first_effect;
+    
     if( p_filter->p_sys->p_vout ) 
     {
         vlc_object_detach( p_filter->p_sys->p_vout) ;
         vout_Destroy( p_filter->p_sys->p_vout );
     }
-    
+   
+    /* Free the list */ 
+    while( p_cur )
+    {
+        p_old = p_cur;
+        p_cur = p_cur->p_next;
+        if( p_old ) free( p_old );
+    }
+                    
     if( p_filter->p_sys != NULL )
         free( p_filter->p_sys);
 }

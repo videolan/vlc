@@ -2,7 +2,7 @@
  * visual.h : Header for the visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.h,v 1.1 2003/08/19 21:20:00 zorglub Exp $
+ * $Id: visual.h,v 1.2 2003/08/29 16:56:43 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -51,6 +51,7 @@ typedef struct visual_effect_t
     int        i_width;
     int        i_height;
     char *     psz_args; 
+    int        i_nb_chans;
 } visual_effect_t ;
 
 
@@ -71,7 +72,10 @@ int random_Run
         (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
 int spectrum_Run
         (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
-
+#if 0
+int blur_Run
+        (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
+#endif
 
 /* Default vout size */       
 #define VOUT_WIDTH 320
