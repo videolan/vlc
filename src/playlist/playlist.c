@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.24 2002/12/03 16:29:04 gitan Exp $
+ * $Id: playlist.c,v 1.25 2002/12/03 23:36:41 gitan Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -103,8 +103,27 @@ void playlist_Destroy( playlist_t * p_playlist )
 int playlist_Add( playlist_t *p_playlist, const char * psz_target,
                                           int i_mode, int i_pos )
 {
-    playlist_item_t *p_item;
+    playlist_item_t * p_item; 
+    
+    p_item = malloc( sizeof( playlist_item_t ) );
+    if( p_item == NULL )
+    {
+        msg_Err( p_playlist, "out of memory" );
+    }
 
+    p_item->psz_name = strdup( psz_target );
+    p_item->psz_uri  = strdup( psz_target );
+    p_item->i_type = 0;
+    p_item->i_status = 0;
+    p_item->b_autodeletion = VLC_FALSE;
+
+    return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
+}
+
+
+int playlist_AddItem( playlist_t *p_playlist, playlist_item_t * p_item,
+                int i_mode, int i_pos)
+{
 
     vlc_mutex_lock( &p_playlist->object_lock );
 
@@ -120,10 +139,17 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
          {
              for ( j = 0; j < p_playlist->i_size; j++ )
              {
-                 if ( !strcmp( p_playlist->pp_items[j]->psz_name, psz_target ) )
+                 if ( !strcmp( p_playlist->pp_items[j]->psz_uri, p_item->psz_uri ) )
                  {
-                      msg_Dbg( p_playlist, "item « %s » already enqued", 
-                                        psz_target );
+                      if( p_item->psz_name ) 
+                      {
+                          free( p_item->psz_name );
+                      }
+                      if( p_item->psz_uri )
+                      {
+                          free( p_item->psz_uri );
+                      }
+                      free( p_item );
                       vlc_mutex_unlock( &p_playlist->object_lock );
                       return 0;   
                  }
@@ -134,19 +160,9 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
     }
 
     
-    msg_Dbg( p_playlist, "adding playlist item « %s »", psz_target );
+    msg_Dbg( p_playlist, "adding playlist item « %s »", p_item->psz_name );
     
     /* Create the new playlist item */
-    p_item = malloc( sizeof( playlist_item_t ) );
-    if( p_item == NULL )
-    {
-        msg_Err( p_playlist, "out of memory" );
-    }
-
-    p_item->psz_name = strdup( psz_target );
-    p_item->i_type = 0;
-    p_item->i_status = 0;
-    p_item->b_autodeletion = VLC_FALSE;
 
 
     /* Do a few boundary checks and allocate space for the item */

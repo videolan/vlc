@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.1 2002/12/03 16:29:04 gitan Exp $
+ * $Id: sap.c,v 1.2 2002/12/03 23:36:41 gitan Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -62,8 +62,8 @@
 
 #define MAX_LINE_LENGTH 256
 
-#define HELLO_PORT 9875  // SAP is aloways on that port
-#define HELLO_GROUP "239.255.255.255"   // FIX ME !!!!!!!!!!!!!!!
+#define HELLO_PORT 9875  /* SAP is always on that port */
+#define HELLO_GROUP "239.255.255.255"   
 #define ADD_SESSION 1;
 
 /*****************************************************************************
@@ -79,7 +79,6 @@ static int Kill          ( intf_thread_t * );
 static ssize_t NetRead    ( intf_thread_t*, int , byte_t *, size_t );
 
 typedef struct  sess_descr_s {
-/*    char *psz_version; // v field (protocol version) */
     char *psz_origin; /* o field (username sess-id sess-version 
                          nettype addrtype addr*/
     char *psz_sessionname; 
@@ -97,9 +96,8 @@ typedef struct  sess_descr_s {
 static int parse_sap ( char ** );
 static int packet_handle ( char **, intf_thread_t * );
 
-static sess_descr_t *  parse_sdp(char *  psz_pct) ;
-
-
+static sess_descr_t *  parse_sdp( char *,intf_thread_t * ) ;
+static playlist_item_t * sess_toitem( sess_descr_t * );
 
 
 /*****************************************************************************
@@ -137,7 +135,6 @@ static void Run( intf_thread_t *p_intf )
     char *psz_addr;
     char *psz_network = NULL;
     struct sockaddr_in addr;
-    struct ip_mreq mreq;
     int fd,addrlen;
     char *psz_buf;
 
@@ -185,7 +182,7 @@ static void Run( intf_thread_t *p_intf )
         
         if( i_read < 0 )
         {
-            msg_Err( p_intf, "argggg" );
+            msg_Err( p_intf, "Cannot read in the socket" );
         }
         if( i_read == 0 )
         {
@@ -193,7 +190,6 @@ static void Run( intf_thread_t *p_intf )
         }
 
 
-        msg_Dbg( p_intf, "New packet arrived" );
         packet_handle( &psz_buf, p_intf  );
                                    
     }
@@ -214,7 +210,25 @@ static int Kill( intf_thread_t *p_intf )
     return VLC_SUCCESS;
 }
 
- 
+/*******************************************************************
+ * sess_toitem : changes a sess_descr_t into a playlist_item_t
+ *******************************************************************/
+
+static playlist_item_t *  sess_toitem( sess_descr_t * p_sd )
+{
+    playlist_item_t * p_item;
+    
+    p_item = malloc( sizeof( playlist_item_t ) );
+    p_item->psz_name = p_sd->psz_sessionname;
+    p_item->psz_uri = p_sd->psz_uri; 
+    p_item->i_type = 0;
+    p_item->i_status = 0;
+    p_item->b_autodeletion = VLC_FALSE; 
+
+    return p_item;
+
+}
+
 /********************************************************************
  * parse_sap : Takes care of the SAP headers
  ********************************************************************
@@ -238,32 +252,34 @@ static int parse_sap( char **  ppsz_sa_packet ) {  /* Dummy Parser : does nothin
 
 static int packet_handle( char **  ppsz_packet, intf_thread_t * p_intf )  {
     int j=0;
-    sess_descr_t * sd;
-    playlist_t *p_playlist; 
+    sess_descr_t * p_sd;
+    playlist_t *p_playlist;
+    playlist_item_t *p_item;
     char *  psz_enqueue;
-    char *  psz_udp = "udp://@\0";
     int i;
     
     j=parse_sap( ppsz_packet ); 
     
     if(j != 0) {
-        msg_Dbg( p_intf, "SAP packet parsed");
-        sd = parse_sdp( * ppsz_packet ); 
+        p_sd = parse_sdp( *ppsz_packet, p_intf ); 
         
-        i = strlen( psz_udp ) + strlen( sd->psz_uri )+1 ;
+        i = strlen( "udp://@\0" ) + strlen( p_sd->psz_uri )+1 ;
         psz_enqueue = malloc ( i * sizeof (char) );
         memset( psz_enqueue, '\0',i );
-        strcat ( psz_enqueue,psz_udp );
-        strcat ( psz_enqueue,sd->psz_uri );
+        strcat ( psz_enqueue,"udp://@\0" );
+        strcat ( psz_enqueue,p_sd->psz_uri );
+        free( p_sd->psz_uri );
+        p_sd->psz_uri = psz_enqueue;
         
+        p_item = sess_toitem ( p_sd );
         p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
-        playlist_Add ( p_playlist, psz_enqueue, PLAYLIST_CHECK_INSERT, PLAYLIST_END); 
-        msg_Dbg(p_intf,"SAP packet : End of treatment");
+
+        playlist_AddItem ( p_playlist, p_item, PLAYLIST_CHECK_INSERT, PLAYLIST_END);
         vlc_object_release( p_playlist );
         
+        free ( p_sd );
         return 1;
     }
-    free ( sd );
     return 0; // Invalid Packet 
 }
         
@@ -276,7 +292,7 @@ static int packet_handle( char **  ppsz_packet, intf_thread_t * p_intf )  {
  * Make a sess_descr_t with a psz
  ******************************************************/
 
-static sess_descr_t *  parse_sdp(char *  psz_pct) 
+static sess_descr_t *  parse_sdp( char *  psz_pct, intf_thread_t * p_intf ) 
 {
     int j,k;
     char **  ppsz_fill;
@@ -289,8 +305,8 @@ static sess_descr_t *  parse_sdp(char *  psz_pct)
        {           
            switch(psz_pct[(j-1)]) {
 /*               case ('v') : {
-//               ppsz_fill = & sd->psz_version;
-//               break;
+                 ppsz_fill = & sd->psz_version;
+                 break;
             } */
             case ('o') : {
                ppsz_fill = & sd->psz_origin;
@@ -334,7 +350,7 @@ static sess_descr_t *  parse_sdp(char *  psz_pct)
             }
 
             default : { 
-               fprintf( stderr,"Warning : Ignored field \"%c\" \n",psz_pct[j-1] );
+/*               msg_Dbg( p_intf, "Warning : Ignored field \"%c\" \n",psz_pct[j-1] ); */
                ppsz_fill = NULL;
             }
 
