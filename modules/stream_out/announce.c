@@ -94,14 +94,14 @@ char * SDPGenerateUDP(char * psz_name_arg,char * psz_url_arg)
         p_url->i_port = DEFAULT_PORT;
     }
 
-    psz_sdp = malloc( sizeof("v=0\n"
-                   "o=VideoLAN 3247692199 3247895918 IN IP4 VideoLAN\n"
-                   "s=\n"
-                   "u=VideoLAN\n"
-                   "t=0 0\n"
-                   "m=video  udp 33\n"
-                   "c=IN IP4 /15\n"
-                   "a=type:test\n")
+    psz_sdp = malloc( sizeof("v=0\r\n"
+                   "o=VideoLAN 3247692199 3247895918 IN IP4 VideoLAN\r\n"
+                   "s=\r\n"
+                   "u=VideoLAN\r\n"
+                   "t=0 0\r\n"
+                   "m=video  udp 33\r\n"
+                   "c=IN IP4 /15\r\n"
+                   "a=type:test\r\n")
            + strlen(psz_name_arg)
            + 20                             /*lengh of a 64 bits int"*/
            + strlen(p_url->psz_host)+1);
@@ -112,13 +112,13 @@ char * SDPGenerateUDP(char * psz_name_arg,char * psz_url_arg)
         return NULL;
     }
 
-    sprintf( psz_sdp,"v=0\n"
-                      "o=VideoLAN 3247692199 3247895918 IN IP4 VideoLAN\n"
-                      "s=%s\n"
-                      "u=VideoLAN\n"
-                      "t=0 0\n"
-                      "m=video %i udp 33\n"
-                      "c=IN IP4 %s/15\n"
+    sprintf( psz_sdp,"v=0\r\n"
+                      "o=VideoLAN 3247692199 3247895918 IN IP4 VideoLAN\r\n"
+                      "s=%s\r\n"
+                      "u=VideoLAN\r\n"
+                      "t=0 0\r\n"
+                      "m=video %i udp 33\r\n"
+                      "c=IN IP4 %s/15\r\n"
                       "a=type:test\n",
              psz_name_arg, p_url->i_port, p_url->psz_host );
 
