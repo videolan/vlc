@@ -436,6 +436,7 @@ void Playlist::UpdateNode( playlist_t *p_playlist, playlist_item_t *p_node,
         {
         }
     }
+    treectrl->SetItemImage( node, p_node->input.i_type );
 
 }
 
@@ -525,6 +526,7 @@ void Playlist::UpdateTreeItem( playlist_t *p_playlist, wxTreeItemId item )
                     wxString(wxL2U(psz_duration ) ) + wxU( ")") );
     }
     treectrl->SetItemText( item , msg );
+    treectrl->SetItemImage( item, p_item->input.i_type );
 
     if( p_playlist->status.p_item == p_item )
     {
