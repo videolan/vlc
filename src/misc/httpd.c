@@ -1435,7 +1435,7 @@ static void httpd_ClientInit( httpd_client_t *cl )
 {
     cl->i_state = HTTPD_CLIENT_RECEIVING;
     cl->i_activity_date = mdate();
-    cl->i_activity_timeout = 50000000;
+    cl->i_activity_timeout = I64C(10000000);
     cl->i_buffer_size = 10000;
     cl->i_buffer = 0;
     cl->p_buffer = malloc( cl->i_buffer_size );
@@ -1843,6 +1843,10 @@ static void httpd_ClientRecv( httpd_client_t *cl )
     }
     cl->i_activity_date = mdate();
 
+    /* XXX: for QT I have to disable timeout. Try to find why */
+    if( cl->query.i_proto == HTTPD_PROTO_RTSP )
+        cl->i_activity_timeout = 0;
+
     /* Debugging only */
     if( cl->i_state == HTTPD_CLIENT_RECEIVE_DONE )
     {
@@ -2004,7 +2008,8 @@ static void httpd_HostThread( httpd_host_t *host )
 
             if( cl->i_ref < 0 || ( cl->i_ref == 0 &&
                 ( cl->i_state == HTTPD_CLIENT_DEAD ||
-                  cl->i_activity_date + cl->i_activity_timeout < mdate() ) ) )
+                  ( cl->i_activity_timeout > 0 &&
+                    cl->i_activity_date+cl->i_activity_timeout < mdate()) ) ) )
             {
                 char *ip;
 
