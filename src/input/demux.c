@@ -323,14 +323,18 @@ void stream_DemuxSend( stream_t *s, block_t *p_block )
 void stream_DemuxDelete( stream_t *s )
 {
     d_stream_sys_t *p_sys = (d_stream_sys_t*)s->p_sys;
+    block_t *p_empty;
 
     s->b_die = VLC_TRUE;
-
     if( p_sys->p_demux ) p_sys->p_demux->b_die = VLC_TRUE;
+    p_empty = block_New( s, 1 ); p_empty->i_buffer = 0;
+    block_FifoPut( p_sys->p_fifo, p_empty );
     vlc_thread_join( s );
 
     if( p_sys->p_demux ) demux2_Delete( p_sys->p_demux );
     if( p_sys->p_block ) block_Release( p_sys->p_block );
+
+    block_FifoRelease( p_sys->p_fifo );
     free( p_sys->psz_name );
     free( p_sys );
 
