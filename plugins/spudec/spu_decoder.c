@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.27 2002/06/02 23:11:48 sam Exp $
+ * $Id: spu_decoder.c,v 1.28 2002/06/05 18:18:49 stef Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -214,6 +214,8 @@ static void EndThread( spudec_thread_t *p_spudec )
                 vout_DestroySubPicture( p_spudec->p_vout, p_subpic );
             }
         }
+
+        vlc_object_release( p_spudec->p_vout );
     }
     
     free( p_spudec );
