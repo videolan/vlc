@@ -2,7 +2,7 @@
 * mosaic.c : Mosaic video plugin for vlc
 *****************************************************************************
 * Copyright (C) 2004-2005 VideoLAN
-* $Id: $
+* $Id$
 *
 * Authors: Antoine Cellerier <dionoea@via.ecp.fr>
 *
@@ -239,6 +239,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
 
+    p_picture_vout = val.p_address;
+
     /* Allocate the subpicture internal data. */
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu )
@@ -246,7 +248,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         return NULL;
     }
 
-    p_picture_vout = val.p_address;
+    /* Initialize subpicture */
+    p_spu->i_channel = 0;
+    p_spu->i_start  = date;
+    p_spu->i_stop = 0;
+    p_spu->b_ephemer = VLC_TRUE;
+    p_spu->i_alpha = p_sys->i_alpha;
 
     vlc_mutex_lock( &p_picture_vout->lock );
 
@@ -327,6 +334,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             p_picture_vout->p_pic[i_index].p_picture, &fmt_in, &fmt_middle );
         if( !p_middle )
         {
+            msg_Err( p_filter, "image resizing failed" );
+            p_filter->pf_sub_buffer_del( p_filter, p_spu );
             vlc_mutex_unlock( &p_picture_vout->lock );
             return NULL;
         }
@@ -335,6 +344,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                  p_middle, &fmt_middle, &fmt_out );
         if( !p_converted )
         {
+            msg_Err( p_filter, "image chroma convertion failed" );
+            p_filter->pf_sub_buffer_del( p_filter, p_spu );
             vlc_mutex_unlock( &p_picture_vout->lock );
             return NULL;
         }
@@ -376,6 +387,19 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
                             * ( p_sys->i_height / p_sys->i_rows
                                 + p_sys->i_hborder );
         }
+
+        if( 1 )
+        {
+            uint8_t *p_a = p_region->picture.A_PIXELS;
+            int i_pitch = p_region->picture.Y_PITCH;
+            int x,y;
+
+            for( x = 0, y=0; x+y < 20; x++, y++){
+                p_a[ x + i_pitch * y ] = 0xff;
+            }
+
+        }
+
         if( p_region_prev == NULL ){
             p_spu->p_region = p_region;
         } else {
@@ -392,20 +416,12 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     vlc_mutex_unlock( &p_picture_vout->lock );
 
-    /* Initialize subpicture */
-    p_spu->i_channel = 0;
-    p_spu->i_start  = date;
-    p_spu->i_stop = 0;
-    p_spu->b_ephemer = VLC_TRUE;
-    p_spu->i_alpha = p_sys->i_alpha;
-
     return p_spu;
 }
 
 /*****************************************************************************
 * Callback to update params on the fly
 *****************************************************************************/
-
 
 static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
                             vlc_value_t oldval, vlc_value_t newval,
