@@ -142,7 +142,7 @@ static void Run( intf_thread_t *p_intf )
         {
             vlc_value_t keyval;
 
-            if( strncmp( "key-", c, 4 )
+            if( strncmp( "key-", c, 4 ) )
             {
                 msg_Err( p_intf, "This doesn't appear to be a valid keycombo lirc sent us. Please look at the doc/lirc/example.lirc file in VLC" );
                 break;
