@@ -2,7 +2,7 @@
  * chroma.c: chroma conversion using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: chroma.c,v 1.6 2003/11/26 22:18:29 gbazin Exp $
+ * $Id: chroma.c,v 1.7 2004/02/27 14:02:05 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -93,6 +93,7 @@ int E_(OpenChroma)( vlc_object_t *p_this )
             break;
 
         case VLC_FOURCC('I','4','1','0'):
+        case VLC_FOURCC('Y','V','U','9'):
             i_ffmpeg_chroma[i] = PIX_FMT_YUV410P;
             break;
 
@@ -174,13 +175,15 @@ static void ChromaConversion( vout_thread_t *p_vout,
     }
 
     /* Special cases */
-    if( p_vout->chroma.p_sys->i_src_vlc_chroma == VLC_FOURCC('Y','V','1','2') )
+    if( p_vout->chroma.p_sys->i_src_vlc_chroma == VLC_FOURCC('Y','V','1','2') ||
+        p_vout->chroma.p_sys->i_src_vlc_chroma == VLC_FOURCC('Y','V','U','9') )
     {
         /* Invert U and V */
         src_pic.data[1] = p_src->p[2].p_pixels;
         src_pic.data[2] = p_src->p[1].p_pixels;
     }
-    if( p_vout->chroma.p_sys->i_dst_vlc_chroma == VLC_FOURCC('Y','V','1','2') )
+    if( p_vout->chroma.p_sys->i_dst_vlc_chroma == VLC_FOURCC('Y','V','1','2') ||
+        p_vout->chroma.p_sys->i_dst_vlc_chroma == VLC_FOURCC('Y','V','U','9') )
     {
         /* Invert U and V */
         dest_pic.data[1] = p_dest->p[2].p_pixels;

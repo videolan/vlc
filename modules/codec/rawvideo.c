@@ -2,7 +2,7 @@
  * rawvideo.c: Pseudo video decoder/packetizer for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.12 2004/02/22 15:57:41 fenrir Exp $
+ * $Id: rawvideo.c,v 1.13 2004/02/27 14:02:05 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -92,6 +92,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('I','Y','U','V'):
         case VLC_FOURCC('I','4','1','1'):
         case VLC_FOURCC('I','4','1','0'):
+        case VLC_FOURCC('Y','V','U','9'):
 
         /* Packed YUV */
         case VLC_FOURCC('Y','U','Y','2'):
