@@ -3,6 +3,7 @@
 #include <vlc/intf.h>
 #include <vlc/vout.h>
 #include <vlc/aout.h>
+#include <vlc_demux.h>
 
 #include <osd.h>
 
@@ -47,13 +48,17 @@ long long mediacontrol_unit_convert( input_thread_t *p_input,
     {
     case mediacontrol_MediaTime:
         if( to == mediacontrol_ByteCount )
-            return value * 50 * p_input->stream.i_mux_rate / 1000;
-
+        {
+            /* FIXME */
+            /* vlc < 0.8 API */
+            /* return value * 50 * p_input->stream.i_mux_rate / 1000; */
+            return 0;
+        }
         if( to == mediacontrol_SampleCount )
         {
             double f_fps;
 
-            if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+            if( demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
                 return 0;
             else
                 return( value * f_fps / 1000.0 );
@@ -66,11 +71,16 @@ long long mediacontrol_unit_convert( input_thread_t *p_input,
     {
         double f_fps;
 
-        if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+	if( demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
             return 0;
 
         if( to == mediacontrol_ByteCount )
-            return ( long long )( value * 50 * p_input->stream.i_mux_rate / f_fps );
+        {
+            /* FIXME */
+            /* vlc < 0.8 API */
+/*             return ( long long )( value * 50 * p_input->stream.i_mux_rate / f_fps ); */
+            return 0;
+        }
 
         if( to == mediacontrol_MediaTime )
             return( long long )( value * 1000.0 / ( double )f_fps );
@@ -79,24 +89,28 @@ long long mediacontrol_unit_convert( input_thread_t *p_input,
         break;
     }
     case mediacontrol_ByteCount:
-        if( p_input->stream.i_mux_rate == 0 )
-            return 0;
+        /* FIXME */
+        return 0;
+/* vlc < 0.8 API: */
 
-        /* Convert an offset into milliseconds. Taken from input_ext-intf.c.
-           The 50 hardcoded constant comes from the definition of i_mux_rate :
-           i_mux_rate : the rate we read the stream (in units of 50 bytes/s) ;
-           0 if undef */
-        if( to == mediacontrol_MediaTime )
-            return ( long long )( 1000 * value / 50 / p_input->stream.i_mux_rate );
-
-        if( to == mediacontrol_SampleCount )
-        {
-            double f_fps;
-            if( demux_Control( p_input, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
-                return 0;
-            else
-                return ( long long )( value * f_fps / 50 / p_input->stream.i_mux_rate );
-        }
+//         if( p_input->stream.i_mux_rate == 0 )
+//             return 0;
+// 
+//         /* Convert an offset into milliseconds. Taken from input_ext-intf.c.
+//            The 50 hardcoded constant comes from the definition of i_mux_rate :
+//            i_mux_rate : the rate we read the stream (in units of 50 bytes/s) ;
+//            0 if undef */
+//         if( to == mediacontrol_MediaTime )
+//             return ( long long )( 1000 * value / 50 / p_input->stream.i_mux_rate );
+// 
+//         if( to == mediacontrol_SampleCount )
+//         {
+//             double f_fps;
+//             if( demux2_Control( p_input->input.p_demux, DEMUX_GET_FPS, &f_fps ) || f_fps < 0.1 )
+//                 return 0;
+//             else
+//                 return ( long long )( value * f_fps / 50 / p_input->stream.i_mux_rate );
+//         }
         /* Cannot happen */
         break;
     }
@@ -328,7 +342,7 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
         return;
     }
 
-    if(  !p_input->stream.b_seekable )
+    if( !var_GetBool( p_input, "seekable" ) )
     {
         RAISE( mediacontrol_InvalidPosition, "Stream not seekable" );
         return;
@@ -758,8 +772,10 @@ mediacontrol_display_text( mediacontrol_Instance *self,
             return;
         }
 
-        i_now = input_ClockGetTS( p_input, NULL, 0 );
-
+        /* FIXME */
+        /* i_now = input_ClockGetTS( p_input, NULL, 0 ); */
+        i_now = 0;
+        
         i_debut = mediacontrol_position2microsecond( p_input,
                                                      ( mediacontrol_Position* ) begin );
         i_debut += i_now;
@@ -802,22 +818,13 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
     }
     else
     {
-        switch( p_input->stream.control.i_status )
+        switch( var_GetInteger( p_input, "state" ) )
         {
-        case UNDEF_S       :
-            retval->streamstatus = mediacontrol_UndefinedStatus;
-            break;
         case PLAYING_S     :
             retval->streamstatus = mediacontrol_PlayingStatus;
             break;
         case PAUSE_S       :
             retval->streamstatus = mediacontrol_PauseStatus;
-            break;
-        case FORWARD_S     :
-            retval->streamstatus = mediacontrol_ForwardStatus;
-            break;
-        case BACKWARD_S    :
-            retval->streamstatus = mediacontrol_BackwardStatus;
             break;
         case INIT_S        :
             retval->streamstatus = mediacontrol_InitStatus;
@@ -830,7 +837,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
             break;
         }
 
-        retval->url = strdup( p_input->psz_source );
+        retval->url = strdup( p_input->input.p_item->psz_uri );
 
         /* TIME and LENGTH are in microseconds. We want them in ms */
         var_Get( p_input, "time", &val);
