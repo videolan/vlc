@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: intf_beos.cpp,v 1.35 2001/12/30 07:09:54 sam Exp $
+ * $Id: intf_beos.cpp,v 1.36 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -156,9 +156,10 @@ static void intf_Run( intf_thread_t *p_intf )
         p_intf->pf_manage( p_intf );
 
         /* Manage the slider */
-        if( p_intf->p_input != NULL && p_intf->p_sys->p_window != NULL)
+        if( p_input_bank->pp_input[0] != NULL
+             && p_intf->p_sys->p_window != NULL)
         {
-        p_intf->p_sys->p_window->updateInterface();
+            p_intf->p_sys->p_window->updateInterface();
         }
 
         /* Wait a bit */

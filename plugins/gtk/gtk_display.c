@@ -2,7 +2,7 @@
  * gtk_display.c: Gtk+ tools for main interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: gtk_display.c,v 1.10 2001/12/30 07:09:55 sam Exp $
+ * $Id: gtk_display.c,v 1.11 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -67,13 +67,13 @@ void GtkDisplayDate( GtkAdjustment *p_adj )
    
     p_intf = gtk_object_get_data( GTK_OBJECT( p_adj ), "p_intf" );
 
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-#define p_area p_intf->p_input->stream.p_selected_area
+#define p_area p_input_bank->pp_input[0]->stream.p_selected_area
         char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
         gtk_frame_set_label( GTK_FRAME( p_intf->p_sys->p_slider_frame ),
-                            input_OffsetToTime( p_intf->p_input, psz_time,
+                            input_OffsetToTime( p_input_bank->pp_input[0], psz_time,
                                    ( p_area->i_size * p_adj->value ) / 100 ) );
 #undef p_area
      }
@@ -120,9 +120,9 @@ gint GtkModeManage( intf_thread_t * p_intf )
     b_control = 0;
 
     /* show the box related to current input mode */
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        switch( p_intf->p_input->stream.i_method & 0xf0 )
+        switch( p_input_bank->pp_input[0]->stream.i_method & 0xf0 )
         {
             case INPUT_METHOD_FILE:
 //intf_WarnMsg( 2, "intf info: file method" );
@@ -131,7 +131,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
                             p_intf->p_sys->p_window ),
                             "label_status" );
                 gtk_label_set_text( GTK_LABEL( p_label ),
-                                    p_intf->p_input->p_source );
+                                    p_input_bank->pp_input[0]->p_source );
                 break;
             case INPUT_METHOD_DISC:
 //intf_WarnMsg( 2, "intf info: disc method" );
@@ -144,7 +144,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
                             p_intf->p_sys->p_window ),
                             "network_address_label" );
                 gtk_label_set_text( GTK_LABEL( p_label ),
-                                    p_intf->p_input->p_source );
+                                    p_input_bank->pp_input[0]->p_source );
                 p_channel = GTK_WIDGET( gtk_object_get_data( GTK_OBJECT(
                            p_intf->p_sys->p_window ), "network_channel_box" ) );
                 if( main_GetIntVariable( INPUT_NETWORK_CHANNEL_VAR,
@@ -164,7 +164,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
         }
     
         /* initialize and show slider for seekable streams */
-        if( p_intf->p_input->stream.b_seekable )
+        if( p_input_bank->pp_input[0]->stream.b_seekable )
         {
             p_intf->p_sys->p_adj->value = p_intf->p_sys->f_adj_oldvalue = 0;
             gtk_signal_emit_by_name( GTK_OBJECT( p_intf->p_sys->p_adj ),
@@ -173,7 +173,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
         }
     
         /* control buttons for free pace streams */
-        b_control = p_intf->p_input->stream.b_pace_control;
+        b_control = p_input_bank->pp_input[0]->stream.b_pace_control;
 
         /* get ready for menu regeneration */
         p_intf->p_sys->b_title_update = 1;
@@ -183,7 +183,7 @@ gint GtkModeManage( intf_thread_t * p_intf )
         p_intf->p_sys->b_spu_update = 1;
         p_intf->p_sys->i_part = 0;
     
-        p_intf->p_input->stream.b_changed = 0;
+        p_input_bank->pp_input[0]->stream.b_changed = 0;
         intf_WarnMsg( 3, "intf: stream has changed, refreshing interface" );
     }
     else

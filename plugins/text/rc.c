@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.8 2002/01/04 14:01:34 sam Exp $
+ * $Id: rc.c,v 1.9 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -163,8 +163,9 @@ static void intf_Run( intf_thread_t *p_intf )
 
     while( !p_intf->b_die )
     {
-#define S p_intf->p_input->stream
-        if( p_intf->p_input != NULL )
+        vlc_mutex_lock( &p_input_bank->lock );
+#define S p_input_bank->pp_input[0]->stream
+        if( p_input_bank->pp_input[0] != NULL )
         {
             /* Get position */
             if( S.i_mux_rate )
@@ -182,6 +183,7 @@ static void intf_Run( intf_thread_t *p_intf )
             }
         }
 #undef S
+        vlc_mutex_unlock( &p_input_bank->lock );
 
         b_complete = 0;
         i_cmd_pos = 0;
@@ -212,6 +214,8 @@ static void intf_Run( intf_thread_t *p_intf )
             }
         }
 
+        vlc_mutex_lock( &p_input_bank->lock );
+
         /* Is there something to do? */
         if( b_complete == 1 )
         {
@@ -223,9 +227,9 @@ static void intf_Run( intf_thread_t *p_intf )
                 {
                     intf_PlaylistAdd( p_main->p_playlist,
                                       PLAYLIST_END, p_cmd + 2 );
-                    if( p_intf->p_input != NULL )
+                    if( p_input_bank->pp_input[0] != NULL )
                     {
-                        p_intf->p_input->b_eof = 1;
+                        p_input_bank->pp_input[0]->b_eof = 1;
                     }
                     intf_PlaylistJumpto( p_main->p_playlist,
                                          p_main->p_playlist->i_size - 2 );
@@ -234,9 +238,10 @@ static void intf_Run( intf_thread_t *p_intf )
 
             case 'p':
             case 'P':
-                if( p_intf->p_input != NULL )
+                if( p_input_bank->pp_input[0] != NULL )
                 {
-                    input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
+                    input_SetStatus( p_input_bank->pp_input[0],
+                                     INPUT_STATUS_PAUSE );
                 }
                 break;
 
@@ -276,7 +281,7 @@ static void intf_Run( intf_thread_t *p_intf )
 
             case 'r':
             case 'R':
-                if( p_intf->p_input != NULL )
+                if( p_input_bank->pp_input[0] != NULL )
                 {
                     for( i_dummy = 1;
                          i_dummy < MAX_LINE_LENGTH && p_cmd[ i_dummy ] >= '0'
@@ -288,7 +293,8 @@ static void intf_Run( intf_thread_t *p_intf )
 
                     p_cmd[ i_dummy ] = 0;
                     f_cpos = atof( p_cmd + 1 );
-                    input_Seek( p_intf->p_input, (off_t) (f_cpos / f_ratio) );
+                    input_Seek( p_input_bank->pp_input[0],
+                                (off_t) (f_cpos / f_ratio) );
                     /* rcreseek(f_cpos); */
                 }
                 break;
@@ -311,6 +317,8 @@ static void intf_Run( intf_thread_t *p_intf )
                 break;
             }
         }
+
+        vlc_mutex_unlock( &p_input_bank->lock );
 
         p_intf->pf_manage( p_intf );
         msleep( INTF_IDLE_SLEEP );

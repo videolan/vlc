@@ -2,7 +2,7 @@
  * intf_qt.cpp: Qt interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_qt.cpp,v 1.10 2001/12/30 07:09:56 sam Exp $
+ * $Id: intf_qt.cpp,v 1.11 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -378,15 +378,15 @@ IntfWindow::~IntfWindow( void )
  *****************************************************************************/
 void IntfWindow::DateDisplay( int i_range )
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
-        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
-        p_date->setText( input_OffsetToTime( p_intf->p_input, psz_time,
-               ( p_intf->p_input->stream.p_selected_area->i_size * i_range )
+        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
+        p_date->setText( input_OffsetToTime( p_input_bank->pp_input[0], psz_time,
+               ( p_input_bank->pp_input[0]->stream.p_selected_area->i_size * i_range )
                    / SLIDER_MAX ) );
-        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
+        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
     }
 }
 
@@ -438,11 +438,11 @@ void IntfWindow::About( void )
 void IntfWindow::Manage( void )
 {
     /* Manage the slider */
-    if( p_intf->p_input != NULL && p_intf->p_input->stream.b_seekable )
+    if( p_input_bank->pp_input[0] != NULL && p_input_bank->pp_input[0]->stream.b_seekable )
     {
         int i_value = p_slider->value();
 
-#define p_area p_intf->p_input->stream.p_selected_area
+#define p_area p_input_bank->pp_input[0]->stream.p_selected_area
         /* If the user hasn't touched the slider since the last time,
          * then the input can safely change it */
         if( i_value == p_slider->oldvalue() )
@@ -458,7 +458,7 @@ void IntfWindow::Manage( void )
         {
             off_t i_seek = ( i_value * p_area->i_size ) / SLIDER_MAX;
 
-            input_Seek( p_intf->p_input, i_seek );
+            input_Seek( p_input_bank->pp_input[0], i_seek );
 
             /* Update the old value */
             p_slider->setOldValue( i_value );
@@ -487,9 +487,9 @@ void IntfWindow::Manage( void )
  *****************************************************************************/
 void IntfWindow::PlaybackPlay( void )
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
     }
 }
 
@@ -498,9 +498,9 @@ void IntfWindow::PlaybackPlay( void )
  *****************************************************************************/
 void IntfWindow::PlaybackPause( void )
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
     }
 }
 
@@ -509,9 +509,9 @@ void IntfWindow::PlaybackPause( void )
  *****************************************************************************/
 void IntfWindow::PlaybackSlow( void )
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_SLOWER );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_SLOWER );
     }
 }
 
@@ -520,9 +520,9 @@ void IntfWindow::PlaybackSlow( void )
  *****************************************************************************/
 void IntfWindow::PlaybackFast( void )
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_FASTER );
     }
 }
 
@@ -531,12 +531,12 @@ void IntfWindow::PlaybackFast( void )
  *****************************************************************************/
 void IntfWindow::PlaylistPrev( void )
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         /* FIXME: temporary hack */
         intf_PlaylistPrev( p_main->p_playlist );
         intf_PlaylistPrev( p_main->p_playlist );
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
 }
 
@@ -545,10 +545,10 @@ void IntfWindow::PlaylistPrev( void )
  *****************************************************************************/
 void IntfWindow::PlaylistNext( void )
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         /* FIXME: temporary hack */
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
 }
 

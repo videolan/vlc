@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.154 2002/01/05 03:49:18 sam Exp $
+ * $Id: video_output.c,v 1.155 2002/01/07 02:12:30 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -695,6 +695,11 @@ static int ReduceHeight( int i_ratio )
     int i_dummy = VOUT_ASPECT_FACTOR;
     int i_pgcd  = 1;
  
+    if( !i_ratio )
+    {
+        return i_pgcd;
+    }
+
     /* VOUT_ASPECT_FACTOR is (2^7 * 3^3 * 5^3), we just check for 2, 3 and 5 */
     while( !(i_ratio & 1) && !(i_dummy & 1) )
     {

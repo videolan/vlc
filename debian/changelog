@@ -1,12 +1,79 @@
-vlc (0.2.92-UNSTABLE) unstable; urgency=low
+vlc (0.2.92cvs-1) unstable; urgency=low
 
   * Development branch.
 
  -- Christophe Massiot <massiot@via.ecp.fr>  Fri,  7 Dec 2001 20:18:56 +0100
 
+vlc (0.2.92-8) unstable; urgency=high
+
+  * Only link with libXv.a if libXv_pic.a wasn't found, which fixes
+    package builds on sid.
+  * Added -ffunction-sections to the compilation of mpeg_vdec.a when
+    the architecture is hppa.
+
+ -- Samuel Hocevar <sam@zoy.org>  Sun,  6 Jan 2002 06:56:08 +0100
+
+vlc (0.2.92-7) unstable; urgency=high
+
+  * Fixed configure.in so that it doesn't fail on hppa.
+  * Fixed a symbol resolution issue that made vlc crash when libdvdcss
+    was installed.
+
+ -- Samuel Hocevar <sam@zoy.org>  Sat,  5 Jan 2002 03:46:23 +0100
+
+vlc (0.2.92-6) unstable; urgency=high
+
+  * Attempt to fix IA64 and hppa builds.
+
+ -- Samuel Hocevar <sam@zoy.org>  Fri,  4 Jan 2002 14:11:02 +0100
+
+vlc (0.2.92-5) unstable; urgency=high
+
+  * Many fixes imported from the 0.2.92 upstream release (VCD input,
+    buffer management, decoder error management).
+  * Removed a stupid dependency on libc6 which prevented the package
+    from being built on alpha.
+
+ -- Samuel Hocevar <sam@zoy.org>  Wed,  2 Jan 2002 04:16:44 +0100
+
+vlc (0.2.92-4) unstable; urgency=high
+
+  * Put debian/control and debian/rules in sync again (Closes: #126697).
+  * Replaced the 48x48 XPM icons with 32x32 icons to comply with policy
+    (Closes: #126939).
+  * Don't spawn the Gtk+ or the Gnome interface if no $DISPLAY variable is
+    present, which fixes the framebuffer output (Closes: #101753).
+
+ -- Samuel Hocevar <sam@zoy.org>  Sun, 30 Dec 2001 02:59:01 +0100
+
+vlc (0.2.92-3) unstable; urgency=high
+
+  * Removed references to vlc-mad (Closes: #126194).
+
+ -- Samuel Hocevar <sam@zoy.org>  Sat, 22 Dec 2001 21:04:27 +0100
+
+vlc (0.2.92-2) unstable; urgency=high
+
+  * Bumped urgency to high to get this stable version into testing; all
+    reported critical bugs were fixed.
+  * Bumped Standards-Version to 3.5.6.
+  * Fixed a PowerPC compilation issue.
+  * Fixed a crash in the VCD input.
+
+ -- Samuel Hocevar <sam@zoy.org>  Thu, 20 Dec 2001 23:24:21 +0100
+
+vlc (0.2.92-1) unstable; urgency=low
+
+  * Using the stable 0.2.92 CVS branch, has lots of stability fixes.
+  * Disabled broken ALSA audio output (Closes: #110869, #119846).
+  * Changed configure.in so that vlc is linked against libXv.a,
+    not xvideo.so and sdl.so (Closes: #111790).
+  * Added versioned build-dep to libasound2-dev (Closes: #121057).
+
+ -- Samuel Hocevar <sam@zoy.org>  Wed, 19 Dec 2001 17:06:44 +0100
+
 vlc (0.2.91-2) unstable; urgency=low
 
-  * Added versioned build-dep to libasound2-dev (Closes: #121057).
   * Added "Video" menu hints (Closes: #121036).
 
  -- Samuel Hocevar <sam@zoy.org>  Sun, 25 Nov 2001 02:25:34 +0100

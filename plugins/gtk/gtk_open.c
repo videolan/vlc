@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.13 2002/01/02 14:37:42 sam Exp $
+ * $Id: gtk_open.c,v 1.14 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -111,9 +111,9 @@ void GtkFileOpenOk( GtkButton * button, gpointer user_data )
     GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
 
     /* end current item, select added item  */
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
@@ -225,9 +225,9 @@ void GtkDiscOpenOk( GtkButton * button, gpointer user_data )
     GtkRebuildCList( p_playlist_clist, p_main->p_playlist );
 
     /* stop current item, select added item */
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
 
     intf_PlaylistJumpto( p_main->p_playlist, i_end - 1 );
@@ -315,9 +315,9 @@ void GtkNetworkOpenOk( GtkButton *button, gpointer user_data )
                                  GTK_WIDGET(button), "network_server" ) ) );
 
     /* select added item */
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
 
     /* Check which protocol was activated */

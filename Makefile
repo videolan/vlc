@@ -61,6 +61,8 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		chroma/chroma_i420_yuy2_mmx \
 		chroma/chroma_i422_yuy2 \
 		chroma/chroma_i422_yuy2_mmx \
+		chroma/chroma_i420_ymga \
+		chroma/chroma_i420_ymga_mmx \
 		directx/directx \
 		dsp/dsp \
 		dummy/dummy \
@@ -98,7 +100,6 @@ PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		memcpy/memcpymmxext \
 		memcpy/memcpy3dn \
 		mga/mga \
-		mga/mgammx \
 		motion/motion \
 		motion/motionmmx \
 		motion/motionmmxext \

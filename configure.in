@@ -307,13 +307,13 @@ esac
 dnl
 dnl  default modules
 dnl
-BUILTINS="${BUILTINS} mpeg_es mpeg_ps mpeg_ts memcpy idct idctclassic motion imdct downmix chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
+BUILTINS="${BUILTINS} mpeg_es mpeg_ps mpeg_ts memcpy idct idctclassic motion imdct downmix chroma_i420_rgb chroma_i420_yuy2 chroma_i422_yuy2 chroma_i420_ymga mpeg_adec lpcm_adec ac3_adec mpeg_vdec"
 PLUGINS="${PLUGINS} ac3_spdif spudec filter_deinterlace filter_invert filter_wall filter_transform filter_distort"
 
 dnl
 dnl  Accelerated modules
 dnl
-MMX_MODULES="memcpymmx idctmmx motionmmx chroma_i420_rgb_mmx chroma_i420_yuy2_mmx chroma_i422_yuy2_mmx"
+MMX_MODULES="memcpymmx idctmmx motionmmx chroma_i420_rgb_mmx chroma_i420_yuy2_mmx chroma_i422_yuy2_mmx chroma_i420_ymga_mmx"
 MMXEXT_MODULES="memcpymmxext idctmmxext motionmmxext"
 THREEDNOW_MODULES="memcpy3dn imdct3dn downmix3dn"
 SSE_MODULES="imdctsse downmixsse"
@@ -949,9 +949,6 @@ AC_ARG_ENABLE(mga,
   [ if test x$enable_mga = xyes
     then
       PLUGINS="${PLUGINS} mga"
-      if test x"$ac_cv_mmx_inline" != x"no"; then
-        PLUGINS="${PLUGINS} mgammx"
-      fi    
     fi ])
 
 dnl

@@ -4,7 +4,7 @@
  * includes all common video types and constants.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video.h,v 1.40 2002/01/05 02:22:03 sam Exp $
+ * $Id: video.h,v 1.41 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -161,6 +161,7 @@ typedef struct picture_heap_s
 #define FOURCC_Y211          0x31313259             /* Packed 2:1:1, Y:U:Y:V */
 
 /* Custom formats which we use but which don't exist in the fourcc database */
+#define FOURCC_YMGA          0x41474d59  /* Planar Y, packed UV, from Matrox */
 #define FOURCC_I422          0x32323449               /* Planar 4:2:2, Y:U:V */
 #define FOURCC_I444          0x34343449               /* Planar 4:4:4, Y:U:V */
 

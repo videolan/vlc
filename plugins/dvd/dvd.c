@@ -2,7 +2,7 @@
  * dvd.c : DVD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: dvd.c,v 1.17 2001/12/30 07:09:55 sam Exp $
+ * $Id: dvd.c,v 1.18 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -118,18 +118,18 @@ static void ProbeLibDVDCSS( void )
     }
     else
     {
-        dvdcss_open = dlsym( p_libdvdcss, "dvdcss_open" );
-        dvdcss_close = dlsym( p_libdvdcss, "dvdcss_close" );
-        dvdcss_title = dlsym( p_libdvdcss, "dvdcss_title" );
-        dvdcss_seek = dlsym( p_libdvdcss, "dvdcss_seek" );
-        dvdcss_read = dlsym( p_libdvdcss, "dvdcss_read" );
-        dvdcss_readv = dlsym( p_libdvdcss, "dvdcss_readv" );
-        dvdcss_error = dlsym( p_libdvdcss, "dvdcss_error" );
+        ____dvdcss_open = dlsym( p_libdvdcss, "dvdcss_open" );
+        ____dvdcss_close = dlsym( p_libdvdcss, "dvdcss_close" );
+        ____dvdcss_title = dlsym( p_libdvdcss, "dvdcss_title" );
+        ____dvdcss_seek = dlsym( p_libdvdcss, "dvdcss_seek" );
+        ____dvdcss_read = dlsym( p_libdvdcss, "dvdcss_read" );
+        ____dvdcss_readv = dlsym( p_libdvdcss, "dvdcss_readv" );
+        ____dvdcss_error = dlsym( p_libdvdcss, "dvdcss_error" );
 
-        if( dvdcss_open == NULL || dvdcss_close == NULL
-             || dvdcss_title == NULL || dvdcss_seek == NULL
-             || dvdcss_read == NULL || dvdcss_readv == NULL
-             || dvdcss_error == NULL )
+        if( ____dvdcss_open == NULL || ____dvdcss_close == NULL
+             || ____dvdcss_title == NULL || ____dvdcss_seek == NULL
+             || ____dvdcss_read == NULL || ____dvdcss_readv == NULL
+             || ____dvdcss_error == NULL )
         {
             intf_ErrMsg( "dvd warning: missing symbols in libdvdcss.so.1, "
                          "this shouldn't happen !" );
@@ -147,13 +147,13 @@ static void ProbeLibDVDCSS( void )
         intf_ErrMsg( "dvd warning: get libdvdcss at "
                      "http://www.videolan.org/libdvdcss/" );
 
-        dvdcss_open = dummy_dvdcss_open;
-        dvdcss_close = dummy_dvdcss_close;
-        dvdcss_title = dummy_dvdcss_title;
-        dvdcss_seek = dummy_dvdcss_seek;
-        dvdcss_read = dummy_dvdcss_read;
-        dvdcss_readv = dummy_dvdcss_readv;
-        dvdcss_error = dummy_dvdcss_error;
+        ____dvdcss_open = dummy_dvdcss_open;
+        ____dvdcss_close = dummy_dvdcss_close;
+        ____dvdcss_title = dummy_dvdcss_title;
+        ____dvdcss_seek = dummy_dvdcss_seek;
+        ____dvdcss_read = dummy_dvdcss_read;
+        ____dvdcss_readv = dummy_dvdcss_readv;
+        ____dvdcss_error = dummy_dvdcss_error;
     }
 }
 

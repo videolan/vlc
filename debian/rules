@@ -59,11 +59,11 @@ install: build
 	# make symlinks for packages and install plugins
 	case $(DEB_BUILD_ARCH) in \
 	i386) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts alsa glide" ;; \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa glide" ;; \
 	alpha|ia64|m68k|powerpc) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts alsa" ;; \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad alsa" ;; \
 	*) \
-		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts" ;; \
+		ARCH_ALIASES="ggi gtk gnome esd sdl qt arts mad" ;; \
 	esac ;\
 	for alias in $$ARCH_ALIASES ; do \
 		ln -s vlc debian/vlc-$$alias/usr/share/doc/vlc-$$alias ; \

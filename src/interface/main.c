@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.142 2002/01/04 14:01:35 sam Exp $
+ * $Id: main.c,v 1.143 2002/01/07 02:12:30 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -227,6 +227,7 @@ static const char *psz_shortopts = "hHvgt:T:u:a:s:c:I:A:V:";
  *****************************************************************************/
 main_t        *p_main;
 module_bank_t *p_module_bank;
+input_bank_t  *p_input_bank;
 aout_bank_t   *p_aout_bank;
 vout_bank_t   *p_vout_bank;
 
@@ -266,11 +267,13 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
 {
     main_t        main_data;                /* root of all data - see main.h */
     module_bank_t module_bank;
+    input_bank_t  input_bank;
     aout_bank_t   aout_bank;
     vout_bank_t   vout_bank;
 
     p_main        = &main_data;               /* set up the global variables */
     p_module_bank = &module_bank;
+    p_input_bank  = &input_bank;
     p_aout_bank   = &aout_bank;
     p_vout_bank   = &vout_bank;
 
@@ -388,9 +391,10 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     GetFilenames( i_argc, ppsz_argv );
 
     /*
-     * Initialize module, aout and vout banks
+     * Initialize module, input, aout and vout banks
      */
     module_InitBank();
+    input_InitBank();
     aout_InitBank();
     vout_InitBank();
 
@@ -453,8 +457,9 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     }
 
     /*
-     * Free aout and vout banks
+     * Free input, aout and vout banks
      */
+    input_EndBank();
     vout_EndBank();
     aout_EndBank();
 

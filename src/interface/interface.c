@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.85 2001/12/30 07:09:56 sam Exp $
+ * $Id: interface.c,v 1.86 2002/01/07 02:12:30 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -93,7 +93,6 @@ intf_thread_t* intf_Create( void )
     /* Initialize structure */
     p_intf->b_die         = 0;
 
-    p_intf->p_input       = NULL;
     p_intf->b_menu        = 0;
     p_intf->b_menu_change = 0;
 
@@ -127,16 +126,20 @@ static void intf_Manage( intf_thread_t *p_intf )
     /* Manage module bank */
     module_ManageBank( );
 
-    if( ( p_intf->p_input != NULL ) &&
-            ( p_intf->p_input->b_error || p_intf->p_input->b_eof ) )
+    vlc_mutex_lock( &p_input_bank->lock );
+
+    if( p_input_bank->i_count 
+         && ( p_input_bank->pp_input[0]->b_error
+               || p_input_bank->pp_input[0]->b_eof ) )
     {
-        input_DestroyThread( p_intf->p_input, NULL );
-        p_intf->p_input = NULL;
-        intf_DbgMsg("Input thread destroyed");
+        intf_WarnMsg( 3, "intf: input thread destroyed" );
+        input_DestroyThread( p_input_bank->pp_input[0], NULL );
+        p_input_bank->pp_input[0] = NULL;
+        p_input_bank->i_count--;
     }
 
     /* If no stream is being played, try to find one */
-    if( p_intf->p_input == NULL && !p_intf->b_die )
+    if( !p_input_bank->i_count && !p_intf->b_die )
     {
 //        vlc_mutex_lock( &p_main->p_playlist->change_lock );
 
@@ -156,8 +159,10 @@ static void intf_Manage( intf_thread_t *p_intf )
                 p_main->p_playlist->i_mode = PLAYLIST_FORWARD + 
                     main_GetIntVariable( PLAYLIST_LOOP_VAR,
                                          PLAYLIST_LOOP_DEFAULT );
-                p_intf->p_input =
+                intf_WarnMsg( 3, "intf: creating new input thread" );
+                p_input_bank->pp_input[0] =
                     input_CreateThread( &p_main->p_playlist->current, NULL );
+                p_input_bank->i_count++;
             }
         }
         else
@@ -178,6 +183,8 @@ static void intf_Manage( intf_thread_t *p_intf )
 
 //        vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     }
+
+    vlc_mutex_unlock( &p_input_bank->lock );
 }
 
 /*****************************************************************************
@@ -190,11 +197,13 @@ void intf_Destroy( intf_thread_t *p_intf )
     /* Destroy interfaces */
     p_intf->pf_close( p_intf );
 
+#if 0
     /* Close input thread, if any (blocking) */
     if( p_intf->p_input )
     {   
         input_DestroyThread( p_intf->p_input, NULL );
     }
+#endif
 
     /* Unlock module */
     module_Unneed( p_intf->p_module );

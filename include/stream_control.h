@@ -1,10 +1,10 @@
 /*****************************************************************************
- * stream_control.h: structures of the input exported verywhere
+ * stream_control.h: structures of the input exported everywhere
  * This header provides a structure so that everybody knows the state
  * of the reading.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: stream_control.h,v 1.6 2001/07/18 14:21:00 massiot Exp $
+ * $Id: stream_control.h,v 1.7 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *

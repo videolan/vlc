@@ -4,3 +4,5 @@ chroma_i420_yuy2_SOURCES = i420_yuy2.c
 chroma_i420_yuy2_mmx_SOURCES = i420_yuy2.c
 chroma_i422_yuy2_SOURCES = i422_yuy2.c
 chroma_i422_yuy2_mmx_SOURCES = i422_yuy2.c
+chroma_i420_ymga_SOURCES = i420_ymga.c
+chroma_i420_ymga_mmx_SOURCES = i420_ymga.c

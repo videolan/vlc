@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.8 2002/01/05 15:17:12 sam Exp $
+ * $Id: xcommon.c,v 1.9 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -222,17 +222,24 @@ typedef struct mwmhints_s
  *****************************************************************************/
 static __inline__ void vout_Seek( off_t i_seek )
 {
-#define area p_main->p_intf->p_input->stream.p_selected_area
-    off_t i_tell = area->i_tell;
+    off_t i_tell;
 
-    i_tell += i_seek * (off_t)50 * p_main->p_intf->p_input->stream.i_mux_rate;
+    vlc_mutex_lock( &p_input_bank->lock );
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+#define S p_input_bank->pp_input[0]->stream
+        i_tell = S.p_selected_area->i_tell + i_seek * (off_t)50 * S.i_mux_rate;
 
-    i_tell = ( i_tell <= 0/*area->i_start*/ ) ? 0/*area->i_start*/
-           : ( i_tell >= area->i_size ) ? area->i_size
-           : i_tell;
+        i_tell = ( i_tell <= 0 /*S.p_selected_area->i_start*/ )
+                   ? 0 /*S.p_selected_area->i_start*/
+                   : ( i_tell >= S.p_selected_area->i_size )
+                       ? S.p_selected_area->i_size
+                       : i_tell;
 
-    input_Seek( p_main->p_intf->p_input, i_tell );
-#undef area
+        input_Seek( p_input_bank->pp_input[0], i_tell );
+#undef S
+    }
+    vlc_mutex_unlock( &p_input_bank->lock );
 }
 
 /*****************************************************************************
@@ -659,12 +666,12 @@ static int vout_Manage( vout_thread_t *p_vout )
                      vout_Seek( -60 );
                      break;
                  case XK_Home:
-                     input_Seek( p_main->p_intf->p_input,
-                     p_main->p_intf->p_input->stream.p_selected_area->i_start );
+                     input_Seek( p_input_bank->pp_input[0],
+                     p_input_bank->pp_input[0]->stream.p_selected_area->i_start );
                      break;
                  case XK_End:
-                     input_Seek( p_main->p_intf->p_input,
-                     p_main->p_intf->p_input->stream.p_selected_area->i_size );
+                     input_Seek( p_input_bank->pp_input[0],
+                     p_input_bank->pp_input[0]->stream.p_selected_area->i_size );
                      break;
                  case XK_Page_Up:
                      vout_Seek( 900 );
@@ -673,7 +680,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                      vout_Seek( -900 );
                      break;
                  case XK_space:
-                     input_SetStatus( p_main->p_intf->p_input,
+                     input_SetStatus( p_input_bank->pp_input[0],
                                       INPUT_STATUS_PAUSE );
                      break;
 
@@ -726,7 +733,7 @@ static int vout_Manage( vout_thread_t *p_vout )
                     /* In this part we will eventually manage
                      * clicks for DVD navigation for instance. For the
                      * moment just pause the stream. */
-                    input_SetStatus( p_main->p_intf->p_input,
+                    input_SetStatus( p_input_bank->pp_input[0],
                                      INPUT_STATUS_PAUSE );
                     break;
 
@@ -778,10 +785,10 @@ static int vout_Manage( vout_thread_t *p_vout )
             if( ((XExposeEvent *)&xevent)->count == 0 )
             {
                 /* (if this is the last a collection of expose events...) */
-                if( p_main->p_intf->p_input != NULL )
+                if( p_input_bank->pp_input[0] != NULL )
                 {
                     if( PAUSE_S ==
-                            p_main->p_intf->p_input->stream.control.i_status )
+                            p_input_bank->pp_input[0]->stream.control.i_status )
                     {
 /*                        XVideoDisplay( p_vout )*/;
                     }

@@ -2,7 +2,7 @@
  * gtk_playlist.c : Interface for the playlist dialog
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: gtk_playlist.c,v 1.25 2002/01/04 14:01:34 sam Exp $
+ * $Id: gtk_playlist.c,v 1.26 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Pierre Baillet <oct@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -102,14 +102,12 @@ gboolean GtkPlaylistPrev( GtkWidget       *widget,
                           GdkEventButton  *event,
                           gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         /* FIXME: temporary hack */
         intf_PlaylistPrev( p_main->p_playlist );
         intf_PlaylistPrev( p_main->p_playlist );
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
 
     return TRUE;
@@ -120,12 +118,10 @@ gboolean GtkPlaylistNext( GtkWidget       *widget,
                           GdkEventButton  *event,
                           gpointer         user_data)
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         /* FIXME: temporary hack */
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
 
     return TRUE;
@@ -281,10 +277,10 @@ gboolean GtkPlaylistEvent( GtkWidget * widget,
                     (event->button).y, &i_row, &i_col ) == 1 )
         {
             /* clicked is in range. */
-            if( p_intf->p_input != NULL )
+            if( p_input_bank->pp_input[0] != NULL )
             {
                 /* FIXME: temporary hack */
-                p_intf->p_input->b_eof = 1;
+                p_input_bank->pp_input[0]->b_eof = 1;
             }
 
             intf_PlaylistJumpto( p_main->p_playlist, i_row - 1 );
@@ -507,7 +503,7 @@ void GtkDeleteGListItem( gpointer data, gpointer param )
     if( p_intf->p_sys->i_playing == i_cur_row )
     {
         /* next ! */
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
         /* this has to set the slider to 0 */
         
         /* step minus one */

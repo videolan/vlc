@@ -2,7 +2,7 @@
  * vout_sdl.c: SDL video output display method
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: vout_sdl.c,v 1.78 2002/01/05 03:49:18 sam Exp $
+ * $Id: vout_sdl.c,v 1.79 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Pierre Baillet <oct@zoy.org>
@@ -97,17 +97,24 @@ typedef struct picture_sys_s
  *****************************************************************************/
 static __inline__ void vout_Seek( off_t i_seek )
 {
-#define area p_main->p_intf->p_input->stream.p_selected_area
-    off_t i_tell = area->i_tell;
+    off_t i_tell;
 
-    i_tell += i_seek * (off_t)50 * p_main->p_intf->p_input->stream.i_mux_rate;
+    vlc_mutex_lock( &p_input_bank->lock );
+    if( p_input_bank->pp_input[0] != NULL )
+    {
+#define S p_input_bank->pp_input[0]->stream
+        i_tell = S.p_selected_area->i_tell + i_seek * (off_t)50 * S.i_mux_rate;
 
-    i_tell = ( i_tell <= area->i_start ) ? area->i_start
-           : ( i_tell >= area->i_size ) ? area->i_size
-           : i_tell;
+        i_tell = ( i_tell <= 0 /*S.p_selected_area->i_start*/ )
+                   ? 0 /*S.p_selected_area->i_start*/
+                   : ( i_tell >= S.p_selected_area->i_size )
+                       ? S.p_selected_area->i_size
+                       : i_tell;
 
-    input_Seek( p_main->p_intf->p_input, i_tell );
-#undef area
+        input_Seek( p_input_bank->pp_input[0], i_tell );
+#undef S
+    }
+    vlc_mutex_unlock( &p_input_bank->lock );
 }
 
 /*****************************************************************************
@@ -401,7 +408,8 @@ static int vout_Manage( vout_thread_t *p_vout )
                 /* In this part we will eventually manage
                  * clicks for DVD navigation for instance. For the
                  * moment just pause the stream. */
-                input_SetStatus( p_main->p_intf->p_input, INPUT_STATUS_PAUSE );
+                input_SetStatus( p_input_bank->pp_input[0],
+                                 INPUT_STATUS_PAUSE );
                 break;
 
             case 4:

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input.c,v 1.167 2001/12/30 07:09:56 sam Exp $
+ * $Id: input.c,v 1.168 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -91,6 +91,37 @@ static void NetworkOpen     ( input_thread_t *p_input );
 static void HTTPOpen        ( input_thread_t *p_input );
 static void NetworkClose    ( input_thread_t *p_input );
 #endif
+
+/*****************************************************************************
+ * input_InitBank: initialize the input bank.
+ *****************************************************************************/
+void input_InitBank ( void )
+{
+    p_input_bank->i_count = 0;
+
+    /* XXX: Workaround for old interface modules */
+    p_input_bank->pp_input[0] = NULL;
+
+    vlc_mutex_init( &p_input_bank->lock );
+}
+
+/*****************************************************************************
+ * input_EndBank: empty the input bank.
+ *****************************************************************************
+ * This function ends all unused inputs and empties the bank in
+ * case of success.
+ *****************************************************************************/
+void input_EndBank ( void )
+{
+    /* Ask all remaining video outputs to die */
+    while( p_input_bank->i_count )
+    {
+        input_DestroyThread(
+                p_input_bank->pp_input[ --p_input_bank->i_count ], NULL );
+    }
+
+    vlc_mutex_destroy( &p_input_bank->lock );
+}
 
 /*****************************************************************************
  * input_CreateThread: creates a new input thread

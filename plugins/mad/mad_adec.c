@@ -63,13 +63,12 @@ void _M( adec_getfunctions )( function_list_t * p_function_list )
  * Build configuration tree.
  *****************************************************************************/
 MODULE_CONFIG_START
-    ADD_WINDOW( "Configuration for mad_adec module" )
-        ADD_COMMENT( "No device to configure." )
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
     SET_DESCRIPTION( "Libmad MPEG 1/2/3 audio decoder library" )
     ADD_CAPABILITY( DECODER, 950 )
+    ADD_SHORTCUT( "mad" )
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START

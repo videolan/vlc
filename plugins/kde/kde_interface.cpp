@@ -222,7 +222,7 @@ void KInterface::slotManage()
 
     /* Update language/chapter menus after user request */
 #if 0
-    if( fInterface->p_input != NULL && p_intf->p_sys->p_window != NULL &&
+    if( p_input_bank->pp_input[0] != NULL && p_intf->p_sys->p_window != NULL &&
         p_intf->p_sys->b_menus_update )
     {
 //        GnomeSetupMenu( p_intf );
@@ -230,9 +230,9 @@ void KInterface::slotManage()
 #endif
 
     /* Manage the slider */
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-#define p_area p_intf->p_input->stream.p_selected_area
+#define p_area p_input_bank->pp_input[0]->stream.p_selected_area
         fSlider->setValue( ( 100 * p_area->i_tell ) / p_area->i_size );
 #undef p_area
     }
@@ -253,25 +253,25 @@ void KInterface::slotSliderMoved( int position )
 // XXX is this locking really useful ?
     vlc_mutex_lock( &p_intf->change_lock );
 
-    off_t i_seek = ( position * p_intf->p_input->stream.p_selected_area->i_size ) / 100;
-    input_Seek( p_intf->p_input, i_seek );
+    off_t i_seek = ( position * p_input_bank->pp_input[0]->stream.p_selected_area->i_size ) / 100;
+    input_Seek( p_input_bank->pp_input[0], i_seek );
 
     vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 void KInterface::slotSliderChanged( int position )
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         char psz_time[ OFFSETTOTIME_MAX_SIZE ];
 
-        vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
+        vlc_mutex_lock( &p_input_bank->pp_input[0]->stream.stream_lock );
 
-#define p_area p_intf->p_input->stream.p_selected_area
-        statusBar()->changeItem( input_OffsetToTime( p_intf->p_input, psz_time, ( p_area->i_size * position ) / 100 ), ID_DATE );
+#define p_area p_input_bank->pp_input[0]->stream.p_selected_area
+        statusBar()->changeItem( input_OffsetToTime( p_input_bank->pp_input[0], psz_time, ( p_area->i_size * position ) / 100 ), ID_DATE );
 #undef p_area
 
-        vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
+        vlc_mutex_unlock( &p_input_bank->pp_input[0]->stream.stream_lock );
      }
 }
 
@@ -295,9 +295,9 @@ void KInterface::slotOpenDisk()
 
         // Select added item and switch to disk interface
         intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
-        if( p_intf->p_input != NULL )
+        if( p_input_bank->pp_input[0] != NULL )
         {
-            p_intf->p_input->b_eof = 1;
+            p_input_bank->pp_input[0]->b_eof = 1;
         }
     }
 }
@@ -319,35 +319,35 @@ void KInterface::slotOpenStream()
         intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, source.latin1() );
         intf_PlaylistJumpto( p_main->p_playlist, p_main->p_playlist->i_size-2 );
 
-        if( p_intf->p_input != NULL )
+        if( p_input_bank->pp_input[0] != NULL )
         {
-            p_intf->p_input->b_eof = 1;
+            p_input_bank->pp_input[0]->b_eof = 1;
         }
     }
 }
 
 void KInterface::slotPlay()
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
     }
 }
 
 void KInterface::slotPause()
 {
-    if ( p_intf->p_input != NULL )
+    if ( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
     }
 }
 
 void KInterface::slotStop()
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         /* end playing item */
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
 
         /* update playlist */
         vlc_mutex_lock( &p_main->p_playlist->change_lock );
@@ -366,37 +366,37 @@ void KInterface::slotBackward()
 
 void KInterface::slotPrev()
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         /* FIXME: temporary hack */
         intf_PlaylistPrev( p_main->p_playlist );
         intf_PlaylistPrev( p_main->p_playlist );
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
 }
 
 void KInterface::slotNext()
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         /* FIXME: temporary hack */
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
     }
 }
 
 void KInterface::slotSlow()
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_SLOWER );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_SLOWER );
     }
 }
 
 void KInterface::slotFast()
 {
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_FASTER );
     }
 }
 

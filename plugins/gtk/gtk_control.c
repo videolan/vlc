@@ -2,7 +2,7 @@
  * gtk_control.c : functions to handle stream control buttons.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_control.c,v 1.8 2001/12/30 07:09:55 sam Exp $
+ * $Id: gtk_control.c,v 1.9 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -69,12 +69,10 @@ gboolean GtkControlStop( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
         /* end playing item */
-        p_intf->p_input->b_eof = 1;
+        p_input_bank->pp_input[0]->b_eof = 1;
 
         /* update playlist */
         vlc_mutex_lock( &p_main->p_playlist->change_lock );
@@ -94,11 +92,9 @@ gboolean GtkControlPlay( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PLAY );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PLAY );
         p_main->p_playlist->b_stopped = 0;
     }
     else
@@ -135,11 +131,9 @@ gboolean GtkControlPause( GtkWidget       *widget,
                           GdkEventButton  *event,
                           gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_PAUSE );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_PAUSE );
 
         vlc_mutex_lock( &p_main->p_playlist->change_lock );
         p_main->p_playlist->b_stopped = 0;
@@ -154,11 +148,9 @@ gboolean GtkControlSlow( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_SLOWER );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_SLOWER );
 
         vlc_mutex_lock( &p_main->p_playlist->change_lock );
         p_main->p_playlist->b_stopped = 0;
@@ -173,11 +165,9 @@ gboolean GtkControlFast( GtkWidget       *widget,
                          GdkEventButton  *event,
                          gpointer         user_data )
 {
-    intf_thread_t *p_intf = GetIntf( GTK_WIDGET(widget), (char*)user_data );
-
-    if( p_intf->p_input != NULL )
+    if( p_input_bank->pp_input[0] != NULL )
     {
-        input_SetStatus( p_intf->p_input, INPUT_STATUS_FASTER );
+        input_SetStatus( p_input_bank->pp_input[0], INPUT_STATUS_FASTER );
 
         vlc_mutex_lock( &p_main->p_playlist->change_lock );
         p_main->p_playlist->b_stopped = 0;

@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.55 2001/12/30 07:09:54 sam Exp $
+ * $Id: input_ext-intf.h,v 1.56 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -35,14 +35,32 @@
 #define OFFSETTOTIME_MAX_SIZE       10
 
 /*****************************************************************************
+ * input_bank_t, p_input_bank (global variable)
+ *****************************************************************************
+ * This global variable is accessed by any function using the input.
+ *****************************************************************************/
+typedef struct input_bank_s
+{
+    /* Array to all the input threads */
+    struct input_thread_s *pp_input[ INPUT_MAX_THREADS ];
+
+    int                   i_count;
+    vlc_mutex_t           lock;                               /* Global lock */
+
+} input_bank_t;
+
+#ifndef PLUGIN
+extern input_bank_t *p_input_bank;
+#else
+#   define p_input_bank (p_symbols->p_input_bank)
+#endif
+
+/*****************************************************************************
  * es_descriptor_t: elementary stream descriptor
  *****************************************************************************
  * Describes an elementary stream, and includes fields required to handle and
  * demultiplex this elementary stream.
  *****************************************************************************/
-struct decoder_fifo_s;                         /* defined in input_ext-dec.h */
-struct pgrm_descriptor_s;
-
 typedef struct es_descriptor_s
 {
     u16                     i_id;            /* stream ID for PS, PID for TS */
@@ -234,9 +252,6 @@ typedef struct stream_descriptor_s
  *****************************************************************************
  * This structure includes all the local static variables of an input thread
  *****************************************************************************/
-struct vout_thread_s;
-struct bit_stream_s;
-
 typedef struct input_thread_s
 {
     /* Thread properties and locks */
@@ -323,6 +338,9 @@ typedef struct input_thread_s
  * Prototypes
  *****************************************************************************/
 #ifndef PLUGIN
+void   input_InitBank       ( void );
+void   input_EndBank        ( void );
+
 struct input_thread_s * input_CreateThread ( struct playlist_item_s *,
                                              int *pi_status );
 void   input_DestroyThread  ( struct input_thread_s *, int *pi_status );

@@ -1,1 +1,1 @@
-glide_SOURCES = glide.c vout_glide.c
+glide_SOURCES = glide.c

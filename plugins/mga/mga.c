@@ -2,7 +2,7 @@
  * mga.c : Matrox Graphic Array plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: mga.c,v 1.14 2002/01/06 18:01:58 sam Exp $
+ * $Id: mga.c,v 1.15 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Aaron Holtzman <aholtzma@ess.engr.uvic.ca>
  *          Samuel Hocevar <sam@zoy.org>
@@ -65,15 +65,9 @@ MODULE_CONFIG_START
 MODULE_CONFIG_STOP
 
 MODULE_INIT_START
-#ifdef MODULE_NAME_IS_mga
     SET_DESCRIPTION( "Matrox Graphic Array video module" )
     ADD_CAPABILITY( VOUT, 10 )
     ADD_SHORTCUT( "mga" )
-#elif defined( MODULE_NAME_IS_mgammx )
-    SET_DESCRIPTION( "MMX-accelerated Matrox Graphic Array video module" )
-    ADD_CAPABILITY( VOUT, 11 )
-    ADD_SHORTCUT( "mgammx" )
-#endif
 MODULE_INIT_STOP
 
 MODULE_ACTIVATE_START
@@ -135,17 +129,12 @@ typedef struct vout_sys_s
     mga_vid_config_t    mga;
     int                 i_fd;
     byte_t *            p_video;
-    boolean_t           b_420bug;
 
 } vout_sys_t;
 
 typedef struct picture_sys_s
 {
     int     i_frame;
-
-    /* For buggy g200s which don't do I420 properly */
-    u8 *    p_chroma;
-    u8 *    p_tmp;
 
 } picture_sys_t;
 
@@ -241,8 +230,9 @@ static int vout_Init( vout_thread_t *p_vout )
                                      * p_vout->output.i_height * 2;
     p_vout->p_sys->mga.version = MGA_VID_VERSION;
 
-    /* Assume we only do YV12 for the moment */
-    p_vout->output.i_chroma = FOURCC_YV12;
+    /* Assume we only do YMGA for the moment. XXX: mga_vid calls this
+     * YV12, but it's actually some strange format with packed UV. */
+    p_vout->output.i_chroma = FOURCC_YMGA;
     p_vout->p_sys->mga.format = MGA_VID_FORMAT_YV12;
     
     if( ioctl(p_vout->p_sys->i_fd, MGA_VID_CONFIG, &p_vout->p_sys->mga) )
@@ -251,18 +241,10 @@ static int vout_Init( vout_thread_t *p_vout )
         return -1;
     }
 
-    p_vout->p_sys->b_420bug = 0;
-
     if( p_vout->p_sys->mga.card_type == MGA_G200 )
     {
         intf_WarnMsg( 3, "vout info: detected MGA G200 (%d MB Ram)",
                          p_vout->p_sys->mga.ram_size );
-        if( p_vout->output.i_chroma == FOURCC_I420
-             || p_vout->output.i_chroma == FOURCC_IYUV
-             || p_vout->output.i_chroma == FOURCC_YV12 )
-        {
-            p_vout->p_sys->b_420bug = 1;
-        }
     }
     else
     {
@@ -334,10 +316,6 @@ static void vout_End( vout_thread_t *p_vout )
     for( i_index = I_OUTPUTPICTURES ; i_index ; )
     {
         i_index--;
-        if( p_vout->p_sys->b_420bug )
-        {
-            free( PP_OUTPUTPICTURE[ i_index ]->p_sys );
-        }
     }
 }
 
@@ -369,59 +347,9 @@ static int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void vout_Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    if( p_vout->p_sys->b_420bug )
-    {
-        /* Grmbl, we have a G200 which mistakenly assumes 4:2:0 planar
-         * has *packed* chroma information! Do some conversion... */
-        u8 *p_dest = p_pic->p_sys->p_chroma;
-        u8 *p_cr = p_pic->U_PIXELS;
-        u8 *p_cb = p_pic->V_PIXELS;
-        int i;
-
-        /* frame_size is a multiple of 64 */
-        for( i = p_vout->p_sys->mga.frame_size / 64; i--; )
-        {
-#ifdef MODULE_NAME_IS_mga
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-            *p_dest++ = *p_cr++; *p_dest++ = *p_cb++;
-#elif defined( MODULE_NAME_IS_mgammx )
-            __asm__( ".align 32 \n\
-            movd       (%0), %%mm0  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0 \n\
-            movd      4(%0), %%mm2  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0 \n\
-            movd      8(%0), %%mm4  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0 \n\
-            movd     12(%0), %%mm6  # Load 4 Cr   00 00 00 00 v3 v2 v1 v0 \n\
-            movd       (%1), %%mm1  # Load 4 Cb   00 00 00 00 u3 u2 u1 u0 \n\
-            movd      4(%1), %%mm3  # Load 4 Cb   00 00 00 00 u3 u2 u1 u0 \n\
-            movd      8(%1), %%mm5  # Load 4 Cb   00 00 00 00 u3 u2 u1 u0 \n\
-            movd     12(%1), %%mm7  # Load 4 Cb   00 00 00 00 u3 u2 u1 u0 \n\
-            punpcklbw %%mm1, %%mm0  #             u3 v3 u2 v2 u1 v1 u0 v0 \n\
-            punpcklbw %%mm3, %%mm2  #             u3 v3 u2 v2 u1 v1 u0 v0 \n\
-            punpcklbw %%mm5, %%mm4  #             u3 v3 u2 v2 u1 v1 u0 v0 \n\
-            punpcklbw %%mm7, %%mm6  #             u3 v3 u2 v2 u1 v1 u0 v0 \n\
-            movq      %%mm0, (%2)   # Store CrCb                          \n\
-            movq      %%mm2, 8(%2)  # Store CrCb                          \n\
-            movq      %%mm4, 16(%2) # Store CrCb                          \n\
-            movq      %%mm6, 24(%2) # Store CrCb"
-            : : "r" (p_cr), "r" (p_cb), "r" (p_dest) );
-
-            p_cr += 16; p_cb += 16; p_dest += 32;
-#endif
-        }
-    }
+    /* Grmbl, if we have a G200 which mistakenly assumes 4:2:0 planar
+     * has *packed* chroma information, we'll need to do some
+     * vonversion... but vlc does this for us. */
 }
 
 /*****************************************************************************
@@ -446,6 +374,13 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     p_pic->p_data = p_vout->p_sys->p_video + I_OUTPUTPICTURES
                                               * p_vout->p_sys->mga.frame_size;
 
+    p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
+
+    if( p_pic->p_sys == NULL )
+    {
+        return -1;
+    }
+
     p_pic->Y_PIXELS = p_pic->p_data;
     p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
     p_pic->p[Y_PLANE].i_pitch = CEIL32( p_vout->output.i_width );
@@ -461,42 +396,13 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         p_pic->p[Y_PLANE].b_margin = 0;
     }
 
-    if( p_vout->p_sys->b_420bug )
-    {
-        /* We need to store the chroma somewhere else */
-        p_pic->p_sys = malloc( sizeof( picture_sys_t )
-                                + p_vout->p_sys->mga.frame_size / 2 );
-
-        if( p_pic->p_sys == NULL )
-        {
-            return -1;
-        }
-
-        p_pic->p_sys->p_chroma =
-              p_pic->p_data + p_vout->p_sys->mga.frame_size / 2;
-        p_pic->p_sys->p_tmp = (u8*)p_pic->p_sys + sizeof( picture_sys_t );
-        p_pic->U_PIXELS = p_pic->p_sys->p_tmp;
-        p_pic->V_PIXELS = p_pic->p_sys->p_tmp
-                           + p_vout->p_sys->mga.frame_size / 4;
-    }
-    else
-    {
-        p_pic->p_sys = malloc( sizeof( picture_sys_t ) );
-
-        if( p_pic->p_sys == NULL )
-        {
-            return -1;
-        }
-
-        p_pic->U_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 2/4;
-        p_pic->V_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 3/4;
-    }
-
+    p_pic->U_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 2/4;
     p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
     p_pic->p[U_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
     p_pic->p[U_PLANE].i_pixel_bytes = 1;
     p_pic->p[U_PLANE].b_margin = 0;
 
+    p_pic->V_PIXELS = p_pic->p_data + p_vout->p_sys->mga.frame_size * 3/4;
     p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
     p_pic->p[V_PLANE].i_pitch = CEIL32( p_vout->output.i_width ) / 2;
     p_pic->p[V_PLANE].i_pixel_bytes = 1;

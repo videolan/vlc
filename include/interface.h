@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: interface.h,v 1.25 2001/12/30 07:09:54 sam Exp $
+ * $Id: interface.h,v 1.26 2002/01/07 02:12:29 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -45,9 +45,6 @@ typedef struct intf_thread_s
 
     /* Interface callback */
     void             ( *pf_manage ) ( struct intf_thread_s * );
-
-    /* Input thread - NULL if not active */
-    p_input_thread_t    p_input;
 
     /* XXX: new message passing stuff will go here */
     vlc_mutex_t         change_lock;
