@@ -1,7 +1,7 @@
 /*****************************************************************************
  * http.c: HTTP input module
  *****************************************************************************
- * Copyright (C) 2001-2004 VideoLAN
+ * Copyright (C) 2001-2005 VideoLAN
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -938,6 +938,7 @@ static int Request( access_t *p_access, int64_t i_tell )
                    p_sys->psz_passwd ? p_sys->psz_passwd : "" );
 
         b64 = vlc_b64_encode( buf );
+        free( buf );
 
         net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
                     "Authorization: Basic %s\r\n", b64 );
