@@ -2,7 +2,7 @@
  * gtk_open.c : functions to handle file/disc/network open widgets.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: gtk_open.c,v 1.20 2002/03/25 02:06:24 jobi Exp $
+ * $Id: gtk_open.c,v 1.21 2002/04/15 04:28:26 jobi Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -530,13 +530,14 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
     char *          psz_source;
     int             i_end = p_main->p_playlist->i_size;
     int             i_freq, i_srate;
+    int             i_fec;
     boolean_t       b_pol;
 
     gtk_widget_hide( p_intf->p_sys->p_sat );
 
     /* Check which polarization was activated */
-    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET(button),
-                                          "sat_pol_vert" ) )->active )
+    if( GTK_TOGGLE_BUTTON( lookup_widget( GTK_WIDGET( button ),
+                                        "sat_pol_vert" ) )->active )
     {
         b_pol = 0;
     }
@@ -544,7 +545,36 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
     {
         b_pol = 1;
     }
-    
+
+    switch( strtol( gtk_entry_get_text( GTK_ENTRY( GTK_COMBO( 
+                lookup_widget( GTK_WIDGET( button ), "sat_fec" )
+                )->entry ) ), NULL, 10 ) )
+    {
+        case 1:
+            i_fec = 1;
+            break;
+        case 2:
+            i_fec = 2;
+            break;
+        case 3:
+            i_fec = 3;
+            break;
+        case 4:
+            i_fec = 4;
+            break;
+        case 5:
+            i_fec = 5;
+            break;
+        case 6:
+            i_fec = 6;
+            break;
+        case 7:
+            i_fec = 7;
+            break;
+        default:
+            i_fec = 8; /* this should not happen */
+    }
+        
     /* Select frequency and symbol rate */
     i_freq = gtk_spin_button_get_value_as_int(
                               GTK_SPIN_BUTTON( lookup_widget(
@@ -561,8 +591,8 @@ void GtkSatOpenOk( GtkButton * button, gpointer user_data )
     }
 
     /* Build source name and add it to playlist */
-    sprintf( psz_source, "%s:%d,%d,%d",
-             "satellite", i_freq, b_pol, i_srate );
+    sprintf( psz_source, "%s:%d,%d,%d,%d",
+             "satellite", i_freq, b_pol, i_fec, i_srate );
     intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, psz_source );
     free( psz_source );
 

@@ -52,7 +52,6 @@
 #include "satellite_tools.h"
 
 #define DISEQC 0                            /* Wether you should use Diseqc*/
-#define FEC 2                                                      /* FEC */
 #define LNB_LOF_1 9750000
 #define LNB_LOF_2 10600000
 #define LNB_SLOF 11700000
@@ -108,13 +107,15 @@ void _M( demux_getfunctions )( function_list_t * p_function_list )
  *****************************************************************************/
 static int SatelliteOpen( input_thread_t * p_input )
 {
-    input_socket_t *   p_satellite;
-    char *                      psz_parser;
-    char *                      psz_next;
-    int                         i_fd = 0;
-    int                         i_freq = 0;
-    int                         i_srate = 0;
-    boolean_t                   b_pol = 0;
+    input_socket_t *    p_satellite;
+    char *              psz_parser;
+    char *              psz_next;
+    int                 i_fd = 0;
+    int                 i_freq = 0;
+    int                 i_srate = 0;
+    boolean_t           b_pol = 0;
+    int                 i_fec = 1;
+    float               f_fec;
 
     /* parse the options passed in command line : */
 
@@ -127,22 +128,76 @@ static int SatelliteOpen( input_thread_t * p_input )
 
     i_freq = (int)strtol( psz_parser, &psz_next, 10 );
 
-    if ( *psz_next )
+    if( *psz_next )
     {
         psz_parser = psz_next + 1;
         b_pol = (boolean_t)strtol( psz_parser, &psz_next, 10 );
-            if ( *psz_next )
+            if( *psz_next )
             {
                 psz_parser = psz_next + 1;
-                i_srate = (boolean_t)strtol( psz_parser, &psz_next, 10 );
+                i_fec = (int)strtol( psz_parser, &psz_next, 10 );
+                if( *psz_next )
+                {
+                    psz_parser = psz_next + 1;
+                    i_srate = (int)strtol( psz_parser, &psz_next, 10 );
+                }
             }
 
     }
 
-    i_freq = i_freq ? i_freq : config_GetIntVariable( "sat_frequency" );
-    i_srate = i_srate ? i_srate : config_GetIntVariable( "sat_symbol_rate" );
-    if ( !b_pol && b_pol != 1 )
+    if( i_freq > 12999 || i_freq < 10000 )
+    {
+        intf_WarnMsg( 1, "input: satellite: invalid frequency, using"\
+                "default one" );
+        i_srate = config_GetIntVariable( "sat_frequency" );
+    }
+
+    if( i_srate > 30000 || i_srate < 1000 )
+    {
+        intf_WarnMsg( 1, "input: satellite: invalid symbol rate, using"\
+                "default one" );
+        i_srate = config_GetIntVariable( "sat_symbol_rate" );
+    }
+
+    if( !b_pol && b_pol != 1 )
+    {
+        intf_WarnMsg( 1, "input: satellite: invalid polarization, using"\
+                "default one" );
         b_pol = config_GetIntVariable( "sat_polarization" );
+    }
+
+    if( i_fec > 7 || i_fec < 1 )
+    {
+        intf_WarnMsg( 1, "input: satellite: invalid FEC, using default one" );
+        i_fec = config_GetIntVariable( "sat_fec" );
+    }
+
+    switch( i_fec )
+    {
+        case 1:
+            f_fec = 1./2;
+            break;
+        case 2:
+            f_fec = 2./3;
+            break;
+        case 3:
+            f_fec = 3./4;
+            break;
+        case 4:
+            f_fec = 4./5;
+            break;
+        case 5:
+            f_fec = 5./6;
+            break;
+        case 6:
+            f_fec = 6./7;
+            break;
+        case 7:
+            f_fec = 7./8;
+            break;
+        default:
+            /* cannot happen */
+    }
 
 
     /* Initialise structure */
@@ -164,28 +219,32 @@ static int SatelliteOpen( input_thread_t * p_input )
                                    /*O_NONBLOCK | O_LARGEFILE*/0 )) == (-1) )
     {
         intf_ErrMsg( "input error: cannot open file (%s)", strerror(errno) );
+        free( p_satellite );
         return -1;
     }
 
 
     /* Initialize the Satellite Card */
 
-    intf_WarnMsg( 2, "Initializing Sat Card with Freq: %d, Pol: %d, Srate: %d",
-                        i_freq, b_pol, i_srate );
+    intf_WarnMsg( 2, "Initializing Sat Card with Freq: %d, Pol: %d, "\
+                        "FEC: %03f, Srate: %d",
+                        i_freq, b_pol, f_fec, i_srate );
 
     if ( ioctl_SECControl( i_freq * 1000, b_pol, LNB_SLOF, DISEQC ) < 0 )
     {
         intf_ErrMsg("input: satellite: An error occured when controling SEC");
+        close( p_satellite->i_handle );
+        free( p_satellite );
         return -1;
     }
 
     intf_WarnMsg( 3, "Initializing Frontend device" );
-    switch (ioctl_SetQPSKFrontend ( i_freq * 1000, i_srate* 1000, FEC,
+    switch (ioctl_SetQPSKFrontend ( i_freq * 1000, i_srate* 1000, f_fec,
                          LNB_LOF_1, LNB_LOF_2, LNB_SLOF))
     {
         case -2:
-            intf_ErrMsg( "input: satellite: Frontend returned\
-                    an unexpected event" );
+            intf_ErrMsg( "input: satellite: Frontend returned"\
+                    "an unexpected event" );
             close( p_satellite->i_handle );
             free( p_satellite );
             return -1;
@@ -228,6 +287,8 @@ static int SatelliteOpen( input_thread_t * p_input )
     {
         intf_ErrMsg( "input: satellite: An error occured when setting\
                 filter on PAT" );
+        close( p_satellite->i_handle );
+        free( p_satellite );
         return -1;
     }
 
@@ -235,6 +296,8 @@ static int SatelliteOpen( input_thread_t * p_input )
     {
         intf_ErrMsg( "input: satellite: Not enough memory to allow stream\
                         structure" );
+        close( p_satellite );
+        free( p_satellite );
         return( -1 );
     }
 
@@ -251,8 +314,7 @@ static int SatelliteOpen( input_thread_t * p_input )
     p_input->psz_demux = "satellite";
 
     return 0;
-
-   }
+}
 
 /*****************************************************************************
  * SatelliteClose : Closes the device

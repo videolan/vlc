@@ -2621,12 +2621,16 @@ create_intf_sat (void)
   GtkObject *sat_freq_adj;
   GtkWidget *sat_freq;
   GtkWidget *label31;
-  GSList *table5_group = NULL;
+  GSList *pol_group = NULL;
   GtkWidget *sat_pol_hor;
   GtkWidget *sat_pol_vert;
   GtkWidget *label33;
   GtkObject *sat_srate_adj;
   GtkWidget *sat_srate;
+  GtkWidget *label35;
+  GtkWidget *sat_fec;
+  GList *sat_fec_items = NULL;
+  GtkWidget *combo_entry4;
   GtkWidget *hbuttonbox2;
   GtkWidget *sat_ok;
   GtkWidget *sat_cancel;
@@ -2654,7 +2658,7 @@ create_intf_sat (void)
   gtk_widget_show (frame13);
   gtk_box_pack_start (GTK_BOX (hbox10), frame13, TRUE, TRUE, 0);
 
-  table5 = gtk_table_new (4, 2, FALSE);
+  table5 = gtk_table_new (5, 2, FALSE);
   gtk_widget_ref (table5);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "table5", table5,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2674,7 +2678,7 @@ create_intf_sat (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label30), 0, 0.5);
 
-  sat_freq_adj = gtk_adjustment_new (12553, 1, 65536, 1, 10, 10);
+  sat_freq_adj = gtk_adjustment_new (11954, 10000, 12999, 1, 10, 10);
   sat_freq = gtk_spin_button_new (GTK_ADJUSTMENT (sat_freq_adj), 1, 0);
   gtk_widget_ref (sat_freq);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_freq", sat_freq,
@@ -2694,8 +2698,8 @@ create_intf_sat (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label31), 0, 0.5);
 
-  sat_pol_hor = gtk_radio_button_new_with_label (table5_group, _("Horizontal"));
-  table5_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sat_pol_hor));
+  sat_pol_hor = gtk_radio_button_new_with_label (pol_group, _("Horizontal"));
+  pol_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sat_pol_hor));
   gtk_widget_ref (sat_pol_hor);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_pol_hor", sat_pol_hor,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2704,8 +2708,8 @@ create_intf_sat (void)
                     (GtkAttachOptions) (GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
 
-  sat_pol_vert = gtk_radio_button_new_with_label (table5_group, _("Vertical"));
-  table5_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sat_pol_vert));
+  sat_pol_vert = gtk_radio_button_new_with_label (pol_group, _("Vertical"));
+  pol_group = gtk_radio_button_group (GTK_RADIO_BUTTON (sat_pol_vert));
   gtk_widget_ref (sat_pol_vert);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_pol_vert", sat_pol_vert,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -2725,7 +2729,7 @@ create_intf_sat (void)
                     (GtkAttachOptions) (0), 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label33), 0, 0.5);
 
-  sat_srate_adj = gtk_adjustment_new (27500, 0, 100, 1, 10, 10);
+  sat_srate_adj = gtk_adjustment_new (27500, 1000, 30000, 1, 10, 10);
   sat_srate = gtk_spin_button_new (GTK_ADJUSTMENT (sat_srate_adj), 1, 0);
   gtk_widget_ref (sat_srate);
   gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_srate", sat_srate,
@@ -2734,6 +2738,41 @@ create_intf_sat (void)
   gtk_table_attach (GTK_TABLE (table5), sat_srate, 1, 2, 1, 2,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
+
+  label35 = gtk_label_new (_("FEC"));
+  gtk_widget_ref (label35);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "label35", label35,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label35);
+  gtk_table_attach (GTK_TABLE (table5), label35, 0, 1, 4, 5,
+                    (GtkAttachOptions) (GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  gtk_misc_set_alignment (GTK_MISC (label35), 0, 0.5);
+
+  sat_fec = gtk_combo_new ();
+  gtk_widget_ref (sat_fec);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "sat_fec", sat_fec,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (sat_fec);
+  gtk_table_attach (GTK_TABLE (table5), sat_fec, 1, 2, 4, 5,
+                    (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
+                    (GtkAttachOptions) (0), 0, 0);
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("1/2"));
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("2/3"));
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("3/4"));
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("4/5"));
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("5/6"));
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("6/7"));
+  sat_fec_items = g_list_append (sat_fec_items, (gpointer) _("7/8"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (sat_fec), sat_fec_items);
+  g_list_free (sat_fec_items);
+
+  combo_entry4 = GTK_COMBO (sat_fec)->entry;
+  gtk_widget_ref (combo_entry4);
+  gtk_object_set_data_full (GTK_OBJECT (intf_sat), "combo_entry4", combo_entry4,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (combo_entry4);
+  gtk_entry_set_text (GTK_ENTRY (combo_entry4), _("3/4"));
 
   hbuttonbox2 = GNOME_DIALOG (intf_sat)->action_area;
   gtk_object_set_data (GTK_OBJECT (intf_sat), "hbuttonbox2", hbuttonbox2);
