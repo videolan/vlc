@@ -284,6 +284,7 @@ void __module_EndBank( vlc_object_t *p_this )
     }
 
     vlc_object_destroy( p_this->p_libvlc->p_module_bank );
+    p_this->p_libvlc->p_module_bank = NULL;
 
     return;
 }
@@ -298,6 +299,21 @@ void __module_EndBank( vlc_object_t *p_this )
  *****************************************************************************/
 void __module_LoadMain( vlc_object_t *p_this )
 {
+    vlc_value_t lockval;
+
+    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+    if( p_this->p_libvlc->p_module_bank->b_main )
+    {
+        vlc_mutex_unlock( lockval.p_address );
+        var_Destroy( p_this->p_libvlc, "libvlc" );
+        return;
+    }
+    p_this->p_libvlc->p_module_bank->b_main = VLC_TRUE;
+    vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( p_this->p_libvlc, "libvlc" );
+
     AllocateBuiltinModule( p_this, vlc_entry__main );
 }
 
@@ -308,6 +324,21 @@ void __module_LoadMain( vlc_object_t *p_this )
  *****************************************************************************/
 void __module_LoadBuiltins( vlc_object_t * p_this )
 {
+    vlc_value_t lockval;
+
+    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+    if( p_this->p_libvlc->p_module_bank->b_builtins )
+    {
+        vlc_mutex_unlock( lockval.p_address );
+        var_Destroy( p_this->p_libvlc, "libvlc" );
+        return;
+    }
+    p_this->p_libvlc->p_module_bank->b_builtins = VLC_TRUE;
+    vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( p_this->p_libvlc, "libvlc" );
+
     msg_Dbg( p_this, "checking builtin modules" );
     ALLOCATE_ALL_BUILTINS();
 }
@@ -320,6 +351,21 @@ void __module_LoadBuiltins( vlc_object_t * p_this )
 void __module_LoadPlugins( vlc_object_t * p_this )
 {
 #ifdef HAVE_DYNAMIC_PLUGINS
+    vlc_value_t lockval;
+
+    var_Create( p_this->p_libvlc, "libvlc", VLC_VAR_MUTEX );
+    var_Get( p_this->p_libvlc, "libvlc", &lockval );
+    vlc_mutex_lock( lockval.p_address );
+    if( p_this->p_libvlc->p_module_bank->b_plugins )
+    {
+        vlc_mutex_unlock( lockval.p_address );
+        var_Destroy( p_this->p_libvlc, "libvlc" );
+        return;
+    }
+    p_this->p_libvlc->p_module_bank->b_plugins = VLC_TRUE;
+    vlc_mutex_unlock( lockval.p_address );
+    var_Destroy( p_this->p_libvlc, "libvlc" );
+
     msg_Dbg( p_this, "checking plugin modules" );
 
     if( config_GetInt( p_this, "plugins-cache" ) )

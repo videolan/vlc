@@ -57,6 +57,10 @@ struct module_bank_t
     int              i_usage;
     module_symbols_t symbols;
 
+    vlc_bool_t       b_main;
+    vlc_bool_t       b_builtins;
+    vlc_bool_t       b_plugins;
+
     /* Plugins cache */
     vlc_bool_t     b_cache;
     vlc_bool_t     b_cache_dirty;
