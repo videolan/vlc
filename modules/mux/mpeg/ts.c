@@ -2,7 +2,7 @@
  * ts.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ts.c,v 1.19 2003/05/31 00:10:11 fenrir Exp $
+ * $Id: ts.c,v 1.20 2003/05/31 21:49:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Eric Petit <titer@videolan.org>
@@ -1032,11 +1032,17 @@ static int GetPMT( sout_mux_t *p_mux,
         else if( p_stream->i_stream_id == 0xa0 )
         {
             uint8_t     data[512];
+            uint8_t     fcc[4];
             bits_buffer_t bits;
+
+            memcpy( fcc, &p_stream->i_bih_codec, 4 );
 
             /* private DIV3 descripor */
             bits_initwrite( &bits, 512, data );
-            bits_write( &bits, 32, p_stream->i_bih_codec );
+            bits_write( &bits, 8,  fcc[0]);
+            bits_write( &bits, 8,  fcc[1]);
+            bits_write( &bits, 8,  fcc[2]);
+            bits_write( &bits, 8,  fcc[3]);
             bits_write( &bits, 16, p_stream->i_bih_width );
             bits_write( &bits, 16, p_stream->i_bih_height );
             bits_write( &bits, 16, p_stream->i_decoder_specific_info_len );
