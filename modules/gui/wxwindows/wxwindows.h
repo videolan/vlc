@@ -671,6 +671,10 @@ private:
     void ShowInfos( int item );
 
     /* Event handlers (these functions should _not_ be virtual) */
+
+    void OnSize( wxSizeEvent &event);
+    void DoSize();
+
     void OnAddFile( wxCommandEvent& event );
     void OnAddMRL( wxCommandEvent& event );
     void OnClose( wxCommandEvent& event );

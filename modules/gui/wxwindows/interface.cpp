@@ -341,11 +341,9 @@ void Interface::CreateOurMenuBar()
                        wxU(_("Open &Capture Device...\tCtrl-C")) );
 
     file_menu->AppendSeparator();
+    file_menu->Append( Wizard_Event, wxU(_("&Wizard...\tCtrl-W")) );
     file_menu->Append( StreamWizard_Event,
-                       wxU(_("Streaming &Wizard...\tCtrl-W")) );
-#if 0
-    file_menu->Append( Wizard_Event, wxU(_("New Wizard...")) );
-#endif
+                       wxU(_("Old streaming Wizard...")) );
     file_menu->AppendSeparator();
     file_menu->Append( Exit_Event, wxU(_("E&xit\tCtrl-X")) );
 

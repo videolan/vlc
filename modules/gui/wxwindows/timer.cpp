@@ -106,7 +106,7 @@ void Timer::Notify()
             b_old_seekable = VLC_FALSE;
 
             p_main_interface->statusbar->SetStatusText(
-                wxU(p_intf->p_sys->p_input->psz_source), 2 );
+                wxU(p_intf->p_sys->p_input->p_item->psz_name), 2 );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;

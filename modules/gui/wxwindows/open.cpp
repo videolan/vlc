@@ -981,8 +981,8 @@ void OpenDialog::OnOk( wxCommandEvent& WXUNUSED(event) )
 
     if( i_method == OPEN_STREAM )
     {
-        Hide();
         if( IsModal() ) EndModal( wxID_OK );
+        Hide();
         return;
     }
 
