@@ -760,7 +760,7 @@ static int Open( vlc_object_t * p_this )
             }
             else if( !strcmp( tk.psz_codec, "V_MPEG4/ISO/AVC" ) )
             {
-                tk.fmt.i_codec = VLC_FOURCC( 'h', '2', '6', '4' );
+                tk.fmt.i_codec = VLC_FOURCC( 'a', 'v', 'c', '1' );
                 tk.fmt.b_packetized = VLC_FALSE;
                 tk.fmt.i_extra = tk.i_extra_data;
                 tk.fmt.p_extra = malloc( tk.i_extra_data );
