@@ -338,7 +338,7 @@ int playlist_NodeEmpty( playlist_t *p_playlist, playlist_item_t *p_root,
         if( p_root->pp_children[i]->i_children > -1 )
         {
             playlist_NodeDelete( p_playlist, p_root->pp_children[i],
-                                b_delete_items );
+                                 b_delete_items );
         }
         else if( b_delete_items )
         {

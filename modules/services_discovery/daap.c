@@ -454,11 +454,27 @@ static void OnHostsUpdate( services_discovery_t *p_sd )
 {
     int i;
 
+    for( i = 0 ; i< p_sd->p_sys->p_db->i_hosts ; i ++ )
+    {
+        p_sd->p_sys->p_db->pp_hosts[i]->b_updated = VLC_FALSE;
+        p_sd->p_sys->p_db->pp_hosts[i]->b_new     = VLC_FALSE;
+    }
+
     vlc_mutex_lock( &p_sd->p_sys->p_db->search_lock );
     DAAP_Client_EnumerateHosts( p_sd->p_sys->p_client, EnumerateCallback, p_sd);
+
+    for( i = 0 ; i< p_sd->p_sys->p_db->i_hosts ; i ++ )
+    {
+        if( p_sd->p_sys->p_db->pp_hosts[i]->b_updated == VLC_FALSE )
+        {
+            host_t *p_host = p_sd->p_sys->p_db->pp_hosts[i];
+            FreeHost( p_sd, p_host );
+            REMOVE_ELEM( p_sd->p_sys->p_db->pp_hosts,
+                         p_sd->p_sys->p_db->i_hosts, i );
+        }
+    }
     vlc_mutex_unlock( &p_sd->p_sys->p_db->search_lock );
 
-    /* FIXME: Handle the list better: remove old hosts, ... */
     for( i = 0 ; i< p_sd->p_sys->p_db->i_hosts ; i ++ )
     {
         if( p_sd->p_sys->p_db->pp_hosts[i]->b_new )
@@ -585,6 +601,10 @@ static void ProcessHost( services_discovery_t *p_sd, host_t *p_host )
                                                    p_host->p_songs[i].id );
         p_item = playlist_ItemNew( p_sd, psz_buff,
                                          p_host->p_songs[i].itemname );
+        vlc_input_item_AddInfo( &p_item->input, _("Meta-Information"),
+                                _("Artist"), p_host->p_songs[i].songartist );
+        vlc_input_item_AddInfo( &p_item->input, _("Meta-Information"),
+                                _("Album"), p_host->p_songs[i].songalbum );
 
         playlist_NodeAddItem( p_playlist, p_item, VIEW_CATEGORY,
                               p_host->p_node, PLAYLIST_APPEND, PLAYLIST_END );
@@ -598,10 +618,20 @@ static void ProcessHost( services_discovery_t *p_sd, host_t *p_host )
 
 static void FreeHost( services_discovery_t *p_sd, host_t *p_host )
 {
+    playlist_t *p_playlist;
+
     if( p_host->p_host )
     {
         DAAP_ClientHost_Disconnect( p_host->p_host );
         DAAP_ClientHost_Release( p_host->p_host );
+    }
+
+    p_playlist = (playlist_t *) vlc_object_find( p_sd, VLC_OBJECT_PLAYLIST,
+                                                 FIND_ANYWHERE );
+    if( p_playlist )
+    {
+        playlist_NodeDelete( p_playlist, p_host->p_node, VLC_TRUE );
+        vlc_object_release( p_playlist );
     }
 
     if( p_host->p_songs ) free( p_host->p_songs );

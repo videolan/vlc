@@ -613,7 +613,7 @@ void Playlist::UpdateItem( int i )
 
     ListView_SetItemText( hListView, i, 0, _FROMMB(p_item->input.psz_name) );
     ListView_SetItemText( hListView, i, 1,
-                          _FROMMB( playlist_ItemGetInfo( p_item,
+                          _FROMMB( vlc_input_item_GetInfo( &p_item->input,
                                    _("General") , _("Author") ) ) );
 
     char psz_duration[MSTRTIME_MAX_SIZE];

@@ -64,7 +64,8 @@ int Export_M3U( vlc_object_t *p_this )
                     p_playlist->pp_items[i]->input.psz_uri ) )
         {
             char *psz_author =
-	        playlist_GetInfo( p_playlist, i, _("General"), _("Author") );
+                   vlc_input_item_GetInfo( &p_playlist->pp_items[i]->input,
+                                         _("General"), _("Author") );
 
             fprintf( p_export->p_file, "#EXTINF:%i,%s,%s\n",
                      (int)(p_playlist->pp_items[i]->input.i_duration/1000000),

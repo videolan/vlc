@@ -358,7 +358,6 @@ static int OpenDemux( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    
     /* Probe for SDP */
     if( p_demux->s )
     {
@@ -381,9 +380,8 @@ static int OpenDemux( vlc_object_t *p_this )
     {
         int i_read = stream_Read( p_demux->s,
                                   &psz_sdp[i_sdp], i_max_sdp - i_sdp - 1 );
-        
+
         if( i_read < 0 )
-            
         {
             msg_Err( p_demux, "failed to read SDP" );
             goto error;
@@ -400,27 +398,27 @@ static int OpenDemux( vlc_object_t *p_this )
         i_max_sdp += 1000;
         psz_sdp = (uint8_t*)realloc( psz_sdp, i_max_sdp );
     }
-    
+
     p_sdp = ParseSDP( VLC_OBJECT(p_demux), psz_sdp );
-    
+
     if( !p_sdp )
     {
         msg_Warn( p_demux, "invalid SDP");
         goto error;
     }
-    
+
     if( p_sdp->i_media > 1 )
     {
         goto error;
     }
-    
+
     if( ParseConnection( VLC_OBJECT( p_demux ), p_sdp ) )
     {
         p_sdp->psz_uri = NULL;
     }
     if( p_sdp->i_media_type != 33 && p_sdp->i_media_type != 32 && p_sdp->i_media_type != 14 )
         goto error;
-    
+
     if( p_sdp->psz_uri == NULL ) goto error;
 
     p_demux->p_sys = (demux_sys_t *)malloc( sizeof(demux_sys_t) );
@@ -431,7 +429,7 @@ static int OpenDemux( vlc_object_t *p_this )
     free( psz_sdp );
     if( p_sdp ) FreeSDP( p_sdp );
     return VLC_SUCCESS;
-    
+
 error:
     free( psz_sdp );
     if( p_sdp ) FreeSDP( p_sdp );
