@@ -989,7 +989,6 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
             /* display length */
             if( p_pes->i_buffer + 2 <= i_skip )
             {
-                msg_Warn( p_demux, "length: %lld", i_length );
                 i_length = GetWBE( &p_pes->p_buffer[i_skip] );
             }
 
@@ -1047,9 +1046,6 @@ static void ParsePES ( demux_t *p_demux, ts_pid_t *pid )
             /* Append a \0 */
             p_block = block_Realloc( p_block, 0, p_block->i_buffer + 1 );
             p_block->p_buffer[p_block->i_buffer -1] = '\0';
-
-            msg_Warn( p_demux, "subs: pts=%lld str='%s'",
-                      p_block->i_pts, p_block->p_buffer );
         }
 
         for( i = 0; i < pid->i_extra_es; i++ )
