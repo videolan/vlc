@@ -37,6 +37,7 @@
 #include "playlist.h"
 #include "controls.h"
 #include "about.h"
+#include "open.h"
 
 /*****************************************************************************
  * Local prototypes.
@@ -375,6 +376,10 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [self setSubmenusEnabled: FALSE];
     [self manageVolumeSlider];
+    
+    /* let's load the open and sout-option dialogues and init the related classes */
+    o_open = [[VLCOpen alloc] init];
+    [o_open getReady];
 
     p_playlist = (playlist_t *) vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
@@ -1281,6 +1286,26 @@ static VLCMain *_o_sharedMainInstance = nil;
 - (void)openRecentItem:(id)sender
 {
     [self application: nil openFile: [sender title]];
+}
+
+- (IBAction)intfOpenFile:(id)sender
+{
+    [o_open openFile];
+}
+
+- (IBAction)intfOpenFileGeneric:(id)sender
+{
+    [o_open openFileGeneric];
+}
+
+- (IBAction)intfOpenDisc:(id)sender
+{
+    [o_open openDisc];
+}
+
+- (IBAction)intfOpenNet:(id)sender
+{
+    [o_open openNet];
 }
 
 - (IBAction)viewAbout:(id)sender

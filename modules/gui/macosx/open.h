@@ -96,24 +96,26 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_sout_options;
 }
 
++ (VLCOpen *)sharedInstance;
+
 - (void)setSubPanel;
 - (void)openTarget:(int)i_type;
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi;
 
-- (IBAction)openFileGeneric:(id)sender;
+- (void)openFileGeneric;
 - (void)openFilePathChanged:(NSNotification *)o_notification;
 - (IBAction)openFileBrowse:(id)sender;
 - (void) pathChosenInPanel: (NSOpenPanel *) sheet withReturn:(int)returnCode contextInfo:(void  *)contextInfo;
 - (IBAction)openFileStreamChanged:(id)sender;
 
-- (IBAction)openDisc:(id)sender;
+- (void)openDisc;
 - (IBAction)openDiscTypeChanged:(id)sender;
 - (IBAction)openDiscStepperChanged:(id)sender;
 - (void)openDiscInfoChanged:(NSNotification *)o_notification;
 - (IBAction)openDiscMenusChanged:(id)sender;
 - (IBAction)openVTSBrowse:(id)sender;
 
-- (IBAction)openNet:(id)sender;
+- (void)openNet;
 - (IBAction)openNetModeChanged:(id)sender;
 - (IBAction)openNetStepperChanged:(id)sender;
 - (void)openNetInfoChanged:(NSNotification *)o_notification;
@@ -129,6 +131,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (IBAction)panelCancel:(id)sender;
 - (IBAction)panelOk:(id)sender;
 
-- (IBAction)openFile:(id)sender;
+- (void)openFile;
 
+- (void)getReady;
 @end

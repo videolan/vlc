@@ -82,7 +82,8 @@ struct intf_sys_t
 {
     intf_thread_t *p_intf;      /* The main intf object */
     id o_prefs;                 /* VLCPrefs       */
-    id o_about;                 /* VLAboutBox */
+    id o_about;                 /* VLAboutBox     */
+    id o_open;                  /* VLCOpen        */
 
     IBOutlet id o_window;       /* main window    */
     IBOutlet id o_scrollfield;  /* info field     */
@@ -260,6 +261,11 @@ struct intf_sys_t
 
 - (IBAction)clearRecentItems:(id)sender;
 - (void)openRecentItem:(id)sender;
+
+- (IBAction)intfOpenFile:(id)sender;
+- (IBAction)intfOpenFileGeneric:(id)sender;
+- (IBAction)intfOpenDisc:(id)sender;
+- (IBAction)intfOpenNet:(id)sender;
 
 - (IBAction)viewAbout:(id)sender;
 - (IBAction)viewPreferences:(id)sender;

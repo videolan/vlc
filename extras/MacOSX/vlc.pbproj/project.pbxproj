@@ -815,6 +815,7 @@
 				8E9CA1C106D7DEE800B7186C,
 				DCA00AA9075F948800E6BF46,
 				DCF358BB077F10BA007DB450,
+				DCA693C30789DF8700139EC6,
 			);
 			isa = PBXResourcesBuildPhase;
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2244,6 +2245,30 @@
 			settings = {
 			};
 		};
+		DCA693C10789DF8700139EC6 = {
+			children = (
+				DCA693C20789DF8700139EC6,
+			);
+			isa = PBXVariantGroup;
+			name = Open.nib;
+			path = "";
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DCA693C20789DF8700139EC6 = {
+			isa = PBXFileReference;
+			lastKnownFileType = wrapper.nib;
+			name = English;
+			path = Resources/English.lproj/Open.nib;
+			refType = 4;
+			sourceTree = "<group>";
+		};
+		DCA693C30789DF8700139EC6 = {
+			fileRef = DCA693C10789DF8700139EC6;
+			isa = PBXBuildFile;
+			settings = {
+			};
+		};
 		DCF358B9077F10BA007DB450 = {
 			children = (
 				DCF358BA077F10BA007DB450,
@@ -2273,6 +2298,7 @@
 				DCA00AA7075F948800E6BF46,
 				F74F13EA02C2A79C01EE194C,
 				DCF358B9077F10BA007DB450,
+				DCA693C10789DF8700139EC6,
 			);
 			isa = PBXGroup;
 			name = nibs;

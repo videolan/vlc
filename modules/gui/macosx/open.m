@@ -129,6 +129,29 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
  *****************************************************************************/
 @implementation VLCOpen
 
+static VLCOpen *_o_sharedMainInstance = nil;
+
++ (VLCOpen *)sharedInstance
+{
+    return _o_sharedMainInstance ? _o_sharedMainInstance : [[self alloc] init];
+}
+
+- (id)init
+{
+    if( _o_sharedMainInstance) {
+        [self dealloc];
+    } else {
+        _o_sharedMainInstance = [super init];
+    }
+    
+    return _o_sharedMainInstance;
+}
+
+- (void)getReady
+{
+    [NSBundle loadNibNamed:@"Open" owner:self];
+}
+
 - (void)awakeFromNib
 {
     intf_thread_t * p_intf = VLCIntf;
@@ -358,19 +381,19 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     }  
 }
 
-- (IBAction)openFileGeneric:(id)sender
+- (void)openFileGeneric
 {
     [self openFilePathChanged: nil];
     [self openTarget: 0];
 }
 
-- (IBAction)openDisc:(id)sender
+- (void)openDisc
 {
     [self openDiscTypeChanged: nil];
     [self openTarget: 1];
 }
 
-- (IBAction)openNet:(id)sender
+- (void)openNet
 {
     [self openNetModeChanged: nil];
     [self openTarget: 2];
@@ -704,7 +727,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_mrl setStringValue: o_mrl_string];
 }
 
-- (IBAction)openFile:(id)sender
+- (void)openFile
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
     int i;
