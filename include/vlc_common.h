@@ -475,6 +475,12 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 #   define __MIN(a, b)   ( ((a) < (b)) ? (a) : (b) )
 #endif
 
+static int64_t GCD( int64_t a, int64_t b )
+{
+    if( b ) return GCD( b, a % b );
+    else return a;
+}
+
 /* Dynamic array handling: realloc array, move data, increment position */
 #define INSERT_ELEM( p_ar, i_oldsize, i_pos, elem )                           \
     do                                                                        \
@@ -907,6 +913,8 @@ typedef __int64 off_t;
 #elif !defined(__PLUGIN__)
 #   define vlc_lseek NULL
 #endif
+
+VLC_EXPORT( vlc_bool_t, vlc_reduce, ( int *, int *, int64_t, int64_t, int64_t ) );
 
 /* vlc_wraptext (defined in src/extras/libc.c) */
 #define wraptext vlc_wraptext
