@@ -122,9 +122,7 @@ static void SetPalette     ( vout_thread_t *,
 static void TestNetWMSupport( vout_thread_t * );
 static int ConvertKey( int );
 
-/* Object variables callbacks */
-static int OnTopCallback( vlc_object_t *, char const *,
-                          vlc_value_t, vlc_value_t, void * );
+static int WindowOnTop( vout_thread_t *, vlc_bool_t );
 
 /*****************************************************************************
  * Activate: allocate X11 video thread output method
@@ -283,11 +281,7 @@ int E_(Activate) ( vlc_object_t *p_this )
 
     TestNetWMSupport( p_vout );
 
-    /* Add a variable to indicate if the window should be on top of others */
-    var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    text.psz_string = _("Always on top");
-    var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
+    /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
     var_Get( p_vout, "video-on-top", &val );
     var_Set( p_vout, "video-on-top", val );
@@ -2122,6 +2116,7 @@ static void SetPalette( vout_thread_t *p_vout,
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
     double f_arg;
+    vlc_bool_t b_arg;
 
     switch( i_query )
     {
@@ -2147,6 +2142,15 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
                              0, 0 );
             XSync( p_vout->p_sys->p_display, False );
             p_vout->p_sys->p_win->owner_window = 0;
+            return VLC_SUCCESS;
+
+        case VOUT_SET_STAY_ON_TOP:
+            if( p_vout->p_sys->p_win->owner_window )
+                return vout_ControlWindow( p_vout,
+                    (void *)p_vout->p_sys->p_win->owner_window, i_query, args);
+
+            b_arg = va_arg( args, vlc_bool_t );
+            WindowOnTop( p_vout, b_arg );
             return VLC_SUCCESS;
 
        default:
@@ -2275,14 +2279,10 @@ static int ConvertKey( int i_key )
 }
 
 /*****************************************************************************
- * object variables callbacks: a bunch of object variables are used by the
- * interfaces to interact with the vout.
+ * WindowOnTop: Switches the "always on top" state of the video window.
  *****************************************************************************/
-static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
-                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int WindowOnTop( vout_thread_t *p_vout, vlc_bool_t b_on_top )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-
     if( p_vout->p_sys->b_net_wm_state_stays_on_top )
     {
         XClientMessageEvent event;
@@ -2294,7 +2294,7 @@ static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
         event.display = p_vout->p_sys->p_display;
         event.window = p_vout->p_sys->p_win->base_window;
         event.format = 32;
-        event.data.l[ 0 ] = newval.b_bool; /* set property */
+        event.data.l[ 0 ] = b_on_top; /* set property */
         event.data.l[ 1 ] = p_vout->p_sys->net_wm_state_stays_on_top;
 
         XSendEvent( p_vout->p_sys->p_display,

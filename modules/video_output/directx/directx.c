@@ -94,8 +94,6 @@ static int  DirectXUnlockSurface  ( vout_thread_t *p_vout, picture_t *p_pic );
 static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t i_color );
 
 /* Object variables callbacks */
-static int OnTopCallback( vlc_object_t *, char const *,
-                          vlc_value_t, vlc_value_t, void * );
 static int FindDevicesCallback( vlc_object_t *, char const *,
                                 vlc_value_t, vlc_value_t, void * );
 
@@ -262,12 +260,8 @@ static int OpenVideo( vlc_object_t *p_this )
     }
 
     /* Add a variable to indicate if the window should be on top of others */
-    var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    text.psz_string = _("Always on top");
-    var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
     var_Get( p_vout, "video-on-top", &val );
     p_vout->p_sys->b_on_top_change = val.b_bool;
-    var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
 
     return VLC_SUCCESS;
 
@@ -408,8 +402,6 @@ static void CloseVideo( vlc_object_t *p_this )
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     msg_Dbg( p_vout, "CloseVideo" );
-
-    var_Destroy( p_vout, "video-on-top" );
 
     if( p_vout->p_sys->p_event )
     {
@@ -1783,18 +1775,6 @@ static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t i_color )
     IDirectDrawSurface2_Unlock( p_vout->p_sys->p_display, NULL );
 
     return i_rgb;
-}
-
-/*****************************************************************************
- * object variables callbacks: a bunch of object variables are used by the
- * interfaces to interact with the vout.
- *****************************************************************************/
-static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
-                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    p_vout->p_sys->b_on_top_change = VLC_TRUE;
-    return VLC_SUCCESS;
 }
 
 /*****************************************************************************

@@ -45,7 +45,8 @@ static int ControlWindow( intf_thread_t *p_intf, void *p_window,
 enum
 {
     UpdateSize_Event = wxID_HIGHEST + 1,
-    UpdateHide_Event
+    UpdateHide_Event,
+    SetStayOnTop_Event,
 };
 
 class VideoWindow: public wxWindow
@@ -70,13 +71,18 @@ private:
 
     void UpdateSize( wxSizeEvent & );
     void UpdateHide( wxSizeEvent & );
+    void OnControlEvent( wxCommandEvent & );
 
     DECLARE_EVENT_TABLE();
 };
 
+DEFINE_LOCAL_EVENT_TYPE( wxEVT_VLC_VIDEO );
+
 BEGIN_EVENT_TABLE(VideoWindow, wxWindow)
     EVT_CUSTOM( wxEVT_SIZE, UpdateSize_Event, VideoWindow::UpdateSize )
     EVT_CUSTOM( wxEVT_SIZE, UpdateHide_Event, VideoWindow::UpdateHide )
+    EVT_COMMAND( SetStayOnTop_Event, wxEVT_VLC_VIDEO,
+                 VideoWindow::OnControlEvent )
 END_EVENT_TABLE()
 
 /*****************************************************************************
@@ -242,6 +248,18 @@ void VideoWindow::UpdateHide( wxSizeEvent &event )
     p_parent->AddPendingEvent( intf_event );
 }
 
+void VideoWindow::OnControlEvent( wxCommandEvent &event )
+{
+    switch( event.GetId() )
+    {
+    case SetStayOnTop_Event:
+        wxCommandEvent intf_event( wxEVT_INTF, 1 );
+        intf_event.SetInt( event.GetInt() );
+        p_parent->AddPendingEvent( intf_event );
+        break;
+    }
+}
+
 static int ControlWindow( intf_thread_t *p_intf, void *p_window,
                           int i_query, va_list args )
 {
@@ -265,6 +283,17 @@ int VideoWindow::ControlWindow( void *p_window, int i_query, va_list args )
             wxSizeEvent event( wxSize(p_vout->render.i_width * f_arg,
                                       p_vout->render.i_height * f_arg),
                                UpdateSize_Event );
+            AddPendingEvent( event );
+
+            i_ret = VLC_SUCCESS;
+        }
+        break;
+
+        case VOUT_SET_STAY_ON_TOP:
+        {
+            int i_arg = va_arg( args, int );
+            wxCommandEvent event( wxEVT_VLC_VIDEO, SetStayOnTop_Event );
+            event.SetInt( i_arg );
             AddPendingEvent( event );
 
             i_ret = VLC_SUCCESS;

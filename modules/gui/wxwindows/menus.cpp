@@ -342,11 +342,7 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent, wxMenu *p_menu )
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "crop";
         pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "directx-on-top";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "xvideo-on-top";
-        pi_objects[i++] = p_object->i_object_id;
-        ppsz_varnames[i] = "x11-on-top";
+        ppsz_varnames[i] = "video-on-top";
         pi_objects[i++] = p_object->i_object_id;
 
         p_dec_obj = (vlc_object_t *)vlc_object_find( p_object,

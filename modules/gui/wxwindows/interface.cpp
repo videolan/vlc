@@ -201,7 +201,8 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_COMMAND_SCROLL(Gamma_Event, Interface::OnGammaUpdate)
 
     /* Custom events */
-    EVT_COMMAND(0, wxEVT_INTF, Interface::UpdateSizeEvent)
+    EVT_COMMAND(0, wxEVT_INTF, Interface::OnControlEvent)
+    EVT_COMMAND(1, wxEVT_INTF, Interface::OnControlEvent)
 
 END_EVENT_TABLE()
 
@@ -290,10 +291,22 @@ Interface::~Interface()
     delete timer;
 }
 
-void Interface::UpdateSizeEvent( wxCommandEvent& event )
+void Interface::OnControlEvent( wxCommandEvent& event )
 {
-    frame_sizer->Layout();
-    frame_sizer->Fit(this);
+    switch( event.GetId() )
+    {
+    case 0:
+        frame_sizer->Layout();
+        frame_sizer->Fit(this);
+        break;
+
+    case 1:
+        long i_style = GetWindowStyle();
+        if( event.GetInt() ) i_style |= wxSTAY_ON_TOP;
+        else i_style &= ~wxSTAY_ON_TOP;
+        SetWindowStyle( i_style );
+        break;
+    }
 }
 
 /*****************************************************************************

@@ -948,6 +948,14 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     case VOUT_CLOSE:
         return VLC_SUCCESS;
 
+    case VOUT_SET_STAY_ON_TOP:
+        if( p_vout->p_sys->hparent )
+            return vout_ControlWindow( p_vout,
+                    (void *)p_vout->p_sys->hparent, i_query, args );
+
+        p_vout->p_sys->b_on_top_change = VLC_TRUE;
+        return VLC_SUCCESS;
+
     default:
         msg_Dbg( p_vout, "control query not supported" );
         return VLC_EGENERIC;

@@ -39,6 +39,8 @@
 /* Object variables callbacks */
 static int ZoomCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
+static int OnTopCallback( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * vout_RequestWindow: Create/Get a video window if possible.
@@ -169,6 +171,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Set( p_vout, "zoom", old_val );
 
     var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
+
+    /* Add a variable to indicate if the window should be on top of others */
+    var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    text.psz_string = _("Always on top");
+    var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "video-on-top", OnTopCallback, NULL );
 }
 
 /*****************************************************************************
@@ -179,5 +187,13 @@ static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_Control( p_vout, VOUT_SET_ZOOM, newval.f_float );
+    return VLC_SUCCESS;
+}
+
+static int OnTopCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+    vout_Control( p_vout, VOUT_SET_STAY_ON_TOP, newval.b_bool );
     return VLC_SUCCESS;
 }
