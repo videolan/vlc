@@ -137,7 +137,7 @@ int ioctl_InfoFrontend(input_thread_t * p_input, struct dvb_frontend_info *info,
         case FE_OFDM:
             msg_Dbg(p_input, "  type = OFDM (DVB-T)" );
             break;
-#ifdef 0 /* DVB_API_VERSION == 3 */
+#if 0 /* DVB_API_VERSION == 3 */
         case FE_MEMORY:
             msg_Dbg(p_input, "  type = MEMORY" );
             break;
@@ -145,7 +145,7 @@ int ioctl_InfoFrontend(input_thread_t * p_input, struct dvb_frontend_info *info,
             msg_Dbg(p_input, "  type = NETWORK" );
             break;
 #endif
-        default
+        default:
             msg_Err(p_input, "  unknown frontend found fe_type_t(%d)", info->type );
             return -1;
     }
