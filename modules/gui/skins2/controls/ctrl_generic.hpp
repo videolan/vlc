@@ -84,9 +84,10 @@ class CtrlGeneric: public SkinObject, public Observer<VarBool>
                      VarBool *pVisible = NULL );
 
         /// Tell the layout when the image has changed, with the size of the
-        /// rectangle to repaint (use the default values for repainting the
-        /// whole window)
-        virtual void notifyLayout( int witdh = -1, int height = -1 ) const;
+        /// rectangle to repaint and its offset.
+        /// Use the default values to repaint the whole window
+        virtual void notifyLayout( int witdh = -1, int height = -1,
+                                   int xOffSet = 0, int yOffSet = 0 ) const;
 
         /// Same as notifyLayout(), but takes optional images as parameters.
         /// The maximum size(s) of the images will be used for repainting.

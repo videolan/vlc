@@ -122,9 +122,10 @@ const list<LayeredControl> &GenericLayout::getControlList() const
 
 
 void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl,
-                                     int width, int height )
+                                     int width, int height,
+                                     int xOffSet, int yOffSet )
 {
-    // The size was not specified (or invalid)
+    // The size is not valid, refresh the whole layout
     if( width <= 0 || height <= 0 )
     {
         refreshAll();
@@ -134,7 +135,9 @@ void GenericLayout::onControlUpdate( const CtrlGeneric &rCtrl,
     const Position *pPos = rCtrl.getPosition();
     if( pPos )
     {
-        refreshRect( pPos->getLeft(), pPos->getTop(), width, height );
+        refreshRect( pPos->getLeft() + xOffSet,
+                     pPos->getTop() + yOffSet,
+                     width, height );
     }
 }
 

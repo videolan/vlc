@@ -133,9 +133,9 @@ int Bezier::getWidth() const
     int width = 0;
     for( int i = 0; i < m_nbPoints; i++ )
     {
-        if( m_leftVect[i] > width )
+        if( m_leftVect[i] >= width )
         {
-            width = m_leftVect[i];
+            width = m_leftVect[i] + 1;
         }
     }
     return width;
@@ -147,9 +147,9 @@ int Bezier::getHeight() const
     int height = 0;
     for( int i = 0; i < m_nbPoints; i++ )
     {
-        if( m_topVect[i] > height )
+        if( m_topVect[i] >= height )
         {
-            height = m_topVect[i];
+            height = m_topVect[i] + 1;
         }
     }
     return height;

@@ -105,8 +105,12 @@ class GenericLayout: public SkinObject, public Box
         virtual const list<LayeredControl> &getControlList() const;
 
         /// Called by a control when its image has changed
+        /// The arguments indicate the size of the rectangle to refresh,
+        /// and the offset (from the control position) of this rectangle.
+        /// Use a negative width or height to refresh the layout completely
         virtual void onControlUpdate( const CtrlGeneric &rCtrl,
-                                      int width, int height );
+                                      int width, int height,
+                                      int xOffSet, int yOffSet );
 
         /// Get the list of the anchors of this layout
         virtual const list<Anchor*>& getAnchorList() const;

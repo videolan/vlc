@@ -69,18 +69,19 @@ void CtrlGeneric::setLayout( GenericLayout *pLayout,
 }
 
 
-void CtrlGeneric::notifyLayout( int width, int height ) const
+void CtrlGeneric::notifyLayout( int width, int height,
+                                int xOffSet, int yOffSet ) const
 {
     // Notify the layout
     if( m_pLayout )
     {
-        m_pLayout->onControlUpdate( *this, width, height );
+        m_pLayout->onControlUpdate( *this, width, height, xOffSet, yOffSet );
     }
 }
 
 
 void CtrlGeneric::notifyLayoutMaxSize( const OSGraphics *pImg1,
-                                      const OSGraphics *pImg2 )
+                                       const OSGraphics *pImg2 )
 {
     if( pImg1 == NULL )
     {
