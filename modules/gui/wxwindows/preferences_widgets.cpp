@@ -2,7 +2,7 @@
  * preferences_widgets.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences_widgets.cpp,v 1.3 2003/10/20 00:09:27 gbazin Exp $
+ * $Id: preferences_widgets.cpp,v 1.4 2003/10/20 12:25:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Sigmund Augdal <sigmunau@idi.ntnu.no>
@@ -39,19 +39,77 @@
 #include "preferences_widgets.h"
 
 /*****************************************************************************
+ * CreateConfigControl wrapper
+ *****************************************************************************/
+ConfigControl *CreateConfigControl( vlc_object_t *p_this,
+                                    module_config_t *p_item, wxWindow *parent )
+{
+    ConfigControl *p_control = NULL;
+
+    switch( p_item->i_type )
+    {
+    case CONFIG_ITEM_MODULE:
+        p_control = new ModuleConfigControl( p_this, p_item, parent );
+        break;
+
+    case CONFIG_ITEM_STRING:
+        if( !p_item->ppsz_list )
+        {
+            p_control = new StringConfigControl( p_item, parent );
+        }
+        else
+        {
+            p_control = new StringListConfigControl( p_item, parent );
+        }
+        break;
+
+    case CONFIG_ITEM_FILE:
+    case CONFIG_ITEM_DIRECTORY:
+        p_control = new FileConfigControl( p_item, parent );
+        break;
+
+    case CONFIG_ITEM_INTEGER:
+        if( p_item->i_min != 0 || p_item->i_max != 0 )
+        {
+            p_control = new RangedIntConfigControl( p_item, parent );
+        }
+        else
+        {
+            p_control = new IntegerConfigControl( p_item, parent );
+        }
+        break;
+
+    case CONFIG_ITEM_KEY:
+        p_control = new KeyConfigControl( p_item, parent );
+        break;
+
+    case CONFIG_ITEM_FLOAT:
+        p_control = new FloatConfigControl( p_item, parent );
+        break;
+
+    case CONFIG_ITEM_BOOL:
+        p_control = new BoolConfigControl( p_item, parent );
+        break;
+
+    default:
+        break;
+    }
+
+    return p_control;
+}
+
+/*****************************************************************************
  * ConfigControl implementation
  *****************************************************************************/
-ConfigControl::ConfigControl( wxWindow *parent ): wxPanel( parent )
+ConfigControl::ConfigControl( module_config_t *p_item, wxWindow *parent )
+  : wxPanel( parent ), name( wxU(p_item->psz_name) ),
+    i_type( p_item->i_type ), b_advanced( p_item->b_advanced )
 {
     sizer = new wxBoxSizer( wxHORIZONTAL );
-    i_value = 0;
-    f_value = 0;
-    psz_value = NULL;
 }
 
 ConfigControl::~ConfigControl()
 {
-    if( psz_value ) free( psz_value );
 }
 
 wxSizer *ConfigControl::Sizer()
@@ -59,26 +117,26 @@ wxSizer *ConfigControl::Sizer()
     return sizer;
 }
 
-int ConfigControl::GetIntValue()
+wxString ConfigControl::GetName()
 {
-    return i_value;
+    return name;
 }
 
-float ConfigControl::GetFloatValue()
+int ConfigControl::GetType()
 {
-    return f_value;
+    return i_type;
 }
 
-wxString ConfigControl::GetPszValue()
+vlc_bool_t ConfigControl::IsAdvanced()
 {
-    return wxString(psz_value ? wxU(psz_value) : wxT(""));
+    return b_advanced;
 }
 
 /*****************************************************************************
  * KeyConfigControl implementation
  *****************************************************************************/
 KeyConfigControl::KeyConfigControl( module_config_t *p_item, wxWindow *parent )
-  : ConfigControl( parent )
+  : ConfigControl( p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     alt = new wxCheckBox( this, -1, wxU(_("Alt")) );
@@ -140,27 +198,27 @@ int KeyConfigControl::GetIntValue()
 /*****************************************************************************
  * ModuleConfigControl implementation
  *****************************************************************************/
-ModuleConfigControl::ModuleConfigControl( intf_thread_t *p_intf,
+ModuleConfigControl::ModuleConfigControl( vlc_object_t *p_this,
                                           module_config_t *p_item,
                                           wxWindow *parent )
-  : ConfigControl( parent )
+  : ConfigControl( p_item, parent )
 {
     vlc_list_t *p_list;
     module_t *p_parser;
-    
+
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     combo = new wxComboBox( this, -1, wxU(p_item->psz_value),
                             wxDefaultPosition, wxDefaultSize,
                             0, NULL, wxCB_READONLY | wxCB_SORT );
-    
+
     /* build a list of available modules */
-    p_list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    p_list = vlc_list_find( p_this, VLC_OBJECT_MODULE, FIND_ANYWHERE );
     combo->Append( wxU(_("Default")), (void *)NULL );
     combo->SetSelection( 0 );
     for( int i_index = 0; i_index < p_list->i_count; i_index++ )
     {
         p_parser = (module_t *)p_list->p_values[i_index].p_object ;
-        
+
         if( !strcmp( p_parser->psz_capability, p_item->psz_type ) )
         {
             combo->Append( wxU(p_parser->psz_longname),
@@ -171,7 +229,7 @@ ModuleConfigControl::ModuleConfigControl( intf_thread_t *p_intf,
         }
     }
     vlc_list_release( p_list );
-    
+
     combo->SetToolTip( wxU(p_item->psz_longtext) );
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     sizer->Add( combo, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
@@ -194,7 +252,7 @@ wxString ModuleConfigControl::GetPszValue()
  *****************************************************************************/
 StringConfigControl::StringConfigControl( module_config_t *p_item,
                                           wxWindow *parent )
-  : ConfigControl( parent )
+  : ConfigControl( p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
@@ -224,14 +282,14 @@ wxString StringConfigControl::GetPszValue()
  *****************************************************************************/
 StringListConfigControl::StringListConfigControl( module_config_t *p_item,
                                                   wxWindow *parent )
-  : ConfigControl( parent )
+  : ConfigControl( p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     sizer->Add( label, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5 );
     combo = new wxComboBox( this, -1, wxU(p_item->psz_value),
                             wxDefaultPosition, wxDefaultSize,
                             0, NULL, wxCB_READONLY|wxCB_SORT );
-    
+
     /* build a list of available options */
     for( int i_index = 0; p_item->ppsz_list[i_index];
          i_index++ )
@@ -241,7 +299,7 @@ StringListConfigControl::StringListConfigControl( module_config_t *p_item,
                                           p_item->ppsz_list[i_index] ) )
             combo->SetSelection( i_index );
     }
-    
+
     if( p_item->psz_value )
         combo->SetValue( wxU(p_item->psz_value) );
     combo->SetToolTip( wxU(p_item->psz_longtext) );
@@ -265,7 +323,7 @@ wxString StringListConfigControl::GetPszValue()
  *****************************************************************************/
 FileConfigControl::FileConfigControl( module_config_t *p_item,
                                       wxWindow *parent )
-  : ConfigControl( parent )
+  : ConfigControl( p_item, parent )
 {
     directory = p_item->i_type == CONFIG_ITEM_DIRECTORY;
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
@@ -327,7 +385,7 @@ wxString FileConfigControl::GetPszValue()
  *****************************************************************************/
 IntegerConfigControl::IntegerConfigControl( module_config_t *p_item,
                                             wxWindow *parent )
-  : ConfigControl( parent )
+  : ConfigControl( p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     spin = new wxSpinCtrl( this, -1,
@@ -358,7 +416,7 @@ int IntegerConfigControl::GetIntValue()
  *****************************************************************************/
 RangedIntConfigControl::RangedIntConfigControl( module_config_t *p_item,
                                                 wxWindow *parent )
-  : ConfigControl( parent )
+  : ConfigControl( p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     slider = new wxSlider( this, -1, p_item->i_value, p_item->i_min,
@@ -385,7 +443,7 @@ int RangedIntConfigControl::GetIntValue()
  *****************************************************************************/
 FloatConfigControl::FloatConfigControl( module_config_t *p_item,
                                         wxWindow *parent )
-  : ConfigControl( parent )
+  : ConfigControl( p_item, parent )
 {
     label = new wxStaticText(this, -1, wxU(p_item->psz_text));
     textctrl = new wxTextCtrl( this, -1,
@@ -418,7 +476,7 @@ float FloatConfigControl::GetFloatValue()
  *****************************************************************************/
 BoolConfigControl::BoolConfigControl( module_config_t *p_item,
                                       wxWindow *parent )
-  : ConfigControl( parent )
+  : ConfigControl( p_item, parent )
 {
     checkbox = new wxCheckBox( this, -1, wxU(p_item->psz_text) );
     if( p_item->i_value ) checkbox->SetValue(TRUE);

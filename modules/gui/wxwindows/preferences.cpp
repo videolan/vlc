@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.37 2003/10/20 00:09:27 gbazin Exp $
+ * $Id: preferences.cpp,v 1.38 2003/10/20 12:25:22 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -89,22 +89,7 @@ private:
     wxTreeItemId plugins_item;
 };
 
-struct ConfigData
-{
-    ConfigData( int _i_conf_type, vlc_bool_t _b_advanced, char *psz_name )
-    { control = NULL; b_advanced = _b_advanced; b_config_list = VLC_FALSE;
-      i_config_type = _i_conf_type; option_name = wxU(psz_name); }
-
-    vlc_bool_t b_advanced;
-    int i_config_type;
-    vlc_bool_t b_config_list;
-
-    ConfigControl *control;
-
-    wxString option_name;
-};
-
-WX_DEFINE_ARRAY(ConfigData *, ArrayOfConfigData);
+WX_DEFINE_ARRAY(ConfigControl *, ArrayOfConfigControls);
 
 class PrefsPanel : public wxPanel
 {
@@ -127,7 +112,7 @@ private:
     wxBoxSizer *config_sizer;
     wxScrolledWindow *config_window;
 
-    ArrayOfConfigData config_array;
+    ArrayOfConfigControls config_array;
 };
 
 class ConfigTreeData : public wxTreeItemData
@@ -832,65 +817,17 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
                 strcmp( psz_section, p_item->psz_text ) )
                 break;
 
-            ConfigData *config_data =
-                new ConfigData( p_item->i_type, p_item->b_advanced,
-                                p_item->psz_name );
-            
-            switch( p_item->i_type )
-            {
-            case CONFIG_ITEM_MODULE:
-                config_data->control = new ModuleConfigControl( p_intf, p_item, config_window );
-                break;
-
-            case CONFIG_ITEM_STRING:
-                if( !p_item->ppsz_list )
-                {
-                    config_data->control = new StringConfigControl( p_item, config_window );
-                }
-                else
-                {
-                    config_data->control = new StringListConfigControl( p_item, config_window );
-                }
-                break;
-            case CONFIG_ITEM_FILE:
-            case CONFIG_ITEM_DIRECTORY:
-                config_data->control = new FileConfigControl( p_item, config_window );
-                break;
-
-            case CONFIG_ITEM_INTEGER:
-                if( p_item->i_min != 0 || p_item->i_max != 0 )
-                {
-                    config_data->control = new RangedIntConfigControl( p_item, config_window );
-                }
-                else
-                {
-                    config_data->control = new IntegerConfigControl( p_item, config_window );
-                }
-                break;
-
-            case CONFIG_ITEM_KEY:
-                config_data->control = new KeyConfigControl( p_item, config_window );
-                break;
-
-            case CONFIG_ITEM_FLOAT:
-                config_data->control = new FloatConfigControl( p_item, config_window );
-                break;
-
-            case CONFIG_ITEM_BOOL:
-                config_data->control = new BoolConfigControl( p_item, config_window );
-                break;
-
-            default:
-                break;
-            }
+            ConfigControl *control =
+                CreateConfigControl( VLC_OBJECT(p_intf),
+                                     p_item, config_window );
 
             /* Don't add items that were not recognized */
-            if( config_data->control == NULL ) continue;
+            if( control == NULL ) continue;
 
             /* Add the config data to our array so we can keep a trace of it */
-            config_array.Add( config_data );
+            config_array.Add( control );
 
-            config_sizer->Add( config_data->control, 0, wxEXPAND | wxALL, 2 );
+            config_sizer->Add( control, 0, wxEXPAND | wxALL, 2 );
         }
         while( p_item->i_type != CONFIG_HINT_END && p_item++ );
 
@@ -919,26 +856,26 @@ void PrefsPanel::ApplyChanges()
 {
     for( size_t i = 0; i < config_array.GetCount(); i++ )
     {
-        ConfigData *config_data = config_array.Item(i);
+        ConfigControl *control = config_array.Item(i);
 
-        switch( config_data->i_config_type )
+        switch( control->GetType() )
         {
         case CONFIG_ITEM_STRING:
         case CONFIG_ITEM_FILE:
         case CONFIG_ITEM_DIRECTORY:
         case CONFIG_ITEM_MODULE:
-            config_PutPsz( p_intf, config_data->option_name.mb_str(),
-                           config_data->control->GetPszValue().mb_str() );
+            config_PutPsz( p_intf, control->GetName().mb_str(),
+                           control->GetPszValue().mb_str() );
             break;
         case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_KEY:
         case CONFIG_ITEM_BOOL:
-            config_PutInt( p_intf, config_data->option_name.mb_str(),
-                           config_data->control->GetIntValue() );
+            config_PutInt( p_intf, control->GetName().mb_str(),
+                           control->GetIntValue() );
             break;
         case CONFIG_ITEM_FLOAT:
-            config_PutFloat( p_intf, config_data->option_name.mb_str(),
-                             config_data->control->GetFloatValue() );
+            config_PutFloat( p_intf, control->GetName().mb_str(),
+                             control->GetFloatValue() );
             break;
         }
     }
@@ -954,11 +891,11 @@ void PrefsPanel::SwitchAdvanced( vlc_bool_t b_new_advanced )
 
         for( size_t i = 0; i < config_array.GetCount(); i++ )
         {
-            ConfigData *config_data = config_array.Item(i);
-            if( config_data->b_advanced )
+            ConfigControl *control = config_array.Item(i);
+            if( control->IsAdvanced() )
             {
-                config_data->control->Show( b_advanced );
-                config_sizer->Show( config_data->control, b_advanced );
+                control->Show( b_advanced );
+                config_sizer->Show( control, b_advanced );
             }
         }
 

@@ -2,7 +2,7 @@
  * preferences_widgets.h : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2003 VideoLAN
- * $Id: preferences_widgets.h,v 1.2 2003/10/20 00:09:27 gbazin Exp $
+ * $Id: preferences_widgets.h,v 1.3 2003/10/20 12:25:22 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -24,20 +24,30 @@
 class ConfigControl: public wxPanel
 {
 public:
-    ConfigControl( wxWindow *parent );
+    ConfigControl( module_config_t *, wxWindow *parent );
     ~ConfigControl();
     wxSizer *Sizer();
-    virtual int GetIntValue();
-    virtual float GetFloatValue();
-    virtual wxString GetPszValue();
+
+    virtual int GetIntValue() {return 0;}
+    virtual float GetFloatValue() {return 0;}
+    virtual wxString GetPszValue() {return wxString();}
+
+    wxString GetName();
+    int GetType();
+    vlc_bool_t IsAdvanced();
+
 protected:
     wxBoxSizer *sizer;
     wxStaticText *label;
+
 private:
-    int i_value;
-    float f_value;
-    char *psz_value;
+    wxString name;
+    int i_type;
+    vlc_bool_t b_advanced;
 };
+
+ConfigControl *CreateConfigControl( vlc_object_t *,
+                                    module_config_t *, wxWindow * );
 
 class KeyConfigControl: public ConfigControl
 {
@@ -55,8 +65,8 @@ private:
 class ModuleConfigControl: public ConfigControl
 {
 public:
-    ModuleConfigControl( intf_thread_t *p_intf, module_config_t *p_item,
-                      wxWindow *parent );
+    ModuleConfigControl( vlc_object_t *p_this, module_config_t *p_item,
+                         wxWindow *parent );
     ~ModuleConfigControl();
     virtual wxString GetPszValue();
 private:
@@ -136,4 +146,3 @@ public:
 private:
     wxCheckBox *checkbox;
 };
-
