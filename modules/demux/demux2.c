@@ -94,30 +94,15 @@ static int Demux2Open( vlc_object_t * p_this )
     demux_t        *p_demux;
     playlist_t     *p_playlist;
 
-    char           *psz_uri;
-
     if( input_InitStream( p_input, 0 ) )
     {
         return VLC_EGENERIC;
     }
 
-    psz_uri = malloc( strlen( p_input->psz_access ) + strlen( p_input->psz_demux ) + strlen( p_input->psz_name  ) + 1 + 3 + 1 );
-    if( p_input->psz_demux && *p_input->psz_demux )
-    {
-        sprintf( psz_uri, "%s/%s://%s", p_input->psz_access, p_input->psz_demux, p_input->psz_name );
-    }
-    else if( p_input->psz_access && *p_input->psz_access )
-    {
-        sprintf( psz_uri, "%s://%s", p_input->psz_access, p_input->psz_name );
-    }
-    else
-    {
-        sprintf( psz_uri, "://%s", p_input->psz_name );
-    }
-
-    p_demux = demux2_New( p_input, psz_uri, p_input->s, p_input->p_es_out );
-
-    free( psz_uri );
+    p_demux = demux2_New( p_input,
+                          p_input->psz_access, p_input->psz_demux,
+                          p_input->psz_name,
+                          p_input->s, p_input->p_es_out );
 
     if( !p_demux )
     {

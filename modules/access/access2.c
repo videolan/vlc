@@ -102,28 +102,13 @@ static int Access2Open( vlc_object_t * p_this )
     access2_sys_t  *p_sys   = malloc( sizeof( access2_sys_t ) );
     access_t       *p_access;
 
-    char           *psz_uri;
     int            i_int;
     int64_t        i_64;
     vlc_bool_t     b_bool;
 
-    psz_uri = malloc( strlen( p_input->psz_access ) + strlen( p_input->psz_demux ) + strlen( p_input->psz_name  ) + 1 + 3 + 1 );
-    if( p_input->psz_demux && *p_input->psz_demux )
-    {
-        sprintf( psz_uri, "%s/%s://%s", p_input->psz_access, p_input->psz_demux, p_input->psz_name );
-    }
-    else if( p_input->psz_access && *p_input->psz_access )
-    {
-        sprintf( psz_uri, "%s://%s", p_input->psz_access, p_input->psz_name );
-    }
-    else
-    {
-        sprintf( psz_uri, "://%s", p_input->psz_name );
-    }
-
-    p_access = access2_New( p_input, psz_uri );
-
-    free( psz_uri );
+    p_access = access2_New( p_input,
+                            p_input->psz_access, p_input->psz_demux,
+                            p_input->psz_name );
 
     if( !p_access )
     {
