@@ -472,7 +472,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     ts_stream_t         *p_stream;
 
-    p_input->p_sys = (void*)p_stream = malloc( sizeof( ts_stream_t ) );
+    p_input->p_sys = p_stream = malloc( sizeof( ts_stream_t ) );
 
     /* Init this new stream */
     p_stream->i_pid = AllocatePID( p_sys, p_input->p_fmt->i_cat );

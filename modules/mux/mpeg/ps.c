@@ -189,7 +189,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     msg_Dbg( p_mux, "adding input codec=%4.4s", (char*)&p_input->p_fmt->i_codec );
 
-    p_input->p_sys = (void*)p_stream = malloc( sizeof( ps_stream_t ) );
+    p_input->p_sys = p_stream = malloc( sizeof( ps_stream_t ) );
 
     /* Init this new stream */
     switch( p_input->p_fmt->i_codec )

@@ -2,7 +2,7 @@
  * wav.c : wav file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: wav.c,v 1.15 2004/03/03 11:40:19 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -119,7 +119,8 @@ static int Open( vlc_object_t * p_this )
     stream_Read( p_demux->s, NULL, 8 );   /* Cannot fail */
 
     /* load waveformatex */
-    p_wf = (WAVEFORMATEX *)p_wf_ext = malloc( __EVEN( i_size ) + 2 );
+    p_wf_ext = malloc( __EVEN( i_size ) + 2 );
+    p_wf = (WAVEFORMATEX *)p_wf_ext;
     p_wf->cbSize = 0;
     if( stream_Read( p_demux->s,
                      p_wf, __EVEN( i_size ) ) < (int)__EVEN( i_size ) )
