@@ -435,7 +435,8 @@
         o_data = [[VLCMenuExt alloc] initWithVar: psz_variable Object: p_object->i_object_id
                 Value: val ofType: i_type];
         [o_mi setRepresentedObject: [NSValue valueWithPointer:[o_data retain]]];
-        [o_mi setState: val.b_bool ? TRUE : FALSE ];
+        if( !( i_type & VLC_VAR_ISCOMMAND ) )
+            [o_mi setState: val.b_bool ? TRUE : FALSE ];
         break;
 
     default:
@@ -517,24 +518,6 @@
 
         switch( i_type & VLC_VAR_TYPE )
         {
-        case VLC_VAR_VARIABLE:
-
-            /* This is causing crashes for the moment.
-            o_title = [NSApp localizedString: text_list.p_list->p_values[i].psz_string ?
-                text_list.p_list->p_values[i].psz_string : val_list.p_list->p_values[i].psz_string ];
-            
-            o_data = [[VLCMenuExt alloc] initWithVar: strdup(psz_variable) Object: p_object->i_object_id
-                Value: val ofType: i_type];
-            [o_lmi setRepresentedObject: [NSValue valueWithPointer:[o_data retain]]];
-
-            // Create a submenu
-            NSMenu *o_menu = [o_lmi submenu];
-
-            [self setupVarMenu: o_menu forMenuItem: o_lmi target:p_object
-                            var:psz_variable selector:pf_callback];
-*/
-            return;
-
         case VLC_VAR_STRING:
             another_val.psz_string =
                 strdup(val_list.p_list->p_values[i].psz_string);
@@ -548,7 +531,7 @@
             [o_lmi setRepresentedObject: [NSValue valueWithPointer:[o_data retain]]];
             [o_lmi setTarget: self];
             
-            if( !strcmp( val.psz_string, val_list.p_list->p_values[i].psz_string ) )
+            if( !strcmp( val.psz_string, val_list.p_list->p_values[i].psz_string ) && !( i_type & VLC_VAR_ISCOMMAND ) )
                 [o_lmi setState: TRUE ];
 
             break;
@@ -566,7 +549,7 @@
             [o_lmi setRepresentedObject: [NSValue valueWithPointer:[ o_data retain]]];
             [o_lmi setTarget: self];
 
-            if( val_list.p_list->p_values[i].i_int == val.i_int )
+            if( val_list.p_list->p_values[i].i_int == val.i_int && !( i_type & VLC_VAR_ISCOMMAND ) )
                 [o_lmi setState: TRUE ];
             break;
 
