@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.55 2003/08/10 21:26:07 gbazin Exp $
+dnl $Id: configure.ac,v 1.56 2003/08/12 08:19:20 sam Exp $
 
 AC_INIT(vlc,0.6.2)
 
@@ -1436,6 +1436,7 @@ AC_LANG_PUSH(C++)
   dnl matroska headers include ebml headers directly... pouah that stinks
   CPPFLAGS="${CPPFLAGS_save} -I/usr/local/include/ebml -I/usr/include/ebml"
   AC_CHECK_HEADERS(EbmlVersion.h matroska/KaxVersion.h, [
+    AC_CHECK_HEADERS(matroska/KaxAttachments.h)
     AX_ADD_PLUGINS([mkv])
     AX_ADD_CXXFLAGS([mkv],[-I/usr/local/include/ebml -I/usr/include/ebml])
     AC_CHECK_LIB(ebml_pic,main,[

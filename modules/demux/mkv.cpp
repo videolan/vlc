@@ -2,7 +2,7 @@
  * mkv.cpp : matroska demuxer
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mkv.cpp,v 1.19 2003/08/10 14:21:15 gbazin Exp $
+ * $Id: mkv.cpp,v 1.20 2003/08/12 08:19:20 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -53,7 +53,11 @@
 #include "ebml/EbmlVoid.h"
 
 #include "matroska/FileKax.h"
+#ifdef HAVE_MATROSKA_KAXATTACHMENTS_H
+#include "matroska/KaxAttachments.h"
+#else
 #include "matroska/KaxAttachements.h"
+#endif
 #include "matroska/KaxBlock.h"
 #include "matroska/KaxBlockData.h"
 #include "matroska/KaxChapters.h"
@@ -930,9 +934,13 @@ static int Activate( vlc_object_t * p_this )
             /* stop parsing the stream */
             break;
         }
+#ifdef HAVE_MATROSKA_KAXATTACHMENTS_H
+        else if( EbmlId( *el1 ) == KaxAttachments::ClassInfos.GlobalId )
+#else
         else if( EbmlId( *el1 ) == KaxAttachements::ClassInfos.GlobalId )
+#endif
         {
-            msg_Dbg( p_input, "|   + Attachements FIXME TODO (but probably never supported)" );
+            msg_Dbg( p_input, "|   + Attachments FIXME TODO (but probably never supported)" );
         }
         else if( EbmlId( *el1 ) == KaxChapters::ClassInfos.GlobalId )
         {
