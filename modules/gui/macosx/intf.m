@@ -797,13 +797,18 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
 
     if( p_intf->p_sys->b_current_title_update )
     {
+        NSString *o_temp;
         vout_thread_t *p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                 FIND_ANYWHERE );
 
         vlc_mutex_lock( &p_playlist->object_lock );
-        [o_scrollfield setStringValue: [NSString stringWithUTF8String: 
-            p_playlist->pp_items[p_playlist->i_index]->input.psz_name]]; 
+        o_temp = [NSString stringWithUTF8String: 
+            p_playlist->pp_items[p_playlist->i_index]->input.psz_name];
+        if( o_temp == NULL )
+            o_temp = [NSString stringWithCString:
+                p_playlist->pp_items[p_playlist->i_index]->input.psz_name];
         vlc_mutex_unlock( &p_playlist->object_lock );
+        [o_scrollfield setStringValue: o_temp ];
 
         if( p_vout != NULL )
         {
@@ -820,7 +825,6 @@ unsigned int VLCModifiersToCocoa( unsigned int i_key )
             vlc_object_release( (vlc_object_t *)p_vout );
         }
         [o_playlist updateRowSelection];
-//        [o_info updateInfo];
 
         p_intf->p_sys->b_current_title_update = FALSE;
     }
