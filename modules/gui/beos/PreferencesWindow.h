@@ -2,7 +2,7 @@
  * PreferencesWindow.h
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.h,v 1.4 2003/01/14 16:00:49 titer Exp $
+ * $Id: PreferencesWindow.h,v 1.5 2003/01/16 15:26:23 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -33,6 +33,7 @@
 #define PREFS_SAVE     'prsa'
 #define PREFS_DEFAULTS 'prde'
 #define SLIDER_UPDATE  'slup'
+#define OLDDVD_CHECK   'olch'
 
 class PreferencesWindow : public BWindow
 {
@@ -49,10 +50,11 @@ class PreferencesWindow : public BWindow
         void             ApplyChanges();
         BView *          fPrefsView;
         BTabView *       fTabView;
-        BView *          fFfmpegView;
+        BView *          fGeneralView;
         BView *          fAdjustView;
-        BTab *           fFfmpegTab;
+        BTab *           fGeneralTab;
         BTab *           fAdjustTab;
+        BCheckBox *      fOldDvdCheck;
         BSlider *        fPpSlider;
         BSlider *        fContrastSlider;
         BSlider *        fBrightnessSlider;

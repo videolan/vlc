@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.17 2003/01/14 22:03:38 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.18 2003/01/16 15:26:23 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -457,7 +457,72 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				{
 					BPath path( &ref );
 					if ( path.InitCheck() == B_OK )
-						files.AddItem( new BString( (char*)path.Path() ) );
+					{
+						bool add = true;
+						// has the user dropped a dvd disk icon?
+						BDirectory dir( &ref );
+						if ( dir.InitCheck() == B_OK && dir.IsRootDirectory() )
+						{
+							BVolumeRoster volRoster;
+							BVolume vol;
+							BDirectory volumeRoot;
+							status_t status = volRoster.GetNextVolume( &vol );
+							while( status == B_NO_ERROR )
+							{
+								if( vol.GetRootDirectory( &volumeRoot ) == B_OK
+									&& dir == volumeRoot )
+								{
+									BString volumeName;
+									BString deviceName;
+									bool isCDROM = false;
+									bool success = false;
+									deviceName = "";
+									volumeName = "";
+									char name[B_FILE_NAME_LENGTH];
+									if ( vol.GetName( name ) >= B_OK )	// disk is currently mounted
+									{
+										volumeName = name;
+										dev_t dev = vol.Device();
+										fs_info info;
+										if ( fs_stat_dev( dev, &info ) == B_OK )
+										{
+											success = true;
+											deviceName = info.device_name;
+											if ( vol.IsReadOnly() )
+											{
+												int i_dev = open( info.device_name, O_RDONLY );
+												if ( i_dev >= 0 )
+												{
+													device_geometry g;
+													if ( ioctl( i_dev, B_GET_GEOMETRY, &g, sizeof( g ) ) >= 0 )
+													isCDROM = ( g.device_type == B_CD );
+													close( i_dev );
+												}
+											}
+										}
+ 									}
+									
+									if( success && isCDROM )
+									{
+										BMessage msg( OPEN_DVD );
+										msg.AddString( "device", deviceName.String() );
+										PostMessage( &msg );
+										add = false;
+									}
+							 		break;
+								}
+								else
+								{
+							 		vol.Unset();
+									status = volRoster.GetNextVolume( &vol );
+								}
+							}
+						}
+						if( add )
+						{
+							files.AddItem( new BString( (char*)path.Path() ) );
+						}
+					}
 				}
 				// give the list to VLC
 				p_wrapper->openFiles(&files, replace);
