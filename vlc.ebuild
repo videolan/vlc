@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.10 2003/06/28 00:29:13 sam Exp $
+# $Id: vlc.ebuild,v 1.11 2003/06/28 01:17:47 sam Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -251,6 +251,6 @@ src_install() {
 	einstall || die "make install failed"
 
 	dodoc ABOUT-NLS AUTHORS COPYING ChangeLog HACKING INSTALL* \
-	MAINTAINERS NEWS README* MODULES THANKS
+	MAINTAINERS NEWS README* MODULES THANKS doc/ChangeLog-*
 
 }

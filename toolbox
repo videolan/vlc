@@ -1,7 +1,7 @@
 #! /bin/sh
 
 ##  toolbox for the VLC media player
-##  $Id: toolbox,v 1.28 2003/06/27 13:50:07 sam Exp $
+##  $Id: toolbox,v 1.29 2003/06/28 01:17:47 sam Exp $
 ##
 ##  Authors: Samuel Hocevar <sam@zoy.org>
 
@@ -20,13 +20,13 @@ help()
 {
   cat << EOF
 recognized flags are:
-  --update-changelog      update the CVS changelog
   --update-vc             update Microsoft Visual Studio files
   --update-po             update translation files
   --update-includes       generate various include files
   --update-glade          generate and fix Glade code
   --update-glade2         generate and fix Glade 2 code
   --update-flexml         generate and fix flexml and flex code
+  --changelog             update the CVS changelog
   --distclean             "make distclean"
 EOF
   exit 1
@@ -52,7 +52,7 @@ then
 fi
 
 case "$1" in
-  --update-changelog)
+  --changelog|--update-changelog)
     action=changelog
     ;;
   --update-vc)
@@ -91,12 +91,21 @@ shift
 ##
 if test "${action}" = "changelog"
 then
+  set -e
+  set -x
   cvs2cl --help >/dev/null 2>&1 || exit 1
-  rm -f ChangeLog
-  cvs2cl --utc --hide-filenames --no-wrap -w --stdout | \
+  rm -f ChangeLog ChangeLog.tmp
+  cvs2cl --utc --hide-filenames --no-wrap -w --stdout -g -z9 | \
     sed -e 's/^[^0-9]/ /' -e 's/^  *$//' | \
-    uniq > ChangeLog
+    uniq > ChangeLog.tmp
+  YEAR=`sed -e 's/\(....\)-..-.*/\1/;q' ChangeLog.tmp`
+  LASTYEAR="$((${YEAR} - 1))"
+  sed -ne "/^${YEAR}-..-../,/^${LASTYEAR}-..-../{/^${LASTYEAR}-..-../d;p}" \
+    < ChangeLog.tmp > Changelog
+  rm -f ChangeLog.tmp
   exit 0
+  # To generate changelog for the year 2001:
+  # sed -ne '/^2001/,/^2000/{/^2000/d;p}'
 fi
 
 ##
@@ -107,7 +116,7 @@ then
   echo "generating Visual Studio files..."
 
   #  The evil ^M
-  M=''
+  M="`printf '\r'`"
 
   #  Variables we get from configure.ac
   LIBVLC_VERSION=`sed -ne '/AC_INIT/s/.*,\(.*\))/\1/p' < configure.ac`

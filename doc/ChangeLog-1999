@@ -1,0 +1,515 @@
+1999-12-31 Friday 17:35  massiot
+
+ Deux oublis dans le commit de la derniere fois.
+
+1999-12-30 Thursday 13:59  stef
+
+ * Modifications de quelques erreurs sur le parseur
+
+1999-12-29 Wednesday 02:48  stef
+
+ * Ajout de quelques fonctions pour traiter les structures *_extension
+   dans le parser
+
+1999-12-28 Tuesday 23:35  massiot
+
+ Suite du video_parser et du video_decoder.
+
+1999-12-22 Wednesday 13:18  massiot
+
+ suite du parseur.
+
+1999-12-22 Wednesday 02:27  massiot
+
+ Un bon morceau du parseur.
+
+ Stef, je ne t'oublie pas, demain t'auras du boulot, promis :)
+
+1999-12-21 Tuesday 18:14  massiot
+
+ Ce fichier la etait en trop
+
+1999-12-21 Tuesday 18:12  massiot
+
+ Début du décodeur + début du parseur.
+
+ Évidemment ça compile pas et on n'est pas sortis de l'auberge, m'enfin...
+
+1999-12-21 Tuesday 00:07  stef
+
+ [no log message]
+
+1999-12-19 Sunday 20:08  sam
+
+  . ajout de #ifdef pour ne pas avoir de console X en mode framebuffer
+  . mode --novlans par défaut
+
+1999-12-18 Saturday 17:13  massiot
+
+ * Patchs MPEG1, qui marchent ou qui ne marche pas ;
+ * Optimisation de ClearBlock() ;
+ * Début du video_parser ;
+
+1999-12-15 Wednesday 19:01  maxx
+
+ * audio_decoder/audio_decoder.c :
+ - l'ancienne méthode de synchro était bugguée, la nouvelle rewlz... Sam,
+ j'espère que tu me pardonneras un jour ;
+
+ * audio_output/audio_output.c :
+ - suppression des messages de debug, à la demande de Polux, qui veut
+ squatter seul la console de debug avec ses messages de fps ;
+
+1999-12-14 Tuesday 23:37  maxx
+
+ * .cvsignore :
+ + Rajout du fichier core ;
+
+ * audio_output/audio_output.c :
+ + Rajout de messages de debug :
+ - nombre de frames audio dans la plage datée courante ;
+ - durée de cette plage audio datée (en µs) ;
+ - fréquence du flux sonore pour cette plage datée ;
+
+ * interface/intf_ctrl.c :
+ - Correction du bug `help vlan' (mouahaha il manquait une virgule :-).
+
+1999-12-12 Sunday 18:04  polux
+
+ Grâce à Jimmy, plus besoin de compiler les fichiers assembleurs à part,
+ le make se débrouille tout seul comme un grand en utilisant gcc pour
+ compiler les .S
+
+1999-12-09 Thursday 22:37  benny
+
+ Correction d'un bug dans la lecture de la version de la PMT
+
+1999-12-08 Wednesday 21:23  benny
+
+ Commit bis des modifications concernant l'initialisation du continuity
+ counter (ecrasees entre temps)
+
+1999-12-08 Wednesday 16:01  polux
+
+ Fin du remplacement des pthread + ajout du frame rate dans display.c.
+
+ Polux
+
+1999-12-08 Wednesday 15:22  polux
+
+ Encapsulation des pthread qui sont maintenant remplacées par les vlc_thread.
+ Toutes les références aux pthread que ce soit les thread, les mutex ou
+ les variables conditionnelles, ont été remplacées par leur équivalent
+ vlc_thread. Les vlc_thread sont une version très simplifiée des pthread et
+ fonctionnent exactement de la même façon. Ceci devrait grandement faciliter
+ le portage vers d'autres OS.
+
+ Polux
+
+1999-12-08 Wednesday 00:42  benny
+
+ Le continuity_counter du vlc est maintenant initialise automatiquement a
+ la valeur du premier paquet TS que l'input recoit pour chaque PID. On
+ evite de trasher systematiquement (ou presque) le premier TS de chaque
+ PID.
+
+1999-12-07 Tuesday 03:33  benny
+
+ Correction d'une erreur dans le parsage de la PMT (mauvais masque de
+ lecture des PID des ES)
+
+1999-12-07 Tuesday 02:16  maxx
+
+ * Documentation/todo :
+ - mise à jour des données concernant l'audio_decoder et l'audio_output ;
+
+ * CVS :
+ - rajout automatique de la signature du commiteur (si vous voyez "maxx"
+ un peu plus bas, c'est que ça rewlz :-) ;
+
+1999-12-06 Monday 17:02  maxx
+
+ * .cvsignore :
+ - Suppression d'une ligne inutile... certains font vraiment n'importe
+ quoi O:->
+
+ -- MaXX
+
+1999-12-06 Monday 16:59  maxx
+
+ * .cvsignore :
+ - Rajout d'une ligne inutile... il faut bien tester la nouvelle
+ configuration CVS :-)
+
+ -- MaXX
+
+1999-12-04 Saturday 23:19  maxx
+
+ retest
+
+1999-12-04 Saturday 23:00  maxx
+
+ test
+
+1999-11-21 Sunday 14:26  polux
+
+ Mise en place du mécanisme de détection de changement de flux dans la synchro
+
+ Polux
+
+1999-11-09 Tuesday 23:30  benny
+
+ Nettoyage de input_psi.
+
+ Debugage de DemuxPSI. Le nouveau code doit etre capable de gerer des cas
+ foireux qui ne sont pas senses arriver (et qui n'ont jamais ete rencontre
+ dans les flux qu'on a, vu que ca n'a jamais plante la avant). Son
+ principal interet est de ne plus produire de warning a la compilation :)
+
+ Benny
+
+1999-11-06 Saturday 21:45  massiot
+
+ Modifications de Polusque depuis la DR2, à savoir :
+ - virationnement de la saturation ;
+ - optimisation MMX de la conversion YUV.
+
+ --Meuuh
+
+1999-10-27 Wednesday 18:00  benny
+
+ Le prototypes des fonctions Enable/DisableScreeSaver dans xutils.h ne
+ correspondait pas a leur declaration dans xutils.c
+
+ Benny
+
+1999-10-20 Wednesday 23:30  benny
+
+ Bug fix: le buffer p_pes_header_save du pes n'etait jamais alloue, ce qui
+ fait que la fonction DemuxPES plantait si jamais le header pes etait plus
+ gros que le premier packet ts du pes.
+
+ Benny
+
+1999-10-12 Tuesday 18:58  massiot
+
+ Synchronisation vlc-DR2/CVS
+
+ * Makefile : nouvelles options d'optimisation, décodeur vidéo ;
+ * config.h : FIFOs et netlist plus longues ;
+ * input_psi.c : Suppression de messages de debug ;
+
+ --Meuuh
+
+1999-10-06 Wednesday 18:47  massiot
+
+ * Correction d'un bug ou quand on ne definait pas le DEBUG, il
+ remplacait les intf_DbgMsg par des ;, ce qui n'est pas cool pour les
+ if ... else sans accolades (input_psi.c).
+
+ --Meuuh
+
+1999-10-06 Wednesday 17:25  massiot
+
+ Un #ifdef DEBUG qui manquait et qui faisait que ca compilait pas sans le DEBUG.
+
+ --Meuuh
+
+1999-10-06 Wednesday 01:29  maxx
+
+ * Documentation/bugs :
+ - Suppression d'un bon nombre de bugs de l'input ;
+ - Rajout d'un bug concernant ./vlc --novideo ;
+
+ --
+ MaXX
+
+1999-10-06 Wednesday 00:32  massiot
+
+ * L'autospawn réagit correctement si on utilise les flags --novideo ou
+   --noaudio ;
+
+ --Meuuh
+
+1999-10-05 Tuesday 23:41  maxx
+
+ * audio_output/audio_output.c :
+ - Suppression totale de la synchro en dates absolues ;
+ - Rajout de la re-synchro en dates relatives (il est donc désormais
+ possible de couper un flux et de le relancer, ou de changer de flux,
+ tout en gardant le même input, le même décodeur audio... pratique pour
+ le pseudo-changement de chaîne prévu à la War :-) ;
+
+ --
+ MaXX
+
+1999-10-04 Monday 10:20  maxx
+
+ * audio_output/audio_output.c :
+ - Suppression de la synchro en attendant de trouver une meilleure méthode ;
+
+ --
+ MaXX
+
+1999-10-04 Monday 02:24  maxx
+
+ * input/input.c :
+ - Correction de deux bugs concernant le calcul de b_has_pts et d'une autre
+ variable de la structure pes (les masques utilisés n'étaient pas les bons...
+ conséquence immédiate : la synchro ne voyait jamais de paquet daté) ;
+ - Correction d'un bug de la méthode de calcul de i_pts ;
+
+ * audio_decoder/audio_decoder.c :
+ - Autodétection des dates en utilisant le champ i_pts fourni par la
+ synchro... le son à fréquence variable adaptée aux pertes de paquets TS et
+ autres problèmes est désormais une réalité :-)
+
+ * audio_output/audio_output.c :
+ + Rajout de la synchro :
+ - On attend si on est en avance ;
+ - On saute des frames si on est en retard ;
+ + Ce n'est pas encore tout à fait ça, mais ça commence à prendre forme...
+ On dirait que le mini-server va trop vite, parce que l'audio est souvent
+ en retard... Polux ?
+
+ * Makefile :
+ - Modifications cosmétiques ;
+
+ --
+ MaXX
+
+1999-10-02 Saturday 22:37  maxx
+
+ * .cvsignore :
+ - Rajout des fichiers vlc.init et gmon.out ;
+
+ --
+ MaXX
+
+1999-10-02 Saturday 22:31  maxx
+
+ * Makefile :
+ - Rajout des options de linkage -g et -pg afin de faire fonctionner le
+ profiling ;
+
+ --
+ MaXX
+
+1999-10-02 Saturday 21:32  maxx
+
+ * include/decoder_fifo.h :
+ - Rajout du support permettant de détecter la fin du thread input
+ correspondant au flux de bits passé en argument à la fonction GetByte ;
+
+ * input/input.c :
+ - Changements cosmétiques ;
+
+ * input/input_psi.c :
+ - Correction d'un bug de la fonction DestroyPgrmDescr qui faisait
+ segfaulter le vlc à sa terminaison ;
+
+ * audio_decoder/audio_decoder.c :
+ * generic_decoder/generic_decoder.c :
+ * video_decoder/video_decoder.c :
+ - Les fonctions xdec_DestroyThread envoient désormais un signal permettant
+ aux decoder threads de quitter la fonction GetByte meme s'ils sont en
+ attente dans la fonction pthread_cond_wait ;
+
+ --
+ MaXX
+
+1999-10-02 Saturday 10:20  massiot
+
+ * input.c : Ajout du booléen b_error et d'une boucle d'erreur pour
+   éviter la fermeture sauvage de l'input ;
+ * main.c : Le vlc se ferme désormais proprement quand il bouffe un SIGINT.
+
+ --Meuuh
+
+1999-10-01 Friday 22:45  massiot
+
+ * Suppression d'un message d'erreur erronné ;
+
+ --Meuuh
+
+1999-10-01 Friday 22:05  massiot
+
+ * L'input devrait être capable de se fermer correctement après une
+   erreur (j'ai dit _capable_, hein, j'ai pas dit qu'elle le faisait) ;
+
+ --Meuuh
+
+1999-10-01 Friday 15:44  maxx
+
+ * Makefile :
+ - Rajout de l'option -pg maintenant que le %*!&#@ de bug est corrigé, et en
+ attendant qu'on trouve le moyen de releaser proprement le lock des
+ decoder_fifos :-)
+
+ * audio_decoder/audio_decoder.c :
+ - Correction d'un bug qui entrainait une dérivation du son ;
+
+ * include/audio_output.h :
+ - Passage du nb max de fifos audio de 4 à 2 pour augmenter le niveau sonore ;
+
+ * interface/main.c :
+ - Typo ;
+
+ --
+ MaXX
+
+1999-10-01 Friday 12:38  maxx
+
+ * input/input_pcr.c :
+ - Correction d'un bug de la fonction input_PcrReInit : pthread_mutex_lock()
+ était appelée avec un argument obtenu en déréférençant un pointeur non
+ initialisé ;
+ - Le bug ne survenait que lorsque le vlc était compilé SANS -Ox, probablement
+ parce que le code optimisé n'exécutait pas les instructions dans le meme
+ ordre ;
+
+ -- MaXX
+
+1999-09-29 Wednesday 09:56  maxx
+
+ * include/mtime.h :
+ - mtime_t devient un s64 (et non plus un u64) pour harmoniser gestion de
+ l'horloge et synchronisation ;
+ - LAST_MDATE correspond désormais à la plus grande valeur que peut
+ prendre un s64 ;
+ - MSTRTIME_MAX_SIZE prend en compte le fait que les dates peuvent désormais
+ être négatives ;
+
+ * misc/mtime.c :
+ - modifications diverses et variées prenant en compte le changement de
+ mtime_t ;
+
+ * include/input.h :
+ - i_pts et les variables s64 de la structure pcr sont désormais des mtime_t ;
+
+ * input/input.c :
+ - passage des casts en (mtime_t) et non (s64) ;
+
+ * input/input_file.c :
+ - rajout d'un #include "mtime.h" ;
+
+ * input/input_pcr.c :
+ - passage des s64 en mtime_t ;
+
+ * misc/xutils.c :
+ - correction de deux warnings ;
+
+ -- MaXX
+
+1999-09-28 Tuesday 10:35  maxx
+
+ * include/decoder_fifo.h :
+ - Proprification des commentaires ;
+
+ * include/input.h :
+ - i_pts était un u32 mais doit être un s64 ;
+ - Question ouverte au Ptyx : pourquoi mtime_t est un u64 ?
+   Est-ce que c'est mauvais de passer mtime_t en s64 ?
+   Est-ce que ça fait modifier beaucoup de code ?
+
+ * input/input.c :
+ - Correction d'un cast ;
+
+ -- MaXX
+
+1999-09-24 Friday 10:02  maxx
+
+ * audio_decoder/audio_decoder.c :
+ - Intégration totale et non commentée du support de la synchro ;
+ - Le problème du 0.1% de CPU -> 9.7% est résolu en compilant avec un
+ flag d'optimisation (cf ci-dessous) ;
+
+ * Makefile :
+ - Rajout d'une ligne *commentée* avec le flag d'optimisation -O2 ;
+ - En -O2 et en faisant tourner le mini-server et un vlc --novideo sur la
+ meme machine, la somme des %CPU du vlc et du mini-server est égale à 0 :-)
+ C'est pas beau ça ?
+
+ -- MaXX "vlc rewlz"
+
+1999-09-23 Thursday 20:56  polux
+
+ Implémentation rudimentaire de la synchro : les packets
+ PES sont maintenant datés.
+
+ --
+ Polux
+
+1999-09-23 Thursday 10:22  massiot
+
+ * AUTO_SPAWN n'est plus necessaire pour lancer l'init script.
+
+ --Meuuh
+
+1999-09-22 Wednesday 15:53  maxx
+
+ * include/audio_output.h :
+ - Correction d'une erreur dans la taille des frames du Layer II (1152
+ et non 1192) (ne vous en faites pas, l'erreur n'était présente que dans
+ un commentaire :-) ;
+
+ * audio_decoder/audio_decoder.c :
+ - Rajout d'un certain nombre de commentaires utiles pour la suite du
+ développement de l'audio_decoder ;
+ - Modification de la méthode de calcul du nombre de frames audio libres
+ dans l'aout_fifo (à tester !) ;
+
+ -- MaXX
+
+1999-09-21 Tuesday 18:55  massiot
+
+ * Le video_decoder a desormais une structure qui tourne (copier-coller de
+   l'audio_decoder) ;
+
+ L'integration du mpeg2decode arrive !
+
+ --Meuuh
+
+1999-09-20 Monday 22:07  massiot
+
+ * Passage de NeedBits(), DumpBits(), etc. dans decoder_fifo.h ;
+ * Suppression de warnings ;
+
+ --Meuuh
+
+1999-09-20 Monday 21:22  massiot
+
+ J'avions oublie celui-la :(
+
+ --Meuuh
+
+1999-09-20 Monday 21:21  massiot
+
+ * La DCT et la PCM sont dans audio_math.c ;
+ * Corrections de quelques warnings ici ou la ;
+
+ --Meuuh
+
+1999-09-20 Monday 20:41  massiot
+
+ * Ajout d'un .cvsignore ;
+ * Au démarrage l'interface lance le script contenu dans vlc.init s'il
+   existe (typiquement spawnage d'input) ;
+ * Le décodeur PSI spawne automatiquement les threads video et audio des
+   qu'il a fini ;
+   [les deux précédents comportements peuvent être désactivés en
+    commentant #define AUTO_SPAWN dans config.h]
+ * Correction d'un bug de compilation dans input_pcr.c
+
+ --Meuuh
+
+1999-08-08 Sunday 12:42  maxx
+
+ * CVS Creation
+
+ -- MaXX
+
+1999-08-08 Sunday 12:42  maxx
+
+ Initial revision
+

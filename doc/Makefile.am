@@ -1,6 +1,10 @@
 NULL =
 
 EXTRA_DIST = \
+	ChangeLog-1999 \
+	ChangeLog-2000 \
+	ChangeLog-2001 \
+	ChangeLog-2002 \
 	vlc.1 \
 	vlc-config.1 \
 	bugreport-howto.txt \

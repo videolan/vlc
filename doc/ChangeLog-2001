@@ -1,0 +1,4275 @@
+2001-12-31 Monday 05:10  sam
+
+   * Updated changelog.
+
+2001-12-31 Monday 04:53  sam
+
+   * Fixed detection of the esd plugin.
+   * Fixed the ts plugin's input type detection.
+   * Fixed the BadCursor error in the x11 and xvideo plugins. For real this
+     time (unlike my 2001/08/03 fix :p).
+   * Made the wall filter work a bit better. It now spawns a 3x2 mosaic,
+     but this will eventually be configurable, à la `--filter wall:3x3'.
+
+2001-12-31 Monday 03:26  massiot
+
+ * Fixed a bug in DecoderError.
+ * Temporary kludge for vlc_mpeg_adec=mad ./vlc ...
+
+2001-12-31 Monday 03:23  massiot
+
+ Fixed a bug in DecoderError.
+
+2001-12-31 Monday 01:21  massiot
+
+ STABLE/HEAD merge ; backported the Next Generation Buffer Manager.
+
+2001-12-31 Monday 01:13  massiot
+
+ Miscellaneous typos.
+
+2001-12-30 Sunday 07:09  sam
+
+ Some heavy changes today:
+   * Removed duplicate function checks from configure.in.
+   * Added extra magic to Makefile.modules so that the module Makefiles
+     are now ridiculously simple. And I mean *simple*. Check it! This will
+     make a possible switch to full autoconf/automake a lot easier.
+   * Added the vlc version name to the plugin symbols, to be sure we only load
+     plugins with the same version number. A nasty consequence is that you
+     need to rebuild your tree after midnight if you are using a CVS tree :-)
+   * Got rid of modules_export.h by #defining exported functions in the same
+     header as their prototype.
+   * Added modules_inner.h and other commonly used .h files to common.h so
+     there are less and less files to include, and renamed common.h to
+     <videolan/vlc.h>.
+   * First modifications to the module handling system towards my ultimate
+     goal to get rid of the *_Probe functions. Got rid of TestMethod and
+     TestCPU, as well as src/misc/tests.c.
+   * Wrote the chroma plugin handling functions. No YUV functions have been
+     ported yet because it'ls a lot of work, but the core system works, I
+     tried it with a naive yv12->rgb16 plugin (which will disappear when the
+     real functions are ready).
+   * Made a lot of functions in dvd_summary.c one-liners to avoid wasting
+     too many output lines.
+   * Fixed a segfault in input_dvd.c:DVDInit.
+   * Added a fixfiles.sh script in plugins/gtk to be run after Glade has
+     generated its C files.
+   * Did some work on the KDE interface to make it suck a bit less. It still
+     segfaults, but at least it runs and it looks less ugly.
+   * RGB SDL rendering works again, though in 16bpp only.
+   * Made plugins/vcd/linux_cdrom_tools.c independent of any vlc structure
+     so that it'll be easily put in a library. Maybe libdvdcss?
+   * Fixed VCD date display.
+   * Merged vout_xvideo.c, vout_x11.c and vout_common.c into xcommon.c.
+   * Wrote non-Shm XVideo output.
+   * Made X11 output work again. Still pretty unstable, only works for 16bpp.
+   * Additional french translation in po/fr.po. Any taker for the rest?
+   * Fixed a segfault in video_output.c when the allocated pictures were
+     not direct buffers.
+   * If $DISPLAY isn't set, don't try to run the Gtk+ interface.
+   * Replaced 48x48 .xpm images with 32x32 ones to conform to Debian policy
+     (Closes Debian bug #126939).
+   * Removed the automatic ./configure launch when running `make all' for
+     the first time.
+
+ Stuff currently more broken than it ought to be:
+   * The wall filter. Being fixed.
+   * x11 and sdl plugins for depth != 16bpp.
+   * Software YUV.
+   * gvlc, gnome-vlc, kvlc shortcuts. Use --intf instead for the moment.
+
+2001-12-30 Sunday 06:31  sam
+
+   * Duh. Reverted Håkan's patch. Adding the same target three times isn't
+     a good idea.
+
+2001-12-30 Sunday 06:10  sam
+
+   * configure.in fix by Håkan Hjort.
+
+2001-12-30 Sunday 06:06  sam
+
+   * Backported the DecoderError() patch.
+
+2001-12-30 Sunday 05:46  sam
+
+   * Forgot a file in my last commit.
+
+2001-12-30 Sunday 05:38  sam
+
+   * Put ErrorThread() in input_ext-dec.h because it was the same function
+     in all decoders. Called it DecoderError() instead.
+   * All decoders enter DecoderError() in case of error, even if they
+     haven't allocated all their data. This prevents the input from getting
+     stuck if a decoder has failed its initialization.
+   * Namespace fixes through the decoder files.
+
+2001-12-29 Saturday 03:44  massiot
+
+ Fixed a cosmetic issue.
+
+2001-12-29 Saturday 03:07  massiot
+
+ Hidden gory buffer management details in a private section of data_packet_t.
+
+2001-12-27 Thursday 03:47  massiot
+
+ * Changed pf_read prototype and minor changes.
+
+2001-12-27 Thursday 01:49  massiot
+
+ * Changed the way decoder_fifo_t works ;
+ * Minor optimizations in the Next Generation Buffer Manager.
+
+2001-12-20 Thursday 22:11  sam
+
+   * Added Jeffrey Baker to the AUTHORS file.
+   * Fixed a PPC compilation issue.
+
+2001-12-19 Wednesday 10:00  massiot
+
+ Next Generation Buffer Manager for DVD and VCD plug-ins.
+
+2001-12-19 Wednesday 03:50  sam
+
+   * Initialize SDL before opening the SDL audio output.
+   * Prevent two SDL video outputs or audio outputs to be spawned at the
+     same time to avoid ugly crashes.
+   * The SDL plugin now says whether we are using software or hardware YUV
+     in its window title.
+   * We now stop at the first ':' when looking for a module name, to easily
+     pass information to the modules. Possible example: --vout sdl:software,
+     implementation of such an option is left as an exercise.
+   * Merged filter_bob and filter_bob422 into filter_bob. Use --filter bob
+     to deinterlace 422 into 420 as well.
+   * Factorized code common to most filters and the video output, optimized
+     a few filters by aligning data and reading 64 bits at a time.
+   * Two new absolutely useless, CPU-eating, resource-wasting, but fun
+     filters: enjoy `transform', which performs flips and 90° rotations, and
+     `distort', which performs animated image effects (currently only a naive
+     sine wave is implemented). Usage examples:
+        --filter transform:hflip
+        --filter transform:vflip
+        --filter transform:90
+        --filter transform:180
+        --filter transform:270
+        --filter distort:wave
+
+2001-12-18 Tuesday 03:13  sam
+
+   * Ultimate fixes to the win32 package generation.
+
+2001-12-18 Tuesday 03:07  sam
+
+   * Ultimate fixes to the win32 package generation.
+
+2001-12-18 Tuesday 02:19  sam
+
+   * Fixed a copy/paste error from previous commit.
+
+2001-12-18 Tuesday 02:03  sam
+
+   * Added --with-dll-path option for my automated Win32 package builds.
+
+2001-12-17 Monday 16:42  sam
+
+   * TS input: bugfix in DecodePAT and minor optimizations elsewhere.
+
+2001-12-17 Monday 16:37  sam
+
+   * TS input: bugfix in DecodePAT and minor optimizations elsewhere.
+
+2001-12-17 Monday 16:03  sam
+
+   * TS input: we now check that the contents of the PAT has changed
+     before updating it, instead of just relying on its version number.
+   * debian/changelog updates.
+
+2001-12-17 Monday 15:59  sam
+
+   * TS input: we now check that the contents of the PAT has changed
+     before updating it, instead of just relying on its version number.
+
+2001-12-17 Monday 12:42  sam
+
+   * Disabled broken ALSA audio output. Closes Debian bugs #110869 and #119846.
+   * Fixed build dependencies on libasound2-dev. Closes Debian bug #121057.
+   * Changed configure.in so that libXv_pic is used instead of libXv.a when
+     available. Closes Debian bug #111790.
+
+2001-12-17 Monday 05:33  sam
+
+   * Pathetic attempt at a 4:2:2 renderer and deinterlacer, combining the
+     most awful line dropping techniques of both BOB and 422 to 420
+     downscaling. Don't worry, it should only survive for a couple of days.
+
+2001-12-17 Monday 03:48  sam
+
+   * CPU detection under BeOS.
+   * Fixed XVideo port selection.
+
+2001-12-17 Monday 03:38  sam
+
+   * CPU detection under BeOS.
+   * Fixed XVideo port selection.
+   * New stupid plugin: "--filter wall" for split-image playback :-)
+      (will evolve into a real image wall plugin when I have time)
+
+2001-12-16 Sunday 18:00  sam
+
+ libdvdcss changes:
+   * Support for REPORT_TITLE_KEY and RPC commands by Håkan Hjort
+     <d95hjort@dtek.chalmers.se>.
+
+ vlc changes:
+   * Minor coding style fixes (please avoid tabs).
+
+2001-12-16 Sunday 16:18  sam
+
+   * Filter plugins. Not very polished (please don't look at how the dates are
+     calculated!), but worth a try. Use the following flags:
+      "--filter invert" for inverse video
+      "--filter bob" for BOB deinterlacing
+   * Fixed a potential segfault if the subtitle stream was encountered
+     before the video stream.
+   * Misc vout4 fixes.
+
+2001-12-13 Thursday 23:56  sam
+
+   * Minor compile fix under Hurd.
+   * Fixed a potential segfault if the subtitle stream was encountered
+     before the video stream.
+
+2001-12-13 Thursday 20:47  sam
+
+   * Buffer choice optimizations - vout4 should eat even less CPU now.
+   * Minor warning fix for Hurd.
+
+2001-12-13 Thursday 17:33  massiot
+
+ Fixed a major bug I introduced lately.
+
+2001-12-13 Thursday 12:47  sam
+
+   * Fixed aspect ratio handling.
+   * Fixed potential compilation issues under eg. BSD/OS.
+
+2001-12-13 Thursday 12:37  sam
+
+   * Fixed potential compilation issues under eg. BSD/OS.
+
+2001-12-12 Wednesday 15:20  sam
+
+   * Fixed unnecessary target remake (recursive make is harmful !).
+
+2001-12-12 Wednesday 15:20  sam
+
+   * Fixed Win32 port.
+   * Fixed unnecessary target remake (recursive make is harmful !).
+
+2001-12-12 Wednesday 13:48  massiot
+
+ Next Generation Buffer Manager, for TS plug-in. Please test in-ten-si-vely !
+
+2001-12-12 Wednesday 11:18  massiot
+
+ Next Generation Buffer Manager, for PS plug-in.
+
+2001-12-12 Wednesday 02:13  sam
+
+   * Additional fixes for OSes with no gettext (thanks to ej0).
+   * Fixed a potential BeOS linking issue.
+   * Fixed a minor bug in input.c.
+
+2001-12-12 Wednesday 02:13  sam
+
+   * Fixed a potential BeOS linking issue.
+   * Fixed a minor bug in input.c.
+
+2001-12-11 Tuesday 23:53  sam
+
+   * Don't try to use gettext if we don't have GNU gettext. This may change
+     in the future though (most GNU software seems to include a local copy of
+     gettext in case the operating system doesn't provide it).
+
+2001-12-11 Tuesday 15:35  sam
+
+   * Fixed an issue in Makefile.dep causing to rebuild unnecessary files
+     in the gtk/gnome plugins.
+   * Removed cruft from configure.in.
+
+2001-12-11 Tuesday 15:31  sam
+
+   * Fixed an issue in Makefile.dep causing to rebuild unnecessary files
+     in the gtk/gnome and x11/xvideo plugins.
+   * Fixed CFLAGS_XVIDEO.
+
+2001-12-11 Tuesday 14:43  sam
+
+   * Added vlc-arts to the debian package generation.
+   * HP-UX port of the DVD ioctls courtesy of David Siebörger.
+
+2001-12-11 Tuesday 13:55  massiot
+
+ Fixed major bugs in the PSI decoder.
+
+2001-12-10 Monday 18:58  gbazin
+
+   * configure.in was broken for win32
+
+2001-12-10 Monday 16:17  massiot
+
+ Backported fix for possible segfault with --input.
+
+2001-12-10 Monday 16:16  massiot
+
+ Fixed possible segfault with --input.
+
+2001-12-10 Monday 13:17  sam
+
+   * (very old) russian translation courtesy of Valek Filippov <frob@df.ru>.
+   * Fixed a charset issue in the french translation.
+
+2001-12-10 Monday 12:40  sam
+
+   * Removed more unused code.
+   * Updated config.guess and config.sub from GNU's latest versions (bozo,
+     you may want to update them in vls as well).
+   * Added vlc.pot skeleton for translators.
+
+2001-12-10 Monday 04:54  sam
+
+   * Fixed a segfault on exit when no fast_memcpy module was found.
+
+2001-12-10 Monday 04:53  sam
+
+   * Removed unused code (intf_channels.c, keystrokes.h).
+   * Put common_win32.h back into common.h -- it wasn't that big and we
+     should not multiply header files.
+   * Added gettext support by Thomas Graf <reeler@reeler.org>, may be
+     broken on other platforms but we'll only see it when I'm finished
+     with vout 4 :-)
+   * Fixed a segfault on exit when no fast_memcpy module was found.
+
+2001-12-09 Sunday 17:08  sam
+
+   * Fixed Debian package builds.
+
+2001-12-09 Sunday 17:01  sam
+
+   * COMPLETE CVS BREAKAGE !! The MAIN branch is going to be a playground
+     for my nevrotic and destructive pulsions during the next few hours!
+
+   * If you want to test vlc, please use the v0_2_92_branch branch.
+
+   * Stuff currently working:
+      - direct to YUV buffer decoding
+      - non-ugly subtitle blending
+      - XVideo and SDL video output
+
+   * Stuff currently utterly broken:
+      - aspect ratio
+      - software rendering (ie, all other video output plugins)
+
+   * Additional misc changes:
+      - Renamed spu_dec to spudec and mad_adec to mad to stay coherent with
+        other plugins. Also, renamed mpeg to mpeg_system.
+      - Added jobi to the AUTHORS file.
+      - Factored code common to vout_x11.c and vout_xvideo.c.
+
+2001-12-09 Sunday 16:34  sam
+
+ file vlc-mad.dirs was initially added on branch v0_2_92_branch.
+
+2001-12-09 Sunday 16:34  sam
+
+   * Added the MAD plugin to the Debian build system, called it mad instead
+     of mad_adec to stay coherent will other plugins.
+   * Fixed a few warnings due to missing <string.h>.
+
+2001-12-08 Saturday 12:55  sam
+
+   * Fixed debian and make snapshot rules.
+
+2001-12-07 Friday 19:29  massiot
+
+ Bumped up revision number to 0.2.92-pre1 and 1.0.1-pre1. Ready for 0.2.92
+ pre-release.
+
+2001-12-07 Friday 19:25  massiot
+
+ 0.2.92 pre-release.
+
+2001-12-07 Friday 19:22  massiot
+
+ Bumped up revision number to 0.2.92-dev and 1.0.1-dev.
+
+2001-12-07 Friday 18:33  sam
+
+   * Fixed a total breakage of decoder plugins introduced by fast_memcpy.
+   * Got rid of #include "main.h", included it in common.h instead ; got
+     rid of #include "config.h" in most files as well.
+
+2001-12-07 Friday 16:47  jobi
+
+ * added functions in inputs to change the current program (most of
+   them do nothing)
+
+ All inputs should now have a pf_setprogram function. A default one is
+ provided in input_programs.c.
+
+2001-12-06 Thursday 13:53  massiot
+
+ Fix for altivec under Linux.
+
+2001-12-06 Thursday 11:18  massiot
+
+ Updated man page.
+
+2001-12-06 Thursday 10:53  massiot
+
+ * mad plug-in is now built-in to avoid PIC/non-PIC collision ;
+ * Updated documentation ;
+ * New --desync option, to delay the video (in case of lip desynchronization) ;
+ this is bad, but we have no other option for the moment ;
+ * Clicking in vout now pauses the stream, patch courtesy of Peter Surda.
+
+2001-12-05 Wednesday 10:30  massiot
+
+ Fix for altivec detection (courtesy of walken).
+
+2001-12-05 Wednesday 03:31  jobi
+
+ * Added 2 fields, p_selected_program and p_new_program, to the
+   input_thread_t structure, so that we may support multi programs
+   streams.
+ * Modified inputs to take account of this change.
+ * Modified input_clock.c so that it doesn't refer to pp_programs[0]
+   any more.
+
+ Now we should not refer to the first program, but to the selected
+ program. Functions to change the current program are coming.
+
+2001-12-04 Tuesday 13:47  massiot
+
+ libmad plug-in, courtesy of Jean-Paul Saman <jpsaman@wxs.nl>.
+
+2001-12-03 Monday 17:55  massiot
+
+ Reversed my previous patch (too buggy).
+
+2001-12-03 Monday 17:34  stef
+
+ -added eof for ts seekable streams
+ -close netlist when ts input ends
+
+2001-12-03 Monday 16:43  massiot
+
+ Fixed a bug in my previous commit.
+
+2001-12-03 Monday 16:18  sam
+
+   * Borrowed MPlayer's fast memcpy() routines. Best is autodetected, choose
+     "--memcpy <whatever>" to choose one from c, mmx, mmxext or 3dn.
+     Please test! Especially Athlon users.
+   * Added versioned build-dep to libasound2-dev (Closes Debian bug #121057).
+   * Updated Gtk/GNOME interfaces to use "udpstream" instead of "ts".
+   * Unrolled ChangeLog.
+
+2001-12-03 Monday 15:58  massiot
+
+ More checks for GTK headers.
+
+2001-12-03 Monday 13:58  massiot
+
+ Fixed a crash when pausing.
+
+2001-12-03 Monday 11:49  massiot
+
+ Fixed numerous bugs in ES selection.
+
+2001-12-02 Sunday 17:32  stef
+
+ -hopeless fix for the input netlist corruption bug.
+
+ Please test.
+
+2001-11-30 Friday 22:52  gbazin
+
+  * DeleteDecoderConfig wasn't freeing (anymore) the packets left in the
+     decoder fifo. This bug was creating an io_vec starving on title change
+     when playing DVDs.
+
+2001-11-30 Friday 00:34  stef
+
+ -Update for libdvdcss documentation
+
+2001-11-29 Thursday 17:24  jobi
+
+ Removed a bug in the Makefile that made the CVS-snapshots building fail.
+
+2001-11-29 Thursday 15:57  massiot
+
+ Added vlc.app
+
+2001-11-29 Thursday 15:34  massiot
+
+ Fixed a problem with vlc.app.
+
+2001-11-29 Thursday 10:20  massiot
+
+ Moved #include <string.h> to macosx plug-in instead of threads.h, as in
+ other plug-ins.
+
+2001-11-29 Thursday 01:01  fgp
+
+   *) Added "#include <string.>" to include/threads.h
+      It' wouldn't compile on OSX without this.
+
+   *) Removed the mutex the vout and intf thread (were supposed to use)
+      for syncronizing acces to the p_vout->p_sys structure.
+      The p_vout->change_lock mutex is used for syncronization now. (and
+      should make synronization work)
+
+2001-11-28 Wednesday 15:08  massiot
+
+ * Added error checking in pthread wrapper ; as a result, intf_msg.h must
+ now be included *before* threads.h ;
+ * Changed all files to include intf_msg.h before threads.h ; while I was
+ at it, I update the copyright notices ;
+ * Removed the obsolete darwin plug-in.
+
+2001-11-27 Tuesday 14:42  sam
+
+   * Fixed a deadlock (bug reported by marcari).
+
+2001-11-27 Tuesday 13:06  massiot
+
+ Removed obsolete entry.
+
+2001-11-27 Tuesday 12:52  massiot
+
+ Documentation updates.
+
+2001-11-27 Tuesday 12:33  massiot
+
+ * Updated man page.
+ * dvd:<device>[@<raw device>] to avoid device namespace collision under
+ win32.
+
+2001-11-27 Tuesday 11:14  massiot
+
+ More WIN32 portability fixes.
+
+2001-11-27 Tuesday 10:58  massiot
+
+ Disabled dvdread by default since it causes many portability problems.
+ Enable it with --enable-dvdread.
+
+2001-11-27 Tuesday 10:50  massiot
+
+ Fixed a compilation issue under Win32
+
+2001-11-27 Tuesday 10:18  massiot
+
+ Fixed a potential packet corruption in the DVD input (I suspect this
+ might be the cause of the OS X problem - please confirm).
+
+2001-11-26 Monday 23:06  marcari
+
+ * changed the protocol version for communication between vlc and vlcs
+ from 12 to 13 (due to change from ts:// to udpstream://)
+
+2001-11-25 Sunday 22:52  gbazin
+
+  * Big clean-up to allow compiling every module as plugins.
+  * Added bytes_swap.h to provide ntoh() and htol() on Win32. With this
+      change we don't have to link winsock2 with every plugin anymore. This
+      should also give us a slight speed increase.
+  * Added #define WIN32_LEAN_AND_MEAN in threads.h to speed-up compilation
+      on Win32.
+  * Modified ac_downmix_3dn and sse so they compile with the latest gcc for
+      Win32.
+
+ (PS: the dvdread plugin doesn't compile yet on Win32)
+
+2001-11-25 Sunday 05:04  stef
+
+ Support for libdvdread.
+
+ Libdvdread files are in extras/libdvdread. They have not been changed from
+ those of libdvdread 0.9.2. The changes are in the subdirectory videolan.
+ They basically consist of a new function in the API that does a readv()
+ instead fo a read().
+
+ The library is statically linked with libdvdcss from extras/libdvdcss, and
+ the whole is statically linked with the plugin dvdread. Dvdread can only be
+ compiled as a builtin module for the time being, I think (which means I
+ haven't tried to compile it as a plugin).
+
+ Basically, input_dvdread.c is a copy and paste from input_dvd.c with a few
+ changes to use libdvdread calls. It is still in very alpha stage, but it
+ should offer the same features as the current DVD input.
+
+ It can be called with either the syntax: "dvdread:/dev/dvd"
+ or "--input dvdread /dev/dvd". The command line switches (-t, -T, -c, -u)
+ should work too.
+
+2001-11-25 Sunday 01:26  sam
+
+   * Added "Video" menu hint to debian/*menu (Closes Debian bug #121036).
+
+2001-11-23 Friday 18:47  massiot
+
+ Major rewrite of the network layer. The following syntax ARE NO LONGER
+ SUPPORTED :
+ ts:toto:1234/meuh
+ --server toto --broadcast meuh --port 1234
+
+ The only supported syntax is :
+ udp[stream]:[//][serveraddr:[serverport]][@[bindaddr][:bindport]]
+ example : udpstream:toto@meuh:toto
+
+ In most cases, simply passing "udpstream:" should work, since it enables
+ unicast and broadcast reception on port 1234 from any server. Other
+ options are only used for fine tuning and multicast.
+
+ TODO :
+ * The GTK interface is broken (glade knowledge wanted !)
+ * Test this on all supported platforms (and fix them :)
+ [this won't work with current channel servers - fix needed]
+
+2001-11-21 Wednesday 22:33  jlj
+
+ Don`t use long long, use u64/s64 (int_types.h).
+ Fixed a stale pointer in mpeg_vdec_Run().
+
+2001-11-21 Wednesday 16:47  massiot
+
+ (Hopefully) fixed the network connect() bug under UNIX. I need
+ confirmation that I didn't break the Win32 port, please.
+
+2001-11-21 Wednesday 10:47  massiot
+
+ Fixed compilation bugs with Qt and BeOS (henriiiiiiiiiiiiiiiiiiiiiiiii !!)
+
+2001-11-19 Monday 23:49  sam
+
+   * aRts audio output courtesy of Emmanuel Blindauer <manu@agat.net>.
+   * Fix to the esd plugin when esd-config --cflags is nonempty.
+
+2001-11-16 Friday 00:29  stef
+
+ * --chennels puts gtk/gnome in multi-channel network mode.
+
+ * the network window of the interface reports the values of the environment
+  variables.
+
+ * channels mode excludes vls configuration
+
+ * the vlc does not try to bind vls.via.ecp.fr by default when you select
+  channels mode.
+
+2001-11-15 Thursday 18:50  sam
+
+   * Fixed MacOS X 10.1 network input, thanks to Mathias Kretschmer
+     <mathias@research.att.com>.
+
+2001-11-15 Thursday 18:11  sam
+
+   * Fixed a little crash introduced in my previous commit :-)
+   * Removed more unused code.
+
+2001-11-15 Thursday 17:39  sam
+
+   * Fixed a few crashes due to race conditions in the decoder spawning.
+   * Removed unused code here and there.
+
+2001-11-15 Thursday 16:15  massiot
+
+ Removed unused structure.
+
+2001-11-14 Wednesday 23:19  xav
+
+ Please, please, don't forget those who use the --with-directx flag when
+ ./configuring ! :p
+ Now, to configure directx, use the --enable-directx and --with-directx
+ if necessary.
+
+2001-11-14 Wednesday 18:08  gbazin
+
+ - The ./configure script is more friendly for Win32 users.
+     ( xvideo, x11 and dsp plugins are not enabled by default for win32,
+       plus a few other Win32 cosmetic changes )
+ - Updated the INSTALL-win32.txt file.
+
+ (Let's hope I didn't break anything ;-)
+
+2001-11-14 Wednesday 16:55  massiot
+
+ Fixed a bug in altivec detection on MacOS X.
+
+2001-11-14 Wednesday 03:38  stef
+
+ -moved warning message to debug message in spdif pass-through plugin
+
+ -changed a bit the wait time. It works better here, please test (Bozo ? 0:-)
+
+2001-11-14 Wednesday 00:01  jlj
+
+ The default file-translation mode was not being set under win32.
+ In other words, file playback in 0.2.91 does not work. For de-
+ scheduling threads use a 0ms sleep instead of 1ms, as it was
+ causing problems under WinXP. I hope this does not introduce
+ problems under previous windows versions. I noticed it was
+ originally 0ms, but later changed to 1ms...
+
+2001-11-13 Tuesday 18:10  sam
+
+   * Fixed heap corruption issues in ac3dec (thanks reno).
+
+2001-11-13 Tuesday 16:28  massiot
+
+ Typo.
+
+2001-11-13 Tuesday 16:00  sam
+
+   * Fixed a crash when using `--input dvd /dev/dvd' instead of `dvd:/dev/dvd'
+
+2001-11-13 Tuesday 15:08  sam
+
+   * configure should no longer assume AltiVec is supported when it actually
+     isn't with buggy compilers and/or pre-set $CFLAGS.
+
+2001-11-13 Tuesday 12:19  massiot
+
+ RPM builds.
+
+2001-11-13 Tuesday 12:15  henri
+
+ Forgot Changelog.
+ Began to re-read the documentation.
+
+2001-11-13 Tuesday 12:11  sam
+
+   * Commited my little release-howto (only useful to core vlc developers).
+
+2001-11-13 Tuesday 12:09  henri
+
+ All decoders (audio, video, subtitles) are now modules.
+
+ - mpeg_vdec, mpeg_adec and ac3_adec are builtins by default
+ - ac3_spdif, spu_dec and lpcm_dec are plugins by default
+
+2001-11-13 Tuesday 11:44  sam
+
+   * Closing Debian bug #119369 which was fixed a while ago.
+
+2001-11-13 Tuesday 01:25  sam
+
+   * Got rid of DVDCSS_SEEK_INI in libdvdcss.
+
+2001-11-13 Tuesday 00:46  sam
+
+   * Added a "make package-beos" rule.
+   * Fixed a BeOS compilation issue.
+
+2001-11-12 Monday 23:56  sam
+
+   * Fixed the vlcs communication for real now.
+
+2001-11-12 Monday 22:42  sam
+
+   * Fixed the vlcs communication issue by initializing WinSock at
+     startup (thanks Meuuh for the tip).
+
+2001-11-12 Monday 20:49  massiot
+
+ Bumped up version number to 0.2.91.
+
+2001-11-12 Monday 20:44  sam
+
+   * Fixed a bug in the "make snapshot*" rules.
+
+2001-11-12 Monday 20:16  sam
+
+   * Made everything ready for a vlc-0.2.91 / libdvdcss-1.0.0 release.
+   * Updated ChangeLog and ChangeLog.libdvdcss.
+   * Increased vlcs response message length.
+   * Removed the i_flags argument to dvdcss_open. Everything is done through
+     environment variables now.
+
+2001-11-12 Monday 13:22  massiot
+
+ Added FAQ.
+
+2001-11-12 Monday 12:54  massiot
+
+ New --channelserver switch.
+
+2001-11-12 Monday 11:37  massiot
+
+ Documentation updates.
+
+2001-11-12 Monday 11:30  massiot
+
+ ipkg script for Familiar Linux 0.5 & bug fix in debian/rules.
+
+2001-11-12 Monday 10:33  massiot
+
+ Corrected a typo.
+
+2001-11-12 Monday 05:15  sam
+
+   * Added Oct's NSIS installer script. It will probably not work for you,
+     but I need it to build the Win32 auto installer.
+
+2001-11-12 Monday 04:12  sam
+
+   * Automatic handling of the Channel Server's response in network mode.
+
+2001-11-12 Monday 03:07  stef
+
+ -LPCM _is_ a private stream. Sorry.
+
+ -GetMACAddress takes the interface defined in the environment variable
+ vlc_iface instead of eth0
+
+2001-11-12 Monday 01:56  stef
+
+ -Fixed bug with MPEG audio in TS streams: MPEG audio & LPCM are _not_
+ private ES :p
+
+2001-11-11 Sunday 18:15  sam
+
+   * Fixed compilation (and quite probably runtime) issues under IA64
+     due to mixed int/void* casts.
+
+2001-11-11 Sunday 01:32  stef
+
+ -Merged DVD netlist with input netlist to remove duplicated code.
+ Basically, this adds the ability for the netlist to handle transport
+ packets that carry more than one data_packet.
+
+2001-11-09 Friday 13:49  massiot
+
+ * BSD/OS VCD patch, courtesy of Steven M. Schultz <sms@TO.GD-ES.COM>
+ * Win32 network fix.
+
+2001-11-08 Thursday 21:07  jlj
+
+   * Fixed a mingw32 problem I introduced last night :)
+
+2001-11-08 Thursday 14:45  stef
+
+ -kludge to have less discontinuity after a zero scr in DVD.
+
+ Maybe we should try to predict the date instead of taking the last one but
+ it seems quite hard.
+
+2001-11-08 Thursday 01:48  jlj
+
+   * Fixed some win32 64-bit issues.
+
+2001-11-07 Wednesday 22:58  jlj
+
+   * Fixed some win32 compile issues.
+   * Don't use long long, use u64/s64 (int_types.h).
+
+2001-11-07 Wednesday 17:37  stef
+
+ *Move function that translates language codes into country name in src/misc
+ so that every plugin can use it
+
+ *Change the name of a function in dvd_udf.c to fit with the forthcoming
+  libdvdread plugin.
+
+2001-11-07 Wednesday 10:34  massiot
+
+ Added fgp.
+
+2001-11-06 Tuesday 17:12  massiot
+
+ New --enable-release config option.
+
+2001-11-06 Tuesday 00:59  sam
+
+   * Fixed support for SPU and LPCM streams over network.
+
+2001-11-05 Monday 21:24  fgp
+
+ Added a new drawer to the control window to support:
+ 1) Title / Chapter selection
+ 2) Subtitle selection
+ 3) Audiochannel/Language selection
+ 4) Angle selection
+
+2001-11-05 Monday 15:22  massiot
+
+ New --volume option (untested, like usual :).
+
+2001-11-02 Friday 13:30  massiot
+
+ * libdvdcss port to OpenBSD.
+
+2001-11-01 Thursday 21:58  fgp
+
+ Reimported Intf_Controller, connected "File/Open/File" to Intf_Controller::file:Open.
+
+2001-11-01 Thursday 15:30  sam
+
+   * Modified the pf_close kludge in input.c so that we don't segfault when
+     pf_init fails.
+
+2001-11-01 Thursday 00:29  asmax
+
+ - Do not resample if delta is short enough
+
+2001-10-31 Wednesday 11:55  reno
+
+ * Fixed a segfault on exit under Windows 2000
+
+2001-10-30 Tuesday 23:45  massiot
+
+ Fixed mistakes in my previous commit.
+
+2001-10-30 Tuesday 19:34  reno
+
+ * Use memalign for aligned data (instead of a greek malloc)
+ * Some optimization in imdct (all data are now aligned)
+ * SSE downmix now works for windows
+ * SSE imdct is desactivated for windows (MINGW32 doesn't know how to aligned data)
+
+2001-10-30 Tuesday 12:49  asmax
+
+ - Changed default configuration for vls/vlcs hostname/IP
+
+2001-10-30 Tuesday 10:57  massiot
+
+ Fixed '-' input.
+
+2001-10-30 Tuesday 10:48  massiot
+
+ New interface for MacOS X, courtesy of Florian G. Pflug.
+
+2001-10-26 Friday 16:23  massiot
+
+ VLC FAQ TBU.
+
+2001-10-23 Tuesday 23:41  sam
+
+   * Synced dummy_dvdcss with Stef's changes to libdvdcss.
+   * configure now compiles the VCD plugin if linux/cdrom.h is present.
+
+2001-10-23 Tuesday 03:06  jobi
+
+ Added VCD input plugin for Linux :
+
+ The Linux specific stuff is located in linux_cdrom_tools files.
+ For the time being, it only has title (tracks). Chapters will come if I
+ ever can read .vcd files.
+ I've modified Gnome and GTK+, not the others.
+ I've noticed a big bug, it segfaults at the end of a title. I will
+ have a look on this tomorrow.
+ Please be indulgent, it's my first peace of code ;-)
+
+2001-10-22 Monday 15:17  massiot
+
+ Fixed ATTR_ALIGN configure test.
+
+2001-10-22 Monday 14:07  sam
+
+   * Fixed NetBSD (and probably OpenBSD) libdvdcss compilation.
+
+2001-10-22 Monday 12:28  massiot
+
+ Fixed compilation problems with OpenBSD.
+
+2001-10-22 Monday 12:02  sam
+
+   * xvideo.so is now built in by default. Mixing PIC and non-PIC code was not
+   very nice.
+   * Fixed compilation errors in src/interface/main.c when the compiler did
+   not support SSE or 3DNow! inline assembly.
+
+2001-10-22 Monday 11:35  massiot
+
+ Qt fix courtesy of Christopher Johnson <cjohnson@mint.net>.
+
+2001-10-22 Monday 02:33  xav
+
+ The vlc now crosscompiles smoothly without having to correct one file
+ BUT this is UGLY ! We HAVE to find a way to make multicast function
+ under Win32.
+
+ BTW, it does now definitely read TS Streams, locally or from the network.
+
+2001-10-22 Monday 00:43  jobi
+
+ [no log message]
+
+2001-10-21 Sunday 23:17  lool
+
+ Moved unlock in the if structure. This suppresses the dead_lock which
+ was crashing the windows port in TS_input.
+
+ The audio still segfaults.
+
+2001-10-16 Tuesday 16:51  stef
+
+ -defining TRACE_DVDCSS in config.h displays libdvdcss debug message.
+ -libdvdcss error messages are reported in input_dvd.c.
+ -vlc verbosity also enables more error messages from libdvdcss.
+
+2001-10-15 Monday 14:59  sam
+
+   * Fixed an error in the ts://server[:port][/broadcast] input parsing.
+
+2001-10-14 Sunday 03:26  stef
+
+ Use of an environment variable to choose libdvdcss method.
+
+2001-10-13 Saturday 15:34  stef
+
+ New features for libdvdcss: we have three ways now to decode a title key.
+
+ 1) Crack the title key (the method that was here before). The only change
+ here is that we search the key for the exact chapter we are seeking with
+ DVDSetArea (in case the key has changed within a title). It is maybe not a
+ good idea.
+
+ 2) Crack the disc key, which allows us to decode instantly all title keys.
+ I've used an algorithm from Frank Stevenson ; it eats much memory (64MB),
+ and takes about 15 s at launch time.
+
+ 3) Decode the disc key with player keys (libcss method). However, you need
+ licensed player keys at build time for that to work.
+
+ To choose between libdvdcss methods, a command line options is supplied:
+
+         vlc --dvdcss <method> where method is one of title, disc, key.
+
+ Note that all these changes only work with linux now, since we have to add a
+ specific ioctl to read title key. I hope that I haven't broken too many things.
+
+2001-10-11 Thursday 16:12  massiot
+
+ * Minor video parser optimization ;
+ * SDL now displays an error message on 422 streams.
+
+2001-10-11 Thursday 13:19  massiot
+
+ * Chroma 4:2:2 and 4:4:4 support in the decoder.
+ * Fixed bugs in the C YUV transform with 4:2:2 format.
+
+2001-10-11 Thursday 11:28  massiot
+
+ * Fixed bugs in RPM spec files ;
+ * Fixed a bug in configure where ix86 machines were improperly detected.
+
+2001-10-10 Wednesday 15:18  sam
+
+   * Fixed bad ChangeLog formatting.
+
+2001-10-10 Wednesday 14:25  sam
+
+   * 0.2.90 release.
+   * Updated ChangeLog files.
+   * XVideo module now compiled as built-in for Debian packages, to avoid
+     PIC and non-PIC code collision (Closes Debian bug #111790).
+
+2001-10-09 Tuesday 11:46  massiot
+
+ MacOS X port : replaced -traditional-cpp (deprecated) with -no-cpp-precomp.
+
+2001-10-08 Monday 16:20  massiot
+
+ MacOS X port : native QuickTime video output, courtesy of Florian G.
+ Pflug <fgp@phlo.org>. Use it with -I macosx_qt.
+
+2001-10-08 Monday 09:21  massiot
+
+ Fixed bugs in the altivec detection, courtesy of Michel Lanners <mlan@cpu.lu>.
+
+2001-10-03 Wednesday 15:10  sam
+
+   * Added User-Agent header in the HTTP input.
+   * Fixed an input segfault which occured using ES input.
+
+2001-10-03 Wednesday 14:41  massiot
+
+ * Enhanced --with-tuning
+ * Fixed a nasty segfault
+
+2001-10-03 Wednesday 13:14  sam
+
+   * Added an endianness check for cross-compilations.
+   * We now check for sys/times.h.
+
+2001-10-03 Wednesday 12:58  massiot
+
+ * Repaired dummy input broken yesterday.
+
+2001-10-03 Wednesday 12:46  massiot
+
+ * Minor ShowBits() optimization ;
+ * Fixed a bug in vlc.spec ;
+ * New --disable-plugins option ; make all plug-ins built-in.
+
+2001-10-03 Wednesday 10:12  massiot
+
+ Info : you can use #ifndef instead of #ifdef... #else :p
+
+2001-10-03 Wednesday 03:32  xav
+
+ The vlc now compiles when cross-compiling with Mingw32. It segfaults
+ while browsing plugins (modules.o, it seems).
+
+ Oh, btw, stats won't work under win32, since <sys/times.h> and the
+ function times don't seem to exist.
+
+ Sam, may I speak with you tomorrow about modules.c ?
+
+2001-10-03 Wednesday 02:53  xav
+
+ Modified configure.in to allow cross-compiling with Mingw32.
+ Quick and ugly, i'm gonna find a better way to do it.
+
+2001-10-03 Wednesday 02:20  tcastley
+
+ Updated to compile on BeOS.
+
+2001-10-03 Wednesday 02:19  tcastley
+
+ Changes to ensure the BeOS compile still works.
+
+2001-10-02 Tuesday 17:09  sam
+
+   * Added HTTP virtualhost support in the HTTP input.
+   * Enabled mouse clicks in the GGI plugin.
+   * Minor Makefile alteration.
+
+2001-10-02 Tuesday 17:04  massiot
+
+ * Fixed a warning in input_es.c ;
+ * Don't connect on INADDR_ANY, patch courtesy of Mathias Kretschmer
+   <mathias@research.att.com>.
+
+2001-10-02 Tuesday 16:46  massiot
+
+ * Cleaned up sam's mess with input's pf_open and pf_close (not completely) ;
+ * With -vvv modules now show up their scores ;
+
+ This afternoon I have been a little bored, so the feature of the day is :
+ * HTTP input support.
+
+ You can test it with :
+ ./vlc http://mysite.com:80/mystream.mpg
+ It doesn't implement any kind of buffering, so make sure you have enough
+ bandwidth, otherwise you'll just get nothing.
+
+ It is compatible with HTTP proxy, just set http_proxy :
+ export http_proxy="http://proxy.mycompany.com:3128/"
+
+ Enjoy !
+
+2001-10-02 Tuesday 13:34  massiot
+
+ * Borrowed Mandrakesoft's vlc.spec and libdvdcss.spec ;
+ * New configure option --with-tuning=[arch], extending --enable-pentiumpro ;
+ for Pentium, use --with-tuning=pentium, for PowerPC 604 use --with-tuning=604,
+ and so on.
+
+2001-10-01 Monday 16:44  massiot
+
+ Dramatically improve compilation time, with a negligible performance
+ tradeoff.
+
+2001-10-01 Monday 16:18  massiot
+
+ * Removed -march=pentiumpro ; should now work on pentium-class machines ;
+ * Removed --enable-stats configuration directive. Stats are now activated
+ at runtime with --stats ;
+ * New intf_StatMsg() call ;
+ * Vout picture heap is now 8 pictures instead of 5 (better synchro) ;
+ * Tremendous enhancements in statistics display ;
+ * Better capabilities handling.
+
+2001-10-01 Monday 12:48  massiot
+
+ Error checks in debug mode : pthread ERRORCHECK_MUTEX and MALLOC_CHECK_=2.
+
+2001-09-30 Sunday 00:33  stef
+
+ .better handling of the buffer of the sound driver to try to remove
+  sratches in spdif.
+
+ Thanx to bozo for his help :)
+
+2001-09-28 Friday 15:08  massiot
+
+ Fixed bugs in the MacOS X port.
+
+2001-09-28 Friday 14:17  massiot
+
+ Faster configure script and as-yet untested Darwin patches.
+
+2001-09-28 Friday 10:39  massiot
+
+ Test for Altivec C extensions.
+
+2001-09-28 Friday 09:57  massiot
+
+ If memalign isn't available, fall back on valloc.
+
+2001-09-26 Wednesday 12:32  massiot
+
+ By default, use the real size of the stream for the video output size.
+
+2001-09-25 Tuesday 11:46  massiot
+
+ Altivec IDCT and motion compensation, courtesy of Michel Lespinasse for
+ mpeg2dec (untested).
+
+2001-09-24 Monday 11:17  massiot
+
+ Fixed many alignment issues.
+
+2001-09-14 Friday 15:36  massiot
+
+ Miscellaneous updates to configure, especially for cross-compilation.
+
+2001-09-09 Sunday 13:43  sam
+
+  Changes to vlc:
+
+   * Fixed arch-dependant build dependencies (Closes Debian bug #109722).
+   * Minor changes to the (non-working) ncurses interface.
+
+  Changes to libdvdcss (courtesy of Håkan Hjort <d95hjort@dtek.chalmers.se>):
+
+   * If we see 3000 unencrypted blocks assume that the title is unencrypted.
+   * If we have not seen any encrypted block and then discover that the block
+     just read is not a valid block of an MPEG2 Program stream, assume that the
+     title is unencrypted.
+   * Empty keys (for unscrambled sectors) are now cached as well.
+   * We try to decrypt the file even if DVD ioctls are not available.
+
+2001-09-06 Thursday 18:21  henri
+
+ - Fixed a netlist packet leak in demuxPSI (Mark Gritter <mgritter@kealia.com>).
+
+ - Removed the nuts message "unable to allocate memory" when the netlist got
+ empty.
+
+ - Cosmetic changes.
+
+2001-09-06 Thursday 13:24  massiot
+
+ Another fix for the altivec detection.
+
+2001-09-06 Thursday 10:39  massiot
+
+ Fixed numerous bugs with the Altivec IDCT (still not compiling).
+
+2001-09-06 Thursday 07:31  henri
+
+ Added gnome.h check and cleaned the error messages in the configure
+ script
+
+2001-09-06 Thursday 04:28  henri
+
+ A very tiny small useless optimization in the LPCM decoder
+
+2001-09-05 Wednesday 16:07  massiot
+
+ * Altivec IDCT and motion compensation, based on Paul Mackerras's mpeg2dec
+ (untested !) ;
+ * Local minor optimizations in IDCT ;
+ * Removed a hopeless kludge in input_clock.c
+
+2001-08-27 Monday 16:13  massiot
+
+ IP Multicast support, courtesy of Mathias Kretschmer <mathias@research.att.com>.
+
+2001-08-24 Friday 10:51  sam
+
+   * Fixed build dependencies for architectures not supporting libasound2
+     (Closes Debian bug #109722).
+
+2001-08-23 Thursday 15:39  sam
+
+   * Attempt to fix the SDL detection under *BSD.
+
+2001-08-23 Thursday 13:24  massiot
+
+ Removed /usr/local/include, because it is unsafe in a cross-compilation
+ environment. If you have problems with this, tell me and we'll find an
+ alternate solution.
+
+2001-08-22 Wednesday 21:18  gbazin
+
+ - The win32 port is once again using msvcrt.dll instead of msvcrt40.dll
+ - Fixed a synchro bug (typo) in video_output.c
+
+2001-08-22 Wednesday 18:47  massiot
+
+ * Added a documentation to use VLC as a netscape plug-in and do some
+ (buggy) web streaming.
+
+2001-08-22 Wednesday 17:21  massiot
+
+ * Totally rewrote the video decoder (inspired by walken's mpeg2dec), implying :
+ - performance boost ;
+ - fixed the "Dual Prime Arithmetic" bug ;
+ - 3DNow! motion compensation module ;
+ * BTW, fixed numerous bugs ;
+ * AC3dec statistics do not show up with --enable-stats, because I doubt
+ they're understandable by a normal human being, and they pollute the output.
+
+2001-08-22 Wednesday 15:16  sam
+
+   * Grmbl. Forgot to update the libdvdcss changelog.
+
+2001-08-22 Wednesday 14:23  sam
+
+   * Split ChangeLog into ChangeLog and ChangeLog.libdvdcss.
+   * Added --xvadaptor flag to select the XVideo adaptor to use.
+   * Everything is ready for the 0.2.83 release.
+
+2001-08-19 Sunday 23:35  sam
+
+   * Added support in ./configure for the cprof profiler.
+   * Activated -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 on all platforms, fixes
+     issues under Solaris and QNX.
+   * Additional checks for SSE-specific (non-MMXEXT) instructions, as
+     reported in <20010817114220.A23480@slartibartfast.angrypacket.com>.
+
+2001-08-14 Tuesday 17:53  sam
+
+   * Fixed yesterday's pthread detection fix.
+
+2001-08-14 Tuesday 04:52  sam
+
+   * GNU/Hurd configuration and compilation fixes.
+
+2001-08-14 Tuesday 00:00  sam
+
+   * Fixed a crash in subtitle rendering.
+   * Activated old crappy subtitle rendering in overlay mode (ugly but
+     probably better than having no subtitles at all).
+
+2001-08-13 Monday 12:24  sam
+
+   * Added missing debian files I forgot to add a long time ago.
+   * Fixed libglide2/libglide3 inconsistency in debian/control.
+
+2001-08-10 Friday 17:43  sam
+
+   * Another mistake in the BSD/OS configuration process.
+
+2001-08-10 Friday 17:14  massiot
+
+ Added --with-sdl-config-path option if you sdl-config is not in $PATH.
+
+2001-08-10 Friday 16:38  sam
+
+   * Added proper Conflicts: rules in debian/control.
+   * configure.in fixes for BSD/OS.
+
+2001-08-09 Thursday 23:12  sam
+
+   * Added BSD/OS libdvd by Steven M. Schultz <sms@TO.GD-ES.COM> in
+     extras/BSDI_dvdioctl after he suggested it. License is GPL.
+   * ./configure now checks for an installed libdvd under BSD/OS and
+     falls back to ours if not found.
+   * Fixed harmless typos in yesterday's Solaris libdvd patches.
+   * Bumped libdvdcss version number up to 0.0.3 ; release will probably
+     follow once the BSDI changes have been tested.
+
+2001-08-09 Thursday 20:16  jlj
+
+ Fixed a memory leak in the ifo parser and input_EndStream
+
+2001-08-09 Thursday 08:20  sam
+
+   * Fixed a bug in the gtk interface which caused vlc to go amok after
+     having met a zero-sized area.
+   * Found out how to type 'å' in vim :-)
+   * Added missing bloat to modules_export.h.
+   * 'snapshot*' rules do not depend on 'clean', and don't use /tmp anymore.
+   * Added vlc:loop playlist command to go back at the beginning.
+     Usage: vlc file1.mpeg file2.mpeg ... fileN.mpeg vlc:loop
+     This change isn't very elegant but there are already bugs in the
+     playlist handling, I'll try to polish it once the playlist is fixed.
+
+2001-08-08 Wednesday 02:48  sam
+
+   * Solaris DVD decryption support by H}kan Hjort <d95hjort@dtek.chalmers.se>.
+
+2001-08-07 Tuesday 10:54  sam
+
+   * Updated version number to 0.2.82.
+   * Updated ChangeLog.
+   * Fixed a typo in Makefile.dep.
+
+2001-08-07 Tuesday 02:48  sam
+
+   * Got Makefile to launch ./configure almost properly. $(MAKECMDGOALS) rules !
+   * Various debian scripts fixes.
+   * Added -lmsvcrt40 to the win32 flags for proper execution under Wine.
+   * Fixed broken soname setting under Solaris (and OS X, sort of).
+   * Made the illegal instruction report more explicit.
+   * BSD/OS 4.3beta1 fixes by Steven M. Schultz <sms@TO.GD-ES.COM>.
+
+2001-08-06 Monday 13:46  sam
+
+   * libdvdcss* packages are now a bit more policy-compliant.
+
+2001-08-06 Monday 13:27  sam
+
+   * Added a dummy libdvdcss so that the DVD plugin can be used without
+     libdvdcss. It will try to dlopen() libdvdcss at runtime, though,
+     and will use the dummy functions only if it couldn't find a valid
+     libdvdcss. This is probably only useful to package maintainers.
+
+   * Tidied the snapshot-* Makefile rules.
+   * Tidied the modules Makefiles.
+   * Removed useless stuff in the debian/ directory.
+   * Removed the "make all" kludge in the Makefile.opts rule. I hope this
+     patch is harmless on all systems.
+
+2001-08-05 Sunday 15:32  gbazin
+
+ * Big rewrite of the DirectX audio plugin. The audio output is now (almost)
+     perfect on Win32.
+ * Fixed a bug in ac3dec_CreateThread() in ac3_decoder_thread.
+ * On Win32, open() will now open files in binary mode by default.
+ * A few minor changes to vout_xvideo.c
+
+2001-08-03 Friday 18:03  gbazin
+
+ Oops, forgot to commit this file.
+
+2001-07-31 Tuesday 21:13  gbazin
+
+ * Fixed a segfault in PSEnd in input_ps.c
+ * The video decoder thread is now also reniced to a lower priority on
+   Win32 (as in the linux version). This slightly increases the responsiveness of vlc.
+
+2001-07-30 Monday 14:13  massiot
+
+ * Now use SDL_CFLAGS for searching SDL/SDL.h.
+
+2001-07-30 Monday 13:57  massiot
+
+ * Don't miserably die in `make` when ./configure hasn't be run ;
+ * Fixed a bug when compiling KDE plug-in without Qt plug-in ;
+ * Now taking into account $KDEDIR ;
+ * Made SDL configure error messages more explicit ;
+ * --disable-sdl is now correctly taken into account ;
+ * Changed the order of evaluation of sdl-config and sdl11-config ;
+ * Finally fixed SDL*/SDL.h check ;
+
+2001-07-30 Monday 00:53  sam
+
+   * VC++/Intel compiler fixes by Jon Lech Johansen <jon-vl@nanocrew.net>.
+
+2001-07-29 Sunday 22:54  sam
+
+   * Better gtk-config detection.
+   * Removed duplicate checks in configure.in.
+   * Fixed a typo in vlc.spec.
+
+2001-07-28 Saturday 02:17  sam
+
+   * Fix in libdvdcss in the key caching code.
+   * Removed useless variables in configure.in which caused all subsequent
+     compilation tests to fail.
+
+2001-07-27 Friday 16:23  sam
+
+   * Additional fixes to the sdl-config detection.
+
+2001-07-27 Friday 16:14  sam
+
+   * Added a make uninstall rule.
+
+2001-07-27 Friday 14:43  sam
+
+   * Updated version numbers for imminent release.
+   * Fixed the --with-dvdcss flag:
+      o --with-dvdcss - build libdvdcss, link statically (also default behaviour)
+      o --with-dvdcss=local-static - build libdvdcss, link statically
+      o --with-dvdcss=local-shared - build libdvdcss, link dynamically
+      o --with-dvdcss=/foo/bar - don't build libdvdcss, use libdvdcss in /foo/bar
+   * Fixed an omission in the dvdcss.h header.
+
+2001-07-27 Friday 01:05  sam
+
+   * Changed libdvdcss API to force binary incompatibility. Yeah, this is
+     evil, but if we don't do it now we'll have to do it when more people
+     are using it.
+   * Fixed minor libdvdcss stuff such as the soname and compilation flags.
+   * New --with-dvdcss flag.
+     Explanation:
+      o default: build libdvdcss, statically link vlc against it.
+      o --with-dvdcss=no: build libdvdcss, dynamically link vlc against it.
+      o --with-dvdcss=yes: don't build libdvdcss, use already installed one.
+      o --with-dvdcss=/foo: don't build libdvdcss, use libdvdcss from /foo/*.
+     (this looks a bit strange to me, I'll find better flag settings)
+
+2001-07-26 Thursday 20:00  reno
+
+ * Format asm functions for gcc
+   -> fixed the segfaults with imdct_sse
+   -> sound is hugly with imdct_sse in debug mode
+
+2001-07-26 Thursday 14:53  massiot
+
+ Now using gcc -pipe.
+
+2001-07-26 Thursday 09:08  massiot
+
+ Accept SDL 1.1.5 or later.
+
+2001-07-26 Thursday 03:13  sam
+
+   * Fixed the MMX YUV plugin issues with gcc 2.96 and 3.0.
+   * Updated TODO, cosmetic changes.
+
+2001-07-25 Wednesday 19:14  massiot
+
+ Now use sdl-config for SDL.
+
+2001-07-25 Wednesday 14:51  bozo
+
+ The spdif audio output won't kill itself anymore at the beginning.
+
+2001-07-25 Wednesday 08:41  gbazin
+
+  * dvdcss_readv optimisations for Win32. We now send only one read command
+    to the DVD drive for the whole iovec.
+  * Fixed _win32_dvdcss_aread to work around the WinASPI32 64kb transfer
+    size restriction.
+  * New and theoretically better Win32 pthread implementation which fixes a
+    problem I was having when changing title on a DVD (netlist related).
+    vlc_cond_multicast may or may not work.
+  * Fixed the "quit" event handling in directx/vout_events.c.
+  * dvd_ifo.c now takes into account error messages from UDFFindFile.
+  * Temporarily disabled aout_Probe() in aout_SDL (this function
+    is creating an awful lot of problems - libSDL bug ).
+
+2001-07-25 Wednesday 03:53  sam
+
+   * Updated ChangeLog.
+
+2001-07-25 Wednesday 03:12  sam
+
+   * ncurses compilation fix by Michael Mondragon <mammon@lokmail.net>.
+   * fix for large inline functions and gcc 3.0.
+   * fixed the gnome plugin so that it does not include gtk headers.
+
+2001-07-24 Tuesday 11:16  xav
+
+ Removed the changes made ; vlc should compile when following the
+ instructions in INSTALL-win32.
+
+2001-07-24 Tuesday 09:40  xav
+
+ Quick and ugly hack in the makefile to allow vlc_win32 to compile when
+ getting it directly from the CVS. As a result, the vlc_win32 program
+ doesn't have an icon any more. Too bad.
+
+2001-07-20 Friday 16:20  massiot
+
+ Fixed the "paused movie won't restart" bug.
+
+2001-07-19 Thursday 11:50  massiot
+
+ * QNX RTOS plug-in by Jon Lech Johansen.
+
+2001-07-19 Thursday 11:42  massiot
+
+ * FreeBSD compilation fix, by Øyvind Kolbu.
+
+2001-07-18 Wednesday 17:05  massiot
+
+ * Updated documentation with recent changes ;
+ * Decoders are niced again, for it is really better.
+
+2001-07-18 Wednesday 15:21  massiot
+
+ A BIG kludge for the calculation of mux_rate, so that times displayed in
+ the scroll bar are now correct for MPEG-2 streams. There is probably a
+ better way to do it, but I haven't found in months.
+
+2001-07-18 Wednesday 14:21  massiot
+
+ * Rewrote the video decoder to take advantage of several processors (SMP mode) ;
+ * Fixed a bug in the video decoder initialization :-p ;
+ * Added --smp option and several hooks in src/input/input_ext-intf.c ;
+ * Grayscale mode now turns off chroma IDCT.
+
+2001-07-17 Tuesday 09:48  massiot
+
+ Cleaned up include/. Unnecessary headers are no longer under include/, but
+ under src/. (eat that)
+
+2001-07-16 Monday 22:00  gbazin
+
+ Added intf_DbgMsg and intf_DbgMsgImm symbols to modules_export.h
+ This fixes the TRACE build.
+
+2001-07-16 Monday 16:40  massiot
+
+ ...and the associated Makefile modifications.
+
+2001-07-16 Monday 16:26  massiot
+
+ * Exploded the outdated generic decoder ;
+ * Updated ChangeLog and TODO.
+
+2001-07-16 Monday 15:54  massiot
+
+ * Added IDEALX developer documentation into main CVS - PLEASE UPDATE
+ REGULARLY ;
+ * Cleaned up doc/ directory.
+
+2001-07-16 Monday 12:10  massiot
+
+ Fixed GetChunk for chunks < 4 bytes.
+
+2001-07-12 Thursday 23:06  gbazin
+
+ - Fixed 2 Win32 bugs in libdvdcss (in _win32_dvdcss_readv), one of them
+     should have prevented the Win9x dvd input from working.
+ - Moved the "if(Win2k)" out of the loop in _win32_dvdcss_readv.
+
+ - Put a readv() function in input_iovec.h, the input_es now compiles.
+ - Modified input_ts to use this function.
+
+ - Fixed an initialisation bug in vout_directx.c
+ - Right clicking on the mouse now displays the navigation menu.
+
+ PS: If someone is willing to test the DVD input on Win95/98/Me I will
+     upload an up to date binary package.
+
+2001-07-12 Thursday 20:31  reno
+
+ * Fix audio/video synchro bug with esd
+ * Should fix buggy sound due to 44100-48000 Hz conversions
+
+2001-07-11 Wednesday 02:01  sam
+
+   * libdvdcss enhancements by Billy Biggs <vektor@dumbterm.net>. This breaks
+     vlc's DVD input (looks like decoders are expecting data too early and
+     DVD input can't cope with it due to decryption). Needs to be investigated.
+   * Plugins are now compiled in plugins/* and libraries in lib/*.
+   * The KDE UI compiles again but does not work yet.
+   * ALSA plugin message corrections.
+   * Calculation modules can now be calledwith a shorter name
+     (eg. '--downmix mmx' instead of '--downmix downmixmmx').
+   * Fixed insane verbosity of the SDL plugin.
+
+2001-07-10 Tuesday 06:07  gbazin
+
+ - Fixed the segfault in vout_UnloadFont
+ - DestroyThread in video_output doesn't call pf_destroy if pf_create has
+     failed previously.
+ - The Xvideo plugin now closes the video window when it XVideoGetPort
+     fails in vout_Create.
+
+2001-07-08 Sunday 23:15  reno
+
+ * Alignement in asm functions
+ * 16 bytes alignement for data (need fo SSE)
+ * Optimization in SSE
+
+2001-07-08 Sunday 17:45  gbazin
+
+ Win32 changes only:
+
+  - defined off_t as a long long. This allows DVD navigation to work.
+    This change is to be implemented on a compiler by compiler basis. For
+    now, it works on mingw32 (tested) and should work on MSVC (not tested).
+
+  - Implemented a quick and dirty hack in intf_msg.c to be able to display
+    long long integers with printf on Win32. This change is also necessary
+    to avoid segfaults when debug is enabled in vlc on Win32.
+
+  - few minor changes in the directx plugins.
+
+  - defined snprintf in common.h and removed a few #ifdef WIN32
+
+2001-07-07 Saturday 17:45  sam
+
+   * Probably fixed the "X eats more and more CPU" bug. Please test.
+   * mingw32 cross-compilation issue fixed.
+
+2001-07-06 Friday 08:43  sam
+
+   * Small optimization in vpar_blocks.c, sparing a few memset() calls.
+   * Additional error checking in vout_sdl.c.
+   * Minor manpage fix, conforming to Debian policy version 3.5.5.0
+     (Closes Debian bug #99561).
+
+2001-07-01 Sunday 08:49  gbazin
+
+ - Portablility fix: We now control the name to be used in the assembler
+     code for a C function or variable.
+     GCC for Win32 normally prepends an underscore to the name of a
+     C function or variable, and the inline assembler code was using the
+     name without the underscore so we had undefined symbols in some
+     modules.
+ - Reenabled all the accelerated modules on Win32.
+
+2001-06-28 Thursday 22:12  gbazin
+
+ - a few bug fixes for the directx plugin.
+ - removed the custom usleep function for win32 as we don't really need
+     this accuracy, and it was eating cpu resources.
+
+2001-06-27 Wednesday 09:53  massiot
+
+ Elementary Stream input plugin (use it with --input es). Only works with
+ video streams at the moment.
+
+2001-06-27 Wednesday 06:29  gbazin
+
+ - Added command line option '--stdout <filename>' which redirects stdout
+     and stderr to the specified file. This option should mainly be useful
+     on Win32.
+ - On Win32, vlc now has an icon associated to the .exe file, and is a full
+     GUI application (you don't have this annoying dos command box anymore)
+ - Added INSTALL-win32.txt for specific details to the Win32 port.
+
+ I've tested these changes on Win32 and Linux, let's hope I didn't break
+   vlc for other platforms.
+
+ --
+ Gildas
+
+2001-06-25 Monday 11:34  sam
+
+   * Compile fix for newer versions of MacOS X by Colin Simmonds
+     <colin_simmonds@Mac.lover.org>.
+   * Additional MacOS X DVD ioctl work by Eugenio Jarosiewicz
+     <ej0@cise.ufl.edu>.
+
+2001-06-21 Thursday 07:22  sam
+
+   * Win32 network support by Boris Dorès <babal@via.ecp.fr>.
+
+2001-06-19 Tuesday 05:51  sam
+
+   * FreeBSD (and probably QNX) shared memory handling fix.
+
+2001-06-18 Monday 23:42  sam
+
+   * First libdvdcss version
+
+2001-06-15 Friday 05:12  sam
+
+   * Unrolled two loops in dvd_netlist.c to prevent flooding.
+   * DVD input stuttering fix by Jon Lech Johansen.
+
+2001-06-14 Thursday 20:21  sam
+
+   * Added gprof profiling support with --enable-profiling.
+
+     It works at last! configure with --enable-profiling, build, run
+  vlc (you may want to add --noaudio, it currently segfaults with sound
+  here) and launch "gprof vlc" when finished.
+
+     To make gprof work with multithreaded programs, one needs to set the
+  internal ITIMER_PROF timer for each new thread launched. I did this
+  through a wrapper in vlc_thread_create (see include/threads.h).
+
+2001-06-14 Thursday 02:47  sam
+
+   * Fully working Windows DVD ioctl support by Jon Lech Johansen.
+   * Usual weekly ChangeLog mass-update.
+
+2001-06-14 Thursday 01:49  sam
+
+   * DirectX enhancements by Gildas Bazin, such as software rendering.
+   * Merged dvdcss_init and dvdcss_open into dvdcss_open, and dvdcss_close
+     and dvdcss_end into dvdcss_close. libdvdcss API now has 7 functions.
+   * Another failed attempt at profiling vlc under Linux: ported the
+     threads API to GNU Pth. Activate with --enable-pth. It doesn't seem to
+     spawn new threads for me, maybe someone will have better luck.
+   * Makefile optimizations.
+   * Automatic build of libdvdcss if not found.
+
+2001-06-13 Wednesday 00:03  stef
+
+ *the dvd netlist no longer stops when the fifo is empty ; it just waits
+ that there are free vectors again
+
+2001-06-12 Tuesday 22:14  sam
+
+   * Exported the CSS part of the dvd plugin into a library.
+
+2001-06-12 Tuesday 18:16  stef
+
+ *slight modification in input_dvd since Getiovec wasn't at the right
+ place
+
+ *send escape packet when changing title, not to be stuck in some
+ decoder.
+
+ *the position in the title is now resetted when we change title to
+ prevent a title from being unavailable because we're stuck at the end
+
+ *fixed a bug with 1-chapter-long title that displayed chapter 0.
+
+ *added a _temporary_ field in p_main to know whether the audio stream is
+ ac3 (ugly). It allows a vlc launched in spdif mode to play mpeg or lpcm
+ audio.
+
+ *cleaned the title property messages to get rid of the ugly stars.
+
+2001-06-12 Tuesday 13:50  henri
+
+ Added LPCM support. It should work with stereo LPCM.
+ Untested with 5-ways LPCM streams.
+
+2001-06-12 Tuesday 11:02  reno
+
+ * Fix the warning in compilation of main.c
+
+2001-06-12 Tuesday 00:30  reno
+
+ * Check that OS support SSE optimization for PIII (to avoid illegal hardware instruction on Linux 2.2.x)
+
+2001-06-09 Saturday 17:01  stef
+
+ *Fixed a bug in synchro reinitialisation: we no longer have a shift each
+ time we restart the synchro (for scr discontinuity for instance)
+
+ *In DVD mode, we reinit the synchro only if the scr are not continuous
+ (instead of each cell)
+
+ *Try to improve ac3 spdif to prevent from desynchronization.
+
+2001-06-08 Friday 20:03  sam
+
+   * Lots of DirectX plugin fixes by Gildas Bazin.
+   * Compilation fix in message queue mode.
+
+2001-06-07 Thursday 15:27  sam
+
+   * Applied old FreeBSD patch for dvd input by German Tischler.
+   * Found what was causing the slowdowns: a namespace collision. Put all
+     plugins into builtins again.
+
+2001-06-07 Thursday 01:10  sam
+
+   * Put most builtins in plugins again due to performances issues (more
+     about this in a forthcoming post here).
+   * Fixed the painfully slow build process (at last!).
+   * Moved the null plugin together with the dummy one.
+   * Added new dummy input plugin.
+
+    More on the dummy input plugin: we'll use it to insert commands in
+   the playlist. Currently implemented are the "quit" and "pause" functions,
+   here are examples on how they are used:
+
+     vlc file.mpeg vlc:quit                # exit after file.mpeg has been read.
+
+     vlc file1.mpeg vlc:pause:3 file2.mpeg # pause 3 seconds before playing
+                                           # the next file.
+
+    From now we can more efficiently benchmark vlc. For instance, to test
+   the video output changes I am doing, I use such a command:
+
+     time vlc -I dummy --noaudio file.mpeg vlc:quit
+
+    Future extentions might include more interesting stuff like "switch
+   to full screen", "repeat next file 3 times", "switch to SDL video
+   output"...
+
+2001-06-05 Tuesday 04:08  sam
+
+   * Updated things and stuff for 0.2.80 release.
+
+2001-06-03 Sunday 12:47  sam
+
+   * Various little fixes
+    - BeOS interface compilation fix by Rene Gollent.
+    - DirectX plugin compilation fix by Gildas Bazin.
+    - removed %ebx spill in the iMDCT plugins.
+
+2001-06-02 Saturday 01:10  sam
+
+   * Moved modules_builtins.h.in into src/misc. Please remove
+     include/modules_builtins.h in your local tree.
+
+2001-06-02 Saturday 01:09  sam
+
+   * DirectX plugin by Gildas Bazin <gbazin@netcourrier.com>.
+
+     Notes: o I called it 'directx' instead of 'windx' because it
+              made a lot more sense to me.
+            o Completely untested. I didn't manage to compile it yet.
+            o Code in vout_directx.c will go through a big rewrite when
+              vout 4 is finished. Xav is already working on this.
+
+2001-05-31 Thursday 16:10  stef
+
+ *fixed a double malloc/free bug in DVDRead
+
+ *fixed a lock issue in the interface introduced in my last commit
+
+2001-05-31 Thursday 12:45  sam
+
+   * Win32 plugin support by Gildas Bazin <gbazin@netcourrier.com>.
+
+2001-05-31 Thursday 03:57  sam
+
+   * BeOS fixes. renamed iovec.h to input_iovec.h because of namespace issues.
+
+2001-05-31 Thursday 03:23  sam
+
+   * miscellaneous Win32 fixes by Gildas Bazin <gbazin@netcourrier.com>, sorry
+     for the 2 weeks delay.
+
+2001-05-31 Thursday 03:12  sam
+
+   * Win2000 DVD input by Jon Lech Johansen <jon-vl@nanocrew.net>.
+
+2001-05-31 Thursday 01:37  sam
+
+   * Applied patch from Jon Lech Johansen <jon-vl@nanocrew.net> to compile
+     vlc with MS and Intel C/C++ compilers.
+
+2001-05-30 Wednesday 23:02  stef
+
+ -Updated the gtk/gnome interface to work in network mode,
+
+ -Fixed some bugs in interface (language menus in ts, misnamed fields)
+
+ -Play/Stop work in network mode to start/stop decoding of the stream
+
+ I have a segfault in imdct_3dn(93). But I can't underdand assembly.
+
+2001-05-30 Wednesday 22:16  sam
+
+   * Fixed a bug introduced in my previous commit which broke DVD input.
+
+2001-05-30 Wednesday 17:04  sam
+
+   * Hrmpf. Forgot the most important file.
+
+2001-05-30 Wednesday 17:03  sam
+
+   * Fixed the BeOS compile typo.
+   * The ALSA plugin is back.
+   * A gift for Gildas: plugins don't rely on backlinking any more. The
+     drawback is the dirty magic in include/modules_export.h which has to
+     be included whenever a module needs one of the functions in it. But
+      a) we should less and less rely on those functions
+      b) no plugin code modification was needed
+
+    The BeOS and MacOS X modules may be broken when compiled as plugins,
+    I'll check this later when I can reboot under BeOS.
+
+2001-05-30 Wednesday 05:19  stef
+
+ -Changes and bugfixes to make network work in VLAN Broadcast mode.
+
+ -Bugfix in the interface to access the network specific features.
+
+ -Some base of synchro in ac3 spdif
+
+2001-05-28 Monday 04:23  sam
+
+   * Added a wrapper for readv() on platforms which don't support it. The
+     network support now compiles under Win32, but still doesn't work, the
+     select in plugins/mpeg/input_ts.c never returns any data.
+
+     Is there anything like strace(1) under Win32 to debug this ?
+
+2001-05-28 Monday 03:17  xav
+
+ Modified in order to add network input under Win32.
+ It compiles under Linux and Win32 (yeeaaahaaa, haven't broken anything
+ :-))
+ (added the WinSock library initialization and cleanup)
+ Could someone test if it does really function ?
+
+2001-05-28 Monday 02:54  sam
+
+   * Of course my Win32 patch broke the Un*x version.
+
+2001-05-28 Monday 02:44  sam
+
+   * Forgot a little #ifdef, sorry.
+
+2001-05-28 Monday 02:38  sam
+
+   * Win32 compilation fixes, esp. the MAC retrieval.
+
+2001-05-25 Friday 13:20  sam
+
+   * Fixed a warning for *BSD compilation.
+   * Fixed a typo in yesterday's Darwin ioctl fixes.
+   * Patch by Eugenio so that the OS X interface and video output handle the
+     aout and vout banks.
+
+2001-05-25 Friday 04:23  sam
+
+   OS X fixes:
+
+   * Applied Eugenio's fix to the DVDioctl driver. I didn't test it, but
+     it should not hang the kernel anymore.
+
+   * Ported most dvd_ioctl.c functions to the DVDioctl driver: ReportAgid,
+     ReportChallenge, ReportKey1, ReportASF, InvalidateAgid, SendChallenge,
+     SendKey2. They should comply with the "Mt. Fuji Commands for Multimedia
+     Devices" paper.
+
+     Last remaining problem: ReadCopyright and ReadKey. The version of
+  Darwin I have here only has reportKey() and sendKey() functions in
+  the IODVDBlockStorageDevice class (pages 413 and 449 of the Mt. Fuji
+  paper), but we also need the READ_STRUCTURE (page 357) which I couldn't
+  find anywhere in the kernel headers. Either I missed it, or we'll have
+  to wait for Apple to implement it (or maybe we can emulate this command
+  with some other IOKit commands).
+
+2001-05-23 Wednesday 23:40  stef
+
+ -A little bug with lpcm in Makefile
+
+2001-05-23 Wednesday 23:08  stef
+
+ -Unification of gnome/gtk intefaces: now all the file are in plugin/gtk.
+
+ Specific files are glade generated files and intf_* files. All the
+ remainders are common to gtk and gnome and contain all the callbacks for
+ both interfaces.
+
+2001-05-23 Wednesday 17:47  stef
+
+ -LPCM audio selection in ps mode, in prevision of henri's decoder.
+
+2001-05-19 Saturday 00:39  stef
+
+ *More cleanification in gtk interface: now to change the
+ title/chapter/audio/spu/angle, we tell the input to do intead of doing
+ it inside the interface. It results in fewer locks during the changes.
+
+ *The dvd plugin reads again blocks of 32 sectors to gain speed since
+ there are no more lock-ups during stream change. I've also created a new
+ file that contain function to described video and audio streams with ifo
+ datas.
+
+ The changes are made only for gtk. We should update the other interfaces
+ soon (beos at least).
+
+ There is a memory corruption somewhere that make the vlc crash. I've no
+ idea where to search.
+
+2001-05-18 Friday 09:49  xav
+
+ [no log message]
+
+2001-05-16 Wednesday 14:51  reno
+
+ * Add 3D Now! imdct
+ * Remove kmudge for ac3 on MacOS X
+
+2001-05-16 Wednesday 02:12  sam
+
+   * We now do pthread detection for FreeBSD like the XMMS guys do. It
+     works even better.
+
+2001-05-15 Tuesday 19:36  sam
+
+   * FreeBSD pthread fixes.
+
+2001-05-15 Tuesday 16:19  sam
+
+   * AC3 IMDCT and downmix functions are now in plugins, --imdct and
+     --downmix options added.
+
+2001-05-15 Tuesday 14:49  stef
+
+ *Bugfixes, cleanings in gtk.
+
+2001-05-15 Tuesday 01:01  stef
+
+ *initialization bugfixes in input_dvd
+
+ *added a b_stopped flag to interface playlist to have a stop function in
+ interface plugins. As a consequence, the playlist no longer loops on end
+ but wait for the user to press 'play' or to add another item (gtk/gnome
+ interface). I think that other plugins are broken but it shouldn't be
+ difficult to repair: just add a 'p_main->p_playlist->b_stopped = 0' in
+ play functions and 'p_main->p_playlist->b_stopped = 1' when you have to
+ stop.
+
+ *Updated gtk interface so that it has the same features as gnome. I
+ think I will merge the code so that we don't have to copy and paste each
+ change. Only the .glade file would be different.
+
+2001-05-14 Monday 15:58  reno
+
+  * Begin of SSE/3DNow! support for imdct and downmix
+
+ If you have a PIII or a Athlon and you want to try this, just comment #if 0
+ in ac3_downmix.c and ac3_imdct.c and add in AC3_DECODER section of Makefile :
+ 	src/ac3_decoder/ac3_imdct_sse.o \
+ 	src/ac3_decoder/ac3_srfft_sse.o \
+ 	src/ac3_decoder/ac3_downmix_sse.o \
+ 	src/ac3_decoder/ac3_downmix_3dn.o \
+
+2001-05-12 Saturday 00:14  henri
+
+ Put a little note in the doc about "dvd devices"
+
+2001-05-11 Friday 15:10  sam
+
+   * Fixed a deadlock in spudec.
+
+2001-05-10 Thursday 06:47  sam
+
+   * Added SPU cropping.
+   * Gnome interface segfault fix.
+   * BeOS interface segfault fix by AnEvilYak (what's you real name btw?).
+
+   Note: if you want to have a look at the currently buggy YUV subpictures,
+         uncomment line 1999 of src/video_output/video_output.c. Don't report
+         bugs about this, I _know_ it's a quick hack.
+
+2001-05-08 Tuesday 20:38  sam
+
+   * Fixed an aspect ratio issue in the SPU decoder, and optimized the
+     SPU renderer.
+
+2001-05-08 Tuesday 14:53  bozo
+
+ end of the last commit :-P
+
+2001-05-08 Tuesday 14:38  bozo
+
+   - fix a discontinuity bug in input_ClockManageRef()
+
+2001-05-08 Tuesday 00:43  sam
+
+   * Speed optimization in the handling of the unusual ephemer DVD subtitles.
+   * Little optimization to bozo's UnalignedShowBits fix.
+   * Race fix in the packet cache by Jon Lech Johansen <jon-vl@nanocrew.net>.
+
+2001-05-07 Monday 13:52  bozo
+
+   - fix a bug in UnalignedShowBits that makes some _heavy_ unaligned streams
+     not wotk correctly (for instance VLS' generated TS streams)
+
+2001-05-07 Monday 04:42  sam
+
+   * Added support for some terribly braindead DVD subtitles in Kenshin
+     which do not have a "stop display" command. Anime fans rejoice!
+   * Fixed the BeOS interface to use p_aout_bank instead of p_main->p_aout.
+   * Coding-style butchery (mostly tabs).
+
+2001-05-07 Monday 03:14  stef
+
+ *Changed the level arg in intf_WarnMsg so that it is more logical: the
+ level corresponds now to the nb of -v to display the message.
+
+ *added functionnal preference window in gnome: it changes the
+ envirronment variables
+
+ *added jump window in gnome to jump to a precise time.
+
+2001-05-06 Sunday 18:32  stef
+
+ *Much work on the gnome interface: added oct's playlist from gtk plugin,
+ tuned appearence, added preferences window (with no features yet), jump
+ window to go to specified time (not functionnal yet), and fixed some
+ bugs.
+
+ *moved b_fullscreen from p_vout->p_sys to p_vout and unified way of
+ toggling fullscreen in sdl in x11/xvideo output (using p_vout->i_ch
+ nges) so that an interface plugin can toogle fullscreen (implemented
+ in gnome)
+
+ *added p_input->stream.p_selected_area->i_tell in input TS so that the
+ slider work with ts files ( however, the time counter doesn't since we
+ have no mux_rate )
+
+ *improved ac3 spdif output ( and made it work again :)). It uses a true
+ blank frame now, and it allows to switch languages like a traditionnal
+ output. It doesn't support multiplexing though, neither can we switch
+ between spdif/analogical mode on-the-fly.
+
+ *beginning of the back port of gnome to gtk for those who do not have
+ gnome.
+
+2001-05-06 Sunday 04:32  sam
+
+   * Fixed a few warnings with gcc 3.0.
+   * aout and vout are now allocated in banks, making it possible to have
+     several of them at the same time.
+   * configure now checks for MMX and MMX EXT support in the assembler.
+   * Removed all MMX code from the main program and moved it to the
+     existing idct modules (Closes: Debian bug #96036).
+
+     Don't forget to make distclean before building vlc again.
+
+2001-05-02 Wednesday 20:01  sam
+
+   * FreeBSD CSS decryption support.
+
+2001-05-02 Wednesday 13:30  henri
+
+ * Corrected vlc-howto thanks to Arnaud Gomes-do-Vale
+ * Fixed a segfault in TS input. Some stream still do not work, or
+   work very slowly with many error messages. I'll try to have a look.
+
+2001-05-01 Tuesday 15:12  sam
+
+   * Fixed a remaining buffer overflow in the Gnome interface and applied
+     the patches to the Gtk+ interface.
+
+2001-05-01 Tuesday 12:22  sam
+
+   * Fixed a segfault in the SPU decoder initialization.
+
+2001-05-01 Tuesday 04:18  sam
+
+   * Mandatory step for video output IV and the audio output quality
+     fix: the output threads are now spawned when a decoder needs one,
+     so it can decide the audio frequency or the video window size. Still
+     under heavy construction, so don't get too excited at finding bugs
+     in it yet.
+
+     Note: this change broke the XVideo module, so I made its score much
+     lower than before. I suspect xvideo.so had a bug before which only
+     appears now. Other video output plugins may be broken as well, but
+     again this might be due to old existing bugs showing their ugly head.
+
+   * Fixed a few buffer overflows in the Gnome interface.
+   * The module bank is now a global variable. The video output bank and
+     the audio output bank might follow (when they exist).
+   * Coding style and organization fixes to the spdif decoder.
+   * autoconf and Makefile changes by Arnaud Gomes-do-Vale
+     <arnaud@carrosse.frmug.org>.
+
+2001-04-30 Monday 21:04  reno
+
+ * Follow of the new ac3_decoder ;)
+   - New ac3_imdct
+   - New ac3_downmix
+
+2001-04-30 Monday 15:00  massiot
+
+ Removed unused files.
+
+2001-04-30 Monday 09:44  massiot
+
+ Fixed a mistake with -g and --enable-debug.
+
+2001-04-29 Sunday 17:57  stef
+
+ -Fixed the title-change-with-no-input-restart in dvd.
+
+ -I haven't forgotten the chagelog this time :)
+
+2001-04-29 Sunday 17:03  sam
+
+   * BeOS crash fix by Wade Majors <guru@startrek.com>.
+
+     Please, try no to forget the ChangeLog when commiting!
+
+2001-04-29 Sunday 14:52  stef
+
+ -slight modification in ClockManageRef: after a synchro reinit, we still
+ do the mwait and re-init last-cr so that there no date irregularity.
+ Such a thing is necessary for dvd playback at cell change ; however,
+ Meuuh, could you look at that since you might think we should do
+ otherwise.
+
+ -turned the "bitsream callback discontinuity" message to debug.
+
+ -removed modification of the title environnement variable in input dvd
+ at title change since we no longer restart the input at title change.
+
+2001-04-29 Sunday 02:55  stef
+
+ Forgot one file.
+
+2001-04-29 Sunday 02:48  stef
+
+ -new audio output using direct ac3 pass-through with some sound
+ cards: it sends raw ac3 frames to an external ac3 decoder. It is very
+ experimental yet, hasn't any synchro ... but it works well with my
+ sblive and my dtt3500 speakers (note that you need a patched emu10k1
+ driver for this to work).
+
+ -bug fix in gnome intf thanks to Shane Harper.
+
+ -bug fix in input_dvd for chapter change.
+
+2001-04-28 Saturday 23:19  henri
+
+ - Fixed a bug in TS input. It should be more smooth now
+ - Fixed the pace control. Meuuh, could you check ?
+
+2001-04-28 Saturday 05:12  sam
+
+   * Updated debian control files and disabled ALSA for this version.
+
+2001-04-28 Saturday 05:08  henri
+
+ Updated files for 0.2.73 release
+
+2001-04-28 Saturday 04:47  sam
+
+   * Fixed a nonsense in configure.in preventing to build sdl.so.
+   * Removed a few stupid debug instructions in aout_s16.c that should
+     have never been commited. Sorry about that.
+
+2001-04-28 Saturday 04:09  sam
+
+   * Don't use the #@%&$! autoconf-suggested CFLAGS.
+
+2001-04-28 Saturday 03:36  sam
+
+   * Coding style fixes here and there.
+   * Miscellaneous QNX compile fixes.
+   * Beginning of the mingw32 port by Gildas Bazin <gbazin@netcourrier.com>.
+   * Added Marcari and Gildas to the AUTHORS file.
+
+   (I commited the mingw32 port because it doesn't add any new code outside
+    the #ifdefs, but we won't tell a word about it for the moment. We don't
+    really need windows users whining about bugs, do we ?)
+
+2001-04-28 Saturday 00:28  henri
+
+ Added a howto. Feel free to correct it. I'll put it on the website soon.
+
+2001-04-27 Friday 19:29  massiot
+
+ Change --enable-debug into --enable-trace. Same with DEBUG_*.
+ --enable-debug still exists, but only activates -g and additional
+ safety checks.
+
+ I hope I didn't break anything :))
+
+2001-04-27 Friday 18:07  henri
+
+ Repaired broadcast support : binding INADDR_ANY doesn't seem to work.
+
+ You now have to specify the broadcast address as an argument.
+ Btw, thanks to sam, you can now use ts://server:port style, which gives
+ for broadcast :
+
+ vlc --broadcast broadcast_addr ts://server[:port]
+
+2001-04-27 Friday 16:08  sam
+
+   * Fixed the continuous 'seeking position' bug in network mode.
+   * rc interface plugin for vlc control through /dev/stdin courtesy
+     of Peter Surda <shurdeek@panorama.sth.ac.at>.
+   * Support for `ts://foo:42' style input source:
+      vlc ts://vls.via.ecp.fr:1234
+      vlc ts://vls.via.ecp.fr
+      vlc ts:vls
+      vlc ts:vls:4321
+     As a side effect, the Gnome and Gtk "network input" buttons work.
+
+2001-04-26 Thursday 03:55  sam
+
+   * Commited Shane's XVideo patches. It works here (tm).
+   * Fixed the XVideo aspect ratio (AR_SQUARE_PICTURE means square pixels,
+     not square image).
+
+2001-04-25 Wednesday 20:54  massiot
+
+ * Removed my optimization attempt.
+
+2001-04-25 Wednesday 10:22  massiot
+
+ * Fixed an alignment issue with the bit stream and the bit stream
+ callback on startup - InitBitstream prototype has changed ;
+ * Removed a buffer zeroing in video output - doesn't change anything
+ for me, does it for you ?
+
+2001-04-25 Wednesday 09:31  sam
+
+   * Updated the TODO list.
+   * Fixed benny's latest C++ism.
+   * Fonts not found are no longer fatal to the video output.
+
+2001-04-25 Wednesday 06:56  benny
+
+ Get rid of the asprintf that were slow and not available on Solaris. Didn't
+ check if the new code still compiles everywhere, but it should.
+
+2001-04-22 Sunday 00:08  stef
+
+ -better handling of angles: you should be able to change on the fly now
+
+ -removed à bug added at my last commit in css code; cleaned CSSGetKey
+
+ -various changes and bugfixes in the gnome interface.
+
+2001-04-21 Saturday 22:49  sam
+
+   * XVideo fullscreen mode by David Kennedy <dkennedy@tinytoad.com>.
+
+2001-04-21 Saturday 00:31  sam
+
+   * X11 fullscreen mode, courtesy of David Kennedy <dkennedy@tinytoad.com>
+
+2001-04-20 Friday 15:02  sam
+
+   * Added prototypes for the Elementary Stream input module for Alexis.
+      it's compiled by default, to activate it: "vlc --input es <file.mpeg>"
+
+2001-04-20 Friday 11:06  sam
+
+   * Fixed build process when no plugins or no builtins were chosen.
+   * Makefile changes to get around MacOS X's brain-damaged gcc.
+   * FreeBSD configure and Makefile patches, courtesy of Espen
+     Skoglund <esk@ira.uka.de>.
+
+2001-04-20 Friday 05:40  stef
+
+ -corrected some bugs in gnome interface: language menu are now
+ synchronized ; and menus have less chances to be changed when they're opened.
+
+ -added basic angle support ; this is a first try. It works with my 2
+ test-DVDs, but I'd like that people having DVDs with repeated scenes to
+ test it. We can choose angle with command line option -u (don't ask me
+ why :)
+
+ -a cosmetic change in css decryption.
+
+ Since config.h.in has changed, you have to re-run ./configure.
+
+2001-04-17 Tuesday 20:43  marcari
+
+ [no log message]
+
+2001-04-17 Tuesday 15:17  colin
+
+ fix MacOS X icon
+
+2001-04-17 Tuesday 14:54  massiot
+
+ Fixed optional PES size bug, courtesy of Steve Brown <sbrown@cortland.com>.
+
+2001-04-17 Tuesday 14:39  sam
+
+    OS X fixes:
+   * Fixed a compilation issue in the DVDioctl driver.
+   * Added a call to ranlib after a built-in module compilation.
+
+2001-04-16 Monday 13:32  sam
+
+   * Fixed a typo in configure.in
+
+2001-04-16 Monday 13:00  sam
+
+   * Merged Makefile.common and Makefile.modules.in into Makefile.modules
+   * Updated version number and ChangeLog to 0.2.72
+   * Additional plugin Makefile cleaning, probably the last.
+
+2001-04-16 Monday 12:34  asmax
+
+ Re-added the new packet allocation method in PS input, using packet caches.
+ With warning level 1, you can see when a packet is allocated or freed; the
+ goal is to never call 'malloc' nor 'free', except at the beginning of the
+ stream.
+ The size of the different caches can be adjusted in plugins/mpeg/input_ps.h.
+ If 'free' is called too often, it means that a cache is too small, so try
+ to increase its size.
+
+2001-04-16 Monday 07:40  sam
+
+   * Added .cvsignore files in the plugins directories.
+   * Additional Makefile cleaning for built-in modules.
+   * Fixed Makefile for Solaris target.
+
+2001-04-15 Sunday 15:11  sam
+
+   * All Debian packages are now lintian-clean.
+   * Fixed XVideo plugin linking.
+
+2001-04-15 Sunday 10:54  sam
+
+   * Updated TODO list with Henri's Apr 6th post.
+   * Built-in modules support almost finished.
+
+     Now you can compile any module within vlc, even the Gnome, Qt, SDL
+   and GGI modules at the same time, resulting in an awful extra fat
+   vlc binary with gazillons of library dependecies.
+
+     The only exception is that the Gnome and Gtk+ modules can't be
+   compiled together into vlc. But you can have one compiled built-in
+   and the other as a plugin.
+
+     Another consequence is that libdl should no longer be needed under
+   MacOS X. I'll check this as soon as possible.
+
+2001-04-15 Sunday 04:46  sam
+
+   * A few Makefile fixes for BeOS
+   * XVideo patches by Shane Harper
+
+2001-04-15 Sunday 04:19  sam
+
+   * Beginning of the built-in modules support.
+
+    A few words about the changes:
+
+   - heavy Makefile butchery has taken place, each plugin now has its own
+     Makefile. I know recursive make blablah harmful, but it was just so
+     much easier to do this way.
+
+   - Makefile.in has disappeared, we now generate Makefile.opts with
+     the overall configuration options, and Makefile.modules which is
+     specific to module compilation.
+
+   - After ./configure has been run you may want to modify Makefile.opts
+     to check which modules will be compiled built-in or as plugins.
+
+   - Some modules cannot be compiled built-in right now because proper
+     linkage doesn't work yet. We don't really care since they're the
+     interface or video output modules. The most important stuff works
+     (iDCT, motion, YUV, input).
+
+   - It's perfectly valid to compile a module both as built-in and as a
+     plugin. vlc will only load the built-in one, but I'll add an option
+     to ignore built-in modules for testing purposes.
+
+   - We *should* see a performance increase here. I didn't have much time
+     to test it, but if anyone can confirm and perhaps give a rough
+     estimate of how much we gain...
+
+2001-04-14 Saturday 07:41  sam
+
+   * Got rid of the sleep() hack in beos_specific.cpp
+   * Fixed a segfault when launched without argument under Darwin.
+
+2001-04-13 Friday 14:33  sam
+
+   * Fix for Darwin program path handling. I mistakenly assumed that the
+     program path was always absolute.
+
+2001-04-13 Friday 06:20  sam
+
+   * Updated version number to 0.2.71 (release today).
+
+   * Merged 6 months of CVS logs to the ChangeLog file.
+     The vlc changelog can now be viewed here:
+        http://www.videolan.org/vlc/changelog.html
+
+   * Fixed a lintian error in debian/rules.
+   * XVideo resize patch by Shane Harper <shanegh@optusnet.com.au>.
+
+2001-04-13 Friday 05:36  stef
+
+ *Added udf fix by Billy Biggs
+
+ *Added checks in dvd_ifo
+
+ *Cleanings in gnome interface : the interface should be dependant on the
+ input method.
+
+2001-04-13 Friday 01:49  henri
+
+ TS input : only one audio & spu ES selected at a time
+ Intf : ts streams in menu
+        fixed a typo
+
+ There be certainly need for debug on the TS input as vls complains about
+ wrong sized PES packets, and that many streams do not seem to work.
+
+ btw, I forgot to mention in my last commit the function that nooone will
+ ever use : "right button" key of 105 keys keybords support under X11,
+ Xv, Sdl
+
+2001-04-12 Thursday 17:57  colin
+
+ MacOS X
+ make vlc.app now correctly updates vlc.app
+ added an icon to the MacOS X vlc
+ removed the build of the vlc app from the install target
+
+2001-04-12 Thursday 08:24  sam
+
+   * Fixed a typo in yesterday's BeOS changes.
+
+2001-04-12 Thursday 03:26  stef
+
+ -added a field to p_input->stream to inform the interface of a stream
+ change (useful in network mode)
+
+2001-04-12 Thursday 02:40  stef
+
+ -Fixed a bug in area management added in my last commit
+
+ -Change the way ifo are read ; I hope this fixes problems with some
+ compilers
+
+ -Added error checks in dvd input
+
+2001-04-12 Thursday 01:52  sam
+
+   * BeOS icon and MIME resources courtesy of Wade Majors <guru@startrek.com>.
+   * Updated icons.
+   * Removed redefinition of NULL in src/audio_decoder/adec_layer?.c.
+   * Created darwin_specific.c to store the program path at boot time.
+     (XXX: check that it didn't break the OS X port)
+   * Fixed a warning in netutils.c.
+
+2001-04-11 Wednesday 14:10  ej
+
+ Forgot a little thing...main.  Done for now I hope;-)
+
+2001-04-11 Wednesday 13:56  ej
+
+ Fixed a dumb mistake in Makefile.in
+
+2001-04-11 Wednesday 13:30  ej
+
+ Updated & cleaned up intf_macosx.c and vout_macosx.c - added Open menu
+ function support and a no-frills About box
+
+ Created macosx_common.h in plugins/macosx/ to hold , well, common stuff
+ (the way I see it, there is inherently a difficult separation of intf and
+ vout on Mac OS, if anyone has suggestions I'm open)
+
+ Cleaned up debug spew I left in modules.c and video_text.c
+
+ Hacked main.c to disregard argv[1] when compiled for OSX & run as a full
+ app (ie., double clicked and not launched from command line)... read the
+ file for more details.  UGLY.
+
+ Updated Makefile.in to make vlc.app by default on Mac OS X & Darwin, added
+ clean code for it as well
+
+2001-04-11 Wednesday 12:52  sam
+
+   * Fixed icons location and Debian desktop menus.
+
+2001-04-11 Wednesday 04:31  sam
+
+   * Fixed the whitespace/tab issues in the Makefile.
+   * Corrected an awful typo in the version name, I hope Lieutenant Commander
+     Arkady Grigorovich Ourumov will never set up us the bomb for that.
+   * Removed deprecated stuff from config.h.
+   * Disabled message queue by default.
+   * A few other changes in the CSS code, the BeOS issues should be fixed.
+   * Fixed a memory leak in gtk_callbacks.c (thanks to Dae).
+
+2001-04-11 Wednesday 02:01  henri
+
+ - Ported the 0.2.0's channel changing functions
+ - Cosmetic changes : the word 'vlan' is disappearing
+ - network_ChannelJoin is still commented out as it's not in sync anymore
+   with our channel server. Nitrox should fix this within a week.
+ - X and Xv output : added autohide cursor as in SDL
+ - X and Sv : keys 1 to 0 change channel
+ - SDL : keys F1 to F10 change channel as I was not able to make 1..0 work
+
+2001-04-10 Tuesday 17:47  stef
+
+ -Fixed the lock segfault bug with some compilers
+
+ -Quick kludge in ifo to avoid a bug with optims. The real fix is coming.
+
+2001-04-08 Sunday 16:57  sam
+
+    * XVideo window now has a black background, thanks to Shane Harper.
+    * Fixed a heap corruption in dvd_css.c.
+
+2001-04-08 Sunday 09:04  stef
+
+ -fixed css authentication under linux since it has been broken for a few
+ days: we have to initialize agid of authinfo struct.
+
+ -fixed a segfault on exit when DVDInit fails
+
+2001-04-08 Sunday 07:24  stef
+
+ -changes in gnome interface
+
+ -bugfix in input dvd
+
+2001-04-08 Sunday 04:17  sam
+
+   * Updated ChangeLog and TODO list.
+   * Added TODO to the .spec file.
+   * Fixed Makefile.in so that `make snapshot' takes extras/* in account.
+
+2001-04-07 Saturday 23:23  massiot
+
+ Removed --enable-mmx (enabled by default under x86) and changed a few
+ things.
+
+2001-04-07 Saturday 16:35  massiot
+
+ Disable x11 plugin if X11 headers are not found.
+
+2001-04-07 Saturday 16:21  massiot
+
+ Added a missing file for MacOS X port.
+
+2001-04-07 Saturday 04:17  sam
+
+    * Updated version information in RedHat and Debian package control files.
+
+2001-04-06 Friday 18:18  massiot
+
+ * Sync MOSX dev/CVS tree : code support for MacOS X audio, video and
+ interface (courtesy of Eugenio Jarosiewicz & Colin Delacroix) ;
+ * Bumped up version number to 0.2.70.
+
+2001-04-06 Friday 09:15  sam
+
+   * Code cleanup: removed a few tabulations.
+   * Fixed inline asm routines to remove all read/write operands.
+   * Added <string.h> to most files to prevent warnings under FreeBSD.
+   * Added "break;" after "default:" in case switches to prevent
+     warnings when compiling with GCC 3.0pre.
+
+2001-04-05 Thursday 16:37  asmax
+
+ switched back to the old packet allocation method for PS input, because
+ Sam does not want the new one ;)
+
+2001-04-05 Thursday 14:00  asmax
+
+ Added a new packet allocation method that punish one's mother in PS input.
+ I hope there won't be too many segfaults because of it ;)
+ A few parameters must be adjusted to optimize this method; I'll do it later
+ because Proba Stat sucks ;)
+
+2001-04-05 Thursday 03:50  sam
+
+   * added the GNU getopt library, which gets compiled in when getopt_long
+     isn't available on the desired platform.
+   * replaced the `--warning' flag with the standard cumulative `-v' flag.
+     `-v' is like `--warning 3', and `-vvvv' is like `--warning 0'
+     (`--warning' is still valid for those used to it)
+   * cleaning in configure.in and Makefile.in, the Solaris port now
+     builds and runs properly.
+
+2001-04-03 Tuesday 03:39  stef
+
+ -Fall back to one-packet-once reading in dvd input since multi-block
+ seems to have a bug that make the vlc crash on title/audio/spu change. I
+ hope that this bug will be fixed soon for the performance is poorer now
+
+ -add-ons and changes in gnome interface:
+         *menu subdivision is done only if there are over 20 items,
+         *in DVD mode next/prev apply to title,
+         *in DVD mode, added a box with button to navigate through
+          chapters.
+ This has not been finished yet (and it is not in gtk plugin then). And I
+ think I will leave toolbar next/prev buttons for playlist and add
+ button specifically for title change like for chapters.*
+
+2001-04-02 Monday 23:30  sam
+
+  * fixes for the Qt plugin compilation under Debian
+
+  * heavy butchering in the CSS and DVD ioctl code to put all architecture-
+    dependent code in dvd_ioctl.c
+
+  * added almost fully-functional /dev/dvd driver for MacOS X in
+    extras/DVDioctl; to build it:
+
+     % cd extras/DVDioctl
+     % pbxbuild
+     % kextload build/DVDioctl.kext # note: kextload has to be run as root
+
+    be aware that the license for the DVDioctl kernel extension is
+    not GPL but APSL, because I borrowed some code from the Darwin kernel.
+
+2001-04-01 Sunday 07:31  stef
+
+ -Various bug fixes in dvd_netlist. Some bugs seem to remain though.
+ -New function input_ToggleES for interaction with interface.
+ -Changes in gnome interface : navigation menus are now splited, there
+ are radio item in menus and the code should be better.
+ -First step for dvd_ifo rewritting. Now allocation/disallocation is
+ being done as it has to be.
+ -Fixed a bug in title management that make dvd like Seven work.
+
+2001-04-01 Sunday 06:21  sam
+
+   * XVideo plugin courtesy of Shane Harper <shanegh@optusnet.com.au>
+   * Makefile.in and configure.in fixes by Nilmoni Deb <ndeb@ece.cmu.edu>
+   * A few syntax fixes in the plain X11 plugin
+
+2001-03-26 Monday 19:06  sam
+
+   - fixed SDL compilation, thanks to Colin.
+   - disabled Altivec iDCT until it works.
+
+2001-03-25 Sunday 17:09  richards
+
+ Language & Inteface support for BeOS interface
+
+2001-03-21 Wednesday 13:42  sam
+
+   * Header cleaning: filled all empty authors fields, added CVS $Id stuff.
+   * Fixes to aout_darwin.c by Colin Delacroix <colin@zoy.org>.
+   * Fixes to configure.in, Makefile.in and main.c (Altivec detection)
+     by Eugenio Jarosiewicz <ej0@cise.ufl.edu>.
+   * Added Colin and Eugenio to the AUTHORS file.
+
+2001-03-21 Wednesday 02:58  sam
+
+   * Fixed a typo in the Altivec iDCT module declaration.
+   * Made a few enhancements to the Makefile.
+
+2001-03-20 Tuesday 23:18  sam
+
+    * Altivec instructions autodetection.
+
+2001-03-20 Tuesday 21:42  sam
+
+    * SDL fixes and enhancements by Shane Harper <shanegh@optusnet.com.au>
+
+    Shane, I removed the static variables from your code because static
+    is not thread-safe, and one can imagine having several video output
+    windows launched at the same time. Also, I made your feature work
+    in windowed mode as well, because people kept asking how to hide the
+    mouse pointer.
+
+    Also, if you want to work on the XVideo extension, you are welcome ;
+    most of us are quite busy at the moment. Damien Lucas <nitrox@via.ecp.fr>
+    had offered to work on it, but he seems to be a bit lost, so you may
+    want to take over his job.
+
+    As for the "zoom" feature, I suggest you wait until version 4 of the
+    video output is done, it'll be easier to do then.
+
+ Regards,
+
+2001-03-20 Tuesday 20:54  massiot
+
+ * Compile Altivec modules on Darwin. [MacOS X port]
+
+2001-03-20 Tuesday 20:40  massiot
+
+ * Use $QTDIR for the qt module ;
+
+2001-03-20 Tuesday 20:20  massiot
+
+ * Fixed Makefile for normal people :p
+
+2001-03-20 Tuesday 20:09  massiot
+
+ * Added IDCT Altivec optimization [MacOS X port]. Untested, not compiled.
+
+2001-03-20 Tuesday 19:36  massiot
+
+ * Compile Darwin module by default on Darwin system. [MacOS X port]
+
+2001-03-20 Tuesday 17:36  massiot
+
+ * Support for Darwin CoreAudio, courtesy of Colin Delacroix [MacOS X port] ;
+ * Added warnings for ac3 mantissa (we still have problems with AC3 on
+ MacOS X) ;
+ * Renamed WriteResource to avoid a namespace clash with Darwin's
+ WriteResource.
+
+2001-03-20 Tuesday 04:44  sam
+
+   * Split audio output into several separate files to make it easier
+   to debug. Removed a few redundancies as well.
+
+2001-03-19 Monday 13:26  sam
+
+   * vlc core compiles under QNX RTOS. Now if anyone feels like tidying
+   it and writing output and interface plugins...
+
+2001-03-19 Monday 05:08  sam
+
+   * Fixed Debian sparc build for real (Closes: Debian bug #89285).
+
+2001-03-18 Sunday 00:01  sam
+
+   * Function prototypes for the forthcoming Darwin and MacOS X port.
+   * Gtk+ interface: fixed a precision issue in the scale.
+   * Qt interface: somebody pop up us the menu!!
+
+2001-03-17 Saturday 22:52  stef
+
+ -Added dsp plugin compilation (/dev/dsp is not a regular file :))
+
+2001-03-16 Friday 22:37  massiot
+
+ * Borrowed config.guess and config.sub from SDL [MacOS X port] ;
+ * Changed files so that the MacOS X port compiles & runs [MacOS X port] ;
+ * If SDL/GTK/DSP is not available, don't compile the associated module.
+
+2001-03-15 Thursday 01:42  sam
+
+   * Bug fixes and enhancements in the Gtk+/Gnome interfaces.
+
+    o the slider should behave correctly and stop jumping here and
+      there (this bug is _not_ related to Stef's similar bug)
+    o added an "open network" menu (useless since the input doesn't
+      handle it properly yet)
+    o tried to reorganize gnome_callbacks.c and gtk_callbacks.c
+    o stream date is now displayed instead of percentage
+    o renamed gnome_sys.h to intf_gnome.h, and gtk_sys.h to intf_gtk.h
+
+   * Changed documentation and package creation files.
+
+    o added versioned conflicts/replaces to vlc-gtk (Closes Debian bug #88796)
+    o removed useless or outdated documentation from doc/*
+    o moved vlc.1 manpage from debian/vlc.1 to doc/vlc.1
+
+   * Added basic Qt interface.
+
+    o working features: slide bar, open file, toolbar, popup menu
+    o added "qvlc" alias, equivalent to "vlc -I qt"
+    o known issues : no "open disc" or "open network" menus yet
+                     the IntfWindow class is never cleaned on destruction
+                     the popup menu always pop at the middle of the screen
+
+   * Misc fixes/updates.
+
+    o renamed netutils.h functions from input_* to network_*
+    o renamed *plst* files and functions to *playlist* (it was stupid
+      from me to name them "plst")
+    o made a few input error messages more meaningful
+    o added -I, -A and -V short flags, corresponding to --intf, --audio
+      and --video
+
+     I got a lot of conflicts on this commit, lart me if I forgot a
+   file or made old bugs reappear.
+
+2001-03-15 Thursday 00:37  stef
+
+ -Fixed most of the bugs in gnome interface menus
+
+ -Added radio checks in menu items.
+
+ There are still issues with default selected item but it works well.
+
+2001-03-14 Wednesday 00:40  massiot
+
+ * Tried to fix the "stream jumps at will" bug.
+
+2001-03-11 Sunday 19:00  henri
+
+ - Moved 2 local network functions
+ - Removed old code
+ - Broadcast should work. I'm not detecting broadcast address, i'm
+ binding 0.0.0.0
+
+2001-03-10 Saturday 11:23  henri
+
+ Small optim.
+
+2001-03-08 Thursday 13:32  octplane
+
+ Hurg !
+ ###code is dirty###
+ Please clean it for me :P
+ (or at least, tell me how to clean it)
+
+ . Slightly modified playlist base interface
+   (Added a function to jump directly to an item, used for double clicking)
+
+ . Added manymanycallbacks
+ . Added the playlist dialog
+ . Added Dnd support for intf_window and the clist1
+   . support URI and plain file(s)/folder(s)
+ . Added "show/hide main window" menuitem in intf_popup
+ . Added bugs :P
+
+ Enjoy and please bug report.
+
+2001-03-07 Wednesday 10:31  stef
+
+ -Working menus for run-time audio/spu/title/chapter selection with gtk
+ interface.
+
+ It is a bit buggy yet, and some pieces of code need to change,
+ especially to handle better menus change when title change but it
+ eventually works.
+
+2001-03-07 Wednesday 02:16  stef
+
+ -Added `glib-config --libs glib` for interface compilation
+ for debian/sid users
+
+2001-03-07 Wednesday 01:36  sam
+
+   * Disabled network input under BeOS so that it compiles again. We'll
+     have to wait for BONE anyway.
+
+2001-03-07 Wednesday 00:18  henri
+
+ - Fixed TS input ( a nasty dead lock had appeared 4 days ago )
+ - Added base of network support
+
+ Things to be done :
+ - Meuuh : fix the PCR synchronisation so that we can set b_pace_cntrol to 0
+ - Sam : find a way of specifing the type of media (file, net). For the
+ moment, the "--input ts" always call input_NetworkOpen
+ - Maybe sam : for the moment the working syntax is vlc --input ts
+ servername, it should nbe turned into "vlc --server servername".
+
+ Things that don't work (i'll work on this this week end) :
+ - stopping and retaking a stream
+ - a nice 'waiting for stream'
+ - we select all incoming streams. we should be able to select.
+
+ Things that haven't been tested :
+ - broadcast
+ - only tested with one stream.
+
+ Kick me if something is broken by my fault.
+
+2001-03-06 Tuesday 19:33  massiot
+
+ * Fixed an alignment problem in UnalignedShowBits().
+
+2001-03-06 Tuesday 17:54  massiot
+
+ * Fixed an alignment problem in PTS parsing.
+
+2001-03-06 Tuesday 17:39  massiot
+
+ * Fixed an alignment problem on startup.
+
+2001-03-06 Tuesday 15:16  massiot
+
+ * Fixed a boolean_t/int mix.
+ * Increased FIFO_SIZE.
+
+2001-03-05 Monday 20:36  richards
+
+ [no log message]
+
+2001-03-05 Monday 16:00  massiot
+
+ Fixed MPEG-1 mux_rate parsing.
+ Fixed MPEG-1 stuffing.
+
+2001-03-05 Monday 11:53  sam
+
+   * fixed headers for FreeBSD compilation.
+   * fixed debian/rules for non-x86 packages (Closes: Debian bug #88583).
+
+2001-03-05 Monday 01:29  sam
+
+   * Everything in place for the 0.2.63 release.
+
+   * Got rid of the CONTRIBUTORS list, and switched AUTHORS to a
+     linux-kernel like author list.
+   * Updated TODO list.
+   * Fixed a segfault in the BeOS interface when --noaudio was specified.
+   * Title and Chapter selection in the Gnome and Gtk+ interfaces.
+
+2001-03-04 Sunday 16:20  sam
+
+    Commited BeOS changes by Richard Shepherd and Tony Castley.
+
+    include/video_output.h
+     * Added boolean_t b_YCbr to vout_thread_s structure to flag YUV-YCbCr
+       decoding needed instead of YUV-RGB
+     * Will be removed later when video_output.c rewritten
+
+    src/video_output.c
+     * vout_CreateThread() initialises b_YCbr to zero
+
+    plugins/beos/*
+     * New BeOS video plugin that supports hardware overlays and new
+       MediaPlayer compatible interface
+
+    plugins/*
+     * Added YUV-YCbCr transforms
+
+2001-03-03 Saturday 11:01  sam
+
+   * Added debian/* files to help generating CSS-enabled non-US packages,
+     and changed plugins/dvd/* to reflect this change.
+   * Added .xpm icons (fixes lintian warnings).
+   * --help output and manpage are now in sync (Closes Debian bug #87478).
+   * Fixed Build-dpends entry in debian/control (Closes Debian bug #83707).
+
+2001-03-02 Friday 15:51  massiot
+
+ * More consistency in the p_input->stream management.
+
+2001-03-02 Friday 13:49  massiot
+
+ * Made input_SelectES() and input_UnselectES() not block the input thread
+ for a long time.
+
+2001-03-02 Friday 13:47  sam
+
+   * Changed debian/control to fix Debian bug #83707
+   * Added a --disable-css configure option
+   * Moved some code here and there in the DVD plugin to make it easier
+     for me to build the Debian CSS-free packages.
+
+2001-03-02 Friday 13:20  massiot
+
+ * Fixed miscellaneous alignment problems (alpha/sparc ports) ;
+ * Added a fps display when toggling 'i' ;
+ * Fixed a bug in the video parser where one picture buffer was not
+ released at quit time ;
+ * Broke the mux_rate calculation, but hey guys ! it was already broken and
+ nobody noticed it.
+
+2001-03-02 Friday 03:32  stef
+
+ -New function for DVD reading, that is able to read multiple blocks
+ (I've chosen 32 now), that doesn't use any memcpy anymore and is also much
+ faster. It is ready now for cell positioning in multi-angle DVD (to come
+ soon).
+
+ -DVD specific netlist adapted to 2048 bytes long blocks that contain
+ several data_packets.
+
+ -Modification in mpeg_system.c to use p_payload_start instead of
+ p_buffer (necessary for DVD plugin). It does not break other plugins
+ since they set p_payload_start to p_buffer
+
+ -New field i_read_once in input_thread_s to be able to read more than
+ the TS related 7 packets ; i_read_once is set to INPUT_READ_ONCE by
+ defaults but plugins can change it during initialisation.
+
+ Please check that nothing is broken :)
+
+2001-02-28 Wednesday 05:20  sam
+
+   * Additional optimizations to the subtitle decoder
+   * The GGI video output should now be faster. Also, right-mouse-clicking
+     works in GGI mode as well.
+
+2001-02-26 Monday 17:41  sam
+
+   * Optimizations done to the SPU decoder. Now the RLE is expanded at
+     decoding time, not rendering time. The main loop in vout_RenderSPU
+     is now 20 lines long.
+
+2001-02-26 Monday 12:16  sam
+
+   * The Gtk+ interface is now built as a Debian package as well. The Gnome
+     package depends on it because of the icon and menu entry.
+   * Added an intf_WarnHexDump() function to do raw hexadecimal dumps of
+     memory areas. For debugging purposes or for real men, as you wish.
+   * Lots of tidying in dvd_ioctl.c, a few comments added.
+   * Better error handling in the subpicture decoder.
+   * Tidied video_spu.c. More to come later.
+   * Fixed subtitle displaying. Will soon work in overlay mode as well.
+
+2001-02-23 Friday 12:37  massiot
+
+ * Fixed a compile problem in debug mode.
+
+2001-02-22 Thursday 17:00  massiot
+
+ * Added functions and hooks to display dates instead of off_t.
+
+2001-02-22 Thursday 16:17  massiot
+
+ * Added a 'd' keystroke to dump the stream contents (for debugging
+ purposes).
+
+2001-02-22 Thursday 08:44  stef
+
+ -New ES detection based on .ifo for DVD module. It might fail (I have
+ found one DVD for which ifo seems false).
+
+ -Title and chapter selection on the command line (see -t and -T options)
+ It will allow to watch some DVD that went through menus by default.
+
+ -beginning of menus in gnome interface.
+
+2001-02-21 Wednesday 15:52  polux
+
+ Some changes in the BeOS video output :
+ - New video output method, the vlc now uses BBitmap instead of
+   BDirectWindow (better performances)
+ - Added resizing
+ - Added beta support for overlay
+
+2001-02-21 Wednesday 11:49  sam
+
+   (note: empty CVS mails mean that a new directory has been created,
+    don't forget to use the -p option if you cvs update)
+
+   * Added a plain Gtk+ port of the Gnome interface, for the gnome-impaired
+     people. Gtk+ is now compiled by default, while Gnome isn't (you will
+     have to add --enable-gnome when running configure)
+   * Replaced -lcurses with -lncurses in configure.in.
+
+2001-02-21 Wednesday 04:38  henri
+
+ TS Input :
+ - Added DemuxPSI, DecodePAT and DecodePMT. Never tested which streams
+   where PAT or PMT are splitted in more than one section.
+ - Some TS files still don't work (matrix.ts i.e : no sound ),
+   others do ... i'll have to investigate.
+
+ Todo :
+ - What if data get unaligned ?
+ - Write NetworkOpen
+ - Try to find why I get no sound on matrix.ts
+ - Support Stream and program selection.
+
+2001-02-21 Wednesday 00:47  sam
+
+   * Forgot to fix the vlc.spec.
+   * Added Bozo to the author list.
+
+2001-02-20 Tuesday 23:30  sam
+
+  * Updated version number to 0.2.62. Release tonight.
+
+  * DVD plugin is still non-functional when you don't have DVD ioctls,
+    but at least it compiles under BeOS as well.
+  * Minor cosmetic changes here and there.
+
+2001-02-20 Tuesday 17:08  polux
+
+ Added the BeOS code for vlc_mutex_destroy() and vlc_cond_destroy()
+
+2001-02-20 Tuesday 15:03  massiot
+
+ Minor optimizations in the video decoder.
+
+2001-02-20 Tuesday 13:41  massiot
+
+ On machines without dvd ioctl, remove the DVD plugin from the Makefile,
+ fucking holy piece of *£$^%ù !
+
+2001-02-20 Tuesday 12:06  reno
+
+ * Move ac3 globals variables into structures
+ * Adding authors
+ * Prepared to add asm imdct and downmix
+
+2001-02-20 Tuesday 11:34  sam
+
+  * Fixed a bash-ism in configure.in
+
+2001-02-20 Tuesday 09:10  sam
+
+  * Fixed a segfault in input.c when no input plugin was found for
+    a given file.
+  * Fixed a deadlock in the Gnome interface. Next time I'll initialize
+    my mutexes, I promise.
+  * Added Oct to the authors list in intf_gnome.glade :)
+
+2001-02-20 Tuesday 08:47  stef
+
+ Second step in area management ; everything is in place now to have
+ title handling; it is coming :)
+
+2001-02-20 Tuesday 07:49  sam
+
+   * Ported Glide and MGA plugins to the new module API. MGA never worked,
+     so this didn't make it work better.
+   * Started thinking about built-in modules, and added some code to
+     make it easier eventually.
+   * Added Oct in the AUTHORS file.
+   * Fixed a mistake in configure.in.
+   * All your base are belong to us.
+   * Fixed a bug in src/misc/modules which prevented loading modules
+     when launched from the Tracker.
+   * Fixed a similar bug in src/video_output/video_text.c.
+   * BeOS CSS support, thanks to Markus Kuespert <ltlBeBoy@beosmail.com>
+     who ported the Linux DVD ioctls. We can now read encrypted DVDs
+     under BeOS ! Woohoo.
+
+2001-02-20 Tuesday 02:53  stef
+
+  First serie of changes in DVD module for the forthcoming interface menus
+  There is a new capability in input type modules for setting the
+ attributes of a new area. It is set to NULL for PS and TS plugins.
+  It should be called for every title change, chapter change,
+ audio mode change or spu channel change.
+
+ But this part of code is not used at the moment, and is not completed
+ yet.
+
+2001-02-19 Monday 19:28  massiot
+
+ * Kludge of the kludge, removing an oddity in YUV initialisation, and
+ activating YUV overlay on startup whenever hardware acceleration is
+ available. Thanks for bearing with us, stay tuned.
+
+2001-02-19 Monday 19:08  massiot
+
+ * mux_rate parsing ;
+ * Changed video decoder's error messages into warnings.
+
+2001-02-19 Monday 03:46  sam
+
+   * Drag and drop support under BeOS.
+
+2001-02-19 Monday 03:12  stef
+
+ -Change in the code to detect beginning of movie. It is much better now
+ but still fails with some DVD for which the movie is not the first
+ Program.
+
+ As a consequence some DVD that worked before don't work anymore.
+
+ -Beginning of ideas to handle chapters and ES selection
+
+2001-02-18 Sunday 19:14  sam
+
+   * configure.in and Makefile.in patches for better SDL support and
+     support for $(bindir) $(datadir) and $(libdir) stuff, courtesy
+     of Arkadiusz Miskiewicz <misiek@pld.ORG.PL>
+   * Ported ggi.so to the new modules API. As for the other modules, only
+     the "q" key works. Moreover, VLC doesn't exit cleanly if you close the
+     GGI window.
+   * Deactivated non-working widgets in the Gnome interface.
+   * Added CONTRIBUTORS file.
+
+   Hint of the day: don't expect to code quite long in your bed when sleepy.
+
+2001-02-18 Sunday 10:24  sam
+
+  * Ported the framebuffer plugin to the new module API. As for most of the
+    other video output modules, keyboard doesn't work. Except ^C to quit.
+
+2001-02-18 Sunday 03:32  polux
+
+    The BeOS port seems to work again.
+
+    I used this command to play an unencrypted DVD, but maybe there is a
+    better solution: ./vlc dvd:/dev/disk/ide/atapi/1/master/0/raw
+
+    Current problems: gcc doesn't like MMX-EXT instructions, and refuses
+    to have register %ebx being used in the main application. Grr.
+
+    ,-- don't trust the CVS bot, it's Sam speaking here :)
+   /
+
+2001-02-18 Sunday 01:42  stef
+
+ -UDF filesystem support so that we know the location of the first video
+ related file with 100% reliability (great change that should make DVDs
+ with binaries and extra stuff work with vlc).
+
+ -Correction of a bug in ifo reading that falsified the adress of
+ video titles.
+
+ -Changed the method for selecting title at start. It is _not_ reliable
+ though, but it is better than the preceding one.
+
+2001-02-17 Saturday 08:48  sam
+
+  * Tried to fix the BeOS interface and video output. Any BeOS developers
+    listening ? I can't even test that code, it probably wants additional
+    fixing.
+  * Added a workaround in modules.c for broken libc's which happen to truncate
+    filenames in dentry structures when using 64bits offsets. The kind of
+    stuff you only see in RedHats <g>.
+  * Made the SDL error messages a bit more useful.
+  * The Gnome menu is now created when mouse is released, not when it
+    is pressed. It may sound stupid, but it really makes a difference.
+
+2001-02-16 Friday 09:25  sam
+
+  * Upgraded version number to 0.2.61. Release is today.
+
+  * Fixed package building (both RPMs and .debs).
+  * Fixed `make snapshot' rule.
+  * Added some magic to filename detection. To read a DVD you now just
+    need to run 'vlc dvd:/dev/hdc' for instance. Same for file:// URIs.
+  * Fixed a segfault in the slider when no stream was playing.
+  * Made the slider go from 0 to 100 (instead of 99 :)
+  * The vlc now doesn't exit when finished playing. As a side effect of
+    the playlist code being very recent, it continuously loops.
+
+2001-02-16 Friday 06:37  sam
+
+  * Fixed a segfault in the input thread creation, as well as a possible
+    deadlock. This happened mostly when opening non-existing files.
+  * Created input_SetStatus to do input_SetRate's job. input_SetRate will
+    be used to set an arbitrary rate, for people who want to read DVDs at
+    1/2.71828 times the actual speed.
+  * Stubs for the ncurses control interface. No working code yet, but the
+    holes just need to be filled.
+  * Improved X11 support. Still not as functional as before.
+  * The output window now states the method name, so that people know whether
+    they are using X11 or SDL.
+  * The Gnome interface is now drag'n'drop aware, you can drop a file
+    on it just like Xine does (or so I guess).
+
+2001-02-15 Thursday 03:01  sam
+
+  * X11 output works again. It's just the output, but it works; I now need
+    to clean the code and add event handling.
+
+2001-02-14 Wednesday 15:58  henri
+
+ Begining of TS Input
+
+ Done :
+ - fixed netlist
+ - embryo : support TS video trough file ( kludgy ... )
+
+ Next :
+ - Write DecodePSI and DemuxPSI, wich will clean the kludges off
+
+ Then :
+ - Write NetworkOpen ( shouldn't be difficult )
+
+ Eventually :
+ - Deal with lost/corrupt packets
+
+2001-02-14 Wednesday 14:31  sam
+
+  * Should have fixed the dependency generater for some plugins.
+
+2001-02-14 Wednesday 07:48  sam
+
+  * updated version information to 0.2.60 -- today's release
+  * started porting the X11 vout (still disabled)
+  * a few unnoticeable changes in the Gnome intf
+
+2001-02-13 Tuesday 04:29  sam
+
+  * added --intf option to vlc
+  * started cleaning vout_sdl.c
+  * the dummy plugin works again
+  * added a slider to the Gnome interface so that we can browse through streams
+
+   There is a problem with the slider: we sometimes get unexpected async
+   replies, which would mean that we don't properly lock our Xlib calls.
+   Which is true. But we also get these errors when using `--vout dummy'.
+   I'll investigate.
+
+2001-02-12 Monday 13:20  massiot
+
+ * We can now seek at position 0 :p ;
+ * Fixed a typo in my previous commit.
+
+2001-02-12 Monday 11:22  massiot
+
+ * Tried to enhance picture dating on timebase discontinuities.
+
+2001-02-12 Monday 09:39  sam
+
+  . removed tests against i_rate and i_new_rate calculation from the
+    plugins and hid this complexity into input_ext-intf.c
+
+2001-02-12 Monday 07:52  sam
+
+   * Fixed my old stupid bug that disabled sound after having played the
+     first playlist item.
+   * Added `Prev' and `Next' buttons to the interface, with the beginning of
+     a playlist window (still empty).
+   * Added `Slow' and `Fast' buttons to the interface and popup menu.
+
+   Ok, I promise it's the last time I check bloat in, from now the interface
+   commits will be much cleaner and actually fix things :)
+
+2001-02-12 Monday 00:20  sam
+
+  * The pure Gnome part of the Gnome interface has been rewritten from
+    scratch, and the .glade file included as well. You can edit it by
+    installing glade-gnome and doing `glade plugins/gnome/intf_gnome.glade',
+    or directly by hand if you grok XML.
+  * Files can now be loaded into vlc using the `Open' buttons. But for the
+    moment you still have to launch vlc with at least one file, because it
+    quits when the end of the playlist is reached.
+  * Idle screen was disabled because it eats a lot of CPU and is mostly
+    useless for the moment. And it gets activated when pause lasts for too
+    long.
+
+2001-02-11 Sunday 01:15  sam
+
+   Beginning of Interface II
+  ---------------------------
+
+  * Plugins have completely disappeared, we now only use the new module API.
+  * All intf and vout modules are now independant. So far, only the Gnome
+    intf module and the SDL vout module have been ported. configure.in has
+    been modified to reflect the changes (x11 and dummy aren't compiled by
+    default anymore, while SDL and Gnome are).
+
+   Note that this is _not_ Interface II, it's just a step forward. For
+   instance, it lacks the whole message passing scheme.
+
+   Things that should work:
+
+  * Right-clicking on the SDL video output window brings the Gnome menu.
+  * Pause, Play, Exit, About work from the menu or from the interface window.
+  * The old SDL keys still work.
+
+    Things that are broken or may be broken:
+
+  * Xlib calls are not locked yet, which may lead to "Unexpected async reply"
+    errors, and make the vlc segfault.
+  * Sound only works for the first file.
+  * The SDL vout_sdl.c file is absolutely ugly and kludgey.
+  * The vlc immediately quits when no filename is given as an argument. Not
+    a real bug, but still annoying.
+  * The Gnome menu does not work in fullscreen mode.
+
+    Things that will come soon, maybe tomorrow:
+
+  * Complete navigation buttons (fast forward, slow, etc.).
+  * File/Open menu to add files to the playlist.
+  * Return of the X11 video output for those of us who do not have SDL.
+  * Textmode interface for those of us who do not have Gnome.
+  * aout and vout autospawn (maybe).
+
+2001-02-09 Friday 03:51  stef
+
+ -Some functions to prepare ifo commands utilisation to move in the
+ structures of DVDs
+ -Change in configure to avoid compiling css functions on BSD.
+
+2001-02-08 Thursday 23:40  sam
+
+  . added comments to src/interface/intf_plst.c and include/intf_plst.h
+    so that people understand how the playlist works.
+  . updated the TODO list (34 items to do, 41 done !)
+
+2001-02-08 Thursday 17:44  massiot
+
+ * Portability : changed off64_t to off_t and activated appropriate
+   GNU/Linux options ;
+ * Changed fseek() to fseeko() for 64-bit offsets ;
+ * Reset frame predictors on a stream discontinuity.
+
+2001-02-08 Thursday 13:52  massiot
+
+ * Implemented basic stream navigation function, and bound Jump forward
+   and jump Backward in the SDL intf. Enjoy !
+
+2001-02-08 Thursday 13:08  massiot
+
+ * Pause function implemented ('p' key).
+
+2001-02-08 Thursday 07:24  sam
+
+  . moved the playlist handling from input/input.c to interface/interface.c
+  . fixed a few warnings at compile-time
+  . fixed sound channel selection in playlist mode
+  . added a color message in the plugin bank because on peut bien déconner
+    cinq minutes, quand-même
+  . we now spawn a new input thread for each file
+  . added a missing pf_close() because it's always cool to close files
+    after we read them
+
+2001-02-08 Thursday 06:41  stef
+
+ -solved bug with cssdescrambling. The vlc might segfault with dvd
+ plugins. I will fix that soon.
+ -minor modification in pluginification.
+
+2001-02-08 Thursday 04:43  sam
+
+    This commit is a bit early, but it'll save Stef, Henri and me much
+  time later, when we don't have to backport modifications to input_*.c
+
+    What's new :
+     - playlist works again (still the old wrong way like Meuuh doesn't
+     like, but this is going to change within a few hours)
+     - input_ps, input_ts and input_dvd are now plugins, located in
+     plugins/mpeg/ and plugins/dvd/
+
+    What's broken :
+     - audio output might be broken on some streams ; have to investigate
+
+    What has changed :
+     - fast/slow keys are now A/Z instead of A/S since S was already
+     linked to the scale/noscale toggle.
+     - `--dvd' doesn't work anymore, for the moment try to use :
+      vlc --input dvd /dev/dvd
+     - module bank is now less verbose ; use `--warn 1' to turn back
+     verbosity on
+
+2001-02-08 Thursday 01:34  stef
+
+ -New method using netlist to read packets on DVD device by sectors of
+ 2048 bytes.
+ -Some modifications in netlist to make it work with DVD.
+ -Fixed à bug in mpeg_system.c
+
+ We use INPUT_READ_ONCE many times in the input code. I think that
+ we should replace it with a field in input_thread_t to give more
+ flexibility to modules. I have done it in DVD plugin but it can't work
+ if input.c is limited by INPUT_READ_ONCE.
+
+ The DVD method is slower than input_ps ; but there are things to
+ improve.
+ CSS descrambling is broken.
+
+2001-02-08 Thursday 00:46  reno
+
+ We can now choose the speed of forward (between 32/1 and 1/8)
+
+ Thanks to Meuuh, he's MORTEL ;)
+
+2001-02-07 Wednesday 17:56  massiot
+
+ Another mistake.
+
+2001-02-07 Wednesday 17:51  massiot
+
+ /me <- pogno who modifies Makefile instead of Makefile.in :p
+
+2001-02-07 Wednesday 17:44  massiot
+
+ * Functional fast forward and slow motion API ;
+ * Dirty hack in the SDL intf to bind "a" (fAst forward), "s" (Slow motion)
+ and "p" (Play).
+
+2001-02-07 Wednesday 15:32  massiot
+
+ * Centralized clock management, preparing for stream navigation ;
+ * Fixed a bug in the management of the first video PTS.
+
+2001-02-06 Tuesday 00:56  nitrox
+
+ . Fixed a FIXME in SDL: p_vout->p_sys is no more used in intf_sdl.c
+ . Used instead p_vout->i_changes like in x11
+
+2001-02-05 Monday 21:00  sam
+
+  . disabled SDL parachute to let the vlc dump a core instead of staying stuck
+  . patched 2 debian bugs
+     (see http://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=vlc)
+  . improved the snapshot generation
+
+2001-02-04 Sunday 03:06  sam
+
+  . removed obsolete video_yuv_mmx.S
+  . updated the TODO list and wrote a small todo.pl parser to make it
+    easier to see which items remain to be done
+  . `make snapshot' now creates vlc-*.tar.gz and vlc-*-nocss.tar.gz
+
+2001-01-31 Wednesday 03:42  sam
+
+  . version 0.2.50 for the Linux Expo
+  . --overlay and --fulscreen options (only work with --vout sdl)
+  . the vlc exits after the end of the stream, which prevents from having
+    to kill it and relaunch it during a presentation, just script it like :
+
+       for i in ~/mpeg/* ; do vlc --fullscreen --overlay --vout sdl $i ; done
+
+  Yes, I know the --overlay stuff is fucking ugly. But *I* am not the one
+   who redefines vout_sys_t in an interface-related source file. I won't
+   change it until the vout/intf is finished being rewritten.
+
+  Additional information: if "--overlay --fulscreen" doesn't center your
+   picture, try with your screen geometry, eg:
+   "--overlay --fullscreen --width 1024 --height 768"
+
+2001-01-31 Wednesday 03:24  sam
+
+  . version 0.2.0 pour la linux expo
+  . ajout des options --fullscreen et --overlay
+  . XXX: l'overlay ne fonctionne pas chez moi, je ne comprends pas
+    pourquoi -- mais je m'en fous, ça ne marchait déjà pas avant ce
+    commit. Si quelqu'un veut voir, qu'il se lâche.
+
+2001-01-30 Tuesday 19:19  massiot
+
+ * Fix for assholes who don't have a dvd players. :pppp
+
+2001-01-30 Tuesday 05:48  sam
+
+  . not a very nice hack, but will probably spare us a few user complaints: if
+   no -a option is specified, the vlc will play the first audio type it finds,
+   so there is no need to specify "-a ac3" for a DVD anymore.
+
+2001-01-29 Monday 06:28  stef
+
+ * Correction of two errors.
+
+2001-01-29 Monday 06:10  stef
+
+ -CSS support kludged for current DVD input.
+ It is very slow now but will be more adapted to the forthcoming DVD
+ input.
+ It should read the first title of many DVDs but has been tested with few.
+
+ -Beginning of ifo commands to implement DVD navigation.
+
+2001-01-27 Saturday 02:51  henri
+
+ added documentation
+
+2001-01-27 Saturday 02:51  henri
+
+ file VideoLAN-HOWTO.sgml was initially added on branch V0_2.
+
+2001-01-26 Friday 15:38  massiot
+
+ * Removed dead code.
+
+2001-01-26 Friday 00:10  bozo
+
+   - backport of the sdl plugin (minor correction in video_output as I made
+     in unstable)
+
+ NOTE: This is the last development commit in the stable version. Do NOT commit
+ any new features in the stable version. If you do you'll be murdered by Henri.
+
+2001-01-25 Thursday 21:57  sam
+
+  . removed Makefile -- I can't understand why it reappeared.
+
+2001-01-24 Wednesday 19:05  massiot
+
+ * Hooks for fast forward and slow motion support.
+
+2001-01-23 Tuesday 13:22  massiot
+
+ * Fixed backwards moves ;
+ * Updated TODO list.
+
+2001-01-23 Tuesday 10:15  massiot
+
+ * Completely removed BIZARRE_OPTIMS.
+
+2001-01-22 Monday 19:40  massiot
+
+ * Tuned up optimizations.
+
+2001-01-22 Monday 18:04  massiot
+
+ * Minor bitstream optimization.
+
+2001-01-22 Monday 15:49  massiot
+
+ * Tuned up optimization flags.
+
+2001-01-22 Monday 05:20  stef
+
+ *Check for the needed headers for DVD ioctls
+
+ I have only tested it on my computer ; so I don't know if it work
+ elsewhere, particularly on BSD and BeOS.
+
+2001-01-21 Sunday 09:20  stef
+
+ *Some cleaning in the dvd authentification code
+
+ Now it generates a valid title key, but there is no sector descrambler
+ yet.
+
+2001-01-21 Sunday 01:36  massiot
+
+ * Various miscellaneous minor optimizations of the video parser.
+
+2001-01-20 Saturday 20:59  stef
+
+ * Beginning of support for encrypted DVDs.
+ * It only tests encryption and authenticates disc.
+
+ The decryption does not work now et it is very ugly but I'm working on it.
+
+2001-01-20 Saturday 13:08  sam
+
+  . really fixed GetChunk now.
+
+2001-01-20 Saturday 04:19  sam
+
+  . the infamous Saturday morning mighty one-liner patch that fixes subtitles
+
+2001-01-19 Friday 18:17  sam
+
+  . changed program version to 0.2.5 (preparing 0.3.0 release).
+  . changed codename to Urumov
+  . cleaned a lot of stuff in the Debian package generation.
+
+   If anyone objects with the versioning scheme, let's fight in the
+   dirt and sort that out. Or change it yourself.
+
+   Debian packages can be tried here: http://armitage.via.ecp.fr/~sam/vlc/
+
+2001-01-18 Thursday 17:40  massiot
+
+ * 32-bit aligned bitstream (not that fast).
+
+2001-01-18 Thursday 05:13  sam
+
+     The motion compensation routines are now modules as well ; choose your
+   implementation with `--motion motion', `--motion motionmmx' or
+   `--motion motionmmxext'. Of course, the best implementation is chosen
+   if you don't ask for any. There doesn't seem to be any performance hit
+   due to the move to shared libs, which is a good thing. Please test
+   actively if you have time, though.
+
+     Updated --help result, manpage, INSTALL document, and a few files.
+
+     I moved vdec_motion.h and vpar_blocks.h back to /include because they
+   will be needed to build motion compensation modules, but perhaps we don't
+   need to export everything which is in these files.
+
+     /src/video_decoder/ now has only one .c file, perhaps it could now be
+   merged with video_parser ?
+
+2001-01-17 Wednesday 18:17  massiot
+
+ * Borrowed LiViD's MMX and MMX EXT IDCT.
+
+ This might break things. Expect a performance increase.
+
+2001-01-17 Wednesday 17:25  sam
+
+  . removed a few useless malloc() and unused variables in the audio SDL stuff
+  . prepared the work for built-in modules (not yet finished)
+
+2001-01-17 Wednesday 00:52  stef
+
+ * Minor changes
+
+2001-01-16 Tuesday 18:35  octplane
+
+ - Added SDL sound support. Sounds a bit laggy sometimes but my streams are ill.
+   please try.
+ - modified configure.in and all that stuff. Re-run configure
+ - SDL audio, video and interface are all part of the same .so now.
+ - remove YUV old files :->
+
+2001-01-16 Tuesday 18:06  massiot
+
+ * Reverted something that wasn't supposed to go into the cvs :p
+ * Removed -fargument-noalias-global which causes problems with as (???).
+
+2001-01-16 Tuesday 17:59  massiot
+
+ * Borrowed livid's latest libmmx and MMXEXT MC. Not in the Makefile => to
+ test it, replace vdec_motion_inner_mmx.c by vdec_motion_inner_mmxext.c.
+
+ I'm interested in performance feedback.
+
+2001-01-16 Tuesday 16:09  sam
+
+  . a few changes in the CPU extensions detection code, borrowed from the
+    kernel and from mpeg2dec. I still don't know how to detect if code
+    compiled with -mcpu=pentiumpro will run, since the cpuid arcanes are
+    quite obtuse to me. Perhaps we should also have a way not to load modules
+    if they have been compiled with a different CPU to avoid segfaults.
+
+2001-01-16 Tuesday 13:26  sam
+
+  . added files for the SSE (MMX on steroids) IDCT. Meuuh, you should just
+    need to touch plugins/idct/idct_mmxext.c (ok, the filenames suck).
+
+2001-01-16 Tuesday 05:04  sam
+
+  [ include/config.h.in has changed, don't forget tu run ./configure ]
+
+  . fixed the --aout, --idct and --yuv flags
+  . updated manpage and --(long)help output to reflect that change
+  . removed a few unneeded #includes here and there
+  . cosmetic changes in error messages in input.c
+
+    Currently available flags are now :
+
+      --aout dummy
+             esd
+             dsp
+             alsa
+
+      --idct idct
+             idctclassic
+             idctmmx
+
+      --yuv yuv
+            yuvmmx
+
+   --vout works like before, but still uses the old plugin system for now.
+
+2001-01-16 Tuesday 04:41  stef
+
+ . Now use of 64 bits offsets to parse the whole DVD. So we have all the
+ available information
+ . Fixed a bug in parsing of VTS attributes
+ . Fixed a bug in input.c that made input plugin initialize even though
+ no stream is reachable (thanks Sam)
+
+ I hope I'll be able to get the position of the movie soon.
+
+ Meuuh : the seek function of the plugin now take off_t as argument which
+ could be a problem later. Maybe it should take off64_t or time argument.
+
+2001-01-16 Tuesday 02:16  sam
+
+  . merged the YUV plugins in the same directory to avoid too much code
+    duplication
+  . YUV transformations now use the new module API ; now only the vout
+    and interface still depend on the old plugin API
+  . changed TestMMX to TestCPU because we will be able to test for other
+    specific extensions (3DNow, SSE) for the forthcoming IDCT we'll
+    borrow to mpeg2dec (as usual :P)
+  . don't show "hiding module" messages anymore except in debug mode
+  . swapped C IDCT and Classic IDCT scores since the classic one seems
+    to be faster ; anyway you should use the MMX one
+  . fixed a Makefile bug under BeOS
+  . tried to fix the cpuid code so that it compiles under BeOS (Polux, can
+    you test it when you have time ?)
+
+2001-01-15 Monday 08:07  sam
+
+    OK, so I foired input.h once again. But this one works. For real.
+
+2001-01-15 Monday 06:56  sam
+
+  . correction d'un poliotage de copier-coller
+
+2001-01-15 Monday 06:18  sam
+
+  . fixed the bug-that-made-the-vlc-segfault-on-exit, which means that
+    more than ever, « le client ne segfaulte pas ».
+
+  . there was still a problem upon quitting: sometimes the null packet
+    wasn't big enough to reach a decoder breakpoint, so I now create 10
+    of them (since I can't make it bigger) to be sure. Meuuh, what do
+    you think ?
+
+  . fixed the Makefile to spare a few variables here and there.
+
+  . reduced module hide delay, removed loading of the audio output
+    plugins since they are now modules.
+
+  . changed a few intf_Msg to intf_DbgMsg, and added "vout:", "intf:",
+    and so on in a few other messages.
+
+  . removed unused includes in the idct modules.
+
+2001-01-15 Monday 03:26  stef
+
+ . Correction of bugs in ifo parsing. Now the structures should be well
+ initialized. It remains some segfaults but it globally works.
+ . DVD mode is enabled with option --dvd. For the moment, it only read
+ the first vts and find the movie if it is at the beginning of the title
+ set.
+
+ Coming soon:
+ . udf filesystem management to access over 2Gb zones.
+ . detection of the offset to the movie inside a vts when it is not at
+ the beginning.
+
+ Is there a chance that using fopen/fseek function instead of open/lseek
+ system calls solve the 2Gb issue ?
+
+2001-01-14 Sunday 07:08  stef
+
+ . Beginning of dvd_input.
+ . Parsing of ifo file almost completed.
+ . Still does not work well.
+
+2001-01-13 Saturday 12:57  sam
+
+  . the IDCT functions are now located in modules : the classic IDCT,
+    our optimized IDCT, and MMX IDCT.
+  . cosmetic changes for modules (pf_* instead of p_*)
+  . fixes to the BeOS and dummy modules
+
+    WARNING: a new directory has been added, which means you have to
+    use `cvs update -dP' to update ; files have been removed , which means
+    you either have to run `make distclean' or remove the .deps directory,
+    and the configure script has changed, which means you have to run it
+    again. Don't complain before having checked this :)
+
+    Note about the IDCT modules: there is no way to choose the one we
+    use, but you may remove the module in lib/ to prevent it from being
+    loaded. The preference order is : MMX, Optimized, Classic.
+
+2001-01-12 Friday 17:33  massiot
+
+ * Changed default values :
+ INPUT_PTS_DELAY down to 200 ms ;
+ video heap down from 10 to 5 pictures ;
+ decoder fifo size from 1023 to 511 PES ;
+ * Fixed various bugs in 32 bit-versions of input_ext-dec.h ;
+ * Fixed a bug in GetChunk() ;
+ * Renamed GetByte, GetWord, ShowWord to _GetByte, _GetWord, _ShowWord ;
+ * Moved decoder_fifo-specific code from programs.c to dec.c ;
+ * Fixed bugs in program.c that prevented vlc to close all decoders ;
+ * Gave sam a lesson for the use of the bitstream in spu_decoder.c :ppp ;
+ * Made the video parser unlock the reference pictures before quitting
+ (still one left, yaknow why ?)
+
+2001-01-12 Friday 14:49  sam
+
+  . destroy fifo mutex and cond variables _after_ they are used for
+    the last time. henri, that'll be one binouze.
+
+2001-01-12 Friday 12:48  henri
+
+ Done :
+ - ported the alsa plugin to the news vlc module API
+ - cosmetic changes
+
+ To do :
+ - check if it works with the latest alsa release
+ - add features ... prepare for 4 or more speakers
+
+2001-01-12 Friday 11:36  massiot
+
+ * Fixed 32 bits bitstream bugs.
+
+2001-01-11 Thursday 17:44  sam
+
+   . moved the MPEG audio decoder to the new bitstream
+
+     I wasn't sure whether the bits counting method was effective to
+   skip ancillary data at the end of a frame, but I kept it for
+   safety. There is still a lot to optimize in the bit counting, like
+   unrolling the first iteration of some loops, but I don't know if
+   it would be worth it. The other solution would have been to look for
+   a startcode after eache frame, without caring about the ancillary bits.
+
+   . cleaning in the SPU decoder.
+
+2001-01-11 Thursday 15:35  sam
+
+  . moved swab32 from input_ext-dec.h to common.h. We probably won't need
+    it anymore really soon, since ntohl() and htonl() seem to be properly
+    optimized when gcc is passed the right optimization flags.
+
+  . fixed GetBits32 and RemoveBits32. I know the #ifdefs are useless since
+    we only support u32 words, but it's a safe reminder. Comments appreciated
+    on this fix since I may have b0rked something -- it runs well here though.
+
+2001-01-10 Wednesday 19:22  massiot
+
+ * Changed code for handling b_die in bitstream ;
+ * Move input_ext-dec.h to input.h ;
+ * New input_NullPacket function ;
+ * Fixed init bugs in input and vpar ;
+
+2001-01-10 Wednesday 16:24  massiot
+
+ * Placed a callback to the decoder in the bitstream structure ;
+ * Fixed a purify bug in input_ps.c ;
+ * Added -mcpu=pentiumpro in the Makefile.
+
+2001-01-10 Wednesday 02:33  sam
+
+  . complete commenting of modules_core.h and small modifications
+  . separated MODULE_CONFIG_START and ADD_WINDOW (Henri, beware)
+  . fixed a very, very old bug that caused namespace collision between
+    plugins (Henri, beware: call your aout_getplugin function like this,
+    not alsa_aout_getplugin)
+  . removed the Debian specific clean rules from the Makefile, since they
+    are already handled by the debian/rules script.
+  . tidied a few compilation rules (-lfoo should always be at the end)
+
+2001-01-09 Tuesday 21:03  sam
+
+  . fixed a warning under FreeBSD (dlerror() is a const char*, not a char*).
+  . made configure script look for the bswap assembly instruction (using
+    AC_TRY_COMPILE makes sure the compiler will really accept it).
+
+2001-01-08 Monday 18:16  sam
+
+  . Added a missing mutex_unlock in video_output.c
+  . Moved a mutex_destroy after the thread cancellation to prevent
+    possible problems
+  . Added a missing #ifdef in intf_msg.c which prevented compilation
+    with --enable-debug
+  . Fixed a bug in the input that prevented to quit properly in certain
+    cases (some ES were not deleted because their index was skipped when
+    the former one was deleted, well Meuuh should know what I mean)
+
+   There is still a segfault when quitting, most presumably in the
+  audio output. I couldn't find what causes it yet.
+
+2001-01-07 Sunday 17:07  sam
+
+  . added a .cvsignore file in lib/ so that the directory doesn't get
+    removed whenever one does a cvs update -dP
+  . fixed debian/.cvsignore because of a new version of debhelper
+
+2001-01-07 Sunday 16:17  sam
+
+  . all plugins now compile with -fPIC.
+
+  . made the audio_output API a bit simpler.
+
+  . got rid of modules_config.h.
+
+  . fixed `make install' rule.
+
+  . fixed warnings in the MMX YUV compilation.
+
+  . probably fixed a bug in the input : pp_foo structures were free()d at
+    the end, but this was useless since the last call to realloc() is
+    equivalent to free(), and two consecutive calls to free() aren't a
+    goo idea.
+
+  . we check that the version number match and that we don't already have
+    a module by that name when loading a new module.
+
+  . all public module_* functions now properly lock the module bank.
+
+  . the audio_output now uses the new module API ; EsounD and DSP modules
+    have been ported, which should be enough for Henri to port the ALSA one.
+
+    The new plugin API is now much simpler ; it's now just a matter of
+ calling module_Need( p_main->p_module_bank, MODULE_CAPABILITY_FOO, p_data );
+ and if successful we get the best module. Capabilities can be ORed, so that
+ one can ask for a plugin that does VOUT _and_ INTF actions for instance.
+
+    It's not complete yet though -- by making it generic I had to do a few
+ ugly casts here and there, which I am going to fix ASAP. Also, command line
+ selection of a plugin does not work yet.
+
+    The switch to the new plugin API has probably broken the BeOS audio
+ output ; we can either wait until the whole vlc has switched to the new
+ plugins, or create a separate beos_sound.so that conforms to the new API.
+
+2001-01-07 Sunday 06:40  benny
+
+ Hum, ouais bon ben euhh, j'avais fume, donc je repare mes conneries et je
+ vais me coucher.
+
+2001-01-07 Sunday 05:41  benny
+
+ Optimisation de BinaryLog
+
+2001-01-07 Sunday 04:31  henri
+
+ - Order : if a then b are initialized, release b then a ;
+ - Typos ;
+ - Cosmetic changes.
+
+2001-01-07 Sunday 03:56  henri
+
+ - Added vlc_mutex_destroy and vlc_cond_destroy function, for pthreads.
+ - Used them before quitting, every lock and cond is destroyed
+ - Checked the return value of malloc and realloc in input_programs
+ - Cosmetic changes
+
+ TODO: add vlc_*_destroy for beos and C_thread
+
+2001-01-06 Saturday 08:05  benny
+
+ Fixed compilation pb under solaris 2.6
+
+2001-01-06 Saturday 08:04  benny
+
+ Fixed solaris libraries
+
+2001-01-06 Saturday 07:23  sam
+
+  . should compile & run on Solaris with ./configure --disable-dsp
+     (tested on puma)
+  . removed most SYS_SOLARIS #ifdef's in favour of more generic tests
+  . updated example ./configure line in INSTALL file
+  . now we only load modules that end with ".so"
+  . null module is compiled by default
+
+2001-01-06 Saturday 05:44  henri
+
+ Fixed a typo than prevented from building ...
+
+2001-01-06 Saturday 03:16  henri
+
+ Fixed initialization of payload_start and payload_end
+ It should be finished now.
+
+2001-01-05 Friday 18:46  massiot
+
+ BSD port, including :
+ * --enable-sdl and some others are now --with-sdl[=name] to supply an
+ optional library name ;
+ * deleted all unnecessary #include <sys/uio.h> ;
+ * /usr/include is now searched when looking for libraries and headers.
+
+ It seems to compile and run on BSD. Under Linux Sam's latest commit makes
+ vlc crash on startup, so I can't really tell, but hey it compiles.
+
+2001-01-05 Friday 18:06  sam
+
+  . src/misc/modules.c is in a workable state now.
+
+   To test it, run ./configure with the --enable-null flag, which will
+   compile the Null Module as a plugin. Watch the memory usage at the
+   launch and when the plugin is released.
+
+2001-01-05 Friday 14:46  sam
+
+ (previous commit foired)
+
+  . this is a coding style patch which removes all "foo(bar){" constructions
+    and most of the tabulations.
+  . also, fixed a bug in the default subtitle track.
+  . and made a few error messages more explicit, ie. changed "error: %s" to
+    "foo error: couldn't initialize bar (%s)"
+  . and removed a warning in intf_ctrl.c which isn't used anyway.
+
+2001-01-05 Friday 14:45  sam
+
+  . this is a coding style patch which removes all "foo(bar){" constructions
+    and most of the tabulations.
+  . also, fixed a bug in the default subtitle track.
+  . and made a few error messages more explicit, ie. changed "error: %s" to
+    "foo error: couldn't initialize bar (%s)"
+
+2001-01-05 Friday 14:28  sam
+
+  . splitted modules.h into modules.h and modules_core.h to enable
+     clean compilation of the Null Module.
+
+2001-01-05 Friday 14:24  sam
+
+  . added the Null Module, the module that does nothing but that is going
+     to be of great help for debugging my module code.
+
+2001-01-05 Friday 13:57  sam
+
+  . Added files needed for the forthcoming module management.
+
+  Notes:
+
+    Plugins are now called modules, because we will be able to compile
+    them either as a dynamic plugin, or within the program. And, more
+    important, I can commit this without having to break the vlc :)
+
+    I tried to be as clear as possible in my comments, please tell me
+    if a few prototypes still have an unclear beahaviour.
+
+    Current features:
+     . none, files haven't even been added to the Makefile yet.
+
+    Future features:
+     . dynamic loading (done)
+     . built-in modules (still to do)
+     . automatic unloading of plugins (done)
+     . dynamic configuration (still to do)
+     . automatic choosing of the most appropriate plugin for a given
+        task (still to do but well prepared)
+
+2001-01-04 Thursday 23:18  bozo
+
+   - fixed pitch bug;
+   - fixed segfault, it was probably a memory corruption but I'm not sure :) ;
+   - video_output.c : compute picture size even if b_need_render == 0;
+
+2001-01-04 Thursday 19:11  massiot
+
+ Fixed a deadlock.
+
+2001-01-04 Thursday 18:47  massiot
+
+ * Fixed a deadlock (the vout unlocked a mutex locked by another thread,
+ grrrr, I'll kill someone) ;
+ * Put config.h in front of others in audio_decoder.c.
+
