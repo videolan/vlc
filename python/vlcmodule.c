@@ -20,7 +20,7 @@ static PyObject *vlc_init(PyObject *self, PyObject *args)
     char *pArgv[] = { "vlc", "--sout", NULL };
     int iRc;
 
-    if (!PyArg_ParseTuple(args, "iss", &iVlc, &pArgv[2]))
+    if (!PyArg_ParseTuple(args, "is", &iVlc, &pArgv[2]))
         return NULL;
     iRc = VLC_Init(iVlc, 3, pArgv);
     return Py_BuildValue("i", iRc);
