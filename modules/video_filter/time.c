@@ -31,7 +31,6 @@
 #include <vlc/vout.h>
 
 #include "vlc_filter.h"
-#include "filter_common.h"
 #include "vlc_block.h"
 
 /*****************************************************************************
@@ -46,13 +45,6 @@ static subpicture_t *Filter( filter_t *, mtime_t );
  *****************************************************************************/
 struct filter_sys_t
 {
-    picture_t *p_pic;
-
-    int i_width, i_height;
-    int posx, posy;
-
-    mtime_t i_last_date;
-    filter_t *p_text;
 };
 
 
@@ -62,8 +54,8 @@ struct filter_sys_t
 vlc_module_begin();
     set_capability( "sub filter", 0 );
     set_callbacks( CreateFilter, DestroyFilter );
-    set_description( _("Logo sub filter") );
-    add_shortcut( "logo" );
+    set_description( _("Time display sub filter") );
+    add_shortcut( "time" );
 vlc_module_end();
 
 /*****************************************************************************
@@ -116,9 +108,7 @@ char *myCtime( time_t *t )
  ****************************************************************************/
 static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu;
-    subpicture_region_t *p_region;
     video_format_t fmt;
     time_t t;
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
