@@ -20,6 +20,8 @@ AC_PROG_CPP
 dnl Find the right ranlib, even when cross-compiling
 AC_CHECK_TOOL(RANLIB, ranlib, :)
 AC_CHECK_TOOL(STRIP, strip, :)
+AC_CHECK_TOOL(AR, ar, :)
+AC_CHECK_TOOL(LD, ld, :)
 
 dnl Check for GNU make
 AC_PATH_PROG(GMAKE, gmake, no)
@@ -1181,11 +1183,21 @@ then
     AC_PATH_PROG(SDL_CONFIG, sdl-config, no, $SDL_PATH)
     SDL_HEADER="SDL/SDL.h"
   fi
+  # check for cross-compiling
+  SDL_PREFIX=
+  AC_ARG_WITH(sdl,
+    [    --with-sdl=PATH       path to libsdl (needed for cross-compiling),
+                               e.g use as:
+                               --with-sdl=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
+  if test "x$with_sdl" != "xno" -a "x$with_sdl" != "x"
+  then
+    SDL_PREFIX="--prefix=$with_sdl"
+  fi
   if test x${SDL_CONFIG} != xno
   then
     PLUGINS="${PLUGINS} sdl"
-    sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} --cflags`"
-    sdl_LDFLAGS="${sdl_LDFLAGS} `${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`"
+    sdl_CFLAGS="${sdl_CFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --cflags`"
+    sdl_LDFLAGS="${sdl_LDFLAGS} `${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`"
     CPPFLAGS="$save_CPPFLAGS $sdl_CFLAGS"
     AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
       <${SDL_HEADER}>, Indicate whether we should use SDL/SDL.h or SDL11/SDL.h),
@@ -1217,7 +1229,7 @@ AC_ARG_ENABLE(qte,
 if test "x${enable_qte}" != "xno"
 then
   AC_ARG_WITH(qte,
-  [    --with-qte=PATH    Qt Embedded headers and libraries])
+  [    --with-qte=PATH       Qt Embedded headers and libraries])
   if test "x${with_qte}" = "x"
   then
     test_LDFLAGS="-L${QTDIR}/lib"
@@ -1498,14 +1510,24 @@ then
   then
     AC_PATH_PROG(GTK_CONFIG, gtk-config, no, ${GTK_PATH})
   fi
+  # check for cross-compiling
+  GTK_PREFIX=
+  AC_ARG_WITH(gtk,
+    [    --with-gtk=PATH       path to libgtk (needed for cross-compiling),
+                          e.g use as:
+                          --with-gtk=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
+  if test "x$with_gtk" != "xno" -a "x$with_gtk" != "x"
+  then
+    GTK_PREFIX="--prefix=$with_gtk"
+  fi
   if test "x${GTK_CONFIG}" != "xno"
   then
     if expr 1.2.0 \> `${GTK_CONFIG} --version` >/dev/null
     then
       AC_MSG_ERROR([Your development package for Gtk+ is too old, you need at least version 1.2.0. Please upgrade and try again. Alternatively you can also configure with --disable-familiar.])
     fi
-    familiar_CFLAGS="${familiar_CFLAGS} `${GTK_CONFIG} --cflags gtk gthread`"
-    familiar_LDFLAGS="${familiar_LDFLAGS} `${GTK_CONFIG} --libs gtk gthread | sed 's,-rdynamic,,'`"
+    familiar_CFLAGS="${familiar_CFLAGS} `${GTK_CONFIG} ${GTK_PREFIX} --cflags gtk gthread`"
+    familiar_LDFLAGS="${familiar_LDFLAGS} `${GTK_CONFIG} ${GTK_PREFIX} --libs gtk gthread | sed 's,-rdynamic,,'`"
     # now look for the gtk.h header
     CPPFLAGS="${save_CPPFLAGS} ${familiar_CFLAGS}"
     ac_cv_gtk_headers=yes
@@ -1513,10 +1535,39 @@ then
       ac_cv_gtk_headers=no
       echo "Cannot find gtk development headers."
     ])
+
+    # now look for gpe support
+    AC_ARG_WITH(gpe-prefix,
+    [    --with-gpe-prefix=PATH       gpe installation path prefix (default search in \$PATH)],[],[])
+    if test "x$with_gpe_prefix" != "xno"  -a "x$with_gpe_prefix" != "x"
+    then
+      gpe_CFLAGS="-I$with_gpe_prefix/include"
+      gpe_LDFLAGS="-lXi -lgdk_pixbuf -L$with_gpe_prefix/lib"
+
+      # now look for gpe/init.h header file
+      save_CFLAGS=$CFLAGS
+      save_LDFLAGS=$LDFLAGS
+#      CFLAGS="${familiar_CFLAGS} ${gpe_CFLAGS}"
+      LDFLAGS="${familiar_LDFLAGS} ${gpe_LDFLAGS}"
+      CPPFLAGS="${save_CPPFLAGS} ${familiar_CFLAGS} ${gpe_CFLAGS}"
+      ac_cv_gpe_headers=yes
+      AC_CHECK_HEADERS(gpe/init.h, ,
+        [ ac_cv_gpe_headers=no 
+          AC_MSG_ERROR([Cannot find development headers for libgpewidget...]) ])
+      AC_CHECK_LIB(gpewidget,  gpe_application_init, 
+        [ gpe_LDFLAGS="${gpe_LDFLAGS} -lgpewidget" ],
+        [ AC_MSG_ERROR([Cannot find libgpewidget library...]) ])
+      CFLAGS=$save_CFLAGS
+      LDFLAGS=$save_LDFLAG 
+      if test "x${ac_cv_gpe_headers}" = "xyes"
+      then
+        familiar_CFLAGS="${familiar_CFLAGS} ${gpe_CFLAGS}"
+        familiar_LDFLAGS="${familiar_LDFLAGS} ${gpe_LDFLAGS}" # -lgpewidget"
+      fi
+    fi 
     if test "x${ac_cv_gtk_headers}" = "xyes"
     then
       PLUGINS="${PLUGINS} familiar"
-      NEED_GTK_MAIN=yes
     fi
     CPPFLAGS="${save_CPPFLAGS}"
   fi
@@ -1591,7 +1642,7 @@ AC_ARG_ENABLE(opie,
   [  --enable-opie           Qt embedded interface support (default disabled)],
   [if test "x${enable_opie}" = "xyes"; then
      AC_ARG_WITH(qte,
-     [    --with-qte=PATH    Qt Embedded headers and libraries])
+  [    --with-qte=PATH       Qt Embedded headers and libraries])
      if test "x${with_qte}" = "x"
      then
        test_LDFLAGS="-L${QTDIR}/lib"
