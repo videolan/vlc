@@ -983,7 +983,7 @@ VLC_ADD_PLUGINS([packetizer_mpegvideo packetizer_h264])
 VLC_ADD_PLUGINS([packetizer_mpeg4video packetizer_mpeg4audio])
 
 if test "${SYS}" != "mingwce"; then
-  VLC_ADD_PLUGINS([access_fake])
+  VLC_ADD_PLUGINS([access_fake access_filter_timeshift])
   VLC_ADD_PLUGINS([gestures rc telnet hotkeys netsync showintf time marq sap])
   VLC_ADD_PLUGINS([picture mosaic wall motiondetect clone crop])
   VLC_ADD_PLUGINS([i420_yuy2 i422_yuy2 i420_ymga])
@@ -3654,7 +3654,7 @@ if test "${SYS}" = "mingwce"; then
   VLC_ADD_LDFLAGS([wince],[modules/gui/wince/wince_rc.o])
 elif test "${SYS}" = "mingw32"; then
   VLC_ADD_CXXFLAGS([wince],[])
-  VLC_ADD_LDFLAGS([wince],[-lcomctl32 -lcomdlg32 -lgdi32])
+  VLC_ADD_LDFLAGS([wince],[-lcomctl32 -lcomdlg32 -lgdi32 -lole32])
   dnl Gross hack
   VLC_ADD_LDFLAGS([wince],[modules/gui/wince/wince_rc.o])
 fi
@@ -4349,6 +4349,7 @@ AC_CONFIG_FILES([
   modules/access/vcd/Makefile
   modules/access/vcdx/Makefile
   modules/access/screen/Makefile
+  modules/access_filter/Makefile
   modules/access_output/Makefile
   modules/audio_filter/Makefile
   modules/audio_filter/channel_mixer/Makefile
