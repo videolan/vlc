@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.17 2002/05/13 21:55:30 fenrir Exp $
+ * $Id: avi.c,v 1.18 2002/05/17 15:47:01 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -338,6 +338,9 @@ static void __AVI_UpdateIndexOffset( input_thread_t *p_input )
     demux_data_avi_file_t *p_avi_demux =
                         (demux_data_avi_file_t*)p_input->p_demux_data;
 
+/* FIXME some work to do :
+        * test in the ile if it's true, if not do a RIFF_Find...
+*/
 #define p_info p_avi_demux->pp_info[i_stream]
     for( i_stream = 0; i_stream < p_avi_demux->i_streams; i_stream++ )
     {
@@ -890,17 +893,18 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
     /* create entry on the fly */
     /* search for the more advance stream and parse from it for all streams*/
     p_info_tmp = p_info;
-    
     for( i = 0; i < p_avi_demux->i_streams; i++ )
     {
 #define p_info_i p_avi_demux->pp_info[i]
-        if( p_info_i->p_index[p_info_i->i_idxnb - 1].i_pos >
-            p_info_tmp->p_index[p_info_tmp->i_idxnb - 1].i_pos )
+        if( ( p_info_i->p_index )
+            && ( p_info_i->p_index[p_info_i->i_idxnb - 1].i_pos >
+            p_info_tmp->p_index[p_info_tmp->i_idxnb - 1].i_pos ) )
         {
             p_info_tmp = p_info_i;
         }
 #undef  p_info_i
     }
+       
     /* go to last defined entry */
     i_idxposc = p_info_tmp->i_idxposc; /* save p_info_tmp->i_idxposc */
     p_info_tmp->i_idxposc = p_info_tmp->i_idxnb - 1;
@@ -933,6 +937,7 @@ static int __AVI_NextIndexEntry( input_thread_t *p_input,
 #define p_info_i    p_avi_demux->pp_info[i_number]
        if( (__AVI_ParseStreamHeader( index.i_id, &i_number, &i_type ) == 0)
              &&( i_number < p_avi_demux->i_streams )
+             &&( p_info_i->p_index )
              &&( p_info_i->p_index[p_info_i->i_idxnb - 1].i_pos + 
                      p_info_i->p_index[p_info_i->i_idxnb - 1].i_length + 8<= 
                         index.i_pos ) 
@@ -1371,6 +1376,7 @@ static pes_packet_t *AVI_GetFrameInPES( input_thread_t *p_input,
             /* get pts while is valid */
             i_pts = AVI_GetPTS( p_info );
             p_pes_tmp = __AVI_ReadStreamChunkInPES( p_input, p_info );
+
             if( !p_pes_tmp )
             {
                 return( p_pes_first );
@@ -1561,6 +1567,7 @@ static int AVIDemux( input_thread_t *p_input )
     p_pes = AVI_GetFrameInPES( p_input,
                                p_info_master,
                                100000 ); /* 100 ms */
+
     AVI_DecodePES( p_input,
                    p_info_master,
                    p_pes);
