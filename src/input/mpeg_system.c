@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: mpeg_system.c,v 1.97 2002/05/27 16:01:42 fenrir Exp $
+ * $Id: mpeg_system.c,v 1.97.2.1 2002/06/02 10:55:53 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1234,8 +1234,6 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data,
                  * draft. As there is nothing interesting in this packet
                  * (except PCR that have already been handled), we can trash
                  * the packet. */
-                intf_WarnMsg( 3, "input: packet without payload received "
-                                 "by TS demux" );
                 b_trash = 1;
             }
             else if( i_dummy <= 0 )

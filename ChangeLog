@@ -4,6 +4,22 @@
 
 HEAD
 
+  * ./src/input/mpeg_system.c: removed unnecessarily verbose message.
+  * ./src/video_output/video_output.c: fixed the "picture has invalid status"
+    bug which might have been the cause of crashes.
+  * ./plugins/filter/crop.c: attempt at an automatic border cropping filter,
+    using "--filter crop --autocrop".
+  * ./vlc.spec: added missing filters to the RPM generation.
+  * ./plugins/macosx/*: channel change support on Mac OS X.
+  * ./extras/MacOSX/Resources/vlc.icns: new OS X icon, courtesy of Benjamin
+    Mironer <bmironer@noos.fr>.
+  * ./plugins/filter/crop.c: crop filter. Usage examples:
+      --filter crop --crop-geometry 640x480
+      --filter crop --crop-geometry 320x200+10+10
+  * ./plugins/macosx/intf_vlc_wrapper.m: fixed a bug in the chapter handling.
+  * ./plugins/macosx/vout_vlc_wrapper.m: more keystrokes.
+  * ./plugins/chroma/i420_yuy2.h: simplified the chroma code. Please test
+    under BeOS and QNX.
   * ./plugins/macosx/intf_vlc_wrapper.m: fix for non-ASCII filenames in the
     MacOS X interface, courtesy of Watanabe Go <go@dsl.gr.jp>.
   * ./plugins/chroma/i420_yuy2.h: fixed an old overflow bug spotted by
