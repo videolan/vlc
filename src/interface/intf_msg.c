@@ -4,7 +4,7 @@
  * interface, such as message output. See config.h for output configuration.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: intf_msg.c,v 1.45 2002/02/20 05:56:18 sam Exp $
+ * $Id: intf_msg.c,v 1.46 2002/02/23 21:31:44 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -142,13 +142,20 @@ intf_subscription_t *intf_MsgSub( void )
 }
 
 /*****************************************************************************
- * intf_MsgSub: unsubscribe from the message queue.
+ * intf_MsgUnsub: unsubscribe from the message queue.
  *****************************************************************************/
 void intf_MsgUnsub( intf_subscription_t *p_sub )
 {
     int i_index;
 
     vlc_mutex_lock( &msg_bank.lock );
+
+    /* Sanity check */
+    if( !msg_bank.i_sub )
+    {
+        intf_ErrMsg( "intf error: no subscriber in the list" );
+        return;
+    }
 
     /* Look for the appropriate subscription */
     for( i_index = 0; i_index < msg_bank.i_sub; i_index++ )
@@ -167,7 +174,7 @@ void intf_MsgUnsub( intf_subscription_t *p_sub )
     }
 
     /* Remove this subscription */
-    for( ; i_index < msg_bank.i_sub; i_index++ )
+    for( ; i_index < (msg_bank.i_sub - 1); i_index++ )
     {
         msg_bank.pp_sub[ i_index ] = msg_bank.pp_sub[ i_index+1 ];
     }
