@@ -1455,7 +1455,7 @@ dnl
 dnl  mad plugin
 dnl
 AC_ARG_ENABLE(mad,
-  [  --enable-mad            libmad module (default disabled)])
+  [  --enable-mad            libmad module (default enabled)])
 if test "x${enable_mad}" != "xno"
 then
   AC_ARG_WITH(mad,
