@@ -1,0 +1,136 @@
+%
+<Meuuh> intf: added `--vout' to playlist
+<Meuuh> intf: added `dummy' to playlist
+
+  -- #videolan
+%
+<Stef> bon j'ai trouvé d'où venait les trashs d'images
+<sam> t'es un dieu
+<Stef> bin justement ct de ma faute :)
+<sam> t'es une merde
+
+  -- #videolan
+%
+<colin> p_bit_stream->buffer |=((u32) *(p_bit_stream->byte_stream.p_byte++))
+<colin>     << (24 - p_bit_stream->i_available);
+<colin> psychopathes
+
+  -- #videolan
+%
+<Stef> xav - AZRTYUUUUOP"'(-È
+<Stef> oups je devrais pas nettoyer mon clavier par ici :)
+
+  -- #videolan
+%
+<bbpig> sam : {#][^#{~]@[ ;P
+<sam> bbp ?
+<bbpig> sam : pouette
+<sam> ah
+<bbpig> :)
+<sam> ok, gotta sleep now
+<sam> it was very nice having this interesting discussion with you
+
+  -- #videolan
+%
+<NovaKANE> spudec error: index mismatch (0x0331 != 0x0000)
+<NovaKANE> spudec error: unknown command 0x7d
+<sam> NovaKANE: yeah if you could cut a slice of VOB it would be pretty helpful
+<jlj> hey, don't you plan on making fair use of your DVDs
+<jlj> I'll give my good friend Jack a call
+
+  -- #videolan
+%
+<NovaKANE> vlc is using about 3% cpu with no audio/video
+<sam> 3% ? the interface isn't bloated enough then :)
+
+  -- #videolan
+%
+-+- djk sets topic on #videolan to: "VideoLAN - 100% skin free DVD!"
+%
+<vektor> so, i think it's time for a mass exodus to libdvdcss.
+<taaz> ack!  hold on a minute
+<vektor> what?
+<vektor> did you feel a great disturbance in the force?
+
+  -- #livid
+%
+<stef> héhé, mais j'ai acheté une voiture :)
+<Meuuh> ouaaah oh, quoi ?
+<stef> une petite 206 toute noire
+<reno> ce qu'il dit pas c'est que c'est une s16 ;)
+<Meuuh> ah 16 bits signés ?
+
+  -- #videolan
+%
+<Meuuh> je l'ai pas testé, hein, faut pas déconner non plus
+<Meuuh> c le boulot des users de tester
+
+  -- #videolan
+%
+<Xag> j ai du retard ds le son quand je stream du dvd.
+<Meuuh> sur ton iPAQ ?
+<Xag> nan laptop
+<Xag> et le CPU n est pas a 100%
+<Xag> et j utilise le dsp
+<Meuuh> ah c'est dommage
+<Meuuh> fais un test de grossesse, on sait jamais
+
+  -- #videolan
+%
+<sam> CHRISTIAN
+<sam> MARILLAT
+<sam> IS
+<sam> A
+<sam> COMPLETE
+<sam>  ____ ___ ____ _  ___   _ _____    _    ____    _ 
+<sam> |  _ \_ _/ ___| |/ / | | | ____|  / \  |  _ \  | |
+<sam> | | | | | |   | ' /| |_| |  _|   / _ \ | | | | | |
+<sam> | |_| | | |___| . \|  _  | |___ / ___ \| |_| | |_|
+<sam> |____/___\____|_|\_\_| |_|_____/_/   \_\____/  (_)
+<sam> 
+
+  -- #videolan
+%
+<bozo> you really shouldn't have touched a computer when you were a little boy
+<stef> _it_ came to me
+
+  -- #videolan
+%
+<sam> anyway, why should we care? as soon as we release libvlc, it'll be in
+      the MPlayer CVS :)
+
+  -- #videolan
+%
+<Meuuh> I read a Jean-Claude Vandamme interview yesterday and it works well
+<Meuuh> except for the sound
+<Kev> Do you really want to have the sound for Jean-Claude Van Damme?
+
+  -- #videolan
+%
+<JediMaster> I'm using the gtk+ interface in kde3
+<lit> silly
+<lit> heheh
+<lit> i use the gnome interface in gnome
+<lit> CALL ME CRAZY
+
+  -- #videolan
+%
+<vax> $grabeuh
+<gally> heheheuhrahaaheuwaheuhehrabeugraaaahawhahrahaa !!
+<vax> hey THAT was a nice grabeuh
+
+  -- #videolan
+%
+<gibalou> hi vax, how's work ?
+<vax> beuhh .. another question ? :P
+<gibalou> heuh, how's you girlfriend ? ;-)
+
+  -- #videolan
+%
+<Meuuh> BTW, there is "Jeanne et le garçon formidable" on M6
+<Meuuh> this movie is so great
+<Meuuh> jlj you debug the http plug-in ? :p
+<jlj> well, you're so busy with Virginie Ledoyen, so I had to do it :)
+
+  -- #videolan
+%
