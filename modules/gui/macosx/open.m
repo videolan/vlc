@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.13 2003/01/23 21:47:59 massiot Exp $
+ * $Id: open.m,v 1.14 2003/01/23 22:25:32 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -844,17 +844,17 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 - (IBAction)openFile:(id)sender
 {
     NSOpenPanel *o_open_panel = [NSOpenPanel openPanel];
-
-    [o_open_panel setAllowsMultipleSelection: NO];
+    
+    [o_open_panel setAllowsMultipleSelection: YES];
     [o_open_panel setTitle: _NS("Open File")];
     [o_open_panel setPrompt: _NS("Open")];
-
+    
     if( [o_open_panel runModalForDirectory: nil
             file: nil types: nil] == NSOKButton )
     {
         intf_thread_t * p_intf = [NSApp getIntf];
         config_PutPsz( p_intf, "sout", NULL );
-        [o_playlist appendArray: [o_open_panel filenames] atPos: -1 enqueue: 0];
+        [o_playlist appendArray: [o_open_panel filenames] atPos: -1 enqueue:VLC_FALSE];
     }
 }
 

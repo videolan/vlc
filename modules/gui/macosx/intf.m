@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: intf.m,v 1.31 2003/01/23 21:47:59 massiot Exp $
+ * $Id: intf.m,v 1.32 2003/01/23 22:25:32 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -191,11 +191,12 @@ static void Run( intf_thread_t *p_intf )
     pTitle = _NS("VLC - Controller");
 
     [o_window setTitle: pTitle];
+    [o_window setExcludedFromWindowsMenu: TRUE];
 
     /* button controls */
     [o_btn_playlist setToolTip: _NS("Playlist")];
     [o_btn_prev setToolTip: _NS("Previous")];
-    [o_btn_slower setToolTip: _NS("Slowmotion")];
+    [o_btn_slowmotion setToolTip: _NS("Slowmotion")];
     [o_btn_play setToolTip: _NS("Play")];
     [o_btn_stop setToolTip: _NS("Stop")];
     [o_btn_fastforward setToolTip: _NS("Fast Forward")];
@@ -207,6 +208,7 @@ static void Run( intf_thread_t *p_intf )
     
     /* messages panel */ 
     [o_msgs_panel setTitle: _NS("Messages")];
+    [o_msgs_panel setExcludedFromWindowsMenu: TRUE];
     [o_msgs_btn_ok setTitle: _NS("Close")];
 
     /* main menu */
@@ -642,7 +644,7 @@ static void Run( intf_thread_t *p_intf )
     /* set control items */
     [o_btn_stop setEnabled: b_input];
     [o_btn_fastforward setEnabled: b_control];
-    [o_btn_slower setEnabled: b_control];
+    [o_btn_slowmotion setEnabled: b_control];
     [o_btn_prev setEnabled: b_plmul];
     [o_btn_next setEnabled: b_plmul];
     [o_controls setVolumeSlider];

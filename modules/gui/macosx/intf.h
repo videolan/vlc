@@ -2,7 +2,7 @@
  * intf.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.h,v 1.15 2003/01/22 01:48:06 hartman Exp $
+ * $Id: intf.h,v 1.16 2003/01/23 22:25:32 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -97,7 +97,7 @@ struct intf_sys_t
 
     IBOutlet id o_btn_playlist; /* btn playlist   */
     IBOutlet id o_btn_prev;     /* btn previous   */
-    IBOutlet id o_btn_slower;   /* btn slower     */
+    IBOutlet id o_btn_slowmotion;   /* btn slowmotion     */
     IBOutlet id o_btn_play;     /* btn play       */
     IBOutlet id o_btn_stop;     /* btn stop       */
     IBOutlet id o_btn_fastforward;   /* btn fastforward     */

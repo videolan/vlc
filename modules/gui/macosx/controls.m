@@ -2,7 +2,7 @@
  * controls.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: controls.m,v 1.10 2003/01/22 01:48:06 hartman Exp $
+ * $Id: controls.m,v 1.11 2003/01/23 22:25:32 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -56,6 +56,7 @@
 - (IBAction)stop:(id)sender;
 - (IBAction)faster:(id)sender;
 - (IBAction)slower:(id)sender;
+- (IBAction)slowMotion:(id)sender;
 - (IBAction)fastForward:(id)sender;
 
 - (IBAction)prev:(id)sender;
@@ -158,6 +159,38 @@
     input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
 }
 
+- (IBAction)slowMotion:(id)sender
+{
+    i_ff++;
+    switch( [[NSApp currentEvent] type] )
+    {
+        case NSPeriodic:
+            if ( i_ff == 1 )
+            {
+                [self slower:sender];
+            }
+            break;
+    
+        case NSLeftMouseUp:
+            if ( i_ff > 1 )
+            {
+                intf_thread_t * p_intf = [NSApp getIntf];
+                
+                [self faster:sender];
+                if ( p_intf->p_sys->p_input != NULL &&
+                            p_intf->p_sys->p_input->stream.control.i_status != PAUSE_S)
+                {
+                    input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+                }
+            }
+            i_ff = 0;
+            break;
+
+        default:
+            break;
+    }
+}
+
 - (IBAction)fastForward:(id)sender
 {
     playlist_t * p_playlist = vlc_object_find( [NSApp getIntf], VLC_OBJECT_PLAYLIST,
@@ -173,7 +206,7 @@
          * You can set this value in intf.m (hartman)
          */
         case NSPeriodic:
-            if (i_ff == 1)
+            if ( i_ff == 1 )
             {
                 [self faster:self];
             }
@@ -192,9 +225,9 @@
             vlc_mutex_lock( &p_playlist->object_lock );
             if( p_playlist->i_size )
             {
-                vlc_mutex_unlock( &p_playlist->object_lock );
                 playlist_Play( p_playlist );
             }
+            vlc_mutex_unlock( &p_playlist->object_lock );
             break;
 
         default:
