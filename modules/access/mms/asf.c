@@ -2,7 +2,7 @@
  * asf.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: asf.c,v 1.1 2003/04/20 19:29:43 fenrir Exp $
+ * $Id: asf.c,v 1.2 2003/12/07 18:55:59 jpsaman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -178,7 +178,9 @@ void E_( asf_StreamSelect ) ( asf_header_t *hdr,
     int i;
     int i_audio, i_video;
     int i_bitrate_total;
+#if 0
     char *psz_stream;
+#endif
 
     i_audio = 0;
     i_video = 0;
