@@ -2,7 +2,7 @@
  * mpeg_system.c: TS, PS and PES management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: mpeg_system.c,v 1.52 2001/04/28 03:36:25 sam Exp $
+ * $Id: mpeg_system.c,v 1.53 2001/05/02 13:30:30 henri Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Michel Lespinasse <walken@via.ecp.fr>
@@ -1048,7 +1048,7 @@ void input_DemuxTS( input_thread_t * p_input, data_packet_t * p_data )
                     /* If this is a PCR_PID, and this TS packet contains a
                      * PCR, we pass it along to the PCR decoder. */
 
-                    if( (p_pgrm_demux->i_pcr_pid == i_pid) && (p[5] & 0x10) )
+                    if( !b_psi && (p_pgrm_demux->i_pcr_pid == i_pid) && (p[5] & 0x10) )
                     {
                         /* There should be a PCR field in the packet, check
                          * if the adaptation field is long enough to carry
@@ -1484,8 +1484,14 @@ static void input_DecodePMT( input_thread_t * p_input, es_descriptor_t * p_es )
                         break;
                     case MPEG1_AUDIO_ES:
                     case MPEG2_AUDIO_ES:
-                    case AC3_AUDIO_ES :
                     case LPCM_AUDIO_ES :
+                        p_new_es->i_cat = AUDIO_ES;
+                        i_audio_es += 1;
+                        if( i_audio_es == i_required_audio_es )
+                            input_SelectES( p_input, p_new_es );
+                        break;
+                    case AC3_AUDIO_ES :
+                        p_new_es->i_stream_id = 0xBD;
                         p_new_es->i_cat = AUDIO_ES;
                         i_audio_es += 1;
                         if( i_audio_es == i_required_audio_es )

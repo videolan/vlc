@@ -3,7 +3,9 @@
 #===================#
 
 HEAD
-
+  * Fixed a segfault in TS input (psi packets with adaptation field).
+  * Corrected vlc-howto.sgml thanks to Arnaud Gomes-do-Vale
+    <arnaud@carrosse.frmug.org>.
   * Fixed a remaining buffer overflow in the Gnome interface and applied
     the patches to the Gtk+ interface.
   * Fixed a segfault in the SPU decoder initialization.

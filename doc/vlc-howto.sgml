@@ -3,7 +3,7 @@
 <titlepag>
  <title>VLC HOWTO</title>
  <author>by the Videolan Team<tt><htmlurl url="mailto:videolan-faq@videlan.org" name="videolan-faq@videlan.org"></tt></author>
- <date>v0.0.2, 21 apr 2001</date>
+ <date>v0.0.3, 21 apr 2001</date>
 
  <abstract>
   This document describes how to use the vlc (VideoLAN client) to read DVDs and mpeg files and DVDs.
@@ -18,7 +18,7 @@
  <sect1>
   <heading>What is VideoLAN ?</heading>
   <p>
-   VideoLAN is a project of sudent of  the École Centrale Paris which aims 
+   VideoLAN is a project of sudents of the École Centrale Paris which aims 
    to broadcast video on the campus, and provide the students with a MPEG2 
    software-only decoder. VideoLAN is an OpenSource project which will thus 
    allow anyone to watch DVD movies under Linux, BeOS, MacOS and most Unix 
@@ -35,7 +35,7 @@
   <p>
    Vlc stands for VideoLAN client. It is the name of the program which is
    capable of decoding MPEG streams, and displaying them onto your screen,
-   so you can watch you favorite movies, confortably sit in your armchair
+   so you can watch you favourite movies, confortably sit in your armchair
    :-).
   </p>
  </sect1>
@@ -81,7 +81,7 @@
 <sect>
  <heading>Installing the vlc : the packages</heading>
   <p>
-   This is certainly the most simple way to intsall the vlc on your system,
+   This is certainly the simplest way to intsall the vlc on your system,
    especially if you're using a packaged OS.
   </p>
 
@@ -93,17 +93,17 @@
  <sect1>
   <heading>Linux/Unix users</heading>
   <sect2>
-   <heading>What package to chose ?</heading>
+   <heading>Which package to chose ?</heading>
    <p>
-    There are different packages because vlc has "plugins" which provide functionnalities 
-    but also enlarges the executable and requires external libs. 
+    There are different packages because vlc has "plugins" which provide features 
+    but also enlarge the executable and require external libs. 
    </p>
    <p>
     SDL is a lib which allows you to have an accelerated video output.
     You will need libsdl > 1.1.6
    </p>
    <p>
-    If you're using the enlighted sound daemon, you may want to try 
+    If you're using the enlightened sound daemon, you may want to try 
     the esd-aware vlc.
    </p>
    <p>
@@ -198,7 +198,7 @@
     <verb>
      vlc [file name]
     </verb>
-    To play a dvd, if you dvd device is "/dev/dvd", you'll type :
+    To play a dvd, if your dvd device is "/dev/dvd", you'll type :
     <verb>
      vlc dvd:/dev/dvd
     </verb>
@@ -393,7 +393,7 @@
   </p>
   <p>
    When you're done with Makefile.opts (which also works if you leave it untouched), just 
-   make, typing :
+   type:
     <verb>
     make
     </verb>
@@ -418,7 +418,7 @@
   <heading>Using the videolan network solution</heading>
   <p>
    I'll only speak about the vlc here. There will be a howto on the whole network solution.
-   You have to say to the vlc that it'll receive network streams. This can be done either by *
+   You have to tell the vlc that it will receive network streams. This can be done either by
    using the "network" button of the interface, or in the command line : 
    <verb>
     vlc ts://server[:port]
