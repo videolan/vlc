@@ -955,6 +955,13 @@ then
   PLUGINS="${PLUGINS} packetizer_copy"
 
   PLUGINS="${PLUGINS} vout_encoder"
+
+    dnl Ogg/ogm
+    AC_CHECK_HEADERS(ogg/ogg.h, [
+      AC_CHECK_LIB( ogg, ogg_stream_packetin, [
+        PLUGINS="${PLUGINS} mux_ogg"
+        LDFLAGS_mux_ogg="${LDFLAGS_mux_ogg} -logg" ])
+    ],[])
 fi
 
 
