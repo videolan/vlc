@@ -2,7 +2,7 @@
  * asf.c
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: asf.c,v 1.4 2003/08/25 23:39:20 fenrir Exp $
+ * $Id: asf.c,v 1.5 2003/08/26 23:14:11 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -248,9 +248,17 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     i_tag = WAVE_FORMAT_A52;
                     break;
                 case VLC_FOURCC( 'm', 'p', 'g', 'a' ):
+#if 1
                     i_tag = WAVE_FORMAT_MPEGLAYER3;
+                    i_blockalign = 1;
                     i_extra = 12;
                     break;
+#else
+                    i_tag = WAVE_FORMAT_MPEG;
+                    i_blockalign = 1;
+                    i_extra = 22;
+                    break;
+#endif
                 case VLC_FOURCC( 'w', 'm', 'a', '1' ):
                     i_tag = WAVE_FORMAT_WMA1;
                     break;
@@ -285,7 +293,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     return VLC_EGENERIC;
             }
 
-            tk->i_extra = sizeof( WAVEFORMATEX ) + p_input->p_fmt->i_extra_data;
+            tk->i_extra = sizeof( WAVEFORMATEX ) +
+                          p_input->p_fmt->i_extra_data + i_extra;
             tk->p_extra = malloc( tk->i_extra );
             bo_init( &bo, tk->p_extra, tk->i_extra );
             bo_addle_u16( &bo, i_tag );
@@ -305,11 +314,24 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 bo_addle_u16( &bo, i_extra );
                 if( i_tag == WAVE_FORMAT_MPEGLAYER3 )
                 {
+                    msg_Dbg( p_mux, "adding mp3 header" );
                     bo_addle_u16( &bo, 1 );     /* wId */
                     bo_addle_u32( &bo, 2 );     /* fdwFlags */
                     bo_addle_u16( &bo, 1152 );  /* nBlockSize */
                     bo_addle_u16( &bo, 1 );     /* nFramesPerBlock */
                     bo_addle_u16( &bo, 1393 );  /* nCodecDelay */
+                }
+                else if( i_tag == WAVE_FORMAT_MPEG )
+                {
+                    msg_Dbg( p_mux, "adding mp2 header" );
+                    bo_addle_u16( &bo, 2 );     /* fwHeadLayer */
+                    bo_addle_u32( &bo, p_input->p_fmt->i_bitrate );
+                    bo_addle_u16( &bo, p_input->p_fmt->i_channels == 2 ?1:8 );
+                    bo_addle_u16( &bo, 0 );     /* fwHeadModeExt */
+                    bo_addle_u16( &bo, 1 );     /* wHeadEmphasis */
+                    bo_addle_u16( &bo, 16 );    /* fwHeadFlags */
+                    bo_addle_u32( &bo, 0 );     /* dwPTSLow */
+                    bo_addle_u32( &bo, 0 );     /* dwPTSHigh */
                 }
             }
 
@@ -348,6 +370,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             {
                 bo_add_mem( &bo, "MP43", 4 );
             }
+            else if( p_input->p_fmt->i_fourcc == VLC_FOURCC('D','I','V','2') )
+            {
+                bo_add_mem( &bo, "MP42", 4 );
+            }
+            else if( p_input->p_fmt->i_fourcc == VLC_FOURCC('D','I','V','1') )
+            {
+                bo_add_mem( &bo, "MPG4", 4 );
+            }
             else
             {
                 bo_add_mem( &bo, (uint8_t*)&p_input->p_fmt->i_fourcc, 4 );
@@ -363,7 +393,14 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                               p_input->p_fmt->i_extra_data );
             }
 
-            p_sys->i_bitrate += 1000000;
+            if( p_input->p_fmt->i_bitrate > 50000 )
+            {
+                p_sys->i_bitrate += p_input->p_fmt->i_bitrate;
+            }
+            else
+            {
+                p_sys->i_bitrate += 1000000;
+            }
             break;
         }
         default:
@@ -690,7 +727,7 @@ static sout_buffer_t *asf_header_create( sout_mux_t *p_mux,
     bo_addle_u64( &bo, b_broadcast ? 0xffffffffLL : p_sys->i_packet_count );
     bo_addle_u64( &bo, i_duration * 10 );   /* play duration (100ns) */
     bo_addle_u64( &bo, i_duration * 10 );   /* send duration (100ns) */
-    bo_addle_u64( &bo, 4000 );              /* preroll duration (ms) */
+    bo_addle_u64( &bo, 3000 );              /* preroll duration (ms) */
     bo_addle_u32( &bo, b_broadcast ? 0x01 : 0x00);      /* flags */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size min */
     bo_addle_u32( &bo, p_sys->i_packet_size );  /* packet size max */
