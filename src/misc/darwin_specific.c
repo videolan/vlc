@@ -2,7 +2,7 @@
  * darwin_specific.c: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.10 2002/06/01 12:32:01 sam Exp $
+ * $Id: darwin_specific.c,v 1.11 2002/06/02 01:20:52 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -76,7 +76,7 @@ void system_Configure( vlc_object_t *p_this )
 /*****************************************************************************
  * system_End: free the program path.
  *****************************************************************************/
-void system_End( vlc_object_t * )
+void system_End( vlc_object_t *p_this )
 {
     free( psz_program_path );
 }

@@ -2,7 +2,7 @@
  * intf_controller.h: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: intf_controller.h,v 1.8 2002/05/20 05:20:12 jlj Exp $
+ * $Id: intf_controller.h,v 1.9 2002/06/02 01:20:52 massiot Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *
@@ -76,6 +76,8 @@
 - (IBAction)slower:(id)sender;
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;
+- (IBAction)prevChannel:(id)sender;
+- (IBAction)nextChannel:(id)sender;
 - (IBAction)mute:(id)sender;
 - (IBAction)fullscreen:(id)fullscreen;
 - (IBAction)eject:(id)sender;

@@ -9,9 +9,11 @@
                 maxvolume = id; 
                 mute = id; 
                 next = id; 
+                nextChannel = id; 
                 pause = id; 
                 play = id; 
                 prev = id; 
+                prevChannel = id; 
                 quit = id; 
                 slower = id; 
                 stop = id; 
