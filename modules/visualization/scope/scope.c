@@ -2,7 +2,7 @@
  * scope.c : Scope effect module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: scope.c,v 1.1 2002/08/04 17:23:44 sam Exp $
+ * $Id: scope.c,v 1.2 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -288,7 +288,7 @@ static void Close( vlc_object_t *p_this )
 
     /* Kill audio output */
     module_Unneed( p_aout->p_sys->p_aout, p_aout->p_sys->p_aout->p_module );
-    vlc_object_detach_all( p_aout->p_sys->p_aout );
+    vlc_object_detach( p_aout->p_sys->p_aout );
     vlc_object_destroy( p_aout->p_sys->p_aout );
 
     /* Kill video output */

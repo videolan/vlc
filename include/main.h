@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.43 2002/08/09 16:39:08 sam Exp $
+ * $Id: main.h,v 1.44 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -58,21 +58,24 @@ struct vlc_t
     void* ( *pf_memset ) ( void *, int, size_t );
 
     /* The module bank */
-    module_bank_t * p_module_bank;
+    module_bank_t *        p_module_bank;
 
     /* The message bank */
-    msg_bank_t      msg_bank;
+    msg_bank_t             msg_bank;
 
     /* Shared data - these structures are accessed directly from p_vlc by
      * several modules */
-    intf_msg_t *           p_msg;                 /* messages interface data */
     input_channel_t *      p_channel;                /* channel library data */
 
     /* Locks */
     vlc_mutex_t            config_lock;          /* lock for the config file */
     vlc_mutex_t            structure_lock;        /* lock for the p_vlc tree */
+
+    /* Object structure data */
     int                    i_unique;                    /* p_vlc occurence # */
     int                    i_counter;                      /* object counter */
+    int                    i_objects;              /* Attached objects count */
+    vlc_object_t **        pp_objects;               /* Array of all objects */
 
     /* Pointer to the big, evil global lock */
     vlc_mutex_t *          p_global_lock;

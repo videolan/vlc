@@ -2,7 +2,7 @@
  * oss.c : OSS /dev/dsp module for vlc
  *****************************************************************************
  * Copyright (C) 2000-2002 VideoLAN
- * $Id: oss.c,v 1.6 2002/08/11 22:36:35 massiot Exp $
+ * $Id: oss.c,v 1.7 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -293,9 +293,8 @@ static int OSSThread( aout_instance_t * p_aout )
 
     while ( !p_sys->b_die )
     {
-        int i_bytes_per_sample;
         aout_buffer_t * p_buffer;
-        mtime_t next_date;
+        mtime_t next_date = 0;
         int i_tmp, i_size;
         byte_t * p_bytes;
 

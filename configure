@@ -7108,7 +7108,7 @@ echo "configure:7097: checking for libfaad.a in ${with_faad_tree}" >&5
       faad_CFLAGS="${faad_CFLAGS} -I${real_faad_tree}/include"
     else
             echo "$ac_t""no" 1>&6
-      { echo "configure: error: cannot find ${real_faad_tree}/.libs/libfaad.a, make sure you compiled libfaad in ${with_faad_tree}" 1>&2; exit 1; }
+      { echo "configure: error: cannot find ${real_faad_tree}/libfaad/.libs/libfaad.a, make sure you compiled libfaad in ${with_faad_tree}" 1>&2; exit 1; }
     fi
   else
     CFLAGS="${save_CFLAGS} ${faad_CFLAGS}"

@@ -1095,7 +1095,7 @@ then
     else
       dnl  The given libfaad wasn't built
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_faad_tree}/.libs/libfaad.a, make sure you compiled libfaad in ${with_faad_tree}])
+      AC_MSG_ERROR([cannot find ${real_faad_tree}/libfaad/.libs/libfaad.a, make sure you compiled libfaad in ${with_faad_tree}])
     fi
   else
     CFLAGS="${save_CFLAGS} ${faad_CFLAGS}"

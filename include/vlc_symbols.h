@@ -93,8 +93,7 @@ struct module_symbols_t
     void (* __vlc_dumpstructure_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_attach_inner) ( vlc_object_t *, vlc_object_t * ) ;
     void (* __vlc_object_destroy_inner) ( vlc_object_t * ) ;
-    void (* __vlc_object_detach_all_inner) ( vlc_object_t * ) ;
-    void (* __vlc_object_detach_inner) ( vlc_object_t *, vlc_object_t * ) ;
+    void (* __vlc_object_detach_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_release_inner) ( vlc_object_t * ) ;
     void (* __vlc_object_yield_inner) ( vlc_object_t * ) ;
     void (* __vlc_thread_join_inner) ( vlc_object_t *, char *, int ) ;
@@ -191,7 +190,6 @@ struct module_symbols_t
 #   define __vlc_object_create p_symbols->__vlc_object_create_inner
 #   define __vlc_object_destroy p_symbols->__vlc_object_destroy_inner
 #   define __vlc_object_detach p_symbols->__vlc_object_detach_inner
-#   define __vlc_object_detach_all p_symbols->__vlc_object_detach_all_inner
 #   define __vlc_object_find p_symbols->__vlc_object_find_inner
 #   define __vlc_object_release p_symbols->__vlc_object_release_inner
 #   define __vlc_object_yield p_symbols->__vlc_object_yield_inner

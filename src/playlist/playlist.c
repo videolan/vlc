@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.9 2002/06/07 23:53:44 sam Exp $
+ * $Id: playlist.c,v 1.10 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -329,7 +329,7 @@ static void RunThread ( playlist_t *p_playlist )
                 /* Unlink current input */
                 p_input = p_playlist->p_input;
                 p_playlist->p_input = NULL;
-                vlc_object_detach_all( p_input );
+                vlc_object_detach( p_input );
 
                 /* Release the playlist lock, because we may get stuck
                  * in input_DestroyThread() for some time. */
@@ -387,7 +387,7 @@ static void RunThread ( playlist_t *p_playlist )
             /* Unlink current input */
             p_input = p_playlist->p_input;
             p_playlist->p_input = NULL;
-            vlc_object_detach_all( p_input );
+            vlc_object_detach( p_input );
             vlc_mutex_unlock( &p_playlist->object_lock );
 
             /* Destroy input */

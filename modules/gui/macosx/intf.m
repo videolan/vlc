@@ -2,7 +2,7 @@
  * intf.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.m,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: intf.m,v 1.2 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -402,7 +402,7 @@ static void Run( intf_thread_t *p_intf )
     while( (p_playlist = vlc_object_find( p_intf->p_vlc, VLC_OBJECT_PLAYLIST,
                                           FIND_CHILD )) )
     {
-        vlc_object_detach_all( p_playlist );
+        vlc_object_detach( p_playlist );
         vlc_object_release( p_playlist );
         playlist_Destroy( p_playlist );
     }
@@ -414,7 +414,7 @@ static void Run( intf_thread_t *p_intf )
     while( (p_vout = vlc_object_find( p_intf->p_vlc, 
                                       VLC_OBJECT_VOUT, FIND_CHILD )) )
     {
-        vlc_object_detach_all( p_vout );
+        vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         vout_DestroyThread( p_vout );
     }

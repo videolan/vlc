@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.43 2002/08/08 00:35:11 sam Exp $
+ * $Id: input_dec.c,v 1.44 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -245,7 +245,7 @@ static decoder_fifo_t * CreateDecoderFifo( input_thread_t * p_input,
  *****************************************************************************/
 static void DeleteDecoderFifo( decoder_fifo_t * p_fifo )
 {
-    vlc_object_detach_all( p_fifo );
+    vlc_object_detach( p_fifo );
 
     msg_Dbg( p_fifo, "killing decoder for 0x%x, fourcc `%4.4s', %d PES in FIFO",
                      p_fifo->i_id, (char*)&p_fifo->i_fourcc, p_fifo->i_depth );

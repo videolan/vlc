@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.15 2002/08/08 00:35:11 sam Exp $
+ * $Id: objects.c,v 1.16 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -47,8 +47,10 @@
  * Local prototypes
  *****************************************************************************/
 static vlc_object_t * vlc_object_find_inner( vlc_object_t *, int, int );
-static void vlc_object_detach_inner( vlc_object_t *, vlc_object_t * );
+static void vlc_object_detach_inner( vlc_object_t * );
 static void vlc_dumpstructure_inner( vlc_object_t *, int, char * );
+static int  find_index_inner( vlc_object_t *, vlc_object_t **, int );
+static void set_attachment_flag( vlc_object_t *, vlc_bool_t );
 
 /*****************************************************************************
  * vlc_object_create: initialize a vlc object
@@ -120,28 +122,46 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
     p_new->psz_object_name = NULL;
 
     p_new->i_refcount = 0;
-    p_new->b_die = 0;
-    p_new->b_error = 0;
+    p_new->b_die = VLC_FALSE;
+    p_new->b_error = VLC_FALSE;
+    p_new->b_dead = VLC_FALSE;
+    p_new->b_attached = VLC_FALSE;
 
     /* If i_type is root, then p_new is our own p_vlc */
     if( i_type == VLC_OBJECT_ROOT )
     {
+        /* We are the first object ... no need to lock. */
         p_new->p_vlc = (vlc_t*)p_new;
+
         p_new->p_vlc->i_counter = 0;
         p_new->i_object_id = 0;
+
+        p_new->p_vlc->i_objects = 1;
+        p_new->p_vlc->pp_objects = malloc( sizeof(vlc_object_t *) );
+        p_new->p_vlc->pp_objects[0] = p_new;
+        p_new->b_attached = VLC_TRUE;
     }
     else
     {
         p_new->p_vlc = p_this->p_vlc;
 
         vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+
         p_new->p_vlc->i_counter++;
         p_new->i_object_id = p_new->p_vlc->i_counter;
+
+        /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
+         * useless to try and recover anything if pp_objects gets smashed. */
+        p_new->p_vlc->i_objects++;
+        p_new->p_vlc->pp_objects =
+                  realloc( p_new->p_vlc->pp_objects,
+                           p_new->p_vlc->i_objects * sizeof(vlc_object_t *) );
+        p_new->p_vlc->pp_objects[ p_new->p_vlc->i_objects - 1 ] = p_new;
+
         vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
     }
 
-    p_new->pp_parents = NULL;
-    p_new->i_parents = 0;
+    p_new->p_parent = NULL;
     p_new->pp_children = NULL;
     p_new->i_children = 0;
 
@@ -171,9 +191,9 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         return;
     }
 
-    if( p_this->i_parents )
+    if( p_this->p_parent )
     {
-        msg_Err( p_this, "cannot delete object with parents" );
+        msg_Err( p_this, "cannot delete object with a parent" );
         vlc_dumpstructure( p_this );
         return;
     }
@@ -202,10 +222,76 @@ void __vlc_object_destroy( vlc_object_t *p_this )
         msleep( 100000 );
     }
 
+    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
+
+    /* Wooohaa! If *this* fails, we're in serious trouble! Anyway it's
+     * useless to try and recover anything if pp_objects gets smashed. */
+    if( p_this->p_vlc->i_objects > 1 )
+    {
+        int i_index = find_index_inner( p_this, p_this->p_vlc->pp_objects,
+                                                p_this->p_vlc->i_objects );
+        memmove( p_this->p_vlc->pp_objects + i_index,
+                 p_this->p_vlc->pp_objects + i_index + 1,
+                 p_this->p_vlc->i_objects - i_index - 1 );
+
+        p_this->p_vlc->pp_objects =
+            realloc( p_this->p_vlc->pp_objects,
+                     (p_this->p_vlc->i_objects - 1) * sizeof(vlc_object_t *) );
+    }
+    else
+    {
+        free( p_this->p_vlc->pp_objects );
+        p_this->p_vlc->pp_objects = NULL;
+    }
+
+    p_this->p_vlc->i_objects--;
+
+    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+
     vlc_mutex_destroy( &p_this->object_lock );
     vlc_cond_destroy( &p_this->object_wait );
 
     free( p_this );
+}
+
+/*****************************************************************************
+ * find_index_inner: find the index of an object in an array of objects
+ *****************************************************************************
+ * This function assumes that p_this can be found in pp_objects. It will not
+ * crash if p_this cannot be found, but will return a random value. It is your
+ * duty to check the return value if you are not certain that the object could
+ * be found for sure.
+ *****************************************************************************/
+static int find_index_inner( vlc_object_t *p_this,
+                             vlc_object_t **pp_objects, int i_count )
+{
+    int i_middle = i_count / 2;
+
+    if( i_count == 0 )
+    {
+        return 0;
+    }
+
+    if( pp_objects[i_middle] == p_this )
+    {
+        return i_middle;
+    }
+
+    if( i_count == 1 )
+    {
+        return 0;
+    }
+
+    /* We take advantage of the sorted array */
+    if( pp_objects[i_middle]->i_object_id < p_this->i_object_id )
+    {
+        return i_middle + find_index_inner( p_this, pp_objects + i_middle,
+                                                    i_count - i_middle );
+    }
+    else
+    {
+        return find_index_inner( p_this, pp_objects, i_middle );
+    }
 }
 
 /*****************************************************************************
@@ -254,21 +340,17 @@ static vlc_object_t * vlc_object_find_inner( vlc_object_t *p_this,
     switch( i_mode & 0x000f )
     {
     case FIND_PARENT:
-        for( i = p_this->i_parents; i--; )
+        p_tmp = p_this->p_parent;
+        if( p_tmp )
         {
-            p_tmp = p_this->pp_parents[i];
             if( p_tmp->i_object_type == i_type )
             {
                 p_tmp->i_refcount++;
                 return p_tmp;
             }
-            else if( p_tmp->i_parents )
+            else
             {
-                p_tmp = vlc_object_find_inner( p_tmp, i_type, i_mode );
-                if( p_tmp )
-                {
-                    return p_tmp;
-                }
+                return vlc_object_find_inner( p_tmp, i_type, i_mode );
             }
         }
         break;
@@ -331,102 +413,56 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 {
     vlc_mutex_lock( &p_this->p_vlc->structure_lock );
 
-    p_this->i_parents++;
-    p_this->pp_parents = (vlc_object_t **)realloc( p_this->pp_parents,
-                            p_this->i_parents * sizeof(vlc_object_t *) );
-    p_this->pp_parents[p_this->i_parents - 1] = p_parent;
+    /* Attach the parent to its child */
+    p_this->p_parent = p_parent;
 
+    /* Attach the child to its parent */
     p_parent->i_children++;
     p_parent->pp_children = (vlc_object_t **)realloc( p_parent->pp_children,
                                p_parent->i_children * sizeof(vlc_object_t *) );
     p_parent->pp_children[p_parent->i_children - 1] = p_this;
 
-    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
-}
-
-#if 0 /* UNUSED */
-/* vlc_object_setchild: attach a child object */
-void __vlc_object_setchild( vlc_object_t *p_this, vlc_object_t *p_child )
-{
-    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-
-    p_this->i_children++;
-    p_this->pp_children = (vlc_object_t **)realloc( p_this->pp_children,
-                             p_this->i_children * sizeof(vlc_object_t *) );
-    p_this->pp_children[p_this->i_children - 1] = p_child;
-
-    p_child->i_parents++;
-    p_child->pp_parents = (vlc_object_t **)realloc( p_child->pp_parents,
-                             p_child->i_parents * sizeof(vlc_object_t *) );
-    p_child->pp_parents[p_child->i_parents - 1] = p_this;
-
-    vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
-}
-#endif
-
-/*****************************************************************************
- * vlc_object_detach_all: detach object from its parents
- *****************************************************************************
- * This function unlinks an object from all its parents. It is up to the
- * object to get rid of its children, so this function doesn't do anything
- * with them.
- *****************************************************************************/
-void __vlc_object_detach_all( vlc_object_t *p_this )
-{
-    vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-
-    /* FIXME: BORK ! BORK ! BORK !!! THIS STUFF IS BORKED !! FIXME */
-    while( p_this->i_parents )
+    /* Climb up the tree to see whether we are connected with the root */
+    if( p_parent->b_attached )
     {
-        /* Not very effective because we know the index, but we'd have to
-         * parse p_parent->pp_children anyway. Plus, we remove duplicates
-         * by not using the object's index */
-        vlc_object_detach_inner( p_this, p_this->pp_parents[0] );
+        set_attachment_flag( p_this, VLC_TRUE );
     }
 
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 }
 
 /*****************************************************************************
- * vlc_object_detach: remove a parent/child link
+ * vlc_object_detach: detach object from its parent
  *****************************************************************************
- * This function removes all links between an object and a given parent.
+ * This function removes all links between an object and its parent.
  *****************************************************************************/
-void __vlc_object_detach( vlc_object_t *p_this, vlc_object_t *p_parent )
+void __vlc_object_detach( vlc_object_t *p_this )
 {
     vlc_mutex_lock( &p_this->p_vlc->structure_lock );
-    vlc_object_detach_inner( p_this, p_parent );
+    if( !p_this->p_parent )
+    {
+        msg_Err( p_this, "object is not attached" );
+        vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
+        return;
+    }
+
+    /* Climb up the tree to see whether we are connected with the root */
+    if( p_this->p_parent->b_attached )
+    {
+        set_attachment_flag( p_this, VLC_FALSE );
+    }
+
+    vlc_object_detach_inner( p_this );
     vlc_mutex_unlock( &p_this->p_vlc->structure_lock );
 }
 
-static void vlc_object_detach_inner( vlc_object_t *p_this,
-                                     vlc_object_t *p_parent )
+static void vlc_object_detach_inner( vlc_object_t *p_this )
 {
+    vlc_object_t *p_parent = p_this->p_parent;
     int i_index, i;
 
-    /* Remove all of p_this's parents which are p_parent */
-    for( i_index = p_this->i_parents ; i_index-- ; )
-    {
-        if( p_this->pp_parents[i_index] == p_parent )
-        {
-            p_this->i_parents--;
-            for( i = i_index ; i < p_this->i_parents ; i++ )
-            {
-                p_this->pp_parents[i] = p_this->pp_parents[i+1];
-            }
-        }
-    }
-
-    if( p_this->i_parents )
-    {
-        p_this->pp_parents = (vlc_object_t **)realloc( p_this->pp_parents,
-                                p_this->i_parents * sizeof(vlc_object_t *) );
-    }
-    else
-    {
-        free( p_this->pp_parents );
-        p_this->pp_parents = NULL;
-    }
+    /* Remove p_this's parent */
+    p_this->p_parent = NULL;
 
     /* Remove all of p_parent's children which are p_this */
     for( i_index = p_parent->i_children ; i_index-- ; )
@@ -451,6 +487,24 @@ static void vlc_object_detach_inner( vlc_object_t *p_this,
         free( p_parent->pp_children );
         p_parent->pp_children = NULL;
     }
+}
+
+/*****************************************************************************
+ * set_attachment_flag: recursively set the b_attached flag of a subtree.
+ *****************************************************************************
+ * This function is used by the attach and detach functions to propagate
+ * the b_attached flag in a subtree.
+ *****************************************************************************/
+static void set_attachment_flag( vlc_object_t *p_this, vlc_bool_t b_attached )
+{
+    int i_index;
+
+    for( i_index = p_this->i_children ; i_index-- ; )
+    {
+        set_attachment_flag( p_this->pp_children[i_index], b_attached );
+    }
+
+    p_this->b_attached = b_attached;
 }
 
 /*****************************************************************************

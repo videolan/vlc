@@ -2,7 +2,7 @@
  * dv.c: a decoder for DV video
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dv.c,v 1.1 2002/08/05 15:16:18 sam Exp $
+ * $Id: dv.c,v 1.2 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *      
@@ -162,7 +162,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
              || p_vout->render.i_aspect != i_aspect )
             {
                 /* We are not interested in this format, close this vout */
-                vlc_object_detach_all( p_vout );
+                vlc_object_detach( p_vout );
                 vlc_object_release( p_vout );
                 vout_DestroyThread( p_vout );
                 p_vout = NULL;
@@ -170,7 +170,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
             else
             {
                 /* This video output is cool! Hijack it. */
-                vlc_object_detach_all( p_vout );
+                vlc_object_detach( p_vout );
                 vlc_object_attach( p_vout, p_fifo );
                 vlc_object_release( p_vout );
             }

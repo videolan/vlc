@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.3 2002/08/04 20:04:11 sam Exp $
+ * $Id: parser.c,v 1.4 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -315,7 +315,7 @@ static void EndThread( vpar_thread_t *p_vpar )
         }
 
         /* We are about to die. Reattach video output to p_vlc. */
-        vlc_object_detach( p_vpar->p_vout, p_vpar->p_fifo );
+        vlc_object_detach( p_vpar->p_vout );
         vlc_object_attach( p_vpar->p_vout, p_vpar->p_fifo->p_vlc );
     }
 

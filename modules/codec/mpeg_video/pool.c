@@ -2,7 +2,7 @@
  * vpar_pool.c : management of the pool of decoder threads
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: pool.c,v 1.2 2002/08/04 18:39:41 sam Exp $
+ * $Id: pool.c,v 1.3 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -125,7 +125,7 @@ void vpar_SpawnPool( vpar_thread_t * p_vpar )
             {
                 int j;
 
-                vlc_object_detach_all( p_vpar->pool.pp_vdec[i] );
+                vlc_object_detach( p_vpar->pool.pp_vdec[i] );
                 vdec_DestroyThread( p_vpar->pool.pp_vdec[i] );
 
                 for( j = 0; j < 12; j++ )
@@ -218,7 +218,7 @@ void vpar_EndPool( vpar_thread_t * p_vpar )
     {
         int j;
 
-        vlc_object_detach_all( p_vpar->pool.pp_vdec[i] );
+        vlc_object_detach( p_vpar->pool.pp_vdec[i] );
         vdec_DestroyThread( p_vpar->pool.pp_vdec[i] );
 
         for( j = 0; j < 12; j++ )
@@ -235,7 +235,7 @@ void vpar_EndPool( vpar_thread_t * p_vpar )
     }
 
     /* Free fake video decoder (used when parser == decoder). */
-    vlc_object_detach_all( p_vpar->pool.p_vdec );
+    vlc_object_detach( p_vpar->pool.p_vdec );
     vdec_EndThread( p_vpar->pool.p_vdec );
     vlc_object_destroy( p_vpar->pool.p_vdec );
 

@@ -2,7 +2,7 @@
  * beos_init.cpp: Initialization for BeOS specific features 
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: beos_specific.cpp,v 1.23 2002/06/02 14:26:15 gbazin Exp $
+ * $Id: beos_specific.cpp,v 1.24 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *
@@ -114,7 +114,7 @@ static void AppThread( vlc_object_t * p_this )
     vlc_object_attach( p_this, p_this->p_vlc );
     BeApp->p_this = p_this;
     BeApp->Run();
-    vlc_object_detach_all( p_this );
+    vlc_object_detach( p_this );
     delete BeApp;
 }
 

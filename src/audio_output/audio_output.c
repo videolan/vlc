@@ -2,7 +2,7 @@
  * audio_output.c : audio output instance
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.c,v 1.93 2002/08/11 23:26:28 massiot Exp $
+ * $Id: audio_output.c,v 1.94 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -77,7 +77,6 @@ void aout_DeleteInstance( aout_instance_t * p_aout )
     vlc_cond_destroy( &p_aout->mixer_signal );
 
     /* Free structure. */
-    vlc_object_detach_all( p_aout );
     vlc_object_destroy( p_aout );
 }
 

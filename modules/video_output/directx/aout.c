@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout.c,v 1.2 2002/08/10 18:17:06 gbazin Exp $
+ * $Id: aout.c,v 1.3 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -265,7 +265,7 @@ void E_(CloseAudio) ( vlc_object_t *p_this )
     /* kill the position notification thread, if any */
     if( p_aout->output.p_sys->p_notif )
     {
-        vlc_object_detach_all( p_aout->output.p_sys->p_notif );
+        vlc_object_detach( p_aout->output.p_sys->p_notif );
         if( p_aout->output.p_sys->p_notif->b_thread )
         {
             p_aout->output.p_sys->p_notif->b_die = 1;

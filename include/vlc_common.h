@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.17 2002/08/10 19:23:06 sam Exp $
+ * $Id: vlc_common.h,v 1.18 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -245,12 +245,12 @@ typedef struct iso639_lang_t iso639_lang_t;
     volatile vlc_bool_t b_error;                    /* set by the object */ \
     volatile vlc_bool_t b_die;                     /* set by the outside */ \
     volatile vlc_bool_t b_dead;                     /* set by the object */ \
+    volatile vlc_bool_t b_attached;                 /* set by the object */ \
                                                                             \
     vlc_t *         p_vlc;                           /* root of all evil */ \
                                                                             \
-    volatile int    i_refcount;                                             \
-    vlc_object_t ** pp_parents;                           /* our parents */ \
-    volatile int    i_parents;                                              \
+    volatile int    i_refcount;                           /* usage count */ \
+    vlc_object_t *  p_parent;                              /* our parent */ \
     vlc_object_t ** pp_children;                         /* our children */ \
     volatile int    i_children;                                             \
                                                                             \

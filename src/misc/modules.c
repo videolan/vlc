@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.82 2002/08/08 00:35:11 sam Exp $
+ * $Id: modules.c,v 1.83 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -155,7 +155,7 @@ void __module_EndBank( vlc_object_t *p_this )
 {
     module_t * p_next;
 
-    vlc_object_detach_all( p_this->p_vlc->p_module_bank );
+    vlc_object_detach( p_this->p_vlc->p_module_bank );
 
     while( p_this->p_vlc->p_module_bank->first != NULL )
     {
@@ -938,7 +938,7 @@ static int DeleteModule( module_t * p_module )
     }
 #endif
 
-    vlc_object_detach_all( p_module );
+    vlc_object_detach( p_module );
 
     /* Unlink the module from the linked list. */
     if( p_module->prev != NULL )
@@ -971,7 +971,7 @@ static int DeleteModule( module_t * p_module )
     while( p_module->i_children )
     {
         vlc_object_t *p_this = p_module->pp_children[0];
-        vlc_object_detach_all( p_this );
+        vlc_object_detach( p_this );
         vlc_object_destroy( p_this );
     }
 

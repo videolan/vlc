@@ -10,7 +10,8 @@ export DH_COMPAT=3
 
 # Compilation options
 export FFMPEG_VERSION=cvs
-export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-ffmpeg --with-ffmpeg-tree=ffmpeg-$(FFMPEG_VERSION) --enable-mp4 --enable-dvb --enable-dv"
+export FAAD_VERSION=cvs
+export CONFIG_FLAGS="--enable-release --prefix=/usr --enable-gnome --enable-gtk --enable-fb --enable-ggi --enable-sdl --enable-esd --enable-qt --enable-mad --enable-arts --enable-alsa --enable-lirc --enable-a52 --enable-aa --enable-dvbpsi --enable-xosd --enable-mozilla --enable-kde --enable-ffmpeg --with-ffmpeg-tree=ffmpeg-$(FFMPEG_VERSION) --enable-mp4 --enable-dvb --enable-dv --enable-faad --with-faad-tree=faad-$(FAAD_VERSION)"
 # Remove --without-dvdcss here in non-totalitarian countries
 export DVDCSS_FLAGS="--enable-dvd --without-dvdcss"
 

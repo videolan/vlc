@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: headers.c,v 1.2 2002/08/04 18:39:41 sam Exp $
+ * $Id: headers.c,v 1.3 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -311,6 +311,8 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     int i_height_save, i_width_save, i_aspect;
 
+    vout_thread_t *p_vout;
+
     i_height_save = p_vpar->sequence.i_height;
     i_width_save = p_vpar->sequence.i_width;
 
@@ -488,35 +490,39 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
 
     /* Spawn a video output if there is none. First we look for our children,
      * then we look for any other vout that might be available. */
-    p_vpar->p_vout = vlc_object_find( p_vpar->p_fifo, VLC_OBJECT_VOUT,
-                                                      FIND_CHILD );
-    if( p_vpar->p_vout == NULL )
+    p_vout = vlc_object_find( p_vpar->p_fifo, VLC_OBJECT_VOUT, FIND_CHILD );
+    if( p_vout == NULL )
     {
-        p_vpar->p_vout = vlc_object_find( p_vpar->p_fifo, VLC_OBJECT_VOUT,
-                                                          FIND_ANYWHERE );
+        p_vout = vlc_object_find( p_vpar->p_fifo, VLC_OBJECT_VOUT,
+                                                  FIND_ANYWHERE );
     }
     
-    if( p_vpar->p_vout )
+    if( p_vout )
     {
-        if( p_vpar->p_vout->render.i_width != p_vpar->sequence.i_width
-             || p_vpar->p_vout->render.i_height != p_vpar->sequence.i_height
-             || p_vpar->p_vout->render.i_chroma != ChromaToFourCC( p_vpar->sequence.i_chroma_format )
-             || p_vpar->p_vout->render.i_aspect != p_vpar->sequence.i_aspect )
+        if( p_vout->render.i_width != p_vpar->sequence.i_width
+             || p_vout->render.i_height != p_vpar->sequence.i_height
+             || p_vout->render.i_chroma != ChromaToFourCC( p_vpar->sequence.i_chroma_format )
+             || p_vout->render.i_aspect != p_vpar->sequence.i_aspect )
         {
             /* We are not interested in this format, close this vout */
-            vlc_object_detach_all( p_vpar->p_vout );
-            vlc_object_release( p_vpar->p_vout );
-            vout_DestroyThread( p_vpar->p_vout );
-            p_vpar->p_vout = NULL;
+            vlc_object_detach( p_vout );
+            vlc_object_release( p_vout );
+            vout_DestroyThread( p_vout );
+            p_vout = NULL;
         }
         else
         {
             /* This video output is cool! Hijack it. */
-            vlc_object_detach_all( p_vpar->p_vout );
-            vlc_object_attach( p_vpar->p_vout, p_vpar->p_fifo );
-            vlc_object_release( p_vpar->p_vout );
+            if( p_vout != p_vpar->p_vout )
+            {
+                vlc_object_detach( p_vout );
+                vlc_object_attach( p_vout, p_vpar->p_fifo );
+            }
+            vlc_object_release( p_vout );
         }
     }
+
+    p_vpar->p_vout = p_vout;
 
     if( p_vpar->p_fifo->b_die || p_vpar->p_fifo->b_error )
     {

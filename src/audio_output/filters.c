@@ -2,7 +2,7 @@
  * filters.c : audio output filters management
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: filters.c,v 1.2 2002/08/09 23:47:23 massiot Exp $
+ * $Id: filters.c,v 1.3 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -91,7 +91,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
         if ( pp_filters[0]->p_module == NULL )
         {
             msg_Err( p_aout, "couldn't find a filter for any conversion" );
-            vlc_object_detach_all( pp_filters[0] );
+            vlc_object_detach( pp_filters[0] );
             vlc_object_destroy( pp_filters[0] );
             return -1;
         }
@@ -101,7 +101,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     pp_filters[1] = vlc_object_create( p_aout, sizeof(aout_filter_t) );
     if ( pp_filters[1] == NULL )
     {
-        vlc_object_detach_all( pp_filters[0] );
+        vlc_object_detach( pp_filters[0] );
         vlc_object_destroy( pp_filters[0] );
         return -1;
     }
@@ -117,9 +117,9 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
     {
         msg_Err( p_aout,
                  "couldn't find a filter for the 2nd part of the conversion" );
-        vlc_object_detach_all( pp_filters[0] );
+        vlc_object_detach( pp_filters[0] );
         vlc_object_destroy( pp_filters[0] );
-        vlc_object_detach_all( pp_filters[1] );
+        vlc_object_detach( pp_filters[1] );
         vlc_object_destroy( pp_filters[1] );
         return -1;
     }
@@ -142,7 +142,7 @@ void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
     for ( i = 0; i < i_nb_filters; i++ )
     {
         module_Unneed( pp_filters[i], pp_filters[i]->p_module );
-        vlc_object_detach_all( pp_filters[i] );
+        vlc_object_detach( pp_filters[i] );
         vlc_object_destroy( pp_filters[i] );
     }
 }

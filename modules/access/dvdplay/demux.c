@@ -2,7 +2,7 @@
  * demux.c: demux functions for dvdplay.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: demux.c,v 1.2 2002/08/07 00:29:36 sam Exp $
+ * $Id: demux.c,v 1.3 2002/08/12 09:34:15 sam Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -132,7 +132,7 @@ void E_(EndDVD) ( vlc_object_t *p_this )
     if( p_intf != NULL )
     {
         intf_StopThread( p_intf );
-        vlc_object_detach_all( p_intf );
+        vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
         intf_Destroy( p_intf );
     }

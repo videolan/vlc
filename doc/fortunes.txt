@@ -197,3 +197,20 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+<ali> by the way i've never learnt the way to make figlets lool ...
+<lool> /exec -o figlet -f small 'ali is so stupid !'
+<sam> I'm not absolutely positive it was a good idea to teach her
+<sam> it's like handing a rocket launcher to a 6yr old ...
+
+  -- #videolan
+%
+<|sF|Vengance|> do u have any videos of porn u can send me?
+
+  -- #videolan
+%
+-+- Ourumov [www-data@brahma.via.ecp.fr] has joined #videolan
+<Ourumov> hey anybody here know videolan ?
+-*- SignOff: Ourumov (Client Quit)
+
+  -- #videolan
+%

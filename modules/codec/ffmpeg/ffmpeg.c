@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.4 2002/08/10 20:05:21 fenrir Exp $
+ * $Id: ffmpeg.c,v 1.5 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -413,7 +413,7 @@ static vout_thread_t *ffmpeg_CreateVout( videodec_thread_t *p_vdec,
                                i_width, i_height, i_aspect,i_chroma ) )
         {
             /* We are not interested in this format, close this vout */
-            vlc_object_detach_all( p_vout );
+            vlc_object_detach( p_vout );
             vlc_object_release( p_vout );
             vout_DestroyThread( p_vout );
             p_vout = NULL;
@@ -421,7 +421,7 @@ static vout_thread_t *ffmpeg_CreateVout( videodec_thread_t *p_vdec,
         else
         {
             /* This video output is cool! Hijack it. */
-            vlc_object_detach_all( p_vout );
+            vlc_object_detach( p_vout );
             vlc_object_attach( p_vout, p_vdec->p_fifo );
             vlc_object_release( p_vout );
         }
@@ -971,7 +971,7 @@ static void EndThread( videodec_thread_t *p_vdec )
     if( p_vdec->p_vout != NULL )
     {
         /* We are about to die. Reattach video output to p_vlc. */
-        vlc_object_detach( p_vdec->p_vout, p_vdec->p_fifo );
+        vlc_object_detach( p_vdec->p_vout );
         vlc_object_attach( p_vdec->p_vout, p_vdec->p_fifo->p_vlc );
     }
 

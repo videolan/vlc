@@ -2,7 +2,7 @@
  * libvlc.c: main libvlc source
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.c,v 1.24 2002/08/09 16:39:08 sam Exp $
+ * $Id: libvlc.c,v 1.25 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -589,7 +589,7 @@ vlc_error_t vlc_add_intf_r( vlc_t *p_vlc, const char *psz_module,
     err = intf_RunThread( p_intf );
     if( err )
     {
-        vlc_object_detach_all( p_intf );
+        vlc_object_detach( p_intf );
         intf_Destroy( p_intf );
         return err;
     }
@@ -629,7 +629,7 @@ vlc_error_t vlc_stop_r( vlc_t *p_vlc )
     while( (p_intf = vlc_object_find( p_vlc, VLC_OBJECT_INTF, FIND_CHILD )) )
     {
         intf_StopThread( p_intf );
-        vlc_object_detach_all( p_intf );
+        vlc_object_detach( p_intf );
         vlc_object_release( p_intf );
         intf_Destroy( p_intf );
     }
@@ -641,7 +641,7 @@ vlc_error_t vlc_stop_r( vlc_t *p_vlc )
     while( (p_playlist = vlc_object_find( p_vlc, VLC_OBJECT_PLAYLIST,
                                           FIND_CHILD )) )
     {
-        vlc_object_detach_all( p_playlist );
+        vlc_object_detach( p_playlist );
         vlc_object_release( p_playlist );
         playlist_Destroy( p_playlist );
     }
@@ -652,7 +652,7 @@ vlc_error_t vlc_stop_r( vlc_t *p_vlc )
     msg_Dbg( p_vlc, "removing all video outputs" );
     while( (p_vout = vlc_object_find( p_vlc, VLC_OBJECT_VOUT, FIND_CHILD )) )
     {
-        vlc_object_detach_all( p_vout );
+        vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         vout_DestroyThread( p_vout );
     }
@@ -663,7 +663,7 @@ vlc_error_t vlc_stop_r( vlc_t *p_vlc )
     msg_Dbg( p_vlc, "removing all audio outputs" );
     while( (p_aout = vlc_object_find( p_vlc, VLC_OBJECT_AOUT, FIND_CHILD )) )
     {
-        vlc_object_detach_all( (vlc_object_t *)p_aout );
+        vlc_object_detach( (vlc_object_t *)p_aout );
         vlc_object_release( (vlc_object_t *)p_aout );
         aout_DeleteInstance( p_aout );
     }

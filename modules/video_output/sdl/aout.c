@@ -2,7 +2,7 @@
  * aout_sdl.c : audio sdl functions library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: aout.c,v 1.2 2002/08/07 21:36:56 massiot Exp $
+ * $Id: aout.c,v 1.3 2002/08/12 09:34:15 sam Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -156,7 +156,7 @@ static void SDLCallback( void * _p_aout, byte_t * p_stream, int i_len )
     }
     else
     {
-        memset( p_stream, 0, i_len );
+        p_aout->p_vlc->pf_memset( p_stream, 0, i_len );
     }
 }
 
