@@ -83,7 +83,7 @@ void E_(ClosePostproc)( decoder_t *, void * );
     "ffmpeg can do error resilience.\n" \
     "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) " \
     "this can produce a lot of errors.\n" \
-    "Valid values range from -1 to 99 (-1 disables all errors resilience).")
+    "Valid values range from 0 to 4 (0 disables all errors resilience).")
 
 #define BUGS_TEXT N_("Workaround bugs")
 #define BUGS_LONGTEXT N_( \
@@ -110,6 +110,12 @@ void E_(ClosePostproc)( decoder_t *, void * );
 
 #define DEBUG_TEXT N_( "Debug mask" )
 #define DEBUG_LONGTEXT N_( "Set ffmpeg debug mask" )
+
+#define VISMV_TEXT N_( "Visualize motion vectors" )
+#define VISMV_LONGTEXT N_( "Set motion vectors visualization mask.\n" \
+    "1 - visualize forward predicted MVs of P frames\n" \
+    "2 - visualize forward predicted MVs of B frames\n" \
+    "4 - visualize backward predicted MVs of B frames" )
 
 #define LIBAVCODEC_PP_TEXT N_("ffmpeg post processing filter chains")
 /* FIXME (cut/past from ffmpeg */

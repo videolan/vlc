@@ -197,8 +197,6 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     decoder_sys_t *p_sys;
     vlc_value_t lockval;
     vlc_value_t val;
-    int i_tmp;
-
 
     var_Get( p_dec->p_libvlc, "avcodec", &lockval );
 
@@ -222,15 +220,18 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->bits_per_sample = p_dec->fmt_in.video.i_bits_per_pixel;
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
-    i_tmp = config_GetInt( p_dec, "ffmpeg-workaround-bugs" );
-    p_sys->p_context->workaround_bugs  = __MAX( __MIN( i_tmp, 99 ), 0 );
-
-    i_tmp = config_GetInt( p_dec, "ffmpeg-error-resilience" );
-    p_sys->p_context->error_resilience = __MAX( __MIN( i_tmp, 99 ), -1 );
+    p_sys->p_context->workaround_bugs =
+        config_GetInt( p_dec, "ffmpeg-workaround-bugs" );
+    p_sys->p_context->error_resilience =
+        config_GetInt( p_dec, "ffmpeg-error-resilience" );
 
     var_Create( p_dec, "grayscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "grayscale", &val );
     if( val.b_bool ) p_sys->p_context->flags |= CODEC_FLAG_GRAY;
+
+    var_Create( p_dec, "ffmpeg-vismv", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_dec, "ffmpeg-vismv", &val );
+    if( val.i_int ) p_sys->p_context->debug_mv = val.i_int;
 
     /* ***** ffmpeg frame skipping ***** */
     var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -245,7 +246,8 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
         ffmpeg_PixFmtToChroma( p_sys->p_context->pix_fmt ) &&
         /* Apparently direct rendering doesn't work with YUV422P */
         p_sys->p_context->pix_fmt != PIX_FMT_YUV422P &&
-        p_sys->i_codec_id != CODEC_ID_H264 &&   /* H264 use too many reference frames */
+        /* H264 uses too many reference frames */
+        p_sys->i_codec_id != CODEC_ID_H264 &&
         !(p_sys->p_context->width % 16) && !(p_sys->p_context->height % 16) )
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
@@ -519,10 +521,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
         /* Nothing to display */
         if( !b_gotpicture )
         {
-            if( i_used == 0 )
-            {
-                break;
-            }
+            if( i_used == 0 ) break;
             continue;
         }
 
@@ -538,7 +537,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_late_frames = 0;
         }
 
-        if( !b_drawpicture || p_sys->p_ff_pic->linesize[0] == 0 )
+        if( !b_drawpicture || !p_sys->p_ff_pic->linesize[0] )
         {
             /* Do not display the picture */
             continue;

@@ -83,12 +83,14 @@ vlc_module_begin();
     set_callbacks( OpenDecoder, CloseDecoder );
 
     add_bool( "ffmpeg-dr", 1, NULL, DR_TEXT, DR_TEXT, VLC_TRUE );
-    add_integer ( "ffmpeg-error-resilience", -1, NULL, ERROR_TEXT,
+    add_integer ( "ffmpeg-error-resilience", 1, NULL, ERROR_TEXT,
         ERROR_LONGTEXT, VLC_TRUE );
     add_integer ( "ffmpeg-workaround-bugs", 1, NULL, BUGS_TEXT, BUGS_LONGTEXT,
         VLC_FALSE );
     add_bool( "ffmpeg-hurry-up", 0, NULL, HURRYUP_TEXT, HURRYUP_LONGTEXT,
         VLC_FALSE );
+    add_integer ( "ffmpeg-vismv", 0, NULL, VISMV_TEXT, VISMV_LONGTEXT,
+        VLC_TRUE );
 
 #ifdef LIBAVCODEC_PP
     add_integer( "ffmpeg-pp-q", 0, NULL, PP_Q_TEXT, PP_Q_LONGTEXT, VLC_FALSE );
