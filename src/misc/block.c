@@ -119,11 +119,12 @@ block_t *block_Realloc( block_t *p_block, int i_prebody, int i_body )
     {
         block_t *p_rea = block_New( p_block->p_manager, i_buffer_size );
 
-        p_rea->i_dts   = p_block->i_dts;
-        p_rea->i_pts   = p_block->i_pts;
-        p_rea->i_flags = p_block->i_flags;
-        p_rea->i_length= p_block->i_length;
-        p_rea->i_rate  = p_block->i_rate;
+        p_rea->i_dts     = p_block->i_dts;
+        p_rea->i_pts     = p_block->i_pts;
+        p_rea->i_flags   = p_block->i_flags;
+        p_rea->i_length  = p_block->i_length;
+        p_rea->i_rate    = p_block->i_rate;
+        p_rea->i_samples = p_block->i_samples;
 
         memcpy( p_rea->p_buffer + i_prebody, p_block->p_buffer,
                 __MIN( p_block->i_buffer, p_rea->i_buffer - i_prebody ) );

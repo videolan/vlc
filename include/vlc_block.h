@@ -119,6 +119,13 @@ static inline block_t *block_Duplicate( block_t *p_block )
 {
     block_t *p_dup = block_New( p_block->p_manager, p_block->i_buffer );
 
+    p_dup->i_dts     = p_block->i_dts;
+    p_dup->i_pts     = p_block->i_pts;
+    p_dup->i_flags   = p_block->i_flags;
+    p_dup->i_length  = p_block->i_length;
+    p_dup->i_rate    = p_block->i_rate;
+    p_dup->i_samples = p_block->i_samples;
+
     if( p_dup && p_block->i_buffer > 0 )
         memcpy( p_dup->p_buffer, p_block->p_buffer, p_block->i_buffer );
 
