@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
  *
- * Authors: 
+ * Authors: Colin Delacroix <colin@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "defs.h"
 
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <sys/param.h>                                    /* for MAXPATHLEN */
 
 #include "config.h"
 #include "common.h"
@@ -36,28 +37,33 @@
 #include "mtime.h"
 #include "tests.h"
 
-#include "intf_msg.h"
 #include "interface.h"
-
-#include "modules.h"
+#include "intf_msg.h"
+#include "intf_playlist.h"
 
 #include "stream_control.h"
 #include "input_ext-intf.h"
 
-#include "intf_playlist.h"
 #include "audio_output.h"
 
+#include "video.h"
+#include "video_output.h"
+
+#include "modules.h"
 #include "main.h"
 
-#include <Carbon/Carbon.h>
+#include "macosx_common.h"
+
+extern main_t *p_main;
+
+
+/*****************************************************************************
+ * Constants & more
+ *****************************************************************************/
 
 //how often to have callback to main loop.  Target of 30fps then 30hz + maybe some more...
 //it doesn't really scale if we move to 2x the hz...  something else is slowing us down...
-
 #define kMainLoopFrequency  (kEventDurationSecond / 45)		//45 for good measure
-
-#define PLAYING		0
-#define PAUSED		1
 
 // Menu defs
 enum
@@ -92,8 +98,8 @@ enum
 */
 
     kMenuApple  = 128,
-    kMenuFile   = 129,
-    kMenuControls   = 130,
+    kMenuFile,
+    kMenuControls,
 
     kAppleAbout = 1, 
     kAppleQuit = 8, //is this always the same?
@@ -120,7 +126,6 @@ enum
     kControlsEjectDiv,
     kControlsEject 
 
-
 #if 0
 //virtual key codes ; raw subtract 0x40 from these values
 //http://devworld.apple.com/techpubs/mac/Text/Text-577.html#HEADING577-0
@@ -137,13 +142,23 @@ enum
 
 };
 
+// Initial Window Constants
+enum
+{
+    kAboutWindowOffset = 200,
+    kAboutWindowWidth = 200, //400
+    kAboutWindowHeight = 50 //100
+};
+
+
 /*****************************************************************************
  * intf_sys_t: description and status of the interface
  *****************************************************************************/
 typedef struct intf_sys_s
 {
     EventLoopTimerRef manageTimer;
-    
+    Rect aboutRect;
+    WindowRef	p_aboutWindow;
 } intf_sys_t;
 
 /*****************************************************************************
@@ -156,13 +171,22 @@ static void intf_Run       ( intf_thread_t *p_intf );
 
 /* OS Specific */
 
+static int MakeAboutWindow		( intf_thread_t *p_intf );
+
 void CarbonManageCallback ( EventLoopTimerRef inTimer, void *inUserData );
+
+OSErr MyOpenDocument(const FSSpecPtr defaultLocationfssPtr);
+
+void playorpause ( intf_thread_t *p_intf );
+void stop ( intf_thread_t *p_intf );
+
 
 #ifndef CarbonEvents
 void EventLoop( intf_thread_t *p_intf );
 void DoEvent( intf_thread_t *p_intf , EventRecord *event);
 void DoMenuCommand( intf_thread_t *p_intf , long menuResult);
 void DrawWindow(WindowRef window);
+void DrawAboutWindow(WindowRef window);
 #else
 /*
 pascal OSErr 	QuitEventHandler(const AppleEvent *theEvent, AppleEvent *theReply, SInt32 refCon);
@@ -287,9 +311,21 @@ static int intf_Open( intf_thread_t *p_intf )
 
     InsertMenu( menu, 0 );
 
+//Hmm, eventually we might want more than one player window, but for now we assume one only (like OS 9 player)
+//and since we start with a window open, we temporarily disable the 'new' menu
+    DisableMenuItem( GetMenuHandle(kMenuFile), kFileNew);
 
+//FIXME - Disabled Menus which are not implemented yet
+    DisableMenuItem( GetMenuHandle(kMenuControls), kControlsDVDMenu);
+    DisableMenuItem( GetMenuHandle(kMenuControls), kControlsEject);
 
     DrawMenuBar();
+
+    if( MakeAboutWindow( p_intf ) )
+    {
+        intf_ErrMsg( "vout error: can't make about window" );
+        return( 1 );
+    }
 
     return( 0 );
 }
@@ -309,20 +345,17 @@ static void intf_Close( intf_thread_t *p_intf )
 static void intf_Run( intf_thread_t *p_intf )
 {
     OSStatus err;
-
     EventLoopTimerUPP manageUPP;
 
 /*
 Eventually we want to use Carbon events, or maybe even write this app in Cocoa
-*/
+ 
+//kinda going out of bounds here... need to bring window creation to this file.
+    main_t *p_main;
 
-//    EventTypeSpec windowEventType = { kEventClassWindow, kEventWindowClose };
-//    EventHandlerUPP windowHandlerUPP;
+    EventTypeSpec windowEventType = { kEventClassWindow, kEventWindowClose };
+    EventHandlerUPP windowHandlerUPP;
 
-    //kinda going out of bounds here... need to bring window creation to this file.
-//    main_t *p_main;
-
-/*
     EventTypeSpec keyboardEventType = { kEventClassKeyboard, kEventRawKeyDown };
     EventHandlerUPP keyboardHandlerUPP;
 */
@@ -332,8 +365,9 @@ Eventually we want to use Carbon events, or maybe even write this app in Cocoa
     assert(err == noErr);
     DisposeEventLoopTimerUPP(manageUPP);
 
-/*    windowHandlerUPP = NewEventHandlerUPP ( MyWindowEventHandler );
-    err = InstallWindowEventHandler ( p_main->p_vout->p_sys->p_window , windowHandlerUPP, GetEventTypeCount(windowEventType), &windowEventType, (void *) p_intf, NULL );
+/*
+    windowHandlerUPP = NewEventHandlerUPP ( MyWindowEventHandler );
+    err = InstallWindowEventHandler ( p_main->p_vout->p_sys->p_window , windowHandlerUPP, 	GetEventTypeCount(windowEventType), &windowEventType, (void *) p_intf, NULL );
     assert(err == noErr);
     DisposeEventHandlerUPP(windowHandlerUPP);
 */
@@ -343,13 +377,43 @@ Eventually we want to use Carbon events, or maybe even write this app in Cocoa
     //UGLY Event Loop!
     EventLoop( p_intf );
 #else
-    //Our big event loop !-)
     RunApplicationEventLoop();
 #endif
     err = RemoveEventLoopTimer(p_intf->p_sys->manageTimer);
     assert(err == noErr);
 }
 
+
+/*****************************************************************************
+ * MakeAboutWindow: similar to MakeWindow in vout_macosx.c ; 
+ * open and set-up a Mac OS window to be used for 'about' program... 
+ * create it hidden and only show it when requested
+ *****************************************************************************/
+static int MakeAboutWindow( intf_thread_t *p_intf )
+{
+    int left = 0;
+    int top = 0;
+    int bottom = kAboutWindowHeight;
+    int right = kAboutWindowWidth;
+
+    WindowAttributes windowAttr = kWindowCloseBoxAttribute |
+                                    kWindowStandardHandlerAttribute |
+                                    kWindowInWindowMenuAttribute;
+    
+    SetRect( &p_intf->p_sys->aboutRect, left, top, right, bottom );
+    OffsetRect( &p_intf->p_sys->aboutRect, kAboutWindowOffset, kAboutWindowOffset );
+
+    CreateNewWindow( kDocumentWindowClass, windowAttr, &p_intf->p_sys->aboutRect, &p_intf->p_sys->p_aboutWindow );
+    if ( p_intf->p_sys->p_aboutWindow == nil )
+    {
+        return( 1 );
+    }
+
+    InstallStandardEventHandler(GetWindowEventTarget(p_intf->p_sys->p_aboutWindow));
+    SetWindowTitleWithCFString( p_intf->p_sys->p_aboutWindow, CFSTR("About DVD.app & VLC") );
+    
+    return( 0 );
+}
 
 
 void CarbonManageCallback ( EventLoopTimerRef inTimer, void *inUserData )
@@ -421,8 +485,6 @@ void DoEvent( intf_thread_t *p_intf , EventRecord *event)
                 case inGoAway:
                     p_intf->b_die = true;
                     return;
-                    //DisposeWindow(whichWindow);
-                    //ExitToShell();
                     break;
                     
                 case inZoomIn:
@@ -450,25 +512,71 @@ void DoEvent( intf_thread_t *p_intf , EventRecord *event)
                     break;
                     
                 case updateEvt:
-			DrawWindow((WindowRef) event->message);
-			break;
+                        DrawWindow((WindowRef) event->message);
+                    break;
                         
                 case kHighLevelEvent:
 			AEProcessAppleEvent( event );
-			break;
+                    break;
 		
                 case diskEvt:
-			break;
+                    break;
 	}
 }
+
+//the code for playorpause and stop taken almost directly from the BeOS code
+void playorpause ( intf_thread_t *p_intf )
+{
+// pause the playback
+    if (p_intf->p_input != NULL )
+    {
+            // mute the volume if currently playing
+            if (p_main->p_vout->p_sys->playback_status == PLAYING)
+            {
+                    if (p_main->p_aout != NULL)
+                    {
+                            p_main->p_aout->vol = 0;
+                    }
+                    p_main->p_vout->p_sys->playback_status = PAUSED;
+                SetMenuItemText( GetMenuHandle(kMenuControls), kControlsPlayORPause, "\pPlay");
+            }
+            else
+            // restore the volume
+            {
+                    if (p_main->p_aout != NULL)
+                    {
+                            p_main->p_aout->vol = p_main->p_vout->p_sys->vol_val;
+                    }
+                    p_main->p_vout->p_sys->playback_status = PLAYING;
+                SetMenuItemText( GetMenuHandle(kMenuControls), kControlsPlayORPause, "\pPause");
+            }
+            //snooze(400000);
+            input_SetStatus(p_intf->p_input, INPUT_STATUS_PAUSE);
+    }
+}
+
+void stop ( intf_thread_t *p_intf )
+{
+    // this currently stops playback not nicely
+    if (p_intf->p_input != NULL )
+    {
+            // silence the sound, otherwise very horrible
+            if (p_main->p_aout != NULL)
+            {
+                    p_main->p_aout->vol = 0;
+            }
+            //snooze(400000);
+            input_SetStatus(p_intf->p_input, INPUT_STATUS_END);
+    }
+    p_main->p_vout->p_sys->playback_status = STOPPED;
+}
+
 
 void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
 {
     short	menuID;		/* the resource ID of the selected menu */
     short	menuItem;	/* the item number of the selected menu */
 	
-    static int vol_val;	// remember the current volume
-    static int playback_status;		// remember playback state
 
     menuID = HiWord(menuResult);    /* use macros to get item & menu number */
     menuItem = LoWord(menuResult);
@@ -479,16 +587,15 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
             switch (menuItem) 
             {
                 case kAppleAbout:
-                    //Fixme
-                    SysBeep(30);
-                    //DoAboutBox();
+                    ShowWindow( p_intf->p_sys->p_aboutWindow );
+                    SelectWindow( p_intf->p_sys->p_aboutWindow );
+                    DrawAboutWindow( p_intf->p_sys->p_aboutWindow); //kludge
+                    EnableMenuItem( GetMenuHandle(kMenuFile), kFileClose);
                     break;
                     
                 case kAppleQuit:
                     p_intf->b_die = true;
-                    //hrmm...
-                    ExitToShell();
-                    return;
+                    //hrmm... don't know what is going on w/ the Quit item in the new application menu...documentation???
                     break;
 				
                 default:
@@ -500,36 +607,34 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
             switch (menuItem) 
             {
                 case kFileNew:
-                    //Fixme
-                    SysBeep(30);
-                    //DoAboutBox();
+                    ShowWindow( p_main->p_vout->p_sys->p_window );
+                    SelectWindow( p_main->p_vout->p_sys->p_window );
+                    DisableMenuItem( GetMenuHandle(kMenuFile), kFileNew);
+                    EnableMenuItem( GetMenuHandle(kMenuFile), kFileClose);
+                    //hmm, can't say to play() right now because I don't know if a file is in playlist yet.
+                    //need to see if I can tell this or eve if calling play() w/o a file is bad...not sure of either
                     break;
 
                 case kFileOpen:
-                    //Fixme
-/*
-	    const char **device;
-	    char device_method_and_name[B_FILE_NAME_LENGTH + 4];
-	    if(p_message->FindString("device", device) != B_ERROR)
-	    	{
-	    	sprintf(device_method_and_name, "dvd:%s", *device); 
-	    	intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, device_method_and_name );
-    		}
-
-*/
-                    SysBeep(30);
-                    //DoAboutBox();
+                    playorpause( p_intf );
+                    MyOpenDocument(nil);
+                    // starts playing automatically on open? playorpause( p_intf );
                     break;
 
                 case kFileClose:
                     HideWindow( FrontWindow() );
-                    //Fixme
-                    SysBeep(30);
-                    //DoAboutBox();
+                    if ( ! IsWindowVisible( p_main->p_vout->p_sys->p_window ) && ! IsWindowVisible( p_intf->p_sys->p_aboutWindow ) )
+                    {
+                        //calling this even if no file open shouldn't be bad... not sure of opposite situation above
+                        stop( p_intf );
+                        EnableMenuItem( GetMenuHandle(kMenuFile), kFileNew);
+                        DisableMenuItem( GetMenuHandle(kMenuFile), kFileClose);
+                    }
                     break;
                     
                 case kFileQuitHack:
-                    p_intf->b_die = true;
+                        stop( p_intf );
+                        p_intf->b_die = true;
                     break;
                     
                 default:
@@ -541,44 +646,11 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
             switch (menuItem) 
             {
                 case kControlsPlayORPause:
-                // pause the playback
-                    if (p_intf->p_input != NULL )
-                    {
-                            // mute the volume if currently playing
-                            if (playback_status == PLAYING)
-                            {
-                                    if (p_main->p_aout != NULL)
-                                    {
-                                            p_main->p_aout->vol = 0;
-                                    }
-                                    playback_status = PAUSED;
-                            }
-                            else
-                            // restore the volume
-                            {
-                                    if (p_main->p_aout != NULL)
-                                    {
-                                            p_main->p_aout->vol = vol_val;
-                                    }
-                                    playback_status = PLAYING;
-                            }
-                            //snooze(400000);
-                            input_SetStatus(p_intf->p_input, INPUT_STATUS_PAUSE);
-                    }
+                        playorpause( p_intf );
                     break;
 
                 case kControlsStop:
-                // this currently stops playback not nicely
-                    if (p_intf->p_input != NULL )
-                    {
-                            // silence the sound, otherwise very horrible
-                            if (p_main->p_aout != NULL)
-                            {
-                                    p_main->p_aout->vol = 0;
-                            }
-                            //snooze(400000);
-                            input_SetStatus(p_intf->p_input, INPUT_STATUS_END);
-                    }
+                        stop( p_intf );
                     break;
 
                 case kControlsForward:
@@ -653,12 +725,12 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
                                     if (p_main->p_aout->vol == 0)
                                     {
                                             //p_vol->SetEnabled(true);
-                                            p_main->p_aout->vol = vol_val;
+                                            p_main->p_aout->vol = p_main->p_vout->p_sys->vol_val;
                                     }	
                                     else
                                     {
                                             //p_vol->SetEnabled(false);
-                                            vol_val = p_main->p_aout->vol;
+                                            p_main->p_vout->p_sys->vol_val = p_main->p_aout->vol;
                                             p_main->p_aout->vol = 0;
                                     }
                             }
@@ -682,19 +754,31 @@ void DoMenuCommand( intf_thread_t *p_intf , long menuResult)
 
 void DrawWindow(WindowRef window)
 {
-    Rect		tempRect;
-    GrafPtr		curPort;
-	
-    GetPort(&curPort);
+    Rect tempRect;
+    GrafPtr previousPort;
+    
+    GetPort(&previousPort);
     SetPort(GetWindowPort(window));
     BeginUpdate(window);
     EraseRect(GetWindowPortBounds(window, &tempRect));
     DrawControls(window);
     DrawGrowIcon(window);
     EndUpdate(window);
-    SetPort(curPort);
+    SetPort(previousPort);
 }
 
+void DrawAboutWindow(WindowRef window)
+{
+    GrafPtr previousPort;
+
+    GetPort(&previousPort);
+    SetPort(GetWindowPort(window));
+    
+    MoveTo(10,30);
+    DrawString("\phttp://www.videolan.org");
+
+    SetPort(previousPort);
+}
 
 #else
 
@@ -786,3 +870,110 @@ static pascal OSStatus MyEventHandler(EventHandlerCallRef myHandler, EventRef ev
     return result;
 }
 #endif
+
+//FIXME Adding this has introduced or surfaced a lot of bugs...
+//comented out a lot of things to strip this down to make this a 'quicky'
+OSErr MyOpenDocument(const FSSpecPtr defaultLocationfssPtr)
+{
+    NavDialogOptions    dialogOptions;
+//    AEDesc              defaultLocation;
+//    NavEventUPP         eventProc = NewNavEventProc(myEventProc);
+//    NavObjectFilterUPP  filterProc = 
+//                        NewNavObjectFilterProc(myFilterProc);
+    OSErr               anErr = noErr;
+    
+    //  Specify default options for dialog box
+    anErr = NavGetDefaultDialogOptions(&dialogOptions);
+    if (anErr == noErr)
+    {
+        //  Adjust the options to fit our needs
+        //  Set default location option
+//        dialogOptions.dialogOptionFlags |= kNavSelectDefaultLocation;
+        //  Clear preview option
+        dialogOptions.dialogOptionFlags ^= kNavAllowPreviews;
+        
+        // make descriptor for default location
+//        anErr = AECreateDesc(typeFSS, defaultLocationfssPtr,
+//                             sizeof(*defaultLocationfssPtr),
+//                             &defaultLocation );
+        if (anErr == noErr)
+        {
+            // Get 'open' resource. A nil handle being returned is OK,
+            // this simply means no automatic file filtering.
+            NavTypeListHandle typeList = (NavTypeListHandle)GetResource(
+                                        'open', 128);
+            NavReplyRecord reply;
+            
+            // Call NavGetFile() with specified options and
+            // declare our app-defined functions and type list
+//            anErr = NavGetFile (&defaultLocation, &reply, &dialogOptions,
+            anErr = NavGetFile (nil, &reply, &dialogOptions,
+//                                eventProc, nil, filterProc,
+                                nil, nil, nil,
+                                typeList, nil);
+            if (anErr == noErr && reply.validRecord)
+            {
+                //  Deal with multiple file selection
+                long    count;
+                
+                anErr = AECountItems(&(reply.selection), &count);
+                // Set up index for file list
+                if (anErr == noErr)
+                {
+                    long index;
+                    
+                    for (index = 1; index <= count; index++)
+                    {
+                        AEKeyword   theKeyword;
+                        DescType    actualType;
+                        Size        actualSize;
+                        FSSpec      documentFSSpec;
+                        
+                        // Get a pointer to selected file
+                        anErr = AEGetNthPtr(&(reply.selection), index,
+                                            typeFSS, &theKeyword,
+                                            &actualType,&documentFSSpec,
+                                            sizeof(documentFSSpec),
+                                            &actualSize);
+                        if (anErr == noErr)
+                        {
+//                            anErr = DoOpenFile(&documentFSSpec);
+//HERE
+                            FSRef newRef;
+                            char path[MAXPATHLEN];
+                            
+                            //make an FSRef out of an FSSpec
+                            anErr = FSpMakeFSRef( &documentFSSpec, &newRef);
+                            if (anErr != noErr)
+                            {
+                                return(anErr);
+                            }
+                            //make a path out of the FSRef
+                            anErr = FSRefMakePath( &newRef, path, MAXPATHLEN);
+                            if (anErr != noErr)
+                            {
+                                return(anErr);
+                            }
+                            
+                            //else, ok...add it to playlist!
+                            intf_PlaylistAdd( p_main->p_playlist, PLAYLIST_END, path );
+
+                            
+                        }
+                    }
+                }
+                //  Dispose of NavReplyRecord, resources, descriptors
+                anErr = NavDisposeReply(&reply);
+            }
+            if (typeList != NULL)
+            {
+                ReleaseResource( (Handle)typeList);
+            }
+            //(void) AEDisposeDesc(&defaultLocation);
+        }
+    }
+//    DisposeRoutineDescriptor(eventProc);
+//    DisposeRoutineDescriptor(filterProc);
+    return anErr;
+}
+

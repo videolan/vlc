@@ -484,6 +484,7 @@ clean:
 	rm -f plugins/*/*.o plugins/*/*.moc plugins/*/*.bak
 	rm -f src/*/*.o extras/*/*.o
 	rm -f lib/*.so vlc gnome-vlc gvlc kvlc qvlc
+	rm -rf vlc.app
 
 distclean: clean
 	rm -f **/*.o **/*~ *.log
@@ -491,6 +492,7 @@ distclean: clean
 	rm -f config.status config.cache config.log
 	rm -f gmon.out core build-stamp
 	rm -Rf .dep
+	rm -f .gdb_history
 
 install:
 	mkdir -p $(DESTDIR)$(bindir)
@@ -682,8 +684,6 @@ ifeq ($(SYS),beos)
 	rm -f ./plugins/_APP_
 	ln -s ../vlc ./plugins/_APP_
 endif
-
-vlc.app: all
 ifneq (,$(findstring darwin,$(SYS)))
 	mkdir -p vlc.app/Contents/MacOS
 	mkdir -p vlc.app/Contents/MacOS/lib

@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
  *
- * Authors: 
+ * Authors: Colin Delacroix <colin@zoy.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,26 +38,20 @@
 #include "mtime.h"
 #include "tests.h"
 
+#include "intf_msg.h"
+
 #include "video.h"
 #include "video_output.h"
 
-#include "intf_msg.h"
-
+#include "modules.h"
 #include "main.h"
 
-#include "modules.h"
+#include "macosx_common.h"
 
-#ifndef __CARBONPREFIX__
-    #define __CARBONPREFIX__
 
-    // Needed for carbonization
-    #define TARGET_API_MAC_CARBON 1
-
-    // For the pascal to C or C to pascal string conversions in carbon
-    #define OLDP2C 1
-#endif
-
-#include <Carbon/Carbon.h>
+/*****************************************************************************
+ * Constants & more
+ *****************************************************************************/
 
 // Initial Window Constants
 enum
@@ -74,32 +68,6 @@ enum
     kInSystem
 };
 
-/*****************************************************************************
- * vout_sys_t: MacOS X video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the MacOS X specific properties of an output thread.
- *****************************************************************************/
-typedef struct vout_sys_s
-{
-    /* MacOS X video memory */
-    byte_t *                    p_video;                      /* base adress */
-    size_t                      i_page_size;                    /* page size */
-    
-    Rect	wrect;
-    WindowRef	p_window;
-    short gwLocOffscreen;
-    GWorldPtr p_gw[ 2 ];
-    Boolean gNewNewGWorld;      /* can we allocate in VRAm or AGP memory ? */
-    
-    // Boolean gDone;
-    // SInt32 gSleepTime;
-    
-    GDHandle  theGDList;
-    Ptr				theBase;
-    int				theRow;
-    int				theDepth;
-} vout_sys_t;
 
 /*****************************************************************************
  * Local prototypes
@@ -174,8 +142,6 @@ static int vout_Create( vout_thread_t *p_vout )
     p_vout->p_sys->p_window       = NULL;
     p_vout->p_sys->p_gw[ 0 ]      = NULL;
     p_vout->p_sys->p_gw[ 1 ]      = NULL;
-    p_vout->p_sys->i_page_size    = p_vout->i_width * p_vout->i_height
-                                  * p_vout->i_bytes_per_pixel;
     
     if ( CreateDisplay( p_vout ) )
     {
@@ -189,22 +155,6 @@ static int vout_Create( vout_thread_t *p_vout )
     intf_ErrMsg( "vout p_vout->i_height %d" , p_vout->i_height);
     intf_ErrMsg( "vout p_vout->i_bytes_per_pixel %d" , p_vout->i_bytes_per_pixel);
     intf_ErrMsg( "vout p_vout->i_screen_depth %d" , p_vout->i_screen_depth);
-    intf_ErrMsg( "vout p_vout->p_sys->i_page_size %d" , p_vout->p_sys->i_page_size);
-#endif
-
-#if 0
-    /* Map two framebuffers a the very beginning of the fb */
-    p_vout->p_sys->p_video = malloc( 2 * p_vout->p_sys->i_page_size );
-    if( p_vout->p_sys->p_video == NULL )
-    {
-        intf_ErrMsg( "vout error: can't map video memory (%s)",
-                     strerror(errno) );
-        free( p_vout->p_sys );
-        return( 1 );
-    }
-    /* Set and initialize buffers */
-    vout_SetBuffers( p_vout, p_vout->p_sys->p_video,
-                    p_vout->p_sys->p_video + p_vout->p_sys->i_page_size );
 #endif
 
     return( 0 );
@@ -237,9 +187,7 @@ void FindBestMemoryLocation( vout_thread_t *p_vout )
 #if 0
         p_vout->i_screen_depth = wPixDepth;
         p_vout->i_bytes_per_pixel = wPixDepth;
-        p_vout->i_bytes_per_line   = p_vout->i_width * p_vout->i_bytes_per_pixel;
-        p_vout->p_sys->i_page_size = p_vout->i_width * p_vout->i_height * p_vout->i_bytes_per_pixel;
-//p_vout->i_bytes_per_line = (**(**hgdWindow).gdPMap).rowBytes & 0x3FFF ;
+        p_vout->i_bytes_per_line = (**(**hgdWindow).gdPMap).rowBytes & 0x3FFF ;
 #endif
         if(    ( noErr == NewGWorld( &pgwTest, wPixDepth, &rectTest, NULL, hgdWindow,
                                      noNewDevice | useDistantHdwrMem ) ) 
@@ -322,6 +270,7 @@ static int MakeWindow( vout_thread_t *p_vout )
     int top = 0;
     int bottom = p_vout->i_height;
     int right = p_vout->i_width;
+    ProcessSerialNumber PSN;
 
     WindowAttributes windowAttr = kWindowStandardDocumentAttributes | 
                                     kWindowStandardHandlerAttribute |
@@ -339,16 +288,18 @@ static int MakeWindow( vout_thread_t *p_vout )
     InstallStandardEventHandler(GetWindowEventTarget(p_vout->p_sys->p_window));
     SetPort( GetWindowPort( p_vout->p_sys->p_window ) );
     SetWindowTitleWithCFString( p_vout->p_sys->p_window, CFSTR("VLC") );
-//    ShowWindow( p_vout->p_sys->p_window );
-    TransitionWindow( p_vout->p_sys->p_window, kWindowZoomTransitionEffect, kWindowShowTransitionAction, NULL);
-    BringToFront(  p_vout->p_sys->p_window );
+    ShowWindow( p_vout->p_sys->p_window );
+    SelectWindow( p_vout->p_sys->p_window );
+
+    //in case we are run from the command line, bring us to front instead of Terminal
+    GetCurrentProcess(&PSN);
+    SetFrontProcess(&PSN);
 
 {
     short wPixDepth = (**(GetPortPixMap( GetWindowPort( p_vout->p_sys->p_window ) ))).pixelSize;
     p_vout->i_screen_depth = wPixDepth;
     p_vout->i_bytes_per_pixel = p_vout->i_screen_depth / 8;
     p_vout->i_bytes_per_line   = p_vout->i_width * p_vout->i_bytes_per_pixel;
-    p_vout->p_sys->i_page_size = p_vout->i_width * p_vout->i_height * p_vout->i_bytes_per_pixel;
 
     p_vout->i_bytes_per_line = (**(**GetWindowDevice( p_vout )).gdPMap).rowBytes & 0x3FFF ;
 
@@ -369,6 +320,7 @@ static int MakeWindow( vout_thread_t *p_vout )
         default:
             break;
     }
+}
 
 #if 0
     p_vout->i_red_lshift = 0x10;
@@ -383,7 +335,6 @@ static int MakeWindow( vout_thread_t *p_vout )
     p_vout->i_gray_pixel = 0x808080;
     p_vout->i_blue_pixel = 0x32;
 #endif
-}
 
     return( 0 );
 }
@@ -459,18 +410,13 @@ static void vout_Destroy( vout_thread_t *p_vout )
 {
     //intf_ErrMsg( "vout_Destroy()" );
 
-//FIXME KLUDGE to lock pixels
-#if 1
-{
+//FIXME Big Lock around Gworlds
     PixMapHandle hPixmap0, hPixmap1;
     hPixmap0 = GetGWorldPixMap( p_vout->p_sys->p_gw[0] );
     hPixmap1 = GetGWorldPixMap( p_vout->p_sys->p_gw[1] );
     UnlockPixels(hPixmap0);
     UnlockPixels(hPixmap1);
-}
-#endif
 
-#if 1
     if ( p_vout->p_sys->p_gw[0] )
     {
         DisposeGWorld( p_vout->p_sys->p_gw[0] );
@@ -483,8 +429,7 @@ static void vout_Destroy( vout_thread_t *p_vout )
     {
         DisposeWindow( p_vout->p_sys->p_window );
     }
-#endif
-    free( p_vout->p_sys->p_video );
+
     free( p_vout->p_sys );
 }
 
@@ -510,7 +455,8 @@ static void vout_Display( vout_thread_t *p_vout )
 {
 //    intf_ErrMsg( "vout_Display()" );
 
-    BlitToWindow ( p_vout, p_vout->i_buffer_index );
+    if ( p_vout->p_sys->playback_status != PAUSED &&  p_vout->p_sys->playback_status != STOPPED )
+        BlitToWindow ( p_vout, p_vout->i_buffer_index );
 }
 
 
@@ -562,9 +508,17 @@ void BlitToWindow( vout_thread_t *p_vout, short index )
 //FIXME have global lock - kinda bad but oh well 
 //    if ( LockPixels( GetGWorldPixMap( p_vout->p_sys->p_gw[index] ) ) )
 //    {
+
+//LockPortBits(GetWindowPort( p_vout->p_sys->p_window ));
+//NoPurgePixels( GetGWorldPixMap( p_vout->p_sys->p_gw[index] ) );
+
         CopyBits( GetPortBitMapForCopyBits( p_vout->p_sys->p_gw[index] ), 
                     GetPortBitMapForCopyBits( GetWindowPort( p_vout->p_sys->p_window ) ), 
                     &rectSource, &rectDest, srcCopy, NULL);
+
+//UnlockPortBits(GetWindowPort( p_vout->p_sys->p_window ));
+//AllowPurgePixels( GetGWorldPixMap( p_vout->p_sys->p_gw[index] ) );
+
 //        UnlockPixels( GetGWorldPixMap( p_vout->p_sys->p_gw[index] ) );
         //flushQD( p_vout );
 //    }

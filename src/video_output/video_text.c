@@ -2,7 +2,7 @@
  * video_text.c : text manipulation functions
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_text.c,v 1.21 2001/04/06 18:18:10 massiot Exp $
+ * $Id: video_text.c,v 1.22 2001/04/11 13:30:30 ej Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,7 +43,6 @@
 #include "video_text.h"
 
 #ifdef SYS_DARWIN1_3
-// #include <CFBundle.h>
 #include <sys/param.h>                                    /* for MAXPATHLEN */
 #include "main.h"
 extern main_t *p_main;
@@ -229,7 +228,6 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     static char         app_path[ MAXPATHLEN ];
     /* HACK TO CUT OUT trailing 'vlc' */
     int                 i_pathlen = strlen( p_main->ppsz_argv[ 0 ] ) - 3;
-    // CFBundleRef         mainBundle;
 #endif
     int                 i_char, i_line;        /* character and line indexes */
     int                 i_file = -1;                          /* source file */
@@ -237,17 +235,12 @@ vout_font_t *vout_LoadFont( const char *psz_name )
     vout_font_t *       p_font;                           /* the font itself */
 
 #ifdef SYS_DARWIN1_3
-    // Get the main bundle for the app
-    // mainBundle = CFBundleGetMainBundle();
-
     if( !once )
     {
-       once = 1;
+        once = 1;
         strncpy( app_path, p_main->ppsz_argv[ 0 ], i_pathlen );
-        intf_ErrMsg( "%s", p_main->ppsz_argv[ 0 ] );
         strcat( app_path, "share" );
         path[ 2 ] = app_path ;
-        intf_ErrMsg( "%s", path[ 2 ] );
     }
 #endif
 

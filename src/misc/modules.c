@@ -2,7 +2,7 @@
  * modules.c : Built-in and dynamic modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.20 2001/04/06 18:18:10 massiot Exp $
+ * $Id: modules.c,v 1.21 2001/04/11 13:30:30 ej Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -122,10 +122,8 @@ void module_InitBank( module_bank_t * p_bank )
     {
         once = 1;
         strncpy( app_path, p_main->ppsz_argv[ 0 ], i_pathlen );
-        intf_ErrMsg( "%s", p_main->ppsz_argv[ 0 ] );
         strcat( app_path, "lib" );
         path[ 3 ] = app_path ;
-        intf_ErrMsg( "%s", path[ 3 ] );
     }
 #endif
 
