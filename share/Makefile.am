@@ -13,6 +13,9 @@ dist_pkgdata_DATA = \
 	$(DIST_icons48) \
 	$(NULL)
 
+nobase_pkgdata_DATA = \
+	$(DIST_skins)
+	
 DIST_fonts = \
 	default8x16.psf \
 	default8x9.psf \
@@ -68,4 +71,49 @@ DIST_icons48 = \
 	vlc48x48.ico \
 	vlc48x48.png \
 	$(NULL)
+
+DIST_skins = \
+	skins/default/add1.bmp \
+	skins/default/del2.bmp \
+	skins/default/open1.bmp \
+	skins/default/play1.bmp \
+	skins/default/playlist_body.bmp \
+	skins/default/prev4.bmp \
+	skins/default/stop2.bmp \
+	skins/default/add2.bmp \
+	skins/default/del3.bmp \
+	skins/default/open2.bmp  \
+	skins/default/play2.bmp  \
+	skins/default/prefs1.bmp \
+	skins/default/quit1.bmp \
+	skins/default/stop3.bmp \
+	skins/default/add3.bmp \
+	skins/default/open3.bmp \
+	skins/default/play3.bmp \
+	skins/default/prefs2.bmp \
+	skins/default/quit2.bmp \
+	skins/default/stop4.bmp \
+	skins/default/body.bmp \
+	skins/default/next1.bmp \
+	skins/default/pause1.bmp \
+	skins/default/play4.bmp \
+	skins/default/prefs3.bmp \
+	skins/default/quit3.bmp \
+	skins/default/theme.xml \
+	skins/default/next2.bmp \
+	skins/default/pause2.bmp \
+	skins/default/playlist1.bmp \
+	skins/default/prev1.bmp \
+	skins/default/slider1.bmp \
+	skins/default/next3.bmp \
+	skins/default/pause3.bmp \
+	skins/default/playlist2.bmp \
+	skins/default/prev2.bmp \
+	skins/default/slider2.bmp \
+	skins/default/del1.bmp \
+	skins/default/next4.bmp \
+	skins/default/pause4.bmp \
+	skins/default/playlist3.bmp \
+	skins/default/prev3.bmp \
+	skins/default/stop1.bmp
 

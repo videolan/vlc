@@ -2,7 +2,7 @@
  * x11_theme.cpp: X11 implementation of the Theme class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: x11_theme.cpp,v 1.12 2003/06/10 11:43:41 gbazin Exp $
+ * $Id: x11_theme.cpp,v 1.13 2003/06/11 21:46:57 asmax Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -60,9 +60,6 @@ X11Theme::X11Theme( intf_thread_t *_p_intf ) : Theme( _p_intf )
 //---------------------------------------------------------------------------
 X11Theme::~X11Theme()
 {
-    XLOCK;
-    //XDestroyWindow( display, p_intf->p_sys->mainWin );
-    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Theme::OnLoadTheme()
@@ -70,12 +67,6 @@ void X11Theme::OnLoadTheme()
 /*    // The create menu
     CreateSystemMenu();
 */
-    Window root = DefaultRootWindow( display );
-    XLOCK;
-    p_intf->p_sys->mainWin = XCreateSimpleWindow( display, root, 0, 0, 
-                                                  1, 1, 0, 0, 0 );
-    XStoreName( display, p_intf->p_sys->mainWin, "VLC Media Player" );
-    XUNLOCK;
 }
 //---------------------------------------------------------------------------
 void X11Theme::AddSystemMenu( string name, Event *event )

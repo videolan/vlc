@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.37 2003/06/11 10:42:34 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.38 2003/06/11 21:46:57 asmax Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -131,6 +131,11 @@ static int Open ( vlc_object_t *p_this )
     // Initialize X11
     p_intf->p_sys->display = XOpenDisplay( NULL );
     vlc_mutex_init( p_intf, &p_intf->p_sys->xlock );
+    // Fake window to receive broadcast events
+    Window root = DefaultRootWindow( p_intf->p_sys->display );
+    p_intf->p_sys->mainWin = XCreateSimpleWindow( p_intf->p_sys->display, root, 0, 0, 
+                                                  1, 1, 0, 0, 0 );
+    XStoreName( p_intf->p_sys->display, p_intf->p_sys->mainWin, "VLC Media Player" );
 
 #elif defined WIN32
     // Interface thread id used to post broadcast messages
@@ -189,6 +194,7 @@ static void Close ( vlc_object_t *p_this )
     delete (OSTheme *)p_intf->p_sys->p_theme;
 
 #if defined X11_SKINS
+    XDestroyWindow( p_intf->p_sys->display, p_intf->p_sys->mainWin );
     XCloseDisplay( p_intf->p_sys->display );
 #endif
 
