@@ -105,6 +105,7 @@ typedef struct
     vlc_fourcc_t i_fourcc;  /* for video */
     char         *psz_name; /* codec name */
     int          i_blockalign; /* for audio only */
+    vlc_bool_t   b_audio_correction;
 
     int          i_sequence;
 
@@ -335,6 +336,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     tk->i_id  = p_sys->i_track + 1;
     tk->i_cat = p_input->p_fmt->i_cat;
     tk->i_sequence = 0;
+    tk->b_audio_correction = 0;
 
     switch( tk->i_cat )
     {
@@ -365,16 +367,25 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     break;
 #endif
                 case VLC_FOURCC( 'w', 'm', 'a', '1' ):
-                    tk->psz_name = "Windows Media Audio 1";
+                    tk->psz_name = "Windows Media Audio v1";
                     tk->i_tag = WAVE_FORMAT_WMA1;
+                    tk->b_audio_correction = VLC_TRUE;
                     break;
+                case VLC_FOURCC( 'w', 'm', 'a', ' ' ):
                 case VLC_FOURCC( 'w', 'm', 'a', '2' ):
-                    tk->psz_name = "Windows Media Audio 2";
+                    tk->psz_name= "Windows Media Audio (v2) 7, 8 and 9 Series";
                     tk->i_tag = WAVE_FORMAT_WMA2;
+                    tk->b_audio_correction = VLC_TRUE;
                     break;
-                case VLC_FOURCC( 'w', 'm', 'a', '3' ):
-                    tk->psz_name = "Windows Media Audio 3";
-                    tk->i_tag = WAVE_FORMAT_WMA3;
+                case VLC_FOURCC( 'w', 'm', 'a', 'p' ):
+                    tk->psz_name = "Windows Media Audio 9 Professional";
+                    tk->i_tag = WAVE_FORMAT_WMAP;
+                    tk->b_audio_correction = VLC_TRUE;
+                    break;
+                case VLC_FOURCC( 'w', 'm', 'a', 'l' ):
+                    tk->psz_name = "Windows Media Audio 9 Lossless";
+                    tk->i_tag = WAVE_FORMAT_WMAL;
+                    tk->b_audio_correction = VLC_TRUE;
                     break;
                     /* raw codec */
                 case VLC_FOURCC( 'u', '8', ' ', ' ' ):
@@ -804,15 +815,8 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
     {
         i_size += 78 + p_sys->track[i].i_extra;
         i_ci_size += 8 + 2 * strlen( p_sys->track[i].psz_name );
-        if( p_sys->track[i].i_cat == AUDIO_ES )
-        {
-            i_ci_size += 4;
-            i_size += 8; /* Error correction data field */
-        }
-        else if( p_sys->track[i].i_cat == VIDEO_ES )
-        {
-            i_ci_size += 6;
-        }
+        if( p_sys->track[i].i_cat == AUDIO_ES ) i_ci_size += 4;
+        else if( p_sys->track[i].i_cat == VIDEO_ES ) i_ci_size += 6;
     }
 
     /* size of the content description object */
@@ -838,6 +842,8 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
 
     i_header_ext_size = i_cm_size ? i_cm_size + 46 : 0;
     i_size += i_ci_size + i_cd_size + i_header_ext_size ;
+    /* Error correction data field */
+    if( tk->b_audio_correction ) i_size += 8;
 
     if( p_sys->b_asf_http )
     {
@@ -949,7 +955,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
 
         bo_add_guid ( &bo, &asf_object_stream_properties_guid );
 
-        if( tk->i_cat == AUDIO_ES ) /* Error correction data field */
+        if( tk->b_audio_correction ) /* Error correction data field */
             bo_addle_u64( &bo, 78 + tk->i_extra + 8 );
         else
             bo_addle_u64( &bo, 78 + tk->i_extra );
@@ -957,7 +963,10 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         if( tk->i_cat == AUDIO_ES )
         {
             bo_add_guid( &bo, &asf_object_stream_type_audio );
-            bo_add_guid( &bo, &asf_guid_audio_conceal_spread );
+            if( tk->b_audio_correction )
+                bo_add_guid( &bo, &asf_guid_audio_conceal_spread );
+            else
+                bo_add_guid( &bo, &asf_guid_audio_conceal_none );
         }
         else if( tk->i_cat == VIDEO_ES )
         {
@@ -966,16 +975,14 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
         }
         bo_addle_u64( &bo, 0 );         /* time offset */
         bo_addle_u32( &bo, tk->i_extra );
-        if( tk->i_cat == AUDIO_ES )
-            bo_addle_u32( &bo, 8 );         /* correction data length */
-        else
-            bo_addle_u32( &bo, 0 );         /* correction data length */
+        /* correction data length */
+        bo_addle_u32( &bo, tk->b_audio_correction ? 8 : 0 );
         bo_addle_u16( &bo, tk->i_id );  /* stream number */
         bo_addle_u32( &bo, 0 );
         bo_add_mem  ( &bo, tk->p_extra, tk->i_extra );
 
         /* Error correction data field */
-        if( tk->i_cat == AUDIO_ES )
+        if( tk->b_audio_correction )
         {
             bo_add_u8( &bo, 0x1 ); /* span */
             bo_addle_u16( &bo, tk->i_blockalign );  /* virtual packet length */

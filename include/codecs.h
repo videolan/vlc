@@ -114,7 +114,12 @@ typedef struct
     uint32_t   biClrUsed;
     uint32_t   biClrImportant;
 } BITMAPINFOHEADER, *PBITMAPINFOHEADER, *LPBITMAPINFOHEADER;
-typedef struct {
+
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
+{
     BITMAPINFOHEADER bmiHeader;
     int        bmiColors[1];
 } BITMAPINFO, *LPBITMAPINFO;
@@ -149,8 +154,57 @@ typedef struct
     uint32_t          dwBitErrorRate;
     REFERENCE_TIME    AvgTimePerFrame;
     BITMAPINFOHEADER  bmiHeader;
-    //int               reserved[3];
 } VIDEOINFOHEADER;
+#endif
+
+#ifndef _RGBQUAD_
+#define _RGBQUAD_
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
+{
+    uint8_t rgbBlue;
+    uint8_t rgbGreen;
+    uint8_t rgbRed;
+    uint8_t rgbReserved;
+} RGBQUAD1;
+#endif
+
+#ifndef _TRUECOLORINFO_
+#define _TRUECOLORINFO_
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
+{
+    uint32_t dwBitMasks[3];
+    RGBQUAD1 bmiColors[256];
+} TRUECOLORINFO;
+#endif
+
+#ifndef _VIDEOINFO_
+#define _VIDEOINFO_
+typedef struct
+#ifdef HAVE_ATTRIBUTE_PACKED
+    __attribute__((__packed__))
+#endif
+{
+    RECT32            rcSource;
+    RECT32            rcTarget;
+    uint32_t          dwBitRate;
+    uint32_t          dwBitErrorRate;
+    REFERENCE_TIME    AvgTimePerFrame;
+    BITMAPINFOHEADER  bmiHeader;
+
+    union
+    {
+        RGBQUAD1 bmiColors[256]; /* Colour palette */
+        uint32_t dwBitMasks[3]; /* True colour masks */
+        TRUECOLORINFO TrueColorInfo; /* Both of the above */
+    };
+
+} VIDEOINFO;
 #endif
 
 /* WAVE format wFormatTag IDs */
@@ -171,9 +225,10 @@ typedef struct
 
 #define WAVE_FORMAT_A52                 0x2000
 #define WAVE_FORMAT_DTS                 0x2001
-#define WAVE_FORMAT_WMA1                0x0160
-#define WAVE_FORMAT_WMA2                0x0161
-#define WAVE_FORMAT_WMA3                0x0162
+#define WAVE_FORMAT_WMA1                0x0160 /* WMA version 1 */
+#define WAVE_FORMAT_WMA2                0x0161 /* WMA (v2) 7, 8, 9 Series */
+#define WAVE_FORMAT_WMAP                0x0162 /* WMA 9 Professional */
+#define WAVE_FORMAT_WMAL                0x0163 /* WMA 9 Lossless */
 #define WAVE_FORMAT_DIVIO_AAC           0x4143
 #define WAVE_FORMAT_AAC                 0x00FF
 
@@ -240,9 +295,11 @@ wave_format_tag_to_fourcc[] =
     { WAVE_FORMAT_MPEGLAYER3,VLC_FOURCC('m', 'p', 'g', 'a' ), "Mpeg Audio" },
     { WAVE_FORMAT_MPEG,     VLC_FOURCC( 'm', 'p', 'g', 'a' ), "Mpeg Audio" },
     { WAVE_FORMAT_A52,      VLC_FOURCC( 'a', '5', '2', ' ' ), "A/52" },
-    { WAVE_FORMAT_WMA1,     VLC_FOURCC( 'w', 'm', 'a', '1' ), "Window Media Audio 1" },
-    { WAVE_FORMAT_WMA2,     VLC_FOURCC( 'w', 'm', 'a', '2' ), "Window Media Audio 2" },
-    { WAVE_FORMAT_WMA3,     VLC_FOURCC( 'w', 'm', 'a', '3' ), "Window Media Audio 3" },
+    { WAVE_FORMAT_WMA1,     VLC_FOURCC( 'w', 'm', 'a', '1' ), "Window Media Audio v1" },
+    { WAVE_FORMAT_WMA2,     VLC_FOURCC( 'w', 'm', 'a', '2' ), "Window Media Audio v2" },
+    { WAVE_FORMAT_WMA2,     VLC_FOURCC( 'w', 'm', 'a', ' ' ), "Window Media Audio v2" },
+    { WAVE_FORMAT_WMAP,     VLC_FOURCC( 'w', 'm', 'a', 'p' ), "Window Media Audio 9 Professional" },
+    { WAVE_FORMAT_WMAL,     VLC_FOURCC( 'w', 'm', 'a', 'l' ), "Window Media Audio 9 Lossless" },
     { WAVE_FORMAT_DK3,      VLC_FOURCC( 'm', 's', 0x00,0x61), "Duck DK3" },
     { WAVE_FORMAT_DK4,      VLC_FOURCC( 'm', 's', 0x00,0x62), "Duck DK4" },
     { WAVE_FORMAT_DTS,      VLC_FOURCC( 'd', 't', 's', ' ' ), "DTS Coherent Acoustics" },
