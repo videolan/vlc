@@ -627,7 +627,7 @@ void Playlist::AppendItem( wxCommandEvent& event )
         UpdateTreeItem( p_playlist, item );
     }
 
-    statusbar->SetStatusText( wxString::Format( wxT(_(
+    statusbar->SetStatusText( wxString::Format( wxU(_(
                               "%i items in playlist")),
                               p_playlist->i_size ), 0 );
 
@@ -770,7 +770,7 @@ void Playlist::Rebuild()
     else
     {
 */
-        statusbar->SetStatusText( wxString::Format( wxT(_(
+        statusbar->SetStatusText( wxString::Format( wxU(_(
                                   "%i items in playlist")),
                                   p_playlist->i_size ), 0 );
 //    }
