@@ -2,7 +2,7 @@
  * intf_beos.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: Interface.cpp,v 1.8 2003/01/25 20:15:41 titer Exp $
+ * $Id: Interface.cpp,v 1.9 2003/02/01 12:01:10 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -70,14 +70,12 @@ int E_(OpenIntf) ( vlc_object_t *p_this )
     p_intf->pf_run = Run;
 
     /* Create the interface window */
-    BScreen *screen;
-    screen = new BScreen();
-    BRect rect = screen->Frame();
+    BScreen screen(B_MAIN_SCREEN_ID);
+    BRect rect = screen.Frame();
     rect.top = rect.bottom-100;
     rect.bottom -= 50;
     rect.left += 50;
     rect.right = rect.left + 350;
-    delete screen;
     p_intf->p_sys->p_window =
         new InterfaceWindow( rect,
                              VOUT_TITLE " (BeOS interface)", p_intf );

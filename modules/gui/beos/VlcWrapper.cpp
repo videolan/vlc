@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.23 2003/01/29 00:02:09 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.24 2003/02/01 12:01:11 stippi Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -358,35 +358,47 @@ bool VlcWrapper::IsPlaying()
  * playlist *
  ************/
 
-void VlcWrapper::OpenFiles( BList* o_files, bool replace )
+void VlcWrapper::OpenFiles( BList* o_files, bool replace, int32 index )
 {
-    BString *o_file;
-    int size = PlaylistSize();
-	bool wasEmpty = ( size < 1 );
-
-    /* delete current playlist */
-    if( replace )
-    {
-        for( int i = 0; i < size; i++ )
-        {
-            playlist_Delete( p_playlist, 0 );
-        }
-    }
-
-    /* append files */
-    while( ( o_file = (BString *)o_files->LastItem() ) )
-    {
-        playlist_Add( p_playlist, o_file->String(),
-                      PLAYLIST_APPEND, PLAYLIST_END );
-        o_files->RemoveItem(o_files->CountItems() - 1);
-    }
-    
-    /* eventually restart playing */
-    if( replace || wasEmpty )
-    {
-        playlist_Stop( p_playlist );
-        playlist_Play( p_playlist );
-    }
+	if ( o_files && o_files->CountItems() > 0)
+	{
+	    int size = PlaylistSize();
+		bool wasEmpty = ( size < 1 );
+		if ( index == -1 )
+			index = PLAYLIST_END;
+		int mode = index == PLAYLIST_END ? PLAYLIST_APPEND : PLAYLIST_INSERT;
+	
+	    /* delete current playlist */
+	    if( replace )
+	    {
+	        for( int i = 0; i < size; i++ )
+	        {
+	            playlist_Delete( p_playlist, 0 );
+	        }
+	    }
+	
+	    /* insert files */
+	    int32 count = o_files->CountItems();
+	    for ( int32 i = count - 1; i >= 0; i-- )
+	    {
+	    	if ( BString* o_file = (BString *)o_files->RemoveItem( i ) )
+	    	{
+		        playlist_Add( p_playlist, o_file->String(),
+		                      mode, index );
+		        if ( mode == PLAYLIST_INSERT )
+		        	index++;
+		        delete o_file;
+	    	}
+	    }
+	    // TODO: implement a user setting
+	    // if to start automatically
+	    /* eventually restart playing */
+	    if( replace || wasEmpty )
+	    {
+	        playlist_Stop( p_playlist );
+	        playlist_Play( p_playlist );
+	    }
+	}
 }
  
 void VlcWrapper::OpenDisc(BString o_type, BString o_device, int i_title, int i_chapter)
@@ -455,11 +467,15 @@ void VlcWrapper::GetPlaylistInfo( int32& currentIndex, int32& maxIndex )
 	maxIndex = -1;
 	if ( p_playlist )
 	{
+	    vlc_mutex_lock( &p_playlist->object_lock );
+
 		maxIndex = p_playlist->i_size;
 		if ( maxIndex > 0 )
-			currentIndex = p_playlist->i_index + 1;
+			currentIndex = p_playlist->i_index/* + 1 -> why?!?*/;
 		else
 			maxIndex = -1;
+
+	    vlc_mutex_unlock( &p_playlist->object_lock );
 	}
 }
 
@@ -609,6 +625,131 @@ void VlcWrapper::NavigateNext()
 	// last but not least, skip to next file
 	if ( !hasSkiped )
 		PlaylistNext();
+}
+
+/*************************
+ * Playlist manipulation *
+ *************************/
+
+// PlaylistLock
+bool
+VlcWrapper::PlaylistLock() const
+{
+// TODO: search and destroy -> deadlock!
+return true;
+	if ( p_playlist )
+	{
+ 		vlc_mutex_lock( &p_playlist->object_lock );
+ 		return true;
+ 	}
+ 	return false;
+}
+
+// PlaylistUnlock
+void
+VlcWrapper::PlaylistUnlock() const
+{
+// TODO: search and destroy -> deadlock!
+return;
+	vlc_mutex_unlock( &p_playlist->object_lock );
+}
+
+// PlaylistItemAt
+void*
+VlcWrapper::PlaylistItemAt( int index ) const
+{
+	playlist_item_t* item = NULL;
+	if ( index >= 0 && index < p_playlist->i_size )
+		item = p_playlist->pp_items[index];
+	return (void*)item;
+}
+
+// PlaylistRemoveItem
+void*
+VlcWrapper::PlaylistRemoveItem( int index ) const
+{
+	playlist_item_t* copy = NULL;
+	// check if item exists at the provided index
+	if ( index >= 0 && index < p_playlist->i_size )
+	{
+		playlist_item_t* item = p_playlist->pp_items[index];
+		if ( item )
+		{
+			// make a copy of the removed item
+			copy = (playlist_item_t*)PlaylistCloneItem( (void*)item );
+			// remove item from playlist (unfortunately, this frees it)
+			playlist_Delete( p_playlist, index );
+		}
+	}
+	return (void*)copy;
+}
+
+// PlaylistRemoveItem
+void*
+VlcWrapper::PlaylistRemoveItem( void* item ) const
+{
+	playlist_item_t* copy = NULL;
+	for ( int32 i = 0; i < p_playlist->i_size; i++ )
+	{
+		if ( p_playlist->pp_items[i] == item )
+		{
+			copy = (playlist_item_t*)PlaylistRemoveItem( i );
+			break;
+		}
+	}
+	return (void*)copy;
+}
+
+// PlaylistAddItem
+bool
+VlcWrapper::PlaylistAddItem( void* item, int index ) const
+{
+	if ( item )
+	{
+		playlist_AddItem( p_playlist, (playlist_item_t*)item,
+						  PLAYLIST_INSERT, index );
+	}
+	// TODO: once playlist is returning useful info, return that instead
+	return true;
+}
+
+// PlaylistCloneItem
+void*
+VlcWrapper::PlaylistCloneItem( void* castToItem ) const
+{
+	playlist_item_t* copy = NULL;
+	playlist_item_t* item = (playlist_item_t*)castToItem;
+	if ( item )
+	{
+		copy = (playlist_item_t*)malloc( sizeof( playlist_item_t ) );
+		if ( copy )
+		{
+			// make a copy of the item at index
+			copy->psz_name = strdup( item->psz_name );
+			copy->psz_uri  = strdup( item->psz_uri );
+			copy->i_type = item->i_type;
+			copy->i_status = item->i_status;
+			copy->b_autodeletion = item->b_autodeletion;
+		}
+	}
+	return (void*)copy;
+}
+
+// Careful! You need to know what you're doing here!
+// The reason for having it, is to be able to deal with
+// the rather lame list implementation of the playlist.
+// It is meant to help manipulate the playlist with the above
+// methods while keeping it valid.
+//
+// PlaylistSetPlaying
+void
+VlcWrapper::PlaylistSetPlaying( int index ) const
+{
+	if ( index < 0 )
+		index = 0;
+	if ( index >= p_playlist->i_size )
+		index = p_playlist->i_size - 1;
+	p_playlist->i_index = index;
 }
 
 
@@ -853,7 +994,7 @@ void VlcWrapper::ChapterInfo( int32 &currentIndex, int32 &maxIndex )
  * Miscellanous *
  ****************/
  
-void VlcWrapper::LoadSubFile( char * psz_file )
+void VlcWrapper::LoadSubFile( const char * psz_file )
 {
     config_PutPsz( p_intf, "sub-file", strdup( psz_file ) );
 }

@@ -2,7 +2,7 @@
  * ListViews.h: BeOS interface list view class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ListViews.h,v 1.2 2003/01/22 01:13:22 titer Exp $
+ * $Id: ListViews.h,v 1.3 2003/02/01 12:01:11 stippi Exp $
  *
  * Authors: Stephan Aßmus <stippi@yellowbites.com>
  *
@@ -73,13 +73,28 @@ class DragSortableListView : public BListView
 									  bool complete = false);
 
 							// DragSortableListView
+	virtual	void			ModifiersChanged();	// called by window
+
+	virtual	void			MoveItems( BList& items, int32 toIndex );
+	virtual	void			CopyItems( BList& items, int32 toIndex );
+	virtual	void			RemoveItemList( BList& indices );
+			void			RemoveSelected(); // uses RemoveItemList()
+
 	virtual	BListItem*		CloneItem( int32 atIndex ) const = 0;
 	virtual	void			DrawListItem( BView* owner, int32 index,
 										  BRect itemFrame ) const = 0;
 	virtual	void			MakeDragMessage( BMessage* message ) const = 0;
 
  private:
-	int32			fDropIndex;
+			void			_SetDropAnticipationRect( BRect r );
+			void			_SetDropIndex( int32 index );
+			void			_RemoveDropAnticipationRect();
+
+	BRect					fDropRect;
+	BMessage				fDragMessageCopy;
+
+ protected:
+	int32					fDropIndex;
 };
 
 // PlaylistView
@@ -88,16 +103,23 @@ class PlaylistView : public DragSortableListView
  public:
 							PlaylistView( BRect frame,
 										  InterfaceWindow* mainWindow,
-										  VlcWrapper * p_wrapper );
+										  VlcWrapper* wrapper,
+										  BMessage* selectionChangeMessage = NULL );
 							~PlaylistView();
 
 							// BListView
 	virtual	void			AttachedToWindow();
+	virtual void			MessageReceived( BMessage* message );
 	virtual void			MouseDown( BPoint where );
 	virtual	void			KeyDown( const char* bytes, int32 numBytes );
 	virtual	void			Pulse();
+	virtual	void			SelectionChanged();
 
 							// DragSortableListView
+	virtual	void			MoveItems( BList& items, int32 toIndex );
+	virtual	void			CopyItems( BList& items, int32 toIndex );
+	virtual	void			RemoveItemList( BList& indices );
+
 	virtual	BListItem*		CloneItem( int32 atIndex ) const;
 	virtual	void			DrawListItem( BView* owner, int32 index,
 										  BRect itemFrame ) const;
@@ -106,13 +128,15 @@ class PlaylistView : public DragSortableListView
 							// PlaylistView
 			void			SetCurrent( int32 index );
 			void			SetPlaying( bool playing );
+			void			RebuildList();
 
  private:
 	int32					fCurrentIndex;
 	bool					fPlaying;
 	InterfaceWindow*		fMainWindow;
+	BMessage*				fSelectionChangeMessage;
 	
-	VlcWrapper *            p_wrapper;
+	VlcWrapper*				fVlcWrapper;
 };
 
 #endif // LIST_VIEWS_H

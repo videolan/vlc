@@ -2,7 +2,7 @@
  * InterfaceWindow.h: BeOS interface window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.h,v 1.10 2003/01/25 20:15:41 titer Exp $
+ * $Id: InterfaceWindow.h,v 1.11 2003/02/01 12:01:11 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -36,6 +36,7 @@ class PlayListWindow;
 class BFilePanel;
 class PreferencesWindow;
 class MessagesWindow;
+class VlcWrapper;
 
 class CDMenu : public BMenu
 {
@@ -60,8 +61,6 @@ class LanguageMenu : public BMenu
     virtual void            AttachedToWindow();
 
  private:
-            void            _GetChannels();
-
     VlcWrapper *            p_wrapper;
     int                     kind;
 };
@@ -115,13 +114,16 @@ class InterfaceWindow : public BWindow
                                               bool hasTitles = false );
             void            _UpdateSpeedMenu( int rate );
             void            _InputStreamChanged();
+            void			_ShowFilePanel( uint32 command,
+            								const char* windowTitle );
+			void			_RestoreSettings();
+			void			_StoreSettings();
 
     intf_thread_t*          p_intf;
     es_descriptor_t*        p_spu_es;
 
     bool                    fPlaylistIsEmpty;
     BFilePanel*             fFilePanel;
-    BFilePanel*             fSubtitlesPanel;
     PlayListWindow*         fPlaylistWindow;
     PreferencesWindow*      fPreferencesWindow;
     MessagesWindow*         fMessagesWindow;
@@ -143,8 +145,20 @@ class InterfaceWindow : public BWindow
     BMenu*                  fSpeedMenu;
     BMenu*                  fShowMenu;
     bigtime_t               fLastUpdateTime;
-    
-    VlcWrapper * p_wrapper;
+	BMessage*				fSettings;	// we keep the message arround
+										// for forward compatibility
+    VlcWrapper*				p_wrapper;
 };
+
+
+// some global support functions
+status_t load_settings( BMessage* message,
+						const char* fileName,
+						const char* folder = NULL );
+
+status_t save_settings( BMessage* message,
+						const char* fileName,
+						const char* folder = NULL );
+
 
 #endif    // BEOS_INTERFACE_WINDOW_H

@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.18 2003/01/29 00:02:09 titer Exp $
+ * $Id: VlcWrapper.h,v 1.19 2003/02/01 12:01:11 stippi Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -79,7 +79,8 @@ public:
     bool         IsPlaying();
         
     /* Playlist */
-    void    OpenFiles( BList *o_files, bool replace = true );
+    void    OpenFiles( BList *o_files, bool replace = true,
+    				   int32 index = -1 );
     void    OpenDisc( BString o_type, BString o_device,
                      int i_title, int i_chapter );
     int     PlaylistSize();
@@ -98,6 +99,21 @@ public:
                                 bool * canSkipNext );
     void    NavigatePrev();
     void    NavigateNext();
+
+	/* Playlist manipulation */
+	bool	PlaylistLock() const;
+	void	PlaylistUnlock() const;
+	// playlist must be locked prior to calling all of these!
+	void*	PlaylistItemAt( int index ) const;
+			// both functions return a copy of the removed item
+			// so that it can be added at another index
+	void*	PlaylistRemoveItem( int index ) const;
+	void*	PlaylistRemoveItem( void* item ) const;
+			// uses playlist_AddItem()
+	bool	PlaylistAddItem( void* item, int index ) const;
+	void*	PlaylistCloneItem( void* item ) const;
+			// only modifies playlist, doesn't effect playback
+	void	PlaylistSetPlaying( int index ) const;
 
     /* Audio */
     bool           HasAudio();
@@ -123,7 +139,7 @@ public:
     void    ChapterInfo( int32& currentIndex, int32& maxIndex );
     
     /* Miscellanous */
-    void LoadSubFile( char * psz_file );
+    void LoadSubFile( const char * psz_file );
     void FilterChange();
     
 private:

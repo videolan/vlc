@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.25 2003/01/31 06:45:00 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.26 2003/02/01 12:01:10 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -52,30 +52,106 @@
 #include "InterfaceWindow.h"
 
 #define INTERFACE_UPDATE_TIMEOUT 80000 // 2 frames if at 25 fps
+#define INTERFACE_LOCKING_TIMEOUT 5000
+
+// make_sure_frame_is_on_screen
+bool
+make_sure_frame_is_on_screen( BRect& frame )
+{
+	BScreen screen( B_MAIN_SCREEN_ID );
+	if (frame.IsValid() && screen.IsValid()) {
+		if (!screen.Frame().Contains(frame)) {
+			// make sure frame fits in the screen
+			if (frame.Width() > screen.Frame().Width())
+				frame.right -= frame.Width() - screen.Frame().Width() + 10.0;
+			if (frame.Height() > screen.Frame().Height())
+				frame.bottom -= frame.Height() - screen.Frame().Height() + 30.0;
+			// frame is now at the most the size of the screen
+			if (frame.right > screen.Frame().right)
+				frame.OffsetBy(-(frame.right - screen.Frame().right), 0.0);
+			if (frame.bottom > screen.Frame().bottom)
+				frame.OffsetBy(0.0, -(frame.bottom - screen.Frame().bottom));
+			if (frame.left < screen.Frame().left)
+				frame.OffsetBy((screen.Frame().left - frame.left), 0.0);
+			if (frame.top < screen.Frame().top)
+				frame.OffsetBy(0.0, (screen.Frame().top - frame.top));
+		}
+		return true;
+	}
+	return false;
+}
+
+// make_sure_frame_is_within_limits
+void
+make_sure_frame_is_within_limits( BRect& frame, float minWidth, float minHeight,
+                                  float maxWidth, float maxHeight )
+{
+    if ( frame.Width() < minWidth )
+        frame.right = frame.left + minWidth;
+    if ( frame.Height() < minHeight )
+        frame.bottom = frame.top + minHeight;
+    if ( frame.Width() > maxWidth )
+        frame.right = frame.left + maxWidth;
+    if ( frame.Height() > maxHeight )
+        frame.bottom = frame.top + maxHeight;
+}
+
+// get_volume_info
+bool
+get_volume_info( BVolume& volume, BString& volumeName, bool& isCDROM, BString& deviceName )
+{
+	bool success = false;
+	isCDROM = false;
+	deviceName = "";
+	volumeName = "";
+	char name[B_FILE_NAME_LENGTH];
+	if ( volume.GetName( name ) >= B_OK )	// disk is currently mounted
+	{
+		volumeName = name;
+		dev_t dev = volume.Device();
+		fs_info info;
+		if ( fs_stat_dev( dev, &info ) == B_OK )
+		{
+			success = true;
+			deviceName = info.device_name;
+			if ( volume.IsReadOnly() )
+			{
+				int i_dev = open( info.device_name, O_RDONLY );
+				if ( i_dev >= 0 )
+				{
+					device_geometry g;
+					if ( ioctl( i_dev, B_GET_GEOMETRY, &g, sizeof( g ) ) >= 0 )
+						isCDROM = ( g.device_type == B_CD );
+					close( i_dev );
+				}
+			}
+		}
+ 	}
+ 	return success;
+}
 
 
 /*****************************************************************************
  * InterfaceWindow
  *****************************************************************************/
 
-InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
-                                  intf_thread_t  *p_interface )
+InterfaceWindow::InterfaceWindow( BRect frame, const char* name,
+                                  intf_thread_t* p_interface )
     : BWindow( frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
                B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK | B_ASYNCHRONOUS_CONTROLS ),
       p_intf( p_interface ),
       fFilePanel( NULL ),
-      fSubtitlesPanel( NULL ),
-      fLastUpdateTime( system_time() )
+      fLastUpdateTime( system_time() ),
+	  fSettings( new BMessage( 'sett' ) ),
+	  p_wrapper( p_intf->p_sys->p_wrapper )
 {
-    p_intf = p_interface;
-    p_wrapper = p_intf->p_sys->p_wrapper;
+	// TODO: ?!? what about user settings?
     p_intf->p_sys->b_dvdmenus = false;
     
     fPlaylistIsEmpty = !( p_wrapper->PlaylistSize() > 0 );
     
-    BScreen *p_screen = new BScreen();
-    BRect screen_rect = p_screen->Frame();
-    delete p_screen;
+    BScreen screen;
+    BRect screen_rect = screen.Frame();
     BRect window_rect;
     window_rect.Set( ( screen_rect.right - PREFS_WINDOW_WIDTH ) / 2,
                      ( screen_rect.bottom - PREFS_WINDOW_HEIGHT ) / 2,
@@ -129,7 +205,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     
     fileMenu->AddItem( new CDMenu( "Open Disc" ) );
 
-    fileMenu->AddItem( new BMenuItem( "Load a subtitle file" B_UTF8_ELLIPSIS,
+    fileMenu->AddItem( new BMenuItem( "Open Subtitles" B_UTF8_ELLIPSIS,
                                       new BMessage( LOAD_SUBFILE ) ) );
     
     fileMenu->AddSeparatorItem();
@@ -176,7 +252,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     fMenuBar->AddItem( fSpeedMenu );
 
     /* Add the Show menu */
-    fShowMenu = new BMenu( "Show" );
+    fShowMenu = new BMenu( "Window" );
     fShowMenu->AddItem( new BMenuItem( "Play List" B_UTF8_ELLIPSIS,
                                        new BMessage( OPEN_PLAYLIST ), 'P') );
     fShowMenu->AddItem( new BMenuItem( "Messages" B_UTF8_ELLIPSIS,
@@ -188,56 +264,106 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
     /* Prepare fow showing */
     _SetMenusEnabled( false );
     p_mediaControl->SetEnabled( false );
+
+	_RestoreSettings();
     
-    /* Restore interface settings */
+/*    // Restore interface settings
+	// main window size and position
     int i_width = config_GetInt( p_intf, "beos-intf-width" ),
         i_height = config_GetInt( p_intf, "beos-intf-height" ),
         i_xpos = config_GetInt( p_intf, "beos-intf-xpos" ),
         i_ypos = config_GetInt( p_intf, "beos-intf-ypos" );
-    if( i_width && i_height && i_xpos && i_ypos )
+    if( i_width > 20 && i_height > 20 && i_xpos >= 0 && i_ypos >= 0 )
     {
-        /* main window size and position */
-        ResizeTo( i_width, i_height );
-        MoveTo( i_xpos, i_ypos );
+    	BRect r( i_xpos, i_ypos, i_xpos + i_width, i_ypos + i_height );
+
+		float minWidth, maxWidth, minHeight, maxHeight;
+		GetSizeLimits( &minWidth, &maxWidth, &minHeight, &maxHeight );
+
+		make_sure_frame_is_within_limits( r, minWidth, minHeight, maxWidth, maxHeight );
+		if ( make_sure_frame_is_on_screen( r ) )
+		{
+	        ResizeTo( r.Width(), r.Height() );
+	        MoveTo( r.LeftTop() );
+		}
     }
+	// playlist window size and position
     i_width = config_GetInt( p_intf, "beos-playlist-width" ),
     i_height = config_GetInt( p_intf, "beos-playlist-height" ),
     i_xpos = config_GetInt( p_intf, "beos-playlist-xpos" ),
     i_ypos = config_GetInt( p_intf, "beos-playlist-ypos" );
-    if( i_width && i_height && i_xpos && i_ypos )
+    if( i_width > 20 && i_height > 20 && i_xpos >= 0 && i_ypos >= 0 )
     {
-        /* playlist window size and position */
-        fPlaylistWindow->ResizeTo( i_width, i_height );
-        fPlaylistWindow->MoveTo( i_xpos, i_ypos );
+    	BRect r( i_xpos, i_ypos, i_xpos + i_width, i_ypos + i_height );
+
+		float minWidth, maxWidth, minHeight, maxHeight;
+		fPlaylistWindow->GetSizeLimits( &minWidth, &maxWidth, &minHeight, &maxHeight );
+
+		make_sure_frame_is_within_limits( r, minWidth, minHeight, maxWidth, maxHeight );
+		if ( make_sure_frame_is_on_screen( r ) )
+		{
+	        fPlaylistWindow->ResizeTo( r.Width(), r.Height() );
+	        fPlaylistWindow->MoveTo( r.LeftTop() );
+		}
     }
+    // child windows are not running yet, that's why we aint locking them
+    // playlist showing
+    // messages window size and position
     i_width = config_GetInt( p_intf, "beos-messages-width" ),
     i_height = config_GetInt( p_intf, "beos-messages-height" ),
     i_xpos = config_GetInt( p_intf, "beos-messages-xpos" ),
     i_ypos = config_GetInt( p_intf, "beos-messages-ypos" );
     if( i_width && i_height && i_xpos && i_ypos )
     {
-        /* messages window size and position */
-        fMessagesWindow->ResizeTo( i_width, i_height );
-        fMessagesWindow->MoveTo( i_xpos, i_ypos );
+    	BRect r( i_xpos, i_ypos, i_xpos + i_width, i_ypos + i_height );
+
+		float minWidth, maxWidth, minHeight, maxHeight;
+		fMessagesWindow->GetSizeLimits( &minWidth, &maxWidth, &minHeight, &maxHeight );
+
+		make_sure_frame_is_within_limits( r, minWidth, minHeight, maxWidth, maxHeight );
+		if ( make_sure_frame_is_on_screen( r ) )
+		{
+	        fMessagesWindow->ResizeTo( r.Width(), r.Height() );
+	        fMessagesWindow->MoveTo( r.LeftTop() );
+		}
     }
     if( config_GetInt( p_intf, "beos-playlist-show" ) )
     {
-        /* playlist showing */
-        if( fPlaylistWindow->Lock() )
-        {
-            fPlaylistWindow->Show();
-            fPlaylistWindow->Unlock();
-        }
+		fPlaylistWindow->Show();
     }
+    else
+    {
+		fPlaylistWindow->Hide();
+		fPlaylistWindow->Show();
+    }
+	// messages window size and position
+    i_width = config_GetInt( p_intf, "beos-messages-width" ),
+    i_height = config_GetInt( p_intf, "beos-messages-height" ),
+    i_xpos = config_GetInt( p_intf, "beos-messages-xpos" ),
+    i_ypos = config_GetInt( p_intf, "beos-messages-ypos" );
+    if( i_width > 20 && i_height > 20 && i_xpos >= 0 && i_ypos >= 0 )
+    {
+    	BRect r( i_xpos, i_ypos, i_xpos + i_width, i_ypos + i_height );
+		float minWidth, maxWidth, minHeight, maxHeight;
+		fMessagesWindow->GetSizeLimits( &minWidth, &maxWidth, &minHeight, &maxHeight );
+
+		make_sure_frame_is_within_limits( r, minWidth, minHeight, maxWidth, maxHeight );
+		if ( make_sure_frame_is_on_screen( r ) )
+		{
+	        fMessagesWindow->ResizeTo( r.Width(), r.Height() );
+	        fMessagesWindow->MoveTo( r.LeftTop() );
+		}
+    }
+    // messages showing
     if( config_GetInt( p_intf, "beos-messages-show" ) )
     {
-        /* messages showing */
-        if( fMessagesWindow->Lock() )
-        {
-            fMessagesWindow->Show();
-            fMessagesWindow->Unlock();
-        }
+		fMessagesWindow->Show();
     }
+    else
+    {
+		fMessagesWindow->Hide();
+		fMessagesWindow->Show();
+    }*/
     
     Show();
 }
@@ -246,8 +372,12 @@ InterfaceWindow::~InterfaceWindow()
 {
     if( fPlaylistWindow )
         fPlaylistWindow->ReallyQuit();
+    fPlaylistWindow = NULL;
     if( fMessagesWindow )
         fMessagesWindow->ReallyQuit();
+    fMessagesWindow = NULL;
+	delete fFilePanel;
+	delete fSettings;
 }
 
 /*****************************************************************************
@@ -285,16 +415,13 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
             
         case OPEN_FILE:
-            if( fFilePanel )
-            {
-                fFilePanel->Show();
-                break;
-            }
-            fFilePanel = new BFilePanel();
-            fFilePanel->SetTarget( this );
-            fFilePanel->Show();
+        	_ShowFilePanel( B_REFS_RECEIVED, "VideoLAN Client: Open Media Files" );
             break;
-    
+
+        case LOAD_SUBFILE:
+        	_ShowFilePanel( SUBFILE_RECEIVED, "VideoLAN Client: Open Subtitle File" );
+            break;
+
         case OPEN_PLAYLIST:
             if (fPlaylistWindow->Lock())
             {
@@ -318,18 +445,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             }
             break;
         
-        case LOAD_SUBFILE:
-            if( fSubtitlesPanel )
-            {
-                fSubtitlesPanel->Show();
-                break;
-            }
-            fSubtitlesPanel = new BFilePanel();
-            fSubtitlesPanel->SetTarget( this );
-            fSubtitlesPanel->SetMessage( new BMessage( SUBFILE_RECEIVED ) );
-            fSubtitlesPanel->Show();
-            break;
-
         case SUBFILE_RECEIVED:
         {
             entry_ref ref;
@@ -337,7 +452,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             {
                 BPath path( &ref );
                 if ( path.InitCheck() == B_OK )
-                    p_wrapper->LoadSubFile( (char*)path.Path() );
+                    p_wrapper->LoadSubFile( path.Path() );
             }
             break;
         }
@@ -346,7 +461,6 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             // this currently stops playback not nicely
             if (playback_status > UNDEF_S)
             {
-                snooze( 400000 );
                 p_wrapper->PlaylistStop();
                 p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
             }
@@ -512,73 +626,73 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                     if ( path.InitCheck() == B_OK )
                     {
                         bool add = true;
-                        // has the user dropped a dvd disk icon?
+                        // has the user dropped a folder?
                         BDirectory dir( &ref );
-                        if ( dir.InitCheck() == B_OK && dir.IsRootDirectory() )
+                        if ( dir.InitCheck() == B_OK)
                         {
-                            BVolumeRoster volRoster;
-                            BVolume vol;
-                            BDirectory volumeRoot;
-                            status_t status = volRoster.GetNextVolume( &vol );
-                            while( status == B_NO_ERROR )
-                            {
-                                if( vol.GetRootDirectory( &volumeRoot ) == B_OK
-                                    && dir == volumeRoot )
-                                {
-                                    BString volumeName;
-                                    BString deviceName;
-                                    bool isCDROM = false;
-                                    bool success = false;
-                                    deviceName = "";
-                                    volumeName = "";
-                                    char name[B_FILE_NAME_LENGTH];
-                                    if ( vol.GetName( name ) >= B_OK )    // disk is currently mounted
-                                    {
-                                        volumeName = name;
-                                        dev_t dev = vol.Device();
-                                        fs_info info;
-                                        if ( fs_stat_dev( dev, &info ) == B_OK )
-                                        {
-                                            success = true;
-                                            deviceName = info.device_name;
-                                            if ( vol.IsReadOnly() )
-                                            {
-                                                int i_dev = open( info.device_name, O_RDONLY );
-                                                if ( i_dev >= 0 )
-                                                {
-                                                    device_geometry g;
-                                                    if ( ioctl( i_dev, B_GET_GEOMETRY, &g, sizeof( g ) ) >= 0 )
-                                                    isCDROM = ( g.device_type == B_CD );
-                                                    close( i_dev );
-                                                }
-                                            }
-                                        }
-                                     }
-                                    
-                                    if( success && isCDROM )
-                                    {
-                                        BMessage msg( OPEN_DVD );
-                                        msg.AddString( "device", deviceName.String() );
-                                        PostMessage( &msg );
-                                        add = false;
-                                    }
-                                     break;
-                                }
-                                else
-                                {
-                                     vol.Unset();
-                                    status = volRoster.GetNextVolume( &vol );
-                                }
-                            }
+	                        // has the user dropped a dvd disk icon?
+                       		// TODO: this code does not work for the following situation:
+                       		// if the user dropped the icon for his partition containing
+                       		// all his mp3 files, this routine will not do anything, because
+                       		// the folder that was dropped is a root folder, but no DVD drive
+							if ( dir.IsRootDirectory() )
+							{
+								BVolumeRoster volRoster;
+								BVolume vol;
+								BDirectory volumeRoot;
+								status_t status = volRoster.GetNextVolume( &vol );
+								while ( status == B_NO_ERROR )
+								{
+									if ( vol.GetRootDirectory( &volumeRoot ) == B_OK
+										 && dir == volumeRoot )
+									{
+										BString volumeName;
+										BString deviceName;
+										bool isCDROM;
+										if ( get_volume_info( vol, volumeName, isCDROM, deviceName )
+											 && isCDROM )
+										{
+											BMessage msg( OPEN_DVD );
+											msg.AddString( "device", deviceName.String() );
+											PostMessage( &msg );
+											add = false;
+										}
+								 		break;
+									}
+									else
+									{
+								 		vol.Unset();
+										status = volRoster.GetNextVolume( &vol );
+									}
+								}
+							}
+                        	else
+                        	{
+                        		// add all files from the dropped folder
+                        		// TODO: do this recursively
+                        		dir.Rewind();
+                        		add = false;
+                        		BEntry entry;
+                        		while ( dir.GetNextEntry( &entry ) == B_OK )
+                        		{
+									// ", 0" is because we receive the files in reverse order
+                        			if ( !entry.IsDirectory() && entry.GetPath( &path ) == B_OK )
+			                            files.AddItem( new BString( path.Path() ), 0 );
+                        		}
+                        	}
                         }
                         if( add )
                         {
-                            files.AddItem( new BString( (char*)path.Path() ) );
+                            files.AddItem( new BString( path.Path() ) );
                         }
                     }
                 }
                 // give the list to VLC
-                p_wrapper->OpenFiles(&files, replace);
+                // BString objects allocated here will be deleted there
+                int32 index;
+                if ( p_message->FindInt32("drop index", &index) != B_OK )
+                	index = -1;
+                p_wrapper->OpenFiles( &files, replace, index );
                 _UpdatePlaylist();
             }
             break;
@@ -625,7 +739,7 @@ bool InterfaceWindow::QuitRequested()
     p_mediaControl->SetStatus(NOT_STARTED_S, DEFAULT_RATE);
 
     /* Save interface settings */
-    BRect frame = Frame();
+/*    BRect frame = Frame();
     config_PutInt( p_intf, "beos-intf-width", (int)frame.Width() );
     config_PutInt( p_intf, "beos-intf-height", (int)frame.Height() );
     config_PutInt( p_intf, "beos-intf-xpos", (int)frame.left );
@@ -649,9 +763,10 @@ bool InterfaceWindow::QuitRequested()
         config_PutInt( p_intf, "beos-messages-ypos", (int)frame.top );
         config_PutInt( p_intf, "beos-messages-show", !fMessagesWindow->IsHidden() );
         fMessagesWindow->Unlock();
-    }
+    }*/
     config_SaveConfigFile( p_intf, "beos" );
-    
+ 	_StoreSettings();
+   
     p_intf->b_die = 1;
 
     return( true );
@@ -666,9 +781,9 @@ void InterfaceWindow::UpdateInterface()
     {
         if ( acquire_sem( p_mediaControl->fScrubSem ) == B_OK )
         {
-            p_wrapper->SetTimeAsFloat(p_mediaControl->GetSeekTo());
+            p_wrapper->SetTimeAsFloat( p_mediaControl->GetSeekTo() );
         }
-        else if ( Lock() )
+        else if ( LockWithTimeout( INTERFACE_LOCKING_TIMEOUT ) == B_OK )
         {
             p_mediaControl->SetEnabled( true );
             bool hasTitles = p_wrapper->HasTitles();
@@ -696,7 +811,7 @@ void InterfaceWindow::UpdateInterface()
             Unlock();
         }
         // update playlist as well
-        if ( fPlaylistWindow->Lock() )
+        if ( fPlaylistWindow->LockWithTimeout( INTERFACE_LOCKING_TIMEOUT ) == B_OK )
         {
             fPlaylistWindow->UpdatePlaylist();
             fPlaylistWindow->Unlock();
@@ -706,7 +821,7 @@ void InterfaceWindow::UpdateInterface()
     {
         _SetMenusEnabled( false );
         if( !( p_wrapper->PlaylistSize() > 0 ) )
-           p_mediaControl->SetEnabled( false );
+            p_mediaControl->SetEnabled( false );
         else
             p_mediaControl->SetProgress( 0 );
     }
@@ -718,8 +833,11 @@ void InterfaceWindow::UpdateInterface()
     {
         p_wrapper->SetVolume( i_volume );
     }
-    
-    fMessagesWindow->UpdateMessages();
+
+	// strangly, someone is calling this function even after the object has been destructed!
+	// even more strangly, this workarround seems to work
+	if (fMessagesWindow)
+	    fMessagesWindow->UpdateMessages();
 
     fLastUpdateTime = system_time();
 }
@@ -758,30 +876,30 @@ InterfaceWindow::_SetMenusEnabled(bool hasFile, bool hasChapters, bool hasTitles
         hasChapters = false;
         hasTitles = false;
     }
-    if (Lock())
+    if ( LockWithTimeout( INTERFACE_LOCKING_TIMEOUT ) == B_OK)
     {
-        if (fNextChapterMI->IsEnabled() != hasChapters)
-            fNextChapterMI->SetEnabled(hasChapters);
-        if (fPrevChapterMI->IsEnabled() != hasChapters)
-            fPrevChapterMI->SetEnabled(hasChapters);
-        if (fChapterMenu->IsEnabled() != hasChapters)
-            fChapterMenu->SetEnabled(hasChapters);
-        if (fNextTitleMI->IsEnabled() != hasTitles)
-            fNextTitleMI->SetEnabled(hasTitles);
-        if (fPrevTitleMI->IsEnabled() != hasTitles)
-            fPrevTitleMI->SetEnabled(hasTitles);
-        if (fTitleMenu->IsEnabled() != hasTitles)
-            fTitleMenu->SetEnabled(hasTitles);
-        if (fAudioMenu->IsEnabled() != hasFile)
-            fAudioMenu->SetEnabled(hasFile);
-        if (fNavigationMenu->IsEnabled() != hasFile)
-            fNavigationMenu->SetEnabled(hasFile);
-        if (fLanguageMenu->IsEnabled() != hasFile)
-            fLanguageMenu->SetEnabled(hasFile);
-        if (fSubtitlesMenu->IsEnabled() != hasFile)
-            fSubtitlesMenu->SetEnabled(hasFile);
-        if (fSpeedMenu->IsEnabled() != hasFile)
-            fSpeedMenu->SetEnabled(hasFile);
+        if ( fNextChapterMI->IsEnabled() != hasChapters )
+             fNextChapterMI->SetEnabled( hasChapters );
+        if ( fPrevChapterMI->IsEnabled() != hasChapters )
+             fPrevChapterMI->SetEnabled( hasChapters );
+        if ( fChapterMenu->IsEnabled() != hasChapters )
+             fChapterMenu->SetEnabled( hasChapters );
+        if ( fNextTitleMI->IsEnabled() != hasTitles )
+             fNextTitleMI->SetEnabled( hasTitles );
+        if ( fPrevTitleMI->IsEnabled() != hasTitles )
+             fPrevTitleMI->SetEnabled( hasTitles );
+        if ( fTitleMenu->IsEnabled() != hasTitles )
+             fTitleMenu->SetEnabled( hasTitles );
+        if ( fAudioMenu->IsEnabled() != hasFile )
+             fAudioMenu->SetEnabled( hasFile );
+        if ( fNavigationMenu->IsEnabled() != hasFile )
+             fNavigationMenu->SetEnabled( hasFile );
+        if ( fLanguageMenu->IsEnabled() != hasFile )
+             fLanguageMenu->SetEnabled( hasFile );
+        if ( fSubtitlesMenu->IsEnabled() != hasFile )
+             fSubtitlesMenu->SetEnabled( hasFile );
+        if ( fSpeedMenu->IsEnabled() != hasFile )
+             fSpeedMenu->SetEnabled( hasFile );
         Unlock();
     }
 }
@@ -820,19 +938,132 @@ InterfaceWindow::_InputStreamChanged()
     p_wrapper->SetVolume( p_mediaControl->GetVolume() );
 }
 
+/*****************************************************************************
+ * InterfaceWindow::_ShowFilePanel
+ *****************************************************************************/
 void
-make_sure_frame_is_within_limits( BRect& frame, float minWidth, float minHeight,
-                                  float maxWidth, float maxHeight )
+InterfaceWindow::_ShowFilePanel( uint32 command, const char* windowTitle )
 {
-    if ( frame.Width() < minWidth )
-        frame.right = frame.left + minWidth;
-    if ( frame.Height() < minHeight )
-        frame.bottom = frame.top + minHeight;
-    if ( frame.Width() > maxWidth )
-        frame.right = frame.left + maxWidth;
-    if ( frame.Height() > maxHeight )
-        frame.bottom = frame.top + maxHeight;
+	if( !fFilePanel )
+	{
+		fFilePanel = new BFilePanel();
+		fFilePanel->SetTarget( this );
+	}
+	fFilePanel->Window()->SetTitle( windowTitle );
+	BMessage message( command );
+	fFilePanel->SetMessage( &message );
+	if ( !fFilePanel->IsShowing() )
+	{
+		fFilePanel->Refresh();
+		fFilePanel->Show();
+	}
 }
+
+// set_window_pos
+void
+set_window_pos( BWindow* window, BRect frame )
+{
+	// sanity checks: make sure window is not too big/small
+	// and that it's not off-screen
+	float minWidth, maxWidth, minHeight, maxHeight;
+	window->GetSizeLimits( &minWidth, &maxWidth, &minHeight, &maxHeight );
+
+	make_sure_frame_is_within_limits( frame,
+									  minWidth, minHeight, maxWidth, maxHeight );
+	if ( make_sure_frame_is_on_screen( frame ) )
+	{
+		window->MoveTo( frame.LeftTop() );
+		window->ResizeTo( frame.Width(), frame.Height() );
+	}
+}
+
+// set_window_pos
+void
+launch_window( BWindow* window, bool showing )
+{
+	if ( window->Lock() )
+	{
+		if ( showing )
+		{
+			if ( window->IsHidden() )
+				window->Show();
+		}
+		else
+		{
+			if ( !window->IsHidden() )
+				window->Hide();
+		}
+		window->Unlock();
+	}
+}
+
+/*****************************************************************************
+ * InterfaceWindow::_RestoreSettings
+ *****************************************************************************/
+void
+InterfaceWindow::_RestoreSettings()
+{
+	if ( load_settings( fSettings, "interface_settings", "VideoLAN Client" ) == B_OK )
+	{
+		BRect frame;
+		if ( fSettings->FindRect( "main frame", &frame ) == B_OK )
+			set_window_pos( this, frame );
+		if (fSettings->FindRect( "playlist frame", &frame ) == B_OK )
+			set_window_pos( fPlaylistWindow, frame );
+		if (fSettings->FindRect( "messages frame", &frame ) == B_OK )
+			set_window_pos( fMessagesWindow, frame );
+		if (fSettings->FindRect( "settings frame", &frame ) == B_OK )
+			set_window_pos( fPreferencesWindow, frame );
+		
+		bool showing;
+		if ( fSettings->FindBool( "playlist showing", &showing ) == B_OK )
+			launch_window( fPlaylistWindow, showing );
+		if ( fSettings->FindBool( "messages showing", &showing ) == B_OK )
+			launch_window( fMessagesWindow, showing );
+		if ( fSettings->FindBool( "settings showing", &showing ) == B_OK )
+			launch_window( fPreferencesWindow, showing );
+	}
+}
+
+/*****************************************************************************
+ * InterfaceWindow::_StoreSettings
+ *****************************************************************************/
+void
+InterfaceWindow::_StoreSettings()
+{
+	if ( fSettings->ReplaceRect( "main frame", Frame() ) != B_OK )
+		fSettings->AddRect( "main frame", Frame() );
+	if ( fPlaylistWindow->Lock() )
+	{
+		if (fSettings->ReplaceRect( "playlist frame", fPlaylistWindow->Frame() ) != B_OK)
+			fSettings->AddRect( "playlist frame", fPlaylistWindow->Frame() );
+		if (fSettings->ReplaceBool( "playlist showing", !fPlaylistWindow->IsHidden() ) != B_OK)
+			fSettings->AddBool( "playlist showing", !fPlaylistWindow->IsHidden() );
+		fPlaylistWindow->Unlock();
+	}
+	if ( fMessagesWindow->Lock() )
+	{
+		if (fSettings->ReplaceRect( "messages frame", fMessagesWindow->Frame() ) != B_OK)
+			fSettings->AddRect( "messages frame", fMessagesWindow->Frame() );
+		if (fSettings->ReplaceBool( "messages showing", !fMessagesWindow->IsHidden() ) != B_OK)
+			fSettings->AddBool( "messages showing", !fMessagesWindow->IsHidden() );
+		fMessagesWindow->Unlock();
+	}
+	if ( fPreferencesWindow->Lock() )
+	{
+		if (fSettings->ReplaceRect( "settings frame", fPreferencesWindow->Frame() ) != B_OK)
+			fSettings->AddRect( "settings frame", fPreferencesWindow->Frame() );
+		if (fSettings->ReplaceBool( "settings showing", !fPreferencesWindow->IsHidden() ) != B_OK)
+			fSettings->AddBool( "settings showing", !fPreferencesWindow->IsHidden() );
+		fPreferencesWindow->Unlock();
+	}
+	save_settings( fSettings, "interface_settings", "VideoLAN Client" );
+}
+
+
+
+
+
 
 /*****************************************************************************
  * CDMenu::CDMenu
@@ -855,9 +1086,9 @@ CDMenu::~CDMenu()
 void CDMenu::AttachedToWindow(void)
 {
     // remove all items
-    while (BMenuItem* item = RemoveItem(0L))
+    while ( BMenuItem* item = RemoveItem( 0L ) )
         delete item;
-    GetCD("/dev/disk");
+    GetCD( "/dev/disk" );
     BMenu::AttachedToWindow();
 }
 
@@ -866,54 +1097,26 @@ void CDMenu::AttachedToWindow(void)
  *****************************************************************************/
 int CDMenu::GetCD( const char *directory )
 {
-    BVolumeRoster *volRoster;
-    BVolume       *vol;
-    BDirectory    *dir;
-    int           status;
-    int           mounted;   
-    char          name[B_FILE_NAME_LENGTH]; 
-    fs_info       info;
-    dev_t         dev;
-    
-    volRoster = new BVolumeRoster();
-    vol = new BVolume();
-    dir = new BDirectory();
-    status = volRoster->GetNextVolume(vol);
-    status = vol->GetRootDirectory(dir);
-    while (status ==  B_NO_ERROR)
-    {
-        mounted = vol->GetName(name);    
-        if ((mounted == B_OK) && /* Disk is currently Mounted */
-            (vol->IsReadOnly()) ) /* Disk is read-only */
-        {
-            dev = vol->Device();
-            fs_stat_dev(dev, &info);
-            
-            device_geometry g;
-            int i_dev;
-            i_dev = open( info.device_name, O_RDONLY );
-           
-            if( i_dev >= 0 )
-            {
-                if( ioctl(i_dev, B_GET_GEOMETRY, &g, sizeof(g)) >= 0 )
-                {
-                    if( g.device_type == B_CD ) //ensure the drive is a CD-ROM
-                    {
-                        BMessage *msg;
-                        msg = new BMessage( OPEN_DVD );
-                        msg->AddString( "device", info.device_name );
-                        BMenuItem *menu_item;
-                        menu_item = new BMenuItem( name, msg );
-                        AddItem( menu_item );
-                    }
-                    close(i_dev);
-                }
-            }
-         }
-         vol->Unset();
-        status = volRoster->GetNextVolume(vol);
-    }
-    return 0;
+	BVolumeRoster volRoster;
+	BVolume vol;
+	BDirectory dir;
+	status_t status = volRoster.GetNextVolume( &vol );
+	while ( status ==  B_NO_ERROR )
+	{
+		BString deviceName;
+		BString volumeName;
+		bool isCDROM;
+		if ( get_volume_info( vol, volumeName, isCDROM, deviceName )
+			 && isCDROM )
+		{
+			BMessage* msg = new BMessage( OPEN_DVD );
+			msg->AddString( "device", deviceName.String() );
+			BMenuItem* item = new BMenuItem( volumeName.String(), msg );
+			AddItem( item );
+		}
+ 		vol.Unset();
+		status = volRoster.GetNextVolume( &vol );
+	}
 }
 
 /*****************************************************************************
@@ -944,31 +1147,16 @@ void LanguageMenu::AttachedToWindow()
         delete item;
 
     SetRadioMode( true );
-    _GetChannels();
+	if ( BList *list = p_wrapper->GetChannels( kind ) )
+	{
+	    for ( int32 i = 0; BMenuItem* item = (BMenuItem*)list->ItemAt( i ); i++ )
+	        AddItem( item );
+	    
+	    if ( list->CountItems() > 1 )
+	        AddItem( new BSeparatorItem(), 1 );
+	}
     BMenu::AttachedToWindow();
 }
-
-/*****************************************************************************
- * LanguageMenu::_GetChannels
- *****************************************************************************/
-void LanguageMenu::_GetChannels()
-{
-    BMenuItem *item;
-    BList *list;
-    
-    if( ( list = p_wrapper->GetChannels( kind ) ) == NULL )
-        return;
-    
-    for( int i = 0; i < list->CountItems(); i++ )
-    {
-        item = (BMenuItem*)list->ItemAt( i );
-        AddItem( item );
-    }
-    
-    if( list->CountItems() > 1 )
-        AddItem( new BSeparatorItem(), 1 );
-}
-
 
 /*****************************************************************************
  * TitleMenu::TitleMenu
@@ -991,21 +1179,14 @@ TitleMenu::~TitleMenu()
  *****************************************************************************/
 void TitleMenu::AttachedToWindow()
 {
-    BMenuItem *item;
-    BList *list;
-
-    while( ( item = RemoveItem( 0L ) ) )
+    while( BMenuItem* item = RemoveItem( 0L ) )
         delete item;
-    
-    if( ( list = p_intf->p_sys->p_wrapper->GetTitles() ) == NULL )
-        return;
-    
-    for( int i = 0; i < list->CountItems(); i++ )
-    {
-        item = (BMenuItem*)list->ItemAt( i );
-        AddItem( item );
-    }
-    
+
+    if ( BList *list = p_intf->p_sys->p_wrapper->GetTitles() )
+	{    
+		for( int i = 0; BMenuItem* item = (BMenuItem*)list->ItemAt( i ); i++ )
+	        AddItem( item );
+	}
     BMenu::AttachedToWindow();
 }
 
@@ -1031,21 +1212,80 @@ ChapterMenu::~ChapterMenu()
  *****************************************************************************/
 void ChapterMenu::AttachedToWindow()
 {
-    BMenuItem *item;
-    BList *list;
-
-    while( ( item = RemoveItem( 0L ) ) )
+    while( BMenuItem* item = RemoveItem( 0L ) )
         delete item;
-    
-    if( ( list = p_intf->p_sys->p_wrapper->GetChapters() ) == NULL )
-        return;
-    
-    for( int i = 0; i < list->CountItems(); i++ )
-    {
-        item = (BMenuItem*)list->ItemAt( i );
-        AddItem( item );
-    }
+
+    if ( BList* list = p_intf->p_sys->p_wrapper->GetChapters() )
+	{    
+	    for( int i = 0; BMenuItem* item = (BMenuItem*)list->ItemAt( i ); i++ )
+	        AddItem( item );
+	}
     
     BMenu::AttachedToWindow();
 }
 
+
+
+
+
+
+
+
+
+/*****************************************************************************
+ * load_settings
+ *****************************************************************************/
+status_t
+load_settings( BMessage* message, const char* fileName, const char* folder )
+{
+	status_t ret = B_BAD_VALUE;
+	if ( message )
+	{
+		BPath path;
+		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
+		{
+			// passing folder is optional
+			if ( folder )
+				ret = path.Append( folder );
+			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
+			{
+				BFile file( path.Path(), B_READ_ONLY );
+				if ( ( ret = file.InitCheck() ) == B_OK )
+				{
+					ret = message->Unflatten( &file );
+					file.Unset();
+				}
+			}
+		}
+	}
+	return ret;
+}
+
+/*****************************************************************************
+ * save_settings
+ *****************************************************************************/
+status_t
+save_settings( BMessage* message, const char* fileName, const char* folder )
+{
+	status_t ret = B_BAD_VALUE;
+	if ( message )
+	{
+		BPath path;
+		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
+		{
+			// passing folder is optional
+			if ( folder && ( ret = path.Append( folder ) ) == B_OK )
+				ret = create_directory( path.Path(), 0777 );
+			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
+			{
+				BFile file( path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
+				if ( ( ret = file.InitCheck() ) == B_OK )
+				{
+					ret = message->Flatten( &file );
+					file.Unset();
+				}
+			}
+		}
+	}
+	return ret;
+}

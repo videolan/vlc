@@ -2,7 +2,7 @@
  * ListViews.h: BeOS interface list view class implementation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ListViews.cpp,v 1.2 2003/01/22 01:13:22 titer Exp $
+ * $Id: ListViews.cpp,v 1.3 2003/02/01 12:01:11 stippi Exp $
  *
  * Authors: Stephan Aßmus <stippi@yellowbites.com>
  *
@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <stdio.h>
+#include <malloc.h>
 
 #include <Bitmap.h>
 #include <String.h>
@@ -128,6 +129,7 @@ DragSortableListView::DragSortableListView( BRect frame, const char* name,
 											list_view_type type, uint32 resizingMode,
 											uint32 flags )
 	: BListView( frame, name, type, resizingMode, flags ),
+	  fDropRect( 0.0, 0.0, -1.0, -1.0 ),
 	  fDropIndex( -1 )
 {
 	SetViewColor( B_TRANSPARENT_32_BIT );
@@ -168,6 +170,12 @@ DragSortableListView::Draw( BRect updateRect )
 		SetLowColor( 255, 255, 255, 255 );
 		FillRect( updateRect, B_SOLID_LOW );
 	}
+	// drop anticipation indication
+	if ( fDropRect.IsValid() )
+	{
+		SetHighColor( 255, 0, 0, 255 );
+		StrokeRect( fDropRect );
+	}
 }
 
 /*****************************************************************************
@@ -176,7 +184,6 @@ DragSortableListView::Draw( BRect updateRect )
 bool
 DragSortableListView::InitiateDrag( BPoint point, int32 index, bool )
 {
-return false;
 	bool success = false;
 	BListItem* item = ItemAt( CurrentSelection( 0 ) );
 	if ( !item )
@@ -197,7 +204,7 @@ return false;
 		int32 numItems;
 		bool fade = false;
 		for (numItems = 0; BListItem* item = ItemAt( CurrentSelection( numItems ) ); numItems++) {
-			dragRect.bottom += item->Height();
+			dragRect.bottom += ceilf( item->Height() ) + 1.0;
 			if ( dragRect.Height() > MAX_DRAG_HEIGHT ) {
 				fade = true;
 				dragRect.bottom = MAX_DRAG_HEIGHT;
@@ -216,7 +223,7 @@ return false;
 				for ( int32 i = 0; i < numItems; i++ ) {
 					int32 index = CurrentSelection( i );
 					BListItem* item = ItemAt( index );
-					itemBounds.bottom = itemBounds.top + item->Height() - 1.0;
+					itemBounds.bottom = itemBounds.top + ceilf( item->Height() );
 					if ( itemBounds.bottom > dragRect.bottom )
 						itemBounds.bottom = dragRect.bottom;
 					DrawListItem( v, index, itemBounds );
@@ -281,49 +288,40 @@ DragSortableListView::WindowActivated( bool active )
 void
 DragSortableListView::MessageReceived(BMessage* message)
 {
-	BListItem *item = NULL;
-	DragSortableListView *list = NULL;
-	if ( message->FindPointer( "list", (void **)&list ) == B_OK
-		 && list == this )
+	switch ( message->what )
 	{
-		int32 count = CountItems();
-		if ( fDropIndex < 0 || fDropIndex > count )
-			fDropIndex = count;
-		bool copy = ( modifiers() & B_SHIFT_KEY );
-		for ( int32 i = 0; message->FindPointer( "item", i, (void **)&item ) == B_OK; i++ )
+		case B_MODIFIERS_CHANGED:
+			ModifiersChanged();
+			break;
+		case B_SIMPLE_DATA:
 		{
-			
-			if ( HasItem( item ) )
+			DragSortableListView *list = NULL;
+			if ( message->FindPointer( "list", (void **)&list ) == B_OK
+				 && list == this )
 			{
-				BListItem* itemToAdd = NULL;
-				int32 index = IndexOf( item );
-				if ( copy )
+				int32 count = CountItems();
+				if ( fDropIndex < 0 || fDropIndex > count )
+					fDropIndex = count;
+				BList items;
+				int32 index;
+				for ( int32 i = 0; message->FindInt32( "index", i, &index ) == B_OK; i++ )
+					if ( BListItem* item = ItemAt(index) )
+						items.AddItem( (void*)item );
+				if ( items.CountItems() > 0 )
 				{
-					// add cloned item
-					itemToAdd = CloneItem( index );
-					Deselect( IndexOf( item ) );
-				}
-				else
-				{
-					// drag sort
-					if ( index < fDropIndex )
-						fDropIndex--;
-					if ( RemoveItem( item ) )
-						itemToAdd = item;
-				}
-				if ( itemToAdd )
-				{
-					if ( AddItem( itemToAdd, fDropIndex ) )
-						Select( IndexOf( itemToAdd ), true );
+					if ( modifiers() & B_SHIFT_KEY )
+						CopyItems( items, fDropIndex );
 					else
-						delete itemToAdd;
+						MoveItems( items, fDropIndex );
 				}
+				fDropIndex = -1;
 			}
-			fDropIndex++;
+			break;
 		}
-		fDropIndex = -1;
-	} else
-		BListView::MessageReceived( message );
+		default:
+			BListView::MessageReceived( message );
+			break;
+	}
 }
 
 /*****************************************************************************
@@ -334,120 +332,46 @@ DragSortableListView::MouseMoved(BPoint where, uint32 transit, const BMessage *m
 {
 	if ( msg && msg->what == B_SIMPLE_DATA )
 	{
+		bool replaceAll = !msg->HasPointer("list") && !(modifiers() & B_SHIFT_KEY);
 		switch ( transit )
 		{
 			case B_ENTERED_VIEW:
-			{
-				// draw drop mark
-				BRect r(ItemFrame(0L));
-				where.y += r.Height() / 2.0;
-				int32 count = CountItems();
-				bool found = false;
-				for (int32 index = 0; index <= count; index++)
-				{
-					r = ItemFrame(index);
-					if (r.Contains(where))
-					{
-						SetHighColor(255, 0, 0, 255);
-						StrokeLine(r.LeftTop(), r.RightTop(), B_SOLID_HIGH);
-						r.top++;
-						StrokeLine(r.LeftTop(), r.RightTop(), B_SOLID_HIGH);
-						fDropIndex = index;
-						found = true;
-						break;
-					}
-				}
-				if (found)
-					break;
-				// mouse is after last item
-				fDropIndex = count;
-				r = Bounds();
-				if (count > 0)
-					r.top = ItemFrame(count - 1).bottom + 1.0;
-				SetHighColor(255, 0, 0, 255);
-				StrokeLine(r.LeftTop(), r.RightTop(), B_SOLID_HIGH);
-				r.top++;
-				StrokeLine(r.LeftTop(), r.RightTop(), B_SOLID_HIGH);
-				break;
-			}
 			case B_INSIDE_VIEW:
 			{
-				// draw drop mark and invalidate previous drop mark
-				BRect r(ItemFrame(0L));
-				where.y += r.Height() / 2.0;
-				int32 count = CountItems();
-				// mouse still after last item?
-				if (fDropIndex == count)
+				if ( replaceAll )
 				{
-					r = Bounds();
-					if (count > 0)
-						r.top = ItemFrame(count - 1).bottom + 1.0;
-					if (r.Contains(where))
-						break;
-					else
-					{
-						r.bottom = r.top + 2.0;
-						Invalidate(r);
-					}
+					BRect r( Bounds() );
+					r.bottom--;	// compensate for scrollbar offset
+					_SetDropAnticipationRect( r );
+					fDropIndex = -1;
 				}
-				// mouse still over same item?
-				if (ItemFrame(fDropIndex).Contains(where))
-					break;
 				else
-					InvalidateItem(fDropIndex);
-
-				// mouse over new item
-				bool found = false;
-				for (int32 index = 0; index <= count; index++)
 				{
-					r = ItemFrame(index);
-					if (r.Contains(where))
-					{
-						SetHighColor(255, 0, 0, 255);
-						StrokeLine(r.LeftTop(), r.RightTop(), B_SOLID_HIGH);
-						r.top++;
-						StrokeLine(r.LeftTop(), r.RightTop(), B_SOLID_HIGH);
-						fDropIndex = index;
-						found = true;
-						break;
-					}
+					// offset where by half of item height
+					BRect r( ItemFrame( 0 ) );
+					where.y += r.Height() / 2.0;
+	
+					int32 index = IndexOf( where );
+					if ( index < 0 )
+						index = CountItems();
+					_SetDropIndex( index );
 				}
-				if (found)
-					break;
-				// mouse is after last item
-				fDropIndex = count;
-				r = Bounds();
-				if (count > 0)
-					r.top = ItemFrame(count - 1).bottom + 1.0;
-				SetHighColor(255, 0, 0, 255);
-				StrokeLine(r.LeftTop(), r.RightTop(), B_SOLID_HIGH);
-				r.top++;
-				StrokeLine(r.LeftTop(), r.RightTop(), B_SOLID_HIGH);
 				break;
 			}
 			case B_EXITED_VIEW:
-			{
-				int32 count = CountItems();
-				if (count > 0)
-				{
-					if (fDropIndex == count)
-					{
-						BRect r(Bounds());
-						r.top = ItemFrame(count - 1).bottom + 1.0;
-						r.bottom = r.top + 2.0;
-						Invalidate(r);
-					}
-					else
-						InvalidateItem(fDropIndex);
-				}
-				break;
-			}
 			case B_OUTSIDE_VIEW:
+				_RemoveDropAnticipationRect();
 				break;
 		}
+		// remember drag message
+		// this is needed to react on modifier changes
+		fDragMessageCopy = *msg;
 	}
 	else
+	{
+		_RemoveDropAnticipationRect();
 		BListView::MouseMoved(where, transit, msg);
+	}
 }
 
 /*****************************************************************************
@@ -457,8 +381,7 @@ void
 DragSortableListView::MouseUp( BPoint where )
 {
 	// remove drop mark
-	if ( fDropIndex >= 0 && fDropIndex < CountItems() )
-		InvalidateItem( fDropIndex );
+	_SetDropAnticipationRect( BRect( 0.0, 0.0, -1.0, -1.0 ) );
 	BListView::MouseUp( where );
 }
 
@@ -471,25 +394,204 @@ DragSortableListView::DrawItem( BListItem *item, BRect itemFrame, bool complete 
 	DrawListItem( this, IndexOf( item ), itemFrame );
 }
 
+/*****************************************************************************
+ * DragSortableListView::ModifiersChaned
+ *****************************************************************************/
+void
+DragSortableListView::ModifiersChanged()
+{
+	BPoint where;
+	uint32 buttons;
+	GetMouse( &where, &buttons, false );
+	uint32 transit = Bounds().Contains( where ) ? B_INSIDE_VIEW : B_OUTSIDE_VIEW;
+	MouseMoved( where, transit, &fDragMessageCopy );
+}
+
+/*****************************************************************************
+ * DragSortableListView::MoveItems
+ *****************************************************************************/
+void
+DragSortableListView::MoveItems( BList& items, int32 index )
+{
+	DeselectAll();
+	// we remove the items while we look at them, the insertion index is decreased
+	// when the items index is lower, so that we insert at the right spot after
+	// removal
+	BList removedItems;
+	int32 count = items.CountItems();
+	for ( int32 i = 0; i < count; i++ )
+	{
+		BListItem* item = (BListItem*)items.ItemAt( i );
+		int32 removeIndex = IndexOf( item );
+		if ( RemoveItem( item ) && removedItems.AddItem( (void*)item ) )
+		{
+			if ( removeIndex < index )
+				index--;
+		}
+		// else ??? -> blow up
+	}
+	for ( int32 i = 0; BListItem* item = (BListItem*)removedItems.ItemAt( i ); i++ )
+	{
+		if ( AddItem( item, index ) )
+		{
+			// after we're done, the newly inserted items will be selected
+			Select( index, true );
+			// next items will be inserted after this one
+			index++;
+		}
+		else
+			delete item;
+	}
+}
+
+/*****************************************************************************
+ * DragSortableListView::CopyItems
+ *****************************************************************************/
+void
+DragSortableListView::CopyItems( BList& items, int32 index )
+{
+	DeselectAll();
+	// by inserting the items after we copied all items first, we avoid
+	// cloning an item we already inserted and messing everything up
+	// in other words, don't touch the list before we know which items
+	// need to be cloned
+	BList clonedItems;
+	int32 count = items.CountItems();
+	for ( int32 i = 0; i < count; i++ )
+	{
+		BListItem* item = CloneItem( IndexOf( (BListItem*)items.ItemAt( i ) ) );
+		if ( item && !clonedItems.AddItem( (void*)item ) )
+			delete item;
+	}
+	for ( int32 i = 0; BListItem* item = (BListItem*)clonedItems.ItemAt( i ); i++ )
+	{
+		if ( AddItem( item, index ) )
+		{
+			// after we're done, the newly inserted items will be selected
+			Select( index, true );
+			// next items will be inserted after this one
+			index++;
+		}
+		else
+			delete item;
+	}
+}
+
+/*****************************************************************************
+ * DragSortableListView::RemoveItemList
+ *****************************************************************************/
+void
+DragSortableListView::RemoveItemList( BList& items )
+{
+	int32 count = items.CountItems();
+	for ( int32 i = 0; i < count; i++ )
+	{
+		BListItem* item = (BListItem*)items.ItemAt( i );
+		if ( RemoveItem( item ) )
+			delete item;
+	}
+}
+
+/*****************************************************************************
+ * DragSortableListView::RemoveSelected
+ *****************************************************************************/
+void
+DragSortableListView::RemoveSelected()
+{
+	BList items;
+	for ( int32 i = 0; BListItem* item = ItemAt( CurrentSelection( i ) ); i++ )
+		items.AddItem( (void*)item );
+	RemoveItemList( items );
+}
+
+/*****************************************************************************
+ * DragSortableListView::_SetDropAnticipationRect
+ *****************************************************************************/
+void
+DragSortableListView::_SetDropAnticipationRect( BRect r )
+{
+	if ( fDropRect != r )
+	{
+		if ( fDropRect.IsValid() )
+			Invalidate( fDropRect );
+		fDropRect = r;
+		if ( fDropRect.IsValid() )
+			Invalidate( fDropRect );
+	}
+}
+
+/*****************************************************************************
+ * DragSortableListView::_SetDropAnticipationRect
+ *****************************************************************************/
+void
+DragSortableListView::_SetDropIndex( int32 index )
+{
+	if ( fDropIndex != index )
+	{
+		fDropIndex = index;
+		if ( fDropIndex == -1 )
+			_SetDropAnticipationRect( BRect( 0.0, 0.0, -1.0, -1.0 ) );
+		else
+		{
+			int32 count = CountItems();
+			if ( fDropIndex == count )
+			{
+				BRect r;
+				if ( BListItem* item = ItemAt( count - 1 ) )
+				{
+					r = ItemFrame( count - 1 );
+					r.top = r.bottom + 1.0;
+					r.bottom = r.top + 1.0;
+				}
+				else
+				{
+					r = Bounds();
+					r.bottom--;	// compensate for scrollbars moved slightly out of window
+				}
+				_SetDropAnticipationRect( r );
+			}
+			else
+			{
+				BRect r = ItemFrame( fDropIndex );
+				r.bottom = r.top + 1.0;
+				_SetDropAnticipationRect( r );
+			}
+		}
+	}
+}
+
+/*****************************************************************************
+ * DragSortableListView::_RemoveDropAnticipationRect
+ *****************************************************************************/
+void
+DragSortableListView::_RemoveDropAnticipationRect()
+{
+	_SetDropAnticipationRect( BRect( 0.0, 0.0, -1.0, -1.0 ) );
+	_SetDropIndex( -1 );
+}
+
 
 /*****************************************************************************
  * PlaylistView class
  *****************************************************************************/
 PlaylistView::PlaylistView( BRect frame, InterfaceWindow* mainWindow,
-                            VlcWrapper * p_wrapper )
+                            VlcWrapper* wrapper,
+                            BMessage* selectionChangeMessage )
 	: DragSortableListView( frame, "playlist listview",
 							B_MULTIPLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES,
 							B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED
 							| B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE ),
 	  fCurrentIndex( -1 ),
 	  fPlaying( false ),
-	  fMainWindow( mainWindow )
+	  fMainWindow( mainWindow ),
+	  fSelectionChangeMessage( selectionChangeMessage ),
+	  fVlcWrapper( wrapper )
 {
-    this->p_wrapper = p_wrapper;
 }
 
 PlaylistView::~PlaylistView()
 {
+	delete fSelectionChangeMessage;
 }
 
 /*****************************************************************************
@@ -499,7 +601,34 @@ void
 PlaylistView::AttachedToWindow()
 {
 	// get pulse message every two frames
-	Window()->SetPulseRate(80000);
+	Window()->SetPulseRate( 80000 );
+}
+
+/*****************************************************************************
+ * PlaylistView::MessageReceived
+ *****************************************************************************/
+void
+PlaylistView::MessageReceived( BMessage* message)
+{
+	switch ( message->what )
+	{
+		case B_SIMPLE_DATA:
+			if ( message->HasPointer( "list" ) )
+			{
+				// message comes from ourself
+				DragSortableListView::MessageReceived( message );
+			}
+			else
+			{
+				// message comes from another app (for example Tracker)
+				message->AddInt32( "drop index", fDropIndex );
+				fMainWindow->PostMessage( message, fMainWindow );
+			}
+			break;
+		default:
+			DragSortableListView::MessageReceived( message );
+			break;
+	}
 }
 
 /*****************************************************************************
@@ -518,7 +647,7 @@ PlaylistView::MouseDown( BPoint where )
 		{
 			if ( clicks == 2 )
 			{
-				p_wrapper->PlaylistJumpTo( i );
+				fVlcWrapper->PlaylistJumpTo( i );
 				handled = true;
 			}
 			else if ( i == fCurrentIndex )
@@ -544,20 +673,12 @@ PlaylistView::MouseDown( BPoint where )
 void
 PlaylistView::KeyDown( const char* bytes, int32 numBytes )
 {
-	if (numBytes < 1)
+	if ( numBytes < 1 )
 		return;
 		
 	if ( ( bytes[0] == B_BACKSPACE ) || ( bytes[0] == B_DELETE ) )
 	{
-		int32 i = CurrentSelection();
-		if ( BListItem *item = ItemAt( i ) )
-		{
-/*			if ( RemoveItem( item ) )
-			{
-				delete item;
-				Select( i + 1 );
-			}*/
-		}
+		RemoveSelected();
 	}
 	DragSortableListView::KeyDown( bytes, numBytes );
 }
@@ -568,8 +689,171 @@ PlaylistView::KeyDown( const char* bytes, int32 numBytes )
 void
 PlaylistView::Pulse()
 {
-	if (fMainWindow->IsStopped())
+	if ( fMainWindow->IsStopped() )
 		SetPlaying( false );
+}
+
+/*****************************************************************************
+ * PlaylistView::SelectionChanged
+ *****************************************************************************/
+void
+PlaylistView::SelectionChanged()
+{
+	BLooper* looper = Looper();
+	if ( fSelectionChangeMessage && looper )
+	{
+		BMessage message( *fSelectionChangeMessage );
+		looper->PostMessage( &message );
+	}
+}
+
+
+/*****************************************************************************
+ * PlaylistView::MoveItems
+ *****************************************************************************/
+void
+PlaylistView::MoveItems( BList& items, int32 index )
+{
+	DeselectAll();
+	// we remove the items while we look at them, the insertion index is decreased
+	// when the items index is lower, so that we insert at the right spot after
+	// removal
+	if ( fVlcWrapper->PlaylistLock() )
+	{
+		BList removedItems;
+		BList removeItems;
+		int32 count = items.CountItems();
+		int32 indexOriginal = index;
+		// remember currently playing item
+		int32 currentIndex, size;
+		fVlcWrapper->GetPlaylistInfo( currentIndex, size );
+		BListItem* playingItem = ItemAt( currentIndex );
+		// collect item pointers for removal by index
+		for ( int32 i = 0; i < count; i++ )
+		{
+			int32 removeIndex = IndexOf( (BListItem*)items.ItemAt( i ) );
+			void* item = fVlcWrapper->PlaylistItemAt( removeIndex );
+			if ( item && removeItems.AddItem( item ) )
+			{
+				if ( removeIndex < index )
+					index--;
+			}
+			// else ??? -> blow up
+		}
+		// actually remove items using pointers
+		for ( int32 i = 0; i < count; i++ )
+		{
+			void* item = fVlcWrapper->PlaylistRemoveItem( removeItems.ItemAt( i ) );
+			if ( item && !removedItems.AddItem( item ) )
+				free( item );
+		}
+		// add items at index
+		for ( int32 i = 0; void* item = removedItems.ItemAt( i ); i++ )
+		{
+			if ( fVlcWrapper->PlaylistAddItem( item, index ) )
+				// next items will be inserted after this one
+				index++;
+			else
+				free( item );
+		}
+		// update GUI
+		DragSortableListView::MoveItems( items, indexOriginal );
+		// restore currently playing item
+		for ( int32 i = 0; BListItem* item = ItemAt( i ); i++ )
+		{
+			if ( item == playingItem )
+			{
+				fVlcWrapper->PlaylistSetPlaying( i );
+				SetCurrent( i );
+				break;
+			}
+		}
+		fVlcWrapper->PlaylistUnlock();
+	}
+}
+
+/*****************************************************************************
+ * PlaylistView::CopyItems
+ *****************************************************************************/
+void
+PlaylistView::CopyItems( BList& items, int32 toIndex )
+{
+	DeselectAll();
+	// we remove the items while we look at them, the insertion index is decreased
+	// when the items index is lower, so that we insert at the right spot after
+	// removal
+	if ( fVlcWrapper->PlaylistLock() )
+	{
+		BList clonedItems;
+		int32 count = items.CountItems();
+		// remember currently playing item
+		int32 currentIndex, size;
+		fVlcWrapper->GetPlaylistInfo( currentIndex, size );
+		BListItem* playingItem = ItemAt( currentIndex );
+		// collect cloned item pointers
+		for ( int32 i = 0; i < count; i++ )
+		{
+			int32 index = IndexOf( (BListItem*)items.ItemAt( i ) );
+			void* item = fVlcWrapper->PlaylistItemAt( index );
+			void* cloned = fVlcWrapper->PlaylistCloneItem( item );
+			if ( cloned && !clonedItems.AddItem( cloned ) )
+				free( cloned );
+			
+		}
+		// add cloned items at index
+		int32 index = toIndex;
+		for ( int32 i = 0; void* item = clonedItems.ItemAt( i ); i++ )
+		{
+			if ( fVlcWrapper->PlaylistAddItem( item, index ) )
+				// next items will be inserted after this one
+				index++;
+			else
+				free( item );
+		}
+		// update GUI
+		DragSortableListView::CopyItems( items, toIndex );
+		// restore currently playing item
+		for ( int32 i = 0; BListItem* item = ItemAt( i ); i++ )
+		{
+			if ( item == playingItem )
+			{
+				fVlcWrapper->PlaylistSetPlaying( i );
+				SetCurrent( i );
+				break;
+			}
+		}
+		fVlcWrapper->PlaylistUnlock();
+	}
+}
+
+/*****************************************************************************
+ * PlaylistView::RemoveItemList
+ *****************************************************************************/
+void
+PlaylistView::RemoveItemList( BList& items )
+{
+	if ( fVlcWrapper->PlaylistLock() )
+	{
+		// collect item pointers for removal
+		BList removeItems;
+		int32 count = items.CountItems();
+		for ( int32 i = 0; i < count; i++ )
+		{
+			int32 index = IndexOf( (BListItem*)items.ItemAt( i ) );
+			void* item = fVlcWrapper->PlaylistItemAt( index );
+			if ( item && !removeItems.AddItem( item ) )
+				free( item );
+		}
+		// remove items from playlist
+		count = removeItems.CountItems();
+		for ( int32 i = 0; void* item = removeItems.ItemAt( i ); i++ )
+		{
+			fVlcWrapper->PlaylistRemoveItem( item );
+		}
+		// update GUI
+		DragSortableListView::RemoveItemList( items );
+		fVlcWrapper->PlaylistUnlock();
+	}
 }
 
 /*****************************************************************************
@@ -603,8 +887,10 @@ PlaylistView::MakeDragMessage( BMessage* message ) const
 	if ( message )
 	{
 		message->AddPointer( "list", (void*)this );
-		for ( int32 i = 0; BListItem* item = ItemAt( CurrentSelection( i ) ); i++ )
-			message->AddPointer( "item", (void*)item );
+		int32 index;
+		for ( int32 i = 0; ( index = CurrentSelection( i ) ) >= 0; i++ )
+			message->AddInt32( "index", index );
+			// TODO: add refs to message (inter application communication)
 	}
 }
 
@@ -633,4 +919,20 @@ PlaylistView::SetPlaying( bool playing )
 		fPlaying = playing;
 		InvalidateItem( fCurrentIndex );
 	}
+}
+
+/*****************************************************************************
+ * PlaylistView::SetPlaying
+ *****************************************************************************/
+void
+PlaylistView::RebuildList()
+{
+	// remove all items
+	int32 count = CountItems();
+	while ( BListItem* item = RemoveItem( --count ) )
+		delete item;
+	
+	// rebuild listview from VLC's playlist
+	for ( int i = 0; i < fVlcWrapper->PlaylistSize(); i++ )
+		AddItem( new PlaylistItem( fVlcWrapper->PlaylistItemName( i ) ) );
 }

@@ -2,7 +2,7 @@
  * VideoWindow.h: BeOS video window class prototype
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: VideoWindow.h,v 1.5 2002/12/07 22:00:36 titer Exp $
+ * $Id: VideoWindow.h,v 1.6 2003/02/01 12:01:11 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Tony Castley <tcastley@mail.powerup.com.au>
@@ -54,6 +54,54 @@ colorcombo colspace[]=
 
 #define COLOR_COUNT 5
 #define DEFAULT_COL 3
+
+class VideoSettings
+{
+ public:
+							VideoSettings( const VideoSettings& clone );
+	virtual					~VideoSettings();
+
+	static	VideoSettings*	DefaultSettings();
+
+	enum
+	{
+		SIZE_OTHER			= 0,
+		SIZE_50				= 1,
+		SIZE_100			= 2,
+		SIZE_200			= 3,
+	};
+
+			void			SetVideoSize( uint32 mode );
+	inline	uint32			VideoSize() const
+								{ return fVideoSize; }
+	enum
+	{
+		FLAG_CORRECT_RATIO	= 0x0001,
+		FLAG_SYNC_RETRACE	= 0x0002,
+		FLAG_ON_TOP_ALL		= 0x0004,
+		FLAG_FULL_SCREEN	= 0x0008,
+	};
+
+	inline	void			SetFlags( uint32 flags )
+								{ fFlags = flags; }
+	inline	void			AddFlags( uint32 flags )
+								{ fFlags |= flags; }
+	inline	void			ClearFlags( uint32 flags )
+								{ fFlags &= ~flags; }
+	inline	bool			HasFlags( uint32 flags ) const
+								{ return fFlags & flags; }
+	inline	uint32			Flags() const
+								{ return fFlags; }
+
+ private:
+							VideoSettings(); // reserved for default settings
+
+	static	VideoSettings	fDefaultSettings;
+
+			uint32			fVideoSize;
+			uint32			fFlags;
+			BMessage*		fSettings;
+};
 
 
 class VLCView : public BView
@@ -107,8 +155,14 @@ public:
 			void			SetInterfaceShowing(bool showIt);
 
 			void			SetCorrectAspectRatio(bool doIt);
-	inline	bool			CorrectAspectRatio() const
-								{ return fCorrectAspect; }
+			bool			CorrectAspectRatio() const;
+			void			ToggleFullScreen();
+			void			SetFullScreen(bool doIt);
+			bool			IsFullScreen() const;
+			void			SetOnTop(bool doIt);
+			bool			IsOnTop() const;
+			void			SetSyncToRetrace(bool doIt);
+			bool			IsSyncedToRetrace() const;
 	inline	status_t		InitCheck() const
 								{ return fInitStatus; }
 
@@ -117,9 +171,8 @@ public:
     int32           i_width;     // aspect corrected bitmap size 
     int32           i_height;
     BRect           winSize;     // current window size
-    bool            is_zoomed, vsync;
     BBitmap	        *bitmap[3];
-    BBitmap         *overlaybitmap;
+//    BBitmap         *overlaybitmap;
     VLCView	        *view;
     int             i_buffer;
 	volatile bool	teardownwindow;
@@ -134,6 +187,7 @@ private:
 			void			_FreeBuffers();
 			void			_BlankBitmap(BBitmap* bitmap) const;
 			void			_SetVideoSize(uint32 mode);
+			void			_SetToSettings();
 
 			void			_SaveScreenShot( BBitmap* bitmap,
 											 char* path,
@@ -153,10 +207,10 @@ private:
 
 	int32			fTrueWidth;     // incomming bitmap size 
 	int32			fTrueHeight;
-	bool			fCorrectAspect;
 	window_feel		fCachedFeel;
 	bool			fInterfaceShowing;
 	status_t		fInitStatus;
+	VideoSettings*	fSettings;
 };
 
 #endif	// BEOS_VIDEO_WINDOW_H

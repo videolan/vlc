@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.6 2003/01/22 01:13:22 titer Exp $
+ * $Id: PlayListWindow.cpp,v 1.7 2003/02/01 12:01:11 stippi Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -43,13 +43,15 @@
 
 enum
 {
-	MSG_SELECT_ALL		= 'sall',
-	MSG_SELECT_NONE		= 'none',
-	MSG_RANDOMIZE		= 'rndm',
-	MSG_SORT_NAME		= 'srtn',
-	MSG_SORT_PATH		= 'srtp',
-	MSG_REMOVE			= 'rmov',
-	MSG_REMOVE_ALL		= 'rmal',
+	MSG_SELECT_ALL			= 'sall',
+	MSG_SELECT_NONE			= 'none',
+	MSG_RANDOMIZE			= 'rndm',
+	MSG_SORT_NAME			= 'srtn',
+	MSG_SORT_PATH			= 'srtp',
+	MSG_REMOVE				= 'rmov',
+	MSG_REMOVE_ALL			= 'rmal',
+
+	MSG_SELECTION_CHANGED	= 'slch',
 };
 
 
@@ -93,32 +95,33 @@ PlayListWindow::PlayListWindow( BRect frame, const char* name,
 	// Add the Edit menu
 	BMenu *editMenu = new BMenu( "Edit" );
 	fMenuBar->AddItem( editMenu );
-	item = new BMenuItem( "Select All",
-						  new BMessage( MSG_SELECT_ALL ), 'A' );
-	editMenu->AddItem( item );
-	item = new BMenuItem( "Select None",
-						  new BMessage( MSG_SELECT_NONE ), 'A', B_SHIFT_KEY );
-	editMenu->AddItem( item );
+	fSelectAllMI = new BMenuItem( "Select All",
+								  new BMessage( MSG_SELECT_ALL ), 'A' );
+	editMenu->AddItem( fSelectAllMI );
+	fSelectNoneMI = new BMenuItem( "Select None",
+								   new BMessage( MSG_SELECT_NONE ), 'A', B_SHIFT_KEY );
+	editMenu->AddItem( fSelectNoneMI );
 
 	editMenu->AddSeparatorItem();
-	item = new BMenuItem( "Sort by Name",
-						  new BMessage( MSG_SORT_NAME ), 'N' );
-	editMenu->AddItem( item );
-	item = new BMenuItem( "Sort by Path",
-						  new BMessage( MSG_SORT_PATH ), 'P' );
-	editMenu->AddItem( item );
-	item = new BMenuItem( "Randomize",
-						  new BMessage( MSG_RANDOMIZE ), 'R' );
-	editMenu->AddItem( item );
+	fSortNameMI = new BMenuItem( "Sort by Name",
+								 new BMessage( MSG_SORT_NAME ), 'N' );
+fSortNameMI->SetEnabled( false );
+	editMenu->AddItem( fSortNameMI );
+	fSortPathMI = new BMenuItem( "Sort by Path",
+								 new BMessage( MSG_SORT_PATH ), 'P' );
+fSortPathMI->SetEnabled( false );
+	editMenu->AddItem( fSortPathMI );
+	fRandomizeMI = new BMenuItem( "Randomize",
+								  new BMessage( MSG_RANDOMIZE ), 'R' );
+fRandomizeMI->SetEnabled( false );
+	editMenu->AddItem( fRandomizeMI );
 	editMenu->AddSeparatorItem();
-	item = new BMenuItem( "Remove",
+	fRemoveMI = new BMenuItem( "Remove",
 						  new BMessage( MSG_REMOVE ) );
-	editMenu->AddItem( item );
-	item = new BMenuItem( "Remove All",
-						  new BMessage( MSG_REMOVE_ALL ) );
-	editMenu->AddItem( item );
-
-editMenu->SetEnabled( false );
+	editMenu->AddItem( fRemoveMI );
+	fRemoveAllMI = new BMenuItem( "Remove All",
+								  new BMessage( MSG_REMOVE_ALL ) );
+	editMenu->AddItem( fRemoveAllMI );
 
 	// make menu bar resize to correct height
 	float menuWidth, menuHeight;
@@ -130,7 +133,8 @@ editMenu->SetEnabled( false );
 	frame.top += fMenuBar->Bounds().IntegerHeight() + 1;
 	frame.right -= B_V_SCROLL_BAR_WIDTH;
 
-	fListView = new PlaylistView( frame, fMainWindow, p_wrapper );
+	fListView = new PlaylistView( frame, fMainWindow, p_wrapper,
+								  new BMessage( MSG_SELECTION_CHANGED ) );
 	fBackgroundView = new BScrollView( "playlist scrollview",
 									   fListView, B_FOLLOW_ALL_SIDES,
 									   0, false, true,
@@ -182,8 +186,10 @@ PlayListWindow::MessageReceived( BMessage * p_message )
 			fMainWindow->PostMessage( p_message );
 			break;
 		case MSG_SELECT_ALL:
+			fListView->Select( 0, fListView->CountItems() - 1 );
 			break;
 		case MSG_SELECT_NONE:
+			fListView->DeselectAll();
 			break;
 		case MSG_RANDOMIZE:
 			break;
@@ -192,8 +198,17 @@ PlayListWindow::MessageReceived( BMessage * p_message )
 		case MSG_SORT_PATH:
 			break;
 		case MSG_REMOVE:
+			fListView->RemoveSelected();
 			break;
 		case MSG_REMOVE_ALL:
+			fListView->Select( 0, fListView->CountItems() - 1 );
+			fListView->RemoveSelected();
+			break;
+		case MSG_SELECTION_CHANGED:
+			_CheckItemsEnableState();
+			break;
+		case B_MODIFIERS_CHANGED:
+			fListView->ModifiersChanged();
 			break;
 		default:
 			BWindow::MessageReceived( p_message );
@@ -235,16 +250,42 @@ void
 PlayListWindow::UpdatePlaylist( bool rebuild )
 {
 	if ( rebuild )
-	{
-		// remove all items
-		int32 count = fListView->CountItems();
-		while ( BListItem* item = fListView->RemoveItem( --count ) )
-			delete item;
-	
-		// rebuild listview from VLC's playlist
-		for ( int i = 0; i < p_wrapper->PlaylistSize(); i++ )
-			fListView->AddItem( new PlaylistItem( p_wrapper->PlaylistItemName( i ) ) );
-	}
+		fListView->RebuildList();
 	fListView->SetCurrent( p_wrapper->PlaylistCurrent() );
 	fListView->SetPlaying( p_wrapper->IsPlaying() );
+
+	_CheckItemsEnableState();
+}
+
+/*****************************************************************************
+ * PlayListWindow::_CheckItemsEnableState
+ *****************************************************************************/
+void
+PlayListWindow::_CheckItemsEnableState() const
+{
+	// check if one item selected
+	int32 test = fListView->CurrentSelection( 0 );
+	bool enable1 = test >= 0;
+	// check if at least two items selected
+//	test = fListView->CurrentSelection( 1 );
+//	bool enable2 = test >= 0;
+	bool notEmpty = fListView->CountItems() > 0;
+	_SetMenuItemEnabled( fSelectAllMI, notEmpty );
+	_SetMenuItemEnabled( fSelectNoneMI, enable1 );
+//	_SetMenuItemEnabled( fSortNameMI, enable2 );
+//	_SetMenuItemEnabled( fSortPathMI, enable2 );
+//	_SetMenuItemEnabled( fRandomizeMI, enable2 );
+	_SetMenuItemEnabled( fRemoveMI, enable1 );
+	_SetMenuItemEnabled( fRemoveAllMI, notEmpty );
+}
+
+/*****************************************************************************
+ * PlayListWindow::_SetMenuItemEnabled
+ *****************************************************************************/
+void
+PlayListWindow::_SetMenuItemEnabled( BMenuItem* item, bool enabled ) const
+{
+	// this check should actally be done in BMenuItem::SetEnabled(), but it is not...
+	if ( item->IsEnabled() != enabled )
+		item->SetEnabled( enabled );
 }

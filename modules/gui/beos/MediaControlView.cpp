@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.13 2003/01/25 01:03:44 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.14 2003/02/01 12:01:11 stippi Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -773,9 +773,11 @@ SeekSlider::ResizeToPreferred()
 void
 SeekSlider::SetPosition(float position)
 {
-    LockLooper();
-	SetValue(fMinValue + (int32)floorf((fMaxValue - fMinValue) * position + 0.5));
-	UnlockLooper();
+	if ( LockLooper() )
+	{
+		SetValue(fMinValue + (int32)floorf((fMaxValue - fMinValue) * position + 0.5));
+		UnlockLooper();
+	}
 }
 
 /*****************************************************************************
@@ -1321,7 +1323,7 @@ PositionInfoView::Pulse()
 	{
 		int32 index, size;
 		p_intf->p_sys->p_wrapper->GetPlaylistInfo( index, size );
-		SetFile( index, size );
+		SetFile( index + 1, size );
 		p_intf->p_sys->p_wrapper->TitleInfo( index, size );
 		SetTitle( index, size );
 		p_intf->p_sys->p_wrapper->ChapterInfo( index, size );

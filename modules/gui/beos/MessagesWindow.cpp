@@ -2,7 +2,7 @@
  * MessagesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MessagesWindow.cpp,v 1.5 2003/01/31 06:45:00 titer Exp $
+ * $Id: MessagesWindow.cpp,v 1.6 2003/02/01 12:01:11 stippi Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -147,17 +147,19 @@ void MessagesWindow::UpdateMessages()
                 case VLC_OBJECT_SOUT: psz_module_type = "stream output"; break;
             }
             
-            fMessagesView->LockLooper();
-            oldLength = fMessagesView->TextLength();
-            BString string;
-            string << p_sub->p_msg[i_start].psz_module << " " << psz_module_type << " : " <<
-                p_sub->p_msg[i_start].psz_msg << "\n";
-            fMessagesView->Insert( string.String() );
-            fMessagesView->SetFontAndColor( oldLength,
-                                            fMessagesView->TextLength(),
-                                            NULL, 0, &color );
-            fMessagesView->Draw( fMessagesView->Bounds() );
-            fMessagesView->UnlockLooper();
+            if ( fMessagesView->LockLooper() )
+            {
+	            oldLength = fMessagesView->TextLength();
+	            BString string;
+	            string << p_sub->p_msg[i_start].psz_module << " " << psz_module_type << " : " <<
+	                p_sub->p_msg[i_start].psz_msg << "\n";
+	            fMessagesView->Insert( string.String() );
+	            fMessagesView->SetFontAndColor( oldLength,
+	                                            fMessagesView->TextLength(),
+	                                            NULL, 0, &color );
+	            fMessagesView->Draw( fMessagesView->Bounds() );
+	            fMessagesView->UnlockLooper();
+            }
             
             /* Scroll at the end */
             if( fScrollBar->LockLooper() )
