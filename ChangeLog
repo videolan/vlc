@@ -1,5 +1,9 @@
 0.1.99h :
 
+  * fixed the sound issue under beos
+  * fixed a bug that was making the crash randomly under beos
+  * fixed a bug that was exhausting system ressources under beos
+  * improved the cond_var for beos
   * added support for the SDL vout : the --display fullscreen allows 
     fullscreen when possible. Disabled by default.
   * added sdlvlc (which probably should start in fullscreen, no ?)
