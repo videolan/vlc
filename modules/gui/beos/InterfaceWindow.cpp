@@ -41,6 +41,7 @@
 #include <vlc/vlc.h>
 #include <vlc/aout.h>
 #include <vlc/intf.h>
+#include <vlc/input.h>
 
 /* BeOS interface headers */
 #include "VlcWrapper.h"
@@ -417,10 +418,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 
         case STOP_PLAYBACK:
             // this currently stops playback not nicely
-            if (playback_status > UNDEF_S)
+            if (playback_status != -1)
             {
                 p_wrapper->PlaylistStop();
-                p_mediaControl->SetStatus(UNDEF_S, DEFAULT_RATE);
+                p_mediaControl->SetStatus(-1, INPUT_RATE_DEFAULT);
             }
             break;
     
@@ -429,7 +430,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
     
         case PAUSE_PLAYBACK:
             /* toggle between pause and play */
-            if (playback_status > UNDEF_S)
+            if (playback_status > -1)
             {
                 /* pause if currently playing */
                 if ( playback_status == PLAYING_S )
@@ -449,31 +450,31 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
     
         case HEIGHTH_PLAY:
-            p_wrapper->InputSetRate( DEFAULT_RATE * 8 );
+            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT * 8 );
             break;
 
         case QUARTER_PLAY:
-            p_wrapper->InputSetRate( DEFAULT_RATE * 4 );
+            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT * 4 );
             break;
 
         case HALF_PLAY:
-            p_wrapper->InputSetRate( DEFAULT_RATE * 2 );
+            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT * 2 );
             break;
 
         case NORMAL_PLAY:
-            p_wrapper->InputSetRate( DEFAULT_RATE );
+            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT );
             break;
 
         case TWICE_PLAY:
-            p_wrapper->InputSetRate( DEFAULT_RATE / 2 );
+            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT / 2 );
             break;
 
         case FOUR_PLAY:
-            p_wrapper->InputSetRate( DEFAULT_RATE / 4 );
+            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT / 4 );
             break;
 
         case HEIGHT_PLAY:
-            p_wrapper->InputSetRate( DEFAULT_RATE / 8 );
+            p_wrapper->InputSetRate( INPUT_RATE_DEFAULT / 8 );
             break;
 
         case SEEK_PLAYBACK:
@@ -482,7 +483,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         // volume related messages
         case VOLUME_CHG:
             /* adjust the volume */
-            if (playback_status > UNDEF_S)
+            if (playback_status > -1)
             {
                 p_wrapper->SetVolume( p_mediaControl->GetVolume() );
                 p_mediaControl->SetMuted( p_wrapper->IsMuted() );
@@ -499,7 +500,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
     
         case SELECT_CHANNEL:
-            if ( playback_status > UNDEF_S )
+            if ( playback_status > -1 )
             {
                 int32 channel;
                 if ( p_message->FindInt32( "channel", &channel ) == B_OK )
@@ -510,7 +511,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
     
         case SELECT_SUBTITLE:
-            if ( playback_status > UNDEF_S )
+            if ( playback_status > -1 )
             {
                 int32 subtitle;
                 if ( p_message->FindInt32( "subtitle", &subtitle ) == B_OK )
@@ -533,7 +534,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         	p_wrapper->ToggleTitle( 0 );
         	break;
         case TOGGLE_TITLE:
-            if ( playback_status > UNDEF_S )
+            if ( playback_status > -1 )
             {
                 int32 index;
                 if( p_message->FindInt32( "index", &index ) == B_OK )
@@ -551,7 +552,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
         }
         case TOGGLE_CHAPTER:
-            if ( playback_status > UNDEF_S )
+            if ( playback_status > -1 )
             {
                 int32 index;
                 if( p_message->FindInt32( "index", &index ) == B_OK )
@@ -726,7 +727,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 bool InterfaceWindow::QuitRequested()
 {
     p_wrapper->PlaylistStop();
-    p_mediaControl->SetStatus(UNDEF_S, DEFAULT_RATE);
+    p_mediaControl->SetStatus(-1, INPUT_RATE_DEFAULT);
 
  	_StoreSettings();
    
@@ -879,31 +880,31 @@ InterfaceWindow::_UpdateSpeedMenu( int rate )
     
     switch( rate )
     {
-        case ( DEFAULT_RATE * 8 ):
+        case ( INPUT_RATE_DEFAULT * 8 ):
             toMark = fHeighthMI;
             break;
             
-        case ( DEFAULT_RATE * 4 ):
+        case ( INPUT_RATE_DEFAULT * 4 ):
             toMark = fQuarterMI;
             break;
             
-        case ( DEFAULT_RATE * 2 ):
+        case ( INPUT_RATE_DEFAULT * 2 ):
             toMark = fHalfMI;
             break;
             
-        case ( DEFAULT_RATE ):
+        case ( INPUT_RATE_DEFAULT ):
             toMark = fNormalMI;
             break;
             
-        case ( DEFAULT_RATE / 2 ):
+        case ( INPUT_RATE_DEFAULT / 2 ):
             toMark = fTwiceMI;
             break;
             
-        case ( DEFAULT_RATE / 4 ):
+        case ( INPUT_RATE_DEFAULT / 4 ):
             toMark = fFourMI;
             break;
             
-        case ( DEFAULT_RATE / 8 ):
+        case ( INPUT_RATE_DEFAULT / 8 ):
             toMark = fHeightMI;
             break;
     }

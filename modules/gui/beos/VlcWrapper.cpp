@@ -31,9 +31,9 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
+#include <vlc/input.h>
 extern "C"
 {
-  #include <input_ext-plugins.h> // needed here when compiling without plugins
   #include <audio_output.h>
   #include <aout_internal.h>
 }
@@ -97,22 +97,20 @@ int VlcWrapper::InputStatus()
 {
     if( !p_input )
     {
-        return UNDEF_S;
+        return -1;
     }
     
-    vlc_value_t state;
-    var_Get( p_input, "state", &state );
-    return state.i_int;
+    return var_GetInteger( p_input, "state" );
 }
 
 int VlcWrapper::InputRate()
 {
     if( !p_input )
     {
-        return DEFAULT_RATE;
+        return INPUT_RATE_DEFAULT;
     }
     
-    return p_input->stream.control.i_rate;
+    return var_GetInteger( p_input, "rate" );
 }
 
 void VlcWrapper::InputSetRate( int rate )
@@ -150,6 +148,8 @@ BList * VlcWrapper::GetChannels( int i_cat )
             return NULL;
        }
 
+        BList *list = new BList();
+#if 0
         vlc_mutex_lock( &p_input->stream.stream_lock );
       
         /* find which track is currently playing */
@@ -161,7 +161,6 @@ BList * VlcWrapper::GetChannels( int i_cat )
         }
         
         /* build a list of all tracks */
-        BList *list = new BList( p_input->stream.i_es_number );
         BMenuItem *menuItem;
         BMessage *message;
         char *trackName;
@@ -193,6 +192,7 @@ BList * VlcWrapper::GetChannels( int i_cat )
         }
         
         vlc_mutex_unlock( &p_input->stream.stream_lock );
+#endif
 
         return list;
     }
@@ -209,7 +209,7 @@ void VlcWrapper::ToggleLanguage( int i_language )
 
 void VlcWrapper::ToggleSubtitle( int i_subtitle )
 {
-    if( i_language < 0 )
+    if( i_subtitle < 0 )
         var_SetInteger( p_input, "spu-es", -1 );  /* Disable SPU */
     else
         var_SetInteger( p_input, "spu-es", i_subtitle );
@@ -262,24 +262,20 @@ void VlcWrapper::SetTimeAsFloat( float f_position )
 
 bool VlcWrapper::IsPlaying()
 {
-	bool playing = false;
-	if( p_input )
-	{
-		switch( p_input->stream.control.i_status )
-		{
-			case PLAYING_S:
-			case FORWARD_S:
-			case BACKWARD_S:
-				playing = true;
-	            break;
-			case PAUSE_S:
-			case UNDEF_S:
-			default:
-				break;
-		}
-	}
-	return playing;
-
+    bool playing = false;
+    if( p_input )
+    {
+        switch( var_GetInteger( p_input, "state" ) )
+        {
+            case INIT_S:
+            case PLAYING_S:
+                playing = true;
+                break;
+            default:
+                break;
+        }
+    }
+    return playing;
 }
 
 /************
@@ -288,45 +284,45 @@ bool VlcWrapper::IsPlaying()
 
 void VlcWrapper::OpenFiles( BList* o_files, bool replace, int32 index )
 {
-	if ( o_files && o_files->CountItems() > 0)
-	{
-	    int size = PlaylistSize();
-		bool wasEmpty = ( size < 1 );
-		if ( index == -1 )
-			index = PLAYLIST_END;
-		int mode = index == PLAYLIST_END ? PLAYLIST_APPEND : PLAYLIST_INSERT;
-	
-	    /* delete current playlist */
-	    if( replace )
-	    {
-	        for( int i = 0; i < size; i++ )
-	        {
-	            playlist_Delete( p_playlist, 0 );
-	        }
-	    }
-	
-	    /* insert files */
-	    int32 count = o_files->CountItems();
-	    for ( int32 i = count - 1; i >= 0; i-- )
-	    {
-	    	if ( BString* o_file = (BString *)o_files->RemoveItem( i ) )
-	    	{
-		        playlist_Add( p_playlist, o_file->String(),
-				      o_file->String(), mode, index );
-		        if ( mode == PLAYLIST_INSERT )
-		        	index++;
-		        delete o_file;
-	    	}
-	    }
-	    // TODO: implement a user setting
-	    // if to start automatically
-	    /* eventually restart playing */
-	    if( replace || wasEmpty )
-	    {
-	        playlist_Stop( p_playlist );
-	        playlist_Play( p_playlist );
-	    }
-	}
+    if ( o_files && o_files->CountItems() > 0)
+    {
+        int size = PlaylistSize();
+        bool wasEmpty = ( size < 1 );
+        if ( index == -1 )
+            index = PLAYLIST_END;
+        int mode = index == PLAYLIST_END ? PLAYLIST_APPEND : PLAYLIST_INSERT;
+    
+        /* delete current playlist */
+        if( replace )
+        {
+            for( int i = 0; i < size; i++ )
+            {
+                playlist_Delete( p_playlist, 0 );
+            }
+        }
+    
+        /* insert files */
+        int32 count = o_files->CountItems();
+        for ( int32 i = count - 1; i >= 0; i-- )
+        {
+            if ( BString* o_file = (BString *)o_files->RemoveItem( i ) )
+            {
+                playlist_Add( p_playlist, o_file->String(),
+                      o_file->String(), mode, index );
+                if ( mode == PLAYLIST_INSERT )
+                    index++;
+                delete o_file;
+            }
+        }
+        // TODO: implement a user setting
+        // if to start automatically
+        /* eventually restart playing */
+        if( replace || wasEmpty )
+        {
+            playlist_Stop( p_playlist );
+            playlist_Play( p_playlist );
+        }
+    }
 }
  
 void VlcWrapper::OpenDisc(BString o_type, BString o_device, int i_title, int i_chapter)
@@ -391,20 +387,20 @@ void VlcWrapper::PlaylistPrev()
 
 void VlcWrapper::GetPlaylistInfo( int32& currentIndex, int32& maxIndex )
 {
-	currentIndex = -1;
-	maxIndex = -1;
-	if ( p_playlist )
-	{
-	    vlc_mutex_lock( &p_playlist->object_lock );
+    currentIndex = -1;
+    maxIndex = -1;
+    if ( p_playlist )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
 
-		maxIndex = p_playlist->i_size;
-		if ( maxIndex > 0 )
-			currentIndex = p_playlist->i_index/* + 1 -> why?!?*/;
-		else
-			maxIndex = -1;
+        maxIndex = p_playlist->i_size;
+        if ( maxIndex > 0 )
+            currentIndex = p_playlist->i_index/* + 1 -> why?!?*/;
+        else
+            maxIndex = -1;
 
-	    vlc_mutex_unlock( &p_playlist->object_lock );
-	}
+        vlc_mutex_unlock( &p_playlist->object_lock );
+    }
 }
 
 void VlcWrapper::PlaylistJumpTo( int pos )
@@ -414,145 +410,149 @@ void VlcWrapper::PlaylistJumpTo( int pos )
 
 void VlcWrapper::GetNavCapabilities( bool *canSkipPrev, bool *canSkipNext )
 {
-	if ( canSkipPrev && canSkipNext )
-	{
-		// init the parameters
-		*canSkipPrev = false;
-		*canSkipNext = false;
-		// get playlist info
-		int pos = PlaylistCurrent();
-		int size = PlaylistSize();
+    if ( canSkipPrev && canSkipNext )
+    {
+        // init the parameters
+        *canSkipPrev = false;
+        *canSkipNext = false;
+        // get playlist info
+        int pos = PlaylistCurrent();
+        int size = PlaylistSize();
 
-		// see if we have got a stream going		
-		if ( p_input )
-		{
-			vlc_mutex_lock( &p_input->stream.stream_lock );
+        // see if we have got a stream going        
+        if ( p_input )
+        {
+#if 0
+            vlc_mutex_lock( &p_input->stream.stream_lock );
 
-			bool hasTitles = p_input->stream.i_area_nb > 1;
-			int numChapters = p_input->stream.p_selected_area->i_part_nb;
-			bool hasChapters = numChapters > 1;
-			// first, look for chapters
-			if ( hasChapters )
-			{
-				*canSkipPrev = p_input->stream.p_selected_area->i_part > 0;
-				*canSkipNext = p_input->stream.p_selected_area->i_part <
-									 p_input->stream.p_selected_area->i_part_nb - 1;
-			}
-			// if one of the skip capabilities is false,
-			// make it depend on titles instead
-			if ( !*canSkipPrev && hasTitles )
-				*canSkipPrev = p_input->stream.p_selected_area->i_id > 1;
-			if ( !*canSkipNext && hasTitles )
-				*canSkipNext = p_input->stream.p_selected_area->i_id <
-				                   p_input->stream.i_area_nb - 1;
+            bool hasTitles = p_input->stream.i_area_nb > 1;
+            int numChapters = p_input->stream.p_selected_area->i_part_nb;
+            bool hasChapters = numChapters > 1;
+            // first, look for chapters
+            if ( hasChapters )
+            {
+                *canSkipPrev = p_input->stream.p_selected_area->i_part > 0;
+                *canSkipNext = p_input->stream.p_selected_area->i_part <
+                                     p_input->stream.p_selected_area->i_part_nb - 1;
+            }
+            // if one of the skip capabilities is false,
+            // make it depend on titles instead
+            if ( !*canSkipPrev && hasTitles )
+                *canSkipPrev = p_input->stream.p_selected_area->i_id > 1;
+            if ( !*canSkipNext && hasTitles )
+                *canSkipNext = p_input->stream.p_selected_area->i_id <
+                                   p_input->stream.i_area_nb - 1;
 
-			vlc_mutex_unlock( &p_input->stream.stream_lock );
-		}
-		// last but not least, make capabilities depend on playlist
-		if ( !*canSkipPrev )
-			*canSkipPrev = pos > 0;
-		if ( !*canSkipNext )
-			*canSkipNext = pos < size - 1;
-	}
+            vlc_mutex_unlock( &p_input->stream.stream_lock );
+#endif
+        }
+        // last but not least, make capabilities depend on playlist
+        if ( !*canSkipPrev )
+            *canSkipPrev = pos > 0;
+        if ( !*canSkipNext )
+            *canSkipNext = pos < size - 1;
+    }
 }
 
 void VlcWrapper::NavigatePrev()
 {
-	bool hasSkiped = false;
+    bool hasSkiped = false;
 
-	// see if we have got a stream going		
-	if ( p_input )
-	{
-		// get information from stream (lock it while looking at it)
-		vlc_mutex_lock( &p_input->stream.stream_lock );
+    // see if we have got a stream going        
+    if ( p_input )
+    {
+#if 0
+        // get information from stream (lock it while looking at it)
+        vlc_mutex_lock( &p_input->stream.stream_lock );
 
-		int currentTitle = p_input->stream.p_selected_area->i_id;
-		int currentChapter = p_input->stream.p_selected_area->i_part;
-		int numTitles = p_input->stream.i_area_nb;
-		bool hasTitles = numTitles > 1;
-		int numChapters = p_input->stream.p_selected_area->i_part_nb;
-		bool hasChapters = numChapters > 1;
+        int currentTitle = p_input->stream.p_selected_area->i_id;
+        int currentChapter = p_input->stream.p_selected_area->i_part;
+        int numTitles = p_input->stream.i_area_nb;
+        bool hasTitles = numTitles > 1;
+        int numChapters = p_input->stream.p_selected_area->i_part_nb;
+        bool hasChapters = numChapters > 1;
 
-		vlc_mutex_unlock( &p_input->stream.stream_lock );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-		// first, look for chapters
-		if ( hasChapters )
-		{
-			// skip to the previous chapter
-			currentChapter--;
+        // first, look for chapters
+        if ( hasChapters )
+        {
+            // skip to the previous chapter
+            currentChapter--;
 
-			if ( currentChapter >= 0 )
-			{
-				ToggleChapter( currentChapter );
-				hasSkiped = true;
-			}
-		}
-		// if we couldn't skip chapters, try titles instead
-		if ( !hasSkiped && hasTitles )
-		{
-			// skip to the previous title
-			currentTitle--;
-			// disallow area 0 since it is used for video_ts.vob
-			if( currentTitle > 0 )
-			{
-				ToggleTitle(currentTitle);
-				hasSkiped = true;
-			}
-		}
-
-	}
-	// last but not least, skip to previous file
-	if ( !hasSkiped )
-		PlaylistPrev();
+            if ( currentChapter >= 0 )
+            {
+                ToggleChapter( currentChapter );
+                hasSkiped = true;
+            }
+        }
+        // if we couldn't skip chapters, try titles instead
+        if ( !hasSkiped && hasTitles )
+        {
+            // skip to the previous title
+            currentTitle--;
+            // disallow area 0 since it is used for video_ts.vob
+            if( currentTitle > 0 )
+            {
+                ToggleTitle(currentTitle);
+                hasSkiped = true;
+            }
+        }
+#endif
+    }
+    // last but not least, skip to previous file
+    if ( !hasSkiped )
+        PlaylistPrev();
 }
 
 void VlcWrapper::NavigateNext()
 {
-	bool hasSkiped = false;
+    bool hasSkiped = false;
 
-	// see if we have got a stream going		
-	if ( p_input )
-	{
-		// get information from stream (lock it while looking at it)
-		vlc_mutex_lock( &p_input->stream.stream_lock );
+    // see if we have got a stream going        
+    if ( p_input )
+    {
+#if 0
+        // get information from stream (lock it while looking at it)
+        vlc_mutex_lock( &p_input->stream.stream_lock );
 
-		int currentTitle = p_input->stream.p_selected_area->i_id;
-		int currentChapter = p_input->stream.p_selected_area->i_part;
-		int numTitles = p_input->stream.i_area_nb;
-		bool hasTitles = numTitles > 1;
-		int numChapters = p_input->stream.p_selected_area->i_part_nb;
-		bool hasChapters = numChapters > 1;
+        int currentTitle = p_input->stream.p_selected_area->i_id;
+        int currentChapter = p_input->stream.p_selected_area->i_part;
+        int numTitles = p_input->stream.i_area_nb;
+        bool hasTitles = numTitles > 1;
+        int numChapters = p_input->stream.p_selected_area->i_part_nb;
+        bool hasChapters = numChapters > 1;
 
-		vlc_mutex_unlock( &p_input->stream.stream_lock );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-		// first, look for chapters
-		if ( hasChapters )
-		{
-			// skip to the next chapter
-			currentChapter++;
-			if ( currentChapter < numChapters )
-			{
-				ToggleChapter( currentChapter );
-				hasSkiped = true;
-			}
-		}
-		// if we couldn't skip chapters, try titles instead
-		if ( !hasSkiped && hasTitles )
-		{
-			// skip to the next title
-			currentTitle++;
-			// disallow area 0 since it is used for video_ts.vob
-			if ( currentTitle < numTitles - 1 )
-			{
-				ToggleTitle(currentTitle);
-				hasSkiped = true;
-			}
-		}
-
-	}
-	// last but not least, skip to next file
-	if ( !hasSkiped )
-		PlaylistNext();
+        // first, look for chapters
+        if ( hasChapters )
+        {
+            // skip to the next chapter
+            currentChapter++;
+            if ( currentChapter < numChapters )
+            {
+                ToggleChapter( currentChapter );
+                hasSkiped = true;
+            }
+        }
+        // if we couldn't skip chapters, try titles instead
+        if ( !hasSkiped && hasTitles )
+        {
+            // skip to the next title
+            currentTitle++;
+            // disallow area 0 since it is used for video_ts.vob
+            if ( currentTitle < numTitles - 1 )
+            {
+                ToggleTitle(currentTitle);
+                hasSkiped = true;
+            }
+        }
+#endif
+    }
+    // last but not least, skip to next file
+    if ( !hasSkiped )
+        PlaylistNext();
 }
 
 /*************************
@@ -565,12 +565,12 @@ VlcWrapper::PlaylistLock() const
 {
 // TODO: search and destroy -> deadlock!
 return true;
-	if ( p_playlist )
-	{
- 		vlc_mutex_lock( &p_playlist->object_lock );
- 		return true;
- 	}
- 	return false;
+    if ( p_playlist )
+    {
+        vlc_mutex_lock( &p_playlist->object_lock );
+        return true;
+    }
+    return false;
 }
 
 // PlaylistUnlock
@@ -579,86 +579,86 @@ VlcWrapper::PlaylistUnlock() const
 {
 // TODO: search and destroy -> deadlock!
 return;
-	vlc_mutex_unlock( &p_playlist->object_lock );
+    vlc_mutex_unlock( &p_playlist->object_lock );
 }
 
 // PlaylistItemAt
 void*
 VlcWrapper::PlaylistItemAt( int index ) const
 {
-	playlist_item_t* item = NULL;
-	if ( index >= 0 && index < p_playlist->i_size )
-		item = p_playlist->pp_items[index];
-	return (void*)item;
+    playlist_item_t* item = NULL;
+    if ( index >= 0 && index < p_playlist->i_size )
+        item = p_playlist->pp_items[index];
+    return (void*)item;
 }
 
 // PlaylistRemoveItem
 void*
 VlcWrapper::PlaylistRemoveItem( int index ) const
 {
-	playlist_item_t* copy = NULL;
-	// check if item exists at the provided index
-	if ( index >= 0 && index < p_playlist->i_size )
-	{
-		playlist_item_t* item = p_playlist->pp_items[index];
-		if ( item )
-		{
-			// make a copy of the removed item
-			copy = (playlist_item_t*)PlaylistCloneItem( (void*)item );
-			// remove item from playlist (unfortunately, this frees it)
-			playlist_Delete( p_playlist, index );
-		}
-	}
-	return (void*)copy;
+    playlist_item_t* copy = NULL;
+    // check if item exists at the provided index
+    if ( index >= 0 && index < p_playlist->i_size )
+    {
+        playlist_item_t* item = p_playlist->pp_items[index];
+        if ( item )
+        {
+            // make a copy of the removed item
+            copy = (playlist_item_t*)PlaylistCloneItem( (void*)item );
+            // remove item from playlist (unfortunately, this frees it)
+            playlist_Delete( p_playlist, index );
+        }
+    }
+    return (void*)copy;
 }
 
 // PlaylistRemoveItem
 void*
 VlcWrapper::PlaylistRemoveItem( void* item ) const
 {
-	playlist_item_t* copy = NULL;
-	for ( int32 i = 0; i < p_playlist->i_size; i++ )
-	{
-		if ( p_playlist->pp_items[i] == item )
-		{
-			copy = (playlist_item_t*)PlaylistRemoveItem( i );
-			break;
-		}
-	}
-	return (void*)copy;
+    playlist_item_t* copy = NULL;
+    for ( int32 i = 0; i < p_playlist->i_size; i++ )
+    {
+        if ( p_playlist->pp_items[i] == item )
+        {
+            copy = (playlist_item_t*)PlaylistRemoveItem( i );
+            break;
+        }
+    }
+    return (void*)copy;
 }
 
 // PlaylistAddItem
 bool
 VlcWrapper::PlaylistAddItem( void* item, int index ) const
 {
-	if ( item )
-	{
-		playlist_AddItem( p_playlist, (playlist_item_t*)item,
-						  PLAYLIST_INSERT, index );
-	}
-	// TODO: once playlist is returning useful info, return that instead
-	return true;
+    if ( item )
+    {
+        playlist_AddItem( p_playlist, (playlist_item_t*)item,
+                          PLAYLIST_INSERT, index );
+    }
+    // TODO: once playlist is returning useful info, return that instead
+    return true;
 }
 
 // PlaylistCloneItem
 void*
 VlcWrapper::PlaylistCloneItem( void* castToItem ) const
 {
-	playlist_item_t* copy = NULL;
-	playlist_item_t* item = (playlist_item_t*)castToItem;
-	if ( item )
-	{
-		copy = (playlist_item_t*)malloc( sizeof( playlist_item_t ) );
-		if ( copy )
-		{
-			// make a copy of the item at index
+    playlist_item_t* copy = NULL;
+    playlist_item_t* item = (playlist_item_t*)castToItem;
+    if ( item )
+    {
+        copy = (playlist_item_t*)malloc( sizeof( playlist_item_t ) );
+        if ( copy )
+        {
+            // make a copy of the item at index
                         *copy = *item;
-			copy->input.psz_name = strdup( item->input.psz_name );
-			copy->input.psz_uri  = strdup( item->input.psz_uri );
-		}
-	}
-	return (void*)copy;
+            copy->input.psz_name = strdup( item->input.psz_name );
+            copy->input.psz_uri  = strdup( item->input.psz_uri );
+        }
+    }
+    return (void*)copy;
 }
 
 // Careful! You need to know what you're doing here!
@@ -671,11 +671,11 @@ VlcWrapper::PlaylistCloneItem( void* castToItem ) const
 void
 VlcWrapper::PlaylistSetPlaying( int index ) const
 {
-	if ( index < 0 )
-		index = 0;
-	if ( index >= p_playlist->i_size )
-		index = p_playlist->i_size - 1;
-	p_playlist->i_index = index;
+    if ( index < 0 )
+        index = 0;
+    if ( index >= p_playlist->i_size )
+        index = p_playlist->i_size - 1;
+    p_playlist->i_index = index;
 }
 
 
@@ -749,16 +749,18 @@ bool VlcWrapper::HasTitles()
     if( !p_input )
         return false;
 
-    return ( p_input->stream.i_area_nb > 1 );
+    /* FIXME */
+    return false;
 }
 
 BList * VlcWrapper::GetTitles()
 {
     if( p_input )
     {
+        BList *list = new BList();
+#if 0
         vlc_mutex_lock( &p_input->stream.stream_lock );
       
-        BList *list = new BList( p_input->stream.i_area_nb );
         BMenuItem *menuItem;
         BMessage *message;
         
@@ -774,7 +776,7 @@ BList * VlcWrapper::GetTitles()
         }
         
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-
+#endif
         return list;
     }
     return NULL;
@@ -782,22 +784,12 @@ BList * VlcWrapper::GetTitles()
 
 void VlcWrapper::PrevTitle()
 {
-    int i_id;
-    i_id = p_input->stream.p_selected_area->i_id - 1;
-    if( i_id > 0 )
-    {
-        ToggleTitle(i_id);
-    }
+    var_SetVoid( p_input, "prev-title" );
 }
 
 void VlcWrapper::NextTitle()
 {
-    unsigned int i_id;
-    i_id = p_input->stream.p_selected_area->i_id + 1;
-    if( i_id < p_input->stream.i_area_nb )
-    {
-        ToggleTitle(i_id);
-    }
+    var_SetVoid( p_input, "next-title" );
 }
 
 void VlcWrapper::ToggleTitle(int i_title)
@@ -810,20 +802,22 @@ void VlcWrapper::ToggleTitle(int i_title)
 
 void VlcWrapper::TitleInfo( int32 &currentIndex, int32 &maxIndex )
 {
-	currentIndex = -1;
-	maxIndex = -1;
-	if ( p_input )
-	{
-		vlc_mutex_lock( &p_input->stream.stream_lock );
+    currentIndex = -1;
+    maxIndex = -1;
+    if ( p_input )
+    {
+#if 0
+        vlc_mutex_lock( &p_input->stream.stream_lock );
 
-		maxIndex = p_input->stream.i_area_nb - 1;
-		if ( maxIndex > 0)
-			currentIndex = p_input->stream.p_selected_area->i_id;
-		else
-			maxIndex = -1;
+        maxIndex = p_input->stream.i_area_nb - 1;
+        if ( maxIndex > 0)
+            currentIndex = p_input->stream.p_selected_area->i_id;
+        else
+            maxIndex = -1;
 
-		vlc_mutex_unlock( &p_input->stream.stream_lock );
-	}
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+#endif
+    }
 }
 
 bool VlcWrapper::HasChapters()
@@ -832,16 +826,18 @@ bool VlcWrapper::HasChapters()
     {
         return false;
     }
-    return ( p_input->stream.p_selected_area->i_part_nb > 1 );
+    /* FIXME */
+    return false;
 }
 
 BList * VlcWrapper::GetChapters()
 {
     if( p_input )
     {
+        BList *list = new BList();
+#if 0
         vlc_mutex_lock( &p_input->stream.stream_lock );
       
-        BList *list = new BList( p_input->stream.p_selected_area->i_part_nb );
         BMenuItem *menuItem;
         BMessage *message;
         
@@ -858,7 +854,7 @@ BList * VlcWrapper::GetChapters()
         }
         
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-
+#endif
         return list;
     }
     return NULL;
@@ -866,22 +862,12 @@ BList * VlcWrapper::GetChapters()
 
 void VlcWrapper::PrevChapter()
 {
-    int i_id;
-    i_id = p_input->stream.p_selected_area->i_part - 1;
-    if( i_id >= 0 )
-    {
-        ToggleChapter(i_id);
-    }
+    var_SetVoid( p_input, "prev-chapter" );
 }
 
 void VlcWrapper::NextChapter()
 {
-    int i_id;
-    i_id = p_input->stream.p_selected_area->i_part + 1;
-    if( i_id >= 0 )
-    {
-        ToggleChapter(i_id);
-    }
+    var_SetVoid( p_input, "next-chapter" );
 }
 
 void VlcWrapper::ToggleChapter(int i_chapter)
@@ -894,20 +880,22 @@ void VlcWrapper::ToggleChapter(int i_chapter)
 
 void VlcWrapper::ChapterInfo( int32 &currentIndex, int32 &maxIndex )
 {
-	currentIndex = -1;
-	maxIndex = -1;
-	if ( p_input )
-	{
-		vlc_mutex_lock( &p_input->stream.stream_lock );
+    currentIndex = -1;
+    maxIndex = -1;
+    if ( p_input )
+    {
+#if 0
+        vlc_mutex_lock( &p_input->stream.stream_lock );
 
-		maxIndex = p_input->stream.p_selected_area->i_part_nb - 1;
-		if ( maxIndex > 0)
-			currentIndex = p_input->stream.p_selected_area->i_part;
-		else
-			maxIndex = -1;
+        maxIndex = p_input->stream.p_selected_area->i_part_nb - 1;
+        if ( maxIndex > 0)
+            currentIndex = p_input->stream.p_selected_area->i_part;
+        else
+            maxIndex = -1;
 
-		vlc_mutex_unlock( &p_input->stream.stream_lock );
-	}
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+#endif
+    }
 }
 
 /****************
@@ -924,6 +912,7 @@ void VlcWrapper::FilterChange()
     if( !p_input )
         return;
     
+#if 0
     vout_thread_t * p_vout;
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -947,4 +936,5 @@ void VlcWrapper::FilterChange()
         }
     }
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+#endif
 }

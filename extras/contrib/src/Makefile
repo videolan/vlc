@@ -58,10 +58,7 @@ all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 endif
 ifeq ($(SYS),BEOS)
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
-	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.FLAC .speex .faad .faac .lame .ffmpeg .openslp \
-	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom .caca .dts .mod \
-	.cddb .cdio .vcdimager
+	.a52 .mpeg2 .id3tag .mad
 endif
 
 FORCE:
@@ -354,6 +351,7 @@ mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
 
 mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p 0 < Patches/mpeg2dec.patch
 
 .mpeg2: mpeg2dec
 	(cd $<; ./configure --prefix=$(PREFIX) --without-x --disable-dsl && make && make install)
@@ -376,7 +374,9 @@ libid3tag: libid3tag-$(LIBID3TAG_VERSION).tar.gz
 
 .id3tag: libid3tag
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+ifeq ($(SYS),DARWIN)
 	$(INSTALL_NAME)
+endif
 	touch $@
 
 CLEAN_FILE += .id3tag
@@ -395,7 +395,9 @@ libmad: libmad-$(LIBMAD_VERSION).tar.gz
 
 .mad: libmad
 	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="-O3" && make && make install)
+ifeq ($(SYS),DARWIN)
 	$(INSTALL_NAME)
+endif
 	touch $@
 
 CLEAN_FILE += .mad

@@ -405,14 +405,28 @@ vlc$(EXEEXT): $(vlc_OBJECTS) $(DEPENDENCIES_vlc) stamp-builtin
 	esac
 
 if HAVE_BEOS
-	xres -o $@ $(srcdir)/share/vlc_beos.rsrc
-	mimeset -f $@
-	rm -Rf $(srcdir)/locale ; mkdir -p "$(srcdir)/locale"
-	for i in $(ALL_LINGUAS); do \
-	  mkdir -p "$(srcdir)/locale/$${i}/LC_MESSAGES" ; \
-	  cp "$(srcdir)/po/$${i}.gmo" \
-	    "$(srcdir)/locale/$${i}/LC_MESSAGES/vlc.mo" || true ; \
+vlc-bundle: vlc
+	rm -rf $(srcdir)/vlc-bundle ; mkdir -p $(srcdir)/vlc-bundle
+	cp $(srcdir)/vlc $(srcdir)/vlc-bundle/
+	xres -o $(srcdir)/vlc-bundle/vlc $(srcdir)/share/vlc_beos.rsrc
+	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
+	  if test -n "$$i" ; then \
+	    mkdir -p $(srcdir)/vlc-bundle/plugins ; \
+	    cp "$$i$(LIBEXT)" $(srcdir)/vlc-bundle/plugins/ ; \
+	  fi ; \
 	done
+	if test -d $(srcdir)/extras/contrib/vlc-lib ; then \
+	  mkdir -p $(srcdir)/vlc-bundle/lib ; \
+	  for i in $(srcdir)/extras/contrib/vlc-lib/*.so ; do \
+	    cp $$i $(srcdir)/vlc-bundle/lib/ ; \
+	  done ; \
+	fi
+	for i in $(ALL_LINGUAS); do \
+	  mkdir -p "$(srcdir)/vlc-bundle/locale/$$i/LC_MESSAGES" ; \
+	  cp "$(srcdir)/po/$$i.gmo" \
+	    "$(srcdir)/vlc-bundle/locale/$$i/LC_MESSAGES/vlc.mo" || true ; \
+	done
+	find $(srcdir)/vlc-bundle -type f $(srcdir)/vlc-bundle -exec mimeset -f "{}" \;
 endif
 
 # Install the modules and the symlinks

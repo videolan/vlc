@@ -63,13 +63,13 @@ static void MergeGeneric ( void *, const void *, const void *, size_t );
 #if defined(CAN_COMPILE_C_ALTIVEC)
 static void MergeAltivec ( void *, const void *, const void *, size_t );
 #endif
-#if defined(CAN_COMPILE_MMX)
+#if defined(CAN_COMPILE_MMXEXT)
 static void MergeMMX     ( void *, const void *, const void *, size_t );
 #endif
 #if defined(CAN_COMPILE_SSE) && !defined(SYS_BEOS)
 static void MergeSSE2    ( void *, const void *, const void *, size_t );
 #endif
-#if defined(CAN_COMPILE_MMX) || defined(CAN_COMPILE_SSE)
+#if defined(CAN_COMPILE_MMXEXT) || defined(CAN_COMPILE_SSE)
 static void EndMMX       ( void );
 #endif
 
@@ -184,7 +184,7 @@ static int Create( vlc_object_t *p_this )
     }
     else
 #endif
-#if defined(CAN_COMPILE_MMX)
+#if defined(CAN_COMPILE_MMXEXT)
     if( p_vout->p_libvlc->i_cpu & CPU_CAPABILITY_MMX )
     {
         p_vout->p_sys->pf_merge = MergeMMX;
@@ -871,7 +871,7 @@ static void MergeGeneric( void *_p_dest, const void *_p_s1,
     }
 }
 
-#if defined(CAN_COMPILE_MMX)
+#if defined(CAN_COMPILE_MMXEXT)
 static void MergeMMX( void *_p_dest, const void *_p_s1, const void *_p_s2,
                       size_t i_bytes )
 {
@@ -934,7 +934,7 @@ static void MergeSSE2( void *_p_dest, const void *_p_s1, const void *_p_s2,
 }
 #endif
 
-#if defined(CAN_COMPILE_MMX) || defined(CAN_COMPILE_SSE)
+#if defined(CAN_COMPILE_MMXEXT) || defined(CAN_COMPILE_SSE)
 static void EndMMX( void )
 {
     __asm__ __volatile__( "emms" :: );

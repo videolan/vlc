@@ -2468,7 +2468,7 @@ dnl  (enabled by default except on win32)
 dnl
 AC_ARG_ENABLE(opengl,
   [  --enable-opengl            OpenGL support (default enabled)])
-if test "${enable_opengl}" != "no"; then
+if test "${enable_opengl}" != "no" && test "${SYS}" != "beos"; then
   AC_CHECK_HEADERS(GL/gl.h, [
       VLC_ADD_PLUGINS([opengl])
       VLC_ADD_LDFLAGS([opengl],[-L${x_libraries} -lGL -lGLU])

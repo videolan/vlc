@@ -31,6 +31,7 @@
 /* VLC headers */
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
+#include <vlc/input.h>
 extern "C"
 {
   #include <audio_output.h>
@@ -80,8 +81,8 @@ MediaControlView::MediaControlView(BRect frame, intf_thread_t *p_interface)
 	: BBox(frame, NULL, B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED,
 		   B_PLAIN_BORDER),
       fScrubSem(B_ERROR),
-      fCurrentRate(DEFAULT_RATE),
-      fCurrentStatus(UNDEF_S),
+      fCurrentRate(INPUT_RATE_DEFAULT),
+      fCurrentStatus(-1),
       fBottomControlHeight(0.0),
       fIsEnabled( true )
 {
@@ -316,14 +317,11 @@ MediaControlView::SetStatus(int status, int rate)
     switch( status )
     {
         case PLAYING_S:
-        case FORWARD_S:
-        case BACKWARD_S:
             fPlayPause->SetPlaying();
             break;
         case PAUSE_S:
             fPlayPause->SetPaused();
             break;
-        case UNDEF_S:
         default:
             fPlayPause->SetStopped();
             break;
@@ -331,7 +329,7 @@ MediaControlView::SetStatus(int status, int rate)
 	if (rate != fCurrentRate)
 	{
 		fCurrentRate = rate;
-	    if ( rate < DEFAULT_RATE )
+	    if ( rate < INPUT_RATE_DEFAULT )
 	    {
 	    	// TODO: ...
 	    }
