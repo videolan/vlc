@@ -713,7 +713,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
             httpd_MsgAdd( answer, "Pragma", "no-cache" );
             httpd_MsgAdd( answer, "Pragma", "client-id=%d", rand()&0x7fff );
             httpd_MsgAdd( answer, "Pragma", "features=\"broadcast\"" );
-
+#if 0
             /* Check if there is a xPlayStrm=1 */
             for( i = 0; i < query->i_name; i++ )
             {
@@ -728,6 +728,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
             {
                 answer->i_body_offset = 0;
             }
+#endif
         }
         else
         {
