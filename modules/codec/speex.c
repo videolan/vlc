@@ -1,8 +1,8 @@
 /*****************************************************************************
- * speex.c: speex decoder/packetizer module making use of libspeex.
+ * speex.c: speex decoder/packetizer/encoder module making use of libspeex.
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: speex.c,v 1.4 2003/11/22 23:39:14 fenrir Exp $
+ * Copyright (C) 2003 VideoLAN
+ * $Id: speex.c,v 1.5 2003/11/23 15:50:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -89,6 +89,11 @@ static block_t *SendPacket( decoder_t *, ogg_packet *, block_t * );
 
 static void ParseSpeexComments( decoder_t *, ogg_packet * );
 
+static int OpenEncoder   ( vlc_object_t * );
+static void CloseEncoder ( vlc_object_t * );
+static block_t *Headers  ( encoder_t * );
+static block_t *Encode   ( encoder_t *, aout_buffer_t * );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -101,6 +106,11 @@ vlc_module_begin();
     set_description( _("Speex audio packetizer") );
     set_capability( "packetizer", 100 );
     set_callbacks( OpenPacketizer, CloseDecoder );
+
+    add_submodule();
+    set_description( _("Speex audio encoder") );
+    set_capability( "encoder", 100 );
+    set_callbacks( OpenEncoder, CloseEncoder );
 vlc_module_end();
 
 /*****************************************************************************
@@ -488,5 +498,252 @@ static void CloseDecoder( vlc_object_t *p_this )
     }
 
     if( p_sys->p_header ) free( p_sys->p_header );
+    free( p_sys );
+}
+
+/*****************************************************************************
+ * encoder_sys_t: encoder descriptor
+ *****************************************************************************/
+#define MAX_FRAME_SIZE  2000
+#define MAX_FRAME_BYTES 2000
+
+struct encoder_sys_t
+{
+    /*
+     * Input properties
+     */
+    int i_headers;
+
+    char *p_buffer;
+    char *p_buffer_out[MAX_FRAME_BYTES];
+
+    /*
+     * Speex properties
+     */
+    SpeexBits bits;
+    SpeexHeader header;
+    SpeexStereoState stereo;
+    void *p_state;
+
+    int i_frames_per_packet;
+    int i_frames_in_packet;
+
+    int i_frame_length;
+    int i_samples_delay;
+    int i_frame_size;
+
+    /*
+     * Common properties
+     */
+    mtime_t i_pts;
+};
+
+/*****************************************************************************
+ * OpenEncoder: probe the encoder and return score
+ *****************************************************************************/
+static int OpenEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys;
+    SpeexMode *p_speex_mode = &speex_nb_mode;
+    int i_quality;
+
+    if( p_enc->fmt_out.i_codec != VLC_FOURCC('s','p','x',' ') )
+    {
+        return VLC_EGENERIC;
+    }
+
+    /* Allocate the memory needed to store the decoder's structure */
+    if( ( p_sys = (encoder_sys_t *)malloc(sizeof(encoder_sys_t)) ) == NULL )
+    {
+        msg_Err( p_enc, "out of memory" );
+        return VLC_EGENERIC;
+    }
+    p_enc->p_sys = p_sys;
+    p_enc->pf_header = Headers;
+    p_enc->pf_encode_audio = Encode;
+    p_enc->fmt_in.i_codec = AOUT_FMT_S16_NE;
+
+    speex_init_header( &p_sys->header, p_enc->fmt_in.audio.i_rate,
+                       1, p_speex_mode );
+
+    p_sys->header.frames_per_packet = 1;
+    p_sys->header.vbr = 1;
+    p_sys->header.nb_channels = p_enc->fmt_in.audio.i_channels;
+
+    /* Create a new encoder state in narrowband mode */
+    p_sys->p_state = speex_encoder_init( p_speex_mode );
+
+    /* Set the quality to 8 (15 kbps) */
+    i_quality = 8;
+    speex_encoder_ctl( p_sys->p_state, SPEEX_SET_QUALITY, &i_quality );
+
+    /*Initialization of the structure that holds the bits*/
+    speex_bits_init( &p_sys->bits );
+
+    p_sys->i_frames_in_packet = 0;
+    p_sys->i_samples_delay = 0;
+    p_sys->i_headers = 0;
+    p_sys->i_pts = 0;
+
+    speex_encoder_ctl( p_sys->p_state, SPEEX_GET_FRAME_SIZE,
+                       &p_sys->i_frame_length );
+
+    p_sys->i_frame_size = p_sys->i_frame_length *
+        sizeof(int16_t) * p_enc->fmt_in.audio.i_channels;
+    p_sys->p_buffer = malloc( p_sys->i_frame_size );
+
+    msg_Dbg( p_enc, "encoding: frame size:%d, channels:%d, samplerate:%d",
+             p_sys->i_frame_size, p_enc->fmt_in.audio.i_channels,
+             p_enc->fmt_in.audio.i_rate );
+
+    return VLC_SUCCESS;
+}
+
+/****************************************************************************
+ * Headers: spits out the headers
+ ****************************************************************************
+ * This function spits out ogg packets.
+ ****************************************************************************/
+static block_t *Headers( encoder_t *p_enc )
+{
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    block_t *p_block, *p_chain = NULL;
+
+    /* Create speex headers */
+    if( !p_sys->i_headers )
+    {
+        char *p_buffer;
+        int i_buffer;
+
+        /* Main header */
+        p_buffer = speex_header_to_packet( &p_sys->header, &i_buffer );
+        p_block = block_New( p_enc, i_buffer );
+        memcpy( p_block->p_buffer, p_buffer, i_buffer );
+        p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
+        block_ChainAppend( &p_chain, p_block );
+
+        /* Comment */
+        p_block = block_New( p_enc, sizeof("ENCODER=VLC media player") );
+        memcpy( p_block->p_buffer, "ENCODER=VLC media player",
+                p_block->i_buffer );
+        p_block->i_dts = p_block->i_pts = p_block->i_length = 0;
+        block_ChainAppend( &p_chain, p_block );
+      
+        p_sys->i_headers = 2;
+    }
+
+    return p_chain;
+}
+
+/****************************************************************************
+ * Encode: the whole thing
+ ****************************************************************************
+ * This function spits out ogg packets.
+ ****************************************************************************/
+static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
+{
+    encoder_sys_t *p_sys = p_enc->p_sys;
+    block_t *p_block, *p_chain = NULL;
+
+    char *p_buffer = p_aout_buf->p_buffer;
+    int i_samples = p_aout_buf->i_nb_samples;
+    int i_samples_delay = p_sys->i_samples_delay;
+
+    p_sys->i_pts = p_aout_buf->start_date -
+                (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
+                (mtime_t)p_enc->fmt_in.audio.i_rate;
+
+    p_sys->i_samples_delay += i_samples;
+
+    while( p_sys->i_samples_delay >= p_sys->i_frame_length )
+    {
+        int16_t *p_samples;
+        int i_out;
+
+        if( i_samples_delay )
+        {
+            /* Take care of the left-over from last time */
+            int i_delay_size = i_samples_delay * 2 *
+                                 p_enc->fmt_in.audio.i_channels;
+            int i_size = p_sys->i_frame_size - i_delay_size;
+
+            p_samples = (int16_t *)p_sys->p_buffer;
+            memcpy( p_sys->p_buffer + i_delay_size, p_buffer, i_size );
+            p_buffer -= i_delay_size;
+            i_samples += i_samples_delay;
+            i_samples_delay = 0;
+        }
+        else
+        {
+            p_samples = (int16_t *)p_buffer;
+        }
+
+        /* Encode current frame */
+        if( p_enc->fmt_in.audio.i_channels == 2 )
+            speex_encode_stereo( p_samples, p_sys->i_frame_length,
+                                 &p_sys->bits );
+
+#if 0
+        if( p_sys->preprocess )
+            speex_preprocess( p_sys->preprocess, p_samples, NULL );
+#endif
+
+        speex_encode( p_sys->p_state, p_samples, &p_sys->bits );
+
+        p_buffer += p_sys->i_frame_size;
+        p_sys->i_samples_delay -= p_sys->i_frame_length;
+        i_samples -= p_sys->i_frame_length;
+
+        p_sys->i_frames_in_packet++;
+
+        if( p_sys->i_frames_in_packet < p_sys->header.frames_per_packet )
+            continue;
+
+        p_sys->i_frames_in_packet = 0;
+
+        speex_bits_insert_terminator( &p_sys->bits );
+        i_out = speex_bits_write( &p_sys->bits, p_sys->p_buffer_out,
+                                  MAX_FRAME_BYTES );
+        speex_bits_reset( &p_sys->bits );
+
+        p_block = block_New( p_enc, i_out );
+        memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
+
+        p_block->i_length = (mtime_t)1000000 *
+            (mtime_t)p_sys->i_frame_length * p_sys->header.frames_per_packet /
+            (mtime_t)p_enc->fmt_in.audio.i_rate;
+
+        p_block->i_dts = p_block->i_pts = p_sys->i_pts;
+
+        /* Update pts */
+        p_sys->i_pts += p_block->i_length;
+        block_ChainAppend( &p_chain, p_block );
+
+    }
+
+    /* Backup the remaining raw samples */
+    if( i_samples )
+    {
+        memcpy( p_sys->p_buffer, p_buffer + i_samples_delay * 2 *
+                p_enc->fmt_in.audio.i_channels,
+                i_samples * 2 * p_enc->fmt_in.audio.i_channels );
+    }
+
+    return p_chain;
+}
+
+/*****************************************************************************
+ * CloseEncoder: encoder destruction
+ *****************************************************************************/
+static void CloseEncoder( vlc_object_t *p_this )
+{
+    encoder_t *p_enc = (encoder_t *)p_this;
+    encoder_sys_t *p_sys = p_enc->p_sys;
+
+    speex_encoder_destroy( p_sys->p_state );
+    speex_bits_destroy( &p_sys->bits );
+
+    if( p_sys->p_buffer ) free( p_sys->p_buffer );
     free( p_sys );
 }

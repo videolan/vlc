@@ -1,8 +1,8 @@
 /*****************************************************************************
  * vorbis.c: vorbis decoder/encoder/packetizer module making use of libvorbis.
  *****************************************************************************
- * Copyright (C) 1999-2001 VideoLAN
- * $Id: vorbis.c,v 1.24 2003/11/22 23:39:14 fenrir Exp $
+ * Copyright (C) 2001-2003 VideoLAN
+ * $Id: vorbis.c,v 1.25 2003/11/23 15:50:07 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -651,23 +651,6 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
 
     buffer = vorbis_analysis_buffer( &p_sys->vd, p_aout_buf->i_nb_samples );
-
-#if 0
-    if( id->ff_dec_c->channels != id->ff_enc_c->channels )
-    {
-        int i, j;
-
-        /* dumb downmixing */
-        for( i = 0; i < id->ff_enc_c->frame_size; i++ )
-        {
-            for( j = 0 ; j < id->f_dst.i_channels; j++ )
-            {
-                p_buffer[i*id->f_dst.i_channels+j] =
-                    p_buffer[i*id->f_src.i_channels+j];
-            }
-        }
-    }
-#endif
 
     /* convert samples to float and uninterleave */
     for( i = 0; i < p_sys->i_channels; i++ )
