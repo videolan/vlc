@@ -2,7 +2,7 @@
  * sub.c: subtitle demux for external subtitle files
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: sub.c,v 1.49 2004/01/27 13:10:29 fenrir Exp $
+ * $Id: sub.c,v 1.50 2004/01/27 22:51:39 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -449,6 +449,7 @@ static int sub_open( subtitle_demux_t *p_sub, input_thread_t  *p_input,
 
     /* *** fix subtitle (order and time) *** */
     p_sub->i_subtitle = 0;  /* will be modified by sub_fix */
+    
     if( p_sub->i_sub_type != SUB_TYPE_VOBSUB )
     {
         sub_fix( p_sub );
@@ -579,7 +580,7 @@ static int  sub_demux( subtitle_demux_t *p_sub, mtime_t i_maxdate )
             if( i_size <= 0 ) i_size = 65535;   /* Invalid or EOF */
 
             /* Seek at the right place (could be avoid if sub_seek is fixed to do his job) */
-            if( fseek( p_sub->p_vobsub_file, i_pos, SEEK_CUR ) )
+            if( fseek( p_sub->p_vobsub_file, i_pos, SEEK_SET ) )
             {
                 msg_Warn( p_sub, "cannot seek at right vobsub location %d", i_pos );
                 p_sub->i_subtitle++;
@@ -1171,12 +1172,18 @@ static int  DemuxVobSub( subtitle_demux_t *p_demux, block_t *p_bk )
         i_spu = i_id&0x1f;
         msg_Dbg( p_demux, "SPU track %d size %d", i_spu, i_size );
 
-        if( p_demux->p_es )
+        /* FIXME i_spu == determines which of the spu tracks we will show. */
+        if( p_demux->p_es && i_spu == 0 )
         {
             p_pkt->i_pts = p_bk->i_pts;
             es_out_Send( p_demux->p_input->p_es_out, p_demux->p_es, p_pkt );
 
             p_bk->i_pts = 0;    /* only first packet has a pts */
+        }
+        else
+        {
+            block_Release( p_pkt );
+            continue;
         }
     }
 

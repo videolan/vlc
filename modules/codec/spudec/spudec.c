@@ -2,7 +2,7 @@
  * spudec.c : SPU decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spudec.c,v 1.30 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: spudec.c,v 1.31 2004/01/27 22:51:39 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -222,6 +222,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->i_spu_size <= 0 && ( p_block->i_pts <= 0 || p_block->i_buffer < 4 ) )
     {
         msg_Dbg( p_dec, "invalid starting packet (size < 4 or pts <=0)" );
+        msg_Dbg( p_dec, "spu size: %d, i_pts: %d i_buffer: %d", p_sys->i_spu_size, p_block->i_pts, p_block->i_buffer );
         block_Release( p_block );
         return NULL;
     }

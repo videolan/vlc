@@ -2,7 +2,7 @@
  * parse.c: SPU parser
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: parse.c,v 1.16 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: parse.c,v 1.17 2004/01/27 22:51:39 hartman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -283,7 +283,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t * p_spu )
                          ((p_sys->buffer[i_index+4]>>4)&0x0f);
             p_spu->i_height = (((p_sys->buffer[i_index+4]&0x0f)<<8)|
                               p_sys->buffer[i_index+5]) - p_spu->i_y + 1;
-
+            
             i_index += 6;
             break;
 
@@ -297,7 +297,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t * p_spu )
             break;
 
         default: /* xx (unknown command) */
-            msg_Err( p_dec, "unknown command 0x%.2x", i_command );
+            msg_Warn( p_dec, "unknown command 0x%.2x", i_command );
             return VLC_EGENERIC;
         }
 
