@@ -8,7 +8,7 @@ Core support:
     - Tree structure
     - Input preparsing (for meta-data)
     - Grouping (by artist, ...) support 
- * Preferences improvements : 
+ * Preferences improvements: 
     - New organization, designed to improve usability
     - New configuration types (list of modules, ...)
  * XML parsers
@@ -18,7 +18,9 @@ Core support:
  * Renamed --spu-channel to --sub-track
  * Renamed --spumargin to --sub-margin
  * Renamed --audio-channel to --audio-track
- * Track selection based on preferred language
+ * Renamed --filter to --video-filter
+   Multiple video filters are now seperated by ',' instead of ':'
+ * Track selection based on preferred language (--sub-language and --audio-language)
  * Many bugfixes...
 
 Input/Demuxers:
@@ -51,12 +53,13 @@ Audio output:
  * Support for 20/24 bits LPCM
 
 Video output:
- * Video snapshot support
- * Image file video output (png or jpg)
+ * Video snapshot support (png or jpg)
+ * Image file video output (png)
  * Motion detection filter (can trigger playlist actions)
  * Improvements to wall video filter
  * Mosaic (picture-in-picture system)
  * Support for font color and opacity
+ * Fixed Mac OS X OpenGL output
 
 Stream output:
  * Muxers
@@ -88,7 +91,7 @@ Windows port:
 BeOS port:
  * Support for single-buffered overlay
 
-Pocket PC port :
+Pocket PC port:
  * Many fixes
  * New interface
  * New video output 
@@ -101,6 +104,7 @@ IE Plugin:
  * Brand new Internet Explorer ActiveX plugin
 
 Translations:
+ The following languages were added
  * Danish
  * Greek
  * Hindi 

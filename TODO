@@ -28,6 +28,14 @@ It's currently not possible to force VLC from stereo to mono mode, or from stere
 Status: Todo
 
 Task
+Difficulty: Hard
+Platform: any
+Urgency: Wishlist
+Description: Java wrapping/bindings
+Allow java apps to use VLC perhaps? Several people have suggested something like this.
+Status: Todo
+
+Task
 Difficulty: Easy
 Platform: win32/macosx
 Urgency: Normal

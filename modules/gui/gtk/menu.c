@@ -318,17 +318,17 @@ static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
     char *psz_filter;
     unsigned int  i;
 
-    psz_filter = config_GetPsz( p_intf, "filter" );
+    psz_filter = config_GetPsz( p_intf, "video-filter" );
 
     if( !strcmp( psz_mode, "None" ) )
     {
-        config_PutPsz( p_intf, "filter", "" );
+        config_PutPsz( p_intf, "video-filter", "" );
     }
     else
     {
         if( !psz_filter || !*psz_filter )
         {
-            config_PutPsz( p_intf, "filter", "deinterlace" );
+            config_PutPsz( p_intf, "video-filter", "deinterlace" );
         }
         else
         {
@@ -337,7 +337,7 @@ static void GtkDeinterlaceUpdate( intf_thread_t *p_intf, char *psz_mode )
                 psz_filter = realloc( psz_filter, strlen( psz_filter ) + 20 );
                 strcat( psz_filter, ",deinterlace" );
             }
-            config_PutPsz( p_intf, "filter", psz_filter );
+            config_PutPsz( p_intf, "video-filter", psz_filter );
         }
     }
 

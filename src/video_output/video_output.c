@@ -142,11 +142,11 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         char *psz_filter_chain;
         vlc_value_t val;
 
-        /* We don't directly check for the "filter" variable for obvious
+        /* We don't directly check for the "video-filter" variable for obvious
          * performance reasons. */
         if( p_vout->b_filter_change )
         {
-            var_Get( p_vout, "filter", &val );
+            var_Get( p_vout, "video-filter", &val );
             psz_filter_chain = val.psz_string;
 
             if( psz_filter_chain && !*psz_filter_chain )
@@ -352,8 +352,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         }
 
         /* Look for the default filter configuration */
-        var_Create( p_vout, "filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-        var_Get( p_vout, "filter", &val );
+        var_Create( p_vout, "video-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Get( p_vout, "video-filter", &val );
         p_vout->psz_filter_chain = val.psz_string;
     }
     else
@@ -429,10 +429,10 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     var_AddCallback( p_vout, "deinterlace", DeinterlaceCallback, NULL );
 
 
-    var_Create( p_vout, "filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     text.psz_string = _("Filters");
-    var_Change( p_vout, "filter", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_vout, "filter", FilterCallback, NULL );
+    var_Change( p_vout, "video-filter", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "video-filter", FilterCallback, NULL );
 
     /* Calculate delay created by internal caching */
     p_input_thread = (input_thread_t *)vlc_object_find( p_vout,
@@ -1372,7 +1372,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     char *psz_mode = newval.psz_string;
     char *psz_filter, *psz_deinterlace = NULL;
 
-    var_Get( p_vout, "filter", &val );
+    var_Get( p_vout, "video-filter", &val );
     psz_filter = val.psz_string;
     if( psz_filter ) psz_deinterlace = strstr( psz_filter, "deinterlace" );
 
@@ -1410,7 +1410,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     var_Set( p_vout, "intf-change", val );
 
     val.psz_string = psz_filter;
-    var_Set( p_vout, "filter", val );
+    var_Set( p_vout, "video-filter", val );
     if( psz_filter ) free( psz_filter );
 
     return VLC_SUCCESS;
@@ -1436,8 +1436,8 @@ static int FilterCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* Modify input as well because the vout might have to be restarted */
     val.psz_string = newval.psz_string;
-    var_Create( p_input, "filter", VLC_VAR_STRING );
-    var_Set( p_input, "filter", val );
+    var_Create( p_input, "video-filter", VLC_VAR_STRING );
+    var_Set( p_input, "video-filter", val );
 
     /* Now restart current video stream */
     var_Get( p_input, "video-es", &val );

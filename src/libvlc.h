@@ -960,7 +960,7 @@ vlc_module_begin();
         change_short('V');
 
     set_subcategory( SUBCAT_VIDEO_VFILTER );
-    add_module_list_cat( "filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
+    add_module_list_cat( "video-filter", SUBCAT_VIDEO_VFILTER, NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );
 
 #if 0
