@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.50 2004/01/09 04:37:43 jlj Exp $
+ * $Id: mp4.c,v 1.51 2004/01/13 01:44:49 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -432,7 +432,8 @@ static int Demux( input_thread_t *p_input )
         while( MP4_GetTrackPTS( &track ) < MP4_GetMoviePTS( p_sys ) )
         {
 
-            if( !b_play_audio && track.fmt.i_cat == AUDIO_ES )
+            if( ( !b_play_audio && track.fmt.i_cat == AUDIO_ES ) ||
+                MP4_TrackSampleSize( &track ) <= 0 )
             {
                 if( MP4_TrackNextSample( p_input, &track ) )
                 {
