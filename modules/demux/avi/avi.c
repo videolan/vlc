@@ -32,7 +32,6 @@
 #include "codecs.h"
 
 #include "libavi.h"
-#include "avi.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -43,10 +42,10 @@
 
 #define INDEX_TEXT N_("Force index creation")
 #define INDEX_LONGTEXT N_( \
-    "Recreate a index for the AVI file so we can seek trough it more reliably." ) 
+    "Recreate a index for the AVI file so we can seek trough it more reliably." )
 
-static int  Open   ( vlc_object_t * );
-static void Close  ( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 vlc_module_begin();
     set_description( _("AVI demuxer") );
@@ -63,13 +62,84 @@ vlc_module_end();
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int    Control         ( input_thread_t *, int, va_list );
-static int    Seek            ( input_thread_t *, mtime_t, int );
-static int    Demux_Seekable  ( input_thread_t * );
-static int    Demux_UnSeekable( input_thread_t *p_input );
+static int Control         ( input_thread_t *, int, va_list );
+static int Seek            ( input_thread_t *, mtime_t, int );
+static int Demux_Seekable  ( input_thread_t * );
+static int Demux_UnSeekable( input_thread_t * );
 
 #define FREE( p ) if( p ) { free( p ); (p) = NULL; }
 #define __ABS( x ) ( (x) < 0 ? (-(x)) : (x) )
+
+typedef struct
+{
+    vlc_fourcc_t i_fourcc;
+    off_t        i_pos;
+    uint32_t     i_size;
+    vlc_fourcc_t i_type;     /* only for AVIFOURCC_LIST */
+
+    uint8_t      i_peek[8];  /* first 8 bytes */
+
+    unsigned int i_stream;
+    unsigned int i_cat;
+} avi_packet_t;
+
+
+typedef struct
+{
+    vlc_fourcc_t i_id;
+    uint32_t     i_flags;
+    off_t        i_pos;
+    uint32_t     i_length;
+    uint32_t     i_lengthtotal;
+
+} avi_entry_t;
+
+typedef struct
+{
+    vlc_bool_t      b_activated;
+
+    unsigned int    i_cat; /* AUDIO_ES, VIDEO_ES */
+    vlc_fourcc_t    i_codec;
+
+    int             i_rate;
+    int             i_scale;
+    int             i_samplesize;
+
+    es_out_id_t     *p_es;
+
+    avi_entry_t     *p_index;
+    unsigned int        i_idxnb;
+    unsigned int        i_idxmax;
+
+    unsigned int        i_idxposc;  /* numero of chunk */
+    unsigned int        i_idxposb;  /* byte in the current chunk */
+
+    /* For VBR audio only */
+    unsigned int        i_blockno;
+    unsigned int        i_blocksize;
+} avi_track_t;
+
+struct demux_sys_t
+{
+    mtime_t i_time;
+    mtime_t i_length;
+    mtime_t i_pcr;
+
+    vlc_bool_t  b_seekable;
+    avi_chunk_t ck_root;
+
+    vlc_bool_t  b_odml;
+
+    off_t   i_movi_begin;
+    off_t   i_movi_lastchunk_pos;   /* XXX position of last valid chunk */
+
+    /* number of streams and information */
+    unsigned int i_track;
+    avi_track_t  **track;
+
+    /* meta */
+    vlc_meta_t  *meta;
+};
 
 static inline off_t __EVEN( off_t i )
 {
@@ -98,7 +168,7 @@ static int AVI_PacketSearch   ( input_thread_t * );
 
 static void AVI_IndexLoad    ( input_thread_t * );
 static void AVI_IndexCreate  ( input_thread_t * );
-static void AVI_IndexAddEntry( demux_sys_t *, int, AVIIndexEntry_t * );
+static void AVI_IndexAddEntry( demux_sys_t *, int, avi_entry_t * );
 
 static mtime_t  AVI_MovieGetLength( input_thread_t * );
 
@@ -686,7 +756,7 @@ static int Demux_Seekable( input_thread_t *p_input )
                 else
                 {
                     /* add this chunk to the index */
-                    AVIIndexEntry_t index;
+                    avi_entry_t index;
 
                     index.i_id = avi_pk.i_fourcc;
                     index.i_flags =
@@ -1348,7 +1418,7 @@ static int AVI_StreamChunkFind( input_thread_t *p_input,
         else
         {
             /* add this chunk to the index */
-            AVIIndexEntry_t index;
+            avi_entry_t index;
 
             index.i_id = avi_pk.i_fourcc;
             index.i_flags =
@@ -1573,10 +1643,8 @@ static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, uint8_t *p_byte )
                 /* it's not an msmpegv1 stream, strange...*/
                 return AVIIF_KEYFRAME;
             }
-            else
-            {
-                return p_byte[4] & 0x06 ? 0 : AVIIF_KEYFRAME;
-            }
+            return p_byte[4] & 0x06 ? 0 : AVIIF_KEYFRAME;
+
         case FOURCC_DIV2:
         case FOURCC_DIV3:   /* wmv1 also */
             /* we have
@@ -1593,10 +1661,8 @@ static int AVI_GetKeyFlag( vlc_fourcc_t i_fourcc, uint8_t *p_byte )
                 /* not true , need to find the first VOP header */
                 return AVIIF_KEYFRAME;
             }
-            else
-            {
-                return p_byte[4] & 0xC0 ? 0 : AVIIF_KEYFRAME;
-            }
+            return p_byte[4] & 0xC0 ? 0 : AVIIF_KEYFRAME;
+
         default:
             /* I can't do it, so say yes */
             return AVIIF_KEYFRAME;
@@ -1837,7 +1903,7 @@ static int AVI_PacketSearch( input_thread_t *p_input )
  ****************************************************************************/
 static void AVI_IndexAddEntry( demux_sys_t *p_sys,
                                int i_stream,
-                               AVIIndexEntry_t *p_index)
+                               avi_entry_t *p_index)
 {
     avi_track_t *tk = p_sys->track[i_stream];
 
@@ -1852,7 +1918,7 @@ static void AVI_IndexAddEntry( demux_sys_t *p_sys,
     {
         tk->i_idxmax += 16384;
         tk->p_index = realloc( tk->p_index,
-                               tk->i_idxmax * sizeof( AVIIndexEntry_t ) );
+                               tk->i_idxmax * sizeof( avi_entry_t ) );
         if( tk->p_index == NULL )
         {
             return;
@@ -1919,7 +1985,7 @@ static int AVI_IndexLoad_idx1( input_thread_t *p_input )
         if( i_stream < p_sys->i_track &&
             i_cat == p_sys->track[i_stream]->i_cat )
         {
-            AVIIndexEntry_t index;
+            avi_entry_t index;
             index.i_id      = p_idx1->entry[i_index].i_fourcc;
             index.i_flags   =
                 p_idx1->entry[i_index].i_flags&(~AVIIF_FIXKEYFRAME);
@@ -1936,7 +2002,7 @@ static void __Parse_indx( input_thread_t    *p_input,
                           avi_chunk_indx_t  *p_indx )
 {
     demux_sys_t         *p_sys    = p_input->p_demux_data;
-    AVIIndexEntry_t     index;
+    avi_entry_t     index;
     int32_t             i;
 
     msg_Dbg( p_input, "loading subindex(0x%x) %d entries", p_indx->i_indextype, p_indx->i_entriesinuse );
@@ -2097,7 +2163,7 @@ static void AVI_IndexCreate( input_thread_t *p_input )
         if( pk.i_stream < p_sys->i_track &&
             pk.i_cat == p_sys->track[pk.i_stream]->i_cat )
         {
-            AVIIndexEntry_t index;
+            avi_entry_t index;
             index.i_id      = pk.i_fourcc;
             index.i_flags   =
                AVI_GetKeyFlag(p_sys->track[pk.i_stream]->i_codec, pk.i_peek);
