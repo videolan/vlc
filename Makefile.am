@@ -458,7 +458,7 @@ vlc_app_DATA = VLC.app
 vlc_appdir = $(bindir)
 VLC.app: vlc $(PLUGIN_FILES)
 	rm -Rf VLC.app
-	cd extras/MacOSX ; pbxbuild | grep -v '^[ \t]' | grep -v "^$$"
+	cd extras/MacOSX ; pbxbuild -target vlc | grep -v '^\([ \t]\|$$\)'
 	cp -r extras/MacOSX/build/vlc.bundle ./VLC.app
 	$(INSTALL) -d VLC.app/Contents/MacOS
 	$(INSTALL) vlc VLC.app/Contents/MacOS/VLC

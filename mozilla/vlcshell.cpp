@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.11 2003/04/09 16:18:36 sam Exp $
+ * $Id: vlcshell.cpp,v 1.12 2003/04/09 17:27:51 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -21,6 +21,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
+/* XXX: disable VLC here */
+#define USE_LIBVLC 1
+
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
@@ -28,7 +31,9 @@
 #include <string.h>
 
 /* vlc stuff */
-#include <vlc/vlc.h>
+#ifdef USE_LIBVLC
+#   include <vlc/vlc.h>
+#endif
 
 /* Mozilla stuff */
 #include <npapi.h>
@@ -44,11 +49,13 @@
 #   include <X11/StringDefs.h>
 #endif
 
+#ifdef XP_MAC
+    /* Mac OS X stuff */
+#   include <QuickDraw.h>
+#endif
+
 #include "vlcpeer.h"
 #include "vlcplugin.h"
-
-/* XXX: disable VLC */
-#define USE_LIBVLC 1
 
 #if USE_LIBVLC
 #   define WINDOW_TEXT "(no picture)"
@@ -162,6 +169,31 @@ NPError NPP_GetValue( NPP instance, NPPVariable variable, void *value )
 
     return NPERR_NO_ERROR;
 }
+
+/******************************************************************************
+ * Mac-only API calls
+ *****************************************************************************/
+#ifdef XP_MAC
+int16 NPP_HandleEvent( NPP instance, void * event )
+{
+    if( instance == NULL )
+    {
+        return false;
+    }
+
+    Boolean eventHandled = false;
+
+#if 0
+    TPlugin *pPlugin = (TPlugin*)instance->pdata;
+    if( pPlugin != NULL && event != NULL )
+    {
+        eventHandled = pPlugin->HandleEvent( *(EventRecord*)event );
+    }
+#endif
+
+    return eventHandled;
+}
+#endif
 
 /******************************************************************************
  * General Plug-in Calls
