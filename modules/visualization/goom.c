@@ -52,7 +52,7 @@ static void Close        ( vlc_object_t * );
 
 #define SPEED_TEXT N_("Goom animation speed")
 #define SPEED_LONGTEXT N_("Allows you to reduce the speed of the animation " \
-  "(default 7, max 10).")
+  "(default 6, max 10).")
 
 #define MAX_SPEED 10
 
@@ -63,7 +63,7 @@ vlc_module_begin();
                  WIDTH_TEXT, RES_LONGTEXT, VLC_FALSE );
     add_integer( "goom-height", 240, NULL,
                  HEIGHT_TEXT, RES_LONGTEXT, VLC_FALSE );
-    add_integer( "goom-speed", 7, NULL,
+    add_integer( "goom-speed", 6, NULL,
                  SPEED_TEXT, SPEED_LONGTEXT, VLC_FALSE );
     set_callbacks( Open, Close );
     add_shortcut( "goom" );
