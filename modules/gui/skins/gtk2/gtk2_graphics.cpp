@@ -2,7 +2,7 @@
  * gtk2_graphics.cpp: GTK2 implementation of the Graphics and Region classes
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: gtk2_graphics.cpp,v 1.10 2003/04/17 16:11:46 karibu Exp $
+ * $Id: gtk2_graphics.cpp,v 1.11 2003/04/17 16:30:40 karibu Exp $
  *
  * Authors: Cyril Deguet     <asmax@videolan.org>
  *
@@ -34,6 +34,7 @@
 #include "gtk2_graphics.h"
 
 #include <stdio.h>
+#include <math.h>
 
 //---------------------------------------------------------------------------
 // GTK2 GRAPHICS
@@ -128,7 +129,7 @@ GTK2Region::GTK2Region( int x, int y, int w, int h )
 //---------------------------------------------------------------------------
 GTK2Region::~GTK2Region()
 {
-/*    DeleteObject( Rgn );*/
+    gdk_region_destroy( Rgn );
 }
 //---------------------------------------------------------------------------
 void GTK2Region::AddPoint( int x, int y )
@@ -149,11 +150,36 @@ void GTK2Region::AddRectangle( int x, int y, int w, int h )
 //---------------------------------------------------------------------------
 void GTK2Region::AddElipse( int x, int y, int w, int h )
 {
-/*    HRGN Buffer;
-    Buffer = CreateEllipticRgn( x, y, x + w, y + h );
-    CombineRgn( Rgn, Buffer, Rgn, 0x2 );
-    DeleteObject( Buffer );*/
-    /*FIXME*/
+    GdkRegion *Buffer;
+    GdkRectangle rect;
+    rect.height = 1;
+
+    double ex, ey;
+    double a = w / 2;
+    double b = h / 2;
+
+    if( !a || !b )
+        return;
+
+    for( ey = 0; ey < h; ey++ )
+    {
+        // Calculate coords
+        ex = a * sqrt( 1 - ey * ey / ( b * b ) );
+
+        // Upper line
+        rect.x     = (gint)( x + a - ex );
+        rect.y     = (gint)( y + b - ey );
+        rect.width = (gint)( 2 * ex );
+        Buffer = gdk_region_rectangle( &rect );
+        gdk_region_union( Rgn, Buffer );
+        gdk_region_destroy( Buffer );
+
+        // Lower line
+        rect.y = (gint)( y + b + ey );
+        Buffer = gdk_region_rectangle( &rect );
+        gdk_region_union( Rgn, Buffer );
+        gdk_region_destroy( Buffer );
+    }
 }
 //---------------------------------------------------------------------------
 void GTK2Region::Move( int x, int y )
