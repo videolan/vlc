@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.23 2004/01/30 17:49:21 fenrir Exp $
+ * $Id: es_out.c,v 1.24 2004/01/31 20:02:26 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -328,7 +328,6 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                             psz_description, 0 );
     es->p_es->i_stream_id = fmt->i_id;
     es->p_es->i_fourcc = fmt->i_codec;
-    free( psz_description );
 
     switch( fmt->i_cat )
     {
@@ -436,14 +435,6 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
                     playlist_AddInfo( p_playlist, -1, psz_cat,
                                       _("Channels"), "%d",                                                            fmt->audio.i_channels );
                 }
-                if( fmt->psz_language )
-                {
-                    input_AddInfo( p_cat, _("Language"), "%s",
-                                   fmt->psz_language );
-                    playlist_AddInfo( p_playlist, -1, psz_cat,
-                                     _("Language"), "%s",
-                                     fmt->psz_language );
-                }
                 if( fmt->audio.i_rate > 0 )
                 {
                     input_AddInfo( p_cat, _("Sample rate"), _("%d Hz"),
@@ -524,6 +515,12 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
         }
         if( p_playlist ) vlc_object_release( p_playlist );
     }
+    if( *psz_description )
+    {
+        input_AddInfo( p_cat, _("Language"), psz_description );
+        playlist_AddInfo( p_playlist, -1, psz_cat, _("Language"), "%s", psz_description );
+    }
+    free( psz_description );
 
     es_format_Copy( &es->p_es->fmt, fmt );
 
