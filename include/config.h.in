@@ -113,7 +113,7 @@
  */
 
 /* Size of the FIFO. FIFO_SIZE+1 must be a power of 2 */
-#define FIFO_SIZE                       511
+#define FIFO_SIZE                       1023
 
 /*
  * Paths

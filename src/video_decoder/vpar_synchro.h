@@ -2,7 +2,7 @@
  * vpar_synchro.h : video parser blocks management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_synchro.h,v 1.7 2001/01/16 13:27:14 massiot Exp $
+ * $Id: vpar_synchro.h,v 1.8 2001/03/06 15:16:42 massiot Exp $
  *
  * Author: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,4 +99,4 @@ void vpar_SynchroDecode         ( struct vpar_thread_s * p_vpar,
 void vpar_SynchroEnd            ( struct vpar_thread_s * p_vpar, int i_garbage );
 mtime_t vpar_SynchroDate        ( struct vpar_thread_s * p_vpar );
 void vpar_SynchroNewPicture( struct vpar_thread_s * p_vpar, int i_coding_type,
-                             boolean_t b_repeat_field );
+                             int i_repeat_field );
