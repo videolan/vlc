@@ -2,7 +2,7 @@
  * asf.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: asf.c,v 1.3 2004/02/12 20:09:38 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -73,6 +73,8 @@ void E_( asf_HeaderParse )  ( asf_header_t *hdr,
     for( i = 0; i < 128; i++ )
     {
         hdr->stream[i].i_cat = ASF_STREAM_UNKNOWN;
+        hdr->stream[i].i_selected = 0;
+        hdr->stream[i].i_bitrate = -1;
     }
 
     //fprintf( stderr, " ---------------------header:%d\n", i_header );

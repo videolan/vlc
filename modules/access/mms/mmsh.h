@@ -2,7 +2,7 @@
  * mmsh.h:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.h,v 1.5 2004/01/21 16:56:16 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -36,18 +36,16 @@ typedef struct
 
 } chunk_t;
 
-#define BUFFER_SIZE 150000
+#define BUFFER_SIZE 65536
 struct access_sys_t
 {
     int             i_proto;
 
     int             fd;
-    url_t           *p_url;
+    vlc_url_t       url;
 
     int             i_request_context;
 
-    int             i_buffer;
-    int             i_buffer_pos;
     uint8_t         buffer[BUFFER_SIZE + 1];
 
     vlc_bool_t      b_broadcast;
@@ -65,27 +63,3 @@ struct access_sys_t
     asf_header_t    asfh;
     guid_t          guid;
 };
-
-typedef struct http_field_s
-{
-    char *psz_name;
-    char *psz_value;
-
-    struct http_field_s *p_next;
-
-} http_field_t;
-
-typedef struct
-{
-    int     i_version;
-    int     i_error;
-    char    *psz_answer;
-
-    http_field_t *p_fields;
-
-    uint8_t *p_body;
-    int     i_body;
-
-} http_answer_t;
-
-
