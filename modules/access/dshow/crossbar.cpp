@@ -178,8 +178,8 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
     }
 
     LONG inputPinIndexRelated, outputPinIndexRelated;
-    LONG inputPinPhysicalType, outputPinPhysicalType;
-    LONG inputPinIndex, outputPinIndex;
+    LONG inputPinPhysicalType = 0, outputPinPhysicalType;
+    LONG inputPinIndex = 0, outputPinIndex;
     if( FAILED(GetCrossbarIndexFromIPin( pXbar, &outputPinIndex,
                                          FALSE, p_output_pin )) ||
         FAILED(pXbar->get_CrossbarPinInfo( FALSE, outputPinIndex,
@@ -192,21 +192,52 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
         return S_FALSE;
     }
 
+    /*
+    ** if physical type is 0, then use default/existing route to physical connector
+    */
+    if( physicalType == 0 )
+    {
+        /* use following as default connector type if we fail to find an existing route */
+        physicalType = PhysConn_Video_Tuner;
+        if( SUCCEEDED(pXbar->get_IsRoutedTo(outputPinIndex, &inputPinIndex)) )
+        {
+
+            if( SUCCEEDED( pXbar->get_CrossbarPinInfo( TRUE,  inputPinIndex,
+                           &inputPinIndexRelated, &inputPinPhysicalType )) )
+            {
+                // remember connector type
+                physicalType = inputPinPhysicalType;
+                
+                msg_Dbg( p_this, "Found Existing Route For ouput %ld (type %ld) to input %ld (type %ld)",
+                         outputPinIndex, outputPinPhysicalType, inputPinIndex,
+                         inputPinPhysicalType );
+                         
+                // fall through to for loop, note 'inputPinIndex' is set to the pin we are looking for
+                // hence, loop iteration should not wind back
+
+            }
+        }
+        else {
+            // reset to first pin for complete loop iteration
+            inputPinIndex = 0;
+        }
+    }                  
+         
     //
     // for all input pins
     //
-    for( inputPinIndex = 0; S_OK != result && inputPinIndex < inputPinCount;
-         inputPinIndex++ ) 
+    for( /* inputPinIndex has been set */ ; (S_OK != result) && (inputPinIndex < inputPinCount); ++inputPinIndex )
     {
         if( FAILED(pXbar->get_CrossbarPinInfo( TRUE,  inputPinIndex,
-                &inputPinIndexRelated, &inputPinPhysicalType )) ) continue;
-   
-        // Is the pin a video pin?
+            &inputPinIndexRelated, &inputPinPhysicalType )) ) continue;
+
+        // Is this pin matching required connector physical type?
         if( inputPinPhysicalType != physicalType ) continue;
 
         // Can we route it?
         if( FAILED(pXbar->CanRoute(outputPinIndex, inputPinIndex)) ) continue;
-
+            
+   
         IPin *pPin;
         if( FAILED(GetCrossbarIPinAtIndex( pXbar, inputPinIndex,
                                            TRUE, &pPin)) ) continue;
@@ -218,7 +249,7 @@ HRESULT FindCrossbarRoutes( vlc_object_t *p_this, access_sys_t *p_sys,
             physicalType == inputPinPhysicalType &&
             (p_sys->i_crossbar_route_depth = depth+1) < MAX_CROSSBAR_DEPTH) )
         {
-            // hold on crossbar
+            // hold on crossbar, will be released when graph is destroyed
             pXbar->AddRef();
 
             // remember crossbar route
