@@ -183,7 +183,7 @@ int E_(Open) ( vlc_object_t *p_this )
                                strlen( "frequency=" ) ) )
             {
                 u_freq =
-                  strtol( psz_parser + strlen( "frequency=" ),
+                (unsigned int)strtol( psz_parser + strlen( "frequency=" ),
                             &psz_parser, 0 );
             }
             else if( !strncmp( psz_parser, "polarization=",
@@ -340,37 +340,22 @@ int E_(Open) ( vlc_object_t *p_this )
     }
     else
     {
-        msg_Warn(p_input,"DVB Input syntax has changed, please see documentation for further informations");
-        u_freq = (unsigned int)i_test;
-        if( *psz_next )
-        {
-            psz_parser = psz_next + 1;
-            i_polarisation = strtol( psz_parser, &psz_next, 10 );
-            if( *psz_next )
-            {
-                psz_parser = psz_next + 1;
-                i_fec = (int)strtol( psz_parser, &psz_next, 10 );
-                if( *psz_next )
-                {
-                    psz_parser = psz_next + 1;
-                    u_srate = (unsigned int)strtol( psz_parser, &psz_next, 10 );
-                }
-            }
-        }
+        msg_Err(p_input, "DVB Input old syntax deprecreated, use vlc -p dvb to see an explantion of the new syntax");
+        return -1;
     }
    
     /* Validating input values */
     if ( ((u_freq) > frontend_info.frequency_max) ||
          ((u_freq) < frontend_info.frequency_min) )
     {
-        msg_Warn( p_input, "invalid frequency %d (KHz), using default one", u_freq );
-        u_freq = config_GetInt( p_input, "frequency" );
-        if ( ((u_freq) > frontend_info.frequency_max) ||
-             ((u_freq) < frontend_info.frequency_min) )
-        {
-            msg_Err( p_input, "invalid default frequency" );
-            return -1;
-        }
+        if ((u_freq) > frontend_info.frequency_max)
+            msg_Err( p_input, "given frequency %u (kHz) > %u (kHz) max. frequency",
+                     u_freq, frontend_info.frequency_max );
+        else
+            msg_Err( p_input, "given frequency %u (kHz) < %u (kHz) min.frequency",
+                     u_freq, frontend_info.frequency_min );
+        msg_Err( p_input, "baling out given frequency outside specification range for this frontend" );
+        return -1;
     }
 
     /* Workaround for backwards compatibility */
@@ -427,7 +412,7 @@ int E_(Open) ( vlc_object_t *p_this )
             
         /* DVB-C */
         case FE_QAM:
-            fep.frequency = u_freq; /* KHz */
+            fep.frequency = u_freq; /* in Hz */
             fep.inversion = dvb_DecodeInversion(p_input, i_polarisation);
             fep.u.qam.symbol_rate = u_srate;
             fep.u.qam.fec_inner = dvb_DecodeFEC(p_input, i_fec); 
@@ -442,7 +427,7 @@ int E_(Open) ( vlc_object_t *p_this )
 
         /* DVB-T */
         case FE_OFDM:
-            fep.frequency = u_freq; /* KHz */
+            fep.frequency = u_freq; /* in Hz */
             fep.inversion = dvb_DecodeInversion(p_input, i_polarisation);
             fep.u.ofdm.bandwidth = dvb_DecodeBandwidth(p_input, i_bandwidth);
             fep.u.ofdm.code_rate_HP = dvb_DecodeFEC(p_input, i_code_rate_HP); 

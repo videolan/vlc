@@ -47,7 +47,7 @@ void E_(Close)   ( vlc_object_t * );
 #define DEVICE_TEXT N_("Device number to use on adapter")
 #define DEVICE_LONGTEXT ""
 
-#define FREQ_TEXT N_("Satellite transponder frequency in kHz")
+#define FREQ_TEXT N_("Satellite transponder frequency in kHz for DVB-S and in Hz for DVB-C/T")
 #define FREQ_LONGTEXT ""
 
 #define POL_TEXT N_("Satellite transponder polarization")

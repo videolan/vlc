@@ -46,6 +46,7 @@
 #include <sys/poll.h>
 
 /* DVB Card Drivers */
+#include <linux/dvb/version.h>
 #include <linux/dvb/dmx.h>
 #include <linux/dvb/frontend.h>
 
@@ -122,65 +123,90 @@ int ioctl_InfoFrontend(input_thread_t * p_input, struct dvb_frontend_info *info,
         return -1;
     }
     /* Print out frontend capabilities. */
-    msg_Dbg(p_input, "Frontend Info:\tname = %s\n\t\tfrequency_min = %d\n\t\tfrequency_max = %d\n\t\tfrequency_stepsize = %d\n\t\tfrequency_tolerance = %d\n\t\tsymbol_rate_min = %d\n\t\tsymbol_rate_max = %d\n\t\tsymbol_rate_tolerance (ppm) = %d\n\t\tnotifier_delay (ms)= %d\n",
-            info->name,
-            info->frequency_min,
-            info->frequency_max,
-            info->frequency_stepsize,
-            info->frequency_tolerance,
-            info->symbol_rate_min,
-            info->symbol_rate_max,
-            info->symbol_rate_tolerance,
-            info->notifier_delay );
+
+    msg_Dbg(p_input, "Frontend Info:" );
+    msg_Dbg(p_input, "  name = %s", info->name);
+    switch(info->type)
+    {
+        case FE_QPSK:
+            msg_Dbg(p_input, "  type = QPSK (DVB-S)" );
+            break;
+        case FE_QAM:
+            msg_Dbg(p_input, "  type = QAM (DVB-C)" );
+            break;
+        case FE_OFDM:
+            msg_Dbg(p_input, "  type = OFDM (DVB-T)" );
+            break;
+#ifdef 0 /* DVB_API_VERSION == 3 */
+        case FE_MEMORY:
+            msg_Dbg(p_input, "  type = MEMORY" );
+            break;
+        case FE_NET:
+            msg_Dbg(p_input, "  type = NETWORK" );
+            break;
+#endif
+        default
+            msg_Err(p_input, "  unknown frontend found fe_type_t(%d)", info->type );
+            return -1;
+    }
+    msg_Dbg(p_input, "  frequency_min = %u (kHz)", info->frequency_min);
+    msg_Dbg(p_input, "  frequency_max = %u (kHz)", info->frequency_max);
+    msg_Dbg(p_input, "  frequency_stepsize = %u",  info->frequency_stepsize);
+    msg_Dbg(p_input, "  frequency_tolerance = %u", info->frequency_tolerance);
+    msg_Dbg(p_input, "  symbol_rate_min = %u (kHz)", info->symbol_rate_min);
+    msg_Dbg(p_input, "  symbol_rate_max = %u (kHz)", info->symbol_rate_max);
+    msg_Dbg(p_input, "  symbol_rate_tolerance (ppm) = %u", info->symbol_rate_tolerance);
+    msg_Dbg(p_input, "  notifier_delay (ms)= %u", info->notifier_delay );
+
     msg_Dbg(p_input, "Frontend Info capability list:");
     if (info->caps&FE_IS_STUPID)
-        msg_Dbg(p_input, "no capabilities - frontend is stupid!");
+        msg_Dbg(p_input, "  no capabilities - frontend is stupid!");
     if (info->caps&FE_CAN_INVERSION_AUTO)
-        msg_Dbg(p_input, "inversion auto");
+        msg_Dbg(p_input, "  inversion auto");
     if (info->caps&FE_CAN_FEC_1_2)
-        msg_Dbg(p_input, "forward error correction 1/2");
+        msg_Dbg(p_input, "  forward error correction 1/2");
     if (info->caps&FE_CAN_FEC_2_3)
-        msg_Dbg(p_input, "forward error correction 2/3");
+        msg_Dbg(p_input, "  forward error correction 2/3");
     if (info->caps&FE_CAN_FEC_3_4)
-        msg_Dbg(p_input, "forward error correction 3/4");
+        msg_Dbg(p_input, "  forward error correction 3/4");
     if (info->caps&FE_CAN_FEC_4_5)
-        msg_Dbg(p_input, "forward error correction 4/5");
+        msg_Dbg(p_input, "  forward error correction 4/5");
     if (info->caps&FE_CAN_FEC_5_6)
-        msg_Dbg(p_input, "forward error correction 5/6");
+        msg_Dbg(p_input, "  forward error correction 5/6");
     if (info->caps&FE_CAN_FEC_6_7)
-        msg_Dbg(p_input, "forward error correction 6/7");
+        msg_Dbg(p_input, "  forward error correction 6/7");
     if (info->caps&FE_CAN_FEC_7_8)
-        msg_Dbg(p_input, "forward error correction 7/8");
+        msg_Dbg(p_input, "  forward error correction 7/8");
     if (info->caps&FE_CAN_FEC_8_9)
-        msg_Dbg(p_input, "forward error correction 8/9");
+        msg_Dbg(p_input, "  forward error correction 8/9");
     if (info->caps&FE_CAN_FEC_AUTO)
-        msg_Dbg(p_input, "forward error correction auto");
+        msg_Dbg(p_input, "  forward error correction auto");
     if (info->caps&FE_CAN_QPSK)
-        msg_Dbg(p_input, "card can do QPSK");
+        msg_Dbg(p_input, "  card can do QPSK");
     if (info->caps&FE_CAN_QAM_16)
-        msg_Dbg(p_input, "card can do QAM 16");
+        msg_Dbg(p_input, "  card can do QAM 16");
     if (info->caps&FE_CAN_QAM_32)
-        msg_Dbg(p_input, "card can do QAM 32");
+        msg_Dbg(p_input, "  card can do QAM 32");
     if (info->caps&FE_CAN_QAM_64)
-        msg_Dbg(p_input, "card can do QAM 64");
+        msg_Dbg(p_input, "  card can do QAM 64");
     if (info->caps&FE_CAN_QAM_128)
-        msg_Dbg(p_input, "card can do QAM 128");
+        msg_Dbg(p_input, "  card can do QAM 128");
     if (info->caps&FE_CAN_QAM_256)
-        msg_Dbg(p_input, "card can do QAM 256");
+        msg_Dbg(p_input, "  card can do QAM 256");
     if (info->caps&FE_CAN_QAM_AUTO)
-        msg_Dbg(p_input, "card can do QAM auto");
+        msg_Dbg(p_input, "  card can do QAM auto");
     if (info->caps&FE_CAN_TRANSMISSION_MODE_AUTO)
-        msg_Dbg(p_input, "transmission mode auto");
+        msg_Dbg(p_input, "  transmission mode auto");
     if (info->caps&FE_CAN_BANDWIDTH_AUTO)
-        msg_Dbg(p_input, "bandwidth mode auto");
+        msg_Dbg(p_input, "  bandwidth mode auto");
     if (info->caps&FE_CAN_GUARD_INTERVAL_AUTO)
-        msg_Dbg(p_input, "guard interval mode auto");
+        msg_Dbg(p_input, "  guard interval mode auto");
     if (info->caps&FE_CAN_HIERARCHY_AUTO)
-        msg_Dbg(p_input, "hierarchy mode auto");
+        msg_Dbg(p_input, "  hierarchy mode auto");
     if (info->caps&FE_CAN_MUTE_TS)
-        msg_Dbg(p_input, "card can mute TS");
+        msg_Dbg(p_input, "  card can mute TS");
     if (info->caps&FE_CAN_CLEAN_SETUP)
-        msg_Dbg(p_input, "clean setup");        
+        msg_Dbg(p_input, "  clean setup");        
     msg_Dbg(p_input,"End of capability list");
     
     close(front);
