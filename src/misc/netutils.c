@@ -2,12 +2,12 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: netutils.c,v 1.64 2002/05/25 19:15:50 marcari Exp $
+ * $Id: netutils.c,v 1.65 2002/05/30 08:59:42 xav Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
  *          Henri Fallon <henri@videolan.org>
- *          Xavier Marchesini <xav@via.ecp.fr>
+ *          Xavier Marchesini <xav@alarue.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
  *

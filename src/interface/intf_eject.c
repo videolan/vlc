@@ -2,11 +2,12 @@
  * intf_eject.c: CD/DVD-ROM ejection handling functions
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: intf_eject.c,v 1.11 2002/05/06 23:18:26 jlj Exp $
+ * $Id: intf_eject.c,v 1.12 2002/05/30 08:59:42 xav Exp $
  *
  * Author: Julien Blache <jb@technologeek.org> for the Linux part
  *               with code taken from the Linux "eject" command
  *         Jon Lech Johansen <jon-vl@nanocrew.net> for Darwin
+ *         Xavier Marchesini <xav@alarue.net> for Win32
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,6 +66,32 @@
 #   include <scsi/sg.h>
 #   include <scsi/scsi_ioctl.h>
 #endif
+
+#ifdef WIN32 
+#   include <windows.h>
+#   include <stdio.h>
+#   include <winioctl.h>
+#   include <ctype.h>
+#   include <tchar.h>
+
+/* define the structures to eject under Win95/98/Me */
+
+#if !defined (VWIN32_DIOC_DOS_IOCTL)
+#define VWIN32_DIOC_DOS_IOCTL      1
+
+typedef struct _DIOC_REGISTERS {
+    DWORD reg_EBX;
+    DWORD reg_EDX;
+    DWORD reg_ECX;
+    DWORD reg_EAX;
+    DWORD reg_EDI;
+    DWORD reg_ESI;
+    DWORD reg_Flags;
+} DIOC_REGISTERS, *PDIOC_REGISTERS;
+#endif    /* VWIN32_DIOC_DOS_IOCTL */
+
+#endif
+
 
 /*****************************************************************************
  * Local prototypes
@@ -127,8 +154,70 @@ int intf_Eject( const char *psz_device )
 
     return 1;
 
-#else /* SYS_DARWIN */
+#elif defined(WIN32) 
+    
+    HANDLE h_drive ;
+    TCHAR  psz_drive_id[8] ;
+    DWORD  dw_access_flags = GENERIC_READ ;
+    DWORD  dw_result ;
+    LPTSTR psz_volume_format = TEXT("\\\\.\\%s") ;
+    BYTE   by_drive ;
+    DIOC_REGISTERS regs = {0} ;
+    
+    /* Win2K ejection code */
+    if ( GetVersion() < 0x80000000 )
+    {
+        intf_WarnMsg (3, "intf: win2k ejecting procedure launched") ;
+        
+        wsprintf(psz_drive_id, psz_volume_format, psz_device) ;
+         
+        intf_WarnMsg(3, "intf: Ejecting drive %s", psz_drive_id) ;
+        
+        /* Create the file handle */ 
+        h_drive = CreateFile(  psz_drive_id, 
+                               dw_access_flags, 
+                               FILE_SHARE_READ | FILE_SHARE_WRITE,
+                               NULL,
+                               OPEN_EXISTING,
+                               0,
+                               NULL );
 
+        if (h_drive == INVALID_HANDLE_VALUE )
+        {
+            intf_ErrMsg ("intf error: (Win32) couldn't create handle for device %s", psz_device) ;
+        }
+
+        i_ret = DeviceIoControl ( h_drive, 
+                                 IOCTL_STORAGE_EJECT_MEDIA,
+                                 NULL, 0,
+                                 NULL, 0, 
+                                 &dw_result, 
+                                 NULL);
+        return (i_ret) ;
+    }
+    else        /* Win95/98/ME */
+    {
+        /* Create the handle to VWIN32 */
+        h_drive = CreateFile ("\\\\.\\vwin32", 0, 0, NULL, 0,
+                              FILE_FLAG_DELETE_ON_CLOSE, NULL ) ;
+        
+        /* Convert logical disk name to DOS-like disk name */
+        by_drive = (toupper (*psz_device) - 'A') + 1;
+
+        /* Let's eject now : Int 21H function 440DH minor code 49h*/
+        regs.reg_EAX = 0x440D ;                        
+        regs.reg_EBX = by_drive ;
+        regs.reg_ECX = MAKEWORD(0x49 , 0x08) ;        // minor code
+
+        i_ret = DeviceIoControl (h_drive, VWIN32_DIOC_DOS_IOCTL,
+                                 &regs, sizeof(regs), &regs, sizeof(regs),
+                                 &dw_result, 0) ;
+
+        CloseHandle (h_drive) ;
+	return (i_ret) ;
+    }
+#else   /* WIN32 */
+    
     int i_fd;
 
     /* This code could be extended to support CD/DVD-ROM chargers */

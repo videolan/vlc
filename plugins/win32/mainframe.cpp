@@ -326,12 +326,12 @@ void __fastcall TMainFrameDlg::ToolButtonEjectClick( TObject *Sender )
     }
 
     /* If there's a stream playing, we aren't allowed to eject ! */
-    if( p_input_bank->pp_input[0] == NULL )
-    {
+//    if( p_input_bank->pp_input[0] == NULL )
+//    {
         intf_WarnMsg( 4, "intf: ejecting %s", Device.c_str() );
 
         intf_Eject( Device.c_str() );
-    }
+//    }
 }
 //--------------------------------------------------------------------------
 
@@ -686,7 +686,7 @@ void __fastcall TMainFrameDlg::ModeManage()
     /* set control items */
     ToolButtonBack->Enabled = false;
     ToolButtonStop->Enabled = true;
-    ToolButtonEject->Enabled = !b_control;
+    ToolButtonEject->Enabled = b_control;
     ToolButtonPause->Enabled = b_control;
     ToolButtonSlow->Enabled = b_control;
     ToolButtonFast->Enabled = b_control;

@@ -219,7 +219,7 @@ object MainFrameDlg: TMainFrameDlg
       Top = 2
       Hint = 'Eject disc'
       Caption = 'Eject'
-      Enabled = False
+      Enabled = True
       ImageIndex = 7
       OnClick = ToolButtonEjectClick
     end
