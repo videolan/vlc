@@ -1,5 +1,5 @@
-/* XML processor/application API for skin.dtd (Id: skin.dtd,v 1.8 2003/03/17 22:14:47 karibu Exp).
- * Generated 2003/03/19 02:59:06.
+/* XML processor/application API for skin.dtd (Id: skin.dtd,v 1.2 2003/03/19 02:09:56 videolan Exp).
+ * Generated 2003/03/19 18:16:00.
  *
  * This program was generated with the FleXML XML processor generator,
  * (Id: flexml.pl,v 1.24 1999/12/13 16:18:30 krisrose Exp).
@@ -76,8 +76,12 @@ typedef char* AT_ButtonControl_down;
 #define AU_ButtonControl_down NULL
 typedef char* AT_CheckBoxControl_disabled1;
 #define AU_CheckBoxControl_disabled1 NULL
+typedef char* AT_CheckBoxControl_onmouseover1;
+#define AU_CheckBoxControl_onmouseover1 NULL
 typedef char* AT_CheckBoxControl_disabled2;
 #define AU_CheckBoxControl_disabled2 NULL
+typedef char* AT_CheckBoxControl_onmouseover2;
+#define AU_CheckBoxControl_onmouseover2 NULL
 typedef char* AT_Font_underline;
 #define AU_Font_underline NULL
 typedef char* AT_ButtonControl_onmouseover;
@@ -140,6 +144,10 @@ typedef char* AT_TextControl_width;
 #define AU_TextControl_width NULL
 typedef char* AT_PlayListControl_id;
 #define AU_PlayListControl_id NULL
+typedef char* AT_CheckBoxControl_onmouseout1;
+#define AU_CheckBoxControl_onmouseout1 NULL
+typedef char* AT_CheckBoxControl_onmouseout2;
+#define AU_CheckBoxControl_onmouseout2 NULL
 typedef char* AT_Bitmap_id;
 #define AU_Bitmap_id NULL
 typedef char* AT_Font_italic;
@@ -293,7 +301,9 @@ extern AT_Window_movealpha A_Window_movealpha;
 extern AT_SliderControl_down A_SliderControl_down;
 extern AT_ButtonControl_down A_ButtonControl_down;
 extern AT_CheckBoxControl_disabled1 A_CheckBoxControl_disabled1;
+extern AT_CheckBoxControl_onmouseover1 A_CheckBoxControl_onmouseover1;
 extern AT_CheckBoxControl_disabled2 A_CheckBoxControl_disabled2;
+extern AT_CheckBoxControl_onmouseover2 A_CheckBoxControl_onmouseover2;
 extern AT_Font_underline A_Font_underline;
 extern AT_ButtonControl_onmouseover A_ButtonControl_onmouseover;
 extern AT_ButtonControl_visible A_ButtonControl_visible;
@@ -325,6 +335,8 @@ extern AT_ImageControl_image A_ImageControl_image;
 extern AT_ThemeInfo_name A_ThemeInfo_name;
 extern AT_TextControl_width A_TextControl_width;
 extern AT_PlayListControl_id A_PlayListControl_id;
+extern AT_CheckBoxControl_onmouseout1 A_CheckBoxControl_onmouseout1;
+extern AT_CheckBoxControl_onmouseout2 A_CheckBoxControl_onmouseout2;
 extern AT_Bitmap_id A_Bitmap_id;
 extern AT_Font_italic A_Font_italic;
 extern AT_PlayListControl_ord A_PlayListControl_ord;

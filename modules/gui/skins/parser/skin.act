@@ -4,7 +4,7 @@
  * skin.act: FleXML actions file
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin.act,v 1.2 2003/03/19 02:09:56 videolan Exp $
+ * $Id: skin.act,v 1.3 2003/03/19 17:14:50 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -103,9 +103,14 @@
     </start>
     <start tag="CheckBoxControl">
         <![CDATA[
-            AddCheckBox( {id}, {visible}, {x}, {y}, {img1}, {img2}, {clickimg1},
-                         {clickimg2}, {disabled1}, {disabled2}, {onclick1},
-                         {onclick2}, {tooltiptext1}, {tooltiptext2}, {help} );
+            AddCheckBox( {id},
+                         {visible},
+                         {x}, {y},
+                         {img1}, {img2}, {clickimg1}, {clickimg2}, {disabled1},
+                         {disabled2},
+                         {onclick1}, {onclick2}, {onmouseover1}, {onmouseout1},
+                         {onmouseover2}, {onmouseout2},
+                         {tooltiptext1}, {tooltiptext2}, {help} );
         ]]>
     </start>
     <start tag="SliderControl">

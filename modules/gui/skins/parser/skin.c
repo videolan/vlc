@@ -1,6 +1,6 @@
-/* XML application for skin.dtd (Id: skin.dtd,v 1.8 2003/03/17 22:14:47 karibu Exp).
+/* XML application for skin.dtd (Id: skin.dtd,v 1.2 2003/03/19 02:09:56 videolan Exp).
  * Includes actions from skin.act.
- * Generated 2003/03/19 02:59:06.
+ * Generated 2003/03/19 18:16:00.
  *
  * This program was generated with the FleXML XML processor generator,
  * (Id: flexml.pl,v 1.24 1999/12/13 16:18:30 krisrose Exp).
@@ -164,16 +164,21 @@ void STag_CheckBoxControl(void)
 #line 104 "skin.act"
 
         
-            AddCheckBox( A_CheckBoxControl_id, A_CheckBoxControl_visible, A_CheckBoxControl_x, A_CheckBoxControl_y, A_CheckBoxControl_img1, A_CheckBoxControl_img2, A_CheckBoxControl_clickimg1,
-                         A_CheckBoxControl_clickimg2, A_CheckBoxControl_disabled1, A_CheckBoxControl_disabled2, A_CheckBoxControl_onclick1,
-                         A_CheckBoxControl_onclick2, A_CheckBoxControl_tooltiptext1, A_CheckBoxControl_tooltiptext2, A_CheckBoxControl_help );
+            AddCheckBox( A_CheckBoxControl_id,
+                         A_CheckBoxControl_visible,
+                         A_CheckBoxControl_x, A_CheckBoxControl_y,
+                         A_CheckBoxControl_img1, A_CheckBoxControl_img2, A_CheckBoxControl_clickimg1, A_CheckBoxControl_clickimg2, A_CheckBoxControl_disabled1,
+                         A_CheckBoxControl_disabled2,
+                         A_CheckBoxControl_onclick1, A_CheckBoxControl_onclick2, A_CheckBoxControl_onmouseover1, A_CheckBoxControl_onmouseout1,
+                         A_CheckBoxControl_onmouseover2, A_CheckBoxControl_onmouseout2,
+                         A_CheckBoxControl_tooltiptext1, A_CheckBoxControl_tooltiptext2, A_CheckBoxControl_help );
         
     
 } /* STag_CheckBoxControl */
 
 void STag_SliderControl(void)
 {
-#line 111 "skin.act"
+#line 116 "skin.act"
 
         
             AddSlider( A_SliderControl_id, A_SliderControl_visible, A_SliderControl_x, A_SliderControl_y, A_SliderControl_type, A_SliderControl_up, A_SliderControl_down, A_SliderControl_abs,
@@ -184,7 +189,7 @@ void STag_SliderControl(void)
 
 void STag_TextControl(void)
 {
-#line 117 "skin.act"
+#line 122 "skin.act"
 
         
             AddText( A_TextControl_id, A_TextControl_visible, A_TextControl_x, A_TextControl_y, A_TextControl_text, A_TextControl_font, A_TextControl_align,
@@ -196,7 +201,7 @@ void STag_TextControl(void)
 
 void STag_PlayListControl(void)
 {
-#line 124 "skin.act"
+#line 129 "skin.act"
 
         
             AddPlayList( A_PlayListControl_id, A_PlayListControl_visible, A_PlayListControl_x, A_PlayListControl_y, A_PlayListControl_width, A_PlayListControl_infowidth,
@@ -208,7 +213,7 @@ void STag_PlayListControl(void)
 
 void ETag_PlayListControl(void)
 {
-#line 131 "skin.act"
+#line 136 "skin.act"
 
         
             AddPlayListEnd();
@@ -218,7 +223,7 @@ void ETag_PlayListControl(void)
 
 void STag_Theme(void)
 {
-#line 136 "skin.act"
+#line 141 "skin.act"
 
         
             StartTheme( A_Theme_log, A_Theme_magnet );
@@ -228,7 +233,7 @@ void STag_Theme(void)
 
 void ETag_Theme(void)
 {
-#line 141 "skin.act"
+#line 146 "skin.act"
 
         
             EndTheme();

@@ -2,7 +2,7 @@
  * win32_event.cpp: Win32 implementation of the Event class
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_event.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: win32_event.cpp,v 1.2 2003/03/19 17:14:50 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -93,6 +93,14 @@ void Win32Event::CreateOSEvent( string para1, string para2, string para3 )
     switch( Message )
     {
         case WINDOW_MOVE:
+            hWnd = GetWindowFromName( para1 );
+            break;
+
+        case WINDOW_CLOSE:
+            hWnd = GetWindowFromName( para1 );
+            break;
+
+        case WINDOW_OPEN:
             hWnd = GetWindowFromName( para1 );
             break;
 

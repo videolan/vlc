@@ -2,7 +2,7 @@
  * win32_run.cpp:
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: win32_run.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: win32_run.cpp,v 1.2 2003/03/19 17:14:50 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -95,12 +95,15 @@ void OSRun( intf_thread_t *p_intf )
         *****************************/
         if( msg.message == WM_KEYUP )
         {
+            msg_Err( p_intf, "Key : %i (%i)", msg.wParam, KeyModifier );
             // If key is CTRL
             if( msg.wParam == 17 )
                 KeyModifier = 0;
             else if( KeyModifier == 0 )
+            {
                 p_intf->p_sys->p_theme->EvtBank->TestShortcut(
-                    msg.wParam, KeyModifier );
+                    msg.wParam, 0 );
+            }
         }
         else if( msg.message == WM_KEYDOWN )
         {

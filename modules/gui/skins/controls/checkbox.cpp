@@ -2,7 +2,7 @@
  * checkbox.cpp: Checkbox control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: checkbox.cpp,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: checkbox.cpp,v 1.2 2003/03/19 17:14:50 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -44,27 +44,50 @@
 //---------------------------------------------------------------------------
 // Checkbox Button
 //---------------------------------------------------------------------------
-ControlCheckBox::ControlCheckBox( string id, bool visible, int x, int y,
-    string img1, string img2, string click1, string click2, string disabled1,
-    string disabled2, string action1, string action2, string tooltiptext1,
-    string tooltiptext2, string help,
+ControlCheckBox::ControlCheckBox(
+    string id,
+    bool visible,
+    int x, int y,
+    string img1, string img2, string clickimg1, string clickimg2,
+    string disabled1, string disabled2,
+    string onclick1, string onclick2, string onmouseover1,
+    string onmouseout1, string onmouseover2, string onmouseout2,
+    string tooltiptext1, string tooltiptext2, string help,
     Window *Parent ) : GenericControl( id, visible, help, Parent )
 {
     Left             = x;
     Top              = y;
     State            = 1;                   // 1 = up - 0 = down
     Selected         = false;
+    CursorIn         = false;
     Act              = 1;
     Enabled1         = true;
     Enabled2         = true;
     Img1             = img1;
     Img2             = img2;
-    Click1           = click1;
-    Click2           = click2;
+    Click1           = clickimg1;
+    Click2           = clickimg2;
     Disabled1        = disabled1;
     Disabled2        = disabled2;
-    ClickActionName1 = action1;
-    ClickActionName2 = action2;
+
+    // Actions
+    ClickActionName1     = onclick1;
+    ClickActionName2     = onclick2;
+
+    MouseOverActionName1 = onmouseover1;
+    MouseOutActionName1  = onmouseout1;
+
+    if( onmouseover2 == "none" )
+        MouseOverActionName2 = MouseOverActionName1;
+    else
+        MouseOverActionName2 = onmouseover2;
+
+    if( onmouseout2 == "none" )
+        MouseOutActionName2 = MouseOutActionName1;
+    else
+        MouseOutActionName2  = onmouseout2;
+
+    // Tooltips
     ToolTipText1     = tooltiptext1;
     ToolTipText2     = tooltiptext2;
 }
@@ -107,7 +130,10 @@ void ControlCheckBox::Init()
     // Create script
     ClickAction1 = new Action( p_intf, ClickActionName1 );
     ClickAction2 = new Action( p_intf, ClickActionName2 );
-
+    MouseOverAction1 = new Action( p_intf, MouseOverActionName1 );
+    MouseOutAction1  = new Action( p_intf, MouseOutActionName1 );
+    MouseOverAction2 = new Action( p_intf, MouseOverActionName2 );
+    MouseOutAction2  = new Action( p_intf, MouseOutActionName2 );
 }
 //---------------------------------------------------------------------------
 bool ControlCheckBox::ProcessEvent( Event *evt  )
@@ -230,37 +256,46 @@ bool ControlCheckBox::MouseDown( int x, int y, int button )
 bool ControlCheckBox::MouseMove( int x, int y, int button )
 {
     // Test enabled
-    if( !Selected || !button )
-        return false;
-
     if( ( !Enabled1 && Act == 1 ) || ( !Enabled2 && Act == 2 ) )
         return false;
 
-    if( Act == 1 )
+    // If mouse is entering control
+    if( MouseOver( x, y ) && !CursorIn )
     {
-        if( State == 1 && Img[0]->Hit( x - Left, y - Top ) )
+        // If control is already selected
+        if( button == 1 && Selected )
         {
             State = 0;
             ParentWindow->Refresh( Left, Top, Width, Height );
         }
-        else if( State == 0 && !Img[1]->Hit( x - Left, y - Top ) )
-        {
-            State = 1;
-            ParentWindow->Refresh( Left, Top, Width, Height );
-        }
+
+        // Check events
+        if( Act == 1 && MouseOverActionName1 != "none" )
+            MouseOverAction1->SendEvent();
+        else if( Act == 2 && MouseOverActionName2 != "none" )
+            MouseOverAction2->SendEvent();
+
+        CursorIn = true;
+        return true;
     }
-    else if( Act == 2 )
+    // If mouse if leaving control
+    else if( !MouseOver( x, y ) && CursorIn )
     {
-        if( State == 1 && Img[2]->Hit( x - Left, y - Top ) )
-        {
-            State = 0;
-            ParentWindow->Refresh( Left, Top, Width, Height );
-        }
-        else if( State == 0 && !Img[3]->Hit( x - Left, y - Top ) )
+        // If control is already selected
+        if( button == 1 && Selected )
         {
             State = 1;
             ParentWindow->Refresh( Left, Top, Width, Height );
         }
+
+        // Check events
+        if( Act == 1 && MouseOutActionName1 != "none" )
+            MouseOutAction1->SendEvent();
+        else if( Act == 2 && MouseOutActionName2 != "none" )
+            MouseOutAction2->SendEvent();
+
+        CursorIn = false;
+        return true;
     }
     return true;
 }
@@ -302,7 +337,16 @@ void ControlCheckBox::Enable( Event *event, bool enabled )
     {
         Enabled1 = enabled;
         if( Act == 1 )
+        {
+            // If cursor is in, send mouse out event
+            if( !Enabled1 && CursorIn )
+            {
+                if( MouseOutActionName2 != "none" )
+                    MouseOutAction2->SendEvent();
+                CursorIn = false;
+            }
             ParentWindow->Refresh( Left, Top, Width, Height );
+        }
     }
 
 
@@ -312,7 +356,16 @@ void ControlCheckBox::Enable( Event *event, bool enabled )
     {
         Enabled2 = enabled;
         if( Act == 2 )
+        {
+            // If cursor is in, send mouse out event
+            if( !Enabled2 && CursorIn )
+            {
+                if( MouseOutActionName2 != "none" )
+                    MouseOutAction2->SendEvent();
+                CursorIn = false;
+            }
             ParentWindow->Refresh( Left, Top, Width, Height );
+        }
     }
 
 }

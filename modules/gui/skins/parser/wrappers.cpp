@@ -2,7 +2,7 @@
  * wrappers.cpp: Wrappers around C++ objects
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: wrappers.cpp,v 1.3 2003/03/19 02:09:56 videolan Exp $
+ * $Id: wrappers.cpp,v 1.4 2003/03/19 17:14:50 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -180,20 +180,29 @@ void AddButton(
         vlcWin ) );
 }
 //---------------------------------------------------------------------------
-void AddCheckBox( char *id, char *visible, char *x, char *y, char *img1,
-    char *img2, char *click1, char *click2, char *disabled1, char *disabled2,
-    char *action1, char *action2, char *tooltiptext1, char *tooltiptext2,
-    char *help )
+void AddCheckBox(
+    char *id,
+    char *visible,
+    char *x, char *y,
+    char *img1, char *img2,
+    char *clickimg1, char *clickimg2, char *disabled1, char *disabled2,
+    char *onclick1, char *onclick2, char *onmouseover1, char *onmouseout1,
+    char *onmouseover2, char *onmouseout2,
+    char *tooltiptext1, char *tooltiptext2, char *help )
 {
     int XOff, YOff;
     Window *vlcWin = g_pIntf->p_sys->p_theme->WindowList.back();
 
     g_pIntf->p_sys->p_theme->OffBank->GetOffSet( XOff, YOff );
 
-    vlcWin->ControlList.push_back( new ControlCheckBox( id,
-        ConvertBoolean( visible ), atoi( x ) + XOff,
-        atoi( y ) + YOff, img1, img2, click1, click2, disabled1, disabled2,
-        action1, action2, tooltiptext1, tooltiptext2, help, vlcWin ) );
+    vlcWin->ControlList.push_back( new ControlCheckBox(
+        id,
+        ConvertBoolean( visible ),
+        atoi( x ) + XOff, atoi( y ) + YOff,
+        img1, img2, clickimg1, clickimg2, disabled1, disabled2,
+        onclick1, onclick2, onmouseover1, onmouseout1, onmouseover2,
+        onmouseout2,
+        tooltiptext1, tooltiptext2, help, vlcWin ) );
 }
 //---------------------------------------------------------------------------
 void AddSlider( char *id, char *visible, char *x, char *y, char *type, char *up,

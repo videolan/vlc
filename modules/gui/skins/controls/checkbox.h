@@ -2,7 +2,7 @@
  * checkbox.h: Checkbox control
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: checkbox.h,v 1.1 2003/03/18 02:21:47 ipkiss Exp $
+ * $Id: checkbox.h,v 1.2 2003/03/19 17:14:50 karibu Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -52,6 +52,7 @@ class ControlCheckBox : public GenericControl
         bool Enabled1;
         bool Enabled2;
         bool Selected;
+        bool CursorIn;
 
         // List of actions to execute when clicking
         int      Act;
@@ -60,15 +61,29 @@ class ControlCheckBox : public GenericControl
         Action  *ClickAction2;
         string   ClickActionName2;
 
+        Action     *MouseOverAction1;
+        string      MouseOverActionName1;
+        Action     *MouseOutAction1;
+        string      MouseOutActionName1;
+        Action     *MouseOverAction2;
+        string      MouseOverActionName2;
+        Action     *MouseOutAction2;
+        string      MouseOutActionName2;
+
         // ToolTip text
         string      ToolTipText1;
         string      ToolTipText2;
 
     public:
         // Constructor
-        ControlCheckBox( string id, bool visible, int x, int y, string img1,
-            string img2,  string click1, string click2, string disabled1,
-            string disabled2, string action1, string action2,
+        ControlCheckBox(
+            string id,
+            bool visible,
+            int x, int y,
+            string img1, string img2,  string clickimg1, string clickimg2,
+            string disabled1, string disabled2,
+            string onclick1, string onclick2, string onmouseover1,
+            string onmouseout1, string onmouseover2, string onmouseout2,
             string tooltiptext1, string tooltiptext2, string help,
             Window *Parent );
 
