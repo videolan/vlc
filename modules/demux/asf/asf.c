@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.3 2002/10/28 11:49:57 fenrir Exp $
+ * $Id: asf.c,v 1.4 2002/11/10 16:31:20 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -432,8 +432,10 @@ static int Demux( input_thread_t *p_input )
         i_packet_send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
         i_packet_duration  = GetWLE( p_peek + i_skip ); i_skip += 2;
     
-        i_packet_size_left = i_packet_length;   // XXX données reellement lu
-
+//        i_packet_size_left = i_packet_length;   // XXX données reellement lu
+        /* FIXME I have to do that for some file, I don't known why */
+        i_packet_size_left = i_data_packet_min;
+        
         if( b_packet_multiple_payload )
         {
             i_payload_count = p_peek[i_skip] & 0x3f;
@@ -495,6 +497,7 @@ static int Demux( input_thread_t *p_input )
                 i_media_object_offset = i_tmp;
             }
 
+            i_pts = __MAX( i_pts - p_demux->p_fp->i_preroll * 1000, 0 );
 
             if( b_packet_multiple_payload )
             {
@@ -632,7 +635,6 @@ loop_error_recovery:
         ASF_SkipBytes( p_input, i_data_packet_min );
 
     }   // loop over packet
-    
     p_demux->i_time = 0;
     for( i = 0; i < 128 ; i++ )
     {
@@ -643,7 +645,7 @@ loop_error_recovery:
         }
 #undef p_stream
     }
-
+    
     return( 1 );
 }
 

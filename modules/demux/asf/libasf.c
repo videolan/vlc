@@ -2,7 +2,7 @@
  * libasf.c : 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.4 2002/11/08 10:26:53 gbazin Exp $
+ * $Id: libasf.c,v 1.5 2002/11/10 16:31:20 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -110,18 +110,45 @@ int ASF_SeekAbsolute( input_thread_t *p_input,
 {
     off_t i_filepos;
 
-    if( i_pos >= p_input->stream.p_selected_area->i_size )
-    {
-        return( 0 );
-    }
-            
     i_filepos = ASF_TellAbsolute( p_input );
-    if( i_pos != i_filepos )
+    if( i_pos == i_filepos )
+    {
+        return( 1 );
+    }
+
+    if( p_input->stream.b_seekable && 
+        p_input->stream.i_method != INPUT_METHOD_NETWORK )
     {
         p_input->pf_seek( p_input, i_pos );
         input_AccessReinit( p_input );
+        return( 1 );
     }
-    return( 1 );
+    else if( i_pos > i_filepos )
+    {
+        u64 i_size = i_pos - i_filepos;
+        do
+        {
+            data_packet_t *p_data;
+            int i_read;
+
+            i_read = 
+                input_SplitBuffer(p_input, &p_data, __MIN( i_size, 1024 ) );
+            if( i_read <= 0 )
+            {
+                return( 0 );
+            }
+            input_DeletePacket( p_input->p_method_data, p_data );
+            i_size -= i_read;
+                    
+        } while( i_size > 0 );
+
+        return( 1 );
+    }
+    else
+    {
+        msg_Err( p_input, "cannot seek" );
+        return( 0 );
+    }   
 }
 
 /* return 1 if success, 0 if fail */
@@ -203,7 +230,7 @@ int ASF_NextObject( input_thread_t *p_input,
     {
         return( 0 ); /* failed */
     }
-    if( p_obj->common.p_father )
+    if( p_obj->common.p_father && p_obj->common.p_father->common.i_object_size != 0 )
     {
         if( p_obj->common.p_father->common.i_object_pos + p_obj->common.p_father->common.i_object_size <
                 p_obj->common.i_object_pos + p_obj->common.i_object_size + 24 )  
