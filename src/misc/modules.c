@@ -2,7 +2,7 @@
  * modules.c : Builtin and plugin modules management functions
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.c,v 1.139 2003/11/19 10:17:51 gbazin Exp $
+ * $Id: modules.c,v 1.140 2003/11/19 13:10:48 gbazin Exp $
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>
@@ -862,13 +862,12 @@ static int AllocatePluginFile( vlc_object_t * p_this, MYCHAR * psz_file )
     }
 
 #elif defined(HAVE_DL_WINDOWS) && defined(WIN32)
-    char psz_filename[MAX_PATH];
     handle = LoadLibrary( psz_file );
     if( handle == NULL )
     {
         char *psz_error = GetWindowsError();
         msg_Warn( p_this, "cannot load module `%s' (%s)",
-                          psz_filename, psz_error );
+                          psz_file, psz_error );
         free( psz_error );
     }
 

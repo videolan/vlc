@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.46 2003/11/17 02:52:39 fenrir Exp $
+ * $Id: video.c,v 1.47 2003/11/19 13:10:48 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -353,6 +353,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
     if( p_block->i_pts > 0 )
     {
         p_sys->input_pts = p_block->i_pts;
+        p_block->i_pts = 0; /* Make sure we don't reuse the same pts twice */
     }
 
     /* TODO implement it in a better way */
