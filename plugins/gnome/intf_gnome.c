@@ -2,7 +2,7 @@
  * intf_gnome.c: Gnome interface
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: intf_gnome.c,v 1.16 2001/02/20 08:47:25 stef Exp $
+ * $Id: intf_gnome.c,v 1.17 2001/02/20 09:10:36 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -140,6 +140,9 @@ static int intf_Open( intf_thread_t *p_intf )
     p_intf->p_sys->pf_gtk_callback = NULL;
     p_intf->p_sys->pf_gdk_callback = NULL;
 
+    /* Initialize lock */
+    vlc_mutex_init( &p_intf->p_sys->change_lock );
+
     return( 0 );
 }
 
@@ -148,6 +151,9 @@ static int intf_Open( intf_thread_t *p_intf )
  *****************************************************************************/
 static void intf_Close( intf_thread_t *p_intf )
 {
+    /* Destroy lock */
+    vlc_mutex_destroy( &p_intf->p_sys->change_lock );
+
     /* Destroy structure */
     free( p_intf->p_sys );
 }

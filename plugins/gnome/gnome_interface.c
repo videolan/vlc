@@ -497,6 +497,7 @@ create_intf_about (void)
     "Régis Duchesne <regis@via.ecp.fr>",
     "Michel Lespinasse <walken@zoy.org>",
     "Olivier Pomel <pomel@via.ecp.fr>",
+    "Pierre Baillet <oct@zoy.org>",
     "Jean-Philippe Grimaldi <jeanphi@via.ecp.fr>",
     "Andres Krapf <dae@via.ecp.fr>",
     "Christophe Massiot <massiot@via.ecp.fr>",

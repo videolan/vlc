@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.86 2001/02/20 08:47:25 stef Exp $
+ * $Id: input.c,v 1.87 2001/02/20 09:10:36 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -296,7 +296,6 @@ static int InitThread( input_thread_t * p_input )
     if( p_input->p_input_module == NULL )
     {
         intf_ErrMsg( "input error: no suitable input module" );
-        module_Unneed( p_main->p_bank, p_input->p_input_module );
         return( -1 );
     }
 
