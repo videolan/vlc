@@ -2,7 +2,7 @@
  * freetype.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2002, 2003 VideoLAN
- * $Id: freetype.c,v 1.32 2003/11/19 00:06:06 sigmunau Exp $
+ * $Id: freetype.c,v 1.33 2003/11/19 12:13:00 hartman Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -91,7 +91,7 @@ static line_desc_t *NewLine( byte_t * );
 #define FONTSIZE_TEXT N_("Font size")
 #define FONTSIZE_LONGTEXT N_("The size of the fonts used by the osd module" )
 
-static char *ppsz_sizes[] = { "smaller", "small", "normal", "large", "larger"};
+static int  *pi_sizes[] = { 20, 18, 16, 12, 6};
 static char *ppsz_sizes_text[] = { N_("Smaller"), N_("Small"), N_("Normal"),
                                    N_("Large"), N_("Larger") };
 
@@ -99,9 +99,9 @@ vlc_module_begin();
     add_category_hint( N_("Fonts"), NULL, VLC_FALSE );
     add_file( "freetype-font", DEFAULT_FONT, NULL, FONT_TEXT, FONT_LONGTEXT, VLC_FALSE );
     add_integer( "freetype-fontsize", 16, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT, VLC_TRUE );
-    add_string( "freetype-rel-fontsize", "normal", NULL, FONTSIZE_TEXT,
-                FONTSIZE_LONGTEXT, VLC_FALSE );
-        change_string_list( ppsz_sizes, ppsz_sizes_text, 0 );
+    add_integer( "freetype-rel-fontsize", 16, NULL, FONTSIZE_TEXT, FONTSIZE_LONGTEXT,
+                 VLC_FALSE );
+        change_integer_list( pi_sizes, ppsz_sizes_text, 0 );
     set_description( _("freetype2 font renderer") );
     set_capability( "text renderer", 100 );
     add_shortcut( "text" );
@@ -182,7 +182,7 @@ static int Create( vlc_object_t *p_this )
     var_Create( p_vout, "freetype-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "freetype-rel-fontsize",
-                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     /* Look what method was requested */
     var_Get( p_vout, "freetype-font", &val );
@@ -249,36 +249,9 @@ static int Create( vlc_object_t *p_this )
 
     var_Get( p_vout, "freetype-rel-fontsize", &val );
     
-    if( val.psz_string )
+    if( val.i_int )
     {
-        if( strncmp( val.psz_string, "smaller", 7 ) == 0 )
-        {
-            i_font_factor = 20;
-        }
-        else if( strncmp( val.psz_string, "small", 5 ) == 0 )
-        {
-            i_font_factor = 18;
-        }
-        else if( strncmp( val.psz_string, "normal", 6 ) == 0 )
-        {
-            i_font_factor = 16;
-        }
-        else if( strncmp( val.psz_string, "large", 5 ) == 0 )
-        {
-            i_font_factor = 12;
-        }
-        else if( strncmp( val.psz_string, "larger", 6 ) == 0 )
-        {
-            i_font_factor = 6;
-        }
-        else
-        {
-            var_Get( p_vout, "freetype-fontsize", &val );
-            i_fontsize = val.i_int;
-        }
-        if( i_font_factor )
-            i_fontsize = (int) p_vout->render.i_height / i_font_factor;
-        free( val.psz_string );
+        i_fontsize = (int) p_vout->render.i_height / val.i_int;
     }
     else
     {
