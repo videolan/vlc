@@ -589,12 +589,6 @@ AC_CACHE_CHECK([if \$CC accepts -Wsign-compare],
     [CFLAGS="-Wsign-compare ${CFLAGS_save}"
      AC_TRY_COMPILE([],,ac_cv_c_Wsign_compare=yes, ac_cv_c_Wsign_compare=no)])
 
-dnl Disabled as it is way too verbose on gcc-3.3
-dnl AC_CACHE_CHECK([if \$CC accepts -Wdisabled-optimization],
-dnl     [ac_cv_c_Wdisabled_optimization],
-dnl     [CFLAGS="-Wdisabled-optimization ${CFLAGS_save}"
-dnl      AC_TRY_COMPILE([],,ac_cv_c_Wdisabled_optimization=yes, ac_cv_c_Wdisabled_optimization=no)])
-
 AC_CACHE_CHECK([if \$CC accepts -Winline],
     [ac_cv_c_Winline],
     [CFLAGS="-Winline ${CFLAGS_save}"
@@ -628,12 +622,6 @@ if test "${ac_cv_c_Wsign_compare}" != "no"; then
     CFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
     CXXFLAGS_save="-Wsign-compare ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="-Wsign-compare ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
-fi
-
-if test "${ac_cv_c_Wdisabled_optimization}" != "no"; then
-    CFLAGS_save="-Wdisabled-optimization ${CFLAGS_save}"; CFLAGS="${CFLAGS_save}"
-    CXXFLAGS_save="-Wdisabled-optimization ${CFLAGS_save}"; CXXFLAGS="${CXXFLAGS_save}"
-    OBJCFLAGS_save="-Wdisabled-optimization ${OBJCFLAGS_save}"; OBJCFLAGS="${OBJCFLAGS_save}"
 fi
 
 if test "${ac_cv_c_Winline}" != "no"; then
