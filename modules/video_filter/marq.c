@@ -69,7 +69,6 @@ struct filter_sys_t
     int  i_font_color, i_font_opacity, i_font_size; /* font control */
     
     time_t last_time;
-    vlc_bool_t b_absolute; /* position control, relative vs. absolute */
 
     vlc_bool_t b_need_update;
 };
@@ -238,17 +237,10 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     {
         return NULL;
     }
-    
-    p_sys->b_absolute = VLC_TRUE;
-    if( p_sys->i_xoff < 0 || p_sys->i_yoff < 0 )
-    {
-        p_sys->b_absolute = VLC_FALSE;
-    }
 
     p_spu = p_filter->pf_sub_buffer_new( p_filter );
     if( !p_spu ) return NULL;
 
-    p_spu->b_absolute = p_sys->b_absolute;
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_FOURCC('T','E','X','T');
     fmt.i_aspect = 0;
@@ -268,13 +260,26 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_start = date;
     p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout * 1000;
     p_spu->b_ephemer = VLC_TRUE;
-    p_spu->i_x = p_sys->i_xoff;
-    p_spu->i_y = p_sys->i_yoff;
+
+    /*  where to locate the string: */
+    if( p_sys->i_xoff < 0 || p_sys->i_yoff < 0 )
+    {   /* set to one of the 9 relative locations */
+        p_spu->i_flags = p_sys->i_pos;
+        p_spu->i_x = 0;
+        p_spu->i_y = 0;
+        p_spu->b_absolute = VLC_FALSE;
+    }
+    else
+    {   /*  set to an absolute xy, referenced to upper left corner */
+	    p_spu->i_flags = OSD_ALIGN_LEFT | OSD_ALIGN_TOP;
+        p_spu->i_x = p_sys->i_xoff;
+        p_spu->i_y = p_sys->i_yoff;
+        p_spu->b_absolute = VLC_TRUE;
+    }
     p_spu->p_region->i_font_color = p_sys->i_font_color;
     p_spu->p_region->i_font_opacity = p_sys->i_font_opacity;
     p_spu->p_region->i_font_size = p_sys->i_font_size;
     
-    p_spu->i_flags = p_sys->i_pos;
 
     p_sys->b_need_update = VLC_FALSE;
     return p_spu;
