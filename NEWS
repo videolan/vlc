@@ -1,4 +1,52 @@
-$Id: NEWS,v 1.15 2003/02/02 16:08:08 sam Exp $
+$Id: NEWS,v 1.16 2003/02/13 21:53:25 massiot Exp $
+
+Changes between 0.5.0 and 0.5.1:
+--------------------------------
+
+Core support:
+ * new mouse gesture interface
+ * audio volume can now be changed at any time, even when no file is
+   playing
+
+Input access:
+ * various minor fixes on the network inputs
+ * fixed some weird URL parsing problems (/Volumes/toto:tata/harry@coin.mpg)
+ * VCD: fixed track number and chapter indexing
+
+Input demux:
+ * fixed a bad initialization in mp4 plug-in
+ * new TS --buggy-psi option for streams which don't update the
+   continuity counter
+
+Codecs:
+ * support for MPEG-2 intra slice refresh (aka. Slice-I) streams
+
+DVD support:
+ * fixed a bug which turned the default interface command-line only
+   without the user consent
+
+UNIX ports:
+ * GTK: fixed a crash when doing fullscreen or volume up from the popup menu
+ * X11: new screen saver disabling plug-in (--extraintf screensaver)
+ * KDE: fixed compilation with KDE 3.1
+ * ALSA: fixed mono files output
+
+Mac OS X port:
+ * fixed a crash on start-up on some localized systems
+ * lower real-time priorities to avoid lock-up on slow machines
+ * VLC can now be made handler of ftp http mms and udp URLs
+ * playlist enhancements
+ * added half, normal and double video window menu items
+ * new step forward/step backward commands
+ * the dock should no longer be visible in fullscreen mode
+ * vlc.app is now VLC.app
+
+Win32 port:
+ * fixed the "RichEdit line insertion error" bug
+
+BeOS port:
+ * lower BeOS priorities to avoid lock-up
+
 
 Changes between 0.4.6 and 0.5.0:
 --------------------------------
