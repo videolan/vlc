@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.24 2003/08/22 22:52:48 fenrir Exp $
+ * $Id: libavi.c,v 1.25 2003/08/30 02:03:44 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -197,9 +197,13 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
     uint8_t  *p_read, *p_buff;    \
     if( !( p_read = p_buff = malloc(i_read ) ) ) \
     { \
-        return 0; \
+        return VLC_EGENERIC; \
     } \
     i_read = stream_Read( s, p_read, i_read ); \
+    if( i_read < (int64_t)__EVEN(p_chk->common.i_chunk_size ) + 8 ) \
+    { \
+        return VLC_EGENERIC; \
+    }\
     p_read += 8; \
     i_read -= 8
 
