@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: vout_beos.cpp,v 1.56 2002/05/20 11:21:01 tcastley Exp $
+ * $Id: vout_beos.cpp,v 1.57 2002/05/22 12:23:41 tcastley Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -92,43 +92,6 @@ BWindow *beos_GetAppWindow(char *name)
         }
     }
     return window; 
-}
-/****************************************************************************
- * DrawingThread : thread that really does the drawing
- ****************************************************************************/
-int32 Draw(void *data)
-{
-    VideoWindow* p_win;
-    p_win = (VideoWindow *) data;
-
-    if ( p_win->LockWithTimeout(50000) == B_OK )
-    {
-        if (p_win->vsync)
-        {
-            BScreen *screen;
-            screen = new BScreen(p_win);
-            screen-> WaitForRetrace(22000);
-            delete screen;
-        }
-        if (p_win-> mode == OVERLAY)
-        {
-            rgb_color key;
-            p_win-> view->SetViewOverlay(p_win-> bitmap[p_win-> i_buffer], 
-                                         p_win-> bitmap[p_win-> i_buffer]->Bounds() ,
-                                         p_win-> view->Bounds(),
-                                         &key, B_FOLLOW_ALL,
-		                                 B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL|
-		                                 B_OVERLAY_TRANSFER_CHANNEL);
-		    p_win-> view->SetViewColor(key);
-        }
-        else
-        {
-            p_win-> view-> DrawBitmap( p_win-> bitmap[p_win-> i_buffer], 
-                                       p_win-> view->Bounds() );
-        }                                
-        p_win-> Unlock();
-    }
-    return B_OK;
 }
 
 /*****************************************************************************
@@ -336,8 +299,8 @@ int VideoWindow::SelectDrawingMode(int width, int height)
             {
                drawingMode = OVERLAY;
                rgb_color key;
-               view->SetViewOverlay(bitmap[i_buffer], 
-                                    bitmap[i_buffer]->Bounds() ,
+               view->SetViewOverlay(bitmap[0], 
+                                    bitmap[0]->Bounds() ,
                                     view->Bounds(),
                                     &key, B_FOLLOW_ALL,
 		                            B_OVERLAY_FILTER_HORIZONTAL|B_OVERLAY_FILTER_VERTICAL);
@@ -367,8 +330,6 @@ int VideoWindow::SelectDrawingMode(int width, int height)
         bitmap[1] = new BBitmap( BRect( 0, 0, width, height ), colspace[colspace_index].colspace);
         bitmap[2] = new BBitmap( BRect( 0, 0, width, height ), colspace[colspace_index].colspace);
     }
-    
-    intf_Msg("Selected mode: %d, %s", colspace[colspace_index].chroma, colspace[colspace_index].name);
     return drawingMode;
 }
 
@@ -457,7 +418,6 @@ int vout_Create( vout_thread_t *p_vout )
     }
     p_vout->p_sys->i_width = p_vout->render.i_width;
     p_vout->p_sys->i_height = p_vout->render.i_height;
-    intf_Msg("Chroma of source: %d", p_vout->render.i_chroma);
 
     return( 0 );
 }
@@ -599,7 +559,6 @@ void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
     }
     /* change buffer */
     p_vout->p_sys->i_index = ++p_vout->p_sys->i_index % 3;
-//       p_vout->p_sys->i_index = ++p_vout->p_sys->i_index & 1;
     p_pic->p->p_pixels = p_vout->p_sys->pp_buffer[p_vout->p_sys->i_index];
 }
 
