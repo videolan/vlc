@@ -2,7 +2,7 @@
  * network.h: interface to communicate with network plug-ins
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: network.h,v 1.7 2004/01/06 23:03:16 fenrir Exp $
+ * $Id: network.h,v 1.8 2004/01/06 23:11:47 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -105,7 +105,19 @@ static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
             url->psz_host[p - psz_parse] = '\0';
         }
 
-        p2 = strchr( url->psz_host, ':' );
+        if( *url->psz_host == '[' )
+        {
+            /* Ipv6 address */
+            p2 = strchr( url->psz_host, ']' );
+            if( p2 )
+            {
+                p2 = strchr( p2, ':' );
+            }
+        }
+        else
+        {
+            p2 = strchr( url->psz_host, ':' );
+        }
         if( p2 )
         {
             *p2++ = '\0';
