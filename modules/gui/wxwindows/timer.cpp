@@ -1,8 +1,8 @@
 /*****************************************************************************
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
- * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.34 2003/10/15 12:24:14 gbazin Exp $
+ * Copyright (C) 2000-2003 VideoLAN
+ * $Id: timer.cpp,v 1.35 2003/11/23 22:29:27 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -40,7 +40,7 @@
 
 /* Callback prototype */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
-                       vlc_value_t old_val, vlc_value_t new_val, void *param );
+                        vlc_value_t old_val, vlc_value_t new_val, void *param );
 
 /*****************************************************************************
  * Constructor.
@@ -97,9 +97,9 @@ void Timer::Notify()
     /* Update the input */
     if( p_intf->p_sys->p_input == NULL )
     {
-        p_intf->p_sys->p_input = (input_thread_t *)vlc_object_find( p_intf,
-                                                       VLC_OBJECT_INPUT,
-                                                       FIND_ANYWHERE );
+        p_intf->p_sys->p_input =
+            (input_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_INPUT,
+                                               FIND_ANYWHERE );
 
         /* Show slider */
         if( p_intf->p_sys->p_input )
@@ -186,26 +186,28 @@ void Timer::Notify()
                     vlc_value_t pos;
                     char psz_time[ OFFSETTOTIME_MAX_SIZE ];
                     vlc_value_t time;
-                    mtime_t     i_seconds;
+                    mtime_t i_seconds;
 
                     /* Update the value */
                     var_Get( p_input, "position", &pos );
                     if( pos.f_float >= 0.0 )
                     {
-                        p_intf->p_sys->i_slider_pos = (int)(SLIDER_MAX_POS * pos.f_float);
+                        p_intf->p_sys->i_slider_pos =
+                            (int)(SLIDER_MAX_POS * pos.f_float);
 
-                        p_main_interface->slider->SetValue( p_intf->p_sys->i_slider_pos );
+                        p_main_interface->slider->SetValue(
+                            p_intf->p_sys->i_slider_pos );
 
                         var_Get( p_intf->p_sys->p_input, "time", &time );
                         i_seconds = time.i_time / 1000000;
 
-                        sprintf( psz_time, "%d:%02d:%02d",
-                                 (int) (i_seconds / (60 * 60)),
-                                 (int) (i_seconds / 60 % 60),
-                                 (int) (i_seconds % 60) );
+                        snprintf( psz_time, OFFSETTOTIME_MAX_SIZE,
+                                  "%d:%02d:%02d",
+                                  (int) (i_seconds / (60 * 60)),
+                                  (int) (i_seconds / 60 % 60),
+                                  (int) (i_seconds % 60) );
 
-
-                        p_main_interface->slider_box->SetLabel(wxU( psz_time ) );
+                        p_main_interface->slider_box->SetLabel( wxU(psz_time) );
                     }
                 }
             }
@@ -266,8 +268,10 @@ static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
     intf_thread_t *p_intf = (intf_thread_t *)param;
 
     if( p_intf->p_sys->pf_show_dialog )
+    {
         p_intf->p_sys->pf_show_dialog( p_intf, INTF_DIALOG_POPUPMENU,
                                        new_val.b_bool, 0 );
+    }
 
     return VLC_SUCCESS;
 }
