@@ -117,6 +117,8 @@ static int Open( vlc_object_t *p_this )
 
     if( p_dec->fmt_in.i_codec != VLC_FOURCC( 'h', '2', '6', '4') &&
         p_dec->fmt_in.i_codec != VLC_FOURCC( 'H', '2', '6', '4') &&
+        p_dec->fmt_in.i_codec != VLC_FOURCC( 'V', 'S', 'S', 'H') &&
+        p_dec->fmt_in.i_codec != VLC_FOURCC( 'v', 's', 's', 'h') &&
         ( p_dec->fmt_in.i_codec != VLC_FOURCC( 'a', 'v', 'c', '1') || p_dec->fmt_in.i_extra < 7 ) )
     {
         return VLC_EGENERIC;
