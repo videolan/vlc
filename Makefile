@@ -422,8 +422,9 @@ package-win32:
 	cp vlc.exe $(PLUGINS:%=plugins/%.so) tmp/ 
 	cp INSTALL-win32.txt AUTHORS COPYING ChangeLog ChangeLog.libdvdcss \
 		README README.libdvdcss FAQ TODO tmp/
-	for file in gtk-1.3.dll gdk-1.3.dll glib-1.3.dll gmodule-1.3.dll \
-		gnu-intl.dll SDL.dll README-SDL.txt ; \
+	for file in iconv.dll libgmodule-1.3-12.dll libgtk-0.dll libgdk-0.dll \
+		libgobject-1.3-12.dll libintl-1.dll libglib-1.3-12.dll \
+		libgthread-1.3-12.dll SDL.dll README-SDL.txt ; \
 			do cp ${DLL_PATH}/$$file tmp/ ; done
 	mkdir tmp/share
 	for file in default8x16.psf default8x9.psf ; \
