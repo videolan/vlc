@@ -46,6 +46,9 @@ static int ImageWriteUrl( image_handler_t *, picture_t *,
 
 static decoder_t *CreateDecoder( vlc_object_t *, video_format_t * );
 static void DeleteDecoder( decoder_t * );
+static encoder_t *CreateEncoder( vlc_object_t *, video_format_t *,
+                                 video_format_t * );
+static void DeleteEncoder( encoder_t * );
 static filter_t *CreateFilter( vlc_object_t *, es_format_t *,
                                video_format_t * );
 static void DeleteFilter( filter_t * );
@@ -81,6 +84,7 @@ void image_HandlerDelete( image_handler_t *p_image )
     if( !p_image ) return;
 
     if( p_image->p_dec ) DeleteDecoder( p_image->p_dec );
+    if( p_image->p_enc ) DeleteEncoder( p_image->p_enc );
     if( p_image->p_filter ) DeleteFilter( p_image->p_filter );
 
     free( p_image );
@@ -215,18 +219,125 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
  *
  */
 
+void PicRelease( picture_t *p_pic ){};
+
 static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
                             video_format_t *p_fmt_in,
                             video_format_t *p_fmt_out )
 {
-    return NULL;
+    block_t *p_block;
+    void (*pf_release)( picture_t * );
+
+    /* Check if we can reuse the current encoder */
+    if( p_image->p_enc &&
+        ( p_image->p_enc->fmt_out.i_codec != p_fmt_out->i_chroma ||
+          p_image->p_enc->fmt_out.video.i_width != p_fmt_out->i_width ||
+          p_image->p_enc->fmt_out.video.i_height != p_fmt_out->i_height ) )
+    {
+        DeleteEncoder( p_image->p_enc );
+        p_image->p_enc = 0;
+    }
+
+    /* Start an encoder */
+    if( !p_image->p_enc )
+    {
+        p_image->p_enc = CreateEncoder( p_image->p_parent,
+                                        p_fmt_in, p_fmt_out );
+        if( !p_image->p_enc ) return NULL;
+    }
+
+    /* Check if we need chroma conversion or resizing */
+    if( p_image->p_enc->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
+        p_image->p_enc->fmt_in.video.i_width != p_fmt_in->i_width ||
+        p_image->p_enc->fmt_in.video.i_height != p_fmt_in->i_height )
+    {
+        picture_t *p_pif;
+
+        if( p_image->p_filter )
+        if( p_image->p_filter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
+            p_image->p_filter->fmt_out.video.i_chroma !=
+            p_image->p_enc->fmt_in.video.i_chroma )
+        {
+            /* We need to restart a new filter */
+            DeleteFilter( p_image->p_filter );
+            p_image->p_filter = 0;
+        }
+
+        /* Start a filter */
+        if( !p_image->p_filter )
+        {
+            es_format_t fmt_in;
+            es_format_Init( &fmt_in, VIDEO_ES, p_fmt_in->i_chroma );
+            fmt_in.video = *p_fmt_in;
+
+            p_image->p_filter =
+                CreateFilter( p_image->p_parent, &fmt_in,
+                              &p_image->p_enc->fmt_in.video );
+
+            if( !p_image->p_filter )
+            {
+                return NULL;
+            }
+        }
+        else
+        {
+            /* Filters should handle on-the-fly size changes */
+            p_image->p_filter->fmt_in.i_codec = p_fmt_in->i_chroma;
+            p_image->p_filter->fmt_out.video = *p_fmt_in;
+            p_image->p_filter->fmt_out.i_codec =p_image->p_enc->fmt_in.i_codec;
+            p_image->p_filter->fmt_out.video = p_image->p_enc->fmt_in.video;
+        }
+
+        pf_release = p_pic->pf_release;
+        p_pic->pf_release = PicRelease; /* Small hack */
+        p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
+        p_pic->pf_release = pf_release;
+        p_pic = p_pif;
+    }
+
+    p_block = p_image->p_enc->pf_encode_video( p_image->p_enc, p_pic );
+
+    if( !p_block )
+    {
+        msg_Dbg( p_image->p_parent, "no image encoded" );
+        return 0;
+    }
+
+    return p_block;
 }
 
 static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
                           video_format_t *p_fmt_in, video_format_t *p_fmt_out,
                           const char *psz_url )
 {
-    return VLC_EGENERIC;
+    block_t *p_block;
+    FILE *file;
+
+    if( !p_fmt_out->i_chroma )
+    {
+        /* Try to guess format from file name */
+        p_fmt_out->i_chroma = Ext2Fourcc( psz_url );
+    }
+
+    file = fopen( psz_url, "wb" );
+    if( !file )
+    {
+        msg_Dbg( p_image->p_parent, "could not open file %s for writing",
+                 psz_url );
+        return VLC_EGENERIC;
+    }
+
+    p_block = ImageWrite( p_image, p_pic, p_fmt_in, p_fmt_out );
+
+    if( p_block )
+    {
+        fwrite( p_block->p_buffer, sizeof(char), p_block->i_buffer, file );
+        block_Release( p_block );
+    }
+
+    fclose( file );
+
+    return p_block ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 /**
@@ -334,7 +445,6 @@ static void video_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
 static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
 {
     decoder_t *p_dec;
-    static es_format_t null_es_format = {0};
 
     p_dec = vlc_object_create( p_this, VLC_OBJECT_DECODER );
     if( p_dec == NULL )
@@ -344,11 +454,9 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
     }
 
     p_dec->p_module = NULL;
-    es_format_Copy( &p_dec->fmt_in, &null_es_format );
-    es_format_Copy( &p_dec->fmt_out, &null_es_format );
+    es_format_Init( &p_dec->fmt_in, VIDEO_ES, fmt->i_chroma );
+    es_format_Init( &p_dec->fmt_out, VIDEO_ES, 0 );
     p_dec->fmt_in.video = *fmt;
-    p_dec->fmt_in.i_cat = VIDEO_ES;
-    p_dec->fmt_in.i_codec = fmt->i_chroma;
     p_dec->b_pace_control = VLC_TRUE;
 
     p_dec->pf_vout_buffer_new = video_new_buffer;
@@ -383,6 +491,64 @@ static void DeleteDecoder( decoder_t * p_dec )
     es_format_Clean( &p_dec->fmt_out );
 
     vlc_object_destroy( p_dec );
+}
+
+static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
+                                 video_format_t *fmt_out )
+{
+    encoder_t *p_enc;
+
+    p_enc = vlc_object_create( p_this, VLC_OBJECT_ENCODER );
+    if( p_enc == NULL )
+    {
+        msg_Err( p_this, "out of memory" );
+        return NULL;
+    }
+
+    p_enc->p_module = NULL;
+    es_format_Init( &p_enc->fmt_in, VIDEO_ES, fmt_in->i_chroma );
+    p_enc->fmt_in.video = *fmt_in;
+    if( fmt_out->i_width > 0 && fmt_out->i_height > 0 )
+    {
+        p_enc->fmt_in.video.i_width = fmt_out->i_width;
+        p_enc->fmt_in.video.i_height = fmt_out->i_height;
+    }
+    p_enc->fmt_in.video.i_frame_rate = 25;
+    p_enc->fmt_in.video.i_frame_rate_base = 1;
+
+    es_format_Init( &p_enc->fmt_out, VIDEO_ES, fmt_out->i_chroma );
+    p_enc->fmt_out.video = *fmt_out;
+    p_enc->fmt_out.video.i_width = p_enc->fmt_in.video.i_width;
+    p_enc->fmt_out.video.i_height = p_enc->fmt_in.video.i_height;
+
+    vlc_object_attach( p_enc, p_this );
+
+    /* Find a suitable decoder module */
+    p_enc->p_module = module_Need( p_enc, "encoder", 0, 0 );
+    if( !p_enc->p_module )
+    {
+        msg_Err( p_enc, "no suitable encoder module for fourcc `%4.4s'.\n"
+                 "VLC probably does not support this image format.",
+                 (char*)&p_enc->fmt_out.i_codec );
+
+        DeleteEncoder( p_enc );
+        return NULL;
+    }
+    p_enc->fmt_in.video.i_chroma = p_enc->fmt_in.i_codec;
+
+    return p_enc;
+}
+
+static void DeleteEncoder( encoder_t * p_enc )
+{
+    vlc_object_detach( p_enc );
+
+    if( p_enc->p_module ) module_Unneed( p_enc, p_enc->p_module );
+
+    es_format_Clean( &p_enc->fmt_in );
+    es_format_Clean( &p_enc->fmt_out );
+
+    vlc_object_destroy( p_enc );
 }
 
 static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
