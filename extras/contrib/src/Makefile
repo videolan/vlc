@@ -29,39 +29,74 @@ include ./packages.mak
 # Set a clean environment
 # ***************************************************************************
 
-ifeq ($(SYS),DARWIN)
+ifeq ($(HOST),ppc-darwin)
 export PATH = $(PREFIX)/bin:/bin:/usr/bin
 export DYLD_LIBRARY_PATH = $(PREFIX)/lib
+endif
+
+ifeq ($(HOST),i586-pc-beos)
+ifeq ($(HOST),$(BUILD))
+# Compiling on BeOS
+export PATH = $(PREFIX)/bin:.:/boot/home/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:/boot/develop/tools/gnupro/bin
+export LIBRARY_PATH = $(PREFIX)/lib:%A/lib:/boot/home/config/lib:/boot/beos/system/lib
+else
+# Cross compiling from Linux
+export PATH = $(PREFIX)/bin:/opt/cross-tools/bin:/usr/bin:/bin
+endif
+endif
+
 export CPPFLAGS = -I$(PREFIX)/include $(EXTRA_CPPFLAGS)
 export CFLAGS = -I$(PREFIX)/include $(EXTRA_CPPFLAGS)
 export CXXFLAGS = -I$(PREFIX)/include $(EXTRA_CPPFLAGS)
-export LDFLAGS = -L$(PREFIX)/lib
-endif
-ifeq ($(SYS),BEOS)
-export PATH = $(PREFIX)/bin:.:/boot/home/config/bin:/bin:/boot/apps:/boot/preferences:/boot/beos/apps:/boot/beos/preferences:/boot/develop/tools/gnupro/bin
-export LIBRARY_PATH = $(PREFIX)/lib:%A/lib:/boot/home/config/lib:/boot/beos/system/lib
-export BELIBRARIES = $(PREFIX)/lib:/boot/develop/lib/x86
-export C_INCLUDE_PATH = $(PREFIX)/include
-export CPLUS_INCLUDE_PATH = $(PREFIX)/include
-export LDFLAGS = -lnet
+export LDFLAGS = -L$(PREFIX)/lib $(EXTRA_LDFLAGS)
+
+# ***************************************************************************
+# Cross compilation variables
+# We'll usually use --host=<platform>, except for a few libraries which
+# don't handle it (gotta set CC/CXX/etc), and obviously FFmpeg has its own
+# way of doing it... ;)
+# ***************************************************************************
+
+ifneq ($(BUILD),$(HOST))
+# We are cross compiling
+HOSTCONF=--host=$(HOST)
+HOSTCC=CC=$(HOST)-gcc CXX=$(HOST)-g++ AR=$(HOST)-ar RANLIB=$(HOST)-ranlib
+# For libebml/libmatroska. Grrr.
+HOSTCC2=CC=$(HOST)-gcc CXX=$(HOST)-g++ "AR=$(HOST)-ar rcvu" RANLIB=$(HOST)-ranlib
+FFMPEGCONF=--cross-prefix=$(HOST)-
+RANLIB=$(HOST)-ranlib
+else
+# Building natively
+RANLIB=ranlib
 endif
 
 # ***************************************************************************
 # Standard rules
 # ***************************************************************************
 
-ifeq ($(SYS),DARWIN)
+ifeq ($(HOST),ppc-darwin)
 all: .autoconf .libtool .automake .iconv .intl .pkgcfg .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .openslp \
 	.dvdcss .dvdread .dvdnav .dvbpsi .live .goom2k4 .caca .mod \
 	.png .gpgerror .gcrypt .gnutls .daap .cddb .cdio .vcdimager .aclocal
 endif
-ifeq ($(SYS),BEOS)
+
+ifeq ($(HOST),i586-pc-beos)
+ifeq ($(HOST),$(BUILD))
+# Native build: we need perl, autoconf, etc first
 all: .perl .autoconf .libtool .automake .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
 	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
 	.dvdread .dvdnav .dvbpsi .aclocal
+else
+# Cross compiling: we already have the Linux tools, only build the
+# libraries now
+all: .iconv .intl .freetype .fribidi \
+	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
+	.FLAC .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
+	.dvdread .dvdnav .dvbpsi .aclocal
+endif
 endif
 
 FORCE:
@@ -94,7 +129,7 @@ endef
 #	$(INSTALL_NAME)
 #	touch $@
 
-ifeq ($(SYS),DARWIN)
+ifeq ($(HOST),ppc-darwin)
 define INSTALL_NAME_LIB
 	install_name_tool \
 		-change $(PREFIX)/lib/$(shell cd $(PREFIX)/lib; ls | grep "lib$(INSTALL_LIB).[0-9]*.dylib") \
@@ -116,7 +151,7 @@ define INSTALL_NAME
 endef
 endif
 
-ifeq ($(SYS),BEOS)
+ifeq ($(HOST),i586-pc-beos)
 # We test if the file actually exists, as sometimes (but not always)
 # libtool won't accept to build the shared library
 define INSTALL_NAME
@@ -132,7 +167,7 @@ endif
 # perl
 # ***************************************************************************
 
-ifeq ($(SYS),BEOS)
+ifeq ($(BUILD),i586-pc-beos)
 perl-$(PERL_VERSION).tar.gz:
 	$(WGET) $(PERL_URL)
 
@@ -172,7 +207,7 @@ DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.gz
 # libtool
 # ***************************************************************************
 
-ifeq ($(SYS),DARWIN)
+ifeq ($(BUILD),ppc-darwin)
 .libtool:
 	if test -x /usr/bin/glibtoolize; then \
 		ln -sf /usr/bin/glibtoolize $(PREFIX)/bin/libtoolize ; \
@@ -180,7 +215,7 @@ ifeq ($(SYS),DARWIN)
 	touch $@
 endif
 
-ifeq ($(SYS),BEOS)
+ifeq ($(BUILD),i586-pc-beos)
 libtool-$(LIBTOOL_VERSION).tar.gz:
 	$(WGET) $(LIBTOOL_URL)
 
@@ -245,13 +280,19 @@ gettext: gettext-$(GETTEXT_VERSION).tar.gz
 	patch -p 0 < Patches/gettext.patch
 
 .intl: gettext
-	( cd $< && ./configure --prefix=$(PREFIX) )
-ifeq ($(SYS),BEOS)
+	( cd $< && ./configure $(HOSTCONF) --prefix=$(PREFIX) )
+ifeq ($(BUILD),i586-pc-beos)
 # The ugliest kludge ever - so libtool correctly links shared libraries
 # on BeOS. Sorry, I just can't figure out how libtool works
 	( cd $< && for f in `find . -name libtool`; do mv $$f $$f.orig; sed -e 's/ -shared / -nostart /' -e 's/^predep_objects.*/predep_objects=""/' < $$f.orig > $$f; chmod +x $$f; rm $$f.orig; done )
 endif
+ifneq ($(HOST),$(BUILD))
+# We'll use the installed gettext and only need to cross-compile libintl
+	( cd $< && make -C gettext-runtime/intl && make -C gettext-runtime/intl install )
+else
+# Build and install the whole gettext
 	( cd $< && make && make install )
+endif
 	$(INSTALL_NAME)
 	touch $@
 
@@ -270,7 +311,7 @@ libiconv: libiconv-$(LIBICONV_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .iconv: libiconv
-	(cd libiconv; ./configure --prefix=$(PREFIX) --disable-nls && make && make install)
+	(cd libiconv; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-nls && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -289,7 +330,7 @@ freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .freetype: freetype2
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -309,7 +350,7 @@ fribidi: fribidi-$(FRIBIDI_VERSION).tar.gz
 	patch -p 0 < Patches/fribidi.patch.real
 
 .fribidi: fribidi
-	(cd $<; ./bootstrap && ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./bootstrap && ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -328,7 +369,7 @@ a52dec: a52dec-$(A52DEC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .a52: a52dec
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	touch $@
 
 CLEAN_FILE += .a52
@@ -358,7 +399,7 @@ mpeg2dec: mpeg2dec-$(MPEG2DEC_VERSION).tar.gz
 #	patch -p 0 < Patches/mpeg2dec.patch
 
 .mpeg2: mpeg2dec
-	(cd $<; ./configure --prefix=$(PREFIX) --without-x --disable-dsl && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-dsl && make && make install)
 	touch $@
 
 CLEAN_FILE += .mpeg2
@@ -377,7 +418,7 @@ libid3tag: libid3tag-$(LIBID3TAG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .id3tag: libid3tag
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -396,7 +437,7 @@ libmad: libmad-$(LIBMAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .mad: libmad
-	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="-O3" && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -421,7 +462,7 @@ libogg: libogg-$(OGG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .ogg: libogg
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -447,12 +488,16 @@ libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .vorbis: libvorbis .ogg
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-	$(INSTALL_NAME)
+# libvorbis' configure doesn't handle --host
+# FIXME: shared libs disabled for now because configure thinks we should
+# link the .so to -lc when cross-compiling to BeOS (-> fails)
+#   -- titer 2005/02/12
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --disable-shared && make && make install)
+#	$(INSTALL_NAME)
 	touch $@
 
 .vorbisenc: .vorbis .ogg
-	$(INSTALL_NAME)
+#	$(INSTALL_NAME)
 	touch $@
 
 CLEAN_FILE += .vorbis .vorbisenc
@@ -471,7 +516,7 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	patch -p 0 < Patches/theora.patch
 
 .theora: libtheora
-	(cd $<; CC="gcc $(CFLAGS)" ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -490,7 +535,7 @@ flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .FLAC: flac
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -510,7 +555,7 @@ speex: speex-$(SPEEX_VERSION).tar.gz
 	patch -p 0 < Patches/speex.patch
 
 .speex: speex
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-ogg=no && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -536,7 +581,7 @@ faad2: faad2-$(FAAD2_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 
 .faad: faad2
-	(cd $<; ./configure --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make -C libfaad && make -C libfaad install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -556,7 +601,7 @@ faac: faac-$(FAAC_VERSION).tar.bz2
 	patch -p 0 < Patches/faac.patch
 
 .faac: faac
-	(cd $<; ./bootstrap && ./configure --prefix=$(PREFIX) --disable-shared && make && make install)
+	(cd $<; rm -f install-sh mkinstalldirs missing && ./bootstrap && ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
 	touch $@
 
 CLEAN_FILE += .faac
@@ -574,7 +619,7 @@ lame: lame-$(LAME_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .lame: lame
-	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
 	touch $@
 
 CLEAN_FILE += .lame
@@ -593,8 +638,8 @@ libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 	-rm -rf $@/CVS
 
 .ebml: libebml
-	(cd $<; make -C make/linux prefix=$(PREFIX) && make -C make/linux install prefix=$(PREFIX))
-	ranlib $(PREFIX)/lib/libebml.a
+	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) && make -C make/linux install prefix=$(PREFIX))
+	$(RANLIB) $(PREFIX)/lib/libebml.a
 	touch $@
 
 CLEAN_FILE += .ebml
@@ -613,8 +658,8 @@ libmatroska: libmatroska-$(LIBMATROSKA_VERSION).tar.bz2
 	-rm -rf $@/CVS
 
 .matroska: libmatroska
-	(cd $<; make -C make/linux prefix=$(PREFIX) && make -C make/linux install prefix=$(PREFIX))
-	ranlib $(PREFIX)/lib/libmatroska.a
+	(cd $<; make -C make/linux prefix=$(PREFIX) $(HOSTCC2) && make -C make/linux install prefix=$(PREFIX))
+	$(RANLIB) $(PREFIX)/lib/libmatroska.a
 	touch $@
 
 CLEAN_FILE += .matroska
@@ -639,7 +684,7 @@ ffmpeg-$(FFMPEG_VERSION).tar.gz:
 #	patch -p 0 < Patches/ffmpeg.patch
 
 .ffmpeg: ffmpeg
-	(cd $<; ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-audio-beos --disable-ffserver --disable-vorbis --disable-faad --enable-mp3lame --enable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
+	(cd $<; ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" --enable-gpl --enable-mp3lame --enable-faac --enable-pp --disable-vhook --disable-audio-beos --disable-ffserver --disable-vorbis --disable-faad --enable-mp3lame --enable-zlib --enable-a52 && make && make -C libavcodec/libpostproc install && make -C libavcodec installlib && make -C libavformat installlib)
 	touch $@
 
 CLEAN_FILE += .ffmpeg
@@ -676,7 +721,7 @@ libdvdcss: libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .dvdcss: libdvdcss
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -696,7 +741,7 @@ libdvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.gz
 	patch -p 0 < Patches/libdvdread.patch
 
 .dvdread: libdvdread .dvdcss
-	(cd $<; ./configure --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -714,15 +759,14 @@ libdvdnav-$(LIBDVDNAV_VERSION).tar.gz:
 libdvdnav: libdvdnav-$(LIBDVDNAV_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p 0 < Patches/dvdnav.patch
-ifeq ($(SYS),DARWIN)
+ifeq ($(BUILD),ppc-darwin)
 	(cd $@; autoconf)
-endif
-ifeq ($(SYS),BEOS)
+else
 	(cd $@; ./autogen.sh noconfig)
 endif
 
 .dvdnav: libdvdnav .dvdread
-	(cd $<; ./configure --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --enable-static --prefix=$(PREFIX) --with-libdvdcss=$(PREFIX) CFLAGS="$(CFLAGS) -Dlseek64=lseek -Doff64_t=off_t" && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -741,7 +785,7 @@ libdvbpsi: libdvbpsi3-$(LIBDVBPSI_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .dvbpsi: libdvbpsi
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -829,16 +873,14 @@ DISTCLEAN_PKG += libcaca-$(LIBCACA_VERSION).tar.gz
 libdts-$(LIBDTS_VERSION).tar.gz:
 	$(WGET) $(LIBDTS_URL)
 
-ifeq ($(SYS),DARWIN)
+ifeq ($(HOST),i586-pc-beos)
 # libdts 0.0.2 doesn't compile on BeOS
-libdts: libdts-$(LIBDTS_VERSION).tar.gz
-	$(EXTRACT_GZ)
-endif
-
-ifeq ($(SYS),BEOS)
 libdts:
 	svn co svn://svn.videolan.org/libdts/trunk libdts
 	(cd $@; ./bootstrap)
+else
+libdts: libdts-$(LIBDTS_VERSION).tar.gz
+	$(EXTRACT_GZ)
 endif
 
 .dts: libdts
@@ -896,13 +938,11 @@ vcdimager-$(VCDIMAGER_VERSION).tar.gz:
 vcdimager: vcdimager-$(VCDIMAGER_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-ifeq ($(SYS),DARWIN)
+ifeq ($(HOST),ppc-darwin)
 .vcdimager: vcdimager
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static LDFLAGS="$(LDFLAGS) -framework CoreFoundation -framework IOKit" && make && make install)
 	touch $@
-endif
-
-ifeq ($(SYS),BEOS)
+else
 .vcdimager: vcdimager
 	(cd $<; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
 	touch $@

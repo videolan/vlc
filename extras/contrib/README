@@ -5,6 +5,11 @@ other operating systems.
 To use it, first in the contrib directory, type :
 	./bootstrap
 
+You can specify an argument to cross compile, for example:
+    ./bootstrap i586-pc-beos
+This will look for a i586-pc-beos-gcc cross compiler. Default is to
+build natively.
+
 Customize config.mak if you need to, then you need to choose between
 building from source (can take a long time but is easily customizable)
 and fetching a pre-compiled binary package. Either type 'make src'

@@ -1,6 +1,6 @@
-diff -ru ffmpeg.orig/configure ffmpeg/configure
---- ffmpeg.orig/configure	Tue Nov 23 19:28:23 2004
-+++ ffmpeg/configure	Sun Nov 28 20:54:48 2004
+diff -ru ffmpeg-orig/configure ffmpeg/configure
+--- ffmpeg-orig/configure	2005-01-21 23:16:04.000000000 +0100
++++ ffmpeg/configure	2005-02-18 21:43:55.000000000 +0100
 @@ -210,7 +210,7 @@
  2.9-beos-991026*|2.9-beos-000224*) echo "R5/GG gcc"
  mmx="no"
@@ -19,9 +19,28 @@ diff -ru ffmpeg.orig/configure ffmpeg/configure
    ;;
    --cpu=*) cpu=`echo $opt | cut -d '=' -f 2`
    ;;
-diff -ru ffmpeg.orig/libavcodec/eval.c ffmpeg/libavcodec/eval.c
---- ffmpeg.orig/libavcodec/eval.c	Wed Feb 18 13:49:30 2004
-+++ ffmpeg/libavcodec/eval.c	Sun Nov 28 20:29:15 2004
+@@ -709,6 +709,18 @@
+ ranlib="${cross_prefix}${ranlib}"
+ strip="${cross_prefix}${strip}"
+ 
++if test "${cross_prefix}" = "i586-pc-beos-"; then
++  # Cross-compiling from Linux for BeOS
++  CFLAGS="$CFLAGS -DPIC -fomit-frame-pointer -fno-expensive-optimizations"
++  SHFLAGS=-nostart
++  audio_oss="no"
++  v4l="no"
++  dv1394="no"
++  netserver="yes"
++  need_inet_aton="yes"
++  extralibs="-lnet"
++fi
++
+ if test -z "$cross_prefix" ; then
+ 
+ # ---
+diff -ru ffmpeg-orig/libavcodec/eval.c ffmpeg/libavcodec/eval.c
+--- ffmpeg-orig/libavcodec/eval.c	2005-01-17 19:25:32.000000000 +0100
++++ ffmpeg/libavcodec/eval.c	2005-02-18 21:12:57.000000000 +0100
 @@ -34,6 +34,8 @@
  #include <string.h>
  #include <math.h>
@@ -31,9 +50,9 @@ diff -ru ffmpeg.orig/libavcodec/eval.c ffmpeg/libavcodec/eval.c
  #ifndef NAN
    #define NAN 0
  #endif
-diff -ru ffmpeg.orig/libavformat/tcp.c ffmpeg/libavformat/tcp.c
---- ffmpeg.orig/libavformat/tcp.c	Thu Aug 12 02:09:32 2004
-+++ ffmpeg/libavformat/tcp.c	Sun Nov 28 20:29:15 2004
+diff -ru ffmpeg-orig/libavformat/tcp.c ffmpeg/libavformat/tcp.c
+--- ffmpeg-orig/libavformat/tcp.c	2004-08-12 02:09:32.000000000 +0200
++++ ffmpeg/libavformat/tcp.c	2005-02-18 21:12:57.000000000 +0100
 @@ -32,6 +32,7 @@
  #include <netdb.h>
  #include <sys/time.h>
