@@ -2,7 +2,7 @@
  * vout_events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: vout_events.c,v 1.14 2002/04/23 22:07:05 gbazin Exp $
+ * $Id: vout_events.c,v 1.15 2002/04/24 23:49:32 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -126,7 +126,6 @@ void DirectXEventThread( vout_thread_t *p_vout )
             break;
 
         case WM_LBUTTONDOWN:
-            p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
             break;
 
         case WM_LBUTTONDBLCLK:
