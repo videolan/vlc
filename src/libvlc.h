@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.121 2003/12/12 23:03:35 yoann Exp $
+ * $Id: libvlc.h,v 1.122 2003/12/15 01:11:44 yoann Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -845,7 +845,7 @@ vlc_module_begin();
     add_key( "key-jump+1min", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_RIGHT, NULL, JF1MIN_KEY_TEXT, JF1MIN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump-5min", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_LEFT, NULL, JB5MIN_KEY_TEXT, JB5MIN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-jump+5min", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|KEY_MODIFIER_ALT|KEY_RIGHT, NULL, JF5MIN_KEY_TEXT, JF5MIN_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "key-nav-activate", KEY_ENTER, NULL, NAV_ACTIVATE_KEY_TEXT, NAV_ACTIVATE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-activate", KEY_ENTER, NULL, NAV_A3TIVATE_KEY_TEXT, NAV_ACTIVATE_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-nav-up", KEY_UP, NULL, NAV_UP_KEY_TEXT, NAV_UP_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-nav-down", KEY_DOWN, NULL, NAV_DOWN_KEY_TEXT, NAV_DOWN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-nav-left", KEY_LEFT, NULL, NAV_LEFT_KEY_TEXT, NAV_LEFT_KEY_LONGTEXT, VLC_FALSE );
@@ -855,7 +855,22 @@ vlc_module_begin();
     add_key( "key-vol-down", KEY_MODIFIER_COMMAND|KEY_DOWN, NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-vol-mute", KEY_MODIFIER_COMMAND|KEY_MODIFIER_SHIFT|'m', NULL, VOL_MUTE_KEY_TEXT, VOL_MUTE_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-set-bookmark1", KEY_MODIFIER_COMMAND|KEY_F1, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark2", KEY_MODIFIER_COMMAND|KEY_F2, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark3", KEY_MODIFIER_COMMAND|KEY_F3, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark4", KEY_MODIFIER_COMMAND|KEY_F4, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark5", KEY_MODIFIER_COMMAND|KEY_F5, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark6", KEY_MODIFIER_COMMAND|KEY_F6, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark7", KEY_MODIFIER_COMMAND|KEY_F7, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-set-bookmark8", KEY_MODIFIER_COMMAND|KEY_F8, NULL, SET_BOOKMARK1_KEY_TEXT, SET_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
     add_key( "key-play-bookmark1", KEY_F1, NULL, PLAY_BOOKMARK1_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark2", KEY_F2, NULL, PLAY_BOOKMARK2_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark3", KEY_F3, NULL, PLAY_BOOKMARK3_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark4", KEY_F4, NULL, PLAY_BOOKMARK4_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark5", KEY_F5, NULL, PLAY_BOOKMARK5_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark6", KEY_F6, NULL, PLAY_BOOKMARK6_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark7", KEY_F7, NULL, PLAY_BOOKMARK7_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play-bookmark8", KEY_F8, NULL, PLAY_BOOKMARK8_KEY_TEXT, PLAY_BOOKMARK_KEY_LONGTEXT, VLC_TRUE );
+/* if you want to want to add bookmark9 and 10, you should also modify modules/control/hotkeys.c */
 #else
     add_key( "key-fullscreen", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
     add_key( "key-play-pause", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );

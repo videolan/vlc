@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.13 2003/12/12 23:03:35 yoann Exp $
+ * $Id: hotkeys.c,v 1.14 2003/12/15 01:11:44 yoann Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -100,10 +100,13 @@ vlc_module_begin();
                 BOOKMARK7_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
     add_string( "bookmark8", NULL, NULL,
                 BOOKMARK8_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+/* that is because F9 and F10 are reserved keys for OSX (see src/libvlc.h) */
+#if !defined(SYS_DARWIN)
     add_string( "bookmark9", NULL, NULL,
                 BOOKMARK9_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
     add_string( "bookmark10", NULL, NULL,
                 BOOKMARK10_TEXT, BOOKMARK_LONGTEXT, VLC_FALSE ); 
+#endif
     set_capability( "interface", 0 );
     set_callbacks( Open, Close );
 vlc_module_end();
