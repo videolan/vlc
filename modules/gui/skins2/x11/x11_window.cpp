@@ -37,7 +37,8 @@
 X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                       X11Display &rDisplay, bool dragDrop, bool playOnDrop,
                       X11Window *pParentWindow ):
-    OSWindow( pIntf ), m_rDisplay( rDisplay ), m_dragDrop( dragDrop )
+    OSWindow( pIntf ), m_rDisplay( rDisplay ), m_pParent( pParentWindow ),
+    m_dragDrop( dragDrop )
 {
     Window parent;
     if (pParentWindow)
@@ -108,7 +109,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     XSetTransientForHint( XDISPLAY, m_wnd, m_rDisplay.getMainWindow() );
 
     // XXX Kludge to tell VLC that this window is the vout
-    if (pParentWindow)
+    if( m_pParent )
     {
         vlc_value_t value;
         value.i_int = (int) (ptrdiff_t) (void *) m_wnd;
@@ -119,6 +120,14 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 
 X11Window::~X11Window()
 {
+    // XXX Kludge to tell VLC that this window is no more the vout
+    if( m_pParent )
+    {
+        vlc_value_t value;
+        value.i_int = 0;
+        var_Set( getIntf()->p_vlc, "drawable", value );
+    }
+
     X11Factory *pFactory = (X11Factory*)X11Factory::instance( getIntf() );
     pFactory->m_windowMap[m_wnd] = NULL;
     pFactory->m_dndMap[m_wnd] = NULL;

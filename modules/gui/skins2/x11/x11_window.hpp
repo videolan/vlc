@@ -70,6 +70,8 @@ class X11Window: public OSWindow
         X11Display &m_rDisplay;
         /// Window ID
         Window m_wnd;
+        /// Parent window
+        X11Window *m_pParent;
         /// Indicates whether the window handles drag&drop events
         bool m_dragDrop;
         /// Drop target

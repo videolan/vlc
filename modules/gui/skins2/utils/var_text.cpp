@@ -45,6 +45,7 @@ VarText::~VarText()
     VlcProc *pVlcProc = VlcProc::instance( getIntf() );
     pVlcProc->getTimeVar().delObserver( this );
     pVlcProc->getVolumeVar().delObserver( this );
+    pVlcProc->getStreamVar().delObserver( this );
     VarManager *pVarManager = VarManager::instance( getIntf() );
     pVarManager->getHelpText().delObserver( this );
 }
