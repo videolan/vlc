@@ -798,7 +798,7 @@ public:
 
 private:
     /* Event handlers (these functions should _not_ be virtual) */
-    void OnClose( wxCommandEvent& event );
+    void OnClose( wxEvent& event );
     void OnClear( wxCommandEvent& event );
     void OnSaveLog( wxCommandEvent& event );
 

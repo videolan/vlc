@@ -193,7 +193,7 @@ void Messages::UpdateLog()
 /*****************************************************************************
  * Private methods.
  *****************************************************************************/
-void Messages::OnClose( wxCommandEvent& WXUNUSED(event) )
+void Messages::OnClose( wxEvent& WXUNUSED(event) )
 {
     Hide();
 }
