@@ -50,7 +50,7 @@ $(BUILTIN_MOTION3DNOW): BUILTIN_MOTION3DNOW_%.o: %.c
 
 $(BUILTIN_MOTIONALTIVEC): BUILTIN_MOTIONALTIVEC_%.o: .dep/%.d
 $(BUILTIN_MOTIONALTIVEC): BUILTIN_MOTIONALTIVEC_%.o: %.c
-	$(CC) $(CFLAGS) -DBUILTIN -DMODULE_NAME=motionaltivec -c -o $@ $<
+	$(CC) $(CFLAGS) -DBUILTIN -DMODULE_NAME=motionaltivec -faltivec -c -o $@ $<
 
 #
 # Real targets
@@ -87,7 +87,7 @@ $(BUILTIN_MOTIONALTIVEC): BUILTIN_MOTIONALTIVEC_%.o: %.c
 ../motion3dnow.so: $(PLUGIN_MOTION3DNOW)
 	$(CC) $(PCFLAGS) -o $@ $^ $(PLCFLAGS) 
 
-../motionm3dnow.a: $(BUILTIN_MOTION3DNOW)
+../motion3dnow.a: $(BUILTIN_MOTION3DNOW)
 	ar r $@ $^
 	$(RANLIB) $@
 

@@ -218,6 +218,7 @@ MMX_MODULES="yuvmmx idctmmx motionmmx"
 MMXEXT_MODULES="idctmmxext motionmmxext"
 THREEDNOW_MODULES="imdct3dn downmix3dn"
 SSE_MODULES="imdctsse downmixsse"
+ALTIVEC_MODULES="idctaltivec motionaltivec"
 
 AC_MSG_CHECKING([if \$CC groks MMX inline assembly])
 AC_TRY_COMPILE([void quux(){void *p;asm("packuswb %%mm1,%%mm2"::"r"(p));}],,

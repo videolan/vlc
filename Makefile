@@ -18,7 +18,7 @@ PLUGINS_DIR :=	alsa beos darwin directx dsp dummy dvd esd fb ggi glide gtk downm
 #
 # All possible plugin objects
 #
-PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx dsp/dsp dummy/dummy dummy/null dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gtk/gnome gtk/gtk downmix/downmix downmix/downmixsse downmix/downmix3dn idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext imdct/imdct imdct/imdct3dn imdct/imdctsse kde/kde macosx/macosx mga/mga motion/motion motion/motionmmx motion/motionmmxext mpeg/es mpeg/ps mpeg/ts qt/qt sdl/sdl text/ncurses text/rc x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
+PLUGINS_TARGETS := alsa/alsa beos/beos darwin/darwin directx/directx dsp/dsp dummy/dummy dummy/null dvd/dvd esd/esd fb/fb ggi/ggi glide/glide gtk/gnome gtk/gtk downmix/downmix downmix/downmixsse downmix/downmix3dn idct/idct idct/idctclassic idct/idctmmx idct/idctmmxext idct/idctaltivec imdct/imdct imdct/imdct3dn imdct/imdctsse kde/kde macosx/macosx mga/mga motion/motion motion/motionmmx motion/motionmmxext motion/motion3dnow motion/motionaltivec mpeg/es mpeg/ps mpeg/ts qt/qt sdl/sdl text/ncurses text/rc x11/x11 x11/xvideo yuv/yuv yuv/yuvmmx
 
 #
 # C Objects
