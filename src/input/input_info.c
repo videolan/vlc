@@ -2,7 +2,7 @@
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_info.c,v 1.5 2002/08/18 13:16:51 sigmunau Exp $
+ * $Id: input_info.c,v 1.6 2002/10/10 22:46:20 massiot Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -103,7 +103,7 @@ int input_AddInfo( input_info_category_t * p_category, char * psz_name,
     /*
      * Convert message to string
      */
-#ifdef HAVE_VASPRINTF
+#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN)
     vasprintf( &psz_str, psz_format, args );
 #else
     psz_str = (char*) malloc( strlen(psz_format) + INTF_MAX_MSG_SIZE );
