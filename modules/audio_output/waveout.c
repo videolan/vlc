@@ -2,9 +2,9 @@
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: waveout.c,v 1.28 2004/01/25 17:58:29 murray Exp $
+ * $Id$
  *
- * Authors: Gildas Bazin <gbazin@netcourrier.com>
+ * Authors: Gildas Bazin <gbazin@videolan.org>
  *      
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,10 +92,9 @@ typedef struct {
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
 #endif
 
-#include <initguid.h>
-DEFINE_GUID( __KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
-DEFINE_GUID( __KSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
-DEFINE_GUID( __KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
+static const GUID __KSDATAFORMAT_SUBTYPE_IEEE_FLOAT = {WAVE_FORMAT_IEEE_FLOAT, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+static const GUID __KSDATAFORMAT_SUBTYPE_PCM = {WAVE_FORMAT_PCM, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
+static const GUID __KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF = {WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
 /*****************************************************************************
  * Local prototypes
@@ -131,9 +130,15 @@ static void InterleaveS16( int16_t *, int *, int );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+#define FLOAT_TEXT N_("Use float32 output")
+#define FLOAT_LONGTEXT N_( \
+    "The option allows you to enable or disable the high-quality float32 " \
+    "audio output mode (which is not well supported by some soundcards)." )
+
 vlc_module_begin();
     set_description( _("Win32 waveOut extension output") );
     set_capability( "audio output", 50 );
+    add_bool( "waveout-float32", 1, NULL, FLOAT_TEXT, FLOAT_LONGTEXT, VLC_TRUE );
     set_callbacks( Open, Close );
 vlc_module_end();
 
@@ -210,6 +215,8 @@ static int Open( vlc_object_t *p_this )
         free( p_aout->output.p_sys );
         return VLC_EGENERIC;
     }
+
+    var_Create( p_aout, "waveout-float32", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
     /* Open the device */
     if( val.i_int == AOUT_VAR_SPDIF )
@@ -597,8 +604,12 @@ static int OpenWaveOutPCM( aout_instance_t *p_aout, int *i_format,
                            int i_channels, int i_nb_channels, int i_rate,
                            vlc_bool_t b_probe )
 {
-    if( OpenWaveOut( p_aout, VLC_FOURCC('f','l','3','2'),
-                     i_channels, i_nb_channels, i_rate, b_probe )
+    vlc_value_t val;
+
+    var_Get( p_aout, "waveout-float32", &val );
+
+    if( !val.b_bool || OpenWaveOut( p_aout, VLC_FOURCC('f','l','3','2'),
+                                   i_channels, i_nb_channels, i_rate, b_probe )
         != VLC_SUCCESS )
     {
         if ( OpenWaveOut( p_aout, VLC_FOURCC('s','1','6','l'),
