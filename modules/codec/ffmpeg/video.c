@@ -231,7 +231,9 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 
     var_Create( p_dec, "ffmpeg-vismv", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_dec, "ffmpeg-vismv", &val );
+#if LIBAVCODEC_BUILD >= 4698
     if( val.i_int ) p_sys->p_context->debug_mv = val.i_int;
+#endif
 
     /* ***** ffmpeg frame skipping ***** */
     var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -249,7 +251,11 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
         /* H264 uses too many reference frames */
         p_sys->i_codec_id != CODEC_ID_H264 &&
         !(p_sys->p_context->width % 16) && !(p_sys->p_context->height % 16) &&
+#if LIBAVCODEC_BUILD >= 4698
         !p_sys->p_context->debug_mv )
+#else
+        1 )
+#endif
     {
         /* Some codecs set pix_fmt only after the 1st frame has been decoded,
          * so we need to do another check in ffmpeg_GetFrameBuf() */
