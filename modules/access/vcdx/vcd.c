@@ -3,8 +3,8 @@
  *         using libcdio, libvcd and libvcdinfo. vlc-specific things tend
  *         to go here.
  *****************************************************************************
- * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.4 2003/11/09 17:45:41 rocky Exp $
+ * Copyright (C) 2000,2003 VideoLAN
+ * $Id: vcd.c,v 1.5 2003/11/20 02:15:37 rocky Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Rocky Bernstein <rocky@panix.com> 
@@ -229,7 +229,7 @@ VCDOpen( vlc_object_t *p_this )
     thread_vcd_data_t *     p_vcd;
     char *                  psz_source;
     vcdinfo_itemid_t        itemid;
-    bool                    play_ok;
+    bool                    b_play_ok;
     
     p_input->pf_read        = VCDRead;
     p_input->pf_seek        = VCDSeek;
@@ -326,11 +326,11 @@ VCDOpen( vlc_object_t *p_this )
         msg_Warn( p_input, "could not read entry LIDs" );
     }
 
-    play_ok = (VLC_SUCCESS == VCDPlay( p_input, itemid ));
+    b_play_ok = (VLC_SUCCESS == VCDPlay( p_input, itemid ));
     
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    if ( ! play_ok ) {
+    if ( ! b_play_ok ) {
       vcdinfo_close( p_vcd->vcd );
       free( p_vcd );
       return VLC_EGENERIC;
@@ -367,21 +367,18 @@ VCDClose( vlc_object_t *p_this )
     free( p_vcd->p_entries );
     free( p_vcd->p_segments );
 
-
-    /* The following if block get moved elsewhere... */
+    /* For reasons that are a mystery to me we don't have to deal with
+       stopping, and destroying the p_vcd->p_intf thread. And if we do
+       it causes problems upstream.
+     */
     if( p_vcd->p_intf != NULL )
     {
-        intf_StopThread( p_vcd->p_intf );
-        vlc_object_detach( p_vcd->p_intf );
-        vlc_object_release( p_vcd->p_intf );
-        intf_Destroy( p_vcd->p_intf );
 	p_vcd->p_intf = NULL;
     }
 
     free( p_vcd );
+    p_input->p_access_data = NULL;
     p_vcd_input = NULL;
-
-
 }
 
 /*****************************************************************************
@@ -427,14 +424,32 @@ VCDRead( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
         case READ_ERROR:
           /* Some sort of error. */
           return i_read;
+
         case READ_STILL_FRAME: 
           {
+	    /* Reached the end of a still frame. */
+
             byte_t * p_buf = p_buffer;
+	    pgrm_descriptor_t * p_pgrm = p_input->stream.p_selected_program;;
+
             p_buf += (i_index*M2F2_SECTOR_SIZE);
             memset(p_buf, 0, M2F2_SECTOR_SIZE);
             p_buf += 2;
             *p_buf = 0x01;
             dbg_print(INPUT_DBG_STILL, "Handled still event\n");
+
+	    /* p_vcd->p_intf->b_end_of_cell = true; */
+	    input_SetStatus( p_input, INPUT_STATUS_PAUSE );
+
+	    vlc_mutex_lock( &p_input->stream.stream_lock );
+
+	    p_pgrm = p_input->stream.p_selected_program;
+	    p_pgrm->i_synchro_state = SYNCHRO_REINIT;
+
+	    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+	    input_ClockManageControl( p_input, p_pgrm, 0 );
+
             return i_read + M2F2_SECTOR_SIZE;
           }
         default:
