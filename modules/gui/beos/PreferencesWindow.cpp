@@ -2,7 +2,7 @@
  * PreferencesWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PreferencesWindow.cpp,v 1.4 2003/01/08 02:32:50 titer Exp $
+ * $Id: PreferencesWindow.cpp,v 1.5 2003/01/11 20:42:47 titer Exp $
  *
  * Authors: Eric Petit <titer@videolan.org>
  *
@@ -93,25 +93,25 @@ PreferencesWindow::PreferencesWindow( BRect frame, const char* name,
                                        new BMessage( SLIDER_UPDATE ),
                                        0, 200, B_TRIANGLE_THUMB,
                                        B_FOLLOW_LEFT, B_WILL_DRAW );
-    fBrightnessSlider->SetValue( 100 * config_GetFloat( p_intf, "Brightness" ) );
+    fBrightnessSlider->SetValue( 100 * config_GetFloat( p_intf, "brightness" ) );
     rect.OffsetBy( 0, 40 );
     fContrastSlider = new BSlider( rect, "contrast", "Contrast",
                                      new BMessage( SLIDER_UPDATE ),
                                      0, 200, B_TRIANGLE_THUMB,
                                      B_FOLLOW_LEFT, B_WILL_DRAW );
-    fContrastSlider->SetValue( 100 * config_GetFloat( p_intf, "Contrast" ) );
+    fContrastSlider->SetValue( 100 * config_GetFloat( p_intf, "contrast" ) );
     rect.OffsetBy( 0, 40 );
     fHueSlider = new BSlider( rect, "hue", "Hue",
                                 new BMessage( SLIDER_UPDATE ),
                                 0, 360, B_TRIANGLE_THUMB,
                                 B_FOLLOW_LEFT, B_WILL_DRAW );
-    fHueSlider->SetValue( config_GetInt( p_intf, "Hue" ) );
+    fHueSlider->SetValue( config_GetInt( p_intf, "hue" ) );
     rect.OffsetBy( 0, 40 );
     fSaturationSlider = new BSlider( rect, "saturation", "Saturation",
                                        new BMessage( SLIDER_UPDATE ),
                                        0, 200, B_TRIANGLE_THUMB,
                                        B_FOLLOW_LEFT, B_WILL_DRAW );
-    fSaturationSlider->SetValue( 100 * config_GetFloat( p_intf, "Saturation" ) );
+    fSaturationSlider->SetValue( 100 * config_GetFloat( p_intf, "saturation" ) );
     fAdjustView->AddChild( fBrightnessSlider );
     fAdjustView->AddChild( fContrastSlider );
     fAdjustView->AddChild( fHueSlider );
@@ -211,18 +211,18 @@ void PreferencesWindow::SetDefaults()
 void PreferencesWindow::ApplyChanges()
 {
     config_PutInt( p_intf, "ffmpeg-pp-q", fPpSlider->Value() );
-    config_PutFloat( p_intf, "Brightness",
+    config_PutFloat( p_intf, "brightness",
                      (float)fBrightnessSlider->Value() / 100 );
-    config_PutFloat( p_intf, "Contrast",
+    config_PutFloat( p_intf, "contrast",
                      (float)fContrastSlider->Value() / 100 );
-    config_PutInt( p_intf, "Hue", fHueSlider->Value() );
-    config_PutFloat( p_intf, "Saturation",
+    config_PutInt( p_intf, "hue", fHueSlider->Value() );
+    config_PutFloat( p_intf, "saturation",
                      (float)fSaturationSlider->Value() / 100 );
 
-    if( config_GetFloat( p_intf, "Brightness" ) != 1 ||
-        config_GetFloat( p_intf, "Contrast" ) != 1 ||
-        config_GetInt( p_intf, "Hue" ) != 0 ||
-        config_GetFloat( p_intf, "Saturation" ) != 1 )
+    if( config_GetFloat( p_intf, "brightness" ) != 1 ||
+        config_GetFloat( p_intf, "contrast" ) != 1 ||
+        config_GetInt( p_intf, "hue" ) != 0 ||
+        config_GetFloat( p_intf, "saturation" ) != 1 )
     {
         config_PutPsz( p_intf, "filter", "adjust" );
     }
