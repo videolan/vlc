@@ -219,14 +219,9 @@ static int InitThread( mad_adec_thread_t * p_mad_adec )
 static void EndThread (mad_adec_thread_t * p_mad_adec)
 {
     /* If the audio output fifo was created, we destroy it */
-    if (p_mad_adec->p_aout_fifo != NULL)
+    if (p_mad_adec->p_aout_input != NULL)
     {
         aout_InputDelete( p_mad_adec->p_aout, p_mad_adec->p_aout_input );
-
-        /* Make sure the output thread leaves the NextFrame() function */
-        vlc_mutex_lock (&(p_mad_adec->p_aout_fifo->data_lock));
-        vlc_cond_signal (&(p_mad_adec->p_aout_fifo->data_wait));
-        vlc_mutex_unlock (&(p_mad_adec->p_aout_fifo->data_lock));
     }
 
     /* mad_decoder_finish releases the memory allocated inside the struct */

@@ -401,7 +401,7 @@ enum mad_flow libmad_output3(void *data, struct mad_header const *p_libmad_heade
      * is right for the entire audio track.
      */
     if( (p_mad_adec->p_aout_input != NULL) &&
-        ( (p_mad_adec->output_format.i_rate != p_libmad_pcm->samplerate)
+        (p_mad_adec->output_format.i_rate != p_libmad_pcm->samplerate) )
     {
         /* Parameters changed - this should not happen. */
         aout_InputDelete( p_mad_adec->p_aout, p_mad_adec->p_aout_input );
@@ -422,24 +422,27 @@ enum mad_flow libmad_output3(void *data, struct mad_header const *p_libmad_heade
            p_mad_adec->p_fifo->b_error = 1;
            return MAD_FLOW_BREAK;
         }
-        msg_Dbg( p_mad_adec->p_fifo, "aout3 buffer created");
+        msg_Dbg( p_mad_adec->p_fifo, "aout3 input created");
     }
 
-    if (p_mad_adec->output_format->i_rate != p_libmad_pcm->samplerate)
+    if (p_mad_adec->output_format.i_rate != p_libmad_pcm->samplerate)
     {
         msg_Warn( p_mad_adec->p_fifo, "samplerate is changing from [%d] Hz "
                   "to [%d] Hz, sample size [%d], error_code [%0x]",
-                  p_mad_adec->p_aout_fifo->i_rate, p_libmad_pcm->samplerate,
+                  p_mad_adec->output_format.i_rate, p_libmad_pcm->samplerate,
                   p_libmad_pcm->length,
                   p_mad_adec->libmad_decoder->sync->stream.error );
         p_mad_adec->output_format.i_rate = p_libmad_pcm->samplerate;
     }
 
     /* Set the Presentation Time Stamp */
-    p_buffer = aout_BufferNew( p_mad_adec->p_aout, p_mad_adec->p_aout_input,
-                               (p_libmad_pcm->length*4) );
+    p_buffer = aout_BufferNew( p_mad_adec->p_aout,
+                               p_mad_adec->p_aout_input,
+                               (p_libmad_pcm->length*2) );
+
     if ( p_buffer == NULL )
     {
+        msg_Dbg( p_mad_adec->p_fifo, "allocating new buffer failed");
         return MAD_FLOW_BREAK;
     }
     /* Add accurate PTS to buffer. */
@@ -451,9 +454,9 @@ enum mad_flow libmad_output3(void *data, struct mad_header const *p_libmad_heade
     {
         p_buffer->start_date = LAST_MDATE;
     }
-    p_mad_adec->last_date += (mtime_t)(p_libmad_pcm->length*4)
+    p_mad_adec->last_date += (mtime_t)(p_libmad_pcm->length*2)
                              / p_mad_adec->output_format.i_rate;
-    p_buffer->end_date = p_mad_adec->last_date;
+    p_buffer->end_date = p_mad_adec->i_next_pts; // last_date;
 
     /* Interleave and keep buffers in mad_fixed_t format */
     while (nsamples--)
@@ -461,11 +464,11 @@ enum mad_flow libmad_output3(void *data, struct mad_header const *p_libmad_heade
         /* left audio channel */
         sample = *left_ch++;
 #ifndef WORDS_BIGENDIAN
-        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 0);
-        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 8);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
 #else
-        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 8);
-        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 0);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
 #endif
         /* right audio channel */
         if (p_libmad_pcm->channels == 2)
@@ -473,11 +476,11 @@ enum mad_flow libmad_output3(void *data, struct mad_header const *p_libmad_heade
            sample = *right_ch++;
         } /* else reuse left audio channel */
 #ifndef WORDS_BIGENDIAN
-        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 0);
-        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 8);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
 #else
-        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 8);
-        p_buffer->p_buffer++ = (mad_fixed_t) (sample >> 0);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 8);
+        *(p_buffer->p_buffer)++ = (byte_t) (sample >> 0);
 #endif
     }
 
