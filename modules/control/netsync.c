@@ -60,7 +60,6 @@
 #endif
 
 #include "network.h"
-#include "input_ext-plugins.h"
 
 #define NETSYNC_PORT_MASTER 9875
 #define NETSYNC_PORT_SLAVE  9876

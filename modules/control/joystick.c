@@ -43,8 +43,6 @@
 #include <linux/joystick.h>
 
 #include "audio_output.h"
-#include "stream_control.h"
-#include "input_ext-intf.h"
 
 /* Default values for parameters */
 #define DEFAULT_MAX_SEEK        10 /* seconds */

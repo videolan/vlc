@@ -2,7 +2,7 @@
  * gestures.c: control vlc with mouse gestures
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: gestures.c,v 1.7 2004/01/25 16:17:03 anil Exp $
+ * $Id$
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -31,9 +31,6 @@
 #include <vlc/vlc.h>
 #include <vlc/intf.h>
 #include <vlc/vout.h>
-
-#include "stream_control.h"
-#include "input_ext-intf.h"
 
 /*****************************************************************************
  * intf_sys_t: description and status of interface

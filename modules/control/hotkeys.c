@@ -361,7 +361,11 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( p_input )
         {
-            vlc_bool_t b_seekable = p_input->stream.b_seekable;
+            /* FIXME --fenrir
+             * How to get a valid value ?
+             * That's not that easy with some special stream
+             */
+            vlc_bool_t b_seekable = VLC_TRUE;
 
             if( i_action == ACTIONID_PAUSE )
             {

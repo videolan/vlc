@@ -873,10 +873,10 @@ static mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
         return s;
     }
 
-    vlc_mutex_lock( &p_input->p_item->lock );
-    for ( i = 0; i < p_input->p_item->i_categories; i++ )
+    vlc_mutex_lock( &p_input->input.p_item->lock );
+    for ( i = 0; i < p_input->input.p_item->i_categories; i++ )
     {
-        info_category_t *p_category = p_input->p_item->pp_categories[i];
+        info_category_t *p_category = p_input->input.p_item->pp_categories[i];
         mvar_t *cat  = mvar_New( name, "set" );
         mvar_t *iset = mvar_New( "info", "set" );
 
@@ -896,7 +896,7 @@ static mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
         }
         mvar_AppendVar( s, cat );
     }
-    vlc_mutex_unlock( &p_input->p_item->lock );
+    vlc_mutex_unlock( &p_input->input.p_item->lock );
 
     return s;
 }

@@ -132,10 +132,8 @@ static void Run( intf_thread_t *p_intf )
     vlc_bool_t b_showpos = config_GetInt( p_intf, "rc-show-pos" );
 
     int        i_dummy;
-    off_t      i_oldpos = 0;
-    off_t      i_newpos;
-
-    double     f_ratio = 1.0;
+    int        i_oldpos = 0;
+    int        i_newpos;
 
 #ifdef WIN32
     HANDLE hConsoleIn;
@@ -324,23 +322,12 @@ static void Run( intf_thread_t *p_intf )
 
         if( p_input && b_showpos )
         {
-            /* Get position */
-            vlc_mutex_lock( &p_input->stream.stream_lock );
-            if( !p_input->b_die && p_input->stream.i_mux_rate )
+            i_newpos = 100 * var_GetFloat( p_input, "position" );
+            if( i_oldpos != i_newpos )
             {
-#define A p_input->stream.p_selected_area
-                f_ratio = 1.0 / ( 50 * p_input->stream.i_mux_rate );
-                i_newpos = A->i_tell * f_ratio;
-
-                if( i_oldpos != i_newpos )
-                {
-                    i_oldpos = i_newpos;
-                    printf( "pos: %li s / %li s\n", (long int)i_newpos,
-                            (long int)(f_ratio * A->i_size) );
-                }
-#undef S
+                i_oldpos = i_newpos;
+                printf( "pos: %d%%\n", i_newpos );
             }
-            vlc_mutex_unlock( &p_input->stream.stream_lock );
         }
 
         /* Is there something to do? */
@@ -400,11 +387,11 @@ static void Run( intf_thread_t *p_intf )
                 if ( p_input )
                 {
                     int i, j;
-                    vlc_mutex_lock( &p_input->p_item->lock );
-                    for ( i = 0; i < p_input->p_item->i_categories; i++ )
+                    vlc_mutex_lock( &p_input->input.p_item->lock );
+                    for ( i = 0; i < p_input->input.p_item->i_categories; i++ )
                     {
                         info_category_t *p_category =
-                            p_input->p_item->pp_categories[i];
+                            p_input->input.p_item->pp_categories[i];
 
                         printf( "+----[ %s ]\n", p_category->psz_name );
                         printf( "| \n" );
@@ -417,7 +404,7 @@ static void Run( intf_thread_t *p_intf )
                         printf( "| \n" );
                     }
                     printf( _("+----[ end of stream info ]\n") );
-                    vlc_mutex_unlock( &p_input->p_item->lock );
+                    vlc_mutex_unlock( &p_input->input.p_item->lock );
                 }
                 else
                 {
