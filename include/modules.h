@@ -2,7 +2,7 @@
  * modules.h : Module management functions.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: modules.h,v 1.64 2003/10/04 11:17:04 sam Exp $
+ * $Id: modules.h,v 1.65 2003/10/04 12:25:00 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -31,6 +31,9 @@
 
 /* The module handle type. */
 #if defined(HAVE_DL_DYLD)
+#   if defined (HAVE_MACH_O_DYLD_H)
+#       include <mach-o/dyld.h>
+#   endif
 typedef NSModule module_handle_t;
 #elif defined(HAVE_IMAGE_H)
 typedef int module_handle_t;
