@@ -71,7 +71,7 @@
 /* called from outside */
 static int  VCDInit         ( struct input_thread_s * );
 static void VCDEnd          ( struct input_thread_s * );
-static int  PSDemux        ( struct input_thread_s * );
+static int  VCDDemux        ( struct input_thread_s * );
 static int  VCDRewind       ( struct input_thread_s * );
 
 static int  VCDOpen         ( struct input_thread_s *);
@@ -81,7 +81,6 @@ static void VCDSeek         ( struct input_thread_s *, off_t );
 static int  VCDSetArea      ( struct input_thread_s *, struct input_area_s * );
 static int  VCDSetProgram   ( struct input_thread_s *, pgrm_descriptor_t * );
 
-static ssize_t PSRead       ( struct input_thread_s *, data_packet_t ** );
 /*****************************************************************************
  * Functions exported as capabilities. They are declared as static so that
  * we don't pollute the namespace too much.
@@ -104,7 +103,7 @@ void _M( demux_getfunctions )( function_list_t * p_function_list )
 #define demux p_function_list->functions.demux
     demux.pf_init             = VCDInit;
     demux.pf_end              = VCDEnd;
-    demux.pf_demux            = PSDemux;
+    demux.pf_demux            = VCDDemux;
     demux.pf_rewind           = VCDRewind;
 #undef demux
 }
@@ -122,11 +121,11 @@ static int VCDOpen( struct input_thread_s *p_input )
     char *                  psz_parser;
     char *                  psz_source;
     char *                  psz_next;
-    thread_vcd_data_t *  p_vcd;
-    int                  i;
-    input_area_t *       p_area;
-    int                  i_title = 1;
-    int                  i_chapter = 1;
+    thread_vcd_data_t *     p_vcd;
+    int                     i;
+    input_area_t *          p_area;
+    int                     i_title = 1;
+    int                     i_chapter = 1;
 
     p_vcd = malloc( sizeof(thread_vcd_data_t) );
 
@@ -219,7 +218,6 @@ static int VCDOpen( struct input_thread_s *p_input )
                                          psz_source );
     if ( p_vcd->p_sectors == NULL )
     {
-        input_BuffersEnd( p_input->p_method_data );
         free( p_vcd );
         return -1;
     }
@@ -314,8 +312,19 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
         p_vcd->i_sector ++;
         if ( p_vcd->i_sector == p_vcd->p_sectors[p_vcd->i_track + 1] )
         {
-            /* FIXME we should go to next track */
-            return 0;
+            input_area_t *p_area;
+            
+            if ( p_vcd->i_track >= p_vcd->nb_tracks - 1 )
+                return 0; /* EOF */
+            
+            p_area = p_input->stream.pp_areas[
+                    p_input->stream.p_selected_area->i_id + 1 ];
+            
+            intf_WarnMsg( 4, "input: vcd info: new title" );
+            
+            p_area->i_part = 1;
+            VCDSetArea( p_input, p_area );
+    
         }
         i_read += VCD_DATA_SIZE;
     }
@@ -477,12 +486,12 @@ static void VCDEnd( input_thread_t * p_input )
 
 
 /*****************************************************************************
- * PSDemux: reads and demuxes data packets
+ * VCDDemux: reads and demuxes data packets
  *****************************************************************************
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * packets.
  *****************************************************************************/
-static int PSDemux( input_thread_t * p_input )
+static int VCDDemux( input_thread_t * p_input )
 {
     int                 i;
 
