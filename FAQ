@@ -1,5 +1,5 @@
 Frequentely Asked Questions for VideoLAN Client
-$Id: FAQ,v 1.5 2002/04/02 10:17:08 sam Exp $
+$Id: FAQ,v 1.6 2002/05/02 23:06:27 massiot Exp $
 
 1. Using VLC
 
@@ -14,6 +14,11 @@ interface :
 ----------------------------------
 It's exactly the same as for a normal DVD. You will need write access to
 /dev/dvd, because of the key negociation process.
+
+If you compiled your VLC by hand, please bear in mind that you also need
+to install libdvdcss. It can be downloaded from the VideoLAN website. It
+used to be distributed in the same package as VLC, but now you must install
+them seperately.
 
 1.3 How do I switch to full screen display ?
 ------------------------------------------
