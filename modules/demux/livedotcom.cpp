@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.5 2003/11/07 22:56:02 gbazin Exp $
+ * $Id: livedotcom.cpp,v 1.6 2003/11/08 06:47:34 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -76,10 +76,10 @@ vlc_module_end();
 
 /* TODO:
  *  - Support PS/TS (need to rework the TS/PS demuxer a lot).
- *  - Support X-QT/X-QUICKTIME generic codec.
- *  - Handle PTS (for now I just use mdate())
+ *  - Support X-QT/X-QUICKTIME generic codec for audio.
  *
- *  - Check memory leak, delete/free.
+ *  - Check memory leak, delete/free -> still one when using rtsp-tcp but I'm
+ *  not sure if it comes from me.
  *
  */
 
@@ -98,9 +98,12 @@ typedef struct
 {
     input_thread_t *p_input;
 
+    vlc_bool_t   b_quicktime;
+
     es_format_t  fmt;
     es_out_id_t  *p_es;
 
+    RTPSource    *rtpSource;
     FramedSource *readSource;
 
     uint8_t      buffer[65536];
@@ -123,6 +126,9 @@ struct demux_sys_t
     live_track_t     **track;   /* XXX mallocated */
     mtime_t          i_pcr;
     mtime_t          i_pcr_start;
+
+    mtime_t          i_length;
+    mtime_t          i_start;
 
     char             event;
 };
@@ -306,6 +312,8 @@ static int  DemuxOpen ( vlc_object_t *p_this )
     p_sys->track   = NULL;
     p_sys->i_pcr   = 0;
     p_sys->i_pcr_start = 0;
+    p_sys->i_length = 0;
+    p_sys->i_start = 0;
 
     /* Gather the complete sdp file */
     i_sdp = 0;
@@ -401,7 +409,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         {
             int fd = sub->rtpSource()->RTPgs()->socketNum();
 
-            msg_Warn( p_input, "RTP subsession '%s/%s'", sub->mediumName(), sub->codecName() );
+            msg_Dbg( p_input, "RTP subsession '%s/%s'", sub->mediumName(), sub->codecName() );
 
             /* Increase the buffer size */
             increaseReceiveBufferTo( *p_sys->env, fd, i_buffer );
@@ -438,6 +446,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         tk->p_input = p_input;
         tk->waiting = 0;
         tk->i_pts   = 0;
+        tk->b_quicktime = VLC_FALSE;
 
         /* Value taken from mplayer */
         if( !strcmp( sub->mediumName(), "audio" ) )
@@ -527,7 +536,7 @@ static int  DemuxOpen ( vlc_object_t *p_this )
             }
             else if( !strcmp( sub->codecName(), "JPEG" ) )
             {
-                tk->fmt.i_codec = VLC_FOURCC( 'J', 'P', 'E', 'G' );
+                tk->fmt.i_codec = VLC_FOURCC( 'M', 'J', 'P', 'G' );
             }
             else if( !strcmp( sub->codecName(), "MP4V-ES" ) )
             {
@@ -545,17 +554,26 @@ static int  DemuxOpen ( vlc_object_t *p_this )
                     delete[] p_extra;
                 }
             }
+            else if( !strcmp( sub->codecName(), "X-QT" ) || !strcmp( sub->codecName(), "X-QUICKTIME" ) )
+            {
+                tk->b_quicktime = VLC_TRUE;
+            }
         }
 
         if( tk->fmt.i_codec != VLC_FOURCC( 'u', 'n', 'd', 'f' ) )
         {
             tk->p_es = es_out_Add( p_input->p_es_out, &tk->fmt );
         }
+        else
+        {
+            tk->p_es = NULL;
+        }
 
-        if( tk->p_es )
+        if( tk->p_es || tk->b_quicktime )
         {
             TAB_APPEND( p_sys->i_track, (void**)p_sys->track, (void*)tk );
             tk->readSource = sub->readSource();
+            tk->rtpSource  = sub->rtpSource();
         }
         else
         {
@@ -563,8 +581,23 @@ static int  DemuxOpen ( vlc_object_t *p_this )
         }
     }
 
-
     delete iter;
+
+    p_sys->i_length = (mtime_t)(p_sys->ms->playEndTime() * 1000000.0);
+    if( p_sys->i_length < 0 )
+    {
+        p_sys->i_length = 0;
+    }
+    else if( p_sys->i_length > 0 )
+    {
+        p_input->stream.p_selected_area->i_size = 1000; /* needed for now */
+    }
+
+    if( p_sys->i_track <= 0 )
+    {
+        msg_Err( p_input, "No codec supported, aborting" );
+        goto error;
+    }
 
     return VLC_SUCCESS;
 
@@ -670,7 +703,7 @@ static int  Demux   ( input_thread_t *p_input )
             i_pcr = tk->i_pts ;
         }
     }
-    if( i_pcr != p_sys->i_pcr )
+    if( i_pcr != p_sys->i_pcr && i_pcr > 0 )
     {
         input_ClockManageRef( p_input,
                               p_input->stream.p_selected_program,
@@ -712,13 +745,62 @@ static int    Control( input_thread_t *p_input, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_input->p_demux_data;
     int64_t *pi64;
+    double  *pf, f;
 
     switch( i_query )
     {
         case DEMUX_GET_TIME:
             pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = p_sys->i_pcr - p_sys->i_pcr_start;
+            *pi64 = p_sys->i_pcr - p_sys->i_pcr_start + p_sys->i_start;
             return VLC_SUCCESS;
+
+        case DEMUX_GET_LENGTH:
+            pi64 = (int64_t*)va_arg( args, int64_t * );
+            *pi64 = p_sys->i_length;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_POSITION:
+            pf = (double*)va_arg( args, double* );
+            if( p_sys->i_length > 0 )
+            {
+                *pf = (double)( p_sys->i_pcr - p_sys->i_pcr_start + p_sys->i_start)/
+                      (double)(p_sys->i_length);
+            }
+            else
+            {
+                *pf = 0;
+            }
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_POSITION:
+        {
+            float time;
+
+            f = (double)va_arg( args, double );
+            time = f * (double)p_sys->i_length / 1000000.0;   /* in second */
+
+            if( p_sys->rtsp && p_sys->i_length > 0 )
+            {
+                MediaSubsessionIterator *iter = new MediaSubsessionIterator( *p_sys->ms );
+                MediaSubsession         *sub;
+                int i;
+
+                while( ( sub = iter->next() ) != NULL )
+                {
+                    p_sys->rtsp->playMediaSubsession( *sub, time );
+                }
+                delete iter;
+                p_sys->i_start = (mtime_t)(f * (double)p_sys->i_length);
+                p_sys->i_pcr_start = 0;
+                p_sys->i_pcr       = 0;
+                for( i = 0; i < p_sys->i_track; i++ )
+                {
+                    p_sys->track[i]->i_pts = 0;
+                }
+                return VLC_SUCCESS;
+            }
+            return VLC_EGENERIC;
+        }
 
         default:
             return demux_vaControlDefault( p_input, i_query, args );
@@ -738,6 +820,31 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
 
     mtime_t        i_pts = (mtime_t)pts.tv_sec * 1000000LL + (mtime_t)pts.tv_usec;
 
+    if( tk->b_quicktime && tk->p_es == NULL )
+    {
+        QuickTimeGenericRTPSource *qtRTPSource = (QuickTimeGenericRTPSource*)tk->rtpSource;
+        QuickTimeGenericRTPSource::QTState &qtState = qtRTPSource->qtState;
+        uint8_t *sdAtom = (uint8_t*)&qtState.sdAtom[4];
+
+        if( qtState.sdAtomSize < 16 + 32 )
+        {
+            /* invalid */
+            p_sys->event = 0xff;
+            tk->waiting = 0;
+            return;
+        }
+        tk->fmt.i_codec = VLC_FOURCC( sdAtom[0], sdAtom[1], sdAtom[2], sdAtom[3] );
+        tk->fmt.video.i_width  = (sdAtom[28] << 8) | sdAtom[29];
+        tk->fmt.video.i_height = (sdAtom[30] << 8) | sdAtom[31];
+
+        tk->fmt.i_extra        = qtState.sdAtomSize - 16;
+        tk->fmt.i_extra_type   = ES_EXTRA_TYPE_BITMAPINFOHEADER;
+        tk->fmt.p_extra        = malloc( tk->fmt.i_extra );
+        memcpy( tk->fmt.p_extra, &sdAtom[12], tk->fmt.i_extra );
+
+        tk->p_es = es_out_Add( p_input->p_es_out, &tk->fmt );
+    }
+
 #if 0
     fprintf( stderr, "StreamRead size=%d pts=%lld\n",
              i_size,
@@ -747,6 +854,10 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     if( ( p_pes = input_NewPES( p_input->p_method_data ) ) == NULL )
     {
         return;
+    }
+    if( i_size > 65536 )
+    {
+        msg_Warn( p_input, "buffer overflow" );
     }
     /* FIXME could i_size be > buffer size ? */
     p_data = input_NewPacket( p_input->p_method_data, i_size );
@@ -781,7 +892,10 @@ static void StreamRead( void *p_private, unsigned int i_size, struct timeval pts
     /* we have read data */
     tk->waiting = 0;
 
-    tk->i_pts = i_pts;
+    if( i_pts > 0 )
+    {
+        tk->i_pts = i_pts;
+    }
 }
 
 /*****************************************************************************
