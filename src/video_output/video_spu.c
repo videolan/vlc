@@ -93,24 +93,19 @@ static int NewLine  ( vout_spu_t *p_vspu, int *i_id );
  *****************************************************************************
  * 
  *****************************************************************************/
-void vout_RenderSPU( vout_thread_t *p_vout, subpicture_t *p_subpic )
+void vout_RenderSPU( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
+                     int i_bytes_per_pixel, int i_bytes_per_line )
 {
     int i_code = 0x00;
     int i_next = 0;
     int i_id = 0;
     int i_color;
-    int i_bytes_per_pixel = p_vout->i_bytes_per_pixel;
-    int i_bytes_per_line = p_vout->i_bytes_per_line;
 
     /* FIXME: we need a way to get this information from the stream */
     #define TARGET_WIDTH     720
     #define TARGET_HEIGHT    576
-    int i_x_scale =
-        ( p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_width << 6 )
-            / TARGET_WIDTH;
-    int i_y_scale =
-        ( p_vout->p_buffer[ p_vout->i_buffer_index ].i_pic_height << 6 )
-            / TARGET_HEIGHT;
+    int i_x_scale = ( p_buffer->i_pic_width << 6 ) / TARGET_WIDTH;
+    int i_y_scale = ( p_buffer->i_pic_height << 6 ) / TARGET_HEIGHT;
 
     /* FIXME: fake palette - the real one has to be sought in the .IFO */
     static int p_palette[4] = { 0x0000, 0x0000, 0x5555, 0xffff };
@@ -126,13 +121,10 @@ void vout_RenderSPU( vout_thread_t *p_vout, subpicture_t *p_subpic )
     vspu.y = 0;
     vspu.width = TARGET_WIDTH;
     vspu.height = TARGET_HEIGHT;
-    vspu.p_data = p_vout->p_buffer[ p_vout->i_buffer_index ].p_data
-                    /* go to the picture coordinates */
-                    + p_vout->p_buffer->i_pic_x * p_vout->i_bytes_per_pixel
-                    + p_vout->p_buffer->i_pic_y * p_vout->i_bytes_per_line
-                    /* go to the SPU coordinates */
-                    + p_subpic->i_x * i_bytes_per_pixel
-                    + p_subpic->i_y * i_bytes_per_line;
+    vspu.p_data = p_buffer->p_data
+                    /* add the picture coordinates and the SPU coordinates */
+                    + ( p_buffer->i_pic_x + p_subpic->i_x ) * i_bytes_per_pixel
+                    + ( p_buffer->i_pic_y + p_subpic->i_y ) * i_bytes_per_line;
 
     while( p_from[0] < (byte_t *)p_subpic->p_data
                          + p_subpic->type.spu.i_offset[1] )

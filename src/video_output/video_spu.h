@@ -23,5 +23,6 @@
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-void   vout_RenderSPU ( vout_thread_t *p_vout, subpicture_t *p_subpic );
+void   vout_RenderSPU ( vout_buffer_t *p_buffer, subpicture_t *p_subpic,
+                        int i_bytes_per_pixel, int i_bytes_per_line );
 

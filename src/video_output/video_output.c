@@ -1069,6 +1069,10 @@ last_display_date = display_date;
                     RenderPictureInfo( p_vout, p_pic );
                     RenderInfo( p_vout );
                 }
+                if( p_subpic )
+                {
+                    RenderSubPicture( p_vout, p_subpic );
+                }
             }
 
             /* Remove picture from heap */
@@ -1088,10 +1092,6 @@ last_display_date = display_date;
             if( b_display && p_vout->b_interface )
             {
                 RenderInterface( p_vout );
-            }
-            if( b_display && p_subpic )
-            {
-                RenderSubPicture( p_vout, p_subpic );
             }
 
         }
@@ -1529,7 +1529,7 @@ static void SetBufferPicture( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /*
-     * Set new picture size - if is is smaller than the previous one, clear
+     * Set new picture size - if it is smaller than the previous one, clear
      * around it. Since picture are centered, only their size is tested.
      */
     if( (p_buffer->i_pic_width > i_pic_width) || (p_buffer->i_pic_height > i_pic_height) )
@@ -1823,7 +1823,9 @@ static void RenderSubPicture( vout_thread_t *p_vout, subpicture_t *p_subpic )
                 vout_DestroySubPicture( p_vout, p_subpic );
                 break;
             }
-            vout_RenderSPU( p_vout, p_subpic );
+            vout_RenderSPU( &p_vout->p_buffer[ p_vout->i_buffer_index ],
+                            p_subpic, p_vout->i_bytes_per_pixel,
+                            p_vout->i_bytes_per_line );
             break;
         case TEXT_SUBPICTURE:                            /* single line text */
             /* Select default font if not specified */
