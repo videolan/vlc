@@ -1175,6 +1175,15 @@ then
 fi
 
 dnl
+dnl  Memory usage
+dnl
+AC_ARG_ENABLE(optimize-memory,
+[  --enable-optimize-memory      optimize memory usage over performance])
+if test "${enable_optimize_memory}" = "yes"; then
+  AC_DEFINE(OPTIMIZE_MEMORY, 1, Define if you want to optimize memory usage over performance)
+fi
+
+dnl
 dnl  Enable/disable optimizations
 dnl
 AC_ARG_ENABLE(optimizations,
