@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmstu.c,v 1.9 2004/02/12 20:09:38 fenrir Exp $
+ * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -345,55 +345,44 @@ static ssize_t Read( input_thread_t *p_input, byte_t *p_buffer, size_t i_len )
 
     i_data = 0;
 
-    /* *** send header if needed ** */
-    if( p_sys->i_pos < p_sys->i_header )
-    {
-        i_copy = __MIN( i_len, p_sys->i_header - p_sys->i_pos );
-        if( i_copy > 0 )
-        {
-            memcpy( p_buffer,
-                    p_sys->p_header + p_sys->i_pos,
-                    i_copy );
-        }
-        i_data += i_copy;
-    }
-
     /* *** now send data if needed *** */
     while( i_data < i_len )
     {
-        if( p_sys->i_media_used < p_sys->i_media )
+        if( p_sys->i_pos < p_sys->i_header )
+        {
+            i_copy = __MIN( i_len, p_sys->i_header - p_sys->i_pos );
+            memcpy( &p_buffer[i_data], &p_sys->p_header[p_sys->i_pos], i_copy );
+            i_data += i_copy;
+            p_sys->i_pos += i_copy;
+        }
+        else if( p_sys->i_media_used < p_sys->i_media )
         {
             i_copy = __MIN( i_len - i_data ,
                             p_sys->i_media - p_sys->i_media_used );
-            memcpy( p_buffer + i_data,
-                    p_sys->p_media + p_sys->i_media_used,
-                    i_copy );
+            memcpy( &p_buffer[i_data], &p_sys->p_media[p_sys->i_media_used], i_copy );
             i_data += i_copy;
             p_sys->i_media_used += i_copy;
+            p_sys->i_pos += i_copy;
         }
         else if( p_sys->p_media != NULL &&
                  p_sys->i_media_used < p_sys->i_packet_length )
         {
             i_copy = __MIN( i_len - i_data,
                             p_sys->i_packet_length - p_sys->i_media_used);
-            memset( p_buffer + i_data, 0, i_copy );
+            memset( &p_buffer[i_data], 0, i_copy );
 
             i_data += i_copy;
             p_sys->i_media_used += i_copy;
+            p_sys->i_pos += i_copy;
         }
-        else
+        else if( p_sys->i_eos ||
+                 mms_HeaderMediaRead( p_input, MMS_PACKET_MEDIA ) < 0 )
         {
-            if( p_sys->i_eos
-                 || mms_HeaderMediaRead( p_input, MMS_PACKET_MEDIA ) < 0 )
-            {
-                p_sys->i_pos += i_data;
-                return( i_data );
-            }
+            break;
         }
     }
 
-    p_sys->i_pos += i_data;
-    return( i_data );
+    return i_data;
 }
 
 /****************************************************************************

@@ -415,7 +415,7 @@ static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
         if( p_sys->i_pos < p_sys->i_header )
         {
             i_copy = __MIN( p_sys->i_header - p_sys->i_pos, i_len - i_data );
-            memcpy( &p_buffer[i_data], p_sys->p_header, i_copy );
+            memcpy( &p_buffer[i_data], &p_sys->p_header[p_sys->i_pos], i_copy );
 
             i_data += i_copy;
             p_sys->i_pos += i_copy;
