@@ -66,6 +66,8 @@ struct decoder_sys_t
     int         i_buffer_size;
     uint8_t     *p_buffer;
     unsigned int i_flags;
+
+    vlc_bool_t  b_frame;
 };
 
 static int m4v_FindStartCode( uint8_t **pp_start, uint8_t *p_end );
@@ -133,6 +135,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_buffer_size = 0;
     p_sys->p_buffer = 0;
     p_sys->i_flags = 0;
+    p_sys->b_frame = VLC_FALSE;
 
     /* Setup properties */
     p_dec->fmt_out = p_dec->fmt_in;
@@ -295,7 +298,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
                     p_sys->i_flags = BLOCK_FLAG_TYPE_P;
                     break;
                 case 2:
-                    p_sys->i_flags = BLOCK_FLAG_TYPE_P;
+                    p_sys->i_flags = BLOCK_FLAG_TYPE_B;
+                    p_sys->b_frame = VLC_TRUE;
                     break;
                 case 3: /* gni ? */
                     p_sys->i_flags = BLOCK_FLAG_TYPE_PB;
@@ -308,13 +312,22 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             {
                 p_sys->i_pts = p_block->i_pts;
             }
-            else
+            else if( (p_sys->i_flags&BLOCK_FLAG_TYPE_B) || !p_sys->b_frame )
             {
                 p_sys->i_pts = p_block->i_dts;
+            }
+            else
+            {
+                p_sys->i_pts = 0;
             }
             if( p_block->i_dts > 0 )
             {
                 p_sys->i_dts = p_block->i_dts;
+            }
+            else if( p_sys->i_dts > 0 )
+            {
+                /* XXX KLUDGE immonde, else transcode won't work */
+                p_sys->i_dts += 1000;
             }
         }
         p_start += 4; /* Next */
