@@ -2,7 +2,7 @@
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_info.c,v 1.2 2002/07/22 21:14:30 sigmunau Exp $
+ * $Id: input_info.c,v 1.3 2002/07/23 00:30:22 sam Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -75,7 +75,7 @@ int input_AddInfo( input_info_category_t * p_category, char * psz_name,
                    char * psz_format, ...)
 {
     input_info_t * p_info, * p_prev;
-    char * psz_str;
+    char * psz_str = NULL;
     va_list args;
 
     p_prev = NULL;
