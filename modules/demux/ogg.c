@@ -520,10 +520,15 @@ static void Ogg_DecodePacket( demux_t *p_demux,
           break;
 
         case VLC_FOURCC( 'f','l','a','c' ):
-          if( p_stream->i_packets_backup == 2 )
+          if( !p_stream->fmt.audio.i_rate && p_stream->i_packets_backup == 2 )
           {
               Ogg_ReadFlacHeader( p_demux, p_stream, p_oggpacket );
               p_stream->b_force_backup = 0;
+          }
+          else if( p_stream->fmt.audio.i_rate )
+          {
+              p_stream->b_force_backup = 0;
+              p_oggpacket->packet += 9; p_oggpacket->bytes -= 9;
           }
           b_store_size = VLC_FALSE;
           break;
@@ -655,7 +660,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         /* We remove the header from the packet */
         i_header_len = (*p_oggpacket->packet & PACKET_LEN_BITS01) >> 6;
         i_header_len |= (*p_oggpacket->packet & PACKET_LEN_BITS2) << 1;
-        
+
         if( p_stream->fmt.i_codec == VLC_FOURCC( 's','u','b','t' ))
         {
             /* But with subtitles we need to retrieve the duration first */
@@ -771,7 +776,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                              p_stream->fmt.audio.i_channels,
                              (int)p_stream->f_rate, p_stream->fmt.i_bitrate );
                 }
-                /* Check for Flac header */
+                /* Check for Flac header (< version 1.1.1) */
                 else if( oggpacket.bytes >= 4 &&
                     ! strncmp( &oggpacket.packet[0], "fLaC", 4 ) )
                 {
@@ -784,6 +789,25 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
 
                     p_stream->fmt.i_cat = AUDIO_ES;
                     p_stream->fmt.i_codec = VLC_FOURCC( 'f','l','a','c' );
+                }
+                /* Check for Flac header (>= version 1.1.1) */
+                else if( oggpacket.bytes >= 13 && oggpacket.packet[0] ==0x7F &&
+                    ! strncmp( &oggpacket.packet[1], "FLAC", 4 ) &&
+                    ! strncmp( &oggpacket.packet[9], "fLaC", 4 ) )
+                {
+                    int i_packets = ((int)oggpacket.packet[7]) << 8 |
+                        oggpacket.packet[8];
+                    msg_Dbg( p_demux, "found FLAC header version %i.%i "
+                             "(%i header packets)",
+                             oggpacket.packet[5], oggpacket.packet[6],
+                             i_packets );
+
+                    p_stream->b_force_backup = 1;
+
+                    p_stream->fmt.i_cat = AUDIO_ES;
+                    p_stream->fmt.i_codec = VLC_FOURCC( 'f','l','a','c' );
+                    oggpacket.packet += 13; oggpacket.bytes -= 13;
+                    Ogg_ReadFlacHeader( p_demux, p_stream, &oggpacket );
                 }
                 /* Check for Theora header */
                 else if( oggpacket.bytes >= 7 &&
@@ -1253,6 +1277,7 @@ static void Ogg_ReadFlacHeader( demux_t *p_demux, logical_stream_t *p_stream,
     bs_t s;
 
     bs_init( &s, p_oggpacket->packet, p_oggpacket->bytes );
+
     bs_read( &s, 1 );
     if( bs_read( &s, 7 ) == 0 )
     {
