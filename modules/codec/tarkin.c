@@ -2,7 +2,7 @@
  * tarkin.c: tarkin decoder module making use of libtarkin.
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: tarkin.c,v 1.9 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: tarkin.c,v 1.10 2003/11/23 03:55:01 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -188,7 +188,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( tarkin_synthesis_headerin( &p_sys->ti, &p_sys->tc, &oggpacket )
             < 0 )
         {
-            msg_Err( p_dec->p_fifo, "3rd Tarkin header is corrupted" );
+            msg_Err( p_dec, "3rd Tarkin header is corrupted" );
             block_Release( p_block );
             return NULL;
         }
@@ -308,8 +308,7 @@ static void tarkin_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
 
         for( i_line = 0; i_line < p_pic->p[i_plane].i_lines; i_line++ )
         {
-            p_dec->p_fifo->p_vlc->pf_memcpy( p_dst, p_src,
-                                             i_src_stride );
+            p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_src_stride );
 
             p_src += i_src_stride;
             p_dst += i_dst_stride;

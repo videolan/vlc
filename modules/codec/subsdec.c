@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.11 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: subsdec.c,v 1.12 2003/11/23 03:55:01 fenrir Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -310,7 +310,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
     }
 #endif
 
-    if( p_dec->p_fifo->i_fourcc == VLC_FOURCC('s','s','a',' ') )
+    if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','s','a',' ') )
     {
         /* Decode SSA strings */
         /* We expect: ReadOrder, Layer, Style, Name, MarginL, MarginR, MarginV, Effect, Text */

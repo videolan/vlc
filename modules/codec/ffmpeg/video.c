@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.48 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: video.c,v 1.49 2003/11/23 03:55:01 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -602,7 +602,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
         default:
             msg_Err( p_dec, "don't know how to convert chroma %i",
                      p_sys->p_context->pix_fmt );
-            p_dec->p_fifo->b_error = 1;
+            p_dec->b_error = 1;
             break;
         }
     }
