@@ -555,20 +555,6 @@ EOF
 fi
 
 ##
-##  Fix flexml-generated files
-##
-if test "${action}" = "flexml"
-then
-  cd modules/gui/skins/parser
-  flexml -SH -a skin.act skin.dtd
-  # comment the dummy main function
-  file=skin.c
-  sed 's@int main@//int main@' < $file > $file.$$.bak
-  mv -f $file.$$.bak $file
-  flex -oflex.c -BLs skin.l
-fi
-
-##
 ##  Make distclean
 ##
 if test "${action}" = "distclean"

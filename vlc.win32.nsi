@@ -133,7 +133,6 @@ Section "Media player (required)" SEC01
 
   File  /r plugins
   File  /r locale
-  File  /r skins
   File  /r skins2
   File  /r http
 
@@ -177,8 +176,6 @@ Section "Start Menu + Desktop Shortcut" SEC02
     "$INSTDIR\vlc.exe" "--intf wxwin"
   CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player (skins).lnk" \
     "$INSTDIR\vlc.exe" "--intf skins2"
-  CreateShortCut "$SMPROGRAMS\VideoLAN\VLC media player (old skins).lnk" \
-    "$INSTDIR\vlc.exe" "--intf skins"
   CreateShortCut "$DESKTOP\VLC media player.lnk" \
     "$INSTDIR\vlc.exe" "--intf wxwin"
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" \

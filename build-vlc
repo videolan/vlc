@@ -1,7 +1,6 @@
 #!/bin/sh
 
 FEATURES="
-SKINS skins
 SKINS skins2
 FAMILIAR familiar
 WXWINDOWS wxwindows

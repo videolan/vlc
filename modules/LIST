@@ -386,8 +386,6 @@ $Id$
 
  * skins2: Skinnable interface, new generation
 
- * skins: Skinnable interface
-
  * slp: input module to access SLP registered sessions
 
  * snapshot: a output module to save pictures from the vout.

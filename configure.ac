@@ -2113,7 +2113,7 @@ dnl
 dnl MP4 module
 dnl
 AC_CHECK_HEADERS(zlib.h, [
-  VLC_ADD_LDFLAGS([mp4 skins skins2 sap],[-lz])
+  VLC_ADD_LDFLAGS([mp4 skins2 sap],[-lz])
 ] )
 
 AC_CHECK_HEADERS(sysfs/libsysfs.h, [
@@ -2121,10 +2121,10 @@ AC_CHECK_HEADERS(sysfs/libsysfs.h, [
 ] )
 
 dnl
-dnl skins module
+dnl skins2 module
 dnl
 AC_CHECK_HEADERS(libtar.h, [
-  VLC_ADD_LDFLAGS([skins skins2],[-ltar])
+  VLC_ADD_LDFLAGS([skins2],[-ltar])
 ] )
 
 
@@ -3132,29 +3132,6 @@ then
 fi
 
 dnl
-dnl Skins module
-dnl
-AC_ARG_ENABLE(skins,
-  [  --enable-skins          Skins interface module (default enabled on Win32)])
-if test "${enable_skins}" != "no"; then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
-
-    VLC_ADD_PLUGINS([skins])
-    ALIASES="${ALIASES} svlc"
-    VLC_ADD_CPPFLAGS([skins],[-U_OFF_T_ -U_off_t -Imodules/gui/skins])
-    VLC_ADD_CXXFLAGS([skins],[-O2 -fno-rtti])
-    VLC_ADD_LDFLAGS([skins],[-loleaut32 -lwinspool -lwinmm -lshell32 -lctl3d32 -ladvapi32 -lwsock32 -lgdi32 -lcomdlg32 -lole32 -luuid -lcomctl32])
-
-  else if test "${enable_skins}" = "yes"; then
-    VLC_ADD_PLUGINS([skins])
-    ALIASES="${ALIASES} svlc"
-    VLC_ADD_CPPFLAGS([skins],[-Imodules/gui/skins -I${x_includes} -I/usr/include/freetype2 -DX11_SKINS])
-    VLC_ADD_CXXFLAGS([skins],[-O2 -fno-rtti])
-    VLC_ADD_LDFLAGS([skins],[-L${x_libraries} -lImlib2 -lXext -lX11 -lfreetype -lpng -lz ])
-  fi fi
-fi
-
-dnl
 dnl Skins2 module
 dnl
 AC_ARG_ENABLE(skins2,
@@ -4076,7 +4053,6 @@ AC_CONFIG_FILES([
   modules/gui/macosx/Makefile
   modules/gui/qnx/Makefile
   modules/gui/qt/Makefile
-  modules/gui/skins/Makefile
   modules/gui/skins2/Makefile
   modules/gui/wxwindows/Makefile
   modules/misc/Makefile
