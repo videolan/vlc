@@ -259,6 +259,8 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
 #define AVIFOURCC_rec          VLC_FOURCC('r','e','c',' ')
 #define AVIFOURCC_auds         VLC_FOURCC('a','u','d','s')
 #define AVIFOURCC_vids         VLC_FOURCC('v','i','d','s')
+#define AVIFOURCC_txts         VLC_FOURCC('t','x','t','s')
+#define AVIFOURCC_mids         VLC_FOURCC('m','i','d','s')
 
 #define AVIFOURCC_IARL         VLC_FOURCC('I','A','R','L')
 #define AVIFOURCC_IART         VLC_FOURCC('I','A','R','T')

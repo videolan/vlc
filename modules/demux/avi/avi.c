@@ -457,6 +457,16 @@ static int Open( vlc_object_t * p_this )
                         (unsigned int)(-(int)p_vids->p_bih->biHeight);
                 }
                 break;
+
+            case( AVIFOURCC_txts):
+                tk->i_cat   = SPU_ES;
+                tk->i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
+                msg_Dbg( p_demux, "stream[%d] subtitles", i );
+                es_format_Init( &fmt, SPU_ES, tk->i_codec );
+                break;
+                
+            case( AVIFOURCC_mids):
+                msg_Dbg( p_demux, "stream[%d] midi is UNSUPPORTED", i );
             default:
                 msg_Warn( p_demux, "stream[%d] unknown type", i );
                 free( tk );
