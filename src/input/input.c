@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input.c,v 1.123 2001/06/15 05:12:30 sam Exp $
+ * $Id: input.c,v 1.124 2001/06/21 07:22:03 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -623,11 +623,14 @@ static void NetworkOpen( input_thread_t * p_input )
     int                 i_port = 0;
     int                 i_opt;
     struct sockaddr_in  sock;
-
+#ifdef WIN32
+    WSADATA Data;
+    int i_err;
+#endif
+    
 #ifdef WIN32
     /* WinSock Library Init. */
-    WSADATA Data;
-    int i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
+    i_err = WSAStartup( MAKEWORD( 1, 1 ), &Data );
 
     if( i_err )
     {
@@ -778,6 +781,13 @@ static void NetworkOpen( input_thread_t * p_input )
         p_input->b_error = 1;
         return;
     }
+
+#if defined( WIN32 )
+    if ( psz_broadcast != NULL )
+    {
+        sock.sin_addr.s_addr = INADDR_ANY;
+    }
+#endif
     
     /* Bind it */
     if( bind( p_input->i_handle, (struct sockaddr *)&sock, 

@@ -21,7 +21,8 @@ D: directory browsing code in modules.c
 
 N: Gildas Bazin
 E: gbazin@netcourrier.com
-D: mingw32 port
+D: mingw32 port, various win32 fixes
+D: DirectX audio and video output
 
 N: Stéphane Borel
 E: stef@via.ecp.fr
@@ -57,6 +58,11 @@ N: Colin Delacroix
 E: colin@zoy.org
 C: colin
 D: MacOS X sound support
+
+N: Boris Dorès
+E: babal@via.ecp.fr
+C: babal
+D: Win32 network input
 
 N: Jean-Marc Dressler
 E: polux@via.ecp.fr
@@ -115,7 +121,7 @@ D: Bug fixes
 N: Jon Lech Johansen
 E: jon-vl@nanocrew.net
 D: PS input fixes
-D: Win32 port
+D: Win32 DVD input port
 
 N: Michel Kaempf
 E: maxx@via.ecp.fr

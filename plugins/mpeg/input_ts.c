@@ -2,7 +2,7 @@
  * input_ts.c: TS demux and netlist management
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: input_ts.c,v 1.26 2001/06/03 12:47:21 sam Exp $
+ * $Id: input_ts.c,v 1.27 2001/06/21 07:22:03 sam Exp $
  *
  * Authors: Henri Fallon <henri@videolan.org>
  *
@@ -57,6 +57,7 @@
 
 #if defined( WIN32 )
 #   include <io.h>
+#   include <winsock2.h>
 #   include "input_iovec.h"
 #else
 #   include <sys/uio.h>                                      /* struct iovec */
@@ -74,11 +75,11 @@
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
 
-#include "input.h"
-#include "input_ts.h"
-
 #include "mpeg_system.h"
 #include "input_netlist.h"
+
+#include "input.h"
+#include "input_ts.h"
 
 #include "modules.h"
 #include "modules_export.h"
@@ -182,6 +183,11 @@ static void TSInit( input_thread_t * p_input )
         return;
     }
 
+#if defined( WIN32 )
+    p_method->i_length = 0;
+    p_method->i_offset = 0;
+#endif
+
     p_input->p_plugin_data = (void *)p_method;
     p_input->p_method_data = NULL;
 
@@ -268,10 +274,9 @@ static int TSRead( input_thread_t * p_input,
 {
     thread_ts_data_t    * p_method;
     unsigned int    i_read, i_loop;
-    int             i_data;
+    int             i_data = 0;
     struct iovec  * p_iovec;
-    struct timeval  s_wait;
-
+    struct timeval  timeout;
 
     /* Get iovecs */
     p_iovec = input_NetlistGetiovec( p_input->p_method_data );
@@ -289,15 +294,20 @@ static int TSRead( input_thread_t * p_input,
     FD_SET( p_input->i_handle, &(p_method->fds) );
 
     /* We'll wait 0.5 second if nothing happens */
-    s_wait.tv_sec = 0;
-    s_wait.tv_usec = 500000;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 500000;
 
     /* Reset pointer table */
     memset( pp_packets, 0, INPUT_READ_ONCE * sizeof(data_packet_t *) );
 
     /* Fill if some data is available */
-    i_data = select( p_input->i_handle + 1, &(p_method->fds), NULL, NULL,
-                     &s_wait);
+#if defined( WIN32 )
+    if ( ! p_input->stream.b_pace_control ) 
+#endif
+    {
+        i_data = select( p_input->i_handle + 1, &p_method->fds,
+                         NULL, NULL, &timeout );
+    }
 
     if( i_data == -1 )
     {
@@ -307,8 +317,19 @@ static int TSRead( input_thread_t * p_input,
 
     if( i_data )
     {
+#if defined( WIN32 )
+        if( p_input->stream.b_pace_control )
+        {
+            i_read = readv_file( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
+        }
+        else
+        {
+            i_read = readv_network( p_input->i_handle, p_iovec,
+                                    INPUT_READ_ONCE, p_method );
+        }
+#else
         i_read = readv( p_input->i_handle, p_iovec, INPUT_READ_ONCE );
-
+#endif
         if( i_read == -1 )
         {
             intf_ErrMsg( "input error: TS readv error" );

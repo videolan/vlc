@@ -1,5 +1,5 @@
 /*****************************************************************************
- * input_iovec.h: iovec structure and readv() replacement
+ * input_iovec.h: iovec structure
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
  *
@@ -29,59 +29,4 @@ struct iovec
     void *iov_base;     /* Pointer to data. */
     size_t iov_len;     /* Length of data.  */
 };
-
-/*****************************************************************************
- * readv: readv() replacement for iovec-impaired C libraries
- *****************************************************************************/
-static __inline int readv( int i_fd, struct iovec *p_iovec, int i_count )
-{
-    int i_index, i_len, i_total = 0;
-    char *p_base;
-
-    for( i_index = i_count; i_index; i_index-- )
-    {
-        register signed int i_bytes;
-
-        i_len  = p_iovec->iov_len;
-        p_base = p_iovec->iov_base;
-
-        /* Loop is unrolled one time to spare the (i_bytes < 0) test */
-        if( i_len > 0 )
-        {
-            i_bytes = read( i_fd, p_base, i_len );
-
-            if( ( i_total == 0 ) && ( i_bytes < 0 ) )
-            {
-                return -1;
-            }
-
-            if( i_bytes <= 0 )
-            {
-                return i_total;
-            }
-
-            i_len   -= i_bytes;
-            i_total += i_bytes;
-            p_base  += i_bytes;
-
-            while( i_len > 0 )
-            {
-                i_bytes = read( i_fd, p_base, i_len );
-
-                if( i_bytes <= 0 )
-                {
-                    return i_total;
-                }
-
-                i_len   -= i_bytes;
-                i_total += i_bytes;
-                p_base  += i_bytes;
-            }
-        }
-
-        p_iovec++;
-    }
-
-    return i_total;
-}
 
