@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.22 2003/08/28 15:59:04 gbazin Exp $
+ * $Id: events.c,v 1.23 2003/09/24 16:10:02 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -95,12 +95,14 @@ void DirectXEventThread( event_thread_t *p_event )
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
-    while( !p_event->b_die
-           && GetMessage( &msg, p_event->p_vout->p_sys->hwnd, 0, 0 ) )
+    while( !p_event->b_die && ( p_event->p_vout->p_sys->hparent ||
+           GetMessage( &msg, p_event->p_vout->p_sys->hwnd, 0, 0 ) ) )
     {
         /* Check if we are asked to exit */
         if( p_event->b_die )
             break;
+
+        if( p_event->p_vout->p_sys->hparent ) msleep( INTF_IDLE_SLEEP );
 
         switch( msg.message )
         {
@@ -514,6 +516,15 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
     if( p_vout->p_sys->hwnd && !p_vout->p_sys->hparent )
     {
         DestroyWindow( p_vout->p_sys->hwnd );
+    }
+    else if( p_vout->p_sys->hparent )
+    {
+        /* We don't want our windowproc to be called anymore */
+        SetWindowLong( p_vout->p_sys->hwnd,
+                       GWL_WNDPROC, (LONG)p_vout->p_sys->pf_wndproc );
+
+        /* Blam! Erase everything that might have been there. */
+        InvalidateRect( p_vout->p_sys->hwnd, NULL, TRUE );
     }
 
     p_vout->p_sys->hwnd = NULL;
