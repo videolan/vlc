@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.9 2002/12/06 11:53:45 fenrir Exp $
+ * $Id: video.c,v 1.10 2002/12/06 14:22:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -95,9 +95,9 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
                                          AVCodecContext *p_context )
 {
     vout_thread_t *p_vout;
-    int         i_width = p_vdec->p_context->width;
-    int         i_height = p_vdec->p_context->height;
-    uint32_t    i_chroma = ffmpeg_PixFmtToChroma( p_vdec->p_context->pix_fmt );
+    int         i_width = p_context->width;
+    int         i_height =p_context->height;
+    uint32_t    i_chroma = ffmpeg_PixFmtToChroma( p_context->pix_fmt );
     int         i_aspect;
 
     if( !i_width || !i_height )
@@ -115,12 +115,12 @@ static vout_thread_t *ffmpeg_CreateVout( vdec_thread_t  *p_vdec,
     }
 #if LIBAVCODEC_BUILD >= 4640
     if( ( i_aspect = (int) ( VOUT_ASPECT_FACTOR * 
-                                p_vdec->p_context->aspect_ratio ) ) == 0 )
+                                p_context->aspect_ratio ) ) == 0 )
     {
         i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
     }
 #else
-    switch( p_vdec->p_context->aspect_ratio_info )
+    switch( p_context->aspect_ratio_info )
     {
         case( FF_ASPECT_4_3_625 ):
         case( FF_ASPECT_4_3_525 ):

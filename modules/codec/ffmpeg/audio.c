@@ -2,7 +2,7 @@
  * audio.c: audio decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: audio.c,v 1.6 2002/12/02 21:13:25 jlj Exp $
+ * $Id: audio.c,v 1.7 2002/12/06 14:22:55 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -58,7 +58,7 @@ int      E_( InitThread_Audio )   ( adec_thread_t * );
 void     E_( EndThread_Audio )    ( adec_thread_t * );
 void     E_( DecodeThread_Audio ) ( adec_thread_t * );
 
-static int pi_channels_maps[6] =
+static unsigned int pi_channels_maps[6] =
 {
     0,
     AOUT_CHAN_CENTER,   AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
