@@ -96,6 +96,9 @@ int __config_GetType( vlc_object_t *p_this, const char *psz_name )
         break;
 
     case CONFIG_ITEM_MODULE:
+    case CONFIG_ITEM_MODULE_CAT:
+    case CONFIG_ITEM_MODULE_LIST:
+    case CONFIG_ITEM_MODULE_LIST_CAT:
         i_type = VLC_VAR_MODULE;
         break;
 
