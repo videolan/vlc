@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.52 2003/11/24 00:39:01 fenrir Exp $
+ * $Id: video.c,v 1.53 2003/11/24 23:22:01 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -265,7 +265,7 @@ int E_(InitVideoDec)( decoder_t *p_dec, AVCodecContext *p_context,
 #endif
 
     /* ffmpeg doesn't properly release old pictures when frames are skipped */
-    if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = 0;
+    //if( p_sys->b_hurry_up ) p_sys->b_direct_rendering = 0;
     if( p_sys->b_direct_rendering )
     {
         msg_Dbg( p_dec, "using direct rendering" );
@@ -686,7 +686,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     if( p_ff_pic->reference != 0 )
     {
-      //vout_LinkPicture( p_sys->p_vout, p_pic );
+        p_dec->pf_picture_link( p_dec, p_pic );
     }
 
     /* FIXME what is that, should give good value */
@@ -716,6 +716,6 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
 
     if( p_ff_pic->reference != 0 )
     {
-      //vout_UnlinkPicture( p_sys->p_vout, p_pic );
+        p_dec->pf_picture_unlink( p_dec, p_pic );
     }
 }

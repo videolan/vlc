@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: input_dec.c,v 1.78 2003/11/24 03:30:38 fenrir Exp $
+ * $Id: input_dec.c,v 1.79 2003/11/24 23:22:01 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -51,6 +51,8 @@ static void aout_del_buffer( decoder_t *, aout_buffer_t * );
 
 static picture_t *vout_new_buffer( decoder_t * );
 static void vout_del_buffer( decoder_t *, picture_t * );
+static void vout_link_picture( decoder_t *, picture_t * );
+static void vout_unlink_picture( decoder_t *, picture_t * );
 
 static es_format_t null_es_format = {0};
 
@@ -436,6 +438,8 @@ static decoder_t * CreateDecoder( input_thread_t * p_input,
     p_dec->pf_aout_buffer_del = aout_del_buffer;
     p_dec->pf_vout_buffer_new = vout_new_buffer;
     p_dec->pf_vout_buffer_del = vout_del_buffer;
+    p_dec->pf_picture_link    = vout_link_picture;
+    p_dec->pf_picture_unlink  = vout_unlink_picture;
 
     vlc_object_attach( p_dec, p_input );
 
@@ -589,19 +593,17 @@ static void DeleteDecoder( decoder_t * p_dec )
     {
         int i_pic;
 
+#define p_pic p_dec->p_owner->p_vout->render.pp_picture[i_pic]
         /* Hack to make sure all the the pictures are freed by the decoder */
         for( i_pic = 0; i_pic < p_dec->p_owner->p_vout->render.i_pictures;
              i_pic++ )
         {
-            if( p_dec->p_owner->p_vout->render.pp_picture[i_pic]->i_status ==
-                RESERVED_PICTURE )
-                vout_DestroyPicture( p_dec->p_owner->p_vout,
-                    p_dec->p_owner->p_vout->render.pp_picture[i_pic] );
-            if( p_dec->p_owner->p_vout->render.pp_picture[i_pic]->i_refcount
-                > 0 )
-                vout_UnlinkPicture( p_dec->p_owner->p_vout,
-                    p_dec->p_owner->p_vout->render.pp_picture[i_pic] );
+            if( p_pic->i_status == RESERVED_PICTURE )
+                vout_DestroyPicture( p_dec->p_owner->p_vout, p_pic );
+            if( p_pic->i_refcount > 0 )
+                vout_UnlinkPicture( p_dec->p_owner->p_vout, p_pic );
         }
+#undef p_pic
 
         /* We are about to die. Reattach video output to p_vlc. */
         vout_Request( p_dec, p_dec->p_owner->p_vout, 0, 0, 0, 0 );
@@ -699,10 +701,39 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
     /* Get a new picture */
     while( !(p_pic = vout_CreatePicture( p_sys->p_vout, 0, 0, 0 ) ) )
     {
+        int i_pic;
+
         if( p_dec->b_die || p_dec->b_error )
         {
             return NULL;
         }
+
+#define p_pic p_dec->p_owner->p_vout->render.pp_picture[i_pic]
+        /* Check the decoder doesn't leak pictures */
+        for( i_pic = 0; i_pic < p_dec->p_owner->p_vout->render.i_pictures;
+             i_pic++ )
+        {
+            if( p_pic->i_status != DISPLAYED_PICTURE &&
+                p_pic->i_status != RESERVED_PICTURE ) break;
+
+            if( !p_pic->i_refcount ) break;
+        }
+        if( i_pic == p_dec->p_owner->p_vout->render.i_pictures )
+        {
+            msg_Err( p_dec, "decoder is leaking pictures, reseting the heap" );
+
+            /* Just free all the pictures */
+            for( i_pic = 0; i_pic < p_dec->p_owner->p_vout->render.i_pictures;
+                 i_pic++ )
+            {
+                if( p_pic->i_status == RESERVED_PICTURE )
+                    vout_DestroyPicture( p_dec->p_owner->p_vout, p_pic );
+                if( p_pic->i_refcount > 0 )
+                vout_UnlinkPicture( p_dec->p_owner->p_vout, p_pic );
+            }
+        }
+#undef p_pic
+
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
@@ -712,4 +743,14 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
 static void vout_del_buffer( decoder_t *p_dec, picture_t *p_pic )
 {
     vout_DestroyPicture( p_dec->p_owner->p_vout, p_pic );
+}
+
+static void vout_link_picture( decoder_t *p_dec, picture_t *p_pic )
+{
+    vout_LinkPicture( p_dec->p_owner->p_vout, p_pic );
+}
+
+static void vout_unlink_picture( decoder_t *p_dec, picture_t *p_pic )
+{
+    vout_UnlinkPicture( p_dec->p_owner->p_vout, p_pic );
 }

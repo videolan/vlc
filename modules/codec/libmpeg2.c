@@ -2,7 +2,7 @@
  * libmpeg2.c: mpeg2 video decoder module making use of libmpeg2.
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: libmpeg2.c,v 1.34 2003/11/22 23:39:14 fenrir Exp $
+ * $Id: libmpeg2.c,v 1.35 2003/11/24 23:22:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -287,7 +287,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* For some reason, libmpeg2 will put this pic twice in
              * discard_picture. This can be considered a bug in libmpeg2. */
-            //vout_LinkPicture( p_sys->p_vout, p_pic );
+            p_dec->pf_picture_link( p_dec, p_pic );
 
             if( p_sys->p_synchro )
             {
@@ -376,6 +376,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         case STATE_END:
         case STATE_SLICE:
+            p_pic = NULL;
             if( p_sys->p_info->display_fbuf
                 && p_sys->p_info->display_fbuf->id )
             {
@@ -396,17 +397,16 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                     p_sys->p_picture_to_destroy = NULL;
                     p_pic->date = 0;
                 }
-	    return p_pic; /* FIXME */
             }
 
             if( p_sys->p_info->discard_fbuf &&
                 p_sys->p_info->discard_fbuf->id )
             {
-	        //p_pic = (picture_t *)p_sys->p_info->discard_fbuf->id;
-                //vout_UnlinkPicture( p_sys->p_vout, p_pic );
+                p_dec->pf_picture_unlink( p_dec,
+                                          p_sys->p_info->discard_fbuf->id );
             }
 
-	    //return p_pic; /* FIXME */
+	    if( p_pic ) return p_pic;
 
             break;
 
@@ -512,7 +512,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec, uint8_t **pp_buf )
     p_pic->i_nb_fields = p_sys->p_info->current_picture != NULL ?
         p_sys->p_info->current_picture->nb_fields : 2;
 
-    //vout_LinkPicture( p_sys->p_vout, p_pic );
+    p_dec->pf_picture_link( p_dec, p_pic );
 
     pp_buf[0] = p_pic->p[0].p_pixels;
     pp_buf[1] = p_pic->p[1].p_pixels;

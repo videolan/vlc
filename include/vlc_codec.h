@@ -2,7 +2,7 @@
  * vlc_codec.h: codec related structures
  *****************************************************************************
  * Copyright (C) 1999-2003 VideoLAN
- * $Id: vlc_codec.h,v 1.5 2003/11/24 00:39:00 fenrir Exp $
+ * $Id: vlc_codec.h,v 1.6 2003/11/24 23:22:01 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -70,6 +70,8 @@ struct decoder_t
     /* Video output callbacks */
     picture_t     * ( * pf_vout_buffer_new) ( decoder_t * );
     void            ( * pf_vout_buffer_del) ( decoder_t *, picture_t * );
+    void            ( * pf_picture_link)    ( decoder_t *, picture_t * );
+    void            ( * pf_picture_unlink)  ( decoder_t *, picture_t * );
 
 
     /* Private structure for the owner of the decoder */
