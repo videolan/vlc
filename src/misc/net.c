@@ -2,7 +2,7 @@
  * net.c:
  *****************************************************************************
  * Copyright (C) 2004 VideoLAN
- * $Id: net.c,v 1.1 2004/01/05 14:10:58 fenrir Exp $
+ * $Id: net.c,v 1.2 2004/01/06 23:03:17 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -283,16 +283,18 @@ char *__net_Gets( vlc_object_t *p_this, int fd )
     {
         if( net_Read( p_this, fd, &psz_line[i_line], 1, VLC_TRUE ) != 1 )
         {
+            psz_line[i_line] = '\0';
             break;
         }
-        if( psz_line[i_line] == '\n' || psz_line[i_line] == '\r' )
-        {
-            break;
-        }
-
         i_line++;
 
-        if( i_line >= i_max )
+        if( psz_line[i_line-1] == '\n' )
+        {
+            psz_line[i_line] = '\0';
+            break;
+        }
+
+        if( i_line >= i_max - 1 )
         {
             i_max += 1024;
             psz_line = realloc( psz_line, i_max );
@@ -305,11 +307,11 @@ char *__net_Gets( vlc_object_t *p_this, int fd )
         return NULL;
     }
 
-    while( i_line >= 0 &&
-           ( psz_line[i_line] == '\n' || psz_line[i_line] == '\r' ) )
+    while( i_line >= 1 &&
+           ( psz_line[i_line-1] == '\n' || psz_line[i_line-1] == '\r' ) )
     {
-        psz_line[i_line] = '\0';
         i_line--;
+        psz_line[i_line] = '\0';
     }
     return psz_line;
 }

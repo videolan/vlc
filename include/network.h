@@ -2,7 +2,7 @@
  * network.h: interface to communicate with network plug-ins
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: network.h,v 1.6 2004/01/05 14:10:58 fenrir Exp $
+ * $Id: network.h,v 1.7 2004/01/06 23:03:16 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -64,7 +64,7 @@ typedef struct
  *****************************************************************************
  * option : if != 0 then path is split at this char
  *
- * format protocol://host[:port]/path[OPTIONoption]
+ * format [protocol://][host[:port]]/path[OPTIONoption]
  *****************************************************************************/
 static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
 {
@@ -78,9 +78,7 @@ static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
     url->psz_path     = NULL;
     url->psz_option   = NULL;
 
-    p  = strchr( psz_dup, ':' );
-
-    if( p )
+    if( ( p  = strstr( psz_parse, ":/" ) ) )
     {
         /* we have a protocol */
 
@@ -93,27 +91,29 @@ static inline void vlc_UrlParse( vlc_url_t *url, char *psz_url, char option )
         url->psz_protocol = strdup( psz_dup );
 
         psz_parse = p;
+    }
 
-        p = strchr( psz_parse, '/' );
-        if( !p || psz_parse < p )
+    p = strchr( psz_parse, '/' );
+    if( !p || psz_parse < p )
+    {
+        char *p2;
+
+        /* We have a host[:port] */
+        url->psz_host = strdup( psz_parse );
+        if( p )
         {
-            char *p2;
-
-            /* We have a host[:port] */
-            url->psz_host = strdup( psz_parse );
-            if( p )
-            {
-                url->psz_host[p - psz_parse] = '\0';
-            }
-
-            p2 = strchr( url->psz_host, ':' );
-            if( p2 )
-            {
-                *p2++ = '\0';
-                url->i_port = atoi( p2 );
-            }
+            url->psz_host[p - psz_parse] = '\0';
         }
 
+        p2 = strchr( url->psz_host, ':' );
+        if( p2 )
+        {
+            *p2++ = '\0';
+            url->i_port = atoi( p2 );
+        }
+    }
+    if( p )
+    {
         psz_parse = p;
     }
 
