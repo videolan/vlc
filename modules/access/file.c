@@ -2,7 +2,7 @@
  * file.c: file input (file: access plug-in)
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: file.c,v 1.8 2003/01/03 13:07:17 massiot Exp $
+ * $Id: file.c,v 1.9 2003/01/05 20:45:29 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -307,7 +307,7 @@ static ssize_t Read( input_thread_t * p_input, byte_t * p_buffer, size_t i_len )
             msg_Warn( p_input, "couldn't stat again the file" );
 #   endif
         }
-        else
+        else if ( p_input->stream.p_selected_area->i_size != stat_info.st_size )
         {
             p_input->stream.p_selected_area->i_size = stat_info.st_size;
             p_input->stream.b_changed = 1;
