@@ -35,9 +35,15 @@ typedef struct
 
     char          *psz_title;
 
+    /* Window properties */
+    int           i_width;
+    int           i_height;
+    int           b_fullscreen;
+
     /* Audio properties */
     int           i_channels;
 
+    /* Audio buffer */
     int16_t       p_data[2][512];
     int           i_cur_sample;
 

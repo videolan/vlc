@@ -113,7 +113,10 @@ static int Open( vlc_object_t *p_this )
     p_thread->i_cur_sample = 0;
     bzero( p_thread->p_data, 2*2*512 );
 
-    galaktos_glx_init( p_thread, 600, 600, 0 );
+    p_thread->i_width = 600;
+    p_thread->i_height = 600;
+    p_thread->b_fullscreen = 0;
+    galaktos_glx_init( p_thread );
     galaktos_init( p_thread );
 
     p_thread->i_channels = aout_FormatNbChannels( &p_filter->input );
@@ -199,10 +202,9 @@ static void Thread( vlc_object_t *p_this )
     int timed=0;
     int timestart=0;
     int mspf=0;
-    int w = 600, h = 600;
 
     galaktos_glx_activate_window( p_thread );
-    setup_opengl( w, h );
+    setup_opengl( p_thread->i_width, p_thread->i_height );
     CreateRenderTarget(512, &RenderTargetTextureID, NULL);
 
     timestart=mdate()/1000;

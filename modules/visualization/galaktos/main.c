@@ -127,8 +127,8 @@ int galaktos_init( galaktos_thread_t *p_thread )
     initPresetLoader();
 
     /* Load default preset directory */
- //   loadPresetDir("/home/cyril/.vlc/galaktos");
-    loadPresetDir("/etc/projectM/presets");
+    loadPresetDir("/home/cyril/.vlc/galaktos");
+//    loadPresetDir("/etc/projectM/presets");
 
     initPCM(maxsamples);
     initBeatDetect();
@@ -207,7 +207,7 @@ int galaktos_update( galaktos_thread_t *p_thread )
     //and then we perform our manipulations on it
     //in pass 2 we will copy the texture into texture memory
 
- //   galaktos_glx_activate_pbuffer( p_thread );
+  //  galaktos_glx_activate_pbuffer( p_thread );
 
     glPushAttrib( GL_ALL_ATTRIB_BITS ); /* Overkill, but safe */
 

@@ -26,8 +26,7 @@
 
 #include "plugin.h"
 
-int galaktos_glx_init( galaktos_thread_t *p_thread, int i_width, int i_height,
-                       int b_fullscreen );
+int galaktos_glx_init( galaktos_thread_t *p_thread );
 void galaktos_glx_done( galaktos_thread_t *p_thread );
 int galaktos_glx_handle_events( galaktos_thread_t *p_thread );
 void galaktos_glx_activate_pbuffer( galaktos_thread_t *p_thread );
