@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.15 2003/06/23 23:51:31 gbazin Exp $
+ * $Id: httpd.c,v 1.16 2003/06/28 23:56:30 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -436,7 +436,8 @@ static httpd_host_t *_RegisterHost( httpd_sys_t *p_httpt, char *psz_host_addr, i
     for( i = 0; i < p_httpt->i_host_count; i++ )
     {
         if( p_httpt->host[i]->sock.sin_port == sock.sin_port &&
-            p_httpt->host[i]->sock.sin_addr.s_addr == sock.sin_addr.s_addr )
+            ( p_httpt->host[i]->sock.sin_addr.s_addr == INADDR_ANY ||
+              p_httpt->host[i]->sock.sin_addr.s_addr == sock.sin_addr.s_addr ) )
         {
             break;
         }

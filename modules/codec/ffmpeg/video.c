@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.33 2003/06/28 21:16:57 fenrir Exp $
+ * $Id: video.c,v 1.34 2003/06/28 23:56:31 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -763,7 +763,8 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so this check is necessary. */
-    if( !ffmpeg_PixFmtToChroma( p_context->pix_fmt ) )
+    if( !ffmpeg_PixFmtToChroma( p_context->pix_fmt ) ||
+        !(p_vdec->p_context->width % 16) || !(p_vdec->p_context->height % 16) )
     {
         p_context->get_buffer = avcodec_default_get_buffer;
         p_context->release_buffer = avcodec_default_release_buffer;
