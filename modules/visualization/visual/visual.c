@@ -2,7 +2,7 @@
  * visual.c : Visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.c,v 1.5 2003/09/09 23:35:28 hartman Exp $
+ * $Id: visual.c,v 1.6 2003/09/10 10:21:09 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -42,7 +42,7 @@ static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
  *****************************************************************************/
 #define ELIST_TEXT N_( "Effects list" )
 #define ELIST_LONGTEXT N_( \
-      "A list of visual effect, separated by commas.\n
+      "A list of visual effect, separated by commas.\n"  \
       "Current effects include: dummy, random, scope, spectrum" )
 
 #define WIDTH_TEXT N_( "Video width" )
@@ -174,13 +174,15 @@ static int Open( vlc_object_t *p_this )
         {
             msg_Err( p_filter, "Out of memory" );
         }
+        
         p_current_effect = p_current_effect -> p_next;
-        p_current_effect->pf_run = NULL;
+        p_current_effect->psz_func = NULL;
         p_current_effect->p_next = NULL;
         p_current_effect->i_width = p_filter->p_sys->i_width;
         p_current_effect->i_height = p_filter->p_sys->i_height;
         p_current_effect->p_data = NULL;
 
+#if 0
         if(! strncasecmp(psz_effects,"dummy",5))
             p_current_effect->pf_run = dummy_Run;
         else if(! strncasecmp(psz_effects,"scope",5) )
@@ -189,10 +191,15 @@ static int Open( vlc_object_t *p_this )
             p_current_effect->pf_run = spectrum_Run;
         else if(! strncasecmp(psz_effects,"random",6) )
             p_current_effect->pf_run = random_Run;
-#if 0
         else if(! strncasecmp(psz_effects,"blur",4) )
             p_current_effect->pf_run = blur_Run;
 #endif
+        if(! ( strncasecmp(psz_effects,"dummy",5) &&
+               strncasecmp(psz_effects,"scope",5) &&
+               strncasecmp(psz_effects,"spectrum",5) &&
+               strncasecmp(psz_effects,"random",5) ) )
+            p_current_effect->psz_func = strdup( psz_effects ) ;
+        
         p_current_effect->psz_args  = NULL;
         p_current_effect->i_nb_chans =
                 aout_FormatNbChannels( &p_filter->input);
@@ -221,12 +228,19 @@ static int Open( vlc_object_t *p_this )
 
     /* Open the video output */
     p_filter->p_sys->p_vout =
-         vout_Request( p_filter, NULL,
+    /*     vout_Request( p_filter, NULL,
                          p_filter->p_sys->i_width, 
                          p_filter->p_sys->i_height,
                   VLC_FOURCC('I','4','2','0'), 
                   VOUT_ASPECT_FACTOR * p_filter->p_sys->i_width/
-                  p_filter->p_sys->i_height  );        
+                  p_filter->p_sys->i_height  );        */
+
+            vout_Create( p_filter, 
+                         p_filter->p_sys->i_width, 
+                         p_filter->p_sys->i_height,
+                         VLC_FOURCC('I','4','2','0'), 
+                         VOUT_ASPECT_FACTOR * p_filter->p_sys->i_width/
+                         p_filter->p_sys->i_height );
     
     if( p_filter->p_sys->p_vout == NULL )
     {
@@ -240,26 +254,6 @@ static int Open( vlc_object_t *p_this )
     return 0 ;
 }
 
-/******************************************************************************
- * SparseCopy: trivially downmix or upmix a buffer
- ******************************************************************************
- * Pasted from trivial.c                                                      *
- *****************************************************************************/
-static void SparseCopy( s32 * p_dest, const s32 * p_src, size_t i_len,
-                        int i_output_stride, int i_input_stride )
-{
-    int i;
-    for ( i = i_len; i--; )
-    {
-        int j;
-        for ( j = 0; j < i_output_stride; j++ )
-        {
-            p_dest[j] = p_src[j % i_input_stride];
-        }
-        p_src += i_input_stride;
-        p_dest += i_output_stride;
-    }
-}
 /*****************************************************************************
  * DoWork: convert a buffer
  *****************************************************************************
@@ -281,63 +275,6 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
 
-    /* First, output the sound */
-    if ( (p_filter->output.i_original_channels & AOUT_CHAN_PHYSMASK)
-         != (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
-         && (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
-           == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
-    {
-        int i;
-        /* This is a bit special. */
-        if ( !(p_filter->output.i_original_channels & AOUT_CHAN_LEFT) )
-        {
-             p_src++;
-        }
-        if ( p_filter->output.i_physical_channels == AOUT_CHAN_CENTER )
-        {
-            /* Mono mode */
-            for ( i = p_in_buf->i_nb_samples; i--; )
-            {
-                *p_dest = *p_src;
-                p_dest++;
-                p_src += 2;
-            }
-        }
-        else
-        {
-            /* Fake-stereo mode */
-            for ( i = p_in_buf->i_nb_samples; i--; )
-            {
-                *p_dest = *p_src;
-                p_dest++;
-                *p_dest = *p_src;
-                p_dest++;
-                p_src += 2;
-            }
-        }
-    }
-    else if ( p_filter->output.i_original_channels
-             & AOUT_CHAN_REVERSESTEREO )
-    {
-        /* Reverse-stereo mode */
-        int i;
-        for ( i = p_in_buf->i_nb_samples; i--; )
-        {
-            *p_dest = p_src[1];
-            p_dest++;
-            *p_dest = p_src[0];
-            p_dest++;
-            p_src += 2;
-        }
-    }
-    else
-    {
-        SparseCopy( p_dest, p_src, p_in_buf->i_nb_samples, i_output_nb,
-                            i_input_nb );
-    }
-
-    /* Ok, the sound is gone, we can think about our effects */
-    
     /* First, get a new picture */
     while( ( p_outpic = vout_CreatePicture( p_filter->p_sys->p_vout,
               VLC_FALSE, VLC_FALSE, 3  ) ) == NULL )
@@ -360,43 +297,33 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     while( p_current_effect )  
     {
 
-#if 1
-        /* FIXME: Find why it segfaults when we directly call
-         * p_current_effect->pf_run(....)
-         *  (segfault in errno()  ) */
-        if( p_current_effect->pf_run == dummy_Run )
+        if( !strcasecmp( p_current_effect->psz_func, "dummy" ) )
         {
             dummy_Run(p_current_effect, p_aout, p_out_buf , p_outpic );
         }
-        else if (p_current_effect->pf_run == scope_Run )
+        else if( !strcasecmp( p_current_effect->psz_func, "scope" ) )
         {
             scope_Run(p_current_effect, p_aout, p_out_buf , p_outpic );
         }
-        else if (p_current_effect->pf_run == random_Run )
+        else if( !strcasecmp( p_current_effect->psz_func, "random" ) )
         {
             random_Run(p_current_effect, p_aout, p_out_buf , p_outpic );
         }
-        else if (p_current_effect->pf_run == spectrum_Run )
+        else if( !strcasecmp( p_current_effect->psz_func, "spectrum" ) )
         {
             spectrum_Run(p_current_effect, p_aout, p_out_buf , p_outpic );
         }
-#if 0
-        else if (p_current_effect->pf_run == blur_Run )
-        {
-            blur_Run(p_current_effect, p_aout, p_out_buf , p_outpic );
-        }
-#endif
-#else
-        p_current_effect->pf_run(p_current_effect, p_aout, p_out_buf , p_outpic );
-#endif
         p_current_effect = p_current_effect->p_next;
     }
    
-    vout_DatePicture ( p_filter->p_sys->p_vout, p_outpic,p_in_buf->start_date);
+    vout_DatePicture ( p_filter->p_sys->p_vout,p_outpic,
+                  ( p_in_buf->start_date + p_in_buf->end_date) /2 );
     
     
     vout_DisplayPicture ( p_filter->p_sys->p_vout, p_outpic );
 
+    
+    
 }
 
 /*****************************************************************************

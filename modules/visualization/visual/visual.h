@@ -2,7 +2,7 @@
  * visual.h : Header for the visualisation system
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: visual.h,v 1.3 2003/09/08 22:00:47 zorglub Exp $
+ * $Id: visual.h,v 1.4 2003/09/10 10:21:09 zorglub Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -47,6 +47,7 @@ typedef struct visual_effect_t
                    (struct visual_effect_t * , aout_instance_t *,
                    aout_buffer_t *, picture_t *);
     void *     p_data; /* The effect stores whatever it wants here */
+    char *     psz_func;
     struct     visual_effect_t * p_next;
     int        i_width;
     int        i_height;

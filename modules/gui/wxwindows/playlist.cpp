@@ -2,7 +2,7 @@
  * playlist.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: playlist.cpp,v 1.18 2003/09/08 12:48:53 zorglub Exp $
+ * $Id: playlist.cpp,v 1.19 2003/09/10 10:21:09 zorglub Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -117,8 +117,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxMenu *manage_menu = new wxMenu;
     manage_menu->Append( AddFile_Event, wxU(_("&Simple Add...")) );
     manage_menu->Append( AddMRL_Event, wxU(_("&Add MRL...")) );
-    manage_menu->Append( Sort_Event, wxU(_("&Sort...")) );
-    manage_menu->Append( RSort_Event, wxU(_("&Reverse Sort...")) );
+    manage_menu->Append( Sort_Event, wxU(_("&Sort")) );
+    manage_menu->Append( RSort_Event, wxU(_("&Reverse Sort")) );
     manage_menu->Append( Open_Event, wxU(_("&Open Playlist...")) );
     manage_menu->Append( Save_Event, wxU(_("&Save Playlist...")) );
     manage_menu->AppendSeparator();
