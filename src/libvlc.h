@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.78 2003/08/14 19:25:56 sigmunau Exp $
+ * $Id: libvlc.h,v 1.79 2003/08/17 20:58:45 alexis Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -469,7 +469,7 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
     "\n  [vcd:][device][@[title][,[chapter]]" \
     "\n                                 VCD device" \
     "\n  udpstream:[@[<bind address>][:<bind port>]]" \
-    "\n                                 UDP stream sent by VLS" \
+    "\n                                 UDP stream sent by a streaming server" \
     "\n  vlc:pause                      pause execution of " \
     "playlist items" \
     "\n  vlc:quit                       quit VLC" \
