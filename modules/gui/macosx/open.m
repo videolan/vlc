@@ -2,7 +2,7 @@
  * open.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: open.m,v 1.21 2003/02/05 22:48:13 hartman Exp $
+ * $Id: open.m,v 1.22 2003/02/09 19:28:43 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -164,7 +164,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
 
     [o_panel setTitle: _NS("Open Source")];
     [o_mrl_lbl setTitle: _NS("Media Resource Locator (MRL)")];
-    [o_ckbox_enqueue setTitle: _NS("Only enqueue in playlist. Do not play.")];
+    [o_ckbox_enqueue setTitle: _NS("Only enqueue in playlist, do not play")];
 
     [o_btn_ok setTitle: _NS("OK")];
     [o_btn_cancel setTitle: _NS("Cancel")];
@@ -177,7 +177,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class )
     [o_file_stream setTitle: _NS("Treat as a pipe rather than as a file")];
 
     [o_file_sub_btn_browse setTitle: _NS("Browse...")];
-    [o_file_sub_ckbox setTitle: _NS("Load subtitles")];
+    [o_file_sub_ckbox setTitle: _NS("Load subtitles file:")];
 
     [o_disc_device_lbl setStringValue: _NS("Device name")];
     [o_disc_title_lbl setStringValue: _NS("Title")];

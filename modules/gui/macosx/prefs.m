@@ -2,7 +2,7 @@
  * prefs.m: MacOS X plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: prefs.m,v 1.11 2003/02/08 22:20:28 massiot Exp $
+ * $Id: prefs.m,v 1.12 2003/02/09 19:28:43 massiot Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
@@ -238,12 +238,15 @@
         [o_text_field setSelectable: NO]; \
         [o_text_field setStringValue: \
             [NSApp localizedString: label]]; \
+        [o_text_field sizeToFit]; \
         [o_view addSubview: [o_text_field autorelease]]; \
     }
 
 #define INPUT_FIELD( ctype, cname, label, w, msg, param, tip ) \
     { \
-        char * psz_duptip = strdup(tip); \
+        char * psz_duptip = NULL; \
+        if ( p_item->psz_longtext != NULL ) \
+            psz_duptip = strdup(p_item->psz_longtext); \
         s_rc.size.height = 25; \
         s_rc.size.width = w; \
         s_rc.origin.y += 10; \
@@ -324,7 +327,9 @@
             NSPopUpButton *o_modules;
             NSButton *o_btn_select;
             NSButton *o_btn_configure;
-            char * psz_duptip = strdup(p_item->psz_longtext);
+            char * psz_duptip = NULL;
+            if ( p_item->psz_longtext != NULL )
+                psz_duptip = strdup(p_item->psz_longtext);
 
 #define MODULE_BUTTON( button, title, sel ) \
     { \
@@ -442,7 +447,9 @@
             {
                 int i;
                 VLCComboBox *o_combo_box;
-                char * psz_duptip = strdup(p_item->psz_longtext);
+                char * psz_duptip = NULL;
+                if ( p_item->psz_longtext != NULL )
+                    psz_duptip = strdup(p_item->psz_longtext);
 
                 s_rc.size.height = 27;
                 s_rc.size.width = 150;
@@ -501,7 +508,9 @@
         case CONFIG_ITEM_BOOL:
         {
             VLCButton *o_btn_bool;
-            char * psz_duptip = strdup(p_item->psz_longtext);
+            char * psz_duptip = NULL;
+            if ( p_item->psz_longtext != NULL )
+                psz_duptip = strdup(p_item->psz_longtext);
 
             s_rc.size.height = 27;
             s_rc.size.width = s_vrc.size.width - X_ORIGIN * 2 - 20;
@@ -562,7 +571,7 @@
     }
 
     s_rc.origin.y = s_panel_rc.origin.y + 14;
-    s_rc.size.height = 25; s_rc.size.width = 100;
+    s_rc.size.height = 25; s_rc.size.width = 105;
     s_rc.origin.x = s_panel_rc.size.width - s_rc.size.width - 14;
     DEF_PANEL_BUTTON( 0, _NS("OK"), clickedCancelOK: );
     [o_panel setDefaultButtonCell: [o_button cell]];
