@@ -2424,10 +2424,10 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                             break;
                         }
                     }
-                    if( b_keep )
-                        break;
+                    if( b_keep ) break;
                 }
             }
+
             if( !b_keep )
             {
                 TAB_APPEND( i_pmt_rm, pmt_rm, pmt );
@@ -2446,22 +2446,23 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
                 int i_prg;
                 for( i_prg = 0; i_prg < pid->p_owner->i_prg; i_prg++ )
                 {
-                    if( pid->p_owner->prg[i_prg]->i_pid_pmt ==
-                        pmt_rm[j]->i_pid && pid->es->id )
-                    {
-                        /* We only remove es that aren't defined by extra pmt */
-                        if( p_sys->b_dvb_control )
-                        {
-                            if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, i, VLC_FALSE ) )
-                                p_sys->b_dvb_control = VLC_FALSE;
-                        }
+                    /* We only remove es that aren't defined by extra pmt */
+                    if( pid->p_owner->prg[i_prg]->i_pid_pmt !=
+                        pmt_rm[j]->i_pid ) continue;
 
-                        PIDClean( p_demux->out, pid );
-                        break;
+                    if( p_sys->b_dvb_control && pid->es->id )
+                    {
+                        if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                            ACCESS_SET_PRIVATE_ID_STATE, i,
+                                            VLC_FALSE ) )
+                            p_sys->b_dvb_control = VLC_FALSE;
                     }
-                }
-                if( !pid->b_valid )
+
+                    PIDClean( p_demux->out, pid );
                     break;
+                }
+
+                if( !pid->b_valid ) break;
             }
         }
 
@@ -2470,17 +2471,17 @@ static void PATCallBack( demux_t *p_demux, dvbpsi_pat_t *p_pat )
         {
             if( p_sys->b_dvb_control )
             {
-                if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS, ACCESS_SET_PRIVATE_ID_STATE, pmt_rm[i]->i_pid, VLC_FALSE ) )
+                if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                    ACCESS_SET_PRIVATE_ID_STATE,
+                                    pmt_rm[i]->i_pid, VLC_FALSE ) )
                     p_sys->b_dvb_control = VLC_FALSE;
             }
 
             PIDClean( p_demux->out, &p_sys->pid[pmt_rm[i]->i_pid] );
             TAB_REMOVE( p_sys->i_pmt, p_sys->pmt, pmt_rm[i] );
         }
-        if( pmt_rm )
-        {
-            free( pmt_rm );
-        }
+
+        if( pmt_rm ) free( pmt_rm );
     }
 
     /* now create programs */
