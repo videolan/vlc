@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.11 2001/09/29 14:52:01 bozo Exp $
+ * $Id: ac3_spdif.c,v 1.12 2001/09/30 20:25:13 bozo Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -150,6 +150,8 @@ static int InitThread( ac3_spdif_thread_t * p_spdif )
     while( !b_sync )
     {
         while( GetBits( &p_spdif->bit_stream, 8 ) != 0x0b );
+        p_spdif->i_real_pts = p_spdif->i_pts;
+        p_spdif->i_pts = 0;
         b_sync = ( ShowBits( &p_spdif->bit_stream, 8 ) == 0x77 );
     }
     RemoveBits( &p_spdif->bit_stream, 8 );
@@ -191,10 +193,6 @@ static void RunThread( ac3_spdif_thread_t * p_spdif )
     boolean_t   b_sync;
     /* PTS of the current frame */
     mtime_t     i_current_pts = 0;
-    /* Valid value of p_spdif->i_pts */
-    mtime_t     i_real_pts = 0;
-    /* b_update_pts is used to know when p_spdif->i_pts is valid */
-    boolean_t   b_update_pts = 1;
 
     /* Initializing the spdif decoder thread */
     if( InitThread( p_spdif ) )
@@ -208,35 +206,21 @@ static void RunThread( ac3_spdif_thread_t * p_spdif )
 
     while( !p_spdif->p_fifo->b_die && !p_spdif->p_fifo->b_error )
     {
-        /* Synchronous update of the PTS */
-        /* when b_update_pts is set p_spdif->i_pts is non-zero */
-        if( b_update_pts /*&& p_spdif->i_pts */)
-        {
-            i_real_pts = p_spdif->i_pts;
-            p_spdif->i_pts = 0;
-        }
-
         /* Handle the dates */
-        if( i_real_pts )
+        if( p_spdif->i_real_pts )
         {
-            if(i_current_pts + i_frame_time != i_real_pts)
+            if(i_current_pts + i_frame_time != p_spdif->i_real_pts)
             {
                 intf_WarnMsg( 2, "spdif warning: date discontinuity (%d)",
-                              i_real_pts - i_current_pts - i_frame_time );
+                              p_spdif->i_real_pts - i_current_pts -
+                              i_frame_time );
             }
-            i_current_pts = i_real_pts;
-            i_real_pts = 0;
+            i_current_pts = p_spdif->i_real_pts;
+            p_spdif->i_real_pts = 0;
         }
         else
         {
             i_current_pts += i_frame_time;
-        }
-
-        /* Delayed update of the PTS */
-        if( !b_update_pts && p_spdif->i_pts )
-        {
-            i_real_pts = p_spdif->i_pts;
-            p_spdif->i_pts = 0;
         }
 
         /* if we're late here the output won't have to play the frame */
@@ -266,7 +250,8 @@ static void RunThread( ac3_spdif_thread_t * p_spdif )
         while( !b_sync )
         {
             while( GetBits( &p_spdif->bit_stream, 8 ) != 0x0b );
-            b_update_pts = p_spdif->i_pts;
+            p_spdif->i_real_pts = p_spdif->i_pts;
+            p_spdif->i_pts = 0;
             b_sync = ( ShowBits( &p_spdif->bit_stream, 8 ) == 0x77 );
         }
         RemoveBits( &p_spdif->bit_stream, 8 );
