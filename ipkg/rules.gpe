@@ -39,11 +39,11 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr \
 	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg"
 
-export VIDDIR="usr/share/videolan"
+export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
-export PKGDIR=/home/jpsaman/iPaq/packages/vlc-0.5.0
+export PKGDIR=/home/jpsaman/iPaq/packages/gpe-vlc-0.5.0
 
 build: build-stamp
 config:
@@ -55,37 +55,32 @@ config:
 build-stamp:
 # This is ugly -- I know
 #	patch -p 0 < ipkg/patch
-
 	$(MAKE)
 
-	touch build-stamp
-
 clean:
-	rm -f build-stamp
-
 	-$(MAKE) distclean
 
 install: build
 	rm -fr ${PKGDIR}/
 	mkdir -p ${PKGDIR}/CONTROL
 	mkdir -p $(PKGDIR)/usr/bin
-	mkdir -p ${PKGDIR}/usr/share/videolan
+	mkdir -p ${PKGDIR}/usr/share/vlc
 	mkdir -p ${PKGDIR}/usr/lib/menu
-	mkdir -p ${PKGDIR}/usr/lib/videolan/vlc
+	mkdir -p ${PKGDIR}/usr/lib/vlc
 	$(STRIP) vlc
 	cp ipkg/control.gpe $(PKGDIR)/CONTROL/control
 	cp ipkg/postinst.gpe ${PKGDIR}/CONTROL/postinst
 	cp ipkg/postrm.gpe ${PKGDIR}/CONTROL/postrm
-	cp share/familiar-* ${PKGDIR}/usr/share/videolan
-	cp share/vlc32x32.xpm ${PKGDIR}/usr/share/videolan
-	cp share/vlc16x16.xpm  ${PKGDIR}/usr/share/videolan
-	cp share/vlc48x48.png  ${PKGDIR}/usr/share/videolan
+	cp share/familiar-* ${PKGDIR}/usr/share/vlc
+	cp share/vlc32x32.xpm ${PKGDIR}/usr/share/vlc
+	cp share/vlc16x16.xpm  ${PKGDIR}/usr/share/vlc
+	cp share/vlc48x48.png  ${PKGDIR}/usr/share/vlc
 	cp vlc $(PKGDIR)/usr/bin
 	cp ipkg/vlc.gpe ${PKGDIR}/usr/lib/menu/vlc
 
 install-plugins: install
-	cp plugins/*.so ${PKGDIR}/usr/lib/videolan/vlc
-	$(STRIP) ${PKGDIR}/usr/lib/videolan/vlc
+	find ./ -name *.so | xargs cp ${PKGDIR}/usr/lib/vlc
+	$(STRIP) ${PKGDIR}/usr/lib/vlc
 
 .PHONY: build clean install
 

@@ -36,7 +36,7 @@ export CONFIG_FLAGS="--enable-release --prefix=/usr \
 	--with-qte=/usr/local/arm/2.95.3/arm-linux/opt/QtPalmtop \
 	--with-ffmpeg-tree=/home/jpsaman/iPaq/src/ffmpeg"
 
-export VIDDIR="usr/share/videolan"
+export VIDDIR="usr/share/vlc"
 export PIXDIR="usr/share/pixmaps"
 #export DESTDIR=/tmp/vlc
 export DESTDIR=/usr/local/arm/2.95.3/arm-linux
@@ -65,23 +65,23 @@ install: build
 	rm -fr ${PKGDIR}/
 	mkdir -p ${PKGDIR}/CONTROL
 	mkdir -p $(PKGDIR)/usr/bin
-	mkdir -p ${PKGDIR}/usr/share/videolan
+	mkdir -p ${PKGDIR}/usr/share/vlc
 	mkdir -p ${PKGDIR}/usr/lib/menu
-	mkdir -p ${PKGDIR}/usr/lib/videolan/vlc
+	mkdir -p ${PKGDIR}/usr/lib/vlc
 	mkdir -p ${PKGDIR}/opt/QtPalmtop/bin
 	mkdir -p ${PKGDIR}/opt/QtPalmtop/apps/Applications
 	$(STRIP) vlc
 	cp ipkg/control.opie $(PKGDIR)/CONTROL/control
 	cp ipkg/postinst.opie ${PKGDIR}/CONTROL/postinst
 	cp ipkg/postrm.opie ${PKGDIR}/CONTROL/postrm
-	cp share/vlc48x48.png  ${PKGDIR}/usr/share/videolan
+	cp share/vlc48x48.png  ${PKGDIR}/usr/share/vlc
 	cp vlc $(PKGDIR)/usr/bin
 	cp ipkg/vlc.opie ${PKGDIR}/opt/QtPalmtop/bin/opie-vlc
 	cp ipkg/vlc.desktop ${PKGDIR}/opt/QtPalmtop/apps/Applications
 
 install-plugins: install
-	cp plugins/*.so ${PKGDIR}/usr/lib/videolan/vlc
-	$(STRIP) ${PKGDIR}/usr/lib/videolan/vlc
+	cp plugins/*.so ${PKGDIR}/usr/lib/vlc
+	$(STRIP) ${PKGDIR}/usr/lib/vlc
 
 .PHONY: build clean install
 
