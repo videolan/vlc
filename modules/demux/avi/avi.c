@@ -448,6 +448,13 @@ static int Open( vlc_object_t * p_this )
                          p_vids->p_bih->biHeight,
                          p_vids->p_bih->biBitCount,
                          (float)tk->i_rate/(float)tk->i_scale );
+
+                if( p_vids->p_bih->biCompression == 0x00 )
+                {
+                    /* RGB DIB are coded from bottom to top */
+                    fmt.video.i_height =
+                        (unsigned int)(-(int)p_vids->p_bih->biHeight);
+                }
                 break;
             default:
                 msg_Warn( p_demux, "stream[%d] unknown type", i );

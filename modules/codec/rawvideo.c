@@ -40,6 +40,7 @@ struct decoder_sys_t
      * Input properties
      */
     int i_raw_size;
+    vlc_bool_t b_invert;
 
     /*
      * Common properties
@@ -119,9 +120,17 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Misc init */
     p_dec->p_sys->b_packetizer = VLC_FALSE;
     p_sys->i_pts = 0;
+    p_sys->b_invert = 0;
 
-    if( p_dec->fmt_in.video.i_width <= 0 ||
-        p_dec->fmt_in.video.i_height <= 0 )
+    if( (int)p_dec->fmt_in.video.i_height < 0 )
+    {
+        /* Frames are coded from bottom to top */
+        p_dec->fmt_in.video.i_height =
+            (unsigned int)(-(int)p_dec->fmt_in.video.i_height);
+        p_sys->b_invert = VLC_TRUE;
+    }
+
+    if( p_dec->fmt_in.video.i_width <= 0 || p_dec->fmt_in.video.i_height <= 0 )
     {
         msg_Err( p_dec, "invalid display size %dx%d",
                  p_dec->fmt_in.video.i_width, p_dec->fmt_in.video.i_height );
@@ -234,8 +243,9 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
 {
     uint8_t *p_src, *p_dst;
     int i_src, i_plane, i_line, i_width;
+    decoder_sys_t *p_sys = p_dec->p_sys;
 
-    p_src  = p_block->p_buffer;
+    p_src = p_block->p_buffer;
     i_src = p_block->i_buffer;
 
     for( i_plane = 0; i_plane < p_pic->i_planes; i_plane++ )
@@ -243,12 +253,18 @@ static void FillPicture( decoder_t *p_dec, block_t *p_block, picture_t *p_pic )
         p_dst = p_pic->p[i_plane].p_pixels;
         i_width = p_pic->p[i_plane].i_visible_pitch;
 
+        if( p_sys->b_invert )
+            p_src += (i_width * (p_pic->p[i_plane].i_visible_lines - 1));
+
         for( i_line = 0; i_line < p_pic->p[i_plane].i_visible_lines; i_line++ )
         {
             p_dec->p_vlc->pf_memcpy( p_dst, p_src, i_width );
-            p_src += i_width;
+            p_src += p_sys->b_invert ? -i_width : i_width;
             p_dst += p_pic->p[i_plane].i_pitch;
         }
+
+        if( p_sys->b_invert )
+            p_src += (i_width * (p_pic->p[i_plane].i_visible_lines + 1));
     }
 }
 
