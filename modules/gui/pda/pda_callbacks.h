@@ -2,7 +2,7 @@
  * callbacks.h : pda plugin for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: pda_callbacks.h,v 1.4 2003/11/07 14:15:23 jpsaman Exp $
+ * $Id: pda_callbacks.h,v 1.5 2003/11/08 16:04:05 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -29,6 +29,7 @@
 void ReadDirectory( GtkListStore *p_list, char *psz_dir );
 void MediaURLOpenChanged( GtkWidget *widget, gchar *psz_url );
 void PlaylistRebuildListStore( GtkListStore *p_list, playlist_t * p_playlist );
+
 
 gboolean
 onPDADeleteEvent                       (GtkWidget       *widget,
@@ -94,54 +95,6 @@ onEntryMRLChanged                      (GtkEditable     *editable,
 
 void
 onEntryMRLEditingDone                  (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onNetworkPortChanged                   (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryNetworkPortEditingDone          (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onNetworkAddressChanged                (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryNetworkAddressEditingDone       (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onNetworkTypeChanged                   (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryNetworkTypeEditingDone          (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onProtocolTypeChanged                  (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryProtocolTypeEditingDone         (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onMRLTypeChanged                       (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryMRLTypeEditingDone              (GtkCellEditable *celleditable,
-                                        gpointer         user_data);
-
-void
-onStreamTypeChanged                    (GtkEditable     *editable,
-                                        gpointer         user_data);
-
-void
-onEntryStreamTypeEditingDone           (GtkCellEditable *celleditable,
                                         gpointer         user_data);
 
 void
@@ -264,3 +217,12 @@ void
 onPreferenceCancel                     (GtkButton       *button,
                                         gpointer         user_data);
 
+
+void
+onNetworkMRLAdd                        (GtkContainer    *container,
+                                        GtkWidget       *widget,
+                                        gpointer         user_data);
+
+void
+NetworkBuildMRL                        (GtkEditable     *editable,
+                                        gpointer         user_data);

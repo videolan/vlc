@@ -2,7 +2,7 @@
  * pda_callbacks.c : Callbacks for the pda Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: pda_callbacks.c,v 1.6 2003/11/07 14:15:23 jpsaman Exp $
+ * $Id: pda_callbacks.c,v 1.7 2003/11/08 16:04:05 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -106,6 +106,7 @@ void PlaylistRebuildListStore( GtkListStore * p_list, playlist_t * p_playlist )
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
 }
+
 
 /*****************************************************************************
  * Helper functions for URL changes in Media and Preferences notebook pages.
@@ -570,7 +571,6 @@ void
 onEntryMRLChanged                      (GtkEditable     *editable,
                                         gpointer         user_data)
 {
-    g_print("onMRLChanged\n");
 }
 
 
@@ -583,133 +583,94 @@ onEntryMRLEditingDone                  (GtkCellEditable *celleditable,
 
 
 void
-onNetworkPortChanged                   (GtkEditable     *editable,
+NetworkBuildMRL                        (GtkEditable     *editable,
                                         gpointer         user_data)
 {
+    GtkSpinButton *networkPort = NULL;
+    GtkEntry      *entryMRL = NULL;
+    GtkEntry      *networkMRLType = NULL;
+    GtkEntry      *networkAddress = NULL;
+    GtkEntry      *networkProtocol = NULL;
+    GtkEntry      *networkType = NULL;
+    const gchar   *mrlType;
+    const gchar   *mrlAddress;
+    gint     mrlPort;
+    const gchar   *mrlProtocol;
+    const gchar   *mrlNetworkType;
+#define VLC_MAX_MRL     256
+    char           text[VLC_MAX_MRL];
+    int            pos = 0;
 
+    entryMRL = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryMRL" );
+
+    networkMRLType  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkMRLType" );
+    networkAddress  = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkAddress" );
+    networkPort     = (GtkSpinButton*) lookup_widget( GTK_WIDGET(editable), "entryNetworkPort" );
+    networkProtocol = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkProtocolType" );
+    networkType     = (GtkEntry*) lookup_widget( GTK_WIDGET(editable), "entryNetworkType" );
+
+    mrlType        = gtk_entry_get_text(GTK_ENTRY(networkMRLType));
+    mrlAddress     = gtk_entry_get_text(GTK_ENTRY(networkAddress));
+    mrlPort        = gtk_spin_button_get_value_as_int(networkPort);
+    mrlProtocol    = gtk_entry_get_text(GTK_ENTRY(networkProtocol));
+    mrlNetworkType = gtk_entry_get_text(GTK_ENTRY(networkType));
+
+    /* Build MRL from parts ;-) */
+    pos = snprintf( &text[0], VLC_MAX_MRL, "%s", (char*)mrlType);
+    if (strncasecmp( (char*)mrlProtocol, "IPv6",4)==0 )
+    {
+        pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "6://" );
+        if (strncasecmp( (char*)mrlNetworkType, "multicast",9)==0)
+        {
+            pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "@" );
+        }
+        pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "[%s]:%d", (char*)mrlAddress, (int)mrlPort );
+    }
+    else
+    {
+        pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "://" );
+        if (strncasecmp( (char*)mrlNetworkType, "multicast",9)==0)
+        {
+            pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "@" );
+        }
+        pos += snprintf( &text[pos], VLC_MAX_MRL - pos, "%s:%d", (char*)mrlAddress, (int)mrlPort );
+    }
+
+    if (pos >= VLC_MAX_MRL)
+        text[VLC_MAX_MRL-1]='\0';
+
+    gtk_entry_set_text(entryMRL,text);
+#undef VLC_MAX_MRL
 }
-
-
-void
-onEntryNetworkPortEditingDone          (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onNetworkAddressChanged                (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryNetworkAddressEditingDone       (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onNetworkTypeChanged                   (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryNetworkTypeEditingDone          (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onProtocolTypeChanged                  (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryProtocolTypeEditingDone         (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onMRLTypeChanged                       (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryMRLTypeEditingDone              (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onStreamTypeChanged                    (GtkEditable     *editable,
-                                        gpointer         user_data)
-{
-
-}
-
-
-void
-onEntryStreamTypeEditingDone           (GtkCellEditable *celleditable,
-                                        gpointer         user_data)
-{
-
-}
-
 
 void
 onAddNetworkPlaylist                   (GtkButton       *button,
                                         gpointer         user_data)
 {
-#if 0
-    GtkEntry *p_mrl;
+    GtkEntry     *p_mrl = NULL;
+    GtkTreeView  *p_tvplaylist = NULL;
+    GtkTreeModel *p_play_model;
+    GtkTreeIter   p_play_iter;
+    const gchar  *mrl_name;
 
-    p_mrl = (GtkEntry*) lookup_widget(GTK_WIDGET(button),"" );
+    p_mrl = (GtkEntry*) lookup_widget(GTK_WIDGET(button),"entryMRL" );
     if (NULL != p_mrl)
     {
-        GtkTreeView  *p_tvplaylist = NULL;
-        GtkTreeModel *p_play_model;
-        GtkTreeIter   p_play_iter;
-        gchar *name;
-        
+        mrl_name = gtk_entry_get_text(p_mrl);
+
         p_tvplaylist = (GtkTreeView *) lookup_widget( GTK_WIDGET(button), "tvPlaylist");
-        if (p_tvplaylist)
+        if (NULL != p_tvplaylist)
         {
             p_play_model = gtk_tree_view_get_model(p_tvplaylist);
+
             /* Add a new row to the playlist treeview model */
-            gtk_list_store_append (p_play_model, &p_play_iter);
-            gtk_list_store_set (p_play_model, &p_play_iter,
-                                    0, name,   /* Add path to it !!! */
-                                    1, "00:00:00",
+            gtk_list_store_append (GTK_LIST_STORE(p_play_model), &p_play_iter);
+            gtk_list_store_set (GTK_LIST_STORE(p_play_model), &p_play_iter,
+                                    0, mrl_name,   /* Add path to it !!! */
+                                    1, "no info",
                                     -1 );
-            /* do we need to unref ?? */
         }
-        else
-    //       msg_Err(p_intf, "Error obtaining pointer to Play List");
-           g_print("Error obtaining pointer to Play List");
     }
-#endif
 }
 
 
@@ -937,6 +898,16 @@ onPreferenceApply                      (GtkButton       *button,
 
 void
 onPreferenceCancel                     (GtkButton       *button,
+                                        gpointer         user_data)
+{
+
+}
+
+
+
+void
+onNetworkMRLAdd                        (GtkContainer    *container,
+                                        GtkWidget       *widget,
                                         gpointer         user_data)
 {
 

@@ -331,6 +331,7 @@
 		      <property name="case_sensitive">False</property>
 		      <property name="enable_arrow_keys">True</property>
 		      <property name="enable_arrows_always">False</property>
+		      <signal name="add" handler="onNetworkMRLAdd" last_modification_time="Fri, 07 Nov 2003 14:35:58 GMT"/>
 
 		      <child internal-child="entry">
 			<widget class="GtkEntry" id="entryMRL">
@@ -345,8 +346,6 @@
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
-			  <signal name="changed" handler="onEntryMRLChanged" last_modification_time="Fri, 26 Sep 2003 12:32:12 GMT"/>
-			  <signal name="editing_done" handler="onEntryMRLEditingDone" last_modification_time="Fri, 26 Sep 2003 13:31:56 GMT"/>
 			</widget>
 		      </child>
 
@@ -356,178 +355,58 @@
 			  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem1">
+			    <widget class="GtkListItem" id="listitem340">
 			      <property name="visible">True</property>
-
-			      <child>
-				<widget class="GtkLabel" id="label31">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">file://</property>
-				  <property name="use_underline">False</property>
-				  <property name="use_markup">False</property>
-				  <property name="justify">GTK_JUSTIFY_LEFT</property>
-				  <property name="wrap">False</property>
-				  <property name="selectable">False</property>
-				  <property name="xalign">0</property>
-				  <property name="yalign">0.5</property>
-				  <property name="xpad">0</property>
-				  <property name="ypad">0</property>
-				</widget>
-			      </child>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">udp://@:1234</property>
 			    </widget>
 			  </child>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem2">
+			    <widget class="GtkListItem" id="listitem341">
 			      <property name="visible">True</property>
-
-			      <child>
-				<widget class="GtkLabel" id="label32">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">ftp://</property>
-				  <property name="use_underline">False</property>
-				  <property name="use_markup">False</property>
-				  <property name="justify">GTK_JUSTIFY_LEFT</property>
-				  <property name="wrap">False</property>
-				  <property name="selectable">False</property>
-				  <property name="xalign">0</property>
-				  <property name="yalign">0.5</property>
-				  <property name="xpad">0</property>
-				  <property name="ypad">0</property>
-				</widget>
-			      </child>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">udp6://@:1234</property>
 			    </widget>
 			  </child>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem3">
+			    <widget class="GtkListItem" id="listitem342">
 			      <property name="visible">True</property>
-
-			      <child>
-				<widget class="GtkLabel" id="label33">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">http://</property>
-				  <property name="use_underline">False</property>
-				  <property name="use_markup">False</property>
-				  <property name="justify">GTK_JUSTIFY_LEFT</property>
-				  <property name="wrap">False</property>
-				  <property name="selectable">False</property>
-				  <property name="xalign">0</property>
-				  <property name="yalign">0.5</property>
-				  <property name="xpad">0</property>
-				  <property name="ypad">0</property>
-				</widget>
-			      </child>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">rtp://</property>
 			    </widget>
 			  </child>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem4">
+			    <widget class="GtkListItem" id="listitem343">
 			      <property name="visible">True</property>
-
-			      <child>
-				<widget class="GtkLabel" id="label34">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">udp://@:1234</property>
-				  <property name="use_underline">False</property>
-				  <property name="use_markup">False</property>
-				  <property name="justify">GTK_JUSTIFY_LEFT</property>
-				  <property name="wrap">False</property>
-				  <property name="selectable">False</property>
-				  <property name="xalign">0</property>
-				  <property name="yalign">0.5</property>
-				  <property name="xpad">0</property>
-				  <property name="ypad">0</property>
-				</widget>
-			      </child>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">rtp6://</property>
 			    </widget>
 			  </child>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem5">
+			    <widget class="GtkListItem" id="listitem344">
 			      <property name="visible">True</property>
-
-			      <child>
-				<widget class="GtkLabel" id="label35">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">udp6://@:1234</property>
-				  <property name="use_underline">False</property>
-				  <property name="use_markup">False</property>
-				  <property name="justify">GTK_JUSTIFY_LEFT</property>
-				  <property name="wrap">False</property>
-				  <property name="selectable">False</property>
-				  <property name="xalign">0</property>
-				  <property name="yalign">0.5</property>
-				  <property name="xpad">0</property>
-				  <property name="ypad">0</property>
-				</widget>
-			      </child>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">ftp://</property>
 			    </widget>
 			  </child>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem6">
+			    <widget class="GtkListItem" id="listitem345">
 			      <property name="visible">True</property>
-
-			      <child>
-				<widget class="GtkLabel" id="label36">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">rtp://</property>
-				  <property name="use_underline">False</property>
-				  <property name="use_markup">False</property>
-				  <property name="justify">GTK_JUSTIFY_LEFT</property>
-				  <property name="wrap">False</property>
-				  <property name="selectable">False</property>
-				  <property name="xalign">0</property>
-				  <property name="yalign">0.5</property>
-				  <property name="xpad">0</property>
-				  <property name="ypad">0</property>
-				</widget>
-			      </child>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">http://</property>
 			    </widget>
 			  </child>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem7">
+			    <widget class="GtkListItem" id="listitem346">
 			      <property name="visible">True</property>
-
-			      <child>
-				<widget class="GtkLabel" id="label37">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes">rtp6://</property>
-				  <property name="use_underline">False</property>
-				  <property name="use_markup">False</property>
-				  <property name="justify">GTK_JUSTIFY_LEFT</property>
-				  <property name="wrap">False</property>
-				  <property name="selectable">False</property>
-				  <property name="xalign">0</property>
-				  <property name="yalign">0.5</property>
-				  <property name="xpad">0</property>
-				  <property name="ypad">0</property>
-				</widget>
-			      </child>
-			    </widget>
-			  </child>
-
-			  <child>
-			    <widget class="GtkListItem" id="listitem8">
-			      <property name="visible">True</property>
-
-			      <child>
-				<widget class="GtkLabel" id="label38">
-				  <property name="visible">True</property>
-				  <property name="label" translatable="yes"></property>
-				  <property name="use_underline">False</property>
-				  <property name="use_markup">False</property>
-				  <property name="justify">GTK_JUSTIFY_LEFT</property>
-				  <property name="wrap">False</property>
-				  <property name="selectable">False</property>
-				  <property name="xalign">0</property>
-				  <property name="yalign">0.5</property>
-				  <property name="xpad">0</property>
-				  <property name="ypad">0</property>
-				</widget>
-			      </child>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">mms://</property>
 			    </widget>
 			  </child>
 			</widget>
@@ -626,9 +505,8 @@
 		      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
 		      <property name="snap_to_ticks">False</property>
 		      <property name="wrap">False</property>
-		      <property name="adjustment">1234 0 100 1 10 10</property>
-		      <signal name="changed" handler="onNetworkPortChanged" last_modification_time="Fri, 26 Sep 2003 12:32:28 GMT"/>
-		      <signal name="editing_done" handler="onEntryNetworkPortEditingDone" last_modification_time="Fri, 26 Sep 2003 13:32:11 GMT"/>
+		      <property name="adjustment">1233 0 65535 1 10 10</property>
+		      <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:34:10 GMT"/>
 		    </widget>
 		    <packing>
 		      <property name="left_attach">1</property>
@@ -659,8 +537,7 @@
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
-			  <signal name="changed" handler="onNetworkAddressChanged" last_modification_time="Fri, 26 Sep 2003 12:33:42 GMT"/>
-			  <signal name="editing_done" handler="onEntryNetworkAddressEditingDone" last_modification_time="Fri, 26 Sep 2003 13:32:33 GMT"/>
+			  <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:34:30 GMT"/>
 			</widget>
 		      </child>
 
@@ -700,8 +577,7 @@
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
-			  <signal name="changed" handler="onNetworkTypeChanged" last_modification_time="Fri, 26 Sep 2003 12:34:45 GMT"/>
-			  <signal name="editing_done" handler="onEntryNetworkTypeEditingDone" last_modification_time="Fri, 26 Sep 2003 13:32:50 GMT"/>
+			  <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:34:45 GMT"/>
 			</widget>
 		      </child>
 
@@ -762,7 +638,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkCombo" id="comboProtocolType">
+		    <widget class="GtkCombo" id="comboNetworkProtocolType">
 		      <property name="visible">True</property>
 		      <property name="value_in_list">False</property>
 		      <property name="allow_empty">True</property>
@@ -771,7 +647,7 @@
 		      <property name="enable_arrows_always">False</property>
 
 		      <child internal-child="entry">
-			<widget class="GtkEntry" id="entryProtocolType">
+			<widget class="GtkEntry" id="entryNetworkProtocolType">
 			  <property name="visible">True</property>
 			  <property name="can_focus">True</property>
 			  <property name="editable">True</property>
@@ -781,13 +657,12 @@
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
-			  <signal name="changed" handler="onProtocolTypeChanged" last_modification_time="Fri, 26 Sep 2003 12:35:31 GMT"/>
-			  <signal name="editing_done" handler="onEntryProtocolTypeEditingDone" last_modification_time="Fri, 26 Sep 2003 13:33:06 GMT"/>
+			  <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:35:01 GMT"/>
 			</widget>
 		      </child>
 
 		      <child internal-child="list">
-			<widget class="GtkList" id="listProtocolType">
+			<widget class="GtkList" id="listNetworkProtocolType">
 			  <property name="visible">True</property>
 			  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
 
@@ -867,7 +742,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkCombo" id="comboMRLType">
+		    <widget class="GtkCombo" id="comboNetworkMRLType">
 		      <property name="visible">True</property>
 		      <property name="value_in_list">False</property>
 		      <property name="allow_empty">True</property>
@@ -876,52 +751,35 @@
 		      <property name="enable_arrows_always">False</property>
 
 		      <child internal-child="entry">
-			<widget class="GtkEntry" id="entryMRLType">
+			<widget class="GtkEntry" id="entryNetworkMRLType">
 			  <property name="visible">True</property>
 			  <property name="can_focus">True</property>
 			  <property name="editable">True</property>
 			  <property name="visibility">True</property>
 			  <property name="max_length">0</property>
-			  <property name="text" translatable="yes"></property>
+			  <property name="text" translatable="yes">udp</property>
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
-			  <signal name="changed" handler="onMRLTypeChanged" last_modification_time="Fri, 26 Sep 2003 12:36:22 GMT"/>
-			  <signal name="editing_done" handler="onEntryMRLTypeEditingDone" last_modification_time="Fri, 26 Sep 2003 13:33:23 GMT"/>
+			  <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:35:14 GMT"/>
 			</widget>
 		      </child>
 
 		      <child internal-child="list">
-			<widget class="GtkList" id="listMRLType">
+			<widget class="GtkList" id="listNetworkMRLType">
 			  <property name="visible">True</property>
 			  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem59">
+			    <widget class="GtkListItem" id="listitem630">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label" translatable="yes">http</property>
+			      <property name="label" translatable="yes">udp</property>
 			    </widget>
 			  </child>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem60">
-			      <property name="visible">True</property>
-			      <property name="can_focus">True</property>
-			      <property name="label" translatable="yes">ftp</property>
-			    </widget>
-			  </child>
-
-			  <child>
-			    <widget class="GtkListItem" id="listitem61">
-			      <property name="visible">True</property>
-			      <property name="can_focus">True</property>
-			      <property name="label" translatable="yes">mms</property>
-			    </widget>
-			  </child>
-
-			  <child>
-			    <widget class="GtkListItem" id="listitem62">
+			    <widget class="GtkListItem" id="listitem631">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
 			      <property name="label" translatable="yes">rtp</property>
@@ -929,10 +787,26 @@
 			  </child>
 
 			  <child>
-			    <widget class="GtkListItem" id="listitem63">
+			    <widget class="GtkListItem" id="listitem632">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
-			      <property name="label" translatable="yes">udp</property>
+			      <property name="label" translatable="yes">ftp</property>
+			    </widget>
+			  </child>
+
+			  <child>
+			    <widget class="GtkListItem" id="listitem633">
+			      <property name="visible">True</property>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">http</property>
+			    </widget>
+			  </child>
+
+			  <child>
+			    <widget class="GtkListItem" id="listitem634">
+			      <property name="visible">True</property>
+			      <property name="can_focus">True</property>
+			      <property name="label" translatable="yes">mms</property>
 			    </widget>
 			  </child>
 			</widget>
@@ -972,7 +846,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkCombo" id="comboStreamType">
+		    <widget class="GtkCombo" id="comboNetworkStreamType">
 		      <property name="visible">True</property>
 		      <property name="value_in_list">False</property>
 		      <property name="allow_empty">True</property>
@@ -981,7 +855,7 @@
 		      <property name="enable_arrows_always">False</property>
 
 		      <child internal-child="entry">
-			<widget class="GtkEntry" id="entryStreamType">
+			<widget class="GtkEntry" id="entryNetworkStreamType">
 			  <property name="visible">True</property>
 			  <property name="can_focus">True</property>
 			  <property name="editable">True</property>
@@ -991,13 +865,12 @@
 			  <property name="has_frame">True</property>
 			  <property name="invisible_char" translatable="yes">*</property>
 			  <property name="activates_default">False</property>
-			  <signal name="changed" handler="onStreamTypeChanged" last_modification_time="Fri, 26 Sep 2003 12:37:04 GMT"/>
-			  <signal name="editing_done" handler="onEntryStreamTypeEditingDone" last_modification_time="Fri, 26 Sep 2003 13:33:39 GMT"/>
+			  <signal name="changed" handler="NetworkBuildMRL" last_modification_time="Sat, 08 Nov 2003 13:35:27 GMT"/>
 			</widget>
 		      </child>
 
 		      <child internal-child="list">
-			<widget class="GtkList" id="listStreamType">
+			<widget class="GtkList" id="listNetworkStreamType">
 			  <property name="visible">True</property>
 			  <property name="selection_mode">GTK_SELECTION_BROWSE</property>
 
@@ -1293,9 +1166,9 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkLabel" id="Camera">
+	    <widget class="GtkLabel" id="Server">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Camera</property>
+	      <property name="label" translatable="yes">Server</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_LEFT</property>
@@ -1816,9 +1689,9 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkLabel" id="Server">
+	    <widget class="GtkLabel" id="Camera">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">Server</property>
+	      <property name="label" translatable="yes">Camera</property>
 	      <property name="use_underline">False</property>
 	      <property name="use_markup">False</property>
 	      <property name="justify">GTK_JUSTIFY_CENTER</property>

@@ -69,18 +69,18 @@ create_pda (void)
   GList *comboNetworkType_items = NULL;
   GtkWidget *entryNetworkType;
   GtkWidget *labelNetworkType;
-  GtkWidget *comboProtocolType;
-  GList *comboProtocolType_items = NULL;
-  GtkWidget *entryProtocolType;
+  GtkWidget *comboNetworkProtocolType;
+  GList *comboNetworkProtocolType_items = NULL;
+  GtkWidget *entryNetworkProtocolType;
   GtkWidget *labelNetworkProtocol;
   GtkWidget *labeNetworkMRLType;
-  GtkWidget *comboMRLType;
-  GList *comboMRLType_items = NULL;
-  GtkWidget *entryMRLType;
+  GtkWidget *comboNetworkMRLType;
+  GList *comboNetworkMRLType_items = NULL;
+  GtkWidget *entryNetworkMRLType;
   GtkWidget *labelNetworkStreamType;
-  GtkWidget *comboStreamType;
-  GList *comboStreamType_items = NULL;
-  GtkWidget *entryStreamType;
+  GtkWidget *comboNetworkStreamType;
+  GList *comboNetworkStreamType_items = NULL;
+  GtkWidget *entryNetworkStreamType;
   GtkWidget *hbox13;
   GtkWidget *AddNetworkPlaylist;
   GtkWidget *Network;
@@ -94,7 +94,7 @@ create_pda (void)
   GtkWidget *entryV4LVideo;
   GtkWidget *hbox16;
   GtkWidget *AddCameraToPlaylist;
-  GtkWidget *Camera;
+  GtkWidget *Server;
   GtkWidget *vbox1;
   GtkWidget *vbox6;
   GtkWidget *frameVideo;
@@ -123,7 +123,7 @@ create_pda (void)
   GtkWidget *label41;
   GtkWidget *hbox14;
   GtkWidget *AddServerToPlaylist;
-  GtkWidget *Server;
+  GtkWidget *Camera;
   GtkWidget *vbox4;
   GtkWidget *scrolledwindow5;
   GtkWidget *tvPlaylist;
@@ -334,14 +334,13 @@ create_pda (void)
   gtk_widget_set_name (comboMRL, "comboMRL");
   gtk_widget_show (comboMRL);
   gtk_box_pack_start (GTK_BOX (hbox12), comboMRL, TRUE, TRUE, 0);
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("file://"));
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("ftp://"));
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("http://"));
   comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("udp://@:1234"));
   comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("udp6://@:1234"));
   comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("rtp://"));
   comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("rtp6://"));
-  comboMRL_items = g_list_append (comboMRL_items, (gpointer) "");
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("ftp://"));
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("http://"));
+  comboMRL_items = g_list_append (comboMRL_items, (gpointer) _("mms://"));
   gtk_combo_set_popdown_strings (GTK_COMBO (comboMRL), comboMRL_items);
   g_list_free (comboMRL_items);
 
@@ -379,7 +378,7 @@ create_pda (void)
   gtk_label_set_justify (GTK_LABEL (labelNetworkAddress), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelNetworkAddress), 0, 0.5);
 
-  entryNetworkPort_adj = gtk_adjustment_new (1234, 0, 100, 1, 10, 10);
+  entryNetworkPort_adj = gtk_adjustment_new (1233, 0, 65535, 1, 10, 10);
   entryNetworkPort = gtk_spin_button_new (GTK_ADJUSTMENT (entryNetworkPort_adj), 1, 0);
   gtk_widget_set_name (entryNetworkPort, "entryNetworkPort");
   gtk_widget_show (entryNetworkPort);
@@ -427,22 +426,22 @@ create_pda (void)
   gtk_label_set_justify (GTK_LABEL (labelNetworkType), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelNetworkType), 0, 0.5);
 
-  comboProtocolType = gtk_combo_new ();
-  g_object_set_data (G_OBJECT (GTK_COMBO (comboProtocolType)->popwin),
-                     "GladeParentKey", comboProtocolType);
-  gtk_widget_set_name (comboProtocolType, "comboProtocolType");
-  gtk_widget_show (comboProtocolType);
-  gtk_table_attach (GTK_TABLE (table2), comboProtocolType, 1, 2, 3, 4,
+  comboNetworkProtocolType = gtk_combo_new ();
+  g_object_set_data (G_OBJECT (GTK_COMBO (comboNetworkProtocolType)->popwin),
+                     "GladeParentKey", comboNetworkProtocolType);
+  gtk_widget_set_name (comboNetworkProtocolType, "comboNetworkProtocolType");
+  gtk_widget_show (comboNetworkProtocolType);
+  gtk_table_attach (GTK_TABLE (table2), comboNetworkProtocolType, 1, 2, 3, 4,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  comboProtocolType_items = g_list_append (comboProtocolType_items, (gpointer) _("IPv4"));
-  comboProtocolType_items = g_list_append (comboProtocolType_items, (gpointer) _("IPv6"));
-  gtk_combo_set_popdown_strings (GTK_COMBO (comboProtocolType), comboProtocolType_items);
-  g_list_free (comboProtocolType_items);
+  comboNetworkProtocolType_items = g_list_append (comboNetworkProtocolType_items, (gpointer) _("IPv4"));
+  comboNetworkProtocolType_items = g_list_append (comboNetworkProtocolType_items, (gpointer) _("IPv6"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboNetworkProtocolType), comboNetworkProtocolType_items);
+  g_list_free (comboNetworkProtocolType_items);
 
-  entryProtocolType = GTK_COMBO (comboProtocolType)->entry;
-  gtk_widget_set_name (entryProtocolType, "entryProtocolType");
-  gtk_widget_show (entryProtocolType);
+  entryNetworkProtocolType = GTK_COMBO (comboNetworkProtocolType)->entry;
+  gtk_widget_set_name (entryNetworkProtocolType, "entryNetworkProtocolType");
+  gtk_widget_show (entryNetworkProtocolType);
 
   labelNetworkProtocol = gtk_label_new (_("Protocol:"));
   gtk_widget_set_name (labelNetworkProtocol, "labelNetworkProtocol");
@@ -462,25 +461,26 @@ create_pda (void)
   gtk_label_set_justify (GTK_LABEL (labeNetworkMRLType), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labeNetworkMRLType), 0, 0.5);
 
-  comboMRLType = gtk_combo_new ();
-  g_object_set_data (G_OBJECT (GTK_COMBO (comboMRLType)->popwin),
-                     "GladeParentKey", comboMRLType);
-  gtk_widget_set_name (comboMRLType, "comboMRLType");
-  gtk_widget_show (comboMRLType);
-  gtk_table_attach (GTK_TABLE (table2), comboMRLType, 1, 2, 4, 5,
+  comboNetworkMRLType = gtk_combo_new ();
+  g_object_set_data (G_OBJECT (GTK_COMBO (comboNetworkMRLType)->popwin),
+                     "GladeParentKey", comboNetworkMRLType);
+  gtk_widget_set_name (comboNetworkMRLType, "comboNetworkMRLType");
+  gtk_widget_show (comboNetworkMRLType);
+  gtk_table_attach (GTK_TABLE (table2), comboNetworkMRLType, 1, 2, 4, 5,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  comboMRLType_items = g_list_append (comboMRLType_items, (gpointer) _("http"));
-  comboMRLType_items = g_list_append (comboMRLType_items, (gpointer) _("ftp"));
-  comboMRLType_items = g_list_append (comboMRLType_items, (gpointer) _("mms"));
-  comboMRLType_items = g_list_append (comboMRLType_items, (gpointer) _("rtp"));
-  comboMRLType_items = g_list_append (comboMRLType_items, (gpointer) _("udp"));
-  gtk_combo_set_popdown_strings (GTK_COMBO (comboMRLType), comboMRLType_items);
-  g_list_free (comboMRLType_items);
+  comboNetworkMRLType_items = g_list_append (comboNetworkMRLType_items, (gpointer) _("udp"));
+  comboNetworkMRLType_items = g_list_append (comboNetworkMRLType_items, (gpointer) _("rtp"));
+  comboNetworkMRLType_items = g_list_append (comboNetworkMRLType_items, (gpointer) _("ftp"));
+  comboNetworkMRLType_items = g_list_append (comboNetworkMRLType_items, (gpointer) _("http"));
+  comboNetworkMRLType_items = g_list_append (comboNetworkMRLType_items, (gpointer) _("mms"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboNetworkMRLType), comboNetworkMRLType_items);
+  g_list_free (comboNetworkMRLType_items);
 
-  entryMRLType = GTK_COMBO (comboMRLType)->entry;
-  gtk_widget_set_name (entryMRLType, "entryMRLType");
-  gtk_widget_show (entryMRLType);
+  entryNetworkMRLType = GTK_COMBO (comboNetworkMRLType)->entry;
+  gtk_widget_set_name (entryNetworkMRLType, "entryNetworkMRLType");
+  gtk_widget_show (entryNetworkMRLType);
+  gtk_entry_set_text (GTK_ENTRY (entryNetworkMRLType), _("udp"));
 
   labelNetworkStreamType = gtk_label_new (_("Stream:"));
   gtk_widget_set_name (labelNetworkStreamType, "labelNetworkStreamType");
@@ -491,22 +491,22 @@ create_pda (void)
   gtk_label_set_justify (GTK_LABEL (labelNetworkStreamType), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (labelNetworkStreamType), 0, 0.5);
 
-  comboStreamType = gtk_combo_new ();
-  g_object_set_data (G_OBJECT (GTK_COMBO (comboStreamType)->popwin),
-                     "GladeParentKey", comboStreamType);
-  gtk_widget_set_name (comboStreamType, "comboStreamType");
-  gtk_widget_show (comboStreamType);
-  gtk_table_attach (GTK_TABLE (table2), comboStreamType, 1, 2, 5, 6,
+  comboNetworkStreamType = gtk_combo_new ();
+  g_object_set_data (G_OBJECT (GTK_COMBO (comboNetworkStreamType)->popwin),
+                     "GladeParentKey", comboNetworkStreamType);
+  gtk_widget_set_name (comboNetworkStreamType, "comboNetworkStreamType");
+  gtk_widget_show (comboNetworkStreamType);
+  gtk_table_attach (GTK_TABLE (table2), comboNetworkStreamType, 1, 2, 5, 6,
                     (GtkAttachOptions) (GTK_EXPAND | GTK_FILL),
                     (GtkAttachOptions) (0), 0, 0);
-  comboStreamType_items = g_list_append (comboStreamType_items, (gpointer) _("server"));
-  comboStreamType_items = g_list_append (comboStreamType_items, (gpointer) _("client"));
-  gtk_combo_set_popdown_strings (GTK_COMBO (comboStreamType), comboStreamType_items);
-  g_list_free (comboStreamType_items);
+  comboNetworkStreamType_items = g_list_append (comboNetworkStreamType_items, (gpointer) _("server"));
+  comboNetworkStreamType_items = g_list_append (comboNetworkStreamType_items, (gpointer) _("client"));
+  gtk_combo_set_popdown_strings (GTK_COMBO (comboNetworkStreamType), comboNetworkStreamType_items);
+  g_list_free (comboNetworkStreamType_items);
 
-  entryStreamType = GTK_COMBO (comboStreamType)->entry;
-  gtk_widget_set_name (entryStreamType, "entryStreamType");
-  gtk_widget_show (entryStreamType);
+  entryNetworkStreamType = GTK_COMBO (comboNetworkStreamType)->entry;
+  gtk_widget_set_name (entryNetworkStreamType, "entryNetworkStreamType");
+  gtk_widget_show (entryNetworkStreamType);
 
   hbox13 = gtk_hbox_new (FALSE, 0);
   gtk_widget_set_name (hbox13, "hbox13");
@@ -591,11 +591,11 @@ create_pda (void)
   gtk_widget_show (AddCameraToPlaylist);
   gtk_box_pack_start (GTK_BOX (hbox16), AddCameraToPlaylist, FALSE, FALSE, 0);
 
-  Camera = gtk_label_new (_("Camera"));
-  gtk_widget_set_name (Camera, "Camera");
-  gtk_widget_show (Camera);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 2), Camera);
-  gtk_label_set_justify (GTK_LABEL (Camera), GTK_JUSTIFY_LEFT);
+  Server = gtk_label_new (_("Server"));
+  gtk_widget_set_name (Server, "Server");
+  gtk_widget_show (Server);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 2), Server);
+  gtk_label_set_justify (GTK_LABEL (Server), GTK_JUSTIFY_LEFT);
 
   vbox1 = gtk_vbox_new (FALSE, 0);
   gtk_widget_set_name (vbox1, "vbox1");
@@ -776,10 +776,10 @@ create_pda (void)
   gtk_widget_show (AddServerToPlaylist);
   gtk_box_pack_start (GTK_BOX (hbox14), AddServerToPlaylist, FALSE, FALSE, 0);
 
-  Server = gtk_label_new (_("Server"));
-  gtk_widget_set_name (Server, "Server");
-  gtk_widget_show (Server);
-  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 3), Server);
+  Camera = gtk_label_new (_("Camera"));
+  gtk_widget_set_name (Camera, "Camera");
+  gtk_widget_show (Camera);
+  gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 3), Camera);
 
   vbox4 = gtk_vbox_new (FALSE, 0);
   gtk_widget_set_name (vbox4, "vbox4");
@@ -947,47 +947,26 @@ create_pda (void)
   g_signal_connect ((gpointer) AddFileToPlaylist, "pressed",
                     G_CALLBACK (onAddFileToPlaylist),
                     NULL);
-  g_signal_connect ((gpointer) entryMRL, "changed",
-                    G_CALLBACK (onEntryMRLChanged),
-                    NULL);
-  g_signal_connect ((gpointer) entryMRL, "editing_done",
-                    G_CALLBACK (onEntryMRLEditingDone),
+  g_signal_connect ((gpointer) comboMRL, "add",
+                    G_CALLBACK (onNetworkMRLAdd),
                     NULL);
   g_signal_connect ((gpointer) entryNetworkPort, "changed",
-                    G_CALLBACK (onNetworkPortChanged),
-                    NULL);
-  g_signal_connect ((gpointer) entryNetworkPort, "editing_done",
-                    G_CALLBACK (onEntryNetworkPortEditingDone),
+                    G_CALLBACK (NetworkBuildMRL),
                     NULL);
   g_signal_connect ((gpointer) entryNetworkAddress, "changed",
-                    G_CALLBACK (onNetworkAddressChanged),
-                    NULL);
-  g_signal_connect ((gpointer) entryNetworkAddress, "editing_done",
-                    G_CALLBACK (onEntryNetworkAddressEditingDone),
+                    G_CALLBACK (NetworkBuildMRL),
                     NULL);
   g_signal_connect ((gpointer) entryNetworkType, "changed",
-                    G_CALLBACK (onNetworkTypeChanged),
+                    G_CALLBACK (NetworkBuildMRL),
                     NULL);
-  g_signal_connect ((gpointer) entryNetworkType, "editing_done",
-                    G_CALLBACK (onEntryNetworkTypeEditingDone),
+  g_signal_connect ((gpointer) entryNetworkProtocolType, "changed",
+                    G_CALLBACK (NetworkBuildMRL),
                     NULL);
-  g_signal_connect ((gpointer) entryProtocolType, "changed",
-                    G_CALLBACK (onProtocolTypeChanged),
+  g_signal_connect ((gpointer) entryNetworkMRLType, "changed",
+                    G_CALLBACK (NetworkBuildMRL),
                     NULL);
-  g_signal_connect ((gpointer) entryProtocolType, "editing_done",
-                    G_CALLBACK (onEntryProtocolTypeEditingDone),
-                    NULL);
-  g_signal_connect ((gpointer) entryMRLType, "changed",
-                    G_CALLBACK (onMRLTypeChanged),
-                    NULL);
-  g_signal_connect ((gpointer) entryMRLType, "editing_done",
-                    G_CALLBACK (onEntryMRLTypeEditingDone),
-                    NULL);
-  g_signal_connect ((gpointer) entryStreamType, "changed",
-                    G_CALLBACK (onStreamTypeChanged),
-                    NULL);
-  g_signal_connect ((gpointer) entryStreamType, "editing_done",
-                    G_CALLBACK (onEntryStreamTypeEditingDone),
+  g_signal_connect ((gpointer) entryNetworkStreamType, "changed",
+                    G_CALLBACK (NetworkBuildMRL),
                     NULL);
   g_signal_connect ((gpointer) AddNetworkPlaylist, "pressed",
                     G_CALLBACK (onAddNetworkPlaylist),
@@ -1113,15 +1092,15 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, comboNetworkType, "comboNetworkType");
   GLADE_HOOKUP_OBJECT (pda, entryNetworkType, "entryNetworkType");
   GLADE_HOOKUP_OBJECT (pda, labelNetworkType, "labelNetworkType");
-  GLADE_HOOKUP_OBJECT (pda, comboProtocolType, "comboProtocolType");
-  GLADE_HOOKUP_OBJECT (pda, entryProtocolType, "entryProtocolType");
+  GLADE_HOOKUP_OBJECT (pda, comboNetworkProtocolType, "comboNetworkProtocolType");
+  GLADE_HOOKUP_OBJECT (pda, entryNetworkProtocolType, "entryNetworkProtocolType");
   GLADE_HOOKUP_OBJECT (pda, labelNetworkProtocol, "labelNetworkProtocol");
   GLADE_HOOKUP_OBJECT (pda, labeNetworkMRLType, "labeNetworkMRLType");
-  GLADE_HOOKUP_OBJECT (pda, comboMRLType, "comboMRLType");
-  GLADE_HOOKUP_OBJECT (pda, entryMRLType, "entryMRLType");
+  GLADE_HOOKUP_OBJECT (pda, comboNetworkMRLType, "comboNetworkMRLType");
+  GLADE_HOOKUP_OBJECT (pda, entryNetworkMRLType, "entryNetworkMRLType");
   GLADE_HOOKUP_OBJECT (pda, labelNetworkStreamType, "labelNetworkStreamType");
-  GLADE_HOOKUP_OBJECT (pda, comboStreamType, "comboStreamType");
-  GLADE_HOOKUP_OBJECT (pda, entryStreamType, "entryStreamType");
+  GLADE_HOOKUP_OBJECT (pda, comboNetworkStreamType, "comboNetworkStreamType");
+  GLADE_HOOKUP_OBJECT (pda, entryNetworkStreamType, "entryNetworkStreamType");
   GLADE_HOOKUP_OBJECT (pda, hbox13, "hbox13");
   GLADE_HOOKUP_OBJECT (pda, AddNetworkPlaylist, "AddNetworkPlaylist");
   GLADE_HOOKUP_OBJECT (pda, Network, "Network");
@@ -1135,7 +1114,7 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, entryV4LVideo, "entryV4LVideo");
   GLADE_HOOKUP_OBJECT (pda, hbox16, "hbox16");
   GLADE_HOOKUP_OBJECT (pda, AddCameraToPlaylist, "AddCameraToPlaylist");
-  GLADE_HOOKUP_OBJECT (pda, Camera, "Camera");
+  GLADE_HOOKUP_OBJECT (pda, Server, "Server");
   GLADE_HOOKUP_OBJECT (pda, vbox1, "vbox1");
   GLADE_HOOKUP_OBJECT (pda, vbox6, "vbox6");
   GLADE_HOOKUP_OBJECT (pda, frameVideo, "frameVideo");
@@ -1162,7 +1141,7 @@ create_pda (void)
   GLADE_HOOKUP_OBJECT (pda, label41, "label41");
   GLADE_HOOKUP_OBJECT (pda, hbox14, "hbox14");
   GLADE_HOOKUP_OBJECT (pda, AddServerToPlaylist, "AddServerToPlaylist");
-  GLADE_HOOKUP_OBJECT (pda, Server, "Server");
+  GLADE_HOOKUP_OBJECT (pda, Camera, "Camera");
   GLADE_HOOKUP_OBJECT (pda, vbox4, "vbox4");
   GLADE_HOOKUP_OBJECT (pda, scrolledwindow5, "scrolledwindow5");
   GLADE_HOOKUP_OBJECT (pda, tvPlaylist, "tvPlaylist");
