@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: parser.c,v 1.5 2002/10/27 16:58:13 gbazin Exp $
+ * $Id: parser.c,v 1.6 2002/10/28 22:23:23 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -87,8 +87,8 @@ vlc_module_begin();
     add_category_hint( N_("Miscellaneous"), NULL );
     add_module  ( "mpeg-idct", "idct", NULL, NULL,
                   VDEC_IDCT_TEXT, VDEC_IDCT_LONGTEXT );
-    add_module  ( "mpeg-motion", "motion", NULL, NULL,
-                  VDEC_MOTION_TEXT, VDEC_IDCT_LONGTEXT );
+    add_module  ( "mpeg-motion", "motion compensation", NULL, NULL,
+                  VDEC_MOTION_TEXT, VDEC_MOTION_LONGTEXT );
     add_integer ( "vdec-smp", 0, NULL, VDEC_SMP_TEXT, VDEC_SMP_LONGTEXT );
     add_string  ( "vpar-synchro", NULL, NULL, VPAR_SYNCHRO_TEXT,
                   VPAR_SYNCHRO_LONGTEXT );

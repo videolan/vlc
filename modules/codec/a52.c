@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.16 2002/10/27 16:58:14 gbazin Exp $
+ * $Id: a52.c,v 1.17 2002/10/28 22:23:23 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -291,7 +291,7 @@ int SyncInfo( const byte_t * p_buf, int * pi_channels, int * pi_sample_rate,
 
     /* acmod, dsurmod and lfeon */
     acmod = p_buf[6] >> 5;
-    if ( p_buf[6] & 0xf8 )
+    if ( (p_buf[6] & 0xf8) == 0x50 )
     {
         *pi_channels = AOUT_CHAN_DOLBY;
     }
