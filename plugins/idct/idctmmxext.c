@@ -2,7 +2,7 @@
  * idctmmxext.c : MMX EXT IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idctmmxext.c,v 1.1 2001/01/16 13:26:46 sam Exp $
+ * $Id: idctmmxext.c,v 1.2 2001/01/16 14:05:38 sam Exp $
  *
  * Authors:
  *
@@ -143,8 +143,7 @@ static void idct_getfunctions( function_list_t * p_function_list )
  *****************************************************************************/
 static int idct_Probe( probedata_t *p_data )
 {
-    /* FIXME: we need  to test for EXT extensions */
-    if( TestCPU() & CPU_CAPABILITY_MMX )
+    if( TestCPU() & CPU_CAPABILITY_MMXEXT )
     {
         if( TestMethod( IDCT_METHOD_VAR, "idctmmxext" ) )
         {
