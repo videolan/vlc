@@ -2,7 +2,7 @@
  * popup.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: popup.cpp,v 1.2 2003/01/23 23:57:50 gbazin Exp $
+ * $Id: popup.cpp,v 1.3 2003/01/26 10:36:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -55,8 +55,9 @@
 enum
 {
     /* menu items */
-    Close_Event = wxID_HIGHEST,
+    Close_Event = wxID_HIGHEST + 1000,
     MenuDummy_Event,
+    MenuLast_Event,
 };
 
 BEGIN_EVENT_TABLE(PopupMenu, wxMenu)
@@ -81,7 +82,7 @@ PopupMenu::PopupMenu( intf_thread_t *_p_intf, Interface *_p_main_interface ):
     /* Initializations */
     p_intf = _p_intf;
     p_main_interface = _p_main_interface;
-    i_item_id = 0;
+    i_item_id = MenuLast_Event;
 
     /* Audio menu */
     Append( MenuDummy_Event, _("Audio menu") );

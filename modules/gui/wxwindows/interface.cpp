@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.13 2003/01/23 23:57:50 gbazin Exp $
+ * $Id: interface.cpp,v 1.14 2003/01/26 10:36:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -122,6 +122,7 @@ BEGIN_EVENT_TABLE(Interface, wxFrame)
     EVT_MENU(PlayStream_Event, Interface::OnPlayStream)
     EVT_MENU(PrevStream_Event, Interface::OnPrevStream)
     EVT_MENU(NextStream_Event, Interface::OnNextStream)
+
     /* Slider events */
     EVT_COMMAND_SCROLL(SliderScroll_Event, Interface::OnSliderUpdate)
 END_EVENT_TABLE()
@@ -511,7 +512,42 @@ void Interface::OnStopStream( wxCommandEvent& WXUNUSED(event) )
 
 void Interface::OnSliderUpdate( wxScrollEvent& event )
 {
-    p_intf->p_sys->i_slider_pos = event.GetPosition();
+    vlc_mutex_lock( &p_intf->change_lock );
+
+    if( event.GetEventType() == wxEVT_SCROLL_THUMBRELEASE
+	|| event.GetEventType() == wxEVT_SCROLL_ENDSCROLL )
+    {
+	if( p_intf->p_sys->i_slider_pos != event.GetPosition()
+	    && p_intf->p_sys->p_input )
+	{
+            p_intf->p_sys->i_slider_pos = event.GetPosition();
+	    input_Seek( p_intf->p_sys->p_input, p_intf->p_sys->i_slider_pos *
+			100 / SLIDER_MAX_POS,
+			INPUT_SEEK_PERCENT | INPUT_SEEK_SET );
+	}
+
+        p_intf->p_sys->b_slider_free = VLC_TRUE;
+    }
+    else
+    {
+        p_intf->p_sys->b_slider_free = VLC_FALSE;
+
+	if( p_intf->p_sys->p_input )
+	{
+  	    /* Update stream date */
+#define p_area p_intf->p_sys->p_input->stream.p_selected_area
+	    char psz_time[ OFFSETTOTIME_MAX_SIZE ];
+
+	    slider_box->SetLabel(
+	        input_OffsetToTime( p_intf->p_sys->p_input,
+				    psz_time,
+				    p_area->i_size * event.GetPosition()
+				    / SLIDER_MAX_POS ) );
+#undef p_area
+	}
+    }
+
+    vlc_mutex_unlock( &p_intf->change_lock );
 }
 
 void Interface::OnPrevStream( wxCommandEvent& WXUNUSED(event) )

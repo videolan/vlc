@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.8 2003/01/23 23:57:50 gbazin Exp $
+ * $Id: timer.cpp,v 1.9 2003/01/26 10:36:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -173,47 +173,22 @@ void Timer::Notify()
 
                 stream_position_t position;
 
-                /* If the user hasn't touched the slider since the last time,
-                 * then the input can safely change it */
-                if( p_intf->p_sys->i_slider_pos ==
-                    p_intf->p_sys->i_slider_oldpos )
+                /* Update the slider if the user isn't dragging it. */
+                if( p_intf->p_sys->b_slider_free )
                 {
                     /* Update the value */
                     vlc_mutex_unlock( &p_input->stream.stream_lock );
                     input_Tell( p_input, &position );
                     vlc_mutex_lock( &p_input->stream.stream_lock );
-                    p_intf->p_sys->i_slider_oldpos =
+                    p_intf->p_sys->i_slider_pos =
                         ( SLIDER_MAX_POS * position.i_tell ) / position.i_size;
 
-                    if( p_intf->p_sys->i_slider_pos !=
-                        p_intf->p_sys->i_slider_oldpos )
-                    {
-                        p_intf->p_sys->i_slider_pos =
-                            p_intf->p_sys->i_slider_oldpos;
+                    p_main_interface->slider->SetValue(
+                        p_intf->p_sys->i_slider_pos );
 
-                        p_main_interface->slider->SetValue(
-                            p_intf->p_sys->i_slider_pos );
-
-                        DisplayStreamDate( p_main_interface->slider_box,
-                                           p_intf,
-                                           p_intf->p_sys->i_slider_pos );
-                    }
-                }
-
-                /* Otherwise, send message to the input if the user has
-                 * finished dragging the slider */
-                else if( p_intf->p_sys->b_slider_free )
-                {
-                    /* release the lock to be able to seek */
-                    vlc_mutex_unlock( &p_input->stream.stream_lock );
-                    input_Seek( p_input, p_intf->p_sys->i_slider_pos *
-                                100 / SLIDER_MAX_POS,
-                                INPUT_SEEK_PERCENT | INPUT_SEEK_SET );
-                    vlc_mutex_lock( &p_input->stream.stream_lock );
-
-                    /* Update the old value */
-                    p_intf->p_sys->i_slider_oldpos =
-                        p_intf->p_sys->i_slider_pos;
+		    DisplayStreamDate( p_main_interface->slider_box,
+				       p_intf,
+				       p_intf->p_sys->i_slider_pos );
                 }
             }
 

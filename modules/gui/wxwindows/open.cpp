@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: open.cpp,v 1.1 2003/01/23 23:57:50 gbazin Exp $
+ * $Id: open.cpp,v 1.2 2003/01/26 10:36:10 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -150,9 +150,9 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
           "following predefined targets:") );
 
     /* Create notebook */
-    wxNotebook *notebook = new wxNotebook( panel, Notebook_Event,
-                                           wxDefaultPosition,
-                                           wxSize( 300, 250 ) );
+    wxNotebook *notebook = new wxNotebook( panel, Notebook_Event );
+    wxNotebookSizer *notebook_sizer = new wxNotebookSizer( notebook );
+
     notebook->AddPage( FilePanel( notebook ), _("File"),
                        i_access_method == FILE_ACCESS );
     notebook->AddPage( DiscPanel( notebook ), _("Disc"),
@@ -181,7 +181,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, Interface *_p_main_interface,
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
     panel_sizer->Add( mrl_sizer_sizer, 0, wxEXPAND, 5 );
     panel_sizer->Add( label, 0, wxEXPAND | wxALL, 5 );
-    panel_sizer->Add( notebook, 1, wxEXPAND | wxALL, 5 );
+    panel_sizer->Add( notebook_sizer, 1, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( button_sizer, 0, wxALIGN_LEFT );
     panel_sizer->Layout();
     panel->SetSizerAndFit( panel_sizer );
@@ -238,12 +238,9 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
     sizer_row->Add( disc_type, 0, wxEXPAND | wxALL, 5 );
 
     wxStaticText *label = new wxStaticText( panel, -1, _("Device Name") );
-    char *psz_device = config_GetPsz( p_intf, "dvd" );
-    disc_device = new wxTextCtrl( panel, DiscDevice_Event,
-                                  psz_device ? psz_device : "",
+    disc_device = new wxTextCtrl( panel, DiscDevice_Event, "",
                                   wxDefaultPosition, wxDefaultSize,
                                   wxTE_PROCESS_ENTER);
-    if( psz_device ) free( psz_device );
 
     sizer->Add( label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     sizer->Add( disc_device, 1, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
@@ -270,6 +267,10 @@ wxPanel *OpenDialog::DiscPanel( wxWindow* parent )
     sizer_row->Add( sizer, 0, wxEXPAND | wxALL, 5 );
 
     panel->SetSizerAndFit( sizer_row );
+
+    /* Update Disc panel */
+    wxCommandEvent dummy_event;
+    OnDiscTypeChange( dummy_event );
 
     return panel;
 }
@@ -318,6 +319,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
     subpanel_sizer->Add( net_ports[0], 1,
                          wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL );
     net_subpanels[0]->SetSizerAndFit( subpanel_sizer );
+    net_radios[0]->SetValue( TRUE );
 
     /* UDP/RTP Multicast row */
     subpanel_sizer = new wxFlexGridSizer( 4, 1, 20 );
@@ -366,7 +368,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
     /* HTTP row */
     subpanel_sizer = new wxFlexGridSizer( 2, 1, 20 );
     label = new wxStaticText( net_subpanels[3], -1, _("URL") );
-    net_addrs[3] = new wxTextCtrl( net_subpanels[3], NetAddr4_Event, "http://",
+    net_addrs[3] = new wxTextCtrl( net_subpanels[3], NetAddr4_Event, "",
                                    wxDefaultPosition, wxSize( 200, -1 ),
                                    wxTE_PROCESS_ENTER);
     subpanel_sizer->Add( label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL );
@@ -387,6 +389,7 @@ wxPanel *OpenDialog::NetPanel( wxWindow* parent )
     panel->SetSizerAndFit( sizer_row );
 
     /* Update Net panel */
+    net_addrs[3]->SetValue( "http://" );
     wxCommandEvent dummy_event;
     dummy_event.SetId( NetRadio1_Event );
     OnNetTypeChange( dummy_event );
@@ -452,7 +455,6 @@ void OpenDialog::UpdateMRL( int i_access_method )
             break;
         }
         break;
-
     case SAT_ACCESS:
         mrl = "satellite://";
         break;
@@ -525,7 +527,6 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
         disc_device->SetValue( psz_device ? psz_device : "" );
         break;
 
-    case 2:
     default:
         psz_device = config_GetPsz( p_intf, "dvd" );
         disc_device->SetValue( psz_device ? psz_device : "" );
@@ -533,6 +534,8 @@ void OpenDialog::OnDiscTypeChange( wxCommandEvent& WXUNUSED(event) )
     }
 
     if( psz_device ) free( psz_device );
+
+    UpdateMRL( DISC_ACCESS );
 }
 
 /*****************************************************************************
@@ -551,6 +554,7 @@ void OpenDialog::OnNetTypeChange( wxCommandEvent& event )
 
     for(i=0; i<4; i++)
     {
+        net_radios[i]->SetValue( event.GetId() == (NetRadio1_Event+i) );
         net_subpanels[i]->Enable( event.GetId() == (NetRadio1_Event+i) );
     }
 
