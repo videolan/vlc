@@ -2,7 +2,7 @@
  * video.c : video encoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: video.c,v 1.3 2003/04/26 14:54:49 gbazin Exp $
+ * $Id: video.c,v 1.4 2003/04/27 23:16:35 gbazin Exp $
  *
  * Authors: Laurent Aimar
  *
@@ -49,7 +49,7 @@ void E_( CloseEncoderVideo )( vlc_object_t * );
  *****************************************************************************/
 static int  Init     ( video_encoder_t *p_encoder );
 static int  Encode   ( video_encoder_t *p_encoder,
-                               picture_t *p_pic, void *p_data, size_t *pi_data );
+                       picture_t *p_pic, void *p_data, size_t *pi_data );
 static void End      ( video_encoder_t *p_encoder );
 
 /*****************************************************************************
@@ -70,7 +70,7 @@ struct encoder_sys_t
  *****************************************************************************
  *
  *****************************************************************************/
-int  E_( OpenEncoderVideo ) ( vlc_object_t *p_this )
+int E_( OpenEncoderVideo ) ( vlc_object_t *p_this )
 {
     video_encoder_t *p_encoder = (video_encoder_t*)p_this;
 
@@ -91,16 +91,27 @@ int  E_( OpenEncoderVideo ) ( vlc_object_t *p_this )
     avcodec_register_all();
 
     /* *** fix parameters *** */
-    /* FIXME be clever, some codec support additional chroma */
-    if( p_encoder->i_chroma != VLC_FOURCC( 'I', '4', '2', '0' ) )
     switch( p_encoder->i_chroma )
     {
-        case VLC_FOURCC( 'I', '4', '2', '0' ):
-        case VLC_FOURCC( 'I', '4', '2', '2' ):
-        case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
+        /* Planar YUV formats */
+        case VLC_FOURCC('I','4','4','4'):
+        case VLC_FOURCC('I','4','2','2'):
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
+        case VLC_FOURCC('I','4','1','1'):
+        case VLC_FOURCC('I','4','1','0'):
+        /* Packed YUV formats */
+        case VLC_FOURCC('Y','U','Y','2'):
+        case VLC_FOURCC('U','Y','V','Y'):
+        /* Packed RGB formats */
+        case VLC_FOURCC('R','V','3','2'):
+        case VLC_FOURCC('R','V','2','4'):
+        case VLC_FOURCC('R','V','1','6'):
+        case VLC_FOURCC('R','V','1','5'):
+        case VLC_FOURCC('R','G','B','2'):
             break;
         default:
-            p_encoder->i_chroma = VLC_FOURCC( 'I', '4', '2', '0' );
             return VLC_EGENERIC;
     }
 #if 0
@@ -161,7 +172,8 @@ static int  Init     ( video_encoder_t *p_encoder )
     }
     if( ( p_sys->p_codec = avcodec_find_encoder( i_codec ) ) == NULL )
     {
-        msg_Err( p_encoder, "cannot find encoder for %s", p_encoder->p_sys->psz_codec );
+        msg_Err( p_encoder, "cannot find encoder for %s",
+                 p_encoder->p_sys->psz_codec );
         return VLC_EGENERIC;
     }
 
@@ -185,7 +197,8 @@ static int  Init     ( video_encoder_t *p_encoder )
 
     if( avcodec_open( p_context, p_encoder->p_sys->p_codec ) < 0 )
     {
-        msg_Err( p_encoder, "failed to open %s codec", p_encoder->p_sys->psz_codec );
+        msg_Err( p_encoder, "failed to open %s codec",
+                 p_encoder->p_sys->psz_codec );
         return VLC_EGENERIC;
     }
 
@@ -193,15 +206,59 @@ static int  Init     ( video_encoder_t *p_encoder )
 
     switch( p_encoder->i_chroma )
     {
-        case VLC_FOURCC( 'I', '4', '2', '0' ):
-            p_frame->pict_type = PIX_FMT_YUV420P;
+        /* Planar YUV formats */
+        case VLC_FOURCC('I','4','4','4'):
+            p_frame->pict_type = PIX_FMT_YUV444P;
             break;
-        case VLC_FOURCC( 'I', '4', '2', '2' ):
+
+        case VLC_FOURCC('I','4','2','2'):
             p_frame->pict_type = PIX_FMT_YUV422P;
             break;
-        case VLC_FOURCC( 'Y', 'U', 'Y', '2' ):
+
+        case VLC_FOURCC('Y','V','1','2'):
+        case VLC_FOURCC('I','4','2','0'):
+        case VLC_FOURCC('I','Y','U','V'):
+            p_frame->pict_type = PIX_FMT_YUV420P;
+            break;
+
+        case VLC_FOURCC('I','4','1','1'):
+            p_frame->pict_type = PIX_FMT_YUV411P;
+            break;
+
+        case VLC_FOURCC('I','4','1','0'):
+            p_frame->pict_type = PIX_FMT_YUV410P;
+            break;
+
+        /* Packed YUV formats */
+
+        case VLC_FOURCC('Y','U','Y','2'):
+        case VLC_FOURCC('U','Y','V','Y'):
             p_frame->pict_type = PIX_FMT_YUV422;
             break;
+           
+        /* Packed RGB formats */
+
+        case VLC_FOURCC('R','V','3','2'):
+            p_frame->pict_type = PIX_FMT_RGBA32;
+            break;
+
+        case VLC_FOURCC('R','V','2','4'):
+            p_frame->pict_type = PIX_FMT_RGB24;
+            //p_frame->pict_type = PIX_FMT_BGR24;
+            break;
+
+        case VLC_FOURCC('R','V','1','6'):
+            p_frame->pict_type = PIX_FMT_RGB565;
+            break;
+
+        case VLC_FOURCC('R','V','1','5'):
+            p_frame->pict_type = PIX_FMT_RGB555;
+            break;
+
+        case VLC_FOURCC('R','G','B','2'):
+            p_frame->pict_type = PIX_FMT_GRAY8;
+            break;
+
         default:
             return VLC_EGENERIC;
     }
@@ -217,14 +274,14 @@ static int  Init     ( video_encoder_t *p_encoder )
  *****************************************************************************
  *
  *****************************************************************************/
-static int  Encode   ( video_encoder_t *p_encoder,
-                       picture_t *p_pic, void *p_data, size_t *pi_data )
+static int Encode( video_encoder_t *p_encoder,
+                   picture_t *p_pic, void *p_data, size_t *pi_data )
 {
 #define p_frame   p_encoder->p_sys->p_frame
 #define p_context p_encoder->p_sys->p_context
     int i;
 
-    for( i = 0; i < 3; i++ )
+    for( i = 0; i < p_pic->i_planes; i++ )
     {
         p_frame->linesize[i] = p_pic->p[i].i_pitch;
         p_frame->data[i]     = p_pic->p[i].p_pixels;
@@ -241,7 +298,7 @@ static int  Encode   ( video_encoder_t *p_encoder,
  *****************************************************************************
  *
  *****************************************************************************/
-static void End      ( video_encoder_t *p_encoder )
+static void End( video_encoder_t *p_encoder )
 {
     avcodec_close( p_encoder->p_sys->p_context );
     free( p_encoder->p_sys->p_context );

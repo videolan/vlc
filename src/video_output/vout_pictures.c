@@ -2,7 +2,7 @@
  * vout_pictures.c : picture management functions
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vout_pictures.c,v 1.38 2003/04/27 17:53:21 gbazin Exp $
+ * $Id: vout_pictures.c,v 1.39 2003/04/27 23:16:35 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -438,6 +438,44 @@ void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
 {
     int i_bytes, i_index;
 
+    vout_InitPicture( VLC_OBJECT(p_vout), p_pic, i_width, i_height, i_chroma );
+
+    /* Calculate how big the new image should be */
+    for( i_bytes = 0, i_index = 0; i_index < p_pic->i_planes; i_index++ )
+    {
+        i_bytes += p_pic->p[ i_index ].i_lines * p_pic->p[ i_index ].i_pitch;
+    }
+
+    p_pic->p_data = vlc_memalign( &p_pic->p_data_orig, 16, i_bytes );
+
+    if( p_pic->p_data == NULL )
+    {
+        p_pic->i_planes = 0;
+        return;
+    }
+
+    /* Fill the p_pixels field for each plane */
+    p_pic->p[ 0 ].p_pixels = p_pic->p_data;
+
+    for( i_index = 1; i_index < p_pic->i_planes; i_index++ )
+    {
+        p_pic->p[i_index].p_pixels = p_pic->p[i_index-1].p_pixels
+                                          + p_pic->p[i_index-1].i_lines
+                                             * p_pic->p[i_index-1].i_pitch;
+    }
+}
+
+/*****************************************************************************
+ * vout_InitPicture: initialise the picture_t fields given chroma/size.
+ *****************************************************************************
+ * This function initializes most of the picture_t fields given a chroma and
+ * size. It makes the assumption that stride == width.
+ *****************************************************************************/
+void vout_InitPicture( vlc_object_t *p_this, picture_t *p_pic,
+                       int i_width, int i_height, vlc_fourcc_t i_chroma )
+{
+    int i_index;
+
     /* Store default values */
     for( i_index = 0; i_index < VOUT_MAX_PLANES; i_index++ )
     {
@@ -588,35 +626,12 @@ void vout_AllocatePicture( vout_thread_t *p_vout, picture_t *p_pic,
             break;
 
         default:
-            msg_Err( p_vout, "unknown chroma type 0x%.8x (%4.4s)",
+            msg_Err( p_this, "unknown chroma type 0x%.8x (%4.4s)",
                              i_chroma, (char*)&i_chroma );
             p_pic->i_planes = 0;
             return;
     }
 
-    /* Calculate how big the new image should be */
-    for( i_bytes = 0, i_index = 0; i_index < p_pic->i_planes; i_index++ )
-    {
-        i_bytes += p_pic->p[ i_index ].i_lines * p_pic->p[ i_index ].i_pitch;
-    }
-
-    p_pic->p_data = vlc_memalign( &p_pic->p_data_orig, 16, i_bytes );
-
-    if( p_pic->p_data == NULL )
-    {
-        p_pic->i_planes = 0;
-        return;
-    }
-
-    /* Fill the p_pixels field for each plane */
-    p_pic->p[ 0 ].p_pixels = p_pic->p_data;
-
-    for( i_index = 1; i_index < p_pic->i_planes; i_index++ )
-    {
-        p_pic->p[i_index].p_pixels = p_pic->p[i_index-1].p_pixels
-                                          + p_pic->p[i_index-1].i_lines
-                                             * p_pic->p[i_index-1].i_pitch;
-    }
 }
 
 /*****************************************************************************

@@ -2,7 +2,7 @@
  * rawvideo.c: Pseudo audio decoder; for raw video data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: rawvideo.c,v 1.3 2003/04/27 17:53:20 gbazin Exp $
+ * $Id: rawvideo.c,v 1.4 2003/04/27 23:16:35 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -161,7 +161,7 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
  *****************************************************************************/
 static int InitThread( vdec_thread_t * p_vdec )
 {
-    picture_t *p_pic;
+    picture_t pic;
     int i;
 
 #define bih ((BITMAPINFOHEADER*)p_vdec->p_fifo->p_bitmapinfoheader)
@@ -187,26 +187,18 @@ static int InitThread( vdec_thread_t * p_vdec )
 
     if( p_vdec->p_vout == NULL )
     {
-        msg_Err( p_vdec->p_fifo, "failled created vout" );
+        msg_Err( p_vdec->p_fifo, "failed created vout" );
         return( VLC_EGENERIC );
     }
 
-    /* Get a 1 picture to be able to compute p_vdec->i_raw_size */
-    p_pic = vout_CreatePicture( p_vdec->p_vout, 0, 0, 0 );
-    if( p_pic == NULL )
-    {
-        msg_Err( p_vdec->p_fifo, "failled to get a vout picture" );
-        return( VLC_EGENERIC );
-    }
-
+    /* Find out p_vdec->i_raw_size */
+    vout_InitPicture( VLC_OBJECT(p_vdec->p_fifo), &pic,
+                      bih->biWidth, bih->biHeight, p_vdec->p_fifo->i_fourcc );
     p_vdec->i_raw_size = 0;
-    for( i = 0; i < p_pic->i_planes; i++ )
+    for( i = 0; i < pic.i_planes; i++ )
     {
-        p_vdec->i_raw_size += p_pic->p[i].i_lines * p_pic->p[i].i_visible_pitch
-            * p_pic->p[i].i_pixel_pitch;
+        p_vdec->i_raw_size += pic.p[i].i_lines * pic.p[i].i_visible_pitch;
     }
-
-    vout_DestroyPicture( p_vdec->p_vout, p_pic );
 
     return( VLC_SUCCESS );
 #undef bih
@@ -284,8 +276,9 @@ static void DecodeThread( vdec_thread_t *p_vdec )
 
     if( i_size < p_vdec->i_raw_size )
     {
-        msg_Warn( p_vdec->p_fifo, "invalid frame size (%d < %d)", i_size, p_vdec->i_raw_size );
-        input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
+        msg_Warn( p_vdec->p_fifo, "invalid frame size (%d < %d)",
+                  i_size, p_vdec->i_raw_size );
+        //input_DeletePES( p_vdec->p_fifo->p_packets_mgt, p_pes );
         return;
     }
 

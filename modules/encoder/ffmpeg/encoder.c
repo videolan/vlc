@@ -2,7 +2,7 @@
  * encoder.c : audio/video encoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: encoder.c,v 1.3 2003/04/26 14:54:49 gbazin Exp $
+ * $Id: encoder.c,v 1.4 2003/04/27 23:16:35 gbazin Exp $
  *
  * Authors: Laurent Aimar
  *
@@ -48,19 +48,18 @@ void E_( CloseEncoderAudio )( vlc_object_t * );
  *****************************************************************************/
 
 vlc_module_begin();
-    set_description( _("ffmpeg encoder") );
+    set_description( _("ffmpeg video encoder") );
     add_shortcut( "ffmpeg" );
+    set_capability( "video encoder", 100 );
+    set_callbacks( E_( OpenEncoderVideo ), E_( CloseEncoderVideo ) );
+    add_category_hint( "video setting", NULL, VLC_TRUE );
+        add_integer( "encoder-ffmpeg-video-bitrate", 1000, NULL, "bitrate (kb/s)", "bitrate (kb/s)", VLC_TRUE );
+        add_integer( "encoder-ffmpeg-video-max-key-interval", 10, NULL, "max key interval", "maximum   value  of   frames  between   two  keyframes", VLC_TRUE );
+        add_integer( "encoder-ffmpeg-video-min-quant", 2, NULL, "min quantizer", "range 1-31", VLC_TRUE );
+        add_integer( "encoder-ffmpeg-video-max-quant", 31, NULL, "max quantizer", "range 1-31", VLC_TRUE );
 
     add_submodule();
-        set_capability( "video encoder", 100 );
-        set_callbacks( E_( OpenEncoderVideo ), E_( CloseEncoderVideo ) );
-        add_category_hint( "video setting", NULL, VLC_TRUE );
-            add_integer( "encoder-ffmpeg-video-bitrate", 1000, NULL, "bitrate (kb/s)", "bitrate (kb/s)", VLC_TRUE );
-            add_integer( "encoder-ffmpeg-video-max-key-interval", 10, NULL, "max key interval", "maximum   value  of   frames  between   two  keyframes", VLC_TRUE );
-            add_integer( "encoder-ffmpeg-video-min-quant", 2, NULL, "min quantizer", "range 1-31", VLC_TRUE );
-            add_integer( "encoder-ffmpeg-video-max-quant", 31, NULL, "max quantizer", "range 1-31", VLC_TRUE );
-
-    add_submodule();
+        set_description( _("ffmpeg audio encoder") );
         set_capability( "audio encoder", 50 );
         set_callbacks( E_( OpenEncoderAudio ), E_( CloseEncoderAudio ) );
         add_category_hint( "audio setting", NULL, VLC_TRUE );
