@@ -242,7 +242,7 @@ void SoutDialog::UpdateMRL()
         if( file_combo->GetValue().size() )
             dumpfile = wxT(" :demuxdump-file=\"") +
                        file_combo->GetValue() + wxT("\"");
-        mrl_combo->SetValue( wxT(":demux=demuxdump") + dumpfile );
+        mrl_combo->SetValue( wxT(":demux=dump") + dumpfile );
 
         return;
     }
