@@ -301,6 +301,49 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
 
     p_block->i_dts = p_block->i_pts = p_sys->i_pts;
 
+    if( p_sys->b_invert )
+    {
+        picture_t pic;
+        uint8_t *p_tmp, *p_pixels;
+        int i, j;
+
+        /* Fill in picture_t fields */
+        vout_InitPicture( VLC_OBJECT(p_dec), &pic, p_dec->fmt_out.i_codec,
+                          p_dec->fmt_out.video.i_width,
+                          p_dec->fmt_out.video.i_height, VOUT_ASPECT_FACTOR );
+
+        if( !pic.i_planes )
+        {
+            msg_Err( p_dec, "unsupported chroma" );
+            return p_block;
+        }
+
+        p_tmp = malloc( pic.p[0].i_visible_pitch );
+        p_pixels = p_block->p_buffer;
+        for( i = 0; i < pic.i_planes; i++ )
+        {
+            int i_pitch = pic.p[i].i_visible_pitch;
+            uint8_t *p_top = p_pixels;
+            uint8_t *p_bottom = p_pixels + i_pitch *
+                (pic.p[i].i_visible_lines - 1);
+
+            for( j = 0; j < pic.p[i].i_visible_lines / 2; j++ )
+            {
+                p_dec->p_vlc->pf_memcpy( p_tmp, p_bottom,
+                                         pic.p[i].i_visible_pitch  );
+                p_dec->p_vlc->pf_memcpy( p_bottom, p_top,
+                                         pic.p[i].i_visible_pitch  );
+                p_dec->p_vlc->pf_memcpy( p_top, p_tmp,
+                                         pic.p[i].i_visible_pitch  );
+                p_top += i_pitch;
+                p_bottom -= i_pitch;
+            }
+
+            p_pixels += i_pitch * pic.p[i].i_lines;
+        }
+        free( p_tmp );
+    }
+
     return p_block;
 }
 
