@@ -2,7 +2,7 @@
  * video.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.22 2003/04/26 21:45:26 fenrir Exp $
+ * $Id: video.c,v 1.23 2003/04/26 22:06:12 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -441,7 +441,7 @@ void  E_( DecodeThread_Video )( vdec_thread_t *p_vdec )
 
     if( p_vdec->i_frame_late > 0 && mdate() - p_vdec->i_frame_late_start > (mtime_t)5000000 )
     {
-        msg_Err( p_vdec->p_fifo, "more than 5 second of late video -> dropping (to slow computer ?)" );
+        msg_Err( p_vdec->p_fifo, "more than 5 seconds of late video -> dropping (to slow computer ?)" );
         do
         {
             input_ExtractPES( p_vdec->p_fifo, &p_pes );
