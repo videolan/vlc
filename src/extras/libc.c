@@ -621,12 +621,12 @@ char **vlc_parse_cmdline( const char *psz_cmdline, int *i_args )
 {
     int argc = 0;
     char **argv = 0;
-    char *s, *psz_parser, *psz_arg;
+    char *s, *psz_parser, *psz_arg, *psz_orig;
     int i_bcount = 0;
 
     if( !psz_cmdline ) return 0;
-    psz_cmdline = strdup( psz_cmdline );
-    psz_arg = psz_parser = s = psz_cmdline;
+    psz_orig = strdup( psz_cmdline );
+    psz_arg = psz_parser = s = psz_orig;
 
     while( *s )
     {
@@ -686,6 +686,6 @@ char **vlc_parse_cmdline( const char *psz_cmdline, int *i_args )
     }
 
     if( i_args ) *i_args = argc;
-    free( psz_cmdline );
+    free( psz_orig );
     return argv;
 }
