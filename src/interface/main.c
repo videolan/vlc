@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.163 2002/03/12 18:37:46 stef Exp $
+ * $Id: main.c,v 1.164 2002/03/16 01:40:58 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -401,7 +401,6 @@ vout_bank_t   *p_vout_bank;
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  GetConfigurationFromFile    ( void ){return 0;};
 static int  GetConfigurationFromCmdLine ( int *pi_argc, char *ppsz_argv[],
                                           boolean_t b_ignore_errors );
 static int  GetFilenames                ( int i_argc, char *ppsz_argv[] );
@@ -604,11 +603,8 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
     /*
      * Override default configuration with config file settings
      */
-    if( GetConfigurationFromFile() )
-    {
-        intf_MsgDestroy();
-        return( errno );
-    }
+    vlc_mutex_init( &p_main->config_lock );
+    config_LoadConfigFile( NULL );
 
     /*
      * Override configuration with command line settings
@@ -618,6 +614,7 @@ int main( int i_argc, char *ppsz_argv[], char *ppsz_env[] )
         intf_MsgDestroy();
         return( errno );
     }
+
 
     /* p_main inititalization. FIXME ? */
     p_main->i_desync = (mtime_t)config_GetIntVariable( "desync" )

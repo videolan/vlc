@@ -121,6 +121,12 @@
 /* Define if you have the sigrelse function.  */
 #undef HAVE_SIGRELSE
 
+/* Define if you have the getpwuid_r function.  */
+#undef HAVE_GETPWUID_R
+
+/* Define if you have the getpwuid function.  */
+#undef HAVE_GETPWUID
+
 /* Define if you have the stpcpy function.  */
 #undef HAVE_STPCPY
 

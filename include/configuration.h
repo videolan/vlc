@@ -4,7 +4,7 @@
  * It includes functions allowing to declare, get or set configuration options.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: configuration.h,v 1.2 2002/03/11 07:23:09 gbazin Exp $
+ * $Id: configuration.h,v 1.3 2002/03/16 01:40:58 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -69,15 +69,20 @@ char * config_GetPszVariable( const char *psz_name );
 void   config_PutIntVariable( const char *psz_name, int i_value );
 void   config_PutPszVariable( const char *psz_name, char *psz_value );
 
+int config_LoadConfigFile( const char *psz_module_name );
+int config_SaveConfigFile( const char *psz_module_name );
 module_config_t *config_FindConfig( const char *psz_name );
 module_config_t *config_Duplicate ( module_t *p_module );
+
 #else
 #   define config_GetIntVariable p_symbols->config_GetIntVariable
 #   define config_PutIntVariable p_symbols->config_PutIntVariable
 #   define config_GetPszVariable p_symbols->config_GetPszVariable
 #   define config_PutPszVariable p_symbols->config_PutPszVariable
-#   define config_Duplicate    p_symbols->config_Duplicate
-#   define config_FindConfig   p_symbols->config_FindConfig
+#   define config_Duplicate      p_symbols->config_Duplicate
+#   define config_FindConfig     p_symbols->config_FindConfig
+#   define config_LoadConfigFile p_symbols->config_LoadConfigFile
+#   define config_SaveConfigFile p_symbols->config_SaveConfigFile
 #endif
 
 /*****************************************************************************
