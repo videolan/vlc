@@ -12,25 +12,37 @@ Description: World domination
 Status: Todo
 
 Task
-Difficulty: Medium
+Difficulty: Guru
 Platform: any
-Urgency: Wishlist
-Description: RAR/ZIP/... access
-An access module that would be able to uncompress compressed files.
+Urgency: Critical
+Description: Clock Synchro redesign
+We need to adapt the clock synchro to work better with BOTH files and streams.
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Critical
+Platform: Mac OS X
+Description: CoreAudio multichannel audio output.
+ Convert to <a href="http://www.mat.ucsb.edu:8000/CoreAudio/108">AUHAL</a> based sytem.
+Still no info over S/PDIF output available.
+Outstanding issues:<br />
+ - G5 S/PDIF not working<br />
+ - G5 PCM not working because S/PDIF is selected by default, even if not connected.<br />
 Status: Todo
 
 Task
 Difficulty: Medium
 Platform: any
-Urgency: Wishlist
-Description: DVTS support
-DV over RTP support. See <a href="http://www.sfc.wide.ad.jp/DVTS/">DVTS homepage</a>
+Urgency: Important
+Description: Update matroska demux
+ Better Seeking
 Status: Todo
 
 Task
 Difficulty: Easy
 Platform: any
-Urgency: Urgent
+Urgency: Important
 Description: proper DVD controls
 Most importantly a proper button that will take you straight to the DVD menu. But also, next/prev chapter should be integrated with next/prev playlistitem.
 Status: Todo
@@ -51,16 +63,6 @@ Urgency: Normal
 Description: configure overview of modules
  configure should report what it will and what it won't build, after it is done running.
 Status: Todo
-
-Task
-Difficulty: Hard
-Platform: WinCE
-Urgency: Wishlist
-Description: WinCE port finalizing
-The WinCE port is already quite functional but we still miss a GAPI video output (GDI works but is slow) and an interface.
-Some code already exists for that (http://sourceforge.net/projects/vlcpocketpc/) and would need to be imported into the VLC source tree.
-Downloads should be added to the main vlc download page. We need an icon for this. 
-Status: Assigned to MixerAnderson
 
 Task
 Difficulty: Hard
@@ -89,19 +91,14 @@ Status: Todo
 
 Task
 Difficulty: Medium
-Urgency: Wishlist
-Platform: any
-Description: Full blown OSD system 
- In the line of freevo etc.
-Status: Assigned to thedj, jpsaman and yoann
-
-Task
-Difficulty: Medium
 Urgency: Normal
 Platform: any
 Description: Rewrite the SAP parser
  The SAP parser is very dirty at the moment, and needs a complete rewrite.
  - caching support<br />
+ - timeout support<br />
+ - add meta-information to playlist<br />
+ - session version support<br />
 Status: Assigned to zorglub (80% done)
 
 Task
@@ -150,6 +147,161 @@ Our avi muxer doesn't produce valid files
 Status: Todo
 
 Task
+Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: 24 bit LPCM
+- Increasingly more DVDs use 24 bit LPCM sound. We should support it.
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: Mac OS X
+Description: LPCM
+The LPCM decoder outputs really small samples which aren't accepted properly by the macosx coreaudio resampler, causing VLC to not output any sound with many DVD's. A test sample that shows this effect on the mac is the Madonna clip.
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Normal
+Platform: Any
+Description: Rework of the preferences
+ * New information in preferences for a rework of how preferences are sorted in interfaces
+ * New widget types
+ See http://www.via.ecp.fr/via/ml/vlc-devel/200409/msg00409.html
+Status: Assigned to zorglub
+
+Task
+Difficulty: Hard
+Urgency: Normal
+Platform: Mac OS X
+Description: New OS X preferences
+ New preferences for Mac OS X. Current not suited for Mac Users and several
+Pref. elements are broken (hotkeys and int with string desc.).
+Status: Todo
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: Mac OS X
+Description: OS X bookmarks window
+We miss a bookmarks window like the wxwidget one.
+Status: Todo
+
+Task
+Difficulty: Medium
+Urgency: Normal
+Platform: Mac OS X
+Description: Finish Mac Mozilla plugin
+The Mac mozilla plugin needs some more work to be useable. Basic funtionality is working. However the video-output part needs some more work since it was crashing. See svn history for the old code. 
+Status: Halfway (stalled)
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: any
+Description: Controlling the mozilla plugin
+The mozilla plugin needs to be better controllable (via javascript). <br />
+- retrieve variable values.<br />
+- open VLC media player<br />
+- default html page to control the plugin<br />
+- XUL controls<br />
+(80% done) see:<br />
+<a href="http://sierra.via.ecp.fr/~zorglub/vlc/plugin/vlc.html">Javascript controls</a>
+<a href="http://sierra.via.ecp.fr/~zorglub/vlc/xul/">XUL controls</a>
+<a href="http://mplayerplug-in.sourceforge.net/">MPlayer Mozilla plugin</a>
+Status: Assigned to zorglub
+
+Task
+Difficulty: Easy
+Platform: Win32, Linux
+Urgency: Normal
+Description: equalizer fixes
+    - Gray out "reset to defaults" for audio equalizer when disabled<br />
+   - Once audio equalizer is disabled, it doesn't enable the first
+     try when you select from main menu. It only works a 2nd change
+     (enable flag not properly set?).
+Status: Todo
+
+Task
+Difficulty: Medium
+Platform: Win32, Linux
+Urgency: Normal
+Description: wxWidgets fixes
+ - Rename wxWindows to wxWidgets<br />
+ - Problems with slider (doesn't go where you click, keep updating while seeking
+?)<br />
+ - Reversed arrows
+Status: Todo
+
+Task
+Difficulty: Guru
+Urgency: Normal
+Platform: Mac OS X
+Description: SVCD support
+libcdio needs to be ported to the Mac to support the cddax and vcdx modules for proper SVCD support
+Status: Todo
+
+Task
+Difficulty: Hard
+Urgency: Normal
+Platform: any
+Description: Stream text subtitles
+ Find a a way to stream text subtitles, in TS and in RTP.<br />
+ Needs testing and validating
+Status: 65% (fenrir)
+
+Task
+Difficulty: Medium
+Urgency: Normal
+Platform: any
+Description: RTSP server
+Full implementation of a RTSP server. We already have a very basic implementation working but it does need a lot more work. See the following <a href="http://via.ecp.fr/via/ml/streaming/200408/msg00068.html">mail</a> and <a href="http://via.ecp.fr/via/ml/streaming/200410/msg00002.html">mail</a>.
+Status: 90%
+
+Task
+Difficulty: Easy
+Urgency: Normal
+Platform: Win32/Linux
+Description: V4L and dshow tuning support
+We need an API that allows us to control the tuning of V4L and dshow TV cards.
+Status: Todo (CryHavoc)
+
+Task
+Difficulty: Medium
+Platform: any
+Urgency: Wishlist
+Description: RAR/ZIP/... access
+An access module that would be able to uncompress compressed files.
+Status: Todo
+
+Task
+Difficulty: Medium
+Platform: any
+Urgency: Wishlist
+Description: DVTS support
+DV over RTP support. See <a href="http://www.sfc.wide.ad.jp/DVTS/">DVTS homepage</a>
+Status: Todo
+
+Task
+Difficulty: Hard
+Platform: WinCE
+Urgency: Wishlist
+Description: WinCE port finalizing
+The WinCE port is already quite functional but we still miss a GAPI video output (GDI works but is slow) and an interface.
+Some code already exists for that (http://sourceforge.net/projects/vlcpocketpc/) and would need to be imported into the VLC source tree.
+Downloads should be added to the main vlc download page. We need an icon for this. 
+Status: Assigned to MixerAnderson
+
+Task
+Difficulty: Medium
+Urgency: Wishlist
+Platform: any
+Description: Full blown OSD system 
+ In the line of freevo etc.
+Status: Assigned to thedj, jpsaman and yoann
+
 Task
 Difficulty: Easy
 Urgency: Wishlist
@@ -172,22 +324,6 @@ Urgency: Wishlist
 Platform: any
 Description: MusePack decoder
 Need I say more? <a href="http://www.hydrogenaudio.org/index.php?showtopic=21775&">MPCdec</a>. We are awaiting MPC 7.5 or 8.0 specification which should split the codec from the fileformat.
-Status: Todo
-
-Task
-Difficulty: Easy
-Urgency: Normal
-Platform: any
-Description: 24 bit LPCM
-- Increasingly more DVDs use 24 bit LPCM sound. We should support it.
-Status: Todo
-
-Task
-Difficulty: Easy
-Urgency: Normal
-Platform: Mac OS X
-Description: LPCM
-The LPCM decoder outputs really small samples which aren't accepted properly by the macosx coreaudio resampler, causing VLC to not output any sound with many DVD's. A test sample that shows this effect on the mac is the Madonna clip.
 Status: Todo
 
 Task
@@ -232,62 +368,6 @@ Platform: any
 Description: IceCast/ShoutCast serving
 This would be a nice thing for the sake of completeness of VLC's streaming capabilities.
 Status: Todo
-
-Task
-Difficulty: Hard
-Urgency: Normal
-Platform: Any
-Description: Rework of the preferences
- * New information in preferences for a rework of how preferences are sorted in interfaces
- * New widget types
- See http://www.via.ecp.fr/via/ml/vlc-devel/200409/msg00409.html
-Status: Assigned to zorglub
-
-Task
-Difficulty: Hard
-Urgency: Normal
-Platform: Mac OS X
-Description: New OS X preferences
- New preferences for Mac OS X. Current not suited for Mac Users and several
-Pref. elements are broken (hotkeys and int with string desc.).
-Status: Todo
-
-Task
-Difficulty: Easy
-Urgency: Normal
-Platform: Mac OS X
-Description: OS X bookmarks window
-We miss a bookmarks window like the wxwidget one.
-Status: Todo
-
-Task
-Difficulty: Hard
-Urgency: Critical
-Platform: Mac OS X
-Description: CoreAudio multichannel audio output.
- Convert to <a href="http://www.mat.ucsb.edu:8000/CoreAudio/108">AUHAL</a> based sytem.
-Still no info over S/PDIF output available.
-Outstanding issues:<br />
- - G5 S/PDIF not working<br />
- - G5 PCM not working because S/PDIF is selected by default, even if not connected.<br />
-Status: Todo
-
-Task
-Difficulty: Hard
-Urgency: Normal
-Platform: any
-Description: Stream text subtitles
- Find a a way to stream text subtitles, in TS and in RTP.<br />
- Needs testing and validating
-Status: 65% (fenrir)
-
-Task
-Difficulty: Medium
-Urgency: Normal
-Platform: any
-Description: RTSP server
-Full implementation of a RTSP server. We already have a very basic implementation working but it does need a lot more work. See the following <a href="http://via.ecp.fr/via/ml/streaming/200408/msg00068.html">mail</a> and <a href="http://via.ecp.fr/via/ml/streaming/200410/msg00002.html">mail</a>.
-Status: 90%
 
 Task
 Difficulty: Easy
@@ -358,14 +438,6 @@ We also will need SIP support.
 Status: Todo
 
 Task
-Difficulty: Guru
-Urgency: Normal
-Platform: Mac OS X
-Description: SVCD support
-libcdio needs to be ported to the Mac to support the cddax and vcdx modules for proper SVCD support
-Status: Todo
-
-Task
 Difficulty: Hard 
 Urgency: Wishlist
 Platform: Mac OS X
@@ -373,30 +445,6 @@ Description: QuickTime capturing
 Allow capturing from QuickTime Firewire, USB and PCI devices.
 Possibly see: <a href="http://bugzilla.videolan.org/cgi-bin/bugzilla/show_bug.cgi?id=416">Bug 416</a>
 Status: Todo
-
-Task
-Difficulty: Medium
-Urgency: Normal
-Platform: Mac OS X
-Description: Finish Mac Mozilla plugin
-The Mac mozilla plugin needs some more work to be useable. Basic funtionality is working. However the video-output part needs some more work since it was crashing. See svn history for the old code. 
-Status: Halfway (stalled)
-
-Task
-Difficulty: Easy
-Urgency: Normal
-Platform: any
-Description: Controlling the mozilla plugin
-The mozilla plugin needs to be better controllable (via javascript). <br />
-- retrieve variable values.<br />
-- open VLC media player<br />
-- default html page to control the plugin<br />
-- XUL controls<br />
-(80% done) see:<br />
-<a href="http://sierra.via.ecp.fr/~zorglub/vlc/plugin/vlc.html">Javascript controls</a>
-<a href="http://sierra.via.ecp.fr/~zorglub/vlc/xul/">XUL controls</a>
-<a href="http://mplayerplug-in.sourceforge.net/">MPlayer Mozilla plugin</a>
-Status: Assigned to zorglub
 
 Task
 Difficulty: Hard
@@ -461,14 +509,6 @@ Platform: any
 Description: SDL vout cleaning
 The SDL vout hasn't been updated for a long while. It needs some cleaning up. New hotkeys support, better resizing, alignment etc. Even though SDL isn't used much, this vout shouldn't disappear, because it is a crossplatform API.
 Status: Todo
-
-Task
-Difficulty: Easy
-Urgency: Normal
-Platform: Win32/Linux
-Description: V4L and dshow tuning support
-We need an API that allows us to control the tuning of V4L and dshow TV cards.
-Status: Todo (CryHavoc)
 
 Task
 Difficulty: Easy
@@ -540,14 +580,6 @@ For integration with smb, sftp and other file sharing/mounting methods
 Status: Todo
 
 Task
-Difficulty: Medium
-Platform: any
-Urgency: Important
-Description: Update matroska demux
- Better Seeking
-Status: Todo
-
-Task
 Difficulty: Hard
 Platform: any
 Urgency: Wishlist
@@ -588,7 +620,6 @@ Urgency: Wishlist
 Description: Faster deinterlacing
 Our deinterlacers are relatively slow. DScaler has the best Soft deinterlacers out there.
 Unfortunatly it is very Win32 focused.
-
 Status: Todo
 
 Task
@@ -612,14 +643,6 @@ Most part easy to do, because the language info is stored in the ES format struc
 Status: Todo
 
 Task
-Difficulty: Hard
-Platform: any
-Urgency: Immediate
-Description: Clock Synchro redesign
-We need to adapt the clock synchro to work better with BOTH files and streams.
-Status: Todo
-
-Task
 Difficulty: Easy
 Platform: win32
 Urgency: Wishlist
@@ -630,7 +653,6 @@ Sound Files( .mp3, .ogg, .wav, .m4a, .m4p)<br />
 Video Files( .avi, .mkv, .mov, .mpg, .m2v, etc)<br />
 Subtitle Files( .idx, .sub, .utf, .srt)<br />
 Status: Todo
-
 
 # Do not remove me
 Task
