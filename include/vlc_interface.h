@@ -4,7 +4,7 @@
  * interface, such as message output.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_interface.h,v 1.6 2003/09/18 17:54:02 zorglub Exp $
+ * $Id: vlc_interface.h,v 1.7 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -52,8 +52,8 @@ struct intf_thread_t
     vlc_bool_t          b_block;
 
     /* Specific interfaces */
-    intf_console_t *    p_console;                                /** console */
-    intf_sys_t *        p_sys;                           /** system interface */
+    intf_console_t *    p_console;                               /** console */
+    intf_sys_t *        p_sys;                          /** system interface */
 
     /** Interface module */
     module_t *   p_module;
@@ -67,6 +67,9 @@ struct intf_thread_t
     vlc_mutex_t  change_lock;
     vlc_bool_t   b_menu_change;
     vlc_bool_t   b_menu;
+
+    /* Provides the ability to switch an interface on the fly */
+    char *psz_switch_intf;
 };
 
 /*****************************************************************************

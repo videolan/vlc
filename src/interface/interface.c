@@ -4,7 +4,7 @@
  * interface, such as command line.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: interface.c,v 1.106 2003/09/18 17:54:02 zorglub Exp $
+ * $Id: interface.c,v 1.107 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -52,6 +52,12 @@
  * Local prototypes
  *****************************************************************************/
 static void Manager( intf_thread_t *p_intf );
+static void RunInterface( intf_thread_t *p_intf );
+
+static int SwitchIntfCallback( vlc_object_t *, char const *,
+                               vlc_value_t , vlc_value_t , void * );
+static int AddIntfCallback( vlc_object_t *, char const *,
+                            vlc_value_t , vlc_value_t , void * );
 
 /*****************************************************************************
  * intf_Create: prepare interface before main loop
@@ -142,7 +148,7 @@ int intf_RunThread( intf_thread_t *p_intf )
             return VLC_EGENERIC;
         }
 
-        p_intf->pf_run( p_intf );
+        RunInterface( p_intf );
 
         p_intf->b_die = VLC_TRUE;
 
@@ -151,7 +157,7 @@ int intf_RunThread( intf_thread_t *p_intf )
     else
     {
         /* Run the interface in a separate thread */
-        if( vlc_thread_create( p_intf, "interface", p_intf->pf_run,
+        if( vlc_thread_create( p_intf, "interface", RunInterface,
                                VLC_THREAD_PRIORITY_LOW, VLC_FALSE ) )
         {
             msg_Err( p_intf, "cannot spawn interface thread" );
@@ -209,9 +215,8 @@ void intf_Destroy( intf_thread_t *p_intf )
     vlc_object_destroy( p_intf );
 }
 
+
 /* Following functions are local */
-
-
 
 /*****************************************************************************
  * Manager: helper thread for blocking interfaces
@@ -246,3 +251,104 @@ static void Manager( intf_thread_t *p_intf )
     }
 }
 
+/*****************************************************************************
+ * RunInterface: setups necessary data and give control to the interface
+ *****************************************************************************/
+static void RunInterface( intf_thread_t *p_intf )
+{
+    vlc_value_t val, text;
+
+    /* Variable used for interface switching */
+    p_intf->psz_switch_intf = NULL;
+    var_Create( p_intf, "intf-switch", VLC_VAR_STRING |
+                VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
+    text.psz_string = _("Switch interface");
+    var_Change( p_intf, "intf-switch", VLC_VAR_SETTEXT, &text, NULL );
+
+    val.psz_string = "skins"; text.psz_string = "Skins";
+    var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "wxwin"; text.psz_string = "wxWindows";
+    var_Change( p_intf, "intf-switch", VLC_VAR_ADDCHOICE, &val, &text );
+
+    var_AddCallback( p_intf, "intf-switch", SwitchIntfCallback, NULL );
+
+    /* Variable used for interface spawning */
+    var_Create( p_intf, "intf-add", VLC_VAR_STRING |
+                VLC_VAR_HASCHOICE | VLC_VAR_ISCOMMAND );
+    text.psz_string = _("Add interface");
+    var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text, NULL );
+
+    val.psz_string = "rc"; text.psz_string = "Console";
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "logger"; text.psz_string = "Debug logging";
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    val.psz_string = "http"; text.psz_string = "HTTP remote control";
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+
+    var_AddCallback( p_intf, "intf-add", AddIntfCallback, NULL );
+
+    /* Give control to the interface */
+    p_intf->pf_run( p_intf );
+
+    /* Provide ability to switch the main interface on the fly */
+    while( p_intf->psz_switch_intf )
+    {
+        char *psz_intf = p_intf->psz_switch_intf;
+        p_intf->psz_switch_intf = NULL;
+        p_intf->b_die = VLC_FALSE;
+
+        /* Make sure the old interface is completely uninitialised */
+        module_Unneed( p_intf, p_intf->p_module );
+
+        p_intf->p_module = module_Need( p_intf, "interface", psz_intf );
+        free( psz_intf );
+
+        if( p_intf->p_module )
+        {
+            p_intf->pf_run( p_intf );
+        }
+        else break;
+    }
+}
+
+static int SwitchIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
+    p_intf->psz_switch_intf =
+        malloc( strlen(newval.psz_string) + sizeof(",none") );
+    sprintf( p_intf->psz_switch_intf, "%s,none", newval.psz_string );
+    p_intf->b_die = VLC_TRUE;
+
+    return VLC_SUCCESS;
+}
+
+static int AddIntfCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    intf_thread_t *p_intf;
+    char *psz_intf = malloc( strlen(newval.psz_string) + sizeof(",none") );
+
+    /* Try to create the interface */
+    sprintf( psz_intf, "%s,none", newval.psz_string );
+    p_intf = intf_Create( p_this, psz_intf );
+    free( psz_intf );
+    if( p_intf == NULL )
+    {
+        msg_Err( p_this, "interface \"%s\" initialization failed",
+                 newval.psz_string );
+        return VLC_EGENERIC;
+    }
+
+    /* Try to run the interface */
+    p_intf->b_block = VLC_FALSE;
+    if( intf_RunThread( p_intf ) != VLC_SUCCESS )
+    {
+        vlc_object_detach( p_intf );
+        intf_Destroy( p_intf );
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}

@@ -2,7 +2,7 @@
  * wxwindows.h: private wxWindows interface description
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: wxwindows.h,v 1.64 2003/10/08 19:40:42 gbazin Exp $
+ * $Id: wxwindows.h,v 1.65 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -225,6 +225,8 @@ private:
     vlc_bool_t b_video_menu;
     wxMenu *p_navig_menu;
     vlc_bool_t b_navig_menu;
+    wxMenu *p_misc_menu;
+    vlc_bool_t b_misc_menu;
 };
 
 /* Dialogs Provider */
@@ -802,6 +804,7 @@ void PopupMenu( intf_thread_t *_p_intf, wxWindow *p_parent,
 wxMenu *AudioMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
+wxMenu *MiscMenu( intf_thread_t *_p_intf, wxWindow *p_parent );
 
 class MenuEvtHandler : public wxEvtHandler
 {

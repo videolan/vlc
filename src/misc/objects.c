@@ -2,7 +2,7 @@
  * objects.c: vlc_object_t handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: objects.c,v 1.41 2003/10/08 21:01:07 gbazin Exp $
+ * $Id: objects.c,v 1.42 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -114,6 +114,10 @@ void * __vlc_object_create( vlc_object_t *p_this, int i_type )
         case VLC_OBJECT_INTF:
             i_size = sizeof(intf_thread_t);
             psz_type = "interface";
+            break;
+        case VLC_OBJECT_DIALOGS:
+            i_size = sizeof(intf_thread_t);
+            psz_type = "dialogs provider";
             break;
         case VLC_OBJECT_PLAYLIST:
             i_size = sizeof(playlist_t);
@@ -274,13 +278,15 @@ void __vlc_object_destroy( vlc_object_t *p_this )
 
     if( p_this->i_children )
     {
-        msg_Err( p_this, "cannot delete object with children" );
+        msg_Err( p_this, "cannot delete object (%i, %s) with children" ,
+                 p_this->i_object_id, p_this->psz_object_name );
         return;
     }
 
     if( p_this->p_parent )
     {
-        msg_Err( p_this, "cannot delete object with a parent" );
+        msg_Err( p_this, "cannot delete object (%i, %s) with a parent",
+                 p_this->i_object_id, p_this->psz_object_name );
         return;
     }
 

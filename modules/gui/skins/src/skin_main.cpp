@@ -2,7 +2,7 @@
  * skin-main.cpp: skins plugin for VLC
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: skin_main.cpp,v 1.47 2003/07/20 10:38:49 gbazin Exp $
+ * $Id: skin_main.cpp,v 1.48 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *          Emmanuel Puig    <karibu@via.ecp.fr>
@@ -204,7 +204,10 @@ static void Close ( vlc_object_t *p_this )
 
 #if defined X11_SKINS
     XDestroyWindow( p_intf->p_sys->display, p_intf->p_sys->mainWin );
-    XCloseDisplay( p_intf->p_sys->display );
+
+    // There is a bug in imlib2 which prevents us from closing the display
+    // (__imlib_RenderImage() can free old GC with already closed display)
+    //XCloseDisplay( p_intf->p_sys->display );
 #endif
 
     // Unsuscribe to messages bank

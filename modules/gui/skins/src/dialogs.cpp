@@ -2,7 +2,7 @@
  * dialogs.cpp: Handles all the different dialog boxes we provide.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.14 2003/09/05 15:55:30 asmax Exp $
+ * $Id: dialogs.cpp,v 1.15 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -55,7 +55,8 @@ Dialogs::Dialogs( intf_thread_t *_p_intf )
     b_popup_change = VLC_FALSE;
 
     /* Allocate descriptor */
-    p_provider = (intf_thread_t *)vlc_object_create( p_intf, VLC_OBJECT_INTF );
+    p_provider = (intf_thread_t *)vlc_object_create( p_intf,
+                                                     VLC_OBJECT_DIALOGS );
     if( p_provider == NULL )
     {
         msg_Err( p_intf, "out of memory" );
@@ -70,6 +71,9 @@ Dialogs::Dialogs( intf_thread_t *_p_intf )
         p_provider = NULL;
         return;
     }
+
+    /* Attach the dialogs provider to its parent interface */
+    vlc_object_attach( p_provider, p_intf );
 
     /* Initialize dialogs provider
      * (returns as soon as initialization is done) */
@@ -91,6 +95,9 @@ Dialogs::~Dialogs()
 {
     if( p_provider && p_module )
     {
+        /* Detach the dialogs provider from its parent interface */
+        vlc_object_detach( p_provider );
+
         module_Unneed( p_provider, p_module );
         vlc_object_destroy( p_provider );
     }

@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.32 2003/09/07 22:53:09 fenrir Exp $
+ * $Id: timer.cpp,v 1.33 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -113,7 +113,7 @@ void Timer::Notify()
             /* Take care of the volume */
             audio_volume_t i_volume;
             aout_VolumeGet( p_intf, &i_volume );
-            p_main_interface->volctrl->SetValue( i_volume * 200 /
+            p_main_interface->volctrl->SetValue( i_volume * 200 * 2 /
                                                  AOUT_VOLUME_MAX );
             p_main_interface->volctrl->SetToolTip(
                 wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),

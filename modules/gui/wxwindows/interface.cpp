@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.64 2003/10/08 12:18:50 zorglub Exp $
+ * $Id: interface.cpp,v 1.65 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -127,6 +127,7 @@ enum
 
     Prefs_Event,
     Extra_Event,
+    Skins_Event,
 
     SliderScroll_Event,
     StopStream_Event,
@@ -258,6 +259,9 @@ Interface::Interface( intf_thread_t *_p_intf ):
 #endif
 
     UpdateAcceleratorTable();
+
+    /* Start timer */
+    timer = new Timer( p_intf, this );
 }
 
 Interface::~Interface()
@@ -266,7 +270,9 @@ Interface::~Interface()
     {
         delete p_intf->p_sys->p_wxwindow;
     }
+
     /* Clean up */
+    delete timer;
 }
 
 /*****************************************************************************
@@ -327,7 +333,6 @@ void Interface::CreateOurMenuBar()
     settings_menu->AppendCheckItem( Extra_Event, wxU(_("&Extended GUI") ),
                                     wxU(_(EXTRA_PREFS)) );
 
-
     /* Create the "Audio" menu */
     p_audio_menu = new wxMenu;
     b_audio_menu = 1;
@@ -339,6 +344,10 @@ void Interface::CreateOurMenuBar()
     /* Create the "Navigation" menu */
     p_navig_menu = new wxMenu;
     b_navig_menu = 1;
+
+    /* Create the "Miscellaneous" menu */
+    p_misc_menu = new wxMenu;
+    b_misc_menu = 1;
 
     /* Create the "Help" menu */
     wxMenu *help_menu = new wxMenu;
@@ -352,6 +361,7 @@ void Interface::CreateOurMenuBar()
     menubar->Append( p_audio_menu, wxU(_("&Audio")) );
     menubar->Append( p_video_menu, wxU(_("&Video")) );
     menubar->Append( p_navig_menu, wxU(_("&Navigation")) );
+    menubar->Append( p_misc_menu, wxU(_("&Miscellaneous")) );
     menubar->Append( help_menu, wxU(_("&Help")) );
 
     /* Attach the menu bar to the frame */
@@ -739,6 +749,25 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
         }
         else b_navig_menu = 1;
     }
+    else if( event.GetEventObject() == p_misc_menu )
+    {
+        if( b_misc_menu )
+        {
+            p_misc_menu = MiscMenu( p_intf, this );
+
+            /* Work-around for buggy wxGTK */
+            wxMenu *menu = GetMenuBar()->GetMenu( 6 );
+            RecursiveDestroy( menu );
+            /* End work-around */
+
+            menu = GetMenuBar()->Replace( 6, p_misc_menu,
+					  wxU(_("&Miscellaneous")));
+            if( menu ) delete menu;
+
+            b_misc_menu = 0;
+        }
+        else b_misc_menu = 1;
+    }
 
 #else
     p_audio_menu = AudioMenu( p_intf, this );
@@ -753,6 +782,9 @@ void Interface::OnMenuOpen(wxMenuEvent& event)
     menu = GetMenuBar()->Replace( 5, p_navig_menu, wxU(_("&Navigation")) );
     if( menu ) delete menu;
 
+    p_misc_menu = MiscMenu( p_intf, this );
+    menu = GetMenuBar()->Replace( 6, p_misc_menu, wxU(_("&Miscellaneous")) );
+    if( menu ) delete menu;
 #endif
 }
 
@@ -1242,7 +1274,7 @@ void wxVolCtrl::OnChange( wxMouseEvent& event )
 
 void wxVolCtrl::Change( int i_volume )
 {
-    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 );
+    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
     SetValue( i_volume );
     SetToolTip( wxString::Format((wxString)wxU(_("Volume")) + wxT(" %d"),
                 i_volume ) );

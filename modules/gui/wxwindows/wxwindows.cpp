@@ -2,7 +2,7 @@
  * wxwindows.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: wxwindows.cpp,v 1.33 2003/10/04 14:59:38 gbazin Exp $
+ * $Id: wxwindows.cpp,v 1.34 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -66,6 +66,7 @@ public:
     Instance( intf_thread_t *_p_intf );
 
     bool OnInit();
+    int  OnExit();
 
 private:
     intf_thread_t *p_intf;
@@ -272,9 +273,6 @@ bool Instance::OnInit()
         MainInterface->Show( TRUE );
 
         SetTopWindow( MainInterface );
-
-        /* Start timer */
-        new Timer( p_intf, MainInterface );
     }
 
     /* Creates the dialogs provider */
@@ -289,6 +287,19 @@ bool Instance::OnInit()
 
     /* Return TRUE to tell program to continue (FALSE would terminate) */
     return TRUE;
+}
+
+/*****************************************************************************
+ * Instance::OnExit: called when the interface execution stops
+ *****************************************************************************/
+int Instance::OnExit()
+{
+    if( p_intf->pf_show_dialog )
+    {
+         /* We need to manually clean up the dialogs class */
+         if( p_intf->p_sys->p_wxwindow ) delete p_intf->p_sys->p_wxwindow;
+    }
+    return 0;
 }
 
 static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,

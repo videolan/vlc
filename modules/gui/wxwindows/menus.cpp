@@ -2,7 +2,7 @@
  * menus.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: menus.cpp,v 1.20 2003/08/28 15:59:04 gbazin Exp $
+ * $Id: menus.cpp,v 1.21 2003/10/14 22:41:41 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -72,7 +72,8 @@ enum
     AudioMenu_Events = wxID_HIGHEST + 2000,
     VideoMenu_Events = wxID_HIGHEST + 3000,
     NavigMenu_Events = wxID_HIGHEST + 4000,
-    PopupMenu_Events = wxID_HIGHEST + 5000
+    MiscMenu_Events  = wxID_HIGHEST + 5000,
+    PopupMenu_Events = wxID_HIGHEST + 6000
 };
 
 BEGIN_EVENT_TABLE(Menu, wxMenu)
@@ -135,6 +136,10 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "deinterlace";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "aspect-ratio";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "crop";
+        pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "directx-on-top";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
@@ -165,6 +170,24 @@ void PopupMenu( intf_thread_t *p_intf, wxWindow *p_parent,
         ppsz_varnames[i] = "audio-es";
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "spu-es";
+        pi_objects[i++] = p_object->i_object_id;
+
+        vlc_object_release( p_object );
+    }
+
+    /* Interface menu */
+    ppsz_varnames[i++] = NULL; /* Separator */
+    ppsz_varnames[i++] = _("Interface menu");
+    ppsz_varnames[i++] = NULL; /* Separator */
+
+    /* vlc_object_find is needed because of the dialogs provider case */
+    p_object = (vlc_object_t *)vlc_object_find( p_intf, VLC_OBJECT_INTF,
+                                                FIND_PARENT );
+    if( p_object != NULL )
+    {
+        ppsz_varnames[i] = "intf-switch";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "intf-add";
         pi_objects[i++] = p_object->i_object_id;
 
         vlc_object_release( p_object );
@@ -239,6 +262,10 @@ wxMenu *VideoMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
         pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "deinterlace";
         pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "aspect-ratio";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "crop";
+        pi_objects[i++] = p_object->i_object_id;
         ppsz_varnames[i] = "directx-on-top";
         pi_objects[i++] = p_object->i_object_id;
         vlc_object_release( p_object );
@@ -300,6 +327,32 @@ wxMenu *NavigMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
     /* Build menu */
     return new Menu( _p_intf, p_parent, i,
                      ppsz_varnames, pi_objects, NavigMenu_Events );
+}
+
+wxMenu *MiscMenu( intf_thread_t *_p_intf, wxWindow *p_parent )
+{
+    vlc_object_t *p_object;
+    char *ppsz_varnames[10];
+    int pi_objects[10];
+    int i = 0;
+
+    /* Initializations */
+    memset( pi_objects, 0, 4 * sizeof(int) );
+
+    p_object = (vlc_object_t *)vlc_object_find( _p_intf, VLC_OBJECT_INTF,
+                                                FIND_PARENT );
+    if( p_object != NULL )
+    {
+        ppsz_varnames[i] = "intf-switch";
+        pi_objects[i++] = p_object->i_object_id;
+        ppsz_varnames[i] = "intf-add";
+        pi_objects[i++] = p_object->i_object_id;
+        vlc_object_release( p_object );
+    }
+
+    /* Build menu */
+    return new Menu( _p_intf, p_parent, i,
+                     ppsz_varnames, pi_objects, MiscMenu_Events );
 }
 
 /*****************************************************************************
