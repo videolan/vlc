@@ -312,8 +312,8 @@ msgid ""
 "This option allows you to set the language of the interface. The system "
 "language is auto-detected if \"auto\" is specified here."
 msgstr ""
-"Cette option permet de choisir le chemin prédéfini que l'interface utilisera "
-"pour ouvrir un fichier."
+"Cette option permet de choisir la langue de l'interface. Si \"auto\" est "
+"spécifié, la langue du système sera automatiquement détectée."
 
 #: src/libvlc.h:68
 msgid "Color messages"
@@ -1511,9 +1511,9 @@ msgid ""
 "without disturbing anyone. If you disable the dynamic range compression the "
 "playback will be more adapted to a movie theater or a listening room."
 msgstr ""
-"La compression dynamique rend les sons forts plus doux et les ons doux plus "
+"La compression dynamique rend les sons forts plus doux et les sons doux plus "
 "forts, de sorte que vous pouvez écouter plus facilement dans un "
-"environnement bruyant sans déranger personne. Si vous désactiver la "
+"environnement bruyant sans déranger personne. Si vous désactivez la "
 "compression dynamique, le rendu sera plus adapté à une salle de cinéma ou "
 "une chambre d'écoute."
 
@@ -1701,7 +1701,7 @@ msgstr "Fichier de sortie"
 
 #: modules/audio_output/file.c:105
 msgid "File to which the audio samples will be written to"
-msgstr ""
+msgstr "Fichier dans lequel les échantillons audio vont être écrits"
 
 #: modules/audio_output/file.c:114
 msgid "file audio output"
@@ -2002,7 +2002,9 @@ msgstr "Utiliser des processeurs supplémentaires"
 msgid ""
 "This video decoder can benefit from a multiprocessor computer. If you have "
 "one, you can specify the number of processors here."
-msgstr ""
+msgstr "iCe décodeur vidéo peut tirer partie d'un ordinateur "
+"multi-processeurs. Si vous en avez un, vous pouvez indiquer le nombre de "
+"procésseurs ici."
 
 #: modules/codec/mpeg_video/parser.c:76
 msgid "Force synchro algorithm {I|I+|IP|IP+|IPB}"
@@ -2100,7 +2102,7 @@ msgstr "Port de la liaison interface HTTP"
 msgid ""
 "You can set the port on which the http interface will accept connections"
 msgstr ""
-"Indiquez le port sur lequel l'interface HTPP va accepter des connexions"
+"Indiquez le port sur lequel l'interface HTTP va accepter des connexions"
 
 #: modules/control/http.c:77
 msgid "HTTP interface bind address"
@@ -2174,7 +2176,7 @@ msgstr "Interface de commande à distance"
 
 #: modules/demux/a52sys.c:52
 msgid "A52 demuxer"
-msgstr "Demultiplexeur A52"
+msgstr "Démultiplexeur A52"
 
 #: modules/demux/aac/demux.c:46
 msgid "AAC stream demuxer"
@@ -2305,11 +2307,11 @@ msgstr ""
 
 #: modules/demux/au.c:47
 msgid "AU demuxer"
-msgstr ""
+msgstr "Démultiplexeur AU"
 
 #: modules/demux/avi/avi.c:60
 msgid "avi-demuxer"
-msgstr ""
+msgstr "Démultiplexeur avi"
 
 #: modules/demux/avi/avi.c:62 modules/demux/avi/avi.c:63
 msgid "force interleaved method"
@@ -2342,7 +2344,7 @@ msgstr "Fréquence d'affichage"
 
 #: modules/demux/avi/avi.c:1239
 msgid "Unknown"
-msgstr ""
+msgstr "Inconnu"
 
 #: modules/demux/demuxdump.c:48
 msgid "Dump file name"
@@ -2403,9 +2405,8 @@ msgid "Writing Application"
 msgstr "Position de départ"
 
 #: modules/demux/mkv.cpp:2319
-#, fuzzy
 msgid "Display Resolution"
-msgstr "Résolution"
+msgstr "Résolution d'affichage"
 
 #: modules/demux/mkv.cpp:2323
 #, fuzzy
@@ -2477,7 +2478,8 @@ msgstr "PSI pépiné"
 msgid ""
 "If you have a stream whose PSI packets do not feature incremented continuity "
 "counters, select this option."
-msgstr ""
+msgstr "Cochez cette option si les packets PSI de votre flux ne possèdent pas "
+"de compteurs de continuité."
 
 #: modules/demux/mpeg/ts.c:110
 msgid "ISO 13818-1 MPEG Transport Stream input"
@@ -2541,19 +2543,16 @@ msgid "Classic Rock"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:10
-#, fuzzy
 msgid "Country"
-msgstr "Contrôles"
+msgstr ""
 
 #: modules/demux/util/id3genres.h:11
-#, fuzzy
 msgid "Dance"
-msgstr "Annuler"
+msgstr ""
 
 #: modules/demux/util/id3genres.h:12
-#, fuzzy
 msgid "Disco"
-msgstr "Disque"
+msgstr ""
 
 #: modules/demux/util/id3genres.h:13
 msgid "Funk"
@@ -2572,9 +2571,8 @@ msgid "Jazz"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:17
-#, fuzzy
 msgid "Metal"
-msgstr "Verticale"
+msgstr "Métal"
 
 #: modules/demux/util/id3genres.h:18
 msgid "New Age"
@@ -2585,9 +2583,8 @@ msgid "Oldies"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:20
-#, fuzzy
 msgid "Other"
-msgstr "Masquer les autres"
+msgstr "Autre"
 
 #: modules/demux/util/id3genres.h:21
 msgid "Pop"
@@ -2622,9 +2619,8 @@ msgid "Alternative"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:29
-#, fuzzy
 msgid "Ska"
-msgstr "Sat"
+msgstr ""
 
 #: modules/demux/util/id3genres.h:30
 msgid "Death Metal"
@@ -2635,9 +2631,8 @@ msgid "Pranks"
 msgstr ""
 
 #: modules/demux/util/id3genres.h:32
-#, fuzzy
 msgid "Soundtrack"
-msgstr "Audio"
+msgstr "Bande son"
 
 #: modules/demux/util/id3genres.h:33
 msgid "Euro-Techno"
@@ -2669,7 +2664,7 @@ msgstr ""
 
 #: modules/demux/util/id3genres.h:40
 msgid "Classical"
-msgstr ""
+msgstr "Classique"
 
 #: modules/demux/util/id3genres.h:41
 msgid "Instrumental"
@@ -2889,7 +2884,7 @@ msgstr "Interface API standard BeOS"
 
 #: modules/gui/beos/InterfaceWindow.cpp:158
 msgid "Open files from all sub-folders as well?"
-msgstr ""
+msgstr "Ouvrir aussi les fichiers des sous-répertoires ?"
 
 #: modules/gui/beos/InterfaceWindow.cpp:159
 msgid "No"
@@ -4447,7 +4442,7 @@ msgstr "Fichier de sous-titres :"
 
 #: modules/gui/macosx/open.m:174
 msgid "Override"
-msgstr ""
+msgstr "Ecraser"
 
 #: modules/gui/macosx/open.m:333 modules/gui/macosx/open.m:527
 #: modules/gui/macosx/open.m:631 modules/gui/macosx/open.m:678
@@ -4469,15 +4464,13 @@ msgid "Advanced output:"
 msgstr "Sortie audio ALSA"
 
 #: modules/gui/macosx/output.m:123
-#, fuzzy
 msgid "Output Options"
-msgstr "Méthode de sortie"
+msgstr "Options de sortie"
 
 #: modules/gui/macosx/output.m:126 modules/gui/macosx/output.m:216
 #: modules/gui/macosx/output.m:291
-#, fuzzy
 msgid "Stream"
-msgstr "Arrêter le flux"
+msgstr "Flux"
 
 #: modules/gui/macosx/output.m:130
 msgid "TTL"
@@ -4533,10 +4526,12 @@ msgid ""
 "Beware this will reset your VLC Media Player config file.\n"
 "Are you sure you want to continue?"
 msgstr ""
+"Attention, ceci va réinitialiser le fichier de configuration du VLC.\n"
+"Voulez-vous vraiment continuer ?"
 
 #: modules/gui/macosx/prefs.m:198
 msgid "Select file or directory"
-msgstr ""
+msgstr "Choisir un fichier ou un répertoire"
 
 #: modules/gui/macosx/prefs.m:408 modules/gui/wxwindows/preferences.cpp:767
 msgid "Default"
@@ -4556,9 +4551,8 @@ msgstr "Interface Qt"
 
 #: modules/gui/skins/src/dialogs.cpp:363
 #: modules/gui/skins/src/skin_main.cpp:300
-#, fuzzy
 msgid "Open a skin file"
-msgstr "Ouvre un fichier"
+msgstr "Ouvre un fichier de skin"
 
 #: modules/gui/skins/src/skin_main.cpp:349
 #: modules/gui/skins/src/skin_main.cpp:350
@@ -4568,7 +4562,7 @@ msgstr "Dernière skin utilisée"
 #: modules/gui/skins/src/skin_main.cpp:351
 #: modules/gui/skins/src/skin_main.cpp:352
 msgid "Config of last used skin"
-msgstr ""
+msgstr "Configuration de la dernière skin utilisée"
 
 #: modules/gui/skins/src/skin_main.cpp:353
 #: modules/gui/skins/src/skin_main.cpp:354
@@ -4581,14 +4575,12 @@ msgid "Show application in taskbar"
 msgstr ""
 
 #: modules/gui/skins/src/skin_main.cpp:367
-#, fuzzy
 msgid "Skinnable Interface"
-msgstr "Masquer/afficher l'interface"
+msgstr "Interface skinnable"
 
 #: modules/gui/wxwindows/fileinfo.cpp:77
-#, fuzzy
 msgid "FileInfo"
-msgstr "&Infos fichier..."
+msgstr ""
 
 #: modules/gui/wxwindows/interface.cpp:254
 msgid "Open a DVD or (S)VCD"
@@ -4620,7 +4612,7 @@ msgstr ""
 
 #: modules/gui/wxwindows/interface.cpp:262
 msgid "Show information about the file being played"
-msgstr ""
+msgstr "Afficher les détails sur le fichier en cours"
 
 #: modules/gui/wxwindows/interface.cpp:264
 msgid "Go to the preferences menu"
@@ -4696,16 +4688,14 @@ msgstr "&Audio"
 #: modules/gui/wxwindows/interface.cpp:323
 #: modules/gui/wxwindows/interface.cpp:528
 #: modules/gui/wxwindows/interface.cpp:561
-#, fuzzy
 msgid "&Video"
-msgstr "Vidéo"
+msgstr "&Vidéo"
 
 #: modules/gui/wxwindows/interface.cpp:324
 #: modules/gui/wxwindows/interface.cpp:547
 #: modules/gui/wxwindows/interface.cpp:565
-#, fuzzy
 msgid "&Navigation"
-msgstr "Navigation"
+msgstr "&Navigation"
 
 #: modules/gui/wxwindows/interface.cpp:325
 msgid "&Help"
@@ -4840,9 +4830,8 @@ msgid "DVD (menus support)"
 msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:375
-#, fuzzy
 msgid "CD Audio"
-msgstr "Audio"
+msgstr ""
 
 #: modules/gui/wxwindows/open.cpp:854 modules/gui/wxwindows/streamout.cpp:649
 msgid "Save file"
@@ -4853,14 +4842,12 @@ msgid "&Add MRL..."
 msgstr ""
 
 #: modules/gui/wxwindows/playlist.cpp:116
-#, fuzzy
 msgid "&Open Playlist..."
-msgstr "Ouvre la liste de lecture"
+msgstr "&Ouvre la liste de lecture"
 
 #: modules/gui/wxwindows/playlist.cpp:117
-#, fuzzy
 msgid "&Save Playlist..."
-msgstr "Liste de lecture..."
+msgstr "&Sauver la liste de lecture..."
 
 #: modules/gui/wxwindows/playlist.cpp:119
 msgid "&Close"
@@ -4891,13 +4878,12 @@ msgid "no info"
 msgstr "Pas d'info"
 
 #: modules/gui/wxwindows/playlist.cpp:330
-#, fuzzy
 msgid "Save playlist"
-msgstr "Ouvre la liste de lecture"
+msgstr "Sauver la liste de lecture"
 
 #: modules/gui/wxwindows/preferences.cpp:318
 msgid "Reset config file"
-msgstr ""
+msgstr "Réinitialiser le fichier de configuration"
 
 #: modules/gui/wxwindows/preferences.cpp:898
 msgid "No configuration options available"
@@ -4929,9 +4915,8 @@ msgid "Output Methods"
 msgstr "Méthode de sortie"
 
 #: modules/gui/wxwindows/streamout.cpp:346
-#, fuzzy
 msgid "Play locally"
-msgstr "Jouer plus lentement"
+msgstr "Jouer en local"
 
 #: modules/gui/wxwindows/streamout.cpp:370
 msgid "Filename"
@@ -4943,14 +4928,12 @@ msgid "Transcoding options"
 msgstr "Afficher les options avancées"
 
 #: modules/gui/wxwindows/streamout.cpp:515
-#, fuzzy
 msgid "Video codec"
-msgstr "Périphérique audio"
+msgstr "Codec video"
 
 #: modules/gui/wxwindows/streamout.cpp:552
-#, fuzzy
 msgid "Audio codec"
-msgstr "Périphérique audio"
+msgstr "Codec audio"
 
 #: modules/gui/wxwindows/subtitles.cpp:83
 msgid "Open Subtitles File"
@@ -5071,27 +5054,22 @@ msgid "Using the logger interface plugin..."
 msgstr "Utiliser le module d'interface fichier journal..."
 
 #: modules/misc/memcpy/memcpy.c:81
-#, fuzzy
 msgid "libc memcpy"
 msgstr "Module de memcpy pour libc"
 
 #: modules/misc/memcpy/memcpy.c:85
-#, fuzzy
 msgid "3D Now! memcpy"
 msgstr "Module de memcpy optimisé 3D Now!"
 
 #: modules/misc/memcpy/memcpy.c:92
-#, fuzzy
 msgid "MMX memcpy"
 msgstr "Module de memcpy optimisé MMX"
 
 #: modules/misc/memcpy/memcpy.c:97
-#, fuzzy
 msgid "MMX EXT memcpy"
 msgstr "Module de memcpy optimisé MMMEXT"
 
 #: modules/misc/memcpy/memcpyaltivec.c:52
-#, fuzzy
 msgid "AltiVec memcpy"
 msgstr "Module de memcpy optimisé AltiVec"
 
@@ -5119,9 +5097,8 @@ msgid "Qt Embedded GUI helper"
 msgstr "Module vidéo Qt Embedded"
 
 #: modules/misc/sap.c:161
-#, fuzzy
 msgid "SAP interface"
-msgstr "&Ajouter une interface"
+msgstr "Interface SAP"
 
 #: modules/misc/screensaver.c:44
 #, fuzzy
@@ -5138,32 +5115,31 @@ msgstr "Tests de performance divers"
 
 #: modules/mux/avi.c:94
 msgid "Avi muxer"
-msgstr ""
+msgstr "Multiplexeur avi"
 
 #: modules/mux/dummy.c:60
 msgid "Dummy muxer"
 msgstr ""
 
 #: modules/mux/mp4.c:52
-#, fuzzy
 msgid "MP4/MOV muxer"
-msgstr "MP4 démultiplexeur"
+msgstr "Démultiplexeur MP4/MOV"
 
 #: modules/mux/mpeg/ps.c:77
 msgid "PS muxer"
-msgstr ""
+msgstr "Multiplexeur PS"
 
 #: modules/mux/mpeg/ts.c:138
 msgid "TS muxer"
-msgstr ""
+msgstr "Multiplexeur TS"
 
 #: modules/mux/mpeg/ts.c:143
 msgid "TS muxer (libdvbpsi)"
-msgstr ""
+msgstr "Multiplexeur TS (libdvbpsi)"
 
 #: modules/mux/ogg.c:55
 msgid "Ogg/ogm muxer"
-msgstr ""
+msgstr "Multiplexeur ogg/ogm"
 
 #: modules/packetizer/a52.c:71
 msgid "A/52 audio packetizer"
@@ -5458,7 +5434,7 @@ msgstr "Sortie vidéo en art ASCII"
 #: modules/video_output/directx/directx.c:94
 #: modules/video_output/directx/directx.c:225
 msgid "Always on top"
-msgstr "Toujours au dessus"
+msgstr "Toujours au-dessus"
 
 #: modules/video_output/directx/directx.c:95
 msgid "Place the directx window on top of other windows"
@@ -5529,7 +5505,7 @@ msgstr "Sortie vidéo pour le framebuffer de Linux"
 #: modules/video_output/ggi.c:56 modules/video_output/mga/xmga.c:96
 #: modules/video_output/x11/x11.c:52 modules/video_output/x11/xvideo.c:58
 msgid "X11 display name"
-msgstr "nom du display X11"
+msgstr "Nom du display X11"
 
 #: modules/video_output/ggi.c:57
 msgid ""
@@ -5613,9 +5589,8 @@ msgid "Windows GDI video output"
 msgstr "Sortie vidéo Windows GDI"
 
 #: modules/video_output/x11/x11.c:57 modules/video_output/x11/xvideo.c:68
-#, fuzzy
 msgid "Use shared memory"
-msgstr "Utilise la mémoire partagée"
+msgstr "Utiliser la mémoire partagée"
 
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
 msgid "Use shared memory to communicate between VLC and the X server."
@@ -5685,7 +5660,6 @@ msgid "Display xosd output on the bottom of the screen instead of the top"
 msgstr "Affiche la sortie xosd au bas de l'écran plutôt qu'en haut"
 
 #: modules/visualization/xosd/xosd.c:65
-#, fuzzy
 msgid "Vertical offset"
 msgstr "Décalage vertical"
 
