@@ -104,7 +104,7 @@ vpar_thread_t * vpar_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
  * be destroyed, and non 0 else. The last case probably means that the thread
  * was still active, and another try may succeed.
  *******************************************************************************/
-void vpar g_DestroyThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
+void vpar_DestroyThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 {
     intf_DbgMsg("vpar debug: requesting termination of video parser thread %p\n", p_vpar);
 
@@ -152,11 +152,11 @@ static int InitThread( vpar_thread_t *p_vpar )
     /* Our first job is to initialize the bit stream structure with the
      * beginning of the input stream */
     vlc_mutex_lock( &p_vpar->fifo.data_lock );
-    while ( PARSER_FIFO_ISEMPTY(p_vpar->fifo) )
+    while ( DECODER_FIFO_ISEMPTY(p_vpar->fifo) )
     {
         vlc_cond_wait( &p_vpar->fifo.data_wait, &p_vpar->fifo.data_lock );
     }
-    p_vpar->bit_stream.p_ts = PARSER_FIFO_START( p_vpar->fifo )->p_first_ts;
+    p_vpar->bit_stream.p_ts = DECODER_FIFO_START( p_vpar->fifo )->p_first_ts;
     p_vpar->bit_stream.i_byte = p_vpar->bit_stream.p_ts->i_payload_start;
     vlc_mutex_unlock( &p_vpar->fifo.data_lock );
 
@@ -187,24 +187,37 @@ static int InitThread( vpar_thread_t *p_vpar )
     p_vpar->c_decoded_b_pictures = 0;
 #endif
 
+    /* Initialize video FIFO */
+    vpar_InitFIFO( p_vpar );
+    
+    bzero( p_vpar->p_vdec, MAX_VDEC*sizeof(vdec_thread_t *) );
+    
+    /* Spawn a video_decoder thread */
+    /* ??? add the possibility to launch multiple vdec threads */
+    if( (p_vpar->p_vdec[0] = vdec_CreateThread( p_vpar )) == NULL )
+    {
+        return( 1 );
+    }
+
     /* Mark thread as running and return */
-    intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);    
+    intf_DbgMsg("vpar debug: InitThread(%p) succeeded\n", p_vpar);
     return( 0 );    
 }
 
 /*******************************************************************************
  * RunThread: generic parser thread
  *******************************************************************************
- * Generic parser thread. This function does only returns when the thread is
+ * Video parser thread. This function does only returns when the thread is
  * terminated. 
  *******************************************************************************/
 static void RunThread( vpar_thread_t *p_vpar )
 {
+    int i_dummy;
 
     intf_DbgMsg("vpar debug: running video parser thread (%p) (pid == %i)\n", p_vpar, getpid());
 
     /* 
-     * Initialize thread and free configuration 
+     * Initialize thread 
      */
     p_vpar->b_error = InitThread( p_vpar );
     if( p_vpar->b_error )
@@ -213,16 +226,28 @@ static void RunThread( vpar_thread_t *p_vpar )
     }
     p_vpar->b_run = 1;
 
-/* REMOVE ME !!!!! */
-p_vpar->b_error = 1;
-
     /*
      * Main loop - it is not executed if an error occured during
      * initialization
      */
     while( (!p_vpar->b_die) && (!p_vpar->b_error) )
     {
-        /* ?? */
+        /* Find the next sequence header in the stream */
+        p_vpar->b_error = vpar_NextSequenceHeader( p_vpar );
+
+#ifdef STATS
+        p_vpar->c_sequences++;
+#endif
+
+        while( (!p_vpar->b_die) && (!p_vpar->b_error) )
+        {
+            /* Parse the next sequence, group or picture header */
+            if( vpar_ParseHeader( p_vpar ) )
+            {
+                /* End of sequence */
+                break;
+            };
+        }
     } 
 
     /*
@@ -275,6 +300,8 @@ static void ErrorThread( vpar_thread_t *p_vpar )
  *******************************************************************************/
 static void EndThread( vpar_thread_t *p_vpar )
 {
+    int i_dummy;
+
     intf_DbgMsg("vpar debug: destroying video parser thread %p\n", p_vpar);
 
 #ifdef DEBUG
@@ -285,6 +312,15 @@ static void EndThread( vpar_thread_t *p_vpar )
     /* Destroy thread structures allocated by InitThread */
 //    vout_DestroyStream( p_vpar->p_vout, p_vpar->i_stream );
     /* ?? */
+
+    /* Destroy vdec threads */
+    for( i_dummy = 0; i_dummy < MAX_VDEC; i_dummy++ )
+    {
+        if( p_vpar->p_vdec[i_dummy] != NULL )
+            vdec_DestroyThread( p_vpar->p_vdec[i_dummy] );
+        else
+            break;
+    }
 
     intf_DbgMsg("vpar debug: EndThread(%p)\n", p_vpar);
 }

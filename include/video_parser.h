@@ -11,8 +11,21 @@
  *  "input.h"
  *  "video.h"
  *  "video_output.h"
- *  "parser_fifo.h"
+ *  "decoder_fifo.h"
+ *  "video_fifo.h"
  *******************************************************************************/
+
+/*******************************************************************************
+ * sequence_t : sequence descriptor
+ *******************************************************************************
+ * ??
+ *******************************************************************************/
+typedef struct sequence_s
+{
+    u32                 i_height, i_width;
+    unsigned int        i_aspect_ratio;
+    double              frame_rate;
+} sequence_t;
 
 /*******************************************************************************
  * vpar_thread_t: video parser thread descriptor
@@ -35,7 +48,7 @@ typedef struct vpar_thread_s
     
 
     /* Input properties */
-    parser_fifo_t      fifo;                                /* PES input fifo */
+    decoder_fifo_t      fifo;                                /* PES input fifo */
 
     /* The bit stream structure handles the PES stream at the bit level */
     bit_stream_t        bit_stream;
@@ -44,11 +57,19 @@ typedef struct vpar_thread_s
     vout_thread_t *     p_vout;                         /* video output thread */
     int                 i_stream;                           /* video stream id */
     
-        
+    /* Decoder properties */
+    struct vdec_thread_s *      p_vdec[MAX_VDEC];
+    video_fifo_t                vfifo;
+    video_buffer_t              vbuffer;
+
+    /* Parser properties */
+    sequence_t          sequence;
+
 #ifdef STATS
     /* Statistics */
     count_t         c_loops;                               /* number of loops */
     count_t         c_idle_loops;                     /* number of idle loops */
+    count_t         c_sequences;                       /* number of sequences */
     count_t         c_pictures;                    /* number of pictures read */
     count_t         c_i_pictures;                /* number of I pictures read */
     count_t         c_p_pictures;                /* number of P pictures read */
@@ -61,13 +82,26 @@ typedef struct vpar_thread_s
 } vpar_thread_t;
 
 /*******************************************************************************
+ * Standard start codes
+ *******************************************************************************/
+#define PICTURE_START_CODE      0x100
+#define SLICE_START_CODE_MIN    0x101
+#define SLICE_START_CODE_MAX    0x1AF
+#define USER_DATA_START_CODE    0x1B2
+#define SEQUENCE_HEADER_CODE    0x1B3
+#define SEQUENCE_ERROR_CODE     0x1B4
+#define EXTENSION_START_CODE    0x1B5
+#define SEQUENCE_END_CODE       0x1B7
+#define GROUP_START_CODE        0x1B8
+
+/*******************************************************************************
  * Prototypes
  *******************************************************************************/
 
 /* Thread management functions */
 vpar_thread_t * vpar_CreateThread       ( /* video_cfg_t *p_cfg, */ input_thread_t *p_input /*,
                                           vout_thread_t *p_vout, int *pi_status */ );
-void             vpar_DestroyThread      ( vpar_thread_t *p_vpar /*, int *pi_status */ );
+void            vpar_DestroyThread      ( vpar_thread_t *p_vpar /*, int *pi_status */ );
 
 /* Time management functions */
 /* ?? */

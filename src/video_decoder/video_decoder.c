@@ -30,27 +30,31 @@
 #include "decoder_fifo.h"
 #include "video.h"
 #include "video_output.h"
+#include "video_parser.h"
+
+#include "undec_picture.h"
+#include "video_fifo.h"
 #include "video_decoder.h"
 
 /*
  * Local prototypes
  */
-//static int      CheckConfiguration  ( video_cfg_t *p_cfg );
 static int      InitThread          ( vdec_thread_t *p_vdec );
 static void     RunThread           ( vdec_thread_t *p_vdec );
 static void     ErrorThread         ( vdec_thread_t *p_vdec );
 static void     EndThread           ( vdec_thread_t *p_vdec );
+static void     DecodePicture       ( vdec_thread_t *p_vdec,
+                                      undec_picture_t * p_undec_p );
 
 /*******************************************************************************
- * vdec_CreateThread: create a generic decoder thread
+ * vdec_CreateThread: create a video decoder thread
  *******************************************************************************
  * This function creates a new video decoder thread, and returns a pointer
  * to its description. On error, it returns NULL.
  * Following configuration properties are used:
  * ??
  *******************************************************************************/
-vdec_thread_t * vdec_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_input /*,
-                                   vout_thread_t *p_vout, int *pi_status */ )
+vdec_thread_t * vdec_CreateThread( vpar_thread_t *p_vpar /*, int *pi_status */ )
 {
     vdec_thread_t *     p_vdec;
 
@@ -59,7 +63,7 @@ vdec_thread_t * vdec_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     /* Allocate the memory needed to store the thread's structure */
     if ( (p_vdec = (vdec_thread_t *)malloc( sizeof(vdec_thread_t) )) == NULL )
     {
-        intf_ErrMsg("adec error: not enough memory for vdec_CreateThread() to create the new thread\n");
+        intf_ErrMsg("vdec error: not enough memory for vdec_CreateThread() to create the new thread\n");
         return( NULL );
     }
 
@@ -70,21 +74,13 @@ vdec_thread_t * vdec_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
     p_vdec->b_error = 0;
 
     /*
-     * Initialize the input properties
+     * Initialize the parser properties
      */
-    /* Initialize the decoder fifo's data lock and conditional variable and set     * its buffer as empty */
-    vlc_mutex_init( &p_vdec->fifo.data_lock );
-    vlc_cond_init( &p_vdec->fifo.data_wait );
-    p_vdec->fifo.i_start = 0;
-    p_vdec->fifo.i_end = 0;
-    /* Initialize the bit stream structure */
-    p_vdec->bit_stream.p_input = p_input;
-    p_vdec->bit_stream.p_decoder_fifo = &p_vdec->fifo;
-    p_vdec->bit_stream.fifo.buffer = 0;
-    p_vdec->bit_stream.fifo.i_available = 0;
+    p_vdec->p_vpar = p_vpar;
 
     /* Spawn the video decoder thread */
-    if ( vlc_thread_create(&p_vdec->thread_id, "video decoder", (vlc_thread_func)RunThread, (void *)p_vdec) )
+    if ( vlc_thread_create(&p_vdec->thread_id, "video decoder",
+         (vlc_thread_func)RunThread, (void *)p_vdec) )
     {
         intf_ErrMsg("vdec error: can't spawn video decoder thread\n");
         free( p_vdec );
@@ -96,9 +92,9 @@ vdec_thread_t * vdec_CreateThread( /* video_cfg_t *p_cfg, */ input_thread_t *p_i
 }
 
 /*******************************************************************************
- * vdec_DestroyThread: destroy a generic decoder thread
+ * vdec_DestroyThread: destroy a video decoder thread
  *******************************************************************************
- * Destroy a terminated thread. This function will return 0 if the thread could
+ * Destroy and terminate thread. This function will return 0 if the thread could
  * be destroyed, and non 0 else. The last case probably means that the thread
  * was still active, and another try may succeed.
  *******************************************************************************/
@@ -108,10 +104,6 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
 
     /* Ask thread to kill itself */
     p_vdec->b_die = 1;
-    /* Make sure the decoder thread leaves the GetByte() function */
-    vlc_mutex_lock( &(p_vdec->fifo.data_lock) );
-    vlc_cond_signal( &(p_vdec->fifo.data_wait) );
-    vlc_mutex_unlock( &(p_vdec->fifo.data_lock) );
 
     /* Waiting for the decoder thread to exit */
     /* Remove this as soon as the "status" flag is implemented */
@@ -121,22 +113,7 @@ void vdec_DestroyThread( vdec_thread_t *p_vdec /*, int *pi_status */ )
 /* following functions are local */
 
 /*******************************************************************************
- * CheckConfiguration: check vdec_CreateThread() configuration
- *******************************************************************************
- * Set default parameters where required. In DEBUG mode, check if configuration
- * is valid.
- *******************************************************************************/
-#if 0
-static int CheckConfiguration( video_cfg_t *p_cfg )
-{
-    /* ?? */
-
-    return( 0 );
-}
-#endif
-
-/*******************************************************************************
- * InitThread: initialize vdec output thread
+ * InitThread: initialize video decoder thread
  *******************************************************************************
  * This function is called from RunThread and performs the second step of the
  * initialization. It returns 0 on success. Note that the thread's flag are not
@@ -144,41 +121,12 @@ static int CheckConfiguration( video_cfg_t *p_cfg )
  *******************************************************************************/
 static int InitThread( vdec_thread_t *p_vdec )
 {
-
     intf_DbgMsg("vdec debug: initializing video decoder thread %p\n", p_vdec);
-
-    /* Our first job is to initialize the bit stream structure with the
-     * beginning of the input stream */
-    vlc_mutex_lock( &p_vdec->fifo.data_lock );
-    while ( DECODER_FIFO_ISEMPTY(p_vdec->fifo) )
-    {
-        vlc_cond_wait( &p_vdec->fifo.data_wait, &p_vdec->fifo.data_lock );
-    }
-    p_vdec->bit_stream.p_ts = DECODER_FIFO_START( p_vdec->fifo )->p_first_ts;
-    p_vdec->bit_stream.i_byte = p_vdec->bit_stream.p_ts->i_payload_start;
-    vlc_mutex_unlock( &p_vdec->fifo.data_lock );
-
-#if 0
-    /* ?? */
-    /* Create video stream */
-    p_vdec->i_stream =  vout_CreateStream( p_vdec->p_vout );
-    if( p_vdec->i_stream < 0 )                                        /* error */
-    {
-        return( 1 );        
-    }
-    
-    /* Initialize decoding data */    
-    /* ?? */
-#endif
 
     /* Initialize other properties */
 #ifdef STATS
     p_vdec->c_loops = 0;    
     p_vdec->c_idle_loops = 0;
-    p_vdec->c_pictures = 0;
-    p_vdec->c_i_pictures = 0;
-    p_vdec->c_p_pictures = 0;
-    p_vdec->c_b_pictures = 0;
     p_vdec->c_decoded_pictures = 0;
     p_vdec->c_decoded_i_pictures = 0;
     p_vdec->c_decoded_p_pictures = 0;
@@ -191,15 +139,15 @@ static int InitThread( vdec_thread_t *p_vdec )
 }
 
 /*******************************************************************************
- * RunThread: generic decoder thread
+ * RunThread: video decoder thread
  *******************************************************************************
- * Generic decoder thread. This function does only returns when the thread is
+ * Video decoder thread. This function does only return when the thread is
  * terminated. 
  *******************************************************************************/
 static void RunThread( vdec_thread_t *p_vdec )
 {
-
-    intf_DbgMsg("vdec debug: running video decoder thread (%p) (pid == %i)\n", p_vdec, getpid());
+    intf_DbgMsg("vdec debug: running video decoder thread (%p) (pid == %i)\n",
+                p_vdec, getpid());
 
     /* 
      * Initialize thread and free configuration 
@@ -211,16 +159,18 @@ static void RunThread( vdec_thread_t *p_vdec )
     }
     p_vdec->b_run = 1;
 
-/* REMOVE ME !!!!! */
-p_vdec->b_error = 1;
-
     /*
      * Main loop - it is not executed if an error occured during
      * initialization
      */
     while( (!p_vdec->b_die) && (!p_vdec->b_error) )
     {
-        /* ?? */
+        undec_picture_t *       p_undec_p;
+        
+        if( (p_undec_p = GetPicture( p_vdec->p_vpar->p_fifo )) != NULL )
+        {
+            DecodePicture( p_vdec, p_undec_p );
+        }
     } 
 
     /*
@@ -245,21 +195,14 @@ p_vdec->b_error = 1;
  *******************************************************************************/
 static void ErrorThread( vdec_thread_t *p_vdec )
 {
+    undec_picture_t *       p_undec_p;
+
     /* Wait until a `die' order */
     while( !p_vdec->b_die )
     {
-        /* We take the lock, because we are going to read/write the start/end
-         * indexes of the decoder fifo */
-        vlc_mutex_lock( &p_vdec->fifo.data_lock );
+        p_undec_p = GetPicture( p_vdec->p_vpar.vfifo );
+        DestroyPicture( p_vdec->p_vpar.vfifo, p_undec_p );
 
-        /* ?? trash all trashable PES packets */
-        while( !DECODER_FIFO_ISEMPTY(p_vdec->fifo) )
-        {
-            input_NetlistFreePES( p_vdec->bit_stream.p_input, DECODER_FIFO_START(p_vdec->fifo) );
-            DECODER_FIFO_INCSTART( p_vdec->fifo );
-        }
-
-        vlc_mutex_unlock( &p_vdec->fifo.data_lock );
         /* Sleep a while */
         msleep( VDEC_IDLE_SLEEP );                
     }
@@ -273,16 +216,96 @@ static void ErrorThread( vdec_thread_t *p_vdec )
  *******************************************************************************/
 static void EndThread( vdec_thread_t *p_vdec )
 {
-    intf_DbgMsg("vdec debug: destroying video decoder thread %p\n", p_vdec);
-
-#ifdef DEBUG
-    /* Check for remaining PES packets */
-    /* ?? */
-#endif
-
-    /* Destroy thread structures allocated by InitThread */
-//    vout_DestroyStream( p_vdec->p_vout, p_vdec->i_stream );
-    /* ?? */
-
     intf_DbgMsg("vdec debug: EndThread(%p)\n", p_vdec);
+}
+
+/*******************************************************************************
+ * DecodePicture : decode a picture
+ *******************************************************************************/
+static void DecodePicture( vdec_thread_t *p_vdec, undec_picture_t * p_undec_p )
+{
+    static int              pi_chroma_nb_blocks[4] = {0, 1, 2, 4};
+    static int              pi_chroma_nb_coeffs[4] = {0, 64, 128, 256};
+    static f_motion_mb_t    ppf_chroma_motion[4] = { NULL,
+                                                     &vdec_MotionMacroBlock420,
+                                                     &vdec_MotionMacroBlock422,
+                                                     &vdec_MotionMacroBlock444 };
+    static f_motion_t       pppf_motion_forward[4][2] = {
+                                {NULL, NULL} /* I picture */
+                                {&vdec_MotionForward, &vdec_MotionForward} /* P */
+                                {NULL, &vdec_MotionForward} /* B */
+                                {NULL, NULL} /* D */ };
+    static f_motion_t       pppf_motion_backward[4][2] = {
+                                {NULL, NULL} /* I picture */
+                                {NULL, NULL} /* P */
+                                {NULL, &vdec_MotionBackward} /* B */
+                                {NULL, NULL} /* D */ };
+    static f_motion_t       ppf_motion[4] = { NULL,
+                                              &vdec_MotionTopFirst,
+                                              &vdec_MotionBottomFirst,
+                                              &vdec_MotionFrame };
+
+    int             i_mb, i_b, i_totb;
+    coeff_t *       p_y, p_u, p_v;
+    f_motion_mb_t   pf_chroma_motion;
+    f_motion_t      pf_motion_forward, pf_motion_backward;
+    int             i_chroma_nb_blocks, i_chroma_nb_coeffs;
+    
+    p_y = (coeff_t *)p_undec_p->p_picture->p_y;
+    p_u = (coeff_t *)p_undec_p->p_picture->p_u;
+    p_v = (coeff_t *)p_undec_p->p_picture->p_v;
+
+#define I_chroma_format     p_undec_p->p_picture->i_chroma_format
+    pf_chroma_motion = ppf_chroma_motion[I_chroma_format];
+    pf_motion_forward
+    pf_motion = ppf_motion[p_undec_p->i_structure];
+
+    i_chroma_nb_blocks = pi_chroma_nb_blocks[I_chroma_format];
+    i_chroma_nb_coeffs = pi_chroma_nb_coeffs[I_chroma_format];
+#undef I_chroma_format
+
+    for( i_mb = 0; i_mb < p_undec_p->i_mb_height*p_undec_p->i_mb_width; i_mb++ )
+    {
+#define P_mb_info           p_undec_p->p_mb_info[i_ref]
+
+        /*
+         * Inverse DCT (ISO/IEC 13818-2 section Annex A)
+         */
+        
+        /* Luminance : always 4 blocks */
+        for( i_b = 0; i_b < 4; i_b++ )
+        {
+            (*P_mb_info.p_idct_function[i_b])( p_y + i_b*64 );
+        }
+        i_totb = 4;
+        
+        /* Chrominance Cr */
+        for( i_b = 0; i_b < i_chroma_nb_blocks; i_b++ )
+        {
+            (*P_mb_info.p_idct_function[i_totb + i_b])( p_u + i_b*64 );
+        }
+        i_totb += i_chroma_nb_blocks;
+        
+        /* Chrominance Cb */
+        for( i_b = 0; i_b < i_chroma_nb_blocks; i_b++ )
+        {
+            (*P_mb_info.p_idct_function[i_totb + i_b])( p_v + i_b*64 );
+        }
+
+        /*
+         * Motion Compensation (ISO/IEC 13818-2 section 7.6)
+         */
+        (*pf_motion)( p_vdec, p_undec_p, i_mb, pf_chroma_motion );
+
+        p_y += 256;
+        p_u += i_chroma_nb_coeffs;
+        p_v += i_chroma_nb_coeffs;
+#undef P_mb_info
+    }
+
+    /*
+     * Decoding is finished, mark the picture ready for displaying and free
+     * unneeded memory
+     */
+    vpar_ReleasePicture( p_vdec->p_vpar->p_fifo, p_undec_p );
 }
