@@ -2,7 +2,7 @@
  * menu.c : functions to handle menu items.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: menu.c,v 1.10 2003/05/05 22:23:38 gbazin Exp $
+ * $Id: menu.c,v 1.11 2003/08/04 12:34:20 jpsaman Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -31,6 +31,7 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
+#include <vlc/input.h>
 #include <vlc/intf.h>
 #include <vlc/aout.h>
 #include <vlc/vout.h>
