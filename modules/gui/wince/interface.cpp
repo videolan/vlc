@@ -102,8 +102,10 @@ TCHAR * szToolTips[] =
 /*****************************************************************************
  * Constructor.
  *****************************************************************************/
-Interface::Interface()
-  : hwndMain(0), hwndCB(0), hwndTB(0), hwndSlider(0), hwndLabel(0),
+Interface::Interface( intf_thread_t *p_intf, CBaseWindow *p_parent,
+                      HINSTANCE h_inst )
+  : CBaseWindow( p_intf, p_parent, h_inst ),
+    hwndMain(0), hwndCB(0), hwndTB(0), hwndSlider(0), hwndLabel(0),
     hwndVol(0), hwndSB(0), timer(0), video(0), b_volume_hold(0)
 {
 }
@@ -114,13 +116,10 @@ Interface::~Interface()
     if( video ) delete video;
 }
 
-BOOL Interface::InitInstance( HINSTANCE hInstance, intf_thread_t *_p_intf )
+BOOL Interface::InitInstance()
 {
     /* Initializations */
-    p_intf = _p_intf;
     i_old_playing_status = PAUSE_S;
-
-    hInst = hInstance; // Store instance handle in our global variable
 
     int i_style = WS_VISIBLE;
 
@@ -132,7 +131,7 @@ BOOL Interface::InitInstance( HINSTANCE hInstance, intf_thread_t *_p_intf )
     hwndMain =
         CreateWindow( _T("VLC WinCE"), _T("VLC media player"), i_style,
                       0, MENU_HEIGHT, CW_USEDEFAULT, CW_USEDEFAULT,
-                      NULL, NULL, hInstance, (void *)this );
+                      NULL, NULL, GetInstance(), (void *)this );
 
     if( !hwndMain ) return FALSE;
 

@@ -55,6 +55,7 @@ private:
     void OnMessages( void );
     void OnFileInfo( void );
     void OnPreferences( void );
+    void OnPopupMenu( void );
 
     void OnOpen( int, int );
     void OnOpenFileSimple( int );
@@ -137,6 +138,7 @@ LRESULT DialogsProvider::WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp )
     case WM_APP + INTF_DIALOG_MESSAGES: OnMessages(); return TRUE;
     case WM_APP + INTF_DIALOG_FILEINFO: OnFileInfo(); return TRUE;
     case WM_APP + INTF_DIALOG_PREFS: OnPreferences(); return TRUE;
+    case WM_APP + INTF_DIALOG_POPUPMENU: OnPopupMenu(); return TRUE;
     }
 
     return DefWindowProc( hwnd, msg, wp, lp );
@@ -152,6 +154,12 @@ void DialogsProvider::OnIdle( void )
 
     /* Update the fileinfo windows */
     if( p_fileinfo_dialog ) p_fileinfo_dialog->UpdateFileInfo();
+}
+
+void DialogsProvider::OnPopupMenu( void )
+{
+    POINT point = {0};
+    PopupMenu( p_intf, hWnd, point );
 }
 
 void DialogsProvider::OnPlaylist( void )

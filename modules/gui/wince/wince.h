@@ -79,8 +79,6 @@ struct intf_sys_t
     void (*pf_show_dialog) ( intf_thread_t *p_intf, int i_dialog, int i_arg,
                              intf_dialog_args_t *p_arg );
 
-    CBaseWindow *p_main_window;
-
     /* Dynamic Menu management */
     vector<MenuItemExt*> *p_audio_menu;
     vector<MenuItemExt*> *p_video_menu;
@@ -139,10 +137,10 @@ class Interface : public CBaseWindow
 {
 public:
     /* Constructor */
-    Interface();
+    Interface( intf_thread_t *, CBaseWindow *, HINSTANCE );
     ~Interface();
 
-    BOOL InitInstance( HINSTANCE, intf_thread_t * );
+    BOOL InitInstance();
 
     HWND CreateMenuBar( HWND, HINSTANCE );
     void TogglePlayButton( int i_playing_status );

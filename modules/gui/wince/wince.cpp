@@ -207,9 +207,8 @@ static void Run( intf_thread_t *p_intf )
 static void MainLoop( intf_thread_t *p_intf )
 {
     MSG msg;
-    Interface intf;
+    Interface *intf = 0;
 
-    p_intf->p_sys->p_main_window = &intf;
     if( !hInstance ) hInstance = GetModuleHandle(NULL);
 
     // Register window class
@@ -234,17 +233,10 @@ static void MainLoop( intf_thread_t *p_intf )
     if( !p_intf->pf_show_dialog )
     {
         /* The module is used in interface mode */
-        p_intf->p_sys->p_window = &intf;
+        p_intf->p_sys->p_window = intf = new Interface( p_intf, 0, hInstance );
 
         /* Create/Show the interface */
-        if( !intf.InitInstance( hInstance, p_intf ) )
-        {
-#ifndef UNDER_CE
-            /* Uninitialize OLE/COM */
-            CoUninitialize();
-#endif
-            return;
-        }
+        if( !intf->InitInstance() ) goto end;
     }
 
     /* Creates the dialogs provider */
@@ -276,6 +268,9 @@ static void MainLoop( intf_thread_t *p_intf )
         TranslateMessage( &msg );
         DispatchMessage( &msg );
     }
+
+ end:
+    if( intf ) delete intf;
 
 #ifndef UNDER_CE
     /* Uninitialize OLE/COM */

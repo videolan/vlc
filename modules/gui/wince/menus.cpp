@@ -724,6 +724,7 @@ void OnMenuEvent( intf_thread_t *p_intf, int id )
     MenuItemExt *p_menuitemext = NULL;
     vector<MenuItemExt*>::iterator iter;
 
+    if( p_intf->p_sys->p_settings_menu )
     for( iter = p_intf->p_sys->p_settings_menu->begin();
          iter != p_intf->p_sys->p_settings_menu->end(); iter++ )
         if( (*iter)->id == id )
@@ -731,6 +732,8 @@ void OnMenuEvent( intf_thread_t *p_intf, int id )
             p_menuitemext = *iter;
             break;
         }
+
+    if( p_intf->p_sys->p_audio_menu && !p_menuitemext )
     for( iter = p_intf->p_sys->p_audio_menu->begin();
          iter != p_intf->p_sys->p_audio_menu->end(); iter++ ) 
         if( (*iter)->id == id )
@@ -738,6 +741,8 @@ void OnMenuEvent( intf_thread_t *p_intf, int id )
             p_menuitemext = *iter;
             break;
         }
+
+    if( p_intf->p_sys->p_video_menu && !p_menuitemext )
     for( iter = p_intf->p_sys->p_video_menu->begin();
          iter != p_intf->p_sys->p_video_menu->end(); iter++ )
         if( (*iter)->id == id )
@@ -745,6 +750,8 @@ void OnMenuEvent( intf_thread_t *p_intf, int id )
             p_menuitemext = *iter;
             break;
         }
+
+    if( p_intf->p_sys->p_navig_menu && !p_menuitemext )
     for( iter = p_intf->p_sys->p_navig_menu->begin();
          iter != p_intf->p_sys->p_navig_menu->end(); iter++ )
         if( (*iter)->id == id )
