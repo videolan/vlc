@@ -5,7 +5,7 @@
  * thread, and destroy a previously oppened video output thread.
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: video_output.c,v 1.234 2003/09/13 17:42:16 fenrir Exp $
+ * $Id: video_output.c,v 1.235 2003/09/14 13:54:43 sigmunau Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -816,7 +816,7 @@ static void RunThread( vout_thread_t *p_vout)
             }
 
             if( display_date >
-                current_date + p_vout->i_pts_delay +  VOUT_BOGUS_DELAY )
+                current_date + p_vout->i_pts_delay + VOUT_BOGUS_DELAY )
             {
                 /* Picture is waaay too early: it will be destroyed */
                 vlc_mutex_lock( &p_vout->picture_lock );
@@ -896,16 +896,24 @@ static void RunThread( vout_thread_t *p_vout)
          */
         if( display_date != 0 && p_directbuffer != NULL )
         {
-            /* Store render time using a sliding mean */
-            p_vout->render_time += mdate() - current_date;
-            p_vout->render_time >>= 1;
+            mtime_t current_render_time = mdate() - current_date;
+            /* if render time is very large we don't include it in the mean */
+            if( current_render_time < p_vout->render_time +
+                VOUT_DISPLAY_DELAY )
+            {
+                /* Store render time using a sliding mean weighting to
+                 * current value in a 3 to 1 ratio*/
+                p_vout->render_time *= 3;
+                p_vout->render_time += current_render_time;
+                p_vout->render_time >>= 2;
+            }
         }
 
         /* Give back change lock */
         vlc_mutex_unlock( &p_vout->change_lock );
 
         /* Sleep a while or until a given date */
-        if( display_date != 0 )
+        if( display_date != 0 && p_vout->psz_filter_chain == NULL )
         {
             mwait( display_date - VOUT_MWAIT_TOLERANCE );
         }
