@@ -456,7 +456,7 @@ package-macosx:
 
 	# Copy relevant files 
 	cp -R vlc.app tmp/
-	cp AUTHORS COPYING ChangeLog README FAQ TODO tmp/
+	cp AUTHORS COPYING ChangeLog README README\ -\ Mac\ OS\ X.rtf FAQ TODO tmp/
 
 	# Create disk image 
 	./macosx-dmg 0 "vlc-${VERSION}" tmp/* 

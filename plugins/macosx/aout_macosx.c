@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.17 2002/03/27 22:15:40 massiot Exp $
+ * $Id: aout_macosx.c,v 1.18 2002/04/25 23:07:23 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -38,6 +38,7 @@
 
 #include <Carbon/Carbon.h>
 #include <CoreAudio/AudioHardware.h>
+#include <CoreAudio/HostTime.h>
 #include <AudioToolbox/AudioConverter.h>
 
 /*****************************************************************************
@@ -60,6 +61,7 @@ typedef struct aout_sys_s
     boolean_t           b_buffer_data;  // available buffer data?
     vlc_mutex_t         mutex_lock;     // pthread locks for sync of
     vlc_cond_t          cond_sync;      // aout_Play and callback
+    mtime_t             clock_diff;     // diff between system clock & audio
 } aout_sys_t;
 
 /*****************************************************************************
@@ -145,6 +147,7 @@ static int aout_Open( aout_thread_t *p_aout )
         intf_ErrMsg( "aout error: failed to get device buffer size: %d", err );
         return( -1 );
     }
+    p_aout->i_latency = p_aout->p_sys->ui_buffer_size;
 
     /* get a description of the data format used by the device */
     ui_param_size = sizeof( p_aout->p_sys->s_dst_stream_format ); 
@@ -322,7 +325,15 @@ static OSStatus CAIOCallback( AudioDeviceID inDevice,
                               const AudioTimeStamp *inOutputTime, 
                               void *threadGlobals )
 {
-    aout_sys_t *p_sys = (aout_sys_t *)threadGlobals;
+    aout_thread_t *p_aout = (aout_thread_t *)threadGlobals;
+    aout_sys_t *p_sys = p_aout->p_sys;
+#if 0
+    AudioTimeStamp host_time;
+
+    host_time.mFlags = kAudioTimeStampHostTimeValid;
+    AudioDeviceTranslateTime( inDevice, inOutputTime, &host_time );
+    intf_Msg( "%lld", AudioConvertHostTimeToNanos(host_time.mHostTime) / 1000 + p_aout->p_sys->clock_diff - p_aout->date );
+#endif
 
     /* see aout_Play below */
     vlc_mutex_lock( &p_sys->mutex_lock );
@@ -445,7 +456,7 @@ static int CABeginFormat( aout_thread_t *p_aout )
     /* add callback */
     err = AudioDeviceAddIOProc( p_aout->p_sys->device, 
                                 (AudioDeviceIOProc)CAIOCallback, 
-                                (void *)p_aout->p_sys );
+                                (void *)p_aout );
 
     if( err != noErr )
     {
@@ -466,6 +477,10 @@ static int CABeginFormat( aout_thread_t *p_aout )
         DisposePtr( p_aout->p_sys->p_buffer );
         return( 1 );
     }
+
+    /* Let's pray for the following operation to be atomic... */
+    p_aout->p_sys->clock_diff = mdate()
+         - AudioConvertHostTimeToNanos(AudioGetCurrentHostTime()) / 1000;
 
     p_aout->p_sys->b_format = 1;
 
