@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.11 2003/02/01 18:54:10 sam Exp $
+ * $Id: events.c,v 1.12 2003/03/04 22:48:55 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -130,7 +130,47 @@ void DirectXEventThread( event_thread_t *p_event )
             ShowCursor( FALSE );
             break;
 
+        case WM_LBUTTONDOWN:
+            var_Get( p_event->p_vout, "mouse-button-down", &val );
+            val.i_int |= 1;
+            var_Set( p_event->p_vout, "mouse-button-down", val );
+            break;
+
+        case WM_LBUTTONUP:
+            var_Get( p_event->p_vout, "mouse-button-down", &val );
+            val.i_int &= ~1;
+            var_Set( p_event->p_vout, "mouse-button-down", val );
+
+            val.b_bool = VLC_TRUE;
+            var_Set( p_event->p_vout, "mouse-clicked", val );
+            break;
+
+        case WM_LBUTTONDBLCLK:
+            p_event->p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
+            break;
+
+        case WM_MBUTTONDOWN:
+            var_Get( p_event->p_vout, "mouse-button-down", &val );
+            val.i_int |= 2;
+            var_Set( p_event->p_vout, "mouse-button-down", val );
+            break;
+
+        case WM_MBUTTONUP:
+            var_Get( p_event->p_vout, "mouse-button-down", &val );
+            val.i_int &= ~2;
+            var_Set( p_event->p_vout, "mouse-button-down", val );
+            break;
+
+        case WM_RBUTTONDOWN:
+            var_Get( p_event->p_vout, "mouse-button-down", &val );
+            val.i_int |= 4;
+            var_Set( p_event->p_vout, "mouse-button-down", val );
+            break;
+
         case WM_RBUTTONUP:
+            var_Get( p_event->p_vout, "mouse-button-down", &val );
+            val.i_int &= ~4;
+            var_Set( p_event->p_vout, "mouse-button-down", val );
             {
                 intf_thread_t *p_intf;
                 p_intf = vlc_object_find( p_event, VLC_OBJECT_INTF,
@@ -141,18 +181,6 @@ void DirectXEventThread( event_thread_t *p_event )
                     vlc_object_release( p_intf );
                 }
             }
-            break;
-
-        case WM_LBUTTONUP:
-            val.b_bool = VLC_TRUE;
-            var_Set( p_event->p_vout, "mouse-clicked", val );
-            break;
-
-        case WM_LBUTTONDOWN:
-            break;
-
-        case WM_LBUTTONDBLCLK:
-            p_event->p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
             break;
 
         case WM_KEYDOWN:

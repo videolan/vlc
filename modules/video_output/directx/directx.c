@@ -2,7 +2,7 @@
  * vout.c: Windows DirectX video output display method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.13 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: directx.c,v 1.14 2003/03/04 22:48:55 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -61,8 +61,6 @@ DEFINE_GUID( IID_IDirectDrawSurface2, 0x57805885,0x6eec,0x11cf,0x94,0x41,0xa8,0x
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static void ToggleOnTop ();
-
 static int  OpenVideo  ( vlc_object_t * );
 static void CloseVideo ( vlc_object_t * );
 
