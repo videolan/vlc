@@ -2,7 +2,7 @@
  * avi.c : AVI file Stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: avi.c,v 1.73 2003/11/21 15:51:32 fenrir Exp $
+ * $Id: avi.c,v 1.74 2003/11/22 15:10:38 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -1235,6 +1235,10 @@ static int AVI_StreamChunkFind( input_thread_t *p_input,
 
     for( ;; )
     {
+        if( p_input->b_die )
+        {
+            return VLC_EGENERIC;
+        }
 
         if( AVI_PacketGetHeader( p_input, &avi_pk ) )
         {
@@ -1952,6 +1956,11 @@ static void AVI_IndexCreate( input_thread_t *p_input )
     for( ;; )
     {
         avi_packet_t pk;
+
+        if( p_input->b_die )
+        {
+            return;
+        }
 
         if( AVI_PacketGetHeader( p_input, &pk ) )
         {
