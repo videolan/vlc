@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.7 2002/06/07 23:53:44 sam Exp $
+ * $Id: vlc_common.h,v 1.8 2002/07/05 11:18:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -434,6 +434,11 @@ struct vlc_object_s
                        & (~(unsigned long)(align-1)) ) \
         : NULL )
 
+#endif
+
+/* strndup (defined in src/misc/extras.c) */
+#ifndef HAVE_STRNDUP
+char * strndup( const char *s, size_t n );
 #endif
 
 

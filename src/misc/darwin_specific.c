@@ -2,7 +2,7 @@
  * darwin_specific.c: Darwin specific features 
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.c,v 1.13 2002/07/02 22:07:02 jlj Exp $
+ * $Id: darwin_specific.c,v 1.14 2002/07/05 11:18:56 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -89,23 +89,3 @@ char * system_GetProgramPath( void )
     return( psz_program_path );
 }
 
-/*****************************************************************************
- * strndup: returns a malloc'd copy of at most n bytes of string 
- * Does anyone know whether or not it will be present in Jaguar?
- *****************************************************************************/
-char *strndup( const char *string, size_t n )
-{
-    char *psz;
-    size_t len;
-
-    len = __MIN( strlen( string ), n ); 
-    psz = (char*)malloc( len + 1 );
-
-    if( psz != NULL )
-    {
-        memcpy( (void*)psz, (const void*)string, len );
-        psz[ len ] = 0;
-    }
-
-    return( psz );
-}

@@ -2,7 +2,7 @@
  * threads.c : threads implementation for the VideoLAN client
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: threads.c,v 1.7 2002/06/08 14:08:46 sam Exp $
+ * $Id: threads.c,v 1.8 2002/07/05 11:18:56 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -308,10 +308,10 @@ int __vlc_cond_init( vlc_object_t *p_this, vlc_cond_t *p_condvar )
         p_condvar->signal = NULL;
 
         /* Create an auto-reset event and a manual-reset event. */
-        p_condvar->p_events[SIGNAL] = CreateEvent( NULL, FALSE, FALSE, NULL );
-        p_condvar->p_events[BROADCAST] = CreateEvent( NULL, TRUE, FALSE, NULL );
+        p_condvar->p_events[0] = CreateEvent( NULL, FALSE, FALSE, NULL );
+        p_condvar->p_events[1] = CreateEvent( NULL, TRUE, FALSE, NULL );
 
-        return !p_condvar->p_events[SIGNAL] || !p_condvar->p_events[BROADCAST];
+        return !p_condvar->p_events[0] || !p_condvar->p_events[1];
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )
@@ -363,8 +363,8 @@ int __vlc_cond_destroy( char * psz_file, int i_line, vlc_cond_t *p_condvar )
     }
     else
     {
-        return !CloseHandle( p_condvar->p_events[SIGNAL] )
-                 || !CloseHandle( p_condvar->p_events[BROADCAST] );
+        return !CloseHandle( p_condvar->p_events[0] )
+                 || !CloseHandle( p_condvar->p_events[1] );
     }
 
 #elif defined( PTHREAD_COND_T_IN_PTHREAD_H )

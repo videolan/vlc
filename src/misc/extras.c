@@ -1,10 +1,10 @@
 /*****************************************************************************
- * darwin_specific.h: Darwin specific features 
+ * extras.c: Extra libc functions for some systems.
  *****************************************************************************
- * Copyright (C) 2001 VideoLAN
- * $Id: darwin_specific.h,v 1.5 2002/07/05 11:18:56 sam Exp $
+ * Copyright (C) 2002 VideoLAN
+ * $Id: extras.c,v 1.1 2002/07/05 11:18:56 sam Exp $
  *
- * Authors: Samuel Hocevar <sam@zoy.org>
+ * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,30 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
+#include <string.h>                                              /* strdup() */
+#include <stdlib.h>
 
+#include <vlc/vlc.h>
+
+#ifndef HAVE_STRNDUP
 /*****************************************************************************
- * Prototypes
+ * strndup: returns a malloc'd copy of at most n bytes of string 
+ * Does anyone know whether or not it will be present in Jaguar?
  *****************************************************************************/
-char  * system_GetProgramPath( void );
+char *strndup( const char *string, size_t n )
+{
+    char *psz;
+    size_t len;
+
+    len = __MIN( strlen( string ), n ); 
+    psz = (char*)malloc( len + 1 );
+
+    if( psz != NULL )
+    {
+        memcpy( (void*)psz, (const void*)string, len );
+        psz[ len ] = 0;
+    }
+
+    return( psz );
+}
+#endif /* HAVE_STRNDUP */

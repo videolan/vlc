@@ -3,7 +3,7 @@
  * This header provides a portable threads implementation.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vlc_threads.h,v 1.3 2002/06/08 14:08:46 sam Exp $
+ * $Id: vlc_threads.h,v 1.4 2002/07/05 11:18:56 sam Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -123,7 +123,6 @@ typedef struct
     vlc_bool_t          b_broadcast;
     SIGNALOBJECTANDWAIT SignalObjectAndWait;
     /* Win95/98/ME implementation */
-    enum                { SIGNAL = 0, BROADCAST = 1 };
     HANDLE              p_events[2];
 } vlc_cond_t;
 
@@ -364,7 +363,7 @@ static inline int vlc_cond_signal( vlc_cond_t *p_condvar )
         }
         else
         {
-            SetEvent( p_condvar->p_events[SIGNAL] );
+            SetEvent( p_condvar->p_events[0/*signal*/] );
         }
     }
     return 0;
@@ -451,7 +450,7 @@ static inline int vlc_cond_broadcast( vlc_cond_t *p_condvar )
         }
         else
         {
-            SetEvent( p_condvar->p_events[BROADCAST] );
+            SetEvent( p_condvar->p_events[1/*broadcast*/] );
         }
     }
     return 0;
@@ -574,10 +573,10 @@ static inline int __vlc_cond_wait( char * psz_file, int i_line,
 
         /* If we are the last waiter and it was a broadcast signal, reset
          * the broadcast event. */
-        if( i_ret == WAIT_OBJECT_0 + BROADCAST
+        if( i_ret == WAIT_OBJECT_0 + 1/*broadcast*/
              && p_condvar->i_waiting_threads == 0 )
         {
-            ResetEvent( p_condvar->p_events[BROADCAST] );
+            ResetEvent( p_condvar->p_events[1/*broadcast*/] );
         }
 
         return( i_ret == WAIT_FAILED );

@@ -142,6 +142,9 @@
 /* Define if you have the strerror function.  */
 #undef HAVE_STRERROR
 
+/* Define if you have the strndup function.  */
+#undef HAVE_STRNDUP
+
 /* Define if you have the strtod function.  */
 #undef HAVE_STRTOD
 
