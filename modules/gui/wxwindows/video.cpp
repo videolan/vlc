@@ -88,9 +88,9 @@ END_EVENT_TABLE()
 /*****************************************************************************
  * Public methods.
  *****************************************************************************/
-wxWindow *VideoWindow( intf_thread_t *p_intf, wxWindow *p_parent )
+wxWindow *CreateVideoWindow( intf_thread_t *p_intf, wxWindow *p_parent )
 {
-    return new VideoWindow::VideoWindow( p_intf, p_parent );
+    return new VideoWindow( p_intf, p_parent );
 }
 
 /*****************************************************************************

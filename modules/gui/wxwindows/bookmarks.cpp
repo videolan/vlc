@@ -296,7 +296,7 @@ BookmarksDialog::~BookmarksDialog()
  *****************************************************************************/
 wxWindow *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent )
 {
-    return new BookmarksDialog::BookmarksDialog( p_intf, p_parent );
+    return new class BookmarksDialog( p_intf, p_parent );
 }
 
 void BookmarksDialog::Update()
@@ -545,8 +545,7 @@ void BookmarksDialog::OnUpdate( wxCommandEvent &event )
 static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
                             vlc_value_t oval, vlc_value_t nval, void *param )
 {
-    BookmarksDialog::BookmarksDialog *p_dialog =
-        (BookmarksDialog::BookmarksDialog *)param;
+    class BookmarksDialog *p_dialog = (class BookmarksDialog *)param;
 
     wxCommandEvent bookmarks_event( wxEVT_BOOKMARKS, 0 );
     p_dialog->AddPendingEvent( bookmarks_event );

@@ -251,7 +251,7 @@ Interface::Interface( intf_thread_t *_p_intf ):
     /* Video window */
     if( config_GetInt( p_intf, "wxwin-embed" ) )
     {
-        VideoWindow( p_intf, this );
+        CreateVideoWindow( p_intf, this );
         frame_sizer->Add( p_intf->p_sys->p_video_sizer, 1, wxEXPAND , 0 );
     }
 
@@ -606,7 +606,7 @@ void Interface::SetupHotkeys()
     p_intf->p_sys->i_first_hotkey_event = wxID_HIGHEST + 7000;
     p_intf->p_sys->i_hotkeys = i_hotkeys;
 
-    wxAcceleratorEntry p_entries[i_hotkeys];
+    wxAcceleratorEntry *p_entries = new wxAcceleratorEntry[i_hotkeys];
 
     /* Setup the hotkeys as accelerators */
     for( int i = 0; i < i_hotkeys; i++ )
@@ -633,6 +633,8 @@ void Interface::SetupHotkeys()
         SetAcceleratorTable( accel );
         msg_Dbg( p_intf, "accelerator table loaded" );
     }
+
+    delete [] p_entries;
 }
 
 /*****************************************************************************

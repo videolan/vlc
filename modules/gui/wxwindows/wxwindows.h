@@ -148,7 +148,7 @@ struct intf_sys_t
  * Prototypes
  *****************************************************************************/
 wxArrayString SeparateEntries( wxString );
-wxWindow *VideoWindow( intf_thread_t *p_intf, wxWindow *p_parent );
+wxWindow *CreateVideoWindow( intf_thread_t *p_intf, wxWindow *p_parent );
 wxWindow *BookmarksDialog( intf_thread_t *p_intf, wxWindow *p_parent );
 wxWindow *CreateDialogsProvider( intf_thread_t *p_intf, wxWindow *p_parent );
 
