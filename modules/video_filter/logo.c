@@ -643,7 +643,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     p_spu->i_y = p_sys->posy;
     p_spu->i_flags = p_sys->pos;
     p_spu->p_region = p_region;
-    //p_subpic->i_alpha = p_sys->i_trans;
+    p_spu->i_alpha = p_sys->i_trans;
 
     return p_spu;
 }
