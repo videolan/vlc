@@ -480,4 +480,8 @@ the Boston strangler is to the woman home alone.
 
   -- #videolan
 %
+00:12 < thedj> i don't trust ffmpeg's make process ;)
+00:13 < gibalou> their make mess you mean ?
 
+  -- #videolan
+%

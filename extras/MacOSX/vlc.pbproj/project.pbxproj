@@ -996,15 +996,15 @@
 			fileEncoding = 30;
 			isa = PBXFileReference;
 			name = output.h;
-			path = /Volumes/Users/pjotr/Development/vlc/modules/gui/macosx/output.h;
-			refType = 0;
+			path = ../../modules/gui/macosx/output.h;
+			refType = 2;
 		};
 		8E55FB800459B0FD00FB3317 = {
 			fileEncoding = 30;
 			isa = PBXFileReference;
 			name = output.m;
-			path = /Volumes/Users/pjotr/Development/vlc/modules/gui/macosx/output.m;
-			refType = 0;
+			path = ../../modules/gui/macosx/output.m;
+			refType = 2;
 		};
 		8E6BC6F6041643860059A3A7 = {
 			fileEncoding = 4;
@@ -1088,8 +1088,8 @@
 			fileEncoding = 30;
 			isa = PBXFileReference;
 			name = coreaudio.c;
-			path = /Volumes/Users/pjotr/Development/vlc/modules/audio_output/coreaudio.c;
-			refType = 0;
+			path = ../../modules/audio_output/coreaudio.c;
+			refType = 2;
 		};
 		8ED6C27B03E2EB1C0059A3A7 = {
 			fileEncoding = 30;

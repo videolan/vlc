@@ -2,7 +2,7 @@
  * output.m: MacOS X Output Dialog
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: output.m,v 1.2 2003/05/10 10:32:29 hartman Exp $
+ * $Id: output.m,v 1.3 2003/05/21 21:30:30 hartman Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net> 
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -179,7 +179,7 @@
 - (IBAction)outputCloseSheet:(id)sender
 {
     intf_thread_t * p_intf = [NSApp getIntf];
-    config_PutPsz( p_intf, "sout", [o_mrl lossyCString] );
+    config_PutPsz( p_intf, "sout", [o_mrl UTF8String] );
     
     [o_output_sheet orderOut:sender];
     [NSApp endSheet: o_output_sheet];
@@ -261,11 +261,11 @@
     NSString *o_mode, *o_mux, *o_mux_string;
     NSMutableString *o_mrl_string = [NSMutableString stringWithString:@"#"];
 
+    [o_mrl_string appendString: o_transcode];
     if( [o_display state] == NSOnState )
     {
-        [o_mrl_string appendString: @"display:"];
+        [o_mrl_string appendString: @"duplicate{dst=display,dst="];
     }
-    [o_mrl_string appendString: o_transcode];
 
     o_mode = [[o_method selectedCell] title];
     o_mux = [o_mux_selector titleOfSelectedItem];
@@ -279,7 +279,7 @@
     if( [o_mode isEqualToString: _NS("File")] )
     {
         [o_mrl_string appendFormat:
-                        @"dst=std{access=file,mux=%@,url=\"%@\"},",
+                        @"std{access=file,mux=%@,url=\"%@\"}",
                         o_mux_string, [o_file_field stringValue]];
     }
     else if( [o_mode isEqualToString: _NS("Stream")] )
@@ -293,12 +293,16 @@
             o_mode = @"rtp";
             
         [o_mrl_string appendFormat:
-                        @"dst=std{access=%@,mux=%@,url=\"%@:%@\"},",
+                        @"std{access=%@,mux=%@,url=\"%@:%@\"}",
                         o_mode, o_mux_string, [o_stream_address stringValue],
                         [o_stream_port stringValue]];
     }
-    [o_mrl_string appendString: @"}:"];
+    if( [o_display state] == NSOnState )
+    {
+        [o_mrl_string appendString: @"}"];
+    }
     [self setMRL:o_mrl_string];
+    NSLog( o_mrl_string );
 }
 
 - (void)TTLChanged:(NSNotification *)o_notification
@@ -395,10 +399,11 @@
                 [o_transcode_audio_selector titleOfSelectedItem],
                 [o_transcode_audio_bitrate stringValue]];
         }
+        [o_transcode_string appendString:@"}:"];
     }
     else
     {
-        o_transcode_string = [NSString stringWithString:@"duplicate{"];
+        o_transcode_string = [NSString stringWithString:@""];
     }
     [self setTranscode: o_transcode_string];
     [self outputInfoChanged:nil];
