@@ -2,7 +2,7 @@
  * rc.c : remote control stdin/stdout plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: rc.c,v 1.11 2002/11/20 15:34:39 gbazin Exp $
+ * $Id: rc.c,v 1.12 2002/11/23 20:37:10 sam Exp $
  *
  * Authors: Peter Surda <shurdeek@panorama.sth.ac.at>
  *
@@ -148,6 +148,8 @@ static void Run( intf_thread_t *p_intf )
     var_Set( p_intf, "stop", (vlc_value_t)(void*)Playlist );
     var_Create( p_intf, "pause", VLC_VAR_COMMAND );
     var_Set( p_intf, "pause", (vlc_value_t)(void*)Playlist );
+    var_Create( p_intf, "seek", VLC_VAR_COMMAND );
+    var_Set( p_intf, "seek", (vlc_value_t)(void*)Playlist );
     var_Create( p_intf, "prev", VLC_VAR_COMMAND );
     var_Set( p_intf, "prev", (vlc_value_t)(void*)Playlist );
     var_Create( p_intf, "next", VLC_VAR_COMMAND );
@@ -370,25 +372,6 @@ static void Run( intf_thread_t *p_intf )
                 ;
                 break;
 
-            case 'r':
-            case 'R':
-                if( p_input )
-                {
-                    for( i_dummy = 1;
-                         i_dummy < MAX_LINE_LENGTH && psz_cmd[ i_dummy ] >= '0'
-                                                   && psz_cmd[ i_dummy ] <= '9';
-                         i_dummy++ )
-                    {
-                        ;
-                    }
-
-                    psz_cmd[ i_dummy ] = 0;
-                    input_Seek( p_input, (off_t)atoi( psz_cmd + 1 ),
-                                INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
-                    /* rcreseek(f_cpos); */
-                }
-                break;
-
             case '?':
             case 'h':
             case 'H':
@@ -406,7 +389,7 @@ static void Run( intf_thread_t *p_intf )
                 printf("| chapter_n  . . . .  next chapter in current item\n");
                 printf("| chapter_p  . .  previous chapter in current item\n");
                 printf("| \n");
-                printf("| r X  . . . seek in seconds, for instance `r 3.5'\n");
+                printf("| seek X . seek in seconds, for instance `seek 12'\n");
                 printf("| pause  . . . . . . . . . . . . . .  toggle pause\n");
                 printf("| f  . . . . . . . . . . . . . . toggle fullscreen\n");
                 printf("| info . . .  information about the current stream\n");
@@ -463,6 +446,11 @@ static int Playlist( vlc_object_t *p_this, char *psz_cmd, char *psz_arg )
         input_SetStatus( p_input, INPUT_STATUS_PAUSE );
         vlc_object_release( p_input );
         return VLC_SUCCESS;
+    }
+    else if( !strcmp( psz_cmd, "seek" ) )
+    {
+        input_Seek( p_input, atoi( psz_arg ),
+                    INPUT_SEEK_SECONDS | INPUT_SEEK_SET );
     }
     else if( !strcmp( psz_cmd, "chapter" ) ||
              !strcmp( psz_cmd, "chapter_n" ) ||
