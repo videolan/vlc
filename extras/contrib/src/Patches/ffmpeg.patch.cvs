@@ -10,17 +10,6 @@ diff -ru ffmpeg.old/libavcodec/eval.c ffmpeg/libavcodec/eval.c
  #ifndef NAN
    #define NAN 0
  #endif
-diff -ru ffmpeg.old/libavformat/rtsp.c ffmpeg/libavformat/rtsp.c
---- ffmpeg.old/libavformat/rtsp.c	Wed Oct 29 15:25:27 2003
-+++ ffmpeg/libavformat/rtsp.c	Sun Nov  2 02:04:09 2003
-@@ -20,6 +20,7 @@
- 
- #include <unistd.h> /* for select() prototype */
- #include <sys/time.h>
-+#include <unistd.h>
- #include <netinet/in.h>
- #include <sys/socket.h>
- #ifndef __BEOS__
 diff -ru ffmpeg.old/libavformat/tcp.c ffmpeg/libavformat/tcp.c
 --- ffmpeg.old/libavformat/tcp.c	Mon Sep 29 03:41:30 2003
 +++ ffmpeg/libavformat/tcp.c	Sun Nov  2 02:04:09 2003
