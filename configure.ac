@@ -1,5 +1,5 @@
 dnl Autoconf settings for vlc
-dnl $Id: configure.ac,v 1.17 2003/06/29 20:58:16 gbazin Exp $
+dnl $Id: configure.ac,v 1.18 2003/07/01 15:06:36 sam Exp $
 
 AC_INIT(vlc,0.6.0)
 
@@ -1263,9 +1263,18 @@ AC_ARG_ENABLE(v4l,
   [  --enable-v4l            Video4Linux input support (default disabled)])
 if test "${enable_v4l}" = "yes"
 then
+  AC_ARG_WITH(v4l,
+    [    --with-v4l=PATH       path to a v4l-enabled kernel tree],[],[])
+  if test "${with_v4l}" != "no" -a "${with_v4l}" != ""
+  then
+    AX_ADD_CPPFLAGS([v4l],[-I${with_v4l}/include])
+  fi
+
+  CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_v4l}"
   AC_CHECK_HEADERS(linux/videodev.h, [
     AX_ADD_PLUGINS([v4l])
-   ],[])
+  ],[])
+  CPPFLAGS="${CPPFLAGS_save}"
 fi
 
 dnl
