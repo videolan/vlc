@@ -454,7 +454,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( p_module->psz_longname ),
+        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ),
                            i_access_method == CAPTURE_ACCESS );
     }
 
@@ -464,7 +464,17 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( p_module->psz_longname ),
+        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ),
+                           i_access_method == CAPTURE_ACCESS );
+    }
+
+    p_module = config_FindModule( VLC_OBJECT(p_intf), "dvb" );
+    if( p_module )
+    {
+        AutoBuiltPanel *autopanel =
+            new AutoBuiltPanel( notebook, this, p_intf, p_module );
+        input_tab_array.Add( autopanel );
+        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ),
                            i_access_method == CAPTURE_ACCESS );
     }
 
@@ -474,7 +484,7 @@ OpenDialog::OpenDialog( intf_thread_t *_p_intf, wxWindow *_p_parent,
         AutoBuiltPanel *autopanel =
             new AutoBuiltPanel( notebook, this, p_intf, p_module );
         input_tab_array.Add( autopanel );
-        notebook->AddPage( autopanel, wxU( p_module->psz_longname ),
+        notebook->AddPage( autopanel, wxU( p_module->psz_shortname ),
                            i_access_method == CAPTURE_ACCESS );
     }
 
