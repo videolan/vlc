@@ -2,7 +2,7 @@
  * macosx.m: MacOS X module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: macosx.m,v 1.19 2004/01/26 18:30:37 titer Exp $
+ * $Id: macosx.m,v 1.20 2004/02/09 13:28:31 titer Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>
@@ -55,8 +55,16 @@ void E_(CloseVideo)   ( vlc_object_t * );
     "0 is fully transparent.")
 
 #define OPENGL_TEXT N_("Use OpenGL")
-#define OPENGL_LONGTEXT N_( \
-    "Use OpenGL instead of QuickTime to render the video on the screen." )
+#define OPENGL_LONGTEXT N_("Use OpenGL instead of QuickTime to " \
+        "render the video on the screen.")
+
+#define OPENGL_EFFECT_TEXT N_("OpenGL effect")
+#define OPENGL_EFFECT_LONGTEXT N_("Use 'None' to display the video " \
+        "without any fantasy, 'Cube' to let the video play on " \
+        "transparent faces of a rotating cube")
+
+static char * effect_list[] = { "none", "cube" };
+static char * effect_list_text[] = { N_("None"), N_("Cube") };
     
 vlc_module_begin();
     set_description( _("MacOS X interface, sound and video") );
@@ -71,5 +79,9 @@ vlc_module_begin();
                 OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, VLC_TRUE );
         add_bool( "macosx-opengl", 0, NULL, OPENGL_TEXT,
                   OPENGL_LONGTEXT, VLC_TRUE );
+        add_string( "macosx-opengl-effect", "none", NULL,
+                    OPENGL_EFFECT_TEXT, OPENGL_EFFECT_LONGTEXT,
+                    VLC_TRUE );
+        change_string_list( effect_list, effect_list_text, 0 );
 vlc_module_end();
 
