@@ -4,6 +4,326 @@
 
 HEAD
 
+  * ./Makefile.opts.in: removed configuration stuff which does not need to
+    rebuild anything to Makefile.config, so that editing it will not cause
+    a complete rebuild.
+  * ./plugins/beos/VideoWindow.h, ./plugins/beos/vout_beos.cpp: improved
+    Overlay and Bitmap output modes.
+  * ./plugins/macosx/aout_macosx.m, ./plugins/macosx/aout_macosx.m: removed
+    unused headers.
+  * ./plugins/macosx/intf_controller.[mh]: you can now drag & drop files onto
+    the vlc dock icon. CFBundleDocumentTypes in Info.plist doesn't seem to have
+    any effect, so you'll have to hold down command-option when dropping until
+    this is resolved.
+  * ./src/video_output/video_output.c: removed previous patch to the video
+    output since it causes problems for some people.
+  * ./plugins/macosx/*: worked around a bug in seeking.
+  * ./include/threads_func.h: OS X port now uses real-time threads.
+  * ./configure.in: fixes for ffmpeg and mad.
+  * ./extras/MacOSX/Resources/English.lproj/MainMenu.nib/objects.nib: OS X intf
+    is now more consistent with Apple guidelines.
+  * ./plugins/gtk/gtk_preferences.c: fixed a segfault I introduced lately in
+    gtk_preferences.
+  * ./plugins/macosx/intf_vlc_wrapper.m: don't try to eject unless there is
+    a disc to eject.
+  * ./plugins/macosx/intf_vlc_wrapper.m: fixed a segfault in the Mac OS X
+    interface.
+  * ./plugins/satellite/input_satellite.c: cosmetic changes in error messages.
+  * ./plugins/gtk/*: gtk and gnome interfaces now use frequency and symbol
+    rate default values.
+  * ./BUGS: removed fixed entries.
+  * ./plugins/spudec/spu_decoder.c: initialize p_spudec->p_vout to NULL to
+    prevent segfaults if InitThread does not complete.
+  * ./plugins/text/rc.c: on win32 the rc plugin opens a new console.
+  * ./plugins/filters/*: filters were using memalign but freeing p_data instead
+    of p_data_orig.
+  * ./extras/Win32_msvc/vlc.dsp: updated MSVC++ project.
+  * ./src/interface/main.c: small corrections to the LONGTEXT descriptions in
+    main.c.
+  * ./AUTHORS: a few additions.
+  * ./vlc.spec: updates, courtesy of Yves Duret <yves.duret@mandrakesoft.com>.
+  * ./configure.in: new --with-ffmpeg option for standard installations.
+  * ./src/interface/main.c: updated long descriptions.
+  * ./plugins/dummy/intf_dummy.c: on win32 the dummy interface plugin will
+    open a dos command box. With this fix, vlc should never fail silently and
+    leave a ghost process running in the background when there isn't any
+    working GUI plugin.
+  * ./include/config.h: on win32 DVD/VCD_DEVICE defaults to to D:.
+  * ./src/interface/main.c: added a few *_LONGTEXT descriptions.
+  * ./plugins/mpeg_vdec/video_parser.c: moved the mpeg-motion and mpeg-idct
+     options to the mpeg_vdec plugin.
+  * ./plugins/spudec/spu_decoder.c: mark subpictures destroyed when we end
+    spudec thread.
+  * ./src/audio_output/aout_pcm.c: desperate attempt to improve audio output.
+  * ./doc/vlc-howto.sgml, ./doc/vlc.1, ./README.MacOSX.rtf: updated
+    documentation.
+  * ./INSTALL.win32: updated INSTALL.win32.
+  * ./plguins/directx/vout_directx.c, ./plugins/directx/vout_events.c: a little
+    bit of clean-up in the directx video output plugin
+  * ./plugins/macosx/*: fixed Mac OS X resizing.
+  * ./src/misc/configuration.c: warning levels are no longer additive, patch
+    courtesy of Arnaud de Bossoreille de Ribou <bozo@via.ecp.fr>.
+  * ALL: changed __inline__ with inline (autoconf does the job for us anyway,
+    and mipspro doesn't know about __inline__).
+  * ./src/audio_output/aout_pcm.c, ./src/audio_output/aout_ext-dec.c: fixed
+    deadlock in NextFrame() in aout_pcm.c.
+  * ./plugins/directx/vout_directx.c, ./plugins/directx/vout_events.c: fixed
+    a bug in the directx window creation function. We register a window
+    class once per process so we must be careful not to free the associated
+    resources.
+  * ./extras/Win32_msvc/vlc.dsp: updated the MSVC++ project files and added
+    support for dirent (vlc compiled with msvc can now load plugins - even
+    compiled with mingw).
+  * ALL: small portability fixes.
+  * ./plugins/macosx/*: menu item to maximize the volume in Mac OS X.
+  * ALL: dropped dependancy on autoconf 2.52.
+  * ./plugins/directx/vout_directx.c: modified the directx video plugin to try
+    to create an YUV surface before falling back to an RGB surface when it's
+    not possible to use overlays. Some graphic cards can do the YUV->RGB
+    conversion in hardware during the blitting stage.
+  * ./plugins/directx/vout_directx.c: in the directx video plugin, we now
+    request that the RGB surface be created in video memory. The reasoning
+    behind this is that usually surfaces in video memory benefit from more
+    hardware acceleration (like for instance hw rescaling, hw blitting, etc.).
+  * ./plugins/directx/directx.c: added two options to the directx video plugin
+    to disable the above features (mainly because my video driver is buggy and
+    doesn't handle them well).
+  * ./src/misc/configuration.c: small cosmetic changes to the generation of
+    the config file.
+  * ./src/misc/configuration.c: fix for config_GetHomeDir() on win32.
+    SHGetFolderPath() is located in shfolder.dll not shell32.dll.
+  * ./plugins/gtk/gtk_preferences.c: fix for the gtk preferences dialog box. To
+    be sure that an int or float value is actually changed we call
+   gtk_spin_button_update() in the GtkInt/FloatChanged() event handler.
+  * ./debian/control: made the Build-Depends: entry a one-liner (Closes
+    Debian bug #147103).
+  * ./src/audio_output/aout_spdif.c: a lock was not released.
+  * ./plugins/text/rc.c: added a safety lock.
+  * ./plugins/gtk/*: new Network dialog box for Gtk and Gnome interfaces.
+  * ./plugins/mpeg_system/mpeg_audio.c: you can now force the mpeg_audio demux
+    module.
+  * ./plugins/mpeg_vdec/vpar_headers.c: update reference in case of sequence
+    end code.
+  * ./src/input/input_clock.c: don't keep the control lock during the pause.
+  * ./plugins/ac3_spdif/ac3_spdif.c, ./src/audio_output/aout_spdif.c: check for
+    b_die and b_error in all loops so that we don't remain stuck waiting for
+    data whereas the vlc has tried to quit.
+  * ./src/misc/mtime.c: we use nanosleep whenever possible (patch from Meuuh).
+  * ./plugins/avi/avi.c : it will not segfault with broken avi with an unknown
+    stream.
+  * ./src/misc/mtime.c: removed usage of usleep (not thread safe) (by Meuuh).
+  * ./src/video_output/video_output.c: video output patch to improve handling
+    of late pictures (by Meuuh).
+  * ./src/interface/intf_msg.c, src/interface/intf_playlist.c: disabled
+    calls to realloc(_,0) in a similar way to input_programs.c.
+  * ./plugins/dvd/dvd_seek.c: fix random segfaults on title change (i_cell
+    should be tested _before_ we access the structures).
+  * ./src/input/input_programs.c: fixed memory corruption by setting a few
+    pointers to NULL after they have been free()ed.
+  * ./src/input/input_programs.c: removed now useless ASSERTs.
+  * ./plugins/beos/*: improved overlay and bitmap support, not tested on nVidia
+    cards. Lower CPU usage and no thread created per frame.
+  * ./plugins/dvd/dvd_summary.c: added a sanity check.
+  * ./plugins/vcd/*: vcd access plugin now uses mpeg_ps demux instead of its
+    own one.
+  * ./plugins/macosx/vout_qdview.m: attempt to fix the video output with
+    QuickTime 6.
+  * ./plugins/ac3_adec/ac3_adec.c: probably fixed most "crash when changing
+    audio track" problems by zeroing the p_ac3dec structure.
+  * ./plugins/ac3_adec/ac3_adec.c: fixed a "INPUT_MAX_ALLOCATION reached"
+    crash.
+  * ./src/input/input_dec.c, ./src/input/input_programs.c: check size to avoid
+    realloc(0).
+  * ./plugins/win32/network.*: new Network dialog box.
+  * ./src/input/input.c, ./plugins/access/http.c, ./plugins/access/udp.c: added
+    the input_FDNetworkClose() function to be called when closing a networking
+    stream instead of input_FDClose().
+  * ./src/misc/netutils.c: use closesocket() instead of close() at the end
+    of the network_ChannelJoin() for WIN32.
+  * ./src/misc/configuration.c: fixed an issue with long options from
+    modules where option arguments and playlist entries were mixed.
+  * ./plugins/spudec/spu_decoder.c: fixed endianness issue; subtitles colors
+    should be OK now.
+  * ./plugins/satellite/input_satellite.c: fixed a compilation warning.
+  * ./configure.in: added libdvbpsi version check.
+  * ./include/modules_inner.h: fixed a bug in module reinitialization,
+    which should fix crashes after a long pause.
+  * ./src/input/*: fixed a bug (glitch/segfault) when seeking.
+  * ./src/input/mpeg_system.c: we handle PCR even if they are not attached
+    to a PMT.
+  * ./configure.in: new --with-mad-tree configure option.
+  * ./BUGS: updated BUGS file.
+  * ./src/input/mpeg_system.c: it should now be possible to quit when reading
+    a bogus file.
+  * ./src/misc/iso-639.def, ./include/iso_lang.h, ./src/misc/iso_lang.c:
+    iso-839-[12] tools.
+  * ./plugins/dvd/dvd_es.c, ./plugins/dvd/dvd_summary.c,
+    ./plugins/dvdread/input_dvdread.c: adapted DecodeLanguage calls to the new
+    behaviour.
+  * plugins/mpeg_system/mpeg_ts.c: ISO-639-2 descriptors handling.
+  * ./include/mmx.h, ./plugins/imdct/*: gcc-3.1 compilation fixes courtesy
+    of Yves Duret and other Mandrakesoft guys I don't know.
+  * ./plugins/macosx/intf_vlc_wrapper.m: do not eject when we're reading from
+    the disc...
+  * ./src/misc/modules.c: if a module has a zero-scored capability, we don't
+    try to use it, unless it was explicitely requested (--vout for example).
+  * ./plugins/sdl/vout_sdl.c: fixed an aspect ratio issue (thanks Meuuh). 
+  * ./src/input/mpeg_system.c: fixed an old old bug in TS demux, thank you
+    Meuuh.
+  * ./plugins/mpeg_system/mpeg_audio.c: to avoid problem with PS, test only the
+    first 4 bytes for mpeg header so some broken files, and all web radio will
+    not work. You can change this by changing value of MPEGAUDIO_MAXTESTPOS.
+  * ./doc/vlc-howto.sgml: spelling mistakes, small updates, harmonization with
+    other documentations (thank you Alexis).
+  * ./plugins/satellite/*: some fixes in options parsing (thank you Sam).
+  * ./extras/MacOSX/Resources/vlc.icns: new OS X icon, courtesy of Joeri van
+    Dooren <joeri@van.dooren.be>.
+  * ./plugins/mpeg_vdec/video_decoder.c: Mac OS X fix.
+  * ./plugins/mpeg_system/mpeg_audio.c: you should again be able to play PS
+    streams (I hope it will be enough). Sorry.
+  * ./plugins/ffmpeg/ffmpeg.c: CVS version of ffmpeg can now decode
+    msmpeg4 v1 v2, so I added support for this. But you can always use
+    the old ffmpeg library without any problem (I hope ;).
+  * ./include/video.h : added new fourcc codes for avi.
+  * ./plugins/filter/clone.c: New filter, `--filter clone', duplicates
+    display. To duplicate 12 times, use `--filter clone:12'.
+  * ./plugins/x11/xcommon.c, ./plugins/x11/xvideo.c: --xvideo-chroma flag to
+    force the XVimage format used.
+  * ./plugins/text/ncurses.c: ncurses interface improvements by Thomas Graf.
+  * ./plugins/mpeg_system/mpeg_audio.c: we don't use any more U32_AT.
+  * ./plugins/macosx/*: disabled auto-hiding of mouse cursor since it doesn't
+    work when browsing menus; instead, click in the video window
+  * ./plugins/macosx/*: fixed a major bug in the spu decoder.
+  * ./plugins/macosx/*: Objective-C files are now .m.
+  * ./plugins/macosx/*: fixed menus.
+  * ./plugins/macosx/*: menus for Program/Title/Chapter/Languages.
+  * ./plugins/avi/avi.c: we use input_ClockManageRef to do synchro.
+  * ./include/common.h, ./include/input_ext-plugins.h: exported
+    input_ClockGetTS for plugins.
+  * ./plugins/mpeg_system/mpeg_audio.c: a demux for mpeg audio stream (file,
+    web radio ...) 
+  * ./src/interface/main.c: if Ctrl-C doesn't kill vlc cleanly for any
+    reason, user just needs to hit Ctrl-C again 1 second later and we'll
+    exit disgustingly instead of freezing.
+  * ./plugins/macosx/intf_vlc_wrapper.c: menu code fixes.
+  * ./plugins/macosx/*: fixed Mac OS X VOUT_SIZE_CHANGE signal.
+  * ./plugins/ffmpeg/ffmpeg.c: corrected some bad lock/unlock.
+  * ./plugins/avi/avi.c: can now use --novideo.
+  * ./plugins/macosx/*: improvements of the OS X GUI.
+  * ./plugins/mad/*: added mad plugin downscale config option for selecting
+    downscaling routine. Choices are: fast, mpg321. Default the fast version
+    is used. The downscale option mpg321 uses an algorithm that adapts to
+    dither errors. This routine is borrowed from MPG321 code.
+  * ./plugins/mad/*.c: mono audio streams get now duplicated on the right
+    channel instead of silencing the right channel (untested).
+  * ./plugins/avi/avi.c, ./plugins/ffmpeg/ffmpeg.c: improvements.
+  * ./src/video_output/video_output.c: video plugins that don't handle
+    rescaling themselves have to let the video_output thread know about
+    resizing events (with VOUT_SIZE_CHANGE event). (this part needs some
+    clean-up but it is basically working for the X11 and SDL plugins).
+  * ./plugins/sdl/vout_sdl.c: fixed fullscreen for the SDL plugin.
+  * ./plugins/sdl/vout_sdl.c, ./plugins/mga/xmga.c: xmga and sdl now switch to
+    fullscreen on double-click.
+  * ./plugins/avi/avi.c: try to not freeze when reaching end file.
+  * ./plugins/x11/xcommon.c, ./src/video_output.c: fixed the resizing and
+    scaling of the X11 video output.
+  * ./plugins/x11/xcommon.c: clicking on the video doesn't pause it anymore
+    (use spacebar for this), but double-clicking will now switch between
+    fullscreen and window mode.
+  * ./plugins/gtk/gtk_preferences.c: the Apply button in the preferences menu
+    is grayed out unless there's a change to apply.
+  * ./plugins/gtk/gtk_preferences.c: GtkConfigApply() now clears the list of
+    config changes before returning.
+  * ./plugins/network/ipv4.c: fixed ipv4.so compilation under QNX.
+  * ./configure.in: deactivated ipv6.so under QNX for now.
+  * ./plugins/macosx/aout_macosx.c: more stable audio output with more output
+    buffering.
+  * ./BUGS: no text in the status bar with gtk intf, no window title in gtk
+    intf on some machines, correct title on another.
+  * ./plugins/gtk/*.glade, ./plugins/gtk/*_interface.*: fix for interface   
+    autoshrink when toolbar text isn't displayed.
+  * ./plugins/gtk/gnome.c, ./plugins/gtk/gtk.c, ./plugins/gtk/gtk_display.*:
+    callbacks for the hide tooltips and toolbar text options.
+  * ./plugins/mad/*: aout fifo adapts it size according to the length of the
+    first frame. The change is needed for MPEG1/2 layer III, because the size
+    of output pcm from mad_decoder is different.
+  * ./include/modules_inner.h, ./src/misc/configuration.c: support for config
+    options callbacks.
+  * ./configure.in: we check support for variadic macros (screw Borland!).
+  * ./plugins/gtk/gnome.c: new option lets you hide the text of the
+    GNOME interface toolbar.
+  * ./FAQ: small FAQ update. Please note that everyone can update this FAQ if
+    they want, it is not my property :-).
+  * ./AUTHORS: added quite a few missing names.
+  * ./plugins/qnx/vout_qnx.c: port of the QNX vout plugin to the vout4 API,
+    courtesy of Pascal Levesque <Pascal.Levesque@mindready.com>.
+  * ./plugins/avi/avi.c: you can now use slow and fast reading. After seeking,
+    audio and video synchro is better.
+  * ./plugins/macosx/aout_macosx.c: misc sound fixes.
+  * ./configure.in: fixed VCD double detection.
+  * ./src/misc/configuration.c, ./plugins/text/logger.c: the configuration file
+    and the log file are opened in text mode. This mode should only have a
+    meaning on Win32 and isn't supposed to break any other platform. If does
+    give you any trouble then shout.
+  * ./configure.in: added a --with-a52-tree option to the configure script.
+  * ./plugins/spudec/spu_decoder.c: FOURCC_YUY2 subtitles support (for NVidia
+    overlay) courtesy of Rudolf Cornelissen <rag.cornelissen@inter.nl.net>.
+  * ./plugins/kde/*: configuration dialog for the KDE interface, courtesy
+    of Sigmund Augdal <sigmunau@stud.ntnu.no>.
+  * ./plugins/chroma/i420_yuy2.h: workaround for yet another annoying gcc
+    behaviour with inline assembly (seems to be BeOS-specific). If anyone has
+    a better idea than the huge "memory" constraint, please have a look at
+    the MMX_CALL() macro!
+  * ./plugins/avi/avi.c: corrected a bug with broken avi files.
+  * ./src/misc/modules_plugin.h: added config_Get/PutFloatVariable to
+    p_sysmbols. Thanks to Sigmund Augdal for pointing this bug out.
+  * ./src/audio_output/aout_pcm.c: on Win32 the aout_pcm thread is given a high
+    priority. This avoids lots of audio underruns, especially when moving
+    around the video window.
+  * plugins/avi/avi.c : changed in order to read more avi files, Meuuh
+    you can now read your file ;) (but audio is awful, perhaps because of mad
+    plugin ?). Fix a bug for audio with some avi files.
+  * ./plugins/satellite/satellite.c: fixed a compilation issue in satellite
+    input. It now uses common or libdvbpsi ts demux. Untested cause I can't
+    get our Nova Card work again.
+  * ./src/video_output/vout_pictures.c: restored vout_CopyPicture(). It is
+    needed by the directx plugin damnit ;-)
+  * ./include/config.h: restored AOUT_BUFFER_DURATION to its old value. It
+    should solve quite a few underrun problems.
+  * ./plugins/directx/vout_directx.c: a little bit of DirectX plugin clean-up.
+  * ./ipkg/control: added more information in ipkg control file.
+  * ./include/modules_inner.h: the module name is now a default shortcut, for
+    it, no need to manually add it.
+  * ./plugins/sdl/vout_sdl.c, ./plugins/x11/xcommon.c: when in fullscreen
+    mode, the Esc key does not quit immediately, but first escapes from
+    fullscreen mode. User-requested feature.
+  * ./include/os_specific.h: fixed a C++ compilation issue.
+  * ./include/videolan/vlc.h: removed the main() declaration because SDL
+    defines it as a macro.
+  * ./plugins/avi/avi.c: with some broken avi files, will not freeze, and
+    try to detect end of file.
+  * ./include/threads_func.h: moved the function definitions from threads.h
+    into threads_funcs.h. This allows us to move p_main_sys into p_main
+    (p_main->p_sys).
+  * ./configure.in: fixed the --with-gtk-config-path and --with-sdl-config-path
+    options.
+  * ./plugins/avi/avi.c: seek is faster.
+  * ./configure.in: fixed a typo in libdvbpsi handling.
+  * ./plugins/vcd/cdrom_tools: FreeBSD 4.5 port of the vcd input.
+  * ./INSTALL.win32: updated win32 compilation instructions.
+  * ./plugins/mpeg_system/mpeg_ts.c: fixed --program option.
+  * ./include/common.h: fixed vlc_memalign.
+  * ./plugins/avi/avi.c: now it can play broken files with seek enabled but
+    it's very slow (will be fixed soon).
+  * ./src/misc/beos_specific.c: added system_Configure(). Sorry O:-)
+  * ./src/input/input_programs.c: a video divx ES will no longer be considered
+    as an audio ES (thanks sam).
+  * ./src/misc/darwin_specific.c: added system_Configure().
+  * ./plugins/macosx/vout_macosx.c: cleaned up QTScaleMatrix().
+  * ./plugins/macosx/*: A/V sync should be much more precise.
+  * ./plugins/macosx/vout_qdview.c: borders in fullscreen mode are now black
+    and the movie is centered.
+  * ./extras/MacOSX/vlc.pbproj/project.pbxproj: new creator ID: VLC#.
   * ./src/misc/modules_plugin.h: exported input_ClockManageRef for fenrir.
   * ./include/video.h: moved vout_CopyPicture out of the way, an inline
     function did not make sense here.
