@@ -2,7 +2,7 @@
  * vlcshell.cpp: a VLC plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.24 2003/09/23 16:07:48 gbazin Exp $
+ * $Id: vlcshell.cpp,v 1.25 2003/10/15 07:34:25 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -302,11 +302,10 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
         ppsz_argv[2] = plugin_path;
 
 #elif defined(XP_WIN)
-        char *ppsz_argv[] = { "vlc", "--plugin-path", NULL, "-vv" };
+        char *ppsz_argv[] = { NULL, "-vv" };
         HKEY h_key;
-        DWORD i_type, i_data;
+        DWORD i_type, i_data = MAX_PATH + 1;
         char p_data[MAX_PATH + 1];
-
         if( RegOpenKeyEx( HKEY_LOCAL_MACHINE, "Software\\VideoLAN\\VLC",
                           0, KEY_READ, &h_key ) == ERROR_SUCCESS )
         {
@@ -315,14 +314,14 @@ NPError NPP_New( NPMIMEType pluginType, NPP instance, uint16 mode, int16 argc,
              {
                  if( i_type == REG_SZ )
                  {
-                     strcat( p_data, "\\plugins" );
-                     ppsz_argv[2] = p_data;
+                     strcat( p_data, "\\vlc" );
+                     ppsz_argv[0] = p_data;
                  }
              }
              RegCloseKey( h_key );
         }
 
-        if( !ppsz_argv[2] ) ppsz_argv[2] = ".";
+        if( !ppsz_argv[0] ) ppsz_argv[0] = "vlc";
 
 #else
         char *ppsz_argv[] =

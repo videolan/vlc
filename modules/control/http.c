@@ -2,7 +2,7 @@
  * http.c :  http mini-server ;)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: http.c,v 1.21 2003/08/01 17:30:33 fenrir Exp $
+ * $Id: http.c,v 1.22 2003/10/15 07:34:24 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -581,7 +581,7 @@ static int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 #define fold p_sys->pp_files[p_sys->i_files-1]
 
             /* FIXME for rep/ add rep (it would be better to do a redirection) */
-            if( strlen(fold->name) > 1 &&
+            if( p_sys->i_files && strlen(fold->name) > 1 &&
                 fold->name[strlen(fold->name) - 1] == '/' )
             {
                 f = malloc( sizeof( httpd_file_callback_args_t ) );
