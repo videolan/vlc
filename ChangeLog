@@ -4,9 +4,10 @@
 
 HEAD
 
+  * ./plugins/spudec/spu_decoder.c: we now use FIND_ANYWHERE to find a vout.
   * ./plugins/dvd/dvd_es.c, ./plugins/satellite/input_satellite.c,
     ./plugins/dvdread/input_dvdread.c: updated outdated variable names.
-  * ./src/playlist/playlist.c, src/input/input.c: added safety checks to
+  * ./src/playlist/playlist.c, ./src/input/input.c: added safety checks to
     prevent crashes on next file.
   * ./src/misc/objects.c: commented all functions.
   * ./src/misc/objects.c: implemented vlc_object_find( , , FIND_ANYWHERE).
@@ -16,8 +17,8 @@ HEAD
   * ./bootstrap.sh, ./src/libvlc.h, ./po/*: fixed bootstrap.sh so that it does
     not include CVS Id lines in automatically created files.
   * ./plugins/dummy/intf_dummy.c, ./plugins/chroma/i420_yuy2.c,
-    src/interface/intf_eject.c, src/misc/threads.c: win32 compilation fix.
-  * ./plugins/directx/aout_directx.c, plugins/directx/vout_directx.c,
+    ./src/interface/intf_eject.c, ./src/misc/threads.c: win32 compilation fix.
+  * ./plugins/directx/aout_directx.c, ./plugins/directx/vout_directx.c,
     ./plugins/directx/vout_events.c: the DirectX notification and event threads
     now use the vlc_thread_create / vlc_thread_ready scheme. Untested.
   * ./configure.in: added a check for inttypes.h and sys/int_types.h.
@@ -36,7 +37,12 @@ HEAD
 0.4.1
 Not released yet
 
-  * ./plugins/macosx: rewrote the net panel for OS X
+  * ./plugins/dvdread/dvdread.c: disabled the dvdread plugin because it
+    currently sucks.
+  * ./src/misc/configuration.c, ./src/interface/main.c: we now accept --nofoo
+    and --no-foo as negations for --foo. Also, the --help output is nicer.
+  * ./plugins/macosx/*: rewrote the net panel for OS X
+  * ./plugins/qnx/vout_qnx.c: QNX compilation fix.
   * ./plugins/spudec/spu_decoder.c: fixed a margin bug in the SPU renderer
     which caused subtitles to appear slanted in odd width windows.
   * ./plugins/gtk/gtk_display.c, ./plugins/win32/mainframe.cpp: we deactivate

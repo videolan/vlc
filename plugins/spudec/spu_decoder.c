@@ -2,7 +2,7 @@
  * spu_decoder.c : spu decoder thread
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: spu_decoder.c,v 1.26 2002/06/02 13:49:35 sam Exp $
+ * $Id: spu_decoder.c,v 1.27 2002/06/02 23:11:48 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Rudolf Cornelissen <rag.cornelissen@inter.nl.net>
@@ -172,7 +172,7 @@ static int InitThread( spudec_thread_t *p_spudec )
         }
 
         p_spudec->p_vout = vlc_object_find( p_spudec->p_fifo, VLC_OBJECT_VOUT,
-                                                              FIND_CHILD );
+                                                              FIND_ANYWHERE );
 
         if( p_spudec->p_vout )
         {

@@ -4,7 +4,7 @@
  * and spawns threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: libvlc.c,v 1.5 2002/06/02 09:03:54 sam Exp $
+ * $Id: libvlc.c,v 1.6 2002/06/02 23:11:48 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -822,15 +822,14 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
  *****************************************************************************/
 static void Usage( vlc_t *p_this, const char *psz_module_name )
 {
-#define FORMAT_STRING "      --%s%s%s%s%s%s %s%s\n"
-    /* option name prefix ------' | | | | |  | |
-     * option name ---------------' | | | |  | |
-     * <bra ------------------------' | | |  | |
-     * option type or "" -------------' | |  | |
-     * ket> ----------------------------' |  | |
-     * padding spaces --------------------'  | |
-     * comment ------------------------------' |
-     * comment suffix -------------------------'
+#define FORMAT_STRING "      --%s%s%s%s%s%s%s %s%s\n"
+    /* option name -------------'     | | | |  | |
+     * <bra --------------------------' | | |  | |
+     * option type or "" ---------------' | |  | |
+     * ket> ------------------------------' |  | |
+     * padding spaces ----------------------'  | |
+     * comment --------------------------------' |
+     * comment suffix ---------------------------'
      *
      * The purpose of having bra and ket is that we might i18n them as well.
      */
@@ -859,10 +858,15 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
 
         if( psz_module_name && strcmp( psz_module_name,
                                        p_module->psz_object_name ) )
+        {
             continue;
+        }
 
         /* Ignore modules without config options */
-        if( !p_module->i_config_items ) continue;
+        if( !p_module->i_config_items )
+        {
+            continue;
+        }
 
         /* Print module name */
         fprintf( stderr, _("%s module options:\n\n"),
@@ -873,7 +877,7 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
              p_item++ )
         {
             char *psz_bra = NULL, *psz_type = NULL, *psz_ket = NULL;
-            char *psz_suf = "";
+            char *psz_suf = "", *psz_prefix = NULL;
             int i;
 
             switch( p_item->i_type )
@@ -925,7 +929,27 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                 if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL
                      && !b_help_module )
                 {
-                    i -= 5;
+                    vlc_bool_t b_dash = 0;
+                    psz_prefix = p_item->psz_name;
+                    while( *psz_prefix )
+                    {
+                        if( *psz_prefix++ == '-' )
+                        {
+                            b_dash = 1;
+                            break;
+                        }
+                    }
+
+                    if( b_dash )
+                    {
+                        psz_prefix = ", --no-";
+                        i -= strlen( p_item->psz_name ) + strlen( ", --no-" );
+                    }
+                    else
+                    {
+                        psz_prefix = ", --no";
+                        i -= strlen( p_item->psz_name ) + strlen( ", --no" );
+                    }
                 }
 
                 if( i < 0 )
@@ -938,11 +962,19 @@ static void Usage( vlc_t *p_this, const char *psz_module_name )
                     psz_spaces[i] = '\0';
                 }
 
-                fprintf( stderr, psz_format,
-                         ( p_item->i_type == MODULE_CONFIG_ITEM_BOOL
-                            && !b_help_module ) ? "(no-)" : "",
-                         p_item->psz_name, psz_bra, psz_type, psz_ket,
-                         psz_spaces, p_item->psz_text, psz_suf );
+                if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL &&
+                    !b_help_module )
+                {
+                    fprintf( stderr, psz_format, p_item->psz_name, psz_prefix,
+                             p_item->psz_name, psz_bra, psz_type, psz_ket,
+                             psz_spaces, p_item->psz_text, psz_suf );
+                }
+                else
+                {
+                    fprintf( stderr, psz_format, p_item->psz_name, "", "",
+                             psz_bra, psz_type, psz_ket, psz_spaces,
+                             p_item->psz_text, psz_suf );
+                }
                 psz_spaces[i] = ' ';
             }
         }

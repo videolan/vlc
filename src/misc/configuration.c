@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.28 2002/06/01 18:04:49 sam Exp $
+ * $Id: configuration.c,v 1.29 2002/06/02 23:11:48 sam Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -877,7 +877,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
         /* count the number of exported configuration options (to allocate
          * longopts). We also need to allocate space for too options when
          * dealing with boolean to allow for --foo and --no-foo */
-        i_opts += (p_module->i_config_items + p_module->i_bool_items);
+        i_opts += (p_module->i_config_items + 2 * p_module->i_bool_items);
     }
 
     p_longopts = malloc( sizeof(struct option) * (i_opts + 1) );
@@ -946,7 +946,18 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
              * option */
             if( p_item->i_type == MODULE_CONFIG_ITEM_BOOL )
             {
-                char *psz_name = malloc( strlen(p_item->psz_name) + 4 );
+                char *psz_name = malloc( strlen(p_item->psz_name) + 3 );
+                if( psz_name == NULL ) continue;
+                strcpy( psz_name, "no" );
+                strcat( psz_name, p_item->psz_name );
+
+                p_longopts[i_index].name = psz_name;
+                p_longopts[i_index].has_arg = no_argument;
+                p_longopts[i_index].flag = &flag;
+                p_longopts[i_index].val = 1;
+                i_index++;
+
+                psz_name = malloc( strlen(p_item->psz_name) + 4 );
                 if( psz_name == NULL ) continue;
                 strcpy( psz_name, "no-" );
                 strcat( psz_name, p_item->psz_name );
