@@ -348,14 +348,7 @@ int E_(Open) ( vlc_object_t *p_this )
             }
         }
     }
-
-    /* Workaround for backwards compatibility */
-    if (strncmp( p_input->psz_access, "satellite",9 ) ==0)
-    {
-        msg_Warn( p_input, "invalid frequency %d possibly in MHz, trying value *1000 KHz", u_freq );
-        u_freq *= 1000;
-    }
-    
+   
     /* Validating input values */
     if ( ((u_freq) > frontend_info.frequency_max) ||
          ((u_freq) < frontend_info.frequency_min) )
