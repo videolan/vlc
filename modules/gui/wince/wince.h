@@ -158,12 +158,6 @@ protected:
     virtual LRESULT WndProc( HWND hwnd, UINT msg, WPARAM wp, LPARAM lp,
                              PBOOL pbProcessed );
 
-    HWND WINAPI CreateToolbar( HWND );
-    HWND WINAPI CreateSliderbar( HWND );
-    HWND WINAPI CreateStaticText( HWND );
-    HWND WINAPI CreateVolTrackbar( HWND );
-    HWND WINAPI CreateStatusbar( HWND );
-
     void OnOpenFileSimple( void );
     void OnPlayStream( void );
     void OnVideoOnTop( void );
@@ -564,12 +558,19 @@ protected:
 #define SHIDIF_SIPDOWN              0x0008
 #define SHIDIF_FULLSCREENNOMENUBAR  0x0010
 #define SHCMBF_HMENU                0x0010
+#define SHCMBF_EMPTYBAR             0x0001
 #define SHFS_SHOWSIPBUTTON          0x0004
 #define GN_CONTEXTMENU              1000
 #define SHCMBM_GETSUBMENU           (WM_USER + 401)
+#define SHCMBM_GETMENU              (WM_USER + 402)
+#ifndef TBSTYLE_NO_DROPDOWN_ARROW
+#define TBSTYLE_NO_DROPDOWN_ARROW   0x0080
+#endif
 #define lstrlenW wcslen
+#define SHGetMenu(hwnd) \
+    (HMENU)SendMessage((hwnd), SHCMBM_GETMENU, (WPARAM)0, (LPARAM)0)
 #define TrackPopupMenu(hm,u,x,y,r,hw,p) \
-        TrackPopupMenuEx((hm),(u),(x),(y),(hw),0)
+    TrackPopupMenuEx((hm),(u),(x),(y),(hw),0)
 
 extern "C" {
     typedef struct tagSHMENUBARINFO
@@ -603,6 +604,8 @@ extern "C" {
         POINT ptAction;
         DWORD dwItemSpec;
     } NMRGINFO, *PNMRGINFO;
+
+    BOOL WINAPI CommandBar_InsertMenubarEx(HWND, HINSTANCE, LPTSTR, WORD);
 }
 
 #if defined( WIN32 ) && !defined( UNDER_CE )

@@ -41,24 +41,15 @@ IDR_MENUBAR MENU DISCARDABLE
 BEGIN
     POPUP "File"
     BEGIN
-        MENUITEM "Quick &Open File",            ID_FILE_QUICKOPEN
-        MENUITEM SEPARATOR
-        MENUITEM "Open &File",                  ID_FILE_OPENFILE
-        MENUITEM "Open &Network Stream",        ID_FILE_OPENNET
-        MENUITEM SEPARATOR
-        MENUITEM "About VLC",                   ID_FILE_ABOUT
-        MENUITEM "E&xit",                       ID_FILE_EXIT
+        MENUITEM "Empty",                       ID_EMPTY, GRAYED
     END
     POPUP "View"
     BEGIN
-        MENUITEM "&Playlist",                   ID_VIEW_PLAYLIST
-        MENUITEM "&Messages",                   ID_VIEW_MESSAGES
-        MENUITEM "&Stream and Media info",      ID_VIEW_STREAMINFO
+        MENUITEM "Empty",                       ID_EMPTY, GRAYED
     END
     POPUP "Settings"
     BEGIN
-        MENUITEM "&Extended GUI",               ID_SETTINGS_EXTEND
-        MENUITEM "&Preferences...",             ID_SETTINGS_PREF
+        MENUITEM "Empty",                       ID_EMPTY, GRAYED
     END
     POPUP "Audio"
     BEGIN
@@ -68,7 +59,7 @@ BEGIN
     BEGIN
         MENUITEM "Empty",                       ID_EMPTY, GRAYED
     END
-    POPUP "Navigation"
+    POPUP "Nav"
     BEGIN
         MENUITEM "Empty",                       ID_EMPTY, GRAYED
     END

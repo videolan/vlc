@@ -144,15 +144,105 @@ BOOL Interface::InitInstance( HINSTANCE hInstance, intf_thread_t *_p_intf )
 }
 
 /***********************************************************************
-
 FUNCTION: 
-  CreateToolbar
+  CreateMenuBar
+
+PURPOSE: 
+  Creates a menu bar.
+***********************************************************************/
+HWND CreateMenuBar( HWND hwnd, HINSTANCE hInst )
+{
+#ifdef UNDER_CE
+    SHMENUBARINFO mbi;
+    memset( &mbi, 0, sizeof(SHMENUBARINFO) );
+    mbi.cbSize     = sizeof(SHMENUBARINFO);
+    mbi.hwndParent = hwnd;
+    mbi.hInstRes   = hInst;
+    mbi.nToolBarId = IDR_MENUBAR;
+
+    if( !SHCreateMenuBar( &mbi ) )
+    {
+        MessageBox(hwnd, _T("SHCreateMenuBar Failed"), _T("Error"), MB_OK);
+        return 0;
+    }
+
+    TBBUTTONINFO tbbi;
+    tbbi.cbSize = sizeof(tbbi);
+    tbbi.dwMask = TBIF_LPARAM;
+
+    SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_FILE, (LPARAM)&tbbi );
+    HMENU hmenu_file = (HMENU)tbbi.lParam;
+    RemoveMenu( hmenu_file, 0, MF_BYPOSITION );
+    SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_VIEW, (LPARAM)&tbbi );
+    HMENU hmenu_view = (HMENU)tbbi.lParam;
+    RemoveMenu( hmenu_view, 0, MF_BYPOSITION );
+    SendMessage( mbi.hwndMB, TB_GETBUTTONINFO, IDM_SETTINGS, (LPARAM)&tbbi );
+    HMENU hmenu_settings = (HMENU)tbbi.lParam;
+
+#else
+    HMENU hmenu_file = CreatePopupMenu();
+    HMENU hmenu_view = CreatePopupMenu();
+    HMENU hmenu_settings = CreatePopupMenu();
+    HMENU hmenu_audio = CreatePopupMenu();
+    HMENU hmenu_video = CreatePopupMenu();
+    HMENU hmenu_navigation = CreatePopupMenu();
+#endif
+
+    AppendMenu( hmenu_file, MF_STRING, ID_FILE_QUICKOPEN,
+                _T("Quick &Open File") );
+    AppendMenu( hmenu_file, MF_SEPARATOR, 0, 0 );
+    AppendMenu( hmenu_file, MF_STRING, ID_FILE_OPENFILE,
+                _T("Open &File") );
+    AppendMenu( hmenu_file, MF_STRING, ID_FILE_OPENNET,
+                _T("Open Network Stream") );
+    AppendMenu( hmenu_file, MF_SEPARATOR, 0, 0 );
+    AppendMenu( hmenu_file, MF_STRING, ID_FILE_ABOUT,
+                _T("About VLC") );
+    AppendMenu( hmenu_file, MF_STRING, ID_FILE_EXIT,
+                _T("E&xit") );
+
+    AppendMenu( hmenu_view, MF_STRING, ID_VIEW_PLAYLIST,
+                _T("&Playlist") );
+    AppendMenu( hmenu_view, MF_STRING, ID_VIEW_MESSAGES,
+                _T("&Messages") );
+    AppendMenu( hmenu_view, MF_STRING, ID_VIEW_STREAMINFO,
+                _T("&Stream and Media info") );
+
+    AppendMenu( hmenu_settings, MF_STRING, ID_SETTINGS_EXTEND,
+                _T("&Extended GUI") );
+    AppendMenu( hmenu_settings, MF_STRING, ID_SETTINGS_PREF,
+                _T("&Preferences...") );
+
+
+#ifdef UNDER_CE
+    return mbi.hwndMB;
+
+#else
+    HMENU hmenu = CreateMenu();
+
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_file, _T("File") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_view, _T("View") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_settings,
+                _T("Settings") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_audio, _T("Audio") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_video, _T("Video") );
+    AppendMenu( hmenu, MF_POPUP|MF_STRING, (UINT)hmenu_navigation,
+                _T("Nav.") );
+
+    SetMenu( hwnd, hmenu );
+    return hwnd;
+
+#endif
+}
+
+/***********************************************************************
+FUNCTION: 
+  CreateToolBar
 
 PURPOSE: 
   Registers the TOOLBAR control class and creates a toolbar.
-
 ***********************************************************************/
-HWND WINAPI Interface::CreateToolbar( HWND hwnd )
+HWND CreateToolBar( HWND hwnd, HINSTANCE hInst )
 {
     DWORD dwStyle;
     HWND hwndTB;
@@ -191,13 +281,13 @@ HWND WINAPI Interface::CreateToolbar( HWND hwnd )
 /***********************************************************************
 
 FUNCTION: 
-  CreateSliderbar
+  CreateSliderBar
 
 PURPOSE: 
   Registers the TRACKBAR_CLASS control class and creates a trackbar.
 
 ***********************************************************************/
-HWND WINAPI Interface::CreateSliderbar( HWND hwnd )
+HWND CreateSliderBar( HWND hwnd, HINSTANCE hInst )
 {
     HWND hwndSlider;
     RECT rect;
@@ -231,7 +321,7 @@ HWND WINAPI Interface::CreateSliderbar( HWND hwnd )
     return hwndSlider;
 }
 
-HWND WINAPI Interface::CreateStaticText( HWND hwnd )
+HWND CreateStaticText( HWND hwnd, HINSTANCE hInst )
 {
     HWND hwndLabel;
     RECT rect;
@@ -256,13 +346,13 @@ HWND WINAPI Interface::CreateStaticText( HWND hwnd )
 /***********************************************************************
 
 FUNCTION: 
-  CreateVolTrackbar
+  CreateVolTrackBar
 
 PURPOSE: 
   Registers the TRACKBAR_CLASS control class and creates a trackbar.
 
 ***********************************************************************/
-HWND WINAPI Interface::CreateVolTrackbar( HWND hwnd )
+HWND CreateVolTrackBar( HWND hwnd, HINSTANCE hInst )
 {
     HWND hwndVol;
     RECT rect;
@@ -300,13 +390,13 @@ HWND WINAPI Interface::CreateVolTrackbar( HWND hwnd )
 /***********************************************************************
 
 FUNCTION: 
-  CreateStatusbar
+  CreateStatusBar
 
 PURPOSE: 
   Registers the StatusBar control class and creates a Statusbar.
 
 ***********************************************************************/
-HWND WINAPI Interface::CreateStatusbar( HWND hwnd )
+HWND CreateStatusBar( HWND hwnd, HINSTANCE hInst )
 {
     DWORD dwStyle;
     HWND hwndSB;
@@ -385,11 +475,11 @@ LRESULT CALLBACK CBaseWindow::BaseWndProc( HWND hwnd, UINT msg, WPARAM wParam,
     CBaseWindow *pObj =
         reinterpret_cast<CBaseWindow *>(::GetWindowLong( hwnd, GWL_USERDATA ));
 
+    if( !pObj ) return DefWindowProc( hwnd, msg, wParam, lParam );
+
     // Filter message through child classes
     if( pObj )
         lResult = pObj->WndProc( hwnd, msg, wParam, lParam, &bProcessed );
-    else
-        return ( pObj->DlgFlag ? FALSE : TRUE ); // message not processed
 
     if( pObj->DlgFlag )
         return bProcessed; // processing a dialog message return TRUE if processed
@@ -412,8 +502,6 @@ PURPOSE:
 LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
                                      LPARAM lp, PBOOL pbProcessed )
 {
-    SHMENUBARINFO mbi;
-
     // call the base class first
     LRESULT lResult = CBaseWindow::WndProc( hwnd, msg, wp, lp, pbProcessed );
     *pbProcessed = TRUE;
@@ -421,37 +509,15 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
     switch( msg )
     {
     case WM_CREATE:
-        //Create the menubar
-        memset( &mbi, 0, sizeof(SHMENUBARINFO) );
-        mbi.cbSize     = sizeof(SHMENUBARINFO);
-        mbi.hwndParent = hwnd;
-        mbi.nToolBarId = IDR_MENUBAR;
-        mbi.hInstRes   = hInst;
-        mbi.nBmpId     = 0;
-        mbi.cBmpImages = 0;
-
-        if( !SHCreateMenuBar(&mbi) )
         {
-            MessageBox(hwnd, _T("SHCreateMenuBar Failed"), _T("Error"), MB_OK);
-            //return -1;
-        }
-
-        hwndCB = mbi.hwndMB;
-
-        // Creates the toolbar
-        hwndTB = CreateToolbar( hwnd );
-
-        // Creates the sliderbar
-        hwndSlider = CreateSliderbar( hwnd );
-
-        // Creates the time label
-        hwndLabel = CreateStaticText( hwnd );
-
-        // Creates the volume trackbar
-        hwndVol = CreateVolTrackbar( hwnd );
-
-        // Creates the statusbar
-        hwndSB = CreateStatusbar( hwnd );
+        hwndCB = CreateMenuBar( hwnd, hInst );
+        hwndTB = CreateToolBar( hwnd, hInst );
+        hwndSlider = CreateSliderBar( hwnd, hInst );
+        hwndLabel = CreateStaticText( hwnd, hInst );
+        hwndVol = CreateVolTrackBar( hwnd, hInst );
+#ifdef UNDER_CE
+        hwndSB = CreateStatusBar( hwnd, hInst );
+#endif
 
         /* Video window */
         if( config_GetInt( pIntf, "wince-embed" ) )
@@ -462,7 +528,7 @@ LRESULT CALLBACK Interface::WndProc( HWND hwnd, UINT msg, WPARAM wp,
         // Hide the SIP button (WINCE only)
         SetForegroundWindow( hwnd );
         SHFullScreen( GetForegroundWindow(), SHFS_HIDESIPBUTTON );
-
+        }
         return lResult;
 
     case WM_COMMAND:
