@@ -2,7 +2,7 @@
  * vout.m: MacOS X video output plugin
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: vout.m,v 1.41 2003/03/18 22:14:42 hartman Exp $
+ * $Id: vout.m,v 1.42 2003/03/18 23:51:29 jlj Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Florian G. Pflug <fgp@phlo.org>
@@ -100,8 +100,8 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
 
     if( NSApp == NULL )
     {
-        /* we need an NSApp to create a window from */
-        msg_Err( p_vout, "no MacOS X application present" );
+        /* no MacOS X intf, unable to communicate with MT */
+        msg_Err( p_vout, "no MacOS X interface present" );
         free( p_vout->p_sys );
         return( 1 );
     }
