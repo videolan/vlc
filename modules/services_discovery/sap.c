@@ -149,7 +149,7 @@ struct  sdp_t
     char *psz_network_type;
     char *psz_address_type;
     char *psz_address;
-    int i_session_id;
+    int64_t i_session_id;
 
     /* "computed" URI */
     char *psz_uri;
@@ -1033,7 +1033,7 @@ static sdp_t *  ParseSDP( vlc_object_t *p_obj, char* psz_sdp )
                 GET_FIELD( p_sdp->psz_username );
                 GET_FIELD( psz_sess_id );
 
-                p_sdp->i_session_id = atoi( psz_sess_id );
+                p_sdp->i_session_id = atoll( psz_sess_id );
 
                 FREE( psz_sess_id );
 
@@ -1233,7 +1233,7 @@ static void FreeSDP( sdp_t *p_sdp )
 static int RemoveAnnounce( services_discovery_t *p_sd,
                            sap_announce_t *p_announce )
 {
-
+    int i;
     playlist_t *p_playlist = (playlist_t *)vlc_object_find( p_sd,
                                           VLC_OBJECT_PLAYLIST, FIND_ANYWHERE );
 
@@ -1250,6 +1250,16 @@ static int RemoveAnnounce( services_discovery_t *p_sd,
     if( p_announce->p_item )
     {
         playlist_Delete( p_playlist, p_announce->p_item->input.i_id );
+    }
+
+    for( i = 0; i< p_sd->p_sys->i_announces; i++)
+    {
+        if( p_sd->p_sys->pp_announces[i] == p_announce )
+        {
+            REMOVE_ELEM( p_sd->p_sys->pp_announces, p_sd->p_sys->i_announces,
+                         i);
+            break;
+        }
     }
 
     vlc_object_release( p_playlist );
