@@ -1,5 +1,5 @@
 List of vlc plugins
-$Id: LIST,v 1.5 2002/11/21 21:37:46 gbazin Exp $
+$Id: LIST,v 1.6 2002/12/09 00:52:42 babal Exp $
 
  * a52_system: input module for A52 decapsulation.
 
@@ -65,6 +65,8 @@ $Id: LIST,v 1.5 2002/11/21 21:37:46 gbazin Exp $
  * gnome: interface using the GNOME widget set.
 
  * gtk: interface using the Gtk+ widget set.
+
+ * headphone: headphone channel mixer with virtual spatialization effect.
 
  * idct: inverse DCT module, used by the video decoder.
 

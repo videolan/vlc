@@ -1,6 +1,9 @@
 0.5.0
 Not released yet
 
+  * ./modules/audio_filter/channel_mixer/headphone.x: new headphone channel
+    mixer with virtual spatialization effect
+  * ./modules/gui/win32/preferences.*: redesigned preference dialog box
   * ./modules/audio_filter/resampler/linear.c: new audio resampler based on
     linear interpolation
   * ./modules/gui/macosx/prefs.m: new configuration interface

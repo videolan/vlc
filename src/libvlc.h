@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.27 2002/12/07 22:29:15 titer Exp $
+ * $Id: libvlc.h,v 1.28 2002/12/09 00:52:42 babal Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -107,6 +107,20 @@
 #define DESYNC_LONGTEXT N_( \
     "This option allows you to delay the audio output. This can be handy if " \
     "you notice a lag between the video and the audio.")
+
+#define HEADPHONE_TEXT N_("headphone virtual spatialization effect")
+#define HEADPHONE_LONGTEXT N_( \
+    "This effect gives you the feeling that you stands in a real room " \
+    "with a complete 5.1 speaker set when using only a headphone, " \
+    "providing a more realistic sound experience. It should also be " \
+    "more comfortable and less tiring when listening to music for " \
+    "long periods of time.\nIt works with any source format from mono " \
+    "to 5.1.")
+
+#define HEADPHONE_DIM_TEXT N_("characteristic dimension")
+#define HEADPHONE_DIM_LONGTEXT N_( \
+     "Headphone virtual spatialization effect parameter: "\
+     "distance between front left speaker and listener in meters.")
 
 #define VOUT_TEXT N_("video output module")
 #define VOUT_LONGTEXT N_( \
@@ -400,6 +414,9 @@ vlc_module_begin();
                  AOUT_CHANNELS_TEXT, AOUT_CHANNELS_LONGTEXT );
     add_integer( "desync", 0, NULL, DESYNC_TEXT, DESYNC_LONGTEXT );
     add_integer( "audio-format", 0, NULL, FORMAT_TEXT, FORMAT_LONGTEXT );
+    add_bool( "headphone", 0, NULL, HEADPHONE_TEXT, HEADPHONE_LONGTEXT );
+    add_integer( "headphone-dim", 5, NULL, HEADPHONE_DIM_TEXT,
+                 HEADPHONE_DIM_LONGTEXT );
 
     /* Video options */
     add_category_hint( N_("Video"), NULL );

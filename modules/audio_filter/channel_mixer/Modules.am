@@ -1,1 +1,2 @@
 SOURCES_trivial_channel_mixer = modules/audio_filter/channel_mixer/trivial.c
+SOURCES_headphone_channel_mixer = modules/audio_filter/channel_mixer/headphone.c

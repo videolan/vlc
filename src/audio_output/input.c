@@ -2,7 +2,7 @@
  * input.c : internal management of input streams for the audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: input.c,v 1.26 2002/12/06 10:10:39 sam Exp $
+ * $Id: input.c,v 1.27 2002/12/09 00:52:42 babal Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -41,7 +41,8 @@
  *****************************************************************************/
 int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
 {
-    audio_sample_format_t intermediate_format;
+    audio_sample_format_t intermediate_format, headphone_intermediate_format;
+    aout_filter_t * p_headphone_filter;
 
     aout_FormatPrint( p_aout, "input", &p_input->input );
 
@@ -52,10 +53,23 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
     /* Create filters. */
     memcpy( &intermediate_format, &p_aout->mixer.mixer,
             sizeof(audio_sample_format_t) );
+    memcpy( &headphone_intermediate_format, &p_aout->mixer.mixer,
+            sizeof(audio_sample_format_t) );
+    if ( config_GetInt( p_aout , "headphone" ) )
+    {
+        headphone_intermediate_format.i_physical_channels = p_input->input.i_physical_channels;
+        headphone_intermediate_format.i_original_channels = p_input->input.i_original_channels;
+        headphone_intermediate_format.i_bytes_per_frame =
+                headphone_intermediate_format.i_bytes_per_frame
+                * aout_FormatNbChannels( &headphone_intermediate_format )
+                / aout_FormatNbChannels( &intermediate_format );
+    }
+
     intermediate_format.i_rate = p_input->input.i_rate;
+    headphone_intermediate_format.i_rate = p_input->input.i_rate;
     if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
                                      &p_input->i_nb_filters, &p_input->input,
-                                     &intermediate_format ) < 0 )
+                                     &headphone_intermediate_format ) < 0 )
     {
         msg_Err( p_aout, "couldn't set an input pipeline" );
 
@@ -63,6 +77,43 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input )
         p_input->b_error = 1;
 
         return -1;
+    }
+
+    if ( config_GetInt( p_aout , "headphone" ) )
+    {
+        /* create a vlc object */
+        p_headphone_filter = vlc_object_create( p_aout
+                , sizeof(aout_filter_t) );
+        if ( p_headphone_filter == NULL )
+        {
+            msg_Err( p_aout, "couldn't open the headphone virtual spatialization module" );
+            aout_FifoDestroy( p_aout, &p_input->fifo );
+            p_input->b_error = 1;
+            return -1;
+        }
+        vlc_object_attach( p_headphone_filter, p_aout );
+
+        /* find the headphone filter */
+        memcpy( &p_headphone_filter->input, &headphone_intermediate_format
+                , sizeof(audio_sample_format_t) );
+        memcpy( &p_headphone_filter->output, &intermediate_format
+                , sizeof(audio_sample_format_t) );
+        p_headphone_filter->p_module = module_Need( p_headphone_filter, "audio filter"
+                , "headphone" );
+        if ( p_headphone_filter->p_module == NULL )
+        {
+            vlc_object_detach( p_headphone_filter );
+            vlc_object_destroy( p_headphone_filter );
+
+            msg_Err( p_aout, "couldn't open the headphone virtual spatialization module" );
+            aout_FifoDestroy( p_aout, &p_input->fifo );
+            p_input->b_error = 1;
+            return -1;
+        }
+
+        /* success */
+        p_headphone_filter->b_reinit = VLC_TRUE;
+        p_input->pp_filters[p_input->i_nb_filters++] = p_headphone_filter;
     }
 
     /* Prepare hints for the buffer allocator. */
