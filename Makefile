@@ -16,6 +16,7 @@ endif
 PLUGINS_DIR :=	ac3_adec \
 		ac3_spdif \
 		alsa \
+ 		arts \
 		beos \
 		darwin \
 		directx \
@@ -49,6 +50,7 @@ PLUGINS_DIR :=	ac3_adec \
 PLUGINS_TARGETS := ac3_adec/ac3_adec \
 		ac3_spdif/ac3_spdif \
 		alsa/alsa \
+ 		arts/arts \
 		beos/beos \
 		darwin/darwin \
 		directx/directx \

@@ -771,7 +771,24 @@ AC_ARG_ENABLE(esd,
      if test x${ESD_CONFIG} != xno
      then
        PLUGINS="${PLUGINS} esd"
+       CFLAGS_ESD="`${ESD_CONFIG} --cflags`"
        LIB_ESD="`${ESD_CONFIG} --libs`"
+     fi
+   fi])
+
+dnl
+dnl  aRts module
+dnl
+AC_ARG_ENABLE(arts,
+  [  --enable-arts           aRts sound server (default disabled)],
+  [if test x$enable_arts = xyes
+   then
+     AC_PATH_PROG(ARTS_CONFIG, artsc-config, no)
+     if test x${ARTS_CONFIG} != xno
+     then
+       PLUGINS="${PLUGINS} arts"
+       CFLAGS_ARTS="`${ARTS_CONFIG} --cflags`"
+       LIB_ARTS="`${ARTS_CONFIG} --libs `"
      fi
    fi])
 
@@ -1164,6 +1181,7 @@ AC_SUBST(SOFLAGS)
 AC_SUBST(LIB)
 AC_SUBST(LIB_ALSA)
 AC_SUBST(LIB_ALTIVEC)
+AC_SUBST(LIB_ARTS)
 AC_SUBST(LIB_BEOS)
 AC_SUBST(LIB_DARWIN)
 AC_SUBST(LIB_DVD)
@@ -1190,6 +1208,8 @@ AC_SUBST(CFLAGS_VLC)
 AC_SUBST(CFLAGS_ALTIVEC)
 AC_SUBST(CFLAGS_DVD)
 AC_SUBST(CFLAGS_LIBDVDCSS)
+AC_SUBST(CFLAGS_ARTS)
+AC_SUBST(CFLAGS_ESD)
 AC_SUBST(CFLAGS_GTK)
 AC_SUBST(CFLAGS_SDL)
 AC_SUBST(CFLAGS_X11)
