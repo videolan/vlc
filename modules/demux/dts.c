@@ -2,7 +2,7 @@
  * dts.c : raw DTS stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dts.c,v 1.6 2004/02/06 15:11:39 hartman Exp $
+ * $Id: dts.c,v 1.7 2004/02/08 16:48:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -121,15 +121,15 @@ static int Open( vlc_object_t * p_this )
         {
             i_peek += GetDWLE( p_peek + i_peek - 4 ) + 8;
         }
- 
+
         /* TODO: should check wave format and sample_rate */
 
         /* Some DTS wav files don't begin with a sync code so we do a more
          * extensive search */
-        if( input_Peek( p_input, &p_peek, i_peek + DTS_PACKET_SIZE ) ==
-            i_peek + DTS_PACKET_SIZE )
+        if( input_Peek( p_input, &p_peek, i_peek + DTS_PACKET_SIZE * 2) ==
+            i_peek + DTS_PACKET_SIZE * 2)
         {
-            int i_size = i_peek + DTS_PACKET_SIZE - DTS_MAX_HEADER_SIZE;
+            int i_size = i_peek + DTS_PACKET_SIZE * 2 - DTS_MAX_HEADER_SIZE;
 
             while( i_peek < i_size )
             {
@@ -143,8 +143,8 @@ static int Open( vlc_object_t * p_this )
     }
 
     /* Have a peep at the show. */
-    if( input_Peek( p_input, &p_peek, i_peek + DTS_MAX_HEADER_SIZE ) <
-        i_peek + DTS_MAX_HEADER_SIZE )
+    if( input_Peek( p_input, &p_peek, i_peek + DTS_MAX_HEADER_SIZE * 2 ) <
+        i_peek + DTS_MAX_HEADER_SIZE * 2 )
     {
         /* Stream too short */
         msg_Warn( p_input, "cannot peek()" );
@@ -240,18 +240,15 @@ static int Demux( input_thread_t * p_input )
     }
 
     if( p_sys->b_start )
-    {
         p_block_in->i_pts = p_block_in->i_dts = 1;
-        p_sys->b_start = VLC_FALSE;
-    }
     else
-    {
         p_block_in->i_pts = p_block_in->i_dts = 0;
-    }
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize(
                 p_sys->p_packetizer, &p_block_in )) )
     {
+        p_sys->b_start = VLC_FALSE;
+
         while( p_block_out )
         {
             block_t *p_next = p_block_out->p_next;
