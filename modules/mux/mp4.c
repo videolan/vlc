@@ -2,9 +2,10 @@
  * mp4.c: mp4/mov muxer
  *****************************************************************************
  * Copyright (C) 2001, 2002, 2003 VideoLAN
- * $Id: mp4.c,v 1.8 2004/01/12 20:19:55 gbazin Exp $
+ * $Id: mp4.c,v 1.9 2004/01/13 15:54:09 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
+ *          Gildas Bazin <gbazin at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -88,6 +89,7 @@ typedef struct
 struct sout_mux_sys_t
 {
     vlc_bool_t b_mov;
+    vlc_bool_t b_64_ext;
 
     uint64_t i_mdat_pos;
     uint64_t i_pos;
@@ -173,11 +175,11 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_mdat_pos = p_sys->i_pos;
 
         box_send( p_mux, box );
-
-        /* FIXME FIXME
-         * Quicktime actually doesn't like the 64 bits extensions !!! */
-        p_sys->b_mov = VLC_TRUE;
     }
+
+    /* FIXME FIXME
+     * Quicktime actually doesn't like the 64 bits extensions !!! */
+    p_sys->b_64_ext = VLC_FALSE;
 
     /* Now add mdat header */
     box = box_new( "mdat" );
@@ -308,9 +310,9 @@ static bo_t *GetWaveTag( mp4_stream_t *p_stream )
     box_fix( box );
     box_gather( wave, box );
 
-    box = box_new( "    " );
-    box_fix( box );
-    box_gather( wave, box );
+    /* wazza ? */
+    bo_add_32be( wave, 8 ); /* new empty box */
+    bo_add_32be( wave, 0 ); /* box label */
 
     box_fix( wave );
 
@@ -396,7 +398,7 @@ static void Close( vlc_object_t * p_this )
     moov = box_new( "moov" );
 
     /* *** add /moov/mvhd *** */
-    if( p_sys->b_mov )
+    if( !p_sys->b_64_ext )
     {
         mvhd = box_full_new( "mvhd", 0, 0 );
         bo_add_32be( mvhd, get_timestamp() );   // creation time
@@ -487,9 +489,13 @@ static void Close( vlc_object_t * p_this )
         trak = box_new( "trak" );
 
         /* *** add /moov/trak/tkhd *** */
-        if( p_sys->b_mov )
+        if( !p_sys->b_64_ext )
         {
-            tkhd = box_full_new( "tkhd", 0, 1 );
+            if( p_sys->b_mov )
+                tkhd = box_full_new( "tkhd", 0, 0x0f );
+            else
+                tkhd = box_full_new( "tkhd", 0, 1 );
+
             bo_add_32be( tkhd, get_timestamp() );       // creation time
             bo_add_32be( tkhd, get_timestamp() );       // modification time
             bo_add_32be( tkhd, p_stream->i_track_id );
@@ -500,7 +506,11 @@ static void Close( vlc_object_t * p_this )
         }
         else
         {
-            tkhd = box_full_new( "tkhd", 1, 1 );
+            if( p_sys->b_mov )
+                tkhd = box_full_new( "tkhd", 1, 0x0f );
+            else
+                tkhd = box_full_new( "tkhd", 1, 1 );
+
             bo_add_64be( tkhd, get_timestamp() );       // creation time
             bo_add_64be( tkhd, get_timestamp() );       // modification time
             bo_add_32be( tkhd, p_stream->i_track_id );
@@ -539,7 +549,7 @@ static void Close( vlc_object_t * p_this )
         mdia = box_new( "mdia" );
 
         /* media header */
-        if( p_sys->b_mov )
+        if( !p_sys->b_64_ext )
         {
             mdhd = box_full_new( "mdhd", 0, 0 );
             bo_add_32be( mdhd, get_timestamp() );   // creation time
@@ -582,10 +592,12 @@ static void Close( vlc_object_t * p_this )
 
         if( p_stream->p_fmt->i_cat == AUDIO_ES )
         {
+            bo_add_8( hdlr, 13 );
             bo_add_mem( hdlr, 13, "SoundHandler" );
         }
         else
         {
+            bo_add_8( hdlr, 13 );
             bo_add_mem( hdlr, 13, "VideoHandler" );
         }
 
