@@ -82,6 +82,7 @@ struct vout_sys_t
     NSAutoreleasePool *o_pool;
     NSRect s_rect;
     VLCWindow * o_window;
+    VLCQTView * o_qtview;
 
     int i_opengl;
     int b_pos_saved;

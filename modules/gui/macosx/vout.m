@@ -63,22 +63,23 @@ struct picture_sys_t
  * Local prototypes
  *****************************************************************************/
 
-static int  vout_Init      ( vout_thread_t * );
-static void vout_End       ( vout_thread_t * );
-static int  vout_Manage    ( vout_thread_t * );
-static void vout_Display   ( vout_thread_t *, picture_t * );
+static int  InitVideo           ( vout_thread_t * );
+static void EndVideo            ( vout_thread_t * );
+static int  ManageVideo         ( vout_thread_t * );
+static void DisplayVideo        ( vout_thread_t *, picture_t * );
+static int  ControlVideo        ( vout_thread_t *, int, va_list );
 
-static int  CoCreateWindow     ( vout_thread_t * );
-static int  CoDestroyWindow    ( vout_thread_t * );
-static int  CoToggleFullscreen ( vout_thread_t * );
+static int  CoCreateWindow      ( vout_thread_t * );
+static int  CoDestroyWindow     ( vout_thread_t * );
+static int  CoToggleFullscreen  ( vout_thread_t * );
 
-static void VLCHideMouse       ( vout_thread_t *, BOOL );
+static void VLCHideMouse        ( vout_thread_t *, BOOL );
 
-static void QTScaleMatrix      ( vout_thread_t * );
-static int  QTCreateSequence   ( vout_thread_t * );
-static void QTDestroySequence  ( vout_thread_t * );
-static int  QTNewPicture       ( vout_thread_t *, picture_t * );
-static void QTFreePicture      ( vout_thread_t *, picture_t * );
+static void QTScaleMatrix       ( vout_thread_t * );
+static int  QTCreateSequence    ( vout_thread_t * );
+static void QTDestroySequence   ( vout_thread_t * );
+static int  QTNewPicture        ( vout_thread_t *, picture_t * );
+static void QTFreePicture       ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * OpenVideo: allocates MacOS X video thread output method
@@ -88,9 +89,9 @@ static void QTFreePicture      ( vout_thread_t *, picture_t * );
 int E_(OpenVideo) ( vlc_object_t *p_this )
 {   
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
+    vlc_value_t val;
     OSErr err;
     int i_timeout;
-    char *psz_vout_type;
 
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
@@ -118,22 +119,36 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         return( 1 );
     }
 
+    p_vout->pf_init = InitVideo;
+    p_vout->pf_end = EndVideo;
+    p_vout->pf_manage = ManageVideo;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = DisplayVideo;
+    p_vout->pf_control = ControlVideo;
+
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
     p_vout->p_sys->b_mouse_moved = VLC_TRUE;
     p_vout->p_sys->i_time_mouse_last_moved = mdate();
 
-    /* set window size */
+    /* set original window size */
     p_vout->p_sys->s_rect.size.width = p_vout->i_window_width;
     p_vout->p_sys->s_rect.size.height = p_vout->i_window_height;
 
+    var_Create( p_vout, "macosx-vout", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-vdev", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-fill", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-stretch", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-opaqueness", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "macosx-opengl-effect", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    
     /* Check if we should use QuickTime or OpenGL */
-    psz_vout_type = config_GetPsz( p_vout, "macosx-vout" );
+    var_Get( p_vout, "macosx-vout", &val);
 
-    if( !strncmp( psz_vout_type, "auto", 4 ) )
+    if( !strncmp( val.psz_string, "auto", 4 ) )
     {
         p_vout->p_sys->i_opengl = CGDisplayUsesOpenGLAcceleration( kCGDirectMainDisplay );
     }
-    else if( !strncmp( psz_vout_type, "opengl", 6 ) )
+    else if( !strncmp( val.psz_string, "opengl", 6 ) )
     {
         p_vout->p_sys->i_opengl = VLC_TRUE;
     }
@@ -141,7 +156,7 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     {
         p_vout->p_sys->i_opengl = VLC_FALSE;
     }
-    free( psz_vout_type );
+    free( val.psz_string );
     
     if( !p_vout->p_sys->i_opengl )
     {
@@ -158,12 +173,13 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
             free( p_vout->p_sys->p_matrix );
             DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
             free( p_vout->p_sys );
-            return( 1 );
+            return VLC_EGENERIC;
         }
 
         /* Damn QT isn't thread safe. so keep a lock in the p_vlc object */
         vlc_mutex_lock( &p_vout->p_vlc->quicktime_lock );
 
+        /* Can we find the right chroma ? */
         err = FindCodec( kYUV420CodecType, bestSpeedCodec,
                             nil, &p_vout->p_sys->img_dc );
         
@@ -190,17 +206,19 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
     }
     else
     {
+        p_vout->output.i_chroma = VLC_FOURCC('Y','U','Y','2');
         msg_Dbg( p_vout, "using OpenGL mode" );
     }
 
+    /* Setup the menuitem for the multiple displays. Read the vlc preference (macosx-vdev) for the primary display */
     NSArray * o_screens = [NSScreen screens];
     if( [o_screens count] > 0 && var_Type( p_vout, "video-device" ) == 0 )
     {
         int i = 1;
-        vlc_value_t val, text;
+        vlc_value_t val2, text;
         NSScreen * o_screen;
 
-        int i_option = config_GetInt( p_vout, "macosx-vdev" );
+        var_Get( p_vout, "macosx-vdev", &val );
 
         var_Create( p_vout, "video-device", VLC_VAR_INTEGER |
                                             VLC_VAR_HASCHOICE ); 
@@ -219,13 +237,13 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
                       (int)s_rect.size.width, (int)s_rect.size.height ); 
 
             text.psz_string = psz_temp;
-            val.i_int = i;
+            val2.i_int = i;
             var_Change( p_vout, "video-device",
-                        VLC_VAR_ADDCHOICE, &val, &text );
+                        VLC_VAR_ADDCHOICE, &val2, &text );
 
-            if( ( i - 1 ) == i_option )
+            if( ( i - 1 ) == val.i_int )
             {
-                var_Set( p_vout, "video-device", val );
+                var_Set( p_vout, "video-device", val2 );
             }
             i++;
         }
@@ -233,37 +251,66 @@ int E_(OpenVideo) ( vlc_object_t *p_this )
         var_AddCallback( p_vout, "video-device", vout_VarCallback,
                          NULL );
 
-        val.b_bool = VLC_TRUE;
-        var_Set( p_vout, "intf-change", val );
+        val2.b_bool = VLC_TRUE;
+        var_Set( p_vout, "intf-change", val2 );
     }
 
+    /* Spawn window */
     if( CoCreateWindow( p_vout ) )
     {
-        msg_Err( p_vout, "unable to create window" );
+        msg_Err( p_vout, "unable to create a window" );
         if( !p_vout->p_sys->i_opengl )
         {
             free( p_vout->p_sys->p_matrix );
             DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
         }
         free( p_vout->p_sys ); 
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
-    p_vout->pf_init = vout_Init;
-    p_vout->pf_end = vout_End;
-    p_vout->pf_manage = vout_Manage;
-    p_vout->pf_render = NULL;
-    p_vout->pf_display = vout_Display;
-
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
- * vout_Init: initialize video thread output method
+ * CloseVideo: destroy video thread output method
  *****************************************************************************/
-static int vout_InitOpenGL( vout_thread_t *p_vout );
-static int vout_InitQuickTime( vout_thread_t *p_vout );
-static int vout_Init( vout_thread_t *p_vout )
+void E_(CloseVideo) ( vlc_object_t *p_this )
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init]; 
+    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+
+    if( CoDestroyWindow( p_vout ) )
+    {
+        msg_Err( p_vout, "unable to destroy window" );
+    }
+
+    if ( p_vout->p_sys->p_fullscreen_state != NULL )
+    {
+        EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
+    }
+
+    if( !p_vout->p_sys->i_opengl )
+    {
+        /* Clean Up Quicktime environment */
+        ExitMovies();
+        free( p_vout->p_sys->p_matrix );
+        DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
+    }
+    else
+    {
+        [p_vout->p_sys->o_glview cleanUp];
+    }
+
+    [o_pool release];
+    free( p_vout->p_sys );
+}
+
+/*****************************************************************************
+ * InitVideo: initialize video thread output method
+ *****************************************************************************/
+static int InitOpenGL   ( vout_thread_t *p_vout );
+static int InitQuickTime( vout_thread_t *p_vout );
+static int InitVideo    ( vout_thread_t *p_vout )
 {
     I_OUTPUTPICTURES = 0;
 
@@ -276,17 +323,17 @@ static int vout_Init( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->i_opengl )
     {
-        return vout_InitOpenGL( p_vout );
+        return InitOpenGL( p_vout );
     }
     else
     {
-        return vout_InitQuickTime( p_vout );    
+        return InitQuickTime( p_vout );    
     }
 }
 
-static int vout_InitOpenGL( vout_thread_t *p_vout )
+static int InitOpenGL( vout_thread_t *p_vout )
 {
-    picture_t *p_pic;
+    picture_t *p_pic = NULL;
     int i_bytes;
     int i_index;
     
@@ -304,9 +351,7 @@ static int vout_InitOpenGL( vout_thread_t *p_vout )
             &p_vout->p_sys->p_data_orig[1], 16, i_bytes );
     p_vout->p_sys->i_cur_pic = 1;
 
-    /* We declare only one picture and will switch buffers
-       manually */
-    p_pic = NULL;
+    /* We declare only one picture and will switch buffers manually */
     while( I_OUTPUTPICTURES < 1 )
     {
         /* Find an empty picture slot */
@@ -351,7 +396,7 @@ static int vout_InitOpenGL( vout_thread_t *p_vout )
     return 0;
 }
 
-static int vout_InitQuickTime( vout_thread_t *p_vout )
+static int InitQuickTime( vout_thread_t *p_vout )
 {
     picture_t *p_pic;
     int i_index;
@@ -379,13 +424,9 @@ static int vout_InitQuickTime( vout_thread_t *p_vout )
                 break;
             }
         }
-        if( p_pic == NULL )
-        {
-            break;
-        }
 
         /* Allocate the picture */
-        if( QTNewPicture( p_vout, p_pic ) )
+        if( p_pic == NULL || QTNewPicture( p_vout, p_pic ) )
         {
             break;
         }
@@ -400,9 +441,9 @@ static int vout_InitQuickTime( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * vout_End: terminate video thread output method
+ * EndVideo: terminate video thread output method
  *****************************************************************************/
-static void vout_End( vout_thread_t *p_vout )
+static void EndVideo( vout_thread_t *p_vout )
 {
     int i_index;
 
@@ -428,46 +469,12 @@ static void vout_End( vout_thread_t *p_vout )
 }
 
 /*****************************************************************************
- * CloseVideo: destroy video thread output method
- *****************************************************************************/
-void E_(CloseVideo) ( vlc_object_t *p_this )
-{
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init]; 
-    vout_thread_t * p_vout = (vout_thread_t *)p_this;     
-
-    if( p_vout->p_sys->i_opengl )
-    {
-        [p_vout->p_sys->o_glview cleanUp];
-    }
-
-    if( CoDestroyWindow( p_vout ) )
-    {
-        msg_Err( p_vout, "unable to destroy window" );
-    }
-
-    if ( p_vout->p_sys->p_fullscreen_state != NULL )
-    {
-        EndFullScreen ( p_vout->p_sys->p_fullscreen_state, NULL );
-    }
-
-    if( !p_vout->p_sys->i_opengl )
-    {
-        ExitMovies();
-        free( p_vout->p_sys->p_matrix );
-        DisposeHandle( (Handle)p_vout->p_sys->h_img_descr );
-    }
-
-    [o_pool release];
-    free( p_vout->p_sys );
-}
-
-/*****************************************************************************
- * vout_Manage: handle events
+ * ManageVideo: handle events
  *****************************************************************************
  * This function should be called regularly by video output thread. It manages
  * console events. It returns a non null value on error.
  *****************************************************************************/
-static int vout_Manage( vout_thread_t *p_vout )
+static int ManageVideo( vout_thread_t *p_vout )
 {
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
@@ -517,7 +524,7 @@ static int vout_Manage( vout_thread_t *p_vout )
  *****************************************************************************
  * This function sends the currently rendered image to the display.
  *****************************************************************************/
-static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
+static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
     if( !p_vout->p_sys->i_opengl )
     {
@@ -571,6 +578,26 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 }
 
 /*****************************************************************************
+ * ControlVideo: control facility for the vout
+ *****************************************************************************/
+static int ControlVideo( vout_thread_t *p_vout, int i_query, va_list args )
+{
+    switch( i_query )
+    {
+        case VOUT_SET_ZOOM:
+            return VLC_SUCCESS;
+
+        case VOUT_SET_STAY_ON_TOP:
+            return VLC_SUCCESS;
+
+        case VOUT_CLOSE:
+        case VOUT_REPARENT:
+        default:
+            return vout_vaControlDefault( p_vout, i_query, args );
+    }
+}
+
+/*****************************************************************************
  * CoCreateWindow: create new window 
  *****************************************************************************
  * Returns 0 on success, 1 otherwise
@@ -578,16 +605,19 @@ static void vout_Display( vout_thread_t *p_vout, picture_t *p_pic )
 static int CoCreateWindow( vout_thread_t *p_vout )
 {
     vlc_value_t val;
-    VLCQTView * o_view;
     NSScreen * o_screen;
     vlc_bool_t b_main_screen;
     NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
 
+    /* Allocate the window. It will be autoreleased when it receives 'close' */
     p_vout->p_sys->o_window = [VLCWindow alloc];
     [p_vout->p_sys->o_window setReleasedWhenClosed: YES];
 
-    if( var_Get( p_vout, "video-device", &val ) < 0 )
+    /* Find out on which screen to open the window */
+    var_Get( p_vout, "video-device", &val );
+    if( val.i_int < 0 )
     {
+        /* No preference specified. Use the main screen */
         o_screen = [NSScreen mainScreen];
         b_main_screen = 1;
     }
@@ -605,7 +635,8 @@ static int CoCreateWindow( vout_thread_t *p_vout )
         {
             i_index--;
             o_screen = [o_screens objectAtIndex: i_index];
-            config_PutInt( p_vout, "macosx-vdev", i_index );
+            val.i_int = i_index;
+            var_Set( p_vout, "macosx-vdev", val );
             b_main_screen = (i_index == 0);
         }
     } 
@@ -619,6 +650,7 @@ static int CoCreateWindow( vout_thread_t *p_vout )
             BeginFullScreen( &p_vout->p_sys->p_fullscreen_state, NULL, 0, 0,
                              NULL, NULL, fullScreenAllowEvents );
 
+        /* Creates a window with size: screen_rect on o_screen */
         [p_vout->p_sys->o_window 
             initWithContentRect: screen_rect
             styleMask: NSBorderlessWindowMask
@@ -647,29 +679,27 @@ static int CoCreateWindow( vout_thread_t *p_vout )
             defer: NO screen: o_screen];
 
         [p_vout->p_sys->o_window setVout: p_vout];
-        [p_vout->p_sys->o_window setAlphaValue: config_GetFloat( p_vout, "macosx-opaqueness" )];
+        var_Get( p_vout, "macosx-opaqueness", &val);
+        [p_vout->p_sys->o_window setAlphaValue: val.f_float];
         
-        if( config_GetInt( p_vout, "video-on-top" ) )
-        {
-            [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
-        }
-        
-        if( !p_vout->p_sys->b_pos_saved )   
-        {
-            [p_vout->p_sys->o_window center];
-        }
+        var_Get( p_vout, "video-on-top", &val );
+        if( val.b_bool ) [p_vout->p_sys->o_window setLevel: NSStatusWindowLevel];
+
+        if( !p_vout->p_sys->b_pos_saved ) [p_vout->p_sys->o_window center];
     }
 
     if( !p_vout->p_sys->i_opengl )
     {
-        o_view = [[VLCQTView alloc] init];
-        /* FIXME: [o_view setMenu:] */
-        [p_vout->p_sys->o_window setContentView: o_view];
-        [o_view autorelease];
+#define o_qtview p_vout->p_sys->o_qtview
+        o_qtview = [[VLCQTView alloc] init];
+        [p_vout->p_sys->o_window setContentView: o_qtview];
+        [o_qtview autorelease];
 
-        [o_view lockFocus];
-        p_vout->p_sys->p_qdport = [o_view qdPort];
-        [o_view unlockFocus];
+        /* Retrieve the QuickDraw port */
+        [o_qtview lockFocus];
+        p_vout->p_sys->p_qdport = [o_qtview qdPort];
+        [o_qtview unlockFocus];
+#undef o_qtview
     }
     else
     {
@@ -701,6 +731,7 @@ static int CoDestroyWindow( vout_thread_t *p_vout )
     {
         NSRect s_rect;
 
+        /* remember the window position before we enter fullscreen */
         s_rect = [[p_vout->p_sys->o_window contentView] frame];
         p_vout->p_sys->s_rect.size = s_rect.size;
 
@@ -751,7 +782,7 @@ static int CoToggleFullscreen( vout_thread_t *p_vout )
         [p_vout->p_sys->o_glview initTextures];
         [p_vout->p_sys->o_glview reshape];
         [p_vout->p_sys->o_glview drawRect:
-            [p_vout->p_sys->o_glview bounds]];
+        [p_vout->p_sys->o_glview bounds]];
         [p_vout->p_sys->o_glview unlockFocus];
     }
     else
@@ -806,6 +837,7 @@ static void VLCHideMouse ( vout_thread_t *p_vout, BOOL b_hide )
 static void QTScaleMatrix( vout_thread_t *p_vout )
 {
     Rect s_rect;
+    vlc_value_t val;
     unsigned int i_width, i_height;
     Fixed factor_x, factor_y;
     unsigned int i_offset_x = 0;
@@ -816,7 +848,8 @@ static void QTScaleMatrix( vout_thread_t *p_vout )
     i_width = s_rect.right - s_rect.left;
     i_height = s_rect.bottom - s_rect.top;
 
-    if( config_GetInt( p_vout, "macosx-stretch" ) )
+    var_Get( p_vout, "macosx-stretch", &val );
+    if( val.b_bool )
     {
         factor_x = FixDiv( Long2Fix( i_width ),
                            Long2Fix( p_vout->output.i_width ) );
@@ -1461,7 +1494,7 @@ CATCH_MOUSE_EVENTS
 
 - (id) initWithFrame: (NSRect) frame vout: (vout_thread_t*) _p_vout
 {
-    char * psz_effect;
+    vlc_value_t val;
     p_vout = _p_vout;
     
     NSOpenGLPixelFormatAttribute attribs[] =
@@ -1494,18 +1527,18 @@ CATCH_MOUSE_EVENTS
     glClearColor( 0.0, 0.0, 0.0, 0.0 );
 
     /* Check if the user asked for useless visual effects */
-    psz_effect = config_GetPsz( p_vout, "macosx-opengl-effect" );
-    if( !psz_effect || !strcmp( psz_effect, "none" ))
+    var_Get( p_vout, "macosx-opengl-effect", &val );
+    if( !val.psz_string || !strcmp( val.psz_string, "none" ))
     {
         i_effect = OPENGL_EFFECT_NONE;
     }
-    else if( !strcmp( psz_effect, "cube" ) )
+    else if( !strcmp( val.psz_string, "cube" ) )
     {
         i_effect = OPENGL_EFFECT_CUBE;
 
         glEnable( GL_DEPTH_TEST );
     }
-    else if( !strcmp( psz_effect, "transparent-cube" ) )
+    else if( !strcmp( val.psz_string, "transparent-cube" ) )
     {
         i_effect = OPENGL_EFFECT_TRANSPARENT_CUBE;
 
@@ -1519,6 +1552,7 @@ CATCH_MOUSE_EVENTS
                   "\"none\"" );
         i_effect = OPENGL_EFFECT_NONE;
     }
+    if( val.psz_string ) free( val.psz_string );
 
     if( i_effect & ( OPENGL_EFFECT_CUBE |
                 OPENGL_EFFECT_TRANSPARENT_CUBE ) )
@@ -1539,8 +1573,11 @@ CATCH_MOUSE_EVENTS
     return self;
 }
 
-- (void) reshape
+- (void)reshape
 {
+    vlc_value_t val;
+    NSRect bounds;
+
     if( !initDone )
     {
         return;
@@ -1548,11 +1585,12 @@ CATCH_MOUSE_EVENTS
     
     [[self openGLContext] makeCurrentContext];
 
-    NSRect bounds = [self bounds];
+    bounds = [self bounds];
     glViewport( 0, 0, (GLint) bounds.size.width,
                 (GLint) bounds.size.height );
 
-    if( config_GetInt( p_vout, "macosx-stretch" ) )
+    var_Get( p_vout, "macosx-stretch", &val );
+    if( val.b_bool )
     {
         f_x = 1.0;
         f_y = 1.0;
@@ -1560,8 +1598,8 @@ CATCH_MOUSE_EVENTS
     else
     {
         /* Quad size is set in order to preserve the aspect ratio */
-        int fill = ( config_GetInt( p_vout, "macosx-fill" ) &&
-                     p_vout->b_fullscreen );
+        var_Get( p_vout, "macosx-fill", &val );
+        int fill = ( val.b_bool && p_vout->b_fullscreen );
         int large = ( bounds.size.height * p_vout->output.i_aspect <
                       bounds.size.width * VOUT_ASPECT_FACTOR );
         if( ( large && !fill ) || ( !large && fill ) )
@@ -1579,7 +1617,7 @@ CATCH_MOUSE_EVENTS
     }
 }
 
-- (void) initTextures
+- (void)initTextures
 {
     int i;
     [[self openGLContext] makeCurrentContext];
