@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.19 2003/01/17 18:19:43 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.20 2003/01/22 01:13:22 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -64,8 +64,7 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	  p_intf( p_interface ),
 	  fFilePanel( NULL ),
 	  fSubtitlesPanel( NULL ),
-	  fLastUpdateTime( system_time() ),
-	  fSettings( new BMessage( 'sett' ) )
+	  fLastUpdateTime( system_time() )
 {
     p_intf = p_interface;
     p_wrapper = p_intf->p_sys->p_wrapper;
@@ -186,8 +185,6 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	_SetMenusEnabled( false );
 	p_mediaControl->SetEnabled( false );
 
-	_RestoreSettings();
-
 	Show();
 }
 
@@ -195,7 +192,6 @@ InterfaceWindow::~InterfaceWindow()
 {
 	if (fPlaylistWindow)
 		fPlaylistWindow->ReallyQuit();
-	delete fSettings;
 }
 
 /*****************************************************************************
@@ -260,7 +256,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 				if( p_message->FindString( "device", &psz_device ) == B_OK )
 				{
 					BString device( psz_device );
-					p_wrapper->openDisc( type, device, 0, 0 );
+					p_wrapper->OpenDisc( type, device, 0, 0 );
 				}
 				_UpdatePlaylist();
 			}
@@ -405,8 +401,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			if ( playback_status > UNDEF_S )
 			{
 				int32 index;
-				if ( p_message->FindInt32( "index", &index ) == B_OK )
-					p_wrapper->toggleTitle( index );
+				if( p_message->FindInt32( "index", &index ) == B_OK )
+					p_wrapper->ToggleTitle( index );
 			}
 			break;
 		case PREV_CHAPTER:
@@ -423,8 +419,8 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			if ( playback_status > UNDEF_S )
 			{
 				int32 index;
-				if ( p_message->FindInt32( "index", &index ) == B_OK )
-                     p_wrapper->toggleChapter( index );
+				if( p_message->FindInt32( "index", &index ) == B_OK )
+                    p_wrapper->ToggleChapter( index );
 			}
 			break;
 		case PREV_FILE:
@@ -435,10 +431,10 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 			break;
 		// general next/prev functionality (skips to whatever makes most sense)
 		case NAVIGATE_PREV:
-			p_wrapper->navigatePrev();
+			p_wrapper->NavigatePrev();
 			break;
 		case NAVIGATE_NEXT:
-			p_wrapper->navigateNext();
+			p_wrapper->NavigateNext();
 			break;
 		// drag'n'drop and system messages
 		case B_REFS_RECEIVED:
@@ -526,7 +522,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
 					}
 				}
 				// give the list to VLC
-				p_wrapper->openFiles(&files, replace);
+				p_wrapper->OpenFiles(&files, replace);
 				_UpdatePlaylist();
 			}
 			break;
@@ -559,8 +555,6 @@ bool InterfaceWindow::QuitRequested()
 	
 	p_intf->b_die = 1;
 
-	_StoreSettings();
-
 	return( true );
 }
 
@@ -573,7 +567,7 @@ void InterfaceWindow::updateInterface()
     {
 		if ( acquire_sem( p_mediaControl->fScrubSem ) == B_OK )
 		{
-		    p_wrapper->setTimeAsFloat(p_mediaControl->GetSeekTo());
+		    p_wrapper->SetTimeAsFloat(p_mediaControl->GetSeekTo());
 		}
 		else if ( Lock() )
 		{
@@ -582,7 +576,7 @@ void InterfaceWindow::updateInterface()
 			bool hasChapters = p_wrapper->HasChapters();
 			p_mediaControl->SetStatus( p_wrapper->InputStatus(), 
 									   p_wrapper->InputRate() );
-			p_mediaControl->SetProgress( p_wrapper->getTimeAsFloat() );
+			p_mediaControl->SetProgress( p_wrapper->GetTimeAsFloat() );
 			_SetMenusEnabled( true, hasChapters, hasTitles );
 
 			_UpdateSpeedMenu( p_wrapper->InputRate() );
@@ -590,7 +584,7 @@ void InterfaceWindow::updateInterface()
 			// enable/disable skip buttons
 			bool canSkipPrev;
 			bool canSkipNext;
-			p_wrapper->getNavCapabilities( &canSkipPrev, &canSkipNext );
+			p_wrapper->GetNavCapabilities( &canSkipPrev, &canSkipNext );
 			p_mediaControl->SetSkippable( canSkipPrev, canSkipNext );
 
 			if ( p_wrapper->HasAudio() )
@@ -716,97 +710,9 @@ InterfaceWindow::_UpdateSpeedMenu( int rate )
 void
 InterfaceWindow::_InputStreamChanged()
 {
-//printf("InterfaceWindow::_InputStreamChanged()\n");
 	// TODO: move more stuff from updateInterface() here!
 	snooze( 400000 );
 	p_wrapper->SetVolume( p_mediaControl->GetVolume() );
-}
-
-/*****************************************************************************
- * InterfaceWindow::_LoadSettings
- *****************************************************************************/
-status_t
-InterfaceWindow::_LoadSettings( BMessage* message, const char* fileName, const char* folder )
-{
-	status_t ret = B_BAD_VALUE;
-	if ( message )
-	{
-		BPath path;
-		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
-		{
-			// passing folder is optional
-			if ( folder )
-				ret = path.Append( folder );
-			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
-			{
-				BFile file( path.Path(), B_READ_ONLY );
-				if ( ( ret = file.InitCheck() ) == B_OK )
-				{
-					ret = message->Unflatten( &file );
-					file.Unset();
-				}
-			}
-		}
-	}
-	return ret;
-}
-
-/*****************************************************************************
- * InterfaceWindow::_SaveSettings
- *****************************************************************************/
-status_t
-InterfaceWindow::_SaveSettings( BMessage* message, const char* fileName, const char* folder )
-{
-	status_t ret = B_BAD_VALUE;
-	if ( message )
-	{
-		BPath path;
-		if ( ( ret = find_directory( B_USER_SETTINGS_DIRECTORY, &path ) ) == B_OK )
-		{
-			// passing folder is optional
-			if ( folder && ( ret = path.Append( folder ) ) == B_OK )
-				ret = create_directory( path.Path(), 0777 );
-			if ( ret == B_OK && ( ret = path.Append( fileName ) ) == B_OK )
-			{
-				BFile file( path.Path(), B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
-				if ( ( ret = file.InitCheck() ) == B_OK )
-				{
-					ret = message->Flatten( &file );
-					file.Unset();
-				}
-			}
-		}
-	}
-	return ret;
-}
-
-/*****************************************************************************
- * InterfaceWindow::_RestoreSettings
- *****************************************************************************/
-bool
-make_sure_frame_is_on_screen( BRect& frame )
-{
-	BScreen screen( B_MAIN_SCREEN_ID );
-	if (frame.IsValid() && screen.IsValid()) {
-		if (!screen.Frame().Contains(frame)) {
-			// make sure frame fits in the screen
-			if (frame.Width() > screen.Frame().Width())
-				frame.right -= frame.Width() - screen.Frame().Width() + 10.0;
-			if (frame.Height() > screen.Frame().Height())
-				frame.bottom -= frame.Height() - screen.Frame().Height() + 30.0;
-			// frame is now at the most the size of the screen
-			if (frame.right > screen.Frame().right)
-				frame.OffsetBy(-(frame.right - screen.Frame().right), 0.0);
-			if (frame.bottom > screen.Frame().bottom)
-				frame.OffsetBy(0.0, -(frame.bottom - screen.Frame().bottom));
-			if (frame.left < screen.Frame().left)
-				frame.OffsetBy((screen.Frame().left - frame.left), 0.0);
-			if (frame.top < screen.Frame().top)
-				frame.OffsetBy(0.0, (screen.Frame().top - frame.top));
-		}
-		return true;
-	}
-	return false;
 }
 
 void
@@ -821,87 +727,6 @@ make_sure_frame_is_within_limits( BRect& frame, float minWidth, float minHeight,
 		frame.right = frame.left + maxWidth;
 	if ( frame.Height() > maxHeight )
 		frame.bottom = frame.top + maxHeight;
-}
-
-/*****************************************************************************
- * InterfaceWindow::_RestoreSettings
- *****************************************************************************/
-void
-InterfaceWindow::_RestoreSettings()
-{
-	if ( _LoadSettings( fSettings, "interface_settings", "VideoLAN Client" ) == B_OK )
-	{
-		BRect mainFrame;
-		if ( fSettings->FindRect( "main frame", &mainFrame ) == B_OK )
-		{
-			// sanity checks: make sure window is not too big/small
-			// and that it's not off-screen
-			float minWidth, maxWidth, minHeight, maxHeight;
-			GetSizeLimits( &minWidth, &maxWidth, &minHeight, &maxHeight );
-
-			make_sure_frame_is_within_limits( mainFrame,
-											  minWidth, minHeight, maxWidth, maxHeight );
-			make_sure_frame_is_on_screen( mainFrame );
-
-
-			MoveTo( mainFrame.LeftTop() );
-			ResizeTo( mainFrame.Width(), mainFrame.Height() );
-		}
-		if ( fPlaylistWindow->Lock() )
-		{
-			BRect playlistFrame;
-			if (fSettings->FindRect( "playlist frame", &playlistFrame ) == B_OK )
-			{
-				// sanity checks: make sure window is not too big/small
-				// and that it's not off-screen
-				float minWidth, maxWidth, minHeight, maxHeight;
-				fPlaylistWindow->GetSizeLimits( &minWidth, &maxWidth, &minHeight, &maxHeight );
-
-				make_sure_frame_is_within_limits( playlistFrame,
-												  minWidth, minHeight, maxWidth, maxHeight );
-				make_sure_frame_is_on_screen( playlistFrame );
-
-				fPlaylistWindow->MoveTo( playlistFrame.LeftTop() );
-				fPlaylistWindow->ResizeTo( playlistFrame.Width(), playlistFrame.Height() );
-			}
-			
-			bool showing;
-			if ( fSettings->FindBool( "playlist showing", &showing ) == B_OK )
-			{
-				if ( showing )
-				{
-					if ( fPlaylistWindow->IsHidden() )
-						fPlaylistWindow->Show();
-				}
-				else
-				{
-					if ( !fPlaylistWindow->IsHidden() )
-						fPlaylistWindow->Hide();
-				}
-			}
-
-			fPlaylistWindow->Unlock();
-		}
-	}
-}
-
-/*****************************************************************************
- * InterfaceWindow::_StoreSettings
- *****************************************************************************/
-void
-InterfaceWindow::_StoreSettings()
-{
-	if ( fSettings->ReplaceRect( "main frame", Frame() ) != B_OK )
-		fSettings->AddRect( "main frame", Frame() );
-	if ( fPlaylistWindow->Lock() )
-	{
-		if (fSettings->ReplaceRect( "playlist frame", fPlaylistWindow->Frame() ) != B_OK)
-			fSettings->AddRect( "playlist frame", fPlaylistWindow->Frame() );
-		if (fSettings->ReplaceBool( "playlist showing", !fPlaylistWindow->IsHidden() ) != B_OK)
-			fSettings->AddBool( "playlist showing", !fPlaylistWindow->IsHidden() );
-		fPlaylistWindow->Unlock();
-	}
-	_SaveSettings( fSettings, "interface_settings", "VideoLAN Client" );
 }
 
 /*****************************************************************************
@@ -1026,7 +851,7 @@ void LanguageMenu::_GetChannels()
     BMenuItem *item;
     BList *list;
     
-    if( ( list = p_wrapper->InputGetChannels( kind ) ) == NULL )
+    if( ( list = p_wrapper->GetChannels( kind ) ) == NULL )
         return;
     
     for( int i = 0; i < list->CountItems(); i++ )
@@ -1061,36 +886,21 @@ TitleMenu::~TitleMenu()
  *****************************************************************************/
 void TitleMenu::AttachedToWindow()
 {
-	// make title menu empty
-	while ( BMenuItem* item = RemoveItem( 0L ) )
-		delete item;
+    BMenuItem *item;
+    BList *list;
 
-#if 0
-	input_thread_t* input = p_intf->p_sys->p_input;
-	if ( input )
-	{
-		// lock stream access
-		vlc_mutex_lock( &input->stream.stream_lock );
-		// populate menu according to current stream
-		int32 numTitles = input->stream.i_area_nb;
-		if ( numTitles > 1 )
-		{
-			// disallow title 0!
-			for ( int32 i = 1; i < numTitles; i++ )
-			{
-				BMessage* message = new BMessage( TOGGLE_TITLE );
-				message->AddInt32( "index", i );
-				BString helper( "" );
-				helper << i;
-				BMenuItem* item = new BMenuItem( helper.String(), message );
-				item->SetMarked( input->stream.p_selected_area->i_id == i );
-				AddItem( item );
-			}
-		}
-		// done messing with stream
-		vlc_mutex_unlock( &input->stream.stream_lock );
-	}
-#endif
+	while( ( item = RemoveItem( 0L ) ) )
+		delete item;
+    
+    if( ( list = p_intf->p_sys->p_wrapper->GetTitles() ) == NULL )
+        return;
+    
+    for( int i = 0; i < list->CountItems(); i++ )
+    {
+        item = (BMenuItem*)list->ItemAt( i );
+        AddItem( item );
+    }
+    
 	BMenu::AttachedToWindow();
 }
 
@@ -1116,35 +926,21 @@ ChapterMenu::~ChapterMenu()
  *****************************************************************************/
 void ChapterMenu::AttachedToWindow()
 {
-	// make title menu empty
-	while ( BMenuItem* item = RemoveItem( 0L ) )
-		delete item;
+    BMenuItem *item;
+    BList *list;
 
-#if 0
-	input_thread_t* input = p_intf->p_sys->p_input;
-	if ( input )
-	{
-		// lock stream access
-		vlc_mutex_lock( &input->stream.stream_lock );
-		// populate menu according to current stream
-		int32 numChapters = input->stream.p_selected_area->i_part_nb;
-		if ( numChapters > 1 )
-		{
-			for ( int32 i = 0; i < numChapters; i++ )
-			{
-				BMessage* message = new BMessage( TOGGLE_CHAPTER );
-				message->AddInt32( "index", i );
-				BString helper( "" );
-				helper << i + 1;
-				BMenuItem* item = new BMenuItem( helper.String(), message );
-				item->SetMarked( input->stream.p_selected_area->i_part == i );
-				AddItem( item );
-			}
-		}
-		// done messing with stream
-		vlc_mutex_unlock( &input->stream.stream_lock );
-	}
+	while( ( item = RemoveItem( 0L ) ) )
+		delete item;
+    
+    if( ( list = p_intf->p_sys->p_wrapper->GetChapters() ) == NULL )
+        return;
+    
+    for( int i = 0; i < list->CountItems(); i++ )
+    {
+        item = (BMenuItem*)list->ItemAt( i );
+        AddItem( item );
+    }
+    
 	BMenu::AttachedToWindow();
-#endif
 }
 

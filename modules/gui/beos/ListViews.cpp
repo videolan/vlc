@@ -2,7 +2,7 @@
  * ListViews.h: BeOS interface list view class implementation
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: ListViews.cpp,v 1.1 2002/09/30 18:30:27 titer Exp $
+ * $Id: ListViews.cpp,v 1.2 2003/01/22 01:13:22 titer Exp $
  *
  * Authors: Stephan Aßmus <stippi@yellowbites.com>
  *
@@ -475,7 +475,8 @@ DragSortableListView::DrawItem( BListItem *item, BRect itemFrame, bool complete 
 /*****************************************************************************
  * PlaylistView class
  *****************************************************************************/
-PlaylistView::PlaylistView( BRect frame, InterfaceWindow* mainWindow )
+PlaylistView::PlaylistView( BRect frame, InterfaceWindow* mainWindow,
+                            VlcWrapper * p_wrapper )
 	: DragSortableListView( frame, "playlist listview",
 							B_MULTIPLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES,
 							B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED
@@ -484,6 +485,7 @@ PlaylistView::PlaylistView( BRect frame, InterfaceWindow* mainWindow )
 	  fPlaying( false ),
 	  fMainWindow( mainWindow )
 {
+    this->p_wrapper = p_wrapper;
 }
 
 PlaylistView::~PlaylistView()
@@ -516,7 +518,7 @@ PlaylistView::MouseDown( BPoint where )
 		{
 			if ( clicks == 2 )
 			{
-				/* Intf_VLCWrapper::playlistJumpTo( i ); */
+				p_wrapper->PlaylistJumpTo( i );
 				handled = true;
 			}
 			else if ( i == fCurrentIndex )

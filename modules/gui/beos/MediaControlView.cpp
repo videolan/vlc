@@ -2,7 +2,7 @@
  * MediaControlView.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.cpp,v 1.10 2003/01/12 02:08:38 titer Exp $
+ * $Id: MediaControlView.cpp,v 1.11 2003/01/22 01:13:22 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -1311,13 +1311,13 @@ PositionInfoView::Pulse()
 	if ( now - fLastPulseUpdate > 900000 )
 	{
 		int32 index, size;
-		p_intf->p_sys->p_wrapper->getPlaylistInfo( index, size );
+		p_intf->p_sys->p_wrapper->GetPlaylistInfo( index, size );
 		SetFile( index, size );
 		p_intf->p_sys->p_wrapper->TitleInfo( index, size );
 		SetTitle( index, size );
 		p_intf->p_sys->p_wrapper->ChapterInfo( index, size );
 		SetChapter( index, size );
-		SetTime( p_intf->p_sys->p_wrapper->getTimeAsString() );
+		SetTime( p_intf->p_sys->p_wrapper->GetTimeAsString() );
 		fLastPulseUpdate = now;
 	}
 }

@@ -2,7 +2,7 @@
  * PlayListWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: PlayListWindow.cpp,v 1.5 2002/12/09 07:57:04 titer Exp $
+ * $Id: PlayListWindow.cpp,v 1.6 2003/01/22 01:13:22 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -130,7 +130,7 @@ editMenu->SetEnabled( false );
 	frame.top += fMenuBar->Bounds().IntegerHeight() + 1;
 	frame.right -= B_V_SCROLL_BAR_WIDTH;
 
-	fListView = new PlaylistView( frame, fMainWindow );
+	fListView = new PlaylistView( frame, fMainWindow, p_wrapper );
 	fBackgroundView = new BScrollView( "playlist scrollview",
 									   fListView, B_FOLLOW_ALL_SIDES,
 									   0, false, true,

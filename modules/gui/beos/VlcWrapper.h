@@ -2,7 +2,7 @@
  * VlcWrapper.h: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.14 2003/01/17 18:19:43 titer Exp $
+ * $Id: VlcWrapper.h,v 1.15 2003/01/22 01:13:22 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -62,66 +62,66 @@ public:
     
     bool UpdateInputAndAOut();
     
-    /* input */
-    bool HasInput();
-    int InputStatus();
-    int InputRate();
-    void InputSlower();
-    void InputFaster();
-    BList * InputGetChannels( int i_cat );
-    void openFiles( BList *o_files, bool replace = true );
-    void openDisc( BString o_type, BString o_device,
-                   int i_title, int i_chapter );
-    void LoadSubFile( char * psz_file );
-    void ToggleLanguage( int i_language );
-    void ToggleSubtitle( int i_subtitle );
-    const char* getTimeAsString();
-    float getTimeAsFloat();
-    void setTimeAsFloat( float i_offset );
-    bool IsPlaying();
+    /* Input */
+    bool         HasInput();
+    int          InputStatus();
+    int          InputRate();
+    void         InputSlower();
+    void         InputFaster();
+    BList *      GetChannels( int i_cat );
+    void         ToggleLanguage( int i_language );
+    void         ToggleSubtitle( int i_subtitle );
+    const char * GetTimeAsString();
+    float        GetTimeAsFloat();
+    void         SetTimeAsFloat( float i_offset );
+    bool         IsPlaying();
         
     /* Playlist */
-    int PlaylistSize();
-    char *PlaylistItemName( int );
-    int PlaylistCurrent();
-    int PlaylistStatus();
-    bool PlaylistPlay();
-    void PlaylistPause();
-    void PlaylistStop();
-    void PlaylistNext();
-    void PlaylistPrev();
-    void PlaylistSkip(int i);
-    void PlaylistGoto(int i);
-    void PlaylistLoop(); 
-    BList* PlaylistAsArray();
-    bool PlaylistPlaying();
-    void getPlaylistInfo( int32& currentIndex,
-                            int32& maxIndex );
-    void PlaylistJumpTo( int );
-    void getNavCapabilities( bool* canSkipPrev,
-                             bool* canSkipNext );
-	void navigatePrev();
-	void navigateNext();
+    void    OpenFiles( BList *o_files, bool replace = true );
+    void    OpenDisc( BString o_type, BString o_device,
+                     int i_title, int i_chapter );
+    int     PlaylistSize();
+    char *  PlaylistItemName( int );
+    int     PlaylistCurrent();
+    bool    PlaylistPlay();
+    void    PlaylistPause();
+    void    PlaylistStop();
+    void    PlaylistNext();
+    void    PlaylistPrev();
+    bool    PlaylistPlaying();
+    void    GetPlaylistInfo( int32& currentIndex,
+                             int32& maxIndex );
+    void    PlaylistJumpTo( int );
+    void    GetNavCapabilities( bool * canSkipPrev,
+                                bool * canSkipNext );
+	void    NavigatePrev();
+	void    NavigateNext();
 
-    /* audio */
+    /* Audio */
+    bool           HasAudio();
     unsigned short GetVolume();
-    void SetVolume( int value );
-    void VolumeMute();
-    void VolumeRestore();
-    bool IsMuted();
-    bool HasAudio();
+    void           SetVolume( int value );
+    void           VolumeMute();
+    void           VolumeRestore();
+    bool           IsMuted();
 
     /* DVD */
-    bool HasTitles();
-    void PrevTitle();
-    void NextTitle();
-    bool HasChapters();
-    void PrevChapter();
-    void NextChapter();
-    void TitleInfo( int32& currentIndex, int32& maxIndex );
-    void ChapterInfo( int32& currentIndex, int32& maxIndex );
-    void toggleTitle( int i_title );
-    void toggleChapter( int i_chapter );
+    bool    HasTitles();
+    BList * GetTitles();
+    void    PrevTitle();
+    void    NextTitle();
+    void    ToggleTitle( int i_title );
+    void    TitleInfo( int32& currentIndex, int32& maxIndex );
+
+    bool    HasChapters();
+    BList * GetChapters();
+    void    PrevChapter();
+    void    NextChapter();
+    void    ToggleChapter( int i_chapter );
+    void    ChapterInfo( int32& currentIndex, int32& maxIndex );
+    
+    /* Miscellanous */
+    void         LoadSubFile( char * psz_file );
     
 private:
     intf_thread_t * p_intf;
@@ -129,4 +129,3 @@ private:
     playlist_t * p_playlist;
     aout_instance_t * p_aout;
 };
-

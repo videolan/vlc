@@ -2,7 +2,7 @@
  * VlcWrapper.cpp: BeOS plugin for vlc (derived from MacOS X port)
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.20 2003/01/17 18:19:43 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.21 2003/01/22 01:13:22 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -106,11 +106,8 @@ bool VlcWrapper::UpdateInputAndAOut()
 bool VlcWrapper::HasInput()
 {
     return ( p_input != NULL );
-//    return ( PlaylistSize() > 0 );
 }
 
-/* status (UNDEF_S, PLAYING_S, PAUSE_S, FORWARD_S, BACKWARD_S,
-   REWIND_S, NOT_STARTED_S, START_S) */
 int VlcWrapper::InputStatus()
 {
     if( !p_input )
@@ -145,7 +142,7 @@ void VlcWrapper::InputFaster()
     }
 }
 
-BList * VlcWrapper::InputGetChannels( int i_cat )
+BList * VlcWrapper::GetChannels( int i_cat )
 {
     if( p_input )
     {
@@ -219,50 +216,6 @@ BList * VlcWrapper::InputGetChannels( int i_cat )
     return NULL;
 }
 
-void VlcWrapper::openFiles( BList* o_files, bool replace )
-{
-    BString *o_file;
-    int size = PlaylistSize();
-	bool wasEmpty = ( size < 1 );
-
-    /* delete current playlist */
-    if( replace )
-    {
-        for( int i = 0; i < size; i++ )
-        {
-            playlist_Delete( p_playlist, 0 );
-        }
-    }
-
-    /* append files */
-    while( ( o_file = (BString *)o_files->LastItem() ) )
-    {
-        playlist_Add( p_playlist, o_file->String(),
-                      PLAYLIST_APPEND, PLAYLIST_END );
-        o_files->RemoveItem(o_files->CountItems() - 1);
-    }
-    
-    /* eventually restart playing */
-    if( replace || wasEmpty )
-    {
-        playlist_Stop( p_playlist );
-        playlist_Play( p_playlist );
-    }
-}
-
-void VlcWrapper::openDisc(BString o_type, BString o_device, int i_title, int i_chapter)
-{
-    if( p_intf->p_sys->b_dvdold )
-        o_device.Prepend( "dvdold:" );
-    playlist_Add( p_playlist, o_device.String(),
-                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
-}
-
-void VlcWrapper::LoadSubFile( char * psz_file )
-{
-    config_PutPsz( p_intf, "sub-file", strdup( psz_file ) );
-}
-
 void VlcWrapper::ToggleLanguage( int i_language )
 {
     es_descriptor_t * p_es = NULL;
@@ -331,7 +284,7 @@ void VlcWrapper::ToggleSubtitle( int i_subtitle )
     }
 }
 
-const char*  VlcWrapper::getTimeAsString()
+const char * VlcWrapper::GetTimeAsString()
 {
     static char psz_currenttime[ OFFSETTOTIME_MAX_SIZE ];
         
@@ -347,7 +300,7 @@ const char*  VlcWrapper::getTimeAsString()
     return(psz_currenttime);
 }
 
-float  VlcWrapper::getTimeAsFloat()
+float VlcWrapper::GetTimeAsFloat()
 {
     float f_time = 0.0;
 
@@ -363,7 +316,7 @@ float  VlcWrapper::getTimeAsFloat()
     return( f_time );
 }
 
-void VlcWrapper::setTimeAsFloat(float f_position)
+void VlcWrapper::SetTimeAsFloat( float f_position )
 {
     if( p_input != NULL )
     {
@@ -399,9 +352,49 @@ bool VlcWrapper::IsPlaying()
 
 }
 
-/******************************
- * playlist infos and control *
- ******************************/
+/************
+ * playlist *
+ ************/
+
+void VlcWrapper::OpenFiles( BList* o_files, bool replace )
+{
+    BString *o_file;
+    int size = PlaylistSize();
+	bool wasEmpty = ( size < 1 );
+
+    /* delete current playlist */
+    if( replace )
+    {
+        for( int i = 0; i < size; i++ )
+        {
+            playlist_Delete( p_playlist, 0 );
+        }
+    }
+
+    /* append files */
+    while( ( o_file = (BString *)o_files->LastItem() ) )
+    {
+        playlist_Add( p_playlist, o_file->String(),
+                      PLAYLIST_APPEND, PLAYLIST_END );
+        o_files->RemoveItem(o_files->CountItems() - 1);
+    }
+    
+    /* eventually restart playing */
+    if( replace || wasEmpty )
+    {
+        playlist_Stop( p_playlist );
+        playlist_Play( p_playlist );
+    }
+}
+ 
+void VlcWrapper::OpenDisc(BString o_type, BString o_device, int i_title, int i_chapter)
+{
+    if( p_intf->p_sys->b_dvdold )
+        o_device.Prepend( "dvdold:" );
+    playlist_Add( p_playlist, o_device.String(),
+                  PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );
+}
+
 int VlcWrapper::PlaylistSize()
 {
     vlc_mutex_lock( &p_playlist->object_lock );
@@ -410,7 +403,7 @@ int VlcWrapper::PlaylistSize()
     return i_size;
 }
 
-char *VlcWrapper::PlaylistItemName( int i )
+char * VlcWrapper::PlaylistItemName( int i )
 {
    return p_playlist->pp_items[i]->psz_name;
 }
@@ -418,11 +411,6 @@ char *VlcWrapper::PlaylistItemName( int i )
 int VlcWrapper::PlaylistCurrent()
 {
     return p_playlist->i_index;
-}
-
-int  VlcWrapper::PlaylistStatus()
-{
-    return p_playlist->i_status;
 }
 
 bool VlcWrapper::PlaylistPlay()
@@ -457,48 +445,7 @@ void VlcWrapper::PlaylistPrev()
     playlist_Prev( p_playlist );
 }
 
-void VlcWrapper::PlaylistSkip( int i )
-{
-    playlist_Skip( p_playlist, i );
-}
-
-void VlcWrapper::PlaylistGoto( int i )
-{
-    playlist_Goto( p_playlist, i );
-}
-
-void VlcWrapper::PlaylistLoop()
-{
-    if ( p_intf->p_sys->b_loop )
-    {
-        playlist_Delete( p_playlist, p_playlist->i_size - 1 );
-    }
-    else
-    {
-        playlist_Add( p_playlist, "vlc:loop",
-                      PLAYLIST_APPEND | PLAYLIST_GO,
-                      PLAYLIST_END );
-    }
-    p_intf->p_sys->b_loop = !p_intf->p_sys->b_loop;
-}
-
-BList * VlcWrapper::PlaylistAsArray()
-{ 
-    int i;
-    BList* p_list = new BList(p_playlist->i_size);
-    
-    vlc_mutex_lock( &p_playlist->object_lock );
-
-    for( i = 0; i < p_playlist->i_size; i++ )
-    {
-        p_list->AddItem(new BString(p_playlist->pp_items[i]->psz_name));
-    }
-
-    vlc_mutex_unlock( &p_playlist->object_lock );
-    return( p_list );
-}
-
-void VlcWrapper::getPlaylistInfo( int32& currentIndex, int32& maxIndex )
+void VlcWrapper::GetPlaylistInfo( int32& currentIndex, int32& maxIndex )
 {
 	currentIndex = -1;
 	maxIndex = -1;
@@ -512,31 +459,12 @@ void VlcWrapper::getPlaylistInfo( int32& currentIndex, int32& maxIndex )
 	}
 }
 
-
 void VlcWrapper::PlaylistJumpTo( int pos )
 {
-#if 0
-	// sanity checks
-	if ( pos < 0 )
-		pos = 0;
-	int size = playlistSize();
-	if (pos >= size)
-		pos = size - 1;
-	// weird hack
-    if( p_input_bank->pp_input[0] != NULL )
-		pos--;
-	// stop current stream
-	playlistStop();
-	// modify current position in playlist
-	playlistLock();
-	p_main->p_playlist->i_index = pos;
-	playlistUnlock();
-	// start playing
-	playlistPlay();
-#endif
+    playlist_Goto( p_playlist, pos );
 }
 
-void VlcWrapper::getNavCapabilities( bool *canSkipPrev, bool *canSkipNext )
+void VlcWrapper::GetNavCapabilities( bool *canSkipPrev, bool *canSkipNext )
 {
 	if ( canSkipPrev && canSkipNext )
 	{
@@ -580,7 +508,7 @@ void VlcWrapper::getNavCapabilities( bool *canSkipPrev, bool *canSkipNext )
 	}
 }
 
-void VlcWrapper::navigatePrev()
+void VlcWrapper::NavigatePrev()
 {
 	bool hasSkiped = false;
 
@@ -607,7 +535,7 @@ void VlcWrapper::navigatePrev()
 
 			if ( currentChapter >= 0 )
 			{
-				toggleChapter( currentChapter );
+				ToggleChapter( currentChapter );
 				hasSkiped = true;
 			}
 		}
@@ -619,7 +547,7 @@ void VlcWrapper::navigatePrev()
 			// disallow area 0 since it is used for video_ts.vob
 			if( currentTitle > 0 )
 			{
-				toggleTitle(currentTitle);
+				ToggleTitle(currentTitle);
 				hasSkiped = true;
 			}
 		}
@@ -630,7 +558,7 @@ void VlcWrapper::navigatePrev()
 		PlaylistPrev();
 }
 
-void VlcWrapper::navigateNext()
+void VlcWrapper::NavigateNext()
 {
 	bool hasSkiped = false;
 
@@ -656,7 +584,7 @@ void VlcWrapper::navigateNext()
 			currentChapter++;
 			if ( currentChapter < numChapters )
 			{
-				toggleChapter( currentChapter );
+				ToggleChapter( currentChapter );
 				hasSkiped = true;
 			}
 		}
@@ -668,7 +596,7 @@ void VlcWrapper::navigateNext()
 			// disallow area 0 since it is used for video_ts.vob
 			if ( currentTitle < numTitles - 1 )
 			{
-				toggleTitle(currentTitle);
+				ToggleTitle(currentTitle);
 				hasSkiped = true;
 			}
 		}
@@ -680,9 +608,14 @@ void VlcWrapper::navigateNext()
 }
 
 
-/***************************
- * audio infos and control *
- ***************************/
+/*********
+ * audio *
+ *********/
+
+bool VlcWrapper::HasAudio()
+{
+    return( p_aout != NULL );
+}
 
 unsigned short VlcWrapper::GetVolume()
 {
@@ -731,14 +664,10 @@ bool VlcWrapper::IsMuted()
     return p_intf->p_sys->b_mute;
 }
 
-bool VlcWrapper::HasAudio()
-{
-    return( p_aout != NULL );
-}
-
 /*******
  * DVD *
  *******/
+
 bool VlcWrapper::HasTitles()
 {
     if( !p_input )
@@ -748,13 +677,41 @@ bool VlcWrapper::HasTitles()
     return ( p_input->stream.i_area_nb > 1 );
 }
 
+BList * VlcWrapper::GetTitles()
+{
+    if( p_input )
+    {
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+      
+        BList *list = new BList( p_input->stream.i_area_nb );
+        BMenuItem *menuItem;
+        BMessage *message;
+        
+        for( unsigned int i = 1; i < p_input->stream.i_area_nb; i++ )
+        {
+            message = new BMessage( TOGGLE_TITLE );
+            message->AddInt32( "index", i );
+            BString helper( "" );
+            helper << i;
+            menuItem = new BMenuItem( helper.String(), message );
+            menuItem->SetMarked( p_input->stream.p_selected_area->i_id == i );
+            list->AddItem( menuItem );
+        }
+        
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        return list;
+    }
+    return NULL;
+}
+
 void VlcWrapper::PrevTitle()
 {
     int i_id;
     i_id = p_input->stream.p_selected_area->i_id - 1;
     if( i_id > 0 )
     {
-        toggleTitle(i_id);
+        ToggleTitle(i_id);
     }
 }
 
@@ -764,36 +721,20 @@ void VlcWrapper::NextTitle()
     i_id = p_input->stream.p_selected_area->i_id + 1;
     if( i_id < p_input->stream.i_area_nb )
     {
-        toggleTitle(i_id);
+        ToggleTitle(i_id);
     }
 }
 
-bool VlcWrapper::HasChapters()
+void VlcWrapper::ToggleTitle(int i_title)
 {
-    if( !p_input )
+    if( p_input != NULL )
     {
-        return false;
-    }
-    return ( p_input->stream.p_selected_area->i_part_nb > 1 );
-}
+        input_ChangeArea( p_input,
+                          p_input->stream.pp_areas[i_title] );
 
-void VlcWrapper::PrevChapter()
-{
-    int i_id;
-    i_id = p_input->stream.p_selected_area->i_part - 1;
-    if( i_id >= 0 )
-    {
-        toggleChapter(i_id);
-    }
-}
+        vlc_mutex_lock( &p_input->stream.stream_lock );
 
-void VlcWrapper::NextChapter()
-{
-    int i_id;
-    i_id = p_input->stream.p_selected_area->i_part + 1;
-    if( i_id >= 0 )
-    {
-        toggleChapter(i_id);
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
     }
 }
 
@@ -815,6 +756,77 @@ void VlcWrapper::TitleInfo( int32 &currentIndex, int32 &maxIndex )
 	}
 }
 
+bool VlcWrapper::HasChapters()
+{
+    if( !p_input )
+    {
+        return false;
+    }
+    return ( p_input->stream.p_selected_area->i_part_nb > 1 );
+}
+
+BList * VlcWrapper::GetChapters()
+{
+    if( p_input )
+    {
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+      
+        BList *list = new BList( p_input->stream.p_selected_area->i_part_nb );
+        BMenuItem *menuItem;
+        BMessage *message;
+        
+        for( unsigned int i = 1;
+             i < p_input->stream.p_selected_area->i_part_nb + 1; i++ )
+        {
+            message = new BMessage( TOGGLE_CHAPTER );
+            message->AddInt32( "index", i );
+            BString helper( "" );
+            helper << i;
+            menuItem = new BMenuItem( helper.String(), message );
+            menuItem->SetMarked( p_input->stream.p_selected_area->i_part == i );
+            list->AddItem( menuItem );
+        }
+        
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+        return list;
+    }
+    return NULL;
+}
+
+void VlcWrapper::PrevChapter()
+{
+    int i_id;
+    i_id = p_input->stream.p_selected_area->i_part - 1;
+    if( i_id >= 0 )
+    {
+        ToggleChapter(i_id);
+    }
+}
+
+void VlcWrapper::NextChapter()
+{
+    int i_id;
+    i_id = p_input->stream.p_selected_area->i_part + 1;
+    if( i_id >= 0 )
+    {
+        ToggleChapter(i_id);
+    }
+}
+
+void VlcWrapper::ToggleChapter(int i_chapter)
+{
+    if( p_input != NULL )
+    {
+        p_input->stream.p_selected_area->i_part = i_chapter;
+        input_ChangeArea( p_input,
+                          p_input->stream.p_selected_area );
+
+        vlc_mutex_lock( &p_input->stream.stream_lock );
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+    }
+}
+
 void VlcWrapper::ChapterInfo( int32 &currentIndex, int32 &maxIndex )
 {
 	currentIndex = -1;
@@ -833,28 +845,11 @@ void VlcWrapper::ChapterInfo( int32 &currentIndex, int32 &maxIndex )
 	}
 }
 
-void VlcWrapper::toggleTitle(int i_title)
+/****************
+ * Miscellanous *
+ ****************/
+ 
+void VlcWrapper::LoadSubFile( char * psz_file )
 {
-    if( p_input != NULL )
-    {
-        input_ChangeArea( p_input,
-                          p_input->stream.pp_areas[i_title] );
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-    }
-}
-
-void VlcWrapper::toggleChapter(int i_chapter)
-{
-    if( p_input != NULL )
-    {
-        p_input->stream.p_selected_area->i_part = i_chapter;
-        input_ChangeArea( p_input,
-                          p_input->stream.p_selected_area );
-
-        vlc_mutex_lock( &p_input->stream.stream_lock );
-        vlc_mutex_unlock( &p_input->stream.stream_lock );
-    }
+    config_PutPsz( p_intf, "sub-file", strdup( psz_file ) );
 }
