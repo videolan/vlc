@@ -1,5 +1,5 @@
 /*****************************************************************************
- * mem_stream.c
+ * mem_stream.c: stream_t wrapper around memory buffer
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
  * $Id: stream.c 9390 2004-11-22 09:56:48Z fenrir $
@@ -35,9 +35,9 @@ struct stream_sys_t
 
 };
 
-static int  AStreamReadMem( stream_t *, void *p_read, int i_read );
-static int  AStreamPeekMem( stream_t *, uint8_t **pp_peek, int i_read );
-static int  AStreamControl( stream_t *, int i_query, va_list );
+static int AStreamReadMem( stream_t *, void *p_read, int i_read );
+static int AStreamPeekMem( stream_t *, uint8_t **pp_peek, int i_read );
+static int AStreamControl( stream_t *, int i_query, va_list );
 
 /****************************************************************************
  * stream_MemoryNew: create a stream from a buffer
@@ -48,32 +48,30 @@ stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
     stream_t *s = vlc_object_create( p_this, VLC_OBJECT_STREAM );
     stream_sys_t *p_sys;
 
-    if( !s )
-        return NULL;
+    if( !s ) return NULL;
 
     s->p_sys = p_sys = malloc( sizeof( stream_sys_t ) );
     p_sys->i_pos = 0;
     p_sys->i_size = i_size;
     p_sys->p_buffer = p_buffer;
 
-    s->pf_block  = NULL;
-    s->pf_read   = AStreamReadMem;    /* Set up later */
-    s->pf_peek   = AStreamPeekMem;
-    s->pf_control= AStreamControl;
+    s->pf_block   = NULL;
+    s->pf_read    = AStreamReadMem;    /* Set up later */
+    s->pf_peek    = AStreamPeekMem;
+    s->pf_control = AStreamControl;
     vlc_object_attach( s, p_this );
-    
+
     return s;
 }
 
 void stream_MemoryDelete( stream_t *s, vlc_bool_t b_free_buffer )
 {
-    if( b_free_buffer )
-    {
-        free( s->p_sys->p_buffer );
-    }
+    if( b_free_buffer ) free( s->p_sys->p_buffer );
     free( s->p_sys );
+    vlc_object_detach( s );
     vlc_object_destroy( s );
 }
+
 /****************************************************************************
  * AStreamControl:
  ****************************************************************************/
@@ -112,6 +110,7 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             i_64 = __MAX( i_64, 0 );
             i_64 = __MIN( i_64, s->p_sys->i_size ); 
             p_sys->i_pos = i_64;
+            break;
 
         case STREAM_GET_MTU:
             return VLC_EGENERIC;
@@ -129,7 +128,7 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     return VLC_SUCCESS;
 }
 
-static int  AStreamReadMem( stream_t *s, void *p_read, int i_read )
+static int AStreamReadMem( stream_t *s, void *p_read, int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     int i_res = __MIN( i_read, p_sys->i_size - p_sys->i_pos );
@@ -138,7 +137,7 @@ static int  AStreamReadMem( stream_t *s, void *p_read, int i_read )
     return i_res;
 }
 
-static int  AStreamPeekMem( stream_t *s, uint8_t **pp_peek, int i_read )
+static int AStreamPeekMem( stream_t *s, uint8_t **pp_peek, int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
     int i_res = __MIN( i_read, p_sys->i_size - p_sys->i_pos );
