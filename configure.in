@@ -191,16 +191,16 @@ AC_CHECK_LIB(m,pow,
 dnl Check for pthreads - borrowed from XMMS
 THREAD_LIB=error
 if test "x${THREAD_LIB}" = "xerror"; then
-  AC_CHECK_LIB(pthread,pthread_attr_init,THREAD_LIB="-lpthread")
+  AC_CHECK_LIB(pthread,main,THREAD_LIB="-lpthread")
 fi
 if test "x${THREAD_LIB}" = "xerror"; then
-  AC_CHECK_LIB(pthreads,pthread_attr_init,THREAD_LIB="-lpthreads")
+  AC_CHECK_LIB(pthreads,main,THREAD_LIB="-lpthreads")
 fi
 if test "x${THREAD_LIB}" = "xerror"; then
-  AC_CHECK_LIB(c_r,pthread_attr_init,THREAD_LIB="-lc_r")
+  AC_CHECK_LIB(c_r,main,THREAD_LIB="-lc_r")
 fi
 if test "x${THREAD_LIB}" = "xerror"; then
-  AC_CHECK_FUNC(pthread_attr_init)
+  AC_CHECK_FUNC(pthread_mutex_lock)
   THREAD_LIB=""
 fi
 
