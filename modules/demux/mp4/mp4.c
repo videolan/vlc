@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.46 2003/12/20 16:22:59 gbazin Exp $
+ * $Id: mp4.c,v 1.47 2004/01/05 12:37:52 jlj Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -31,6 +31,7 @@
 
 #include "libmp4.h"
 #include "mp4.h"
+#include "drms.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -457,6 +458,13 @@ static int Demux( input_thread_t *p_input )
                     msg_Warn( p_input, "track[0x%x] will be disabled (eof?)", track.i_track_ID );
                     MP4_TrackUnselect( p_input, &track );
                     break;
+                }
+
+                if( track.p_drms != NULL )
+                {
+                    drms_decrypt( track.p_drms,
+                                  (uint32_t *)p_block->p_buffer,
+                                  p_block->i_buffer );
                 }
 
                 if( track.fmt.i_cat == VIDEO_ES )
@@ -1240,6 +1248,8 @@ static void MP4_TrackCreate( input_thread_t *p_input,
     MP4_Box_t *p_vmhd;
     MP4_Box_t *p_smhd;
 
+    MP4_Box_t *p_drms;
+
     unsigned int i;
     char language[4];
 
@@ -1321,6 +1331,10 @@ static void MP4_TrackCreate( input_thread_t *p_input,
     {
         return;
     }
+
+    p_drms = MP4_BoxGet( p_track->p_stsd, "drms" );
+    p_track->p_drms = p_drms != NULL ?
+        p_drms->data.p_sample_soun->p_drms : NULL;
 
     /* Set language */
     if( strcmp( language, "```" ) && strcmp( language, "und" ) )

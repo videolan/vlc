@@ -3,4 +3,7 @@ SOURCES_mp4 = \
 	mp4.h \
 	libmp4.c \
 	libmp4.h \
+	drms.c \
+	drms.h \
+	drmstables.h \
 	$(NULL)

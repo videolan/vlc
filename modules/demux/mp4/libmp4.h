@@ -2,7 +2,7 @@
  * libmp4.h : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.h,v 1.17 2003/10/07 14:59:10 gbazin Exp $
+ * $Id: libmp4.h,v 1.18 2004/01/05 12:37:52 jlj Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -153,6 +153,13 @@
 
 #define FOURCC_gmhd VLC_FOURCC( 'g', 'm', 'h', 'd' )
 #define FOURCC_wave VLC_FOURCC( 'w', 'a', 'v', 'e' )
+
+#define FOURCC_drms VLC_FOURCC( 'd', 'r', 'm', 's' )
+#define FOURCC_sinf VLC_FOURCC( 's', 'i', 'n', 'f' )
+#define FOURCC_schi VLC_FOURCC( 's', 'c', 'h', 'i' )
+#define FOURCC_iviv VLC_FOURCC( 'i', 'v', 'i', 'v' )
+#define FOURCC_name VLC_FOURCC( 'n', 'a', 'm', 'e' )
+#define FOURCC_priv VLC_FOURCC( 'p', 'r', 'i', 'v' )
 
 /* Do you want some debug information on all read boxes ? */
 #define MP4_VERBOSE  1
@@ -380,6 +387,8 @@ typedef struct MP4_Box_data_sample_soun_s
     /* XXX hack */
     int     i_qt_description;
     uint8_t *p_qt_description;
+
+    void    *p_drms;
 
 } MP4_Box_data_sample_soun_t;
 

@@ -2,7 +2,7 @@
  * libmp4.c : LibMP4 library for mp4 module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libmp4.c,v 1.39 2003/12/22 14:32:55 sam Exp $
+ * $Id: libmp4.c,v 1.40 2004/01/05 12:37:52 jlj Exp $
  *
  * Author: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -30,6 +30,7 @@
 #endif
 
 #include "libmp4.h"
+#include "drms.h"
 
 /*****************************************************************************
  * Here are defined some macro to make life simpler but before using it
@@ -1146,6 +1147,79 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
         msg_Dbg( p_stream->p_input, "Read Box: \"soun\" mp4 or qt1/2 (rest="I64Fd")", i_read );
         MP4_SeekStream( p_stream, p_box->i_pos + MP4_BOX_HEADERSIZE( p_box ) + 28 );
     }
+
+    p_box->data.p_sample_soun->p_drms =
+        p_box->i_type == FOURCC_drms ? drms_alloc() : NULL;
+
+    if( p_box->data.p_sample_soun->p_drms )
+    {
+        FILE *file;
+        char *psz_homedir;
+        char *psz_filename;
+        uint32_t p_user_key[ 4 ];
+
+        int i_ret = 0;
+        vlc_bool_t b_key = VLC_FALSE;
+
+        psz_filename = NULL;
+        psz_homedir = p_stream->p_input->p_vlc->psz_homedir;
+
+#define DRMS_FILENAME "drms"
+
+        if( psz_homedir != NULL )
+        {
+            psz_filename = (char *)malloc( sizeof("/" CONFIG_DIR "/"
+                                           DRMS_FILENAME) +
+                                           strlen( psz_homedir ) );
+            if( psz_filename != NULL )
+            {
+                sprintf( psz_filename, "%s/" CONFIG_DIR "/" DRMS_FILENAME,
+                         psz_homedir );
+
+                file = fopen( psz_filename, "r" );
+                if( file != NULL )
+                {
+                    b_key = fread( p_user_key, sizeof(uint32_t),
+                                   4, file ) == 4 ? VLC_TRUE : VLC_FALSE;
+                    fclose( file );
+                }
+            }
+        }
+
+        if( b_key == VLC_FALSE )
+        {
+            i_ret = drms_get_user_key( NULL, p_user_key );
+        }
+
+        if( !i_ret )
+        {
+            if( b_key == VLC_FALSE && psz_filename != NULL )
+            {
+                file = fopen( psz_filename, "w" );
+                if( file != NULL )
+                {
+                    fwrite( p_user_key, sizeof(uint32_t), 4, file );
+                    fclose( file );
+                }
+            }
+
+            i_ret = drms_init( p_box->data.p_sample_soun->p_drms,
+                               DRMS_INIT_UKEY, (uint8_t *)p_user_key,
+                               sizeof(p_user_key) );
+        }
+
+        if( psz_filename != NULL )
+        {
+            free( (void *)psz_filename );
+        }
+
+        if( i_ret )
+        {
+            drms_free( p_box->data.p_sample_soun->p_drms );
+            p_box->data.p_sample_soun->p_drms = NULL;
+        }
+    }
+
     MP4_ReadBoxContainerRaw( p_stream, p_box ); /* esds */
 
 #ifdef MP4_VERBOSE
@@ -1157,6 +1231,18 @@ static int MP4_ReadBox_sample_soun( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
 
 #endif
     MP4_READBOX_EXIT( 1 );
+}
+
+
+static void MP4_FreeBox_sample_soun( MP4_Box_t *p_box )
+{
+    if( p_box->i_type == FOURCC_drms )
+    {
+        if( p_box->data.p_sample_soun->p_drms )
+        {
+            drms_free( p_box->data.p_sample_soun->p_drms );
+        }
+    }
 }
 
 
@@ -1879,6 +1965,81 @@ static int MP4_ReadBox_rmvc( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_iviv( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_READBOX_ENTER( uint8_t );
+
+    if( i_read >= sizeof(uint32_t) * 4 )
+    {
+        MP4_Box_t *p_drms_box = p_box;
+
+        do
+        {
+            p_drms_box = p_drms_box->p_father;
+        } while( p_drms_box && p_drms_box->i_type != FOURCC_drms );
+
+        if( p_drms_box && p_drms_box->data.p_sample_soun->p_drms )
+        {
+            if( drms_init( p_drms_box->data.p_sample_soun->p_drms,
+                           DRMS_INIT_IVIV, p_peek, sizeof(uint32_t) * 4 ) )
+            {
+                drms_free( p_drms_box->data.p_sample_soun->p_drms );
+                p_drms_box->data.p_sample_soun->p_drms = NULL;
+            }
+        }
+    }
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_name( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_Box_t *p_drms_box = p_box;
+
+    MP4_READBOX_ENTER( uint8_t );
+
+    do
+    {
+        p_drms_box = p_drms_box->p_father;
+    } while( p_drms_box && p_drms_box->i_type != FOURCC_drms );
+
+    if( p_drms_box && p_drms_box->data.p_sample_soun->p_drms )
+    {
+        if( drms_init( p_drms_box->data.p_sample_soun->p_drms,
+                       DRMS_INIT_NAME, p_peek, strlen( p_peek ) ) )
+        {
+            drms_free( p_drms_box->data.p_sample_soun->p_drms );
+            p_drms_box->data.p_sample_soun->p_drms = NULL;
+        }
+    }
+
+    MP4_READBOX_EXIT( 1 );
+}
+
+static int MP4_ReadBox_priv( MP4_Stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_Box_t *p_drms_box = p_box;
+
+    MP4_READBOX_ENTER( uint8_t );
+
+    do
+    {
+        p_drms_box = p_drms_box->p_father;
+    } while( p_drms_box && p_drms_box->i_type != FOURCC_drms );
+
+    if( p_drms_box && p_drms_box->data.p_sample_soun->p_drms )
+    {
+        if( drms_init( p_drms_box->data.p_sample_soun->p_drms,
+                       DRMS_INIT_PRIV, p_peek, i_read ) )
+        {
+            drms_free( p_drms_box->data.p_sample_soun->p_drms );
+            p_drms_box->data.p_sample_soun->p_drms = NULL;
+        }
+    }
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 /**** ------------------------------------------------------------------- ****/
 /****                   "Higher level" Functions                          ****/
 /**** ------------------------------------------------------------------- ****/
@@ -2013,6 +2174,13 @@ static struct
     { FOURCC_rmdr,  MP4_ReadBox_rmdr,           MP4_FreeBox_Common },
     { FOURCC_rmqu,  MP4_ReadBox_rmqu,           MP4_FreeBox_Common },
     { FOURCC_rmvc,  MP4_ReadBox_rmvc,           MP4_FreeBox_Common },
+
+    { FOURCC_drms,  MP4_ReadBox_sample_soun,    MP4_FreeBox_sample_soun },
+    { FOURCC_sinf,  MP4_ReadBoxContainer,       MP4_FreeBox_Common },
+    { FOURCC_schi,  MP4_ReadBoxContainer,       MP4_FreeBox_Common },
+    { FOURCC_iviv,  MP4_ReadBox_iviv,           MP4_FreeBox_Common },
+    { FOURCC_name,  MP4_ReadBox_name,           MP4_FreeBox_Common },
+    { FOURCC_priv,  MP4_ReadBox_priv,           MP4_FreeBox_Common },
 
     /* Last entry */
     { 0,            NULL,                   NULL }
