@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.30 2003/08/11 20:48:19 gbazin Exp $
+ * $Id: transcode.c,v 1.31 2003/08/26 18:01:16 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -536,8 +536,12 @@ static struct
     { VLC_FOURCC( 'a', 'l', 'a', 'w' ), CODEC_ID_PCM_ALAW },
 
     /* video */
-    { VLC_FOURCC( 'm', 'p', '4', 'v'),  CODEC_ID_MPEG4 },
     { VLC_FOURCC( 'm', 'p', 'g', 'v' ), CODEC_ID_MPEG1VIDEO },
+    { VLC_FOURCC( 'm', 'p', '1', 'v' ), CODEC_ID_MPEG1VIDEO },
+#if LIBAVCODEC_BUILD >= 4676
+    { VLC_FOURCC( 'm', 'p', '2', 'v' ), CODEC_ID_MPEG2VIDEO },
+#endif
+    { VLC_FOURCC( 'm', 'p', '4', 'v'),  CODEC_ID_MPEG4 },
     { VLC_FOURCC( 'D', 'I', 'V', '1' ), CODEC_ID_MSMPEG4V1 },
     { VLC_FOURCC( 'D', 'I', 'V', '2' ), CODEC_ID_MSMPEG4V2 },
     { VLC_FOURCC( 'D', 'I', 'V', '3' ), CODEC_ID_MSMPEG4V3 },
@@ -1213,6 +1217,12 @@ static int transcode_video_ffmpeg_new( sout_stream_t *p_stream,
     {
         msg_Err( p_stream, "cannot find encoder" );
         return VLC_EGENERIC;
+    }
+
+    if( id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','1','v' )||
+        id->f_dst.i_fourcc == VLC_FOURCC( 'm','p','2','v' ) )
+    {
+        id->f_dst.i_fourcc = VLC_FOURCC( 'm','p','g','v' );
     }
 
     id->ff_enc_c = avcodec_alloc_context();
