@@ -381,7 +381,7 @@ xtag_parse_tag (XTagParser * parser)
     xtag_assert_and_pass (parser, X_SLASH);
     name = xtag_slurp_to (parser, X_WHITESPACE | X_CLOSETAG, X_NONE);
     if (name) {
-      if (strcmp (name, tag->name)) {
+      if (name && tag->name && strcmp (name, tag->name)) {
 #ifdef XTAG_DEBUG
         printf ("got %s expected %s\n", name, tag->name);
 #endif
@@ -525,7 +525,7 @@ xtag_get_attribute (XTag * xtag, char * attribute)
 
   for (l = xtag->attributes; l; l = l->next) {
     if ((attr = (XAttribute *)l->data) != NULL) {
-      if (!strcmp (attr->name, attribute))
+      if (attr->name && attribute && !strcmp (attr->name, attribute))
         return attr->value;
     }
   }
@@ -551,7 +551,7 @@ xtag_first_child (XTag * xtag, char * name)
   for (; l; l = l->next) {
     child = (XTag *)l->data;
 
-    if (!strcmp(child->name, name)) {
+    if (child->name && name && !strcmp(child->name, name)) {
       xtag->current_child = l;
       return child;
     }
@@ -584,7 +584,7 @@ xtag_next_child (XTag * xtag, char * name)
   for (; l; l = l->next) {
     child = (XTag *)l->data;
 
-    if (!strcmp(child->name, name)) {
+    if (child->name && name && !strcmp(child->name, name)) {
       xtag->current_child = l;
       return child;
     }
