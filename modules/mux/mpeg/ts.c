@@ -104,6 +104,12 @@ static void    Close  ( vlc_object_t * );
   "PCRs (Program Clock Reference) will be sent. " \
   "This value should be below 100ms. (default is 30)")
 
+#define BMIN_TEXT N_( "Minimum B (deprecated)")
+#define BMIN_LONGTEXT N_( "This setting is deprecated and not used anymore" )
+
+#define BMAX_TEXT N_( "Maximum B (deprecated)")
+#define BMAX_LONGTEXT N_( "This setting is deprecated and not used anymore")
+
 #define DTS_TEXT N_("DTS delay (ms)")
 #define DTS_LONGTEXT N_("This option will delay the DTS (decoding time " \
   "stamps) and PTS (presentation timestamps) of the data in the " \
@@ -142,9 +148,9 @@ vlc_module_begin();
 
     add_integer( SOUT_CFG_PREFIX "pcr", 30, NULL, PCR_TEXT, PCR_LONGTEXT,
                  VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, PCR_TEXT, PCR_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX "bmin", 0, NULL, BMIN_TEXT, BMIN_LONGTEXT,
                  VLC_TRUE );
-    add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, PCR_TEXT, PCR_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX "bmax", 0, NULL, BMAX_TEXT, BMAX_LONGTEXT,
                  VLC_TRUE );
     add_integer( SOUT_CFG_PREFIX "dts-delay", 200, NULL, DTS_TEXT,
                  DTS_LONGTEXT, VLC_TRUE );
