@@ -2,7 +2,7 @@
  * dvd_ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: dvd_ioctl.c,v 1.9 2001/04/11 04:31:59 sam Exp $
+ * $Id: dvd_ioctl.c,v 1.10 2001/04/11 04:46:18 sam Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -63,11 +63,11 @@
  * Local prototypes - BeOS specific
  *****************************************************************************/
 #if defined( SYS_BEOS )
-static void BeInitRDC ( raw_device_command *, void *, int );
+static void BeInitRDC ( raw_device_command *, void *, int, int );
 #define INIT_RDC( TYPE, SIZE ) \
     raw_device_command rdc; \
     u8 p_buffer[ (SIZE) ]; \
-    BeInitRDC( &rdc, p_buffer, (SIZE), (TYPE) );
+    BeInitRDC( &rdc, p_buffer, (TYPE), (SIZE) );
 #endif
 
 /*****************************************************************************
@@ -417,7 +417,7 @@ int ioctl_HostSendKey2( int i_fd, int *pi_agid, u8 *p_key )
  * use, either a read command or a write command.
  *****************************************************************************/
 static void BeInitRDC( raw_device_command *p_rdc,
-                       void *p_buffer, int i_len, int i_type )
+                       void *p_buffer, int i_type, int i_len )
 {
     memset( p_rdc, 0, sizeof( raw_device_command ) );
     memset( p_buffer, 0, i_len );
@@ -430,7 +430,7 @@ static void BeInitRDC( raw_device_command *p_rdc,
 
         case GPCMD_READ_DVD_STRUCTURE:
         case GPCMD_REPORT_KEY:
-            p_rdc.flags         = B_RAW_DEVICE_DATA_IN;
+            p_rdc->flags = B_RAW_DEVICE_DATA_IN;
             break;
     }
 
