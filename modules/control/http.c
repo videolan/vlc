@@ -1922,7 +1922,12 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     uri_extract_value( p_request, "psz_newpos", psz_newpos, 6 );
                     i_pos = atoi( psz_pos );
                     i_newpos = atoi( psz_newpos );
-                    playlist_Move( p_sys->p_playlist, i_pos, i_newpos + 1 );
+                    if ( i_pos < i_newpos )
+                    {
+                        playlist_Move( p_sys->p_playlist, i_pos, i_newpos + 1 );
+                    } else {
+                        playlist_Move( p_sys->p_playlist, i_pos, i_newpos );
+                    }
                     msg_Dbg( p_intf, "requested move playlist item %d to %d", i_pos, i_newpos);
                     break;
                 }
