@@ -745,7 +745,9 @@ on_main_window_toggle                  (GtkMenuItem     *menuitem,
     if( GTK_WIDGET_VISIBLE(p_intf->p_sys->p_window) ) {
         gtk_widget_hide( p_intf->p_sys->p_window);
 
-    } else {
+    } 
+    else 
+    {
         gtk_widget_show( p_intf->p_sys->p_window );
     }
 }

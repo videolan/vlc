@@ -73,27 +73,26 @@ void
 on_menubar_playlist_activate           (GtkMenuItem     *menuitem,
                                         gpointer         user_data)
 {
+
     intf_thread_t *p_intf = GetIntf( GTK_WIDGET(menuitem), "intf_window" );
     playlist_t * p_playlist ;
     GtkCList * list;
     
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
     {
+        /* this shoud never happen */
+        intf_ErrMsgImm("intf_playlist is not a widget !");
         p_intf->p_sys->p_playlist = create_intf_playlist();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
                              "p_intf", p_intf );
     }
     
-    
     vlc_mutex_lock( &p_main->p_playlist->change_lock );
     if(p_main->p_playlist->i_size > 0 )
     {
         p_playlist = p_main->p_playlist;
-        
         list = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist, "playlist_clist" )) ;
         rebuildCList( list, p_playlist );
-        
-       
     }
     vlc_mutex_unlock( &p_main->p_playlist->change_lock );
     
@@ -110,13 +109,18 @@ on_toolbar_playlist_clicked            (GtkButton       *button,
 
     if( !GTK_IS_WIDGET( p_intf->p_sys->p_playlist ) )
     {
+        /* this shoud never happen */
+        intf_ErrMsgImm("intf_playlist is not a widget !");
+
         p_intf->p_sys->p_playlist = create_intf_playlist();
         gtk_object_set_data( GTK_OBJECT( p_intf->p_sys->p_playlist ),
                              "p_intf", p_intf );
     }
     if( GTK_WIDGET_VISIBLE(p_intf->p_sys->p_playlist) ) {
         gtk_widget_hide( p_intf->p_sys->p_playlist);
-    } else {        
+    } 
+    else 
+    {        
         GtkCList * clist;
         gtk_widget_show( p_intf->p_sys->p_playlist );
         clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist" ));
@@ -261,6 +265,9 @@ on_delete_clicked                      (GtkMenuItem       *item,
     
     if( g_list_length(selection)>0 )
     {
+        /* reverse-sort so that we can delete from the furthest to the 
+           closest item to delete...
+          */
         selection = g_list_sort( selection, compareItems );
         g_list_foreach( selection,
                         deleteGListItem, 
@@ -277,9 +284,9 @@ on_intf_playlist_destroy_event         (GtkWidget       *widget,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
-  gtk_widget_hide(widget);
-
-  return TRUE;
+    /* hide ! */
+    gtk_widget_hide(widget);
+    return TRUE;
 }
 
 void
@@ -298,7 +305,8 @@ on_intf_playlist_drag_data_received    (GtkWidget       *widget,
     gint row, col;
 
     clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist" ));
-    
+   
+    /* are we dropping somewhere into the clist items ? */
     if( gtk_clist_get_selection_info( clist, 
                 x, 
                 y, 
@@ -306,7 +314,10 @@ on_intf_playlist_drag_data_received    (GtkWidget       *widget,
                 &col )== 1)
     {
         on_generic_drop_data_received( p_intf, data, info, row );
-    } else {
+    } 
+    /* else, put that at the end of the playlist */
+    else 
+    {
         on_generic_drop_data_received( p_intf, data, info, PLAYLIST_END);
     }
 }
@@ -337,6 +348,7 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
     }
     
     /* this cuts string into single file drops */
+    /* this code was borrowed from xmms, thx guys :) */
     while(*string)
     {
         temp = strchr(string, '\n');
@@ -367,7 +379,9 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
             }
             intf_WarnMsg(1,"Dropped %s",string);
 
-        } else {
+        } 
+        else 
+        {
             protocol = strdup("");
         }
          
@@ -393,10 +407,13 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
     {
         /* lock the interface */
         vlc_mutex_lock( &p_intf->p_sys->change_lock );
-        intf_WarnMsg(1, "List has %d elements",g_list_length(files)); 
+        intf_WarnMsg( 1, "List has %d elements",g_list_length( files ) ); 
         intf_AppendList( p_playlist, position, files );
+
         /* get the CList  and rebuild it. */
-        clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist" )); 
+        clist = GTK_CLIST(
+                lookup_widget( p_intf->p_sys->p_playlist,
+                               "playlist_clist" ) ); 
         rebuildCList( clist , p_playlist );
         
         /* unlock the interface */
@@ -406,15 +423,15 @@ void on_generic_drop_data_received( intf_thread_t * p_intf,
 
 /* check a file (string) against supposed valid extension */
 int 
-hasValidExtension(gchar * filename)
+hasValidExtension( gchar * filename )
 {
     char * ext[6] = {"mpg","mpeg","vob","mp2","ts","ps"};
     int  i_ext = 6;
     int dummy;
-    gchar * p_filename = strrchr( filename, '.') + sizeof( char );
-    for(dummy=0; dummy<i_ext;dummy++)
+    gchar * p_filename = strrchr( filename, '.' ) + sizeof( char );
+    for( dummy=0; dummy<i_ext;dummy++ )
     {
-        if(strcmp(p_filename,ext[dummy])==0)
+        if( strcmp( p_filename,ext[dummy] )==0 )
             return 1;
     }
     return 0;
@@ -422,11 +439,12 @@ hasValidExtension(gchar * filename)
 
 /* recursive function: descend into folders and build a list of valid filenames */
 GList * 
-intf_readFiles(gchar * fsname )
+intf_readFiles( gchar * fsname )
 {
     struct stat statbuf;
     GList  * current = NULL;
 
+    /* get the attributes of this file */
     stat(fsname, &statbuf);
     
     /* is it a regular file ? */
@@ -436,8 +454,11 @@ intf_readFiles(gchar * fsname )
         {
             intf_WarnMsg( 3, "%s is a valid file. Stacking on the playlist", fsname );
             return g_list_append( NULL, g_strdup(fsname) );
-        } else
+        } 
+        else
+        {
             return NULL;
+        }
     } 
     /* is it a directory (should we check for symlinks ?) */
     else if( S_ISDIR( statbuf.st_mode ) ) 
@@ -471,7 +492,7 @@ intf_readFiles(gchar * fsname )
                         strlen( dirContent->d_name ) * sizeof( char ) );
                 strcpy( newfs, fsname );
                 strcpy( newfs + strlen( fsname )+1, dirContent->d_name);
-                newfs[strlen(fsname)] = '/';
+                newfs[strlen( fsname )] = '/';
                 
                 current = g_list_concat( current, intf_readFiles( newfs ) );
                     
@@ -491,32 +512,39 @@ int intf_AppendList( playlist_t * p_playlist, int i_pos, GList * list )
 {
     guint length, dummy;
     length = g_list_length( list );
-    for(dummy=0; dummy<length; dummy++)
+    for( dummy=0; dummy<length; dummy++ )
     {
         intf_PlstAdd( p_playlist, 
-                i_pos==PLAYLIST_END?PLAYLIST_END:(i_pos + dummy), 
+                /* ok; this is a really nasty trick to insert
+                   the item where they are suppose to go but, hey
+                   this works :P (btw, you are really nasty too) */
+                i_pos==PLAYLIST_END?PLAYLIST_END:( i_pos + dummy ), 
                 g_list_nth_data(list, dummy));
     }
     return 0;
 }
 gboolean
-on_playlist_clist_event                        (GtkWidget       *widget,
-        GdkEvent        *event,
-        gpointer         user_data)
+on_playlist_clist_event (GtkWidget       *widget,
+                            GdkEvent        *event,
+                            gpointer         user_data)
 {
-    intf_thread_t * p_intf =  GetIntf( GTK_WIDGET(widget), "intf_playlist" );
+    intf_thread_t * p_intf =  GetIntf( GTK_WIDGET( widget ), "intf_playlist" );
 
-    if( (event->button).type == GDK_2BUTTON_PRESS )
+    if( ( event->button ).type == GDK_2BUTTON_PRESS )
     {
         GtkCList *  clist;
         gint row, col;
 
-        clist = GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist,"playlist_clist" )); 
+        clist = GTK_CLIST( 
+                    lookup_widget( 
+                        p_intf->p_sys->p_playlist,
+                        "playlist_clist" ) );
+        
         if( gtk_clist_get_selection_info( clist, 
                     (event->button).x, 
                     (event->button).y, 
                     &row, 
-                    &col )== 1)
+                    &col )== 1 )
         {
 
             /* clicked is in range. */
@@ -535,9 +563,7 @@ on_playlist_clist_event                        (GtkWidget       *widget,
 /* statis timeouted function */
 void GtkPlayListManage( gpointer p_data )
 {
-
     /* this thing really sucks for now :( */
-
     /* TODO speak more with interface/intf_plst.c */
 
     intf_thread_t *p_intf = (void *)p_data;
@@ -545,23 +571,25 @@ void GtkPlayListManage( gpointer p_data )
 
     vlc_mutex_lock( &p_intf->p_sys->change_lock );
 
-    if(p_intf->p_sys->i_playing != p_playlist->i_index)
+    if( p_intf->p_sys->i_playing != p_playlist->i_index )
     {
         GdkColor color;
 
-        color.red = 65535;
+        color.red = 0xffff;
         color.green = 0;
         color.blue = 0;
 
-        gtk_clist_set_background (
-        GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist, "playlist_clist" ) ),
-        p_playlist->i_index,
-        &color);
+        gtk_clist_set_background ( GTK_CLIST(
+                    lookup_widget( p_intf->p_sys->p_playlist, 
+                                   "playlist_clist" ) ),
+                    p_playlist->i_index,
+                    &color );
+
         if( p_intf->p_sys->i_playing != -1 )
         {
-            color.red = 65535;
-            color.green = 65535;
-            color.blue = 65535;
+            color.red = 0xffff;
+            color.green = 0xffff;
+            color.blue = 0xffff;
             gtk_clist_set_background (
             GTK_CLIST(lookup_widget( p_intf->p_sys->p_playlist, "playlist_clist" ) ),
             p_intf->p_sys->i_playing,
