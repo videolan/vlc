@@ -309,10 +309,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     if( p_input->b_restart )
     {
         vlc_mutex_lock( &p_aout->mixer_lock );
-        vlc_mutex_lock( &p_input->lock );
         aout_InputDelete( p_aout, p_input );
         aout_InputNew( p_aout, p_input );
-        vlc_mutex_unlock( &p_input->lock );
         vlc_mutex_unlock( &p_aout->mixer_lock );
     }
 
