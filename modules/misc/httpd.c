@@ -2,7 +2,7 @@
  * httpd.c
  *****************************************************************************
  * Copyright (C) 2001-2003 VideoLAN
- * $Id: httpd.c,v 1.11 2003/03/18 02:28:53 hartman Exp $
+ * $Id: httpd.c,v 1.12 2003/04/27 03:08:36 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1628,6 +1628,7 @@ search_file:
     {
         p += sprintf( p, "WWW-Authenticate: Basic realm=\"%s\"\r\n", user );
     }
+    p += sprintf( p, "Cache-Control: no-cache\r\n" );
     p += sprintf( p, "\r\n" );
 
     p_con->i_buffer_size = strlen( p_con->p_buffer );// + 1;
