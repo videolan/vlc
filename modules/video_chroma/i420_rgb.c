@@ -2,7 +2,7 @@
  * i420_rgb.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_rgb.c,v 1.3 2002/11/25 19:29:10 sam Exp $
+ * $Id: i420_rgb.c,v 1.4 2003/08/29 18:58:05 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -56,7 +56,7 @@ static void Deactivate ( vlc_object_t * );
 #if defined (MODULE_NAME_IS_i420_rgb)
 static void SetGammaTable       ( int *pi_table, double f_gamma );
 static void SetYUV              ( vout_thread_t * );
-static void Set8bppPalette      ( vout_thread_t *, u8 * );
+static void Set8bppPalette      ( vout_thread_t *, uint8_t * );
 #endif
 
 /*****************************************************************************
@@ -195,14 +195,14 @@ static int Activate( vlc_object_t *p_this )
     switch( p_vout->output.i_chroma )
     {
     case VLC_FOURCC('R','G','B','2'):
-        i_tables_size = sizeof( u8 ) * PALETTE_TABLE_SIZE;
+        i_tables_size = sizeof( uint8_t ) * PALETTE_TABLE_SIZE;
         break;
     case VLC_FOURCC('R','V','1','5'):
     case VLC_FOURCC('R','V','1','6'):
-        i_tables_size = sizeof( u16 ) * RGB_TABLE_SIZE;
+        i_tables_size = sizeof( uint16_t ) * RGB_TABLE_SIZE;
         break;
     default: /* RV24, RV32 */
-        i_tables_size = sizeof( u32 ) * RGB_TABLE_SIZE;
+        i_tables_size = sizeof( uint32_t ) * RGB_TABLE_SIZE;
         break;
     }
 
@@ -277,13 +277,13 @@ static void SetYUV( vout_thread_t *p_vout )
     switch( p_vout->output.i_chroma )
     {
     case VLC_FOURCC('R','G','B','2'):
-        p_vout->chroma.p_sys->p_rgb8 = (u8 *)p_vout->chroma.p_sys->p_base;
+        p_vout->chroma.p_sys->p_rgb8 = (uint8_t *)p_vout->chroma.p_sys->p_base;
         Set8bppPalette( p_vout, p_vout->chroma.p_sys->p_rgb8 );
         break;
 
     case VLC_FOURCC('R','V','1','5'):
     case VLC_FOURCC('R','V','1','6'):
-        p_vout->chroma.p_sys->p_rgb16 = (u16 *)p_vout->chroma.p_sys->p_base;
+        p_vout->chroma.p_sys->p_rgb16 = (uint16_t *)p_vout->chroma.p_sys->p_base;
         for( i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
             p_vout->chroma.p_sys->p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_vout, pi_gamma[0], 0, 0 );
@@ -309,7 +309,7 @@ static void SetYUV( vout_thread_t *p_vout )
 
     case VLC_FOURCC('R','V','2','4'):
     case VLC_FOURCC('R','V','3','2'):
-        p_vout->chroma.p_sys->p_rgb32 = (u32 *)p_vout->chroma.p_sys->p_base;
+        p_vout->chroma.p_sys->p_rgb32 = (uint32_t *)p_vout->chroma.p_sys->p_base;
         for( i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
             p_vout->chroma.p_sys->p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_vout, pi_gamma[0], 0, 0 );
@@ -335,14 +335,14 @@ static void SetYUV( vout_thread_t *p_vout )
     }
 }
 
-static void Set8bppPalette( vout_thread_t *p_vout, u8 *p_rgb8 )
+static void Set8bppPalette( vout_thread_t *p_vout, uint8_t *p_rgb8 )
 {
     #define CLIP( x ) ( ((x < 0) ? 0 : (x > 255) ? 255 : x) << 8 )
 
     int y,u,v;
     int r,g,b;
     int i = 0, j = 0;
-    u16 red[ 256 ], green[ 256 ], blue[ 256 ];
+    uint16_t red[ 256 ], green[ 256 ], blue[ 256 ];
     unsigned char p_lookup[PALETTE_TABLE_SIZE];
 
     /* This loop calculates the intersection of an YUV box and the RGB cube. */

@@ -2,7 +2,7 @@
  * i420_ymga.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_ymga.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: i420_ymga.c,v 1.2 2003/08/29 18:58:05 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -88,8 +88,8 @@ static int Activate( vlc_object_t *p_this )
         default:
             return -1;
     }
-    
-    return 0; 
+
+    return 0;
 }
 
 /* Following functions are local */
@@ -100,9 +100,9 @@ static int Activate( vlc_object_t *p_this )
 static void I420_YMGA( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    u8 *p_uv = p_dest->U_PIXELS;
-    u8 *p_u = p_source->U_PIXELS;
-    u8 *p_v = p_source->V_PIXELS;
+    uint8_t *p_uv = p_dest->U_PIXELS;
+    uint8_t *p_u = p_source->U_PIXELS;
+    uint8_t *p_v = p_source->V_PIXELS;
 
     int i_x;
 

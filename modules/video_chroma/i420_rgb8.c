@@ -2,7 +2,7 @@
  * i420_rgb8.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb8.c,v 1.2 2002/11/20 13:37:36 sam Exp $
+ * $Id: i420_rgb8.c,v 1.3 2003/08/29 18:58:05 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -41,10 +41,10 @@ static void SetOffset( int, int, int, int, vlc_bool_t *, int *, int * );
 void E_(I420_RGB8)( vout_thread_t *p_vout, picture_t *p_src, picture_t *p_dest )
 {
     /* We got this one from the old arguments */
-    u8 *p_pic = (u8*)p_dest->p->p_pixels;
-    u8 *p_y   = p_src->Y_PIXELS;
-    u8 *p_u   = p_src->U_PIXELS;
-    u8 *p_v   = p_src->V_PIXELS;
+    uint8_t *p_pic = (uint8_t*)p_dest->p->p_pixels;
+    uint8_t *p_y   = p_src->Y_PIXELS;
+    uint8_t *p_u   = p_src->U_PIXELS;
+    uint8_t *p_v   = p_src->V_PIXELS;
 
     vlc_bool_t  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
@@ -55,7 +55,7 @@ void E_(I420_RGB8)( vout_thread_t *p_vout, picture_t *p_src, picture_t *p_dest )
     unsigned int i_chroma_width = p_vout->render.i_width / 2;/* chroma width */
 
     /* Lookup table */
-    u8 *        p_lookup = p_vout->chroma.p_sys->p_base;
+    uint8_t *        p_lookup = p_vout->chroma.p_sys->p_base;
 
     /* Offset array pointer */
     int *       p_offset_start = p_vout->chroma.p_sys->p_offset;

@@ -2,7 +2,7 @@
  * i422_yuy2.h : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: i422_yuy2.h,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: i422_yuy2.h,v 1.2 2003/08/29 18:58:05 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -83,10 +83,10 @@ movq      %%mm1, 8(%0)  # Store high UYVY                                 \n\
     *(p_line)++ = *(p_y)++;                                                 \
 
 #define C_YUV422_Y211( p_line, p_y, p_u, p_v )                              \
-    *(p_line)++ = *(p_y); ((u16*)p_y)++;                                    \
-    *(p_line)++ = *(p_u) - 0x80; ((u16*)p_u)++;                             \
-    *(p_line)++ = *(p_y); ((u16*)p_y)++;                                    \
-    *(p_line)++ = *(p_v) - 0x80; ((u16*)p_v)++;                             \
+    *(p_line)++ = *(p_y); ((uint16_t*)p_y)++;                               \
+    *(p_line)++ = *(p_u) - 0x80; ((uint16_t*)p_u)++;                        \
+    *(p_line)++ = *(p_y); ((uint16_t*)p_y)++;                               \
+    *(p_line)++ = *(p_v) - 0x80; ((uint16_t*)p_v)++;                        \
 
 #endif
 

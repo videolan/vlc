@@ -2,7 +2,7 @@
  * i420_rgb.h : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb.h,v 1.3 2002/11/26 20:04:33 sam Exp $
+ * $Id: i420_rgb.h,v 1.4 2003/08/29 18:58:05 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -29,15 +29,15 @@
  *****************************************************************************/
 struct chroma_sys_t
 {
-    u8  *p_buffer;
+    uint8_t  *p_buffer;
     int *p_offset;
 
 #ifdef MODULE_NAME_IS_i420_rgb
     /* Pre-calculated conversion tables */
     void *p_base;                          /* base for all conversion tables */
-    u8   *p_rgb8;                                        /* RGB 8 bits table */
-    u16  *p_rgb16;                                      /* RGB 16 bits table */
-    u32  *p_rgb32;                                      /* RGB 32 bits table */
+    uint8_t   *p_rgb8;                                   /* RGB 8 bits table */
+    uint16_t  *p_rgb16;                                 /* RGB 16 bits table */
+    uint32_t  *p_rgb32;                                 /* RGB 32 bits table */
 #endif
 };
 
@@ -175,13 +175,13 @@ void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
         {                                                                     \
             *p_pic++ = *p_buffer;   p_buffer += *p_offset++;                  \
         }                                                                     \
-        (u8*)p_pic += i_right_margin;                                         \
+        (uint8_t*)p_pic += i_right_margin;                                    \
     }                                                                         \
     else                                                                      \
     {                                                                         \
         /* No scaling, conversion has been done directly in picture memory.   \
          * Increment of picture pointer to end of line is still needed */     \
-        (u8*)p_pic += p_dest->p->i_pitch;                                     \
+        (uint8_t*)p_pic += p_dest->p->i_pitch;                                \
     }                                                                         \
 
 /*****************************************************************************
@@ -213,7 +213,7 @@ void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
         }                                                                     \
     }                                                                         \
     /* Increment of picture pointer to end of line is still needed */         \
-    (u8*)p_pic += i_right_margin;                                             \
+    (uint8_t*)p_pic += i_right_margin;                                        \
                                                                               \
     /* Increment the Y coordinate in the matrix, modulo 4 */                  \
     i_real_y = (i_real_y + 1) & 0x3;                                          \
@@ -267,7 +267,7 @@ void E_(I420_RGB32)        ( vout_thread_t *, picture_t *, picture_t * );
             /* Height increment: copy previous picture line */                \
             p_vout->p_vlc->pf_memcpy( p_pic, p_pic_start,                     \
                                       p_vout->output.i_width * BPP );         \
-            (u8*)p_pic += p_dest->p->i_pitch;                                 \
+            (uint8_t*)p_pic += p_dest->p->i_pitch;                            \
         }                                                                     \
         i_scale_count += p_vout->output.i_height;                             \
         break;                                                                \

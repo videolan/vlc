@@ -2,7 +2,7 @@
  * i420_yuy2.c : YUV to YUV conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: i420_yuy2.c,v 1.2 2002/11/20 13:37:36 sam Exp $
+ * $Id: i420_yuy2.c,v 1.3 2003/08/29 18:58:05 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -71,8 +71,8 @@ vlc_module_begin();
     set_capability( "chroma", 100 );
     add_requirement( MMX );
     /* Initialize MMX-specific constants */
-    i_00ffw = 0x00ff00ff00ff00ff;
-    i_80w   = 0x0000000080808080;
+    i_00ffw = 0x00ff00ff00ff00ffULL;
+    i_80w   = 0x0000000080808080ULL;
 #endif
     set_callbacks( Activate, NULL );
 vlc_module_end();
@@ -147,10 +147,10 @@ static int Activate( vlc_object_t *p_this )
 static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    u8 *p_line1, *p_line2 = p_dest->p->p_pixels;
-    u8 *p_y1, *p_y2 = p_source->Y_PIXELS;
-    u8 *p_u = p_source->U_PIXELS;
-    u8 *p_v = p_source->V_PIXELS;
+    uint8_t *p_line1, *p_line2 = p_dest->p->p_pixels;
+    uint8_t *p_y1, *p_y2 = p_source->Y_PIXELS;
+    uint8_t *p_u = p_source->U_PIXELS;
+    uint8_t *p_v = p_source->V_PIXELS;
 
     int i_x, i_y;
 
@@ -192,10 +192,10 @@ static void I420_YUY2( vout_thread_t *p_vout, picture_t *p_source,
 static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    u8 *p_line1, *p_line2 = p_dest->p->p_pixels;
-    u8 *p_y1, *p_y2 = p_source->Y_PIXELS;
-    u8 *p_u = p_source->U_PIXELS;
-    u8 *p_v = p_source->V_PIXELS;
+    uint8_t *p_line1, *p_line2 = p_dest->p->p_pixels;
+    uint8_t *p_y1, *p_y2 = p_source->Y_PIXELS;
+    uint8_t *p_u = p_source->U_PIXELS;
+    uint8_t *p_v = p_source->V_PIXELS;
 
     int i_x, i_y;
 
@@ -237,10 +237,10 @@ static void I420_YVYU( vout_thread_t *p_vout, picture_t *p_source,
 static void I420_UYVY( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    u8 *p_line1, *p_line2 = p_dest->p->p_pixels;
-    u8 *p_y1, *p_y2 = p_source->Y_PIXELS;
-    u8 *p_u = p_source->U_PIXELS;
-    u8 *p_v = p_source->V_PIXELS;
+    uint8_t *p_line1, *p_line2 = p_dest->p->p_pixels;
+    uint8_t *p_y1, *p_y2 = p_source->Y_PIXELS;
+    uint8_t *p_u = p_source->U_PIXELS;
+    uint8_t *p_v = p_source->V_PIXELS;
 
     int i_x, i_y;
 
@@ -292,12 +292,14 @@ static void I420_IUYV( vout_thread_t *p_vout, picture_t *p_source,
 static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    u8 *p_line1 = p_dest->p->p_pixels + p_dest->p->i_lines * p_dest->p->i_pitch
-                                      + p_dest->p->i_pitch;
-    u8 *p_line2 = p_dest->p->p_pixels + p_dest->p->i_lines * p_dest->p->i_pitch;
-    u8 *p_y1, *p_y2 = p_source->Y_PIXELS;
-    u8 *p_u = p_source->U_PIXELS;
-    u8 *p_v = p_source->V_PIXELS;
+    uint8_t *p_line1 = p_dest->p->p_pixels +
+                       p_dest->p->i_lines * p_dest->p->i_pitch
+                       + p_dest->p->i_pitch;
+    uint8_t *p_line2 = p_dest->p->p_pixels +
+                       p_dest->p->i_lines * p_dest->p->i_pitch;
+    uint8_t *p_y1, *p_y2 = p_source->Y_PIXELS;
+    uint8_t *p_u = p_source->U_PIXELS;
+    uint8_t *p_v = p_source->V_PIXELS;
 
     int i_x, i_y;
 
@@ -340,10 +342,10 @@ static void I420_cyuv( vout_thread_t *p_vout, picture_t *p_source,
 static void I420_Y211( vout_thread_t *p_vout, picture_t *p_source,
                                               picture_t *p_dest )
 {
-    u8 *p_line1, *p_line2 = p_dest->p->p_pixels;
-    u8 *p_y1, *p_y2 = p_source->Y_PIXELS;
-    u8 *p_u = p_source->U_PIXELS;
-    u8 *p_v = p_source->V_PIXELS;
+    uint8_t *p_line1, *p_line2 = p_dest->p->p_pixels;
+    uint8_t *p_y1, *p_y2 = p_source->Y_PIXELS;
+    uint8_t *p_u = p_source->U_PIXELS;
+    uint8_t *p_v = p_source->V_PIXELS;
 
     int i_x, i_y;
 

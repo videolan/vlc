@@ -2,7 +2,7 @@
  * i420_rgb16.c : YUV to bitmap RGB conversion module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: i420_rgb16.c,v 1.4 2002/11/25 19:29:10 sam Exp $
+ * $Id: i420_rgb16.c,v 1.5 2003/08/29 18:58:05 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -54,10 +54,10 @@ void E_(I420_RGB16_dithering)( vout_thread_t *p_vout, picture_t *p_src,
                                                       picture_t *p_dest )
 {
     /* We got this one from the old arguments */
-    u16 *p_pic = (u16*)p_dest->p->p_pixels;
-    u8  *p_y   = p_src->Y_PIXELS;
-    u8  *p_u   = p_src->U_PIXELS;
-    u8  *p_v   = p_src->V_PIXELS;
+    uint16_t *p_pic = (uint16_t*)p_dest->p->p_pixels;
+    uint8_t  *p_y   = p_src->Y_PIXELS;
+    uint8_t  *p_u   = p_src->U_PIXELS;
+    uint8_t  *p_v   = p_src->V_PIXELS;
 
     vlc_bool_t   b_hscale;                        /* horizontal scaling type */
     int          i_vscale;                          /* vertical scaling type */
@@ -68,15 +68,15 @@ void E_(I420_RGB16_dithering)( vout_thread_t *p_vout, picture_t *p_src,
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
-    u16 *       p_pic_start;       /* beginning of the current line for copy */
+    uint16_t *  p_pic_start;       /* beginning of the current line for copy */
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
-    u16 *       p_yuv = p_vout->chroma.p_sys->p_rgb16;
-    u16 *       p_ybase;                     /* Y dependant conversion table */
+    uint16_t *  p_yuv = p_vout->chroma.p_sys->p_rgb16;
+    uint16_t *  p_ybase;                     /* Y dependant conversion table */
 
     /* Conversion buffer pointer */
-    u16 *       p_buffer_start = (u16*)p_vout->chroma.p_sys->p_buffer;
-    u16 *       p_buffer;
+    uint16_t *  p_buffer_start = (uint16_t*)p_vout->chroma.p_sys->p_buffer;
+    uint16_t *  p_buffer;
 
     /* Offset array pointer */
     int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
@@ -190,10 +190,10 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
-    u16 *p_pic = (u16*)p_dest->p->p_pixels;
-    u8  *p_y   = p_src->Y_PIXELS;
-    u8  *p_u   = p_src->U_PIXELS;
-    u8  *p_v   = p_src->V_PIXELS;
+    uint16_t *p_pic = (uint16_t*)p_dest->p->p_pixels;
+    uint8_t  *p_y   = p_src->Y_PIXELS;
+    uint8_t  *p_u   = p_src->U_PIXELS;
+    uint8_t  *p_v   = p_src->V_PIXELS;
 
     vlc_bool_t  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
@@ -203,17 +203,17 @@ void E_(I420_RGB16)( vout_thread_t *p_vout, picture_t *p_src,
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
-    u16 *       p_pic_start;       /* beginning of the current line for copy */
+    uint16_t *  p_pic_start;       /* beginning of the current line for copy */
 #if defined (MODULE_NAME_IS_i420_rgb)
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
-    u16 *       p_yuv = p_vout->chroma.p_sys->p_rgb16;
-    u16 *       p_ybase;                     /* Y dependant conversion table */
+    uint16_t *  p_yuv = p_vout->chroma.p_sys->p_rgb16;
+    uint16_t *  p_ybase;                     /* Y dependant conversion table */
 #endif
 
     /* Conversion buffer pointer */
-    u16 *       p_buffer_start = (u16*)p_vout->chroma.p_sys->p_buffer;
-    u16 *       p_buffer;
+    uint16_t *  p_buffer_start = (uint16_t*)p_vout->chroma.p_sys->p_buffer;
+    uint16_t *  p_buffer;
 
     /* Offset array pointer */
     int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
@@ -359,10 +359,10 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
                                             picture_t *p_dest )
 {
     /* We got this one from the old arguments */
-    u32 *p_pic = (u32*)p_dest->p->p_pixels;
-    u8  *p_y   = p_src->Y_PIXELS;
-    u8  *p_u   = p_src->U_PIXELS;
-    u8  *p_v   = p_src->V_PIXELS;
+    uint32_t *p_pic = (uint32_t*)p_dest->p->p_pixels;
+    uint8_t  *p_y   = p_src->Y_PIXELS;
+    uint8_t  *p_u   = p_src->U_PIXELS;
+    uint8_t  *p_v   = p_src->V_PIXELS;
 
     vlc_bool_t  b_hscale;                         /* horizontal scaling type */
     unsigned int i_vscale;                          /* vertical scaling type */
@@ -372,17 +372,17 @@ void E_(I420_RGB32)( vout_thread_t *p_vout, picture_t *p_src,
     int         i_rewind;
     int         i_scale_count;                       /* scale modulo counter */
     int         i_chroma_width = p_vout->render.i_width / 2; /* chroma width */
-    u32 *       p_pic_start;       /* beginning of the current line for copy */
+    uint32_t *  p_pic_start;       /* beginning of the current line for copy */
 #if defined (MODULE_NAME_IS_i420_rgb)
     int         i_uval, i_vval;                           /* U and V samples */
     int         i_red, i_green, i_blue;          /* U and V modified samples */
-    u32 *       p_yuv = p_vout->chroma.p_sys->p_rgb32;
-    u32 *       p_ybase;                     /* Y dependant conversion table */
+    uint32_t *  p_yuv = p_vout->chroma.p_sys->p_rgb32;
+    uint32_t *  p_ybase;                     /* Y dependant conversion table */
 #endif
 
     /* Conversion buffer pointer */
-    u32 *       p_buffer_start = (u32*)p_vout->chroma.p_sys->p_buffer;
-    u32 *       p_buffer;
+    uint32_t *  p_buffer_start = (uint32_t*)p_vout->chroma.p_sys->p_buffer;
+    uint32_t *  p_buffer;
 
     /* Offset array pointer */
     int *       p_offset_start = p_vout->chroma.p_sys->p_offset;
