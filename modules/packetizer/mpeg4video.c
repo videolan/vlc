@@ -117,6 +117,8 @@ static int Open( vlc_object_t *p_this )
         case VLC_FOURCC( 'd', 'x', '5', '0'):
         case VLC_FOURCC( 0x04, 0,   0,   0):
         case VLC_FOURCC( '3', 'I', 'V', '2'):
+        case VLC_FOURCC( 'm', '4', 'c', 'c'):
+        case VLC_FOURCC( 'M', '4', 'C', 'C'):
             break;
 
         default:
