@@ -1,3 +1,16 @@
+vlc (0.6.0+cvs-20030716-1) unstable; urgency=low
+
+  * New CVS snapshot.
+  * debian/control:
+    + Set policy to 3.6.0. No changes required.
+    + Extended the package description.
+  * modules/video_output/x11/xcommon.c:
+    + Fix for crashes in the Mozilla plugin (Closes: #200920).
+  * mozilla/*:
+    + Compilation fixes for Mozilla 1.4 headers (Closes: #201093).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Wed, 16 Jul 2003 16:55:31 +0200
+
 vlc (0.6.0+cvs-20030705-1) unstable; urgency=low
 
   * New CVS snapshot.
