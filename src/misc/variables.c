@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: variables.c,v 1.38 2004/02/29 13:08:56 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -501,11 +501,18 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             {
                 p_var->pf_free( &p_var->choices.p_values[i] );
             }
-            if( p_var->choices.i_count )
-                free( p_var->choices.p_values );
+            for( i = 0 ; i < p_var->choices_text.i_count ; i++ )
+            {
+                if( p_var->choices_text.p_values[i].psz_string )
+                    free( p_var->choices_text.p_values[i].psz_string );
+            }
+            if( p_var->choices.i_count ) free( p_var->choices.p_values );
+            if( p_var->choices_text.i_count ) free( p_var->choices_text.p_values );
 
             p_var->choices.i_count = 0;
             p_var->choices.p_values = NULL;
+            p_var->choices_text.i_count = 0;
+            p_var->choices_text.p_values = NULL;
             p_var->i_default = -1;
             break;
         case VLC_VAR_SETDEFAULT:
