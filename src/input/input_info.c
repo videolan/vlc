@@ -2,7 +2,7 @@
  * input_info.c: Convenient functions to handle the input info structures
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_info.c,v 1.4 2002/07/25 21:53:53 sigmunau Exp $
+ * $Id: input_info.c,v 1.5 2002/08/18 13:16:51 sigmunau Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -36,12 +36,22 @@
 #include "input_ext-intf.h"
 #include "interface.h"
 
-input_info_category_t * input_InfoCategory( input_thread_t * p_this,
+/**
+ * \brief Find info category by name.
+ *
+ * Returns a pointer to the info category with the given name, and
+ * creates it if necessary
+ *
+ * \param p_input pointer to the input thread in which the info is to be found
+ * \param psz_name the name of the category to be found
+ * \returns a pointer to the category with the given name
+ */
+input_info_category_t * input_InfoCategory( input_thread_t * p_input,
                                             char * psz_name)
 {
     input_info_category_t * p_category, * p_prev;
     p_prev = NULL;
-    for ( p_category = p_this->stream.p_info;
+    for ( p_category = p_input->stream.p_info;
           (p_category != NULL) && strcmp( p_category->psz_name, psz_name ); 
           p_category = p_category->p_next)
     {
@@ -56,7 +66,7 @@ input_info_category_t * input_InfoCategory( input_thread_t * p_this,
         p_category = malloc( sizeof( input_info_category_t ) );
         if ( !p_category )
         {
-            msg_Err( p_this, "No mem" );
+            msg_Err( p_input, "No mem" );
             return 0;
         }
         p_category->psz_name = strdup( psz_name );
@@ -67,6 +77,14 @@ input_info_category_t * input_InfoCategory( input_thread_t * p_this,
     }
 }
 
+/**
+ * \brief Add a info item to a category
+ *
+ * \param p_category Pointer to the category to put this info in
+ * \param psz_name Name of the info item to add
+ * \param psz_format printf style format string for the value.
+ * \return a negative number on error. 0 on success.
+ */
 int input_AddInfo( input_info_category_t * p_category, char * psz_name,
                    char * psz_format, ...)
 {
@@ -123,6 +141,13 @@ int input_AddInfo( input_info_category_t * p_category, char * psz_name,
     return 0;
 }
 
+/**
+ * \brief Destroy info structures
+ * \internal
+ *
+ * \param p_input The input thread to be cleaned for info
+ * \returns for the moment 0
+ */
 int input_DelInfo( input_thread_t * p_input )
 {
     input_info_category_t * p_category, * p_prev_category;

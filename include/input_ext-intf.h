@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.76 2002/08/12 22:12:50 massiot Exp $
+ * $Id: input_ext-intf.h,v 1.77 2002/08/18 13:16:51 sigmunau Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -151,28 +151,53 @@ struct input_area_t
     off_t                   i_plugin_data;
 };
 
-/*****************************************************************************
- * input_info_t
- *****************************************************************************
+/**
+ * \brief A list of info items.
+ *
  * Composes a linked list of name/value pairs intended to inform the
  * user about the current stream
- *****************************************************************************/
+ * \see input_AddInfo
+ */
 struct input_info_t {
-  char *         psz_name;
-  char *         psz_value;
-  input_info_t * p_next;
+    /**
+     * Name of this item
+     */
+    char *         psz_name;
+
+    /**
+     * Value of this item
+     */
+    char *         psz_value;
+    
+    /**
+     * Pointer to next item in list, or NULL it at end of list
+     */
+    input_info_t * p_next;
 };
 
-/*****************************************************************************
- * input_info_category_t
- *****************************************************************************
- * Composes a linked list of categories in which to place info about
- * the stream.
- *****************************************************************************/
+/**
+ * \brief A list of info categories.
+ *
+ * Composes a NULL terminated linked list of categories in which to
+ * place info about the stream.
+ *
+ * \see input_InfoCategory
+ */
 struct input_info_category_t {
-  char *                  psz_name;
-  input_info_t *          p_info;
-  input_info_category_t * p_next;
+    /**
+     * The name of this category
+     */
+    char *                  psz_name;
+    
+    /**
+     * first element of a linked list containing info items
+     */
+    input_info_t *          p_info;
+    
+    /**
+     * Pointer to next element in this list, or NULL if at end of list
+     */
+    input_info_category_t * p_next;
 };
 
 /*****************************************************************************
