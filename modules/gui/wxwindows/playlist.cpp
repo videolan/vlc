@@ -33,6 +33,11 @@
 #include "bitmaps/repeat.xpm"
 #include "bitmaps/loop.xpm"
 
+
+#define HELP_SHUFFLE N_( "Shuffle" )
+#define HELP_LOOP N_( "Loop" )
+#define HELP_REPEAT N_( "Repeat" )
+
 /* Callback prototype */
 static int PlaylistChanged( vlc_object_t *, const char *,
                             vlc_value_t, vlc_value_t, void * );
@@ -176,7 +181,7 @@ END_EVENT_TABLE()
  *****************************************************************************/
 Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxFrame( p_parent, -1, wxU(_("Playlist")), wxDefaultPosition,
-             wxDefaultSize, wxDEFAULT_FRAME_STYLE )
+             wxSize(345,400), wxDEFAULT_FRAME_STYLE )
 {
     vlc_value_t val;
 
@@ -259,9 +264,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     /* Create the toolbar */
     wxToolBar *toolbar =
              CreateToolBar( wxTB_HORIZONTAL | wxTB_FLAT | wxTB_DOCKABLE );
-#define HELP_SHUFFLE "Shuffle"
-#define HELP_LOOP "Loop"
-#define HELP_REPEAT "Repeat"
 
     /* Create the random tool */
     toolbar->AddTool( Random_Event, wxT(""), wxBitmap(shuffle_on_xpm),
@@ -301,7 +303,7 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     search_button->SetDefault();
     wxControl *p_dummy_ctrl =
             new wxControl( toolbar, -1, wxDefaultPosition,
-                           wxSize(64, 16 ), wxBORDER_NONE );
+                           wxSize(16, 16 ), wxBORDER_NONE );
 
     toolbar->AddSeparator();
     toolbar->AddControl( p_dummy_ctrl );
@@ -317,8 +319,12 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
      * themselves to the size of a listview, and with a wxDefaultSize the
      * playlist window is ridiculously small */
     listview = new wxListView( playlist_panel, ListView_Event,
-                               wxDefaultPosition, wxDefaultSize,
+                               wxDefaultPosition, wxDefaultSize,// wxSize(-1,50),
                                wxLC_REPORT | wxSUNKEN_BORDER );
+
+    wxFont font= listview->GetFont();
+    font.SetPointSize(8);
+    listview->SetFont( font );
     listview->InsertColumn( 0, wxU(_("Name")) );
 #if 0
     listview->InsertColumn( 1, wxU(_("Author")) );
@@ -327,10 +333,8 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
 #if 0
     listview->InsertColumn( 3, wxU(_("Group")) );
 #endif
-    listview->SetColumnWidth( 0, 240 );
-    listview->SetColumnWidth( 1, 55 );
-
-   DoSize();
+   listview->SetColumnWidth( 0, 250 );
+   listview->SetColumnWidth( 1, 75 );
 
     /* Create the Up-Down buttons */
     wxButton *up_button =
@@ -355,22 +359,6 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     updown_sizer->Add( down_button, 0, wxALIGN_LEFT|wxLEFT, 3);
     updown_sizer->Layout();
 
-#if 0
-    wxBoxSizer *checkbox_sizer = new wxBoxSizer( wxHORIZONTAL );
-    //checkbox_sizer->Add( random_checkbox, 0,
-      //                   wxEXPAND | wxALIGN_RIGHT | wxALL, 5);
-    //checkbox_sizer->Add( loop_checkbox, 0,
-                         wxEXPAND | wxALIGN_RIGHT | wxALL, 5);
-    checkbox_sizer->Add( repeat_checkbox, 0,
-                         wxEXPAND | wxALIGN_RIGHT | wxALL, 5);
-    checkbox_sizer->Layout();
-
-    wxBoxSizer *search_sizer = new wxBoxSizer( wxHORIZONTAL );
-//    search_sizer->Add( search_text, 0, wxRIGHT|wxALIGN_CENTER, 3);
-//    search_sizer->Add( search_button, 0, wxLEFT|wxALIGN_CENTER, 3);
-    search_sizer->Layout();
-#endif
-
     /* The top and bottom sizers */
 #if 0
     wxBoxSizer *top_sizer = new wxBoxSizer( wxHORIZONTAL );
@@ -381,23 +369,29 @@ Playlist::Playlist( intf_thread_t *_p_intf, wxWindow *p_parent ):
     wxBoxSizer *bottom_sizer = new wxBoxSizer( wxHORIZONTAL );
     bottom_sizer->Add( updown_sizer, 0,
                        wxEXPAND |wxRIGHT | wxLEFT | wxALIGN_LEFT, 4 );
-//    bottom_sizer->Add( button_sizer, 0,
-//                     wxEXPAND|wxLEFT | wxRIGHT | wxALIGN_RIGHT, 4 );
+#if 0
+    bottom_sizer->Add( button_sizer, 0,
+                       wxEXPAND|wxLEFT | wxRIGHT | wxALIGN_RIGHT, 4 );
+#endif
+
     bottom_sizer->Layout();
 
+#if 0
     wxBoxSizer *main_sizer = new wxBoxSizer( wxVERTICAL );
+#endif
 
     wxBoxSizer *panel_sizer = new wxBoxSizer( wxVERTICAL );
- //   panel_sizer->Add( top_sizer, 0, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( listview, 1, wxEXPAND | wxALL, 5 );
     panel_sizer->Add( bottom_sizer, 0, wxEXPAND | wxALL, 5);
     panel_sizer->Layout();
 
     playlist_panel->SetSizerAndFit( panel_sizer );
+    DoSize();
+#if 0
     main_sizer->Add( playlist_panel, 1, wxGROW, 0 );
     main_sizer->Layout();
     SetSizerAndFit( main_sizer );
-
+#endif
 #if wxUSE_DRAG_AND_DROP
     /* Associate drop targets with the playlist */
     SetDropTarget( new DragAndDrop( p_intf, VLC_TRUE ) );
@@ -438,7 +432,7 @@ void Playlist::OnSize( wxSizeEvent& event)
 void Playlist::DoSize()
 {
     wxSize size = GetClientSize();
-    listview->SetSize( 0,0,size.x,size.y);
+    listview->SetSize( 0,0, size.x ,size.y * 4 / 5);
 }
 
 
@@ -562,6 +556,7 @@ void Playlist::Rebuild()
     {
         wxString filename = wxL2U(p_playlist->pp_items[i]->input.psz_name);
         listview->InsertItem( i, filename );
+        /* FIXME: Very slow, need to find the playlist many times */
         UpdateItem( i );
     }
     vlc_mutex_unlock( &p_playlist->object_lock );
