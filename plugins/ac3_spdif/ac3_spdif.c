@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.29 2002/06/02 23:43:38 bozo Exp $
+ * $Id: ac3_spdif.c,v 1.30 2002/06/05 18:15:46 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -166,7 +166,12 @@ static int decoder_Run( decoder_fifo_t * p_fifo )
     
     if (InitThread( p_spdif ) )
     {
-        msg_Err( p_fifo, "could not initialize thread" );
+        
+        if( p_fifo->b_error )
+        {
+            msg_Err( p_fifo, "could not initialize thread" );
+        }
+
         DecoderError( p_fifo );
         free( p_spdif );
         return( -1 );
