@@ -2,7 +2,7 @@
  * dummy_dvdcss.h: Dummy libdvdcss header.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: dummy_dvdcss.h,v 1.3 2001/11/12 20:16:33 sam Exp $
+ * $Id: dummy_dvdcss.h,v 1.4 2001/11/13 01:25:05 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -27,23 +27,13 @@
 typedef struct dvdcss_s* dvdcss_handle;
 
 /*****************************************************************************
- * Flags
+ * Defines and flags
  *****************************************************************************/
-#define DVDCSS_NOFLAGS         0
-
-#define DVDCSS_READ_DECRYPT    (1 << 0)
-
-#define DVDCSS_SEEK_INI        (1 << 0)
-#define DVDCSS_SEEK_MPEG       (2 << 0)
-
 #define DVDCSS_BLOCK_SIZE      2048
 
-/*****************************************************************************
- * libdvdcss method: used like init flags
- *****************************************************************************/
-#define DVDCSS_KEY        0
-#define DVDCSS_DISC       1
-#define DVDCSS_TITLE      2
+#define DVDCSS_NOFLAGS         0
+#define DVDCSS_READ_DECRYPT    (1 << 0)
+#define DVDCSS_SEEK_MPEG       (1 << 0)
 
 /*****************************************************************************
  * Exported prototypes

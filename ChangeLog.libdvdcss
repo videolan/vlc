@@ -9,6 +9,7 @@ HEAD
 1.0.0
 Mon, 12 Nov 2001 17:14:29 +0100
 
+  * Got rid of DVDCSS_SEEK_INI.
   * Removed the i_flags argument to dvdcss_open. Everything is done through
     environment variables now.
   * Fixed a buffer overflow in CSSAuth().
