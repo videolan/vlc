@@ -2,7 +2,7 @@
  * kde.cpp : KDE plugin for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: kde.cpp,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: kde.cpp,v 1.2 2002/08/18 13:14:39 sigmunau Exp $
  *
  * Authors: Andres Krapf <dae@chez.com> Sun Mar 25 2001
  *
@@ -37,28 +37,14 @@
 #include <qwidget.h>
 
 /*****************************************************************************
- * The local class.
+ * The local class and prototypes
  *****************************************************************************/
 class KInterface;
 class KAboutData;
 
-class KThread
-{
-    private:
-        KThread ( KThread &thread ) { };
-        KThread &operator= ( KThread &thread ) { return ( *this ); };
-
-        intf_thread_t *p_intf;
-        
-    public:
-        KThread(intf_thread_t *p_intf);
-        ~KThread();
-
-        // These methods get exported to the core
-        static int     open    ( vlc_object_t * );
-        static void    close   ( vlc_object_t * );
-        static void    run     ( intf_thread_t * );
-};
+static int open( vlc_object_t * p_this );
+static void close( vlc_object_t * p_this );
+static void run(intf_thread_t *p_intf);
 
 /*****************************************************************************
  * Module descriptor
@@ -73,16 +59,52 @@ vlc_module_begin();
     set_capability( "interface", i );
     set_program( "kvlc" );
     //set_callbacks( E_(Open), E_(Close) );
-    set_callbacks( KThread::open, KThread::close );
+    set_callbacks( open, close );
 vlc_module_end();
 
 /*****************************************************************************
- * KThread::KThread: KDE interface constructor
+ * KThread::open: initialize and create window
  *****************************************************************************/
-KThread::KThread(intf_thread_t *p_intf)
+static int open(vlc_object_t *p_this)
 {
-    this->p_intf = p_intf;
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
+    /* Allocate instance and initialize some members */
+    p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
+    if( p_intf->p_sys == NULL )
+    {
+        msg_Err( p_intf, "out of memory" );
+        return( 1 );
+    }
+
+    p_intf->pf_run = run;
+    return ( 0 );
+}
+
+/*****************************************************************************
+ * KThread::close: destroy interface window
+ *****************************************************************************/
+static void close(vlc_object_t *p_this)
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    if( p_intf->p_sys->p_input )
+    {
+        vlc_object_release( p_intf->p_sys->p_input );
+    }
+    
+    delete p_intf->p_sys->p_app;
+    delete p_intf->p_sys->p_about;
+    free( p_intf->p_sys );
+}
+
+/*****************************************************************************
+ * KThread::run: KDE thread
+ *****************************************************************************
+ * This part of the interface is in a separate thread so that we can call
+ * exec() from within it without annoying the rest of the program.
+ *****************************************************************************/
+void run(intf_thread_t *p_intf)
+{
     p_intf->p_sys->p_about =
       new KAboutData( "VideoLAN Client", I18N_NOOP("Kvlc"), VERSION,
          _("This is the VideoLAN client, a DVD and MPEG player. It can play "
@@ -90,7 +112,7 @@ KThread::KThread(intf_thread_t *p_intf)
          KAboutData::License_GPL,
          _("(C) 1996, 1997, 1998, 1999, 2000, 2001, 2002 - the VideoLAN Team"),
          0, 0, "");
-
+ 
     char *authors[][2] = {
         { "the VideoLAN Team", "<videolan@videolan.org>" },
         { NULL, NULL },
@@ -109,65 +131,7 @@ KThread::KThread(intf_thread_t *p_intf)
     p_intf->p_sys->p_window->setCaption( VOUT_TITLE " (KDE interface)" );
 
     p_intf->p_sys->p_input = NULL;
-}
 
-/*****************************************************************************
- * KThread::~KThread: KDE interface destructor
- *****************************************************************************/
-KThread::~KThread()
-{
-    if( p_intf->p_sys->p_input )
-    {
-        vlc_object_release( p_intf->p_sys->p_input );
-    }
-
-    /* XXX: can be deleted if the user closed the window ! */
-    //delete p_intf->p_sys->p_window;
-
-    delete p_intf->p_sys->p_app;
-    delete p_intf->p_sys->p_about;
-}
-
-/*****************************************************************************
- * KThread::open: initialize and create window
- *****************************************************************************/
-int KThread::open(vlc_object_t *p_this)
-{
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-
-    /* Allocate instance and initialize some members */
-    p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
-    if( p_intf->p_sys == NULL )
-    {
-        msg_Err( p_intf, "out of memory" );
-        return( 1 );
-    }
-
-    p_intf->pf_run = KThread::run;
-
-    p_intf->p_sys->p_thread = new KThread(p_intf);
-    return ( 0 );
-}
-
-/*****************************************************************************
- * KThread::close: destroy interface window
- *****************************************************************************/
-void KThread::close(vlc_object_t *p_this)
-{
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-
-    delete p_intf->p_sys->p_thread;
-    free( p_intf->p_sys );
-}
-
-/*****************************************************************************
- * KThread::run: KDE thread
- *****************************************************************************
- * This part of the interface is in a separate thread so that we can call
- * exec() from within it without annoying the rest of the program.
- *****************************************************************************/
-void KThread::run(intf_thread_t *p_intf)
-{
     p_intf->p_sys->p_window->show();
     p_intf->p_sys->p_app->exec();
 }

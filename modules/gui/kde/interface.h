@@ -44,10 +44,14 @@ class KInterface : public KMainWindow
         void slotFileOpen();
         /** opens a file from the recent files menu */
         void slotFileOpenRecent(const KURL& url);
-        /** asks for saving if the file is modified, then closes the actual file and window*/
+        /** asks for saving if the file is modified, then closes the
+         * actual file and window*/
         void slotFileClose();
-        /** closes all open windows by calling close() on each memberList item until the list is empty, then quits the application.
-         * If queryClose() returns false because the user canceled the saveModified() dialog, the closing breaks.
+        /** closes all open windows by calling close() on each
+         * memberList item until the list is empty, then quits the
+         * application.  If queryClose() returns false because the
+         * user canceled the saveModified() dialog, the closing
+         * breaks.
          */
         void slotFileQuit();
         void slotShowPreferences();
@@ -58,7 +62,8 @@ class KInterface : public KMainWindow
         /** toggles the statusbar
          */
         void slotViewStatusBar();
-        /** changes the statusbar contents for the standard label permanently, used to indicate current actions.
+        /** changes the statusbar contents for the standard label
+         * permanently, used to indicate current actions.
          * @param text the text that is displayed in the statusbar
          */
         void slotStatusMsg( const QString &text );
@@ -138,8 +143,6 @@ class KInterface : public KMainWindow
  *****************************************************************************/
 struct intf_sys_t
 {
-    KThread      *p_thread;
-
     KApplication *p_app;
     KInterface   *p_window;
     KAboutData   *p_about;

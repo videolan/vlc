@@ -25,6 +25,7 @@
 #include <qdragobject.h>
 #include <qtimer.h>
 #include <kdialog.h>
+#include <kstatusbar.h>
 
 #define ID_STATUS_MSG       1
 #define ID_DATE             2
@@ -117,7 +118,7 @@ void KInterface::initActions()
     next->setStatusText( i18n( "Next" ) );
     // use the absolute path to your ktestui.rc file for testing purpose in createGUI();
 
-    createGUI("modules/gui/kde/ui.rc");
+    createGUI( DATA_PATH "/vlc_kde_ui.rc" );
 }
 
 void KInterface::initStatusBar()
