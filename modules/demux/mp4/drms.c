@@ -107,18 +107,6 @@ struct shuffle_s
     uint32_t p_bordel[ 16 ];
 };
 
-/*****************************************************************************
- * shuffle_ext_s: extended shuffle structure
- *****************************************************************************
- * This structure stores the static information needed to shuffle data using
- * a custom algorithm.
- *****************************************************************************/
-struct shuffle_ext_s
-{
-    uint32_t * p_bordel;
-    uint32_t i_cmd, i_jc, i_tmp;
-};
-
 #define SWAP( a, b ) { (a) ^= (b); (b) ^= (a); (a) ^= (b); }
 
 /*****************************************************************************
@@ -154,14 +142,17 @@ static void InitShuffle   ( struct shuffle_s *, uint32_t *, uint32_t );
 static void DoShuffle     ( struct shuffle_s *, uint32_t *, uint32_t );
 
 static uint32_t FirstPass ( uint32_t * );
-static void SecondPass    ( struct shuffle_ext_s * );
-static uint32_t ThirdPass ( uint32_t * );
-static void FourthPass    ( uint32_t *, uint32_t );
-static void FifthPass     ( uint32_t * );
-static void BigShuffle1   ( struct shuffle_ext_s * );
-static void BigShuffle2   ( struct shuffle_ext_s * );
+static void SecondPass    ( uint32_t *, uint32_t );
+static void ThirdPass     ( uint32_t * );
+static void FourthPass    ( uint32_t * );
 static void TinyShuffle1  ( uint32_t * );
 static void TinyShuffle2  ( uint32_t * );
+static void TinyShuffle3  ( uint32_t * );
+static void TinyShuffle4  ( uint32_t * );
+static void TinyShuffle5  ( uint32_t * );
+static void TinyShuffle6  ( uint32_t * );
+static void TinyShuffle7  ( uint32_t * );
+static void TinyShuffle8  ( uint32_t * );
 static void DoExtShuffle  ( uint32_t * );
 
 static int GetSystemKey   ( uint32_t *, vlc_bool_t );
@@ -821,51 +812,21 @@ static void DoShuffle( struct shuffle_s *p_shuffle,
 static void DoExtShuffle( uint32_t * p_bordel )
 {
     uint32_t i_ret;
-    struct shuffle_ext_s exs;
-    exs.p_bordel = p_bordel;
 
-    exs.i_tmp = FirstPass( p_bordel );
+    i_ret = FirstPass( p_bordel );
 
-    SecondPass( &exs );
+    SecondPass( p_bordel, i_ret );
 
-    i_ret = ThirdPass( p_bordel );
+    ThirdPass( p_bordel );
 
-    FourthPass( p_bordel, i_ret );
-
-    FifthPass( p_bordel );
+    FourthPass( p_bordel );
 }
 
 static uint32_t FirstPass( uint32_t * p_bordel )
 {
-    uint32_t i, j;
-    uint32_t i_cmd, i_ret;
+    uint32_t i, i_cmd, i_ret = 5;
 
-    i_ret = 5;
-    i_cmd = (p_bordel[ 5 ] + 10) >> 2;
-
-    if( p_bordel[ 5 ] > 0x7D0 )
-    {
-        i_cmd -= 0x305;
-    }
-
-    switch( i_cmd & 3 )
-    {
-        case 0:
-            p_bordel[ 5 ] += 5;
-            break;
-        case 1:
-            p_bordel[ 4 ] -= 1;
-            break;
-        case 2:
-            if( p_bordel[ 4 ] & 5 )
-            {
-                p_bordel[ 1 ] ^= 0x4D;
-            }
-            /* no break */
-        case 3:
-            p_bordel[ 12 ] += 5;
-            break;
-    }
+    TinyShuffle1( p_bordel );
 
     for( ; ; )
     {
@@ -884,9 +845,7 @@ static uint32_t FirstPass( uint32_t * p_bordel )
 
             if( (p_bordel[ 1 ] + p_bordel[ 2 ]) >= 0x7D0 )
             {
-                i_cmd = ((p_bordel[ 3 ] ^ 0x567F) >> 2) & 7;
-
-                switch( i_cmd )
+                switch( ((p_bordel[ 3 ] ^ 0x567F) >> 2) & 7 )
                 {
                     case 0:
                         for( i = 0; i < 3; i++ )
@@ -1012,6 +971,310 @@ break2:
             break;
     }
 
+    TinyShuffle2( p_bordel );
+
+    return i_ret;
+}
+
+static void SecondPass( uint32_t * p_bordel, uint32_t i_tmp )
+{
+    uint32_t i, i_cmd, i_jc = 5;
+
+    TinyShuffle3( p_bordel );
+
+    for( i = 0, i_cmd = 0; i < 16; i++ )
+    {
+        if( p_bordel[ i ] > p_bordel[ i_cmd ] )
+        {
+            i_cmd = i;
+        }
+    }
+
+    switch( i_cmd )
+    {
+        case 0:
+            if( p_bordel[ 1 ] < p_bordel[ 8 ] )
+            {
+                p_bordel[ 5 ] += 1;
+            }
+            break;
+        case 4:
+            if( (p_bordel[ 9 ] & 0x7777) == 0x3333 )
+            {
+                p_bordel[ 5 ] -= 1;
+            }
+            else
+            {
+                i_jc--;
+                if( p_bordel[ 1 ] < p_bordel[ 8 ] )
+                {
+                    p_bordel[ 5 ] += 1;
+                }
+                break;
+            }
+            /* no break */
+        case 7:
+            p_bordel[ 2 ] -= 1;
+            p_bordel[ 1 ] -= p_bordel[ 5 ];
+            for( i = 0; i < 3; i++ )
+            {
+                switch( p_bordel[ 1 ] & 3 )
+                {
+                    case 0:
+                        p_bordel[ 1 ] += 1;
+                        /* no break */
+                    case 1:
+                        p_bordel[ 3 ] -= 8;
+                        break;
+                    case 2:
+                        p_bordel[ 13 ] &= 0xFEFEFEF7;
+                        break;
+                    case 3:
+                        p_bordel[ 8 ] |= 0x80080011;
+                        break;
+                }
+            }
+            return;
+        case 10:
+            p_bordel[ 4 ] -= 1;
+            p_bordel[ 5 ] += 1;
+            p_bordel[ 6 ] -= 1;
+            p_bordel[ 7 ] += 1;
+            break;
+        default:
+            p_bordel[ 15 ] ^= 0x18547EFF;
+            break;
+    }
+
+    for( i = 3; i--; )
+    {
+        switch( ( p_bordel[ 12 ] + p_bordel[ 13 ] + p_bordel[ 6 ] ) % 5 )
+        {
+            case 0:
+                p_bordel[ 12 ] -= 1;
+                /* no break */
+            case 1:
+                p_bordel[ 12 ] -= 1;
+                p_bordel[ 13 ] += 1;
+                break;
+            case 2:
+                p_bordel[ 13 ] += 4;
+                /* no break */
+            case 3:
+                p_bordel[ 12 ] -= 1;
+                break;
+            case 4:
+                i_jc--;
+                p_bordel[ 5 ] += 1;
+                p_bordel[ 6 ] -= 1;
+                p_bordel[ 7 ] += 1;
+                i = 3; /* Restart the whole loop */
+                break;
+        }
+    }
+
+    TinyShuffle4( p_bordel );
+
+    for( ; ; )
+    {
+        TinyShuffle5( p_bordel );
+
+        switch( ( p_bordel[ 2 ] * 2 + 15 ) % 5 )
+        {
+            case 0:
+                if( ( p_bordel[ 3 ] + i_tmp ) <=
+                    ( p_bordel[ 1 ] + p_bordel[ 15 ] ) )
+                {
+                    p_bordel[ 3 ] += 1;
+                }
+                break;
+            case 4:
+                p_bordel[ 10 ] -= 0x13;
+                break;
+            case 3:
+                p_bordel[ 5 ] >>= 2;
+                break;
+        }
+
+        if( !( p_bordel[ 2 ] & 1 ) || i_jc == 0 )
+        {
+            break;
+        }
+
+        i_jc--;
+        p_bordel[ 2 ] += 0x13;
+        p_bordel[ 12 ] += 1;
+    }
+
+    p_bordel[ 2 ] &= 0x10076000;
+}
+
+static void ThirdPass( uint32_t * p_bordel )
+{
+    uint32_t i_cmd;
+
+    i_cmd = ((p_bordel[ 7 ] + p_bordel[ 14 ] + 10) >> 1) - p_bordel[ 14 ];
+    i_cmd = i_cmd % 10;
+
+    switch( i_cmd )
+    {
+        case 0:
+            p_bordel[ 1 ] <<= 1;
+            p_bordel[ 2 ] <<= 2;
+            p_bordel[ 3 ] <<= 3;
+            break;
+        case 6:
+            p_bordel[ i_cmd + 3 ] &= 0x5EDE36B;
+            p_bordel[ 5 ] += p_bordel[ 8 ];
+            p_bordel[ 4 ] += p_bordel[ 7 ];
+            p_bordel[ 3 ] += p_bordel[ 6 ];
+            p_bordel[ 2 ] += p_bordel[ 5 ];
+            /* no break */
+        case 2:
+            p_bordel[ 1 ] += p_bordel[ 4 ];
+            p_bordel[ 0 ] += p_bordel[ 3 ];
+            TinyShuffle6( p_bordel );
+            return; /* jc = 4 */
+        case 3:
+            if( (p_bordel[ 11 ] & p_bordel[ 2 ]) > 0x211B )
+            {
+                p_bordel[ 6 ] += 1;
+            }
+            break;
+        case 4:
+            p_bordel[ 7 ] += 1;
+            /* no break */
+        case 5:
+            p_bordel[ 9 ] ^= p_bordel[ 2 ];
+            break;
+        case 7:
+            p_bordel[ 2 ] ^= (p_bordel[ 1 ] & p_bordel[ 13 ]);
+            break;
+        case 8:
+            p_bordel[ 0 ] -= p_bordel[ 11 ] & p_bordel[ 15 ];
+            return; /* jc = 4 */
+        case 9:
+            p_bordel[ 6 ] >>= (p_bordel[ 14 ] & 3);
+            break;
+    }
+
+    SWAP( p_bordel[ 0 ], p_bordel[ 10 ] );
+
+    TinyShuffle6( p_bordel );
+
+    return; /* jc = 5 */
+}
+
+static void FourthPass( uint32_t * p_bordel )
+{
+    uint32_t i, j;
+
+    TinyShuffle7( p_bordel );
+
+    switch( p_bordel[ 5 ] % 5)
+    {
+        case 0:
+            p_bordel[ 0 ] += 1;
+            break;
+        case 2:
+            p_bordel[ 11 ] ^= (p_bordel[ 3 ] + p_bordel[ 6 ] + p_bordel[ 8 ]);
+            break;
+        case 3:
+            for( i = 4; i < 15 && (p_bordel[ i ] & 5) == 0; i++ )
+            {
+                SWAP( p_bordel[ i ], p_bordel[ 15 - i ] );
+            }
+            break;
+        case 4:
+            p_bordel[ 12 ] -= 1;
+            p_bordel[ 13 ] += 1;
+            p_bordel[ 2 ] -= 0x64;
+            p_bordel[ 3 ] += 0x64;
+            TinyShuffle8( p_bordel );
+            return;
+    }
+
+    for( i = 0, j = 0; i < 16; i++ )
+    {
+        if( p_bordel[ i ] > p_bordel[ j ] )
+        {
+            j = i;
+        }
+    }
+
+    switch( p_bordel[ j ] % 100 )
+    {
+        case 0:
+            SWAP( p_bordel[ 0 ], p_bordel[ j ] );
+            break;
+        case 8:
+            p_bordel[ 1 ] >>= 1;
+            p_bordel[ 2 ] <<= 1;
+            p_bordel[ 14 ] >>= 3;
+            p_bordel[ 15 ] <<= 4;
+            break;
+        case 57:
+            p_bordel[ j ] += p_bordel[ 13 ];
+            break;
+        case 76:
+            p_bordel[ 1 ] += 0x20E;
+            p_bordel[ 5 ] += 0x223D;
+            p_bordel[ 13 ] -= 0x576;
+            p_bordel[ 15 ] += 0x576;
+            return;
+        case 91:
+            p_bordel[ 2 ] -= 0x64;
+            p_bordel[ 3 ] += 0x64;
+            p_bordel[ 12 ] -= 1;
+            p_bordel[ 13 ] += 1;
+            break;
+        case 99:
+            p_bordel[ 0 ] += 1;
+            p_bordel[ j ] += p_bordel[ 13 ];
+            break;
+    }
+
+    TinyShuffle8( p_bordel );
+}
+
+/*****************************************************************************
+ * TinyShuffle[12345678]: tiny shuffle subroutines
+ *****************************************************************************
+ * These standalone functions are little helpers for the shuffling process.
+ *****************************************************************************/
+static void TinyShuffle1( uint32_t * p_bordel )
+{
+    uint32_t i_cmd = (p_bordel[ 5 ] + 10) >> 2;
+
+    if( p_bordel[ 5 ] > 0x7D0 )
+    {
+        i_cmd -= 0x305;
+    }
+
+    switch( i_cmd & 3 )
+    {
+        case 0:
+            p_bordel[ 5 ] += 5;
+            break;
+        case 1:
+            p_bordel[ 4 ] -= 1;
+            break;
+        case 2:
+            if( p_bordel[ 4 ] & 5 )
+            {
+                p_bordel[ 1 ] ^= 0x4D;
+            }
+            /* no break */
+        case 3:
+            p_bordel[ 12 ] += 5;
+            break;
+    }
+}
+
+static void TinyShuffle2( uint32_t * p_bordel )
+{
+    uint32_t i, j;
+
     for( i = 0, j = 0; i < 16; i++ )
     {
         if( (p_bordel[ i ] & 0x777) > (p_bordel[ j ] & 0x777) )
@@ -1031,341 +1294,94 @@ break2:
     {
         p_bordel[ 2 ] &= 0xB62FC;
     }
-
-    return i_ret;
 }
 
-static void SecondPass( struct shuffle_ext_s * p_exs )
+static void TinyShuffle3( uint32_t * p_bordel )
 {
-    uint32_t i;
+    uint32_t i_cmd = p_bordel[ 6 ] + 0x194B;
 
-    p_exs->i_cmd = p_exs->p_bordel[ 6 ] + 0x194B;
-    if( p_exs->p_bordel[ 6 ] > 0x2710 )
+    if( p_bordel[ 6 ] > 0x2710 )
     {
-        p_exs->i_cmd >>= 1;
+        i_cmd >>= 1;
     }
 
-    switch( p_exs->i_cmd & 3 )
+    switch( i_cmd & 3 )
     {
         case 1:
-            p_exs->p_bordel[ 3 ] += 0x19FE;
+            p_bordel[ 3 ] += 0x19FE;
             break;
         case 2:
-            p_exs->p_bordel[ 7 ] -= p_exs->p_bordel[ 3 ] >> 2;
+            p_bordel[ 7 ] -= p_bordel[ 3 ] >> 2;
             /* no break */
         case 0:
-            p_exs->p_bordel[ 5 ] ^= 0x248A;
+            p_bordel[ 5 ] ^= 0x248A;
             break;
     }
-
-    p_exs->i_jc = 5;
-
-    for( i = 0, p_exs->i_cmd = 0; i < 16; i++ )
-    {
-        if( p_exs->p_bordel[ i ] > p_exs->p_bordel[ p_exs->i_cmd ] )
-        {
-            p_exs->i_cmd = i;
-        }
-    }
-
-    switch( p_exs->i_cmd )
-    {
-        case 0:
-            if( p_exs->p_bordel[ 1 ] < p_exs->p_bordel[ 8 ] )
-            {
-                p_exs->p_bordel[ 5 ] += 1;
-            }
-            break;
-        case 4:
-            if( (p_exs->p_bordel[ 9 ] & 0x7777) == 0x3333 )
-            {
-                p_exs->p_bordel[ 5 ] -= 1;
-            }
-            else
-            {
-                p_exs->i_jc--;
-                if( p_exs->p_bordel[ 1 ] < p_exs->p_bordel[ 8 ] )
-                {
-                    p_exs->p_bordel[ 5 ] += 1;
-                }
-                break;
-            }
-            /* no break */
-        case 7:
-            p_exs->p_bordel[ 2 ] -= 1;
-            p_exs->p_bordel[ 1 ] -= p_exs->p_bordel[ 5 ];
-            TinyShuffle1( p_exs->p_bordel );
-            return;
-        case 10:
-            p_exs->p_bordel[ 4 ] -= 1;
-            p_exs->p_bordel[ 5 ] += 1;
-            p_exs->p_bordel[ 6 ] -= 1;
-            p_exs->p_bordel[ 7 ] += 1;
-            break;
-        default:
-            p_exs->p_bordel[ 15 ] ^= 0x18547EFF;
-            break;
-    }
-
-    BigShuffle1( p_exs );
 }
 
-static void BigShuffle1( struct shuffle_ext_s * p_exs )
+static void TinyShuffle4( uint32_t * p_bordel )
 {
     uint32_t i, j;
 
-    for( i = 0; i < 3; i++ )
-    {
-        p_exs->i_cmd = p_exs->p_bordel[ 12 ] + p_exs->p_bordel[ 13 ] + p_exs->p_bordel[ 6 ];
-        p_exs->i_cmd -= (((uint32_t)(((uint64_t)p_exs->i_cmd * 0x0CCCCCCCD) >> 32)) >> 2) * 5;
-
-        if( p_exs->i_cmd > 4 )
-        {
-            break;
-        }
-
-        switch( p_exs->i_cmd )
-        {
-            case 0:
-                p_exs->p_bordel[ 12 ] -= 1;
-                /* no break */
-            case 1:
-                p_exs->p_bordel[ 12 ] -= 1;
-                p_exs->p_bordel[ 13 ] += 1;
-                break;
-            case 2:
-                p_exs->p_bordel[ 13 ] += 4;
-                /* no break */
-            case 3:
-                p_exs->p_bordel[ 12 ] -= 1;
-                break;
-            case 4:
-                if( p_exs->i_jc )
-                {
-                    p_exs->i_jc--;
-                    p_exs->p_bordel[ 5 ] += 1;
-                    p_exs->p_bordel[ 6 ] -= 1;
-                    p_exs->p_bordel[ 7 ] += 1;
-                    BigShuffle1( p_exs );
-                    return;
-                }
-                break;
-        }
-    }
-
     for( i = 0, j = 0; i < 16; i++ )
     {
-        if( p_exs->p_bordel[ i ] < p_exs->p_bordel[ j ] )
+        if( p_bordel[ i ] < p_bordel[ j ] )
         {
             j = i;
         }
     }
 
-    if( (p_exs->p_bordel[ j ] % (j + 1)) > 10 )
+    if( (p_bordel[ j ] % (j + 1)) > 10 )
     {
-        p_exs->p_bordel[ 1 ] -= 1;
-
-        p_exs->p_bordel[ 2 ] += 0x13;
-        p_exs->p_bordel[ 12 ] += 1;
+        p_bordel[ 1 ] -= 1;
+        p_bordel[ 2 ] += 0x13;
+        p_bordel[ 12 ] += 1;
     }
-
-    BigShuffle2( p_exs );
 }
 
-static void BigShuffle2( struct shuffle_ext_s * p_exs )
+static void TinyShuffle5( uint32_t * p_bordel )
 {
     uint32_t i;
 
-    p_exs->p_bordel[ 2 ] &= 0x7F3F;
+    p_bordel[ 2 ] &= 0x7F3F;
 
     for( i = 0; i < 5; i++ )
     {
-        p_exs->i_cmd = (p_exs->p_bordel[ 2 ] + 0xA) + i;
-        p_exs->i_cmd -= (((uint32_t)(((uint64_t)p_exs->i_cmd * 0x0CCCCCCCD) >> 32)) >> 2) * 5;
-
-        if( p_exs->i_cmd > 4 )
-        {
-            continue;
-        }
-
-        switch( p_exs->i_cmd )
+        switch( ( p_bordel[ 2 ] + 10 + i ) % 5 )
         {
             case 0:
-                p_exs->p_bordel[ 12 ] &= p_exs->p_bordel[ 2 ];
+                p_bordel[ 12 ] &= p_bordel[ 2 ];
                 /* no break */
             case 1:
-                p_exs->p_bordel[ 3 ] ^= p_exs->p_bordel[ 15 ];
+                p_bordel[ 3 ] ^= p_bordel[ 15 ];
                 break;
             case 2:
-                p_exs->p_bordel[ 15 ] += 0x576;
+                p_bordel[ 15 ] += 0x576;
                 /* no break */
             case 3:
-                p_exs->p_bordel[ 7 ] -= 0x2D;
+                p_bordel[ 7 ] -= 0x2D;
                 /* no break */
             case 4:
-                p_exs->p_bordel[ 1 ] <<= 1;
+                p_bordel[ 1 ] <<= 1;
                 break;
         }
     }
-
-    p_exs->i_cmd = (p_exs->p_bordel[ 2 ] * 2) + 15;
-    p_exs->i_cmd -= (((uint32_t)(((uint64_t)p_exs->i_cmd * 0x0CCCCCCCD) >> 32)) >> 2) * 5;
-
-    switch( p_exs->i_cmd )
-    {
-        case 0:
-            if( ( p_exs->p_bordel[ 3 ] + p_exs->i_tmp ) <=
-                ( p_exs->p_bordel[ 1 ] + p_exs->p_bordel[ 15 ] ) )
-            {
-                p_exs->p_bordel[ 3 ] += 1;
-            }
-            break;
-        case 3:
-            p_exs->p_bordel[ 5 ] >>= 2;
-            break;
-        case 4:
-            p_exs->p_bordel[ 10 ] -= 0x13;
-            break;
-    }
-
-    p_exs->i_cmd = ((p_exs->p_bordel[ 2 ] * 2) + 10) >> 1;
-    if( p_exs->p_bordel[ 2 ] & 1 )
-    {
-        if( p_exs->i_jc )
-        {
-            p_exs->i_jc--;
-            p_exs->p_bordel[ 2 ] += 0x13;
-            p_exs->p_bordel[ 12 ] += 1;
-            BigShuffle2( p_exs );
-            return;
-        }
-    }
-
-    p_exs->i_cmd -= p_exs->p_bordel[ 2 ];
-    p_exs->i_cmd -= (((uint32_t)(((uint64_t)p_exs->i_cmd * 0x0CCCCCCCD) >> 32)) >> 3) * 10;
-
-    switch( p_exs->i_cmd )
-    {
-        case 0:
-            for( i = 0; i < 5; i++ )
-            {
-                if( ( p_exs->p_bordel[ 1 ] & p_exs->p_bordel[ 2 ] ) >
-                    ( p_exs->p_bordel[ 7 ] & p_exs->p_bordel[ 12 ] ) )
-                {
-                    p_exs->p_bordel[ 2 ] += 1;
-                    p_exs->p_bordel[ 7 ] ^= p_exs->p_bordel[ 2 ];
-                }
-            }
-        case 1:
-            p_exs->p_bordel[ 3 ] -= 1;
-            p_exs->p_bordel[ 4 ] |= 0x400000;
-            break;
-        case 2:
-            if( p_exs->p_bordel[ 13 ] >= p_exs->p_bordel[ 3 ] )
-            {
-                if( p_exs->i_jc )
-                {
-                    p_exs->i_jc--;
-                    p_exs->p_bordel[ 5 ] += 1;
-                    p_exs->p_bordel[ 6 ] -= 1;
-                    p_exs->p_bordel[ 7 ] += 1;
-                    BigShuffle1( p_exs );
-                }
-                return;
-            }
-            else
-            {
-                p_exs->p_bordel[ 5 ] += 3;
-            }
-            break;
-        case 3:
-            p_exs->p_bordel[ 1 ] ^= (p_exs->p_bordel[ 5 ] + p_exs->p_bordel[ 15 ]);
-            break;
-        case 4:
-            p_exs->p_bordel[ 14 ] += 1;
-            break;
-        case 5:
-            p_exs->p_bordel[ 2 ] &= 0x10076000;
-            break;
-        case 6:
-            p_exs->p_bordel[ 1 ] -= p_exs->p_bordel[ 5 ];
-            /* no break */
-        case 7:
-            TinyShuffle1( p_exs->p_bordel );
-            break;
-        case 8:
-            p_exs->p_bordel[ 7 ] ^= ((p_exs->p_bordel[ 1 ] + p_exs->p_bordel[ 5 ]) - p_exs->p_bordel[ 8 ]);
-            break;
-        case 9:
-            if( (p_exs->p_bordel[ 1 ] ^ p_exs->p_bordel[ 10 ]) > 0x6000 )
-            {
-                p_exs->p_bordel[ 11 ] += 1;
-            }
-            break;
-    }
 }
 
-static uint32_t ThirdPass( uint32_t * p_bordel )
-{
-    uint32_t i_cmd, i_ret = 5;
-
-    i_cmd = ((p_bordel[ 7 ] + p_bordel[ 14 ] + 10) >> 1) - p_bordel[ 14 ];
-    i_cmd -= (((uint32_t)(((uint64_t)i_cmd * 0x0CCCCCCCD) >> 32)) >> 3) * 10;
-
-    switch( i_cmd )
-    {
-        case 0:
-            p_bordel[ 1 ] <<= 1;
-            p_bordel[ 2 ] <<= 2;
-            p_bordel[ 3 ] <<= 3;
-            break;
-        case 6:
-            p_bordel[ i_cmd + 3 ] &= 0x5EDE36B;
-            /* no break */
-        case 2:
-            while( i_cmd )
-            {
-                i_cmd -= 1;
-                p_bordel[ i_cmd ] += p_bordel[ i_cmd + 3 ];
-            }
-            i_ret--;
-            TinyShuffle2( p_bordel );
-            return i_ret;
-        case 3:
-            if( (p_bordel[ 11 ] & p_bordel[ 2 ]) > 0x211B )
-            {
-                p_bordel[ 6 ] += 1;
-            }
-            break;
-        case 4:
-            p_bordel[ 7 ] += 1;
-            /* no break */
-        case 5:
-            p_bordel[ 9 ] ^= p_bordel[ 2 ];
-            break;
-        case 7:
-            p_bordel[ 2 ] ^= (p_bordel[ 1 ] & p_bordel[ 13 ]);
-            break;
-        case 8:
-            p_bordel[ 0 ] -= p_bordel[ 11 ] & p_bordel[ 15 ];
-            i_ret--;
-            return i_ret;
-        case 9:
-            p_bordel[ 6 ] >>= (p_bordel[ 14 ] & 3);
-            break;
-    }
-
-    SWAP( p_bordel[ 0 ], p_bordel[ 10 ] );
-
-    TinyShuffle2( p_bordel );
-
-    return i_ret;
-}
-
-static void FourthPass( uint32_t * p_bordel, uint32_t i_jc )
+static void TinyShuffle6( uint32_t * p_bordel )
 {
     uint32_t i, j;
-    uint32_t i_cmd;
+
+    for( i = 0; i < 8; i++ )
+    {
+        j = p_bordel[ 3 ] & 0x7514 ? 5 : 7;
+        SWAP( p_bordel[ i ], p_bordel[ i + j ] );
+    }
+}
+
+static void TinyShuffle7( uint32_t * p_bordel )
+{
+    uint32_t i;
 
     i = (((p_bordel[ 9 ] + p_bordel[ 15 ] + 12) >> 2) - p_bordel[ 4 ]) & 7;
 
@@ -1374,152 +1390,68 @@ static void FourthPass( uint32_t * p_bordel, uint32_t i_jc )
         SWAP( p_bordel[ i ], p_bordel[ i + 3 ] );
     }
 
-    SWAP( p_bordel[ 10 ], p_bordel[ 1 ] );
-
-    i_cmd = p_bordel[ 5 ];
-    i_cmd -= (((uint32_t)(((uint64_t)i_cmd * 0x0CCCCCCCD) >> 32)) >> 2) * 5;
-
-    switch( i_cmd )
-    {
-        case 0:
-            p_bordel[ 0 ] += 1;
-            break;
-        case 2:
-            p_bordel[ 11 ] ^= (p_bordel[ 3 ] + p_bordel[ 6 ] + p_bordel[ 8 ]);
-            break;
-        case 3:
-            for( i = 4; i < 15; i++ )
-            {
-                if( p_bordel[ i ] & 5 )
-                {
-                    break;
-                }
-
-                SWAP( p_bordel[ i ], p_bordel[ 15 - i ] );
-            }
-            break;
-        case 4:
-            if( i_jc )
-            {
-                p_bordel[ 12 ] -= 1;
-                p_bordel[ 13 ] += 1;
-                p_bordel[ 2 ] -= 0x64;
-                p_bordel[ 3 ] += 0x64;
-                return;
-            }
-            break;
-    }
-
-    for( i = 0, j = 0; i < 16; i++ )
-    {
-        if( p_bordel[ i ] > p_bordel[ j ] )
-        {
-            j = i;
-        }
-    }
-
-    i_cmd = p_bordel[ j ];
-    i_cmd -= (((uint32_t)(((uint64_t)i_cmd * 0x51EB851F) >> 32)) >> 5) * 0x64;
-
-    switch( i_cmd )
-    {
-        case 0x0:
-            SWAP( p_bordel[ j ], p_bordel[ 0 ] );
-            break;
-        case 0x8:
-            p_bordel[ 1 ] >>= 1;
-            p_bordel[ 2 ] <<= 1;
-            p_bordel[ 14 ] >>= 3;
-            p_bordel[ 15 ] <<= 4;
-            break;
-        case 0x39:
-            p_bordel[ j ] += p_bordel[ 13 ];
-            break;
-        case 0x4c:
-            if( i_jc )
-            {
-                p_bordel[ 1 ] += 0x20E;
-                p_bordel[ 5 ] += 0x223D;
-                p_bordel[ 13 ] -= 0x576;
-                p_bordel[ 15 ] += 0x576;
-            }
-            break;
-        case 0x5b:
-            p_bordel[ 2 ] -= 0x64;
-            p_bordel[ 3 ] += 0x64;
-            p_bordel[ 12 ] -= 1;
-            p_bordel[ 13 ] += 1;
-            break;
-        case 0x63:
-            p_bordel[ 0 ] += 1;
-            p_bordel[ j ] += p_bordel[ 13 ];
-            break;
-    }
+    SWAP( p_bordel[ 1 ], p_bordel[ 10 ] );
 }
 
-static void FifthPass( uint32_t * p_bordel )
+static void TinyShuffle8( uint32_t * p_bordel )
 {
     uint32_t i;
-    uint32_t i_cmd;
 
     i = (p_bordel[ 0 ] & p_bordel[ 6 ]) & 0xF;
 
-    i_cmd = p_bordel[ i ];
-    i_cmd -= ((((uint32_t)(((uint64_t)i_cmd * 0x10624DD3) >> 32)) >> 6) * 0x3E8);
-
-    switch( i_cmd )
+    switch( p_bordel[ i ] % 1000 )
     {
-        case 0x7:
+        case 7:
             if( (p_bordel[ i ] & 0x777) > (p_bordel[ 7 ] & 0x5555) )
             {
                 p_bordel[ i ] ^= p_bordel[ 5 ] & p_bordel[ 3 ];
             }
             break;
-        case 0x13:
+        case 19:
             p_bordel[ 15 ] &= 0x5555;
             break;
-        case 0x5d:
+        case 93:
             p_bordel[ i ] ^= p_bordel[ 15 ];
             break;
-        case 0x64:
-            SWAP( p_bordel[ 0 ], p_bordel[ 1 ] );
-            SWAP( p_bordel[ 1 ], p_bordel[ 7 ] );
+        case 100:
+            SWAP( p_bordel[ 0 ], p_bordel[ 3 ] );
+            SWAP( p_bordel[ 1 ], p_bordel[ 6 ] );
+            SWAP( p_bordel[ 3 ], p_bordel[ 6 ] );
             SWAP( p_bordel[ 4 ], p_bordel[ 9 ] );
-            SWAP( p_bordel[ 8 ], p_bordel[ 5 ] );
-            SWAP( p_bordel[ 6 ], p_bordel[ 1 ] );
-            SWAP( p_bordel[ 3 ], p_bordel[ 0 ] );
+            SWAP( p_bordel[ 5 ], p_bordel[ 8 ] );
+            SWAP( p_bordel[ 6 ], p_bordel[ 7 ] );
             SWAP( p_bordel[ 13 ], p_bordel[ 14 ] );
             break;
-        case 0x149:
+        case 329:
             p_bordel[ i ] += p_bordel[ 1 ] ^ 0x80080011;
             p_bordel[ i ] += p_bordel[ 2 ] ^ 0xBEEFDEAD;
             p_bordel[ i ] += p_bordel[ 3 ] ^ 0x8765F444;
             p_bordel[ i ] += p_bordel[ 4 ] ^ 0x78145326;
             break;
-        case 0x237:
+        case 567:
             p_bordel[ 12 ] -= p_bordel[ i ];
             p_bordel[ 13 ] += p_bordel[ i ];
             break;
-        case 0x264:
+        case 612:
             p_bordel[ i ] += p_bordel[ 1 ];
             p_bordel[ i ] -= p_bordel[ 7 ];
             p_bordel[ i ] -= p_bordel[ 8 ];
             p_bordel[ i ] += p_bordel[ 9 ];
             p_bordel[ i ] += p_bordel[ 13 ];
             break;
-        case 0x2f2:
+        case 754:
             i = __MIN( i, 12 );
             p_bordel[ i + 1 ] >>= 1;
             p_bordel[ i + 2 ] <<= 4;
             p_bordel[ i + 3 ] >>= 3;
             break;
-        case 0x309:
+        case 777:
             p_bordel[ 1 ] += 0x20E;
             p_bordel[ 5 ] += 0x223D;
             p_bordel[ 13 ] -= 0x576;
             p_bordel[ 15 ] += 0x576;
             break;
-        case 0x3d5:
+        case 981:
             if( (p_bordel[ i ] ^ 0x8765F441) < 0x2710 )
             {
                 SWAP( p_bordel[ 0 ], p_bordel[ 1 ] );
@@ -1529,47 +1461,6 @@ static void FifthPass( uint32_t * p_bordel )
                 SWAP( p_bordel[ 1 ], p_bordel[ 11 ] );
             }
             break;
-    }
-}
-
-static void TinyShuffle1( uint32_t * p_bordel )
-{
-    uint32_t i;
-
-    for( i = 0; i < 3; i++ )
-    {
-        switch( p_bordel[ 1 ] & 3 )
-        {
-            case 0:
-                p_bordel[ 1 ] += 1;
-                /* no break */
-            case 1:
-                p_bordel[ 3 ] -= 8;
-                break;
-            case 2:
-                p_bordel[ 13 ] &= 0xFEFEFEF7;
-                break;
-            case 3:
-                p_bordel[ 8 ] |= 0x80080011;
-                break;
-        }
-    }
-}
-
-static void TinyShuffle2( uint32_t * p_bordel )
-{
-    uint32_t i;
-
-    for( i = 0; i < 8; i++ )
-    {
-        if( p_bordel[ 3 ] & 0x7514 )
-        {
-            SWAP( p_bordel[ i ], p_bordel[ i + 5 ] );
-        }
-        else
-        {
-            SWAP( p_bordel[ i ], p_bordel[ i + 7 ] );
-        }
     }
 }
 
