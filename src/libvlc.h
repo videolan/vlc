@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.72 2003/05/28 03:53:04 hartman Exp $
+ * $Id: libvlc.h,v 1.73 2003/06/06 02:23:30 hartman Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -48,7 +48,8 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
 #define EXTRAINTF_LONGTEXT N_( \
     "This option allows you to select additional interfaces used by VLC. " \
     "They will be launched in the background in addition to the default " \
-    "interface. Use a comma separated list of interface modules.")
+    "interface. Use a comma separated list of interface modules. (common " \
+    "values are: logger,gestures,sap,rc,http,screensaver)")
 
 #define VERBOSE_TEXT N_("Verbosity (0,1,2)")
 #define VERBOSE_LONGTEXT N_( \
@@ -71,8 +72,9 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
 
 #define ADVANCED_TEXT N_("Show advanced options")
 #define ADVANCED_LONGTEXT N_( \
-    "When this option is turned on, the interfaces will show all the " \
-    "available options, including those that most users should never touch")
+    "When this option is turned on, the preferences and/or interfaces  will " \
+    "show all the available options, including those that most users should " \
+    "never touch")
 
 #define INTF_PATH_TEXT N_("Interface default search path")
 #define INTF_PATH_LONGTEXT N_( \
@@ -93,7 +95,7 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
 #define AUDIO_TEXT N_("Enable audio")
 #define AUDIO_LONGTEXT N_( \
     "You can completely disable the audio output. In this case the audio " \
-    "decoding stage won't be done, and it will save some processing power.")
+    "decoding will not take place, and it will save some processing power.")
 
 #define MONO_TEXT N_("Force mono audio")
 #define MONO_LONGTEXT N_("This will force a mono audio output")
@@ -131,7 +133,7 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
 
 #define HEADPHONE_TEXT N_("Headphone virtual spatialization effect")
 #define HEADPHONE_LONGTEXT N_( \
-    "This effect gives you the feeling that you stands in a real room " \
+    "This effect gives you the feeling that you are standing in a room " \
     "with a complete 5.1 speaker set when using only a headphone, " \
     "providing a more realistic sound experience. It should also be " \
     "more comfortable and less tiring when listening to music for " \
@@ -147,16 +149,16 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
 #define VIDEO_TEXT N_("Enable video")
 #define VIDEO_LONGTEXT N_( \
     "You can completely disable the video output. In this case the video " \
-    "decoding stage won't be done, which will save some processing power.")
+    "decoding stage will not take place, which will save some processing power.")
 
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_( \
-    "You can enforce the video width here. By default VLC will " \
+    "You can enforce the video width here. By default (-1) VLC will " \
     "adapt to the video characteristics.")
 
 #define HEIGHT_TEXT N_("Video height")
 #define HEIGHT_LONGTEXT N_( \
-    "You can enforce the video height here. By default VLC will " \
+    "You can enforce the video height here. By default (-1) VLC will " \
     "adapt to the video characteristics.")
 
 #define ZOOM_TEXT N_("Zoom video")
@@ -176,7 +178,7 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
 #define OVERLAY_TEXT N_("Overlay video output")
 #define OVERLAY_LONGTEXT N_( \
     "If enabled, VLC will try to take advantage of the overlay capabilities " \
-    "of your graphic card.")
+    "of your graphics card.")
 
 #define SPUMARGIN_TEXT N_("Force SPU position")
 #define SPUMARGIN_LONGTEXT N_( \
@@ -234,7 +236,8 @@ static char *ppsz_language[] = { "auto", "en", "en_GB", "de", "fr", "it",
 
 #define INPUT_AUDIO_TEXT N_("Choose audio")
 #define INPUT_AUDIO_LONGTEXT N_( \
-    "Give the default type of audio you want to use in a DVD.")
+    "Give the default type of audio you want to use in a DVD. " \
+    "(Developers only)")
 
 #define INPUT_CHAN_TEXT N_("Choose channel")
 #define INPUT_CHAN_LONGTEXT N_( \
@@ -441,7 +444,7 @@ vlc_module_begin();
     add_module_with_short( "intf", 'I', "interface", NULL, NULL,
                            INTF_TEXT, INTF_LONGTEXT, VLC_TRUE );
     add_string( "extraintf", NULL, NULL, EXTRAINTF_TEXT, EXTRAINTF_LONGTEXT, VLC_TRUE );
-    add_integer_with_short( "verbose", 'v', -1, NULL,
+    add_integer_with_short( "verbose", 'v', 0, NULL,
                             VERBOSE_TEXT, VERBOSE_LONGTEXT, VLC_FALSE );
     add_bool_with_short( "quiet", 'q', 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, VLC_TRUE );
     add_string_from_list( "language", "auto", ppsz_language, NULL, LANGUAGE_TEXT, LANGUAGE_LONGTEXT, VLC_FALSE );
@@ -480,7 +483,9 @@ vlc_module_begin();
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, VLC_TRUE );
     add_bool( "grayscale", 0, NULL, GRAYSCALE_TEXT, GRAYSCALE_LONGTEXT, VLC_TRUE );
     add_bool( "fullscreen", 0, NULL, FULLSCREEN_TEXT, FULLSCREEN_LONGTEXT, VLC_FALSE );
+#ifndef SYS_DARWIN
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, VLC_TRUE );
+#endif
     add_integer( "spumargin", -1, NULL, SPUMARGIN_TEXT, SPUMARGIN_LONGTEXT, VLC_TRUE );
     add_module( "filter", "video filter", NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_TRUE );

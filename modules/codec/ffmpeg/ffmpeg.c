@@ -2,7 +2,7 @@
  * ffmpeg.c: video decoder using ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ffmpeg.c,v 1.40 2003/05/25 10:14:20 gbazin Exp $
+ * $Id: ffmpeg.c,v 1.41 2003/06/06 02:23:30 hartman Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -88,9 +88,9 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 #define ERROR_TEXT N_("Error resilience")
 #define ERROR_LONGTEXT N_( \
     "ffmpeg can make errors resiliences.          \n" \
-    "Nevertheless, with buggy encoder (like ISO MPEG-4 encoder from M$) " \
+    "Nevertheless, with a buggy encoder (like ISO MPEG-4 encoder from M$) " \
     "this will produce a lot of errors.\n" \
-    "Valid range is -1 to 99 (-1 disable all errors resiliences).")
+    "Valid range is -1 to 99 (-1 disables all errors resiliences).")
 
 #define BUGS_TEXT N_("Workaround bugs")
 #define BUGS_LONGTEXT N_( \
@@ -100,22 +100,23 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
     "4  xvid interlaced\n" \
     "8  ump4 \n" \
     "16 no padding\n" \
-    "32 ac vlc" \
+    "32 ac vlc\n" \
     "64 Qpel chroma")
 
 #define HURRYUP_TEXT N_("Hurry up")
 #define HURRYUP_LONGTEXT N_( \
     "Allow the decoder to partially decode or skip frame(s) " \
-    "when there not enough time.\n It's usefull with low CPU power " \
-    "but it could produce broken pictures.")
+    "when there is not enough time. It's useful with low CPU power " \
+    "but it can produce distorted pictures.")
 
 #define TRUNC_TEXT N_("Truncated stream")
 #define TRUNC_LONGTEXT N_("truncated stream -1:auto,0:disable,:1:enable")
 
 #define PP_Q_TEXT N_("Post processing quality")
 #define PP_Q_LONGTEXT N_( \
-    "Quality of post processing\n"\
-    "Valid range is 0 to 6" )
+    "Quality of post processing. Valid range is 0 to 6\n" \
+    "Higher levels require considerable more CPU power, but produce " \
+    "better looking pictures." )
 
 #define LIBAVCODEC_PP_TEXT N_("Ffmpeg postproc filter chains")
 /* FIXME (cut/past from ffmpeg */
@@ -124,7 +125,7 @@ static int ffmpeg_GetFfmpegCodec( vlc_fourcc_t, int *, int *, char ** );
 "long form example:\n" \
 "vdeblock:autoq/hdeblock:autoq/linblenddeint    default,-vdeblock\n" \
 "short form example:\n" \
-"vb:a/hb:a/lb                                   de,-vb\n" \
+"vb:a/hb:a/lb de,-vb\n" \
 "more examples:\n" \
 "tn:64:128:256\n" \
 "Filters                        Options\n" \

@@ -2,7 +2,7 @@
  * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: coreaudio.c,v 1.5 2003/05/15 22:27:37 massiot Exp $
+ * $Id: coreaudio.c,v 1.6 2003/06/06 02:23:30 hartman Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -216,13 +216,16 @@ static OSStatus StreamListener   ( AudioStreamID inStream,
  * Module descriptor
  *****************************************************************************/
 #define ADEV_TEXT N_("Audio device")
+#define ADEV_LONGTEXT N_("Choose a number corresponding to the number of an " \
+    "audio device, as listed in your 'audio device' menu. This device will " \
+    "then be used by default for audio playback.")
 
 vlc_module_begin();
     set_description( _("CoreAudio output") );
     set_capability( "audio output", 100 );
     set_callbacks( Open, Close );
     add_category_hint( N_("Audio"), NULL, VLC_FALSE );
-    add_integer( "coreaudio-dev", -1, NULL, ADEV_TEXT, ADEV_TEXT, VLC_FALSE ); 
+    add_integer( "coreaudio-dev", -1, NULL, ADEV_TEXT, ADEV_LONGTEXT, VLC_FALSE ); 
 vlc_module_end();
 
 /*****************************************************************************
