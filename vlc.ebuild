@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.11 2003/06/28 01:17:47 sam Exp $
+# $Id: vlc.ebuild,v 1.12 2003/07/10 00:47:42 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -20,7 +20,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
 ###############################################################################
-IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l xvid lirc wxwindows imlib"
+# Instructions: http://wiki.videolan.org/index.php/Linux%20Gentoo
+# Some of the ideas in this ebuild are derived from the official Gentoo ebuild
+# Thanks to the Gentoo Team for supporting us.
+###############################################################################
+
+IUSE="arts qt ncurses dvd gtk nls 3dfx matrox svga fbcon esd kde X alsa ggi oggvorbis gnome xv oss sdl fbcon aalib slp truetype v4l xvid lirc wxwindows imlib matroska dvb pvr"
 
 # Change these to correspond with the
 # unpacked dirnames of the CVS snapshots.
@@ -31,9 +36,7 @@ S=${WORKDIR}/${P}
 SFFMPEG=${WORKDIR}/${PFFMPEG}
 SLIBMPEG2=${WORKDIR}/${PLIBMPEG2}
 
-DESCRIPTION="VLC media player - A videoplayer that plays DVD,
-             VCD, files and networkstreams o.a."
-
+DESCRIPTION="VLC media player - Video player and streamer"
 SRC_URI="http://www.videolan.org/pub/${PN}/${PV}/${P}.tar.bz2
 		 http://www.videolan.org/pub/${PN}/${PV}/contrib/mpeg2dec-20030612.tar.bz2
 		 http://www.videolan.org/pub/${PN}/${PV}/contrib/ffmpeg-20030622.tar.bz2"
@@ -42,7 +45,7 @@ HOMEPAGE="http://www.videolan.org/vlc"
 
 SLOT="0"
 LICENSE="GPL-2"
-KEYWORDS="~x86 ~ppc"
+KEYWORDS="~x86 ~ppc ~sparc ~alpha ~mips ~hppa"
 
 DEPEND="X? ( virtual/x11 )
 	nls? ( sys-devel/gettext )
@@ -68,15 +71,16 @@ DEPEND="X? ( virtual/x11 )
 	lirc? ( app-misc/lirc )
 	imlib? ( >=media-libs/imlib2-1.0.6 )
 	wxwindows? ( >=x11-libs/wxGTK-2.4.0 )
+	matroska? ( media-libs/libmatroska )
+	dvb? ( media-libs/libdvb 
+		media-tv/linuxtv-dvb )
         >=media-libs/libdvbpsi-0.1.2
 	>=media-sound/mad-0.14.2b
 	>=media-libs/faad2-1.1
-	>=media-libs/a52dec-0.7.4"
-# other optional libraries
-#	>=media-libs/flac-1.1.0
-#	>=media-libs/libdv-0.98
+	>=media-libs/a52dec-0.7.4
+	>=media-libs/flac-1.1.0"
 
-# not in gentoo
+# Missing support for
 #	tarkin
 #	theora
 #	tremor
@@ -97,24 +101,24 @@ src_unpack() {
 	( use qt || use kde ) && ( \
 	if [ ${QTDIR} = "/usr/qt/3" ]
 	then
-		cp configure.ac configure.ac.orig
-		sed "s:-lkfile::" \
-			configure.ac.orig > configure.ac
-
 		cp configure configure.orig
-		sed "s:-lkfile::" \
-			configure.orig > configure
+		sed -e "s:-lkfile::" configure.orig > configure
 
 		cd ${S}/modules/gui/kde
 		cp interface.h interface.h.orig
-		sed "s:\(#include <kmainwindow.h>\):\1\n#include <kstatusbar.h>:" \
+		sed -e "s:\(#include <kmainwindow.h>\):\1\n#include <kstatusbar.h>:" \
 			interface.h.orig > interface.h
 
 		cp preferences.cpp preferences.cpp.orig
-		sed 's:\("vlc preferences", true, false, \)\("Save\):\1(KGuiItem)\2:' \
+		sed -e 's:\("vlc preferences", true, false, \)\("Save\):\1(KGuiItem)\2:' \
 			preferences.cpp.orig > preferences.cpp
 	fi
 	)
+
+	# Change the location of the glide headers
+	cd ${S}
+	cp configure configure.orig
+	sed -e "s:/usr/include/glide:/usr/include/glide3:" configure.orig > configure
 	
 	# patch libmpeg2
 	cd ${SLIBMPEG2}
@@ -205,6 +209,8 @@ src_compile(){
 
 	use slp || myconf="${myconf} --disable-slp"
 
+	use truetype && myconf="${myconf} --enable-freetype"
+
 	# xvid is a local USE var, see /usr/portage/profiles/use.local.desc for more details
 	use xvid && myconf="${myconf} --enable-xvid"
 
@@ -214,6 +220,15 @@ src_compile(){
 	# wxwindows is a local USE var. already enabled by default, but depends on wxGTK
 	# but if we use wxwindows and imlib, then we can also use skins
 	(use imlib && use wxwindows) && myconf="${myconf} --enable-skins"
+
+	# matroska is a local USE var. 
+	# http://forums.gentoo.org/viewtopic.php?t=63722&highlight=matroska
+	use matroska && myconf="${myconf} --enable-mkv"
+
+	use dvb && myconf="${myconf} --enable-satellite"
+
+	# pvr is a local USE var, see /usr/portage/profiles/use.local.desc for more details
+        use pvr && myconf="${myconf} --enable-pvr"
 
 	# vlc uses its own ultraoptimizaed CXXFLAGS
 	# and forcing custom ones generally fails building
@@ -235,6 +250,7 @@ src_compile(){
 		--enable-release \
 		--enable-mad \
 		--enable-faad \
+		--enable-flac \
 		--enable-a52"
 
 	ewarn ${myconf}
