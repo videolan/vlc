@@ -1620,15 +1620,6 @@ AC_ARG_ENABLE(faad,
 [  --enable-faad           faad codec (default disabled)])
 if test "x${enable_faad}" = "xyes"
 then
-  AC_ARG_WITH(faad,
-    [    --with-faad=PATH      path to faad installation],[],[])
-  if test "x${with_faad}" != "xno" -a "x${with_faad}" != "x"
-  then
-    CPPFLAGS_faad="${CPPFLAGS_faad} -I${with_faad}/include"
-    LDFLAGS_faad="${LDFLAGS_faad} -L${with_faad}/lib"
-  fi
-  LDFLAGS_faad="${LDFLAGS_faad}"
-
   AC_ARG_WITH(faad-tree,
   [    --with-faad-tree=PATH faad tree for static linking])
   if test "x${with_faad_tree}" != "x"
@@ -1648,6 +1639,14 @@ then
       BUILTINS="${BUILTINS} faad"
       LDFLAGS_faad="${LDFLAGS_faad} -L${real_faad_tree}/libfaad/.libs -lfaad"
       CPPFLAGS_faad="${CPPFLAGS_faad} -I${real_faad_tree}/include"
+      CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_faad}"
+      LDFLAGS="${LDFLAGS_save} ${LDFLAGS_faad}"
+      AC_TRY_COMPILE([#include <faad.h>],
+        [faacDecHandle a; faacDecFrameInfo *b; unsigned char *c;
+         unsigned long d; faacDecDecode(a,b,c,d);],
+        [], [AC_DEFINE(HAVE_OLD_FAAD2, 1, Define if FAAD2 < 1.2)])
+      LDFLAGS="${LDFLAGS_save}"
+      CPPFLAGS="${CPPFLAGS_save}"
     else
       dnl  The given libfaad wasn't built
       AC_MSG_RESULT(no)
@@ -1660,7 +1659,11 @@ then
       [ AC_MSG_ERROR([Cannot find development headers for libfaad...]) ])
     AC_CHECK_LIB(faad, faacDecOpen, [
       PLUGINS="${PLUGINS} faad"
-      LDFLAGS_faad="${LDFLAGS_faad} -lfaad" ],
+      LDFLAGS_faad="${LDFLAGS_faad} -lfaad"
+      AC_TRY_COMPILE([#include <faad.h>],
+        [faacDecHandle a; faacDecFrameInfo *b; unsigned char *c;
+         unsigned long d; faacDecDecode(a,b,c,d);],
+        [], [AC_DEFINE(HAVE_OLD_FAAD2, 1, Define if FAAD2 < 1.2)]) ],
       [ AC_MSG_ERROR([Cannot find libfaad library...]) ])
     LDFLAGS="${LDFLAGS_save}"
     CPPFLAGS="${CPPFLAGS_save}"
