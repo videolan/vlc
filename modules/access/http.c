@@ -505,7 +505,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_GET_TITLE_INFO:
-        case ACCESS_GET_SEEKPOINT_INFO:
         case ACCESS_SET_TITLE:
         case ACCESS_SET_SEEKPOINT:
             return VLC_EGENERIC;
