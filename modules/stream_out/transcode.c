@@ -2,7 +2,7 @@
  * transcode.c
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: transcode.c,v 1.11 2003/05/03 13:18:16 fenrir Exp $
+ * $Id: transcode.c,v 1.12 2003/05/03 14:22:47 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -1016,9 +1016,12 @@ static int transcode_video_ffmpeg_process( sout_stream_t *p_stream, sout_stream_
         {
             /* XXX hack because of copy packetizer and mpeg4video that can failed
                detecting size */
-            if( id->ff_enc_c->width <= 0 || id->ff_enc_c->height <= 0 )
+            if( id->ff_enc_c->width <= 0 )
             {
                 id->ff_enc_c->width  = id->f_dst.i_width  = id->ff_dec_c->width;
+            }
+            if( id->ff_enc_c->height <= 0 )
+            {
                 id->ff_enc_c->height = id->f_dst.i_height = id->ff_dec_c->height;
             }
 
