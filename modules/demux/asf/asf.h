@@ -2,7 +2,7 @@
  * asf.h : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.h,v 1.3 2003/02/01 01:21:04 fenrir Exp $
+ * $Id: asf.h,v 1.4 2003/08/17 23:42:37 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,6 @@ typedef struct asf_stream_s
 
 struct demux_sys_t
 {
-    mtime_t             i_pcr;  // 1/90000 s
     mtime_t             i_time; //  µs
 
     asf_object_root_t   root;

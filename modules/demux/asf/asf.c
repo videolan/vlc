@@ -2,7 +2,7 @@
  * asf.c : ASFv01 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: asf.c,v 1.31 2003/08/17 23:02:52 fenrir Exp $
+ * $Id: asf.c,v 1.32 2003/08/17 23:42:37 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -24,37 +24,40 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-#include <errno.h>
-#include <sys/types.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"
 #include "asf.h"
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int    Activate   ( vlc_object_t * );
-static void   Deactivate ( vlc_object_t * );
-static int    Demux      ( input_thread_t * );
-
-/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
+static int  Open  ( vlc_object_t * );
+static void Close ( vlc_object_t * );
+
 vlc_module_begin();
-    set_description( _("ASF v1.0 demuxer (file only)") );
+    set_description( _("ASF v1.0 demuxer") );
     set_capability( "demux", 200 );
-    set_callbacks( Activate, Deactivate );
+    set_callbacks( Open, Close );
     add_shortcut( "asf" );
 vlc_module_end();
 
+
 /*****************************************************************************
- * Activate: check file and initializes ASF structures
+ * Local prototypes
  *****************************************************************************/
-static int Activate( vlc_object_t * p_this )
+static int  Demux   ( input_thread_t * );
+
+static mtime_t  GetMoviePTS( demux_sys_t * );
+static int      DemuxPacket( input_thread_t *, vlc_bool_t b_play_audio );
+
+/*****************************************************************************
+ * Open: check file and initializes ASF structures
+ *****************************************************************************/
+static int Open( vlc_object_t * p_this )
 {
     input_thread_t  *p_input = (input_thread_t *)p_this;
     uint8_t         *p_peek;
@@ -65,95 +68,71 @@ static int Activate( vlc_object_t * p_this )
 
     vlc_bool_t      b_seekable;
 
-    /* Initialize access plug-in structures. */
-    if( p_input->i_mtu == 0 )
-    {
-        /* Improve speed. */
-        p_input->i_bufsize = INPUT_DEFAULT_BUFSIZE;
-    }
-
-    p_input->pf_demux = Demux;
+    input_info_category_t *p_cat;
 
     /* a little test to see if it could be a asf stream */
     if( input_Peek( p_input, &p_peek, 16 ) < 16 )
     {
-        msg_Warn( p_input, "ASF v1.0 plugin discarded (cannot peek)" );
-        return( -1 );
+        msg_Warn( p_input, "ASF plugin discarded (cannot peek)" );
+        return VLC_EGENERIC;
     }
-    GetGUID( &guid, p_peek );
-    if( !CmpGUID( &guid, &asf_object_header_guid ) )
+    ASF_GetGUID( &guid, p_peek );
+    if( !ASF_CmpGUID( &guid, &asf_object_header_guid ) )
     {
-        msg_Warn( p_input, "ASF v1.0 plugin discarded (not a valid file)" );
-        return( -1 );
+        msg_Warn( p_input, "ASF plugin discarded (not a valid file)" );
+        return VLC_EGENERIC;
     }
 
-    /* create our structure that will contains all data */
-    if( !( p_input->p_demux_data =
-                p_demux = malloc( sizeof( demux_sys_t ) ) ) )
-    {
-        msg_Err( p_input, "out of memory" );
-        return( -1 );
-    }
+    /* Set p_input field */
+    p_input->pf_demux = Demux;
+    p_input->p_demux_data = p_demux = malloc( sizeof( demux_sys_t ) );
     memset( p_demux, 0, sizeof( demux_sys_t ) );
-    p_demux->i_pcr  = -1;
     p_demux->i_time = -1;
 
     /* Now load all object ( except raw data ) */
-    if( p_input->stream.b_seekable && p_input->stream.i_method == INPUT_METHOD_FILE )
-    {
-        b_seekable = VLC_TRUE;
-    }
-    else
-    {
-        b_seekable = VLC_FALSE;
-    }
+    b_seekable = p_input->stream.b_seekable &&
+                 p_input->stream.i_method == INPUT_METHOD_FILE;
+
     if( !ASF_ReadObjectRoot( p_input, &p_demux->root, b_seekable ) )
     {
-        msg_Warn( p_input, "ASF v1.0 plugin discarded (not a valid file)" );
+        msg_Warn( p_input, "ASF plugin discarded (not a valid file)" );
         free( p_demux );
-        return( -1 );
+        return VLC_EGENERIC;
     }
     /* Check if we have found all mandatory asf object */
     if( !p_demux->root.p_hdr || !p_demux->root.p_data )
     {
-        ASF_FreeObjectRoot( p_input, &p_demux->root );
-        free( p_demux );
-        msg_Warn( p_input, "ASF v1.0 plugin discarded (not a valid file)" );
-        return( -1 );
+        msg_Warn( p_input, "ASF plugin discarded (not a valid file)" );
+        goto error;
     }
 
     if( !( p_demux->p_fp = ASF_FindObject( p_demux->root.p_hdr,
                                     &asf_object_file_properties_guid, 0 ) ) )
     {
-        ASF_FreeObjectRoot( p_input, &p_demux->root );
-        free( p_demux );
-        msg_Warn( p_input, "ASF v1.0 plugin discarded (missing file_properties object)" );
-        return( -1 );
+        msg_Warn( p_input,
+                  "ASF plugin discarded (missing file_properties object)" );
+        goto error;
     }
 
     if( p_demux->p_fp->i_min_data_packet_size != p_demux->p_fp->i_max_data_packet_size )
     {
-        ASF_FreeObjectRoot( p_input, &p_demux->root );
-        free( p_demux );
-        msg_Warn( p_input, "ASF v1.0 plugin discarded (invalid file_properties object)" );
-        return( -1 );
+        msg_Warn( p_input,
+                  "ASF plugin discarded (invalid file_properties object)" );
+        goto error;
     }
 
     p_demux->i_streams = ASF_CountObject( p_demux->root.p_hdr,
                                           &asf_object_stream_properties_guid );
     if( !p_demux->i_streams )
     {
-        ASF_FreeObjectRoot( p_input, &p_demux->root );
-        free( p_demux );
         msg_Warn( p_input, "ASF plugin discarded (cannot find any stream!)" );
-        return( -1 );
+        goto error;
     }
-    else
-    {
-        input_info_category_t *p_cat = input_InfoCategory( p_input, "Asf" );
-        msg_Dbg( p_input, "found %d streams", p_demux->i_streams );
-        input_AddInfo( p_cat, _("Number of streams"), "%d" , p_demux->i_streams );
-    }
+
+    msg_Dbg( p_input, "found %d streams", p_demux->i_streams );
+
+    p_cat = input_InfoCategory( p_input, "Asf" );
+    input_AddInfo( p_cat, _("Number of streams"), "%d" , p_demux->i_streams );
 
     /*  create one program */
     vlc_mutex_lock( &p_input->stream.stream_lock );
@@ -161,16 +140,16 @@ static int Activate( vlc_object_t * p_this )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot init stream" );
-        return( -1 );
+        goto error;
     }
     if( input_AddProgram( p_input, 0, 0) == NULL )
     {
         vlc_mutex_unlock( &p_input->stream.stream_lock );
         msg_Err( p_input, "cannot add program" );
-        return( -1 );
+        goto error;
     }
     p_input->stream.p_selected_program = p_input->stream.pp_programs[0];
-    p_input->stream.i_mux_rate = 0 ; /* FIXME */
+    p_input->stream.i_mux_rate = 0 ; /* updated later */
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
     for( i_stream = 0; i_stream < p_demux->i_streams; i_stream ++ )
@@ -178,7 +157,6 @@ static int Activate( vlc_object_t * p_this )
         asf_stream_t    *p_stream;
         asf_object_stream_properties_t *p_sp;
         char psz_cat[sizeof("Stream ")+10];
-        input_info_category_t *p_cat;
         sprintf( psz_cat, "Stream %d", i_stream );
         p_cat = input_InfoCategory( p_input, psz_cat);
 
@@ -198,7 +176,7 @@ static int Activate( vlc_object_t * p_this )
         p_stream->p_es = NULL;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
-        if( CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) )
+        if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) )
         {
             int i_codec;
             if( p_sp->p_type_specific_data )
@@ -278,7 +256,7 @@ static int Activate( vlc_object_t * p_this )
             }
         }
         else
-        if( CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) )
+        if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_video ) )
         {
             p_stream->i_cat = VIDEO_ES;
             p_stream->p_es = input_AddES( p_input,
@@ -398,7 +376,6 @@ static int Activate( vlc_object_t * p_this )
         {
             p_input->stream.i_mux_rate = 0;
         }
-
     }
     else
     {
@@ -406,15 +383,147 @@ static int Activate( vlc_object_t * p_this )
         p_input->stream.i_mux_rate = 0;
     }
 
-
-
     p_input->stream.p_selected_program->b_is_ok = 1;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    return( 0 );
+    return VLC_SUCCESS;
+
+error:
+    ASF_FreeObjectRoot( p_input, &p_demux->root );
+    free( p_demux );
+    return VLC_EGENERIC;
 }
 
 
+/*****************************************************************************
+ * Demux: read packet and send them to decoders
+ *****************************************************************************/
+static int Demux( input_thread_t *p_input )
+{
+    demux_sys_t *p_demux = p_input->p_demux_data;
+    vlc_bool_t b_play_audio;
+    int i;
+    vlc_bool_t b_stream;
+
+    b_stream = VLC_FALSE;
+    for( i = 0; i < 128; i++ )
+    {
+        if( p_demux->stream[i] &&
+            p_demux->stream[i]->p_es &&
+            p_demux->stream[i]->p_es->p_decoder_fifo )
+        {
+            b_stream = VLC_TRUE;
+        }
+    }
+    if( !b_stream )
+    {
+        msg_Warn( p_input, "no stream selected, exiting..." );
+        return( 0 );
+    }
+
+    /* catch seek from user */
+    if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
+    {
+        off_t i_offset;
+
+        msleep( p_input->i_pts_delay );
+        i_offset = ASF_TellAbsolute( p_input ) - p_demux->i_data_begin;
+
+        if( i_offset  < 0 )
+        {
+            i_offset = 0;
+        }
+        i_offset += p_demux->p_fp->i_min_data_packet_size -
+                        i_offset % p_demux->p_fp->i_min_data_packet_size;
+        ASF_SeekAbsolute( p_input, p_demux->i_data_begin + i_offset );
+
+        p_demux->i_time = -1;
+        for( i = 0; i < 128 ; i++ )
+        {
+#define p_stream p_demux->stream[i]
+            if( p_stream )
+            {
+                p_stream->i_time = -1;
+            }
+#undef p_stream
+        }
+    }
+
+    /* Check if we need to send the audio data to decoder */
+    b_play_audio = !p_input->stream.control.b_mute;
+
+    for( ;; )
+    {
+        mtime_t i_length;
+        mtime_t i_time_begin = GetMoviePTS( p_demux );
+        int i_result;
+
+        if( p_input->b_die )
+        {
+            break;
+        }
+
+        if( ( i_result = DemuxPacket( p_input, b_play_audio ) ) <= 0 )
+        {
+            return i_result;
+        }
+        if( i_time_begin == -1 )
+        {
+            i_time_begin = GetMoviePTS( p_demux );
+        }
+        else
+        {
+            i_length = GetMoviePTS( p_demux ) - i_time_begin;
+            if( i_length < 0 || i_length >= 40 * 1000 )
+            {
+                break;
+            }
+        }
+    }
+
+    p_demux->i_time = GetMoviePTS( p_demux );
+    if( p_demux->i_time >= 0 )
+    {
+        input_ClockManageRef( p_input,
+                              p_input->stream.p_selected_program,
+                              p_demux->i_time * 9 / 100 );
+    }
+
+    return( 1 );
+}
+
+/*****************************************************************************
+ * Close: frees unused data
+ *****************************************************************************/
+static void Close( vlc_object_t * p_this )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    demux_sys_t    *p_sys = p_input->p_demux_data;
+    int i_stream;
+
+    msg_Dbg( p_input, "Freeing all memory" );
+
+    ASF_FreeObjectRoot( p_input, &p_sys->root );
+    for( i_stream = 0; i_stream < 128; i_stream++ )
+    {
+#define p_stream p_sys->stream[i_stream]
+        if( p_stream )
+        {
+            if( p_stream->p_pes )
+            {
+                input_DeletePES( p_input->p_method_data, p_stream->p_pes );
+            }
+            free( p_stream );
+        }
+#undef p_stream
+    }
+    free( p_sys );
+}
+
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
 static mtime_t GetMoviePTS( demux_sys_t *p_demux )
 {
     mtime_t i_time;
@@ -441,9 +550,6 @@ static mtime_t GetMoviePTS( demux_sys_t *p_demux )
     return( i_time );
 }
 
-/*****************************************************************************
- * Demux: read packet and send them to decoders
- *****************************************************************************/
 #define GETVALUE2b( bits, var, def ) \
     switch( (bits)&0x03 ) \
     { \
@@ -766,133 +872,4 @@ loop_error_recovery:
     return( 1 );
 }
 
-static int Demux( input_thread_t *p_input )
-{
-    demux_sys_t *p_demux = p_input->p_demux_data;
-    vlc_bool_t b_play_audio;
-    int i;
-    vlc_bool_t b_stream;
-
-    b_stream = VLC_FALSE;
-    for( i = 0; i < 128; i++ )
-    {
-        if( p_demux->stream[i] &&
-            p_demux->stream[i]->p_es &&
-            p_demux->stream[i]->p_es->p_decoder_fifo )
-        {
-            b_stream = VLC_TRUE;
-        }
-    }
-    if( !b_stream )
-    {
-        msg_Warn( p_input, "no stream selected, exiting..." );
-        return( 0 );
-    }
-
-    /* catch seek from user */
-    if( p_input->stream.p_selected_program->i_synchro_state == SYNCHRO_REINIT )
-    {
-        off_t i_offset;
-
-        msleep( p_input->i_pts_delay );
-        i_offset = ASF_TellAbsolute( p_input ) - p_demux->i_data_begin;
-
-        if( i_offset  < 0 )
-        {
-            i_offset = 0;
-        }
-        /* XXX work only when i_min_data_packet_size == i_max_data_packet_size */
-        i_offset += p_demux->p_fp->i_min_data_packet_size -
-                        i_offset % p_demux->p_fp->i_min_data_packet_size;
-        ASF_SeekAbsolute( p_input, p_demux->i_data_begin + i_offset );
-
-        p_demux->i_time = -1;
-        for( i = 0; i < 128 ; i++ )
-        {
-#define p_stream p_demux->stream[i]
-            if( p_stream )
-            {
-                p_stream->i_time = -1;
-            }
-#undef p_stream
-        }
-    }
-
-    /* Check if we need to send the audio data to decoder */
-    b_play_audio = !p_input->stream.control.b_mute;
-
-    for( ;; )
-    {
-        mtime_t i_length;
-        mtime_t i_time_begin = GetMoviePTS( p_demux );
-        int i_result;
-
-        if( p_input->b_die )
-        {
-            break;
-        }
-
-        if( ( i_result = DemuxPacket( p_input, b_play_audio ) ) <= 0 )
-        {
-            return i_result;
-        }
-        if( i_time_begin == -1 )
-        {
-            i_time_begin = GetMoviePTS( p_demux );
-        }
-        else
-        {
-            i_length = GetMoviePTS( p_demux ) - i_time_begin;
-            if( i_length < 0 || i_length >= 40 * 1000 )
-            {
-                break;
-            }
-        }
-    }
-
-    p_demux->i_time = GetMoviePTS( p_demux );
-    if( p_demux->i_time >= 0 )
-    {
-        /* update pcr XXX in mpeg scale so in 90000 unit/s */
-        p_demux->i_pcr = p_demux->i_time * 9 / 100;
-
-        /* first wait for the good time to read next packets */
-        input_ClockManageRef( p_input,
-                              p_input->stream.p_selected_program,
-                              p_demux->i_pcr );
-    }
-
-    return( 1 );
-}
-
-/*****************************************************************************
- * MP4End: frees unused data
- *****************************************************************************/
-static void Deactivate( vlc_object_t * p_this )
-{
-#define FREE( p ) \
-    if( p ) { free( p ); }
-
-    input_thread_t *  p_input = (input_thread_t *)p_this;
-    demux_sys_t *p_demux = p_input->p_demux_data;
-    int i_stream;
-
-    msg_Dbg( p_input, "Freeing all memory" );
-    ASF_FreeObjectRoot( p_input, &p_demux->root );
-    for( i_stream = 0; i_stream < 128; i_stream++ )
-    {
-#define p_stream p_demux->stream[i_stream]
-        if( p_stream )
-        {
-            if( p_stream->p_pes )
-            {
-                input_DeletePES( p_input->p_method_data, p_stream->p_pes );
-            }
-            free( p_stream );
-        }
-#undef p_stream
-    }
-    FREE( p_input->p_demux_data );
-#undef FREE
-}
 

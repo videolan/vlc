@@ -2,7 +2,7 @@
  * libasf.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.c,v 1.13 2003/08/17 23:02:52 fenrir Exp $
+ * $Id: libasf.c,v 1.14 2003/08/17 23:42:37 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,13 +21,11 @@
  *****************************************************************************/
 
 #include <stdlib.h>                                      /* malloc(), free() */
-#include <string.h>                                              /* strdup() */
-#include <errno.h>
-#include <sys/types.h>
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
 
+#include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include "libasf.h"
 
 #define ASF_DEBUG 1
@@ -43,7 +41,7 @@
     (guid).v4[0],(guid).v4[1],(guid).v4[2],(guid).v4[3],    \
     (guid).v4[4],(guid).v4[5],(guid).v4[6],(guid).v4[7]
 
-void GetGUID( guid_t *p_guid, uint8_t *p_data )
+void ASF_GetGUID( guid_t *p_guid, uint8_t *p_data )
 {
     p_guid->v1 = GetDWLE( p_data );
     p_guid->v2 = GetWLE( p_data + 4);
@@ -51,7 +49,7 @@ void GetGUID( guid_t *p_guid, uint8_t *p_data )
     memcpy( p_guid->v4, p_data + 8, 8 );
 }
 
-int CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
+int ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 )
 {
     if( (p_guid1->v1 != p_guid2->v1 )||(p_guid1->v2 != p_guid2->v2 )||
         (p_guid1->v3 != p_guid2->v3 )||
@@ -184,7 +182,7 @@ int  ASF_ReadObjectCommon( input_thread_t *p_input,
     {
         return( 0 );
     }
-    GetGUID( &p_common->i_object_id, p_peek );
+    ASF_GetGUID( &p_common->i_object_id, p_peek );
     p_common->i_object_size = GetQWLE( p_peek + 16 );
     p_common->i_object_pos = ASF_TellAbsolute( p_input );
     p_common->p_next = NULL;
@@ -300,7 +298,7 @@ int  ASF_ReadObject_Data( input_thread_t *p_input,
     {
        return( 0 );
     }
-    GetGUID( &p_data->i_file_id, p_peek + 24 );
+    ASF_GetGUID( &p_data->i_file_id, p_peek + 24 );
     p_data->i_total_data_packets = GetQWLE( p_peek + 40 );
     p_data->i_reserved = GetWLE( p_peek + 48 );
 #ifdef ASF_DEBUG
@@ -325,7 +323,7 @@ int  ASF_ReadObject_Index( input_thread_t *p_input,
     {
        return( 0 );
     }
-    GetGUID( &p_index->i_file_id, p_peek + 24 );
+    ASF_GetGUID( &p_index->i_file_id, p_peek + 24 );
     p_index->i_index_entry_time_interval = GetQWLE( p_peek + 40 );
     p_index->i_max_packet_count = GetDWLE( p_peek + 48 );
     p_index->i_index_entry_count = GetDWLE( p_peek + 52 );
@@ -362,7 +360,7 @@ int  ASF_ReadObject_file_properties( input_thread_t *p_input,
     {
        return( 0 );
     }
-    GetGUID( &p_fp->i_file_id, p_peek + 24 );
+    ASF_GetGUID( &p_fp->i_file_id, p_peek + 24 );
     p_fp->i_file_size = GetQWLE( p_peek + 40 );
     p_fp->i_creation_date = GetQWLE( p_peek + 48 );
     p_fp->i_data_packets_count = GetQWLE( p_peek + 56 );
@@ -407,7 +405,7 @@ int  ASF_ReadObject_header_extention( input_thread_t *p_input,
     {
        return( 0 );
     }
-    GetGUID( &p_he->i_reserved1, p_peek + 24 );
+    ASF_GetGUID( &p_he->i_reserved1, p_peek + 24 );
     p_he->i_reserved2 = GetWLE( p_peek + 40 );
     p_he->i_header_extention_size = GetDWLE( p_peek + 42 );
     if( p_he->i_header_extention_size )
@@ -450,8 +448,8 @@ int  ASF_ReadObject_stream_properties( input_thread_t *p_input,
     {
        return( 0 );
     }
-    GetGUID( &p_sp->i_stream_type, p_peek + 24 );
-    GetGUID( &p_sp->i_error_correction_type, p_peek + 40 );
+    ASF_GetGUID( &p_sp->i_stream_type, p_peek + 24 );
+    ASF_GetGUID( &p_sp->i_error_correction_type, p_peek + 40 );
     p_sp->i_time_offset = GetQWLE( p_peek + 56 );
     p_sp->i_type_specific_data_length = GetDWLE( p_peek + 64 );
     p_sp->i_error_correction_data_length = GetDWLE( p_peek + 68 );
@@ -524,7 +522,7 @@ int  ASF_ReadObject_codec_list( input_thread_t *p_input,
        return( 0 );
     }
 
-    GetGUID( &p_cl->i_reserved, p_peek + 24 );
+    ASF_GetGUID( &p_cl->i_reserved, p_peek + 24 );
     p_cl->i_codec_entries_count = GetWLE( p_peek + 40 );
     if( p_cl->i_codec_entries_count > 0 )
     {
@@ -757,9 +755,9 @@ int  ASF_ReadObject( input_thread_t *p_input,
     /* find this object */
     for( i_index = 0; ; i_index++ )
     {
-        if( CmpGUID( ASF_Object_Function[i_index].p_id,
+        if( ASF_CmpGUID( ASF_Object_Function[i_index].p_id,
                      &p_obj->common.i_object_id )||
-            CmpGUID( ASF_Object_Function[i_index].p_id,
+            ASF_CmpGUID( ASF_Object_Function[i_index].p_id,
                      &asf_object_null_guid ) )
         {
             break;
@@ -822,9 +820,9 @@ void ASF_FreeObject( input_thread_t *p_input,
     /* find this object */
     for( i_index = 0; ; i_index++ )
     {
-        if( CmpGUID( ASF_Object_Function[i_index].p_id,
+        if( ASF_CmpGUID( ASF_Object_Function[i_index].p_id,
                      &p_obj->common.i_object_id )||
-            CmpGUID( ASF_Object_Function[i_index].p_id,
+            ASF_CmpGUID( ASF_Object_Function[i_index].p_id,
                      &asf_object_null_guid ) )
         {
             break;
@@ -945,7 +943,7 @@ int  __ASF_CountObject( asf_object_t *p_obj, const guid_t *p_guid )
     p_child = p_obj->common.p_first;
     while( p_child )
     {
-        if( CmpGUID( &p_child->common.i_object_id, p_guid ) )
+        if( ASF_CmpGUID( &p_child->common.i_object_id, p_guid ) )
         {
             i_count++;
         }
@@ -962,7 +960,7 @@ void *__ASF_FindObject( asf_object_t *p_obj, const guid_t *p_guid, int i_number 
 
     while( p_child )
     {
-        if( CmpGUID( &p_child->common.i_object_id, p_guid ) )
+        if( ASF_CmpGUID( &p_child->common.i_object_id, p_guid ) )
         {
             if( i_number == 0 )
             {

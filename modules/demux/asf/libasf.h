@@ -2,7 +2,7 @@
  * libasf.h :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libasf.h,v 1.5 2002/12/06 16:34:06 sam Exp $
+ * $Id: libasf.h,v 1.6 2003/08/17 23:42:37 fenrir Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-#include "codecs.h"                        /* BITMAPINFOHEADER, WAVEFORMATEX */
 
 /*****************************************************************************
  * Structure needed for decoder
@@ -152,24 +151,6 @@ static const guid_t asf_object_stream_type_command =
     0x11D0,
     { 0xA3,0xAC, 0x00,0xA0,0xC9,0x03,0x48,0xF6 }
 };
-
-#if 0
-static const guid_t asf_object_
-{
-
-
-};
-#endif
-#if 0
-typedef struct asf_packet_s
-{
-    int i_stream_number;
-
-    int i_payload_size;
-    u8  *p_payload_data;
-
-} asf_packet_t;
-#endif
 
 #define ASF_OBJECT_COMMON           \
     int          i_type;            \
@@ -334,14 +315,6 @@ typedef struct asf_object_codec_list_s
 
 } asf_object_codec_list_t;
 
-#if 0
-typedef struct asf_object_script_command_s
-{
-    ASF_OBJECT_COMMON
-
-
-} asf_object_script_command_t;
-#endif
 typedef struct asf_marker_s
 {
     uint64_t     i_offset;
@@ -351,7 +324,6 @@ typedef struct asf_marker_s
     uint32_t     i_flags;
     uint32_t     i_marker_description_length;
     uint8_t      *i_marker_description;
-    /* u8 padding */
 
 } asf_marker_t;
 
@@ -365,14 +337,6 @@ typedef struct asf_object_marker_s
     asf_marker_t *marker;
 
 } asf_object_marker_t;
-
-#if 0
-typedef struct asf_object__s
-{
-    ASF_OBJECT_COMMON
-
-} asf_object__t;
-#endif
 
 typedef union asf_object_u
 {
@@ -395,8 +359,8 @@ int     ASF_SeekAbsolute( input_thread_t *p_input, off_t i_pos);
 int     ASF_ReadData( input_thread_t *p_input, uint8_t *p_buff, int i_size );
 int     ASF_SkipBytes( input_thread_t *p_input, int i_count );
 
-void GetGUID( guid_t *p_guid, uint8_t *p_data );
-int  CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 );
+void ASF_GetGUID( guid_t *p_guid, uint8_t *p_data );
+int  ASF_CmpGUID( const guid_t *p_guid1, const guid_t *p_guid2 );
 
 int  ASF_ReadObjectCommon( input_thread_t *p_input,
                            asf_object_t *p_obj );
