@@ -506,18 +506,7 @@ STDMETHODIMP CapturePin::Disconnect()
 
     msg_Dbg( p_input, "CapturePin::Disconnect [OK]" );
 
-#if 1 // This used to create crashes sometimes. Is the problem fixed ?
-    VLCMediaSample vlc_sample;
-
-    vlc_mutex_lock( &p_sys->lock );
-    while( samples_queue.size() )
-    {
-        vlc_sample = samples_queue.back();
-        samples_queue.pop_back();
-        vlc_sample.p_sample->Release();
-    }
-    vlc_mutex_unlock( &p_sys->lock );
-#endif
+    /* samples_queue was already flushed in EndFlush() */
 
     p_connected_pin->Release();
     p_connected_pin = NULL;
@@ -683,6 +672,18 @@ STDMETHODIMP CapturePin::EndFlush( void )
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CapturePin::EndFlush" );
 #endif
+
+    VLCMediaSample vlc_sample;
+
+    vlc_mutex_lock( &p_sys->lock );
+    while( samples_queue.size() )
+    {
+        vlc_sample = samples_queue.back();
+        samples_queue.pop_back();
+        vlc_sample.p_sample->Release();
+    }
+    vlc_mutex_unlock( &p_sys->lock );
+
     return S_OK;
 }
 STDMETHODIMP CapturePin::NewSegment( REFERENCE_TIME tStart,
@@ -897,6 +898,8 @@ STDMETHODIMP CaptureFilter::Stop()
 #ifdef DEBUG_DSHOW
     msg_Dbg( p_input, "CaptureFilter::Stop" );
 #endif
+
+    p_pin->EndFlush();
 
     state = State_Stopped;
     return S_OK;
