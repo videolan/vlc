@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.99 2001/11/25 22:52:21 gbazin Exp $
+ * $Id: input_dvd.c,v 1.100 2001/11/27 11:44:48 massiot Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -310,6 +310,8 @@ static void DVDInit( input_thread_t * p_input )
 static void DVDOpen( struct input_thread_s *p_input )
 {
     dvdcss_handle dvdhandle;
+    char * psz_parser;
+    char * psz_device;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
 
@@ -323,16 +325,34 @@ static void DVDOpen( struct input_thread_s *p_input )
 
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 
-    /* XXX: put this shit in an access plugin */
+    /* Parse input string : dvd:device[:rawdevice] */
     if( strlen( p_input->p_source ) > 4
          && !strncasecmp( p_input->p_source, "dvd:", 4 ) )
     {
-        dvdhandle = dvdcss_open( p_input->p_source + 4 );
+        psz_parser = psz_device = p_input->p_source + 4;
     }
     else
     {
-        dvdhandle = dvdcss_open( p_input->p_source );
+        psz_parser = psz_device = p_input->p_source;
     }
+
+    while( *psz_parser && *psz_parser != ':' )
+    {
+        *psz_parser++;
+    }
+
+    if( *psz_parser == ':' )
+    {
+        /* Found raw device */
+        *psz_parser = '\0';
+        psz_parser++;
+
+        main_PutPszVariable( "DVDCSS_RAW_DEVICE", psz_parser );
+    }
+
+    intf_WarnMsg( 2, "input: dvd=%s raw=%s", psz_device, psz_parser );
+
+    dvdhandle = dvdcss_open( psz_device );
 
     if( dvdhandle == NULL )
     {
