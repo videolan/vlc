@@ -35,6 +35,10 @@
 #include "filter_common.h"
 #include "vlc_image.h"
 
+#ifdef LoadImage
+#   undef LoadImage
+#endif
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
