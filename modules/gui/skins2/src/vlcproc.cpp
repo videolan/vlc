@@ -115,7 +115,7 @@ VlcProc::~VlcProc()
 void VlcProc::manage()
 {
     // Did the user requested to quit vlc ?
-    if( getIntf()->p_vlc->b_die )
+    if( getIntf()->b_die || getIntf()->p_vlc->b_die )
     {
         CmdQuit *pCmd = new CmdQuit( getIntf() );
         AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );

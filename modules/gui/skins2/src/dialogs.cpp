@@ -2,7 +2,7 @@
  * dialogs.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: dialogs.cpp,v 1.3 2004/03/03 20:39:52 gbazin Exp $
+ * $Id$
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *          Olivier Teulière <ipkiss@via.ecp.fr>
@@ -125,7 +125,7 @@ bool Dialogs::init()
 {
     // Allocate descriptor
     m_pProvider = (intf_thread_t *)vlc_object_create( getIntf(),
-                                                      VLC_OBJECT_INTF );
+                                                      VLC_OBJECT_DIALOGS );
     if( m_pProvider == NULL )
     {
         msg_Err( getIntf(), "out of memory" );
