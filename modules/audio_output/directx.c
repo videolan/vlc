@@ -2,7 +2,7 @@
  * aout.c: Windows DirectX audio output method
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: directx.c,v 1.1 2002/10/05 17:29:50 gbazin Exp $
+ * $Id: directx.c,v 1.2 2002/10/06 19:28:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -34,6 +34,7 @@
 #include <vlc/aout.h>
 #include "aout_internal.h"
 
+#include <windows.h>
 #include <mmsystem.h>
 #include <dsound.h>
 

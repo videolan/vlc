@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.2 2002/10/01 20:43:35 ipkiss Exp $
+ * $Id: events.c,v 1.3 2002/10/06 19:28:28 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -246,7 +246,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     HDC        hdc;
     HMENU      hMenu;
     HICON      vlc_icon = NULL;
-    char       vlc_path[_MAX_PATH+1];
+    char       vlc_path[MAX_PATH+1];
 
     msg_Dbg( p_vout, "DirectXCreateWindow" );
 
@@ -290,7 +290,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
 
     /* Get the Icon from the main app */
     vlc_icon = NULL;
-    if( GetModuleFileName( NULL, vlc_path, _MAX_PATH ) )
+    if( GetModuleFileName( NULL, vlc_path, MAX_PATH ) )
     {
         vlc_icon = ExtractIcon( hInstance, vlc_path, 0 );
     }

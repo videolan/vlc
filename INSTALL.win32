@@ -23,11 +23,14 @@ Building VideoLAN Client from the source code
 =============================================
 
 If you want to do the tricky job of building vlc from sources, you can do it
-in two ways:
+in several ways:
 
 - natively on Windows, using MSYS+MINGW (www.mingw.org)
   (MSYS is a minimal build environnement to compile unixish projects under
    windoze. It provides all the common unix tools like sh, gmake...)
+
+- natively on Windows, using cygwin (www.cygwin.com) with or without the
+  unix emulation layer.
 
 - or on Linux, using the mingw32 cross-compiler
 
@@ -44,7 +47,7 @@ You first need to download a linux cross-compiler version of mingw32.
 You must also not forget to install the extra development packages if you want
 to build the DirectX, GTK and SDL plugins.
 
-- compiling natively on Windoze:
+- compiling natively on Windoze with MSYS+MINGW:
 You will need to download and install the latest MSYS (version 1.0.7 as
 of now) and MINGW.
 The installation is really easy. Begin with the MSYS auto-installer and once
@@ -69,6 +72,13 @@ The same is true for the SDL package, it is installed in
 SDL-1.2.3-win32/i386-mingw32msvc/bin/sdl-config if you plan to extract the
 archive in a different directory.
 
+- compiling natively on Windoze with cygwin:
+You will need to download and install cygwin (www.cygwin.com).
+
+You must also not forget to install the extra development packages if you want
+to build the DirectX, GTK and SDL plugins.
+(http://www.videolan.org/vlc/windows.html)
+
 Configuring the build
 =====================
 
@@ -80,7 +90,7 @@ See `./configure --help' for more information.
 If you are cross-compiling from Debian, you can use something
 along those lines:
 
-  make distclean ; \
+  ./bootstrap; \
   CC=i586-mingw32msvc-gcc \
   ./configure --host=i586-mingw32msvc --build=i386-linux \
   --with-gtk-config-path=/usr/local/gtk-win32/bin \
@@ -91,6 +101,7 @@ along those lines:
 If you are cross-compiling using the mingw32 package provided by
 www.videolan.org, you have to use something along those lines:
 
+  ./bootstrap; \
   CC=i586-mingw32msvc-gcc \
   PATH=/usr/local/cross-tools/bin:$PATH \
   ./configure --host=i586-mingw32msvc --build=i386-linux \
@@ -101,11 +112,25 @@ www.videolan.org, you have to use something along those lines:
 
 If you are compiling natively on Windoze, then you can use something
 along those lines:
+  ./bootstrap; \
   ./configure \
   --with-gtk-config-path=/c/dev/gtk-win32/bin \
   --with-sdl-config-path=/c/dev/SDL-1.2.3-win32/i386-mingw32msvc/bin \
   --with-directx=/c/dev/dxheaders \
   --with-dvdcss-tree=../libdvdcss-win
+
+If you are using cygwin, you can build vlc with or without the unix emulation
+layer (without is usually better). To build without the emulaion layer, use
+something like this:
+  ./bootstrap; \
+  CC="gcc -mno-cygwin" \
+  ./configure \
+  --with-gtk-config-path=/cygdrive/c/dev/gtk-win32/bin \
+  --with-sdl-config-path=/cygdrive/c/dev/SDL-1.2.3-win32/i386-mingw32msvc/bin \
+  --with-directx=/cygdrive/c/dev/dxheaders \
+  --with-dvdcss-tree=../libdvdcss-win
+If you want to use the emulation layer, then just omit the CC="gcc -mno-cygwin"
+line.
 
 Note: when using the --with-dvdcss-tree you need to compile the tree
 beforehand.
