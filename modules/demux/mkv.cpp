@@ -257,13 +257,13 @@ class EbmlParser
     EbmlStream  *m_es;
     int         mi_level;
     EbmlElement *m_el[10];
-	int64_t      mi_remain_size[10];
+    int64_t      mi_remain_size[10];
 
     EbmlElement *m_got;
 
     int         mi_user_level;
     vlc_bool_t  mb_keep;
-	vlc_bool_t  mb_dummy;
+    vlc_bool_t  mb_dummy;
 };
 
 
@@ -1198,7 +1198,7 @@ matroska_stream_t *demux_sys_t::AnalyseAllSegmentsFound( EbmlStream *p_estream )
             matroska_segment_t *p_segment1 = new matroska_segment_t( *this, *p_estream );
             b_keep_segment = false;
 
-			ep = new EbmlParser(p_estream, p_l0, &demuxer );
+            ep = new EbmlParser(p_estream, p_l0, &demuxer );
             p_segment1->ep = ep;
             p_segment1->segment = (KaxSegment*)p_l0;
 
@@ -1569,10 +1569,11 @@ bool matroska_segment_t::Select( mtime_t i_start_time )
     }
     
     sys.i_start_pts = i_start_time;
-    ep->Reset( &sys.demuxer );
-
     // reset the stream reading to the first cluster of the segment used
     es.I_O().setFilePointer( i_start_pos );
+
+    delete ep;
+    ep = new EbmlParser( &es, segment, &sys.demuxer );
 
     return true;
 }
@@ -1591,6 +1592,8 @@ void matroska_segment_t::UnSelect( )
         }
 #undef tk
     }
+    delete ep;
+    ep = NULL;
 }
 
 bool virtual_segment_t::Select( input_title_t & title )
@@ -1822,8 +1825,8 @@ static int Demux( demux_t *p_demux)
 
     for( ;; )
     {
-		if ( p_sys->demuxer.b_die )
-			return 0;
+        if ( p_sys->demuxer.b_die )
+            return 0;
 
         if( p_sys->i_pts >= p_sys->i_start_pts  )
             p_vsegment->UpdateCurrentToChapter( *p_demux );
@@ -1974,7 +1977,7 @@ EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux 
     m_es = es;
     m_got = NULL;
     m_el[0] = el_start;
-	mi_remain_size[0] = el_start->GetSize();
+    mi_remain_size[0] = el_start->GetSize();
 
     for( i = 1; i < 6; i++ )
     {
@@ -1983,7 +1986,7 @@ EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux 
     mi_level = 1;
     mi_user_level = 1;
     mb_keep = VLC_FALSE;
-	mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
+    mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
 }
 
 EbmlParser::~EbmlParser( void )
@@ -2041,7 +2044,7 @@ void EbmlParser::Reset( demux_t *p_demux )
 #else
     m_es->I_O().setFilePointer( m_el[0]->GetElementPosition() + m_el[0]->ElementSize(true) - m_el[0]->GetSize() );
 #endif
-	mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
+    mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
 }
 
 EbmlElement *EbmlParser::Get( void )
@@ -2070,8 +2073,8 @@ EbmlElement *EbmlParser::Get( void )
         mb_keep = VLC_FALSE;
     }
 
-	m_el[mi_level] = m_es->FindNextElement( m_el[mi_level - 1]->Generic().Context, i_ulev, 0xFFFFFFFFL, mb_dummy, 1 );
-//	mi_remain_size[mi_level] = m_el[mi_level]->GetSize();
+    m_el[mi_level] = m_es->FindNextElement( m_el[mi_level - 1]->Generic().Context, i_ulev, 0xFFFFFFFFL, mb_dummy, 1 );
+//    mi_remain_size[mi_level] = m_el[mi_level]->GetSize();
     if( i_ulev > 0 )
     {
         while( i_ulev > 0 )
@@ -2140,7 +2143,7 @@ void matroska_segment_t::LoadCues( )
         return;
     }
 
-	ep = new EbmlParser( &es, cues, &sys.demuxer );
+    ep = new EbmlParser( &es, cues, &sys.demuxer );
     while( ( el = ep->Get() ) != NULL )
     {
         if( MKV_IS_ID( el, KaxCuePoint ) )
@@ -2250,7 +2253,7 @@ void matroska_segment_t::LoadTags( )
     }
 
     msg_Dbg( &sys.demuxer, "Tags" );
-	ep = new EbmlParser( &es, tags, &sys.demuxer );
+    ep = new EbmlParser( &es, tags, &sys.demuxer );
     while( ( el = ep->Get() ) != NULL )
     {
         if( MKV_IS_ID( el, KaxTag ) )
@@ -3678,11 +3681,11 @@ void matroska_segment_t::Seek( mtime_t i_date, mtime_t i_time_offset )
     msg_Dbg( &sys.demuxer, "seek got "I64Fd" (%d%%)",
                 i_seek_time, (int)( 100 * i_seek_position / stream_Size( sys.demuxer.s ) ) );
 
-    delete ep;
-	ep = new EbmlParser( &es, segment, &sys.demuxer );
-    cluster = NULL;
-
     es.I_O().setFilePointer( i_seek_position, seek_beginning );
+
+    delete ep;
+    ep = new EbmlParser( &es, segment, &sys.demuxer );
+    cluster = NULL;
 
     sys.i_start_pts = i_date;
 
