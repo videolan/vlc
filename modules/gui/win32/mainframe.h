@@ -59,9 +59,10 @@ __published:	// IDE-managed Components
     TToolButton *ToolButtonEject;
     TToolButton *ToolButtonPlay;
     TToolButton *ToolButtonPause;
+    TToolButton *ToolButtonSep2;
     TToolButton *ToolButtonSlow;
     TToolButton *ToolButtonFast;
-    TToolButton *ToolButtonSep2;
+    TToolButton *ToolButtonSep3;
     TToolButton *ToolButtonPlaylist;
     TToolButton *ToolButtonPrev;
     TToolButton *ToolButtonNext;
@@ -137,7 +138,6 @@ __published:	// IDE-managed Components
     TMenuItem *PopupClose;
     TMenuItem *N9;
     TCSpinEdit *SpinEditChannel;
-    TToolButton *ToolButton1;
     TActionList *ActionList1;
     TAction *OpenFileAction;
     TAction *OpenDiscAction;
@@ -157,23 +157,25 @@ __published:	// IDE-managed Components
     TAction *PreferencesAction;
     TAction *MessagesAction;
     TAction *AboutAction;
-    TMenuItem *Control1;
-    TMenuItem *N5;
-    TMenuItem *N6;
-    TMenuItem *N10;
     TAction *PrevTitleAction;
     TAction *NextTitleAction;
     TAction *PrevChapterAction;
     TAction *NextChapterAction;
+    TAction *VolumeUpAction;
+    TAction *VolumeDownAction;
+    TAction *MuteAction;
+    TAction *StreamOutputAction;
+    TAction *AddSubtitlesAction;
+    TMenuItem *Control1;
+    TMenuItem *N5;
+    TMenuItem *N6;
+    TMenuItem *N10;
     TMenuItem *N11;
     TMenuItem *MenuChannel;
     TMenuItem *PopupChannel;
     TMenuItem *MenuVolumeUp;
     TMenuItem *MenuVolumeDown;
     TMenuItem *MenuMute;
-    TAction *VolumeUpAction;
-    TAction *VolumeDownAction;
-    TAction *MuteAction;
     TMenuItem *MenuADevice;
     TMenuItem *PopupAudioSettings;
     TMenuItem *PopupADevice;
@@ -185,9 +187,9 @@ __published:	// IDE-managed Components
     TMenuItem *N1;
     TMenuItem *PopupVDevice;
     TMenuItem *MenuStreamOuput;
-    TAction *StreamOutputAction;
     TMenuItem *MenuAddSubtitles;
-    TAction *AddSubtitlesAction;
+    TMenuItem *N4;
+    TMenuItem *MenuAddInterface;
     void __fastcall TimerManageTimer( TObject *Sender );
     void __fastcall TrackBarChange( TObject *Sender );
     void __fastcall FormClose( TObject *Sender, TCloseAction &Action );
@@ -222,7 +224,7 @@ __published:	// IDE-managed Components
     void __fastcall NextTitleActionExecute( TObject *Sender );
     void __fastcall PrevChapterActionExecute( TObject *Sender );
     void __fastcall NextChapterActionExecute( TObject *Sender );
-    void __fastcall AddSubtitlesActionsExecute(TObject *Sender);
+    void __fastcall AddSubtitlesActionsExecute( TObject *Sender );
 private:	// User declarations
     intf_thread_t *p_intf;
     /* drag and drop handling */

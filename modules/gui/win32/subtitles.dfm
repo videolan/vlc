@@ -42,6 +42,8 @@ object SubtitlesDlg: TSubtitlesDlg
       Width = 57
       Height = 21
       Hint = 'Set the delay (in seconds)'
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 0
       Text = '0.0'
     end
@@ -52,6 +54,8 @@ object SubtitlesDlg: TSubtitlesDlg
       Height = 21
       Hint = 'Set the number of Frames Per Second'
       Anchors = [akTop, akRight]
+      ParentShowHint = False
+      ShowHint = True
       TabOrder = 1
       Text = '0.0'
     end

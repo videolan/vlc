@@ -2,7 +2,7 @@
  * sout.cpp: the stream ouput dialog box
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: sout.cpp,v 1.2 2003/01/22 21:42:51 ipkiss Exp $
+ * $Id: sout.cpp,v 1.3 2003/01/23 03:33:34 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -79,7 +79,7 @@ void __fastcall TSoutDlg::RadioButtonAccessClick( TObject *Sender )
     SpinEditPort->Enabled = b_udp | b_rtp;
     RadioButtonPS->Enabled = !b_rtp;
 
-    if( b_rtp )
+    if( b_udp || b_rtp )
         RadioButtonTS->Checked = true;
 
     RebuildMrl();

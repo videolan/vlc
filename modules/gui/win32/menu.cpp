@@ -2,7 +2,7 @@
  * menu.cpp: functions to handle menu items
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: menu.cpp,v 1.7 2003/01/19 17:55:18 ipkiss Exp $
+ * $Id: menu.cpp,v 1.8 2003/01/23 03:33:34 ipkiss Exp $
  *
  * Authors: Olivier Teuliere <ipkiss@via.ecp.fr>
  *
@@ -83,6 +83,40 @@ void __fastcall TMenusGen::VoutVarClick( TObject *Sender )
     }
 
     vlc_object_release( p_vout );
+}
+
+/*
+ * Modules
+ */
+
+/* Interface modules: we spawn a new interface */
+void __fastcall TMenusGen::InterfaceModuleClick( TObject *Sender )
+{
+    TMenuItem * Item = (TMenuItem *)Sender;
+
+    AnsiString IntfName = CleanCaption( Item->Caption );
+
+    intf_thread_t *p_newintf;
+    char *psz_oldmodule = config_GetPsz( p_intf->p_vlc, "intf" );
+
+    config_PutPsz( p_intf->p_vlc, "intf", IntfName.c_str() );
+    p_newintf = intf_Create( p_intf->p_vlc );
+    config_PutPsz( p_intf->p_vlc, "intf", psz_oldmodule );
+
+    if( psz_oldmodule )
+    {
+        free( psz_oldmodule );
+    }
+
+    if( p_newintf )
+    {
+        p_newintf->b_block = VLC_FALSE;
+        if( intf_RunThread( p_newintf ) )
+        {
+            vlc_object_detach( p_newintf );
+            intf_Destroy( p_newintf );
+        }
+    }
 }
 
 /*
@@ -258,6 +292,12 @@ __fastcall TMenusGen::TMenusGen( intf_thread_t *_p_intf ) : TObject()
     MenuTitle = p_window->MenuTitle;
     MenuChapter = p_window->MenuChapter;
     PopupNavigation = p_window->PopupNavigation;
+    MenuAddInterface = p_window->MenuAddInterface;
+
+    /* Create the "Add interface" menu */
+#if 0
+    SetupModuleMenu( "inerface", MenuAddInterface, InterfaceModuleClick );
+#endif
 }
 
 
@@ -463,6 +503,19 @@ int __fastcall TMenusGen::Pos2Data( int title, int chapter )
     return (int) (( title << 16 ) | ( chapter & 0xffff ));
 }
 
+/* This function deletes all the '&' characters in the caption string,
+ * because Borland automatically adds one when (and only when!) you click on
+ * the menuitem. Grrrrr... */
+AnsiString __fastcall TMenusGen::CleanCaption( AnsiString Caption )
+{
+    while( Caption.LastDelimiter( "&" ) != 0 )
+    {
+        Caption.Delete( Caption.LastDelimiter( "&" ), 1 );
+    }
+
+    return Caption;
+}
+
 /****************************************************************************
  * VarChange: change a variable in a vlc_object_t
  ****************************************************************************
@@ -475,14 +528,7 @@ void __fastcall TMenusGen::VarChange( vlc_object_t *p_object,
     vlc_value_t val;
     int i_index;
 
-    /* We must delete all the '&' characters in the caption string, because
-     * Borland automatically adds one when (and only when!) you click on
-     * the menuitem. Grrrrr... */
-    AnsiString Caption = Item->Caption;
-    while( Caption.LastDelimiter( "&" ) != 0 )
-    {
-        Caption.Delete( Caption.LastDelimiter( "&" ), 1 );
-    }
+    AnsiString Caption = CleanCaption( Item->Caption );
     val.psz_string = Caption.c_str();
 
     /* set the new value */
@@ -626,6 +672,43 @@ void __fastcall TMenusGen::SetupVarMenu( vlc_object_t *p_object,
 }
 
 /*****************************************************************************
+ * SetupModuleMenu: build a menu listing all the modules of a given
+                    capability
+ *****************************************************************************/
+void __fastcall TMenusGen::SetupModuleMenu( const char *psz_capability,
+        TMenuItem *Root, TNotifyEvent MenuItemClick )
+{
+    module_t * p_parser;
+    vlc_list_t list;
+    int i_index;
+
+    /* remove previous menu */
+    Root->Clear();
+    Root->Enabled = false;
+
+    list = vlc_list_find( p_intf, VLC_OBJECT_MODULE, FIND_ANYWHERE );
+    for( i_index = 0; i_index < list.i_count; i_index++ )
+    {
+        p_parser = (module_t *)list.p_values[i_index].p_object ;
+
+        if( !strcmp( p_parser->psz_capability, psz_capability ) )
+        {
+            TMenuItem *Item = new TMenuItem( Root );
+            Item->Caption = p_parser->psz_object_name;
+            Item->Hint = Item->Caption;
+            Item->OnClick = MenuItemClick;
+            Root->Add( Item );
+        }
+    }
+
+    vlc_list_release( &list );
+
+    /* be sure that menu is enabled, if there is at least one item */
+    if( i_index > 0 )
+        Root->Enabled = true;
+}
+
+/*****************************************************************************
  * ProgramMenu: update the programs menu of the interface
  *****************************************************************************
  * Builds the program menu according to what have been found in the PAT
@@ -660,9 +743,7 @@ void __fastcall TMenusGen::ProgramMenu( TMenuItem *Root,
 
         /* check the currently selected program */
         if( p_pgrm == p_intf->p_sys->p_input->stream.pp_programs[i] )
-        {
             Item->Checked = true;
-        }
 
         /* add the item to the submenu */
         Root->Add( Item );
@@ -670,9 +751,7 @@ void __fastcall TMenusGen::ProgramMenu( TMenuItem *Root,
 
     /* be sure that menu is enabled if more than 1 program */
     if( p_intf->p_sys->p_input->stream.i_pgrm_number > 1 )
-    {
         Root->Enabled = true;
-    }
 }
 
 /*****************************************************************************
@@ -699,9 +778,7 @@ void __fastcall TMenusGen::RadioMenu( TMenuItem *Root, AnsiString ItemName,
         if( ( i_item % 10 == 1 ) && ( i_nb > 20 ) )
         {
             if( i_item != 1 )
-            {
                 Root->Add( ItemGroup );
-            }
 
             Name.sprintf( "%ss %d to %d", ItemName, i_item, i_item + 9 );
             ItemGroup = new TMenuItem( Root );
@@ -728,9 +805,7 @@ void __fastcall TMenusGen::RadioMenu( TMenuItem *Root, AnsiString ItemName,
 
         /* check the currently selected chapter */
         if( i_selected == i_item )
-        {
             Item->Checked = true;
-        }
 
         /* setup signal handling */
         Item->OnClick = MenuItemClick;
@@ -743,15 +818,11 @@ void __fastcall TMenusGen::RadioMenu( TMenuItem *Root, AnsiString ItemName,
 
 //  if( ( i_nb > 20 ) && ( i_item % 10 ) )  ?
     if( i_nb > 20 )
-    {
         Root->Add( ItemGroup );
-    }
 
     /* be sure that menu is enabled, if there are several items */
     if( i_nb > 1 )
-    {
         Root->Enabled = true;
-    }
 }
 
 /*****************************************************************************
@@ -806,9 +877,7 @@ void __fastcall TMenusGen::LanguageMenu( TMenuItem *Root, es_descriptor_t *p_es,
             i_item++;
             Name = p_intf->p_sys->p_input->stream.pp_es[i]->psz_desc;
             if( Name.IsEmpty() )
-            {
                 Name.sprintf( "Language %d", i_item );
-            }
 
             Item = new TMenuItem( Root );
             Item->RadioItem = true;
@@ -818,9 +887,7 @@ void __fastcall TMenusGen::LanguageMenu( TMenuItem *Root, es_descriptor_t *p_es,
 
             /* check the currently selected item */
             if( p_es == p_intf->p_sys->p_input->stream.pp_es[i] )
-            {
                 Item->Checked = true;
-            }
 
             /* setup signal hanling */
             Item->OnClick = MenuItemClick;
@@ -833,9 +900,7 @@ void __fastcall TMenusGen::LanguageMenu( TMenuItem *Root, es_descriptor_t *p_es,
 
     /* be sure that menu is enabled if non empty */
     if( i_item > 0 )
-    {
         Root->Enabled = true;
-    }
 }
 
 /*****************************************************************************
@@ -870,9 +935,7 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
         if( ( i_title % 10 == 1 ) && ( i_title_nb > 20 ) )
         {
             if( i_title != 1 )
-            {
                 Root->Add( TitleGroup );
-            }
 
             Name.sprintf( "%d - %d", i_title, i_title + 9 );
             TitleGroup = new TMenuItem( Root );
@@ -900,9 +963,7 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
                 if( ( i_chapter % 10 == 1 ) && ( i_chapter_nb > 20 ) )
                 {
                     if( i_chapter != 1 )
-                    {
                         TitleItem->Add( ChapterGroup );
-                    }
 
                     Name.sprintf( "%d - %d", i_chapter, i_chapter + 9 );
                     ChapterGroup = new TMenuItem( TitleItem );
@@ -961,12 +1022,9 @@ void __fastcall TMenusGen::NavigationMenu( TMenuItem *Root,
     }
 
     if( i_title_nb > 20 )
-    {
         Root->Add( TitleGroup );
-    }
 
     /* be sure that menu is sensitive */
     Root->Enabled = true;
 }
-
 

@@ -2,7 +2,7 @@
  * win32.cpp : Win32 interface plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002-2003 VideoLAN
- * $Id: win32.cpp,v 1.10 2003/01/22 21:42:51 ipkiss Exp $
+ * $Id: win32.cpp,v 1.11 2003/01/23 03:33:34 ipkiss Exp $
  *
  * Authors: Olivier Teulière <ipkiss@via.ecp.fr>
  *
@@ -128,6 +128,7 @@ static void Run( intf_thread_t *p_intf )
     delete p_intf->p_sys->p_menus;
     delete p_intf->p_sys->p_messages;
     delete p_intf->p_sys->p_playwin;
+    delete p_intf->p_sys->p_window;
 }
 
 /*****************************************************************************
@@ -242,7 +243,7 @@ int Win32Manage( intf_thread_t *p_intf )
 
             vlc_object_release( (vlc_object_t *)p_aout );
         }
-        
+
         /* Does the video output require to update the menus ? */
         p_vout = (vout_thread_t *)vlc_object_find( p_intf, VLC_OBJECT_VOUT,
                                                    FIND_ANYWHERE );
@@ -259,8 +260,8 @@ int Win32Manage( intf_thread_t *p_intf )
             vlc_object_release( (vlc_object_t *)p_vout );
         }
 
-        if( b_need_menus )
-            p_intf->p_sys->p_menus->SetupMenus();
+//        if( b_need_menus )
+//            p_intf->p_sys->p_menus->SetupMenus();
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
     }

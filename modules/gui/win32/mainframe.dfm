@@ -206,11 +206,11 @@ object MainFrameDlg: TMainFrameDlg
       Top = 0
       Action = EjectAction
     end
-    object ToolButton1: TToolButton
+    object ToolButtonSep2: TToolButton
       Left = 320
       Top = 0
       Width = 8
-      Caption = 'ToolButton1'
+      Caption = 'ToolButtonSep2'
       ImageIndex = 13
       Style = tbsSeparator
     end
@@ -226,11 +226,11 @@ object MainFrameDlg: TMainFrameDlg
       Top = 0
       Action = FastAction
     end
-    object ToolButtonSep2: TToolButton
+    object ToolButtonSep3: TToolButton
       Left = 406
       Top = 0
       Width = 8
-      Caption = 'ToolButtonSep2'
+      Caption = 'ToolButtonSep3'
       ImageIndex = 9
       Style = tbsSeparator
     end
@@ -501,6 +501,15 @@ object MainFrameDlg: TMainFrameDlg
       object MenuPreferences: TMenuItem
         Tag = 3
         Action = PreferencesAction
+      end
+      object N4: TMenuItem
+        Caption = '-'
+      end
+      object MenuAddInterface: TMenuItem
+        Tag = 3
+        Caption = '&Add interface'
+        Enabled = False
+        Hint = 'Spawn a new interface'
       end
     end
     object MenuControls: TMenuItem
