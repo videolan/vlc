@@ -90,7 +90,11 @@ int yuv_CInit( vout_thread_t *p_vout )
         free( p_vout->yuv.p_base );
         return( 1 );
     }
-    p_vout->yuv.p_offset = malloc( p_vout->i_width * sizeof( int ) );
+
+    /* In 8bpp we have a twice as big offset table because we also
+     * need the offsets for U and V (not only Y) */
+    p_vout->yuv.p_offset = malloc( p_vout->i_width * sizeof( int ) *
+                             ( ( p_vout->i_bytes_per_pixel == 1 ) ? 2 : 1 ) );
     if( p_vout->yuv.p_offset == NULL )
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
@@ -451,10 +455,12 @@ void SetYUV( vout_thread_t *p_vout )
  * SetOffset: build offset array for conversion functions
  *****************************************************************************
  * This function will build an offset array used in later conversion functions.
- * It will also set horizontal and vertical scaling indicators.
+ * It will also set horizontal and vertical scaling indicators. If b_double
+ * is set, the p_offset structure has interleaved Y and U/V offsets.
  *****************************************************************************/
 void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
-                boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset )
+                boolean_t *pb_h_scaling, int *pi_v_scaling, int *p_offset,
+                boolean_t b_double )
 {
     int i_x;                                    /* x position in destination */
     int i_scale_count;                                     /* modulo counter */
@@ -465,16 +471,35 @@ void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
     if( i_pic_width - i_width > 0 )
     {
         /* Prepare scaling array for horizontal extension */
-        *pb_h_scaling =  1;
-        i_scale_count =         i_pic_width;
-        for( i_x = i_width; i_x--; )
+        *pb_h_scaling = 1;
+        i_scale_count = i_pic_width;
+        if( b_double )
         {
-            while( (i_scale_count -= i_width) > 0 )
+            int i_dummy = 0;
+            for( i_x = i_width; i_x--; )
             {
-                *p_offset++ = 0;
+                while( (i_scale_count -= i_width) > 0 )
+                {
+                    *p_offset++ = 0;
+                    *p_offset++ = 0;
+                }
+                *p_offset++ = 1;
+                *p_offset++ = i_dummy & 1;
+                i_dummy++;
+                i_scale_count += i_pic_width;
             }
-            *p_offset++ = 1;
-            i_scale_count += i_pic_width;
+        }
+        else
+        {
+            for( i_x = i_width; i_x--; )
+            {
+                while( (i_scale_count -= i_width) > 0 )
+                {
+                    *p_offset++ = 0;
+                }
+                *p_offset++ = 1;
+                i_scale_count += i_pic_width;
+            }
         }
     }
     else if( i_pic_width - i_width < 0 )
@@ -482,15 +507,35 @@ void SetOffset( int i_width, int i_height, int i_pic_width, int i_pic_height,
         /* Prepare scaling array for horizontal reduction */
         *pb_h_scaling =  1;
         i_scale_count =         i_pic_width;
-        for( i_x = i_pic_width; i_x--; )
+        if( b_double )
         {
-            *p_offset = 1;
-            while( (i_scale_count -= i_pic_width) >= 0 )
+            int i_remainder = 0;
+            int i_jump;
+            for( i_x = i_pic_width; i_x--; )
             {
-                *p_offset += 1;
+                i_jump = 1;
+                while( (i_scale_count -= i_pic_width) >= 0 )
+                {
+                    i_jump += 1;
+                }
+                *p_offset++ = i_jump;
+                *p_offset++ = ( i_jump += i_remainder ) >> 1;
+                i_remainder = i_jump & 1;
+                i_scale_count += i_width;
             }
-            p_offset++;
-            i_scale_count += i_width;
+         }
+        else
+        {
+           for( i_x = i_pic_width; i_x--; )
+            {
+                *p_offset = 1;
+                while( (i_scale_count -= i_pic_width) >= 0 )
+                {
+                    *p_offset += 1;
+                }
+                p_offset++;
+                i_scale_count += i_width;
+            }
         }
     }
     else

@@ -54,34 +54,30 @@
         ( ((*p_y + dither10[i_real_y]) >> 4) << 7)                            \
         + ((*p_u + dither20[i_real_y]) >> 5) * 9                              \
         + ((*p_v + dither20[i_real_y]) >> 5) ];                               \
-    b_jump_uv += *p_offset;                                                   \
-    p_y += *p_offset;                                                         \
-    p_u += *p_offset   & b_jump_uv;                                           \
-    p_v += *p_offset++ & b_jump_uv;                                           \
+    p_y += *p_offset++;                                                       \
+    p_u += *p_offset;                                                         \
+    p_v += *p_offset++;                                                       \
     *p_pic++ = p_lookup[                                                      \
         ( ((*p_y + dither11[i_real_y]) >> 4) << 7)                            \
         + ((*p_u + dither21[i_real_y]) >> 5) * 9                              \
         + ((*p_v + dither21[i_real_y]) >> 5) ];                               \
-    b_jump_uv += *p_offset;                                                   \
-    p_y += *p_offset;                                                         \
-    p_u += *p_offset   & b_jump_uv;                                           \
-    p_v += *p_offset++ & b_jump_uv;                                           \
+    p_y += *p_offset++;                                                       \
+    p_u += *p_offset;                                                         \
+    p_v += *p_offset++;                                                       \
     *p_pic++ = p_lookup[                                                      \
         ( ((*p_y + dither12[i_real_y]) >> 4) << 7)                            \
         + ((*p_u + dither22[i_real_y]) >> 5) * 9                              \
         + ((*p_v + dither22[i_real_y]) >> 5) ];                               \
-    b_jump_uv += *p_offset;                                                   \
-    p_y += *p_offset;                                                         \
-    p_u += *p_offset   & b_jump_uv;                                           \
-    p_v += *p_offset++ & b_jump_uv;                                           \
+    p_y += *p_offset++;                                                       \
+    p_u += *p_offset;                                                         \
+    p_v += *p_offset++;                                                       \
     *p_pic++ = p_lookup[                                                      \
         ( ((*p_y + dither13[i_real_y]) >> 4) << 7)                            \
         + ((*p_u + dither23[i_real_y]) >> 5) * 9                              \
         + ((*p_v + dither23[i_real_y]) >> 5) ];                               \
-    b_jump_uv += *p_offset;                                                   \
-    p_y += *p_offset;                                                         \
-    p_u += *p_offset   & b_jump_uv;                                           \
-    p_v += *p_offset++ & b_jump_uv;                                           \
+    p_y += *p_offset++;                                                       \
+    p_u += *p_offset;                                                         \
+    p_v += *p_offset++;                                                       \
 
 /*****************************************************************************
  * SCALE_WIDTH_DITHER: scale a line horizontally for dithered 8 bpp
@@ -91,9 +87,8 @@
 #define SCALE_WIDTH_DITHER( CHROMA )                                          \
     if( b_horizontal_scaling )                                                \
     {                                                                         \
-        /* Horizontal scaling, but we can't use a buffer due to dither */     \
+        /* Horizontal scaling - we can't use a buffer due to dithering */     \
         p_offset = p_offset_start;                                            \
-        b_jump_uv = 0;                                                        \
         for( i_x = i_pic_width / 16; i_x--; )                                 \
         {                                                                     \
             CONVERT_4YUV_PIXELS_SCALE( CHROMA )                               \
@@ -114,13 +109,15 @@
     }                                                                         \
     /* Increment of picture pointer to end of line is still needed */         \
     p_pic += i_pic_line_width;                                                \
+                                                                              \
+    /* Increment the Y coordinate in the matrix, modulo 4 */                  \
     i_real_y = (i_real_y + 1) & 0x3;                                          \
 
 /*****************************************************************************
  * SCALE_HEIGHT_DITHER: handle vertical scaling for dithered 8 bpp
  *****************************************************************************
- * This macro handles vertical scaling for a picture. CHROMA may be 420, 422 or
- * 444 for RGB conversion, or 400 for gray conversion.
+ * This macro handles vertical scaling for a picture. CHROMA may be 420,
+ * 422 or 444 for RGB conversion, or 400 for gray conversion.
  *****************************************************************************/
 #define SCALE_HEIGHT_DITHER( CHROMA )                                         \
                                                                               \

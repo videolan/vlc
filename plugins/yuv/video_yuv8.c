@@ -72,7 +72,7 @@ void ConvertY4Gray8( YUV_ARGS_8BPP )
     p_buffer_start =    p_vout->yuv.p_buffer;
     p_offset_start =    p_vout->yuv.p_offset;
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
-               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
 
     /*
      * Perform conversion
@@ -114,7 +114,6 @@ void ConvertYUV420RGB8( YUV_ARGS_8BPP )
     int         i_vertical_scaling;                 /* vertical scaling type */
     int         i_x, i_y;                 /* horizontal and vertical indexes */
     int         i_scale_count;                       /* scale modulo counter */
-    int         b_jump_uv;                       /* should we jump u and v ? */
     int         i_real_y;                                           /* y % 4 */
     u8 *        p_lookup;                                    /* lookup table */
     int         i_chroma_width;                              /* chroma width */
@@ -122,17 +121,17 @@ void ConvertYUV420RGB8( YUV_ARGS_8BPP )
     int *       p_offset;                            /* offset array pointer */
 
     /* 
-     * The dither matrices
+     * The dithering matrices
      */
-    int dither10[4] = {  0x0,  0x8,  0x2,  0xa };
-    int dither11[4] = {  0xc,  0x4,  0xe,  0x6 };
-    int dither12[4] = {  0x3,  0xb,  0x1,  0x9 };
-    int dither13[4] = {  0xf,  0x7,  0xd,  0x5 };
+    static int dither10[4] = {  0x0,  0x8,  0x2,  0xa };
+    static int dither11[4] = {  0xc,  0x4,  0xe,  0x6 };
+    static int dither12[4] = {  0x3,  0xb,  0x1,  0x9 };
+    static int dither13[4] = {  0xf,  0x7,  0xd,  0x5 };
 
-    int dither20[4] = {  0x0, 0x10,  0x4, 0x14 };
-    int dither21[4] = { 0x18,  0x8, 0x1c,  0xc };
-    int dither22[4] = {  0x6, 0x16,  0x2, 0x12 };
-    int dither23[4] = { 0x1e,  0xe, 0x1a,  0xa };
+    static int dither20[4] = {  0x0, 0x10,  0x4, 0x14 };
+    static int dither21[4] = { 0x18,  0x8, 0x1c,  0xc };
+    static int dither22[4] = {  0x6, 0x16,  0x2, 0x12 };
+    static int dither23[4] = { 0x1e,  0xe, 0x1a,  0xa };
 
     /*
      * Initialize some values  - i_pic_line_width will store the line skip
@@ -142,7 +141,7 @@ void ConvertYUV420RGB8( YUV_ARGS_8BPP )
     p_offset_start =    p_vout->yuv.p_offset;
     p_lookup =          p_vout->yuv.p_base;
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
-               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 1 );
 
     /*
      * Perform conversion

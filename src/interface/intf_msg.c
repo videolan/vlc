@@ -184,7 +184,7 @@ void intf_MsgDestroy( void )
 }
 
 /*****************************************************************************
- * intf_Msg: print a message                                              (ok ?)
+ * intf_Msg: print a message                                             (ok ?)
  *****************************************************************************
  * This function queue a message for later printing, or print it immediately
  * if the queue isn't used.
@@ -199,7 +199,7 @@ void intf_Msg( char *psz_format, ... )
 }
 
 /*****************************************************************************
- * intf_ErrMsg : print an error message                                   (ok ?)
+ * intf_ErrMsg : print an error message                                  (ok ?)
  *****************************************************************************
  * This function is the same as intf_Msg, except that it prints its messages
  * on stderr.
@@ -214,7 +214,7 @@ void intf_ErrMsg( char *psz_format, ...)
 }
 
 /*****************************************************************************
- * intf_IntfMsg : print an interface message                              (ok ?)
+ * intf_IntfMsg : print an interface message                             (ok ?)
  *****************************************************************************
  * In opposition to all other intf_*Msg function, this function does not print
  * it's message on default terminal (stdout or stderr), but send it to
@@ -234,7 +234,7 @@ void intf_IntfMsg(char *psz_format, ...)
 }
 
 /*****************************************************************************
- * _intf_DbgMsg: print a debugging message                                (ok ?)
+ * _intf_DbgMsg: print a debugging message                               (ok ?)
  *****************************************************************************
  * This function prints a debugging message. Compared to other intf_*Msg
  * functions, it is only defined if DEBUG is defined and require a file name,
@@ -255,7 +255,7 @@ void _intf_DbgMsg( char *psz_file, char *psz_function, int i_line,
 #endif
 
 /*****************************************************************************
- * intf_ErrMsgImm: print a message                                        (ok ?)
+ * intf_ErrMsgImm: print a message                                       (ok ?)
  *****************************************************************************
  * This function prints a message immediately. If the queue is used, all
  * waiting messages are also printed.
@@ -271,7 +271,7 @@ void intf_MsgImm( char *psz_format, ... )
 }
 
 /*****************************************************************************
- * intf_ErrMsgImm: print an error message immediately                     (ok ?)
+ * intf_ErrMsgImm: print an error message immediately                    (ok ?)
  *****************************************************************************
  * This function is the same as intf_MsgImm, except that it prints its message
  * on stderr.
@@ -287,7 +287,7 @@ void intf_ErrMsgImm(char *psz_format, ...)
 }
 
 /*****************************************************************************
- * _intf_DbgMsgImm: print a debugging message immediately                 (ok ?)
+ * _intf_DbgMsgImm: print a debugging message immediately                (ok ?)
  *****************************************************************************
  * This function is the same as intf_DbgMsgImm, except that it prints its
  * message immediately. It should only be called through the macro
@@ -308,12 +308,12 @@ void _intf_DbgMsgImm( char *psz_file, char *psz_function, int i_line,
 #endif
 
 /*****************************************************************************
- * intf_FlushMsg                                                          (ok ?)
+ * intf_FlushMsg                                                        (ok ?)
  *****************************************************************************
  * Print all messages remaining in queue: get lock and call FlushLockedMsg.
  * This function does nothing if the message queue isn't used.
- * This function is only implemented if message queue is used. If not, it is an
- * empty macro.
+ * This function is only implemented if message queue is used. If not, it is
+ * an empty macro.
  *****************************************************************************/
 #ifdef INTF_MSG_QUEUE
 void intf_FlushMsg( void )
@@ -339,10 +339,10 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
     char *                  psz_str;             /* formatted message string */
     intf_msg_item_t *       p_msg_item;                /* pointer to message */
 
-#ifndef INTF_MSG_QUEUE /*..................................... instant mode ...*/
+#ifndef INTF_MSG_QUEUE /*................................... instant mode ...*/
     intf_msg_item_t         msg_item;                             /* message */
     p_msg_item =           &msg_item;
-#endif /*......................................................................*/
+#endif /*....................................................................*/
 
     /*
      * Convert message to string
@@ -361,8 +361,8 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
         exit( errno );
     }
 
-#ifdef INTF_MSG_QUEUE /*........................................ queue mode ...*/
-    vlc_mutex_lock( &p_msg->lock );                            /* get lock */
+#ifdef INTF_MSG_QUEUE /*...................................... queue mode ...*/
+    vlc_mutex_lock( &p_msg->lock );                              /* get lock */
     if( p_msg->i_count == INTF_MSG_QSIZE )          /* flush queue if needed */
     {
 #ifdef DEBUG               /* in debug mode, queue overflow causes a warning */
@@ -371,7 +371,7 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
         FlushLockedMsg( p_msg );
     }
     p_msg_item = p_msg->msg + p_msg->i_count++;            /* select message */
-#endif /*................................................ end of queue mode ...*/
+#endif /*.............................................. end of queue mode ...*/
 
     /*
      * Fill message information fields
@@ -379,12 +379,12 @@ static void QueueMsg( intf_msg_t *p_msg, int i_type, char *psz_format, va_list a
     p_msg_item->i_type =     i_type;
     p_msg_item->psz_msg =    psz_str;
 
-#ifdef INTF_MSG_QUEUE /*........................................... queue mode */
+#ifdef INTF_MSG_QUEUE /*......................................... queue mode */
     vlc_mutex_unlock( &p_msg->lock );                      /* give lock back */
-#else /*......................................................... instant mode */
+#else /*....................................................... instant mode */
     PrintMsg( p_msg_item );                                 /* print message */
     free( psz_str );                                    /* free message data */
-#endif /*......................................................................*/
+#endif /*....................................................................*/
 }
 
 /*****************************************************************************
@@ -400,10 +400,10 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
     char *                  psz_str;             /* formatted message string */
     intf_msg_item_t *       p_msg_item;                /* pointer to message */
 
-#ifndef INTF_MSG_QUEUE /*..................................... instant mode ...*/
+#ifndef INTF_MSG_QUEUE /*................................... instant mode ...*/
     intf_msg_item_t         msg_item;                             /* message */
     p_msg_item =           &msg_item;
-#endif /*......................................................................*/
+#endif /*....................................................................*/
 
     /*
      * Convert message to string
@@ -423,8 +423,8 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
         exit( errno );
     }
 
-#ifdef INTF_MSG_QUEUE /*........................................ queue mode ...*/
-    vlc_mutex_lock( &p_msg->lock );                            /* get lock */
+#ifdef INTF_MSG_QUEUE /*...................................... queue mode ...*/
+    vlc_mutex_lock( &p_msg->lock );                              /* get lock */
     if( p_msg->i_count == INTF_MSG_QSIZE )          /* flush queue if needed */
     {
 #ifdef DEBUG               /* in debug mode, queue overflow causes a warning */
@@ -433,7 +433,7 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
         FlushLockedMsg( p_msg );
     }
     p_msg_item = p_msg->msg + p_msg->i_count++;            /* select message */
-#endif /*................................................ end of queue mode ...*/
+#endif /*.............................................. end of queue mode ...*/
 
     /*
      * Fill message information fields
@@ -445,17 +445,17 @@ static void QueueDbgMsg(intf_msg_t *p_msg, char *psz_file, char *psz_function,
     p_msg_item->i_line =       i_line;
     p_msg_item->date =         mdate();
 
-#ifdef INTF_MSG_QUEUE /*........................................... queue mode */
+#ifdef INTF_MSG_QUEUE /*......................................... queue mode */
     vlc_mutex_unlock( &p_msg->lock );                      /* give lock back */
-#else /*......................................................... instant mode */
+#else /*....................................................... instant mode */
     PrintMsg( p_msg_item );                                 /* print message */
     free( psz_str );                                    /* free message data */
-#endif /*......................................................................*/
+#endif /*....................................................................*/
 }
 #endif
 
 /*****************************************************************************
- * FlushLockedMsg                                                        (ok ?)
+ * FlushLockedMsg                                                       (ok ?)
  *****************************************************************************
  * Print all messages remaining in queue. MESSAGE QUEUE MUST BE LOCKED, since
  * this function does not check the lock. This function is only defined if
@@ -478,7 +478,7 @@ static void FlushLockedMsg ( intf_msg_t *p_msg )
 #endif
 
 /*****************************************************************************
- * PrintMsg: print a message                                              (ok ?)
+ * PrintMsg: print a message                                             (ok ?)
  *****************************************************************************
  * Print a single message. The message data is not freed. This function exists
  * in two version. The DEBUG version prints a date with each message, and is

@@ -71,7 +71,7 @@ void ConvertY4Gray32( YUV_ARGS_32BPP )
     p_buffer_start =    p_vout->yuv.p_buffer;
     p_offset_start =    p_vout->yuv.p_offset;
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
-               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
 
     /*
      * Perform conversion
@@ -133,7 +133,7 @@ void ConvertYUV420RGB32( YUV_ARGS_32BPP )
     p_buffer_start =    p_vout->yuv.p_buffer;
     p_offset_start =    p_vout->yuv.p_offset;
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
-               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
 
     /*
      * Perform conversion
@@ -195,7 +195,7 @@ void ConvertYUV422RGB32( YUV_ARGS_32BPP )
     p_buffer_start =    p_vout->yuv.p_buffer;
     p_offset_start =    p_vout->yuv.p_offset;
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
-               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
 
     /*
      * Perform conversion
@@ -256,7 +256,7 @@ void ConvertYUV444RGB32( YUV_ARGS_32BPP )
     p_buffer_start =    p_vout->yuv.p_buffer;
     p_offset_start =    p_vout->yuv.p_offset;
     SetOffset( i_width, i_height, i_pic_width, i_pic_height,
-               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start );
+               &b_horizontal_scaling, &i_vertical_scaling, p_offset_start, 0 );
 
     /*
      * Perform conversion

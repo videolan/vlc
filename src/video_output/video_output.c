@@ -160,7 +160,7 @@ vout_thread_t * vout_CreateThread   ( char *psz_display, int i_root_window,
                                                        VOUT_GRAYSCALE_DEFAULT );
     p_vout->b_info              = 0;
     p_vout->b_interface         = 0;
-    p_vout->b_scale             = 0;
+    p_vout->b_scale             = 1;
 
     intf_DbgMsg( "wished configuration: %dx%d, %d/%d bpp (%d Bpl)\n",
                  p_vout->i_width, p_vout->i_height, p_vout->i_screen_depth,
@@ -1691,7 +1691,7 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
      */
     if( p_vout->c_fps_samples > VOUT_FPS_SAMPLES )
     {
-        sprintf( psz_buffer, "%lli fps/10", VOUT_FPS_SAMPLES * 1000000 * 10 /
+        sprintf( psz_buffer, "%lli/10 fps", VOUT_FPS_SAMPLES * 1000000 * 10 /
                  ( p_vout->p_fps_sample[ (p_vout->c_fps_samples - 1) % VOUT_FPS_SAMPLES ] -
                    p_vout->p_fps_sample[ p_vout->c_fps_samples % VOUT_FPS_SAMPLES ] ) );
         Print( p_vout, 0, 0, RIGHT_RALIGN, TOP_RALIGN, psz_buffer );
@@ -1700,7 +1700,7 @@ static void RenderPictureInfo( vout_thread_t *p_vout, picture_t *p_pic )
     /*
      * Print frames count and loop time in upper left corner
      */
-    sprintf( psz_buffer, "%ld frames   rendering: %ld us",
+    sprintf( psz_buffer, "%ld frames, render: %ldus",
              (long) p_vout->c_fps_samples, (long) p_vout->render_time );
     Print( p_vout, 0, 0, LEFT_RALIGN, TOP_RALIGN, psz_buffer );
 #endif

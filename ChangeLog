@@ -4,6 +4,10 @@
   * new --synchro flag which lets you force which images are decoded.
   * removed an unused variable in the MMX YUVs.
   * fixed 32bpp MMX YUV, made the comments clearer, removed an emms.
+  * now scaling is on by default, so that people won't tell that the vlc
+    cannot do scaling :-)
+  * fixed a few long lines.
+  * _almost_ fixed 8bpp YUV.
 
 Tue Aug  8 11:24:01 CEST 2000
 0.1.99f :
