@@ -2,15 +2,15 @@
  * fb.c : framebuffer plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: fb.c,v 1.5 2003/03/30 18:14:38 gbazin Exp $
+ * $Id: fb.c,v 1.6 2003/04/20 21:15:31 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
- *      
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -64,7 +64,7 @@ static void GfxMode        ( int i_tty );
  *****************************************************************************/
 #define FB_DEV_VAR "fbdev"
 
-vlc_module_begin();                                            
+vlc_module_begin();
     add_category_hint( N_("Frame Buffer"), NULL, VLC_FALSE );
     add_file( FB_DEV_VAR, "/dev/fb0", NULL, N_("framebuffer device"), NULL, VLC_FALSE );
     set_description( _("Linux console framebuffer video output") );
@@ -95,7 +95,7 @@ struct vout_sys_t
     struct fb_var_screeninfo    var_info;       /* current mode informations */
     vlc_bool_t                  b_pan;     /* does device supports panning ? */
     struct fb_cmap              fb_cmap;                /* original colormap */
-    u16                         *p_palette;              /* original palette */
+    uint16_t                    *p_palette;              /* original palette */
 
     /* Video information */
     int i_width;
@@ -124,7 +124,7 @@ static int Create( vlc_object_t *p_this )
     p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
     {
-        return( 1 );
+        return VLC_ENOMEM;
     };
 
     p_vout->pf_init = Init;
@@ -175,7 +175,7 @@ static int Create( vlc_object_t *p_this )
         tcsetattr(0, 0, &p_vout->p_sys->old_termios);
         TextMode( p_vout->p_sys->i_tty );
         free( p_vout->p_sys );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* Set-up tty according to new signal handler */
@@ -188,7 +188,7 @@ static int Create( vlc_object_t *p_this )
         tcsetattr(0, 0, &p_vout->p_sys->old_termios);
         TextMode( p_vout->p_sys->i_tty );
         free( p_vout->p_sys );
-        return( 1 );
+        return VLC_EGENERIC;
     }
     memcpy( &vt_mode, &p_vout->p_sys->vt_mode, sizeof( vt_mode ) );
     vt_mode.mode   = VT_PROCESS;
@@ -204,7 +204,7 @@ static int Create( vlc_object_t *p_this )
         tcsetattr(0, 0, &p_vout->p_sys->old_termios);
         TextMode( p_vout->p_sys->i_tty );
         free( p_vout->p_sys );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     if( OpenDisplay( p_vout ) )
@@ -215,10 +215,10 @@ static int Create( vlc_object_t *p_this )
         tcsetattr(0, 0, &p_vout->p_sys->old_termios);
         TextMode( p_vout->p_sys->i_tty );
         free( p_vout->p_sys );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -248,7 +248,7 @@ static int Init( vout_thread_t *p_vout )
         default:
             msg_Err( p_vout, "unknown screen depth %i",
                      p_vout->p_sys->var_info.bits_per_pixel );
-            return 0;
+            return VLC_EGENERIC;
     }
 
     /* Only useful for p_vout->p_sys->var_info.bits_per_pixel != 8 */
@@ -285,7 +285,7 @@ static int Init( vout_thread_t *p_vout )
     /* Allocate the picture */
     if( p_pic == NULL )
     {
-        return 0;
+        return VLC_EGENERIC;
     }
 
     /* We know the chroma, allocate a buffer which will be used
@@ -317,7 +317,7 @@ static int Init( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES++;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -397,7 +397,7 @@ static int Manage( vout_thread_t *p_vout )
         if( Init( p_vout ) )
         {
             msg_Err( p_vout, "cannot reinit framebuffer screen" );
-            return( 1 );
+            return VLC_EGENERIC;
         }
 
         /* Clear screen */
@@ -410,7 +410,7 @@ static int Manage( vout_thread_t *p_vout )
 #endif
     }
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -421,6 +421,7 @@ static int Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
+static int panned=0;
     /* swap the two Y offsets if the drivers supports panning */
     if( p_vout->p_sys->b_pan )
     {
@@ -431,8 +432,11 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
          * some other app might have played with the framebuffer */
         p_vout->p_sys->var_info.xoffset = 0;
 
+if(panned < 0) {
         ioctl( p_vout->p_sys->i_fd,
                FBIOPAN_DISPLAY, &p_vout->p_sys->var_info );
+panned++;
+}
     }
 }
 
@@ -460,7 +464,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( !(psz_device = config_GetPsz( p_vout, FB_DEV_VAR )) )
     {
         msg_Err( p_vout, "don't know which fb device to open" );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     p_vout->p_sys->i_fd = open( psz_device, O_RDWR);
@@ -469,7 +473,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "cannot open %s (%s)", psz_device, strerror(errno) );
         free( psz_device );
-        return( 1 );
+        return VLC_EGENERIC;
     }
     free( psz_device );
 
@@ -479,16 +483,11 @@ static int OpenDisplay( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "cannot get fb info (%s)", strerror(errno) );
         close( p_vout->p_sys->i_fd );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
-    if( ioctl( p_vout->p_sys->i_fd,
-               FBIOGET_VSCREENINFO, &p_vout->p_sys->old_info ) )
-    {
-        msg_Err( p_vout, "cannot get 2nd fb info (%s)", strerror(errno) );
-        close( p_vout->p_sys->i_fd );
-        return( 1 );
-    }
+    memcpy( &p_vout->p_sys->old_info, &p_vout->p_sys->var_info,
+            sizeof( struct fb_var_screeninfo ) );
 
     /* Set some attributes */
     p_vout->p_sys->var_info.activate = FB_ACTIVATE_NXTOPEN;
@@ -500,7 +499,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     {
         msg_Err( p_vout, "cannot set fb info (%s)", strerror(errno) );
         close( p_vout->p_sys->i_fd );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* Get some informations again, in the definitive configuration */
@@ -513,10 +512,10 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
         /* Restore fb config */
         ioctl( p_vout->p_sys->i_fd,
-               FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );
+               FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
 
         close( p_vout->p_sys->i_fd );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     /* FIXME: if the image is full-size, it gets cropped on the left
@@ -570,10 +569,10 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
         /* Restore fb config */
         ioctl( p_vout->p_sys->i_fd,
-               FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );
+               FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
 
         close( p_vout->p_sys->i_fd );
-        return 1;
+        return VLC_EGENERIC;
     }
 
     p_vout->p_sys->i_page_size = p_vout->p_sys->i_width *
@@ -595,16 +594,16 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
         /* Restore fb config */
         ioctl( p_vout->p_sys->i_fd,
-               FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );
+               FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
 
         close( p_vout->p_sys->i_fd );
-        return( 1 );
+        return VLC_EGENERIC;
     }
 
     msg_Dbg( p_vout, "framebuffer type=%d, visual=%d, ypanstep=%d, "
              "ywrap=%d, accel=%d", fix_info.type, fix_info.visual,
              fix_info.ypanstep, fix_info.ywrapstep, fix_info.accel );
-    return( 0 );
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -625,7 +624,7 @@ static void CloseDisplay( vout_thread_t *p_vout )
 
     /* Restore fb config */
     ioctl( p_vout->p_sys->i_fd,
-           FBIOPUT_VSCREENINFO, &p_vout->p_sys->var_info );
+           FBIOPUT_VSCREENINFO, &p_vout->p_sys->old_info );
 
     /* Close fb */
     close( p_vout->p_sys->i_fd );
