@@ -3,3 +3,4 @@ SOURCES_ugly_resampler = modules/audio_filter/resampler/ugly.c
 SOURCES_linear_resampler = modules/audio_filter/resampler/linear.c
 SOURCES_bandlimited_resampler = modules/audio_filter/resampler/bandlimited.c \
 	modules/audio_filter/resampler/bandlimited.h
+SOURCES_coreaudio_resampler = modules/audio_filter/resampler/coreaudio.c

@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.227 2003/03/25 17:07:45 gbazin Exp $
+ * $Id: input.c,v 1.228 2003/03/30 01:13:37 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -45,6 +45,7 @@
 #include "input_ext-plugins.h"
 
 #include "stream_output.h"
+#include <vlc/vout.h>
 
 #include "interface.h"
 
@@ -595,7 +596,7 @@ static void EndThread( input_thread_t * p_input )
     {
         vlc_object_detach( p_object );
         vlc_object_release( p_object );
-        vout_Destroy( p_object );
+        vout_Destroy( (vout_thread_t *)p_object );
     }
 
     free( p_input->psz_source );
