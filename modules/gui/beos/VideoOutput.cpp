@@ -2,7 +2,7 @@
  * vout_beos.cpp: beos video output display method
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: VideoOutput.cpp,v 1.5 2002/10/30 00:59:22 titer Exp $
+ * $Id: VideoOutput.cpp,v 1.6 2002/11/22 19:37:25 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -202,6 +202,11 @@ VideoWindow::VideoWindow(int v_width, int v_height, BRect frame,
        bitmap[1]->GetOverlayRestrictions(&r);
        SetSizeLimits((i_width * r.min_width_scale), i_width * r.max_width_scale,
                      (i_height * r.min_height_scale), i_height * r.max_height_scale);
+    }
+    
+    if( config_GetInt( p_vout, "fullscreen" ) )
+    {
+        BWindow::Zoom();;
     }
 }
 
