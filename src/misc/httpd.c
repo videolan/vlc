@@ -2033,6 +2033,7 @@ static void httpd_ClientTlsHsIn( httpd_client_t *cl )
 
         case -1:
             cl->i_state = HTTPD_CLIENT_DEAD;
+            cl->p_tls = NULL;
             break;
 
         case 2:
@@ -2050,6 +2051,7 @@ static void httpd_ClientTlsHsOut( httpd_client_t *cl )
 
         case -1:
             cl->i_state = HTTPD_CLIENT_DEAD;
+            cl->p_tls = NULL;
             break;
 
         case 1:
