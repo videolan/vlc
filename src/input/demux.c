@@ -96,7 +96,7 @@ demux_t *__demux2_New( vlc_object_t *p_obj,
             { "ogg",  "ogg" }, { "ogm",  "ogg" },
             { "pva",  "pva" },
             { "rm",   "rm" },
-            { "",  "" },
+            { NULL,  NULL },
         };
 
         char *psz_ext = strrchr( p_demux->psz_path, '.' ) + 1;
