@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-02 01:26+0100\n"
+"POT-Creation-Date: 2003-02-02 01:46+0100\n"
 "PO-Revision-Date: 2002-07-23 23:00+0200\n"
 "Last-Translator: Joel Arvidsson <dogai@privat.utfors.se>\n"
 "Language-Team: \n"
@@ -1507,7 +1507,7 @@ msgid "Familiar Linux Gtk+ interface module"
 msgstr ""
 
 #: modules/gui/familiar/interface.c:66
-msgid "vlc (familiar)"
+msgid "VLC media player"
 msgstr ""
 
 #: modules/gui/familiar/interface.c:90 modules/gui/macosx/open.m:387
@@ -1597,7 +1597,7 @@ msgstr ""
 #: modules/gui/familiar/interface.c:459 modules/gui/gtk/gtk_interface.c:1619
 #: modules/gui/win32/strings.cpp:7
 msgid "About"
-msgstr "Om vlc"
+msgstr "Om VLC"
 
 #: modules/gui/familiar/interface.c:231 modules/gui/win32/strings.cpp:168
 msgid "URL:"
@@ -2453,7 +2453,7 @@ msgstr "_Avsluta"
 
 #: modules/gui/gtk/gtk_interface.c:266 modules/gui/win32/strings.cpp:124
 msgid "Exit the program"
-msgstr "Avsluta vlc"
+msgstr "Avsluta VLC"
 
 #: modules/gui/gtk/gtk_interface.c:273
 msgid "_View"
@@ -2485,11 +2485,11 @@ msgstr ""
 
 #: modules/gui/gtk/gtk_interface.c:592 modules/gui/gtk/gtk_interface.c:1476
 msgid "_About..."
-msgstr "_Om vlc..."
+msgstr "_Om VLC..."
 
 #: modules/gui/gtk/gtk_interface.c:600 modules/gui/win32/strings.cpp:132
 msgid "About this application"
-msgstr "Om vlc"
+msgstr "Om VLC"
 
 #: modules/gui/gtk/gtk_interface.c:930 modules/gui/win32/strings.cpp:41
 msgid "Channel:"
@@ -2682,9 +2682,8 @@ msgid "About VLC Media Player"
 msgstr ""
 
 #: modules/gui/macosx/intf.m:269
-#, fuzzy
 msgid "Hide VLC"
-msgstr "Göm vlc"
+msgstr "Göm VLC"
 
 #: modules/gui/macosx/intf.m:270
 msgid "Hide Others"
@@ -2697,7 +2696,7 @@ msgstr "Visa alla"
 #: modules/gui/macosx/intf.m:272
 #, fuzzy
 msgid "Quit VLC"
-msgstr "Avsluta vlc"
+msgstr "Avsluta VLC"
 
 #: modules/gui/macosx/intf.m:275
 #, fuzzy
@@ -3181,7 +3180,7 @@ msgstr ""
 #: modules/gui/win32/strings.cpp:131
 #, fuzzy
 msgid "About..."
-msgstr "_Om vlc..."
+msgstr "_Om VLC..."
 
 #: modules/gui/win32/strings.cpp:136
 #, fuzzy
@@ -3655,7 +3654,7 @@ msgstr ""
 #: modules/video_output/ggi.c:57
 msgid ""
 "Specify the X11 hardware display you want to use.\n"
-"By default vlc will use the value of the DISPLAY environment variable."
+"By default VLC will use the value of the DISPLAY environment variable."
 msgstr ""
 
 #: modules/video_output/glide.c:64
@@ -3688,7 +3687,7 @@ msgstr ""
 #: modules/video_output/mga/xmga.c:100 modules/video_output/x11/x11.c:54
 #: modules/video_output/x11/xvideo.c:60
 msgid ""
-"Specify the X11 hardware display you want to use. By default vlc will use "
+"Specify the X11 hardware display you want to use. By default VLC will use "
 "the value of the DISPLAY environment variable."
 msgstr ""
 
@@ -3702,7 +3701,7 @@ msgstr ""
 
 #: modules/video_output/qte/qte.cpp:90
 msgid ""
-"Specify the Qt Embedded hardware display you want to use. By default vlc "
+"Specify the Qt Embedded hardware display you want to use. By default VLC "
 "will use the value of the DISPLAY environment variable."
 msgstr ""
 
@@ -3737,7 +3736,7 @@ msgid "use shared memory"
 msgstr ""
 
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
-msgid "Use shared memory to communicate between vlc and the X server."
+msgid "Use shared memory to communicate between VLC and the X server."
 msgstr ""
 
 #: modules/video_output/x11/x11.c:62
@@ -3854,10 +3853,6 @@ msgstr ""
 
 #~ msgid "Previous File"
 #~ msgstr "Föregående fil"
-
-#, fuzzy
-#~ msgid "Select program"
-#~ msgstr "Avsluta vlc"
 
 #, fuzzy
 #~ msgid "Toggle fullscreen"

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
-"POT-Creation-Date: 2003-02-02 01:26+0100\n"
+"POT-Creation-Date: 2003-02-02 01:46+0100\n"
 "PO-Revision-Date: 2001-12-10 13:32+0100\n"
 "Last-Translator: Samuel Hocevar <sam@zoy.org>\n"
 "Language-Team: \n"
@@ -1658,8 +1658,8 @@ msgid "Familiar Linux Gtk+ interface module"
 msgstr "module d'interface Gtk+ Familiar Linux"
 
 #: modules/gui/familiar/interface.c:66
-msgid "vlc (familiar)"
-msgstr ""
+msgid "VLC media player"
+msgstr "Lecteur multimédia VLC"
 
 #: modules/gui/familiar/interface.c:90 modules/gui/macosx/open.m:387
 #: modules/gui/macosx/open.m:423 modules/gui/macosx/open.m:584
@@ -3749,10 +3749,10 @@ msgstr "nom du display X11"
 #: modules/video_output/ggi.c:57
 msgid ""
 "Specify the X11 hardware display you want to use.\n"
-"By default vlc will use the value of the DISPLAY environment variable."
+"By default VLC will use the value of the DISPLAY environment variable."
 msgstr ""
 "Spécifier le display X11 que vous désirez utiliser.\n"
-"Par défaut vlc utilisera la valeur de la variable d'environnement DISPLAY."
+"Par défaut VLC utilisera la valeur de la variable d'environnement DISPLAY."
 
 #: modules/video_output/glide.c:64
 msgid "3dfx Glide module"
@@ -3791,10 +3791,10 @@ msgstr ""
 #: modules/video_output/mga/xmga.c:100 modules/video_output/x11/x11.c:54
 #: modules/video_output/x11/xvideo.c:60
 msgid ""
-"Specify the X11 hardware display you want to use. By default vlc will use "
+"Specify the X11 hardware display you want to use. By default VLC will use "
 "the value of the DISPLAY environment variable."
 msgstr ""
-"Spécifier le display X11 que vous désirez utiliser. Par défaut vlc utilisera "
+"Spécifier le display X11 que vous désirez utiliser. Par défaut VLC utilisera "
 "la valeur de la variable d'environnement DISPLAY."
 
 #: modules/video_output/mga/xmga.c:107
@@ -3807,10 +3807,10 @@ msgstr "nom du display Qt Embedded"
 
 #: modules/video_output/qte/qte.cpp:90
 msgid ""
-"Specify the Qt Embedded hardware display you want to use. By default vlc "
+"Specify the Qt Embedded hardware display you want to use. By default VLC "
 "will use the value of the DISPLAY environment variable."
 msgstr ""
-"Spécifier le display Qt Embedded que vous désirez utiliser. Par défaut vlc "
+"Spécifier le display Qt Embedded que vous désirez utiliser. Par défaut VLC "
 "utilisera la valeur de la variable d'environnement DISPLAY."
 
 #: modules/video_output/qte/qte.cpp:92
@@ -3844,9 +3844,9 @@ msgid "use shared memory"
 msgstr "utilise la mémoire partagée"
 
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
-msgid "Use shared memory to communicate between vlc and the X server."
+msgid "Use shared memory to communicate between VLC and the X server."
 msgstr ""
-"Utiliser la mémoire partagée pour communiquer entre vlc et le serveur X."
+"Utiliser la mémoire partagée pour communiquer entre VLC et le serveur X."
 
 #: modules/video_output/x11/x11.c:62
 msgid "X11"

@@ -2,7 +2,7 @@
  * ggi.c : GGI plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: ggi.c,v 1.2 2002/11/10 18:04:22 sam Exp $
+ * $Id: ggi.c,v 1.3 2003/02/02 00:46:58 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -55,7 +55,7 @@ static void SetPalette     ( vout_thread_t *, u16 *, u16 *, u16 * );
  *****************************************************************************/
 #define DISPLAY_TEXT N_("X11 display name")
 #define DISPLAY_LONGTEXT N_("Specify the X11 hardware display you want to use."\
-                           "\nBy default vlc will use the value of the DISPLAY"\
+                           "\nBy default VLC will use the value of the DISPLAY"\
                            " environment variable.")
 
 vlc_module_begin();                                

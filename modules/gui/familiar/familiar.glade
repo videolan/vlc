@@ -25,7 +25,7 @@
     <handler>on_familiar_delete_event</handler>
     <last_modification_time>Wed, 21 Aug 2002 19:12:40 GMT</last_modification_time>
   </signal>
-  <title>vlc (familiar)</title>
+  <title>VLC media player</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>

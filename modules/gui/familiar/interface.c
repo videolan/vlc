@@ -63,7 +63,7 @@ create_familiar (void)
   gtk_widget_set_name (familiar, "familiar");
   gtk_object_set_data (GTK_OBJECT (familiar), "familiar", familiar);
   gtk_widget_set_usize (familiar, 240, 320);
-  gtk_window_set_title (GTK_WINDOW (familiar), _("vlc (familiar)"));
+  gtk_window_set_title (GTK_WINDOW (familiar), _("VLC media player"));
   gtk_window_set_policy (GTK_WINDOW (familiar), TRUE, TRUE, TRUE);
 
   vbox = gtk_vbox_new (FALSE, 0);

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 0.73.3\n"
-"POT-Creation-Date: 2003-02-02 01:26+0100\n"
+"POT-Creation-Date: 2003-02-02 01:46+0100\n"
 "PO-Revision-Date: 2002-04-18 23:38+0100\n"
 "Last-Translator: Felix Kuehne <fk@aenneburghardt.de><fk@aenneburghardt.de>\n"
 "Language-Team: \n"
@@ -980,7 +980,7 @@ msgid ""
 msgstr ""
 "\n"
 "Warnung: Falls Sie die Oberfläche nicht mehr benutzen können, öffnen Sie die "
-"DOS-Eingabe, gehen Sie in den Ordner von vlc lassen Sie \"vlc -I win32\" "
+"DOS-Eingabe, gehen Sie in den Ordner von VLC lassen Sie \"vlc -I win32\" "
 "laufen.\n"
 
 #. ****************************************************************************
@@ -1662,8 +1662,8 @@ msgid ""
 "and 0.4. By default VLC assumes you have the latest VLS. In case you're "
 "using an old version, select this option."
 msgstr ""
-"Das Protokoll um A/52 Ton-Streams zu übertragen, hat zwischen vlc 0.3.x und "
-"0.4.x gewechselt. Standardmäßig nimmt vlc an, dass sie das neueste VLS "
+"Das Protokoll um A/52 Ton-Streams zu übertragen, hat zwischen VLC 0.3.x und "
+"0.4.x gewechselt. Standardmäßig nimmt VLC an, dass sie das neueste VLS "
 "haben. Falls Sie eine alte Version benutzen, aktivieren Sie dies."
 
 #: modules/demux/mpeg/ts.c:105
@@ -1703,8 +1703,8 @@ msgid "Familiar Linux Gtk+ interface module"
 msgstr "Familiar Linux Gtk+ Oberflächen Modul"
 
 #: modules/gui/familiar/interface.c:66
-msgid "vlc (familiar)"
-msgstr "vlc (familiar)"
+msgid "VLC media player"
+msgstr "VLC Media Player"
 
 #: modules/gui/familiar/interface.c:90 modules/gui/macosx/open.m:387
 #: modules/gui/macosx/open.m:423 modules/gui/macosx/open.m:584
@@ -3808,10 +3808,10 @@ msgstr "X11 Bildschirm-Name"
 #: modules/video_output/ggi.c:57
 msgid ""
 "Specify the X11 hardware display you want to use.\n"
-"By default vlc will use the value of the DISPLAY environment variable."
+"By default VLC will use the value of the DISPLAY environment variable."
 msgstr ""
 "Geben Sie den X11-Bildschirm an, den Sie benutzen wollen.\n"
-"Standardmäßig wird vlc den Wert der DISPLAY environment (=Bildschirm-"
+"Standardmäßig wird VLC den Wert der DISPLAY environment (=Bildschirm-"
 "Umgebung) Variablen benutzen."
 
 #: modules/video_output/glide.c:64
@@ -3851,11 +3851,11 @@ msgstr ""
 #: modules/video_output/mga/xmga.c:100 modules/video_output/x11/x11.c:54
 #: modules/video_output/x11/xvideo.c:60
 msgid ""
-"Specify the X11 hardware display you want to use. By default vlc will use "
+"Specify the X11 hardware display you want to use. By default VLC will use "
 "the value of the DISPLAY environment variable."
 msgstr ""
 "Geben Sie den X11-Bildschirm an, den Sie benutzen wollen. Standardmäßig wird "
-"vlc den Wert der DISPLAY environment (=Bildschirm-Umgebung) Variablen "
+"VLC den Wert der DISPLAY environment (=Bildschirm-Umgebung) Variablen "
 "benutzen."
 
 #: modules/video_output/mga/xmga.c:107
@@ -3868,11 +3868,11 @@ msgstr "QT Bildschirm-Name"
 
 #: modules/video_output/qte/qte.cpp:90
 msgid ""
-"Specify the Qt Embedded hardware display you want to use. By default vlc "
+"Specify the Qt Embedded hardware display you want to use. By default VLC "
 "will use the value of the DISPLAY environment variable."
 msgstr ""
 "Geben Sie den QT-Bildschirm an, den Sie benutzen möchten. Standardmäßig wird "
-"vlc den Wert der DISPLAY environment (=Bildschirm-Umgebung) Variablen "
+"VLC den Wert der DISPLAY environment (=Bildschirm-Umgebung) Variablen "
 "benutzen."
 
 #: modules/video_output/qte/qte.cpp:92
@@ -3908,9 +3908,9 @@ msgid "use shared memory"
 msgstr "Geteilten Speicher benutzen"
 
 #: modules/video_output/x11/x11.c:59 modules/video_output/x11/xvideo.c:70
-msgid "Use shared memory to communicate between vlc and the X server."
+msgid "Use shared memory to communicate between VLC and the X server."
 msgstr ""
-"Geteilten Speicher benutzen, um zwischen vlc und dem X Server zu "
+"Geteilten Speicher benutzen, um zwischen VLC und dem X Server zu "
 "kommunizieren."
 
 #: modules/video_output/x11/x11.c:62

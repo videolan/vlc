@@ -2,7 +2,7 @@
  * qte.cpp : QT Embedded plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: qte.cpp,v 1.9 2003/01/19 22:16:13 jpsaman Exp $
+ * $Id: qte.cpp,v 1.10 2003/02/02 00:46:58 sam Exp $
  *
  * Authors: Gerald Hansink <gerald.hansink@ordain.nl>
  *          Jean-Paul Saman <jpsaman@wxs.nl>
@@ -87,7 +87,7 @@ extern "C"
     "to show on top of the video.")
 #define DISPLAY_TEXT N_("QT Embedded display name")
 #define DISPLAY_LONGTEXT N_( \
-    "Specify the Qt Embedded hardware display you want to use. By default vlc will " \
+    "Specify the Qt Embedded hardware display you want to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
 #define DRAWABLE_TEXT N_("QT Embedded drawable")
 #define DRAWABLE_LONGTEXT N_( \

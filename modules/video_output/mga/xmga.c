@@ -2,7 +2,7 @@
  * xmga.c : X11 MGA plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xmga.c,v 1.1 2002/08/04 17:23:43 sam Exp $
+ * $Id: xmga.c,v 1.2 2003/02/02 00:46:58 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -97,7 +97,7 @@ static void ToggleCursor   ( vout_thread_t * );
 
 #define DISPLAY_TEXT N_("X11 display name")
 #define DISPLAY_LONGTEXT N_( \
-    "Specify the X11 hardware display you want to use. By default vlc will " \
+    "Specify the X11 hardware display you want to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
 
 vlc_module_begin();  

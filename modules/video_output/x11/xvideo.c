@@ -2,7 +2,7 @@
  * xvideo.c : Xvideo plugin for vlc
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xvideo.c,v 1.3 2003/02/01 18:54:10 sam Exp $
+ * $Id: xvideo.c,v 1.4 2003/02/02 00:46:58 sam Exp $
  *
  * Authors: Shane Harper <shanegh@optusnet.com.au>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -57,7 +57,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
 
 #define DISPLAY_TEXT N_("X11 display name")
 #define DISPLAY_LONGTEXT N_( \
-    "Specify the X11 hardware display you want to use. By default vlc will " \
+    "Specify the X11 hardware display you want to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
 
 #define CHROMA_TEXT N_("XVimage chroma format")
@@ -67,7 +67,7 @@ extern void E_(Deactivate) ( vlc_object_t * );
 
 #define SHM_TEXT N_("use shared memory")
 #define SHM_LONGTEXT N_( \
-    "Use shared memory to communicate between vlc and the X server.")
+    "Use shared memory to communicate between VLC and the X server.")
 
 vlc_module_begin();
     add_category_hint( N_("XVideo"), NULL );
