@@ -10,7 +10,7 @@
  *  -dvd_udf to find files
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: input_dvd.c,v 1.68 2001/06/07 22:25:42 sam Exp $
+ * $Id: input_dvd.c,v 1.69 2001/06/09 17:01:22 stef Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -796,6 +796,12 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     
             DVDFindSector( p_dvd );
             p_dvd->i_cell += p_dvd->i_angle_cell;
+
+            if( p_input->stream.pp_programs[0]->i_synchro_state == SYNCHRO_OK )
+            {
+                p_input->stream.pp_programs[0]->i_synchro_state =
+                    SYNCHRO_REINIT;
+            }
         }
         else
         {
@@ -809,7 +815,6 @@ static int DVDSetArea( input_thread_t * p_input, input_area_t * p_area )
     p_input->stream.b_seekable = 1;
     p_input->stream.b_changed = 1;
 
-    p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_REINIT;
 
     return 0;
 }
@@ -899,7 +904,7 @@ static int DVDRead( input_thread_t * p_input,
         p_input->stream.p_selected_area->i_part = p_dvd->i_chapter;
 
         /* the synchro has to be reinitialized when we change cell */
-        p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_REINIT;
+//        p_input->stream.pp_programs[0]->i_synchro_state = SYNCHRO_REINIT;
 
         vlc_mutex_unlock( &p_input->stream.stream_lock );
 

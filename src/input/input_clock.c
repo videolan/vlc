@@ -2,7 +2,7 @@
  * input_clock.c: Clock/System date convertions, stream management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_clock.c,v 1.16 2001/05/08 14:53:31 bozo Exp $
+ * $Id: input_clock.c,v 1.17 2001/06/09 17:01:22 stef Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -123,7 +123,7 @@ static void ClockNewRef( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
                          mtime_t i_clock, mtime_t i_sysdate )
 {
     p_pgrm->cr_ref = i_clock;
-    p_pgrm->sysdate_ref = i_sysdate;
+    p_pgrm->sysdate_ref = p_pgrm->last_syscr ? p_pgrm->last_syscr : i_sysdate;
 }
 
 /*****************************************************************************
@@ -133,6 +133,7 @@ static void ClockNewRef( input_thread_t * p_input, pgrm_descriptor_t * p_pgrm,
 void input_ClockInit( pgrm_descriptor_t * p_pgrm )
 {
     p_pgrm->last_cr = 0;
+    p_pgrm->last_syscr = 0;
     p_pgrm->cr_ref = 0;
     p_pgrm->sysdate_ref = 0;
     p_pgrm->delta_cr = 0;
@@ -145,7 +146,7 @@ void input_ClockInit( pgrm_descriptor_t * p_pgrm )
 void input_ClockManageRef( input_thread_t * p_input,
                            pgrm_descriptor_t * p_pgrm, mtime_t i_clock )
 {
-    if( p_pgrm->i_synchro_state != SYNCHRO_OK )
+    if( ( p_pgrm->i_synchro_state != SYNCHRO_OK ) || ( i_clock == 0 ) )
     {
         /* Feed synchro with a new reference point. */
         ClockNewRef( p_input, p_pgrm, i_clock, mdate() );
@@ -160,6 +161,7 @@ void input_ClockManageRef( input_thread_t * p_input,
         else
         {
             p_pgrm->last_cr = 0;
+            p_pgrm->last_syscr = 0;
             p_pgrm->delta_cr = 0;
             p_pgrm->c_average_count = 0;
         }
@@ -187,7 +189,8 @@ void input_ClockManageRef( input_thread_t * p_input,
             /* Wait a while before delivering the packets to the decoder.
              * In case of multiple programs, we arbitrarily follow the
              * clock of the first program. */
-            mwait( ClockToSysdate( p_input, p_pgrm, i_clock ) );
+            p_pgrm->last_syscr = ClockToSysdate( p_input, p_pgrm, i_clock );
+            mwait( p_pgrm->last_syscr );
 
             /* Now take into account interface changes. */
             vlc_mutex_lock( &p_input->stream.stream_lock );

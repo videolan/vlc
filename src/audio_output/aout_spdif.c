@@ -2,7 +2,7 @@
  * aout_spdif: ac3 passthrough output
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_spdif.c,v 1.11 2001/05/31 16:10:05 stef Exp $
+ * $Id: aout_spdif.c,v 1.12 2001/06/09 17:01:22 stef Exp $
  *
  * Authors: Michel Kaempf <maxx@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -74,6 +74,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
     /* variable used to compute the nnumber of blank frames since the
      * last significant frame */
     i_blank = 0;
+    mdelta = 0;
 
     /* Compute the theorical duration of an ac3 frame */
 
@@ -104,7 +105,7 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                                 l_start_frame];
                     mdelta = mplay - mdate();
 
-                    if( mdelta < ( 2 * SLEEP_TIME ) )
+                    if( mdelta < ( 3 * SLEEP_TIME ) )
                     {
                         intf_WarnMsg( 12, "spdif out (%d):"
                                           "playing frame %lld (%lld)",
@@ -126,6 +127,11 @@ void aout_SpdifThread( aout_thread_t * p_aout )
                         i_frame++;
                         i_blank = 0;
                     }
+                    else
+                    {
+                        intf_WarnMsg( 12, "spdif out (%d): early frame %lld", 
+                                            i_fifo, mdelta );
+                    }
                     vlc_mutex_unlock( &p_aout->fifo[i_fifo].data_lock );
                 }
                 else
@@ -137,16 +143,23 @@ void aout_SpdifThread( aout_thread_t * p_aout )
 
         if( i_frame )
         {
-            /* we leave some time for aout fifo to fill and not to stress
-             * the external decoder too much */
-            msleep( SLEEP_TIME );
+            if( mdelta > 0 )
+            {
+                /* we leave some time for aout fifo to fill and not to stress
+                 * the external decoder too much */
+                msleep( mdelta + SLEEP_TIME );
+            }
+            else if( mdelta > -SLEEP_TIME )
+            {
+                msleep( SLEEP_TIME );
+            }
         }
         else
         {
             /* insert blank frame for stream continuity to
              * the external decoder */
             intf_WarnMsg( 6, "spdif warning: blank frame" );
-            p_aout->pf_play( p_aout, pi_blank, SPDIF_FRAME_SIZE/4 );
+            p_aout->pf_play( p_aout, pi_blank, SPDIF_FRAME_SIZE );
 
             /* we kill the output if we don't have any stream */
             if( ++i_blank > BLANK_FRAME_MAX )

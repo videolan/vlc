@@ -2,7 +2,7 @@
  * ac3_spdif.c: ac3 pass-through to external decoder with enabled soundcard
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.c,v 1.7 2001/05/31 01:37:08 sam Exp $
+ * $Id: ac3_spdif.c,v 1.8 2001/06/09 17:01:22 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Juha Yrjola <jyrjola@cc.hut.fi>
@@ -190,10 +190,9 @@ static void RunThread( ac3_spdif_thread_t * p_spdif )
     while( !p_spdif->p_fifo->b_die && !p_spdif->p_fifo->b_error )
     {
         /* Handle the dates */
-        if(DECODER_FIFO_START(*p_spdif->p_fifo)->i_pts)
+        if( p_spdif->i_pts != m_last_pts )
         {
-            m_last_pts = DECODER_FIFO_START(*p_spdif->p_fifo)->i_pts;
-            DECODER_FIFO_START(*p_spdif->p_fifo)->i_pts = 0;
+            m_last_pts = p_spdif->i_pts;
         }
         else
         {
@@ -306,8 +305,16 @@ static void EndThread( ac3_spdif_thread_t * p_spdif )
 static void BitstreamCallback ( bit_stream_t * p_bit_stream,
                                         boolean_t b_new_pes)
 {
+    ac3_spdif_thread_t *    p_spdif;
+
     if( b_new_pes )
     {
+        p_spdif = (ac3_spdif_thread_t *)p_bit_stream->p_callback_arg;
+
         p_bit_stream->p_byte += 3;
+
+        p_spdif->i_pts =
+            DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_pts;
+        DECODER_FIFO_START( *p_bit_stream->p_decoder_fifo )->i_pts = 0;
     }
 }

@@ -2,7 +2,7 @@
  * ac3_spdif.h: header for ac3 pass-through
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: ac3_spdif.h,v 1.3 2001/05/06 18:32:30 stef Exp $
+ * $Id: ac3_spdif.h,v 1.4 2001/06/09 17:01:22 stef Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -55,6 +55,9 @@ typedef struct ac3_spdif_thread_s
     ac3_info_t          ac3_info;
     u8 *                p_ac3;
     u8 *                p_iec;
+
+    /* current pes date */
+    mtime_t             i_pts;
 
     /*
      * Output properties
