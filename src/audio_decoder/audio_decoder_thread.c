@@ -204,14 +204,8 @@ static void RunThread (adec_thread_t * p_adec)
             intf_DbgMsg ( "adec: sync\n" );
             
             p_byte_stream = adec_byte_stream ( &p_adec->audio_decoder );
-            do 
-            {
-                adec_byte_stream_next ( p_byte_stream );
-            } while ( !(!*p_adec->p_data->p_payload_start
-                         && !p_adec->p_data->p_payload_start[1]
-                         && p_adec->p_data->p_payload_start[2] == 1)
-                       && (!p_adec->b_die)
-                       && (!p_adec->b_error) );
+            /* FIXME: the check will be done later, am I right ? */
+            adec_byte_stream_next ( p_byte_stream );
 
             if( p_adec->b_die || p_adec->b_error )
             {
