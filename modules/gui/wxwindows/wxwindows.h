@@ -93,6 +93,7 @@ class DialogsProvider;
 class PrefsTreeCtrl;
 class AutoBuiltPanel;
 class VideoWindow;
+class WindowSettings;
 
 /*****************************************************************************
  * intf_sys_t: description and status of wxwindows interface
@@ -102,6 +103,9 @@ struct intf_sys_t
     /* the wx parent window */
     wxWindow            *p_wxwindow;
     wxIcon              *p_icon;
+
+    /* window settings */
+    WindowSettings      *p_window_settings;
 
     /* special actions */
     vlc_bool_t          b_playing;
@@ -1016,6 +1020,41 @@ private:
 };
 #endif
 } // end of wxvlc namespace
+
+/* */
+class WindowSettings
+{
+public:
+    WindowSettings( intf_thread_t *_p_intf );
+    virtual ~WindowSettings();
+    enum
+    {
+        ID_SCREEN = -1,
+        ID_MAIN,
+        ID_PLAYLIST,
+        ID_MESSAGES,
+        ID_FILE_INFO,
+        ID_BOOKMARKS,
+
+        ID_MAX,
+    };
+
+    void SetSettings( int id, bool _b_shown,
+                      wxPoint p = wxDefaultPosition, wxSize s = wxDefaultSize );
+    bool GetSettings( int id, bool& _b_shown, wxPoint& p, wxSize& s );
+
+    void SetScreen( int i_screen_w, int i_screen_h );
+
+private:
+    intf_thread_t *p_intf;
+
+    int     i_screen_w;
+    int     i_screen_h;
+    bool    b_valid[ID_MAX];
+    bool    b_shown[ID_MAX];
+    wxPoint position[ID_MAX];
+    wxSize  size[ID_MAX];
+};
 
 /* Menus */
 void PopupMenu( intf_thread_t *, wxWindow *, const wxPoint& );

@@ -164,10 +164,50 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf, wxWindow *p_parent )
 
     /* Intercept all menu events in our custom event handler */
     PushEventHandler( new MenuEvtHandler( p_intf, NULL ) );
+
+
+    WindowSettings *ws = p_intf->p_sys->p_window_settings;
+    wxPoint p;
+    wxSize  s;
+    bool    b_shown;
+
+#define INIT( id, w, N, S ) \
+    if( ws->GetSettings( WindowSettings::id, b_shown, p, s ) && b_shown ) \
+    {                           \
+        if( !w )                \
+            w = N;              \
+        w->SetSize( s );        \
+        w->SetPosition( p );    \
+        w->S( true );           \
+    }
+
+    INIT( ID_PLAYLIST, p_playlist_dialog, new Playlist(p_intf,this), ShowPlaylist );
+    INIT( ID_MESSAGES, p_messages_dialog, new Messages(p_intf,this), Show );
+    INIT( ID_FILE_INFO, p_fileinfo_dialog, new FileInfo(p_intf,this), Show );
+    INIT( ID_BOOKMARKS, p_bookmarks_dialog, BookmarksDialog(p_intf,this), Show);
+#undef INIT
 }
 
 DialogsProvider::~DialogsProvider()
 {
+    WindowSettings *ws = p_intf->p_sys->p_window_settings;
+
+#define UPDATE(id,w)                                        \
+  {                                                         \
+    if( w && w->IsShown() )                                 \
+        ws->SetSettings(  WindowSettings::id, true,         \
+                          w->GetPosition(), w->GetSize() ); \
+    else                                                    \
+        ws->SetSettings(  WindowSettings::id, false );      \
+  }
+
+    UPDATE( ID_PLAYLIST,  p_playlist_dialog );
+    UPDATE( ID_MESSAGES,  p_messages_dialog );
+    UPDATE( ID_FILE_INFO, p_fileinfo_dialog );
+    UPDATE( ID_BOOKMARKS, p_bookmarks_dialog );
+
+#undef UPDATE
+
     /* Clean up */
     if( p_open_dialog )     delete p_open_dialog;
     if( p_prefs_dialog )    p_prefs_dialog->Destroy();

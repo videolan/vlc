@@ -300,10 +300,27 @@ Interface::Interface( intf_thread_t *_p_intf, long style ):
 
     /* Start timer */
     timer = new Timer( p_intf, this );
+
+    /* */
+    WindowSettings *ws = p_intf->p_sys->p_window_settings;
+    wxPoint p;
+    wxSize  s;
+    bool    b_shown;
+
+    ws->SetScreen( wxSystemSettings::GetMetric( wxSYS_SCREEN_X ),
+                   wxSystemSettings::GetMetric( wxSYS_SCREEN_Y ) );
+
+    if( ws->GetSettings( WindowSettings::ID_MAIN, b_shown, p, s ) )
+        SetPosition( p );
 }
 
 Interface::~Interface()
 {
+    WindowSettings *ws = p_intf->p_sys->p_window_settings;
+
+    ws->SetSettings( WindowSettings::ID_MAIN, true,
+                     GetPosition(), GetSize() );
+
 #ifdef wxHAS_TASK_BAR_ICON
     if( p_systray )
     {

@@ -121,6 +121,8 @@ vlc_module_begin();
     add_bool( "wxwin-systray", 0, NULL,
               SYSTRAY_TEXT, SYSTRAY_LONGTEXT, VLC_FALSE );
 #endif
+    add_string( "wxwin-config-last", NULL, NULL,
+                "last config", "last config", VLC_TRUE );
 
     add_submodule();
     set_description( _("wxWindows dialogs provider") );
@@ -168,6 +170,9 @@ static int Open( vlc_object_t *p_this )
     /* We support play on start */
     p_intf->b_play = VLC_TRUE;
 
+    /* */
+    p_intf->p_sys->p_window_settings = new WindowSettings( p_intf );
+
     return VLC_SUCCESS;
 }
 
@@ -201,6 +206,9 @@ static void Close( vlc_object_t *p_this )
     }
 
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+
+    /* */
+    delete p_intf->p_sys->p_window_settings;
 
     /* Destroy structure */
     free( p_intf->p_sys );
@@ -381,3 +389,184 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
         p_intf->p_sys->p_wxwindow->AddPendingEvent( event );
     }
 }
+
+WindowSettings::WindowSettings( intf_thread_t *_p_intf )
+{
+    char *psz_org = NULL;
+    char *psz;
+    int i;
+
+    /* */
+    p_intf = _p_intf;
+
+    /* */
+    for( i = 0; i < ID_MAX; i++ )
+    {
+        b_valid[i] = false;
+        b_shown[i] = false;
+        position[i] = wxDefaultPosition;
+        size[i] = wxDefaultSize;
+    }
+    b_shown[ID_MAIN] = true;
+
+    /* Parse the configuration */
+    psz_org = psz = config_GetPsz( p_intf, "wxwin-config-last" );
+    if( !psz || *psz == '\0' )
+        return;
+
+    msg_Dbg( p_intf, "Using last windows config '%s'", psz );
+
+    i_screen_w = 0;
+    i_screen_h = 0;
+    while( psz && *psz )
+    {
+        int id, v[4];
+
+        psz = strchr( psz, '(' );
+
+        if( !psz )
+            break;
+        psz++;
+
+        id = strtol( psz, &psz, 0 );
+        if( *psz != ',' ) /* broken cfg */
+            goto invalid;
+        psz++;
+
+        for( i = 0; i < 4; i++ )
+        {
+            v[i] = strtol( psz, &psz, 0 );
+
+            if( i < 3 )
+            {
+                if( *psz != ',' )
+                    goto invalid;
+                psz++;
+            }
+            else
+            {
+                if( *psz != ')' )
+                    goto invalid;
+            }
+        }
+        if( id == ID_SCREEN )
+        {
+            i_screen_w = v[2];
+            i_screen_h = v[3];
+        }
+        else if( id >= 0 && id < ID_MAX )
+        {
+            b_valid[id] = true;
+            b_shown[id] = true;
+            position[id] = wxPoint( v[0], v[1] );
+            size[id] = wxSize( v[2], v[3] );
+
+            msg_Dbg( p_intf, "id=%d p=(%d,%d) s=(%d,%d)",
+                     id, position[id].x, position[id].y,
+                         size[id].x, size[id].y );
+        }
+
+        psz = strchr( psz, ')' );
+        if( psz ) psz++;
+    }
+
+    if( i_screen_w <= 0 || i_screen_h <= 0 )
+        goto invalid;
+
+    for( i = 0; i < ID_MAX; i++ )
+    {
+        if( !b_valid[i] )
+            continue;
+        if( position[i].x < 0 || position[i].y < 0 )
+            goto invalid;
+        if( size[i].x <= 0 || size[i].y <= 0 )
+            goto invalid;
+    }
+
+    if( psz_org ) free( psz_org );
+    return;
+
+invalid:
+    msg_Dbg( p_intf, "last windows config is invalid (ignored)" );
+    for( i = 0; i < ID_MAX; i++ )
+    {
+        b_valid[i] = false;
+        b_shown[i] = false;
+        position[i] = wxDefaultPosition;
+        size[i] = wxDefaultSize;
+    }
+    if( psz_org ) free( psz_org );
+}
+
+
+WindowSettings::~WindowSettings( )
+{
+    wxString sCfg;
+    int i;
+
+    sCfg = wxString::Format( "(%d,0,0,%d,%d)", ID_SCREEN,
+                             wxSystemSettings::GetMetric( wxSYS_SCREEN_X ),
+                             wxSystemSettings::GetMetric( wxSYS_SCREEN_Y ) );
+    for( i = 0; i < ID_MAX; i++ )
+    {
+        if( !b_valid[i] || !b_shown[i] )
+            continue;
+
+        sCfg += wxString::Format( "(%d,%d,%d,%d,%d)",
+                                  i, position[i].x, position[i].y,
+                                     size[i].x, size[i].y );
+    }
+
+    config_PutPsz( p_intf, "wxwin-config-last", sCfg.c_str() );
+    config_SaveConfigFile( p_intf, "wxwindows" );
+}
+void WindowSettings::SetScreen( int i_screen_w, int i_screen_h )
+{
+    int i;
+
+    for( i = 0; i < ID_MAX; i++ )
+    {
+        if( !b_valid[i] )
+            continue;
+        if( position[i].x >= i_screen_w || position[i].y >= i_screen_h )
+            goto invalid;
+    }
+    return;
+
+invalid:
+    for( i = 0; i < ID_MAX; i++ )
+    {
+        b_valid[i] = false;
+        b_shown[i] = false;
+        position[i] = wxDefaultPosition;
+        size[i] = wxDefaultSize;
+    }
+}
+
+void WindowSettings::SetSettings( int id, bool _b_shown, wxPoint p, wxSize s )
+{
+    if( id < 0 || id >= ID_MAX )
+        return;
+
+    b_valid[id] = true;
+    b_shown[id] = _b_shown;
+
+    position[id] = p;
+    size[id] = s;
+}
+
+bool WindowSettings::GetSettings( int id, bool& _b_shown, wxPoint& p, wxSize& s)
+{
+    if( id < 0 || id >= ID_MAX )
+        return false;
+
+    if( !b_valid[id] )
+        return false;
+
+    _b_shown = b_shown[id];
+    p = position[id];
+    s = size[id];
+
+    return true;
+}
+
