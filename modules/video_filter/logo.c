@@ -59,7 +59,7 @@ static void DestroyFilter( vlc_object_t * );
  * Module descriptor
  *****************************************************************************/
 #define FILE_TEXT N_("Logo filename")
-#define FILE_LONGTEXT N_("The file must be in PNG RGBA 8bits format (for now).")
+#define FILE_LONGTEXT N_("Full path of the PNG file to use.")
 #define POSX_TEXT N_("X coordinate of the logo")
 #define POSX_LONGTEXT N_("You can move the logo by left-clicking on it." )
 #define POSY_TEXT N_("Y coordinate of the logo")
