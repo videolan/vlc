@@ -2,7 +2,7 @@
  * playlist.m: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.m,v 1.52 2004/01/12 21:22:22 hartman Exp $
+ * $Id: playlist.m,v 1.53 2004/01/14 18:45:45 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -104,6 +104,7 @@
     }
 }
 
+
 @end
 
 /*****************************************************************************
@@ -133,6 +134,28 @@
         [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 
     [o_window setExcludedFromWindowsMenu: TRUE];
+
+/* We need to check whether _defaultTableHeaderSortImage exists, since it 
+belongs to an Apple hidden private API, and then can "disapear" at any time*/
+
+    if ([[NSTableView class] respondsToSelector:@selector(_defaultTableHeaderSortImage)])
+    {
+    o_ascendingSortingImage = [[NSTableView class] _defaultTableHeaderSortImage];
+    }
+    else
+    {
+    o_ascendingSortingImage = nil;
+    }
+
+    if ([[NSTableView class] respondsToSelector:@selector(_defaultTableHeaderReverseSortImage)])
+    {
+        o_descendingSortingImage = [[NSTableView class] _defaultTableHeaderReverseSortImage];
+    }
+    else
+    {
+        o_descendingSortingImage = nil;
+    }
+
     [self initStrings];
 }
 
@@ -152,6 +175,62 @@
     [o_search_button setTitle: _NS("Search")];
     [o_btn_playlist setToolTip: _NS("Playlist")];
 }
+
+- (void) tableView:(NSTableView*)o_tv
+                  didClickTableColumn:(NSTableColumn *)o_tc
+{
+    intf_thread_t * p_intf = [NSApp getIntf];
+    playlist_t *p_playlist =
+        (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                       FIND_ANYWHERE );
+
+    int max = [[o_table_view tableColumns] count];
+    int i;
+
+    if( p_playlist == NULL )
+    {
+        return;
+    }
+
+    if (o_tc_sortColumn == o_tc )
+    { 
+        b_isSortDescending = !b_isSortDescending;
+    }
+    else if (o_tc == o_tc_name || o_tc == o_tc_author)
+    {
+        b_isSortDescending = VLC_FALSE;
+        [o_table_view setHighlightedTableColumn:o_tc];
+        o_tc_sortColumn = o_tc;
+        for (i=0;i<max;i++)
+        {
+            [o_table_view setIndicatorImage:nil inTableColumn:[[o_table_view tableColumns] objectAtIndex:i]];
+        }
+    }
+
+    if (o_tc_name == o_tc && !b_isSortDescending)
+    {    
+        playlist_SortTitle( p_playlist , 0 );
+        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];    
+    }
+    else if (o_tc_author == o_tc && !b_isSortDescending)
+    {
+        playlist_SortAuthor( p_playlist , 0 );
+        [o_table_view setIndicatorImage:o_ascendingSortingImage inTableColumn:o_tc];
+    }
+    else if (o_tc_name == o_tc && b_isSortDescending)
+    {    
+        playlist_SortTitle( p_playlist , 1 );
+        [o_table_view setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
+    }
+    else if (o_tc_author == o_tc && b_isSortDescending)
+    {
+        playlist_SortAuthor( p_playlist , 1 );
+        [o_table_view setIndicatorImage:o_descendingSortingImage inTableColumn:o_tc];
+    } 
+    vlc_object_release( p_playlist );
+    [self playlistUpdated];
+}
+
 
 - (BOOL)tableView:(NSTableView *)o_tv 
                   shouldEditTableColumn:(NSTableColumn *)o_tc
@@ -327,6 +406,7 @@
     vlc_object_release( p_playlist );
 }
 
+
 - (void)appendArray:(NSArray*)o_array atPos:(int)i_position enqueue:(BOOL)b_enqueue
 {
     int i_item;
@@ -447,7 +527,7 @@
     [o_table_view selectRow: i_row byExtendingSelection: NO];
     [o_table_view scrollRowToVisible: i_row];
 }
-    
+
 
 @end
 
@@ -492,8 +572,8 @@
     else if( [[o_tc identifier] isEqualToString:@"1"] )
     {
         vlc_mutex_lock( &p_playlist->object_lock );
-        o_value = [[NSString stringWithUTF8String: 
-            p_playlist->pp_items[i_row]->psz_name] lastPathComponent];
+        o_value = [NSString stringWithUTF8String: 
+            p_playlist->pp_items[i_row]->psz_name];
         vlc_mutex_unlock( &p_playlist->object_lock );
     }
     else if( [[o_tc identifier] isEqualToString:@"2"] )

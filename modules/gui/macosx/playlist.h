@@ -2,7 +2,7 @@
  * playlist.h: MacOS X interface plugin
  *****************************************************************************
  * Copyright (C) 2002-2004 VideoLAN
- * $Id: playlist.h,v 1.17 2004/01/09 22:11:04 hartman Exp $
+ * $Id: playlist.h,v 1.18 2004/01/14 18:45:45 bigben Exp $
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Derk-Jan Hartman <hartman at videolan dot org>
@@ -37,6 +37,7 @@
 @interface VLCPlaylist : NSObject
 {
     int i_moveRow;
+    int b_isSortDescending;
     
     IBOutlet id o_window;
     IBOutlet id o_btn_playlist;
@@ -46,6 +47,7 @@
     IBOutlet id o_tc_name;
     IBOutlet id o_tc_author;
     IBOutlet id o_tc_duration;
+    IBOutlet id o_tc_sortColumn;
 
     IBOutlet id o_ctx_menu;
     IBOutlet id o_mi_save_playlist;
@@ -59,6 +61,9 @@
 
     IBOutlet id o_search_keyword;
     IBOutlet id o_search_button;
+
+    NSImage *o_descendingSortingImage;
+    NSImage *o_ascendingSortingImage;
 
 }
 
