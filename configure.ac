@@ -3558,6 +3558,8 @@ fi
 dnl
 dnl corba (ORBit) plugin
 dnl
+dnl Default: do not enable corba
+enablecorba=false
 AC_ARG_ENABLE(corba,
   [  --enable-corba          corba interface support (default disabled)])
 if test "${enable_corba}" = "yes"; then
@@ -3568,11 +3570,14 @@ if test "${enable_corba}" = "yes"; then
 	gobject-2.0 >= $GLIB_VERSION \
 	gthread-2.0 >= $GLIB_VERSION,
 	[
+	  enablecorba=true
  	  AX_ADD_LDFLAGS([corba],[$CORBA_LIBS])
       	  AX_ADD_CFLAGS([corba],[$CORBA_CFLAGS])
           AX_ADD_PLUGINS([corba snapshot]) ],
-        [ AC_MSG_WARN(corba library not found) ])
+        [ enablecorba=false
+	  AC_MSG_WARN(corba library not found) ])
 fi
+AM_CONDITIONAL(ENABLE_CORBA, test x$enablecorba = xtrue)
 
 AC_ARG_WITH(,[Misc options:])
 
