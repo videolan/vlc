@@ -2,7 +2,7 @@
  * a52.c : raw A/52 stream input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: a52.c,v 1.1 2004/02/13 21:48:32 gbazin Exp $
+ * $Id: a52.c,v 1.2 2004/02/13 22:10:00 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -28,8 +28,12 @@
 #include <vlc/input.h>
 #include <vlc_codec.h>
 
+#ifdef HAVE_UNISTD_H
+#   include <unistd.h>
+#endif
+
 #define A52_PACKET_SIZE 16384
-#define A52_MAX_HEADER_SIZE 11
+#define A52_MAX_HEADER_SIZE 10
 
 /*****************************************************************************
  * Local prototypes
@@ -222,6 +226,10 @@ static int Demux( input_thread_t * p_input )
     demux_sys_t  *p_sys = p_input->p_demux_data;
     block_t *p_block_in, *p_block_out;
 
+     /* Align stream */
+    int64_t i_pos = stream_Tell( p_input->s );
+    if( i_pos % 2 ) stream_Read( p_input->s, NULL, 1 );
+
     if( !( p_block_in = stream_Block( p_input->s, A52_PACKET_SIZE ) ) )
     {
         return 0;
@@ -230,8 +238,6 @@ static int Demux( input_thread_t * p_input )
     if( !p_sys->b_big_endian && p_block_in->i_buffer )
     {
         /* Convert to big endian */
-        int64_t i_pos = stream_Tell( p_input->s );
-        if( i_pos % 2 ) p_block_in->p_buffer++; /* Align stream */
 
 #ifdef HAVE_SWAB
         swab(p_block_in->p_buffer, p_block_in->p_buffer, p_block_in->i_buffer);
