@@ -2,7 +2,7 @@
  * qte_main.c : QT Embedded wrapper for gte_main
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: qte_main.cpp,v 1.8 2003/12/22 02:24:52 sam Exp $
+ * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -159,8 +159,6 @@ static void Close( vlc_object_t *p_this )
 static void QteMain( qte_thread_t *p_this )
 {
     int i_argc = 1;
-    char *p_args[] = {"-qws", NULL};
-    char **pp_args = p_args;
 
     p_this->b_gui_server = VLC_FALSE;
     if( config_GetInt( p_this, "qte-guiserver" ) )
