@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.20 2003/11/30 14:49:23 fenrir Exp $
+ * $Id: ninput.h,v 1.21 2003/11/30 17:29:03 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -157,6 +157,32 @@ static int inline stream_Seek( stream_t *s, int64_t i_pos )
  * \defgroup demux Demux
  * @{
  */
+
+
+struct demux_t
+{
+    VLC_COMMON_MEMBERS
+
+    /* Module properties */
+    module_t    *p_module;
+
+    /* eg informative but needed (we can have access+demux) */
+    char        *psz_access;
+    char        *psz_demux;
+    char        *psz_path;
+
+    /* input stream */
+    stream_t    *s;     /* NULL in case of a access+demux in one */
+
+    /* es output */
+    es_out_t    *out;   /* ou p_es_out */
+
+    /* set by demuxer */
+    int (*pf_demux)  ( demux_t * );   /* demux one frame only */
+    int (*pf_control)( demux_t *, int i_query, va_list args);
+    demux_sys_t *p_sys;
+};
+
 enum demux_query_e
 {
     DEMUX_GET_POSITION,         /* arg1= double *       res=    */
@@ -177,6 +203,33 @@ VLC_EXPORT( int,            demux_vaControl,        ( input_thread_t *, int i_qu
 VLC_EXPORT( int,            demux_Control,          ( input_thread_t *, int i_query, ...  ) );
 
 VLC_EXPORT( int,            demux_vaControlDefault, ( input_thread_t *, int i_query, va_list  ) );
+
+
+/* New demux arch: don't touch that */
+/* stream_t *s could be null and then it mean a access+demux in one */
+#define demux2_New( a, b, c, d ) __demux2_New(VLC_OBJECT(a), b, c, d)
+VLC_EXPORT( demux_t *, __demux2_New,  ( vlc_object_t *p_obj, char *psz_mrl, stream_t *s, es_out_t *out ) );
+VLC_EXPORT( void,      demux2_Delete, ( demux_t * ) );
+
+static inline int demux2_Demux( demux_t *p_demux )
+{
+    return p_demux->pf_demux( p_demux );
+}
+static inline int demux2_vaControl( demux_t *p_demux, int i_query, va_list args )
+{
+    return p_demux->pf_control( p_demux, i_query, args );
+}
+static inline int demux2_Control( demux_t *p_demux, int i_query, ... )
+{
+    va_list args;
+    int     i_result;
+
+    va_start( args, i_query );
+    i_result = demux2_vaControl( p_demux, i_query, args );
+    va_end( args );
+    return i_result;
+}
+
 
 /* Subtitles */
 VLC_EXPORT( char **,        subtitles_Detect,       ( input_thread_t *, char* path, char *fname ) );

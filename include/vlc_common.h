@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.91 2003/11/24 20:45:23 gbazin Exp $
+ * $Id: vlc_common.h,v 1.92 2003/11/30 17:29:03 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -230,7 +230,7 @@ typedef struct stream_t stream_t;
 typedef struct es_out_t     es_out_t;
 typedef struct es_out_id_t  es_out_id_t;
 typedef struct es_out_sys_t es_out_sys_t;
-
+typedef struct demux_t  demux_t;
 
 /* Audio */
 typedef struct aout_instance_t aout_instance_t;
