@@ -2678,6 +2678,31 @@ dnl  AX_ADD_CXXFLAGS([qt_video],[-I/usr/include/qt3 -I/usr/include/qt -I${QTDIR}
 dnl fi
 
 dnl
+dnl Roku HD1000 Video output module
+dnl
+AC_ARG_ENABLE(hd1000v,
+  [  --enable-hd1000v        HD1000 Video Output module (default enabled on HD1 000)])
+if test "${enable_hd1000v}" != "no" &&
+  (test "${SYS}" != "mingw32" || test "${enable_hd1000v}" = "yes")
+then
+  AC_LANG_PUSH([C++])
+  AC_CHECK_HEADERS([cascade/graphics/CascadeScreen.h cascade/graphics/CascadeBitmap.h],
+  [
+    can_build_roku="yes"
+  ],
+  [
+    can_build_roku="no"
+    AC_MSG_WARN([Not building Roku HD1000 compatible video output])
+  ])
+  if test "$can_build_roku" = "yes"
+  then
+    AX_ADD_PLUGINS([hd1000v])
+    AX_ADD_LDFLAGS([hd1000v],[-lCascade])
+  fi
+  AC_LANG_POP([C++])
+fi
+
+dnl
 dnl  Windows DirectX module
 dnl
 AC_ARG_ENABLE(directx,

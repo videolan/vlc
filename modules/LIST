@@ -187,6 +187,8 @@ $Id$
 
  * hd1000a: audio output module for the Roku HD1000 Set-Top-Box
 
+ * hd1000v: video output module for the Roku HD1000 Set-Top-Box
+
  * headphone_channel_mixer:
 	 headphone channel mixer with virtual spatialization effect.
 
@@ -338,10 +340,10 @@ $Id$
 
  * qt: interface module using the Qt widget set.
 
+ * qt_video: video output module for Qt.
+
  * qte: video output module for Qt Embedded.
  
- * qte_main: QT Embedded wrapper for gte_main
-
  * quicktime: Quicktime decoder that uses the QT library
 
  * rawdv: Raw DV demuxer
