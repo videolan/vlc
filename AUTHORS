@@ -19,6 +19,12 @@ C: marcari
 D: communication with channel server
 S: France
 
+N: Stephan Assmus
+E: stippi@yellowbites.com
+C: stippi
+D: BeOS module fixes and enhancements
+S: Germany
+
 N: Sigmund Augdal
 E: sigmunau@idi.ntnu.no
 D: lirc plugin
@@ -358,6 +364,12 @@ E: heiko.panther@web.de
 D: Mac OS X audio device selection framework
 S: Germany
 
+N: Eric Petit
+E: titer@videolan.org
+C: titer
+D: BeOS module fixes and enhancements
+S: France
+
 N: Olivier Pomel
 E: pomel@via.ecp.fr
 C: pomel
@@ -375,6 +387,12 @@ D: iPAQ port
 D: Familiar Linux interface
 D: Dutch Translation
 S: Netherlands
+
+N: Arnaud Schauly
+E: gitan@via.ecp.fr
+C: gitan
+D: SAP module
+S: France
 
 N: Steven M. Schultz
 E: sms@TO.GD-ES.COM

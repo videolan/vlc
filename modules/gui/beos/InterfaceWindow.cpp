@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.10 2002/11/27 05:36:41 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.11 2002/12/04 02:16:23 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -937,6 +937,7 @@ void LanguageMenu::AttachedToWindow()
  *****************************************************************************/
 void LanguageMenu::_GetChannels()
 {
+#if 0 // must be ported to 0.5.0
 	char  *psz_name;
 	bool   b_active;
 	BMessage *msg;
@@ -954,7 +955,6 @@ void LanguageMenu::_GetChannels()
 		menu_item->SetMarked( true );
 	}
 
-#if 0
 	input_thread_t* input = p_intf->p_sys->p_input;
 	if ( input )
 	{

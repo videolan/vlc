@@ -1,4 +1,4 @@
-# $Id: MAINTAINERS,v 1.3 2002/10/23 23:17:45 gbazin Exp $
+# $Id: MAINTAINERS,v 1.4 2002/12/04 02:16:23 titer Exp $
 #
 #                            VLC MAINTAINERS
 #
@@ -23,7 +23,7 @@
 
   - Debian GNU/Linux : [sam]
   - Mandrake Linux : Yves Duret
-  - BeOS : Tony Castley (Eric Petit)
+  - BeOS : Eric Petit (Stephan Assmus)
   - Windows : [gibalou]
   - Mac OS X : [jlj] ([meuuh])
   - QNX RTOS : [jlj]
