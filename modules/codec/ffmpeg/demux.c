@@ -29,6 +29,7 @@
 
 #include <vlc/vlc.h>
 #include <vlc/input.h>
+#include "vlc_meta.h"
 
 /* ffmpeg header */
 #ifdef HAVE_FFMPEG_AVCODEC_H
@@ -38,6 +39,8 @@
 #endif
 
 #include "ffmpeg.h"
+
+//#define AVFORMAT_DEBUG 1
 
 /* Version checking */
 #if (LIBAVFORMAT_BUILD >= 4611) && defined(HAVE_LIBAVFORMAT)
@@ -82,10 +85,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     demux_sys_t   *p_sys;
     AVProbeData   pd;
     AVInputFormat *fmt;
-    int i, b_forced;
-
-    b_forced = ( p_demux->psz_demux && *p_demux->psz_demux &&
-                 !strcmp( p_demux->psz_demux, "ffmpeg" ) ) ? 1 : 0;
+    int i;
 
     /* Init Probe data */
     pd.filename = p_demux->psz_path;
@@ -106,7 +106,7 @@ int E_(OpenDemux)( vlc_object_t *p_this )
     }
 
     /* Don't try to handle MPEG unless forced */
-    if( !b_forced &&
+    if( !p_demux->b_force &&
         ( !strcmp( fmt->name, "mpeg" ) ||
           !strcmp( fmt->name, "vcd" ) ||
           !strcmp( fmt->name, "vob" ) ||
@@ -267,8 +267,10 @@ static int Demux( demux_t *p_demux )
     p_frame->i_pts = ( pkt.pts == AV_NOPTS_VALUE ) ?
         0 : (pkt.pts - i_start_time) * 1000000 / AV_TIME_BASE;
 
+#ifdef AVFORMAT_DEBUG
     msg_Dbg( p_demux, "tk[%d] dts="I64Fd" pts="I64Fd,
              pkt.stream_index, p_frame->i_dts, p_frame->i_pts );
+#endif
 
     if( pkt.dts > 0  &&
         ( pkt.stream_index == p_sys->i_pcr_tk || p_sys->i_pcr_tk < 0 ) )
@@ -350,6 +352,33 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_pcr = -1; /* Invalidate time display */
             return VLC_SUCCESS;
 
+        case DEMUX_GET_META:
+        {
+            vlc_meta_t **pp_meta = (vlc_meta_t**)va_arg( args, vlc_meta_t** );
+            vlc_meta_t *meta;
+
+            if( !p_sys->ic->title[0] || !p_sys->ic->author[0] ||
+                !p_sys->ic->copyright[0] || !p_sys->ic->comment[0] ||
+                /*!p_sys->ic->album[0] ||*/ !p_sys->ic->genre[0] )
+            {
+                return VLC_EGENERIC;
+            }
+
+            *pp_meta = meta = vlc_meta_New();
+
+            if( p_sys->ic->title[0] )
+                vlc_meta_Add( meta, VLC_META_TITLE, p_sys->ic->title );
+            if( p_sys->ic->author[0] )
+                vlc_meta_Add( meta, VLC_META_AUTHOR, p_sys->ic->author );
+            if( p_sys->ic->copyright[0] )
+                vlc_meta_Add( meta, VLC_META_COPYRIGHT, p_sys->ic->copyright );
+            if( p_sys->ic->comment[0] )
+                vlc_meta_Add( meta, VLC_META_DESCRIPTION, p_sys->ic->comment );
+            if( p_sys->ic->genre[0] )
+                vlc_meta_Add( meta, VLC_META_GENRE, p_sys->ic->genre );
+            return VLC_SUCCESS;
+        }
+
         default:
             return VLC_EGENERIC;
     }
@@ -362,7 +391,8 @@ static int IORead( void *opaque, uint8_t *buf, int buf_size )
 {
     URLContext *p_url = opaque;
     demux_t *p_demux = p_url->priv_data;
-    return stream_Read( p_demux->s, buf, buf_size );
+    int i_ret = stream_Read( p_demux->s, buf, buf_size );
+    return i_ret ? i_ret : -1;
 }
 
 static int IOSeek( void *opaque, offset_t offset, int whence )
@@ -371,7 +401,9 @@ static int IOSeek( void *opaque, offset_t offset, int whence )
     demux_t *p_demux = p_url->priv_data;
     int64_t i_absolute;
 
+#ifdef AVFORMAT_DEBUG
     msg_Warn( p_demux, "IOSeek offset: "I64Fd", whence: %i", offset, whence );
+#endif
 
     switch( whence )
     {
