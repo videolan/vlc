@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.16 2003/03/26 00:56:22 gbazin Exp $
+ * $Id: interface.cpp,v 1.17 2003/03/30 19:56:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -156,6 +156,8 @@ Interface::Interface( intf_thread_t *_p_intf ):
 
     /* Creation of the slider sub-window */
     CreateOurSlider();
+    frame_sizer->Add( slider_frame, 1, wxGROW, 0 );
+    frame_sizer->Hide( slider_frame );
 
     /* Creation of the status bar
      * Helptext for menu items and toolbar tools will automatically get
@@ -318,7 +320,6 @@ void Interface::CreateOurSlider()
     /* Create a new frame containing the slider */
     slider_frame = new wxPanel( this, -1, wxDefaultPosition, wxDefaultSize );
     slider_frame->SetAutoLayout( TRUE );
-    slider_frame->Hide();
 
     /* Create static box to surround the slider */
     slider_box = new wxStaticBox( slider_frame, -1, "" );
@@ -335,6 +336,9 @@ void Interface::CreateOurSlider()
     slider_sizer->Add( slider, 1, wxGROW | wxALL, 5 );
     slider_sizer->Layout();
     slider_sizer->SetSizeHints(slider_frame);
+
+    /* Hide the slider by default */
+    slider_frame->Hide();
 }
 
 void Interface::Open( int i_access_method )

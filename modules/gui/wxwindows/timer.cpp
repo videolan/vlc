@@ -2,7 +2,7 @@
  * timer.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: timer.cpp,v 1.11 2003/03/26 00:56:22 gbazin Exp $
+ * $Id: timer.cpp,v 1.12 2003/03/30 19:56:11 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -98,6 +98,8 @@ static int wxSetupMenus( intf_thread_t * p_intf )
  *****************************************************************************/
 void Timer::Notify()
 {
+    vlc_bool_t b_pace_control;
+
     vlc_mutex_lock( &p_intf->change_lock );
 
     /* If the "display popup" flag has changed */
@@ -120,28 +122,37 @@ void Timer::Notify()
         p_intf->p_sys->p_input = (input_thread_t *)vlc_object_find( p_intf,
                                                        VLC_OBJECT_INPUT,
                                                        FIND_ANYWHERE );
+
         /* Show slider */
-        if(p_intf->p_sys->p_input)
+        if( p_intf->p_sys->p_input )
         {
-            p_main_interface->frame_sizer->Add(
-                p_main_interface->slider_frame, 1, wxGROW, 0 );
-            p_main_interface->slider_frame->Show();
-            p_main_interface->frame_sizer->Layout();
-            p_main_interface->frame_sizer->Fit( p_main_interface );
+	    //if( p_intf->p_sys->p_input->stream.b_seekable )
+            {
+                p_main_interface->slider_frame->Show();
+                p_main_interface->frame_sizer->Show(
+                    p_main_interface->slider_frame );
+                p_main_interface->frame_sizer->Layout();
+                p_main_interface->frame_sizer->Fit( p_main_interface );
+            }
+
             p_main_interface->statusbar->SetStatusText(
                 p_intf->p_sys->p_input->psz_source, 1 );
 
             p_main_interface->TogglePlayButton( PLAYING_S );
             i_old_playing_status = PLAYING_S;
         }
+
+        /* control buttons for free pace streams */
+        b_pace_control = p_intf->p_sys->p_input->stream.b_pace_control;
+
     }
     else if( p_intf->p_sys->p_input->b_dead )
     {
         /* Hide slider */
-        if(p_intf->p_sys->p_input)
+        //if( p_intf->p_sys->p_input->stream.b_seekable )
         {
             p_main_interface->slider_frame->Hide();
-            p_main_interface->frame_sizer->Remove(
+            p_main_interface->frame_sizer->Hide(
                 p_main_interface->slider_frame );
             p_main_interface->frame_sizer->Layout();
             p_main_interface->frame_sizer->Fit( p_main_interface );
@@ -181,7 +192,6 @@ void Timer::Notify()
             /* Manage the slider */
             if( p_input->stream.b_seekable && p_intf->p_sys->b_playing )
             {
-
                 stream_position_t position;
 
                 /* Update the slider if the user isn't dragging it. */
@@ -191,15 +201,17 @@ void Timer::Notify()
                     vlc_mutex_unlock( &p_input->stream.stream_lock );
                     input_Tell( p_input, &position );
                     vlc_mutex_lock( &p_input->stream.stream_lock );
-                    p_intf->p_sys->i_slider_pos =
+                    if( position.i_size )
+                    {
+                        p_intf->p_sys->i_slider_pos =
                         ( SLIDER_MAX_POS * position.i_tell ) / position.i_size;
 
-                    p_main_interface->slider->SetValue(
-                        p_intf->p_sys->i_slider_pos );
+                        p_main_interface->slider->SetValue(
+                            p_intf->p_sys->i_slider_pos );
 
-                    DisplayStreamDate( p_main_interface->slider_box,
-                                       p_intf,
-                                       p_intf->p_sys->i_slider_pos );
+                        DisplayStreamDate( p_main_interface->slider_box,p_intf,
+                                           p_intf->p_sys->i_slider_pos );
+                    }
                 }
             }
 
