@@ -27,6 +27,7 @@
  * Preamble
  *****************************************************************************/
 #include <stdlib.h>                                      /* malloc(), free() */
+#include <ctype.h>                                              /* tolower() */
 
 #include <vlc/vlc.h>
 
@@ -648,6 +649,20 @@ static int ExecuteCommand(vlm_t *vlm, char *command, vlm_message_t **p_message)
                 {
                     vlm_MediaSetup( vlm, media, p_command[i], NULL );
                 }
+                else if( i + 1 >= i_command && !strcmp( p_command[i], "mux" ) )
+                {
+                    if( media->i_type != VOD_TYPE )
+                    {
+                        message = vlm_MessageNew( p_command[0],
+                                  "mux only available for broadcast" );
+                    }
+                    else
+                    {
+                        vlm_MediaSetup( vlm, media, p_command[i],
+					p_command[i+1] );
+			i++;
+                    }
+                }
                 else if( strcmp( p_command[i], "loop" ) == 0 ||
                          strcmp( p_command[i], "unloop" ) == 0 )
                 {
@@ -771,6 +786,7 @@ static vlm_media_t *vlm_MediaNew( vlm_t *vlm, char *psz_name, int i_type )
     media->b_loop = VLC_FALSE;
     media->vod_media = NULL;
     media->psz_vod_output = NULL;
+    media->psz_mux = NULL;
     media->i_input = 0;
     media->input = NULL;
     media->psz_output = NULL;
@@ -824,6 +840,7 @@ static void vlm_MediaDelete( vlm_t *vlm, vlm_media_t *media, char *psz_name )
     if( media->input ) free( media->input );
 
     if( media->psz_output ) free( media->psz_output );
+    if( media->psz_mux ) free( media->psz_mux );
 
     while( media->i_option-- ) free( media->option[media->i_option] );
     if( media->option ) free( media->option );
@@ -851,6 +868,12 @@ static int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
     else if( strcmp( psz_cmd, "disabled" ) == 0 )
     {
         media->b_enabled = VLC_FALSE;
+    }
+    else if( strcmp( psz_cmd, "mux" ) == 0 )
+    {
+        if( media->psz_mux ) free( media->psz_mux );
+        media->psz_mux = NULL;
+        if( psz_value ) media->psz_mux = strdup( psz_value );
     }
     else if( strcmp( psz_cmd, "input" ) == 0 )
     {
@@ -940,6 +963,26 @@ static int vlm_MediaSetup( vlm_t *vlm, vlm_media_t *media, char *psz_cmd,
                 vlc_object_destroy( p_input );
             }
             free( psz_output );
+
+            if( media->psz_mux )
+            {
+                input_item_t item;
+                es_format_t es, *p_es = &es;
+                char fourcc[5];
+
+                sprintf( fourcc, "%4.4s", media->psz_mux );
+                fourcc[0] = tolower(fourcc[0]); fourcc[1] = tolower(fourcc[1]);
+                fourcc[2] = tolower(fourcc[2]); fourcc[3] = tolower(fourcc[3]);
+
+                item = media->item;
+                item.i_es = 1;
+                item.es = &p_es;
+                es_format_Init( &es, VIDEO_ES, *((int *)fourcc) );
+
+                media->vod_media =
+                  vlm->vod->pf_media_new( vlm->vod, media->psz_name, &item );
+                return VLC_SUCCESS;
+            }
 
             media->vod_media =
                 vlm->vod->pf_media_new( vlm->vod, media->psz_name,
@@ -1396,6 +1439,10 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
                         vlm_MessageNew( "loop", media->b_loop ?
                                         "yes" : "no" ) );
 
+        if( media->i_type == VOD_TYPE && media->psz_mux )
+            vlm_MessageAdd( msg_media,
+                            vlm_MessageNew( "mux", media->psz_mux ) );
+
         msg_child = vlm_MessageAdd( msg_media,
                                     vlm_MessageNew( "inputs", NULL ) );
 
@@ -1529,7 +1576,7 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
 
     }
 
-    else if( psz_filter && strcmp( psz_filter, "media") == 0 )
+    else if( psz_filter && strcmp( psz_filter, "media" ) == 0 )
     {
         int i, j;
         vlm_message_t *msg;
@@ -1553,6 +1600,10 @@ static vlm_message_t *vlm_Show( vlm_t *vlm, vlm_media_t *media,
             vlm_MessageAdd( msg_media,
                             vlm_MessageNew( "enabled", m->b_enabled ?
                                             "yes" : "no" ) );
+
+            if( m->i_type == VOD_TYPE && m->psz_mux )
+                vlm_MessageAdd( msg_media,
+                                vlm_MessageNew( "mux", m->psz_mux ) );
 
             msg_instance = vlm_MessageAdd( msg_media,
                                            vlm_MessageNew( "instances", 0 ) );

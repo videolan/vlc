@@ -127,6 +127,7 @@ struct vod_media_t
     /* ES list */
     int        i_es;
     media_es_t **es;
+    char       *psz_mux;
 
     /* RTSP client */
     int           i_rtsp;
@@ -265,6 +266,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, char *psz_name,
 
     memset( p_media, 0, sizeof(vod_media_t) );
     p_media->es = 0;
+    p_media->psz_mux = 0;
     p_media->rtsp = 0;
 
     asprintf( &p_media->psz_rtsp_path, "%s%s", p_sys->psz_path, psz_name );
@@ -347,6 +349,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     char *psz_urlc;
 
     memset( p_es, 0, sizeof(media_es_t) );
+    p_media->psz_mux = NULL;
 
     /* TODO: update SDP, etc... */
     asprintf( &psz_urlc, "%s/trackid=%d",
@@ -423,6 +426,16 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
                      "IndexDeltaLength=3; Profile=1;", p_hexa );
             free( p_hexa );
         }
+        break;
+    case VLC_FOURCC( 'm', 'p', '2', 't' ):
+        p_media->psz_mux = "ts";
+        p_es->i_payload_type = 33;
+        p_es->psz_rtpmap = strdup( "MP2T/90000" );
+        break;
+    case VLC_FOURCC( 'm', 'p', '2', 'p' ):
+        p_media->psz_mux = "ps";
+        p_es->i_payload_type = p_media->i_payload_type++;
+        p_es->psz_rtpmap = strdup( "MP2P/90000" );
         break;
 
     default:
@@ -648,8 +661,17 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     i_port_video = p_rtsp->es[i]->i_port;
             }
 
-            asprintf( &psz_output, "rtp{dst=%s,port-video=%i,port-audio=%i}",
-                      ip, i_port_video, i_port_audio );
+            if( p_media->psz_mux )
+            {
+                asprintf( &psz_output, "rtp{dst=%s,port=%i,mux=%s}",
+                          ip, i_port_video, p_media->psz_mux );
+            }
+            else
+            {
+                asprintf( &psz_output, "rtp{dst=%s,port-video=%i,"
+                          "port-audio=%i}", ip, i_port_video, i_port_audio );
+            }
+
             vod_MediaControl( p_vod, p_media, psz_session, VOD_MEDIA_PLAY,
                               psz_output );
             free( psz_output );

@@ -102,6 +102,12 @@ Note: an element is a media or a schedule.
             If a media with "loop" option receives the "play" command
             and finally finishes to play the last input of the list, it
             will automatically restart to play the input list.
+        mux (mux_name)
+            Used for vod only.
+            Only needs to be specified if you want the elementary streams
+            to be sent encapsulated instead of raw. The (mux_name) should be
+            a fourcc describing the encapsulation type (eg. mp2t for MPEG TS,
+            or mp2t for MPEG PS).
 
     Schedule Properties Syntax:
         enabled|disabled
