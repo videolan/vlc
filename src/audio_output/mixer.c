@@ -2,7 +2,7 @@
  * mixer.c : audio output mixing operations
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: mixer.c,v 1.23 2003/01/06 22:07:47 massiot Exp $
+ * $Id: mixer.c,v 1.24 2003/01/23 17:13:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -58,13 +58,11 @@ int aout_MixerNew( aout_instance_t * p_aout )
  *****************************************************************************
  * Please note that you must hold the mixer lock.
  *****************************************************************************/
-int aout_MixerDelete( aout_instance_t * p_aout )
+void aout_MixerDelete( aout_instance_t * p_aout )
 {
-    if ( p_aout->mixer.b_error ) return 0;
+    if ( p_aout->mixer.b_error ) return;
     module_Unneed( p_aout, p_aout->mixer.p_module );
     p_aout->mixer.b_error = 1;
-
-    return 0;
 }
 
 /*****************************************************************************

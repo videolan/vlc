@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.36 2002/12/07 23:50:30 massiot Exp $
+ * $Id: aout_internal.h,v 1.37 2003/01/23 17:13:28 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -128,7 +128,7 @@ typedef struct aout_mixer_t
     void                 (* pf_do_work)( struct aout_instance_t *,
                                          struct aout_buffer_t * );
 
-    /* If b_error == 1, there is no mixer nor audio output pipeline. */
+    /* If b_error == 1, there is no mixer. */
     vlc_bool_t              b_error;
     /* Multiplier used to raise or lower the volume of the sound in
      * software. Beware, this creates sound distortion and should be avoided
@@ -202,6 +202,9 @@ typedef struct aout_output_t
     audio_volume_t          i_volume;
     /* Saved volume for aout_VolumeMute(). */
     audio_volume_t          i_saved_volume;
+
+    /* If b_error == 1, there is no audio output pipeline. */
+    vlc_bool_t              b_error;
 } aout_output_t;
 
 /*****************************************************************************
@@ -264,7 +267,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
 
 /* From mixer.c : */
 int aout_MixerNew( aout_instance_t * p_aout );
-int aout_MixerDelete( aout_instance_t * p_aout );
+void aout_MixerDelete( aout_instance_t * p_aout );
 void aout_MixerRun( aout_instance_t * p_aout );
 int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier );
 int aout_MixerMultiplierGet( aout_instance_t * p_aout, float * pf_multiplier );
