@@ -150,7 +150,7 @@ static void PSRead( input_thread_t * p_input,
     if( (U32_AT(p_header) & 0xFFFFFF00) != 0x100L )
     {
         u32         i_buffer = U32_AT(p_header);
-        intf_ErrMsg( "Garbage at input (%x)\n", i_buffer );
+        intf_WarnMsg( 1, "Garbage at input (%x)\n", i_buffer );
         while( (i_buffer & 0xFFFFFF00) != 0x100L )
         {
             i_buffer <<= 8;
@@ -161,7 +161,7 @@ static void PSRead( input_thread_t * p_input,
                 return;
             }
         }
-        *(u32 *)p_header = i_buffer;
+        *(u32 *)p_header = U32_AT(&i_buffer);
         fread( p_header + 4, 2, 1, p_method->stream );
     }
 
