@@ -1263,8 +1263,7 @@ static int GetFilenames( vlc_t *p_vlc, int i_argc, char *ppsz_argv[] )
         VLC_AddTarget( p_vlc->i_object_id, ppsz_argv[ i_opt ],
                        (char const **)( i_options ? &ppsz_argv[i_opt + 1] :
                                         NULL ), i_options,
-                       PLAYLIST_INSERT | (i_opt == optind ? PLAYLIST_GO : 0),
-                       0 );
+                       PLAYLIST_INSERT, 0 );
     }
 
     return VLC_SUCCESS;

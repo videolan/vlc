@@ -310,7 +310,7 @@ bool Instance::OnInit()
     vlc_thread_ready( p_intf );
 
     /* Check if we need to start playing */
-    if( p_intf->b_play )
+    if( !p_intf->pf_show_dialog && p_intf->b_play )
     {
         playlist_t *p_playlist =
             (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,

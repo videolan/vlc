@@ -122,6 +122,9 @@ static int Open( vlc_object_t *p_this )
     }
     Dialogs::instance( p_intf );
 
+    /* We support play on start */
+    p_intf->b_play = VLC_TRUE;
+
     return( VLC_SUCCESS );
 }
 
@@ -208,6 +211,19 @@ static void Run( intf_thread_t *p_intf )
     // Get the instance of OSLoop
     OSLoop *loop = OSFactory::instance( p_intf )->getOSLoop();
 
+    // Check if we need to start playing
+    if( p_intf->b_play )
+    {
+        playlist_t *p_playlist =
+            (playlist_t *)vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                           FIND_ANYWHERE );
+        if( p_playlist )
+        {
+            playlist_Play( p_playlist );
+            vlc_object_release( p_playlist );
+        }
+    }
+
     // Enter the main event loop
     loop->run();
 
@@ -228,7 +244,7 @@ static void Run( intf_thread_t *p_intf )
 #define SKINS2_CONFIG      N_("Config of last used skin")
 #define SKINS2_CONFIG_LONG N_("Config of last used skin.")
 #define SKINS2_TRANSPARENCY      N_("Enable transparency effects")
-#define SKINS2_TRANSPARENCY_LONG N_("You can disable all transparency effects" \
+#define SKINS2_TRANSPARENCY_LONG N_("You can disable all transparency effects"\
     " if you want. This is mainly useful when moving windows does not behave" \
     " correctly.")
 
