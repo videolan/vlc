@@ -12,6 +12,7 @@
 #define INTF_KEY_TOGGLE_INTERFACE   0x09
 #define INTF_KEY_TOGGLE_INFO        0x0A
 #define INTF_KEY_TOGGLE_SCALING     0x0B
-#define INTF_KEY_UNKNOWN            0x0C
+#define INTF_KEY_DUMP_STREAM        0x0C
+#define INTF_KEY_UNKNOWN            0x0D
 
 #endif

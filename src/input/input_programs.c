@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.34 2001/02/22 08:44:45 stef Exp $
+ * $Id: input_programs.c,v 1.35 2001/02/22 16:17:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -473,7 +473,6 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     
 }
 
-#ifdef STATS
 /*****************************************************************************
  * input_DumpStream: dumps the contents of a stream descriptor
  *****************************************************************************/
@@ -506,7 +505,6 @@ void input_DumpStream( input_thread_t * p_input )
         }
     }
 }
-#endif
 
 /*****************************************************************************
  * InitDecConfig: initializes a decoder_config_t

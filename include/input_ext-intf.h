@@ -4,7 +4,7 @@
  * control the pace of reading. 
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_ext-intf.h,v 1.24 2001/02/20 08:47:24 stef Exp $
+ * $Id: input_ext-intf.h,v 1.25 2001/02/22 16:17:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -342,4 +342,5 @@ void input_DestroyThread( struct input_thread_s *, int *pi_status );
 void input_SetStatus( struct input_thread_s *, int );
 void input_SetRate  ( struct input_thread_s *, int );
 void input_Seek     ( struct input_thread_s *, off_t );
+void input_DumpStream( struct input_thread_s * );
 

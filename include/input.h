@@ -2,7 +2,7 @@
  * input.h: structures of the input not exported to other modules
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input.h,v 1.31 2001/02/22 08:44:45 stef Exp $
+ * $Id: input.h,v 1.32 2001/02/22 16:17:12 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -59,7 +59,6 @@ struct pgrm_descriptor_s * input_AddProgram ( struct input_thread_s *,
 void input_DelProgram( struct input_thread_s *, struct pgrm_descriptor_s * );
 struct input_area_s * input_AddArea( struct input_thread_s * );
 void input_DelArea   ( struct input_thread_s *, struct input_area_s * );
-void input_DumpStream( struct input_thread_s * );
 struct es_descriptor_s * input_FindES( struct input_thread_s *, u16 );
 struct es_descriptor_s * input_AddES ( struct input_thread_s *,
                                        struct pgrm_descriptor_s *, u16,

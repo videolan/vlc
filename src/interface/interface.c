@@ -306,6 +306,7 @@ void intf_AssignNormalKeys( intf_thread_t *p_intf)
     intf_AssignKey( p_intf , ' ', INTF_KEY_TOGGLE_INTERFACE, 0);
     intf_AssignKey( p_intf , 'i', INTF_KEY_TOGGLE_INFO, 0);
     intf_AssignKey( p_intf , 's', INTF_KEY_TOGGLE_SCALING, 0);
+    intf_AssignKey( p_intf , 'd', INTF_KEY_DUMP_STREAM, 0);
 }   
 
 /*****************************************************************************
@@ -362,6 +363,14 @@ int intf_ProcessKey( intf_thread_t *p_intf, int g_key )
             /* FIXME: we should lock if called from the interface */
             p_main->p_vout->f_gamma   += INTF_GAMMA_STEP;
             p_main->p_vout->i_changes |= VOUT_GAMMA_CHANGE;
+        }
+        break;
+   case INTF_KEY_DUMP_STREAM:
+        if( p_intf->p_input != NULL )
+        {
+            vlc_mutex_lock( &p_intf->p_input->stream.stream_lock );
+            input_DumpStream( p_intf->p_input );
+            vlc_mutex_unlock( &p_intf->p_input->stream.stream_lock );
         }
         break;
    default:                                                   /* unknown key */

@@ -201,7 +201,8 @@ static int vout_Create( vout_thread_t *p_vout )
     intf_AssignKey(p_intf, SDLK_c,      INTF_KEY_TOGGLE_GRAYSCALE, 0);
     intf_AssignKey(p_intf, SDLK_SPACE,  INTF_KEY_TOGGLE_INTERFACE, 0);
     intf_AssignKey(p_intf, SDLK_i,      INTF_KEY_TOGGLE_INFO, 0);
-    intf_AssignKey(p_intf, SDLK_s,      INTF_KEY_TOGGLE_SCALING, 0); }
+    intf_AssignKey(p_intf, SDLK_s,      INTF_KEY_TOGGLE_SCALING, 0);
+    intf_AssignKey(p_intf, SDLK_d,      INTF_KEY_DUMP_STREAM, 0); }
 
     return( 0 );
 }
