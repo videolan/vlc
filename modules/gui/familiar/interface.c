@@ -53,10 +53,10 @@ create_familiar (void)
   GtkWidget *preferences;
   GtkWidget *fixedAbout;
   GtkWidget *logo;
-  GtkWidget *labelVlc;
   GtkWidget *labelCopyright;
   GtkWidget *labelAuthors;
   GtkWidget *labelAbout;
+  GtkWidget *labelVlc;
   GtkWidget *about;
 
   familiar = gtk_window_new (GTK_WINDOW_TOPLEVEL);
@@ -412,18 +412,7 @@ create_familiar (void)
   gtk_widget_set_uposition (logo, 8, 0);
   gtk_widget_set_usize (logo, 50, 50);
 
-  labelVlc = gtk_label_new (_("VideoLAN Client\n for familiar Linux"));
-  gtk_widget_set_name (labelVlc, "labelVlc");
-  gtk_widget_ref (labelVlc);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelVlc", labelVlc,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (labelVlc);
-  gtk_fixed_put (GTK_FIXED (fixedAbout), labelVlc, 64, 8);
-  gtk_widget_set_uposition (labelVlc, 64, 8);
-  gtk_widget_set_usize (labelVlc, 120, 40);
-  gtk_label_set_line_wrap (GTK_LABEL (labelVlc), TRUE);
-
-  labelCopyright = gtk_label_new (_("(c) 2002, the VideoLAN Team"));
+  labelCopyright = gtk_label_new (_("(c) 1996-2003 the VideoLAN team"));
   gtk_widget_set_name (labelCopyright, "labelCopyright");
   gtk_widget_ref (labelCopyright);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "labelCopyright", labelCopyright,
@@ -455,6 +444,17 @@ create_familiar (void)
   gtk_widget_set_usize (labelAbout, 200, 70);
   gtk_label_set_justify (GTK_LABEL (labelAbout), GTK_JUSTIFY_LEFT);
   gtk_label_set_line_wrap (GTK_LABEL (labelAbout), TRUE);
+
+  labelVlc = gtk_label_new (_("VLC media player"));
+  gtk_widget_set_name (labelVlc, "labelVlc");
+  gtk_widget_ref (labelVlc);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "labelVlc", labelVlc,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (labelVlc);
+  gtk_fixed_put (GTK_FIXED (fixedAbout), labelVlc, 64, 8);
+  gtk_widget_set_uposition (labelVlc, 64, 8);
+  gtk_widget_set_usize (labelVlc, 120, 40);
+  gtk_label_set_line_wrap (GTK_LABEL (labelVlc), TRUE);
 
   about = gtk_label_new (_("About"));
   gtk_widget_set_name (about, "about");

@@ -33,7 +33,7 @@
     <handler>GtkWindowDelete</handler>
     <last_modification_time>Tue, 09 Jul 2002 09:09:53 GMT</last_modification_time>
   </signal>
-  <title>VideoLAN Client</title>
+  <title>VLC media player</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
@@ -1585,7 +1585,7 @@
       <widget>
 	<class>GtkLabel</class>
 	<name>label14</name>
-	<label>VideoLAN Client</label>
+	<label>VLC media player</label>
 	<justify>GTK_JUSTIFY_CENTER</justify>
 	<wrap>False</wrap>
 	<xalign>0.5</xalign>
@@ -1602,7 +1602,7 @@
       <widget>
 	<class>GtkLabel</class>
 	<name>label18</name>
-	<label>(C) 1996-2003 - the VideoLAN Team</label>
+	<label>(c) 1996-2003 the VideoLAN team</label>
 	<justify>GTK_JUSTIFY_LEFT</justify>
 	<wrap>False</wrap>
 	<xalign>0.5</xalign>
@@ -1629,16 +1629,44 @@
 	</child>
 
 	<widget>
-	  <class>GtkLabel</class>
-	  <name>label16</name>
-	  <label>the VideoLAN team &lt;videolan@videolan.org&gt;
-http://www.videolan.org/</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0</yalign>
-	  <xpad>5</xpad>
-	  <ypad>5</ypad>
+	  <class>GtkVBox</class>
+	  <name>vbox17</name>
+	  <homogeneous>False</homogeneous>
+	  <spacing>0</spacing>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label16</name>
+	    <label>the VideoLAN team &lt;videolan@videolan.org&gt;</label>
+	    <justify>GTK_JUSTIFY_LEFT</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0</yalign>
+	    <xpad>5</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
+
+	  <widget>
+	    <class>GtkLabel</class>
+	    <name>label39</name>
+	    <label>http://www.videolan.org/</label>
+	    <justify>GTK_JUSTIFY_LEFT</justify>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0</yalign>
+	    <xpad>5</xpad>
+	    <ypad>0</ypad>
+	    <child>
+	      <padding>0</padding>
+	      <expand>False</expand>
+	      <fill>False</fill>
+	    </child>
+	  </widget>
 	</widget>
       </widget>
 

@@ -5,11 +5,10 @@
  */
 
   Caption = _( "About" );
-    Caption = _( "VideoLAN Client" );
-    Caption = _( "(C) 1996-2003 - the VideoLAN Team" );
+    Caption = _( "VLC media player" );
+    Caption = _( "(c) 1996-2003 the VideoLAN team" );
     Caption = _(       "This is the VideoLAN Client, a DVD, MPEG and DivX player. It can"       " play MPEG and MPEG2 files from a file or from a network source." );
-    Caption = _( "The VideoLAN Team  <videolan@videolan.org>" );
-    Caption = _( "http://www.videolan.org/" );
+    Caption = _( "the VideoLAN Team <videolan@videolan.org>" );
     Caption = _( "Version x.y.z" );
     Caption = _( "OK" );
 
@@ -32,7 +31,7 @@
  * from modules/gui/win32/mainframe.dfm:
  */
 
-  Caption = _( "VideoLAN Client" );
+  Caption = _( "VLC media player" );
     Caption = _( "ToolBar" );
       Caption = _( "ToolButtonSep1" );
       Caption = _( "ToolButtonSep2" );
@@ -170,7 +169,6 @@
       Caption = _( "UDP/RTP Multicast" );
       Caption = _( "Channel server" );
       Caption = _( "HTTP/FTP/MMS" );
-      Text = _( "vlcs" );
     Caption = _( "OK" );
     Caption = _( "Cancel" );
 

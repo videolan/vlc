@@ -123,7 +123,7 @@ create_intf_window (void)
 
   intf_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
   gtk_object_set_data (GTK_OBJECT (intf_window), "intf_window", intf_window);
-  gtk_window_set_title (GTK_WINDOW (intf_window), _("VideoLAN Client"));
+  gtk_window_set_title (GTK_WINDOW (intf_window), _("VLC media player"));
   gtk_window_set_policy (GTK_WINDOW (intf_window), TRUE, TRUE, TRUE);
 
   window_vbox = gtk_vbox_new (FALSE, 0);
@@ -1608,7 +1608,9 @@ create_intf_about (void)
   GtkWidget *label14;
   GtkWidget *label18;
   GtkWidget *frame1;
+  GtkWidget *vbox17;
   GtkWidget *label16;
+  GtkWidget *label39;
   GtkWidget *label17;
   GtkWidget *dialog_action_area;
   GtkWidget *about_ok;
@@ -1631,7 +1633,7 @@ create_intf_about (void)
   gtk_widget_show (vbox3);
   gtk_box_pack_start (GTK_BOX (dialog_vbox1), vbox3, TRUE, TRUE, 0);
 
-  label14 = gtk_label_new (_("VideoLAN Client"));
+  label14 = gtk_label_new (_("VLC media player"));
   gtk_widget_ref (label14);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label14", label14,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1639,7 +1641,7 @@ create_intf_about (void)
   gtk_box_pack_start (GTK_BOX (vbox3), label14, TRUE, TRUE, 0);
   gtk_misc_set_padding (GTK_MISC (label14), 0, 10);
 
-  label18 = gtk_label_new (_("(C) 1996-2003 - the VideoLAN Team"));
+  label18 = gtk_label_new (_("(c) 1996-2003 the VideoLAN team"));
   gtk_widget_ref (label18);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label18", label18,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -1655,15 +1657,32 @@ create_intf_about (void)
   gtk_widget_show (frame1);
   gtk_box_pack_start (GTK_BOX (vbox3), frame1, FALSE, FALSE, 0);
 
-  label16 = gtk_label_new (_("the VideoLAN team <videolan@videolan.org>\nhttp://www.videolan.org/"));
+  vbox17 = gtk_vbox_new (FALSE, 0);
+  gtk_widget_ref (vbox17);
+  gtk_object_set_data_full (GTK_OBJECT (intf_about), "vbox17", vbox17,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (vbox17);
+  gtk_container_add (GTK_CONTAINER (frame1), vbox17);
+
+  label16 = gtk_label_new (_("the VideoLAN team <videolan@videolan.org>"));
   gtk_widget_ref (label16);
   gtk_object_set_data_full (GTK_OBJECT (intf_about), "label16", label16,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (label16);
-  gtk_container_add (GTK_CONTAINER (frame1), label16);
+  gtk_box_pack_start (GTK_BOX (vbox17), label16, FALSE, FALSE, 0);
   gtk_label_set_justify (GTK_LABEL (label16), GTK_JUSTIFY_LEFT);
   gtk_misc_set_alignment (GTK_MISC (label16), 0.5, 0);
-  gtk_misc_set_padding (GTK_MISC (label16), 5, 5);
+  gtk_misc_set_padding (GTK_MISC (label16), 5, 0);
+
+  label39 = gtk_label_new ("http://www.videolan.org/");
+  gtk_widget_ref (label39);
+  gtk_object_set_data_full (GTK_OBJECT (intf_about), "label39", label39,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (label39);
+  gtk_box_pack_start (GTK_BOX (vbox17), label39, FALSE, FALSE, 0);
+  gtk_label_set_justify (GTK_LABEL (label39), GTK_JUSTIFY_LEFT);
+  gtk_misc_set_alignment (GTK_MISC (label39), 0.5, 0);
+  gtk_misc_set_padding (GTK_MISC (label39), 5, 0);
 
   label17 = gtk_label_new (_("This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source."));
   gtk_widget_ref (label17);

@@ -252,7 +252,7 @@ object AboutDlg: TAboutDlg
     Top = 18
     Width = 132
     Height = 20
-    Caption = 'VideoLAN Client'
+    Caption = 'VLC media player'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -266,7 +266,7 @@ object AboutDlg: TAboutDlg
     Top = 64
     Width = 172
     Height = 13
-    Caption = '(C) 1996-2003 - the VideoLAN Team'
+    Caption = '(c) 1996-2003 the VideoLAN team'
   end
   object Label4: TLabel
     Tag = 3
@@ -285,7 +285,7 @@ object AboutDlg: TAboutDlg
     Top = 80
     Width = 227
     Height = 13
-    Caption = 'The VideoLAN Team  <videolan@videolan.org>'
+    Caption = 'the VideoLAN Team <videolan@videolan.org>'
   end
   object Image1: TImage
     Left = 32

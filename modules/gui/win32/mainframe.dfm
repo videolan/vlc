@@ -5,7 +5,7 @@ object MainFrameDlg: TMainFrameDlg
   Width = 541
   Height = 306
   BorderIcons = [biSystemMenu, biMinimize]
-  Caption = 'VideoLAN Client'
+  Caption = 'VLC media player'
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText

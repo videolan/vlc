@@ -276,7 +276,7 @@ create_intf_window (void)
 
   tooltips = gtk_tooltips_new ();
 
-  intf_window = gnome_app_new ("VideoLAN Client", _("VideoLAN Client"));
+  intf_window = gnome_app_new ("VideoLAN Client", _("VLC media player"));
   gtk_object_set_data (GTK_OBJECT (intf_window), "intf_window", intf_window);
   gtk_window_set_policy (GTK_WINDOW (intf_window), FALSE, TRUE, TRUE);
 
@@ -1399,7 +1399,7 @@ create_intf_about (void)
   GtkWidget *intf_about;
 
   intf_about = gnome_about_new ("VideoLAN Client", VERSION,
-                        _("(C) 1996-2003 - the VideoLAN Team"),
+                        _("(c) 1996-2003 the VideoLAN team"),
                         authors,
                         _("This is the VideoLAN Client, a DVD, MPEG and DivX player. It can play MPEG and MPEG2 files from a file or from a network source."),
                         NULL);

@@ -34,7 +34,7 @@
     <handler>GtkWindowDrag</handler>
     <last_modification_time>Sat, 19 May 2001 02:30:24 GMT</last_modification_time>
   </signal>
-  <title>VideoLAN Client</title>
+  <title>VLC media player</title>
   <type>GTK_WINDOW_TOPLEVEL</type>
   <position>GTK_WIN_POS_NONE</position>
   <modal>False</modal>
@@ -1535,7 +1535,7 @@
   <class>GnomeAbout</class>
   <name>intf_about</name>
   <modal>False</modal>
-  <copyright>(C) 1996-2003 - the VideoLAN Team</copyright>
+  <copyright>(c) 1996-2003 the VideoLAN team</copyright>
   <authors>the VideoLAN team &lt;videolan@videolan.org&gt;
 http://www.videolan.org/
 </authors>

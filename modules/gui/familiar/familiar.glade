@@ -502,29 +502,12 @@ rtp6://:1234
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>labelVlc</name>
-	  <x>64</x>
-	  <y>8</y>
-	  <width>120</width>
-	  <height>40</height>
-	  <label>VideoLAN Client
- for familiar Linux</label>
-	  <justify>GTK_JUSTIFY_CENTER</justify>
-	  <wrap>True</wrap>
-	  <xalign>0.5</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>labelCopyright</name>
 	  <x>16</x>
 	  <y>56</y>
 	  <width>200</width>
 	  <height>18</height>
-	  <label>(c) 2002, the VideoLAN Team</label>
+	  <label>(c) 1996-2003 the VideoLAN team</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -558,6 +541,22 @@ rtp6://:1234
 	  <height>70</height>
 	  <label>The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input from local or network sources.</label>
 	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>True</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>labelVlc</name>
+	  <x>64</x>
+	  <y>8</y>
+	  <width>120</width>
+	  <height>40</height>
+	  <label>VLC media player</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>True</wrap>
 	  <xalign>0.5</xalign>
 	  <yalign>0.5</yalign>
