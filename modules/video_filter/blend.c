@@ -119,11 +119,11 @@ static void Blend( filter_t *p_filter, picture_t *p_dst,
 {
     int i_width, i_height;
 
-    i_width = __MIN( p_filter->fmt_out.video.i_visible_width - i_x_offset,
-                     p_filter->fmt_in.video.i_visible_width );
+    i_width = __MIN((int)p_filter->fmt_out.video.i_visible_width - i_x_offset,
+                    (int)p_filter->fmt_in.video.i_visible_width);
 
-    i_height = __MIN( p_filter->fmt_out.video.i_visible_height - i_y_offset,
-                      p_filter->fmt_in.video.i_visible_height );
+    i_height = __MIN((int)p_filter->fmt_out.video.i_visible_height -i_y_offset,
+                     (int)p_filter->fmt_in.video.i_visible_height);
 
     if( i_width <= 0 || i_height <= 0 ) return;
 
