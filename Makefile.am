@@ -324,6 +324,7 @@ show-libvlc-pkg-headers: FORCE
 	@echo X: $(dist_pkginclude_HEADERS)
 
 dist-hook:
+	mv vlc.ebuild vlc-${VERSION}.ebuild
 	cd $(distdir); ./toolbox --update-vc
 
 ###############################################################################

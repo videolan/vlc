@@ -2,7 +2,7 @@
 # vlc.ebuild: A Gentoo ebuild for vlc
 ###############################################################################
 # Copyright (C) 2003 VideoLAN
-# $Id: vlc.ebuild,v 1.1 2003/05/15 00:32:28 hartman Exp $
+# $Id: vlc.ebuild,v 1.2 2003/05/15 15:35:55 hartman Exp $
 #
 # Authors: Derk-Jan Hartman <thedj at users.sf.net>
 #
@@ -153,7 +153,7 @@ src_compile(){
 		&& myconf="${myconf} --enable-x11" \
 		|| myconf="${myconf} --disable-x11"
 
-	use xv\
+	use xv \
 		&& myconf="${myconf} --enable-xvideo" \
 		|| myconf="${myconf} --diable-xvideo"
 		
