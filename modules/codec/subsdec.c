@@ -2,7 +2,7 @@
  * subsdec.c : text subtitles decoder
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subsdec.c,v 1.7 2003/11/16 21:07:30 gbazin Exp $
+ * $Id: subsdec.c,v 1.8 2003/11/18 23:25:38 sigmunau Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -290,7 +290,9 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
 
         if( inbytes_left )
         {
-            msg_Warn( p_dec, "Something fishy happened during conversion" );
+            msg_Warn( p_dec, "Failed to convert subtitle encoding, dropping subtitle" );
+            free( psz_subtitle );
+            return;
         }
         else
         {
