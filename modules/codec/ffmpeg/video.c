@@ -2,7 +2,7 @@
  * video.c: video decoder using the ffmpeg library
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: video.c,v 1.64 2004/02/08 18:30:30 sigmunau Exp $
+ * $Id: video.c,v 1.65 2004/02/08 18:49:53 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -519,8 +519,7 @@ picture_t *E_(DecodeVideo)( decoder_t *p_dec, block_t **pp_block )
             continue;
         }
 
-        if( !p_sys->b_direct_rendering ||
-            p_sys->b_pp || !p_sys->p_ff_pic->opaque )
+        if( !p_sys->p_ff_pic->opaque )
         {
             /* Get a new picture */
             p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
