@@ -148,11 +148,16 @@ static void Run( intf_thread_t *p_intf )
     char p_data[MAX_MSG_LENGTH];
     int i_socket;
 
-    if( !b_master && (!psz_master || inet_addr( psz_master ) == INADDR_NONE) )
+    if( !psz_master || inet_addr( psz_master ) == INADDR_NONE )
     {
-        if( psz_master ) free( psz_master );
-        msg_Err( p_intf, "invalid master address." );
-        return;
+        if( !b_master )
+        {
+            if( psz_master ) free( psz_master );
+            msg_Err( p_intf, "invalid master address." );
+            return;
+        }
+
+        if( !psz_master ) psz_master = strdup("");
     }
 
     memset( &master_addr, 0, sizeof( struct sockaddr_in ) );
