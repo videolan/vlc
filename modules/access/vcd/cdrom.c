@@ -2,7 +2,7 @@
  * cdrom.c: cdrom tools
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.c,v 1.8 2003/03/10 00:12:53 gbazin Exp $
+ * $Id: cdrom.c,v 1.9 2003/05/17 20:30:31 gbazin Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -67,8 +67,8 @@
 #   include <linux/cdrom.h>
 #endif
 
+#include "cdrom_internals.h"
 #include "cdrom.h"
-#include "vcd.h"
 
 /*****************************************************************************
  * ioctl_Open: Opens a VCD device or file and returns an opaque handle
@@ -542,10 +542,11 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
 }
 
 /****************************************************************************
- * ioctl_ReadSector: Read a sector (2324 bytes)
+ * ioctl_ReadSector: Read a sector (2352 bytes - i_start)
  ****************************************************************************/
 int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
-                      int i_sector, byte_t * p_buffer )
+                      int i_sector, byte_t * p_buffer, size_t i_start,
+                      size_t i_len )
 {
     byte_t p_block[ VCD_SECTOR_SIZE ];
 
@@ -569,7 +570,7 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         }
 
         /* We don't want to keep the header of the read sector */
-        memcpy( p_buffer, p_block + VCD_DATA_START, VCD_DATA_SIZE );
+        memcpy( p_buffer, p_block + i_start, i_len );
 
         return 0;
     }
@@ -627,6 +628,9 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             /* Operation code */
             ssc.CDBByte[ 0 ] = READ_CD;
 
+            /* Sector type */
+            ssc.CDBByte[ 1 ] = SECTOR_TYPE_MODE2_FORM2;
+
             /* Start of LBA */
             ssc.CDBByte[ 2 ] = ( i_sector >> 24 ) & 0xff;
             ssc.CDBByte[ 3 ] = ( i_sector >> 16 ) & 0xff;
@@ -639,7 +643,7 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             ssc.CDBByte[ 8 ] = 1;
 
             /* Data selection */
-            ssc.CDBByte[ 9 ] = READ_CD_USERDATA_MODE2;
+            ssc.CDBByte[ 9 ] = READ_CD_RAW_MODE2;
 
             /* Result buffer */
             ssc.SRB_BufPointer  = p_block;
@@ -662,10 +666,6 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             {
                 return -1;
             }
-
-            /* We don't want to keep the footer of the read sector */
-            memcpy( p_buffer, p_block, VCD_DATA_SIZE );
-            return 0;
         }
         else
         {
@@ -685,11 +685,6 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
             {
                 return -1;
             }
-
-            /* We don't want to keep the header of the read sector */
-            memcpy( p_buffer, p_block + VCD_DATA_START, VCD_DATA_SIZE );
-
-            return 0;
         }
 
 #elif defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
@@ -698,17 +693,9 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         int i_blocks = 1;
         int i_ret;
 
-        int sector_type = 5; /* mode2/form2 */
-        int sync = 0,
-            header_code = 0,
-            user_data = 1,
-            edc_ecc = 0,
-            error_field = 0;
-        int sub_channel = 0;
-
         memset( &sc, 0, sizeof(sc) );
         sc.cmd[0] = 0xBE;
-        sc.cmd[1] = (sector_type) << 2;
+        sc.cmd[1] = SECTOR_TYPE_MODE2_FORM2;
         sc.cmd[2] = (i_sector >> 24) & 0xff;
         sc.cmd[3] = (i_sector >> 16) & 0xff;
         sc.cmd[4] = (i_sector >>  8) & 0xff;
@@ -716,12 +703,11 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         sc.cmd[6] = (i_blocks >> 16) & 0xff;
         sc.cmd[7] = (i_blocks >>  8) & 0xff;
         sc.cmd[8] = (i_blocks >>  0) & 0xff;
-        sc.cmd[9] = (sync << 7) | (header_code << 5) | (user_data << 4) |
-                    (edc_ecc << 3) | (error_field << 1);
-        sc.cmd[10] = sub_channel;
+        sc.cmd[9] = READ_CD_RAW_MODE2;
+        sc.cmd[10] = 0; /* sub channel */
         sc.cmdlen = 12;
         sc.databuf = (caddr_t)p_block;
-        sc.datalen = VCD_SECTOR_SIZE;      // was 2328 == VCD_DATA_SIZE + 4;
+        sc.datalen = VCD_SECTOR_SIZE;
         sc.senselen = sizeof( sc.sense );
         sc.flags = SCCMD_READ;
         sc.timeout = 10000;
@@ -779,13 +765,8 @@ int ioctl_ReadSector( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         }
 #endif
 
-#if defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
-        /* FIXME: is this ok? */
-        memcpy( p_buffer, p_block, VCD_DATA_SIZE );
-#else
         /* We don't want to keep the header of the read sector */
-        memcpy( p_buffer, p_block + VCD_DATA_START, VCD_DATA_SIZE );
-#endif
+        memcpy( p_buffer, p_block + i_start, i_len );
 
         return( 0 );
     }
@@ -832,7 +813,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
     }
 
     /* Open the cue file and try to parse it */
-    msg_Dbg( p_this,"using .cue file: %s", psz_cuefile );
+    msg_Dbg( p_this,"trying .cue file: %s", psz_cuefile );
     cuefile = fopen( psz_cuefile, "rt" );
     if( cuefile && fscanf( cuefile, "FILE %c", line ) &&
         fgets( line, 1024, cuefile ) )

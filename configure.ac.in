@@ -85,6 +85,7 @@ case "x${target_os}" in
     LDFLAGS_dvd="${LDFLAGS_dvd} -ldvd"
     LDFLAGS_dvdcss="${LDFLAGS_dvdcss} -ldvd"
     LDFLAGS_vcd="${LDFLAGS_vcd} -ldvd"
+    LDFLAGS_cdda="${LDFLAGS_cdda} -ldvd"
     ;;
   x*bsd*)
     SYS="${target_os}"
@@ -1357,7 +1358,7 @@ then
   AC_MSG_CHECKING(for cdrom_msf0 in linux/cdrom.h)
   AC_EGREP_HEADER(cdrom_msf0,linux/cdrom.h,[
     AC_MSG_RESULT(yes)
-    PLUGINS="${PLUGINS} vcd"
+    PLUGINS="${PLUGINS} vcd cdda"
   ],[
     AC_MSG_RESULT(no)
   ])
@@ -1365,7 +1366,7 @@ then
   AC_MSG_CHECKING(for scsireq in sys/scsiio.h)
   AC_EGREP_HEADER(scsireq,sys/scsiio.h,[
     AC_MSG_RESULT(yes)
-    PLUGINS="${PLUGINS} vcd"
+    PLUGINS="${PLUGINS} vcd cdda"
     AC_DEFINE(HAVE_SCSIREQ_IN_SYS_SCSIIO_H, 1, For NetBSD VCD support)
   ],[
     AC_MSG_RESULT(no)
@@ -1374,7 +1375,7 @@ then
   AC_MSG_CHECKING(for ioc_toc_header in sys/cdio.h)
   AC_EGREP_HEADER(ioc_toc_header ,sys/cdio.h,[
     AC_MSG_RESULT(yes)
-    PLUGINS="${PLUGINS} vcd"
+    PLUGINS="${PLUGINS} vcd cdda"
     AC_DEFINE(HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H, 1, For FreeBSD VCD support)
   ],[
     AC_MSG_RESULT(no)
@@ -1382,13 +1383,14 @@ then
 
   if test "x${SYS}" = "xbsdi" -o "x${SYS}" = "xmingw32"
   then
-    PLUGINS="${PLUGINS} vcd"
+    PLUGINS="${PLUGINS} vcd cdda"
   fi
 
   if test "x${SYS}" = "xdarwin"
   then
-    PLUGINS="${PLUGINS} vcd"
+    PLUGINS="${PLUGINS} vcd cdda"
     LDFLAGS_vcd="${LDFLAGS_vcd} -framework IOKit -framework CoreFoundation"
+    LDFLAGS_cdda="${LDFLAGS_cdda} -framework IOKit -framework CoreFoundation"
   fi
 fi
 

@@ -1,6 +1,6 @@
 SOURCES_vcd = \
 	modules/access/vcd/vcd.c \
-	modules/access/vcd/vcd.h \
 	modules/access/vcd/cdrom.c \
 	modules/access/vcd/cdrom.h \
+	modules/access/vcd/cdrom_internals.h \
 	$(NULL)

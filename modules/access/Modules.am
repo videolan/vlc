@@ -4,3 +4,9 @@ SOURCES_access_udp = modules/access/udp.c
 SOURCES_access_http = modules/access/http.c
 SOURCES_access_ftp = modules/access/ftp.c
 SOURCES_slp = modules/access/slp.c
+SOURCES_cdda = \
+        modules/access/cdda.c \
+        modules/access/vcd/cdrom.c \
+        modules/access/vcd/cdrom.h \
+        modules/access/vcd/cdrom_internals.h \
+        $(NULL)

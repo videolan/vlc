@@ -2,7 +2,7 @@
  * araw.c: Pseudo audio decoder; for raw pcm data
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: araw.c,v 1.14 2003/03/11 17:40:40 fenrir Exp $
+ * $Id: araw.c,v 1.15 2003/05/17 20:30:31 gbazin Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -39,9 +39,6 @@
 typedef struct adec_thread_s
 {
     WAVEFORMATEX    *p_wf;
-
-    /* The bit stream structure handles the PES stream at the bit level */
-//    bit_stream_t        bit_stream;
 
     /* Input properties */
     decoder_fifo_t *p_fifo;
@@ -244,7 +241,8 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
  *****************************************************************************/
 static int InitThread( adec_thread_t * p_adec )
 {
-    if( ( p_adec->p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_waveformatex ) == NULL )
+    if( ( p_adec->p_wf = (WAVEFORMATEX*)p_adec->p_fifo->p_waveformatex )
+        == NULL )
     {
         msg_Err( p_adec->p_fifo, "unknown raw format" );
         return( -1 );
@@ -261,7 +259,8 @@ static int InitThread( adec_thread_t * p_adec )
     }
 
     msg_Dbg( p_adec->p_fifo,
-             "raw format: samplerate:%dHz channels:%d bits/sample:%d blockalign:%d",
+             "raw format: samplerate:%dHz channels:%d bits/sample:%d "
+             "blockalign:%d",
              p_adec->p_wf->nSamplesPerSec,
              p_adec->p_wf->nChannels,
              p_adec->p_wf->wBitsPerSample,
@@ -362,8 +361,7 @@ static int InitThread( adec_thread_t * p_adec )
     }
     p_adec->output_format.i_rate = p_adec->p_wf->nSamplesPerSec;
 
-    if( p_adec->p_wf->nChannels <= 0 ||
-            p_adec->p_wf->nChannels > 5 )
+    if( p_adec->p_wf->nChannels <= 0 || p_adec->p_wf->nChannels > 5 )
     {
         msg_Err( p_adec->p_fifo, "bad channels count(1-5)" );
         return( -1 );
@@ -386,10 +384,6 @@ static int InitThread( adec_thread_t * p_adec )
         return( -1 );
     }
 
-    /* Init the BitStream */
-//    InitBitstream( &p_adec->bit_stream, p_adec->p_fifo,
-//                   NULL, NULL );
-
     return( 0 );
 }
 
@@ -405,7 +399,8 @@ static void GetPESData( u8 *p_buf, int i_max, pes_packet_t *p_pes )
     while( p_data != NULL && i_count < i_max )
     {
 
-        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start, i_max - i_count );
+        i_copy = __MIN( p_data->p_payload_end - p_data->p_payload_start,
+                        i_max - i_count );
 
         if( i_copy > 0 )
         {
@@ -455,11 +450,9 @@ static void DecodeThread( adec_thread_t *p_adec )
         return;
     }
 
-    i_samples = i_size /
-                ( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 ) /
+    i_samples = i_size / ( ( p_adec->p_wf->wBitsPerSample + 7 ) / 8 ) /
                 p_adec->p_wf->nChannels;
 
-//    msg_Warn( p_adec->p_fifo, "got %d samples (%d bytes)", i_samples, i_size );
     p_adec->pts = p_pes->i_pts;
 
     /* **** Now we can output these samples **** */
@@ -511,8 +504,7 @@ static void DecodeThread( adec_thread_t *p_adec )
         }
         else
         {
-            memcpy( p_aout_buffer->p_buffer,
-                    p,
+            memcpy( p_aout_buffer->p_buffer, p,
                     p_aout_buffer->i_nb_bytes );
 
             p += p_aout_buffer->i_nb_bytes;
@@ -526,7 +518,6 @@ static void DecodeThread( adec_thread_t *p_adec )
     free( p_data );
     input_DeletePES( p_adec->p_fifo->p_packets_mgt, p_pes );
 }
-
 
 /*****************************************************************************
  * EndThread : faad decoder thread destruction
@@ -542,5 +533,3 @@ static void EndThread (adec_thread_t *p_adec)
 
     free( p_adec );
 }
-
-

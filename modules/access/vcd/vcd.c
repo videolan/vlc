@@ -2,7 +2,7 @@
  * vcd.c : VCD input module for vlc
  *****************************************************************************
  * Copyright (C) 2000 VideoLAN
- * $Id: vcd.c,v 1.19 2003/05/04 22:42:15 gbazin Exp $
+ * $Id: vcd.c,v 1.20 2003/05/17 20:30:31 gbazin Exp $
  *
  * Author: Johan Bilien <jobi@via.ecp.fr>
  *
@@ -38,7 +38,7 @@
 
 #include <string.h>
 
-#include "vcd.h"
+#include "cdrom.h"
 
 /* how many blocks VCDRead will read in each loop */
 #define VCD_BLOCKS_ONCE 20
@@ -101,11 +101,7 @@ static int VCDOpen( vlc_object_t *p_this )
     input_area_t *          p_area;
     int                     i_title = 1;
     int                     i_chapter = 1;
-
-    p_input->pf_read = VCDRead;
-    p_input->pf_seek = VCDSeek;
-    p_input->pf_set_area = VCDSetArea;
-    p_input->pf_set_program = VCDSetProgram;
+    vcddev_t                *vcddev;
 
 #ifdef WIN32
     /* On Win32 we want the VCD access plugin to be explicitly requested,
@@ -154,40 +150,38 @@ static int VCDOpen( vlc_object_t *p_this )
         if( !psz_source ) return -1;
     }
 
-    p_vcd = malloc( sizeof(thread_vcd_data_t) );
+    /* Open VCD */
+    if( !(vcddev = ioctl_Open( p_this, psz_source )) )
+    {
+        msg_Warn( p_input, "could not open %s", psz_source );
+        free( psz_source );
+        return -1;
+    }
 
+    p_vcd = malloc( sizeof(thread_vcd_data_t) );
     if( p_vcd == NULL )
     {
         msg_Err( p_input, "out of memory" );
         free( psz_source );
         return -1;
     }
+    free( psz_source );
 
+    p_vcd->vcddev = vcddev;
     p_input->p_access_data = (void *)p_vcd;
 
     p_input->i_mtu = VCD_DATA_ONCE;
 
     vlc_mutex_lock( &p_input->stream.stream_lock );
-
     p_input->stream.b_pace_control = 1;
     p_input->stream.b_seekable = 1;
     p_input->stream.p_selected_area->i_size = 0;
     p_input->stream.p_selected_area->i_tell = 0;
-
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
-    if( !(p_vcd->vcddev = ioctl_Open( p_this, psz_source )) )
-    {
-        msg_Warn( p_input, "could not open %s", psz_source );
-        free( psz_source );
-        free( p_vcd );
-        return -1;
-    }
 
     /* We read the Table Of Content information */
     p_vcd->i_nb_tracks = ioctl_GetTracksMap( VLC_OBJECT(p_input),
                                            p_vcd->vcddev, &p_vcd->p_sectors );
-    free( psz_source );
     if( p_vcd->i_nb_tracks < 0 )
         msg_Err( p_input, "unable to count tracks" );
     else if( p_vcd->i_nb_tracks <= 1 )
@@ -258,6 +252,11 @@ static int VCDOpen( vlc_object_t *p_this )
         p_input->psz_demux = "ps";
     }
 
+    p_input->pf_read = VCDRead;
+    p_input->pf_seek = VCDSeek;
+    p_input->pf_set_area = VCDSetArea;
+    p_input->pf_set_program = VCDSetProgram;
+
     return 0;
 }
 
@@ -299,7 +298,8 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
     for ( i_index = 0 ; i_index < i_blocks ; i_index++ )
     {
         if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->vcddev,
-                    p_vcd->i_sector, p_buffer + i_index * VCD_DATA_SIZE ) < 0 )
+             p_vcd->i_sector, p_buffer + i_index * VCD_DATA_SIZE,
+             VCD_DATA_START, VCD_DATA_SIZE ) < 0 )
         {
             msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );
             return -1;
@@ -352,7 +352,8 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
     if ( i_len % VCD_DATA_SIZE ) /* this should not happen */
     {
         if ( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->vcddev,
-                               p_vcd->i_sector, p_last_sector ) < 0 )
+             p_vcd->i_sector, p_last_sector, VCD_DATA_START,
+             VCD_DATA_SIZE ) < 0 )
         {
             msg_Err( p_input, "could not read sector %d", p_vcd->i_sector );
             return -1;
@@ -366,7 +367,6 @@ static int VCDRead( input_thread_t * p_input, byte_t * p_buffer,
     return i_read;
 }
 
-
 /*****************************************************************************
  * VCDSetProgram: Does nothing since a VCD is mono_program
  *****************************************************************************/
@@ -375,7 +375,6 @@ static int VCDSetProgram( input_thread_t * p_input,
 {
     return 0;
 }
-
 
 /*****************************************************************************
  * VCDSetArea: initialize input data for title x, chapter y.
@@ -443,7 +442,6 @@ static int VCDSetArea( input_thread_t * p_input, input_area_t * p_area )
     return 0;
 }
 
-
 /****************************************************************************
  * VCDSeek
  ****************************************************************************/
@@ -502,7 +500,7 @@ static int VCDEntryPoints( input_thread_t * p_input )
     }
 
     if( ioctl_ReadSector( VLC_OBJECT(p_input), p_vcd->vcddev,
-                                VCD_ENTRIES_SECTOR, p_sector ) < 0 )
+        VCD_ENTRIES_SECTOR, p_sector, VCD_DATA_START, VCD_DATA_SIZE ) < 0 )
     {
         msg_Err( p_input, "could not read entry points sector" );
         free( p_sector );

@@ -2,7 +2,7 @@
  * cdrom.h: cdrom tools header
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: cdrom.h,v 1.4 2002/10/16 23:12:46 massiot Exp $
+ * $Id: cdrom.h,v 1.5 2003/05/17 20:30:31 gbazin Exp $
  *
  * Authors: Johan Bilien <jobi@via.ecp.fr>
  *          Gildas Bazin <gbazin@netcourrier.com>
@@ -22,32 +22,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * The vcddev structure
- *****************************************************************************/
-typedef struct vcddev_s
-{
-    char   *psz_dev;                                      /* vcd device name */
+/* where the data start on a VCD sector */
+#define VCD_DATA_START 24
+/* size of the availablr data on a VCD sector */
+#define VCD_DATA_SIZE 2324
+/* size of a VCD sector, header and tail included */
+#define VCD_SECTOR_SIZE 2352
+/* size of a CD sector */
+#define CD_SECTOR_SIZE 2048
+/* sector containing the entry points */
+#define VCD_ENTRIES_SECTOR 151
 
-    /* Section used in vcd image mode */
-    int    i_vcdimage_handle;                   /* vcd image file descriptor */
-    int    i_tracks;                          /* number of tracks of the vcd */
-    int    *p_sectors;                           /* tracks layout on the vcd */
-
-    /* Section used in vcd device mode */
-
-#ifdef WIN32
-    HANDLE h_device_handle;                         /* vcd device descriptor */
-    long  hASPI;
-    short i_sid;
-    long  (*lpSendCommand)( void* );
-
-#else
-    int    i_device_handle;                         /* vcd device descriptor */
-#endif
-
-} vcddev_t;
-
+/* where the data start on a CDDA sector */
+#define CDDA_DATA_START 0
+/* size of the availablr data on a CDDA sector */
+#define CDDA_DATA_SIZE 2352
+/* size of a CDDA sector, header and tail included */
+#define CDDA_SECTOR_SIZE 2352
 
 /*****************************************************************************
  * Misc. Macros
@@ -56,157 +47,48 @@ typedef struct vcddev_s
 #define MSF_TO_LBA(min, sec, frame) ((int)frame + 75 * (sec + 60 * min))
 /* LBA = msf.frame + 75 * ( msf.second - 2 + 60 * msf.minute ) */
 #define MSF_TO_LBA2(min, sec, frame) ((int)frame + 75 * (sec -2 + 60 * min))
+/* Converts BCD to Binary data */
+#define BCD_TO_BIN(i) \
+    (uint8_t)((uint8_t)(0xf & (uint8_t)i)+((uint8_t)10*((uint8_t)i >> 4)))
 
-#ifndef O_BINARY
-#   define O_BINARY 0
-#endif
-
-#define VCDDEV_T 1
-
-/*****************************************************************************
- * Platform specifics
- *****************************************************************************/
-#if defined( SYS_DARWIN )
-#define darwin_freeTOC( p ) free( (void*)p )
-#define CD_MIN_TRACK_NO 01
-#define CD_MAX_TRACK_NO 99
-#endif
-
-#if defined( WIN32 )
-
-/* Win32 DeviceIoControl specifics */
-#ifndef MAXIMUM_NUMBER_TRACKS
-#    define MAXIMUM_NUMBER_TRACKS 100
-#endif
-typedef struct _TRACK_DATA {
-    UCHAR Reserved;
-    UCHAR Control : 4;
-    UCHAR Adr : 4;
-    UCHAR TrackNumber;
-    UCHAR Reserved1;
-    UCHAR Address[4];
-} TRACK_DATA, *PTRACK_DATA;
-typedef struct _CDROM_TOC {
-    UCHAR Length[2];
-    UCHAR FirstTrack;
-    UCHAR LastTrack;
-    TRACK_DATA TrackData[MAXIMUM_NUMBER_TRACKS];
-} CDROM_TOC, *PCDROM_TOC;
-typedef enum _TRACK_MODE_TYPE {
-    YellowMode2,
-    XAForm2,
-    CDDA
-} TRACK_MODE_TYPE, *PTRACK_MODE_TYPE;
-typedef struct __RAW_READ_INFO {
-    LARGE_INTEGER DiskOffset;
-    ULONG SectorCount;
-    TRACK_MODE_TYPE TrackMode;
-} RAW_READ_INFO, *PRAW_READ_INFO;
-
-#ifndef IOCTL_CDROM_BASE
-#    define IOCTL_CDROM_BASE FILE_DEVICE_CD_ROM
-#endif
-#ifndef IOCTL_CDROM_READ_TOC
-#    define IOCTL_CDROM_READ_TOC CTL_CODE(IOCTL_CDROM_BASE, 0x0000, \
-                                          METHOD_BUFFERED, FILE_READ_ACCESS)
-#endif
-#ifndef IOCTL_CDROM_RAW_READ
-#define IOCTL_CDROM_RAW_READ CTL_CODE(IOCTL_CDROM_BASE, 0x000F, \
-                                      METHOD_OUT_DIRECT, FILE_READ_ACCESS)
-#endif
-
-/* Win32 aspi specific */
-#define WIN_NT               ( GetVersion() < 0x80000000 )
-#define ASPI_HAID           0
-#define ASPI_TARGET         0
-#define DTYPE_CDROM         0x05
-
-#define SENSE_LEN           0x0E
-#define SC_GET_DEV_TYPE     0x01
-#define SC_EXEC_SCSI_CMD    0x02
-#define SC_GET_DISK_INFO    0x06
-#define SS_COMP             0x01
-#define SS_PENDING          0x00
-#define SS_NO_ADAPTERS      0xE8
-#define SRB_DIR_IN          0x08
-#define SRB_DIR_OUT         0x10
-#define SRB_EVENT_NOTIFY    0x40
-
-#define READ_CD 0xbe
-#define SECTOR_TYPE_MODE2 0x14
-#define READ_CD_USERDATA_MODE2 0x10
-
-#define READ_TOC 0x43
-#define READ_TOC_FORMAT_TOC 0x0
-
-#pragma pack(1)
-
-struct SRB_GetDiskInfo
-{
-    unsigned char   SRB_Cmd;
-    unsigned char   SRB_Status;
-    unsigned char   SRB_HaId;
-    unsigned char   SRB_Flags;
-    unsigned long   SRB_Hdr_Rsvd;
-    unsigned char   SRB_Target;
-    unsigned char   SRB_Lun;
-    unsigned char   SRB_DriveFlags;
-    unsigned char   SRB_Int13HDriveInfo;
-    unsigned char   SRB_Heads;
-    unsigned char   SRB_Sectors;
-    unsigned char   SRB_Rsvd1[22];
-};
-
-struct SRB_GDEVBlock
-{
-    unsigned char SRB_Cmd;
-    unsigned char SRB_Status;
-    unsigned char SRB_HaId;
-    unsigned char SRB_Flags;
-    unsigned long SRB_Hdr_Rsvd;
-    unsigned char SRB_Target;
-    unsigned char SRB_Lun;
-    unsigned char SRB_DeviceType;
-    unsigned char SRB_Rsvd1;
-};
-
-struct SRB_ExecSCSICmd
-{
-    unsigned char   SRB_Cmd;
-    unsigned char   SRB_Status;
-    unsigned char   SRB_HaId;
-    unsigned char   SRB_Flags;
-    unsigned long   SRB_Hdr_Rsvd;
-    unsigned char   SRB_Target;
-    unsigned char   SRB_Lun;
-    unsigned short  SRB_Rsvd1;
-    unsigned long   SRB_BufLen;
-    unsigned char   *SRB_BufPointer;
-    unsigned char   SRB_SenseLen;
-    unsigned char   SRB_CDBLen;
-    unsigned char   SRB_HaStat;
-    unsigned char   SRB_TargStat;
-    unsigned long   *SRB_PostProc;
-    unsigned char   SRB_Rsvd2[20];
-    unsigned char   CDBByte[16];
-    unsigned char   SenseArea[SENSE_LEN+2];
-};
-
-#pragma pack()
-#endif /* WIN32 */
-
+typedef struct vcddev_s vcddev_t;
 
 /*****************************************************************************
- * Local Prototypes
+ * structure to store minute/second/frame locations
  *****************************************************************************/
-static int    OpenVCDImage( vlc_object_t *, const char *, vcddev_t * );
-static void   CloseVCDImage( vlc_object_t *, vcddev_t * );
+typedef struct msf_s
+{
+    uint8_t minute;
+    uint8_t second;
+    uint8_t frame;
+} msf_t;
 
-#if defined( SYS_DARWIN )
-static CDTOC *darwin_getTOC( vlc_object_t *, const vcddev_t * );
-static int    darwin_getNumberOfDescriptors( CDTOC * );
-static int    darwin_getNumberOfTracks( CDTOC *, int );
+/*****************************************************************************
+ * entries_sect structure: the sector containing entry points
+ *****************************************************************************/
+typedef struct entries_sect_s
+{
+    uint8_t psz_id[8];                              /* "ENTRYVCD" */
+    uint8_t i_version;                              /* 0x02 VCD2.0
+                                                       0x01 SVCD  */
+    uint8_t i_sys_prof_tag;                         /* 0x01 if VCD1.1
+                                                       0x00 else */
+    uint16_t i_entries_nb;                          /* entries number <= 500 */
 
-#elif defined( WIN32 )
-static int    win32_vcd_open( vlc_object_t *, const char *, vcddev_t * );
-#endif
+    struct
+    {
+        uint8_t i_track;                            /* track number */
+        msf_t   msf;                                /* msf location
+                                                       (in BCD format) */
+    } entry[500];
+    uint8_t zeros[36];                              /* should be 0x00 */
+} entries_sect_t;
+
+/*****************************************************************************
+ * Prototypes
+ *****************************************************************************/
+vcddev_t *ioctl_Open         ( vlc_object_t *, const char * );
+void      ioctl_Close        ( vlc_object_t *, vcddev_t * );
+int       ioctl_GetTracksMap ( vlc_object_t *, const vcddev_t *, int ** );
+int       ioctl_ReadSector   ( vlc_object_t *, const vcddev_t *,
+                               int, byte_t *, size_t, size_t );
