@@ -2,7 +2,7 @@
  * cddax.c : CD digital audio input module for vlc using libcdio
  *****************************************************************************
  * Copyright (C) 2000,2003 VideoLAN
- * $Id: access.c,v 1.9 2003/12/02 03:33:22 rocky Exp $
+ * $Id: access.c,v 1.10 2003/12/02 04:16:21 rocky Exp $
  *
  * Authors: Rocky Bernstein <rocky@panix.com> 
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -307,9 +307,9 @@ static void CDDASeek( input_thread_t * p_input, off_t i_off )
 }
 
 #define meta_info_add_str(title, str) \
-  if ( str ) {						\
-    printf("field %s str %s\n", title, str);		\
-    input_AddInfo( p_cat, _(title), "%s", str );	\
+  if ( str ) {								\
+    dbg_print( INPUT_DBG_META, "field %s: %s\n", title, str);	\
+    input_AddInfo( p_cat, _(title), "%s", str );			\
   }
 
 
