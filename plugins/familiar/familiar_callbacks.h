@@ -2,7 +2,7 @@
  * familiar_callbacks.h : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar_callbacks.h,v 1.4 2002/07/24 15:59:02 jpsaman Exp $
+ * $Id: familiar_callbacks.h,v 1.5 2002/07/24 20:46:08 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -26,41 +26,38 @@
 gboolean GtkExit                ( GtkWidget *, gpointer );
 
 gboolean
-on_xpm_open_button_press_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
-on_xpm_preferences_button_press_event  (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
-on_xpm_rewind_button_press_event       (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
-on_xpm_pause_button_press_event        (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
-on_xpm_play_button_press_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
-on_xpm_stop_button_press_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
-on_xpm_forward_button_press_event      (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data);
-
-gboolean
 on_familiar_destroy_event              (GtkWidget       *widget,
                                         GdkEvent        *event,
+                                        gpointer         user_data);
+
+void
+on_toolbar_open_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_preferences_clicked         (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_rewind_clicked              (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_pause_clicked               (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_play_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_stop_clicked                (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_forward_clicked             (GtkButton       *button,
+                                        gpointer         user_data);
+
+void
+on_toolbar_about_clicked               (GtkButton       *button,
                                         gpointer         user_data);

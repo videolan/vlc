@@ -2,7 +2,7 @@
  * familiar.c : familiar plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: familiar.c,v 1.5 2002/07/23 18:39:29 jpsaman Exp $
+ * $Id: familiar.c,v 1.6 2002/07/24 20:46:08 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -198,6 +198,11 @@ static void intf_Run( intf_thread_t *p_intf )
     /* Set the title of the main window */
     gtk_window_set_title( GTK_WINDOW(p_intf->p_sys->p_window),
                           VOUT_TITLE " (Familiar Linux interface)");
+
+    /* Get the slider object */
+    p_intf->p_sys->p_notebook = GTK_NOTEBOOK( gtk_object_get_data(
+        GTK_OBJECT( p_intf->p_sys->p_window ), "notebook" ) );
+//    gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
 
     /* Store p_intf to keep an eye on it */
     gtk_object_set_data( GTK_OBJECT(p_intf->p_sys->p_window),

@@ -2,7 +2,7 @@
  * familiar_callbacks.c : Callbacks for the Familiar Linux Gtk+ plugin.
  *****************************************************************************
  * Copyright (C) 2000, 2001 VideoLAN
- * $Id: familiar_callbacks.c,v 1.3 2002/07/23 18:39:29 jpsaman Exp $
+ * $Id: familiar_callbacks.c,v 1.4 2002/07/24 20:46:08 jpsaman Exp $
  *
  * Authors: Jean-Paul Saman <jpsaman@wxs.nl>
  *
@@ -98,81 +98,138 @@ gboolean GtkExit( GtkWidget       *widget,
 }
 
 gboolean
-on_xpm_open_button_press_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
-{
-
-  return FALSE;
-}
-
-
-gboolean
-on_xpm_preferences_button_press_event  (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
-{
-
-  return FALSE;
-}
-
-
-gboolean
-on_xpm_rewind_button_press_event       (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
-{
-
-  return FALSE;
-}
-
-
-gboolean
-on_xpm_pause_button_press_event        (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
-{
-
-  return FALSE;
-}
-
-
-gboolean
-on_xpm_play_button_press_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
-{
-
-  return FALSE;
-}
-
-
-gboolean
-on_xpm_stop_button_press_event         (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
-{
-
-  return FALSE;
-}
-
-
-gboolean
-on_xpm_forward_button_press_event      (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
-{
-
-  return FALSE;
-}
-
-
-gboolean
 on_familiar_destroy_event              (GtkWidget       *widget,
                                         GdkEvent        *event,
                                         gpointer         user_data)
 {
-  GtkExit( GTK_WIDGET( widget ), user_data );
-  return TRUE;
+    GtkExit( GTK_WIDGET( widget ), user_data );
+    return TRUE;
+}
+
+
+void
+on_toolbar_open_clicked                (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GtkGetIntf( button );
+    if (p_intf)
+        gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+}
+
+
+void
+on_toolbar_preferences_clicked         (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GtkGetIntf( button );
+    if (p_intf)
+        gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+}
+
+
+void
+on_toolbar_rewind_clicked              (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *  p_intf = GtkGetIntf( button );
+
+    if( p_intf )
+    {
+        if( p_intf->p_sys->p_input )
+        {
+            input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_SLOWER );
+        }
+    }
+}
+
+
+void
+on_toolbar_pause_clicked               (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *  p_intf = GtkGetIntf( button );
+
+    if( p_intf )
+    {
+        if( p_intf->p_sys->p_input )
+        {
+            input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_PAUSE );
+        }
+    }
+}
+
+
+void
+on_toolbar_play_clicked                (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *  p_intf = GtkGetIntf( button );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        // Display open page
+    }
+
+    /* If the playlist is empty, open a file requester instead */
+    vlc_mutex_lock( &p_playlist->object_lock );
+    if( p_playlist->i_size )
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        playlist_Play( p_playlist );
+        vlc_object_release( p_playlist );
+    }
+    else
+    {
+        vlc_mutex_unlock( &p_playlist->object_lock );
+        vlc_object_release( p_playlist );
+        // Display open page
+    }
+}
+
+
+void
+on_toolbar_stop_clicked                (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *  p_intf = GtkGetIntf( button );
+    playlist_t * p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
+                                                       FIND_ANYWHERE );
+    if( p_playlist == NULL )
+    {
+        playlist_Stop( p_playlist );
+        vlc_object_release( p_playlist );
+    }
+}
+
+
+void
+on_toolbar_forward_clicked             (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *  p_intf = GtkGetIntf( button );
+
+    if( p_intf )
+    {
+        if( p_intf->p_sys->p_input )
+        {
+            input_SetStatus( p_intf->p_sys->p_input, INPUT_STATUS_FASTER );
+        }
+    }
+}
+
+
+void
+on_toolbar_about_clicked               (GtkButton       *button,
+                                        gpointer         user_data)
+{
+    intf_thread_t *p_intf = GtkGetIntf( button );
+    if (p_intf)
+    { // Toggle notebook
+//        if ( gtk_get_data(  GTK_WIDGET(p_intf->p_sys->p_notebook), "visible" ) )
+//           gtk_widget_hide( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+//        else
+           gtk_widget_show( GTK_WIDGET(p_intf->p_sys->p_notebook) );
+    }
 }
 

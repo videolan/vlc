@@ -53,9 +53,9 @@ create_familiar (void)
   GtkWidget *combo_entry2;
   GtkWidget *frameIP;
   GtkWidget *fixed2;
-  GSList *IPversion_group = NULL;
-  GtkWidget *rbIPv6;
+  GSList *fixed2_group = NULL;
   GtkWidget *rbIPv4;
+  GtkWidget *rbIPv6;
   GtkWidget *preferences;
   GtkWidget *fixedAbout;
   GtkWidget *logo;
@@ -69,12 +69,14 @@ create_familiar (void)
   tooltips = gtk_tooltips_new ();
 
   familiar = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_widget_set_name (familiar, "familiar");
   gtk_object_set_data (GTK_OBJECT (familiar), "familiar", familiar);
   gtk_widget_set_usize (familiar, 240, 320);
   gtk_window_set_title (GTK_WINDOW (familiar), _("vlc (familiar)"));
-  gtk_window_set_policy (GTK_WINDOW (familiar), FALSE, FALSE, FALSE);
+  gtk_window_set_policy (GTK_WINDOW (familiar), TRUE, TRUE, TRUE);
 
   vbox = gtk_vbox_new (FALSE, 0);
+  gtk_widget_set_name (vbox, "vbox");
   gtk_widget_ref (vbox);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "vbox", vbox,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -82,6 +84,7 @@ create_familiar (void)
   gtk_container_add (GTK_CONTAINER (familiar), vbox);
 
   toolbar = gtk_toolbar_new (GTK_ORIENTATION_HORIZONTAL, GTK_TOOLBAR_ICONS);
+  gtk_widget_set_name (toolbar, "toolbar");
   gtk_widget_ref (toolbar);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar", toolbar,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -94,8 +97,9 @@ create_familiar (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Open"),
-                                NULL, NULL,
+                                _("Open file"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_set_name (toolbar_open, "toolbar_open");
   gtk_widget_ref (toolbar_open);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_open", toolbar_open,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -106,8 +110,9 @@ create_familiar (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Preferences"),
-                                NULL, NULL,
+                                _("Preferences"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_set_name (toolbar_preferences, "toolbar_preferences");
   gtk_widget_ref (toolbar_preferences);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_preferences", toolbar_preferences,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -120,8 +125,9 @@ create_familiar (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Rewind"),
-                                NULL, NULL,
+                                _("Rewind stream"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_set_name (toolbar_rewind, "toolbar_rewind");
   gtk_widget_ref (toolbar_rewind);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_rewind", toolbar_rewind,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -132,8 +138,9 @@ create_familiar (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Pause"),
-                                NULL, NULL,
+                                _("Pause stream"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_set_name (toolbar_pause, "toolbar_pause");
   gtk_widget_ref (toolbar_pause);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_pause", toolbar_pause,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -144,8 +151,9 @@ create_familiar (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Play"),
-                                NULL, NULL,
+                                _("Play stream"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_set_name (toolbar_play, "toolbar_play");
   gtk_widget_ref (toolbar_play);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_play", toolbar_play,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -156,8 +164,9 @@ create_familiar (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Stop"),
-                                NULL, NULL,
+                                _("Stop stream"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_set_name (toolbar_stop, "toolbar_stop");
   gtk_widget_ref (toolbar_stop);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_stop", toolbar_stop,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -168,8 +177,9 @@ create_familiar (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("Forward"),
-                                NULL, NULL,
+                                _("Forward stream"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_set_name (toolbar_forward, "toolbar_forward");
   gtk_widget_ref (toolbar_forward);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_forward", toolbar_forward,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -182,14 +192,16 @@ create_familiar (void)
                                 GTK_TOOLBAR_CHILD_BUTTON,
                                 NULL,
                                 _("About"),
-                                NULL, NULL,
+                                _("About"), NULL,
                                 tmp_toolbar_icon, NULL, NULL);
+  gtk_widget_set_name (toolbar_about, "toolbar_about");
   gtk_widget_ref (toolbar_about);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "toolbar_about", toolbar_about,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (toolbar_about);
 
   progress = gtk_progress_bar_new ();
+  gtk_widget_set_name (progress, "progress");
   gtk_widget_ref (progress);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "progress", progress,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -198,6 +210,7 @@ create_familiar (void)
   gtk_progress_set_activity_mode (GTK_PROGRESS (progress), TRUE);
 
   notebook = gtk_notebook_new ();
+  gtk_widget_set_name (notebook, "notebook");
   gtk_widget_ref (notebook);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "notebook", notebook,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -205,6 +218,7 @@ create_familiar (void)
   gtk_box_pack_start (GTK_BOX (vbox), notebook, TRUE, TRUE, 0);
 
   fixedMedia = gtk_fixed_new ();
+  gtk_widget_set_name (fixedMedia, "fixedMedia");
   gtk_widget_ref (fixedMedia);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "fixedMedia", fixedMedia,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -212,6 +226,7 @@ create_familiar (void)
   gtk_container_add (GTK_CONTAINER (notebook), fixedMedia);
 
   labelUrl = gtk_label_new (_("URL:"));
+  gtk_widget_set_name (labelUrl, "labelUrl");
   gtk_widget_ref (labelUrl);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "labelUrl", labelUrl,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -221,6 +236,7 @@ create_familiar (void)
   gtk_widget_set_usize (labelUrl, 38, 18);
 
   listMedia = gtk_list_new ();
+  gtk_widget_set_name (listMedia, "listMedia");
   gtk_widget_ref (listMedia);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "listMedia", listMedia,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -232,6 +248,7 @@ create_familiar (void)
   gtk_list_set_selection_mode (GTK_LIST (listMedia), GTK_SELECTION_MULTIPLE);
 
   comboURL = gtk_combo_new ();
+  gtk_widget_set_name (comboURL, "comboURL");
   gtk_widget_ref (comboURL);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "comboURL", comboURL,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -247,6 +264,7 @@ create_familiar (void)
   g_list_free (comboURL_items);
 
   combo_entry1 = GTK_COMBO (comboURL)->entry;
+  gtk_widget_set_name (combo_entry1, "combo_entry1");
   gtk_widget_ref (combo_entry1);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "combo_entry1", combo_entry1,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -254,6 +272,7 @@ create_familiar (void)
   gtk_entry_set_text (GTK_ENTRY (combo_entry1), _("file://"));
 
   media = gtk_label_new (_("Media"));
+  gtk_widget_set_name (media, "media");
   gtk_widget_ref (media);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "media", media,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -261,6 +280,7 @@ create_familiar (void)
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 0), media);
 
   fixedPreferences = gtk_fixed_new ();
+  gtk_widget_set_name (fixedPreferences, "fixedPreferences");
   gtk_widget_ref (fixedPreferences);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "fixedPreferences", fixedPreferences,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -268,6 +288,7 @@ create_familiar (void)
   gtk_container_add (GTK_CONTAINER (notebook), fixedPreferences);
 
   buttonSave = gtk_button_new_with_label (_("Save"));
+  gtk_widget_set_name (buttonSave, "buttonSave");
   gtk_widget_ref (buttonSave);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "buttonSave", buttonSave,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -277,6 +298,7 @@ create_familiar (void)
   gtk_widget_set_usize (buttonSave, 54, 24);
 
   buttonApply = gtk_button_new_with_label (_("Apply"));
+  gtk_widget_set_name (buttonApply, "buttonApply");
   gtk_widget_ref (buttonApply);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "buttonApply", buttonApply,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -286,6 +308,7 @@ create_familiar (void)
   gtk_widget_set_usize (buttonApply, 54, 24);
 
   buttonCancel = gtk_button_new_with_label (_("Cancel"));
+  gtk_widget_set_name (buttonCancel, "buttonCancel");
   gtk_widget_ref (buttonCancel);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "buttonCancel", buttonCancel,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -295,6 +318,7 @@ create_familiar (void)
   gtk_widget_set_usize (buttonCancel, 54, 24);
 
   frameDefaultURL = gtk_frame_new (_("Default URL:"));
+  gtk_widget_set_name (frameDefaultURL, "frameDefaultURL");
   gtk_widget_ref (frameDefaultURL);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "frameDefaultURL", frameDefaultURL,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -304,6 +328,7 @@ create_familiar (void)
   gtk_widget_set_usize (frameDefaultURL, 220, 60);
 
   fixed3 = gtk_fixed_new ();
+  gtk_widget_set_name (fixed3, "fixed3");
   gtk_widget_ref (fixed3);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "fixed3", fixed3,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -311,6 +336,7 @@ create_familiar (void)
   gtk_container_add (GTK_CONTAINER (frameDefaultURL), fixed3);
 
   comboDefaultURL = gtk_combo_new ();
+  gtk_widget_set_name (comboDefaultURL, "comboDefaultURL");
   gtk_widget_ref (comboDefaultURL);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "comboDefaultURL", comboDefaultURL,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -326,6 +352,7 @@ create_familiar (void)
   g_list_free (comboDefaultURL_items);
 
   combo_entry2 = GTK_COMBO (comboDefaultURL)->entry;
+  gtk_widget_set_name (combo_entry2, "combo_entry2");
   gtk_widget_ref (combo_entry2);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "combo_entry2", combo_entry2,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -333,6 +360,7 @@ create_familiar (void)
   gtk_entry_set_text (GTK_ENTRY (combo_entry2), _("file://"));
 
   frameIP = gtk_frame_new (_("IP version:"));
+  gtk_widget_set_name (frameIP, "frameIP");
   gtk_widget_ref (frameIP);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "frameIP", frameIP,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -342,24 +370,16 @@ create_familiar (void)
   gtk_widget_set_usize (frameIP, 220, 60);
 
   fixed2 = gtk_fixed_new ();
+  gtk_widget_set_name (fixed2, "fixed2");
   gtk_widget_ref (fixed2);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "fixed2", fixed2,
                             (GtkDestroyNotify) gtk_widget_unref);
   gtk_widget_show (fixed2);
   gtk_container_add (GTK_CONTAINER (frameIP), fixed2);
 
-  rbIPv6 = gtk_radio_button_new_with_label (IPversion_group, _("IPv6"));
-  IPversion_group = gtk_radio_button_group (GTK_RADIO_BUTTON (rbIPv6));
-  gtk_widget_ref (rbIPv6);
-  gtk_object_set_data_full (GTK_OBJECT (familiar), "rbIPv6", rbIPv6,
-                            (GtkDestroyNotify) gtk_widget_unref);
-  gtk_widget_show (rbIPv6);
-  gtk_fixed_put (GTK_FIXED (fixed2), rbIPv6, 112, 8);
-  gtk_widget_set_uposition (rbIPv6, 112, 8);
-  gtk_widget_set_usize (rbIPv6, 104, 26);
-
-  rbIPv4 = gtk_radio_button_new_with_label (IPversion_group, _("IPv4"));
-  IPversion_group = gtk_radio_button_group (GTK_RADIO_BUTTON (rbIPv4));
+  rbIPv4 = gtk_radio_button_new_with_label (fixed2_group, _("IPv4"));
+  fixed2_group = gtk_radio_button_group (GTK_RADIO_BUTTON (rbIPv4));
+  gtk_widget_set_name (rbIPv4, "rbIPv4");
   gtk_widget_ref (rbIPv4);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "rbIPv4", rbIPv4,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -369,7 +389,19 @@ create_familiar (void)
   gtk_widget_set_usize (rbIPv4, 104, 26);
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (rbIPv4), TRUE);
 
+  rbIPv6 = gtk_radio_button_new_with_label (fixed2_group, _("IPv6"));
+  fixed2_group = gtk_radio_button_group (GTK_RADIO_BUTTON (rbIPv6));
+  gtk_widget_set_name (rbIPv6, "rbIPv6");
+  gtk_widget_ref (rbIPv6);
+  gtk_object_set_data_full (GTK_OBJECT (familiar), "rbIPv6", rbIPv6,
+                            (GtkDestroyNotify) gtk_widget_unref);
+  gtk_widget_show (rbIPv6);
+  gtk_fixed_put (GTK_FIXED (fixed2), rbIPv6, 112, 8);
+  gtk_widget_set_uposition (rbIPv6, 112, 8);
+  gtk_widget_set_usize (rbIPv6, 104, 26);
+
   preferences = gtk_label_new (_("Preference"));
+  gtk_widget_set_name (preferences, "preferences");
   gtk_widget_ref (preferences);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "preferences", preferences,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -377,6 +409,7 @@ create_familiar (void)
   gtk_notebook_set_tab_label (GTK_NOTEBOOK (notebook), gtk_notebook_get_nth_page (GTK_NOTEBOOK (notebook), 1), preferences);
 
   fixedAbout = gtk_fixed_new ();
+  gtk_widget_set_name (fixedAbout, "fixedAbout");
   gtk_widget_ref (fixedAbout);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "fixedAbout", fixedAbout,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -384,6 +417,7 @@ create_familiar (void)
   gtk_container_add (GTK_CONTAINER (notebook), fixedAbout);
 
   logo = create_pixmap (familiar, "vlc32x32.xpm");
+  gtk_widget_set_name (logo, "logo");
   gtk_widget_ref (logo);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "logo", logo,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -393,6 +427,7 @@ create_familiar (void)
   gtk_widget_set_usize (logo, 50, 50);
 
   labelVlc = gtk_label_new (_("VideoLAN Client\n for familiar Linux"));
+  gtk_widget_set_name (labelVlc, "labelVlc");
   gtk_widget_ref (labelVlc);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "labelVlc", labelVlc,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -403,6 +438,7 @@ create_familiar (void)
   gtk_label_set_line_wrap (GTK_LABEL (labelVlc), TRUE);
 
   labelCopyright = gtk_label_new (_("(c) 2002, the VideoLAN Team"));
+  gtk_widget_set_name (labelCopyright, "labelCopyright");
   gtk_widget_ref (labelCopyright);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "labelCopyright", labelCopyright,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -412,6 +448,7 @@ create_familiar (void)
   gtk_widget_set_usize (labelCopyright, 200, 18);
 
   labelAuthors = gtk_label_new (_("Authors: The VideoLAN Team, http://www.videolan.org"));
+  gtk_widget_set_name (labelAuthors, "labelAuthors");
   gtk_widget_ref (labelAuthors);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "labelAuthors", labelAuthors,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -422,6 +459,7 @@ create_familiar (void)
   gtk_label_set_line_wrap (GTK_LABEL (labelAuthors), TRUE);
 
   labelAbout = gtk_label_new (_("The VideoLAN Client is a MPEG, MPEG 2, MP3, DivX player, that accepts input from local or network sources."));
+  gtk_widget_set_name (labelAbout, "labelAbout");
   gtk_widget_ref (labelAbout);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "labelAbout", labelAbout,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -433,6 +471,7 @@ create_familiar (void)
   gtk_label_set_line_wrap (GTK_LABEL (labelAbout), TRUE);
 
   about = gtk_label_new (_("About"));
+  gtk_widget_set_name (about, "about");
   gtk_widget_ref (about);
   gtk_object_set_data_full (GTK_OBJECT (familiar), "about", about,
                             (GtkDestroyNotify) gtk_widget_unref);
@@ -444,6 +483,30 @@ create_familiar (void)
                       NULL);
   gtk_signal_connect (GTK_OBJECT (familiar), "destroy",
                       GTK_SIGNAL_FUNC (gtk_main_quit),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_open), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_open_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_preferences), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_preferences_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_rewind), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_rewind_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_pause), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_pause_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_play), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_play_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_stop), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_stop_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_forward), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_forward_clicked),
+                      NULL);
+  gtk_signal_connect (GTK_OBJECT (toolbar_about), "clicked",
+                      GTK_SIGNAL_FUNC (on_toolbar_about_clicked),
                       NULL);
 
   gtk_object_set_data (GTK_OBJECT (familiar), "tooltips", tooltips);
