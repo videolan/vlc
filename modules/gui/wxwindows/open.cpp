@@ -2,7 +2,7 @@
  * open.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000, 2001, 2003 VideoLAN
- * $Id: open.cpp,v 1.57 2003/12/16 09:14:22 courmisch Exp $
+ * $Id: open.cpp,v 1.58 2003/12/16 13:35:12 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -804,7 +804,7 @@ void OpenDialog::UpdateMRL( int i_access_method )
 
         case 3:
             /* RTSP access */
-            if( net_addrs[3]->GetLineText(0).Find("rtsp://") != 0 )
+            if( net_addrs[3]->GetLineText(0).Find(wxT("rtsp://")) != 0 )
             {
                 mrltemp = wxT("rtsp") + demux + wxT("://");
             }
