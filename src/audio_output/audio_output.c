@@ -156,8 +156,6 @@ aout_thread_t *aout_CreateThread( int *pi_status )
 
     /* Initialize the vomue level */
     p_aout->vol = VOL;
-
-
     
     /* FIXME: maybe it would be cleaner to change SpawnThread prototype
      * see vout to handle status correctly ?? however, it is not critical since
@@ -581,18 +579,18 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
     {
         vlc_mutex_lock( &p_aout->fifos_lock );
         for ( i_fifo = 0; i_fifo < AOUT_MAX_FIFOS; i_fifo++ )
-	{
+        {
             switch ( p_aout->fifo[i_fifo].i_type )
-	    {
+            {
 	        case AOUT_EMPTY_FIFO:
                     break;
 
 	        case AOUT_INTF_MONO_FIFO:
                     if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
-		    {
+                    {
                         l_buffer = 0;
                         while ( l_buffer < (p_aout->l_units /*<< 1*/) ) /* p_aout->b_stereo == 1 */
-			{
+                        {
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
                             p_aout->s32_buffer[l_buffer++] +=
@@ -602,10 +600,10 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                         p_aout->fifo[i_fifo].l_units -= p_aout->l_units;
                     }
                     else
-		    {
+                    {
                         l_buffer = 0;
                         while ( l_buffer < (p_aout->fifo[i_fifo].l_units /*<< 1*/) ) /* p_aout->b_stereo == 1 */
-			{
+                        {
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[p_aout->fifo[i_fifo].l_unit] );
                             p_aout->s32_buffer[l_buffer++] +=
@@ -620,10 +618,10 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
 
                 case AOUT_INTF_STEREO_FIFO:
                     if ( p_aout->fifo[i_fifo].l_units > p_aout->l_units )
-		    {
+                    {
                         l_buffer = 0;
                         while ( l_buffer < (p_aout->l_units /*<< 1*/) ) /* p_aout->b_stereo == 1 */
-			{
+                        {
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
                             p_aout->s32_buffer[l_buffer++] +=
@@ -633,10 +631,10 @@ void aout_Thread_U8_Mono( aout_thread_t * p_aout )
                         p_aout->fifo[i_fifo].l_units -= p_aout->l_units;
                     }
                     else
-		    {
+                    {
                         l_buffer = 0;
                         while ( l_buffer < (p_aout->fifo[i_fifo].l_units /*<< 1*/) ) /* p_aout->b_stereo == 1 */
-			{
+                        {
                             p_aout->s32_buffer[l_buffer++] +=
                                 (s32)( ((s16 *)p_aout->fifo[i_fifo].buffer)[2*p_aout->fifo[i_fifo].l_unit] );
                             p_aout->s32_buffer[l_buffer++] +=
@@ -926,7 +924,6 @@ intf_DbgMsg( "%d - p_aout->s32b %ld\n", l_buffer, (s32) ( ((s16 *)p_aout->fifo[i
         }
     }
     vlc_mutex_unlock( &p_aout->fifos_lock );
-
 
 }
 
