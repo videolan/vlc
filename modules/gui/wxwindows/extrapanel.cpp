@@ -484,7 +484,8 @@ wxPanel *ExtraPanel::EqzPanel( wxWindow *parent )
                     wxDefaultPosition, wxSize( 100, -1 ) );
     smooth_slider->SetToolTip( wxU( SMOOTH_TIP ) );
     top_sizer->Add( smooth_slider, 0, wxALL, 2 );
-
+    i_smooth = 0;
+ 
     /* Create flex grid */
     wxFlexGridSizer *eq_gridsizer =
         new wxFlexGridSizer( 2, 12, 0, 0);
