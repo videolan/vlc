@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmstu.c,v 1.3 2003/05/09 02:39:21 fenrir Exp $
+ * $Id: mmstu.c,v 1.4 2003/07/10 23:55:14 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -724,10 +724,13 @@ static int MMSOpen( input_thread_t  *p_input,
     var_buffer_add32( &buffer, 0x00 );
     var_buffer_add64( &buffer, 0x40ac200000000000 );
     var_buffer_add32( &buffer, p_sys->i_header_packet_id_type );
+    var_buffer_add32( &buffer, 0x00 );
     mms_CommandSend( p_input, 0x15, p_sys->i_command_level, 0x00,
                      buffer.p_data, buffer.i_data );
 
     /* *** wait for reponse *** */
+    /* Commented out because it fails on some stream (no 0x11 answer) */
+#if 0
     mms_CommandRead( p_input, 0x11, 0 );
 
     if( p_sys->i_command != 0x11 )
@@ -739,6 +742,8 @@ static int MMSOpen( input_thread_t  *p_input,
         MMSClose( p_input );
         return( -1 );
     }
+#endif
+
     /* *** now read header packet *** */
     /* XXX could be split over multiples packets */
     msg_Dbg( p_input, "reading header" );
