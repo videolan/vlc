@@ -532,8 +532,8 @@ package-win32-base:
 	mkdir -p "$(srcdir)/vlc-${VERSION}/plugins"
 	for i in "" `$(VLC_CONFIG) --target plugin` ; do \
 	  if test -n "$$i" ; then \
-	    $(INSTALL) "$(srcdir)/$$i$(LIBEXT)" "\
-            $(srcdir)/vlc-${VERSION}/plugins/" ; \
+	    $(INSTALL) "$(srcdir)/$$i$(LIBEXT)" \
+            "$(srcdir)/vlc-${VERSION}/plugins/" ; \
 	  fi ; done
 
 	for i in "" $(srcdir)/vlc-${VERSION}/plugins/*$(LIBEXT) ; \
@@ -555,7 +555,7 @@ package-win32-base:
 	  cp $$i $(srcdir)/vlc-${VERSION}/skins/ || true ; \
 	done
 
-	mkdir -p "$(srcdir)/tmp/http/admin"
+	mkdir -p "$(srcdir)/vlc-${VERSION}/http/admin"
 	cp $(srcdir)/share/http/*.html $(srcdir)/vlc-${VERSION}/http/ ;
 	cp $(srcdir)/share/http/admin/*.html \
            $(srcdir)/vlc-${VERSION}/http/admin/ ;
