@@ -2,7 +2,7 @@
  * playlist.cpp
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: playlist.cpp,v 1.4 2004/01/05 19:33:11 sam Exp $
+ * $Id: playlist.cpp,v 1.5 2004/01/05 20:02:21 gbazin Exp $
  *
  * Authors: Cyril Deguet     <asmax@via.ecp.fr>
  *
@@ -147,18 +147,18 @@ UString *Playlist::convertName( const char *pName )
         return new UString( getIntf(), pName );
     }
 
-    char *pNewName, *pBufferOut, *pBufferIn;
+    char *pNewName, *pBufferOut;
+    const char *pBufferIn;
     size_t ret, inbytesLeft, outbytesLeft;
 
     // Try to convert the playlist item into UTF8
     pNewName = (char*)malloc( 6 * strlen( pName ) );
     pBufferOut = pNewName;
-    // Cast to char* event if the chars do not get cast, because of
-    // differences in various iconv versions.
-    pBufferIn = (char *)(intptr_t)pName;
+    pBufferIn = pName;
     inbytesLeft = strlen( pName );
     outbytesLeft = 6 * inbytesLeft;
-    ret = iconv( iconvHandle, &pBufferIn, &inbytesLeft,
+    // ICONV_CONST is defined in config.h
+    ret = iconv( iconvHandle, (ICONV_CONST char **)&pBufferIn, &inbytesLeft,
                  &pBufferOut, &outbytesLeft );
     *pBufferOut = '\0';
 
