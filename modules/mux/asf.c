@@ -138,9 +138,10 @@ struct sout_mux_sys_t
 
 static int MuxGetStream( sout_mux_t *, int *pi_stream, mtime_t *pi_dts );
 
-static block_t *asf_header_create( sout_mux_t *, vlc_bool_t b_broadcast );
+static block_t *asf_header_create( sout_mux_t *, vlc_bool_t );
 static block_t *asf_packet_create( sout_mux_t *, asf_track_t *, block_t * );
 static block_t *asf_stream_end_create( sout_mux_t *);
+static block_t *asf_packet_flush( sout_mux_t * );
 
 typedef struct
 {
@@ -242,6 +243,12 @@ static void Close( vlc_object_t * p_this )
     int i;
 
     msg_Dbg( p_mux, "Asf muxer closed" );
+
+    /* Flush last packet if any */
+    if( (out = asf_packet_flush( p_mux ) ) )
+    {
+        sout_AccessOutWrite( p_mux->p_access, out );
+    }
 
     if( ( out = asf_stream_end_create( p_mux ) ) )
     {
@@ -386,7 +393,6 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                 default:
                     return VLC_EGENERIC;
             }
-
 
             tk->i_extra = sizeof( WAVEFORMATEX ) +
                           p_input->p_fmt->i_extra + i_extra;
@@ -930,6 +936,41 @@ static block_t *asf_header_create( sout_mux_t *p_mux, vlc_bool_t b_broadcast )
 /****************************************************************************
  *
  ****************************************************************************/
+static block_t *asf_packet_flush( sout_mux_t *p_mux )
+{
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
+    int i_pad, i_preheader = p_sys->b_asf_http ? 12 : 0;
+    block_t *pk;
+    bo_t bo;
+
+    if( !p_sys->pk ) return 0;
+
+    i_pad = p_sys->i_packet_size - p_sys->i_pk_used;
+    memset( p_sys->pk->p_buffer + p_sys->i_pk_used, 0, i_pad );
+
+    bo_init( &bo, p_sys->pk->p_buffer, 14 + i_preheader );
+
+    if( p_sys->b_asf_http )
+        asf_chunk_add( &bo, 0x4424, p_sys->i_packet_size, 0x0, p_sys->i_seq++);
+
+    bo_add_u8   ( &bo, 0x82 );
+    bo_addle_u16( &bo, 0 );
+    bo_add_u8( &bo, 0x11 );
+    bo_add_u8( &bo, 0x5d );
+    bo_addle_u16( &bo, i_pad );
+    bo_addle_u32( &bo, (p_sys->i_pk_dts - p_sys->i_dts_first) / 1000 +
+                  p_sys->i_preroll_time );
+    bo_addle_u16( &bo, 0 /* data->i_length */ );
+    bo_add_u8( &bo, 0x80 | p_sys->i_pk_frame );
+
+    pk = p_sys->pk;
+    p_sys->pk = NULL;
+
+    p_sys->i_packet_count++;
+
+    return pk;
+}
+
 static block_t *asf_packet_create( sout_mux_t *p_mux,
                                    asf_track_t *tk, block_t *data )
 {
@@ -979,33 +1020,9 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
 
         if( p_sys->i_pk_used + 17 >= p_sys->i_packet_size )
         {
-            /* not enough data for another payload, flush the packet */
-            int i_pad = p_sys->i_packet_size - p_sys->i_pk_used;
-
-            bo_init( &bo, p_sys->pk->p_buffer, 14 + i_preheader );
-
-            if( p_sys->b_asf_http )
-            {
-                asf_chunk_add( &bo, 0x4424, p_sys->i_packet_size,
-                               0x00, p_sys->i_seq++);
-            }
-            bo_add_u8   ( &bo, 0x82 );
-            bo_addle_u16( &bo, 0 );
-            bo_add_u8( &bo, 0x11 );
-            bo_add_u8( &bo, 0x5d );
-            bo_addle_u16( &bo, i_pad );
-            bo_addle_u32( &bo, (p_sys->i_pk_dts - p_sys->i_dts_first) / 1000 +
-                          p_sys->i_preroll_time );
-            bo_addle_u16( &bo, 0 * data->i_length / 1000 );
-            bo_add_u8( &bo, 0x80 | p_sys->i_pk_frame );
-
-            /* append the packet */
-            *last = p_sys->pk;
-            last  = &p_sys->pk->p_next;
-
-            p_sys->pk = NULL;
-
-            p_sys->i_packet_count++;
+            /* Not enough data for another payload, flush the packet */
+            *last = asf_packet_flush( p_mux );
+            last  = &(*last)->p_next;
         }
     }
 
