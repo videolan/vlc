@@ -2,7 +2,7 @@
  * item-ext.c : Playlist item management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: item-ext.c,v 1.14 2004/02/28 17:10:23 gbazin Exp $
+ * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Clément Stenac <zorglub@videolan.org>
@@ -55,7 +55,9 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      mtime_t i_duration, const char **ppsz_options,
                      int i_options )
 {
-    playlist_item_t * p_item = playlist_ItemNew( p_playlist , psz_uri, psz_name );
+    playlist_item_t * p_item =
+        playlist_ItemNew( p_playlist , psz_uri, psz_name );
+    int i;
 
     if( p_item == NULL )
     {
@@ -64,8 +66,23 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
     }
 
     p_item->i_duration = i_duration;
-    p_item->ppsz_options = (char **)ppsz_options;
-    p_item->i_options  = i_options;
+
+    p_item->i_options = i_options;
+    p_item->ppsz_options = NULL;
+    for( i = 0; i < i_options; i++ )
+    {
+        if( i == 0 )
+        {
+            p_item->ppsz_options = malloc( i_options * sizeof(char *) );
+            if( !p_item->ppsz_options )
+            {
+                p_item->i_options = 0;
+                break;
+            }
+        }
+
+        p_item->ppsz_options[i] = strdup( ppsz_options[i] );
+    }
 
     return playlist_AddItem( p_playlist, p_item, i_mode, i_pos );
 }
