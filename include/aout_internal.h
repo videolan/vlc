@@ -2,7 +2,7 @@
  * aout_internal.h : internal defines for audio output
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: aout_internal.h,v 1.15 2002/09/02 23:17:05 massiot Exp $
+ * $Id: aout_internal.h,v 1.16 2002/09/06 23:15:44 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -171,7 +171,7 @@ struct aout_instance_t
 
     /* Locks : please note that if you need several of these locks, it is
      * mandatory (to avoid deadlocks) to take them in the following order :
-     * p_input->lock, mixer_lock, output_fifo_lock, input_fifo_lock.
+     * p_input->lock, mixer_lock, output_fifo_lock, input_fifos_lock.
      * --Meuuh */
     /* When input_fifos_lock is taken, none of the p_input->fifo structures
      * can be read or modified by a third-party thread. */

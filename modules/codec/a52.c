@@ -2,7 +2,7 @@
  * a52.c: A/52 basic parser
  *****************************************************************************
  * Copyright (C) 2001-2002 VideoLAN
- * $Id: a52.c,v 1.9 2002/09/02 23:17:05 massiot Exp $
+ * $Id: a52.c,v 1.10 2002/09/06 23:15:44 massiot Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -225,7 +225,12 @@ static int RunDecoder( decoder_fifo_t *p_fifo )
         memcpy( p_buffer->p_buffer, p_header, 7 );
         GetChunk( &p_dec->bit_stream, p_buffer->p_buffer + 7,
                   i_frame_size - 7 );
-        if( p_dec->p_fifo->b_die ) break;
+        if( p_dec->p_fifo->b_die )
+        {
+            aout_BufferDelete( p_dec->p_aout, p_dec->p_aout_input,
+                               p_buffer );
+            break;
+        }
 
         /* Send the buffer to the mixer. */
         aout_BufferPlay( p_dec->p_aout, p_dec->p_aout_input, p_buffer );
