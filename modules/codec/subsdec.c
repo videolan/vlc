@@ -58,6 +58,7 @@ static void CloseDecoder  ( vlc_object_t * );
 static void DecodeBlock   ( decoder_t *, block_t ** );
 
 static void ParseText     ( decoder_t *, block_t *, vout_thread_t * );
+static void StripTags     ( char * );
 
 #define DEFAULT_NAME "System Default"
 
@@ -369,7 +370,7 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
             break;
         }
     }
-
+    StripTags( psz_subtitle );
     vout_ShowTextAbsolute( p_vout, psz_subtitle, NULL, 
         OSD_ALIGN_BOTTOM | p_sys->i_align, i_align_h,
         i_align_v, p_block->i_pts,
@@ -377,3 +378,47 @@ static void ParseText( decoder_t *p_dec, block_t *p_block,
 
     free( psz_subtitle );
 }
+
+static void StripTags( char *psz_text )
+{
+    int i_left_moves = 0;
+    vlc_bool_t b_inside_tag = VLC_FALSE;
+    int i = 0;
+    int i_tag_start = -1;
+    while( psz_text[ i ] )
+    {
+        if( !b_inside_tag )
+        {
+            if( psz_text[ i ] == '<' )
+            {
+                b_inside_tag = VLC_TRUE;
+                i_tag_start = i;
+            }
+            psz_text[ i - i_left_moves ] = psz_text[ i ];
+        }
+        else
+        {
+            if( ( psz_text[ i ] == ' ' ) ||
+                ( psz_text[ i ] == '\t' ) ||
+                ( psz_text[ i ] == '\n' ) ||
+                ( psz_text[ i ] == '\r' ) )
+            {
+                b_inside_tag = VLC_FALSE;
+                i_tag_start = -1;
+            }
+            else if( psz_text[ i ] == '>' )
+            {
+                i_left_moves += i - i_tag_start + 1;
+                i_tag_start = -1;
+                b_inside_tag = VLC_FALSE;
+            }
+            else
+            {
+                psz_text[ i - i_left_moves ] = psz_text[ i ];
+            }
+        }
+        i++;
+    }
+    psz_text[ i - i_left_moves ] = '\0';
+}
+                            
