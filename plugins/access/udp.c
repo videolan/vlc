@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.6 2002/03/27 22:15:40 massiot Exp $
+ * $Id: udp.c,v 1.7 2002/03/29 00:14:19 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -231,6 +231,19 @@ static int UDPOpen( input_thread_t * p_input )
     p_input->stream.p_selected_area->i_tell = 0;
     p_input->stream.i_method = INPUT_METHOD_NETWORK;
     vlc_mutex_unlock( &p_input->stream.stream_lock );
+
+    if( *psz_server_addr || i_server_port )
+    {
+        intf_ErrMsg("input warning: this UDP syntax is deprecated ; the server argument will be");
+        intf_ErrMsg("ignored (%s:%d). If you wanted to enter a multicast address",
+                    psz_server_addr, i_server_port);
+        intf_ErrMsg("or local port, type : %s:@%s:%d",
+                    *p_input->psz_access ? p_input->psz_access : "udp",
+                    psz_server_addr, i_server_port );
+
+        i_server_port = 0;
+        psz_server_addr = "";
+    }
  
     intf_WarnMsg( 2, "input: opening server=%s:%d local=%s:%d",
                   psz_server_addr, i_server_port, psz_bind_addr, i_bind_port );

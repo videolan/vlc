@@ -4,7 +4,7 @@
  * and spawn threads.
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: main.c,v 1.172 2002/03/28 21:21:51 massiot Exp $
+ * $Id: main.c,v 1.173 2002/03/29 00:14:19 massiot Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -936,8 +936,7 @@ static void Usage( const char *psz_module_name )
                 "\n                                 \tDVD device"
                 "\n  [vcd:][device][@[title][,[chapter]]"
                 "\n                                 \tVCD device"
-                "\n  udpstream:[<server>[:<server port>]][@[<bind address>]"
-                      "[:<bind port>]]"
+                "\n  udpstream:[@[<bind address>][:<bind port>]]"
                 "\n                                 \tUDP stream sent by VLS"
                 "\n  vlc:loop                       \tLoop execution of the "
                       "playlist"
