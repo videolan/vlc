@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.12 2002/04/02 10:17:08 sam Exp $
+ * $Id: configuration.c,v 1.13 2002/04/02 11:31:36 ipkiss Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -26,6 +26,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <string.h>                                              /* strdup() */
+#include <errno.h>					           /* errno */
 
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>                                          /* getuid() */
