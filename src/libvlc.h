@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.13 2002/08/12 22:12:51 massiot Exp $
+ * $Id: libvlc.h,v 1.14 2002/08/16 12:31:04 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -263,17 +263,22 @@
     "If your processor supports the AltiVec instructions set, vlc can take "\
     "advantage of them.")
 
-#define PL_LAUNCH_TEXT N_("launch playlist on startup")
-#define PL_LAUNCH_LONGTEXT N_( \
+#define RANDOM_TEXT N_("play files randomly forever")
+#define RANDOM_LONGTEXT N_( \
+    "When selected, vlc will randomly play files in the playlist until " \
+    "interrupted.")
+
+#define LAUNCH_TEXT N_("launch playlist on startup")
+#define LAUNCH_LONGTEXT N_( \
     "If you want vlc to start playing on startup, then enable this option.")
 
-#define PL_ENQUEUE_TEXT N_("enqueue items in playlist")
-#define PL_ENQUEUE_LONGTEXT N_( \
+#define ENQUEUE_TEXT N_("enqueue items in playlist")
+#define ENQUEUE_LONGTEXT N_( \
     "If you want vlc to add items to the playlist as you open them, then " \
     "enable this option.")
 
-#define PL_LOOP_TEXT N_("loop playlist on end")
-#define PL_LOOP_LONGTEXT N_( \
+#define LOOP_TEXT N_("loop playlist on end")
+#define LOOP_LONGTEXT N_( \
     "If you want vlc to keep playing the playlist indefinitely then enable " \
     "this option.")
 
@@ -421,9 +426,10 @@ vlc_module_begin();
 
     /* Playlist options */
     add_category_hint( N_("Playlist"), NULL );
-    add_bool( "playlist", 0, NULL, PL_LAUNCH_TEXT, PL_LAUNCH_LONGTEXT );
-    add_bool( "enqueue", 0, NULL, PL_ENQUEUE_TEXT, PL_ENQUEUE_LONGTEXT );
-    add_bool( "loop", 0, NULL, PL_LOOP_TEXT, PL_LOOP_LONGTEXT );
+    add_bool_with_short( "random", 'Z', 0, NULL, RANDOM_TEXT, RANDOM_LONGTEXT );
+    add_bool( "playlist", 0, NULL, LAUNCH_TEXT, LAUNCH_LONGTEXT );
+    add_bool( "enqueue", 0, NULL, ENQUEUE_TEXT, ENQUEUE_LONGTEXT );
+    add_bool( "loop", 0, NULL, LOOP_TEXT, LOOP_LONGTEXT );
 
     /* Misc options */
     add_category_hint( N_("Miscellaneous"), NULL );

@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: playlist.c,v 1.10 2002/08/12 09:34:15 sam Exp $
+ * $Id: playlist.c,v 1.11 2002/08/16 12:31:04 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -105,7 +105,7 @@ int playlist_Add( playlist_t *p_playlist, const char * psz_target,
 {
     playlist_item_t *p_item;
 
-    msg_Warn( p_playlist, "adding playlist item « %s »", psz_target );
+    msg_Dbg( p_playlist, "adding playlist item « %s »", psz_target );
 
     /* Create the new playlist item */
     p_item = malloc( sizeof( playlist_item_t ) );
@@ -213,8 +213,8 @@ int playlist_Delete( playlist_t * p_playlist, int i_pos )
 
     if( i_pos >= 0 && i_pos < p_playlist->i_size )
     {
-        msg_Warn( p_playlist, "deleting playlist item « %s »",
-                              p_playlist->pp_items[i_pos]->psz_name );
+        msg_Dbg( p_playlist, "deleting playlist item « %s »",
+                             p_playlist->pp_items[i_pos]->psz_name );
 
         free( p_playlist->pp_items[i_pos]->psz_name );
         free( p_playlist->pp_items[i_pos] );
@@ -435,7 +435,17 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
     }
 
     /* Increment */
-    p_playlist->i_index += i_arg;
+    if( config_GetInt( p_playlist, "random" ) )
+    {
+        /* Simple random stuff */
+        srand( mdate() );
+        p_playlist->i_index += 1 + (int) ( 1.0 * p_playlist->i_size * rand()
+                                            / ( RAND_MAX + 1.0 ) );
+    }
+    else
+    {
+        p_playlist->i_index += i_arg;
+    }
 
     /* Boundary check */
     if( p_playlist->i_index >= p_playlist->i_size )
@@ -443,7 +453,8 @@ static void SkipItem( playlist_t *p_playlist, int i_arg )
         if( p_playlist->i_status == PLAYLIST_STOPPED
              || config_GetInt( p_playlist, "loop" ) )
         {
-            p_playlist->i_index = 0;
+            p_playlist->i_index -= p_playlist->i_size
+                         * ( p_playlist->i_index / p_playlist->i_size );
         }
         else
         {
