@@ -305,7 +305,7 @@ void E_(Close) ( vlc_object_t *p_this )
 {
     input_thread_t *    p_input = (input_thread_t *)p_this;
     input_socket_t *    p_satellite;
-    int                 i_es_index;
+    unsigned int        i_es_index;
 
     if ( p_input->stream.p_selected_program )
     {
@@ -336,7 +336,7 @@ static ssize_t SatelliteRead( input_thread_t * p_input, byte_t * p_buffer,
     input_socket_t * p_access_data = (input_socket_t *)p_input->p_access_data;
     ssize_t i_ret;
  
-    int i;
+    unsigned int i;
 
     /* if not set, set filters to the PMTs */
     for( i = 0; i < p_input->stream.i_pgrm_number; i++ )
@@ -381,7 +381,7 @@ static int SatelliteSetArea( input_thread_t * p_input, input_area_t * p_area )
 int SatelliteSetProgram( input_thread_t    * p_input,
                          pgrm_descriptor_t * p_new_prg )
 {
-    int                 i_es_index;
+    unsigned int i_es_index;
 
     if ( p_input->stream.p_selected_program )
     {

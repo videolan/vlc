@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.11 2003/01/28 13:03:13 gbazin Exp $
+ * $Id: xcommon.c,v 1.12 2003/01/28 16:57:28 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -730,7 +730,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                              ClientMessage, &xevent ) )
     {
         if( (xevent.xclient.message_type == p_vout->p_sys->p_win->wm_protocols)
-               && (xevent.xclient.data.l[0]
+               && ((Atom)xevent.xclient.data.l[0]
                      == p_vout->p_sys->p_win->wm_delete_window ) )
         {
             p_vout->p_vlc->b_die = 1;

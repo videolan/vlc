@@ -2,7 +2,7 @@
  * libavi.c :
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: libavi.c,v 1.15 2003/01/25 16:58:34 fenrir Exp $
+ * $Id: libavi.c,v 1.16 2003/01/28 16:57:28 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -384,8 +384,8 @@ static int AVI_ChunkRead_list( input_thread_t *p_input,
 
         if( AVI_ChunkRead( p_input, p_chk, p_container, b_seekable ) ||
            ( AVI_TellAbsolute( p_input ) >=
-                (off_t)p_chk->common.p_father->common.i_chunk_pos + 
-                    __EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
+              (off_t)p_chk->common.p_father->common.i_chunk_pos +
+               (off_t)__EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
         {
             break;
         }
@@ -928,8 +928,8 @@ int AVI_ChunkReadRoot( input_thread_t *p_input,
 
         if( AVI_ChunkRead( p_input, p_chk, p_root, b_seekable ) ||
            ( AVI_TellAbsolute( p_input ) >=
-                (off_t)p_chk->common.p_father->common.i_chunk_pos + 
-                    __EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
+              (off_t)p_chk->common.p_father->common.i_chunk_pos +
+               (off_t)__EVEN( p_chk->common.p_father->common.i_chunk_size ) ) )
         {
             break;
         }

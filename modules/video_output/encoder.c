@@ -2,7 +2,7 @@
  * encoder.c :  encoder wrapper plugin for vlc
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: encoder.c,v 1.1 2003/01/22 10:41:57 fenrir Exp $
+ * $Id: encoder.c,v 1.2 2003/01/28 16:57:28 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -170,7 +170,7 @@ static int Init( vout_thread_t *p_vout )
     /* *** set wanted input format *** */
     p_encoder->i_codec  = p_vout->p_sys->i_codec;
 
-    /* *** set prefered properties *** */
+    /* *** set preferred properties *** */
     /* encoder can modify all these values except i_codec */
     p_encoder->i_chroma = p_vout->render.i_chroma;
     p_encoder->i_width  = p_vout->render.i_width;

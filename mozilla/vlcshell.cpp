@@ -2,7 +2,7 @@
  * vlcshell.c: a VideoLAN Client plugin for Mozilla
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: vlcshell.cpp,v 1.7 2002/11/28 23:53:03 sigmunau Exp $
+ * $Id: vlcshell.cpp,v 1.8 2003/01/28 16:57:28 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -546,7 +546,7 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
     fprintf(stderr, "NPP_StreamAsFile %s\n", fname);
 
 #if USE_LIBVLC
-    VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata;
+/*    VlcPlugin* p_plugin = (VlcPlugin*)instance->pdata; */
 
 /*    VLC_AddTarget( p_plugin->i_vlc, fname,
       PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END );*/

@@ -2,7 +2,7 @@
  * dv.c: a decoder for DV video
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: dv.c,v 1.3 2002/11/28 17:34:59 sam Exp $
+ * $Id: dv.c,v 1.4 2003/01/28 16:57:28 sam Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -75,7 +75,7 @@ static int RunDecoder ( decoder_fifo_t *p_fifo )
 {
     uint8_t *p_buffer;
     pes_packet_t *p_pes = NULL;
-    int i_data = 120000;
+    unsigned int i_data = 120000;
     int i_aspect;
 
     bit_stream_t    bit_stream;

@@ -2,7 +2,7 @@
  * mp4.c : MP4 file input module for vlc
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: mp4.c,v 1.15 2003/01/25 17:57:36 fenrir Exp $
+ * $Id: mp4.c,v 1.16 2003/01/28 16:57:28 sam Exp $
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -165,30 +165,30 @@ static int MP4Init( vlc_object_t * p_this )
         switch( p_ftyp->data.p_ftyp->i_major_brand )
         {
             case( FOURCC_isom ):
-                msg_Info( p_input, 
-                          "ISO Media file (isom) version %d.",
-                          p_ftyp->data.p_ftyp->i_minor_version );
+                msg_Dbg( p_input, 
+                         "ISO Media file (isom) version %d.",
+                         p_ftyp->data.p_ftyp->i_minor_version );
                 break;
             default:
-                msg_Info( p_input,
-                          "Unrecognize major file specification (%c%c%c%c).",
-                           p_ftyp->data.p_ftyp->i_major_brand&0xff,
-                           ( p_ftyp->data.p_ftyp->i_major_brand >>  8)&0xff,
-                           ( p_ftyp->data.p_ftyp->i_major_brand >> 16 )&0xff,
-                           ( p_ftyp->data.p_ftyp->i_major_brand >> 24 )&0xff );
+                msg_Dbg( p_input,
+                         "unrecognized major file specification (%c%c%c%c).",
+                          p_ftyp->data.p_ftyp->i_major_brand&0xff,
+                          ( p_ftyp->data.p_ftyp->i_major_brand >>  8)&0xff,
+                          ( p_ftyp->data.p_ftyp->i_major_brand >> 16 )&0xff,
+                          ( p_ftyp->data.p_ftyp->i_major_brand >> 24 )&0xff );
                 break;
         }
     }
     else
     {
-        msg_Info( p_input, "File Type box missing(assume ISO Media file)" );
+        msg_Dbg( p_input, "file type box missing (assuming ISO Media file)" );
     }
 
     /* the file need to have one moov box */
     if( MP4_BoxCount( &p_demux->box_root, "/moov" ) != 1 )
     {
         msg_Err( p_input, 
-                 "MP4 plugin discarded (%d moov box)",
+                 "MP4 plugin discarded (%d moov boxes)",
                  MP4_BoxCount( &p_demux->box_root, "/moov" ) );
 //        MP4End( p_input );
 //        return( -1 );
@@ -196,7 +196,7 @@ static int MP4Init( vlc_object_t * p_this )
 
     if( !(p_mvhd = MP4_BoxGet( &p_demux->box_root, "/moov/mvhd" ) ) )
     {
-        msg_Err( p_input, "cannot find /moov/mvhd !" );
+        msg_Err( p_input, "cannot find /moov/mvhd" );
         MP4End( p_input );
         return( -1 );
     }
@@ -209,7 +209,7 @@ static int MP4Init( vlc_object_t * p_this )
     if( !( p_demux->i_tracks = 
                 MP4_BoxCount( &p_demux->box_root, "/moov/trak" ) ) )
     {
-        msg_Err( p_input, "cannot find any /moov/trak !" );
+        msg_Err( p_input, "cannot find any /moov/trak" );
         MP4End( p_input );
         return( -1 );
     }
@@ -427,7 +427,7 @@ static void __MP4End ( vlc_object_t * p_this )
     input_thread_t *  p_input = (input_thread_t *)p_this;
     demux_sys_t *p_demux = p_input->p_demux_data;
 
-    msg_Dbg( p_input, "Freeing all memory" );
+    msg_Dbg( p_input, "freeing all memory" );
     MP4_BoxFree( p_input, &p_demux->box_root );
     for( i_track = 0; i_track < p_demux->i_tracks; i_track++ )
     {
@@ -553,7 +553,7 @@ static int MP4_TrackSynchro( input_thread_t *p_input, track_data_mp4_t *p_track 
     else
     {
         msg_Dbg( p_input, 
-                    "track[Id 0x%x] doesn't provided Sync Sample Box (stss)", 
+                    "track[Id 0x%x] does not provide Sync Sample Box (stss)", 
                     p_track->i_track_ID );
     }
 
@@ -612,12 +612,12 @@ static void MP4_ParseTrack( input_thread_t *p_input,
     
     if( ( p_elst = MP4_BoxGet( p_trak, "edts/elst" ) ) )
     {
-/*        msg_Warn( p_input, "Unhandled box: edts --> FIXME" ); */
+/*        msg_Warn( p_input, "unhandled box: edts --> FIXME" ); */
     }
 
     if( p_tref )
     {
-/*        msg_Warn( p_input, "Unhandled box: tref --> FIXME" ); */
+/*        msg_Warn( p_input, "unhandled box: tref --> FIXME" ); */
     } 
 
     p_mdhd = MP4_BoxGet( p_trak, "mdia/mdhd" );
@@ -709,7 +709,7 @@ static int MP4_CreateChunksIndex( input_thread_t *p_input,
     p_demux_track->i_chunk_count = p_co64->data.p_co64->i_entry_count;
     if( !p_demux_track->i_chunk_count )
     {
-        msg_Warn( p_input, "No chunk defined" );
+        msg_Warn( p_input, "no chunk defined" );
         return( 0 );
     }
     p_demux_track->chunk = calloc( p_demux_track->i_chunk_count, 
@@ -923,7 +923,7 @@ static void MP4_StartDecoder( input_thread_t *p_input,
         return;
     }
 
-    msg_Dbg( p_input, "Starting decoder for track[Id 0x%x]",
+    msg_Dbg( p_input, "starting decoder for track[Id 0x%x]",
                       p_demux_track->i_track_ID );
 
     /* launch decoder according in chunk we are */
@@ -1027,7 +1027,7 @@ static void MP4_StartDecoder( input_thread_t *p_input,
             default:
                 /* Unknown entry, but don't touch i_fourcc */
                 msg_Warn( p_input, 
-                          "objectTypeIndication(0x%x) unknow (Track[ID 0x%x])",
+                          "unknown objectTypeIndication(0x%x) (Track[ID 0x%x])",
                           p_decconfig->i_objectTypeIndication,
                           p_demux_track->i_track_ID );
                 break;
@@ -1180,7 +1180,7 @@ static void MP4_StartDecoder( input_thread_t *p_input,
 static void MP4_StopDecoder( input_thread_t *p_input,
                              track_data_mp4_t *p_demux_track )
 {
-    msg_Dbg( p_input, "Stopping decoder (track[Id 0x%x])",
+    msg_Dbg( p_input, "stopping decoder (track[Id 0x%x])",
                       p_demux_track->i_track_ID );
 
     input_UnselectES( p_input, p_demux_track->p_es );

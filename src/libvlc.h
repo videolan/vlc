@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.38 2003/01/28 02:03:33 sam Exp $
+ * $Id: libvlc.h,v 1.39 2003/01/28 16:57:28 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -262,7 +262,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "If you check this box, IPv4 will be used by default for all UDP and " \
     "HTTP connections.")
 
-#define CODEC_TEXT N_("choose prefered codec list")
+#define CODEC_TEXT N_("choose preferred codec list")
 #define CODEC_LONGTEXT N_( \
     "This allows you to select the order in which vlc will choose its " \
     "codecs. For instance, 'a52old,a52,any' will try the old a52 codec " \
@@ -271,11 +271,11 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
     "'any' at the end of the list to make sure there is a fallback for the " \
     "types you didn't specify.")
 
-#define ENCODER_VIDEO_TEXT N_("choose prefered video encoder list")
+#define ENCODER_VIDEO_TEXT N_("choose preferred video encoder list")
 #define ENCODER_VIDEO_LONGTEXT N_( \
     "This allows you to select the order in which vlc will choose its " \
     "codecs. " )
-#define ENCODER_AUDIO_TEXT N_("choose prefered audio encoder list")
+#define ENCODER_AUDIO_TEXT N_("choose preferred audio encoder list")
 #define ENCODER_AUDIO_LONGTEXT N_( \
     "This allows you to select the order in which vlc will choose its " \
     "codecs. " )
@@ -302,7 +302,7 @@ static char *ppsz_sout_vcodec[] = { "", "mpeg1", "mpeg2", "mpeg4", NULL };
 #define SOUT_ACODEC_LONGTEXT N_( \
     "This allows you to force audio encoding")
 
-#define PACKETIZER_TEXT N_("choose prefered packetizer list")
+#define PACKETIZER_TEXT N_("choose preferred packetizer list")
 #define PACKETIZER_LONGTEXT N_( \
     "This allows you to select the order in which vlc will choose its " \
     "packetizers."  )

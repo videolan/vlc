@@ -2,7 +2,7 @@
  * decoder.c: AAC decoder using libfaad2
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: decoder.c,v 1.20 2003/01/25 18:09:30 fenrir Exp $
+ * $Id: decoder.c,v 1.21 2003/01/28 16:57:28 sam Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -261,7 +261,7 @@ static int InitThread( adec_thread_t * p_adec )
         return( -1 );
     }
     msg_Dbg( p_adec->p_fifo,
-             "faad intitialized, samplerate:%dHz channels:%d",
+             "faad intitialized, samplerate: %ldHz channels: %d",
              i_rate, 
              i_nb_channels );
 
