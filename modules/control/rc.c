@@ -5,7 +5,6 @@
  * $Id$
  *
  * Author: Peter Surda <shurdeek@panorama.sth.ac.at>
- *         Jean-Paul Saman <M2X>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,7 +71,7 @@ static void Run          ( intf_thread_t * );
 
 static vlc_bool_t ReadCommand( intf_thread_t *, char *, int * );
 
-static void mrl_Split( vlc_object_t *, char const *, char **, char **, int * );
+static playlist_item_t *parse_MRL( intf_thread_t *, char * );
 
 static int  Input        ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -826,39 +825,16 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     {
         playlist_Stop( p_playlist );
     }
-    else if( !strcmp( psz_cmd, "add" ) )
+    else if( !strcmp( psz_cmd, "add" ) &&
+             newval.psz_string && *newval.psz_string )
     {
-        playlist_item_t *p_item = NULL;
-        char *psz_options = NULL;
-        char *psz_uri = NULL;
-        int i_count = 0;
-        int i = 0;
-        int i_id;
+        playlist_item_t *p_item = parse_MRL( p_intf, newval.psz_string );
 
-        msg_rc( _("trying to add %s to playlist\n"), newval.psz_string );
-        mrl_Split( p_this, newval.psz_string, &psz_uri, &psz_options, &i_count );
-
-        msg_Dbg( p_intf, "found [%s] with options [%s] to playlist", psz_uri, psz_options );
-
-        /* Create a playlist Item */
-        p_item = playlist_ItemNew( p_intf, (const char*)psz_uri, (const char *)newval.psz_string );
-        if( !p_item )
+        if( p_item )
         {
-            msg_rc( _("failed adding %s to playlist\n"), newval.psz_string);
-            goto failed;
-        }
-
-        /* Insert options */
-        for( i=0; i < i_count; i++ )
-        {
-            playlist_ItemAddOption( p_item, psz_options );
-        }
-        i_id = playlist_AddItem( p_playlist, p_item,
-                             PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
-        if( i_id < 0 )
-        {
-            msg_rc( _("(%d) failed adding %s to playlist\n"), i_id, newval.psz_string );
-            goto failed;
+            msg_rc( _("trying to add %s to playlist\n"), newval.psz_string );
+            playlist_AddItem( p_playlist, p_item,
+                              PLAYLIST_GO|PLAYLIST_APPEND, PLAYLIST_END );
         }
     }
     else if( !strcmp( psz_cmd, "playlist" ) )
@@ -882,15 +858,10 @@ static int Playlist( vlc_object_t *p_this, char const *psz_cmd,
     else
     {
         msg_rc( _("unknown command!\n") );
-        goto failed;
     }
 
     vlc_object_release( p_playlist );
     return VLC_SUCCESS;
-
-failed:
-    vlc_object_release( p_playlist );
-    return VLC_EGENERIC;
 }
 
 static int Other( vlc_object_t *p_this, char const *psz_cmd,
@@ -1233,62 +1204,79 @@ vlc_bool_t ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
     return VLC_FALSE;
 }
 
-static void mrl_Split( vlc_object_t *p_this, char const *psz_mrl, char **ppsz_uri, char **ppsz_options, int *i_count )
+/*****************************************************************************
+ * parse_MRL: build a playlist item from a full mrl
+ *****************************************************************************
+ * MRL format: "simplified-mrl [:option-name[=option-value]]"
+ * We don't check for '"' or '\'', we just assume that a ':' that follows a
+ * space is a new option. Should be good enough for our purpose.
+ *****************************************************************************/
+static playlist_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
 {
-    char *psz_name = strdup( psz_mrl );
-    char *psz_parser = psz_name;
+#define SKIPSPACE( p ) { while( *p && ( *p == ' ' || *p == '\t' ) ) p++; }
+#define SKIPTRAILINGSPACE( p, d ) \
+    { char *e=d; while( e > p && (*(e-1)==' ' || *(e-1)=='\t') ){e--;*e=0;} }
 
-    char *psz_option = "";
-    char *psz_protocol = psz_parser;
-    *i_count = 0;
-    vlc_bool_t b_found = VLC_FALSE;
+    playlist_item_t *p_item = NULL;
+    char *psz_item = NULL, *psz_item_mrl = NULL, *psz_orig;
+    char **ppsz_options = NULL;
+    int i, i_options = 0;
 
-    msg_Dbg( p_this, "Parsing %s for MRL options", psz_mrl );
-    while( *psz_parser && *psz_parser != '\0' && b_found == VLC_FALSE )
+    if( !psz_mrl ) return 0;
+
+    psz_mrl = psz_orig = strdup( psz_mrl );
+    while( *psz_mrl )
     {
-        if( *psz_parser == ':' )
-        {   /* Found first (protocol/demux) part of MRL */
-            *psz_parser++;
-            while( *psz_parser && *psz_parser != '\0' )
+        SKIPSPACE( psz_mrl );
+        psz_item = psz_mrl;
+
+        for( ; *psz_mrl; psz_mrl++ )
+        {
+            if( (*psz_mrl == ' ' || *psz_mrl == '\t') && psz_mrl[1] == ':' )
             {
-                if( *psz_parser == ':' )
-                {   
-                    *psz_parser++ = '\0';    /* terminate first part of MRL */
-                    psz_option = psz_parser; /* options start here */
-                    b_found = VLC_TRUE;
-                    break;
-                }
-                else if( *psz_parser == ' ' )
-                {
-                    /* Should be followed by '--<protocol>[/<demux>] <options>' part */
-                    *psz_parser++ = '\0';
-                    if( *psz_parser && *psz_parser == '-' )
-                        psz_parser++;
-                    if( *psz_parser && *psz_parser == '-' )
-                        *psz_parser++ = '\0';
-                    psz_option = psz_parser; /* options start here */
-                    b_found = VLC_TRUE;
-                    /* Keep <protocol>[/<demux>] part and replace ' ' by ':' */
-                    while( *psz_parser && *psz_parser != '\0' )
-                    {
-                        if( *psz_parser == ' ' )
-                        {
-                            *psz_parser++ = '=';
-                            break;
-                        }
-                        psz_parser++;
-                    }
-                    break;
-                }
-                psz_parser++;
+                /* We have a complete item */
+                break;
+            }
+            if( (*psz_mrl == ' ' || *psz_mrl == '\t') &&
+                (psz_mrl[1] == '"' || psz_mrl[1] == '\'') && psz_mrl[2] == ':')
+            {
+                /* We have a complete item */
+                break;
             }
         }
-        psz_parser++;
+
+        if( *psz_mrl ) { *psz_mrl = 0; psz_mrl++; }
+        SKIPTRAILINGSPACE( psz_item, psz_item + strlen( psz_item ) );
+
+        /* Remove '"' and '\'' if necessary */
+        if( *psz_item == '"' && psz_item[strlen(psz_item)-1] == '"' )
+        { psz_item++; psz_item[strlen(psz_item)-1] = 0; }
+        if( *psz_item == '\'' && psz_item[strlen(psz_item)-1] == '\'' )
+        { psz_item++; psz_item[strlen(psz_item)-1] = 0; }
+
+        if( !psz_item_mrl ) psz_item_mrl = psz_item;
+        else if( *psz_item )
+        {
+            i_options++;
+            ppsz_options = realloc( ppsz_options, i_options * sizeof(char *) );
+            ppsz_options[i_options - 1] = &psz_item[1];
+        }
+
+        if( *psz_mrl ) SKIPSPACE( psz_mrl );
     }
 
-    *i_count = 1;
-    (*ppsz_uri) = strdup( psz_protocol );
-    (*ppsz_options) = strdup( psz_option );
-    msg_Dbg( p_this, "Leaving mrl_Split(psz_mrl, %s, %s, %d)", *ppsz_uri, *ppsz_options, *i_count );
-    free( psz_name );
+    /* Now create a playlist item */
+    if( psz_item_mrl )
+    {
+        p_item = playlist_ItemNew( p_intf, psz_item_mrl, psz_item_mrl );
+        for( i = 0; i < i_options; i++ )
+        {
+            playlist_ItemAddOption( p_item, ppsz_options[i] );
+        }
+    }
+
+    if( i_options ) free( ppsz_options );
+    free( psz_orig );
+
+    return p_item;
 }
