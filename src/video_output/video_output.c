@@ -30,24 +30,28 @@
 /******************************************************************************
  * Local prototypes
  ******************************************************************************/
-static int      InitThread              ( vout_thread_t *p_vout );
-static void     RunThread               ( vout_thread_t *p_vout );
-static void     ErrorThread             ( vout_thread_t *p_vout );
-static void     EndThread               ( vout_thread_t *p_vout );
-static void     DestroyThread           ( vout_thread_t *p_vout, int i_status );
-static void     Print                   ( vout_thread_t *p_vout, int i_x, int i_y, 
-                                          int i_h_align, int i_v_align, unsigned char *psz_text );
-static void     SetBufferArea           ( vout_thread_t *p_vout, int i_x, int i_y, int i_w, int i_h );
-static void     SetBufferPicture        ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderPicture           ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderPictureInfo       ( vout_thread_t *p_vout, picture_t *p_pic );
-static void     RenderSubPicture        ( vout_thread_t *p_vout, subpicture_t *p_subpic );
-static void     RenderInterface         ( vout_thread_t *p_vout );
-static int      RenderIdle              ( vout_thread_t *p_vout );
-static void     RenderInfo              ( vout_thread_t *p_vout );
-static int      Manage                  ( vout_thread_t *p_vout );
-static int      Align                   ( vout_thread_t *p_vout, int *pi_x, int *pi_y, 
-                                          int i_width, int i_height, int i_h_align, int i_v_align );
+static int      InitThread        ( vout_thread_t *p_vout );
+static void     RunThread         ( vout_thread_t *p_vout );
+static void     ErrorThread       ( vout_thread_t *p_vout );
+static void     EndThread         ( vout_thread_t *p_vout );
+static void     DestroyThread     ( vout_thread_t *p_vout, int i_status );
+static void     Print             ( vout_thread_t *p_vout, int i_x, int i_y, 
+                                    int i_h_align, int i_v_align,
+                                    unsigned char *psz_text );
+static void     SetBufferArea     ( vout_thread_t *p_vout, int i_x, int i_y,
+                                    int i_w, int i_h );
+static void     SetBufferPicture  ( vout_thread_t *p_vout, picture_t *p_pic );
+static void     RenderPicture     ( vout_thread_t *p_vout, picture_t *p_pic );
+static void     RenderPictureInfo ( vout_thread_t *p_vout, picture_t *p_pic );
+static void     RenderSubPicture  ( vout_thread_t *p_vout,
+                                    subpicture_t *p_subpic );
+static void     RenderInterface   ( vout_thread_t *p_vout );
+static int      RenderIdle        ( vout_thread_t *p_vout );
+static void     RenderInfo        ( vout_thread_t *p_vout );
+static int      Manage            ( vout_thread_t *p_vout );
+static int      Align             ( vout_thread_t *p_vout, int *pi_x,
+                                    int *pi_y, int i_width, int i_height,
+                                    int i_h_align, int i_v_align );
 
 /******************************************************************************
  * vout_CreateThread: creates a new video output thread
@@ -62,7 +66,7 @@ vout_thread_t * vout_CreateThread               ( char *psz_display, int i_root_
 {
     vout_thread_t * p_vout;                              /* thread descriptor */
     int             i_status;                                /* thread status */
-    int             i_index;                /* index for array initialization */    
+    int             i_index;                /* index for array initialization */
 
     /* Allocate descriptor */
     intf_DbgMsg("\n");    

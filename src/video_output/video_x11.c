@@ -295,17 +295,20 @@ static int X11OpenDisplay( vout_thread_t *p_vout, char *psz_display, Window root
                                            p_vout->p_sys->i_screen );
     switch( p_vout->i_screen_depth )
     {
-    case 15:                        /* 15 bpp (16bpp with a missing green bit) */
-    case 16:                                          /* 16 bpp (65536 colors) */
+    case 8:                                    /* 24 bpp (millions of colors) */
+        p_vout->i_bytes_per_pixel = 1;
+        break;
+    case 15:                       /* 15 bpp (16bpp with a missing green bit) */
+    case 16:                                         /* 16 bpp (65536 colors) */
         p_vout->i_bytes_per_pixel = 2;
         break;
-    case 24:                                    /* 24 bpp (millions of colors) */
+    case 24:                                   /* 24 bpp (millions of colors) */
         p_vout->i_bytes_per_pixel = 3;
         break;
-    case 32:                                    /* 32 bpp (millions of colors) */
+    case 32:                                   /* 32 bpp (millions of colors) */
         p_vout->i_bytes_per_pixel = 4;
         break;
-    default:                                       /* unsupported screen depth */
+    default:                                      /* unsupported screen depth */
         intf_ErrMsg("error: screen depth %d is not supported\n", 
                     p_vout->i_screen_depth);    
         XCloseDisplay( p_vout->p_sys->p_display );        
@@ -419,13 +422,13 @@ static void X11DestroyWindow( vout_thread_t *p_vout )
  *******************************************************************************/
 static int X11CreateImage( vout_thread_t *p_vout, XImage **pp_ximage )
 {
-    byte_t *    pb_data;                            /* image data storage zone */
-    int         i_quantum;                       /* XImage quantum (see below) */
+    byte_t *    pb_data;                           /* image data storage zone */
+    int         i_quantum;                      /* XImage quantum (see below) */
   
     /* Allocate memory for image */
     p_vout->i_bytes_per_line = p_vout->i_width * p_vout->i_bytes_per_pixel;    
     pb_data = (byte_t *) malloc( p_vout->i_bytes_per_line * p_vout->i_height );
-    if( !pb_data )                                                    /* error */
+    if( !pb_data )                                                   /* error */
     {
         intf_ErrMsg("error: %s\n", strerror(ENOMEM));
         return( 1 );   

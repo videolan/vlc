@@ -30,19 +30,19 @@
  *******************************************************************************/
 typedef struct vout_font_s
 {
-    int                 i_type;                                   /* font type */
-    int                 i_width;                  /* character width in pixels */
-    int                 i_height;                /* character height in pixels */
-    int                 i_interspacing;   /* characters interspacing in pixels */
-    int                 i_bytes_per_line;          /* bytes per character line */    
-    int                 i_bytes_per_char;               /* bytes per character */    
-    u16                 i_first;                            /* first character */    
-    u16                 i_last;                              /* last character */
-    byte_t *            p_data;                         /* font character data */
+    int                 i_type;                                 /* font type */
+    int                 i_width;                /* character width in pixels */
+    int                 i_height;              /* character height in pixels */
+    int                 i_interspacing; /* characters interspacing in pixels */
+    int                 i_bytes_per_line;        /* bytes per character line */
+    int                 i_bytes_per_char;             /* bytes per character */
+    u16                 i_first;                          /* first character */
+    u16                 i_last;                            /* last character */
+    byte_t *            p_data;                       /* font character data */
 } vout_font_t;
 
 /* Font types */
-#define VOUT_FIXED_FONT       0                           /* simple fixed font */
+#define VOUT_FIXED_FONT       0                         /* simple fixed font */
 
 /*******************************************************************************
  * vout_put_byte_t: PutByte function
@@ -61,126 +61,132 @@ typedef void (vout_put_byte_t)( void *p_pic, int i_byte, int i_char, int i_borde
 
 /* PUT_BYTE_MASK: put pixels from a byte-wide mask. It uses a branching tree
  * to optimize the number of tests. It is used in the PutByte functions. */
-#define TREE( i_mask, i_mask_color )                                            \
-if( i_mask & 0xf0 )                                       /* one from 1111 */   \
-{                                                                               \
-    if( i_mask & 0xc0 )                                   /* one from 1100 */   \
-    {                                                                           \
-        if( i_mask & 0x80 )                                        /* 1000 */   \
-        {                                                                       \
-            p_pic[0] = i_mask_color;                                            \
-            if( i_mask & 0x40 )                                    /* 0100 */   \
-            {                                                                   \
-                p_pic[1] = i_mask_color;                                        \
-            }                                                                   \
-        }                                                                       \
-        else                                        /* not 1000 means 0100 */   \
-        {                                                                       \
-            p_pic[1] = i_mask_color;                                            \
-        }                                                                       \
-        if( i_mask & 0x30 )                               /* one from 0011 */   \
-        {                                                                       \
-            if( i_mask & 0x20 )                                    /* 0010 */   \
-            {                                                                   \
-                p_pic[2] = i_mask_color;                                        \
-                if( i_mask & 0x10 )                                /* 0001 */   \
-                {                                                               \
-                    p_pic[3] = i_mask_color;                                    \
-                }                                                               \
-            }                                                                   \
-            else                                    /* not 0010 means 0001 */   \
-            {                                                                   \
-                 p_pic[3] = i_mask_color;                                       \
-            }                                                                   \
-        }                                                                       \
-    }                                                                           \
-    else                                            /* not 1100 means 0011 */   \
-    {                                                                           \
-        if( i_mask & 0x20 )                                        /* 0010 */   \
-        {                                                                       \
-            p_pic[2] = i_mask_color;                                            \
-            if( i_mask & 0x10 )                                    /* 0001 */   \
-            {                                                                   \
-                p_pic[3] = i_mask_color;                                        \
-            }                                                                   \
-        }                                                                       \
-        else                                        /* not 0010 means 0001 */   \
-        {                                                                       \
-            p_pic[3] = i_mask_color;                                            \
-        }                                                                       \
-    }                                                                           \
-}                                                                               \
-if( i_mask & 0x0f )                                                             \
-{                                                                               \
-    if( i_mask & 0x0c )                       /* one from 1100 */               \
-    {                                                                           \
-        if( i_mask & 0x08 )                                        /* 1000 */   \
-        {                                                                       \
-            p_pic[4] = i_mask_color;                                            \
-            if( i_mask & 0x04 )                                    /* 0100 */   \
-            {                                                                   \
-                p_pic[5] = i_mask_color;                                        \
-            }                                                                   \
-        }                                                                       \
-        else                                        /* not 1000 means 0100 */   \
-        {                                                                       \
-            p_pic[5] = i_mask_color;                                            \
-        }                                                                       \
-        if( i_mask & 0x03 )                               /* one from 0011 */   \
-        {                                                                       \
-            if( i_mask & 0x02 )                                    /* 0010 */   \
-            {                                                                   \
-                p_pic[6] = i_mask_color;                                        \
-                if( i_mask & 0x01 )                                /* 0001 */   \
-                {                                                               \
-                    p_pic[7] = i_mask_color;                                    \
-                }                                                               \
-            }                                                                   \
-            else                                    /* not 0010 means 0001 */   \
-            {                                                                   \
-                 p_pic[7] = i_mask_color;                                       \
-            }                                                                   \
-        }                                                                       \
-    }                                                                           \
-    else                                            /* not 1100 means 0011 */   \
-    {                                                                           \
-        if( i_mask & 0x02 )                                        /* 0010 */   \
-        {                                                                       \
-            p_pic[6] = i_mask_color;                                            \
-            if( i_mask & 0x01 )                                    /* 0001 */   \
-            {                                                                   \
-                p_pic[7] = i_mask_color;                                        \
-            }                                                                   \
-        }                                                                       \
-        else                                        /* not 0010 means 0001 */   \
-        {                                                                       \
-            p_pic[7] = i_mask_color;                                            \
-        }                                                                       \
-    }                                                                           \
+#define TREE( i_mask, i_mask_color )                                          \
+if( i_mask & 0xf0 )                                       /* one from 1111 */ \
+{                                                                             \
+    if( i_mask & 0xc0 )                                   /* one from 1100 */ \
+    {                                                                         \
+        if( i_mask & 0x80 )                                        /* 1000 */ \
+        {                                                                     \
+            p_pic[0] = i_mask_color;                                          \
+            if( i_mask & 0x40 )                                    /* 0100 */ \
+            {                                                                 \
+                p_pic[1] = i_mask_color;                                      \
+            }                                                                 \
+        }                                                                     \
+        else                                        /* not 1000 means 0100 */ \
+        {                                                                     \
+            p_pic[1] = i_mask_color;                                          \
+        }                                                                     \
+        if( i_mask & 0x30 )                               /* one from 0011 */ \
+        {                                                                     \
+            if( i_mask & 0x20 )                                    /* 0010 */ \
+            {                                                                 \
+                p_pic[2] = i_mask_color;                                      \
+                if( i_mask & 0x10 )                                /* 0001 */ \
+                {                                                             \
+                    p_pic[3] = i_mask_color;                                  \
+                }                                                             \
+            }                                                                 \
+            else                                    /* not 0010 means 0001 */ \
+            {                                                                 \
+                 p_pic[3] = i_mask_color;                                     \
+            }                                                                 \
+        }                                                                     \
+    }                                                                         \
+    else                                            /* not 1100 means 0011 */ \
+    {                                                                         \
+        if( i_mask & 0x20 )                                        /* 0010 */ \
+        {                                                                     \
+            p_pic[2] = i_mask_color;                                          \
+            if( i_mask & 0x10 )                                    /* 0001 */ \
+            {                                                                 \
+                p_pic[3] = i_mask_color;                                      \
+            }                                                                 \
+        }                                                                     \
+        else                                        /* not 0010 means 0001 */ \
+        {                                                                     \
+            p_pic[3] = i_mask_color;                                          \
+        }                                                                     \
+    }                                                                         \
+}                                                                             \
+if( i_mask & 0x0f )                                                           \
+{                                                                             \
+    if( i_mask & 0x0c )                       /* one from 1100 */             \
+    {                                                                         \
+        if( i_mask & 0x08 )                                        /* 1000 */ \
+        {                                                                     \
+            p_pic[4] = i_mask_color;                                          \
+            if( i_mask & 0x04 )                                    /* 0100 */ \
+            {                                                                 \
+                p_pic[5] = i_mask_color;                                      \
+            }                                                                 \
+        }                                                                     \
+        else                                        /* not 1000 means 0100 */ \
+        {                                                                     \
+            p_pic[5] = i_mask_color;                                          \
+        }                                                                     \
+        if( i_mask & 0x03 )                               /* one from 0011 */ \
+        {                                                                     \
+            if( i_mask & 0x02 )                                    /* 0010 */ \
+            {                                                                 \
+                p_pic[6] = i_mask_color;                                      \
+                if( i_mask & 0x01 )                                /* 0001 */ \
+                {                                                             \
+                    p_pic[7] = i_mask_color;                                  \
+                }                                                             \
+            }                                                                 \
+            else                                    /* not 0010 means 0001 */ \
+            {                                                                 \
+                 p_pic[7] = i_mask_color;                                     \
+            }                                                                 \
+        }                                                                     \
+    }                                                                         \
+    else                                            /* not 1100 means 0011 */ \
+    {                                                                         \
+        if( i_mask & 0x02 )                                        /* 0010 */ \
+        {                                                                     \
+            p_pic[6] = i_mask_color;                                          \
+            if( i_mask & 0x01 )                                    /* 0001 */ \
+            {                                                                 \
+                p_pic[7] = i_mask_color;                                      \
+            }                                                                 \
+        }                                                                     \
+        else                                        /* not 0010 means 0001 */ \
+        {                                                                     \
+            p_pic[7] = i_mask_color;                                          \
+        }                                                                     \
+    }                                                                         \
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * Local prototypes 
- *******************************************************************************/
-static void PutByte16( u16 *p_pic, int i_byte, int i_char, int i_border, int i_bg, 
-                       u32 i_char_color, u32 i_border_color, u32 i_bg_color );
-static void PutByte24( void *p_pic, int i_byte, byte_t i_char, byte_t i_border, byte_t i_bg, 
-                       u32 i_char_color, u32 i_border_color, u32 i_bg_color );
-static void PutByte32( u32 *p_pic, int i_byte, byte_t i_char, byte_t i_border, byte_t i_bg, 
-                       u32 i_char_color, u32 i_border_color, u32 i_bg_color );
+ *****************************************************************************/
+static void PutByte8 ( u8 *p_pic, int i_byte, int i_char, int i_border,
+                       int i_bg, u32 i_char_color, u32 i_border_color,
+                       u32 i_bg_color );
+static void PutByte16( u16 *p_pic, int i_byte, int i_char, int i_border,
+                       int i_bg, u32 i_char_color, u32 i_border_color,
+                       u32 i_bg_color );
+static void PutByte24( void *p_pic, int i_byte, byte_t i_char, byte_t i_border,
+                       byte_t i_bg, u32 i_char_color, u32 i_border_color,
+                       u32 i_bg_color );
+static void PutByte32( u32 *p_pic, int i_byte, byte_t i_char, byte_t i_border,
+                       byte_t i_bg, u32 i_char_color, u32 i_border_color,
+                       u32 i_bg_color );
 
-/*******************************************************************************
+/*****************************************************************************
  * vout_LoadFont: load a bitmap font from a file
- *******************************************************************************
+ *****************************************************************************
  * This function will try to open a .psf font and load it. It will return
  * NULL on error.
- *******************************************************************************/
+ *****************************************************************************/
 vout_font_t *vout_LoadFont( const char *psz_name )
 {
-    int                 i_char, i_line;          /* character and line indexes */    
-    int                 i_file;                                 /* source file */
-    byte_t              pi_buffer[2];                           /* file buffer */
-    vout_font_t *       p_font;                             /* the font itself */                
+    int                 i_char, i_line;        /* character and line indexes */
+    int                 i_file;                               /* source file */
+    byte_t              pi_buffer[2];                         /* file buffer */
+    vout_font_t *       p_font;                           /* the font itself */
     
     /* Open file */
     i_file = open( psz_name, O_RDONLY );
@@ -335,38 +341,41 @@ void vout_TextSize( vout_font_t *p_font, int i_style, const char *psz_text, int 
 void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int i_bytes_per_line, 
                  u32 i_char_color, u32 i_border_color, u32 i_bg_color, int i_style, const char *psz_text )
 {
-    byte_t      *p_char, *p_border;          /* character and border mask data */    
-    int         i_char_mask, i_border_mask, i_bg_mask;                /* masks */    
-    int         i_line;                           /* current line in character */    
-    int         i_byte;                           /* current byte in character */
-    int         i_interspacing;                    /* offset between two chars */    
-    int         i_font_bytes_per_line, i_font_height;       /* font properties */    
-    vout_put_byte_t *p_PutByte;                            /* PutByte function */    
+    byte_t      *p_char, *p_border;        /* character and border mask data */
+    int         i_char_mask, i_border_mask, i_bg_mask;              /* masks */
+    int         i_line;                         /* current line in character */
+    int         i_byte;                         /* current byte in character */
+    int         i_interspacing;                  /* offset between two chars */
+    int         i_font_bytes_per_line, i_font_height;     /* font properties */
+    vout_put_byte_t *p_PutByte;                          /* PutByte function */
 
     //?? background: can be something else that whole byte 
 
     /* Select output function */
     switch( i_bytes_per_pixel )
     {
+    case 1:
+        p_PutByte = (vout_put_byte_t *) PutByte8;
+        break;        
     case 2:
-        p_PutByte = (vout_put_byte_t *) PutByte16;        
-        break;        
+        p_PutByte = (vout_put_byte_t *) PutByte16;
+        break;
     case 3:
-        p_PutByte = (vout_put_byte_t *) PutByte24;        
-        break;        
+        p_PutByte = (vout_put_byte_t *) PutByte24;
+        break;
     case 4:
 #ifndef DEBUG
-    default:        
+    default:
 #endif
-        p_PutByte = (vout_put_byte_t *) PutByte32;        
-        break;        
+        p_PutByte = (vout_put_byte_t *) PutByte32;
+        break;
 #ifdef DEBUG
     default:
-        intf_DbgMsg("error: invalid bytes per pixel %d\n", i_bytes_per_pixel );        
-        p_PutByte = NULL;        
+        intf_DbgMsg("error: invalid bytes per pixel %d\n", i_bytes_per_pixel );
+        p_PutByte = NULL;
         break;
 #endif
-    }    
+    }
 
     /* Choose masks and copy font data to local variables */
     i_char_mask =               (i_style & VOID_TEXT) ?         0 : 0xff;
@@ -437,11 +446,12 @@ void vout_Print( vout_font_t *p_font, byte_t *p_pic, int i_bytes_per_pixel, int 
 
 /* following functions are local */
 
-/*******************************************************************************
- * PutByte16: print a fixed width font character byte in 15 or 16 bpp
- *******************************************************************************/
-static void PutByte16( u16 *p_pic, int i_byte, int i_char, int i_border, int i_bg, 
-                       u32 i_char_color, u32 i_border_color, u32 i_bg_color )
+/*****************************************************************************
+ * PutByte8: print a fixed width font character byte in 15 or 16 bpp
+ *****************************************************************************/
+static void PutByte8( u8 *p_pic, int i_byte, int i_char, int i_border,
+                       int i_bg, u32 i_char_color, u32 i_border_color,
+                       u32 i_bg_color )
 {
     /* Computes position offset and background mask */
     p_pic += 8 * i_byte;
@@ -453,18 +463,35 @@ static void PutByte16( u16 *p_pic, int i_byte, int i_char, int i_border, int i_b
     TREE(i_bg, i_bg_color);
 }
 
-/*******************************************************************************
+/*****************************************************************************
+ * PutByte16: print a fixed width font character byte in 15 or 16 bpp
+ *****************************************************************************/
+static void PutByte16( u16 *p_pic, int i_byte, int i_char, int i_border,
+                       int i_bg, u32 i_char_color, u32 i_border_color,
+                       u32 i_bg_color )
+{
+    /* Computes position offset and background mask */
+    p_pic += 8 * i_byte;
+    i_bg &= ~(i_char | i_border);
+
+    /* Put character bits */
+    TREE(i_char, i_char_color);
+    TREE(i_border, i_border_color);
+    TREE(i_bg, i_bg_color);
+}
+
+/*****************************************************************************
  * PutByte24: print a fixed width font character byte in 24 bpp
- *******************************************************************************/
+ *****************************************************************************/
 static void PutByte24( void *p_pic, int i_byte, byte_t i_char, byte_t i_border, byte_t i_bg, 
                        u32 i_char_color, u32 i_border_color, u32 i_bg_color )
 {
     //??
 }
 
-/*******************************************************************************
+/*****************************************************************************
  * PutByte32: print a fixed width font character byte in 32 bpp
- *******************************************************************************/
+ *****************************************************************************/
 static void PutByte32( u32 *p_pic, int i_byte, byte_t i_char, byte_t i_border, byte_t i_bg, 
                        u32 i_char_color, u32 i_border_color, u32 i_bg_color )
 {

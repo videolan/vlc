@@ -199,24 +199,31 @@ static int FBOpenDisplay( vout_thread_t *p_vout )
 
     p_vout->i_width =                   p_vout->p_sys->var_info.xres;
     p_vout->i_height =                  p_vout->p_sys->var_info.yres;
-    p_vout->i_bytes_per_line =          p_vout->i_width * 2;
     p_vout->i_screen_depth =            p_vout->p_sys->var_info.bits_per_pixel;
     switch( p_vout->i_screen_depth )
     {
-    case 15:                        /* 15 bpp (16bpp with a missing green bit) */
-    case 16:                                          /* 16 bpp (65536 colors) */
+    case 8:                                                          /* 8 bpp */
+        p_vout->i_bytes_per_pixel = 1;
+        p_vout->i_bytes_per_line = p_vout->i_width;
+        break;
+
+    case 15:                       /* 15 bpp (16bpp with a missing green bit) */
+    case 16:                                         /* 16 bpp (65536 colors) */
         p_vout->i_bytes_per_pixel = 2;
+        p_vout->i_bytes_per_line = p_vout->i_width * 2;
         break;
 
-    case 24:                                    /* 24 bpp (millions of colors) */
+    case 24:                                   /* 24 bpp (millions of colors) */
         p_vout->i_bytes_per_pixel = 3;
+        p_vout->i_bytes_per_line = p_vout->i_width * 3;
         break;
 
-    case 32:                                    /* 32 bpp (millions of colors) */
+    case 32:                                   /* 32 bpp (millions of colors) */
         p_vout->i_bytes_per_pixel = 4;
+        p_vout->i_bytes_per_line = p_vout->i_width * 4;
         break;
 
-    default:                                       /* unsupported screen depth */
+    default:                                      /* unsupported screen depth */
         intf_ErrMsg("vout error: screen depth %d is not supported\n",
 		                     p_vout->i_screen_depth);
         return( 1  );
@@ -256,3 +263,4 @@ static void FBCloseDisplay( vout_thread_t *p_vout )
     // Destroy window and close display
     close( p_vout->p_sys->i_fb_dev );    
 }
+
