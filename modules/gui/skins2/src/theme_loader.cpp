@@ -32,9 +32,12 @@
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
 #endif
-#if !defined( WIN32 )
+#ifdef HAVE_SYS_STAT_H
+#   include <sys/stat.h>
+#endif
+#ifdef HAVE_UNISTD_H
 #   include <unistd.h>
-#else
+#elif defined( WIN32 )
 #   include <direct.h>
 #endif
 
