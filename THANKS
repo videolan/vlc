@@ -40,6 +40,7 @@ Fumio Nakayama <endymion@ca2.so-net.ne.jp> - Japanese translation
 Goetz Waschk <waschk at informatik.uni-rostock dot de> - Mandrake packages
 Haakon Meland Eriksen - Norwegian translation
 Hans-Peter Jansen <hpj@urpla.net> - patch for module options handling
+Jean-Alexis Montignies <ja@sente.ch> - coreaudio multiple streams fix
 Jean-Philippe Grimaldi <jeanphi@via.ecp.fr> - bug fixes
 Jean-Pierre Kuypers <Kuypers@sri.ucl.ac.be> - French translation
 Jeffrey Baker <jwbaker@acm.org> - port of the ALSA plugin to the ALSA 1.0 API

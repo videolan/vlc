@@ -1,8 +1,8 @@
 /*****************************************************************************
  * coreaudio.c: CoreAudio output plugin
  *****************************************************************************
- * Copyright (C) 2002-2003 VideoLAN
- * $Id: coreaudio.c,v 1.10 2004/01/25 18:53:07 gbazin Exp $
+ * Copyright (C) 2002-2004 VideoLAN
+ * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -157,6 +157,7 @@ struct aout_sys_t
     struct aout_option_t *      p_options;
 
     AudioDeviceID               devid;
+    UInt32                      i_stream_index;
     AudioStreamBasicDescription stream_format;
     UInt32                      b_dev_alive;
 
@@ -236,6 +237,8 @@ static int Open( vlc_object_t * p_this )
     UInt32 i_param_size;
     struct aout_sys_t * p_sys;
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    struct aout_option_t * p_option;
+    UInt32 i_startingChannel;
 
     /* Allocate structure */
     p_sys = (struct aout_sys_t *)malloc( sizeof( struct aout_sys_t ) );
@@ -275,9 +278,29 @@ static int Open( vlc_object_t * p_this )
         return( VLC_EGENERIC );
     } 
 
+    /* get starting channel for the selected stream */
+    p_option = &p_sys->p_options[p_sys->i_sel_opt];
+
+    i_param_size = sizeof( UInt32 ); 
+    err = AudioStreamGetProperty( p_option->i_sid, 0, 
+                                  kAudioStreamPropertyStartingChannel,
+                                  &i_param_size, &i_startingChannel );
+    if( err != noErr )
+    {
+        msg_Err( p_aout, "failed to get channel number: [%4.4s]", 
+                 (char *)&err );
+        FreeDevice( p_aout );
+        FreeHardwareInfo( p_aout );
+        vlc_mutex_destroy( &p_sys->lock );
+        free( (void *)p_sys );
+        return( VLC_EGENERIC );
+    }
+    
+    msg_Dbg( p_aout, "starting channel: [%ld]", i_startingChannel );
+
     /* Get a description of the stream format */
     i_param_size = sizeof( AudioStreamBasicDescription ); 
-    err = AudioDeviceGetProperty( p_sys->devid, 0, FALSE, 
+    err = AudioDeviceGetProperty( p_sys->devid, i_startingChannel, FALSE, 
                                   kAudioDevicePropertyStreamFormat,
                                   &i_param_size, &p_sys->stream_format );
     if( err != noErr )
@@ -300,7 +323,7 @@ static int Open( vlc_object_t * p_this )
 
     /* Get the buffer size */
     i_param_size = sizeof( p_sys->i_buffer_size );
-    err = AudioDeviceGetProperty( p_sys->devid, 0, FALSE, 
+    err = AudioDeviceGetProperty( p_sys->devid, i_startingChannel, FALSE, 
                                   kAudioDevicePropertyBufferSize, 
                                   &i_param_size, &p_sys->i_buffer_size );
     if( err != noErr )
@@ -315,7 +338,8 @@ static int Open( vlc_object_t * p_this )
     }
 
     msg_Dbg( p_aout, "device buffer size: [%ld]", p_sys->i_buffer_size );
-
+    msg_Dbg( p_aout, "device buffer index: [%ld]", p_sys->i_stream_index );
+    
     /* If we do AC3 over SPDIF, set buffer size to one AC3 frame */
     if( ( p_sys->stream_format.mFormatID == kAudioFormat60958AC3 ||
           p_sys->stream_format.mFormatID == 'IAC3' ) &&
@@ -605,7 +629,7 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
     if( p_buffer != NULL )
     {
         /* move data into output data buffer */
-        p_aout->p_vlc->pf_memcpy( outOutputData->mBuffers[ 0 ].mData, 
+        p_aout->p_vlc->pf_memcpy( outOutputData->mBuffers[ p_sys->i_stream_index ].mData, 
                                   p_buffer->p_buffer, 
                                   p_sys->i_buffer_size );
 
@@ -616,7 +640,7 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
         if( p_aout->output.output.i_format == VLC_FOURCC('f','l','3','2') )
         {
             UInt32 i, i_size = p_sys->i_buffer_size / sizeof(float);
-            float * p = (float *)outOutputData->mBuffers[ 0 ].mData;
+            float * p = (float *)outOutputData->mBuffers[ p_sys->i_stream_index ].mData;
 
             for( i = 0; i < i_size; i++ )
             {
@@ -625,7 +649,7 @@ static OSStatus IOCallback( AudioDeviceID inDevice,
         }
         else
         {
-            memset( outOutputData->mBuffers[ 0 ].mData, 
+            memset( outOutputData->mBuffers[ p_sys->i_stream_index ].mData, 
                     0, p_sys->i_buffer_size );
         }
     }
@@ -1116,7 +1140,7 @@ static int InitDevice( aout_instance_t * p_aout )
     vlc_value_t val;
     unsigned int i_option;
     vlc_bool_t b_found = VLC_FALSE;
-    UInt32 i, i_stream, i_param_size;
+    UInt32 i, i_stream, i_param_size, i_firstChannelNum;
 
     struct aout_dev_t * p_dev;
     struct aout_option_t * p_option;
@@ -1162,6 +1186,13 @@ static int InitDevice( aout_instance_t * p_aout )
     } 
 
     i_stream = b_found ? i : p_option->i_sdx;
+
+    i_firstChannelNum = 0;
+    for( i = 0; i < i_stream; i++ )
+    {
+        i_firstChannelNum += P_STREAMS[i].mChannelsPerFrame;
+    } 
+
 
     i_param_size = sizeof( p_sys->sfmt_revert );
     err = AudioStreamGetProperty( p_option->i_sid, 0,
@@ -1254,8 +1285,6 @@ static int InitDevice( aout_instance_t * p_aout )
         p_sys->b_revert_sfmt = VLC_TRUE;
     }
 
-#undef I_STREAMS
-#undef P_STREAMS
 
     err = AudioDeviceAddPropertyListener( p_dev->devid, 0, FALSE,
                                           kAudioDevicePropertyDeviceIsAlive,
@@ -1271,6 +1300,9 @@ static int InitDevice( aout_instance_t * p_aout )
 
     p_sys->i_sel_opt = i_option;
     p_sys->devid = p_dev->devid;
+    p_sys->i_stream_index = p_option->i_idx;
+#undef I_STREAMS
+#undef P_STREAMS
 
     return( VLC_SUCCESS );
 } 
