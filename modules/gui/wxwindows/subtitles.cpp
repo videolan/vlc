@@ -2,7 +2,7 @@
  * subtitles.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: subtitles.cpp,v 1.4 2003/08/10 10:22:52 gbazin Exp $
+ * $Id: subtitles.cpp,v 1.5 2003/08/20 21:59:01 asmax Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -158,8 +158,9 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     wxStaticText *label =
         new wxStaticText(panel, -1, wxU(_("Delay subtitles (in 1/10s)")));
     int i_delay = config_GetInt( p_intf, "sub-delay" );
-    delay_spinctrl = new wxSpinCtrl( panel, -1,
-                                     wxString::Format(wxT("%d"), i_delay),
+    /* Outside the new wxSpinCtrl to avoid an internal error in gcc2.95 ! */
+    wxString format_delay(wxString::Format(wxT("%d"), i_delay));
+    delay_spinctrl = new wxSpinCtrl( panel, -1, format_delay,
                                      wxDefaultPosition, wxDefaultSize,
                                      wxSP_ARROW_KEYS,
                                      -650000, 650000, i_delay );
@@ -170,8 +171,9 @@ SubsFileDialog::SubsFileDialog( intf_thread_t *_p_intf, wxWindow* _p_parent ):
     label = new wxStaticText(panel, -1, wxU(_("Frames per second")));
 
     float f_fps = config_GetFloat( p_intf, "sub-fps" );
-    fps_spinctrl = new wxSpinCtrl( panel, -1,
-                                   wxString::Format(wxT("%d"),(int)f_fps),
+    /* Outside the new wxSpinCtrl to avoid an internal error in gcc2.95 ! */
+    wxString format_fps(wxString::Format(wxT("%d"),(int)f_fps));
+    fps_spinctrl = new wxSpinCtrl( panel, -1, format_fps,
                                    wxDefaultPosition, wxDefaultSize,
                                    wxSP_ARROW_KEYS,
                                    0, 16000, (int)f_fps );
