@@ -2,7 +2,7 @@
  * input_programs.c: es_descriptor_t, pgrm_descriptor_t management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_programs.c,v 1.23 2001/01/10 19:22:11 massiot Exp $
+ * $Id: input_programs.c,v 1.24 2001/01/12 14:49:55 sam Exp $
  *
  * Authors:
  *
@@ -342,6 +342,11 @@ void input_DelES( input_thread_t * p_input, es_descriptor_t * p_es )
     if( p_es->p_decoder_fifo != NULL )
     {
         input_EndDecoder( p_input, p_es );
+
+        /* Destroy the lock and cond */
+        vlc_cond_destroy( &p_es->p_decoder_fifo->data_wait );
+        vlc_mutex_destroy( &p_es->p_decoder_fifo->data_lock );
+    
         free( p_es->p_decoder_fifo );
     }
 

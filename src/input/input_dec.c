@@ -2,7 +2,7 @@
  * input_dec.c: Functions for the management of decoders
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: input_dec.c,v 1.4 2001/01/10 19:22:11 massiot Exp $
+ * $Id: input_dec.c,v 1.5 2001/01/12 14:49:55 sam Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -61,10 +61,6 @@ void input_EndDecoder( input_thread_t * p_input, es_descriptor_t * p_es )
         input_DecodePES( p_es->p_decoder_fifo, p_es->p_pes );
     }
 
-    /* Destroy the lock and cond */
-    vlc_cond_destroy( &p_es->p_decoder_fifo->data_wait );
-    vlc_mutex_destroy( &p_es->p_decoder_fifo->data_lock );
-    
     /* Waiting for the thread to exit */
     vlc_thread_join( p_es->thread_id );
 
