@@ -593,19 +593,21 @@ static int Manage( vout_thread_t *p_vout )
             PostMessage( p_vout->p_sys->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
         }
 
+        if( p_vout->p_sys->hparent )
+        {
+            ShowWindow( p_vout->p_sys->hwnd, SW_HIDE );
+            SetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE,
+                           !p_vout->b_fullscreen ?
+                           WS_EX_NOPARENTNOTIFY | WS_EX_TOOLWINDOW :
+                           WS_EX_NOPARENTNOTIFY );
+            ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
+        }
+
         /* Change window style, borders and title bar */
         SetWindowLong( p_vout->p_sys->hwnd, GWL_STYLE, i_style );
         SetWindowPlacement( p_vout->p_sys->hwnd, &window_placement );
         SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0, 0, 0,
                       SWP_NOMOVE|SWP_NOSIZE|SWP_NOZORDER|SWP_FRAMECHANGED );
-
-	if( p_vout->p_sys->hparent )
-	{
-	    ShowWindow( p_vout->p_sys->hwnd, SW_HIDE );
-	    SetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE,
-			   p_vout->b_fullscreen ? 0 : WS_EX_TOOLWINDOW );
-	    ShowWindow( p_vout->p_sys->hwnd, SW_SHOW );
-	}
 
         /* Update the object variable and trigger callback */
         val.b_bool = p_vout->b_fullscreen;
