@@ -318,12 +318,17 @@ package-win32:
 	for file in AUTHORS COPYING ChangeLog README FAQ TODO ; \
 			do cp $$file tmp/$${file}.txt ; \
 			unix2dos tmp/$${file}.txt ; done
-	mkdir tmp/modules
-	cp $(PLUGINS:%=modules/%.so) tmp/modules/ 
-	# don't include these two
-	#rm -f tmp/modules/gtk.so tmp/modules/sdl.so
+	mkdir tmp/plugins
 ifneq (,$(PLUGINS))
-	for i in $(PLUGINS) ; do if test $$i != intfwin ; then $(STRIP) tmp/modules/$$i.so ; fi ; done
+	for i in $(PLUGINS) ; do \
+		DIR=`echo $$i | cut -f1 -d/` ; \
+		mkdir -p tmp/plugins/$$DIR ; \
+		cp modules/$$i.so tmp/plugins/$$DIR ; \
+		if test $$i != gui/win32/win32 ; then \
+			$(STRIP) \
+			tmp/plugins/$$DIR/`echo $$i | sed -e 's@.*/@@'`.so ; \
+		fi ; \
+	done
 endif
 	mkdir tmp/share
 	for file in default8x16.psf default8x9.psf ; \
