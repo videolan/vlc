@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.cpp,v 1.6 2002/10/14 20:09:17 titer Exp $
+ * $Id: VlcWrapper.cpp,v 1.7 2002/10/28 19:42:24 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -621,20 +621,20 @@ void Intf_VLCWrapper::eject(){}
 
     /* playback info */
 
-BString*  Intf_VLCWrapper::getTimeAsString()
+const char*  Intf_VLCWrapper::getTimeAsString()
 {
     static char psz_currenttime[ OFFSETTOTIME_MAX_SIZE ];
         
     if( p_intf->p_sys->p_input == NULL )
     {
-        return (new BString("00:00:00"));
+        return ("-:--:--");
     }     
    
     input_OffsetToTime( p_intf->p_sys->p_input, 
                         psz_currenttime, 
                         p_intf->p_sys->p_input->stream.p_selected_area->i_tell );        
 
-    return(new BString(psz_currenttime));
+    return(psz_currenttime);
 }
 
 float  Intf_VLCWrapper::getTimeAsFloat()
@@ -688,6 +688,62 @@ BList  *Intf_VLCWrapper::playlistAsArray()
     vlc_mutex_unlock( &p_playlist->object_lock );
     vlc_object_release( p_playlist );
     return( p_list );
+}
+
+// getPlaylistInfo
+void
+Intf_VLCWrapper::getPlaylistInfo( int32& currentIndex, int32& maxIndex )
+{
+	currentIndex = -1;
+	maxIndex = -1;
+	if ( playlist_t* list = (playlist_t*)p_intf->p_sys->p_playlist )
+	{
+		maxIndex = list->i_size;
+		if ( maxIndex > 0 )
+			currentIndex = list->i_index + 1;
+		else
+			maxIndex = -1;
+	}
+}
+
+// getTitleInfo
+void  
+Intf_VLCWrapper::getTitleInfo( int32& currentIndex, int32& maxIndex )
+{
+	currentIndex = -1;
+	maxIndex = -1;
+	if ( input_thread_t* input = p_intf->p_sys->p_input )
+	{
+		vlc_mutex_lock( &input->stream.stream_lock );
+
+		maxIndex = input->stream.i_area_nb - 1;
+		if ( maxIndex > 0)
+			currentIndex = input->stream.p_selected_area->i_id;
+		else
+			maxIndex = -1;
+
+		vlc_mutex_unlock( &input->stream.stream_lock );
+	}
+}
+
+// getChapterInfo
+void
+Intf_VLCWrapper::getChapterInfo( int32& currentIndex, int32& maxIndex )
+{
+	currentIndex = -1;
+	maxIndex = -1;
+	if ( input_thread_t* input = p_intf->p_sys->p_input )
+	{
+		vlc_mutex_lock( &input->stream.stream_lock );
+
+		maxIndex = input->stream.p_selected_area->i_part_nb - 1;
+		if ( maxIndex > 0)
+			currentIndex = input->stream.p_selected_area->i_part;
+		else
+			maxIndex = -1;
+
+		vlc_mutex_unlock( &input->stream.stream_lock );
+	}
 }
 
     /* open file/disc/network */

@@ -2,7 +2,7 @@
  * InterfaceWindow.cpp: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: InterfaceWindow.cpp,v 1.4 2002/10/28 16:55:05 titer Exp $
+ * $Id: InterfaceWindow.cpp,v 1.5 2002/10/28 19:42:24 titer Exp $
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -86,7 +86,8 @@ InterfaceWindow::InterfaceWindow( BRect frame, const char *name,
 	SetTitle( VOUT_TITLE );
 
 	// the media control view
-	p_mediaControl = new MediaControlView( BRect( 0.0, 0.0, 250.0, 50.0 ) );
+	p_mediaControl = new MediaControlView( BRect( 0.0, 0.0, 250.0, 50.0 ),
+	                                       p_intf );
 	p_mediaControl->SetViewColor( ui_color( B_PANEL_BACKGROUND_COLOR ) );
 	p_mediaControl->SetEnabled( !fPlaylistIsEmpty );
 

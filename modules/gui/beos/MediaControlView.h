@@ -2,7 +2,7 @@
  * MediaControlView.h: beos interface
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: MediaControlView.h,v 1.2 2002/09/30 18:30:27 titer Exp $
+ * $Id: MediaControlView.h,v 1.3 2002/10/28 19:42:24 titer Exp $
  *
  * Authors: Tony Castley <tony@castley.net>
  *          Stephan Aßmus <stippi@yellowbites.com>
@@ -30,6 +30,7 @@
 
 class BBitmap;
 class PlayPauseButton;
+class PositionInfoView;
 class SeekSlider;
 class TransportButton;
 class VolumeSlider;
@@ -37,7 +38,7 @@ class VolumeSlider;
 class MediaControlView : public BBox
 {
  public:
-								MediaControlView( BRect frame );
+								MediaControlView( BRect frame, intf_thread_t *p_intf );
 	virtual						~MediaControlView();
 
 								// BBox
@@ -66,7 +67,8 @@ class MediaControlView : public BBox
 			BRect				_MinFrame() const;
 			void				_LayoutControl(BView* view,
 											   BRect frame,
-											   bool resize = false) const;
+											   bool resizeWidth = false,
+											   bool resizeHeight = false) const;
 
 
 			VolumeSlider*		fVolumeSlider;
@@ -78,11 +80,14 @@ class MediaControlView : public BBox
 			PlayPauseButton*	fPlayPause;
 			TransportButton*	fStop;
 			TransportButton*	fMute;
+			PositionInfoView*   fPositionInfo;
 
 			int					fCurrentRate;
 			int					fCurrentStatus;
 			float				fBottomControlHeight;
 			BRect				fOldBounds;
+			
+			intf_thread_t *     p_intf;
 };
 
 class SeekSlider : public BControl
@@ -163,6 +168,64 @@ class VolumeSlider : public BControl
 			bool				fMuted;
 			int32				fMinValue;
 			int32				fMaxValue;
+};
+
+class PositionInfoView : public BView
+{
+ public:
+								PositionInfoView( BRect frame,
+												  const char* name,
+												  intf_thread_t *p_intf );
+	virtual						~PositionInfoView();
+
+								// BView
+	virtual	void				Draw( BRect updateRect );
+	virtual	void				ResizeToPreferred();
+	virtual	void				GetPreferredSize( float* width,
+												  float* height );
+	virtual	void				Pulse();
+
+								// PositionInfoView
+	enum
+	{
+		MODE_SMALL,
+		MODE_BIG,
+	};
+
+			void				SetMode( uint32 mode );
+			void				GetBigPreferredSize( float* width,
+													 float* height );
+
+			void				SetFile( int32 index, int32 size );
+			void				SetTitle( int32 index, int32 size );
+			void				SetChapter( int32 index, int32 size );
+			void				SetTime( int32 seconds );
+			void				SetTime( const char* string );
+ private:
+			void				_InvalidateContents( uint32 which = 0 );
+			void				_MakeString( BString& into,
+											 int32 index,
+											 int32 maxIndex ) const;
+//			void				_DrawAlignedString( const char* string,
+//													BRect frame,
+//													alignment mode = B_ALIGN_LEFT );
+
+			uint32				fMode;
+			int32				fCurrentFileIndex;
+			int32				fCurrentFileSize;
+			int32				fCurrentTitleIndex;
+			int32				fCurrentTitleSize;
+			int32				fCurrentChapterIndex;
+			int32				fCurrentChapterSize;
+
+			int32				fSeconds;
+			BString				fTimeString;
+			bigtime_t			fLastPulseUpdate;
+			float				fStackedWidthCache;
+			float				fStackedHeightCache;
+			
+			intf_thread_t *     p_intf;
+			
 };
 
 #endif	// BEOS_MEDIA_CONTROL_VIEW_H

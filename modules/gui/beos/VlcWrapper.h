@@ -2,7 +2,7 @@
  * intf_vlc_wrapper.h: BeOS plugin for vlc (derived from MacOS X port )
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: VlcWrapper.h,v 1.4 2002/10/14 20:09:17 titer Exp $
+ * $Id: VlcWrapper.h,v 1.5 2002/10/28 19:42:24 titer Exp $
  *
  * Authors: Florian G. Pflug <fgp@phlo.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -118,11 +118,18 @@ public:
     void inputSeek();
 
     /* playback info */
-    BString* getTimeAsString();
+    const char* getTimeAsString();
     float  getTimeAsFloat();
     void   setTimeAsFloat( float i_offset );
     bool   playlistPlaying();
     BList* playlistAsArray();
+    
+    void   getPlaylistInfo( int32& currentIndex,
+                            int32& maxIndex );
+    void   getTitleInfo( int32& currentIndex,
+                                int32& maxIndex );
+    void   getChapterInfo( int32& currentIndex,
+                                  int32& maxIndex );
 
     /* open file/disc/network */
     void openFiles( BList *o_files, bool replace = true );
