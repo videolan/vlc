@@ -886,7 +886,7 @@ vlc_module_begin();
 
     add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, VLC_FALSE );
-    add_bool( "video-deco", 0, NULL, VIDEO_DECO_TEXT,
+    add_bool( "video-deco", 1, NULL, VIDEO_DECO_TEXT,
               VIDEO_DECO_LONGTEXT, VLC_TRUE );
     add_module( "filter", "video filter", NULL, NULL,
                 FILTER_TEXT, FILTER_LONGTEXT, VLC_FALSE );

@@ -61,7 +61,7 @@ static void UpdateItemLength( input_thread_t *, int64_t i_length );
 
 static void ParseOption( input_thread_t *p_input, const char *psz_option );
 
-static void DecodeUrl  ( char * );
+static void DecodeUrl( char * );
 static void MRLSplit( input_thread_t *, char *, char **, char **, char ** );
 static void MRLSections( input_thread_t *, char *, int *, int *, int *, int *);
 
@@ -740,8 +740,8 @@ static int Init( input_thread_t * p_input )
             }
             psz = psz_delim;
         }
-        free( psz );
     }
+    if( psz ) free( psz );
 
     /* Set up es_out */
     es_out_Control( p_input->p_es_out, ES_OUT_SET_ACTIVE, VLC_TRUE );
