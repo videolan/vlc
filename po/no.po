@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc\n"
 "POT-Creation-Date: 2003-04-02 00:02+0200\n"
-"PO-Revision-Date: 2003-03-16 00:01+0100\n"
+"PO-Revision-Date: 2003-04-06 12:32+0200\n"
 "Last-Translator: Haakon Meland Eriksen <haakon.eriksen@far.no>\n"
 "Language-Team: vlc <>\n"
 "MIME-Version: 1.0\n"
@@ -71,9 +71,8 @@ msgstr ""
 "Programmet er skrevet av VideoLAN-teamet ved Ecole Centrale, Paris.\n"
 
 #: src/libvlc.h:37
-#, fuzzy
 msgid "interface module"
-msgstr "Standard grensesnitt: "
+msgstr "grensesnittmodul"
 
 #: src/libvlc.h:39
 msgid ""
@@ -84,9 +83,8 @@ msgstr ""
 "Standard innstillingen velger automatisk den beste tilgjengelige modulen."
 
 #: src/libvlc.h:43
-#, fuzzy
 msgid "extra interface modules"
-msgstr "Standard grensesnitt: "
+msgstr "ekstra grensesnittmoduler"
 
 #: src/libvlc.h:45
 msgid ""
@@ -118,19 +116,16 @@ msgstr ""
 "Skru av alle advarsler og informasjonsmeldinger med dette alternativet."
 
 #: src/libvlc.h:58
-#, fuzzy
 msgid "translation"
-msgstr "Varighet"
+msgstr "oversettelse"
 
 #: src/libvlc.h:60
-#, fuzzy
 msgid "This option allows you to enable the translation of the interface."
-msgstr "Standard sti som grensesnittet benytter for å finne filer velger du med dette alternativet."
+msgstr "Dette valget lar deg skru på oversettelse av grensesnittet"
 
 #: src/libvlc.h:62
-#, fuzzy
 msgid "color messages"
-msgstr "Beskjeder"
+msgstr "fargede beskjeder"
 
 #: src/libvlc.h:64
 msgid ""
@@ -268,9 +263,8 @@ msgid ""
 msgstr "Du får følelsen av å stå i et rom med et komplett 5.1 høytaleranlegg selv om du bare benytter en høretelefon når denne effekten er valgt, noe som gir en mer realistisk lydopplevelse. Når du hører på musikk over lengre tidsrom bør denne effekten gi en mer komfortabel og mindre trøttende opplevelse. Effekten virker uansett kildeformat, fra mono to 5.1."
 
 #: src/libvlc.h:129
-#, fuzzy
 msgid "video output module"
-msgstr "Standard grensesnitt: "
+msgstr "Videofremvisningsmodul"
 
 #: src/libvlc.h:131
 msgid ""
@@ -811,11 +805,11 @@ msgid ""
 "to happen). However it is possible to use slower alternatives which should "
 "be more robust. Currently you can choose between implementation 0 (which is "
 "the default and the fastest), 1 and 2."
-msgstr "Under Windows 9x/Me bruker vi en rask, men ikke korrekt framgangsmåte for tilstandsvariabler (som åpner for usikkerhet om hvilken kodebit som får oppdatere en fellesvariabel først). Det er mulig å velge tregere alternativer som skal være mer robuste. I øyeblikket kan du velge mellom framgangsmåte 0 ("
+msgstr "Under Windows 9x/Me bruker vi en rask, men ikke korrekt framgangsmåte for tilstandsvariabler (som åpner for usikkerhet om hvilken kodebit som får oppdatere en fellesvariabel først). Det er mulig å velge tregere alternativer som skal være mer robuste. I øyeblikket kan du velge mellom framgangsmåte 0 (som er standard og raskest), 1 og 2"
 
 #: src/libvlc.h:412
 msgid "Real-time priority"
-msgstr ""
+msgstr "Sanntidsprioritet"
 
 #: src/libvlc.h:414
 msgid ""
@@ -858,12 +852,13 @@ msgstr ""
 
 #: src/libvlc.h:529
 msgid "Decoders"
-msgstr ""
+msgstr "Dekodere"
 
 #: src/libvlc.h:532
 msgid "Encoders"
 msgstr ""
 
+# , fuzzy
 #: src/libvlc.h:537 modules/gui/gtk/gnome_interface.c:2149
 #: modules/gui/gtk/gtk_interface.c:2468 modules/gui/gtk/gtk_interface.c:3150
 #: modules/gui/win32/strings.cpp:221 modules/gui/wxwindows/open.cpp:177
@@ -895,41 +890,39 @@ msgstr "Spilleliste"
 #: modules/video_filter/wall.c:66 modules/video_output/ggi.c:62
 #: modules/video_output/mga/xmga.c:104
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Forskjellig"
 
 #: src/libvlc.h:582
-#, fuzzy
 msgid "main program"
-msgstr "Avslutt programmet"
+msgstr "hovedprogrammet"
 
 #: src/libvlc.h:588
 msgid "print help"
-msgstr ""
+msgstr "skriv ut hjelp"
 
 #: src/libvlc.h:590
 msgid "print detailed help"
-msgstr ""
+msgstr "skriv ut detaljert hjelp"
 
 #: src/libvlc.h:593
 msgid "print a list of available modules"
-msgstr ""
+msgstr "skriv ut liste av tilgjengelige moduler"
 
 #: src/libvlc.h:595
-#, fuzzy
 msgid "print help on module"
-msgstr "Standard grensesnitt: "
+msgstr "skriv ut hjelp for et modul"
 
 #: src/libvlc.h:598
 msgid "print version information"
-msgstr ""
+msgstr "skriv ut versjonsinformasjon"
 
 #: src/misc/configuration.c:904
 msgid "boolean"
-msgstr ""
+msgstr "boolsk"
 
 #: src/audio_output/output.c:72 src/audio_output/output.c:139
 msgid "Reverse stereo"
-msgstr ""
+msgstr "Omvendt stereo"
 
 #: src/audio_output/output.c:77 src/audio_output/output.c:103
 #: src/audio_output/output.c:132 modules/audio_output/alsa.c:161
@@ -945,12 +938,12 @@ msgstr "Stereo"
 #: src/audio_output/output.c:113 src/audio_output/output.c:135
 #: src/audio_output/output.c:145
 msgid "Left"
-msgstr ""
+msgstr "Venstre"
 
 #: src/audio_output/output.c:86 src/audio_output/output.c:107
 #: src/audio_output/output.c:137
 msgid "Right"
-msgstr ""
+msgstr "Høyre"
 
 #: src/audio_output/output.c:90 src/audio_output/output.c:128
 msgid "Dolby Surround"
@@ -961,7 +954,7 @@ msgid ""
 "\n"
 "Warning: if you can't access the GUI anymore, open a dos command box, go to "
 "the directory where you installed VLC and run \"vlc -I win32\"\n"
-msgstr ""
+msgstr "\nAdvarsel: om du ikke lenger får tilgang til brukergrensesnittet kan du åpne et dos vindu, gå til katalogen du har installer VLC i og kjøre \"vlc -I win32\"\n"
 
 #: modules/access/directory.c:82
 msgid "Standard filesystem directory input"
@@ -1062,9 +1055,8 @@ msgid "Standard filesystem file input"
 msgstr ""
 
 #: modules/access/file.c:76
-#, fuzzy
 msgid "file"
-msgstr "Fil"
+msgstr "fil"
 
 #: modules/access/ftp.c:88
 msgid ""
@@ -1112,9 +1104,8 @@ msgid "UDP/RTP input"
 msgstr ""
 
 #: modules/access/udp.c:79
-#, fuzzy
 msgid "udp"
-msgstr "dsp"
+msgstr ""
 
 #: modules/access/satellite/satellite.c:41
 msgid "satellite default transponder frequency"
@@ -1193,16 +1184,15 @@ msgstr "Parametre for romklangeffekt i høretelefoner: avstanden mellom fremre ve
 
 #: modules/audio_filter/channel_mixer/headphone.c:54
 msgid "headphone"
-msgstr ""
+msgstr "høretelefoner"
 
 #: modules/audio_filter/channel_mixer/headphone.c:57
-#, fuzzy
 msgid "headphone channel mixer with virtual spatialization effect"
 msgstr "romklangeffekt i høretelefoner"
 
 #: modules/audio_filter/channel_mixer/trivial.c:46
 msgid "audio filter for trivial channel mixing"
-msgstr ""
+msgstr "Lydfilter for triviell miksing av lydkanaler"
 
 #: modules/audio_filter/converter/a52tofloat32.c:76
 msgid "A/52 dynamic range compression"
@@ -1257,9 +1247,8 @@ msgid "audio filter for s16->float32 conversion"
 msgstr ""
 
 #: modules/audio_filter/converter/mpgatofixed32.c:61
-#, fuzzy
 msgid "MPEG audio decoder"
-msgstr "Standard grensesnitt: "
+msgstr "MPEG-lyd dekoder"
 
 #: modules/audio_filter/converter/s16tofixed32.c:46
 msgid "audio filter for s16->fixed32 conversion"
@@ -1319,9 +1308,8 @@ msgid "ALSA"
 msgstr ""
 
 #: modules/audio_output/alsa.c:93
-#, fuzzy
 msgid "ALSA device name"
-msgstr "Navn på enhet"
+msgstr "Navn på ALSA-enhet"
 
 #: modules/audio_output/alsa.c:94
 #, fuzzy
@@ -1356,7 +1344,7 @@ msgstr ""
 #: modules/audio_output/oss.c:173 modules/audio_output/oss.c:318
 #: modules/audio_output/waveout.c:241 modules/audio_output/waveout.c:346
 msgid "2 Front 2 Rear"
-msgstr ""
+msgstr "2 Front 2 Bak"
 
 #: modules/audio_output/arts.c:66
 #, fuzzy
@@ -1364,9 +1352,8 @@ msgid "aRts audio output"
 msgstr "Lydeksport volum"
 
 #: modules/audio_output/coreaudio.c:218
-#, fuzzy
 msgid "audio device"
-msgstr "Standard grensesnitt: "
+msgstr "lydenhet"
 
 #: modules/audio_output/coreaudio.c:221
 #, fuzzy
@@ -1395,11 +1382,11 @@ msgstr ""
 
 #: modules/audio_output/file.c:86
 msgid "add wave header"
-msgstr ""
+msgstr "lag wavfil"
 
 #: modules/audio_output/file.c:87
 msgid "instead of writing a raw file, you can add a wav header to the file"
-msgstr ""
+msgstr "Du kan lage en wavfil i stede for en rå lydfil"
 
 #: modules/audio_output/file.c:104
 #, fuzzy
@@ -1440,9 +1427,8 @@ msgid "Linux OSS audio output"
 msgstr "Standard grensesnitt: "
 
 #: modules/audio_output/sdl.c:68
-#, fuzzy
 msgid "Simple DirectMedia Layer audio output"
-msgstr "Simple DirectMedia Layer videomodul"
+msgstr "Simple DirectMedia Layer lydmodul"
 
 #: modules/audio_output/waveout.c:130
 msgid "Win32 waveOut extension output"
@@ -1508,9 +1494,8 @@ msgid "AAC audio decoder (using libfaad2)"
 msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:99
-#, fuzzy
 msgid "ffmpeg"
-msgstr "mpeg"
+msgstr ""
 
 #: modules/codec/ffmpeg/ffmpeg.c:113
 msgid "Post processing"
@@ -1657,9 +1642,8 @@ msgid ""
 msgstr ""
 
 #: modules/codec/spudec/spudec.c:56
-#, fuzzy
 msgid "subtitles"
-msgstr "_Teksting"
+msgstr "teksting"
 
 #: modules/codec/spudec/spudec.c:65
 #, fuzzy
@@ -1850,9 +1834,8 @@ msgid "Size"
 msgstr ""
 
 #: modules/demux/asf/asf.c:322 modules/demux/avi/avi.c:1043
-#, fuzzy
 msgid "Resolution"
-msgstr "Valg"
+msgstr "Oppløsning"
 
 #: modules/demux/asf/asf.c:324
 #, fuzzy
@@ -1917,7 +1900,7 @@ msgstr ""
 
 #: modules/demux/avi/avi.c:1071
 msgid "Unknown"
-msgstr ""
+msgstr "Ukjent"
 
 #: modules/demux/demuxdump.c:48
 #, fuzzy
@@ -1951,14 +1934,12 @@ msgid "MPEG I/II audio stream demuxer"
 msgstr "Standard grensesnitt: "
 
 #: modules/demux/mpeg/audio.c:616 modules/demux/mpeg/audio.c:633
-#, fuzzy
 msgid "mpeg"
 msgstr "mpeg"
 
 #: modules/demux/mpeg/audio.c:620
-#, fuzzy
 msgid "Mode"
-msgstr "Moduler"
+msgstr "Modus"
 
 #: modules/demux/mpeg/audio.c:624
 msgid "Average Bitrate"
@@ -2170,7 +2151,7 @@ msgstr ""
 #: modules/gui/familiar/interface.c:362 modules/gui/gtk/preferences.c:325
 #: modules/gui/kde/pluginsbox.cpp:45
 msgid "Name"
-msgstr ""
+msgstr "Navn"
 
 #: modules/gui/familiar/interface.c:378 modules/gui/gtk/gnome_interface.c:508
 #: modules/gui/gtk/gnome_interface.c:1617
@@ -2242,11 +2223,11 @@ msgstr ""
 #: modules/gui/familiar/interface.c:569
 #, fuzzy
 msgid "Time"
-msgstr "Tittel"
+msgstr "Tid"
 
 #: modules/gui/familiar/interface.c:586
 msgid "Update"
-msgstr ""
+msgstr "Oppdater"
 
 #: modules/gui/familiar/interface.c:594
 msgid " Del "
@@ -2284,7 +2265,7 @@ msgstr "Innstillinger"
 #: modules/gui/gtk/gtk_interface.c:1644 modules/gui/kde/kde.cpp:111
 #: modules/gui/win32/strings.cpp:9
 msgid "(c) 1996-2003 the VideoLAN team"
-msgstr "© 1996-2003 the VideoLAN team"
+msgstr "(c) 1996-2003 the VideoLAN team"
 
 #: modules/gui/familiar/interface.c:721
 msgid "Authors: The VideoLAN Team, http://www.videolan.org"
@@ -2376,14 +2357,13 @@ msgstr "_Nettverksstrøm"
 #: modules/gui/gtk/gnome_interface.c:1041 modules/gui/gtk/gtk_interface.c:208
 #: modules/gui/gtk/gtk_interface.c:646 modules/gui/gtk/gtk_interface.c:1464
 #: modules/gui/win32/strings.cpp:98
-#, fuzzy
 msgid "Select a network stream"
 msgstr "Velg en nettverksstrøm"
 
 #: modules/gui/gtk/gnome_interface.c:41 modules/gui/gtk/gtk_interface.c:223
 #, fuzzy
 msgid "_Eject Disc"
-msgstr "Åpne Disk"
+msgstr "Løs ut disk"
 
 #: modules/gui/gtk/gnome_interface.c:42 modules/gui/gtk/gnome_interface.c:584
 #: modules/gui/gtk/gtk_interface.c:231 modules/gui/win32/strings.cpp:106
@@ -2393,7 +2373,6 @@ msgid "Eject disc"
 msgstr "Åpne Disk"
 
 #: modules/gui/gtk/gnome_interface.c:56 modules/gui/gtk/gtk_interface.c:291
-#, fuzzy
 msgid "_Hide interface"
 msgstr "_Gjem grensesnitt"
 
@@ -2413,7 +2392,6 @@ msgid "_Title"
 msgstr "_Tittel"
 
 #: modules/gui/gtk/gnome_interface.c:72 modules/gui/win32/strings.cpp:65
-#, fuzzy
 msgid "Choose title"
 msgstr "Velg tittel"
 
@@ -2422,7 +2400,6 @@ msgid "_Chapter"
 msgstr "_Kapittel"
 
 #: modules/gui/gtk/gnome_interface.c:79 modules/gui/win32/strings.cpp:67
-#, fuzzy
 msgid "Choose chapter"
 msgstr "Velg Kapittel"
 
@@ -2437,22 +2414,19 @@ msgstr "Åpne spilleliste-vinduet"
 
 #: modules/gui/gtk/gnome_interface.c:93 modules/gui/gtk/gtk_interface.c:369
 msgid "_Modules..."
-msgstr "_Moduler"
+msgstr "_Moduler..."
 
 #: modules/gui/gtk/gnome_interface.c:94 modules/gui/gtk/gtk_interface.c:378
-#, fuzzy
 msgid "Open the module manager"
 msgstr "Åpne plugin håndterer"
 
 #: modules/gui/gtk/gnome_interface.c:100 modules/gui/gtk/gtk_interface.c:380
 #: modules/gui/kde/interface.cpp:133 modules/gui/win32/strings.cpp:128
-#, fuzzy
 msgid "Messages..."
-msgstr "Beskjeder"
+msgstr "Beskjeder..."
 
 #: modules/gui/gtk/gnome_interface.c:101 modules/gui/gtk/gtk_interface.c:386
 #: modules/gui/win32/strings.cpp:129
-#, fuzzy
 msgid "Open the messages window"
 msgstr "Åpne spilleliste-vinduet"
 
@@ -2471,13 +2445,13 @@ msgstr "Velg lydkanal"
 #: modules/gui/gtk/gtk_interface.c:457 modules/gui/gtk/gtk_interface.c:1294
 #: modules/gui/macosx/intf.m:338
 msgid "Volume Up"
-msgstr ""
+msgstr "Øk volum"
 
 #: modules/gui/gtk/gnome_interface.c:133 modules/gui/gtk/gnome_interface.c:957
 #: modules/gui/gtk/gtk_interface.c:464 modules/gui/gtk/gtk_interface.c:1301
 #: modules/gui/macosx/intf.m:339
 msgid "Volume Down"
-msgstr ""
+msgstr "Senk volum"
 
 #: modules/gui/gtk/gnome_interface.c:140 modules/gui/gtk/gnome_interface.c:964
 #: modules/gui/gtk/gtk_interface.c:471 modules/gui/gtk/gtk_interface.c:1308
@@ -2499,7 +2473,6 @@ msgstr "_Teksting"
 
 #: modules/gui/gtk/gnome_interface.c:168 modules/gui/gtk/gnome_interface.c:992
 #: modules/gui/gtk/gtk_interface.c:529 modules/gui/win32/strings.cpp:73
-#, fuzzy
 msgid "Select subtitles channel"
 msgstr "Velg teksting kanal"
 
@@ -2529,9 +2502,8 @@ msgid "_Audio"
 msgstr "_Lyd"
 
 #: modules/gui/gtk/gnome_interface.c:218 modules/gui/gtk/gtk_interface.c:502
-#, fuzzy
 msgid "_Video"
-msgstr "Video"
+msgstr "_Video"
 
 #: modules/gui/gtk/gnome_interface.c:520 modules/gui/gtk/gnome_interface.c:723
 #: modules/gui/gtk/gnome_interface.c:1738
@@ -2566,7 +2538,6 @@ msgid "Back"
 msgstr "Tilbake"
 
 #: modules/gui/gtk/gnome_interface.c:559 modules/gui/gtk/gtk_interface.c:670
-#, fuzzy
 msgid "Go Backward"
 msgstr "Gå tilbake"
 
@@ -4182,7 +4153,7 @@ msgstr "_Nettverksstrøm"
 #: modules/gui/wxwindows/interface.cpp:219
 #, fuzzy
 msgid "&Eject Disc"
-msgstr "Åpne Disk"
+msgstr "Løs ut disk"
 
 #: modules/gui/wxwindows/interface.cpp:221
 #, fuzzy
@@ -4333,7 +4304,7 @@ msgstr ""
 #: modules/gui/wxwindows/playlist.cpp:112
 #, fuzzy
 msgid "&Invert"
-msgstr "Inverter"
+msgstr "&Inverter"
 
 #: modules/gui/wxwindows/playlist.cpp:114
 #, fuzzy
