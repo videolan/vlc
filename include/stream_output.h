@@ -2,7 +2,7 @@
  * stream_output.h : stream output module
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: stream_output.h,v 1.13 2003/08/14 17:50:43 sigmunau Exp $
+ * $Id: stream_output.h,v 1.14 2003/09/12 18:34:44 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar <fenrir@via.ecp.fr>
@@ -253,54 +253,6 @@ struct sout_instance_t
     /* sout private */
     sout_instance_sys_t     *p_sys;
 };
-
-/* some macro */
-#define TAB_APPEND( count, tab, p )             \
-    if( (count) > 0 )                           \
-    {                                           \
-        (tab) = realloc( (tab), sizeof( void ** ) * ( (count) + 1 ) ); \
-    }                                           \
-    else                                        \
-    {                                           \
-        (tab) = malloc( sizeof( void ** ) );    \
-    }                                           \
-    (void**)(tab)[(count)] = (void*)(p);        \
-    (count)++
-
-#define TAB_FIND( count, tab, p, index )        \
-    {                                           \
-        int _i_;                                \
-        (index) = -1;                           \
-        for( _i_ = 0; _i_ < (count); _i_++ )    \
-        {                                       \
-            if((void**)(tab)[_i_]==(void*)(p))  \
-            {                                   \
-                (index) = _i_;                  \
-                break;                          \
-            }                                   \
-        }                                       \
-    }
-
-#define TAB_REMOVE( count, tab, p )             \
-    {                                           \
-        int i_index;                            \
-        TAB_FIND( count, tab, p, i_index );     \
-        if( i_index >= 0 )                      \
-        {                                       \
-            if( count > 1 )                     \
-            {                                   \
-                memmove( ((void**)tab + i_index),    \
-                         ((void**)tab + i_index+1),  \
-                         ( (count) - i_index - 1 ) * sizeof( void* ) );\
-            }                                   \
-            else                                \
-            {                                   \
-                free( tab );                    \
-                (tab) = NULL;                   \
-            }                                   \
-            (count)--;                          \
-        }                                       \
-    }
 
 static inline sout_cfg_t *sout_cfg_find( sout_cfg_t *p_cfg, char *psz_name )
 {

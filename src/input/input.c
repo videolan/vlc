@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.238 2003/09/12 16:26:40 fenrir Exp $
+ * $Id: input.c,v 1.239 2003/09/12 18:34:45 fenrir Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -29,8 +29,8 @@
 #include <stdlib.h>
 
 #include <vlc/vlc.h>
-
-#include <string.h>
+#include <vlc/input.h>
+#include <vlc/vout.h>
 
 #ifdef HAVE_SYS_TIMES_H
 #   include <sys/times.h>
@@ -38,16 +38,9 @@
 
 #include "vlc_playlist.h"
 
-#include "stream_control.h"
-#include "input_ext-intf.h"
-#include "input_ext-dec.h"
-#include "input_ext-plugins.h"
-
 #include "stream_output.h"
-#include <vlc/vout.h>
 
 #include "vlc_interface.h"
-#include "ninput.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -59,6 +52,10 @@ static void EndThread       ( input_thread_t *p_input );
 
 static void ParseOption     ( input_thread_t *p_input,
                               const char *psz_option );
+
+static es_out_t *EsOutCreate ( input_thread_t * );
+static void      EsOutRelease( es_out_t * );
+
 /*****************************************************************************
  * Callbacks
  *****************************************************************************/
@@ -154,6 +151,9 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent,
 
     /* Stream */
     p_input->s = NULL;
+
+    /* es out */
+    p_input->p_es_out = NULL;
 
     /* Demux */
     p_input->p_demux   = NULL;
@@ -569,6 +569,8 @@ static int InitThread( input_thread_t * p_input )
         free( val.psz_string );
     }
 
+    p_input->p_es_out = EsOutCreate( p_input );
+
     /* Find and open appropriate access module */
     p_input->p_access = module_Need( p_input, "access",
                                      p_input->psz_access );
@@ -729,6 +731,9 @@ static void EndThread( input_thread_t * p_input )
     /* Destroy the stream_t facilities */
     stream_Release( p_input->s );
 
+    /* Destroy es out */
+    EsOutRelease( p_input->p_es_out );
+
     /* Close the access plug-in */
     module_Unneed( p_input, p_input->p_access );
 
@@ -839,6 +844,67 @@ static void ParseOption( input_thread_t *p_input, const char *psz_option )
   cleanup:
     if( psz_name ) free( psz_name );
     return;
+}
+
+/*****************************************************************************
+ * es_out_t input handler
+ *****************************************************************************/
+struct es_out_sys_t
+{
+    input_thread_t *p_input;
+
+    int         i_id;
+    es_out_id_t **id;
+};
+struct es_out_id_t
+{
+    es_descriptor_t *p_es;
+};
+
+static es_out_id_t *EsOutAdd    ( es_out_t *, es_format_t * );
+static int          EsOutSend   ( es_out_t *, es_out_id_t *, pes_packet_t * );
+static void         EsOutDel    ( es_out_t *, es_out_id_t * );
+static int          EsOutControl( es_out_t *, int i_query, va_list );
+
+static es_out_t *EsOutCreate( input_thread_t *p_input )
+{
+    es_out_t *out = malloc( sizeof( es_out_t ) );
+
+    out->pf_add     = EsOutAdd;
+    out->pf_send    = EsOutSend;
+    out->pf_del     = EsOutDel;
+    out->pf_control = EsOutControl;
+
+    out->p_sys = malloc( sizeof( es_out_sys_t ) );
+    out->p_sys->p_input = p_input;
+    out->p_sys->i_id    = 0;
+    out->p_sys->id      = NULL;
+
+    return out;
+}
+static void      EsOutRelease( es_out_t *out )
+{
+    free( out->p_sys );
+    free( out );
+}
+
+static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
+{
+    es_out_id_t *id = malloc( sizeof( es_out_id_t ) );
+
+    return id;
+}
+static int EsOutSend( es_out_t *out, es_out_id_t *id, pes_packet_t *p_pes )
+{
+    return VLC_SUCCESS;
+}
+static void EsOutDel( es_out_t *out, es_out_id_t *id )
+{
+    free( id );
+}
+static int EsOutControl( es_out_t *out, int i_query, va_list args )
+{
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************

@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: vlc_common.h,v 1.76 2003/09/02 20:19:25 gbazin Exp $
+ * $Id: vlc_common.h,v 1.77 2003/09/12 18:34:44 fenrir Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -228,6 +228,10 @@ typedef struct stream_sys_t stream_sys_t;
 
 /* NInput */
 typedef struct stream_t stream_t;
+typedef struct es_out_t     es_out_t;
+typedef struct es_out_id_t  es_out_id_t;
+typedef struct es_out_sys_t es_out_sys_t;
+
 
 /* Audio */
 typedef struct aout_instance_t aout_instance_t;
@@ -439,6 +443,53 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     }                                                                         \
     while( 0 )
 
+
+#define TAB_APPEND( count, tab, p )             \
+    if( (count) > 0 )                           \
+    {                                           \
+        (tab) = realloc( (tab), sizeof( void ** ) * ( (count) + 1 ) ); \
+    }                                           \
+    else                                        \
+    {                                           \
+        (tab) = malloc( sizeof( void ** ) );    \
+    }                                           \
+    (void**)(tab)[(count)] = (void*)(p);        \
+    (count)++
+
+#define TAB_FIND( count, tab, p, index )        \
+    {                                           \
+        int _i_;                                \
+        (index) = -1;                           \
+        for( _i_ = 0; _i_ < (count); _i_++ )    \
+        {                                       \
+            if((void**)(tab)[_i_]==(void*)(p))  \
+            {                                   \
+                (index) = _i_;                  \
+                break;                          \
+            }                                   \
+        }                                       \
+    }
+
+#define TAB_REMOVE( count, tab, p )             \
+    {                                           \
+        int _i_index_;                          \
+        TAB_FIND( count, tab, p, _i_index_ );   \
+        if( _i_index_ >= 0 )                    \
+        {                                       \
+            if( (count) > 1 )                     \
+            {                                   \
+                memmove( ((void**)(tab) + _i_index_),    \
+                         ((void**)(tab) + _i_index_+1),  \
+                         ( (count) - _i_index_ - 1 ) * sizeof( void* ) );\
+            }                                   \
+            else                                \
+            {                                   \
+                free( tab );                    \
+                (tab) = NULL;                   \
+            }                                   \
+            (count)--;                          \
+        }                                       \
+    }
 
 /* MSB (big endian)/LSB (little endian) conversions - network order is always
  * MSB, and should be used for both network communications and files. Note that

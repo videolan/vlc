@@ -2,7 +2,7 @@
  * ninput.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ninput.h,v 1.9 2003/09/12 16:26:40 fenrir Exp $
+ * $Id: ninput.h,v 1.10 2003/09/12 18:34:44 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -24,7 +24,6 @@
 #ifndef _NINPUT_H
 #define _NINPUT_H 1
 
-#if 0
 enum es_extra_type_e
 {
     ES_EXTRA_TYPE_UNKNOWN,
@@ -108,16 +107,12 @@ enum es_out_query_e
     ES_OUT_GET_SELECT   /* arg1= es_out_id_t* arg2=vlc_bool_t*  */
 };
 
-typedef struct es_out_t     es_out_t;
-typedef struct es_out_id_t  es_out_id_t;
-typedef struct es_out_sys_t es_out_sys_t;
-
 struct es_out_t
 {
-    es_out_id_t (*pf_add)    ( es_out_t *, es_format_t * );
-    int         (*pf_send)   ( es_out_t *, es_out_id_t *, pes_packet_t * );
-    void        (*pf_del)    ( es_out_t *, es_out_id_t * );
-    int         (*pf_control)( es_out_t *, int i_query, va_list );
+    es_out_id_t *(*pf_add)    ( es_out_t *, es_format_t * );
+    int          (*pf_send)   ( es_out_t *, es_out_id_t *, pes_packet_t * );
+    void         (*pf_del)    ( es_out_t *, es_out_id_t * );
+    int          (*pf_control)( es_out_t *, int i_query, va_list );
 
     es_out_sys_t    *p_sys;
 };
@@ -148,7 +143,6 @@ static inline int es_out_Control( es_out_t *out, int i_query, ... )
     va_end( args );
     return i_result;
 }
-#endif
 
 /**
  * \defgroup stream Stream
