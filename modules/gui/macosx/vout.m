@@ -1347,7 +1347,7 @@ static void QTFreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Check if the user asked for useless visual effects */
     psz_effect = config_GetPsz( p_vout, "macosx-opengl-effect" );
-    if( !strcmp( psz_effect, "none" ) )
+    if( !psz_effect || !strcmp( psz_effect, "none" ))
     {
         i_effect = OPENGL_EFFECT_NONE;
     }
