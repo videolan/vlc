@@ -2,7 +2,7 @@
  * playlist.c : Playlist management functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VideoLAN
- * $Id: playlist.c,v 1.81 2004/02/23 21:50:14 gbazin Exp $
+ * $Id: playlist.c,v 1.82 2004/02/23 21:57:56 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -380,7 +380,7 @@ static void RunThread ( playlist_t *p_playlist )
                 i_vout_destroyed_date =
                     ObjectGarbageCollector( p_playlist, VLC_OBJECT_VOUT,
                                             i_vout_destroyed_date );
-                i_vout_destroyed_date =
+                i_sout_destroyed_date =
                     ObjectGarbageCollector( p_playlist, VLC_OBJECT_SOUT,
                                             i_sout_destroyed_date );
                 vlc_mutex_lock( &p_playlist->object_lock );
