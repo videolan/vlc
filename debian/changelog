@@ -1,6 +1,7 @@
 vlc (0.2.91-1) unstable; urgency=low
 
   * New upstream release.
+  * This release fixes IFO parsing issues (Closes: #119369).
   * vlc will dlopen() an installed libdvdcss if available, to play
     encrypted DVDs (Closes: #89856).
   * vlc is now in sync with the official libdvdcss (Closes: #118194).
