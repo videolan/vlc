@@ -278,7 +278,7 @@ endif
 ifneq (,$(findstring 86,$(ARCH)))
 ifneq (,$(findstring mmx,$(ARCH)))
 ASM_OBJ =		
-STD_PLUGIN_ASM = 	plugins/idct/idctmmx_asm.o
+STD_PLUGIN_ASM = 	
 endif
 endif
 
@@ -351,11 +351,10 @@ PLUGIN_IDCTCLASSIC =	plugins/idct/idctclassic.o \
 			plugins/idct/idct_common.o
 
 PLUGIN_IDCTMMX =	plugins/idct/idctmmx.o \
-			plugins/idct/idct_common.o \
-			plugins/idct/idctmmx_asm.o
+			plugins/idct/idct_common.o
 
 PLUGIN_IDCTMMXEXT =	plugins/idct/idctmmxext.o \
-			plugins/idct/idct_mmxext.o
+			plugins/idct/idct_common.o
 
 PLUGIN_ALSA =	plugins/alsa/alsa.o \
 		plugins/alsa/aout_alsa.o

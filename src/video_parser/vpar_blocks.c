@@ -2,7 +2,7 @@
  * vpar_blocks.c : blocks parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.c,v 1.70 2001/01/13 12:57:21 sam Exp $
+ * $Id: vpar_blocks.c,v 1.71 2001/01/17 18:17:31 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -609,6 +609,26 @@ void vpar_InitDCTTables( vpar_thread_t * p_vpar )
     FillDCTTable( p_vpar->ppl_dct_coef[1], pl_DCT_tab6,    1, 16, 16 );
 }
 
+/*****************************************************************************
+ * vpar_InitScanTable : Initialize scan table
+ *****************************************************************************/
+void vpar_InitScanTable( vpar_thread_t * p_vpar )
+{
+    int     i;
+
+    memcpy( p_vpar->ppi_scan, pi_scan, sizeof(pi_scan) );
+    p_vpar->pf_norm_scan( p_vpar->ppi_scan );
+
+    /* If scan table has changed, we must change the quantization matrices. */
+    for( i = 0; i < 64; i++ )
+    {
+        p_vpar->pi_default_intra_quant[ p_vpar->ppi_scan[0][i] ] =
+            pi_default_intra_quant[ pi_scan[0][i] ];
+        p_vpar->pi_default_nonintra_quant[ p_vpar->ppi_scan[0][i] ] =
+            pi_default_nonintra_quant[ pi_scan[0][i] ];
+    }
+}
+
 
 /*
  * Block parsing
@@ -686,11 +706,6 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
                 
                 break;
             case DCT_EOB:
-#ifdef HAVE_MMX
-                /* The MMX IDCT has a precision problem with non-intra
-                 * blocks. */
-                p_mb->ppi_blocks[i_b][0] += 4;
-#endif
                 if( i_nc <= 1 )
                 {
                     p_mb->pf_idct[i_b] = p_vpar->pf_sparse_idct;
@@ -715,7 +730,7 @@ static __inline__ void DecodeMPEG1NonIntra( vpar_thread_t * p_vpar,
             break;
         }
 
-        i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
+        i_pos = p_vpar->ppi_scan[p_vpar->picture.b_alternate_scan][i_parse];
         i_level = ( ((i_level << 1) + 1) * p_vpar->mb.i_quantizer_scale
                     * p_vpar->sequence.nonintra_quant.pi_matrix[i_pos] ) >> 4;
 
@@ -870,7 +885,7 @@ static __inline__ void DecodeMPEG1Intra( vpar_thread_t * p_vpar,
         }
 
         /* Determine the position of the block in the frame */
-        i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
+        i_pos = p_vpar->ppi_scan[p_vpar->picture.b_alternate_scan][i_parse];
         i_level = ( i_level *
                     p_vpar->mb.i_quantizer_scale *
                     p_vpar->sequence.intra_quant.pi_matrix[i_pos] ) >> 3;
@@ -908,7 +923,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
     boolean_t   b_dc;
     boolean_t   b_sign;
     boolean_t   b_chroma;
-    int *       pi_quant;
+    u8 *        pi_quant;
 
     /* Give the chromatic component (0, 1, 2) */
     i_cc = pi_cc_index[i_b];
@@ -988,7 +1003,7 @@ static __inline__ void DecodeMPEG2NonIntra( vpar_thread_t * p_vpar,
             break;
         }
 
-        i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
+        i_pos = p_vpar->ppi_scan[p_vpar->picture.b_alternate_scan][i_parse];
         i_level = ( ((i_level << 1) + 1) * p_vpar->mb.i_quantizer_scale
                     * pi_quant[i_pos] ) >> 5;
         p_mb->ppi_blocks[i_b][i_pos] = b_sign ? -i_level : i_level;
@@ -1019,7 +1034,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
     boolean_t       b_vlc_intra;
     boolean_t       b_sign;
     boolean_t       b_chroma;
-    int *           pi_quant;
+    u8 *            pi_quant;
     
     /* Give the chromatic component (0, 1, 2) */
     i_cc = pi_cc_index[i_b];
@@ -1132,7 +1147,7 @@ static __inline__ void DecodeMPEG2Intra( vpar_thread_t * p_vpar,
         }
 
         /* Determine the position of the block in the frame */
-        i_pos = pi_scan[p_vpar->picture.b_alternate_scan][i_parse];
+        i_pos = p_vpar->ppi_scan[p_vpar->picture.b_alternate_scan][i_parse];
         i_level = ( i_level *
                     p_vpar->mb.i_quantizer_scale *
                     pi_quant[i_pos] ) >> 4;

@@ -2,7 +2,7 @@
  * vpar_blocks.h : video parser blocks management
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_blocks.h,v 1.1 2000/12/21 17:19:52 massiot Exp $
+ * $Id: vpar_blocks.h,v 1.2 2001/01/17 18:17:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Jean-Marc Dressler <polux@via.ecp.fr>
@@ -157,8 +157,8 @@ typedef struct dct_lookup_s
 /*****************************************************************************
  * Constants
  *****************************************************************************/
-extern int      pi_default_intra_quant[];
-extern int      pi_default_nonintra_quant[];
+extern u8       pi_default_intra_quant[64];
+extern u8       pi_default_nonintra_quant[64];
 extern u8       pi_scan[2][64];
 
 /*****************************************************************************
@@ -170,4 +170,5 @@ void vpar_InitPMBType( struct vpar_thread_s * p_vpar );
 void vpar_InitBMBType( struct vpar_thread_s * p_vpar );
 void vpar_InitCodedPattern( struct vpar_thread_s * p_vpar );
 void vpar_InitDCTTables( struct vpar_thread_s * p_vpar );
+void vpar_InitScanTable( struct vpar_thread_s * p_vpar );
 void vpar_PictureData( struct vpar_thread_s * p_vpar, int i_mb_base );

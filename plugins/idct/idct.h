@@ -2,7 +2,7 @@
  * idct.h : macros for the inverse discrete cosine transform
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct.h,v 1.1 2001/01/13 12:57:20 sam Exp $
+ * $Id: idct.h,v 1.2 2001/01/17 18:17:30 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -26,7 +26,7 @@
 #define DCTSIZE 8 /* 8*8 DCT */
 
 /*****************************************************************************
- *  Macros
+ * Macros
  *****************************************************************************/
 
 /* We assume that right shift corresponds to signed division by 2 with
@@ -139,4 +139,13 @@
 #ifndef MULTIPLY                                       /* default definition */
 #define MULTIPLY(var,const)  ((var) * (const))
 #endif
+
+/*****************************************************************************
+ * Protoypes
+ *****************************************************************************/
+void vdec_SparseIDCT ( vdec_thread_t * p_vdec, dctelem_t * p_block,
+                       int i_sparse_pos);
+void vdec_InitIDCT   ( vdec_thread_t * p_vdec );
+void vdec_IDCT       ( vdec_thread_t * p_vdec, dctelem_t * p_block,
+                       int i_idontcare );
 

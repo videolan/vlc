@@ -2,7 +2,7 @@
  * video_parser.c : video parser thread
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: video_parser.c,v 1.67 2001/01/15 13:25:09 massiot Exp $
+ * $Id: video_parser.c,v 1.68 2001/01/17 18:17:31 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Samuel Hocevar <sam@via.ecp.fr>
@@ -116,6 +116,7 @@ vlc_thread_t vpar_CreateThread( vdec_config_t * p_config )
     p_vpar->pf_init         = idct_functions.pf_init;
     p_vpar->pf_sparse_idct  = idct_functions.pf_sparse_idct;
     p_vpar->pf_idct         = idct_functions.pf_idct;
+    p_vpar->pf_norm_scan    = idct_functions.pf_norm_scan;
 #undef idct_functions
 
     /* Spawn the video parser thread */
@@ -228,6 +229,7 @@ static int InitThread( vpar_thread_t *p_vpar )
     vpar_InitPMBType( p_vpar );
     vpar_InitBMBType( p_vpar );
     vpar_InitDCTTables( p_vpar );
+    vpar_InitScanTable( p_vpar );
 
     /*
      * Initialize the synchro properties

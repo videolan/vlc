@@ -2,7 +2,7 @@
  * vdec_idct.h : types for the inverse discrete cosine transform
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vdec_idct.h,v 1.3 2001/01/13 12:57:47 sam Exp $
+ * $Id: vdec_idct.h,v 1.4 2001/01/17 18:17:30 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -26,4 +26,4 @@ struct vdec_thread_s;
 
 typedef void ( *idct_init_t )   ( struct vdec_thread_s * );
 typedef void ( *f_idct_t )      ( struct vdec_thread_s *, dctelem_t*, int );
-
+typedef void ( *norm_scan_t )   ( u8 ppi_scan[2][64] );

@@ -83,6 +83,7 @@ typedef struct function_list_s
             void ( * pf_idct )         ( struct vdec_thread_s * p_vdec,
                                          dctelem_t * p_block,
                                          int i_idontcare );
+            void ( * pf_norm_scan )    ( u8 ppi_scan[2][64] );
         } idct;
 
         struct

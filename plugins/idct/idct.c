@@ -2,7 +2,7 @@
  * idct.c : IDCT module
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: idct.c,v 1.4 2001/01/16 05:04:25 sam Exp $
+ * $Id: idct.c,v 1.5 2001/01/17 18:17:30 massiot Exp $
  *
  * Authors: Gaël Hendryckx <jimmy@via.ecp.fr>
  *
@@ -50,13 +50,8 @@
  * Local and extern prototypes.
  *****************************************************************************/
 static void idct_getfunctions( function_list_t * p_function_list );
-
 static int  idct_Probe      ( probedata_t *p_data );
-static void vdec_InitIDCT   ( vdec_thread_t * p_vdec);
-       void vdec_SparseIDCT ( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                              int i_sparse_pos);
-static void vdec_IDCT       ( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                              int i_idontcare );
+static void vdec_NormScan   ( u8 ppi_scan[2][64] );
 
 
 /*****************************************************************************
@@ -136,6 +131,7 @@ static void idct_getfunctions( function_list_t * p_function_list )
     p_function_list->functions.idct.pf_init = vdec_InitIDCT;
     p_function_list->functions.idct.pf_sparse_idct = vdec_SparseIDCT;
     p_function_list->functions.idct.pf_idct = vdec_IDCT;
+    p_function_list->functions.idct.pf_norm_scan = vdec_NormScan;
 }
 
 /*****************************************************************************
@@ -153,28 +149,17 @@ static int idct_Probe( probedata_t *p_data )
 }
 
 /*****************************************************************************
- * vdec_InitIDCT : initialize datas for vdec_SparseIDCT
+ * vdec_NormScan : Unused in this IDCT
  *****************************************************************************/
-static void vdec_InitIDCT (vdec_thread_t * p_vdec)
+static void vdec_NormScan( u8 ppi_scan[2][64] )
 {
-    int i;
-
-    dctelem_t * p_pre = p_vdec->p_pre_idct;
-    memset( p_pre, 0, 64*64*sizeof(dctelem_t) );
-
-    for( i=0 ; i < 64 ; i++ )
-    {
-        p_pre[i*64+i] = 1 << SPARSE_SCALE_FACTOR;
-        vdec_IDCT( p_vdec, &p_pre[i*64], 0) ;
-    }
-    return;
 }
 
 /*****************************************************************************
  * vdec_IDCT : IDCT function for normal matrices
  *****************************************************************************/
-static void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block,
-                       int i_idontcare )
+void vdec_IDCT( vdec_thread_t * p_vdec, dctelem_t * p_block,
+                int i_idontcare )
 {
     s32 tmp0, tmp1, tmp2, tmp3;
     s32 tmp10, tmp11, tmp12, tmp13;

@@ -2,7 +2,7 @@
  * vpar_headers.c : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.c,v 1.72 2001/01/16 18:06:01 massiot Exp $
+ * $Id: vpar_headers.c,v 1.73 2001/01/17 18:17:31 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -76,8 +76,7 @@ static void CopyrightExtension( vpar_thread_t * p_vpar );
 /*****************************************************************************
  * pi_default_intra_quant : default quantization matrix
  *****************************************************************************/
-#ifndef VDEC_DFT
-int pi_default_intra_quant[] =
+u8 pi_default_intra_quant[] =
 {
     8,  16, 19, 22, 26, 27, 29, 34,
     16, 16, 22, 24, 27, 29, 34, 37,
@@ -88,25 +87,11 @@ int pi_default_intra_quant[] =
     26, 27, 29, 34, 38, 46, 56, 69,
     27, 29, 35, 38, 46, 56, 69, 83
 };
-#else
-int pi_default_intra_quant[] =
-{
-    2048,   5681,   6355,   6623,   6656,   5431,   4018,   2401,
-    5681,   7880,   10207,  10021,  9587,   8091,   6534,   3625,
-    6355,   10207,  11363,  10619,  9700,   8935,   6155,   3507,
-    6623,   9186,   10226,  9557,   8730,   8041,   6028,   3322,
-    5632,   9232,   9031,   8730,   8192,   7040,   5542,   3390,
-    5230,   7533,   7621,   7568,   7040,   6321,   5225,   3219,
-    3602,   5189,   5250,   5539,   5265,   5007,   4199,   2638,
-    1907,   2841,   3230,   3156,   3249,   3108,   2638,   1617
-};
-#endif
 
 /*****************************************************************************
  * pi_default_nonintra_quant : default quantization matrix
  *****************************************************************************/
-#ifndef VDEC_DFT
-int pi_default_nonintra_quant[] =
+u8 pi_default_nonintra_quant[] =
 {
     16, 16, 16, 16, 16, 16, 16, 16,
     16, 16, 16, 16, 16, 16, 16, 16,
@@ -117,19 +102,6 @@ int pi_default_nonintra_quant[] =
     16, 16, 16, 16, 16, 16, 16, 16,
     16, 16, 16, 16, 16, 16, 16, 16
 };
-#else
-int pi_default_nonintra_quanit[] =
-{
-    4096,   5680,   5344,   4816,   4096,   3216,   2224,   1136,
-    5680,   7888,   7424,   6688,   5680,   4464,   3072,   1568,
-    5344,   7424,   6992,   6288,   5344,   4208,   2896,   1472,
-    4816,   6688,   6288,   5664,   4816,   3792,   2608,   1328,
-    4096,   5680,   5344,   4816,   4096,   3216,   2224,   1136,
-    3216,   4464,   4208,   3792,   3216,   2528,   1744,   880,
-    2224,   3072,   2896,   2608,   2224,   1744,   1200,   608,
-    1136,   1568,   1472,   1328,   1136,   880,    608,    304
-};
-#endif
 
 /*****************************************************************************
  * pi_scan : zig-zag and alternate scan patterns
@@ -211,14 +183,15 @@ static void __inline__ ReferenceReplace( vpar_thread_t * p_vpar,
 /*****************************************************************************
  * LoadMatrix : Load a quantization matrix
  *****************************************************************************/
-static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_matrix )
+static __inline__ void LoadMatrix( vpar_thread_t * p_vpar,
+                                   quant_matrix_t * p_matrix )
 {
     int i_dummy;
 
     if( !p_matrix->b_allocated )
     {
         /* Allocate a piece of memory to load the matrix. */
-        if( (p_matrix->pi_matrix = (int *)malloc( 64*sizeof(int) )) == NULL )
+        if( (p_matrix->pi_matrix = (u8 *)malloc( 64*sizeof(u8) )) == NULL )
         {
             intf_ErrMsg( "vpar error: allocation error in LoadMatrix()" );
             p_vpar->p_fifo->b_error = 1;
@@ -229,7 +202,7 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_ma
 
     for( i_dummy = 0; i_dummy < 64; i_dummy++ )
     {
-        p_matrix->pi_matrix[pi_scan[SCAN_ZIGZAG][i_dummy]]
+        p_matrix->pi_matrix[p_vpar->ppi_scan[SCAN_ZIGZAG][i_dummy]]
              = GetBits( &p_vpar->bit_stream, 8 );
     }
 
@@ -243,7 +216,7 @@ static __inline__ void LoadMatrix( vpar_thread_t * p_vpar, quant_matrix_t * p_ma
 /*****************************************************************************
  * LinkMatrix : Link a quantization matrix to another
  *****************************************************************************/
-static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, int * pi_array )
+static __inline__ void LinkMatrix( quant_matrix_t * p_matrix, u8 * pi_array )
 {
     if( p_matrix->b_allocated )
     {
@@ -366,7 +339,8 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     else
     {
         /* Use default matrix. */
-        LinkMatrix( &p_vpar->sequence.intra_quant, pi_default_intra_quant );
+        LinkMatrix( &p_vpar->sequence.intra_quant,
+                    p_vpar->pi_default_intra_quant );
     }
 
     if( GetBits( &p_vpar->bit_stream, 1 ) ) /* load_non_intra_quantizer_matrix */
@@ -376,7 +350,8 @@ static void SequenceHeader( vpar_thread_t * p_vpar )
     else
     {
         /* Use default matrix. */
-        LinkMatrix( &p_vpar->sequence.nonintra_quant, pi_default_nonintra_quant );
+        LinkMatrix( &p_vpar->sequence.nonintra_quant,
+                    p_vpar->pi_default_nonintra_quant );
     }
 
     /* Unless later overwritten by a matrix extension, we have the same
@@ -905,7 +880,7 @@ static void QuantMatrixExtension( vpar_thread_t * p_vpar )
     {
         /* Use the default matrix. */
         LinkMatrix( &p_vpar->sequence.intra_quant,
-                    pi_default_intra_quant );
+                    p_vpar->pi_default_intra_quant );
     }
     if( GetBits( &p_vpar->bit_stream, 1 ) )
     {
@@ -916,7 +891,7 @@ static void QuantMatrixExtension( vpar_thread_t * p_vpar )
     {
         /* Use the default matrix. */
         LinkMatrix( &p_vpar->sequence.nonintra_quant,
-                    pi_default_nonintra_quant );
+                    p_vpar->pi_default_nonintra_quant );
     }
     if( GetBits( &p_vpar->bit_stream, 1 ) )
     {

@@ -2,7 +2,7 @@
  * vpar_headers.h : video parser : headers parsing
  *****************************************************************************
  * Copyright (C) 1999, 2000 VideoLAN
- * $Id: vpar_headers.h,v 1.3 2001/01/15 18:02:48 massiot Exp $
+ * $Id: vpar_headers.h,v 1.4 2001/01/17 18:17:30 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Stéphane Borel <stef@via.ecp.fr>
@@ -40,7 +40,7 @@
  *****************************************************************************/
 typedef struct quant_matrix_s
 {
-    int *       pi_matrix;
+    u8 *        pi_matrix;
     boolean_t   b_allocated;
                           /* Has the matrix been allocated by vpar_headers ? */
 } quant_matrix_t;
