@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="iso8859-1" ?>
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1//EN" "/usr/share/sgml/docbook/dtd/xml/4.1.2/docbookx.dtd">
 
+<!-- vim: set ts=2 sts=2 sw=2 et -->
+
 <article id="skin-creation-howto">
 
 <articleinfo>
@@ -84,7 +86,7 @@ difficulty to understand how VLC skins work.</para>
 <sect1>
 <title>The bitmaps</title>
 
-<para>Basically, you need one bitmap file (in PNG format) by state of control. For example, with a Image control you need 1 image, with a Button control you need 3 images (for the up, down and mouseover states). Of course, the same bitmap file can be used for many controls, provided you want to display the same image!</para>
+<para>Basically, you need one bitmap file (in PNG format) by state of control. For example, with a <link linkend="Image">Image</link> control you need 1 image, with a <link linkend="Button">Button</link> control you need 3 images (for the up, down and mouseover states). Of course, the same bitmap file can be used for many controls, provided you want to display the same image!</para>
 
 <para>The PNG format allows setting a transparency mask, which will be used wherever the image needs to be displayed (only non-transparent parts will be drawn). In addition, you can also specify a transparency color in the XML file: the bitmap will be considered as transparent wherever this color appears in the bitmap file.</para>
 
@@ -861,7 +863,7 @@ VLC is able to give warnings and error messages about a loaded skin if it finds 
   <listitem><para>on Linux, simply start VLC from a console with the following command-line: 'vlc -I skins2 -v' (you can use -vv if you want to see debug messages too),</para></listitem>
   <listitem><para>on Windows it is more difficult to use the same method (but you can use it with a rxvt console, in the Cygwin environment). Then another solution is to start VLC with a command-line such as 'vlc -I skins2 -v --extraintf logger'. This should open both VLC and a log window containing the messages. What's more, the logs should be saved in a file named 'vlc-log.txt', in VLC installation directory. The relevant lines are those starting with "[00000178] skins2 interface" (the number may be different).</para></listitem>
 </itemizedlist>
-  
+
   </sect2>
 
   <sect2>
