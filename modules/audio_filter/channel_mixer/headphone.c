@@ -3,7 +3,7 @@
  *               -> gives the feeling of a real room with a simple headphone
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: headphone.c,v 1.1 2002/12/09 00:52:42 babal Exp $
+ * $Id: headphone.c,v 1.2 2003/02/11 11:16:04 massiot Exp $
  *
  * Authors: Boris Dorès <babal@via.ecp.fr>
  *
@@ -260,6 +260,8 @@ static int Create( vlc_object_t *p_this )
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
     if ( p_filter->output.i_physical_channels != ( AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT )
+          || (p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLELEFT)
+          || (p_filter->input.i_physical_channels & AOUT_CHAN_MIDDLERIGHT)
           || p_filter->input.i_format != p_filter->output.i_format
           || p_filter->input.i_rate != p_filter->output.i_rate
           || (p_filter->input.i_format != VLC_FOURCC('f','l','3','2')

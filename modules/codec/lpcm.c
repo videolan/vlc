@@ -2,7 +2,7 @@
  * lpcm.c: lpcm decoder module
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: lpcm.c,v 1.10 2003/01/02 20:48:28 gbazin Exp $
+ * $Id: lpcm.c,v 1.11 2003/02/11 11:16:04 massiot Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Henri Fallon <henri@videolan.org>
@@ -176,7 +176,7 @@ static void DecodeFrame( dec_thread_t * p_dec )
     aout_buffer_t *    p_buffer;
     mtime_t            i_pts;
     uint8_t            i_header;
-    unsigned int       i_rate, i_original_channels, i_nb_channels;
+    unsigned int       i_rate, i_original_channels;
 
     /* Look for sync word - should be 0xXX80 */
     RealignBits( &p_dec->bit_stream );
@@ -214,32 +214,41 @@ static void DecodeFrame( dec_thread_t * p_dec )
     {
     case 0:
         i_original_channels = AOUT_CHAN_CENTER;
-        i_nb_channels = 1;
         break;
     case 1:
         i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-        i_nb_channels = 2;
+        break;
+    case 2:
+        /* This is unsure. */
+        i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_LFE;
         break;
     case 3:
         i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT;
-        i_nb_channels = 4;
+        break;
+    case 4:
+        /* This is unsure. */
+        i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                               | AOUT_CHAN_LFE;
         break;
     case 5:
         i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
                                | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
                                | AOUT_CHAN_CENTER | AOUT_CHAN_LFE;
-        i_nb_channels = 6;
         break;
-    case 2:
-    case 4:
     case 6:
+        i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                               | AOUT_CHAN_CENTER | AOUT_CHAN_MIDDLELEFT
+                               | AOUT_CHAN_MIDDLERIGHT;
+        break;
     case 7:
-    default:
-        msg_Err( p_dec->p_fifo, "unsupported LPCM channels (0x%x)",
-                 i_header );
-        p_dec->p_fifo->b_error = 1;
-        return;
+        i_original_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT
+                               | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT
+                               | AOUT_CHAN_CENTER | AOUT_CHAN_MIDDLELEFT
+                               | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE;
+        break;
     }
 
     if( (p_dec->p_aout_input != NULL) &&

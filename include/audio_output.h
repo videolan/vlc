@@ -2,7 +2,7 @@
  * audio_output.h : audio output interface
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: audio_output.h,v 1.78 2003/02/09 01:13:43 massiot Exp $
+ * $Id: audio_output.h,v 1.79 2003/02/11 11:16:04 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -111,7 +111,9 @@ typedef int32_t vlc_fixed_t;
 #define AOUT_CHAN_REARCENTER        0x10
 #define AOUT_CHAN_REARLEFT          0x20
 #define AOUT_CHAN_REARRIGHT         0x40
-#define AOUT_CHAN_LFE               0x100
+#define AOUT_CHAN_MIDDLELEFT        0x100
+#define AOUT_CHAN_MIDDLERIGHT       0x200
+#define AOUT_CHAN_LFE               0x1000
 
 /* Values available for original channels only */
 #define AOUT_CHAN_DOLBYSTEREO       0x10000

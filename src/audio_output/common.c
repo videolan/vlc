@@ -2,7 +2,7 @@
  * common.c : audio output management of common data structures
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: common.c,v 1.16 2003/01/23 17:13:28 massiot Exp $
+ * $Id: common.c,v 1.17 2003/02/11 11:16:04 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -99,7 +99,7 @@ unsigned int aout_FormatNbChannels( const audio_sample_format_t * p_format )
     static const uint32_t pi_channels[] =
         { AOUT_CHAN_CENTER, AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
           AOUT_CHAN_REARCENTER, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
-          AOUT_CHAN_LFE };
+          AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT, AOUT_CHAN_LFE };
     unsigned int i_nb = 0, i;
 
     for ( i = 0; i < sizeof(pi_channels)/sizeof(uint32_t); i++ )
@@ -235,6 +235,14 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
     case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
           | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE:
         return "3F2R/LFE";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT
+          | AOUT_CHAN_MIDDLERIGHT:
+        return "3F2M2R";
+    case AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
+          | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT
+          | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE:
+        return "3F2M2R/LFE";
     }
 
     return "ERROR";
