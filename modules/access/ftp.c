@@ -2,7 +2,7 @@
  * ftp.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: ftp.c,v 1.16 2003/04/30 09:11:13 gbazin Exp $
+ * $Id: ftp.c,v 1.17 2003/05/08 19:06:33 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -64,12 +64,12 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static int  Open        ( vlc_object_t * );
-static void Close       ( vlc_object_t * );
+static int     Open     ( vlc_object_t * );
+static void    Close    ( vlc_object_t * );
 
-static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
+static ssize_t Read     ( input_thread_t * p_input, byte_t * p_buffer,
                           size_t i_len );
-static void Seek        ( input_thread_t *, off_t );
+static void    Seek     ( input_thread_t *, off_t );
 
 
 static ssize_t NetRead ( input_thread_t *, input_socket_t *, byte_t *, size_t );
@@ -438,7 +438,7 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
-static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
+static ssize_t Read     ( input_thread_t * p_input, byte_t * p_buffer,
                           size_t i_len )
 {
     access_t    *p_access = (access_t*)p_input->p_access_data;
@@ -454,13 +454,13 @@ static int  ftp_SendCommand( input_thread_t *p_input, char *psz_fmt, ... )
     access_t        *p_access = (access_t*)p_input->p_access_data;
     va_list args;
     char    *psz_buffer;
-#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN)
+#if !defined(HAVE_VASPRINTF) || defined(SYS_DARWIN) || defined(SYS_BEOS)
         size_t  i_size;
 #endif
 
     va_start( args, psz_fmt );
 
-#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN)
+#if defined(HAVE_VASPRINTF) && !defined(SYS_DARWIN) && !defined(SYS_BEOS)
     vasprintf( &psz_buffer, psz_fmt, args );
 #else
     i_size = strlen( psz_fmt ) + 2048;

@@ -6,7 +6,7 @@
  * It depends on: libdvdread for ifo files and block reading.
  *****************************************************************************
  * Copyright (C) 2001, 2003 VideoLAN
- * $Id: input.c,v 1.21 2003/05/05 22:23:33 gbazin Exp $
+ * $Id: input.c,v 1.22 2003/05/08 19:06:44 titer Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -84,18 +84,18 @@ struct demux_sys_t
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int  DvdReadDemux    ( input_thread_t * );
-static int  DvdReadRewind   ( input_thread_t * );
+static int     DvdReadDemux    ( input_thread_t * );
+static int     DvdReadRewind   ( input_thread_t * );
 
-static int  DvdReadSetArea    ( input_thread_t *, input_area_t * );
-static int  DvdReadSetProgram ( input_thread_t *, pgrm_descriptor_t * );
-static int  DvdReadRead       ( input_thread_t *, byte_t *, size_t );
-static void DvdReadSeek       ( input_thread_t *, off_t );
+static int     DvdReadSetArea    ( input_thread_t *, input_area_t * );
+static int     DvdReadSetProgram ( input_thread_t *, pgrm_descriptor_t * );
+static ssize_t DvdReadRead       ( input_thread_t *, byte_t *, size_t );
+static void    DvdReadSeek       ( input_thread_t *, off_t );
 
 /* called only from here */
-static void DvdReadLauchDecoders( input_thread_t * p_input );
-static void DvdReadHandleDSI( thread_dvd_data_t * p_dvd, uint8_t * p_data );
-static void DvdReadFindCell ( thread_dvd_data_t * p_dvd );
+static void    DvdReadLauchDecoders( input_thread_t * p_input );
+static void    DvdReadHandleDSI( thread_dvd_data_t * p_dvd, uint8_t * p_data );
+static void    DvdReadFindCell ( thread_dvd_data_t * p_dvd );
 
 /*
  * Data demux functions
@@ -856,8 +856,8 @@ static int DvdReadSetArea( input_thread_t * p_input, input_area_t * p_area )
  * Returns -1 in case of error, 0 in case of EOF, otherwise the number of
  * bytes.
  *****************************************************************************/
-static int DvdReadRead( input_thread_t * p_input,
-                        byte_t * p_buffer, size_t i_count )
+static ssize_t DvdReadRead( input_thread_t * p_input,
+                            byte_t * p_buffer, size_t i_count )
 {
     thread_dvd_data_t *     p_dvd;
     byte_t *                p_buf;

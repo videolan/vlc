@@ -2,7 +2,7 @@
  * mmsh.c:
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmsh.c,v 1.2 2003/04/25 17:33:57 fenrir Exp $
+ * $Id: mmsh.c,v 1.3 2003/05/08 19:06:45 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -75,9 +75,9 @@
 int  E_( MMSHOpen )  ( input_thread_t * );
 void E_( MMSHClose ) ( input_thread_t * );
 
-static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
-                          size_t i_len );
-static void Seek        ( input_thread_t *, off_t );
+static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
+                             size_t i_len );
+static void    Seek        ( input_thread_t *, off_t );
 
 /****************************************************************************
  ****************************************************************************
@@ -432,8 +432,8 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
 /*****************************************************************************
  * Read:
  *****************************************************************************/
-static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
-                          size_t i_len )
+static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
+                             size_t i_len )
 {
     access_sys_t *p_sys = p_input->p_access_data;
     size_t       i_copy;

@@ -2,7 +2,7 @@
  * mms.c: MMS access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: mmstu.c,v 1.1 2003/04/20 19:29:43 fenrir Exp $
+ * $Id: mmstu.c,v 1.2 2003/05/08 19:06:45 titer Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -77,24 +77,24 @@ int  E_( MMSTUOpen )  ( input_thread_t * );
 void E_( MMSTUClose ) ( input_thread_t * );
 
 
-static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
-                          size_t i_len );
-static void Seek        ( input_thread_t *, off_t );
+static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
+                             size_t i_len );
+static void    Seek        ( input_thread_t *, off_t );
 
-static int MMSOpen( input_thread_t  *, url_t *, int, char * );
+static int    MMSOpen( input_thread_t  *, url_t *, int, char * );
 
-static int MMSStart  ( input_thread_t  *, uint32_t );
-static int MMSStop  ( input_thread_t  *p_input );
+static int    MMSStart  ( input_thread_t  *, uint32_t );
+static int    MMSStop  ( input_thread_t  *p_input );
 
-static int MMSClose  ( input_thread_t  * );
+static int    MMSClose  ( input_thread_t  * );
 
 
-static int  mms_CommandRead( input_thread_t *p_input, int i_command1, int i_command2 );
-static int  mms_CommandSend( input_thread_t *, int, uint32_t, uint32_t, uint8_t *, int );
+static int     mms_CommandRead( input_thread_t *p_input, int i_command1, int i_command2 );
+static int     mms_CommandSend( input_thread_t *, int, uint32_t, uint32_t, uint8_t *, int );
 
-static int  mms_HeaderMediaRead( input_thread_t *, int );
+static int     mms_HeaderMediaRead( input_thread_t *, int );
 
-static int  mms_ReceivePacket( input_thread_t * );
+static int     mms_ReceivePacket( input_thread_t * );
 
 //static void mms_ParseURL( url_t *p_url, char *psz_url );
 
@@ -356,8 +356,8 @@ static void Seek( input_thread_t * p_input, off_t i_pos )
     vlc_mutex_unlock( &p_input->stream.stream_lock );
 }
 
-static int  Read        ( input_thread_t * p_input, byte_t * p_buffer,
-                          size_t i_len )
+static ssize_t Read        ( input_thread_t * p_input, byte_t * p_buffer,
+                             size_t i_len )
 {
     access_sys_t    *p_sys = p_input->p_access_data;
     size_t      i_data;

@@ -2,7 +2,7 @@
  * access.c: access capabilities for dvdplay plugin.
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: access.c,v 1.17 2003/05/04 22:42:14 gbazin Exp $
+ * $Id: access.c,v 1.18 2003/05/08 19:06:44 titer Exp $
  *
  * Author: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -54,12 +54,12 @@
  * Local prototypes
  *****************************************************************************/
 /* called from outside */
-static int    dvdplay_SetArea       ( input_thread_t *, input_area_t * );
-static int    dvdplay_SetProgram    ( input_thread_t *, pgrm_descriptor_t * );
-static int    dvdplay_Read          ( input_thread_t *, byte_t *, size_t );
-static void   dvdplay_Seek          ( input_thread_t *, off_t );
+static int     dvdplay_SetArea       ( input_thread_t *, input_area_t * );
+static int     dvdplay_SetProgram    ( input_thread_t *, pgrm_descriptor_t * );
+static ssize_t dvdplay_Read          ( input_thread_t *, byte_t *, size_t );
+static void    dvdplay_Seek          ( input_thread_t *, off_t );
 
-static void   pf_vmg_callback       ( void*, dvdplay_event_t );
+static void    pf_vmg_callback       ( void*, dvdplay_event_t );
 
 /* only from inside */
 static int dvdNewArea( input_thread_t *, input_area_t * );
@@ -331,7 +331,7 @@ static int dvdplay_SetArea( input_thread_t * p_input, input_area_t * p_area )
  * Returns -1 in case of error, the number of bytes read if everything went
  * well.
  *****************************************************************************/
-static int dvdplay_Read( input_thread_t * p_input,
+static ssize_t dvdplay_Read( input_thread_t * p_input,
                          byte_t * p_buffer, size_t i_count )
 {
     dvd_data_t *    p_dvd;
@@ -342,7 +342,7 @@ static int dvdplay_Read( input_thread_t * p_input,
     vlc_mutex_lock( &p_input->stream.stream_lock );
     i_read = LB2OFF( dvdplay_read( p_dvd->vmg, p_buffer, OFF2LB( i_count ) ) );
     vlc_mutex_unlock( &p_input->stream.stream_lock );
-
+    
     return i_read;
 }
 
