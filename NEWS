@@ -1,4 +1,29 @@
-$Id: NEWS,v 1.64 2003/08/13 01:45:13 gbazin Exp $
+$Id: NEWS,v 1.65 2003/08/24 17:24:33 gbazin Exp $
+
+Changes between 0.6.2 and HEAD:
+---------------------------------
+
+Stream output:
+ * MPEG TS muxer follows the ATSC/DVB specs for embedded A52 audio.
+
+Input demux:
+ * MPEG TS demuxer also handles A52 audio in DVB streams.
+ * Fixed seeking support in FLAC files.
+
+Codecs:
+ * Support for AAC + SBR.
+
+Mac OS X port:
+ * Mozilla plugin for Mac OS X.
+
+Win32 port:
+ * New DirectShow input module (for video acquisition cards, webcams...).
+ * VLC can be installed as a Windows NT service.
+ * Support for 3F2R in audio output.
+
+Miscellaneous:
+ * Text subtitles filename and charset autodetection.
+ * Audio visual effects filter using goom.
 
 Changes between 0.6.1 and 0.6.2:
 ---------------------------------
