@@ -277,7 +277,8 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         /* Add Navigation entries */
         sprintf( val.psz_string,  "title %2i", i );
         var_Destroy( p_input, val.psz_string );
-        var_Create( p_input, val.psz_string, VLC_VAR_INTEGER|VLC_VAR_HASCHOICE|VLC_VAR_ISCOMMAND );
+        var_Create( p_input, val.psz_string,
+                    VLC_VAR_INTEGER|VLC_VAR_HASCHOICE|VLC_VAR_ISCOMMAND );
         var_AddCallback( p_input, val.psz_string, NavigationCallback, (void *)i );
 
         if( p_input->title[i]->psz_name == NULL ||
@@ -411,8 +412,9 @@ void input_ConfigVarInit ( input_thread_t *p_input )
 /*****************************************************************************
  * All Callbacks:
  *****************************************************************************/
-static int StateCallback   ( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
+                          vlc_value_t oldval, vlc_value_t newval,
+                          void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
 
@@ -425,8 +427,8 @@ static int StateCallback   ( vlc_object_t *p_this, char const *psz_cmd,
 
     return VLC_EGENERIC;
 }
-static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t val;
@@ -461,7 +463,8 @@ static int RateCallback    ( vlc_object_t *p_this, char const *psz_cmd,
 }
 
 static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                             vlc_value_t oldval, vlc_value_t newval,
+                             void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t val, length;
@@ -493,8 +496,8 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
 }
 
 
-static int TimeCallback    ( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t val, length;
@@ -525,8 +528,9 @@ static int TimeCallback    ( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int ProgramCallback ( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int ProgramCallback( vlc_object_t *p_this, char const *psz_cmd,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
 
@@ -535,8 +539,9 @@ static int ProgramCallback ( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int TitleCallback   ( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
+                          vlc_value_t oldval, vlc_value_t newval,
+                          void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t val, count;
@@ -567,7 +572,8 @@ static int TitleCallback   ( vlc_object_t *p_this, char const *psz_cmd,
 }
 
 static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                              vlc_value_t oldval, vlc_value_t newval,
+                              void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t val, count;
@@ -598,7 +604,8 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
 }
 
 static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                               vlc_value_t oldval, vlc_value_t newval,
+                               void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
     vlc_value_t     val;
@@ -617,8 +624,8 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int ESCallback      ( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int ESCallback( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
 
@@ -658,7 +665,8 @@ static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
 }
 
 static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
-                             vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                             vlc_value_t oldval, vlc_value_t newval,
+                             void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
 
@@ -666,4 +674,3 @@ static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     return VLC_SUCCESS;
 }
-

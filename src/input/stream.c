@@ -47,15 +47,15 @@
 #define STREAM_CACHE_SIZE  (4*STREAM_CACHE_TRACK*1024*1024)
   /* How many data we try to prebuffer */
 #define STREAM_CACHE_PREBUFFER_SIZE (32767)
-
-#define STREAM_CACHE_PREBUFFER_LENGTH (100*1000)    /* Maximum time we take to pre-buffer */
+/* Maximum time we take to pre-buffer */
+#define STREAM_CACHE_PREBUFFER_LENGTH (100*1000)
 
 
 /* Method1: Simple, for pf_block.
  *  We get blocks and put them in the linked list.
  *  We release blocks once the total size is bigger than CACHE_BLOCK_SIZE
  */
-#define STREAM_DATA_WAIT 40000                     /* Time between before a pf_block retry */
+#define STREAM_DATA_WAIT 40000       /* Time between before a pf_block retry */
 
 /* Method2: A bit more complex, for pf_read
  *  - We use ring buffers, only one if unseekable, all if seekable
@@ -106,7 +106,7 @@ struct stream_sys_t
     /* Method 2: for pf_read */
     struct
     {
-        int i_offset;   /* Buffer ofset in the current track */
+        int i_offset;   /* Buffer offset in the current track */
         int i_tk;       /* Current track */
         stream_track_t tk[STREAM_CACHE_TRACK];
 
@@ -226,7 +226,8 @@ stream_t *stream_AccessNew( access_t *p_access )
         p_sys->stream.i_tk     = 0;
         p_sys->stream.p_buffer = malloc( STREAM_CACHE_SIZE );
         p_sys->stream.i_used   = 0;
-        access2_Control( p_access, ACCESS_GET_MTU, &p_sys->stream.i_read_size );
+        access2_Control( p_access, ACCESS_GET_MTU,
+                         &p_sys->stream.i_read_size );
         if( p_sys->stream.i_read_size <= 0 )
             p_sys->stream.i_read_size = STREAM_READ_ATONCE;
         else if( p_sys->stream.i_read_size <= 256 )
@@ -477,13 +478,16 @@ static int AStreamReadBlock( stream_t *s, void *p_read, int i_read )
 
     while( i_data < i_read )
     {
-        int i_current = p_sys->block.p_current->i_buffer - p_sys->block.i_offset;
+        int i_current =
+            p_sys->block.p_current->i_buffer - p_sys->block.i_offset;
         int i_copy = __MIN( i_current, i_read - i_data);
 
         /* Copy data */
         if( p_data )
         {
-            memcpy( p_data, &p_sys->block.p_current->p_buffer[p_sys->block.i_offset], i_copy );
+            memcpy( p_data,
+                    &p_sys->block.p_current->p_buffer[p_sys->block.i_offset],
+                    i_copy );
             p_data += i_copy;
         }
         i_data += i_copy;
@@ -536,7 +540,8 @@ static int AStreamPeekBlock( stream_t *s, uint8_t **pp_peek, int i_read )
     }
 
     /* Fill enough data */
-    while( p_sys->block.i_size - (p_sys->i_pos - p_sys->block.i_start) < i_read )
+    while( p_sys->block.i_size - (p_sys->i_pos - p_sys->block.i_start)
+           < i_read )
     {
         block_t **pp_last = p_sys->block.pp_last;
 
@@ -785,8 +790,7 @@ static int AStreamReadStream( stream_t *s, void *p_read, int i_read )
     uint8_t *p_data = (uint8_t *)p_read;
     int      i_data = 0;
 
-    if( tk->i_start >= tk->i_end  )
-        return 0;   /* EOF */
+    if( tk->i_start >= tk->i_end ) return 0; /* EOF */
 
 #if 0
     msg_Dbg( s, "AStreamReadStream: %d pos="I64Fd" tk=%d start="I64Fd
@@ -1015,8 +1019,9 @@ static int AStreamRefillStream( stream_t *s )
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
 
     /* We read but won't increase i_start after initial start + offset */
-    int i_toread = __MIN( p_sys->stream.i_used, STREAM_CACHE_TRACK_SIZE -
-                          (tk->i_end - tk->i_start - p_sys->stream.i_offset) );
+    int i_toread =
+        __MIN( p_sys->stream.i_used, STREAM_CACHE_TRACK_SIZE -
+               (tk->i_end - tk->i_start - p_sys->stream.i_offset) );
     int64_t i_start, i_stop;
 
     if( i_toread <= 0 ) return VLC_EGENERIC; /* EOF */
@@ -1058,7 +1063,6 @@ static int AStreamRefillStream( stream_t *s )
             p_sys->stream.i_offset -= i_invalid;
         }
 
-
         i_toread -= i_read;
         p_sys->stream.i_used -= i_read;
 
@@ -1089,9 +1093,8 @@ static void AStreamPrebufferStream( stream_t *s )
         int64_t i_date = mdate();
         int i_read;
 
-        if( s->b_die ||
-            tk->i_end >= STREAM_CACHE_PREBUFFER_SIZE ||
-            ( i_first > 0 && i_first + STREAM_CACHE_PREBUFFER_LENGTH < i_date ) )
+        if( s->b_die || tk->i_end >= STREAM_CACHE_PREBUFFER_SIZE ||
+            (i_first > 0 && i_first + STREAM_CACHE_PREBUFFER_LENGTH < i_date) )
         {
             int64_t i_byterate;
 
@@ -1175,4 +1178,3 @@ char *stream_ReadLine( stream_t *s )
         return p_line;
     }
 }
-

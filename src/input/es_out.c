@@ -245,7 +245,8 @@ void input_EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
 /*****************************************************************************
  *
  *****************************************************************************/
-static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es )
+static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es,
+                              vlc_bool_t b_delete )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
@@ -261,6 +262,14 @@ static void EsOutESVarUpdate( es_out_t *out, es_out_id_t *es )
         psz_var = "spu-es";
     else
         return;
+
+    if( b_delete )
+    {
+        val.i_int = es->i_id;
+        var_Change( p_input, psz_var, VLC_VAR_DELCHOICE, &val, NULL );
+        var_SetBool( p_sys->p_input, "intf-change", VLC_TRUE );
+        return;
+    }
 
     /* Get the number of ES already added */
     var_Change( p_input, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
@@ -342,7 +351,7 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     var_Change( p_input, "spu-es",   VLC_VAR_CLEARCHOICES, NULL, NULL );
     for( i = 0; i < p_sys->i_es; i++ )
     {
-        EsOutESVarUpdate( out, p_sys->es[i] );
+        EsOutESVarUpdate( out, p_sys->es[i], VLC_FALSE );
         EsOutSelect( out, p_sys->es[i], VLC_FALSE );
     }
 
@@ -448,7 +457,7 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
     es->p_dec = NULL;
 
     if( es->p_pgrm == p_sys->p_pgrm )
-        EsOutESVarUpdate( out, es );
+        EsOutESVarUpdate( out, es, VLC_FALSE );
 
 #if 0
     /* Add stream info */
@@ -555,18 +564,22 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
 
     if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
     {
-        if( !var_GetBool( p_input, "video" ) || ( p_input->p_sout && !var_GetBool( p_input, "sout-video" ) ) )
+        if( !var_GetBool( p_input, "video" ) ||
+            ( p_input->p_sout && !var_GetBool( p_input, "sout-video" ) ) )
         {
-            msg_Dbg( p_input, "video is disabled, not selecting ES 0x%x", es->i_id );
+            msg_Dbg( p_input, "video is disabled, not selecting ES 0x%x",
+                     es->i_id );
             return;
         }
     }
     else if( es->fmt.i_cat == AUDIO_ES )
     {
         var_Get( p_input, "audio", &val );
-        if( !var_GetBool( p_input, "audio" ) || ( p_input->p_sout && !var_GetBool( p_input, "sout-audio" ) ) )
+        if( !var_GetBool( p_input, "audio" ) ||
+            ( p_input->p_sout && !var_GetBool( p_input, "sout-audio" ) ) )
         {
-            msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x", es->i_id );
+            msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
+                     es->i_id );
             return;
         }
     }
@@ -785,12 +798,16 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
     if( es->p_dec )
         EsUnselect( out, es, es->p_pgrm == p_sys->p_pgrm );
 
+    if( es->p_pgrm == p_sys->p_pgrm )
+        EsOutESVarUpdate( out, es, VLC_TRUE );
+
     TAB_REMOVE( p_sys->i_es, p_sys->es, es );
 
     es->p_pgrm->i_es--;
     if( es->p_pgrm->i_es == 0 )
     {
-        msg_Err( p_sys->p_input, "Program doesn't have es anymore, clenaing TODO ?" );
+        msg_Err( p_sys->p_input, "Program doesn't contain anymore ES, "
+                 "TODO cleaning ?" );
     }
 
     if( p_sys->p_es_audio == es ) p_sys->p_es_audio = NULL;
@@ -885,7 +902,8 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
                 {
                     if( p_sys->es[i]->p_dec )
                     {
-                        EsUnselect( out, p_sys->es[i], p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
+                        EsUnselect( out, p_sys->es[i],
+                                    p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
                     }
                 }
                 for( i = 0; i < p_sys->i_es; i++ )
@@ -917,24 +935,30 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
             {
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
-                    if( p_sys->es[i]->p_dec && p_sys->es[i]->fmt.i_cat == AUDIO_ES )
-                        EsUnselect( out, p_sys->es[i], p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
+                    if( p_sys->es[i]->p_dec &&
+                        p_sys->es[i]->fmt.i_cat == AUDIO_ES )
+                        EsUnselect( out, p_sys->es[i],
+                                    p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
                 }
             }
             else if( es == (es_out_id_t*)((uint8_t*)NULL+VIDEO_ES) )
             {
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
-                    if( p_sys->es[i]->p_dec && p_sys->es[i]->fmt.i_cat == VIDEO_ES )
-                        EsUnselect( out, p_sys->es[i], p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
+                    if( p_sys->es[i]->p_dec &&
+                        p_sys->es[i]->fmt.i_cat == VIDEO_ES )
+                        EsUnselect( out, p_sys->es[i],
+                                    p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
                 }
             }
             else if( es == (es_out_id_t*)((uint8_t*)NULL+SPU_ES) )
             {
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
-                    if( p_sys->es[i]->p_dec && p_sys->es[i]->fmt.i_cat == SPU_ES )
-                        EsUnselect( out, p_sys->es[i], p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
+                    if( p_sys->es[i]->p_dec &&
+                        p_sys->es[i]->fmt.i_cat == SPU_ES )
+                        EsUnselect( out, p_sys->es[i],
+                                    p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
                 }
             }
             else
@@ -979,8 +1003,9 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 
             i_pcr = (int64_t)va_arg( args, int64_t );
             /* search program */
-                /* 11 is a vodoo trick to avoid non_pcr*9/100 to be null */
-                input_ClockSetPCR( p_sys->p_input, &p_pgrm->clock, (i_pcr + 11 ) * 9 / 100);
+            /* 11 is a vodoo trick to avoid non_pcr*9/100 to be null */
+            input_ClockSetPCR( p_sys->p_input, &p_pgrm->clock,
+                               (i_pcr + 11 ) * 9 / 100);
             return VLC_SUCCESS;
         }
 
