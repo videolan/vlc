@@ -292,11 +292,11 @@ input_thread_t *__input_CreateThread( vlc_object_t *p_parent, char *psz_uri,
                 }
                 else if( !strncmp( psz_start, "bytes=", 6 ) )
                 {
-                    seekpoint.i_byte_offset = atol(psz_start + 6);
+                    seekpoint.i_byte_offset = atoll(psz_start + 6);
                 }
                 else if( !strncmp( psz_start, "time=", 5 ) )
                 {
-                    seekpoint.i_time_offset = atol(psz_start + 5) * 1000000;
+                    seekpoint.i_time_offset = atoll(psz_start + 5) * 1000000;
                 }
                 psz_start = psz_end + 1;
             }
