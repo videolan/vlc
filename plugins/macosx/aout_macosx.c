@@ -2,7 +2,7 @@
  * aout_macosx.c : CoreAudio output plugin
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: aout_macosx.c,v 1.16 2002/03/22 00:47:47 jlj Exp $
+ * $Id: aout_macosx.c,v 1.17 2002/03/27 22:15:40 massiot Exp $
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -26,6 +26,11 @@
  * Preamble
  *****************************************************************************/
 #include <string.h>
+#include <mach/mach_init.h>
+#include <mach/task_policy.h>
+#include <mach/thread_act.h>
+#include <mach/thread_policy.h>
+#include <sys/sysctl.h>
 
 #include <videolan/vlc.h>
 
@@ -99,6 +104,12 @@ static int aout_Open( aout_thread_t *p_aout )
     OSStatus err;
     UInt32 ui_param_size;
 
+    struct thread_time_constraint_policy ttcpolicy;
+    int mib[2];
+    unsigned int miblen;
+    int i_busspeed;
+    size_t len;
+
     /* allocate instance */
     p_aout->p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_aout->p_sys == NULL )
@@ -167,6 +178,40 @@ static int aout_Open( aout_thread_t *p_aout )
     {
         intf_ErrMsg( "aout error: CABeginFormat failed" );
         return( -1 );
+    }
+
+    /* Go to time-constrained thread policy */
+
+    /* Get bus speed */
+    mib[0] = CTL_HW;
+    mib[1] = HW_BUS_FREQ;
+    miblen = 2;
+    len = 4;
+    if( sysctl(mib, miblen, &i_busspeed, &len, NULL, 0) == -1 )
+    {
+        intf_ErrMsg("vout error: couldn't go to time-constrained policy (bus speed)");
+    }
+    else
+    {
+        /* This is in AbsoluteTime units, which are equal to
+         * 1/4 the bus speed on most machines. */
+        /* FIXME : these are random numbers ! */
+        /* hard-coded numbers are approximations for 100 MHz bus speed.
+         * assume that app deals in frame-sized chunks, e.g. 30 per second.
+         * ttcpolicy.period = 833333; */
+        ttcpolicy.period = i_busspeed / 120;
+        /* ttcpolicy.computation = 60000; */
+        ttcpolicy.computation = i_busspeed / 1440;
+        /* ttcpolicy.constraint = 120000; */
+        ttcpolicy.constraint = i_busspeed / 720;
+        ttcpolicy.preemptible = 1;
+
+        if (thread_policy_set(mach_thread_self(),
+                  THREAD_TIME_CONSTRAINT_POLICY, (int *)&ttcpolicy,
+                  THREAD_TIME_CONSTRAINT_POLICY_COUNT) != KERN_SUCCESS)
+        {
+            intf_ErrMsg("vout error: couldn't go to time-constrained policy (thread_policy_set)");
+        }
     }
 
     return( 0 );

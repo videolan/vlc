@@ -2,7 +2,7 @@
  * udp.c: raw UDP access plug-in
  *****************************************************************************
  * Copyright (C) 2001, 2002 VideoLAN
- * $Id: udp.c,v 1.5 2002/03/26 23:39:43 massiot Exp $
+ * $Id: udp.c,v 1.6 2002/03/27 22:15:40 massiot Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -266,11 +266,57 @@ static int UDPOpen( input_thread_t * p_input )
 }
 
 /*****************************************************************************
- * UDPSetProgram: Do nothing
+ * UDPSetProgram: Selects another program
  *****************************************************************************/
-static int UDPSetProgram( input_thread_t * p_input,
-                           pgrm_descriptor_t * p_program )
+int UDPSetProgram( input_thread_t    * p_input,
+                   pgrm_descriptor_t * p_new_prg )
 {
+    int                 i_es_index;
+
+    if ( p_input->stream.p_selected_program )
+    {
+        for ( i_es_index = 1 ; /* 0 should be the PMT */
+                i_es_index < p_input->stream.p_selected_program->
+                    i_es_number ;
+                i_es_index ++ )
+        {
+#define p_es p_input->stream.p_selected_program->pp_es[i_es_index]
+            if ( p_es->p_decoder_fifo )
+            {
+                input_UnselectES( p_input , p_es );
+                p_es->p_pes = NULL; /* FIXME */
+            }
+#undef p_es
+        }
+    }
+
+    for (i_es_index = 1 ; i_es_index < p_new_prg->i_es_number ; i_es_index ++ )
+    {
+#define p_es p_new_prg->pp_es[i_es_index]
+        switch( p_es->i_cat )
+        {
+            case MPEG1_VIDEO_ES:
+            case MPEG2_VIDEO_ES:
+                if ( p_main->b_video )
+                {
+                    input_SelectES( p_input , p_es );
+                }
+                break;
+            case MPEG1_AUDIO_ES:
+            case MPEG2_AUDIO_ES:
+                if ( p_main->b_audio )
+                {
+                    input_SelectES( p_input , p_es );
+                }
+                break;
+            default:
+                input_SelectES( p_input , p_es );
+                break;
+#undef p_es
+        }
+    }
+
+    p_input->stream.p_selected_program = p_new_prg;
+
     return( 0 );
 }
-
