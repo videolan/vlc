@@ -381,6 +381,30 @@ package-win32:
 	# Clean up
 	rm -Rf tmp
 
+package-beos:
+	# Check that tmp isn't in the way
+	@if test -e tmp; then \
+		echo "Error: please remove ./tmp, it is in the way"; false; \
+	else \
+		echo "OK."; mkdir tmp; \
+	fi
+	
+	# Create dir
+	mkdir -p tmp/vlc/share
+	# Copy relevant files
+	cp vlc tmp/vlc/
+	cp AUTHORS COPYING ChangeLog ChangeLog.libdvdcss \
+		README README.libdvdcss FAQ TODO tmp/vlc/
+	for file in default8x16.psf default8x9.psf ; \
+		do cp share/$$file tmp/vlc/share/ ; done
+	# Create package 
+	mv tmp/vlc tmp/vlc-${VLC_QUICKVERSION}
+	(cd tmp ; find vlc-${VLC_QUICKVERSION} | \
+	zip -9 -@ vlc-${VLC_QUICKVERSION}-beos.zip )
+	mv tmp/vlc-${VLC_QUICKVERSION}-beos.zip .
+	# Clean up
+	rm -Rf tmp
+
 libdvdcss-snapshot: snapshot-common
 	# Remove vlc sources and icons, doc, debian directory...
 	rm -Rf tmp/vlc/src tmp/vlc/share tmp/vlc/plugins tmp/vlc/doc

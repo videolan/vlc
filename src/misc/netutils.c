@@ -2,7 +2,7 @@
  * netutils.c: various network functions
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001 VideoLAN
- * $Id: netutils.c,v 1.44 2001/11/12 23:56:53 sam Exp $
+ * $Id: netutils.c,v 1.45 2001/11/13 00:46:23 sam Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Benoit Steiner <benny@via.ecp.fr>
@@ -114,14 +114,13 @@ static int GetAdapterInfo  ( int i_adapter, char *psz_string );
 int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
                             char * psz_broadcast )
 {
-
-    char                psz_hostname[INPUT_MAX_SOURCE_LENGTH];
-    struct hostent    * p_hostent;
-
 #if defined( SYS_BEOS )
     intf_ErrMsg( "error: channel changing is not yet supported under BeOS" );
     return( 1 );
-#endif
+
+#else
+    char                psz_hostname[INPUT_MAX_SOURCE_LENGTH];
+    struct hostent    * p_hostent;
 
     /* Reset struct */
     memset( p_socket, 0, sizeof( struct sockaddr_in ) );
@@ -166,6 +165,7 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
                  p_hostent->h_length );
     }
     return( 0 );
+#endif
 }
 
 /*****************************************************************************
@@ -173,13 +173,12 @@ int network_BuildLocalAddr( struct sockaddr_in * p_socket, int i_port,
  *****************************************************************************/
 int network_BuildRemoteAddr( struct sockaddr_in * p_socket, char * psz_server )
 {
-
-    struct hostent            * p_hostent;
-
 #if defined( SYS_BEOS )
     intf_ErrMsg( "error: channel changing is not yet supported under BeOS" );
     return( 1 );
-#endif
+
+#else
+    struct hostent            * p_hostent;
 
     /* Reset structure */
     memset( p_socket, 0, sizeof( struct sockaddr_in ) );
@@ -208,6 +207,7 @@ int network_BuildRemoteAddr( struct sockaddr_in * p_socket, char * psz_server )
                  p_hostent->h_length );
     }
     return( 0 );
+#endif
 }
 
 /*****************************************************************************
