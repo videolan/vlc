@@ -1221,6 +1221,12 @@ then
   [    --with-dvdread=PATH    libdvdread headers and libraries])
   AC_ARG_WITH(dvdread-tree,
   [    --with-dvdread-tree=PATH libdvdread tree for static linking])
+
+  dnl Temporary hack (yeah, sure ;)
+  if test "${SYS}" = "mingw32" || test "${SYS}" = "darwin"; then
+      VLC_ADD_LDFLAGS([dvdread],[-ldvdcss])
+  fi
+
   if test -z "${with_dvdread}"
   then
     if test -z "${with_dvdread_tree}"
@@ -1272,12 +1278,6 @@ then
       AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvd_reader.h])
     fi
   fi
-
-  dnl Temporary hack (yeah, sure ;)
-  if test "${SYS}" = "mingw32" || test "${SYS}" = "darwin"; then
-      VLC_ADD_LDFLAGS([dvdread],[-ldvdcss])
-  fi
-
 fi
 
 dnl
