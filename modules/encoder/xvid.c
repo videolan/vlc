@@ -2,7 +2,7 @@
  * xvid.c: an encoder for libxvidcore, the Xvid video codec
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: xvid.c,v 1.2 2003/02/20 01:52:46 sigmunau Exp $
+ * $Id: xvid.c,v 1.3 2003/02/22 16:10:31 fenrir Exp $
  *
  * Authors: Laurent Aimar
  *
@@ -65,11 +65,11 @@ vlc_module_begin();
         add_integer( "encoder-xvid-min-quantizer", 2, NULL, "min quantizer", "range 1-31", VLC_TRUE );
         add_integer( "encoder-xvid-max-quantizer", 31, NULL, "max quantizer", "1-31", VLC_TRUE );
         add_integer( "encoder-xvid-max-key-interval", -1, NULL, "max key interval", "maximum   value  of   frames  between   two  keyframes", VLC_TRUE );
-    add_category_hint( "advanced setting", NULL );
+    add_category_hint( "advanced setting", NULL, VLC_TRUE );
         add_integer( "encoder-xvid-reaction-delay-factor", -1, NULL, "rc reaction delay factor", "rate controler parameters", VLC_TRUE);
         add_integer( "encoder-xvid-averaging-period", -1, NULL, "rc averaging period", "rate controler parameters", VLC_TRUE );
         add_integer( "encoder-xvid-buffer", -1, NULL, "rc buffer", "rate controler parameters", VLC_TRUE );
-    add_category_hint( "advanced frame setting", NULL );
+    add_category_hint( "advanced frame setting", NULL, VLC_TRUE );
         add_string_from_list( "encoder-xvid-quantization", "MPEG", ppsz_xvid_quant_algo, NULL, "quantization algorithm", "", VLC_TRUE );
         add_bool( "encoder-xvid-halfpel", 1, NULL, "half pixel  motion estimation.", "", VLC_TRUE );
         add_bool( "encoder-xvid-4mv", 0, NULL, "fourc vector per macroblock(need halfpel)", "", VLC_TRUE );
