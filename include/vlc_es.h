@@ -2,7 +2,7 @@
  * vlc_es.h
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: vlc_es.h,v 1.5 2003/11/24 02:35:50 fenrir Exp $
+ * $Id: vlc_es.h,v 1.6 2004/01/19 18:15:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -107,6 +107,8 @@ struct es_format_t
     int             i_cat;
     vlc_fourcc_t    i_codec;
 
+    int             i_id;       /* -1: let the core mark the right id
+                                   >=0: valid id */
     int             i_group;    /* -1 : standalone
                                    >= 0 then a "group" (program) is created
                                         for each value */
@@ -140,6 +142,7 @@ static inline void es_format_Init( es_format_t *fmt,
 {
     fmt->i_cat                  = i_cat;
     fmt->i_codec                = i_codec;
+    fmt->i_id                   = -1;
     fmt->i_group                = 0;
     fmt->i_priority             = 0;
     fmt->psz_language           = NULL;

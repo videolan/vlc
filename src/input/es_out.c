@@ -2,7 +2,7 @@
  * es_out.c: Es Out handler for input.
  *****************************************************************************
  * Copyright (C) 2003-2004 VideoLAN
- * $Id: es_out.c,v 1.18 2004/01/18 19:35:48 fenrir Exp $
+ * $Id: es_out.c,v 1.19 2004/01/19 18:15:29 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -274,13 +274,17 @@ static es_out_id_t *EsOutAdd( es_out_t *out, es_format_t *fmt )
             }
         }
     }
+    if( fmt->i_id < 0 )
+    {
+        fmt->i_id = out->p_sys->i_id - 1;
+    }
 
     es->p_es = input_AddES( p_input,
                             p_prgm,
-                            out->p_sys->i_id,
+                            fmt->i_id + 1,
                             fmt->i_cat,
                             fmt->psz_language, 0 );
-    es->p_es->i_stream_id = out->p_sys->i_id;
+    es->p_es->i_stream_id = fmt->i_id;
     es->p_es->i_fourcc = fmt->i_codec;
 
     switch( fmt->i_cat )
