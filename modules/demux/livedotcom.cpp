@@ -2,7 +2,7 @@
  * live.cpp : live.com support.
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: livedotcom.cpp,v 1.11 2003/11/21 06:14:59 fenrir Exp $
+ * $Id: livedotcom.cpp,v 1.12 2003/11/27 05:41:19 fenrir Exp $
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
  *
@@ -360,6 +360,15 @@ static int  DemuxOpen ( vlc_object_t *p_this )
     p_sys->i_start = 0;
 
     /* Gather the complete sdp file */
+    vlc_mutex_lock( &p_input->stream.stream_lock );
+    if( input_InitStream( p_input, 0 ) == -1)
+    {
+        vlc_mutex_unlock( &p_input->stream.stream_lock );
+        msg_Err( p_input, "cannot init stream" );
+        goto error;
+    }
+    vlc_mutex_unlock( &p_input->stream.stream_lock );
+
     i_sdp = 0;
     i_sdp_max = 1000;
     p_sdp = (uint8_t*)malloc( i_sdp_max );
