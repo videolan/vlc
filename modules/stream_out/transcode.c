@@ -1388,6 +1388,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
             {
                 transcode_video_close( p_stream, id );
                 id->b_transcode = VLC_FALSE;
+                return VLC_EGENERIC;
             }
 
             /* Deinterlace */
@@ -1446,6 +1447,10 @@ static int transcode_video_process( sout_stream_t *p_stream,
                     msg_Dbg( p_stream, "no video filter found" );
                     vlc_object_detach( id->pp_filter[id->i_filter] );
                     vlc_object_destroy( id->pp_filter[id->i_filter] );
+
+                    transcode_video_close( p_stream, id );
+                    id->b_transcode = VLC_FALSE;
+                    return VLC_EGENERIC;
                 }
             }
         }
