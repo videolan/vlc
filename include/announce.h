@@ -2,7 +2,7 @@
  * announce.h : Session announcement
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: announce.h,v 1.6 2003/07/05 15:00:28 zorglub Exp $
+ * $Id: announce.h,v 1.7 2003/07/17 14:10:08 sam Exp $
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *
@@ -51,8 +51,8 @@ struct sap_session_t
         char psz_name[1024];
         char psz_port[8];
         module_t p_network;
-        unsigned int socket;
-        unsigned int sendnow;
+        unsigned int i_socket;
+        unsigned int i_calls;
         int i_ip_version;
 };
 
