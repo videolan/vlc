@@ -2081,7 +2081,7 @@ static void __Parse_indx( demux_t    *p_demux,
     }
     else
     {
-        msg_Warn( p_demux, "unknow subtype index(0x%x)", p_indx->i_indexsubtype );
+        msg_Warn( p_demux, "unknown subtype index(0x%x)", p_indx->i_indexsubtype );
     }
 }
 
@@ -2131,7 +2131,7 @@ static void AVI_IndexLoad_indx( demux_t *p_demux )
         }
         else
         {
-            msg_Warn( p_demux, "unknow type index(0x%x)", p_indx->i_indextype );
+            msg_Warn( p_demux, "unknown type index(0x%x)", p_indx->i_indextype );
         }
 #undef p_stream
     }
