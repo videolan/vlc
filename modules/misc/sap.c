@@ -2,7 +2,7 @@
  * sap.c :  SAP interface module
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: sap.c,v 1.6 2003/01/02 23:50:55 massiot Exp $
+ * $Id: sap.c,v 1.7 2003/01/21 18:43:54 lool Exp $
  *
  * Authors: Arnaud Schauly <gitan@via.ecp.fr>
  *
@@ -197,6 +197,11 @@ static void Run( intf_thread_t *p_intf )
     /* read SAP packets */
 
     psz_buf = malloc( 2000 );
+    if( psz_buf == NULL )
+    {
+        msg_Err( p_intf, "Not enough memory for psz_buf in Run()" );
+        return;
+    }
 
     while( !p_intf->b_die )
     {
@@ -271,8 +276,12 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
 
     for( i_count=0 ; i_count <= p_sd->i_media ; i_count ++ )
     {
-
         p_item = malloc( sizeof( playlist_item_t ) );
+        if( p_item == NULL )
+        {
+            msg_Err( p_intf, "Not enough memory for p_item in sesstoitem()" );
+            return 0;
+        }
         p_item->psz_name = strdup( p_sd->psz_sessionname );
         p_item->i_type = 0;
         p_item->i_status = 0;
@@ -328,6 +337,7 @@ static int sess_toitem( intf_thread_t * p_intf, sess_descr_t * p_sd )
         if( p_item->psz_uri == NULL )
         {
             msg_Err( p_intf, "Not enough memory");
+            free( p_item );
             return 0;
         }
 
@@ -440,7 +450,7 @@ static void mfield_parse( char *psz_mfield, char **ppsz_proto,
         *psz_pos = '\0';
         psz_pos++;
         *ppsz_proto = psz_pos;
-        while( *psz_pos!='\0' && *psz_pos !=' ' && 
+        while( *psz_pos!='\0' && *psz_pos !=' ' &&
                         *psz_pos!='/' )
         {
             *psz_pos = tolower( *psz_pos );
@@ -482,7 +492,6 @@ static int packet_handle( intf_thread_t * p_intf, char **  ppsz_packet )  {
 
         p_sd = parse_sdp( *ppsz_packet, p_intf );
 
-
         sess_toitem ( p_intf, p_sd );
 
         free_sd ( p_sd );
@@ -507,11 +516,9 @@ static sess_descr_t *  parse_sdp( char *  psz_pct, intf_thread_t * p_intf )
     sess_descr_t *  sd;
 
     sd = malloc( sizeof(sess_descr_t) );
-
-
     if( sd == NULL )
     {
-        msg_Err( p_intf, "out of memory" );
+        msg_Err( p_intf, "Not enough memory for sd in parse_sdp()" );
     }
     else
     {
@@ -535,64 +542,80 @@ static sess_descr_t *  parse_sdp( char *  psz_pct, intf_thread_t * p_intf )
            if (psz_pct[j] == '=')
            {
                switch(psz_pct[(j-1)]) {
-               case ('v') : {
+               case 'v' : {
                      ppsz_fill = & sd->psz_version;
                      break;
                 }
-                case ('o') : {
+                case 'o' : {
                    ppsz_fill = & sd->psz_origin;
                    break;
                 }
-                case ('s') : {
+                case 's' : {
                    ppsz_fill = & sd->psz_sessionname;
                    break;
                 }
-                case ('i') : {
+                case 'i' : {
                    ppsz_fill = & sd->psz_information;
                    break;
                 }
-                case ('u') : {
+                case 'u' : {
                    ppsz_fill = & sd->psz_uri;
                    break;
                 }
-                case ('e') : {
+                case 'e' : {
                    ppsz_fill = & sd->psz_emails;
                    break;
                 }
-                case ('p') : {
+                case 'p' : {
                    ppsz_fill = & sd->psz_phone;
                    break;
                 }
-                case ('t') : {
+                case 't' : {
                    ppsz_fill = & sd->psz_time;
                    break;
                 }
-                case ('r') : {
+                case 'r' : {
                    ppsz_fill = & sd->psz_repeat;
                    break;
                 }
-                case ('a') : {
+                case 'a' : {
                    ppsz_fill = & sd->psz_attribute;
                    break;
                 }
-                case ('m') : {
-                   sd->i_media++;
-                   if( sd->pp_media ) {
-                       sd->pp_media = realloc( sd->pp_media,
-                                ( sizeof( void * )  * (sd->i_media + 1)) );
-                   }
-                   else
-                   {
-                       sd->pp_media = malloc( sizeof ( void * ) );
-                   }
-                   sd->pp_media[sd->i_media] =
-                           malloc( sizeof( media_descr_t ) );
+                case 'm' : {
+                    sd->i_media++;
+                    if( sd->pp_media ) {
+                        sd->pp_media = realloc( sd->pp_media,
+                                 ( sizeof( void * )  * (sd->i_media + 1)) );
+                    }
+                    else
+                    {
+                        sd->pp_media = malloc( sizeof ( void * ) );
+                        if( sd->pp_media == NULL )
+                        {
+                            msg_Err( p_intf, "Not enough memory for " \
+                                             "sd->pp_media in parse_sdp()" );
+                            free_sd( sd );
+                            return NULL;
+                        }
+                    }
+                    sd->pp_media[sd->i_media] =
+                            malloc( sizeof( media_descr_t ) );
+                    if( sd->pp_media[sd->i_media] == NULL )
+                    {
+                        sd->i_media--;
+                        msg_Err( p_intf, "Not enough memory for "     \
+                                         "sd->pp_media[sd->i_media] " \
+                                         "in parse_sdp()" );
+                        free_sd( sd );
+                        return NULL;
+                    }
 
-                   sd->pp_media[sd->i_media]->psz_medianame = NULL;
-                   sd->pp_media[sd->i_media]->psz_mediaconnection = NULL;
+                    sd->pp_media[sd->i_media]->psz_medianame = NULL;
+                    sd->pp_media[sd->i_media]->psz_mediaconnection = NULL;
 
-                   ppsz_fill = & sd->pp_media[sd->i_media]->psz_medianame;
-                   break;
+                    ppsz_fill = & sd->pp_media[sd->i_media]->psz_medianame;
+                    break;
                 }
                 case ('c') : {
                    if( sd->i_media == -1 )
@@ -622,9 +645,16 @@ static sess_descr_t *  parse_sdp( char *  psz_pct, intf_thread_t * p_intf )
 
           if( ppsz_fill != NULL )
           {
-              *ppsz_fill= malloc( sizeof(char) * (k+1) );
-             memcpy(*ppsz_fill, &(psz_pct[j-k+1]), k );
-             (*ppsz_fill)[k]='\0';
+              *ppsz_fill = malloc( sizeof(char) * (k + 1) );
+              if( *ppsz_fill == NULL )
+              {
+                  msg_Err( p_intf, "Not enough memory for "     \
+                                   "*ppsz_fill in parse_sdp()" );
+                  free_sd( sd );
+                  return NULL;
+              }
+              memcpy(*ppsz_fill, &(psz_pct[j-k+1]), k );
+              (*ppsz_fill)[k]='\0';
           }
           ppsz_fill = NULL;
           } // if
@@ -641,28 +671,27 @@ static void free_sd( sess_descr_t * p_sd )
     int i;
     if( p_sd )
     {
+        FREE( p_sd->psz_origin );
+        FREE( p_sd->psz_sessionname );
+        FREE( p_sd->psz_information );
+        FREE( p_sd->psz_uri );
+        FREE( p_sd->psz_emails );
+        FREE( p_sd->psz_phone );
+        FREE( p_sd->psz_time );
+        FREE( p_sd->psz_repeat );
+        FREE( p_sd->psz_attribute );
+        FREE( p_sd->psz_connection );
 
-    FREE( p_sd->psz_origin );
-    FREE( p_sd->psz_sessionname );
-    FREE( p_sd->psz_information );
-    FREE( p_sd->psz_uri );
-    FREE( p_sd->psz_emails );
-    FREE( p_sd->psz_phone );
-    FREE( p_sd->psz_time );
-    FREE( p_sd->psz_repeat );
-    FREE( p_sd->psz_attribute );
-    FREE( p_sd->psz_connection );
-
-    if( p_sd->i_media >= 0 && p_sd->pp_media )
-    {
-        for( i=0; i <= p_sd->i_media ; i++ )
+        if( p_sd->i_media >= 0 && p_sd->pp_media )
         {
-            FREE( p_sd->pp_media[i]->psz_medianame );
-            FREE( p_sd->pp_media[i]->psz_mediaconnection );
+            for( i=0; i <= p_sd->i_media ; i++ )
+            {
+                FREE( p_sd->pp_media[i]->psz_medianame );
+                FREE( p_sd->pp_media[i]->psz_mediaconnection );
+            }
+            FREE( p_sd->pp_media );
         }
-        FREE( p_sd->pp_media );
-    }
-    free( p_sd );
+        free( p_sd );
     }
     else
     {
@@ -681,6 +710,11 @@ static int ismult( char *psz_uri )
     int i;
 
     psz_c = malloc( 3 );
+    if( psz_c == NULL )
+    {
+/*        msg_Err( p_intf, "Not enough memory for psz_c in ismult()" ); */
+        return 0;
+    }
 
     memcpy( psz_c, psz_uri, 3 );
     if( psz_c[2] == '.' || psz_c[1] == '.' )
