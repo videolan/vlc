@@ -2,7 +2,7 @@
  * hotkeys.c: Hotkey handling for vlc
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: hotkeys.c,v 1.1 2003/10/26 12:46:55 sigmunau Exp $
+ * $Id: hotkeys.c,v 1.2 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -33,6 +33,8 @@
 #include <vlc/aout.h>
 #include <osd.h>
 
+#include "vlc_keys.h"
+
 #define BUFFER_SIZE 10
 /*****************************************************************************
  * intf_sys_t: description and status of FB interface
@@ -60,6 +62,8 @@ static void Feedback( intf_thread_t *, char * );
 static int  GetKey  ( intf_thread_t *);
 static int  KeyEvent( vlc_object_t *, char const *,
                       vlc_value_t, vlc_value_t, void * );
+static int  ActionKeyCB( vlc_object_t *, char const *,
+                         vlc_value_t, vlc_value_t, void * );
 
 /*****************************************************************************
  * Module descriptor
@@ -90,6 +94,7 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->p_vout = NULL;
+
     var_AddCallback( p_intf->p_vlc, "key-pressed", KeyEvent, p_intf );
     return 0;
 }
@@ -121,22 +126,26 @@ static void Run( intf_thread_t *p_intf )
     playlist_t *p_playlist;
     input_thread_t *p_input;
     vout_thread_t *p_vout = NULL;
-    int i_fullscreen = config_GetInt( p_intf, "fullscreen-key" );
-    int i_quit = config_GetInt( p_intf, "quit-key" );
-    int i_vol_up = config_GetInt( p_intf, "vol-up-key" );
-    int i_vol_down = config_GetInt( p_intf, "vol-down-key" );
-    int i_play_pause = config_GetInt( p_intf, "play-pause-key" );    
-    int i_play = config_GetInt( p_intf, "play-key" );    
-    int i_pause = config_GetInt( p_intf, "pause-key" );    
-    int i_stop = config_GetInt( p_intf, "stop-key" );
-    int i_next = config_GetInt( p_intf, "next-key" );
-    int i_prev = config_GetInt( p_intf, "prev-key" );
-    int i_faster = config_GetInt( p_intf, "faster-key" );
-    int i_slower = config_GetInt( p_intf, "slower-key" );
-    int i_key = 0;
-    
+    struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
+    vlc_value_t val;
+    int i;
+
+    /* Initialize hotkey structure */
+    for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+    {
+        var_Create( p_intf->p_vlc, p_hotkeys[i].psz_action,
+                    VLC_VAR_HOTKEY | VLC_VAR_DOINHERIT );
+
+        var_AddCallback( p_intf->p_vlc, p_hotkeys[i].psz_action,
+                         ActionKeyCB, NULL );
+        var_Get( p_intf->p_vlc, p_hotkeys[i].psz_action, &val );
+        var_Set( p_intf->p_vlc, p_hotkeys[i].psz_action, val );
+    }
+
     while( !p_intf->b_die )
     {
+        int i_key, i_action;
+
         /* Sleep a bit */
         msleep( INTF_IDLE_SLEEP );
 
@@ -167,20 +176,31 @@ static void Run( intf_thread_t *p_intf )
             p_intf->p_sys->p_vout = NULL;
         }
 
+        /* Find action triggered by hotkey */
+        i_action = 0;
         i_key = GetKey( p_intf );
-        if ( !i_key )
+        for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+        {
+            if( p_hotkeys[i].i_key == i_key )
+            {
+                 i_action = p_hotkeys[i].i_action;
+            }
+        }
+
+        if( !i_action )
         {
             /* No key pressed, sleep a bit more */
             msleep( INTF_IDLE_SLEEP );
             continue;
         }
-        if( i_key == i_quit )
+
+        if( i_action == ACTIONID_QUIT )
         {
             p_intf->p_vlc->b_die = VLC_TRUE;
             Feedback( p_intf, _("Quit" ) );
             continue;
         }
-        if( i_key == i_vol_up )
+        else if( i_action == ACTIONID_VOL_UP )
         {
             audio_volume_t i_newvol;
             char string[9];
@@ -188,7 +208,7 @@ static void Run( intf_thread_t *p_intf )
             sprintf( string, "Vol %%%d", i_newvol*100/AOUT_VOLUME_MAX );
             Feedback( p_intf, string );
         }
-        if( i_key == i_vol_down )
+        else if( i_action == ACTIONID_VOL_DOWN )
         {
             audio_volume_t i_newvol;
             char string[9];
@@ -196,16 +216,14 @@ static void Run( intf_thread_t *p_intf )
             sprintf( string, "Vol %%%d", i_newvol*100/AOUT_VOLUME_MAX );
             Feedback( p_intf, string );
         }
-        if( p_vout )
+        else if( i_action == ACTIONID_FULLSCREEN )
         {
-            if( i_key == i_fullscreen )
+            if( p_vout )
             {
                 p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                continue;
             }
         }
-            
-        if( i_key == i_play )
+        else if( i_action == ACTIONID_PLAY )
         {
             p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                           FIND_ANYWHERE );
@@ -219,10 +237,8 @@ static void Run( intf_thread_t *p_intf )
                     vlc_object_release( p_playlist );
                 }
             }
-            continue;
         }
-            
-        if( i_key == i_play_pause )
+        else if( i_action == ACTIONID_PLAY_PAUSE )
         {
             if( p_input &&
                 p_input->stream.control.i_status != PAUSE_S )
@@ -245,18 +261,16 @@ static void Run( intf_thread_t *p_intf )
                         vlc_object_release( p_playlist );
                     }
                 }
-            }                    
-            continue;
+            }
         }
-            
         else if( p_input )
         {
-            if( i_key == i_pause )
+            if( i_action == ACTIONID_PAUSE )
             {
                 Feedback( p_intf, _( "Pause" ) );
                 input_SetStatus( p_input, INPUT_STATUS_PAUSE );
             }
-            else if( i_key == i_next )
+            else if( i_action == ACTIONID_NEXT )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                               FIND_ANYWHERE );
@@ -266,7 +280,7 @@ static void Run( intf_thread_t *p_intf )
                     vlc_object_release( p_playlist );
                 }
             }
-            else if( i_key == i_prev )
+            else if( i_action == ACTIONID_PREV )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                               FIND_ANYWHERE );
@@ -276,7 +290,7 @@ static void Run( intf_thread_t *p_intf )
                     vlc_object_release( p_playlist );
                 }
             }
-            else if( i_key == i_stop )
+            else if( i_action == ACTIONID_STOP )
             {
                 p_playlist = vlc_object_find( p_intf, VLC_OBJECT_PLAYLIST,
                                               FIND_ANYWHERE );
@@ -286,11 +300,11 @@ static void Run( intf_thread_t *p_intf )
                     vlc_object_release( p_playlist );
                 }
             }
-            else if( i_key == i_faster )
+            else if( i_action == ACTIONID_FASTER )
             {
                 input_SetStatus( p_input, INPUT_STATUS_FASTER );
             }
-            else if( i_key == i_slower )
+            else if( i_action == ACTIONID_FASTER )
             {
                 input_SetStatus( p_input, INPUT_STATUS_SLOWER );
             }
@@ -303,18 +317,18 @@ static void Feedback( intf_thread_t *p_intf, char *psz_string )
 {
     if ( p_intf->p_sys->p_vout )
     {
-	vout_ShowTextRelative( p_intf->p_sys->p_vout, psz_string, NULL, 
-				 OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,400000 );
+        vout_ShowTextRelative( p_intf->p_sys->p_vout, psz_string, NULL, 
+                                 OSD_ALIGN_TOP|OSD_ALIGN_RIGHT, 30,20,400000 );
     }
 }
 
-static int  GetKey  ( intf_thread_t *p_intf)
+static int GetKey( intf_thread_t *p_intf)
 {
     vlc_mutex_lock( &p_intf->p_sys->change_lock );
     if ( p_intf->p_sys->i_size == 0 )
     {
         vlc_mutex_unlock( &p_intf->p_sys->change_lock );
-        return 0;
+        return -1;
     }
     else
     {
@@ -334,7 +348,7 @@ static int  GetKey  ( intf_thread_t *p_intf)
  * KeyEvent: callback for keyboard events
  *****************************************************************************/
 static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_data;
     vlc_mutex_lock( &p_intf->p_sys->change_lock );
@@ -348,9 +362,26 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     {
         p_intf->p_sys->p_keys[ p_intf->p_sys->i_size ] = newval.i_int;
         p_intf->p_sys->i_size++;
-    }            
+    }
     vlc_mutex_unlock( &p_intf->p_sys->change_lock );
 
     return VLC_SUCCESS;
 }
 
+static int ActionKeyCB( vlc_object_t *p_this, char const *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    vlc_t *p_vlc = (vlc_t *)p_this;
+    struct hotkey *p_hotkeys = p_vlc->p_hotkeys;
+    int i;
+
+    for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+    {
+        if( !strcmp( p_hotkeys[i].psz_action, psz_var ) )
+        {
+            p_hotkeys[i].i_key = newval.i_int;
+        }
+    }
+
+    return VLC_SUCCESS;
+}

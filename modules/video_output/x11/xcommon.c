@@ -2,7 +2,7 @@
  * xcommon.c: Functions common to the X11 and XVideo plugins
  *****************************************************************************
  * Copyright (C) 1998-2001 VideoLAN
- * $Id: xcommon.c,v 1.37 2003/10/28 21:59:12 gbazin Exp $
+ * $Id: xcommon.c,v 1.38 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -555,15 +555,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                 {
                     val.i_int |= KEY_MODIFIER_ALT;
                 }
-
-                if( val.i_int == config_GetInt( p_vout, "fullscreen-key" ) )
-                {
-                    p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
-                }
-                else
-                {
-                    var_Set( p_vout->p_vlc, "key-pressed", val );
-                }
+                var_Set( p_vout->p_vlc, "key-pressed", val );
             }
         }
         /* Mouse click */

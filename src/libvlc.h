@@ -2,7 +2,7 @@
  * libvlc.h: main libvlc header
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libvlc.h,v 1.97 2003/10/27 21:54:10 gbazin Exp $
+ * $Id: libvlc.h,v 1.98 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -719,23 +719,23 @@ vlc_module_begin();
 
     /* Hotkey options*/
     add_category_hint( N_("Hot keys"), HOTKEY_CAT_LONGTEXT , VLC_FALSE );
-    add_key( "fullscreen-key", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "play-pause-key", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "pause-key", 0, NULL, PAUSE_KEY_TEXT, PAUSE_KEY_LONGTEXT, VLC_TRUE );
-    add_key( "play-key", 0, NULL, PLAY_KEY_TEXT, PLAY_KEY_LONGTEXT, VLC_TRUE );
-    add_key( "faster-key", '+', NULL, FASTER_KEY_TEXT, FASTER_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "slower-key", '-', NULL, SLOWER_KEY_TEXT, SLOWER_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "next-key", 'n', NULL, NEXT_KEY_TEXT, NEXT_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "prev-key", 'p', NULL, PREV_KEY_TEXT, PREV_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "stop-key", 's', NULL, STOP_KEY_TEXT, STOP_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "nav-activate-key", KEY_ENTER, NULL, NAV_ACTIVATE_KEY_TEXT, NAV_ACTIVATE_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "nav-up-key", KEY_UP, NULL, NAV_UP_KEY_TEXT, NAV_UP_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "nav-down-key", KEY_DOWN, NULL, NAV_DOWN_KEY_TEXT, NAV_DOWN_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "nav-left-key", KEY_LEFT, NULL, NAV_LEFT_KEY_TEXT, NAV_LEFT_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "nav-right-key", KEY_RIGHT, NULL, NAV_RIGHT_KEY_TEXT, NAV_RIGHT_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "quit-key", KEY_MODIFIER_CTRL|KEY_SPACE, NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "vol-up-key", 'a', NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
-    add_key( "vol-down-key", 'z', NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-fullscreen", 'f', NULL, FULLSCREEN_KEY_TEXT, FULLSCREEN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-play-pause", KEY_SPACE, NULL, PLAY_PAUSE_KEY_TEXT, PLAY_PAUSE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-pause", 0, NULL, PAUSE_KEY_TEXT, PAUSE_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-play", 0, NULL, PLAY_KEY_TEXT, PLAY_KEY_LONGTEXT, VLC_TRUE );
+    add_key( "key-faster", '+', NULL, FASTER_KEY_TEXT, FASTER_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-slower", '-', NULL, SLOWER_KEY_TEXT, SLOWER_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-next", 'n', NULL, NEXT_KEY_TEXT, NEXT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-prev", 'p', NULL, PREV_KEY_TEXT, PREV_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-stop", 's', NULL, STOP_KEY_TEXT, STOP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-activate", KEY_ENTER, NULL, NAV_ACTIVATE_KEY_TEXT, NAV_ACTIVATE_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-up", KEY_UP, NULL, NAV_UP_KEY_TEXT, NAV_UP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-down", KEY_DOWN, NULL, NAV_DOWN_KEY_TEXT, NAV_DOWN_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-left", KEY_LEFT, NULL, NAV_LEFT_KEY_TEXT, NAV_LEFT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-nav-right", KEY_RIGHT, NULL, NAV_RIGHT_KEY_TEXT, NAV_RIGHT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-quit", KEY_MODIFIER_CTRL|KEY_SPACE, NULL, QUIT_KEY_TEXT, QUIT_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-vol-up", 'a', NULL, VOL_UP_KEY_TEXT, VOL_UP_KEY_LONGTEXT, VLC_FALSE );
+    add_key( "key-vol-down", 'z', NULL, VOL_DOWN_KEY_TEXT, VOL_DOWN_KEY_LONGTEXT, VLC_FALSE );
 
     /* Usage (mainly useful for cmd line stuff) */
     add_usage_hint( PLAYLIST_USAGE );
@@ -768,3 +768,28 @@ static module_config_t p_help_config[] =
 /*****************************************************************************
  * End configuration.
  *****************************************************************************/
+
+/*****************************************************************************
+ * Initializer for the vlc_t structure storing the action / key associations
+ *****************************************************************************/
+static struct hotkey p_hotkeys[] =
+{
+    { "key-quit", ACTIONID_QUIT, 0 },
+    { "key-play-pause", ACTIONID_PLAY_PAUSE, 0 },
+    { "key-play", ACTIONID_PLAY, 0 },
+    { "key-pause", ACTIONID_PAUSE, 0 },
+    { "key-stop", ACTIONID_STOP, 0 },
+    { "key-prev", ACTIONID_PREV, 0 },
+    { "key-next", ACTIONID_NEXT, 0 },
+    { "key-faster", ACTIONID_FASTER, 0 },
+    { "key-slower", ACTIONID_SLOWER, 0 },
+    { "key-fullscreen", ACTIONID_FULLSCREEN, 0 },
+    { "key-vol-up", ACTIONID_VOL_UP, 0 },
+    { "key-vol-down", ACTIONID_VOL_DOWN, 0 },
+    { "key-nav-activate", ACTIONID_NAV_ACTIVATE, 0 },
+    { "key-nav-up", ACTIONID_NAV_UP, 0 },
+    { "key-nav-down", ACTIONID_NAV_DOWN, 0 },
+    { "key-nav-left", ACTIONID_NAV_LEFT, 0 },
+    { "key-nav-right", ACTIONID_NAV_RIGHT, 0 },
+    { NULL, 0, 0 }
+};

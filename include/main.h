@@ -3,7 +3,7 @@
  * Declaration and extern access to global program object.
  *****************************************************************************
  * Copyright (C) 1999, 2000, 2001, 2002 VideoLAN
- * $Id: main.h,v 1.55 2003/09/24 21:31:54 gbazin Exp $
+ * $Id: main.h,v 1.56 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *
@@ -83,9 +83,6 @@ struct vlc_t
     char *                 psz_homedir;             /* user's home directory */
     char *                 psz_configfile;        /* location of config file */
 
-    /* Generic settings */
-    mtime_t                i_desync;   /* relative desync of the audio ouput */
-
     /* Fast memcpy plugin used */
     module_t *             p_memcpy_module;
 #if defined( UNDER_CE )
@@ -98,12 +95,20 @@ struct vlc_t
 
     /* Shared data - these structures are accessed directly from p_vlc by
      * several modules */
-    input_channel_t *      p_channel;                /* channel library data */
 
     /* Locks */
     vlc_mutex_t            config_lock;          /* lock for the config file */
 #ifdef SYS_DARWIN
     vlc_mutex_t            quicktime_lock;          /* QT is not thread safe on OSX */
 #endif
+
+    /* Structure storing the action name / key associations */
+    struct hotkey
+    {
+        const char *psz_action;
+        int i_action;
+        int i_key;
+
+    } *p_hotkeys;
 };
 

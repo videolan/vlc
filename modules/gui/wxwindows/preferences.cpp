@@ -2,7 +2,7 @@
  * preferences.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: preferences.cpp,v 1.38 2003/10/20 12:25:22 gbazin Exp $
+ * $Id: preferences.cpp,v 1.39 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -854,6 +854,8 @@ PrefsPanel::PrefsPanel( wxWindow* parent, intf_thread_t *_p_intf,
 
 void PrefsPanel::ApplyChanges()
 {
+    vlc_value_t val;
+
     for( size_t i = 0; i < config_array.GetCount(); i++ )
     {
         ConfigControl *control = config_array.Item(i);
@@ -867,8 +869,11 @@ void PrefsPanel::ApplyChanges()
             config_PutPsz( p_intf, control->GetName().mb_str(),
                            control->GetPszValue().mb_str() );
             break;
-        case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_KEY:
+            /* So you don't need to restart to have the changes take effect */
+            val.i_int = control->GetIntValue();
+            var_Set( p_intf->p_vlc, control->GetName().mb_str(), val );
+        case CONFIG_ITEM_INTEGER:
         case CONFIG_ITEM_BOOL:
             config_PutInt( p_intf, control->GetName().mb_str(),
                            control->GetIntValue() );

@@ -2,7 +2,7 @@
  * events.c: Windows DirectX video output events handler
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: events.c,v 1.25 2003/10/28 17:02:14 gbazin Exp $
+ * $Id: events.c,v 1.26 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -220,15 +220,7 @@ void DirectXEventThread( event_thread_t *p_event )
                     val.i_int |= KEY_MODIFIER_ALT;
                 }
 
-                if( val.i_int == config_GetInt( p_event, "fullscreen-key" ) )
-                {
-                    p_event->p_vout->p_sys->i_changes |=
-                        VOUT_FULLSCREEN_CHANGE;
-                }
-                else
-                {
-                    var_Set( p_event->p_vlc, "key-pressed", val );
-                }
+                var_Set( p_event->p_vlc, "key-pressed", val );
             }
             break;
 

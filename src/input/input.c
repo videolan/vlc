@@ -4,7 +4,7 @@
  * decoders.
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: input.c,v 1.249 2003/10/22 17:12:31 gbazin Exp $
+ * $Id: input.c,v 1.250 2003/10/29 01:33:26 gbazin Exp $
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *
@@ -667,8 +667,10 @@ static int InitThread( input_thread_t * p_input )
 
     /* If the desynchronisation requested by the user is < 0, we need to
      * cache more data. */
-    if( p_input->p_vlc->i_desync < 0 )
-        p_input->i_pts_delay -= p_input->p_vlc->i_desync;
+    var_Create( p_input, "audio-desync", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    var_Get( p_input, "audio-desync", &val );
+    if( val.i_int < 0 )
+        p_input->i_pts_delay -= (val.i_int * 1000);
 
     if( p_input->p_current_data == NULL && p_input->pf_read != NULL )
     {

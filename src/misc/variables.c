@@ -2,7 +2,7 @@
  * variables.c: routines for object variables handling
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: variables.c,v 1.32 2003/10/22 17:12:31 gbazin Exp $
+ * $Id: variables.c,v 1.33 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *
@@ -220,6 +220,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             p_var->val.b_bool = VLC_FALSE;
             break;
         case VLC_VAR_INTEGER:
+        case VLC_VAR_HOTKEY:
             p_var->pf_cmp = CmpInt;
             p_var->val.i_int = 0;
             break;
@@ -1162,6 +1163,7 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
             p_val->f_float = config_GetFloat( p_this, psz_name );
             break;
         case VLC_VAR_INTEGER:
+        case VLC_VAR_HOTKEY:
             p_val->i_int = config_GetInt( p_this, psz_name );
             break;
         case VLC_VAR_BOOL:

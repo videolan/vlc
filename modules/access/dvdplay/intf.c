@@ -2,7 +2,7 @@
  * intf.c: interface for DVD video manager
  *****************************************************************************
  * Copyright (C) 2002 VideoLAN
- * $Id: intf.c,v 1.8 2003/10/26 13:10:05 sigmunau Exp $
+ * $Id: intf.c,v 1.9 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *
@@ -34,6 +34,8 @@
 #include "stream_control.h"
 #include "input_ext-intf.h"
 #include "input_ext-dec.h"
+
+#include "vlc_keys.h"
 
 #include "dvd.h"
 
@@ -109,11 +111,6 @@ static void RunIntf( intf_thread_t *p_intf )
     vlc_object_t *      p_vout = NULL;
     mtime_t             mtime = 0;
     mtime_t             mlast = 0;
-    int i_nav_up = config_GetInt( p_intf, "nav-up-key" );
-    int i_nav_down = config_GetInt( p_intf, "nav-down-key" );
-    int i_nav_left = config_GetInt( p_intf, "nav-left-key" );
-    int i_nav_right = config_GetInt( p_intf, "nav-right-key" );
-    int i_nav_activate = config_GetInt( p_intf, "nav-activate-key" );
 
     if( InitThread( p_intf ) < 0 )
     {
@@ -223,30 +220,40 @@ static void RunIntf( intf_thread_t *p_intf )
         if( p_intf->p_sys->b_key_pressed )
         {
             vlc_value_t val;
-            int i_activate;
+            int i, i_activate, i_action = -1;
+            struct hotkey *p_hotkeys = p_intf->p_vlc->p_hotkeys;
 
             p_intf->p_sys->b_key_pressed = VLC_FALSE;
             
+            /* Find action triggered by hotkey (if any) */
             var_Get( p_intf->p_vlc, "key-pressed", &val );
-            if ( val.i_int )
+            for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
             {
-                if( val.i_int == i_nav_left )
+                if( p_hotkeys[i].i_key == val.i_int )
+                {
+                    i_action = p_hotkeys[i].i_action;
+                }
+            }
+
+            if( i_action )
+            {
+                if( i_action == ACTIONID_NAV_LEFT )
                 {
                     p_intf->p_sys->control.type = DVDCtrlLeftButtonSelect;
                 }
-                else if( val.i_int == i_nav_right )
+                else if( i_action == ACTIONID_NAV_RIGHT )
                 {
                     p_intf->p_sys->control.type = DVDCtrlRightButtonSelect;
                 }
-                else if( val.i_int == i_nav_up )
+                else if( i_action == ACTIONID_NAV_UP )
                 {
                     p_intf->p_sys->control.type = DVDCtrlUpperButtonSelect;
                 }
-                else if( val.i_int == i_nav_down )
+                else if( i_action == ACTIONID_NAV_DOWN )
                 {
                     p_intf->p_sys->control.type = DVDCtrlLowerButtonSelect;
                 }
-                else if( val.i_int == i_nav_activate )
+                else if( i_action == ACTIONID_NAV_ACTIVATE )
                 {
                     p_intf->p_sys->control.type = DVDCtrlButtonActivate;
                 }

@@ -2,7 +2,7 @@
  * configuration.c management of the modules configuration
  *****************************************************************************
  * Copyright (C) 2001 VideoLAN
- * $Id: configuration.c,v 1.65 2003/09/24 21:31:54 gbazin Exp $
+ * $Id: configuration.c,v 1.66 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -1141,8 +1141,6 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc, char *ppsz_argv[],
     /* Set default configuration and copy arguments */
     p_this->p_vlc->i_argc    = *pi_argc;
     p_this->p_vlc->ppsz_argv = ppsz_argv;
-
-    p_this->p_vlc->p_channel = NULL;
 
 #ifdef SYS_DARWIN
     /* When vlc.app is run by double clicking in Mac OS X, the 2nd arg

@@ -2,7 +2,7 @@
  * interface.cpp : wxWindows plugin for vlc
  *****************************************************************************
  * Copyright (C) 2000-2001 VideoLAN
- * $Id: interface.cpp,v 1.67 2003/10/19 22:52:11 sigmunau Exp $
+ * $Id: interface.cpp,v 1.68 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Gildas Bazin <gbazin@netcourrier.com>
  *
@@ -632,28 +632,30 @@ void Interface::UpdateAcceleratorTable()
 {
     /* Set some hotkeys */
     wxAcceleratorEntry entries[7];
-    int i_key = config_GetInt( p_intf, "quit-key" );
+    vlc_value_t val;
     int i = 0;
-    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
-                    Exit_Event );
-    i_key = config_GetInt( p_intf, "stop-key" );
-    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
-                    StopStream_Event );
-    i_key = config_GetInt( p_intf, "play-pause-key" );
-    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
-                    PlayStream_Event );
-    i_key = config_GetInt( p_intf, "next-key" );
-    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
-                    NextStream_Event );
-    i_key = config_GetInt( p_intf, "prev-key" );
-    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
-                    PrevStream_Event );
-    i_key = config_GetInt( p_intf, "faster-key" );
-    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
-                    FastStream_Event );
-    i_key = config_GetInt( p_intf, "slower-key" );
-    entries[i++].Set( ConvertHotkeyModifiers( i_key ), ConvertHotkey( i_key ),
-                    SlowStream_Event );
+
+    var_Get( p_intf->p_vlc, "key-quit", &val );
+    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
+                      ConvertHotkey( val.i_int ), Exit_Event );
+    var_Get( p_intf->p_vlc, "key-stop", &val );
+    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
+                      ConvertHotkey( val.i_int ), StopStream_Event );
+    var_Get( p_intf->p_vlc, "key-play-pause", &val );
+    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
+                      ConvertHotkey( val.i_int ), PlayStream_Event );
+    var_Get( p_intf->p_vlc, "key-next", &val );
+    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
+                      ConvertHotkey( val.i_int ), NextStream_Event );
+    var_Get( p_intf->p_vlc, "key-prev", &val );
+    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
+                      ConvertHotkey( val.i_int ), PrevStream_Event );
+    var_Get( p_intf->p_vlc, "key-faster", &val );
+    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
+                      ConvertHotkey( val.i_int ), FastStream_Event );
+    var_Get( p_intf->p_vlc, "key-slower", &val );
+    entries[i++].Set( ConvertHotkeyModifiers( val.i_int ),
+                      ConvertHotkey( val.i_int ), SlowStream_Event );
 
     wxAcceleratorTable accel( 7, entries );
 
@@ -664,8 +666,6 @@ void Interface::UpdateAcceleratorTable()
     msg_Dbg( p_intf, "accelerator table loaded" );
 
 }
-
-
 
 /*****************************************************************************
  * Event Handlers.

@@ -2,7 +2,7 @@
  * hotkeys.h: keycode defines
  *****************************************************************************
  * Copyright (C) 2003 VideoLAN
- * $Id: vlc_keys.h,v 1.4 2003/10/28 20:15:48 hartman Exp $
+ * $Id: vlc_keys.h,v 1.5 2003/10/29 01:33:27 gbazin Exp $
  *
  * Authors: Sigmund Augdal <sigmunau@idi.ntnu.no>
  *
@@ -162,3 +162,20 @@ static inline char *KeyToString( int i_key )
     return NULL;
 }
 
+#define ACTIONID_QUIT                  1
+#define ACTIONID_PLAY_PAUSE            2
+#define ACTIONID_PLAY                  3
+#define ACTIONID_PAUSE                 4
+#define ACTIONID_STOP                  5
+#define ACTIONID_PREV                  6
+#define ACTIONID_NEXT                  7
+#define ACTIONID_SLOWER                8
+#define ACTIONID_FASTER                9
+#define ACTIONID_FULLSCREEN            10
+#define ACTIONID_VOL_UP                11
+#define ACTIONID_VOL_DOWN              12
+#define ACTIONID_NAV_ACTIVATE          13
+#define ACTIONID_NAV_UP                14
+#define ACTIONID_NAV_DOWN              15
+#define ACTIONID_NAV_LEFT              16
+#define ACTIONID_NAV_RIGHT             17
